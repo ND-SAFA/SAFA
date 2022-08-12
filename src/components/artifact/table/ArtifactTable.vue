@@ -39,7 +39,7 @@
 
       <template v-slot:[`item.type`]="{ item }">
         <td>
-          <artifact-table-chip :text="item.type" display-icon />
+          <table-chip :text="item.type" display-icon />
         </td>
       </template>
 
@@ -88,8 +88,12 @@ import {
   errorModule,
 } from "@/store";
 import { handleDeleteArtifact } from "@/api";
-import { GenericIconButton, Typography, FlexBox } from "@/components/common";
-import ArtifactTableChip from "./ArtifactTableChip.vue";
+import {
+  GenericIconButton,
+  Typography,
+  FlexBox,
+  TableChip,
+} from "@/components/common";
 import ArtifactTableHeader from "./ArtifactTableHeader.vue";
 import ArtifactTableCell from "./ArtifactTableCell.vue";
 import ArtifactTableDeltaChip from "./ArtifactTableDeltaChip.vue";
@@ -104,7 +108,7 @@ export default Vue.extend({
     Typography,
     ArtifactTableDeltaChip,
     ArtifactTableHeader,
-    ArtifactTableChip,
+    TableChip,
     GenericIconButton,
     ArtifactTableCell,
   },

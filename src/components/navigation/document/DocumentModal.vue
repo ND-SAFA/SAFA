@@ -108,7 +108,7 @@ export default Vue.extend({
      */
     isNameValid(): boolean {
       return (
-        !documentModule.doesDocumentExist(this.document?.name) ||
+        !documentModule.doesDocumentExist(this.editingDocument?.name) ||
         this.editingDocument.name === this.document?.name
       );
     },

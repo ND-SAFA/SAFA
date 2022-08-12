@@ -53,7 +53,7 @@
       </template>
 
       <template v-slot:[`item.actions`]="{ item }">
-        <td>
+        <td @click.stop="">
           <generic-icon-button
             icon-id="mdi-pencil"
             :tooltip="`Edit '${item.name}'`"

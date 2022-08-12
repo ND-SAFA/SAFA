@@ -60,6 +60,7 @@ public class AppRoutes {
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
         public static class Documents {
             public static final String CREATE_OR_UPDATE_DOCUMENT = PROJECT_PREFIX + "/versions/{versionId}/documents";
+            public static final String GET_DOCUMENT_BY_ID = PROJECT_PREFIX + "/documents/{documentId}";
             public static final String GET_PROJECT_DOCUMENTS = PROJECT_PREFIX + "/{projectId}/documents";
             public static final String DELETE_DOCUMENT = PROJECT_PREFIX + "/documents/{documentId}";
             public static final String SET_CURRENT_DOCUMENT = PROJECT_PREFIX + "/documents/current/{documentId}";

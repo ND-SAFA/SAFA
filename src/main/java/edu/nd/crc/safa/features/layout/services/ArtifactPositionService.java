@@ -1,6 +1,10 @@
 package edu.nd.crc.safa.features.layout.services;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
@@ -55,11 +59,22 @@ public class ArtifactPositionService {
             artifactPosition.setArtifactVersion(artifactVersion);
             artifactPosition.setDocument(document);
         }
-        
+
         // Step 3 - Set position
         artifactPosition.setX(layoutPosition.getX());
         artifactPosition.setY(layoutPosition.getY());
 
         return artifactPosition;
+    }
+
+    public Map<String, LayoutPosition> retrieveDocumentLayout(UUID documentId) {
+        Map<String, LayoutPosition> layout = new HashMap<>();
+        List<ArtifactPosition> artifactPositions = this.artifactPositionRepository.findByDocumentDocumentId(documentId);
+        for (ArtifactPosition artifactPosition : artifactPositions) {
+            String artifactId = artifactPosition.getArtifactVersion().getArtifact().getArtifactId().toString();
+            LayoutPosition layoutPosition = new LayoutPosition(artifactPosition.getX(), artifactPosition.getY());
+            layout.put(artifactId, layoutPosition);
+        }
+        return layout;
     }
 }

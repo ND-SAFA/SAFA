@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.features.layout.repositories;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -11,4 +12,6 @@ import org.springframework.data.repository.CrudRepository;
 
 public interface ArtifactPositionRepository extends CrudRepository<ArtifactPosition, UUID> {
     Optional<ArtifactPosition> findByArtifactVersionAndDocument(ArtifactVersion artifactVersion, Document document);
+
+    List<ArtifactPosition> findByDocumentDocumentId(UUID documentId);
 }

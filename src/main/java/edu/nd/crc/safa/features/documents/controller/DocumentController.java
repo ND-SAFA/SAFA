@@ -56,6 +56,7 @@ public class DocumentController extends BaseDocumentController {
         this.layoutService = layoutService;
     }
 
+
     /**
      * Persists given document object as a new document a part of the specified project.
      *
@@ -112,7 +113,6 @@ public class DocumentController extends BaseDocumentController {
         return documentLayoutMap.get(documentAppEntity.getDocumentId().toString());
     }
 
-
     /**
      * Returns the Documents associated with given specified project.
      *
@@ -124,6 +124,14 @@ public class DocumentController extends BaseDocumentController {
     public List<DocumentAppEntity> getProjectDocuments(@PathVariable UUID projectId) throws SafaError {
         Project project = resourceBuilder.fetchProject(projectId).withViewProject();
         return this.documentService.getDocumentsInProject(project);
+    }
+
+    @GetMapping(AppRoutes.Projects.Documents.GET_DOCUMENT_BY_ID)
+    public DocumentAppEntity getDocumentBdId(@PathVariable UUID documentId) throws SafaError {
+        Document document = this.documentService.getDocumentById(documentId);
+        Project project = document.getProject();
+        resourceBuilder.setProject(project).withViewProject();
+        return this.documentService.createDocumentAppEntity(document);
     }
 
     /**

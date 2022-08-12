@@ -2,6 +2,7 @@
   <private-page>
     <template v-slot:page>
       <back-button text="Back To Tree View" />
+      <trace-link-table />
       <approval-section
         show-approve
         show-decline
@@ -40,11 +41,16 @@ import {
 } from "@/types";
 import { projectModule } from "@/store";
 import { handleApproveLink, handleDeclineLink, getGeneratedLinks } from "@/api";
-import { ApprovalSection, PrivatePage, BackButton } from "@/components";
+import {
+  ApprovalSection,
+  PrivatePage,
+  BackButton,
+  TraceLinkTable,
+} from "@/components";
 
 export default Vue.extend({
   name: "ApproveLinksView",
-  components: { BackButton, PrivatePage, ApprovalSection },
+  components: { TraceLinkTable, BackButton, PrivatePage, ApprovalSection },
   data() {
     return {
       links: [] as TraceLinkModel[],

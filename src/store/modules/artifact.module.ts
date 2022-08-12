@@ -150,8 +150,8 @@ export default class ArtifactModule extends VuexModule {
   /**
    * @return A collection of artifacts, keyed by their id.
    */
-  get getArtifactsById(): Record<string, ArtifactModel> {
-    return this.artifacts
+  get getAllArtifactsById(): Record<string, ArtifactModel> {
+    return this.allArtifacts
       .map((artifact) => ({ [artifact.id]: artifact }))
       .reduce((acc, cur) => ({ ...acc, ...cur }), {});
   }

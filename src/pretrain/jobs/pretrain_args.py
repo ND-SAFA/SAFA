@@ -6,7 +6,7 @@ from pretrain.data.corpuses.domain import Domain, get_path
 from pretrain.electra.configure_pretraining import PretrainingConfig
 
 
-class ModelPretrainArgs(PretrainingConfig):
+class PretrainArgs(PretrainingConfig):
     num_processes: int = 1
     blanks_separate_docs: bool = False
     strip_accents: bool = True

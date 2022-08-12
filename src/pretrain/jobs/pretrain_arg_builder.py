@@ -4,7 +4,7 @@ from common.models.base_models.supported_base_model import SupportedBaseModel
 from common.models.model_generator import ModelGenerator
 from common.models.model_properties import ModelSize
 from pretrain.data.corpuses.domain import Domain
-from pretrain.jobs.pretrain_args import ModelPretrainArgs
+from pretrain.jobs.pretrain_args import PretrainArgs
 
 
 class PretrainArgBuilder(AbstractArgBuilder):
@@ -26,7 +26,7 @@ class PretrainArgBuilder(AbstractArgBuilder):
         self.model_size = model_size
         self.kwargs = kwargs
 
-    def build(self) -> ModelPretrainArgs:
+    def build(self) -> PretrainArgs:
         """
         Creates Pretraining arguments for pretraining a model.
         :return: Arguments for pretraining a model
@@ -34,7 +34,7 @@ class PretrainArgBuilder(AbstractArgBuilder):
         model_generator = ModelGenerator(SupportedBaseModel.ELECTRA_TRACE_SINGLE.name,
                                          PRETRAIN_MODEL_PATH.format(self.model_size.value),
                                          model_size=self.model_size)
-        return ModelPretrainArgs(
+        return PretrainArgs(
             model_generator=model_generator,
             output_path=self.output_path,
             corpus_dir=self.corpus_dir,

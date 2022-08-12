@@ -8,7 +8,7 @@ from transformers.trainer import Trainer
 from transformers.trainer_pt_utils import get_tpu_sampler, is_torch_tpu_available
 from transformers.trainer_utils import PredictionOutput
 
-from trace.jobs.trace_args import ModelTraceArgs
+from trace.jobs.trace_args import TraceArgs
 from trace.metrics.supported_metrics import get_metric_path
 
 
@@ -17,7 +17,7 @@ class TraceTrainer(Trainer):
     Responsible for using given model for training and prediction using given dataset.
     """
 
-    def __init__(self, args: ModelTraceArgs):
+    def __init__(self, args: TraceArgs):
         """
         Handles the training and evaluation of learning models
         :param args: the learning model arguments

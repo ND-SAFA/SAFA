@@ -5,7 +5,7 @@ from common.jobs.abstract_arg_builder import AbstractArgBuilder
 from common.models.model_generator import ModelGenerator
 from trace.data.trace_dataset_creator import TraceDatasetCreator
 
-from trace.jobs.trace_args import ModelTraceArgs
+from trace.jobs.trace_args import TraceArgs
 
 
 class TraceArgBuilder(AbstractArgBuilder):
@@ -30,7 +30,7 @@ class TraceArgBuilder(AbstractArgBuilder):
         self.targets = targets
         self.kwargs = kwargs
 
-    def build(self) -> ModelTraceArgs:
+    def build(self) -> TraceArgs:
         """
         Builds training arguments for some pretrained model.
         :return: Arguments for trace job including training and predicting trace links
@@ -41,7 +41,7 @@ class TraceArgBuilder(AbstractArgBuilder):
                                                     true_links=self.links,
                                                     model_generator=model_generator,
                                                     linked_targets_only=LINKED_TARGETS_ONLY_DEFAULT)
-        return ModelTraceArgs(model_generator=model_generator,
-                              trace_dataset_creator=trace_dataset_creator,
-                              output_path=self.output_path,
-                              kwargs=self.kwargs)
+        return TraceArgs(model_generator=model_generator,
+                         trace_dataset_creator=trace_dataset_creator,
+                         output_path=self.output_path,
+                         kwargs=self.kwargs)

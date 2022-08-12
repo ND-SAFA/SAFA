@@ -1,19 +1,19 @@
 import {
-  Artifact,
-  ArtifactType,
+  ArtifactModel,
+  ArtifactTypeModel,
   ColumnDataType,
   Commit,
   ConfirmationType,
   ConfirmDialogueMessage,
-  DocumentColumn,
+  ColumnModel,
   DocumentType,
   FTANodeType,
   MessageType,
-  Project,
+  ProjectModel,
   ProjectDelta,
-  ProjectDocument,
-  ProjectIdentifier,
-  ProjectVersion,
+  DocumentModel,
+  IdentifierModel,
+  VersionModel,
   SafetyCaseType,
   SessionModel,
   SnackbarMessage,
@@ -56,8 +56,8 @@ export function createSession(): SessionModel {
  * @return An empty project identifier.
  */
 export function createProjectIdentifier(
-  identifier?: Partial<ProjectIdentifier>
-): ProjectIdentifier {
+  identifier?: Partial<IdentifierModel>
+): IdentifierModel {
   return {
     name: identifier?.name || "",
     projectId: identifier?.projectId || "",
@@ -70,7 +70,7 @@ export function createProjectIdentifier(
 /**
  * @return An empty project.
  */
-export function createProject(project?: Partial<Project>): Project {
+export function createProject(project?: Partial<ProjectModel>): ProjectModel {
   return {
     ...createProjectIdentifier(project),
     artifacts: project?.artifacts || [],
@@ -104,7 +104,9 @@ export function createProjectDelta(): ProjectDelta {
 /**
  * @return An artifact initialized to the given props.
  */
-export function createArtifact(artifact?: Partial<Artifact>): Artifact {
+export function createArtifact(
+  artifact?: Partial<ArtifactModel>
+): ArtifactModel {
   return {
     id: artifact?.id || "",
     baseEntityId: artifact?.baseEntityId || "",
@@ -131,9 +133,9 @@ export function createArtifact(artifact?: Partial<Artifact>): Artifact {
  * @return An artifact initialized to the given props.
  */
 export function createArtifactOfType(
-  artifact: Partial<Artifact> | undefined,
+  artifact: Partial<ArtifactModel> | undefined,
   type: true | string
-): Artifact {
+): ArtifactModel {
   if (typeof type === "string") {
     const isFTA = type in FTANodeType;
     const isSC = type in SafetyCaseType;
@@ -169,7 +171,7 @@ export function createArtifactOfType(
 /**
  * @return An column initialized to the given props.
  */
-export function createColumn(column?: Partial<DocumentColumn>): DocumentColumn {
+export function createColumn(column?: Partial<ColumnModel>): ColumnModel {
   return {
     id: column?.id || "",
     name: column?.name || "",
@@ -181,7 +183,7 @@ export function createColumn(column?: Partial<DocumentColumn>): DocumentColumn {
 /**
  * @returns An empty commit.
  */
-export function createCommit(version: ProjectVersion): Commit {
+export function createCommit(version: VersionModel): Commit {
   return {
     commitVersion: version,
     artifacts: {
@@ -201,19 +203,21 @@ export function createCommit(version: ProjectVersion): Commit {
  * @returns A record mapping the lowercase artifact type name to the corresponding default icon.
  */
 export function createDefaultTypeIcons(
-  artifactTypes: ArtifactType[] = []
+  artifactTypes: ArtifactTypeModel[] = []
 ): Record<string, string> {
   return artifactTypes
     .map((t) => ({ [t.name]: t.icon }))
-    .reduce((acc, cur) => ({ ...acc, ...cur }), { default: "mdi-help" });
+    .reduce((acc, cur) => ({ ...acc, ...cur }), {
+      default: "mdi-alpha-a-box-outline",
+    });
 }
 
 /**
  * @return An document initialized to the given props.
  */
 export function createDocument(
-  document?: Partial<ProjectDocument>
-): ProjectDocument {
+  document?: Partial<DocumentModel>
+): DocumentModel {
   return {
     documentId: document?.documentId || "",
     project: document?.project || {

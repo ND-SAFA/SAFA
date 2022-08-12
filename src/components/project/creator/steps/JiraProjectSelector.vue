@@ -26,7 +26,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { JiraProject } from "@/types";
+import { JiraProjectModel } from "@/types";
 import { GenericStepperListStep } from "@/components";
 
 /**
@@ -41,7 +41,7 @@ export default Vue.extend({
   },
   props: {
     projects: {
-      type: Array as PropType<JiraProject[]>,
+      type: Array as PropType<JiraProjectModel[]>,
       required: true,
     },
     loading: {
@@ -54,7 +54,7 @@ export default Vue.extend({
      * Handles a click to select a project.
      * @param project - The project to select.
      */
-    handleProjectSelect(project: JiraProject) {
+    handleProjectSelect(project: JiraProjectModel) {
       this.$emit("select", project);
     },
     /**
@@ -62,7 +62,7 @@ export default Vue.extend({
      * @param project - The project to extract from.
      * @return The subtitle.
      */
-    getProjectSubtitle(project: JiraProject): string {
+    getProjectSubtitle(project: JiraProjectModel): string {
       const {
         key,
         insight: { totalIssueCount },

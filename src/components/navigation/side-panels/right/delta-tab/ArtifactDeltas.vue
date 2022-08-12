@@ -1,9 +1,9 @@
 <template>
   <v-container v-if="isDeltaMode">
-    <h2 class="text-h6">Artifacts</h2>
-    <v-divider class="mb-2" />
+    <typography el="h2" variant="subtitle" value="Artifacts" />
+    <v-divider />
 
-    <v-expansion-panels class="ma-0 pa-0" multiple v-model="openPanels">
+    <v-list expand>
       <delta-button-group
         delta-type="added"
         :items="addedArtifacts"
@@ -19,15 +19,16 @@
         :items="modifiedArtifacts"
         @click="handleModifiedSelect"
       />
-      <artifact-delta-diff
-        v-if="selectedDeltaArtifact !== undefined"
-        :isOpen="selectedDeltaArtifact !== undefined"
-        :name="selectedDeltaArtifact.name"
-        :input-artifact="selectedDeltaArtifact.artifact"
-        :delta-type="selectedDeltaArtifact.deltaType"
-        @close="handleCloseModal"
-      />
-    </v-expansion-panels>
+    </v-list>
+
+    <artifact-delta-diff
+      v-if="selectedDeltaArtifact !== undefined"
+      :isOpen="selectedDeltaArtifact !== undefined"
+      :name="selectedDeltaArtifact.name"
+      :input-artifact="selectedDeltaArtifact.artifact"
+      :delta-type="selectedDeltaArtifact.deltaType"
+      @close="handleCloseModal"
+    />
   </v-container>
 </template>
 
@@ -35,6 +36,7 @@
 import Vue from "vue";
 import { DeltaType, DeltaArtifact, ChangedArtifact } from "@/types";
 import { deltaModule } from "@/store";
+import { Typography } from "@/components/common";
 import DeltaButtonGroup from "./DeltaButtonGroup.vue";
 import ArtifactDeltaDiff from "./ArtifactDeltaDiff.vue";
 
@@ -45,7 +47,7 @@ import ArtifactDeltaDiff from "./ArtifactDeltaDiff.vue";
  */
 export default Vue.extend({
   name: "ArtifactDeltas",
-  components: { ArtifactDeltaDiff, DeltaButtonGroup },
+  components: { ArtifactDeltaDiff, DeltaButtonGroup, Typography },
   data() {
     return {
       selectedDeltaArtifact: undefined as ChangedArtifact | undefined,

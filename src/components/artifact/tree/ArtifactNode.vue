@@ -4,7 +4,11 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { Artifact, ArtifactCytoCoreElement, ArtifactDeltaState } from "@/types";
+import {
+  ArtifactModel,
+  ArtifactCytoCoreElement,
+  ArtifactDeltaState,
+} from "@/types";
 import {
   artifactSelectionModule,
   deltaModule,
@@ -16,7 +20,7 @@ export default Vue.extend({
   name: "ArtifactNode",
   props: {
     artifactDefinition: {
-      type: Object as PropType<Artifact>,
+      type: Object as PropType<ArtifactModel>,
       required: true,
     },
     hidden: Boolean,

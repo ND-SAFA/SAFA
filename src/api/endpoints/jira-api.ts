@@ -1,10 +1,10 @@
 import {
-  InternalJiraCredentials,
-  JiraAccessToken,
-  JiraCloudSite,
-  JiraProject,
-  JiraProjectList,
-  Job,
+  InternalJiraCredentialsModel,
+  JiraAccessTokenModel,
+  JiraCloudSiteModel,
+  JiraProjectModel,
+  JiraProjectListModel,
+  JobModel,
 } from "@/types";
 import { sessionModule } from "@/store";
 import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
@@ -75,8 +75,8 @@ export function authorizeJira(): void {
  */
 export async function getJiraToken(
   accessCode: string
-): Promise<JiraAccessToken> {
-  return fetchAtlassian<JiraAccessToken>(
+): Promise<JiraAccessTokenModel> {
+  return fetchAtlassian<JiraAccessTokenModel>(
     "https://auth.atlassian.com/oauth/token",
     {
       method: "POST",
@@ -102,8 +102,8 @@ export async function getJiraToken(
  */
 export async function getJiraRefreshToken(
   refreshToken: string
-): Promise<JiraAccessToken> {
-  return fetchAtlassian<JiraAccessToken>(
+): Promise<JiraAccessTokenModel> {
+  return fetchAtlassian<JiraAccessTokenModel>(
     "https://auth.atlassian.com/oauth/token",
     {
       method: "POST",
@@ -128,8 +128,8 @@ export async function getJiraRefreshToken(
  */
 export async function getJiraCloudSites(
   accessToken: string
-): Promise<JiraCloudSite[]> {
-  return fetchAtlassian<JiraCloudSite[]>(
+): Promise<JiraCloudSiteModel[]> {
+  return fetchAtlassian<JiraCloudSiteModel[]>(
     "https://api.atlassian.com/oauth/token/accessible-resources",
     {
       method: "GET",
@@ -152,8 +152,8 @@ export async function getJiraCloudSites(
 export async function getJiraProjects(
   accessToken: string,
   cloudId: string
-): Promise<JiraProject[]> {
-  const projects = await fetchAtlassian<JiraProjectList>(
+): Promise<JiraProjectModel[]> {
+  const projects = await fetchAtlassian<JiraProjectListModel>(
     `https://api.atlassian.com/ex/jira/${cloudId}/rest/api/3/project/search?expand=insight`,
     {
       method: "GET",
@@ -173,7 +173,7 @@ export async function getJiraProjects(
  * @param credentials - The access and refresh token received from authorizing Jira.
  */
 export async function saveJiraCredentials(
-  credentials: InternalJiraCredentials
+  credentials: InternalJiraCredentialsModel
 ): Promise<void> {
   return authHttpClient<void>(Endpoint.jiraCredentials, {
     method: "POST",
@@ -190,8 +190,8 @@ export async function saveJiraCredentials(
 export async function createJiraProject(
   cloudId: string,
   projectId: string
-): Promise<Job> {
-  return authHttpClient<Job>(
+): Promise<JobModel> {
+  return authHttpClient<JobModel>(
     fillEndpoint(Endpoint.jiraProject, { cloudId, projectId }),
     {
       method: "POST",

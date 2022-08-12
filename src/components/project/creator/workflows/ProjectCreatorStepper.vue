@@ -5,8 +5,6 @@
     submitText="Create Project"
     @submit="saveProject()"
   >
-    <v-row>Create a new project</v-row>
-
     <template v-slot:items>
       <v-stepper-content step="1">
         <project-identifier-input
@@ -71,14 +69,14 @@
 <script lang="ts">
 import Vue from "vue";
 import {
-  Artifact,
+  ArtifactModel,
   ArtifactMap,
-  Project,
-  ProjectMembership,
+  ProjectModel,
+  MembershipModel,
   ProjectRole,
   StepState,
   TraceFile,
-  TraceLink,
+  TraceLinkModel,
 } from "@/types";
 import { createProject } from "@/util";
 import {
@@ -152,7 +150,7 @@ export default Vue.extend({
     /**
      * @return All artifacts.
      */
-    artifacts(): Artifact[] {
+    artifacts(): ArtifactModel[] {
       return this.artifactUploader.panels
         .map(({ projectFile }) => projectFile.artifacts || [])
         .reduce((acc, cur) => [...acc, ...cur], []);
@@ -174,7 +172,7 @@ export default Vue.extend({
     /**
      * @return All trace links.
      */
-    traces(): TraceLink[] {
+    traces(): TraceLinkModel[] {
       return this.traceUploader.panels
         .map(({ projectFile }) => projectFile.traces || [])
         .reduce((acc, cur) => [...acc, ...cur], []);
@@ -188,8 +186,8 @@ export default Vue.extend({
     /**
      * @return The project to create.
      */
-    project(): Project {
-      const user: ProjectMembership = {
+    project(): ProjectModel {
+      const user: MembershipModel = {
         projectMembershipId: "",
         email: sessionModule.userEmail,
         role: ProjectRole.OWNER,

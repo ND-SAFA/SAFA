@@ -1,11 +1,11 @@
 import {
   ArtifactMap,
   IGenericUploader,
-  Artifact,
+  ArtifactModel,
   TraceFile,
-  ParseTraceFileResponse,
-  Link,
-  TraceLink,
+  ParseTraceFileModel,
+  LinkModel,
+  TraceLinkModel,
   TracePanel,
 } from "@/types";
 import { parseTraceFile, createGeneratedLinks } from "@/api";
@@ -19,7 +19,7 @@ const DEFAULT_IS_GENERATED = false;
  */
 export function createTraceUploader(): IGenericUploader<
   ArtifactMap,
-  Link,
+  LinkModel,
   TraceFile
 > {
   return {
@@ -33,7 +33,7 @@ export function createTraceUploader(): IGenericUploader<
  *
  * @param traceLink - The like to create the panel for.
  */
-function createNewPanel(traceLink: Link): TracePanel {
+function createNewPanel(traceLink: LinkModel): TracePanel {
   const emptyArtifactFile: TraceFile = createTraceFile(traceLink);
   return {
     title: extractTraceId(traceLink),
@@ -66,11 +66,11 @@ function generateTraceLinks(
 ): Promise<void> {
   const sourceType = panel.projectFile.sourceId;
   const targetType = panel.projectFile.targetId;
-  const artifacts: Artifact[] = Object.values(artifactMap);
-  const sourceArtifacts: Artifact[] = artifacts.filter(
+  const artifacts: ArtifactModel[] = Object.values(artifactMap);
+  const sourceArtifacts: ArtifactModel[] = artifacts.filter(
     (a) => a.type === sourceType
   );
-  const targetArtifacts: Artifact[] = artifacts.filter(
+  const targetArtifacts: ArtifactModel[] = artifacts.filter(
     (a) => a.type === targetType
   );
 
@@ -87,7 +87,7 @@ function generateTraceLinks(
  *
  * @param traceLink - The trace link in this file.
  */
-function createTraceFile(traceLink: Link): TraceFile {
+function createTraceFile(traceLink: LinkModel): TraceFile {
   return {
     sourceId: traceLink.sourceId,
     targetId: traceLink.targetId,
@@ -139,9 +139,9 @@ function createParsedArtifactFile(
   file: File
 ): Promise<void> {
   return parseTraceFile(file)
-    .then((res: ParseTraceFileResponse) => {
+    .then((res: ParseTraceFileModel) => {
       const { entities, errors } = res;
-      const validTraces: TraceLink[] = [];
+      const validTraces: TraceLinkModel[] = [];
 
       entities.forEach((link) => {
         const error = getTraceError(panel.projectFile, artifactMap, link);
@@ -175,8 +175,8 @@ function createParsedArtifactFile(
  */
 function getTraceError(
   traceFile: TraceFile,
-  artifactMap: Record<string, Artifact>,
-  traceLink: Link
+  artifactMap: Record<string, ArtifactModel>,
+  traceLink: LinkModel
 ): string | undefined {
   const { sourceName, targetName } = traceLink;
 

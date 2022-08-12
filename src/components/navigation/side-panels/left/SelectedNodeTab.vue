@@ -2,20 +2,26 @@
   <v-container class="mb-10">
     <div v-if="selectedArtifact !== undefined">
       <artifact-title />
-      <v-divider class="mb-2" />
-      <p class="text-body-1">{{ artifactBody }}</p>
+      <v-divider />
+      <typography
+        defaultExpanded
+        y="2"
+        variant="expandable"
+        :value="artifactBody"
+      />
       <artifact-traces />
       <artifact-documents />
       <artifact-errors />
     </div>
 
-    <p v-else class="text-caption">No artifact is selected.</p>
+    <typography v-else align="center" el="p" value="No artifact is selected." />
   </v-container>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import { artifactSelectionModule } from "@/store";
+import { Typography } from "@/components/common";
 import ArtifactTitle from "./ArtifactTitle.vue";
 import ArtifactTraces from "./ArtifactTraces.vue";
 import ArtifactDocuments from "./ArtifactDocuments.vue";
@@ -31,6 +37,7 @@ export default Vue.extend({
     ArtifactDocuments,
     ArtifactTraces,
     ArtifactTitle,
+    Typography,
   },
   computed: {
     /**

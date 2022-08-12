@@ -1,23 +1,16 @@
 <template>
-  <v-row>
-    <v-col>
-      <v-row>
-        <v-col cols="11">
-          <h1 class="text-h4">{{ project.name }}</h1>
-        </v-col>
-        <v-col cols="1">
-          <generic-icon-button
-            tooltip="Edit title"
-            icon-id="mdi-pencil"
-            @click="handleEdit"
-          />
-        </v-col>
-      </v-row>
-      <v-divider />
-      <p class="text-body-1">
-        {{ project.description }}
-      </p>
-    </v-col>
+  <v-container>
+    <flex-box justify="space-between">
+      <typography el="h1" variant="title" :value="project.name" />
+      <generic-icon-button
+        tooltip="Edit title"
+        icon-id="mdi-pencil"
+        @click="handleEdit"
+      />
+    </flex-box>
+    <v-divider />
+    <typography :value="project.description" />
+
     <project-identifier-modal
       title="Edit Project"
       :is-open="isEditOpen"
@@ -26,16 +19,16 @@
       @close="isEditOpen = false"
       @save="handleSave"
     />
-  </v-row>
+  </v-container>
 </template>
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { Project, ProjectIdentifier } from "@/types";
-import { GenericIconButton } from "@/components/common";
-import { ProjectIdentifierModal } from "@/components/project/shared";
+import { ProjectModel, IdentifierModel } from "@/types";
 import { handleSaveProject } from "@/api";
 import { projectModule } from "@/store";
+import { GenericIconButton, Typography, FlexBox } from "@/components/common";
+import { ProjectIdentifierModal } from "@/components/project/shared";
 
 /**
  * Represents the section describing the project name and descriptions
@@ -43,10 +36,15 @@ import { projectModule } from "@/store";
  */
 export default Vue.extend({
   name: "SettingsGeneralSection",
-  components: { GenericIconButton, ProjectIdentifierModal },
+  components: {
+    FlexBox,
+    Typography,
+    GenericIconButton,
+    ProjectIdentifierModal,
+  },
   props: {
     project: {
-      type: Object as PropType<Project>,
+      type: Object as PropType<ProjectModel>,
       required: true,
     },
   },
@@ -68,7 +66,7 @@ export default Vue.extend({
     /**
      * Attempts to save the project.
      */
-    handleSave(project: ProjectIdentifier): void {
+    handleSave(project: IdentifierModel): void {
       this.isEditLoading = true;
 
       handleSaveProject(

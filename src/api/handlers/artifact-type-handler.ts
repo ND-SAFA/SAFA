@@ -1,4 +1,4 @@
-import { ArtifactType } from "@/types";
+import { ArtifactTypeModel } from "@/types";
 import { saveArtifactType } from "@/api/endpoints/artifact-type-api";
 import { projectModule } from "@/store";
 
@@ -8,7 +8,7 @@ import { projectModule } from "@/store";
  * @param artifactType - The artifact type to add or edit.
  */
 export async function handleSaveArtifactType(
-  artifactType: ArtifactType
+  artifactType: ArtifactTypeModel
 ): Promise<void> {
   const updatedArtifactType = await saveArtifactType(
     projectModule.projectId,

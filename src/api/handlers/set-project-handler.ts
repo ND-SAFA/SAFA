@@ -1,4 +1,4 @@
-import { Project } from "@/types";
+import { ProjectModel } from "@/types";
 import { createProject } from "@/util";
 import { QueryParams, updateParam } from "@/router";
 import {
@@ -56,7 +56,7 @@ export async function handleClearProject(): Promise<void> {
  *
  * @param project - Project created containing entities.
  */
-export async function handleSetProject(project: Project): Promise<void> {
+export async function handleSetProject(project: ProjectModel): Promise<void> {
   const projectId = project.projectId;
   const versionId = project.projectVersion?.versionId || "";
   const isDifferentProject = projectModule.versionId !== versionId;
@@ -64,6 +64,7 @@ export async function handleSetProject(project: Project): Promise<void> {
   project.artifactTypes = await getProjectArtifactTypes(projectId);
 
   await handleSelectVersion(projectId, versionId);
+  artifactSelectionModule.clearSelections();
   await projectModule.initializeProject(project);
   await handleResetGraph(isDifferentProject);
   await handleLoadTraceMatrices();
@@ -84,7 +85,7 @@ export async function handleReloadProject(): Promise<void> {
  * Otherwise default document would continue to be in view.
  * @param project The project possibly containing a currentDocumentId.
  */
-async function setCurrentDocument(project: Project): Promise<void> {
+async function setCurrentDocument(project: ProjectModel): Promise<void> {
   if (project.currentDocumentId) {
     const documents = project.documents.filter(
       (d) => d.documentId === project.currentDocumentId

@@ -1,5 +1,5 @@
 <template>
-  <div class="d-flex flex-row">
+  <flex-box>
     <template v-for="definition in definitions">
       <icon-button
         v-if="!definition.isHidden && definition.type === iconType"
@@ -19,12 +19,13 @@
         :definition="definition"
       />
     </template>
-  </div>
+  </flex-box>
 </template>
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { ButtonDefinition, ButtonType } from "@/types";
+import { FlexBox } from "@/components/common/display";
 import IconButton from "./IconButton.vue";
 import CheckmarkMenu from "./CheckmarkMenu.vue";
 import ListMenu from "./ListMenu.vue";
@@ -34,7 +35,7 @@ import ListMenu from "./ListMenu.vue";
  */
 export default Vue.extend({
   name: "ButtonRow",
-  components: { IconButton, CheckmarkMenu, ListMenu },
+  components: { FlexBox, IconButton, CheckmarkMenu, ListMenu },
   props: {
     definitions: Array as PropType<ButtonDefinition[]>,
     large: Boolean,

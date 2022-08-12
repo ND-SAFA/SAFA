@@ -1,4 +1,4 @@
-import { ArtifactDeltaState, JobStatus } from "@/types";
+import { ApprovalType, ArtifactDeltaState, JobStatus } from "@/types";
 
 /**
  * Defines all colors in the theme.
@@ -21,16 +21,21 @@ export enum ThemeColors {
 }
 
 /**
- * Returns the background color for the given delta state.
- * @param deltaState - The delta state to get the color for.
+ * Returns the background color for the given state.
+ * @param state - The state to get the color for.
  * @return The color.
  */
-export function getBackgroundColor(deltaState?: ArtifactDeltaState): string {
-  switch (deltaState) {
+export function getBackgroundColor(
+  state?: ArtifactDeltaState | ApprovalType
+): string {
+  switch (state) {
+    case ApprovalType.APPROVED:
     case ArtifactDeltaState.ADDED:
       return ThemeColors.added;
+    case ApprovalType.UNREVIEWED:
     case ArtifactDeltaState.MODIFIED:
       return ThemeColors.modified;
+    case ApprovalType.DECLINED:
     case ArtifactDeltaState.REMOVED:
       return ThemeColors.removed;
     default:

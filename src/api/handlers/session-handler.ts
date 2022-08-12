@@ -1,11 +1,18 @@
-import { UserModel } from "@/types";
+import {
+  ConfirmationType,
+  IOHandlerCallback,
+  PasswordChangeModel,
+  UserModel,
+} from "@/types";
 import { createSession } from "@/util";
 import { getParam, getParams, navigateTo, QueryParams, Routes } from "@/router";
-import { sessionModule } from "@/store";
+import { logModule, sessionModule } from "@/store";
 import {
   handleLoadLastProject,
   handleClearProject,
   createLoginSession,
+  savePassword,
+  deleteAccount,
 } from "@/api";
 
 /**
@@ -56,4 +63,45 @@ export async function handleAuthentication(): Promise<void> {
   } catch (e) {
     await handleLogout();
   }
+}
+
+/**
+ * Updates a user's password.
+ *
+ * @param password - The old and new password.
+ * @param onSuccess - Called if the action is successful.
+ * @param onError - Called if the action fails.
+ */
+export function handleChangePassword(
+  password: PasswordChangeModel,
+  { onSuccess, onError }: IOHandlerCallback
+): void {
+  savePassword(password)
+    .then(() => {
+      logModule.onSuccess("Your password has been updated.");
+      onSuccess?.();
+    })
+    .catch((e) => {
+      logModule.onError("Unable to update your password.");
+      logModule.onDevError(e);
+      onError?.(e);
+    });
+}
+
+/**
+ * Confirms and deletes a user's account.
+ *
+ * @param password - The user's current password.
+ */
+export function handleDeleteAccount(password: string): void {
+  logModule.SET_CONFIRMATION_MESSAGE({
+    type: ConfirmationType.INFO,
+    title: `Delete your account?`,
+    body: `This action cannot be undone.`,
+    statusCallback: (isConfirmed: boolean) => {
+      if (!isConfirmed) return;
+
+      deleteAccount(password).then(handleLogout);
+    },
+  });
 }

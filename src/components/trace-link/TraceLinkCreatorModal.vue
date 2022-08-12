@@ -1,12 +1,12 @@
 <template>
   <generic-modal
-    title="Trace Link"
+    title="Create Trace Link"
     :is-open="isOpen"
     @close="$emit('close')"
     size="l"
   >
     <template v-slot:body>
-      <v-row class="mt-8">
+      <v-row class="mt-2">
         <v-col cols="6">
           <artifact-input
             v-model="sourceArtifactId"
@@ -24,25 +24,21 @@
       </v-row>
     </template>
     <template v-slot:actions>
-      <v-row justify="end" align="center">
-        <span v-if="!!errorMessage" class="text-body-1 error--text pr-2">
-          {{ errorMessage }}
-        </span>
-        <v-btn color="primary" :disabled="!canSave" @click="handleSubmit">
-          Create
-        </v-btn>
-      </v-row>
+      <v-spacer />
+      <typography color="error" r="2" :value="errorMessage" />
+      <v-btn color="primary" :disabled="!canSave" @click="handleSubmit">
+        Create
+      </v-btn>
     </template>
   </generic-modal>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { GenericModal } from "@/components/common";
-import ArtifactInput from "@/components/common/input/ArtifactInput.vue";
+import { GenericModal, Typography, ArtifactInput } from "@/components/common";
 import { artifactModule, traceModule } from "@/store";
 import { handleCreateLink } from "@/api";
-import { Artifact } from "@/types";
+import { ArtifactModel } from "@/types";
 
 /**
  * A modal for creating trace links.
@@ -51,7 +47,7 @@ import { Artifact } from "@/types";
  */
 export default Vue.extend({
   name: "TraceLinkCreatorModal",
-  components: { ArtifactInput, GenericModal },
+  components: { Typography, ArtifactInput, GenericModal },
   props: {
     isOpen: {
       type: Boolean,
@@ -76,13 +72,13 @@ export default Vue.extend({
     /**
      * @return The source artifact.
      */
-    sourceArtifact(): Artifact {
+    sourceArtifact(): ArtifactModel {
       return artifactModule.getArtifactById(this.sourceArtifactId);
     },
     /**
      * @return The source artifact.
      */
-    targetArtifact(): Artifact {
+    targetArtifact(): ArtifactModel {
       return artifactModule.getArtifactById(this.targetArtifactId);
     },
     /**

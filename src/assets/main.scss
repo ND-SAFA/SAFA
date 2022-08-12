@@ -1,5 +1,6 @@
 @import "./typography.scss";
 @import "./graph.scss";
+@import "./table.scss";
 @import "./context-menu.scss";
 
 .full-window-page {
@@ -22,11 +23,6 @@
   &-fit {
     width: fit-content;
   }
-}
-
-.text-ellipsis {
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .faded {

@@ -36,7 +36,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { ProjectIdentifier, ProjectVersion, DataItem } from "@/types";
+import { IdentifierModel, VersionModel, DataItem } from "@/types";
 import { getProjectVersions, handleDeleteVersion } from "@/api";
 import { projectModule } from "@/store";
 import { GenericSelector } from "@/components/common";
@@ -67,7 +67,7 @@ export default Vue.extend({
      * The currently selected project whose versions we are displaying.
      */
     project: {
-      type: Object as PropType<ProjectIdentifier>,
+      type: Object as PropType<IdentifierModel>,
       required: false,
     },
     hideCurrentVersion: {
@@ -108,8 +108,8 @@ export default Vue.extend({
             ...baseHeaders,
             { text: "Actions", value: "actions", sortable: false },
           ],
-      versions: [] as ProjectVersion[],
-      versionToDelete: undefined as ProjectVersion | undefined,
+      versions: [] as VersionModel[],
+      versionToDelete: undefined as VersionModel | undefined,
       deleteVersionDialogue: false,
       addVersionDialogue: false,
       isLoading: false,
@@ -127,7 +127,7 @@ export default Vue.extend({
     /**
      * @return The displayed versions.
      */
-    displayedVersions(): ProjectVersion[] {
+    displayedVersions(): VersionModel[] {
       return this.hideCurrentVersion
         ? this.versions.filter(
             ({ versionId }) => versionId !== projectModule.versionId
@@ -145,7 +145,7 @@ export default Vue.extend({
       this.isLoading = true;
 
       getProjectVersions(this.project.projectId)
-        .then((versions: ProjectVersion[]) => {
+        .then((versions: VersionModel[]) => {
           this.versions = versions;
         })
         .finally(() => {
@@ -155,7 +155,7 @@ export default Vue.extend({
     /**
      * Emits selected versions.
      */
-    handleSelectVersion(item: DataItem<ProjectVersion>) {
+    handleSelectVersion(item: DataItem<VersionModel>) {
       if (item.value) {
         this.$emit("selected", item.item);
       } else {
@@ -178,7 +178,7 @@ export default Vue.extend({
      * Adds the new version the version list, and emits the new version to select.
      * @param version - The new version.
      */
-    handleVersionCreated(version: ProjectVersion) {
+    handleVersionCreated(version: VersionModel) {
       this.versions = [version, ...this.versions];
       this.addVersionDialogue = false;
       this.$emit("selected", version);
@@ -187,7 +187,7 @@ export default Vue.extend({
      * Opens the version deletion modal.
      * @param version - The version to delete.
      */
-    handleDeleteVersion(version: ProjectVersion) {
+    handleDeleteVersion(version: VersionModel) {
       this.versionToDelete = version;
       this.deleteVersionDialogue = true;
     },
@@ -201,7 +201,7 @@ export default Vue.extend({
      * Attempts to delete the version.
      * @param version - The version to delete.
      */
-    handleConfirmDeleteVersion(version: ProjectVersion) {
+    handleConfirmDeleteVersion(version: VersionModel) {
       this.deleteVersionDialogue = false;
       this.isLoading = true;
 

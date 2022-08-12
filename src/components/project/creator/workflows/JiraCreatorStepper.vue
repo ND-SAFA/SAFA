@@ -35,9 +35,9 @@
 <script lang="ts">
 import Vue from "vue";
 import {
-  InternalJiraCredentials,
-  JiraCloudSite,
-  JiraProject,
+  InternalJiraCredentialsModel,
+  JiraCloudSiteModel,
+  JiraProjectModel,
   StepState,
 } from "@/types";
 import { getParam, QueryParams } from "@/router";
@@ -67,16 +67,16 @@ export default Vue.extend({
   data() {
     return {
       accessCode: getParam(QueryParams.JIRA_TOKEN),
-      credentials: undefined as InternalJiraCredentials | undefined,
+      credentials: undefined as InternalJiraCredentialsModel | undefined,
       isLoading: true,
 
-      sites: [] as JiraCloudSite[],
+      sites: [] as JiraCloudSiteModel[],
       sitesLoading: false,
-      selectedSite: undefined as JiraCloudSite | undefined,
+      selectedSite: undefined as JiraCloudSiteModel | undefined,
 
-      projects: [] as JiraProject[],
+      projects: [] as JiraProjectModel[],
       projectsLoading: false,
-      selectedProject: undefined as JiraProject | undefined,
+      selectedProject: undefined as JiraProjectModel | undefined,
 
       steps: [
         ["Connect to Jira", false],
@@ -160,7 +160,7 @@ export default Vue.extend({
     /**
      * Selects a Jira site to load projects from.
      */
-    handleSiteSelect(site: JiraCloudSite) {
+    handleSiteSelect(site: JiraCloudSiteModel) {
       if (this.selectedSite?.id !== site.id) {
         this.selectedSite = site;
         this.setStepIsValid(1, true);
@@ -174,7 +174,7 @@ export default Vue.extend({
     /**
      * Selects a Jira project to import.
      */
-    handleProjectSelect(project: JiraProject) {
+    handleProjectSelect(project: JiraProjectModel) {
       if (this.selectedProject?.id !== project.id) {
         this.selectedProject = project;
         this.setStepIsValid(2, true);

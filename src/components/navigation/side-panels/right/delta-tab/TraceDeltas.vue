@@ -1,9 +1,9 @@
 <template>
   <v-container v-if="isDeltaMode">
-    <h2 class="text-h6">Trace Links</h2>
-    <v-divider class="mb-2" />
+    <typography el="h2" variant="subtitle" value="Trace Links" />
+    <v-divider />
 
-    <v-expansion-panels class="ma-0 pa-0" multiple v-model="openPanels">
+    <v-list expand>
       <delta-button-group
         is-traces
         deltaType="added"
@@ -16,7 +16,7 @@
         :items="removedTraces"
         @click="handleRemovedSelect"
       />
-    </v-expansion-panels>
+    </v-list>
 
     <trace-link-approval-modal
       :is-open="isTraceModalOpen"
@@ -28,8 +28,9 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { TraceLink } from "@/types";
+import { TraceLinkModel } from "@/types";
 import { deltaModule } from "@/store";
+import { Typography } from "@/components/common";
 import { TraceLinkApprovalModal } from "@/components/trace-link";
 import DeltaButtonGroup from "./DeltaButtonGroup.vue";
 
@@ -40,11 +41,11 @@ import DeltaButtonGroup from "./DeltaButtonGroup.vue";
  */
 export default Vue.extend({
   name: "TraceDeltas",
-  components: { DeltaButtonGroup, TraceLinkApprovalModal },
+  components: { DeltaButtonGroup, TraceLinkApprovalModal, Typography },
   data() {
     return {
       isTraceModalOpen: false,
-      selectedDeltaLink: undefined as TraceLink | undefined,
+      selectedDeltaLink: undefined as TraceLinkModel | undefined,
       openPanels: [0, 1],
     };
   },

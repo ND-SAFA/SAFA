@@ -1,9 +1,9 @@
 import {
-  InternalGitHubCredentials,
-  InternalJiraCredentials,
+  GitHubCredentialsModel,
+  InternalJiraCredentialsModel,
   IOHandlerCallback,
-  JiraAccessToken,
-  JiraProject,
+  JiraAccessTokenModel,
+  JiraProjectModel,
   LocalStorageKeys,
   URLParameter,
 } from "@/types";
@@ -26,9 +26,9 @@ import { logModule } from "@/store";
  */
 export function handleAuthorizeJira(
   accessCode: URLParameter,
-  { onSuccess, onError }: IOHandlerCallback<InternalJiraCredentials>
+  { onSuccess, onError }: IOHandlerCallback<InternalJiraCredentialsModel>
 ): void {
-  const handleSuccess = (token: JiraAccessToken) => {
+  const handleSuccess = (token: JiraAccessTokenModel) => {
     localStorage.setItem(
       LocalStorageKeys.JIRA_REFRESH_TOKEN,
       token.refresh_token
@@ -61,8 +61,8 @@ export function handleAuthorizeJira(
  * @param onError - Called if the action fails.
  */
 export function handleLoadJiraProjects(
-  credentials: InternalJiraCredentials,
-  { onSuccess, onError }: IOHandlerCallback<JiraProject[]>
+  credentials: InternalJiraCredentialsModel,
+  { onSuccess, onError }: IOHandlerCallback<JiraProjectModel[]>
 ): void {
   localStorage.setItem(LocalStorageKeys.JIRA_CLOUD_ID, credentials.cloudId);
 
@@ -85,9 +85,9 @@ export function handleLoadJiraProjects(
  */
 export function handleAuthorizeGitHub(
   accessCode: URLParameter,
-  { onSuccess, onError }: IOHandlerCallback<InternalGitHubCredentials>
+  { onSuccess, onError }: IOHandlerCallback<GitHubCredentialsModel>
 ): void {
-  const handleSuccess = (token: InternalGitHubCredentials) => {
+  const handleSuccess = (token: GitHubCredentialsModel) => {
     onSuccess?.(token);
 
     localStorage.setItem(

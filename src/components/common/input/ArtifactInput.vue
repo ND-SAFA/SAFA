@@ -1,15 +1,16 @@
 <template>
   <v-autocomplete
-    :filled="filled"
     chips
-    :multiple="multiple"
     deletable-chips
+    :filled="filled"
+    :multiple="multiple"
     :label="label"
     v-model="model"
     :items="artifacts"
     item-text="name"
     item-value="id"
-    :filter="filter"
+    hide-details
+    :filter="filterArtifacts"
     @keydown.enter="$emit('enter')"
   >
     <template v-slot:item="{ item }">
@@ -20,9 +21,10 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { Artifact } from "@/types";
+import { ArtifactModel } from "@/types";
 import { artifactModule } from "@/store";
 import { GenericArtifactBodyDisplay } from "@/components/common/generic";
+import { filterArtifacts } from "@/util";
 
 /**
  * An input for artifacts.
@@ -60,34 +62,16 @@ export default Vue.extend({
   data() {
     return {
       model: this.value,
-      showPassword: false,
     };
   },
   methods: {
-    /**
-     * Decides whether to filter an artifact out of view.
-     * @param artifact - The artifact to check.
-     * @param queryText - The current query text.
-     * @return If true, the artifact should be kept.
-     */
-    filter(artifact: Artifact, queryText: string): boolean {
-      const lowercaseQuery = queryText.toLowerCase();
-      const { name, type } = artifact;
-
-      if (this.value?.includes(artifact.id)) return false;
-
-      return (
-        name.toLowerCase().includes(lowercaseQuery) ||
-        type.toLowerCase().includes(lowercaseQuery) ||
-        type.toLowerCase().includes(lowercaseQuery)
-      );
-    },
+    filterArtifacts,
   },
   computed: {
     /**
      * @return The artifacts to select from.
      */
-    artifacts(): Artifact[] {
+    artifacts(): ArtifactModel[] {
       return this.onlyDocumentArtifacts
         ? artifactModule.artifacts
         : artifactModule.allArtifacts;

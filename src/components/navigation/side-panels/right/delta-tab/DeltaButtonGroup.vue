@@ -1,26 +1,26 @@
 <template>
-  <v-expansion-panel>
-    <v-expansion-panel-header>
-      <h2 class="text-body-1">{{ title }}</h2>
-    </v-expansion-panel-header>
-
-    <v-expansion-panel-content>
-      <artifact-delta-button
-        v-for="{ name, id } in itemFields"
-        class="mr-1 mb-1"
-        :key="name"
-        :name="name"
-        :deltaType="deltaType"
-        @click="$emit('click', id)"
-      />
-    </v-expansion-panel-content>
-  </v-expansion-panel>
+  <toggle-list :value="itemFields.length > 0" :title="title">
+    <artifact-delta-button
+      v-for="{ name, id } in itemFields"
+      class="mr-1 my-1"
+      :key="name"
+      :name="name"
+      :deltaType="deltaType"
+      @click="$emit('click', id)"
+    />
+  </toggle-list>
 </template>
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { Artifact, DeltaType, EntityModification, TraceLink } from "@/types";
+import {
+  ArtifactModel,
+  DeltaType,
+  EntityModification,
+  TraceLinkModel,
+} from "@/types";
 import { capitalize } from "@/util";
+import { ToggleList } from "@/components/common";
 import ArtifactDeltaButton from "./ArtifactDeltaButton.vue";
 
 /**
@@ -30,7 +30,7 @@ import ArtifactDeltaButton from "./ArtifactDeltaButton.vue";
  */
 export default Vue.extend({
   name: "DeltaButtonGroup",
-  components: { ArtifactDeltaButton },
+  components: { ArtifactDeltaButton, ToggleList },
   props: {
     deltaType: {
       type: String as PropType<DeltaType>,
@@ -38,7 +38,10 @@ export default Vue.extend({
     },
     items: {
       type: Object as PropType<
-        Record<string, Artifact | EntityModification<Artifact> | TraceLink>
+        Record<
+          string,
+          ArtifactModel | EntityModification<ArtifactModel> | TraceLinkModel
+        >
       >,
       required: true,
     },
@@ -76,7 +79,7 @@ export default Vue.extend({
       const items = Object.values(this.items);
 
       if (this.isTraces) {
-        return (items as TraceLink[]).map(
+        return (items as TraceLinkModel[]).map(
           ({ traceLinkId, sourceName, targetName }) => ({
             id: traceLinkId,
             name: `${sourceName} > ${targetName}`,
@@ -84,10 +87,10 @@ export default Vue.extend({
         );
       } else {
         return this.deltaType === "modified"
-          ? (items as EntityModification<Artifact>[]).map(
+          ? (items as EntityModification<ArtifactModel>[]).map(
               ({ after: { id, name } }) => ({ id, name })
             )
-          : (items as Artifact[]).map(({ id, name }) => ({ id, name }));
+          : (items as ArtifactModel[]).map(({ id, name }) => ({ id, name }));
       }
     },
   },

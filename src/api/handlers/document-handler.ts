@@ -1,9 +1,9 @@
 import {
-  Artifact,
-  DocumentColumn,
+  ArtifactModel,
+  ColumnModel,
   DocumentType,
   IOHandlerCallback,
-  ProjectDocument,
+  DocumentModel,
 } from "@/types";
 import { createDocument } from "@/util";
 import {
@@ -53,7 +53,7 @@ export async function handleCreateDocument(
  * @param document - The document to edit.
  */
 export async function handleUpdateDocument(
-  document: ProjectDocument
+  document: DocumentModel
 ): Promise<void> {
   const versionId = projectModule.versionIdWithLog;
   const updatedDocument = await saveDocument(versionId, document);
@@ -74,7 +74,7 @@ export async function handleUpdateDocument(
  * @param onError - Called if the operation fails.
  */
 export function handleDeleteDocument(
-  document: ProjectDocument,
+  document: DocumentModel,
   { onSuccess, onError }: IOHandlerCallback
 ): void {
   const { name } = document;
@@ -100,7 +100,7 @@ export function handleDeleteDocument(
  */
 export async function handleDocumentReload(
   projectId = projectModule.projectId,
-  artifacts: Artifact[] = projectModule.getProject.artifacts
+  artifacts: ArtifactModel[] = projectModule.getProject.artifacts
 ): Promise<void> {
   const documents = await getDocuments(projectId);
 
@@ -120,7 +120,7 @@ export async function handleDocumentReload(
  * @param onError - Called if the operation fails.
  */
 export function handleSaveDocument(
-  document: ProjectDocument,
+  document: DocumentModel,
   isUpdate: boolean,
   includedChildTypes: string[],
   { onSuccess, onError }: IOHandlerCallback
@@ -178,9 +178,9 @@ export function handleSaveDocument(
  * @param onError - Called if the operation fails.
  */
 export function handleColumnMove(
-  column: DocumentColumn,
+  column: ColumnModel,
   moveUp: boolean,
-  { onSuccess, onError }: IOHandlerCallback<DocumentColumn[]>
+  { onSuccess, onError }: IOHandlerCallback<ColumnModel[]>
 ): void {
   const document = documentModule.document;
   const currentIndex = (document.columns || []).indexOf(column);
@@ -215,7 +215,7 @@ export function handleColumnMove(
  * @param onError - Called if the operation fails.
  */
 export function handleColumnSave(
-  column: DocumentColumn,
+  column: ColumnModel,
   isEditMode: boolean,
   { onSuccess, onError }: IOHandlerCallback
 ): void {
@@ -250,7 +250,7 @@ export function handleColumnSave(
  * @param onError - Called if the operation fails.
  */
 export function handleColumnDelete(
-  column: DocumentColumn,
+  column: ColumnModel,
   { onSuccess, onError }: IOHandlerCallback
 ): void {
   const document = documentModule.document;
@@ -278,7 +278,7 @@ export function handleColumnDelete(
  * @param document - The current document.
  */
 export async function handleUpdateCurrentDocument(
-  document: ProjectDocument
+  document: DocumentModel
 ): Promise<void> {
   if (document.documentId) {
     await setCurrentDocument(document.documentId);

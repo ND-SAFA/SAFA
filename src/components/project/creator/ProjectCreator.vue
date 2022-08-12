@@ -2,7 +2,7 @@
   <v-container>
     <v-tabs v-model="tab">
       <v-tab v-for="{ name } in tabs" :key="name">
-        {{ name }}
+        <typography :value="name" />
       </v-tab>
     </v-tabs>
     <v-tabs-items v-model="tab" class="mt-1">
@@ -32,6 +32,7 @@ import {
   GitHubCreatorStepper,
   ProjectBulkUpload,
 } from "./workflows";
+import Typography from "@/components/common/display/Typography.vue";
 
 /**
  * Allows for creating a project.
@@ -39,6 +40,7 @@ import {
 export default Vue.extend({
   name: "ProjectCreator",
   components: {
+    Typography,
     GitHubCreatorStepper,
     ProjectCreatorStepper,
     ProjectBulkUpload,
@@ -86,6 +88,9 @@ export default Vue.extend({
         updateParam(QueryParams.TAB, currentTabId);
       }
     },
+    /**
+     * Opens the current tab when the route changes.
+     */
     $route() {
       this.openCurrentTab();
     },

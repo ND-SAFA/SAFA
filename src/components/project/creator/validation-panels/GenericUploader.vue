@@ -2,7 +2,7 @@
   <v-container>
     <validated-panels
       :itemName="itemName"
-      :showError="projectFiles.length === 0"
+      :showError="showError"
       :isValidStates="isValidStates"
       :isButtonDisabled="isCreatorOpen"
       :defaultValidState="defaultValidState"
@@ -42,7 +42,7 @@ import {
   ValidFileTypes,
   ProjectFile,
   ValidPayloads,
-  Link,
+  LinkModel,
 } from "@/types";
 import FilePanelController from "./FilePanelController.vue";
 import ValidatedPanels from "./ValidatedPanels.vue";
@@ -85,6 +85,12 @@ export default Vue.extend({
     openPanelIndexes: [] as number[],
   }),
   computed: {
+    /**
+     * @return Whether to show errors.
+     */
+    showError(): boolean {
+      return this.defaultValidState ? false : this.projectFiles.length === 0;
+    },
     /**
      * @return Whether all panels are valid.
      */
@@ -154,7 +160,7 @@ export default Vue.extend({
      * Emits changes when a panel is added.
      * @param payload - The added panel artifact name or trace link.
      */
-    handleAddFile(payload: string | Link): void {
+    handleAddFile(payload: string | LinkModel): void {
       const newPanel = this.uploader.createNewPanel(payload);
       this.$emit("change", this.panels.concat([newPanel]));
       this.openPanelIndexes.push(this.panels.length - 1);

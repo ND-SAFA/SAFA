@@ -30,9 +30,9 @@ export const allowedSafetyCaseTypes: Record<SafetyCaseType, SafetyCaseType[]> =
   };
 
 /**
- * Defines an artifact file.
+ * Defines an artifact of a project.
  */
-export interface Artifact {
+export interface ArtifactModel {
   /**
    * A unique UUID identifying an artifact across versions.
    */
@@ -82,12 +82,12 @@ export interface Artifact {
 /**
  * Defines an artifact with its custom fields flattened into the artifact data.
  */
-export type FlatArtifact = Artifact & Record<string, string>;
+export type FlatArtifact = ArtifactModel & Record<string, string>;
 
 /**
  * Defines an artifact warning.
  */
-export interface ArtifactWarning {
+export interface WarningModel {
   /**
    * The artifact rule name.
    */
@@ -101,9 +101,9 @@ export interface ArtifactWarning {
 /**
  * A collection of warnings for all artifacts.
  */
-export type ProjectWarnings = Record<string, ArtifactWarning[]>;
+export type ProjectWarnings = Record<string, WarningModel[]>;
 
 /**
  * Returns an artifact matching the given query, if one exists.
  */
-export type ArtifactQueryFunction = (q: string) => Artifact;
+export type ArtifactQueryFunction = (q: string) => ArtifactModel;

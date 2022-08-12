@@ -9,7 +9,7 @@
     <template v-slot:extension v-if="doShowGraphButtons">
       <v-row dense class="full-width">
         <v-col cols="8">
-          <div class="d-flex flex-row">
+          <flex-box>
             <generic-icon-button
               color="white"
               :tooltip="leftPanelTooltip"
@@ -18,17 +18,18 @@
             />
             <document-selector />
             <graph-buttons />
-          </div>
+            <searchbar />
+          </flex-box>
         </v-col>
         <v-col cols="4">
-          <v-row justify="end" class="ma-0 pa-0">
+          <flex-box justify="end">
             <generic-icon-button
               color="white"
               :tooltip="rightPanelTooltip"
               :icon-id="rightPanelIcon"
               @click="handleRightPanelClick"
             />
-          </v-row>
+          </flex-box>
         </v-col>
       </v-row>
       <v-row>
@@ -40,13 +41,13 @@
 
 <script lang="ts">
 import Vue from "vue";
+import { Route } from "vue-router";
 import { appModule, documentModule } from "@/store";
 import { router, Routes } from "@/router";
-import { GenericIconButton } from "@/components/common";
-import { AppBarHeader, GraphButtons } from "./header";
+import { GenericIconButton, FlexBox } from "@/components/common";
+import { AppBarHeader, GraphButtons, Searchbar } from "./header";
 import { DocumentSelector } from "./document";
 import LoadingBar from "./LoadingBar.vue";
-import { Route } from "vue-router";
 
 /**
  * Displays the navigation top bar.
@@ -54,6 +55,8 @@ import { Route } from "vue-router";
 export default Vue.extend({
   name: "AppBar",
   components: {
+    FlexBox,
+    Searchbar,
     DocumentSelector,
     GraphButtons,
     AppBarHeader,

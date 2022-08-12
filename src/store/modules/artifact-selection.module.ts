@@ -1,8 +1,14 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 
-import type { Artifact, FilterAction } from "@/types";
+import type { ArtifactModel, FilterAction } from "@/types";
 import { PanelType } from "@/types";
-import { appModule, artifactModule, logModule, viewportModule } from "@/store";
+import {
+  appModule,
+  artifactModule,
+  artifactSelectionModule,
+  logModule,
+  viewportModule,
+} from "@/store";
 
 @Module({ namespaced: true, name: "artifactSelection" })
 /**
@@ -58,6 +64,21 @@ export default class ArtifactSelectionModule extends VuexModule {
     this.SELECT_ARTIFACT(artifactId);
     appModule.openPanel(PanelType.left);
     viewportModule.centerOnArtifacts([artifactId]);
+  }
+
+  @Action
+  /**
+   * Sets the given artifact as selected if it is not already,
+   * otherwise clears the current selection.
+   *
+   * @param artifactId - The artifact to select.
+   */
+  toggleSelectArtifact(artifactId: string): void {
+    if (artifactSelectionModule.getSelectedArtifactId === artifactId) {
+      artifactSelectionModule.clearSelections();
+    } else {
+      artifactSelectionModule.selectArtifact(artifactId);
+    }
   }
 
   @Action
@@ -165,7 +186,7 @@ export default class ArtifactSelectionModule extends VuexModule {
   /**
    * @return The currently selected artifact.
    */
-  get getSelectedArtifact(): Artifact | undefined {
+  get getSelectedArtifact(): ArtifactModel | undefined {
     if (this.selectedArtifactId !== "") {
       try {
         return artifactModule.getArtifactById(this.selectedArtifactId);

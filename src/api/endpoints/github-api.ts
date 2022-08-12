@@ -1,9 +1,9 @@
 import {
-  GitHubInstallation,
-  GitHubInstallationList,
-  GitHubRepository,
-  GitHubRepositoryList,
-  InternalGitHubCredentials,
+  GitHubInstallationModel,
+  GitHubInstallationListModel,
+  GitHubRepositoryModel,
+  GitHubRepositoryListModel,
+  GitHubCredentialsModel,
 } from "@/types";
 
 /**
@@ -79,7 +79,7 @@ export function authorizeGitHub(): void {
  */
 export async function getGitHubToken(
   accessCode: string
-): Promise<InternalGitHubCredentials> {
+): Promise<GitHubCredentialsModel> {
   const params = await fetchGitHubForm(
     {
       code: accessCode,
@@ -107,7 +107,7 @@ export async function getGitHubToken(
  */
 export async function getGitHubRefreshToken(
   refreshToken: string
-): Promise<InternalGitHubCredentials> {
+): Promise<GitHubCredentialsModel> {
   const params = await fetchGitHubForm(
     {
       grant_type: "refresh_token",
@@ -135,8 +135,8 @@ export async function getGitHubRefreshToken(
  */
 export async function getGitHubInstallations(
   accessToken: string
-): Promise<GitHubInstallation[]> {
-  const items = await fetchGitHub<GitHubInstallationList>(
+): Promise<GitHubInstallationModel[]> {
+  const items = await fetchGitHub<GitHubInstallationListModel>(
     "https://api.github.com/user/installations",
     {
       method: "GET",
@@ -160,8 +160,8 @@ export async function getGitHubInstallations(
 export async function getGitHubRepositories(
   accessToken: string,
   installationId: string
-): Promise<GitHubRepository[]> {
-  const { repositories } = await fetchGitHub<GitHubRepositoryList>(
+): Promise<GitHubRepositoryModel[]> {
+  const { repositories } = await fetchGitHub<GitHubRepositoryListModel>(
     `https://api.github.com/user/installations/${installationId}/repositories`,
     {
       method: "GET",

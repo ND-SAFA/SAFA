@@ -1,76 +1,91 @@
 <template>
   <div
-    class="d-flex flex-row align-center justify-space-between"
-    style="height: 100%"
     v-if="!isEditMode"
     @mouseover="showEditButton = true"
     @mouseout="showEditButton = false"
   >
-    <v-icon
-      v-if="column.required && !item[column.id]"
-      :key="artifact.id"
-      :color="errorColor"
-    >
-      mdi-information-outline
-    </v-icon>
-    <div v-if="isFreeText(column.dataType)">
-      <span class="text-body-1">{{ item[column.id] || "" }}</span>
-    </div>
-    <div v-if="isRelation(column.dataType)">
-      <artifact-table-chip
-        v-for="artifactId in getArrayValue(item[column.id])"
-        :key="artifactId"
-        :text="getArtifactName(artifactId)"
-      />
-    </div>
-    <div v-if="isSelect(column.dataType)">
-      <artifact-table-chip
-        v-for="val in getArrayValue(item[column.id])"
-        :key="val"
-        :text="val"
-      />
-    </div>
-    <generic-icon-button
-      class="ml-1"
-      icon-id="mdi-pencil"
-      :tooltip="`Edit '${column.name}'`"
-      :is-hidden="!showEditButton"
-      @click="isEditMode = true"
-    />
+    <flex-box align="center" justify="space-between">
+      <v-icon
+        v-if="column.required && !item[column.id]"
+        :key="artifact.id"
+        :color="errorColor"
+      >
+        mdi-information-outline
+      </v-icon>
+      <div v-if="isFreeText(column.dataType)">
+        <typography :value="item[column.id] || ''" />
+      </div>
+      <div v-if="isRelation(column.dataType)">
+        <table-chip
+          v-for="artifactId in getArrayValue(item[column.id])"
+          :key="artifactId"
+          :text="getArtifactName(artifactId)"
+        />
+      </div>
+      <div v-if="isSelect(column.dataType)">
+        <table-chip
+          v-for="val in getArrayValue(item[column.id])"
+          :key="val"
+          :text="val"
+        />
+      </div>
+      <div @click.stop="">
+        <generic-icon-button
+          class="ml-1"
+          icon-id="mdi-pencil"
+          :tooltip="`Edit '${column.name}'`"
+          :is-hidden="!showEditButton"
+          @click="isEditMode = true"
+        />
+      </div>
+    </flex-box>
   </div>
-  <div v-else class="d-flex flex-row align-center">
-    <single-custom-field-input
-      :column="column"
-      :value="artifact"
-      :filled="false"
-    />
-    <generic-icon-button
-      class="ml-1"
-      icon-id="mdi-content-save"
-      :tooltip="`Save '${column.name}'`"
-      @click="handleSaveEdit"
-    />
-    <generic-icon-button
-      class="ml-1"
-      icon-id="mdi-close-circle"
-      :tooltip="`Cancel editing '${column.name}'`"
-      @click="handleCancelEdit"
-    />
+  <div v-else>
+    <flex-box align="center">
+      <div @click.stop="">
+        <single-custom-field-input
+          :column="column"
+          :value="artifact"
+          :filled="false"
+        />
+      </div>
+      <div @click.stop="">
+        <generic-icon-button
+          class="ml-1"
+          icon-id="mdi-content-save"
+          :tooltip="`Save '${column.name}'`"
+          @click="handleSaveEdit"
+        />
+      </div>
+      <div @click.stop="">
+        <generic-icon-button
+          class="ml-1"
+          icon-id="mdi-close-circle"
+          :tooltip="`Cancel editing '${column.name}'`"
+          @click="handleCancelEdit"
+        />
+      </div>
+    </flex-box>
   </div>
 </template>
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import {
-  Artifact,
+  ArtifactModel,
   ColumnDataType,
-  DocumentColumn,
+  ColumnModel,
   FlatArtifact,
 } from "@/types";
-import ArtifactTableChip from "./ArtifactTableChip.vue";
 import { artifactModule } from "@/store";
 import { ThemeColors } from "@/util";
-import { GenericIconButton, SingleCustomFieldInput } from "@/components/common";
+import {
+  GenericIconButton,
+  SingleCustomFieldInput,
+  Typography,
+  TableChip,
+  FlexBox,
+} from "@/components/common";
 import { handleSaveArtifact } from "@/api";
 
 /**
@@ -79,8 +94,10 @@ import { handleSaveArtifact } from "@/api";
 export default Vue.extend({
   name: "ArtifactTableCell",
   components: {
+    FlexBox,
+    Typography,
     GenericIconButton,
-    ArtifactTableChip,
+    TableChip,
     SingleCustomFieldInput,
   },
   props: {
@@ -89,7 +106,7 @@ export default Vue.extend({
       required: true,
     },
     column: {
-      type: Object as PropType<DocumentColumn>,
+      type: Object as PropType<ColumnModel>,
       required: true,
     },
   },
@@ -105,7 +122,7 @@ export default Vue.extend({
     /**
      * Returns the associated artifact for this cell.
      */
-    artifact(): Artifact {
+    artifact(): ArtifactModel {
       return artifactModule.getArtifactById(this.item.id);
     },
   },

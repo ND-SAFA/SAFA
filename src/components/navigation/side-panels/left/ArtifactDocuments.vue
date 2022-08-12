@@ -1,36 +1,34 @@
 <template>
   <div v-if="documents.length > 0" class="mt-4">
-    <h2 class="text-h6">Documents</h2>
+    <typography el="h2" variant="subtitle" value="Views" />
     <v-divider />
 
     <v-list>
-      <v-list-item
-        v-for="doc in documents"
-        :key="doc.documentId"
-        @click="handleSwitchDocument(doc)"
-      >
-        <v-list-item-title>
-          {{ doc.name }}
-        </v-list-item-title>
-        <v-list-item-subtitle>
-          {{ documentTypeName(doc.type) }}
-        </v-list-item-subtitle>
-      </v-list-item>
+      <template v-for="(doc, idx) in documents">
+        <v-divider :key="doc.documentId + '-div'" v-if="idx !== 0" />
+        <generic-list-item
+          :key="doc.documentId"
+          :item="{ title: doc.name, subtitle: documentTypeName(doc.type) }"
+          @click="handleSwitchDocument(doc)"
+        />
+      </template>
     </v-list>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { ProjectDocument } from "@/types";
+import { DocumentModel } from "@/types";
 import { documentTypeOptions } from "@/util";
 import { artifactSelectionModule, documentModule } from "@/store";
+import { Typography, GenericListItem } from "@/components/common";
 
 /**
  * Displays the selected node's documents.
  */
 export default Vue.extend({
   name: "ArtifactDocuments",
+  components: { Typography, GenericListItem },
   computed: {
     /**
      * @return The selected artifact.
@@ -41,7 +39,7 @@ export default Vue.extend({
     /**
      * @return The selected artifact's documents.
      */
-    documents(): ProjectDocument[] {
+    documents(): DocumentModel[] {
       if (!this.selectedArtifact) return [];
 
       return documentModule.projectDocuments.filter(({ documentId }) =>
@@ -54,7 +52,7 @@ export default Vue.extend({
      * Switches to another document.
      * @param document - The document to switch to.
      */
-    handleSwitchDocument(document: ProjectDocument): void {
+    handleSwitchDocument(document: DocumentModel): void {
       documentModule.switchDocuments(document);
     },
     /**

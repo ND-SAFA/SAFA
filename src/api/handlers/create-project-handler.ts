@@ -1,10 +1,14 @@
-import { InternalGitHubCredentials, IOHandlerCallback, Project } from "@/types";
+import {
+  GitHubCredentialsModel,
+  IOHandlerCallback,
+  ProjectModel,
+} from "@/types";
 import { navigateTo, Routes } from "@/router";
 import { appModule, logModule } from "@/store";
 import {
   createJiraProject,
+  createProjectCreationJob,
   handleJobSubmission,
-  handleSetProject,
   handleUploadProjectVersion,
   saveProject,
 } from "@/api";
@@ -17,16 +21,16 @@ import {
  * @param onError - Called if the action fails.
  */
 export function handleImportProject(
-  project: Project,
+  project: ProjectModel,
   { onSuccess, onError }: IOHandlerCallback
 ): void {
   appModule.onLoadStart();
 
-  saveProject(project)
-    .then(async (projectCreated) => {
-      logModule.onSuccess(`Project has been created: ${project.name}`);
-      await navigateTo(Routes.ARTIFACT);
-      await handleSetProject(projectCreated);
+  createProjectCreationJob(project)
+    .then(async (job) => {
+      await handleJobSubmission(job);
+      await navigateTo(Routes.UPLOAD_STATUS);
+      logModule.onSuccess(`Project is being created: ${project.name}`);
       onSuccess?.();
     })
     .catch((e) => {
@@ -47,7 +51,7 @@ export function handleImportProject(
  */
 export function handleBulkImportProject(
   project: Pick<
-    Project,
+    ProjectModel,
     "projectId" | "name" | "description" | "projectVersion"
   >,
   files: File[],
@@ -110,7 +114,7 @@ export function handleImportJiraProject(
  */
 export function handleImportGitHubProject(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  credentials: InternalGitHubCredentials,
+  credentials: GitHubCredentialsModel,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   orgId: string,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

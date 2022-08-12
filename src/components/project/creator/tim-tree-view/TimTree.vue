@@ -1,13 +1,9 @@
 <template>
   <v-container>
-    <v-row dense justify="space-between" class="full-width">
-      <v-col>
-        <h1 class="text-h6 text-no-wrap">Project TIM</h1>
-      </v-col>
-      <v-col class="flex-grow-0">
-        <v-btn text @click="handleResetGraph"> Reset Graph </v-btn>
-      </v-col>
-    </v-row>
+    <flex-box justify="space-between">
+      <typography el="h1" variant="subtitle" value="Project TIM" />
+      <v-btn text @click="handleResetGraph"> Reset Graph </v-btn>
+    </flex-box>
     <v-container class="elevation-3 overflow-hidden" style="max-height: 50vh">
       <generic-cytoscape-controller
         id="cytoscape-tim"
@@ -44,6 +40,7 @@ import {
   GenericCytoscapeController,
 } from "@/components/common";
 import ArtifactTypeNode from "./ArtifactTypeNode.vue";
+import { Typography, FlexBox } from "@/components/common";
 
 /**
  * Creates a Cytoscape graph containing artifact types are nodes
@@ -52,6 +49,8 @@ import ArtifactTypeNode from "./ArtifactTypeNode.vue";
 export default Vue.extend({
   name: "TimTree",
   components: {
+    FlexBox,
+    Typography,
     ArtifactTypeNode,
     GenericCytoscapeController,
     GenericGraphLink,

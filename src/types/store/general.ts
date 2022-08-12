@@ -1,10 +1,10 @@
 import {
-  Artifact,
+  ArtifactModel,
   ArtifactData,
   DocumentType,
   FTANodeType,
   SafetyCaseType,
-  TraceLink,
+  TraceLinkModel,
 } from "@/types";
 
 /**
@@ -72,14 +72,14 @@ export type LinkValidator = (sourceId: string, targetId: string) => boolean;
  * Returns true if a link can be created, otherwise an error.
  */
 export type CreateLinkValidator = (
-  source: Artifact | ArtifactData,
-  target: Artifact | ArtifactData
+  source: ArtifactModel | ArtifactData,
+  target: ArtifactModel | ArtifactData
 ) => boolean | string;
 
 /**
  * Returns the trace link between the given artifact ids.
  */
-export type LinkFinder = (sourceId: string, targetId: string) => TraceLink;
+export type LinkFinder = (sourceId: string, targetId: string) => TraceLinkModel;
 
 /**
  * Defines a title and message for a confirmation dialog.

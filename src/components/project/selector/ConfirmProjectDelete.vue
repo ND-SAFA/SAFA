@@ -27,7 +27,7 @@
 </template>
 
 <script lang="ts">
-import { ProjectIdentifier } from "@/types";
+import { IdentifierModel } from "@/types";
 import Vue, { PropType } from "vue";
 import { GenericModal } from "@/components/common";
 
@@ -46,7 +46,7 @@ export default Vue.extend({
       required: true,
     },
     project: {
-      type: Object as PropType<ProjectIdentifier>,
+      type: Object as PropType<IdentifierModel>,
       required: false,
     },
   },
@@ -85,7 +85,7 @@ export default Vue.extend({
     /**
      * Updates the modal text when the project changes.
      */
-    project(project: ProjectIdentifier | undefined) {
+    project(project: IdentifierModel | undefined) {
       if (!project) return;
 
       this.textboxLabel = `Type "${project.name}"`;

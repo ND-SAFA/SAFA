@@ -1,17 +1,18 @@
 <template>
-  <v-container>
-    <h1 class="text-h4 my-2">Type Options</h1>
+  <v-container class="mt-2">
+    <typography el="h1" variant="title" value="Type Options" />
     <v-divider class="mb-2" />
 
-    <div v-for="entry in artifactDirections" :key="entry.type">
-      <h2 class="text-h5 mb-2">{{ entry.label }}</h2>
-
+    <div v-for="entry in artifactDirections" :key="entry.type" class="mt-2">
+      <typography el="h2" variant="subtitle" :value="entry.label" />
       <v-divider />
 
-      <v-subheader class="pl-0" style="height: 30px">
-        {{ entry.label }} Traces To
-      </v-subheader>
-
+      <typography
+        secondary
+        el="div"
+        y="1"
+        :value="`${entry.label} Traces To`"
+      />
       <v-chip-group column>
         <v-chip
           v-for="type in entry.allowedTypes"
@@ -19,16 +20,15 @@
           close
           @click:close="handleDeleteDirection(entry, type)"
         >
-          {{ getTypeLabel(type) }}
+          <typography :value="getTypeLabel(type)" />
         </v-chip>
       </v-chip-group>
-      <v-chip v-if="entry.allowedTypes.length === 0"> Any Type </v-chip>
+      <v-chip v-if="entry.allowedTypes.length === 0">
+        <typography value="Any Type" />
+      </v-chip>
 
-      <v-subheader class="pl-0" style="height: 30px">
-        {{ entry.label }} Icon
-      </v-subheader>
-
-      <v-btn-toggle v-model="entry.iconIndex" class="mb-4" borderless>
+      <typography secondary el="div" y="1" :value="`${entry.label} Icon`" />
+      <v-btn-toggle v-model="entry.iconIndex" class="my-1" borderless>
         <v-btn
           v-for="option in icons"
           :key="option"
@@ -43,16 +43,18 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { LabeledArtifactDirection } from "@/types";
+import { LabelledTraceDirectionModel } from "@/types";
 import { getArtifactTypePrintName } from "@/util";
 import { projectModule, typeOptionsModule } from "@/store";
 import { handleSaveArtifactType, handleRemoveTraceType } from "@/api";
+import { Typography } from "@/components/common";
 
 export default Vue.extend({
   name: "trace-link-direction-tab",
+  components: { Typography },
   data() {
     return {
-      artifactDirections: [] as LabeledArtifactDirection[],
+      artifactDirections: [] as LabelledTraceDirectionModel[],
       icons: typeOptionsModule.allArtifactTypeIcons,
     };
   },
@@ -84,7 +86,7 @@ export default Vue.extend({
      * @param entry - The type to update.
      * @param icon - The icon to set.
      */
-    handleIconChange(entry: LabeledArtifactDirection, icon: string) {
+    handleIconChange(entry: LabelledTraceDirectionModel, icon: string) {
       const type = projectModule.getProject.artifactTypes.find(
         ({ name }) => name === entry.type
       );
@@ -100,7 +102,7 @@ export default Vue.extend({
      * @param removedType - The type to remove.
      */
     handleDeleteDirection(
-      entry: LabeledArtifactDirection,
+      entry: LabelledTraceDirectionModel,
       removedType: string
     ) {
       entry.allowedTypes = entry.allowedTypes.filter(

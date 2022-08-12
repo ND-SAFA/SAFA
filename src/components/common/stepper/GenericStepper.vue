@@ -16,7 +16,7 @@
                 :key="stepIndex"
                 :editable="currentStep > stepIndex"
               >
-                <span class="text-center">{{ stepName }}</span>
+                <typography :value="stepName" class="width-max" el="div" />
               </v-stepper-step>
               <v-divider
                 :key="`${stepName}-divider`"
@@ -55,6 +55,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
+import { Typography } from "@/components/common/display";
 
 /**
  * Displays a generic stepper.
@@ -64,6 +65,7 @@ import Vue, { PropType } from "vue";
  */
 export default Vue.extend({
   name: "GenericStepper",
+  components: { Typography },
   props: {
     value: {
       // Current step number

@@ -1,4 +1,4 @@
-import { ProjectVersion } from "@/types";
+import { VersionModel } from "@/types";
 
 /**
  * Stringifies the version number.
@@ -7,7 +7,7 @@ import { ProjectVersion } from "@/types";
  *
  * @return The stringified version number.
  */
-export function versionToString(currentVersion?: ProjectVersion): string {
+export function versionToString(currentVersion?: VersionModel): string {
   if (currentVersion === undefined) {
     return "X.X.X";
   }

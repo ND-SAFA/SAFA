@@ -59,7 +59,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { ProjectDocument } from "@/types";
+import { DocumentModel } from "@/types";
 import { createDocument, documentTypeOptions } from "@/util";
 import { documentModule, typeOptionsModule } from "@/store";
 import { handleDeleteDocument, handleSaveDocument } from "@/api";
@@ -76,7 +76,7 @@ export default Vue.extend({
   props: {
     isOpen: Boolean,
     document: {
-      type: Object as PropType<ProjectDocument>,
+      type: Object as PropType<DocumentModel>,
       required: false,
     },
   },
@@ -101,14 +101,14 @@ export default Vue.extend({
      * @return The modal title.
      */
     title(): string {
-      return this.isEditMode ? "Edit Document" : "Add Document";
+      return this.isEditMode ? "Edit View" : "Add View";
     },
     /**
      * @return Whether the current document name is valid.
      */
     isNameValid(): boolean {
       return (
-        !documentModule.doesDocumentExist(this.document?.name) ||
+        !documentModule.doesDocumentExist(this.editingDocument?.name) ||
         this.editingDocument.name === this.document?.name
       );
     },

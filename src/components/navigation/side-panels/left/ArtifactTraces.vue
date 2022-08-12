@@ -1,51 +1,38 @@
 <template>
   <div v-if="parents.length + children.length > 0" class="mb-2">
-    <div class="d-flex flex-row">
+    <flex-box>
       <v-icon color="primary" style="transform: rotate(-45deg)">
         mdi-ray-start-arrow
       </v-icon>
-      <h2 class="text-h6 ml-1">Trace Links</h2>
-    </div>
+      <typography el="h2" l="1" variant="subtitle" value="Trace Links" />
+    </flex-box>
 
-    <v-divider class="mb-2" />
+    <v-divider />
 
-    <v-expansion-panels>
-      <v-expansion-panel v-if="parents.length > 0">
-        <v-expansion-panel-header class="text-body-1">
-          {{ parentTitle }}
-        </v-expansion-panel-header>
-        <v-expansion-panel-content>
-          <v-list dense style="max-height: 300px" class="overflow-y-auto">
-            <template v-for="(parent, idx) in parents">
-              <v-divider :key="parent.title + '-div'" v-if="idx !== 0" />
-              <generic-list-item
-                :key="parent.title"
-                :item="parent"
-                @click="handleArtifactClick(parent.title)"
-              />
-            </template>
-          </v-list>
-        </v-expansion-panel-content>
-      </v-expansion-panel>
-
-      <v-expansion-panel v-if="children.length > 0">
-        <v-expansion-panel-header class="text-body-1">
-          {{ childTitle }}
-        </v-expansion-panel-header>
-        <v-expansion-panel-content>
-          <v-list dense style="max-height: 300px" class="overflow-y-auto">
-            <template v-for="(child, idx) in children">
-              <v-divider :key="child.title + '-div'" v-if="idx !== 0" />
-              <generic-list-item
-                :key="child.title"
-                :item="child"
-                @click="handleArtifactClick(child.title)"
-              />
-            </template>
-          </v-list>
-        </v-expansion-panel-content>
-      </v-expansion-panel>
-    </v-expansion-panels>
+    <v-list expand>
+      <toggle-list v-if="parents.length > 0" :title="parentTitle">
+        <v-list dense style="max-height: 300px" class="overflow-y-auto">
+          <template v-for="parent in parents">
+            <generic-list-item
+              :key="parent.title"
+              :item="parent"
+              @click="handleArtifactClick(parent.title)"
+            />
+          </template>
+        </v-list>
+      </toggle-list>
+      <toggle-list v-if="children.length > 0" :title="childTitle">
+        <v-list dense style="max-height: 300px" class="overflow-y-auto">
+          <template v-for="child in children">
+            <generic-list-item
+              :key="child.title"
+              :item="child"
+              @click="handleArtifactClick(child.title)"
+            />
+          </template>
+        </v-list>
+      </toggle-list>
+    </v-list>
   </div>
 </template>
 
@@ -53,14 +40,19 @@
 import Vue from "vue";
 import { artifactModule, artifactSelectionModule, traceModule } from "@/store";
 import { ListItem } from "@/types";
-import GenericListItem from "@/components/common/generic/GenericListItem.vue";
+import {
+  GenericListItem,
+  Typography,
+  FlexBox,
+  ToggleList,
+} from "@/components/common";
 
 /**
  * Displays the selected node's parents and children.
  */
 export default Vue.extend({
   name: "ArtifactTraces",
-  components: { GenericListItem },
+  components: { FlexBox, Typography, GenericListItem, ToggleList },
   computed: {
     /**
      * @return The selected artifact.

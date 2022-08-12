@@ -7,16 +7,12 @@
     persistent
   >
     <v-card :class="`modal-${size}`">
-      <v-card-title class="grey lighten-2">
+      <v-card-title class="primary">
         <generic-modal-title :title="title" @close="$emit('close')" />
       </v-card-title>
 
       <v-card-text>
-        <v-row class="ma-0 pa-0" style="height: 100%">
-          <v-col align-self="center" class="ma-0 pa-0">
-            <slot name="body" />
-          </v-col>
-        </v-row>
+        <slot name="body" />
       </v-card-text>
 
       <v-divider />

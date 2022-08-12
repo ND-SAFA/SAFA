@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-row class="my-4">
+    <v-row class="my-1">
       <v-col cols="6">
         <generic-artifact-body-display
           :artifact="sourceArtifact"
@@ -20,27 +20,30 @@
       </v-col>
     </v-row>
 
-    <div class="d-flex flex-row justify-end">
+    <flex-box justify="end">
       <v-btn
         outlined
         v-if="showApprove"
+        :loading="isApproveLoading"
         color="primary"
         class="ma-1"
-        @click="$emit('link:approve', link)"
+        @click="handleApprove"
       >
         Approve
       </v-btn>
       <v-btn
         outlined
         v-if="showDecline"
+        :loading="isDeclineLoading"
         color="error"
         class="ma-1"
-        @click="$emit('link:decline', link)"
+        @click="handleDecline"
       >
         Decline
       </v-btn>
       <v-btn
         v-if="showDelete"
+        :loading="isDeleteLoading"
         color="error"
         class="ma-1"
         :text="!confirmDelete"
@@ -57,15 +60,17 @@
       >
         Cancel
       </v-btn>
-    </div>
+    </flex-box>
   </div>
 </template>
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { Artifact, TraceLink } from "@/types";
+import { ArtifactModel, TraceLinkModel } from "@/types";
 import { GenericArtifactBodyDisplay } from "@/components";
 import { artifactModule } from "@/store";
+import { FlexBox } from "@/components/common";
+import { handleApproveLink, handleDeclineLink } from "@/api";
 
 /**
  * Displays a trace link.
@@ -78,11 +83,12 @@ import { artifactModule } from "@/store";
 export default Vue.extend({
   name: "TraceLinkDisplay",
   components: {
+    FlexBox,
     GenericArtifactBodyDisplay,
   },
   props: {
     link: {
-      type: Object as PropType<TraceLink>,
+      type: Object as PropType<TraceLinkModel>,
       required: true,
     },
     showDecline: {
@@ -103,20 +109,23 @@ export default Vue.extend({
       isSourceExpanded: false,
       isTargetExpanded: false,
       confirmDelete: false,
+      isApproveLoading: false,
+      isDeclineLoading: false,
+      isDeleteLoading: false,
     };
   },
   computed: {
     /**
      * @return The artifact this link comes from.
      */
-    sourceArtifact(): Artifact {
-      return artifactModule.getArtifactsById[this.link.sourceId];
+    sourceArtifact(): ArtifactModel {
+      return artifactModule.getAllArtifactsById[this.link.sourceId];
     },
     /**
      * @return The artifact this link goes towards.
      */
-    targetArtifact(): Artifact {
-      return artifactModule.getArtifactsById[this.link.targetId];
+    targetArtifact(): ArtifactModel {
+      return artifactModule.getAllArtifactsById[this.link.targetId];
     },
     /**
      * @return The text to display on the delete button.
@@ -127,13 +136,46 @@ export default Vue.extend({
   },
   methods: {
     /**
+     * Approves the given link and updates the stored links.
+     */
+    handleApprove() {
+      this.isApproveLoading = true;
+      handleApproveLink(this.link, {
+        onSuccess: () => {
+          this.isApproveLoading = false;
+          this.$emit("link:approve", this.link);
+        },
+        onError: () => (this.isApproveLoading = false),
+      });
+    },
+    /**
+     * Declines the given link and updates the stored links.
+     */
+    handleDecline() {
+      this.isDeclineLoading = true;
+      handleDeclineLink(this.link, {
+        onSuccess: () => {
+          this.isDeclineLoading = false;
+          this.$emit("link:decline", this.link);
+        },
+        onError: () => (this.isDeclineLoading = false),
+      });
+    },
+    /**
      * Attempts to delete the link, after confirming.
      */
     handleDelete() {
       if (!this.confirmDelete) {
         this.confirmDelete = true;
       } else {
-        this.$emit("link:delete", this.link);
+        this.isDeleteLoading = true;
+        handleDeclineLink(this.link, {
+          onSuccess: () => {
+            this.isDeleteLoading = false;
+            this.$emit("link:delete", this.link);
+          },
+          onError: () => (this.isDeleteLoading = false),
+        });
       }
     },
   },

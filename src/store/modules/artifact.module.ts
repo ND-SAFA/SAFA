@@ -1,7 +1,7 @@
 import { Module, VuexModule, Mutation, Action } from "vuex-module-decorators";
 
 import type {
-  Artifact,
+  ArtifactModel,
   ArtifactQueryFunction,
   DocumentArtifacts,
 } from "@/types";
@@ -17,11 +17,11 @@ export default class ArtifactModule extends VuexModule {
   /**
    * All artifacts in the project.
    */
-  private projectArtifacts: Artifact[] = [];
+  private projectArtifacts: ArtifactModel[] = [];
   /**
    * The currently visible artifacts.
    */
-  private currentArtifacts: Artifact[] = [];
+  private currentArtifacts: ArtifactModel[] = [];
 
   @Action
   /**
@@ -46,7 +46,7 @@ export default class ArtifactModule extends VuexModule {
    *
    * @param artifacts - The artifacts to set.
    */
-  async addOrUpdateArtifacts(updatedArtifacts: Artifact[]): Promise<void> {
+  async addOrUpdateArtifacts(updatedArtifacts: ArtifactModel[]): Promise<void> {
     const visibleIds = documentModule.document.artifactIds;
     const visibleArtifacts = updatedArtifacts.filter(({ id }) =>
       visibleIds.includes(id)
@@ -72,9 +72,9 @@ export default class ArtifactModule extends VuexModule {
    * DO NOT CALL THIS OUTSIDE OF THE PROJECT MODULE.
    * Deletes the artifact with the given name.
    */
-  async deleteArtifacts(artifacts: Artifact[]): Promise<void> {
+  async deleteArtifacts(artifacts: ArtifactModel[]): Promise<void> {
     const deletedNames = artifacts.map(({ name }) => name);
-    const removeArtifact = (currentArtifacts: Artifact[]) =>
+    const removeArtifact = (currentArtifacts: ArtifactModel[]) =>
       currentArtifacts.filter(({ name }) => !deletedNames.includes(name));
     this.SET_PROJECT_ARTIFACTS(removeArtifact(this.projectArtifacts));
     this.SET_CURRENT_ARTIFACTS(removeArtifact(this.currentArtifacts));
@@ -84,7 +84,7 @@ export default class ArtifactModule extends VuexModule {
   /**
    * Sets the project artifacts.
    */
-  SET_PROJECT_ARTIFACTS(artifacts: Artifact[]): void {
+  SET_PROJECT_ARTIFACTS(artifacts: ArtifactModel[]): void {
     this.projectArtifacts = artifacts;
   }
 
@@ -92,21 +92,21 @@ export default class ArtifactModule extends VuexModule {
   /**
    * Sets the current artifacts.
    */
-  SET_CURRENT_ARTIFACTS(artifacts: Artifact[]): void {
+  SET_CURRENT_ARTIFACTS(artifacts: ArtifactModel[]): void {
     this.currentArtifacts = artifacts;
   }
 
   /**
    * @return All artifacts in the project.
    */
-  get allArtifacts(): Artifact[] {
+  get allArtifacts(): ArtifactModel[] {
     return this.projectArtifacts;
   }
 
   /**
    * @return The artifacts for the current document.
    */
-  get artifacts(): Artifact[] {
+  get artifacts(): ArtifactModel[] {
     return this.currentArtifacts;
   }
 
@@ -150,9 +150,26 @@ export default class ArtifactModule extends VuexModule {
   /**
    * @return A collection of artifacts, keyed by their id.
    */
-  get getArtifactsById(): Record<string, Artifact> {
-    return this.artifacts
+  get getAllArtifactsById(): Record<string, ArtifactModel> {
+    return this.allArtifacts
       .map((artifact) => ({ [artifact.id]: artifact }))
       .reduce((acc, cur) => ({ ...acc, ...cur }), {});
+  }
+
+  /**
+   * @return A collection of artifact lists, keyed by their type.
+   */
+  get getArtifactsByType(): Record<string, ArtifactModel[]> {
+    const artifactsByType: Record<string, ArtifactModel[]> = {};
+
+    this.artifacts.forEach((artifact) => {
+      if (!artifactsByType[artifact.type]) {
+        artifactsByType[artifact.type] = [];
+      }
+
+      artifactsByType[artifact.type].push(artifact);
+    });
+
+    return artifactsByType;
   }
 }

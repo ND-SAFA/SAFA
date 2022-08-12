@@ -1,5 +1,5 @@
 import { Module, VuexModule, Action, Mutation } from "vuex-module-decorators";
-import type { CytoCore, Artifact, LayoutPayload, IGraphLayout } from "@/types";
+import type { CytoCore, LayoutPayload, IGraphLayout } from "@/types";
 import {
   appModule,
   artifactModule,
@@ -18,8 +18,8 @@ import {
   cyCreateLayout,
   cyCenterOnArtifacts,
   cyApplyAutomove,
-  cyCenterNodes,
   cyResetTim,
+  cyResetTree,
 } from "@/cytoscape";
 
 @Module({ namespaced: true, name: "viewport" })
@@ -46,13 +46,13 @@ export default class ViewportModule extends VuexModule {
    *
    * @param artifact - The artifact to select and view.
    */
-  async viewArtifactSubtree(artifact: Artifact): Promise<void> {
+  async viewArtifactSubtree(artifactId: string): Promise<void> {
     const artifactsInSubtree = [
-      ...subtreeModule.getSubtreeByArtifactId(artifact.id),
-      artifact.id,
+      ...subtreeModule.getSubtreeByArtifactId(artifactId),
+      artifactId,
     ];
 
-    artifactSelectionModule.selectArtifact(artifact.id);
+    artifactSelectionModule.selectArtifact(artifactId);
 
     await artifactSelectionModule.filterGraph({
       type: "subtree",
@@ -97,8 +97,6 @@ export default class ViewportModule extends VuexModule {
    * Resets the graph layout.
    */
   async setGraphLayout(layoutPayload: LayoutPayload): Promise<void> {
-    const selectedId = artifactSelectionModule.getSelectedArtifactId;
-
     appModule.onLoadStart();
 
     this.SET_LAYOUT(layoutPayload.layout);
@@ -107,14 +105,8 @@ export default class ViewportModule extends VuexModule {
 
     setTimeout(() => {
       appModule.onLoadEnd();
-      cyCenterNodes();
       cyResetTim();
-
-      if (selectedId) {
-        artifactSelectionModule.selectArtifact(selectedId);
-      } else {
-        cyCenterNodes();
-      }
+      cyResetTree();
     }, 200);
   }
 

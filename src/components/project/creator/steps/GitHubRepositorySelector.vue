@@ -30,7 +30,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { GitHubRepository } from "@/types";
+import { GitHubRepositoryModel } from "@/types";
 import { GenericStepperListStep } from "@/components/common";
 
 /**
@@ -45,7 +45,7 @@ export default Vue.extend({
   },
   props: {
     repositories: {
-      type: Array as PropType<GitHubRepository[]>,
+      type: Array as PropType<GitHubRepositoryModel[]>,
       required: true,
     },
     loading: {
@@ -58,7 +58,7 @@ export default Vue.extend({
      * SHandles a click to select a repository.
      * @param repository - The repository to select.
      */
-    handleRepositorySelect(repository: GitHubRepository) {
+    handleRepositorySelect(repository: GitHubRepositoryModel) {
       this.$emit("select", repository);
     },
     /**
@@ -66,7 +66,7 @@ export default Vue.extend({
      * @param repository - The repository to extract from.
      * @return The subtitle.
      */
-    getRepositorySubtitle(repository: GitHubRepository): string {
+    getRepositorySubtitle(repository: GitHubRepositoryModel): string {
       const { full_name, size } = repository;
       const subtitle = `${full_name} | ${size} File`;
 
@@ -77,7 +77,7 @@ export default Vue.extend({
      * @param repository - The repository to extract from.
      * @return The last updated time.
      */
-    getRepositoryTime(repository: GitHubRepository): string {
+    getRepositoryTime(repository: GitHubRepositoryModel): string {
       const updated = new Date(repository.updated_at);
 
       return `Updated on ${updated.getMonth()}/${updated.getDate()}/${updated.getFullYear()}`;

@@ -2,7 +2,7 @@
   <generic-cytoscape-controller
     id="cytoscape-artifact"
     :cyto-core-graph="cytoCoreGraph"
-    :class="isVisible ? 'artifact-view visible' : 'artifact-view'"
+    :class="className"
   >
     <template v-slot:elements>
       <artifact-node
@@ -37,17 +37,18 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { TraceLink, Artifact, CytoCoreGraph } from "@/types";
+import { TraceLinkModel, ArtifactModel, CytoCoreGraph } from "@/types";
 import {
   appModule,
   artifactModule,
+  artifactSelectionModule,
   deltaModule,
   documentModule,
   subtreeModule,
   traceModule,
   viewportModule,
 } from "@/store";
-import { artifactTreeGraph } from "@/cytoscape";
+import { artifactTreeGraph, cyResetTree } from "@/cytoscape";
 import {
   GenericGraphLink,
   GenericCytoscapeController,
@@ -66,16 +67,28 @@ export default Vue.extend({
   data() {
     return {
       isTraceModalOpen: false,
-      selectedLink: undefined as TraceLink | undefined,
+      selectedLink: undefined as TraceLinkModel | undefined,
       artifactsInView: [] as string[],
     };
   },
   computed: {
     /**
-     * @return Whether to render the artifact tree.
+     * @return Whether the tree should be rendered at all.
      */
-    isVisible(): boolean {
-      return !appModule.getIsLoading && !documentModule.isTableDocument;
+    isInView(): boolean {
+      return !documentModule.isTableDocument;
+    },
+    /**
+     * @return The class name for the artifact tree.
+     */
+    className(): string {
+      if (!this.isInView) {
+        return "artifact-view disabled";
+      } else if (!appModule.getIsLoading) {
+        return "artifact-view visible";
+      } else {
+        return "artifact-view";
+      }
     },
     /**
      * @return The artifact tree graph.
@@ -86,13 +99,13 @@ export default Vue.extend({
     /**
      * @return All visible artifacts.
      */
-    artifacts(): Artifact[] {
+    artifacts(): ArtifactModel[] {
       return artifactModule.artifacts;
     },
     /**
      * @return All visible trace links.
      */
-    traceLinks(): TraceLink[] {
+    traceLinks(): TraceLinkModel[] {
       return deltaModule.inDeltaView
         ? traceModule.traces
         : traceModule.nonDeclinedTraces;
@@ -121,16 +134,15 @@ export default Vue.extend({
   },
   watch: {
     nodesInView(): void {
-      this.setNodesInView();
+      this.artifactsInView = this.nodesInView;
+    },
+    isInView(inView: boolean): void {
+      if (!inView || !artifactSelectionModule.getSelectedArtifactId) return;
+
+      setTimeout(() => cyResetTree(), 200);
     },
   },
   methods: {
-    /**
-     * Sets whether the artifacts are in view.
-     */
-    setNodesInView(): void {
-      this.artifactsInView = this.nodesInView;
-    },
     /**
      * Returns whether to fade an artifact.
      * @param id - The artifact to check.
@@ -152,7 +164,7 @@ export default Vue.extend({
      * @param link - The trace link to check.
      * @return Whether to fade.
      */
-    isTraceLinkFaded(link: TraceLink): boolean {
+    isTraceLinkFaded(link: TraceLinkModel): boolean {
       return (
         !this.artifactsInView.includes(link.targetId) ||
         !this.artifactsInView.includes(link.sourceId)
@@ -162,7 +174,7 @@ export default Vue.extend({
      * Selects a clicked trace link and opens the link modal.
      * @param traceLink - The trace link to select.
      */
-    handleLinkRightClick(traceLink: TraceLink): void {
+    handleLinkRightClick(traceLink: TraceLinkModel): void {
       this.selectedLink = traceLink;
       this.isTraceModalOpen = true;
     },

@@ -1,4 +1,4 @@
-import { TraceApproval, TraceLink, Artifact } from "@/types";
+import { ApprovalType, TraceLinkModel, ArtifactModel } from "@/types";
 import { Endpoint, fillEndpoint, authHttpClient } from "@/api/util";
 import { CommitBuilder } from "@/api";
 
@@ -10,8 +10,8 @@ import { CommitBuilder } from "@/api";
  */
 export async function getGeneratedLinks(
   versionId: string
-): Promise<TraceLink[]> {
-  return authHttpClient<TraceLink[]>(
+): Promise<TraceLinkModel[]> {
+  return authHttpClient<TraceLinkModel[]>(
     fillEndpoint(Endpoint.getGeneratedLinks, { versionId }),
     { method: "GET" }
   );
@@ -25,15 +25,18 @@ export async function getGeneratedLinks(
  * @return All generated links.
  */
 export async function createGeneratedLinks(
-  sourceArtifacts: Artifact[],
-  targetArtifacts: Artifact[]
-): Promise<TraceLink[]> {
+  sourceArtifacts: ArtifactModel[],
+  targetArtifacts: ArtifactModel[]
+): Promise<TraceLinkModel[]> {
   const payload = { sourceArtifacts, targetArtifacts };
 
-  return authHttpClient<TraceLink[]>(fillEndpoint(Endpoint.generateLinks), {
-    method: "POST",
-    body: JSON.stringify(payload),
-  });
+  return authHttpClient<TraceLinkModel[]>(
+    fillEndpoint(Endpoint.generateLinks),
+    {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }
+  );
 }
 
 /**
@@ -43,9 +46,9 @@ export async function createGeneratedLinks(
  * @return The modified trace links.
  */
 export async function updateApprovedLink(
-  traceLink: TraceLink
-): Promise<TraceLink[]> {
-  traceLink.approvalStatus = TraceApproval.APPROVED;
+  traceLink: TraceLinkModel
+): Promise<TraceLinkModel[]> {
+  traceLink.approvalStatus = ApprovalType.APPROVED;
   return CommitBuilder.withCurrentVersion()
     .withModifiedTraceLink(traceLink)
     .save()
@@ -59,9 +62,9 @@ export async function updateApprovedLink(
  * @return The removed trace links.
  */
 export async function updateDeclinedLink(
-  traceLink: TraceLink
-): Promise<TraceLink[]> {
-  traceLink.approvalStatus = TraceApproval.DECLINED;
+  traceLink: TraceLinkModel
+): Promise<TraceLinkModel[]> {
+  traceLink.approvalStatus = ApprovalType.DECLINED;
   return CommitBuilder.withCurrentVersion()
     .withModifiedTraceLink(traceLink)
     .save()
@@ -74,8 +77,10 @@ export async function updateDeclinedLink(
  * @param traceLink - The trace link to persist.
  * @return The created trace links.
  */
-export async function createLink(traceLink: TraceLink): Promise<TraceLink[]> {
-  traceLink.approvalStatus = TraceApproval.APPROVED;
+export async function createLink(
+  traceLink: TraceLinkModel
+): Promise<TraceLinkModel[]> {
+  traceLink.approvalStatus = ApprovalType.APPROVED;
   return CommitBuilder.withCurrentVersion()
     .withNewTraceLink(traceLink)
     .save()

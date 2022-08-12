@@ -18,52 +18,50 @@
       <slot name="deleteItemDialogue" />
       <slot name="editItemDialogue" />
       <slot name="addItemDialogue" />
-      <v-row class="ma-1" v-if="!minimal">
-        <v-col cols="11" class="ma-0 pa-0">
-          <v-text-field
-            v-model="search"
-            label="Search"
-            rounded
-            solo
-            dense
-            prepend-inner-icon="mdi-magnify"
-          />
-        </v-col>
-        <v-col cols="1" class="ma-0 pa-0">
-          <v-row justify="center" class="ma-0 pa-0">
-            <generic-icon-button
-              tooltip="Refresh"
-              icon-id="mdi-refresh"
-              @click="$emit('refresh')"
-            />
-          </v-row>
-        </v-col>
-      </v-row>
+      <flex-box v-if="!minimal" align="center" justify="space-between" y="2">
+        <v-text-field
+          v-model="search"
+          label="Search"
+          outlined
+          dense
+          hide-details
+          class="mr-1"
+          prepend-inner-icon="mdi-magnify"
+        />
+        <generic-icon-button
+          tooltip="Refresh"
+          icon-id="mdi-refresh"
+          @click="$emit('refresh')"
+        />
+      </flex-box>
     </template>
     <template v-slot:[`item.actions`]="{ item }">
-      <generic-icon-button
-        v-if="hasEdit"
-        icon-id="mdi-pencil"
-        tooltip="Edit"
-        @click="$emit('item:edit', item)"
-      />
-      <generic-icon-button
-        v-if="isDeleteEnabled(item)"
-        icon-id="mdi-delete"
-        tooltip="Delete"
-        @click="$emit('item:delete', item)"
-      />
-    </template>
-    <template v-slot:footer>
-      <v-row justify="end" class="mr-2 mt-1" v-if="!minimal">
+      <flex-box>
         <generic-icon-button
+          v-if="hasEdit"
+          icon-id="mdi-pencil"
+          tooltip="Edit"
+          @click="$emit('item:edit', item)"
+        />
+        <generic-icon-button
+          v-if="isDeleteEnabled(item)"
+          icon-id="mdi-delete"
+          tooltip="Delete"
+          @click="$emit('item:delete', item)"
+        />
+      </flex-box>
+    </template>
+    <template v-slot:[`footer.prepend`]>
+      <div class="py-3">
+        <generic-icon-button
+          v-if="!minimal"
           fab
           color="primary"
           icon-id="mdi-plus"
           tooltip="Create"
           @click="$emit('item:add')"
         />
-      </v-row>
+      </div>
     </template>
   </v-data-table>
 </template>
@@ -72,6 +70,7 @@
 import Vue, { PropType } from "vue";
 import { DataItemProps, DataTableHeader } from "vuetify";
 import GenericIconButton from "./GenericIconButton.vue";
+import FlexBox from "@/components/common/display/FlexBox.vue";
 
 /**
  * Displays a generic selector.
@@ -84,7 +83,7 @@ import GenericIconButton from "./GenericIconButton.vue";
  */
 export default Vue.extend({
   name: "GenericSelector",
-  components: { GenericIconButton },
+  components: { FlexBox, GenericIconButton },
   props: {
     headers: {
       type: Array as PropType<DataTableHeader[]>,

@@ -1,113 +1,98 @@
 <template>
   <v-expansion-panel>
     <v-expansion-panel-header>
-      <v-row dense align="center" justify="start">
-        <v-col class="flex-grow-0">
-          <v-icon :color="iconColor" data-cy="button-artifact-dropbox">{{
-            iconName
-          }}</v-icon>
-        </v-col>
-        <v-col>
-          <slot name="title" />
-        </v-col>
-      </v-row>
+      <flex-box align="center">
+        <v-icon
+          class="mr-1"
+          :color="iconColor"
+          data-cy="button-artifact-dropbox"
+        >
+          {{ iconName }}
+        </v-icon>
+        <slot name="title" />
+      </flex-box>
     </v-expansion-panel-header>
     <v-expansion-panel-content>
-      <v-container>
-        <v-row>
-          <v-container>
-            <v-row class="full-width">
-              <slot name="before-rows" />
-            </v-row>
-            <v-row>
-              <v-divider />
-            </v-row>
-          </v-container>
-        </v-row>
+      <slot name="before-rows" />
 
-        <v-row v-if="showFileUploader">
-          <generic-file-selector :multiple="false" @input="emitChangeFiles" />
-        </v-row>
+      <generic-file-selector
+        v-if="showFileUploader"
+        :multiple="false"
+        @input="emitChangeFiles"
+      />
 
-        <v-row justify="space-between" align="center" dense>
-          <v-col>
-            <generic-switch
-              v-if="showFileUploader"
-              v-model="ignoreErrors"
-              label="Ignore Errors"
-              data-cy="button-ignore-errors"
+      <flex-box justify="space-between" align="center">
+        <generic-switch
+          v-if="showFileUploader"
+          v-model="ignoreErrors"
+          label="Ignore Errors"
+          data-cy="button-ignore-errors"
+        />
+        <typography v-if="!isValid && showFileUploader" error :value="error" />
+      </flex-box>
+
+      <v-expansion-panels accordion>
+        <v-expansion-panel v-if="entityNames.length !== 0">
+          <v-expansion-panel-header data-cy="button-file-entities">
+            <typography variant="subtitle" value="Entities" />
+          </v-expansion-panel-header>
+          <v-expansion-panel-content>
+            <v-btn
+              outlined
+              color="primary"
+              class="ma-1"
+              v-for="entityName in entityNames"
+              :key="entityName"
+              @click="underDevelopmentError()"
+            >
+              {{ entityName }}
+            </v-btn>
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+        <v-expansion-panel v-if="errors.length > 0">
+          <v-expansion-panel-header disable-icon-rotate>
+            <typography
+              variant="subtitle"
+              :value="errors.length === 0 ? 'No Errors' : 'Errors'"
             />
-          </v-col>
-          <v-col v-if="!isValid && showFileUploader" style="text-align: end">
-            {{ error }}
-          </v-col>
-        </v-row>
+            <template v-slot:actions>
+              <v-icon color="error">mdi-alert-circle</v-icon>
+            </template>
+          </v-expansion-panel-header>
+          <v-expansion-panel-content>
+            <typography
+              v-for="(error, i) in errors"
+              :key="i"
+              error
+              :value="error"
+            />
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+      </v-expansion-panels>
 
-        <v-row justify="center">
-          <v-expansion-panels accordion>
-            <v-expansion-panel v-if="entityNames.length !== 0">
-              <v-expansion-panel-header data-cy="button-file-entities">
-                <span class="text-h6">Entities</span>
-              </v-expansion-panel-header>
-              <v-expansion-panel-content>
-                <v-row>
-                  <v-btn
-                    outlined
-                    color="primary"
-                    class="ma-1"
-                    v-for="entityName in entityNames"
-                    :key="entityName"
-                    @click="underDevelopmentError()"
-                  >
-                    {{ entityName }}
-                  </v-btn>
-                </v-row>
-              </v-expansion-panel-content>
-            </v-expansion-panel>
-            <v-expansion-panel v-if="errors.length > 0">
-              <v-expansion-panel-header disable-icon-rotate>
-                <span class="text-h6">
-                  {{ errors.length === 0 ? "No Errors" : "Errors" }}
-                </span>
-                <template v-slot:actions>
-                  <v-icon color="error">mdi-alert-circle</v-icon>
-                </template>
-              </v-expansion-panel-header>
-              <v-expansion-panel-content>
-                <p
-                  v-for="(error, i) in errors"
-                  :key="i"
-                  class="error--text my-0"
-                >
-                  {{ error }}
-                </p>
-              </v-expansion-panel-content>
-            </v-expansion-panel>
-          </v-expansion-panels>
-        </v-row>
-
-        <v-row v-if="showFileUploader">
-          <v-divider />
-        </v-row>
-
-        <v-row class="mt-5" justify="end">
-          <v-btn
-            @click="$emit('delete')"
-            color="error"
-            data-cy="button-delete-artifact"
-          >
-            Delete
-          </v-btn>
-        </v-row>
-      </v-container>
+      <flex-box justify="space-between" t="4">
+        <v-spacer />
+        <v-btn
+          @click="$emit('delete')"
+          color="error"
+          data-cy="button-delete-artifact"
+        >
+          Delete
+        </v-btn>
+      </flex-box>
     </v-expansion-panel-content>
   </v-expansion-panel>
 </template>
 
 <script lang="ts">
-import { GenericFileSelector, GenericSwitch } from "@/components/common";
-import { logModule } from "@/store";
 import Vue, { PropType } from "vue";
+import { logModule } from "@/store";
+import {
+  GenericSwitch,
+  GenericFileSelector,
+  Typography,
+  FlexBox,
+} from "@/components/common";
 
 const DEFAULT_ERROR_MESSAGE = "No file has been uploaded.";
 
@@ -122,6 +107,8 @@ const DEFAULT_ERROR_MESSAGE = "No file has been uploaded.";
 export default Vue.extend({
   name: "FilePanel",
   components: {
+    FlexBox,
+    Typography,
     GenericSwitch,
     GenericFileSelector,
   },

@@ -1,4 +1,4 @@
-import { Artifact, CytoCore, SubtreeMap } from "@/types";
+import { ArtifactModel, CytoCore, SubtreeMap } from "@/types";
 import { SingularElementArgument, EdgeCollection } from "cytoscape";
 
 /**
@@ -10,7 +10,7 @@ import { SingularElementArgument, EdgeCollection } from "cytoscape";
  */
 export function createSubtreeMap(
   cy: CytoCore,
-  artifacts: Artifact[]
+  artifacts: ArtifactModel[]
 ): SubtreeMap {
   const computedSubtrees = {};
   return artifacts
@@ -65,7 +65,9 @@ function getChildren(cy: CytoCore, artifactId: string): string[] {
   const nodeEdges = cy.edges(`edge[source="${artifactId}"]`);
   const children = nodeEdges.targets();
 
-  return children.map((child) => child.data().id);
+  return children
+    .map((child) => child.data().id)
+    .filter((id) => id !== artifactId);
 }
 
 /**

@@ -13,9 +13,9 @@
         :show-approve="canBeApproved"
         :show-decline="canBeDeclined"
         :show-delete="canBeDeleted"
-        @link:approve="handleApprove"
-        @link:decline="handleDecline"
-        @link:delete="handleDecline"
+        @link:approve="handleClose"
+        @link:decline="handleClose"
+        @link:delete="handleClose"
         @close="$emit('close')"
       />
     </template>
@@ -24,8 +24,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { TraceApproval, TraceLink, TraceType } from "@/types";
-import { handleApproveLink, handleDeclineLink } from "@/api";
+import { ApprovalType, TraceLinkModel, TraceType } from "@/types";
 import { GenericModal } from "@/components/common";
 import TraceLinkDisplay from "./TraceLinkDisplay.vue";
 import { deltaModule } from "@/store";
@@ -43,7 +42,7 @@ export default Vue.extend({
       type: Boolean,
       required: true,
     },
-    link: Object as PropType<TraceLink>,
+    link: Object as PropType<TraceLinkModel>,
   },
   computed: {
     /**
@@ -64,7 +63,7 @@ export default Vue.extend({
     canBeApproved(): boolean {
       return (
         this.canBeModified &&
-        this.link?.approvalStatus !== TraceApproval.APPROVED
+        this.link?.approvalStatus !== ApprovalType.APPROVED
       );
     },
     /**
@@ -73,25 +72,15 @@ export default Vue.extend({
     canBeDeclined(): boolean {
       return (
         this.canBeModified &&
-        this.link?.approvalStatus !== TraceApproval.DECLINED
+        this.link?.approvalStatus !== ApprovalType.DECLINED
       );
     },
   },
   methods: {
     /**
-     * Approves the given link and closes the modal.
-     * @param traceLink - The link to approve.
+     * Closes the modal.
      */
-    async handleApprove(traceLink: TraceLink): Promise<void> {
-      await handleApproveLink(traceLink);
-      this.$emit("close");
-    },
-    /**
-     * Declines the given link and closes the modal.
-     * @param traceLink - The link to decline.
-     */
-    handleDecline(traceLink: TraceLink): void {
-      handleDeclineLink(traceLink);
+    handleClose() {
       this.$emit("close");
     },
   },

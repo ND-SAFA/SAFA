@@ -6,14 +6,14 @@ import {
   ArtifactDeltaState,
   FTANodeType,
   SafetyCaseType,
-  TraceApproval,
+  ApprovalType,
   TraceType,
 } from "@/types";
 
 export const ARTIFACT_NODE_SELECTOR = "node[graph='artifact']";
 export const ARTIFACT_EDGE_SELECTOR = "edge[graph='artifact']";
 export const GENERATED_LINK_SELECTOR = `${ARTIFACT_EDGE_SELECTOR}[traceType='${TraceType.GENERATED}']`;
-export const GENERATED_APPROVED_LINK_SELECTOR = `${GENERATED_LINK_SELECTOR}[approvalStatus='${TraceApproval.APPROVED}']`;
+export const GENERATED_APPROVED_LINK_SELECTOR = `${GENERATED_LINK_SELECTOR}[approvalStatus='${ApprovalType.APPROVED}']`;
 
 export const CytoscapeStyle: (Stylesheet | CytoStyleSheet)[] = [
   // Edges
@@ -22,9 +22,9 @@ export const CytoscapeStyle: (Stylesheet | CytoStyleSheet)[] = [
     style: {
       width: "2px",
       "curve-style": "bezier",
-      "line-color": ThemeColors.primary,
+      "line-color": ThemeColors.black,
       "source-arrow-shape": "chevron",
-      "source-arrow-color": ThemeColors.primary,
+      "source-arrow-color": ThemeColors.black,
       "arrow-scale": 2,
     },
   },
@@ -41,7 +41,7 @@ export const CytoscapeStyle: (Stylesheet | CytoStyleSheet)[] = [
     },
   },
   {
-    selector: `${ARTIFACT_EDGE_SELECTOR}[approvalStatus='${TraceApproval.UNREVIEWED}']`,
+    selector: `${ARTIFACT_EDGE_SELECTOR}[approvalStatus='${ApprovalType.UNREVIEWED}']`,
     style: {
       "line-style": "dashed",
       "line-dash-pattern": [6, 3],

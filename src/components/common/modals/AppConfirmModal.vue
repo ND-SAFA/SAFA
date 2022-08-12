@@ -5,13 +5,12 @@
     :title="title"
     @close="handleClose"
   >
-    <template v-slot:body>{{ body }}</template>
+    <template v-slot:body>
+      <typography y="2" el="p" :value="body" />
+    </template>
     <template v-slot:actions>
-      <v-row justify="end">
-        <v-btn outlined color="primary" @click="handleConfirm">
-          I accept
-        </v-btn>
-      </v-row>
+      <v-spacer />
+      <v-btn color="primary" @click="handleConfirm"> I accept </v-btn>
     </template>
   </generic-modal>
 </template>
@@ -21,13 +20,14 @@ import Vue, { PropType } from "vue";
 import { ConfirmationType, ConfirmDialogueMessage } from "@/types";
 import { logModule } from "@/store";
 import GenericModal from "./GenericModal.vue";
+import Typography from "@/components/common/display/Typography.vue";
 
 /**
  * Displays a modal for confirming sensitive actions.
  */
 export default Vue.extend({
   name: "AppConfirmModal",
-  components: { GenericModal },
+  components: { Typography, GenericModal },
   props: {
     message: {
       type: Object as PropType<ConfirmDialogueMessage>,

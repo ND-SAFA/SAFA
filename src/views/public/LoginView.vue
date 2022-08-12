@@ -25,8 +25,8 @@
       </v-btn>
 
       <div class="ml-auto text-right">
-        <span class="text-body-1">
-          Dont have an account yet?
+        <span>
+          <typography value="Dont have an account yet?" />
 
           <v-btn
             text
@@ -59,13 +59,14 @@ import Vue from "vue";
 import { navigateTo, Routes } from "@/router";
 import { handleLogin } from "@/api";
 import { CardPage, PasswordField } from "@/components";
+import Typography from "@/components/common/display/Typography.vue";
 
 /**
  * Displays the login page.
  */
 export default Vue.extend({
   name: "LoginView",
-  components: { PasswordField, CardPage },
+  components: { Typography, PasswordField, CardPage },
   data() {
     return {
       email: "",

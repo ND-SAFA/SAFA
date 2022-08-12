@@ -1,30 +1,32 @@
 <template>
-  <v-row v-if="isOpen" class="my-3" align="center">
-    <v-col cols="9">
-      <div class="d-flex width-min">
-        <button-row :definitions="[sourceDefinition]" />
-        <v-icon class="mx-2">mdi-arrow-right</v-icon>
-        <button-row :definitions="[targetDefinition]" />
-      </div>
-    </v-col>
-    <v-col cols="3">
-      <v-btn
-        @click="handleSubmit"
-        color="primary"
-        class="ml-10"
-        data-cy="button-create-trace-matrix"
-      >
-        Create Trace Matrix
-      </v-btn>
-    </v-col>
-  </v-row>
+  <flex-box
+    v-if="isOpen"
+    align="center"
+    justify="space-between"
+    full-width
+    y="3"
+  >
+    <flex-box>
+      <button-row :definitions="[sourceDefinition]" />
+      <v-icon class="mx-2">mdi-arrow-right</v-icon>
+      <button-row :definitions="[targetDefinition]" />
+    </flex-box>
+    <v-btn
+      @click="handleSubmit"
+      color="primary"
+      class="ml-10"
+      data-cy="button-create-trace-matrix"
+    >
+      Create Trace Matrix
+    </v-btn>
+  </flex-box>
 </template>
 
 <script lang="ts">
-import { ButtonRow } from "@/components/common";
-import { logModule } from "@/store";
-import { ButtonDefinition, ButtonType, Link, TraceFile } from "@/types";
 import Vue, { PropType } from "vue";
+import { ButtonDefinition, ButtonType, LinkModel, TraceFile } from "@/types";
+import { logModule } from "@/store";
+import { ButtonRow, FlexBox } from "@/components/common";
 
 /**
  * Trace file creator.
@@ -35,6 +37,7 @@ import Vue, { PropType } from "vue";
 export default Vue.extend({
   name: "TraceFileCreator",
   components: {
+    FlexBox,
     ButtonRow,
   },
   props: {
@@ -75,7 +78,7 @@ export default Vue.extend({
         sourceId: this.source,
         targetName: this.target,
         targetId: this.target,
-      } as Link);
+      } as LinkModel);
     },
   },
   watch: {

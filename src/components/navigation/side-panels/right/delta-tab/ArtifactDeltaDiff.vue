@@ -41,7 +41,7 @@
 import Vue, { PropType } from "vue";
 import CodeDiff from "vue-code-diff";
 import {
-  Artifact,
+  ArtifactModel,
   DeltaArtifact,
   DeltaType,
   EntityModification,
@@ -93,7 +93,7 @@ export default Vue.extend({
     /**
      * Returns the current modified artifact.
      */
-    modification(): EntityModification<Artifact> | undefined {
+    modification(): EntityModification<ArtifactModel> | undefined {
       return isModifiedArtifact(this.inputArtifact)
         ? this.inputArtifact
         : undefined;

@@ -1,11 +1,11 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 
 import type {
-  Artifact,
+  ArtifactModel,
   EntityModification,
   ProjectDelta,
-  ProjectVersion,
-  TraceLink,
+  VersionModel,
+  TraceLinkModel,
 } from "@/types";
 import { ArtifactDeltaState, PanelType } from "@/types";
 import { createProjectDelta } from "@/util";
@@ -29,7 +29,7 @@ export default class ErrorModule extends VuexModule {
   /**
    * The version that artifact deltas have been made to.
    */
-  private afterVersion?: ProjectVersion;
+  private afterVersion?: VersionModel;
   /**
    * A collection of all added artifacts.
    */
@@ -77,7 +77,7 @@ export default class ErrorModule extends VuexModule {
    *
    * @param version - The new version.
    */
-  setAfterVersion(version?: ProjectVersion): void {
+  setAfterVersion(version?: VersionModel): void {
     this.SET_AFTER_VERSION(version);
   }
 
@@ -127,49 +127,49 @@ export default class ErrorModule extends VuexModule {
    *
    * @param afterVersion - The new version.
    */
-  SET_AFTER_VERSION(afterVersion?: ProjectVersion): void {
+  SET_AFTER_VERSION(afterVersion?: VersionModel): void {
     this.afterVersion = afterVersion;
   }
 
   /**
    * @return A mapping of artifact IDs and the artifacts added.
    */
-  get addedArtifacts(): Record<string, Artifact> {
+  get addedArtifacts(): Record<string, ArtifactModel> {
     return this.projectDelta.artifacts.added;
   }
 
   /**
    * @return A mapping of artifact IDs and the artifacts removed.
    */
-  get removedArtifacts(): Record<string, Artifact> {
+  get removedArtifacts(): Record<string, ArtifactModel> {
     return this.projectDelta.artifacts.removed;
   }
 
   /**
    * @return A collection of modified deltas.
    */
-  get modifiedArtifacts(): Record<string, EntityModification<Artifact>> {
+  get modifiedArtifacts(): Record<string, EntityModification<ArtifactModel>> {
     return this.projectDelta.artifacts.modified;
   }
 
   /**
    * @return A mapping of trace IDs and the traces added.
    */
-  get addedTraces(): Record<string, TraceLink> {
+  get addedTraces(): Record<string, TraceLinkModel> {
     return this.projectDelta.traces.added;
   }
 
   /**
    * @return A mapping of trace IDs and the traces removed.
    */
-  get removedTraces(): Record<string, TraceLink> {
+  get removedTraces(): Record<string, TraceLinkModel> {
     return this.projectDelta.traces.removed;
   }
 
   /**
    * @return The current version that deltas are made to.
    */
-  get deltaVersion(): ProjectVersion | undefined {
+  get deltaVersion(): VersionModel | undefined {
     return this.afterVersion;
   }
 

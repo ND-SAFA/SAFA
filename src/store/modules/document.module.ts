@@ -1,6 +1,6 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 
-import type { DocumentColumn, Project, ProjectDocument } from "@/types";
+import type { ColumnModel, ProjectModel, DocumentModel } from "@/types";
 import { DocumentType } from "@/types";
 import { createDocument, isTableDocument } from "@/util";
 import { artifactModule, layoutModule, traceModule } from "@/store";
@@ -18,21 +18,21 @@ export default class DocumentModule extends VuexModule {
   /**
    * The currently visible document.
    */
-  private currentDocument: ProjectDocument = createDocument();
+  private currentDocument: DocumentModel = createDocument();
   /**
    * The base document with all artifacts.
    */
-  private baseDocument: ProjectDocument = createDocument();
+  private baseDocument: DocumentModel = createDocument();
   /**
    * All project documents.
    */
-  private allDocuments: ProjectDocument[] = [this.currentDocument];
+  private allDocuments: DocumentModel[] = [this.currentDocument];
 
   @Action
   /**
    * Initializes the current artifacts and traces visible in the current document.
    */
-  initializeProject(project: Project): void {
+  initializeProject(project: ProjectModel): void {
     const {
       artifacts,
       traces,
@@ -71,7 +71,7 @@ export default class DocumentModule extends VuexModule {
    *
    * @param updatedDocuments - The updated documents.
    */
-  async updateDocuments(updatedDocuments: ProjectDocument[]): Promise<void> {
+  async updateDocuments(updatedDocuments: DocumentModel[]): Promise<void> {
     const updatedDocumentIds: string[] = updatedDocuments.map(
       (d) => d.documentId
     );
@@ -84,7 +84,7 @@ export default class DocumentModule extends VuexModule {
     this.SET_ALL_DOCUMENTS(newDocuments);
 
     if (updatedDocumentIds.includes(this.currentDocument.documentId)) {
-      const updatedCurrentDocument: ProjectDocument = updatedDocuments.filter(
+      const updatedCurrentDocument: DocumentModel = updatedDocuments.filter(
         ({ documentId }) => documentId === this.currentDocument.documentId
       )[0];
       this.SET_CURRENT_DOCUMENT(updatedCurrentDocument);
@@ -95,7 +95,7 @@ export default class DocumentModule extends VuexModule {
   /**
    * Sets the current document and initializes its artifacts and traces.
    */
-  async switchDocuments(document: ProjectDocument): Promise<void> {
+  async switchDocuments(document: DocumentModel): Promise<void> {
     const currentArtifactIds = document.artifactIds;
 
     this.SET_CURRENT_DOCUMENT(document);
@@ -110,7 +110,7 @@ export default class DocumentModule extends VuexModule {
   /**
    * Adds a new document.
    */
-  async addDocument(document: ProjectDocument): Promise<void> {
+  async addDocument(document: DocumentModel): Promise<void> {
     this.SET_ALL_DOCUMENTS([...this.allDocuments, document]);
 
     await this.switchDocuments(document);
@@ -120,7 +120,7 @@ export default class DocumentModule extends VuexModule {
   /**
    * Removes an existing document.
    */
-  async removeDocument(document: ProjectDocument): Promise<void> {
+  async removeDocument(document: DocumentModel): Promise<void> {
     const remainingDocuments = this.allDocuments.filter(
       ({ documentId }) => documentId !== document.documentId
     );
@@ -144,7 +144,7 @@ export default class DocumentModule extends VuexModule {
   /**
    * Sets the current document.
    */
-  SET_ALL_DOCUMENTS(documents: ProjectDocument[]): void {
+  SET_ALL_DOCUMENTS(documents: DocumentModel[]): void {
     this.allDocuments = documents;
   }
 
@@ -152,7 +152,7 @@ export default class DocumentModule extends VuexModule {
   /**
    * Sets the current document.
    */
-  SET_CURRENT_DOCUMENT(document: ProjectDocument): void {
+  SET_CURRENT_DOCUMENT(document: DocumentModel): void {
     this.currentDocument = document;
   }
 
@@ -160,7 +160,7 @@ export default class DocumentModule extends VuexModule {
   /**
    * Sets the current document.
    */
-  SET_BASE_DOCUMENT(document: ProjectDocument): void {
+  SET_BASE_DOCUMENT(document: DocumentModel): void {
     this.baseDocument = document;
   }
 
@@ -175,14 +175,14 @@ export default class DocumentModule extends VuexModule {
   /**
    * @return The current document.
    */
-  get projectDocuments(): ProjectDocument[] {
+  get projectDocuments(): DocumentModel[] {
     return [...this.allDocuments, this.baseDocument];
   }
 
   /**
    * @return The current document.
    */
-  get document(): ProjectDocument {
+  get document(): DocumentModel {
     return this.currentDocument;
   }
 
@@ -196,7 +196,7 @@ export default class DocumentModule extends VuexModule {
   /**
    * @return The default document.
    */
-  get defaultDocument(): ProjectDocument {
+  get defaultDocument(): DocumentModel {
     return this.baseDocument;
   }
 
@@ -205,7 +205,10 @@ export default class DocumentModule extends VuexModule {
    */
   get doesDocumentExist(): (name: string) => boolean {
     return (newName) => {
-      return !!this.projectDocuments.find(({ name }) => name === newName);
+      return (
+        newName === this.baseDocument.name ||
+        !!this.projectDocuments.find(({ name }) => name === newName)
+      );
     };
   }
 
@@ -226,7 +229,7 @@ export default class DocumentModule extends VuexModule {
   /**
    * Returns the column definitions for a table document.
    */
-  get tableColumns(): DocumentColumn[] {
+  get tableColumns(): ColumnModel[] {
     return (this.isTableDocument && this.currentDocument.columns) || [];
   }
 

@@ -14,7 +14,7 @@ import {
   handleSetProject,
   getWarningsInProjectVersion,
 } from "@/api";
-import { ProjectDocument } from "@/types";
+import { DocumentModel } from "@/types";
 
 /**
  * Load the given project version of given Id. Navigates to the artifact
@@ -25,7 +25,7 @@ import { ProjectDocument } from "@/types";
  */
 export async function handleLoadVersion(
   versionId: string,
-  document?: ProjectDocument
+  document?: DocumentModel
 ): Promise<void> {
   appModule.onLoadStart();
 

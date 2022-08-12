@@ -1,8 +1,8 @@
 import {
   ArtifactMap,
   IGenericUploader,
-  Artifact,
-  ParseArtifactFileResponse,
+  ArtifactModel,
+  ParseArtifactFileModel,
   ArtifactFile,
   ArtifactPanel,
 } from "@/types";
@@ -102,9 +102,9 @@ function createParsedArtifactFile(
   file: File
 ): Promise<void> {
   return parseArtifactFile(panel.projectFile.type, file)
-    .then((res: ParseArtifactFileResponse) => {
+    .then((res: ParseArtifactFileModel) => {
       const { entities, errors } = res;
-      const validArtifacts: Artifact[] = [];
+      const validArtifacts: ArtifactModel[] = [];
 
       entities.forEach((artifact) => {
         const error = getArtifactError(artifactMap, artifact);
@@ -141,7 +141,7 @@ function createParsedArtifactFile(
  */
 function getArtifactError(
   artifactMap: ArtifactMap,
-  artifact: Artifact
+  artifact: ArtifactModel
 ): string | undefined {
   if (artifact.name in artifactMap) {
     return `Could not parse duplicate artifact: ${artifact.name}`;

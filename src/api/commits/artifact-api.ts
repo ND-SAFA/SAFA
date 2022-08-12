@@ -1,4 +1,4 @@
-import { Artifact, ArtifactNameValidationResponse } from "@/types";
+import { ArtifactModel, NameValidationModel } from "@/types";
 import { Endpoint, fillEndpoint, authHttpClient, CommitBuilder } from "@/api";
 
 /**
@@ -12,9 +12,9 @@ export async function getDoesArtifactExist(
   versionId: string,
   artifactName: string
 ): Promise<boolean> {
-  const res = await authHttpClient<ArtifactNameValidationResponse>(
-    fillEndpoint(Endpoint.isArtifactNameTaken, { versionId, artifactName }),
-    { method: "GET" }
+  const res = await authHttpClient<NameValidationModel>(
+    fillEndpoint(Endpoint.isArtifactNameTaken, { versionId }),
+    { method: "POST", body: JSON.stringify({ artifactName }) }
   );
 
   return res.artifactExists;
@@ -26,7 +26,9 @@ export async function getDoesArtifactExist(
  * @param artifact - The artifact to delete.
  * @return The deleted artifact.
  */
-export async function deleteArtifact(artifact: Artifact): Promise<Artifact> {
+export async function deleteArtifact(
+  artifact: ArtifactModel
+): Promise<ArtifactModel> {
   return CommitBuilder.withCurrentVersion()
     .withRemovedArtifact(artifact)
     .save()
@@ -42,8 +44,8 @@ export async function deleteArtifact(artifact: Artifact): Promise<Artifact> {
  */
 export async function createArtifact(
   versionId: string,
-  artifact: Artifact
-): Promise<Artifact[]> {
+  artifact: ArtifactModel
+): Promise<ArtifactModel[]> {
   return CommitBuilder.withCurrentVersion()
     .withNewArtifact(artifact)
     .save()
@@ -59,8 +61,8 @@ export async function createArtifact(
  */
 export async function updateArtifact(
   versionId: string,
-  artifact: Artifact
-): Promise<Artifact[]> {
+  artifact: ArtifactModel
+): Promise<ArtifactModel[]> {
   return CommitBuilder.withCurrentVersion()
     .withModifiedArtifact(artifact)
     .save()

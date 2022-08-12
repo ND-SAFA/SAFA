@@ -1,15 +1,11 @@
 <template>
   <v-snackbar v-model="showSnackbar" :timeout="timeout" :color="messageColor">
-    <v-row class="ma-0 pa-0" justify="space-around">
+    <v-row class="ma-0 pa-0" justify="space-around" align="center">
       <v-col cols="1" class="ma-0 pa-0" align-self="center">
         <v-icon> {{ messageIcon }} </v-icon>
       </v-col>
-      <v-col
-        :cols="hasErrors ? 6 : 9"
-        class="ma-1 pa-0 text-center white--text"
-        align-self="center"
-      >
-        {{ snackbarMessage }}
+      <v-col :cols="hasErrors ? 6 : 9" align-self="center">
+        <typography align="center" color="white" :value="snackbarMessage" />
       </v-col>
       <v-col :cols="hasErrors ? 3 : 0" class="ma-0 pa-0" align-self="center">
         <v-row justify="end" class="ma-0 pa-0">
@@ -38,6 +34,7 @@ import Vue from "vue";
 import { MessageType, SnackbarMessage } from "@/types";
 import { appModule, logModule } from "@/store";
 import { ServerErrorModal } from "@/components/common/modals";
+import Typography from "./Typography.vue";
 
 /**
  * Displays snackbar messages.
@@ -45,6 +42,7 @@ import { ServerErrorModal } from "@/components/common/modals";
 export default Vue.extend({
   name: "Snackbar",
   components: {
+    Typography,
     ServerErrorModal,
   },
   props: {
@@ -65,7 +63,7 @@ export default Vue.extend({
      */
     showMessage(snackbarMessage: SnackbarMessage) {
       this.showSnackbar = true;
-      this.snackbarMessage = snackbarMessage.message;
+      this.snackbarMessage = String(snackbarMessage.message);
       this.errors = snackbarMessage.errors || [];
       this.messageType = snackbarMessage.type;
     },

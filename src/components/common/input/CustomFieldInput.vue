@@ -1,6 +1,6 @@
 <template>
   <div v-if="columns.length > 0">
-    <h1 class="text-h6">Custom Fields</h1>
+    <typography el="h1" variant="subtitle" value="Custom Fields" />
     <v-divider class="mb-2" />
     <single-custom-field-input
       v-for="column in columns"
@@ -14,8 +14,9 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { Artifact, DocumentColumn } from "@/types";
+import { ArtifactModel, ColumnModel } from "@/types";
 import { documentModule } from "@/store";
+import { Typography } from "@/components/common/display";
 import SingleCustomFieldInput from "./SingleCustomFieldInput.vue";
 
 /**
@@ -25,10 +26,10 @@ import SingleCustomFieldInput from "./SingleCustomFieldInput.vue";
  */
 export default Vue.extend({
   name: "CustomFieldInput",
-  components: { SingleCustomFieldInput },
+  components: { SingleCustomFieldInput, Typography },
   props: {
     value: {
-      type: Object as PropType<Artifact>,
+      type: Object as PropType<ArtifactModel>,
       required: true,
     },
   },
@@ -42,7 +43,7 @@ export default Vue.extend({
     /**
      * @return The current document columns.
      */
-    columns(): DocumentColumn[] {
+    columns(): ColumnModel[] {
       return documentModule.tableColumns;
     },
   },

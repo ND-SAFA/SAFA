@@ -3,48 +3,72 @@
     <v-expansion-panel-header disable-icon-rotate>
       <v-row no-gutters>
         <v-col cols="4">
-          {{ job.name }}
+          <typography :value="job.name" />
         </v-col>
-        <v-col cols="8" class="text--secondary">
+        <v-col cols="8">
           <v-row v-if="isCancelled(job.status)" no-gutters>
-            <v-col cols="4"> Upload Cancelled </v-col>
             <v-col cols="4">
-              {{ getUpdatedText(job.lastUpdatedAt) }}
+              <typography secondary value="Upload Cancelled" />
+            </v-col>
+            <v-col cols="4">
+              <typography
+                secondary
+                :value="getUpdatedText(job.lastUpdatedAt)"
+              />
             </v-col>
           </v-row>
-          <span v-else-if="isCompleted(job.status)">
-            {{ getCompletedText(job.completedAt) }}
-          </span>
+          <typography
+            v-else-if="isCompleted(job.status)"
+            secondary
+            :value="getCompletedText(job.completedAt)"
+          />
           <v-row v-else no-gutters>
             <v-col cols="4">
-              Upload Progress: {{ job.currentProgress }}%
+              <typography
+                secondary
+                :value="`Upload Progress: ${job.currentProgress}%`"
+              />
             </v-col>
             <v-col cols="4">
-              {{ getUpdatedText(job.lastUpdatedAt) }}
+              <typography
+                secondary
+                :value="getUpdatedText(job.lastUpdatedAt)"
+              />
             </v-col>
           </v-row>
         </v-col>
       </v-row>
       <template v-slot:actions>
-        <div style="width: 120px" class="d-flex justify-end">
-          <v-chip :color="getStatusColor(job.status)" data-cy="job-status">
-            <span class="mr-1">
-              {{ formatStatus(job.status) }}
-            </span>
+        <flex-box justify="end">
+          <v-chip
+            outlined
+            :color="getStatusColor(job.status)"
+            data-cy="job-status"
+          >
             <v-progress-circular
               v-if="isInProgress(job.status)"
+              :color="getStatusColor(job.status)"
               indeterminate
               size="16"
               class="mx-1"
             />
-            <v-icon v-if="isCompleted(job.status)">
+            <v-icon
+              v-if="isCompleted(job.status)"
+              :color="getStatusColor(job.status)"
+            >
               mdi-check-circle-outline
             </v-icon>
-            <v-icon v-if="isCancelled(job.status)">
+            <v-icon
+              v-if="isCancelled(job.status)"
+              :color="getStatusColor(job.status)"
+            >
               mdi-close-circle-outline
             </v-icon>
+            <span class="ml-1">
+              {{ formatStatus(job.status) }}
+            </span>
           </v-chip>
-        </div>
+        </flex-box>
       </template>
     </v-expansion-panel-header>
 
@@ -53,17 +77,21 @@
         <v-stepper-header>
           <template v-for="(step, stepIndex) in job.steps">
             <v-stepper-step :key="stepIndex" :step="stepIndex">
-              <span class="upload-step">
-                {{ job.steps[stepIndex] }}
-              </span>
+              <typography
+                class="upload-step"
+                align="center"
+                el="p"
+                :value="job.steps[stepIndex]"
+              />
             </v-stepper-step>
             <v-divider :key="step" />
           </template>
         </v-stepper-header>
       </v-stepper>
 
-      <div class="d-flex">
+      <flex-box full-width justify="end">
         <v-btn
+          outlined
           color="error"
           class="mr-1"
           data-cy="button-delete-job"
@@ -78,27 +106,29 @@
         >
           View Project
         </v-btn>
-      </div>
+      </flex-box>
     </v-expansion-panel-content>
   </v-expansion-panel>
 </template>
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { Job, JobStatus } from "@/types";
+import { JobModel, JobStatus } from "@/types";
 import { enumToDisplay, getJobStatusColor, timestampToDisplay } from "@/util";
 import { handleDeleteJob, handleLoadVersion } from "@/api";
 import { logModule } from "@/store";
+import { Typography } from "@/components/common";
+import FlexBox from "@/components/common/display/FlexBox.vue";
 
 /**
  * Displays a project import job.
- * TODO: Close panel before deleting job.
  */
 export default Vue.extend({
   name: "JobPanel",
+  components: { FlexBox, Typography },
   props: {
     job: {
-      type: Object as PropType<Job>,
+      type: Object as PropType<JobModel>,
       required: true,
     },
   },
@@ -149,13 +179,13 @@ export default Vue.extend({
      * Attempts to delete a job.
      * @param job - The job to delete.
      */
-    deleteJob(job: Job): void {
+    deleteJob(job: JobModel): void {
       handleDeleteJob(job, {});
     },
     /**
      * Navigates user to the completed project.
      */
-    async viewProject(job: Job): Promise<void> {
+    async viewProject(job: JobModel): Promise<void> {
       if (job.completedEntityId) {
         await handleLoadVersion(job.completedEntityId);
       } else {
@@ -169,6 +199,5 @@ export default Vue.extend({
 <style>
 .upload-step {
   width: min-content;
-  text-align: center;
 }
 </style>

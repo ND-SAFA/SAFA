@@ -9,6 +9,7 @@
   >
     <template v-slot:body>
       <generic-stepper
+        minimal
         v-model="currentStep"
         :steps="steps"
         @submit="$emit('submit')"

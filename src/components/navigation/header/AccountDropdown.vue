@@ -22,15 +22,27 @@
 
     <v-card>
       <v-list-item-content class="justify-center">
-        <div class="mx-auto text-center">
+        <div class="text-center">
           <v-avatar>
             <v-icon color="secondary" style="font-size: 48px">
               mdi-account-circle
             </v-icon>
           </v-avatar>
-          <h3 class="text-h6">{{ userName }}</h3>
-          <p class="text-caption mx-1">{{ userEmail }}</p>
-          <v-divider class="my-3"></v-divider>
+          <typography
+            el="div"
+            align="center"
+            variant="subtitle"
+            :value="userName"
+          />
+          <typography
+            el="div"
+            align="center"
+            variant="caption"
+            :value="userEmail"
+          />
+          <v-divider class="my-3" />
+          <v-btn text rounded @click="handleFeedback">Send Feedback</v-btn>
+          <br />
           <v-btn text rounded @click="handleEditAccount">Edit Account</v-btn>
           <v-divider class="my-3"></v-divider>
           <v-btn
@@ -53,9 +65,11 @@ import Vue from "vue";
 import { sessionModule } from "@/store";
 import { handleLogout } from "@/api";
 import { navigateTo, Routes } from "@/router";
+import { Typography } from "@/components/common";
 
 export default Vue.extend({
   name: "AccountDropdown",
+  components: { Typography },
   computed: {
     /**
      * @return The current user's email.
@@ -67,10 +81,18 @@ export default Vue.extend({
      * @return The current user's name.
      */
     userName() {
-      return "Demo User";
+      return "SAFA User";
     },
   },
   methods: {
+    /**
+     * Routes the user to the feedback page.
+     */
+    handleFeedback(): void {
+      window.open(
+        "https://www.notion.so/nd-safa/b73d1a8bfe0345f8b4d72daa1ceaf934?v=6e5d2439907a428fa1db2671a5eaa0b6"
+      );
+    },
     /**
      * Logs the user out.
      */

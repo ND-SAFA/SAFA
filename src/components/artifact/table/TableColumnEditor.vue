@@ -14,23 +14,25 @@
     <template v-slot:selection> {{ selectDisplay }} </template>
     <template v-slot:item="{ item }">
       <v-list-item-title @click.stop="handleEditOpen(item)">
-        {{ item.name }}
+        <typography :value="item.name" />
       </v-list-item-title>
-      <v-list-item-action class="d-flex flex-row pr-2">
-        <generic-icon-button
-          small
-          :is-disabled="isFirstItem(item)"
-          icon-id="mdi-menu-up"
-          :tooltip="`Move '${item.name}' Up`"
-          @click="handleMove(item, true)"
-        />
-        <generic-icon-button
-          small
-          :is-disabled="isLastItem(item)"
-          icon-id="mdi-menu-down"
-          :tooltip="`Move '${item.name}' Down`"
-          @click="handleMove(item, false)"
-        />
+      <v-list-item-action class="pr-2">
+        <flex-box>
+          <generic-icon-button
+            small
+            :is-disabled="isFirstItem(item)"
+            icon-id="mdi-menu-up"
+            :tooltip="`Move '${item.name}' Up`"
+            @click="handleMove(item, true)"
+          />
+          <generic-icon-button
+            small
+            :is-disabled="isLastItem(item)"
+            icon-id="mdi-menu-down"
+            :tooltip="`Move '${item.name}' Down`"
+            @click="handleMove(item, false)"
+          />
+        </flex-box>
       </v-list-item-action>
     </template>
 
@@ -53,21 +55,21 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { DocumentColumn } from "@/types";
+import { ColumnModel } from "@/types";
 import { columnTypeOptions } from "@/util";
 import { documentModule } from "@/store";
 import { handleColumnMove } from "@/api";
-import { GenericIconButton } from "@/components/common";
+import { GenericIconButton, FlexBox, Typography } from "@/components/common";
 import TableColumnModal from "./TableColumnModal.vue";
 
 export default Vue.extend({
   name: "TableColumnEditor",
-  components: { TableColumnModal, GenericIconButton },
+  components: { Typography, FlexBox, TableColumnModal, GenericIconButton },
   data() {
     return {
       isCreateOpen: false,
       isEditOpen: false,
-      editingColumn: undefined as DocumentColumn | undefined,
+      editingColumn: undefined as ColumnModel | undefined,
       items: documentModule.tableColumns,
       dataTypes: columnTypeOptions(),
     };
@@ -88,7 +90,7 @@ export default Vue.extend({
       get() {
         return undefined;
       },
-      set(column?: DocumentColumn) {
+      set(column?: ColumnModel) {
         if (!column) return;
         this.handleEditOpen(column);
       },
@@ -120,7 +122,7 @@ export default Vue.extend({
      * Opens the edit modal.
      * @param column - The column to edit.
      */
-    handleEditOpen(column: DocumentColumn) {
+    handleEditOpen(column: ColumnModel) {
       this.editingColumn = column;
       this.isEditOpen = true;
     },
@@ -130,7 +132,7 @@ export default Vue.extend({
      * @param item - The column to check.
      * @return Whether it is first.
      */
-    isFirstItem(item: DocumentColumn) {
+    isFirstItem(item: ColumnModel) {
       return this.items.indexOf(item) === 0;
     },
     /**
@@ -138,7 +140,7 @@ export default Vue.extend({
      * @param item - The column to check.
      * @return Whether it is last.
      */
-    isLastItem(item: DocumentColumn) {
+    isLastItem(item: ColumnModel) {
       return this.items.indexOf(item) === this.items.length - 1;
     },
 
@@ -153,7 +155,7 @@ export default Vue.extend({
      * @param item - The column to move.
      * @param moveUp - Whether to move the column up or down.
      */
-    handleMove(item: DocumentColumn, moveUp: boolean) {
+    handleMove(item: ColumnModel, moveUp: boolean) {
       handleColumnMove(item, moveUp, {
         onSuccess: (columns) => (this.items = columns),
       });

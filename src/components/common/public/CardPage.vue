@@ -4,7 +4,7 @@
       <v-card rounded elevation="2" class="mx-auto py-4 px-6" width="30em">
         <v-card-title class="mx-auto width-max">
           <safa-icon />
-          <h1 class="text-h2 font-weight-bold primary-text">SAFA</h1>
+          <typography el="h1" l="2" variant="large" value="SAFA" />
         </v-card-title>
 
         <v-form class="px-2">
@@ -21,7 +21,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { SafaIcon } from "@/components/common/display";
+import { SafaIcon, Typography } from "@/components/common/display";
 
 /**
  * Presents the page within a card containing SAFA title, a slot for a form,
@@ -29,6 +29,6 @@ import { SafaIcon } from "@/components/common/display";
  */
 export default Vue.extend({
   name: "CardPage",
-  components: { SafaIcon },
+  components: { Typography, SafaIcon },
 });
 </script>

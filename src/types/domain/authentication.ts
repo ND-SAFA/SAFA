@@ -32,9 +32,9 @@ export interface SessionModel {
 export type UserResetModel = Omit<UserModel, "password">;
 
 /**
- * Defines a user model for password updating.
+ * Defines a user model for password reset.
  */
-export interface UserChangeModel {
+export interface PasswordResetModel {
   /**
    * The token generated and included by email as a query param to securely change a user's password.
    */
@@ -43,6 +43,20 @@ export interface UserChangeModel {
    * The new password to set.
    */
   password: string;
+}
+
+/**
+ * Defines a user model for password change.
+ */
+export interface PasswordChangeModel {
+  /**
+   * The current password to change.
+   */
+  oldPassword: string;
+  /**
+   * The new password to set.
+   */
+  newPassword: string;
 }
 
 /**

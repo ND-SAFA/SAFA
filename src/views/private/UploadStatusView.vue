@@ -1,27 +1,23 @@
 <template>
   <private-page>
     <template v-slot:page>
-      <v-btn text @click="handleGoBack">
-        <v-icon left> mdi-arrow-left </v-icon>
-        Back To Project Creator
-      </v-btn>
-      <v-container>
-        <h1 class="text-h4">Current Uploads</h1>
-        <v-divider />
-        <p class="text-body-1 mt-2 mb-3">
-          Select a project below to see more detailed updates on the import
-          status.
-        </p>
-        <job-list />
-      </v-container>
+      <back-button />
+      <typography el="h1" variant="title" value="Current Uploads" />
+      <v-divider />
+      <typography
+        el="p"
+        y="2"
+        value="Select a project below to see more detailed updates on the import
+        status."
+      />
+      <job-list />
     </template>
   </private-page>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { navigateTo, Routes } from "@/router";
-import { JobList, PrivatePage } from "@/components";
+import { JobList, PrivatePage, BackButton, Typography } from "@/components";
 
 /**
  * Displays project uploads.
@@ -29,16 +25,10 @@ import { JobList, PrivatePage } from "@/components";
 export default Vue.extend({
   name: "UploadStatusView",
   components: {
+    Typography,
+    BackButton,
     JobList,
     PrivatePage,
-  },
-  methods: {
-    /**
-     * Goes back to the artifact page.
-     */
-    handleGoBack() {
-      navigateTo(Routes.PROJECT_CREATOR);
-    },
   },
 });
 </script>

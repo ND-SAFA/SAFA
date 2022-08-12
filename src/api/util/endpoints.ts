@@ -14,8 +14,11 @@ export enum Endpoint {
   logout = "accounts/logout",
   forgotPassword = "accounts/forgot",
   resetPassword = "accounts/reset",
+  updatePassword = "accounts/change",
+  deleteAccount = "accounts/delete",
 
   // Jobs
+  createProjectJob = "jobs/projects",
   updateProjectThroughFlatFiles = "jobs/projects/versions/:versionId",
   getUserJobs = "jobs",
   deleteJobById = "jobs/:jobId",
@@ -33,7 +36,7 @@ export enum Endpoint {
 
   // Commits
   commit = "projects/versions/:versionId/commit",
-  isArtifactNameTaken = "projects/versions/:versionId/artifacts/validate/:artifactName",
+  isArtifactNameTaken = "projects/versions/:versionId/artifacts/validate/",
 
   // Types
   getProjectArtifactTypes = "projects/:projectId/artifactTypes",

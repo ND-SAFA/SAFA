@@ -1,10 +1,10 @@
 <template>
-  <div class="d-flex flex-row align-center">
+  <flex-box align="center">
     <v-select
       ref="documentSelector"
       v-model="select"
       :items="items"
-      label="Document"
+      label="View"
       outlined
       color="secondary"
       dense
@@ -32,7 +32,7 @@
       <template v-slot:append-item>
         <v-btn text block color="primary" @click="handleCreateOpen">
           <v-icon>mdi-plus</v-icon>
-          Add Document
+          Add View
         </v-btn>
 
         <document-modal :is-open="isCreateOpen" @close="handleCloseMenu" />
@@ -50,23 +50,23 @@
       :tooltip="toggleViewTooltip"
       @click="handleToggleTableView"
     />
-  </div>
+  </flex-box>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { ProjectDocument } from "@/types";
+import { DocumentModel } from "@/types";
 import { documentModule } from "@/store";
-import { GenericIconButton } from "@/components/common/generic";
+import { GenericIconButton, FlexBox } from "@/components/common";
 import DocumentModal from "./DocumentModal.vue";
 
 export default Vue.extend({
   name: "DocumentSelector",
-  components: { DocumentModal, GenericIconButton },
+  components: { FlexBox, DocumentModal, GenericIconButton },
   data: () => ({
     isCreateOpen: false,
     isEditOpen: false,
-    editingDocument: undefined as ProjectDocument | undefined,
+    editingDocument: undefined as DocumentModel | undefined,
   }),
   computed: {
     /**
@@ -126,7 +126,7 @@ export default Vue.extend({
     /**
      * Opens the edit document modal.
      */
-    handleEditOpen(document: ProjectDocument) {
+    handleEditOpen(document: DocumentModel) {
       this.editingDocument = document;
       this.isEditOpen = true;
     },

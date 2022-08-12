@@ -1,11 +1,11 @@
 <template>
-  <v-flex class="d-flex flex-row align-center">
-    <v-flex class="d-flex flex-row align-center">
+  <flex-box align="center">
+    <flex-box full-width align="center">
       <safa-icon />
-      <h1 class="text-h4 white--text ml-4">SAFA</h1>
+      <typography el="h1" variant="large" l="4" color="white" value="SAFA" />
       <button-row :definitions="definitions" class="mx-3" />
       <saving-icon />
-    </v-flex>
+    </flex-box>
 
     <div class="mr-5">
       <version-label />
@@ -33,7 +33,7 @@
       @close="createVersionOpen = false"
       @create="handleVersionCreated"
     />
-  </v-flex>
+  </flex-box>
 </template>
 
 <script lang="ts">
@@ -42,12 +42,12 @@ import {
   ButtonDefinition,
   ButtonMenuItem,
   ButtonType,
-  ProjectVersion,
+  VersionModel,
 } from "@/types";
 import { navigateTo, Routes } from "@/router";
 import { logModule, projectModule } from "@/store";
 import { handleLoadVersion } from "@/api";
-import { ButtonRow, SafaIcon } from "@/components/common";
+import { ButtonRow, SafaIcon, Typography, FlexBox } from "@/components/common";
 import {
   VersionCreator,
   BaselineVersionModal,
@@ -60,6 +60,8 @@ import SavingIcon from "./SavingIcon.vue";
 export default Vue.extend({
   name: "AppBarHeader",
   components: {
+    FlexBox,
+    Typography,
     VersionLabel,
     AccountDropdown,
     SafaIcon,
@@ -205,7 +207,7 @@ export default Vue.extend({
     /**
      * Closes the version creator and loads the created version.
      */
-    handleVersionCreated(version: ProjectVersion) {
+    handleVersionCreated(version: VersionModel) {
       handleLoadVersion(version.versionId);
 
       this.createVersionOpen = false;

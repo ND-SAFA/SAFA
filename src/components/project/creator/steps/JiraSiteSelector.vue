@@ -26,7 +26,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { JiraCloudSite } from "@/types";
+import { JiraCloudSiteModel } from "@/types";
 import { GenericStepperListStep } from "@/components";
 
 /**
@@ -41,7 +41,7 @@ export default Vue.extend({
   },
   props: {
     sites: {
-      type: Array as PropType<JiraCloudSite[]>,
+      type: Array as PropType<JiraCloudSiteModel[]>,
       required: true,
     },
     loading: {
@@ -54,7 +54,7 @@ export default Vue.extend({
      * Handles a click to select a site.
      * @param site - The site to select.
      */
-    handleSiteSelect(site: JiraCloudSite) {
+    handleSiteSelect(site: JiraCloudSiteModel) {
       this.$emit("select", site);
     },
   },

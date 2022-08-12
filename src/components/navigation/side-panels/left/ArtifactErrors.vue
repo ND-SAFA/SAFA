@@ -1,38 +1,36 @@
 <template>
   <div v-if="selectedArtifactWarnings.length > 0">
-    <div class="d-flex flex-row">
+    <flex-box>
       <v-icon color="secondary">mdi-hazard-lights</v-icon>
-      <h2 class="text-h6 ml-1">Warnings</h2>
-    </div>
+      <typography el="h2" l="1" variant="subtitle" value="Warnings" />
+    </flex-box>
 
-    <v-divider class="mb-2" />
+    <v-divider />
 
-    <v-expansion-panels>
-      <v-expansion-panel
+    <v-list expand>
+      <toggle-list
         v-for="(warning, idx) in selectedArtifactWarnings"
         :key="idx"
+        :title="warning.ruleName"
       >
-        <v-expansion-panel-header class="text-body-1">
-          {{ warning.ruleName }}
-        </v-expansion-panel-header>
-        <v-expansion-panel-content class="text-body-1">
-          {{ warning.ruleMessage }}
-        </v-expansion-panel-content>
-      </v-expansion-panel>
-    </v-expansion-panels>
+        <typography :value="warning.ruleMessage" />
+      </toggle-list>
+    </v-list>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { ArtifactWarning } from "@/types";
+import { WarningModel } from "@/types";
 import { artifactSelectionModule, errorModule } from "@/store";
+import { Typography, FlexBox, ToggleList } from "@/components/common";
 
 /**
  * Displays the selected node's error.
  */
 export default Vue.extend({
   name: "ArtifactErrors",
+  components: { ToggleList, FlexBox, Typography },
   computed: {
     /**
      * @return The selected artifact.
@@ -43,7 +41,7 @@ export default Vue.extend({
     /**
      * @return The selected artifact's warnings.
      */
-    selectedArtifactWarnings(): ArtifactWarning[] {
+    selectedArtifactWarnings(): WarningModel[] {
       const id = this.selectedArtifact?.id || "";
 
       return errorModule.getArtifactWarnings[id] || [];

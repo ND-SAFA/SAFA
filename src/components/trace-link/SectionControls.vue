@@ -1,5 +1,5 @@
 <template>
-  <div class="d-flex flex-row">
+  <flex-box>
     <generic-icon-button
       color="error"
       tooltip="Collapse All"
@@ -12,12 +12,12 @@
       icon-id="mdi-arrow-expand-all"
       @click="$emit('open:all')"
     />
-  </div>
+  </flex-box>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { GenericIconButton } from "@/components/common";
+import { GenericIconButton, FlexBox } from "@/components/common";
 
 /**
  * Displays section controls.
@@ -27,6 +27,6 @@ import { GenericIconButton } from "@/components/common";
  */
 export default Vue.extend({
   name: "SectionControls",
-  components: { GenericIconButton },
+  components: { FlexBox, GenericIconButton },
 });
 </script>

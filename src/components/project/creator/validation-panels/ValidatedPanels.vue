@@ -11,19 +11,20 @@
           @click="$emit('add')"
           data-cy="button-create-panel"
         >
-          Create new {{ itemName }}</v-btn
-        >
+          Create new {{ itemName }}
+        </v-btn>
       </v-col>
-      <v-col v-if="showError" style="white-space: nowrap">
-        Requires at least 1 {{ itemName }}.
+      <v-col v-if="showError">
+        <typography :value="`Requires at least 1 ${itemName}.`" />
       </v-col>
     </v-row>
   </v-container>
 </template>
 
 <script lang="ts">
-import { ThemeColors } from "@/util";
 import Vue, { PropType } from "vue";
+import { ThemeColors } from "@/util";
+import { Typography } from "@/components/common";
 
 /**
  * Validated upload panels.
@@ -34,6 +35,7 @@ import Vue, { PropType } from "vue";
  */
 export default Vue.extend({
   name: "ValidatedPanels",
+  components: { Typography },
   props: {
     itemName: {
       type: String,

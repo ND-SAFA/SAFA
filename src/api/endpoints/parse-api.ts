@@ -1,4 +1,4 @@
-import { ParseArtifactFileResponse, ParseTraceFileResponse } from "@/types";
+import { ParseArtifactFileModel, ParseTraceFileModel } from "@/types";
 import { Endpoint, fillEndpoint, authHttpClient } from "@/api";
 
 /**
@@ -11,12 +11,12 @@ import { Endpoint, fillEndpoint, authHttpClient } from "@/api";
 export async function parseArtifactFile(
   artifactType: string,
   file: File
-): Promise<ParseArtifactFileResponse> {
+): Promise<ParseArtifactFileModel> {
   const formData = new FormData();
 
   formData.append("file", file);
 
-  return authHttpClient<ParseArtifactFileResponse>(
+  return authHttpClient<ParseArtifactFileModel>(
     fillEndpoint(Endpoint.parseArtifactFile, { artifactType }),
     {
       method: "POST",
@@ -32,14 +32,12 @@ export async function parseArtifactFile(
  * @param file - The trace file to parse.
  * @return The parsed trace file.
  */
-export async function parseTraceFile(
-  file: File
-): Promise<ParseTraceFileResponse> {
+export async function parseTraceFile(file: File): Promise<ParseTraceFileModel> {
   const formData = new FormData();
 
   formData.append("file", file);
 
-  return authHttpClient<ParseTraceFileResponse>(
+  return authHttpClient<ParseTraceFileModel>(
     Endpoint.parseTraceFile,
     {
       method: "POST",

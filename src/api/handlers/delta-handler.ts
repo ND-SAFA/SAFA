@@ -1,4 +1,4 @@
-import { EmptyLambda, ProjectDelta, ProjectVersion } from "@/types";
+import { EmptyLambda, ProjectDelta, VersionModel } from "@/types";
 import { deltaModule, logModule } from "@/store";
 import { getProjectDelta } from "@/api";
 
@@ -10,8 +10,8 @@ import { getProjectDelta } from "@/api";
  * @param onComplete - Ran if the operation is successful.
  */
 export function handleSetProjectDelta(
-  sourceVersion: ProjectVersion,
-  targetVersion: ProjectVersion,
+  sourceVersion: VersionModel,
+  targetVersion: VersionModel,
   onComplete: EmptyLambda
 ): void {
   getProjectDelta(sourceVersion.versionId, targetVersion.versionId)

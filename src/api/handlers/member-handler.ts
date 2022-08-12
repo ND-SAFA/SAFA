@@ -1,7 +1,7 @@
 import {
   ConfirmationType,
   IOHandlerCallback,
-  ProjectMembership,
+  MembershipModel,
   ProjectRole,
 } from "@/types";
 import { logModule } from "@/store";
@@ -39,7 +39,7 @@ export function handleInviteMember(
  *
  * @param member - The member to delete.
  */
-export function handleDeleteMember(member: ProjectMembership): void {
+export function handleDeleteMember(member: MembershipModel): void {
   logModule.SET_CONFIRMATION_MESSAGE({
     type: ConfirmationType.INFO,
     title: "Remove User from Project",

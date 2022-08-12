@@ -16,7 +16,7 @@ import { svgDetails, svgDiv, svgTitle } from "./core-svg";
  */
 export function svgTIM(data: TimNodeData): string {
   const x = 10;
-  const y = 40;
+  const y = 30;
 
   return `
     <svg
@@ -37,8 +37,8 @@ export function svgTIM(data: TimNodeData): string {
         class="artifact-svg"
       />
       ${svgTitle(data.id, ThemeColors.black, y)}
-      ${svgDiv({ x, y: y + 7, width: TIM_NODE_WIDTH - x * 2 })}
-      ${svgDetails(`${data.count} Nodes`, ThemeColors.black, y + 27)}
+      ${svgDiv({ x, y: y + 17, width: TIM_NODE_WIDTH - x * 2 })}
+      ${svgDetails(`${data.count} Nodes`, ThemeColors.black, y + 47)}
     </svg>
     `;
 }

@@ -23,32 +23,29 @@
     />
 
     <v-list class="search-container full-width" expand>
-      <v-list-group
+      <toggle-list
         v-for="type in artifactTypes"
         :key="type"
-        :prepend-icon="getIconName(type)"
+        :icon="getIconName(type)"
         :value="!!searchText"
       >
         <template v-slot:activator>
-          <v-list-item-title>
-            <v-tooltip bottom open-delay="300">
-              <template v-slot:activator="{ on, attrs }">
-                <div v-on="on" v-bind="attrs">
-                  <typography :value="getTypePrintName(type)" />
-                  <typography
-                    secondary
-                    :value="`(${artifactTypeHashTable[type].length})`"
-                  />
-                </div>
-              </template>
-              <span>
-                {{ getTypePrintName(type) }}
-                ({{ artifactTypeHashTable[type].length }})
-              </span>
-            </v-tooltip>
-          </v-list-item-title>
+          <v-tooltip bottom open-delay="300">
+            <template v-slot:activator="{ on, attrs }">
+              <div v-on="on" v-bind="attrs">
+                <typography :value="getTypePrintName(type)" />
+                <typography
+                  secondary
+                  :value="`(${artifactTypeHashTable[type].length})`"
+                />
+              </div>
+            </template>
+            <span>
+              {{ getTypePrintName(type) }}
+              ({{ artifactTypeHashTable[type].length }})
+            </span>
+          </v-tooltip>
         </template>
-        <v-divider />
         <v-list-item
           v-for="artifact in artifactTypeHashTable[type]"
           :key="artifact.name"
@@ -56,7 +53,7 @@
         >
           <generic-artifact-body-display display-title :artifact="artifact" />
         </v-list-item>
-      </v-list-group>
+      </toggle-list>
     </v-list>
   </v-container>
 </template>
@@ -66,14 +63,18 @@ import Vue from "vue";
 import { ArtifactModel } from "@/types";
 import { filterArtifacts, getArtifactTypePrintName } from "@/util";
 import { typeOptionsModule, viewportModule, artifactModule } from "@/store";
-import { Typography, GenericArtifactBodyDisplay } from "@/components/common";
+import {
+  Typography,
+  GenericArtifactBodyDisplay,
+  ToggleList,
+} from "@/components/common";
 
 /**
  * Displays all project artifacts.
  */
 export default Vue.extend({
   name: "SubTreeSelectorTab",
-  components: { Typography, GenericArtifactBodyDisplay },
+  components: { Typography, GenericArtifactBodyDisplay, ToggleList },
   data() {
     return {
       searchText: "",

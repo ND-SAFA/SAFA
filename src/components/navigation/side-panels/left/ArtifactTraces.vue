@@ -10,13 +10,7 @@
     <v-divider />
 
     <v-list expand>
-      <v-list-group v-if="parents.length > 0">
-        <template v-slot:activator>
-          <v-list-item-title>
-            <typography :value="parentTitle" />
-          </v-list-item-title>
-        </template>
-        <v-divider class="faded" />
+      <toggle-list v-if="parents.length > 0" :title="parentTitle">
         <v-list dense style="max-height: 300px" class="overflow-y-auto">
           <template v-for="parent in parents">
             <generic-list-item
@@ -26,15 +20,8 @@
             />
           </template>
         </v-list>
-      </v-list-group>
-
-      <v-list-group v-if="children.length > 0">
-        <template v-slot:activator>
-          <v-list-item-title>
-            <typography :value="childTitle" />
-          </v-list-item-title>
-        </template>
-        <v-divider class="faded" />
+      </toggle-list>
+      <toggle-list v-if="children.length > 0" :title="childTitle">
         <v-list dense style="max-height: 300px" class="overflow-y-auto">
           <template v-for="child in children">
             <generic-list-item
@@ -44,7 +31,7 @@
             />
           </template>
         </v-list>
-      </v-list-group>
+      </toggle-list>
     </v-list>
   </div>
 </template>
@@ -53,14 +40,19 @@
 import Vue from "vue";
 import { artifactModule, artifactSelectionModule, traceModule } from "@/store";
 import { ListItem } from "@/types";
-import { GenericListItem, Typography, FlexBox } from "@/components/common";
+import {
+  GenericListItem,
+  Typography,
+  FlexBox,
+  ToggleList,
+} from "@/components/common";
 
 /**
  * Displays the selected node's parents and children.
  */
 export default Vue.extend({
   name: "ArtifactTraces",
-  components: { FlexBox, Typography, GenericListItem },
+  components: { FlexBox, Typography, GenericListItem, ToggleList },
   computed: {
     /**
      * @return The selected artifact.

@@ -1,20 +1,14 @@
 <template>
-  <v-list-group :value="itemFields.length > 0">
-    <template v-slot:activator>
-      <v-list-item-title>
-        <typography :value="title" />
-      </v-list-item-title>
-    </template>
-    <v-divider class="faded mb-2" />
+  <toggle-list :value="itemFields.length > 0" :title="title">
     <artifact-delta-button
       v-for="{ name, id } in itemFields"
-      class="mr-1 mb-1"
+      class="mr-1 my-1"
       :key="name"
       :name="name"
       :deltaType="deltaType"
       @click="$emit('click', id)"
     />
-  </v-list-group>
+  </toggle-list>
 </template>
 
 <script lang="ts">
@@ -26,7 +20,7 @@ import {
   TraceLinkModel,
 } from "@/types";
 import { capitalize } from "@/util";
-import { Typography } from "@/components/common";
+import { ToggleList } from "@/components/common";
 import ArtifactDeltaButton from "./ArtifactDeltaButton.vue";
 
 /**
@@ -36,7 +30,7 @@ import ArtifactDeltaButton from "./ArtifactDeltaButton.vue";
  */
 export default Vue.extend({
   name: "DeltaButtonGroup",
-  components: { Typography, ArtifactDeltaButton },
+  components: { ArtifactDeltaButton, ToggleList },
   props: {
     deltaType: {
       type: String as PropType<DeltaType>,

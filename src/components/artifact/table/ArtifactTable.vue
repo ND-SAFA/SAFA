@@ -145,17 +145,20 @@ export default Vue.extend({
           value: "name",
           width: "200px",
           filterable: true,
+          divider: true,
         },
         {
           text: "Type",
           value: "type",
           width: "200px",
           filterable: true,
+          divider: true,
         },
         ...documentModule.tableColumns.map((col) => ({
           text: col.name,
           value: col.id,
           width: "300px",
+          divider: true,
         })),
         {
           text: "Actions",
@@ -244,14 +247,17 @@ export default Vue.extend({
 </script>
 
 <style lang="scss">
-.v-data-table__expanded__content {
-  box-shadow: inset 0px 2px 8px -5px rgba(50, 50, 50, 0.75),
-    inset 0px -2px 8px -5px rgba(50, 50, 50, 0.75) !important;
-}
-
 .artifact-view {
+  .v-data-table__expanded__content {
+    box-shadow: inset 0 2px 8px -5px rgba(50, 50, 50, 0.75) !important;
+  }
+
   tr {
     cursor: pointer;
+
+    &.v-data-table__expanded__content {
+      cursor: text;
+    }
   }
 }
 </style>

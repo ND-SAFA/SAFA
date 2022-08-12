@@ -1,14 +1,14 @@
 from typing import Dict, List, Tuple
 
 from trace.config.constants import LINKED_TARGETS_ONLY_DEFAULT
-from common.jobs.abstract_arg_builder import AbstractArgBuilder
+from common.jobs.abstract_args_builder import AbstractArgsBuilder
 from common.models.model_generator import ModelGenerator
 from trace.data.trace_dataset_creator import TraceDatasetCreator
 
 from trace.jobs.trace_args import TraceArgs
 
 
-class TraceArgBuilder(AbstractArgBuilder):
+class TraceArgsBuilder(AbstractArgsBuilder):
 
     def __init__(self, base_model_name: str, links: List[Tuple[str, str]], model_path: str, output_path: str,
                 sources: Dict[str, str], targets: Dict[str, str], **kwargs):

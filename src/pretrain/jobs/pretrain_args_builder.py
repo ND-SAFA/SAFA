@@ -1,5 +1,5 @@
 from pretrain.config.constants import PRETRAIN_MODEL_PATH
-from common.jobs.abstract_arg_builder import AbstractArgBuilder
+from common.jobs.abstract_args_builder import AbstractArgsBuilder
 from common.models.base_models.supported_base_model import SupportedBaseModel
 from common.models.model_generator import ModelGenerator
 from common.models.model_properties import ModelSize
@@ -7,9 +7,8 @@ from pretrain.data.corpuses.domain import Domain
 from pretrain.jobs.pretrain_args import PretrainArgs
 
 
-class PretrainArgBuilder(AbstractArgBuilder):
+class PretrainArgBuilder(AbstractArgsBuilder):
 
-    @staticmethod
     def __init__(self, output_path: str, corpus_dir: str = None, domain: Domain = Domain.BASE,
                  model_size: ModelSize = ModelSize.BASE, **kwargs):
         """

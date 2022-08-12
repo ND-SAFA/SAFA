@@ -1,7 +1,7 @@
 from abc import abstractmethod
 
 
-class AbstractArgBuilder:
+class AbstractArgsBuilder:
 
     @abstractmethod
     def build(self):

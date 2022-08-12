@@ -1,13 +1,13 @@
 from abc import ABC
 
 from common.jobs.abstract_job import AbstractJob
-from common.jobs.abstract_arg_builder import AbstractArgBuilder
+from common.jobs.abstract_args_builder import AbstractArgsBuilder
 from trace.train.trace_trainer import TraceTrainer
 
 
 class AbstractTraceJob(AbstractJob, ABC):
 
-    def __init__(self, args_builder: AbstractArgBuilder):
+    def __init__(self, args_builder: AbstractArgsBuilder):
         """
         Base job for task using a model (i.e. training, prediction, evaluation...)
         :param args: arguments used for configuring the model

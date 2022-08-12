@@ -63,7 +63,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { Artifact, TraceLink } from "@/types";
+import { ArtifactModel, TraceLinkModel } from "@/types";
 import { GenericArtifactBodyDisplay } from "@/components";
 import { artifactModule } from "@/store";
 import { FlexBox } from "@/components/common";
@@ -84,7 +84,7 @@ export default Vue.extend({
   },
   props: {
     link: {
-      type: Object as PropType<TraceLink>,
+      type: Object as PropType<TraceLinkModel>,
       required: true,
     },
     showDecline: {
@@ -111,13 +111,13 @@ export default Vue.extend({
     /**
      * @return The artifact this link comes from.
      */
-    sourceArtifact(): Artifact {
+    sourceArtifact(): ArtifactModel {
       return artifactModule.getArtifactsById[this.link.sourceId];
     },
     /**
      * @return The artifact this link goes towards.
      */
-    targetArtifact(): Artifact {
+    targetArtifact(): ArtifactModel {
       return artifactModule.getArtifactsById[this.link.targetId];
     },
     /**

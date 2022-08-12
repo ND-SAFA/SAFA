@@ -37,7 +37,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { TraceLink, Artifact, CytoCoreGraph } from "@/types";
+import { TraceLinkModel, ArtifactModel, CytoCoreGraph } from "@/types";
 import {
   appModule,
   artifactModule,
@@ -67,7 +67,7 @@ export default Vue.extend({
   data() {
     return {
       isTraceModalOpen: false,
-      selectedLink: undefined as TraceLink | undefined,
+      selectedLink: undefined as TraceLinkModel | undefined,
       artifactsInView: [] as string[],
     };
   },
@@ -99,13 +99,13 @@ export default Vue.extend({
     /**
      * @return All visible artifacts.
      */
-    artifacts(): Artifact[] {
+    artifacts(): ArtifactModel[] {
       return artifactModule.artifacts;
     },
     /**
      * @return All visible trace links.
      */
-    traceLinks(): TraceLink[] {
+    traceLinks(): TraceLinkModel[] {
       return deltaModule.inDeltaView
         ? traceModule.traces
         : traceModule.nonDeclinedTraces;
@@ -164,7 +164,7 @@ export default Vue.extend({
      * @param link - The trace link to check.
      * @return Whether to fade.
      */
-    isTraceLinkFaded(link: TraceLink): boolean {
+    isTraceLinkFaded(link: TraceLinkModel): boolean {
       return (
         !this.artifactsInView.includes(link.targetId) ||
         !this.artifactsInView.includes(link.sourceId)
@@ -174,7 +174,7 @@ export default Vue.extend({
      * Selects a clicked trace link and opens the link modal.
      * @param traceLink - The trace link to select.
      */
-    handleLinkRightClick(traceLink: TraceLink): void {
+    handleLinkRightClick(traceLink: TraceLinkModel): void {
       this.selectedLink = traceLink;
       this.isTraceModalOpen = true;
     },

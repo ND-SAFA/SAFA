@@ -63,7 +63,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { Artifact } from "@/types";
+import { ArtifactModel } from "@/types";
 import { filterArtifacts, getArtifactTypePrintName } from "@/util";
 import { typeOptionsModule, viewportModule, artifactModule } from "@/store";
 import { Typography, GenericArtifactBodyDisplay } from "@/components/common";
@@ -77,9 +77,9 @@ export default Vue.extend({
   data() {
     return {
       searchText: "",
-      artifacts: [] as Artifact[],
+      artifacts: [] as ArtifactModel[],
       artifactTypes: [] as string[],
-      artifactTypeHashTable: {} as Record<string, Artifact[]>,
+      artifactTypeHashTable: {} as Record<string, ArtifactModel[]>,
     };
   },
   mounted() {
@@ -97,7 +97,7 @@ export default Vue.extend({
     /**
      * Returns all visible artifacts.
      */
-    allArtifacts(): Artifact[] {
+    allArtifacts(): ArtifactModel[] {
       return artifactModule.artifacts;
     },
   },
@@ -121,7 +121,7 @@ export default Vue.extend({
      */
     updateArtifacts(): void {
       const artifacts = artifactModule.artifacts;
-      const hashTable: Record<string, Artifact[]> = {};
+      const hashTable: Record<string, ArtifactModel[]> = {};
 
       this.artifacts = this.searchText
         ? artifacts.filter((artifact) =>
@@ -158,7 +158,7 @@ export default Vue.extend({
      * Focuses the graph on the given artifact's subtree.
      * @param artifact - The artifact focus on.
      */
-    async handleArtifactClick(artifact: Artifact): Promise<void> {
+    async handleArtifactClick(artifact: ArtifactModel): Promise<void> {
       await viewportModule.viewArtifactSubtree(artifact.id);
     },
   },

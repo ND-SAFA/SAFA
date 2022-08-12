@@ -72,9 +72,9 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import {
-  Artifact,
+  ArtifactModel,
   ColumnDataType,
-  DocumentColumn,
+  ColumnModel,
   FlatArtifact,
 } from "@/types";
 import ArtifactTableChip from "./ArtifactTableChip.vue";
@@ -106,7 +106,7 @@ export default Vue.extend({
       required: true,
     },
     column: {
-      type: Object as PropType<DocumentColumn>,
+      type: Object as PropType<ColumnModel>,
       required: true,
     },
   },
@@ -122,7 +122,7 @@ export default Vue.extend({
     /**
      * Returns the associated artifact for this cell.
      */
-    artifact(): Artifact {
+    artifact(): ArtifactModel {
       return artifactModule.getArtifactById(this.item.id);
     },
   },

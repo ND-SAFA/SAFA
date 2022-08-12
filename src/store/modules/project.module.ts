@@ -1,10 +1,10 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 
 import type {
-  ArtifactType,
-  Project,
-  ProjectDocument,
-  ProjectIdentifier,
+  ArtifactTypeModel,
+  ProjectModel,
+  DocumentModel,
+  IdentifierModel,
   MembershipModel,
 } from "@/types";
 import { createProject } from "@/util";
@@ -18,7 +18,7 @@ import {
   typeOptionsModule,
   viewportModule,
 } from "@/store";
-import { Artifact, TraceLink } from "@/types";
+import { ArtifactModel, TraceLinkModel } from "@/types";
 import { handleDocumentReload } from "@/api";
 
 @Module({ namespaced: true, name: "project" })
@@ -35,7 +35,7 @@ export default class ProjectModule extends VuexModule {
   /**
    * Initializes the current project
    */
-  async initializeProject(project: Project): Promise<void> {
+  async initializeProject(project: ProjectModel): Promise<void> {
     this.SAVE_PROJECT(project);
     documentModule.initializeProject(project);
     typeOptionsModule.initializeTypeIcons(project.artifactTypes);
@@ -53,7 +53,7 @@ export default class ProjectModule extends VuexModule {
    *
    * @param artifacts - The artifacts to set.
    */
-  async addOrUpdateArtifacts(newArtifacts: Artifact[]): Promise<void> {
+  async addOrUpdateArtifacts(newArtifacts: ArtifactModel[]): Promise<void> {
     const newIds = newArtifacts.map(({ id }) => id);
     const updatedArtifacts = [
       ...this.project.artifacts.filter(({ id }) => !newIds.includes(id)),
@@ -71,7 +71,7 @@ export default class ProjectModule extends VuexModule {
   /**
    * Deletes the artifact with the given name.
    */
-  async deleteArtifacts(artifacts: Artifact[]): Promise<void> {
+  async deleteArtifacts(artifacts: ArtifactModel[]): Promise<void> {
     if (artifacts.length === 0) return;
 
     const deletedNames = artifacts.map(({ name }) => name);
@@ -89,7 +89,7 @@ export default class ProjectModule extends VuexModule {
    *
    * @param traceLinks - The trace links to set.
    */
-  async addOrUpdateTraceLinks(newTraces: TraceLink[]): Promise<void> {
+  async addOrUpdateTraceLinks(newTraces: TraceLinkModel[]): Promise<void> {
     const newIds = newTraces.map(({ traceLinkId }) => traceLinkId);
     const updatedTraces = [
       ...this.project.traces.filter(
@@ -110,7 +110,7 @@ export default class ProjectModule extends VuexModule {
    *
    * @param traceLink - The trace link to remove.
    */
-  async deleteTraceLinks(traceLinks: TraceLink[]): Promise<void> {
+  async deleteTraceLinks(traceLinks: TraceLinkModel[]): Promise<void> {
     if (traceLinks.length === 0) return;
 
     const deletedIds = traceLinks.map(({ traceLinkId }) => traceLinkId);
@@ -131,7 +131,7 @@ export default class ProjectModule extends VuexModule {
    *
    * @param artifactType - The artifact type to add.
    */
-  addOrUpdateArtifactType(artifactType: ArtifactType): void {
+  addOrUpdateArtifactType(artifactType: ArtifactTypeModel): void {
     const unaffectedTypes = this.project.artifactTypes.filter(
       (a) => a.typeId !== artifactType.typeId
     );
@@ -160,7 +160,7 @@ export default class ProjectModule extends VuexModule {
    *
    * @param project - The new project to track.
    */
-  SET_PROJECT_IDENTIFIER(project: ProjectIdentifier): void {
+  SET_PROJECT_IDENTIFIER(project: IdentifierModel): void {
     this.project = {
       ...this.project,
       name: project.name,
@@ -174,7 +174,7 @@ export default class ProjectModule extends VuexModule {
    *
    * @param project - The new project to track.
    */
-  SAVE_PROJECT(project: Project): void {
+  SAVE_PROJECT(project: ProjectModel): void {
     this.project = project;
   }
 
@@ -190,7 +190,7 @@ export default class ProjectModule extends VuexModule {
   /**
    * Sets the current artifacts in the project.
    */
-  SET_ARTIFACTS(artifacts: Artifact[]): void {
+  SET_ARTIFACTS(artifacts: ArtifactModel[]): void {
     this.project.artifacts = artifacts;
   }
 
@@ -198,7 +198,7 @@ export default class ProjectModule extends VuexModule {
   /**
    * Sets the current trace links in the project.
    */
-  SET_TRACES(traces: TraceLink[]): void {
+  SET_TRACES(traces: TraceLinkModel[]): void {
     this.project.traces = traces;
   }
 
@@ -206,7 +206,7 @@ export default class ProjectModule extends VuexModule {
   /**
    * Sets the current documents in the project.
    */
-  SET_DOCUMENTS(documents: ProjectDocument[]): void {
+  SET_DOCUMENTS(documents: DocumentModel[]): void {
     this.project.documents = documents;
   }
 
@@ -214,14 +214,14 @@ export default class ProjectModule extends VuexModule {
   /**
    * Sets the current artifact type in the project.
    */
-  SET_ARTIFACT_TYPES(artifactTypes: ArtifactType[]): void {
+  SET_ARTIFACT_TYPES(artifactTypes: ArtifactTypeModel[]): void {
     this.project.artifactTypes = artifactTypes;
   }
 
   /**
    * @return The current project.
    */
-  get getProject(): Project {
+  get getProject(): ProjectModel {
     return this.project;
   }
 

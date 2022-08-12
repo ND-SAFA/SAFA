@@ -49,7 +49,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { DocumentColumn } from "@/types";
+import { ColumnModel } from "@/types";
 import { columnTypeOptions, createColumn } from "@/util";
 import { documentModule } from "@/store";
 import { handleColumnDelete, handleColumnSave } from "@/api";
@@ -66,7 +66,7 @@ export default Vue.extend({
   props: {
     isOpen: Boolean,
     column: {
-      type: Object as PropType<DocumentColumn>,
+      type: Object as PropType<ColumnModel>,
       required: false,
     },
   },

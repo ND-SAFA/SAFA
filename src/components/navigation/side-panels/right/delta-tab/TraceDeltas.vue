@@ -28,7 +28,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { TraceLink } from "@/types";
+import { TraceLinkModel } from "@/types";
 import { deltaModule } from "@/store";
 import { Typography } from "@/components/common";
 import { TraceLinkApprovalModal } from "@/components/trace-link";
@@ -45,7 +45,7 @@ export default Vue.extend({
   data() {
     return {
       isTraceModalOpen: false,
-      selectedDeltaLink: undefined as TraceLink | undefined,
+      selectedDeltaLink: undefined as TraceLinkModel | undefined,
       openPanels: [0, 1],
     };
   },

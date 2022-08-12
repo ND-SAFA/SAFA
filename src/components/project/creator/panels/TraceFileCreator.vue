@@ -19,7 +19,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { ButtonDefinition, ButtonType, Link, TraceFile } from "@/types";
+import { ButtonDefinition, ButtonType, LinkModel, TraceFile } from "@/types";
 import { logModule } from "@/store";
 import { ButtonRow, FlexBox } from "@/components/common";
 
@@ -73,7 +73,7 @@ export default Vue.extend({
         sourceId: this.source,
         targetName: this.target,
         targetId: this.target,
-      } as Link);
+      } as LinkModel);
     },
   },
   watch: {

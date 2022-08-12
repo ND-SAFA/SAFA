@@ -20,7 +20,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { Artifact } from "@/types";
+import { ArtifactModel } from "@/types";
 import { getArtifactTypePrintName } from "@/util";
 import { Typography, FlexBox } from "@/components/common/display";
 
@@ -32,7 +32,7 @@ export default Vue.extend({
   components: { FlexBox, Typography },
   props: {
     artifact: {
-      type: Object as PropType<Artifact>,
+      type: Object as PropType<ArtifactModel>,
       required: true,
     },
     displayTitle: Boolean,

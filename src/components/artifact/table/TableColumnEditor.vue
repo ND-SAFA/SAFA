@@ -55,7 +55,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { DocumentColumn } from "@/types";
+import { ColumnModel } from "@/types";
 import { columnTypeOptions } from "@/util";
 import { documentModule } from "@/store";
 import { handleColumnMove } from "@/api";
@@ -69,7 +69,7 @@ export default Vue.extend({
     return {
       isCreateOpen: false,
       isEditOpen: false,
-      editingColumn: undefined as DocumentColumn | undefined,
+      editingColumn: undefined as ColumnModel | undefined,
       items: documentModule.tableColumns,
       dataTypes: columnTypeOptions(),
     };
@@ -90,7 +90,7 @@ export default Vue.extend({
       get() {
         return undefined;
       },
-      set(column?: DocumentColumn) {
+      set(column?: ColumnModel) {
         if (!column) return;
         this.handleEditOpen(column);
       },
@@ -122,7 +122,7 @@ export default Vue.extend({
      * Opens the edit modal.
      * @param column - The column to edit.
      */
-    handleEditOpen(column: DocumentColumn) {
+    handleEditOpen(column: ColumnModel) {
       this.editingColumn = column;
       this.isEditOpen = true;
     },
@@ -132,7 +132,7 @@ export default Vue.extend({
      * @param item - The column to check.
      * @return Whether it is first.
      */
-    isFirstItem(item: DocumentColumn) {
+    isFirstItem(item: ColumnModel) {
       return this.items.indexOf(item) === 0;
     },
     /**
@@ -140,7 +140,7 @@ export default Vue.extend({
      * @param item - The column to check.
      * @return Whether it is last.
      */
-    isLastItem(item: DocumentColumn) {
+    isLastItem(item: ColumnModel) {
       return this.items.indexOf(item) === this.items.length - 1;
     },
 
@@ -155,7 +155,7 @@ export default Vue.extend({
      * @param item - The column to move.
      * @param moveUp - Whether to move the column up or down.
      */
-    handleMove(item: DocumentColumn, moveUp: boolean) {
+    handleMove(item: ColumnModel, moveUp: boolean) {
       handleColumnMove(item, moveUp, {
         onSuccess: (columns) => (this.items = columns),
       });

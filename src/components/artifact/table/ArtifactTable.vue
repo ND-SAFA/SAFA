@@ -78,7 +78,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { Artifact, ArtifactDeltaState, FlatArtifact } from "@/types";
+import { ArtifactModel, ArtifactDeltaState, FlatArtifact } from "@/types";
 import {
   appModule,
   artifactModule,
@@ -112,7 +112,7 @@ export default Vue.extend({
     return {
       searchText: "",
       selectedDeltaTypes: [] as ArtifactDeltaState[],
-      expanded: [] as Artifact[],
+      expanded: [] as ArtifactModel[],
     };
   },
   computed: {
@@ -193,7 +193,7 @@ export default Vue.extend({
      * Opens the view artifact side panel.
      * @param artifact - The artifact to view.
      */
-    handleView(artifact: Artifact) {
+    handleView(artifact: ArtifactModel) {
       if (artifactSelectionModule.getSelectedArtifactId === artifact.id) {
         artifactSelectionModule.clearSelections();
         this.expanded = [];
@@ -206,7 +206,7 @@ export default Vue.extend({
      * Opens the edit artifact window.
      * @param artifact - The artifact to edit.
      */
-    handleEdit(artifact: Artifact) {
+    handleEdit(artifact: ArtifactModel) {
       artifactSelectionModule.selectArtifact(artifact.id);
       appModule.openArtifactCreatorTo({
         isNewArtifact: false,
@@ -216,7 +216,7 @@ export default Vue.extend({
      * Opens the delete artifact window.
      * @param artifact - The artifact to delete.
      */
-    handleDelete(artifact: Artifact) {
+    handleDelete(artifact: ArtifactModel) {
       handleDeleteArtifact(artifact, {});
     },
     /**
@@ -224,7 +224,7 @@ export default Vue.extend({
      * @param item - The artifact to display.
      * @return The class name to add to the artifact.
      */
-    getItemBackground(item: Artifact): string {
+    getItemBackground(item: ArtifactModel): string {
       if (artifactSelectionModule.getSelectedArtifactId === item.id) {
         return "artifact-row-selected";
       }
@@ -236,7 +236,7 @@ export default Vue.extend({
      * @param item - The artifact to search for
      * @return Whether the artifact has warnings.
      */
-    getHasWarnings(item: Artifact): boolean {
+    getHasWarnings(item: ArtifactModel): boolean {
       return errorModule.getWarningsByIds([item.id]).length > 0;
     },
   },

@@ -43,7 +43,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { LabeledArtifactDirection } from "@/types";
+import { LabelledTraceDirectionModel } from "@/types";
 import { getArtifactTypePrintName } from "@/util";
 import { projectModule, typeOptionsModule } from "@/store";
 import { handleSaveArtifactType, handleRemoveTraceType } from "@/api";
@@ -54,7 +54,7 @@ export default Vue.extend({
   components: { Typography },
   data() {
     return {
-      artifactDirections: [] as LabeledArtifactDirection[],
+      artifactDirections: [] as LabelledTraceDirectionModel[],
       icons: typeOptionsModule.allArtifactTypeIcons,
     };
   },
@@ -86,7 +86,7 @@ export default Vue.extend({
      * @param entry - The type to update.
      * @param icon - The icon to set.
      */
-    handleIconChange(entry: LabeledArtifactDirection, icon: string) {
+    handleIconChange(entry: LabelledTraceDirectionModel, icon: string) {
       const type = projectModule.getProject.artifactTypes.find(
         ({ name }) => name === entry.type
       );
@@ -102,7 +102,7 @@ export default Vue.extend({
      * @param removedType - The type to remove.
      */
     handleDeleteDirection(
-      entry: LabeledArtifactDirection,
+      entry: LabelledTraceDirectionModel,
       removedType: string
     ) {
       entry.allowedTypes = entry.allowedTypes.filter(

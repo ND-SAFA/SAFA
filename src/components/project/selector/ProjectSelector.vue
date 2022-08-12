@@ -46,7 +46,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { DataItem, ProjectIdentifier, ProjectRole } from "@/types";
+import { DataItem, IdentifierModel, ProjectRole } from "@/types";
 import { logModule, sessionModule } from "@/store";
 import { getProjects, handleDeleteProject, handleSaveProject } from "@/api";
 import { GenericSelector } from "@/components/common";
@@ -84,8 +84,8 @@ export default Vue.extend({
   },
   data() {
     return {
-      selected: undefined as ProjectIdentifier | undefined,
-      projects: [] as ProjectIdentifier[],
+      selected: undefined as IdentifierModel | undefined,
+      projects: [] as IdentifierModel[],
       deletableProjects: [] as number[],
       headers: this.minimal
         ? [{ text: "Name", value: "name", sortable: true, isSelectable: true }]
@@ -107,8 +107,8 @@ export default Vue.extend({
       deleteProjectDialogue: false,
       addProjectDialogue: false,
       isLoading: false,
-      projectToEdit: { name: "", description: "" } as ProjectIdentifier,
-      projectToDelete: undefined as ProjectIdentifier | undefined,
+      projectToEdit: { name: "", description: "" } as IdentifierModel,
+      projectToDelete: undefined as IdentifierModel | undefined,
     };
   },
   /**
@@ -155,10 +155,7 @@ export default Vue.extend({
      * @param item - The selected project.
      * @param goToNextStep - If true with a valid project, the next step will be navigated to.
      */
-    handleSelectProject(
-      item: DataItem<ProjectIdentifier>,
-      goToNextStep = false
-    ) {
+    handleSelectProject(item: DataItem<IdentifierModel>, goToNextStep = false) {
       if (item.value) {
         this.$emit("selected", item.item, goToNextStep);
       } else {
@@ -181,7 +178,7 @@ export default Vue.extend({
      * Attempts to create a project, and closes the add modal.
      * @param project - The project to create.
      */
-    handleConfirmAddProject(project: ProjectIdentifier) {
+    handleConfirmAddProject(project: IdentifierModel) {
       this.saveOrUpdateProjectHandler(project);
       this.addProjectDialogue = false;
     },
@@ -189,7 +186,7 @@ export default Vue.extend({
      * Opens the edit project modal.
      * @param item - The project to edit.
      */
-    handleEditProject(item: ProjectIdentifier) {
+    handleEditProject(item: IdentifierModel) {
       this.projectToEdit = item;
       this.editProjectDialogue = true;
     },
@@ -203,7 +200,7 @@ export default Vue.extend({
      * Attempts to update a project, and closes the edit modal.
      * @param project - The project to update.
      */
-    handleConfirmEditProject(project: ProjectIdentifier) {
+    handleConfirmEditProject(project: IdentifierModel) {
       this.saveOrUpdateProjectHandler(project);
       this.editProjectDialogue = false;
     },
@@ -211,7 +208,7 @@ export default Vue.extend({
      * Opens the delete project modal.
      * @param item - The project to delete.
      */
-    handleDeleteProject(item: ProjectIdentifier) {
+    handleDeleteProject(item: IdentifierModel) {
       this.deleteProjectDialogue = true;
       this.projectToDelete = item;
     },
@@ -225,7 +222,7 @@ export default Vue.extend({
      * Attempts to delete a project, and closes the delete modal.
      * @param project - The project to delete.
      */
-    handleConfirmDeleteProject(project: ProjectIdentifier) {
+    handleConfirmDeleteProject(project: IdentifierModel) {
       this.deleteProjectHandler(project);
       this.deleteProjectDialogue = false;
     },
@@ -248,7 +245,7 @@ export default Vue.extend({
      * Attempts to delete a project.
      * @param project - The project to delete.
      */
-    deleteProjectHandler(project: ProjectIdentifier) {
+    deleteProjectHandler(project: IdentifierModel) {
       this.isLoading = true;
 
       handleDeleteProject(project, {
@@ -266,7 +263,7 @@ export default Vue.extend({
      * Attempts to save a project.
      * @param project - The project to save.
      */
-    saveOrUpdateProjectHandler(project: ProjectIdentifier) {
+    saveOrUpdateProjectHandler(project: IdentifierModel) {
       this.isLoading = true;
 
       handleSaveProject(project, {

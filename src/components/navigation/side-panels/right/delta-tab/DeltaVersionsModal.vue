@@ -29,7 +29,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { Project, ProjectVersion } from "@/types";
+import { ProjectModel, VersionModel } from "@/types";
 import { logModule } from "@/store";
 import { GenericModal } from "@/components/common";
 import { VersionSelector } from "@/components/project";
@@ -47,13 +47,13 @@ export default Vue.extend({
   props: {
     isOpen: Boolean,
     project: {
-      type: Object as PropType<Project>,
+      type: Object as PropType<ProjectModel>,
       required: true,
     },
   },
   data() {
     return {
-      selectedVersion: undefined as ProjectVersion | undefined,
+      selectedVersion: undefined as VersionModel | undefined,
       isLoading: false,
       isInitialized: false,
     };
@@ -63,7 +63,7 @@ export default Vue.extend({
      * Selects a delta version.
      * @param version - The version to select.
      */
-    handleSelectVersion(version: ProjectVersion) {
+    handleSelectVersion(version: VersionModel) {
       this.selectedVersion = version;
 
       if (this.isInitialized) {

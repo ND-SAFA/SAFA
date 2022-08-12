@@ -1,7 +1,7 @@
 /**
  * Represents the access code returned from authorizing jira.
  */
-export interface JiraAccessToken {
+export interface JiraAccessTokenModel {
   /**
    * The API bearer access token.
    */
@@ -15,7 +15,7 @@ export interface JiraAccessToken {
 /**
  * Represents the cloud site returned from authorizing jira.
  */
-export interface JiraCloudSite {
+export interface JiraCloudSiteModel {
   /**
    * The Jira site's id.
    */
@@ -37,7 +37,7 @@ export interface JiraCloudSite {
 /**
  * Represents a jira project.
  */
-export interface JiraProject {
+export interface JiraProjectModel {
   /**
    * The project's domain url.
    */
@@ -81,7 +81,7 @@ export interface JiraProject {
 /**
  * Represents a list of jira projects.
  */
-export interface JiraProjectList {
+export interface JiraProjectListModel {
   /**
    * The total results per page.
    */
@@ -101,13 +101,13 @@ export interface JiraProjectList {
   /**
    * The list of projects.
    */
-  values: JiraProject[];
+  values: JiraProjectModel[];
 }
 
 /**
  * Represents the internally stored Jira credentials.
  */
-export interface InternalJiraCredentials {
+export interface InternalJiraCredentialsModel {
   /**
    * The API bearer access token.
    */

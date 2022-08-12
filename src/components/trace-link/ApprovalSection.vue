@@ -21,7 +21,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { TraceLink } from "@/types";
+import { TraceLinkModel } from "@/types";
 import { Typography, FlexBox } from "@/components/common";
 import TraceLinkExpansionPanel from "./TraceLinkExpansionPanel.vue";
 import SectionControls from "./SectionControls.vue";
@@ -45,7 +45,7 @@ export default Vue.extend({
       type: Boolean,
       default: true,
     },
-    links: Array as PropType<TraceLink[]>,
+    links: Array as PropType<TraceLinkModel[]>,
     startOpen: {
       type: Boolean,
       default: true,
@@ -61,7 +61,7 @@ export default Vue.extend({
     /**
      * When trace links change, sets all panels to open.
      */
-    links(newLinks: TraceLink[]) {
+    links(newLinks: TraceLinkModel[]) {
       if (!this.isOpen) return;
 
       this.$nextTick(

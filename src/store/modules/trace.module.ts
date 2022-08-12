@@ -4,9 +4,9 @@ import type {
   DocumentTraces,
   LinkFinder,
   LinkValidator,
-  TraceLink,
+  TraceLinkModel,
 } from "@/types";
-import { CreateLinkValidator, TraceApproval } from "@/types";
+import { CreateLinkValidator, ApprovalType } from "@/types";
 import { documentModule, traceModule, typeOptionsModule } from "@/store";
 import { getTraceId } from "@/util";
 
@@ -18,11 +18,11 @@ export default class TraceModule extends VuexModule {
   /**
    * All trace links in the project.
    */
-  private projectTraces: TraceLink[] = [];
+  private projectTraces: TraceLinkModel[] = [];
   /**
    * The trace links visible artifacts.
    */
-  private currentTraces: TraceLink[] = [];
+  private currentTraces: TraceLinkModel[] = [];
 
   @Action
   /**
@@ -50,7 +50,7 @@ export default class TraceModule extends VuexModule {
    *
    * @param traceLinks - The trace links to set.
    */
-  async addOrUpdateTraceLinks(updatedTraces: TraceLink[]): Promise<void> {
+  async addOrUpdateTraceLinks(updatedTraces: TraceLinkModel[]): Promise<void> {
     const visibleIds = documentModule.document.artifactIds;
     const visibleTraces = updatedTraces.filter(
       ({ sourceId, targetId }) =>
@@ -68,9 +68,9 @@ export default class TraceModule extends VuexModule {
    *
    * @param traceLink - The trace link to remove.
    */
-  async deleteTraceLinks(traceLinks: TraceLink[]): Promise<void> {
+  async deleteTraceLinks(traceLinks: TraceLinkModel[]): Promise<void> {
     const deletedIds = traceLinks.map(({ traceLinkId }) => traceLinkId);
-    const removeLink = (currentTraces: TraceLink[]) =>
+    const removeLink = (currentTraces: TraceLinkModel[]) =>
       currentTraces.filter(
         ({ traceLinkId }) => !deletedIds.includes(traceLinkId)
       );
@@ -83,7 +83,7 @@ export default class TraceModule extends VuexModule {
   /**
    * Sets the project trace links.
    */
-  SET_PROJECT_TRACES(traces: TraceLink[]): void {
+  SET_PROJECT_TRACES(traces: TraceLinkModel[]): void {
     this.projectTraces = traces;
   }
 
@@ -91,30 +91,30 @@ export default class TraceModule extends VuexModule {
   /**
    * Sets the current trace links.
    */
-  SET_CURRENT_TRACES(traces: TraceLink[]): void {
+  SET_CURRENT_TRACES(traces: TraceLinkModel[]): void {
     this.currentTraces = traces;
   }
 
   /**
    * @return All trace links in the project.
    */
-  get allTraces(): TraceLink[] {
+  get allTraces(): TraceLinkModel[] {
     return this.projectTraces;
   }
 
   /**
    * @return The trace links for the current document.
    */
-  get traces(): TraceLink[] {
+  get traces(): TraceLinkModel[] {
     return this.currentTraces;
   }
 
   /**
    * @return All non-declined trace links.
    */
-  get nonDeclinedTraces(): TraceLink[] {
+  get nonDeclinedTraces(): TraceLinkModel[] {
     return this.currentTraces.filter(
-      (t) => t.approvalStatus != TraceApproval.DECLINED
+      (t) => t.approvalStatus != ApprovalType.DECLINED
     );
   }
 

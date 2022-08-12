@@ -38,7 +38,7 @@ import Vue from "vue";
 import { GenericModal, Typography, ArtifactInput } from "@/components/common";
 import { artifactModule, traceModule } from "@/store";
 import { handleCreateLink } from "@/api";
-import { Artifact } from "@/types";
+import { ArtifactModel } from "@/types";
 
 /**
  * A modal for creating trace links.
@@ -72,13 +72,13 @@ export default Vue.extend({
     /**
      * @return The source artifact.
      */
-    sourceArtifact(): Artifact {
+    sourceArtifact(): ArtifactModel {
       return artifactModule.getArtifactById(this.sourceArtifactId);
     },
     /**
      * @return The source artifact.
      */
-    targetArtifact(): Artifact {
+    targetArtifact(): ArtifactModel {
       return artifactModule.getArtifactById(this.targetArtifactId);
     },
     /**

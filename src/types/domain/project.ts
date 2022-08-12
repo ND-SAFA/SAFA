@@ -1,17 +1,17 @@
 import {
   ArtifactPositions,
-  ArtifactType,
-  ArtifactWarning,
+  ArtifactTypeModel,
+  WarningModel,
   MembershipModel,
-  TraceLink,
+  TraceLinkModel,
 } from "@/types";
-import { Artifact } from "./artifact";
-import { ProjectDocument } from "./document";
+import { ArtifactModel } from "./artifact";
+import { DocumentModel } from "./document";
 
 /**
  * Enumerates the states of parsing.
  */
-export enum ApplicationActivity {
+export enum ApplicationActivityType {
   PARSING_TIM,
   PARSING_ARTIFACTS,
   PARSING_TRACES,
@@ -21,7 +21,7 @@ export enum ApplicationActivity {
 /**
  * Defines a parser error.
  */
-export interface ParserError {
+export interface ParserErrorModel {
   /**
    * The id of the error.
    */
@@ -33,7 +33,7 @@ export interface ParserError {
   /**
    * The state of the parser when this error was encountered.
    */
-  activity: ApplicationActivity;
+  activity: ApplicationActivityType;
   /**
    * The location of the error.
    */
@@ -43,17 +43,17 @@ export interface ParserError {
 /**
  * Defines a collection of all parser errors.
  */
-export interface ProjectErrors {
-  tim: ParserError[];
-  artifacts: ParserError[];
-  traces: ParserError[];
-  allErrors: ParserError[];
+export interface ProjectErrorsModel {
+  tim: ParserErrorModel[];
+  artifacts: ParserErrorModel[];
+  traces: ParserErrorModel[];
+  allErrors: ParserErrorModel[];
 }
 
 /**
  * Defines a project.
  */
-export interface ProjectIdentifier {
+export interface IdentifierModel {
   /**
    * The ID of the project.
    */
@@ -82,7 +82,7 @@ export interface ProjectIdentifier {
 /**
  * Defines the version of a project.
  */
-export interface ProjectVersion {
+export interface VersionModel {
   /**
    * The project version id.
    */
@@ -90,7 +90,7 @@ export interface ProjectVersion {
   /**
    * The project.
    */
-  project?: ProjectIdentifier;
+  project?: IdentifierModel;
   /**
    * The major version number.
    */
@@ -108,20 +108,20 @@ export interface ProjectVersion {
 /**
  * Defines a versioned and parsed project.
  */
-export interface Project extends ProjectIdentifier {
+export interface ProjectModel extends IdentifierModel {
   /**
    * The project's version.
    */
-  projectVersion?: ProjectVersion;
+  projectVersion?: VersionModel;
 
   /**
    * The project's artifacts.
    */
-  artifacts: Artifact[];
+  artifacts: ArtifactModel[];
   /**
    * The project's traces.
    */
-  traces: TraceLink[];
+  traces: TraceLinkModel[];
 
   /**
    * The current document id.
@@ -130,32 +130,20 @@ export interface Project extends ProjectIdentifier {
   /**
    * The different documents for this project.
    */
-  documents: ProjectDocument[];
+  documents: DocumentModel[];
 
   /**
    * The artifact types present in the project.
    */
-  artifactTypes: ArtifactType[];
+  artifactTypes: ArtifactTypeModel[];
   /**
    * A collection of warnings on project artifacts.
    */
-  warnings: Record<string, ArtifactWarning[]>;
+  warnings: Record<string, WarningModel[]>;
   /**
    * Map of artifact ids to their position in the default graph.
    */
   layout: ArtifactPositions;
-}
-
-export interface ProjectSummary {
-  /**
-   * The project itself.
-   */
-  project: Project;
-
-  /**
-   * A collection of errors on project artifacts.
-   */
-  errors: ProjectErrors;
 }
 
 export type VersionType = "major" | "minor" | "revision";

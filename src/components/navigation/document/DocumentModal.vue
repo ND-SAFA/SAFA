@@ -59,7 +59,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { ProjectDocument } from "@/types";
+import { DocumentModel } from "@/types";
 import { createDocument, documentTypeOptions } from "@/util";
 import { documentModule, typeOptionsModule } from "@/store";
 import { handleDeleteDocument, handleSaveDocument } from "@/api";
@@ -76,7 +76,7 @@ export default Vue.extend({
   props: {
     isOpen: Boolean,
     document: {
-      type: Object as PropType<ProjectDocument>,
+      type: Object as PropType<DocumentModel>,
       required: false,
     },
   },

@@ -16,7 +16,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { ProjectVersion } from "@/types";
+import { VersionModel } from "@/types";
 import { versionToString } from "@/util";
 import { GenericModal } from "@/components/common";
 
@@ -35,7 +35,7 @@ export default Vue.extend({
       required: true,
     },
     version: {
-      type: Object as PropType<ProjectVersion>,
+      type: Object as PropType<VersionModel>,
       required: false,
     },
   },
@@ -62,7 +62,7 @@ export default Vue.extend({
     /**
      * Updates the title when the version changes.
      */
-    version(version: ProjectVersion) {
+    version(version: VersionModel) {
       this.title = `Delete version: ${versionToString(version)}`;
     },
   },

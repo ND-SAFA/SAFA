@@ -49,7 +49,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { ProjectIdentifier, ProjectVersion, VersionType } from "@/types";
+import { IdentifierModel, VersionModel, VersionType } from "@/types";
 import { versionToString } from "@/util";
 import {
   createMajorVersion,
@@ -76,14 +76,14 @@ export default Vue.extend({
       required: true,
     },
     project: {
-      type: Object as PropType<ProjectIdentifier>,
+      type: Object as PropType<IdentifierModel>,
       required: false,
     },
   },
   data() {
     return {
       isLoading: false,
-      currentVersion: undefined as ProjectVersion | undefined,
+      currentVersion: undefined as VersionModel | undefined,
     };
   },
   computed: {
@@ -123,7 +123,7 @@ export default Vue.extend({
       if (!this.project) return;
 
       const createVersionFrom = async (
-        createVersion: (projectId: string) => Promise<ProjectVersion>
+        createVersion: (projectId: string) => Promise<VersionModel>
       ) => {
         this.isLoading = true;
 

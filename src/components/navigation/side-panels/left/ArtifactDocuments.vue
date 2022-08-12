@@ -18,7 +18,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { ProjectDocument } from "@/types";
+import { DocumentModel } from "@/types";
 import { documentTypeOptions } from "@/util";
 import { artifactSelectionModule, documentModule } from "@/store";
 import { Typography, GenericListItem } from "@/components/common";
@@ -39,7 +39,7 @@ export default Vue.extend({
     /**
      * @return The selected artifact's documents.
      */
-    documents(): ProjectDocument[] {
+    documents(): DocumentModel[] {
       if (!this.selectedArtifact) return [];
 
       return documentModule.projectDocuments.filter(({ documentId }) =>
@@ -52,7 +52,7 @@ export default Vue.extend({
      * Switches to another document.
      * @param document - The document to switch to.
      */
-    handleSwitchDocument(document: ProjectDocument): void {
+    handleSwitchDocument(document: DocumentModel): void {
       documentModule.switchDocuments(document);
     },
     /**

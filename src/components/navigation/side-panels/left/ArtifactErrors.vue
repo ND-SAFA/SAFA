@@ -26,7 +26,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { ArtifactWarning } from "@/types";
+import { WarningModel } from "@/types";
 import { artifactSelectionModule, errorModule } from "@/store";
 import { Typography, FlexBox } from "@/components/common";
 
@@ -46,7 +46,7 @@ export default Vue.extend({
     /**
      * @return The selected artifact's warnings.
      */
-    selectedArtifactWarnings(): ArtifactWarning[] {
+    selectedArtifactWarnings(): WarningModel[] {
       const id = this.selectedArtifact?.id || "";
 
       return errorModule.getArtifactWarnings[id] || [];

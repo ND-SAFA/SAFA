@@ -24,7 +24,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { TraceApproval, TraceLink, TraceType } from "@/types";
+import { ApprovalType, TraceLinkModel, TraceType } from "@/types";
 import { handleApproveLink, handleDeclineLink } from "@/api";
 import { GenericModal } from "@/components/common";
 import TraceLinkDisplay from "./TraceLinkDisplay.vue";
@@ -43,7 +43,7 @@ export default Vue.extend({
       type: Boolean,
       required: true,
     },
-    link: Object as PropType<TraceLink>,
+    link: Object as PropType<TraceLinkModel>,
   },
   computed: {
     /**
@@ -64,7 +64,7 @@ export default Vue.extend({
     canBeApproved(): boolean {
       return (
         this.canBeModified &&
-        this.link?.approvalStatus !== TraceApproval.APPROVED
+        this.link?.approvalStatus !== ApprovalType.APPROVED
       );
     },
     /**
@@ -73,7 +73,7 @@ export default Vue.extend({
     canBeDeclined(): boolean {
       return (
         this.canBeModified &&
-        this.link?.approvalStatus !== TraceApproval.DECLINED
+        this.link?.approvalStatus !== ApprovalType.DECLINED
       );
     },
   },
@@ -82,7 +82,7 @@ export default Vue.extend({
      * Approves the given link and closes the modal.
      * @param traceLink - The link to approve.
      */
-    async handleApprove(traceLink: TraceLink): Promise<void> {
+    async handleApprove(traceLink: TraceLinkModel): Promise<void> {
       await handleApproveLink(traceLink);
       this.$emit("close");
     },
@@ -90,7 +90,7 @@ export default Vue.extend({
      * Declines the given link and closes the modal.
      * @param traceLink - The link to decline.
      */
-    handleDecline(traceLink: TraceLink): void {
+    handleDecline(traceLink: TraceLinkModel): void {
       handleDeclineLink(traceLink);
       this.$emit("close");
     },

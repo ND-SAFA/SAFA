@@ -1,4 +1,4 @@
-import { Link } from "@/types";
+import { LinkModel } from "@/types";
 
 /**
  * Returns the trace ID made from the given source and target IDs.
@@ -17,6 +17,6 @@ export function getTraceId(source: string, target: string): string {
  * @param traceLink - The trace link.
  * @return The standardized ID of the source joined to the target.
  */
-export function extractTraceId(traceLink: Link): string {
+export function extractTraceId(traceLink: LinkModel): string {
   return `${traceLink.sourceName}-${traceLink.targetName}`;
 }

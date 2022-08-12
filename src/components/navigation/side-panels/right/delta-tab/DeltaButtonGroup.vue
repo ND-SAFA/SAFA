@@ -19,7 +19,12 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { Artifact, DeltaType, EntityModification, TraceLink } from "@/types";
+import {
+  ArtifactModel,
+  DeltaType,
+  EntityModification,
+  TraceLinkModel,
+} from "@/types";
 import { capitalize } from "@/util";
 import { Typography } from "@/components/common";
 import ArtifactDeltaButton from "./ArtifactDeltaButton.vue";
@@ -39,7 +44,10 @@ export default Vue.extend({
     },
     items: {
       type: Object as PropType<
-        Record<string, Artifact | EntityModification<Artifact> | TraceLink>
+        Record<
+          string,
+          ArtifactModel | EntityModification<ArtifactModel> | TraceLinkModel
+        >
       >,
       required: true,
     },
@@ -77,7 +85,7 @@ export default Vue.extend({
       const items = Object.values(this.items);
 
       if (this.isTraces) {
-        return (items as TraceLink[]).map(
+        return (items as TraceLinkModel[]).map(
           ({ traceLinkId, sourceName, targetName }) => ({
             id: traceLinkId,
             name: `${sourceName} > ${targetName}`,
@@ -85,10 +93,10 @@ export default Vue.extend({
         );
       } else {
         return this.deltaType === "modified"
-          ? (items as EntityModification<Artifact>[]).map(
+          ? (items as EntityModification<ArtifactModel>[]).map(
               ({ after: { id, name } }) => ({ id, name })
             )
-          : (items as Artifact[]).map(({ id, name }) => ({ id, name }));
+          : (items as ArtifactModel[]).map(({ id, name }) => ({ id, name }));
       }
     },
   },

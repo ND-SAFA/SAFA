@@ -1,5 +1,10 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
-import type { SubtreeLink, SubtreeMap, Project, Artifact } from "@/types";
+import type {
+  SubtreeLinkModel,
+  SubtreeMap,
+  ProjectModel,
+  ArtifactModel,
+} from "@/types";
 import { artifactModule, traceModule } from "@/store";
 import {
   artifactTreeCyPromise,
@@ -22,7 +27,7 @@ export default class SubtreeModule extends VuexModule {
   /**
    * List of phantom links used when hiding subtrees.
    */
-  private subtreeLinks: SubtreeLink[] = [];
+  private subtreeLinks: SubtreeLinkModel[] = [];
 
   /**
    * List of nodes currently hidden within subtrees
@@ -41,7 +46,7 @@ export default class SubtreeModule extends VuexModule {
    * @param artifacts - The artifacts to create the subtree for.
    */
   async updateSubtreeMap(
-    artifacts: Artifact[] = artifactModule.allArtifacts
+    artifacts: ArtifactModel[] = artifactModule.allArtifacts
   ): Promise<void> {
     artifactTreeCyPromise.then(async (cy) => {
       const subtreeMap = await createSubtreeMap(cy, artifacts);
@@ -91,7 +96,7 @@ export default class SubtreeModule extends VuexModule {
   /**
    * Updates the subtree map, and hides all subtrees greater than the set threshold.
    */
-  async initializeProject(project: Project): Promise<void> {
+  async initializeProject(project: ProjectModel): Promise<void> {
     await this.updateSubtreeMap(project.artifacts);
   }
 
@@ -173,7 +178,7 @@ export default class SubtreeModule extends VuexModule {
    *
    * @param subtreeLinks The list of phantom links used for hiding subtrees.
    */
-  SET_SUBTREE_LINKS(subtreeLinks: SubtreeLink[]): void {
+  SET_SUBTREE_LINKS(subtreeLinks: SubtreeLinkModel[]): void {
     this.subtreeLinks = subtreeLinks;
   }
 
@@ -214,7 +219,7 @@ export default class SubtreeModule extends VuexModule {
   /**
    * @returns list of phantom links used for hiding subtrees.
    */
-  get getSubtreeLinks(): SubtreeLink[] {
+  get getSubtreeLinks(): SubtreeLinkModel[] {
     return this.subtreeLinks;
   }
 
@@ -233,14 +238,14 @@ export default class SubtreeModule extends VuexModule {
     n: string[],
     r: string,
     c: string
-  ) => SubtreeLink[] {
+  ) => SubtreeLinkModel[] {
     return (nodesInSubtree: string[], rootId: string, childId: string) => {
       const traces = traceModule.traces;
       const subtreeLinkIds = this.subtreeLinks.map(
         ({ traceLinkId }) => traceLinkId
       );
 
-      const subtreeLinkCreator: (isIncoming: boolean) => SubtreeLink[] = (
+      const subtreeLinkCreator: (isIncoming: boolean) => SubtreeLinkModel[] = (
         isIncoming: boolean
       ) => {
         return traces
@@ -257,7 +262,7 @@ export default class SubtreeModule extends VuexModule {
             );
           })
           .map((link) => {
-            const base: SubtreeLink = {
+            const base: SubtreeLinkModel = {
               ...link,
               traceLinkId: `${link.traceLinkId}-phantom`,
               type: InternalTraceType.SUBTREE,

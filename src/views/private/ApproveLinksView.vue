@@ -32,7 +32,12 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { TraceApproval, TraceLink, ProjectVersion, EmptyLambda } from "@/types";
+import {
+  ApprovalType,
+  TraceLinkModel,
+  VersionModel,
+  EmptyLambda,
+} from "@/types";
 import { projectModule } from "@/store";
 import { handleApproveLink, handleDeclineLink, getGeneratedLinks } from "@/api";
 import { ApprovalSection, PrivatePage, BackButton } from "@/components";
@@ -42,16 +47,16 @@ export default Vue.extend({
   components: { BackButton, PrivatePage, ApprovalSection },
   data() {
     return {
-      links: [] as TraceLink[],
-      declinedLinks: [] as TraceLink[],
-      approvedLinks: [] as TraceLink[],
+      links: [] as TraceLinkModel[],
+      declinedLinks: [] as TraceLinkModel[],
+      approvedLinks: [] as TraceLinkModel[],
     };
   },
   watch: {
     /**
      * Loads generated links when the version changes.
      */
-    projectVersion(newVersion?: ProjectVersion) {
+    projectVersion(newVersion?: VersionModel) {
       if (!newVersion) return;
 
       this.loadGeneratedLinks();
@@ -79,13 +84,13 @@ export default Vue.extend({
 
       links.forEach((link) => {
         switch (link.approvalStatus) {
-          case TraceApproval.UNREVIEWED:
+          case ApprovalType.UNREVIEWED:
             this.links.push(link);
             break;
-          case TraceApproval.APPROVED:
+          case ApprovalType.APPROVED:
             this.approvedLinks.push(link);
             break;
-          case TraceApproval.DECLINED:
+          case ApprovalType.DECLINED:
             this.declinedLinks.push(link);
             break;
         }
@@ -98,7 +103,7 @@ export default Vue.extend({
      * @param link - The link to approve.
      * @param filterCallback - The callback to run afterward.
      */
-    approveLink(link: TraceLink, filterCallback: EmptyLambda) {
+    approveLink(link: TraceLinkModel, filterCallback: EmptyLambda) {
       handleApproveLink(link, () => {
         filterCallback();
         this.approvedLinks = this.approvedLinks.concat([link]);
@@ -110,7 +115,7 @@ export default Vue.extend({
      * @param link - The link to decline.
      * @param filterCallback - The callback to run afterward.
      */
-    declineLink(link: TraceLink, filterCallback: EmptyLambda) {
+    declineLink(link: TraceLinkModel, filterCallback: EmptyLambda) {
       handleDeclineLink(link, () => {
         filterCallback();
         this.declinedLinks = this.declinedLinks.concat([link]);
@@ -122,7 +127,7 @@ export default Vue.extend({
      *
      * @param link - The link to approve.
      */
-    handleApprove(link: TraceLink) {
+    handleApprove(link: TraceLinkModel) {
       this.approveLink(link, () => {
         this.links = this.links.filter(
           (t) => t.traceLinkId != link.traceLinkId
@@ -134,7 +139,7 @@ export default Vue.extend({
      *
      * @param link - The link to approve.
      */
-    handleApproveDeclined(link: TraceLink) {
+    handleApproveDeclined(link: TraceLinkModel) {
       this.approveLink(link, () => {
         this.declinedLinks = this.declinedLinks.filter(
           (t) => t.traceLinkId != link.traceLinkId
@@ -146,7 +151,7 @@ export default Vue.extend({
      *
      * @param link - The link to decline.
      */
-    handleDecline(link: TraceLink) {
+    handleDecline(link: TraceLinkModel) {
       this.declineLink(link, () => {
         this.links = this.links.filter(
           (t) => t.traceLinkId != link.traceLinkId
@@ -158,7 +163,7 @@ export default Vue.extend({
      *
      * @param link - The link to decline.
      */
-    handleDeclineApproved(link: TraceLink) {
+    handleDeclineApproved(link: TraceLinkModel) {
       this.declineLink(link, () => {
         this.approvedLinks = this.approvedLinks.filter(
           (t) => t.traceLinkId != link.traceLinkId

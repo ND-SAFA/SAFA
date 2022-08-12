@@ -1,6 +1,6 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 
-import type { Artifact, FilterAction } from "@/types";
+import type { ArtifactModel, FilterAction } from "@/types";
 import { PanelType } from "@/types";
 import {
   appModule,
@@ -186,7 +186,7 @@ export default class ArtifactSelectionModule extends VuexModule {
   /**
    * @return The currently selected artifact.
    */
-  get getSelectedArtifact(): Artifact | undefined {
+  get getSelectedArtifact(): ArtifactModel | undefined {
     if (this.selectedArtifactId !== "") {
       try {
         return artifactModule.getArtifactById(this.selectedArtifactId);

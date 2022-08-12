@@ -1,4 +1,4 @@
-import type { ProjectWarnings, ArtifactWarning } from "@/types";
+import type { ProjectWarnings, WarningModel } from "@/types";
 import { Module, VuexModule, Mutation, Action } from "vuex-module-decorators";
 
 @Module({ namespaced: true, name: "warning" })
@@ -42,7 +42,7 @@ export default class WarningModule extends VuexModule {
   /**
    * @return Warnings associated with artifacts of given ids.
    */
-  get getWarningsByIds(): (ids: string[]) => ArtifactWarning[] {
+  get getWarningsByIds(): (ids: string[]) => WarningModel[] {
     return (ids) => {
       return ids
         .map((id) => this.artifactWarnings[id] || [])

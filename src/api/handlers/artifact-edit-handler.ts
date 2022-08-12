@@ -1,4 +1,4 @@
-import { Artifact, ConfirmationType, IOHandlerCallback } from "@/types";
+import { ArtifactModel, ConfirmationType, IOHandlerCallback } from "@/types";
 import {
   artifactSelectionModule,
   logModule,
@@ -23,9 +23,9 @@ import {
  * @param onError - Called if the save fails.
  */
 export async function handleSaveArtifact(
-  artifact: Artifact,
+  artifact: ArtifactModel,
   isUpdate: boolean,
-  parentArtifact: Artifact | undefined,
+  parentArtifact: ArtifactModel | undefined,
   { onSuccess, onError }: IOHandlerCallback
 ): Promise<void> {
   try {
@@ -69,7 +69,7 @@ export async function handleSaveArtifact(
  * @param onError - Called if the duplicate fails.
  */
 export function handleDuplicateArtifact(
-  artifact: Artifact,
+  artifact: ArtifactModel,
   { onSuccess, onError }: IOHandlerCallback
 ): Promise<void> {
   return handleSaveArtifact(
@@ -93,7 +93,7 @@ export function handleDuplicateArtifact(
  * @param onError - Called if the delete fails.
  */
 export function handleDeleteArtifact(
-  artifact: Artifact,
+  artifact: ArtifactModel,
   { onSuccess, onError }: IOHandlerCallback
 ): Promise<void> {
   return new Promise((resolve, reject) => {

@@ -35,8 +35,8 @@
 <script lang="ts">
 import Vue from "vue";
 import {
-  GitHubInstallation,
-  GitHubRepository,
+  GitHubInstallationModel,
+  GitHubRepositoryModel,
   GitHubCredentialsModel,
   StepState,
 } from "@/types";
@@ -71,13 +71,13 @@ export default Vue.extend({
       credentials: undefined as GitHubCredentialsModel | undefined,
       isLoading: true,
 
-      installations: [] as GitHubInstallation[],
+      installations: [] as GitHubInstallationModel[],
       installationsLoading: false,
-      selectedInstallation: undefined as GitHubInstallation | undefined,
+      selectedInstallation: undefined as GitHubInstallationModel | undefined,
 
-      repositories: [] as GitHubRepository[],
+      repositories: [] as GitHubRepositoryModel[],
       repositoriesLoading: false,
-      selectedRepository: undefined as GitHubRepository | undefined,
+      selectedRepository: undefined as GitHubRepositoryModel | undefined,
 
       steps: [
         ["Connect to GitHub", false],
@@ -149,7 +149,7 @@ export default Vue.extend({
     /**
      * Selects a GitHub organization to load projects from.
      */
-    handleInstallationSelect(org: GitHubInstallation) {
+    handleInstallationSelect(org: GitHubInstallationModel) {
       if (this.selectedInstallation?.id !== org.id) {
         this.selectedInstallation = org;
         this.setStepIsValid(1, true);
@@ -163,7 +163,7 @@ export default Vue.extend({
     /**
      * Selects a GitHub project to import.
      */
-    handleProjectSelect(project: GitHubRepository) {
+    handleProjectSelect(project: GitHubRepositoryModel) {
       if (this.selectedRepository?.id !== project.id) {
         this.selectedRepository = project;
         this.setStepIsValid(2, true);

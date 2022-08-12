@@ -33,7 +33,7 @@ import {
   ButtonMenuItem,
   ButtonType,
   ListMenuDefinition,
-  ProjectIdentifier,
+  IdentifierModel,
   MembershipModel,
   ProjectRole,
 } from "@/types";
@@ -53,7 +53,7 @@ export default Vue.extend({
       required: true,
     },
     project: {
-      type: Object as PropType<ProjectIdentifier>,
+      type: Object as PropType<IdentifierModel>,
       required: true,
     },
     title: {

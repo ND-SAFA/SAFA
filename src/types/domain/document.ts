@@ -1,4 +1,4 @@
-import { ProjectIdentifier } from "@/types/domain/project";
+import { IdentifierModel } from "@/types/domain/project";
 import { ArtifactPositions } from "@/types";
 
 /**
@@ -24,7 +24,7 @@ export enum ColumnDataType {
 /**
  * Represents a column definition in a table-like document.
  */
-export interface DocumentColumn {
+export interface ColumnModel {
   /**
    * The ID of this column.
    */
@@ -46,7 +46,7 @@ export interface DocumentColumn {
 /**
  * Defines a specific document.
  */
-export interface ProjectDocument {
+export interface DocumentModel {
   /**
    * The id of this document.
    */
@@ -54,7 +54,7 @@ export interface ProjectDocument {
   /**
    * The project associated with this document.
    */
-  project: ProjectIdentifier;
+  project: IdentifierModel;
   /**
    * The name of the document.
    */
@@ -78,5 +78,5 @@ export interface ProjectDocument {
   /**
    * Defines the columns of a table-like document.
    */
-  columns?: DocumentColumn[];
+  columns?: ColumnModel[];
 }

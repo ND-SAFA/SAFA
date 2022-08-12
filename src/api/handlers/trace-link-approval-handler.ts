@@ -1,9 +1,9 @@
 import {
-  Artifact,
+  ArtifactModel,
   ArtifactData,
   EmptyLambda,
-  TraceApproval,
-  TraceLink,
+  ApprovalType,
+  TraceLinkModel,
   TraceType,
 } from "@/types";
 import { appModule, logModule, projectModule } from "@/store";
@@ -16,22 +16,22 @@ import { createLink, updateApprovedLink, updateDeclinedLink } from "@/api";
  * @param target - The artifact to link to.
  */
 export async function handleCreateLink(
-  source: Artifact | ArtifactData,
-  target: Artifact | ArtifactData
+  source: ArtifactModel | ArtifactData,
+  target: ArtifactModel | ArtifactData
 ): Promise<void> {
   const sourceName =
     "artifactName" in source ? source.artifactName : source.name;
   const targetName =
     "artifactName" in target ? target.artifactName : target.name;
 
-  const traceLink: TraceLink = {
+  const traceLink: TraceLinkModel = {
     traceLinkId: "",
     sourceId: source.id,
     sourceName,
     targetId: target.id,
     targetName,
     traceType: TraceType.MANUAL,
-    approvalStatus: TraceApproval.APPROVED,
+    approvalStatus: ApprovalType.APPROVED,
     score: 1,
   };
 
@@ -54,10 +54,10 @@ export async function handleCreateLink(
  * @param onSuccess - Run when the API call successfully resolves.
  */
 export async function handleApproveLink(
-  link: TraceLink,
+  link: TraceLinkModel,
   onSuccess?: EmptyLambda
 ): Promise<void> {
-  link.approvalStatus = TraceApproval.APPROVED;
+  link.approvalStatus = ApprovalType.APPROVED;
 
   linkAPIHandler(link, updateApprovedLink, async () => {
     onSuccess?.();
@@ -73,10 +73,10 @@ export async function handleApproveLink(
  * @param onSuccess - Run when the API call successfully resolves.
  */
 export async function handleDeclineLink(
-  link: TraceLink,
+  link: TraceLinkModel,
   onSuccess?: EmptyLambda
 ): Promise<void> {
-  link.approvalStatus = TraceApproval.DECLINED;
+  link.approvalStatus = ApprovalType.DECLINED;
 
   linkAPIHandler(link, updateDeclinedLink, async () => {
     onSuccess?.();
@@ -93,8 +93,8 @@ export async function handleDeclineLink(
  * @param onSuccess - Run when the API call successfully resolves.
  */
 function linkAPIHandler(
-  link: TraceLink,
-  linkAPI: (traceLink: TraceLink) => Promise<TraceLink[]>,
+  link: TraceLinkModel,
+  linkAPI: (traceLink: TraceLinkModel) => Promise<TraceLinkModel[]>,
   onSuccess: () => Promise<void>
 ): void {
   appModule.onLoadStart();

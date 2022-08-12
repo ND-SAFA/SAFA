@@ -1,7 +1,7 @@
 /**
  * Enumerates the type of trace approvals.
  */
-export enum TraceApproval {
+export enum ApprovalType {
   UNREVIEWED = "UNREVIEWED",
   APPROVED = "APPROVED",
   DECLINED = "DECLINED",
@@ -25,7 +25,7 @@ export enum InternalTraceType {
 /**
  * Defines a link.
  */
-export interface Link {
+export interface LinkModel {
   /**
    * The source node ID.
    */
@@ -47,7 +47,7 @@ export interface Link {
 /**
  * Defines a trace link.
  */
-export interface TraceLink extends Link {
+export interface TraceLinkModel extends LinkModel {
   /**
    * The trace link ID.
    */
@@ -55,7 +55,7 @@ export interface TraceLink extends Link {
   /**
    * The approval status of the trace.
    */
-  approvalStatus: TraceApproval;
+  approvalStatus: ApprovalType;
   /**
    * The confidence score of the trace.
    */
@@ -67,24 +67,10 @@ export interface TraceLink extends Link {
 }
 
 /**
- * Defines a displayable trace link.
- */
-export interface TraceLinkDisplayData extends TraceLink {
-  /**
-   * The body of the source of the link.
-   */
-  sourceBody: string;
-  /**
-   * The body of the target of the link.
-   */
-  targetBody: string;
-}
-
-/**
  * Link used when hiding subtrees to summarize the links of the children
  * of some root node.
  */
-export interface SubtreeLink extends TraceLink {
+export interface SubtreeLinkModel extends TraceLinkModel {
   type: InternalTraceType.SUBTREE;
   /**
    * The id of the artifact.
@@ -95,7 +81,7 @@ export interface SubtreeLink extends TraceLink {
 /**
  * The direction of trace links allowed by an artifact type.
  */
-export interface ArtifactDirection {
+export interface TraceDirectionModel {
   /**
    * The name of source the artifact type.
    */
@@ -109,7 +95,7 @@ export interface ArtifactDirection {
 /**
  * The direction of trace links allowed by an artifact type, with a label.
  */
-export interface LabeledArtifactDirection extends ArtifactDirection {
+export interface LabelledTraceDirectionModel extends TraceDirectionModel {
   /**
    * The label to present an artifact direction.
    */

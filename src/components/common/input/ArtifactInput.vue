@@ -21,7 +21,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { Artifact } from "@/types";
+import { ArtifactModel } from "@/types";
 import { artifactModule } from "@/store";
 import { GenericArtifactBodyDisplay } from "@/components/common/generic";
 import { filterArtifacts } from "@/util";
@@ -71,7 +71,7 @@ export default Vue.extend({
     /**
      * @return The artifacts to select from.
      */
-    artifacts(): Artifact[] {
+    artifacts(): ArtifactModel[] {
       return this.onlyDocumentArtifacts
         ? artifactModule.artifacts
         : artifactModule.allArtifacts;

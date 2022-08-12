@@ -1,7 +1,7 @@
 /**
  * Defines a resource file.
  */
-export interface Resource {
+export interface ResourceModel {
   /**
    * The file path.
    */
@@ -11,7 +11,7 @@ export interface Resource {
 /**
  * Defines a trace matrix file.
  */
-export interface TraceMatrixFile extends Resource {
+export interface TraceMatrixModel extends ResourceModel {
   /**
    * The source type to trace from.
    */
@@ -25,13 +25,13 @@ export interface TraceMatrixFile extends Resource {
 /**
  * A collection of resources.
  */
-export interface DataFile {
-  [key: string]: Resource;
+export interface FileModel {
+  [key: string]: ResourceModel;
 }
 
 /**
  * A collection of tim files.
  */
-export interface TimFile {
-  [key: string]: DataFile | TraceMatrixFile;
+export interface TimFileModel {
+  [key: string]: FileModel | TraceMatrixModel;
 }

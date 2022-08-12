@@ -18,7 +18,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { TraceLink } from "@/types";
+import { TraceLinkModel } from "@/types";
 import TraceLinkDisplay from "./TraceLinkDisplay.vue";
 import Typography from "@/components/common/display/Typography.vue";
 
@@ -33,7 +33,7 @@ export default Vue.extend({
   components: { Typography, TraceLinkDisplay },
   props: {
     link: {
-      type: Object as PropType<TraceLink>,
+      type: Object as PropType<TraceLinkModel>,
       required: true,
     },
     showDecline: {

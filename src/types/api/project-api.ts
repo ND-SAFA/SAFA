@@ -1,4 +1,4 @@
-import { Artifact, TraceLink } from "@/types/domain";
+import { ArtifactModel, TraceLinkModel } from "@/types/domain";
 
 /**
  * Defines the response from checking if an artifact exists.
@@ -27,7 +27,7 @@ export interface ParseArtifactFileModel extends ParseFileModel {
   /**
    * The artifacts parsed.
    */
-  entities: Artifact[];
+  entities: ArtifactModel[];
 }
 
 /**
@@ -37,33 +37,5 @@ export interface ParseTraceFileModel extends ParseFileModel {
   /**
    * The traces parsed.
    */
-  entities: TraceLink[];
-}
-
-/**
- * Represents a member in a given project
- */
-export interface MembershipModel {
-  projectMembershipId: string;
-  email: string;
-  role: ProjectRole;
-}
-
-/**
- * Represents a role with certain authorization constraints
- * within a given project.
- */
-export enum ProjectRole {
-  VIEWER = "VIEWER",
-  EDITOR = "EDITOR",
-  ADMIN = "ADMIN",
-  OWNER = "OWNER",
-}
-
-/**
- * Represents a request for adding a member to a project.
- */
-export interface MemberRequestModel {
-  memberEmail: string;
-  projectRole: ProjectRole;
+  entities: TraceLinkModel[];
 }

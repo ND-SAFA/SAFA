@@ -15,7 +15,7 @@ export interface GitHubCredentialsModel {
 /**
  * Defines a GitHub installation (organization).
  */
-export interface GitHubInstallation {
+export interface GitHubInstallationModel {
   /**
    * The installation's id.
    */
@@ -37,11 +37,11 @@ export interface GitHubInstallation {
 /**
  * Defines a list of GitHub installations (organization).
  */
-export interface GitHubInstallationList {
+export interface GitHubInstallationListModel {
   /**
    * The list of installations.
    */
-  installations: GitHubInstallation[];
+  installations: GitHubInstallationModel[];
   /**
    * The count of installations.
    */
@@ -51,7 +51,7 @@ export interface GitHubInstallationList {
 /**
  * Defines a GitHub repository.
  */
-export interface GitHubRepository {
+export interface GitHubRepositoryModel {
   /**
    * The project's id.
    */
@@ -89,11 +89,11 @@ export interface GitHubRepository {
 /**
  * Defines a list of GitHub repositories.
  */
-export interface GitHubRepositoryList {
+export interface GitHubRepositoryListModel {
   /**
    * The list of installations.
    */
-  repositories: GitHubRepository[];
+  repositories: GitHubRepositoryModel[];
   /**
    * The count of installations.
    */

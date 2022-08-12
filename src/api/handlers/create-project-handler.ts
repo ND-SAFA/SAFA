@@ -1,4 +1,8 @@
-import { GitHubCredentialsModel, IOHandlerCallback, Project } from "@/types";
+import {
+  GitHubCredentialsModel,
+  IOHandlerCallback,
+  ProjectModel,
+} from "@/types";
 import { navigateTo, Routes } from "@/router";
 import { appModule, logModule } from "@/store";
 import {
@@ -17,7 +21,7 @@ import {
  * @param onError - Called if the action fails.
  */
 export function handleImportProject(
-  project: Project,
+  project: ProjectModel,
   { onSuccess, onError }: IOHandlerCallback
 ): void {
   appModule.onLoadStart();
@@ -47,7 +51,7 @@ export function handleImportProject(
  */
 export function handleBulkImportProject(
   project: Pick<
-    Project,
+    ProjectModel,
     "projectId" | "name" | "description" | "projectVersion"
   >,
   files: File[],

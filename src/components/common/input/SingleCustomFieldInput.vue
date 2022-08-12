@@ -33,7 +33,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { Artifact, ColumnDataType, DocumentColumn } from "@/types";
+import { ArtifactModel, ColumnDataType, ColumnModel } from "@/types";
 import ArtifactInput from "./ArtifactInput.vue";
 
 /**
@@ -46,11 +46,11 @@ export default Vue.extend({
   components: { ArtifactInput },
   props: {
     value: {
-      type: Object as PropType<Artifact>,
+      type: Object as PropType<ArtifactModel>,
       required: true,
     },
     column: {
-      type: Object as PropType<DocumentColumn>,
+      type: Object as PropType<ColumnModel>,
       required: true,
     },
     filled: {

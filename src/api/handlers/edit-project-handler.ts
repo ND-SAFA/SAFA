@@ -1,4 +1,4 @@
-import { IOHandlerCallback, Project, ProjectIdentifier } from "@/types";
+import { IOHandlerCallback, ProjectModel, IdentifierModel } from "@/types";
 import { logModule, projectModule } from "@/store";
 import {
   deleteProject,
@@ -15,8 +15,8 @@ import {
  * @param onError - Called if the action fails.
  */
 export function handleSaveProject(
-  project: Pick<ProjectIdentifier, "projectId" | "name" | "description">,
-  { onSuccess, onError }: IOHandlerCallback<Project>
+  project: Pick<IdentifierModel, "projectId" | "name" | "description">,
+  { onSuccess, onError }: IOHandlerCallback<ProjectModel>
 ): void {
   saveProject(project)
     .then((project) => {
@@ -38,8 +38,8 @@ export function handleSaveProject(
  * @param onError - Called if the action fails.
  */
 export function handleDeleteProject(
-  project: ProjectIdentifier,
-  { onSuccess, onError }: IOHandlerCallback<ProjectIdentifier>
+  project: IdentifierModel,
+  { onSuccess, onError }: IOHandlerCallback<IdentifierModel>
 ): void {
   deleteProject(project.projectId)
     .then(async () => {

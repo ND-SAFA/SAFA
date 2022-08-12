@@ -14,7 +14,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { ProjectIdentifier, ProjectVersion } from "@/types";
+import { IdentifierModel, VersionModel } from "@/types";
 import { logModule } from "@/store";
 import { handleLoadVersion } from "@/api";
 import ProjectVersionStepperModal from "./ProjectVersionStepperModal.vue";
@@ -49,14 +49,14 @@ export default Vue.extend({
      * fetching the versions of given project.
      */
     project: {
-      type: Object as PropType<ProjectIdentifier>,
+      type: Object as PropType<IdentifierModel>,
       required: false,
     },
   },
   data() {
     return {
       currentStep: this.project === undefined ? 1 : 2,
-      selectedVersion: undefined as ProjectVersion | undefined,
+      selectedVersion: undefined as VersionModel | undefined,
       selectedProject: this.project,
       isLoading: false,
     };

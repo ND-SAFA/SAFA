@@ -1,9 +1,9 @@
 import {
   JobModel,
   MemberRequestModel,
-  Project,
+  ProjectModel,
   ProjectDelta,
-  ProjectIdentifier,
+  IdentifierModel,
   MembershipModel,
   ProjectRole,
 } from "@/types";
@@ -16,16 +16,16 @@ import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
  * @return The saved project.
  */
 export async function saveProject(
-  project: Pick<Project, "projectId" | "name" | "description">
-): Promise<Project> {
-  return authHttpClient<Project>(Endpoint.project, {
+  project: Pick<ProjectModel, "projectId" | "name" | "description">
+): Promise<ProjectModel> {
+  return authHttpClient<ProjectModel>(Endpoint.project, {
     method: "POST",
     body: JSON.stringify(project),
   });
 }
 
 export async function createProjectCreationJob(
-  project: Project
+  project: ProjectModel
 ): Promise<JobModel> {
   return authHttpClient<JobModel>(Endpoint.createProjectJob, {
     method: "POST",
@@ -38,8 +38,8 @@ export async function createProjectCreationJob(
  *
  * @return All project identifiers.
  */
-export async function getProjects(): Promise<ProjectIdentifier[]> {
-  return authHttpClient<ProjectIdentifier[]>(Endpoint.project, {
+export async function getProjects(): Promise<IdentifierModel[]> {
+  return authHttpClient<IdentifierModel[]>(Endpoint.project, {
     method: "GET",
   });
 }

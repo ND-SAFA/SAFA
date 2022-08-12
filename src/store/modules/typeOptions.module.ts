@@ -1,16 +1,16 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
 
 import type {
-  ArtifactType,
+  ArtifactTypeModel,
   ArtifactTypeDirections,
-  LabeledArtifactDirection,
-  ArtifactDirection,
+  LabelledTraceDirectionModel,
+  TraceDirectionModel,
   ArtifactTypeIcons,
 } from "@/types";
 import { createDefaultTypeIcons } from "@/util";
 import {
   allowedSafetyCaseTypes,
-  Artifact,
+  ArtifactModel,
   CreateLinkValidator,
   SafetyCaseType,
 } from "@/types";
@@ -28,7 +28,7 @@ export default class TypeOptionsModule extends VuexModule {
   /**
    * A list of all artifact types.
    */
-  private allArtifactTypes: ArtifactType[] = [];
+  private allArtifactTypes: ArtifactTypeModel[] = [];
   /**
    * A mapping of the icons for each artifact type.
    */
@@ -48,7 +48,7 @@ export default class TypeOptionsModule extends VuexModule {
   /**
    * Changes what directions of trace links between artifacts are allowed.
    */
-  initializeTypeIcons(artifactTypes: ArtifactType[]): void {
+  initializeTypeIcons(artifactTypes: ArtifactTypeModel[]): void {
     this.SET_TYPE_ICONS(createDefaultTypeIcons(artifactTypes));
     this.SET_TYPES(artifactTypes);
   }
@@ -57,7 +57,7 @@ export default class TypeOptionsModule extends VuexModule {
   /**
    * Changes what directions of trace links between artifacts are allowed.
    */
-  updateLinkDirections({ type, allowedTypes }: ArtifactDirection): void {
+  updateLinkDirections({ type, allowedTypes }: TraceDirectionModel): void {
     this.SET_LINK_DIRECTIONS({
       ...this.artifactTypeDirections,
       [type]: allowedTypes,
@@ -68,7 +68,7 @@ export default class TypeOptionsModule extends VuexModule {
   /**
    * Changes what icons each artifact uses.
    */
-  updateArtifactIcon({ type, icon }: LabeledArtifactDirection): void {
+  updateArtifactIcon({ type, icon }: LabelledTraceDirectionModel): void {
     this.SET_TYPE_ICONS({
       ...this.artifactTypeIcons,
       [type]: icon,
@@ -79,7 +79,7 @@ export default class TypeOptionsModule extends VuexModule {
   /**
    * Adds a new artifact type if it does not yet exist.
    */
-  addArtifactTypes(newArtifacts: Artifact[]): void {
+  addArtifactTypes(newArtifacts: ArtifactModel[]): void {
     newArtifacts.forEach(({ type }) => {
       if (this.artifactTypeDirections[type]) return;
 
@@ -110,7 +110,7 @@ export default class TypeOptionsModule extends VuexModule {
    *
    * @param artifactTypes - The artifact types.
    */
-  SET_TYPES(artifactTypes: ArtifactType[]): void {
+  SET_TYPES(artifactTypes: ArtifactTypeModel[]): void {
     this.allArtifactTypes = artifactTypes;
   }
 

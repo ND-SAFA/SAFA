@@ -55,7 +55,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { ProjectDocument } from "@/types";
+import { DocumentModel } from "@/types";
 import { documentModule } from "@/store";
 import { GenericIconButton, FlexBox } from "@/components/common";
 import DocumentModal from "./DocumentModal.vue";
@@ -66,7 +66,7 @@ export default Vue.extend({
   data: () => ({
     isCreateOpen: false,
     isEditOpen: false,
-    editingDocument: undefined as ProjectDocument | undefined,
+    editingDocument: undefined as DocumentModel | undefined,
   }),
   computed: {
     /**
@@ -126,7 +126,7 @@ export default Vue.extend({
     /**
      * Opens the edit document modal.
      */
-    handleEditOpen(document: ProjectDocument) {
+    handleEditOpen(document: DocumentModel) {
       this.editingDocument = document;
       this.isEditOpen = true;
     },

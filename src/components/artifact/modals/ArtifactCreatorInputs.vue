@@ -85,7 +85,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { Artifact, DocumentType, SelectOption } from "@/types";
+import { ArtifactModel, DocumentType, SelectOption } from "@/types";
 import { documentTypeMap, logicTypeOptions, safetyCaseOptions } from "@/util";
 import { documentModule, projectModule, typeOptionsModule } from "@/store";
 import { getDoesArtifactExist } from "@/api";
@@ -106,7 +106,7 @@ export default Vue.extend({
   components: { CustomFieldInput, ArtifactInput, Typography },
   props: {
     artifact: {
-      type: Object as PropType<Artifact>,
+      type: Object as PropType<ArtifactModel>,
       required: true,
     },
     currentArtifactName: String,

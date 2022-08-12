@@ -41,7 +41,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { Project, MembershipModel, ProjectRole } from "@/types";
+import { ProjectModel, MembershipModel, ProjectRole } from "@/types";
 import { sessionModule } from "@/store";
 import { getProjectMembers, handleDeleteMember } from "@/api";
 import { GenericSelector, Typography } from "@/components/common";
@@ -55,7 +55,7 @@ export default Vue.extend({
   components: { GenericSelector, SettingsMemberInformationModal, Typography },
   props: {
     project: {
-      type: Object as PropType<Project>,
+      type: Object as PropType<ProjectModel>,
       required: true,
     },
   },

@@ -29,7 +29,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { ProjectIdentifier, ProjectVersion } from "@/types";
+import { IdentifierModel, VersionModel } from "@/types";
 import { logModule, projectModule } from "@/store";
 import { handleUploadProjectVersion } from "@/api";
 import { GenericFileSelector } from "@/components/common";
@@ -55,8 +55,8 @@ export default Vue.extend({
   data() {
     return {
       currentStep: 1,
-      selectedProject: undefined as ProjectIdentifier | undefined,
-      selectedVersion: undefined as ProjectVersion | undefined,
+      selectedProject: undefined as IdentifierModel | undefined,
+      selectedVersion: undefined as VersionModel | undefined,
       selectedFiles: [] as File[],
       isLoading: false,
       setAsNewVersion: true,

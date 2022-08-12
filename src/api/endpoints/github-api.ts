@@ -1,8 +1,8 @@
 import {
-  GitHubInstallation,
-  GitHubInstallationList,
-  GitHubRepository,
-  GitHubRepositoryList,
+  GitHubInstallationModel,
+  GitHubInstallationListModel,
+  GitHubRepositoryModel,
+  GitHubRepositoryListModel,
   GitHubCredentialsModel,
 } from "@/types";
 
@@ -135,8 +135,8 @@ export async function getGitHubRefreshToken(
  */
 export async function getGitHubInstallations(
   accessToken: string
-): Promise<GitHubInstallation[]> {
-  const items = await fetchGitHub<GitHubInstallationList>(
+): Promise<GitHubInstallationModel[]> {
+  const items = await fetchGitHub<GitHubInstallationListModel>(
     "https://api.github.com/user/installations",
     {
       method: "GET",
@@ -160,8 +160,8 @@ export async function getGitHubInstallations(
 export async function getGitHubRepositories(
   accessToken: string,
   installationId: string
-): Promise<GitHubRepository[]> {
-  const { repositories } = await fetchGitHub<GitHubRepositoryList>(
+): Promise<GitHubRepositoryModel[]> {
+  const { repositories } = await fetchGitHub<GitHubRepositoryListModel>(
     `https://api.github.com/user/installations/${installationId}/repositories`,
     {
       method: "GET",

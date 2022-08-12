@@ -42,7 +42,7 @@ import {
   ButtonDefinition,
   ButtonMenuItem,
   ButtonType,
-  ProjectVersion,
+  VersionModel,
 } from "@/types";
 import { navigateTo, Routes } from "@/router";
 import { logModule, projectModule } from "@/store";
@@ -207,7 +207,7 @@ export default Vue.extend({
     /**
      * Closes the version creator and loads the created version.
      */
-    handleVersionCreated(version: ProjectVersion) {
+    handleVersionCreated(version: VersionModel) {
       handleLoadVersion(version.versionId);
 
       this.createVersionOpen = false;

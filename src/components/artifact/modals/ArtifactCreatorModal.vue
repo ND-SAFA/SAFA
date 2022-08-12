@@ -28,7 +28,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { Artifact, DocumentType } from "@/types";
+import { ArtifactModel, DocumentType } from "@/types";
 import { createArtifact, createArtifactOfType } from "@/util";
 import { artifactModule, documentModule } from "@/store";
 import { handleSaveArtifact } from "@/api";
@@ -52,7 +52,7 @@ export default Vue.extend({
       required: true,
     },
     artifact: {
-      type: Object as PropType<Artifact>,
+      type: Object as PropType<ArtifactModel>,
       required: false,
     },
   },
@@ -112,7 +112,7 @@ export default Vue.extend({
     /**
      * @return The parent artifact of a logic node.
      */
-    parentArtifact(): Artifact | undefined {
+    parentArtifact(): ArtifactModel | undefined {
       return this.parentId
         ? artifactModule.getArtifactById(this.parentId)
         : undefined;

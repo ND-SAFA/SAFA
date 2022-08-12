@@ -25,7 +25,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { GitHubInstallation } from "@/types";
+import { GitHubInstallationModel } from "@/types";
 import { GenericStepperListStep } from "@/components/common";
 
 /**
@@ -40,7 +40,7 @@ export default Vue.extend({
   },
   props: {
     installations: {
-      type: Array as PropType<GitHubInstallation[]>,
+      type: Array as PropType<GitHubInstallationModel[]>,
       required: true,
     },
     loading: {
@@ -53,7 +53,7 @@ export default Vue.extend({
      * Handles a click to select an installation.
      * @param installation - The installation to select.
      */
-    handleInstallationSelect(installation: GitHubInstallation) {
+    handleInstallationSelect(installation: GitHubInstallationModel) {
       this.$emit("select", installation);
     },
   },

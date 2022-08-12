@@ -24,7 +24,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { Project, ProjectIdentifier } from "@/types";
+import { ProjectModel, IdentifierModel } from "@/types";
 import { handleSaveProject } from "@/api";
 import { projectModule } from "@/store";
 import { GenericIconButton, Typography, FlexBox } from "@/components/common";
@@ -44,7 +44,7 @@ export default Vue.extend({
   },
   props: {
     project: {
-      type: Object as PropType<Project>,
+      type: Object as PropType<ProjectModel>,
       required: true,
     },
   },
@@ -66,7 +66,7 @@ export default Vue.extend({
     /**
      * Attempts to save the project.
      */
-    handleSave(project: ProjectIdentifier): void {
+    handleSave(project: IdentifierModel): void {
       this.isEditLoading = true;
 
       handleSaveProject(

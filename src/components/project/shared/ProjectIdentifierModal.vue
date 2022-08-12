@@ -39,7 +39,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { ProjectIdentifier } from "@/types";
+import { IdentifierModel } from "@/types";
 import { createProjectIdentifier } from "@/util";
 import { GenericModal } from "@/components/common";
 import ProjectIdentifierInput from "./ProjectIdentifierInput.vue";
@@ -64,7 +64,7 @@ export default Vue.extend({
       required: true,
     },
     project: {
-      type: Object as PropType<ProjectIdentifier>,
+      type: Object as PropType<IdentifierModel>,
       required: false,
     },
     title: {

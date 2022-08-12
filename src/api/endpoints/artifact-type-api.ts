@@ -1,4 +1,4 @@
-import { ArtifactType } from "@/types";
+import { ArtifactTypeModel } from "@/types";
 import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
 
 /**
@@ -10,9 +10,9 @@ import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
  */
 export async function saveArtifactType(
   projectId: string,
-  artifactType: ArtifactType
-): Promise<ArtifactType> {
-  return authHttpClient<ArtifactType>(
+  artifactType: ArtifactTypeModel
+): Promise<ArtifactTypeModel> {
+  return authHttpClient<ArtifactTypeModel>(
     fillEndpoint(Endpoint.createOrUpdateArtifactType, {
       projectId,
     }),
@@ -47,8 +47,8 @@ export async function deleteArtifactType(typeId: string): Promise<void> {
  */
 export async function getProjectArtifactTypes(
   projectId: string
-): Promise<ArtifactType[]> {
-  return authHttpClient<ArtifactType[]>(
+): Promise<ArtifactTypeModel[]> {
+  return authHttpClient<ArtifactTypeModel[]>(
     fillEndpoint(Endpoint.getProjectArtifactTypes, {
       projectId,
     }),

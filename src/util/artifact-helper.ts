@@ -1,4 +1,4 @@
-import { Artifact } from "@/types";
+import { ArtifactModel } from "@/types";
 
 /**
  * Decides whether to filter an artifact out of view.
@@ -8,7 +8,7 @@ import { Artifact } from "@/types";
  * @return If true, the artifact should be kept.
  */
 export function filterArtifacts(
-  artifact: Artifact,
+  artifact: ArtifactModel,
   queryText: string
 ): boolean {
   const lowercaseQuery = queryText.toLowerCase();

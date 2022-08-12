@@ -69,14 +69,14 @@
 <script lang="ts">
 import Vue from "vue";
 import {
-  Artifact,
+  ArtifactModel,
   ArtifactMap,
-  Project,
+  ProjectModel,
   MembershipModel,
   ProjectRole,
   StepState,
   TraceFile,
-  TraceLink,
+  TraceLinkModel,
 } from "@/types";
 import { createProject } from "@/util";
 import {
@@ -150,7 +150,7 @@ export default Vue.extend({
     /**
      * @return All artifacts.
      */
-    artifacts(): Artifact[] {
+    artifacts(): ArtifactModel[] {
       return this.artifactUploader.panels
         .map(({ projectFile }) => projectFile.artifacts || [])
         .reduce((acc, cur) => [...acc, ...cur], []);
@@ -172,7 +172,7 @@ export default Vue.extend({
     /**
      * @return All trace links.
      */
-    traces(): TraceLink[] {
+    traces(): TraceLinkModel[] {
       return this.traceUploader.panels
         .map(({ projectFile }) => projectFile.traces || [])
         .reduce((acc, cur) => [...acc, ...cur], []);
@@ -186,7 +186,7 @@ export default Vue.extend({
     /**
      * @return The project to create.
      */
-    project(): Project {
+    project(): ProjectModel {
       const user: MembershipModel = {
         projectMembershipId: "",
         email: sessionModule.userEmail,

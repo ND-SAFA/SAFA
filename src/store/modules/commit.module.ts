@@ -1,5 +1,5 @@
 import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
-import type { Artifact, Commit, CommitHistory } from "@/types";
+import type { ArtifactModel, Commit, CommitHistory } from "@/types";
 import { createCommit } from "@/util";
 import { artifactModule, logModule, traceModule } from "@/store";
 
@@ -116,8 +116,8 @@ export default class CommitModule extends VuexModule {
    */
   get getRevert(): (c: Commit) => Commit {
     return (commit: Commit) => {
-      const originalArtifacts: Artifact[] = commit.artifacts.modified.map(
-        (a: Artifact) => artifactModule.getArtifactById(a.id)
+      const originalArtifacts: ArtifactModel[] = commit.artifacts.modified.map(
+        (a: ArtifactModel) => artifactModule.getArtifactById(a.id)
       );
       const originalTraces = commit.traces.modified.map((t) =>
         traceModule.getTraceLinkByArtifacts(t.sourceId, t.targetId)

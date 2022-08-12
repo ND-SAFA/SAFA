@@ -14,7 +14,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { Artifact, DocumentColumn } from "@/types";
+import { ArtifactModel, ColumnModel } from "@/types";
 import { documentModule } from "@/store";
 import { Typography } from "@/components/common/display";
 import SingleCustomFieldInput from "./SingleCustomFieldInput.vue";
@@ -29,7 +29,7 @@ export default Vue.extend({
   components: { SingleCustomFieldInput, Typography },
   props: {
     value: {
-      type: Object as PropType<Artifact>,
+      type: Object as PropType<ArtifactModel>,
       required: true,
     },
   },
@@ -43,7 +43,7 @@ export default Vue.extend({
     /**
      * @return The current document columns.
      */
-    columns(): DocumentColumn[] {
+    columns(): ColumnModel[] {
       return documentModule.tableColumns;
     },
   },

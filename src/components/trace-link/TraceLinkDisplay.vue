@@ -112,13 +112,13 @@ export default Vue.extend({
      * @return The artifact this link comes from.
      */
     sourceArtifact(): ArtifactModel {
-      return artifactModule.getArtifactsById[this.link.sourceId];
+      return artifactModule.getAllArtifactsById[this.link.sourceId];
     },
     /**
      * @return The artifact this link goes towards.
      */
     targetArtifact(): ArtifactModel {
-      return artifactModule.getArtifactsById[this.link.targetId];
+      return artifactModule.getAllArtifactsById[this.link.targetId];
     },
     /**
      * @return The text to display on the delete button.

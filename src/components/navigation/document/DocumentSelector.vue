@@ -4,7 +4,7 @@
       ref="documentSelector"
       v-model="select"
       :items="items"
-      label="Document"
+      label="View"
       outlined
       color="secondary"
       dense
@@ -32,7 +32,7 @@
       <template v-slot:append-item>
         <v-btn text block color="primary" @click="handleCreateOpen">
           <v-icon>mdi-plus</v-icon>
-          Add Document
+          Add View
         </v-btn>
 
         <document-modal :is-open="isCreateOpen" @close="handleCloseMenu" />

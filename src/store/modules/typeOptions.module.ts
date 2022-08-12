@@ -182,7 +182,7 @@ export default class TypeOptionsModule extends VuexModule {
       "mdi-math-compass",
       "mdi-hazard-lights",
       "mdi-pine-tree-fire",
-      "mdi-help",
+      "mdi-alpha-a-box-outline",
     ];
   }
 

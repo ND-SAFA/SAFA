@@ -55,6 +55,7 @@ export default Vue.extend({
     value: String,
     classes: String,
     color: String,
+    inheritColor: Boolean,
     error: Boolean,
     defaultExpanded: Boolean,
     ellipsis: Boolean,
@@ -116,6 +117,7 @@ export default Vue.extend({
 
       if (this.classes) classNames += ` ${this.classes}`;
       if (this.color) classNames += ` ${this.color}--text`;
+      if (this.inheritColor) classNames += ` inherit-color`;
       if (this.error) classNames += ` error--text`;
       if (this.ellipsis) classNames += ` text-ellipsis`;
       if (this.secondary) classNames += ` text--secondary`;

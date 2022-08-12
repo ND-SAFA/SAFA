@@ -16,14 +16,14 @@
         <typography :value="item[column.id] || ''" />
       </div>
       <div v-if="isRelation(column.dataType)">
-        <artifact-table-chip
+        <table-chip
           v-for="artifactId in getArrayValue(item[column.id])"
           :key="artifactId"
           :text="getArtifactName(artifactId)"
         />
       </div>
       <div v-if="isSelect(column.dataType)">
-        <artifact-table-chip
+        <table-chip
           v-for="val in getArrayValue(item[column.id])"
           :key="val"
           :text="val"
@@ -77,16 +77,16 @@ import {
   ColumnModel,
   FlatArtifact,
 } from "@/types";
-import ArtifactTableChip from "./ArtifactTableChip.vue";
 import { artifactModule } from "@/store";
 import { ThemeColors } from "@/util";
 import {
   GenericIconButton,
   SingleCustomFieldInput,
   Typography,
+  TableChip,
+  FlexBox,
 } from "@/components/common";
 import { handleSaveArtifact } from "@/api";
-import FlexBox from "@/components/common/display/FlexBox.vue";
 
 /**
  * Displays a cell in the artifact table.
@@ -97,7 +97,7 @@ export default Vue.extend({
     FlexBox,
     Typography,
     GenericIconButton,
-    ArtifactTableChip,
+    TableChip,
     SingleCustomFieldInput,
   },
   props: {

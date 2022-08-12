@@ -1,6 +1,6 @@
 <template>
   <v-chip v-if="doRender" small class="mr-1" :color="color" outlined>
-    <typography :value="text" />
+    <typography :value="text" inherit-color />
   </v-chip>
 </template>
 

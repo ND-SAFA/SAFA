@@ -5,16 +5,16 @@
     :class="isVisible ? 'artifact-view visible' : 'artifact-view'"
   >
     <v-data-table
+      show-group-by
+      show-expand
+      single-expand
+      fixed-header
       :headers="headers"
       :items="items"
       :search="searchText"
       :expanded="expanded"
       :item-class="getItemBackground"
       sort-by="name"
-      show-group-by
-      show-expand
-      single-expand
-      fixed-header
       :items-per-page="50"
       @click:row="handleView($event)"
     >
@@ -39,7 +39,7 @@
 
       <template v-slot:[`item.type`]="{ item }">
         <td>
-          <artifact-table-chip :text="item.type" display-icon />
+          <table-chip :text="item.type" display-icon />
         </td>
       </template>
 
@@ -88,8 +88,12 @@ import {
   errorModule,
 } from "@/store";
 import { handleDeleteArtifact } from "@/api";
-import { GenericIconButton, Typography, FlexBox } from "@/components/common";
-import ArtifactTableChip from "./ArtifactTableChip.vue";
+import {
+  GenericIconButton,
+  Typography,
+  FlexBox,
+  TableChip,
+} from "@/components/common";
 import ArtifactTableHeader from "./ArtifactTableHeader.vue";
 import ArtifactTableCell from "./ArtifactTableCell.vue";
 import ArtifactTableDeltaChip from "./ArtifactTableDeltaChip.vue";
@@ -104,7 +108,7 @@ export default Vue.extend({
     Typography,
     ArtifactTableDeltaChip,
     ArtifactTableHeader,
-    ArtifactTableChip,
+    TableChip,
     GenericIconButton,
     ArtifactTableCell,
   },
@@ -245,19 +249,3 @@ export default Vue.extend({
   },
 });
 </script>
-
-<style lang="scss">
-.artifact-view {
-  .v-data-table__expanded__content {
-    box-shadow: inset 0 2px 8px -5px rgba(50, 50, 50, 0.75) !important;
-  }
-
-  tr {
-    cursor: pointer;
-
-    &.v-data-table__expanded__content {
-      cursor: text;
-    }
-  }
-}
-</style>

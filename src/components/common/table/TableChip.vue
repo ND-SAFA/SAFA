@@ -23,10 +23,10 @@ import { getArtifactTypePrintName } from "@/util";
 import { Typography } from "@/components/common";
 
 /**
- * Renders a chip on an artifact table row.
+ * Renders a chip on a table row.
  */
 export default Vue.extend({
-  name: "ArtifactTableChip",
+  name: "TableChip",
   components: { Typography },
   props: {
     text: String,

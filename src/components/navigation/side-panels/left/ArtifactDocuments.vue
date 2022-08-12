@@ -1,6 +1,6 @@
 <template>
   <div v-if="documents.length > 0" class="mt-4">
-    <typography el="h2" variant="subtitle" value="Documents" />
+    <typography el="h2" variant="subtitle" value="Views" />
     <v-divider />
 
     <v-list>

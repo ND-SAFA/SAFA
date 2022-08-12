@@ -207,7 +207,9 @@ export function createDefaultTypeIcons(
 ): Record<string, string> {
   return artifactTypes
     .map((t) => ({ [t.name]: t.icon }))
-    .reduce((acc, cur) => ({ ...acc, ...cur }), { default: "mdi-help" });
+    .reduce((acc, cur) => ({ ...acc, ...cur }), {
+      default: "mdi-alpha-a-box-outline",
+    });
 }
 
 /**

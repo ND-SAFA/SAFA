@@ -138,7 +138,6 @@ public class ArtifactVersionRepositoryImpl
         };
         Map<String, String> customFields = JsonFileUtilities.parse(artifactVersion.getCustomFields(), typeReference);
 
-
         ArtifactAppEntity artifactAppEntity =
             new ArtifactAppEntity(artifactVersion.getArtifact().getArtifactId().toString(),
                 artifactVersion.getTypeName(),

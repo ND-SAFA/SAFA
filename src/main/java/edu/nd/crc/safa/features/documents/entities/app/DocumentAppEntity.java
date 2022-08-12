@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import edu.nd.crc.safa.features.documents.entities.db.Document;
-import edu.nd.crc.safa.features.layout.entities.LayoutPosition;
+import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

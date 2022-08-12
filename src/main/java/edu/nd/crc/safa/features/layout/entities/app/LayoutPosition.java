@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.layout.entities;
+package edu.nd.crc.safa.features.layout.entities.app;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

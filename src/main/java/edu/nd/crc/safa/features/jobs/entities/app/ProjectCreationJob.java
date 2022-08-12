@@ -5,6 +5,7 @@ import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.commits.services.EntityVersionService;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
+import edu.nd.crc.safa.features.layout.entities.app.ProjectLayout;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.services.AppEntityRetrievalService;
@@ -55,15 +56,16 @@ public class ProjectCreationJob extends AbstractJob {
     }
 
     public void generatingLayout() {
-        //TODO: Store generated layout
-    }
-
-    @Override
-    public void done() {
         AppEntityRetrievalService appEntityRetrievalService = serviceProvider.getAppEntityRetrievalService();
         this.projectAppEntity = appEntityRetrievalService.retrieveProjectAppEntityAtProjectVersion(
             projectCommit.getCommitVersion()
         );
+        ProjectLayout projectLayout = new ProjectLayout(projectAppEntity, serviceProvider);
+        projectLayout.createLayoutForAllDocuments();
+    }
+
+    @Override
+    public void done() {
         this.jobDbEntity.setCompletedEntityId(projectCommit.getCommitVersion().getVersionId());
         super.done();
     }

@@ -1,7 +1,6 @@
 package edu.nd.crc.safa.features.projects.services;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -12,15 +11,10 @@ import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
-import edu.nd.crc.safa.features.documents.entities.app.DocumentColumnAppEntity;
-import edu.nd.crc.safa.features.documents.entities.db.Document;
-import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
-import edu.nd.crc.safa.features.documents.repositories.DocumentArtifactRepository;
-import edu.nd.crc.safa.features.documents.repositories.DocumentColumnRepository;
-import edu.nd.crc.safa.features.documents.repositories.DocumentRepository;
 import edu.nd.crc.safa.features.documents.services.CurrentDocumentService;
+import edu.nd.crc.safa.features.documents.services.DocumentService;
 import edu.nd.crc.safa.features.errors.services.CommitErrorRetrievalService;
-import edu.nd.crc.safa.features.layout.entities.LayoutPosition;
+import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
 import edu.nd.crc.safa.features.layout.services.LayoutService;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectParsingErrors;
@@ -55,14 +49,12 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class AppEntityRetrievalService {
 
-    private final DocumentRepository documentRepository;
     private final TraceLinkVersionRepository traceLinkVersionRepository;
-    private final DocumentArtifactRepository documentArtifactRepository;
     private final ArtifactVersionRepository artifactVersionRepository;
     private final ArtifactTypeRepository artifactTypeRepository;
     private final ProjectMembershipRepository projectMembershipRepository;
-    private final DocumentColumnRepository documentColumnRepository;
     private final CurrentDocumentService currentDocumentService;
+    private final DocumentService documentService;
 
     private final RuleService ruleService;
     private final CommitErrorRetrievalService commitErrorRetrievalService;
@@ -91,7 +83,7 @@ public class AppEntityRetrievalService {
         List<ProjectMemberAppEntity> projectMembers = getMembersInProject(project);
 
         // Documents
-        List<DocumentAppEntity> documents = this.getDocumentsInProject(project);
+        List<DocumentAppEntity> documents = this.documentService.getDocumentsInProject(project);
         generatedAndSetDocumentLayouts(artifacts, traces, documents);
 
         // Current document
@@ -217,38 +209,6 @@ public class AppEntityRetrievalService {
             .collect(Collectors.toList());
     }
 
-    /**
-     * Returns list of documents in given project
-     *
-     * @param project The projects whose documents are returned.
-     * @return List of documents in project.
-     */
-    public List<DocumentAppEntity> getDocumentsInProject(Project project) {
-        List<Document> projectDocuments = this.documentRepository.findByProject(project);
-        List<DocumentAppEntity> documentAppEntities = new ArrayList<>();
-        for (Document document : projectDocuments) {
-            // Retrieve linked artifact Ids
-            List<String> artifactIds = this.documentArtifactRepository.findByDocument(document)
-                .stream()
-                .map(da -> da.getArtifact().getArtifactId().toString())
-                .collect(Collectors.toList());
-            //TODO: Retrieve artifact positions
-            DocumentAppEntity documentAppEntity = new DocumentAppEntity(document, artifactIds, new Hashtable<>());
-
-            // Retrieve FMEA columns
-            if (document.getType() == DocumentType.FMEA) {
-                List<DocumentColumnAppEntity> documentColumns = this.documentColumnRepository
-                    .findByDocumentOrderByTableColumnIndexAsc(document)
-                    .stream()
-                    .map(DocumentColumnAppEntity::new)
-                    .collect(Collectors.toList());
-                documentAppEntity.setColumns(documentColumns);
-            }
-
-            documentAppEntities.add(documentAppEntity);
-        }
-        return documentAppEntities;
-    }
 
     /**
      * Returns mapping of artifact name to the list of violations it is inhibiting.

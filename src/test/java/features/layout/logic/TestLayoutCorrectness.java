@@ -1,6 +1,6 @@
 package features.layout.logic;
 
-import edu.nd.crc.safa.features.layout.entities.LayoutPosition;
+import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 
 import features.layout.base.AbstractCorrectnessTest;

@@ -1,13 +1,18 @@
 package edu.nd.crc.safa.features.common;
 
 import edu.nd.crc.safa.features.commits.services.EntityVersionService;
+import edu.nd.crc.safa.features.documents.repositories.DocumentRepository;
+import edu.nd.crc.safa.features.documents.services.DocumentService;
 import edu.nd.crc.safa.features.errors.repositories.CommitErrorRepository;
 import edu.nd.crc.safa.features.flatfiles.services.FileUploadService;
 import edu.nd.crc.safa.features.flatfiles.services.FlatFileService;
 import edu.nd.crc.safa.features.jira.repositories.JiraAccessCredentialsRepository;
 import edu.nd.crc.safa.features.jira.services.JiraConnectionService;
 import edu.nd.crc.safa.features.jobs.services.JobService;
+import edu.nd.crc.safa.features.layout.repositories.ArtifactPositionRepository;
+import edu.nd.crc.safa.features.layout.services.ArtifactPositionService;
 import edu.nd.crc.safa.features.notifications.NotificationService;
+import edu.nd.crc.safa.features.projects.repositories.ProjectRepository;
 import edu.nd.crc.safa.features.projects.services.AppEntityRetrievalService;
 import edu.nd.crc.safa.features.projects.services.ProjectService;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
@@ -30,21 +35,32 @@ import org.springframework.stereotype.Component;
 @Data
 @Scope("singleton")
 public class ServiceProvider {
-    // Flat Files
+    // Project
+    private final ProjectRepository projectRepository;
     private final ProjectService projectService;
+    private final AppEntityRetrievalService appEntityRetrievalService;
+    // Artifact
+    private final ArtifactPositionRepository artifactPositionRepository;
+    // Changes
     private final ProjectVersionRepository projectVersionRepository;
+    private final EntityVersionService entityVersionService;
+    private final CommitErrorRepository commitErrorRepository;
+    // Documents
+    private final DocumentRepository documentRepository;
+    private final DocumentService documentService;
+    // Flat Files
     private final FileUploadService fileUploadService;
     private final FlatFileService flatFileService;
-    private final EntityVersionService entityVersionService;
-    private final AppEntityRetrievalService appEntityRetrievalService;
-    // Common
+    // Notifications
     private final NotificationService notificationService;
-    private final JobService jobService;
     private final SafaUserService safaUserService;
-    private final CommitErrorRepository commitErrorRepository;
     // JIRA
     private final JiraAccessCredentialsRepository jiraAccessCredentialsRepository;
     private final JiraConnectionService jiraConnectionService;
+    private final JobService jobService;
+    //Layout
+    ArtifactPositionService artifactPositionService;
     // Jobs
     JobLauncher jobLauncher;
+
 }

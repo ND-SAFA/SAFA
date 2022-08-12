@@ -10,12 +10,15 @@ import edu.nd.crc.safa.features.artifacts.repositories.IVersionRepository;
 import edu.nd.crc.safa.features.commits.entities.app.CommitAction;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.common.IVersionEntity;
+import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.delta.entities.app.ProjectChange;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.errors.entities.db.CommitError;
+import edu.nd.crc.safa.features.layout.entities.app.ProjectLayout;
 import edu.nd.crc.safa.features.notifications.NotificationService;
 import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.IAppEntityCreator;
+import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.services.AppEntityRetrievalService;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
@@ -23,13 +26,14 @@ import edu.nd.crc.safa.features.traces.repositories.TraceLinkVersionRepository;
 import edu.nd.crc.safa.features.versions.entities.app.VersionEntityTypes;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
+import lombok.AllArgsConstructor;
 import org.javatuples.Pair;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
  * Responsible for performing commits.
  */
+@AllArgsConstructor
 @Service
 public class CommitService {
     private final ArtifactVersionRepository artifactVersionRepository;
@@ -37,17 +41,8 @@ public class CommitService {
 
     private final AppEntityRetrievalService appEntityRetrievalService;
     private final NotificationService notificationService;
+    private final ServiceProvider serviceProvider;
 
-    @Autowired
-    public CommitService(ArtifactVersionRepository artifactVersionRepository,
-                         TraceLinkVersionRepository traceLinkVersionRepository,
-                         AppEntityRetrievalService appEntityRetrievalService,
-                         NotificationService notificationService) {
-        this.appEntityRetrievalService = appEntityRetrievalService;
-        this.artifactVersionRepository = artifactVersionRepository;
-        this.traceLinkVersionRepository = traceLinkVersionRepository;
-        this.notificationService = notificationService;
-    }
 
     /**
      * Saves entities in commit to specified project version.
@@ -69,7 +64,7 @@ public class CommitService {
             projectCommit.addTraces(ModificationType.REMOVED, linksToArtifact);
         }
 
-        // Commit artifact and trace changes.
+        // Step - Commit artifact and trace changes.
         Pair<ProjectChange<ArtifactAppEntity>, List<CommitError>> artifactResponse = commitArtifactChanges(
             projectVersion,
             projectCommit.getArtifacts(),
@@ -77,12 +72,19 @@ public class CommitService {
         errors = new ArrayList<>(artifactResponse.getValue1()); // linter wants it like this for some reason
         ProjectChange<ArtifactAppEntity> artifactChanges = artifactResponse.getValue0();
 
+        // Step - Add errors
         Pair<ProjectChange<TraceAppEntity>, List<CommitError>> traceResponse = commitTraceChanges(
             projectVersion,
             projectCommit.getTraces(),
             failOnError);
         ProjectChange<TraceAppEntity> traceChanges = traceResponse.getValue0();
         errors.addAll(traceResponse.getValue1());
+
+        // Step - Generate layout updates
+        ProjectAppEntity projectAppEntity =
+            this.appEntityRetrievalService.retrieveProjectAppEntityAtProjectVersion(projectVersion);
+        ProjectLayout projectLayout = new ProjectLayout(projectAppEntity, serviceProvider);
+        projectLayout.updateLayoutWithChanges(projectCommit);
 
         if (artifactChanges.getSize() > 0) {
             this.notificationService.broadUpdateProjectVersionMessage(projectVersion, VersionEntityTypes.ARTIFACTS);

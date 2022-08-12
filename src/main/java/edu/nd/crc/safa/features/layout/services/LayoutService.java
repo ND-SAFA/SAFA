@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
-import edu.nd.crc.safa.features.layout.entities.LayoutPosition;
+import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
 import edu.nd.crc.safa.features.layout.generator.KlayLayoutGenerator;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 

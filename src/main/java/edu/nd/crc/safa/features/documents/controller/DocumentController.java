@@ -11,7 +11,7 @@ import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.documents.repositories.DocumentRepository;
 import edu.nd.crc.safa.features.documents.services.DocumentService;
-import edu.nd.crc.safa.features.layout.entities.LayoutPosition;
+import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
 import edu.nd.crc.safa.features.layout.services.LayoutService;
 import edu.nd.crc.safa.features.notifications.NotificationService;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
@@ -123,7 +123,7 @@ public class DocumentController extends BaseDocumentController {
     @GetMapping(AppRoutes.Projects.Documents.GET_PROJECT_DOCUMENTS)
     public List<DocumentAppEntity> getProjectDocuments(@PathVariable UUID projectId) throws SafaError {
         Project project = resourceBuilder.fetchProject(projectId).withViewProject();
-        return this.appEntityRetrievalService.getDocumentsInProject(project);
+        return this.documentService.getDocumentsInProject(project);
     }
 
     /**

@@ -5,9 +5,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Map;
 
-import edu.nd.crc.safa.features.layout.entities.LayoutPosition;
-import edu.nd.crc.safa.features.layout.LayoutSettings;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
+import edu.nd.crc.safa.features.layout.LayoutSettings;
+import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
 
 import features.layout.base.AbstractLayoutTest;
 import org.junit.jupiter.api.Test;

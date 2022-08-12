@@ -5,15 +5,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import edu.nd.crc.safa.builders.CommitBuilder;
 import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 import edu.nd.crc.safa.utilities.JsonFileUtilities;
 
+import features.base.ApplicationBaseTest;
 import org.javatuples.Pair;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
-import features.base.ApplicationBaseTest;
 
 /**
  * Tests that changes to the content of artifacts are retrieved.

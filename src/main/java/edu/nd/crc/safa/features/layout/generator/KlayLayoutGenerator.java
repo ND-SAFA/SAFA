@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.layout.entities.LayoutPosition;
+import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 
 import lombok.Getter;

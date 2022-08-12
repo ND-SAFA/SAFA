@@ -1,5 +1,7 @@
 package edu.nd.crc.safa.features.documents.services;
 
+import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -15,9 +17,11 @@ import edu.nd.crc.safa.features.documents.entities.db.DocumentColumn;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.documents.repositories.DocumentArtifactRepository;
 import edu.nd.crc.safa.features.documents.repositories.DocumentColumnRepository;
+import edu.nd.crc.safa.features.documents.repositories.DocumentRepository;
 import edu.nd.crc.safa.features.notifications.NotificationService;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectEntityTypes;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.versions.entities.app.VersionEntityTypes;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
@@ -32,6 +36,7 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class DocumentService {
 
+    private final DocumentRepository documentRepository;
     private final ArtifactRepository artifactRepository;
     private final DocumentArtifactRepository documentArtifactRepository;
     private final DocumentColumnRepository documentColumnRepository;
@@ -157,5 +162,38 @@ public class DocumentService {
             }
         }
         return nUpdated;
+    }
+
+    /**
+     * Returns list of documents in given project
+     *
+     * @param project The projects whose documents are returned.
+     * @return List of documents in project.
+     */
+    public List<DocumentAppEntity> getDocumentsInProject(Project project) {
+        List<Document> projectDocuments = this.documentRepository.findByProject(project);
+        List<DocumentAppEntity> documentAppEntities = new ArrayList<>();
+        for (Document document : projectDocuments) {
+            // Retrieve linked artifact Ids
+            List<String> artifactIds = this.documentArtifactRepository.findByDocument(document)
+                .stream()
+                .map(da -> da.getArtifact().getArtifactId().toString())
+                .collect(Collectors.toList());
+            //TODO: Retrieve artifact positions
+            DocumentAppEntity documentAppEntity = new DocumentAppEntity(document, artifactIds, new Hashtable<>());
+
+            // Retrieve FMEA columns
+            if (document.getType() == DocumentType.FMEA) {
+                List<DocumentColumnAppEntity> documentColumns = this.documentColumnRepository
+                    .findByDocumentOrderByTableColumnIndexAsc(document)
+                    .stream()
+                    .map(DocumentColumnAppEntity::new)
+                    .collect(Collectors.toList());
+                documentAppEntity.setColumns(documentColumns);
+            }
+
+            documentAppEntities.add(documentAppEntity);
+        }
+        return documentAppEntities;
     }
 }

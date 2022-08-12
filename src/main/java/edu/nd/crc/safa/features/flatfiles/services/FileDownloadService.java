@@ -14,7 +14,7 @@ import edu.nd.crc.safa.features.artifacts.entities.SafetyCaseType;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.flatfiles.entities.common.AbstractArtifactFile;
 import edu.nd.crc.safa.features.flatfiles.entities.common.AbstractTraceFile;
-import edu.nd.crc.safa.features.flatfiles.entities.common.ArtifactMaps;
+import edu.nd.crc.safa.features.flatfiles.entities.common.ProjectEntityMaps;
 import edu.nd.crc.safa.features.flatfiles.entities.common.TraceMaps;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
@@ -43,12 +43,12 @@ public class FileDownloadService {
             this.appEntityRetrievalService.retrieveProjectAppEntityAtProjectVersion(projectVersion);
         List<File> projectFiles = new ArrayList<>();
 
-        ArtifactMaps artifactMaps = new ArtifactMaps(projectAppEntity);
-        List<ArtifactFileIdentifier> artifactFiles = writeArtifactFiles(fileType, project, artifactMaps,
+        ProjectEntityMaps projectEntityMaps = new ProjectEntityMaps(projectAppEntity);
+        List<ArtifactFileIdentifier> artifactFiles = writeArtifactFiles(fileType, project, projectEntityMaps,
             projectFiles);
         List<TraceFileIdentifier> traceFiles = writeTraceFiles(fileType, project, projectFiles,
             projectAppEntity,
-            artifactMaps);
+            projectEntityMaps);
         File timFile = writeTimFile(project, artifactFiles, traceFiles);
         projectFiles.add(timFile);
         return projectFiles;
@@ -58,8 +58,8 @@ public class FileDownloadService {
                                                       Project project,
                                                       List<File> projectFiles,
                                                       ProjectAppEntity projectAppEntity,
-                                                      ArtifactMaps artifactMaps) throws Exception {
-        TraceMaps traceMaps = new TraceMaps(projectAppEntity, artifactMaps);
+                                                      ProjectEntityMaps projectEntityMaps) throws Exception {
+        TraceMaps traceMaps = new TraceMaps(projectAppEntity, projectEntityMaps);
         List<TraceFileIdentifier> traceFiles = new ArrayList<>();
         for (String sourceType : traceMaps.getSourceTypes()) {
             for (String targetType : traceMaps.getTargetTypes(sourceType)) {
@@ -83,15 +83,15 @@ public class FileDownloadService {
 
     private List<ArtifactFileIdentifier> writeArtifactFiles(String fileType,
                                                             Project project,
-                                                            ArtifactMaps artifactMaps,
+                                                            ProjectEntityMaps projectEntityMaps,
                                                             List<File> projectFiles) throws Exception {
         List<ArtifactFileIdentifier> artifactFiles = new ArrayList<>();
-        for (String artifactType : artifactMaps.getArtifactTypes()) {
+        for (String artifactType : projectEntityMaps.getArtifactTypes()) {
             String fileName = String.format("%s.%s", artifactType, fileType);
             String pathToFile = ProjectPaths.getPathToProjectFile(project, fileName);
 
             File artifactFileOutput = new File(pathToFile);
-            List<ArtifactAppEntity> artifacts = artifactMaps.getArtifactsInType(artifactType);
+            List<ArtifactAppEntity> artifacts = projectEntityMaps.getArtifactsInType(artifactType);
             DocumentType documentType = getDocumentTypeFromType(artifactType);
             AbstractArtifactFile<?> artifactFile = DataFileBuilder.createArtifactFileParser(artifactType,
                 pathToFile,

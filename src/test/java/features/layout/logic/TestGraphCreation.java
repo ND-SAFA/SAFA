@@ -7,16 +7,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import edu.nd.crc.safa.features.layout.generator.ElkGraphCreator;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
+import edu.nd.crc.safa.features.layout.generator.ElkGraphCreator;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 
+import features.base.DefaultProjectConstants;
 import features.layout.base.AbstractLayoutTest;
 import org.eclipse.elk.graph.ElkGraphElement;
 import org.eclipse.elk.graph.ElkNode;
 import org.javatuples.Pair;
 import org.junit.jupiter.api.Test;
-import features.base.DefaultProjectConstants;
 
 /**
  * Tests that creating a graph from a project:

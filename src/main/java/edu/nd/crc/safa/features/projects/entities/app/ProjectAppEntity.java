@@ -12,7 +12,7 @@ import javax.validation.constraints.NotNull;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactType;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
-import edu.nd.crc.safa.features.layout.entities.LayoutPosition;
+import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.rules.parser.RuleName;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;

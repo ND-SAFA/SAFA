@@ -26,7 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Verifies that:
  * 1. We are able to find the last inputted artifact body.
  */
-class TestArtifactService extends ApplicationBaseTest {
+class TestArtifactDataStructureService extends ApplicationBaseTest {
 
 
     @Autowired

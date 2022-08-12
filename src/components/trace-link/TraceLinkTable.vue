@@ -77,11 +77,10 @@ import Vue from "vue";
 import { ApprovalType, TraceLinkModel, VersionModel } from "@/types";
 import { artifactModule, projectModule } from "@/store";
 import { getGeneratedLinks, handleApproveLink, handleDeclineLink } from "@/api";
-import { FlexBox, TableChip } from "@/components/common";
+import { FlexBox, TableChip, Typography } from "@/components/common";
 import TraceLinkDisplay from "./TraceLinkDisplay.vue";
 import SectionControls from "./SectionControls.vue";
 import ApprovalChip from "./ApprovalChip.vue";
-import Typography from "@/components/common/display/Typography.vue";
 
 /**
  * Displays a table of trace links.

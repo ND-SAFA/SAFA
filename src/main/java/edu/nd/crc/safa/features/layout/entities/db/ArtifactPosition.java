@@ -35,7 +35,7 @@ public class ArtifactPosition {
      */
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "entityVersionId", nullable = false, unique = true)
+    @JoinColumn(name = "entityVersionId", nullable = false)
     ArtifactVersion artifactVersion;
 
     /**
@@ -43,7 +43,7 @@ public class ArtifactPosition {
      */
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "documentId", nullable = false, unique = true)
+    @JoinColumn(name = "documentId")
     Document document;
 
     /**

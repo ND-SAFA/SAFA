@@ -5,16 +5,16 @@
     :class="isVisible ? 'artifact-view visible' : 'artifact-view'"
   >
     <v-data-table
+      show-group-by
+      show-expand
+      single-expand
+      fixed-header
       :headers="headers"
       :items="items"
       :search="searchText"
       :expanded="expanded"
       :item-class="getItemBackground"
       sort-by="name"
-      show-group-by
-      show-expand
-      single-expand
-      fixed-header
       :items-per-page="50"
       @click:row="handleView($event)"
     >
@@ -245,19 +245,3 @@ export default Vue.extend({
   },
 });
 </script>
-
-<style lang="scss">
-.artifact-view {
-  .v-data-table__expanded__content {
-    box-shadow: inset 0 2px 8px -5px rgba(50, 50, 50, 0.75) !important;
-  }
-
-  tr {
-    cursor: pointer;
-
-    &.v-data-table__expanded__content {
-      cursor: text;
-    }
-  }
-}
-</style>

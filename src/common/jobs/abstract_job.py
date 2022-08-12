@@ -1,12 +1,12 @@
 from abc import abstractmethod
 
-from common.jobs.arg_builder import ArgBuilder
+from common.jobs.abstract_arg_builder import AbstractArgBuilder
 from common.jobs.job_result import JobResult
 
 
 class AbstractJob:
 
-    def __init__(self, arg_builder: ArgBuilder):
+    def __init__(self, arg_builder: AbstractArgBuilder):
         """
         Base job class
         :param arg_builder: job arguments

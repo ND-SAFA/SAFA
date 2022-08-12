@@ -9,42 +9,48 @@ import { persistCommit } from "@/api";
  * @return The saved commit.
  */
 export async function saveCommit(commit: Commit): Promise<Commit> {
-  appModule.SET_IS_SAVING(true);
+  try {
+    appModule.SET_IS_SAVING(true);
 
-  const commitResponse = await persistCommit(commit);
-  await commitModule.saveCommit(commitResponse);
+    const commitResponse = await persistCommit(commit);
+    await commitModule.saveCommit(commitResponse);
 
-  appModule.SET_IS_SAVING(false);
-
-  return commitResponse;
+    return commitResponse;
+  } finally {
+    appModule.SET_IS_SAVING(false);
+  }
 }
 
 /**
  * Undoes the last commit.
  */
 export async function undoCommit(): Promise<void> {
-  appModule.SET_IS_SAVING(true);
+  try {
+    appModule.SET_IS_SAVING(true);
 
-  const commit = await commitModule.undoLastCommit();
-  const commitResponse = await persistCommit(commit);
+    const commit = await commitModule.undoLastCommit();
+    const commitResponse = await persistCommit(commit);
 
-  await applyArtifactChanges(commitResponse);
-
-  appModule.SET_IS_SAVING(false);
+    await applyArtifactChanges(commitResponse);
+  } finally {
+    appModule.SET_IS_SAVING(false);
+  }
 }
 
 /**
  * Reattempts the last undone commit.
  */
 export async function redoCommit(): Promise<void> {
-  appModule.SET_IS_SAVING(true);
+  try {
+    appModule.SET_IS_SAVING(true);
 
-  const commit = await commitModule.redoLastUndoneCommit();
-  const commitResponse = await persistCommit(commit);
+    const commit = await commitModule.redoLastUndoneCommit();
+    const commitResponse = await persistCommit(commit);
 
-  await applyArtifactChanges(commitResponse);
-
-  appModule.SET_IS_SAVING(false);
+    await applyArtifactChanges(commitResponse);
+  } finally {
+    appModule.SET_IS_SAVING(false);
+  }
 }
 
 /**

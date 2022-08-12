@@ -1,10 +1,10 @@
 import {
   ArtifactModel,
   ArtifactData,
-  EmptyLambda,
   ApprovalType,
   TraceLinkModel,
   TraceType,
+  IOHandlerCallback,
 } from "@/types";
 import { appModule, logModule, projectModule } from "@/store";
 import { createLink, updateApprovedLink, updateDeclinedLink } from "@/api";
@@ -51,18 +51,27 @@ export async function handleCreateLink(
  * Processes link approvals, setting the app state to loading in between, and updating trace links afterwards.
  *
  * @param link - The trace link to process.
- * @param onSuccess - Run when the API call successfully resolves.
+ * @param onSuccess - Called if the action is successful.
+ * @param onError - Called if the action fails.
  */
 export async function handleApproveLink(
   link: TraceLinkModel,
-  onSuccess?: EmptyLambda
+  { onSuccess, onError }: IOHandlerCallback
 ): Promise<void> {
+  const currentStatus = link.approvalStatus;
+
   link.approvalStatus = ApprovalType.APPROVED;
 
-  linkAPIHandler(link, updateApprovedLink, async () => {
-    onSuccess?.();
-
-    await projectModule.addOrUpdateTraceLinks([link]);
+  linkAPIHandler(link, updateApprovedLink, {
+    onSuccess: async () => {
+      await projectModule.addOrUpdateTraceLinks([link]);
+      onSuccess?.();
+    },
+    onError: (e) => {
+      link.approvalStatus = currentStatus;
+      logModule.onError("Unable to approve this link");
+      onError?.(e);
+    },
   });
 }
 
@@ -70,18 +79,27 @@ export async function handleApproveLink(
  * Processes link declines, setting the app state to loading in between, and updating trace links afterwards.
  *
  * @param link - The trace link to process.
- * @param onSuccess - Run when the API call successfully resolves.
+ * @param onSuccess - Called if the action is successful.
+ * @param onError - Called if the action fails.
  */
 export async function handleDeclineLink(
   link: TraceLinkModel,
-  onSuccess?: EmptyLambda
+  { onSuccess, onError }: IOHandlerCallback
 ): Promise<void> {
+  const currentStatus = link.approvalStatus;
+
   link.approvalStatus = ApprovalType.DECLINED;
 
-  linkAPIHandler(link, updateDeclinedLink, async () => {
-    onSuccess?.();
-
-    await projectModule.deleteTraceLinks([link]);
+  linkAPIHandler(link, updateDeclinedLink, {
+    onSuccess: async () => {
+      await projectModule.deleteTraceLinks([link]);
+      onSuccess?.();
+    },
+    onError: (e) => {
+      link.approvalStatus = currentStatus;
+      logModule.onError("Unable to decline this link");
+      onError?.(e);
+    },
   });
 }
 
@@ -90,15 +108,17 @@ export async function handleDeclineLink(
  *
  * @param link - The trace link to process.
  * @param linkAPI - The endpoint to call with the link.
- * @param onSuccess - Run when the API call successfully resolves.
+ * @param onSuccess - Called if the action is successful.
+ * @param onError - Called if the action fails.
  */
 function linkAPIHandler(
   link: TraceLinkModel,
   linkAPI: (traceLink: TraceLinkModel) => Promise<TraceLinkModel[]>,
-  onSuccess: () => Promise<void>
+  { onSuccess, onError }: IOHandlerCallback
 ): void {
   appModule.onLoadStart();
   linkAPI(link)
-    .then(onSuccess)
+    .then(() => onSuccess?.())
+    .catch((e) => onError?.(e))
     .finally(() => appModule.onLoadEnd());
 }

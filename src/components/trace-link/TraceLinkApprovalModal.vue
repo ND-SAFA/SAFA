@@ -13,9 +13,9 @@
         :show-approve="canBeApproved"
         :show-decline="canBeDeclined"
         :show-delete="canBeDeleted"
-        @link:approve="handleApprove"
-        @link:decline="handleDecline"
-        @link:delete="handleDecline"
+        @link:approve="handleClose"
+        @link:decline="handleClose"
+        @link:delete="handleClose"
         @close="$emit('close')"
       />
     </template>
@@ -25,7 +25,6 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { ApprovalType, TraceLinkModel, TraceType } from "@/types";
-import { handleApproveLink, handleDeclineLink } from "@/api";
 import { GenericModal } from "@/components/common";
 import TraceLinkDisplay from "./TraceLinkDisplay.vue";
 import { deltaModule } from "@/store";
@@ -79,19 +78,9 @@ export default Vue.extend({
   },
   methods: {
     /**
-     * Approves the given link and closes the modal.
-     * @param traceLink - The link to approve.
+     * Closes the modal.
      */
-    async handleApprove(traceLink: TraceLinkModel): Promise<void> {
-      await handleApproveLink(traceLink);
-      this.$emit("close");
-    },
-    /**
-     * Declines the given link and closes the modal.
-     * @param traceLink - The link to decline.
-     */
-    handleDecline(traceLink: TraceLinkModel): void {
-      handleDeclineLink(traceLink);
+    handleClose() {
       this.$emit("close");
     },
   },

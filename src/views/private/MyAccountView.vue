@@ -1,25 +1,13 @@
 <template>
   <private-page>
     <template v-slot:page>
-      <v-btn text @click="handleGoBack">
-        <v-icon left> mdi-arrow-left </v-icon>
-        Go Back
-      </v-btn>
+      <back-button />
       <v-container>
         <typography el="h1" variant="title" value="My Account" />
         <v-divider />
-        <div style="max-width: 300px">
-          <typography variant="subtitle" el="h2" value="Password" y="2" />
-          <password-field label="Current Password" v-model="oldPassword" />
-          <password-field label="New Password" v-model="newPassword" />
-          <v-btn
-            :disabled="!oldPassword || !newPassword"
-            outlined
-            @click="handleEditPassword"
-          >
-            Update Password
-          </v-btn>
-        </div>
+        <update-password />
+        <v-divider class="mt-4" />
+        <delete-account />
       </v-container>
     </template>
   </private-page>
@@ -27,9 +15,13 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { PrivatePage, PasswordField, Typography } from "@/components";
-import { navigateBack } from "@/router";
-import { logModule } from "@/store";
+import {
+  PrivatePage,
+  Typography,
+  BackButton,
+  DeleteAccount,
+  UpdatePassword,
+} from "@/components";
 
 /**
  * Displays the account page.
@@ -37,29 +29,11 @@ import { logModule } from "@/store";
 export default Vue.extend({
   name: "MyAccountView",
   components: {
+    BackButton,
     Typography,
-    PasswordField,
     PrivatePage,
-  },
-  data() {
-    return {
-      oldPassword: "",
-      newPassword: "",
-    };
-  },
-  methods: {
-    /**
-     * Called to navigate back to the previous page.
-     */
-    handleGoBack() {
-      navigateBack();
-    },
-    /**
-     * Handles an password edit.
-     */
-    handleEditPassword(): void {
-      logModule.onInfo("Account editing is not yet available.");
-    },
+    DeleteAccount,
+    UpdatePassword,
   },
 });
 </script>

@@ -11,7 +11,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { Job } from "@/types";
+import { JobModel } from "@/types";
 import { jobModule } from "@/store";
 import { connectAndSubscribeToJob, getUserJobs } from "@/api";
 import JobPanel from "./JobPanel.vue";
@@ -38,7 +38,7 @@ export default Vue.extend({
     /**
      * Returns the current jobs.
      */
-    uploads(): Job[] {
+    uploads(): JobModel[] {
       return jobModule.currentJobs;
     },
     /**

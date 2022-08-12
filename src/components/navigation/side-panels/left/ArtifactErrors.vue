@@ -1,9 +1,9 @@
 <template>
   <div v-if="selectedArtifactWarnings.length > 0">
-    <div class="d-flex flex-row">
+    <flex-box>
       <v-icon color="secondary">mdi-hazard-lights</v-icon>
-      <h2 class="text-h6 ml-1">Warnings</h2>
-    </div>
+      <typography el="h2" l="1" variant="subtitle" value="Warnings" />
+    </flex-box>
 
     <v-divider class="mb-2" />
 
@@ -12,11 +12,11 @@
         v-for="(warning, idx) in selectedArtifactWarnings"
         :key="idx"
       >
-        <v-expansion-panel-header class="text-body-1">
-          {{ warning.ruleName }}
+        <v-expansion-panel-header>
+          <typography :value="warning.ruleName" />
         </v-expansion-panel-header>
-        <v-expansion-panel-content class="text-body-1">
-          {{ warning.ruleMessage }}
+        <v-expansion-panel-content>
+          <typography :value="warning.ruleMessage" />
         </v-expansion-panel-content>
       </v-expansion-panel>
     </v-expansion-panels>
@@ -27,12 +27,14 @@
 import Vue from "vue";
 import { ArtifactWarning } from "@/types";
 import { artifactSelectionModule, errorModule } from "@/store";
+import { Typography, FlexBox } from "@/components/common";
 
 /**
  * Displays the selected node's error.
  */
 export default Vue.extend({
   name: "ArtifactErrors",
+  components: { FlexBox, Typography },
   computed: {
     /**
      * @return The selected artifact.

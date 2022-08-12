@@ -7,12 +7,14 @@
     :type="showPassword ? 'text' : 'password'"
     data-cy="input-password"
     @click:append="showPassword = !showPassword"
+    :error-messages="errors"
+    :error="errors.length > 0"
     @keydown.enter="$emit('enter')"
   />
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import Vue, { PropType } from "vue";
 
 /**
  * A generic password input.
@@ -30,6 +32,10 @@ export default Vue.extend({
     label: {
       type: String,
       default: "Password",
+    },
+    errors: {
+      type: Array as PropType<string[]>,
+      default: () => [],
     },
   },
   data() {

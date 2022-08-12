@@ -100,7 +100,7 @@ export function handleDeleteArtifact(
     logModule.SET_CONFIRMATION_MESSAGE({
       type: ConfirmationType.INFO,
       title: `Delete ${artifact.name}?`,
-      body: `Deleting this artifact cannot be undone in this version of SAFA.`,
+      body: `Are you sure you would like to delete this artifact?`,
       statusCallback: (isConfirmed: boolean) => {
         if (!isConfirmed) return;
 

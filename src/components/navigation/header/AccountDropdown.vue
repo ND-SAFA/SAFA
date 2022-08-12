@@ -28,9 +28,19 @@
               mdi-account-circle
             </v-icon>
           </v-avatar>
-          <h3 class="text-h6">{{ userName }}</h3>
-          <p class="text-caption mx-1">{{ userEmail }}</p>
-          <v-divider class="my-3"></v-divider>
+          <typography
+            el="div"
+            align="center"
+            variant="subtitle"
+            :value="userName"
+          />
+          <typography
+            el="div"
+            align="center"
+            variant="caption"
+            :value="userEmail"
+          />
+          <v-divider class="my-3" />
           <v-btn text rounded @click="handleFeedback">Send Feedback</v-btn>
           <br />
           <v-btn text rounded @click="handleEditAccount">Edit Account</v-btn>
@@ -55,9 +65,11 @@ import Vue from "vue";
 import { sessionModule } from "@/store";
 import { handleLogout } from "@/api";
 import { navigateTo, Routes } from "@/router";
+import { Typography } from "@/components/common";
 
 export default Vue.extend({
   name: "AccountDropdown",
+  components: { Typography },
   computed: {
     /**
      * @return The current user's email.
@@ -69,7 +81,7 @@ export default Vue.extend({
      * @return The current user's name.
      */
     userName() {
-      return "Demo User";
+      return "SAFA User";
     },
   },
   methods: {

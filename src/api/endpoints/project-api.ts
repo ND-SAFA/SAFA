@@ -1,10 +1,10 @@
 import {
-  Job,
-  MemberRequest,
+  JobModel,
+  MemberRequestModel,
   Project,
   ProjectDelta,
   ProjectIdentifier,
-  ProjectMembership,
+  MembershipModel,
   ProjectRole,
 } from "@/types";
 import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
@@ -24,8 +24,10 @@ export async function saveProject(
   });
 }
 
-export async function createProjectCreationJob(project: Project): Promise<Job> {
-  return authHttpClient<Job>(Endpoint.createProjectJob, {
+export async function createProjectCreationJob(
+  project: Project
+): Promise<JobModel> {
+  return authHttpClient<JobModel>(Endpoint.createProjectJob, {
     method: "POST",
     body: JSON.stringify(project),
   });
@@ -83,8 +85,8 @@ export async function getProjectDelta(
  */
 export async function getProjectMembers(
   projectId: string
-): Promise<ProjectMembership[]> {
-  return authHttpClient<ProjectMembership[]>(
+): Promise<MembershipModel[]> {
+  return authHttpClient<MembershipModel[]>(
     fillEndpoint(Endpoint.getProjectMembers, {
       projectId,
     }),
@@ -105,8 +107,8 @@ export async function saveProjectMember(
   projectId: string,
   memberEmail: string,
   projectRole: ProjectRole
-): Promise<ProjectMembership[]> {
-  return authHttpClient<ProjectMembership[]>(
+): Promise<MembershipModel[]> {
+  return authHttpClient<MembershipModel[]>(
     fillEndpoint(Endpoint.getProjectMembers, {
       projectId,
     }),
@@ -115,7 +117,7 @@ export async function saveProjectMember(
       body: JSON.stringify({
         memberEmail,
         projectRole,
-      } as MemberRequest),
+      } as MemberRequestModel),
     }
   );
 }
@@ -128,8 +130,8 @@ export async function saveProjectMember(
  */
 export async function deleteProjectMember({
   projectMembershipId,
-}: ProjectMembership): Promise<ProjectMembership[]> {
-  return authHttpClient<ProjectMembership[]>(
+}: MembershipModel): Promise<MembershipModel[]> {
+  return authHttpClient<MembershipModel[]>(
     fillEndpoint(Endpoint.deleteProjectMember, {
       projectMemberId: projectMembershipId,
     }),

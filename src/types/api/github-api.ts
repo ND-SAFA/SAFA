@@ -1,7 +1,7 @@
 /**
  * Defines the credentials returned by github.
  */
-export interface InternalGitHubCredentials {
+export interface GitHubCredentialsModel {
   /**
    * The API bearer access token.
    */

@@ -41,7 +41,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { Project, ProjectMembership, ProjectRole } from "@/types";
+import { Project, MembershipModel, ProjectRole } from "@/types";
 import { sessionModule } from "@/store";
 import { getProjectMembers, handleDeleteMember } from "@/api";
 import { GenericSelector, Typography } from "@/components/common";
@@ -61,7 +61,7 @@ export default Vue.extend({
   },
   data() {
     return {
-      memberToEdit: undefined as ProjectMembership | undefined,
+      memberToEdit: undefined as MembershipModel | undefined,
       isLoading: false,
       isNewOpen: false,
       isEditOpen: false,
@@ -109,7 +109,7 @@ export default Vue.extend({
     async handleRetrieveMembers(): Promise<void> {
       if (this.project.projectId !== "") {
         this.isLoading = true;
-        this.members = await getProjectMembers(this.project.projectId);
+        this.project.members = await getProjectMembers(this.project.projectId);
         this.isLoading = false;
       }
     },
@@ -123,7 +123,7 @@ export default Vue.extend({
      * Opens the edit member modal.
      * @param member - The member to edit.
      */
-    handleEditMember(member: ProjectMembership): void {
+    handleEditMember(member: MembershipModel): void {
       this.memberToEdit = member;
       this.isEditOpen = true;
     },
@@ -131,7 +131,7 @@ export default Vue.extend({
      * Opens the delete member modal.
      * @param member - The member to delete.
      */
-    handleDeleteMember(member: ProjectMembership): void {
+    handleDeleteMember(member: MembershipModel): void {
       handleDeleteMember(member);
     },
     /**

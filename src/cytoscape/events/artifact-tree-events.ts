@@ -5,6 +5,9 @@ import { DefaultCytoEvents } from "@/cytoscape/events/cyto-events";
 import { Artifact } from "@/types";
 import { disableDrawMode } from "@/cytoscape";
 
+const doubleClickDelayMs = 350;
+let previousTapStamp = doubleClickDelayMs;
+
 /**
  * Handlers for mouse events on the artifact tree.
  */
@@ -17,6 +20,22 @@ export const ArtifactTreeCytoEvents: CytoEventHandlers = {
         artifactSelectionModule.clearSelections();
         disableDrawMode();
       }
+    },
+  },
+  select: {
+    events: [CytoEvent.TAP],
+    action: (cy: CytoCore, event: EventObject) => {
+      const currentTimeStamp = event.timeStamp;
+      const artifact = event.target.data() as Artifact;
+      const msFromLastTap = currentTimeStamp - previousTapStamp;
+
+      if (msFromLastTap === 0 || !artifact.id) return;
+
+      if (msFromLastTap < doubleClickDelayMs) {
+        artifactSelectionModule.toggleSelectArtifact(artifact.id);
+      }
+
+      previousTapStamp = currentTimeStamp;
     },
   },
   selectAll: {

@@ -2,7 +2,7 @@ import {
   ArtifactPositions,
   ArtifactType,
   ArtifactWarning,
-  ProjectMembership,
+  MembershipModel,
   TraceLink,
 } from "@/types";
 import { Artifact } from "./artifact";
@@ -71,7 +71,7 @@ export interface ProjectIdentifier {
   /**
    * List of members and roles in project.
    */
-  members: ProjectMembership[];
+  members: MembershipModel[];
 
   /**
    * The primary owner of this project.

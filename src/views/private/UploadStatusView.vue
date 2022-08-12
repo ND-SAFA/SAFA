@@ -1,7 +1,7 @@
 <template>
   <private-page>
     <template v-slot:page>
-      <back-button text="Back To Project Creator" />
+      <back-button />
       <typography el="h1" variant="title" value="Current Uploads" />
       <v-divider />
       <typography

@@ -1,5 +1,5 @@
 <template>
-  <div class="d-flex flex-row">
+  <flex-box>
     <v-divider inset vertical class="white mx-1 faded" />
 
     <template v-for="definition in changeButtons">
@@ -35,7 +35,7 @@
       :definition="filterButton"
       :is-disabled="isButtonDisabled(filterButton)"
     />
-  </div>
+  </flex-box>
 </template>
 
 <script lang="ts">
@@ -50,11 +50,12 @@ import {
 } from "@/store";
 import { redoCommit, undoCommit } from "@/api";
 import { cyZoomIn, cyZoomOut } from "@/cytoscape";
-import { GenericIconButton, CheckmarkMenu } from "@/components/common";
+import { GenericIconButton, CheckmarkMenu, FlexBox } from "@/components/common";
 
 export default Vue.extend({
   name: "GraphButtons",
   components: {
+    FlexBox,
     GenericIconButton,
     CheckmarkMenu,
   },

@@ -1,12 +1,6 @@
 <template>
-  <v-chip
-    v-if="doRender"
-    small
-    class="text-body-1 mr-1"
-    :color="color"
-    outlined
-  >
-    {{ text }}
+  <v-chip v-if="doRender" small class="mr-1" :color="color" outlined>
+    <typography :value="text" />
   </v-chip>
 </template>
 
@@ -15,12 +9,14 @@ import Vue, { PropType } from "vue";
 import { Artifact, ArtifactDeltaState } from "@/types";
 import { deltaModule } from "@/store";
 import { capitalize, getBackgroundColor } from "@/util";
+import Typography from "@/components/common/display/Typography.vue";
 
 /**
  * Renders a chip for the delta state of this artifact.
  */
 export default Vue.extend({
   name: "ArtifactTableDeltaChip",
+  components: { Typography },
   props: {
     artifact: Object as PropType<Artifact>,
   },

@@ -5,7 +5,7 @@ import type {
   Project,
   ProjectDocument,
   ProjectIdentifier,
-  ProjectMembership,
+  MembershipModel,
 } from "@/types";
 import { createProject } from "@/util";
 import {
@@ -182,7 +182,7 @@ export default class ProjectModule extends VuexModule {
   /**
    * Sets the members of current project.
    */
-  SET_MEMBERS(members: ProjectMembership[]): void {
+  SET_MEMBERS(members: MembershipModel[]): void {
     this.project.members = members;
   }
 

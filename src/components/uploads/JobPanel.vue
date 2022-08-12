@@ -5,31 +5,41 @@
         <v-col cols="4">
           <typography :value="job.name" />
         </v-col>
-        <v-col cols="8" class="text--secondary">
+        <v-col cols="8">
           <v-row v-if="isCancelled(job.status)" no-gutters>
             <v-col cols="4">
-              <typography value="Upload Cancelled" />
+              <typography secondary value="Upload Cancelled" />
             </v-col>
             <v-col cols="4">
-              <typography :value="getUpdatedText(job.lastUpdatedAt)" />
+              <typography
+                secondary
+                :value="getUpdatedText(job.lastUpdatedAt)"
+              />
             </v-col>
           </v-row>
           <typography
             v-else-if="isCompleted(job.status)"
+            secondary
             :value="getCompletedText(job.completedAt)"
           />
           <v-row v-else no-gutters>
             <v-col cols="4">
-              <typography :value="`Upload Progress: ${job.currentProgress}%`" />
+              <typography
+                secondary
+                :value="`Upload Progress: ${job.currentProgress}%`"
+              />
             </v-col>
             <v-col cols="4">
-              <typography :value="getUpdatedText(job.lastUpdatedAt)" />
+              <typography
+                secondary
+                :value="getUpdatedText(job.lastUpdatedAt)"
+              />
             </v-col>
           </v-row>
         </v-col>
       </v-row>
       <template v-slot:actions>
-        <div style="width: 120px" class="d-flex justify-end">
+        <flex-box justify="end">
           <v-chip
             outlined
             :color="getStatusColor(job.status)"
@@ -58,7 +68,7 @@
               {{ formatStatus(job.status) }}
             </span>
           </v-chip>
-        </div>
+        </flex-box>
       </template>
     </v-expansion-panel-header>
 
@@ -79,8 +89,9 @@
         </v-stepper-header>
       </v-stepper>
 
-      <div class="d-flex">
+      <flex-box full-width justify="end">
         <v-btn
+          outlined
           color="error"
           class="mr-1"
           data-cy="button-delete-job"
@@ -95,28 +106,29 @@
         >
           View Project
         </v-btn>
-      </div>
+      </flex-box>
     </v-expansion-panel-content>
   </v-expansion-panel>
 </template>
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { Job, JobStatus } from "@/types";
+import { JobModel, JobStatus } from "@/types";
 import { enumToDisplay, getJobStatusColor, timestampToDisplay } from "@/util";
 import { handleDeleteJob, handleLoadVersion } from "@/api";
 import { logModule } from "@/store";
 import { Typography } from "@/components/common";
+import FlexBox from "@/components/common/display/FlexBox.vue";
 
 /**
  * Displays a project import job.
  */
 export default Vue.extend({
   name: "JobPanel",
-  components: { Typography },
+  components: { FlexBox, Typography },
   props: {
     job: {
-      type: Object as PropType<Job>,
+      type: Object as PropType<JobModel>,
       required: true,
     },
   },
@@ -167,13 +179,13 @@ export default Vue.extend({
      * Attempts to delete a job.
      * @param job - The job to delete.
      */
-    deleteJob(job: Job): void {
+    deleteJob(job: JobModel): void {
       handleDeleteJob(job, {});
     },
     /**
      * Navigates user to the completed project.
      */
-    async viewProject(job: Job): Promise<void> {
+    async viewProject(job: JobModel): Promise<void> {
       if (job.completedEntityId) {
         await handleLoadVersion(job.completedEntityId);
       } else {

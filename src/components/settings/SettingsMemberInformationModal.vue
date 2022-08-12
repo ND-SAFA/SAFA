@@ -1,7 +1,7 @@
 <template>
   <generic-modal :is-open="isOpen" :title="title" @close="handleCancel">
     <template v-slot:body>
-      <div class="d-flex align-center mt-4">
+      <flex-box align="center" t="4">
         <v-text-field
           v-model="userEmail"
           label="User Email"
@@ -15,7 +15,7 @@
           @update:error="handleErrorUpdate"
         />
         <button-row :definitions="buttonDefinition" />
-      </div>
+      </flex-box>
     </template>
     <template v-slot:actions>
       <v-spacer />
@@ -34,19 +34,19 @@ import {
   ButtonType,
   ListMenuDefinition,
   ProjectIdentifier,
-  ProjectMembership,
+  MembershipModel,
   ProjectRole,
 } from "@/types";
 import { logModule } from "@/store";
 import { handleInviteMember } from "@/api";
-import { GenericModal, ButtonRow } from "@/components/common";
+import { GenericModal, ButtonRow, FlexBox } from "@/components/common";
 
 /**
  * The modal for sharing a project with a user.
  */
 export default Vue.extend({
   name: "SettingsMemberInformation",
-  components: { ButtonRow, GenericModal },
+  components: { FlexBox, ButtonRow, GenericModal },
   props: {
     isOpen: {
       type: Boolean,
@@ -61,7 +61,7 @@ export default Vue.extend({
       default: "Share Project",
     },
     member: {
-      type: Object as PropType<ProjectMembership>,
+      type: Object as PropType<MembershipModel>,
       required: false,
     },
     clearOnClose: {
@@ -190,7 +190,7 @@ export default Vue.extend({
      * Updates member fields when the member changes.
      * @param newMember - The new member.
      */
-    member(newMember: ProjectMembership | undefined): void {
+    member(newMember: MembershipModel | undefined): void {
       if (!newMember) return;
 
       this.userRole = newMember.role;

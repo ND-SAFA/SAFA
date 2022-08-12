@@ -1,14 +1,15 @@
 <template>
   <v-list-item-content style="max-width: 500px">
     <v-list-item-title v-if="!!displayTitle">
-      <div class="d-flex align-center">
+      <flex-box align="center">
         <typography r="2" :value="artifact.name" />
         <typography variant="caption" :value="artifactType" />
-      </div>
+      </flex-box>
       <v-divider v-if="!!displayDivider" />
     </v-list-item-title>
     <v-list-item-subtitle>
       <typography
+        secondary
         variant="expandable"
         :value="artifact.body"
         :defaultExpanded="!!displayDivider && !!displayTitle"
@@ -21,14 +22,14 @@
 import Vue, { PropType } from "vue";
 import { Artifact } from "@/types";
 import { getArtifactTypePrintName } from "@/util";
-import { Typography } from "@/components/common/display";
+import { Typography, FlexBox } from "@/components/common/display";
 
 /**
  * Displays the body of an artifact that can be expanded.
  */
 export default Vue.extend({
   name: "GenericArtifactBodyDisplay",
-  components: { Typography },
+  components: { FlexBox, Typography },
   props: {
     artifact: {
       type: Object as PropType<Artifact>,

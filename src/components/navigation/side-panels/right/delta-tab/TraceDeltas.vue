@@ -1,6 +1,6 @@
 <template>
   <v-container v-if="isDeltaMode">
-    <h2 class="text-h6">Trace Links</h2>
+    <typography el="h2" variant="subtitle" value="Trace Links" />
     <v-divider class="mb-2" />
 
     <v-expansion-panels class="ma-0 pa-0" multiple v-model="openPanels">
@@ -30,6 +30,7 @@
 import Vue from "vue";
 import { TraceLink } from "@/types";
 import { deltaModule } from "@/store";
+import { Typography } from "@/components/common";
 import { TraceLinkApprovalModal } from "@/components/trace-link";
 import DeltaButtonGroup from "./DeltaButtonGroup.vue";
 
@@ -40,7 +41,7 @@ import DeltaButtonGroup from "./DeltaButtonGroup.vue";
  */
 export default Vue.extend({
   name: "TraceDeltas",
-  components: { DeltaButtonGroup, TraceLinkApprovalModal },
+  components: { DeltaButtonGroup, TraceLinkApprovalModal, Typography },
   data() {
     return {
       isTraceModalOpen: false,

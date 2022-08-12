@@ -3,7 +3,7 @@ import {
   GitHubInstallationList,
   GitHubRepository,
   GitHubRepositoryList,
-  InternalGitHubCredentials,
+  GitHubCredentialsModel,
 } from "@/types";
 
 /**
@@ -79,7 +79,7 @@ export function authorizeGitHub(): void {
  */
 export async function getGitHubToken(
   accessCode: string
-): Promise<InternalGitHubCredentials> {
+): Promise<GitHubCredentialsModel> {
   const params = await fetchGitHubForm(
     {
       code: accessCode,
@@ -107,7 +107,7 @@ export async function getGitHubToken(
  */
 export async function getGitHubRefreshToken(
   refreshToken: string
-): Promise<InternalGitHubCredentials> {
+): Promise<GitHubCredentialsModel> {
   const params = await fetchGitHubForm(
     {
       grant_type: "refresh_token",

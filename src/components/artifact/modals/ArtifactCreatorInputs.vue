@@ -2,7 +2,7 @@
   <v-container class="px-10">
     <v-row>
       <v-col :cols="isFTA ? 12 : 5">
-        <h1 class="text-h6">Artifact</h1>
+        <typography el="h1" variant="subtitle" value="Artifact" />
         <v-divider class="mb-2" />
         <v-text-field
           filled
@@ -58,7 +58,7 @@
         />
       </v-col>
       <v-col cols="7" v-if="!isFTA">
-        <h1 class="text-h6">Description</h1>
+        <typography el="h1" variant="subtitle" value="Description" />
         <v-divider class="mb-2" />
         <v-textarea
           filled
@@ -89,7 +89,11 @@ import { Artifact, DocumentType, SelectOption } from "@/types";
 import { documentTypeMap, logicTypeOptions, safetyCaseOptions } from "@/util";
 import { documentModule, projectModule, typeOptionsModule } from "@/store";
 import { getDoesArtifactExist } from "@/api";
-import { ArtifactInput, CustomFieldInput } from "@/components/common";
+import {
+  ArtifactInput,
+  CustomFieldInput,
+  Typography,
+} from "@/components/common";
 
 /**
  * Inputs for artifact creation.
@@ -99,7 +103,7 @@ import { ArtifactInput, CustomFieldInput } from "@/components/common";
  */
 export default Vue.extend({
   name: "ArtifactCreator",
-  components: { CustomFieldInput, ArtifactInput },
+  components: { CustomFieldInput, ArtifactInput, Typography },
   props: {
     artifact: {
       type: Object as PropType<Artifact>,

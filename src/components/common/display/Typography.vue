@@ -10,16 +10,27 @@
     >
       {{ value }}
     </div>
-    <v-btn text small @click.stop="isExpanded = !isExpanded">
+    <v-btn
+      text
+      small
+      @click.stop="isExpanded = !isExpanded"
+      class="text--secondary"
+    >
       {{ isExpanded ? "See Less" : "See More" }}
     </v-btn>
   </div>
+  <pre v-else-if="variant === 'code'" :class="className">
+     {{ value }}
+  </pre>
   <span v-else-if="el === 'span'" :class="className">
     {{ value }}
   </span>
   <p v-else-if="el === 'p'" :class="className">
     {{ value }}
   </p>
+  <div v-else-if="el === 'div'" :class="className">
+    {{ value }}
+  </div>
   <h1 v-else-if="el === 'h1'" :class="className">
     {{ value }}
   </h1>
@@ -29,14 +40,11 @@
   <h3 v-else-if="el === 'h3'" :class="className">
     {{ value }}
   </h3>
-  <pre v-else-if="el === 'pre'" :class="className">
-    {{ value }}
-  </pre>
 </template>
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { AlignType, ElementType, SizeType, TextType } from "@/types";
+import { TextAlignType, ElementType, SizeType, TextType } from "@/types";
 
 /**
  * A generic component for displaying text.
@@ -46,9 +54,11 @@ export default Vue.extend({
   props: {
     value: String,
     classes: String,
+    color: String,
     error: Boolean,
     defaultExpanded: Boolean,
     ellipsis: Boolean,
+    secondary: Boolean,
     variant: {
       type: String as PropType<TextType>,
       default: "body",
@@ -58,14 +68,10 @@ export default Vue.extend({
       default: "span",
     },
     align: {
-      type: String as PropType<AlignType>,
+      type: String as PropType<TextAlignType>,
       default: "left",
     },
     x: {
-      type: String as PropType<SizeType>,
-      default: "",
-    },
-    y: {
       type: String as PropType<SizeType>,
       default: "",
     },
@@ -74,6 +80,18 @@ export default Vue.extend({
       default: "",
     },
     r: {
+      type: String as PropType<SizeType>,
+      default: "",
+    },
+    y: {
+      type: String as PropType<SizeType>,
+      default: "",
+    },
+    t: {
+      type: String as PropType<SizeType>,
+      default: "",
+    },
+    b: {
       type: String as PropType<SizeType>,
       default: "",
     },
@@ -91,18 +109,22 @@ export default Vue.extend({
       return this.variant === "expandable";
     },
     /**
-     * @return The class name based on the text type.
+     * @return The class name.
      */
     className(): string {
       let classNames = ` text-${this.align}`;
 
       if (this.classes) classNames += ` ${this.classes}`;
+      if (this.color) classNames += ` ${this.color}--text`;
       if (this.error) classNames += ` error--text`;
       if (this.ellipsis) classNames += ` text-ellipsis`;
+      if (this.secondary) classNames += ` text--secondary`;
       if (this.x) classNames += ` mx-${this.x}`;
-      if (this.y) classNames += ` my-${this.y}`;
       if (this.l) classNames += ` ml-${this.l}`;
       if (this.r) classNames += ` mr-${this.r}`;
+      if (this.y) classNames += ` my-${this.y}`;
+      if (this.t) classNames += ` mt-${this.t}`;
+      if (this.b) classNames += ` mb-${this.b}`;
 
       switch (this.variant) {
         case "large":
@@ -115,6 +137,8 @@ export default Vue.extend({
           return "text-subtitle-2" + classNames;
         case "caption":
           return "text-caption text--secondary" + classNames;
+        case "code":
+          return "text-body-1 overflow-y-auto" + classNames;
         default:
           return "text-body-1" + classNames;
       }

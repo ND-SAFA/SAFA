@@ -2,7 +2,7 @@ import {
   ArtifactMap,
   IGenericUploader,
   Artifact,
-  ParseArtifactFileResponse,
+  ParseArtifactFileModel,
   ArtifactFile,
   ArtifactPanel,
 } from "@/types";
@@ -102,7 +102,7 @@ function createParsedArtifactFile(
   file: File
 ): Promise<void> {
   return parseArtifactFile(panel.projectFile.type, file)
-    .then((res: ParseArtifactFileResponse) => {
+    .then((res: ParseArtifactFileModel) => {
       const { entities, errors } = res;
       const validArtifacts: Artifact[] = [];
 

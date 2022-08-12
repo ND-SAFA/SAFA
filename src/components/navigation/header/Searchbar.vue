@@ -18,10 +18,10 @@
       :filter="filterArtifacts"
     >
       <template v-slot:prepend-item>
-        <div class="full-width d-flex px-3">
+        <flex-box x="3">
           <v-spacer />
-          <span class="text-end text-caption">{{ matchText }}</span>
-        </div>
+          <typography align="end" variant="caption" :value="matchText" />
+        </flex-box>
       </template>
       <template v-slot:item="{ item }">
         <generic-artifact-body-display display-title :artifact="item" />
@@ -38,8 +38,9 @@ import {
   artifactSelectionModule,
   viewportModule,
 } from "@/store";
-import { GenericArtifactBodyDisplay } from "@/components/common";
+import { GenericArtifactBodyDisplay, Typography } from "@/components/common";
 import { filterArtifacts, getArtifactTypePrintName } from "@/util";
+import FlexBox from "@/components/common/display/FlexBox.vue";
 
 /**
  * Artifact search bar.
@@ -47,6 +48,8 @@ import { filterArtifacts, getArtifactTypePrintName } from "@/util";
 export default Vue.extend({
   name: "Searchbar",
   components: {
+    FlexBox,
+    Typography,
     GenericArtifactBodyDisplay,
   },
   data() {

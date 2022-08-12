@@ -2,7 +2,7 @@
  * Container for the project entity to update
  * along with the initiator.
  */
-export interface ProjectMessage {
+export interface ProjectMessageModel {
   type: ProjectMessageType;
   user: string;
 }
@@ -21,7 +21,7 @@ export enum ProjectMessageType {
  * Container for the versioned entity to update
  * along with the initiator.
  */
-export interface VersionMessage {
+export interface VersionMessageModel {
   type: VersionMessageType;
   user: string;
 }

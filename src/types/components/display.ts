@@ -46,17 +46,28 @@ export type TextType =
   | "body"
   | "small"
   | "caption"
-  | "expandable";
+  | "expandable"
+  | "code";
 
 /**
  * The types of text elements.
  */
-export type ElementType = "span" | "p" | "h1" | "h2" | "h3" | "pre";
+export type ElementType = "span" | "p" | "div" | "h1" | "h2" | "h3";
+
+/**
+ * The methods of text alignment.
+ */
+export type TextAlignType = "left" | "center" | "right";
 
 /**
  * The methods of alignment.
  */
-export type AlignType = "left" | "center" | "right";
+export type AlignType = "start" | "center" | "end";
+
+/**
+ * The methods of justifying.
+ */
+export type JustifyType = AlignType | "space-between" | "space-around";
 
 /**
  * The possible increments for spacing.

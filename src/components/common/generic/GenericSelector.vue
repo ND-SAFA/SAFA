@@ -18,10 +18,7 @@
       <slot name="deleteItemDialogue" />
       <slot name="editItemDialogue" />
       <slot name="addItemDialogue" />
-      <div
-        v-if="!minimal"
-        class="d-flex justify-space-between align-center my-2"
-      >
+      <flex-box v-if="!minimal" align="center" justify="space-between" y="2">
         <v-text-field
           v-model="search"
           label="Search"
@@ -36,21 +33,23 @@
           icon-id="mdi-refresh"
           @click="$emit('refresh')"
         />
-      </div>
+      </flex-box>
     </template>
     <template v-slot:[`item.actions`]="{ item }">
-      <generic-icon-button
-        v-if="hasEdit"
-        icon-id="mdi-pencil"
-        tooltip="Edit"
-        @click="$emit('item:edit', item)"
-      />
-      <generic-icon-button
-        v-if="isDeleteEnabled(item)"
-        icon-id="mdi-delete"
-        tooltip="Delete"
-        @click="$emit('item:delete', item)"
-      />
+      <flex-box>
+        <generic-icon-button
+          v-if="hasEdit"
+          icon-id="mdi-pencil"
+          tooltip="Edit"
+          @click="$emit('item:edit', item)"
+        />
+        <generic-icon-button
+          v-if="isDeleteEnabled(item)"
+          icon-id="mdi-delete"
+          tooltip="Delete"
+          @click="$emit('item:delete', item)"
+        />
+      </flex-box>
     </template>
     <template v-slot:[`footer.prepend`]>
       <div class="py-3">
@@ -71,6 +70,7 @@
 import Vue, { PropType } from "vue";
 import { DataItemProps, DataTableHeader } from "vuetify";
 import GenericIconButton from "./GenericIconButton.vue";
+import FlexBox from "@/components/common/display/FlexBox.vue";
 
 /**
  * Displays a generic selector.
@@ -83,7 +83,7 @@ import GenericIconButton from "./GenericIconButton.vue";
  */
 export default Vue.extend({
   name: "GenericSelector",
-  components: { GenericIconButton },
+  components: { FlexBox, GenericIconButton },
   props: {
     headers: {
       type: Array as PropType<DataTableHeader[]>,

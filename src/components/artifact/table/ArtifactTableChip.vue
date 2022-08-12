@@ -5,11 +5,11 @@
         v-on="on"
         v-bind="attrs"
         small
-        class="text-body-1"
         style="max-width: 200px"
+        class="mr-1"
       >
         <v-icon small>{{ icon }}</v-icon>
-        <span class="text-ellipsis ml-1">{{ displayText }}</span>
+        <typography ellipsis l="1" :value="displayText" />
       </v-chip>
     </template>
     <span>{{ displayText }}</span>
@@ -20,12 +20,14 @@
 import Vue from "vue";
 import { typeOptionsModule } from "@/store";
 import { getArtifactTypePrintName } from "@/util";
+import { Typography } from "@/components/common";
 
 /**
  * Renders a chip on an artifact table row.
  */
 export default Vue.extend({
   name: "ArtifactTableChip",
+  components: { Typography },
   props: {
     text: String,
     displayIcon: Boolean,

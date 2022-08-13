@@ -26,7 +26,7 @@
       </template>
 
       <template v-slot:[`item.name`]="{ item }">
-        <td>
+        <td class="v-data-table__divider">
           <flex-box align="center">
             <artifact-table-delta-chip :artifact="item" />
             <v-icon v-if="getHasWarnings(item)" color="secondary">
@@ -38,7 +38,7 @@
       </template>
 
       <template v-slot:[`item.type`]="{ item }">
-        <td>
+        <td class="v-data-table__divider">
           <table-chip :text="item.type" display-icon />
         </td>
       </template>
@@ -47,7 +47,7 @@
         v-for="column in columns"
         v-slot:[`item.${column.id}`]="{ item }"
       >
-        <td :key="column.id">
+        <td :key="column.id" class="v-data-table__divider">
           <artifact-table-cell :column="column" :item="item" />
         </td>
       </template>

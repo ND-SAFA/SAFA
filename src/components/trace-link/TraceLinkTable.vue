@@ -5,12 +5,15 @@
       show-group-by
       show-expand
       single-expand
-      fixed-header
+      multi-sort
       :headers="headers"
       :items="items"
       :expanded="expanded"
       :search="searchText"
-      sort-by="targetName"
+      :loading="isLoading"
+      :sort-by="['targetName', 'sourceName']"
+      :group-desc="true"
+      group-by="approvalStatus"
       item-key="traceLinkId"
       :items-per-page="50"
       @click:row="handleView($event)"
@@ -34,26 +37,66 @@
       </template>
 
       <template v-slot:[`item.sourceType`]="{ item }">
-        <td>
+        <td class="v-data-table__divider">
           <table-chip :text="item.sourceType" display-icon />
         </td>
       </template>
 
       <template v-slot:[`item.targetType`]="{ item }">
-        <td>
+        <td class="v-data-table__divider">
           <table-chip :text="item.targetType" display-icon />
         </td>
       </template>
 
       <template v-slot:[`item.approvalStatus`]="{ item }">
         <td>
-          <approval-chip :link="item" />
+          <approval-chip :status="item.approvalStatus" />
         </td>
       </template>
 
       <template v-slot:[`item.score`]="{ item }">
-        <td>
+        <td class="v-data-table__divider">
           <typography :value="String(item.score).slice(0, 4)" />
+        </td>
+      </template>
+
+      <template
+        v-slot:[`group.header`]="{
+          group,
+          groupBy,
+          isOpen,
+          headers,
+          toggle,
+          remove,
+        }"
+      >
+        <td :colspan="headers.length">
+          <flex-box y="2" x="2" align="center">
+            <generic-icon-button
+              small
+              icon-id="mdi-close"
+              tooltip="Remove Grouping"
+              @click="remove"
+            />
+            <generic-icon-button
+              small
+              :icon-id="isOpen ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+              :tooltip="isOpen ? 'Hide Group' : 'Show Group'"
+              @click="toggle"
+            />
+            <typography :value="displayGroupHeader(groupBy)" x="2" />
+            <approval-chip
+              v-if="groupBy.includes('approvalStatus')"
+              :status="group"
+            />
+            <table-chip
+              v-else
+              :text="group"
+              :display-icon="
+                groupBy.includes('sourceType') || groupBy.includes('targetType')
+              "
+            />
+          </flex-box>
         </td>
       </template>
 
@@ -78,10 +121,16 @@ import Vue from "vue";
 import { ApprovalType, TraceLinkModel, VersionModel } from "@/types";
 import { appModule, artifactModule, projectModule } from "@/store";
 import { getGeneratedLinks } from "@/api";
-import { FlexBox, TableChip, Typography } from "@/components/common";
+import {
+  FlexBox,
+  TableChip,
+  Typography,
+  GenericIconButton,
+} from "@/components/common";
 import TraceLinkDisplay from "./TraceLinkDisplay.vue";
 import SectionControls from "./SectionControls.vue";
 import ApprovalChip from "./ApprovalChip.vue";
+import { camelcaseToDisplay } from "@/util";
 
 /**
  * Displays a table of trace links.
@@ -89,6 +138,7 @@ import ApprovalChip from "./ApprovalChip.vue";
 export default Vue.extend({
   name: "TraceLinkTable",
   components: {
+    GenericIconButton,
     Typography,
     ApprovalChip,
     SectionControls,
@@ -160,6 +210,12 @@ export default Vue.extend({
   },
   computed: {
     /**
+     * @return Whether the app is loading.
+     */
+    isLoading() {
+      return appModule.getIsLoading;
+    },
+    /**
      * @return The current project version.
      */
     projectVersion() {
@@ -196,6 +252,12 @@ export default Vue.extend({
       } finally {
         appModule.onLoadEnd();
       }
+    },
+    /**
+     * Converts the group attributes into a display string.
+     */
+    displayGroupHeader(groupBy: (keyof TraceLinkModel)[]): string {
+      return groupBy.map(camelcaseToDisplay).join(", ") + ":";
     },
     /**
      * Determines whether to show approval for a link.

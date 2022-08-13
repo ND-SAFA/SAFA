@@ -37,6 +37,17 @@ export function capitalize(str: string): string {
 }
 
 /**
+ * Converts camel case to sentence case.
+ *
+ * @param str - The string to convert.
+ *
+ * @return The converted string.
+ */
+export function camelcaseToDisplay(str: string): string {
+  return capitalize(str.replace(/([A-Z])/g, " $1"));
+}
+
+/**
  * Capitalizes the first letter of all words in the given string.
  *
  * @param str - The string to capitalize.

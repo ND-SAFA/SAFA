@@ -12,7 +12,7 @@ import edu.nd.crc.safa.features.jobs.services.JobService;
 import edu.nd.crc.safa.features.notifications.NotificationService;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
-import features.flatfile.base.BaseFlatFileTest;
+import features.flatfiles.base.BaseFlatFileTest;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;

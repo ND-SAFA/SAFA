@@ -79,7 +79,10 @@ public class DocumentArtifactController extends BaseDocumentController {
 
         LayoutManager layoutManager = new LayoutManager(serviceProvider, projectVersion);
         layoutManager.generateDocumentLayout(document, true);
-        this.notificationService.broadcastUpdateProjectMessage(projectVersion.getProject(), ProjectEntityTypes.DOCUMENTS);
+        this.notificationService.broadcastUpdateProjectMessage(
+            projectVersion.getProject(),
+            ProjectEntityTypes.DOCUMENTS
+        );
         return artifacts;
     }
 
@@ -96,7 +99,10 @@ public class DocumentArtifactController extends BaseDocumentController {
                 document,
                 artifact);
         documentArtifactQuery.ifPresent(this.documentArtifactRepository::delete);
-        this.notificationService.broadcastUpdateProjectMessage(projectVersion.getProject(), ProjectEntityTypes.DOCUMENTS);
+        this.notificationService.broadcastUpdateProjectMessage(
+            projectVersion.getProject(),
+            ProjectEntityTypes.DOCUMENTS
+        );
         this.notificationService.broadcastUpdateProjectVersionMessage(projectVersion, VersionEntityTypes.ARTIFACTS);
     }
 

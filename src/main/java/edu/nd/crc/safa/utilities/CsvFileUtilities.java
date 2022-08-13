@@ -6,8 +6,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.function.Function;
 
-import edu.nd.crc.safa.features.flatfiles.entities.csv.CsvArtifactFile;
-import edu.nd.crc.safa.features.flatfiles.entities.csv.CsvTraceFile;
+import edu.nd.crc.safa.features.flatfiles.parser.formats.csv.CsvArtifactFile;
+import edu.nd.crc.safa.features.flatfiles.parser.formats.csv.CsvTraceFile;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;

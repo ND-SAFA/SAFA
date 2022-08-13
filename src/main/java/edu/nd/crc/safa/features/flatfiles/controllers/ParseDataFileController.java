@@ -12,10 +12,10 @@ import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
-import edu.nd.crc.safa.features.flatfiles.entities.app.ArtifactNameCheck;
-import edu.nd.crc.safa.features.flatfiles.entities.common.AbstractArtifactFile;
-import edu.nd.crc.safa.features.flatfiles.entities.common.AbstractTraceFile;
-import edu.nd.crc.safa.features.flatfiles.entities.parser.FileParser;
+import edu.nd.crc.safa.features.flatfiles.controllers.entities.ArtifactNameCheck;
+import edu.nd.crc.safa.features.flatfiles.parser.base.AbstractArtifactFile;
+import edu.nd.crc.safa.features.flatfiles.parser.base.AbstractTraceFile;
+import edu.nd.crc.safa.features.flatfiles.parser.interfaces.IFileParser;
 import edu.nd.crc.safa.features.flatfiles.services.CheckArtifactNameService;
 import edu.nd.crc.safa.features.flatfiles.services.DataFileBuilder;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
@@ -106,7 +106,7 @@ public class ParseDataFileController extends BaseController {
         return response;
     }
 
-    private <T> void tryParseFile(EntityParsingResult<T, String> response, FileParser fileParser) {
+    private <T> void tryParseFile(EntityParsingResult<T, String> response, IFileParser fileParser) {
         try {
             fileParser.parseFile();
         } catch (Exception e) {

@@ -2,13 +2,13 @@ package edu.nd.crc.safa.features.versions;
 
 import java.util.List;
 
+import edu.nd.crc.safa.common.ProjectEntities;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.errors.entities.db.CommitError;
-import edu.nd.crc.safa.features.flatfiles.entities.common.ProjectEntities;
 import edu.nd.crc.safa.features.layout.entities.app.LayoutManager;
 import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
@@ -37,6 +37,7 @@ public class ProjectChanger {
      * Performs modifications specified in project commit and updates the layout accordingly.
      *
      * @param projectCommit Commit containing addition, modifications, and deletions of entities.
+     * @return {@link ProjectCommit} Commit containing persisted entities and any errors.
      */
     public ProjectCommit commit(ProjectCommit projectCommit) {
         ProjectCommit committedChanges = serviceProvider

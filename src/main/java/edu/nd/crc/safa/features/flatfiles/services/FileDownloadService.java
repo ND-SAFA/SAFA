@@ -6,16 +6,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import edu.nd.crc.safa.common.ProjectEntities;
+import edu.nd.crc.safa.common.Type2TraceMap;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.entities.FTAType;
 import edu.nd.crc.safa.features.artifacts.entities.SafetyCaseType;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
-import edu.nd.crc.safa.features.flatfiles.entities.common.AbstractArtifactFile;
-import edu.nd.crc.safa.features.flatfiles.entities.common.AbstractTraceFile;
-import edu.nd.crc.safa.features.flatfiles.entities.common.ProjectEntities;
-import edu.nd.crc.safa.features.flatfiles.entities.common.TraceMaps;
+import edu.nd.crc.safa.features.flatfiles.parser.base.AbstractArtifactFile;
+import edu.nd.crc.safa.features.flatfiles.parser.base.AbstractTraceFile;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.services.AppEntityRetrievalService;
@@ -59,17 +59,17 @@ public class FileDownloadService {
                                                       List<File> projectFiles,
                                                       ProjectAppEntity projectAppEntity,
                                                       ProjectEntities projectEntityMaps) throws Exception {
-        TraceMaps traceMaps = new TraceMaps(projectAppEntity, projectEntityMaps);
+        Type2TraceMap type2TraceMap = new Type2TraceMap(projectAppEntity, projectEntityMaps);
         List<TraceFileIdentifier> traceFiles = new ArrayList<>();
-        for (String sourceType : traceMaps.getSourceTypes()) {
-            for (String targetType : traceMaps.getTargetTypes(sourceType)) {
+        for (String sourceType : type2TraceMap.getSourceTypes()) {
+            for (String targetType : type2TraceMap.getTargetTypes(sourceType)) {
                 // Step - Create file
                 String fileName = String.format("%s2%s.%s", sourceType, targetType, fileType);
                 String pathToFile = ProjectPaths.getPathToProjectFile(project, fileName);
                 File traceFileOutput = new File(pathToFile);
 
                 // Step - Create trace file
-                List<TraceAppEntity> traces = traceMaps.getTracesBetweenTypes(sourceType, targetType);
+                List<TraceAppEntity> traces = type2TraceMap.getTracesBetweenTypes(sourceType, targetType);
                 AbstractTraceFile<?> traceFile = DataFileBuilder.createTraceFileParser(pathToFile, traces);
                 TraceFileIdentifier traceFileIdentifier = new TraceFileIdentifier(fileName, sourceType, targetType);
                 traceFiles.add(traceFileIdentifier);

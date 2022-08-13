@@ -4,11 +4,11 @@ import java.util.UUID;
 
 import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
-import edu.nd.crc.safa.features.layout.entities.messages.LayoutEntity;
-import edu.nd.crc.safa.features.layout.entities.messages.LayoutMessage;
+import edu.nd.crc.safa.features.notifications.messages.LayoutMessage;
+import edu.nd.crc.safa.features.notifications.messages.ProjectMessage;
 import edu.nd.crc.safa.features.notifications.messages.VersionMessage;
+import edu.nd.crc.safa.features.notifications.messages.layout.LayoutEntity;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectEntityTypes;
-import edu.nd.crc.safa.features.projects.entities.app.ProjectMessage;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.services.SafaUserService;

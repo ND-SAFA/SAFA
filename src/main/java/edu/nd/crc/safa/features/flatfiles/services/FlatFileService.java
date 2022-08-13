@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.common.EntityParsingResult;
+import edu.nd.crc.safa.common.ProjectEntities;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
@@ -16,8 +17,8 @@ import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.errors.entities.db.CommitError;
 import edu.nd.crc.safa.features.errors.repositories.CommitErrorRepository;
-import edu.nd.crc.safa.features.flatfiles.entities.common.ProjectEntities;
-import edu.nd.crc.safa.features.flatfiles.entities.parser.FlatFileParser;
+import edu.nd.crc.safa.features.flatfiles.parser.FlatFileParser;
+import edu.nd.crc.safa.features.flatfiles.parser.TimFileParser;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
@@ -58,10 +59,11 @@ public class FlatFileService {
      * Responsible for creating a project from given flat files. This includes
      * parsing tim.json, creating artifacts, and their trace links.
      *
-     * @param project        The project whose artifacts and trace links should be associated with
-     * @param projectVersion The version that the artifacts and errors will be associated with.
-     * @param files          the flat files defining the project
-     * @param asCompleteSet  Whether entities in flat files are complete set of entities in project version.
+     * @param project         The project whose artifacts and trace links should be associated with
+     * @param projectVersion  The version that the artifacts and errors will be associated with.
+     * @param serviceProvider Provides persistent services for storing entity.
+     * @param files           The flat files defining the project
+     * @param asCompleteSet   Whether entities in flat files are complete set of entities in project version.
      * @return FlatFileResponse containing uploaded, parsed, and generated files.
      * @throws SafaError on any parsing error of tim.json, artifacts, or trace links
      */
@@ -82,9 +84,10 @@ public class FlatFileService {
      * Note, this route expects all files to be stored in local storage
      * before processing.
      *
-     * @param projectVersion The project version to be associated with the files specified.
-     * @param timFileJson    JSON definition of project extracted from tim.json file.
-     * @param asCompleteSet  Whether to save entities in flat files as entire set of entities in project.
+     * @param projectVersion  The project version to be associated with the files specified.
+     * @param serviceProvider Provides persistent service to application.
+     * @param timFileJson     JSON definition of project extracted from tim.json file.
+     * @param asCompleteSet   Whether to save entities in flat files as entire set of entities in project.
      * @throws SafaError any error occurring while parsing project.
      */
     public void parseFlatFilesAndCommitEntities(ProjectVersion projectVersion,
@@ -183,7 +186,8 @@ public class FlatFileService {
     ) throws SafaError, IOException {
         // Step - Create project parser
         String pathToFiles = ProjectPaths.getPathToUploadedFiles(projectVersion.getProject(), false);
-        FlatFileParser flatFileParser = new FlatFileParser(timFileJson, pathToFiles);
+        TimFileParser timFileParser = new TimFileParser(timFileJson, pathToFiles);
+        FlatFileParser flatFileParser = new FlatFileParser(timFileParser);
         ProjectCommit projectCommit = new ProjectCommit(projectVersion, false);
 
         // Step - parse artifacts

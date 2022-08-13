@@ -13,7 +13,7 @@ import edu.nd.crc.safa.features.jobs.entities.app.JobType;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
-import features.flatfile.base.BaseFlatFileTest;
+import features.flatfiles.base.BaseFlatFileTest;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;

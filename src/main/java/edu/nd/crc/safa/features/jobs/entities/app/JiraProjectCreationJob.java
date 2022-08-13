@@ -3,10 +3,10 @@ package edu.nd.crc.safa.features.jobs.entities.app;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.nd.crc.safa.common.ProjectEntities;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
-import edu.nd.crc.safa.features.flatfiles.entities.common.ProjectEntities;
 import edu.nd.crc.safa.features.jira.entities.api.JiraIdentifier;
 import edu.nd.crc.safa.features.jira.entities.app.JiraIssueDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraProjectResponseDTO;
@@ -28,7 +28,7 @@ import lombok.Setter;
  * 3. Saving issues as artifacts
  * 4. Returning project created
  */
-public class JiraProjectCreationJob extends ProjectCreationJob {
+public class JiraProjectCreationJob extends CommitJob {
     /**
      * The project version to upload entities to.
      */

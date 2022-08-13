@@ -6,12 +6,12 @@ import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
-import edu.nd.crc.safa.features.flatfiles.entities.common.AbstractArtifactFile;
-import edu.nd.crc.safa.features.flatfiles.entities.common.AbstractTraceFile;
-import edu.nd.crc.safa.features.flatfiles.entities.csv.CsvArtifactFile;
-import edu.nd.crc.safa.features.flatfiles.entities.csv.CsvTraceFile;
-import edu.nd.crc.safa.features.flatfiles.entities.json.JsonArtifactFile;
-import edu.nd.crc.safa.features.flatfiles.entities.json.JsonTraceFile;
+import edu.nd.crc.safa.features.flatfiles.parser.base.AbstractArtifactFile;
+import edu.nd.crc.safa.features.flatfiles.parser.base.AbstractTraceFile;
+import edu.nd.crc.safa.features.flatfiles.parser.formats.csv.CsvArtifactFile;
+import edu.nd.crc.safa.features.flatfiles.parser.formats.csv.CsvTraceFile;
+import edu.nd.crc.safa.features.flatfiles.parser.formats.json.JsonArtifactFile;
+import edu.nd.crc.safa.features.flatfiles.parser.formats.json.JsonTraceFile;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 

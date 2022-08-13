@@ -2,8 +2,8 @@ package edu.nd.crc.safa.features.jobs.entities.builders;
 
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.jobs.entities.app.CommitJob;
 import edu.nd.crc.safa.features.jobs.entities.app.JobType;
-import edu.nd.crc.safa.features.jobs.entities.app.ProjectCreationJob;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
@@ -50,11 +50,11 @@ public class CreateProjectByJsonJobBuilder extends AbstractJobBuilder<ProjectVer
         JobDbEntity jobDbEntity = this.serviceProvider
             .getJobService()
             .createNewJob(JobType.PROJECT_CREATION, jobName);
-        ProjectCreationJob projectCreationJob = new ProjectCreationJob(
+        CommitJob commitJob = new CommitJob(
             jobDbEntity,
             serviceProvider,
             change
         );
-        return new JobDefinition(jobDbEntity, projectCreationJob);
+        return new JobDefinition(jobDbEntity, commitJob);
     }
 }

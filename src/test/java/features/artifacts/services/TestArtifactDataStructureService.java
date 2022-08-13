@@ -7,12 +7,12 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Optional;
 
+import edu.nd.crc.safa.common.ProjectEntities;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
-import edu.nd.crc.safa.features.flatfiles.entities.common.ProjectEntities;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.versions.ProjectChanger;
@@ -120,7 +120,7 @@ class TestArtifactDataStructureService extends ApplicationBaseTest {
         ProjectEntities projectEntities = new ProjectEntities(Arrays.asList(artifactApp));
         ProjectChanger projectChanger = new ProjectChanger(newVersion, serviceProvider);
         projectChanger.setEntitiesAsCompleteSet(projectEntities);
-        
+
         List<ArtifactVersion> artifactBodies = this.artifactVersionRepository.findByArtifact(artifact);
         assertThat(artifactBodies).hasSize(1);
     }

@@ -9,8 +9,8 @@ import edu.nd.crc.safa.builders.RouteBuilder;
 import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactType;
+import edu.nd.crc.safa.features.notifications.messages.ProjectMessage;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectEntityTypes;
-import edu.nd.crc.safa.features.projects.entities.app.ProjectMessage;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 
 import features.base.ApplicationBaseTest;

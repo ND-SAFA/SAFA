@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import edu.nd.crc.safa.common.ProjectEntities;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactType;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
@@ -14,7 +15,6 @@ import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
 import edu.nd.crc.safa.features.documents.services.CurrentDocumentService;
 import edu.nd.crc.safa.features.documents.services.DocumentService;
 import edu.nd.crc.safa.features.errors.services.CommitErrorRetrievalService;
-import edu.nd.crc.safa.features.flatfiles.entities.common.ProjectEntities;
 import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
 import edu.nd.crc.safa.features.layout.services.ArtifactPositionService;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
@@ -201,7 +201,6 @@ public class AppEntityRetrievalService {
             .filter(t -> artifactName.equals(t.getSourceName()) || artifactName.equals(t.getTargetName()))
             .collect(Collectors.toList());
     }
-
 
     /**
      * Returns mapping of artifact name to the list of violations it is inhibiting.

@@ -14,7 +14,8 @@ import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.errors.entities.db.CommitError;
 import edu.nd.crc.safa.features.errors.repositories.CommitErrorRepository;
-import edu.nd.crc.safa.features.flatfiles.entities.parser.FlatFileParser;
+import edu.nd.crc.safa.features.flatfiles.parser.FlatFileParser;
+import edu.nd.crc.safa.features.flatfiles.parser.TimFileParser;
 import edu.nd.crc.safa.features.flatfiles.services.FileUploadService;
 import edu.nd.crc.safa.features.flatfiles.services.FlatFileService;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
@@ -32,7 +33,7 @@ import org.springframework.web.multipart.MultipartFile;
  * Responsible for providing step implementations for parsing flat files
  * to use the project creation worker.
  */
-public class FlatFileProjectCreationJob extends ProjectCreationJob {
+public class FlatFileProjectCreationJob extends CommitJob {
 
     /**
      * The initial project version
@@ -86,7 +87,8 @@ public class FlatFileProjectCreationJob extends ProjectCreationJob {
 
         try {
             JSONObject timFileJson = FileUtilities.readJSONFile(this.pathToTIMFile);
-            this.flatFileParser = new FlatFileParser(timFileJson, this.pathToFiles);
+            TimFileParser timFileParser = new TimFileParser(timFileJson, this.pathToFiles);
+            this.flatFileParser = new FlatFileParser(timFileParser);
         } catch (Exception e) {
             throw new SafaError("Could not parse");
         }

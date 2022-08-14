@@ -22,8 +22,17 @@
 
     <flex-box justify="end">
       <v-btn
+        text
+        v-if="showUnreviewed"
+        :loading="isUnreviewLoading"
+        class="ma-1"
+        @click="handleUnreview"
+      >
+        Unreview
+      </v-btn>
+      <v-btn
         outlined
-        v-if="showApprove"
+        v-if="showApproved"
         :loading="isApproveLoading"
         color="primary"
         class="ma-1"
@@ -33,7 +42,7 @@
       </v-btn>
       <v-btn
         outlined
-        v-if="showDecline"
+        v-if="showDeclined"
         :loading="isDeclineLoading"
         color="error"
         class="ma-1"
@@ -50,7 +59,7 @@
         :outlined="confirmDelete"
         @click="handleDelete"
       >
-        {{ deleteButtonText }}
+        Delete
       </v-btn>
       <v-btn
         outlined
@@ -66,17 +75,27 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { ArtifactModel, TraceLinkModel } from "@/types";
+import {
+  ApprovalType,
+  ArtifactModel,
+  TraceLinkModel,
+  TraceType,
+} from "@/types";
 import { GenericArtifactBodyDisplay } from "@/components";
-import { artifactModule } from "@/store";
+import { artifactModule, deltaModule } from "@/store";
 import { FlexBox } from "@/components/common";
-import { handleApproveLink, handleDeclineLink } from "@/api";
+import {
+  handleApproveLink,
+  handleDeclineLink,
+  handleUnreviewLink,
+} from "@/api";
 
 /**
  * Displays a trace link.
  *
  * @emits-1 `link:approve` - On Link Approval.
  * @emits-2 `link:decline` - On Link Decline.
+ * @emits-2 `link:unreview` - On Link Unreview.
  * @emits-3 `link:delete` - On Link Delete.
  * @emits-4 `close` - On Close.
  */
@@ -91,18 +110,6 @@ export default Vue.extend({
       type: Object as PropType<TraceLinkModel>,
       required: true,
     },
-    showDecline: {
-      type: Boolean,
-      default: true,
-    },
-    showApprove: {
-      type: Boolean,
-      default: true,
-    },
-    showDelete: {
-      type: Boolean,
-      default: true,
-    },
   },
   data() {
     return {
@@ -111,6 +118,7 @@ export default Vue.extend({
       confirmDelete: false,
       isApproveLoading: false,
       isDeclineLoading: false,
+      isUnreviewLoading: false,
       isDeleteLoading: false,
     };
   },
@@ -128,10 +136,41 @@ export default Vue.extend({
       return artifactModule.getAllArtifactsById[this.link.targetId];
     },
     /**
-     * @return The text to display on the delete button.
+     * @return Whether this link can be modified.
      */
-    deleteButtonText(): string {
-      return this.confirmDelete ? "Delete" : "Delete Link";
+    canBeModified(): boolean {
+      return this.link?.traceType === TraceType.GENERATED;
+    },
+    /**
+     * @return Whether this link can be deleted.
+     */
+    showDelete(): boolean {
+      return !this.canBeModified && !deltaModule.inDeltaView;
+    },
+    /**
+     * @return Whether this link can be approved.
+     */
+    showApproved(): boolean {
+      return (
+        this.canBeModified && this.link.approvalStatus !== ApprovalType.APPROVED
+      );
+    },
+    /**
+     * @return Whether this link can be declined.
+     */
+    showDeclined(): boolean {
+      return (
+        this.canBeModified && this.link.approvalStatus !== ApprovalType.DECLINED
+      );
+    },
+    /**
+     * @return Whether this link can be unreviewed.
+     */
+    showUnreviewed(): boolean {
+      return (
+        this.canBeModified &&
+        this.link.approvalStatus !== ApprovalType.UNREVIEWED
+      );
     },
   },
   methods: {
@@ -157,6 +196,19 @@ export default Vue.extend({
         onSuccess: () => {
           this.isDeclineLoading = false;
           this.$emit("link:decline", this.link);
+        },
+        onError: () => (this.isDeclineLoading = false),
+      });
+    },
+    /**
+     * Unreviews the given link and updates the stored links.
+     */
+    handleUnreview() {
+      this.isDeclineLoading = true;
+      handleUnreviewLink(this.link, {
+        onSuccess: () => {
+          this.isDeclineLoading = false;
+          this.$emit("link:unreview", this.link);
         },
         onError: () => (this.isDeclineLoading = false),
       });

@@ -26,7 +26,7 @@ export enum ThemeColors {
  * @return The color.
  */
 export function getBackgroundColor(
-  state?: ArtifactDeltaState | ApprovalType
+  state?: ArtifactDeltaState | ApprovalType | string
 ): string {
   switch (state) {
     case ApprovalType.APPROVED:

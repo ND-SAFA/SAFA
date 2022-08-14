@@ -19,96 +19,48 @@
       @click:row="handleView($event)"
     >
       <template v-slot:top>
-        <flex-box justify="space-between">
-          <v-text-field
-            dense
-            outlined
-            clearable
-            label="Search Trace Links"
-            style="max-width: 600px"
-            v-model="searchText"
-            append-icon="mdi-magnify"
-          />
-          <section-controls
-            @open:all="handleOpenAll"
-            @close:all="handleCloseAll"
-          />
-        </flex-box>
+        <trace-link-table-header
+          @search="searchText = $event"
+          @open:all="handleOpenAll"
+          @close:all="handleCloseAll"
+        />
       </template>
 
       <template v-slot:[`item.sourceType`]="{ item }">
         <td class="v-data-table__divider">
-          <table-chip :text="item.sourceType" display-icon />
+          <attribute-chip :value="item.sourceType" artifact-type />
         </td>
       </template>
 
       <template v-slot:[`item.targetType`]="{ item }">
         <td class="v-data-table__divider">
-          <table-chip :text="item.targetType" display-icon />
+          <attribute-chip :value="item.targetType" artifact-type />
         </td>
       </template>
 
       <template v-slot:[`item.approvalStatus`]="{ item }">
         <td>
-          <approval-chip :status="item.approvalStatus" />
+          <attribute-chip :value="item.approvalStatus" />
         </td>
       </template>
 
       <template v-slot:[`item.score`]="{ item }">
         <td class="v-data-table__divider">
-          <typography :value="String(item.score).slice(0, 4)" />
+          <attribute-chip confidence-score :value="String(item.score)" />
         </td>
       </template>
 
-      <template
-        v-slot:[`group.header`]="{
-          group,
-          groupBy,
-          isOpen,
-          headers,
-          toggle,
-          remove,
-        }"
-      >
-        <td :colspan="headers.length">
-          <flex-box y="2" x="2" align="center">
-            <generic-icon-button
-              small
-              icon-id="mdi-close"
-              tooltip="Remove Grouping"
-              @click="remove"
-            />
-            <generic-icon-button
-              small
-              :icon-id="isOpen ? 'mdi-chevron-up' : 'mdi-chevron-down'"
-              :tooltip="isOpen ? 'Hide Group' : 'Show Group'"
-              @click="toggle"
-            />
-            <typography :value="displayGroupHeader(groupBy)" x="2" />
-            <approval-chip
-              v-if="groupBy.includes('approvalStatus')"
-              :status="group"
-            />
-            <table-chip
-              v-else
-              :text="group"
-              :display-icon="
-                groupBy.includes('sourceType') || groupBy.includes('targetType')
-              "
-            />
-          </flex-box>
-        </td>
+      <template v-slot:[`group.header`]="data">
+        <trace-link-table-group :data="data" />
       </template>
 
       <template v-slot:expanded-item="{ headers, item }">
         <td :colspan="headers.length" class="pb-2">
           <trace-link-display
             :link="item"
-            :show-decline="showDeclined(item)"
-            :show-approve="showApproved(item)"
-            :show-delete="false"
             @link:approve="handleApprove($event)"
             @link:decline="handleDecline($event)"
+            @link:unreview="handleUnreview($event)"
           />
         </td>
       </template>
@@ -121,16 +73,10 @@ import Vue from "vue";
 import { ApprovalType, TraceLinkModel, VersionModel } from "@/types";
 import { appModule, artifactModule, projectModule } from "@/store";
 import { getGeneratedLinks } from "@/api";
-import {
-  FlexBox,
-  TableChip,
-  Typography,
-  GenericIconButton,
-} from "@/components/common";
-import TraceLinkDisplay from "./TraceLinkDisplay.vue";
-import SectionControls from "./SectionControls.vue";
-import ApprovalChip from "./ApprovalChip.vue";
-import { camelcaseToDisplay } from "@/util";
+import { AttributeChip } from "@/components/common";
+import TraceLinkDisplay from "../TraceLinkDisplay.vue";
+import TraceLinkTableHeader from "./TraceLinkTableHeader.vue";
+import TraceLinkTableGroup from "./TraceLinkTableGroup.vue";
 
 /**
  * Displays a table of trace links.
@@ -138,13 +84,10 @@ import { camelcaseToDisplay } from "@/util";
 export default Vue.extend({
   name: "TraceLinkTable",
   components: {
-    GenericIconButton,
-    Typography,
-    ApprovalChip,
-    SectionControls,
-    FlexBox,
+    TraceLinkTableGroup,
+    TraceLinkTableHeader,
+    AttributeChip,
     TraceLinkDisplay,
-    TableChip,
   },
   data() {
     return {
@@ -254,28 +197,6 @@ export default Vue.extend({
       }
     },
     /**
-     * Converts the group attributes into a display string.
-     */
-    displayGroupHeader(groupBy: (keyof TraceLinkModel)[]): string {
-      return groupBy.map(camelcaseToDisplay).join(", ") + ":";
-    },
-    /**
-     * Determines whether to show approval for a link.
-     *
-     * @param link - The link to display.
-     */
-    showApproved(link: TraceLinkModel): boolean {
-      return !this.approved.includes(link.traceLinkId);
-    },
-    /**
-     * Determines whether to show decline for a link.
-     *
-     * @param link - The link to display.
-     */
-    showDeclined(link: TraceLinkModel): boolean {
-      return !this.declined.includes(link.traceLinkId);
-    },
-    /**
      * Opens all panels.
      */
     handleOpenAll() {
@@ -308,6 +229,19 @@ export default Vue.extend({
         (declinedId) => declinedId != link.traceLinkId
       );
       this.declined.push(link.traceLinkId);
+    },
+    /**
+     * Unreivews the given link and updates the stored links.
+     *
+     * @param link - The link to unreview.
+     */
+    handleUnreview(link: TraceLinkModel) {
+      this.approved = this.approved.filter(
+        (declinedId) => declinedId != link.traceLinkId
+      );
+      this.declined = this.declined.filter(
+        (declinedId) => declinedId != link.traceLinkId
+      );
     },
     /**
      * Handles viewing a trace link.

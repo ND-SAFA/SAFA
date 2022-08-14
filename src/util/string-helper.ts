@@ -37,14 +37,28 @@ export function capitalize(str: string): string {
 }
 
 /**
- * Converts camel case to sentence case.
+ * Converts `camelCase` to `Sentence Case`.
  *
- * @param str - The string to convert.
+ * @param str - The string to convert.ize.
  *
- * @return The converted string.
+ * @return The capitalized string.
  */
 export function camelcaseToDisplay(str: string): string {
   return capitalize(str.replace(/([A-Z])/g, " $1"));
+}
+
+/**
+ * Converts `UPPER_CASE` to `Sentence Case`.
+ *
+ * @param str - The string to convert.
+ *
+ * @return The capitalized string.
+ */
+export function uppercaseToDisplay(str: string): string {
+  return str
+    .split("_")
+    .map((word) => capitalize(word))
+    .join(" ");
 }
 
 /**

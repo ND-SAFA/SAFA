@@ -5,5 +5,4 @@ export * from "./display";
 export * from "./modals";
 export * from "./stepper";
 export * from "./cytoscape";
-export * from "./table";
 export * from "./public";

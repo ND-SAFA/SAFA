@@ -30,7 +30,7 @@
         <table-group-header :data="data" />
       </template>
 
-      <template v-slot:[`item.sourceType`]="{ item, header }">
+      <template v-slot:[`item.sourceType`]="{ item }">
         <td class="v-data-table__divider">
           <attribute-chip :value="item.sourceType" artifact-type />
         </td>
@@ -217,6 +217,9 @@ export default Vue.extend({
         (declinedId) => declinedId != link.traceLinkId
       );
       this.approved.push(link.traceLinkId);
+      this.expanded = this.expanded.filter(
+        (expandedLink) => expandedLink.traceLinkId !== link.traceLinkId
+      );
     },
     /**
      * Declines the given link and updates the stored links.
@@ -228,6 +231,9 @@ export default Vue.extend({
         (declinedId) => declinedId != link.traceLinkId
       );
       this.declined.push(link.traceLinkId);
+      this.expanded = this.expanded.filter(
+        (expandedLink) => expandedLink.traceLinkId !== link.traceLinkId
+      );
     },
     /**
      * Unreivews the given link and updates the stored links.
@@ -240,6 +246,9 @@ export default Vue.extend({
       );
       this.declined = this.declined.filter(
         (declinedId) => declinedId != link.traceLinkId
+      );
+      this.expanded = this.expanded.filter(
+        (expandedLink) => expandedLink.traceLinkId !== link.traceLinkId
       );
     },
     /**
@@ -259,5 +268,3 @@ export default Vue.extend({
   },
 });
 </script>
-
-<style scoped></style>

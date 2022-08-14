@@ -15,7 +15,8 @@ import org.json.JSONObject;
 public interface ITraceFIle extends IDataFile<TraceAppEntity> {
     static void validateTraceDefinition(JSONObject traceDefinition) {
         FileUtilities.assertHasKeys(traceDefinition, AbstractTraceFile.Constants.REQUIRED_DEFINITION_FIELDS);
-        List<String> oneRequired = List.of(AbstractTraceFile.Constants.GENERATE_LINKS_PARAM, TimFileParser.Constants.FILE_PARAM);
+        List<String> oneRequired = List.of(AbstractTraceFile.Constants.GENERATE_LINKS_PARAM,
+            TimFileParser.Constants.FILE_PARAM);
         boolean containsOne = false;
         for (String oneRequiredField : oneRequired) {
             if (traceDefinition.has(oneRequiredField)) {

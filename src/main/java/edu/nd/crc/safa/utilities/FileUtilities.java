@@ -38,7 +38,7 @@ public class FileUtilities {
     public static CSVParser readCSVFile(String pathToFile) throws IOException {
         File csvData = new File(pathToFile);
         if (!csvData.exists()) {
-            String errorMessage = String.format("Cannot find CSV file %s.", csvData.getName());
+            String errorMessage = String.format("Could not find CSV file %s.", csvData.getAbsolutePath());
             throw new IOException(errorMessage);
         }
 

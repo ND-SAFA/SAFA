@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.builders.entities;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -26,6 +27,7 @@ import edu.nd.crc.safa.features.documents.repositories.DocumentRepository;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.repositories.ProjectRepository;
+import edu.nd.crc.safa.features.projects.services.ProjectService;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.traces.entities.db.TraceLink;
 import edu.nd.crc.safa.features.traces.entities.db.TraceLinkVersion;
@@ -61,6 +63,7 @@ public class DbEntityBuilder extends BaseBuilder {
     private final TraceLinkVersionRepository traceLinkVersionRepository;
     private final ProjectMembershipRepository projectMembershipRepository;
     private final ArtifactVersionRepositoryImpl artifactVersionRepositoryImpl;
+    private final ProjectService projectService;
     Map<String, Project> projects;
     Map<String, Map<Integer, ProjectVersion>> versions;
     Map<String, Map<String, Document>> documents;
@@ -81,7 +84,8 @@ public class DbEntityBuilder extends BaseBuilder {
                            ArtifactVersionRepository artifactVersionRepository,
                            TraceLinkRepository traceLinkRepository,
                            TraceLinkVersionRepository traceLinkVersionRepository,
-                           ArtifactVersionRepositoryImpl artifactVersionRepositoryImpl) {
+                           ArtifactVersionRepositoryImpl artifactVersionRepositoryImpl,
+                           ProjectService projectService) {
         this.projectRepository = projectRepository;
         this.projectVersionRepository = projectVersionRepository;
         this.documentRepository = documentRepository;
@@ -93,6 +97,7 @@ public class DbEntityBuilder extends BaseBuilder {
         this.traceLinkVersionRepository = traceLinkVersionRepository;
         this.projectMembershipRepository = projectMembershipRepository;
         this.artifactVersionRepositoryImpl = artifactVersionRepositoryImpl;
+        this.projectService = projectService;
     }
 
     public static DbEntityBuilder getInstance() {
@@ -104,14 +109,13 @@ public class DbEntityBuilder extends BaseBuilder {
         DbEntityBuilder.instance = this;
     }
 
-    public void createEmptyData() {
+    public void createEmptyData() throws IOException {
         this.projects = new Hashtable<>();
         this.versions = new Hashtable<>();
         this.documents = new Hashtable<>();
         this.artifactTypes = new Hashtable<>();
         this.artifacts = new Hashtable<>();
         this.bodies = new Hashtable<>();
-        this.projectRepository.deleteAll();
         this.projectVersionRepository.deleteAll();
         this.documentRepository.deleteAll();
         this.documentArtifactRepository.deleteAll();
@@ -119,6 +123,12 @@ public class DbEntityBuilder extends BaseBuilder {
         this.artifactRepository.deleteAll();
         this.artifactVersionRepository.deleteAll();
         this.revisionNumber = 1;
+
+        //Deletes project data
+        for (Project project : this.projectRepository.findAll()) {
+            projectService.deleteProject(project);
+        }
+        projectRepository.deleteAll();
     }
 
     public void setCurrentUser(SafaUser user) {

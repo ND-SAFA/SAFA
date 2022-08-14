@@ -3,10 +3,10 @@ package features.utilities;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.io.IOException;
 import java.util.List;
 
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
 import features.base.DefaultProjectConstants;
@@ -50,9 +50,9 @@ class TestCSVReader extends EntityBaseTest {
 
     @Test
     void csvFileNotFound() {
-        Exception exception = assertThrows(SafaError.class, () -> {
+        Exception exception = assertThrows(IOException.class, () -> {
             FileUtilities.readCSVFile("/abc/123");
         });
-        assertThat(exception.getMessage()).contains("not exist");
+        assertThat(exception.getMessage()).contains("/abc/123");
     }
 }

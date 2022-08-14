@@ -26,7 +26,7 @@ public class SafaError extends RuntimeException {
     }
 
     public SafaError(String format, Object... args) {
-        this(String.format(format.replaceAll("%s", "%s"), args));
+        this(String.format(format.replace("%s", "[%s]"), args));
     }
 
     public SafaError(String message, Exception e) {

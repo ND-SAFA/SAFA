@@ -2,7 +2,7 @@ package features.jobs.logic.flatfiles;
 
 import java.util.UUID;
 
-import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.config.ProjectPaths;
 
 import features.jobs.base.AbstractUpdateProjectViaFlatFileTest;
 import features.jobs.base.JobTestService;
@@ -25,7 +25,7 @@ class TestProjectCreationWorkerFlatFile extends AbstractUpdateProjectViaFlatFile
     void testDefaultProjectCompletes() throws Exception {
 
         // Step - Find Job
-        UUID jobId = updateProjectViaFlatFiles(AppRoutes.Jobs.FLAT_FILE_PROJECT_UPDATE_JOB);
+        UUID jobId = updateProjectViaFlatFiles(ProjectPaths.Tests.DefaultProject.V1);
 
         // Step - Get Job and subscribe for updates
         createNewConnection(defaultUser).subscribeToJob(defaultUser, jobService.getJobById(jobId));

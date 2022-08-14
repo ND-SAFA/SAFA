@@ -38,7 +38,8 @@ public class FileUploadService {
 
         for (MultipartFile requestFile : requestFiles) {
             try {
-                String pathToFile = ProjectPaths.Storage.uploadedProjectFilePath(project, requestFile.getOriginalFilename());
+                String pathToFile = ProjectPaths.Storage.uploadedProjectFilePath(project,
+                    requestFile.getOriginalFilename());
                 Path pathToUploadedFile = Paths.get(pathToFile);
                 File newFile = new File(pathToUploadedFile.toString());
                 File parentFile = newFile.getParentFile();

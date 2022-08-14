@@ -87,6 +87,4 @@ public abstract class AbstractTraceFile<I> extends AbstractDataFile<TraceAppEnti
         }
         return errors;
     }
-
-
 }

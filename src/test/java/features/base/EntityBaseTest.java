@@ -1,5 +1,7 @@
 package features.base;
 
+import java.io.IOException;
+
 import edu.nd.crc.safa.builders.JsonBuilder;
 import edu.nd.crc.safa.builders.entities.DbEntityBuilder;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactRepository;
@@ -97,7 +99,7 @@ public abstract class EntityBaseTest extends SpringBootBaseTest {
     ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
-    public void createNewBuilders() {
+    public void createNewBuilders() throws IOException {
         dbEntityBuilder.createEmptyData();
         jsonBuilder.createEmptyData();
     }

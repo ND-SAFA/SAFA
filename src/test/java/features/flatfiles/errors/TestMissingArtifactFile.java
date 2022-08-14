@@ -20,6 +20,6 @@ class TestMissingArtifactFile extends AbstractUpdateProjectViaFlatFileTest {
         JSONObject response = updateProjectViaFlatFiles(ProjectPaths.Tests.MISSING_DATA_FILE,
             status().is4xxClientError());
         String errorMessage = response.getString("message");
-        assertThat(errorMessage).contains("missing").contains(missingArtifactFile);
+        assertThat(errorMessage).contains(missingArtifactFile);
     }
 }

@@ -27,8 +27,8 @@ public class OSHelper {
     public static void clearOrCreateDirectory(String pathToDir) throws IOException {
         File myDir = new File(pathToDir);
 
-        if (!myDir.exists() && !myDir.mkdirs()) {
-            throw new SafaError("creating folder at path: %s", pathToDir);
+        if (!myDir.exists()) {
+            myDir.mkdirs();
         }
 
         FileUtils.cleanDirectory(myDir);

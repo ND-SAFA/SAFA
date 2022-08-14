@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.builders;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -7,7 +8,7 @@ import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
 
 public abstract class BaseBuilder {
 
-    public abstract void createEmptyData();
+    public abstract void createEmptyData() throws IOException;
 
     protected <T, K> void addEntry(Map<String, Map<K, T>> table,
                                    String projectName,

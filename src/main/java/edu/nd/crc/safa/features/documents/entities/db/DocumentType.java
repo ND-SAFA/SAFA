@@ -10,24 +10,22 @@ public enum DocumentType {
     /**
      * Document containing only pure system artifacts.
      */
-    ARTIFACT_TREE("ARTIFACT_TREE"),
+    ARTIFACT_TREE,
     /**
      * Document containing AND & OR nodes
      */
-    FTA("FTA"),
+    FTA,
     /**
      * Document containing context, goals, strategies, and evidence.
      */
-    SAFETY_CASE("SAFETY_CASE"),
+    SAFETY_CASE,
     /**
      * Document being represented in a table.
      */
-    FMEA("FMEA");
-
-    private String value;
+    FMEA;
 
     @Override
     public String toString() {
-        return this.value;
+        return this.name();
     }
 }

@@ -2,7 +2,7 @@
   <card-page id="login-view">
     <template v-slot:form>
       <v-text-field
-        filled
+        outlined
         label="Email"
         v-model="email"
         :error-messages="isError ? ['Invalid username or password'] : []"

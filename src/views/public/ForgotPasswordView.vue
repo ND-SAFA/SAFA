@@ -16,7 +16,7 @@
         />
 
         <v-text-field
-          filled
+          outlined
           label="Email"
           v-model="email"
           :error-messages="isError ? ['Unable to reset password'] : []"

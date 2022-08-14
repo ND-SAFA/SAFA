@@ -1,6 +1,6 @@
 <template>
   <v-text-field
-    filled
+    outlined
     :label="label"
     v-model="model"
     :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"

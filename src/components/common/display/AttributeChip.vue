@@ -11,7 +11,12 @@
         :color="color"
       >
         <v-icon v-if="iconId" small>{{ iconId }}</v-icon>
-        <typography ellipsis inherit-color :l="iconId ? 1 : 0" :value="text" />
+        <typography
+          ellipsis
+          inherit-color
+          :l="iconId ? '1' : '0'"
+          :value="text"
+        />
       </v-chip>
     </template>
     <span>{{ text }}</span>

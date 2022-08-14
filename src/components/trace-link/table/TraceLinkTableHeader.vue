@@ -53,7 +53,7 @@ export default Vue.extend({
      * Emits a call to close all items.
      */
     handleCloseAll() {
-      this.$emit("clos:all");
+      this.$emit("close:all");
     },
   },
 });

@@ -26,7 +26,7 @@ export enum ThemeColors {
  * @return The color.
  */
 export function getBackgroundColor(
-  state?: ArtifactDeltaState | ApprovalType
+  state?: ArtifactDeltaState | ApprovalType | string
 ): string {
   switch (state) {
     case ApprovalType.APPROVED:
@@ -40,6 +40,26 @@ export function getBackgroundColor(
       return ThemeColors.removed;
     default:
       return ThemeColors.lightGrey;
+  }
+}
+
+/**
+ * Returns the background color for the given confidence score.
+ * @param score - The score to get the color for.
+ * @return The color.
+ */
+export function getScoreColor(score: number | string): string {
+  const [ints, decimals] = String(score).split(".");
+  const tenths = decimals[0];
+
+  if (ints === "1" || ["8", "9"].includes(tenths)) {
+    return ThemeColors.added;
+  } else if (["6", "7"].includes(tenths)) {
+    return ThemeColors.secondary;
+  } else if (["4", "5"].includes(tenths)) {
+    return ThemeColors.accent;
+  } else {
+    return ThemeColors.error;
   }
 }
 

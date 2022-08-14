@@ -25,21 +25,19 @@
         />
       </template>
 
+      <template v-slot:[`group.header`]="data">
+        <table-group-header :data="data" />
+      </template>
+
       <template v-slot:[`item.name`]="{ item }">
-        <td>
-          <flex-box align="center">
-            <artifact-table-delta-chip :artifact="item" />
-            <v-icon v-if="getHasWarnings(item)" color="secondary">
-              mdi-hazard-lights
-            </v-icon>
-            <typography l="1" :value="item.name" />
-          </flex-box>
+        <td class="v-data-table__divider">
+          <artifact-table-row-name :artifact="item" />
         </td>
       </template>
 
       <template v-slot:[`item.type`]="{ item }">
-        <td>
-          <table-chip :text="item.type" display-icon />
+        <td class="v-data-table__divider">
+          <attribute-chip :value="item.type" artifact-type />
         </td>
       </template>
 
@@ -47,23 +45,14 @@
         v-for="column in columns"
         v-slot:[`item.${column.id}`]="{ item }"
       >
-        <td :key="column.id">
+        <td :key="column.id" class="v-data-table__divider">
           <artifact-table-cell :column="column" :item="item" />
         </td>
       </template>
 
       <template v-slot:[`item.actions`]="{ item }">
         <td @click.stop="">
-          <generic-icon-button
-            icon-id="mdi-pencil"
-            :tooltip="`Edit '${item.name}'`"
-            @click="handleEdit(item)"
-          />
-          <generic-icon-button
-            icon-id="mdi-delete"
-            :tooltip="`Delete '${item.name}'`"
-            @click="handleDelete(item)"
-          />
+          <artifact-table-row-actions :artifact="item" />
         </td>
       </template>
 
@@ -85,18 +74,16 @@ import {
   artifactSelectionModule,
   deltaModule,
   documentModule,
-  errorModule,
 } from "@/store";
-import { handleDeleteArtifact } from "@/api";
 import {
-  GenericIconButton,
   Typography,
-  FlexBox,
-  TableChip,
+  AttributeChip,
+  TableGroupHeader,
 } from "@/components/common";
 import ArtifactTableHeader from "./ArtifactTableHeader.vue";
 import ArtifactTableCell from "./ArtifactTableCell.vue";
-import ArtifactTableDeltaChip from "./ArtifactTableDeltaChip.vue";
+import ArtifactTableRowName from "./ArtifactTableRowName.vue";
+import ArtifactTableRowActions from "./ArtifactTableRowActions.vue";
 
 /**
  * Represents a table of artifacts.
@@ -104,13 +91,13 @@ import ArtifactTableDeltaChip from "./ArtifactTableDeltaChip.vue";
 export default Vue.extend({
   name: "ArtifactTable",
   components: {
-    FlexBox,
+    ArtifactTableRowActions,
+    AttributeChip,
     Typography,
-    ArtifactTableDeltaChip,
     ArtifactTableHeader,
-    TableChip,
-    GenericIconButton,
     ArtifactTableCell,
+    ArtifactTableRowName,
+    TableGroupHeader,
   },
   data() {
     return {
@@ -138,7 +125,6 @@ export default Vue.extend({
     isTableView(): boolean {
       return documentModule.isTableDocument;
     },
-
     /**
      * @return The artifact table's headers.
      */
@@ -210,23 +196,6 @@ export default Vue.extend({
       }
     },
     /**
-     * Opens the edit artifact window.
-     * @param artifact - The artifact to edit.
-     */
-    handleEdit(artifact: ArtifactModel) {
-      artifactSelectionModule.selectArtifact(artifact.id);
-      appModule.openArtifactCreatorTo({
-        isNewArtifact: false,
-      });
-    },
-    /**
-     * Opens the delete artifact window.
-     * @param artifact - The artifact to delete.
-     */
-    handleDelete(artifact: ArtifactModel) {
-      handleDeleteArtifact(artifact, {});
-    },
-    /**
      * Returns the background class name of an artifact row.
      * @param item - The artifact to display.
      * @return The class name to add to the artifact.
@@ -237,14 +206,6 @@ export default Vue.extend({
       }
 
       return "";
-    },
-    /**
-     * Returns whether the artifact has any warnings.
-     * @param item - The artifact to search for
-     * @return Whether the artifact has warnings.
-     */
-    getHasWarnings(item: ArtifactModel): boolean {
-      return errorModule.getWarningsByIds([item.id]).length > 0;
     },
   },
 });

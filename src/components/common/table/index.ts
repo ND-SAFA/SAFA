@@ -1,1 +1,1 @@
-export { default as TableChip } from "./TableChip.vue";
+export { default as TableGroupHeader } from "./TableGroupHeader.vue";

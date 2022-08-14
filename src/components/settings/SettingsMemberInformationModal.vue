@@ -3,9 +3,9 @@
     <template v-slot:body>
       <flex-box align="center" t="4">
         <v-text-field
+          filled
           v-model="userEmail"
           label="User Email"
-          outlined
           dense
           hide-details
           class="mr-1"

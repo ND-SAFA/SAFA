@@ -9,6 +9,7 @@
           color="primary"
           :disabled="isButtonDisabled"
           @click="$emit('add')"
+          data-cy="button-create-panel"
         >
           Create new {{ itemName }}
         </v-btn>

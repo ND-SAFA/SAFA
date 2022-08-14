@@ -11,7 +11,12 @@
       <v-icon class="mx-2">mdi-arrow-right</v-icon>
       <button-row :definitions="[targetDefinition]" />
     </flex-box>
-    <v-btn @click="handleSubmit" color="primary" class="ml-10">
+    <v-btn
+      @click="handleSubmit"
+      color="primary"
+      class="ml-10"
+      data-cy="button-create-trace-matrix"
+    >
       Create Trace Matrix
     </v-btn>
   </flex-box>

@@ -1,7 +1,7 @@
 <template>
   <v-file-input
     clearable
-    outlined
+    filled
     small-chips
     label="Upload Files"
     :multiple="multiple"

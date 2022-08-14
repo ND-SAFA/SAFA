@@ -7,7 +7,12 @@ import {
   IOHandlerCallback,
 } from "@/types";
 import { appModule, logModule, projectModule } from "@/store";
-import { createLink, updateApprovedLink, updateDeclinedLink } from "@/api";
+import {
+  createLink,
+  updateApprovedLink,
+  updateDeclinedLink,
+  updateUnreviewedLink,
+} from "@/api";
 
 /**
  * Creates a new trace link.
@@ -60,8 +65,6 @@ export async function handleApproveLink(
 ): Promise<void> {
   const currentStatus = link.approvalStatus;
 
-  link.approvalStatus = ApprovalType.APPROVED;
-
   linkAPIHandler(link, updateApprovedLink, {
     onSuccess: async () => {
       await projectModule.addOrUpdateTraceLinks([link]);
@@ -88,8 +91,6 @@ export async function handleDeclineLink(
 ): Promise<void> {
   const currentStatus = link.approvalStatus;
 
-  link.approvalStatus = ApprovalType.DECLINED;
-
   linkAPIHandler(link, updateDeclinedLink, {
     onSuccess: async () => {
       await projectModule.deleteTraceLinks([link]);
@@ -98,6 +99,31 @@ export async function handleDeclineLink(
     onError: (e) => {
       link.approvalStatus = currentStatus;
       logModule.onError("Unable to decline this link");
+      onError?.(e);
+    },
+  });
+}
+
+/**
+ * Processes link unreview, setting the app state to loading in between, and updating trace links afterwards.
+ *
+ * @param link - The trace link to process.
+ * @param onSuccess - Called if the action is successful.
+ * @param onError - Called if the action fails.
+ */
+export async function handleUnreviewLink(
+  link: TraceLinkModel,
+  { onSuccess, onError }: IOHandlerCallback
+): Promise<void> {
+  const currentStatus = link.approvalStatus;
+
+  linkAPIHandler(link, updateUnreviewedLink, {
+    onSuccess: () => {
+      onSuccess?.();
+    },
+    onError: (e) => {
+      link.approvalStatus = currentStatus;
+      logModule.onError("Unable to reset this link");
       onError?.(e);
     },
   });

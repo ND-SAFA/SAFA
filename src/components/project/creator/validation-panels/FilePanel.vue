@@ -2,7 +2,13 @@
   <v-expansion-panel>
     <v-expansion-panel-header>
       <flex-box align="center">
-        <v-icon class="mr-1" :color="iconColor">{{ iconName }}</v-icon>
+        <v-icon
+          class="mr-1"
+          :color="iconColor"
+          data-cy="button-artifact-dropbox"
+        >
+          {{ iconName }}
+        </v-icon>
         <slot name="title" />
       </flex-box>
     </v-expansion-panel-header>
@@ -20,13 +26,14 @@
           v-if="showFileUploader"
           v-model="ignoreErrors"
           label="Ignore Errors"
+          data-cy="button-ignore-errors"
         />
         <typography v-if="!isValid && showFileUploader" error :value="error" />
       </flex-box>
 
       <v-expansion-panels accordion>
         <v-expansion-panel v-if="entityNames.length !== 0">
-          <v-expansion-panel-header>
+          <v-expansion-panel-header data-cy="button-file-entities">
             <typography variant="subtitle" value="Entities" />
           </v-expansion-panel-header>
           <v-expansion-panel-content>
@@ -65,7 +72,13 @@
 
       <flex-box justify="space-between" t="4">
         <v-spacer />
-        <v-btn @click="$emit('delete')" color="error"> Delete </v-btn>
+        <v-btn
+          @click="$emit('delete')"
+          color="error"
+          data-cy="button-delete-artifact"
+        >
+          Delete
+        </v-btn>
       </flex-box>
     </v-expansion-panel-content>
   </v-expansion-panel>

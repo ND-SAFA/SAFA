@@ -1,20 +1,29 @@
 <template>
-  <v-row v-if="isOpen" align="center" class="mx-auto my-3">
+  <flex-box v-if="isOpen" full-width>
     <v-text-field
-      v-model="artifactName"
-      label="Artifact Name"
+      filled
       required
+      dense
+      v-model="artifactName"
+      label="Artifact Type Name"
       :error-messages="errors"
       @keydown.enter="handleEnterPress"
+      data-cy="input-artifact-type"
     />
-    <v-btn @click="handleSubmit" color="primary" class="ml-1">
-      Create Artifact
+    <v-btn
+      @click="handleSubmit"
+      color="primary"
+      class="ml-1 mt-2"
+      data-cy="button-artifact-type"
+    >
+      Create Artifact Type
     </v-btn>
-  </v-row>
+  </flex-box>
 </template>
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
+import { FlexBox } from "@/components/common";
 
 /**
  * Modal for creating new artifact types.
@@ -24,6 +33,7 @@ import Vue, { PropType } from "vue";
  */
 export default Vue.extend({
   name: "ArtifactTypeCreator",
+  components: { FlexBox },
   props: {
     isOpen: {
       type: Boolean,

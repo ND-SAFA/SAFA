@@ -18,12 +18,14 @@ declare namespace Cypress {
      * @param inputValue - The value to set.
      */
     inputText(dataCy: string, inputValue: string): Chainable<void>;
+
     /**
      * Clicks a button.
      *
      * @param dataCy - The testing selector of the button to click.
      */
     clickButton(dataCy: string): Chainable<void>;
+
     /**
      * Uploads files.
      *
@@ -31,6 +33,7 @@ declare namespace Cypress {
      * @param filePaths - The paths to the files to upload.
      */
     uploadFiles(dataCy: string, ...filePaths: string[]): Chainable<void>;
+
     /**
      * Clicks to switch to a different tab.
      *
@@ -47,9 +50,22 @@ declare namespace Cypress {
      * @param password - The password to log in with.
      */
     login(email: string, password: string): Chainable<void>;
+
     /**
      * Logs out of the app.
      */
     logout(): Chainable<void>;
+
+    // Project Creator Commands
+
+    /**
+     * Setting the project name and description within the standard project creator.
+     * @param name - Project name.
+     * @param description - Project description.
+     */
+    setProjectInformationInStandardUpload(
+      name?: string,
+      description?: string
+    ): Chainable<void>;
   }
 }

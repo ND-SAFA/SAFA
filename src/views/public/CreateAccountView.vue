@@ -16,7 +16,7 @@
         />
 
         <v-text-field
-          outlined
+          filled
           label="Email"
           v-model="email"
           :error-messages="isError ? ['Unable to create an account'] : []"

@@ -1,7 +1,7 @@
 <template>
   <flex-box v-if="isOpen" full-width>
     <v-text-field
-      outlined
+      filled
       required
       dense
       v-model="artifactName"
@@ -13,7 +13,7 @@
     <v-btn
       @click="handleSubmit"
       color="primary"
-      class="ml-1"
+      class="ml-1 mt-2"
       data-cy="button-artifact-type"
     >
       Create Artifact Type

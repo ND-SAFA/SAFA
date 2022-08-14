@@ -1,13 +1,13 @@
 <template>
   <v-container style="max-width: 30em">
     <v-text-field
-      outlined
+      filled
       v-model="currentName"
       label="Project Name"
       data-cy="input-project-name"
     />
     <v-textarea
-      outlined
+      filled
       hide-details
       v-model="currentDescription"
       label="Project Description"

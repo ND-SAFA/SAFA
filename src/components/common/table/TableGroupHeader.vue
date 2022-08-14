@@ -1,21 +1,23 @@
 <template>
   <td :colspan="data.headers.length">
-    <flex-box y="2" x="2" align="center">
+    <flex-box y="2" x="2" align="center" justify="space-between">
+      <flex-box align="center">
+        <generic-icon-button
+          small
+          :icon-id="data.isOpen ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+          :tooltip="data.isOpen ? 'Hide Group' : 'Show Group'"
+          @click="data.toggle"
+        />
+        <typography :value="displayGroupHeader(data.groupBy)" x="2" />
+        <attribute-chip :value="data.group" :artifact-type="artifactType" />
+        <typography secondary :value="data.items.length" x="2" />
+      </flex-box>
       <generic-icon-button
         small
         icon-id="mdi-close"
         tooltip="Remove Grouping"
         @click="data.remove"
       />
-      <generic-icon-button
-        small
-        :icon-id="data.isOpen ? 'mdi-chevron-up' : 'mdi-chevron-down'"
-        :tooltip="data.isOpen ? 'Hide Group' : 'Show Group'"
-        @click="data.toggle"
-      />
-      <typography :value="displayGroupHeader(data.groupBy)" x="2" />
-      <attribute-chip :value="data.group" :artifact-type="artifactType" />
-      <typography secondary :value="data.items.length" x="2" />
     </flex-box>
   </td>
 </template>

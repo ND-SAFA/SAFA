@@ -30,7 +30,7 @@
         <table-group-header :data="data" />
       </template>
 
-      <template v-slot:[`item.sourceType`]="{ item }">
+      <template v-slot:[`item.sourceType`]="{ item, header }">
         <td class="v-data-table__divider">
           <attribute-chip :value="item.sourceType" artifact-type />
         </td>
@@ -43,7 +43,7 @@
       </template>
 
       <template v-slot:[`item.approvalStatus`]="{ item }">
-        <td>
+        <td class="v-data-table__divider">
           <attribute-chip :value="item.approvalStatus" />
         </td>
       </template>
@@ -115,15 +115,15 @@ export default Vue.extend({
           divider: true,
         },
         {
-          text: "Confidence Score",
-          value: "score",
-          groupable: false,
-          divider: true,
-        },
-        {
           text: "Approval Status",
           value: "approvalStatus",
           filterable: true,
+          divider: true,
+        },
+        {
+          text: "Confidence Score",
+          value: "score",
+          groupable: false,
           divider: true,
         },
         {

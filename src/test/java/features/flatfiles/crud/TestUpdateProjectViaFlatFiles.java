@@ -33,33 +33,33 @@ class TestUpdateProjectViaFlatFiles extends ApplicationBaseTest {
         ProjectVersion noChangeVersion = dbEntityBuilder.getProjectVersion(projectName, 2);
 
         // Step - Create request to update project via flat files
-        FlatFileRequest.updateProjectVersionFromFlatFiles(updateVersion, ProjectPaths.PATH_TO_DEFAULT_PROJECT);
+        FlatFileRequest.updateProjectVersionFromFlatFiles(updateVersion, ProjectPaths.Tests.DefaultProject.V1);
 
         // VP - Verify that no artifacts associated with empty version
         List<ArtifactVersion> initialBodies = this.artifactVersionRepository.findByProjectVersion(emptyVersion);
-        assertThat(initialBodies.size())
+        assertThat(initialBodies)
             .as("no bodies at init")
-            .isZero();
+            .isEmpty();
 
         // VP - Verify that artifacts are constructed and associated with update version
         List<ArtifactVersion> updateBodies = this.artifactVersionRepository.findByProjectVersion(updateVersion);
-        assertThat(updateBodies.size())
+        assertThat(updateBodies)
             .as("bodies created in later version")
-            .isEqualTo(DefaultProjectConstants.Entities.N_ARTIFACTS);
+            .hasSize(DefaultProjectConstants.Entities.N_ARTIFACTS);
         List<TraceLinkVersion> updateTraces = this.traceLinkVersionRepository.getApprovedLinksInProject(project);
-        assertThat(updateTraces.size()).isEqualTo(DefaultProjectConstants.Entities.N_LINKS);
+        assertThat(updateTraces).hasSize(DefaultProjectConstants.Entities.N_LINKS);
 
         // Step - Create request to parse same flat files at different version
-        FlatFileRequest.updateProjectVersionFromFlatFiles(noChangeVersion, ProjectPaths.PATH_TO_DEFAULT_PROJECT);
+        FlatFileRequest.updateProjectVersionFromFlatFiles(noChangeVersion, ProjectPaths.Tests.DefaultProject.V1);
 
         // VP - No new artifacts were created
         List<ArtifactVersion> noChangeBodies = this.artifactVersionRepository.findByProjectVersion(noChangeVersion);
-        assertThat(noChangeBodies.size())
+        assertThat(noChangeBodies)
             .as("no changes were detected in project versions")
-            .isZero();
+            .isEmpty();
 
         // VP - No new trace links were created
         List<TraceLinkVersion> noChangeTraces = this.traceLinkVersionRepository.getApprovedLinksInProject(project);
-        assertThat(noChangeTraces.size()).isEqualTo(DefaultProjectConstants.Entities.N_LINKS);
+        assertThat(noChangeTraces).hasSize(DefaultProjectConstants.Entities.N_LINKS);
     }
 }

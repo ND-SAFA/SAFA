@@ -42,7 +42,7 @@ class TestApproveLinkInFutureVersion extends AbstractTraceTest {
             .newVersionWithReturn(projectName);
 
         // Step - Upload before files containing generated links
-        FlatFileRequest.updateProjectVersionFromFlatFiles(projectVersion, ProjectPaths.PATH_TO_DEFAULT_PROJECT);
+        FlatFileRequest.updateProjectVersionFromFlatFiles(projectVersion, ProjectPaths.Tests.DefaultProject.V1);
 
         // Step - Get generated links
         String url = getGeneratedLinkEndpoint(dbEntityBuilder.getProjectVersion(projectName, 0));

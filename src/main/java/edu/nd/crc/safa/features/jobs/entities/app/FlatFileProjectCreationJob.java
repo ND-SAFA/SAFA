@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.features.jobs.entities.app;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -66,18 +67,18 @@ public class FlatFileProjectCreationJob extends CommitJob {
     }
 
     @Override
-    public void initJobData() throws SafaError {
+    public void initJobData() throws SafaError, IOException {
         super.initJobData();
         Project project = this.projectVersion.getProject();
         uploadFlatFiles(project);
-        this.pathToFiles = ProjectPaths.getPathToUploadedFiles(project, false);
+        this.pathToFiles = ProjectPaths.Storage.projectUploadsPath(project, false);
         parseTimFile();
     }
 
-    private void uploadFlatFiles(Project project) {
+    private void uploadFlatFiles(Project project) throws IOException {
         FileUploadService fileUploadService = this.serviceProvider.getFileUploadService();
         fileUploadService.uploadFilesToServer(project, Arrays.asList(files));
-        this.pathToTIMFile = ProjectPaths.getPathToFlatFile(project, ProjectVariables.TIM_FILENAME);
+        this.pathToTIMFile = ProjectPaths.Storage.uploadedProjectFilePath(project, ProjectVariables.TIM_FILENAME);
     }
 
     private void parseTimFile() {

@@ -7,6 +7,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -148,11 +150,11 @@ public class FileUtilities {
     public static List<File> extractFilesFromZipContent(String content) throws IOException {
         ZipEntry entry;
         final var zin = new ZipInputStream(new ByteArrayInputStream(content.getBytes(StandardCharsets.ISO_8859_1)));
-        String temporaryFolder = ProjectPaths.createTemporaryDirectory();
+        String temporaryFolder = ProjectPaths.Storage.createTemporaryDirectory();
         List<File> filesCreated = new ArrayList<>();
         while ((entry = zin.getNextEntry()) != null) {
             String name = entry.getName();
-            String pathToFile = ProjectPaths.joinPaths(temporaryFolder, name);
+            String pathToFile = builtPath(temporaryFolder, name);
             try (FileOutputStream outputStream = new FileOutputStream(pathToFile)) {
                 for (var c = zin.read(); c != -1; c = zin.read()) {
                     outputStream.write(c);
@@ -165,10 +167,60 @@ public class FileUtilities {
         return filesCreated;
     }
 
+    /**
+     * Writes content to file.
+     *
+     * @param file        The file to write to.
+     * @param fileContent The content to write to file.
+     * @throws IOException Throws error if problem opening file.
+     */
     public static void writeToFile(File file, String fileContent) throws IOException {
         try (FileWriter myWriter = new FileWriter(file)) {
             myWriter.write(fileContent);
         }
+    }
+
+    /**
+     * Attempts to create directory to given path.
+     *
+     * @param pathToDirectory Path to directory to create.
+     * @param createIfEmpty   Flag used to disable attempt
+     */
+    public static void createDirectoryIfEmpty(String pathToDirectory, boolean createIfEmpty) throws IOException {
+        if (createIfEmpty) {
+            createDirectoryIfEmpty(pathToDirectory);
+        }
+    }
+
+    /**
+     * Creates directory at given path if it does not exist.
+     *
+     * @param pathToDirectory Path to directory to create.
+     * @throws IOException If error occurs while creating directory.
+     */
+    public static void createDirectoryIfEmpty(String pathToDirectory) throws IOException {
+        if (!Files.exists(Paths.get(pathToDirectory))) {
+            Files.createDirectories(Paths.get(pathToDirectory));
+        }
+    }
+
+    /**
+     * Creates OS-aware path of given directory.
+     *
+     * @param directories Directories that once joined create path.
+     * @return String representing built path.
+     */
+    public static String builtPath(String... directories) {
+        StringBuilder finalPath = new StringBuilder();
+        for (int i = 0; i < directories.length; i++) {
+            String p = directories[i];
+            if (i < directories.length - 1) {
+                finalPath.append(p).append(File.separator);
+            } else {
+                finalPath.append(p);
+            }
+        }
+        return finalPath.toString();
     }
 
     public void hasRequiredFields(JSONObject json, Iterator<String> fields) {

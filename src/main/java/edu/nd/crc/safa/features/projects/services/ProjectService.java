@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.features.projects.services;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -59,9 +60,9 @@ public class ProjectService {
      * @param project The project to delete.
      * @throws SafaError Throws error if error occurs while deleting flat files.
      */
-    public void deleteProject(Project project) throws SafaError {
+    public void deleteProject(Project project) throws SafaError, IOException {
         this.projectRepository.delete(project);
-        OSHelper.deletePath(ProjectPaths.getPathToStorage(project, false));
+        OSHelper.deletePath(ProjectPaths.Storage.projectPath(project, false));
     }
 
     /**

@@ -43,7 +43,7 @@ class TestLinkVersioning extends ApplicationBaseTest {
         Project project = v1.getProject();
 
         // Step - Create base trace link
-        String flatFilesPath = ProjectPaths.PATH_TO_MINI_FILES;
+        String flatFilesPath = ProjectPaths.Tests.MINI;
         FlatFileRequest.updateProjectVersionFromFlatFiles(v1, flatFilesPath);
 
         // VP - Verify that link is stored as added

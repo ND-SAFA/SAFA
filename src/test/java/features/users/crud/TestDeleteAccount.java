@@ -22,7 +22,7 @@ class TestDeleteAccount extends AbstractUserTest {
      * Creates new account, verifies it exists, deletes it, and verifies
      * that it is deleted.
      *
-     * @throws Exception Throws errors if HTTP request fails.
+     * @throws Exception If HTTP request fails.
      */
     @Test
     void testDeleteAccount() throws Exception {

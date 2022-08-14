@@ -68,7 +68,7 @@ public abstract class ApplicationBaseTest extends WebSocketBaseTest {
         ProjectVersion projectVersion = createProjectWithNewVersion(projectName);
         Project project = projectVersion.getProject();
         List<MultipartFile> files = MultipartRequestService.readDirectoryAsMultipartFiles(
-            ProjectPaths.PATH_TO_DEFAULT_PROJECT,
+            ProjectPaths.Tests.DefaultProject.V1,
             "files");
         fileUploadService.uploadFilesToServer(project, files);
         return projectVersion;
@@ -107,8 +107,9 @@ public abstract class ApplicationBaseTest extends WebSocketBaseTest {
         ProjectVersion afterVersion = dbEntityBuilder.getProjectVersion(projectName, 1);
 
         if (uploadFiles) {
-            FlatFileRequest.updateProjectVersionFromFlatFiles(beforeVersion, ProjectPaths.PATH_TO_DEFAULT_PROJECT);
-            FlatFileRequest.updateProjectVersionFromFlatFiles(afterVersion, ProjectPaths.PATH_TO_AFTER_FILES);
+            FlatFileRequest.updateProjectVersionFromFlatFiles(beforeVersion,
+                ProjectPaths.Tests.DefaultProject.V1);
+            FlatFileRequest.updateProjectVersionFromFlatFiles(afterVersion, ProjectPaths.Tests.DefaultProject.V2);
         }
 
         return new Pair<>(beforeVersion, afterVersion);

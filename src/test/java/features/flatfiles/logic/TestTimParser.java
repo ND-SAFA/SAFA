@@ -30,26 +30,27 @@ class TestTimParser extends ApplicationBaseTest {
         // Step - Upload files for project
         Project project = this.dbEntityBuilder.newProjectWithReturn(projectName);
         List<MultipartFile> files = MultipartRequestService.readDirectoryAsMultipartFiles(
-            ProjectPaths.PATH_TO_DEFAULT_PROJECT,
+            ProjectPaths.Tests.DefaultProject.V1,
             "files");
         this.fileUploadService.uploadFilesToServer(project, files);
 
         // Step - Start processing for
-        String pathToTimFile = ProjectPaths.getPathToFlatFile(project, ProjectVariables.TIM_FILENAME);
+        String pathToTimFile = ProjectPaths.Storage.uploadedProjectFilePath(project, ProjectVariables.TIM_FILENAME);
         JSONObject timJson = FileUtilities.readJSONFile(pathToTimFile);
-        TimFileParser timFileParser = new TimFileParser(timJson, ProjectPaths.getPathToUploadedFiles(project, false));
+        TimFileParser timFileParser = new TimFileParser(timJson, ProjectPaths.Storage.projectUploadsPath(project,
+            false));
         FlatFileParser flatFileParser = new FlatFileParser(timFileParser);
 
         // VP - Assert that 4 artifact files and 6 trace files
-        assertThat(flatFileParser.getArtifactFiles().size()).isEqualTo(4);
-        assertThat(flatFileParser.getTraceFiles().size()).isEqualTo(6);
+        assertThat(flatFileParser.getArtifactFiles()).hasSize(4);
+        assertThat(flatFileParser.getTraceFiles()).hasSize(6);
     }
 
     @Test
     void testTraceFile() throws IOException {
         Project project = this.dbEntityBuilder.newProjectWithReturn(projectName);
         List<MultipartFile> files = MultipartRequestService.readDirectoryAsMultipartFiles(
-            ProjectPaths.PATH_TO_DEFAULT_PROJECT,
+            ProjectPaths.Tests.DefaultProject.V1,
             "files");
         this.fileUploadService.uploadFilesToServer(project, files);
         MultipartFile file =
@@ -61,6 +62,6 @@ class TestTimParser extends ApplicationBaseTest {
 
         CsvTraceFile traceFile = new CsvTraceFile(file);
         List<TraceAppEntity> traces = traceFile.getEntities();
-        assertThat(traces.size()).isEqualTo(3);
+        assertThat(traces).hasSize(3);
     }
 }

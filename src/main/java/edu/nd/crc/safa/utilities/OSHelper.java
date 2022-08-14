@@ -22,8 +22,7 @@ public class OSHelper {
      * been created then new directory is created.
      *
      * @param pathToDir path to a directory
-     * @throws SafaError failure to delete any files or folders with
-     *                   directory will be thrown.
+     * @throws SafaError If failure to delete any files or folders.
      */
     public static void clearOrCreateDirectory(String pathToDir) throws SafaError {
         File myDir = new File(pathToDir);
@@ -44,8 +43,7 @@ public class OSHelper {
      * Deletes file or folder located at given path
      *
      * @param path path to a file or directory which to delete
-     * @throws SafaError fails if an error occurs while deleting file, directory,
-     *                   or children of directory
+     * @throws SafaError If an error occurs while deleting file, directory, or children of directory.
      */
     public static void deletePath(String path) throws SafaError {
         File objectAtPath = new File(path);

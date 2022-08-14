@@ -185,7 +185,7 @@ public class FlatFileService {
                                                                                 JSONObject timFileJson
     ) throws SafaError, IOException {
         // Step - Create project parser
-        String pathToFiles = ProjectPaths.getPathToUploadedFiles(projectVersion.getProject(), false);
+        String pathToFiles = ProjectPaths.Storage.projectUploadsPath(projectVersion.getProject(), false);
         TimFileParser timFileParser = new TimFileParser(timFileJson, pathToFiles);
         FlatFileParser flatFileParser = new FlatFileParser(timFileParser);
         ProjectCommit projectCommit = new ProjectCommit(projectVersion, false);
@@ -223,7 +223,7 @@ public class FlatFileService {
     }
 
     private JSONObject getTimFileContent(Project project) throws IOException {
-        String pathToTimFile = ProjectPaths.getPathToFlatFile(project, ProjectVariables.TIM_FILENAME);
+        String pathToTimFile = ProjectPaths.Storage.uploadedProjectFilePath(project, ProjectVariables.TIM_FILENAME);
         if (!Files.exists(Paths.get(pathToTimFile))) {
             throw new SafaError("TIM.json file was not uploaded for this project");
         }

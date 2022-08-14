@@ -32,7 +32,7 @@ class TestUploadFiles extends ApplicationBaseTest {
         //Cleanup
         this.projectVersionRepository.delete(projectVersion);
         projectService.deleteProject(project);
-        File oldStorage = new File(ProjectPaths.getPathToUploadedFiles(project, false));
+        File oldStorage = new File(ProjectPaths.Storage.projectUploadsPath(project, false));
         assertThat(oldStorage).as("delete project storage").doesNotExist();
     }
 }

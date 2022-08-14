@@ -48,7 +48,7 @@ public abstract class AbstractFlatFileJobTest extends BaseFlatFileTest {
             .withRoute(AppRoutes.Jobs.FLAT_FILE_PROJECT_UPDATE_JOB)
             .withVersion(projectVersion)
             .getFlatFileHelper()
-            .postWithFilesInDirectory(ProjectPaths.PATH_TO_DEFAULT_PROJECT, kwargs);
+            .postWithFilesInDirectory(ProjectPaths.Tests.DefaultProject.V1, kwargs);
 
         return UUID.fromString(jobSubmissionResponse.getString("id"));
     }

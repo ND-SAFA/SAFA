@@ -29,7 +29,7 @@ class TestFlatFileMessage extends ApplicationBaseTest {
         createNewConnection(clientId).subscribeToVersion(clientId, projectVersion);
 
         // Step - Upload flat files
-        FlatFileRequest.updateProjectVersionFromFlatFiles(projectVersion, ProjectPaths.PATH_TO_DEFAULT_PROJECT);
+        FlatFileRequest.updateProjectVersionFromFlatFiles(projectVersion, ProjectPaths.Tests.DefaultProject.V1);
 
         // VP - Verify that single message sent
         assertThat(getQueueSize(clientId)).isEqualTo(1);

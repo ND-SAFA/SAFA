@@ -65,7 +65,7 @@ public class FileDownloadService {
             for (String targetType : type2TraceMap.getTargetTypes(sourceType)) {
                 // Step - Create file
                 String fileName = String.format("%s2%s.%s", sourceType, targetType, fileType);
-                String pathToFile = ProjectPaths.getPathToProjectFile(project, fileName);
+                String pathToFile = ProjectPaths.Storage.getPathToProjectFile(project, fileName);
                 File traceFileOutput = new File(pathToFile);
 
                 // Step - Create trace file
@@ -88,7 +88,7 @@ public class FileDownloadService {
         List<ArtifactFileIdentifier> artifactFiles = new ArrayList<>();
         for (String artifactType : projectEntityMaps.getArtifactTypes()) {
             String fileName = String.format("%s.%s", artifactType, fileType);
-            String pathToFile = ProjectPaths.getPathToProjectFile(project, fileName);
+            String pathToFile = ProjectPaths.Storage.getPathToProjectFile(project, fileName);
 
             File artifactFileOutput = new File(pathToFile);
             List<ArtifactAppEntity> artifacts = projectEntityMaps.getArtifactsInType(artifactType);
@@ -128,7 +128,7 @@ public class FileDownloadService {
     private File writeTimFile(Project project,
                               List<ArtifactFileIdentifier> artifactFiles,
                               List<TraceFileIdentifier> traceFiles) throws IOException {
-        String pathToFile = ProjectPaths.getPathToProjectFile(project, ProjectVariables.TIM_FILENAME);
+        String pathToFile = ProjectPaths.Storage.getPathToProjectFile(project, ProjectVariables.TIM_FILENAME);
         File timFile = new File(pathToFile);
         JSONObject fileContent = new JSONObject();
         JSONObject dataFiles = new JSONObject();

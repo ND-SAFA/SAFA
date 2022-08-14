@@ -141,7 +141,7 @@ class TestLinkApproval extends AbstractTraceTest {
         Project project = projectVersion.getProject();
 
         // Step - Upload flat files and generate some trace links
-        FlatFileRequest.updateProjectVersionFromFlatFiles(projectVersion, ProjectPaths.PATH_TO_DEFAULT_PROJECT);
+        FlatFileRequest.updateProjectVersionFromFlatFiles(projectVersion, ProjectPaths.Tests.DefaultProject.V1);
 
         // Step - Get all trace links that were generated.
         String url = getGeneratedLinkEndpoint(projectVersion);
@@ -193,7 +193,7 @@ class TestLinkApproval extends AbstractTraceTest {
 
         // Step - Create project with artifacts.
         ProjectVersion projectVersion = dbEntityBuilder.newProject(projectName).newVersionWithReturn(projectName);
-        FlatFileRequest.updateProjectVersionFromFlatFiles(projectVersion, ProjectPaths.PATH_TO_DEFAULT_PROJECT);
+        FlatFileRequest.updateProjectVersionFromFlatFiles(projectVersion, ProjectPaths.Tests.DefaultProject.V1);
 
         // VP - Verify that trace does not exist
         Project project = projectVersion.getProject();

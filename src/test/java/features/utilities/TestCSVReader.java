@@ -9,11 +9,11 @@ import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
+import features.base.DefaultProjectConstants;
+import features.base.EntityBaseTest;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.junit.jupiter.api.Test;
-import features.base.DefaultProjectConstants;
-import features.base.EntityBaseTest;
 
 /**
  * Tests that we are able to read a CSV file containing headers.
@@ -21,7 +21,7 @@ import features.base.EntityBaseTest;
 class TestCSVReader extends EntityBaseTest {
     @Test
     void readCSVFile() throws Exception {
-        String pathToFile = ProjectPaths.getPathToDefaultProjectFile(
+        String pathToFile = ProjectPaths.Tests.DefaultProject.getPathToFile(
             DefaultProjectConstants.File.DESIGN_FILE
         );
         CSVParser designFile = FileUtilities.readCSVFile(pathToFile);

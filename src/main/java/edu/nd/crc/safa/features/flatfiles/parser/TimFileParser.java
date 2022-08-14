@@ -7,7 +7,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
@@ -71,7 +70,7 @@ public class TimFileParser implements IProjectDefinitionParser {
                 ? DocumentType.valueOf(artifactDefinition.getString(Constants.TYPE_PARAM)) : DocumentType.ARTIFACT_TREE;
 
             // Step - Create artifact file parser
-            String pathToFile = ProjectPaths.joinPaths(this.pathToFiles, fileName);
+            String pathToFile = FileUtilities.builtPath(this.pathToFiles, fileName);
             AbstractArtifactFile<?> artifactFile = DataFileBuilder.createArtifactFileParser(artifactType,
                 documentType,
                 pathToFile);
@@ -118,7 +117,7 @@ public class TimFileParser implements IProjectDefinitionParser {
             // Step - If file is defined, create trace file parser
             if (traceFileDefinition.has(Constants.FILE_PARAM)) {
                 String fileName = traceFileDefinition.getString(Constants.FILE_PARAM);
-                String pathToFile = ProjectPaths.joinPaths(this.pathToFiles, fileName);
+                String pathToFile = FileUtilities.builtPath(this.pathToFiles, fileName);
                 AbstractTraceFile<?> traceFile = DataFileBuilder.createTraceFileParser(pathToFile);
                 traceFiles.add(traceFile);
             }

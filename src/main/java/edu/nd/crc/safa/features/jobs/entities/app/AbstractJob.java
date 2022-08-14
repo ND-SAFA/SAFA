@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.features.jobs.entities.app;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
@@ -105,7 +106,7 @@ public abstract class AbstractJob implements Job {
      *
      * @throws SafaError Error occurring during job initialization.
      */
-    public void initJobData() throws SafaError {
+    public void initJobData() throws SafaError, IOException {
     }
 
     @Override

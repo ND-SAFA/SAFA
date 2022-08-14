@@ -32,7 +32,7 @@ class TestArtifactIFileParser extends ApplicationBaseTest {
 
         // Step - parse Design artifact definition specification
         JSONObject jsonSpec = new JSONObject("{\"datafiles\": { \"Design\": {\"file\": \"Design.csv\"}}}");
-        String pathToFiles = ProjectPaths.getPathToUploadedFiles(projectVersion.getProject(), false);
+        String pathToFiles = ProjectPaths.Storage.projectUploadsPath(projectVersion.getProject(), false);
         TimFileParser timFileParser = new TimFileParser(jsonSpec, pathToFiles);
         FlatFileParser flatFileParser = new FlatFileParser(timFileParser);
         EntityParsingResult<ArtifactAppEntity, String> artifactCreationResponse = flatFileParser.parseArtifacts();
@@ -47,7 +47,7 @@ class TestArtifactIFileParser extends ApplicationBaseTest {
     void missingFileKey() throws Exception {
         ProjectVersion projectVersion = createDefaultProject("testProject");
         JSONObject jsonSpec = new JSONObject("{\"datafiles\": { \"Design\": {}}}");
-        String pathToFiles = ProjectPaths.getPathToUploadedFiles(projectVersion.getProject(), false);
+        String pathToFiles = ProjectPaths.Storage.projectUploadsPath(projectVersion.getProject(), false);
         TimFileParser timFileParser = new TimFileParser(jsonSpec, pathToFiles);
         Exception exception = assertThrows(SafaError.class, () -> new FlatFileParser(timFileParser));
         assertThat(exception.getMessage()).contains(TimFileParser.Constants.FILE_PARAM);

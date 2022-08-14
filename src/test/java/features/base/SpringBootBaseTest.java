@@ -44,7 +44,7 @@ public abstract class SpringBootBaseTest {
     /**
      * Sets the current job launcher to run job synchronously so that
      *
-     * @throws Exception Throws exception is error encountered during afterPropertiesSet.
+     * @throws Exception If error encountered during afterPropertiesSet.
      */
     @PostConstruct
     public void afterConstruct() throws Exception {

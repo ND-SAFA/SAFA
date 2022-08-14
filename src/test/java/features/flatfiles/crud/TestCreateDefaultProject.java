@@ -22,7 +22,7 @@ class TestCreateDefaultProject extends BaseFlatFileTest {
         JSONObject responseBody = SafaRequest
             .withRoute(AppRoutes.Projects.FlatFiles.CREATE_NEW_PROJECT_FROM_FLAT_FILES)
             .getFlatFileHelper()
-            .postWithFilesInDirectory(ProjectPaths.PATH_TO_DEFAULT_PROJECT, new JSONObject());
+            .postWithFilesInDirectory(ProjectPaths.Tests.DefaultProject.V1, new JSONObject());
 
         // VP - Verify response contains entities
         Project project = verifyDefaultProjectCreationResponse(responseBody);

@@ -46,7 +46,7 @@ public abstract class ParseBaseTest extends ApplicationBaseTest {
 
     protected JSONObject parseFileAndReturnBody(String routeName, String fileName) throws Exception {
         // Step - Upload flat files
-        String pathToFile = ProjectPaths.getPathToDefaultProjectFile(fileName);
+        String pathToFile = ProjectPaths.Tests.DefaultProject.getPathToFile(fileName);
         return SafaRequest
             .withRoute(routeName)
             .getFlatFileHelper()

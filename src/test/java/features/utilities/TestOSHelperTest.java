@@ -18,7 +18,7 @@ class TestOSHelperTest {
 
     @Test
     void canCreateAndDeleteFolder() throws SafaError {
-        String pathToDummyFolder = ProjectPaths.PATH_TO_BUILD + "/dummy_folder";
+        String pathToDummyFolder = ProjectPaths.BUILD + "/dummy_folder";
         File folder = new File(pathToDummyFolder);
         assertFalse(folder.exists());
         OSHelper.clearOrCreateDirectory(pathToDummyFolder);
@@ -30,7 +30,7 @@ class TestOSHelperTest {
 
     @Test
     void deleteNestedDirectories() throws SafaError {
-        String pathToParent = ProjectPaths.PATH_TO_BUILD + "/dummy_folder";
+        String pathToParent = ProjectPaths.BUILD + "/dummy_folder";
         String pathToChild = pathToParent + "/pathToChild";
 
         File parentFolder = new File(pathToParent);

@@ -25,6 +25,7 @@ import { ApprovalType } from "@/types";
 import {
   camelcaseToDisplay,
   getBackgroundColor,
+  getScoreColor,
   uppercaseToDisplay,
 } from "@/util";
 import { typeOptionsModule } from "@/store";
@@ -68,20 +69,24 @@ export default Vue.extend({
      */
     iconId(): string {
       return this.artifactType
-        ? typeOptionsModule.getArtifactTypeIcon(this.text)
+        ? typeOptionsModule.getArtifactTypeIcon(this.value)
         : this.icon;
     },
     /**
      * @return The color to display for this chip.
      */
     color(): string {
-      return getBackgroundColor(this.value);
+      if (this.confidenceScore) {
+        return getScoreColor(this.value);
+      } else {
+        return getBackgroundColor(this.value);
+      }
     },
     /**
      * @return Whether the chip is outlined.
      */
     outlined(): boolean {
-      return this.enumerated;
+      return this.enumerated || this.confidenceScore;
     },
   },
 });

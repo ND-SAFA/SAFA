@@ -44,6 +44,26 @@ export function getBackgroundColor(
 }
 
 /**
+ * Returns the background color for the given confidence score.
+ * @param score - The score to get the color for.
+ * @return The color.
+ */
+export function getScoreColor(score: number | string): string {
+  const [ints, decimals] = String(score).split(".");
+  const tenths = decimals[0];
+
+  if (ints === "1" || ["8", "9"].includes(tenths)) {
+    return ThemeColors.added;
+  } else if (["6", "7"].includes(tenths)) {
+    return ThemeColors.secondary;
+  } else if (["4", "5"].includes(tenths)) {
+    return ThemeColors.accent;
+  } else {
+    return ThemeColors.error;
+  }
+}
+
+/**
  * Returns the text color for the given delta state.
  * @param deltaState - The delta state to get the color for.
  * @return The color.

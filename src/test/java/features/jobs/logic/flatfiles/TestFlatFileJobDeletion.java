@@ -10,15 +10,15 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 
-import features.jobs.base.AbstractFlatFileJobTest;
+import features.jobs.base.AbstractUpdateProjectViaFlatFileTest;
 import org.junit.jupiter.api.Test;
 
-class TestFlatFileJobDeletion extends AbstractFlatFileJobTest {
+class TestFlatFileJobDeletion extends AbstractUpdateProjectViaFlatFileTest {
 
     @Test
     void testDeleteJob() throws Exception {
         // Create job deletion endpoint
-        UUID jobId = createJobForDefaultProject();
+        UUID jobId = updateProjectViaFlatFiles(AppRoutes.Jobs.FLAT_FILE_PROJECT_UPDATE_JOB);
         JobDbEntity job = this.jobService.getJobById(jobId);
         String route = RouteBuilder
             .withRoute(AppRoutes.Jobs.DELETE_JOB)

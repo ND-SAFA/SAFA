@@ -2,11 +2,13 @@ package features.jobs.logic.flatfiles;
 
 import java.util.UUID;
 
-import features.jobs.base.AbstractFlatFileJobTest;
+import edu.nd.crc.safa.config.AppRoutes;
+
+import features.jobs.base.AbstractUpdateProjectViaFlatFileTest;
 import features.jobs.base.JobTestService;
 import org.junit.jupiter.api.Test;
 
-class TestProjectCreationWorkerFlatFile extends AbstractFlatFileJobTest {
+class TestProjectCreationWorkerFlatFile extends AbstractUpdateProjectViaFlatFileTest {
 
     int N_STEPS = 4;
 
@@ -23,7 +25,7 @@ class TestProjectCreationWorkerFlatFile extends AbstractFlatFileJobTest {
     void testDefaultProjectCompletes() throws Exception {
 
         // Step - Find Job
-        UUID jobId = createJobForDefaultProject();
+        UUID jobId = updateProjectViaFlatFiles(AppRoutes.Jobs.FLAT_FILE_PROJECT_UPDATE_JOB);
 
         // Step - Get Job and subscribe for updates
         createNewConnection(defaultUser).subscribeToJob(defaultUser, jobService.getJobById(jobId));

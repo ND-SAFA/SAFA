@@ -83,16 +83,15 @@ public abstract class AuthenticatedBaseTest extends EntityBaseTest {
     public void removeMemberFromProject(Project project, String username) throws Exception {
         Optional<SafaUser> safaUserOptional = this.safaUserRepository.findByEmail(username);
         if (safaUserOptional.isEmpty()) {
-            throw new SafaError("Could not find user with name: " + username);
+            throw new SafaError("Could not find user with name: %s", username);
         }
         Optional<ProjectMembership> projectMembershipOptional = this.projectMembershipRepository.findByProjectAndMember(
             project,
             safaUserOptional.get());
         if (projectMembershipOptional.isEmpty()) {
-            String errorMessage = String.format("Could not find membership between {%s} and {%s}.",
+            throw new SafaError("Could not find membership between {%s} and {%s}.",
                 username,
                 project.getName());
-            throw new SafaError(errorMessage);
 
         }
         SafaRequest

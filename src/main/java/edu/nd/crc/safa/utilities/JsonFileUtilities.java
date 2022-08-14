@@ -25,7 +25,7 @@ public interface JsonFileUtilities {
      */
     static List<JSONObject> getArrayAsRecords(JSONObject jsonFile, String arrayKeyName) {
         if (!jsonFile.has(arrayKeyName)) {
-            throw new SafaError("Expected file to contain key: " + arrayKeyName);
+            throw new SafaError("Expected file to contain key: %s", arrayKeyName);
         }
         JSONArray jsonArtifactArray = jsonFile.getJSONArray(arrayKeyName);
         List<JSONObject> jsonArtifacts = new ArrayList<>();

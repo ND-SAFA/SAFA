@@ -48,7 +48,7 @@ public class JobSteps {
             case TRAIN_MODEL:
                 return modelTrainingSteps;
             default:
-                throw new SafaError(jobType + " is under development.");
+                throw new SafaError("Unknown job type: %s.", jobType);
         }
     }
 

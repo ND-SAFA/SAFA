@@ -283,7 +283,7 @@ public class ArtifactVersionRepositoryImpl
             Optional<Artifact> artifactOptional = this.artifactRepository
                 .findById(UUID.fromString(artifactId));
             if (artifactOptional.isEmpty()) {
-                throw new SafaError("Could not find artifact with id:" + artifactId);
+                throw new SafaError("Could not find artifact with id: %s", artifactId);
             }
             Artifact artifact = artifactOptional.get();
             artifact.setType(artifactType);

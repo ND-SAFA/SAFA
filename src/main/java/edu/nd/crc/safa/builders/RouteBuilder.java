@@ -91,7 +91,7 @@ public class RouteBuilder<T extends RouteBuilder<T>> {
 
     public String buildEndpoint() {
         if (this.path.contains("{")) {
-            throw new SafaError("Path is not fully configured:" + this.path);
+            throw new SafaError("Path is not fully configured: %s", this.path);
         }
         return this.path;
     }

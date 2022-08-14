@@ -22,7 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
  * Returns the parser for specified file type.
  */
 public class DataFileBuilder {
-    private static final String UNSUPPORTED_FILE_TYPE = "File type is not supported: ";
+    private static final String UNSUPPORTED_FILE_TYPE = "Unsupported file type: %s";
 
     public static AbstractArtifactFile<?> createArtifactFileParser(String artifactType,
                                                                    DocumentType documentType,
@@ -33,7 +33,7 @@ public class DataFileBuilder {
             case JSON:
                 return new JsonArtifactFile(pathToFile);
             default:
-                throw new SafaError(UNSUPPORTED_FILE_TYPE + pathToFile);
+                throw new SafaError(UNSUPPORTED_FILE_TYPE, pathToFile);
         }
     }
 
@@ -46,7 +46,7 @@ public class DataFileBuilder {
             case JSON:
                 return new JsonArtifactFile(file);
             default:
-                throw new SafaError(UNSUPPORTED_FILE_TYPE + file.getOriginalFilename());
+                throw new SafaError(UNSUPPORTED_FILE_TYPE, file.getOriginalFilename());
         }
     }
 
@@ -60,7 +60,7 @@ public class DataFileBuilder {
             case JSON:
                 return new JsonArtifactFile(artifacts);
             default:
-                throw new SafaError(UNSUPPORTED_FILE_TYPE + fileName);
+                throw new SafaError(UNSUPPORTED_FILE_TYPE, fileName);
         }
     }
 
@@ -71,7 +71,7 @@ public class DataFileBuilder {
             case JSON:
                 return new JsonTraceFile(pathToFile);
             default:
-                throw new SafaError(UNSUPPORTED_FILE_TYPE + pathToFile);
+                throw new SafaError(UNSUPPORTED_FILE_TYPE, pathToFile);
         }
     }
 
@@ -82,7 +82,7 @@ public class DataFileBuilder {
             case JSON:
                 return new JsonTraceFile(file);
             default:
-                throw new SafaError(UNSUPPORTED_FILE_TYPE + file.getOriginalFilename());
+                throw new SafaError(UNSUPPORTED_FILE_TYPE, file.getOriginalFilename());
         }
     }
 
@@ -93,7 +93,7 @@ public class DataFileBuilder {
             case JSON:
                 return new JsonTraceFile(traces);
             default:
-                throw new SafaError(UNSUPPORTED_FILE_TYPE + fileName);
+                throw new SafaError(UNSUPPORTED_FILE_TYPE, fileName);
         }
     }
 
@@ -105,7 +105,7 @@ public class DataFileBuilder {
                 return acceptedFileTypes;
             }
         }
-        throw new SafaError(UNSUPPORTED_FILE_TYPE + fileName);
+        throw new SafaError(UNSUPPORTED_FILE_TYPE, fileName);
     }
 
     @AllArgsConstructor

@@ -81,18 +81,14 @@ public class FlatFileProjectCreationJob extends CommitJob {
         this.pathToTIMFile = ProjectPaths.Storage.uploadedProjectFilePath(project, ProjectVariables.TIM_FILENAME);
     }
 
-    private void parseTimFile() {
+    private void parseTimFile() throws IOException {
         if (!Files.exists(Paths.get(this.pathToTIMFile))) {
             throw new SafaError("TIM.json file was not uploaded for this project");
         }
 
-        try {
-            JSONObject timFileJson = FileUtilities.readJSONFile(this.pathToTIMFile);
-            TimFileParser timFileParser = new TimFileParser(timFileJson, this.pathToFiles);
-            this.flatFileParser = new FlatFileParser(timFileParser);
-        } catch (Exception e) {
-            throw new SafaError("Could not parse");
-        }
+        JSONObject timFileJson = FileUtilities.readJSONFile(this.pathToTIMFile);
+        TimFileParser timFileParser = new TimFileParser(timFileJson, this.pathToFiles);
+        this.flatFileParser = new FlatFileParser(timFileParser);
     }
 
     public void parsingArtifactFiles() throws SafaError {

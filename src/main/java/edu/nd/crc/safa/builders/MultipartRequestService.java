@@ -89,7 +89,7 @@ public interface MultipartRequestService {
         File[] directoryFiles = directory.listFiles();
 
         if (directoryFiles == null) {
-            throw new SafaError("Could not list files inside directory: " + directory.getPath());
+            throw new SafaError("Could not list files inside directory: %s", directory.getPath());
         }
         return directoryFiles;
     }

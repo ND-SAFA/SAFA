@@ -60,6 +60,7 @@ public class ProjectPaths {
         public static final String MINI = PATH + "/mini";
         public static final String TEST2 = PATH + "/test2";
         public static final String TEST3 = PATH + "/test3";
+        public static final String MISSING_DATA_FILE = PATH + "/missing_data_file";
 
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
         public static class DefaultProject {

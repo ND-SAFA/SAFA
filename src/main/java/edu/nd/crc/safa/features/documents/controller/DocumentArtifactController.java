@@ -111,6 +111,6 @@ public class DocumentArtifactController extends BaseDocumentController {
         if (artifactOptional.isPresent()) {
             return artifactOptional.get();
         }
-        throw new SafaError("Could not find artifact with id: " + artifactId);
+        throw new SafaError("Could not find artifact with id: %s", artifactId);
     }
 }

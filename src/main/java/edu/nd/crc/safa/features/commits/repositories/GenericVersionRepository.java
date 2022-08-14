@@ -245,7 +245,7 @@ public abstract class GenericVersionRepository<
                     removedEntities.put(baseEntityId, appRemoved);
                     break;
                 default:
-                    throw new SafaError("Missing case in switch for modification type:" + modificationType);
+                    throw new SafaError("Missing case in switch for modification type: %s", modificationType);
             }
         }
 

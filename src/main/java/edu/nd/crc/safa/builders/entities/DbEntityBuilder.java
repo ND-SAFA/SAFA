@@ -385,7 +385,7 @@ public class DbEntityBuilder extends BaseBuilder {
     public Artifact getArtifact(String projectName, String artifactName) {
         assertProjectExists(this.artifacts, projectName);
         if (!this.artifacts.get(projectName).containsKey(artifactName)) {
-            throw new SafaError(String.format("Artifact %s has not been created.", artifactName));
+            throw new SafaError("Artifact %s has not been created.", artifactName);
         }
         return this.artifacts.get(projectName).get(artifactName);
     }

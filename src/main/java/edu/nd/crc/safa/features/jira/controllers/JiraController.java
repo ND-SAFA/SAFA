@@ -89,7 +89,7 @@ public class JiraController extends BaseController {
             boolean areCredentialsValid = jiraConnectionService.checkCredentials(credentials);
 
             if (!areCredentialsValid) {
-                throw new SafaError("Invalid JIRA credentials");
+                throw new SafaError("User contains invalid JIRA credentials.");
             }
 
             JiraAccessCredentials previousCredentials =

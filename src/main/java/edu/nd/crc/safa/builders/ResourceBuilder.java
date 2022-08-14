@@ -39,7 +39,7 @@ public class ResourceBuilder {
     public ResourceBuilder fetchProject(UUID projectId) throws SafaError {
         this.project = this.projectRepository.findByProjectId(projectId);
         if (this.project == null) {
-            throw new SafaError("Unable to find project with id:" + projectId);
+            throw new SafaError("Unable to find project with ID: %s", projectId);
         }
         return this;
     }
@@ -47,7 +47,7 @@ public class ResourceBuilder {
     public ResourceBuilder fetchVersion(UUID versionId) throws SafaError {
         this.projectVersion = this.projectVersionRepository.findByVersionId(versionId);
         if (this.projectVersion == null) {
-            throw new SafaError("Unable to find project version with id:" + versionId);
+            throw new SafaError("Unable to find project version with id: %s", versionId);
         }
         return this;
     }

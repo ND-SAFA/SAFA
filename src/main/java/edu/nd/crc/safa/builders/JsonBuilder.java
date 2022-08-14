@@ -223,8 +223,7 @@ public class JsonBuilder extends BaseBuilder {
                 return artifact;
             }
         }
-        String error = String.format("Could not find artifact %s in project %s.", artifactName, projectName);
-        throw new SafaError("Could not find artifact with name:" + error);
+        throw new SafaError("Could not find artifact %s in project %s.", artifactName, projectName);
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)

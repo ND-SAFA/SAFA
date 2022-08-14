@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.List;
 
 import edu.nd.crc.safa.features.flatfiles.parser.base.AbstractTraceFile;
-import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.utilities.FileUtilities;
 import edu.nd.crc.safa.utilities.JsonFileUtilities;
@@ -28,7 +27,6 @@ public class JsonTraceFile extends AbstractTraceFile<JSONObject> {
 
     public JsonTraceFile(String pathToFile) throws IOException {
         super(pathToFile);
-        throw new SafaError("JSON Not implemented yet");
     }
 
     public JsonTraceFile(MultipartFile file) throws IOException {

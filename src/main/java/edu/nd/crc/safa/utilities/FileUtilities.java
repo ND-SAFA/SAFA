@@ -35,34 +35,28 @@ import org.springframework.web.multipart.MultipartFile;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class FileUtilities {
 
-    public static CSVParser readCSVFile(String pathToFile) throws SafaError {
-        try {
-            File csvData = new File(pathToFile);
-            if (!csvData.exists()) {
-                throw new SafaError("CSV file does not exist: " + pathToFile);
-            }
-
-            CSVFormat fileFormat = createUnknownHeaderCsvFileFormat();
-            return CSVParser.parse(csvData, Charset.defaultCharset(), fileFormat);
-        } catch (IOException e) {
-            String error = String.format("Could not read CSV file at path: %s", pathToFile);
-            throw new SafaError(error, e);
+    public static CSVParser readCSVFile(String pathToFile) throws IOException {
+        File csvData = new File(pathToFile);
+        if (!csvData.exists()) {
+            String errorMessage = String.format("Cannot find CSV file %s.", csvData.getName());
+            throw new IOException(errorMessage);
         }
+
+        CSVFormat fileFormat = createUnknownHeaderCsvFileFormat();
+        return CSVParser.parse(csvData, Charset.defaultCharset(), fileFormat);
     }
 
     public static CSVParser readMultiPartCSVFile(MultipartFile file, String[] requiredColumns) throws
         SafaError {
-        String requiredColumnsLabel = String.join(", ", requiredColumns);
         if (!Objects.requireNonNull(file.getOriginalFilename()).contains(".csv")) {
-            throw new SafaError("Expected a CSV file with columns: " + requiredColumnsLabel);
+            throw new SafaError("Expected a CSV file with columns: %s", (Object) requiredColumns);
         }
         try {
             CSVParser parsedFile = CSVParser.parse(new String(file.getBytes()), createUnknownHeaderCsvFileFormat());
             assertHasColumns(parsedFile, requiredColumns);
             return parsedFile;
         } catch (IOException e) {
-            String error = "Unable to read csv file: " + file.getOriginalFilename();
-            throw new SafaError(error, e);
+            throw new SafaError("Unable to read csv file %s.", file.getOriginalFilename());
         }
     }
 
@@ -88,8 +82,9 @@ public class FileUtilities {
         for (String rColumn : requiredColumns) {
             if (!headerNamesLower.contains(rColumn)) {
                 String requiredColumnsLabel = String.join(", ", requiredColumns);
-                String error = "Expected CSV to have column(s) [%s] but found: %s";
-                throw new SafaError(String.format(error, requiredColumnsLabel, file.getHeaderNames()));
+                throw new SafaError("Expected CSV to have column(s) %s but found: %s",
+                    requiredColumnsLabel,
+                    file.getHeaderNames());
             }
         }
     }
@@ -97,8 +92,7 @@ public class FileUtilities {
     public static void assertHasKeys(JSONObject obj, List<String> keys) throws SafaError {
         for (String key : keys) {
             if (!obj.has(key)) {
-                String error = String.format("Expected %s to have key: %s", obj, key);
-                throw new SafaError(error);
+                throw new SafaError("Expected %s to have key: %s", obj, key);
             }
         }
     }
@@ -221,14 +215,5 @@ public class FileUtilities {
             }
         }
         return finalPath.toString();
-    }
-
-    public void hasRequiredFields(JSONObject json, Iterator<String> fields) {
-        for (Iterator<String> it = fields; it.hasNext(); ) {
-            String field = it.next();
-            if (!json.has(field)) {
-                throw new SafaError("Expected object:\n" + json + "\n to contain field:" + field);
-            }
-        }
     }
 }

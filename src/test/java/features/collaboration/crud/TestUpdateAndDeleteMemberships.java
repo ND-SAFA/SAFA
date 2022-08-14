@@ -71,6 +71,6 @@ class TestUpdateAndDeleteMemberships extends AbstractCollaborationTest {
                 return membership;
             }
         }
-        throw new SafaError("Could not find membership with email:" + email);
+        throw new SafaError("Project membership not found for: %s", email);
     }
 }

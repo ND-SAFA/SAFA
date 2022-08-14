@@ -162,7 +162,7 @@ public class DocumentService {
                     this.documentArtifactRepository.save(documentArtifact);
                     nUpdated++;
                 } else {
-                    throw new SafaError("Could not find artifact with id: " + artifactId);
+                    throw new SafaError("Could not find artifact with id: %s", artifactId);
                 }
 
             }

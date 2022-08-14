@@ -1,10 +1,11 @@
 package features.jobs.base;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import java.util.UUID;
 
 import edu.nd.crc.safa.builders.requests.FlatFileRequest;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.jobs.repositories.JobDbRepository;
@@ -16,8 +17,9 @@ import features.flatfiles.base.BaseFlatFileTest;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.web.servlet.ResultMatcher;
 
-public abstract class AbstractFlatFileJobTest extends BaseFlatFileTest {
+public abstract class AbstractUpdateProjectViaFlatFileTest extends BaseFlatFileTest {
 
     @Autowired
     public JobService jobService;
@@ -41,15 +43,25 @@ public abstract class AbstractFlatFileJobTest extends BaseFlatFileTest {
             .newVersionWithReturn(projectName);
     }
 
-    public UUID createJobForDefaultProject() throws Exception {
+    /**
+     * Uploads project files at given directory to update project by flat files route.
+     *
+     * @param pathToProjectFiles Path to project files.
+     * @return {@link UUID} ID of update project job.
+     * @throws Exception If HTTP error occurs.
+     */
+    public UUID updateProjectViaFlatFiles(String pathToProjectFiles) throws Exception {
+        JSONObject response = updateProjectViaFlatFiles(pathToProjectFiles, status().is2xxSuccessful());
+        return UUID.fromString(response.getString("id"));
+    }
+
+    public JSONObject updateProjectViaFlatFiles(String pathToProjectFiles, ResultMatcher resultMatcher) throws Exception {
         JSONObject kwargs = new JSONObject();
         kwargs.put(ProjectVariables.AS_COMPLETE_SET, false);
-        JSONObject jobSubmissionResponse = FlatFileRequest
+        return FlatFileRequest
             .withRoute(AppRoutes.Jobs.FLAT_FILE_PROJECT_UPDATE_JOB)
             .withVersion(projectVersion)
             .getFlatFileHelper()
-            .postWithFilesInDirectory(ProjectPaths.Tests.DefaultProject.V1, kwargs);
-
-        return UUID.fromString(jobSubmissionResponse.getString("id"));
+            .postWithFilesInDirectory(pathToProjectFiles, resultMatcher, kwargs);
     }
 }

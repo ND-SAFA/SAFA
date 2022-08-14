@@ -63,7 +63,7 @@ public class VersionService {
         if (projectVersionQuery.isPresent()) {
             return projectVersionQuery.get();
         } else {
-            throw new SafaError("Expected given project to contain an initial version");
+            throw new SafaError("Expected given project to contain an initial version.");
         }
     }
 }

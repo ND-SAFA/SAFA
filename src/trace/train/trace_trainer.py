@@ -8,6 +8,7 @@ from transformers.trainer import Trainer
 from transformers.trainer_pt_utils import get_tpu_sampler, is_torch_tpu_available
 from transformers.trainer_utils import PredictionOutput
 
+from trace.config.constants import LINKED_TARGETS_ONLY_DEFAULT
 from trace.jobs.trace_args import TraceArgs
 from trace.metrics.supported_metrics import get_metric_path
 
@@ -38,6 +39,8 @@ class TraceTrainer(Trainer):
         :return: a dictionary containing the results
         """
         self.train_dataset = self.trace_dataset_creator.get_training_dataset(self.args.resample_rate)
+        self.eval_dataset = self.trace_dataset_creator.get_validation_dataset(self.args.eval_dataset_size,
+                                                                              linked_targets_only=LINKED_TARGETS_ONLY_DEFAULT)
         output = self.train(resume_from_checkpoint=checkpoint)
         self.save_model()
         return dict(output)
@@ -48,7 +51,7 @@ class TraceTrainer(Trainer):
         Performs the prediction and (optionally) evaluation for the model
         :return: a dictionary containing the results
         """
-        self.eval_dataset = self.trace_dataset_creator.get_validation_dataset(self.args.dataset_size)
+        self.eval_dataset = self.trace_dataset_creator.get_prediction_dataset()
         output = self.predict(self.eval_dataset)
         if self.args.metrics:
             output.metrics = self._eval(output, self.args.metrics)

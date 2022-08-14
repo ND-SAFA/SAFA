@@ -4,6 +4,7 @@ from server.api import RequestParams
 from django.http.request import HttpRequest
 from django.http.response import JsonResponse
 
+from trace.config.constants import VALIDATION_PERCENTAGE_DEFAULT
 from trace.jobs.trace_args_builder import TraceArgsBuilder
 from server.job_type import JobType
 
@@ -30,7 +31,7 @@ def _make_job_params_from_request(params: Dict):
     base_model = params[RequestParams.BASE_MODEL]
     links = params.get(RequestParams.LINKS, None)
     output_path = params.get(RequestParams.OUTPUT_PATH, None)
-    return TraceArgsBuilder(base_model, links, model_path, output_path, sources, targets)
+    return TraceArgsBuilder(base_model, links, model_path, output_path, sources, targets, VALIDATION_PERCENTAGE_DEFAULT)
 
 
 def _as_json(response_object: Dict) -> JsonResponse:

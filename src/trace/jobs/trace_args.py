@@ -12,7 +12,7 @@ class TraceArgs(TrainingArguments):
     pad_to_max_length: bool = PAD_TO_MAX_LENGTH_DEFAULT
     resample_rate: int = RESAMPLE_RATE_DEFAULT
     max_seq_length: int = MAX_SEQ_LENGTH_DEFAULT
-    dataset_size: int = EVAL_DATASET_SIZE_DEFAULT
+    eval_dataset_size: int = EVAL_DATASET_SIZE_DEFAULT
     metrics: List[str] = None
 
     def __init__(self, model_generator: ModelGenerator,

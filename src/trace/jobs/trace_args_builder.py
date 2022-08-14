@@ -1,6 +1,5 @@
 from typing import Dict, List, Tuple
 
-from trace.config.constants import LINKED_TARGETS_ONLY_DEFAULT
 from common.jobs.abstract_args_builder import AbstractArgsBuilder
 from common.models.model_generator import ModelGenerator
 from trace.data.trace_dataset_creator import TraceDatasetCreator
@@ -11,7 +10,7 @@ from trace.jobs.trace_args import TraceArgs
 class TraceArgsBuilder(AbstractArgsBuilder):
 
     def __init__(self, base_model_name: str, links: List[Tuple[str, str]], model_path: str, output_path: str,
-                sources: Dict[str, str], targets: Dict[str, str], **kwargs):
+                sources: Dict[str, str], targets: Dict[str, str], validation_percentage: float, **kwargs):
         """
         Responsible for building training arguments for some pretrained model.
         :param base_model_name: supported base model name
@@ -28,6 +27,7 @@ class TraceArgsBuilder(AbstractArgsBuilder):
         self.output_path = output_path
         self.sources = sources
         self.targets = targets
+        self.validation_percentage = validation_percentage
         self.kwargs = kwargs
 
     def build(self) -> TraceArgs:
@@ -40,7 +40,7 @@ class TraceArgsBuilder(AbstractArgsBuilder):
         trace_dataset_creator = TraceDatasetCreator(source_artifacts=self.sources, target_artifacts=self.targets,
                                                     true_links=self.links,
                                                     model_generator=model_generator,
-                                                    linked_targets_only=LINKED_TARGETS_ONLY_DEFAULT)
+                                                    validation_percentage=self.validation_percentage)
         return TraceArgs(model_generator=model_generator,
                          trace_dataset_creator=trace_dataset_creator,
                          output_path=self.output_path,

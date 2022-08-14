@@ -26,6 +26,10 @@
         />
       </template>
 
+      <template v-slot:[`group.header`]="data">
+        <table-group-header :data="data" />
+      </template>
+
       <template v-slot:[`item.sourceType`]="{ item }">
         <td class="v-data-table__divider">
           <attribute-chip :value="item.sourceType" artifact-type />
@@ -50,10 +54,6 @@
         </td>
       </template>
 
-      <template v-slot:[`group.header`]="data">
-        <trace-link-table-group :data="data" />
-      </template>
-
       <template v-slot:expanded-item="{ headers, item }">
         <td :colspan="headers.length" class="pb-2">
           <trace-link-display
@@ -73,10 +73,9 @@ import Vue from "vue";
 import { ApprovalType, TraceLinkModel, VersionModel } from "@/types";
 import { appModule, artifactModule, projectModule } from "@/store";
 import { getGeneratedLinks } from "@/api";
-import { AttributeChip } from "@/components/common";
+import { AttributeChip, TableGroupHeader } from "@/components/common";
 import TraceLinkDisplay from "../TraceLinkDisplay.vue";
 import TraceLinkTableHeader from "./TraceLinkTableHeader.vue";
-import TraceLinkTableGroup from "./TraceLinkTableGroup.vue";
 
 /**
  * Displays a table of trace links.
@@ -84,7 +83,7 @@ import TraceLinkTableGroup from "./TraceLinkTableGroup.vue";
 export default Vue.extend({
   name: "TraceLinkTable",
   components: {
-    TraceLinkTableGroup,
+    TableGroupHeader,
     TraceLinkTableHeader,
     AttributeChip,
     TraceLinkDisplay,

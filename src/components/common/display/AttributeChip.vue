@@ -54,12 +54,12 @@ export default Vue.extend({
      * @return The text of the chip.
      */
     text(): string {
-      if (this.enumerated) {
+      if (this.confidenceScore) {
+        return this.value.slice(0, 4);
+      } else if (this.enumerated || this.value === this.value?.toUpperCase()) {
         return uppercaseToDisplay(this.value);
       } else if (this.format || this.artifactType) {
         return camelcaseToDisplay(this.value);
-      } else if (this.confidenceScore) {
-        return this.value.slice(0, 4);
       } else {
         return this.value;
       }

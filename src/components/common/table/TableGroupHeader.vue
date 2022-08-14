@@ -32,10 +32,10 @@ import {
 } from "@/components/common";
 
 /**
- * Renders a group header in the trace link table.
+ * Renders a group header in a table.
  */
 export default Vue.extend({
-  name: "TraceLinkTableGroup",
+  name: "TableGroupHeader",
   components: {
     AttributeChip,
     GenericIconButton,

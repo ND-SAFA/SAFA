@@ -25,6 +25,10 @@
         />
       </template>
 
+      <template v-slot:[`group.header`]="data">
+        <table-group-header :data="data" />
+      </template>
+
       <template v-slot:[`item.name`]="{ item }">
         <td class="v-data-table__divider">
           <artifact-table-row-name :artifact="item" />
@@ -71,7 +75,11 @@ import {
   deltaModule,
   documentModule,
 } from "@/store";
-import { Typography, AttributeChip } from "@/components/common";
+import {
+  Typography,
+  AttributeChip,
+  TableGroupHeader,
+} from "@/components/common";
 import ArtifactTableHeader from "./ArtifactTableHeader.vue";
 import ArtifactTableCell from "./ArtifactTableCell.vue";
 import ArtifactTableRowName from "./ArtifactTableRowName.vue";
@@ -89,6 +97,7 @@ export default Vue.extend({
     ArtifactTableHeader,
     ArtifactTableCell,
     ArtifactTableRowName,
+    TableGroupHeader,
   },
   data() {
     return {

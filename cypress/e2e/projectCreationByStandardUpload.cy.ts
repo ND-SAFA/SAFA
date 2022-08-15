@@ -14,9 +14,11 @@ describe("Project Creation", () => {
   describe("Manual Project Creation", () => {
     describe("Project Artifact Uploading", () => {
       it("cant continue without name", () => {
-        cy.getCy("input-project-description")
-          .last()
-          .type("Safety Artifact Forest Analysis");
+        cy.inputText(
+          "input-project-description",
+          "Safety Artifact Forest Analysis",
+          "last"
+        );
 
         cy.getCy("generic-stepper-continue").should("be.disabled");
       });
@@ -54,7 +56,7 @@ describe("Project Creation", () => {
         cy.clickButton("generic-stepper-continue");
 
         cy.clickButton("button-create-panel");
-        cy.getCy("input-artifact-type").last().type("Hazards");
+        cy.inputText("input-artifact-type", "Hazards", "last");
         cy.clickButton("button-artifact-type");
         cy.uploadFiles("input-files", SimpleProjectFilesMap.hazard);
         //need to make new function to enter in all of the files left
@@ -70,7 +72,7 @@ describe("Project Creation", () => {
         cy.clickButton("generic-stepper-continue");
 
         cy.clickButton("button-create-panel");
-        cy.getCy("input-artifact-type").last().type("Hazards");
+        cy.inputText("input-artifact-type", "Hazards", "last");
         cy.clickButton("button-artifact-type");
         cy.uploadFiles("input-files", SimpleProjectFilesMap.hazard);
 
@@ -85,7 +87,7 @@ describe("Project Creation", () => {
         cy.getCy("generic-stepper-continue").should("not.be.disabled");
         cy.clickButton("generic-stepper-continue");
         cy.clickButton("button-create-panel");
-        cy.getCy("input-artifact-type").last().type("Hazards");
+        cy.inputText("input-artifact-type", "Hazards", "last");
         cy.clickButton("button-artifact-type");
         cy.uploadFiles("input-files", SimpleProjectFilesMap.hazard);
         cy.clickButton("button-artifact-dropbox");
@@ -104,7 +106,7 @@ describe("Project Creation", () => {
         cy.getCy("generic-stepper-continue").should("not.be.disabled");
         cy.clickButton("generic-stepper-continue");
         cy.clickButton("button-create-panel");
-        cy.getCy("input-artifact-type").last().type("Hazards");
+        cy.inputText("input-artifact-type", "Hazards", "last");
         cy.clickButton("button-artifact-type");
         cy.uploadFiles("input-files", SimpleProjectFilesMap.hazard);
 
@@ -135,7 +137,7 @@ describe("Project Creation", () => {
         cy.clickButton("generic-stepper-continue");
 
         cy.clickButton("button-create-panel");
-        cy.getCy("input-artifact-type").last().type("Hazards");
+        cy.inputText("input-artifact-type", "Hazards", "last");
         cy.clickButton("button-artifact-type");
         cy.uploadFiles("input-files", SimpleProjectFilesMap.hazard);
 
@@ -151,7 +153,7 @@ describe("Project Creation", () => {
         cy.clickButton("generic-stepper-continue");
 
         cy.clickButton("button-create-panel");
-        cy.getCy("input-artifact-type").last().type("requirement");
+        cy.inputText("input-artifact-type", "requirement", "last");
         cy.clickButton("button-artifact-type");
         cy.uploadFiles("input-files", SimpleProjectFilesMap.requirement2hazard);
 
@@ -171,28 +173,51 @@ describe("Project Creation", () => {
         cy.getCy("generic-stepper-continue").should("not.be.disabled");
         cy.clickButton("generic-stepper-continue");
 
+        // Step - Create hazard panel and upload file
         cy.clickButton("button-create-panel");
-        cy.getCy("input-artifact-type").last().type("hazard");
+        cy.inputText("input-artifact-type", "hazard", "last");
         cy.clickButton("button-artifact-type");
         cy.uploadFiles("input-files", SimpleProjectFilesMap.hazard);
         //cy.getCy("generic-stepper-continue").should("not.be.disabled"); //need to make error command function
         //if(cy.getCy("generic-stepper-continue").is("disabled")).clickButton("button-ignore-errors")
         // cy.clickButton("button-ignore-errors");
 
+        // Step - Create invalid artifact type (Hazard2Hazard)
         cy.clickButton("button-create-panel");
-        cy.getCy("input-artifact-type").last().type("Hazard2Hazard");
+
+        cy.inputText("input-artifact-type", "Hazard2Hazard", "last");
         cy.clickButton("button-artifact-type");
         cy.uploadFiles("input-files", SimpleProjectFilesMap.hazard2hazard);
-        //cy.getCy("generic-stepper-continue").should("be.disabled");
-        cy.clickButton("button-ignore-errors");
 
-        //ANYTHING UNDER IS NEW CODE
+        // Step - wait 500ms (.5 sec) for app to parse file and gather errors
+        cy.wait(500);
+
+        // VP - Verify that continue button is disabled (file panel has errors)
+        cy.getCy("generic-stepper-continue").should("be.disabled");
+
+        // Step - Ignore errors in hazard2hazard
+        cy.clickButton("button-ignore-errors", "last");
+
+        // Step - Move to step 3 (creating trace panels)
         cy.clickButton("generic-stepper-continue");
-        cy.clickButton("button-new-create-trace-matrix"); //
-        cy.clickButton("button-select-source"); //
-        cy.clickButton("haz");
-        cy.clickButton("button-select-target");
-        cy.clickButton("haz2haz");
+
+        // Step - Create new trace matrix
+        cy.clickButtonWithName("Create new trace matrix");
+
+        // Step - Select source artifact as "hazard"
+        cy.clickButtonWithName("Select Source");
+        cy.clickMenuOption("hazard");
+
+        // Step - Select target artifact as "hazard"
+        cy.clickButtonWithName("Select Target");
+        cy.clickMenuOption("hazard");
+
+        // Step - Create trace matrix panel
+        cy.clickButtonWithName("Create trace matrix");
+
+        /**
+         * WORK IN PROGRESS
+         */
 
         cy.clickButton("create-trace-matrix"); //
         cy.uploadFiles("input-files", SimpleProjectFilesMap.hazard2hazard);

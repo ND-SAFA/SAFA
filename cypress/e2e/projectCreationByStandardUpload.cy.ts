@@ -1,5 +1,4 @@
-import { SimpleProjectFilesMap } from "../fixtures/simpleProjectFilesMap";
-import { validUser } from "../fixtures/user.json";
+import { simpleProjectFilesMap, validUser } from "../fixtures";
 
 describe("Project Creation", () => {
   beforeEach(() => {
@@ -58,7 +57,7 @@ describe("Project Creation", () => {
         cy.clickButton("button-create-panel");
         cy.inputText("input-artifact-type", "Hazards", "last");
         cy.clickButton("button-artifact-type");
-        cy.uploadFiles("input-files", SimpleProjectFilesMap.hazard);
+        cy.uploadFiles("input-files", simpleProjectFilesMap.hazard);
         //need to make new function to enter in all of the files left
       });
     });
@@ -74,7 +73,7 @@ describe("Project Creation", () => {
         cy.clickButton("button-create-panel");
         cy.inputText("input-artifact-type", "Hazards", "last");
         cy.clickButton("button-artifact-type");
-        cy.uploadFiles("input-files", SimpleProjectFilesMap.hazard);
+        cy.uploadFiles("input-files", simpleProjectFilesMap.hazard);
 
         cy.clickButton("button-artifact-dropbox");
         cy.clickButton("button-delete-artifact");
@@ -89,7 +88,7 @@ describe("Project Creation", () => {
         cy.clickButton("button-create-panel");
         cy.inputText("input-artifact-type", "Hazards", "last");
         cy.clickButton("button-artifact-type");
-        cy.uploadFiles("input-files", SimpleProjectFilesMap.hazard);
+        cy.uploadFiles("input-files", simpleProjectFilesMap.hazard);
         cy.clickButton("button-artifact-dropbox");
         cy.clickButton("button-delete-artifact");
 
@@ -108,7 +107,7 @@ describe("Project Creation", () => {
         cy.clickButton("button-create-panel");
         cy.inputText("input-artifact-type", "Hazards", "last");
         cy.clickButton("button-artifact-type");
-        cy.uploadFiles("input-files", SimpleProjectFilesMap.hazard);
+        cy.uploadFiles("input-files", simpleProjectFilesMap.hazard);
 
         cy.clickButton("button-artifact-dropbox");
         cy.clickButton("button-file-entities");
@@ -139,7 +138,7 @@ describe("Project Creation", () => {
         cy.clickButton("button-create-panel");
         cy.inputText("input-artifact-type", "Hazards", "last");
         cy.clickButton("button-artifact-type");
-        cy.uploadFiles("input-files", SimpleProjectFilesMap.hazard);
+        cy.uploadFiles("input-files", simpleProjectFilesMap.hazard);
 
         cy.getCy("generic-stepper-continue").should("not.be.disabled");
         cy.clickButton("generic-stepper-continue");
@@ -155,7 +154,7 @@ describe("Project Creation", () => {
         cy.clickButton("button-create-panel");
         cy.inputText("input-artifact-type", "requirement", "last");
         cy.clickButton("button-artifact-type");
-        cy.uploadFiles("input-files", SimpleProjectFilesMap.requirement2hazard);
+        cy.uploadFiles("input-files", simpleProjectFilesMap.requirement2hazard);
 
         cy.getCy("generic-stepper-continue").should("be.disabled");
         cy.clickButton("button-ignore-errors"); //button hasnt been tested
@@ -177,7 +176,7 @@ describe("Project Creation", () => {
         cy.clickButton("button-create-panel");
         cy.inputText("input-artifact-type", "hazard", "last");
         cy.clickButton("button-artifact-type");
-        cy.uploadFiles("input-files", SimpleProjectFilesMap.hazard);
+        cy.uploadFiles("input-files", simpleProjectFilesMap.hazard);
         //cy.getCy("generic-stepper-continue").should("not.be.disabled"); //need to make error command function
         //if(cy.getCy("generic-stepper-continue").is("disabled")).clickButton("button-ignore-errors")
         // cy.clickButton("button-ignore-errors");
@@ -187,7 +186,7 @@ describe("Project Creation", () => {
 
         cy.inputText("input-artifact-type", "Hazard2Hazard", "last");
         cy.clickButton("button-artifact-type");
-        cy.uploadFiles("input-files", SimpleProjectFilesMap.hazard2hazard);
+        cy.uploadFiles("input-files", simpleProjectFilesMap.hazard2hazard);
 
         // Step - wait 500ms (.5 sec) for app to parse file and gather errors
         cy.wait(500);
@@ -220,7 +219,7 @@ describe("Project Creation", () => {
          */
 
         cy.clickButton("create-trace-matrix"); //
-        cy.uploadFiles("input-files", SimpleProjectFilesMap.hazard2hazard);
+        cy.uploadFiles("input-files", simpleProjectFilesMap.hazard2hazard);
         cy.clickButton("generate-trace-links"); //
 
         cy.getCy("button-new-create-trace-matrix").should("not.be.disabled"); //

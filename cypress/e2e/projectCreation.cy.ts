@@ -1,6 +1,8 @@
-import { validUser } from "../fixtures/user.json";
-import files from "../fixtures/simpleProjectFiles.json";
-import { SimpleProjectFilesMap } from "../fixtures/simpleProjectFilesMap";
+import {
+  validUser,
+  simpleProjectFiles,
+  simpleProjectFilesMap,
+} from "../fixtures";
 
 describe("Project Creation", () => {
   beforeEach(() => {
@@ -16,28 +18,27 @@ describe("Project Creation", () => {
     });
 
     it("cant create a project without a name", () => {
-      cy.getCy("input-project-description").last().type("A project");
-      cy.uploadFiles("input-files", SimpleProjectFilesMap.tim);
+      cy.getCy("input-project-description", "last").type("A project");
+      cy.uploadFiles("input-files", simpleProjectFilesMap.tim);
 
       cy.getCy("button-create-project").should("be.disabled");
     });
 
     it("cant create a project without any files", () => {
-      cy.getCy("input-project-name").last().type("Test Project");
-      cy.getCy("input-project-description").last().type("A project");
+      cy.getCy("input-project-name", "last").type("Test Project");
+      cy.getCy("input-project-description", "last").type("A project");
 
       cy.getCy("button-create-project").should("be.disabled");
     });
 
     it("can create a valid project", () => {
-      cy.getCy("input-project-name").last().type("Test Project");
-      cy.getCy("input-project-description").last().type("A project");
-      cy.uploadFiles("input-files", ...files);
+      cy.getCy("input-project-name", "last").type("Test Project");
+      cy.getCy("input-project-description", "last").type("A project");
+      cy.uploadFiles("input-files", ...simpleProjectFiles);
 
       cy.getCy("button-create-project").should("not.be.disabled").click();
 
-      cy.getCy("job-status", 5000)
-        .first()
+      cy.getCy("job-status", "first", 5000)
         .wait(5000)
         .should("contain.text", "Completed");
 

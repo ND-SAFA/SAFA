@@ -161,7 +161,7 @@ describe("Project Creation", () => {
 
   describe("Project Trace Link Uploading", () => {
     describe("I can create sets of trace links between two artifacts", () => {
-      it("can create a new panel of trace links", () => {
+      it.only("can create a new panel of trace links", () => {
         cy.setProjectIdentifier("standard");
         cy.getCy(DataCy.stepperContinueButton).should("not.be.disabled");
         cy.clickButton(DataCy.stepperContinueButton);
@@ -195,7 +195,7 @@ describe("Project Creation", () => {
         cy.getCy(DataCy.stepperContinueButton).should("be.disabled");
 
         // Step - Ignore errors in hazard2hazard
-        cy.clickButton(DataCy.creationIgnoreErrorsButton, undefined);
+        cy.clickButton(DataCy.creationIgnoreErrorsButton, "last");
 
         // Step - Move to step 3 (creating trace panels)
         cy.clickButton(DataCy.stepperContinueButton);

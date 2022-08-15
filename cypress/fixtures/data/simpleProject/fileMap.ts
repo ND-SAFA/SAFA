@@ -1,9 +1,9 @@
-import files from "./simpleProjectFiles.json";
+import files from "./files.json";
 
 /**
  * A mapping from file name to each of the simple files.
  */
-export const simpleProjectFilesMap = {
+export default {
   tim: files[0],
   design: files[1],
   design2design: files[2],
@@ -15,9 +15,4 @@ export const simpleProjectFilesMap = {
   requirement: files[8],
   requirement2hazard: files[9],
   requirement2requirement: files[10],
-};
-
-export const testProject = {
-  name: "Test Project",
-  description: "A project created during testing",
 };

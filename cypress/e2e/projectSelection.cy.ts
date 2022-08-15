@@ -1,4 +1,4 @@
-import { validUser } from "../fixtures/user.json";
+import { validUser } from "../fixtures";
 
 describe("Project Selection", () => {
   beforeEach(() => {
@@ -6,6 +6,10 @@ describe("Project Selection", () => {
       validUser.email,
       validUser.password
     );
+  });
+
+  afterEach(() => {
+    cy.logout();
   });
 
   // it("does something", () => {});

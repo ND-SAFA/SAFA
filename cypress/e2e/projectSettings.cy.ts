@@ -1,11 +1,15 @@
-import { validUser } from "../fixtures/user.json";
+import { validUser } from "../fixtures";
 
 describe("Project Settings", () => {
   beforeEach(() => {
-    cy.visit("http://localhost:8080/create").login(
+    cy.visit("http://localhost:8080/settings").login(
       validUser.email,
       validUser.password
     );
+  });
+
+  afterEach(() => {
+    cy.logout();
   });
 
   // it("does something", () => {});

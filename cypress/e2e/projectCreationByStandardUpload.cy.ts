@@ -226,6 +226,7 @@ describe("Project Creation", () => {
         cy.getCy("button-new-create-trace-matrix").should("not.be.disabled"); //
         cy.clickButton("button-new-create-trace-matrix"); //
       });
+
       it("cannot create a new panel withoutselecting two artifact types", () => {});
     });
   });

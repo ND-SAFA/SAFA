@@ -67,6 +67,11 @@ export interface TraceLinkModel extends LinkModel {
 }
 
 /**
+ * Represents a trace link merged with other properties.
+ */
+export type FlatTraceLink = TraceLinkModel & Record<string, string>;
+
+/**
  * Link used when hiding subtrees to summarize the links of the children
  * of some root node.
  */

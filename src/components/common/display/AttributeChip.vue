@@ -1,0 +1,100 @@
+<template>
+  <v-tooltip bottom z-index="12" :disabled="text.length < 10">
+    <template v-slot:activator="{ on, attrs }">
+      <v-chip
+        v-on="on"
+        v-bind="attrs"
+        small
+        style="max-width: 200px"
+        class="mr-1"
+        :outlined="outlined"
+        :color="color"
+      >
+        <v-icon v-if="iconId" small>{{ iconId }}</v-icon>
+        <typography
+          ellipsis
+          inherit-color
+          :l="iconId ? '1' : '0'"
+          :value="text"
+        />
+      </v-chip>
+    </template>
+    <span>{{ text }}</span>
+  </v-tooltip>
+</template>
+
+<script lang="ts">
+import Vue from "vue";
+import Typography from "./Typography.vue";
+import { ApprovalType } from "@/types";
+import {
+  camelcaseToDisplay,
+  getBackgroundColor,
+  getScoreColor,
+  uppercaseToDisplay,
+} from "@/util";
+import { typeOptionsModule } from "@/store";
+
+/**
+ * Displays a generic chip that can render specific attributes.
+ */
+export default Vue.extend({
+  name: "AttributeChip",
+  components: { Typography },
+  props: {
+    value: String,
+    format: Boolean,
+    icon: String,
+    artifactType: Boolean,
+    confidenceScore: Boolean,
+  },
+  computed: {
+    /**
+     * @return Whether the value of this chip is enumerated.
+     */
+    enumerated(): boolean {
+      return this.value in ApprovalType;
+    },
+    /**
+     * @return The text of the chip.
+     */
+    text(): string {
+      if (this.confidenceScore) {
+        return this.value.slice(0, 4);
+      } else if (this.enumerated || this.value === this.value?.toUpperCase()) {
+        return uppercaseToDisplay(this.value);
+      } else if (this.format || this.artifactType) {
+        return camelcaseToDisplay(this.value);
+      } else {
+        return this.value;
+      }
+    },
+    /**
+     * @return The icon to display on this chip.
+     */
+    iconId(): string {
+      return this.artifactType
+        ? typeOptionsModule.getArtifactTypeIcon(this.value)
+        : this.icon;
+    },
+    /**
+     * @return The color to display for this chip.
+     */
+    color(): string {
+      if (this.confidenceScore) {
+        return getScoreColor(this.value);
+      } else {
+        return getBackgroundColor(this.value);
+      }
+    },
+    /**
+     * @return Whether the chip is outlined.
+     */
+    outlined(): boolean {
+      return this.enumerated || this.confidenceScore;
+    },
+  },
+});
+</script>
+
+<style scoped></style>

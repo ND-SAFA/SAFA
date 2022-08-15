@@ -49,6 +49,7 @@ export async function updateApprovedLink(
   traceLink: TraceLinkModel
 ): Promise<TraceLinkModel[]> {
   traceLink.approvalStatus = ApprovalType.APPROVED;
+
   return CommitBuilder.withCurrentVersion()
     .withModifiedTraceLink(traceLink)
     .save()
@@ -65,10 +66,28 @@ export async function updateDeclinedLink(
   traceLink: TraceLinkModel
 ): Promise<TraceLinkModel[]> {
   traceLink.approvalStatus = ApprovalType.DECLINED;
+
   return CommitBuilder.withCurrentVersion()
     .withModifiedTraceLink(traceLink)
     .save()
     .then(async ({ traces }) => traces.removed);
+}
+
+/**
+ * Declines the given trace link ID.
+ *
+ * @param traceLink - The trace link to decline.
+ * @return The removed trace links.
+ */
+export async function updateUnreviewedLink(
+  traceLink: TraceLinkModel
+): Promise<TraceLinkModel[]> {
+  traceLink.approvalStatus = ApprovalType.UNREVIEWED;
+
+  return CommitBuilder.withCurrentVersion()
+    .withModifiedTraceLink(traceLink)
+    .save()
+    .then(async ({ traces }) => traces.modified);
 }
 
 /**

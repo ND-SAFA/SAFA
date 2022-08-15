@@ -5,55 +5,52 @@
       show-group-by
       show-expand
       single-expand
-      fixed-header
+      multi-sort
       :headers="headers"
       :items="items"
       :expanded="expanded"
       :search="searchText"
-      sort-by="targetName"
+      :loading="isLoading"
+      :sort-by="['targetName', 'sourceName']"
+      :group-desc="true"
+      group-by="approvalStatus"
       item-key="traceLinkId"
       :items-per-page="50"
       @click:row="handleView($event)"
     >
       <template v-slot:top>
-        <flex-box justify="space-between">
-          <v-text-field
-            dense
-            outlined
-            clearable
-            label="Search Trace Links"
-            style="max-width: 600px"
-            v-model="searchText"
-            append-icon="mdi-magnify"
-          />
-          <section-controls
-            @open:all="handleOpenAll"
-            @close:all="handleCloseAll"
-          />
-        </flex-box>
+        <trace-link-table-header
+          @search="searchText = $event"
+          @open:all="handleOpenAll"
+          @close:all="handleCloseAll"
+        />
+      </template>
+
+      <template v-slot:[`group.header`]="data">
+        <table-group-header :data="data" />
       </template>
 
       <template v-slot:[`item.sourceType`]="{ item }">
-        <td>
-          <table-chip :text="item.sourceType" display-icon />
+        <td class="v-data-table__divider">
+          <attribute-chip :value="item.sourceType" artifact-type />
         </td>
       </template>
 
       <template v-slot:[`item.targetType`]="{ item }">
-        <td>
-          <table-chip :text="item.targetType" display-icon />
+        <td class="v-data-table__divider">
+          <attribute-chip :value="item.targetType" artifact-type />
         </td>
       </template>
 
       <template v-slot:[`item.approvalStatus`]="{ item }">
-        <td>
-          <approval-chip :link="item" />
+        <td class="v-data-table__divider">
+          <attribute-chip :value="item.approvalStatus" />
         </td>
       </template>
 
       <template v-slot:[`item.score`]="{ item }">
-        <td>
-          <typography :value="String(item.score).slice(0, 4)" />
+        <td class="v-data-table__divider">
+          <attribute-chip confidence-score :value="String(item.score)" />
         </td>
       </template>
 
@@ -61,11 +58,9 @@
         <td :colspan="headers.length" class="pb-2">
           <trace-link-display
             :link="item"
-            :show-decline="showDeclined(item)"
-            :show-approve="showApproved(item)"
-            :show-delete="false"
             @link:approve="handleApprove($event)"
             @link:decline="handleDecline($event)"
+            @link:unreview="handleUnreview($event)"
           />
         </td>
       </template>
@@ -78,10 +73,9 @@ import Vue from "vue";
 import { ApprovalType, TraceLinkModel, VersionModel } from "@/types";
 import { appModule, artifactModule, projectModule } from "@/store";
 import { getGeneratedLinks } from "@/api";
-import { FlexBox, TableChip, Typography } from "@/components/common";
-import TraceLinkDisplay from "./TraceLinkDisplay.vue";
-import SectionControls from "./SectionControls.vue";
-import ApprovalChip from "./ApprovalChip.vue";
+import { AttributeChip, TableGroupHeader } from "@/components/common";
+import TraceLinkDisplay from "../TraceLinkDisplay.vue";
+import TraceLinkTableHeader from "./TraceLinkTableHeader.vue";
 
 /**
  * Displays a table of trace links.
@@ -89,12 +83,10 @@ import ApprovalChip from "./ApprovalChip.vue";
 export default Vue.extend({
   name: "TraceLinkTable",
   components: {
-    Typography,
-    ApprovalChip,
-    SectionControls,
-    FlexBox,
+    TableGroupHeader,
+    TraceLinkTableHeader,
+    AttributeChip,
     TraceLinkDisplay,
-    TableChip,
   },
   data() {
     return {
@@ -123,15 +115,15 @@ export default Vue.extend({
           divider: true,
         },
         {
-          text: "Confidence Score",
-          value: "score",
-          groupable: false,
-          divider: true,
-        },
-        {
           text: "Approval Status",
           value: "approvalStatus",
           filterable: true,
+          divider: true,
+        },
+        {
+          text: "Confidence Score",
+          value: "score",
+          groupable: false,
           divider: true,
         },
         {
@@ -159,6 +151,12 @@ export default Vue.extend({
     },
   },
   computed: {
+    /**
+     * @return Whether the app is loading.
+     */
+    isLoading() {
+      return appModule.getIsLoading;
+    },
     /**
      * @return The current project version.
      */
@@ -198,22 +196,6 @@ export default Vue.extend({
       }
     },
     /**
-     * Determines whether to show approval for a link.
-     *
-     * @param link - The link to display.
-     */
-    showApproved(link: TraceLinkModel): boolean {
-      return !this.approved.includes(link.traceLinkId);
-    },
-    /**
-     * Determines whether to show decline for a link.
-     *
-     * @param link - The link to display.
-     */
-    showDeclined(link: TraceLinkModel): boolean {
-      return !this.declined.includes(link.traceLinkId);
-    },
-    /**
      * Opens all panels.
      */
     handleOpenAll() {
@@ -235,6 +217,9 @@ export default Vue.extend({
         (declinedId) => declinedId != link.traceLinkId
       );
       this.approved.push(link.traceLinkId);
+      this.expanded = this.expanded.filter(
+        (expandedLink) => expandedLink.traceLinkId !== link.traceLinkId
+      );
     },
     /**
      * Declines the given link and updates the stored links.
@@ -246,6 +231,25 @@ export default Vue.extend({
         (declinedId) => declinedId != link.traceLinkId
       );
       this.declined.push(link.traceLinkId);
+      this.expanded = this.expanded.filter(
+        (expandedLink) => expandedLink.traceLinkId !== link.traceLinkId
+      );
+    },
+    /**
+     * Unreivews the given link and updates the stored links.
+     *
+     * @param link - The link to unreview.
+     */
+    handleUnreview(link: TraceLinkModel) {
+      this.approved = this.approved.filter(
+        (declinedId) => declinedId != link.traceLinkId
+      );
+      this.declined = this.declined.filter(
+        (declinedId) => declinedId != link.traceLinkId
+      );
+      this.expanded = this.expanded.filter(
+        (expandedLink) => expandedLink.traceLinkId !== link.traceLinkId
+      );
     },
     /**
      * Handles viewing a trace link.
@@ -264,5 +268,3 @@ export default Vue.extend({
   },
 });
 </script>
-
-<style scoped></style>

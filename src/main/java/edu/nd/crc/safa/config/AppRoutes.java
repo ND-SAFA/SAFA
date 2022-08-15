@@ -1,5 +1,8 @@
 package edu.nd.crc.safa.config;
 
+import java.util.Arrays;
+import java.util.List;
+
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -9,12 +12,29 @@ import lombok.NoArgsConstructor;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class AppRoutes {
+
+    public static String path(String... args) {
+        return String.join("/", args);
+    }
+
+    public static String createPath(List<String> paths) {
+        return String.join("/", paths);
+    }
+
+    public static String createPathWithPrefix(String prefix, String... args) {
+        List<String> argList = Arrays.asList(args);
+        argList.add(0, prefix);
+        return createPath(argList);
+    }
+
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Accounts {
         public static final String LOGIN = "/login";
-        public static final String PREFIX = "/accounts";
-        public static final String CREATE_ACCOUNT = PREFIX + "/create";
-        public static final String DELETE_ACCOUNT = PREFIX + "/delete";
+        protected static final String PREFIX = "/accounts";
+        public static final String CREATE_ACCOUNT = path(Accounts.PREFIX, "create");
+        public static final String DELETE_ACCOUNT = path(PREFIX, "delete");
+    }
+
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Layout {
         protected static final String PREFIX = "/layout";
@@ -24,7 +44,7 @@ public class AppRoutes {
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Jobs {
-        private static final String JOBS_PREFIX = "/jobs";
+        protected static final String JOBS_PREFIX = "/jobs";
         public static final String FLAT_FILE_PROJECT_UPDATE_JOB = JOBS_PREFIX + "/projects/versions/{versionId}";
         public static final String GET_JOBS = JOBS_PREFIX;
         public static final String JSON_PROJECT_JOB = JOBS_PREFIX + Projects.PREFIX;
@@ -34,7 +54,8 @@ public class AppRoutes {
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Projects {
-        public static final String PREFIX = "/projects";
+        protected static final String PREFIX = "/projects";
+        public static final String BY_ID = PREFIX + "/{projectId}";
         public static final String DELETE_PROJECT_BY_ID = PREFIX + "/{projectId}";
         public static final String CREATE_OR_UPDATE_PROJECT_META = PREFIX;
         public static final String GET_PROJECTS = PREFIX;
@@ -78,12 +99,14 @@ public class AppRoutes {
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Documents {
-        public static final String CREATE_OR_UPDATE_DOCUMENT = Projects.PREFIX + "/versions/{versionId}/documents";
-        public static final String GET_DOCUMENT_BY_ID = Projects.PREFIX + "/documents/{documentId}";
         public static final String GET_PROJECT_DOCUMENTS = Projects.PREFIX + "/{projectId}/documents";
-        public static final String DELETE_DOCUMENT = Projects.PREFIX + "/documents/{documentId}";
-        public static final String SET_CURRENT_DOCUMENT = Projects.PREFIX + "/documents/current/{documentId}";
-        public static final String CLEAR_CURRENT_DOCUMENT = Projects.PREFIX + "/documents/current";
+        protected static final String PREFIX = "/documents";
+        public static final String CREATE_OR_UPDATE_DOCUMENT = Versions.BY_ID + Documents.PREFIX;
+        public static final String GET_DOCUMENT_BY_ID = Projects.PREFIX + Documents.PREFIX + "/{documentId}";
+        public static final String DELETE_DOCUMENT = Projects.PREFIX + Documents.PREFIX + "/{documentId}";
+        public static final String SET_CURRENT_DOCUMENT = Projects.PREFIX + Documents.PREFIX + "/current/{documentId}";
+        public static final String CLEAR_CURRENT_DOCUMENT = Projects.PREFIX + Documents.PREFIX + "/current";
+        protected static final String BY_ID = PREFIX + "/{documentId}";
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -140,6 +163,7 @@ public class AppRoutes {
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Versions {
         public static final String GET_VERSIONS = Projects.PREFIX + "/{projectId}/versions";
+        public static final String BY_ID = Projects.PREFIX + "/versions/{versionId}";
         public static final String GET_CURRENT_VERSION = Projects.PREFIX + "/{projectId}/versions/current";
         public static final String CREATE_NEW_MAJOR_VERSION = Projects.PREFIX + "/{projectId}/versions/major";
         public static final String CREATE_NEW_MINOR_VERSION = Projects.PREFIX + "/{projectId}/versions/minor";

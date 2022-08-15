@@ -15,6 +15,11 @@ public class AppRoutes {
         public static final String PREFIX = "/accounts";
         public static final String CREATE_ACCOUNT = PREFIX + "/create";
         public static final String DELETE_ACCOUNT = PREFIX + "/delete";
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class Layout {
+        protected static final String PREFIX = "/layout";
+        public static final String GET_DOCUMENT_LAYOUT = Versions.BY_ID + Documents.BY_ID + Layout.PREFIX;
+        public static final String GET_PROJECT_LAYOUT = Projects.BY_ID + Layout.PREFIX;
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)

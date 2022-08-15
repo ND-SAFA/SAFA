@@ -2,7 +2,9 @@ import {
   validUser,
   simpleProjectFiles,
   simpleProjectFilesMap,
+  DataCy,
 } from "../fixtures";
+import { testProject } from "../fixtures/project";
 
 describe("Project Creation", () => {
   beforeEach(() => {
@@ -18,31 +20,35 @@ describe("Project Creation", () => {
     });
 
     it("cant create a project without a name", () => {
-      cy.getCy("input-project-description", "last").type("A project");
-      cy.uploadFiles("input-files", simpleProjectFilesMap.tim);
+      cy.getCy(DataCy.creationBulkDescriptionInput).type(testProject.name);
+      cy.uploadFiles(DataCy.creationBulkFilesInput, simpleProjectFilesMap.tim);
 
-      cy.getCy("button-create-project").should("be.disabled");
+      cy.getCy(DataCy.creationUploadButton).should("be.disabled");
     });
 
     it("cant create a project without any files", () => {
-      cy.getCy("input-project-name", "last").type("Test Project");
-      cy.getCy("input-project-description", "last").type("A project");
+      cy.getCy(DataCy.creationBulkNameInput).type(testProject.name);
+      cy.getCy(DataCy.creationBulkDescriptionInput).type(
+        testProject.description
+      );
 
-      cy.getCy("button-create-project").should("be.disabled");
+      cy.getCy(DataCy.creationUploadButton).should("be.disabled");
     });
 
     it("can create a valid project", () => {
-      cy.getCy("input-project-name", "last").type("Test Project");
-      cy.getCy("input-project-description", "last").type("A project");
-      cy.uploadFiles("input-files", ...simpleProjectFiles);
+      cy.getCy(DataCy.creationBulkNameInput).type(testProject.name);
+      cy.getCy(DataCy.creationBulkDescriptionInput).type(
+        testProject.description
+      );
+      cy.uploadFiles(DataCy.creationBulkFilesInput, ...simpleProjectFiles);
 
-      cy.getCy("button-create-project").should("not.be.disabled").click();
+      cy.getCy(DataCy.creationUploadButton).should("not.be.disabled").click();
 
-      cy.getCy("job-status", "first", 5000)
+      cy.getCy(DataCy.jobStatus, "first", 5000)
         .wait(5000)
         .should("contain.text", "Completed");
 
-      cy.clickButton("job-panel").clickButton("button-delete-job");
+      cy.clickButton(DataCy.jobPanel).clickButton(DataCy.jobDeleteButton);
     });
   });
 });

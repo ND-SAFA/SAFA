@@ -16,3 +16,8 @@ export const simpleProjectFilesMap = {
   requirement2hazard: files[9],
   requirement2requirement: files[10],
 };
+
+export const testProject = {
+  name: "Test Project",
+  description: "A project created during testing",
+};

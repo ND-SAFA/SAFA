@@ -10,6 +10,8 @@
         <project-identifier-input
           v-bind:name.sync="name"
           v-bind:description.sync="description"
+          data-cy-name="input-project-name-standard"
+          data-cy-description="input-project-description-standard"
         />
       </v-stepper-content>
 

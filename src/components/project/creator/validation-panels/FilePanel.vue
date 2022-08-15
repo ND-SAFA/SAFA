@@ -18,6 +18,7 @@
       <generic-file-selector
         v-if="showFileUploader"
         :multiple="false"
+        data-cy="input-files-panel"
         @input="emitChangeFiles"
       />
 

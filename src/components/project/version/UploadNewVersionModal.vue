@@ -16,6 +16,7 @@
         <generic-file-selector
           v-if="selectedVersion !== undefined"
           v-model="selectedFiles"
+          data-cy="input-files-version"
         />
         <v-switch
           v-model="replaceAllArtifacts"

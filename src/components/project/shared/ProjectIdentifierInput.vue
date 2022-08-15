@@ -4,7 +4,7 @@
       filled
       v-model="currentName"
       label="Project Name"
-      data-cy="input-project-name"
+      :data-cy="dataCyName"
     />
     <v-textarea
       filled
@@ -12,7 +12,7 @@
       v-model="currentDescription"
       label="Project Description"
       rows="3"
-      data-cy="input-project-description"
+      :data-cy="dataCyDescription"
     />
   </v-container>
 </template>
@@ -37,6 +37,14 @@ export default Vue.extend({
     description: {
       type: String,
       required: true,
+    },
+    dataCyName: {
+      type: String,
+      default: "input-project-name",
+    },
+    dataCyDescription: {
+      type: String,
+      default: "input-project-description",
     },
   },
   computed: {

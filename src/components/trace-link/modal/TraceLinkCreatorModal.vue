@@ -4,6 +4,7 @@
     :is-open="isOpen"
     @close="$emit('close')"
     size="l"
+    data-cy="button-create-trace-matrix"
   >
     <template v-slot:body>
       <v-row class="mt-2">
@@ -12,6 +13,7 @@
             v-model="sourceArtifactId"
             label="Source Artifact"
             :multiple="false"
+            data-cy="button-select-source"
           />
         </v-col>
         <v-col cols="6">
@@ -19,6 +21,7 @@
             v-model="targetArtifactId"
             label="Target Artifact"
             :multiple="false"
+            data-cy="button-select-target"
           />
         </v-col>
       </v-row>

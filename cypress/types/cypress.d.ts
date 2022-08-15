@@ -1,4 +1,6 @@
 declare namespace Cypress {
+  type ElementPosition = "first" | "last";
+
   interface Chainable<Subject> {
     // Base Commands
 
@@ -6,25 +8,53 @@ declare namespace Cypress {
      * Gets an element based on the `data-cy` selector.
      *
      * @param dataCy - The testing selector to find.
+     * @param elementPosition - Whether to return first or last element of query.
      * @param timeout - The timeout to optionally wait for.
      * @return The elements that match the given selector.
      */
-    getCy(dataCy: string, timeout?: number): Chainable<JQuery<HTMLElement>>;
+    getCy(
+      dataCy: string,
+      elementPosition?: ElementPosition,
+      timeout?: number
+    ): Chainable<JQuery<HTMLElement>>;
 
     /**
      * Sets the value of an input field.
      *
      * @param dataCy - The testing selector of the input being set.
      * @param inputValue - The value to set.
+     * @param isFirst - Whether to input text to first element matching dataCy.
+     *                  Otherwise, last element is used.
      */
-    inputText(dataCy: string, inputValue: string): Chainable<void>;
+    inputText(
+      dataCy: string,
+      inputValue: string,
+      elementPosition?: ElementPosition
+    ): Chainable<void>;
 
     /**
      * Clicks a button.
      *
      * @param dataCy - The testing selector of the button to click.
+     * @param isFirst - Whether to click first element matching `dataCy`.
+     *                  Otherwise, last one is selected.
      */
-    clickButton(dataCy: string): Chainable<void>;
+    clickButton(
+      dataCy: string,
+      elementPosition?: ElementPosition
+    ): Chainable<void>;
+
+    /**
+     * Finds last button with given name within it and clicks it.
+     * @param name - Name of button.
+     */
+    clickButtonWithName(name: string): Chainable<void>;
+
+    /**
+     * Clicks option with given name in first menu found.
+     * @param optionName - Name of option to click.
+     */
+    clickMenuOption(optionName: string): Chainable<void>;
 
     /**
      * Uploads files.

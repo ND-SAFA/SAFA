@@ -1,9 +1,11 @@
+import { DataCy } from "../fixtures";
+
 Cypress.Commands.add("login", (email, password) => {
-  cy.inputText("input-email", email)
-    .inputText("input-password", password)
-    .clickButton("button-login");
+  cy.inputText(DataCy.emailInput, email)
+    .inputText(DataCy.passwordInput, password)
+    .clickButton(DataCy.loginButton);
 });
 
 Cypress.Commands.add("logout", () => {
-  cy.getCy("account-dropdown").click().clickButton("button-logout");
+  cy.getCy(DataCy.accountDropdown).click().clickButton("button-logout");
 });

@@ -1,9 +1,16 @@
-Cypress.Commands.add(
-  "setProjectInformationInStandardUpload",
-  (name: string, description: string) => {
-    cy.getCy("input-project-name").first().type(name);
-    cy.getCy("input-project-description").first().type(description);
-  }
-);
+import { DataCy, testProject } from "../fixtures";
 
-Cypress.Commands.add("selectForPossibleErros", (containsErros: boolean) => {}); //need to finish command
+Cypress.Commands.add("setProjectIdentifier", (type) => {
+  if (type === "standard") {
+    cy.getCy(DataCy.creationStandardNameInput).type(testProject.name);
+    cy.getCy(DataCy.creationStandardDescriptionInput).type(
+      testProject.description
+    );
+  } else {
+    cy.getCy(DataCy.creationBulkNameInput).type(testProject.name);
+    cy.getCy(DataCy.creationBulkDescriptionInput).type(testProject.description);
+  }
+});
+
+// TODO: finish
+// Cypress.Commands.add("selectForPossibleErros", (containsErros: boolean) => {});

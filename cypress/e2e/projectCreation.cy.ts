@@ -3,8 +3,8 @@ import {
   simpleProjectFiles,
   simpleProjectFilesMap,
   DataCy,
+  testProject,
 } from "../fixtures";
-import { testProject } from "../fixtures/project";
 
 describe("Project Creation", () => {
   beforeEach(() => {
@@ -27,19 +27,13 @@ describe("Project Creation", () => {
     });
 
     it("cant create a project without any files", () => {
-      cy.getCy(DataCy.creationBulkNameInput).type(testProject.name);
-      cy.getCy(DataCy.creationBulkDescriptionInput).type(
-        testProject.description
-      );
+      cy.setProjectIdentifier("bulk");
 
       cy.getCy(DataCy.creationUploadButton).should("be.disabled");
     });
 
     it("can create a valid project", () => {
-      cy.getCy(DataCy.creationBulkNameInput).type(testProject.name);
-      cy.getCy(DataCy.creationBulkDescriptionInput).type(
-        testProject.description
-      );
+      cy.setProjectIdentifier("bulk");
       cy.uploadFiles(DataCy.creationBulkFilesInput, ...simpleProjectFiles);
 
       cy.getCy(DataCy.creationUploadButton).should("not.be.disabled").click();

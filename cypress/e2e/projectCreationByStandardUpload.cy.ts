@@ -1,4 +1,9 @@
-import { simpleProjectFilesMap, validUser } from "../fixtures";
+import {
+  DataCy,
+  simpleProjectFilesMap,
+  testProject,
+  validUser,
+} from "../fixtures";
 
 describe("Project Creation", () => {
   beforeEach(() => {
@@ -7,198 +12,193 @@ describe("Project Creation", () => {
       validUser.password
     );
   });
+
   afterEach(() => {
     cy.logout();
   });
+
   describe("Manual Project Creation", () => {
     describe("Project Artifact Uploading", () => {
       it("cant continue without name", () => {
         cy.inputText(
-          "input-project-description",
-          "Safety Artifact Forest Analysis",
-          "last"
+          DataCy.creationStandardDescriptionInput,
+          testProject.description
         );
 
-        cy.getCy("generic-stepper-continue").should("be.disabled");
+        cy.getCy(DataCy.stepperContinueButton).should("be.disabled");
       });
 
       it("can continue with a name set", () => {
-        cy.setProjectInformationInStandardUpload(
-          "SAFA",
-          "Safety Artifact Forest Analysis"
-        );
+        cy.setProjectIdentifier("standard");
 
-        cy.getCy("generic-stepper-continue").should("not.be.disabled");
+        cy.getCy(DataCy.stepperContinueButton).should("not.be.disabled");
       });
     });
 
     describe("I can Create sets of artifacts by type", () => {
       it("cannot create a new panel with an empty name", () => {
-        cy.setProjectInformationInStandardUpload(
-          "SAFA",
-          "Safety Artifact Forest Analysis"
-        );
-        cy.getCy("generic-stepper-continue").should("not.be.disabled");
-        cy.clickButton("generic-stepper-continue");
+        cy.setProjectIdentifier("standard");
+        cy.getCy(DataCy.stepperContinueButton).should("not.be.disabled");
+        cy.clickButton(DataCy.stepperContinueButton);
 
-        cy.getCy("button-create-panel").should("not.be.disabled");
-        cy.clickButton("button-create-panel");
-        cy.getCy("button-create-panel").should("be.disabled");
+        cy.getCy(DataCy.creationCreatePanelButton).should("not.be.disabled");
+        cy.clickButton(DataCy.creationCreatePanelButton);
+        cy.getCy(DataCy.creationCreatePanelButton).should("be.disabled");
       });
 
       it("Can create a new panel of artifacts", () => {
-        cy.setProjectInformationInStandardUpload(
-          "SAFA",
-          "Safety Artifact Forest Analysis"
-        );
-        cy.getCy("generic-stepper-continue").should("not.be.disabled");
-        cy.clickButton("generic-stepper-continue");
+        cy.setProjectIdentifier("standard");
+        cy.getCy(DataCy.stepperContinueButton).should("not.be.disabled");
+        cy.clickButton(DataCy.stepperContinueButton);
 
-        cy.clickButton("button-create-panel");
-        cy.inputText("input-artifact-type", "Hazards", "last");
-        cy.clickButton("button-artifact-type");
-        cy.uploadFiles("input-files", simpleProjectFilesMap.hazard);
+        cy.clickButton(DataCy.creationCreatePanelButton);
+        cy.inputText(DataCy.creationTypeInput, "Hazards");
+        cy.clickButton(DataCy.creationTypeButton);
+        cy.uploadFiles(
+          DataCy.creationStandardFilesInput,
+          simpleProjectFilesMap.hazard
+        );
         //need to make new function to enter in all of the files left
       });
     });
     describe("I can delete artifacts", () => {
       it("can delete artifacts", () => {
-        cy.setProjectInformationInStandardUpload(
-          "SAFA",
-          "Safety Artifact Forest Analysis"
+        cy.setProjectIdentifier("standard");
+        cy.getCy(DataCy.stepperContinueButton).should("not.be.disabled");
+        cy.clickButton(DataCy.stepperContinueButton);
+
+        cy.clickButton(DataCy.creationCreatePanelButton);
+        cy.inputText(DataCy.creationTypeInput, "Hazards");
+        cy.clickButton(DataCy.creationTypeButton);
+        cy.uploadFiles(
+          DataCy.creationStandardFilesInput,
+          simpleProjectFilesMap.hazard
         );
-        cy.getCy("generic-stepper-continue").should("not.be.disabled");
-        cy.clickButton("generic-stepper-continue");
 
-        cy.clickButton("button-create-panel");
-        cy.inputText("input-artifact-type", "Hazards", "last");
-        cy.clickButton("button-artifact-type");
-        cy.uploadFiles("input-files", simpleProjectFilesMap.hazard);
-
-        cy.clickButton("button-artifact-dropbox");
-        cy.clickButton("button-delete-artifact");
+        cy.clickButton(DataCy.creationArtifactButton);
+        cy.clickButton(DataCy.creationArtifactDeleteButton);
       });
       it("cannot continue after deleted", () => {
-        cy.setProjectInformationInStandardUpload(
-          "SAFA",
-          "Safety Artifact Forest Analysis"
+        cy.setProjectIdentifier("standard");
+        cy.getCy(DataCy.stepperContinueButton).should("not.be.disabled");
+        cy.clickButton(DataCy.stepperContinueButton);
+        cy.clickButton(DataCy.creationCreatePanelButton);
+        cy.inputText(DataCy.creationTypeInput, "Hazards");
+        cy.clickButton(DataCy.creationTypeButton);
+        cy.uploadFiles(
+          DataCy.creationStandardFilesInput,
+          simpleProjectFilesMap.hazard
         );
-        cy.getCy("generic-stepper-continue").should("not.be.disabled");
-        cy.clickButton("generic-stepper-continue");
-        cy.clickButton("button-create-panel");
-        cy.inputText("input-artifact-type", "Hazards", "last");
-        cy.clickButton("button-artifact-type");
-        cy.uploadFiles("input-files", simpleProjectFilesMap.hazard);
-        cy.clickButton("button-artifact-dropbox");
-        cy.clickButton("button-delete-artifact");
+        cy.clickButton(DataCy.creationArtifactButton);
+        cy.clickButton(DataCy.creationArtifactDeleteButton);
 
-        cy.getCy("generic-stepper-continue").should("be.disabled");
+        cy.getCy(DataCy.stepperContinueButton).should("be.disabled");
       });
     });
 
     describe("I can preview the list of artifacts loaded from a file", () => {
       it("displays buttons for all of the artifacts in the file", () => {
-        cy.setProjectInformationInStandardUpload(
-          "SAFA",
-          "Safety Artifact Forest Analysis"
+        cy.setProjectIdentifier("standard");
+        cy.getCy(DataCy.stepperContinueButton).should("not.be.disabled");
+        cy.clickButton(DataCy.stepperContinueButton);
+        cy.clickButton(DataCy.creationCreatePanelButton);
+        cy.inputText(DataCy.creationTypeInput, "Hazards");
+        cy.clickButton(DataCy.creationTypeButton);
+        cy.uploadFiles(
+          DataCy.creationStandardFilesInput,
+          simpleProjectFilesMap.hazard
         );
-        cy.getCy("generic-stepper-continue").should("not.be.disabled");
-        cy.clickButton("generic-stepper-continue");
-        cy.clickButton("button-create-panel");
-        cy.inputText("input-artifact-type", "Hazards", "last");
-        cy.clickButton("button-artifact-type");
-        cy.uploadFiles("input-files", simpleProjectFilesMap.hazard);
 
-        cy.clickButton("button-artifact-dropbox");
-        cy.clickButton("button-file-entities");
+        cy.clickButton(DataCy.creationArtifactButton);
+        cy.clickButton(DataCy.creationEntitiesButton);
       });
     });
 
     describe("I can upload a file containing the artifacts I want to create", () => {
       it("cannot create a project without atleast one artifact", () => {
-        cy.setProjectInformationInStandardUpload(
-          "SAFA",
-          "Safety Artifact Forest Analysis"
-        );
-        cy.getCy("generic-stepper-continue").should("not.be.disabled");
-        cy.clickButton("generic-stepper-continue");
+        cy.setProjectIdentifier("standard");
+        cy.getCy(DataCy.stepperContinueButton).should("not.be.disabled");
+        cy.clickButton(DataCy.stepperContinueButton);
 
-        cy.clickButton("button-create-panel");
-        cy.getCy("button-create-panel").should("be.disabled");
-        cy.getCy("generic-stepper-continue").should("be.disabled");
+        cy.clickButton(DataCy.creationCreatePanelButton);
+        cy.getCy(DataCy.creationCreatePanelButton).should("be.disabled");
+        cy.getCy(DataCy.stepperContinueButton).should("be.disabled");
       });
       it("can continue after uploading artifacts", () => {
-        cy.setProjectInformationInStandardUpload(
-          "SAFA",
-          "Safety Artifact Forest Analysis"
+        cy.setProjectIdentifier("standard");
+        cy.getCy(DataCy.stepperContinueButton).should("not.be.disabled");
+        cy.clickButton(DataCy.stepperContinueButton);
+
+        cy.clickButton(DataCy.creationCreatePanelButton);
+        cy.inputText(DataCy.creationTypeInput, "Hazards");
+        cy.clickButton(DataCy.creationTypeButton);
+        cy.uploadFiles(
+          DataCy.creationStandardFilesInput,
+          simpleProjectFilesMap.hazard
         );
-        cy.getCy("generic-stepper-continue").should("not.be.disabled");
-        cy.clickButton("generic-stepper-continue");
 
-        cy.clickButton("button-create-panel");
-        cy.inputText("input-artifact-type", "Hazards", "last");
-        cy.clickButton("button-artifact-type");
-        cy.uploadFiles("input-files", simpleProjectFilesMap.hazard);
-
-        cy.getCy("generic-stepper-continue").should("not.be.disabled");
-        cy.clickButton("generic-stepper-continue");
+        cy.getCy(DataCy.stepperContinueButton).should("not.be.disabled");
+        cy.clickButton(DataCy.stepperContinueButton);
       });
       it("can continue with bad file if errors are ignored", () => {
-        cy.setProjectInformationInStandardUpload(
-          "SAFA",
-          "Safety Artifact Forest Analysis"
+        cy.setProjectIdentifier("standard");
+        cy.getCy(DataCy.stepperContinueButton).should("not.be.disabled");
+        cy.clickButton(DataCy.stepperContinueButton);
+
+        cy.clickButton(DataCy.creationCreatePanelButton);
+        cy.inputText(DataCy.creationTypeInput, "requirement");
+        cy.clickButton(DataCy.creationTypeButton);
+        cy.uploadFiles(
+          DataCy.creationStandardFilesInput,
+          simpleProjectFilesMap.requirement2hazard
         );
-        cy.getCy("generic-stepper-continue").should("not.be.disabled");
-        cy.clickButton("generic-stepper-continue");
 
-        cy.clickButton("button-create-panel");
-        cy.inputText("input-artifact-type", "requirement", "last");
-        cy.clickButton("button-artifact-type");
-        cy.uploadFiles("input-files", simpleProjectFilesMap.requirement2hazard);
-
-        cy.getCy("generic-stepper-continue").should("be.disabled");
-        cy.clickButton("button-ignore-errors"); //button hasnt been tested
+        cy.getCy(DataCy.stepperContinueButton).should("be.disabled");
+        cy.clickButton(DataCy.creationIgnoreErrorsButton, undefined); //button hasnt been tested
       });
     });
   });
 
   describe("Project Trace Link Uploading", () => {
     describe("I can create sets of trace links between two artifacts", () => {
-      it.only("can create a new panel of trace links", () => {
-        cy.setProjectInformationInStandardUpload(
-          "SAFA",
-          "Safety Artifact Forest Analysis"
-        );
-        cy.getCy("generic-stepper-continue").should("not.be.disabled");
-        cy.clickButton("generic-stepper-continue");
+      it("can create a new panel of trace links", () => {
+        cy.setProjectIdentifier("standard");
+        cy.getCy(DataCy.stepperContinueButton).should("not.be.disabled");
+        cy.clickButton(DataCy.stepperContinueButton);
 
         // Step - Create hazard panel and upload file
-        cy.clickButton("button-create-panel");
-        cy.inputText("input-artifact-type", "hazard", "last");
-        cy.clickButton("button-artifact-type");
-        cy.uploadFiles("input-files", simpleProjectFilesMap.hazard);
-        //cy.getCy("generic-stepper-continue").should("not.be.disabled"); //need to make error command function
-        //if(cy.getCy("generic-stepper-continue").is("disabled")).clickButton("button-ignore-errors")
-        // cy.clickButton("button-ignore-errors");
+        cy.clickButton(DataCy.creationCreatePanelButton);
+        cy.inputText(DataCy.creationTypeInput, "hazard");
+        cy.clickButton(DataCy.creationTypeButton);
+        cy.uploadFiles(
+          DataCy.creationStandardFilesInput,
+          simpleProjectFilesMap.hazard
+        );
+        //cy.getCy(DataCy.stepperContinueButton).should("not.be.disabled"); //need to make error command function
+        //if(cy.getCy(DataCy.stepperContinueButton).is("disabled")).clickButton(DataCy.creationIgnoreErrorsButton, undefined)
+        // cy.clickButton(DataCy.creationIgnoreErrorsButton, undefined);
 
         // Step - Create invalid artifact type (Hazard2Hazard)
-        cy.clickButton("button-create-panel");
+        cy.clickButton(DataCy.creationCreatePanelButton);
 
-        cy.inputText("input-artifact-type", "Hazard2Hazard", "last");
-        cy.clickButton("button-artifact-type");
-        cy.uploadFiles("input-files", simpleProjectFilesMap.hazard2hazard);
+        cy.inputText(DataCy.creationTypeInput, "Hazard2Hazard");
+        cy.clickButton(DataCy.creationTypeButton);
+        cy.uploadFiles(
+          DataCy.creationStandardFilesInput,
+          simpleProjectFilesMap.hazard2hazard
+        );
 
         // Step - wait 500ms (.5 sec) for app to parse file and gather errors
         cy.wait(500);
 
         // VP - Verify that continue button is disabled (file panel has errors)
-        cy.getCy("generic-stepper-continue").should("be.disabled");
+        cy.getCy(DataCy.stepperContinueButton).should("be.disabled");
 
         // Step - Ignore errors in hazard2hazard
-        cy.clickButton("button-ignore-errors", "last");
+        cy.clickButton(DataCy.creationIgnoreErrorsButton, undefined);
 
         // Step - Move to step 3 (creating trace panels)
-        cy.clickButton("generic-stepper-continue");
+        cy.clickButton(DataCy.stepperContinueButton);
 
         // Step - Create new trace matrix
         cy.clickButtonWithName("Create new trace matrix");
@@ -218,12 +218,15 @@ describe("Project Creation", () => {
          * WORK IN PROGRESS
          */
 
-        cy.clickButton("create-trace-matrix"); //
-        cy.uploadFiles("input-files", simpleProjectFilesMap.hazard2hazard);
-        cy.clickButton("generate-trace-links"); //
+        cy.clickButton("create-trace-matrix"); // Add new DataCy option
+        cy.uploadFiles(
+          DataCy.creationStandardFilesInput,
+          simpleProjectFilesMap.hazard2hazard
+        );
+        cy.clickButton("generate-trace-links"); // Add new DataCy option
 
-        cy.getCy("button-new-create-trace-matrix").should("not.be.disabled"); //
-        cy.clickButton("button-new-create-trace-matrix"); //
+        cy.getCy("button-new-create-trace-matrix").should("not.be.disabled"); // Add new DataCy option
+        cy.clickButton("button-new-create-trace-matrix");
       });
 
       it("cannot create a new panel withoutselecting two artifact types", () => {});

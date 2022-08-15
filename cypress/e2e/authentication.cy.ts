@@ -1,4 +1,4 @@
-import { validUser, invalidUser } from "../fixtures";
+import { validUser, invalidUser, DataCy } from "../fixtures";
 
 describe("Authentication", () => {
   beforeEach(() => {
@@ -11,8 +11,8 @@ describe("Authentication", () => {
   //     it("displays successful account creation", () => {
   //       cy.clickButton("button-create-account-redirect").wait(500);
   //
-  //       cy.inputText("input-email", validUser.email)
-  //         .inputText("input-password", validUser.password)
+  //       cy.inputText(DataCy.emailInput, validUser.email)
+  //         .inputText(DataCy.passwordInput, validUser.password)
   //         .clickButton("button-create-account");
   //
   //       cy.contains(
@@ -28,19 +28,19 @@ describe("Authentication", () => {
       it("logs in successfully with validUser credentials", () => {
         cy.login(validUser.email, validUser.password);
 
-        cy.get("[data-cy='account-dropdown']").should("exist");
+        cy.getCy(DataCy.accountDropdown).should("exist");
       });
 
       it("fails to log in with invalidUser credentials", () => {
         cy.login(invalidUser.email, invalidUser.password);
 
-        cy.get("[data-cy='account-dropdown']").should("not.exist");
+        cy.getCy(DataCy.accountDropdown).should("not.exist");
       });
 
       it("wont let you log in without both an email and password", () => {
-        cy.inputText("input-email", validUser.email);
+        cy.inputText(DataCy.emailInput, validUser.email);
 
-        cy.getCy("button-login").should("be.disabled");
+        cy.getCy(DataCy.loginButton).should("be.disabled");
       });
     });
 
@@ -48,7 +48,7 @@ describe("Authentication", () => {
       it("logs out successfully", () => {
         cy.login(validUser.email, validUser.password);
         cy.logout();
-        cy.getCy("button-login").should("exist");
+        cy.getCy(DataCy.loginButton).should("exist");
       });
 
       it("clears my session on logout", () => {

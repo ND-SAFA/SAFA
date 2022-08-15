@@ -90,13 +90,10 @@ declare namespace Cypress {
     // Project Creator Commands
 
     /**
-     * Setting the project name and description within the standard project creator.
-     * @param name - Project name.
-     * @param description - Project description.
+     * Setting the project name and description within the project creator.
+     *
+     * @param type - The type of project identifier to set.
      */
-    setProjectInformationInStandardUpload(
-      name?: string,
-      description?: string
-    ): Chainable<void>;
+    setProjectIdentifier(type: "bulk" | "standard"): Chainable<void>;
   }
 }

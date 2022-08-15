@@ -109,7 +109,7 @@ describe("Project Creation", () => {
         cy.uploadFiles("input-files", SimpleProjectFilesMap.hazard);
 
         cy.clickButton("button-artifact-dropbox");
-        cy.clickButton("button-file-entities"); //new command, havent been able to test due to login issue
+        cy.clickButton("button-file-entities");
       });
     });
 
@@ -163,7 +163,7 @@ describe("Project Creation", () => {
 
   describe("Project Trace Link Uploading", () => {
     describe("I can create sets of trace links between two artifacts", () => {
-      it("can create a new panel of trace links", () => {
+      it.only("can create a new panel of trace links", () => {
         cy.setProjectInformationInStandardUpload(
           "SAFA",
           "Safety Artifact Forest Analysis"
@@ -175,16 +175,31 @@ describe("Project Creation", () => {
         cy.getCy("input-artifact-type").last().type("hazard");
         cy.clickButton("button-artifact-type");
         cy.uploadFiles("input-files", SimpleProjectFilesMap.hazard);
-        cy.getCy("generic-stepper-continue").should("not.be.disabled"); //need to make error command function
+        //cy.getCy("generic-stepper-continue").should("not.be.disabled"); //need to make error command function
         //if(cy.getCy("generic-stepper-continue").is("disabled")).clickButton("button-ignore-errors")
-        cy.clickButton("button-ignore-errors");
+        // cy.clickButton("button-ignore-errors");
 
         cy.clickButton("button-create-panel");
         cy.getCy("input-artifact-type").last().type("Hazard2Hazard");
-        cy.clickButton("button-artifact type");
+        cy.clickButton("button-artifact-type");
         cy.uploadFiles("input-files", SimpleProjectFilesMap.hazard2hazard);
+        //cy.getCy("generic-stepper-continue").should("be.disabled");
+        cy.clickButton("button-ignore-errors");
 
-        //need to make all of trace matrix steps
+        //ANYTHING UNDER IS NEW CODE
+        cy.clickButton("generic-stepper-continue");
+        cy.clickButton("button-new-create-trace-matrix"); //
+        cy.clickButton("button-select-source"); //
+        cy.clickButton("haz");
+        cy.clickButton("button-select-target");
+        cy.clickButton("haz2haz");
+
+        cy.clickButton("create-trace-matrix"); //
+        cy.uploadFiles("input-files", SimpleProjectFilesMap.hazard2hazard);
+        cy.clickButton("generate-trace-links"); //
+
+        cy.getCy("button-new-create-trace-matrix").should("not.be.disabled"); //
+        cy.clickButton("button-new-create-trace-matrix"); //
       });
       it("cannot create a new panel withoutselecting two artifact types", () => {});
     });

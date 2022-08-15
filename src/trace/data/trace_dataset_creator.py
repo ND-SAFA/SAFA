@@ -33,7 +33,7 @@ class TraceDatasetCreator:
         self.links, self.pos_link_ids, self.neg_link_ids = self._create_links(self.model_generator, source_artifacts, target_artifacts,
                                                                               true_links)
         self.validation_percentage = validation_percentage
-        self.linked_target_ids = self._get_linked_targets_only(true_links)
+        self.linked_target_ids = self._get_linked_targets_only(true_links) if true_links else set()
         random.shuffle(self.pos_link_ids)
         random.shuffle(self.neg_link_ids)
 
@@ -46,11 +46,15 @@ class TraceDatasetCreator:
         if self.__training_dataset is None:
             train_pos_link_ids = self._get_data_split(self.pos_link_ids)
             train_neg_link_ids = self._get_data_split(self.neg_link_ids)
-            reduced_neg_link_ids = self._reduce_data_size(train_neg_link_ids,
-                                                          len(train_pos_link_ids) * resample_rate)
 
             self.__training_dataset = self._get_feature_entries(train_pos_link_ids, resample_rate)
-            self.__training_dataset.extend(self._get_feature_entries(reduced_neg_link_ids, 1))
+
+            # get same number of negative links
+            feature_entries_neg_links = self._get_feature_entries(train_neg_link_ids, 1)
+            equal_feature_entries_neg_links = self._change_data_size(feature_entries_neg_links,
+                                                                     len(self.__training_dataset),
+                                                                     include_duplicates=True)
+            self.__training_dataset.extend(equal_feature_entries_neg_links)
         return self.__training_dataset
 
     def get_validation_dataset(self, dataset_size: int = EVAL_DATASET_SIZE_DEFAULT,
@@ -68,11 +72,13 @@ class TraceDatasetCreator:
             if linked_targets_only:
                 val_neg_link_ids = self._reduce_to_linked_targets_only(val_neg_link_ids)
 
-            self.__validation_dataset = self._get_feature_entries(val_pos_link_ids)
-            self.__validation_dataset.extend(self._get_feature_entries(val_neg_link_ids))
+            link_ids = [*val_pos_link_ids, *val_neg_link_ids]
 
-            if dataset_size < len(self.__validation_dataset):
-                self.__validation_dataset = self._reduce_data_size(self.__validation_dataset, dataset_size, include_duplicates=False)
+            if dataset_size < len(link_ids):
+                link_ids = self._change_data_size(link_ids, dataset_size)
+
+            self.__validation_dataset = self._get_feature_entries(link_ids)
+
         return self.__validation_dataset
 
     def get_prediction_dataset(self) -> List[Dict]:
@@ -237,14 +243,15 @@ class TraceDatasetCreator:
         return feature_info
 
     @staticmethod
-    def _reduce_data_size(data: List, new_length: int, include_duplicates: bool = True) -> List:
+    def _change_data_size(data: List, new_length: int, include_duplicates: bool = False) -> List:
         """
-        Reduces the size of the given dataset by using random choice or sample
+        Changes the size of the given dataset by using random choice or sample
         :param data: list of data
         :param new_length: desired length
         :param include_duplicates: if True, uses sampling
-        :return: a list with the reduced data
+        :return: a list with the data of the new_length
         """
+        include_duplicates = True if new_length > len(data) else include_duplicates  # must include duplicates to make a bigger dataset
         reduction_func = random.choices if include_duplicates else random.sample
         return reduction_func(data, k=new_length)
 

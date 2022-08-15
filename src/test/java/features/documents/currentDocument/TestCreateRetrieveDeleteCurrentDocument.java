@@ -37,7 +37,7 @@ class TestCreateRetrieveDeleteCurrentDocument extends ApplicationBaseTest {
 
         // Step - Set current document
         SafaRequest
-            .withRoute(AppRoutes.Projects.Documents.SET_CURRENT_DOCUMENT)
+            .withRoute(AppRoutes.Documents.SET_CURRENT_DOCUMENT)
             .withDocument(document)
             .postWithJsonObject(new JSONObject());
 
@@ -45,7 +45,7 @@ class TestCreateRetrieveDeleteCurrentDocument extends ApplicationBaseTest {
         assertThat(getCurrentDocumentId(projectVersion)).isEqualTo(document.getDocumentId().toString());
 
         // Step - Delete currentDocumentId
-        String deleteRoute = RouteBuilder.withRoute(AppRoutes.Projects.Documents.CLEAR_CURRENT_DOCUMENT).buildEndpoint();
+        String deleteRoute = RouteBuilder.withRoute(AppRoutes.Documents.CLEAR_CURRENT_DOCUMENT).buildEndpoint();
         SafaRequest.withRoute(deleteRoute).deleteWithJsonObject();
 
         // VP - Verify that currentDocumentId is back to null

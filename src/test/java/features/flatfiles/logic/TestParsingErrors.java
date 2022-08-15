@@ -14,7 +14,7 @@ class TestParsingErrors extends ParseBaseTest {
     @Test
     void errorForWrongColumnsInArtifactFile() throws Exception {
         String routeName = RouteBuilder
-            .withRoute(AppRoutes.Projects.FlatFiles.PARSE_ARTIFACT_FILE)
+            .withRoute(AppRoutes.FlatFiles.PARSE_ARTIFACT_FILE)
             .withArtifactType("Designs")
             .buildEndpoint();
         String fileName = "Design2Requirement.csv";
@@ -27,7 +27,7 @@ class TestParsingErrors extends ParseBaseTest {
     @Test
     void errorForWrongColumnsInTraceFile() throws Exception {
         // VP - Verify error message informs that columns are wrong
-        String c = uploadEntityFileAndGetError(AppRoutes.Projects.FlatFiles.PARSE_TRACE_FILE,
+        String c = uploadEntityFileAndGetError(AppRoutes.FlatFiles.PARSE_TRACE_FILE,
             DefaultProjectConstants.File.DESIGN_FILE);
         assertThat(c).contains("source, target");
     }
@@ -35,7 +35,7 @@ class TestParsingErrors extends ParseBaseTest {
     @Test
     void jsonFileHasMissingArtifactKey() throws Exception {
         String routeName = RouteBuilder
-            .withRoute(AppRoutes.Projects.FlatFiles.PARSE_ARTIFACT_FILE)
+            .withRoute(AppRoutes.FlatFiles.PARSE_ARTIFACT_FILE)
             .withArtifactType("Designs")
             .buildEndpoint();
         String fileName = "tim.json";
@@ -50,7 +50,7 @@ class TestParsingErrors extends ParseBaseTest {
         String fileName = "tim.json";
 
         // VP - Verify error message informs that columns are wrong
-        String c = uploadEntityFileAndGetError(AppRoutes.Projects.FlatFiles.PARSE_TRACE_FILE, fileName);
+        String c = uploadEntityFileAndGetError(AppRoutes.FlatFiles.PARSE_TRACE_FILE, fileName);
         assertThat(c).contains("key").contains("traces");
     }
 }

@@ -23,7 +23,7 @@ class TestArtifactFileParsingErrors extends ApplicationBaseTest {
 
         // Step 1 - Upload flat files
         JSONObject responseBody = SafaRequest
-            .withRoute(AppRoutes.Projects.FlatFiles.CREATE_NEW_PROJECT_FROM_FLAT_FILES)
+            .withRoute(AppRoutes.FlatFiles.CREATE_NEW_PROJECT_FROM_FLAT_FILES)
             .getFlatFileHelper()
             .postWithFilesInDirectory(ProjectPaths.Tests.TEST2,
                 MockMvcResultMatchers.status().isBadRequest(),
@@ -38,7 +38,7 @@ class TestArtifactFileParsingErrors extends ApplicationBaseTest {
     void testDuplicateArtifactBody() throws Exception {
         // Step 1 - Upload flat files
         JSONObject responseBody = SafaRequest
-            .withRoute(AppRoutes.Projects.FlatFiles.CREATE_NEW_PROJECT_FROM_FLAT_FILES)
+            .withRoute(AppRoutes.FlatFiles.CREATE_NEW_PROJECT_FROM_FLAT_FILES)
             .getFlatFileHelper()
             .postWithFilesInDirectory(ProjectPaths.Tests.TEST3, new JSONObject());
         // VP - Verify that message contains artifact that failed constraint

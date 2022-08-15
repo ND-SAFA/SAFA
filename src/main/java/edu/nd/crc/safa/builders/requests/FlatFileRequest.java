@@ -37,7 +37,7 @@ public class FlatFileRequest extends SafaMultiPartRequest {
         JSONObject kwargs = new JSONObject();
         kwargs.put(ProjectVariables.AS_COMPLETE_SET, true);
         return SafaRequest
-            .withRoute(AppRoutes.Projects.FlatFiles.UPDATE_PROJECT_VERSION_FROM_FLAT_FILES)
+            .withRoute(AppRoutes.FlatFiles.UPDATE_PROJECT_VERSION_FROM_FLAT_FILES)
             .withVersion(projectVersion)
             .getFlatFileHelper()
             .postWithFilesInDirectory(pathToFileDir, kwargs);

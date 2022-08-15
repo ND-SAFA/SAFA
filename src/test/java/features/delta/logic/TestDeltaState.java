@@ -42,7 +42,7 @@ class TestDeltaState extends AbstractDeltaTest {
 
         // Step - Calculate delta between versions
         JSONObject projectDelta = SafaRequest
-            .withRoute(AppRoutes.Projects.Delta.CALCULATE_PROJECT_DELTA)
+            .withRoute(AppRoutes.Delta.CALCULATE_PROJECT_DELTA)
             .withBaselineVersion(beforeVersion)
             .withTargetVersion(afterVersion)
             .getWithJsonObject();

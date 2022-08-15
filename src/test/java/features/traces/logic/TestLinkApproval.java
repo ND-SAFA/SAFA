@@ -165,7 +165,7 @@ class TestLinkApproval extends AbstractTraceTest {
         }
 
         // Send to generate route
-        String generateRoute = RouteBuilder.withRoute(AppRoutes.Projects.Links.GENERATE_LINKS).buildEndpoint();
+        String generateRoute = RouteBuilder.withRoute(AppRoutes.Links.GENERATE_LINKS).buildEndpoint();
 
         JSONObject generateTraceLinkBody = new JSONObject();
         generateTraceLinkBody.put("sourceArtifacts", sourceArtifacts);

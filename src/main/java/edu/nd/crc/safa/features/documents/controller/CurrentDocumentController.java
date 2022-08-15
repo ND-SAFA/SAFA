@@ -37,7 +37,7 @@ public class CurrentDocumentController extends BaseDocumentController {
      *
      * @param documentId The ID of the document to set as the default.
      */
-    @PostMapping(AppRoutes.Projects.Documents.SET_CURRENT_DOCUMENT)
+    @PostMapping(AppRoutes.Documents.SET_CURRENT_DOCUMENT)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void setCurrentDocument(@PathVariable UUID documentId) {
         Document document = getDocumentById(this.documentRepository, documentId);
@@ -47,7 +47,7 @@ public class CurrentDocumentController extends BaseDocumentController {
     /**
      * Removes default document for authenticated user.
      */
-    @DeleteMapping(AppRoutes.Projects.Documents.CLEAR_CURRENT_DOCUMENT)
+    @DeleteMapping(AppRoutes.Documents.CLEAR_CURRENT_DOCUMENT)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void clearCurrentDocument() {
         this.currentDocumentService.clearCurrentDocumentForCurrentUser();

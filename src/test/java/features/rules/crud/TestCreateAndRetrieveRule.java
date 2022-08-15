@@ -37,7 +37,7 @@ class TestCreateAndRetrieveRule extends ApplicationBaseTest {
             // Step - Create rule
             RuleAppEntity rule = ruleTest.getRule();
             JSONObject ruleCreated = SafaRequest
-                .withRoute(AppRoutes.Projects.Rules.CREATE_WARNING_IN_PROJECT)
+                .withRoute(AppRoutes.Rules.CREATE_WARNING_IN_PROJECT)
                 .withProject(project)
                 .postWithJsonObject(rule);
 
@@ -50,7 +50,7 @@ class TestCreateAndRetrieveRule extends ApplicationBaseTest {
 
             // Step - Retrieve project warnings
             JSONObject projectWarnings = SafaRequest
-                .withRoute(AppRoutes.Projects.Rules.GET_WARNINGS_IN_PROJECT_VERSION)
+                .withRoute(AppRoutes.Rules.GET_WARNINGS_IN_PROJECT_VERSION)
                 .withVersion(projectVersion)
                 .getWithJsonObject();
 

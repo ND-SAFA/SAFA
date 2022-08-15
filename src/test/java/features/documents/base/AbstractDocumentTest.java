@@ -64,7 +64,7 @@ public abstract class AbstractDocumentTest extends ApplicationBaseTest {
 
     protected JSONArray getProjectDocuments(Project project) throws Exception {
         return SafaRequest
-            .withRoute(AppRoutes.Projects.Documents.GET_PROJECT_DOCUMENTS)
+            .withRoute(AppRoutes.Documents.GET_PROJECT_DOCUMENTS)
             .withProject(project)
             .getWithJsonArray();
     }

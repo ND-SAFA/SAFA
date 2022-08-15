@@ -163,7 +163,7 @@ public abstract class AbstractArtifactTest<T extends IArtifact> extends Applicat
 
         // Step - Get project delta
         JSONObject projectDelta = SafaRequest
-            .withRoute(AppRoutes.Projects.Delta.CALCULATE_PROJECT_DELTA)
+            .withRoute(AppRoutes.Delta.CALCULATE_PROJECT_DELTA)
             .withBaselineVersion(baselineVersion)
             .withTargetVersion(newProjectVersion)
             .getWithJsonObject();

@@ -9,9 +9,9 @@ import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 
+import features.base.ApplicationBaseTest;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
-import features.base.ApplicationBaseTest;
 
 /**
  * Tests that server errors include a
@@ -26,7 +26,7 @@ class TestSafaErrorMessage extends ApplicationBaseTest {
         project.setProjectId(UUID.randomUUID());
 
         JSONObject obj = SafaRequest
-            .withRoute(AppRoutes.Projects.Versions.GET_VERSIONS)
+            .withRoute(AppRoutes.Versions.GET_VERSIONS)
             .withProject(project)
             .getWithJsonObject(status().is4xxClientError());
 

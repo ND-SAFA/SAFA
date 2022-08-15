@@ -44,14 +44,14 @@ class TestDownloadAndReuploadFlatFiles extends ApplicationBaseTest {
         verifyProjectCreated(projectVersion);
 
         // Step - Download current project as JSON flat files
-        List<File> projectFiles = new SafaRequest(AppRoutes.Projects.FlatFiles.DOWNLOAD_FLAT_FILES)
+        List<File> projectFiles = new SafaRequest(AppRoutes.FlatFiles.DOWNLOAD_FLAT_FILES)
             .withVersion(projectVersion)
             .withFileType(DataFileBuilder.AcceptedFileTypes.JSON)
             .getWithFilesInZip();
 
         // Step - Create files with flat files downloaded
         String newVersionIdString = SafaRequest
-            .withRoute(AppRoutes.Projects.FlatFiles.CREATE_NEW_PROJECT_FROM_FLAT_FILES)
+            .withRoute(AppRoutes.FlatFiles.CREATE_NEW_PROJECT_FROM_FLAT_FILES)
             .getFlatFileHelper()
             .postWithFiles(projectFiles, new JSONObject())
             .getJSONObject("projectVersion")

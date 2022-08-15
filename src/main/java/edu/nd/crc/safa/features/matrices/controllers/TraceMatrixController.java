@@ -49,7 +49,7 @@ public class TraceMatrixController extends BaseController {
      * @return List of project matrices defined in project.
      * @throws SafaError Throws error if project with ID is not found.
      */
-    @GetMapping(AppRoutes.Projects.TraceMatrix.GET_TRACE_MATRICES)
+    @GetMapping(AppRoutes.TraceMatrix.GET_TRACE_MATRICES)
     public Map<String, List<String>> getTraceMatricesInProject(@PathVariable UUID projectId) throws SafaError {
         Project project = this.resourceBuilder.fetchProject(projectId).withViewProject();
         List<TraceMatrix> projectTraceMatrices = traceMatrixRepository.findByProject(project);
@@ -83,7 +83,7 @@ public class TraceMatrixController extends BaseController {
      * @param targetArtifactTypeName The name of the target artifact type.
      * @throws SafaError Throws error if project with ID is not found.
      */
-    @PostMapping(AppRoutes.Projects.TraceMatrix.CREATE_TRACE_MATRIX)
+    @PostMapping(AppRoutes.TraceMatrix.CREATE_TRACE_MATRIX)
     public void createTraceMatrix(@PathVariable UUID projectId,
                                   @PathVariable String sourceArtifactTypeName,
                                   @PathVariable String targetArtifactTypeName) throws SafaError {
@@ -111,7 +111,7 @@ public class TraceMatrixController extends BaseController {
      * @param targetArtifactTypeName The target artifact type name of the matrix.
      * @throws SafaError Throws error if user does not have edit permission on project.
      */
-    @DeleteMapping(AppRoutes.Projects.TraceMatrix.DELETE_TRACE_MATRIX)
+    @DeleteMapping(AppRoutes.TraceMatrix.DELETE_TRACE_MATRIX)
     public void deleteTraceMatrix(@PathVariable UUID projectId,
                                   @PathVariable String sourceArtifactTypeName,
                                   @PathVariable String targetArtifactTypeName) throws SafaError {

@@ -11,8 +11,8 @@ import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 
-import org.junit.jupiter.api.Test;
 import features.base.ApplicationBaseTest;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests that a user is able to delete a document in a project.
@@ -38,7 +38,7 @@ class TestDeleteDocument extends ApplicationBaseTest {
 
         // Step - Create new document payload
         String route = RouteBuilder
-            .withRoute(AppRoutes.Projects.Documents.DELETE_DOCUMENT)
+            .withRoute(AppRoutes.Documents.DELETE_DOCUMENT)
             .withDocument(document)
             .buildEndpoint();
         SafaRequest.withRoute(route).deleteWithJsonObject();

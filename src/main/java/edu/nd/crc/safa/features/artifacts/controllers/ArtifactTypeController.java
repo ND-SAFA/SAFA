@@ -46,7 +46,7 @@ public class ArtifactTypeController extends BaseController {
      * @return List of artifact types.
      * @throws SafaError Throws error if user does not have viewing permission on project.
      */
-    @GetMapping(AppRoutes.Projects.ArtifactType.GET_PROJECT_ARTIFACT_TYPES)
+    @GetMapping(AppRoutes.ArtifactType.GET_PROJECT_ARTIFACT_TYPES)
     public List<ArtifactType> getProjectArtifactTypes(@PathVariable UUID projectId) throws SafaError {
         Project project = this.resourceBuilder.fetchProject(projectId).withViewProject();
         return this.artifactTypeRepository.findByProject(project);
@@ -60,7 +60,7 @@ public class ArtifactTypeController extends BaseController {
      * @return The updated artifact type with id if being created.
      * @throws SafaError Throws error if user does not have edit permissions on project.
      */
-    @PostMapping(AppRoutes.Projects.ArtifactType.CREATE_OR_UPDATE_ARTIFACT_TYPE)
+    @PostMapping(AppRoutes.ArtifactType.CREATE_OR_UPDATE_ARTIFACT_TYPE)
     public ArtifactType createOrUpdateArtifactType(@PathVariable UUID projectId,
                                                    @RequestBody ArtifactType artifactType) throws SafaError {
         Project project = this.resourceBuilder.fetchProject(projectId).withEditProject();
@@ -76,7 +76,7 @@ public class ArtifactTypeController extends BaseController {
      * @param typeId The id of the type to delete.
      * @throws SafaError Throws error if user does not have edit permissions on project.
      */
-    @DeleteMapping(AppRoutes.Projects.ArtifactType.DELETE_ARTIFACT_TYPE)
+    @DeleteMapping(AppRoutes.ArtifactType.DELETE_ARTIFACT_TYPE)
     public void deleteArtifactType(@PathVariable UUID typeId) throws SafaError {
         ArtifactType artifactType = this.artifactTypeRepository.findByTypeId(typeId);
         Project project = artifactType.getProject();

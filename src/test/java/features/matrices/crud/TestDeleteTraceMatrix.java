@@ -6,8 +6,8 @@ import edu.nd.crc.safa.builders.RouteBuilder;
 import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactType;
-import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.matrices.entities.TraceMatrix;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.traces.repositories.TraceMatrixRepository;
 
 import features.matrices.base.AbstractMatrixTest;
@@ -34,7 +34,7 @@ class TestDeleteTraceMatrix extends AbstractMatrixTest {
 
         // Step - Send request to delete matrix.
         String route = RouteBuilder
-            .withRoute(AppRoutes.Projects.TraceMatrix.DELETE_TRACE_MATRIX)
+            .withRoute(AppRoutes.TraceMatrix.DELETE_TRACE_MATRIX)
             .withProject(project)
             .withSourceArtifactTypeName(sourceArtifactTypeName)
             .withTargetArtifactTypeName(targetArtifactTypeName)

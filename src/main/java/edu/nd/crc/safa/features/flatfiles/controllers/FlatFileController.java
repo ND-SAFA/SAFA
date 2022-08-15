@@ -73,7 +73,7 @@ public class FlatFileController extends BaseController {
      * @return ServerResponse whose body contains all entities in project created.
      * @throws SafaError Throws errors if no files are given.
      */
-    @PostMapping(value = AppRoutes.Projects.FlatFiles.UPDATE_PROJECT_VERSION_FROM_FLAT_FILES)
+    @PostMapping(value = AppRoutes.FlatFiles.UPDATE_PROJECT_VERSION_FROM_FLAT_FILES)
     @ResponseStatus(HttpStatus.CREATED)
     public ProjectAppEntity updateProjectVersionFromFlatFiles(
         @PathVariable UUID versionId,
@@ -105,7 +105,7 @@ public class FlatFileController extends BaseController {
      * @return ProjectCreationResponse containing project artifacts, traces, and warnings.
      * @throws SafaError Throws errors if tim.json file does not exist or an error occurred while parsing it.
      */
-    @PostMapping(value = AppRoutes.Projects.FlatFiles.CREATE_NEW_PROJECT_FROM_FLAT_FILES)
+    @PostMapping(value = AppRoutes.FlatFiles.CREATE_NEW_PROJECT_FROM_FLAT_FILES)
     @ResponseStatus(HttpStatus.CREATED)
     public ProjectAppEntity createNewProjectFromFlatFiles(@RequestParam MultipartFile[] files)
         throws SafaError, IOException {
@@ -124,7 +124,7 @@ public class FlatFileController extends BaseController {
         return projectAppEntity;
     }
 
-    @GetMapping(AppRoutes.Projects.FlatFiles.DOWNLOAD_FLAT_FILES)
+    @GetMapping(AppRoutes.FlatFiles.DOWNLOAD_FLAT_FILES)
     public void downloadFlatFiles(@PathVariable UUID versionId,
                                   @PathVariable String fileType,
                                   HttpServletResponse response) throws Exception {

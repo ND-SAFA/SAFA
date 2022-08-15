@@ -55,7 +55,7 @@ public class ParseDataFileController extends BaseController {
      * @param file         The file defining a list of artifacts containing columns id, summary, and content.
      * @return ParseArtifactResponse containing artifacts and error messages occurring during parsing.
      */
-    @PostMapping(value = AppRoutes.Projects.FlatFiles.PARSE_ARTIFACT_FILE)
+    @PostMapping(value = AppRoutes.FlatFiles.PARSE_ARTIFACT_FILE)
     @ResponseStatus(HttpStatus.OK)
     public EntityParsingResult<ArtifactAppEntity, String> parseArtifactFile(@PathVariable String artifactType,
                                                                             @RequestParam MultipartFile file) {
@@ -77,7 +77,7 @@ public class ParseDataFileController extends BaseController {
      * @param file The file defining a list of trace links containing columns source and target.
      * @return ParseArtifactResponse containing trace links and error messages occurring during parsing.
      */
-    @PostMapping(value = AppRoutes.Projects.FlatFiles.PARSE_TRACE_FILE)
+    @PostMapping(value = AppRoutes.FlatFiles.PARSE_TRACE_FILE)
     @ResponseStatus(HttpStatus.OK)
     public EntityParsingResult<TraceAppEntity, String> parseTraceFile(@RequestParam MultipartFile file) {
         EntityParsingResult<TraceAppEntity, String> response = new EntityParsingResult<>();

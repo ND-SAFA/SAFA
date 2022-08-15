@@ -5,8 +5,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactType;
-import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.matrices.entities.TraceMatrix;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.traces.repositories.TraceMatrixRepository;
 
 import features.matrices.base.AbstractMatrixTest;
@@ -34,7 +34,7 @@ class TestCRUDMatrix extends AbstractMatrixTest {
         this.traceMatrixRepository.save(traceMatrix);
 
         // Step - Send request to retrieve matrix.
-        JSONObject projectMatrices = new SafaRequest(AppRoutes.Projects.TraceMatrix.GET_TRACE_MATRICES)
+        JSONObject projectMatrices = new SafaRequest(AppRoutes.TraceMatrix.GET_TRACE_MATRICES)
             .withProject(project)
             .getWithJsonObject();
 

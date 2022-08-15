@@ -37,7 +37,7 @@ class TestCrudSingleType extends ApplicationBaseTest {
 
         // Step - Create artifact type
         String endpoint = RouteBuilder
-            .withRoute(AppRoutes.Projects.ArtifactType.CREATE_OR_UPDATE_ARTIFACT_TYPE)
+            .withRoute(AppRoutes.ArtifactType.CREATE_OR_UPDATE_ARTIFACT_TYPE)
             .withProject(project)
             .buildEndpoint();
         ArtifactType initialArtifactType = new ArtifactType(project, typeName);
@@ -84,7 +84,7 @@ class TestCrudSingleType extends ApplicationBaseTest {
 
         // Step - Retrieve artifact type
         JSONArray projectTypes = SafaRequest
-            .withRoute(AppRoutes.Projects.ArtifactType.GET_PROJECT_ARTIFACT_TYPES)
+            .withRoute(AppRoutes.ArtifactType.GET_PROJECT_ARTIFACT_TYPES)
             .withProject(project)
             .getWithJsonArray();
 
@@ -94,13 +94,13 @@ class TestCrudSingleType extends ApplicationBaseTest {
 
         // Step - Delete artifact type
         SafaRequest
-            .withRoute(AppRoutes.Projects.ArtifactType.DELETE_ARTIFACT_TYPE)
+            .withRoute(AppRoutes.ArtifactType.DELETE_ARTIFACT_TYPE)
             .withType(createdArtifactType)
             .deleteWithJsonObject();
 
         // Step - Retrieve artifact types
         projectTypes = SafaRequest
-            .withRoute(AppRoutes.Projects.ArtifactType.GET_PROJECT_ARTIFACT_TYPES)
+            .withRoute(AppRoutes.ArtifactType.GET_PROJECT_ARTIFACT_TYPES)
             .withProject(project).getWithJsonArray();
 
         // VP - Verify that type retrieved.

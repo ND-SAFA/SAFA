@@ -123,7 +123,7 @@ class TestRetrieveProjectVersionWarnings extends ApplicationBaseTest {
     }
 
     private JSONObject getProjectRules(ProjectVersion projectVersion) throws Exception {
-        return new SafaRequest(AppRoutes.Projects.Rules.GET_WARNINGS_IN_PROJECT_VERSION)
+        return new SafaRequest(AppRoutes.Rules.GET_WARNINGS_IN_PROJECT_VERSION)
             .withVersion(projectVersion)
             .getWithJsonObject();
     }

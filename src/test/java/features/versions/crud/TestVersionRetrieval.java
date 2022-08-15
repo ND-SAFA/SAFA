@@ -34,7 +34,7 @@ class TestVersionRetrieval extends ApplicationBaseTest {
     }
 
     private JSONArray getVersionsInProject(Project project) throws Exception {
-        return new SafaRequest(AppRoutes.Projects.Versions.GET_VERSIONS)
+        return new SafaRequest(AppRoutes.Versions.GET_VERSIONS)
             .withProject(project)
             .getWithJsonArray();
     }

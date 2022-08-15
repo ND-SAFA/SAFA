@@ -88,7 +88,7 @@ public abstract class ApplicationBaseTest extends WebSocketBaseTest {
     public JSONObject commitWithStatus(CommitBuilder commitBuilder, ResultMatcher expectedStatus) throws Exception {
         ProjectVersion commitVersion = commitBuilder.get().getCommitVersion();
         return SafaRequest
-            .withRoute(AppRoutes.Projects.Commits.COMMIT_CHANGE)
+            .withRoute(AppRoutes.Commits.COMMIT_CHANGE)
             .withVersion(commitVersion)
             .postWithJsonObject(commitBuilder.asJson(), expectedStatus);
     }
@@ -180,7 +180,7 @@ public abstract class ApplicationBaseTest extends WebSocketBaseTest {
                                                     JSONObject docJson) throws Exception {
         return
             SafaRequest
-                .withRoute(AppRoutes.Projects.Documents.CREATE_OR_UPDATE_DOCUMENT)
+                .withRoute(AppRoutes.Documents.CREATE_OR_UPDATE_DOCUMENT)
                 .withVersion(projectVersion)
                 .postWithJsonObject(docJson);
     }
@@ -189,7 +189,7 @@ public abstract class ApplicationBaseTest extends WebSocketBaseTest {
                                               Document document,
                                               JSONArray artifactsJson) throws Exception {
         return SafaRequest
-            .withRoute(AppRoutes.Projects.DocumentArtifact.ADD_ARTIFACTS_TO_DOCUMENT)
+            .withRoute(AppRoutes.DocumentArtifact.ADD_ARTIFACTS_TO_DOCUMENT)
             .withVersion(projectVersion)
             .withDocument(document)
             .postWithJsonArray(artifactsJson);

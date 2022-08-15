@@ -23,7 +23,7 @@ class TestArtifactAndTraceFileParse extends ParseBaseTest {
      */
     @Test
     void testArtifactEntities() throws Exception {
-        String baseRoute = AppRoutes.Projects.FlatFiles.PARSE_ARTIFACT_FILE;
+        String baseRoute = AppRoutes.FlatFiles.PARSE_ARTIFACT_FILE;
         String type = "Design";
 
         //Step - Upload file, parse artifacts, and collect them
@@ -49,7 +49,7 @@ class TestArtifactAndTraceFileParse extends ParseBaseTest {
         String fileName = "Design2Requirement.csv";
 
         // Step 1 - Upload TraceFile to parsing route and get response
-        String route = AppRoutes.Projects.FlatFiles.PARSE_TRACE_FILE;
+        String route = AppRoutes.FlatFiles.PARSE_TRACE_FILE;
         JSONObject responseBody = parseFileAndReturnBody(route, fileName);
 
         // VP - Verify that message contains constraint

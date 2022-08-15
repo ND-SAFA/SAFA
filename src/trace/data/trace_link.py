@@ -47,4 +47,4 @@ class TraceLink:
         return hash(source_id) + hash(target_id)
 
     def __hash__(self):
-        return hash(self.id_)
+        return self.id_

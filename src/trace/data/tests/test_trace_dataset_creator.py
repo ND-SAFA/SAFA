@@ -76,6 +76,16 @@ class TestTraceDatasetCreator(TestCase):
         self.assertFalse(get_feature_entry_mock.called)
 
     @patch.object(TraceDatasetCreator, "_get_feature_entry")
+    def test_get_training_dataset_no_validation(self, get_feature_entry_mock: mock.MagicMock):
+        resample_rate = 1
+        get_feature_entry_mock.side_effect = fake_extract_feature_info
+        expected_dataset_size = self.get_expected_train_dataset_size(resample_rate, 0)
+
+        test_trace_dataset_creator = self.get_test_trace_dataset_creator(validation_percentage=0)
+        training_dataset = test_trace_dataset_creator.get_training_dataset(resample_rate)
+        self.assertEquals(len(training_dataset), expected_dataset_size)
+
+    @patch.object(TraceDatasetCreator, "_get_feature_entry")
     def test_get_validation_dataset_full(self, get_feature_entry_mock: mock.MagicMock):
         get_feature_entry_mock.side_effect = fake_extract_feature_info
         test_trace_dataset_creator = self.get_test_trace_dataset_creator()
@@ -309,8 +319,8 @@ class TestTraceDatasetCreator(TestCase):
         t = Artifact(target, self.TEST_T_ARTS[target], lambda text: text)
         return TraceLink(s, t, lambda text_pair, text, return_token_type_ids, add_special_tokens: text + "_" + text_pair)
 
-    def get_expected_train_dataset_size(self, resample_rate):
-        num_train_pos_links = round(len(self.TEST_POS_LINKS) * (1 - self.VAlIDATION_PERCENTAGE))
+    def get_expected_train_dataset_size(self, resample_rate, validation_percentage=VAlIDATION_PERCENTAGE):
+        num_train_pos_links = round(len(self.TEST_POS_LINKS) * (1 - validation_percentage))
         return resample_rate * num_train_pos_links * 2  # equal number pos and neg links
 
     def get_test_trace_dataset_creator(self, validation_percentage=VAlIDATION_PERCENTAGE, include_links=True, model_generator=None):

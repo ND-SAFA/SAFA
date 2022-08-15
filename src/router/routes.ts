@@ -30,6 +30,7 @@ export enum QueryParams {
 export const routesWithRequiredProject: string[] = [
   Routes.TRACE_LINK,
   Routes.PROJECT_SETTINGS,
+  Routes.ARTIFACT,
 ];
 
 export const routesPublic: string[] = [

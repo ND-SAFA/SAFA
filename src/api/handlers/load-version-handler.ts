@@ -3,9 +3,15 @@ import {
   documentModule,
   errorModule,
   projectModule,
+  sessionModule,
   viewportModule,
 } from "@/store";
-import { navigateTo, Routes } from "@/router";
+import {
+  navigateTo,
+  router,
+  Routes,
+  routesWithRequiredProject,
+} from "@/router";
 import {
   getArtifactsInVersion,
   getProjectVersion,
@@ -28,8 +34,15 @@ export async function handleLoadVersion(
   document?: DocumentModel
 ): Promise<void> {
   appModule.onLoadStart();
+  await sessionModule.updateSession({ versionId });
 
-  return navigateTo(Routes.ARTIFACT)
+  const navigateIfNeeded = async () => {
+    if (routesWithRequiredProject.includes(router.currentRoute.path)) return;
+
+    await navigateTo(Routes.ARTIFACT);
+  };
+
+  return navigateIfNeeded()
     .then(() => getProjectVersion(versionId))
     .then(handleSetProject)
     .then(async () => {

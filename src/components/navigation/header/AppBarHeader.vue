@@ -44,7 +44,7 @@ import {
   ButtonType,
   VersionModel,
 } from "@/types";
-import { navigateTo, Routes } from "@/router";
+import { getParams, navigateTo, Routes } from "@/router";
 import { logModule, projectModule } from "@/store";
 import { handleLoadVersion } from "@/api";
 import { ButtonRow, SafaIcon, Typography, FlexBox } from "@/components/common";
@@ -109,7 +109,7 @@ export default Vue.extend({
         {
           name: "Project Settings",
           tooltip: "View this project's settings",
-          onClick: () => navigateTo(Routes.PROJECT_SETTINGS),
+          onClick: () => navigateTo(Routes.PROJECT_SETTINGS, getParams()),
         },
       ];
 
@@ -158,7 +158,7 @@ export default Vue.extend({
             {
               name: "Approve Generated Trace Links",
               tooltip: "Review automatically created graph links",
-              onClick: () => navigateTo(Routes.TRACE_LINK),
+              onClick: () => navigateTo(Routes.TRACE_LINK, getParams()),
             },
           ],
         },

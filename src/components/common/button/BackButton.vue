@@ -7,7 +7,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { navigateBack, navigateTo, Routes } from "@/router";
+import { getParams, navigateBack, navigateTo, Routes } from "@/router";
 
 /**
  * A generic back button
@@ -23,13 +23,16 @@ export default Vue.extend({
       type: String as PropType<Routes | undefined>,
       default: undefined,
     },
+    toProject: Boolean,
   },
   methods: {
     /**
      * Routes back to the given page.
      */
     handleClick(): void {
-      if (this.route) {
+      if (this.toProject) {
+        navigateTo(Routes.ARTIFACT, getParams());
+      } else if (this.route) {
         navigateTo(this.route);
       } else {
         navigateBack();

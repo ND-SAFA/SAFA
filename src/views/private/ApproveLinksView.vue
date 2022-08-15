@@ -1,7 +1,7 @@
 <template>
   <private-page>
     <template v-slot:page>
-      <back-button text="Back To Tree View" />
+      <back-button text="Back To Tree View" to-project />
       <trace-link-table />
     </template>
   </private-page>

@@ -8,7 +8,6 @@ import { createSession } from "@/util";
 import { getParam, getParams, navigateTo, QueryParams, Routes } from "@/router";
 import { logModule, sessionModule } from "@/store";
 import {
-  handleLoadLastProject,
   handleClearProject,
   createLoginSession,
   savePassword,
@@ -29,11 +28,10 @@ export async function handleLogin(user: UserModel): Promise<void> {
 
   sessionModule.SET_SESSION(session);
 
-  if (typeof goToPath === "string" && goToPath !== Routes.ARTIFACT) {
+  if (typeof goToPath === "string") {
     await navigateTo(goToPath, query);
   } else {
-    await navigateTo(Routes.ARTIFACT, query);
-    await handleLoadLastProject();
+    await navigateTo(Routes.HOME, query);
   }
 }
 

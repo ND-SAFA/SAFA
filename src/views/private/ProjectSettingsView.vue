@@ -1,7 +1,7 @@
 <template>
   <private-page>
     <template v-slot:page>
-      <back-button text="Back To Tree View" />
+      <back-button text="Back To Tree View" to-project />
       <v-container>
         <settings-general-section :project="project" />
         <settings-member-section :project="project" />

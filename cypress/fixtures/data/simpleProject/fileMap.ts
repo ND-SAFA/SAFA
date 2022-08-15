@@ -1,6 +1,9 @@
-import files from "./simpleProjectFiles.json";
+import files from "./files.json";
 
-export const SimpleProjectFilesMap = {
+/**
+ * A mapping from file name to each of the simple files.
+ */
+export default {
   tim: files[0],
   design: files[1],
   design2design: files[2],

@@ -1,6 +1,10 @@
-import { validUser } from "../fixtures/user.json";
-import files from "../fixtures/simpleProjectFiles.json";
-import { SimpleProjectFilesMap } from "../fixtures/simpleProjectFilesMap";
+import {
+  validUser,
+  simpleProjectFiles,
+  simpleProjectFilesMap,
+  DataCy,
+  testProject,
+} from "../fixtures";
 
 describe("Project Creation", () => {
   beforeEach(() => {
@@ -16,32 +20,29 @@ describe("Project Creation", () => {
     });
 
     it("cant create a project without a name", () => {
-      cy.getCy("input-project-description").last().type("A project");
-      cy.uploadFiles("input-files", SimpleProjectFilesMap.tim);
+      cy.getCy(DataCy.creationBulkDescriptionInput).type(testProject.name);
+      cy.uploadFiles(DataCy.creationBulkFilesInput, simpleProjectFilesMap.tim);
 
-      cy.getCy("button-create-project").should("be.disabled");
+      cy.getCy(DataCy.creationUploadButton).should("be.disabled");
     });
 
     it("cant create a project without any files", () => {
-      cy.getCy("input-project-name").last().type("Test Project");
-      cy.getCy("input-project-description").last().type("A project");
+      cy.setProjectIdentifier("bulk");
 
-      cy.getCy("button-create-project").should("be.disabled");
+      cy.getCy(DataCy.creationUploadButton).should("be.disabled");
     });
 
     it("can create a valid project", () => {
-      cy.getCy("input-project-name").last().type("Test Project");
-      cy.getCy("input-project-description").last().type("A project");
-      cy.uploadFiles("input-files", ...files);
+      cy.setProjectIdentifier("bulk");
+      cy.uploadFiles(DataCy.creationBulkFilesInput, ...simpleProjectFiles);
 
-      cy.getCy("button-create-project").should("not.be.disabled").click();
+      cy.getCy(DataCy.creationUploadButton).should("not.be.disabled").click();
 
-      cy.getCy("job-status", 5000)
-        .first()
+      cy.getCy(DataCy.jobStatus, "first", 5000)
         .wait(5000)
         .should("contain.text", "Completed");
 
-      cy.clickButton("job-panel").clickButton("button-delete-job");
+      cy.clickButton(DataCy.jobPanel).clickButton(DataCy.jobDeleteButton);
     });
   });
 });

@@ -1,4 +1,4 @@
-import { validUser } from "../fixtures/user.json";
+import { validUser } from "../fixtures";
 
 describe("Integrations - Jira", () => {
   beforeEach(() => {
@@ -6,6 +6,10 @@ describe("Integrations - Jira", () => {
       validUser.email,
       validUser.password
     );
+  });
+
+  afterEach(() => {
+    cy.logout();
   });
 
   // it("does something", () => {});

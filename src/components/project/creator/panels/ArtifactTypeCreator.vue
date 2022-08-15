@@ -1,5 +1,5 @@
 <template>
-  <flex-box v-if="isOpen" full-width>
+  <flex-box v-if="isOpen" full-width y="3">
     <v-text-field
       filled
       required

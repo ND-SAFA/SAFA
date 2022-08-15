@@ -1,6 +1,9 @@
-declare namespace Cypress {
-  type ElementPosition = "first" | "last";
+/**
+ * The position of an element within a list.
+ */
+type ElementPosition = "first" | "last";
 
+declare namespace Cypress {
   interface Chainable<Subject> {
     // Base Commands
 
@@ -23,8 +26,7 @@ declare namespace Cypress {
      *
      * @param dataCy - The testing selector of the input being set.
      * @param inputValue - The value to set.
-     * @param isFirst - Whether to input text to first element matching dataCy.
-     *                  Otherwise, last element is used.
+     * @param elementPosition - The specific element to grab, if there are multiple.
      */
     inputText(
       dataCy: string,
@@ -36,8 +38,7 @@ declare namespace Cypress {
      * Clicks a button.
      *
      * @param dataCy - The testing selector of the button to click.
-     * @param isFirst - Whether to click first element matching `dataCy`.
-     *                  Otherwise, last one is selected.
+     * @param elementPosition - The specific element to grab, if there are multiple.
      */
     clickButton(
       dataCy: string,
@@ -89,13 +90,10 @@ declare namespace Cypress {
     // Project Creator Commands
 
     /**
-     * Setting the project name and description within the standard project creator.
-     * @param name - Project name.
-     * @param description - Project description.
+     * Setting the project name and description within the project creator.
+     *
+     * @param type - The type of project identifier to set.
      */
-    setProjectInformationInStandardUpload(
-      name?: string,
-      description?: string
-    ): Chainable<void>;
+    setProjectIdentifier(type: "bulk" | "standard"): Chainable<void>;
   }
 }

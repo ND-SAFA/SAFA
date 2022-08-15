@@ -11,6 +11,8 @@
       <project-identifier-input
         v-bind:name.sync="identifier.name"
         v-bind:description.sync="identifier.description"
+        data-cy-name="input-project-name-modal"
+        data-cy-description="input-project-description-modal"
       />
       <v-switch
         style="margin-left: 80px"

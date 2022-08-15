@@ -8,7 +8,7 @@
     truncate-length="30"
     class="mt-3"
     v-model="model"
-    data-cy="input-files"
+    :data-cy="dataCy"
     @click:clear="$emit('clear')"
   />
 </template>
@@ -30,6 +30,10 @@ export default Vue.extend({
       type: Boolean,
       required: false,
       default: true,
+    },
+    dataCy: {
+      type: String,
+      default: "input-files",
     },
   },
   data() {

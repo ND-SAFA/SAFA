@@ -40,6 +40,7 @@ import edu.nd.crc.safa.features.users.repositories.ProjectMembershipRepository;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 import edu.nd.crc.safa.features.versions.repositories.ProjectVersionRepository;
 
+import org.junit.jupiter.api.AfterEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -116,6 +117,9 @@ public class DbEntityBuilder extends BaseBuilder {
         this.artifactTypes = new Hashtable<>();
         this.artifacts = new Hashtable<>();
         this.bodies = new Hashtable<>();
+
+        this.deleteProjectFiles();
+        this.projectRepository.deleteAll();
         this.projectVersionRepository.deleteAll();
         this.documentRepository.deleteAll();
         this.documentArtifactRepository.deleteAll();
@@ -123,7 +127,10 @@ public class DbEntityBuilder extends BaseBuilder {
         this.artifactRepository.deleteAll();
         this.artifactVersionRepository.deleteAll();
         this.revisionNumber = 1;
+    }
 
+    @AfterEach
+    public void deleteProjectFiles() throws IOException {
         //Deletes project data
         for (Project project : this.projectRepository.findAll()) {
             projectService.deleteProject(project);

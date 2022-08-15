@@ -102,11 +102,11 @@ public class AppRoutes {
         public static final String GET_PROJECT_DOCUMENTS = Projects.PREFIX + "/{projectId}/documents";
         protected static final String PREFIX = "/documents";
         public static final String CREATE_OR_UPDATE_DOCUMENT = Versions.BY_ID + Documents.PREFIX;
-        public static final String GET_DOCUMENT_BY_ID = Projects.PREFIX + Documents.PREFIX + "/{documentId}";
-        public static final String DELETE_DOCUMENT = Projects.PREFIX + Documents.PREFIX + "/{documentId}";
         public static final String SET_CURRENT_DOCUMENT = Projects.PREFIX + Documents.PREFIX + "/current/{documentId}";
         public static final String CLEAR_CURRENT_DOCUMENT = Projects.PREFIX + Documents.PREFIX + "/current";
         protected static final String BY_ID = PREFIX + "/{documentId}";
+        public static final String GET_DOCUMENT_BY_ID = Versions.BY_ID + Documents.BY_ID;
+        public static final String DELETE_DOCUMENT = Projects.PREFIX + Documents.BY_ID;
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)

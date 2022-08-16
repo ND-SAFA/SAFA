@@ -109,7 +109,7 @@ export default Vue.extend({
     return {
       steps: [
         [PROJECT_IDENTIFIER_STEP_NAME, false],
-        ["Upload Artifacts", false],
+        ["Upload Artifacts", true],
         ["Upload Trace Links", true],
         ["View TIM", true],
       ] as StepState[],

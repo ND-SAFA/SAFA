@@ -1,0 +1,111 @@
+package edu.nd.crc.safa.features.jobs.controllers;
+
+import java.util.List;
+import java.util.UUID;
+
+import edu.nd.crc.safa.builders.ResourceBuilder;
+import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.features.commits.services.EntityVersionService;
+import edu.nd.crc.safa.features.common.BaseController;
+import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
+import edu.nd.crc.safa.features.jobs.entities.builders.CreateProjectByJsonJobBuilder;
+import edu.nd.crc.safa.features.jobs.entities.builders.UpdateProjectByFlatFileJobBuilder;
+import edu.nd.crc.safa.features.jobs.services.JobService;
+import edu.nd.crc.safa.features.notifications.NotificationService;
+import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.projects.repositories.ProjectRepository;
+import edu.nd.crc.safa.features.projects.services.AppEntityRetrievalService;
+import edu.nd.crc.safa.features.projects.services.ProjectService;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
+/**
+ * Responsible for submitting jobs and retrieving their results.
+ */
+@RestController
+public class JobController extends BaseController {
+
+    JobService jobService;
+    EntityVersionService entityVersionService;
+    ProjectService projectService;
+    ProjectRepository projectRepository;
+    AppEntityRetrievalService appEntityRetrievalService;
+    NotificationService notificationService;
+    TaskExecutor taskExecutor;
+    ServiceProvider serviceProvider;
+
+    @Autowired
+    public JobController(ResourceBuilder resourceBuilder,
+                         JobService jobService,
+                         EntityVersionService entityVersionService,
+                         ProjectService projectService,
+                         ProjectRepository projectRepository,
+                         AppEntityRetrievalService appEntityRetrievalService,
+                         NotificationService notificationService,
+                         TaskExecutor taskExecutor,
+                         ServiceProvider serviceProvider) {
+        super(resourceBuilder);
+        this.jobService = jobService;
+        this.entityVersionService = entityVersionService;
+        this.projectService = projectService;
+        this.projectRepository = projectRepository;
+        this.appEntityRetrievalService = appEntityRetrievalService;
+        this.notificationService = notificationService;
+        this.taskExecutor = taskExecutor;
+        this.serviceProvider = serviceProvider;
+    }
+
+    @GetMapping(AppRoutes.Jobs.GET_JOBS)
+    public List<JobAppEntity> getJobStatus() throws SafaError {
+        return this.jobService.retrieveCurrentUserJobs();
+    }
+
+    /**
+     * Responsible for stopping the process running the job and cleaning up any resources.
+     *
+     * @param jobId The UUID for the job to stop.
+     * @throws SafaError Throws error because still in construction.
+     */
+    @DeleteMapping(AppRoutes.Jobs.DELETE_JOB)
+    public void deleteJob(@PathVariable UUID jobId) throws SafaError {
+        this.jobService.deleteJob(jobId);
+    }
+
+    /**
+     * Parses given job payload by the jobType and returns the job created.
+     *
+     * @param versionId The project version to save the entities to.
+     * @param files     The flat files to be parsed and uploaded.
+     * @return The current status of the job created.
+     * @throws SafaError Throws error if job failed to start or is under construction.
+     */
+    @PostMapping(AppRoutes.Jobs.FLAT_FILE_PROJECT_UPDATE_JOB)
+    @ResponseStatus(HttpStatus.CREATED)
+    public JobAppEntity flatFileProjectUpdateJob(@PathVariable UUID versionId,
+                                                 @RequestParam MultipartFile[] files) throws Exception {
+        UpdateProjectByFlatFileJobBuilder updateProjectByFlatFileJobBuilder = new UpdateProjectByFlatFileJobBuilder(
+            serviceProvider,
+            versionId, files);
+        return updateProjectByFlatFileJobBuilder.perform();
+    }
+
+    @PostMapping(AppRoutes.Jobs.JSON_PROJECT_JOB)
+    public JobAppEntity createProjectFromJSON(@RequestBody ProjectAppEntity projectAppEntity) throws Exception {
+        CreateProjectByJsonJobBuilder createProjectByJsonJobBuilder = new CreateProjectByJsonJobBuilder(
+            serviceProvider, projectAppEntity);
+        return createProjectByJsonJobBuilder.perform();
+    }
+}

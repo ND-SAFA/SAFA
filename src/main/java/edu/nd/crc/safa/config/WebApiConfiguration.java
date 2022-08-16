@@ -1,5 +1,8 @@
 package edu.nd.crc.safa.config;
 
+import edu.nd.crc.safa.features.jira.repositories.JiraProjectRepository;
+import edu.nd.crc.safa.features.jira.services.JiraConnectionService;
+import edu.nd.crc.safa.features.jira.services.JiraConnectionServiceImpl;
 import edu.nd.crc.safa.server.repositories.github.GithubProjectRepository;
 import edu.nd.crc.safa.server.repositories.jira.JiraProjectRepository;
 import edu.nd.crc.safa.server.services.github.GithubConnectionService;

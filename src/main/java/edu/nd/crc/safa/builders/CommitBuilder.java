@@ -1,9 +1,10 @@
 package edu.nd.crc.safa.builders;
 
-import edu.nd.crc.safa.server.entities.api.ProjectCommit;
-import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
-import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
-import edu.nd.crc.safa.server.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
+import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
+import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
+import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,27 +26,27 @@ public class CommitBuilder {
     }
 
     public CommitBuilder withAddedArtifact(JSONObject artifactJson) throws JsonProcessingException {
-        this.projectCommit.getArtifacts().getAdded().add(asArtifactAppEntity(artifactJson));
+        this.projectCommit.addArtifact(ModificationType.ADDED, asArtifactAppEntity(artifactJson));
         return this;
     }
 
     public CommitBuilder withRemovedArtifact(JSONObject artifactJson) throws JsonProcessingException {
-        this.projectCommit.getArtifacts().getRemoved().add(asArtifactAppEntity(artifactJson));
+        this.projectCommit.addArtifact(ModificationType.REMOVED, asArtifactAppEntity(artifactJson));
         return this;
     }
 
     public CommitBuilder withModifiedArtifact(JSONObject artifactJson) throws JsonProcessingException {
-        this.projectCommit.getArtifacts().getModified().add(asArtifactAppEntity(artifactJson));
+        this.projectCommit.addArtifact(ModificationType.MODIFIED, asArtifactAppEntity(artifactJson));
         return this;
     }
 
-    public CommitBuilder withAddedTrace(JSONObject json) throws JsonProcessingException {
-        this.projectCommit.getTraces().getAdded().add(asTraceAppEntity(json));
+    public CommitBuilder withAddedTrace(JSONObject traceJson) throws JsonProcessingException {
+        this.projectCommit.addTrace(ModificationType.ADDED, asTraceAppEntity(traceJson));
         return this;
     }
 
     public CommitBuilder withModifiedTrace(TraceAppEntity traceAppEntity) {
-        this.projectCommit.getTraces().getModified().add(traceAppEntity);
+        this.projectCommit.addTrace(ModificationType.MODIFIED, traceAppEntity);
         return this;
     }
 

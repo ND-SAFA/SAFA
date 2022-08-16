@@ -11,6 +11,7 @@ import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
 import edu.nd.crc.safa.features.jobs.entities.builders.CreateProjectByJsonJobBuilder;
 import edu.nd.crc.safa.features.jobs.entities.builders.UpdateProjectByFlatFileJobBuilder;
 import edu.nd.crc.safa.features.jobs.services.JobService;
+import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 
@@ -55,6 +56,11 @@ public class JobController extends BaseController {
     @DeleteMapping(AppRoutes.Jobs.DELETE_JOB)
     public void deleteJob(@PathVariable UUID jobId) throws SafaError {
         this.jobService.deleteJob(jobId);
+        this.serviceProvider.getNotificationService().broadcastChange(
+            EntityChangeBuilder
+                .create(jobId)
+                .withJobDelete(jobId)
+        );
     }
 
     /**

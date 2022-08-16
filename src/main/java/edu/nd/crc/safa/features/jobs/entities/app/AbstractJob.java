@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.jobs.services.JobService;
+import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
 import edu.nd.crc.safa.features.notifications.services.NotificationService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 
@@ -53,18 +54,18 @@ public abstract class AbstractJob implements Job {
                 // Pre-step
                 Method method = getMethodForStepByName(stepName);
                 jobService.startStep(jobDbEntity);
-                notificationService.broadcastUpdateJobMessage(jobDbEntity);
+                notificationService.broadcastChange(EntityChangeBuilder.createJobUpdate(jobDbEntity));
 
                 // Step
                 method.invoke(this);
 
                 // Post-step
                 jobService.endStep(jobDbEntity);
-                notificationService.broadcastUpdateJobMessage(jobDbEntity);
+                notificationService.broadcastChange(EntityChangeBuilder.createJobUpdate(jobDbEntity));
             } catch (Exception e) {
                 jobService.failJob(jobDbEntity);
                 e.printStackTrace();
-                notificationService.broadcastUpdateJobMessage(jobDbEntity);
+                notificationService.broadcastChange(EntityChangeBuilder.createJobUpdate(jobDbEntity));
                 throw new SafaError(e.getMessage());
             }
         }

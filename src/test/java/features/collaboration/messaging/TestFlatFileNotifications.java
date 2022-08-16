@@ -4,28 +4,29 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import edu.nd.crc.safa.builders.requests.FlatFileRequest;
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.features.notifications.entities.old.VersionMessage;
-import edu.nd.crc.safa.features.versions.entities.app.VersionEntityTypes;
+import edu.nd.crc.safa.features.notifications.entities.Change;
+import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
 import features.base.ApplicationBaseTest;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests that uploading flat files incurs a single update message.
+ * Tests that uploading flat files:
+ * - incurs a single update message.
+ * - update message has single change of type VERSION
  */
-class TestFlatFileMessage extends ApplicationBaseTest {
-    @Test
-    void singleMessageOnFlatFileUpload() throws Exception {
-        String projectName = "test-project";
+class TestFlatFileNotifications extends ApplicationBaseTest {
+    String clientId = "client-one";
 
+    @Test
+    void singleNotificationOnUpload() throws Exception {
         // Step - Create project and version id
         ProjectVersion projectVersion = dbEntityBuilder
             .newProject(projectName)
             .newVersionWithReturn(projectName);
 
-        // Step - Connect to websocket and subscribe to version messages.
-        String clientId = "client-one";
+        // Step - Subscribe to version notifications
         createNewConnection(clientId).subscribeToVersion(clientId, projectVersion);
 
         // Step - Upload flat files
@@ -33,7 +34,11 @@ class TestFlatFileMessage extends ApplicationBaseTest {
 
         // VP - Verify that single message sent
         assertThat(getQueueSize(clientId)).isEqualTo(1);
-        VersionMessage message = getNextMessage(clientId, VersionMessage.class);
-        assertThat(message.getType()).isEqualTo(VersionEntityTypes.VERSION);
+        EntityChangeMessage message = getNextMessage(clientId, EntityChangeMessage.class);
+        assertThat(message.getChanges()).hasSize(1);
+
+        // VP - Verify that entity changed = VERSIONS
+        Change change = message.getChanges().get(0);
+        assertThat(change.getEntity()).isEqualTo(Change.Entity.VERSION);
     }
 }

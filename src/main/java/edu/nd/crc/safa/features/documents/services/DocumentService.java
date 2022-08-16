@@ -23,7 +23,6 @@ import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
 import edu.nd.crc.safa.features.layout.services.ArtifactPositionService;
 import edu.nd.crc.safa.features.notifications.services.NotificationService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
-import edu.nd.crc.safa.features.versions.entities.app.VersionEntityTypes;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
 import lombok.AllArgsConstructor;
@@ -120,23 +119,6 @@ public class DocumentService implements IAppEntityService<DocumentAppEntity> {
         // Step - Remove columns not included in payload
         for (UUID removedColumnId : originalColumnIds) {
             this.documentColumnRepository.deleteById(removedColumnId);
-        }
-    }
-
-    /**
-     * Sends notification to project subscribers that the documents have changed. If updateArtifacts is
-     * true then project version subscribers will be notified to update their artifacts.
-     *
-     * @param projectVersion  The project version whose artifacts are updated.
-     * @param updateArtifacts Whether to notify project version subsribers.
-     */
-    public void notifyDocumentChanges(ProjectVersion projectVersion, boolean updateArtifacts) {
-        this.notificationService.broadcastUpdateProjectVersionMessage(
-            projectVersion,
-            VersionEntityTypes.DOCUMENTS
-        );
-        if (updateArtifacts) {
-            this.notificationService.broadcastUpdateProjectVersionMessage(projectVersion, VersionEntityTypes.ARTIFACTS);
         }
     }
 

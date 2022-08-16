@@ -3,6 +3,7 @@ package edu.nd.crc.safa.features.documents.controller;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.validation.Valid;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
@@ -13,10 +14,10 @@ import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.documents.services.DocumentService;
 import edu.nd.crc.safa.features.layout.entities.app.LayoutManager;
 import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
+import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
 import edu.nd.crc.safa.features.notifications.services.NotificationService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
-import edu.nd.crc.safa.features.versions.entities.app.VersionEntityTypes;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,12 +78,18 @@ public class DocumentController extends BaseDocumentController {
             projectVersion,
             document,
             documentAppEntity.getArtifactIds());
+        List<UUID> affectedArtifactIds =
+            documentAppEntity.getArtifactIds().stream().map(UUID::fromString).collect(Collectors.toList());
 
         // Create or update: columns
         documentService.updateFMEAColumns(documentAppEntity, document);
 
         // Update version subscribers
-        documentService.notifyDocumentChanges(projectVersion, nArtifactUpdated > 0);
+        notificationService.broadcastChange(
+            EntityChangeBuilder.create(versionId)
+                .withDocumentUpdate(List.of(document.getDocumentId()))
+                .withArtifactsUpdate(affectedArtifactIds)
+        );
 
         // Generate layout
         Map<String, LayoutPosition> documentLayout = createDocumentLayout(projectVersion, documentAppEntity);
@@ -129,12 +136,21 @@ public class DocumentController extends BaseDocumentController {
     @DeleteMapping(AppRoutes.Documents.DELETE_DOCUMENT)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteDocument(@PathVariable UUID documentId) throws SafaError {
+        // Step - Retrieve document and associated project.
         Document document = getDocumentById(this.documentRepository, documentId);
         Project project = document.getProject();
+
+        // Step - Verify authorized user has permission to delete.
         resourceBuilder.setProject(project).withEditProject();
-        for (ProjectVersion projectVersion : this.serviceProvider.getProjectVersionRepository().findByProject(project)) {
-            this.notificationService.broadcastUpdateProjectVersionMessage(projectVersion, VersionEntityTypes.DOCUMENTS);
-        }
+
+        // Step - Delete document.
         this.documentRepository.delete(document);
+
+        // Step - Notify project users that document has been deleted.
+        this.notificationService.broadcastChange(
+            EntityChangeBuilder
+                .create(project)
+                .withDocumentDelete(documentId)
+        );
     }
 }

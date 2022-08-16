@@ -10,9 +10,9 @@ import java.util.concurrent.LinkedBlockingDeque;
 
 import edu.nd.crc.safa.config.WebSocketBrokerConfig;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
+import edu.nd.crc.safa.features.notifications.services.NotificationService;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
-import edu.nd.crc.safa.features.notifications.services.NotificationService;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -94,7 +94,7 @@ public abstract class WebSocketBaseTest extends AuthenticatedBaseTest {
      * @return The test instance allowing for the builder pattern.
      */
     public WebSocketBaseTest subscribeToProject(String clientId, Project project) {
-        String projectSubscriptionDestination = NotificationService.getProjectTopic(project);
+        String projectSubscriptionDestination = NotificationService.getTopic(project.getProjectId());
         return this.subscribe(clientId, projectSubscriptionDestination);
     }
 
@@ -106,7 +106,7 @@ public abstract class WebSocketBaseTest extends AuthenticatedBaseTest {
      * @return The test instance allowing for the builder pattern.
      */
     public WebSocketBaseTest subscribeToVersion(String clientId, ProjectVersion projectVersion) {
-        String projectVersionSubscriptionDestination = NotificationService.getVersionTopic(projectVersion);
+        String projectVersionSubscriptionDestination = NotificationService.getTopic(projectVersion.getVersionId());
         return this.subscribe(clientId, projectVersionSubscriptionDestination);
     }
 
@@ -117,7 +117,7 @@ public abstract class WebSocketBaseTest extends AuthenticatedBaseTest {
      * @param jobDbEntity The job whose updates are listened for.
      */
     public void subscribeToJob(String clientId, JobDbEntity jobDbEntity) {
-        String projectVersionSubscriptionDestination = NotificationService.getJobTopic(jobDbEntity);
+        String projectVersionSubscriptionDestination = NotificationService.getTopic(jobDbEntity.getId());
         this.subscribe(clientId, projectVersionSubscriptionDestination);
     }
 
@@ -133,17 +133,14 @@ public abstract class WebSocketBaseTest extends AuthenticatedBaseTest {
      */
     public <T> T getNextMessage(String clientId, Class<T> targetClass) throws InterruptedException, JsonProcessingException {
         String response = getNextMessage(clientId);
+        assert response != null;
         return toClass(response, targetClass);
     }
 
     public <T> T toClass(String response, Class<T> targetClass) throws JsonProcessingException {
         return mapper.readValue(response, targetClass);
     }
-
-    public ObjectMapper getMapper() {
-        return objectMapper;
-    }
-
+    
     /**
      * Returns the next message in the queue associated with given client id.
      *

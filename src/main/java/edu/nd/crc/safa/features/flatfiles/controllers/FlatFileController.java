@@ -15,7 +15,6 @@ import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
-import edu.nd.crc.safa.features.versions.entities.app.VersionEntityTypes;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,8 +71,11 @@ public class FlatFileController extends BaseController {
             serviceProvider,
             files,
             asCompleteSet);
-        this.serviceProvider.getNotificationService().broadcastUpdateProjectVersionMessage(projectVersion,
-            VersionEntityTypes.VERSION);
+        this.serviceProvider.getNotificationService().broadcastChange(
+            EntityChangeBuilder
+                .create(versionId)
+                .withVersionUpdate(versionId)
+        );
         return projectCreated;
     }
 

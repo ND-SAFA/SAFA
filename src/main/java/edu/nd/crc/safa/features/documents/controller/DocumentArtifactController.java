@@ -17,7 +17,6 @@ import edu.nd.crc.safa.features.layout.entities.app.LayoutManager;
 import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
 import edu.nd.crc.safa.features.notifications.services.NotificationService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
-import edu.nd.crc.safa.features.versions.entities.app.VersionEntityTypes;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,10 +74,6 @@ public class DocumentArtifactController extends BaseDocumentController {
 
         LayoutManager layoutManager = new LayoutManager(serviceProvider, projectVersion);
         layoutManager.generateDocumentLayout(document, true);
-        this.notificationService.broadcastUpdateProjectVersionMessage(
-            projectVersion,
-            VersionEntityTypes.DOCUMENTS
-        );
         this.notificationService.broadcastChange(
             EntityChangeBuilder
                 .create(versionId)
@@ -100,11 +95,12 @@ public class DocumentArtifactController extends BaseDocumentController {
                 document,
                 artifact);
         documentArtifactQuery.ifPresent(this.documentArtifactRepository::delete);
-        this.notificationService.broadcastUpdateProjectVersionMessage(
-            projectVersion,
-            VersionEntityTypes.DOCUMENTS
+
+        this.notificationService.broadcastChange(
+            EntityChangeBuilder.create(versionId)
+                .withDocumentUpdate(List.of(documentId))
+                .withArtifactsUpdate(List.of(artifactId))
         );
-        this.notificationService.broadcastUpdateProjectVersionMessage(projectVersion, VersionEntityTypes.ARTIFACTS);
     }
 
     private Artifact getArtifactById(UUID artifactId) throws SafaError {

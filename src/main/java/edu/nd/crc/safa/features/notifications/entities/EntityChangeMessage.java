@@ -2,7 +2,9 @@ package edu.nd.crc.safa.features.notifications.entities;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 /**
@@ -34,5 +36,25 @@ public class EntityChangeMessage {
             .stream()
             .map(Change::getEntity)
             .anyMatch(entitiesTriggeringLayout::contains);
+    }
+
+    @JsonIgnore
+    public Change getChangeForEntity(Change.Entity entity) {
+        List<Change> changeQuery = changes
+            .stream()
+            .filter(c -> c.getEntity().equals(entity))
+            .collect(Collectors.toList());
+        assert changeQuery.size() == 1;
+        return changeQuery.get(0);
+    }
+
+    /**
+     * Returns list of entities changed in message.
+     *
+     * @return List of {@link Change.Entity}, one per change.
+     */
+    @JsonIgnore
+    public List<Change.Entity> getChangedEntities() {
+        return this.changes.stream().map(Change::getEntity).collect(Collectors.toList());
     }
 }

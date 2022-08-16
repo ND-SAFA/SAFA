@@ -67,9 +67,6 @@ public class LayoutManager {
             .getDocumentRepository()
             .findByProject(this.project)
             .forEach(d -> generateDocumentLayout(d, false));
-        this.serviceProvider
-            .getNotificationService()
-            .broadcastProjectLayoutMessage(projectVersion);
     }
 
     /**
@@ -115,13 +112,6 @@ public class LayoutManager {
 
         // Step - Persist layout
         createOrUpdateArtifactPositions(document, artifact2position);
-
-        // Step - Notify document subscribers that layout has been generated
-        if (sendNotification) {
-            this.serviceProvider
-                .getNotificationService()
-                .broadcastDocumentLayoutMessage(projectVersion, document.getDocumentId());
-        }
 
         return artifact2position;
     }

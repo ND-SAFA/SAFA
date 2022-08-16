@@ -103,7 +103,7 @@ public class ProjectMembershipController extends BaseController {
             .broadcastChange(
                 EntityChangeBuilder
                     .create(project.getProjectId())
-                    .withMembersUpdate(projectMembershipId)
+                    .withMembersDelete(projectMembershipId)
             );
     }
 }

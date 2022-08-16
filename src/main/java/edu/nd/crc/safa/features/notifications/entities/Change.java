@@ -1,16 +1,19 @@
 package edu.nd.crc.safa.features.notifications.entities;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * A modification made to an entity and the necessary action
  * to synchronize front-end.
  */
+@NoArgsConstructor
 @AllArgsConstructor
 @Data
 public class Change {
@@ -25,7 +28,7 @@ public class Change {
     /**
      * ID of entity changed.
      */
-    List<UUID> entityIds;
+    List<UUID> entityIds = new ArrayList<>();
 
     public List<String> getStringEntityIds() {
         return this.entityIds.stream().map(UUID::toString).collect(Collectors.toList());
@@ -55,7 +58,8 @@ public class Change {
         DOCUMENT,
         ARTIFACTS,
         TRACES,
-        WARNINGS;
+        WARNINGS,
+        JOBS;
 
         @Override
         public String toString() {

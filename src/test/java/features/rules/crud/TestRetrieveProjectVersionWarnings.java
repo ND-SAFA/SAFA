@@ -2,13 +2,11 @@ package features.rules.crud;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.Hashtable;
-
 import edu.nd.crc.safa.builders.CommitBuilder;
 import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.features.notifications.entities.old.VersionMessage;
-import edu.nd.crc.safa.features.versions.entities.app.VersionEntityTypes;
+import edu.nd.crc.safa.features.notifications.entities.Change;
+import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
 import features.base.ApplicationBaseTest;
@@ -30,11 +28,6 @@ class TestRetrieveProjectVersionWarnings extends ApplicationBaseTest {
      */
     @Test
     void testRetrievingProjectWarnings() throws Exception {
-        String projectName = "project-name";
-        String requirementName = "RE-20";
-        String requirementType = "Requirement";
-        String designName = "DD-10";
-        String designType = "Design";
 
         // Step - Create project, version, and requirement + design artifacts.
         ProjectVersion projectVersion = this.dbEntityBuilder
@@ -49,9 +42,9 @@ class TestRetrieveProjectVersionWarnings extends ApplicationBaseTest {
 
         // Step - Create requirement artifact
         String requirementId = this.dbEntityBuilder
-            .newType(projectName, requirementType)
-            .newArtifactAndBody(projectName, requirementType, requirementName, "", "")
-            .getArtifact(projectName, requirementName)
+            .newType(projectName, Requirement.type)
+            .newArtifactAndBody(projectName, Requirement.type, Requirement.name, "", "")
+            .getArtifact(projectName, Requirement.name)
             .getArtifactId().toString();
 
         // Step - Retrieve project warnings
@@ -65,8 +58,7 @@ class TestRetrieveProjectVersionWarnings extends ApplicationBaseTest {
         assertThat(ruleViolated.getString("ruleName")).isEqualTo("Missing child");
 
         // Step - Subscribe to project version
-        createNewConnection(defaultUser)
-            .subscribeToVersion(defaultUser, projectVersion);
+        createNewConnection(defaultUser).subscribeToVersion(defaultUser, projectVersion);
 
         // Step - Create Design artifact and link
         JSONObject designJson =
@@ -74,10 +66,10 @@ class TestRetrieveProjectVersionWarnings extends ApplicationBaseTest {
                 .withProject(projectName, projectName, "")
                 .withArtifactAndReturn(projectName,
                     "",
-                    designName, designType,
+                    Design.name, Design.type,
                     ""
                 );
-        JSONObject traceJson = this.jsonBuilder.withTraceAndReturn(projectName, designName, requirementName);
+        JSONObject traceJson = this.jsonBuilder.withTraceAndReturn(projectName, Design.name, Requirement.name);
         CommitBuilder commitBuilder = CommitBuilder
             .withVersion(projectVersion)
             .withAddedArtifact(designJson)
@@ -85,15 +77,24 @@ class TestRetrieveProjectVersionWarnings extends ApplicationBaseTest {
         designJson = commit(commitBuilder);
 
         // VP - Receive expected messages
-        Hashtable<VersionEntityTypes, VersionMessage> messages = new Hashtable<>();
-        int nExpectedMessages = getQueueSize(defaultUser);
-        for (int i = 0; i < nExpectedMessages; i++) {
-            VersionMessage message = getNextMessage(defaultUser, VersionMessage.class);
-            messages.put(message.getType(), message);
-        }
-        assertThat(messages.containsKey(VersionEntityTypes.ARTIFACTS)).isTrue();
-        assertThat(messages.containsKey(VersionEntityTypes.TRACES)).isTrue();
-        assertThat(messages.containsKey(VersionEntityTypes.WARNINGS)).isTrue();
+        EntityChangeMessage message = getNextMessage(defaultUser, EntityChangeMessage.class);
+        assertThat(message.getChanges()).hasSize(3);
+        assertThat(message.getChangedEntities())
+            .contains(Change.Entity.ARTIFACTS)
+            .contains(Change.Entity.TRACES)
+            .contains(Change.Entity.WARNINGS);
+
+        // VP - Verify artifact change
+        Change artifactChange = message.getChangeForEntity(Change.Entity.ARTIFACTS);
+        assertThat(artifactChange.getAction()).isEqualTo(Change.Action.UPDATE);
+
+        // VP - Verify trace change
+        Change traceChange = message.getChangeForEntity(Change.Entity.TRACES);
+        assertThat(traceChange.getAction()).isEqualTo(Change.Action.UPDATE);
+
+        // VP - Verify warning change
+        Change warningsChange = message.getChangeForEntity(Change.Entity.WARNINGS);
+        assertThat(warningsChange.getAction()).isEqualTo(Change.Action.UPDATE);
 
         // Step - Retrieve project warnings
         JSONObject rulesWithDesign = getProjectRules(projectVersion);
@@ -126,5 +127,15 @@ class TestRetrieveProjectVersionWarnings extends ApplicationBaseTest {
         return new SafaRequest(AppRoutes.Rules.GET_WARNINGS_IN_PROJECT_VERSION)
             .withVersion(projectVersion)
             .getWithJsonObject();
+    }
+
+    static class Requirement {
+        public static final String name = "RE-20";
+        public static final String type = "Requirement";
+    }
+
+    static class Design {
+        public static final String name = "DD-10";
+        public static final String type = "Design";
     }
 }

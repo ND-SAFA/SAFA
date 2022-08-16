@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.notifications.entities.Change;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
+import edu.nd.crc.safa.features.notifications.services.NotificationService;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
@@ -42,13 +44,18 @@ public class EntityChangeBuilder {
         return new EntityChangeBuilder(topicId);
     }
 
+    public static EntityChangeBuilder createJobUpdate(JobDbEntity jobDbEntity) {
+        UUID jobId = jobDbEntity.getId();
+        return create(jobId).withJobUpdate(jobId);
+    }
+
     public EntityChangeMessage get(String email) {
         entityChangeMessage.setUser(email);
         return entityChangeMessage;
     }
 
     public String getTopic() {
-        return String.format("/topic/%s", this.topicId);
+        return NotificationService.getTopic(this.topicId);
     }
 
     public EntityChangeBuilder withProjectUpdate(UUID projectId) {
@@ -96,7 +103,7 @@ public class EntityChangeBuilder {
     }
 
     public EntityChangeBuilder withWarningsUpdate() {
-        return withEntityUpdate(Change.Entity.WARNINGS, new ArrayList<>());
+        return withEntityUpdate(Change.Entity.WARNINGS, new ArrayList<>(), false);
     }
 
     public EntityChangeBuilder withTracesUpdate(List<UUID> traceIds) {
@@ -107,18 +114,42 @@ public class EntityChangeBuilder {
         return withEntityDelete(Change.Entity.TRACES, traceLinkIds);
     }
 
+    public EntityChangeBuilder withJobUpdate(UUID jobId) {
+        return withEntityUpdate(Change.Entity.JOBS, List.of(jobId));
+    }
+
+    public EntityChangeBuilder withJobDelete(UUID jobId) {
+        return withEntityDelete(Change.Entity.JOBS, List.of(jobId));
+    }
+
     private EntityChangeBuilder withEntityUpdate(Change.Entity entity, List<UUID> entityIds) {
+        return withEntityUpdate(entity, entityIds, true);
+    }
+
+    private EntityChangeBuilder withEntityUpdate(Change.Entity entity,
+                                                 List<UUID> entityIds,
+                                                 boolean checkIfEmpty) {
         Change change = new Change(entity, Change.Action.UPDATE, entityIds);
-        return addChange(change);
+        return addChange(change, checkIfEmpty);
     }
 
     private EntityChangeBuilder withEntityDelete(Change.Entity entity, List<UUID> entityIds) {
-        Change change = new Change(entity, Change.Action.DELETE, entityIds);
-        return addChange(change);
+        return withEntityDelete(entity, entityIds, true);
     }
 
-    private EntityChangeBuilder addChange(Change change) {
-        if (!change.getEntityIds().isEmpty()) {
+    private EntityChangeBuilder withEntityDelete(Change.Entity entity,
+                                                 List<UUID> entityIds,
+                                                 boolean checkIfEmpty) {
+        Change change = new Change(entity, Change.Action.DELETE, entityIds);
+        return addChange(change, checkIfEmpty);
+    }
+
+    private EntityChangeBuilder addChange(Change change, boolean checkIfEmpty) {
+        if (checkIfEmpty) {
+            if (!change.getEntityIds().isEmpty()) {
+                this.entityChangeMessage.getChanges().add(change);
+            }
+        } else {
             this.entityChangeMessage.getChanges().add(change);
         }
         return this;

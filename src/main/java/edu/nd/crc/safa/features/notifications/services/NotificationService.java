@@ -2,17 +2,9 @@ package edu.nd.crc.safa.features.notifications.services;
 
 import java.util.UUID;
 
-import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
-import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
-import edu.nd.crc.safa.features.notifications.entities.old.LayoutMessage;
-import edu.nd.crc.safa.features.notifications.entities.old.VersionMessage;
-import edu.nd.crc.safa.features.notifications.entities.old.layout.LayoutEntity;
-import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
-import edu.nd.crc.safa.features.versions.entities.app.VersionEntityTypes;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -35,99 +27,17 @@ public class NotificationService {
         this.safaUserService = safaUserService;
     }
 
-    /**
-     * Returns the topic endpoint for notifications to project entities.
-     *
-     * @param project The project whose topic is returned.
-     * @return String representing path to project version endpoint.
-     */
-    public static String getProjectTopic(Project project) {
-        return String.format("/topic/projects/%s", project.getProjectId().toString());
+    public static String getTopic(UUID id) {
+        return String.format("/topic/%s", id);
     }
 
     /**
-     * Returns the topic endpoint for notifications to project version entities.
+     * Broadcasts change in given builder.
      *
-     * @param projectVersion The project version whose topic is returned.
-     * @return String representing path to project version endpoint.
+     * @param builder Builder for {@link edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage} to send.
      */
-    public static String getVersionTopic(ProjectVersion projectVersion) {
-        return String.format("/topic/revisions/%s", projectVersion.getVersionId());
-    }
-
-    /**
-     * Returns the topic for receiving job updates for given job.
-     *
-     * @param jobDbEntity The job to subscribe to.
-     * @return String representing job topic.
-     */
-    public static String getJobTopic(JobDbEntity jobDbEntity) {
-        return String.format("/topic/jobs/%s", jobDbEntity.getId());
-    }
-
-    /**
-     * Topic responsible for alerting users whenever a layout to a document has been changed.
-     *
-     * @param projectVersion The project version whose artifact positions have been changed.
-     * @return String representing version layout topic.
-     */
-    public static String getProjectVersionLayoutTopic(ProjectVersion projectVersion) {
-        return String.format("/topics/layout/%s", projectVersion.getVersionId().toString());
-    }
-
     public void broadcastChange(EntityChangeBuilder builder) {
         SafaUser safaUser = this.safaUserService.getCurrentUser();
         messagingTemplate.convertAndSend(builder.getTopic(), builder.get(safaUser.getEmail()));
-    }
-
-    /**
-     * Notifies all subscribers of given version to update the defined project entity.
-     *
-     * @param projectVersion     The version whose subscribers will be notified of update.
-     * @param versionEntityTypes The versioned entities to update.
-     */
-    public void broadcastUpdateProjectVersionMessage(ProjectVersion projectVersion,
-                                                     VersionEntityTypes versionEntityTypes) {
-        SafaUser safaUser = this.safaUserService.getCurrentUser();
-        String versionTopicDestination = getVersionTopic(projectVersion);
-        VersionMessage message = new VersionMessage(safaUser.getEmail(), versionEntityTypes);
-        messagingTemplate.convertAndSend(versionTopicDestination, message);
-    }
-
-    /**
-     * Sends job to topic subscribers.
-     *
-     * @param jobDbEntity The job to broadcast.
-     */
-    public void broadcastUpdateJobMessage(JobDbEntity jobDbEntity) {
-        String jobTopic = getJobTopic(jobDbEntity);
-        JobAppEntity jobAppEntity = JobAppEntity.createFromJob(jobDbEntity);
-        messagingTemplate.convertAndSend(jobTopic, jobAppEntity);
-    }
-
-    /**
-     * Notifies subscribes that document layout has changed.
-     *
-     * @param projectVersion Project version whose artifact positions was updated.
-     * @param documentId     Document ID of layout whose been updated.
-     */
-    public void broadcastDocumentLayoutMessage(ProjectVersion projectVersion,
-                                               UUID documentId) {
-        String layoutTopic = getProjectVersionLayoutTopic(projectVersion);
-        SafaUser safaUser = this.safaUserService.getCurrentUser();
-        LayoutMessage layoutMessage = new LayoutMessage(LayoutEntity.DOCUMENT, documentId, safaUser.getEmail());
-        messagingTemplate.convertAndSend(layoutTopic, layoutMessage);
-    }
-
-    /**
-     * Notifies subscribes that project layout has changed (e.g. generated entire layout or default document).
-     *
-     * @param projectVersion The version whose layout will be notified.
-     */
-    public void broadcastProjectLayoutMessage(ProjectVersion projectVersion) {
-        String layoutTopic = getProjectVersionLayoutTopic(projectVersion);
-        SafaUser safaUser = this.safaUserService.getCurrentUser();
-        LayoutMessage layoutMessage = new LayoutMessage(LayoutEntity.PROJECT, null, safaUser.getEmail());
-        messagingTemplate.convertAndSend(layoutTopic, layoutMessage);
     }
 }

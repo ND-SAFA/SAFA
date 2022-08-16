@@ -10,7 +10,7 @@ import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.jobs.repositories.JobDbRepository;
 import edu.nd.crc.safa.features.jobs.services.JobService;
-import edu.nd.crc.safa.features.notifications.NotificationService;
+import edu.nd.crc.safa.features.notifications.services.NotificationService;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
 import features.flatfiles.base.BaseFlatFileTest;

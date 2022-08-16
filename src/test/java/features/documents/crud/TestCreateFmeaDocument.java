@@ -82,12 +82,12 @@ class TestCreateFmeaDocument extends AbstractDocumentTest {
         // VP - Verify that columns were persisted
         List<DocumentColumn> updatedDocumentColumns = documentColumnRepository
             .findByDocumentDocumentIdOrderByTableColumnIndexAsc(UUID.fromString(documentId));
-        assertThat(updatedDocumentColumns.size()).isEqualTo(2);
+        assertThat(updatedDocumentColumns).hasSize(2);
         DocumentColumn updatedDocumentColumn = updatedDocumentColumns.get(0);
         assertDocumentColumn(updatedDocumentColumn, newColumnName, newColumnType, 0);
 
         // Step - Retrieve document
-        JSONArray documentsRetrieved = getProjectDocuments(projectVersion.getProject());
+        JSONArray documentsRetrieved = getProjectDocuments(projectVersion);
 
         // VP - Verify single document retrieved
         assertThat(documentsRetrieved.length()).isEqualTo(1);

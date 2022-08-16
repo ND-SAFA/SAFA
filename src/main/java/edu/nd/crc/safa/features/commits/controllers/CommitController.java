@@ -22,15 +22,12 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 public class CommitController extends BaseController {
-
-    private final ServiceProvider serviceProvider;
-
+    
     @Autowired
     public CommitController(ResourceBuilder resourceBuilder,
                             ServiceProvider serviceProvider
     ) {
-        super(resourceBuilder);
-        this.serviceProvider = serviceProvider;
+        super(resourceBuilder, serviceProvider);
     }
 
     /**

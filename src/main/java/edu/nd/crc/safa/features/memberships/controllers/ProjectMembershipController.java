@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.users.controllers;
+package edu.nd.crc.safa.features.memberships.controllers;
 
 import java.util.List;
 import java.util.UUID;
@@ -7,14 +7,13 @@ import java.util.stream.Collectors;
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.BaseController;
-import edu.nd.crc.safa.features.notifications.NotificationService;
-import edu.nd.crc.safa.features.projects.entities.app.ProjectEntityTypes;
+import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.memberships.entities.api.ProjectMembershipRequest;
+import edu.nd.crc.safa.features.memberships.entities.app.ProjectMemberAppEntity;
+import edu.nd.crc.safa.features.memberships.entities.db.ProjectMembership;
+import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
-import edu.nd.crc.safa.features.projects.services.ProjectService;
-import edu.nd.crc.safa.features.users.entities.app.ProjectMemberAppEntity;
-import edu.nd.crc.safa.features.users.entities.app.ProjectMembershipRequest;
-import edu.nd.crc.safa.features.users.entities.db.ProjectMembership;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,16 +31,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class ProjectMembershipController extends BaseController {
 
-    private final ProjectService projectService;
-    private final NotificationService notificationService;
-
     @Autowired
     public ProjectMembershipController(ResourceBuilder resourceBuilder,
-                                       ProjectService projectService,
-                                       NotificationService notificationService) {
-        super(resourceBuilder);
-        this.projectService = projectService;
-        this.notificationService = notificationService;
+                                       ServiceProvider serviceProvider) {
+        super(resourceBuilder, serviceProvider);
     }
 
     /**
@@ -52,14 +45,19 @@ public class ProjectMembershipController extends BaseController {
      * @param request   The request containing project, member to add, and their given role.
      */
     @PostMapping(AppRoutes.Projects.Membership.ADD_PROJECT_MEMBER)
-    public void addOrUpdateProjectMembership(@PathVariable UUID projectId,
-                                             @RequestBody ProjectMembershipRequest request)
+    public ProjectMembership addOrUpdateProjectMembership(@PathVariable UUID projectId,
+                                                          @RequestBody ProjectMembershipRequest request)
         throws SafaError {
         Project project = this.resourceBuilder.fetchProject(projectId).withViewProject();
-        this.projectService.addOrUpdateProjectMembership(project,
-            request.getMemberEmail(),
-            request.getProjectRole());
-        this.notificationService.broadcastUpdateProjectMessage(project, ProjectEntityTypes.MEMBERS);
+        ProjectMembership updatedProjectMembership = this.serviceProvider
+            .getProjectService()
+            .addOrUpdateProjectMembership(project, request.getMemberEmail(), request.getProjectRole());
+        this.serviceProvider
+            .getNotificationService()
+            .broadcastChange(EntityChangeBuilder
+                .create(projectId)
+                .withMembersUpdate(updatedProjectMembership.getMembershipId()));
+        return updatedProjectMembership;
     }
 
     /**
@@ -71,7 +69,9 @@ public class ProjectMembershipController extends BaseController {
     @GetMapping(AppRoutes.Projects.Membership.GET_PROJECT_MEMBERS)
     public List<ProjectMemberAppEntity> getProjectMembers(@PathVariable UUID projectId) throws SafaError {
         Project project = this.resourceBuilder.fetchProject(projectId).withViewProject();
-        return this.projectService.getProjectMembers(project)
+        return this.serviceProvider
+            .getProjectService()
+            .getProjectMembers(project)
             .stream()
             .map(ProjectMemberAppEntity::new)
             .collect(Collectors.toList());
@@ -86,12 +86,24 @@ public class ProjectMembershipController extends BaseController {
     @DeleteMapping(AppRoutes.Projects.Membership.DELETE_PROJECT_MEMBERSHIP)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteProjectMemberById(@PathVariable UUID projectMembershipId) throws SafaError {
-        //TODO: Check for project permission before deleting.
-        ProjectMembership projectMembership = this.projectService.deleteProjectMembershipById(projectMembershipId);
-        if (projectMembership != null) {
-            this.notificationService.broadcastUpdateProjectMessage(
-                projectMembership.getProject(),
-                ProjectEntityTypes.MEMBERS);
-        }
+        ProjectMembership projectMembership = this.serviceProvider
+            .getMemberService()
+            .getMembershipById(projectMembershipId);
+
+        // Step - Verify user has sufficient permissions
+        Project project = projectMembership.getProject();
+        this.resourceBuilder.setProject(project).withEditProject();
+
+        // Step - Delete membership
+        this.serviceProvider.getProjectMembershipRepository().delete(projectMembership);
+
+        // Step - Broadcast change
+        this.serviceProvider
+            .getNotificationService()
+            .broadcastChange(
+                EntityChangeBuilder
+                    .create(project.getProjectId())
+                    .withMembersUpdate(projectMembershipId)
+            );
     }
 }

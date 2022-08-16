@@ -29,7 +29,7 @@ public class UpdateProjectByJiraJobBuilder extends AbstractJobBuilder<JiraIdenti
     protected JiraIdentifier constructIdentifier() {
         Project project = new Project("", ""); // Set once parse starts
         this.serviceProvider.getProjectService().saveProjectWithCurrentUserAsOwner(project);
-        ProjectVersion projectVersion = this.serviceProvider.getProjectService().createInitialProjectVersion(project);
+        ProjectVersion projectVersion = this.serviceProvider.getVersionService().createInitialProjectVersion(project);
         return new JiraIdentifier(projectVersion, this.jiraProjectId, this.cloudId);
     }
 

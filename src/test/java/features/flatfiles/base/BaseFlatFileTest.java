@@ -8,7 +8,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactType;
+import edu.nd.crc.safa.features.types.ArtifactType;
 import edu.nd.crc.safa.features.errors.entities.db.CommitError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;

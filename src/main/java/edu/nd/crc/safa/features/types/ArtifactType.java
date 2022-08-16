@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.artifacts.entities.db;
+package edu.nd.crc.safa.features.types;
 
 import java.io.Serializable;
 import java.util.UUID;

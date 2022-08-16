@@ -3,11 +3,11 @@ package edu.nd.crc.safa.features.users.controllers;
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.BaseController;
+import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.app.UserAppEntity;
 import edu.nd.crc.safa.features.users.entities.app.UserPassword;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
-import edu.nd.crc.safa.features.users.services.SafaUserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,13 +24,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class SafaUserController extends BaseController {
 
-    private final SafaUserService safaUserService;
-
     @Autowired
     public SafaUserController(ResourceBuilder resourceBuilder,
-                              SafaUserService safaUserService) {
-        super(resourceBuilder);
-        this.safaUserService = safaUserService;
+                              ServiceProvider serviceProvider) {
+        super(resourceBuilder, serviceProvider);
     }
 
     /**
@@ -42,7 +39,9 @@ public class SafaUserController extends BaseController {
      */
     @PostMapping(AppRoutes.Accounts.CREATE_ACCOUNT)
     public UserAppEntity createNewUser(@RequestBody SafaUser newUser) {
-        return this.safaUserService.createUser(newUser.getEmail(), newUser.getPassword());
+        return this.serviceProvider
+            .getSafaUserService()
+            .createUser(newUser.getEmail(), newUser.getPassword());
     }
 
     /**
@@ -57,6 +56,8 @@ public class SafaUserController extends BaseController {
         if (confirmationPassword == null) {
             throw new SafaError("Received empty confirmation password.");
         }
-        this.safaUserService.deleteUser(confirmationPassword);
+        this.serviceProvider
+            .getSafaUserService()
+            .deleteUser(confirmationPassword);
     }
 }

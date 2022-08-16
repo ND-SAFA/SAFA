@@ -5,7 +5,6 @@ package edu.nd.crc.safa.features.projects.entities.app;
  * be updated via notifications.
  */
 public enum ProjectEntityTypes {
-    DOCUMENTS,
     MEMBERS,
     TYPES;
 

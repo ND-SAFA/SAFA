@@ -10,15 +10,13 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
-import edu.nd.crc.safa.features.documents.repositories.DocumentRepository;
 import edu.nd.crc.safa.features.documents.services.DocumentService;
 import edu.nd.crc.safa.features.layout.entities.app.LayoutManager;
 import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
-import edu.nd.crc.safa.features.notifications.NotificationService;
-import edu.nd.crc.safa.features.projects.entities.app.ProjectEntityTypes;
+import edu.nd.crc.safa.features.notifications.services.NotificationService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
-import edu.nd.crc.safa.features.projects.services.AppEntityRetrievalService;
+import edu.nd.crc.safa.features.versions.entities.app.VersionEntityTypes;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,19 +35,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class DocumentController extends BaseDocumentController {
     private final DocumentService documentService;
-    private final AppEntityRetrievalService appEntityRetrievalService;
     private final NotificationService notificationService;
-    private final ServiceProvider serviceProvider;
 
     @Autowired
     public DocumentController(ResourceBuilder resourceBuilder,
-                              DocumentRepository documentRepository,
                               ServiceProvider serviceProvider) {
-        super(resourceBuilder, documentRepository);
-        this.serviceProvider = serviceProvider;
+        super(resourceBuilder, serviceProvider);
         this.documentService = serviceProvider.getDocumentService();
         this.notificationService = serviceProvider.getNotificationService();
-        this.appEntityRetrievalService = serviceProvider.getAppEntityRetrievalService();
     }
 
 
@@ -107,22 +100,22 @@ public class DocumentController extends BaseDocumentController {
     /**
      * Returns the Documents associated with given specified project.
      *
-     * @param projectId The UUID of the project whose documents are returned.
+     * @param versionId ID of project version used to retrieve layout of document.
      * @return List of project documents.
      * @throws SafaError Throws error if authorized user does not have permission to view project.
      */
     @GetMapping(AppRoutes.Documents.GET_PROJECT_DOCUMENTS)
-    public List<DocumentAppEntity> getProjectDocuments(@PathVariable UUID projectId) throws SafaError {
-        Project project = resourceBuilder.fetchProject(projectId).withViewProject();
-        return this.documentService.getDocumentsInProject(project);
+    public List<DocumentAppEntity> getProjectDocuments(@PathVariable UUID versionId) throws SafaError {
+        ProjectVersion projectVersion = resourceBuilder.fetchVersion(versionId).withViewVersion();
+        return this.documentService.getAppEntities(projectVersion);
     }
 
     @GetMapping(AppRoutes.Documents.GET_DOCUMENT_BY_ID)
-    public DocumentAppEntity getDocumentBdId(@PathVariable UUID documentId) throws SafaError {
+    public DocumentAppEntity getDocumentById(@PathVariable UUID versionId,
+                                             @PathVariable UUID documentId) throws SafaError {
+        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
         Document document = this.documentService.getDocumentById(documentId);
-        Project project = document.getProject();
-        resourceBuilder.setProject(project).withViewProject();
-        return this.documentService.createDocumentAppEntity(document);
+        return this.documentService.createDocumentAppEntity(document, projectVersion);
     }
 
     /**
@@ -139,7 +132,9 @@ public class DocumentController extends BaseDocumentController {
         Document document = getDocumentById(this.documentRepository, documentId);
         Project project = document.getProject();
         resourceBuilder.setProject(project).withEditProject();
-        this.notificationService.broadcastUpdateProjectMessage(project, ProjectEntityTypes.DOCUMENTS);
+        for (ProjectVersion projectVersion : this.serviceProvider.getProjectVersionRepository().findByProject(project)) {
+            this.notificationService.broadcastUpdateProjectVersionMessage(projectVersion, VersionEntityTypes.DOCUMENTS);
+        }
         this.documentRepository.delete(document);
     }
 }

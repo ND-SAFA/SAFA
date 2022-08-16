@@ -13,14 +13,14 @@ import edu.nd.crc.safa.features.common.IVersionEntity;
 import edu.nd.crc.safa.features.delta.entities.app.ProjectChange;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.errors.entities.db.CommitError;
-import edu.nd.crc.safa.features.notifications.NotificationService;
+import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
+import edu.nd.crc.safa.features.notifications.services.NotificationService;
 import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.IAppEntityCreator;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
-import edu.nd.crc.safa.features.projects.services.AppEntityRetrievalService;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.repositories.TraceLinkVersionRepository;
-import edu.nd.crc.safa.features.versions.entities.app.VersionEntityTypes;
+import edu.nd.crc.safa.features.traces.services.TraceService;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
 import lombok.AllArgsConstructor;
@@ -33,10 +33,9 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 @Service
 public class CommitService {
+    private final TraceService traceService;
     private final ArtifactVersionRepository artifactVersionRepository;
     private final TraceLinkVersionRepository traceLinkVersionRepository;
-
-    private final AppEntityRetrievalService appEntityRetrievalService;
     private final NotificationService notificationService;
 
     /**
@@ -47,19 +46,18 @@ public class CommitService {
      * @throws SafaError Throws error if any change fails to commit.
      */
     public ProjectCommit performCommit(ProjectCommit projectCommit) throws SafaError {
-
         ProjectVersion projectVersion = projectCommit.getCommitVersion();
         boolean failOnError = projectCommit.isFailOnError();
         List<CommitError> errors;
 
-        // Pre-processing: Add related trace links to be removed.
+        // Step - Add related trace links to be removed.
         for (ArtifactAppEntity artifact : projectCommit.getArtifacts().getRemoved()) {
-            List<TraceAppEntity> linksToArtifact = this.appEntityRetrievalService
+            List<TraceAppEntity> linksToArtifact = this.traceService
                 .getTracesInProjectVersionRelatedToArtifact(projectVersion, artifact.getName());
             projectCommit.addTraces(ModificationType.REMOVED, linksToArtifact);
         }
 
-        // Step - Commit artifact and trace changes.
+        // Step - Commit artifact
         Pair<ProjectChange<ArtifactAppEntity>, List<CommitError>> artifactResponse = commitArtifactChanges(
             projectVersion,
             projectCommit.getArtifacts(),
@@ -67,23 +65,27 @@ public class CommitService {
         errors = new ArrayList<>(artifactResponse.getValue1()); // linter wants it like this for some reason
         ProjectChange<ArtifactAppEntity> artifactChanges = artifactResponse.getValue0();
 
-        // Step - Add errors
+        // Step - Commit traces
         Pair<ProjectChange<TraceAppEntity>, List<CommitError>> traceResponse = commitTraceChanges(
             projectVersion,
             projectCommit.getTraces(),
             failOnError);
         ProjectChange<TraceAppEntity> traceChanges = traceResponse.getValue0();
+
+        // Step - Add errors
         errors.addAll(traceResponse.getValue1());
 
-        if (artifactChanges.getSize() > 0) {
-            this.notificationService.broadcastUpdateProjectVersionMessage(projectVersion, VersionEntityTypes.ARTIFACTS);
-        }
-        if (traceChanges.getSize() > 0) {
-            this.notificationService.broadcastUpdateProjectVersionMessage(projectVersion, VersionEntityTypes.TRACES);
-        }
-        if (artifactChanges.getSize() + traceChanges.getSize() > 0) {
-            this.notificationService.broadcastUpdateProjectVersionMessage(projectVersion, VersionEntityTypes.WARNINGS);
-        }
+        // Step - Broadcast change
+        EntityChangeBuilder builder = new EntityChangeBuilder(projectVersion.getVersionId());
+        builder
+            .withArtifactsUpdate(artifactChanges.getUpdatedIds())
+            .withArtifactsDelete(artifactChanges.getDeletedIds())
+            .withTracesUpdate(traceChanges.getUpdatedIds())
+            .withTracesDelete(traceChanges.getDeletedIds())
+            .withWarningsUpdate();
+
+        this.notificationService.broadcastChange(builder);
+
         return new ProjectCommit(projectVersion, artifactChanges, traceChanges, errors, failOnError);
     }
 

@@ -14,7 +14,7 @@ import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentArtifact;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.documents.repositories.DocumentArtifactRepository;
-import edu.nd.crc.safa.features.notifications.messages.VersionMessage;
+import edu.nd.crc.safa.features.notifications.entities.old.VersionMessage;
 import edu.nd.crc.safa.features.versions.entities.app.VersionEntityTypes;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 

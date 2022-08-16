@@ -23,9 +23,9 @@ import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;
-import edu.nd.crc.safa.features.projects.services.AppEntityRetrievalService;
+import edu.nd.crc.safa.features.projects.services.ProjectRetrievalService;
 import edu.nd.crc.safa.features.tgen.entities.TraceGenerationRequest;
-import edu.nd.crc.safa.features.tgen.generator.TraceLinkGenerator;
+import edu.nd.crc.safa.features.tgen.generator.TraceGenerationService;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.versions.ProjectChanger;
@@ -51,9 +51,9 @@ public class FlatFileService {
     private static final String DELIMITER = "*";
 
     private final CommitErrorRepository commitErrorRepository;
-    private final TraceLinkGenerator traceLinkGenerator;
+    private final TraceGenerationService traceGenerationService;
     private final FileUploadService fileUploadService;
-    private final AppEntityRetrievalService appEntityRetrievalService;
+    private final ProjectRetrievalService projectRetrievalService;
 
     /**
      * Responsible for creating a project from given flat files. This includes
@@ -76,7 +76,7 @@ public class FlatFileService {
         this.fileUploadService.uploadFilesToServer(project, Arrays.asList(files));
         JSONObject timFileContent = getTimFileContent(project);
         this.parseFlatFilesAndCommitEntities(projectVersion, serviceProvider, timFileContent, asCompleteSet);
-        return this.appEntityRetrievalService.retrieveProjectAppEntityAtProjectVersion(projectVersion);
+        return this.projectRetrievalService.getProjectAppEntity(projectVersion);
     }
 
     /**
@@ -148,7 +148,7 @@ public class FlatFileService {
                 .filter(a -> a.type.equalsIgnoreCase(targetArtifactType))
                 .collect(Collectors.toList());
 
-            List<TraceAppEntity> generatedLinkInRequest = traceLinkGenerator
+            List<TraceAppEntity> generatedLinkInRequest = traceGenerationService
                 .generateLinksBetweenArtifactAppEntities(sourceArtifacts, targetArtifacts);
             generatedLinks.addAll(generatedLinkInRequest);
         }

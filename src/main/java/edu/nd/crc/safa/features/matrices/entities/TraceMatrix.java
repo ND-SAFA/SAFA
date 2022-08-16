@@ -12,7 +12,7 @@ import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.config.AppConstraints;
-import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactType;
+import edu.nd.crc.safa.features.types.ArtifactType;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 
 import org.hibernate.annotations.OnDelete;

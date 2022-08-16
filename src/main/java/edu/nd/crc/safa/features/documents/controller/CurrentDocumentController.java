@@ -4,8 +4,8 @@ import java.util.UUID;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
-import edu.nd.crc.safa.features.documents.repositories.DocumentRepository;
 import edu.nd.crc.safa.features.documents.services.CurrentDocumentService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,10 +26,9 @@ public class CurrentDocumentController extends BaseDocumentController {
 
     @Autowired
     public CurrentDocumentController(ResourceBuilder resourceBuilder,
-                                     DocumentRepository documentRepository,
-                                     CurrentDocumentService currentDocumentService) {
-        super(resourceBuilder, documentRepository);
-        this.currentDocumentService = currentDocumentService;
+                                     ServiceProvider serviceProvider) {
+        super(resourceBuilder, serviceProvider);
+        this.currentDocumentService = serviceProvider.getCurrentDocumentService();
     }
 
     /**

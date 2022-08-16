@@ -6,9 +6,12 @@ import java.util.UUID;
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.BaseController;
+import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
+import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
-import org.apache.commons.lang3.NotImplementedException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 
 /**
@@ -17,8 +20,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class LayoutController extends BaseController {
     final String NOT_IMPLEMENTED = "Endpoint is under construction";
 
-    public LayoutController(ResourceBuilder resourceBuilder) {
-        super(resourceBuilder);
+    @Autowired
+    public LayoutController(ResourceBuilder resourceBuilder, ServiceProvider serviceProvider) {
+        super(resourceBuilder, serviceProvider);
     }
 
     /**
@@ -28,20 +32,26 @@ public class LayoutController extends BaseController {
      * @param documentId ID of document whose layout.
      * @return Map of artifact IDs to their position in document.
      */
-    @GetMapping(AppRoutes.Layout.GET_DOCUMENT_LAYOUT)
+    @GetMapping(AppRoutes.Layout.DOCUMENT_LAYOUT)
     public Map<String, LayoutPosition> getDocumentLayout(UUID versionId,
                                                          UUID documentId) {
-        throw new NotImplementedException(NOT_IMPLEMENTED);
+        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
+        Document document = this.serviceProvider.getDocumentService().getDocumentById(documentId);
+        return this.serviceProvider.getArtifactPositionService().retrieveDocumentLayout(projectVersion,
+            document.getDocumentId());
     }
 
     /**
      * Return layout of default project document.
      *
-     * @param projectId ID of project.
+     * @param versionId ID of project version whose layout is returned.
      * @return Map of artifact IDs to position in default document.
      */
-    @GetMapping(AppRoutes.Layout.GET_PROJECT_LAYOUT)
-    public Map<String, LayoutPosition> getProjectLayout(UUID projectId) {
-        throw new NotImplementedException(NOT_IMPLEMENTED);
+    @GetMapping(AppRoutes.Layout.VERSION_LAYOUT)
+    public Map<String, LayoutPosition> getVersionLayout(UUID versionId) {
+        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
+
+        return this.serviceProvider.getArtifactPositionService().retrieveDocumentLayout(projectVersion,
+            null);
     }
 }

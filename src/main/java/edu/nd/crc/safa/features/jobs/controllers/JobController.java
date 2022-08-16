@@ -11,15 +11,10 @@ import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
 import edu.nd.crc.safa.features.jobs.entities.builders.CreateProjectByJsonJobBuilder;
 import edu.nd.crc.safa.features.jobs.entities.builders.UpdateProjectByFlatFileJobBuilder;
 import edu.nd.crc.safa.features.jobs.services.JobService;
-import edu.nd.crc.safa.features.notifications.NotificationService;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
-import edu.nd.crc.safa.features.projects.repositories.ProjectRepository;
-import edu.nd.crc.safa.features.projects.services.AppEntityRetrievalService;
-import edu.nd.crc.safa.features.projects.services.ProjectService;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,25 +32,13 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 public class JobController extends BaseController {
 
-    JobService jobService;
-    ProjectService projectService;
-    ProjectRepository projectRepository;
-    AppEntityRetrievalService appEntityRetrievalService;
-    NotificationService notificationService;
-    TaskExecutor taskExecutor;
-    ServiceProvider serviceProvider;
+    private final JobService jobService;
 
     @Autowired
     public JobController(ResourceBuilder resourceBuilder,
                          ServiceProvider serviceProvider) {
-        super(resourceBuilder);
-        this.serviceProvider = serviceProvider;
+        super(resourceBuilder, serviceProvider);
         this.jobService = serviceProvider.getJobService();
-        this.projectService = serviceProvider.getProjectService();
-        this.projectRepository = serviceProvider.getProjectRepository();
-        this.appEntityRetrievalService = serviceProvider.getAppEntityRetrievalService();
-        this.notificationService = serviceProvider.getNotificationService();
-        this.taskExecutor = serviceProvider.getTaskExecutor();
     }
 
     @GetMapping(AppRoutes.Jobs.GET_JOBS)

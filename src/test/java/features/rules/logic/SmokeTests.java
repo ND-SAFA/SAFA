@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
-import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactType;
+import edu.nd.crc.safa.features.types.ArtifactType;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 import edu.nd.crc.safa.features.traces.entities.db.TraceLink;

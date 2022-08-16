@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.users.entities.db;
+package edu.nd.crc.safa.features.memberships.entities.db;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -15,6 +15,8 @@ import javax.persistence.UniqueConstraint;
 
 import edu.nd.crc.safa.config.AppConstraints;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.users.entities.db.ProjectRole;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

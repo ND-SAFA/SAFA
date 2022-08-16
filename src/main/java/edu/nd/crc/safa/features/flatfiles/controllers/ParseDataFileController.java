@@ -11,6 +11,7 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.common.BaseController;
+import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.flatfiles.controllers.entities.ArtifactNameCheck;
 import edu.nd.crc.safa.features.flatfiles.parser.base.AbstractArtifactFile;
@@ -43,9 +44,9 @@ public class ParseDataFileController extends BaseController {
 
     @Autowired
     public ParseDataFileController(ResourceBuilder resourceBuilder,
-                                   CheckArtifactNameService checkArtifactNameService) {
-        super(resourceBuilder);
-        this.checkArtifactNameService = checkArtifactNameService;
+                                   ServiceProvider serviceProvider) {
+        super(resourceBuilder, serviceProvider);
+        this.checkArtifactNameService = serviceProvider.getCheckArtifactNameService();
     }
 
     /**

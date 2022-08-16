@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.notifications.messages.layout;
+package edu.nd.crc.safa.features.notifications.entities.old.layout;
 
 import lombok.AllArgsConstructor;
 

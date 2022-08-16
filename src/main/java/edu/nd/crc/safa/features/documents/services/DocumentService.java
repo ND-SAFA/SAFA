@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactRepository;
+import edu.nd.crc.safa.features.common.IAppEntityService;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentColumnAppEntity;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
@@ -20,10 +21,8 @@ import edu.nd.crc.safa.features.documents.repositories.DocumentColumnRepository;
 import edu.nd.crc.safa.features.documents.repositories.DocumentRepository;
 import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
 import edu.nd.crc.safa.features.layout.services.ArtifactPositionService;
-import edu.nd.crc.safa.features.notifications.NotificationService;
-import edu.nd.crc.safa.features.projects.entities.app.ProjectEntityTypes;
+import edu.nd.crc.safa.features.notifications.services.NotificationService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
-import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.versions.entities.app.VersionEntityTypes;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
@@ -36,7 +35,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @AllArgsConstructor
-public class DocumentService {
+public class DocumentService implements IAppEntityService<DocumentAppEntity> {
 
     private final DocumentRepository documentRepository;
     private final ArtifactRepository artifactRepository;
@@ -44,6 +43,22 @@ public class DocumentService {
     private final DocumentColumnRepository documentColumnRepository;
     private final NotificationService notificationService;
     private final ArtifactPositionService artifactPositionService;
+
+    /**
+     * Returns list of documents in given project
+     *
+     * @param projectVersion The version used to calculate artifact positions within the document.
+     * @return List of documents in project.
+     */
+    public List<DocumentAppEntity> getAppEntities(ProjectVersion projectVersion) {
+        List<Document> projectDocuments = this.documentRepository.findByProject(projectVersion.getProject());
+        List<DocumentAppEntity> documentAppEntities = new ArrayList<>();
+        for (Document document : projectDocuments) {
+            DocumentAppEntity documentAppEntity = createDocumentAppEntity(document, projectVersion);
+            documentAppEntities.add(documentAppEntity);
+        }
+        return documentAppEntities;
+    }
 
     /**
      * Compares the artifacts linked to document with the one's given and creates / deletes links as necessary.
@@ -116,9 +131,9 @@ public class DocumentService {
      * @param updateArtifacts Whether to notify project version subsribers.
      */
     public void notifyDocumentChanges(ProjectVersion projectVersion, boolean updateArtifacts) {
-        this.notificationService.broadcastUpdateProjectMessage(
-            projectVersion.getProject(),
-            ProjectEntityTypes.DOCUMENTS
+        this.notificationService.broadcastUpdateProjectVersionMessage(
+            projectVersion,
+            VersionEntityTypes.DOCUMENTS
         );
         if (updateArtifacts) {
             this.notificationService.broadcastUpdateProjectVersionMessage(projectVersion, VersionEntityTypes.ARTIFACTS);
@@ -170,21 +185,6 @@ public class DocumentService {
         return nUpdated;
     }
 
-    /**
-     * Returns list of documents in given project
-     *
-     * @param project The projects whose documents are returned.
-     * @return List of documents in project.
-     */
-    public List<DocumentAppEntity> getDocumentsInProject(Project project) {
-        List<Document> projectDocuments = this.documentRepository.findByProject(project);
-        List<DocumentAppEntity> documentAppEntities = new ArrayList<>();
-        for (Document document : projectDocuments) {
-            DocumentAppEntity documentAppEntity = createDocumentAppEntity(document);
-            documentAppEntities.add(documentAppEntity);
-        }
-        return documentAppEntities;
-    }
 
     /**
      * Creates {@link DocumentAppEntity} from its database entity {@link Document}.
@@ -193,7 +193,7 @@ public class DocumentService {
      * @param document Persisted document base entity.
      * @return {@link DocumentAppEntity} Representing front-end model of document.
      */
-    public DocumentAppEntity createDocumentAppEntity(Document document) {
+    public DocumentAppEntity createDocumentAppEntity(Document document, ProjectVersion projectVersion) {
         // Step - Retrieve linked artifact Ids
         List<String> artifactIds = this.documentArtifactRepository.findByDocument(document)
             .stream()
@@ -202,7 +202,7 @@ public class DocumentService {
 
         // Step - Retrieve artifact layout
         Map<String, LayoutPosition> documentLayout =
-            this.artifactPositionService.retrieveDocumentLayout(document.getDocumentId());
+            this.artifactPositionService.retrieveDocumentLayout(projectVersion, document.getDocumentId());
 
         // Step - Create document app entity
         DocumentAppEntity documentAppEntity = new DocumentAppEntity(document, artifactIds, documentLayout);

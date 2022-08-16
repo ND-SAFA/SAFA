@@ -9,13 +9,14 @@ import java.util.UUID;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactType;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.features.common.BaseController;
+import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.matrices.entities.TraceMatrix;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.traces.repositories.TraceMatrixRepository;
+import edu.nd.crc.safa.features.types.ArtifactType;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -30,16 +31,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class TraceMatrixController extends BaseController {
 
-    TraceMatrixRepository traceMatrixRepository;
-    ArtifactTypeRepository artifactTypeRepository;
+    private final TraceMatrixRepository traceMatrixRepository;
+    private final ArtifactTypeRepository artifactTypeRepository;
 
     @Autowired
     public TraceMatrixController(ResourceBuilder resourceBuilder,
-                                 TraceMatrixRepository traceMatrixRepository,
-                                 ArtifactTypeRepository artifactTypeRepository) {
-        super(resourceBuilder);
-        this.traceMatrixRepository = traceMatrixRepository;
-        this.artifactTypeRepository = artifactTypeRepository;
+                                 ServiceProvider serviceProvider) {
+        super(resourceBuilder, serviceProvider);
+        this.traceMatrixRepository = serviceProvider.getTraceMatrixRepository();
+        this.artifactTypeRepository = serviceProvider.getArtifactTypeRepository();
     }
 
     /**

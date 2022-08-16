@@ -43,28 +43,19 @@ import org.springframework.web.context.request.async.DeferredResult;
 public class JiraController extends BaseController {
 
     private final Logger log = LoggerFactory.getLogger(JiraController.class);
-
     private final JiraAccessCredentialsRepository accessCredentialsRepository;
-
     private final SafaUserService safaUserService;
     private final JiraConnectionService jiraConnectionService;
-
     private final ExecutorDelegate executorDelegate;
-    private final ServiceProvider serviceProvider;
 
     @Autowired
     public JiraController(ResourceBuilder resourceBuilder,
-                          SafaUserService safaUserService,
-                          JiraAccessCredentialsRepository accessCredentialsRepository,
-                          JiraConnectionService jiraConnectionService,
-                          ExecutorDelegate executorDelegate,
                           ServiceProvider serviceProvider) {
-        super(resourceBuilder);
-        this.safaUserService = safaUserService;
-        this.accessCredentialsRepository = accessCredentialsRepository;
-        this.jiraConnectionService = jiraConnectionService;
-        this.executorDelegate = executorDelegate;
-        this.serviceProvider = serviceProvider;
+        super(resourceBuilder, serviceProvider);
+        this.safaUserService = serviceProvider.getSafaUserService();
+        this.accessCredentialsRepository = serviceProvider.getJiraAccessCredentialsRepository();
+        this.jiraConnectionService = serviceProvider.getJiraConnectionService();
+        this.executorDelegate = serviceProvider.getExecutorDelegate();
     }
 
     @PostMapping(AppRoutes.Jira.CREATE_PROJECT_FROM_JIRA)

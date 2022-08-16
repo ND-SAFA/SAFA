@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import edu.nd.crc.safa.builders.requests.FlatFileRequest;
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.features.notifications.messages.VersionMessage;
+import edu.nd.crc.safa.features.notifications.entities.old.VersionMessage;
 import edu.nd.crc.safa.features.versions.entities.app.VersionEntityTypes;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 

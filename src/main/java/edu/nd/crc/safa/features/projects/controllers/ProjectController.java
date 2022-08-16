@@ -7,12 +7,11 @@ import javax.validation.Valid;
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.BaseController;
+import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectIdentifier;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
-import edu.nd.crc.safa.features.projects.repositories.ProjectRepository;
-import edu.nd.crc.safa.features.projects.services.ProjectService;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,16 +30,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class ProjectController extends BaseController {
 
-    private final ProjectRepository projectRepository;
-    private final ProjectService projectService;
-
     @Autowired
     public ProjectController(ResourceBuilder resourceBuilder,
-                             ProjectRepository projectRepository,
-                             ProjectService projectService) {
-        super(resourceBuilder);
-        this.projectRepository = projectRepository;
-        this.projectService = projectService;
+                             ServiceProvider serviceProvider) {
+        super(resourceBuilder, serviceProvider);
     }
 
     /**
@@ -60,20 +53,20 @@ public class ProjectController extends BaseController {
         if (projectAppEntity.projectId.isEmpty()) { // new projects expected to have no projectId or projectVersion
             // Step - Create project identifier
             Project projectEntity = Project.fromAppEntity(projectAppEntity);
-            projectService.saveProjectWithCurrentUserAsOwner(projectEntity);
+            this.serviceProvider.getProjectService().saveProjectWithCurrentUserAsOwner(projectEntity);
             projectAppEntity.setProjectId(projectEntity.getProjectId().toString());
 
             // Step - Create version
-            ProjectVersion projectVersion = projectService.createInitialProjectVersion(projectEntity);
+            ProjectVersion projectVersion = this.serviceProvider.getVersionService().createInitialProjectVersion(projectEntity);
             projectAppEntity.setProjectVersion(projectVersion);
         } else {
             // Step - Finding project identifier
             UUID projectId = UUID.fromString(projectAppEntity.getProjectId());
-            Project project = this.projectRepository.findByProjectId(projectId);
+            Project project = this.serviceProvider.getProjectRepository().findByProjectId(projectId);
 
             // Step - Update meta information
             project.updateFromAppEntity(projectAppEntity);
-            this.projectRepository.save(project);
+            this.serviceProvider.getProjectRepository().save(project);
         }
 
         return projectAppEntity;
@@ -86,7 +79,7 @@ public class ProjectController extends BaseController {
      */
     @GetMapping(AppRoutes.Projects.Membership.GET_USER_PROJECTS)
     public List<ProjectIdentifier> getUserProjects() {
-        return projectService.getCurrentUserProjects();
+        return this.serviceProvider.getProjectService().getProjectsForCurrentUser();
     }
 
     /**
@@ -99,6 +92,6 @@ public class ProjectController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     public void deleteProject(@PathVariable UUID projectId) throws SafaError {
         Project project = this.resourceBuilder.fetchProject(projectId).withOwnProject();
-        this.projectRepository.delete(project);
+        this.serviceProvider.getProjectRepository().delete(project);
     }
 }

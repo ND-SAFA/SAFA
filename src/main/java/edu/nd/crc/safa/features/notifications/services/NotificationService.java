@@ -1,14 +1,13 @@
-package edu.nd.crc.safa.features.notifications;
+package edu.nd.crc.safa.features.notifications.services;
 
 import java.util.UUID;
 
 import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
-import edu.nd.crc.safa.features.notifications.messages.LayoutMessage;
-import edu.nd.crc.safa.features.notifications.messages.ProjectMessage;
-import edu.nd.crc.safa.features.notifications.messages.VersionMessage;
-import edu.nd.crc.safa.features.notifications.messages.layout.LayoutEntity;
-import edu.nd.crc.safa.features.projects.entities.app.ProjectEntityTypes;
+import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
+import edu.nd.crc.safa.features.notifications.entities.old.LayoutMessage;
+import edu.nd.crc.safa.features.notifications.entities.old.VersionMessage;
+import edu.nd.crc.safa.features.notifications.entities.old.layout.LayoutEntity;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
@@ -73,20 +72,12 @@ public class NotificationService {
      * @return String representing version layout topic.
      */
     public static String getProjectVersionLayoutTopic(ProjectVersion projectVersion) {
-        return String.format("/topics/layout/document/%s", projectVersion.getVersionId().toString());
+        return String.format("/topics/layout/%s", projectVersion.getVersionId().toString());
     }
 
-    /**
-     * Notifies all subscribers of given project to update the defined project entity.
-     *
-     * @param project            The project whose subscribers will be notified of update.
-     * @param projectEntityTypes The project entities to update.
-     */
-    public void broadcastUpdateProjectMessage(Project project, ProjectEntityTypes projectEntityTypes) {
+    public void broadcastChange(EntityChangeBuilder builder) {
         SafaUser safaUser = this.safaUserService.getCurrentUser();
-        String versionTopicDestination = getProjectTopic(project);
-        ProjectMessage message = new ProjectMessage(safaUser.getEmail(), projectEntityTypes);
-        messagingTemplate.convertAndSend(versionTopicDestination, message);
+        messagingTemplate.convertAndSend(builder.getTopic(), builder.get(safaUser.getEmail()));
     }
 
     /**
@@ -123,7 +114,8 @@ public class NotificationService {
     public void broadcastDocumentLayoutMessage(ProjectVersion projectVersion,
                                                UUID documentId) {
         String layoutTopic = getProjectVersionLayoutTopic(projectVersion);
-        LayoutMessage layoutMessage = new LayoutMessage(LayoutEntity.DOCUMENT, documentId);
+        SafaUser safaUser = this.safaUserService.getCurrentUser();
+        LayoutMessage layoutMessage = new LayoutMessage(LayoutEntity.DOCUMENT, documentId, safaUser.getEmail());
         messagingTemplate.convertAndSend(layoutTopic, layoutMessage);
     }
 
@@ -134,7 +126,8 @@ public class NotificationService {
      */
     public void broadcastProjectLayoutMessage(ProjectVersion projectVersion) {
         String layoutTopic = getProjectVersionLayoutTopic(projectVersion);
-        LayoutMessage layoutMessage = new LayoutMessage(LayoutEntity.PROJECT, null);
+        SafaUser safaUser = this.safaUserService.getCurrentUser();
+        LayoutMessage layoutMessage = new LayoutMessage(LayoutEntity.PROJECT, null, safaUser.getEmail());
         messagingTemplate.convertAndSend(layoutTopic, layoutMessage);
     }
 }

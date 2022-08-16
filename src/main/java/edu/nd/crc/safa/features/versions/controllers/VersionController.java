@@ -6,10 +6,10 @@ import java.util.UUID;
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.BaseController;
+import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
-import edu.nd.crc.safa.features.versions.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.features.versions.services.VersionService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,16 +27,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class VersionController extends BaseController {
 
-    private final ProjectVersionRepository projectVersionRepository;
-    private final VersionService versionService;
+    VersionService versionService;
 
     @Autowired
     public VersionController(ResourceBuilder resourceBuilder,
-                             ProjectVersionRepository projectVersionRepository,
-                             VersionService versionService) {
-        super(resourceBuilder);
-        this.projectVersionRepository = projectVersionRepository;
-        this.versionService = versionService;
+                             ServiceProvider serviceProvider) {
+        super(resourceBuilder, serviceProvider);
+        this.versionService = serviceProvider.getVersionService();
     }
 
     /**
@@ -49,7 +46,7 @@ public class VersionController extends BaseController {
     @GetMapping(AppRoutes.Versions.GET_VERSIONS)
     public List<ProjectVersion> getVersions(@PathVariable UUID projectId) throws SafaError {
         Project project = this.resourceBuilder.fetchProject(projectId).withViewProject();
-        return versionService.getProjectVersions(project);
+        return this.versionService.getProjectVersions(project);
     }
 
     /**
@@ -62,7 +59,7 @@ public class VersionController extends BaseController {
     @GetMapping(AppRoutes.Versions.GET_CURRENT_VERSION)
     public ProjectVersion getCurrentVersion(@PathVariable UUID projectId) throws SafaError {
         Project project = this.resourceBuilder.fetchProject(projectId).withViewProject();
-        return versionService.getCurrentVersion(project);
+        return this.versionService.getCurrentVersion(project);
     }
 
     /**
@@ -116,6 +113,6 @@ public class VersionController extends BaseController {
     @DeleteMapping(AppRoutes.Versions.DELETE_VERSION_BY_ID)
     public void deleteVersion(@PathVariable UUID versionId) throws SafaError {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersion();
-        this.projectVersionRepository.delete(projectVersion);
+        this.serviceProvider.getProjectVersionRepository().delete(projectVersion);
     }
 }

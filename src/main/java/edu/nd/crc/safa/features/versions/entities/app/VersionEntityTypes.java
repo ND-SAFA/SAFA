@@ -8,7 +8,8 @@ public enum VersionEntityTypes {
     VERSION,
     ARTIFACTS,
     TRACES,
-    WARNINGS;
+    WARNINGS,
+    DOCUMENTS;
 
     @Override
     public String toString() {

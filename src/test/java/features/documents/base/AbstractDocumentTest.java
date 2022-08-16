@@ -12,6 +12,7 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
 import features.base.ApplicationBaseTest;
 import org.json.JSONArray;
@@ -56,16 +57,16 @@ public abstract class AbstractDocumentTest extends ApplicationBaseTest {
             .stream()
             .map(da -> da.getArtifact().getArtifactId().toString())
             .collect(Collectors.toList());
-        assertThat(artifactIds.size()).isEqualTo(documentArtifactIds.size());
+        assertThat(artifactIds).hasSize(documentArtifactIds.size());
         assertTrue(artifactIds.containsAll(documentArtifactIds));
         assertTrue(documentArtifactIds.containsAll(artifactIds));
     }
 
 
-    protected JSONArray getProjectDocuments(Project project) throws Exception {
+    protected JSONArray getProjectDocuments(ProjectVersion projectVersion) throws Exception {
         return SafaRequest
             .withRoute(AppRoutes.Documents.GET_PROJECT_DOCUMENTS)
-            .withProject(project)
+            .withVersion(projectVersion)
             .getWithJsonArray();
     }
 }

@@ -3,7 +3,7 @@ package edu.nd.crc.safa.features.flatfiles.services;
 import java.util.List;
 import java.util.Optional;
 
-import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactType;
+import edu.nd.crc.safa.features.types.ArtifactType;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;

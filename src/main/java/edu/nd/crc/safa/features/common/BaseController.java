@@ -25,8 +25,9 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 @RestController
 @AllArgsConstructor
 public abstract class BaseController {
-
+    
     protected final ResourceBuilder resourceBuilder;
+    protected final ServiceProvider serviceProvider;
 
     protected Document getDocumentById(DocumentRepository documentRepository,
                                        UUID documentId) throws SafaError {

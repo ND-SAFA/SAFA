@@ -7,7 +7,6 @@ import edu.nd.crc.safa.features.jobs.entities.app.JobType;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
-import edu.nd.crc.safa.features.projects.services.ProjectService;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
 /**
@@ -28,13 +27,13 @@ public class CreateProjectByJsonJobBuilder extends AbstractJobBuilder<ProjectVer
 
     @Override
     protected ProjectVersion constructIdentifier() {
-        ProjectService projectService = this.serviceProvider.getProjectService();
         Project project = new Project(
             projectAppEntity.getName(),
             projectAppEntity.getDescription());
-        projectService
+        this.serviceProvider
+            .getProjectService()
             .saveProjectWithCurrentUserAsOwner(project);
-        return projectService.createInitialProjectVersion(project);
+        return this.serviceProvider.getVersionService().createInitialProjectVersion(project);
     }
 
     @Override

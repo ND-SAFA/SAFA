@@ -7,22 +7,20 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.config.ProjectPaths;
+import edu.nd.crc.safa.features.memberships.entities.app.ProjectMemberAppEntity;
+import edu.nd.crc.safa.features.memberships.entities.db.ProjectMembership;
+import edu.nd.crc.safa.features.memberships.repositories.ProjectMembershipRepository;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectIdentifier;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.repositories.ProjectRepository;
-import edu.nd.crc.safa.features.users.entities.app.ProjectMemberAppEntity;
-import edu.nd.crc.safa.features.users.entities.db.ProjectMembership;
 import edu.nd.crc.safa.features.users.entities.db.ProjectRole;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
-import edu.nd.crc.safa.features.users.repositories.ProjectMembershipRepository;
 import edu.nd.crc.safa.features.users.repositories.SafaUserRepository;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
-import edu.nd.crc.safa.features.versions.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.utilities.OSHelper;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,29 +28,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 /**
  * Responsible for updating, deleting, and retrieving project identifiers.
  */
+@AllArgsConstructor
 @Service
 @Scope("singleton")
 public class ProjectService {
 
     private final ProjectRepository projectRepository;
-    private final ProjectVersionRepository projectVersionRepository;
     private final ProjectMembershipRepository projectMembershipRepository;
     private final SafaUserRepository safaUserRepository;
-
     private final SafaUserService safaUserService;
-
-    @Autowired
-    public ProjectService(ProjectRepository projectRepository,
-                          ProjectVersionRepository projectVersionRepository,
-                          ProjectMembershipRepository projectMembershipRepository,
-                          SafaUserRepository safaUserRepository,
-                          SafaUserService safaUserService) {
-        this.projectRepository = projectRepository;
-        this.projectVersionRepository = projectVersionRepository;
-        this.projectMembershipRepository = projectMembershipRepository;
-        this.safaUserRepository = safaUserRepository;
-        this.safaUserService = safaUserService;
-    }
 
     /**
      * Deletes given project and all related entities through cascade property.
@@ -70,7 +54,7 @@ public class ProjectService {
      *
      * @return List of projects where given user has access to.
      */
-    public List<ProjectIdentifier> getCurrentUserProjects() {
+    public List<ProjectIdentifier> getProjectsForCurrentUser() {
         SafaUser user = this.safaUserService.getCurrentUser();
         return this.projectMembershipRepository
             .findByMember(user)
@@ -86,16 +70,14 @@ public class ProjectService {
             .collect(Collectors.toList());
     }
 
+    /**
+     * Sets authorized user as project owner and saves project.
+     *
+     * @param project The project to set user as owner
+     */
     public void saveProjectWithCurrentUserAsOwner(Project project) {
         this.projectRepository.save(project);
         this.setCurrentUserAsOwner(project);
-    }
-
-    public ProjectVersion createInitialProjectVersion(Project project) {
-        ProjectVersion projectVersion = new ProjectVersion(project, 1, 1, 1);
-        this.projectVersionRepository.save(projectVersion);
-        projectVersion.setProject(project);
-        return projectVersion;
     }
 
     /**
@@ -107,9 +89,9 @@ public class ProjectService {
      * @throws SafaError Throws error if given role is greater than the role
      *                   of the user issuing this request.
      */
-    public void addOrUpdateProjectMembership(Project project,
-                                             String newMemberEmail,
-                                             ProjectRole newMemberRole) throws SafaError {
+    public ProjectMembership addOrUpdateProjectMembership(Project project,
+                                                          String newMemberEmail,
+                                                          ProjectRole newMemberRole) throws SafaError {
         // Step - Find member being added and the current member.
         Optional<SafaUser> newMemberQuery = this.safaUserRepository.findByEmail(newMemberEmail);
         if (newMemberQuery.isEmpty()) {
@@ -131,14 +113,17 @@ public class ProjectService {
 
         Optional<ProjectMembership> projectMembershipQuery =
             this.projectMembershipRepository.findByProjectAndMember(project, newMember);
+        ProjectMembership updatedProjectMembership;
         if (projectMembershipQuery.isPresent()) {
             ProjectMembership existingProjectMembership = projectMembershipQuery.get();
             existingProjectMembership.setRole(newMemberRole);
-            this.projectMembershipRepository.save(existingProjectMembership);
+            updatedProjectMembership = existingProjectMembership;
         } else {
             ProjectMembership newProjectMembership = new ProjectMembership(project, newMember, newMemberRole);
-            this.projectMembershipRepository.save(newProjectMembership);
+            updatedProjectMembership = newProjectMembership;
         }
+        this.projectMembershipRepository.save(updatedProjectMembership);
+        return updatedProjectMembership;
     }
 
     /**

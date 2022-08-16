@@ -43,7 +43,7 @@ class TestFlatFileJiraProjectCreation extends JiraBaseFlatFileTest {
         // Step - Create skeleton project
         Project project = new Project("", ""); // Set once parse starts
         this.serviceProvider.getProjectService().saveProjectWithCurrentUserAsOwner(project);
-        ProjectVersion projectVersion = this.serviceProvider.getProjectService().createInitialProjectVersion(project);
+        ProjectVersion projectVersion = this.serviceProvider.getVersionService().createInitialProjectVersion(project);
         JiraIdentifier jiraIdentifier = new JiraIdentifier(projectVersion, jiraProjectId, cloudId);
 
         // Step - Create job and worker

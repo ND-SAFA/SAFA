@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.notifications.messages;
+package edu.nd.crc.safa.features.notifications.entities.old;
 
 import edu.nd.crc.safa.features.versions.entities.app.VersionEntityTypes;
 

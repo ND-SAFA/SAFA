@@ -12,7 +12,7 @@ import edu.nd.crc.safa.config.WebSocketBrokerConfig;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
-import edu.nd.crc.safa.features.notifications.NotificationService;
+import edu.nd.crc.safa.features.notifications.services.NotificationService;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

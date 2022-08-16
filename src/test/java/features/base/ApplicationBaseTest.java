@@ -19,11 +19,11 @@ import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
+import edu.nd.crc.safa.features.memberships.entities.api.ProjectMembershipRequest;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
-import edu.nd.crc.safa.features.projects.services.AppEntityRetrievalService;
-import edu.nd.crc.safa.features.users.entities.app.ProjectMembershipRequest;
+import edu.nd.crc.safa.features.projects.services.ProjectRetrievalService;
 import edu.nd.crc.safa.features.users.entities.db.ProjectRole;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
@@ -44,7 +44,7 @@ import org.springframework.web.multipart.MultipartFile;
 public abstract class ApplicationBaseTest extends WebSocketBaseTest {
 
     @Autowired
-    protected AppEntityRetrievalService appEntityRetrievalService;
+    protected ProjectRetrievalService projectRetrievalService;
     protected String projectName = this.getClass().getName();
     @Autowired
     UserDetailsService userDetailsService;
@@ -61,7 +61,7 @@ public abstract class ApplicationBaseTest extends WebSocketBaseTest {
 
     public ProjectAppEntity getProjectAtVersion(ProjectVersion projectVersion) {
         setAuthorization(); // Required because getting currentDocument requires a user be logged in
-        return appEntityRetrievalService.retrieveProjectAppEntityAtProjectVersion(projectVersion);
+        return projectRetrievalService.getProjectAppEntity(projectVersion);
     }
 
     public ProjectVersion createDefaultProject(String projectName) throws SafaError, IOException {

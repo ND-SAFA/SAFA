@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
-import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactType;
+import edu.nd.crc.safa.features.types.ArtifactType;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.features.artifacts.entities.db.FTAArtifact;
 import edu.nd.crc.safa.features.artifacts.entities.db.SafetyCaseArtifact;

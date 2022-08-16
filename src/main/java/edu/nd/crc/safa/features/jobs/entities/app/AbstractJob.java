@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.jobs.services.JobService;
-import edu.nd.crc.safa.features.notifications.NotificationService;
+import edu.nd.crc.safa.features.notifications.services.NotificationService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 
 import lombok.Getter;

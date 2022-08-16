@@ -24,12 +24,12 @@ class TestDownloadAsCsv extends ApplicationBaseTest {
         ProjectVersion projectVersion = response.getValue0();
         setAuthorization();
         ProjectAppEntity projectAppEntity =
-            this.appEntityRetrievalService.retrieveProjectAppEntityAtProjectVersion(projectVersion);
+            this.projectRetrievalService.getProjectAppEntity(projectVersion);
         List<File> projectFiles = new SafaRequest(AppRoutes.FlatFiles.DOWNLOAD_FLAT_FILES)
             .withVersion(projectVersion)
             .withFileType(DataFileBuilder.AcceptedFileTypes.JSON)
             .getWithFilesInZip();
 
-        assertThat(projectFiles.size()).isPositive();
+        assertThat(projectFiles).isNotEmpty();
     }
 }

@@ -13,14 +13,14 @@ import edu.nd.crc.safa.features.tgen.vsm.Controller;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 
 import lombok.NoArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 /**
  * Responsible for generating trace links for given projects.
  */
-@Component
+@Service
 @NoArgsConstructor
-public class TraceLinkGenerator {
+public class TraceGenerationService {
 
     public List<TraceAppEntity> generateLinksBetweenArtifactAppEntities(List<ArtifactAppEntity> sourceDocs,
                                                                         List<ArtifactAppEntity> targetDocs) {

@@ -4,18 +4,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import edu.nd.crc.safa.features.delta.entities.app.ProjectDelta;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 import edu.nd.crc.safa.features.delta.services.DeltaService;
+import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
+import features.base.ApplicationBaseTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import features.base.ApplicationBaseTest;
 
 /**
  * Responsible for testing incurring and validating each type of change is detected
  * and returned the delta calculation.
  */
-class TestAllChangeTypes extends ApplicationBaseTest {
+class TestAllActionTypes extends ApplicationBaseTest {
 
     @Autowired
     DeltaService deltaService;

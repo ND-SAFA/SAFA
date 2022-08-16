@@ -13,10 +13,9 @@ import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentArtifact;
 import edu.nd.crc.safa.features.documents.repositories.DocumentArtifactRepository;
-import edu.nd.crc.safa.features.documents.repositories.DocumentRepository;
 import edu.nd.crc.safa.features.layout.entities.app.LayoutManager;
-import edu.nd.crc.safa.features.notifications.NotificationService;
-import edu.nd.crc.safa.features.projects.entities.app.ProjectEntityTypes;
+import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
+import edu.nd.crc.safa.features.notifications.services.NotificationService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.versions.entities.app.VersionEntityTypes;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
@@ -39,14 +38,11 @@ public class DocumentArtifactController extends BaseDocumentController {
     private final ArtifactRepository artifactRepository;
     private final DocumentArtifactRepository documentArtifactRepository;
     private final NotificationService notificationService;
-    private final ServiceProvider serviceProvider;
 
     @Autowired
     public DocumentArtifactController(ResourceBuilder resourceBuilder,
-                                      DocumentRepository documentRepository,
                                       ServiceProvider serviceProvider) {
-        super(resourceBuilder, documentRepository);
-        this.serviceProvider = serviceProvider;
+        super(resourceBuilder, serviceProvider);
         this.artifactRepository = serviceProvider.getArtifactRepository();
         this.documentArtifactRepository = serviceProvider.getDocumentArtifactRepository();
         this.notificationService = serviceProvider.getNotificationService();
@@ -79,9 +75,14 @@ public class DocumentArtifactController extends BaseDocumentController {
 
         LayoutManager layoutManager = new LayoutManager(serviceProvider, projectVersion);
         layoutManager.generateDocumentLayout(document, true);
-        this.notificationService.broadcastUpdateProjectMessage(
-            projectVersion.getProject(),
-            ProjectEntityTypes.DOCUMENTS
+        this.notificationService.broadcastUpdateProjectVersionMessage(
+            projectVersion,
+            VersionEntityTypes.DOCUMENTS
+        );
+        this.notificationService.broadcastChange(
+            EntityChangeBuilder
+                .create(versionId)
+                .withDocumentUpdate(List.of(documentId))
         );
         return artifacts;
     }
@@ -99,9 +100,9 @@ public class DocumentArtifactController extends BaseDocumentController {
                 document,
                 artifact);
         documentArtifactQuery.ifPresent(this.documentArtifactRepository::delete);
-        this.notificationService.broadcastUpdateProjectMessage(
-            projectVersion.getProject(),
-            ProjectEntityTypes.DOCUMENTS
+        this.notificationService.broadcastUpdateProjectVersionMessage(
+            projectVersion,
+            VersionEntityTypes.DOCUMENTS
         );
         this.notificationService.broadcastUpdateProjectVersionMessage(projectVersion, VersionEntityTypes.ARTIFACTS);
     }

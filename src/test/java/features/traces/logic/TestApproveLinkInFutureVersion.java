@@ -10,7 +10,7 @@ import edu.nd.crc.safa.builders.CommitBuilder;
 import edu.nd.crc.safa.builders.requests.FlatFileRequest;
 import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.features.projects.services.AppEntityRetrievalService;
+import edu.nd.crc.safa.features.projects.services.ProjectRetrievalService;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.traces.entities.db.TraceLinkVersion;
@@ -28,7 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 class TestApproveLinkInFutureVersion extends AbstractTraceTest {
 
     @Autowired
-    AppEntityRetrievalService appEntityRetrievalService;
+    ProjectRetrievalService projectRetrievalService;
 
     @Test
     void ableToEditGeneratedLinksInFutureVersions() throws Exception {

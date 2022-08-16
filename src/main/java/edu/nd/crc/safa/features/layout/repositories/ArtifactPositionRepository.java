@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
+import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.layout.entities.db.ArtifactPosition;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
@@ -16,5 +17,7 @@ public interface ArtifactPositionRepository extends CrudRepository<ArtifactPosit
         Artifact artifact,
         UUID documentId);
 
-    List<ArtifactPosition> findByDocumentDocumentId(UUID documentId);
+    List<ArtifactPosition> findByProjectVersionAndDocument(ProjectVersion projectVersion, Document document);
+
+    List<ArtifactPosition> findByProjectVersionAndDocumentDocumentId(ProjectVersion projectVersion, UUID documentId);
 }

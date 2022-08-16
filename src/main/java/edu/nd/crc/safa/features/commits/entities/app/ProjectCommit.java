@@ -110,5 +110,4 @@ public class ProjectCommit {
         mod2entities.put(ModificationType.REMOVED, projectChange.getRemoved());
         return mod2entities;
     }
-
 }

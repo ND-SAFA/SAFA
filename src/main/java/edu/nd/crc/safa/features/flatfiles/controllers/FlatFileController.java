@@ -11,14 +11,10 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
-import edu.nd.crc.safa.features.flatfiles.services.FileDownloadService;
-import edu.nd.crc.safa.features.flatfiles.services.FlatFileService;
-import edu.nd.crc.safa.features.flatfiles.services.ZipFileService;
-import edu.nd.crc.safa.features.notifications.NotificationService;
+import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
-import edu.nd.crc.safa.features.projects.services.ProjectService;
 import edu.nd.crc.safa.features.versions.entities.app.VersionEntityTypes;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
@@ -39,28 +35,10 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 public class FlatFileController extends BaseController {
 
-    private final ProjectService projectService;
-    private final NotificationService notificationService;
-    private final FlatFileService flatFileService;
-    private final ZipFileService zipFileService;
-    private final FileDownloadService fileDownloadService;
-    private final ServiceProvider serviceProvider;
-
     @Autowired
     public FlatFileController(ResourceBuilder resourceBuilder,
-                              ProjectService projectService,
-                              NotificationService notificationService,
-                              FlatFileService flatFileService,
-                              ZipFileService zipFileService,
-                              FileDownloadService fileDownloadService,
                               ServiceProvider serviceProvider) {
-        super(resourceBuilder);
-        this.projectService = projectService;
-        this.notificationService = notificationService;
-        this.flatFileService = flatFileService;
-        this.zipFileService = zipFileService;
-        this.fileDownloadService = fileDownloadService;
-        this.serviceProvider = serviceProvider;
+        super(resourceBuilder, serviceProvider);
     }
 
 
@@ -88,13 +66,14 @@ public class FlatFileController extends BaseController {
         }
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersion();
         Project project = projectVersion.getProject();
-        ProjectAppEntity projectCreated = this.flatFileService.createProjectFromFlatFiles(
+        ProjectAppEntity projectCreated = this.serviceProvider.getFlatFileService().createProjectFromFlatFiles(
             project,
             projectVersion,
             serviceProvider,
             files,
             asCompleteSet);
-        this.notificationService.broadcastUpdateProjectVersionMessage(projectVersion, VersionEntityTypes.VERSION);
+        this.serviceProvider.getNotificationService().broadcastUpdateProjectVersionMessage(projectVersion,
+            VersionEntityTypes.VERSION);
         return projectCreated;
     }
 
@@ -113,14 +92,25 @@ public class FlatFileController extends BaseController {
             throw new SafaError("Could not create project because no files were received.");
         }
         Project project = new Project("", "");
-        this.projectService.saveProjectWithCurrentUserAsOwner(project);
-        ProjectVersion projectVersion = projectService.createInitialProjectVersion(project);
-        ProjectAppEntity projectAppEntity = this.flatFileService.createProjectFromFlatFiles(project,
-            projectVersion,
-            serviceProvider,
-            files,
-            true);
-        this.notificationService.broadcastUpdateProjectVersionMessage(projectVersion, VersionEntityTypes.VERSION);
+        this.serviceProvider
+            .getProjectService()
+            .saveProjectWithCurrentUserAsOwner(project);
+        ProjectVersion projectVersion = this.serviceProvider
+            .getVersionService()
+            .createInitialProjectVersion(project);
+        ProjectAppEntity projectAppEntity = this.serviceProvider
+            .getFlatFileService()
+            .createProjectFromFlatFiles(project,
+                projectVersion,
+                serviceProvider,
+                files,
+                true);
+        this.serviceProvider
+            .getNotificationService()
+            .broadcastChange(EntityChangeBuilder
+                .create(projectVersion)
+                .withVersionUpdate(projectVersion.getVersionId())
+            );
         return projectAppEntity;
     }
 
@@ -133,7 +123,10 @@ public class FlatFileController extends BaseController {
         String versionName = projectVersion.toString();
         String fileName = String.format("%s-%s.zip", projectName, versionName);
 
-        List<File> projectFiles = fileDownloadService.downloadProjectFiles(projectVersion, fileType.toLowerCase());
-        zipFileService.sendFilesAsZipResponse(response, fileName, projectFiles);
+        List<File> projectFiles = this.serviceProvider
+            .getFileDownloadService()
+            .downloadProjectFiles(projectVersion,
+                fileType.toLowerCase());
+        this.serviceProvider.getZipFileService().sendFilesAsZipResponse(response, fileName, projectFiles);
     }
 }

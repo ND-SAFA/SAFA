@@ -31,15 +31,15 @@ public class AppRoutes {
     public static class Accounts {
         public static final String LOGIN = "/login";
         protected static final String PREFIX = "/accounts";
-        public static final String CREATE_ACCOUNT = path(Accounts.PREFIX, "create");
-        public static final String DELETE_ACCOUNT = path(PREFIX, "delete");
+        public static final String CREATE_ACCOUNT = Accounts.PREFIX + "/create";
+        public static final String DELETE_ACCOUNT = Accounts.PREFIX + "/delete";
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Layout {
         protected static final String PREFIX = "/layout";
-        public static final String GET_DOCUMENT_LAYOUT = Versions.BY_ID + Documents.BY_ID + Layout.PREFIX;
-        public static final String GET_PROJECT_LAYOUT = Projects.BY_ID + Layout.PREFIX;
+        public static final String VERSION_LAYOUT = Versions.BY_ID + Layout.PREFIX;
+        public static final String DOCUMENT_LAYOUT = Layout.VERSION_LAYOUT + Documents.BY_ID;
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -72,9 +72,6 @@ public class AppRoutes {
         public static class Entities {
             public static final String CHECK_IF_ARTIFACT_EXISTS = PREFIX
                 + "/versions/{versionId}/artifacts/validate";
-            public static final String GET_PROJECT_IN_VERSION = PREFIX + "/versions/{versionId}";
-            public static final String GET_ARTIFACTS_IN_PROJECT_VERSION = GET_PROJECT_IN_VERSION + "/artifacts";
-            public static final String GET_TRACES_IN_VERSION = GET_PROJECT_IN_VERSION + "/traces";
         }
 
     }
@@ -99,7 +96,7 @@ public class AppRoutes {
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Documents {
-        public static final String GET_PROJECT_DOCUMENTS = Projects.PREFIX + "/{projectId}/documents";
+        public static final String GET_PROJECT_DOCUMENTS = Versions.BY_ID + "/documents";
         protected static final String PREFIX = "/documents";
         public static final String CREATE_OR_UPDATE_DOCUMENT = Versions.BY_ID + Documents.PREFIX;
         public static final String SET_CURRENT_DOCUMENT = Projects.PREFIX + Documents.PREFIX + "/current/{documentId}";
@@ -168,6 +165,20 @@ public class AppRoutes {
         public static final String CREATE_NEW_MAJOR_VERSION = Projects.PREFIX + "/{projectId}/versions/major";
         public static final String CREATE_NEW_MINOR_VERSION = Projects.PREFIX + "/{projectId}/versions/minor";
         public static final String CREATE_NEW_REVISION_VERSION = Projects.PREFIX + "/{projectId}/versions/revision";
-        public static final String DELETE_VERSION_BY_ID = Projects.Entities.GET_PROJECT_IN_VERSION;
+        public static final String DELETE_VERSION_BY_ID = Versions.BY_ID;
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class Retrieval {
+        public static final String GET_PROJECT_IN_VERSION = Versions.BY_ID;
+        public static final String GET_TRACES_IN_VERSION = Versions.BY_ID + "/traces";
+        public static final String GET_ARTIFACTS_IN_VERSION = Versions.BY_ID + "/artifacts";
+        public static final String GET_ARTIFACT_IDS_IN_VERSION = Versions.BY_ID + "/artifacts/query";
+
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class Sync {
+        public static final String GET_CHANGES = Versions.BY_ID + "/changes";
     }
 }

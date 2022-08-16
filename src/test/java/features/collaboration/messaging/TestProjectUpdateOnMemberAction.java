@@ -3,7 +3,7 @@ package features.collaboration.messaging;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import edu.nd.crc.safa.features.notifications.messages.ProjectMessage;
+import edu.nd.crc.safa.features.notifications.entities.old.ProjectMessage;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectEntityTypes;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.ProjectRole;
@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
  * Tests that notifications are sent to subscribed users when a member is
  * added or removed from a project.
  */
-class TestProjectUpdateOnMemberChange extends ApplicationBaseTest {
+class TestProjectUpdateOnMemberAction extends ApplicationBaseTest {
 
     @Test
     void canSendAndReceiveMessagesBetweenClients() throws Exception {

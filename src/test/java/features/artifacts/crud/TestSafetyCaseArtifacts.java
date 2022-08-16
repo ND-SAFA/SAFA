@@ -8,7 +8,7 @@ import edu.nd.crc.safa.features.artifacts.entities.db.SafetyCaseArtifact;
 import edu.nd.crc.safa.features.artifacts.repositories.SafetyCaseArtifactRepository;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.projects.entities.app.IProjectEntityRetriever;
-import edu.nd.crc.safa.features.projects.services.AppEntityRetrievalService;
+import edu.nd.crc.safa.features.projects.services.ProjectRetrievalService;
 
 import features.artifacts.base.AbstractArtifactTest;
 import org.json.JSONObject;
@@ -27,7 +27,7 @@ public class TestSafetyCaseArtifacts extends AbstractArtifactTest<SafetyCaseArti
     SafetyCaseArtifactRepository safetyCaseArtifactRepository;
 
     @Autowired
-    AppEntityRetrievalService appEntityRetrievalService;
+    ProjectRetrievalService projectRetrievalService;
 
     @Override
     public JSONObject getArtifactJson(String projectName, String artifactName, String artifactBody) {

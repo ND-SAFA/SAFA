@@ -50,7 +50,7 @@ public class LayoutManager {
         this.projectVersion = projectVersion;
         this.project = projectVersion.getProject();
         this.projectEntities = serviceProvider
-            .getAppEntityRetrievalService()
+            .getProjectRetrievalService()
             .retrieveProjectEntitiesAtProjectVersion(projectVersion);
         this.serviceProvider = serviceProvider;
     }

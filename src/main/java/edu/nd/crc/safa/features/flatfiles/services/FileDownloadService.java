@@ -18,7 +18,7 @@ import edu.nd.crc.safa.features.flatfiles.parser.base.AbstractArtifactFile;
 import edu.nd.crc.safa.features.flatfiles.parser.base.AbstractTraceFile;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
-import edu.nd.crc.safa.features.projects.services.AppEntityRetrievalService;
+import edu.nd.crc.safa.features.projects.services.ProjectRetrievalService;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 import edu.nd.crc.safa.utilities.FileUtilities;
@@ -35,12 +35,12 @@ import org.springframework.stereotype.Service;
 @Service
 @AllArgsConstructor
 public class FileDownloadService {
-    private final AppEntityRetrievalService appEntityRetrievalService;
+    private final ProjectRetrievalService projectRetrievalService;
 
     public List<File> downloadProjectFiles(ProjectVersion projectVersion, String fileType) throws Exception {
         Project project = projectVersion.getProject();
         ProjectAppEntity projectAppEntity =
-            this.appEntityRetrievalService.retrieveProjectAppEntityAtProjectVersion(projectVersion);
+            this.projectRetrievalService.getProjectAppEntity(projectVersion);
         List<File> projectFiles = new ArrayList<>();
 
         ProjectEntities projectEntityMaps = new ProjectEntities(projectAppEntity);

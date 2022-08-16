@@ -2,12 +2,12 @@ package edu.nd.crc.safa.features.users.services;
 
 import java.util.Optional;
 
+import edu.nd.crc.safa.features.memberships.entities.db.ProjectMembership;
+import edu.nd.crc.safa.features.memberships.repositories.ProjectMembershipRepository;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
-import edu.nd.crc.safa.features.users.entities.db.ProjectMembership;
 import edu.nd.crc.safa.features.users.entities.db.ProjectRole;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
-import edu.nd.crc.safa.features.users.repositories.ProjectMembershipRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

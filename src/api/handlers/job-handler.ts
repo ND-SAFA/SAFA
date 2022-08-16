@@ -4,9 +4,10 @@ import {
   deleteJobById,
   Endpoint,
   fillEndpoint,
+  getUserJobs,
   stompClient,
 } from "@/api";
-import { jobModule, logModule } from "@/store";
+import { appModule, jobModule, logModule } from "@/store";
 
 /**
  * Subscribes to updates for job with given id.
@@ -55,4 +56,27 @@ export function handleDeleteJob(
       onSuccess?.();
     })
     .catch(onError);
+}
+
+/**
+ * Reloads the current list of jobs.
+ */
+export async function handleReloadJobs(): Promise<void> {
+  try {
+    appModule.onLoadStart();
+
+    const jobs = await getUserJobs();
+
+    for (const job of jobs) {
+      await connectAndSubscribeToJob(job.id);
+    }
+
+    jobModule.SET_JOBS(jobs);
+
+    if (jobs.length === 0) return;
+
+    jobModule.selectJob(jobs[0]);
+  } finally {
+    appModule.onLoadEnd();
+  }
 }

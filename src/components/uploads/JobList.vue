@@ -1,21 +1,23 @@
 <template>
   <v-expansion-panels v-model="selectedJobs" multiple>
-    <typography
-      v-if="uploads.length === 0"
-      variant="small"
-      value="There aren't any uploads yet."
-    />
-    <job-panel v-for="(upload, i) in uploads" :key="i" :job="upload" />
+    <div class="full-width" v-if="uploads.length > 0">
+      <job-panel v-for="(upload, i) in uploads" :key="i" :job="upload" />
+    </div>
+    <flex-box v-else-if="isLoading" justify="center" x="2" y="2">
+      <v-progress-circular size="40" indeterminate />
+    </flex-box>
+    <typography v-else variant="small" value="There aren't any uploads yet." />
   </v-expansion-panels>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import { JobModel } from "@/types";
-import { jobModule } from "@/store";
-import { connectAndSubscribeToJob, getUserJobs } from "@/api";
-import JobPanel from "./JobPanel.vue";
+import { appModule, jobModule } from "@/store";
+import { handleReloadJobs } from "@/api";
 import { Typography } from "@/components/common";
+import JobPanel from "./JobPanel.vue";
+import FlexBox from "@/components/common/display/FlexBox.vue";
 
 /**
  * Displays all jobs.
@@ -23,6 +25,7 @@ import { Typography } from "@/components/common";
 export default Vue.extend({
   name: "JobList",
   components: {
+    FlexBox,
     Typography,
     JobPanel,
   },
@@ -36,13 +39,19 @@ export default Vue.extend({
   },
   computed: {
     /**
-     * Returns the current jobs.
+     * @return Whether the app is loading.
+     */
+    isLoading(): boolean {
+      return appModule.getIsLoading;
+    },
+    /**
+     * return The current jobs.
      */
     uploads(): JobModel[] {
       return jobModule.currentJobs;
     },
     /**
-     * Returns the current selected job index.
+     * return The current selected job index.
      */
     selectedJobIndex(): number {
       return jobModule.selectedJobIndex;
@@ -65,14 +74,7 @@ export default Vue.extend({
      * Reloads the list of jobs.
      */
     async reloadJobs() {
-      const jobs = await getUserJobs();
-
-      for (const job of jobs) {
-        await connectAndSubscribeToJob(job.id);
-      }
-
-      jobModule.SET_JOBS(jobs);
-      jobModule.selectJob(jobs[0]);
+      await handleReloadJobs();
     },
   },
 });

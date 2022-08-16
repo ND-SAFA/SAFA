@@ -10,7 +10,7 @@
         />
         <typography :value="displayGroupHeader(data.groupBy)" x="2" />
         <attribute-chip :value="data.group" :artifact-type="artifactType" />
-        <typography secondary :value="data.items.length" x="2" />
+        <typography secondary :value="String(data.items.length)" x="2" />
       </flex-box>
       <generic-icon-button
         small

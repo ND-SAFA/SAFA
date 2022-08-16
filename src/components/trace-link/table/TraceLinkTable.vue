@@ -176,10 +176,12 @@ export default Vue.extend({
      * Loads the generated links for the current project.
      */
     async loadGeneratedLinks() {
+      if (!projectModule.isProjectDefined) return;
+
       try {
         appModule.onLoadStart();
-        const versionId = projectModule.versionIdWithLog;
-        this.links = await getGeneratedLinks(versionId);
+
+        this.links = await getGeneratedLinks(projectModule.versionId);
         this.approved = [];
         this.declined = [];
         this.expanded = [];

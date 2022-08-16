@@ -1,6 +1,6 @@
 import { getParam, navigateTo, QueryParams, Routes } from "@/router";
-import { sessionModule } from "@/store";
 import { getCurrentVersion, getProjects, handleLoadVersion } from "@/api";
+import { logModule } from "@/store";
 
 /**
  * Loads the last stored project.
@@ -15,12 +15,12 @@ export async function handleLoadLastProject(): Promise<void> {
       versionId = (await getCurrentVersion(projects[0].projectId)).versionId;
     }
   }
-  if (versionId && typeof versionId === "string") {
-    await sessionModule.updateSession({ versionId });
-    await handleLoadVersion(versionId).catch(() =>
-      navigateTo(Routes.PROJECT_CREATOR)
-    );
+  if (typeof versionId === "string") {
+    await handleLoadVersion(versionId).catch((e) => {
+      logModule.onDevError(e);
+      navigateTo(Routes.HOME);
+    });
   } else {
-    await navigateTo(Routes.PROJECT_CREATOR);
+    await navigateTo(Routes.HOME);
   }
 }

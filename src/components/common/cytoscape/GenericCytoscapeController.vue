@@ -6,7 +6,7 @@
     :preConfig="preConfig"
     :afterCreated="afterCreated"
   >
-    <slot name="elements" />
+    <slot v-if="initialized" name="elements" />
   </cytoscape>
 </template>
 
@@ -29,6 +29,11 @@ export default Vue.extend({
       type: String,
       required: true,
     },
+  },
+  data() {
+    return {
+      initialized: false,
+    };
   },
   methods: {
     /**
@@ -60,6 +65,7 @@ export default Vue.extend({
         plugin.afterInit(cy);
       });
       this.cytoCoreGraph.afterInit(cy);
+      this.initialized = true;
     },
   },
 });

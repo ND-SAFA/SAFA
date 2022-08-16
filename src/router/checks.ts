@@ -8,11 +8,11 @@ import {
 } from "@/router/routes";
 import {
   appModule,
-  logModule,
   projectModule,
   sessionModule,
   viewportModule,
 } from "@/store";
+import { handleLoadVersion } from "@/api";
 
 /**
  * Defines list of functions that are run before navigating to a new page.
@@ -41,15 +41,18 @@ export const routerChecks: Record<string, RouterCheck> = {
       },
     });
   },
-  requireProjectForRoutes(to: Route, from: Route, next: NavigationGuardNext) {
+  requireProjectForRoutes(to: Route) {
     if (
       projectModule.isProjectDefined ||
       !routesWithRequiredProject.includes(to.path)
     )
       return;
 
-    logModule.onWarning("Please select a project.");
-    next(Routes.HOME);
+    const versionId = to.query[QueryParams.VERSION];
+
+    if (typeof versionId === "string") {
+      handleLoadVersion(versionId, undefined, false);
+    }
   },
   closePanelsIfNotInGraph(to: Route) {
     if (to.path === Routes.ARTIFACT) return;

@@ -8,6 +8,7 @@ import {
 } from "@/store";
 import {
   navigateTo,
+  QueryParams,
   router,
   Routes,
   routesWithRequiredProject,
@@ -28,28 +29,34 @@ import { DocumentModel } from "@/types";
  *
  * @param versionId - The id of the version to retrieve and load.
  * @param document - The document to start with viewing.
+ * @param doNavigate - Whether to navigate to the artifact tree if not already on anartifact page.
  */
 export async function handleLoadVersion(
   versionId: string,
-  document?: DocumentModel
+  document?: DocumentModel,
+  doNavigate = true
 ): Promise<void> {
   appModule.onLoadStart();
   await sessionModule.updateSession({ versionId });
 
   const navigateIfNeeded = async () => {
-    if (routesWithRequiredProject.includes(router.currentRoute.path)) return;
+    if (
+      !doNavigate ||
+      routesWithRequiredProject.includes(router.currentRoute.path)
+    )
+      return;
 
-    await navigateTo(Routes.ARTIFACT);
+    await navigateTo(Routes.ARTIFACT, { [QueryParams.VERSION]: versionId });
   };
 
-  return navigateIfNeeded()
-    .then(() => getProjectVersion(versionId))
+  return getProjectVersion(versionId)
     .then(handleSetProject)
     .then(async () => {
       if (!document) return;
 
       await documentModule.switchDocuments(document);
     })
+    .then(navigateIfNeeded)
     .finally(() => appModule.onLoadEnd());
 }
 

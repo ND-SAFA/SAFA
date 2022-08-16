@@ -12,7 +12,7 @@ import {
   sessionModule,
   viewportModule,
 } from "@/store";
-import { handleLoadVersionIfExists } from "@/api";
+import { handleLoadVersion } from "@/api";
 
 /**
  * Defines list of functions that are run before navigating to a new page.
@@ -48,7 +48,11 @@ export const routerChecks: Record<string, RouterCheck> = {
     )
       return;
 
-    handleLoadVersionIfExists(to.query[QueryParams.VERSION]);
+    const versionId = to.query[QueryParams.VERSION];
+
+    if (typeof versionId === "string") {
+      handleLoadVersion(versionId, undefined, false);
+    }
   },
   closePanelsIfNotInGraph(to: Route) {
     if (to.path === Routes.ARTIFACT) return;

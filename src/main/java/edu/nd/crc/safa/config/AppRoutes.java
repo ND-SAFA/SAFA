@@ -16,24 +16,18 @@ public class AppRoutes {
         public static final String CREATE_ACCOUNT = ACCOUNTS_PREFIX + "/create";
         public static final String DELETE_ACCOUNT = ACCOUNTS_PREFIX + "/delete";
 
-        public static final String githubCredentials = accountPrefix + "/github/credentials";
-        public static final String githubAccessCredentialsRefresh= accountPrefix + "/github/credentials";
-
-
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
         public static class Jira {
             public static final String JIRA_CREDENTIALS = ACCOUNTS_PREFIX + "/jira/credentials";
             public static final String JIRA_CREDENTIALS_REFRESH = ACCOUNTS_PREFIX + "/jira/credentials/{cloudId}";
             public static final String JIRA_CREDENTIALS_VALIDATE = ACCOUNTS_PREFIX + "/jira/credentials/validate";
         }
-        public static final String loginLink = "/login";
-        private static final String accountPrefix = "/accounts";
-        public static final String createNewUser = accountPrefix + "/create";
-        public static final String jiraCredentials = accountPrefix + "/jira/credentials";
-        public static final String jiraCredentialsRefresh = accountPrefix + "/jira/credentials/{cloudId}";
-        public static final String jiraCredentialsValidate = accountPrefix + "/jira/credentials/validate";
-        public static final String githubCredentials = accountPrefix + "/github/credentials";
-        public static final String githubAccessCredentialsRefresh= accountPrefix + "/github/credentials";
+
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        public static class Github {
+            public static final String GITHUB_CREDENTIALS = ACCOUNTS_PREFIX + "/github/credentials";
+            public static final String GITHUB_ACCESS_CREDENTIALS_REFRESH = ACCOUNTS_PREFIX + "/github/credentials";
+        }
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -49,25 +43,18 @@ public class AppRoutes {
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Projects {
-        private static final String projectPrefix = "/projects";
-        public static final String retrieveJIRAProjects = projectPrefix + "/jira/{cloudId}";
-        public static final String deleteProjectById = projectPrefix + "/{projectId}";
-        public static final String createOrUpdateProjectMeta = projectPrefix;
-        public static final String getProjects = projectPrefix;
-        public static final String retrieveGithubRepositories = projectPrefix + "/github";
         private static final String PROJECT_PREFIX = "/projects";
         public static final String RETRIEVE_JIRA_PROJECTS = PROJECT_PREFIX + "/jira/{cloudId}";
         public static final String DELETE_PROJECT_BY_ID = PROJECT_PREFIX + "/{projectId}";
         public static final String CREATE_OR_UPDATE_PROJECT_META = PROJECT_PREFIX;
         public static final String GET_PROJECTS = PROJECT_PREFIX;
+        public static final String RETRIEVE_GITHUB_REPOSITORIES = PROJECT_PREFIX + "/github";
 
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
         public static class Import {
             public static final String IMPORT_PREFIX = PROJECT_PREFIX + "/import";
             public static final String CREATE_PROJECT_FROM_JIRA = IMPORT_PREFIX + "/jira/{cloudId}/{id}";
-            public static final String importPrefix = projectPrefix + "/import";
-            public static final String pullJiraProject = importPrefix + "/jira/{cloudId}/{id}";
-            public static final String pullGitHubRepository = importPrefix + "/github/{repositoryName}";
+            public static final String PULL_GITHUB_REPOSITORY = PROJECT_PREFIX + "/github/{repositoryName}";
         }
 
         @NoArgsConstructor(access = AccessLevel.PRIVATE)

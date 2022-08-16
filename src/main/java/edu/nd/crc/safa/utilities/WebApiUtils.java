@@ -1,17 +1,17 @@
 package edu.nd.crc.safa.utilities;
 
-import edu.nd.crc.safa.server.entities.api.SafaError;
+import java.util.Optional;
+
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.reactive.function.client.WebClientException;
 import reactor.core.publisher.Mono;
 
-import java.util.Optional;
-
 /**
  * Helper methods used when connecting Safa to external API services.
- *
- * Abstract so it cannot be instantiated
+ * Defined abstract, so it cannot be instantiated.(removes the need to a private constructor)
  */
 public abstract class WebApiUtils {
 

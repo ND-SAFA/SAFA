@@ -31,11 +31,11 @@ public abstract class AbstractJob implements Job {
     /**
      * The job identifying information that is being performed.
      */
-    JobDbEntity jobDbEntity;
+    protected JobDbEntity jobDbEntity;
     /**
      * Service used to send job updates.
      */
-    ServiceProvider serviceProvider;
+    protected ServiceProvider serviceProvider;
 
     protected AbstractJob(JobDbEntity jobDbEntity, ServiceProvider serviceProvider) {
         this.jobDbEntity = jobDbEntity;

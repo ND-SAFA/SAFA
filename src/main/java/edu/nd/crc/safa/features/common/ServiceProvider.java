@@ -12,17 +12,9 @@ import edu.nd.crc.safa.features.projects.services.AppEntityRetrievalService;
 import edu.nd.crc.safa.features.projects.services.ProjectService;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
 import edu.nd.crc.safa.features.versions.repositories.ProjectVersionRepository;
-import edu.nd.crc.safa.importer.flatfiles.ArtifactFileParser;
-import edu.nd.crc.safa.importer.flatfiles.FlatFileService;
-import edu.nd.crc.safa.server.authentication.SafaUserService;
-import edu.nd.crc.safa.server.repositories.CommitErrorRepository;
 import edu.nd.crc.safa.server.repositories.github.GithubAccessCredentialsRepository;
 import edu.nd.crc.safa.server.repositories.github.GithubProjectRepository;
-import edu.nd.crc.safa.server.repositories.jira.JiraAccessCredentialsRepository;
 import edu.nd.crc.safa.server.services.github.GithubConnectionService;
-import edu.nd.crc.safa.server.services.jira.JiraConnectionService;
-import edu.nd.crc.safa.server.services.jobs.JobService;
-import edu.nd.crc.safa.server.services.retrieval.AppEntityRetrievalService;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

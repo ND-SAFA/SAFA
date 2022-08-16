@@ -39,12 +39,21 @@ public class JobSteps {
         "Convert Issues To Artifacts And Trace Links"
     };
 
+    public static String[] githubProjectCreationSteps = {
+        "Authenticate User Credentials",
+        "Retrieve GitHub Repository",
+        "Create SAFA Project",
+        "Convert Filetree To Artifacts And TraceLinks"
+    };
+
     public static String[] getJobSteps(JobType jobType) {
         switch (jobType) {
             case FLAT_FILE_PROJECT_CREATION:
                 return concatWithStream(flatFileProjectCreation, projectCreationSteps);
             case JIRA_PROJECT_CREATION:
                 return concatWithStream(jiraProjectCreationSteps, projectCreationSteps);
+            case GITHUB_PROJECT_CREATION:
+                return concatWithStream(githubProjectCreationSteps, projectCreationSteps);
             case PROJECT_CREATION:
                 return projectCreationSteps;
             case TRAIN_MODEL:

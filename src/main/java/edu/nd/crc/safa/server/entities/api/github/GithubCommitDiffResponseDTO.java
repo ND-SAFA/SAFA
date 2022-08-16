@@ -1,11 +1,11 @@
 package edu.nd.crc.safa.server.entities.api.github;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Transfer object describing a diff between two commits for a GitHub

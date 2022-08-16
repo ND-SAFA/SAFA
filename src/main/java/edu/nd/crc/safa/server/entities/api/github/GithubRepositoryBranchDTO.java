@@ -1,10 +1,11 @@
 package edu.nd.crc.safa.server.entities.api.github;
 
+import java.util.Map;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
-
-import java.util.Map;
+import lombok.NonNull;
 
 /**
  * Transfer object describing a GitHub repository branch
@@ -25,10 +26,10 @@ public class GithubRepositoryBranchDTO {
     /**
      * Retrieve last commit sha
      *
-     * @param commit object child situated at .commit in the JSON object tree
+     * @param commitJson object child situated at .commit in the JSON object tree
      */
     @JsonProperty("commit")
-    public void setCommit(Map<String, String> commit) {
-        this.lastCommitSha = commit.get(COMMIT_SHA_KEY);
+    public void setCommit(@NonNull Map<String, Object> commitJson) {
+        this.lastCommitSha = (String) commitJson.get(COMMIT_SHA_KEY);
     }
 }

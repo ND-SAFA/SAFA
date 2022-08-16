@@ -1,6 +1,5 @@
 package edu.nd.crc.safa.server.entities.api.github;
 
-import edu.nd.crc.safa.server.entities.api.jira.JiraResponseDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

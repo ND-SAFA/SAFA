@@ -21,6 +21,9 @@ public class GithubRepositoryFileDTO {
 
     private GithubRepositoryFileType type;
 
+    @JsonProperty("url")
+    private String blobApiUrl;
+
     public enum GithubRepositoryFileType {
         @JsonProperty("blob")
         FILE,

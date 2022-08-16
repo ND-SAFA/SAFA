@@ -1,13 +1,25 @@
 package edu.nd.crc.safa.server.entities.db;
 
+import java.time.LocalDateTime;
+import java.util.UUID;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+import javax.persistence.Version;
+
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
+
 import lombok.Data;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
-
-import javax.persistence.*;
-import java.time.LocalDateTime;
-import java.util.UUID;
 
 
 /**

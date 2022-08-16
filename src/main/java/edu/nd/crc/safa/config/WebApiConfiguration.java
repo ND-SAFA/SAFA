@@ -4,11 +4,8 @@ import edu.nd.crc.safa.features.jira.repositories.JiraProjectRepository;
 import edu.nd.crc.safa.features.jira.services.JiraConnectionService;
 import edu.nd.crc.safa.features.jira.services.JiraConnectionServiceImpl;
 import edu.nd.crc.safa.server.repositories.github.GithubProjectRepository;
-import edu.nd.crc.safa.server.repositories.jira.JiraProjectRepository;
 import edu.nd.crc.safa.server.services.github.GithubConnectionService;
 import edu.nd.crc.safa.server.services.github.GithubConnectionServiceImpl;
-import edu.nd.crc.safa.server.services.jira.JiraConnectionService;
-import edu.nd.crc.safa.server.services.jira.JiraConnectionServiceImpl;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -35,6 +32,7 @@ import reactor.netty.http.client.HttpClient;
 public class WebApiConfiguration {
 
     public static final String JSON_CONTENT_TYPE_HEADER_VALUE = "application/json";
+
     private static final Integer WEBCLIENT_MAX_MEMORY = 16 * 1024 * 1024;
     private static final Logger log = LoggerFactory.getLogger(WebApiConfiguration.class);
 

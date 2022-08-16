@@ -1,15 +1,16 @@
 package edu.nd.crc.safa.server.entities.api.github;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import edu.nd.crc.safa.server.entities.api.github.GithubRepositoryFileDTO.GithubRepositoryFileType;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Object defining the response received when getting the filetree of

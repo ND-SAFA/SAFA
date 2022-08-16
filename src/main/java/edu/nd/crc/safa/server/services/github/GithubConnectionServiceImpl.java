@@ -1,14 +1,20 @@
 package edu.nd.crc.safa.server.services.github;
 
+import java.util.List;
 
 import edu.nd.crc.safa.config.WebApiConfiguration;
-import edu.nd.crc.safa.server.entities.api.SafaError;
-import edu.nd.crc.safa.server.entities.api.github.*;
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.server.entities.api.github.GithubCommitDiffResponseDTO;
+import edu.nd.crc.safa.server.entities.api.github.GithubFileBlobDTO;
+import edu.nd.crc.safa.server.entities.api.github.GithubRefreshTokenDTO;
+import edu.nd.crc.safa.server.entities.api.github.GithubRepositoryBranchDTO;
+import edu.nd.crc.safa.server.entities.api.github.GithubRepositoryDTO;
+import edu.nd.crc.safa.server.entities.api.github.GithubRepositoryFiletreeResponseDTO;
+import edu.nd.crc.safa.server.entities.api.github.GithubSelfResponseDTO;
 import edu.nd.crc.safa.server.entities.db.GithubAccessCredentials;
-import edu.nd.crc.safa.server.entities.db.GithubProject;
-import edu.nd.crc.safa.server.entities.db.Project;
 import edu.nd.crc.safa.server.repositories.github.GithubProjectRepository;
 import edu.nd.crc.safa.utilities.WebApiUtils;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.core.ParameterizedTypeReference;
@@ -16,8 +22,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriBuilder;
-
-import java.util.List;
 
 @AllArgsConstructor
 public class GithubConnectionServiceImpl implements GithubConnectionService {
@@ -45,14 +49,14 @@ public class GithubConnectionServiceImpl implements GithubConnectionService {
     @Override
     public GithubSelfResponseDTO getSelf(GithubAccessCredentials credentials) {
         return WebApiUtils.blockOptional(
-                this.webClient
-                        .method(ApiRoute.USER.getMethod())
-                        .uri(ApiRoute.USER.getFullPath())
-                        .header(HttpHeaders.AUTHORIZATION,
-                                this.buildAuthorizationHeaderValue(credentials.getAccessToken()))
-                        .header(HttpHeaders.ACCEPT, WebApiConfiguration.JSON_CONTENT_TYPE_HEADER_VALUE)
-                        .retrieve()
-                        .bodyToMono(GithubSelfResponseDTO.class)
+            this.webClient
+                .method(ApiRoute.USER.getMethod())
+                .uri(ApiRoute.USER.getFullPath())
+                .header(HttpHeaders.AUTHORIZATION,
+                    this.buildAuthorizationHeaderValue(credentials.getAccessToken()))
+                .header(HttpHeaders.ACCEPT, WebApiConfiguration.JSON_CONTENT_TYPE_HEADER_VALUE)
+                .retrieve()
+                .bodyToMono(GithubSelfResponseDTO.class)
         ).orElseThrow(() -> new SafaError("Error while trying to refresh GitHub credentials"));
     }
 
@@ -60,52 +64,52 @@ public class GithubConnectionServiceImpl implements GithubConnectionService {
     public GithubRefreshTokenDTO refreshAccessToken(GithubAccessCredentials credentials) {
         return WebApiUtils.blockOptional(
             this.webClient
-                    .method(ApiRoute.REFRESH_TOKEN.getMethod())
-                    .uri(ApiRoute.REFRESH_TOKEN.getFullPath(), builder ->
-                        this.setAuthorizationQueryParameters(builder, credentials)
-                            .queryParam(GRANT_TYPE_PARAM, REFRESH_TOKEN_REQUEST_GRANT_TYPE)
-                            .build()
-                    )
-                    .header(HttpHeaders.ACCEPT, WebApiConfiguration.JSON_CONTENT_TYPE_HEADER_VALUE)
-                    .retrieve()
-                    .bodyToMono(GithubRefreshTokenDTO.class)
+                .method(ApiRoute.REFRESH_TOKEN.getMethod())
+                .uri(ApiRoute.REFRESH_TOKEN.getFullPath(), builder ->
+                    this.setAuthorizationQueryParameters(builder, credentials)
+                        .queryParam(GRANT_TYPE_PARAM, REFRESH_TOKEN_REQUEST_GRANT_TYPE)
+                        .build()
+                )
+                .header(HttpHeaders.ACCEPT, WebApiConfiguration.JSON_CONTENT_TYPE_HEADER_VALUE)
+                .retrieve()
+                .bodyToMono(GithubRefreshTokenDTO.class)
         ).orElseThrow(() -> new SafaError("Error while trying to refresh GitHub credentials"));
     }
 
     @Override
     public List<GithubRepositoryDTO> getUserRepositories(GithubAccessCredentials credentials) {
         return WebApiUtils.blockOptional(
-                this.webClient
-                        .method(ApiRoute.REPOSITORIES.getMethod())
-                        .uri(ApiRoute.REPOSITORIES.getFullPath(), builder ->
-                            builder
-                                .queryParam(REPOSITORIES_SORT_PARAM, "updated")
-                                .queryParam(REPOSITORIES_SORT_DIR_PARAM, "desc")
-                                .queryParam(REPOSITORIES_AFFILIATION_PARAM,
-                                        "owner,collaborator,organization_member")
-                                .queryParam(REPOSITORIES_PAGE_SIZE_PARAM, 100)
-                                .build()
-                        )
-                        .header(HttpHeaders.AUTHORIZATION,
-                                this.buildAuthorizationHeaderValue(credentials.getAccessToken()))
-                        .header(HttpHeaders.ACCEPT, WebApiConfiguration.JSON_CONTENT_TYPE_HEADER_VALUE)
-                        .retrieve()
-                        .bodyToMono(new ParameterizedTypeReference<List<GithubRepositoryDTO>>() {
-                        })
+            this.webClient
+                .method(ApiRoute.REPOSITORIES.getMethod())
+                .uri(ApiRoute.REPOSITORIES.getFullPath(), builder ->
+                    builder
+                        .queryParam(REPOSITORIES_SORT_PARAM, "updated")
+                        .queryParam(REPOSITORIES_SORT_DIR_PARAM, "desc")
+                        .queryParam(REPOSITORIES_AFFILIATION_PARAM,
+                            "owner,collaborator,organization_member")
+                        .queryParam(REPOSITORIES_PAGE_SIZE_PARAM, 100)
+                        .build()
+                )
+                .header(HttpHeaders.AUTHORIZATION,
+                    this.buildAuthorizationHeaderValue(credentials.getAccessToken()))
+                .header(HttpHeaders.ACCEPT, WebApiConfiguration.JSON_CONTENT_TYPE_HEADER_VALUE)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<List<GithubRepositoryDTO>>() {
+                })
         ).orElseThrow(() -> new SafaError("Error while trying to retrieve repositories"));
     }
 
     @Override
     public GithubRepositoryDTO getUserRepository(GithubAccessCredentials credentials, String name) {
         return WebApiUtils.blockOptional(
-                this.webClient
-                        .method(ApiRoute.SINGLE_REPOSITORY.getMethod())
-                        .uri(ApiRoute.SINGLE_REPOSITORY.getFullPath(), credentials.getGithubHandler(), name)
-                        .header(HttpHeaders.AUTHORIZATION,
-                                this.buildAuthorizationHeaderValue(credentials.getAccessToken()))
-                        .header(HttpHeaders.ACCEPT, WebApiConfiguration.JSON_CONTENT_TYPE_HEADER_VALUE)
-                        .retrieve()
-                        .bodyToMono(GithubRepositoryDTO.class)
+            this.webClient
+                .method(ApiRoute.SINGLE_REPOSITORY.getMethod())
+                .uri(ApiRoute.SINGLE_REPOSITORY.getFullPath(), credentials.getGithubHandler(), name)
+                .header(HttpHeaders.AUTHORIZATION,
+                    this.buildAuthorizationHeaderValue(credentials.getAccessToken()))
+                .header(HttpHeaders.ACCEPT, WebApiConfiguration.JSON_CONTENT_TYPE_HEADER_VALUE)
+                .retrieve()
+                .bodyToMono(GithubRepositoryDTO.class)
         ).orElseThrow(() -> new SafaError("Error while trying to retrieve repository " + name));
     }
 
@@ -113,17 +117,17 @@ public class GithubConnectionServiceImpl implements GithubConnectionService {
     public List<GithubRepositoryBranchDTO> getRepositoryBranches(GithubAccessCredentials credentials,
                                                                  String repositoryName) {
         return WebApiUtils.blockOptional(
-                this.webClient
-                        .method(ApiRoute.REPOSITORY_BRANCHES.getMethod())
-                        .uri(ApiRoute.REPOSITORY_BRANCHES.getFullPath(),
-                                credentials.getGithubHandler(), repositoryName
-                        )
-                        .header(HttpHeaders.AUTHORIZATION,
-                                this.buildAuthorizationHeaderValue(credentials.getAccessToken()))
-                        .header(HttpHeaders.ACCEPT, WebApiConfiguration.JSON_CONTENT_TYPE_HEADER_VALUE)
-                        .retrieve()
-                        .bodyToMono(new ParameterizedTypeReference<List<GithubRepositoryBranchDTO>>() {
-                        })
+            this.webClient
+                .method(ApiRoute.REPOSITORY_BRANCHES.getMethod())
+                .uri(ApiRoute.REPOSITORY_BRANCHES.getFullPath(),
+                    credentials.getGithubHandler(), repositoryName
+                )
+                .header(HttpHeaders.AUTHORIZATION,
+                    this.buildAuthorizationHeaderValue(credentials.getAccessToken()))
+                .header(HttpHeaders.ACCEPT, WebApiConfiguration.JSON_CONTENT_TYPE_HEADER_VALUE)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<List<GithubRepositoryBranchDTO>>() {
+                })
         ).orElseThrow(() -> new SafaError("Error while trying to retrieve repository branches for " + repositoryName));
     }
 
@@ -132,16 +136,16 @@ public class GithubConnectionServiceImpl implements GithubConnectionService {
                                                          String repositoryName,
                                                          String repositoryBranch) {
         return WebApiUtils.blockOptional(
-                this.webClient
-                        .method(ApiRoute.SINGLE_REPOSITORY_BRANCH.getMethod())
-                        .uri(ApiRoute.SINGLE_REPOSITORY_BRANCH.getFullPath(),
-                                credentials.getGithubHandler(), repositoryName, repositoryBranch
-                        )
-                        .header(HttpHeaders.AUTHORIZATION,
-                                this.buildAuthorizationHeaderValue(credentials.getAccessToken()))
-                        .header(HttpHeaders.ACCEPT, WebApiConfiguration.JSON_CONTENT_TYPE_HEADER_VALUE)
-                        .retrieve()
-                        .bodyToMono(GithubRepositoryBranchDTO.class)
+            this.webClient
+                .method(ApiRoute.SINGLE_REPOSITORY_BRANCH.getMethod())
+                .uri(ApiRoute.SINGLE_REPOSITORY_BRANCH.getFullPath(),
+                    credentials.getGithubHandler(), repositoryName, repositoryBranch
+                )
+                .header(HttpHeaders.AUTHORIZATION,
+                    this.buildAuthorizationHeaderValue(credentials.getAccessToken()))
+                .header(HttpHeaders.ACCEPT, WebApiConfiguration.JSON_CONTENT_TYPE_HEADER_VALUE)
+                .retrieve()
+                .bodyToMono(GithubRepositoryBranchDTO.class)
         ).orElseThrow(() -> new SafaError("Error while trying to retrieve single repository branch"));
     }
 
@@ -151,20 +155,20 @@ public class GithubConnectionServiceImpl implements GithubConnectionService {
                                                                   String commitSha) {
         return WebApiUtils.blockOptional(
                 this.webClient
-                        .method(ApiRoute.REPOSITORY_FILETREE.getMethod())
-                        .uri(ApiRoute.REPOSITORY_FILETREE.getFullPath(), builder ->
-                            builder
-                                    .queryParam(FILETREE_RECURSIVE_PARAM, true)
-                                    .build(credentials.getGithubHandler(), repositoryName, commitSha)
-                        )
-                        .header(HttpHeaders.AUTHORIZATION,
-                                this.buildAuthorizationHeaderValue(credentials.getAccessToken()))
-                        .header(HttpHeaders.ACCEPT, WebApiConfiguration.JSON_CONTENT_TYPE_HEADER_VALUE)
-                        .retrieve()
-                        .bodyToMono(GithubRepositoryFiletreeResponseDTO.class)
-        )
-        .map(GithubRepositoryFiletreeResponseDTO::filterOutFolders)
-        .orElseThrow(() -> new SafaError("Error while trying to retrieve file tree for " + repositoryName));
+                    .method(ApiRoute.REPOSITORY_FILETREE.getMethod())
+                    .uri(ApiRoute.REPOSITORY_FILETREE.getFullPath(), builder ->
+                        builder
+                            .queryParam(FILETREE_RECURSIVE_PARAM, true)
+                            .build(credentials.getGithubHandler(), repositoryName, commitSha)
+                    )
+                    .header(HttpHeaders.AUTHORIZATION,
+                        this.buildAuthorizationHeaderValue(credentials.getAccessToken()))
+                    .header(HttpHeaders.ACCEPT, WebApiConfiguration.JSON_CONTENT_TYPE_HEADER_VALUE)
+                    .retrieve()
+                    .bodyToMono(GithubRepositoryFiletreeResponseDTO.class)
+            )
+            .map(GithubRepositoryFiletreeResponseDTO::filterOutFolders)
+            .orElseThrow(() -> new SafaError("Error while trying to retrieve file tree for " + repositoryName));
     }
 
     @Override
@@ -174,19 +178,32 @@ public class GithubConnectionServiceImpl implements GithubConnectionService {
         String commitRange = String.format("%s...HEAD", baseCommitSha);
 
         return WebApiUtils.blockOptional(
-                this.webClient
-                        .method(ApiRoute.COMMIT_DIFF.getMethod())
-                        .uri(ApiRoute.COMMIT_DIFF.getFullPath(),
-                                credentials.getGithubHandler(), repositoryName, commitRange
-                        )
-                        .header(HttpHeaders.AUTHORIZATION,
-                                this.buildAuthorizationHeaderValue(credentials.getAccessToken()))
-                        .header(HttpHeaders.ACCEPT, WebApiConfiguration.JSON_CONTENT_TYPE_HEADER_VALUE)
-                        .retrieve()
-                        .bodyToMono(GithubCommitDiffResponseDTO.class)
+            this.webClient
+                .method(ApiRoute.COMMIT_DIFF.getMethod())
+                .uri(ApiRoute.COMMIT_DIFF.getFullPath(),
+                    credentials.getGithubHandler(), repositoryName, commitRange
+                )
+                .header(HttpHeaders.AUTHORIZATION,
+                    this.buildAuthorizationHeaderValue(credentials.getAccessToken()))
+                .header(HttpHeaders.ACCEPT, WebApiConfiguration.JSON_CONTENT_TYPE_HEADER_VALUE)
+                .retrieve()
+                .bodyToMono(GithubCommitDiffResponseDTO.class)
         ).orElseThrow(() -> new SafaError("Error while trying to retrieve diff starting from " + baseCommitSha));
     }
 
+    @Override
+    public GithubFileBlobDTO getBlobInformation(GithubAccessCredentials credentials, String url) {
+        return WebApiUtils.blockOptional(
+            this.webClient
+                .method(HttpMethod.GET)
+                .uri(url)
+                .header(HttpHeaders.AUTHORIZATION,
+                    this.buildAuthorizationHeaderValue(credentials.getAccessToken()))
+                .header(HttpHeaders.ACCEPT, WebApiConfiguration.JSON_CONTENT_TYPE_HEADER_VALUE)
+                .retrieve()
+                .bodyToMono(GithubFileBlobDTO.class)
+        ).orElseThrow(() -> new SafaError("Error while trying to retrieve blob information from " + url));
+    }
 
     private String buildAuthorizationHeaderValue(String token) {
         return String.format("token %s", token);

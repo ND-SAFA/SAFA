@@ -6,8 +6,15 @@ import javax.validation.Valid;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.server.authentication.SafaUserService;
-import edu.nd.crc.safa.server.entities.api.SafaError;
+import edu.nd.crc.safa.features.common.BaseController;
+import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
+import edu.nd.crc.safa.features.jobs.entities.app.JobType;
+import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
+import edu.nd.crc.safa.features.jobs.services.JobService;
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
+import edu.nd.crc.safa.features.users.services.SafaUserService;
 import edu.nd.crc.safa.server.entities.api.github.GithubAccessCredentialsDTO;
 import edu.nd.crc.safa.server.entities.api.github.GithubRefreshTokenDTO;
 import edu.nd.crc.safa.server.entities.api.github.GithubRepositoryDTO;
@@ -15,16 +22,11 @@ import edu.nd.crc.safa.server.entities.api.github.GithubResponseDTO;
 import edu.nd.crc.safa.server.entities.api.github.GithubResponseDTO.GithubResponseMessage;
 import edu.nd.crc.safa.server.entities.api.github.GithubSelfResponseDTO;
 import edu.nd.crc.safa.server.entities.api.jobs.GithubProjectCreationJob;
-import edu.nd.crc.safa.server.entities.api.jobs.JobType;
-import edu.nd.crc.safa.server.entities.app.JobAppEntity;
 import edu.nd.crc.safa.server.entities.db.GithubAccessCredentials;
-import edu.nd.crc.safa.server.entities.db.JobDbEntity;
-import edu.nd.crc.safa.server.entities.db.SafaUser;
 import edu.nd.crc.safa.server.repositories.github.GithubAccessCredentialsRepository;
-import edu.nd.crc.safa.server.services.ServiceProvider;
 import edu.nd.crc.safa.server.services.github.GithubConnectionService;
-import edu.nd.crc.safa.server.services.jobs.JobService;
 import edu.nd.crc.safa.utilities.ExecutorDelegate;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -63,15 +65,7 @@ public class GithubController extends BaseController {
         this.serviceProvider = serviceProvider;
     }
 
-    /**
-     * Sets up and validates credentials and pulls the GitHub handler for the user associated
-     * with these credentials.
-     * If the principal user has already registered previous GitHub credentials, those will be
-     * deleted.
-     *
-     * @param data Validated credentials as request body
-     */
-    @PostMapping(AppRoutes.Accounts.githubCredentials)
+    @PostMapping(AppRoutes.Accounts.Github.GITHUB_CREDENTIALS)
     public DeferredResult<GithubResponseDTO<Void>> createCredentials(
         @RequestBody @Valid GithubAccessCredentialsDTO data) {
         DeferredResult<GithubResponseDTO<Void>> output = executorDelegate.createOutput(5000L);
@@ -91,7 +85,7 @@ public class GithubController extends BaseController {
 
             credentials.setGithubHandler(selfResponseDTO.getLogin());
             credentials.setUser(principal);
-            credentials = githubAccessCredentialsRepository.save(credentials);
+            githubAccessCredentialsRepository.save(credentials);
 
             output.setResult(new GithubResponseDTO<>(null, GithubResponseMessage.CREATED));
         });
@@ -99,13 +93,7 @@ public class GithubController extends BaseController {
         return output;
     }
 
-    /**
-     * Refreshes the credentials for the logged-in user.
-     * If the credentials are expired they are deleted and an error message is returned.
-     *
-     * Request body: empty
-     */
-    @PutMapping(AppRoutes.Accounts.githubAccessCredentialsRefresh)
+    @PutMapping(AppRoutes.Accounts.Github.GITHUB_ACCESS_CREDENTIALS_REFRESH)
     public DeferredResult<GithubResponseDTO<Void>> refreshCredentials() {
         DeferredResult<GithubResponseDTO<Void>> output = executorDelegate.createOutput(5000L);
 
@@ -131,7 +119,7 @@ public class GithubController extends BaseController {
             githubAccessCredentials.setRefreshToken(refreshTokenDTO.getRefreshToken());
             githubAccessCredentials.setAccessTokenExpiration(refreshTokenDTO.getAccessTokenExpiration());
             githubAccessCredentials.setRefreshTokenExpiration(refreshTokenDTO.getRefreshTokenExpiration());
-            githubAccessCredentials = githubAccessCredentialsRepository.save(githubAccessCredentials);
+            githubAccessCredentialsRepository.save(githubAccessCredentials);
 
             output.setResult(new GithubResponseDTO<>(null, GithubResponseMessage.UPDATED));
         });
@@ -139,12 +127,7 @@ public class GithubController extends BaseController {
         return output;
     }
 
-    /**
-     * Return the available repositories
-     *
-     * Request body: empty
-     */
-    @GetMapping(AppRoutes.Projects.retrieveGithubRepositories)
+    @GetMapping(AppRoutes.Projects.RETRIEVE_GITHUB_REPOSITORIES)
     public DeferredResult<GithubResponseDTO<List<GithubRepositoryDTO>>> retrieveGithubRepositories() {
         DeferredResult<GithubResponseDTO<List<GithubRepositoryDTO>>> output =
             executorDelegate.createOutput(5000L);
@@ -162,23 +145,24 @@ public class GithubController extends BaseController {
         return output;
     }
 
-    @PostMapping(AppRoutes.Projects.Import.pullGitHubRepository)
+    @PostMapping(AppRoutes.Projects.Import.PULL_GITHUB_REPOSITORY)
     public DeferredResult<GithubResponseDTO<JobAppEntity>> pullJiraProject(
         @PathVariable("repositoryName") String repositoryName) {
         DeferredResult<GithubResponseDTO<JobAppEntity>> output = executorDelegate.createOutput(5000L);
 
         executorDelegate.submit(output, () -> {
             JobService jobService = this.serviceProvider.getJobService();
+
             // Step - Create job identifier
             String jobName = GithubProjectCreationJob.createJobName(repositoryName);
             JobDbEntity jobDbEntity = jobService.createNewJob(JobType.GITHUB_PROJECT_CREATION, jobName);
 
             // Step - Create jira project creation job
-            GithubProjectCreationJob job = new GithubProjectCreationJob(
-                jobDbEntity, serviceProvider, repositoryName);
+            GithubProjectCreationJob job = new GithubProjectCreationJob(jobDbEntity, serviceProvider, repositoryName);
 
             // Step - Start job
             jobService.executeJob(jobDbEntity, serviceProvider, job);
+
             // Step - Respond with project
             output.setResult(new GithubResponseDTO<>(JobAppEntity.createFromJob(jobDbEntity),
                 GithubResponseMessage.OK));

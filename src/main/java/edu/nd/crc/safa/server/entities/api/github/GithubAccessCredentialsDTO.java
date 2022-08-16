@@ -1,12 +1,11 @@
 package edu.nd.crc.safa.server.entities.api.github;
 
-import edu.nd.crc.safa.server.entities.db.GithubAccessCredentials;
-import edu.nd.crc.safa.server.entities.db.JiraAccessCredentials;
-import lombok.Data;
-
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.nio.charset.StandardCharsets;
+
+import edu.nd.crc.safa.server.entities.db.GithubAccessCredentials;
+
+import lombok.Data;
 
 /**
  * Describes the information needed to import a GitHub project

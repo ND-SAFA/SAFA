@@ -1,25 +1,29 @@
 package edu.nd.crc.safa.server.entities.api.jobs;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 
-import edu.nd.crc.safa.server.authentication.SafaUserService;
-import edu.nd.crc.safa.server.entities.api.ProjectCommit;
-import edu.nd.crc.safa.server.entities.api.SafaError;
+import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
+import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
+import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
+import edu.nd.crc.safa.features.jobs.entities.app.ProjectCreationJob;
+import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.projects.services.ProjectService;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
+import edu.nd.crc.safa.features.users.services.SafaUserService;
+import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.server.entities.api.github.GithubFileBlobDTO;
 import edu.nd.crc.safa.server.entities.api.github.GithubRepositoryDTO;
 import edu.nd.crc.safa.server.entities.api.github.GithubRepositoryFileDTO;
 import edu.nd.crc.safa.server.entities.api.github.GithubRepositoryFiletreeResponseDTO;
-import edu.nd.crc.safa.server.entities.app.project.ArtifactAppEntity;
-import edu.nd.crc.safa.server.entities.app.project.TraceAppEntity;
 import edu.nd.crc.safa.server.entities.db.GithubAccessCredentials;
 import edu.nd.crc.safa.server.entities.db.GithubProject;
-import edu.nd.crc.safa.server.entities.db.JobDbEntity;
-import edu.nd.crc.safa.server.entities.db.Project;
-import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.entities.db.SafaUser;
 import edu.nd.crc.safa.server.repositories.github.GithubAccessCredentialsRepository;
-import edu.nd.crc.safa.server.services.ProjectService;
-import edu.nd.crc.safa.server.services.ServiceProvider;
 import edu.nd.crc.safa.server.services.github.GithubConnectionService;
 
 /**
@@ -40,6 +44,8 @@ public class GithubProjectCreationJob extends ProjectCreationJob {
     private GithubRepositoryDTO githubRepositoryDTO;
 
     private GithubRepositoryFiletreeResponseDTO filetreeResponseDTO;
+
+    private ProjectVersion projectVersion;
 
     public GithubProjectCreationJob(JobDbEntity jobDbEntity,
                                     ServiceProvider serviceProvider,
@@ -65,14 +71,14 @@ public class GithubProjectCreationJob extends ProjectCreationJob {
     /**
      * Separate method for retrieving the GitHub project such that it can be mocked
      */
-    public void retrieveGitHubProject() {
+    public void retrieveGitHubRepository() {
         GithubConnectionService connectionService = serviceProvider.getGithubConnectionService();
 
         this.githubRepositoryDTO = connectionService.getUserRepository(this.credentials, this.repositoryName);
         this.commitSha = connectionService.getRepositoryBranch(this.credentials, this.repositoryName,
             this.githubRepositoryDTO.getDefaultBranch()).getLastCommitSha();
-        this.filetreeResponseDTO = connectionService.getRepositoryFiles(this.credentials, this.commitSha,
-            this.repositoryName);
+        this.filetreeResponseDTO = connectionService.getRepositoryFiles(this.credentials, this.repositoryName,
+            this.commitSha);
     }
 
     public void createSafaProject() {
@@ -109,10 +115,28 @@ public class GithubProjectCreationJob extends ProjectCreationJob {
 
     public void convertFiletreeToArtifactsAndTraceLinks() {
         List<ArtifactAppEntity> artifacts = new ArrayList<>();
-        List<TraceAppEntity> traces = new ArrayList<>();
 
         for (GithubRepositoryFileDTO file : this.filetreeResponseDTO.filterOutFolders().getTree()) {
-            // TODO: create artifacts and links between them
+            GithubFileBlobDTO blobDTO = this.serviceProvider.getGithubConnectionService()
+                .getBlobInformation(this.credentials, file.getBlobApiUrl());
+            String name = file.getPath();
+            String type = file.getType().name();
+            String summary = file.getSha();
+            String body = blobDTO.getContent();
+
+            ArtifactAppEntity artifact = new ArtifactAppEntity(
+                "",
+                type,
+                name,
+                summary,
+                body,
+                DocumentType.ARTIFACT_TREE,
+                new Hashtable<>()
+            );
+
+            artifacts.add(artifact);
         }
+
+        this.projectCommit.addArtifacts(ModificationType.ADDED, artifacts);
     }
 }

@@ -17,7 +17,7 @@ public class ProjectCreationJob extends AbstractJob {
     /**
      * The project version of the
      */
-    ProjectCommit projectCommit;
+    protected ProjectCommit projectCommit;
     /**
      * The entities created during job.
      */

@@ -1,7 +1,6 @@
 package edu.nd.crc.safa.features.jira.services;
 
 import java.util.List;
-import java.util.Optional;
 
 import edu.nd.crc.safa.features.jira.entities.app.JiraIssuesResponseDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraProjectResponseDTO;
@@ -11,16 +10,8 @@ import edu.nd.crc.safa.features.jira.entities.db.JiraProject;
 import edu.nd.crc.safa.features.jira.repositories.JiraProjectRepository;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
-
-import edu.nd.crc.safa.server.entities.api.SafaError;
-import edu.nd.crc.safa.server.entities.api.jira.JiraIssuesResponseDTO;
-import edu.nd.crc.safa.server.entities.api.jira.JiraProjectResponseDTO;
-import edu.nd.crc.safa.server.entities.api.jira.JiraRefreshTokenDTO;
-import edu.nd.crc.safa.server.entities.db.JiraAccessCredentials;
-import edu.nd.crc.safa.server.entities.db.JiraProject;
-import edu.nd.crc.safa.server.entities.db.Project;
-import edu.nd.crc.safa.server.repositories.jira.JiraProjectRepository;
 import edu.nd.crc.safa.utilities.WebApiUtils;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.slf4j.Logger;
@@ -32,8 +23,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.List;
-
 @AllArgsConstructor
 public class JiraConnectionServiceImpl implements JiraConnectionService {
 
@@ -44,13 +33,7 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
     private static final Logger log = LoggerFactory.getLogger(JiraConnectionServiceImpl.class);
 
     private final JiraProjectRepository jiraProjectRepository;
-
-    @Autowired
-    private WebClient webClient;
-
-    public JiraConnectionServiceImpl(JiraProjectRepository jiraProjectRepository) {
-        this.jiraProjectRepository = jiraProjectRepository;
-    }
+    private final WebClient webClient;
 
     private String buildBaseURI(String cloudId) {
         return String.format("/ex/jira/%s/rest/api/%d", cloudId, API_VERSION);
@@ -149,7 +132,6 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
                 .bodyToMono(JiraIssuesResponseDTO.class)
         ).orElseThrow(() -> new SafaError("Error while trying to refresh JIRA credentials"));
     }
-
 
     @Override
     public void createJiraProjectMapping(Project project, Long jiraProjectId) {

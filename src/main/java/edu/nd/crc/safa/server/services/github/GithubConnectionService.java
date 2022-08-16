@@ -1,10 +1,15 @@
 package edu.nd.crc.safa.server.services.github;
 
-import edu.nd.crc.safa.server.entities.api.github.*;
-import edu.nd.crc.safa.server.entities.db.GithubAccessCredentials;
-import edu.nd.crc.safa.server.entities.db.Project;
-
 import java.util.List;
+
+import edu.nd.crc.safa.server.entities.api.github.GithubCommitDiffResponseDTO;
+import edu.nd.crc.safa.server.entities.api.github.GithubFileBlobDTO;
+import edu.nd.crc.safa.server.entities.api.github.GithubRefreshTokenDTO;
+import edu.nd.crc.safa.server.entities.api.github.GithubRepositoryBranchDTO;
+import edu.nd.crc.safa.server.entities.api.github.GithubRepositoryDTO;
+import edu.nd.crc.safa.server.entities.api.github.GithubRepositoryFiletreeResponseDTO;
+import edu.nd.crc.safa.server.entities.api.github.GithubSelfResponseDTO;
+import edu.nd.crc.safa.server.entities.db.GithubAccessCredentials;
 
 public interface GithubConnectionService {
 
@@ -72,4 +77,14 @@ public interface GithubConnectionService {
     GithubCommitDiffResponseDTO getDiffBetweenOldCommitAndHead(GithubAccessCredentials credentials,
                                                                String repositoryName,
                                                                String baseCommitSha);
+
+    /**
+     * @param credentials User credentials
+     * @param url         Blob location. Format should be:
+     *                    https://api.github.com/repos/{username}/{repo}/git/blobs/{file_sha}
+     *                    URL can be constructed manually, or it can be provided in the filetree
+     *                    response for each file.
+     * @return Information blob information for the url provided.
+     */
+    GithubFileBlobDTO getBlobInformation(GithubAccessCredentials credentials, String url);
 }

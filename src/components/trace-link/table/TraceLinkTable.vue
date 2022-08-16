@@ -11,15 +11,20 @@
       :expanded="expanded"
       :search="searchText"
       :loading="isLoading"
-      :sort-by="['targetName', 'sourceName']"
+      :sort-by.sync="sortBy"
+      :group-by.sync="groupBy"
       :group-desc="true"
-      group-by="approvalStatus"
       item-key="traceLinkId"
       :items-per-page="50"
       @click:row="handleView($event)"
     >
       <template v-slot:top>
-        <trace-link-table-header @search="searchText = $event" />
+        <trace-link-table-header
+          :headers="headers"
+          :group-by.sync="groupBy"
+          :sort-by.sync="sortBy"
+          @search="searchText = $event"
+        />
       </template>
 
       <template v-slot:[`group.header`]="data">
@@ -97,6 +102,8 @@ export default Vue.extend({
   data() {
     return {
       searchText: "",
+      sortBy: ["targetName", "sourceName"] as (keyof FlatTraceLink)[],
+      groupBy: "approvalStatus" as keyof FlatTraceLink,
       headers: [
         {
           text: "Source Name",

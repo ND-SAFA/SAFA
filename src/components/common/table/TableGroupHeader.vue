@@ -68,7 +68,7 @@ export default Vue.extend({
       return (
         this.data.groupBy.includes("sourceType") ||
         this.data.groupBy.includes("targetType") ||
-        this.data.groupBy.includes("type")
+        (this.data.groupBy as string[]).includes("type")
       );
     },
   },

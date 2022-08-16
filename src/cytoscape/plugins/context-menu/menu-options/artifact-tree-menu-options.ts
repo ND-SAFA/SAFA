@@ -192,9 +192,9 @@ type ArtifactHandler = (a: ArtifactModel) => void | Promise<void>;
 function handleOnClick(event: EventObject, handler: ArtifactHandler): void {
   if (event.target !== null) {
     const artifactData: ArtifactData = event.target.data();
-    const artifact = artifactModule.getArtifactByName(
-      artifactData.artifactName
-    );
+    const artifact = artifactModule.getArtifactById(artifactData.id);
+
+    if (!artifact) return;
 
     handler(artifact);
   }

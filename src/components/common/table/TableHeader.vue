@@ -1,56 +1,61 @@
 <template>
-  <table-header
-    :headers="headers"
-    :search-text.sync="currentSearch"
-    :group-by.sync="currentGroup"
-    :sort-by.sync="currentSort"
-  >
-    <template slot="right">
-      <flex-box b="1">
+  <flex-box justify="space-between" b="2">
+    <v-text-field
+      dense
+      outlined
+      clearable
+      label="Search Trace Links"
+      style="max-width: 30vw"
+      v-model="currentSearch"
+      append-icon="mdi-magnify"
+    />
+    <div>
+      <slot name="right" />
+      <flex-box>
+        <v-autocomplete
+          clearable
+          outlined
+          dense
+          hide-details
+          label="Group By"
+          v-model="currentGroup"
+          :items="options"
+          item-text="text"
+          item-value="value"
+          style="max-width: 200px"
+        />
         <v-autocomplete
           outlined
           multiple
           dense
           hide-details
-          v-if="inDeltaView"
-          label="Delta Types"
-          v-model="selectedDeltaTypes"
-          :items="deltaTypes"
-          item-text="name"
-          item-value="id"
-          style="width: 200px"
-          class="mr-1"
+          label="Sort By"
+          v-model="currentSort"
+          :items="options"
+          item-text="text"
+          item-value="value"
+          style="max-width: 200px"
+          class="ml-1"
         />
-        <table-column-editor />
       </flex-box>
-    </template>
-  </table-header>
+    </div>
+  </flex-box>
 </template>
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
+import { FlexBox } from "@/components/common";
 import { DataTableHeader } from "vuetify";
-import { ArtifactDeltaState } from "@/types";
-import { deltaTypeOptions } from "@/util";
-import { deltaModule } from "@/store";
-import { TableHeader, FlexBox } from "@/components/common";
-import TableColumnEditor from "./TableColumnEditor.vue";
-
 /**
- * Represents the header and inputs for a table of artifacts.
+ * Renders the header for a table.
  *
  * @emits-1 `update:searchText` (String) on search.
  * @emits-2 `update:sortBy` (String[]) on sort update.
  * @emits-3 `update:groupBy` (String) on group update.
- * @emits-4 `filter` (ArtifactDeltaState[]) - On filter search.
  */
 export default Vue.extend({
-  name: "ArtifactTableHeader",
-  components: {
-    FlexBox,
-    TableHeader,
-    TableColumnEditor,
-  },
+  name: "TableHeader",
+  components: { FlexBox },
   props: {
     headers: {
       type: Array as PropType<DataTableHeader[]>,
@@ -60,18 +65,11 @@ export default Vue.extend({
     groupBy: String,
     sortBy: Array as PropType<string[]>,
   },
-  data() {
-    return {
-      selectedDeltaTypes: [] as ArtifactDeltaState[],
-      deltaTypes: deltaTypeOptions(),
-    };
-  },
   computed: {
-    /**
-     * @return Whether the app is in delta view.
-     */
-    inDeltaView(): boolean {
-      return deltaModule.inDeltaView;
+    options() {
+      return this.headers
+        .filter(({ text }) => !!text && text !== "Actions")
+        .map(({ text, value }) => ({ text, value }));
     },
     /**
      * Emits changes to the grouping.
@@ -109,10 +107,10 @@ export default Vue.extend({
   },
   watch: {
     /**
-     * Emits the selected delta types on change.
+     * Emits the current search text on change.
      */
-    selectedDeltaTypes(items: ArtifactDeltaState[]) {
-      this.$emit("filter", items);
+    searchText(search: string) {
+      this.$emit("search", search);
     },
   },
 });

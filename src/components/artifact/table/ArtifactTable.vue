@@ -12,15 +12,19 @@
       :headers="headers"
       :items="items"
       :search="searchText"
+      :sort-by.sync="sortBy"
+      :group-by.sync="groupBy"
       :expanded="expanded"
       :item-class="getItemBackground"
-      sort-by="name"
       :items-per-page="50"
       @click:row="handleView($event)"
     >
       <template v-slot:top>
         <artifact-table-header
-          @search="searchText = $event"
+          :headers="headers"
+          :group-by.sync="groupBy"
+          :sort-by.sync="sortBy"
+          :search-text.sync="searchText"
           @filter="selectedDeltaTypes = $event"
         />
       </template>
@@ -102,6 +106,8 @@ export default Vue.extend({
   data() {
     return {
       searchText: "",
+      sortBy: ["name"] as (keyof FlatArtifact)[],
+      groupBy: "type" as keyof FlatArtifact,
       selectedDeltaTypes: [] as ArtifactDeltaState[],
       expanded: [] as ArtifactModel[],
     };

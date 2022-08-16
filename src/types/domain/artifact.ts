@@ -106,4 +106,4 @@ export type ProjectWarnings = Record<string, WarningModel[]>;
 /**
  * Returns an artifact matching the given query, if one exists.
  */
-export type ArtifactQueryFunction = (q: string) => ArtifactModel;
+export type ArtifactQueryFunction = (q: string) => ArtifactModel | undefined;

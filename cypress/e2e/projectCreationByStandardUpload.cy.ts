@@ -115,15 +115,6 @@ describe("Project Creation", () => {
     });
 
     describe("I can upload a file containing the artifacts I want to create", () => {
-      it("cannot create a project without atleast one artifact", () => {
-        cy.setProjectIdentifier("standard");
-        cy.getCy(DataCy.stepperContinueButton).should("not.be.disabled");
-        cy.clickButton(DataCy.stepperContinueButton);
-
-        cy.clickButton(DataCy.creationCreatePanelButton);
-        cy.getCy(DataCy.creationCreatePanelButton).should("be.disabled");
-        cy.getCy(DataCy.stepperContinueButton).should("be.disabled");
-      });
       it("can continue after uploading artifacts", () => {
         cy.setProjectIdentifier("standard");
         cy.getCy(DataCy.stepperContinueButton).should("not.be.disabled");
@@ -161,7 +152,7 @@ describe("Project Creation", () => {
 
   describe("Project Trace Link Uploading", () => {
     describe("I can create sets of trace links between two artifacts", () => {
-      it.only("can create a new panel of trace links", () => {
+      it.skip("can create a new panel of trace links", () => {
         cy.setProjectIdentifier("standard");
         cy.getCy(DataCy.stepperContinueButton).should("not.be.disabled");
         cy.clickButton(DataCy.stepperContinueButton);

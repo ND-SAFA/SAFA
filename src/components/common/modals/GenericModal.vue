@@ -6,7 +6,7 @@
     :retain-focus="false"
     persistent
   >
-    <v-card :class="`modal-${size}`">
+    <v-card :class="`modal-${size}`" :data-cy="dataCy">
       <v-card-title class="primary">
         <generic-modal-title :title="title" @close="$emit('close')" />
       </v-card-title>
@@ -69,6 +69,7 @@ export default Vue.extend({
       required: false,
       default: "m",
     },
+    dataCy: String,
   },
   computed: {
     /**

@@ -9,6 +9,7 @@
     :is-loading="isLoading"
     :has-delete-for-indexes="deletableProjects"
     :has-delete="false"
+    data-cy="table-project"
     @item:edit="handleEditProject"
     @item:select="handleSelectProject"
     @item:delete="handleDeleteProject"

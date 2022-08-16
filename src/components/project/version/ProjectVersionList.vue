@@ -51,7 +51,7 @@ const SELECT_VERSION_DEFAULT_NAME = "Select a Version";
  * Presents a stepper in a modal for selecting a project and version.
  */
 export default Vue.extend({
-  name: "ProjectVersionStepperModal",
+  name: "ProjectVersionList",
   components: {
     GenericStepper,
     ProjectSelector,

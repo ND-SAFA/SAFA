@@ -6,6 +6,7 @@
     :title="title"
     :is-loading="isLoading"
     size="l"
+    :data-cy="dataCy"
     @close="handleClose"
     @reset="clearData"
     @submit="$emit('submit')"
@@ -69,6 +70,7 @@ export default Vue.extend({
     VersionSelector,
   },
   props: {
+    dataCy: String,
     /**
      * The current step of the stepper.
      */

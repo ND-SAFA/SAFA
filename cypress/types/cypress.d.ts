@@ -72,6 +72,13 @@ declare namespace Cypress {
      */
     switchTab(tabLabel: string): Chainable<void>;
 
+    /**
+     * Closes a given modal.
+     *
+     * @param dataCy - The testing selector of the modal.
+     */
+    closeModal(dataCy: string): Chainable<void>;
+
     // Authentication Commands
 
     /**
@@ -87,7 +94,7 @@ declare namespace Cypress {
      */
     logout(): Chainable<void>;
 
-    // Project Creator Commands
+    // Project Creation
 
     /**
      * Setting the project name and description within the project creator.
@@ -95,5 +102,12 @@ declare namespace Cypress {
      * @param type - The type of project identifier to set.
      */
     setProjectIdentifier(type: "bulk" | "standard"): Chainable<void>;
+
+    // Project Selection
+
+    /**
+     * Opens the project selection modal.
+     */
+    openProjectSelector(): Chainable<void>;
   }
 }

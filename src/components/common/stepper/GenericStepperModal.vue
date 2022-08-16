@@ -5,6 +5,7 @@
     :is-loading="isLoading"
     :size="size"
     :actions-height="0"
+    :data-cy="dataCy"
     @close="$emit('close')"
   >
     <template v-slot:body>
@@ -43,6 +44,7 @@ export default Vue.extend({
     GenericStepper,
   },
   props: {
+    dataCy: String,
     value: {
       type: Number,
       required: true,

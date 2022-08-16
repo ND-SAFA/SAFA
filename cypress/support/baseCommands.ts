@@ -1,4 +1,5 @@
 import "cypress-file-upload";
+import { DataCy } from "../fixtures";
 
 Cypress.Commands.add("getCy", (dataCy, elementPosition, timeout) => {
   const elementList = cy.get(`[data-cy="${dataCy}"]`, { timeout });
@@ -36,4 +37,8 @@ Cypress.Commands.add("uploadFiles", (dataCy, ...filePaths) => {
 
 Cypress.Commands.add("switchTab", (tabLabel) => {
   cy.contains("div", tabLabel).click();
+});
+
+Cypress.Commands.add("closeModal", (dataCy) => {
+  cy.getCy(dataCy).within(() => cy.clickButton(DataCy.selectionClose));
 });

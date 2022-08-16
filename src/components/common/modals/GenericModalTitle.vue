@@ -5,6 +5,7 @@
       tooltip="Close"
       icon-id="mdi-close"
       color="white"
+      data-cy="button-close"
       @click="$emit('close')"
     />
   </flex-box>

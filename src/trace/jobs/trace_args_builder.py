@@ -9,16 +9,16 @@ from trace.jobs.trace_args import TraceArgs
 
 class TraceArgsBuilder(AbstractArgsBuilder):
 
-    def __init__(self, base_model_name: str, links: List[Tuple[str, str]], model_path: str, output_path: str,
-                sources: Dict[str, str], targets: Dict[str, str], validation_percentage: float, **kwargs):
+    def __init__(self, base_model_name: str, model_path: str, output_path: str, sources: Dict[str, str],
+                 targets: Dict[str, str], links: List[Tuple[str, str]], validation_percentage: float, **kwargs):
         """
         Responsible for building training arguments for some pretrained model.
         :param base_model_name: supported base model name
-        :param links: list of true links to fine-tune on
         :param model_path: where the pretrained model will be loaded from
         :param output_path: where the model will be saved to
         :param sources: mapping between source artifact ids and their tokens
         :param targets: mapping between target artifact ids and their tokens
+        :param links: list of true links to fine-tune on
         :param kwargs: additional parameters passed into ModelTraceArgs
         """
         self.base_model_name = base_model_name

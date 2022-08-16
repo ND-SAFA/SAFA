@@ -31,7 +31,7 @@ def _make_job_params_from_request(params: Dict):
     base_model = params[RequestParams.BASE_MODEL]
     links = params.get(RequestParams.LINKS, None)
     output_path = params.get(RequestParams.OUTPUT_PATH, None)
-    return TraceArgsBuilder(base_model, links, model_path, output_path, sources, targets, VALIDATION_PERCENTAGE_DEFAULT)
+    return TraceArgsBuilder(base_model, model_path, output_path, sources, targets, links, VALIDATION_PERCENTAGE_DEFAULT)
 
 
 def _as_json(response_object: Dict) -> JsonResponse:

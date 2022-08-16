@@ -18,6 +18,7 @@
       @close="uploadVersionOpen = false"
     />
     <baseline-version-modal
+      data-cy="modal-project-select"
       :is-open="openProjectOpen"
       @close="openProjectOpen = false"
     />

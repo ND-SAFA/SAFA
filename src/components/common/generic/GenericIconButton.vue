@@ -10,6 +10,7 @@
         :class="disabled ? 'disable-events' : ''"
         :small="small"
         :hidden="isHidden"
+        :data-cy="dataCy"
         @click="$emit('click')"
       >
         <v-icon :style="iconStyle">{{ iconId }}</v-icon>
@@ -30,6 +31,7 @@ import Vue from "vue";
 export default Vue.extend({
   name: "GenericIconButton",
   props: {
+    dataCy: String,
     tooltip: {
       type: String,
       required: true,

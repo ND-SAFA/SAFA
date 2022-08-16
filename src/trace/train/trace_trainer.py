@@ -10,7 +10,7 @@ from transformers.trainer_utils import PredictionOutput
 
 from trace.config.constants import LINKED_TARGETS_ONLY_DEFAULT
 from trace.jobs.trace_args import TraceArgs
-from trace.metrics.supported_metrics import get_metric_path
+from trace.metrics.supported_trace_metric import get_metric_path
 
 
 class TraceTrainer(Trainer):

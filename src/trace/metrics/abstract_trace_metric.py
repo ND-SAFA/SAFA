@@ -1,29 +1,28 @@
-from typing import Dict, List
+from typing import Dict, List, re
 
-from datasets import Metric
-from abc import ABC, abstractmethod
-import os
-from common.config.paths import PROJ_PATH
+import datasets
+from abc import abstractmethod
 
 
-class TraceMetric(Metric, ABC):
+class AbstractTraceMetric(datasets.Metric):
+    metric_suffix = "Metric"
 
-    @property
-    @abstractmethod
-    def name(self) -> str:
+    def get_features(self) -> datasets.Features:
         """
-        The name of metric
-        :return: the name
+        Gets the features for the metric
+        :return: the features
         """
-        pass
-
-    @property
-    def path(self) -> str:
-        """
-        The path to metric class file
-        :return: the path
-        """
-        return os.path.dirname(os.path.relpath(__file__, PROJ_PATH))
+        return datasets.Features(
+            {
+                "predictions": datasets.Sequence(datasets.Value("int32")),
+                "references": datasets.Sequence(datasets.Value("int32")),
+            }
+            if self.config_name == "multilabel"
+            else {
+                "predictions": datasets.Value("int32"),
+                "references": datasets.Value("int32"),
+            }
+        ),
 
     @abstractmethod
     def _perform_compute(self, predictions: List, labels: List, **kwargs) -> float:
@@ -36,13 +35,14 @@ class TraceMetric(Metric, ABC):
         """
         pass
 
-    def _compute(self, predictions: List, references: List) -> Dict:
+    def _compute(self, predictions: List, references: List, **kwargs) -> Dict:
         """
         Performs the computation
         :param predictions: the predictions
         :param references: the true labels
+        :param kwargs: any other arguments used in computation
         :return: metric name, score mappings
         """
         return {
-            self.name: self._perform_compute(predictions, references)
+            self.metric_name: self._perform_compute(predictions, references, **kwargs)
         }

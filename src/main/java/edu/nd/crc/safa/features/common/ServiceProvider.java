@@ -19,6 +19,7 @@ import edu.nd.crc.safa.server.services.github.GithubConnectionService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -48,8 +49,8 @@ public class ServiceProvider {
     // JIRA
     private final JiraAccessCredentialsRepository jiraAccessCredentialsRepository;
     private final JiraConnectionService jiraConnectionService;
-    // Jobs
-    private final JobLauncher jobLauncher;
+    // Jobs(not final since is set while testing)
+    private JobLauncher jobLauncher;
     // GitHub
     private final GithubAccessCredentialsRepository githubAccessCredentialsRepository;
     private final GithubConnectionService githubConnectionService;

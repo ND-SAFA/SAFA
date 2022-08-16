@@ -19,11 +19,11 @@
       @click:row="handleView($event)"
     >
       <template v-slot:top>
-        <trace-link-table-header
+        <table-header
           :headers="headers"
           :group-by.sync="groupBy"
           :sort-by.sync="sortBy"
-          @search="searchText = $event"
+          :search-text.sync="searchText"
         />
       </template>
 
@@ -84,9 +84,12 @@ import {
 } from "@/types";
 import { appModule, artifactModule, projectModule } from "@/store";
 import { getGeneratedLinks } from "@/api";
-import { AttributeChip, TableGroupHeader } from "@/components/common";
+import {
+  AttributeChip,
+  TableGroupHeader,
+  TableHeader,
+} from "@/components/common";
 import TraceLinkDisplay from "../TraceLinkDisplay.vue";
-import TraceLinkTableHeader from "./TraceLinkTableHeader.vue";
 
 /**
  * Displays a table of trace links.
@@ -94,8 +97,8 @@ import TraceLinkTableHeader from "./TraceLinkTableHeader.vue";
 export default Vue.extend({
   name: "TraceLinkTable",
   components: {
+    TableHeader,
     TableGroupHeader,
-    TraceLinkTableHeader,
     AttributeChip,
     TraceLinkDisplay,
   },

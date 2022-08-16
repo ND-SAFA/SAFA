@@ -1,6 +1,8 @@
 describe("Canvas", () => {
   beforeEach(() => {
-    cy.visit("http://localhost:8080/project");
+    cy.visit(
+      "http://localhost:8080/project?version=13801fc6-2483-4be4-920e-322edb9d8722"
+    );
   });
 
   it("can interact with the canvas", () => {
@@ -25,6 +27,6 @@ describe("Canvas", () => {
       .then(($el) => $el.click());
 
     // Validates that the add artifact window is open.
-    cy.contains("label", "Create Artifact").should("be.visible");
+    cy.contains("span", "Create Artifact").should("be.visible");
   });
 });

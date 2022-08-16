@@ -20,4 +20,19 @@ public class EntityChangeMessage {
      * The user initiating the change.
      */
     String user;
+    /**
+     * Whether to update the default layout of the project.
+     */
+    boolean updateLayout = false;
+
+    public boolean shouldUpdateLayout() {
+        List<Change.Entity> entitiesTriggeringLayout = List.of(
+            Change.Entity.ARTIFACTS,
+            Change.Entity.TRACES,
+            Change.Entity.VERSION);
+        return this.changes
+            .stream()
+            .map(Change::getEntity)
+            .anyMatch(entitiesTriggeringLayout::contains);
+    }
 }

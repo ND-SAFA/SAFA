@@ -10,6 +10,7 @@ import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
+import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
 import edu.nd.crc.safa.features.memberships.entities.app.ProjectMemberAppEntity;
 import edu.nd.crc.safa.features.notifications.entities.Change;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
@@ -40,6 +41,11 @@ public class SyncController extends BaseController {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
         for (Change change : message.getChanges()) {
             projectAppEntity = updateProjectAppEntity(projectAppEntity, projectVersion, change);
+        }
+        if (message.shouldUpdateLayout()) {
+            Map<String, LayoutPosition> defaultDocumentLayout = this.serviceProvider
+                .getArtifactPositionService().retrieveDocumentLayout(projectVersion, null);
+            projectAppEntity.setLayout(defaultDocumentLayout);
         }
         return projectAppEntity;
     }

@@ -27,9 +27,18 @@ class TraceArgs(TrainingArguments):
         https://huggingface.co/docs/transformers/v4.21.0/en/main_classes/trainer#transformers.TrainingArguments
         """
         self.output_dir = output_path
-        self.__set_args(**kwargs)
         self.model_generator = model_generator
         self.trace_dataset_creator = trace_dataset_creator
+        self.kwargs = kwargs
+
+    @property
+    def should_log(self):
+        return False
+
+    def __post_init__(self):
+        super().__post_init__()
+        self.log_level_replica_node = -1
+        self.__set_args(**self.kwargs)
 
     def __set_args(self, **kwargs) -> None:
         """

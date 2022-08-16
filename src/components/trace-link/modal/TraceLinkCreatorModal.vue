@@ -7,7 +7,7 @@
     data-cy="button-create-trace-matrix"
   >
     <template v-slot:body>
-      <v-row class="mt-2">
+      <v-row class="my-2">
         <v-col cols="6">
           <artifact-input
             v-model="sourceArtifactId"
@@ -25,6 +25,18 @@
           />
         </v-col>
       </v-row>
+      <v-expansion-panels flat>
+        <v-expansion-panel>
+          <v-expansion-panel-header>
+            <typography value="Allowed Trace Directions" />
+          </v-expansion-panel-header>
+          <v-expansion-panel-content>
+            <div v-for="entry in artifactDirections" :key="entry.label">
+              <type-direction-input :entry="entry" />
+            </div>
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+      </v-expansion-panels>
     </template>
     <template v-slot:actions>
       <v-spacer />
@@ -38,10 +50,15 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { GenericModal, Typography, ArtifactInput } from "@/components/common";
-import { artifactModule, traceModule } from "@/store";
+import { artifactModule, traceModule, typeOptionsModule } from "@/store";
 import { handleCreateLink } from "@/api";
-import { ArtifactModel } from "@/types";
+import { ArtifactModel, LabelledTraceDirectionModel } from "@/types";
+import {
+  GenericModal,
+  Typography,
+  ArtifactInput,
+  TypeDirectionInput,
+} from "@/components/common";
 
 /**
  * A modal for creating trace links.
@@ -50,7 +67,7 @@ import { ArtifactModel } from "@/types";
  */
 export default Vue.extend({
   name: "TraceLinkCreatorModal",
-  components: { Typography, ArtifactInput, GenericModal },
+  components: { Typography, ArtifactInput, GenericModal, TypeDirectionInput },
   props: {
     isOpen: {
       type: Boolean,
@@ -108,6 +125,12 @@ export default Vue.extend({
         !!this.targetArtifactId &&
         this.errorMessage === ""
       );
+    },
+    /**
+     * @return The current project's artifact types.
+     */
+    artifactDirections(): LabelledTraceDirectionModel[] {
+      return typeOptionsModule.labeledTypeDirections();
     },
   },
   methods: {

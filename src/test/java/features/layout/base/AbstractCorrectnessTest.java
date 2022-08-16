@@ -16,6 +16,7 @@ import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import common.MappingTestService;
 import features.base.ApplicationBaseTest;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -38,7 +39,7 @@ public abstract class AbstractCorrectnessTest extends ApplicationBaseTest {
             .newProject(projectName)
             .newVersionWithReturn(projectName);
         this.jsonBuilder.withProject(projectName, projectName, "");
-        return commit(CommitBuilder.withVersion(projectVersion)
+        return commitTestService.commit(CommitBuilder.withVersion(projectVersion)
             .withAddedArtifact(createArtifact(a1Name))
             .withAddedArtifact(createArtifact(a2Name))
             .withAddedArtifact(createArtifact(a3Name))
@@ -84,7 +85,7 @@ public abstract class AbstractCorrectnessTest extends ApplicationBaseTest {
     protected LayoutPosition getLayoutPositionInDocument(ProjectAppEntity project,
                                                          String documentId,
                                                          String artifactName) {
-        String artifactId = getArtifactId(project.artifacts, artifactName);
+        String artifactId = retrievalTestService.getArtifactId(project.artifacts, artifactName);
         List<DocumentAppEntity> documents = project.getDocuments()
             .stream()
             .filter(d -> d.getDocumentId().toString().equals(documentId))
@@ -116,7 +117,7 @@ public abstract class AbstractCorrectnessTest extends ApplicationBaseTest {
         JSONObject projectCommit,
         JSONObject documentJson,
         List<String> artifactNames) throws JsonProcessingException {
-        DocumentAppEntity document = toClass(documentJson.toString(), DocumentAppEntity.class);
+        DocumentAppEntity document = MappingTestService.toClass(documentJson.toString(), DocumentAppEntity.class);
         return artifactNames.stream()
             .map(artifactName -> {
                 String artifactId = getArtifactIdFromProjectCommit(projectCommit, artifactName);

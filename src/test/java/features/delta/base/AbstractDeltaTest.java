@@ -22,7 +22,7 @@ public abstract class AbstractDeltaTest extends ApplicationBaseTest {
 
     @BeforeEach
     public void setupVersion() throws Exception {
-        Pair<ProjectVersion, ProjectVersion> versionPair = createDualVersions(projectName);
+        Pair<ProjectVersion, ProjectVersion> versionPair = this.setupTestService.createDualVersions(projectName);
         this.beforeVersion = versionPair.getValue0();
         this.afterVersion = versionPair.getValue1();
     }
@@ -30,7 +30,8 @@ public abstract class AbstractDeltaTest extends ApplicationBaseTest {
     public void verifyArtifactInDelta(JSONObject artifactDelta,
                                       String deltaName,
                                       String artifactName) {
-        assertThat(artifactDelta.getJSONObject(deltaName).has(getId(projectName, artifactName))).isTrue();
+        String artifactId = retrievalTestService.getId(projectName, artifactName);
+        assertThat(artifactDelta.getJSONObject(deltaName).has(artifactId)).isTrue();
     }
 
     public void verifyNumOfChangesInDelta(JSONObject entityDelta,

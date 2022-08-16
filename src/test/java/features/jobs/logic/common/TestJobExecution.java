@@ -30,7 +30,7 @@ class TestJobExecution extends ApplicationBaseTest {
 
     @BeforeEach
     public void createProject() throws IOException {
-        this.projectVersion = createDefaultProject("project");
+        this.projectVersion = setupTestService.createDefaultProject("project");
     }
 
     @Test

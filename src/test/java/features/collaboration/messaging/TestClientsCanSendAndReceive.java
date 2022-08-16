@@ -29,10 +29,12 @@ class TestClientsCanSendAndReceive extends ApplicationBaseTest {
         Project project = projectVersion.getProject();
 
         // Step - Create two client and subscript to version
-        createNewConnection(clientOne)
+        notificationTestService
+            .createNewConnection(clientOne)
             .subscribeToProject(clientOne, project)
             .subscribeToVersion(clientOne, projectVersion);
-        createNewConnection(clientTwo)
+        notificationTestService
+            .createNewConnection(clientTwo)
             .subscribeToProject(clientTwo, project)
             .subscribeToVersion(clientTwo, projectVersion);
 
@@ -40,7 +42,7 @@ class TestClientsCanSendAndReceive extends ApplicationBaseTest {
         FlatFileRequest.updateProjectVersionFromFlatFiles(projectVersion, ProjectPaths.Tests.DefaultProject.V1);
 
         // VP - Artifact and traces received
-        assertThat(getQueueSize(clientOne)).isEqualTo(1);
-        assertThat(getQueueSize(clientTwo)).isEqualTo(1);
+        assertThat(notificationTestService.getQueueSize(clientOne)).isEqualTo(1);
+        assertThat(notificationTestService.getQueueSize(clientTwo)).isEqualTo(1);
     }
 }

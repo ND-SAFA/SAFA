@@ -42,6 +42,6 @@ class TestCreateTraceMatrix extends AbstractMatrixTest {
 
         // VP - Assert that single matrix exists for project.
         projectMatrices = traceMatrixRepository.findByProject(project);
-        assertThat(projectMatrices.size()).isEqualTo(1);
+        assertThat(projectMatrices).hasSize(1);
     }
 }

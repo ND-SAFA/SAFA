@@ -28,7 +28,9 @@ class TestProjectCreationWorkerFlatFile extends AbstractUpdateProjectViaFlatFile
         UUID jobId = updateProjectViaFlatFiles(ProjectPaths.Tests.DefaultProject.V1);
 
         // Step - Get Job and subscribe for updates
-        createNewConnection(defaultUser).subscribeToJob(defaultUser, jobService.getJobById(jobId));
+        notificationTestService
+            .createNewConnection(defaultUser)
+            .subscribeToJob(defaultUser, jobService.getJobById(jobId));
 
         // VP - Verify that job has finished.
         JobTestService.verifyJobWasCompleted(serviceProvider, jobId, N_STEPS);

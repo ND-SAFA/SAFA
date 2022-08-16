@@ -7,7 +7,6 @@ import java.util.UUID;
 import edu.nd.crc.safa.builders.requests.FlatFileRequest;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.config.ProjectVariables;
-import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.jobs.repositories.JobDbRepository;
 import edu.nd.crc.safa.features.jobs.services.JobService;
 import edu.nd.crc.safa.features.notifications.services.NotificationService;
@@ -30,10 +29,6 @@ public abstract class AbstractUpdateProjectViaFlatFileTest extends BaseFlatFileT
     @Autowired
     public JobDbRepository jobDbRepository;
 
-    @Autowired
-    public ServiceProvider serviceProvider;
-
-    protected String projectName = "test-before-files";
     protected ProjectVersion projectVersion;
 
     @BeforeEach

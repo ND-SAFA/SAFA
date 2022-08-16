@@ -29,7 +29,6 @@ import org.junit.jupiter.api.Test;
  * 5. Recreation of artifacts
  */
 public abstract class AbstractArtifactTest<T extends IArtifact> extends ApplicationBaseTest {
-    protected String projectName = "test-project";
     protected String projectDescription = "project-description";
     protected String artifactName = "RE-10";
     protected String artifactBody = "this is a body";
@@ -102,7 +101,7 @@ public abstract class AbstractArtifactTest<T extends IArtifact> extends Applicat
         CommitBuilder commitBuilder = CommitBuilder
             .withVersion(projectVersion)
             .withAddedArtifact(artifactJson);
-        JSONObject commitResponseJson = commit(commitBuilder);
+        JSONObject commitResponseJson = commitTestService.commit(commitBuilder);
 
         // VP - Verify single artifact returned in response
         JSONArray artifactsAddedJson = commitResponseJson.getJSONObject("artifacts").getJSONArray("added");
@@ -120,7 +119,7 @@ public abstract class AbstractArtifactTest<T extends IArtifact> extends Applicat
 
         // VP - Verify that single artifact was persisted in project
         List<T> projectArtifacts = this.getArtifactRepository().getByProject(projectVersion.getProject());
-        assertThat(projectArtifacts.size()).isEqualTo(1);
+        assertThat(projectArtifacts).hasSize(1);
 
         // VP - Verify persisted information is correct
         T projectArtifact = projectArtifacts.get(0);
@@ -144,11 +143,11 @@ public abstract class AbstractArtifactTest<T extends IArtifact> extends Applicat
         // Step - Delete artifact
         CommitBuilder deleteCommitBuilder =
             CommitBuilder.withVersion(projectVersion).withRemovedArtifact(artifactJson);
-        commit(deleteCommitBuilder);
+        commitTestService.commit(deleteCommitBuilder);
 
         // VP - Verify that artifact no longer exists in database
         List<T> projectArtifacts = this.getArtifactRepository().getByProject(projectVersion.getProject());
-        assertThat(projectArtifacts.size()).isEqualTo(1);
+        assertThat(projectArtifacts).isNotEmpty();
     }
 
     protected void testArtifactDelta(ProjectVersion baselineVersion, JSONObject artifactJson) throws Exception {
@@ -157,7 +156,7 @@ public abstract class AbstractArtifactTest<T extends IArtifact> extends Applicat
         artifactJson.put("body", newArtifactBody);
 
         // Step - Commit modified artifact
-        commit(CommitBuilder
+        commitTestService.commit(CommitBuilder
             .withVersion(newProjectVersion)
             .withModifiedArtifact(artifactJson));
 
@@ -187,7 +186,7 @@ public abstract class AbstractArtifactTest<T extends IArtifact> extends Applicat
         JSONObject requestedDocumentJson = this.createDocumentJson();
 
         // Step - Send creation request.
-        JSONObject documentJson = createOrUpdateDocumentJson(projectVersion, requestedDocumentJson);
+        JSONObject documentJson = setupTestService.createOrUpdateDocumentJson(projectVersion, requestedDocumentJson);
         return documentJson.getString("documentId");
     }
 

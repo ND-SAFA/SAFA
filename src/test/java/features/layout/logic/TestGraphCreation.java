@@ -38,7 +38,7 @@ class TestGraphCreation extends AbstractLayoutTest {
         ElkNode d1Parent = getParent(d1Node);
         assert d1Parent != null;
         assertThat(d1Parent.getIdentifier()).isEqualTo(getArtifactId(parentId));
-        assertThat(artifactChildren.size()).isEqualTo(nChildren);
+        assertThat(artifactChildren).hasSize(nChildren);
     }
 
     @Test
@@ -57,7 +57,7 @@ class TestGraphCreation extends AbstractLayoutTest {
             .map(ElkGraphElement::getIdentifier)
             .collect(Collectors.toList());
 
-        assertThat(graphNodesNames.size()).isEqualTo(DefaultProjectConstants.Entities.N_ARTIFACTS);
+        assertThat(graphNodesNames).hasSize(DefaultProjectConstants.Entities.N_ARTIFACTS);
     }
 
     @Test
@@ -85,9 +85,8 @@ class TestGraphCreation extends AbstractLayoutTest {
             .stream()
             .map(ElkGraphElement::getIdentifier)
             .collect(Collectors.toList());
-        assertThat(children.size()).isEqualTo(2);
-        assertThat(childrenNames.contains("R2")).isTrue();
-        assertThat(childrenNames.contains("R1")).isTrue();
+        assertThat(children).hasSize(2);
+        assertThat(childrenNames).contains("R2").contains("R1");
 
         // VP - Verify that R1 is a child of R2.
         ElkNode parent = getParent(name2Node.get("R1"));

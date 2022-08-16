@@ -21,7 +21,7 @@ class TestTokenizerParsing {
         String query = String.format("%s(0, Requirement, child, Package)", functionName);
         List<Token> tokens = Tokenizer.lex(query);
 
-        assertThat(tokens.size()).isEqualTo(6);
+        assertThat(tokens).hasSize(6);
         assertThat(tokens.get(0).value).isEqualTo(functionName);
         assertThat(tokens.get(0).tokenType).isEqualTo(TokenType.FUNC_START);
 

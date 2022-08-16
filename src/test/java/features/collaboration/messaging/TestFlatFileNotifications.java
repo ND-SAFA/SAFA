@@ -27,14 +27,14 @@ class TestFlatFileNotifications extends ApplicationBaseTest {
             .newVersionWithReturn(projectName);
 
         // Step - Subscribe to version notifications
-        createNewConnection(clientId).subscribeToVersion(clientId, projectVersion);
+        notificationTestService.createNewConnection(clientId).subscribeToVersion(clientId, projectVersion);
 
         // Step - Upload flat files
         FlatFileRequest.updateProjectVersionFromFlatFiles(projectVersion, ProjectPaths.Tests.DefaultProject.V1);
 
         // VP - Verify that single message sent
-        assertThat(getQueueSize(clientId)).isEqualTo(1);
-        EntityChangeMessage message = getNextMessage(clientId, EntityChangeMessage.class);
+        assertThat(notificationTestService.getQueueSize(clientId)).isEqualTo(1);
+        EntityChangeMessage message = notificationTestService.getNextMessage(clientId);
         assertThat(message.getChanges()).hasSize(1);
 
         // VP - Verify that entity changed = VERSIONS

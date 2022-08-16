@@ -13,6 +13,8 @@ import edu.nd.crc.safa.features.jobs.entities.app.JobType;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
+import common.AuthorizationTestService;
+import common.MappingTestService;
 import features.flatfiles.base.BaseFlatFileTest;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -32,7 +34,7 @@ public abstract class JiraBaseFlatFileTest extends BaseFlatFileTest {
 
     @BeforeEach
     public void setJiraAuthorization() {
-        setAuthorization(); // Required because getting currentDocument requires a user be logged in
+        AuthorizationTestService.setAuthorization(serviceProvider);
 
         // Step - Create fake credentials
         JiraAccessCredentials credentials = new JiraAccessCredentials();
@@ -54,7 +56,7 @@ public abstract class JiraBaseFlatFileTest extends BaseFlatFileTest {
         List<JiraIssueDTO> issues = new ArrayList<>();
         for (int i = 0; i < issuesJson.length(); i++) {
             JSONObject issueJson = issuesJson.getJSONObject(i);
-            JiraIssueDTO issue = toClass(issueJson.toString(), JiraIssueDTO.class);
+            JiraIssueDTO issue = MappingTestService.toClass(issueJson.toString(), JiraIssueDTO.class);
             issues.add(issue);
         }
         return issues;

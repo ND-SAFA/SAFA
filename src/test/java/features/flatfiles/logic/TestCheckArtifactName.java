@@ -55,7 +55,7 @@ class TestCheckArtifactName extends ApplicationBaseTest {
         CommitBuilder deleteCommit = CommitBuilder
             .withVersion(v2)
             .withRemovedArtifact(artifactJson);
-        commit(deleteCommit);
+        commitTestService.commit(deleteCommit);
 
         // VP - Verify that
         assertThat(doesArtifactExists(v1, artifactName)).isTrue();

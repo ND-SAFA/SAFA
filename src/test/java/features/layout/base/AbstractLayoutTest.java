@@ -26,7 +26,6 @@ import org.junit.jupiter.api.BeforeEach;
  */
 public abstract class AbstractLayoutTest extends ApplicationBaseTest {
 
-    protected String projectName = "test-project";
     protected ProjectVersion projectVersion;
     protected ProjectAppEntity projectAppEntity;
     protected ElkNode rootGraphNode;
@@ -58,7 +57,7 @@ public abstract class AbstractLayoutTest extends ApplicationBaseTest {
             .newProject(projectName)
             .newVersionWithReturn(projectName);
         FlatFileRequest.updateProjectVersionFromFlatFiles(projectVersion, ProjectPaths.Tests.DefaultProject.V1);
-        this.projectAppEntity = getProjectAtVersion(projectVersion);
+        this.projectAppEntity = retrievalTestService.getProjectAtVersion(projectVersion);
         Pair<ElkNode, Map<String, ElkNode>> response =
             ElkGraphCreator.createGraphFromProject(projectAppEntity.artifacts, projectAppEntity.traces);
         rootGraphNode = response.getValue0();

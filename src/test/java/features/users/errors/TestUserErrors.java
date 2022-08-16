@@ -8,7 +8,7 @@ import edu.nd.crc.safa.config.AppRoutes;
 import features.users.base.AbstractUserTest;
 import org.junit.jupiter.api.Test;
 
-public class TestUserErrors extends AbstractUserTest {
+class TestUserErrors extends AbstractUserTest {
     @Test
     void testInvalidRequestMissingCredentials() throws Exception {
         SafaRequest.clearAuthorizationToken();
@@ -19,6 +19,6 @@ public class TestUserErrors extends AbstractUserTest {
 
     @Test
     void testForbiddenIsUserNotAuthorized() throws Exception {
-        loginUser(testEmail, testPassword, status().is4xxClientError(), false);
+        authorizationTestService.loginUser(testEmail, testPassword, status().is4xxClientError(), false);
     }
 }

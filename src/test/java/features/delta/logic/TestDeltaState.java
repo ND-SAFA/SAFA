@@ -53,18 +53,17 @@ class TestDeltaState extends AbstractDeltaTest {
         verifyArtifactInDelta(artifactDelta, "added", Constants.ARTIFACT_ADDED);
         verifyArtifactInDelta(artifactDelta, "removed", Constants.ARTIFACT_REMOVED);
 
-        ProjectAppEntity beforeAppEntity = getProjectAtVersion(beforeVersion);
+        ProjectAppEntity beforeAppEntity = retrievalTestService.getProjectAtVersion(beforeVersion);
         List<String> beforeArtifactNames = beforeAppEntity.getArtifactNames();
 
         // VP - Verify added artifact does not exist in before version.
-        assertThat(beforeArtifactNames.contains(Constants.ARTIFACT_ADDED)).isFalse();
-        assertThat(beforeArtifactNames.contains(Constants.ARTIFACT_REMOVED)).isTrue();
-
-        // VP - Verify that no artifacts were added to before version.
-        assertThat(beforeArtifactNames.size()).isEqualTo(DefaultProjectConstants.Entities.N_ARTIFACTS);
+        assertThat(beforeArtifactNames)
+            .doesNotContain(Constants.ARTIFACT_ADDED)
+            .contains(Constants.ARTIFACT_REMOVED)
+            .hasSize(DefaultProjectConstants.Entities.N_ARTIFACTS);
 
         // Step - Collect list of artifact names in the after version.
-        ProjectAppEntity afterAppEntity = getProjectAtVersion(afterVersion);
+        ProjectAppEntity afterAppEntity = retrievalTestService.getProjectAtVersion(afterVersion);
         List<String> afterArtifactNames = afterAppEntity
             .getArtifacts()
             .stream()
@@ -72,13 +71,12 @@ class TestDeltaState extends AbstractDeltaTest {
             .collect(Collectors.toList());
 
         // VP - Verify that removed artifact not included
-        assertThat(afterArtifactNames.contains("D7")).isFalse();
-
-        // VP - Verify that artifact added in after version is retrieved.
-        assertThat(afterArtifactNames.contains("D12")).isTrue();
+        assertThat(afterArtifactNames)
+            .doesNotContain("D7")
+            .contains("D12");
 
         // VP - Verify that no extra artifacts where created.
-        assertThat(afterAppEntity.getArtifacts().size()).isEqualTo(DefaultProjectConstants.Entities.N_ARTIFACTS);
+        assertThat(afterAppEntity.getArtifacts()).hasSize(DefaultProjectConstants.Entities.N_ARTIFACTS);
 
         // VP - Verify that trace link changes are detected
         JSONObject traceDelta = projectDelta.getJSONObject("traces");

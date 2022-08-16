@@ -58,7 +58,7 @@ class TestRetrieveProjectVersionWarnings extends ApplicationBaseTest {
         assertThat(ruleViolated.getString("ruleName")).isEqualTo("Missing child");
 
         // Step - Subscribe to project version
-        createNewConnection(defaultUser).subscribeToVersion(defaultUser, projectVersion);
+        notificationTestService.createNewConnection(defaultUser).subscribeToVersion(defaultUser, projectVersion);
 
         // Step - Create Design artifact and link
         JSONObject designJson =
@@ -74,10 +74,10 @@ class TestRetrieveProjectVersionWarnings extends ApplicationBaseTest {
             .withVersion(projectVersion)
             .withAddedArtifact(designJson)
             .withAddedTrace(traceJson);
-        designJson = commit(commitBuilder);
+        designJson = commitTestService.commit(commitBuilder);
 
         // VP - Receive expected messages
-        EntityChangeMessage message = getNextMessage(defaultUser, EntityChangeMessage.class);
+        EntityChangeMessage message = notificationTestService.getNextMessage(defaultUser);
         assertThat(message.getChanges()).hasSize(3);
         assertThat(message.getChangedEntities())
             .contains(Change.Entity.ARTIFACTS)
@@ -108,7 +108,7 @@ class TestRetrieveProjectVersionWarnings extends ApplicationBaseTest {
             .getJSONArray("added")
             .getJSONObject(0);
         JSONObject deletionCommit =
-            commit(CommitBuilder.withVersion(projectVersion).withRemovedArtifact(updatedDesign));
+            commitTestService.commit(CommitBuilder.withVersion(projectVersion).withRemovedArtifact(updatedDesign));
 
         // VP - Verify that trace was deleted too
         JSONArray deletedTraces = deletionCommit.getJSONObject("traces").getJSONArray("removed");

@@ -36,6 +36,8 @@ import edu.nd.crc.safa.features.traces.repositories.TraceLinkVersionRepository;
 import edu.nd.crc.safa.features.traces.repositories.TraceMatrixRepository;
 import edu.nd.crc.safa.features.traces.services.TraceService;
 import edu.nd.crc.safa.features.types.TypeService;
+import edu.nd.crc.safa.features.users.repositories.SafaUserRepository;
+import edu.nd.crc.safa.features.users.services.AccountLookupService;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
 import edu.nd.crc.safa.features.versions.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.features.versions.services.VersionService;
@@ -46,6 +48,7 @@ import lombok.Data;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 /**
@@ -114,6 +117,10 @@ public class ServiceProvider {
     private final ArtifactPositionService artifactPositionService;
     private final TaskExecutor taskExecutor;
     private final ExecutorDelegate executorDelegate;
+    // Users
+    private final UserDetailsService userDetailsService;
+    private final SafaUserRepository safaUserRepository;
+    private final AccountLookupService accountLookupService;
     // Jobs
     JobLauncher jobLauncher;
 }

@@ -1,4 +1,4 @@
-package features.artifacts.types;
+package features.types;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -35,7 +35,7 @@ class TestArtifactTypeCRUD extends ApplicationBaseTest {
         Project project = dbEntityBuilder.newProjectWithReturn(projectName);
 
         // Step - Subscribe to project
-        createNewConnection(defaultUser).subscribeToProject(defaultUser, project);
+        notificationTestService.createNewConnection(defaultUser).subscribeToProject(defaultUser, project);
 
         // Step - Create artifact type
         ArtifactType initialArtifactType = new ArtifactType(project, TypeConstants.name);
@@ -58,7 +58,7 @@ class TestArtifactTypeCRUD extends ApplicationBaseTest {
         assertThat(createdArtifactType.getIcon()).isEqualTo(icon);
 
         // VP - Verify that notification received
-        EntityChangeMessage creationMessage = getNextMessage(defaultUser, EntityChangeMessage.class);
+        EntityChangeMessage creationMessage = notificationTestService.getNextMessage(defaultUser);
         verifyUpdateChange(creationMessage, typeId);
 
         // Step - Edit ion
@@ -76,7 +76,7 @@ class TestArtifactTypeCRUD extends ApplicationBaseTest {
         assertThat(updatedArtifactType.getIcon()).isEqualTo(TypeConstants.newIconName);
 
         // VP - Verify that notification of update is received
-        EntityChangeMessage updatedMessage = getNextMessage(defaultUser, EntityChangeMessage.class);
+        EntityChangeMessage updatedMessage = notificationTestService.getNextMessage(defaultUser);
         verifyUpdateChange(updatedMessage, typeId);
 
         // Step - Retrieve artifact type
@@ -105,7 +105,7 @@ class TestArtifactTypeCRUD extends ApplicationBaseTest {
         assertThat(projectTypes.length()).isZero();
 
         // VP - Verify that notification of deletion is received
-        EntityChangeMessage deletedMessage = getNextMessage(defaultUser, EntityChangeMessage.class);
+        EntityChangeMessage deletedMessage = notificationTestService.getNextMessage(defaultUser);
         verifyTypeMessage(deletedMessage, typeId, Change.Action.DELETE);
     }
 

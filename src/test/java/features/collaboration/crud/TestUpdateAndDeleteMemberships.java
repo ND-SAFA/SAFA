@@ -24,16 +24,14 @@ class TestUpdateAndDeleteMemberships extends AbstractCollaborationTest {
      */
     @Test
     void updateAndDeleteMemberships() throws Exception {
-        String projectName = "test-project";
-
         // Step - Create and share a project.
         Project project = createAndShareProject(projectName);
 
         // Step - Update project member with new role
-        shareProject(project, otherUserEmail, ProjectRole.ADMIN, status().is2xxSuccessful());
+        setupTestService.shareProject(project, otherUserEmail, ProjectRole.ADMIN, status().is2xxSuccessful());
 
         // Step - Get project members
-        JSONArray response = getProjectMembers(project);
+        JSONArray response = retrievalTestService.getProjectMembers(project);
 
         // VP - Verify that new role is reflected
         JSONObject membership = getMembershipWithEmail(response, otherUserEmail);
@@ -47,17 +45,14 @@ class TestUpdateAndDeleteMemberships extends AbstractCollaborationTest {
      */
     @Test
     void testDeleteMembership() throws Exception {
-
-        String projectName = "test-project";
-
         // Step - Create and share a project.
         Project project = createAndShareProject(projectName);
 
         // Step - Delete project member
-        removeMemberFromProject(project, this.otherUser.getEmail());
+        authorizationTestService.removeMemberFromProject(project, this.otherUser.getEmail());
 
         // Step - Get members
-        JSONArray members = getProjectMembers(project);
+        JSONArray members = retrievalTestService.getProjectMembers(project);
 
         // VP - Verify that member is not in list
         assertThat(members.length()).isEqualTo(1);

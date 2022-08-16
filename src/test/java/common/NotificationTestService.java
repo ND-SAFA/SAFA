@@ -1,4 +1,4 @@
-package features.base;
+package common;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
@@ -10,15 +10,13 @@ import java.util.concurrent.LinkedBlockingDeque;
 
 import edu.nd.crc.safa.config.WebSocketBrokerConfig;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
+import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
 import edu.nd.crc.safa.features.notifications.services.NotificationService;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.messaging.simp.stomp.StompFrameHandler;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
@@ -29,37 +27,25 @@ import org.springframework.web.socket.messaging.WebSocketStompClient;
 import org.springframework.web.socket.sockjs.client.SockJsClient;
 import org.springframework.web.socket.sockjs.client.WebSocketTransport;
 
-/**
- * Provides an abstraction over the websocket connection enabling:
- * 1. connecting to server through websocket endpoint
- * 2. Reading messages in queue associated
- * <p>
- * TODO: Do I need to clear subscriptions?
- */
-public abstract class WebSocketBaseTest extends AuthenticatedBaseTest {
+public class NotificationTestService {
 
-    static final String WEBSOCKET_URI = "ws://localhost:%s/websocket";
-    private static ObjectMapper mapper;
-    private static WebSocketStompClient stompClient;
-    private static HashMap<String, BlockingQueue<String>> idToQueue;
-    private static HashMap<String, StompSession> idToSession;
+    private final WebSocketStompClient stompClient;
+    private final HashMap<String, StompSession> idToSession = new HashMap<>();
+    private final int port;
+    private HashMap<String, BlockingQueue<String>> idToQueue = new HashMap<>();
 
-    final int TIME_TO_POLL_SECONDS = 10; // # of seconds to wait for a message until failing
-    final int TIME_TO_POLL_MS = TIME_TO_POLL_SECONDS * 1000;
+    public NotificationTestService(int port) {
+        this.stompClient = createStompClient();
+        this.port = port;
+    }
 
-    @LocalServerPort
-    private Integer port;
-
-    @BeforeAll
-    public static void setup() {
-        mapper = new ObjectMapper();
-        idToQueue = new HashMap<>();
-        idToSession = new HashMap<>();
+    private WebSocketStompClient createStompClient() {
         StandardWebSocketClient webSocketClient = new StandardWebSocketClient();
         WebSocketTransport transport = new WebSocketTransport(webSocketClient);
         SockJsClient client = new SockJsClient(List.of(transport));
-        stompClient = new WebSocketStompClient(client);
+        WebSocketStompClient stompClient = new WebSocketStompClient(client);
         stompClient.setInboundMessageSizeLimit(WebSocketBrokerConfig.MESSAGE_SIZE_LIMIT);
+        return stompClient;
     }
 
     @BeforeEach
@@ -74,12 +60,11 @@ public abstract class WebSocketBaseTest extends AuthenticatedBaseTest {
      * @return Current object allowing for builder pattern.
      * @throws Exception Throws error if a problem occurs connecting to stomp endpoint.
      */
-    public WebSocketBaseTest createNewConnection(String clientId) throws Exception {
+    public NotificationTestService createNewConnection(String clientId) throws Exception {
         WebSocketHttpHeaders headers = new WebSocketHttpHeaders();
         StompSession session = stompClient
-            .connect(String.format(WEBSOCKET_URI, port),
-                new StompSessionHandlerAdapter() {
-                })
+            .connect(String.format(Constants.WEBSOCKET_URI, port), new StompSessionHandlerAdapter() {
+            })
             .get(1, SECONDS);
         idToSession.put(clientId, session);
         idToQueue.put(clientId, new LinkedBlockingDeque<>());
@@ -93,7 +78,7 @@ public abstract class WebSocketBaseTest extends AuthenticatedBaseTest {
      * @param project  The project to listen updates to.
      * @return The test instance allowing for the builder pattern.
      */
-    public WebSocketBaseTest subscribeToProject(String clientId, Project project) {
+    public NotificationTestService subscribeToProject(String clientId, Project project) {
         String projectSubscriptionDestination = NotificationService.getTopic(project.getProjectId());
         return this.subscribe(clientId, projectSubscriptionDestination);
     }
@@ -105,7 +90,7 @@ public abstract class WebSocketBaseTest extends AuthenticatedBaseTest {
      * @param projectVersion The project version to listen updates to.
      * @return The test instance allowing for the builder pattern.
      */
-    public WebSocketBaseTest subscribeToVersion(String clientId, ProjectVersion projectVersion) {
+    public NotificationTestService subscribeToVersion(String clientId, ProjectVersion projectVersion) {
         String projectVersionSubscriptionDestination = NotificationService.getTopic(projectVersion.getVersionId());
         return this.subscribe(clientId, projectVersionSubscriptionDestination);
     }
@@ -124,32 +109,26 @@ public abstract class WebSocketBaseTest extends AuthenticatedBaseTest {
     /**
      * Returns the next message in the queue associated with given client id.
      *
-     * @param clientId    The Id of the client whose queue we're reading.
-     * @param targetClass The target class which to map the message into.
-     * @param <T>         The type of class to be returned.
-     * @return
+     * @param clientId The ID of the client whose queue we're reading.
+     * @return {@link EntityChangeMessage} Message is client's queue.
      * @throws InterruptedException    Throws error if problem occurs with thread when reading message.
      * @throws JsonProcessingException Throws error if cannot parse message into target class.
      */
-    public <T> T getNextMessage(String clientId, Class<T> targetClass) throws InterruptedException, JsonProcessingException {
-        String response = getNextMessage(clientId);
+    public EntityChangeMessage getNextMessage(String clientId) throws JsonProcessingException, InterruptedException {
+        String response = getMessageInQueue(clientId);
         assert response != null;
-        return toClass(response, targetClass);
+        return MappingTestService.toClass(response, EntityChangeMessage.class);
     }
 
-    public <T> T toClass(String response, Class<T> targetClass) throws JsonProcessingException {
-        return mapper.readValue(response, targetClass);
-    }
-    
     /**
      * Returns the next message in the queue associated with given client id.
      *
      * @param clientId The ID given to the client whose queue message is returned.
      * @return The next message in the queue.
-     * @throws InterruptedException
+     * @throws InterruptedException If interrupted while polling for message.
      */
-    public String getNextMessage(String clientId) throws InterruptedException {
-        return idToQueue.get(clientId).poll(TIME_TO_POLL_SECONDS, SECONDS);
+    private String getMessageInQueue(String clientId) throws InterruptedException {
+        return idToQueue.get(clientId).poll(Constants.TIME_TO_POLL_SECONDS, SECONDS);
     }
 
     /**
@@ -164,7 +143,7 @@ public abstract class WebSocketBaseTest extends AuthenticatedBaseTest {
         return idToQueue.get(clientId).size();
     }
 
-    private WebSocketBaseTest subscribe(String id, String topic) {
+    private NotificationTestService subscribe(String id, String topic) {
         idToSession.get(id).subscribe(topic, new StompFrameHandler() {
             public Type getPayloadType(StompHeaders stompHeaders) {
                 return byte[].class;
@@ -175,5 +154,10 @@ public abstract class WebSocketBaseTest extends AuthenticatedBaseTest {
             }
         });
         return this;
+    }
+
+    static class Constants {
+        private static final String WEBSOCKET_URI = "ws://localhost:%s/websocket";
+        private static final int TIME_TO_POLL_SECONDS = 10; // # of seconds to wait for a message until failing
     }
 }

@@ -94,8 +94,9 @@ public class SyncController extends BaseController {
                     .getProjectRetrievalService()
                     .getProjectAppEntity(projectVersion);
             case WARNINGS:
-                Map<String, List<RuleName>> warnings =
-                    this.serviceProvider.getWarningService().retrieveWarningsInProjectVersion(projectVersion);
+                Map<String, List<RuleName>> warnings = this.serviceProvider
+                    .getWarningService()
+                    .retrieveWarningsInProjectVersion(projectVersion);
                 projectAppEntity.setWarnings(warnings);
                 break;
             default:

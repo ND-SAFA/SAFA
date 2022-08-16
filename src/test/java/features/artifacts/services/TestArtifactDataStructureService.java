@@ -18,6 +18,7 @@ import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.versions.ProjectChanger;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
+import common.AuthorizationTestService;
 import features.base.ApplicationBaseTest;
 import org.junit.jupiter.api.Test;
 
@@ -116,7 +117,8 @@ class TestArtifactDataStructureService extends ApplicationBaseTest {
         ArtifactAppEntity artifactApp = this.artifactVersionRepository
             .retrieveAppEntityFromVersionEntity(artifactVersion);
 
-        setAuthorization(); // Required because getting currentDocument requires a user be logged in
+        AuthorizationTestService.setAuthorization(serviceProvider); // Required because getting currentDocument requires a user
+        // be logged in
         ProjectEntities projectEntities = new ProjectEntities(Arrays.asList(artifactApp));
         ProjectChanger projectChanger = new ProjectChanger(newVersion, serviceProvider);
         projectChanger.setEntitiesAsCompleteSet(projectEntities);
@@ -155,7 +157,8 @@ class TestArtifactDataStructureService extends ApplicationBaseTest {
             new Hashtable<>());
 
         // VP - Verify that artifact body is detected to be modified
-        setAuthorization(); // Required because getting currentDocument requires a user be logged in
+        AuthorizationTestService.setAuthorization(this.serviceProvider); // Required because getting currentDocument requires a user
+        // be logged in
         ProjectEntities projectEntities = new ProjectEntities(List.of(appEntity));
         ProjectChanger projectChanger = new ProjectChanger(projectVersion, serviceProvider);
         projectChanger.setEntitiesAsCompleteSet(projectEntities);

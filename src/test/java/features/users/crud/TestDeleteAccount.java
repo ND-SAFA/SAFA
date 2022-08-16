@@ -27,8 +27,8 @@ class TestDeleteAccount extends AbstractUserTest {
     @Test
     void testDeleteAccount() throws Exception {
         // Step 1 - Create account
-        createUser(this.testEmail, this.testPassword);
-        loginUser(this.testEmail, this.testPassword);
+        authorizationTestService.createUser(this.testEmail, this.testPassword);
+        authorizationTestService.loginUser(this.testEmail, this.testPassword);
 
         // VP - Verify account exists
         Optional<SafaUser> safaUserOptional = this.safaUserRepository.findByEmail(this.testEmail);

@@ -53,7 +53,7 @@ class TestArtifactCustomFields extends ApplicationBaseTest {
         artifactJson.put("customFields", customFields);
 
         // Step - Save added artifact
-        JSONObject response = commit(CommitBuilder
+        JSONObject response = commitTestService.commit(CommitBuilder
             .withVersion(projectVersion)
             .withAddedArtifact(artifactJson));
 
@@ -78,7 +78,7 @@ class TestArtifactCustomFields extends ApplicationBaseTest {
         artifactJsonResponse.getJSONObject("customFields").put(fieldName, newFieldValue);
 
         // Step - Commit changes to new version
-        commit(CommitBuilder.withVersion(afterVersion).withModifiedArtifact(artifactJsonResponse));
+        commitTestService.commit(CommitBuilder.withVersion(afterVersion).withModifiedArtifact(artifactJsonResponse));
 
         // Step - Get delta
         EntityDelta<ArtifactAppEntity> delta = this.artifactVersionRepository.calculateEntityDelta(projectVersion,

@@ -27,25 +27,26 @@ class TestMembershipNotifications extends ApplicationBaseTest {
         Project project = dbEntityBuilder.newProjectWithReturn(projectName);
 
         // Step - Create two users
-        createUser(newMemberEmail, newMemberPassword);
-        loginUser(newMemberEmail, newMemberPassword, false);
+        authorizationTestService.createUser(newMemberEmail, newMemberPassword);
+        authorizationTestService.loginUser(newMemberEmail, newMemberPassword, false);
 
         // Step - Subscribe to project notifications
-        createNewConnection(defaultUser)
+        notificationTestService
+            .createNewConnection(defaultUser)
             .subscribeToProject(defaultUser, project);
 
         // Step - Add member to project
-        shareProject(project, newMemberEmail, ProjectRole.VIEWER, status().isOk());
+        setupTestService.shareProject(project, newMemberEmail, ProjectRole.VIEWER, status().isOk());
 
         // VP - Verify that single change was broadcast.
-        EntityChangeMessage addMemberMessage = getNextMessage(defaultUser, EntityChangeMessage.class);
+        EntityChangeMessage addMemberMessage = notificationTestService.getNextMessage(defaultUser);
         verifyMessageContent(addMemberMessage, Change.Action.UPDATE);
 
         // Step - Remove member from project
-        removeMemberFromProject(project, newMemberEmail);
+        authorizationTestService.removeMemberFromProject(project, newMemberEmail);
 
         // VP - Verify that message is sent to update members after deletion
-        EntityChangeMessage removeMemberMessage = getNextMessage(defaultUser, EntityChangeMessage.class);
+        EntityChangeMessage removeMemberMessage = notificationTestService.getNextMessage(defaultUser);
         verifyMessageContent(removeMemberMessage, Change.Action.DELETE);
     }
 

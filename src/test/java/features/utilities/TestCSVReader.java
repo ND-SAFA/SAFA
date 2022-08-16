@@ -35,11 +35,11 @@ class TestCSVReader extends EntityBaseTest {
 
         // VP 1 - Headers were parsed correctly
         List<String> headerNames = designFile.getHeaderNames();
-        assertThat(headerNames.size()).as("number of headers").isEqualTo(3);
+        assertThat(headerNames).as("number of headers").hasSize(3);
 
         // VP 2 - All records read
         List<CSVRecord> records = designFile.getRecords();
-        assertThat(records.size()).as("record size").isEqualTo(nTotalRecords);
+        assertThat(records).as("record size").hasSize(nTotalRecords);
 
         // VP 3 - Some particular record contains correct content
         CSVRecord testRecord = records.get(testArtifactIndex);

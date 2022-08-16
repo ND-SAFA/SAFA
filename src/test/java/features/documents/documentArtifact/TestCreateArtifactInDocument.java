@@ -68,10 +68,10 @@ class TestCreateArtifactInDocument extends ApplicationBaseTest {
 
         // Step -
         CommitBuilder commitBuilder = CommitBuilder.withVersion(projectVersion).withModifiedArtifact(artifactJson);
-        commit(commitBuilder);
+        commitTestService.commit(commitBuilder);
 
         // VP - Verify single document created for project
         List<DocumentArtifact> projectDocuments = this.documentArtifactRepository.findByDocument(document);
-        assertThat(projectDocuments.size()).isEqualTo(1);
+        assertThat(projectDocuments).hasSize(1);
     }
 }

@@ -25,7 +25,7 @@ class TestLayoutCorrectness extends AbstractCorrectnessTest {
         Iterable<ArtifactPosition> artifactPositionRepositoryList = artifactPositionRepository.findAll();
 
         // Step - Create layout
-        ProjectAppEntity project = getProjectAtVersion(projectVersion);
+        ProjectAppEntity project = retrievalTestService.getProjectAtVersion(projectVersion);
 
         // Step - Extract positions
         LayoutPosition a1Pos = getPosition(project, a1Name);

@@ -32,7 +32,6 @@ class TestLinkApproval extends AbstractTraceTest {
 
     @Test
     void ableToCreateAndRetrieveSingleGeneratedLink() throws Exception {
-        String projectName = "test-project";
         String sourceName = "RE-8";
         String targetName = "DD-10";
         String artifactSummary = "This is a summary.";
@@ -66,7 +65,6 @@ class TestLinkApproval extends AbstractTraceTest {
 
     @Test
     void testApproveDeclineLinks() throws Exception {
-        String projectName = "test-project";
         String sourceName = "RE-8";
         String targetName = "DD-10";
         double score = 0.2;
@@ -95,7 +93,7 @@ class TestLinkApproval extends AbstractTraceTest {
         // Step - Approve generated trace link
         TraceAppEntity generatedLinkAppEntity = this.traceLinkVersionRepository
             .retrieveAppEntityFromVersionEntity(generatedLink);
-        commit(CommitBuilder
+        commitTestService.commit(CommitBuilder
             .withVersion(projectVersion)
             .withModifiedTrace(generatedLinkAppEntity));
 
@@ -113,7 +111,7 @@ class TestLinkApproval extends AbstractTraceTest {
         // Step - Commit changes
         TraceAppEntity updatedGeneratedLink = this.traceLinkVersionRepository
             .retrieveAppEntityFromVersionEntity(generatedLink);
-        commit(CommitBuilder
+        commitTestService.commit(CommitBuilder
             .withVersion(projectVersion)
             .withModifiedTrace(updatedGeneratedLink));
 
@@ -134,7 +132,6 @@ class TestLinkApproval extends AbstractTraceTest {
     void testGenerateTraceLinks() throws Exception {
 
         // Step - Create project and version
-        String projectName = "test-project";
         ProjectVersion projectVersion = dbEntityBuilder
             .newProject(projectName)
             .newVersionWithReturn(projectName);
@@ -187,7 +184,6 @@ class TestLinkApproval extends AbstractTraceTest {
      */
     @Test
     void testCreateTraceLink() throws Exception {
-        String projectName = "project-name";
         String sourceName = "D9";
         String targetName = "F21";
 
@@ -201,7 +197,7 @@ class TestLinkApproval extends AbstractTraceTest {
 
         // Step - POST trace links creation
         JSONObject traceJson = jsonBuilder.createTrace(sourceName, targetName);
-        commit(
+        commitTestService.commit(
             CommitBuilder
                 .withVersion(projectVersion)
                 .withAddedTrace(traceJson)

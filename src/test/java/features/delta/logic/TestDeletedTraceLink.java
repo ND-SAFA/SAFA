@@ -10,6 +10,7 @@ import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 import edu.nd.crc.safa.utilities.JsonFileUtilities;
 
+import common.MappingTestService;
 import features.base.ApplicationBaseTest;
 import org.javatuples.Pair;
 import org.json.JSONObject;
@@ -35,7 +36,8 @@ class TestDeletedTraceLink extends ApplicationBaseTest {
     @Test
     void test() throws Exception {
         // Step - Create before and after version
-        Pair<ProjectVersion, ProjectVersion> versionPair = createDualVersions(projectName, false);
+        Pair<ProjectVersion, ProjectVersion> versionPair = setupTestService
+            .createDualVersions(projectName, false);
         ProjectVersion beforeVersion = versionPair.getValue0();
         ProjectVersion afterVersion = versionPair.getValue1();
 
@@ -49,20 +51,20 @@ class TestDeletedTraceLink extends ApplicationBaseTest {
             .withTraceAndReturn(projectName, artifactOneName, artifactTwoName);
 
         // Step - Find artifact to delete
-        JSONObject projectCommitJson = commit(CommitBuilder.withVersion(beforeVersion)
+        JSONObject projectCommitJson = commitTestService.commit(CommitBuilder.withVersion(beforeVersion)
             .withAddedArtifact(artifactOne)
             .withAddedArtifact(artifactTwo)
             .withAddedTrace(traceJson));
-        ProjectCommit projectCommit = toClass(projectCommitJson.toString(), ProjectCommit.class);
+        ProjectCommit projectCommit = MappingTestService.toClass(projectCommitJson.toString(), ProjectCommit.class);
         ArtifactAppEntity firstArtifact = projectCommit.getArtifacts().filterAdded(a -> a.name.equals(artifactOneName));
         ArtifactAppEntity secondArtifact = // TODO: Remove or add test cases
             projectCommit.getArtifacts().filterAdded(a -> a.name.equals(artifactTwoName));
 
         // Step - Commit deleted artifactOne
-        JSONObject commitJson = commit(CommitBuilder
+        JSONObject commitJson = commitTestService.commit(CommitBuilder
             .withVersion(afterVersion)
             .withRemovedArtifact(JsonFileUtilities.toJson(firstArtifact)));
-        ProjectCommit commit = toClass(commitJson.toString(), ProjectCommit.class);
+        ProjectCommit commit = MappingTestService.toClass(commitJson.toString(), ProjectCommit.class);
 
         // Step - Calculate delta
         verifyDelta(beforeVersion, afterVersion, "removed");

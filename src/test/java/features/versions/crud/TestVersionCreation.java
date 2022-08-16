@@ -18,7 +18,6 @@ class TestVersionCreation extends ApplicationBaseTest {
 
     @Test
     void attemptNewRevisionWithoutVersions() throws Exception {
-        String projectName = "test-project";
         Project project = dbEntityBuilder
             .newProjectWithReturn(projectName);
         JSONObject response =
@@ -31,7 +30,6 @@ class TestVersionCreation extends ApplicationBaseTest {
 
     @Test
     void createFirstVersionThroughRevision() throws Exception {
-        String projectName = "test-project";
         Project project = dbEntityBuilder
             .newProject(projectName)
             .newVersion(projectName)
@@ -53,7 +51,6 @@ class TestVersionCreation extends ApplicationBaseTest {
 
     @Test
     void createNewMinorVersion() throws Exception {
-        String projectName = "test-project";
         Project project = dbEntityBuilder
             .newProject(projectName)
             .newVersion(projectName)
@@ -73,7 +70,6 @@ class TestVersionCreation extends ApplicationBaseTest {
 
     @Test
     void createNewMajorVersion() throws Exception {
-        String projectName = "test-project";
         Project project = dbEntityBuilder
             .newProject(projectName)
             .newVersion(projectName)

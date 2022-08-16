@@ -43,7 +43,7 @@ class TestProjectRetrievalWithSharing extends AbstractCollaborationTest {
         Project project = createAndShareProject(projectName);
 
         // Step - Get projects for user who got shared with
-        JSONArray members = getProjectMembers(project);
+        JSONArray members = retrievalTestService.getProjectMembers(project);
 
         // VP - Verify that shared project is visible
         assertThat(members.length()).isEqualTo(2);

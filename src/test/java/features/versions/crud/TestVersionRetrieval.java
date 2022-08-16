@@ -23,12 +23,11 @@ class TestVersionRetrieval extends ApplicationBaseTest {
 
     @Test
     void getMultipleVersions() throws Exception {
-        String projectName = "test-project";
         dbEntityBuilder
             .newProject(projectName)
             .newVersion(projectName)
             .newVersion(projectName);
-        Project project = dbEntityBuilder.getProject("test-project");
+        Project project = dbEntityBuilder.getProject(projectName);
         JSONArray response = getVersionsInProject(project);
         assertThat(response.length()).isEqualTo(2);
     }

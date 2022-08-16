@@ -45,6 +45,6 @@ class TestDeleteDocument extends ApplicationBaseTest {
 
         // VP - Verify that no documents are associated with project
         List<Document> projectDocuments = this.documentRepository.findByProject(project);
-        assertThat(projectDocuments.size()).isZero();
+        assertThat(projectDocuments).isEmpty();
     }
 }

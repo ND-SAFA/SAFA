@@ -8,11 +8,11 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-import edu.nd.crc.safa.features.types.ArtifactType;
 import edu.nd.crc.safa.features.errors.entities.db.CommitError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;
 import edu.nd.crc.safa.features.traces.entities.db.TraceType;
+import edu.nd.crc.safa.features.types.ArtifactType;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
 import features.base.ApplicationBaseTest;
@@ -73,7 +73,7 @@ public abstract class BaseFlatFileTest extends ApplicationBaseTest {
 
         // VP - Project warnings present in response
         JSONObject projectWarnings = creationResponse.getJSONObject("warnings");
-        assertThat(projectWarnings.keySet().size()).isPositive();
+        assertThat(projectWarnings.keySet()).isNotEmpty();
 
         return project;
     }
@@ -134,9 +134,9 @@ public abstract class BaseFlatFileTest extends ApplicationBaseTest {
                                                              int nItems) {
         String testName = "Verified # of" + itemName + ":" + nItems;
         List<T> items = findFunction.get();
-        assertThat(items.size())
+        assertThat(items)
             .as(testName)
-            .isEqualTo(nItems);
+            .hasSize(nItems);
         return items;
     }
 }

@@ -22,8 +22,6 @@ import org.junit.jupiter.api.Test;
  */
 class TestLinkVersioning extends ApplicationBaseTest {
 
-    String projectName = "project-name";
-
     /**
      * Tests that an identical trace submitted to the next version is not stored
      * as an entry.
@@ -47,7 +45,7 @@ class TestLinkVersioning extends ApplicationBaseTest {
         FlatFileRequest.updateProjectVersionFromFlatFiles(v1, flatFilesPath);
 
         // VP - Verify that link is stored as added
-        ProjectAppEntity baseEntities = getProjectAtVersion(v1);
+        ProjectAppEntity baseEntities = retrievalTestService.getProjectAtVersion(v1);
         List<TraceAppEntity> baseTraces = baseEntities.getTraces();
         assertThat(baseTraces).hasSize(1);
 
@@ -55,11 +53,11 @@ class TestLinkVersioning extends ApplicationBaseTest {
         FlatFileRequest.updateProjectVersionFromFlatFiles(v2, flatFilesPath);
 
         // VP - Verify that no change is stored by system
-        assertThat(this.traceLinkVersionRepository.getProjectLinks(project).size()).isEqualTo(1);
+        assertThat(this.traceLinkVersionRepository.getProjectLinks(project)).hasSize(1);
 
         // VP - Verify that retrieving link from target version.
-        ProjectAppEntity targetEntities = getProjectAtVersion(v1);
+        ProjectAppEntity targetEntities = retrievalTestService.getProjectAtVersion(v1);
         List<TraceAppEntity> targetTraces = targetEntities.getTraces();
-        assertThat(targetTraces.size()).isEqualTo(1);
+        assertThat(targetTraces).hasSize(1);
     }
 }

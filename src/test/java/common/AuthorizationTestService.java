@@ -1,51 +1,51 @@
-package features.base;
+package common;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Optional;
 
+import edu.nd.crc.safa.builders.entities.DbEntityBuilder;
 import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.memberships.entities.db.ProjectMembership;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
+import features.base.ApplicationBaseTest;
+import lombok.AllArgsConstructor;
 import org.json.JSONObject;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.web.servlet.ResultMatcher;
 
-/**
- * Wraps each test with a test harness for creating a user account and logging in before each test.
- * If a certain test needs to exclude this harness one needs to create a test rule that excludes the
- * pre-test setup.
- */
-public abstract class AuthenticatedBaseTest extends EntityBaseTest {
+@AllArgsConstructor
+public class AuthorizationTestService {
 
-    public static final String defaultUser = "root-test-user@gmail.com";
-    public static final String defaultUserPassword = "r{QjR3<Ec2eZV@?";
-    public static SafaUser currentUser;
-    protected String token;
+    ServiceProvider serviceProvider;
+    DbEntityBuilder dbEntityBuilder;
 
-    @BeforeEach
-    public void createData() throws Exception {
-        token = null;
-        this.safaUserRepository.deleteAll();
-        SafaRequest.setMockMvc(mockMvc);
-        this.defaultLogin();
-        this.dbEntityBuilder.setCurrentUser(currentUser);
-    }
+    public static void setAuthorization(ServiceProvider serviceProvider) {
+        String userName = ApplicationBaseTest.defaultUser;
+        UserDetails userDetails = serviceProvider.getUserDetailsService().loadUserByUsername(userName);
+        UsernamePasswordAuthenticationToken authorization = new UsernamePasswordAuthenticationToken(
+            userDetails,
+            null,
+            userDetails.getAuthorities());
 
-    @AfterEach
-    public void clearAuthentication() {
-        SafaRequest.clearAuthorizationToken();
+        SecurityContextHolder.getContext().setAuthentication(authorization);
     }
 
     public void defaultLogin() throws Exception {
+        String defaultUser = ApplicationBaseTest.defaultUser;
+        String defaultUserPassword = ApplicationBaseTest.defaultUserPassword;
         createUser(defaultUser, defaultUserPassword);
         loginUser(defaultUser, defaultUserPassword);
-        currentUser = accountLookupService.getUserFromUsername(defaultUser);
+        ApplicationBaseTest.currentUser = serviceProvider
+            .getAccountLookupService()
+            .getUserFromUsername(defaultUser);
     }
 
     public void createUser(String email, String password) throws Exception {
@@ -75,19 +75,22 @@ public abstract class AuthenticatedBaseTest extends EntityBaseTest {
             .withRoute(AppRoutes.Accounts.LOGIN)
             .postWithJsonObject(user, test);
         if (setToken) {
-            this.token = response.getString("token");
-            SafaRequest.setAuthorizationToken(this.token);
+            String token = response.getString("token");
+            SafaRequest.setAuthorizationToken(token);
         }
     }
 
     public void removeMemberFromProject(Project project, String username) throws Exception {
-        Optional<SafaUser> safaUserOptional = this.safaUserRepository.findByEmail(username);
+        Optional<SafaUser> safaUserOptional = this.serviceProvider
+            .getSafaUserRepository()
+            .findByEmail(username);
         if (safaUserOptional.isEmpty()) {
             throw new SafaError("Could not find user with name: %s", username);
         }
-        Optional<ProjectMembership> projectMembershipOptional = this.projectMembershipRepository.findByProjectAndMember(
-            project,
-            safaUserOptional.get());
+        Optional<ProjectMembership> projectMembershipOptional =
+            this.serviceProvider.getProjectMembershipRepository().findByProjectAndMember(
+                project,
+                safaUserOptional.get());
         if (projectMembershipOptional.isEmpty()) {
             throw new SafaError("Could not find membership between {%s} and {%s}.",
                 username,

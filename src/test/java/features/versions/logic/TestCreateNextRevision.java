@@ -20,7 +20,6 @@ class TestCreateNextRevision extends ApplicationBaseTest {
 
     @Test
     void createNextVersion() throws SafaError {
-        String projectName = "test-project";
         dbEntityBuilder
             .newProject(projectName)
             .newVersion(projectName);

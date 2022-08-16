@@ -44,7 +44,7 @@ public abstract class AbstractDocumentTest extends ApplicationBaseTest {
                                                  DocumentType docType,
                                                  List<String> artifactIds) {
         List<Document> projectDocuments = this.documentRepository.findByProject(project);
-        assertThat(projectDocuments.size()).isEqualTo(1);
+        assertThat(projectDocuments).hasSize(1);
 
         // VP - Verify that persistent entity contains name, description, and type
         Document document = projectDocuments.get(0);
@@ -61,7 +61,6 @@ public abstract class AbstractDocumentTest extends ApplicationBaseTest {
         assertTrue(artifactIds.containsAll(documentArtifactIds));
         assertTrue(documentArtifactIds.containsAll(artifactIds));
     }
-
 
     protected JSONArray getProjectDocuments(ProjectVersion projectVersion) throws Exception {
         return SafaRequest

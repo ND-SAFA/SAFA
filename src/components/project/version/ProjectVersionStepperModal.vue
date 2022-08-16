@@ -17,7 +17,6 @@
       <v-stepper-content :step="projectStep">
         <project-selector
           :is-open="projectSelectorIsOpen"
-          data-cy="table-project-list"
           @selected="selectProject"
           @unselected="unselectProject"
         />

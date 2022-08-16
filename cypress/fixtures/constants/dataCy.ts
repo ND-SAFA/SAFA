@@ -41,6 +41,8 @@ export enum DataCy {
   // Project Selection
 
   selectionModal = "modal-project-select",
-  selectionProjectList = "table-project-list",
+  selectionProjectList = "table-project",
+  selectionSearch = "input-selector-search",
+  selectionReload = "button-selector-reload",
   selectionClose = "button-close",
 }

@@ -12,12 +12,19 @@
         <attribute-chip :value="data.group" :artifact-type="artifactType" />
         <typography secondary :value="String(data.items.length)" x="2" />
       </flex-box>
-      <generic-icon-button
-        small
-        icon-id="mdi-close"
-        tooltip="Remove Grouping"
-        @click="data.remove"
-      />
+      <flex-box>
+        <section-controls
+          v-if="showExpand"
+          @open:all="$emit('open:all', data)"
+          @close:all="$emit('close:all', data)"
+        />
+        <generic-icon-button
+          small
+          icon-id="mdi-close"
+          tooltip="Remove Grouping"
+          @click="data.remove"
+        />
+      </flex-box>
     </flex-box>
   </td>
 </template>
@@ -32,9 +39,13 @@ import {
   Typography,
   GenericIconButton,
 } from "@/components/common";
+import SectionControls from "./SectionControls.vue";
 
 /**
  * Renders a group header in a table.
+ *
+ * @emits-1 `open:all` (DataTableGroup) - On open all expanded.
+ * @emits-2 `close:all` (DataTableGroup) - On close all expanded.
  */
 export default Vue.extend({
   name: "TableGroupHeader",
@@ -43,9 +54,11 @@ export default Vue.extend({
     GenericIconButton,
     Typography,
     FlexBox,
+    SectionControls,
   },
   props: {
-    data: Object as PropType<DataTableGroup<FlatTraceLink>>,
+    data: Object as PropType<DataTableGroup>,
+    showExpand: Boolean,
   },
   computed: {
     /**

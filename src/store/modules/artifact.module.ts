@@ -131,7 +131,7 @@ export default class ArtifactModule extends VuexModule {
     return (artifactName) => {
       const query = this.artifacts.filter((a) => a.name === artifactName);
 
-      return getSingleQueryResult(query, `Find by name: ${artifactName}`);
+      return getSingleQueryResult(query);
     };
   }
 
@@ -143,7 +143,7 @@ export default class ArtifactModule extends VuexModule {
     return (targetArtifactId) => {
       const query = this.allArtifacts.filter((a) => a.id === targetArtifactId);
 
-      return getSingleQueryResult(query, `Find by id: ${targetArtifactId}`);
+      return getSingleQueryResult(query);
     };
   }
 

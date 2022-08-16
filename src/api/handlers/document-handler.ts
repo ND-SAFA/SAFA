@@ -135,7 +135,7 @@ export function handleSaveDocument(
       subtreeModule.getSubtreeMap[parentId].forEach((childId) => {
         const artifact = artifactModule.getArtifactById(childId);
 
-        if (!includedChildTypes.includes(artifact.type)) return;
+        if (!artifact || !includedChildTypes.includes(artifact.type)) return;
 
         childArtifactIds.add(childId);
       });

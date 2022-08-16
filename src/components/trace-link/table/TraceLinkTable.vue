@@ -7,7 +7,7 @@
       single-expand
       multi-sort
       :headers="headers"
-      :items="items"
+      :items="links"
       :expanded="expanded"
       :search="searchText"
       :loading="isLoading"
@@ -19,15 +19,16 @@
       @click:row="handleView($event)"
     >
       <template v-slot:top>
-        <trace-link-table-header
-          @search="searchText = $event"
-          @open:all="handleOpenAll"
-          @close:all="handleCloseAll"
-        />
+        <trace-link-table-header @search="searchText = $event" />
       </template>
 
       <template v-slot:[`group.header`]="data">
-        <table-group-header :data="data" />
+        <table-group-header
+          show-expand
+          :data="data"
+          @open:all="handleOpenAll"
+          @close:all="handleCloseAll"
+        />
       </template>
 
       <template v-slot:[`item.sourceType`]="{ item }">
@@ -70,7 +71,12 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { ApprovalType, TraceLinkModel, VersionModel } from "@/types";
+import {
+  ApprovalType,
+  FlatTraceLink,
+  TraceTableGroup,
+  VersionModel,
+} from "@/types";
 import { appModule, artifactModule, projectModule } from "@/store";
 import { getGeneratedLinks } from "@/api";
 import { AttributeChip, TableGroupHeader } from "@/components/common";
@@ -131,8 +137,8 @@ export default Vue.extend({
           groupable: false,
         },
       ],
-      links: [] as TraceLinkModel[],
-      expanded: [] as TraceLinkModel[],
+      links: [] as FlatTraceLink[],
+      expanded: [] as FlatTraceLink[],
       approved: [] as string[],
       declined: [] as string[],
     };
@@ -163,13 +169,6 @@ export default Vue.extend({
     projectVersion() {
       return projectModule.getProject.projectVersion;
     },
-    items(): TraceLinkModel[] {
-      return this.links.map((link) => ({
-        ...link,
-        sourceType: artifactModule.getArtifactById(link.sourceId).type,
-        targetType: artifactModule.getArtifactById(link.targetId).type,
-      }));
-    },
   },
   methods: {
     /**
@@ -178,13 +177,22 @@ export default Vue.extend({
     async loadGeneratedLinks() {
       if (!projectModule.isProjectDefined) return;
 
+      this.approved = [];
+      this.declined = [];
+      this.expanded = [];
+
       try {
         appModule.onLoadStart();
 
-        this.links = await getGeneratedLinks(projectModule.versionId);
-        this.approved = [];
-        this.declined = [];
-        this.expanded = [];
+        this.links = (await getGeneratedLinks(projectModule.versionId)).map(
+          (link) => ({
+            ...link,
+            sourceType:
+              artifactModule.getArtifactById(link.sourceId)?.type || "",
+            targetType:
+              artifactModule.getArtifactById(link.targetId)?.type || "",
+          })
+        );
 
         this.links.forEach((link) => {
           if (link.approvalStatus === ApprovalType.APPROVED) {
@@ -200,21 +208,25 @@ export default Vue.extend({
     /**
      * Opens all panels.
      */
-    handleOpenAll() {
-      this.expanded = this.links;
+    handleOpenAll(data: TraceTableGroup) {
+      this.expanded = this.links.filter(
+        (link) => link[data.groupBy[0]] === data.group
+      );
     },
     /**
      * Closes all panels.
      */
-    handleCloseAll() {
-      this.expanded = [];
+    handleCloseAll(data: TraceTableGroup) {
+      this.expanded = this.expanded.filter(
+        (link) => link[data.groupBy[0]] !== data.group
+      );
     },
     /**
      * Approves the given link and updates the stored links.
      *
      * @param link - The link to approve.
      */
-    handleApprove(link: TraceLinkModel) {
+    handleApprove(link: FlatTraceLink) {
       this.declined = this.declined.filter(
         (declinedId) => declinedId != link.traceLinkId
       );
@@ -228,7 +240,7 @@ export default Vue.extend({
      *
      * @param link - The link to decline.
      */
-    handleDecline(link: TraceLinkModel) {
+    handleDecline(link: FlatTraceLink) {
       this.approved = this.approved.filter(
         (declinedId) => declinedId != link.traceLinkId
       );
@@ -242,7 +254,7 @@ export default Vue.extend({
      *
      * @param link - The link to unreview.
      */
-    handleUnreview(link: TraceLinkModel) {
+    handleUnreview(link: FlatTraceLink) {
       this.approved = this.approved.filter(
         (declinedId) => declinedId != link.traceLinkId
       );
@@ -258,7 +270,7 @@ export default Vue.extend({
      *
      * @param link - The link to view.
      */
-    handleView(link: TraceLinkModel) {
+    handleView(link: FlatTraceLink) {
       if (this.expanded.includes(link)) {
         this.expanded = this.expanded.filter(
           (expandedLink) => link.traceLinkId !== expandedLink.traceLinkId

@@ -123,7 +123,7 @@ export default Vue.extend({
      * Returns the associated artifact for this cell.
      */
     artifact(): ArtifactModel {
-      return artifactModule.getArtifactById(this.item.id);
+      return artifactModule.getArtifactById(this.item.id) || this.item;
     },
   },
   methods: {
@@ -154,7 +154,7 @@ export default Vue.extend({
      * @return The artifact name.
      */
     getArtifactName(id: string): string {
-      return artifactModule.getArtifactById(id).name;
+      return artifactModule.getArtifactById(id)?.name || "";
     },
     /**
      * Returns the value of an array custom field.

@@ -29,7 +29,7 @@ class TestCreateDocument extends AbstractDocumentTest {
         JSONObject documentJson = jsonBuilder.createDocument(docName, docDescription, docType);
 
         // Step - Create new document
-        Pair<ProjectVersion, JSONObject> response = setupTestService.createProjectWithDocument(
+        Pair<ProjectVersion, JSONObject> response = creationTestService.createProjectWithDocument(
             projectName,
             documentJson);
 

@@ -37,7 +37,7 @@ class TestEditDocument extends AbstractDocumentTest {
         docJson.put("documentId", document.getDocumentId().toString());
 
         // Step - Send Update request.
-        JSONObject docCreated = setupTestService.createOrUpdateDocumentJson(projectVersion, docJson);
+        JSONObject docCreated = creationTestService.createOrUpdateDocumentJson(projectVersion, docJson);
 
         // VP - Verify that response object contains name, description, and type
         assertionTestService.assertObjectsMatch(docJson, docCreated);
@@ -72,7 +72,7 @@ class TestEditDocument extends AbstractDocumentTest {
         docRequestJson.put("artifactIds", artifactIds);
 
         // Step - Send Update request.
-        JSONObject docCreated = setupTestService.createOrUpdateDocumentJson(projectVersion, docRequestJson);
+        JSONObject docCreated = creationTestService.createOrUpdateDocumentJson(projectVersion, docRequestJson);
 
         // VP - Verify that response object contains name, description, and type
         assertionTestService.assertObjectsMatch(docRequestJson, docCreated, List.of("documentId"));
@@ -83,7 +83,7 @@ class TestEditDocument extends AbstractDocumentTest {
         docRequestJson.put("artifactIds", artifactIds);
 
         // Step - Update document
-        JSONObject docUpdated = setupTestService.createOrUpdateDocumentJson(projectVersion, docRequestJson);
+        JSONObject docUpdated = creationTestService.createOrUpdateDocumentJson(projectVersion, docRequestJson);
 
         // VP - Verify that response contains updates.
         assertionTestService.assertObjectsMatch(docRequestJson, docUpdated);

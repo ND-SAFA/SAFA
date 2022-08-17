@@ -186,7 +186,7 @@ public abstract class AbstractArtifactTest<T extends IArtifact> extends Applicat
         JSONObject requestedDocumentJson = this.createDocumentJson();
 
         // Step - Send creation request.
-        JSONObject documentJson = setupTestService.createOrUpdateDocumentJson(projectVersion, requestedDocumentJson);
+        JSONObject documentJson = creationTestService.createOrUpdateDocumentJson(projectVersion, requestedDocumentJson);
         return documentJson.getString("documentId");
     }
 

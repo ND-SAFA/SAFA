@@ -31,11 +31,11 @@ public class TypeAppEntity implements IAppEntity {
 
     @Override
     public String getBaseEntityId() {
-        return null;
+        return this.typeId;
     }
 
     @Override
     public void setBaseEntityId(String id) {
-
+        this.typeId = id;
     }
 }

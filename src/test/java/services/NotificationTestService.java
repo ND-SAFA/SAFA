@@ -5,6 +5,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
@@ -79,8 +80,7 @@ public class NotificationTestService {
      * @return The test instance allowing for the builder pattern.
      */
     public NotificationTestService subscribeToProject(String clientId, Project project) {
-        String projectSubscriptionDestination = NotificationService.getTopic(project.getProjectId());
-        return this.subscribe(clientId, projectSubscriptionDestination);
+        return subscribeToTopic(clientId, project.getProjectId());
     }
 
     /**
@@ -91,8 +91,7 @@ public class NotificationTestService {
      * @return The test instance allowing for the builder pattern.
      */
     public NotificationTestService subscribeToVersion(String clientId, ProjectVersion projectVersion) {
-        String projectVersionSubscriptionDestination = NotificationService.getTopic(projectVersion.getVersionId());
-        return this.subscribe(clientId, projectVersionSubscriptionDestination);
+        return subscribeToTopic(clientId, projectVersion.getVersionId());
     }
 
     /**
@@ -102,8 +101,13 @@ public class NotificationTestService {
      * @param jobDbEntity The job whose updates are listened for.
      */
     public void subscribeToJob(String clientId, JobDbEntity jobDbEntity) {
-        String projectVersionSubscriptionDestination = NotificationService.getTopic(jobDbEntity.getId());
+        subscribeToTopic(clientId, jobDbEntity.getId());
+    }
+
+    public NotificationTestService subscribeToTopic(String clientId, UUID id) {
+        String projectVersionSubscriptionDestination = NotificationService.getTopic(id);
         this.subscribe(clientId, projectVersionSubscriptionDestination);
+        return this;
     }
 
     /**

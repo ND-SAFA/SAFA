@@ -21,7 +21,7 @@ class TestTrivialDelta extends AbstractDeltaTest {
         String projectName = "testThatTrivialArtifactNotCalculated";
 
         // Step - Create empty before and after versions
-        Pair<ProjectVersion, ProjectVersion> versionPair = setupTestService
+        Pair<ProjectVersion, ProjectVersion> versionPair = creationTestService
             .createDualVersions(projectName, false);
         ProjectVersion beforeVersion = versionPair.getValue0();
         ProjectVersion afterVersion = versionPair.getValue1();

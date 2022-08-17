@@ -29,7 +29,7 @@ class TestDocumentLayoutIsRetrieved extends AbstractCorrectnessTest {
 
         // Step - Add artifacts to layout
         JSONArray artifactsJson = commitResponse.getJSONObject("artifacts").getJSONArray("added");
-        setupTestService.addArtifactToDocument(projectVersion, document, artifactsJson);
+        creationTestService.addArtifactToDocument(projectVersion, document, artifactsJson);
 
         // Step - Retrieve project (including layout)
         ProjectAppEntity project = retrievalTestService.getProjectAtVersion(projectVersion);
@@ -62,7 +62,7 @@ class TestDocumentLayoutIsRetrieved extends AbstractCorrectnessTest {
             artifactIds);
 
         // Step - Create project with document
-        JSONObject docCreated = setupTestService.createOrUpdateDocumentJson(projectVersion, documentJson);
+        JSONObject docCreated = creationTestService.createOrUpdateDocumentJson(projectVersion, documentJson);
 
         // Step - Get list of artifact positions
         List<LayoutPosition> artifactPositions = getArtifactPositionsInDocument(

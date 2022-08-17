@@ -36,7 +36,7 @@ class TestMembershipNotifications extends ApplicationBaseTest {
             .subscribeToProject(defaultUser, project);
 
         // Step - Add member to project
-        setupTestService.shareProject(project, newMemberEmail, ProjectRole.VIEWER, status().isOk());
+        creationTestService.shareProject(project, newMemberEmail, ProjectRole.VIEWER, status().isOk());
 
         // VP - Verify that single change was broadcast.
         EntityChangeMessage addMemberMessage = notificationTestService.getNextMessage(defaultUser);

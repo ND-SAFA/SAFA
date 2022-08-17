@@ -36,7 +36,7 @@ public abstract class AbstractCollaborationTest extends ApplicationBaseTest {
             .newProjectWithReturn(projectName);
 
         // Step - Share project
-        setupTestService.shareProject(project, otherUser.getEmail(), ProjectRole.VIEWER, status().is2xxSuccessful());
+        creationTestService.shareProject(project, otherUser.getEmail(), ProjectRole.VIEWER, status().is2xxSuccessful());
 
         return project;
     }

@@ -8,6 +8,7 @@ import edu.nd.crc.safa.features.memberships.entities.db.ProjectMembership;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.types.ArtifactType;
+import edu.nd.crc.safa.features.types.TypeAppEntity;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
 /**
@@ -36,6 +37,11 @@ public class RouteBuilder<T extends RouteBuilder<T>> {
 
     public T withType(ArtifactType artifactType) {
         this.path = this.path.replace("{typeId}", artifactType.getTypeId().toString());
+        return (T) this;
+    }
+
+    public T withType(TypeAppEntity type) {
+        this.path = this.path.replace("{typeId}", type.getTypeId());
         return (T) this;
     }
 

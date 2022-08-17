@@ -64,7 +64,7 @@ class TestAddArtifactsToDocument extends ApplicationBaseTest {
 
         // Step - Request artifact is added to document
 
-        JSONArray artifactsAdded = setupTestService.addArtifactToDocument(projectVersion, document, artifactsJson);
+        JSONArray artifactsAdded = creationTestService.addArtifactToDocument(projectVersion, document, artifactsJson);
 
         // VP - Verify that response object contains name, description, and type
         for (int i = 0; i < artifactsAdded.length(); i++) {

@@ -45,7 +45,7 @@ class TestCreateFmeaDocument extends AbstractDocumentTest {
         requestedDocumentJson.put("columns", columns);
 
         // Step - Send creation request.
-        JSONObject responseDocumentJson = setupTestService.createOrUpdateDocumentJson(projectVersion,
+        JSONObject responseDocumentJson = creationTestService.createOrUpdateDocumentJson(projectVersion,
             requestedDocumentJson);
 
         // VP - Assert document base entity properties were returned
@@ -73,7 +73,7 @@ class TestCreateFmeaDocument extends AbstractDocumentTest {
         responseDocumentJson.put("columns", newColumns);
 
         //Step - Update columns
-        JSONObject updateResponseJson = setupTestService.createOrUpdateDocumentJson(projectVersion,
+        JSONObject updateResponseJson = creationTestService.createOrUpdateDocumentJson(projectVersion,
             responseDocumentJson);
 
         // VP - Assert columns properties were returned in response

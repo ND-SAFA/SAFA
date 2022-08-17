@@ -28,7 +28,7 @@ class TestUpdateAndDeleteMemberships extends AbstractCollaborationTest {
         Project project = createAndShareProject(projectName);
 
         // Step - Update project member with new role
-        setupTestService.shareProject(project, otherUserEmail, ProjectRole.ADMIN, status().is2xxSuccessful());
+        creationTestService.shareProject(project, otherUserEmail, ProjectRole.ADMIN, status().is2xxSuccessful());
 
         // Step - Get project members
         JSONArray response = retrievalTestService.getProjectMembers(project);

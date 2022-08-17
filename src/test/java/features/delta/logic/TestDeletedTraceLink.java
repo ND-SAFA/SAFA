@@ -36,7 +36,7 @@ class TestDeletedTraceLink extends ApplicationBaseTest {
     @Test
     void test() throws Exception {
         // Step - Create before and after version
-        Pair<ProjectVersion, ProjectVersion> versionPair = setupTestService
+        Pair<ProjectVersion, ProjectVersion> versionPair = creationTestService
             .createDualVersions(projectName, false);
         ProjectVersion beforeVersion = versionPair.getValue0();
         ProjectVersion afterVersion = versionPair.getValue1();

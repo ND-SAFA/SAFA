@@ -26,17 +26,29 @@ public class CommitBuilder {
     }
 
     public CommitBuilder withAddedArtifact(JSONObject artifactJson) throws JsonProcessingException {
-        this.projectCommit.addArtifact(ModificationType.ADDED, asArtifactAppEntity(artifactJson));
+        return withAddedArtifact(asArtifactAppEntity(artifactJson));
+    }
+
+    public CommitBuilder withAddedArtifact(ArtifactAppEntity artifact) {
+        this.projectCommit.addArtifact(ModificationType.ADDED, artifact);
         return this;
     }
 
     public CommitBuilder withRemovedArtifact(JSONObject artifactJson) throws JsonProcessingException {
-        this.projectCommit.addArtifact(ModificationType.REMOVED, asArtifactAppEntity(artifactJson));
+        return withRemovedArtifact(asArtifactAppEntity(artifactJson));
+    }
+
+    public CommitBuilder withRemovedArtifact(ArtifactAppEntity artifact) {
+        this.projectCommit.addArtifact(ModificationType.REMOVED, artifact);
         return this;
     }
 
     public CommitBuilder withModifiedArtifact(JSONObject artifactJson) throws JsonProcessingException {
-        this.projectCommit.addArtifact(ModificationType.MODIFIED, asArtifactAppEntity(artifactJson));
+        return withModifiedArtifact(asArtifactAppEntity(artifactJson));
+    }
+
+    public CommitBuilder withModifiedArtifact(ArtifactAppEntity artifact) {
+        this.projectCommit.addArtifact(ModificationType.MODIFIED, artifact);
         return this;
     }
 

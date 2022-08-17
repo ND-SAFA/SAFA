@@ -29,6 +29,19 @@ public class CreationTestService {
     ServiceProvider serviceProvider;
     DbEntityBuilder dbEntityBuilder;
 
+    /**
+     * Creates empty project with initial version.
+     *
+     * @param projectName The name of the project to create.
+     * @return {@link ProjectVersion} initial project version (1.1.1);
+     */
+    public ProjectVersion createProjectWithNewVersion(String projectName) {
+        return dbEntityBuilder
+            .newProject(projectName)
+            .newVersion(projectName)
+            .getProjectVersion(projectName, 0);
+    }
+
     public ProjectVersion createDefaultProject(String projectName) throws SafaError, IOException {
         ProjectVersion projectVersion = createProjectWithNewVersion(projectName);
         Project project = projectVersion.getProject();
@@ -39,12 +52,6 @@ public class CreationTestService {
         return projectVersion;
     }
 
-    public ProjectVersion createProjectWithNewVersion(String projectName) {
-        return dbEntityBuilder
-            .newProject(projectName)
-            .newVersion(projectName)
-            .getProjectVersion(projectName, 0);
-    }
 
     public Pair<ProjectVersion, ProjectVersion> createDualVersions(String projectName) throws Exception {
         return createDualVersions(projectName, true);

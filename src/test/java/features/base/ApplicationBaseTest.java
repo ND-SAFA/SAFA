@@ -39,7 +39,7 @@ public abstract class ApplicationBaseTest extends EntityBaseTest {
     protected String projectName = this.getClass().getName();
     protected CommitTestService commitTestService = new CommitTestService();
     protected NotificationTestService notificationTestService;
-    protected CreationTestService setupTestService;
+    protected CreationTestService creationTestService;
     protected AssertionTestService assertionTestService = new AssertionTestService();
     protected RetrievalTestService retrievalTestService;
     protected AuthorizationTestService authorizationTestService;
@@ -70,7 +70,7 @@ public abstract class ApplicationBaseTest extends EntityBaseTest {
      */
     public void initTestServices() {
         notificationTestService = new NotificationTestService(port);
-        setupTestService = new CreationTestService(this.serviceProvider, this.dbEntityBuilder);
+        creationTestService = new CreationTestService(this.serviceProvider, this.dbEntityBuilder);
         retrievalTestService = new RetrievalTestService(this.serviceProvider, this.dbEntityBuilder);
         authorizationTestService = new AuthorizationTestService(this.serviceProvider, this.dbEntityBuilder);
     }

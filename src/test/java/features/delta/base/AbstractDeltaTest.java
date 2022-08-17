@@ -22,7 +22,7 @@ public abstract class AbstractDeltaTest extends ApplicationBaseTest {
 
     @BeforeEach
     public void setupVersion() throws Exception {
-        Pair<ProjectVersion, ProjectVersion> versionPair = this.setupTestService.createDualVersions(projectName);
+        Pair<ProjectVersion, ProjectVersion> versionPair = this.creationTestService.createDualVersions(projectName);
         this.beforeVersion = versionPair.getValue0();
         this.afterVersion = versionPair.getValue1();
     }

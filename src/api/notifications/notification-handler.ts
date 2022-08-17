@@ -5,7 +5,7 @@ import {
   fillEndpoint,
   stompClient,
 } from "@/api";
-import { handleEntityChangeMessage } from "@/api/notifications/message-handler";
+import { handleEntityChangeMessage } from "./message-handler";
 
 /**
  * Connects and subscribes to the given project and version.

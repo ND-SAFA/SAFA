@@ -1,31 +1,32 @@
 import { Frame } from "webstomp-client";
 import {
-  Action,
-  Change,
-  Entity,
-  EntityChangeMessage,
-  ProjectModel,
+  ActionType,
+  ChangeModel,
+  EntityType,
+  ChangeMessageModel,
 } from "@/types";
 import { getChanges } from "@/api/endpoints/sync-api";
 
+/**
+ * Handles changes messages by updating affected parts of the app.
+ *
+ * @param versionId - The project version being updated.
+ * @param frame - The message describing changes.
+ */
 export async function handleEntityChangeMessage(
   versionId: string,
   frame: Frame
-) {
-  const message: EntityChangeMessage = JSON.parse(frame.body);
-  const project: ProjectModel = await getChanges(versionId, message);
+): Promise<void> {
+  const message: ChangeMessageModel = JSON.parse(frame.body);
+  const project = await getChanges(versionId, message);
 
   // Step - Iterate through message and delete entities
-  for (
-    let changeIndex = 0;
-    changeIndex < message.changes.length;
-    changeIndex++
-  ) {
-    const change: Change = message.changes[changeIndex];
-    if (change.action === Action.DELETE) {
-      handleDeleteChange(change.entity, change.entityIds);
+  for (const change of message.changes) {
+    if (change.action === ActionType.DELETE) {
+      handleDeleteChange(change);
     }
   }
+
   // Step - Update default layout
   if (message.updateLayout) {
     // TODO: Set project layout (updated layout included in project.layout)
@@ -38,40 +39,38 @@ export async function handleEntityChangeMessage(
 }
 
 /**
- * For a change marking the deletion of some entities,
- * this removes those entities from the store.
- * @param change
+ * Deletes stored objects in the store.
+ *
+ * @param change - The deletion change.
  */
-function handleDeleteChange(entity: Entity, entityIds: string[]) {
-  switch (entity) {
-    case Entity.PROJECT:
+function handleDeleteChange(change: ChangeModel) {
+  switch (change.entity) {
+    case EntityType.PROJECT:
       //(entityIds.length should be 1 and equal to projectId)
       break;
-    case Entity.MEMBERS:
+    case EntityType.MEMBERS:
       // (entityIds = projectMembershipsIds)
       break;
-    case Entity.VERSION:
+    case EntityType.VERSION:
       // (entityIds = project version id)
       break;
-    case Entity.TYPES:
+    case EntityType.TYPES:
       // (entityIds = type id)
       break;
-    case Entity.DOCUMENT:
+    case EntityType.DOCUMENT:
       // (entityIds = document id)
       break;
-    case Entity.ARTIFACTS:
+    case EntityType.ARTIFACTS:
       // (entityIds = artifact ids)
       break;
-    case Entity.TRACES:
+    case EntityType.TRACES:
       // (entityIds = trace link ids)
       break;
-    case Entity.WARNINGS:
+    case EntityType.WARNINGS:
       // Never called, case here for completion.
       break;
-    case Entity.JOBS:
+    case EntityType.JOBS:
       // (entityIds = jobId)
       break;
-    default:
-      throw Error("Unknown entity type:" + entity);
   }
 }

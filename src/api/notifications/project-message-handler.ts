@@ -4,6 +4,7 @@ import { getProjectMembers, handleDocumentReload } from "@/api";
 import { projectModule } from "@/store";
 
 /**
+ * TODO: Delete
  * Handles revision messages.
  *
  * @param projectId - ID of project to update.

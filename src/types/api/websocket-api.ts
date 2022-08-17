@@ -41,7 +41,7 @@ export enum VersionMessageType {
  * Notifies client of a series of changes to the project.
  *
  */
-export interface EntityChangeMessage {
+export interface ChangeMessageModel {
   /**
    * The user initiating the change.
    */
@@ -51,7 +51,7 @@ export interface EntityChangeMessage {
    * Each change depicts what entity was affected, how it was affected
    * (UPDATED / DELETED), and the affected entity ids).
    */
-  changes: Change[];
+  changes: ChangeModel[];
   /**
    * Includes whether the default document layout should be updated.
    * This is true if any artifacts or trace links where changed.
@@ -62,16 +62,16 @@ export interface EntityChangeMessage {
 /**
  * Represents list of changed entities.
  */
-export interface Change {
-  entity: Entity;
-  action: Action;
+export interface ChangeModel {
+  entity: EntityType;
+  action: ActionType;
   entityIds: string[];
 }
 
 /**
  * Entity being changed.
  */
-export enum Entity {
+export enum EntityType {
   PROJECT = "PROJECT",
   MEMBERS = "MEMBERS",
   VERSION = "VERSION",
@@ -85,9 +85,9 @@ export enum Entity {
 
 /**
  * The action performed on an change to an entity.
- * Used in notifications to signal asyncronous updates.
+ * Used in notifications to signal asynchronous updates.
  */
-export enum Action {
+export enum ActionType {
   UPDATE = "UPDATE",
   DELETE = "DELETE",
 }

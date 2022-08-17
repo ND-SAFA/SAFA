@@ -227,7 +227,7 @@ export function createDocument(
       owner: "",
       members: [],
     },
-    name: document?.name || "Default",
+    name: document?.name || "",
     type: document?.type || DocumentType.ARTIFACT_TREE,
     artifactIds: document?.artifactIds || [],
     description: document?.description || "",

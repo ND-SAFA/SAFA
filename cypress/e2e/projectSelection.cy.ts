@@ -53,8 +53,8 @@ describe("Project Selection", () => {
         cy.getCy(DataCy.selectionModal).within(() => {
           cy.inputText(DataCy.selectionSearch, "$".repeat(20));
 
-          cy.getCy(DataCy.selectionProjectList).within(() => {
-            cy.get("tr").should("have.length", 2);
+          cy.withinTableRows(DataCy.selectionProjectList, (tr) => {
+            tr.should("have.length", 2);
           });
         });
       });

@@ -79,6 +79,17 @@ declare namespace Cypress {
      */
     closeModal(dataCy: string): Chainable<void>;
 
+    /**
+     * Runs a callback on all rows of a table.
+     *
+     * @param dataCy - The testing selector of the table.
+     * @param fn - A callback run on each row of the table.
+     */
+    withinTableRows(
+      dataCy: string,
+      fn: (tr: Chainable<JQuery<HTMLElement>>) => void
+    ): Chainable<void>;
+
     // Authentication Commands
 
     /**

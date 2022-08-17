@@ -11,10 +11,10 @@ import edu.nd.crc.safa.features.flatfiles.services.DataFileBuilder;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
-import common.AuthorizationTestService;
 import features.base.ApplicationBaseTest;
 import org.javatuples.Pair;
 import org.junit.jupiter.api.Test;
+import services.AuthorizationTestService;
 
 /**
  * Tests that a project's flat files is able to be downloaded as zip file.

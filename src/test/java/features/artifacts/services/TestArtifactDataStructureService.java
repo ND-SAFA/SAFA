@@ -18,9 +18,9 @@ import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.versions.ProjectChanger;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
-import common.AuthorizationTestService;
 import features.base.ApplicationBaseTest;
 import org.junit.jupiter.api.Test;
+import services.AuthorizationTestService;
 
 /**
  * Verifies that:

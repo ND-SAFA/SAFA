@@ -13,12 +13,12 @@ import edu.nd.crc.safa.features.jobs.entities.app.JobType;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
-import common.AuthorizationTestService;
-import common.MappingTestService;
 import features.flatfiles.base.BaseFlatFileTest;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
+import services.AuthorizationTestService;
+import services.MappingTestService;
 
 /**
  * Sets up internal SAFA and JIRA authentication in order to skip

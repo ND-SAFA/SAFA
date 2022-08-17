@@ -1,4 +1,4 @@
-package common;
+package services;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 

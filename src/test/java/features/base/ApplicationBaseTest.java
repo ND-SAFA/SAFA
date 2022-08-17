@@ -8,17 +8,17 @@ import javax.annotation.PostConstruct;
 import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
-import common.AssertionTestService;
-import common.AuthorizationTestService;
-import common.CommitTestService;
-import common.CreationTestService;
-import common.NotificationTestService;
-import common.RetrievalTestService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.core.task.SyncTaskExecutor;
+import services.AssertionTestService;
+import services.AuthorizationTestService;
+import services.CommitTestService;
+import services.CreationTestService;
+import services.NotificationTestService;
+import services.RetrievalTestService;
 
 /**
  * Testing layer for encapsulating application logic.

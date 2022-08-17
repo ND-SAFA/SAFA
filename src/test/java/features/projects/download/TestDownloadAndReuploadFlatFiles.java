@@ -19,10 +19,10 @@ import edu.nd.crc.safa.features.flatfiles.services.DataFileBuilder;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
-import common.AuthorizationTestService;
 import features.base.ApplicationBaseTest;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
+import services.AuthorizationTestService;
 
 /**
  * Creates a project containing one of each type of artifact and attempts to download and

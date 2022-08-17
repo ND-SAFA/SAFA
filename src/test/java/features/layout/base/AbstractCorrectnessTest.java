@@ -16,11 +16,11 @@ import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import common.MappingTestService;
 import features.base.ApplicationBaseTest;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.webjars.NotFoundException;
+import services.MappingTestService;
 
 public abstract class AbstractCorrectnessTest extends ApplicationBaseTest {
     protected String projectName = "project name";

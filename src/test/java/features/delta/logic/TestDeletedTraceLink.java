@@ -10,11 +10,11 @@ import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 import edu.nd.crc.safa.utilities.JsonFileUtilities;
 
-import common.MappingTestService;
 import features.base.ApplicationBaseTest;
 import org.javatuples.Pair;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
+import services.MappingTestService;
 
 /**
  * Tests that changes to the content of artifacts are retrieved.

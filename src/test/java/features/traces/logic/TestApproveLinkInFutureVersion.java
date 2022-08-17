@@ -15,11 +15,11 @@ import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.traces.entities.db.TraceLinkVersion;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
-import common.MappingTestService;
 import features.traces.base.AbstractTraceTest;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
+import services.MappingTestService;
 
 /**
  * Tests that generated trace links are able to be reviewed in subsequent versions after generation

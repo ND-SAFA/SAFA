@@ -43,6 +43,7 @@ public class ProjectMembershipController extends BaseController {
      *
      * @param projectId The UUID of the project which the member is being added to.
      * @param request   The request containing project, member to add, and their given role.
+     * @return {@link ProjectMembership} Updated project membership.
      */
     @PostMapping(AppRoutes.Projects.Membership.ADD_PROJECT_MEMBER)
     public ProjectMembership addOrUpdateProjectMembership(@PathVariable UUID projectId,

@@ -167,12 +167,12 @@ public class DocumentService implements IAppEntityService<DocumentAppEntity> {
         return nUpdated;
     }
 
-
     /**
      * Creates {@link DocumentAppEntity} from its database entity {@link Document}.
      * This includes retrieving linked artifacts, their positions, and any FMEA columns
      *
-     * @param document Persisted document base entity.
+     * @param document       Persisted document base entity.
+     * @param projectVersion The version of the document's artifact to generate layout with.
      * @return {@link DocumentAppEntity} Representing front-end model of document.
      */
     public DocumentAppEntity createDocumentAppEntity(Document document, ProjectVersion projectVersion) {

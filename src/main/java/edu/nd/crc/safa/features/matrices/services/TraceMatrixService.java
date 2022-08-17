@@ -2,11 +2,11 @@ package edu.nd.crc.safa.features.matrices.services;
 
 import java.util.List;
 
-import edu.nd.crc.safa.features.types.ArtifactType;
 import edu.nd.crc.safa.features.matrices.entities.TraceMatrix;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.traces.repositories.TraceMatrixRepository;
+import edu.nd.crc.safa.features.types.ArtifactType;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;

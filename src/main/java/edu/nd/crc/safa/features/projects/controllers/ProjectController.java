@@ -57,7 +57,9 @@ public class ProjectController extends BaseController {
             projectAppEntity.setProjectId(projectEntity.getProjectId().toString());
 
             // Step - Create version
-            ProjectVersion projectVersion = this.serviceProvider.getVersionService().createInitialProjectVersion(projectEntity);
+            ProjectVersion projectVersion = this.serviceProvider
+                .getVersionService()
+                .createInitialProjectVersion(projectEntity);
             projectAppEntity.setProjectVersion(projectVersion);
         } else {
             // Step - Finding project identifier

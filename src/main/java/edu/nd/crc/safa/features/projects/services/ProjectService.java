@@ -86,6 +86,7 @@ public class ProjectService {
      * @param project        The project to add the member to.
      * @param newMemberEmail The email of the member being added.
      * @param newMemberRole  The role to give the member in the project.
+     * @return {@link ProjectMembership} Updated project membership.
      * @throws SafaError Throws error if given role is greater than the role
      *                   of the user issuing this request.
      */

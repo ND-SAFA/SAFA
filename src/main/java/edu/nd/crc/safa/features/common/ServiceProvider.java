@@ -66,6 +66,7 @@ public class ServiceProvider {
     private final ProjectRepository projectRepository;
     private final ProjectService projectService;
     private final ProjectRetrievalService projectRetrievalService;
+    // Members
     private final ProjectMembershipRepository projectMembershipRepository;
     private final MemberService memberService;
     // Versions

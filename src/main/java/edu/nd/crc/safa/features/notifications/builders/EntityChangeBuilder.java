@@ -147,10 +147,10 @@ public class EntityChangeBuilder {
     private EntityChangeBuilder addChange(Change change, boolean checkIfEmpty) {
         if (checkIfEmpty) {
             if (!change.getEntityIds().isEmpty()) {
-                this.entityChangeMessage.getChanges().add(change);
+                this.entityChangeMessage.addChange(change);
             }
         } else {
-            this.entityChangeMessage.getChanges().add(change);
+            this.entityChangeMessage.addChange(change);
         }
         return this;
     }

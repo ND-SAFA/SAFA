@@ -51,7 +51,7 @@ public class ProjectMembershipController extends BaseController {
         throws SafaError {
         Project project = this.resourceBuilder.fetchProject(projectId).withViewProject();
         ProjectMembership updatedProjectMembership = this.serviceProvider
-            .getProjectService()
+            .getMemberService()
             .addOrUpdateProjectMembership(project, request.getMemberEmail(), request.getProjectRole());
         this.serviceProvider
             .getNotificationService()
@@ -71,7 +71,7 @@ public class ProjectMembershipController extends BaseController {
     public List<ProjectMemberAppEntity> getProjectMembers(@PathVariable UUID projectId) throws SafaError {
         Project project = this.resourceBuilder.fetchProject(projectId).withViewProject();
         return this.serviceProvider
-            .getProjectService()
+            .getMemberService()
             .getProjectMembers(project)
             .stream()
             .map(ProjectMemberAppEntity::new)

@@ -2,8 +2,6 @@ package edu.nd.crc.safa.features.projects.services;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.config.ProjectPaths;
@@ -23,7 +21,6 @@ import edu.nd.crc.safa.utilities.OSHelper;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 
 /**
  * Responsible for updating, deleting, and retrieving project identifiers.
@@ -81,63 +78,6 @@ public class ProjectService {
     }
 
     /**
-     * Finds and adds given member to project with specified role.
-     *
-     * @param project        The project to add the member to.
-     * @param newMemberEmail The email of the member being added.
-     * @param newMemberRole  The role to give the member in the project.
-     * @return {@link ProjectMembership} Updated project membership.
-     * @throws SafaError Throws error if given role is greater than the role
-     *                   of the user issuing this request.
-     */
-    public ProjectMembership addOrUpdateProjectMembership(Project project,
-                                                          String newMemberEmail,
-                                                          ProjectRole newMemberRole) throws SafaError {
-        // Step - Find member being added and the current member.
-        Optional<SafaUser> newMemberQuery = this.safaUserRepository.findByEmail(newMemberEmail);
-        if (newMemberQuery.isEmpty()) {
-            throw new SafaError("No user exists with given email: " + newMemberEmail);
-        }
-        SafaUser newMember = newMemberQuery.get();
-        SafaUser currentUser = this.safaUserService.getCurrentUser();
-
-        // Step - Assert that member being added has fewer permissions than current user.
-        Optional<ProjectMembership> currentUserMembershipQuery = this.projectMembershipRepository
-            .findByProjectAndMember(project, currentUser);
-        if (currentUserMembershipQuery.isPresent()) {
-            if (newMemberRole.compareTo(currentUserMembershipQuery.get().getRole()) > 0) {
-                throw new SafaError("Cannot add member with authorization greater that current user.");
-            }
-        } else {
-            throw new SafaError("Cannot add member to project which current user is not apart of.");
-        }
-
-        Optional<ProjectMembership> projectMembershipQuery =
-            this.projectMembershipRepository.findByProjectAndMember(project, newMember);
-        ProjectMembership updatedProjectMembership;
-        if (projectMembershipQuery.isPresent()) {
-            ProjectMembership existingProjectMembership = projectMembershipQuery.get();
-            existingProjectMembership.setRole(newMemberRole);
-            updatedProjectMembership = existingProjectMembership;
-        } else {
-            ProjectMembership newProjectMembership = new ProjectMembership(project, newMember, newMemberRole);
-            updatedProjectMembership = newProjectMembership;
-        }
-        this.projectMembershipRepository.save(updatedProjectMembership);
-        return updatedProjectMembership;
-    }
-
-    /**
-     * Returns list of members in given project.
-     *
-     * @param project The project whose members are retrieved.
-     * @return List of project memberships relating members to projects.
-     */
-    public List<ProjectMembership> getProjectMembers(Project project) {
-        return this.projectMembershipRepository.findByProject(project);
-    }
-
-    /**
      * The current authorized user to be an owner to given project.
      *
      * @param project The project the current user will be owner in.
@@ -146,23 +86,5 @@ public class ProjectService {
         SafaUser user = this.safaUserService.getCurrentUser();
         ProjectMembership projectMembership = new ProjectMembership(project, user, ProjectRole.OWNER);
         this.projectMembershipRepository.save(projectMembership);
-    }
-
-    /**
-     * Deletes project membership effectively removing user from
-     * associated project
-     *
-     * @param projectMembershipId ID of the membership linking user and project.
-     * @return ProjectMembers The membership object identified by given id, or null if none found.
-     */
-    public ProjectMembership deleteProjectMembershipById(@PathVariable UUID projectMembershipId) {
-        Optional<ProjectMembership> projectMembershipQuery =
-            this.projectMembershipRepository.findById(projectMembershipId);
-        if (projectMembershipQuery.isPresent()) {
-            ProjectMembership projectMembership = projectMembershipQuery.get();
-            this.projectMembershipRepository.delete(projectMembership);
-            return projectMembership;
-        }
-        return null;
     }
 }

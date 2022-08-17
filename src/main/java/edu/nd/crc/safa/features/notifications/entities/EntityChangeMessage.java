@@ -22,17 +22,11 @@ public class EntityChangeMessage {
      * The user initiating the change.
      */
     String user;
-
-    public boolean getUpdateLayout() {
-        List<Change.Entity> entitiesTriggeringLayout = List.of(
-            Change.Entity.ARTIFACTS,
-            Change.Entity.TRACES,
-            Change.Entity.VERSION);
-        return this.changes
-            .stream()
-            .map(Change::getEntity)
-            .anyMatch(entitiesTriggeringLayout::contains);
-    }
+    /**
+     * Whether the changes included in the message invalidate
+     * the default document layout.
+     */
+    boolean updateLayout;
 
     @JsonIgnore
     public Change getChangeForEntity(Change.Entity entity) {
@@ -52,5 +46,16 @@ public class EntityChangeMessage {
     @JsonIgnore
     public List<Change.Entity> getChangedEntities() {
         return this.changes.stream().map(Change::getEntity).collect(Collectors.toList());
+    }
+
+    public void addChange(Change change) {
+        List<Change.Entity> entitiesTriggeringLayout = List.of(
+            Change.Entity.ARTIFACTS,
+            Change.Entity.TRACES,
+            Change.Entity.VERSION);
+        if (entitiesTriggeringLayout.contains(change.entity)) {
+            this.updateLayout = true;
+        }
+        this.changes.add(change);
     }
 }

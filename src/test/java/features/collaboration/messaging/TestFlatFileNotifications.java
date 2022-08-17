@@ -2,14 +2,15 @@ package features.collaboration.messaging;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import features.base.ApplicationBaseTest;
+import org.junit.jupiter.api.Test;
 import edu.nd.crc.safa.builders.requests.FlatFileRequest;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.features.notifications.entities.Change;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
 import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
-import features.base.ApplicationBaseTest;
-import org.junit.jupiter.api.Test;
+
 
 /**
  * Tests that uploading flat files:

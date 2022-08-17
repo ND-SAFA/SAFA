@@ -45,43 +45,10 @@ public abstract class ApplicationBaseTest extends EntityBaseTest {
     protected AuthorizationTestService authorizationTestService;
 
     @PostConstruct
-    public void setup() {
-        notificationTestService = new NotificationTestService(port);
-        setupTestService = new CreationTestService(this.serviceProvider, this.dbEntityBuilder);
-        retrievalTestService = new RetrievalTestService(this.serviceProvider, this.dbEntityBuilder);
-        authorizationTestService = new AuthorizationTestService(this.serviceProvider, this.dbEntityBuilder);
-    }
-
-
-    /**
-     * Sets the current job launcher to run job synchronously so that
-     *
-     * @throws Exception If error encountered during afterPropertiesSet.
-     */
-    @PostConstruct
-    public void afterConstruct() throws Exception {
-        SimpleJobLauncher jobLauncher = new SimpleJobLauncher();
-        jobLauncher.setJobRepository(jobRepository);
-        jobLauncher.setTaskExecutor(new SyncTaskExecutor());
-        jobLauncher.afterPropertiesSet();
-
-        serviceProvider.setJobLauncher(jobLauncher);
-    }
-
-    /**
-     * Sets the testing database's mode, H2, to legacy in order for spring
-     * batch to be able to initialize its own tables.
-     *
-     * @throws SQLException Throws exception if unable to set legacy mode.
-     */
-    @PostConstruct
-    public void setLegacyModeInH2Database() throws SQLException {
-        String query = "SET MODE LEGACY;\n";
-        Connection connection = this.dataSource.getConnection();
-        try (Statement statement = connection.createStatement()) {
-            statement.execute(query);
-        }
-        connection.close();
+    public void init() throws Exception {
+        initTestServices();
+        initJobLauncher();
+        setLegacyModeInH2Database();
     }
 
     @BeforeEach
@@ -98,5 +65,42 @@ public abstract class ApplicationBaseTest extends EntityBaseTest {
         SafaRequest.clearAuthorizationToken();
     }
 
+    /**
+     * Initializes test services with service provider and database entity builder.
+     */
+    public void initTestServices() {
+        notificationTestService = new NotificationTestService(port);
+        setupTestService = new CreationTestService(this.serviceProvider, this.dbEntityBuilder);
+        retrievalTestService = new RetrievalTestService(this.serviceProvider, this.dbEntityBuilder);
+        authorizationTestService = new AuthorizationTestService(this.serviceProvider, this.dbEntityBuilder);
+    }
 
+    /**
+     * Sets the current job launcher to run job synchronously so that
+     *
+     * @throws Exception If error encountered during afterPropertiesSet.
+     */
+    public void initJobLauncher() throws Exception {
+        SimpleJobLauncher jobLauncher = new SimpleJobLauncher();
+        jobLauncher.setJobRepository(jobRepository);
+        jobLauncher.setTaskExecutor(new SyncTaskExecutor());
+        jobLauncher.afterPropertiesSet();
+
+        serviceProvider.setJobLauncher(jobLauncher);
+    }
+
+    /**
+     * Sets the testing database's mode, H2, to legacy in order for spring
+     * batch to be able to initialize its own tables.
+     *
+     * @throws SQLException Throws exception if unable to set legacy mode.
+     */
+    public void setLegacyModeInH2Database() throws SQLException {
+        String query = "SET MODE LEGACY;\n";
+        Connection connection = this.dataSource.getConnection();
+        try (Statement statement = connection.createStatement()) {
+            statement.execute(query);
+        }
+        connection.close();
+    }
 }

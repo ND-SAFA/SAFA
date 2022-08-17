@@ -42,7 +42,7 @@ public class SyncController extends BaseController {
         for (Change change : message.getChanges()) {
             projectAppEntity = updateProjectAppEntity(projectAppEntity, projectVersion, change);
         }
-        if (message.shouldUpdateLayout()) {
+        if (message.getUpdateLayout()) {
             Map<String, LayoutPosition> defaultDocumentLayout = this.serviceProvider
                 .getArtifactPositionService().retrieveDocumentLayout(projectVersion, null);
             projectAppEntity.setLayout(defaultDocumentLayout);

@@ -5,8 +5,7 @@ import {
   fillEndpoint,
   stompClient,
 } from "@/api";
-import { handleProjectMessage } from "./project-message-handler";
-import { handleVersionMessage } from "./version-message-handler";
+import { handleEntityChangeMessage } from "@/api/notifications/message-handler";
 
 /**
  * Connects and subscribes to the given project and version.
@@ -26,13 +25,18 @@ export async function handleSelectVersion(
 
   clearSubscriptions();
 
+  /**
+   * Project and Version topics are transmit {@link EntityChangeMessage}.
+   * The difference is that the project topic transmits non-version specific
+   * data (e.g. artifact types) while the version topic does.
+   */
   stompClient.subscribe(
     fillEndpoint(Endpoint.projectTopic, { projectId }),
-    (frame) => handleProjectMessage(projectId, frame)
+    (frame) => handleEntityChangeMessage(versionId, frame)
   );
 
   stompClient.subscribe(
     fillEndpoint(Endpoint.versionTopic, { versionId }),
-    (frame) => handleVersionMessage(versionId, frame)
+    (frame) => handleEntityChangeMessage(versionId, frame)
   );
 }

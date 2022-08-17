@@ -7,6 +7,7 @@
     absolute
     bottom
     color="secondary"
+    data-cy="app-loading"
   />
 </template>
 

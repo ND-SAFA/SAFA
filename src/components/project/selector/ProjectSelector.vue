@@ -53,6 +53,7 @@ import { getProjects, handleDeleteProject, handleSaveProject } from "@/api";
 import { GenericSelector } from "@/components/common";
 import { ProjectIdentifierModal } from "@/components/project/shared";
 import ConfirmProjectDelete from "./ConfirmProjectDelete.vue";
+import { Route } from "vue-router";
 
 /**
  * Displays list of project available to current user and allows them to
@@ -231,7 +232,10 @@ export default Vue.extend({
      * Fetches all projects.
      */
     fetchProjects(): void {
+      if (!sessionModule.getDoesSessionExist) return;
+
       this.isLoading = true;
+
       getProjects()
         .then((projects) => {
           this.projects = projects;

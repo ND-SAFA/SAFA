@@ -4,6 +4,8 @@
 export enum DataCy {
   // General
 
+  appLoading = "app-loading",
+
   stepperContinueButton = "button-stepper-continue",
   stepperBackButton = "button-stepper-back",
 
@@ -56,6 +58,7 @@ export enum DataCy {
 
   selectionModal = "modal-project-select",
   selectionProjectList = "table-project",
+  selectionVersionList = "table-version",
   selectionSearch = "input-selector-search",
   selectionReload = "button-selector-reload",
   selectionClose = "button-close",

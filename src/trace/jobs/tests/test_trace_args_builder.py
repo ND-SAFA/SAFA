@@ -1,22 +1,12 @@
 from django.test import TestCase
 
 from trace.config.constants import VALIDATION_PERCENTAGE_DEFAULT
-from trace.data.trace_dataset_creator import TraceDatasetCreator
 from trace.data.trace_link import TraceLink
 from trace.jobs.trace_args_builder import TraceArgsBuilder
-
-from mock import patch
-import mock
+from test.test_data import TEST_T_ARTS, TEST_S_ARTS, TEST_POS_LINKS
 
 
 class TestTraceArgsBuilder(TestCase):
-    TEST_S_ARTS = {"s1": "token1",
-                   "s2": "token2",
-                   "s3": "token3"}
-    TEST_T_ARTS = {"t1": "token1",
-                   "t2": "token2",
-                   "t3": "token3"}
-    TEST_POS_LINKS = [("s1", "t1"), ("s2", "t1"), ("s3", "t2")]
     EXPECTED_VALUES = {"base_model_name": "bert_trace_single",
                        "model_path": "model",
                        "output_path": "output",
@@ -25,7 +15,7 @@ class TestTraceArgsBuilder(TestCase):
                        "links": TEST_POS_LINKS,
                        "validation_percentage": VALIDATION_PERCENTAGE_DEFAULT}
 
-    def test_build(self,):
+    def test_build(self, ):
         test_trace_args_buidler = self.get_test_trace_arg_builder()
         args = test_trace_args_buidler.build()
         self.assertEquals(args.model_generator.model_name.lower(), self.EXPECTED_VALUES["base_model_name"])

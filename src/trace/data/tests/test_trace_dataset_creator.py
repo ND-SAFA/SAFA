@@ -1,11 +1,13 @@
 from django.test import TestCase
 
 from common.models.model_generator import ModelGenerator
+from test.test_tokenizer import get_test_tokenizer
 from trace.data.artifact import Artifact
 from trace.data.trace_dataset_creator import TraceDatasetCreator
 from mock import patch
 import mock
 from trace.data.trace_link import TraceLink
+from test.test_data import TEST_T_ARTS, TEST_S_ARTS, TEST_POS_LINKS
 
 
 def fake_extract_feature_info(feature, prefix=''):
@@ -13,15 +15,6 @@ def fake_extract_feature_info(feature, prefix=''):
 
 
 class TestTraceDatasetCreator(TestCase):
-    TEST_S_ARTS = {"s1": "token1",
-                   "s2": "token2",
-                   "s3": "token3"}
-
-    TEST_T_ARTS = {"t1": "token1",
-                   "t2": "token2",
-                   "t3": "token3"}
-
-    TEST_POS_LINKS = [("s1", "t1"), ("s2", "t1"), ("s3", "t2")]
     ALL_LINKS = [("s1", "t1"), ("s2", "t1"), ("s3", "t1"),
                  ("s1", "t2"), ("s2", "t2"), ("s3", "t2"),
                  ("s1", "t3"), ("s2", "t3"), ("s3", "t3")]
@@ -38,6 +31,27 @@ class TestTraceDatasetCreator(TestCase):
     EXPECTED_FEATURE_KEYS = ["input_ids", "token_type_ids", "attention_mask"]
     IRRELEVANT_FEATURE_KEYS = ["irrelevant_key1", "irrelevant_key2"]
     TEST_MODEL_GENERATOR = ModelGenerator("bert_trace_single", "path")
+
+    # ========================= high-level testing (ensure all functionality works together) =========================
+    @patch.object(ModelGenerator, "get_tokenizer")
+    def test_get_training_and_validation_dataset_with_transformers(self, get_tokenizer_mock: mock.MagicMock):
+        get_tokenizer_mock.return_value = get_test_tokenizer()
+        test_trace_dataset_creator = self.get_test_trace_dataset_creator()
+        training_dataset = test_trace_dataset_creator.get_training_dataset()
+        validation_dataset = test_trace_dataset_creator.get_validation_dataset()
+
+        self.assertEquals(len(training_dataset), self.get_expected_train_dataset_size(1))
+        self.assertEquals(len(validation_dataset), self.EXPECTED_VALIDATION_SIZE)
+
+    @patch.object(ModelGenerator, "get_tokenizer")
+    def test_get_prediction_dataset_with_transformers(self, get_tokenizer_mock: mock.MagicMock):
+        get_tokenizer_mock.return_value = get_test_tokenizer()
+        test_trace_dataset_creator = self.get_test_trace_dataset_creator(include_links=False)
+        prediction_dataset = test_trace_dataset_creator.get_prediction_dataset()
+
+        self.assertEqual(len(prediction_dataset), len(self.ALL_LINKS))
+
+    # ========================= mid-level testing (no external packages like transformers) =========================
 
     @patch.object(TraceDatasetCreator, "_get_feature_entry")
     def test_get_training_and_validation_dataset(self, get_feature_entry_mock: mock.MagicMock):
@@ -62,7 +76,7 @@ class TestTraceDatasetCreator(TestCase):
         self.assertEquals(len(get_feature_entry_mock.mock_calls), len(self.ALL_LINKS) - self.EXPECTED_VALIDATION_SIZE)
         self.assertEquals(len(training_dataset), expected_dataset_size)
 
-        pos_links = self.get_links(self.TEST_POS_LINKS)
+        pos_links = self.get_links(TEST_POS_LINKS)
         train_dataset_links = self.get_dataset_link_attrs(training_dataset)
         pos_link_count = 0
         for link_id in train_dataset_links:
@@ -139,6 +153,8 @@ class TestTraceDatasetCreator(TestCase):
         test_trace_dataset_creator.get_prediction_dataset()
         self.assertFalse(get_feature_entry_mock.called)
 
+    # ========================= low-level testing (isolated individual methods) =========================
+
     # TODO
     def test_update_embeddings(self):
         pass
@@ -152,7 +168,7 @@ class TestTraceDatasetCreator(TestCase):
         extract_feature_info_mock.side_effect = fake_extract_feature_info
 
         test_trace_dataset_creator = self.get_test_trace_dataset_creator(model_generator=ModelGenerator("bert_trace_siamese", "path"))
-        source, target = self.TEST_POS_LINKS[0]
+        source, target = TEST_POS_LINKS[0]
         test_link = self.get_test_link(source, target)
         feature_entry = test_trace_dataset_creator._get_feature_entry(test_link)
 
@@ -166,7 +182,7 @@ class TestTraceDatasetCreator(TestCase):
         extract_feature_info_mock.side_effect = fake_extract_feature_info
 
         test_trace_dataset_creator = self.get_test_trace_dataset_creator()
-        source, target = self.TEST_POS_LINKS[0]
+        source, target = TEST_POS_LINKS[0]
         test_link = self.get_test_link(source, target)
         feature_entry = test_trace_dataset_creator._get_feature_entry(test_link)
 
@@ -178,11 +194,11 @@ class TestTraceDatasetCreator(TestCase):
         get_feature_entry_mock.return_value = {"feature_entry": "value"}
 
         test_trace_dataset_creator = self.get_test_trace_dataset_creator()
-        link_ids = self.get_links(self.TEST_POS_LINKS).keys()
+        link_ids = self.get_links(TEST_POS_LINKS).keys()
         feature_entries = test_trace_dataset_creator._get_feature_entries(link_ids, 5)
 
-        self.assertEquals(len(feature_entries), 5 * len(self.TEST_POS_LINKS))
-        self.assertEquals(get_feature_entry_mock.call_count, len(self.TEST_POS_LINKS))
+        self.assertEquals(len(feature_entries), 5 * len(TEST_POS_LINKS))
+        self.assertEquals(get_feature_entry_mock.call_count, len(TEST_POS_LINKS))
 
     def test_get_data_split(self):
         test_trace_dataset_creator = self.get_test_trace_dataset_creator()
@@ -213,27 +229,27 @@ class TestTraceDatasetCreator(TestCase):
 
     @patch.object(TraceDatasetCreator, '_create_pos_and_neg_links')
     def test_create_links_with_no_true_links(self, create_pos_and_neg_links_mock: mock.MagicMock):
-        links, pos_link_ids, neg_link_ids = TraceDatasetCreator._create_links(self.TEST_MODEL_GENERATOR, self.TEST_S_ARTS,
-                                                                              self.TEST_T_ARTS)
+        links, pos_link_ids, neg_link_ids = TraceDatasetCreator._create_links(self.TEST_MODEL_GENERATOR, TEST_S_ARTS,
+                                                                              TEST_T_ARTS)
         self.links_test(links)
         self.assertFalse(create_pos_and_neg_links_mock.called)
 
     @patch.object(TraceDatasetCreator, '_create_pos_and_neg_links')
     def test_create_links_with_true_links(self, create_pos_and_neg_links_mock: mock.MagicMock):
         create_pos_and_neg_links_mock.return_value = ([1, 2, 3], [4, 5, 6])
-        links, pos_link_ids, neg_link_ids = TraceDatasetCreator._create_links(self.TEST_MODEL_GENERATOR, self.TEST_S_ARTS,
-                                                                              self.TEST_T_ARTS, self.TEST_POS_LINKS)
+        links, pos_link_ids, neg_link_ids = TraceDatasetCreator._create_links(self.TEST_MODEL_GENERATOR, TEST_S_ARTS,
+                                                                              TEST_T_ARTS, TEST_POS_LINKS)
         self.links_test(links)
         self.assertTrue(create_pos_and_neg_links_mock.called)
 
     def test_create_pos_and_neg_links(self):
         all_links = self.get_links(self.ALL_LINKS)
-        pos_link_ids, neg_link_ids = TraceDatasetCreator._create_pos_and_neg_links(self.TEST_POS_LINKS, all_links)
+        pos_link_ids, neg_link_ids = TraceDatasetCreator._create_pos_and_neg_links(TEST_POS_LINKS, all_links)
 
-        self.assertEquals(len(pos_link_ids), len(self.TEST_POS_LINKS))
-        self.assertEquals(len(neg_link_ids), len(self.ALL_LINKS) - len(self.TEST_POS_LINKS))
+        self.assertEquals(len(pos_link_ids), len(TEST_POS_LINKS))
+        self.assertEquals(len(neg_link_ids), len(self.ALL_LINKS) - len(TEST_POS_LINKS))
 
-        for link in self.TEST_POS_LINKS:
+        for link in TEST_POS_LINKS:
             id_ = TraceLink.generate_link_id(link[0], link[1])
             self.assertIn(id_, pos_link_ids)
 
@@ -266,19 +282,19 @@ class TestTraceDatasetCreator(TestCase):
             self.assertNotIn(prefix + key, feature_info)
 
     def test_change_data_size_bigger(self):
-        new_dataset = TraceDatasetCreator._change_data_size(self.TEST_POS_LINKS, 5)
+        new_dataset = TraceDatasetCreator._change_data_size(TEST_POS_LINKS, 5)
         self.assertEquals(len(new_dataset), 5)
 
     def test_change_data_size_duplicates(self):
-        new_dataset = TraceDatasetCreator._change_data_size(self.TEST_POS_LINKS, 2, True)
+        new_dataset = TraceDatasetCreator._change_data_size(TEST_POS_LINKS, 2, True)
         self.assertEquals(len(new_dataset), 2)
 
     def test_reduce_data_size_smaller_no_duplicates(self):
-        new_dataset = TraceDatasetCreator._change_data_size(self.TEST_POS_LINKS, 2, False)
+        new_dataset = TraceDatasetCreator._change_data_size(TEST_POS_LINKS, 2, False)
         self.assertEquals(len(set(new_dataset)), 2)
 
     def tests_get_linked_targets_only(self):
-        linked_targets = TraceDatasetCreator._get_linked_targets_only(self.TEST_POS_LINKS)
+        linked_targets = TraceDatasetCreator._get_linked_targets_only(TEST_POS_LINKS)
 
         for target in self.LINKED_TARGETS:
             self.assertIn(target, linked_targets)
@@ -315,17 +331,17 @@ class TestTraceDatasetCreator(TestCase):
         return links
 
     def get_test_link(self, source, target):
-        s = Artifact(source, self.TEST_S_ARTS[source], lambda text: text)
-        t = Artifact(target, self.TEST_T_ARTS[target], lambda text: text)
+        s = Artifact(source, TEST_S_ARTS[source], lambda text: text)
+        t = Artifact(target, TEST_T_ARTS[target], lambda text: text)
         return TraceLink(s, t, lambda text_pair, text, return_token_type_ids, add_special_tokens: text + "_" + text_pair)
 
     def get_expected_train_dataset_size(self, resample_rate, validation_percentage=VAlIDATION_PERCENTAGE):
-        num_train_pos_links = round(len(self.TEST_POS_LINKS) * (1 - validation_percentage))
+        num_train_pos_links = round(len(TEST_POS_LINKS) * (1 - validation_percentage))
         return resample_rate * num_train_pos_links * 2  # equal number pos and neg links
 
     def get_test_trace_dataset_creator(self, validation_percentage=VAlIDATION_PERCENTAGE, include_links=True, model_generator=None):
         if model_generator is None:
             model_generator = self.TEST_MODEL_GENERATOR
-        return TraceDatasetCreator(self.TEST_S_ARTS, self.TEST_T_ARTS, model_generator=model_generator,
-                                   true_links=self.TEST_POS_LINKS if include_links else None,
+        return TraceDatasetCreator(TEST_S_ARTS, TEST_T_ARTS, model_generator=model_generator,
+                                   true_links=TEST_POS_LINKS if include_links else None,
                                    validation_percentage=validation_percentage)

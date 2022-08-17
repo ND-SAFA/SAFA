@@ -8,6 +8,8 @@ from trace.config.constants import MAX_SEQ_LENGTH_DEFAULT
 from common.models.base_models.supported_base_model import SupportedBaseModel
 from common.models.model_properties import ArchitectureType, ModelSize
 
+from transformers.tokenization_utils import PreTrainedTokenizer
+
 
 class ModelGenerator:
     """
@@ -72,7 +74,7 @@ class ModelGenerator:
             self.__model = self.__load_model()
         return self.__model
 
-    def get_tokenizer(self) -> AutoTokenizer:
+    def get_tokenizer(self) -> PreTrainedTokenizer:
         """
         Gets the pretrained Tokenizer
         :return: the Tokenizer
@@ -96,6 +98,7 @@ class ModelGenerator:
         :param kwargs: other arguments for tokenizer
         :return: feature name, value mappings
         """
-        return self.get_tokenizer()(truncation="longest_first", return_attention_mask=True,
+        tokenizer = self.get_tokenizer()
+        return tokenizer(truncation="longest_first", return_attention_mask=True,
                                     max_length=self._max_seq_length,
                                     padding="max_length", return_token_type_ids=return_token_type_ids, **kwargs)

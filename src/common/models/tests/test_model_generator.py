@@ -6,8 +6,8 @@ from transformers.models.auto.tokenization_auto import AutoTokenizer
 from common.models.model_generator import ModelGenerator
 from common.models.base_models.supported_base_model import SupportedBaseModel
 from common.models.model_properties import ArchitectureType
-
 from common.models.base_models.bert_trace_siamese import BertTraceSiamese
+from test.test_tokenizer import get_test_tokenizer
 
 
 class TestTokenizer:
@@ -79,3 +79,20 @@ class TestModelGenerator(TestCase):
 
     def get_test_model_generator(self):
         return ModelGenerator(self.TEST_BASE_MODEL["base_model_name"], "path")
+
+    @patch.object(ModelGenerator, 'get_tokenizer')
+    def test_get_feature_with_return_token_type_ids(self, get_tokenizer_mock: mock.MagicMock):
+        get_tokenizer_mock.return_value = get_test_tokenizer()
+
+        test_model_generator = self.get_test_model_generator()
+        feature = test_model_generator.get_feature(text="token", return_token_type_ids=True)
+        self.assertIn("token_type_ids", feature)
+
+    @patch.object(ModelGenerator, 'get_tokenizer')
+    def test_get_feature_without_return_token_type_ids(self, get_tokenizer_mock: mock.MagicMock):
+        get_tokenizer_mock.return_value = get_test_tokenizer()
+
+        test_model_generator = self.get_test_model_generator()
+        feature = test_model_generator.get_feature(text="token", return_token_type_ids=False)
+        self.assertNotIn("token_type_ids", feature)
+

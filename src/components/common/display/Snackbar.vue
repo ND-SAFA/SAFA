@@ -1,6 +1,11 @@
 <template>
   <v-snackbar v-model="showSnackbar" :timeout="timeout" :color="messageColor">
-    <v-row class="ma-0 pa-0" justify="space-around" align="center">
+    <v-row
+      class="ma-0 pa-0"
+      justify="space-around"
+      align="center"
+      :data-cy="`snackbar-${messageType}`"
+    >
       <v-col cols="1" class="ma-0 pa-0" align-self="center">
         <v-icon> {{ messageIcon }} </v-icon>
       </v-col>

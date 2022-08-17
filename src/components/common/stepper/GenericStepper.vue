@@ -33,7 +33,7 @@
                 :outlined="currentStep !== numberOfSteps"
                 :disabled="!isStepDone"
                 @click="onStepForward"
-                data-cy="generic-stepper-continue"
+                data-cy="button-stepper-continue"
               >
                 {{ currentStep === numberOfSteps ? submitText : "Continue" }}
               </v-btn>
@@ -42,6 +42,7 @@
                 @click="onStepBack"
                 :disabled="currentStep === 1"
                 color="primary"
+                data-cy="button-stepper-back"
               >
                 Go Back
               </v-btn>

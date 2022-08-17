@@ -6,6 +6,9 @@ Cypress.Commands.add("setProjectIdentifier", (type) => {
     cy.getCy(DataCy.creationStandardDescriptionInput).type(
       testProject.description
     );
+  } else if (type === "modal") {
+    cy.getCy(DataCy.selectionNameInput).type(testProject.name);
+    cy.getCy(DataCy.selectionDescriptionInput).type(testProject.description);
   } else {
     cy.getCy(DataCy.creationBulkNameInput).type(testProject.name);
     cy.getCy(DataCy.creationBulkDescriptionInput).type(testProject.description);

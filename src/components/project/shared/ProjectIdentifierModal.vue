@@ -5,6 +5,7 @@
     size="m"
     :actions-height="isUploadOpen ? 0 : 50"
     :is-loading="isLoading"
+    data-cy="modal-project-edit"
     @close="handleClose"
   >
     <template v-slot:body>
@@ -32,6 +33,7 @@
         color="primary"
         class="ml-auto"
         :disabled="isDisabled"
+        data-cy="button-project-save"
       >
         Save
       </v-btn>

@@ -4,7 +4,14 @@
 export enum DataCy {
   // General
 
-  stepperContinueButton = "generic-stepper-continue",
+  stepperContinueButton = "button-stepper-continue",
+  stepperBackButton = "button-stepper-back",
+
+  selectorAddButton = "button-selector-add",
+  selectorEditButton = "button-selector-edit",
+  selectorDeleteButton = "button-selector-delete",
+
+  modalTitle = "modal-title",
 
   // Authentication
 
@@ -12,6 +19,13 @@ export enum DataCy {
   emailInput = "input-email",
   passwordInput = "input-password",
   loginButton = "button-login",
+
+  // Snackbar
+
+  snackbarInfo = "snackbar-info",
+  snackbarSuccess = "snackbar-success",
+  snackbarWarning = "snackbar-warning",
+  snackbarError = "snackbar-error",
 
   // Project Creation
 
@@ -45,4 +59,13 @@ export enum DataCy {
   selectionSearch = "input-selector-search",
   selectionReload = "button-selector-reload",
   selectionClose = "button-close",
+
+  selectionEditModal = "modal-project-edit",
+  selectionNameInput = "input-project-name-modal",
+  selectionDescriptionInput = "input-project-description-modal",
+  selectionSaveButton = "button-project-save",
+
+  selectionDeleteModal = "modal-project-delete",
+  selectionDeleteNameInput = "input-project-delete-name",
+  selectionDeleteButton = "button-project-delete",
 }

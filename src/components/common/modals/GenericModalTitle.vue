@@ -1,5 +1,10 @@
 <template>
-  <flex-box full-width justify="space-between" align="center">
+  <flex-box
+    full-width
+    justify="space-between"
+    align="center"
+    data-cy="modal-title"
+  >
     <typography :value="title" color="white" />
     <generic-icon-button
       tooltip="Close"

@@ -4,9 +4,7 @@ describe("Project Selection", () => {
   beforeEach(() => {
     cy.visit("http://localhost:8080")
       .login(validUser.email, validUser.password)
-      .openProjectSelector()
-      // Wait for projects to load.
-      .wait(1000);
+      .openProjectSelector();
   });
 
   afterEach(() => {
@@ -26,7 +24,7 @@ describe("Project Selection", () => {
 
       it("Reloads the list of projects", () => {
         cy.getCy(DataCy.selectionModal).within(() => {
-          cy.clickButton(DataCy.selectionReload).wait(1000);
+          cy.clickButton(DataCy.selectionReload);
 
           cy.withinTableRows(DataCy.selectionProjectList, (tr) =>
             tr.should("have.length.above", 0)
@@ -46,7 +44,7 @@ describe("Project Selection", () => {
         });
       });
 
-      it.only("Displays no projects when none match", () => {
+      it("Displays no projects when none match", () => {
         cy.getCy(DataCy.selectionModal).within(() => {
           cy.inputText(DataCy.selectionSearch, "$".repeat(20));
 
@@ -61,14 +59,74 @@ describe("Project Selection", () => {
       it("Selects a project and continues to the version step", () => {
         cy.getCy(DataCy.selectionModal).within(() => {
           cy.withinTableRows(DataCy.selectionProjectList, (tr) => {
-            tr.first();
+            tr.get(".v-simple-checkbox").last().click();
           });
+
+          cy.getCy(DataCy.stepperBackButton).should("not.be.disabled");
+        });
+      });
+
+      it("Cannot continue without a project selected", () => {
+        cy.getCy(DataCy.selectionModal).within(() => {
+          cy.withinTableRows(DataCy.selectionProjectList, (tr) => {
+            tr.get(".v-simple-checkbox").first().click();
+          });
+
+          cy.getCy(DataCy.stepperContinueButton).should("be.disabled");
         });
       });
     });
   });
 
-  describe("Project CRUD", () => {});
+  describe("Project CRUD", () => {
+    it("I can create an empty project", () => {
+      cy.getCy(DataCy.selectionModal).within(() => {
+        cy.clickButton(DataCy.selectorAddButton);
+      });
+
+      cy.getCy(DataCy.selectionEditModal).within(() =>
+        cy.setProjectIdentifier("modal").clickButton(DataCy.selectionSaveButton)
+      );
+
+      cy.getCy(DataCy.snackbarSuccess).should("be.visible");
+    });
+
+    it("As an admin, I can edit a project's name and description", () => {
+      cy.getCy(DataCy.selectionModal).within(() => {
+        cy.clickButton(DataCy.selectorEditButton, "first");
+      });
+
+      cy.getCy(DataCy.selectionEditModal).within(() =>
+        cy
+          .getCy(DataCy.selectionNameInput)
+          .type(" Edited")
+          .clickButton(DataCy.selectionSaveButton)
+      );
+
+      cy.getCy(DataCy.snackbarSuccess).should("be.visible");
+    });
+
+    it("As an owner, I can delete a project", () => {
+      cy.getCy(DataCy.selectionModal).within(() => {
+        cy.clickButton(DataCy.selectorDeleteButton, "first");
+      });
+
+      cy.getCy(DataCy.selectionDeleteModal).within(() => {
+        cy.getCy(DataCy.modalTitle)
+          .invoke("text")
+          .then((text) =>
+            cy.inputText(
+              DataCy.selectionDeleteNameInput,
+              text.split(":")[1].trim()
+            )
+          );
+
+        cy.clickButton(DataCy.selectionDeleteButton);
+      });
+
+      cy.getCy(DataCy.snackbarSuccess).should("be.visible");
+    });
+  });
 
   describe("Project Version List", () => {});
 

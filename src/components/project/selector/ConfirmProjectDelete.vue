@@ -3,6 +3,7 @@
     size="md"
     :is-open="isOpen"
     :title="title"
+    data-cy="modal-project-delete"
     @close="handleCancel"
   >
     <template v-slot:body>
@@ -11,6 +12,7 @@
         :label="textboxLabel"
         class="ma-3"
         filled
+        data-cy="input-project-delete-name"
       />
     </template>
     <template v-slot:actions>
@@ -19,6 +21,7 @@
         color="error"
         @click="handleConfirm"
         class="ml-auto"
+        data-cy="button-project-delete"
       >
         Delete
       </v-btn>

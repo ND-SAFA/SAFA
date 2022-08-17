@@ -112,7 +112,7 @@ declare namespace Cypress {
      *
      * @param type - The type of project identifier to set.
      */
-    setProjectIdentifier(type: "bulk" | "standard"): Chainable<void>;
+    setProjectIdentifier(type: "bulk" | "standard" | "modal"): Chainable<void>;
 
     // Project Selection
 

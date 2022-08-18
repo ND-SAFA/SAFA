@@ -1,5 +1,6 @@
 import { projectModule, typeOptionsModule } from "@/store";
 import { deleteTraceMatrix, getTraceMatrices } from "@/api";
+import { LabelledTraceDirectionModel } from "@/types";
 
 /**
  * Updates the trace matrices for the project.
@@ -27,4 +28,22 @@ export async function handleRemoveTraceType(
     sourceArtifactTypeName,
     targetArtifactTypeName
   );
+}
+
+/**
+ * Removes a saved artifact type direction and updates related stores.
+ *
+ * @param labeledType - The artifact type to edit.
+ * @param removedType - The type direction to remove.
+ */
+export async function handleRemoveDirection(
+  labeledType: LabelledTraceDirectionModel,
+  removedType: string
+): Promise<void> {
+  labeledType.allowedTypes = labeledType.allowedTypes.filter(
+    (allowedType) => allowedType !== removedType
+  );
+
+  typeOptionsModule.updateLinkDirections(labeledType);
+  await handleRemoveTraceType(labeledType.type, removedType);
 }

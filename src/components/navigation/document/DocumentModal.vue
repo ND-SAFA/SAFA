@@ -21,12 +21,11 @@
         item-text="name"
         item-value="id"
       />
-      <artifact-input v-model="editingDocument.artifactIds" />
-      <v-switch
-        class="my-0 py-0"
-        label="Include artifact children"
-        v-model="includeChildren"
+      <artifact-input
+        label="Document Artifacts"
+        v-model="editingDocument.artifactIds"
       />
+      <v-switch label="Include artifact children" v-model="includeChildren" />
       <v-autocomplete
         v-if="includeChildren"
         filled
@@ -34,6 +33,12 @@
         label="Included Child Types"
         v-model="includedChildTypes"
         :items="artifactTypes"
+        @blur="handleSaveChildren"
+      />
+      <artifact-input
+        v-if="includeChildren"
+        label="Child Artifacts"
+        v-model="childIds"
       />
     </template>
     <template v-slot:actions>
@@ -61,7 +66,7 @@
 import Vue, { PropType } from "vue";
 import { DocumentModel } from "@/types";
 import { createDocument, documentTypeOptions } from "@/util";
-import { documentModule, typeOptionsModule } from "@/store";
+import { documentModule, subtreeModule, typeOptionsModule } from "@/store";
 import { handleDeleteDocument, handleSaveDocument } from "@/api";
 import { ArtifactInput, GenericModal } from "@/components/common";
 
@@ -88,6 +93,7 @@ export default Vue.extend({
       types: documentTypeOptions(),
       includeChildren: false,
       includedChildTypes: [] as string[],
+      childIds: [] as string[],
     };
   },
   computed: {
@@ -142,18 +148,36 @@ export default Vue.extend({
      * Resets all modal data.
      */
     resetModalData() {
+      this.includeChildren = false;
+      this.includedChildTypes = [];
+      this.childIds = [];
       this.editingDocument = createDocument(this.document);
       this.confirmDelete = false;
       this.$emit("close");
     },
     /**
+     * Generates children to save on this document.
+     */
+    handleSaveChildren() {
+      this.childIds = subtreeModule.getMatchingChildren(
+        this.editingDocument.artifactIds,
+        this.includedChildTypes
+      );
+    },
+    /**
      * Attempts to save the document.
      */
     handleSubmit() {
+      const artifactIds = this.includeChildren
+        ? [...this.editingDocument.artifactIds, ...this.childIds]
+        : this.editingDocument.artifactIds;
+
       handleSaveDocument(
-        this.editingDocument,
+        {
+          ...this.editingDocument,
+          artifactIds,
+        },
         this.isEditMode,
-        this.includeChildren ? this.includedChildTypes : [],
         {
           onSuccess: () => this.resetModalData(),
         }

@@ -7,7 +7,7 @@ import type {
   TraceDirectionModel,
   ArtifactTypeIcons,
 } from "@/types";
-import { createDefaultTypeIcons } from "@/util";
+import { createDefaultTypeIcons, getArtifactTypePrintName } from "@/util";
 import {
   allowedSafetyCaseTypes,
   ArtifactModel,
@@ -192,5 +192,23 @@ export default class TypeOptionsModule extends VuexModule {
   get getArtifactTypeIcon(): (type: string) => string {
     return (type) =>
       this.artifactTypeIcons[type] || this.artifactTypeIcons.default;
+  }
+
+  /**
+   * @return Labeled artifact type directions.
+   */
+  get labeledTypeDirections(): () => LabelledTraceDirectionModel[] {
+    return () =>
+      Object.entries(this.linkDirections).map(([type, allowedTypes]) => {
+        const icon = this.getArtifactTypeIcon(type);
+
+        return {
+          type,
+          allowedTypes,
+          label: getArtifactTypePrintName(type),
+          icon,
+          iconIndex: this.allArtifactTypeIcons.indexOf(icon),
+        };
+      });
   }
 }

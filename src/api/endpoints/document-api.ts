@@ -26,15 +26,15 @@ export async function saveDocument(
 /**
  * Returns list of documents associated with given project.
  *
- * @param projectId - The project to get documents for.
+ * @param versionId - The project version to get documents for.
  * @return The project's documents.
  */
 export async function getDocuments(
-  projectId: string
+  versionId: string
 ): Promise<DocumentModel[]> {
   return authHttpClient<DocumentModel[]>(
     fillEndpoint(Endpoint.getProjectDocuments, {
-      projectId,
+      versionId,
     }),
     {
       method: "GET",

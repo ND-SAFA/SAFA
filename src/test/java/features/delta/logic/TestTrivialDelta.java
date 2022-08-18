@@ -2,9 +2,10 @@ package features.delta.logic;
 
 import java.util.List;
 
-import edu.nd.crc.safa.builders.requests.SafaRequest;
+import requests.SafaRequest;
+
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import features.delta.base.AbstractDeltaTest;
 import org.javatuples.Pair;

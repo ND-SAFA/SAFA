@@ -4,8 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.UUID;
 
-import edu.nd.crc.safa.builders.RouteBuilder;
-import edu.nd.crc.safa.builders.requests.SafaRequest;
+import requests.RouteBuilder;
+import requests.SafaRequest;
+
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;

@@ -2,15 +2,16 @@ package features.flatfiles.logic;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import edu.nd.crc.safa.builders.CommitBuilder;
-import edu.nd.crc.safa.builders.entities.ProjectBuilder;
-import edu.nd.crc.safa.builders.requests.SafaRequest;
+import builders.CommitBuilder;
+import builders.ProjectBuilder;
+import requests.SafaRequest;
+
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.features.flatfiles.controllers.entities.ArtifactNameCheck;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.utilities.JsonFileUtilities;
 
 import features.base.ApplicationBaseTest;

@@ -2,10 +2,11 @@ package features.collaboration.messaging;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import edu.nd.crc.safa.builders.requests.FlatFileRequest;
+import requests.FlatFileRequest;
+
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import features.base.ApplicationBaseTest;
 import org.junit.jupiter.api.Test;

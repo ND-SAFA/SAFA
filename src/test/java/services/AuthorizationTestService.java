@@ -4,8 +4,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.Optional;
 
-import edu.nd.crc.safa.builders.entities.DbEntityBuilder;
-import edu.nd.crc.safa.builders.requests.SafaRequest;
+import requests.SafaRequest;
+
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.memberships.entities.db.ProjectMembership;
@@ -13,6 +13,7 @@ import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
+import builders.DbEntityBuilder;
 import features.base.ApplicationBaseTest;
 import lombok.AllArgsConstructor;
 import org.json.JSONObject;

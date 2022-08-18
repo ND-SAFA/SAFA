@@ -2,7 +2,7 @@ package features.delta.base;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import features.base.ApplicationBaseTest;
 import org.javatuples.Pair;

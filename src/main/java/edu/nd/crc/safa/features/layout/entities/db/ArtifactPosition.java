@@ -11,7 +11,7 @@ import javax.persistence.Table;
 
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import lombok.Data;
 import org.hibernate.annotations.OnDelete;

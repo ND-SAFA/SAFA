@@ -6,7 +6,7 @@ import edu.nd.crc.safa.features.jobs.entities.app.JiraProjectCreationJob;
 import edu.nd.crc.safa.features.jobs.entities.app.JobType;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 /**
  * Builds job for pulling issues from JIRA and updating project.

@@ -14,7 +14,7 @@ import edu.nd.crc.safa.features.rules.entities.app.RuleAppEntity;
 import edu.nd.crc.safa.features.rules.entities.db.Rule;
 import edu.nd.crc.safa.features.rules.parser.ParserRule;
 import edu.nd.crc.safa.features.rules.parser.RuleName;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;

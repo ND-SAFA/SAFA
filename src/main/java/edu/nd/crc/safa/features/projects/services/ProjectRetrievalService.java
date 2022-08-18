@@ -24,7 +24,7 @@ import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.services.TraceService;
 import edu.nd.crc.safa.features.types.TypeAppEntity;
 import edu.nd.crc.safa.features.types.TypeService;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Scope;

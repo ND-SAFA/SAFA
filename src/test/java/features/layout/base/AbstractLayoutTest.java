@@ -5,11 +5,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import edu.nd.crc.safa.builders.requests.FlatFileRequest;
+import requests.FlatFileRequest;
+
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.features.layout.generator.ElkGraphCreator;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import features.base.ApplicationBaseTest;
 import org.eclipse.elk.graph.ElkConnectableShape;

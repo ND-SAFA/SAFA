@@ -4,15 +4,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.UUID;
 
-import edu.nd.crc.safa.builders.CommitBuilder;
-import edu.nd.crc.safa.builders.entities.ProjectBuilder;
+import builders.CommitBuilder;
+import builders.ProjectBuilder;
+
 import edu.nd.crc.safa.features.common.IAppEntityService;
 import edu.nd.crc.safa.features.notifications.entities.Change;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.traces.entities.db.TraceType;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import common.AbstractCrudTest;
 import org.json.JSONObject;

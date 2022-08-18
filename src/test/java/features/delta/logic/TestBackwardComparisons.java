@@ -1,6 +1,7 @@
 package features.delta.logic;
 
-import edu.nd.crc.safa.builders.requests.SafaRequest;
+import requests.SafaRequest;
+
 import edu.nd.crc.safa.config.AppRoutes;
 
 import features.delta.base.AbstractDeltaTest;

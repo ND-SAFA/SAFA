@@ -1,6 +1,6 @@
 package edu.nd.crc.safa.features.jira.entities.api;
 
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

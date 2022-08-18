@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.builders;
+package builders;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -6,7 +6,7 @@ import java.util.Map;
 
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
 
-public abstract class BaseBuilder {
+public abstract class AbstractBuilder {
 
     public abstract void createEmptyData() throws IOException;
 

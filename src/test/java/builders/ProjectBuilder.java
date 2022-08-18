@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.builders.entities;
+package builders;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +14,7 @@ import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.types.ArtifactType;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

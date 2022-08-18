@@ -2,7 +2,8 @@ package features.artifacts.base;
 
 import java.util.UUID;
 
-import edu.nd.crc.safa.builders.CommitBuilder;
+import builders.CommitBuilder;
+
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.common.IAppEntityService;
 import edu.nd.crc.safa.features.notifications.entities.Change;

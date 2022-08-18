@@ -3,9 +3,10 @@ package features.rules.logic;
 import java.util.List;
 import java.util.Map;
 
-import edu.nd.crc.safa.builders.entities.DbEntityBuilder;
+import builders.DbEntityBuilder;
+
 import edu.nd.crc.safa.features.rules.entities.app.RuleAppEntity;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.features.rules.parser.RuleName;
 
 /**

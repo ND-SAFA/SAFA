@@ -1,14 +1,13 @@
-package edu.nd.crc.safa.builders.requests;
+package requests;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.File;
 import java.util.List;
 
-import edu.nd.crc.safa.builders.MultipartRequestService;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.config.ProjectVariables;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import org.json.JSONObject;
 import org.springframework.mock.web.MockMultipartFile;

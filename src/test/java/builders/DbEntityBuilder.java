@@ -1,13 +1,11 @@
-package edu.nd.crc.safa.builders.entities;
+package builders;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.PostConstruct;
 
-import edu.nd.crc.safa.builders.BaseBuilder;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.entities.FTAType;
 import edu.nd.crc.safa.features.artifacts.entities.SafetyCaseType;
@@ -17,6 +15,7 @@ import edu.nd.crc.safa.features.artifacts.repositories.ArtifactRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepositoryImpl;
+import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentArtifact;
@@ -37,7 +36,7 @@ import edu.nd.crc.safa.features.traces.repositories.TraceLinkVersionRepository;
 import edu.nd.crc.safa.features.types.ArtifactType;
 import edu.nd.crc.safa.features.users.entities.db.ProjectRole;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.features.versions.repositories.ProjectVersionRepository;
 
 import org.junit.jupiter.api.AfterEach;
@@ -48,7 +47,7 @@ import org.springframework.stereotype.Component;
  * Provides an API for quickly creating persistent entities in a project.
  */
 @Component
-public class DbEntityBuilder extends BaseBuilder {
+public class DbEntityBuilder extends AbstractBuilder {
 
     static final int MAJOR_VERSION = 1;
     static final int MINOR_VERSION = 1;
@@ -75,39 +74,24 @@ public class DbEntityBuilder extends BaseBuilder {
     SafaUser currentUser;
 
     @Autowired
-    public DbEntityBuilder(ProjectRepository projectRepository,
-                           ProjectMembershipRepository projectMembershipRepository,
-                           ProjectVersionRepository projectVersionRepository,
-                           DocumentRepository documentRepository,
-                           DocumentArtifactRepository documentArtifactRepository,
-                           ArtifactTypeRepository artifactTypeRepository,
-                           ArtifactRepository artifactRepository,
-                           ArtifactVersionRepository artifactVersionRepository,
-                           TraceLinkRepository traceLinkRepository,
-                           TraceLinkVersionRepository traceLinkVersionRepository,
-                           ArtifactVersionRepositoryImpl artifactVersionRepositoryImpl,
-                           ProjectService projectService) {
-        this.projectRepository = projectRepository;
-        this.projectVersionRepository = projectVersionRepository;
-        this.documentRepository = documentRepository;
-        this.documentArtifactRepository = documentArtifactRepository;
-        this.artifactTypeRepository = artifactTypeRepository;
-        this.artifactRepository = artifactRepository;
-        this.artifactVersionRepository = artifactVersionRepository;
-        this.traceLinkRepository = traceLinkRepository;
-        this.traceLinkVersionRepository = traceLinkVersionRepository;
-        this.projectMembershipRepository = projectMembershipRepository;
-        this.artifactVersionRepositoryImpl = artifactVersionRepositoryImpl;
-        this.projectService = projectService;
+    public DbEntityBuilder(ServiceProvider serviceProvider) {
+        this.projectRepository = serviceProvider.getProjectRepository();
+        this.projectService = serviceProvider.getProjectService();
+        this.projectVersionRepository = serviceProvider.getProjectVersionRepository();
+        this.documentRepository = serviceProvider.getDocumentRepository();
+        this.documentArtifactRepository = serviceProvider.getDocumentArtifactRepository();
+        this.artifactTypeRepository = serviceProvider.getArtifactTypeRepository();
+        this.artifactRepository = serviceProvider.getArtifactRepository();
+        this.artifactVersionRepository = serviceProvider.getArtifactVersionRepository();
+        this.traceLinkRepository = serviceProvider.getTraceLinkRepository();
+        this.traceLinkVersionRepository = serviceProvider.getTraceLinkVersionRepository();
+        this.projectMembershipRepository = serviceProvider.getProjectMembershipRepository();
+        this.artifactVersionRepositoryImpl = serviceProvider.getArtifactVersionRepositoryImpl();
+        DbEntityBuilder.instance = this;
     }
 
     public static DbEntityBuilder getInstance() {
         return DbEntityBuilder.instance;
-    }
-
-    @PostConstruct
-    public void setInstance() {
-        DbEntityBuilder.instance = this;
     }
 
     public void createEmptyData() throws IOException {

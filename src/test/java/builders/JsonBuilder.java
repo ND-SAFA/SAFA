@@ -1,12 +1,10 @@
-package edu.nd.crc.safa.builders;
+package builders;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-import edu.nd.crc.safa.features.artifacts.entities.FTAType;
-import edu.nd.crc.safa.features.artifacts.entities.SafetyCaseType;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentColumnDataType;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
@@ -21,7 +19,7 @@ import org.springframework.stereotype.Component;
  * Provides an API for creating JSON types of application entities.
  */
 @Component
-public class JsonBuilder extends BaseBuilder {
+public class JsonBuilder extends AbstractBuilder {
     Map<String, JSONObject> projects;
     Map<String, JSONObject> projectVersions;
 
@@ -109,48 +107,6 @@ public class JsonBuilder extends BaseBuilder {
         artifact.put(Constants.DOCUMENT_TYPE, DocumentType.ARTIFACT_TREE.toString());
         artifact.put("customFields", customFields);
         project.getJSONArray(Constants.ARTIFACTS).put(artifact);
-        return this;
-    }
-
-    public JsonBuilder withSafetyCaseArtifact(String projectName,
-                                              String artifactName,
-                                              String artifactType,
-                                              String body,
-                                              SafetyCaseType safetyCaseType
-    ) {
-
-        this.withArtifact(projectName, "", artifactName, artifactType, body);
-        JSONObject artifact = this.getArtifact(projectName, artifactName);
-        artifact.put("safetyCaseType", safetyCaseType.toString());
-        artifact.put(Constants.DOCUMENT_TYPE, DocumentType.SAFETY_CASE.toString());
-        return this;
-    }
-
-    public JsonBuilder withFTAArtifact(String projectName,
-                                       String artifactName,
-                                       String artifactType,
-                                       String body,
-                                       FTAType ftaType
-    ) {
-
-        this.withArtifact(projectName, "", artifactName, artifactType, body);
-        JSONObject artifact = this.getArtifact(projectName, artifactName);
-        artifact.put("logicType", ftaType.toString());
-        artifact.put(Constants.DOCUMENT_TYPE, DocumentType.FTA.toString());
-        return this;
-    }
-
-    public JsonBuilder withFMEAArtifact(String projectName,
-                                        String artifactName,
-                                        String artifactType,
-                                        String body,
-                                        JSONObject customFields
-    ) {
-
-        this.withArtifact(projectName, "", artifactName, artifactType, body);
-        JSONObject artifact = this.getArtifact(projectName, artifactName);
-        artifact.put("customFields", customFields);
-        artifact.put(Constants.DOCUMENT_TYPE, DocumentType.FMEA.toString());
         return this;
     }
 

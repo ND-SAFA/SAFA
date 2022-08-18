@@ -7,7 +7,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import edu.nd.crc.safa.builders.MultipartRequestService;
+import requests.MultipartRequestService;
+
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.features.flatfiles.parser.FlatFileParser;

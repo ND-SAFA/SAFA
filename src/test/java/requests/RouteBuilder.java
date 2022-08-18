@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.builders;
+package requests;
 
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
@@ -10,7 +10,7 @@ import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.types.ArtifactType;
 import edu.nd.crc.safa.features.types.TypeAppEntity;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 /**
  * Given a route template, allows the users to specify the needed parameters and validates the final path.

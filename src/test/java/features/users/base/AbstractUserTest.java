@@ -1,6 +1,6 @@
 package features.users.base;
 
-import edu.nd.crc.safa.builders.requests.SafaRequest;
+import requests.SafaRequest;
 
 import features.base.ApplicationBaseTest;
 import org.junit.jupiter.api.BeforeEach;

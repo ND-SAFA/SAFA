@@ -1,18 +1,20 @@
 package features.base;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import javax.annotation.PostConstruct;
 
-import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
-import org.junit.jupiter.api.AfterEach;
+import builders.DbEntityBuilder;
+import builders.JsonBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.core.task.SyncTaskExecutor;
+import requests.SafaRequest;
 import services.AssertionTestService;
 import services.AuthorizationTestService;
 import services.CommitTestService;
@@ -46,31 +48,40 @@ public abstract class ApplicationBaseTest extends EntityBaseTest {
     protected AuthorizationTestService authorizationTestService;
     protected MessageVerificationTestService messageVerificationTestService = new MessageVerificationTestService();
 
+    /**
+     * Builders
+     */
+    protected DbEntityBuilder dbEntityBuilder;
+    protected JsonBuilder jsonBuilder;
+
     @PostConstruct
     public void init() throws Exception {
+        initBuilders();
         initTestServices();
         initJobLauncher();
         setLegacyModeInH2Database();
     }
 
     @BeforeEach
-    public void createAuthenticationData() throws Exception {
-        token = null;
-        this.safaUserRepository.deleteAll();
-        SafaRequest.setMockMvc(mockMvc);
-        this.authorizationTestService.defaultLogin();
-        this.dbEntityBuilder.setCurrentUser(currentUser);
+    public void testSetup() throws Exception {
+        clearData();
+        setAuthorization();
     }
 
-    @AfterEach
-    public void clearAuthentication() {
-        SafaRequest.clearAuthorizationToken();
+    /**
+     * Creates database and json builders with current service provider.
+     */
+    private void initBuilders() {
+        assert this.serviceProvider != null;
+        this.dbEntityBuilder = new DbEntityBuilder(serviceProvider);
+        this.jsonBuilder = new JsonBuilder();
     }
 
     /**
      * Initializes test services with service provider and database entity builder.
      */
-    public void initTestServices() {
+    private void initTestServices() {
+        assert this.dbEntityBuilder != null;
         notificationTestService = new NotificationTestService(port);
         creationTestService = new CreationTestService(this.serviceProvider, this.dbEntityBuilder);
         retrievalTestService = new RetrievalTestService(this.serviceProvider, this.dbEntityBuilder);
@@ -82,7 +93,7 @@ public abstract class ApplicationBaseTest extends EntityBaseTest {
      *
      * @throws Exception If error encountered during afterPropertiesSet.
      */
-    public void initJobLauncher() throws Exception {
+    private void initJobLauncher() throws Exception {
         SimpleJobLauncher jobLauncher = new SimpleJobLauncher();
         jobLauncher.setJobRepository(jobRepository);
         jobLauncher.setTaskExecutor(new SyncTaskExecutor());
@@ -97,12 +108,36 @@ public abstract class ApplicationBaseTest extends EntityBaseTest {
      *
      * @throws SQLException Throws exception if unable to set legacy mode.
      */
-    public void setLegacyModeInH2Database() throws SQLException {
+    private void setLegacyModeInH2Database() throws SQLException {
         String query = "SET MODE LEGACY;\n";
         Connection connection = this.dataSource.getConnection();
         try (Statement statement = connection.createStatement()) {
             statement.execute(query);
         }
         connection.close();
+    }
+
+    /**
+     * Clears data in database.
+     *
+     * @throws IOException If error occurs while deleting data.
+     */
+    private void clearData() throws IOException {
+        this.safaUserRepository.deleteAll();
+        this.dbEntityBuilder.createEmptyData();
+        this.jsonBuilder.createEmptyData();
+    }
+
+    /**
+     * Creates new user and logs in, setting global test token.
+     *
+     * @throws Exception If error occurs while logging in.
+     */
+    private void setAuthorization() throws Exception {
+        SafaRequest.setMockMvc(mockMvc);
+        SafaRequest.clearAuthorizationToken();
+        token = null;
+        this.authorizationTestService.defaultLogin();
+        this.dbEntityBuilder.setCurrentUser(currentUser);
     }
 }

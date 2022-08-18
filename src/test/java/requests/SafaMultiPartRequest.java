@@ -1,8 +1,6 @@
-package edu.nd.crc.safa.builders.requests;
+package requests;
 
 import java.util.List;
-
-import edu.nd.crc.safa.builders.ResponseParser;
 
 import org.json.JSONObject;
 import org.springframework.mock.web.MockMultipartFile;

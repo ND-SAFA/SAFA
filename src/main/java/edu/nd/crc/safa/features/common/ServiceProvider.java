@@ -3,6 +3,7 @@ package edu.nd.crc.safa.features.common;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
+import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepositoryImpl;
 import edu.nd.crc.safa.features.artifacts.services.ArtifactService;
 import edu.nd.crc.safa.features.commits.services.CommitService;
 import edu.nd.crc.safa.features.delta.services.DeltaService;
@@ -32,6 +33,7 @@ import edu.nd.crc.safa.features.rules.repositories.RuleRepository;
 import edu.nd.crc.safa.features.rules.services.RuleService;
 import edu.nd.crc.safa.features.rules.services.WarningService;
 import edu.nd.crc.safa.features.tgen.generator.TraceGenerationService;
+import edu.nd.crc.safa.features.traces.repositories.TraceLinkRepository;
 import edu.nd.crc.safa.features.traces.repositories.TraceLinkVersionRepository;
 import edu.nd.crc.safa.features.traces.repositories.TraceMatrixRepository;
 import edu.nd.crc.safa.features.traces.services.TraceService;
@@ -79,10 +81,12 @@ public class ServiceProvider {
     private final ArtifactPositionRepository artifactPositionRepository;
     private final ArtifactVersionRepository artifactVersionRepository;
     private final ArtifactService artifactService;
+    private final ArtifactVersionRepositoryImpl artifactVersionRepositoryImpl;
     //Traces
     private final TraceLinkVersionRepository traceLinkVersionRepository;
     private final TraceService traceService;
     private final TraceGenerationService traceGenerationService;
+    private final TraceLinkRepository traceLinkRepository;
     // Matrix
     private final TraceMatrixRepository traceMatrixRepository;
     // Changes

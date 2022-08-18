@@ -3,10 +3,10 @@ package services;
 import java.io.IOException;
 import java.util.List;
 
-import edu.nd.crc.safa.builders.MultipartRequestService;
-import edu.nd.crc.safa.builders.entities.DbEntityBuilder;
-import edu.nd.crc.safa.builders.requests.FlatFileRequest;
-import edu.nd.crc.safa.builders.requests.SafaRequest;
+import requests.MultipartRequestService;
+import requests.FlatFileRequest;
+import requests.SafaRequest;
+
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.features.common.ServiceProvider;
@@ -15,8 +15,9 @@ import edu.nd.crc.safa.features.memberships.entities.api.ProjectMembershipReques
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.ProjectRole;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
+import builders.DbEntityBuilder;
 import lombok.AllArgsConstructor;
 import org.javatuples.Pair;
 import org.json.JSONArray;

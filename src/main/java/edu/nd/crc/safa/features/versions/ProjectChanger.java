@@ -4,7 +4,6 @@ import java.util.List;
 
 import edu.nd.crc.safa.common.ProjectEntities;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.common.ServiceProvider;
@@ -13,7 +12,7 @@ import edu.nd.crc.safa.features.layout.entities.app.LayoutManager;
 import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.TraceLinkVersion;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import lombok.AllArgsConstructor;
 import org.javatuples.Pair;
@@ -64,13 +63,6 @@ public class ProjectChanger {
             .commitAllAppEntitiesToProjectVersion(projectVersion, traces, true);
         saveCommitErrors(artifactResponse, ProjectEntity.ARTIFACTS);
         saveCommitErrors(traceResponse, ProjectEntity.TRACES);
-
-        Iterable<Artifact> allArtifacts = this.serviceProvider.getArtifactRepository().findAll();
-        List<Artifact> projectArtifacts =
-            this.serviceProvider.getArtifactRepository().findByProject(projectVersion.getProject());
-        Iterable<ArtifactVersion> allVersions = this.serviceProvider.getArtifactVersionRepository().findAll();
-        List<ArtifactVersion> projectArtifactVersions =
-            this.serviceProvider.getArtifactVersionRepository().findByProjectVersion(projectVersion);
 
         LayoutManager layoutManager = new LayoutManager(serviceProvider, projectVersion);
         layoutManager.generateLayoutForProject();

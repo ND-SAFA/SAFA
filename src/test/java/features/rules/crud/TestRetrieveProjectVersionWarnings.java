@@ -2,12 +2,13 @@ package features.rules.crud;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import edu.nd.crc.safa.builders.CommitBuilder;
-import edu.nd.crc.safa.builders.requests.SafaRequest;
+import builders.CommitBuilder;
+import requests.SafaRequest;
+
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.notifications.entities.Change;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import features.base.ApplicationBaseTest;
 import org.json.JSONArray;

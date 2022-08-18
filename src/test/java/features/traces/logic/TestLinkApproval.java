@@ -6,10 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import edu.nd.crc.safa.builders.CommitBuilder;
-import edu.nd.crc.safa.builders.RouteBuilder;
-import edu.nd.crc.safa.builders.requests.FlatFileRequest;
-import edu.nd.crc.safa.builders.requests.SafaRequest;
+import builders.CommitBuilder;
+import requests.RouteBuilder;
+import requests.FlatFileRequest;
+import requests.SafaRequest;
+
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
@@ -18,7 +19,7 @@ import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.traces.entities.db.TraceLinkVersion;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import features.traces.base.AbstractTraceTest;
 import org.json.JSONArray;

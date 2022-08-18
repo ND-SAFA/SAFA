@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.builders.requests;
+package requests;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -7,8 +7,6 @@ import java.io.File;
 import java.util.List;
 import java.util.function.Function;
 
-import edu.nd.crc.safa.builders.ResponseParser;
-import edu.nd.crc.safa.builders.RouteBuilder;
 import edu.nd.crc.safa.utilities.JsonFileUtilities;
 
 import org.json.JSONArray;

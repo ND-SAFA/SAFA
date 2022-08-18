@@ -2,7 +2,8 @@ package features.flatfiles.base;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import edu.nd.crc.safa.builders.requests.SafaRequest;
+import requests.SafaRequest;
+
 import edu.nd.crc.safa.config.ProjectPaths;
 
 import features.base.ApplicationBaseTest;

@@ -9,7 +9,7 @@ import edu.nd.crc.safa.features.documents.entities.app.DocumentColumnDataType;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentColumn;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.documents.repositories.DocumentColumnRepository;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import features.documents.base.AbstractDocumentTest;
 import org.json.JSONArray;

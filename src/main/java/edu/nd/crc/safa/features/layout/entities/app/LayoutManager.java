@@ -15,7 +15,7 @@ import edu.nd.crc.safa.features.layout.entities.db.ArtifactPosition;
 import edu.nd.crc.safa.features.layout.generator.KlayLayoutGenerator;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 /**
  * Responsible for managing common layout on a project

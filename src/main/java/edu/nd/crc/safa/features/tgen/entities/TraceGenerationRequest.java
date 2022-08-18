@@ -1,33 +1,16 @@
 package edu.nd.crc.safa.features.tgen.entities;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 /**
  * Represents a request to generate links between two artifact types;
  */
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
 public class TraceGenerationRequest {
     String source;
     String target;
-
-    public TraceGenerationRequest() {
-    }
-
-    public TraceGenerationRequest(String source, String target) {
-        this.source = source;
-        this.target = target;
-    }
-
-    public String getSource() {
-        return source;
-    }
-
-    public void setSource(String source) {
-        this.source = source;
-    }
-
-    public String getTarget() {
-        return target;
-    }
-
-    public void setTarget(String target) {
-        this.target = target;
-    }
 }

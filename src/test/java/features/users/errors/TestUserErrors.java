@@ -2,7 +2,8 @@ package features.users.errors;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import edu.nd.crc.safa.builders.requests.SafaRequest;
+import requests.SafaRequest;
+
 import edu.nd.crc.safa.config.AppRoutes;
 
 import features.users.base.AbstractUserTest;

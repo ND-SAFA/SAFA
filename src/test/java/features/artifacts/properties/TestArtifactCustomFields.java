@@ -5,12 +5,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Map;
 
-import edu.nd.crc.safa.builders.CommitBuilder;
+import builders.CommitBuilder;
+
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
 import edu.nd.crc.safa.features.delta.entities.app.EntityDelta;
 import edu.nd.crc.safa.features.delta.entities.app.ModifiedEntity;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import features.base.ApplicationBaseTest;
 import org.json.JSONArray;

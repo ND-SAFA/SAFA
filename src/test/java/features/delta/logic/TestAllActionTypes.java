@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import edu.nd.crc.safa.features.delta.entities.app.ProjectDelta;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.delta.services.DeltaService;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import features.base.ApplicationBaseTest;
 import org.junit.jupiter.api.Test;

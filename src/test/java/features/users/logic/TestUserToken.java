@@ -3,7 +3,7 @@ package features.users.logic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import edu.nd.crc.safa.builders.requests.SafaRequest;
+import requests.SafaRequest;
 
 import features.users.base.AbstractUserTest;
 import org.junit.jupiter.api.Test;

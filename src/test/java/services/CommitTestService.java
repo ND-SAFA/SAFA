@@ -2,11 +2,12 @@ package services;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import edu.nd.crc.safa.builders.CommitBuilder;
-import edu.nd.crc.safa.builders.requests.SafaRequest;
-import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import requests.SafaRequest;
 
+import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
+
+import builders.CommitBuilder;
 import org.json.JSONObject;
 import org.springframework.test.web.servlet.ResultMatcher;
 

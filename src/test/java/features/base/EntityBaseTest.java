@@ -1,9 +1,5 @@
 package features.base;
 
-import java.io.IOException;
-
-import edu.nd.crc.safa.builders.JsonBuilder;
-import edu.nd.crc.safa.builders.entities.DbEntityBuilder;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
@@ -26,7 +22,6 @@ import edu.nd.crc.safa.features.users.services.SafaUserService;
 import edu.nd.crc.safa.features.versions.repositories.ProjectVersionRepository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -83,12 +78,6 @@ public abstract class EntityBaseTest extends SpringBootBaseTest {
     protected AccountLookupService accountLookupService;
 
     @Autowired
-    protected DbEntityBuilder dbEntityBuilder;
-
-    @Autowired
-    protected JsonBuilder jsonBuilder;
-
-    @Autowired
     protected SafetyCaseArtifactRepository safetyCaseArtifactRepository;
 
     @Autowired
@@ -101,10 +90,4 @@ public abstract class EntityBaseTest extends SpringBootBaseTest {
     protected ServiceProvider serviceProvider;
 
     ObjectMapper objectMapper = new ObjectMapper();
-
-    @BeforeEach
-    public void createNewBuilders() throws IOException {
-        dbEntityBuilder.createEmptyData();
-        jsonBuilder.createEmptyData();
-    }
 }

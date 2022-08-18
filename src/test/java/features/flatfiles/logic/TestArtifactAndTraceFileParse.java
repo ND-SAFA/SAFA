@@ -2,7 +2,8 @@ package features.flatfiles.logic;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import edu.nd.crc.safa.builders.RouteBuilder;
+import requests.RouteBuilder;
+
 import edu.nd.crc.safa.config.AppRoutes;
 
 import features.base.DefaultProjectConstants;

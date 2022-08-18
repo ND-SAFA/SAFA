@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.server.accounts;
+package edu.nd.crc.safa.features.users.entities.app;
 
 import java.util.Date;
 import java.util.UUID;
@@ -9,6 +9,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

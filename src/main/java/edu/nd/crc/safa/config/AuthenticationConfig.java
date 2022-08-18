@@ -70,8 +70,8 @@ public class AuthenticationConfig extends WebSecurityConfigurerAdapter {
             .antMatchers(
                 AppRoutes.Accounts.LOGIN,
                 AppRoutes.Accounts.CREATE_ACCOUNT,
-                AppRoutes.Accounts.forgotPassword,
-                AppRoutes.Accounts.resetPassword,
+                AppRoutes.Accounts.FORGOT_PASSWORD,
+                AppRoutes.Accounts.RESET_PASSWORD,
                 "/websocket/**").permitAll()
             // API Generation
             .antMatchers(

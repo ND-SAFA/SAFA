@@ -16,11 +16,11 @@ public class AppRoutes {
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Accounts {
-        public static final String changePassword = accountPrefix + "/change";
-        public static final String resetPassword = accountPrefix + "/reset";
-        public static final String forgotPassword = accountPrefix + "/forgot";
         public static final String LOGIN = "/login";
         protected static final String PREFIX = "/accounts";
+        public static final String CHANGE_PASSWORD = Accounts.PREFIX + "/change";
+        public static final String RESET_PASSWORD = Accounts.PREFIX + "/reset";
+        public static final String FORGOT_PASSWORD = Accounts.PREFIX + "/forgot";
         public static final String CREATE_ACCOUNT = Accounts.PREFIX + "/create";
         public static final String DELETE_ACCOUNT = Accounts.PREFIX + "/delete";
     }

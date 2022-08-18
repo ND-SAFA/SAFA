@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.server.accounts;
+package edu.nd.crc.safa.features.users.entities.app;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;

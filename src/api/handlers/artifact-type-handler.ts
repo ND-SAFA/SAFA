@@ -1,6 +1,6 @@
-import { ArtifactTypeModel } from "@/types";
+import { ArtifactTypeModel, LabelledTraceDirectionModel } from "@/types";
 import { saveArtifactType } from "@/api/endpoints/artifact-type-api";
-import { projectModule } from "@/store";
+import { projectModule, typeOptionsModule } from "@/store";
 
 /**
  * Creates or updates the given artifact type.
@@ -16,4 +16,22 @@ export async function handleSaveArtifactType(
   );
 
   projectModule.addOrUpdateArtifactType(updatedArtifactType);
+}
+
+/**
+ * Updates the icon for an artifact type.
+ *
+ * @param labeledType - The artifact type to add or edit.
+ */
+export async function handleSaveArtifactTypeIcon(
+  labeledType: LabelledTraceDirectionModel
+): Promise<void> {
+  const type = projectModule.getProject.artifactTypes.find(
+    ({ name }) => name === labeledType.type
+  );
+
+  if (!type) return;
+
+  typeOptionsModule.updateArtifactIcon(labeledType);
+  await handleSaveArtifactType({ ...type, icon: labeledType.icon });
 }

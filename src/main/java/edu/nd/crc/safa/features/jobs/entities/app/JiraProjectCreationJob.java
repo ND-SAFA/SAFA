@@ -3,6 +3,7 @@ package edu.nd.crc.safa.features.jobs.entities.app;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Objects;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
@@ -33,6 +34,9 @@ import lombok.Setter;
  * 4. Returning project created
  */
 public class JiraProjectCreationJob extends ProjectCreationJob {
+
+    private static final String EMPTY_STRING = "";
+
     /**
      * The project version to upload entities to.
      */
@@ -166,6 +170,14 @@ public class JiraProjectCreationJob extends ProjectCreationJob {
      */
     private String getIssueDescription(JiraIssueDTO issue) {
         StringBuilder contentString = new StringBuilder();
+
+        if (Objects.isNull(issue.getFields())) {
+            return EMPTY_STRING;
+        }
+        if (Objects.isNull(issue.getFields().getDescription())) {
+            return EMPTY_STRING;
+        }
+
         for (JiraIssueDTO.JiraIssueFields.JiraDescription.Content content :
             issue.getFields().getDescription().getContent()) {
             for (JiraIssueDTO.JiraIssueFields.JiraDescription.ContentContent contentContent :
@@ -173,6 +185,7 @@ public class JiraProjectCreationJob extends ProjectCreationJob {
                 contentString.append(contentContent.getText());
             }
         }
+
         return contentString.toString().strip();
     }
 }

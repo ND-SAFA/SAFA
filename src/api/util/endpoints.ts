@@ -78,8 +78,8 @@ export enum Endpoint {
   parseTraceFile = "projects/parse/traces",
 
   // Trace Matrices
-  createTraceMatrix = "projects/:projectId/matrices/:sourceArtifactTypeName/:targetArtifactTypeName",
-  deleteTraceMatrix = "projects/matrices/:traceMatrixId",
+  createTraceMatrix = "projects/:projectId/matrices/:sourceType/:targetType",
+  deleteTraceMatrix = "projects/:projectId/matrices/:sourceType/:targetType",
   retrieveTraceMatrices = "projects/:projectId/matrices",
 
   // Warnings

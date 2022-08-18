@@ -70,7 +70,7 @@ export default Vue.extend({
         .filter(({ sourceName }) => sourceName === this.selectedArtifact?.name)
         .map(({ targetName, targetId }) => ({
           title: targetName,
-          subtitle: artifactModule.getArtifactById(targetId).type,
+          subtitle: artifactModule.getArtifactById(targetId)?.type,
         }));
     },
     /**
@@ -83,7 +83,7 @@ export default Vue.extend({
         .filter(({ targetName }) => targetName === this.selectedArtifact?.name)
         .map(({ sourceName, sourceId }) => ({
           title: sourceName,
-          subtitle: artifactModule.getArtifactById(sourceId).type,
+          subtitle: artifactModule.getArtifactById(sourceId)?.type,
         }));
     },
     /**
@@ -118,6 +118,8 @@ export default Vue.extend({
      */
     handleArtifactClick(artifactName: string): void {
       const artifact = artifactModule.getArtifactByName(artifactName);
+
+      if (!artifact) return;
 
       artifactSelectionModule.selectArtifact(artifact.id);
     },

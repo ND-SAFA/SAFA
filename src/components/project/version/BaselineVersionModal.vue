@@ -4,6 +4,7 @@
     :title="title"
     :isOpen="isOpen"
     :startStep="startStep"
+    :data-cy="dataCy"
     v-bind:isLoading.sync="isLoading"
     v-bind:project.sync="selectedProject"
     v-bind:version.sync="selectedVersion"
@@ -30,6 +31,7 @@ export default Vue.extend({
     ProjectVersionStepperModal,
   },
   props: {
+    dataCy: String,
     /**
      * Whether the current component should be in open.
      */

@@ -6,13 +6,7 @@ import {
   DocumentModel,
 } from "@/types";
 import { createDocument } from "@/util";
-import {
-  artifactModule,
-  documentModule,
-  logModule,
-  projectModule,
-  subtreeModule,
-} from "@/store";
+import { documentModule, logModule, projectModule } from "@/store";
 import {
   saveDocument,
   deleteDocument,
@@ -95,14 +89,14 @@ export function handleDeleteDocument(
 /**
  * Updates the artifact for the all documents.
  *
- * @param projectId - The project to load documents for.
+ * @param versionId - The project version to load documents for.
  * @param artifacts - The full list of artifacts.
  */
 export async function handleDocumentReload(
-  projectId = projectModule.projectId,
+  versionId = projectModule.versionId,
   artifacts: ArtifactModel[] = projectModule.getProject.artifacts
 ): Promise<void> {
-  const documents = await getDocuments(projectId);
+  const documents = await getDocuments(versionId);
 
   await documentModule.updateDocuments(documents);
 
@@ -114,35 +108,15 @@ export async function handleDocumentReload(
  *
  * @param document - The document to save.
  * @param isUpdate - Set to true if the document already exists.
- * @param includedChildTypes - The types of child artifacts to include for
- * all parent artifacts attached to this document.
  * @param onSuccess - Called if the operation is successful.
  * @param onError - Called if the operation fails.
  */
 export function handleSaveDocument(
   document: DocumentModel,
   isUpdate: boolean,
-  includedChildTypes: string[],
   { onSuccess, onError }: IOHandlerCallback
 ): void {
   const { name, type, artifactIds } = document;
-
-  if (includedChildTypes.length > 0) {
-    // Add all child artifacts of the artifacts in the document that match the given types.
-    const childArtifactIds = new Set<string>();
-
-    document.artifactIds.forEach((parentId) => {
-      subtreeModule.getSubtreeMap[parentId].forEach((childId) => {
-        const artifact = artifactModule.getArtifactById(childId);
-
-        if (!includedChildTypes.includes(artifact.type)) return;
-
-        childArtifactIds.add(childId);
-      });
-    });
-
-    document.artifactIds.push(...Array.from(childArtifactIds));
-  }
 
   if (isUpdate) {
     handleUpdateDocument(document)

@@ -1,14 +1,15 @@
 import { Module, VuexModule, Action, Mutation } from "vuex-module-decorators";
-import type { CytoCore, LayoutPayload, IGraphLayout } from "@/types";
+import type { LayoutPayload, IGraphLayout } from "@/types";
+import { getRootNode } from "@/util";
 import {
   appModule,
   artifactModule,
   artifactSelectionModule,
   subtreeModule,
+  traceModule,
 } from "@/store";
 import {
   artifactTreeCyPromise,
-  getRootNode,
   isInSubtree,
   doesNotContainType,
   ArtifactGraphLayout,
@@ -113,16 +114,12 @@ export default class ViewportModule extends VuexModule {
   @Action
   /**
    * Moves the viewport such that top most parent is centered at default zoom.
-   * @param cyPromise - A promise returning a cytoscape instance whose root
-   * node is calculated relative to.
    */
-  centerOnRootNode(cyPromise: Promise<CytoCore> = artifactTreeCyPromise): void {
-    cyPromise.then((cy) => {
-      getRootNode(cy).then((rootNode) => {
-        if (!rootNode) return;
+  centerOnRootNode(): void {
+    getRootNode(artifactModule.artifacts, traceModule.traces).then((rootId) => {
+      if (!rootId) return;
 
-        this.centerOnArtifacts([rootNode.data()?.id]);
-      });
+      this.centerOnArtifacts([rootId]);
     });
   }
 

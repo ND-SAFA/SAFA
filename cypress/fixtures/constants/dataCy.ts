@@ -3,6 +3,7 @@
  */
 export enum DataCy {
   // General
+
   stepperContinueButton = "generic-stepper-continue",
 
   // Authentication
@@ -13,6 +14,7 @@ export enum DataCy {
   loginButton = "button-login",
 
   // Project Creation
+
   creationUploadButton = "button-create-project",
 
   creationBulkNameInput = "input-project-name-bulk",
@@ -35,4 +37,12 @@ export enum DataCy {
   jobStatus = "job-status",
   jobPanel = "job-panel",
   jobDeleteButton = "button-delete-job",
+
+  // Project Selection
+
+  selectionModal = "modal-project-select",
+  selectionProjectList = "table-project",
+  selectionSearch = "input-selector-search",
+  selectionReload = "button-selector-reload",
+  selectionClose = "button-close",
 }

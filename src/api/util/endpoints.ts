@@ -61,7 +61,7 @@ export enum Endpoint {
 
   // Documents
   createOrUpdateDocument = "projects/versions/:versionId/documents",
-  getProjectDocuments = "projects/:projectId/documents",
+  getProjectDocuments = "projects/versions/:versionId/documents",
   deleteDocument = "projects/documents/:documentId",
 
   // Document Artifacts

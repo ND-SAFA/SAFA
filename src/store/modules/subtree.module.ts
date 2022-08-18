@@ -4,15 +4,15 @@ import type {
   SubtreeMap,
   ProjectModel,
   ArtifactModel,
+  TraceLinkModel,
 } from "@/types";
-import { artifactModule, traceModule } from "@/store";
 import {
-  artifactTreeCyPromise,
+  getMatchingChildren,
+  createPhantomLinks,
   createSubtreeMap,
-  cyDisplayAll,
-  cySetDisplay,
-} from "@/cytoscape";
-import { InternalTraceType } from "@/types";
+} from "@/util";
+import { artifactModule, traceModule } from "@/store";
+import { cyDisplayAll, cySetDisplay } from "@/cytoscape";
 
 @Module({ namespaced: true, name: "subtree" })
 /**
@@ -46,13 +46,12 @@ export default class SubtreeModule extends VuexModule {
    * @param artifacts - The artifacts to create the subtree for.
    */
   async updateSubtreeMap(
-    artifacts: ArtifactModel[] = artifactModule.allArtifacts
+    artifacts: ArtifactModel[] = artifactModule.allArtifacts,
+    traces: TraceLinkModel[] = traceModule.allTraces
   ): Promise<void> {
-    artifactTreeCyPromise.then(async (cy) => {
-      const subtreeMap = await createSubtreeMap(cy, artifacts);
+    const subtreeMap = await createSubtreeMap(artifacts, traces);
 
-      this.SET_SUBTREE_MAP(subtreeMap);
-    });
+    this.SET_SUBTREE_MAP(subtreeMap);
   }
 
   @Action
@@ -97,7 +96,7 @@ export default class SubtreeModule extends VuexModule {
    * Updates the subtree map, and hides all subtrees greater than the set threshold.
    */
   async initializeProject(project: ProjectModel): Promise<void> {
-    await this.updateSubtreeMap(project.artifacts);
+    await this.updateSubtreeMap(project.artifacts, project.traces);
   }
 
   @Action
@@ -231,7 +230,6 @@ export default class SubtreeModule extends VuexModule {
   }
 
   /**
-   * TODO: this is very inefficient.
    * @returns a constructor for creating phantom links from artifacts.
    */
   get createSubtreeLinks(): (
@@ -244,36 +242,13 @@ export default class SubtreeModule extends VuexModule {
       const subtreeLinkIds = this.subtreeLinks.map(
         ({ traceLinkId }) => traceLinkId
       );
-
-      const subtreeLinkCreator: (isIncoming: boolean) => SubtreeLinkModel[] = (
-        isIncoming: boolean
-      ) => {
-        return traces
-          .filter((link) => {
-            const value = isIncoming ? link.targetId : link.sourceId;
-            const oppoValue = isIncoming ? link.sourceId : link.targetId;
-            const doesNotExist = !subtreeLinkIds.includes(
-              `${link.traceLinkId}-phantom`
-            );
-            return (
-              doesNotExist &&
-              value === childId &&
-              !nodesInSubtree.includes(oppoValue)
-            );
-          })
-          .map((link) => {
-            const base: SubtreeLinkModel = {
-              ...link,
-              traceLinkId: `${link.traceLinkId}-phantom`,
-              type: InternalTraceType.SUBTREE,
-              rootNode: rootId,
-            };
-
-            return isIncoming
-              ? { ...base, target: rootId }
-              : { ...base, source: rootId };
-          });
-      };
+      const subtreeLinkCreator = createPhantomLinks(
+        traces,
+        subtreeLinkIds,
+        nodesInSubtree,
+        rootId,
+        childId
+      );
 
       const incomingPhantom = subtreeLinkCreator(true);
       const outgoingPhantom = subtreeLinkCreator(false);
@@ -292,6 +267,22 @@ export default class SubtreeModule extends VuexModule {
 
       return childNodes.filter((id) => hiddenNodes.includes(id));
     };
+  }
+
+  /**
+   * @return The ids of all children under the given parent ids.
+   */
+  get getMatchingChildren(): (
+    parentIds: string[],
+    includedChildTypes: string[]
+  ) => string[] {
+    return (parentIds, includedChildTypes) =>
+      getMatchingChildren(
+        parentIds,
+        includedChildTypes,
+        this.getSubtreeByArtifactId,
+        artifactModule.getArtifactById
+      );
   }
 
   /**

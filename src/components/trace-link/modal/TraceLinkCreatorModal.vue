@@ -92,25 +92,25 @@ export default Vue.extend({
     /**
      * @return The source artifact.
      */
-    sourceArtifact(): ArtifactModel {
+    sourceArtifact(): ArtifactModel | undefined {
       return artifactModule.getArtifactById(this.sourceArtifactId);
     },
     /**
      * @return The source artifact.
      */
-    targetArtifact(): ArtifactModel {
+    targetArtifact(): ArtifactModel | undefined {
       return artifactModule.getArtifactById(this.targetArtifactId);
     },
     /**
      * @return Any errors in trying to create this link.
      */
     errorMessage(): string {
-      if (!this.sourceArtifactId || !this.targetArtifactId) return "";
+      const source = this.sourceArtifact;
+      const target = this.targetArtifact;
 
-      const isLinkAllowed = traceModule.isLinkAllowed(
-        this.sourceArtifact,
-        this.targetArtifact
-      );
+      if (!source || !target) return "";
+
+      const isLinkAllowed = traceModule.isLinkAllowed(source, target);
 
       return isLinkAllowed === true
         ? ""
@@ -138,10 +138,12 @@ export default Vue.extend({
      * Creates a trace link from the given artifacts.
      */
     async handleSubmit(): Promise<void> {
-      if (!this.sourceArtifactId || !this.targetArtifactId) return;
+      const source = this.sourceArtifact;
+      const target = this.targetArtifact;
 
-      await handleCreateLink(this.sourceArtifact, this.targetArtifact);
+      if (!source || !target) return;
 
+      await handleCreateLink(source, target);
       this.$emit("close");
     },
   },

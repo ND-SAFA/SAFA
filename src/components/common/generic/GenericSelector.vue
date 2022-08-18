@@ -27,10 +27,12 @@
           hide-details
           class="mr-1"
           prepend-inner-icon="mdi-magnify"
+          data-cy="input-selector-search"
         />
         <generic-icon-button
           tooltip="Refresh"
           icon-id="mdi-refresh"
+          data-cy="button-selector-reload"
           @click="$emit('refresh')"
         />
       </flex-box>

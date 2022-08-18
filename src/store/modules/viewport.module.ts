@@ -1,5 +1,6 @@
 import { Module, VuexModule, Action, Mutation } from "vuex-module-decorators";
-import type { CytoCore, LayoutPayload, IGraphLayout } from "@/types";
+import type { LayoutPayload, IGraphLayout } from "@/types";
+import { getRootNode } from "@/util";
 import {
   appModule,
   artifactModule,
@@ -9,7 +10,6 @@ import {
 } from "@/store";
 import {
   artifactTreeCyPromise,
-  getRootNode,
   isInSubtree,
   doesNotContainType,
   ArtifactGraphLayout,

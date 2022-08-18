@@ -6,15 +6,13 @@ import type {
   ArtifactModel,
   TraceLinkModel,
 } from "@/types";
-import { artifactModule, traceModule } from "@/store";
 import {
-  artifactTreeCyPromise,
+  getMatchingChildren,
   createPhantomLinks,
   createSubtreeMap,
-  cyDisplayAll,
-  cySetDisplay,
-  getMatchingChildren,
-} from "@/cytoscape";
+} from "@/util";
+import { artifactModule, traceModule } from "@/store";
+import { cyDisplayAll, cySetDisplay } from "@/cytoscape";
 
 @Module({ namespaced: true, name: "subtree" })
 /**

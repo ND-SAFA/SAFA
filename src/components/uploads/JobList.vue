@@ -31,7 +31,7 @@ export default Vue.extend({
   },
   data() {
     return {
-      selectedJobs: [] as number[],
+      selectedJobs: [0] as number[],
     };
   },
   mounted() {
@@ -67,6 +67,12 @@ export default Vue.extend({
       } else {
         this.selectedJobs = [newIndex];
       }
+    },
+    /**
+     * Selects the first job when the uploads change.
+     */
+    uploads(): void {
+      this.selectedJobs = [0];
     },
   },
   methods: {

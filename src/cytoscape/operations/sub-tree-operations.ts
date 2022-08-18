@@ -165,11 +165,8 @@ function getChildren(
   artifactId: string
 ): string[] {
   return traces
-    .filter(
-      ({ sourceId, targetId }) =>
-        sourceId === artifactId && targetId !== artifactId
-    )
-    .map(({ targetId }) => targetId);
+    .filter(({ targetId }) => targetId === artifactId)
+    .map(({ sourceId }) => sourceId);
 }
 
 /**

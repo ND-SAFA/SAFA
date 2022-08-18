@@ -1,6 +1,6 @@
 import { ProjectModel } from "@/types";
 import { createProject } from "@/util";
-import { QueryParams, updateParam } from "@/router";
+import { QueryParams, removeParams, updateParam } from "@/router";
 import {
   appModule,
   artifactSelectionModule,
@@ -49,6 +49,7 @@ export async function handleClearProject(): Promise<void> {
   await handleResetGraph();
   typeOptionsModule.clearData();
   await subtreeModule.clearSubtrees();
+  await removeParams();
 }
 
 /**

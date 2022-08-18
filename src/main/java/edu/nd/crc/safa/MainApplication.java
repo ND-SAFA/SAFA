@@ -3,6 +3,7 @@ package edu.nd.crc.safa;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
@@ -10,7 +11,7 @@ import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBr
 /**
  * The entry point into the application.
  */
-@SpringBootApplication
+@SpringBootApplication(exclude = FlywayAutoConfiguration.class)
 @EnableWebSocket
 @EnableWebSocketMessageBroker
 @EnableBatchProcessing

@@ -14,7 +14,6 @@ import {
   CreateLinkValidator,
   SafetyCaseType,
 } from "@/types";
-import { typeOptionsModule } from "@/store";
 
 @Module({ namespaced: true, name: "typeOptions" })
 /**

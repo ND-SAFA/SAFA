@@ -104,17 +104,11 @@ export default Vue.extend({
       default: 1,
       required: false,
     },
-    /**
-     * The StepStates of the steps coming before selection a project.
-     */
     beforeSteps: {
       type: Array as PropType<Array<StepState>>,
       required: false,
       default: () => [] as StepState[],
     },
-    /**
-     * The StepStates of the steps coming after selecting a version.
-     */
     afterSteps: {
       type: Array as PropType<Array<StepState>>,
       required: false,

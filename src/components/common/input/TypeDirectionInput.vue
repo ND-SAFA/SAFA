@@ -25,14 +25,14 @@ import Vue, { PropType } from "vue";
 import { LabelledTraceDirectionModel } from "@/types";
 import { getArtifactTypePrintName } from "@/util";
 import { handleRemoveDirection } from "@/api";
-import { Typography, FlexBox } from "@/components/common/display";
+import { Typography } from "@/components/common/display";
 
 /**
  * Renders an input for changing the allowed artifact type directions.
  */
 export default Vue.extend({
   name: "TypeDirectionInput",
-  components: { FlexBox, Typography },
+  components: { Typography },
   props: {
     entry: Object as PropType<LabelledTraceDirectionModel>,
   },

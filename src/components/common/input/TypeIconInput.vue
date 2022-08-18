@@ -21,14 +21,14 @@ import Vue, { PropType } from "vue";
 import { LabelledTraceDirectionModel } from "@/types";
 import { typeOptionsModule } from "@/store";
 import { handleSaveArtifactTypeIcon } from "@/api";
-import { Typography, FlexBox } from "@/components/common/display";
+import { Typography } from "@/components/common/display";
 
 /**
  * Renders an input for changing the icon for an artifact type.
  */
 export default Vue.extend({
   name: "TypeIconInput",
-  components: { Typography, FlexBox },
+  components: { Typography },
   props: {
     entry: Object as PropType<LabelledTraceDirectionModel>,
   },

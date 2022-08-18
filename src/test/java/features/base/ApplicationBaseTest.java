@@ -17,6 +17,7 @@ import services.AssertionTestService;
 import services.AuthorizationTestService;
 import services.CommitTestService;
 import services.CreationTestService;
+import services.MessageVerificationTestService;
 import services.NotificationTestService;
 import services.RetrievalTestService;
 
@@ -43,6 +44,7 @@ public abstract class ApplicationBaseTest extends EntityBaseTest {
     protected AssertionTestService assertionTestService = new AssertionTestService();
     protected RetrievalTestService retrievalTestService;
     protected AuthorizationTestService authorizationTestService;
+    protected MessageVerificationTestService messageVerificationTestService = new MessageVerificationTestService();
 
     @PostConstruct
     public void init() throws Exception {

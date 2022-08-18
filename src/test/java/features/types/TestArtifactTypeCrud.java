@@ -15,42 +15,44 @@ import edu.nd.crc.safa.features.types.TypeService;
 import common.AbstractCrudTest;
 import org.json.JSONObject;
 
-public class TestArifactTypeCrud extends AbstractCrudTest<TypeAppEntity> {
+public class TestArtifactTypeCrud extends AbstractCrudTest<TypeAppEntity> {
     String editTypePath = AppRoutes.ArtifactType.CREATE_OR_UPDATE_ARTIFACT_TYPE;
+    ArtifactType artifactType = new ArtifactType(project, Constants.name);
 
     protected UUID createEntity() throws Exception {
-        ArtifactType initialArtifactType = new ArtifactType(project, Constants.name);
         JSONObject createdType = SafaRequest
             .withRoute(editTypePath)
             .withProject(project)
-            .postWithJsonObject(initialArtifactType);
-        return UUID.fromString(createdType.getString("typeId"));
+            .postWithJsonObject(artifactType);
+        UUID typeId = UUID.fromString(createdType.getString("typeId"));
+        artifactType.setTypeId(typeId);
+        return typeId;
     }
 
-    protected void verifyCreatedEntity(TypeAppEntity createdEntity) {
-        assertThat(createdEntity.getName()).isEqualTo(Constants.name);
-        assertThat(createdEntity.getIcon()).isNotNull();
+    protected void verifyCreatedEntity(TypeAppEntity retrievedEntity) {
+        assertThat(retrievedEntity.getName()).isEqualTo(Constants.name);
+        assertThat(retrievedEntity.getIcon()).isNotNull();
     }
 
     protected void verifyCreationMessage(EntityChangeMessage message) {
         verifyUpdateMessage(message);
     }
 
-    protected void updateEntity(TypeAppEntity updatedEntity) throws Exception {
-        updatedEntity.setIcon(Constants.newIconName);
+    protected void updateEntity() throws Exception {
+        artifactType.setIcon(Constants.newIconName);
         SafaRequest
             .withRoute(editTypePath)
             .withProject(project)
-            .postWithJsonObject(updatedEntity);
+            .postWithJsonObject(artifactType);
     }
 
-    protected void verifyUpdatedEntity(TypeAppEntity updatedEntity) {
-        assertThat(updatedEntity.getIcon()).isEqualTo(Constants.newIconName);
+    protected void verifyUpdatedEntity(TypeAppEntity retrievedEntity) {
+        assertThat(retrievedEntity.getIcon()).isEqualTo(Constants.newIconName);
     }
 
     protected void verifyUpdateMessage(EntityChangeMessage message) {
         assertThat(message.getChanges()).hasSize(1);
-        assertionTestService.verifyChangeInMessage(message,
+        messageVerificationTestService.verifyChangeInMessage(message,
             entityId,
             Change.Entity.TYPES,
             Change.Action.UPDATE);
@@ -65,7 +67,7 @@ public class TestArifactTypeCrud extends AbstractCrudTest<TypeAppEntity> {
 
     protected void verifyDeletionMessage(EntityChangeMessage message) {
         assertThat(message.getChanges()).hasSize(1);
-        assertionTestService.verifyChangeInMessage(message,
+        messageVerificationTestService.verifyChangeInMessage(message,
             entityId,
             Change.Entity.TYPES,
             Change.Action.DELETE);

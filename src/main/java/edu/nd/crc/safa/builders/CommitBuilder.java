@@ -53,12 +53,21 @@ public class CommitBuilder {
     }
 
     public CommitBuilder withAddedTrace(JSONObject traceJson) throws JsonProcessingException {
-        this.projectCommit.addTrace(ModificationType.ADDED, asTraceAppEntity(traceJson));
+        return withAddedTrace(asTraceAppEntity(traceJson));
+    }
+
+    public CommitBuilder withAddedTrace(TraceAppEntity trace) {
+        this.projectCommit.addTrace(ModificationType.ADDED, trace);
         return this;
     }
 
     public CommitBuilder withModifiedTrace(TraceAppEntity traceAppEntity) {
         this.projectCommit.addTrace(ModificationType.MODIFIED, traceAppEntity);
+        return this;
+    }
+
+    public CommitBuilder withRemovedTrace(TraceAppEntity traceAppEntity) {
+        this.projectCommit.addTrace(ModificationType.REMOVED, traceAppEntity);
         return this;
     }
 

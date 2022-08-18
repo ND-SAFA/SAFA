@@ -5,10 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.UUID;
-
-import edu.nd.crc.safa.features.notifications.entities.Change;
-import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -60,28 +56,5 @@ public class AssertionTestService {
         }
     }
 
-    public void verifyTypeMessage(EntityChangeMessage message,
-                                  int numberChanges,
-                                  UUID typeId,
-                                  Change.Entity entity,
-                                  Change.Action action) {
-        assertThat(message.getChanges()).hasSize(numberChanges);
 
-        Change entityChange = message.getChangeForEntity(entity);
-        assertThat(entityChange.getEntity()).isEqualTo(entity);
-        assertThat(entityChange.getAction()).isEqualTo(action);
-        assertThat(entityChange.getEntityIds()).hasSize(1).contains(typeId);
-    }
-
-    public void verifyChangeInMessage(EntityChangeMessage message,
-                                      UUID typeId,
-                                      Change.Entity entity,
-                                      Change.Action action) {
-        Change entityChange = message.getChangeForEntity(entity);
-        assertThat(entityChange.getEntity()).isEqualTo(entity);
-        assertThat(entityChange.getAction()).isEqualTo(action);
-        if (typeId != null) {
-            assertThat(entityChange.getEntityIds()).hasSize(1).contains(typeId);
-        }
-    }
 }

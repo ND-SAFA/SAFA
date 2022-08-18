@@ -12,7 +12,7 @@ import common.AbstractCrudTest;
 import org.json.JSONObject;
 
 public abstract class AbstractArtifactCrudTest extends AbstractCrudTest<ArtifactAppEntity> {
-    Constants constants = new Constants();
+    ArtifactAppEntity artifact = getStartingArtifact();
 
     @Override
     protected UUID getTopicId() {
@@ -29,19 +29,19 @@ public abstract class AbstractArtifactCrudTest extends AbstractCrudTest<Artifact
         JSONObject commitJson = commitTestService
             .commit(CommitBuilder
                 .withVersion(projectVersion)
-                .withAddedArtifact(constants.artifact));
+                .withAddedArtifact(artifact));
         String id = commitJson
             .getJSONObject("artifacts")
             .getJSONArray("added")
             .getJSONObject(0)
             .getString("id");
-        constants.artifact.setId(id);
+        artifact.setId(id);
         return UUID.fromString(id);
     }
 
     @Override
-    protected void verifyCreatedEntity(ArtifactAppEntity createdEntity) {
-        assertionTestService.assertMatch(constants.artifact, createdEntity);
+    protected void verifyCreatedEntity(ArtifactAppEntity retrievedEntity) {
+        assertionTestService.assertMatch(artifact, retrievedEntity);
     }
 
     @Override
@@ -50,17 +50,17 @@ public abstract class AbstractArtifactCrudTest extends AbstractCrudTest<Artifact
     }
 
     @Override
-    protected void updateEntity(ArtifactAppEntity updatedEntity) throws Exception {
-        this.modifyArtifact(constants.artifact);
+    protected void updateEntity() throws Exception {
+        this.modifyArtifact(artifact);
         commitTestService
             .commit(CommitBuilder
                 .withVersion(projectVersion)
-                .withModifiedArtifact(constants.artifact));
+                .withModifiedArtifact(artifact));
     }
 
     @Override
-    protected void verifyUpdatedEntity(ArtifactAppEntity updatedEntity) {
-        assertionTestService.assertMatch(constants.artifact, updatedEntity);
+    protected void verifyUpdatedEntity(ArtifactAppEntity retrievedEntity) {
+        assertionTestService.assertMatch(artifact, retrievedEntity);
     }
 
     @Override
@@ -73,7 +73,7 @@ public abstract class AbstractArtifactCrudTest extends AbstractCrudTest<Artifact
         commitTestService
             .commit(CommitBuilder
                 .withVersion(projectVersion)
-                .withRemovedArtifact(constants.artifact));
+                .withRemovedArtifact(artifact));
     }
 
     @Override
@@ -83,11 +83,8 @@ public abstract class AbstractArtifactCrudTest extends AbstractCrudTest<Artifact
 
     private void verifyArtifactMessage(EntityChangeMessage message,
                                        Change.Action action) {
-        assertionTestService.verifyChangeInMessage(message,
-            entityId,
-            Change.Entity.ARTIFACTS,
-            action);
-        assertionTestService.verifyChangeInMessage(message,
+        messageVerificationTestService.verifyArtifactMessage(message, entityId, action);
+        messageVerificationTestService.verifyChangeInMessage(message,
             null,
             Change.Entity.WARNINGS,
             Change.Action.UPDATE);
@@ -102,8 +99,4 @@ public abstract class AbstractArtifactCrudTest extends AbstractCrudTest<Artifact
      * Performs a modification on artifact
      */
     protected abstract void modifyArtifact(ArtifactAppEntity artifact);
-
-    protected class Constants {
-        protected final ArtifactAppEntity artifact = getStartingArtifact();
-    }
 }

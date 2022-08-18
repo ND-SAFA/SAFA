@@ -19,7 +19,7 @@ public abstract class AbstractCrudTest<T extends IAppEntity> extends Application
     protected Project project;
     protected UUID entityId;
 
-    protected ProjectVersion setupProject() {
+    protected ProjectVersion setupProject() throws Exception {
         return creationTestService.createProjectWithNewVersion(projectName);
     }
 
@@ -43,7 +43,7 @@ public abstract class AbstractCrudTest<T extends IAppEntity> extends Application
         verifyCreationMessage(creationMessage);
 
         // Step - Update entity and retrieve message
-        updateEntity(entity);
+        updateEntity();
 
         // Step - Verify updated entity
         T updatedEntity = getEntity(projectVersion, entityId);
@@ -94,9 +94,9 @@ public abstract class AbstractCrudTest<T extends IAppEntity> extends Application
     /**
      * Verifies that given entity matches that created.
      *
-     * @param createdEntity Entity created.
+     * @param retrievedEntity Entity created.
      */
-    protected abstract void verifyCreatedEntity(T createdEntity);
+    protected abstract void verifyCreatedEntity(T retrievedEntity);
 
     /**
      * Verifies the correctness of message received after entity is created.
@@ -108,17 +108,16 @@ public abstract class AbstractCrudTest<T extends IAppEntity> extends Application
     /**
      * Updates given app entity.
      *
-     * @param updatedEntity Original entity created.
      * @throws Exception If HTTP error occurs.
      */
-    protected abstract void updateEntity(T updatedEntity) throws Exception;
+    protected abstract void updateEntity() throws Exception;
 
     /**
      * Verifies that given entity contains updates specified.
      *
-     * @param updatedEntity Updated entity.
+     * @param retrievedEntity Updated entity.
      */
-    protected abstract void verifyUpdatedEntity(T updatedEntity);
+    protected abstract void verifyUpdatedEntity(T retrievedEntity);
 
     /**
      * Verifies that message contains the update message for entity.

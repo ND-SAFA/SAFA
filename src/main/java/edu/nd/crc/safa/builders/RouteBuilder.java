@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.builders;
 
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
+import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.flatfiles.services.DataFileBuilder;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
@@ -47,6 +48,11 @@ public class RouteBuilder<T extends RouteBuilder<T>> {
 
     public T withDocument(Document document) {
         this.path = this.path.replace("{documentId}", document.getDocumentId().toString());
+        return (T) this;
+    }
+
+    public T withDocument(DocumentAppEntity document) {
+        this.path = this.path.replace("{documentId}", document.getDocumentId());
         return (T) this;
     }
 

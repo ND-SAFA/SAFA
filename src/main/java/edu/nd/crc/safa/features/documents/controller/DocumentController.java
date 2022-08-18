@@ -63,18 +63,18 @@ public class DocumentController extends BaseDocumentController {
         throws SafaError {
         ProjectVersion projectVersion = resourceBuilder.fetchVersion(versionId).withEditVersion();
         Project project = projectVersion.getProject();
-        documentAppEntity.setProject(project); // Manually set to verify authenticity
 
         // Create or update: document base entity
         Document document = documentAppEntity.toDocument();
+        document.setProject(project);
         this.documentRepository.save(document);
 
-        if (documentAppEntity.getDocumentId() == null) {
-            documentAppEntity.setDocumentId(document.getDocumentId());
+        if (documentAppEntity.getDocumentId().isEmpty()) {
+            documentAppEntity.setDocumentId(document.getDocumentId().toString());
         }
 
         // Create or update: artifact links
-        int nArtifactUpdated = documentService.createOrUpdateArtifactIds(
+        documentService.createOrUpdateArtifactIds(
             projectVersion,
             document,
             documentAppEntity.getArtifactIds());
@@ -86,7 +86,7 @@ public class DocumentController extends BaseDocumentController {
 
         // Update version subscribers
         notificationService.broadcastChange(
-            EntityChangeBuilder.create(versionId)
+            EntityChangeBuilder.create(project.getProjectId())
                 .withDocumentUpdate(List.of(document.getDocumentId()))
                 .withArtifactsUpdate(affectedArtifactIds)
         );

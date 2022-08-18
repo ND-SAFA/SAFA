@@ -15,6 +15,7 @@ import features.base.ApplicationBaseTest;
 import org.junit.jupiter.api.Test;
 
 public abstract class AbstractCrudTest<T extends IAppEntity> extends ApplicationBaseTest {
+    protected T entity;
     protected ProjectVersion projectVersion;
     protected Project project;
     protected UUID entityId;

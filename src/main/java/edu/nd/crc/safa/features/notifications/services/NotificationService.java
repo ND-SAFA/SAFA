@@ -3,6 +3,7 @@ package edu.nd.crc.safa.features.notifications.services;
 import java.util.UUID;
 
 import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
+import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
 
@@ -27,6 +28,12 @@ public class NotificationService {
         this.safaUserService = safaUserService;
     }
 
+    /**
+     * Returns topic for given entity id.
+     *
+     * @param id ID of the entity to subs
+     * @return {@link String} representing topic destination
+     */
     public static String getTopic(UUID id) {
         return String.format("/topic/%s", id);
     }
@@ -38,6 +45,7 @@ public class NotificationService {
      */
     public void broadcastChange(EntityChangeBuilder builder) {
         SafaUser safaUser = this.safaUserService.getCurrentUser();
-        messagingTemplate.convertAndSend(builder.getTopic(), builder.get(safaUser.getEmail()));
+        EntityChangeMessage message = builder.get(safaUser.getEmail());
+        messagingTemplate.convertAndSend(builder.getTopic(), message);
     }
 }

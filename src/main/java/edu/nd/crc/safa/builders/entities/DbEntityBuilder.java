@@ -173,7 +173,7 @@ public class DbEntityBuilder extends BaseBuilder {
                                        String docDescription,
                                        DocumentType docType) {
         Project project = this.getProject(projectName);
-        Document document = new Document(project, docName, docDescription, docType);
+        Document document = new Document(null, project, docType, docName, docDescription);
         this.documentRepository.save(document);
         addEntry(this.documents, projectName, docName, document);
         return this;

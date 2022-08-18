@@ -7,17 +7,22 @@ import java.util.Map;
 import java.util.UUID;
 
 import edu.nd.crc.safa.features.documents.entities.db.Document;
+import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
 import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class DocumentAppEntity extends Document implements IAppEntity {
+@AllArgsConstructor
+public class DocumentAppEntity implements IAppEntity {
+    private String documentId;
+    private DocumentType documentType;
+    private String name;
+    private String description;
     private List<String> artifactIds = new ArrayList<>();
     private List<DocumentColumnAppEntity> columns = new ArrayList<>();
     private Map<String, LayoutPosition> layout = new HashMap<>();
@@ -25,23 +30,32 @@ public class DocumentAppEntity extends Document implements IAppEntity {
     public DocumentAppEntity(Document document,
                              List<String> artifactIds,
                              Map<String, LayoutPosition> layout) {
-        super(document);
+        this.documentId = document.getDocumentId().toString();
+        this.documentType = document.getType();
+        this.name = document.getName();
+        this.description = document.getDescription();
         this.artifactIds = artifactIds;
         this.columns = new ArrayList<>();
         this.layout = layout;
     }
 
     public Document toDocument() {
-        return new Document(this);
+        UUID documentId = this.documentId.isEmpty() ? null : UUID.fromString(this.documentId);
+        return new Document(
+            documentId,
+            null,
+            this.documentType,
+            this.name,
+            this.description);
     }
 
     @Override
     public String getBaseEntityId() {
-        return this.getDocumentId().toString();
+        return this.getDocumentId();
     }
 
     @Override
     public void setBaseEntityId(String id) {
-        this.setDocumentId(UUID.fromString(id));
+        this.setDocumentId(id);
     }
 }

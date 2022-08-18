@@ -9,6 +9,17 @@ import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
 
 public class MessageVerificationTestService {
 
+    public void verifyDocumentMessage(EntityChangeMessage message,
+                                      UUID entityId,
+                                      Change.Action action) {
+        verifyChangeInMessage(
+            message,
+            entityId,
+            Change.Entity.DOCUMENT,
+            action
+        );
+    }
+
     public void verifyArtifactMessage(EntityChangeMessage message,
                                       UUID entityId,
                                       Change.Action action) {

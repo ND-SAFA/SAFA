@@ -33,7 +33,7 @@ export default class ProjectModule extends VuexModule {
 
   @Action
   /**
-   * Initializes the current project
+   * Initializes the current project.
    */
   async initializeProject(project: ProjectModel): Promise<void> {
     this.SAVE_PROJECT(project);
@@ -42,9 +42,9 @@ export default class ProjectModule extends VuexModule {
     layoutModule.SET_ARTIFACT_POSITIONS(project.layout);
 
     await setTimeout(async () => {
-      // Not sure why this needs any wait, but it doesnt work without it.
+      // Wait for the graph to initialize.
       await subtreeModule.initializeProject(project);
-    }, 100);
+    }, 200);
   }
 
   @Action

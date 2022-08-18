@@ -55,3 +55,10 @@ export async function updateParam(key: string, value: string): Promise<void> {
     return navigateTo(router.currentRoute.path, { [key]: value });
   }
 }
+
+/**
+ * Removes all query parameters.
+ */
+export async function removeParams(): Promise<void> {
+  return navigateTo(router.currentRoute.path, {});
+}

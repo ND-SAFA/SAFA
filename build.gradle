@@ -14,7 +14,6 @@ plugins {
     id 'checkstyle'
     id 'jacoco'
     id 'org.barfuin.gradle.jacocolog' version '1.0.1'
-    id 'org.flywaydb.flyway' version "8.2.3"
     id "io.freefair.lombok" version "4.1.6"
 }
 
@@ -34,59 +33,59 @@ repositories {
 }
 
 dependencies {
-    // JIRA parsing
-    implementation 'com.jsoniter:jsoniter:0.9.23'
-    implementation 'org.eclipse.jgit:org.eclipse.jgit:5.13.0.202109080827-r'
-
     // data parsing
     implementation 'org.javatuples:javatuples:1.2'
     implementation 'org.apache.commons:commons-dbcp2:2.9.0'
     implementation 'org.apache.commons:commons-csv:1.9.0'
     implementation 'commons-io:commons-io:2.11.0' // TODO: Upgrade contains breaking changes
-    implementation 'org.json:json:20210307'
+    implementation 'org.json:json:20220320'
 
     //database
-    implementation 'mysql:mysql-connector-java:8.0.25'
-    implementation 'com.google.cloud.sql:mysql-socket-factory-connector-j-8:1.4.0'
+    implementation 'mysql:mysql-connector-java:8.0.29'
+    implementation 'com.google.cloud.sql:mysql-socket-factory-connector-j-8:1.6.2'
     implementation 'javax.annotation:javax.annotation-api:1.3.2'
-    implementation 'org.hibernate:hibernate-core:5.6.1.Final'
-    implementation 'com.zaxxer:HikariCP:5.0.0'
+    implementation 'org.hibernate:hibernate-core:5.6.1.Final' // TODO: Upgrading contains breaking changes
+    implementation 'com.zaxxer:HikariCP:5.0.1'
+    implementation 'org.flywaydb:flyway-core:9.0.4'
+    implementation 'org.flywaydb:flyway-mysql:9.1.2'
 
     //Spring
-    implementation 'org.springframework.boot:spring-boot-starter-web:2.5.6'
-    implementation 'org.springframework.data:spring-data-commons:2.6.0'
-    implementation 'org.springframework.data:spring-data-jpa:2.5.6' // TODO: Upgrade contains breaking changes
-    implementation 'org.springframework.boot:spring-boot-starter-validation:2.5.6'
-    implementation 'org.springframework:spring-websocket:5.3.13'
-    implementation 'org.springframework:spring-messaging:5.3.13'
-    implementation 'org.springframework.boot:spring-boot-starter-security:2.5.6'
-    implementation 'org.springframework.security:spring-security-messaging:5.6.0'
-    implementation 'org.springframework.boot:spring-boot-starter-mail:2.6.1'
-    implementation 'org.springframework.boot:spring-boot-starter-webflux:2.6.6'
-    implementation 'org.springframework.batch:spring-batch-core:4.3.5'
+    implementation 'org.springframework.boot:spring-boot-starter-web:2.7.2'
+    implementation 'org.springframework.data:spring-data-commons:2.7.2'
+    implementation 'org.springframework.data:spring-data-jpa:2.7.2'
+    implementation 'org.springframework.boot:spring-boot-starter-validation:2.7.2'
+    implementation 'org.springframework:spring-websocket:5.3.22'
+    implementation 'org.springframework:spring-messaging:5.3.22'
+    implementation 'org.springframework.boot:spring-boot-starter-security:2.7.2'
+    implementation 'org.springframework.security:spring-security-messaging:5.7.2'
+    implementation 'org.springframework.boot:spring-boot-starter-mail:2.7.2'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux:2.7.2'
+    implementation 'org.springframework.batch:spring-batch-core:4.3.6'
 
     //authentication
-    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.2'
-    implementation 'io.jsonwebtoken:jjwt-api:0.11.2'
-    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.2'
-    runtimeOnly 'io.jsonwebtoken:jjwt-orgjson:0.11.2'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-orgjson:0.11.5'
 
     // websockets
     implementation 'org.webjars:sockjs-client:1.5.1'
     implementation 'org.webjars:stomp-websocket:2.3.4'
 
     // automatic documentation
-    annotationProcessor 'com.github.therapi:therapi-runtime-javadoc-scribe:0.13.0'
-    implementation 'org.springdoc:springdoc-openapi-ui:1.6.9'
-    implementation 'org.springdoc:springdoc-openapi-webmvc-core:1.6.9'
-    implementation 'org.springdoc:springdoc-openapi-javadoc:1.6.9'
-    implementation 'org.springdoc:springdoc-openapi-security:1.6.9'
+    implementation 'org.springdoc:springdoc-openapi-ui:1.6.9' // Creates swagger ui
+    annotationProcessor 'com.github.therapi:therapi-runtime-javadoc-scribe:0.15.0' // Parses javadoc
+    implementation 'org.springdoc:springdoc-openapi-javadoc:1.6.9' // Adds javadoc to swagger docs
+
+    // layout generation
+    implementation 'org.eclipse.elk:org.eclipse.elk.core:0.8.1'
+    implementation 'org.eclipse.elk:org.eclipse.elk.alg.mrtree:0.8.1'
 
     // testing
-    implementation 'org.springframework.boot:spring-boot-starter-test:2.5.6'
-    testImplementation 'com.h2database:h2:1.4.200'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
-    testImplementation 'org.springframework.security:spring-security-test:5.6.0'
+    implementation 'org.springframework.boot:spring-boot-starter-test:2.7.2'
+    testImplementation 'com.h2database:h2:2.1.210' // Most up-to-date version compatible with flyway
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
+    testImplementation 'org.springframework.security:spring-security-test:5.7.2'
 }
 
 test {
@@ -102,7 +101,6 @@ test {
     finalizedBy jacocoTestCoverageVerification
 }
 
-
 /*
  * CI/CD
  */
@@ -110,7 +108,7 @@ jacocoTestCoverageVerification {
     violationRules {
         rule {
             limit {
-                minimum = 0.7
+                minimum = 0.80
             }
         }
     }
@@ -141,6 +139,3 @@ checkstyleMain {
 checkstyleTest {
     source = 'src/test/'
 }
-
-
-

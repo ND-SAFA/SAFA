@@ -1,15 +1,26 @@
 package edu.nd.crc.safa.utilities;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
-import edu.nd.crc.safa.server.entities.api.SafaError;
+import edu.nd.crc.safa.config.ProjectPaths;
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.io.FileUtils;
@@ -21,40 +32,39 @@ import org.springframework.web.multipart.MultipartFile;
  * Responsible for reading CSV files and validating them
  * while mindful that casing does not matter.
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class FileUtilities {
 
-    public static CSVParser readCSVFile(String pathToFile) throws SafaError {
-        try {
-            File csvData = new File(pathToFile);
-            if (!csvData.exists()) {
-                throw new SafaError("CSV file does not exist: " + pathToFile);
-            }
-
-            CSVFormat fileFormat = getFormat();
-            return CSVParser.parse(csvData, Charset.defaultCharset(), fileFormat);
-        } catch (IOException e) {
-            String error = String.format("Could not read CSV file at path: %s", pathToFile);
-            throw new SafaError(error, e);
+    public static CSVParser readCSVFile(String pathToFile) throws IOException {
+        File csvData = new File(pathToFile);
+        if (!csvData.exists()) {
+            String errorMessage = String.format("Could not find CSV file %s.", csvData.getAbsolutePath());
+            throw new IOException(errorMessage);
         }
+
+        CSVFormat fileFormat = createUnknownHeaderCsvFileFormat();
+        return CSVParser.parse(csvData, Charset.defaultCharset(), fileFormat);
     }
 
     public static CSVParser readMultiPartCSVFile(MultipartFile file, String[] requiredColumns) throws
         SafaError {
-        String requiredColumnsLabel = String.join(", ", requiredColumns);
         if (!Objects.requireNonNull(file.getOriginalFilename()).contains(".csv")) {
-            throw new SafaError("Expected a CSV file with columns: " + requiredColumnsLabel);
+            throw new SafaError("Expected a CSV file with columns: %s", (Object) requiredColumns);
         }
         try {
-            CSVParser parsedFile = CSVParser.parse(new String(file.getBytes()), getFormat());
+            CSVParser parsedFile = CSVParser.parse(new String(file.getBytes()), createUnknownHeaderCsvFileFormat());
             assertHasColumns(parsedFile, requiredColumns);
             return parsedFile;
         } catch (IOException e) {
-            String error = "Unable to read csv file: " + file.getOriginalFilename();
-            throw new SafaError(error, e);
+            throw new SafaError("Unable to read csv file %s.", file.getOriginalFilename());
         }
     }
 
-    private static CSVFormat getFormat() {
+    public static JSONObject readMultiPartJSONFile(MultipartFile file) throws IOException {
+        return new JSONObject(new String(file.getBytes()));
+    }
+
+    public static CSVFormat createUnknownHeaderCsvFileFormat() {
         return CSVFormat.DEFAULT
             .withHeader() // only way to read headers without defining them.
             .builder()
@@ -72,39 +82,18 @@ public class FileUtilities {
         for (String rColumn : requiredColumns) {
             if (!headerNamesLower.contains(rColumn)) {
                 String requiredColumnsLabel = String.join(", ", requiredColumns);
-                String error = "Expected CSV to have column(s) [%s] but found: %s";
-                throw new SafaError(String.format(error, requiredColumnsLabel, file.getHeaderNames()));
+                throw new SafaError("Expected CSV to have column(s) %s but found: %s",
+                    requiredColumnsLabel,
+                    file.getHeaderNames());
             }
         }
     }
 
-    public static void assertHasKeys(JSONObject obj, String[] keys) throws SafaError {
+    public static void assertHasKeys(JSONObject obj, List<String> keys) throws SafaError {
         for (String key : keys) {
             if (!obj.has(key)) {
-                String error = String.format("Expected %s to have key: %s", obj, key);
-                throw new SafaError(error);
+                throw new SafaError("Expected %s to have key: %s", obj, key);
             }
-        }
-    }
-
-    public static String toString(Object[] a) {
-        if (a == null) {
-            return "null";
-        }
-
-        int iMax = a.length - 1;
-        if (iMax == -1) {
-            return "[]";
-        }
-
-        StringBuilder b = new StringBuilder();
-        b.append('[');
-        for (int i = 0; ; i++) {
-            b.append(a[i]);
-            if (i == iMax) {
-                return b.append(']').toString();
-            }
-            b.append(", ");
         }
     }
 
@@ -118,10 +107,10 @@ public class FileUtilities {
 
     public static JSONObject toLowerCase(JSONObject jsonObject) throws JSONException {
         JSONObject result = new JSONObject();
-        Iterator keys = jsonObject.keys();
+        Iterator<String> keys = jsonObject.keys();
 
         while (keys.hasNext()) {
-            String key = keys.next().toString();
+            String key = keys.next();
             Object value = jsonObject.get(key);
             if (value instanceof JSONObject) {
                 result.put(key.toLowerCase(), toLowerCase((JSONObject) value));
@@ -141,7 +130,90 @@ public class FileUtilities {
      * @throws IOException If file is missing or not able to be read.
      */
     public static JSONObject readJSONFile(String path) throws IOException {
-        String fileContent = FileUtils.readFileToString(new File(path), "utf-8");
+        String fileContent = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8);
         return new JSONObject(fileContent);
+    }
+
+    /**
+     * Extracts files in given zip bytearray as a string.
+     *
+     * @param content The content of the zip as a string representing an array of bytes.
+     * @return List of files found in the zip content.
+     * @throws IOException Throws error if error occurred while saving file.
+     */
+    public static List<File> extractFilesFromZipContent(String content) throws IOException {
+        ZipEntry entry;
+        final var zin = new ZipInputStream(new ByteArrayInputStream(content.getBytes(StandardCharsets.ISO_8859_1)));
+        String temporaryFolder = ProjectPaths.Storage.createTemporaryDirectory();
+        List<File> filesCreated = new ArrayList<>();
+        while ((entry = zin.getNextEntry()) != null) {
+            String name = entry.getName();
+            String pathToFile = builtPath(temporaryFolder, name);
+            try (FileOutputStream outputStream = new FileOutputStream(pathToFile)) {
+                for (var c = zin.read(); c != -1; c = zin.read()) {
+                    outputStream.write(c);
+                }
+                outputStream.flush();
+                zin.closeEntry();
+                filesCreated.add(new File(pathToFile));
+            }
+        }
+        return filesCreated;
+    }
+
+    /**
+     * Writes content to file.
+     *
+     * @param file        The file to write to.
+     * @param fileContent The content to write to file.
+     * @throws IOException Throws error if problem opening file.
+     */
+    public static void writeToFile(File file, String fileContent) throws IOException {
+        try (FileWriter myWriter = new FileWriter(file)) {
+            myWriter.write(fileContent);
+        }
+    }
+
+    /**
+     * Attempts to create directory to given path.
+     *
+     * @param pathToDirectory Path to directory to create.
+     * @param createIfEmpty   Flag used to disable attempt
+     */
+    public static void createDirectoryIfEmpty(String pathToDirectory, boolean createIfEmpty) throws IOException {
+        if (createIfEmpty) {
+            createDirectoryIfEmpty(pathToDirectory);
+        }
+    }
+
+    /**
+     * Creates directory at given path if it does not exist.
+     *
+     * @param pathToDirectory Path to directory to create.
+     * @throws IOException If error occurs while creating directory.
+     */
+    public static void createDirectoryIfEmpty(String pathToDirectory) throws IOException {
+        if (!Files.exists(Paths.get(pathToDirectory))) {
+            Files.createDirectories(Paths.get(pathToDirectory));
+        }
+    }
+
+    /**
+     * Creates OS-aware path of given directory.
+     *
+     * @param directories Directories that once joined create path.
+     * @return String representing built path.
+     */
+    public static String builtPath(String... directories) {
+        StringBuilder finalPath = new StringBuilder();
+        for (int i = 0; i < directories.length; i++) {
+            String p = directories[i];
+            if (i < directories.length - 1) {
+                finalPath.append(p).append(File.separator);
+            } else {
+                finalPath.append(p);
+            }
+        }
+        return finalPath.toString();
     }
 }

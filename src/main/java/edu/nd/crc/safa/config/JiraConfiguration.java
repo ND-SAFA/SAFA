@@ -1,8 +1,8 @@
 package edu.nd.crc.safa.config;
 
-import edu.nd.crc.safa.server.repositories.jira.JiraProjectRepository;
-import edu.nd.crc.safa.server.services.jira.JiraConnectionService;
-import edu.nd.crc.safa.server.services.jira.JiraConnectionServiceImpl;
+import edu.nd.crc.safa.features.jira.repositories.JiraProjectRepository;
+import edu.nd.crc.safa.features.jira.services.JiraConnectionService;
+import edu.nd.crc.safa.features.jira.services.JiraConnectionServiceImpl;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;

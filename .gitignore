@@ -6,7 +6,8 @@ build/
 !**/src/test/**
 application-credentials.json
 **/application-prod.properties
-**/application-deploy.properties
+**/application-safa-dev.properties
+**/application-safa-prod.properties
 docker-build.sh
 ### STS ###
 .apt_generated
@@ -18,6 +19,7 @@ docker-build.sh
 .sts4-cache
 
 ### IntelliJ IDEA ###
+/**/.idea
 .idea
 *.iws
 *.iml

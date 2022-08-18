@@ -2,7 +2,8 @@ package features.collaboration.crud;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import edu.nd.crc.safa.builders.requests.SafaRequest;
+import requests.SafaRequest;
+
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 
@@ -43,7 +44,7 @@ class TestProjectRetrievalWithSharing extends AbstractCollaborationTest {
         Project project = createAndShareProject(projectName);
 
         // Step - Get projects for user who got shared with
-        JSONArray members = getProjectMembers(project);
+        JSONArray members = retrievalTestService.getProjectMembers(project);
 
         // VP - Verify that shared project is visible
         assertThat(members.length()).isEqualTo(2);

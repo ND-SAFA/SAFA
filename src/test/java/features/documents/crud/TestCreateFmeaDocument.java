@@ -9,7 +9,7 @@ import edu.nd.crc.safa.features.documents.entities.app.DocumentColumnDataType;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentColumn;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.documents.repositories.DocumentColumnRepository;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import features.documents.base.AbstractDocumentTest;
 import org.json.JSONArray;
@@ -45,11 +45,12 @@ class TestCreateFmeaDocument extends AbstractDocumentTest {
         requestedDocumentJson.put("columns", columns);
 
         // Step - Send creation request.
-        JSONObject responseDocumentJson = createOrUpdateDocumentJson(projectVersion, requestedDocumentJson);
+        JSONObject responseDocumentJson = creationTestService.createOrUpdateDocumentJson(projectVersion,
+            requestedDocumentJson);
 
         // VP - Assert document base entity properties were returned
         String documentId = responseDocumentJson.getString("documentId");
-        assertObjectsMatch(requestedDocumentJson, responseDocumentJson, List.of("id", "columns"));
+        assertionTestService.assertObjectsMatch(requestedDocumentJson, responseDocumentJson, List.of("id", "columns"));
         assertThat(documentId).isNotEmpty();
 
         // VP - Assert columns properties were returned in response
@@ -62,7 +63,7 @@ class TestCreateFmeaDocument extends AbstractDocumentTest {
         // VP - Verify that columns were persisted
         List<DocumentColumn> documentColumns = documentColumnRepository
             .findByDocumentDocumentIdOrderByTableColumnIndexAsc(UUID.fromString(documentId));
-        assertThat(documentColumns.size()).isEqualTo(1);
+        assertThat(documentColumns).isNotEmpty();
         DocumentColumn documentColumn = documentColumns.get(0);
         assertDocumentColumn(documentColumn, columnName, columnType, 0);
 
@@ -72,7 +73,8 @@ class TestCreateFmeaDocument extends AbstractDocumentTest {
         responseDocumentJson.put("columns", newColumns);
 
         //Step - Update columns
-        JSONObject updateResponseJson = createOrUpdateDocumentJson(projectVersion, responseDocumentJson);
+        JSONObject updateResponseJson = creationTestService.createOrUpdateDocumentJson(projectVersion,
+            responseDocumentJson);
 
         // VP - Assert columns properties were returned in response
         JSONArray updatedColumnsJson = updateResponseJson.getJSONArray("columns");
@@ -82,12 +84,12 @@ class TestCreateFmeaDocument extends AbstractDocumentTest {
         // VP - Verify that columns were persisted
         List<DocumentColumn> updatedDocumentColumns = documentColumnRepository
             .findByDocumentDocumentIdOrderByTableColumnIndexAsc(UUID.fromString(documentId));
-        assertThat(updatedDocumentColumns.size()).isEqualTo(2);
+        assertThat(updatedDocumentColumns).hasSize(2);
         DocumentColumn updatedDocumentColumn = updatedDocumentColumns.get(0);
         assertDocumentColumn(updatedDocumentColumn, newColumnName, newColumnType, 0);
 
         // Step - Retrieve document
-        JSONArray documentsRetrieved = getProjectDocuments(projectVersion.getProject());
+        JSONArray documentsRetrieved = getProjectDocuments(projectVersion);
 
         // VP - Verify single document retrieved
         assertThat(documentsRetrieved.length()).isEqualTo(1);
@@ -101,7 +103,7 @@ class TestCreateFmeaDocument extends AbstractDocumentTest {
         expectedColumns.put("columns", updatedColumnsJson);
         actualColumns.put("columns", documentJson.getJSONArray("columns"));
 
-        assertObjectsMatch(expectedColumns, actualColumns);
+        assertionTestService.assertObjectsMatch(expectedColumns, actualColumns);
     }
 
     private JSONArray assertDocumentColumns(JSONObject object,

@@ -2,10 +2,10 @@ package features.layout.crud;
 
 import java.util.List;
 
-import edu.nd.crc.safa.features.layout.entities.LayoutPosition;
-import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
+import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
+import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 
 import features.layout.base.AbstractCorrectnessTest;
 import org.json.JSONArray;
@@ -29,16 +29,16 @@ class TestDocumentLayoutIsRetrieved extends AbstractCorrectnessTest {
 
         // Step - Add artifacts to layout
         JSONArray artifactsJson = commitResponse.getJSONObject("artifacts").getJSONArray("added");
-        addArtifactToDocument(projectVersion, document, artifactsJson);
+        creationTestService.addArtifactToDocument(projectVersion, document, artifactsJson);
 
         // Step - Retrieve project (including layout)
-        ProjectAppEntity project = getProjectAtVersion(projectVersion);
+        ProjectAppEntity project = retrievalTestService.getProjectAtVersion(projectVersion);
 
         // Step - Extract artifact positions
         String documentId = document.getDocumentId().toString();
-        LayoutPosition a1Pos = getArtifactPositionInProjectLayout(project, documentId, a1Name);
-        LayoutPosition a2Pos = getArtifactPositionInProjectLayout(project, documentId, a2Name);
-        LayoutPosition a3Pos = getArtifactPositionInProjectLayout(project, documentId, a3Name);
+        LayoutPosition a1Pos = getLayoutPositionInDocument(project, documentId, a1Name);
+        LayoutPosition a2Pos = getLayoutPositionInDocument(project, documentId, a2Name);
+        LayoutPosition a3Pos = getLayoutPositionInDocument(project, documentId, a3Name);
 
         // VP - Verify that root has greatest y
         assertLayoutCorrectness(a1Pos, a2Pos, a3Pos);
@@ -62,7 +62,7 @@ class TestDocumentLayoutIsRetrieved extends AbstractCorrectnessTest {
             artifactIds);
 
         // Step - Create project with document
-        JSONObject docCreated = createOrUpdateDocumentJson(projectVersion, documentJson);
+        JSONObject docCreated = creationTestService.createOrUpdateDocumentJson(projectVersion, documentJson);
 
         // Step - Get list of artifact positions
         List<LayoutPosition> artifactPositions = getArtifactPositionsInDocument(

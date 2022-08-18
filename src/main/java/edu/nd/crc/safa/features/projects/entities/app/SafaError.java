@@ -25,6 +25,10 @@ public class SafaError extends RuntimeException {
         this.errors = new ArrayList<>();
     }
 
+    public SafaError(String format, Object... args) {
+        this(String.format(format.replace("%s", "[%s]"), args));
+    }
+
     public SafaError(String message, Exception e) {
         this.exception = e;
         this.message = message;

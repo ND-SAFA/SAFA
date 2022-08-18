@@ -6,7 +6,7 @@ import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.jobs.entities.app.FlatFileProjectCreationJob;
 import edu.nd.crc.safa.features.jobs.entities.app.JobType;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import org.springframework.web.multipart.MultipartFile;
 

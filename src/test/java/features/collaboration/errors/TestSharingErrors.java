@@ -33,7 +33,8 @@ class TestSharingErrors extends AbstractCollaborationTest {
 
         // Step - Share with non-existent user
         String nonUserEmail = "non-existing@email.com";
-        JSONObject response = shareProject(project, nonUserEmail, ProjectRole.VIEWER, status().is4xxClientError());
+        JSONObject response = creationTestService.shareProject(project, nonUserEmail, ProjectRole.VIEWER,
+            status().is4xxClientError());
 
         // VP - Verify that error informs that email not associated with account
         String error = response.getString("message");

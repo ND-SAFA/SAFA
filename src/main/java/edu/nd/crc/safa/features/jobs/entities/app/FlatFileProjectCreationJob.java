@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.features.jobs.entities.app;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -14,7 +15,8 @@ import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.errors.entities.db.CommitError;
 import edu.nd.crc.safa.features.errors.repositories.CommitErrorRepository;
-import edu.nd.crc.safa.features.flatfiles.entities.parser.FlatFileParser;
+import edu.nd.crc.safa.features.flatfiles.parser.FlatFileParser;
+import edu.nd.crc.safa.features.flatfiles.parser.TimFileParser;
 import edu.nd.crc.safa.features.flatfiles.services.FileUploadService;
 import edu.nd.crc.safa.features.flatfiles.services.FlatFileService;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
@@ -22,7 +24,7 @@ import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
 import org.json.JSONObject;
@@ -32,7 +34,7 @@ import org.springframework.web.multipart.MultipartFile;
  * Responsible for providing step implementations for parsing flat files
  * to use the project creation worker.
  */
-public class FlatFileProjectCreationJob extends ProjectCreationJob {
+public class FlatFileProjectCreationJob extends CommitJob {
 
     /**
      * The initial project version
@@ -65,31 +67,28 @@ public class FlatFileProjectCreationJob extends ProjectCreationJob {
     }
 
     @Override
-    public void initJobData() throws SafaError {
+    public void initJobData() throws SafaError, IOException {
         super.initJobData();
         Project project = this.projectVersion.getProject();
         uploadFlatFiles(project);
-        this.pathToFiles = ProjectPaths.getPathToUploadedFiles(project, false);
+        this.pathToFiles = ProjectPaths.Storage.projectUploadsPath(project, false);
         parseTimFile();
     }
 
-    private void uploadFlatFiles(Project project) {
+    private void uploadFlatFiles(Project project) throws IOException {
         FileUploadService fileUploadService = this.serviceProvider.getFileUploadService();
         fileUploadService.uploadFilesToServer(project, Arrays.asList(files));
-        this.pathToTIMFile = ProjectPaths.getPathToFlatFile(project, ProjectVariables.TIM_FILENAME);
+        this.pathToTIMFile = ProjectPaths.Storage.uploadedProjectFilePath(project, ProjectVariables.TIM_FILENAME);
     }
 
-    private void parseTimFile() {
+    private void parseTimFile() throws IOException {
         if (!Files.exists(Paths.get(this.pathToTIMFile))) {
             throw new SafaError("TIM.json file was not uploaded for this project");
         }
 
-        try {
-            JSONObject timFileJson = FileUtilities.readJSONFile(this.pathToTIMFile);
-            this.flatFileParser = new FlatFileParser(timFileJson, this.pathToFiles);
-        } catch (Exception e) {
-            throw new SafaError("Could not parse");
-        }
+        JSONObject timFileJson = FileUtilities.readJSONFile(this.pathToTIMFile);
+        TimFileParser timFileParser = new TimFileParser(timFileJson, this.pathToFiles);
+        this.flatFileParser = new FlatFileParser(timFileParser);
     }
 
     public void parsingArtifactFiles() throws SafaError {

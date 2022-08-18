@@ -101,7 +101,7 @@ public class AppConstraints {
             case AppConstraints.NULL_VALUE:
                 return createNullError(cause);
             default:
-                throw new SafaError("Constrain friendly name is not defined.");
+                throw new SafaError("Database constraint was violated. %s", cause);
         }
     }
 

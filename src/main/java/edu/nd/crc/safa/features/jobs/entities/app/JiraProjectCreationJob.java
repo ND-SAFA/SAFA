@@ -1,14 +1,13 @@
 package edu.nd.crc.safa.features.jobs.entities.app;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.List;
 
-import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
+import edu.nd.crc.safa.common.ProjectEntities;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
-import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
+import edu.nd.crc.safa.features.jira.entities.api.JiraIdentifier;
 import edu.nd.crc.safa.features.jira.entities.app.JiraIssueDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraProjectResponseDTO;
 import edu.nd.crc.safa.features.jira.entities.db.JiraAccessCredentials;
@@ -17,11 +16,8 @@ import edu.nd.crc.safa.features.jira.services.JiraConnectionService;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
-import edu.nd.crc.safa.features.projects.services.ProjectService;
-import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
 import lombok.Setter;
 
@@ -32,19 +28,11 @@ import lombok.Setter;
  * 3. Saving issues as artifacts
  * 4. Returning project created
  */
-public class JiraProjectCreationJob extends ProjectCreationJob {
+public class JiraProjectCreationJob extends CommitJob {
     /**
      * The project version to upload entities to.
      */
-    ProjectVersion projectVersion;
-    /**
-     * The JIRA id of the project to scrape.
-     */
-    Long jiraProjectId;
-    /**
-     * Id of JIRA resource containing project.
-     */
-    String cloudId;
+    JiraIdentifier jiraIdentifier;
     /**
      * The credentials used to access the project.
      */
@@ -63,11 +51,9 @@ public class JiraProjectCreationJob extends ProjectCreationJob {
     public JiraProjectCreationJob(
         JobDbEntity jobDbEntity,
         ServiceProvider serviceProvider,
-        Long jiraProjectId,
-        String cloudId) {
-        super(jobDbEntity, serviceProvider, new ProjectCommit());
-        this.jiraProjectId = jiraProjectId;
-        this.cloudId = cloudId;
+        JiraIdentifier jiraIdentifier) {
+        super(jobDbEntity, serviceProvider, new ProjectCommit(jiraIdentifier.getProjectVersion(), false));
+        this.jiraIdentifier = jiraIdentifier;
         this.issues = new ArrayList<>();
     }
 
@@ -83,7 +69,8 @@ public class JiraProjectCreationJob extends ProjectCreationJob {
 
         SafaUser principal = safaUserService.getCurrentUser();
         this.credentials = jiraAccessCredentialsRepository
-            .findByUserAndCloudId(principal, this.cloudId).orElseThrow(() -> new SafaError("No JIRA credentials "
+            .findByUserAndCloudId(principal, this.jiraIdentifier.getCloudId()).orElseThrow(() -> new SafaError("No "
+                + "JIRA credentials "
                 + "found"));
     }
 
@@ -95,27 +82,27 @@ public class JiraProjectCreationJob extends ProjectCreationJob {
         JiraConnectionService jiraConnectionService = this.serviceProvider.getJiraConnectionService();
 
         // Step - Retrieve project information including issues
+        Long jiraProjectId = this.jiraIdentifier.getJiraProjectId();
         this.jiraProjectResponse = jiraConnectionService.retrieveJIRAProject(credentials,
             jiraProjectId);
         this.issues = jiraConnectionService.retrieveJIRAIssues(credentials, jiraProjectId).getIssues();
     }
 
     public void createSafaProject() {
-        ProjectService projectService = this.serviceProvider.getProjectService();
-
         // Step - Save as SAFA project
         String projectName = this.jiraProjectResponse.getName();
         String projectDescription = this.jiraProjectResponse.getDescription();
-        Project project = new Project(projectName, projectDescription);
-        projectService.saveProjectWithCurrentUserAsOwner(project);
+        Project project = this.jiraIdentifier.getProjectVersion().getProject();
+        project.setName(projectName);
+        project.setDescription(projectDescription);
+        this.serviceProvider.getProjectRepository().save(project);
 
         // Step - Update job name
         this.serviceProvider.getJobService().setJobName(this.getJobDbEntity(), createJobName(projectName));
 
         // Step - Map JIRA project to SAFA project
-        this.serviceProvider.getJiraConnectionService().createJiraProjectMapping(project, jiraProjectId);
-        this.projectVersion = this.serviceProvider.getProjectService().createInitialProjectVersion(project);
-        this.projectCommit.setCommitVersion(this.projectVersion);
+        this.serviceProvider.getJiraConnectionService().createJiraProjectMapping(project,
+            this.jiraIdentifier.getJiraProjectId());
     }
 
     /**
@@ -123,57 +110,9 @@ public class JiraProjectCreationJob extends ProjectCreationJob {
      * to convert them into artifacts. Issue links are also extracted.
      */
     public void convertIssuesToArtifactsAndTraceLinks() {
-        List<ArtifactAppEntity> artifacts = new ArrayList<>();
-        List<TraceAppEntity> traces = new ArrayList<>();
-
-        for (JiraIssueDTO issue : this.issues) {
-            String name = issue.getKey();
-            String type = issue.getFields().getIssueType().getName();
-            String summary = issue.getFields().getSummary();
-            String description = getIssueDescription(issue);
-
-            ArtifactAppEntity artifact = new ArtifactAppEntity(
-                "",
-                type,
-                name,
-                summary,
-                description,
-                DocumentType.ARTIFACT_TREE,
-                new Hashtable<>()
-            );
-            artifacts.add(artifact);
-            for (JiraIssueDTO.JiraIssueFields.JiraIssueLink link : issue.getFields().getIssueLinks()) {
-                JiraIssueDTO targetArtifact = link.getOutwardIssue();
-                if (targetArtifact != null) {
-                    String targetName = link.getOutwardIssue().getKey();
-
-                    TraceAppEntity trace = new TraceAppEntity()
-                        .asManualTrace()
-                        .betweenArtifacts(name, targetName);
-                    traces.add(trace);
-                }
-            }
-        }
-
-        this.projectCommit.addArtifacts(ModificationType.ADDED, artifacts);
-        this.projectCommit.addTraces(ModificationType.ADDED, traces);
-    }
-
-    /**
-     * Concatenates all issue contents into string delimited by newlines.
-     *
-     * @param issue The issue whose content is returned.
-     * @return String representing delimited content.
-     */
-    private String getIssueDescription(JiraIssueDTO issue) {
-        StringBuilder contentString = new StringBuilder();
-        for (JiraIssueDTO.JiraIssueFields.JiraDescription.Content content :
-            issue.getFields().getDescription().getContent()) {
-            for (JiraIssueDTO.JiraIssueFields.JiraDescription.ContentContent contentContent :
-                content.getContent()) {
-                contentString.append(contentContent.getText());
-            }
-        }
-        return contentString.toString().strip();
+        ProjectEntities projectEntities =
+            this.serviceProvider.getJiraParsingService().parseProjectEntitiesFromIssues(this.issues);
+        this.projectCommit.addArtifacts(ModificationType.ADDED, projectEntities.getArtifacts());
+        this.projectCommit.addTraces(ModificationType.ADDED, projectEntities.getTraces());
     }
 }

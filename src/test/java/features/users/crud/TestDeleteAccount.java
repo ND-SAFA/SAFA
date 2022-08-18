@@ -4,7 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Optional;
 
-import edu.nd.crc.safa.builders.requests.SafaRequest;
+import requests.SafaRequest;
+
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.users.entities.app.UserPassword;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
@@ -22,13 +23,13 @@ class TestDeleteAccount extends AbstractUserTest {
      * Creates new account, verifies it exists, deletes it, and verifies
      * that it is deleted.
      *
-     * @throws Exception Throws errors if HTTP request fails.
+     * @throws Exception If HTTP request fails.
      */
     @Test
     void testDeleteAccount() throws Exception {
         // Step 1 - Create account
-        createUser(this.testEmail, this.testPassword);
-        loginUser(this.testEmail, this.testPassword);
+        authorizationTestService.createUser(this.testEmail, this.testPassword);
+        authorizationTestService.loginUser(this.testEmail, this.testPassword);
 
         // VP - Verify account exists
         Optional<SafaUser> safaUserOptional = this.safaUserRepository.findByEmail(this.testEmail);

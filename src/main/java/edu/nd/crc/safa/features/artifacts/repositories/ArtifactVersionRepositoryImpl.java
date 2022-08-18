@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
-import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactType;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.features.artifacts.entities.db.FTAArtifact;
 import edu.nd.crc.safa.features.artifacts.entities.db.SafetyCaseArtifact;
@@ -23,7 +22,8 @@ import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;
 import edu.nd.crc.safa.features.traces.repositories.TraceLinkVersionRepository;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.types.ArtifactType;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.utilities.JsonFileUtilities;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -137,7 +137,6 @@ public class ArtifactVersionRepositoryImpl
         TypeReference<Map<String, String>> typeReference = new TypeReference<Map<String, String>>() {
         };
         Map<String, String> customFields = JsonFileUtilities.parse(artifactVersion.getCustomFields(), typeReference);
-
 
         ArtifactAppEntity artifactAppEntity =
             new ArtifactAppEntity(artifactVersion.getArtifact().getArtifactId().toString(),
@@ -284,7 +283,7 @@ public class ArtifactVersionRepositoryImpl
             Optional<Artifact> artifactOptional = this.artifactRepository
                 .findById(UUID.fromString(artifactId));
             if (artifactOptional.isEmpty()) {
-                throw new SafaError("Could not find artifact with id:" + artifactId);
+                throw new SafaError("Could not find artifact with id: %s", artifactId);
             }
             Artifact artifact = artifactOptional.get();
             artifact.setType(artifactType);

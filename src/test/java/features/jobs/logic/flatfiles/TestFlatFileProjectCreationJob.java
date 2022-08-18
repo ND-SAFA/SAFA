@@ -2,13 +2,15 @@ package features.jobs.logic.flatfiles;
 
 import java.util.UUID;
 
-import features.jobs.base.AbstractFlatFileJobTest;
+import edu.nd.crc.safa.config.ProjectPaths;
+
+import features.jobs.base.AbstractUpdateProjectViaFlatFileTest;
 import features.jobs.base.JobTestService;
 import org.junit.jupiter.api.Test;
 
-class TestProjectCreationWorkerFlatFile extends AbstractFlatFileJobTest {
+class TestProjectCreationWorkerFlatFile extends AbstractUpdateProjectViaFlatFileTest {
 
-    int N_STEPS = 6;
+    int N_STEPS = 4;
 
     /*
      * Tests that uploading default project as job completes.
@@ -23,10 +25,12 @@ class TestProjectCreationWorkerFlatFile extends AbstractFlatFileJobTest {
     void testDefaultProjectCompletes() throws Exception {
 
         // Step - Find Job
-        UUID jobId = createJobForDefaultProject();
+        UUID jobId = updateProjectViaFlatFiles(ProjectPaths.Tests.DefaultProject.V1);
 
         // Step - Get Job and subscribe for updates
-        createNewConnection(defaultUser).subscribeToJob(defaultUser, jobService.getJobById(jobId));
+        notificationTestService
+            .createNewConnection(defaultUser)
+            .subscribeToJob(defaultUser, jobService.getJobById(jobId));
 
         // VP - Verify that job has finished.
         JobTestService.verifyJobWasCompleted(serviceProvider, jobId, N_STEPS);

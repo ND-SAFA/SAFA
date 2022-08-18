@@ -5,6 +5,8 @@ import edu.nd.crc.safa.features.jira.entities.api.JiraIdentifier;
 import edu.nd.crc.safa.features.jobs.entities.app.JiraProjectCreationJob;
 import edu.nd.crc.safa.features.jobs.entities.app.JobType;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 /**
  * Builds job for pulling issues from JIRA and updating project.
@@ -25,7 +27,10 @@ public class UpdateProjectByJiraJobBuilder extends AbstractJobBuilder<JiraIdenti
 
     @Override
     protected JiraIdentifier constructIdentifier() {
-        return new JiraIdentifier(this.jiraProjectId, this.cloudId);
+        Project project = new Project("", ""); // Set once parse starts
+        this.serviceProvider.getProjectService().saveProjectWithCurrentUserAsOwner(project);
+        ProjectVersion projectVersion = this.serviceProvider.getVersionService().createInitialProjectVersion(project);
+        return new JiraIdentifier(projectVersion, this.jiraProjectId, this.cloudId);
     }
 
     @Override
@@ -44,8 +49,7 @@ public class UpdateProjectByJiraJobBuilder extends AbstractJobBuilder<JiraIdenti
         JiraProjectCreationJob jiraProjectCreationjob = new JiraProjectCreationJob(
             jobDbEntity,
             serviceProvider,
-            jiraProjectId,
-            cloudId
+            this.identifier
         );
         return new JobDefinition(jobDbEntity, jiraProjectCreationjob);
     }

@@ -1,29 +1,27 @@
 package features.base;
 
-import edu.nd.crc.safa.builders.JsonBuilder;
-import edu.nd.crc.safa.builders.entities.DbEntityBuilder;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.FTAArtifactRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.SafetyCaseArtifactRepository;
+import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.documents.repositories.DocumentArtifactRepository;
 import edu.nd.crc.safa.features.documents.repositories.DocumentRepository;
 import edu.nd.crc.safa.features.errors.repositories.CommitErrorRepository;
 import edu.nd.crc.safa.features.flatfiles.services.FileUploadService;
 import edu.nd.crc.safa.features.jobs.services.JobService;
+import edu.nd.crc.safa.features.memberships.repositories.ProjectMembershipRepository;
 import edu.nd.crc.safa.features.projects.repositories.ProjectRepository;
 import edu.nd.crc.safa.features.projects.services.ProjectService;
 import edu.nd.crc.safa.features.traces.repositories.TraceLinkRepository;
 import edu.nd.crc.safa.features.traces.repositories.TraceLinkVersionRepository;
-import edu.nd.crc.safa.features.users.repositories.ProjectMembershipRepository;
 import edu.nd.crc.safa.features.users.repositories.SafaUserRepository;
 import edu.nd.crc.safa.features.users.services.AccountLookupService;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
 import edu.nd.crc.safa.features.versions.repositories.ProjectVersionRepository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -80,12 +78,6 @@ public abstract class EntityBaseTest extends SpringBootBaseTest {
     protected AccountLookupService accountLookupService;
 
     @Autowired
-    protected DbEntityBuilder dbEntityBuilder;
-
-    @Autowired
-    protected JsonBuilder jsonBuilder;
-
-    @Autowired
     protected SafetyCaseArtifactRepository safetyCaseArtifactRepository;
 
     @Autowired
@@ -94,11 +86,8 @@ public abstract class EntityBaseTest extends SpringBootBaseTest {
     @Autowired
     protected JobService jobService;
 
-    ObjectMapper objectMapper = new ObjectMapper();
+    @Autowired
+    protected ServiceProvider serviceProvider;
 
-    @BeforeEach
-    public void createNewBuilders() {
-        dbEntityBuilder.createEmptyData();
-        jsonBuilder.createEmptyData();
-    }
+    ObjectMapper objectMapper = new ObjectMapper();
 }

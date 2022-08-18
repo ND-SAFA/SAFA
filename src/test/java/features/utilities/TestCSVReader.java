@@ -3,17 +3,17 @@ package features.utilities;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.io.IOException;
 import java.util.List;
 
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
+import features.base.DefaultProjectConstants;
+import features.base.EntityBaseTest;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.junit.jupiter.api.Test;
-import features.base.DefaultProjectConstants;
-import features.base.EntityBaseTest;
 
 /**
  * Tests that we are able to read a CSV file containing headers.
@@ -21,7 +21,7 @@ import features.base.EntityBaseTest;
 class TestCSVReader extends EntityBaseTest {
     @Test
     void readCSVFile() throws Exception {
-        String pathToFile = ProjectPaths.getPathToDefaultProjectFile(
+        String pathToFile = ProjectPaths.Tests.DefaultProject.getPathToFile(
             DefaultProjectConstants.File.DESIGN_FILE
         );
         CSVParser designFile = FileUtilities.readCSVFile(pathToFile);
@@ -35,11 +35,11 @@ class TestCSVReader extends EntityBaseTest {
 
         // VP 1 - Headers were parsed correctly
         List<String> headerNames = designFile.getHeaderNames();
-        assertThat(headerNames.size()).as("number of headers").isEqualTo(3);
+        assertThat(headerNames).as("number of headers").hasSize(3);
 
         // VP 2 - All records read
         List<CSVRecord> records = designFile.getRecords();
-        assertThat(records.size()).as("record size").isEqualTo(nTotalRecords);
+        assertThat(records).as("record size").hasSize(nTotalRecords);
 
         // VP 3 - Some particular record contains correct content
         CSVRecord testRecord = records.get(testArtifactIndex);
@@ -50,9 +50,9 @@ class TestCSVReader extends EntityBaseTest {
 
     @Test
     void csvFileNotFound() {
-        Exception exception = assertThrows(SafaError.class, () -> {
+        Exception exception = assertThrows(IOException.class, () -> {
             FileUtilities.readCSVFile("/abc/123");
         });
-        assertThat(exception.getMessage()).contains("not exist");
+        assertThat(exception.getMessage()).contains("/abc/123");
     }
 }

@@ -1,23 +1,31 @@
 package features.layout.logic;
 
-import edu.nd.crc.safa.features.layout.entities.LayoutPosition;
+import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
+import edu.nd.crc.safa.features.layout.entities.db.ArtifactPosition;
+import edu.nd.crc.safa.features.layout.repositories.ArtifactPositionRepository;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 
 import features.layout.base.AbstractCorrectnessTest;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Tests that nodes are formatted in a hierarchical structure.
  */
 class TestLayoutCorrectness extends AbstractCorrectnessTest {
 
+    @Autowired
+    ArtifactPositionRepository artifactPositionRepository;
+
     @Test
     void testParentWithTwoChildren() throws Exception {
         // Step - Create project
         createProject();
 
+        Iterable<ArtifactPosition> artifactPositionRepositoryList = artifactPositionRepository.findAll();
+
         // Step - Create layout
-        ProjectAppEntity project = getProjectAtVersion(projectVersion);
+        ProjectAppEntity project = retrievalTestService.getProjectAtVersion(projectVersion);
 
         // Step - Extract positions
         LayoutPosition a1Pos = getPosition(project, a1Name);

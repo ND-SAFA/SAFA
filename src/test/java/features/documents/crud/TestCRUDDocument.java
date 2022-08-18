@@ -2,16 +2,16 @@ package features.documents.crud;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import edu.nd.crc.safa.builders.requests.SafaRequest;
+import requests.SafaRequest;
+
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
-import edu.nd.crc.safa.features.projects.entities.db.Project;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
+import features.base.ApplicationBaseTest;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
-import features.base.ApplicationBaseTest;
 
 /**
  * Tests that a user is able to delete a document in a project.
@@ -32,7 +32,7 @@ class TestCRUDDocument extends ApplicationBaseTest {
 
         // Step - Retrieve project
         JSONObject projectJson = SafaRequest
-            .withRoute(AppRoutes.Projects.Entities.GET_PROJECT_IN_VERSION)
+            .withRoute(AppRoutes.Retrieval.GET_PROJECT_IN_VERSION)
             .withVersion(projectVersion)
             .getWithJsonObject();
 
@@ -47,7 +47,7 @@ class TestCRUDDocument extends ApplicationBaseTest {
 
         // VP - Verify that project meta data contains a single document
         projectJson = SafaRequest
-            .withRoute(AppRoutes.Projects.Entities.GET_PROJECT_IN_VERSION)
+            .withRoute(AppRoutes.Retrieval.GET_PROJECT_IN_VERSION)
             .withVersion(projectVersion)
             .getWithJsonObject();
         JSONArray documentsJson = projectJson.getJSONArray("documents");

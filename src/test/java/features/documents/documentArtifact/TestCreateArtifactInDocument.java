@@ -4,13 +4,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
-import edu.nd.crc.safa.builders.CommitBuilder;
+import builders.CommitBuilder;
+
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentArtifact;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.documents.repositories.DocumentArtifactRepository;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import features.base.ApplicationBaseTest;
 import org.json.JSONArray;
@@ -68,10 +69,10 @@ class TestCreateArtifactInDocument extends ApplicationBaseTest {
 
         // Step -
         CommitBuilder commitBuilder = CommitBuilder.withVersion(projectVersion).withModifiedArtifact(artifactJson);
-        commit(commitBuilder);
+        commitTestService.commit(commitBuilder);
 
         // VP - Verify single document created for project
         List<DocumentArtifact> projectDocuments = this.documentArtifactRepository.findByDocument(document);
-        assertThat(projectDocuments.size()).isEqualTo(1);
+        assertThat(projectDocuments).hasSize(1);
     }
 }

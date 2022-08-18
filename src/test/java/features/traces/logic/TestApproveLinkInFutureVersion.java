@@ -6,33 +6,29 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import edu.nd.crc.safa.builders.CommitBuilder;
-import edu.nd.crc.safa.builders.requests.FlatFileRequest;
-import edu.nd.crc.safa.builders.requests.SafaRequest;
+import builders.CommitBuilder;
+import requests.FlatFileRequest;
+import requests.SafaRequest;
+
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.features.projects.services.AppEntityRetrievalService;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.traces.entities.db.TraceLinkVersion;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import features.traces.base.AbstractTraceTest;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import services.MappingTestService;
 
 /**
  * Tests that generated trace links are able to be reviewed in subsequent versions after generation
  */
 class TestApproveLinkInFutureVersion extends AbstractTraceTest {
 
-    @Autowired
-    AppEntityRetrievalService appEntityRetrievalService;
-
     @Test
     void ableToEditGeneratedLinksInFutureVersions() throws Exception {
-        String projectName = "test-project";
         String sourceName = "RE-8";
         String targetName = "DD-10";
 
@@ -42,7 +38,7 @@ class TestApproveLinkInFutureVersion extends AbstractTraceTest {
             .newVersionWithReturn(projectName);
 
         // Step - Upload before files containing generated links
-        FlatFileRequest.updateProjectVersionFromFlatFiles(projectVersion, ProjectPaths.PATH_TO_DEFAULT_PROJECT);
+        FlatFileRequest.updateProjectVersionFromFlatFiles(projectVersion, ProjectPaths.Tests.DefaultProject.V1);
 
         // Step - Get generated links
         String url = getGeneratedLinkEndpoint(dbEntityBuilder.getProjectVersion(projectName, 0));
@@ -51,7 +47,7 @@ class TestApproveLinkInFutureVersion extends AbstractTraceTest {
 
         // Step - Set link to approved
         link.put("approvalStatus", ApprovalStatus.APPROVED);
-        TraceAppEntity traceAppEntity = toClass(link.toString(), TraceAppEntity.class);
+        TraceAppEntity traceAppEntity = MappingTestService.toClass(link.toString(), TraceAppEntity.class);
 
         // Step - Commit link change to new version
         ProjectVersion projectVersionLater = dbEntityBuilder.newVersionWithReturn(projectName);
@@ -60,12 +56,12 @@ class TestApproveLinkInFutureVersion extends AbstractTraceTest {
             .withModifiedTrace(traceAppEntity);
 
         // Step - Commit
-        commit(commitBuilder);
+        commitTestService.commit(commitBuilder);
 
         // VP - Verify that two versions exist of the trace link
         UUID traceLinkId = UUID.fromString(link.getString("traceLinkId"));
         List<TraceLinkVersion> linkVersions = this.traceLinkVersionRepository.findByTraceLinkTraceLinkId(traceLinkId);
-        assertThat(linkVersions.size()).isEqualTo(2);
+        assertThat(linkVersions).hasSize(2);
 
         // VP - Verify that
         TraceLinkVersion modifiedTraceLinkVersion = linkVersions.get(1);
@@ -74,7 +70,6 @@ class TestApproveLinkInFutureVersion extends AbstractTraceTest {
 
     @Test
     void testApproveDeclineLinks() throws Exception {
-        String projectName = "test-project";
         String sourceName = "RE-8";
         String targetName = "DD-10";
         double score = 0.2;
@@ -103,7 +98,7 @@ class TestApproveLinkInFutureVersion extends AbstractTraceTest {
         // Step - Approve generated trace link
         TraceAppEntity generatedLinkAppEntity = this.traceLinkVersionRepository
             .retrieveAppEntityFromVersionEntity(generatedLink);
-        commit(CommitBuilder
+        commitTestService.commit(CommitBuilder
             .withVersion(projectVersion)
             .withModifiedTrace(generatedLinkAppEntity));
 
@@ -121,7 +116,7 @@ class TestApproveLinkInFutureVersion extends AbstractTraceTest {
         // Step - Commit changes
         TraceAppEntity updatedGeneratedLinkAppEntity = this.traceLinkVersionRepository
             .retrieveAppEntityFromVersionEntity(generatedLink);
-        commit(CommitBuilder
+        commitTestService.commit(CommitBuilder
             .withVersion(projectVersion)
             .withModifiedTrace(updatedGeneratedLinkAppEntity));
 

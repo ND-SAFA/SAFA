@@ -13,10 +13,12 @@ import edu.nd.crc.safa.features.jobs.entities.app.JobType;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
-import features.flatfile.base.BaseFlatFileTest;
+import features.flatfiles.base.BaseFlatFileTest;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
+import services.AuthorizationTestService;
+import services.MappingTestService;
 
 /**
  * Sets up internal SAFA and JIRA authentication in order to skip
@@ -25,14 +27,14 @@ import org.junit.jupiter.api.BeforeEach;
 public abstract class JiraBaseFlatFileTest extends BaseFlatFileTest {
 
     protected String jiraProjectName = "test-jira-project";
-    protected int N_STEPS = 5;
+    protected int N_STEPS = 3;
     protected String cloudId = UUID.randomUUID().toString();
     protected Long jiraProjectId = (long) 1;
 
 
     @BeforeEach
     public void setJiraAuthorization() {
-        setAuthorization(); // Required because getting currentDocument requires a user be logged in
+        AuthorizationTestService.setAuthorization(serviceProvider);
 
         // Step - Create fake credentials
         JiraAccessCredentials credentials = new JiraAccessCredentials();
@@ -54,7 +56,7 @@ public abstract class JiraBaseFlatFileTest extends BaseFlatFileTest {
         List<JiraIssueDTO> issues = new ArrayList<>();
         for (int i = 0; i < issuesJson.length(); i++) {
             JSONObject issueJson = issuesJson.getJSONObject(i);
-            JiraIssueDTO issue = toClass(issueJson.toString(), JiraIssueDTO.class);
+            JiraIssueDTO issue = MappingTestService.toClass(issueJson.toString(), JiraIssueDTO.class);
             issues.add(issue);
         }
         return issues;

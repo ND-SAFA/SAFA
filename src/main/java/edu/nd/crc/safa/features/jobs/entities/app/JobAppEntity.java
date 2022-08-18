@@ -5,9 +5,14 @@ import java.lang.reflect.Field;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 /**
  * Represents a job's information for presenting its current progress.
  */
+@Data
+@EqualsAndHashCode(callSuper = true)
 public class JobAppEntity extends JobDbEntity {
 
     /**
@@ -29,15 +34,8 @@ public class JobAppEntity extends JobDbEntity {
             jobAppEntity.steps = JobSteps.getJobSteps(jobAppEntity.jobType);
             return jobAppEntity;
         } catch (IllegalAccessException e) {
-            throw new SafaError("Illegally accessed field while creating job app entity.");
+            String errorMessage = "Illegally accessed field while creating job app entity. %s";
+            throw new SafaError(errorMessage, e.getMessage());
         }
-    }
-
-    public String[] getSteps() {
-        return steps;
-    }
-
-    public void setSteps(String[] steps) {
-        this.steps = steps;
     }
 }

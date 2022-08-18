@@ -1,5 +1,7 @@
 package edu.nd.crc.safa.features.jira.entities.api;
 
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -9,6 +11,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class JiraIdentifier {
+    ProjectVersion projectVersion;
     Long jiraProjectId;
     String cloudId;
 }

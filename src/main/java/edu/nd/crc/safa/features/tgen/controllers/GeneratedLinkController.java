@@ -8,13 +8,12 @@ import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.common.BaseController;
+import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
-import edu.nd.crc.safa.features.projects.services.AppEntityRetrievalService;
 import edu.nd.crc.safa.features.tgen.entities.TraceLinkGenerationRequest;
-import edu.nd.crc.safa.features.tgen.generator.TraceLinkGenerator;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.TraceType;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,16 +29,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class GeneratedLinkController extends BaseController {
 
-    private final TraceLinkGenerator traceLinkGenerator;
-    private final AppEntityRetrievalService appEntityRetrievalService;
-
     @Autowired
     public GeneratedLinkController(ResourceBuilder resourceBuilder,
-                                   AppEntityRetrievalService appEntityRetrievalService,
-                                   TraceLinkGenerator traceLinkGenerator) {
-        super(resourceBuilder);
-        this.appEntityRetrievalService = appEntityRetrievalService;
-        this.traceLinkGenerator = traceLinkGenerator;
+                                   ServiceProvider serviceProvider) {
+        super(resourceBuilder, serviceProvider);
     }
 
     /**
@@ -49,11 +42,12 @@ public class GeneratedLinkController extends BaseController {
      * @return List of trace app entities representing generated links in project version.
      * @throws SafaError If user does not have permissions to access this project.
      */
-    @GetMapping(value = AppRoutes.Projects.Links.GET_GENERATED_LINKS_IN_PROJECT_VERSION)
+    @GetMapping(value = AppRoutes.Links.GET_GENERATED_LINKS_IN_PROJECT_VERSION)
     public List<TraceAppEntity> getGeneratedLinks(@PathVariable UUID versionId) throws SafaError {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
-        return this.appEntityRetrievalService
-            .retrieveTracesInProjectVersion(projectVersion)
+        return this.serviceProvider
+            .getTraceService()
+            .getAppEntities(projectVersion)
             .stream()
             .filter(t -> t.getTraceType().equals(TraceType.GENERATED))
             .collect(Collectors.toList());
@@ -65,10 +59,12 @@ public class GeneratedLinkController extends BaseController {
      * @param traceLinkGenerationRequest Request containing source and target artifacts.
      * @return Returns list of trace app entities
      */
-    @PostMapping(value = AppRoutes.Projects.Links.GENERATE_LINKS)
+    @PostMapping(value = AppRoutes.Links.GENERATE_LINKS)
     public List<TraceAppEntity> generateTraceLinks(@RequestBody TraceLinkGenerationRequest traceLinkGenerationRequest) {
         List<ArtifactAppEntity> sourceArtifacts = traceLinkGenerationRequest.getSourceArtifacts();
         List<ArtifactAppEntity> targetArtifacts = traceLinkGenerationRequest.getTargetArtifacts();
-        return traceLinkGenerator.generateLinksBetweenArtifactAppEntities(sourceArtifacts, targetArtifacts);
+        return this.serviceProvider
+            .getTraceGenerationService()
+            .generateLinksBetweenArtifactAppEntities(sourceArtifacts, targetArtifacts);
     }
 }

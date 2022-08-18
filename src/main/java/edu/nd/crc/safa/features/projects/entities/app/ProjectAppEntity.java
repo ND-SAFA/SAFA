@@ -10,14 +10,14 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactType;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
-import edu.nd.crc.safa.features.layout.entities.LayoutPosition;
+import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
+import edu.nd.crc.safa.features.memberships.entities.app.ProjectMemberAppEntity;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.rules.parser.RuleName;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
-import edu.nd.crc.safa.features.users.entities.app.ProjectMemberAppEntity;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.types.TypeAppEntity;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
@@ -26,7 +26,7 @@ import lombok.Data;
  * Represents the front-end model of a project.
  */
 @Data
-public class ProjectAppEntity {
+public class ProjectAppEntity implements IAppEntity {
     @NotNull
     public String projectId;
     @NotNull
@@ -46,7 +46,7 @@ public class ProjectAppEntity {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     public List<@Valid @NotNull DocumentAppEntity> documents;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    public List<@Valid @NotNull ArtifactType> artifactTypes;
+    public List<@Valid @NotNull TypeAppEntity> artifactTypes;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     Map<String, List<@Valid @NotNull RuleName>> warnings;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
@@ -73,7 +73,7 @@ public class ProjectAppEntity {
                             List<ProjectMemberAppEntity> members,
                             List<DocumentAppEntity> documents,
                             @Nullable String currentDocumentId,
-                            List<ArtifactType> artifactTypes,
+                            List<TypeAppEntity> artifactTypes,
                             Map<String, List<@Valid @NotNull RuleName>> warnings,
                             ProjectParsingErrors errors,
                             Map<String, LayoutPosition> layout) {
@@ -99,5 +99,15 @@ public class ProjectAppEntity {
             .stream()
             .map(ArtifactAppEntity::getName)
             .collect(Collectors.toList());
+    }
+
+    @Override
+    public String getBaseEntityId() {
+        return this.projectId;
+    }
+
+    @Override
+    public void setBaseEntityId(String id) {
+        this.projectId = id;
     }
 }

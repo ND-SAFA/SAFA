@@ -43,31 +43,22 @@ import org.springframework.web.context.request.async.DeferredResult;
 public class JiraController extends BaseController {
 
     private final Logger log = LoggerFactory.getLogger(JiraController.class);
-
     private final JiraAccessCredentialsRepository accessCredentialsRepository;
-
     private final SafaUserService safaUserService;
     private final JiraConnectionService jiraConnectionService;
-
     private final ExecutorDelegate executorDelegate;
-    private final ServiceProvider serviceProvider;
 
     @Autowired
     public JiraController(ResourceBuilder resourceBuilder,
-                          SafaUserService safaUserService,
-                          JiraAccessCredentialsRepository accessCredentialsRepository,
-                          JiraConnectionService jiraConnectionService,
-                          ExecutorDelegate executorDelegate,
                           ServiceProvider serviceProvider) {
-        super(resourceBuilder);
-        this.safaUserService = safaUserService;
-        this.accessCredentialsRepository = accessCredentialsRepository;
-        this.jiraConnectionService = jiraConnectionService;
-        this.executorDelegate = executorDelegate;
-        this.serviceProvider = serviceProvider;
+        super(resourceBuilder, serviceProvider);
+        this.safaUserService = serviceProvider.getSafaUserService();
+        this.accessCredentialsRepository = serviceProvider.getJiraAccessCredentialsRepository();
+        this.jiraConnectionService = serviceProvider.getJiraConnectionService();
+        this.executorDelegate = serviceProvider.getExecutorDelegate();
     }
 
-    @PostMapping(AppRoutes.Projects.Import.CREATE_PROJECT_FROM_JIRA)
+    @PostMapping(AppRoutes.Jira.CREATE_PROJECT_FROM_JIRA)
     public JobAppEntity pullJiraProject(@PathVariable("id") Long jiraProjectId,
                                         @PathVariable("cloudId") String cloudId) throws Exception {
 
@@ -78,7 +69,7 @@ public class JiraController extends BaseController {
         return updateProjectByJiraJobBuilder.perform();
     }
 
-    @PostMapping(AppRoutes.Accounts.Jira.JIRA_CREDENTIALS)
+    @PostMapping(AppRoutes.Jira.JIRA_CREDENTIALS)
     public DeferredResult<JiraResponseDTO<Void>> createCredentials(@RequestBody @Valid JiraAccessCredentialsDTO data) {
         DeferredResult<JiraResponseDTO<Void>> output = executorDelegate.createOutput(5000L);
 
@@ -89,7 +80,7 @@ public class JiraController extends BaseController {
             boolean areCredentialsValid = jiraConnectionService.checkCredentials(credentials);
 
             if (!areCredentialsValid) {
-                throw new SafaError("Invalid JIRA credentials");
+                throw new SafaError("User contains invalid JIRA credentials.");
             }
 
             JiraAccessCredentials previousCredentials =
@@ -117,7 +108,7 @@ public class JiraController extends BaseController {
         return output;
     }
 
-    @PutMapping(AppRoutes.Accounts.Jira.JIRA_CREDENTIALS_REFRESH)
+    @PutMapping(AppRoutes.Jira.JIRA_CREDENTIALS_REFRESH)
     public DeferredResult<JiraResponseDTO<Void>> createCredentials(@PathVariable("cloudId") String cloudId) {
         DeferredResult<JiraResponseDTO<Void>> output = executorDelegate.createOutput(5000L);
 
@@ -143,7 +134,7 @@ public class JiraController extends BaseController {
         return output;
     }
 
-    @GetMapping(AppRoutes.Projects.RETRIEVE_JIRA_PROJECTS)
+    @GetMapping(AppRoutes.Jira.RETRIEVE_JIRA_PROJECTS)
     public DeferredResult<JiraResponseDTO<List<JiraProjectResponseDTO>>> retrieveJIRAProjects(
         @PathVariable("cloudId") String cloudId) {
         DeferredResult<JiraResponseDTO<List<JiraProjectResponseDTO>>> output =
@@ -162,7 +153,7 @@ public class JiraController extends BaseController {
         return output;
     }
 
-    @PostMapping(AppRoutes.Accounts.Jira.JIRA_CREDENTIALS_VALIDATE)
+    @PostMapping(AppRoutes.Jira.JIRA_CREDENTIALS_VALIDATE)
     public DeferredResult<JiraResponseDTO<Boolean>> validateJIRACredentials(
         @RequestBody @Valid JiraAccessCredentialsDTO data) {
         DeferredResult<JiraResponseDTO<Boolean>> output = executorDelegate.createOutput(5000L);

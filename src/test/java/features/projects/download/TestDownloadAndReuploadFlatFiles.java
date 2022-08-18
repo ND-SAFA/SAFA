@@ -8,8 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import edu.nd.crc.safa.builders.entities.ProjectBuilder;
-import edu.nd.crc.safa.builders.requests.SafaRequest;
+import builders.ProjectBuilder;
+import requests.SafaRequest;
+
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.entities.FTAType;
@@ -17,22 +18,23 @@ import edu.nd.crc.safa.features.artifacts.entities.SafetyCaseType;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.flatfiles.services.DataFileBuilder;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import features.base.ApplicationBaseTest;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
+import services.AuthorizationTestService;
 
 /**
  * Creates a project containing one of each type of artifact and attempts to download and
  * re-upload the project.
  */
 class TestDownloadAndReuploadFlatFiles extends ApplicationBaseTest {
-    String projectName = "project-name";
+    String projectName = "first-project";
 
     @Test
     void downloadAndReuploadFlatFiles() throws Exception {
-        setAuthorization();
+        AuthorizationTestService.setAuthorization(this.serviceProvider);
         // Step - Create project with artifacts from docs: artifact tree, safety case, fta
         ProjectVersion projectVersion = ProjectBuilder
             .withProject(projectName)
@@ -44,14 +46,14 @@ class TestDownloadAndReuploadFlatFiles extends ApplicationBaseTest {
         verifyProjectCreated(projectVersion);
 
         // Step - Download current project as JSON flat files
-        List<File> projectFiles = new SafaRequest(AppRoutes.Projects.FlatFiles.DOWNLOAD_FLAT_FILES)
+        List<File> projectFiles = new SafaRequest(AppRoutes.FlatFiles.DOWNLOAD_FLAT_FILES)
             .withVersion(projectVersion)
             .withFileType(DataFileBuilder.AcceptedFileTypes.JSON)
             .getWithFilesInZip();
 
         // Step - Create files with flat files downloaded
         String newVersionIdString = SafaRequest
-            .withRoute(AppRoutes.Projects.FlatFiles.CREATE_NEW_PROJECT_FROM_FLAT_FILES)
+            .withRoute(AppRoutes.FlatFiles.CREATE_NEW_PROJECT_FROM_FLAT_FILES)
             .getFlatFileHelper()
             .postWithFiles(projectFiles, new JSONObject())
             .getJSONObject("projectVersion")
@@ -65,10 +67,10 @@ class TestDownloadAndReuploadFlatFiles extends ApplicationBaseTest {
 
     private void verifyProjectCreated(ProjectVersion projectVersion) {
         // Step - Retrieve project
-        ProjectAppEntity projectAppEntity = getProjectAtVersion(projectVersion);
+        ProjectAppEntity projectAppEntity = retrievalTestService.getProjectAtVersion(projectVersion);
 
         // VP - Verify that artifacts are created
-        assertThat(projectAppEntity.artifacts.size()).isEqualTo(Constants.N_ARTIFACTS);
+        assertThat(projectAppEntity.artifacts).hasSize(Constants.N_ARTIFACTS);
 
         // Step - Extract artifact information
         Map<String, ArtifactAppEntity> name2artifact = new HashMap<>();

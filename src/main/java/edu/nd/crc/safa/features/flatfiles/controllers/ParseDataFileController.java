@@ -11,16 +11,17 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.common.BaseController;
+import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
-import edu.nd.crc.safa.features.flatfiles.entities.app.ArtifactNameCheck;
-import edu.nd.crc.safa.features.flatfiles.entities.common.AbstractArtifactFile;
-import edu.nd.crc.safa.features.flatfiles.entities.common.AbstractTraceFile;
-import edu.nd.crc.safa.features.flatfiles.entities.parser.FileParser;
+import edu.nd.crc.safa.features.flatfiles.controllers.entities.ArtifactNameCheck;
+import edu.nd.crc.safa.features.flatfiles.parser.base.AbstractArtifactFile;
+import edu.nd.crc.safa.features.flatfiles.parser.base.AbstractTraceFile;
+import edu.nd.crc.safa.features.flatfiles.parser.interfaces.IFileParser;
 import edu.nd.crc.safa.features.flatfiles.services.CheckArtifactNameService;
 import edu.nd.crc.safa.features.flatfiles.services.DataFileBuilder;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -43,9 +44,9 @@ public class ParseDataFileController extends BaseController {
 
     @Autowired
     public ParseDataFileController(ResourceBuilder resourceBuilder,
-                                   CheckArtifactNameService checkArtifactNameService) {
-        super(resourceBuilder);
-        this.checkArtifactNameService = checkArtifactNameService;
+                                   ServiceProvider serviceProvider) {
+        super(resourceBuilder, serviceProvider);
+        this.checkArtifactNameService = serviceProvider.getCheckArtifactNameService();
     }
 
     /**
@@ -55,7 +56,7 @@ public class ParseDataFileController extends BaseController {
      * @param file         The file defining a list of artifacts containing columns id, summary, and content.
      * @return ParseArtifactResponse containing artifacts and error messages occurring during parsing.
      */
-    @PostMapping(value = AppRoutes.Projects.FlatFiles.PARSE_ARTIFACT_FILE)
+    @PostMapping(value = AppRoutes.FlatFiles.PARSE_ARTIFACT_FILE)
     @ResponseStatus(HttpStatus.OK)
     public EntityParsingResult<ArtifactAppEntity, String> parseArtifactFile(@PathVariable String artifactType,
                                                                             @RequestParam MultipartFile file) {
@@ -77,7 +78,7 @@ public class ParseDataFileController extends BaseController {
      * @param file The file defining a list of trace links containing columns source and target.
      * @return ParseArtifactResponse containing trace links and error messages occurring during parsing.
      */
-    @PostMapping(value = AppRoutes.Projects.FlatFiles.PARSE_TRACE_FILE)
+    @PostMapping(value = AppRoutes.FlatFiles.PARSE_TRACE_FILE)
     @ResponseStatus(HttpStatus.OK)
     public EntityParsingResult<TraceAppEntity, String> parseTraceFile(@RequestParam MultipartFile file) {
         EntityParsingResult<TraceAppEntity, String> response = new EntityParsingResult<>();
@@ -106,7 +107,7 @@ public class ParseDataFileController extends BaseController {
         return response;
     }
 
-    private <T> void tryParseFile(EntityParsingResult<T, String> response, FileParser fileParser) {
+    private <T> void tryParseFile(EntityParsingResult<T, String> response, IFileParser fileParser) {
         try {
             fileParser.parseFile();
         } catch (Exception e) {

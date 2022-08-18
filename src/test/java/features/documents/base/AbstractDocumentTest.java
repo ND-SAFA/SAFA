@@ -7,11 +7,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import edu.nd.crc.safa.builders.requests.SafaRequest;
+import requests.SafaRequest;
+
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import features.base.ApplicationBaseTest;
 import org.json.JSONArray;
@@ -43,7 +45,7 @@ public abstract class AbstractDocumentTest extends ApplicationBaseTest {
                                                  DocumentType docType,
                                                  List<String> artifactIds) {
         List<Document> projectDocuments = this.documentRepository.findByProject(project);
-        assertThat(projectDocuments.size()).isEqualTo(1);
+        assertThat(projectDocuments).hasSize(1);
 
         // VP - Verify that persistent entity contains name, description, and type
         Document document = projectDocuments.get(0);
@@ -56,16 +58,15 @@ public abstract class AbstractDocumentTest extends ApplicationBaseTest {
             .stream()
             .map(da -> da.getArtifact().getArtifactId().toString())
             .collect(Collectors.toList());
-        assertThat(artifactIds.size()).isEqualTo(documentArtifactIds.size());
+        assertThat(artifactIds).hasSize(documentArtifactIds.size());
         assertTrue(artifactIds.containsAll(documentArtifactIds));
         assertTrue(documentArtifactIds.containsAll(artifactIds));
     }
 
-
-    protected JSONArray getProjectDocuments(Project project) throws Exception {
+    protected JSONArray getProjectDocuments(ProjectVersion projectVersion) throws Exception {
         return SafaRequest
-            .withRoute(AppRoutes.Projects.Documents.GET_PROJECT_DOCUMENTS)
-            .withProject(project)
+            .withRoute(AppRoutes.Documents.GET_PROJECT_DOCUMENTS)
+            .withVersion(projectVersion)
             .getWithJsonArray();
     }
 }

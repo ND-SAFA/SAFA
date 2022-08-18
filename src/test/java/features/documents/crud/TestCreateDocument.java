@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import features.documents.base.AbstractDocumentTest;
 import org.javatuples.Pair;
@@ -29,7 +29,7 @@ class TestCreateDocument extends AbstractDocumentTest {
         JSONObject documentJson = jsonBuilder.createDocument(docName, docDescription, docType);
 
         // Step - Create new document
-        Pair<ProjectVersion, JSONObject> response = createProjectWithDocument(
+        Pair<ProjectVersion, JSONObject> response = creationTestService.createProjectWithDocument(
             projectName,
             documentJson);
 
@@ -38,7 +38,7 @@ class TestCreateDocument extends AbstractDocumentTest {
         JSONObject documentCreated = response.getValue1();
 
         // VP - Assert all properties were returned as inputted.
-        assertObjectsMatch(documentJson, documentCreated, List.of("documentId"));
+        assertionTestService.assertObjectsMatch(documentJson, documentCreated, List.of("documentId"));
         assertThat(documentCreated.getString("documentId")).isNotEmpty();
 
         // VP - Verify that contents was persisted.

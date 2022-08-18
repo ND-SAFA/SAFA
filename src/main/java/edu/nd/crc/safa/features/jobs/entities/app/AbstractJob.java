@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.features.jobs.entities.app;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
@@ -8,7 +9,8 @@ import java.util.stream.Collectors;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.jobs.services.JobService;
-import edu.nd.crc.safa.features.notifications.NotificationService;
+import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
+import edu.nd.crc.safa.features.notifications.services.NotificationService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 
 import lombok.Getter;
@@ -52,18 +54,18 @@ public abstract class AbstractJob implements Job {
                 // Pre-step
                 Method method = getMethodForStepByName(stepName);
                 jobService.startStep(jobDbEntity);
-                notificationService.broadUpdateJobMessage(jobDbEntity);
+                notificationService.broadcastChange(EntityChangeBuilder.createJobUpdate(jobDbEntity));
 
                 // Step
                 method.invoke(this);
 
                 // Post-step
                 jobService.endStep(jobDbEntity);
-                notificationService.broadUpdateJobMessage(jobDbEntity);
+                notificationService.broadcastChange(EntityChangeBuilder.createJobUpdate(jobDbEntity));
             } catch (Exception e) {
                 jobService.failJob(jobDbEntity);
                 e.printStackTrace();
-                notificationService.broadUpdateJobMessage(jobDbEntity);
+                notificationService.broadcastChange(EntityChangeBuilder.createJobUpdate(jobDbEntity));
                 throw new SafaError(e.getMessage());
             }
         }
@@ -105,7 +107,7 @@ public abstract class AbstractJob implements Job {
      *
      * @throws SafaError Error occurring during job initialization.
      */
-    public void initJobData() throws SafaError {
+    public void initJobData() throws SafaError, IOException {
     }
 
     @Override

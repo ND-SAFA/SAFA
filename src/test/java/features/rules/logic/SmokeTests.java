@@ -9,20 +9,20 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
-import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactType;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
-import edu.nd.crc.safa.features.traces.entities.db.TraceLink;
-import edu.nd.crc.safa.features.traces.entities.db.TraceLinkVersion;
 import edu.nd.crc.safa.features.rules.parser.ArtifactRelationship;
 import edu.nd.crc.safa.features.rules.parser.Condition;
 import edu.nd.crc.safa.features.rules.parser.DefaultTreeRules;
 import edu.nd.crc.safa.features.rules.parser.Function;
 import edu.nd.crc.safa.features.rules.parser.RuleName;
 import edu.nd.crc.safa.features.rules.parser.TreeVerifier;
+import edu.nd.crc.safa.features.traces.entities.db.TraceLink;
+import edu.nd.crc.safa.features.traces.entities.db.TraceLinkVersion;
+import edu.nd.crc.safa.features.types.ArtifactType;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
-import org.junit.jupiter.api.Test;
 import features.base.ApplicationBaseTest;
+import org.junit.jupiter.api.Test;
 
 /**
  * Provides a smoke test for various types of rules that are used
@@ -104,7 +104,6 @@ class SmokeTests extends ApplicationBaseTest {
 
     @Test
     void testFindRuleViolations() {
-        String projectName = "test-project";
         String sourceType = "Package";
         String targetType = "Requirement";
         String sourceName = "SomeClass.java";
@@ -137,7 +136,7 @@ class SmokeTests extends ApplicationBaseTest {
         // VP - Verify that right warnings were triggered.
         String targetId = dbEntityBuilder.getArtifact(projectName, targetName).getArtifactId().toString();
         assertThat(violatedRules).hasSize(1);
-        assertThat(violatedRules.get(targetId).size()).isEqualTo(2);
+        assertThat(violatedRules.get(targetId)).hasSize(2);
         String targetRule = violatedRules.get(targetId).get(0).toString();
         assertThat(targetRule).contains("design").contains("process");
         targetRule = violatedRules.get(targetId).get(1).toString();

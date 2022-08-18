@@ -1,18 +1,15 @@
 {
-    "DataFiles": 
-      {
-        "SafetyRequirement": {
-          "File": "SafetyRequirements.csv"
-        },
-		"Requirement": {
-          "File": "Requirements.csv"
-        }
-      }
-	  ,
-    "RequirementsToSafetyRequirements": 
-      {
-        "Source": "Requirements",
-        "Target":  "SafetyRequirements",
-        "File": "Requirements2SafetyRequirements.csv"
-      },
+  "DataFiles": {
+    "SafetyRequirement": {
+      "File": "SafetyRequirements.csv"
+    },
+    "Requirement": {
+      "File": "Requirements.csv"
+    }
+  },
+  "RequirementsToSafetyRequirements": {
+    "Source": "Requirements",
+    "Target": "SafetyRequirements",
+    "File": "Requirements2SafetyRequirements.csv"
   }
+}

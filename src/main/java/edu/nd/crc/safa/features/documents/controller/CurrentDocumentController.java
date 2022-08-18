@@ -4,8 +4,8 @@ import java.util.UUID;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
-import edu.nd.crc.safa.features.documents.repositories.DocumentRepository;
 import edu.nd.crc.safa.features.documents.services.CurrentDocumentService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,10 +26,9 @@ public class CurrentDocumentController extends BaseDocumentController {
 
     @Autowired
     public CurrentDocumentController(ResourceBuilder resourceBuilder,
-                                     DocumentRepository documentRepository,
-                                     CurrentDocumentService currentDocumentService) {
-        super(resourceBuilder, documentRepository);
-        this.currentDocumentService = currentDocumentService;
+                                     ServiceProvider serviceProvider) {
+        super(resourceBuilder, serviceProvider);
+        this.currentDocumentService = serviceProvider.getCurrentDocumentService();
     }
 
     /**
@@ -37,7 +36,7 @@ public class CurrentDocumentController extends BaseDocumentController {
      *
      * @param documentId The ID of the document to set as the default.
      */
-    @PostMapping(AppRoutes.Projects.Documents.SET_CURRENT_DOCUMENT)
+    @PostMapping(AppRoutes.Documents.SET_CURRENT_DOCUMENT)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void setCurrentDocument(@PathVariable UUID documentId) {
         Document document = getDocumentById(this.documentRepository, documentId);
@@ -47,7 +46,7 @@ public class CurrentDocumentController extends BaseDocumentController {
     /**
      * Removes default document for authenticated user.
      */
-    @DeleteMapping(AppRoutes.Projects.Documents.CLEAR_CURRENT_DOCUMENT)
+    @DeleteMapping(AppRoutes.Documents.CLEAR_CURRENT_DOCUMENT)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void clearCurrentDocument() {
         this.currentDocumentService.clearCurrentDocumentForCurrentUser();

@@ -166,15 +166,14 @@ public class JobService {
                            AbstractJob jobCreationThread) throws
         JobExecutionAlreadyRunningException, JobRestartException,
         JobInstanceAlreadyCompleteException, JobParametersInvalidException {
-        JobParameters jobParameters =
-            new JobParametersBuilder()
-                .addLong("time", System.currentTimeMillis()).toJobParameters();
+        JobParameters jobParameters = new JobParametersBuilder()
+            .addLong("time", System.currentTimeMillis()).toJobParameters();
 
         try {
             jobCreationThread.initJobData();
         } catch (Exception e) {
             serviceProvider.getJobService().failJob(jobDbEntity);
-            throw new SafaError("Failed to start job.");
+            throw new SafaError("Failed to start job. %s", e.getMessage());
         }
         JobLauncher jobLauncher = serviceProvider.getJobLauncher();
         jobLauncher.run(jobCreationThread, jobParameters);

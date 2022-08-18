@@ -1,13 +1,11 @@
 import {
   ArtifactModel,
   ArtifactQueryFunction,
-  CytoCore,
   InternalTraceType,
   SubtreeLinkModel,
   SubtreeMap,
   TraceLinkModel,
 } from "@/types";
-import { SingularElementArgument, EdgeCollection } from "cytoscape";
 
 /**
  * Returns a list of all child artifact ids of the given parents that match the given types.
@@ -91,18 +89,23 @@ export function createPhantomLinks(
 /**
  * Computes the subtree map of given artifacts.
  *
- * @param cy - The cytoscape instance to operate on.
- * @param artifacts - The current artifacts.
+ * @param artifacts - All artifacts in the system.
+ * @param traces - All traces in the system.
  * @return The computed subtree map.
  */
 export function createSubtreeMap(
-  cy: CytoCore,
-  artifacts: ArtifactModel[]
+  artifacts: ArtifactModel[],
+  traces: TraceLinkModel[]
 ): SubtreeMap {
   const computedSubtrees = {};
   return artifacts
     .map((artifact) => ({
-      [artifact.id]: getSubtree(cy, artifact.id, computedSubtrees),
+      [artifact.id]: getSubtree(
+        artifacts,
+        traces,
+        artifact.id,
+        computedSubtrees
+      ),
     }))
     .reduce((acc, cur) => ({ ...acc, ...cur }), {});
 }
@@ -110,13 +113,15 @@ export function createSubtreeMap(
 /**
  * Returns list of children names for artifact specified.
  *
- * @param cy - The cytoscape instance to operate on.
+ * @param artifacts - All artifacts in the system.
+ * @param traces - All traces in the system.
  * @param artifactId - The id of the root artifact whose subtree is being calculated.
  * @param subtreeMapCache - A cache of previously calculated subtrees.
  * @return The child ids in the subtree.
  */
 function getSubtree(
-  cy: CytoCore,
+  artifacts: ArtifactModel[],
+  traces: TraceLinkModel[],
   artifactId: string,
   subtreeMapCache: SubtreeMap
 ): string[] {
@@ -125,9 +130,14 @@ function getSubtree(
   if (artifactId in subtreeMapCache) {
     return subtreeMapCache[artifactId];
   }
-  for (const childId of getChildren(cy, artifactId)) {
+  for (const childId of getChildren(artifacts, traces, artifactId)) {
     if (!(childId in subtreeMapCache)) {
-      subtreeMapCache[childId] = getSubtree(cy, childId, subtreeMapCache);
+      subtreeMapCache[childId] = getSubtree(
+        artifacts,
+        traces,
+        childId,
+        subtreeMapCache
+      );
     }
 
     const childSubtreeIds = [...subtreeMapCache[childId], childId];
@@ -144,17 +154,22 @@ function getSubtree(
 /**
  * Returns list of artifact ids corresponding to children of artifact.
  *
- * @param cy - The cytoscape instance to operate on.
+ * @param artifacts - All artifacts in the system.
+ * @param traces - All traces in the system.
  * @param artifactId - The id of the root artifact whose subtree is being calculated.
  * @return The computed child artifact ids.
  */
-function getChildren(cy: CytoCore, artifactId: string): string[] {
-  const nodeEdges = cy.edges(`edge[source="${artifactId}"]`);
-  const children = nodeEdges.targets();
-
-  return children
-    .map((child) => child.data().id)
-    .filter((id) => id !== artifactId);
+function getChildren(
+  artifacts: ArtifactModel[],
+  traces: TraceLinkModel[],
+  artifactId: string
+): string[] {
+  return traces
+    .filter(
+      ({ sourceId, targetId }) =>
+        sourceId === artifactId && targetId !== artifactId
+    )
+    .map(({ targetId }) => targetId);
 }
 
 /**
@@ -162,74 +177,81 @@ function getChildren(cy: CytoCore, artifactId: string): string[] {
  * Starting at the node with most edges, its parent is followed until no
  * more exist. If a loop is encountered, then the first repeated node is returned.
  *
- * @param cy - The cy instance.
- * @param currentNode - Defines where we are in the tree during recursion.
+ * @param artifacts - All artifacts in the system.
+ * @param traces - All traces in the system.
+ * @param currentArtifactId - Defines where we are in the tree during recursion.
  * @param traversedNodes - A list of all traversed node IDs to avoid loops.
  * @return The root node.
  */
 export async function getRootNode(
-  cy: CytoCore,
-  currentNode?: SingularElementArgument,
+  artifacts: ArtifactModel[],
+  traces: TraceLinkModel[],
+  currentArtifactId?: string,
   traversedNodes: string[] = []
-): Promise<SingularElementArgument | undefined> {
-  if (cy.nodes().length === 0) return;
+): Promise<string | undefined> {
+  if (traces.length === 0) return;
 
-  if (currentNode === undefined) {
-    currentNode = getMostConnectedNode(cy);
+  if (currentArtifactId === undefined) {
+    currentArtifactId = getMostConnectedNode(artifacts, traces);
   }
 
   // Avoid getting stuck in cycles.
-  if (traversedNodes.includes(currentNode.id())) {
-    return currentNode;
+  if (traversedNodes.includes(currentArtifactId)) {
+    return currentArtifactId;
   } else {
-    traversedNodes.push(currentNode.id());
+    traversedNodes.push(currentArtifactId);
   }
 
-  const edgesOutOfNode: EdgeCollection = cy
-    .edges()
-    .filter((e) => e.target() === currentNode);
+  const edgesOutOfNode = traces.filter(
+    ({ targetId }) => targetId === currentArtifactId
+  );
 
   if (edgesOutOfNode.length === 0) {
-    return currentNode;
+    return currentArtifactId;
   } else {
-    return getRootNode(cy, edgesOutOfNode[0].source(), traversedNodes);
+    return getRootNode(
+      artifacts,
+      traces,
+      edgesOutOfNode[0].sourceId,
+      traversedNodes
+    );
   }
 }
 
 /**
  * Returns the node in given Cytoscape instance with the most connected edges.
  *
- * @param cy - The cytoscape instance to operate on.
+ * @param artifacts - All artifacts in the system.
+ * @param traces - All traces in the system.
  * @return The found node.
  */
-function getMostConnectedNode(cy: CytoCore): SingularElementArgument {
+function getMostConnectedNode(
+  artifacts: ArtifactModel[],
+  traces: TraceLinkModel[]
+): string {
+  let max = -1;
+  let maxId = "";
   const counts: Record<string, number> = {};
 
-  cy.edges().forEach((edge) => {
-    const sourceName = edge.source().data().id;
-    const targetName = edge.target().data().id;
-    const increaseCounts = (name: string) => {
-      if (name in counts) {
-        counts[name]++;
-      } else {
-        counts[name] = 1;
-      }
-    };
-    increaseCounts(sourceName);
-    increaseCounts(targetName);
+  const increaseCounts = (name: string) => {
+    if (name in counts) {
+      counts[name]++;
+    } else {
+      counts[name] = 1;
+    }
+  };
+
+  traces.forEach(({ sourceId, targetId }) => {
+    increaseCounts(sourceId);
+    increaseCounts(targetId);
   });
 
-  let max = -1;
-  let maxName = cy.nodes().first().data().name;
-  for (const [name, count] of Object.entries(counts)) {
+  for (const [id, count] of Object.entries(counts)) {
     if (count > max) {
       max = count;
-      maxName = name;
+      maxId = id;
     }
   }
 
-  return cy
-    .nodes()
-    .filter((n) => n.data().id === maxName)
-    .first();
+  return maxId;
 }

@@ -4,6 +4,7 @@ import type {
   SubtreeMap,
   ProjectModel,
   ArtifactModel,
+  TraceLinkModel,
 } from "@/types";
 import { artifactModule, traceModule } from "@/store";
 import {
@@ -47,13 +48,12 @@ export default class SubtreeModule extends VuexModule {
    * @param artifacts - The artifacts to create the subtree for.
    */
   async updateSubtreeMap(
-    artifacts: ArtifactModel[] = artifactModule.allArtifacts
+    artifacts: ArtifactModel[] = artifactModule.allArtifacts,
+    traces: TraceLinkModel[] = traceModule.allTraces
   ): Promise<void> {
-    artifactTreeCyPromise.then(async (cy) => {
-      const subtreeMap = await createSubtreeMap(cy, artifacts);
+    const subtreeMap = await createSubtreeMap(artifacts, traces);
 
-      this.SET_SUBTREE_MAP(subtreeMap);
-    });
+    this.SET_SUBTREE_MAP(subtreeMap);
   }
 
   @Action
@@ -98,7 +98,7 @@ export default class SubtreeModule extends VuexModule {
    * Updates the subtree map, and hides all subtrees greater than the set threshold.
    */
   async initializeProject(project: ProjectModel): Promise<void> {
-    await this.updateSubtreeMap(project.artifacts);
+    await this.updateSubtreeMap(project.artifacts, project.traces);
   }
 
   @Action

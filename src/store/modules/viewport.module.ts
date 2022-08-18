@@ -5,6 +5,7 @@ import {
   artifactModule,
   artifactSelectionModule,
   subtreeModule,
+  traceModule,
 } from "@/store";
 import {
   artifactTreeCyPromise,
@@ -113,16 +114,12 @@ export default class ViewportModule extends VuexModule {
   @Action
   /**
    * Moves the viewport such that top most parent is centered at default zoom.
-   * @param cyPromise - A promise returning a cytoscape instance whose root
-   * node is calculated relative to.
    */
-  centerOnRootNode(cyPromise: Promise<CytoCore> = artifactTreeCyPromise): void {
-    cyPromise.then((cy) => {
-      getRootNode(cy).then((rootNode) => {
-        if (!rootNode) return;
+  centerOnRootNode(): void {
+    getRootNode(artifactModule.artifacts, traceModule.traces).then((rootId) => {
+      if (!rootId) return;
 
-        this.centerOnArtifacts([rootNode.data()?.id]);
-      });
+      this.centerOnArtifacts([rootId]);
     });
   }
 

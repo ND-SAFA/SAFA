@@ -1,5 +1,10 @@
 package edu.nd.crc.safa.features.jira.services;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,22 +31,18 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientException;
 import reactor.core.publisher.Mono;
 
+@AllArgsConstructor
 public class JiraConnectionServiceImpl implements JiraConnectionService {
 
     private static final String ATLASSIAN_API_URL = "https://api.atlassian.com";
     private static final String ATLASSIAN_AUTH_URL = "https://auth.atlassian.com";
     private static final int API_VERSION = 3;
     private static final String REFRESH_TOKEN_REQUEST_GRANT_TYPE = "refresh_token";
+    private static final String JIRA_ISSUE_UPDATE_DATE_FORMAT = "yyyy-MM-dd HH:mm";
+
     private final Logger log = LoggerFactory.getLogger(JiraConnectionServiceImpl.class);
-
     private final JiraProjectRepository jiraProjectRepository;
-
-    @Autowired
-    private WebClient webClient;
-
-    public JiraConnectionServiceImpl(JiraProjectRepository jiraProjectRepository) {
-        this.jiraProjectRepository = jiraProjectRepository;
-    }
+    private final WebClient webClient;
 
     private String buildBaseURI(String cloudId) {
         return String.format("/ex/jira/%s/rest/api/%d", cloudId, API_VERSION);
@@ -127,13 +128,43 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
 
     @Override
     public JiraIssuesResponseDTO retrieveJIRAIssues(JiraAccessCredentials credentials, Long jiraProjectId) {
-        String uri = this.buildApiRequestURI(credentials.getCloudId(), ApiRoute.ISSUES)
-            + String.format("?jql=project=%s&fields", jiraProjectId);
+        String jqlQuery = String.format("project=%s", jiraProjectId);
+
+        return this.getJIRAIssues(credentials, jqlQuery);
+    }
+
+    @Override
+    public JiraIssuesResponseDTO retrieveUpdatedJIRAIssues(JiraAccessCredentials credentials,
+                                                           Long jiraProjectId,
+                                                           Date timestamp) {
+        String updateDate = new SimpleDateFormat(JIRA_ISSUE_UPDATE_DATE_FORMAT).format(timestamp);
+        String jqlQuery = String.format(
+            "project=%s AND (updated>\"%s\" OR created>\"%s\")", jiraProjectId, updateDate, updateDate);
+
+        return this.getJIRAIssues(credentials, jqlQuery);
+    }
+
+    private String encodeValue(String value)  {
+        try {
+            return URLEncoder.encode(value, StandardCharsets.UTF_8.toString());
+        } catch (UnsupportedEncodingException e) {
+            throw new SafaError("Could not encode value " + value);
+        }
+    }
+
+    public JiraIssuesResponseDTO getJIRAIssues(JiraAccessCredentials credentials, String jqlQuery) {
+        String baseUri = this.buildApiRequestURI(credentials.getCloudId(), ApiRoute.ISSUES);
 
         return this.blockOptional(
             this.webClient
                 .method(ApiRoute.ISSUES.getMethod())
-                .uri(uri)
+                .uri(baseUri, builder ->
+                    builder
+                        .queryParam("jql", jqlQuery)
+                        .queryParam("fields")
+                        .queryParam("fields")
+                        .build()
+                )
                 .header(HttpHeaders.AUTHORIZATION,
                     this.buildAuthorizationHeaderValue(credentials.getBearerAccessToken()))
                 .retrieve()

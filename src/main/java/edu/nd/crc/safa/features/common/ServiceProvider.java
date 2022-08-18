@@ -18,6 +18,7 @@ import edu.nd.crc.safa.features.flatfiles.services.FileUploadService;
 import edu.nd.crc.safa.features.flatfiles.services.FlatFileService;
 import edu.nd.crc.safa.features.flatfiles.services.ZipFileService;
 import edu.nd.crc.safa.features.jira.repositories.JiraAccessCredentialsRepository;
+import edu.nd.crc.safa.features.jira.repositories.JiraProjectRepository;
 import edu.nd.crc.safa.features.jira.services.JiraConnectionService;
 import edu.nd.crc.safa.features.jira.services.JiraParsingService;
 import edu.nd.crc.safa.features.jobs.services.JobService;
@@ -116,6 +117,7 @@ public class ServiceProvider {
     private final JiraConnectionService jiraConnectionService;
     private final JobService jobService;
     private final JiraParsingService jiraParsingService;
+    private final JiraProjectRepository jiraProjectRepository;
     // Delta
     private final DeltaService deltaService;
     //Layout

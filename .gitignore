@@ -4,11 +4,20 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**
 !**/src/test/**
+
+# Data
+.jpb
+
+# Properties
 application-credentials.json
 **/application-prod.properties
 **/application-safa-dev.properties
 **/application-safa-prod.properties
+src/main/resources/*local.properties
+
+### Build
 docker-build.sh
+
 ### STS ###
 .apt_generated
 .classpath
@@ -40,5 +49,3 @@ bin
 
 ### Macs ###
 /**/.DS_Store
-
-src/main/resources/*local.properties

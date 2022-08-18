@@ -104,6 +104,7 @@ public class JobDbEntity {
      * The id of the entity that been created or modified with this job.
      */
     @Column(name = "completed_entity_id")
+    @Type(type = "uuid-char")
     UUID completedEntityId;
 
     public JobDbEntity(SafaUser user,

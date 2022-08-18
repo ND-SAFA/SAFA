@@ -89,14 +89,14 @@ export function handleDeleteDocument(
 /**
  * Updates the artifact for the all documents.
  *
- * @param projectId - The project to load documents for.
+ * @param versionId - The project version to load documents for.
  * @param artifacts - The full list of artifacts.
  */
 export async function handleDocumentReload(
-  projectId = projectModule.projectId,
+  versionId = projectModule.versionId,
   artifacts: ArtifactModel[] = projectModule.getProject.artifacts
 ): Promise<void> {
-  const documents = await getDocuments(projectId);
+  const documents = await getDocuments(versionId);
 
   await documentModule.updateDocuments(documents);
 

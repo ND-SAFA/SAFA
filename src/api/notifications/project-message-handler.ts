@@ -18,6 +18,6 @@ export async function handleProjectMessage(
     case "MEMBERS":
       return getProjectMembers(projectId).then(projectModule.SET_MEMBERS);
     case "DOCUMENTS":
-      return handleDocumentReload(projectId);
+      return handleDocumentReload();
   }
 }

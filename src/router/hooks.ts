@@ -13,6 +13,7 @@ export async function navigateTo(
   route: Routes | string,
   query?: Record<string, string | (string | null)[]>
 ): Promise<void> {
+  console.trace(route, query);
   if (router.currentRoute.path === route && !query) {
     return;
   } else {
@@ -51,14 +52,15 @@ export function getParam(key: QueryParams): URLParameter {
  * @param value - The query param value.
  */
 export async function updateParam(key: string, value: string): Promise<void> {
-  if (router.currentRoute.query[key] !== value) {
-    return navigateTo(router.currentRoute.path, { [key]: value });
-  }
+  if (router.currentRoute.query[key] === value) return;
+
+  return navigateTo(router.currentRoute.path, { [key]: value });
 }
 
 /**
  * Removes all query parameters.
  */
 export async function removeParams(): Promise<void> {
+  if (Object.values(router.currentRoute.query).length === 0) return;
   return navigateTo(router.currentRoute.path, {});
 }

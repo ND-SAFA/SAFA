@@ -79,6 +79,17 @@ declare namespace Cypress {
      */
     closeModal(dataCy: string): Chainable<void>;
 
+    /**
+     * Runs a callback on all rows of a table.
+     *
+     * @param dataCy - The testing selector of the table.
+     * @param fn - A callback run on each row of the table.
+     */
+    withinTableRows(
+      dataCy: string,
+      fn: (tr: Chainable<JQuery<HTMLElement>>) => void
+    ): Chainable<void>;
+
     // Authentication Commands
 
     /**
@@ -101,7 +112,7 @@ declare namespace Cypress {
      *
      * @param type - The type of project identifier to set.
      */
-    setProjectIdentifier(type: "bulk" | "standard"): Chainable<void>;
+    setProjectIdentifier(type: "bulk" | "standard" | "modal"): Chainable<void>;
 
     // Project Selection
 
@@ -109,5 +120,23 @@ declare namespace Cypress {
      * Opens the project selection modal.
      */
     openProjectSelector(): Chainable<void>;
+
+    /**
+     * Opens the upload flat files modal.
+     */
+    openUploadFiles(): Chainable<void>;
+
+    /**
+     * Must have the project selector open.
+     * On the project step: Selects the current project, continuing to the version step.
+     * On the version step: Selects the current version, continuing to the project page.
+     */
+    projectSelectorContinue(): Chainable<void>;
+
+    /**
+     * Must have the project selector open to the version step.
+     * Creates a new version of the given type.
+     */
+    createNewVersion(type: "major" | "minor" | "revision"): Chainable<void>;
   }
 }

@@ -8,6 +8,7 @@
     v-bind:isLoading.sync="isLoading"
     v-bind:project.sync="selectedProject"
     v-bind:version.sync="selectedVersion"
+    data-cy="modal-version-upload"
     @submit="onSubmit"
     @close="handleClose"
   >

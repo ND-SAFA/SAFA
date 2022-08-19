@@ -231,7 +231,10 @@ export default Vue.extend({
      * Fetches all projects.
      */
     fetchProjects(): void {
+      if (!sessionModule.getDoesSessionExist) return;
+
       this.isLoading = true;
+
       getProjects()
         .then((projects) => {
           this.projects = projects;

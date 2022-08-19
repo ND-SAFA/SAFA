@@ -8,6 +8,7 @@
             v-bind="attrs"
             color="white"
             icon
+            :data-cy="definition.dataCy"
             :class="isDisabled ? 'disable-events' : ''"
           >
             <v-icon>{{ definition.icon }}</v-icon>

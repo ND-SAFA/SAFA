@@ -22,11 +22,15 @@ export type ButtonDefinition =
  * BaseButtonDefinition
  */
 
+/**
+ * Defines a generic button.
+ */
 export interface BaseButtonDefinition {
   label: string;
   isDisabled?: boolean;
   buttonColor?: string;
   isHidden?: boolean;
+  dataCy?: string;
 }
 
 /**

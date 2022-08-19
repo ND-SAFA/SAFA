@@ -125,6 +125,7 @@ export default Vue.extend({
           type: ButtonType.LIST_MENU,
           label: "Project",
           buttonIsText: true,
+          dataCy: "button-nav-project",
           menuItems: this.projectMenuItems,
         },
         {
@@ -132,6 +133,7 @@ export default Vue.extend({
           type: ButtonType.LIST_MENU,
           label: "Version",
           buttonIsText: true,
+          dataCy: "button-nav-version",
           menuItems: [
             {
               name: "Change Version",
@@ -155,6 +157,7 @@ export default Vue.extend({
           type: ButtonType.LIST_MENU,
           label: "Trace Links",
           buttonIsText: true,
+          dataCy: "button-nav-links",
           menuItems: [
             {
               name: "Approve Generated Trace Links",

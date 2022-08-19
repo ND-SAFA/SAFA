@@ -10,6 +10,7 @@
     :minimal="minimal"
     :has-edit="false"
     :can-delete-last-item="false"
+    data-cy="table-version"
     @item:select="handleSelectVersion"
     @item:delete="handleDeleteVersion"
     @item:add="handleAddItem"

@@ -5,14 +5,69 @@ import {
   TraceLinkModel,
   TraceType,
   IOHandlerCallback,
+  GeneratedLinksModel,
+  FlatTraceLink,
 } from "@/types";
-import { appModule, logModule, projectModule } from "@/store";
+import { appModule, artifactModule, logModule, projectModule } from "@/store";
 import {
   createLink,
+  getGeneratedLinks,
   updateApprovedLink,
   updateDeclinedLink,
   updateUnreviewedLink,
 } from "@/api";
+
+/**
+ * Returns all generated links.
+ *
+ * @param onSuccess - Called if the action is successful.
+ * @param onError - Called if the action fails.
+ */
+export async function handleGetGeneratedLinks({
+  onSuccess,
+  onError,
+}: IOHandlerCallback<GeneratedLinksModel>): Promise<void> {
+  if (!projectModule.isProjectDefined) return;
+
+  const links: FlatTraceLink[] = [];
+  const approved: string[] = [];
+  const declined: string[] = [];
+
+  try {
+    appModule.onLoadStart();
+
+    const generatedLinks = await getGeneratedLinks(projectModule.versionId);
+
+    generatedLinks.forEach((link) => {
+      const source = artifactModule.getArtifactById(link.sourceId);
+      const target = artifactModule.getArtifactById(link.targetId);
+
+      if (link.approvalStatus === ApprovalType.APPROVED) {
+        approved.push(link.traceLinkId);
+      } else if (link.approvalStatus === ApprovalType.DECLINED) {
+        declined.push(link.traceLinkId);
+      }
+
+      links.push({
+        ...link,
+        sourceType: source?.type || "",
+        sourceBody: source?.body || "",
+        targetType: target?.type || "",
+        targetBody: target?.body || "",
+      });
+    });
+
+    onSuccess?.({
+      links,
+      approved,
+      declined,
+    });
+  } catch (e) {
+    onError?.(e);
+  } finally {
+    appModule.onLoadEnd();
+  }
+}
 
 /**
  * Creates a new trace link.

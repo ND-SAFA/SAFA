@@ -6,7 +6,7 @@
     <div
       v-else
       :class="className + ' text-ellipsis'"
-      style="white-space: nowrap; width: inherit"
+      style="white-space: nowrap; width: inherit; max-width: 60vw"
     >
       {{ value }}
     </div>

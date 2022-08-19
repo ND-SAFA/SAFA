@@ -1,85 +1,29 @@
 <template>
-  <div>
-    <v-row class="my-1" v-if="!showOnly">
-      <v-col cols="6">
-        <generic-artifact-body-display
-          :artifact="sourceArtifact"
-          display-title
-          display-divider
-        />
-      </v-col>
-
-      <v-divider vertical inset />
-
-      <v-col cols="6">
-        <generic-artifact-body-display
-          :artifact="targetArtifact"
-          display-title
-          display-divider
-        />
-      </v-col>
-    </v-row>
-
-    <typography
-      v-else
-      defaultExpanded
-      secondary
-      t="1"
-      variant="expandable"
-      :value="showOnly === 'source' ? sourceArtifact.body : targetArtifact.body"
+  <flex-box align="center" justify="center">
+    <generic-icon-button
+      v-if="showUnreviewed"
+      :loading="isUnreviewLoading"
+      icon-id="mdi-checkbox-blank-circle-outline"
+      tooltip="Unreview"
+      @click="handleUnreview"
     />
-
-    <flex-box justify="end">
-      <v-btn
-        text
-        v-if="showUnreviewed"
-        :loading="isUnreviewLoading"
-        class="ma-1"
-        @click="handleUnreview"
-      >
-        Unreview
-      </v-btn>
-      <v-btn
-        outlined
-        v-if="showApproved"
-        :loading="isApproveLoading"
-        color="primary"
-        class="ma-1"
-        @click="handleApprove"
-      >
-        Approve
-      </v-btn>
-      <v-btn
-        outlined
-        v-if="showDeclined"
-        :loading="isDeclineLoading"
-        color="error"
-        class="ma-1"
-        @click="handleDecline"
-      >
-        Decline
-      </v-btn>
-      <v-btn
-        v-if="showDelete"
-        :loading="isDeleteLoading"
-        color="error"
-        class="ma-1"
-        :text="!confirmDelete"
-        :outlined="confirmDelete"
-        @click="handleDelete"
-      >
-        Delete
-      </v-btn>
-      <v-btn
-        outlined
-        v-if="confirmDelete"
-        @click="confirmDelete = false"
-        class="ma-1"
-      >
-        Cancel
-      </v-btn>
-    </flex-box>
-  </div>
+    <generic-icon-button
+      v-if="showApproved"
+      :loading="isApproveLoading"
+      color="primary"
+      icon-id="mdi-check-circle-outline"
+      tooltip="Approve"
+      @click="handleApprove"
+    />
+    <generic-icon-button
+      v-if="showDeclined"
+      :loading="isDeclineLoading"
+      color="error"
+      icon-id="mdi-close-circle-outline"
+      tooltip="Decline"
+      @click="handleDecline"
+    />
+  </flex-box>
 </template>
 
 <script lang="ts">
@@ -90,39 +34,32 @@ import {
   TraceLinkModel,
   TraceType,
 } from "@/types";
-import { GenericArtifactBodyDisplay } from "@/components";
 import { artifactModule, deltaModule } from "@/store";
-import { FlexBox } from "@/components/common";
+import { FlexBox, GenericIconButton } from "@/components/common";
 import {
   handleApproveLink,
   handleDeclineLink,
   handleUnreviewLink,
 } from "@/api";
-import Typography from "@/components/common/display/Typography.vue";
 
 /**
- * Displays a trace link.
+ * Displays trace link approval buttons.
  *
  * @emits-1 `link:approve` - On Link Approval.
  * @emits-2 `link:decline` - On Link Decline.
  * @emits-2 `link:unreview` - On Link Unreview.
- * @emits-3 `link:delete` - On Link Delete.
- * @emits-4 `close` - On Close.
  */
 export default Vue.extend({
-  name: "TraceLinkDisplay",
+  name: "TraceLinkApproval",
   components: {
-    Typography,
+    GenericIconButton,
     FlexBox,
-    GenericArtifactBodyDisplay,
   },
   props: {
     link: {
       type: Object as PropType<TraceLinkModel>,
       required: true,
     },
-    hideActions: Boolean,
-    showOnly: String as PropType<"source" | "target">,
   },
   data() {
     return {
@@ -152,15 +89,13 @@ export default Vue.extend({
      * @return Whether this link can be modified.
      */
     canBeModified(): boolean {
-      return !this.hideActions && this.link?.traceType === TraceType.GENERATED;
+      return this.link?.traceType === TraceType.GENERATED;
     },
     /**
      * @return Whether this link can be deleted.
      */
     showDelete(): boolean {
-      return (
-        !this.canBeModified && !this.hideActions && !deltaModule.inDeltaView
-      );
+      return !this.canBeModified && !deltaModule.inDeltaView;
     },
     /**
      * @return Whether this link can be approved.

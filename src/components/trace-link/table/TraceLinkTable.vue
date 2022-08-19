@@ -60,14 +60,20 @@
         </td>
       </template>
 
-      <template v-slot:expanded-item="{ headers, item }">
-        <td :colspan="headers.length" class="pb-2">
-          <trace-link-display
+      <template v-slot:[`item.actions`]="{ item }">
+        <td class="v-data-table__divider" @click.stop="">
+          <trace-link-approval
             :link="item"
             @link:approve="handleApprove($event)"
             @link:decline="handleDecline($event)"
             @link:unreview="handleUnreview($event)"
           />
+        </td>
+      </template>
+
+      <template v-slot:expanded-item="{ headers, item }">
+        <td :colspan="headers.length" class="pb-2">
+          <trace-link-display :link="item" hide-actions :show-only="showOnly" />
         </td>
       </template>
     </v-data-table>
@@ -76,20 +82,16 @@
 
 <script lang="ts">
 import Vue from "vue";
-import {
-  ApprovalType,
-  FlatTraceLink,
-  TraceTableGroup,
-  VersionModel,
-} from "@/types";
-import { appModule, artifactModule, projectModule } from "@/store";
-import { getGeneratedLinks } from "@/api";
+import { FlatTraceLink, TraceTableGroup, VersionModel } from "@/types";
+import { appModule, projectModule } from "@/store";
+import { handleGetGeneratedLinks } from "@/api";
 import {
   AttributeChip,
   TableGroupHeader,
   TableHeader,
 } from "@/components/common";
 import TraceLinkDisplay from "../TraceLinkDisplay.vue";
+import TraceLinkApproval from "./TraceLinkApproval.vue";
 
 /**
  * Displays a table of trace links.
@@ -97,6 +99,7 @@ import TraceLinkDisplay from "../TraceLinkDisplay.vue";
 export default Vue.extend({
   name: "TraceLinkTable",
   components: {
+    TraceLinkApproval,
     TableHeader,
     TableGroupHeader,
     AttributeChip,
@@ -143,6 +146,12 @@ export default Vue.extend({
           divider: true,
         },
         {
+          text: "Actions",
+          value: "actions",
+          groupable: false,
+          divider: true,
+        },
+        {
           value: "data-table-expand",
           groupable: false,
         },
@@ -179,41 +188,38 @@ export default Vue.extend({
     projectVersion() {
       return projectModule.getProject.projectVersion;
     },
+    /**
+     * @return What parts of the expansion panel to show.
+     */
+    showOnly(): undefined | "source" | "target" {
+      if (this.groupBy.includes("sourceName")) {
+        return "target";
+      } else if (this.groupBy.includes("targetName")) {
+        return "source";
+      } else {
+        return undefined;
+      }
+    },
   },
   methods: {
     /**
      * Loads the generated links for the current project.
      */
     async loadGeneratedLinks() {
-      if (!projectModule.isProjectDefined) return;
-
-      this.approved = [];
-      this.declined = [];
       this.expanded = [];
 
-      try {
-        appModule.onLoadStart();
-
-        this.links = (await getGeneratedLinks(projectModule.versionId)).map(
-          (link) => ({
-            ...link,
-            sourceType:
-              artifactModule.getArtifactById(link.sourceId)?.type || "",
-            targetType:
-              artifactModule.getArtifactById(link.targetId)?.type || "",
-          })
-        );
-
-        this.links.forEach((link) => {
-          if (link.approvalStatus === ApprovalType.APPROVED) {
-            this.approved.push(link.traceLinkId);
-          } else if (link.approvalStatus === ApprovalType.DECLINED) {
-            this.declined.push(link.traceLinkId);
-          }
-        });
-      } finally {
-        appModule.onLoadEnd();
-      }
+      await handleGetGeneratedLinks({
+        onSuccess: (generated) => {
+          this.links = generated.links;
+          this.approved = generated.approved;
+          this.declined = generated.declined;
+        },
+        onError: () => {
+          this.links = [];
+          this.approved = [];
+          this.declined = [];
+        },
+      });
     },
     /**
      * Opens all panels.

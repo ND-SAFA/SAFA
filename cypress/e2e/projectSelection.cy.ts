@@ -197,6 +197,10 @@ describe("Project Selection", () => {
 
   describe("Project Version CRUD", () => {
     describe("I can create a new major, minor, or revision version", () => {
+      afterEach(() => {
+        cy.closeModal(DataCy.selectionModal);
+      });
+
       it("Can create a new major version", () => {
         cy.projectSelectorContinue().createNewVersion("major");
 

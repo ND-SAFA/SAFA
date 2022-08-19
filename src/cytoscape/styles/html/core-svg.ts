@@ -66,9 +66,11 @@ export function svgNode(
 export function svgTitle(title: string, color: string, yPos: number): string {
   return `
    <text 
-      x="50%" y="${yPos}" text-anchor="middle"
+      x="50%" y="${yPos}" 
+      text-anchor="middle"
       fill="${color}" 
       font-weight="600"
+      font-size="${title.length > 20 ? "x-small" : "medium"}"
     >
       ${title}
     </text>

@@ -36,7 +36,7 @@ export function createTraceUploader(): IGenericUploader<
 function createNewPanel(traceLink: LinkModel): TracePanel {
   const emptyArtifactFile: TraceFile = createTraceFile(traceLink);
   return {
-    title: extractTraceId(traceLink),
+    title: `${traceLink.sourceName} X ${traceLink.targetName}`,
     entityNames: [],
     projectFile: emptyArtifactFile,
     getIsValid(): boolean {

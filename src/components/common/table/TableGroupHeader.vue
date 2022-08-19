@@ -14,6 +14,11 @@
           :artifact-type="artifactType"
           :confidence-score="score"
         />
+        <attribute-chip
+          v-if="displayArtifact"
+          :value="headerType"
+          artifact-type
+        />
         <typography secondary :value="String(data.items.length)" x="2" />
       </flex-box>
       <flex-box>
@@ -30,7 +35,7 @@
         />
       </flex-box>
     </flex-box>
-    <div class="mb-1" v-if="displayDescription">
+    <div class="mb-1" v-if="displayArtifact">
       <typography
         default-expanded
         variant="expandable"
@@ -101,26 +106,28 @@ export default Vue.extend({
     /**
      * @return Whether to render the description.
      */
-    displayDescription(): boolean {
+    displayArtifact(): boolean {
       return (
         this.data.groupBy.includes("sourceName") ||
         this.data.groupBy.includes("targetName")
       );
     },
     /**
-     * @return Renders artifact text when grouping by artifact.
+     * @return Renders artifact type when grouping by artifact.
      */
     headerDescription(): undefined | string {
-      if (this.displayDescription) {
-        const artifact = artifactModule.getArtifactByName(this.data.group);
-
-        return artifact?.body;
-      } else {
-        return undefined;
-      }
+      return this.displayArtifact
+        ? artifactModule.getArtifactByName(this.data.group)?.body
+        : undefined;
+    },
+    /**
+     * @return Renders artifact type when grouping by artifact.
+     */
+    headerType(): undefined | string {
+      return this.displayArtifact
+        ? artifactModule.getArtifactByName(this.data.group)?.type
+        : undefined;
     },
   },
 });
 </script>
-
-<style scoped></style>

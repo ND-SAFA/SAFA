@@ -1,4 +1,5 @@
 import {
+  ApprovalType,
   ArtifactDeltaState,
   ColumnDataType,
   DocumentType,
@@ -113,5 +114,18 @@ export function deltaTypeOptions(): SelectOption[] {
     createEnumOption(ArtifactDeltaState.ADDED),
     createEnumOption(ArtifactDeltaState.MODIFIED),
     createEnumOption(ArtifactDeltaState.REMOVED),
+  ];
+}
+
+/**
+ * Returns display names for each approval type.
+ *
+ * @return The select option names and ids.
+ */
+export function approvalTypeOptions(): SelectOption[] {
+  return [
+    createEnumOption(ApprovalType.UNREVIEWED),
+    createEnumOption(ApprovalType.APPROVED),
+    createEnumOption(ApprovalType.DECLINED),
   ];
 }

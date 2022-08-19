@@ -6,24 +6,25 @@
       show-expand
       single-expand
       multi-sort
-      :headers="headers"
-      :items="links"
+      :headers="visibleHeaders"
+      :items="visibleLinks"
       :expanded="expanded"
       :search="searchText"
       :loading="isLoading"
       :sort-by.sync="sortBy"
       :group-by.sync="groupBy"
-      :group-desc="true"
+      :sort-desc="true"
       item-key="traceLinkId"
       :items-per-page="50"
       @click:row="handleView($event)"
     >
       <template v-slot:top>
-        <table-header
+        <trace-link-table-header
           :headers="headers"
           :group-by.sync="groupBy"
           :sort-by.sync="sortBy"
           :search-text.sync="searchText"
+          :approval-types.sync="approvalTypes"
         />
       </template>
 
@@ -82,16 +83,20 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { FlatTraceLink, TraceTableGroup, VersionModel } from "@/types";
+import { DataTableHeader } from "vuetify";
+import {
+  ApprovalType,
+  FlatTraceLink,
+  TraceTableGroup,
+  VersionModel,
+} from "@/types";
 import { appModule, projectModule } from "@/store";
 import { handleGetGeneratedLinks } from "@/api";
-import {
-  AttributeChip,
-  TableGroupHeader,
-  TableHeader,
-} from "@/components/common";
+import { AttributeChip, TableGroupHeader } from "@/components/common";
 import TraceLinkDisplay from "../TraceLinkDisplay.vue";
 import TraceLinkApproval from "./TraceLinkApproval.vue";
+import TraceLinkTableHeader from "./TraceLinkTableHeader.vue";
+import traceLinkTableHeaders from "./traceLinkTableHeaders";
 
 /**
  * Displays a table of trace links.
@@ -99,8 +104,8 @@ import TraceLinkApproval from "./TraceLinkApproval.vue";
 export default Vue.extend({
   name: "TraceLinkTable",
   components: {
+    TraceLinkTableHeader,
     TraceLinkApproval,
-    TableHeader,
     TableGroupHeader,
     AttributeChip,
     TraceLinkDisplay,
@@ -108,58 +113,14 @@ export default Vue.extend({
   data() {
     return {
       searchText: "",
-      sortBy: ["targetName", "sourceName"] as (keyof FlatTraceLink)[],
-      groupBy: "approvalStatus" as keyof FlatTraceLink,
-      headers: [
-        {
-          text: "Source Name",
-          value: "sourceName",
-          filterable: true,
-        },
-        {
-          text: "Source Type",
-          value: "sourceType",
-          filterable: true,
-          divider: true,
-        },
-        {
-          text: "Target Name",
-          value: "targetName",
-          filterable: true,
-        },
-        {
-          text: "Target Type",
-          value: "targetType",
-          filterable: true,
-          divider: true,
-        },
-        {
-          text: "Approval Status",
-          value: "approvalStatus",
-          filterable: true,
-          divider: true,
-        },
-        {
-          text: "Confidence Score",
-          value: "score",
-          groupable: false,
-          divider: true,
-        },
-        {
-          text: "Actions",
-          value: "actions",
-          groupable: false,
-          divider: true,
-        },
-        {
-          value: "data-table-expand",
-          groupable: false,
-        },
-      ],
+      sortBy: ["score"] as (keyof FlatTraceLink)[],
+      groupBy: "targetName" as keyof FlatTraceLink | undefined,
+      headers: traceLinkTableHeaders,
       links: [] as FlatTraceLink[],
       expanded: [] as FlatTraceLink[],
       approved: [] as string[],
       declined: [] as string[],
+      approvalTypes: [ApprovalType.UNREVIEWED],
     };
   },
   mounted() {
@@ -192,13 +153,36 @@ export default Vue.extend({
      * @return What parts of the expansion panel to show.
      */
     showOnly(): undefined | "source" | "target" {
-      if (this.groupBy.includes("sourceName")) {
+      if (this.groupBy?.includes("sourceName")) {
         return "target";
-      } else if (this.groupBy.includes("targetName")) {
+      } else if (this.groupBy?.includes("targetName")) {
         return "source";
       } else {
         return undefined;
       }
+    },
+    /**
+     * @return All visible links.
+     */
+    visibleLinks(): FlatTraceLink[] {
+      return this.links.filter(({ approvalStatus }) =>
+        this.approvalTypes.includes(approvalStatus)
+      );
+    },
+    /**
+     * @return All visible links.
+     */
+    visibleHeaders(): Partial<DataTableHeader>[] {
+      return this.headers.filter((header) => {
+        return !(
+          (this.approvalTypes.length === 1 &&
+            header.value === "approvalStatus") ||
+          (this.groupBy?.includes("sourceName") &&
+            header.value === "sourceType") ||
+          (this.groupBy?.includes("targetName") &&
+            header.value === "targetType")
+        );
+      });
     },
   },
   methods: {

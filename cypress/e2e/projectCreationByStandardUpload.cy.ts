@@ -2,6 +2,7 @@
 import {
   DataCy,
   simpleProjectFilesMap,
+  testFileMap,
   testProject,
   validUser
 } from "../fixtures";
@@ -323,7 +324,55 @@ describe("Project Creation", () => {
     });
 
     describe("I can upload a file containing the trace links I want to create", () => {
-      it("can continue with no trace links", () => {}); //Need to make new file with no where no trace links are made
+      it("can continue with no trace links", () => {
+        cy.setProjectIdentifier("standard");
+        cy.getCy(DataCy.stepperContinueButton).should("not.be.disabled");
+        cy.clickButton(DataCy.stepperContinueButton);
+
+        // Step - Create requirement panel and upload file
+        cy.clickButton(DataCy.creationCreatePanelButton);
+        cy.inputText(DataCy.creationTypeInput, "Empty design");
+        cy.clickButton(DataCy.creationTypeButton);
+        cy.uploadFiles(
+          DataCy.creationStandardFilesInput,
+          testFileMap.Emptydesign
+        );
+
+        cy.clickButton(DataCy.creationCreatePanelButton);
+        cy.inputText(DataCy.creationTypeInput, "Empty design2design");
+        cy.clickButton(DataCy.creationTypeButton);
+        cy.uploadFiles(
+          DataCy.creationStandardFilesInput,
+          testFileMap.Emptydesign2design
+        );
+
+        cy.clickButton(DataCy.creationIgnoreErrorsButton, "last");
+
+        // Step - wait 500ms (.5 sec) for app to parse file and gather errors
+        cy.wait(500);
+
+        // Step - Move to step 3 (creating trace panels)
+        cy.clickButton(DataCy.stepperContinueButton);
+
+        // Step - Create new trace matrix
+        cy.clickButtonWithName("Create new trace matrix");
+
+        // Step - Select source artifact as "hazard"
+        cy.clickButtonWithName("Select Source");
+        cy.clickMenuOption("design");
+
+        cy.clickButtonWithName("Select Target");
+        cy.clickMenuOption("design");
+
+        cy.clickButtonWithName("Create trace matrix");
+
+        cy.uploadFiles(
+          DataCy.creationStandardFilesInput,
+          testFileMap.Emptydesign2design
+        );
+
+        cy.clickButton(DataCy.stepperContinueButton);
+      });
       it("can continue after uploading trace links", () => {
         cy.setProjectIdentifier("standard");
         cy.getCy(DataCy.stepperContinueButton).should("not.be.disabled");
@@ -428,7 +477,7 @@ describe("Project Creation", () => {
       });
     });
     describe("I can generate trace links between artifacts", () => {
-      it.only("can continue with trace links set to be generated", () => {
+      it("can continue with trace links set to be generated", () => {
         cy.setProjectIdentifier("standard");
         cy.getCy(DataCy.stepperContinueButton).should("not.be.disabled");
         cy.clickButton(DataCy.stepperContinueButton);
@@ -476,5 +525,10 @@ describe("Project Creation", () => {
         cy.clickButton(DataCy.stepperContinueButton);
       });
     });
+  });
+  describe("Project Tim Preview", () => {
+    it("displays artifact types on the graph", () => {});
+    it("displays trace links between artifact types on the graph", () => {});
+    it("displays the correct count of artifacts and links", () => {});
   });
 });

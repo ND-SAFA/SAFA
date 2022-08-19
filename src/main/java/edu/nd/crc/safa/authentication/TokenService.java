@@ -23,15 +23,20 @@ public class TokenService {
 
     public String createTokenForUsername(String userName, long expirationDelta) {
         Date exp = new Date(System.currentTimeMillis() + expirationDelta);
+
+        return createTokenForUsername(userName, exp);
+    }
+
+    public String createTokenForUsername(String userName, Date exp) {
         Key key = Keys.hmacShaKeyFor(securityConstants.getKey().getBytes());
         Claims claims = Jwts.claims().setSubject(userName);
 
         return Jwts
-            .builder()
-            .setClaims(claims)
-            .signWith(key, SignatureAlgorithm.HS512)
-            .setExpiration(exp)
-            .compact();
+                .builder()
+                .setClaims(claims)
+                .signWith(key, SignatureAlgorithm.HS512)
+                .setExpiration(exp)
+                .compact();
     }
 
     public Claims getTokenClaims(String token) {

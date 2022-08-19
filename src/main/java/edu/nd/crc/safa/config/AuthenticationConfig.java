@@ -70,10 +70,12 @@ public class AuthenticationConfig extends WebSecurityConfigurerAdapter {
             .antMatchers(
                 AppRoutes.Accounts.LOGIN,
                 AppRoutes.Accounts.CREATE_ACCOUNT,
+                AppRoutes.Accounts.FORGOT_PASSWORD,
+                AppRoutes.Accounts.RESET_PASSWORD,
                 "/websocket/**").permitAll()
             // API Generation
             .antMatchers(
-                "/swagger-ui/**", // Needed to get configu
+                "/swagger-ui/**", // Needed to get configuration
                 "/v3/api-docs/**",
                 "/docs").permitAll()
             // Close authentication settings

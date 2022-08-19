@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.features.common;
 
+import edu.nd.crc.safa.authentication.TokenService;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
@@ -52,6 +53,7 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 /**
@@ -128,6 +130,8 @@ public class ServiceProvider {
     private final UserDetailsService userDetailsService;
     private final SafaUserRepository safaUserRepository;
     private final AccountLookupService accountLookupService;
+    private final TokenService tokenService;
+    private final PasswordEncoder passwordEncoder;
     // Jobs
     JobLauncher jobLauncher;
 }

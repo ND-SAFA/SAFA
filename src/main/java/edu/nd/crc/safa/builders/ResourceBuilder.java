@@ -2,12 +2,12 @@ package edu.nd.crc.safa.builders;
 
 import java.util.UUID;
 
-import edu.nd.crc.safa.server.entities.api.SafaError;
-import edu.nd.crc.safa.server.entities.db.Project;
-import edu.nd.crc.safa.server.entities.db.ProjectVersion;
-import edu.nd.crc.safa.server.repositories.projects.ProjectRepository;
-import edu.nd.crc.safa.server.repositories.projects.ProjectVersionRepository;
-import edu.nd.crc.safa.server.services.PermissionService;
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.projects.repositories.ProjectRepository;
+import edu.nd.crc.safa.features.users.services.PermissionService;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
+import edu.nd.crc.safa.features.versions.repositories.ProjectVersionRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -39,7 +39,7 @@ public class ResourceBuilder {
     public ResourceBuilder fetchProject(UUID projectId) throws SafaError {
         this.project = this.projectRepository.findByProjectId(projectId);
         if (this.project == null) {
-            throw new SafaError("Unable to find project with id:" + projectId);
+            throw new SafaError("Unable to find project with ID: %s", projectId);
         }
         return this;
     }
@@ -47,7 +47,7 @@ public class ResourceBuilder {
     public ResourceBuilder fetchVersion(UUID versionId) throws SafaError {
         this.projectVersion = this.projectVersionRepository.findByVersionId(versionId);
         if (this.projectVersion == null) {
-            throw new SafaError("Unable to find project version with id:" + versionId);
+            throw new SafaError("Unable to find project version with id: %s", versionId);
         }
         return this;
     }

@@ -1,117 +1,176 @@
 package edu.nd.crc.safa.config;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
 /**
  * The container centralizing all route names used within controllers and testing.
  * See usages of class RouteBuilder within tests for example of how to construct paths.
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class AppRoutes {
+
+    public static String path(String... args) {
+        return String.join("/", args);
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Accounts {
-        public static final String loginLink = "/login";
-        private static final String accountPrefix = "/accounts";
-        public static final String createNewUser = accountPrefix + "/create";
-        public static final String jiraCredentials = accountPrefix + "/jira/credentials";
-        public static final String jiraCredentialsRefresh = accountPrefix + "/jira/credentials/{cloudId}";
-        public static final String jiraCredentialsValidate = accountPrefix + "/jira/credentials/validate";
+        public static final String LOGIN = "/login";
+        protected static final String PREFIX = "/accounts";
+        public static final String CHANGE_PASSWORD = Accounts.PREFIX + "/change";
+        public static final String RESET_PASSWORD = Accounts.PREFIX + "/reset";
+        public static final String FORGOT_PASSWORD = Accounts.PREFIX + "/forgot";
+        public static final String CREATE_ACCOUNT = Accounts.PREFIX + "/create";
+        public static final String DELETE_ACCOUNT = Accounts.PREFIX + "/delete";
     }
 
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Jobs {
-        private static final String jobRoot = "/jobs";
-        public static final String flatFileProjectUpdateJob = jobRoot + "/projects/versions/{versionId}";
-        public static final String getJobs = jobRoot;
-        private static final String jobId = jobRoot + "/{jobId}";
-        public static final String deleteJob = jobId;
+        protected static final String JOBS_PREFIX = "/jobs";
+        public static final String FLAT_FILE_PROJECT_UPDATE_JOB = JOBS_PREFIX + "/projects/versions/{versionId}";
+        public static final String GET_JOBS = JOBS_PREFIX;
+        public static final String JSON_PROJECT_JOB = JOBS_PREFIX + Projects.ROOT;
+        private static final String JOB_ID = JOBS_PREFIX + "/{jobId}";
+        public static final String DELETE_JOB = JOB_ID;
     }
 
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Projects {
-        private static final String projectPrefix = "/projects";
-        public static final String retrieveJIRAProjects = projectPrefix + "/jira/{cloudId}";
-        public static final String deleteProjectById = projectPrefix + "/{projectId}";
-        public static final String createOrUpdateProjectMeta = projectPrefix;
-        public static final String getProjects = projectPrefix;
+        protected static final String ROOT = "/projects";
+        public static final String BY_ID = ROOT + "/{projectId}";
+        public static final String DELETE_PROJECT_BY_ID = ROOT + "/{projectId}";
+        public static final String CREATE_OR_UPDATE_PROJECT_META = ROOT;
+        public static final String GET_PROJECTS = ROOT;
 
-        public static class Import {
-            public static final String importPrefix = projectPrefix + "/import";
-            public static final String pullJiraProject = importPrefix + "/jira/{cloudId}/{id}";
-        }
-
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
         public static class Membership {
-            public static final String addProjectMember = projectPrefix + "/{projectId}/members";
-            public static final String getProjectMembers = projectPrefix + "/{projectId}/members";
-            public static final String deleteProjectMembership = projectPrefix + "/members/{projectMembershipId}";
-            public static final String getUserProjects = projectPrefix;
+            public static final String ADD_PROJECT_MEMBER = ROOT + "/{projectId}/members";
+            public static final String GET_PROJECT_MEMBERS = ROOT + "/{projectId}/members";
+            public static final String DELETE_PROJECT_MEMBERSHIP = ROOT + "/members/{projectMembershipId}";
+            public static final String GET_USER_PROJECTS = ROOT;
         }
 
-        public static class Documents {
-            public static final String createOrUpdateDocument = projectPrefix + "/versions/{versionId}/documents";
-            public static final String getProjectDocuments = projectPrefix + "/{projectId}/documents";
-            public static final String deleteDocument = projectPrefix + "/documents/{documentId}";
-            public static final String setCurrentDocument = projectPrefix + "/documents/current/{documentId}";
-            public static final String clearCurrentDocument = projectPrefix + "/documents/current";
-        }
-
-        public static class DocumentArtifact {
-            public static final String addArtifactsToDocument = projectPrefix + "/versions/{versionId}/documents"
-                + "/{documentId}/artifacts";
-            public static final String removeArtifactFromDocument = addArtifactsToDocument + "/{artifactId}";
-        }
-
-        public static class Links {
-            public static final String getGeneratedLinksInProjectVersion = projectPrefix
-                + "/versions/{versionId}/links/generated";
-            public static final String generateLinks = projectPrefix + "/links/generate";
-        }
-
-        public static class Versions {
-            public static final String getVersions = projectPrefix + "/{projectId}/versions";
-            public static final String getCurrentVersion = projectPrefix + "/{projectId}/versions/current";
-            public static final String createNewMajorVersion = projectPrefix + "/{projectId}/versions/major";
-            public static final String createNewMinorVersion = projectPrefix + "/{projectId}/versions/minor";
-            public static final String createNewRevisionVersion = projectPrefix + "/{projectId}/versions/revision";
-        }
-
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
         public static class Entities {
-            public static final String checkIfArtifactExists = projectPrefix
-                + "/versions/{versionId}/artifacts/validate/{artifactName}";
-            public static final String getProjectInVersion = projectPrefix + "/versions/{versionId}";
-            public static final String getArtifactsInProjectVersion = getProjectInVersion + "/artifacts";
-            public static final String getTracesInVersion = getProjectInVersion + "/traces";
-            public static final String deleteVersionById = getProjectInVersion;
+            public static final String CHECK_IF_ARTIFACT_EXISTS = ROOT
+                + "/versions/{versionId}/artifacts/validate";
         }
 
-        public static class Delta {
-            public static final String calculateProjectDelta = projectPrefix
-                + "/delta/{baselineVersionId}/{targetVersionId}";
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class ArtifactType {
+        public static final String GET_PROJECT_ARTIFACT_TYPES = Projects.ROOT + "/{projectId}/artifactTypes";
+        public static final String CREATE_OR_UPDATE_ARTIFACT_TYPE = GET_PROJECT_ARTIFACT_TYPES;
+        public static final String DELETE_ARTIFACT_TYPE = Projects.ROOT + "/artifactTypes/{typeId}";
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class Commits {
+        public static final String COMMIT_CHANGE = Projects.ROOT + "/versions/{versionId}/commit";
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class Delta {
+        public static final String CALCULATE_PROJECT_DELTA = Projects.ROOT
+            + "/delta/{baselineVersionId}/{targetVersionId}";
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class Documents {
+        public static final String GET_PROJECT_DOCUMENTS = Versions.BY_ID + "/documents";
+        protected static final String ROOT = "/documents";
+        public static final String CREATE_OR_UPDATE_DOCUMENT = Versions.BY_ID + Documents.ROOT;
+        public static final String SET_CURRENT_DOCUMENT = Projects.ROOT + Documents.ROOT + "/current/{documentId}";
+        public static final String CLEAR_CURRENT_DOCUMENT = Projects.ROOT + Documents.ROOT + "/current";
+        protected static final String BY_ID = ROOT + "/{documentId}";
+        public static final String GET_DOCUMENT_BY_ID = Versions.BY_ID + Documents.BY_ID;
+        public static final String DELETE_DOCUMENT = Projects.ROOT + Documents.BY_ID;
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class DocumentArtifact {
+        public static final String ADD_ARTIFACTS_TO_DOCUMENT = Projects.ROOT + "/versions/{versionId}/documents"
+            + "/{documentId}/artifacts";
+        public static final String REMOVE_ARTIFACT_FROM_DOCUMENT = ADD_ARTIFACTS_TO_DOCUMENT + "/{artifactId}";
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class Rules {
+        public static final String CREATE_WARNING_IN_PROJECT = "/project/{projectId}/rules";
+        public static final String GET_WARNINGS_IN_PROJECT_VERSION = Projects.ROOT
+            + "/versions/{versionId}/warnings";
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class FlatFiles {
+        public static final String UPDATE_PROJECT_VERSION_FROM_FLAT_FILES = Projects.ROOT
+            + "/versions/{versionId}/flat-files";
+        public static final String DOWNLOAD_FLAT_FILES = UPDATE_PROJECT_VERSION_FROM_FLAT_FILES + "/{fileType}";
+        public static final String CREATE_NEW_PROJECT_FROM_FLAT_FILES = Projects.ROOT + "/flat-files";
+        public static final String PARSE_ARTIFACT_FILE = Projects.ROOT + "/parse/artifacts/{artifactType}";
+        public static final String PARSE_TRACE_FILE = Projects.ROOT + "/parse/traces";
+
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class TraceMatrix {
+        public static final String GET_TRACE_MATRICES = Projects.ROOT + "/{projectId}/matrices";
+        public static final String CREATE_TRACE_MATRIX = Projects.ROOT + "/{projectId}/matrices/"
+            + "{sourceArtifactTypeName}/{targetArtifactTypeName}";
+        public static final String DELETE_TRACE_MATRIX = Projects.ROOT + "/{projectId}/matrices/"
+            + "{sourceArtifactTypeName}/{targetArtifactTypeName}";
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class Jira {
+        public static final String RETRIEVE_JIRA_PROJECTS = Projects.ROOT + "/jira/{cloudId}";
+
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        public static class Credentials {
+            public static final String ROOT = Accounts.PREFIX + "/jira/credentials";
+            public static final String REFRESH = Credentials.ROOT + "/{cloudId}";
+            public static final String VALIDATE = Credentials.ROOT + "/validate";
+
         }
 
-        public static class Commits {
-            public static final String commitChange = projectPrefix + "/versions/{versionId}/commit";
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        public static class Import {
+            public static final String ROOT = Projects.ROOT + "/import";
+            public static final String BY_ID = Import.ROOT + "/jira/{cloudId}/{id}";
         }
+    }
 
-        public static class FlatFiles {
-            public static final String updateProjectVersionFromFlatFiles = projectPrefix
-                + "/versions/{versionId}/flat-files";
-            public static final String projectFlatFiles = projectPrefix + "/flat-files";
-            public static final String parseArtifactFile = projectPrefix + "/parse/artifacts/{artifactType}";
-            public static final String parseTraceFile = projectPrefix + "/parse/traces";
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class Links {
+        public static final String GET_GENERATED_LINKS_IN_PROJECT_VERSION = Projects.ROOT
+            + "/versions/{versionId}/links/generated";
+        public static final String GENERATE_LINKS = Projects.ROOT + "/links/generate";
+    }
 
-        }
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class Versions {
+        public static final String GET_VERSIONS = Projects.ROOT + "/{projectId}/versions";
+        public static final String BY_ID = Projects.ROOT + "/versions/{versionId}";
+        public static final String GET_CURRENT_VERSION = Projects.ROOT + "/{projectId}/versions/current";
+        public static final String CREATE_NEW_MAJOR_VERSION = Projects.ROOT + "/{projectId}/versions/major";
+        public static final String CREATE_NEW_MINOR_VERSION = Projects.ROOT + "/{projectId}/versions/minor";
+        public static final String CREATE_NEW_REVISION_VERSION = Projects.ROOT + "/{projectId}/versions/revision";
+        public static final String DELETE_VERSION_BY_ID = Versions.BY_ID;
+    }
 
-        public static class TraceMatrix {
-            public static final String getTraceMatrices = projectPrefix + "/{projectId}/matrices";
-            public static final String createTraceMatrix = projectPrefix + "/{projectId}/matrices/"
-                + "{sourceArtifactTypeName}/{targetArtifactTypeName}";
-            public static final String deleteTraceMatrix = projectPrefix + "/{projectId}/matrices/"
-                + "{sourceArtifactTypeName}/{targetArtifactTypeName}";
-        }
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class Retrieval {
+        public static final String GET_PROJECT_IN_VERSION = Versions.BY_ID;
+        public static final String GET_TRACES_IN_VERSION = Versions.BY_ID + "/traces";
+        public static final String GET_ARTIFACTS_IN_VERSION = Versions.BY_ID + "/artifacts";
+        public static final String GET_ARTIFACT_IDS_IN_VERSION = Versions.BY_ID + "/artifacts/query";
 
-        public static class ArtifactType {
-            public static final String getProjectArtifactTypes = projectPrefix + "/{projectId}/artifactTypes";
-            public static final String createOrUpdateArtifactType = getProjectArtifactTypes;
-            public static final String deleteArtifactType = projectPrefix + "/artifactTypes/{typeId}";
-        }
+    }
 
-        public static class Warnings {
-            public static final String getWarningsInProjectVersion = projectPrefix + "/versions/{versionId}/warnings";
-        }
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class Sync {
+        public static final String GET_CHANGES = Versions.BY_ID + "/changes";
     }
 }

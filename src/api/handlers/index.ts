@@ -12,3 +12,4 @@ export * from "./load-version-handler";
 export * from "./edit-project-handler";
 export * from "./member-handler";
 export * from "./job-handler";
+export * from "./create-version-handler";

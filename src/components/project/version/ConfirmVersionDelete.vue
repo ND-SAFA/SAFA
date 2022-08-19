@@ -3,11 +3,18 @@
     size="xxs"
     :is-open="deleteDialogue"
     :title="title"
-    @close="handleCancel"
+    data-cy="modal-version-delete"
     :actions-height="0"
+    @close="handleCancel"
   >
     <template v-slot:body>
-      <v-btn color="error" @click="handleConfirm" block class="mt-3">
+      <v-btn
+        color="error"
+        @click="handleConfirm"
+        block
+        class="mt-3"
+        data-cy="button-version-delete"
+      >
         Delete
       </v-btn>
     </template>

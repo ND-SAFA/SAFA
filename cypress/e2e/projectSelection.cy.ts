@@ -13,7 +13,8 @@ describe("Project Selection", () => {
         cy.closeModal(DataCy.selectionModal);
       }
 
-      cy.logout();
+      // Wait for projects to load
+      cy.wait(500).logout();
     });
   });
 
@@ -89,8 +90,10 @@ describe("Project Selection", () => {
         cy.clickButton(DataCy.selectorAddButton);
       });
 
-      cy.getCy(DataCy.selectionEditModal).within(() =>
-        cy.setProjectIdentifier("modal").clickButton(DataCy.selectionSaveButton)
+      cy.getCy(DataCy.projectEditModal).within(() =>
+        cy
+          .setProjectIdentifier("modal")
+          .clickButton(DataCy.projectEditSaveButton)
       );
 
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
@@ -101,11 +104,11 @@ describe("Project Selection", () => {
         cy.clickButton(DataCy.selectorEditButton, "first");
       });
 
-      cy.getCy(DataCy.selectionEditModal).within(() =>
+      cy.getCy(DataCy.projectEditModal).within(() =>
         cy
-          .getCy(DataCy.selectionNameInput)
+          .getCy(DataCy.projectEditNameInput)
           .type(" Edited")
-          .clickButton(DataCy.selectionSaveButton)
+          .clickButton(DataCy.projectEditSaveButton)
       );
 
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
@@ -116,17 +119,17 @@ describe("Project Selection", () => {
         cy.clickButton(DataCy.selectorDeleteButton, "first");
       });
 
-      cy.getCy(DataCy.selectionDeleteModal).within(() => {
+      cy.getCy(DataCy.projectDeleteModal).within(() => {
         cy.getCy(DataCy.modalTitle)
           .invoke("text")
           .then((text) =>
             cy.inputText(
-              DataCy.selectionDeleteNameInput,
+              DataCy.projectDeleteNameInput,
               text.split(":")[1].trim()
             )
           );
 
-        cy.clickButton(DataCy.selectionDeleteButton);
+        cy.clickButton(DataCy.projectDeleteConfirmButton);
       });
 
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
@@ -136,9 +139,9 @@ describe("Project Selection", () => {
   describe("Project Version List", () => {
     describe("I can reload my list of project versions", () => {
       it("Displays project versions", () => {
-        cy.getCy(DataCy.selectionModal).within(() => {
-          cy.clickButton(DataCy.stepperContinueButton);
+        cy.projectSelectorContinue();
 
+        cy.getCy(DataCy.selectionModal).within(() => {
           cy.withinTableRows(DataCy.selectionVersionList, (tr) =>
             tr.should("have.length.above", 1)
           );
@@ -146,9 +149,9 @@ describe("Project Selection", () => {
       });
 
       it("Reloads project versions", () => {
-        cy.getCy(DataCy.selectionModal).within(() => {
-          cy.clickButton(DataCy.stepperContinueButton);
+        cy.projectSelectorContinue();
 
+        cy.getCy(DataCy.selectionModal).within(() => {
           cy.clickButton(DataCy.selectionReload, "last");
 
           cy.withinTableRows(DataCy.selectionVersionList, (tr) =>
@@ -160,19 +163,15 @@ describe("Project Selection", () => {
 
     describe("I can select and load a version of the project", () => {
       it("Selects and loads a project and version", () => {
-        cy.getCy(DataCy.selectionModal).within(() => {
-          cy.clickButton(DataCy.stepperContinueButton).clickButton(
-            DataCy.stepperContinueButton
-          );
-        });
+        cy.projectSelectorContinue().projectSelectorContinue();
 
         cy.getCy(DataCy.appLoading).should("be.visible");
       });
 
       it("Cannot continue if a version is not selected", () => {
-        cy.getCy(DataCy.selectionModal).within(() => {
-          cy.clickButton(DataCy.stepperContinueButton);
+        cy.projectSelectorContinue();
 
+        cy.getCy(DataCy.selectionModal).within(() => {
           cy.withinTableRows(DataCy.selectionVersionList, (tr) => {
             tr.get(".v-simple-checkbox").first().click();
           });
@@ -183,31 +182,49 @@ describe("Project Selection", () => {
     });
   });
 
-  // describe("Project Version CRUD", () => {
-  //   describe("I can create a new major, minor, or revision version", () => {
-  //     it("Can create a new major version", () => {
-  //       cy.getCy(DataCy.selectionModal).within(() => {
-  //         cy.clickButton(DataCy.stepperContinueButton);
-  //       });
-  //     });
-  //
-  //     it("Can create a new minor version", () => {
-  //       cy.getCy(DataCy.selectionModal).within(() => {
-  //         cy.clickButton(DataCy.stepperContinueButton);
-  //       });
-  //     });
-  //
-  //     it("Can create a new revision version", () => {
-  //       cy.getCy(DataCy.selectionModal).within(() => {
-  //         cy.clickButton(DataCy.stepperContinueButton);
-  //       });
-  //     });
-  //   });
-  //
-  //   describe("I can upload new flat files to a project version");
-  //
-  //   describe("[WIP] I can upload flat files to the current document");
-  //
-  //   describe("I can delete a project version");
-  // });
+  describe("Project Version CRUD", () => {
+    describe("I can create a new major, minor, or revision version", () => {
+      it("Can create a new major version", () => {
+        cy.projectSelectorContinue().createNewVersion("major");
+
+        cy.getCy(DataCy.snackbarSuccess).should("be.visible");
+      });
+
+      it("Can create a new minor version", () => {
+        cy.projectSelectorContinue().createNewVersion("minor");
+
+        cy.getCy(DataCy.snackbarSuccess).should("be.visible");
+      });
+
+      it("Can create a new revision version", () => {
+        cy.projectSelectorContinue().createNewVersion("revision");
+
+        cy.getCy(DataCy.snackbarSuccess).should("be.visible");
+      });
+    });
+
+    describe("I can delete a project version", () => {
+      it("Deletes a version", () => {
+        cy.projectSelectorContinue();
+
+        cy.getCy(DataCy.selectionModal).within(() => {
+          cy.getCy(DataCy.selectionVersionList).within(() => {
+            cy.clickButton(DataCy.selectorDeleteButton);
+          });
+        });
+
+        cy.getCy(DataCy.versionDeleteModal).within(() => {
+          cy.clickButton(DataCy.versionDeleteConfirmButton);
+        });
+
+        cy.getCy(DataCy.snackbarSuccess).should("be.visible");
+      });
+    });
+
+    // describe("I can upload new flat files to a project version", () => {
+    //   it("Uploads files to the current version", () => {});
+    // });
+
+    // describe("[WIP] I can upload flat files to the current document");
+  });
 });

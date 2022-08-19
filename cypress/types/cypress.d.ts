@@ -120,5 +120,18 @@ declare namespace Cypress {
      * Opens the project selection modal.
      */
     openProjectSelector(): Chainable<void>;
+
+    /**
+     * Must have the project selector open.
+     * On the project step: Selects the current project, continuing to the version step.
+     * On the version step: Selects the current version, continuing to the project page.
+     */
+    projectSelectorContinue(): Chainable<void>;
+
+    /**
+     * Must have the project selector open to the version step.
+     * Creates a new version of the given type.
+     */
+    createNewVersion(type: "major" | "minor" | "revision"): Chainable<void>;
   }
 }

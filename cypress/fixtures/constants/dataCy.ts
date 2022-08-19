@@ -63,12 +63,20 @@ export enum DataCy {
   selectionReload = "button-selector-reload",
   selectionClose = "button-close",
 
-  selectionEditModal = "modal-project-edit",
-  selectionNameInput = "input-project-name-modal",
-  selectionDescriptionInput = "input-project-description-modal",
-  selectionSaveButton = "button-project-save",
+  projectEditModal = "modal-project-edit",
+  projectEditNameInput = "input-project-name-modal",
+  projectEditDescriptionInput = "input-project-description-modal",
+  projectEditSaveButton = "button-project-save",
 
-  selectionDeleteModal = "modal-project-delete",
-  selectionDeleteNameInput = "input-project-delete-name",
-  selectionDeleteButton = "button-project-delete",
+  projectDeleteModal = "modal-project-delete",
+  projectDeleteNameInput = "input-project-delete-name",
+  projectDeleteConfirmButton = "button-project-delete",
+
+  versionCreateModal = "modal-version-create",
+  versionCreateMajorButton = "button-create-major-version",
+  versionCreateMinorButton = "button-create-minor-version",
+  versionCreateRevisionButton = "button-create-revision-version",
+
+  versionDeleteModal = "modal-version-delete",
+  versionDeleteConfirmButton = "button-version-delete",
 }

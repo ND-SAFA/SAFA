@@ -8,8 +8,17 @@
           :tooltip="data.isOpen ? 'Hide Group' : 'Show Group'"
           @click="data.toggle"
         />
-        <typography :value="displayGroupHeader(data.groupBy)" x="2" />
-        <attribute-chip :value="data.group" :artifact-type="artifactType" />
+        <typography :value="groupHeader" x="2" />
+        <attribute-chip
+          :value="data.group"
+          :artifact-type="artifactType"
+          :confidence-score="score"
+        />
+        <attribute-chip
+          v-if="displayArtifact"
+          :value="headerType"
+          artifact-type
+        />
         <typography secondary :value="String(data.items.length)" x="2" />
       </flex-box>
       <flex-box>
@@ -26,12 +35,19 @@
         />
       </flex-box>
     </flex-box>
+    <div class="mb-1" v-if="displayArtifact">
+      <typography
+        default-expanded
+        variant="expandable"
+        :value="headerDescription"
+      />
+    </div>
   </td>
 </template>
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { DataTableGroup, FlatTraceLink } from "@/types";
+import { DataTableGroup } from "@/types";
 import { camelcaseToDisplay } from "@/util";
 import {
   FlexBox,
@@ -40,6 +56,7 @@ import {
   GenericIconButton,
 } from "@/components/common";
 import SectionControls from "./SectionControls.vue";
+import { artifactModule } from "@/store";
 
 /**
  * Renders a group header in a table.
@@ -57,7 +74,10 @@ export default Vue.extend({
     SectionControls,
   },
   props: {
-    data: Object as PropType<DataTableGroup>,
+    data: {
+      type: Object as PropType<DataTableGroup>,
+      required: true,
+    },
     showExpand: Boolean,
   },
   computed: {
@@ -71,16 +91,43 @@ export default Vue.extend({
         (this.data.groupBy as string[]).includes("type")
       );
     },
-  },
-  methods: {
     /**
-     * Converts the group attributes into a display string.
+     * @return Whether this group represents a score.
      */
-    displayGroupHeader(groupBy: (keyof FlatTraceLink)[]): string {
-      return groupBy.map(camelcaseToDisplay).join(", ") + ":";
+    score(): boolean {
+      return this.data.groupBy.includes("score");
+    },
+    /**
+     * @return The group attributes into a display string.
+     */
+    groupHeader(): string {
+      return this.data.groupBy.map(camelcaseToDisplay).join(", ") + ":";
+    },
+    /**
+     * @return Whether to render the description.
+     */
+    displayArtifact(): boolean {
+      return (
+        this.data.groupBy.includes("sourceName") ||
+        this.data.groupBy.includes("targetName")
+      );
+    },
+    /**
+     * @return Renders artifact type when grouping by artifact.
+     */
+    headerDescription(): undefined | string {
+      return this.displayArtifact
+        ? artifactModule.getArtifactByName(this.data.group)?.body
+        : undefined;
+    },
+    /**
+     * @return Renders artifact type when grouping by artifact.
+     */
+    headerType(): undefined | string {
+      return this.displayArtifact
+        ? artifactModule.getArtifactByName(this.data.group)?.type
+        : undefined;
     },
   },
 });
 </script>
-
-<style scoped></style>

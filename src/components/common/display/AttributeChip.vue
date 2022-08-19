@@ -1,5 +1,10 @@
 <template>
-  <v-tooltip bottom z-index="12" :disabled="text.length < 10">
+  <v-tooltip
+    v-if="!confidenceScore"
+    bottom
+    z-index="12"
+    :disabled="text.length < 10"
+  >
     <template v-slot:activator="{ on, attrs }">
       <v-chip
         v-on="on"
@@ -21,6 +26,10 @@
     </template>
     <span>{{ text }}</span>
   </v-tooltip>
+  <flex-box v-else :style="`color: ${color}`" align="center">
+    <v-progress-linear :value="parseFloat(text) * 100" :color="color" />
+    <typography inherit-color l="1" :value="text" />
+  </flex-box>
 </template>
 
 <script lang="ts">
@@ -34,13 +43,14 @@ import {
   uppercaseToDisplay,
 } from "@/util";
 import { typeOptionsModule } from "@/store";
+import FlexBox from "@/components/common/display/FlexBox.vue";
 
 /**
  * Displays a generic chip that can render specific attributes.
  */
 export default Vue.extend({
   name: "AttributeChip",
-  components: { Typography },
+  components: { FlexBox, Typography },
   props: {
     value: String,
     format: Boolean,

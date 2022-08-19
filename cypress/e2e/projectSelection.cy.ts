@@ -1,4 +1,9 @@
-import { DataCy, testProject, validUser } from "../fixtures";
+import {
+  DataCy,
+  simpleProjectFiles,
+  testProject,
+  validUser,
+} from "../fixtures";
 
 describe("Project Selection", () => {
   beforeEach(() => {
@@ -8,17 +13,15 @@ describe("Project Selection", () => {
   });
 
   afterEach(() => {
-    cy.location().then((location) => {
-      if (!location.href.includes("project")) {
-        cy.closeModal(DataCy.selectionModal);
-      }
-
-      // Wait for projects to load
-      cy.wait(500).logout();
-    });
+    // Wait for projects to load
+    cy.wait(500).logout();
   });
 
   describe("Project List", () => {
+    afterEach(() => {
+      cy.closeModal(DataCy.selectionModal);
+    });
+
     describe("I can reload my list of projects", () => {
       it("Shows the list of projects", () => {
         cy.getCy(DataCy.selectionModal).within(() => {
@@ -85,6 +88,10 @@ describe("Project Selection", () => {
   });
 
   describe("Project CRUD", () => {
+    afterEach(() => {
+      cy.closeModal(DataCy.selectionModal);
+    });
+
     it("I can create an empty project", () => {
       cy.getCy(DataCy.selectionModal).within(() => {
         cy.clickButton(DataCy.selectorAddButton);
@@ -138,6 +145,10 @@ describe("Project Selection", () => {
 
   describe("Project Version List", () => {
     describe("I can reload my list of project versions", () => {
+      afterEach(() => {
+        cy.closeModal(DataCy.selectionModal);
+      });
+
       it("Displays project versions", () => {
         cy.projectSelectorContinue();
 
@@ -178,6 +189,8 @@ describe("Project Selection", () => {
 
           cy.getCy(DataCy.stepperContinueButton).should("be.disabled");
         });
+
+        cy.closeModal(DataCy.selectionModal);
       });
     });
   });
@@ -218,12 +231,26 @@ describe("Project Selection", () => {
         });
 
         cy.getCy(DataCy.snackbarSuccess).should("be.visible");
+
+        cy.closeModal(DataCy.selectionModal);
       });
     });
 
-    // describe("I can upload new flat files to a project version", () => {
-    //   it("Uploads files to the current version", () => {});
-    // });
+    describe("I can upload new flat files to a project version", () => {
+      it("Uploads files to the current version", () => {
+        cy.projectSelectorContinue()
+          .projectSelectorContinue()
+          .openUploadFiles();
+
+        cy.getCy(DataCy.versionUploadModal).within(() => {
+          cy.clickButton(DataCy.stepperContinueButton)
+            .uploadFiles(DataCy.versionUploadFilesInput, ...simpleProjectFiles)
+            .clickButton(DataCy.stepperContinueButton);
+        });
+
+        cy.getCy(DataCy.snackbarSuccess).should("be.visible");
+      });
+    });
 
     // describe("[WIP] I can upload flat files to the current document");
   });

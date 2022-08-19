@@ -122,6 +122,11 @@ declare namespace Cypress {
     openProjectSelector(): Chainable<void>;
 
     /**
+     * Opens the upload flat files modal.
+     */
+    openUploadFiles(): Chainable<void>;
+
+    /**
      * Must have the project selector open.
      * On the project step: Selects the current project, continuing to the version step.
      * On the version step: Selects the current version, continuing to the project page.

@@ -1,7 +1,13 @@
 import { DataCy } from "../fixtures";
 
 Cypress.Commands.add("openProjectSelector", () => {
-  cy.clickButtonWithName("Project").clickButtonWithName("Open Project");
+  cy.clickButton(DataCy.navProjectButton).clickButtonWithName("Open Project");
+});
+
+Cypress.Commands.add("openUploadFiles", () => {
+  cy.clickButton(DataCy.navVersionButton).clickButtonWithName(
+    "Upload Flat Files"
+  );
 });
 
 Cypress.Commands.add("projectSelectorContinue", () => {

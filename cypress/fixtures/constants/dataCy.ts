@@ -6,6 +6,10 @@ export enum DataCy {
 
   appLoading = "app-loading",
 
+  navProjectButton = "button-nav-project",
+  navVersionButton = "button-nav-version",
+  navLinksButton = "button-nav-links",
+
   stepperContinueButton = "button-stepper-continue",
   stepperBackButton = "button-stepper-back",
 
@@ -79,4 +83,7 @@ export enum DataCy {
 
   versionDeleteModal = "modal-version-delete",
   versionDeleteConfirmButton = "button-version-delete",
+
+  versionUploadModal = "modal-version-upload",
+  versionUploadFilesInput = "input-files-version",
 }

@@ -4,7 +4,7 @@
       dense
       outlined
       clearable
-      label="Search Trace Links"
+      label="Search"
       style="max-width: 30vw"
       v-model="currentSearch"
       append-icon="mdi-magnify"

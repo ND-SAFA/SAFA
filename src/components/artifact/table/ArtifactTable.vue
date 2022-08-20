@@ -14,6 +14,8 @@
       :search="searchText"
       :sort-by.sync="sortBy"
       :group-by.sync="groupBy"
+      :group-desc.sync="groupDesc"
+      :sort-desc.sync="sortDesc"
       :expanded="expanded"
       :item-class="getItemBackground"
       :items-per-page="50"
@@ -24,6 +26,8 @@
           :headers="headers"
           :group-by.sync="groupBy"
           :sort-by.sync="sortBy"
+          :group-desc.sync="groupDesc"
+          :sort-desc.sync="sortDesc"
           :search-text.sync="searchText"
           @filter="selectedDeltaTypes = $event"
         />
@@ -108,6 +112,8 @@ export default Vue.extend({
       searchText: "",
       sortBy: ["name"] as (keyof FlatArtifact)[],
       groupBy: "type" as keyof FlatArtifact,
+      sortDesc: false,
+      groupDesc: false,
       selectedDeltaTypes: [] as ArtifactDeltaState[],
       expanded: [] as ArtifactModel[],
     };

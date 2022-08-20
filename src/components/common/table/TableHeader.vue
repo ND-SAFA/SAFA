@@ -23,6 +23,10 @@
           item-text="text"
           item-value="value"
           style="max-width: 200px"
+          :prepend-inner-icon="`mdi-arrow-${
+            currentGroupDesc ? 'up' : 'down'
+          }-thin-circle-outline`"
+          @click:prepend-inner="currentGroupDesc = !currentGroupDesc"
         />
         <v-autocomplete
           outlined
@@ -36,6 +40,10 @@
           item-value="value"
           style="max-width: 200px"
           class="ml-1"
+          :prepend-inner-icon="`mdi-arrow-${
+            currentSortDesc ? 'up' : 'down'
+          }-thin-circle-outline`"
+          @click:prepend-inner="currentSortDesc = !currentSortDesc"
         />
       </flex-box>
     </div>
@@ -63,7 +71,9 @@ export default Vue.extend({
     },
     searchText: String,
     groupBy: String,
+    groupDesc: Boolean,
     sortBy: Array as PropType<string[]>,
+    sortDesc: Boolean,
   },
   computed: {
     options() {
@@ -94,6 +104,17 @@ export default Vue.extend({
       },
     },
     /**
+     * Emits changes to the sorting order.
+     */
+    currentSortDesc: {
+      get(): boolean {
+        return this.sortDesc;
+      },
+      set(newDesc: boolean): void {
+        this.$emit("update:sortDesc", newDesc);
+      },
+    },
+    /**
      * Emits changes to the grouping.
      */
     currentGroup: {
@@ -102,6 +123,17 @@ export default Vue.extend({
       },
       set(newGroup: string): void {
         this.$emit("update:groupBy", newGroup);
+      },
+    },
+    /**
+     * Emits changes to the grouping order.
+     */
+    currentGroupDesc: {
+      get(): boolean {
+        return this.groupDesc;
+      },
+      set(newDesc: boolean): void {
+        this.$emit("update:groupDesc", newDesc);
       },
     },
   },

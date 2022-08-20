@@ -26,9 +26,9 @@
     </template>
     <span>{{ text }}</span>
   </v-tooltip>
-  <flex-box v-else :style="`color: ${color}`" align="center">
-    <v-progress-linear :value="parseFloat(text) * 100" :color="color" />
-    <typography inherit-color l="1" :value="text" />
+  <flex-box v-else align="center">
+    <v-progress-linear :value="progress" :color="color" height="20" rounded />
+    <typography l="2" :value="progress + '%'" style="width: 50px" />
   </flex-box>
 </template>
 
@@ -102,6 +102,12 @@ export default Vue.extend({
      */
     outlined(): boolean {
       return this.enumerated || this.confidenceScore;
+    },
+    /**
+     * @return Thee current progress %.
+     */
+    progress(): number {
+      return Math.min(Math.ceil(parseFloat(this.text) * 100), 100);
     },
   },
 });

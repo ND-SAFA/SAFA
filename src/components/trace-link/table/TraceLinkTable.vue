@@ -13,7 +13,8 @@
       :loading="isLoading"
       :sort-by.sync="sortBy"
       :group-by.sync="groupBy"
-      :sort-desc="true"
+      :group-desc.sync="groupDesc"
+      :sort-desc.sync="sortDesc"
       item-key="traceLinkId"
       :items-per-page="50"
       @click:row="handleView($event)"
@@ -23,6 +24,8 @@
           :headers="headers"
           :group-by.sync="groupBy"
           :sort-by.sync="sortBy"
+          :group-desc.sync="groupDesc"
+          :sort-desc.sync="sortDesc"
           :search-text.sync="searchText"
           :approval-types.sync="approvalTypes"
         />
@@ -115,6 +118,8 @@ export default Vue.extend({
       searchText: "",
       sortBy: ["score"] as (keyof FlatTraceLink)[],
       groupBy: "targetName" as keyof FlatTraceLink | undefined,
+      sortDesc: true,
+      groupDesc: false,
       headers: traceLinkTableHeaders,
       links: [] as FlatTraceLink[],
       expanded: [] as FlatTraceLink[],

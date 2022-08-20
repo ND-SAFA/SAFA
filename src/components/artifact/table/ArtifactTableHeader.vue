@@ -4,6 +4,8 @@
     :search-text.sync="currentSearch"
     :group-by.sync="currentGroup"
     :sort-by.sync="currentSort"
+    :sort-desc.sync="currentSortDesc"
+    :group-desc.sync="currentGroupDesc"
   >
     <template slot="right">
       <flex-box b="1">
@@ -59,6 +61,8 @@ export default Vue.extend({
     searchText: String,
     groupBy: String,
     sortBy: Array as PropType<string[]>,
+    groupDesc: Boolean,
+    sortDesc: Boolean,
   },
   data() {
     return {
@@ -104,6 +108,28 @@ export default Vue.extend({
       },
       set(newGroup: string): void {
         this.$emit("update:groupBy", newGroup);
+      },
+    },
+    /**
+     * Emits changes to the sorting order.
+     */
+    currentSortDesc: {
+      get(): boolean {
+        return this.sortDesc;
+      },
+      set(newDesc: boolean): void {
+        this.$emit("update:sortDesc", newDesc);
+      },
+    },
+    /**
+     * Emits changes to the grouping order.
+     */
+    currentGroupDesc: {
+      get(): boolean {
+        return this.groupDesc;
+      },
+      set(newDesc: boolean): void {
+        this.$emit("update:groupDesc", newDesc);
       },
     },
   },

@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Data;
 
 /**
  * Responsible for identifying error that were accounted
@@ -14,6 +15,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  * regarded as unaccounted for.
  */
 @JsonIgnoreProperties({"cause", "stackTrace", "suppressed", "localizedMessage"})
+@Data
 public class SafaError extends RuntimeException {
     private final Exception exception;
     private final List<String> errors;
@@ -42,14 +44,5 @@ public class SafaError extends RuntimeException {
 
     public void printError() {
         Objects.requireNonNullElse(this.exception, this).printStackTrace();
-    }
-
-    @Override
-    public String getMessage() {
-        return this.message;
-    }
-
-    public List<String> getErrors() {
-        return this.errors;
     }
 }

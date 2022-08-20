@@ -25,7 +25,7 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 @RestController
 @AllArgsConstructor
 public abstract class BaseController {
-    
+
     protected final ResourceBuilder resourceBuilder;
     protected final ServiceProvider serviceProvider;
 
@@ -51,13 +51,6 @@ public abstract class BaseController {
         return new SafaError("Upload exceeded max size of. Please contact SAFA administrators.");
     }
 
-    @ExceptionHandler(SafaError.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public SafaError handleServerError(SafaError safaError) {
-        safaError.printError();
-        return safaError;
-    }
-
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public SafaError handleValidationError(MethodArgumentNotValidException exception) {
@@ -75,6 +68,13 @@ public abstract class BaseController {
         exception.printStackTrace();
         String errorMessage = AppConstraints.getConstraintError(exception);
         return new SafaError(errorMessage, exception);
+    }
+
+    @ExceptionHandler(SafaError.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public SafaError handleServerError(SafaError safaError) {
+        safaError.printError();
+        return safaError;
     }
 
     @ExceptionHandler(Exception.class)

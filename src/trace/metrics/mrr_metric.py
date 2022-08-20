@@ -20,6 +20,7 @@ _CITATION = """
 
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
 class MRRMetric(AbstractTraceMetric):
+    metric_name = "mrr"
 
     # TODO
     def _perform_compute(self, predictions, labels, **kwargs) -> float:
@@ -30,7 +31,7 @@ class MRRMetric(AbstractTraceMetric):
         :param kwargs: any other necessary params
         :return: Precision@K score.
         """
-        pass
+        return 0
 
     def _info(self) -> datasets.MetricInfo:
         """

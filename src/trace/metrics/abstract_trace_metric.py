@@ -1,10 +1,10 @@
 from typing import Dict, List, re
 
 import datasets
-from abc import abstractmethod
+from abc import abstractmethod, ABC
 
 
-class AbstractTraceMetric(datasets.Metric):
+class AbstractTraceMetric(datasets.Metric, ABC):
     metric_suffix = "Metric"
 
     def get_features(self) -> datasets.Features:
@@ -22,7 +22,7 @@ class AbstractTraceMetric(datasets.Metric):
                 "predictions": datasets.Value("int32"),
                 "references": datasets.Value("int32"),
             }
-        ),
+        )
 
     @abstractmethod
     def _perform_compute(self, predictions: List, labels: List, **kwargs) -> float:

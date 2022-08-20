@@ -22,6 +22,7 @@ _CITATION = """
 
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
 class PrecisionAtKMetric(AbstractTraceMetric):
+    metric_name = "precision_at_k"
 
     # TODO
     def _perform_compute(self, predictions, labels, k=K_METRIC_DEFAULT, **kwargs) -> float:
@@ -33,7 +34,7 @@ class PrecisionAtKMetric(AbstractTraceMetric):
         :param kwargs: any other necessary params
         :return: Precision@K score.
         """
-        pass
+        return 0
 
     def _info(self) -> datasets.MetricInfo:
         """

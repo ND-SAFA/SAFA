@@ -22,6 +22,7 @@ _CITATION = """
 
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
 class MapAtKMetric(AbstractTraceMetric):
+    metric_name = "map_at_k"
 
     # TODO
     def _perform_compute(self, predictions, labels, k=K_METRIC_DEFAULT, **kwargs) -> float:
@@ -34,7 +35,7 @@ class MapAtKMetric(AbstractTraceMetric):
         :param kwargs: any other necessary params
         :return: Mean Average Precision@K score.
         """
-        pass
+        return 0
 
     def _info(self) -> datasets.MetricInfo:
         """

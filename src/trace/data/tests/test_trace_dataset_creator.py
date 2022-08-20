@@ -37,8 +37,8 @@ class TestTraceDatasetCreator(TestCase):
     def test_get_training_and_validation_dataset_with_transformers(self, get_tokenizer_mock: mock.MagicMock):
         get_tokenizer_mock.return_value = get_test_tokenizer()
         test_trace_dataset_creator = self.get_test_trace_dataset_creator()
-        training_dataset = test_trace_dataset_creator.get_training_dataset()
-        validation_dataset = test_trace_dataset_creator.get_validation_dataset()
+        training_dataset = test_trace_dataset_creator.get_training_dataset().data
+        validation_dataset = test_trace_dataset_creator.get_validation_dataset().data
 
         self.assertEquals(len(training_dataset), self.get_expected_train_dataset_size(1))
         self.assertEquals(len(validation_dataset), self.EXPECTED_VALIDATION_SIZE)
@@ -47,9 +47,17 @@ class TestTraceDatasetCreator(TestCase):
     def test_get_prediction_dataset_with_transformers(self, get_tokenizer_mock: mock.MagicMock):
         get_tokenizer_mock.return_value = get_test_tokenizer()
         test_trace_dataset_creator = self.get_test_trace_dataset_creator(include_links=False)
-        prediction_dataset = test_trace_dataset_creator.get_prediction_dataset()
+        prediction_dataset = test_trace_dataset_creator.get_prediction_dataset().data
 
         self.assertEqual(len(prediction_dataset), len(self.ALL_LINKS))
+
+    @patch.object(ModelGenerator, "get_tokenizer")
+    def test_create_dataset_full(self, get_tokenizer_mock: mock.MagicMock):
+        get_tokenizer_mock.return_value = get_test_tokenizer()
+        test_trace_dataset_creator = self.get_test_trace_dataset_creator(include_links=False)
+        links = self.get_links(TEST_POS_LINKS)
+        dataset = test_trace_dataset_creator._create_dataset(list(links.keys()))
+        self.assertEquals(len(dataset), len(list(TEST_POS_LINKS)))
 
     # ========================= mid-level testing (no external packages like transformers) =========================
 
@@ -57,8 +65,8 @@ class TestTraceDatasetCreator(TestCase):
     def test_get_training_and_validation_dataset(self, get_feature_entry_mock: mock.MagicMock):
         get_feature_entry_mock.side_effect = fake_extract_feature_info
         test_trace_dataset_creator = self.get_test_trace_dataset_creator()
-        training_dataset = test_trace_dataset_creator.get_training_dataset()
-        validation_dataset = test_trace_dataset_creator.get_validation_dataset()
+        training_dataset = test_trace_dataset_creator.get_training_dataset().data
+        validation_dataset = test_trace_dataset_creator.get_validation_dataset().data
 
         training_link_ids = self.get_dataset_link_attrs(training_dataset)
         validation_link_ids = self.get_dataset_link_attrs(validation_dataset)
@@ -72,8 +80,8 @@ class TestTraceDatasetCreator(TestCase):
         expected_dataset_size = self.get_expected_train_dataset_size(resample_rate)
 
         test_trace_dataset_creator = self.get_test_trace_dataset_creator()
-        training_dataset = test_trace_dataset_creator.get_training_dataset(resample_rate)
-        self.assertEquals(len(get_feature_entry_mock.mock_calls), len(self.ALL_LINKS) - self.EXPECTED_VALIDATION_SIZE)
+        training_dataset = test_trace_dataset_creator.get_training_dataset(resample_rate).data
+        self.assertEquals(len(get_feature_entry_mock.mock_calls), expected_dataset_size)
         self.assertEquals(len(training_dataset), expected_dataset_size)
 
         pos_links = self.get_links(TEST_POS_LINKS)
@@ -96,14 +104,14 @@ class TestTraceDatasetCreator(TestCase):
         expected_dataset_size = self.get_expected_train_dataset_size(resample_rate, 0)
 
         test_trace_dataset_creator = self.get_test_trace_dataset_creator(validation_percentage=0)
-        training_dataset = test_trace_dataset_creator.get_training_dataset(resample_rate)
+        training_dataset = test_trace_dataset_creator.get_training_dataset(resample_rate).data
         self.assertEquals(len(training_dataset), expected_dataset_size)
 
     @patch.object(TraceDatasetCreator, "_get_feature_entry")
     def test_get_validation_dataset_full(self, get_feature_entry_mock: mock.MagicMock):
         get_feature_entry_mock.side_effect = fake_extract_feature_info
         test_trace_dataset_creator = self.get_test_trace_dataset_creator()
-        validation_dataset = test_trace_dataset_creator.get_validation_dataset()
+        validation_dataset = test_trace_dataset_creator.get_validation_dataset().data
         self.assertEquals(len(get_feature_entry_mock.mock_calls), self.EXPECTED_VALIDATION_SIZE)
         self.assertEquals(len(validation_dataset), self.EXPECTED_VALIDATION_SIZE)
 
@@ -117,7 +125,7 @@ class TestTraceDatasetCreator(TestCase):
         get_feature_entry_mock.side_effect = fake_extract_feature_info
         dataset_size = 2
         test_trace_dataset_creator = self.get_test_trace_dataset_creator()
-        validation_dataset = test_trace_dataset_creator.get_validation_dataset(dataset_size=dataset_size)
+        validation_dataset = test_trace_dataset_creator.get_validation_dataset(dataset_size=dataset_size).data
         self.assertEquals(len(get_feature_entry_mock.mock_calls), dataset_size)
         self.assertEquals(len(validation_dataset), dataset_size)
 
@@ -125,7 +133,7 @@ class TestTraceDatasetCreator(TestCase):
     def test_get_validation_dataset_linked_targets_only(self, get_feature_entry_mock: mock.MagicMock):
         get_feature_entry_mock.side_effect = fake_extract_feature_info
         test_trace_dataset_creator = self.get_test_trace_dataset_creator()
-        validation_dataset = test_trace_dataset_creator.get_validation_dataset(linked_targets_only=True)
+        validation_dataset = test_trace_dataset_creator.get_validation_dataset(linked_targets_only=True).data
 
         self.assertLessEqual(len(get_feature_entry_mock.mock_calls), self.EXPECTED_VALIDATION_SIZE)
         self.assertLessEqual(len(validation_dataset), self.EXPECTED_VALIDATION_SIZE)
@@ -138,7 +146,7 @@ class TestTraceDatasetCreator(TestCase):
     def test_get_prediction_dataset(self, get_feature_entry_mock: mock.MagicMock):
         get_feature_entry_mock.side_effect = fake_extract_feature_info
         test_trace_dataset_creator = self.get_test_trace_dataset_creator(include_links=False)
-        prediction_dataset = test_trace_dataset_creator.get_prediction_dataset()
+        prediction_dataset = test_trace_dataset_creator.get_prediction_dataset().data
         self.assertEquals(len(get_feature_entry_mock.mock_calls), len(self.ALL_LINKS))
 
         self.assertEqual(len(prediction_dataset), len(self.ALL_LINKS))
@@ -152,6 +160,14 @@ class TestTraceDatasetCreator(TestCase):
         get_feature_entry_mock.called = False
         test_trace_dataset_creator.get_prediction_dataset()
         self.assertFalse(get_feature_entry_mock.called)
+
+    @patch.object(TraceDatasetCreator, "_get_feature_entry")
+    def test_create_dataset(self, get_feature_entry_mock: mock.MagicMock):
+        get_feature_entry_mock.side_effect = fake_extract_feature_info
+        test_trace_dataset_creator = self.get_test_trace_dataset_creator(include_links=False)
+        links = self.get_links(TEST_POS_LINKS)
+        dataset = test_trace_dataset_creator._create_dataset(list(links.keys()))
+        self.assertEquals(len(dataset), len(list(TEST_POS_LINKS)))
 
     # ========================= low-level testing (isolated individual methods) =========================
 
@@ -173,7 +189,7 @@ class TestTraceDatasetCreator(TestCase):
         feature_entry = test_trace_dataset_creator._get_feature_entry(test_link)
 
         self.feature_entry_test(feature_entry, test_link)
-        self.assertEquals(extract_feature_info_mock.call_count, 2)
+        self.assertTrue(extract_feature_info_mock.called)
         extract_feature_info_mock.assert_any_call(test_link.source.token, "s_")
         extract_feature_info_mock.assert_any_call(test_link.target.token, "t_")
 
@@ -195,9 +211,9 @@ class TestTraceDatasetCreator(TestCase):
 
         test_trace_dataset_creator = self.get_test_trace_dataset_creator()
         link_ids = self.get_links(TEST_POS_LINKS).keys()
-        feature_entries = test_trace_dataset_creator._get_feature_entries(link_ids, 5)
+        feature_entries = test_trace_dataset_creator._get_feature_entries(link_ids)
 
-        self.assertEquals(len(feature_entries), 5 * len(TEST_POS_LINKS))
+        self.assertEquals(len(feature_entries), len(TEST_POS_LINKS))
         self.assertEquals(get_feature_entry_mock.call_count, len(TEST_POS_LINKS))
 
     def test_get_data_split(self):
@@ -281,18 +297,6 @@ class TestTraceDatasetCreator(TestCase):
         for key in self.IRRELEVANT_FEATURE_KEYS:
             self.assertNotIn(prefix + key, feature_info)
 
-    def test_change_data_size_bigger(self):
-        new_dataset = TraceDatasetCreator._change_data_size(TEST_POS_LINKS, 5)
-        self.assertEquals(len(new_dataset), 5)
-
-    def test_change_data_size_duplicates(self):
-        new_dataset = TraceDatasetCreator._change_data_size(TEST_POS_LINKS, 2, True)
-        self.assertEquals(len(new_dataset), 2)
-
-    def test_reduce_data_size_smaller_no_duplicates(self):
-        new_dataset = TraceDatasetCreator._change_data_size(TEST_POS_LINKS, 2, False)
-        self.assertEquals(len(set(new_dataset)), 2)
-
     def tests_get_linked_targets_only(self):
         linked_targets = TraceDatasetCreator._get_linked_targets_only(TEST_POS_LINKS)
 
@@ -306,12 +310,6 @@ class TestTraceDatasetCreator(TestCase):
         return [getattr(feature_entry["feature_info"], attr) for feature_entry in dataset]
 
     def feature_entry_test(self, feature_entry, test_link):
-        self.assertIn("sid", feature_entry)
-        self.assertEquals(feature_entry["sid"], test_link.source.id_)
-
-        self.assertIn("tid", feature_entry)
-        self.assertEquals(feature_entry["tid"], test_link.target.id_)
-
         self.assertIn("label", feature_entry)
         self.assertEquals(feature_entry["label"], 0)
 

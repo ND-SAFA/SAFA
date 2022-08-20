@@ -27,6 +27,11 @@ class TestTraceLink(TestCase):
         feature = test_trace_link.get_feature()
         self.assertEquals(feature["feature_name"], expected_value)
 
+    def test_get_source_target_ids(self):
+        link = self.get_test_trace_link()
+        source_target_ids = link.get_source_target_ids()
+        self.assertEqual(source_target_ids, (self.S_ID, self.T_ID))
+
     def test_generate_link_id(self):
         link_id = TraceLink.generate_link_id(self.S_ID, self.T_ID)
         self.assertEquals(link_id - hash(self.S_ID), hash(self.T_ID))

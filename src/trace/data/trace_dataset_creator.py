@@ -7,17 +7,19 @@ import torch
 from trace.config.constants import EVAL_DATASET_SIZE_DEFAULT, LINKED_TARGETS_ONLY_DEFAULT, RESAMPLE_RATE_DEFAULT
 from trace.data.artifact import Artifact
 from trace.data.data_key import DataKey
+from trace.data.trace_dataset import TraceDataset
 from trace.data.trace_link import TraceLink
 from common.models.model_generator import ModelGenerator, ArchitectureType
 
 
 class TraceDatasetCreator:
+    __training_dataset: TraceDataset = None
+    __validation_dataset: TraceDataset = None
+    __prediction_dataset: TraceDataset = None
+
     """
     Responsible for creating dataset in format for defined models.
     """
-    __training_dataset: List[Dict] = None
-    __validation_dataset: List[Dict] = None
-    __prediction_dataset: List[Dict] = None
 
     def __init__(self, source_artifacts: Dict[str, str], target_artifacts: Dict[str, str], model_generator: ModelGenerator,
                  true_links: List[Tuple[str, str]] = None, validation_percentage: float = 0.0):
@@ -29,6 +31,7 @@ class TraceDatasetCreator:
         :param model_generator: the ModelGenerator
         :param validation_percentage: percentage of dataset used for validation, if no value is supplied then data will not be split
         """
+
         self.model_generator = model_generator
         self.links, self.pos_link_ids, self.neg_link_ids = self._create_links(self.model_generator, source_artifacts, target_artifacts,
                                                                               true_links)
@@ -37,7 +40,7 @@ class TraceDatasetCreator:
         random.shuffle(self.pos_link_ids)
         random.shuffle(self.neg_link_ids)
 
-    def get_training_dataset(self, resample_rate: int = RESAMPLE_RATE_DEFAULT) -> List[Dict]:
+    def get_training_dataset(self, resample_rate: int = RESAMPLE_RATE_DEFAULT) -> TraceDataset:
         """
         Gets the dataset used for training
         :param resample_rate: specifies the rate to resample the links to balance the dataset
@@ -47,18 +50,16 @@ class TraceDatasetCreator:
             train_pos_link_ids = self._get_data_split(self.pos_link_ids)
             train_neg_link_ids = self._get_data_split(self.neg_link_ids)
 
-            self.__training_dataset = self._get_feature_entries(train_pos_link_ids, resample_rate)
+            train_pos_link_ids = TraceDataset.resample_data(train_pos_link_ids, resample_rate)
+            train_neg_link_ids = TraceDataset.resize_data(train_neg_link_ids, len(train_pos_link_ids), include_duplicates=True)
 
-            # get same number of negative links
-            feature_entries_neg_links = self._get_feature_entries(train_neg_link_ids, 1)
-            equal_feature_entries_neg_links = self._change_data_size(feature_entries_neg_links,
-                                                                     len(self.__training_dataset),
-                                                                     include_duplicates=True)
-            self.__training_dataset.extend(equal_feature_entries_neg_links)
+            link_ids = [*train_pos_link_ids, *train_neg_link_ids]
+            self.__training_dataset = self._create_dataset(link_ids)
+
         return self.__training_dataset
 
     def get_validation_dataset(self, dataset_size: int = EVAL_DATASET_SIZE_DEFAULT,
-                               linked_targets_only: bool = LINKED_TARGETS_ONLY_DEFAULT) -> List[Dict]:
+                               linked_targets_only: bool = LINKED_TARGETS_ONLY_DEFAULT) -> TraceDataset:
         """
         Gets the dataset used for validation
         :param dataset_size: desired size for dataset (if larger than original dataset, the entire dataset is used)
@@ -75,20 +76,32 @@ class TraceDatasetCreator:
             link_ids = [*val_pos_link_ids, *val_neg_link_ids]
 
             if dataset_size < len(link_ids):
-                link_ids = self._change_data_size(link_ids, dataset_size)
+                link_ids = TraceDataset.resize_data(link_ids, dataset_size)
 
-            self.__validation_dataset = self._get_feature_entries(link_ids)
+            self.__validation_dataset = self._create_dataset(link_ids)
 
         return self.__validation_dataset
 
-    def get_prediction_dataset(self) -> List[Dict]:
+    def get_prediction_dataset(self) -> TraceDataset:
         """
         Gets the dataset used for validation
         :return: the prediction dataset
         """
         if self.__prediction_dataset is None:
-            self.__prediction_dataset = self._get_feature_entries(self.links.keys())
+            self.__prediction_dataset = self._create_dataset(list(self.links.keys()))
         return self.__prediction_dataset
+
+    def _create_dataset(self, link_ids: List[int]) -> TraceDataset:
+        """
+        Creates a TraceDataset from the identified links
+        :param link_ids: ids of links to be in dataset
+        :return: the TraceDataset created from the links
+        """
+        dataset = TraceDataset()
+        feature_entries = self._get_feature_entries(link_ids)
+        source_target_pairs = [self.links[link_id].get_source_target_ids() for link_id in link_ids]
+        dataset.add_entries(feature_entries, source_target_pairs)
+        return dataset
 
     # TODO is this needed?
     def update_embeddings(self) -> None:
@@ -136,23 +149,16 @@ class TraceDatasetCreator:
                      **self._extract_feature_info(link.target.get_feature(), DataKey.TARGET_PRE + "_")}
         else:
             entry = self._extract_feature_info(link.get_feature())
-        entry[DataKey.SOURCE_PRE + DataKey.ID_KEY] = link.source.id_
-        entry[DataKey.TARGET_PRE + DataKey.ID_KEY] = link.target.id_
         entry[DataKey.LABEL_KEY] = int(link.is_true_link)
         return entry
 
-    def _get_feature_entries(self, link_ids: Iterable[str], resample_rate: int = RESAMPLE_RATE_DEFAULT) -> List[Dict]:
+    def _get_feature_entries(self, link_ids: Iterable[int]) -> List[Dict]:
         """
         Gets a list of link features to be used in the dataset
         :param link_ids: ids of links to create dataset from
-        :param resample_rate: specifies the rate to resample the links to balance the dataset
         :return: a list of the feature entries
         """
-        feature_entries = []
-        for link_id in link_ids:
-            feature_entry = self._get_feature_entry(self.links[link_id])
-            feature_entries.extend([feature_entry for i in range(resample_rate)])
-        return feature_entries
+        return [self._get_feature_entry(self.links[link_id]) for link_id in link_ids]
 
     def _get_data_split(self, data: List, for_validation: bool = False) -> List:
         """
@@ -241,19 +247,6 @@ class TraceDatasetCreator:
             if key_ in feature:
                 feature_info[prefix + key_] = feature[key_]
         return feature_info
-
-    @staticmethod
-    def _change_data_size(data: List, new_length: int, include_duplicates: bool = False) -> List:
-        """
-        Changes the size of the given dataset by using random choice or sample
-        :param data: list of data
-        :param new_length: desired length
-        :param include_duplicates: if True, uses sampling
-        :return: a list with the data of the new_length
-        """
-        include_duplicates = True if new_length > len(data) else include_duplicates  # must include duplicates to make a bigger dataset
-        reduction_func = random.choices if include_duplicates else random.sample
-        return reduction_func(data, k=new_length)
 
     @staticmethod
     def _get_linked_targets_only(true_links: List) -> Set:

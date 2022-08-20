@@ -14,10 +14,11 @@ class TraceArgs(TrainingArguments):
     max_seq_length: int = MAX_SEQ_LENGTH_DEFAULT
     eval_dataset_size: int = EVAL_DATASET_SIZE_DEFAULT
     metrics: List[str] = None
+    prediction_ids_key: str = 'ids'
 
     def __init__(self, model_generator: ModelGenerator,
                  trace_dataset_creator: TraceDatasetCreator,
-                 output_path: str = None, **kwargs):
+                 output_path: str = None, ** kwargs):
         """
         Arguments for Learning Model
         :param model_generator: generates model with specified base model and path.
@@ -28,9 +29,8 @@ class TraceArgs(TrainingArguments):
         """
         self.model_generator = model_generator
         self.trace_dataset_creator = trace_dataset_creator
-        self.kwargs = kwargs
         super().__init__(log_level="info", log_level_replica="info", output_dir=output_path)
-        self.__set_args(**self.kwargs)
+        self.__set_args(**kwargs)
 
     def __set_args(self, **kwargs) -> None:
         """

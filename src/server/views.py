@@ -1,6 +1,6 @@
 from typing import Dict
 
-from server.api import RequestParams
+from server.api import Api
 from django.http.request import HttpRequest
 from django.http.response import JsonResponse
 
@@ -21,17 +21,19 @@ def _run_job(request, job_type):
     args = _make_job_params_from_request(request.POST)
     job = job_type.value(args)
     job_results = job.start()
-    return _as_json(job_results)
+    return _as_json(job_results.output)
 
 
 def _make_job_params_from_request(params: Dict):
-    model_path = params[RequestParams.MODEL_PATH]
-    sources = params[RequestParams.SOURCES]
-    targets = params[RequestParams.TARGETS]
-    base_model = params[RequestParams.BASE_MODEL]
-    links = params.get(RequestParams.LINKS, None)
-    output_path = params.get(RequestParams.OUTPUT_PATH, None)
-    return TraceArgsBuilder(base_model, model_path, output_path, sources, targets, links, VALIDATION_PERCENTAGE_DEFAULT)
+    model_path = params[Api.MODEL_PATH]
+    sources = params[Api.SOURCES]
+    targets = params[Api.TARGETS]
+    base_model = params[Api.BASE_MODEL]
+    links = params.get(Api.LINKS, None)
+    output_path = params.get(Api.OUTPUT_PATH, None)
+    kwargs = params.get(Api.SETTINGS)
+    return TraceArgsBuilder(base_model, model_path, output_path, sources, targets, links, VALIDATION_PERCENTAGE_DEFAULT,
+                            prediction_ids_key=Api.PREDICTION_IDS, **kwargs)
 
 
 def _as_json(response_object: Dict) -> JsonResponse:

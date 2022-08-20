@@ -133,7 +133,7 @@ public class DocumentController extends BaseDocumentController {
      * @param documentId The UUID of the document to delete.
      * @throws SafaError Throws error is authorized user does not have edit permission.
      */
-    @DeleteMapping(AppRoutes.Documents.DELETE_DOCUMENT)
+    @DeleteMapping(AppRoutes.Documents.DELETE_DOCUMENT_BY_ID)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteDocument(@PathVariable UUID documentId) throws SafaError {
         // Step - Retrieve document and associated project.

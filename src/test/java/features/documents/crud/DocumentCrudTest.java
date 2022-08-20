@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
-import requests.SafaRequest;
-
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.IAppEntityService;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
@@ -17,6 +15,7 @@ import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
 
 import common.AbstractCrudTest;
 import org.json.JSONObject;
+import requests.SafaRequest;
 
 public class DocumentCrudTest extends AbstractCrudTest<DocumentAppEntity> {
     String newName = "new-name";
@@ -90,7 +89,7 @@ public class DocumentCrudTest extends AbstractCrudTest<DocumentAppEntity> {
     @Override
     protected void deleteEntity(DocumentAppEntity entity) throws Exception {
         SafaRequest
-            .withRoute(AppRoutes.Documents.DELETE_DOCUMENT)
+            .withRoute(AppRoutes.Documents.DELETE_DOCUMENT_BY_ID)
             .withDocument(document)
             .deleteWithJsonObject();
     }

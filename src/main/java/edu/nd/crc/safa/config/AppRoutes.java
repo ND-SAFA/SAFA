@@ -86,7 +86,7 @@ public class AppRoutes {
         public static final String CLEAR_CURRENT_DOCUMENT = Projects.ROOT + Documents.ROOT + "/current";
         protected static final String BY_ID = ROOT + "/{documentId}";
         public static final String GET_DOCUMENT_BY_ID = Versions.BY_ID + Documents.BY_ID;
-        public static final String DELETE_DOCUMENT = Projects.ROOT + Documents.BY_ID;
+        public static final String DELETE_DOCUMENT_BY_ID = Projects.ROOT + Documents.BY_ID;
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)

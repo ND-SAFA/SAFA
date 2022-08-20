@@ -1,10 +1,10 @@
-package features.collaboration.crud;
+package features.memberships.logic;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 
-import features.collaboration.AbstractSharingTest;
+import common.AbstractSharingTest;
 import org.json.JSONArray;
 import org.junit.jupiter.api.Test;
 

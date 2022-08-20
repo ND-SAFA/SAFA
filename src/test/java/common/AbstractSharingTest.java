@@ -1,4 +1,4 @@
-package features.collaboration;
+package common;
 
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.ProjectRole;
@@ -26,7 +26,11 @@ public abstract class AbstractSharingTest extends ApplicationBaseTest {
     protected Project project;
 
     @BeforeEach
-    public void createShareeAccountAndShareProject() throws Exception {
+    public void setupProject() throws Exception {
+        createShareeAccountAndShareProject();
+    }
+
+    protected void createShareeAccountAndShareProject() throws Exception {
         // Step - Create project and initial version
         this.projectVersion = creationTestService.createProjectWithNewVersion(projectName);
         this.project = this.projectVersion.getProject();
@@ -39,6 +43,16 @@ public abstract class AbstractSharingTest extends ApplicationBaseTest {
             this.projectVersion.getProject(),
             Sharee.email,
             this.otherUserProjectRole);
+
+        // Step - Subscribe Sharee to project  notifications
+        notificationTestService
+            .createNewConnection(Sharee.email)
+            .subscribeToProject(Sharee.email, project);
+
+        // Step - Subscribe Sharee to version notifications
+        notificationTestService
+            .createNewConnection(Sharee.email)
+            .subscribeToVersion(Sharee.email, projectVersion);
     }
 
     /**

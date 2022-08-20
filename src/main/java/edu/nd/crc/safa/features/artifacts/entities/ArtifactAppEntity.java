@@ -1,7 +1,7 @@
 package edu.nd.crc.safa.features.artifacts.entities;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.validation.constraints.NotEmpty;
@@ -49,7 +49,7 @@ public class ArtifactAppEntity implements IAppEntity {
     /**
      * Mapping of columns ids to column values for this artifact.
      */
-    Map<String, String> customFields;
+    Map<String, String> customFields = new HashMap<>();
     /**
      * The type of document this artifact is displayed in.
      */
@@ -65,15 +65,13 @@ public class ArtifactAppEntity implements IAppEntity {
     /**
      * List of document Ids this artifact belongs to.
      */
-    List<String> documentIds;
+    List<String> documentIds = new ArrayList<>();
 
     public ArtifactAppEntity() {
         this.id = "";
         this.name = "";
         this.body = "";
         this.summary = "";
-        this.documentIds = new ArrayList<>();
-        this.customFields = new Hashtable<>();
     }
 
     public ArtifactAppEntity(String artifactId,

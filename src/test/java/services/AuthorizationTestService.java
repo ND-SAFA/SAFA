@@ -4,8 +4,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.Optional;
 
-import requests.SafaRequest;
-
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.memberships.entities.db.ProjectMembership;
@@ -21,6 +19,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.web.servlet.ResultMatcher;
+import requests.SafaRequest;
 
 @AllArgsConstructor
 public class AuthorizationTestService {
@@ -68,13 +67,30 @@ public class AuthorizationTestService {
         this.loginUser(email, password, test, true);
     }
 
-    public void loginUser(String email, String password, ResultMatcher test, boolean setToken) throws Exception {
-        JSONObject user = new JSONObject();
-        user.put("email", email);
-        user.put("password", password);
+    /**
+     * Sends request to login endpoint with given account credentials. Result matches
+     * used to verify request response. If setToken is true, then token is set to global
+     * SafaRequest variable.
+     *
+     * @param email         Account email.
+     * @param password      Account password.
+     * @param resultMatcher Expected HTTP response assertions.
+     * @param setToken      Whether to set authorization token.
+     * @throws Exception If http error occurs.
+     */
+    public void loginUser(String email,
+                          String password,
+                          ResultMatcher resultMatcher,
+                          boolean setToken) throws Exception {
+        // Step - Clear token if setting new one
+        if (setToken) {
+            SafaRequest.clearAuthorizationToken();
+        }
+
         JSONObject response = SafaRequest
             .withRoute(AppRoutes.Accounts.LOGIN)
-            .postWithJsonObject(user, test);
+            .postWithJsonObject(new SafaUser(email, password), resultMatcher);
+
         if (setToken) {
             String token = response.getString("token");
             SafaRequest.setAuthorizationToken(token);

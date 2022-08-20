@@ -1,6 +1,5 @@
 package edu.nd.crc.safa.features.common;
 
-import java.nio.file.AccessDeniedException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -26,7 +25,7 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 @RestController
 @AllArgsConstructor
 public abstract class BaseController {
-    
+
     protected final ResourceBuilder resourceBuilder;
     protected final ServiceProvider serviceProvider;
 
@@ -69,14 +68,6 @@ public abstract class BaseController {
         exception.printStackTrace();
         String errorMessage = AppConstraints.getConstraintError(exception);
         return new SafaError(errorMessage, exception);
-    }
-
-    @ExceptionHandler(AccessDeniedException.class)
-    @ResponseStatus(HttpStatus.FORBIDDEN)
-    public AccessDeniedException handlePermissionError(AccessDeniedException e) {
-        //Exists to not get handled in generic handler below
-        System.out.println("PERMISSION ERROR");
-        return e;
     }
 
     @ExceptionHandler(SafaError.class)

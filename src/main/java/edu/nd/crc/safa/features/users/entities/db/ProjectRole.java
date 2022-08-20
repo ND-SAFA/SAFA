@@ -7,5 +7,10 @@ public enum ProjectRole {
     VIEWER,
     EDITOR,
     ADMIN,
-    OWNER,
+    OWNER;
+
+    @Override
+    public String toString() {
+        return this.name();
+    }
 }

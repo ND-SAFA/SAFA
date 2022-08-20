@@ -132,9 +132,13 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
         );
     }
 
-    public void deleteWithJsonObject() throws Exception {
-        sendAuthenticatedRequest(MockMvcRequestBuilders.delete(this.buildEndpoint()),
-            status().is2xxSuccessful(),
+    public JSONObject deleteWithJsonObject() throws Exception {
+        return deleteWithJsonObject(status().is2xxSuccessful());
+    }
+
+    public JSONObject deleteWithJsonObject(ResultMatcher resultMatcher) throws Exception {
+        return sendAuthenticatedRequest(MockMvcRequestBuilders.delete(this.buildEndpoint()),
+            resultMatcher,
             authorizationToken,
             ResponseParser::jsonCreator);
     }

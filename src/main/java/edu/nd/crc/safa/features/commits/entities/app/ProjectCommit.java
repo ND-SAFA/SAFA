@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import javax.validation.Valid;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.delta.entities.app.ProjectChange;
@@ -25,8 +26,8 @@ import lombok.Setter;
 @Setter
 public class ProjectCommit {
     ProjectVersion commitVersion;
-    ProjectChange<ArtifactAppEntity> artifacts;
-    ProjectChange<TraceAppEntity> traces;
+    ProjectChange<@Valid ArtifactAppEntity> artifacts;
+    ProjectChange<@Valid TraceAppEntity> traces;
     List<CommitError> errors;
     boolean failOnError;
 

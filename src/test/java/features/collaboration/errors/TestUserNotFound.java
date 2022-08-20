@@ -1,12 +1,11 @@
 package features.collaboration.errors;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.ProjectRole;
 
-import features.collaboration.base.AbstractCollaborationTest;
+import features.collaboration.AbstractSharingTest;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
@@ -15,7 +14,8 @@ import org.junit.jupiter.api.Test;
  * 1. User is not found
  * 2. User is already on the project
  */
-class TestSharingErrors extends AbstractCollaborationTest {
+public class TestUserNotFound extends AbstractSharingTest {
+    String nonUserEmail = "non-existing@email.com";
 
     /**
      * Tests that error message notifies user that email is not registered
@@ -24,16 +24,13 @@ class TestSharingErrors extends AbstractCollaborationTest {
      * @throws Exception Throws exception if http fails when sending get request.
      */
     @Test
-    void userNotFoundError() throws Exception {
-        String projectName = "test-project";
-
-        // Step - Create a project
-        Project project = dbEntityBuilder
-            .newProjectWithReturn(projectName);
-
+    public void userNotFoundError() throws Exception {
         // Step - Share with non-existent user
-        String nonUserEmail = "non-existing@email.com";
-        JSONObject response = creationTestService.shareProject(project, nonUserEmail, ProjectRole.VIEWER,
+
+        JSONObject response = creationTestService.shareProject(
+            project,
+            nonUserEmail,
+            ProjectRole.VIEWER,
             status().is4xxClientError());
 
         // VP - Verify that error informs that email not associated with account

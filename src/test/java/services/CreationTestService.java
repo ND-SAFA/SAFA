@@ -1,11 +1,9 @@
 package services;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import java.io.IOException;
 import java.util.List;
-
-import requests.MultipartRequestService;
-import requests.FlatFileRequest;
-import requests.SafaRequest;
 
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.config.ProjectPaths;
@@ -24,6 +22,9 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.web.multipart.MultipartFile;
+import requests.FlatFileRequest;
+import requests.MultipartRequestService;
+import requests.SafaRequest;
 
 @AllArgsConstructor
 public class CreationTestService {
@@ -107,6 +108,12 @@ public class CreationTestService {
             .withVersion(projectVersion)
             .withDocument(document)
             .postWithJsonArray(artifactsJson);
+    }
+
+    public JSONObject shareProject(Project project,
+                                   String email,
+                                   ProjectRole role) throws Exception {
+        return shareProject(project, email, role, status().is2xxSuccessful());
     }
 
     public JSONObject shareProject(Project project,

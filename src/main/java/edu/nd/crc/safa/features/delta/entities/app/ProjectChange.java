@@ -5,11 +5,13 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import javax.validation.Valid;
 
 import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Container for the possible changes that an entity could have
@@ -17,17 +19,12 @@ import lombok.Data;
  *
  * @param <T> The type of entity that is changing.
  */
+@NoArgsConstructor
 @Data
 public class ProjectChange<T extends IAppEntity> {
-    List<T> added;
-    List<T> removed;
-    List<T> modified;
-
-    public ProjectChange() {
-        this.added = new ArrayList<>();
-        this.removed = new ArrayList<>();
-        this.modified = new ArrayList<>();
-    }
+    List<@Valid T> added = new ArrayList<>();
+    List<@Valid T> removed = new ArrayList<>();
+    List<@Valid T> modified = new ArrayList<>();
 
     @JsonIgnore
     public int getSize() {

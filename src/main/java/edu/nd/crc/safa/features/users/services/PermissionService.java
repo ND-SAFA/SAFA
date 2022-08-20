@@ -10,7 +10,6 @@ import edu.nd.crc.safa.features.users.entities.db.ProjectRole;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 /**
@@ -18,7 +17,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class PermissionService {
-    private static final String EDIT_PERMISSION_ERROR = "User does not have edit permissions on project.";
+    private final String PERMISSION_ERROR = "User does not have %s permissions for this project";
     private final ProjectMembershipRepository projectMembershipRepository;
     private final SafaUserService safaUserService;
 
@@ -32,22 +31,21 @@ public class PermissionService {
     public void requireOwnerPermission(Project project) {
         SafaUser currentUser = this.safaUserService.getCurrentUser();
         if (!hasOwnerPermission(project, currentUser)) {
-            throw new SafaError(EDIT_PERMISSION_ERROR);
-            throw new AccessDeniedException("User does not have edit permissions on project.");
-        }
-    }
-
-    public void requireViewPermission(Project project) {
-        SafaUser currentUser = this.safaUserService.getCurrentUser();
-        if (!hasViewingPermission(project, currentUser)) {
-            throw new AccessDeniedException("User does not have edit permissions on project.");
+            throw new SafaError(String.format(PERMISSION_ERROR, ProjectRole.OWNER));
         }
     }
 
     public void requireEditPermission(Project project) {
         SafaUser currentUser = this.safaUserService.getCurrentUser();
         if (!hasEditPermission(project, currentUser)) {
-            throw new AccessDeniedException("User does not have edit permissions on project.");
+            throw new SafaError(String.format(PERMISSION_ERROR, ProjectRole.EDITOR));
+        }
+    }
+
+    public void requireViewPermission(Project project) {
+        SafaUser currentUser = this.safaUserService.getCurrentUser();
+        if (!hasViewingPermission(project, currentUser)) {
+            throw new SafaError(String.format(PERMISSION_ERROR, ProjectRole.VIEWER));
         }
     }
 
@@ -55,12 +53,12 @@ public class PermissionService {
         return hasPermissionOrGreater(project, user, ProjectRole.OWNER);
     }
 
-    private boolean hasViewingPermission(Project project, SafaUser user) {
-        return hasPermissionOrGreater(project, user, ProjectRole.VIEWER);
-    }
-
     private boolean hasEditPermission(Project project, SafaUser user) {
         return hasPermissionOrGreater(project, user, ProjectRole.EDITOR);
+    }
+
+    private boolean hasViewingPermission(Project project, SafaUser user) {
+        return hasPermissionOrGreater(project, user, ProjectRole.VIEWER);
     }
 
     private boolean hasPermissionOrGreater(Project project, SafaUser user, ProjectRole role) {

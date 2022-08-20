@@ -1,42 +1,18 @@
 package features.collaboration.crud;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
-import edu.nd.crc.safa.features.projects.entities.db.Project;
-import edu.nd.crc.safa.features.users.entities.db.ProjectRole;
 
-import features.collaboration.base.AbstractCollaborationTest;
+import features.collaboration.AbstractSharingTest;
 import org.json.JSONArray;
-import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
 /**
  * Tests that projects defined in database are to be retrieved by user.
  */
-class TestUpdateAndDeleteMemberships extends AbstractCollaborationTest {
+class TestUpdateAndDeleteMemberships extends AbstractSharingTest {
 
-    /**
-     * Tests that a project role can be modified.
-     *
-     * @throws Exception Throws exception if http fails when sending get request.
-     */
-    @Test
-    void updateAndDeleteMemberships() throws Exception {
-        // Step - Create and share a project.
-        Project project = createAndShareProject(projectName);
-
-        // Step - Update project member with new role
-        creationTestService.shareProject(project, otherUserEmail, ProjectRole.ADMIN, status().is2xxSuccessful());
-
-        // Step - Get project members
-        JSONArray response = retrievalTestService.getProjectMembers(project);
-
-        // VP - Verify that new role is reflected
-        JSONObject membership = getMembershipWithEmail(response, otherUserEmail);
-        assertThat(membership.getString("role")).isEqualTo(ProjectRole.ADMIN.toString());
-    }
 
     /**
      * Tests that project memberships can be deleted.
@@ -45,27 +21,19 @@ class TestUpdateAndDeleteMemberships extends AbstractCollaborationTest {
      */
     @Test
     void testDeleteMembership() throws Exception {
-        // Step - Create and share a project.
-        Project project = createAndShareProject(projectName);
-
         // Step - Delete project member
-        authorizationTestService.removeMemberFromProject(project, this.otherUser.getEmail());
+        authorizationTestService.removeMemberFromProject(
+            project,
+            Sharee.email);
 
         // Step - Get members
         JSONArray members = retrievalTestService.getProjectMembers(project);
 
-        // VP - Verify that member is not in list
+        // VP - Verify that single member on project
         assertThat(members.length()).isEqualTo(1);
-        assertThat(members.getJSONObject(0).getString("email")).isEqualTo(currentUser.getEmail());
-    }
 
-    private JSONObject getMembershipWithEmail(JSONArray memberships, String email) throws SafaError {
-        for (int i = 0; i < memberships.length(); i++) {
-            JSONObject membership = memberships.getJSONObject(i);
-            if (membership.getString("email").equals(email)) {
-                return membership;
-            }
-        }
-        throw new SafaError("Project membership not found for: %s", email);
+        // VP - Verify that member email is correct
+        String memberEmail = members.getJSONObject(0).getString("email");
+        assertThat(memberEmail).isEqualTo(currentUser.getEmail());
     }
 }

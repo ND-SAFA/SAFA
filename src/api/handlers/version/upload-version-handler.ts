@@ -1,7 +1,7 @@
 import { appModule, logModule } from "@/store";
 import { navigateTo, Routes } from "@/router";
 import { handleSelectVersion } from "@/api/notifications";
-import { handleJobSubmission } from "@/api/handlers/job-handler";
+import { handleJobSubmission } from "@/api/handlers/project/job-handler";
 import { createFlatFileUploadJob } from "@/api";
 
 /**
@@ -11,6 +11,7 @@ import { createFlatFileUploadJob } from "@/api";
  * @param versionId - The version associated with given project to update.
  * @param selectedFiles  - The flat files that will update given version.
  * @param setVersionIfSuccessful - Whether the store should be set to the uploaded version if successful.
+ * @param isCompleteSet - Whether to delete any other artifacts in the current version.
  */
 export async function handleUploadProjectVersion(
   projectId: string,

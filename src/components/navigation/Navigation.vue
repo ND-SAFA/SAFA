@@ -1,6 +1,6 @@
 <template>
   <div>
-    <snackbar :timeout="5000" />
+    <snackbar />
     <app-confirm-modal :message="confirmationMessage" />
 
     <artifact-body-modal v-if="isLoggedIn" />

@@ -29,7 +29,7 @@ import { DocumentModel } from "@/types";
  *
  * @param versionId - The id of the version to retrieve and load.
  * @param document - The document to start with viewing.
- * @param doNavigate - Whether to navigate to the artifact tree if not already on anartifact page.
+ * @param doNavigate - Whether to navigate to the artifact tree if not already on an artifact page.
  */
 export async function handleLoadVersion(
   versionId: string,

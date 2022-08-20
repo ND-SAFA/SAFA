@@ -33,7 +33,7 @@ import { ProjectModel, VersionModel } from "@/types";
 import { logModule } from "@/store";
 import { GenericModal } from "@/components/common";
 import { VersionSelector } from "@/components/project";
-import { handleSetProjectDelta } from "@/api/handlers/delta-handler";
+import { handleSetProjectDelta } from "@/api/handlers/version/delta-handler";
 
 /**
  * A modal for displaying delta versions.

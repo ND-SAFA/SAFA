@@ -222,6 +222,8 @@ export default class ProjectModule extends VuexModule {
       this.isArtifactBodyOpen = !this.isArtifactBodyOpen;
     } else if (panel === PanelType.traceLinkCreator) {
       this.isTraceLinkCreatorOpen = !this.isTraceLinkCreatorOpen;
+    } else if (panel === PanelType.errorDisplay) {
+      this.isErrorDisplayOpen = !this.isErrorDisplayOpen;
     }
   }
 

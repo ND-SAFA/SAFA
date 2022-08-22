@@ -19,9 +19,9 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { LabelledTraceDirectionModel } from "@/types";
-import { typeOptionsModule } from "@/store";
 import { handleSaveArtifactTypeIcon } from "@/api";
 import { Typography } from "@/components/common/display";
+import { allTypeIcons } from "@/util";
 
 /**
  * Renders an input for changing the icon for an artifact type.
@@ -32,13 +32,8 @@ export default Vue.extend({
   props: {
     entry: Object as PropType<LabelledTraceDirectionModel>,
   },
-  computed: {
-    /**
-     * @return The current project's artifact types.
-     */
-    icons(): string[] {
-      return typeOptionsModule.allArtifactTypeIcons;
-    },
+  data() {
+    return { icons: allTypeIcons };
   },
   methods: {
     /**

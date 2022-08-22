@@ -71,7 +71,7 @@ export async function handleReloadJobs(): Promise<void> {
       await connectAndSubscribeToJob(job.id);
     }
 
-    jobStore.jobs = jobs;
+    jobStore.$patch({ jobs });
 
     if (jobs.length === 0) return;
 

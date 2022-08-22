@@ -61,8 +61,9 @@
 <script lang="ts">
 import Vue from "vue";
 import { ArtifactModel } from "@/types";
-import { filterArtifacts, getArtifactTypePrintName } from "@/util";
-import { typeOptionsModule, viewportModule, artifactModule } from "@/store";
+import { filterArtifacts } from "@/util";
+import { viewportModule, artifactModule } from "@/store";
+import { typeOptionsStore } from "@/hooks";
 import {
   Typography,
   GenericArtifactBodyDisplay,
@@ -146,14 +147,16 @@ export default Vue.extend({
      * @param type - The artifact type.
      * @return The type display name.
      */
-    getTypePrintName: getArtifactTypePrintName,
+    getTypePrintName(type: string): string {
+      return typeOptionsStore.getArtifactTypeDisplay(type);
+    },
     /**
      * Returns the icon for this artifact type.
      * @param type - The artifact type.
      * @return The type icon.
      */
     getIconName(type: string): string {
-      return typeOptionsModule.getArtifactTypeIcon(type);
+      return typeOptionsStore.getArtifactTypeIcon(type);
     },
     /**
      * Focuses the graph on the given artifact's subtree.

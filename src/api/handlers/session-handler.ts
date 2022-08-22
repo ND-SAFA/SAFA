@@ -88,14 +88,16 @@ export function handleChangePassword(
  * @param password - The user's current password.
  */
 export function handleDeleteAccount(password: string): void {
-  logStore.confirmation = {
-    type: ConfirmationType.INFO,
-    title: `Delete your account?`,
-    body: `This action cannot be undone.`,
-    statusCallback: (isConfirmed: boolean) => {
-      if (!isConfirmed) return;
+  logStore.$patch({
+    confirmation: {
+      type: ConfirmationType.INFO,
+      title: `Delete your account?`,
+      body: `This action cannot be undone.`,
+      statusCallback: (isConfirmed: boolean) => {
+        if (!isConfirmed) return;
 
-      deleteAccount(password).then(handleLogout);
+        deleteAccount(password).then(handleLogout);
+      },
     },
-  };
+  });
 }

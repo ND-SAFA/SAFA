@@ -11,14 +11,14 @@ import { persistCommit } from "@/api";
  */
 export async function saveCommit(commit: Commit): Promise<Commit> {
   try {
-    appStore.isSaving = true;
+    appStore.$patch({ isSaving: true });
 
     const commitResponse = await persistCommit(commit);
     await commitModule.saveCommit(commitResponse);
 
     return commitResponse;
   } finally {
-    appStore.isSaving = false;
+    appStore.$patch({ isSaving: false });
   }
 }
 
@@ -27,14 +27,14 @@ export async function saveCommit(commit: Commit): Promise<Commit> {
  */
 export async function undoCommit(): Promise<void> {
   try {
-    appStore.isSaving = true;
+    appStore.$patch({ isSaving: true });
 
     const commit = await commitModule.undoLastCommit();
     const commitResponse = await persistCommit(commit);
 
     await applyArtifactChanges(commitResponse);
   } finally {
-    appStore.isSaving = false;
+    appStore.$patch({ isSaving: false });
   }
 }
 
@@ -43,14 +43,14 @@ export async function undoCommit(): Promise<void> {
  */
 export async function redoCommit(): Promise<void> {
   try {
-    appStore.isSaving = true;
+    appStore.$patch({ isSaving: true });
 
     const commit = await commitModule.redoLastUndoneCommit();
     const commitResponse = await persistCommit(commit);
 
     await applyArtifactChanges(commitResponse);
   } finally {
-    appStore.isSaving = false;
+    appStore.$patch({ isSaving: false });
   }
 }
 

@@ -38,8 +38,9 @@ import {
   artifactSelectionModule,
   viewportModule,
 } from "@/store";
+import { typeOptionsStore } from "@/hooks";
 import { GenericArtifactBodyDisplay, Typography } from "@/components/common";
-import { filterArtifacts, getArtifactTypePrintName } from "@/util";
+import { filterArtifacts } from "@/util";
 import FlexBox from "@/components/common/display/FlexBox.vue";
 
 /**
@@ -92,7 +93,7 @@ export default Vue.extend({
     artifacts(): ArtifactSearchItem[] {
       return Object.entries(artifactModule.getArtifactsByType)
         .map(([type, artifacts]) => [
-          { header: getArtifactTypePrintName(type) },
+          { header: typeOptionsStore.getArtifactTypeDisplay(type) },
           ...artifacts,
         ])
         .reduce((acc, cur) => [...acc, ...cur], []);

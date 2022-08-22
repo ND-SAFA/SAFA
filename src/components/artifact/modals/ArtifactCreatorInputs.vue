@@ -87,7 +87,8 @@
 import Vue, { PropType } from "vue";
 import { ArtifactModel, DocumentType, SelectOption } from "@/types";
 import { documentTypeMap, logicTypeOptions, safetyCaseOptions } from "@/util";
-import { documentModule, projectModule, typeOptionsModule } from "@/store";
+import { documentModule, projectModule } from "@/store";
+import { typeOptionsStore } from "@/hooks";
 import { getDoesArtifactExist } from "@/api";
 import {
   ArtifactInput,
@@ -163,7 +164,7 @@ export default Vue.extend({
      * @return The types of artifacts that exist so far.
      */
     artifactTypes(): string[] {
-      return typeOptionsModule.artifactTypes;
+      return typeOptionsStore.artifactTypes;
     },
   },
   watch: {

@@ -71,12 +71,8 @@
 import Vue, { PropType } from "vue";
 import { DocumentModel } from "@/types";
 import { createDocument, documentTypeOptions } from "@/util";
-import {
-  artifactModule,
-  documentModule,
-  subtreeModule,
-  typeOptionsModule,
-} from "@/store";
+import { artifactModule, documentModule, subtreeModule } from "@/store";
+import { typeOptionsStore } from "@/hooks";
 import { handleDeleteDocument, handleSaveDocument } from "@/api";
 import { ArtifactInput, GenericModal } from "@/components/common";
 
@@ -151,7 +147,7 @@ export default Vue.extend({
      * @return All types of artifacts
      */
     artifactTypes(): string[] {
-      return typeOptionsModule.artifactTypes;
+      return typeOptionsStore.artifactTypes;
     },
   },
   methods: {

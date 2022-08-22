@@ -50,7 +50,8 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { artifactModule, traceModule, typeOptionsModule } from "@/store";
+import { artifactModule, traceModule } from "@/store";
+import { typeOptionsStore } from "@/hooks";
 import { handleCreateLink } from "@/api";
 import { ArtifactModel, LabelledTraceDirectionModel } from "@/types";
 import {
@@ -130,7 +131,7 @@ export default Vue.extend({
      * @return The current project's artifact types.
      */
     artifactDirections(): LabelledTraceDirectionModel[] {
-      return typeOptionsModule.labeledTypeDirections();
+      return typeOptionsStore.labeledTypeDirections();
     },
   },
   methods: {

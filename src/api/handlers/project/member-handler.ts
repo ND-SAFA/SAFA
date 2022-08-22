@@ -40,14 +40,16 @@ export function handleInviteMember(
  * @param member - The member to delete.
  */
 export function handleDeleteMember(member: MembershipModel): void {
-  logStore.confirmation = {
-    type: ConfirmationType.INFO,
-    title: "Remove User from Project",
-    body: `Are you sure you want to remove ${member.email} from project?`,
-    statusCallback: async (isConfirmed: boolean) => {
-      if (!isConfirmed) return;
+  logStore.$patch({
+    confirmation: {
+      type: ConfirmationType.INFO,
+      title: "Remove User from Project",
+      body: `Are you sure you want to remove ${member.email} from project?`,
+      statusCallback: async (isConfirmed: boolean) => {
+        if (!isConfirmed) return;
 
-      await deleteProjectMember(member);
+        await deleteProjectMember(member);
+      },
     },
-  };
+  });
 }

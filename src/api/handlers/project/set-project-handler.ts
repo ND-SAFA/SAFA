@@ -8,10 +8,9 @@ import {
   errorModule,
   projectModule,
   subtreeModule,
-  typeOptionsModule,
   viewportModule,
 } from "@/store";
-import { appStore } from "@/hooks";
+import { appStore, typeOptionsStore } from "@/hooks";
 import {
   handleLoadTraceMatrices,
   handleLoadVersion,
@@ -47,7 +46,7 @@ export async function handleClearProject(): Promise<void> {
 
   await projectModule.initializeProject(project);
   await handleResetGraph();
-  typeOptionsModule.clearData();
+  typeOptionsStore.clear();
   await subtreeModule.clearSubtrees();
   await removeParams();
 }

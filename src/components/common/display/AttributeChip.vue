@@ -42,7 +42,7 @@ import {
   getScoreColor,
   uppercaseToDisplay,
 } from "@/util";
-import { typeOptionsModule } from "@/store";
+import { typeOptionsStore } from "@/hooks";
 import FlexBox from "@/components/common/display/FlexBox.vue";
 
 /**
@@ -84,7 +84,7 @@ export default Vue.extend({
      */
     iconId(): string {
       return this.artifactType
-        ? typeOptionsModule.getArtifactTypeIcon(this.value)
+        ? typeOptionsStore.getArtifactTypeIcon(this.value)
         : this.icon;
     },
     /**

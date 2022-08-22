@@ -96,20 +96,22 @@ export function handleDeleteArtifact(
   artifact: ArtifactModel,
   { onSuccess, onError }: IOHandlerCallback
 ): void {
-  logStore.confirmation = {
-    type: ConfirmationType.INFO,
-    title: `Delete ${artifact.name}?`,
-    body: `Are you sure you would like to delete this artifact?`,
-    statusCallback: (isConfirmed: boolean) => {
-      if (!isConfirmed) return;
+  logStore.$patch({
+    confirmation: {
+      type: ConfirmationType.INFO,
+      title: `Delete ${artifact.name}?`,
+      body: `Are you sure you would like to delete this artifact?`,
+      statusCallback: (isConfirmed: boolean) => {
+        if (!isConfirmed) return;
 
-      deleteArtifact(artifact)
-        .then(async () => {
-          await artifactSelectionModule.UNSELECT_ARTIFACT();
-          await projectModule.deleteArtifacts([artifact]);
-          onSuccess?.();
-        })
-        .catch(onError);
+        deleteArtifact(artifact)
+          .then(async () => {
+            await artifactSelectionModule.UNSELECT_ARTIFACT();
+            await projectModule.deleteArtifacts([artifact]);
+            onSuccess?.();
+          })
+          .catch(onError);
+      },
     },
-  };
+  });
 }

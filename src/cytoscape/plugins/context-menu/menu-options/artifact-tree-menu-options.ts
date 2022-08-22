@@ -108,7 +108,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
     coreAsWell: false,
     onClickFunction(event: EventObject): void {
       handleOnClick(event, async (artifact: ArtifactModel) => {
-        await handleDeleteArtifact(artifact, {});
+        handleDeleteArtifact(artifact, {});
       });
     },
     isVisible(artifactData: ArtifactData | undefined): boolean {

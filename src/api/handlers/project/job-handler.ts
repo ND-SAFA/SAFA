@@ -7,7 +7,8 @@ import {
   getUserJobs,
   stompClient,
 } from "@/api";
-import { appModule, jobModule, logModule } from "@/store";
+import { appModule, jobModule } from "@/store";
+import { logStore } from "@/hooks";
 
 /**
  * Subscribes to updates for job with given id.
@@ -25,7 +26,7 @@ export async function connectAndSubscribeToJob(jobId: string): Promise<void> {
     const incomingJob: JobModel = JSON.parse(frame.body);
 
     jobModule.addOrUpdateJob(incomingJob);
-    logModule.onDevMessage(`New Job message: ${incomingJob.id}`);
+    logStore.onDevInfo(`New Job message: ${incomingJob.id}`);
   });
 }
 

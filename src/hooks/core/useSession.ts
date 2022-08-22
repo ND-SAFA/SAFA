@@ -4,6 +4,7 @@ import jwt_decode from "jwt-decode";
 import { pinia } from "@/plugins";
 import { AuthToken, SessionModel } from "@/types";
 import { createSession } from "@/util";
+import logStore from "./useLog";
 
 export const useSession = defineStore("session", {
   state() {
@@ -66,7 +67,7 @@ export const useSession = defineStore("session", {
       if (!this.doesSessionExist) {
         return false;
       } else if (this.isTokenExpired) {
-        // logModule.onWarning("Your session has expired, please log back in.");
+        logStore.onWarning("Your session has expired, please log back in.");
         return false;
       }
 

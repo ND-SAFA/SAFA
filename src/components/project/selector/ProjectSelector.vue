@@ -48,7 +48,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { DataItem, IdentifierModel, ProjectRole } from "@/types";
-import { logModule } from "@/store";
+import { logStore } from "@/hooks";
 import { sessionStore } from "@/hooks";
 import { getProjects, handleDeleteProject, handleSaveProject } from "@/api";
 import { GenericSelector } from "@/components/common";
@@ -242,7 +242,7 @@ export default Vue.extend({
           this.deletableProjects = this.getDeletableProjects();
         })
         .catch((e) => {
-          logModule.onDevError(e);
+          logStore.onDevError(e);
         })
         .finally(() => (this.isLoading = false));
     },

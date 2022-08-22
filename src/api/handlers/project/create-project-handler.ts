@@ -4,7 +4,8 @@ import {
   ProjectModel,
 } from "@/types";
 import { navigateTo, Routes } from "@/router";
-import { appModule, logModule } from "@/store";
+import { appModule } from "@/store";
+import { logStore } from "@/hooks";
 import {
   createJiraProject,
   createProjectCreationJob,
@@ -30,12 +31,12 @@ export function handleImportProject(
     .then(async (job) => {
       await handleJobSubmission(job);
       await navigateTo(Routes.UPLOAD_STATUS);
-      logModule.onSuccess(`Project is being created: ${project.name}`);
+      logStore.onSuccess(`Project is being created: ${project.name}`);
       onSuccess?.();
     })
     .catch((e) => {
-      logModule.onError(`Unable to import project: ${project.name}`);
-      logModule.onDevError(e);
+      logStore.onError(`Unable to import project: ${project.name}`);
+      logStore.onDevError(e);
       onError?.(e);
     })
     .finally(() => appModule.onLoadEnd());
@@ -91,13 +92,13 @@ export function handleImportJiraProject(
   createJiraProject(cloudId, projectId)
     .then(async (job) => {
       await handleJobSubmission(job);
-      logModule.onSuccess(`Jira project has been created: ${projectId}`);
+      logStore.onSuccess(`Jira project has been created: ${projectId}`);
       await navigateTo(Routes.UPLOAD_STATUS);
       onSuccess?.();
     })
     .catch((e) => {
-      logModule.onError(`Unable to import jira project: ${projectId}`);
-      logModule.onDevError(e.message);
+      logStore.onError(`Unable to import jira project: ${projectId}`);
+      logStore.onDevError(e.message);
       onError?.(e);
     })
     .finally(() => appModule.onLoadEnd());
@@ -122,5 +123,5 @@ export function handleImportGitHubProject(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   { onSuccess, onError }: IOHandlerCallback
 ): void {
-  logModule.onDevMessage("Importing from GitHub is not yet enabled.");
+  logStore.onInfo("Importing from GitHub is not yet enabled.");
 }

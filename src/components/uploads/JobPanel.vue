@@ -116,7 +116,7 @@ import Vue, { PropType } from "vue";
 import { JobModel, JobStatus } from "@/types";
 import { enumToDisplay, getJobStatusColor, timestampToDisplay } from "@/util";
 import { handleDeleteJob, handleLoadVersion } from "@/api";
-import { logModule } from "@/store";
+import { logStore } from "@/hooks";
 import { Typography } from "@/components/common";
 import FlexBox from "@/components/common/display/FlexBox.vue";
 
@@ -189,7 +189,7 @@ export default Vue.extend({
       if (job.completedEntityId) {
         await handleLoadVersion(job.completedEntityId);
       } else {
-        logModule.onError("Project creation contains empty ID.");
+        logStore.onError("Unable to view this project right now.");
       }
     },
   },

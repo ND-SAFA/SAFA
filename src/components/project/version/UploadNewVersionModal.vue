@@ -32,7 +32,8 @@
 <script lang="ts">
 import Vue from "vue";
 import { IdentifierModel, VersionModel } from "@/types";
-import { logModule, projectModule } from "@/store";
+import { projectModule } from "@/store";
+import { logStore } from "@/hooks";
 import { handleUploadProjectVersion } from "@/api";
 import { GenericFileSelector } from "@/components/common";
 import ProjectVersionStepperModal from "./ProjectVersionStepperModal.vue";
@@ -106,10 +107,10 @@ export default Vue.extend({
      */
     onSubmit() {
       if (this.selectedProject === undefined) {
-        return logModule.onWarning("No project is selected.");
+        return logStore.onWarning("No project is selected.");
       }
       if (this.selectedVersion === undefined) {
-        return logModule.onWarning("No project version is selected.");
+        return logStore.onWarning("No project version is selected.");
       }
 
       this.isLoading = true;

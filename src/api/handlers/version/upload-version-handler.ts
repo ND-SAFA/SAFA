@@ -1,4 +1,5 @@
-import { appModule, logModule } from "@/store";
+import { appModule } from "@/store";
+import { logStore } from "@/hooks";
 import { navigateTo, Routes } from "@/router";
 import { handleSelectVersion } from "@/api/notifications";
 import { handleJobSubmission } from "@/api/handlers/project/job-handler";
@@ -21,7 +22,7 @@ export async function handleUploadProjectVersion(
   isCompleteSet = false
 ): Promise<void> {
   if (selectedFiles.length === 0) {
-    logModule.onWarning("Please add at least one file to upload.");
+    logStore.onWarning("Please add at least one file to upload.");
   } else {
     const formData = new FormData();
 
@@ -33,14 +34,14 @@ export async function handleUploadProjectVersion(
 
     if (setVersionIfSuccessful) {
       handleSelectVersion(projectId, versionId).catch((e) =>
-        logModule.onError(e.message)
+        logStore.onError(e.message)
       );
     }
 
     const uploadFlatFiles = async () => {
       const job = await createFlatFileUploadJob(versionId, formData);
       await handleJobSubmission(job);
-      logModule.onSuccess(`Project upload has been submitted.`);
+      logStore.onSuccess(`Project upload has been submitted.`);
       return job;
     };
 
@@ -50,7 +51,7 @@ export async function handleUploadProjectVersion(
         await handleSelectVersion(projectId, versionId);
         await uploadFlatFiles();
       } catch (e) {
-        logModule.onError(String(e));
+        logStore.onError(String(e));
       } finally {
         await navigateTo(Routes.UPLOAD_STATUS);
         appModule.onLoadEnd();

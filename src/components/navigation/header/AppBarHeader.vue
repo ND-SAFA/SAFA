@@ -46,7 +46,8 @@ import {
   VersionModel,
 } from "@/types";
 import { getParams, navigateTo, Routes } from "@/router";
-import { logModule, projectModule } from "@/store";
+import { projectModule } from "@/store";
+import { logStore } from "@/hooks";
 import { handleLoadVersion } from "@/api";
 import { ButtonRow, SafaIcon, Typography, FlexBox } from "@/components/common";
 import {
@@ -195,7 +196,7 @@ export default Vue.extend({
       if (projectModule.versionId) {
         this.changeVersionOpen = true;
       } else {
-        logModule.onWarning("Please select a project.");
+        logStore.onWarning("Please select a project.");
       }
     },
     /**
@@ -205,7 +206,7 @@ export default Vue.extend({
       if (projectModule.projectId) {
         this.createVersionOpen = true;
       } else {
-        logModule.onWarning("Please select a project.");
+        logStore.onWarning("Please select a project.");
       }
     },
     /**

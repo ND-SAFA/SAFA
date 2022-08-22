@@ -87,7 +87,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { logModule } from "@/store";
+import { logStore } from "@/hooks";
 import {
   GenericSwitch,
   GenericFileSelector,
@@ -213,7 +213,7 @@ export default Vue.extend({
       }
     },
     underDevelopmentError(): void {
-      logModule.onInfo("Viewing parsed entities is under development.");
+      logStore.onInfo("Viewing parsed entities is under development.");
     },
   },
 });

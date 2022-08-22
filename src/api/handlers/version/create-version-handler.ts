@@ -4,7 +4,7 @@ import {
   createMinorVersion,
   createRevisionVersion,
 } from "@/api";
-import { logModule } from "@/store";
+import { logStore } from "@/hooks";
 import { versionToString } from "@/util";
 
 /**
@@ -33,11 +33,11 @@ export async function handleCreateVersion(
 
   createVersion()
     .then((version) => {
-      logModule.onSuccess(`Created a new version: ${versionToString(version)}`);
+      logStore.onSuccess(`Created a new version: ${versionToString(version)}`);
       onSuccess?.(version);
     })
     .catch((e) => {
-      logModule.onError("Unable to create a new version.");
+      logStore.onError("Unable to create a new version.");
       onError?.(e);
     });
 }

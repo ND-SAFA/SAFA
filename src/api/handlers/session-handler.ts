@@ -5,14 +5,13 @@ import {
   UserModel,
 } from "@/types";
 import { getParam, getParams, navigateTo, QueryParams, Routes } from "@/router";
-import { logModule } from "@/store";
 import {
   handleClearProject,
   createLoginSession,
   savePassword,
   deleteAccount,
 } from "@/api";
-import { sessionStore } from "@/hooks";
+import { sessionStore, logStore } from "@/hooks";
 
 /**
  * Attempts to log a user in.
@@ -73,12 +72,12 @@ export function handleChangePassword(
 ): void {
   savePassword(password)
     .then(() => {
-      logModule.onSuccess("Your password has been updated.");
+      logStore.onSuccess("Your password has been updated.");
       onSuccess?.();
     })
     .catch((e) => {
-      logModule.onError("Unable to update your password.");
-      logModule.onDevError(e);
+      logStore.onError("Unable to update your password.");
+      logStore.onDevError(e);
       onError?.(e);
     });
 }
@@ -89,7 +88,7 @@ export function handleChangePassword(
  * @param password - The user's current password.
  */
 export function handleDeleteAccount(password: string): void {
-  logModule.SET_CONFIRMATION_MESSAGE({
+  logStore.confirmation = {
     type: ConfirmationType.INFO,
     title: `Delete your account?`,
     body: `This action cannot be undone.`,
@@ -98,5 +97,5 @@ export function handleDeleteAccount(password: string): void {
 
       deleteAccount(password).then(handleLogout);
     },
-  });
+  };
 }

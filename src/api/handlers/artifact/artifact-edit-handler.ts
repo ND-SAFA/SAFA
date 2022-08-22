@@ -1,10 +1,10 @@
 import { ArtifactModel, ConfirmationType, IOHandlerCallback } from "@/types";
 import {
   artifactSelectionModule,
-  logModule,
   projectModule,
   viewportModule,
 } from "@/store";
+import { logStore } from "@/hooks";
 import {
   createArtifact,
   deleteArtifact,
@@ -55,8 +55,8 @@ export async function handleSaveArtifact(
 
     onSuccess?.();
   } catch (e) {
-    logModule.onDevError(String(e));
-    logModule.onError(`Unable to create artifact: ${artifact.name}`);
+    logStore.onDevError(String(e));
+    logStore.onError(`Unable to create artifact: ${artifact.name}`);
     onError?.(e as Error);
   }
 }
@@ -95,27 +95,21 @@ export function handleDuplicateArtifact(
 export function handleDeleteArtifact(
   artifact: ArtifactModel,
   { onSuccess, onError }: IOHandlerCallback
-): Promise<void> {
-  return new Promise((resolve, reject) => {
-    logModule.SET_CONFIRMATION_MESSAGE({
-      type: ConfirmationType.INFO,
-      title: `Delete ${artifact.name}?`,
-      body: `Are you sure you would like to delete this artifact?`,
-      statusCallback: (isConfirmed: boolean) => {
-        if (!isConfirmed) return;
+): void {
+  logStore.confirmation = {
+    type: ConfirmationType.INFO,
+    title: `Delete ${artifact.name}?`,
+    body: `Are you sure you would like to delete this artifact?`,
+    statusCallback: (isConfirmed: boolean) => {
+      if (!isConfirmed) return;
 
-        deleteArtifact(artifact)
-          .then(async () => {
-            await artifactSelectionModule.UNSELECT_ARTIFACT();
-            await projectModule.deleteArtifacts([artifact]);
-            onSuccess?.();
-            resolve();
-          })
-          .catch((e) => {
-            onError?.(e);
-            reject(e);
-          });
-      },
-    });
-  });
+      deleteArtifact(artifact)
+        .then(async () => {
+          await artifactSelectionModule.UNSELECT_ARTIFACT();
+          await projectModule.deleteArtifacts([artifact]);
+          onSuccess?.();
+        })
+        .catch(onError);
+    },
+  };
 }

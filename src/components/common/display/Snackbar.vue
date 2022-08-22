@@ -34,7 +34,8 @@
 <script lang="ts">
 import Vue from "vue";
 import { MessageType, SnackbarMessage } from "@/types";
-import { appModule, logModule } from "@/store";
+import { appModule } from "@/store";
+import { logStore } from "@/hooks";
 import { ServerErrorModal } from "@/components/common/modals";
 import Typography from "./Typography.vue";
 import { ThemeColors } from "@/util";
@@ -88,7 +89,7 @@ export default Vue.extend({
      * @return The current message.
      */
     message() {
-      return logModule.getMessage;
+      return logStore.message;
     },
     /**
      * @return Whether the error display is open.
@@ -139,7 +140,7 @@ export default Vue.extend({
       if (newMessage.type === MessageType.CLEAR) return;
 
       this.showMessage(newMessage);
-      logModule.CLEAR_MESSAGE();
+      logStore.clearMessage();
     },
   },
 });

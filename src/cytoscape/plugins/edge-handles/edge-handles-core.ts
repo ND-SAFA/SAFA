@@ -1,7 +1,8 @@
 import { CytoCore, CytoEvent, EdgeHandleCore } from "@/types";
 import { onArtifactTreeEdgeComplete } from "@/cytoscape/plugins/edge-handles/on-complete";
 import { CollectionReturnValue, NodeSingular } from "cytoscape";
-import { appModule, logModule } from "@/store";
+import { appModule } from "@/store";
+import { logStore } from "@/hooks";
 
 let edgeHandlesCore: EdgeHandleCore | undefined = undefined;
 
@@ -35,7 +36,7 @@ export function setEdgeHandlesCore(
  */
 export function getEdgeHandlesCore(): EdgeHandleCore | undefined {
   if (edgeHandlesCore === undefined) {
-    logModule.onDevMessage("EdgeHandles has not been instantiated");
+    logStore.onDevError("EdgeHandles has not been instantiated");
   }
 
   return edgeHandlesCore;

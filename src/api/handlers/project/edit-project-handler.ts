@@ -1,5 +1,6 @@
 import { IOHandlerCallback, ProjectModel, IdentifierModel } from "@/types";
-import { logModule, projectModule } from "@/store";
+import { projectModule } from "@/store";
+import { logStore } from "@/hooks";
 import {
   deleteProject,
   deleteProjectVersion,
@@ -20,12 +21,12 @@ export function handleSaveProject(
 ): void {
   saveProject(project)
     .then((project) => {
-      logModule.onSuccess(`Project has been saved: ${project.name}`);
+      logStore.onSuccess(`Project has been saved: ${project.name}`);
       onSuccess?.(project);
     })
     .catch((e) => {
-      logModule.onSuccess(`Unable to save project ${project.name}.`);
-      logModule.onDevError(e.message);
+      logStore.onSuccess(`Unable to save project ${project.name}.`);
+      logStore.onDevError(e.message);
       onError?.(e);
     });
 }
@@ -43,7 +44,7 @@ export function handleDeleteProject(
 ): void {
   deleteProject(project.projectId)
     .then(async () => {
-      logModule.onSuccess(`Project has been deleted: ${project.name}`);
+      logStore.onSuccess(`Project has been deleted: ${project.name}`);
       onSuccess?.(project);
 
       if (project.name !== projectModule.getProject.name) return;
@@ -52,8 +53,8 @@ export function handleDeleteProject(
       await handleClearProject();
     })
     .catch((e) => {
-      logModule.onSuccess(`Unable to delete project: ${project.name}.`);
-      logModule.onDevError(e.message);
+      logStore.onSuccess(`Unable to delete project: ${project.name}.`);
+      logStore.onDevError(e.message);
       onError?.(e);
     });
 }
@@ -71,12 +72,12 @@ export function handleDeleteVersion(
 ): void {
   deleteProjectVersion(versionId)
     .then(async () => {
-      logModule.onSuccess(`Version has successfully been deleted.`);
+      logStore.onSuccess(`Version has successfully been deleted.`);
       onSuccess?.();
     })
     .catch((e) => {
-      logModule.onSuccess(`Unable to delete version.`);
-      logModule.onDevError(e.message);
+      logStore.onSuccess(`Unable to delete version.`);
+      logStore.onDevError(e.message);
       onError?.(e);
     });
 }

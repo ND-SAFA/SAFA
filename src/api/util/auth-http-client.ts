@@ -1,5 +1,5 @@
 import { APIOptions } from "@/types";
-import { logModule } from "@/store";
+import { logStore } from "@/hooks";
 import { baseURL } from "@/api";
 import { handleLogout } from "@/api/handlers";
 import { sessionStore } from "@/hooks";
@@ -32,7 +32,7 @@ export default async function authHttpClient<T>(
   if (token === undefined) {
     const error = `${relativeUrl} requires token.`;
 
-    logModule.onDevError(error);
+    logStore.onDevError(error);
 
     throw Error(error);
   } else {
@@ -49,7 +49,7 @@ export default async function authHttpClient<T>(
   switch (fetchResponse.status) {
     case 403:
       message = "Session has timed out. Please log back in.";
-      logModule.onWarning(message);
+      logStore.onWarning(message);
       await handleLogout();
       throw Error(message);
     case 204:
@@ -64,7 +64,7 @@ export default async function authHttpClient<T>(
   const resJson = JSON.parse(resContent);
 
   if (!fetchResponse.ok) {
-    logModule.onServerError(resJson);
+    logStore.onServerError(resJson);
 
     throw Error(resJson.error);
   } else {

@@ -6,7 +6,8 @@ import {
   DocumentModel,
 } from "@/types";
 import { createDocument } from "@/util";
-import { documentModule, logModule, projectModule } from "@/store";
+import { documentModule, projectModule } from "@/store";
+import { logStore } from "@/hooks";
 import {
   saveDocument,
   deleteDocument,
@@ -76,12 +77,12 @@ export function handleDeleteDocument(
   deleteDocument(document)
     .then(async () => {
       await documentModule.removeDocument(document);
-      logModule.onSuccess(`Document has been deleted: ${name}`);
+      logStore.onSuccess(`Document has been deleted: ${name}`);
       onSuccess?.();
     })
     .catch((e) => {
-      logModule.onError(`Unable to delete document: ${name}`);
-      logModule.onDevError(e);
+      logStore.onError(`Unable to delete document: ${name}`);
+      logStore.onDevError(e);
       onError?.(e);
     });
 }
@@ -121,23 +122,23 @@ export function handleSaveDocument(
   if (isUpdate) {
     handleUpdateDocument(document)
       .then(() => {
-        logModule.onSuccess(`Document has been edited: ${name}`);
+        logStore.onSuccess(`Document has been edited: ${name}`);
         onSuccess?.();
       })
       .catch((e) => {
-        logModule.onError(`Unable to edit document: ${name}`);
-        logModule.onDevError(e);
+        logStore.onError(`Unable to edit document: ${name}`);
+        logStore.onDevError(e);
         onError?.(e);
       });
   } else {
     handleCreateDocument(name, type, artifactIds)
       .then(() => {
-        logModule.onSuccess(`Document has been created: ${name}`);
+        logStore.onSuccess(`Document has been created: ${name}`);
         onSuccess?.();
       })
       .catch((e) => {
-        logModule.onError(`Unable to create document: ${name}`);
-        logModule.onDevError(e);
+        logStore.onError(`Unable to create document: ${name}`);
+        logStore.onDevError(e);
         onError?.(e);
       });
   }
@@ -170,12 +171,12 @@ export function handleColumnMove(
 
   handleUpdateDocument(document)
     .then(() => {
-      logModule.onSuccess(`Column order has been updated.`);
+      logStore.onSuccess(`Column order has been updated.`);
       onSuccess?.(document.columns || []);
     })
     .catch((e) => {
-      logModule.onError(`Unable to update column order.`);
-      logModule.onDevWarning(e);
+      logStore.onError(`Unable to update column order.`);
+      logStore.onDevError(e);
       onError?.(e);
     });
 }
@@ -206,12 +207,12 @@ export function handleColumnSave(
 
   handleUpdateDocument(document)
     .then(() => {
-      logModule.onSuccess(`Column has been updated: ${name}`);
+      logStore.onSuccess(`Column has been updated: ${name}`);
       onSuccess?.();
     })
     .catch((e) => {
-      logModule.onError(`Unable to update column: ${name}`);
-      logModule.onDevError(e);
+      logStore.onError(`Unable to update column: ${name}`);
+      logStore.onDevError(e);
       onError?.(e);
     });
 }
@@ -236,12 +237,12 @@ export function handleColumnDelete(
 
   handleUpdateDocument(document)
     .then(() => {
-      logModule.onSuccess(`Column has ben deleted: ${name}`);
+      logStore.onSuccess(`Column has ben deleted: ${name}`);
       onSuccess?.();
     })
     .catch((e) => {
-      logModule.onError(`Unable to delete column: ${name}`);
-      logModule.onDevError(e);
+      logStore.onError(`Unable to delete column: ${name}`);
+      logStore.onDevError(e);
       onError?.(e);
     });
 }

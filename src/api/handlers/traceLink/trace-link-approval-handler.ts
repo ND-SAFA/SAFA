@@ -8,7 +8,8 @@ import {
   GeneratedLinksModel,
   FlatTraceLink,
 } from "@/types";
-import { appModule, artifactModule, logModule, projectModule } from "@/store";
+import { appModule, artifactModule, projectModule } from "@/store";
+import { logStore } from "@/hooks";
 import {
   createLink,
   getGeneratedLinks,
@@ -100,10 +101,10 @@ export async function handleCreateLink(
 
     await projectModule.addOrUpdateTraceLinks(createdLinks);
   } catch (e) {
-    logModule.onError(
+    logStore.onError(
       `Unable to create trace link: ${sourceName} -> ${targetName}`
     );
-    logModule.onDevError(String(e));
+    logStore.onDevError(String(e));
   }
 }
 
@@ -127,7 +128,7 @@ export async function handleApproveLink(
     },
     onError: (e) => {
       link.approvalStatus = currentStatus;
-      logModule.onError("Unable to approve this link");
+      logStore.onError("Unable to approve this link");
       onError?.(e);
     },
   });
@@ -153,7 +154,7 @@ export async function handleDeclineLink(
     },
     onError: (e) => {
       link.approvalStatus = currentStatus;
-      logModule.onError("Unable to decline this link");
+      logStore.onError("Unable to decline this link");
       onError?.(e);
     },
   });
@@ -178,7 +179,7 @@ export async function handleUnreviewLink(
     },
     onError: (e) => {
       link.approvalStatus = currentStatus;
-      logModule.onError("Unable to reset this link");
+      logStore.onError("Unable to reset this link");
       onError?.(e);
     },
   });

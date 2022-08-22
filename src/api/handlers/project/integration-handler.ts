@@ -15,7 +15,7 @@ import {
   getJiraToken,
   saveJiraCredentials,
 } from "@/api";
-import { logModule } from "@/store";
+import { logStore } from "@/hooks";
 
 /**
  * Handles Jira authentication when the app loads.
@@ -72,7 +72,7 @@ export function handleLoadJiraProjects(
     .then(onSuccess)
     .catch((e) => {
       onError?.(e);
-      logModule.onError(e);
+      logStore.onError(e);
     });
 }
 

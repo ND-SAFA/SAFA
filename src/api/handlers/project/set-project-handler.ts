@@ -2,7 +2,6 @@ import { ProjectModel } from "@/types";
 import { createProject } from "@/util";
 import { QueryParams, removeParams, updateParam } from "@/router";
 import {
-  appModule,
   artifactSelectionModule,
   deltaModule,
   documentModule,
@@ -12,6 +11,7 @@ import {
   typeOptionsModule,
   viewportModule,
 } from "@/store";
+import { appStore } from "@/hooks";
 import {
   handleLoadTraceMatrices,
   handleLoadVersion,
@@ -36,7 +36,7 @@ export async function handleResetGraph(
   disableDrawMode();
   artifactSelectionModule.clearSelections();
   deltaModule.clearDelta();
-  appModule.closeSidePanels();
+  appStore.closeSidePanels();
 }
 
 /**

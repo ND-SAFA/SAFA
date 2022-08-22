@@ -93,7 +93,8 @@ import {
   TraceTableGroup,
   VersionModel,
 } from "@/types";
-import { appModule, projectModule } from "@/store";
+import { projectModule } from "@/store";
+import { appStore } from "@/hooks";
 import { handleGetGeneratedLinks } from "@/api";
 import { AttributeChip, TableGroupHeader } from "@/components/common";
 import TraceLinkDisplay from "../TraceLinkDisplay.vue";
@@ -146,7 +147,7 @@ export default Vue.extend({
      * @return Whether the app is loading.
      */
     isLoading() {
-      return appModule.getIsLoading;
+      return appStore.isLoading;
     },
     /**
      * @return The current project version.

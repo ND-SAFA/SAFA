@@ -8,7 +8,8 @@ import {
   GeneratedLinksModel,
   FlatTraceLink,
 } from "@/types";
-import { appModule, artifactModule, projectModule } from "@/store";
+import { artifactModule, projectModule } from "@/store";
+import { appStore } from "@/hooks";
 import { logStore } from "@/hooks";
 import {
   createLink,
@@ -35,7 +36,7 @@ export async function handleGetGeneratedLinks({
   const declined: string[] = [];
 
   try {
-    appModule.onLoadStart();
+    appStore.onLoadStart();
 
     const generatedLinks = await getGeneratedLinks(projectModule.versionId);
 
@@ -66,7 +67,7 @@ export async function handleGetGeneratedLinks({
   } catch (e) {
     onError?.(e as Error);
   } finally {
-    appModule.onLoadEnd();
+    appStore.onLoadEnd();
   }
 }
 
@@ -198,9 +199,9 @@ function linkAPIHandler(
   linkAPI: (traceLink: TraceLinkModel) => Promise<TraceLinkModel[]>,
   { onSuccess, onError }: IOHandlerCallback
 ): void {
-  appModule.onLoadStart();
+  appStore.onLoadStart();
   linkAPI(link)
     .then(() => onSuccess?.())
     .catch((e) => onError?.(e))
-    .finally(() => appModule.onLoadEnd());
+    .finally(() => appStore.onLoadEnd());
 }

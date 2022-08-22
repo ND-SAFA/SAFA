@@ -39,7 +39,6 @@
 import Vue from "vue";
 import { TraceLinkModel, ArtifactModel, CytoCoreGraph } from "@/types";
 import {
-  appModule,
   artifactModule,
   artifactSelectionModule,
   deltaModule,
@@ -48,6 +47,7 @@ import {
   traceModule,
   viewportModule,
 } from "@/store";
+import { appStore } from "@/hooks";
 import { artifactTreeGraph, cyResetTree } from "@/cytoscape";
 import {
   GenericGraphLink,
@@ -84,7 +84,7 @@ export default Vue.extend({
     className(): string {
       if (!this.isInView) {
         return "artifact-view disabled";
-      } else if (!appModule.getIsLoading) {
+      } else if (!appStore.isLoading) {
         return "artifact-view visible";
       } else {
         return "artifact-view";

@@ -27,6 +27,7 @@ export enum PanelType {
   errorDisplay,
   artifactBody,
   traceLinkCreator,
+  traceLinkDraw,
 }
 
 export type PanelOpenState =

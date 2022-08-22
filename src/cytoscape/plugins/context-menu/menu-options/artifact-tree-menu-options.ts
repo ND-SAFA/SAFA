@@ -1,13 +1,13 @@
 import { EventObject } from "cytoscape";
 import { ArtifactModel, ArtifactData, MenuItem } from "@/types";
 import {
-  appModule,
   artifactModule,
   artifactSelectionModule,
   projectModule,
   subtreeModule,
   viewportModule,
 } from "@/store";
+import { appStore } from "@/hooks";
 import { enableDrawMode } from "@/cytoscape";
 import { handleDeleteArtifact, handleDuplicateArtifact } from "@/api";
 import { ftaMenuItem } from "./fta-menu-options";
@@ -24,7 +24,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
     coreAsWell: true,
     onClickFunction(): void {
       projectModule.ifProjectDefined(() => {
-        appModule.openArtifactCreatorTo({ isNewArtifact: true });
+        appStore.openArtifactCreatorTo({ isNewArtifact: true });
       });
     },
     isVisible: () => true,
@@ -36,7 +36,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
     coreAsWell: true,
     onClickFunction(): void {
       projectModule.ifProjectDefined(() => {
-        appModule.toggleTraceLinkCreator();
+        appStore.toggleTraceLinkCreator();
       });
     },
   },
@@ -76,7 +76,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
     onClickFunction(event: EventObject): void {
       handleOnClick(event, (artifact: ArtifactModel) => {
         artifactSelectionModule.selectArtifact(artifact.id);
-        appModule.toggleArtifactBody();
+        appStore.toggleArtifactBody();
       });
     },
     isVisible(artifactData: ArtifactData | undefined): boolean {
@@ -93,7 +93,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
     onClickFunction(event: EventObject): void {
       handleOnClick(event, async (artifact: ArtifactModel) => {
         artifactSelectionModule.selectArtifact(artifact.id);
-        appModule.openArtifactCreatorTo({});
+        appStore.openArtifactCreatorTo({});
       });
     },
     isVisible(artifactData: ArtifactData | undefined): boolean {

@@ -19,7 +19,8 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { appModule, artifactSelectionModule } from "@/store";
+import { artifactSelectionModule } from "@/store";
+import { appStore } from "@/hooks";
 import { GenericModal, Typography } from "@/components/common";
 
 /**
@@ -33,7 +34,7 @@ export default Vue.extend({
   },
   computed: {
     isOpen() {
-      return appModule.getIsArtifactBodyOpen;
+      return appStore.isArtifactBodyOpen;
     },
     /**
      * @return The selected artifact.
@@ -64,7 +65,7 @@ export default Vue.extend({
   },
   methods: {
     handleClose() {
-      appModule.toggleArtifactBody();
+      appStore.toggleArtifactBody();
     },
   },
 });

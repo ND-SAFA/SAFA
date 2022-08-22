@@ -1,10 +1,10 @@
 import {
-  appModule,
   documentModule,
   errorModule,
   projectModule,
   viewportModule,
 } from "@/store";
+import { appStore } from "@/hooks";
 import {
   navigateTo,
   QueryParams,
@@ -36,7 +36,7 @@ export async function handleLoadVersion(
   document?: DocumentModel,
   doNavigate = true
 ): Promise<void> {
-  appModule.onLoadStart();
+  appStore.onLoadStart();
   sessionStore.updateSession({ versionId });
 
   const navigateIfNeeded = async () => {
@@ -57,7 +57,7 @@ export async function handleLoadVersion(
       await documentModule.switchDocuments(document);
     })
     .then(navigateIfNeeded)
-    .finally(() => appModule.onLoadEnd());
+    .finally(() => appStore.onLoadEnd());
 }
 
 /**

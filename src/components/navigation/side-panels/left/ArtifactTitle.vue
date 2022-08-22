@@ -38,7 +38,8 @@
 <script lang="ts">
 import Vue from "vue";
 import { PanelType } from "@/types";
-import { appModule, artifactSelectionModule } from "@/store";
+import { artifactSelectionModule } from "@/store";
+import { appStore } from "@/hooks";
 import { handleDeleteArtifact } from "@/api";
 import { GenericIconButton } from "@/components/common";
 import Typography from "@/components/common/display/Typography.vue";
@@ -87,7 +88,7 @@ export default Vue.extend({
     handleDeleteArtifact(): void {
       if (this.selectedArtifact !== undefined) {
         handleDeleteArtifact(this.selectedArtifact, {
-          onSuccess: () => appModule.closePanel(PanelType.left),
+          onSuccess: () => appStore.closePanel(PanelType.left),
         });
       }
     },
@@ -95,13 +96,13 @@ export default Vue.extend({
      * Opens the artifact creator.
      */
     handleEditArtifact(): void {
-      appModule.openArtifactCreatorTo({});
+      appStore.openArtifactCreatorTo({});
     },
     /**
      * Opens the artifact body display.
      */
     handleViewBody(): void {
-      appModule.toggleArtifactBody();
+      appStore.toggleArtifactBody();
     },
   },
 });

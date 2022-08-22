@@ -27,9 +27,53 @@ export const useApp = defineStore("app", {
       [PanelType.errorDisplay]: false,
       [PanelType.artifactBody]: false,
       [PanelType.traceLinkCreator]: false,
+      [PanelType.traceLinkDraw]: false,
     } as Record<PanelType, PanelOpenState>,
   }),
-  getters: {},
+  getters: {
+    /**
+     * @return Whether the left panel is open.
+     */
+    isLeftPanelOpen(): boolean {
+      return !!this.isOpen[PanelType.left];
+    },
+    /**
+     * @return Whether the right panel is open.
+     */
+    isRightPanelOpen(): boolean {
+      return !!this.isOpen[PanelType.right];
+    },
+    /**
+     * @return Whether the artifact creator is open.
+     */
+    isArtifactCreatorOpen(): PanelOpenState {
+      return this.isOpen[PanelType.artifactCreator];
+    },
+    /**
+     * @return Whether the error display is open.
+     */
+    isErrorDisplayOpen(): boolean {
+      return !!this.isOpen[PanelType.errorDisplay];
+    },
+    /**
+     * @return Whether the artifact body is open.
+     */
+    isArtifactBodyOpen(): boolean {
+      return !!this.isOpen[PanelType.artifactBody];
+    },
+    /**
+     * @return Whether the trace link creator is open.
+     */
+    isTraceLinkCreatorOpen(): boolean {
+      return !!this.isOpen[PanelType.traceLinkCreator];
+    },
+    /**
+     * @return Whether trace link drawing is enabled.
+     */
+    isCreateLinkEnabled(): boolean {
+      return !!this.isOpen[PanelType.traceLinkDraw];
+    },
+  },
   actions: {
     /**
      * Adds a loading process.
@@ -104,6 +148,18 @@ export const useApp = defineStore("app", {
      */
     toggleTraceLinkCreator(): void {
       this.togglePanel(PanelType.traceLinkCreator);
+    },
+    /**
+     * Enables the draw link mode.
+     */
+    enableDrawLink(): void {
+      this.openPanel(PanelType.traceLinkDraw);
+    },
+    /**
+     * Disables the draw link mode.
+     */
+    disableDrawLink(): void {
+      this.closePanel(PanelType.traceLinkDraw);
     },
     /**
      * Opens the artifact creator to a specific node type.

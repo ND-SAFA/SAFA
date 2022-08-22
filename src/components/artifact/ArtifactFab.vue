@@ -51,7 +51,8 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { appModule, documentModule, projectModule } from "@/store";
+import { documentModule, projectModule } from "@/store";
+import { appStore } from "@/hooks";
 import { GenericIconButton } from "@/components";
 import { disableDrawMode, enableDrawMode } from "@/cytoscape";
 
@@ -71,13 +72,13 @@ export default Vue.extend({
      * @return Whether to render the artifact tree.
      */
     isVisible(): boolean {
-      return !appModule.getIsLoading && !documentModule.isTableDocument;
+      return !appStore.isLoading && !documentModule.isTableDocument;
     },
     /**
      * @return Whether trace link draw mode is currently enabled.
      */
     isCreateLinkEnabled(): boolean {
-      return appModule.getIsCreateLinkEnabled;
+      return appStore.isCreateLinkEnabled;
     },
   },
   methods: {
@@ -86,7 +87,7 @@ export default Vue.extend({
      */
     handleAddArtifact(): void {
       projectModule.ifProjectDefined(() => {
-        appModule.openArtifactCreatorTo({ isNewArtifact: true });
+        appStore.openArtifactCreatorTo({ isNewArtifact: true });
       });
     },
     /**
@@ -94,7 +95,7 @@ export default Vue.extend({
      */
     handleAddTraceLink(): void {
       projectModule.ifProjectDefined(() => {
-        appModule.toggleTraceLinkCreator();
+        appStore.toggleTraceLinkCreator();
       });
     },
     /**

@@ -7,7 +7,8 @@ import {
   getUserJobs,
   stompClient,
 } from "@/api";
-import { appModule, jobModule } from "@/store";
+import { jobModule } from "@/store";
+import { appStore } from "@/hooks";
 import { logStore } from "@/hooks";
 
 /**
@@ -64,7 +65,7 @@ export function handleDeleteJob(
  */
 export async function handleReloadJobs(): Promise<void> {
   try {
-    appModule.onLoadStart();
+    appStore.onLoadStart();
 
     const jobs = await getUserJobs();
 
@@ -78,6 +79,6 @@ export async function handleReloadJobs(): Promise<void> {
 
     jobModule.selectJob(jobs[0]);
   } finally {
-    appModule.onLoadEnd();
+    appStore.onLoadEnd();
   }
 }

@@ -1,4 +1,4 @@
-import { PanelType, RouterCheck } from "@/types";
+import { RouterCheck } from "@/types";
 import { NavigationGuardNext, Route } from "vue-router";
 import {
   QueryParams,
@@ -6,7 +6,8 @@ import {
   routesPublic,
   routesWithRequiredProject,
 } from "@/router/routes";
-import { appModule, projectModule, viewportModule } from "@/store";
+import { projectModule, viewportModule } from "@/store";
+import { appStore } from "@/hooks";
 import { handleLoadVersion } from "@/api";
 import { sessionStore } from "@/hooks";
 
@@ -53,16 +54,15 @@ export const routerChecks: Record<string, RouterCheck> = {
   closePanelsIfNotInGraph(to: Route) {
     if (to.path === Routes.ARTIFACT) return;
 
-    appModule.closePanel(PanelType.left);
-    appModule.closePanel(PanelType.right);
+    appStore.closeSidePanels();
   },
   refocusGraph(to: Route) {
     if (to.path !== Routes.ARTIFACT) return;
 
-    appModule.onLoadStart();
+    appStore.onLoadStart();
 
     setTimeout(() => {
-      viewportModule.setArtifactTreeLayout().then(appModule.onLoadEnd);
+      viewportModule.setArtifactTreeLayout().then(appStore.onLoadEnd);
     }, 200);
   },
 };

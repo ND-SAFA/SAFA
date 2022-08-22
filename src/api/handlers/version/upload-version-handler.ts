@@ -1,4 +1,4 @@
-import { appModule } from "@/store";
+import { appStore } from "@/hooks";
 import { logStore } from "@/hooks";
 import { navigateTo, Routes } from "@/router";
 import { handleSelectVersion } from "@/api/notifications";
@@ -47,14 +47,14 @@ export async function handleUploadProjectVersion(
 
     if (setVersionIfSuccessful) {
       try {
-        appModule.onLoadStart();
+        appStore.onLoadStart();
         await handleSelectVersion(projectId, versionId);
         await uploadFlatFiles();
       } catch (e) {
         logStore.onError(String(e));
       } finally {
         await navigateTo(Routes.UPLOAD_STATUS);
-        appModule.onLoadEnd();
+        appStore.onLoadEnd();
       }
     } else {
       await uploadFlatFiles();

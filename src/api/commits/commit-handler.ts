@@ -1,5 +1,6 @@
 import { Commit } from "@/types";
-import { projectModule, commitModule, appModule } from "@/store";
+import { projectModule, commitModule } from "@/store";
+import { appStore } from "@/hooks";
 import { persistCommit } from "@/api";
 
 /**
@@ -10,14 +11,14 @@ import { persistCommit } from "@/api";
  */
 export async function saveCommit(commit: Commit): Promise<Commit> {
   try {
-    appModule.SET_IS_SAVING(true);
+    appStore.isSaving = true;
 
     const commitResponse = await persistCommit(commit);
     await commitModule.saveCommit(commitResponse);
 
     return commitResponse;
   } finally {
-    appModule.SET_IS_SAVING(false);
+    appStore.isSaving = false;
   }
 }
 
@@ -26,14 +27,14 @@ export async function saveCommit(commit: Commit): Promise<Commit> {
  */
 export async function undoCommit(): Promise<void> {
   try {
-    appModule.SET_IS_SAVING(true);
+    appStore.isSaving = true;
 
     const commit = await commitModule.undoLastCommit();
     const commitResponse = await persistCommit(commit);
 
     await applyArtifactChanges(commitResponse);
   } finally {
-    appModule.SET_IS_SAVING(false);
+    appStore.isSaving = false;
   }
 }
 
@@ -42,14 +43,14 @@ export async function undoCommit(): Promise<void> {
  */
 export async function redoCommit(): Promise<void> {
   try {
-    appModule.SET_IS_SAVING(true);
+    appStore.isSaving = true;
 
     const commit = await commitModule.redoLastUndoneCommit();
     const commitResponse = await persistCommit(commit);
 
     await applyArtifactChanges(commitResponse);
   } finally {
-    appModule.SET_IS_SAVING(false);
+    appStore.isSaving = false;
   }
 }
 

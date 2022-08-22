@@ -34,7 +34,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { MessageType, SnackbarMessage } from "@/types";
-import { appModule } from "@/store";
+import { appStore } from "@/hooks";
 import { logStore } from "@/hooks";
 import { ServerErrorModal } from "@/components/common/modals";
 import Typography from "./Typography.vue";
@@ -75,7 +75,7 @@ export default Vue.extend({
      * Opens the error display panel.
      */
     handleSeeError(): void {
-      appModule.toggleErrorDisplay();
+      appStore.toggleErrorDisplay();
     },
   },
   computed: {
@@ -95,7 +95,7 @@ export default Vue.extend({
      * @return Whether the error display is open.
      */
     isErrorDisplayOpen(): boolean {
-      return appModule.getIsErrorDisplayOpen;
+      return appStore.isErrorDisplayOpen;
     },
     /**
      * @return The message color for the current message.

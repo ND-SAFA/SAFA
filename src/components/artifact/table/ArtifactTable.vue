@@ -77,12 +77,12 @@
 import Vue from "vue";
 import { ArtifactModel, ArtifactDeltaState, FlatArtifact } from "@/types";
 import {
-  appModule,
   artifactModule,
   artifactSelectionModule,
   deltaModule,
   documentModule,
 } from "@/store";
+import { appStore } from "@/hooks";
 import {
   Typography,
   AttributeChip,
@@ -123,7 +123,7 @@ export default Vue.extend({
      * @return Whether to render the artifact table.
      */
     isVisible(): boolean {
-      return !appModule.getIsLoading && documentModule.isTableDocument;
+      return !appStore.isLoading && documentModule.isTableDocument;
     },
     /**
      * @return Whether delta view is enabled.

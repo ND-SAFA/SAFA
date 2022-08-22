@@ -4,7 +4,7 @@ import {
   ProjectModel,
 } from "@/types";
 import { navigateTo, Routes } from "@/router";
-import { appModule } from "@/store";
+import { appStore } from "@/hooks";
 import { logStore } from "@/hooks";
 import {
   createJiraProject,
@@ -25,7 +25,7 @@ export function handleImportProject(
   project: ProjectModel,
   { onSuccess, onError }: IOHandlerCallback
 ): void {
-  appModule.onLoadStart();
+  appStore.onLoadStart();
 
   createProjectCreationJob(project)
     .then(async (job) => {
@@ -39,7 +39,7 @@ export function handleImportProject(
       logStore.onDevError(e);
       onError?.(e);
     })
-    .finally(() => appModule.onLoadEnd());
+    .finally(() => appStore.onLoadEnd());
 }
 
 /**
@@ -58,7 +58,7 @@ export function handleBulkImportProject(
   files: File[],
   { onSuccess, onError }: IOHandlerCallback
 ): void {
-  appModule.onLoadStart();
+  appStore.onLoadStart();
 
   saveProject(project)
     .then(async (project) =>
@@ -71,7 +71,7 @@ export function handleBulkImportProject(
     )
     .then(onSuccess)
     .catch(onError)
-    .finally(() => appModule.onLoadEnd());
+    .finally(() => appStore.onLoadEnd());
 }
 
 /**
@@ -87,7 +87,7 @@ export function handleImportJiraProject(
   projectId: string,
   { onSuccess, onError }: IOHandlerCallback
 ): void {
-  appModule.onLoadStart();
+  appStore.onLoadStart();
 
   createJiraProject(cloudId, projectId)
     .then(async (job) => {
@@ -101,7 +101,7 @@ export function handleImportJiraProject(
       logStore.onDevError(e.message);
       onError?.(e);
     })
-    .finally(() => appModule.onLoadEnd());
+    .finally(() => appStore.onLoadEnd());
 }
 
 /**

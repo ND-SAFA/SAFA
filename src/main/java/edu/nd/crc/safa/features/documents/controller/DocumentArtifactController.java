@@ -66,7 +66,7 @@ public class DocumentArtifactController extends BaseDocumentController {
         ProjectVersion projectVersion = resourceBuilder.fetchVersion(versionId).withEditVersion();
         Document document = getDocumentById(this.documentRepository, documentId);
         for (ArtifactAppEntity a : artifacts) {
-            UUID artifactId = UUID.fromString(a.getBaseEntityId());
+            UUID artifactId = UUID.fromString(a.getId());
             Artifact artifact = getArtifactById(artifactId);
             DocumentArtifact documentArtifact = new DocumentArtifact(projectVersion, document, artifact);
             this.documentArtifactRepository.save(documentArtifact);

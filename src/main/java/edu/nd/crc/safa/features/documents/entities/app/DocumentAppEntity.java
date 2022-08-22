@@ -57,12 +57,12 @@ public class DocumentAppEntity implements IAppEntity {
     }
 
     @Override
-    public String getBaseEntityId() {
+    public String getId() {
         return this.getDocumentId();
     }
 
     @Override
-    public void setBaseEntityId(String id) {
+    public void setId(String id) {
         this.setDocumentId(id);
     }
 }

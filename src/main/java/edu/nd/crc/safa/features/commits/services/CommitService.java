@@ -147,7 +147,7 @@ public class CommitService {
         CommitAction<A, V> deleteAction = a ->
             versionEntityRepository.deleteVersionEntityByBaseEntityId(
                 projectVersion,
-                a.getBaseEntityId());
+                a.getId());
 
         // Commit added entities
         EntityParsingResult<A, CommitError> addedResponse = commitActionOnAppEntities(

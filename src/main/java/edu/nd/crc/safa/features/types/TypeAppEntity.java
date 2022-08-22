@@ -30,12 +30,12 @@ public class TypeAppEntity implements IAppEntity {
     }
 
     @Override
-    public String getBaseEntityId() {
+    public String getId() {
         return this.typeId;
     }
 
     @Override
-    public void setBaseEntityId(String id) {
+    public void setId(String id) {
         this.typeId = id;
     }
 }

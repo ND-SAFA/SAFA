@@ -98,12 +98,12 @@ public class ProjectAppEntity implements IAppEntity {
     }
 
     @Override
-    public String getBaseEntityId() {
+    public String getId() {
         return this.projectId;
     }
 
     @Override
-    public void setBaseEntityId(String id) {
+    public void setId(String id) {
         this.projectId = id;
     }
 }

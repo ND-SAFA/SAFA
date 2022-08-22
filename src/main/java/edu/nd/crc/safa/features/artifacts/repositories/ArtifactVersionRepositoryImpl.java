@@ -96,7 +96,7 @@ public class ArtifactVersionRepositoryImpl
     public Artifact createOrUpdateRelatedEntities(ProjectVersion projectVersion,
                                                   ArtifactAppEntity artifactAppEntity) throws SafaError {
         Artifact artifact = createOrUpdateArtifactFromAppEntity(projectVersion.getProject(), artifactAppEntity);
-        artifactAppEntity.setBaseEntityId(artifactAppEntity.getBaseEntityId());
+        artifactAppEntity.setId(artifactAppEntity.getId());
 
         createOrUpdateDocumentIds(projectVersion, artifact, artifactAppEntity.getDocumentIds());
         createOrUpdateDocumentNodeInformation(artifactAppEntity, artifact);
@@ -268,7 +268,7 @@ public class ArtifactVersionRepositoryImpl
 
     private Artifact createOrUpdateArtifactFromAppEntity(Project project,
                                                          ArtifactAppEntity artifactAppEntity) throws SafaError {
-        String artifactId = artifactAppEntity.getBaseEntityId();
+        String artifactId = artifactAppEntity.getId();
         String typeName = artifactAppEntity.type;
         String artifactName = artifactAppEntity.name;
         ArtifactType artifactType = findOrCreateArtifactType(project, typeName);

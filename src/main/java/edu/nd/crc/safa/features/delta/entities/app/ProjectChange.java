@@ -54,6 +54,6 @@ public class ProjectChange<T extends IAppEntity> {
 
     @JsonIgnore
     public List<UUID> getIds(List<T> entities) {
-        return entities.stream().map(IAppEntity::getBaseEntityId).map(UUID::fromString).collect(Collectors.toList());
+        return entities.stream().map(IAppEntity::getId).map(UUID::fromString).collect(Collectors.toList());
     }
 }

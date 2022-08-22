@@ -1,4 +1,4 @@
-package features.collaboration.permissions;
+package features.memberships.permissions;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 

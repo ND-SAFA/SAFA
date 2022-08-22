@@ -37,10 +37,10 @@ class TestEditDocument extends AbstractDocumentTest {
         docJson.put("documentId", document.getDocumentId().toString());
 
         // Step - Send Update request.
-        JSONObject docCreated = creationTestService.createOrUpdateDocumentJson(projectVersion, docJson);
+        JSONObject docCreated = creationService.createOrUpdateDocumentJson(projectVersion, docJson);
 
         // VP - Verify that response object contains name, description, and type
-        assertionTestService.assertObjectsMatch(docJson, docCreated);
+        assertionService.assertObjectsMatch(docJson, docCreated);
 
         assertDocumentInProjectExists(projectVersion.getProject(), docName, newDescription, docType);
     }
@@ -72,10 +72,10 @@ class TestEditDocument extends AbstractDocumentTest {
         docRequestJson.put("artifactIds", artifactIds);
 
         // Step - Send Update request.
-        JSONObject docCreated = creationTestService.createOrUpdateDocumentJson(projectVersion, docRequestJson);
+        JSONObject docCreated = creationService.createOrUpdateDocumentJson(projectVersion, docRequestJson);
 
         // VP - Verify that response object contains name, description, and type
-        assertionTestService.assertObjectsMatch(docRequestJson, docCreated, List.of("documentId"));
+        assertionService.assertObjectsMatch(docRequestJson, docCreated, List.of("documentId"));
         assertDocumentInProjectExists(projectVersion.getProject(), docName, newDescription, docType, artifactIds);
 
         // Step - Delete artifact id
@@ -83,10 +83,10 @@ class TestEditDocument extends AbstractDocumentTest {
         docRequestJson.put("artifactIds", artifactIds);
 
         // Step - Update document
-        JSONObject docUpdated = creationTestService.createOrUpdateDocumentJson(projectVersion, docRequestJson);
+        JSONObject docUpdated = creationService.createOrUpdateDocumentJson(projectVersion, docRequestJson);
 
         // VP - Verify that response contains updates.
-        assertionTestService.assertObjectsMatch(docRequestJson, docUpdated);
+        assertionService.assertObjectsMatch(docRequestJson, docUpdated);
         assertDocumentInProjectExists(projectVersion.getProject(), docName, newDescription, docType, artifactIds);
     }
 }

@@ -1,10 +1,10 @@
-package features.collaboration.permissions;
+package features.memberships.permissions;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import edu.nd.crc.safa.features.users.entities.db.ProjectRole;
 
-import features.collaboration.AbstractSharingTest;
+import common.AbstractSharingTest;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
@@ -28,7 +28,7 @@ public abstract class AbstractPermissionViolationTest extends AbstractSharingTes
     @Test
     protected void attemptProjectEdit() throws Exception {
         // Step - Log in as other user
-        authorizationTestService.loginUser(Sharee.email, Sharee.password, true);
+        authorizationService.loginUser(Sharee.email, Sharee.password, true);
 
         // Step - Perform violating action
         String message = performViolatingAction().getString("message");

@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
-import requests.SafaRequest;
-
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.IAppEntityService;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
@@ -17,8 +15,12 @@ import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
 
 import common.AbstractCrudTest;
 import org.json.JSONObject;
+import requests.SafaRequest;
 
-public class DocumentCrudTest extends AbstractCrudTest<DocumentAppEntity> {
+/**
+ * Test that a document can be created, retreived, updated, and deleted.
+ */
+public class TestDocumentCrud extends AbstractCrudTest<DocumentAppEntity> {
     String newName = "new-name";
     DocumentAppEntity document = new DocumentAppEntity(
         "",
@@ -53,15 +55,16 @@ public class DocumentCrudTest extends AbstractCrudTest<DocumentAppEntity> {
 
     @Override
     protected void verifyCreatedEntity(DocumentAppEntity retrievedEntity) {
-        this.assertionTestService.assertMatch(document, retrievedEntity);
+        this.assertionService.assertMatch(document, retrievedEntity);
     }
 
     @Override
     protected void verifyCreationMessage(EntityChangeMessage creationMessage) {
-        messageVerificationTestService.verifyDocumentMessage(
+        changeMessageVerifies.verifyDocumentChange(
             creationMessage,
             entityId,
             Change.Action.UPDATE);
+        changeMessageVerifies.verifyUpdateLayout(creationMessage, false);
     }
 
     @Override
@@ -75,31 +78,34 @@ public class DocumentCrudTest extends AbstractCrudTest<DocumentAppEntity> {
 
     @Override
     protected void verifyUpdatedEntity(DocumentAppEntity retrievedEntity) {
-        assertionTestService.assertMatch(document, retrievedEntity);
+        assertionService.assertMatch(document, retrievedEntity);
         assertThat(retrievedEntity.getName()).isEqualTo(newName);
     }
 
     @Override
     protected void verifyUpdateMessage(EntityChangeMessage updateMessage) {
-        messageVerificationTestService.verifyDocumentMessage(
+        changeMessageVerifies.verifyDocumentChange(
             updateMessage,
             entityId,
             Change.Action.UPDATE);
+        changeMessageVerifies.verifyUpdateLayout(updateMessage, false);
     }
 
     @Override
     protected void deleteEntity(DocumentAppEntity entity) throws Exception {
         SafaRequest
-            .withRoute(AppRoutes.Documents.DELETE_DOCUMENT)
+            .withRoute(AppRoutes.Documents.DELETE_DOCUMENT_BY_ID)
             .withDocument(document)
             .deleteWithJsonObject();
     }
 
     @Override
     protected void verifyDeletionMessage(EntityChangeMessage deletionMessage) {
-        messageVerificationTestService.verifyDocumentMessage(
+        changeMessageVerifies.verifyDocumentChange(
             deletionMessage,
             entityId,
             Change.Action.DELETE);
+        changeMessageVerifies.verifyUpdateLayout(deletionMessage, false);
+
     }
 }

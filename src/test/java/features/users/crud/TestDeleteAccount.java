@@ -4,21 +4,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Optional;
 
-import requests.SafaRequest;
-
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.users.entities.app.UserPassword;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.utilities.JsonFileUtilities;
 
-import features.users.base.AbstractUserTest;
+import features.base.ApplicationBaseTest;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
+import requests.SafaRequest;
 
 /**
  * Tests the ability of a user to delete their account
  */
-class TestDeleteAccount extends AbstractUserTest {
+class TestDeleteAccount extends ApplicationBaseTest {
     /**
      * Creates new account, verifies it exists, deletes it, and verifies
      * that it is deleted.
@@ -27,23 +26,19 @@ class TestDeleteAccount extends AbstractUserTest {
      */
     @Test
     void testDeleteAccount() throws Exception {
-        // Step 1 - Create account
-        authorizationTestService.createUser(this.testEmail, this.testPassword);
-        authorizationTestService.loginUser(this.testEmail, this.testPassword);
-
         // VP - Verify account exists
-        Optional<SafaUser> safaUserOptional = this.safaUserRepository.findByEmail(this.testEmail);
+        Optional<SafaUser> safaUserOptional = this.safaUserRepository.findByEmail(defaultUser);
         assertThat(safaUserOptional).isPresent();
 
         // Step 2 - Delete account
-        UserPassword userPassword = new UserPassword(this.testPassword);
+        UserPassword userPassword = new UserPassword(defaultUserPassword);
         JSONObject userJson = JsonFileUtilities.toJson(userPassword);
         SafaRequest
             .withRoute(AppRoutes.Accounts.DELETE_ACCOUNT)
             .postWithJsonObject(userJson);
 
         // VP - Verify account does not exist
-        safaUserOptional = this.safaUserRepository.findByEmail(this.testEmail);
+        safaUserOptional = this.safaUserRepository.findByEmail(defaultUser);
         assertThat(safaUserOptional).isEmpty();
     }
 }

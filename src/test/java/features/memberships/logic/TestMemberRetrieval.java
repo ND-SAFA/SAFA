@@ -1,10 +1,10 @@
-package features.collaboration.crud;
+package features.memberships.logic;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import edu.nd.crc.safa.features.users.entities.db.ProjectRole;
 
-import features.collaboration.AbstractSharingTest;
+import common.AbstractSharingTest;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
@@ -18,7 +18,7 @@ public class TestMemberRetrieval extends AbstractSharingTest {
     @Test
     void newMemberFoundWhenRetrievingMembers() throws Exception {
         // Step - Get projects for user who got shared with
-        JSONArray members = retrievalTestService.getProjectMembers(projectVersion.getProject());
+        JSONArray members = retrievalService.getProjectMembers(projectVersion.getProject());
 
         // VP - Verify that shared project is visible
         assertThat(members.length()).isEqualTo(2);

@@ -2,15 +2,15 @@ package features.artifacts.base;
 
 import java.util.UUID;
 
-import builders.CommitBuilder;
-
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.common.IAppEntityService;
+import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.notifications.entities.Change;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
 
+import builders.CommitBuilder;
 import common.AbstractCrudTest;
-import org.json.JSONObject;
 
 public abstract class AbstractArtifactCrudTest extends AbstractCrudTest<ArtifactAppEntity> {
     ArtifactAppEntity artifact = getStartingArtifact();
@@ -27,33 +27,30 @@ public abstract class AbstractArtifactCrudTest extends AbstractCrudTest<Artifact
 
     @Override
     protected UUID createEntity() throws Exception {
-        JSONObject commitJson = commitTestService
+        ProjectCommit commit = commitService
             .commit(CommitBuilder
                 .withVersion(projectVersion)
                 .withAddedArtifact(artifact));
-        String id = commitJson
-            .getJSONObject("artifacts")
-            .getJSONArray("added")
-            .getJSONObject(0)
-            .getString("id");
-        artifact.setId(id);
-        return UUID.fromString(id);
+
+        String artifactId = commit.getArtifact(ModificationType.ADDED, 0).getId();
+        artifact.setId(artifactId);
+        return UUID.fromString(artifactId);
     }
 
     @Override
     protected void verifyCreatedEntity(ArtifactAppEntity retrievedEntity) {
-        assertionTestService.assertMatch(artifact, retrievedEntity);
+        assertionService.assertMatch(artifact, retrievedEntity);
     }
 
     @Override
     protected void verifyCreationMessage(EntityChangeMessage creationMessage) {
-        verifyArtifactMessage(creationMessage, Change.Action.UPDATE);
+        verifyArtifactMessage(creationMessage, Change.Action.UPDATE, true);
     }
 
     @Override
     protected void updateEntity() throws Exception {
         this.modifyArtifact(artifact);
-        commitTestService
+        commitService
             .commit(CommitBuilder
                 .withVersion(projectVersion)
                 .withModifiedArtifact(artifact));
@@ -61,17 +58,17 @@ public abstract class AbstractArtifactCrudTest extends AbstractCrudTest<Artifact
 
     @Override
     protected void verifyUpdatedEntity(ArtifactAppEntity retrievedEntity) {
-        assertionTestService.assertMatch(artifact, retrievedEntity);
+        assertionService.assertMatch(artifact, retrievedEntity);
     }
 
     @Override
     protected void verifyUpdateMessage(EntityChangeMessage updateMessage) {
-        verifyArtifactMessage(updateMessage, Change.Action.UPDATE);
+        verifyArtifactMessage(updateMessage, Change.Action.UPDATE, false);
     }
 
     @Override
     protected void deleteEntity(ArtifactAppEntity entity) throws Exception {
-        commitTestService
+        commitService
             .commit(CommitBuilder
                 .withVersion(projectVersion)
                 .withRemovedArtifact(artifact));
@@ -79,16 +76,15 @@ public abstract class AbstractArtifactCrudTest extends AbstractCrudTest<Artifact
 
     @Override
     protected void verifyDeletionMessage(EntityChangeMessage deletionMessage) {
-        verifyArtifactMessage(deletionMessage, Change.Action.DELETE);
+        verifyArtifactMessage(deletionMessage, Change.Action.DELETE, true);
     }
 
     private void verifyArtifactMessage(EntityChangeMessage message,
-                                       Change.Action action) {
-        messageVerificationTestService.verifyArtifactMessage(message, entityId, action);
-        messageVerificationTestService.verifyChangeInMessage(message,
-            null,
-            Change.Entity.WARNINGS,
-            Change.Action.UPDATE);
+                                       Change.Action action,
+                                       boolean updateLayout) {
+        this.changeMessageVerifies.verifyArtifactMessage(message, entityId, action);
+        this.changeMessageVerifies.verifyWarningMessage(message);
+        this.changeMessageVerifies.verifyUpdateLayout(message, updateLayout);
     }
 
     /**

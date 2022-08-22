@@ -175,12 +175,12 @@ public abstract class GenericVersionRepository<
             if (versionEntity.getModificationType() != ModificationType.NO_MODIFICATION) {
                 createOrUpdateVersionEntity(versionEntity);
                 String baseEntityId = b.getBaseEntityId();
-                appEntity.setBaseEntityId(baseEntityId);
+                appEntity.setId(baseEntityId);
             }
 
             return Optional.of(versionEntity);
         };
-        String baseEntityId = appEntity.getBaseEntityId();
+        String baseEntityId = appEntity.getId();
         return commitErrorHandler(projectVersion, versionEntityAction, baseEntityId, this.getProjectActivity());
     }
 
@@ -275,7 +275,7 @@ public abstract class GenericVersionRepository<
                 if (commitResponse.getValue1() == null) {
                     String baseEntityId = commitResponse.getValue0().getBaseEntityId();
                     processedAppEntities.add(baseEntityId);
-                    a.setBaseEntityId(baseEntityId);
+                    a.setId(baseEntityId);
                 }
                 return commitResponse;
             })

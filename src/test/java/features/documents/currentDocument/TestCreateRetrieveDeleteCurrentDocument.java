@@ -2,9 +2,6 @@ package features.documents.currentDocument;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import requests.RouteBuilder;
-import requests.SafaRequest;
-
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
@@ -13,6 +10,8 @@ import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import features.base.ApplicationBaseTest;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
+import requests.RouteBuilder;
+import requests.SafaRequest;
 
 /**
  * Tests that a user is able to set the current document, retrieve it, and remove it.
@@ -54,6 +53,6 @@ class TestCreateRetrieveDeleteCurrentDocument extends ApplicationBaseTest {
     }
 
     String getCurrentDocumentId(ProjectVersion projectVersion) {
-        return retrievalTestService.getProjectAtVersion(projectVersion).currentDocumentId;
+        return retrievalService.getProjectAtVersion(projectVersion).getCurrentDocumentId();
     }
 }

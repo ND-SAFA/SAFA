@@ -1,11 +1,11 @@
-package features.collaboration.errors;
+package features.memberships.errors;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import edu.nd.crc.safa.features.users.entities.db.ProjectRole;
 
-import features.collaboration.AbstractSharingTest;
+import common.AbstractSharingTest;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
  * 1. User is not found
  * 2. User is already on the project
  */
-public class TestUserNotFound extends AbstractSharingTest {
+public class TestSharingWithMissingAccount extends AbstractSharingTest {
     String nonUserEmail = "non-existing@email.com";
 
     /**
@@ -26,8 +26,7 @@ public class TestUserNotFound extends AbstractSharingTest {
     @Test
     public void userNotFoundError() throws Exception {
         // Step - Share with non-existent user
-
-        JSONObject response = creationTestService.shareProject(
+        JSONObject response = creationService.shareProject(
             project,
             nonUserEmail,
             ProjectRole.VIEWER,

@@ -101,6 +101,7 @@ public class ArtifactTypeController extends BaseController {
             .broadcastChange(
                 EntityChangeBuilder
                     .create(artifactType.getProject().getProjectId())
-                    .withTypeDelete(artifactType.getTypeId()));
+                    .withTypeDelete(artifactType.getTypeId())
+                    .withUpdateLayout());
     }
 }

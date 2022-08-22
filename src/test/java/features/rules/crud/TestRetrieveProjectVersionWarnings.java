@@ -2,18 +2,23 @@ package features.rules.crud;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import builders.CommitBuilder;
-import requests.SafaRequest;
+import java.util.List;
 
 import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
+import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.notifications.entities.Change;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
+import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
+import builders.CommitBuilder;
 import features.base.ApplicationBaseTest;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
+import requests.SafaRequest;
 
 /**
  * Responsible for testing if you can retrieve the warnings
@@ -59,7 +64,7 @@ class TestRetrieveProjectVersionWarnings extends ApplicationBaseTest {
         assertThat(ruleViolated.getString("ruleName")).isEqualTo("Missing child");
 
         // Step - Subscribe to project version
-        notificationTestService.createNewConnection(defaultUser).subscribeToVersion(defaultUser, projectVersion);
+        notificationService.createNewConnection(defaultUser).subscribeToVersion(defaultUser, projectVersion);
 
         // Step - Create Design artifact and link
         JSONObject designJson =
@@ -75,10 +80,10 @@ class TestRetrieveProjectVersionWarnings extends ApplicationBaseTest {
             .withVersion(projectVersion)
             .withAddedArtifact(designJson)
             .withAddedTrace(traceJson);
-        designJson = commitTestService.commit(commitBuilder);
+        ProjectCommit addDesignCommit = commitService.commit(commitBuilder);
 
         // VP - Receive expected messages
-        EntityChangeMessage message = notificationTestService.getNextMessage(defaultUser);
+        EntityChangeMessage message = notificationService.getNextMessage(defaultUser);
         assertThat(message.getChanges()).hasSize(3);
         assertThat(message.getChangedEntities())
             .contains(Change.Entity.ARTIFACTS)
@@ -104,16 +109,15 @@ class TestRetrieveProjectVersionWarnings extends ApplicationBaseTest {
         assertThat(rulesWithDesign.length()).isZero();
 
         // Step - Delete design artifact
-        JSONObject updatedDesign = designJson
-            .getJSONObject("artifacts")
-            .getJSONArray("added")
-            .getJSONObject(0);
-        JSONObject deletionCommit =
-            commitTestService.commit(CommitBuilder.withVersion(projectVersion).withRemovedArtifact(updatedDesign));
+        ArtifactAppEntity updatedDesign = addDesignCommit.getArtifact(ModificationType.ADDED, 0);
+        ProjectCommit deletionCommit = commitService
+            .commit(CommitBuilder
+                .withVersion(projectVersion)
+                .withRemovedArtifact(updatedDesign));
 
         // VP - Verify that trace was deleted too
-        JSONArray deletedTraces = deletionCommit.getJSONObject("traces").getJSONArray("removed");
-        assertThat(deletedTraces.length()).isEqualTo(1);
+        List<TraceAppEntity> deletedTraces = deletionCommit.getTraces().getRemoved();
+        assertThat(deletedTraces).hasSize(1);
 
         // Step - Retrieve project warnings
         JSONObject rulesAfterDelete = getProjectRules(projectVersion);

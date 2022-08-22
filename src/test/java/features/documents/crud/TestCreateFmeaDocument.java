@@ -45,12 +45,12 @@ class TestCreateFmeaDocument extends AbstractDocumentTest {
         requestedDocumentJson.put("columns", columns);
 
         // Step - Send creation request.
-        JSONObject responseDocumentJson = creationTestService.createOrUpdateDocumentJson(projectVersion,
+        JSONObject responseDocumentJson = creationService.createOrUpdateDocumentJson(projectVersion,
             requestedDocumentJson);
 
         // VP - Assert document base entity properties were returned
         String documentId = responseDocumentJson.getString("documentId");
-        assertionTestService.assertObjectsMatch(requestedDocumentJson, responseDocumentJson, List.of("id", "columns"));
+        assertionService.assertObjectsMatch(requestedDocumentJson, responseDocumentJson, List.of("id", "columns"));
         assertThat(documentId).isNotEmpty();
 
         // VP - Assert columns properties were returned in response
@@ -73,7 +73,7 @@ class TestCreateFmeaDocument extends AbstractDocumentTest {
         responseDocumentJson.put("columns", newColumns);
 
         //Step - Update columns
-        JSONObject updateResponseJson = creationTestService.createOrUpdateDocumentJson(projectVersion,
+        JSONObject updateResponseJson = creationService.createOrUpdateDocumentJson(projectVersion,
             responseDocumentJson);
 
         // VP - Assert columns properties were returned in response
@@ -103,7 +103,7 @@ class TestCreateFmeaDocument extends AbstractDocumentTest {
         expectedColumns.put("columns", updatedColumnsJson);
         actualColumns.put("columns", documentJson.getJSONArray("columns"));
 
-        assertionTestService.assertObjectsMatch(expectedColumns, actualColumns);
+        assertionService.assertObjectsMatch(expectedColumns, actualColumns);
     }
 
     private JSONArray assertDocumentColumns(JSONObject object,

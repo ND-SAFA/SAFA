@@ -1,10 +1,10 @@
-package features.collaboration.crud;
+package features.memberships.crud;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import edu.nd.crc.safa.config.AppRoutes;
 
-import features.collaboration.AbstractSharingTest;
+import common.AbstractSharingTest;
 import org.json.JSONArray;
 import org.junit.jupiter.api.Test;
 import requests.SafaRequest;
@@ -22,7 +22,7 @@ class TestProjectRetrievalWithSharing extends AbstractSharingTest {
     @Test
     void sharedProjectAppearsInGetProjects() throws Exception {
         // Step - Login as other user
-        authorizationTestService.loginUser(Sharee.email, Sharee.password, true);
+        authorizationService.loginUser(Sharee.email, Sharee.password, true);
 
         // Step - Get projects for user who got shared with
         JSONArray projects = SafaRequest

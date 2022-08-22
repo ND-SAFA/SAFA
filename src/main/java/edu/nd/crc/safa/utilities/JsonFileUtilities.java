@@ -72,6 +72,14 @@ public interface JsonFileUtilities {
         });
     }
 
+    static JSONArray toJsonArray(Object object) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        return wrapReturnValue(() -> {
+            String objectJsonString = objectMapper.writeValueAsString(object);
+            return new JSONArray(objectJsonString);
+        });
+    }
+
     /**
      * Converts JSON string to instance of java class.
      *

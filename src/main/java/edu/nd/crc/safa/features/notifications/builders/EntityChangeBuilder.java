@@ -122,6 +122,11 @@ public class EntityChangeBuilder {
         return withEntityDelete(Change.Entity.JOBS, List.of(jobId));
     }
 
+    public EntityChangeBuilder withUpdateLayout() {
+        this.entityChangeMessage.setUpdateLayout(true);
+        return this;
+    }
+
     private EntityChangeBuilder withEntityUpdate(Change.Entity entity, List<UUID> entityIds) {
         return withEntityUpdate(entity, entityIds, true);
     }

@@ -8,9 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import builders.ProjectBuilder;
-import requests.SafaRequest;
-
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.entities.FTAType;
@@ -20,9 +17,11 @@ import edu.nd.crc.safa.features.flatfiles.services.DataFileBuilder;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
+import builders.ProjectBuilder;
 import features.base.ApplicationBaseTest;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
+import requests.SafaRequest;
 import services.AuthorizationTestService;
 
 /**
@@ -67,15 +66,15 @@ class TestDownloadAndReuploadFlatFiles extends ApplicationBaseTest {
 
     private void verifyProjectCreated(ProjectVersion projectVersion) {
         // Step - Retrieve project
-        ProjectAppEntity projectAppEntity = retrievalTestService.getProjectAtVersion(projectVersion);
+        ProjectAppEntity projectAppEntity = retrievalService.getProjectAtVersion(projectVersion);
 
         // VP - Verify that artifacts are created
-        assertThat(projectAppEntity.artifacts).hasSize(Constants.N_ARTIFACTS);
+        assertThat(projectAppEntity.getArtifacts()).hasSize(Constants.N_ARTIFACTS);
 
         // Step - Extract artifact information
         Map<String, ArtifactAppEntity> name2artifact = new HashMap<>();
         projectAppEntity
-            .artifacts
+            .getArtifacts()
             .forEach(artifact -> name2artifact.put(artifact.name, artifact));
 
         // VP - Verify regular artifact

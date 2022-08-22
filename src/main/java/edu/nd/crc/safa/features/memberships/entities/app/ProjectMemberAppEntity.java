@@ -24,12 +24,12 @@ public class ProjectMemberAppEntity implements IAppEntity {
     }
 
     @Override
-    public String getBaseEntityId() {
+    public String getId() {
         return this.projectMembershipId;
     }
 
     @Override
-    public void setBaseEntityId(String id) {
+    public void setId(String id) {
         this.projectMembershipId = id;
     }
 }

@@ -83,6 +83,9 @@ public class CommitService {
             .withTracesUpdate(traceChanges.getUpdatedIds())
             .withTracesDelete(traceChanges.getDeletedIds())
             .withWarningsUpdate();
+        if (projectCommit.shouldUpdateDefaultLayout()) {
+            builder.withUpdateLayout();
+        }
 
         this.notificationService.broadcastChange(builder);
 
@@ -144,7 +147,7 @@ public class CommitService {
         CommitAction<A, V> deleteAction = a ->
             versionEntityRepository.deleteVersionEntityByBaseEntityId(
                 projectVersion,
-                a.getBaseEntityId());
+                a.getId());
 
         // Commit added entities
         EntityParsingResult<A, CommitError> addedResponse = commitActionOnAppEntities(

@@ -6,11 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import builders.CommitBuilder;
-import requests.RouteBuilder;
-import requests.FlatFileRequest;
-import requests.SafaRequest;
-
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
@@ -21,10 +16,14 @@ import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.traces.entities.db.TraceLinkVersion;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
+import builders.CommitBuilder;
 import features.traces.base.AbstractTraceTest;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
+import requests.FlatFileRequest;
+import requests.RouteBuilder;
+import requests.SafaRequest;
 
 /**
  * Tests that generated trace links are able to be reviewed.
@@ -94,7 +93,7 @@ class TestLinkApproval extends AbstractTraceTest {
         // Step - Approve generated trace link
         TraceAppEntity generatedLinkAppEntity = this.traceLinkVersionRepository
             .retrieveAppEntityFromVersionEntity(generatedLink);
-        commitTestService.commit(CommitBuilder
+        commitService.commit(CommitBuilder
             .withVersion(projectVersion)
             .withModifiedTrace(generatedLinkAppEntity));
 
@@ -112,7 +111,7 @@ class TestLinkApproval extends AbstractTraceTest {
         // Step - Commit changes
         TraceAppEntity updatedGeneratedLink = this.traceLinkVersionRepository
             .retrieveAppEntityFromVersionEntity(generatedLink);
-        commitTestService.commit(CommitBuilder
+        commitService.commit(CommitBuilder
             .withVersion(projectVersion)
             .withModifiedTrace(updatedGeneratedLink));
 
@@ -198,7 +197,7 @@ class TestLinkApproval extends AbstractTraceTest {
 
         // Step - POST trace links creation
         JSONObject traceJson = jsonBuilder.createTrace(sourceName, targetName);
-        commitTestService.commit(
+        commitService.commit(
             CommitBuilder
                 .withVersion(projectVersion)
                 .withAddedTrace(traceJson)

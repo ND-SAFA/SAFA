@@ -4,8 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.UUID;
 
-import requests.SafaRequest;
-
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.notifications.entities.Change;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
@@ -15,6 +13,7 @@ import edu.nd.crc.safa.features.types.TypeService;
 
 import common.AbstractCrudTest;
 import org.json.JSONObject;
+import requests.SafaRequest;
 
 public class TestArtifactTypeCrud extends AbstractCrudTest<TypeAppEntity> {
     String editTypePath = AppRoutes.ArtifactType.CREATE_OR_UPDATE_ARTIFACT_TYPE;
@@ -53,10 +52,10 @@ public class TestArtifactTypeCrud extends AbstractCrudTest<TypeAppEntity> {
 
     protected void verifyUpdateMessage(EntityChangeMessage message) {
         assertThat(message.getChanges()).hasSize(1);
-        messageVerificationTestService.verifyChangeInMessage(message,
+        this.changeMessageVerifies.verifyTypeChange(message,
             entityId,
-            Change.Entity.TYPES,
             Change.Action.UPDATE);
+        this.changeMessageVerifies.verifyUpdateLayout(message, false);
     }
 
     protected void deleteEntity(TypeAppEntity entity) throws Exception {
@@ -68,10 +67,10 @@ public class TestArtifactTypeCrud extends AbstractCrudTest<TypeAppEntity> {
 
     protected void verifyDeletionMessage(EntityChangeMessage message) {
         assertThat(message.getChanges()).hasSize(1);
-        messageVerificationTestService.verifyChangeInMessage(message,
+        this.changeMessageVerifies.verifyTypeChange(message,
             entityId,
-            Change.Entity.TYPES,
             Change.Action.DELETE);
+        this.changeMessageVerifies.verifyUpdateLayout(message, true);
     }
 
     @Override

@@ -21,7 +21,7 @@ public abstract class AbstractCrudTest<T extends IAppEntity> extends Application
     protected UUID entityId;
 
     protected ProjectVersion setupProject() throws Exception {
-        return creationTestService.createProjectWithNewVersion(projectName);
+        return creationService.createProjectWithNewVersion(projectName);
     }
 
     @Test
@@ -29,7 +29,7 @@ public abstract class AbstractCrudTest<T extends IAppEntity> extends Application
         // Step - Setup project
         this.projectVersion = this.setupProject();
         this.project = this.projectVersion.getProject();
-        notificationTestService.createNewConnection(defaultUser).subscribeToTopic(defaultUser, getTopicId());
+        notificationService.createNewConnection(defaultUser).subscribeToTopic(defaultUser, getTopicId());
 
         // Step - Create entity and retrieve message
         this.entityId = createEntity();
@@ -40,7 +40,7 @@ public abstract class AbstractCrudTest<T extends IAppEntity> extends Application
         verifyCreatedEntity(entity);
 
         // VP - Verify creation message
-        EntityChangeMessage creationMessage = notificationTestService.getNextMessage(defaultUser);
+        EntityChangeMessage creationMessage = notificationService.getNextMessage(defaultUser);
         verifyCreationMessage(creationMessage);
 
         // Step - Update entity and retrieve message
@@ -51,7 +51,7 @@ public abstract class AbstractCrudTest<T extends IAppEntity> extends Application
         verifyUpdatedEntity(updatedEntity);
 
         // VP - Verify update message
-        EntityChangeMessage updateMessage = notificationTestService.getNextMessage(defaultUser);
+        EntityChangeMessage updateMessage = notificationService.getNextMessage(defaultUser);
         verifyUpdateMessage(updateMessage);
 
         // Step - Delete entity
@@ -62,7 +62,7 @@ public abstract class AbstractCrudTest<T extends IAppEntity> extends Application
         assertThat(entitiesWithId).isEmpty();
 
         // VP - Verify deletion message
-        EntityChangeMessage deleteMessage = notificationTestService.getNextMessage(defaultUser);
+        EntityChangeMessage deleteMessage = notificationService.getNextMessage(defaultUser);
         verifyDeletionMessage(deleteMessage);
     }
 

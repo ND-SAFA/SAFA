@@ -2,10 +2,6 @@ package features.flatfiles.logic;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import builders.CommitBuilder;
-import builders.ProjectBuilder;
-import requests.SafaRequest;
-
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
@@ -14,9 +10,12 @@ import edu.nd.crc.safa.features.flatfiles.controllers.entities.ArtifactNameCheck
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.utilities.JsonFileUtilities;
 
+import builders.CommitBuilder;
+import builders.ProjectBuilder;
 import features.base.ApplicationBaseTest;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
+import requests.SafaRequest;
 
 class TestCheckArtifactName extends ApplicationBaseTest {
 
@@ -56,7 +55,7 @@ class TestCheckArtifactName extends ApplicationBaseTest {
         CommitBuilder deleteCommit = CommitBuilder
             .withVersion(v2)
             .withRemovedArtifact(artifactJson);
-        commitTestService.commit(deleteCommit);
+        commitService.commit(deleteCommit);
 
         // VP - Verify that
         assertThat(doesArtifactExists(v1, artifactName)).isTrue();

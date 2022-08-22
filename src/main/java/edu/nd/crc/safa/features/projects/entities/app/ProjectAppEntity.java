@@ -28,30 +28,26 @@ import lombok.Data;
 @Data
 public class ProjectAppEntity implements IAppEntity {
     @NotNull
-    public String projectId;
+    String projectId;
     @NotNull
-    public String name;
+    String name;
     @NotNull
-    public String description;
+    String description;
     @Valid
-    public ProjectVersion projectVersion;
+    ProjectVersion projectVersion;
     @NotNull
-    public List<@Valid @NotNull ArtifactAppEntity> artifacts;
+    List<@Valid @NotNull ArtifactAppEntity> artifacts;
     @NotNull
-    public List<@Valid @NotNull TraceAppEntity> traces;
+    List<@Valid @NotNull TraceAppEntity> traces;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    public List<ProjectMemberAppEntity> members;
+    List<ProjectMemberAppEntity> members;
     @Nullable
-    public String currentDocumentId;
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    public List<@Valid @NotNull DocumentAppEntity> documents;
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    public List<@Valid @NotNull TypeAppEntity> artifactTypes;
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    String currentDocumentId;
+    List<@Valid @NotNull DocumentAppEntity> documents;
+    List<@Valid @NotNull TypeAppEntity> artifactTypes;
     Map<String, List<@Valid @NotNull RuleName>> warnings;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     ProjectParsingErrors errors;
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     Map<String, LayoutPosition> layout;
 
     public ProjectAppEntity() {
@@ -102,12 +98,12 @@ public class ProjectAppEntity implements IAppEntity {
     }
 
     @Override
-    public String getBaseEntityId() {
+    public String getId() {
         return this.projectId;
     }
 
     @Override
-    public void setBaseEntityId(String id) {
+    public void setId(String id) {
         this.projectId = id;
     }
 }

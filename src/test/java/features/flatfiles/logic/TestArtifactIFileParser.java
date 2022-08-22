@@ -28,7 +28,7 @@ class TestArtifactIFileParser extends ApplicationBaseTest {
      */
     @Test
     void parseDesignArtifacts() throws Exception {
-        ProjectVersion projectVersion = creationTestService.createDefaultProject("testProject");
+        ProjectVersion projectVersion = creationService.createDefaultProject("testProject");
 
         // Step - parse Design artifact definition specification
         JSONObject jsonSpec = new JSONObject("{\"datafiles\": { \"Design\": {\"file\": \"Design.csv\"}}}");
@@ -45,7 +45,7 @@ class TestArtifactIFileParser extends ApplicationBaseTest {
 
     @Test
     void missingFileKey() throws Exception {
-        ProjectVersion projectVersion = creationTestService.createDefaultProject("testProject");
+        ProjectVersion projectVersion = creationService.createDefaultProject("testProject");
         JSONObject jsonSpec = new JSONObject("{\"datafiles\": { \"Design\": {}}}");
         String pathToFiles = ProjectPaths.Storage.projectUploadsPath(projectVersion.getProject(), false);
         TimFileParser timFileParser = new TimFileParser(jsonSpec, pathToFiles);

@@ -72,7 +72,8 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
     }
 
     public JSONObject getWithJsonObject(ResultMatcher expectedResultMatcher) throws Exception {
-        return sendAuthenticatedRequest(MockMvcRequestBuilders.get(this.buildEndpoint()),
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get(this.buildEndpoint());
+        return sendAuthenticatedRequest(requestBuilder,
             expectedResultMatcher,
             authorizationToken,
             ResponseParser::jsonCreator);
@@ -120,16 +121,25 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
                                          ResultMatcher resultMatcher,
                                          String localAuthorizationToken
     ) throws Exception {
-        String content = body instanceof JSONObject || body instanceof JSONArray
-            ? body.toString() : JsonFileUtilities.toJson(body).toString();
         return sendAuthenticatedRequest(
             post(this.buildEndpoint())
-                .content(content)
+                .content(stringify(body))
                 .contentType(MediaType.APPLICATION_JSON),
             resultMatcher,
             localAuthorizationToken,
             responseParser
         );
+    }
+
+    private String stringify(Object body) {
+        String content;
+        if (body instanceof JSONObject || body instanceof JSONArray) {
+            return body.toString();
+        } else if (body instanceof List) {
+            return JsonFileUtilities.toJsonArray(body).toString();
+        } else {
+            return JsonFileUtilities.toJson(body).toString();
+        }
     }
 
     public JSONObject deleteWithJsonObject() throws Exception {

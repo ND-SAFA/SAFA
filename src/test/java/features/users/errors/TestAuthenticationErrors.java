@@ -2,16 +2,15 @@ package features.users.errors;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import requests.SafaRequest;
-
 import edu.nd.crc.safa.config.AppRoutes;
 
-import features.users.base.AbstractUserTest;
+import features.base.ApplicationBaseTest;
 import org.junit.jupiter.api.Test;
+import requests.SafaRequest;
 
-class TestUserErrors extends AbstractUserTest {
+class TestAuthenticationErrors extends ApplicationBaseTest {
     @Test
-    void testInvalidRequestMissingCredentials() throws Exception {
+    void testMissingCredentials() throws Exception {
         SafaRequest.clearAuthorizationToken();
         SafaRequest
             .withRoute(AppRoutes.Projects.GET_PROJECTS)
@@ -20,6 +19,8 @@ class TestUserErrors extends AbstractUserTest {
 
     @Test
     void testForbiddenIsUserNotAuthorized() throws Exception {
-        authorizationTestService.loginUser(testEmail, testPassword, status().is4xxClientError(), false);
+        String testEmail = "test@123.com";
+        String testPassword = "testpassword";
+        authorizationService.loginUser(testEmail, testPassword, status().is4xxClientError(), false);
     }
 }

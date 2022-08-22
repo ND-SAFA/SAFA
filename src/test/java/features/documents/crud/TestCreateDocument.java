@@ -29,7 +29,7 @@ class TestCreateDocument extends AbstractDocumentTest {
         JSONObject documentJson = jsonBuilder.createDocument(docName, docDescription, docType);
 
         // Step - Create new document
-        Pair<ProjectVersion, JSONObject> response = creationTestService.createProjectWithDocument(
+        Pair<ProjectVersion, JSONObject> response = creationService.createProjectWithDocument(
             projectName,
             documentJson);
 
@@ -38,7 +38,7 @@ class TestCreateDocument extends AbstractDocumentTest {
         JSONObject documentCreated = response.getValue1();
 
         // VP - Assert all properties were returned as inputted.
-        assertionTestService.assertObjectsMatch(documentJson, documentCreated, List.of("documentId"));
+        assertionService.assertObjectsMatch(documentJson, documentCreated, List.of("documentId"));
         assertThat(documentCreated.getString("documentId")).isNotEmpty();
 
         // VP - Verify that contents was persisted.

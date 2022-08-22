@@ -27,7 +27,7 @@ public interface IAppEntityService<T extends IAppEntity> {
     default List<T> getAppEntitiesByIds(ProjectVersion projectVersion, List<String> entityIds) {
         return this.getAppEntities(projectVersion)
             .stream()
-            .filter(e -> entityIds.contains(e.getBaseEntityId()))
+            .filter(e -> entityIds.contains(e.getId()))
             .collect(Collectors.toList());
     }
 }

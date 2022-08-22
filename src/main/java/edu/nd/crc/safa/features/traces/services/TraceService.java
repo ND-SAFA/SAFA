@@ -26,7 +26,7 @@ public class TraceService implements IAppEntityService<TraceAppEntity> {
             .getAppEntities(projectVersion);
         List<String> projectVersionArtifactIds = projectVersionArtifacts
             .stream()
-            .map(ArtifactAppEntity::getBaseEntityId)
+            .map(ArtifactAppEntity::getId)
             .collect(Collectors.toList());
         return retrieveTracesInProjectVersion(projectVersion, projectVersionArtifactIds);
     }

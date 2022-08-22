@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import requests.FlatFileRequest;
-
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.features.layout.generator.ElkGraphCreator;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
@@ -18,6 +16,7 @@ import org.eclipse.elk.graph.ElkEdge;
 import org.eclipse.elk.graph.ElkNode;
 import org.javatuples.Pair;
 import org.junit.jupiter.api.BeforeEach;
+import requests.FlatFileRequest;
 
 /**
  * Base class responsible for:
@@ -58,9 +57,9 @@ public abstract class AbstractLayoutTest extends ApplicationBaseTest {
             .newProject(projectName)
             .newVersionWithReturn(projectName);
         FlatFileRequest.updateProjectVersionFromFlatFiles(projectVersion, ProjectPaths.Tests.DefaultProject.V1);
-        this.projectAppEntity = retrievalTestService.getProjectAtVersion(projectVersion);
+        this.projectAppEntity = retrievalService.getProjectAtVersion(projectVersion);
         Pair<ElkNode, Map<String, ElkNode>> response =
-            ElkGraphCreator.createGraphFromProject(projectAppEntity.artifacts, projectAppEntity.traces);
+            ElkGraphCreator.createGraphFromProject(projectAppEntity.getArtifacts(), projectAppEntity.getTraces());
         rootGraphNode = response.getValue0();
         name2nodes = response.getValue1();
     }

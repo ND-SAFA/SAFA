@@ -5,16 +5,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.Optional;
 
-import requests.SafaRequest;
-
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
-import edu.nd.crc.safa.features.users.repositories.SafaUserRepository;
 
-import features.users.base.AbstractUserTest;
+import features.base.ApplicationBaseTest;
 import org.json.JSONArray;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import requests.SafaRequest;
 
 /**
  * Tests that user is able to:
@@ -22,16 +19,13 @@ import org.springframework.beans.factory.annotation.Autowired;
  * 2. Log into an existing account
  * 3. User is not allowed without credentials.
  */
-class TestCreateAndLogin extends AbstractUserTest {
-
-
-    @Autowired
-    SafaUserRepository safaUserRepository;
-
+class TestCreateAndLogin extends ApplicationBaseTest {
+    String testEmail = "abc@test.com";
+    String testPassword = "password123";
 
     @Test
     void testCreateAccount() throws Exception {
-        authorizationTestService.createUser(testEmail, testPassword);
+        authorizationService.createUser(testEmail, testPassword);
         Optional<SafaUser> userQuery = safaUserRepository.findByEmail(testEmail);
         assertThat(userQuery).isPresent();
 
@@ -39,11 +33,10 @@ class TestCreateAndLogin extends AbstractUserTest {
         assertThat(user.getEmail()).isEqualTo(testEmail);
     }
 
-
     @Test
     void testLogin() throws Exception {
-        authorizationTestService.createUser(testEmail, testPassword);
-        authorizationTestService.loginUser(testEmail, testPassword, status().isOk());
+        authorizationService.createUser(testEmail, testPassword);
+        authorizationService.loginUser(testEmail, testPassword, status().isOk());
 
         // VP - Verify that user is able to be authenticated and no projects are assigned to it.
         JSONArray response = new SafaRequest(AppRoutes.Projects.GET_PROJECTS).getWithJsonArray();

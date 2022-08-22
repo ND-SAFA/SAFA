@@ -1,10 +1,10 @@
-package features.collaboration.crud;
+package features.memberships.logic;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 
-import features.collaboration.AbstractSharingTest;
+import common.AbstractSharingTest;
 import org.json.JSONArray;
 import org.junit.jupiter.api.Test;
 
@@ -22,12 +22,12 @@ class TestUpdateAndDeleteMemberships extends AbstractSharingTest {
     @Test
     void testDeleteMembership() throws Exception {
         // Step - Delete project member
-        authorizationTestService.removeMemberFromProject(
+        authorizationService.removeMemberFromProject(
             project,
             Sharee.email);
 
         // Step - Get members
-        JSONArray members = retrievalTestService.getProjectMembers(project);
+        JSONArray members = retrievalService.getProjectMembers(project);
 
         // VP - Verify that single member on project
         assertThat(members.length()).isEqualTo(1);

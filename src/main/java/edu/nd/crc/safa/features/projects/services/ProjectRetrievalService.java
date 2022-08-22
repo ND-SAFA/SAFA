@@ -113,7 +113,7 @@ public class ProjectRetrievalService {
             .getAppEntities(projectVersion);
         List<String> artifactIds = artifacts
             .stream()
-            .map(ArtifactAppEntity::getBaseEntityId)
+            .map(ArtifactAppEntity::getId)
             .collect(Collectors.toList());
         List<TraceAppEntity> traces = this.traceService
             .retrieveTracesInProjectVersion(projectVersion, artifactIds);

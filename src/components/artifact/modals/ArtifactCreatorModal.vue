@@ -31,7 +31,8 @@
 import Vue, { PropType } from "vue";
 import { ArtifactModel, DocumentType } from "@/types";
 import { createArtifact, createArtifactOfType } from "@/util";
-import { artifactModule, documentModule } from "@/store";
+import { documentModule } from "@/store";
+import { artifactStore } from "@/hooks";
 import { handleSaveArtifact } from "@/api";
 import { GenericModal } from "@/components/common";
 import ArtifactCreatorInputs from "./ArtifactCreatorInputs.vue";
@@ -115,7 +116,7 @@ export default Vue.extend({
      */
     parentArtifact(): ArtifactModel | undefined {
       return this.parentId
-        ? artifactModule.getArtifactById(this.parentId)
+        ? artifactStore.getArtifactById(this.parentId)
         : undefined;
     },
     /**

@@ -33,12 +33,8 @@
 <script lang="ts">
 import Vue from "vue";
 import { ArtifactSearchItem } from "@/types";
-import {
-  artifactModule,
-  artifactSelectionModule,
-  viewportModule,
-} from "@/store";
-import { typeOptionsStore } from "@/hooks";
+import { artifactSelectionModule, viewportModule } from "@/store";
+import { typeOptionsStore, artifactStore } from "@/hooks";
 import { GenericArtifactBodyDisplay, Typography } from "@/components/common";
 import { filterArtifacts } from "@/util";
 import FlexBox from "@/components/common/display/FlexBox.vue";
@@ -81,7 +77,7 @@ export default Vue.extend({
     matchText(): string {
       if (!this.queryText) return "";
 
-      const count = artifactModule.artifacts.filter((artifact) =>
+      const count = artifactStore.currentArtifacts.filter((artifact) =>
         filterArtifacts(artifact, this.queryText || "")
       ).length;
 
@@ -91,7 +87,7 @@ export default Vue.extend({
      * @return The artifacts to select from.
      */
     artifacts(): ArtifactSearchItem[] {
-      return Object.entries(artifactModule.getArtifactsByType)
+      return Object.entries(artifactStore.getArtifactsByType)
         .map(([type, artifacts]) => [
           { header: typeOptionsStore.getArtifactTypeDisplay(type) },
           ...artifacts,

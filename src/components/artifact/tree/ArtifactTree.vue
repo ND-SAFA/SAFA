@@ -39,15 +39,13 @@
 import Vue from "vue";
 import { TraceLinkModel, ArtifactModel, CytoCoreGraph } from "@/types";
 import {
-  artifactModule,
   artifactSelectionModule,
   deltaModule,
   documentModule,
   subtreeModule,
-  traceModule,
   viewportModule,
 } from "@/store";
-import { appStore } from "@/hooks";
+import { appStore, artifactStore, traceStore } from "@/hooks";
 import { artifactTreeGraph, cyResetTree } from "@/cytoscape";
 import {
   GenericGraphLink,
@@ -100,15 +98,15 @@ export default Vue.extend({
      * @return All visible artifacts.
      */
     artifacts(): ArtifactModel[] {
-      return artifactModule.artifacts;
+      return artifactStore.currentArtifacts;
     },
     /**
      * @return All visible trace links.
      */
     traceLinks(): TraceLinkModel[] {
       return deltaModule.inDeltaView
-        ? traceModule.traces
-        : traceModule.nonDeclinedTraces;
+        ? traceStore.currentTraces
+        : traceStore.visibleTraces;
     },
     /**
      * @return All subtree trace links.

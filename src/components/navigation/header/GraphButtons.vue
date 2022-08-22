@@ -42,12 +42,12 @@
 import Vue from "vue";
 import { ButtonDefinition, ButtonType } from "@/types";
 import {
-  artifactModule,
   artifactSelectionModule,
   commitModule,
   documentModule,
   viewportModule,
 } from "@/store";
+import { artifactStore } from "@/hooks";
 import { redoCommit, undoCommit } from "@/api";
 import { cyZoomIn, cyZoomOut } from "@/cytoscape";
 import { GenericIconButton, CheckmarkMenu, FlexBox } from "@/components/common";
@@ -75,7 +75,7 @@ export default Vue.extend({
      * @return The visible project artifacts.
      */
     artifacts() {
-      return artifactModule.artifacts;
+      return artifactStore.currentArtifacts;
     },
     /**
      * @return The change buttons.

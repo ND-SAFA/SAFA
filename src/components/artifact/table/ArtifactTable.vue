@@ -76,13 +76,8 @@
 <script lang="ts">
 import Vue from "vue";
 import { ArtifactModel, ArtifactDeltaState, FlatArtifact } from "@/types";
-import {
-  artifactModule,
-  artifactSelectionModule,
-  deltaModule,
-  documentModule,
-} from "@/store";
-import { appStore } from "@/hooks";
+import { artifactSelectionModule, deltaModule, documentModule } from "@/store";
+import { appStore, artifactStore } from "@/hooks";
 import {
   Typography,
   AttributeChip,
@@ -186,7 +181,7 @@ export default Vue.extend({
     items(): FlatArtifact[] {
       const selectedTypes = this.inDeltaView ? this.selectedDeltaTypes : [];
 
-      return artifactModule.flatArtifacts.filter(
+      return artifactStore.flatArtifacts.filter(
         ({ id }) =>
           selectedTypes.length === 0 ||
           selectedTypes.includes(deltaModule.getArtifactDeltaType(id))

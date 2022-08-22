@@ -8,9 +8,8 @@ import {
   GeneratedLinksModel,
   FlatTraceLink,
 } from "@/types";
-import { artifactModule, projectModule } from "@/store";
-import { appStore } from "@/hooks";
-import { logStore } from "@/hooks";
+import { projectModule } from "@/store";
+import { appStore, logStore, artifactStore } from "@/hooks";
 import {
   createLink,
   getGeneratedLinks,
@@ -41,8 +40,8 @@ export async function handleGetGeneratedLinks({
     const generatedLinks = await getGeneratedLinks(projectModule.versionId);
 
     generatedLinks.forEach((link) => {
-      const source = artifactModule.getArtifactById(link.sourceId);
-      const target = artifactModule.getArtifactById(link.targetId);
+      const source = artifactStore.getArtifactById(link.sourceId);
+      const target = artifactStore.getArtifactById(link.targetId);
 
       if (link.approvalStatus === ApprovalType.APPROVED) {
         approved.push(link.traceLinkId);

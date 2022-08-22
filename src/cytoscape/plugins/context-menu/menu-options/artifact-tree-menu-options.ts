@@ -1,13 +1,12 @@
 import { EventObject } from "cytoscape";
 import { ArtifactModel, ArtifactData, MenuItem } from "@/types";
 import {
-  artifactModule,
   artifactSelectionModule,
   projectModule,
   subtreeModule,
   viewportModule,
 } from "@/store";
-import { appStore } from "@/hooks";
+import { appStore, artifactStore } from "@/hooks";
 import { enableDrawMode } from "@/cytoscape";
 import { handleDeleteArtifact, handleDuplicateArtifact } from "@/api";
 import { ftaMenuItem } from "./fta-menu-options";
@@ -192,7 +191,7 @@ type ArtifactHandler = (a: ArtifactModel) => void | Promise<void>;
 function handleOnClick(event: EventObject, handler: ArtifactHandler): void {
   if (event.target !== null) {
     const artifactData: ArtifactData = event.target.data();
-    const artifact = artifactModule.getArtifactById(artifactData.id);
+    const artifact = artifactStore.getArtifactById(artifactData.id);
 
     if (!artifact) return;
 

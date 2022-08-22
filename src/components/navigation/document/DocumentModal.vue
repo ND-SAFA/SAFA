@@ -71,7 +71,8 @@
 import Vue, { PropType } from "vue";
 import { DocumentModel } from "@/types";
 import { createDocument, documentTypeOptions } from "@/util";
-import { artifactModule, documentModule, subtreeModule } from "@/store";
+import { documentModule, subtreeModule } from "@/store";
+import { artifactStore } from "@/hooks";
 import { typeOptionsStore } from "@/hooks";
 import { handleDeleteDocument, handleSaveDocument } from "@/api";
 import { ArtifactInput, GenericModal } from "@/components/common";
@@ -166,7 +167,7 @@ export default Vue.extend({
      * Generates children to save on this document.
      */
     handleSaveTypes() {
-      this.editingDocument.artifactIds = artifactModule.allArtifacts
+      this.editingDocument.artifactIds = artifactStore.allArtifacts
         .filter(({ type }) => this.includedTypes.includes(type))
         .map(({ id }) => id);
     },

@@ -62,8 +62,8 @@
 import Vue from "vue";
 import { ArtifactModel } from "@/types";
 import { filterArtifacts } from "@/util";
-import { viewportModule, artifactModule } from "@/store";
-import { typeOptionsStore } from "@/hooks";
+import { viewportModule } from "@/store";
+import { typeOptionsStore, artifactStore } from "@/hooks";
 import {
   Typography,
   GenericArtifactBodyDisplay,
@@ -100,7 +100,7 @@ export default Vue.extend({
      * Returns all visible artifacts.
      */
     allArtifacts(): ArtifactModel[] {
-      return artifactModule.artifacts;
+      return artifactStore.currentArtifacts;
     },
   },
   watch: {
@@ -122,7 +122,7 @@ export default Vue.extend({
      * Updates the saved list of artifacts to match the current search.
      */
     updateArtifacts(): void {
-      const artifacts = artifactModule.artifacts;
+      const artifacts = artifactStore.currentArtifacts;
       const hashTable: Record<string, ArtifactModel[]> = {};
 
       this.artifacts = this.searchText

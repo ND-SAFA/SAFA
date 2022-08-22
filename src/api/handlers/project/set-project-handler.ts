@@ -8,9 +8,8 @@ import {
   errorModule,
   projectModule,
   subtreeModule,
-  viewportModule,
 } from "@/store";
-import { appStore, typeOptionsStore } from "@/hooks";
+import { appStore, layoutStore, typeOptionsStore } from "@/hooks";
 import {
   handleLoadTraceMatrices,
   handleLoadVersion,
@@ -29,7 +28,7 @@ export async function handleResetGraph(
 ): Promise<void> {
   if (isDifferentProject) {
     await subtreeModule.resetHiddenNodes();
-    await viewportModule.setArtifactTreeLayout();
+    await layoutStore.setArtifactTreeLayout();
   }
 
   disableDrawMode();

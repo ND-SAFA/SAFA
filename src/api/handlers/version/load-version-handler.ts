@@ -1,10 +1,5 @@
-import {
-  documentModule,
-  errorModule,
-  projectModule,
-  viewportModule,
-} from "@/store";
-import { appStore } from "@/hooks";
+import { documentModule, errorModule, projectModule } from "@/store";
+import { appStore, layoutStore } from "@/hooks";
 import {
   navigateTo,
   QueryParams,
@@ -74,7 +69,7 @@ export async function handleReloadArtifacts(versionId: string): Promise<void> {
   await handleLoadTraceMatrices();
 
   if (artifacts.length > currentArtifactCount) {
-    await viewportModule.setArtifactTreeLayout();
+    await layoutStore.setArtifactTreeLayout();
   }
 }
 
@@ -89,7 +84,7 @@ export async function handleReloadTraceLinks(versionId: string): Promise<void> {
 
   await projectModule.addOrUpdateTraceLinks(traces);
   await handleLoadTraceMatrices();
-  viewportModule.applyAutomove();
+  layoutStore.applyAutomove();
 }
 
 /**

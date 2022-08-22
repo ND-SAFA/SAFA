@@ -91,7 +91,8 @@ import {
   TraceType,
 } from "@/types";
 import { GenericArtifactBodyDisplay } from "@/components";
-import { artifactModule, deltaModule } from "@/store";
+import { deltaModule } from "@/store";
+import { artifactStore } from "@/hooks";
 import { FlexBox } from "@/components/common";
 import {
   handleApproveLink,
@@ -139,14 +140,14 @@ export default Vue.extend({
     /**
      * @return The artifact this link comes from.
      */
-    sourceArtifact(): ArtifactModel {
-      return artifactModule.getAllArtifactsById[this.link.sourceId];
+    sourceArtifact(): ArtifactModel | undefined {
+      return artifactStore.getArtifactById(this.link.sourceId);
     },
     /**
      * @return The artifact this link goes towards.
      */
-    targetArtifact(): ArtifactModel {
-      return artifactModule.getAllArtifactsById[this.link.targetId];
+    targetArtifact(): ArtifactModel | undefined {
+      return artifactStore.getArtifactById(this.link.targetId);
     },
     /**
      * @return Whether this link can be modified.

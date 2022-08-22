@@ -22,7 +22,7 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { ArtifactModel } from "@/types";
-import { artifactModule } from "@/store";
+import { artifactStore } from "@/hooks";
 import { GenericArtifactBodyDisplay } from "@/components/common/generic";
 import { filterArtifacts } from "@/util";
 
@@ -73,8 +73,8 @@ export default Vue.extend({
      */
     artifacts(): ArtifactModel[] {
       return this.onlyDocumentArtifacts
-        ? artifactModule.artifacts
-        : artifactModule.allArtifacts;
+        ? artifactStore.currentArtifacts
+        : artifactStore.allArtifacts;
     },
   },
   watch: {

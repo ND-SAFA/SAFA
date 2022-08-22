@@ -1,10 +1,6 @@
 import { ArtifactModel, ConfirmationType, IOHandlerCallback } from "@/types";
-import {
-  artifactSelectionModule,
-  projectModule,
-  viewportModule,
-} from "@/store";
-import { logStore } from "@/hooks";
+import { artifactSelectionModule, projectModule } from "@/store";
+import { layoutStore, logStore } from "@/hooks";
 import {
   createArtifact,
   deleteArtifact,
@@ -41,7 +37,7 @@ export async function handleSaveArtifact(
       await projectModule.addOrUpdateArtifacts(createdArtifacts);
       artifactSelectionModule.selectArtifact(createdArtifacts[0].id);
       // TODO: load new layout
-      await viewportModule.setArtifactTreeLayout();
+      await layoutStore.setArtifactTreeLayout();
 
       if (!parentArtifact) {
         onSuccess?.();

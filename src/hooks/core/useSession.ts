@@ -6,6 +6,9 @@ import { AuthToken, SessionModel } from "@/types";
 import { createSession } from "@/util";
 import logStore from "./useLog";
 
+/**
+ * This module defines the state of the current user session.
+ */
 export const useSession = defineStore("session", {
   state() {
     try {

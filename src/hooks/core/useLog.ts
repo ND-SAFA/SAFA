@@ -4,9 +4,18 @@ import { pinia } from "@/plugins";
 import { APIErrorBody, MessageType } from "@/types";
 import { createConfirmDialogueMessage, createSnackbarMessage } from "@/util";
 
+/**
+ * This module controls logging and snackbar messages.
+ */
 export const useLog = defineStore("log", {
   state: () => ({
+    /**
+     * The current snackbar message.
+     */
     message: createSnackbarMessage(),
+    /**
+     * The current confirmation message.
+     */
     confirmation: createConfirmDialogueMessage(),
   }),
   getters: {},

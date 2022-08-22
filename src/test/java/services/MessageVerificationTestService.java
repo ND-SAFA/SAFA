@@ -57,6 +57,13 @@ public class MessageVerificationTestService {
         );
     }
 
+    public void verifyWarningMessage(EntityChangeMessage message) {
+        this.verifyChangeInMessage(message,
+            null,
+            Change.Entity.WARNINGS,
+            Change.Action.UPDATE);
+    }
+
     public void verifyChangeInMessage(EntityChangeMessage message,
                                       UUID typeId,
                                       Change.Entity entity,

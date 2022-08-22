@@ -18,11 +18,11 @@ import org.junit.jupiter.api.Test;
 class TestLayoutRetrieved extends AbstractLayoutTest {
 
     @Test
-    void testValidLayoutExistsInDefaultProject() throws Exception {
+    void testValidLayoutExistsInDefaultProject() {
         Map<String, LayoutPosition> layout = projectAppEntity.getLayout();
 
         // VP - Verify position created for every artifact
-        for (ArtifactAppEntity artifact : this.projectAppEntity.artifacts) {
+        for (ArtifactAppEntity artifact : this.projectAppEntity.getArtifacts()) {
             boolean hasArtifact = layout.containsKey(artifact.id);
             assertThat(hasArtifact).isTrue();
             LayoutPosition artifactPosition = layout.get(artifact.id);

@@ -73,7 +73,7 @@ public abstract class AbstractCorrectnessTest extends ApplicationBaseTest {
     protected LayoutPosition getPosition(ProjectAppEntity project, String artifactName) {
         ArtifactAppEntity artifact =
             project
-                .artifacts
+                .getArtifacts()
                 .stream()
                 .filter(a -> a.name.equals(artifactName))
                 .collect(Collectors.toList())
@@ -85,7 +85,7 @@ public abstract class AbstractCorrectnessTest extends ApplicationBaseTest {
     protected LayoutPosition getLayoutPositionInDocument(ProjectAppEntity project,
                                                          String documentId,
                                                          String artifactName) {
-        String artifactId = retrievalService.getArtifactId(project.artifacts, artifactName);
+        String artifactId = retrievalService.getArtifactId(project.getArtifacts(), artifactName);
         List<DocumentAppEntity> documents = project.getDocuments()
             .stream()
             .filter(d -> d.getDocumentId().equals(documentId))

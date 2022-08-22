@@ -21,12 +21,15 @@ import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.types.TypeAppEntity;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Responsible for
  */
+@RestController
 public class SyncController extends BaseController {
 
     public SyncController(ResourceBuilder resourceBuilder,
@@ -34,9 +37,9 @@ public class SyncController extends BaseController {
         super(resourceBuilder, serviceProvider);
     }
 
-    @GetMapping(AppRoutes.Sync.GET_CHANGES)
+    @PostMapping(AppRoutes.Sync.GET_CHANGES)
     public ProjectAppEntity getChanges(@PathVariable UUID versionId,
-                                       EntityChangeMessage message) {
+                                       @RequestBody EntityChangeMessage message) {
         ProjectAppEntity projectAppEntity = new ProjectAppEntity();
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
         for (Change change : message.getChanges()) {

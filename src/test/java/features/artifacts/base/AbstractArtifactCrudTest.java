@@ -82,12 +82,9 @@ public abstract class AbstractArtifactCrudTest extends AbstractCrudTest<Artifact
     private void verifyArtifactMessage(EntityChangeMessage message,
                                        Change.Action action,
                                        boolean updateLayout) {
-        changeMessageVerifies.verifyArtifactMessage(message, entityId, action);
-        changeMessageVerifies.verifyChangeInMessage(message,
-            null,
-            Change.Entity.WARNINGS,
-            Change.Action.UPDATE);
-        changeMessageVerifies.verifyUpdateLayout(message, updateLayout);
+        this.changeMessageVerifies.verifyArtifactMessage(message, entityId, action);
+        this.changeMessageVerifies.verifyWarningMessage(message);
+        this.changeMessageVerifies.verifyUpdateLayout(message, updateLayout);
     }
 
     /**

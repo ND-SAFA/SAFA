@@ -7,25 +7,27 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import requests.RouteBuilder;
-import requests.SafaRequest;
-
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentArtifact;
-import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.notifications.entities.Change;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
+import common.EntityConstants;
 import features.base.ApplicationBaseTest;
 import org.junit.jupiter.api.Test;
+import requests.RouteBuilder;
+import requests.SafaRequest;
 
 /**
  * Tests that the client is able to remove an artifact from a document
  */
 class TestDeleteArtifactFromDocument extends ApplicationBaseTest {
+
+    EntityConstants.DocumentConstants documentConstants = new EntityConstants.DocumentConstants();
+    EntityConstants.ArtifactConstants artifactConstants = new EntityConstants.ArtifactConstants();
 
     /**
      * Verifies that:
@@ -36,8 +38,8 @@ class TestDeleteArtifactFromDocument extends ApplicationBaseTest {
     void testDeleteArtifactFromDocument() throws Exception {
         // Step - Create, project, document, three artifact
         ProjectVersion projectVersion = createProjectData();
-        Document document = dbEntityBuilder.getDocument(projectName, DocumentConstants.name);
-        Artifact artifact = dbEntityBuilder.getArtifact(projectName, ArtifactConstants.name);
+        Document document = dbEntityBuilder.getDocument(projectName, documentConstants.name);
+        Artifact artifact = dbEntityBuilder.getArtifact(projectName, artifactConstants.name);
 
         // VP - Verify that artifact is linked
         Optional<DocumentArtifact> documentArtifactOptional = this.documentArtifactRepository
@@ -87,30 +89,19 @@ class TestDeleteArtifactFromDocument extends ApplicationBaseTest {
         return dbEntityBuilder
             .newProject(projectName)
             .newVersion(projectName)
-            .newType(projectName, ArtifactConstants.type)
+            .newType(projectName, artifactConstants.type)
             .newArtifactAndBody(projectName,
-                ArtifactConstants.type,
-                ArtifactConstants.name,
-                ArtifactConstants.summary,
-                ArtifactConstants.content)
+                artifactConstants.type,
+                artifactConstants.name,
+                artifactConstants.summary,
+                artifactConstants.body)
             .newDocument(projectName,
-                DocumentConstants.name,
-                DocumentConstants.description,
-                DocumentConstants.type)
-            .newDocumentArtifact(projectName, 0, DocumentConstants.name, ArtifactConstants.name)
+                documentConstants.name,
+                documentConstants.description,
+                documentConstants.type)
+            .newDocumentArtifact(projectName, 0, documentConstants.name, artifactConstants.name)
             .getProjectVersion(projectName, 0);
     }
 
-    static class DocumentConstants {
-        public static final String name = "test-document";
-        public static final String description = "this is a description";
-        public static final DocumentType type = DocumentType.ARTIFACT_TREE;
-    }
 
-    static class ArtifactConstants {
-        public static final String name = "RE-10";
-        public static final String summary = "summary";
-        public static final String content = "content";
-        public static final String type = "requirement";
-    }
 }

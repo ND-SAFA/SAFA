@@ -87,10 +87,10 @@ public class ProjectCommit {
 
     @JsonIgnore
     public boolean shouldUpdateDefaultLayout() {
-        return this.getArtifacts().getAdded().size() +
-            this.getArtifacts().getRemoved().size() +
-            this.getTraces().getAdded().size() +
-            this.getTraces().getRemoved().size() > 0;
+        return this.getArtifacts().getAdded().size()
+            + this.getArtifacts().getRemoved().size()
+            + this.getTraces().getAdded().size()
+            + this.getTraces().getRemoved().size() > 0;
     }
 
     @JsonIgnore

@@ -50,7 +50,7 @@ public class ProjectController extends BaseController {
     public ProjectAppEntity createOrUpdateProject(@RequestBody @Valid ProjectAppEntity projectAppEntity)
         throws SafaError {
 
-        if (projectAppEntity.projectId.isEmpty()) { // new projects expected to have no projectId or projectVersion
+        if (projectAppEntity.getProjectId().isEmpty()) { // new projects expected to have no projectId or projectVersion
             // Step - Create project identifier
             Project projectEntity = Project.fromAppEntity(projectAppEntity);
             this.serviceProvider.getProjectService().saveProjectWithCurrentUserAsOwner(projectEntity);

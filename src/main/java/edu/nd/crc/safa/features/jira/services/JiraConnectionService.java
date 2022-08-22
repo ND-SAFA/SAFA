@@ -65,6 +65,7 @@ public interface JiraConnectionService {
      *
      * @param project       The safa project associated with the JIRA project.
      * @param jiraProjectId The id of the JIRA project.
+     * @return JiraProject The jira project created.
      */
     JiraProject createJiraProjectMapping(Project project, Long jiraProjectId);
 

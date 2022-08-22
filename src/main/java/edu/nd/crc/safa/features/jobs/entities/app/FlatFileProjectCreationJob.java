@@ -3,7 +3,6 @@ package edu.nd.crc.safa.features.jobs.entities.app;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,7 +16,6 @@ import edu.nd.crc.safa.features.errors.entities.db.CommitError;
 import edu.nd.crc.safa.features.errors.repositories.CommitErrorRepository;
 import edu.nd.crc.safa.features.flatfiles.parser.FlatFileParser;
 import edu.nd.crc.safa.features.flatfiles.parser.TimFileParser;
-import edu.nd.crc.safa.features.flatfiles.services.FileUploadService;
 import edu.nd.crc.safa.features.flatfiles.services.FlatFileService;
 import edu.nd.crc.safa.features.jobs.entities.IJobStep;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
@@ -72,15 +70,9 @@ public class FlatFileProjectCreationJob extends CommitJob {
     public void initJobData() throws SafaError, IOException {
         super.initJobData();
         Project project = this.projectVersion.getProject();
-        uploadFlatFiles(project);
+        this.pathToTIMFile = ProjectPaths.Storage.uploadedProjectFilePath(project, ProjectVariables.TIM_FILENAME);
         this.pathToFiles = ProjectPaths.Storage.projectUploadsPath(project, false);
         parseTimFile();
-    }
-
-    private void uploadFlatFiles(Project project) throws IOException {
-        FileUploadService fileUploadService = this.serviceProvider.getFileUploadService();
-        fileUploadService.uploadFilesToServer(project, Arrays.asList(files));
-        this.pathToTIMFile = ProjectPaths.Storage.uploadedProjectFilePath(project, ProjectVariables.TIM_FILENAME);
     }
 
     private void parseTimFile() throws IOException {

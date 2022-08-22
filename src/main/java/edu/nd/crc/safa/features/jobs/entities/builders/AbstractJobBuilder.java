@@ -1,5 +1,7 @@
 package edu.nd.crc.safa.features.jobs.entities.builders;
 
+import java.io.IOException;
+
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.jobs.entities.app.AbstractJob;
 import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
@@ -51,7 +53,7 @@ public abstract class AbstractJobBuilder<I> {
     /**
      * Step 2 - Creates job definition for change.
      */
-    abstract JobDefinition constructJobForWork();
+    abstract JobDefinition constructJobForWork() throws IOException;
 
     @AllArgsConstructor
     protected static class JobDefinition {

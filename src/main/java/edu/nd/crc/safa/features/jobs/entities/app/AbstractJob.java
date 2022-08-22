@@ -64,7 +64,6 @@ public abstract class AbstractJob implements Job {
         for (Method method : jobClass.getMethods()) {
             IJobStep jobStep = method.getAnnotation(IJobStep.class);
             if (jobStep != null) {
-                int position = jobStep.position();
                 JobStepImplementation stepImplementation = new JobStepImplementation(
                     jobStep,
                     method
@@ -114,28 +113,29 @@ public abstract class AbstractJob implements Job {
         JobService jobService = this.serviceProvider.getJobService();
         NotificationService notificationService = this.serviceProvider.getNotificationService();
 
-        getSteps(this.getClass())
-            .forEach(stepImplementation -> {
-                try {
-                    if (this.skipSteps.contains(stepImplementation.annotation.position())) {
-                        return;
-                    }
-                    // Pre-step
-                    jobService.startStep(jobDbEntity);
-                    notificationService.broadcastChange(EntityChangeBuilder.createJobUpdate(jobDbEntity));
-                    // Pre-step
-                    stepImplementation.method.invoke(this);
+        List<JobStepImplementation> jobSteps = getSteps(this.getClass());
 
-                    // Post-step
-                    jobService.endStep(jobDbEntity);
-                    notificationService.broadcastChange(EntityChangeBuilder.createJobUpdate(jobDbEntity));
-                } catch (Exception e) {
-                    jobService.failJob(jobDbEntity);
-                    e.printStackTrace();
-                    notificationService.broadcastChange(EntityChangeBuilder.createJobUpdate(jobDbEntity));
-                    throw new SafaError(e.getMessage());
+        try {
+            for (JobStepImplementation stepImplementation : jobSteps) {
+                if (this.skipSteps.contains(stepImplementation.annotation.position())) {
+                    continue;
                 }
-            });
+                // Pre-step
+                jobService.startStep(jobDbEntity);
+                notificationService.broadcastChange(EntityChangeBuilder.createJobUpdate(jobDbEntity));
+                // Pre-step
+                stepImplementation.method.invoke(this);
+
+                // Post-step
+                jobService.endStep(jobDbEntity);
+                notificationService.broadcastChange(EntityChangeBuilder.createJobUpdate(jobDbEntity));
+            }
+        } catch (Exception e) {
+            jobService.failJob(jobDbEntity);
+            e.printStackTrace();
+            notificationService.broadcastChange(EntityChangeBuilder.createJobUpdate(jobDbEntity));
+            throw new SafaError(e.getMessage());
+        }
 
         this.done();
     }

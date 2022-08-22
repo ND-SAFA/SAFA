@@ -13,7 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 /**
  * Builds job for updating project via flat files.
  */
-public class UpdateProjectByFlatFileJobBuilder extends AbstractJobBuilder<ProjectVersion, Object> {
+public class UpdateProjectByFlatFileJobBuilder extends AbstractJobBuilder<ProjectVersion> {
 
     /**
      * ID of ProjectVersion being updated.
@@ -41,12 +41,7 @@ public class UpdateProjectByFlatFileJobBuilder extends AbstractJobBuilder<Projec
     }
 
     @Override
-    protected Object constructJobWork(ProjectVersion projectVersion) {
-        return null; // TODO: Move flat files here
-    }
-
-    @Override
-    JobDefinition constructJobForWork(Object change) {
+    JobDefinition constructJobForWork() {
         String projectName = this.identifier.getProject().getName();
         JobDbEntity jobDbEntity = this.serviceProvider
             .getJobService()

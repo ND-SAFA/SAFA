@@ -36,7 +36,7 @@ class TestJsonCommitJob extends ApplicationBaseTest {
 
         // Step 2 - Submit project to be created
         String jobIdString = SafaRequest
-            .withRoute(AppRoutes.Jobs.JSON_PROJECT_JOB)
+            .withRoute(AppRoutes.Jobs.CREATE_PROJECT_VIA_JSON)
             .postWithJsonObject(JsonFileUtilities.toJson(projectAppEntity))
             .getString("id");
         UUID jobId = UUID.fromString(jobIdString);

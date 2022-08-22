@@ -28,9 +28,9 @@ public class AppRoutes {
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Jobs {
         protected static final String JOBS_PREFIX = "/jobs";
-        public static final String FLAT_FILE_PROJECT_UPDATE_JOB = JOBS_PREFIX + "/projects/versions/{versionId}";
+        public static final String UPDATE_PROJECT_VIA_FLAT_FILES = JOBS_PREFIX + "/projects/versions/{versionId}";
         public static final String GET_JOBS = JOBS_PREFIX;
-        public static final String JSON_PROJECT_JOB = JOBS_PREFIX + Projects.ROOT;
+        public static final String CREATE_PROJECT_VIA_JSON = JOBS_PREFIX + Projects.ROOT;
         private static final String JOB_ID = JOBS_PREFIX + "/{jobId}";
         public static final String DELETE_JOB = JOB_ID;
     }
@@ -139,6 +139,7 @@ public class AppRoutes {
         public static class Import {
             public static final String ROOT = Projects.ROOT + "/import";
             public static final String BY_ID = Import.ROOT + "/jira/{cloudId}/{id}";
+            public static final String UPDATE = Versions.BY_ID + "/import/jira/{cloudId}/{id}";
         }
     }
 

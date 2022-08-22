@@ -71,7 +71,7 @@ public class JobController extends BaseController {
      * @return The current status of the job created.
      * @throws SafaError Throws error if job failed to start or is under construction.
      */
-    @PostMapping(AppRoutes.Jobs.FLAT_FILE_PROJECT_UPDATE_JOB)
+    @PostMapping(AppRoutes.Jobs.UPDATE_PROJECT_VIA_FLAT_FILES)
     @ResponseStatus(HttpStatus.CREATED)
     public JobAppEntity flatFileProjectUpdateJob(@PathVariable UUID versionId,
                                                  @RequestParam MultipartFile[] files) throws Exception {
@@ -81,7 +81,7 @@ public class JobController extends BaseController {
         return updateProjectByFlatFileJobBuilder.perform();
     }
 
-    @PostMapping(AppRoutes.Jobs.JSON_PROJECT_JOB)
+    @PostMapping(AppRoutes.Jobs.CREATE_PROJECT_VIA_JSON)
     public JobAppEntity createProjectFromJSON(@RequestBody ProjectAppEntity projectAppEntity) throws Exception {
         CreateProjectByJsonJobBuilder createProjectByJsonJobBuilder = new CreateProjectByJsonJobBuilder(
             serviceProvider, projectAppEntity);

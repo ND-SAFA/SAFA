@@ -57,6 +57,7 @@ class TestFlatFileJiraProjectCreation extends JiraBaseFlatFileTest {
         job.setIssues(issues);
 
         // Step - Run job
+        job.getSkipSteps().addAll(List.of(1, 2));
         serviceProvider
             .getJobService()
             .executeJob(jobDbEntity, serviceProvider, job);

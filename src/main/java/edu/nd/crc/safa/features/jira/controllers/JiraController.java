@@ -1,26 +1,26 @@
 package edu.nd.crc.safa.features.jira.controllers;
 
-import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
-import edu.nd.crc.safa.features.jira.entities.app.JiraIssuesResponseDTO;
+import edu.nd.crc.safa.features.jira.entities.api.JiraIdentifier;
 import edu.nd.crc.safa.features.jira.entities.app.JiraProjectResponseDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraResponseDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraResponseDTO.JiraResponseMessage;
 import edu.nd.crc.safa.features.jira.entities.db.JiraAccessCredentials;
-import edu.nd.crc.safa.features.jira.entities.db.JiraProject;
 import edu.nd.crc.safa.features.jira.repositories.JiraAccessCredentialsRepository;
-import edu.nd.crc.safa.features.jira.repositories.JiraProjectRepository;
 import edu.nd.crc.safa.features.jira.services.JiraConnectionService;
 import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
-import edu.nd.crc.safa.features.jobs.entities.builders.UpdateProjectByJiraJobBuilder;
+import edu.nd.crc.safa.features.jobs.entities.builders.CreateProjectViaJiraBuilder;
+import edu.nd.crc.safa.features.jobs.entities.builders.UpdateProjectViaJiraBuilder;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.utilities.ExecutorDelegate;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +42,6 @@ public class JiraController extends BaseController {
     private final SafaUserService safaUserService;
     private final JiraConnectionService jiraConnectionService;
     private final ExecutorDelegate executorDelegate;
-    private final JiraProjectRepository jiraProjectRepository;
 
     @Autowired
     public JiraController(ResourceBuilder resourceBuilder,
@@ -52,7 +51,6 @@ public class JiraController extends BaseController {
         this.accessCredentialsRepository = serviceProvider.getJiraAccessCredentialsRepository();
         this.jiraConnectionService = serviceProvider.getJiraConnectionService();
         this.executorDelegate = serviceProvider.getExecutorDelegate();
-        this.jiraProjectRepository = serviceProvider.getJiraProjectRepository();
     }
 
     @GetMapping(AppRoutes.Jira.RETRIEVE_JIRA_PROJECTS)
@@ -75,37 +73,25 @@ public class JiraController extends BaseController {
     }
 
     @PostMapping(AppRoutes.Jira.Import.BY_ID)
-    public JobAppEntity pullJiraProject(@PathVariable("id") Long jiraProjectId,
-                                        @PathVariable("cloudId") String cloudId) throws Exception {
+    public JobAppEntity createJiraProject(@PathVariable("id") Long jiraProjectId,
+                                          @PathVariable("cloudId") String cloudId) throws Exception {
 
-        UpdateProjectByJiraJobBuilder updateProjectByJiraJobBuilder = new UpdateProjectByJiraJobBuilder(
+        CreateProjectViaJiraBuilder createProjectViaJira = new CreateProjectViaJiraBuilder(
             serviceProvider,
-            jiraProjectId,
-            cloudId);
-        return updateProjectByJiraJobBuilder.perform();
+            new JiraIdentifier(null, jiraProjectId, cloudId)); // version created in job
+        return createProjectViaJira.perform();
     }
 
-    @PutMapping(AppRoutes.Jira.Import.BY_ID)
-    // TODO: Modify the output of the endpoint. Currently it retrieves the updated issues for testing purposes
-    public DeferredResult<JiraIssuesResponseDTO> updateJiraProject(@PathVariable("id") Long jiraProjectId,
-                                                                   @PathVariable("cloudId") String cloudId) {
-        DeferredResult<JiraIssuesResponseDTO> output = executorDelegate.createOutput(5000L);
-
-        executorDelegate.submit(output, () -> {
-            // TODO: @Alberto, please update the artifacts given the changed issues
-            JiraProject jiraProject = jiraProjectRepository.findByJiraProjectId(jiraProjectId)
-                .orElseThrow(() -> new SafaError("JIRA project not imported"));
-            SafaUser principal = safaUserService.getCurrentUser();
-            JiraAccessCredentials credentials = accessCredentialsRepository
-                .findByUserAndCloudId(principal, cloudId).orElseThrow(() -> new SafaError("No JIRA credentials found"));
-            JiraIssuesResponseDTO dto = jiraConnectionService.retrieveUpdatedJIRAIssues(credentials, jiraProjectId,
-                jiraProject.getLastUpdate());
-
-            jiraProject.setLastUpdate(new Date());
-            jiraProjectRepository.save(jiraProject);
-            output.setResult(dto);
-        });
-
-        return output;
+    @PutMapping(AppRoutes.Jira.Import.UPDATE)
+    public JobAppEntity updateJiraProject(@PathVariable UUID versionId,
+                                          @PathVariable("id") Long jiraProjectId,
+                                          @PathVariable("cloudId") String cloudId) throws Exception {
+        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersion();
+        JiraIdentifier jiraIdentifier = new JiraIdentifier(projectVersion, jiraProjectId, cloudId);
+        UpdateProjectViaJiraBuilder updateProjectViaJira = new UpdateProjectViaJiraBuilder(
+            this.serviceProvider,
+            jiraIdentifier
+        );
+        return updateProjectViaJira.perform();
     }
 }

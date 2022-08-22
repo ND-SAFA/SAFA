@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.features.jobs.entities.app;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import edu.nd.crc.safa.common.ProjectEntities;
@@ -11,8 +12,10 @@ import edu.nd.crc.safa.features.jira.entities.api.JiraIdentifier;
 import edu.nd.crc.safa.features.jira.entities.app.JiraIssueDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraProjectResponseDTO;
 import edu.nd.crc.safa.features.jira.entities.db.JiraAccessCredentials;
+import edu.nd.crc.safa.features.jira.entities.db.JiraProject;
 import edu.nd.crc.safa.features.jira.repositories.JiraAccessCredentialsRepository;
 import edu.nd.crc.safa.features.jira.services.JiraConnectionService;
+import edu.nd.crc.safa.features.jobs.entities.IJobStep;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
@@ -32,21 +35,25 @@ public class JiraProjectCreationJob extends CommitJob {
     /**
      * The project version to upload entities to.
      */
-    JiraIdentifier jiraIdentifier;
+    protected JiraIdentifier jiraIdentifier;
     /**
      * The credentials used to access the project.
      */
-    JiraAccessCredentials credentials;
+    protected JiraAccessCredentials credentials;
     /**
      * List of issues in project;
      */
     @Setter
-    List<JiraIssueDTO> issues;
+    protected List<JiraIssueDTO> issues;
     /**
      * JIRA's response for downloading project
      */
     @Setter
-    JiraProjectResponseDTO jiraProjectResponse;
+    protected JiraProjectResponseDTO jiraProjectResponse;
+    /**
+     * The jira project created.
+     */
+    JiraProject jiraProject;
 
     public JiraProjectCreationJob(
         JobDbEntity jobDbEntity,
@@ -57,10 +64,15 @@ public class JiraProjectCreationJob extends CommitJob {
         this.issues = new ArrayList<>();
     }
 
+    public static String createJobName(JiraIdentifier jiraIdentifier) {
+        return createJobName(jiraIdentifier.getJiraProjectId().toString());
+    }
+
     public static String createJobName(String jiraProjectName) {
         return "Importing JIRA project:" + jiraProjectName;
     }
 
+    @IJobStep(name = "Authenticating User Credentials", position = 1)
     public void authenticateUserCredentials() {
         // Step - Get services needed
         SafaUserService safaUserService = this.serviceProvider.getSafaUserService();
@@ -69,25 +81,22 @@ public class JiraProjectCreationJob extends CommitJob {
 
         SafaUser principal = safaUserService.getCurrentUser();
         this.credentials = jiraAccessCredentialsRepository
-            .findByUserAndCloudId(principal, this.jiraIdentifier.getCloudId()).orElseThrow(() -> new SafaError("No "
-                + "JIRA credentials "
-                + "found"));
+            .findByUserAndCloudId(principal, this.jiraIdentifier.getCloudId())
+            .orElseThrow(() -> new SafaError("No JIRA credentials found"));
     }
 
-    /**
-     * Placeholder for retrieving project issues
-     */
+    @IJobStep(name = "Retrieving Jira Project", position = 2)
     public void retrieveJiraProject() {
         // Step - Get required services
         JiraConnectionService jiraConnectionService = this.serviceProvider.getJiraConnectionService();
 
         // Step - Retrieve project information including issues
         Long jiraProjectId = this.jiraIdentifier.getJiraProjectId();
-        this.jiraProjectResponse = jiraConnectionService.retrieveJIRAProject(credentials,
-            jiraProjectId);
+        this.jiraProjectResponse = jiraConnectionService.retrieveJIRAProject(credentials, jiraProjectId);
         this.issues = jiraConnectionService.retrieveJIRAIssues(credentials, jiraProjectId).getIssues();
     }
 
+    @IJobStep(name = "Creating SAFA Project", position = 3)
     public void createSafaProject() {
         // Step - Save as SAFA project
         String projectName = this.jiraProjectResponse.getName();
@@ -101,18 +110,26 @@ public class JiraProjectCreationJob extends CommitJob {
         this.serviceProvider.getJobService().setJobName(this.getJobDbEntity(), createJobName(projectName));
 
         // Step - Map JIRA project to SAFA project
-        this.serviceProvider.getJiraConnectionService().createJiraProjectMapping(project,
-            this.jiraIdentifier.getJiraProjectId());
+        this.jiraProject = this.serviceProvider
+            .getJiraConnectionService()
+            .createJiraProjectMapping(
+                project,
+                this.jiraIdentifier.getJiraProjectId());
     }
 
-    /**
-     * Takes all JIRA issues and extracts their name, type, summary, and description
-     * to convert them into artifacts. Issue links are also extracted.
-     */
+    @IJobStep(name = "Importing Issues and Links", position = 4)
     public void convertIssuesToArtifactsAndTraceLinks() {
-        ProjectEntities projectEntities =
-            this.serviceProvider.getJiraParsingService().parseProjectEntitiesFromIssues(this.issues);
+        ProjectEntities projectEntities = this.retrieveJiraEntities();
         this.projectCommit.addArtifacts(ModificationType.ADDED, projectEntities.getArtifacts());
         this.projectCommit.addTraces(ModificationType.ADDED, projectEntities.getTraces());
+
+        jiraProject.setLastUpdate(new Date());
+        this.serviceProvider.getJiraProjectRepository().save(jiraProject);
+    }
+
+    protected ProjectEntities retrieveJiraEntities() {
+        return this.serviceProvider
+            .getJiraParsingService()
+            .parseProjectEntitiesFromIssues(this.issues);
     }
 }

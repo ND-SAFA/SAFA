@@ -1,12 +1,13 @@
 import { getParam, navigateTo, QueryParams, Routes } from "@/router";
 import { getCurrentVersion, getProjects, handleLoadVersion } from "@/api";
-import { logModule, sessionModule } from "@/store";
+import { logModule } from "@/store";
+import { sessionStore } from "@/hooks";
 
 /**
  * Loads the last stored project.
  */
 export async function handleLoadLastProject(): Promise<void> {
-  if (!sessionModule.getDoesSessionExist) return;
+  if (!sessionStore.doesSessionExist) return;
 
   let versionId = getParam(QueryParams.VERSION);
 

@@ -3,7 +3,6 @@ import {
   documentModule,
   errorModule,
   projectModule,
-  sessionModule,
   viewportModule,
 } from "@/store";
 import {
@@ -22,6 +21,7 @@ import {
   getWarningsInProjectVersion,
 } from "@/api";
 import { DocumentModel } from "@/types";
+import { sessionStore } from "@/hooks";
 
 /**
  * Load the given project version of given Id. Navigates to the artifact
@@ -37,7 +37,7 @@ export async function handleLoadVersion(
   doNavigate = true
 ): Promise<void> {
   appModule.onLoadStart();
-  await sessionModule.updateSession({ versionId });
+  sessionStore.updateSession({ versionId });
 
   const navigateIfNeeded = async () => {
     if (

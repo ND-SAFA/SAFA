@@ -6,13 +6,9 @@ import {
   routesPublic,
   routesWithRequiredProject,
 } from "@/router/routes";
-import {
-  appModule,
-  projectModule,
-  sessionModule,
-  viewportModule,
-} from "@/store";
+import { appModule, projectModule, viewportModule } from "@/store";
 import { handleLoadVersion } from "@/api";
+import { sessionStore } from "@/hooks";
 
 /**
  * Defines list of functions that are run before navigating to a new page.
@@ -29,7 +25,7 @@ export const routerChecks: Record<string, RouterCheck> = {
     from: Route,
     next: NavigationGuardNext
   ) {
-    if (sessionModule.getDoesSessionExist || routesPublic.includes(to.path)) {
+    if (sessionStore.doesSessionExist || routesPublic.includes(to.path)) {
       return;
     }
 

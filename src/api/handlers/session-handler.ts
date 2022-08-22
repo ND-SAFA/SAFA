@@ -4,15 +4,15 @@ import {
   PasswordChangeModel,
   UserModel,
 } from "@/types";
-import { createSession } from "@/util";
 import { getParam, getParams, navigateTo, QueryParams, Routes } from "@/router";
-import { logModule, sessionModule } from "@/store";
+import { logModule } from "@/store";
 import {
   handleClearProject,
   createLoginSession,
   savePassword,
   deleteAccount,
 } from "@/api";
+import { sessionStore } from "@/hooks";
 
 /**
  * Attempts to log a user in.
@@ -26,7 +26,7 @@ export async function handleLogin(user: UserModel): Promise<void> {
 
   delete query[QueryParams.LOGIN_PATH];
 
-  sessionModule.SET_SESSION(session);
+  sessionStore.updateSession(session);
 
   if (typeof goToPath === "string") {
     await navigateTo(goToPath, query);
@@ -39,7 +39,7 @@ export async function handleLogin(user: UserModel): Promise<void> {
  * Logs a user out.
  */
 export async function handleLogout(): Promise<void> {
-  sessionModule.SET_SESSION(createSession());
+  sessionStore.clearSession();
   await navigateTo(Routes.LOGIN_ACCOUNT);
   await handleClearProject();
 }
@@ -50,7 +50,7 @@ export async function handleLogout(): Promise<void> {
  */
 export async function handleAuthentication(): Promise<void> {
   try {
-    const isAuthorized = await sessionModule.hasAuthorization();
+    const isAuthorized = await sessionStore.hasAuthorization;
 
     if (isAuthorized) return;
 

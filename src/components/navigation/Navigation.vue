@@ -12,10 +12,11 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { logModule, sessionModule } from "@/store";
+import { logModule } from "@/store";
 import { AppConfirmModal, ArtifactBodyModal, Snackbar } from "@/components";
 import AppBar from "./AppBar.vue";
 import { LeftNavDrawer, RightNavDrawer } from "./side-panels";
+import { sessionStore } from "@/hooks";
 
 /**
  * Renders the navigation bars and top level modals.
@@ -41,7 +42,7 @@ export default Vue.extend({
      * Returns whether a user is currently logged in.
      */
     isLoggedIn() {
-      return sessionModule.getDoesSessionExist;
+      return sessionStore.doesSessionExist;
     },
   },
 });

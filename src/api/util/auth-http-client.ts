@@ -1,7 +1,8 @@
 import { APIOptions } from "@/types";
-import { logModule, sessionModule } from "@/store";
+import { logModule } from "@/store";
 import { baseURL } from "@/api";
 import { handleLogout } from "@/api/handlers";
+import { sessionStore } from "@/hooks";
 
 /**
  * Executes an http request with the given parameters containing current
@@ -19,7 +20,7 @@ export default async function authHttpClient<T>(
   options: APIOptions,
   setJsonContentType = true
 ): Promise<T> {
-  const token = sessionModule.getToken;
+  const token = sessionStore.getToken;
   const URL = `${baseURL}/${relativeUrl}`;
 
   if (setJsonContentType) {

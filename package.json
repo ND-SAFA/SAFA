@@ -24,6 +24,7 @@
   "main": "background.js",
   "dependencies": {
     "@mdi/font": "^6.3.95",
+    "@vue/composition-api": "^1.7.0",
     "core-js": "^3.6.5",
     "cytoscape-automove": "^1.10.2",
     "cytoscape-context-menus": "^4.1.0",

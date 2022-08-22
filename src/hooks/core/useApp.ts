@@ -178,7 +178,7 @@ export const useApp = defineStore("app", {
       this.isOpen[PanelType.artifactCreator] = type || true;
     },
     /**
-     * Closes the side panels.
+     * Closes the artifact creator.
      */
     closeArtifactCreator(): void {
       this.closePanel(PanelType.artifactCreator);

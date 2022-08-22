@@ -2,7 +2,6 @@
   <v-dialog
     :value="isOpen"
     :width="`${width}px`"
-    @click:outside="$emit('close')"
     :retain-focus="false"
     persistent
   >

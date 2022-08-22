@@ -12,7 +12,7 @@ import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 /**
  * Builds job for creating a project via JSON.
  */
-public class CreateProjectByJsonJobBuilder extends AbstractJobBuilder<ProjectVersion, ProjectCommit> {
+public class CreateProjectByJsonJobBuilder extends AbstractJobBuilder<ProjectVersion> {
 
     /**
      * The project requested to create.
@@ -37,13 +37,12 @@ public class CreateProjectByJsonJobBuilder extends AbstractJobBuilder<ProjectVer
     }
 
     @Override
-    protected ProjectCommit constructJobWork(ProjectVersion projectVersion) {
-        projectAppEntity.setProjectVersion(projectVersion);
-        return new ProjectCommit(projectAppEntity);
-    }
+    JobDefinition constructJobForWork() {
+        // Step - Create initial commit
+        projectAppEntity.setProjectVersion(this.identifier);
+        ProjectCommit projectCommit = new ProjectCommit(projectAppEntity);
 
-    @Override
-    JobDefinition constructJobForWork(ProjectCommit change) {
+        // Step - Create job
         String projectName = this.identifier.getProject().getName();
         String jobName = String.format("Creating project %s.", projectName);
         JobDbEntity jobDbEntity = this.serviceProvider
@@ -52,7 +51,7 @@ public class CreateProjectByJsonJobBuilder extends AbstractJobBuilder<ProjectVer
         CommitJob commitJob = new CommitJob(
             jobDbEntity,
             serviceProvider,
-            change
+            projectCommit
         );
         return new JobDefinition(jobDbEntity, commitJob);
     }

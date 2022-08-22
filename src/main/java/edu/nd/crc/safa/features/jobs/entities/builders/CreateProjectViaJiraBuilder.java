@@ -11,18 +11,15 @@ import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 /**
  * Builds job for pulling issues from JIRA and updating project.
  */
-public class UpdateProjectByJiraJobBuilder extends AbstractJobBuilder<JiraIdentifier, String> {
-    Long jiraProjectId;
-    String cloudId;
+public class CreateProjectViaJiraBuilder extends AbstractJobBuilder<JiraIdentifier> {
+    JiraIdentifier jiraIdentifier;
 
-    public UpdateProjectByJiraJobBuilder(
+    public CreateProjectViaJiraBuilder(
         ServiceProvider serviceProvider,
-        Long jiraProjectId,
-        String cloudId
+        JiraIdentifier jiraIdentifier
     ) {
         super(serviceProvider);
-        this.jiraProjectId = jiraProjectId;
-        this.cloudId = cloudId;
+        this.jiraIdentifier = jiraIdentifier;
     }
 
     @Override
@@ -30,17 +27,13 @@ public class UpdateProjectByJiraJobBuilder extends AbstractJobBuilder<JiraIdenti
         Project project = new Project("", ""); // Set once parse starts
         this.serviceProvider.getProjectService().saveProjectWithCurrentUserAsOwner(project);
         ProjectVersion projectVersion = this.serviceProvider.getVersionService().createInitialProjectVersion(project);
-        return new JiraIdentifier(projectVersion, this.jiraProjectId, this.cloudId);
+        this.jiraIdentifier.setProjectVersion(projectVersion);
+        return this.jiraIdentifier;
     }
 
     @Override
-    protected String constructJobWork(JiraIdentifier input) {
-        return null;
-    }
-
-    @Override
-    JobDefinition constructJobForWork(String change) {
-        String jobName = JiraProjectCreationJob.createJobName(jiraProjectId.toString());
+    JobDefinition constructJobForWork() {
+        String jobName = JiraProjectCreationJob.createJobName(this.jiraIdentifier);
         JobDbEntity jobDbEntity = this.serviceProvider
             .getJobService()
             .createNewJob(JobType.JIRA_PROJECT_CREATION, jobName);

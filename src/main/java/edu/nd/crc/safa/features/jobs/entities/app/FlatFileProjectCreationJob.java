@@ -19,6 +19,7 @@ import edu.nd.crc.safa.features.flatfiles.parser.FlatFileParser;
 import edu.nd.crc.safa.features.flatfiles.parser.TimFileParser;
 import edu.nd.crc.safa.features.flatfiles.services.FileUploadService;
 import edu.nd.crc.safa.features.flatfiles.services.FlatFileService;
+import edu.nd.crc.safa.features.jobs.entities.IJobStep;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
@@ -67,6 +68,7 @@ public class FlatFileProjectCreationJob extends CommitJob {
     }
 
     @Override
+    @IJobStep(name = "Uploading Flat Files", position = 1)
     public void initJobData() throws SafaError, IOException {
         super.initJobData();
         Project project = this.projectVersion.getProject();
@@ -91,6 +93,7 @@ public class FlatFileProjectCreationJob extends CommitJob {
         this.flatFileParser = new FlatFileParser(timFileParser);
     }
 
+    @IJobStep(name = "Parsing Artifact Files", position = 2)
     public void parsingArtifactFiles() throws SafaError {
         EntityParsingResult<ArtifactAppEntity, String> artifactCreationResponse = flatFileParser.parseArtifacts();
         projectCommit.getArtifacts().setAdded(artifactCreationResponse.getEntities());
@@ -98,6 +101,7 @@ public class FlatFileProjectCreationJob extends CommitJob {
         projectCommit.getErrors().addAll(artifactErrors);
     }
 
+    @IJobStep(name = "Parsing Trace Files", position = 3)
     public void parsingTraceFiles() throws SafaError {
         List<ArtifactAppEntity> artifactsCreated = projectCommit.getArtifacts().getAdded();
         EntityParsingResult<TraceAppEntity, String> traceCreationResponse =
@@ -118,6 +122,7 @@ public class FlatFileProjectCreationJob extends CommitJob {
                 .collect(Collectors.toList());
     }
 
+    @IJobStep(name = "Generating Trace Links", position = 4)
     public void generatingTraces() {
         FlatFileService flatFileService = this.getServiceProvider().getFlatFileService();
         List<TraceAppEntity> generatedLinks = flatFileService.generateTraceLinks(

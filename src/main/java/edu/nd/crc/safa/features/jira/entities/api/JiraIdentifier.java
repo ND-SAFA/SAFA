@@ -11,7 +11,16 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class JiraIdentifier {
+    /**
+     * The project version identified by this JIRA project.
+     */
     ProjectVersion projectVersion;
+    /**
+     * The JIRA id of the project.
+     */
     Long jiraProjectId;
+    /**
+     * The JIRA resource ID.w
+     */
     String cloudId;
 }

@@ -21,7 +21,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -144,7 +143,7 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
         return this.getJIRAIssues(credentials, jqlQuery);
     }
 
-    private String encodeValue(String value)  {
+    private String encodeValue(String value) {
         try {
             return URLEncoder.encode(value, StandardCharsets.UTF_8.toString());
         } catch (UnsupportedEncodingException e) {
@@ -182,9 +181,9 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
     }
 
     @Override
-    public void createJiraProjectMapping(Project project, Long jiraProjectId) {
+    public JiraProject createJiraProjectMapping(Project project, Long jiraProjectId) {
         JiraProject jiraProject = new JiraProject(project, jiraProjectId);
-        jiraProjectRepository.save(jiraProject);
+        return jiraProjectRepository.save(jiraProject);
     }
 
     @Getter

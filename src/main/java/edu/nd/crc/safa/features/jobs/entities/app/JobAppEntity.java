@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.features.jobs.entities.app;
 
 import java.lang.reflect.Field;
+import java.util.List;
 
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
@@ -18,7 +19,7 @@ public class JobAppEntity extends JobDbEntity {
     /**
      * The list of steps that must be performed for this job.
      */
-    String[] steps;
+    List<String> steps;
 
     public JobAppEntity() {
         super();

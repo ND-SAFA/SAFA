@@ -7,6 +7,7 @@ import edu.nd.crc.safa.features.jira.entities.app.JiraIssuesResponseDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraProjectResponseDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraRefreshTokenDTO;
 import edu.nd.crc.safa.features.jira.entities.db.JiraAccessCredentials;
+import edu.nd.crc.safa.features.jira.entities.db.JiraProject;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 
 import org.springframework.context.annotation.Scope;
@@ -65,7 +66,7 @@ public interface JiraConnectionService {
      * @param project       The safa project associated with the JIRA project.
      * @param jiraProjectId The id of the JIRA project.
      */
-    void createJiraProjectMapping(Project project, Long jiraProjectId);
+    JiraProject createJiraProjectMapping(Project project, Long jiraProjectId);
 
     /**
      * Retrieve updated issues associated with a JIRA project after a certain timestamp

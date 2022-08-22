@@ -1,7 +1,10 @@
 package edu.nd.crc.safa.features.jobs.entities.app;
 
+import java.util.UUID;
+
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.jobs.entities.IJobStep;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
@@ -38,13 +41,13 @@ public class CommitJob extends AbstractJob {
         this.projectChanger = new ProjectChanger(projectVersion, serviceProvider);
     }
 
+    @IJobStep(name = "Committing Entities", position = -1)
     public void commitArtifactsAndTraceLinks() throws SafaError {
         projectChanger.commit(projectCommit);
     }
 
     @Override
-    public void done() {
-        this.jobDbEntity.setCompletedEntityId(projectCommit.getCommitVersion().getVersionId());
-        super.done();
+    protected UUID getCompletedEntityId() {
+        return projectCommit.getCommitVersion().getVersionId();
     }
 }

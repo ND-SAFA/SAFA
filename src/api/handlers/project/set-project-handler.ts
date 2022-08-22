@@ -46,7 +46,7 @@ export async function handleClearProject(): Promise<void> {
 
   await projectModule.initializeProject(project);
   await handleResetGraph();
-  typeOptionsStore.clear();
+  typeOptionsStore.$reset();
   await subtreeModule.clearSubtrees();
   await removeParams();
 }

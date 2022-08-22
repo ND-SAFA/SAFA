@@ -22,7 +22,7 @@ import {
  * This module tracks the directions of links between artifacts that are
  * allowed, and the icons for each type.
  */
-export const useTypeOptions = defineStore("useTypeOptions", {
+export const useTypeOptions = defineStore("typeOptions", {
   state: () => ({
     /**
      * A mapping of the allowed directions of links between artifacts.
@@ -51,19 +51,13 @@ export const useTypeOptions = defineStore("useTypeOptions", {
   },
   actions: {
     /**
-     * Clears all store data.
-     */
-    clear() {
-      this.artifactTypeDirections = {};
-      this.allArtifactTypes = [];
-      this.artifactTypeIcons = createDefaultTypeIcons([]);
-    },
-    /**
      * Changes what directions of trace links between artifacts are allowed.
      */
-    initializeTypeIcons(artifactTypes: ArtifactTypeModel[]): void {
-      this.artifactTypeIcons = createDefaultTypeIcons(artifactTypes);
-      this.allArtifactTypes = artifactTypes;
+    initializeTypeIcons(allArtifactTypes: ArtifactTypeModel[]): void {
+      this.$patch({
+        artifactTypeIcons: createDefaultTypeIcons(allArtifactTypes),
+        allArtifactTypes,
+      });
     },
     /**
      * Changes what directions of trace links between artifacts are allowed.
@@ -90,14 +84,16 @@ export const useTypeOptions = defineStore("useTypeOptions", {
       newArtifacts.forEach(({ type }) => {
         if (this.artifactTypeDirections[type]) return;
 
-        this.artifactTypeIcons = {
-          ...this.artifactTypeIcons,
-          [type]: defaultTypeIcon,
-        };
-        this.artifactTypeDirections = {
-          ...this.artifactTypeDirections,
-          [type]: [],
-        };
+        this.$patch({
+          artifactTypeIcons: {
+            ...this.artifactTypeIcons,
+            [type]: defaultTypeIcon,
+          },
+          artifactTypeDirections: {
+            ...this.artifactTypeDirections,
+            [type]: [],
+          },
+        });
       });
     },
     /**

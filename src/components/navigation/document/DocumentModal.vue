@@ -21,16 +21,21 @@
         item-text="name"
         item-value="id"
       />
-      <artifact-input
-        label="Document Artifacts"
-        v-model="editingDocument.artifactIds"
+      <v-autocomplete
+        filled
+        multiple
+        label="Include Artifact Types"
+        v-model="includedTypes"
+        :items="artifactTypes"
+        @blur="handleSaveTypes"
       />
+      <artifact-input label="Artifacts" v-model="editingDocument.artifactIds" />
       <v-switch label="Include artifact children" v-model="includeChildren" />
       <v-autocomplete
         v-if="includeChildren"
         filled
         multiple
-        label="Included Child Types"
+        label="Include Child Types"
         v-model="includedChildTypes"
         :items="artifactTypes"
         @blur="handleSaveChildren"
@@ -66,7 +71,12 @@
 import Vue, { PropType } from "vue";
 import { DocumentModel } from "@/types";
 import { createDocument, documentTypeOptions } from "@/util";
-import { documentModule, subtreeModule, typeOptionsModule } from "@/store";
+import {
+  artifactModule,
+  documentModule,
+  subtreeModule,
+  typeOptionsModule,
+} from "@/store";
 import { handleDeleteDocument, handleSaveDocument } from "@/api";
 import { ArtifactInput, GenericModal } from "@/components/common";
 
@@ -91,6 +101,7 @@ export default Vue.extend({
       confirmDelete: false,
       isValid: false,
       types: documentTypeOptions(),
+      includedTypes: [] as string[],
       includeChildren: false,
       includedChildTypes: [] as string[],
       childIds: [] as string[],
@@ -154,6 +165,14 @@ export default Vue.extend({
       this.editingDocument = createDocument(this.document);
       this.confirmDelete = false;
       this.$emit("close");
+    },
+    /**
+     * Generates children to save on this document.
+     */
+    handleSaveTypes() {
+      this.editingDocument.artifactIds = artifactModule.allArtifacts
+        .filter(({ type }) => this.includedTypes.includes(type))
+        .map(({ id }) => id);
     },
     /**
      * Generates children to save on this document.

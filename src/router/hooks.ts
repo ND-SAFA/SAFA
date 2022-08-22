@@ -13,7 +13,6 @@ export async function navigateTo(
   route: Routes | string,
   query?: Record<string, string | (string | null)[]>
 ): Promise<void> {
-  console.trace(route, query);
   if (router.currentRoute.path === route && !query) {
     return;
   } else {

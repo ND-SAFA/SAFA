@@ -82,27 +82,16 @@ public class JiraController extends BaseController {
         return createProjectViaJira.perform();
     }
 
-    @PutMapping(AppRoutes.Jira.Import.BY_ID)
-    // TODO: Modify the output of the endpoint. Currently it retrieves the updated issues for testing purposes
-    public DeferredResult<JiraIssuesResponseDTO> updateJiraProject(@PathVariable("id") Long jiraProjectId,
-                                                                   @PathVariable("cloudId") String cloudId) {
-        DeferredResult<JiraIssuesResponseDTO> output = executorDelegate.createOutput(5000L);
-
-        executorDelegate.submit(output, () -> {
-            // TODO: @Alberto, please update the artifacts given the changed issues
-            JiraProject jiraProject = jiraProjectRepository.findByJiraProjectId(jiraProjectId)
-                .orElseThrow(() -> new SafaError("JIRA project not imported"));
-            SafaUser principal = safaUserService.getCurrentUser();
-            JiraAccessCredentials credentials = accessCredentialsRepository
-                .findByUserAndCloudId(principal, cloudId).orElseThrow(() -> new SafaError("No JIRA credentials found"));
-            JiraIssuesResponseDTO dto = jiraConnectionService.retrieveUpdatedJIRAIssues(credentials, jiraProjectId,
-                jiraProject.getLastUpdate());
-
-            jiraProject.setLastUpdate(new Date());
-            jiraProjectRepository.save(jiraProject);
-            output.setResult(dto);
-        });
-
-        return output;
+    @PutMapping(AppRoutes.Jira.Import.UPDATE)
+    public JobAppEntity updateJiraProject(@PathVariable UUID versionId,
+                                          @PathVariable("id") Long jiraProjectId,
+                                          @PathVariable("cloudId") String cloudId) throws Exception {
+        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersion();
+        JiraIdentifier jiraIdentifier = new JiraIdentifier(projectVersion, jiraProjectId, cloudId);
+        UpdateProjectViaJiraBuilder updateProjectViaJira = new UpdateProjectViaJiraBuilder(
+            this.serviceProvider,
+            jiraIdentifier
+        );
+        return updateProjectViaJira.perform();
     }
 }

@@ -139,6 +139,7 @@ public class AppRoutes {
         public static class Import {
             public static final String ROOT = Projects.ROOT + "/import";
             public static final String BY_ID = Import.ROOT + "/jira/{cloudId}/{id}";
+            public static final String UPDATE = Versions.BY_ID + "/import/jira/{cloudId}/{id}";
         }
     }
 

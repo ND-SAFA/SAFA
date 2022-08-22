@@ -3,6 +3,7 @@ package edu.nd.crc.safa.features.documents.controller;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
@@ -74,10 +75,17 @@ public class DocumentArtifactController extends BaseDocumentController {
 
         LayoutManager layoutManager = new LayoutManager(serviceProvider, projectVersion);
         layoutManager.generateDocumentLayout(document, true);
+        List<UUID> artifactIds = artifacts
+            .stream()
+            .map(ArtifactAppEntity::getId)
+            .map(UUID::fromString)
+            .collect(Collectors.toList());
+
         this.notificationService.broadcastChange(
             EntityChangeBuilder
                 .create(versionId)
                 .withDocumentUpdate(List.of(documentId))
+                .withArtifactsUpdate(artifactIds)
         );
         return artifacts;
     }

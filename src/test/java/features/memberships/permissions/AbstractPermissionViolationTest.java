@@ -28,7 +28,7 @@ public abstract class AbstractPermissionViolationTest extends AbstractSharingTes
     @Test
     protected void attemptProjectEdit() throws Exception {
         // Step - Log in as other user
-        authorizationTestService.loginUser(Sharee.email, Sharee.password, true);
+        authorizationService.loginUser(Sharee.email, Sharee.password, true);
 
         // Step - Perform violating action
         String message = performViolatingAction().getString("message");

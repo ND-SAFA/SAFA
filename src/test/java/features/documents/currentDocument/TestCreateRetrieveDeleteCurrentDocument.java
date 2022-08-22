@@ -54,6 +54,6 @@ class TestCreateRetrieveDeleteCurrentDocument extends ApplicationBaseTest {
     }
 
     String getCurrentDocumentId(ProjectVersion projectVersion) {
-        return retrievalTestService.getProjectAtVersion(projectVersion).currentDocumentId;
+        return retrievalService.getProjectAtVersion(projectVersion).currentDocumentId;
     }
 }

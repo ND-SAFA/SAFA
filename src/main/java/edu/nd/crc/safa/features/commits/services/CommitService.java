@@ -83,6 +83,9 @@ public class CommitService {
             .withTracesUpdate(traceChanges.getUpdatedIds())
             .withTracesDelete(traceChanges.getDeletedIds())
             .withWarningsUpdate();
+        if (projectCommit.shouldUpdateDefaultLayout()) {
+            builder.withUpdateLayout();
+        }
 
         this.notificationService.broadcastChange(builder);
 

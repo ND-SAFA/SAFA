@@ -25,18 +25,18 @@ class TestCreateAndLogin extends ApplicationBaseTest {
 
     @Test
     void testCreateAccount() throws Exception {
-        authorizationTestService.createUser(testEmail, testPassword);
+        authorizationService.createUser(testEmail, testPassword);
         Optional<SafaUser> userQuery = safaUserRepository.findByEmail(testEmail);
         assertThat(userQuery).isPresent();
 
         SafaUser user = userQuery.get();
         assertThat(user.getEmail()).isEqualTo(testEmail);
     }
-    
+
     @Test
     void testLogin() throws Exception {
-        authorizationTestService.createUser(testEmail, testPassword);
-        authorizationTestService.loginUser(testEmail, testPassword, status().isOk());
+        authorizationService.createUser(testEmail, testPassword);
+        authorizationService.loginUser(testEmail, testPassword, status().isOk());
 
         // VP - Verify that user is able to be authenticated and no projects are assigned to it.
         JSONArray response = new SafaRequest(AppRoutes.Projects.GET_PROJECTS).getWithJsonArray();

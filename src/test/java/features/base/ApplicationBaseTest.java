@@ -40,13 +40,13 @@ public abstract class ApplicationBaseTest extends EntityBaseTest {
     @LocalServerPort
     protected Integer port;
     protected String projectName = this.getClass().getName();
-    protected CommitTestService commitTestService = new CommitTestService();
-    protected NotificationTestService notificationTestService;
-    protected CreationTestService creationTestService;
-    protected AssertionTestService assertionTestService = new AssertionTestService();
-    protected RetrievalTestService retrievalTestService;
-    protected AuthorizationTestService authorizationTestService;
-    protected MessageVerificationTestService messageVerificationTestService = new MessageVerificationTestService();
+    protected CommitTestService commitService = new CommitTestService();
+    protected NotificationTestService notificationService;
+    protected CreationTestService creationService;
+    protected AssertionTestService assertionService = new AssertionTestService();
+    protected RetrievalTestService retrievalService;
+    protected AuthorizationTestService authorizationService;
+    protected MessageVerificationTestService changeMessageVerifies = new MessageVerificationTestService();
 
     /**
      * Builders
@@ -82,10 +82,10 @@ public abstract class ApplicationBaseTest extends EntityBaseTest {
      */
     private void initTestServices() {
         assert this.dbEntityBuilder != null;
-        notificationTestService = new NotificationTestService(port);
-        creationTestService = new CreationTestService(this.serviceProvider, this.dbEntityBuilder);
-        retrievalTestService = new RetrievalTestService(this.serviceProvider, this.dbEntityBuilder);
-        authorizationTestService = new AuthorizationTestService(this.serviceProvider, this.dbEntityBuilder);
+        notificationService = new NotificationTestService(port);
+        creationService = new CreationTestService(this.serviceProvider, this.dbEntityBuilder);
+        retrievalService = new RetrievalTestService(this.serviceProvider, this.dbEntityBuilder);
+        authorizationService = new AuthorizationTestService(this.serviceProvider, this.dbEntityBuilder);
     }
 
     /**
@@ -137,7 +137,7 @@ public abstract class ApplicationBaseTest extends EntityBaseTest {
         SafaRequest.setMockMvc(mockMvc);
         SafaRequest.clearAuthorizationToken();
         token = null;
-        this.authorizationTestService.defaultLogin();
+        this.authorizationService.defaultLogin();
         this.dbEntityBuilder.setCurrentUser(currentUser);
     }
 }

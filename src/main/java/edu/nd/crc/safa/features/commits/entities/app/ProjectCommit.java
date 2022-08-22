@@ -16,6 +16,7 @@ import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -82,6 +83,19 @@ public class ProjectCommit {
     public void addTrace(ModificationType modificationType,
                          TraceAppEntity trace) {
         this.addEntity(modificationType, this.traces, trace);
+    }
+
+    @JsonIgnore
+    public boolean shouldUpdateDefaultLayout() {
+        return this.getArtifacts().getAdded().size() +
+            this.getArtifacts().getRemoved().size() +
+            this.getTraces().getAdded().size() +
+            this.getTraces().getRemoved().size() > 0;
+    }
+
+    @JsonIgnore
+    public ArtifactAppEntity getArtifact(ModificationType modificationType, int index) {
+        return this.generateMod2Entities(this.artifacts).get(modificationType).get(index);
     }
 
     private <T extends IAppEntity> void addEntities(ModificationType modificationType,

@@ -44,7 +44,7 @@ class TestCreateAndRetrieveRule extends ApplicationBaseTest {
 
             // VP - Verify that ID is returned
             assertThat(ruleCreated).isNotNull();
-            assertionTestService.assertObjectsMatch(JsonFileUtilities.toJson(rule), ruleCreated, List.of("id"));
+            assertionService.assertObjectsMatch(JsonFileUtilities.toJson(rule), ruleCreated, List.of("id"));
 
             // Step - Create violating rule entities
             ruleTest.createViolatingRuleEntities(projectVersion, this.dbEntityBuilder);

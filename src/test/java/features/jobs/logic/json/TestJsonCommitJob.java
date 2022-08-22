@@ -52,7 +52,7 @@ class TestJsonCommitJob extends ApplicationBaseTest {
         UUID jobId = UUID.fromString(jobIdString);
 
         // Step - Get Job and subscribe for updates
-        notificationTestService.createNewConnection(defaultUser).subscribeToJob(defaultUser,
+        notificationService.createNewConnection(defaultUser).subscribeToJob(defaultUser,
             jobService.getJobById(jobId));
 
         // VP - Verify that job has finished.
@@ -63,7 +63,7 @@ class TestJsonCommitJob extends ApplicationBaseTest {
 
         // Step - Retrieve project created
         ProjectVersion projectVersion = this.projectVersionRepository.findByVersionId(versionId);
-        ProjectAppEntity project = retrievalTestService.getProjectAtVersion(projectVersion);
+        ProjectAppEntity project = retrievalService.getProjectAtVersion(projectVersion);
 
         // VP - Verify project was created with name and description
         assertThat(project.getName()).isEqualTo(projectName);

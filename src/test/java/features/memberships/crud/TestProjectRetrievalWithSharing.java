@@ -22,7 +22,7 @@ class TestProjectRetrievalWithSharing extends AbstractSharingTest {
     @Test
     void sharedProjectAppearsInGetProjects() throws Exception {
         // Step - Login as other user
-        authorizationTestService.loginUser(Sharee.email, Sharee.password, true);
+        authorizationService.loginUser(Sharee.email, Sharee.password, true);
 
         // Step - Get projects for user who got shared with
         JSONArray projects = SafaRequest

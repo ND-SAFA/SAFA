@@ -10,7 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 /**
  * Creates a project under the default user and shares with an external account, Sharee.
  */
-public abstract class AbstractSharingTest extends ApplicationBaseTest {
+public abstract class AbstractSharingTest extends ApplicationBaseTest implements IShareTest {
 
     /**
      * Project role of sharee.
@@ -27,30 +27,30 @@ public abstract class AbstractSharingTest extends ApplicationBaseTest {
 
     @BeforeEach
     public void setupProject() throws Exception {
-        createShareeAccountAndShareProject();
+        setupTestResources();
     }
 
-    protected void createShareeAccountAndShareProject() throws Exception {
+    protected void setupTestResources() throws Exception {
         // Step - Create project and initial version
-        this.projectVersion = creationTestService.createProjectWithNewVersion(projectName);
+        this.projectVersion = creationService.createProjectWithNewVersion(projectName);
         this.project = this.projectVersion.getProject();
 
         // Step - Create other user to share project with.
-        this.authorizationTestService.createUser(Sharee.email, Sharee.password);
+        this.authorizationService.createUser(Sharee.email, Sharee.password);
 
         // Step - Share project with sharee
-        creationTestService.shareProject(
+        creationService.shareProject(
             this.projectVersion.getProject(),
             Sharee.email,
             this.otherUserProjectRole);
 
         // Step - Subscribe Sharee to project  notifications
-        notificationTestService
+        notificationService
             .createNewConnection(Sharee.email)
             .subscribeToProject(Sharee.email, project);
 
         // Step - Subscribe Sharee to version notifications
-        notificationTestService
+        notificationService
             .createNewConnection(Sharee.email)
             .subscribeToVersion(Sharee.email, projectVersion);
     }
@@ -62,10 +62,20 @@ public abstract class AbstractSharingTest extends ApplicationBaseTest {
         return ProjectRole.VIEWER;
     }
 
+    @Override
+    public String getShareeEmail() {
+        return Sharee.email;
+    }
+
+    @Override
+    public String getShareePassword() {
+        return Sharee.password;
+    }
+
     /**
      * The account for which the project is shared with.
      */
-    protected static class Sharee {
+    public static class Sharee {
         public static final String email = "otherUser@gmail.com";
         public static final String password = "otherUserPassword";
     }

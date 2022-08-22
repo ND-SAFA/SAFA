@@ -21,7 +21,7 @@ public class TestViewPermissionViolation extends AbstractPermissionViolationTest
         CommitBuilder commitBuilder = CommitBuilder
             .withVersion(projectVersion)
             .withAddedArtifact(Constants.artifact); // attempt to edit project
-        return commitTestService.commitWithStatus(commitBuilder, status().is4xxClientError());
+        return commitService.commitWithStatus(commitBuilder, status().is4xxClientError());
     }
 
     @Override

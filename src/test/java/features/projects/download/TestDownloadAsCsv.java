@@ -24,7 +24,7 @@ class TestDownloadAsCsv extends ApplicationBaseTest {
 
     @Test
     void downloadDefaultProject() throws Exception {
-        Pair<ProjectVersion, ProjectVersion> response = creationTestService.createDualVersions(projectName, true);
+        Pair<ProjectVersion, ProjectVersion> response = creationService.createDualVersions(projectName, true);
         ProjectVersion projectVersion = response.getValue0();
         AuthorizationTestService.setAuthorization(serviceProvider);
         ProjectAppEntity projectAppEntity = this.serviceProvider

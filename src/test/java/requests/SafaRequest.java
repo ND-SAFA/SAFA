@@ -120,8 +120,15 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
                                          ResultMatcher resultMatcher,
                                          String localAuthorizationToken
     ) throws Exception {
-        String content = body instanceof JSONObject || body instanceof JSONArray
-            ? body.toString() : JsonFileUtilities.toJson(body).toString();
+        String content;
+        if (body instanceof JSONObject || body instanceof JSONArray) {
+            content = body.toString();
+        } else if (body instanceof List) {
+            content = JsonFileUtilities.toJsonArray(body).toString();
+        } else {
+            content = JsonFileUtilities.toJson(body).toString();
+        }
+
         return sendAuthenticatedRequest(
             post(this.buildEndpoint())
                 .content(content)

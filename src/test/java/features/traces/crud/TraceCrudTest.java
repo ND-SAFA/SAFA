@@ -4,9 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.UUID;
 
-import builders.CommitBuilder;
-import builders.ProjectBuilder;
-
 import edu.nd.crc.safa.features.common.IAppEntityService;
 import edu.nd.crc.safa.features.notifications.entities.Change;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
@@ -15,8 +12,9 @@ import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.traces.entities.db.TraceType;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
+import builders.CommitBuilder;
+import builders.ProjectBuilder;
 import common.AbstractCrudTest;
-import org.json.JSONObject;
 
 public class TraceCrudTest extends AbstractCrudTest<TraceAppEntity> {
     private final TraceAppEntity trace = new TraceAppEntity(
@@ -51,20 +49,19 @@ public class TraceCrudTest extends AbstractCrudTest<TraceAppEntity> {
 
     @Override
     protected UUID createEntity() throws Exception {
-        JSONObject traceJson = commitTrace();
-        String id = traceJson.getString("traceLinkId");
+        TraceAppEntity traceAdded = commitTrace();
 
         // Step - Setting missing properties
-        trace.setSourceId(traceJson.getString("sourceId"));
-        trace.setTargetId(traceJson.getString("targetId"));
-        trace.setTraceLinkId(id);
+        trace.setSourceId(traceAdded.getSourceId());
+        trace.setTargetId(traceAdded.getTargetId());
+        trace.setTraceLinkId(traceAdded.getTraceLinkId());
 
-        return UUID.fromString(id);
+        return UUID.fromString(traceAdded.getTraceLinkId());
     }
 
     @Override
     protected void verifyCreatedEntity(TraceAppEntity retrievedEntity) {
-        assertionTestService.assertMatch(trace, retrievedEntity);
+        assertionService.assertMatch(trace, retrievedEntity);
     }
 
     @Override
@@ -80,7 +77,7 @@ public class TraceCrudTest extends AbstractCrudTest<TraceAppEntity> {
 
     @Override
     protected void verifyUpdatedEntity(TraceAppEntity retrievedEntity) {
-        assertionTestService.assertMatch(trace, retrievedEntity);
+        assertionService.assertMatch(trace, retrievedEntity);
         assertThat(retrievedEntity.getScore()).isEqualTo(1);
     }
 
@@ -91,7 +88,7 @@ public class TraceCrudTest extends AbstractCrudTest<TraceAppEntity> {
 
     @Override
     protected void deleteEntity(TraceAppEntity entity) throws Exception {
-        commitTestService
+        commitService
             .commit(CommitBuilder
                 .withVersion(projectVersion)
                 .withRemovedTrace(entity));
@@ -99,21 +96,21 @@ public class TraceCrudTest extends AbstractCrudTest<TraceAppEntity> {
 
     @Override
     protected void verifyDeletionMessage(EntityChangeMessage deletionMessage) {
-        messageVerificationTestService.verifyTraceMessage(deletionMessage, entityId, Change.Action.DELETE);
+        changeMessageVerifies.verifyTraceMessage(deletionMessage, entityId, Change.Action.DELETE);
     }
 
     private void verifyTraceUpdateMessage(EntityChangeMessage message) {
-        messageVerificationTestService.verifyTraceMessage(message, entityId, Change.Action.UPDATE);
+        changeMessageVerifies.verifyTraceMessage(message, entityId, Change.Action.UPDATE);
     }
 
-    private JSONObject commitTrace() throws Exception {
-        return this.commitTestService
+    private TraceAppEntity commitTrace() throws Exception {
+        return this.commitService
             .commit(
                 CommitBuilder
                     .withVersion(projectVersion)
                     .withAddedTrace(trace))
-            .getJSONObject("traces")
-            .getJSONArray("added")
-            .getJSONObject(0);
+            .getTraces()
+            .getAdded()
+            .get(0);
     }
 }

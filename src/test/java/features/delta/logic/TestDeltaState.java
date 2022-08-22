@@ -54,7 +54,7 @@ class TestDeltaState extends AbstractDeltaTest {
         verifyArtifactInDelta(artifactDelta, "added", Constants.ARTIFACT_ADDED);
         verifyArtifactInDelta(artifactDelta, "removed", Constants.ARTIFACT_REMOVED);
 
-        ProjectAppEntity beforeAppEntity = retrievalTestService.getProjectAtVersion(beforeVersion);
+        ProjectAppEntity beforeAppEntity = retrievalService.getProjectAtVersion(beforeVersion);
         List<String> beforeArtifactNames = beforeAppEntity.getArtifactNames();
 
         // VP - Verify added artifact does not exist in before version.
@@ -64,7 +64,7 @@ class TestDeltaState extends AbstractDeltaTest {
             .hasSize(DefaultProjectConstants.Entities.N_ARTIFACTS);
 
         // Step - Collect list of artifact names in the after version.
-        ProjectAppEntity afterAppEntity = retrievalTestService.getProjectAtVersion(afterVersion);
+        ProjectAppEntity afterAppEntity = retrievalService.getProjectAtVersion(afterVersion);
         List<String> afterArtifactNames = afterAppEntity
             .getArtifacts()
             .stream()

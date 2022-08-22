@@ -92,7 +92,7 @@ public class CreationTestService {
     }
 
     public JSONObject createOrUpdateDocumentJson(ProjectVersion projectVersion,
-                                                 JSONObject docJson) throws Exception {
+                                                 Object docJson) throws Exception {
         return
             SafaRequest
                 .withRoute(AppRoutes.Documents.CREATE_OR_UPDATE_DOCUMENT)
@@ -102,7 +102,7 @@ public class CreationTestService {
 
     public JSONArray addArtifactToDocument(ProjectVersion projectVersion,
                                            Document document,
-                                           JSONArray artifactsJson) throws Exception {
+                                           Object artifactsJson) throws Exception {
         return SafaRequest
             .withRoute(AppRoutes.DocumentArtifact.ADD_ARTIFACTS_TO_DOCUMENT)
             .withVersion(projectVersion)

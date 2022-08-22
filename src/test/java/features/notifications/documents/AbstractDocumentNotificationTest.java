@@ -1,13 +1,10 @@
 package features.notifications.documents;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
-import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentColumnAppEntity;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
@@ -16,7 +13,6 @@ import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
 
 import features.notifications.AbstractNotificationTest;
 import org.json.JSONObject;
-import requests.SafaRequest;
 
 public abstract class AbstractDocumentNotificationTest extends AbstractNotificationTest {
     /**
@@ -26,47 +22,37 @@ public abstract class AbstractDocumentNotificationTest extends AbstractNotificat
     /**
      * Instance of constants, including document being manipulated
      */
-    Constants constants = new Constants();
+    protected DocumentConstants documentConstants = new DocumentConstants();
+
+    protected void createDocumentAndVerifyMessage() throws Exception {
+        this.createDocument();
+        EntityChangeMessage message = this.notificationService.getNextMessage(Sharee.email);
+        this.changeMessageVerifies.verifyDocumentChange(
+            message,
+            this.documentId,
+            Change.Action.UPDATE
+        );
+        this.changeMessageVerifies.verifyUpdateLayout(message, false);
+    }
 
     protected void createDocument() throws Exception {
-        JSONObject response = SafaRequest
-            .withRoute(AppRoutes.Documents.CREATE_OR_UPDATE_DOCUMENT)
-            .withVersion(projectVersion)
-            .postWithJsonObject(constants.document);
-        this.documentId = UUID.fromString(response.getString("documentId"));
-        this.constants.document.setDocumentId(this.documentId.toString());
+        JSONObject response = this.creationService.createOrUpdateDocumentJson(
+            this.projectVersion,
+            this.documentConstants.document);
+        setDocumentId(response.getString("documentId"));
     }
 
-    @Override
-    protected void verifyShareeMessage(EntityChangeMessage message) {
-        this.verifyDocumentMessage(message, Change.Action.UPDATE);
+    public void setDocumentId(String documentId) {
+        this.documentId = UUID.fromString(documentId);
+        this.documentConstants.document.setDocumentId(this.documentId.toString());
     }
 
-    protected void verifyDocumentMessage(EntityChangeMessage message,
-                                         Change.Action action) {
-        assertThat(message.getChanges())
-            .as("single change in message")
-            .hasSize(1);
-
-        Change change = message.getChanges().get(0);
-
-        assertThat(change.getEntity())
-            .as("Entity = DOCUMENT")
-            .isEqualTo(Change.Entity.DOCUMENT);
-        assertThat(change.getAction())
-            .as("Action = UPDATE")
-            .isEqualTo(action);
-        assertThat(change.getEntityIds())
-            .as("Entity ID = Document.id")
-            .hasSize(1).contains(this.documentId);
-    }
-
-    static class Constants {
+    public static class DocumentConstants {
         private final String name = "document-name";
         private final String description = "document-description";
         private final List<String> artifactIds = new ArrayList<>();
         private final List<DocumentColumnAppEntity> columns = new ArrayList();
-        final DocumentAppEntity document = new DocumentAppEntity(
+        public final DocumentAppEntity document = new DocumentAppEntity(
             "",
             DocumentType.ARTIFACT_TREE,
             name,

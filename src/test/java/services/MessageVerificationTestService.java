@@ -9,9 +9,24 @@ import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
 
 public class MessageVerificationTestService {
 
-    public void verifyDocumentMessage(EntityChangeMessage message,
-                                      UUID entityId,
-                                      Change.Action action) {
+    public void verifyUpdateLayout(EntityChangeMessage message, boolean updateLayout) {
+        assertThat(message.isUpdateLayout()).isEqualTo(updateLayout);
+    }
+
+    public void verifyTypeChange(EntityChangeMessage message,
+                                 UUID entityId,
+                                 Change.Action action) {
+        verifyChangeInMessage(
+            message,
+            entityId,
+            Change.Entity.TYPES,
+            action
+        );
+    }
+
+    public void verifyDocumentChange(EntityChangeMessage message,
+                                     UUID entityId,
+                                     Change.Action action) {
         verifyChangeInMessage(
             message,
             entityId,

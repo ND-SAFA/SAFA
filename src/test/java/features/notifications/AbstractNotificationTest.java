@@ -30,12 +30,12 @@ public abstract class AbstractNotificationTest extends AbstractSharingTest {
         performAction();
 
         // VP - Verify that single message sent
-        assertThat(notificationTestService.getQueueSize(Sharee.email))
+        assertThat(notificationService.getQueueSize(Sharee.email))
             .as("single message for flat file upload")
             .isEqualTo(1);
 
         // Step - Retrieve action message
-        EntityChangeMessage actionMessage = this.notificationTestService.getNextMessage(Sharee.email);
+        EntityChangeMessage actionMessage = this.notificationService.getNextMessage(Sharee.email);
 
         // VP - Verify message correctness
         verifyShareeMessage(actionMessage);

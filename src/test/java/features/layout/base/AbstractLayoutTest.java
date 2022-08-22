@@ -58,7 +58,7 @@ public abstract class AbstractLayoutTest extends ApplicationBaseTest {
             .newProject(projectName)
             .newVersionWithReturn(projectName);
         FlatFileRequest.updateProjectVersionFromFlatFiles(projectVersion, ProjectPaths.Tests.DefaultProject.V1);
-        this.projectAppEntity = retrievalTestService.getProjectAtVersion(projectVersion);
+        this.projectAppEntity = retrievalService.getProjectAtVersion(projectVersion);
         Pair<ElkNode, Map<String, ElkNode>> response =
             ElkGraphCreator.createGraphFromProject(projectAppEntity.artifacts, projectAppEntity.traces);
         rootGraphNode = response.getValue0();

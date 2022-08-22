@@ -6,20 +6,19 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import builders.CommitBuilder;
-import requests.FlatFileRequest;
-import requests.SafaRequest;
-
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.traces.entities.db.TraceLinkVersion;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
+import builders.CommitBuilder;
 import features.traces.base.AbstractTraceTest;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
+import requests.FlatFileRequest;
+import requests.SafaRequest;
 import services.MappingTestService;
 
 /**
@@ -56,7 +55,7 @@ class TestApproveLinkInFutureVersion extends AbstractTraceTest {
             .withModifiedTrace(traceAppEntity);
 
         // Step - Commit
-        commitTestService.commit(commitBuilder);
+        commitService.commit(commitBuilder);
 
         // VP - Verify that two versions exist of the trace link
         UUID traceLinkId = UUID.fromString(link.getString("traceLinkId"));
@@ -98,7 +97,7 @@ class TestApproveLinkInFutureVersion extends AbstractTraceTest {
         // Step - Approve generated trace link
         TraceAppEntity generatedLinkAppEntity = this.traceLinkVersionRepository
             .retrieveAppEntityFromVersionEntity(generatedLink);
-        commitTestService.commit(CommitBuilder
+        commitService.commit(CommitBuilder
             .withVersion(projectVersion)
             .withModifiedTrace(generatedLinkAppEntity));
 
@@ -116,7 +115,7 @@ class TestApproveLinkInFutureVersion extends AbstractTraceTest {
         // Step - Commit changes
         TraceAppEntity updatedGeneratedLinkAppEntity = this.traceLinkVersionRepository
             .retrieveAppEntityFromVersionEntity(generatedLink);
-        commitTestService.commit(CommitBuilder
+        commitService.commit(CommitBuilder
             .withVersion(projectVersion)
             .withModifiedTrace(updatedGeneratedLinkAppEntity));
 

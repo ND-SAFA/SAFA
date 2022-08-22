@@ -26,7 +26,7 @@ public class TestSharingWithMissingAccount extends AbstractSharingTest {
     @Test
     public void userNotFoundError() throws Exception {
         // Step - Share with non-existent user
-        JSONObject response = creationTestService.shareProject(
+        JSONObject response = creationService.shareProject(
             project,
             nonUserEmail,
             ProjectRole.VIEWER,

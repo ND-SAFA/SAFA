@@ -18,7 +18,7 @@ public class TestMemberRetrieval extends AbstractSharingTest {
     @Test
     void newMemberFoundWhenRetrievingMembers() throws Exception {
         // Step - Get projects for user who got shared with
-        JSONArray members = retrievalTestService.getProjectMembers(projectVersion.getProject());
+        JSONArray members = retrievalService.getProjectMembers(projectVersion.getProject());
 
         // VP - Verify that shared project is visible
         assertThat(members.length()).isEqualTo(2);

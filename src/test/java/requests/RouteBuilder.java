@@ -72,7 +72,11 @@ public class RouteBuilder<T extends RouteBuilder<T>> {
     }
 
     public T withArtifactId(Artifact artifact) {
-        this.path = this.path.replace("{artifactId}", artifact.getArtifactId().toString());
+        return this.withArtifactId(artifact.getArtifactId().toString());
+    }
+
+    public T withArtifactId(String artifactId) {
+        this.path = this.path.replace("{artifactId}", artifactId);
         return (T) this;
     }
 

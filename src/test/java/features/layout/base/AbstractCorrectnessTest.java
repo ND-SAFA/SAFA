@@ -8,17 +8,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import builders.CommitBuilder;
-
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
 import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
+import builders.CommitBuilder;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import features.base.ApplicationBaseTest;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.webjars.NotFoundException;
 import services.MappingTestService;
@@ -34,13 +33,13 @@ public abstract class AbstractCorrectnessTest extends ApplicationBaseTest {
 
     protected ProjectVersion projectVersion;
 
-    public JSONObject createProject() throws Exception {
+    public ProjectCommit createProject() throws Exception {
         this.jsonBuilder.withProject(projectName, projectName, "");
         this.projectVersion = this.dbEntityBuilder
             .newProject(projectName)
             .newVersionWithReturn(projectName);
         this.jsonBuilder.withProject(projectName, projectName, "");
-        return commitTestService.commit(CommitBuilder.withVersion(projectVersion)
+        return commitService.commit(CommitBuilder.withVersion(projectVersion)
             .withAddedArtifact(createArtifact(a1Name))
             .withAddedArtifact(createArtifact(a2Name))
             .withAddedArtifact(createArtifact(a3Name))
@@ -86,10 +85,10 @@ public abstract class AbstractCorrectnessTest extends ApplicationBaseTest {
     protected LayoutPosition getLayoutPositionInDocument(ProjectAppEntity project,
                                                          String documentId,
                                                          String artifactName) {
-        String artifactId = retrievalTestService.getArtifactId(project.artifacts, artifactName);
+        String artifactId = retrievalService.getArtifactId(project.artifacts, artifactName);
         List<DocumentAppEntity> documents = project.getDocuments()
             .stream()
-            .filter(d -> d.getDocumentId().toString().equals(documentId))
+            .filter(d -> d.getDocumentId().equals(documentId))
             .collect(Collectors.toList());
 
         if (documents.size() == 0) {
@@ -106,20 +105,21 @@ public abstract class AbstractCorrectnessTest extends ApplicationBaseTest {
         return documentLayout.get(artifactId);
     }
 
-    protected List<String> getArtifactIds(JSONObject projectCommit) {
+    protected List<String> getArtifactIds(ProjectCommit projectCommit) {
         return new ArrayList<>(getArtifactNameToIdMap(projectCommit).values());
     }
 
-    protected String getArtifactIdFromProjectCommit(JSONObject projectCommit, String artifactName) {
+    protected String getArtifactIdFromProjectCommit(ProjectCommit projectCommit, String artifactName) {
         return getArtifactNameToIdMap(projectCommit).get(artifactName);
     }
 
     protected List<LayoutPosition> getArtifactPositionsInDocument(
-        JSONObject projectCommit,
+        ProjectCommit projectCommit,
         JSONObject documentJson,
         List<String> artifactNames) throws JsonProcessingException {
         DocumentAppEntity document = MappingTestService.toClass(documentJson.toString(), DocumentAppEntity.class);
-        return artifactNames.stream()
+        return artifactNames
+            .stream()
             .map(artifactName -> {
                 String artifactId = getArtifactIdFromProjectCommit(projectCommit, artifactName);
                 return document.getLayout().get(artifactId);
@@ -127,15 +127,11 @@ public abstract class AbstractCorrectnessTest extends ApplicationBaseTest {
             .collect(Collectors.toList());
     }
 
-    private Map<String, String> getArtifactNameToIdMap(JSONObject projectCommit) {
+    private Map<String, String> getArtifactNameToIdMap(ProjectCommit projectCommit) {
         Map<String, String> name2id = new Hashtable<>();
-        JSONArray artifactsJson = projectCommit.getJSONObject("artifacts").getJSONArray("added");
-        for (int i = 0; i < artifactsJson.length(); i++) {
-            JSONObject artifactAdded = artifactsJson.getJSONObject(i);
-            String artifactId = artifactAdded.getString("id");
-            String artifactName = artifactAdded.getString("name");
-            name2id.put(artifactName, artifactId);
-        }
+        projectCommit.getArtifacts().getAdded().forEach(artifact -> {
+            name2id.put(artifact.getName(), artifact.getId());
+        });
         return name2id;
     }
 }

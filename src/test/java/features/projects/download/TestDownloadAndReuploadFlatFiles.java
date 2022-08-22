@@ -67,7 +67,7 @@ class TestDownloadAndReuploadFlatFiles extends ApplicationBaseTest {
 
     private void verifyProjectCreated(ProjectVersion projectVersion) {
         // Step - Retrieve project
-        ProjectAppEntity projectAppEntity = retrievalTestService.getProjectAtVersion(projectVersion);
+        ProjectAppEntity projectAppEntity = retrievalService.getProjectAtVersion(projectVersion);
 
         // VP - Verify that artifacts are created
         assertThat(projectAppEntity.artifacts).hasSize(Constants.N_ARTIFACTS);

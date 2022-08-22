@@ -4,31 +4,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.UUID;
 
-import requests.FlatFileRequest;
-
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.config.ProjectVariables;
-import edu.nd.crc.safa.features.jobs.repositories.JobDbRepository;
-import edu.nd.crc.safa.features.jobs.services.JobService;
-import edu.nd.crc.safa.features.notifications.services.NotificationService;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import features.flatfiles.base.BaseFlatFileTest;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.ResultMatcher;
+import requests.FlatFileRequest;
 
 public abstract class AbstractUpdateProjectViaFlatFileTest extends BaseFlatFileTest {
-
-    @Autowired
-    public JobService jobService;
-
-    @Autowired
-    public NotificationService notificationService;
-
-    @Autowired
-    public JobDbRepository jobDbRepository;
 
     protected ProjectVersion projectVersion;
 

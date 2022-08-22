@@ -191,7 +191,7 @@ export default class ArtifactSelectionModule extends VuexModule {
       try {
         return artifactModule.getArtifactById(this.selectedArtifactId);
       } catch (e) {
-        logModule.onError(e);
+        logModule.onError(String(e));
       }
     }
   }

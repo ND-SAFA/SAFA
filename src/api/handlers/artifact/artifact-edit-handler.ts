@@ -55,9 +55,9 @@ export async function handleSaveArtifact(
 
     onSuccess?.();
   } catch (e) {
-    logModule.onDevError(e);
+    logModule.onDevError(String(e));
     logModule.onError(`Unable to create artifact: ${artifact.name}`);
-    onError?.(e);
+    onError?.(e as Error);
   }
 }
 

@@ -50,7 +50,7 @@ export async function handleUploadProjectVersion(
         await handleSelectVersion(projectId, versionId);
         await uploadFlatFiles();
       } catch (e) {
-        logModule.onError(e.message);
+        logModule.onError(String(e));
       } finally {
         await navigateTo(Routes.UPLOAD_STATUS);
         appModule.onLoadEnd();

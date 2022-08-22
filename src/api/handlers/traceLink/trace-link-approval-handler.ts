@@ -63,7 +63,7 @@ export async function handleGetGeneratedLinks({
       declined,
     });
   } catch (e) {
-    onError?.(e);
+    onError?.(e as Error);
   } finally {
     appModule.onLoadEnd();
   }
@@ -103,7 +103,7 @@ export async function handleCreateLink(
     logModule.onError(
       `Unable to create trace link: ${sourceName} -> ${targetName}`
     );
-    logModule.onDevError(e);
+    logModule.onDevError(String(e));
   }
 }
 

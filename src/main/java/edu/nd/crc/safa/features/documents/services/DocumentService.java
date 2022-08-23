@@ -1,12 +1,15 @@
 package edu.nd.crc.safa.features.documents.services;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactRepository;
+import edu.nd.crc.safa.features.common.IAppEntityService;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentColumnAppEntity;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
@@ -15,11 +18,12 @@ import edu.nd.crc.safa.features.documents.entities.db.DocumentColumn;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.documents.repositories.DocumentArtifactRepository;
 import edu.nd.crc.safa.features.documents.repositories.DocumentColumnRepository;
-import edu.nd.crc.safa.features.notifications.NotificationService;
-import edu.nd.crc.safa.features.projects.entities.app.ProjectEntityTypes;
+import edu.nd.crc.safa.features.documents.repositories.DocumentRepository;
+import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
+import edu.nd.crc.safa.features.layout.services.ArtifactPositionService;
+import edu.nd.crc.safa.features.notifications.services.NotificationService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
-import edu.nd.crc.safa.features.versions.entities.app.VersionEntityTypes;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,12 +34,30 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @AllArgsConstructor
-public class DocumentService {
+public class DocumentService implements IAppEntityService<DocumentAppEntity> {
 
+    private final DocumentRepository documentRepository;
     private final ArtifactRepository artifactRepository;
     private final DocumentArtifactRepository documentArtifactRepository;
     private final DocumentColumnRepository documentColumnRepository;
     private final NotificationService notificationService;
+    private final ArtifactPositionService artifactPositionService;
+
+    /**
+     * Returns list of documents in given project
+     *
+     * @param projectVersion The version used to calculate artifact positions within the document.
+     * @return List of documents in project.
+     */
+    public List<DocumentAppEntity> getAppEntities(ProjectVersion projectVersion) {
+        List<Document> projectDocuments = this.documentRepository.findByProject(projectVersion.getProject());
+        List<DocumentAppEntity> documentAppEntities = new ArrayList<>();
+        for (Document document : projectDocuments) {
+            DocumentAppEntity documentAppEntity = createDocumentAppEntity(document, projectVersion);
+            documentAppEntities.add(documentAppEntity);
+        }
+        return documentAppEntities;
+    }
 
     /**
      * Compares the artifacts linked to document with the one's given and creates / deletes links as necessary.
@@ -100,20 +122,6 @@ public class DocumentService {
         }
     }
 
-    /**
-     * Sends notification to project subscribers that the documents have changed. If updateArtifacts is
-     * true then project version subscribers will be notified to update their artifacts.
-     *
-     * @param projectVersion  The project version whose artifacts are updated.
-     * @param updateArtifacts Whether to notify project version subsribers.
-     */
-    public void notifyDocumentChanges(ProjectVersion projectVersion, boolean updateArtifacts) {
-        this.notificationService.broadUpdateProjectMessage(projectVersion.getProject(), ProjectEntityTypes.DOCUMENTS);
-        if (updateArtifacts) {
-            this.notificationService.broadUpdateProjectVersionMessage(projectVersion, VersionEntityTypes.ARTIFACTS);
-        }
-    }
-
     private int removeDeletedDocumentArtifactLinks(Document document,
                                                    List<String> artifactIds,
                                                    List<String> artifactIdsLinkedToDocument) {
@@ -151,11 +159,54 @@ public class DocumentService {
                     this.documentArtifactRepository.save(documentArtifact);
                     nUpdated++;
                 } else {
-                    throw new SafaError("Could not find artifact with id: " + artifactId);
+                    throw new SafaError("Could not find artifact with id: %s", artifactId);
                 }
 
             }
         }
         return nUpdated;
+    }
+
+    /**
+     * Creates {@link DocumentAppEntity} from its database entity {@link Document}.
+     * This includes retrieving linked artifacts, their positions, and any FMEA columns
+     *
+     * @param document       Persisted document base entity.
+     * @param projectVersion The version of the document's artifact to generate layout with.
+     * @return {@link DocumentAppEntity} Representing front-end model of document.
+     */
+    public DocumentAppEntity createDocumentAppEntity(Document document, ProjectVersion projectVersion) {
+        // Step - Retrieve linked artifact Ids
+        List<String> artifactIds = this.documentArtifactRepository.findByDocument(document)
+            .stream()
+            .map(da -> da.getArtifact().getArtifactId().toString())
+            .collect(Collectors.toList());
+
+        // Step - Retrieve artifact layout
+        Map<String, LayoutPosition> documentLayout =
+            this.artifactPositionService.retrieveDocumentLayout(projectVersion, document.getDocumentId());
+
+        // Step - Create document app entity
+        DocumentAppEntity documentAppEntity = new DocumentAppEntity(document, artifactIds, documentLayout);
+
+        // Step - Add FMEA columns
+        if (document.getType() == DocumentType.FMEA) {
+            List<DocumentColumnAppEntity> documentColumns = this.documentColumnRepository
+                .findByDocumentOrderByTableColumnIndexAsc(document)
+                .stream()
+                .map(DocumentColumnAppEntity::new)
+                .collect(Collectors.toList());
+            documentAppEntity.setColumns(documentColumns);
+        }
+        return documentAppEntity;
+    }
+
+    public Document getDocumentById(UUID documentId) {
+        Optional<Document> documentOptional = this.documentRepository.findById(documentId);
+        if (documentOptional.isPresent()) {
+            return documentOptional.get();
+        } else {
+            throw new IllegalArgumentException("Could not find document with id:" + documentId);
+        }
     }
 }

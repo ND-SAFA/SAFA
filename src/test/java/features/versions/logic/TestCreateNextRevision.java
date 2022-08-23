@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.features.versions.services.VersionService;
 
 import features.base.ApplicationBaseTest;
@@ -20,7 +20,6 @@ class TestCreateNextRevision extends ApplicationBaseTest {
 
     @Test
     void createNextVersion() throws SafaError {
-        String projectName = "test-project";
         dbEntityBuilder
             .newProject(projectName)
             .newVersion(projectName);

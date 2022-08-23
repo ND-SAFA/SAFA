@@ -5,72 +5,53 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
-import edu.nd.crc.safa.builders.RouteBuilder;
-import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.features.versions.entities.app.VersionEntityTypes;
-import edu.nd.crc.safa.features.notifications.VersionMessage;
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentArtifact;
-import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
-import edu.nd.crc.safa.features.documents.repositories.DocumentArtifactRepository;
+import edu.nd.crc.safa.features.notifications.entities.Change;
+import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import common.EntityConstants;
 import features.base.ApplicationBaseTest;
+import org.junit.jupiter.api.Test;
+import requests.RouteBuilder;
+import requests.SafaRequest;
 
 /**
- * Tests that the client is able to add multiple artifact to some
- * specified document.
+ * Tests that the client is able to remove an artifact from a document
  */
 class TestDeleteArtifactFromDocument extends ApplicationBaseTest {
 
-    @Autowired
-    DocumentArtifactRepository documentArtifactRepository;
+    EntityConstants.DocumentConstants documentConstants = new EntityConstants.DocumentConstants();
+    EntityConstants.ArtifactConstants artifactConstants = new EntityConstants.ArtifactConstants();
 
     /**
-     * Verifies that the response object contains
+     * Verifies that:
+     * - Client is able to remove user from document
+     * - Other members are notified that member has been removed.
      */
     @Test
     void testDeleteArtifactFromDocument() throws Exception {
-        String projectName = "test-project";
-        String docName = "test-document";
-        String docDescription = "this is a description";
-        DocumentType docType = DocumentType.ARTIFACT_TREE;
-
-        String artifactType = "requirement";
-        String artifactName = "RE-10";
-        String artifactSummary = "summary";
-        String artifactContent = "content";
-
-        // Step - Create empty project with empty document and a three artifact
-        ProjectVersion projectVersion = dbEntityBuilder
-            .newProject(projectName)
-            .newVersion(projectName)
-            .newType(projectName, artifactType)
-            .newArtifactAndBody(projectName,
-                artifactType, artifactName, artifactSummary, artifactContent)
-            .newDocument(projectName, docName, docDescription, docType)
-            .newDocumentArtifact(projectName, 0, docName, artifactName)
-            .getProjectVersion(projectName, 0);
-        Document document = dbEntityBuilder.getDocument(projectName, docName);
-        Artifact artifact = dbEntityBuilder.getArtifact(projectName, artifactName);
+        // Step - Create, project, document, three artifact
+        ProjectVersion projectVersion = createProjectData();
+        Document document = dbEntityBuilder.getDocument(projectName, documentConstants.name);
+        Artifact artifact = dbEntityBuilder.getArtifact(projectName, artifactConstants.name);
 
         // VP - Verify that artifact is linked
-        Optional<DocumentArtifact> documentArtifactOptional =
-            this.documentArtifactRepository.findByProjectVersionAndDocumentAndArtifact(projectVersion,
-                document, artifact);
+        Optional<DocumentArtifact> documentArtifactOptional = this.documentArtifactRepository
+            .findByProjectVersionAndDocumentAndArtifact(projectVersion, document, artifact);
         assertThat(documentArtifactOptional).isPresent();
 
-        // Step - Subscribe to version updates
-        createNewConnection(defaultUser)
-            .subscribeToVersion(defaultUser, projectVersion);
+        // Step - Subscribe to version updates as other member
+        notificationService.createNewConnection(defaultUser).subscribeToVersion(defaultUser, projectVersion);
 
         // Step - Request artifact is removed from document
-        String route = RouteBuilder.withRoute(AppRoutes.Projects.DocumentArtifact.REMOVE_ARTIFACT_FROM_DOCUMENT)
+        String route = RouteBuilder
+            .withRoute(AppRoutes.DocumentArtifact.REMOVE_ARTIFACT_FROM_DOCUMENT)
             .withVersion(projectVersion)
             .withDocument(document)
             .withArtifactId(artifact)
@@ -81,8 +62,46 @@ class TestDeleteArtifactFromDocument extends ApplicationBaseTest {
         List<DocumentArtifact> documentArtifactList = this.documentArtifactRepository.findByDocument(document);
         assertThat(documentArtifactList).isEmpty();
 
-        // VP - Verify that websocket message to update artifacts.
-        VersionMessage message = getNextMessage(defaultUser, VersionMessage.class);
-        assertThat(message.getType()).isEqualTo(VersionEntityTypes.ARTIFACTS);
+        // VP - Verify that 2 changes are detected (document + artifacts).
+        EntityChangeMessage message = notificationService.getNextMessage(defaultUser);
+        assertThat(message.getChanges()).hasSize(2);
+
+        // VP - Verify that change is for a deleted member
+        List<Change.Entity> changedEntities =
+            message.getChanges().stream().map(Change::getEntity).collect(Collectors.toList());
+        Change change = message.getChanges().get(0);
+        assertThat(changedEntities)
+            .contains(Change.Entity.DOCUMENT)
+            .contains(Change.Entity.ARTIFACTS);
+
+        // VP - Verify document change has action: UPDATE
+        Change documentChange = message.getChangeForEntity(Change.Entity.DOCUMENT);
+        assertThat(documentChange.getAction()).isEqualTo(Change.Action.UPDATE);
+        assertThat(documentChange.getEntityIds()).hasSize(1);
+
+        // VP - Verify that artifact change has action: UPDATE
+        Change artifactChange = message.getChangeForEntity(Change.Entity.ARTIFACTS);
+        assertThat(artifactChange.getAction()).isEqualTo(Change.Action.UPDATE);
+        assertThat(artifactChange.getEntityIds()).hasSize(1);
     }
+
+    public ProjectVersion createProjectData() {
+        return dbEntityBuilder
+            .newProject(projectName)
+            .newVersion(projectName)
+            .newType(projectName, artifactConstants.type)
+            .newArtifactAndBody(projectName,
+                artifactConstants.type,
+                artifactConstants.name,
+                artifactConstants.summary,
+                artifactConstants.body)
+            .newDocument(projectName,
+                documentConstants.name,
+                documentConstants.description,
+                documentConstants.type)
+            .newDocumentArtifact(projectName, 0, documentConstants.name, artifactConstants.name)
+            .getProjectVersion(projectName, 0);
+    }
+
+
 }

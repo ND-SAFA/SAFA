@@ -5,12 +5,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 import java.util.Map;
 
-import edu.nd.crc.safa.builders.requests.SafaRequest;
+import requests.SafaRequest;
+
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.rules.entities.app.RuleAppEntity;
 import edu.nd.crc.safa.features.rules.parser.RuleName;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.utilities.JsonFileUtilities;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -37,20 +38,20 @@ class TestCreateAndRetrieveRule extends ApplicationBaseTest {
             // Step - Create rule
             RuleAppEntity rule = ruleTest.getRule();
             JSONObject ruleCreated = SafaRequest
-                .withRoute(AppRoutes.Projects.Rules.CREATE_WARNING_IN_PROJECT)
+                .withRoute(AppRoutes.Rules.CREATE_WARNING_IN_PROJECT)
                 .withProject(project)
                 .postWithJsonObject(rule);
 
             // VP - Verify that ID is returned
             assertThat(ruleCreated).isNotNull();
-            assertObjectsMatch(JsonFileUtilities.toJson(rule), ruleCreated, List.of("id"));
+            assertionService.assertObjectsMatch(JsonFileUtilities.toJson(rule), ruleCreated, List.of("id"));
 
             // Step - Create violating rule entities
             ruleTest.createViolatingRuleEntities(projectVersion, this.dbEntityBuilder);
 
             // Step - Retrieve project warnings
             JSONObject projectWarnings = SafaRequest
-                .withRoute(AppRoutes.Projects.Rules.GET_WARNINGS_IN_PROJECT_VERSION)
+                .withRoute(AppRoutes.Rules.GET_WARNINGS_IN_PROJECT_VERSION)
                 .withVersion(projectVersion)
                 .getWithJsonObject();
 

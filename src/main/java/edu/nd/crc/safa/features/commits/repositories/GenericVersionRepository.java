@@ -20,7 +20,7 @@ import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.utilities.ProjectVersionFilter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -175,12 +175,12 @@ public abstract class GenericVersionRepository<
             if (versionEntity.getModificationType() != ModificationType.NO_MODIFICATION) {
                 createOrUpdateVersionEntity(versionEntity);
                 String baseEntityId = b.getBaseEntityId();
-                appEntity.setBaseEntityId(baseEntityId);
+                appEntity.setId(baseEntityId);
             }
 
             return Optional.of(versionEntity);
         };
-        String baseEntityId = appEntity.getBaseEntityId();
+        String baseEntityId = appEntity.getId();
         return commitErrorHandler(projectVersion, versionEntityAction, baseEntityId, this.getProjectActivity());
     }
 
@@ -245,7 +245,7 @@ public abstract class GenericVersionRepository<
                     removedEntities.put(baseEntityId, appRemoved);
                     break;
                 default:
-                    throw new SafaError("Missing case in switch for modification type:" + modificationType);
+                    throw new SafaError("Missing case in switch for modification type: %s", modificationType);
             }
         }
 
@@ -270,14 +270,18 @@ public abstract class GenericVersionRepository<
         List<String> processedAppEntities = new ArrayList<>();
         List<Pair<V, CommitError>> response = appEntities
             .stream()
-            .map(a -> this.commitAppEntityToProjectVersion(projectVersion, a))
-            .peek(commitResponse -> {
+            .map(a -> {
+                Pair<V, CommitError> commitResponse = this.commitAppEntityToProjectVersion(projectVersion, a);
                 if (commitResponse.getValue1() == null) {
-                    processedAppEntities.add(commitResponse.getValue0().getBaseEntityId());
+                    String baseEntityId = commitResponse.getValue0().getBaseEntityId();
+                    processedAppEntities.add(baseEntityId);
+                    a.setId(baseEntityId);
                 }
-            }).collect(Collectors.toList());
+                return commitResponse;
+            })
+            .collect(Collectors.toList());
 
-        if (asCompleteSet) { // calculates deletes entities if this is complete set
+        if (asCompleteSet) { // calculates deleted entities if this is complete set
             List<Pair<V, CommitError>> removedVersionEntities = this.retrieveBaseEntitiesByProject(
                     projectVersion.getProject())
                 .stream()

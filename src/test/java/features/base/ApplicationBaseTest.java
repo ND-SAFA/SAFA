@@ -1,229 +1,143 @@
 package features.base;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+import javax.annotation.PostConstruct;
 
-import edu.nd.crc.safa.builders.CommitBuilder;
-import edu.nd.crc.safa.builders.MultipartRequestService;
-import edu.nd.crc.safa.builders.requests.FlatFileRequest;
-import edu.nd.crc.safa.builders.requests.SafaRequest;
-import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
-import edu.nd.crc.safa.features.documents.entities.db.Document;
-import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
-import edu.nd.crc.safa.features.projects.entities.app.SafaError;
-import edu.nd.crc.safa.features.projects.entities.db.Project;
-import edu.nd.crc.safa.features.projects.services.AppEntityRetrievalService;
-import edu.nd.crc.safa.features.users.entities.app.ProjectMembershipRequest;
-import edu.nd.crc.safa.features.users.entities.db.ProjectRole;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
-import org.javatuples.Pair;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.test.web.servlet.ResultMatcher;
-import org.springframework.web.multipart.MultipartFile;
+import builders.DbEntityBuilder;
+import builders.JsonBuilder;
+import org.junit.jupiter.api.BeforeEach;
+import org.springframework.batch.core.launch.support.SimpleJobLauncher;
+import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.core.task.SyncTaskExecutor;
+import requests.SafaRequest;
+import services.AssertionTestService;
+import services.AuthorizationTestService;
+import services.CommitTestService;
+import services.CreationTestService;
+import services.MessageVerificationTestService;
+import services.NotificationTestService;
+import services.RetrievalTestService;
 
 /**
  * Testing layer for encapsulating application logic.
  */
-public abstract class ApplicationBaseTest extends WebSocketBaseTest {
-
-    @Autowired
-    protected AppEntityRetrievalService appEntityRetrievalService;
+public abstract class ApplicationBaseTest extends EntityBaseTest {
+    /**
+     * Authentication
+     */
+    public static final String defaultUser = "root-test-user@gmail.com";
+    public static final String defaultUserPassword = "r{QjR3<Ec2eZV@?";
+    public static SafaUser currentUser;
+    public String token;
+    /**
+     * Services
+     */
+    @LocalServerPort
+    protected Integer port;
     protected String projectName = this.getClass().getName();
-    @Autowired
-    UserDetailsService userDetailsService;
+    protected CommitTestService commitService = new CommitTestService();
+    protected NotificationTestService notificationService;
+    protected CreationTestService creationService;
+    protected AssertionTestService assertionService = new AssertionTestService();
+    protected RetrievalTestService retrievalService;
+    protected AuthorizationTestService authorizationService;
+    protected MessageVerificationTestService changeMessageVerifies = new MessageVerificationTestService();
 
-    public void setAuthorization() {
-        UserDetails userDetails = userDetailsService.loadUserByUsername(defaultUser);
-        UsernamePasswordAuthenticationToken authorization = new UsernamePasswordAuthenticationToken(
-            userDetails,
-            null,
-            userDetails.getAuthorities());
+    /**
+     * Builders
+     */
+    protected DbEntityBuilder dbEntityBuilder;
+    protected JsonBuilder jsonBuilder;
 
-        SecurityContextHolder.getContext().setAuthentication(authorization);
+    @PostConstruct
+    public void init() throws Exception {
+        initBuilders();
+        initTestServices();
+        initJobLauncher();
+        setLegacyModeInH2Database();
     }
 
-    public ProjectAppEntity getProjectAtVersion(ProjectVersion projectVersion) {
-        setAuthorization(); // Required because getting currentDocument requires a user be logged in
-        return appEntityRetrievalService.retrieveProjectAppEntityAtProjectVersion(projectVersion);
+    @BeforeEach
+    public void testSetup() throws Exception {
+        clearData();
+        setAuthorization();
     }
 
-    public ProjectVersion createDefaultProject(String projectName) throws SafaError, IOException {
-        ProjectVersion projectVersion = createProjectWithNewVersion(projectName);
-        Project project = projectVersion.getProject();
-        List<MultipartFile> files = MultipartRequestService.readDirectoryAsMultipartFiles(
-            ProjectPaths.PATH_TO_DEFAULT_PROJECT,
-            "files");
-        fileUploadService.uploadFilesToServer(project, files);
-        return projectVersion;
+    /**
+     * Creates database and json builders with current service provider.
+     */
+    private void initBuilders() {
+        assert this.serviceProvider != null;
+        this.dbEntityBuilder = new DbEntityBuilder(serviceProvider);
+        this.jsonBuilder = new JsonBuilder();
     }
 
-    public ProjectVersion createProjectWithNewVersion(String projectName) {
-        return dbEntityBuilder
-            .newProject(projectName)
-            .newVersion(projectName)
-            .getProjectVersion(projectName, 0);
+    /**
+     * Initializes test services with service provider and database entity builder.
+     */
+    private void initTestServices() {
+        assert this.dbEntityBuilder != null;
+        notificationService = new NotificationTestService(port);
+        creationService = new CreationTestService(this.serviceProvider, this.dbEntityBuilder);
+        retrievalService = new RetrievalTestService(this.serviceProvider, this.dbEntityBuilder);
+        authorizationService = new AuthorizationTestService(this.serviceProvider, this.dbEntityBuilder);
     }
 
-    public JSONObject commit(CommitBuilder commitBuilder) throws Exception {
-        return commitWithStatus(commitBuilder, status().is2xxSuccessful());
+    /**
+     * Sets the current job launcher to run job synchronously so that
+     *
+     * @throws Exception If error encountered during afterPropertiesSet.
+     */
+    private void initJobLauncher() throws Exception {
+        SimpleJobLauncher jobLauncher = new SimpleJobLauncher();
+        jobLauncher.setJobRepository(jobRepository);
+        jobLauncher.setTaskExecutor(new SyncTaskExecutor());
+        jobLauncher.afterPropertiesSet();
+
+        serviceProvider.setJobLauncher(jobLauncher);
     }
 
-    public JSONObject commitWithStatus(CommitBuilder commitBuilder, ResultMatcher expectedStatus) throws Exception {
-        ProjectVersion commitVersion = commitBuilder.get().getCommitVersion();
-        return SafaRequest
-            .withRoute(AppRoutes.Projects.Commits.COMMIT_CHANGE)
-            .withVersion(commitVersion)
-            .postWithJsonObject(commitBuilder.asJson(), expectedStatus);
-    }
-
-    protected Pair<ProjectVersion, ProjectVersion> createDualVersions(String projectName) throws Exception {
-        return createDualVersions(projectName, true);
-    }
-
-    protected Pair<ProjectVersion, ProjectVersion> createDualVersions(String projectName, boolean uploadFiles) throws Exception {
-        dbEntityBuilder
-            .newProject(projectName)
-            .newVersion(projectName)
-            .newVersion(projectName);
-
-        ProjectVersion beforeVersion = dbEntityBuilder.getProjectVersion(projectName, 0);
-        ProjectVersion afterVersion = dbEntityBuilder.getProjectVersion(projectName, 1);
-
-        if (uploadFiles) {
-            FlatFileRequest.updateProjectVersionFromFlatFiles(beforeVersion, ProjectPaths.PATH_TO_DEFAULT_PROJECT);
-            FlatFileRequest.updateProjectVersionFromFlatFiles(afterVersion, ProjectPaths.PATH_TO_AFTER_FILES);
+    /**
+     * Sets the testing database's mode, H2, to legacy in order for spring
+     * batch to be able to initialize its own tables.
+     *
+     * @throws SQLException Throws exception if unable to set legacy mode.
+     */
+    private void setLegacyModeInH2Database() throws SQLException {
+        String query = "SET MODE LEGACY;\n";
+        Connection connection = this.dataSource.getConnection();
+        try (Statement statement = connection.createStatement()) {
+            statement.execute(query);
         }
-
-        return new Pair<>(beforeVersion, afterVersion);
+        connection.close();
     }
 
-    public String getId(String projectName, String artifactName) {
-        Project project = this.dbEntityBuilder.getProject(projectName);
-        Optional<Artifact> artifactOptional = this.artifactRepository.findByProjectAndName(project, artifactName);
-        if (artifactOptional.isPresent()) {
-            return artifactOptional.get().getArtifactId().toString();
-        }
-        throw new RuntimeException("Could not find artifact with name:" + artifactName);
+    /**
+     * Clears data in database.
+     *
+     * @throws IOException If error occurs while deleting data.
+     */
+    private void clearData() throws IOException {
+        this.safaUserRepository.deleteAll();
+        this.dbEntityBuilder.createEmptyData();
+        this.jsonBuilder.createEmptyData();
     }
 
-    protected JSONObject shareProject(Project project,
-                                      String email,
-                                      ProjectRole role,
-                                      ResultMatcher resultMatcher) throws Exception {
-        ProjectMembershipRequest request = new ProjectMembershipRequest(email, role);
-        return SafaRequest
-            .withRoute(AppRoutes.Projects.Membership.ADD_PROJECT_MEMBER)
-            .withProject(project)
-            .postWithJsonObject(request, resultMatcher);
-    }
-
-    protected JSONArray getProjectMembers(Project project) throws Exception {
-        return SafaRequest
-            .withRoute(AppRoutes.Projects.Membership.GET_PROJECT_MEMBERS)
-            .withProject(project)
-            .getWithJsonArray();
-    }
-
-    protected void assertMatch(Object expected, Object actual) {
-        if (expected instanceof JSONObject) {
-            assertObjectsMatch((JSONObject) expected, (JSONObject) actual);
-        } else if (expected instanceof JSONArray) {
-            assertArraysMatch((JSONArray) expected, (JSONArray) actual);
-        } else {
-            assertThat(actual).isEqualTo(expected);
-        }
-    }
-
-    protected void assertObjectsMatch(JSONObject expected, JSONObject actual) {
-        assertObjectsMatch(expected, actual, new ArrayList<>());
-    }
-
-    protected void assertObjectsMatch(JSONObject expected,
-                                      JSONObject actual,
-                                      List<String> ignoreProperties) {
-        for (Iterator<String> expectedIterator = expected.keys(); expectedIterator.hasNext(); ) {
-            String key = expectedIterator.next();
-            if (ignoreProperties.contains(key)) {
-                continue;
-            }
-
-            if (!actual.has(key)) {
-                throw new RuntimeException(actual + " does not contain key:" + key);
-            }
-
-            Object expectedValue = expected.get(key);
-            Object actualValue = actual.get(key);
-
-            assertMatch(expectedValue, actualValue);
-        }
-    }
-
-    protected JSONObject createOrUpdateDocumentJson(ProjectVersion projectVersion,
-                                                    JSONObject docJson) throws Exception {
-        return
-            SafaRequest
-                .withRoute(AppRoutes.Projects.Documents.CREATE_OR_UPDATE_DOCUMENT)
-                .withVersion(projectVersion)
-                .postWithJsonObject(docJson);
-    }
-
-    protected JSONArray addArtifactToDocument(ProjectVersion projectVersion,
-                                              Document document,
-                                              JSONArray artifactsJson) throws Exception {
-        return SafaRequest
-            .withRoute(AppRoutes.Projects.DocumentArtifact.ADD_ARTIFACTS_TO_DOCUMENT)
-            .withVersion(projectVersion)
-            .withDocument(document)
-            .postWithJsonArray(artifactsJson);
-    }
-
-    protected String getArtifactId(List<ArtifactAppEntity> artifacts, String artifactName) {
-        ArtifactAppEntity artifact =
-            artifacts
-                .stream()
-                .filter(a -> a.name.equals(artifactName))
-                .collect(Collectors.toList())
-                .get(0);
-        return artifact.getId();
-    }
-
-    private void assertArraysMatch(JSONArray expected, JSONArray actual) {
-        assertThat(actual.length()).isEqualTo(expected.length());
-        for (int i = 0; i < expected.length(); i++) {
-            Object expectedValue = expected.get(i);
-            Object actualValue = actual.get(i);
-            assertMatch(expectedValue, actualValue);
-        }
-    }
-
-    protected Pair<ProjectVersion, JSONObject> createProjectWithDocument(
-        String projectName,
-        JSONObject documentJson) throws Exception {
-        // Step - Create empty project
-        ProjectVersion projectVersion = dbEntityBuilder
-            .newProject(projectName)
-            .newVersionWithReturn(projectName);
-
-        // Step - Send creation request.
-        JSONObject docCreated = createOrUpdateDocumentJson(projectVersion, documentJson);
-
-        return new Pair<>(projectVersion, docCreated);
+    /**
+     * Creates new user and logs in, setting global test token.
+     *
+     * @throws Exception If error occurs while logging in.
+     */
+    private void setAuthorization() throws Exception {
+        SafaRequest.setMockMvc(mockMvc);
+        SafaRequest.clearAuthorizationToken();
+        token = null;
+        this.authorizationService.defaultLogin();
+        this.dbEntityBuilder.setCurrentUser(currentUser);
     }
 }

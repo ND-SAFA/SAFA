@@ -18,9 +18,9 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
 
+@Data
 @Entity
 @Table(name = "project_rule")
-@Data
 @NoArgsConstructor
 public class Rule {
     /**

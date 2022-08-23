@@ -1,14 +1,16 @@
 package features.layout.crud;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-import edu.nd.crc.safa.features.layout.entities.LayoutPosition;
-import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
+import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
+import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
+import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 
 import features.layout.base.AbstractCorrectnessTest;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
@@ -22,23 +24,22 @@ class TestDocumentLayoutIsRetrieved extends AbstractCorrectnessTest {
         String documentName = "test-document";
 
         // Step - Create project
-        JSONObject commitResponse = createProject();
+        ProjectCommit commit = createProject();
         Document document = this.dbEntityBuilder
             .newDocument(projectName, documentName, "", DocumentType.ARTIFACT_TREE)
             .getDocument(projectName, documentName);
 
         // Step - Add artifacts to layout
-        JSONArray artifactsJson = commitResponse.getJSONObject("artifacts").getJSONArray("added");
-        addArtifactToDocument(projectVersion, document, artifactsJson);
+        creationService.addArtifactToDocument(projectVersion, document, commit.getArtifacts().getAdded());
 
         // Step - Retrieve project (including layout)
-        ProjectAppEntity project = getProjectAtVersion(projectVersion);
+        ProjectAppEntity project = retrievalService.getProjectAtVersion(projectVersion);
 
         // Step - Extract artifact positions
         String documentId = document.getDocumentId().toString();
-        LayoutPosition a1Pos = getArtifactPositionInProjectLayout(project, documentId, a1Name);
-        LayoutPosition a2Pos = getArtifactPositionInProjectLayout(project, documentId, a2Name);
-        LayoutPosition a3Pos = getArtifactPositionInProjectLayout(project, documentId, a3Name);
+        LayoutPosition a1Pos = getLayoutPositionInDocument(project, documentId, a1Name);
+        LayoutPosition a2Pos = getLayoutPositionInDocument(project, documentId, a2Name);
+        LayoutPosition a3Pos = getLayoutPositionInDocument(project, documentId, a3Name);
 
         // VP - Verify that root has greatest y
         assertLayoutCorrectness(a1Pos, a2Pos, a3Pos);
@@ -51,8 +52,13 @@ class TestDocumentLayoutIsRetrieved extends AbstractCorrectnessTest {
         String docDescription = "";
 
         // Step - Create project
-        JSONObject projectCommit = createProject();
-        List<String> artifactIds = getArtifactIds(projectCommit);
+        ProjectCommit projectCommit = createProject();
+        List<String> artifactIds = projectCommit
+            .getArtifacts()
+            .getAdded()
+            .stream()
+            .map(ArtifactAppEntity::getId)
+            .collect(Collectors.toList());
 
         // Step - Create new document payload
         JSONObject documentJson = jsonBuilder.createDocument(
@@ -62,7 +68,7 @@ class TestDocumentLayoutIsRetrieved extends AbstractCorrectnessTest {
             artifactIds);
 
         // Step - Create project with document
-        JSONObject docCreated = createOrUpdateDocumentJson(projectVersion, documentJson);
+        JSONObject docCreated = creationService.createOrUpdateDocumentJson(projectVersion, documentJson);
 
         // Step - Get list of artifact positions
         List<LayoutPosition> artifactPositions = getArtifactPositionsInDocument(

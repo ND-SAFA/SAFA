@@ -4,12 +4,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
-import edu.nd.crc.safa.builders.requests.FlatFileRequest;
+import requests.FlatFileRequest;
+
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import features.base.ApplicationBaseTest;
 import org.junit.jupiter.api.Test;
@@ -21,8 +22,6 @@ import org.junit.jupiter.api.Test;
  * TODO: Test that removal is detected
  */
 class TestLinkVersioning extends ApplicationBaseTest {
-
-    String projectName = "project-name";
 
     /**
      * Tests that an identical trace submitted to the next version is not stored
@@ -43,11 +42,11 @@ class TestLinkVersioning extends ApplicationBaseTest {
         Project project = v1.getProject();
 
         // Step - Create base trace link
-        String flatFilesPath = ProjectPaths.PATH_TO_MINI_FILES;
+        String flatFilesPath = ProjectPaths.Tests.MINI;
         FlatFileRequest.updateProjectVersionFromFlatFiles(v1, flatFilesPath);
 
         // VP - Verify that link is stored as added
-        ProjectAppEntity baseEntities = getProjectAtVersion(v1);
+        ProjectAppEntity baseEntities = retrievalService.getProjectAtVersion(v1);
         List<TraceAppEntity> baseTraces = baseEntities.getTraces();
         assertThat(baseTraces).hasSize(1);
 
@@ -55,11 +54,11 @@ class TestLinkVersioning extends ApplicationBaseTest {
         FlatFileRequest.updateProjectVersionFromFlatFiles(v2, flatFilesPath);
 
         // VP - Verify that no change is stored by system
-        assertThat(this.traceLinkVersionRepository.getProjectLinks(project).size()).isEqualTo(1);
+        assertThat(this.traceLinkVersionRepository.getProjectLinks(project)).hasSize(1);
 
         // VP - Verify that retrieving link from target version.
-        ProjectAppEntity targetEntities = getProjectAtVersion(v1);
+        ProjectAppEntity targetEntities = retrievalService.getProjectAtVersion(v1);
         List<TraceAppEntity> targetTraces = targetEntities.getTraces();
-        assertThat(targetTraces.size()).isEqualTo(1);
+        assertThat(targetTraces).hasSize(1);
     }
 }

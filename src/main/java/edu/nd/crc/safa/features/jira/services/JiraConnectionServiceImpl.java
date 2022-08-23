@@ -1,5 +1,10 @@
 package edu.nd.crc.safa.features.jira.services;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import edu.nd.crc.safa.features.jira.entities.app.JiraIssuesResponseDTO;
@@ -32,6 +37,9 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
     private static final String REFRESH_TOKEN_REQUEST_GRANT_TYPE = "refresh_token";
     private static final Logger log = LoggerFactory.getLogger(JiraConnectionServiceImpl.class);
 
+    private static final String JIRA_ISSUE_UPDATE_DATE_FORMAT = "yyyy-MM-dd HH:mm";
+
+    private final Logger log = LoggerFactory.getLogger(JiraConnectionServiceImpl.class);
     private final JiraProjectRepository jiraProjectRepository;
     private final WebClient webClient;
 
@@ -119,13 +127,43 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
 
     @Override
     public JiraIssuesResponseDTO retrieveJIRAIssues(JiraAccessCredentials credentials, Long jiraProjectId) {
-        String uri = this.buildApiRequestURI(credentials.getCloudId(), ApiRoute.ISSUES)
-            + String.format("?jql=project=%s&fields", jiraProjectId);
+        String jqlQuery = String.format("project=%s", jiraProjectId);
+
+        return this.getJIRAIssues(credentials, jqlQuery);
+    }
+
+    @Override
+    public JiraIssuesResponseDTO retrieveUpdatedJIRAIssues(JiraAccessCredentials credentials,
+                                                           Long jiraProjectId,
+                                                           Date timestamp) {
+        String updateDate = new SimpleDateFormat(JIRA_ISSUE_UPDATE_DATE_FORMAT).format(timestamp);
+        String jqlQuery = String.format(
+            "project=%s AND (updated>\"%s\" OR created>\"%s\")", jiraProjectId, updateDate, updateDate);
+
+        return this.getJIRAIssues(credentials, jqlQuery);
+    }
+
+    private String encodeValue(String value) {
+        try {
+            return URLEncoder.encode(value, StandardCharsets.UTF_8.toString());
+        } catch (UnsupportedEncodingException e) {
+            throw new SafaError("Could not encode value " + value);
+        }
+    }
+
+    public JiraIssuesResponseDTO getJIRAIssues(JiraAccessCredentials credentials, String jqlQuery) {
+        String baseUri = this.buildApiRequestURI(credentials.getCloudId(), ApiRoute.ISSUES);
 
         return WebApiUtils.blockOptional(
             this.webClient
                 .method(ApiRoute.ISSUES.getMethod())
-                .uri(uri)
+                .uri(baseUri, builder ->
+                    builder
+                        .queryParam("jql", jqlQuery)
+                        .queryParam("fields")
+                        .queryParam("fields")
+                        .build()
+                )
                 .header(HttpHeaders.AUTHORIZATION,
                     this.buildAuthorizationHeaderValue(credentials.getBearerAccessToken()))
                 .retrieve()
@@ -134,9 +172,9 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
     }
 
     @Override
-    public void createJiraProjectMapping(Project project, Long jiraProjectId) {
+    public JiraProject createJiraProjectMapping(Project project, Long jiraProjectId) {
         JiraProject jiraProject = new JiraProject(project, jiraProjectId);
-        jiraProjectRepository.save(jiraProject);
+        return jiraProjectRepository.save(jiraProject);
     }
 
     @Getter

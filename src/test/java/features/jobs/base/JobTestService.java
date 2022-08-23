@@ -14,9 +14,9 @@ public interface JobTestService {
                                              UUID jobId,
                                              int nSteps) {
         JobDbEntity jobDbEntity = serviceProvider.getJobService().getJobById(jobId);
-        assertThat(jobDbEntity.getCurrentStep()).isEqualTo(nSteps);
         assertThat(jobDbEntity.getCurrentProgress()).isEqualTo(100);
         assertThat(jobDbEntity.getStatus()).isEqualTo(JobStatus.COMPLETED);
+        assertThat(jobDbEntity.getCurrentStep()).isEqualTo(nSteps - 1);
 
         // Step - Assert that start is before completed.
         assert jobDbEntity.getCompletedAt() != null;

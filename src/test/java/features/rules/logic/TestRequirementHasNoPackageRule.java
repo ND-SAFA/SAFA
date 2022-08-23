@@ -8,14 +8,14 @@ import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.rules.parser.RuleName;
+import edu.nd.crc.safa.features.rules.services.RuleService;
 import edu.nd.crc.safa.features.traces.entities.db.TraceLink;
 import edu.nd.crc.safa.features.traces.entities.db.TraceLinkVersion;
-import edu.nd.crc.safa.features.rules.services.RuleService;
-import edu.nd.crc.safa.features.rules.parser.RuleName;
 
+import features.base.ApplicationBaseTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import features.base.ApplicationBaseTest;
 
 class TestRequirementHasNoPackageRule extends ApplicationBaseTest {
 
@@ -24,7 +24,6 @@ class TestRequirementHasNoPackageRule extends ApplicationBaseTest {
 
     @Test
     void testRequirementHasNoPackageLink() {
-        String projectName = "test-project";
         String targetType = "Requirement";
         String targetName = "RE-8";
         String sourceType = "Package";

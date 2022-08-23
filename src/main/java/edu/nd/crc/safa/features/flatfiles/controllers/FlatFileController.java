@@ -10,16 +10,12 @@ import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.features.common.BaseController;
-import edu.nd.crc.safa.features.flatfiles.services.FileDownloadService;
-import edu.nd.crc.safa.features.flatfiles.services.FlatFileService;
-import edu.nd.crc.safa.features.flatfiles.services.ZipFileService;
-import edu.nd.crc.safa.features.notifications.NotificationService;
+import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
-import edu.nd.crc.safa.features.projects.services.ProjectService;
-import edu.nd.crc.safa.features.versions.entities.app.VersionEntityTypes;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -38,25 +34,10 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 public class FlatFileController extends BaseController {
 
-    private final ProjectService projectService;
-    private final NotificationService notificationService;
-    private final FlatFileService flatFileService;
-    private final ZipFileService zipFileService;
-    private final FileDownloadService fileDownloadService;
-
     @Autowired
     public FlatFileController(ResourceBuilder resourceBuilder,
-                              ProjectService projectService,
-                              NotificationService notificationService,
-                              FlatFileService flatFileService,
-                              ZipFileService zipFileService,
-                              FileDownloadService fileDownloadService) {
-        super(resourceBuilder);
-        this.projectService = projectService;
-        this.notificationService = notificationService;
-        this.flatFileService = flatFileService;
-        this.zipFileService = zipFileService;
-        this.fileDownloadService = fileDownloadService;
+                              ServiceProvider serviceProvider) {
+        super(resourceBuilder, serviceProvider);
     }
 
 
@@ -69,7 +50,7 @@ public class FlatFileController extends BaseController {
      * @return ServerResponse whose body contains all entities in project created.
      * @throws SafaError Throws errors if no files are given.
      */
-    @PostMapping(value = AppRoutes.Projects.FlatFiles.UPDATE_PROJECT_VERSION_FROM_FLAT_FILES)
+    @PostMapping(value = AppRoutes.FlatFiles.UPDATE_PROJECT_VERSION_FROM_FLAT_FILES)
     @ResponseStatus(HttpStatus.CREATED)
     public ProjectAppEntity updateProjectVersionFromFlatFiles(
         @PathVariable UUID versionId,
@@ -84,12 +65,17 @@ public class FlatFileController extends BaseController {
         }
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersion();
         Project project = projectVersion.getProject();
-        ProjectAppEntity projectCreated = this.flatFileService.createProjectFromFlatFiles(
+        ProjectAppEntity projectCreated = this.serviceProvider.getFlatFileService().createProjectFromFlatFiles(
             project,
             projectVersion,
+            serviceProvider,
             files,
             asCompleteSet);
-        this.notificationService.broadUpdateProjectVersionMessage(projectVersion, VersionEntityTypes.VERSION);
+        this.serviceProvider.getNotificationService().broadcastChange(
+            EntityChangeBuilder
+                .create(versionId)
+                .withVersionUpdate(versionId)
+        );
         return projectCreated;
     }
 
@@ -100,7 +86,7 @@ public class FlatFileController extends BaseController {
      * @return ProjectCreationResponse containing project artifacts, traces, and warnings.
      * @throws SafaError Throws errors if tim.json file does not exist or an error occurred while parsing it.
      */
-    @PostMapping(value = AppRoutes.Projects.FlatFiles.CREATE_NEW_PROJECT_FROM_FLAT_FILES)
+    @PostMapping(value = AppRoutes.FlatFiles.CREATE_NEW_PROJECT_FROM_FLAT_FILES)
     @ResponseStatus(HttpStatus.CREATED)
     public ProjectAppEntity createNewProjectFromFlatFiles(@RequestParam MultipartFile[] files)
         throws SafaError, IOException {
@@ -108,17 +94,29 @@ public class FlatFileController extends BaseController {
             throw new SafaError("Could not create project because no files were received.");
         }
         Project project = new Project("", "");
-        this.projectService.saveProjectWithCurrentUserAsOwner(project);
-        ProjectVersion projectVersion = projectService.createInitialProjectVersion(project);
-        ProjectAppEntity projectAppEntity = this.flatFileService.createProjectFromFlatFiles(project,
-            projectVersion,
-            files,
-            true);
-        this.notificationService.broadUpdateProjectVersionMessage(projectVersion, VersionEntityTypes.VERSION);
+        this.serviceProvider
+            .getProjectService()
+            .saveProjectWithCurrentUserAsOwner(project);
+        ProjectVersion projectVersion = this.serviceProvider
+            .getVersionService()
+            .createInitialProjectVersion(project);
+        ProjectAppEntity projectAppEntity = this.serviceProvider
+            .getFlatFileService()
+            .createProjectFromFlatFiles(project,
+                projectVersion,
+                serviceProvider,
+                files,
+                true);
+        this.serviceProvider
+            .getNotificationService()
+            .broadcastChange(EntityChangeBuilder
+                .create(projectVersion)
+                .withVersionUpdate(projectVersion.getVersionId())
+            );
         return projectAppEntity;
     }
 
-    @GetMapping(AppRoutes.Projects.FlatFiles.DOWNLOAD_FLAT_FILES)
+    @GetMapping(AppRoutes.FlatFiles.DOWNLOAD_FLAT_FILES)
     public void downloadFlatFiles(@PathVariable UUID versionId,
                                   @PathVariable String fileType,
                                   HttpServletResponse response) throws Exception {
@@ -127,7 +125,10 @@ public class FlatFileController extends BaseController {
         String versionName = projectVersion.toString();
         String fileName = String.format("%s-%s.zip", projectName, versionName);
 
-        List<File> projectFiles = fileDownloadService.downloadProjectFiles(projectVersion, fileType);
-        zipFileService.sendFilesAsZipResponse(response, fileName, projectFiles);
+        List<File> projectFiles = this.serviceProvider
+            .getFileDownloadService()
+            .downloadProjectFiles(projectVersion,
+                fileType.toLowerCase());
+        this.serviceProvider.getZipFileService().sendFilesAsZipResponse(response, fileName, projectFiles);
     }
 }

@@ -6,10 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import edu.nd.crc.safa.builders.CommitBuilder;
-import edu.nd.crc.safa.builders.RouteBuilder;
-import edu.nd.crc.safa.builders.requests.FlatFileRequest;
-import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
@@ -18,12 +14,16 @@ import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.traces.entities.db.TraceLinkVersion;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
+import builders.CommitBuilder;
 import features.traces.base.AbstractTraceTest;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
+import requests.FlatFileRequest;
+import requests.RouteBuilder;
+import requests.SafaRequest;
 
 /**
  * Tests that generated trace links are able to be reviewed.
@@ -32,7 +32,6 @@ class TestLinkApproval extends AbstractTraceTest {
 
     @Test
     void ableToCreateAndRetrieveSingleGeneratedLink() throws Exception {
-        String projectName = "test-project";
         String sourceName = "RE-8";
         String targetName = "DD-10";
         String artifactSummary = "This is a summary.";
@@ -66,7 +65,6 @@ class TestLinkApproval extends AbstractTraceTest {
 
     @Test
     void testApproveDeclineLinks() throws Exception {
-        String projectName = "test-project";
         String sourceName = "RE-8";
         String targetName = "DD-10";
         double score = 0.2;
@@ -95,7 +93,7 @@ class TestLinkApproval extends AbstractTraceTest {
         // Step - Approve generated trace link
         TraceAppEntity generatedLinkAppEntity = this.traceLinkVersionRepository
             .retrieveAppEntityFromVersionEntity(generatedLink);
-        commit(CommitBuilder
+        commitService.commit(CommitBuilder
             .withVersion(projectVersion)
             .withModifiedTrace(generatedLinkAppEntity));
 
@@ -113,7 +111,7 @@ class TestLinkApproval extends AbstractTraceTest {
         // Step - Commit changes
         TraceAppEntity updatedGeneratedLink = this.traceLinkVersionRepository
             .retrieveAppEntityFromVersionEntity(generatedLink);
-        commit(CommitBuilder
+        commitService.commit(CommitBuilder
             .withVersion(projectVersion)
             .withModifiedTrace(updatedGeneratedLink));
 
@@ -134,14 +132,13 @@ class TestLinkApproval extends AbstractTraceTest {
     void testGenerateTraceLinks() throws Exception {
 
         // Step - Create project and version
-        String projectName = "test-project";
         ProjectVersion projectVersion = dbEntityBuilder
             .newProject(projectName)
             .newVersionWithReturn(projectName);
         Project project = projectVersion.getProject();
 
         // Step - Upload flat files and generate some trace links
-        FlatFileRequest.updateProjectVersionFromFlatFiles(projectVersion, ProjectPaths.PATH_TO_DEFAULT_PROJECT);
+        FlatFileRequest.updateProjectVersionFromFlatFiles(projectVersion, ProjectPaths.Tests.DefaultProject.V1);
 
         // Step - Get all trace links that were generated.
         String url = getGeneratedLinkEndpoint(projectVersion);
@@ -165,7 +162,7 @@ class TestLinkApproval extends AbstractTraceTest {
         }
 
         // Send to generate route
-        String generateRoute = RouteBuilder.withRoute(AppRoutes.Projects.Links.GENERATE_LINKS).buildEndpoint();
+        String generateRoute = RouteBuilder.withRoute(AppRoutes.Links.GENERATE_LINKS).buildEndpoint();
 
         JSONObject generateTraceLinkBody = new JSONObject();
         generateTraceLinkBody.put("sourceArtifacts", sourceArtifacts);
@@ -187,13 +184,12 @@ class TestLinkApproval extends AbstractTraceTest {
      */
     @Test
     void testCreateTraceLink() throws Exception {
-        String projectName = "project-name";
         String sourceName = "D9";
         String targetName = "F21";
 
         // Step - Create project with artifacts.
         ProjectVersion projectVersion = dbEntityBuilder.newProject(projectName).newVersionWithReturn(projectName);
-        FlatFileRequest.updateProjectVersionFromFlatFiles(projectVersion, ProjectPaths.PATH_TO_DEFAULT_PROJECT);
+        FlatFileRequest.updateProjectVersionFromFlatFiles(projectVersion, ProjectPaths.Tests.DefaultProject.V1);
 
         // VP - Verify that trace does not exist
         Project project = projectVersion.getProject();
@@ -201,7 +197,7 @@ class TestLinkApproval extends AbstractTraceTest {
 
         // Step - POST trace links creation
         JSONObject traceJson = jsonBuilder.createTrace(sourceName, targetName);
-        commit(
+        commitService.commit(
             CommitBuilder
                 .withVersion(projectVersion)
                 .withAddedTrace(traceJson)

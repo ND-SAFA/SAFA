@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import features.documents.base.AbstractDocumentTest;
 import org.json.JSONArray;
@@ -27,9 +28,10 @@ class TestRetrieveDocument extends AbstractDocumentTest {
 
         // Step - Create empty project
         Project project = dbEntityBuilder.newProjectWithReturn(projectName);
+        ProjectVersion projectVersion = dbEntityBuilder.newVersionWithReturn(projectName);
 
         // Step - Retrieve project documents
-        JSONArray documents = getProjectDocuments(project);
+        JSONArray documents = getProjectDocuments(projectVersion);
 
         // VP - Verify that no documents are returned
         assertThat(documents.length()).isZero();
@@ -40,7 +42,7 @@ class TestRetrieveDocument extends AbstractDocumentTest {
             .newDocument(projectName, docNameTwo, docDescription, docType);
 
         // Step - Retrieve project documents
-        documents = getProjectDocuments(project);
+        documents = getProjectDocuments(projectVersion);
 
         // VP - Verify that no documents are associated with project
         assertThat(documents.length()).isEqualTo(2);

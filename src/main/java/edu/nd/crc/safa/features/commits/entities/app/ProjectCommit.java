@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import javax.validation.Valid;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.delta.entities.app.ProjectChange;
@@ -13,8 +14,9 @@ import edu.nd.crc.safa.features.errors.entities.db.CommitError;
 import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -25,8 +27,8 @@ import lombok.Setter;
 @Setter
 public class ProjectCommit {
     ProjectVersion commitVersion;
-    ProjectChange<ArtifactAppEntity> artifacts;
-    ProjectChange<TraceAppEntity> traces;
+    ProjectChange<@Valid ArtifactAppEntity> artifacts;
+    ProjectChange<@Valid TraceAppEntity> traces;
     List<CommitError> errors;
     boolean failOnError;
 
@@ -83,6 +85,19 @@ public class ProjectCommit {
         this.addEntity(modificationType, this.traces, trace);
     }
 
+    @JsonIgnore
+    public boolean shouldUpdateDefaultLayout() {
+        return this.getArtifacts().getAdded().size()
+            + this.getArtifacts().getRemoved().size()
+            + this.getTraces().getAdded().size()
+            + this.getTraces().getRemoved().size() > 0;
+    }
+
+    @JsonIgnore
+    public ArtifactAppEntity getArtifact(ModificationType modificationType, int index) {
+        return this.generateMod2Entities(this.artifacts).get(modificationType).get(index);
+    }
+
     private <T extends IAppEntity> void addEntities(ModificationType modificationType,
                                                     ProjectChange<T> projectChange,
                                                     List<T> artifacts) {
@@ -110,5 +125,4 @@ public class ProjectCommit {
         mod2entities.put(ModificationType.REMOVED, projectChange.getRemoved());
         return mod2entities;
     }
-
 }

@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.features.jira.entities.db;
 
+import java.util.Date;
 import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -16,6 +17,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
+import org.hibernate.annotations.UpdateTimestamp;
 
 
 /**
@@ -46,6 +48,12 @@ public class JiraProject {
      */
     @Column(name = "jira_project_id", nullable = false)
     Long jiraProjectId;
+
+    /**
+     * Timestamp of the last update
+     */
+    @Column(name = "last_update", nullable = false)
+    private Date lastUpdate = new Date();
 
     public JiraProject(Project project, Long jiraProjectId) {
         this.project = project;

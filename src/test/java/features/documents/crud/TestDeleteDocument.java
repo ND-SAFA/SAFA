@@ -4,15 +4,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
-import edu.nd.crc.safa.builders.RouteBuilder;
-import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 
-import org.junit.jupiter.api.Test;
 import features.base.ApplicationBaseTest;
+import org.junit.jupiter.api.Test;
+import requests.RouteBuilder;
+import requests.SafaRequest;
 
 /**
  * Tests that a user is able to delete a document in a project.
@@ -38,13 +38,13 @@ class TestDeleteDocument extends ApplicationBaseTest {
 
         // Step - Create new document payload
         String route = RouteBuilder
-            .withRoute(AppRoutes.Projects.Documents.DELETE_DOCUMENT)
+            .withRoute(AppRoutes.Documents.DELETE_DOCUMENT_BY_ID)
             .withDocument(document)
             .buildEndpoint();
         SafaRequest.withRoute(route).deleteWithJsonObject();
 
         // VP - Verify that no documents are associated with project
         List<Document> projectDocuments = this.documentRepository.findByProject(project);
-        assertThat(projectDocuments.size()).isZero();
+        assertThat(projectDocuments).isEmpty();
     }
 }

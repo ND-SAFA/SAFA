@@ -13,8 +13,8 @@ import javax.persistence.UniqueConstraint;
 
 import edu.nd.crc.safa.config.AppConstraints;
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
-import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactType;
 import edu.nd.crc.safa.features.common.IBaseEntity;
+import edu.nd.crc.safa.features.types.ArtifactType;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

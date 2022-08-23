@@ -7,16 +7,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import edu.nd.crc.safa.features.layout.generator.ElkGraphCreator;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
+import edu.nd.crc.safa.features.layout.generator.ElkGraphCreator;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 
+import features.base.DefaultProjectConstants;
 import features.layout.base.AbstractLayoutTest;
 import org.eclipse.elk.graph.ElkGraphElement;
 import org.eclipse.elk.graph.ElkNode;
 import org.javatuples.Pair;
 import org.junit.jupiter.api.Test;
-import features.base.DefaultProjectConstants;
 
 /**
  * Tests that creating a graph from a project:
@@ -38,13 +38,13 @@ class TestGraphCreation extends AbstractLayoutTest {
         ElkNode d1Parent = getParent(d1Node);
         assert d1Parent != null;
         assertThat(d1Parent.getIdentifier()).isEqualTo(getArtifactId(parentId));
-        assertThat(artifactChildren.size()).isEqualTo(nChildren);
+        assertThat(artifactChildren).hasSize(nChildren);
     }
 
     @Test
     void testName2Node() {
         assertThat(name2nodes).hasSize(DefaultProjectConstants.Entities.N_ARTIFACTS);
-        for (ArtifactAppEntity artifact : project.getArtifacts()) {
+        for (ArtifactAppEntity artifact : projectAppEntity.getArtifacts()) {
             assertThat(name2nodes).containsKey(artifact.id);
         }
     }
@@ -57,7 +57,7 @@ class TestGraphCreation extends AbstractLayoutTest {
             .map(ElkGraphElement::getIdentifier)
             .collect(Collectors.toList());
 
-        assertThat(graphNodesNames.size()).isEqualTo(DefaultProjectConstants.Entities.N_ARTIFACTS);
+        assertThat(graphNodesNames).hasSize(DefaultProjectConstants.Entities.N_ARTIFACTS);
     }
 
     @Test
@@ -85,9 +85,8 @@ class TestGraphCreation extends AbstractLayoutTest {
             .stream()
             .map(ElkGraphElement::getIdentifier)
             .collect(Collectors.toList());
-        assertThat(children.size()).isEqualTo(2);
-        assertThat(childrenNames.contains("R2")).isTrue();
-        assertThat(childrenNames.contains("R1")).isTrue();
+        assertThat(children).hasSize(2);
+        assertThat(childrenNames).contains("R2").contains("R1");
 
         // VP - Verify that R1 is a child of R2.
         ElkNode parent = getParent(name2Node.get("R1"));

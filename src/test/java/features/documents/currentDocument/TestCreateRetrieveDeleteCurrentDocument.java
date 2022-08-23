@@ -2,16 +2,16 @@ package features.documents.currentDocument;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import edu.nd.crc.safa.builders.RouteBuilder;
-import edu.nd.crc.safa.builders.requests.SafaRequest;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import features.base.ApplicationBaseTest;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
+import requests.RouteBuilder;
+import requests.SafaRequest;
 
 /**
  * Tests that a user is able to set the current document, retrieve it, and remove it.
@@ -37,7 +37,7 @@ class TestCreateRetrieveDeleteCurrentDocument extends ApplicationBaseTest {
 
         // Step - Set current document
         SafaRequest
-            .withRoute(AppRoutes.Projects.Documents.SET_CURRENT_DOCUMENT)
+            .withRoute(AppRoutes.Documents.SET_CURRENT_DOCUMENT)
             .withDocument(document)
             .postWithJsonObject(new JSONObject());
 
@@ -45,7 +45,7 @@ class TestCreateRetrieveDeleteCurrentDocument extends ApplicationBaseTest {
         assertThat(getCurrentDocumentId(projectVersion)).isEqualTo(document.getDocumentId().toString());
 
         // Step - Delete currentDocumentId
-        String deleteRoute = RouteBuilder.withRoute(AppRoutes.Projects.Documents.CLEAR_CURRENT_DOCUMENT).buildEndpoint();
+        String deleteRoute = RouteBuilder.withRoute(AppRoutes.Documents.CLEAR_CURRENT_DOCUMENT).buildEndpoint();
         SafaRequest.withRoute(deleteRoute).deleteWithJsonObject();
 
         // VP - Verify that currentDocumentId is back to null
@@ -53,6 +53,6 @@ class TestCreateRetrieveDeleteCurrentDocument extends ApplicationBaseTest {
     }
 
     String getCurrentDocumentId(ProjectVersion projectVersion) {
-        return getProjectAtVersion(projectVersion).currentDocumentId;
+        return retrievalService.getProjectAtVersion(projectVersion).getCurrentDocumentId();
     }
 }

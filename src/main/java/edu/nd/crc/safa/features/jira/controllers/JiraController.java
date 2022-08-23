@@ -1,38 +1,34 @@
 package edu.nd.crc.safa.features.jira.controllers;
 
 import java.util.List;
-import java.util.Objects;
-import javax.validation.Valid;
+import java.util.UUID;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
-import edu.nd.crc.safa.features.jira.entities.app.JiraAccessCredentialsDTO;
+import edu.nd.crc.safa.features.jira.entities.api.JiraIdentifier;
 import edu.nd.crc.safa.features.jira.entities.app.JiraProjectResponseDTO;
-import edu.nd.crc.safa.features.jira.entities.app.JiraRefreshTokenDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraResponseDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraResponseDTO.JiraResponseMessage;
 import edu.nd.crc.safa.features.jira.entities.db.JiraAccessCredentials;
 import edu.nd.crc.safa.features.jira.repositories.JiraAccessCredentialsRepository;
 import edu.nd.crc.safa.features.jira.services.JiraConnectionService;
 import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
-import edu.nd.crc.safa.features.jobs.entities.builders.UpdateProjectByJiraJobBuilder;
+import edu.nd.crc.safa.features.jobs.entities.builders.CreateProjectViaJiraBuilder;
+import edu.nd.crc.safa.features.jobs.entities.builders.UpdateProjectViaJiraBuilder;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.utilities.ExecutorDelegate;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.context.request.async.DeferredResult;
 
 
@@ -42,103 +38,22 @@ import org.springframework.web.context.request.async.DeferredResult;
 @Controller
 public class JiraController extends BaseController {
 
-    private final Logger log = LoggerFactory.getLogger(JiraController.class);
-
     private final JiraAccessCredentialsRepository accessCredentialsRepository;
-
     private final SafaUserService safaUserService;
     private final JiraConnectionService jiraConnectionService;
-
     private final ExecutorDelegate executorDelegate;
-    private final ServiceProvider serviceProvider;
 
     @Autowired
     public JiraController(ResourceBuilder resourceBuilder,
-                          SafaUserService safaUserService,
-                          JiraAccessCredentialsRepository accessCredentialsRepository,
-                          JiraConnectionService jiraConnectionService,
-                          ExecutorDelegate executorDelegate,
                           ServiceProvider serviceProvider) {
-        super(resourceBuilder);
-        this.safaUserService = safaUserService;
-        this.accessCredentialsRepository = accessCredentialsRepository;
-        this.jiraConnectionService = jiraConnectionService;
-        this.executorDelegate = executorDelegate;
-        this.serviceProvider = serviceProvider;
+        super(resourceBuilder, serviceProvider);
+        this.safaUserService = serviceProvider.getSafaUserService();
+        this.accessCredentialsRepository = serviceProvider.getJiraAccessCredentialsRepository();
+        this.jiraConnectionService = serviceProvider.getJiraConnectionService();
+        this.executorDelegate = serviceProvider.getExecutorDelegate();
     }
 
-    @PostMapping(AppRoutes.Projects.Import.CREATE_PROJECT_FROM_JIRA)
-    public JobAppEntity pullJiraProject(@PathVariable("id") Long jiraProjectId,
-                                        @PathVariable("cloudId") String cloudId) throws Exception {
-
-        UpdateProjectByJiraJobBuilder updateProjectByJiraJobBuilder = new UpdateProjectByJiraJobBuilder(
-            serviceProvider,
-            jiraProjectId,
-            cloudId);
-        return updateProjectByJiraJobBuilder.perform();
-    }
-
-    @PostMapping(AppRoutes.Accounts.Jira.JIRA_CREDENTIALS)
-    public DeferredResult<JiraResponseDTO<Void>> createCredentials(@RequestBody @Valid JiraAccessCredentialsDTO data) {
-        DeferredResult<JiraResponseDTO<Void>> output = executorDelegate.createOutput(5000L);
-
-        executorDelegate.submit(output, () -> {
-            SafaUser principal = safaUserService.getCurrentUser();
-            JiraAccessCredentials credentials = data.toEntity();
-
-            boolean areCredentialsValid = jiraConnectionService.checkCredentials(credentials);
-
-            if (!areCredentialsValid) {
-                throw new SafaError("Invalid JIRA credentials");
-            }
-
-            JiraAccessCredentials previousCredentials =
-                accessCredentialsRepository.findByUserAndCloudId(principal, credentials.getCloudId()).orElse(null);
-
-            if (Objects.nonNull(previousCredentials)) {
-                log.info("Deleting previous JIRA credentials for {}", principal.getEmail());
-                accessCredentialsRepository.delete(previousCredentials);
-            }
-
-            credentials.setUser(principal);
-            credentials = accessCredentialsRepository.save(credentials);
-            // TODO: Use appropriate messages and a standard object output payload for API responses
-            // Payload to be something like
-            /*
-                {
-                    payload: <returned-object>
-                    isError: <true/false>
-                    status: <HttpCode>
-                    message: <SafaMessage.EnumConstant>
-             */
-            output.setResult(new JiraResponseDTO<>(null, JiraResponseMessage.CREATED));
-        });
-
-        return output;
-    }
-
-    @PutMapping(AppRoutes.Accounts.Jira.JIRA_CREDENTIALS_REFRESH)
-    public DeferredResult<JiraResponseDTO<Void>> refreshCredentials(@PathVariable("cloudId") String cloudId) {
-        DeferredResult<JiraResponseDTO<Void>> output = executorDelegate.createOutput(5000L);
-
-        executorDelegate.submit(output, () -> {
-            SafaUser principal = safaUserService.getCurrentUser();
-            JiraAccessCredentials credentials = accessCredentialsRepository
-                .findByUserAndCloudId(principal, cloudId).orElseThrow(() -> new SafaError("No JIRA credentials found"));
-
-            JiraRefreshTokenDTO newCredentials = jiraConnectionService.refreshAccessToken(credentials);
-
-            credentials.setBearerAccessToken(newCredentials.getAccessToken().getBytes());
-            credentials.setRefreshToken(newCredentials.getRefreshToken());
-            credentials = accessCredentialsRepository.save(credentials);
-
-            output.setResult(new JiraResponseDTO<>(null, JiraResponseMessage.UPDATED));
-        });
-
-        return output;
-    }
-
-    @GetMapping(AppRoutes.Projects.RETRIEVE_JIRA_PROJECTS)
+    @GetMapping(AppRoutes.Jira.RETRIEVE_JIRA_PROJECTS)
     public DeferredResult<JiraResponseDTO<List<JiraProjectResponseDTO>>> retrieveJIRAProjects(
         @PathVariable("cloudId") String cloudId) {
         DeferredResult<JiraResponseDTO<List<JiraProjectResponseDTO>>> output =
@@ -157,23 +72,26 @@ public class JiraController extends BaseController {
         return output;
     }
 
-    @PostMapping(AppRoutes.Accounts.Jira.JIRA_CREDENTIALS_VALIDATE)
-    public DeferredResult<JiraResponseDTO<Boolean>> validateJIRACredentials(
-        @RequestBody @Valid JiraAccessCredentialsDTO data) {
-        DeferredResult<JiraResponseDTO<Boolean>> output = executorDelegate.createOutput(5000L);
+    @PostMapping(AppRoutes.Jira.Import.BY_ID)
+    public JobAppEntity createJiraProject(@PathVariable("id") Long jiraProjectId,
+                                          @PathVariable("cloudId") String cloudId) throws Exception {
 
-        executorDelegate.submit(output, () -> {
-            JiraAccessCredentials credentials = data.toEntity();
+        CreateProjectViaJiraBuilder createProjectViaJira = new CreateProjectViaJiraBuilder(
+            serviceProvider,
+            new JiraIdentifier(null, jiraProjectId, cloudId)); // version created in job
+        return createProjectViaJira.perform();
+    }
 
-            try {
-                boolean areCredentialsValid = jiraConnectionService.checkCredentials(credentials);
-
-                output.setResult(new JiraResponseDTO<>(areCredentialsValid, JiraResponseMessage.OK));
-            } catch (Exception ex) {
-                output.setResult(new JiraResponseDTO<>(false, JiraResponseMessage.ERROR));
-            }
-        });
-
-        return output;
+    @PutMapping(AppRoutes.Jira.Import.UPDATE)
+    public JobAppEntity updateJiraProject(@PathVariable UUID versionId,
+                                          @PathVariable("id") Long jiraProjectId,
+                                          @PathVariable("cloudId") String cloudId) throws Exception {
+        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersion();
+        JiraIdentifier jiraIdentifier = new JiraIdentifier(projectVersion, jiraProjectId, cloudId);
+        UpdateProjectViaJiraBuilder updateProjectViaJira = new UpdateProjectViaJiraBuilder(
+            this.serviceProvider,
+            jiraIdentifier
+        );
+        return updateProjectViaJira.perform();
     }
 }

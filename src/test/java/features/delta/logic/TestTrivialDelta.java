@@ -2,9 +2,10 @@ package features.delta.logic;
 
 import java.util.List;
 
-import edu.nd.crc.safa.builders.requests.SafaRequest;
+import requests.SafaRequest;
+
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import features.delta.base.AbstractDeltaTest;
 import org.javatuples.Pair;
@@ -21,7 +22,8 @@ class TestTrivialDelta extends AbstractDeltaTest {
         String projectName = "testThatTrivialArtifactNotCalculated";
 
         // Step - Create empty before and after versions
-        Pair<ProjectVersion, ProjectVersion> versionPair = createDualVersions(projectName, false);
+        Pair<ProjectVersion, ProjectVersion> versionPair = creationService
+            .createDualVersions(projectName, false);
         ProjectVersion beforeVersion = versionPair.getValue0();
         ProjectVersion afterVersion = versionPair.getValue1();
 
@@ -35,7 +37,7 @@ class TestTrivialDelta extends AbstractDeltaTest {
         dbEntityBuilder.newArtifactBody(projectName, 2, "RE-NA", dummySummary, dummyContent);
 
         // Step - Send Delta Request
-        JSONObject projectDelta = new SafaRequest(AppRoutes.Projects.Delta.CALCULATE_PROJECT_DELTA)
+        JSONObject projectDelta = new SafaRequest(AppRoutes.Delta.CALCULATE_PROJECT_DELTA)
             .withBaselineVersion(beforeVersion)
             .withTargetVersion(afterVersion)
             .getWithJsonObject();

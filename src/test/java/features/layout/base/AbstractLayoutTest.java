@@ -5,18 +5,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import edu.nd.crc.safa.builders.requests.FlatFileRequest;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.features.layout.generator.ElkGraphCreator;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
+import features.base.ApplicationBaseTest;
 import org.eclipse.elk.graph.ElkConnectableShape;
 import org.eclipse.elk.graph.ElkEdge;
 import org.eclipse.elk.graph.ElkNode;
 import org.javatuples.Pair;
 import org.junit.jupiter.api.BeforeEach;
-import features.base.ApplicationBaseTest;
+import requests.FlatFileRequest;
 
 /**
  * Base class responsible for:
@@ -26,9 +26,8 @@ import features.base.ApplicationBaseTest;
  */
 public abstract class AbstractLayoutTest extends ApplicationBaseTest {
 
-    protected String projectName = "test-project";
     protected ProjectVersion projectVersion;
-    protected ProjectAppEntity project;
+    protected ProjectAppEntity projectAppEntity;
     protected ElkNode rootGraphNode;
     protected Map<String, ElkNode> name2nodes;
 
@@ -57,10 +56,10 @@ public abstract class AbstractLayoutTest extends ApplicationBaseTest {
         this.projectVersion = this.dbEntityBuilder
             .newProject(projectName)
             .newVersionWithReturn(projectName);
-        FlatFileRequest.updateProjectVersionFromFlatFiles(projectVersion, ProjectPaths.PATH_TO_DEFAULT_PROJECT);
-        this.project = getProjectAtVersion(projectVersion);
+        FlatFileRequest.updateProjectVersionFromFlatFiles(projectVersion, ProjectPaths.Tests.DefaultProject.V1);
+        this.projectAppEntity = retrievalService.getProjectAtVersion(projectVersion);
         Pair<ElkNode, Map<String, ElkNode>> response =
-            ElkGraphCreator.createGraphFromProject(project.artifacts, project.traces);
+            ElkGraphCreator.createGraphFromProject(projectAppEntity.getArtifacts(), projectAppEntity.getTraces());
         rootGraphNode = response.getValue0();
         name2nodes = response.getValue1();
     }
@@ -71,7 +70,7 @@ public abstract class AbstractLayoutTest extends ApplicationBaseTest {
     }
 
     protected String getArtifactId(String name) {
-        return this.project
+        return this.projectAppEntity
             .getArtifacts()
             .stream()
             .filter(a -> a.name.equals(name))

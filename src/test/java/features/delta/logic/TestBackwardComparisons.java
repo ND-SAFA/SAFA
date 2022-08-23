@@ -1,6 +1,7 @@
 package features.delta.logic;
 
-import edu.nd.crc.safa.builders.requests.SafaRequest;
+import requests.SafaRequest;
+
 import edu.nd.crc.safa.config.AppRoutes;
 
 import features.delta.base.AbstractDeltaTest;
@@ -16,7 +17,7 @@ class TestBackwardComparisons extends AbstractDeltaTest {
     @Test
     void backwardsVersioning() throws Exception {
         // Step - Calculate Delta in Backwards direction
-        JSONObject projectDelta = new SafaRequest(AppRoutes.Projects.Delta.CALCULATE_PROJECT_DELTA)
+        JSONObject projectDelta = new SafaRequest(AppRoutes.Delta.CALCULATE_PROJECT_DELTA)
             .withBaselineVersion(afterVersion)
             .withTargetVersion(beforeVersion)
             .getWithJsonObject();

@@ -81,6 +81,7 @@ public class WebApiConfiguration {
             .clientConnector(new ReactorClientHttpConnector(HttpClient.create().wiretap(true)))
             .defaultHeader(HttpHeaders.CONTENT_TYPE, JSON_CONTENT_TYPE_HEADER_VALUE)
             .defaultHeader(HttpHeaders.ACCEPT, "*/*")
+            .filter(logRequest())
             .build();
     }
 

@@ -5,22 +5,17 @@ import java.util.UUID;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.features.commits.services.EntityVersionService;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
 import edu.nd.crc.safa.features.jobs.entities.builders.CreateProjectByJsonJobBuilder;
 import edu.nd.crc.safa.features.jobs.entities.builders.UpdateProjectByFlatFileJobBuilder;
 import edu.nd.crc.safa.features.jobs.services.JobService;
-import edu.nd.crc.safa.features.notifications.NotificationService;
+import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
-import edu.nd.crc.safa.features.projects.repositories.ProjectRepository;
-import edu.nd.crc.safa.features.projects.services.AppEntityRetrievalService;
-import edu.nd.crc.safa.features.projects.services.ProjectService;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,34 +33,13 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 public class JobController extends BaseController {
 
-    JobService jobService;
-    EntityVersionService entityVersionService;
-    ProjectService projectService;
-    ProjectRepository projectRepository;
-    AppEntityRetrievalService appEntityRetrievalService;
-    NotificationService notificationService;
-    TaskExecutor taskExecutor;
-    ServiceProvider serviceProvider;
+    private final JobService jobService;
 
     @Autowired
     public JobController(ResourceBuilder resourceBuilder,
-                         JobService jobService,
-                         EntityVersionService entityVersionService,
-                         ProjectService projectService,
-                         ProjectRepository projectRepository,
-                         AppEntityRetrievalService appEntityRetrievalService,
-                         NotificationService notificationService,
-                         TaskExecutor taskExecutor,
                          ServiceProvider serviceProvider) {
-        super(resourceBuilder);
-        this.jobService = jobService;
-        this.entityVersionService = entityVersionService;
-        this.projectService = projectService;
-        this.projectRepository = projectRepository;
-        this.appEntityRetrievalService = appEntityRetrievalService;
-        this.notificationService = notificationService;
-        this.taskExecutor = taskExecutor;
-        this.serviceProvider = serviceProvider;
+        super(resourceBuilder, serviceProvider);
+        this.jobService = serviceProvider.getJobService();
     }
 
     @GetMapping(AppRoutes.Jobs.GET_JOBS)
@@ -82,6 +56,11 @@ public class JobController extends BaseController {
     @DeleteMapping(AppRoutes.Jobs.DELETE_JOB)
     public void deleteJob(@PathVariable UUID jobId) throws SafaError {
         this.jobService.deleteJob(jobId);
+        this.serviceProvider.getNotificationService().broadcastChange(
+            EntityChangeBuilder
+                .create(jobId)
+                .withJobDelete(jobId)
+        );
     }
 
     /**
@@ -92,7 +71,7 @@ public class JobController extends BaseController {
      * @return The current status of the job created.
      * @throws SafaError Throws error if job failed to start or is under construction.
      */
-    @PostMapping(AppRoutes.Jobs.FLAT_FILE_PROJECT_UPDATE_JOB)
+    @PostMapping(AppRoutes.Jobs.UPDATE_PROJECT_VIA_FLAT_FILES)
     @ResponseStatus(HttpStatus.CREATED)
     public JobAppEntity flatFileProjectUpdateJob(@PathVariable UUID versionId,
                                                  @RequestParam MultipartFile[] files) throws Exception {
@@ -102,7 +81,7 @@ public class JobController extends BaseController {
         return updateProjectByFlatFileJobBuilder.perform();
     }
 
-    @PostMapping(AppRoutes.Jobs.JSON_PROJECT_JOB)
+    @PostMapping(AppRoutes.Jobs.CREATE_PROJECT_VIA_JSON)
     public JobAppEntity createProjectFromJSON(@RequestBody ProjectAppEntity projectAppEntity) throws Exception {
         CreateProjectByJsonJobBuilder createProjectByJsonJobBuilder = new CreateProjectByJsonJobBuilder(
             serviceProvider, projectAppEntity);

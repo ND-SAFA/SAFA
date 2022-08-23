@@ -1,0 +1,65 @@
+package features.notifications.documents;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
+
+import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
+import edu.nd.crc.safa.features.documents.entities.app.DocumentColumnAppEntity;
+import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
+import edu.nd.crc.safa.features.notifications.entities.Change;
+import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
+
+import features.notifications.AbstractNotificationTest;
+import org.json.JSONObject;
+
+public abstract class AbstractDocumentNotificationTest extends AbstractNotificationTest {
+    /**
+     * ID of document being manipulated.
+     */
+    protected UUID documentId;
+    /**
+     * Instance of constants, including document being manipulated
+     */
+    protected DocumentConstants documentConstants = new DocumentConstants();
+
+    protected void createDocumentAndVerifyMessage() throws Exception {
+        this.createDocument();
+        EntityChangeMessage message = this.notificationService.getNextMessage(Sharee.email);
+        this.changeMessageVerifies.verifyDocumentChange(
+            message,
+            this.documentId,
+            Change.Action.UPDATE
+        );
+        this.changeMessageVerifies.verifyUpdateLayout(message, false);
+    }
+
+    protected void createDocument() throws Exception {
+        JSONObject response = this.creationService.createOrUpdateDocumentJson(
+            this.projectVersion,
+            this.documentConstants.document);
+        setDocumentId(response.getString("documentId"));
+    }
+
+    public void setDocumentId(String documentId) {
+        this.documentId = UUID.fromString(documentId);
+        this.documentConstants.document.setDocumentId(this.documentId.toString());
+    }
+
+    public static class DocumentConstants {
+        private final String name = "document-name";
+        private final String description = "document-description";
+        private final List<String> artifactIds = new ArrayList<>();
+        private final List<DocumentColumnAppEntity> columns = new ArrayList();
+        public final DocumentAppEntity document = new DocumentAppEntity(
+            "",
+            DocumentType.ARTIFACT_TREE,
+            name,
+            description,
+            artifactIds,
+            columns,
+            new HashMap<>()
+        );
+    }
+}

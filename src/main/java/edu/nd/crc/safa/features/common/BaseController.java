@@ -27,6 +27,7 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 public abstract class BaseController {
 
     protected final ResourceBuilder resourceBuilder;
+    protected final ServiceProvider serviceProvider;
 
     protected Document getDocumentById(DocumentRepository documentRepository,
                                        UUID documentId) throws SafaError {
@@ -34,30 +35,20 @@ public abstract class BaseController {
         if (documentOptional.isPresent()) {
             return documentOptional.get();
         } else {
-            throw new SafaError("Could not find document with given id:" + documentId);
+            throw new SafaError("Could not find document with id: %s", documentId);
         }
     }
 
     @ExceptionHandler(FileSizeLimitExceededException.class)
     public SafaError handleFileSizeLimitExceeded(FileSizeLimitExceededException exception) {
         exception.printStackTrace();
-        String errorMessage = exception.getFileName() + " is too big. Please contact SAFA administrators.";
-        return new SafaError(errorMessage, exception);
+        return new SafaError("%s is too big. Please contact SAFA administrators.", exception.getFileName());
     }
 
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public SafaError handleFileSizeLimitExceeded(MaxUploadSizeExceededException exception) {
         exception.printStackTrace();
-        String errorMessage = "Upload exceeded max size of " + exception.getMaxUploadSize()
-            + ". Please contact SAFA administrators.";
-        return new SafaError(errorMessage, exception);
-    }
-
-    @ExceptionHandler(SafaError.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public SafaError handleServerError(SafaError safaError) {
-        safaError.printError();
-        return safaError;
+        return new SafaError("Upload exceeded max size of. Please contact SAFA administrators.");
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -68,8 +59,7 @@ public abstract class BaseController {
         for (ObjectError error : bindingResult.getAllErrors()) {
             errorMessage.append(createValidationMessage(error)).append("\n");
         }
-        SafaError error = new SafaError(errorMessage.toString());
-        return error;
+        return new SafaError(errorMessage.toString());
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
@@ -78,6 +68,13 @@ public abstract class BaseController {
         exception.printStackTrace();
         String errorMessage = AppConstraints.getConstraintError(exception);
         return new SafaError(errorMessage, exception);
+    }
+
+    @ExceptionHandler(SafaError.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public SafaError handleServerError(SafaError safaError) {
+        safaError.printError();
+        return safaError;
     }
 
     @ExceptionHandler(Exception.class)

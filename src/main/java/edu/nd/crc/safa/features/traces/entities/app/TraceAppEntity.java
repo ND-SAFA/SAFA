@@ -67,12 +67,12 @@ public class TraceAppEntity implements IAppEntity {
     }
 
     @Override
-    public String getBaseEntityId() {
+    public String getId() {
         return this.traceLinkId;
     }
 
     @Override
-    public void setBaseEntityId(String id) {
+    public void setId(String id) {
         this.traceLinkId = id;
     }
 }

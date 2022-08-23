@@ -3,6 +3,7 @@ package edu.nd.crc.safa.features.jira.entities.app;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import javax.annotation.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -50,6 +51,7 @@ public class JiraIssueDTO {
         /**
          * The text defining this issue.
          */
+        @Nullable
         JiraDescription description;
         Date updated;
         Date created;

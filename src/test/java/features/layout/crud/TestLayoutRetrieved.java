@@ -5,9 +5,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Map;
 
-import edu.nd.crc.safa.features.layout.entities.LayoutPosition;
-import edu.nd.crc.safa.features.layout.LayoutSettings;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
+import edu.nd.crc.safa.features.layout.LayoutSettings;
+import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
 
 import features.layout.base.AbstractLayoutTest;
 import org.junit.jupiter.api.Test;
@@ -18,11 +18,11 @@ import org.junit.jupiter.api.Test;
 class TestLayoutRetrieved extends AbstractLayoutTest {
 
     @Test
-    void testValidLayoutExistsInDefaultProject() throws Exception {
-        Map<String, LayoutPosition> layout = project.getLayout();
+    void testValidLayoutExistsInDefaultProject() {
+        Map<String, LayoutPosition> layout = projectAppEntity.getLayout();
 
         // VP - Verify position created for every artifact
-        for (ArtifactAppEntity artifact : this.project.artifacts) {
+        for (ArtifactAppEntity artifact : this.projectAppEntity.getArtifacts()) {
             boolean hasArtifact = layout.containsKey(artifact.id);
             assertThat(hasArtifact).isTrue();
             LayoutPosition artifactPosition = layout.get(artifact.id);

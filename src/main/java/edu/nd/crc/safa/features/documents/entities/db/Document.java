@@ -15,6 +15,7 @@ import javax.persistence.Table;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
@@ -28,6 +29,7 @@ import org.hibernate.annotations.Type;
 @Table(name = "document")
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class Document implements Serializable {
 
     @Id
@@ -56,17 +58,11 @@ public class Document implements Serializable {
     String description;
 
     public Document(Document document) {
-        this(document.project,
+        this(document.documentId,
+            document.project,
+            document.type,
             document.name,
-            document.description,
-            document.type);
-        this.documentId = document.getDocumentId();
-    }
-
-    public Document(Project project, String name, String description, DocumentType type) {
-        this.project = project;
-        this.name = name;
-        this.description = description;
-        this.type = type;
+            document.description
+        );
     }
 }

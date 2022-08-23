@@ -8,14 +8,14 @@ import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentArtifact;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 import edu.nd.crc.safa.features.documents.repositories.DocumentArtifactRepository;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
+import features.base.ApplicationBaseTest;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import features.base.ApplicationBaseTest;
 
 /**
  * Tests that the client is able to add multiple artifact to some
@@ -64,7 +64,7 @@ class TestAddArtifactsToDocument extends ApplicationBaseTest {
 
         // Step - Request artifact is added to document
 
-        JSONArray artifactsAdded = addArtifactToDocument(projectVersion, document, artifactsJson);
+        JSONArray artifactsAdded = creationService.addArtifactToDocument(projectVersion, document, artifactsJson);
 
         // VP - Verify that response object contains name, description, and type
         for (int i = 0; i < artifactsAdded.length(); i++) {
@@ -76,6 +76,6 @@ class TestAddArtifactsToDocument extends ApplicationBaseTest {
 
         // VP - Verify single document created for project
         List<DocumentArtifact> projectDocuments = this.documentArtifactRepository.findByDocument(document);
-        assertThat(projectDocuments.size()).isEqualTo(1);
+        assertThat(projectDocuments).hasSize(1);
     }
 }

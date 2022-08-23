@@ -3,17 +3,18 @@ package features.artifacts.properties;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
 import java.util.Map;
 
-import edu.nd.crc.safa.builders.CommitBuilder;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.delta.entities.app.EntityDelta;
 import edu.nd.crc.safa.features.delta.entities.app.ModifiedEntity;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
+import builders.CommitBuilder;
 import features.base.ApplicationBaseTest;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,14 +54,17 @@ class TestArtifactCustomFields extends ApplicationBaseTest {
         artifactJson.put("customFields", customFields);
 
         // Step - Save added artifact
-        JSONObject response = commit(CommitBuilder
+        ProjectCommit commit = commitService.commit(CommitBuilder
             .withVersion(projectVersion)
             .withAddedArtifact(artifactJson));
 
         // VP - Verify that artifact was added
-        JSONArray artifactsAddedJson = response.getJSONObject("artifacts").getJSONArray("added");
-        assertThat(artifactsAddedJson.length()).isEqualTo(1);
-        String artifactId = artifactsAddedJson.getJSONObject(0).getString("id");
+        List<ArtifactAppEntity> artifactsAdded = commit.getArtifacts().getAdded();
+        assertThat(artifactsAdded).hasSize(1);
+
+        // Step - Extract artifact
+        ArtifactAppEntity artifact = artifactsAdded.get(0);
+        String artifactId = artifact.getId();
 
         // VP - Verify that custom fields persisted
         ArtifactAppEntity appEntity =
@@ -73,12 +77,9 @@ class TestArtifactCustomFields extends ApplicationBaseTest {
         // Step - Create second version
         ProjectVersion afterVersion = this.dbEntityBuilder.newVersionWithReturn(projectName);
 
-        // Step - Update fields
-        JSONObject artifactJsonResponse = artifactsAddedJson.getJSONObject(0);
-        artifactJsonResponse.getJSONObject("customFields").put(fieldName, newFieldValue);
-
-        // Step - Commit changes to new version
-        commit(CommitBuilder.withVersion(afterVersion).withModifiedArtifact(artifactJsonResponse));
+        // Step - Add new field to `customFields`
+        artifact.getCustomFields().put(fieldName, newFieldValue);
+        commitService.commit(CommitBuilder.withVersion(afterVersion).withModifiedArtifact(artifact));
 
         // Step - Get delta
         EntityDelta<ArtifactAppEntity> delta = this.artifactVersionRepository.calculateEntityDelta(projectVersion,

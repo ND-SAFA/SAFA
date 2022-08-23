@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.layout.entities.LayoutPosition;
+import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 
 import lombok.Getter;
@@ -52,22 +52,22 @@ public class KlayLayoutGenerator {
 
     private Map<String, LayoutPosition> createPositionMap() {
         Map<String, LayoutPosition> positionMap = new HashMap<>();
-        addChildrenToMap(positionMap, graph);
+        addChildrenToPositionMap(positionMap, graph);
         return positionMap;
+    }
+
+    private void addChildrenToPositionMap(Map<String, LayoutPosition> map, ElkNode graph) {
+        for (ElkNode child : graph.getChildren()) {
+            addPositionToMap(map, child);
+        }
     }
 
     private void addPositionToMap(Map<String, LayoutPosition> map, ElkNode graph) {
         String id = graph.getIdentifier();
         map.computeIfAbsent(id, newKey -> {
             LayoutPosition graphPosition = new LayoutPosition(graph.getX(), graph.getY());
-            addChildrenToMap(map, graph);
+            addChildrenToPositionMap(map, graph);
             return graphPosition;
         });
-    }
-
-    private void addChildrenToMap(Map<String, LayoutPosition> map, ElkNode graph) {
-        for (ElkNode child : graph.getChildren()) {
-            addPositionToMap(map, child);
-        }
     }
 }

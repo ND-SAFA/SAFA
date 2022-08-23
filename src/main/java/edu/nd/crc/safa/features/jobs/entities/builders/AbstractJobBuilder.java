@@ -1,5 +1,7 @@
 package edu.nd.crc.safa.features.jobs.entities.builders;
 
+import java.io.IOException;
+
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.jobs.entities.app.AbstractJob;
 import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
@@ -10,7 +12,7 @@ import lombok.AllArgsConstructor;
 /**
  * Defines a job performing some actions on some identified entity.
  */
-public abstract class AbstractJobBuilder<I, W> {
+public abstract class AbstractJobBuilder<I> {
     /**
      * List of services.
      */
@@ -19,10 +21,6 @@ public abstract class AbstractJobBuilder<I, W> {
      * Input to job builder.
      */
     I identifier;
-    /**
-     * Work to be done by job.
-     */
-    W work;
 
     protected AbstractJobBuilder(ServiceProvider serviceProvider) {
         this.serviceProvider = serviceProvider;
@@ -32,11 +30,8 @@ public abstract class AbstractJobBuilder<I, W> {
         // Step 1 - Select project version to change
         this.identifier = this.constructIdentifier();
 
-        // Step - Construct change
-        this.work = this.constructJobWork(this.identifier);
-
         // Step 3 - Construct job definition
-        JobDefinition jobDefinition = this.constructJobForWork(this.work);
+        JobDefinition jobDefinition = this.constructJobForWork();
 
         // Step 4 - Start job
         JobDbEntity jobDbEntity = jobDefinition.jobDbEntity;
@@ -56,14 +51,9 @@ public abstract class AbstractJobBuilder<I, W> {
     protected abstract I constructIdentifier();
 
     /**
-     * Step 2 - Generate necessary changes to project.
+     * Step 2 - Creates job definition for change.
      */
-    protected abstract W constructJobWork(I input);
-
-    /**
-     * Step 3 - Creates job definition for change.
-     */
-    abstract JobDefinition constructJobForWork(W change);
+    abstract JobDefinition constructJobForWork() throws IOException;
 
     @AllArgsConstructor
     protected static class JobDefinition {

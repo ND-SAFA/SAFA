@@ -162,7 +162,7 @@ create table if not exists job
 (
     id                  varchar(255) not null,
     completed_at        datetime(6),
-    completed_entity_id binary(255),
+    completed_entity_id varchar(255),
     current_progress    integer      not null,
     current_step        integer      not null,
     job_type            integer      not null,

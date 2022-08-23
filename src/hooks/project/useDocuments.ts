@@ -9,10 +9,10 @@ import {
 } from "@/types";
 import { createDocument, isTableDocument } from "@/util";
 import { handleResetGraph, handleUpdateCurrentDocument } from "@/api";
-import artifactStore from "./useArtifacts";
-import traceStore from "./useTraces";
 import layoutStore from "../graph/useLayout";
 import projectStore from "./useProject";
+import traceStore from "./useTraces";
+import artifactStore from "./useArtifacts";
 
 /**
  * This module keeps track of the different document views for a project.

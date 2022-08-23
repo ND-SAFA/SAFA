@@ -1,6 +1,6 @@
+import { CollectionReturnValue, NodeSingular } from "cytoscape";
 import { CytoCore, CytoEvent, EdgeHandleCore } from "@/types";
 import { onArtifactTreeEdgeComplete } from "@/cytoscape/plugins/edge-handles/on-complete";
-import { CollectionReturnValue, NodeSingular } from "cytoscape";
 import { appStore, logStore } from "@/hooks";
 
 let edgeHandlesCore: EdgeHandleCore | undefined = undefined;

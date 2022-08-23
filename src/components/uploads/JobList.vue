@@ -15,9 +15,8 @@ import Vue from "vue";
 import { JobModel } from "@/types";
 import { appStore, jobStore } from "@/hooks";
 import { handleReloadJobs } from "@/api";
-import { Typography } from "@/components/common";
+import { Typography, FlexBox } from "@/components/common";
 import JobPanel from "./JobPanel.vue";
-import FlexBox from "@/components/common/display/FlexBox.vue";
 
 /**
  * Displays all jobs.

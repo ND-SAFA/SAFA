@@ -1,6 +1,5 @@
 import { Commit } from "@/types";
-import { projectStore } from "@/hooks";
-import { appStore, commitStore } from "@/hooks";
+import { projectStore, appStore, commitStore } from "@/hooks";
 import { persistCommit } from "@/api";
 
 /**

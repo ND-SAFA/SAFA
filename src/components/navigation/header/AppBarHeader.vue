@@ -54,9 +54,9 @@ import {
   BaselineVersionModal,
   UploadNewVersionModal,
 } from "@/components/project";
-import AccountDropdown from "./AccountDropdown.vue";
-import VersionLabel from "./VersionLabel.vue";
 import SavingIcon from "./SavingIcon.vue";
+import VersionLabel from "./VersionLabel.vue";
+import AccountDropdown from "./AccountDropdown.vue";
 
 export default Vue.extend({
   name: "AppBarHeader",

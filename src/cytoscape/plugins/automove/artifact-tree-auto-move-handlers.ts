@@ -1,10 +1,10 @@
+import { EventObject, NodeSingular } from "cytoscape";
 import {
   AutoMoveEventHandlers,
   AutoMoveRule,
   CSSCursor,
   CytoEvent,
 } from "@/types";
-import { EventObject, NodeSingular } from "cytoscape";
 
 /**
  * Defines a set of triggers-handler pairs for use in the artifact tree graph.

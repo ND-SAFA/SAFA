@@ -34,7 +34,6 @@
 
 <script lang="ts">
 import Vue from "vue";
-import Typography from "./Typography.vue";
 import { ApprovalType } from "@/types";
 import {
   camelcaseToDisplay,
@@ -44,6 +43,7 @@ import {
 } from "@/util";
 import { typeOptionsStore } from "@/hooks";
 import FlexBox from "@/components/common/display/FlexBox.vue";
+import Typography from "./Typography.vue";
 
 /**
  * Displays a generic chip that can render specific attributes.

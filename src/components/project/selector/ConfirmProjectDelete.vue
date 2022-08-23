@@ -30,8 +30,8 @@
 </template>
 
 <script lang="ts">
-import { IdentifierModel } from "@/types";
 import Vue, { PropType } from "vue";
+import { IdentifierModel } from "@/types";
 import { GenericModal } from "@/components/common";
 
 /**

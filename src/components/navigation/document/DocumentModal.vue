@@ -71,8 +71,12 @@
 import Vue, { PropType } from "vue";
 import { DocumentModel } from "@/types";
 import { createDocument, documentTypeOptions } from "@/util";
-import { artifactStore, documentStore, subtreeStore } from "@/hooks";
-import { typeOptionsStore } from "@/hooks";
+import {
+  artifactStore,
+  documentStore,
+  subtreeStore,
+  typeOptionsStore,
+} from "@/hooks";
 import { handleDeleteDocument, handleSaveDocument } from "@/api";
 import { ArtifactInput, GenericModal } from "@/components/common";
 

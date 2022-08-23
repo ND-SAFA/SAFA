@@ -41,8 +41,8 @@ import { IdentifierModel, VersionModel, DataItem } from "@/types";
 import { getProjectVersions, handleDeleteVersion } from "@/api";
 import { projectStore } from "@/hooks";
 import { GenericSelector } from "@/components/common";
-import VersionCreator from "./VersionCreator.vue";
 import ConfirmVersionDelete from "./ConfirmVersionDelete.vue";
+import VersionCreator from "./VersionCreator.vue";
 
 /**
  * Displays list of project versions available to given project and allows them

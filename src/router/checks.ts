@@ -1,14 +1,13 @@
-import { RouterCheck } from "@/types";
 import { NavigationGuardNext, Route } from "vue-router";
+import { NavigationGuard } from "vue-router/types/router";
 import {
   QueryParams,
   Routes,
   routesPublic,
   routesWithRequiredProject,
 } from "@/router/routes";
-import { appStore, layoutStore, projectStore } from "@/hooks";
+import { appStore, layoutStore, projectStore, sessionStore } from "@/hooks";
 import { handleLoadVersion } from "@/api";
-import { sessionStore } from "@/hooks";
 
 /**
  * Defines list of functions that are run before navigating to a new page.
@@ -19,7 +18,7 @@ import { sessionStore } from "@/hooks";
  * that once a check has used the `next` function the remaining checks
  * are ignored.
  */
-export const routerChecks: Record<string, RouterCheck> = {
+export const routerChecks: Record<string, NavigationGuard> = {
   redirectToLoginIfNoSessionFound(
     to: Route,
     from: Route,

@@ -52,8 +52,8 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { FlexBox } from "@/components/common";
 import { DataTableHeader } from "vuetify";
+import { FlexBox } from "@/components/common";
 /**
  * Renders the header for a table.
  *

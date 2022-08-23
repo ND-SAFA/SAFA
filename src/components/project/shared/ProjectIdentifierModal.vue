@@ -46,8 +46,8 @@ import Vue, { PropType } from "vue";
 import { IdentifierModel } from "@/types";
 import { createProjectIdentifier } from "@/util";
 import { GenericModal } from "@/components/common";
-import ProjectIdentifierInput from "./ProjectIdentifierInput.vue";
 import ProjectFilesInput from "./ProjectFilesInput.vue";
+import ProjectIdentifierInput from "./ProjectIdentifierInput.vue";
 
 /**
  * A modal for renaming a project.

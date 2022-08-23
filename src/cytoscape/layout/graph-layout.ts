@@ -1,3 +1,4 @@
+import { NodeSingular } from "cytoscape";
 import {
   KlayLayoutSettings,
   LayoutHook,
@@ -7,7 +8,6 @@ import {
   CytoEventHandlers,
 } from "@/types";
 import { layoutStore } from "@/hooks";
-import { NodeSingular } from "cytoscape";
 
 /**
  * Defines a graph layout.

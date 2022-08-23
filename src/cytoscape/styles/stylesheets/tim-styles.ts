@@ -1,5 +1,5 @@
-import { CytoStyleSheet } from "@/types/cytoscape";
 import { Stylesheet } from "cytoscape";
+import { CytoStyleSheet } from "@/types/cytoscape";
 import {
   TIM_EDGE_ARROW_SHAPE,
   TIM_EDGE_STYLE,

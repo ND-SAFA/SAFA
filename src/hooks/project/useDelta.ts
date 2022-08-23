@@ -11,10 +11,10 @@ import {
 } from "@/types";
 import { createProjectDelta } from "@/util";
 import { disableDrawMode } from "@/cytoscape";
-import appStore from "../core/useApp";
 import layoutStore from "../graph/useLayout";
-import subtreeStore from "./useSubtree";
+import appStore from "../core/useApp";
 import projectStore from "./useProject";
+import subtreeStore from "./useSubtree";
 
 /**
  * This module tracks the delta state of a project.

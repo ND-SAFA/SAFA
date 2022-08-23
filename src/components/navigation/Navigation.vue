@@ -12,11 +12,10 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { logStore } from "@/hooks";
+import { logStore, sessionStore } from "@/hooks";
 import { AppConfirmModal, ArtifactBodyModal, Snackbar } from "@/components";
-import AppBar from "./AppBar.vue";
 import { LeftNavDrawer, RightNavDrawer } from "./side-panels";
-import { sessionStore } from "@/hooks";
+import AppBar from "./AppBar.vue";
 
 /**
  * Renders the navigation bars and top level modals.

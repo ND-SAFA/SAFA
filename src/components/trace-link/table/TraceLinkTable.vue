@@ -97,9 +97,9 @@ import { appStore, projectStore } from "@/hooks";
 import { handleGetGeneratedLinks } from "@/api";
 import { AttributeChip, TableGroupHeader } from "@/components/common";
 import TraceLinkDisplay from "../TraceLinkDisplay.vue";
-import TraceLinkApproval from "./TraceLinkApproval.vue";
-import TraceLinkTableHeader from "./TraceLinkTableHeader.vue";
 import traceLinkTableHeaders from "./traceLinkTableHeaders";
+import TraceLinkTableHeader from "./TraceLinkTableHeader.vue";
+import TraceLinkApproval from "./TraceLinkApproval.vue";
 
 /**
  * Displays a table of trace links.

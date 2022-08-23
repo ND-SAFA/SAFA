@@ -48,8 +48,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { DataItem, IdentifierModel, ProjectRole } from "@/types";
-import { logStore } from "@/hooks";
-import { sessionStore } from "@/hooks";
+import { logStore, sessionStore } from "@/hooks";
 import { getProjects, handleDeleteProject, handleSaveProject } from "@/api";
 import { GenericSelector } from "@/components/common";
 import { ProjectIdentifierModal } from "@/components/project/shared";

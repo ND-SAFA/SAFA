@@ -34,12 +34,11 @@
 <script lang="ts">
 import Vue from "vue";
 import { MessageType, SnackbarMessage } from "@/types";
-import { appStore } from "@/hooks";
-import { logStore } from "@/hooks";
+import { appStore, logStore } from "@/hooks";
 import { ServerErrorModal } from "@/components/common/modals";
-import Typography from "./Typography.vue";
 import { ThemeColors } from "@/util";
 import FlexBox from "@/components/common/display/FlexBox.vue";
+import Typography from "./Typography.vue";
 
 /**
  * Displays snackbar messages.

@@ -1,6 +1,6 @@
+import { NodeSingular, EdgeDataDefinition } from "cytoscape";
 import { EdgeHandlersOptions } from "@/types";
 import { getTraceId } from "@/util";
-import { NodeSingular, EdgeDataDefinition } from "cytoscape";
 import { canConnect } from "@/cytoscape/plugins/edge-handles/can-connect";
 
 // the default values of each option are outlined below:

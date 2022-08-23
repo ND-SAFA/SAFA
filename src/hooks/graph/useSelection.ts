@@ -9,9 +9,9 @@ import {
   isInSubtree,
 } from "@/cytoscape";
 import { ArtifactModel, FilterAction, PanelType } from "@/types";
-import appStore from "../core/useApp";
-import artifactStore from "../project/useArtifacts";
 import subtreeStore from "../project/useSubtree";
+import artifactStore from "../project/useArtifacts";
+import appStore from "../core/useApp";
 
 /**
  * Manages selection of parts of the project.

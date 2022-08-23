@@ -1,8 +1,7 @@
 import { APIOptions } from "@/types";
-import { logStore } from "@/hooks";
+import { logStore, sessionStore } from "@/hooks";
 import { baseURL } from "@/api";
 import { handleLogout } from "@/api/handlers";
-import { sessionStore } from "@/hooks";
 
 /**
  * Executes an http request with the given parameters containing current

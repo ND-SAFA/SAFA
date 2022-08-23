@@ -1,5 +1,5 @@
-import { ArtifactData, CytoEvent } from "@/types";
 import { EventObject } from "cytoscape";
+import { ArtifactData, CytoEvent } from "@/types";
 
 /**
  * Depicts options given to cytoscape context menu plugin options.

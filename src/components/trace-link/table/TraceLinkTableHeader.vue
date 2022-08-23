@@ -26,9 +26,9 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
+import { DataTableHeader } from "vuetify";
 import { TableHeader } from "@/components/common";
 import { approvalTypeOptions } from "@/util";
-import { DataTableHeader } from "vuetify";
 
 /**
  * Displays the header for the trace links table.

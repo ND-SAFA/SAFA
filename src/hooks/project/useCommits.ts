@@ -3,8 +3,8 @@ import { defineStore } from "pinia";
 import { pinia } from "@/plugins";
 import { ArtifactModel, Commit, CommitHistory, TraceLinkModel } from "@/types";
 import { createCommit } from "@/util";
-import artifactStore from "./useArtifacts";
 import traceStore from "./useTraces";
+import artifactStore from "./useArtifacts";
 
 /**
  * This module tracks commits and allows for undoing them.

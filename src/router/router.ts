@@ -1,6 +1,5 @@
 import Vue from "vue";
 import VueRouter, { NavigationGuardNext, Route, RouteConfig } from "vue-router";
-import { Routes } from "./routes";
 import {
   ApproveLinksView,
   ArtifactView,
@@ -16,7 +15,7 @@ import {
   MyAccountView,
 } from "@/views";
 import { routerChecks } from "@/router/checks";
-import { NextPayload } from "@/types";
+import { Routes } from "./routes";
 
 export { Routes };
 
@@ -100,7 +99,7 @@ router.beforeResolve((to: Route, from: Route, next: NavigationGuardNext) => {
   let exit = false;
   for (const check of Object.values(routerChecks)) {
     if (exit) return;
-    check(to, from, (p: NextPayload) => {
+    check(to, from, (p) => {
       next(p);
       exit = true;
     });

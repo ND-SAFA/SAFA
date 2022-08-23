@@ -45,9 +45,9 @@ import { Route } from "vue-router";
 import { appStore, documentStore } from "@/hooks";
 import { router, Routes } from "@/router";
 import { GenericIconButton, FlexBox } from "@/components/common";
-import { AppBarHeader, GraphButtons, Searchbar } from "./header";
-import { DocumentSelector } from "./document";
 import LoadingBar from "./LoadingBar.vue";
+import { DocumentSelector } from "./document";
+import { AppBarHeader, GraphButtons, Searchbar } from "./header";
 
 /**
  * Displays the navigation top bar.

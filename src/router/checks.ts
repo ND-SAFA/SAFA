@@ -1,5 +1,5 @@
 import { NavigationGuardNext, Route } from "vue-router";
-import { RouterCheck } from "@/types";
+import { NavigationGuard } from "vue-router/types/router";
 import {
   QueryParams,
   Routes,
@@ -18,7 +18,7 @@ import { handleLoadVersion } from "@/api";
  * that once a check has used the `next` function the remaining checks
  * are ignored.
  */
-export const routerChecks: Record<string, RouterCheck> = {
+export const routerChecks: Record<string, NavigationGuard> = {
   redirectToLoginIfNoSessionFound(
     to: Route,
     from: Route,

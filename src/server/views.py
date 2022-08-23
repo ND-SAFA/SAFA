@@ -1,3 +1,4 @@
+from copy import deepcopy
 from typing import Dict
 
 from server.api import Api
@@ -11,6 +12,8 @@ import json
 
 
 def predict(request: HttpRequest) -> JsonResponse:
+    body_json = json.loads(request.body)
+    print("RequestBODY:", body_json)
     return _run_job(request, JobType.PREDICT)
 
 
@@ -26,6 +29,7 @@ def _run_job(request, job_type):
 
 
 def _make_job_params_from_request(params: Dict):
+    params = deepcopy(params)
     model_path = params.pop(Api.MODEL_PATH.value)
     sources = params.pop(Api.SOURCES.value)
     targets = params.pop(Api.TARGETS.value)

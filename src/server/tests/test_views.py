@@ -2,6 +2,7 @@ from copy import deepcopy
 
 from django.test import TestCase
 from django.test import Client
+from django.test.client import JSON_CONTENT_TYPE_RE
 
 from server import views
 from server.api import Api
@@ -14,7 +15,7 @@ from test.test_model import get_test_model
 from test.test_tokenizer import get_test_tokenizer
 import mock
 from mock import patch
-
+import json
 
 class TestViews(TestCase):
     TEST_PARAMS = {Api.SOURCES.value: TEST_S_ARTS,
@@ -43,7 +44,7 @@ class TestViews(TestCase):
         model_generator_mock.get_model = mock.MagicMock(return_value=get_test_model())
         model_generator_mock.get_tokenizer = mock.MagicMock(return_value=get_test_tokenizer())
         test_request = self.get_test_request('/predict/', self.TEST_PARAMS)
-        # response = views._run_job(test_request, JobType.PREDICT)
+        response = views._run_job(test_request, JobType.PREDICT)
 
     """
      def test_make_job_params_from_request(self):
@@ -64,5 +65,8 @@ class TestViews(TestCase):
     def get_test_request(self, url: str, params: dict):
         c = Client()
         print("PARAMS", params)
-        request = c.post(url, data=params)
+        print(type(params))
+        body_str = json.dumps(params)
+        print("PARAM STR:", body_str)
+        request = c.post(url, data=params, content_type="application/json")
         return request

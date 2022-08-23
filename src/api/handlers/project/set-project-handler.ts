@@ -1,15 +1,14 @@
 import { ProjectModel } from "@/types";
 import { createProject } from "@/util";
 import { QueryParams, removeParams, updateParam } from "@/router";
+import { artifactSelectionModule, projectModule, subtreeModule } from "@/store";
 import {
-  artifactSelectionModule,
-  deltaModule,
-  documentModule,
-  errorModule,
-  projectModule,
-  subtreeModule,
-} from "@/store";
-import { appStore, layoutStore, typeOptionsStore } from "@/hooks";
+  appStore,
+  layoutStore,
+  typeOptionsStore,
+  documentStore,
+  deltaStore,
+} from "@/hooks";
 import {
   handleLoadTraceMatrices,
   handleLoadVersion,
@@ -33,7 +32,7 @@ export async function handleResetGraph(
 
   disableDrawMode();
   artifactSelectionModule.clearSelections();
-  deltaModule.clearDelta();
+  deltaStore.clear();
   appStore.closeSidePanels();
 }
 
@@ -67,7 +66,6 @@ export async function handleSetProject(project: ProjectModel): Promise<void> {
   await projectModule.initializeProject(project);
   await handleResetGraph(isDifferentProject);
   await handleLoadTraceMatrices();
-  errorModule.setArtifactWarnings(project.warnings);
   await setCurrentDocument(project);
   await updateParam(QueryParams.VERSION, versionId);
 }
@@ -76,7 +74,10 @@ export async function handleSetProject(project: ProjectModel): Promise<void> {
  * Reloads the current project.
  */
 export async function handleReloadProject(): Promise<void> {
-  await handleLoadVersion(projectModule.versionId, documentModule.document);
+  await handleLoadVersion(
+    projectModule.versionId,
+    documentStore.currentDocument
+  );
 }
 
 /**
@@ -91,7 +92,7 @@ async function setCurrentDocument(project: ProjectModel): Promise<void> {
     );
     if (documents.length === 1) {
       const document = documents[0];
-      await documentModule.switchDocuments(document);
+      await documentStore.switchDocuments(document);
     }
   }
 }

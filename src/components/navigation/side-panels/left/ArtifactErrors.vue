@@ -22,8 +22,9 @@
 <script lang="ts">
 import Vue from "vue";
 import { WarningModel } from "@/types";
-import { artifactSelectionModule, errorModule } from "@/store";
+import { artifactSelectionModule } from "@/store";
 import { Typography, FlexBox, ToggleList } from "@/components/common";
+import { warningStore } from "@/hooks";
 
 /**
  * Displays the selected node's error.
@@ -44,7 +45,7 @@ export default Vue.extend({
     selectedArtifactWarnings(): WarningModel[] {
       const id = this.selectedArtifact?.id || "";
 
-      return errorModule.getArtifactWarnings[id] || [];
+      return warningStore.artifactWarnings[id] || [];
     },
   },
 });

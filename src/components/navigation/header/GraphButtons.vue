@@ -41,13 +41,8 @@
 <script lang="ts">
 import Vue from "vue";
 import { ButtonDefinition, ButtonType } from "@/types";
-import {
-  artifactSelectionModule,
-  commitModule,
-  documentModule,
-  viewportModule,
-} from "@/store";
-import { artifactStore } from "@/hooks";
+import { artifactSelectionModule, viewportModule } from "@/store";
+import { artifactStore, documentStore, commitStore } from "@/hooks";
 import { redoCommit, undoCommit } from "@/api";
 import { cyZoomIn, cyZoomOut } from "@/cytoscape";
 import { GenericIconButton, CheckmarkMenu, FlexBox } from "@/components/common";
@@ -89,14 +84,14 @@ export default Vue.extend({
           },
           label: "Undo",
           icon: "mdi-undo",
-          isDisabled: !commitModule.canUndo,
+          isDisabled: !commitStore.canUndo,
         },
         {
           type: ButtonType.ICON,
           handler: () => redoCommit().then(),
           label: "Redo",
           icon: "mdi-redo",
-          isDisabled: !commitModule.canRedo,
+          isDisabled: !commitStore.canRedo,
         },
       ];
     },
@@ -157,7 +152,7 @@ export default Vue.extend({
      * @return Whether to disable a graph button.
      */
     isButtonDisabled(button: ButtonDefinition): boolean {
-      return button.isDisabled || documentModule.isTableDocument;
+      return button.isDisabled || documentStore.isTableDocument;
     },
     /**
      * Filters the visible artifacts on the graph.

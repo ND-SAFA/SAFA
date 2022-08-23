@@ -76,8 +76,8 @@
 <script lang="ts">
 import Vue from "vue";
 import { ArtifactModel, ArtifactDeltaState, FlatArtifact } from "@/types";
-import { artifactSelectionModule, deltaModule, documentModule } from "@/store";
-import { appStore, artifactStore } from "@/hooks";
+import { artifactSelectionModule } from "@/store";
+import { appStore, artifactStore, documentStore, deltaStore } from "@/hooks";
 import {
   Typography,
   AttributeChip,
@@ -118,19 +118,19 @@ export default Vue.extend({
      * @return Whether to render the artifact table.
      */
     isVisible(): boolean {
-      return !appStore.isLoading && documentModule.isTableDocument;
+      return !appStore.isLoading && documentStore.isTableDocument;
     },
     /**
      * @return Whether delta view is enabled.
      */
     inDeltaView(): boolean {
-      return deltaModule.inDeltaView;
+      return deltaStore.inDeltaView;
     },
     /**
      * @return Whether table view is enabled.
      */
     isTableView(): boolean {
-      return documentModule.isTableDocument;
+      return documentStore.isTableDocument;
     },
     /**
      * @return The artifact table's headers.
@@ -151,7 +151,7 @@ export default Vue.extend({
           filterable: true,
           divider: true,
         },
-        ...documentModule.tableColumns.map((col) => ({
+        ...documentStore.tableColumns.map((col) => ({
           text: col.name,
           value: col.id,
           width: "300px",
@@ -173,7 +173,7 @@ export default Vue.extend({
      * @return The artifact table's columns.
      */
     columns() {
-      return documentModule.tableColumns;
+      return documentStore.tableColumns;
     },
     /**
      * @return The artifact table's items.
@@ -184,7 +184,7 @@ export default Vue.extend({
       return artifactStore.flatArtifacts.filter(
         ({ id }) =>
           selectedTypes.length === 0 ||
-          selectedTypes.includes(deltaModule.getArtifactDeltaType(id))
+          selectedTypes.includes(deltaStore.getArtifactDeltaType(id))
       );
     },
   },

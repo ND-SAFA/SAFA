@@ -20,7 +20,8 @@
 import Vue from "vue";
 import { DocumentModel } from "@/types";
 import { documentTypeOptions } from "@/util";
-import { artifactSelectionModule, documentModule } from "@/store";
+import { artifactSelectionModule } from "@/store";
+import { documentStore } from "@/hooks";
 import { Typography, GenericListItem } from "@/components/common";
 
 /**
@@ -42,7 +43,7 @@ export default Vue.extend({
     documents(): DocumentModel[] {
       if (!this.selectedArtifact) return [];
 
-      return documentModule.projectDocuments.filter(({ documentId }) =>
+      return documentStore.projectDocuments.filter(({ documentId }) =>
         this.selectedArtifact?.documentIds.includes(documentId)
       );
     },
@@ -53,7 +54,7 @@ export default Vue.extend({
      * @param document - The document to switch to.
      */
     handleSwitchDocument(document: DocumentModel): void {
-      documentModule.switchDocuments(document);
+      documentStore.switchDocuments(document);
     },
     /**
      * Converts the document type into a display name.

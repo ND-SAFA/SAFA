@@ -9,12 +9,8 @@ import {
   ArtifactCytoCoreElement,
   ArtifactDeltaState,
 } from "@/types";
-import {
-  artifactSelectionModule,
-  deltaModule,
-  errorModule,
-  subtreeModule,
-} from "@/store";
+import { artifactSelectionModule, subtreeModule } from "@/store";
+import { warningStore, deltaStore } from "@/hooks";
 
 export default Vue.extend({
   name: "ArtifactNode",
@@ -39,12 +35,12 @@ export default Vue.extend({
      * @return The delta state of this artifact.
      */
     artifactDeltaState(): ArtifactDeltaState {
-      if (!deltaModule.inDeltaView) {
+      if (!deltaStore.inDeltaView) {
         return ArtifactDeltaState.NO_CHANGE;
       }
 
       return (
-        deltaModule.getArtifactDeltaType(this.artifactDefinition.id) ||
+        deltaStore.getArtifactDeltaType(this.artifactDefinition.id) ||
         ArtifactDeltaState.NO_CHANGE
       );
     },
@@ -54,12 +50,12 @@ export default Vue.extend({
     definition(): ArtifactCytoCoreElement {
       const { id, body, type, name, safetyCaseType, logicType } =
         this.artifactDefinition;
-      const warnings =
-        errorModule.getArtifactWarnings[this.artifactDefinition.id];
+      const warnings = warningStore.artifactWarnings[id];
       const hiddenChildren = subtreeModule.getHiddenChildrenByParentId(id);
-      const hiddenChildWarnings = errorModule.getWarningsByIds(hiddenChildren);
+      const hiddenChildWarnings =
+        warningStore.getArtifactWarnings(hiddenChildren);
       const hiddenChildDeltaStates =
-        deltaModule.getDeltaStatesByArtifactNames(hiddenChildren);
+        deltaStore.getArtifactDeltaStates(hiddenChildren);
       const opacity = this.hidden ? 0 : this.faded ? 0.1 : 1;
 
       return {

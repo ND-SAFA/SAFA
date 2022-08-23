@@ -51,8 +51,8 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { documentModule, projectModule } from "@/store";
-import { appStore } from "@/hooks";
+import { projectModule } from "@/store";
+import { appStore, documentStore } from "@/hooks";
 import { GenericIconButton } from "@/components";
 import { disableDrawMode, enableDrawMode } from "@/cytoscape";
 
@@ -72,7 +72,7 @@ export default Vue.extend({
      * @return Whether to render the artifact tree.
      */
     isVisible(): boolean {
-      return !appStore.isLoading && !documentModule.isTableDocument;
+      return !appStore.isLoading && !documentStore.isTableDocument;
     },
     /**
      * @return Whether trace link draw mode is currently enabled.

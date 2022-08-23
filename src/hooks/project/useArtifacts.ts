@@ -57,7 +57,7 @@ export const useArtifacts = defineStore("artifacts", {
       });
     },
     /**
-     * DO NOT CALL THIS OUTSIDE OF THE PROJECT MODULE.
+     * DO NOT CALL THIS OUTSIDE OF THE STORES.
      * Deletes the artifacts with the given names.
      *
      * @param artifacts - The artifacts to delete.

@@ -34,7 +34,7 @@ import Vue, { PropType } from "vue";
 import { DataTableHeader } from "vuetify";
 import { ArtifactDeltaState } from "@/types";
 import { deltaTypeOptions } from "@/util";
-import { deltaModule } from "@/store";
+import { deltaStore } from "@/hooks";
 import { TableHeader, FlexBox } from "@/components/common";
 import TableColumnEditor from "./TableColumnEditor.vue";
 
@@ -75,7 +75,7 @@ export default Vue.extend({
      * @return Whether the app is in delta view.
      */
     inDeltaView(): boolean {
-      return deltaModule.inDeltaView;
+      return deltaStore.inDeltaView;
     },
     /**
      * Emits changes to the grouping.

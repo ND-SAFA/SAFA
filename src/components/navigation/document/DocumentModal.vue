@@ -71,8 +71,8 @@
 import Vue, { PropType } from "vue";
 import { DocumentModel } from "@/types";
 import { createDocument, documentTypeOptions } from "@/util";
-import { documentModule, subtreeModule } from "@/store";
-import { artifactStore } from "@/hooks";
+import { subtreeModule } from "@/store";
+import { artifactStore, documentStore } from "@/hooks";
 import { typeOptionsStore } from "@/hooks";
 import { handleDeleteDocument, handleSaveDocument } from "@/api";
 import { ArtifactInput, GenericModal } from "@/components/common";
@@ -122,7 +122,7 @@ export default Vue.extend({
      */
     isNameValid(): boolean {
       return (
-        !documentModule.doesDocumentExist(this.editingDocument?.name) ||
+        !documentStore.doesDocumentExist(this.editingDocument?.name) ||
         this.editingDocument.name === this.document?.name
       );
     },

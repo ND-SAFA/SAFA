@@ -42,8 +42,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { Route } from "vue-router";
-import { documentModule } from "@/store";
-import { appStore } from "@/hooks";
+import { appStore, documentStore } from "@/hooks";
 import { router, Routes } from "@/router";
 import { GenericIconButton, FlexBox } from "@/components/common";
 import { AppBarHeader, GraphButtons, Searchbar } from "./header";
@@ -90,7 +89,7 @@ export default Vue.extend({
      * @return Whether to disable graphing buttons.
      */
     doDisableButtons(): boolean {
-      return documentModule.isTableDocument;
+      return documentStore.isTableDocument;
     },
     /**
      * @return The left panel button icon to display.

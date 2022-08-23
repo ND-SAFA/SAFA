@@ -1,5 +1,4 @@
-import { documentModule } from "@/store";
-import { appStore } from "@/hooks";
+import { appStore, documentStore } from "@/hooks";
 import { ArtifactData, DocumentType, FTANodeType, MenuItem } from "@/types";
 
 /**
@@ -17,7 +16,7 @@ export const ftaMenuItem: MenuItem = {
   },
   isVisible: (artifactData: ArtifactData | undefined): boolean => {
     if (artifactData === undefined) {
-      return documentModule.type === DocumentType.FTA;
+      return documentStore.currentType === DocumentType.FTA;
     }
     return false;
   },

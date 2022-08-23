@@ -40,7 +40,8 @@
 import Vue from "vue";
 import { ProjectModel } from "@/types";
 import { handleReloadProject } from "@/api";
-import { deltaModule, projectModule } from "@/store";
+import { projectModule } from "@/store";
+import { deltaStore } from "@/hooks";
 import DeltaVersionsModal from "./DeltaVersionsModal.vue";
 import { Typography } from "@/components/common";
 
@@ -74,7 +75,7 @@ export default Vue.extend({
      * @return Whether delta view is enabled.
      */
     isDeltaViewEnabled(): boolean {
-      return deltaModule.inDeltaView;
+      return deltaStore.inDeltaView;
     },
   },
   methods: {
@@ -85,7 +86,7 @@ export default Vue.extend({
       if (!this.isDeltaViewEnabled) {
         this.isModalOpen = true;
       } else {
-        deltaModule.setIsDeltaViewEnabled(false);
+        deltaStore.setIsDeltaViewEnabled(false);
         handleReloadProject();
       }
     },
@@ -93,7 +94,7 @@ export default Vue.extend({
      * Enables delta view.
      */
     handleSubmit(): void {
-      deltaModule.setIsDeltaViewEnabled(true);
+      deltaStore.setIsDeltaViewEnabled(true);
     },
   },
   watch: {

@@ -53,7 +53,7 @@ export const useTraces = defineStore("traces", {
       });
     },
     /**
-     * DO NOT CALL THIS OUTSIDE OF THE PROJECT MODULE.
+     * DO NOT CALL THIS OUTSIDE OF THE STORES.
      * Deletes the given trace links.
      *
      * @param traceLinks - The trace links to remove.

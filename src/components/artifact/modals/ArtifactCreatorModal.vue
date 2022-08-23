@@ -31,8 +31,7 @@
 import Vue, { PropType } from "vue";
 import { ArtifactModel, DocumentType } from "@/types";
 import { createArtifact, createArtifactOfType } from "@/util";
-import { documentModule } from "@/store";
-import { artifactStore } from "@/hooks";
+import { artifactStore, documentStore } from "@/hooks";
 import { handleSaveArtifact } from "@/api";
 import { GenericModal } from "@/components/common";
 import ArtifactCreatorInputs from "./ArtifactCreatorInputs.vue";
@@ -188,7 +187,7 @@ export default Vue.extend({
      * Attempts to save the artifact.
      */
     handleSubmit(): void {
-      const { documentId } = documentModule.document;
+      const { documentId } = documentStore.currentDocument;
       const { logicType, safetyCaseType } = this.editedArtifact;
       const isUpdate = this.artifact !== undefined;
       const artifact = createArtifact({

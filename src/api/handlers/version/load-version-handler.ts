@@ -1,5 +1,12 @@
-import { documentModule, errorModule, projectModule } from "@/store";
-import { appStore, layoutStore } from "@/hooks";
+import { DocumentModel } from "@/types";
+import { projectModule } from "@/store";
+import {
+  appStore,
+  layoutStore,
+  warningStore,
+  sessionStore,
+  documentStore,
+} from "@/hooks";
 import {
   navigateTo,
   QueryParams,
@@ -15,8 +22,6 @@ import {
   handleSetProject,
   getWarningsInProjectVersion,
 } from "@/api";
-import { DocumentModel } from "@/types";
-import { sessionStore } from "@/hooks";
 
 /**
  * Load the given project version of given Id. Navigates to the artifact
@@ -49,7 +54,7 @@ export async function handleLoadVersion(
     .then(async () => {
       if (!document) return;
 
-      await documentModule.switchDocuments(document);
+      await documentStore.switchDocuments(document);
     })
     .then(navigateIfNeeded)
     .finally(() => appStore.onLoadEnd());
@@ -93,7 +98,5 @@ export async function handleReloadTraceLinks(versionId: string): Promise<void> {
  * @param versionId - The project version to load from.
  */
 export async function handleReloadWarnings(versionId: string): Promise<void> {
-  const warnings = await getWarningsInProjectVersion(versionId);
-
-  errorModule.setArtifactWarnings(warnings);
+  warningStore.artifactWarnings = await getWarningsInProjectVersion(versionId);
 }

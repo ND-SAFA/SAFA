@@ -6,8 +6,8 @@ import {
   DocumentModel,
 } from "@/types";
 import { createDocument } from "@/util";
-import { documentModule, projectModule } from "@/store";
-import { logStore } from "@/hooks";
+import { projectModule } from "@/store";
+import { logStore, documentStore } from "@/hooks";
 import {
   saveDocument,
   deleteDocument,
@@ -39,7 +39,7 @@ export async function handleCreateDocument(
     })
   );
 
-  await documentModule.addDocument(createdDocument);
+  await documentStore.addDocument(createdDocument);
 }
 
 /**
@@ -53,11 +53,11 @@ export async function handleUpdateDocument(
   const versionId = projectModule.versionIdWithLog;
   const updatedDocument = await saveDocument(versionId, document);
 
-  await documentModule.updateDocuments([updatedDocument]);
+  await documentStore.updateDocuments([updatedDocument]);
 
-  if (documentModule.document.documentId !== updatedDocument.documentId) return;
+  if (documentStore.currentId !== updatedDocument.documentId) return;
 
-  await documentModule.switchDocuments(updatedDocument);
+  await documentStore.switchDocuments(updatedDocument);
 }
 
 /**
@@ -76,7 +76,7 @@ export function handleDeleteDocument(
 
   deleteDocument(document)
     .then(async () => {
-      await documentModule.removeDocument(document);
+      await documentStore.removeDocument(document);
       logStore.onSuccess(`Document has been deleted: ${name}`);
       onSuccess?.();
     })
@@ -99,9 +99,9 @@ export async function handleDocumentReload(
 ): Promise<void> {
   const documents = await getDocuments(versionId);
 
-  await documentModule.updateDocuments(documents);
+  await documentStore.updateDocuments(documents);
 
-  documentModule.defaultDocument.artifactIds = artifacts.map(({ id }) => id);
+  documentStore.baseDocument.artifactIds = artifacts.map(({ id }) => id);
 }
 
 /**
@@ -157,7 +157,7 @@ export function handleColumnMove(
   moveUp: boolean,
   { onSuccess, onError }: IOHandlerCallback<ColumnModel[]>
 ): void {
-  const document = documentModule.document;
+  const document = documentStore.currentDocument;
   const currentIndex = (document.columns || []).indexOf(column);
   const swapIndex = moveUp ? currentIndex - 1 : currentIndex + 1;
   const columns = document.columns || [];
@@ -194,7 +194,7 @@ export function handleColumnSave(
   isEditMode: boolean,
   { onSuccess, onError }: IOHandlerCallback
 ): void {
-  const document = documentModule.document;
+  const document = documentStore.currentDocument;
   const { id: columnId, name } = column;
 
   if (!isEditMode) {
@@ -228,7 +228,7 @@ export function handleColumnDelete(
   column: ColumnModel,
   { onSuccess, onError }: IOHandlerCallback
 ): void {
-  const document = documentModule.document;
+  const document = documentStore.currentDocument;
   const { id: columnId, name } = column;
 
   document.columns = (document.columns || []).filter(

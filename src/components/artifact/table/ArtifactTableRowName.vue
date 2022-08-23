@@ -11,7 +11,7 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { ArtifactModel } from "@/types";
-import { errorModule } from "@/store";
+import { warningStore } from "@/hooks";
 import { Typography, FlexBox } from "@/components/common";
 import ArtifactTableDeltaChip from "./ArtifactTableDeltaChip.vue";
 
@@ -35,7 +35,7 @@ export default Vue.extend({
      * @return Whether the artifact has warnings.
      */
     getHasWarnings(item: ArtifactModel): boolean {
-      return errorModule.getWarningsByIds([item.id]).length > 0;
+      return warningStore.artifactWarnings[item.id].length > 0;
     },
   },
 });

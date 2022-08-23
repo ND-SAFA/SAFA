@@ -91,8 +91,7 @@ import {
   TraceType,
 } from "@/types";
 import { GenericArtifactBodyDisplay } from "@/components";
-import { deltaModule } from "@/store";
-import { artifactStore } from "@/hooks";
+import { artifactStore, deltaStore } from "@/hooks";
 import { FlexBox } from "@/components/common";
 import {
   handleApproveLink,
@@ -160,7 +159,7 @@ export default Vue.extend({
      */
     showDelete(): boolean {
       return (
-        !this.canBeModified && !this.hideActions && !deltaModule.inDeltaView
+        !this.canBeModified && !this.hideActions && !deltaStore.inDeltaView
       );
     },
     /**

@@ -11,6 +11,3 @@ Cypress.Commands.add("setProjectIdentifier", (type) => {
     cy.getCy(DataCy.creationBulkDescriptionInput).type(testProject.description);
   }
 });
-
-// TODO: finish
-// Cypress.Commands.add("selectForPossibleErros", (containsErros: boolean) => {});

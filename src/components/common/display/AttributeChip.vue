@@ -73,8 +73,10 @@ export default Vue.extend({
         return this.value.slice(0, 4);
       } else if (this.enumerated || this.value === this.value?.toUpperCase()) {
         return uppercaseToDisplay(this.value);
-      } else if (this.format || this.artifactType) {
+      } else if (this.format) {
         return camelcaseToDisplay(this.value);
+      } else if (this.artifactType) {
+        return typeOptionsStore.getArtifactTypeDisplay(this.value);
       } else {
         return this.value;
       }

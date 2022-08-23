@@ -31,7 +31,7 @@
             <typography value="Allowed Trace Directions" />
           </v-expansion-panel-header>
           <v-expansion-panel-content>
-            <div v-for="entry in artifactDirections" :key="entry.label">
+            <div v-for="entry in typeDirections" :key="entry.label">
               <type-direction-input :entry="entry" />
             </div>
           </v-expansion-panel-content>
@@ -129,8 +129,8 @@ export default Vue.extend({
     /**
      * @return The current project's artifact types.
      */
-    artifactDirections(): LabelledTraceDirectionModel[] {
-      return typeOptionsStore.labeledTypeDirections();
+    typeDirections(): LabelledTraceDirectionModel[] {
+      return typeOptionsStore.typeDirections();
     },
   },
   methods: {

@@ -69,3 +69,8 @@ $graph-border-radius: 8px;
     fill: lighten($color-removed, 10);
   }
 }
+
+.no-icon-rotate {
+  cursor: pointer !important;
+  transform: none !important;
+}

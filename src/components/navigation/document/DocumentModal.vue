@@ -21,23 +21,19 @@
         item-text="name"
         item-value="id"
       />
-      <v-autocomplete
-        filled
+      <artifact-type-input
         multiple
         label="Include Artifact Types"
         v-model="includedTypes"
-        :items="artifactTypes"
         @blur="handleSaveTypes"
       />
       <artifact-input label="Artifacts" v-model="editingDocument.artifactIds" />
       <v-switch label="Include artifact children" v-model="includeChildren" />
-      <v-autocomplete
+      <artifact-type-input
         v-if="includeChildren"
-        filled
         multiple
         label="Include Child Types"
         v-model="includedChildTypes"
-        :items="artifactTypes"
         @blur="handleSaveChildren"
       />
       <artifact-input
@@ -71,14 +67,13 @@
 import Vue, { PropType } from "vue";
 import { DocumentModel } from "@/types";
 import { createDocument, documentTypeOptions } from "@/util";
-import {
-  artifactStore,
-  documentStore,
-  subtreeStore,
-  typeOptionsStore,
-} from "@/hooks";
+import { artifactStore, documentStore, subtreeStore } from "@/hooks";
 import { handleDeleteDocument, handleSaveDocument } from "@/api";
-import { ArtifactInput, GenericModal } from "@/components/common";
+import {
+  ArtifactInput,
+  GenericModal,
+  ArtifactTypeInput,
+} from "@/components/common";
 
 /**
  * A modal for adding or editing documents.
@@ -87,7 +82,7 @@ import { ArtifactInput, GenericModal } from "@/components/common";
  */
 export default Vue.extend({
   name: "DocumentModal",
-  components: { GenericModal, ArtifactInput },
+  components: { ArtifactTypeInput, GenericModal, ArtifactInput },
   props: {
     isOpen: Boolean,
     document: {
@@ -147,12 +142,6 @@ export default Vue.extend({
     deleteButtonText(): string {
       return this.confirmDelete ? "Delete" : "Delete Document";
     },
-    /**
-     * @return All types of artifacts
-     */
-    artifactTypes(): string[] {
-      return typeOptionsStore.artifactTypes;
-    },
   },
   methods: {
     /**
@@ -170,9 +159,18 @@ export default Vue.extend({
      * Generates children to save on this document.
      */
     handleSaveTypes() {
-      this.editingDocument.artifactIds = artifactStore.allArtifacts
-        .filter(({ type }) => this.includedTypes.includes(type))
-        .map(({ id }) => id);
+      const baseArtifacts = this.document?.artifactIds || [];
+
+      this.editingDocument.artifactIds =
+        this.includedTypes.length > 0
+          ? artifactStore.allArtifacts
+              .filter(
+                ({ id, type }) =>
+                  this.includedTypes.includes(type) ||
+                  baseArtifacts.includes(id)
+              )
+              .map(({ id }) => id)
+          : baseArtifacts;
     },
     /**
      * Generates children to save on this document.
@@ -232,8 +230,6 @@ export default Vue.extend({
       if (!open) return;
 
       this.editingDocument = createDocument(this.document);
-      this.includeChildren = false;
-      this.includedChildTypes = [];
     },
   },
 });

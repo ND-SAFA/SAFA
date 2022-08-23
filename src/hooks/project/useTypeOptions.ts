@@ -162,7 +162,7 @@ export const useTypeOptions = defineStore("typeOptions", {
     /**
      * Generates labeled artifact type directions.
      */
-    labeledTypeDirections(): LabelledTraceDirectionModel[] {
+    typeDirections(): LabelledTraceDirectionModel[] {
       return Object.entries(this.artifactTypeDirections).map(
         ([type, allowedTypes]) => {
           const icon = this.getArtifactTypeIcon(type);

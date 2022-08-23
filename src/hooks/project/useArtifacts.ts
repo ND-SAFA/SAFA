@@ -25,12 +25,12 @@ export const useArtifacts = defineStore("artifacts", {
       );
     },
     /**
-     * @return A collection of artifact lists, keyed by their type.
+     * @return A collection of current artifact lists, keyed by their type.
      */
     getArtifactsByType(): Record<string, ArtifactModel[]> {
       const artifactsByType: Record<string, ArtifactModel[]> = {};
 
-      this.allArtifacts.forEach((artifact) => {
+      this.currentArtifacts.forEach((artifact) => {
         if (!artifactsByType[artifact.type]) {
           artifactsByType[artifact.type] = [];
         }

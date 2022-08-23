@@ -46,21 +46,17 @@ describe("Authentication", () => {
 
     describe("I can log out", () => {
       it("logs out successfully", () => {
-        cy.login(validUser.email, validUser.password);
-        cy.logout();
+        cy.login(validUser.email, validUser.password).logout();
+
         cy.getCy(DataCy.loginButton).should("exist");
       });
 
       it("clears my session on logout", () => {
-        cy.login(validUser.email, validUser.password);
-        cy.logout();
+        cy.login(validUser.email, validUser.password)
+          .logout()
+          .visit("http://localhost:8080");
 
-        const store = JSON.parse(localStorage.getItem("t"));
-
-        expect(store).to.deep.equal({
-          token: "",
-          versionId: "",
-        });
+        cy.getCy(DataCy.loginButton).should("exist");
       });
     });
   });

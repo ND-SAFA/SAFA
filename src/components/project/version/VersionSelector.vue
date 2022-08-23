@@ -141,7 +141,7 @@ export default Vue.extend({
      * Loads project versions.
      */
     handleLoadProjectVersions() {
-      if (!this.project) return;
+      if (!this.project?.projectId) return;
 
       this.isLoading = true;
 

@@ -8,17 +8,13 @@ import {
 
 describe("Project Creation", () => {
   beforeEach(() => {
-    cy.visit("http://localhost:8080/create").login(
+    cy.visit("http://localhost:8080/create?tab=bulk").login(
       validUser.email,
       validUser.password
     );
   });
 
   describe("I can create a project from files uploaded in bulk", () => {
-    beforeEach(() => {
-      cy.switchTab("Bulk Upload");
-    });
-
     it("cant create a project without a name", () => {
       cy.getCy(DataCy.creationBulkDescriptionInput).type(testProject.name);
       cy.uploadFiles(DataCy.creationBulkFilesInput, simpleProjectFilesMap.tim);
@@ -38,11 +34,7 @@ describe("Project Creation", () => {
 
       cy.getCy(DataCy.creationUploadButton).should("not.be.disabled").click();
 
-      cy.getCy(DataCy.jobStatus, "first", 5000)
-        .wait(5000)
-        .should("contain.text", "Completed");
-
-      cy.clickButton(DataCy.jobPanel).clickButton(DataCy.jobDeleteButton);
+      cy.getCy(DataCy.snackbarSuccess).should("be.visible");
     });
   });
 });

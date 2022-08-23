@@ -1,0 +1,59 @@
+import { describe } from "mocha";
+import { validUser, simpleProjectFiles, DataCy } from "../fixtures";
+
+describe("Job Submission", () => {
+  beforeEach(() => {
+    cy.visit("http://localhost:8080/create?tab=bulk").login(
+      validUser.email,
+      validUser.password
+    );
+
+    cy.setProjectIdentifier("bulk")
+      .uploadFiles(DataCy.creationBulkFilesInput, ...simpleProjectFiles)
+      .clickButton(DataCy.creationUploadButton);
+  });
+
+  describe("I can view projects being imported", () => {
+    it("Shows a list of imported projects", () => {
+      cy.clickButton(DataCy.navProjectButton).clickButtonWithName(
+        "Project Uploads"
+      );
+
+      cy.getCy(DataCy.jobPanel).should("have.length.above", 0);
+
+      cy.clickButton(DataCy.jobPanel).clickButton(DataCy.jobDeleteButton);
+    });
+  });
+
+  describe("I can see the current import status of a project being imported", () => {
+    it("Shows in progress jobs", () => {
+      cy.getCy(DataCy.jobStatus, "first", 5000).should(
+        "contain.text",
+        "In Progress"
+      );
+    });
+
+    it.skip("Shows completed jobs", () => {
+      cy.getCy(DataCy.jobStatus, "first", 5000).should(
+        "contain.text",
+        "Completed"
+      );
+    });
+
+    afterEach(() => {
+      cy.clickButton(DataCy.jobPanel).clickButton(DataCy.jobDeleteButton);
+    });
+  });
+
+  // describe("I can see the current import progress of a project being imported");
+
+  describe("I can delete a project import", () => {
+    it("Deletes a project from the list", () => {
+      cy.clickButton(DataCy.jobPanel).clickButton(DataCy.jobDeleteButton);
+
+      cy.getCy(DataCy.snackbarSuccess).should("be.visible");
+    });
+  });
+
+  // describe("I can cancel a project that is being imported");
+});

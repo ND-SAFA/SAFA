@@ -36,8 +36,8 @@ import {
   Typography,
   TypeDirectionInput,
   TypeIconInput,
+  ToggleList,
 } from "@/components/common";
-import ToggleList from "@/components/common/display/ToggleList.vue";
 
 /**
  * Renders a tab for changing artifact type icons and trace directions.

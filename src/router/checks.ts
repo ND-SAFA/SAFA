@@ -6,7 +6,7 @@ import {
   routesPublic,
   routesWithRequiredProject,
 } from "@/router/routes";
-import { appStore, layoutStore, projectStore, selectionStore } from "@/hooks";
+import { appStore, layoutStore, projectStore } from "@/hooks";
 import { handleLoadVersion } from "@/api";
 import { sessionStore } from "@/hooks";
 

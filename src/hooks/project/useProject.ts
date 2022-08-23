@@ -16,6 +16,7 @@ import typeOptionsStore from "./useTypeOptions";
 import artifactStore from "./useArtifacts";
 import traceStore from "./useTraces";
 import logStore from "../core/useLog";
+import { warningStore } from "@/hooks";
 
 /**
  * Manages the selected project.
@@ -91,6 +92,7 @@ export const useProject = defineStore("project", {
       typeOptionsStore.initializeTypeIcons(project.artifactTypes);
       documentStore.initializeProject(project);
       subtreeStore.initializeProject(project);
+      warningStore.artifactWarnings = project.warnings;
     },
     /**
      * Updates the current artifacts in the project, preserving any that already existed.

@@ -6,8 +6,6 @@ import { ProjectWarnings } from "@/types";
 /**
  * This module defines the state of warnings generated for
  * artifacts in this version.
- *
- * TODO: initialize in project initialize.
  */
 export const useWarnings = defineStore("warnings", {
   state: () => ({

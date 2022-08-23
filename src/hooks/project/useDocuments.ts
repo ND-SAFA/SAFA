@@ -8,10 +8,11 @@ import {
   ProjectModel,
 } from "@/types";
 import { createDocument, isTableDocument } from "@/util";
+import { handleResetGraph, handleUpdateCurrentDocument } from "@/api";
 import artifactStore from "./useArtifacts";
 import traceStore from "./useTraces";
 import layoutStore from "../graph/useLayout";
-import { handleResetGraph, handleUpdateCurrentDocument } from "@/api";
+import projectStore from "./useProject";
 
 /**
  * This module keeps track of the different document views for a project.
@@ -146,7 +147,7 @@ export const useDocuments = defineStore("documents", {
       if (document.documentId !== "") {
         layoutStore.artifactPositions = document.layout;
       } else {
-        //TODO: set project layout
+        layoutStore.artifactPositions = projectStore.project.layout;
       }
 
       await handleResetGraph();

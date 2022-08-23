@@ -113,7 +113,6 @@ export const useSubtree = defineStore("subtrees", {
       );
 
       this.$patch({
-        // TODO: check if this optimization is valid.
         subtreeLinks: childrenInSubtree
           .map((childId) =>
             this.createSubtreeLinks(nodesInSubtree, rootId, childId)

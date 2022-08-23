@@ -9,8 +9,8 @@ import {
   ArtifactCytoCoreElement,
   ArtifactDeltaState,
 } from "@/types";
-import { artifactSelectionModule, subtreeModule } from "@/store";
-import { warningStore, deltaStore } from "@/hooks";
+import { artifactSelectionModule } from "@/store";
+import { warningStore, deltaStore, subtreeStore } from "@/hooks";
 
 export default Vue.extend({
   name: "ArtifactNode",
@@ -51,7 +51,7 @@ export default Vue.extend({
       const { id, body, type, name, safetyCaseType, logicType } =
         this.artifactDefinition;
       const warnings = warningStore.artifactWarnings[id];
-      const hiddenChildren = subtreeModule.getHiddenChildrenByParentId(id);
+      const hiddenChildren = subtreeStore.getHiddenChildren(id);
       const hiddenChildWarnings =
         warningStore.getArtifactWarnings(hiddenChildren);
       const hiddenChildDeltaStates =

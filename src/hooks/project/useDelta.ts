@@ -11,8 +11,10 @@ import {
 } from "@/types";
 import { createProjectDelta } from "@/util";
 import { disableDrawMode } from "@/cytoscape";
-import { projectModule, subtreeModule } from "@/store";
-import { appStore, layoutStore } from "@/hooks";
+import { projectModule } from "@/store";
+import appStore from "../core/useApp";
+import layoutStore from "../graph/useLayout";
+import subtreeStore from "./useSubtree";
 
 /**
  * This module tracks the delta state of a project.
@@ -108,7 +110,7 @@ export const useDelta = defineStore("delta", {
         ...Object.values(payload.traces.added),
         ...Object.values(payload.traces.removed),
       ]);
-      await subtreeModule.restoreHiddenNodesAfter(async () =>
+      await subtreeStore.restoreHiddenNodesAfter(async () =>
         layoutStore.setArtifactTreeLayout()
       );
     },

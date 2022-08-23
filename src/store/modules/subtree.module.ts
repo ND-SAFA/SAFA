@@ -122,6 +122,7 @@ export default class SubtreeModule extends VuexModule {
         childId
       );
 
+      // TODO: this is deleting the rest.
       this.SET_SUBTREE_LINKS(newSubtreeLinks);
     }
 

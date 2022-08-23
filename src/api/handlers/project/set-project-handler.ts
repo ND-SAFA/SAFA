@@ -1,13 +1,14 @@
 import { ProjectModel } from "@/types";
 import { createProject } from "@/util";
 import { QueryParams, removeParams, updateParam } from "@/router";
-import { artifactSelectionModule, projectModule, subtreeModule } from "@/store";
+import { artifactSelectionModule, projectModule } from "@/store";
 import {
   appStore,
   layoutStore,
   typeOptionsStore,
   documentStore,
   deltaStore,
+  subtreeStore,
 } from "@/hooks";
 import {
   handleLoadTraceMatrices,
@@ -26,7 +27,7 @@ export async function handleResetGraph(
   isDifferentProject = true
 ): Promise<void> {
   if (isDifferentProject) {
-    await subtreeModule.resetHiddenNodes();
+    await subtreeStore.resetHiddenNodes();
     await layoutStore.setArtifactTreeLayout();
   }
 
@@ -45,7 +46,7 @@ export async function handleClearProject(): Promise<void> {
   await projectModule.initializeProject(project);
   await handleResetGraph();
   typeOptionsStore.$reset();
-  await subtreeModule.clearSubtrees();
+  subtreeStore.$reset();
   await removeParams();
 }
 

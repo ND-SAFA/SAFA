@@ -38,17 +38,14 @@
 <script lang="ts">
 import Vue from "vue";
 import { TraceLinkModel, ArtifactModel, CytoCoreGraph } from "@/types";
-import {
-  artifactSelectionModule,
-  subtreeModule,
-  viewportModule,
-} from "@/store";
+import { artifactSelectionModule, viewportModule } from "@/store";
 import {
   appStore,
   artifactStore,
   traceStore,
   documentStore,
   deltaStore,
+  subtreeStore,
 } from "@/hooks";
 import { artifactTreeGraph, cyResetTree } from "@/cytoscape";
 import {
@@ -116,7 +113,7 @@ export default Vue.extend({
      * @return All subtree trace links.
      */
     subtreeLinks() {
-      return subtreeModule.getSubtreeLinks;
+      return subtreeStore.subtreeLinks;
     },
     /**
      * @return The artifact ids currently in view.
@@ -128,7 +125,7 @@ export default Vue.extend({
      * @return The artifact ids that are currently hidden in closed subtrees.
      */
     hiddenSubtreeIds(): string[] {
-      return subtreeModule.getHiddenSubtreeIds;
+      return subtreeStore.hiddenSubtreeNodes;
     },
   },
   mounted() {

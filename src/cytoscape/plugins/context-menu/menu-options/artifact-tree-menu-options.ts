@@ -3,10 +3,9 @@ import { ArtifactModel, ArtifactData, MenuItem } from "@/types";
 import {
   artifactSelectionModule,
   projectModule,
-  subtreeModule,
   viewportModule,
 } from "@/store";
-import { appStore, artifactStore } from "@/hooks";
+import { appStore, artifactStore, subtreeStore } from "@/hooks";
 import { enableDrawMode } from "@/cytoscape";
 import { handleDeleteArtifact, handleDuplicateArtifact } from "@/api";
 import { ftaMenuItem } from "./fta-menu-options";
@@ -149,7 +148,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
     async onClickFunction(event: EventObject): Promise<void> {
       const artifactId: string = event.target.data().id;
 
-      await subtreeModule.hideSubtree(artifactId);
+      await subtreeStore.hideSubtree(artifactId);
     },
     isVisible: hasSubtree,
   },
@@ -161,11 +160,11 @@ export const artifactTreeMenuItems: MenuItem[] = [
     async onClickFunction(event: EventObject): Promise<void> {
       const artifactId: string = event.target.data().id;
 
-      await subtreeModule.showSubtree(artifactId);
+      await subtreeStore.showSubtree(artifactId);
     },
     isVisible(artifactData: ArtifactData | undefined): boolean {
       if (artifactData !== undefined) {
-        return subtreeModule.getCollapsedParentNodes.includes(artifactData.id);
+        return subtreeStore.collapsedParentNodes.includes(artifactData.id);
       }
       return false;
     },
@@ -176,7 +175,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
 
 function hasSubtree(artifactData: ArtifactData | undefined): boolean {
   if (artifactData !== undefined) {
-    return !subtreeModule.getCollapsedParentNodes.includes(artifactData.id);
+    return !subtreeStore.collapsedParentNodes.includes(artifactData.id);
   }
   return false;
 }

@@ -1,11 +1,4 @@
-import {
-  ArtifactModel,
-  ArtifactData,
-  DocumentType,
-  FTANodeType,
-  SafetyCaseType,
-  TraceLinkModel,
-} from "@/types";
+import { DocumentType, FTANodeType, SafetyCaseType } from "@/types";
 
 /**
  * Enumerates the allowed trace link directions between artifact types.

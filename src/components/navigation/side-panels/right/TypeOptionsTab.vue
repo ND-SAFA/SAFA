@@ -5,7 +5,7 @@
 
     <v-list expand>
       <toggle-list
-        v-for="entry in artifactDirections"
+        v-for="entry in typeDirections"
         :key="entry.type"
         :icon="entry.icon"
       >
@@ -49,8 +49,8 @@ export default Vue.extend({
     /**
      * @return The current project's artifact types.
      */
-    artifactDirections(): LabelledTraceDirectionModel[] {
-      return typeOptionsStore.labeledTypeDirections();
+    typeDirections(): LabelledTraceDirectionModel[] {
+      return typeOptionsStore.typeDirections();
     },
   },
 });

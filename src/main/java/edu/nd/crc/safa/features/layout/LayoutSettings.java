@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class LayoutSettings {
     public static final int ARTIFACT_WIDTH = 225;
-    public static final int ARTIFACT_HEIGHT = 170;
+    public static final int ARTIFACT_HEIGHT = 200;
     public static final String LAYOUT_ALGORITHM = "org.eclipse.elk.mrtree";
 }

@@ -75,9 +75,17 @@ export interface FlatTraceLink extends TraceLinkModel {
    */
   sourceType: string;
   /**
+   * The body of source artifact.
+   */
+  sourceBody: string;
+  /**
    * The type of target artifact.
    */
   targetType: string;
+  /**
+   * The body of target artifact.
+   */
+  targetBody: string;
 }
 
 /**
@@ -122,4 +130,22 @@ export interface LabelledTraceDirectionModel extends TraceDirectionModel {
    * The index of the icon representing this artifact type.
    */
   iconIndex: number;
+}
+
+/**
+ * Represents links generated for a project.
+ */
+export interface GeneratedLinksModel {
+  /**
+   * All generated links.
+   */
+  links: FlatTraceLink[];
+  /**
+   * Approved generated link ids.
+   */
+  approved: string[];
+  /**
+   * Declined generated link ids.
+   */
+  declined: string[];
 }

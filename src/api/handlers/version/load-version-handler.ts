@@ -1,0 +1,102 @@
+import { DocumentModel } from "@/types";
+import {
+  appStore,
+  layoutStore,
+  warningStore,
+  sessionStore,
+  documentStore,
+  projectStore,
+} from "@/hooks";
+import {
+  navigateTo,
+  QueryParams,
+  router,
+  Routes,
+  routesWithRequiredProject,
+} from "@/router";
+import {
+  getArtifactsInVersion,
+  getProjectVersion,
+  getTracesInVersion,
+  handleLoadTraceMatrices,
+  handleSetProject,
+  getWarningsInProjectVersion,
+} from "@/api";
+
+/**
+ * Load the given project version of given Id. Navigates to the artifact
+ * tree page in order to show the new project.
+ *
+ * @param versionId - The id of the version to retrieve and load.
+ * @param document - The document to start with viewing.
+ * @param doNavigate - Whether to navigate to the artifact tree if not already on an artifact page.
+ */
+export async function handleLoadVersion(
+  versionId: string,
+  document?: DocumentModel,
+  doNavigate = true
+): Promise<void> {
+  appStore.onLoadStart();
+  sessionStore.updateSession({ versionId });
+
+  const navigateIfNeeded = async () => {
+    if (
+      !doNavigate ||
+      routesWithRequiredProject.includes(router.currentRoute.path)
+    )
+      return;
+
+    await navigateTo(Routes.ARTIFACT, { [QueryParams.VERSION]: versionId });
+  };
+
+  return getProjectVersion(versionId)
+    .then(handleSetProject)
+    .then(async () => {
+      if (!document) return;
+
+      await documentStore.switchDocuments(document);
+    })
+    .then(navigateIfNeeded)
+    .finally(() => appStore.onLoadEnd());
+}
+
+/**
+ * Call this function whenever artifacts need to be re-downloaded.
+ * Reloads project artifacts for the given version.
+ *
+ * @param versionId - The project version to load from.
+ */
+export async function handleReloadArtifacts(versionId: string): Promise<void> {
+  const artifacts = await getArtifactsInVersion(versionId);
+  const currentArtifactCount = projectStore.project.artifacts.length;
+
+  await projectStore.addOrUpdateArtifacts(artifacts);
+  await handleLoadTraceMatrices();
+
+  if (artifacts.length > currentArtifactCount) {
+    await layoutStore.setArtifactTreeLayout();
+  }
+}
+
+/**
+ * Call this function whenever trace links need to be re-downloaded.
+ * Reloads project traces for the given version.
+ *
+ * @param versionId - The project version to load from.
+ */
+export async function handleReloadTraceLinks(versionId: string): Promise<void> {
+  const traces = await getTracesInVersion(versionId);
+
+  await projectStore.addOrUpdateTraceLinks(traces);
+  await handleLoadTraceMatrices();
+  layoutStore.applyAutomove();
+}
+
+/**
+ * Call this function whenever warnings need to be re-downloaded.
+ *
+ * @param versionId - The project version to load from.
+ */
+export async function handleReloadWarnings(versionId: string): Promise<void> {
+  warningStore.artifactWarnings = await getWarningsInProjectVersion(versionId);
+}

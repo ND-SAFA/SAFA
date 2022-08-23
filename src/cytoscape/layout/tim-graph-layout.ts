@@ -1,7 +1,7 @@
 import { DefaultCytoEvents } from "@/cytoscape/events";
+import { TIMPostLayoutHooks, TIMPreLayoutHooks } from "@/cytoscape";
 import { TimKlaySettings } from "./tim-klay-settings";
 import GraphLayout from "./graph-layout";
-import { TIMPostLayoutHooks, TIMPreLayoutHooks } from "@/cytoscape";
 
 /**
  * Defines the layout of the tim graph.

@@ -4,51 +4,9 @@ import {
   WarningModel,
   MembershipModel,
   TraceLinkModel,
+  ArtifactModel,
+  DocumentModel,
 } from "@/types";
-import { ArtifactModel } from "./artifact";
-import { DocumentModel } from "./document";
-
-/**
- * Enumerates the states of parsing.
- */
-export enum ApplicationActivityType {
-  PARSING_TIM,
-  PARSING_ARTIFACTS,
-  PARSING_TRACES,
-  UNKNOWN,
-}
-
-/**
- * Defines a parser error.
- */
-export interface ParserErrorModel {
-  /**
-   * The id of the error.
-   */
-  errorId: string;
-  /**
-   * The message of the error.
-   */
-  message: string;
-  /**
-   * The state of the parser when this error was encountered.
-   */
-  activity: ApplicationActivityType;
-  /**
-   * The location of the error.
-   */
-  location: string;
-}
-
-/**
- * Defines a collection of all parser errors.
- */
-export interface ProjectErrorsModel {
-  tim: ParserErrorModel[];
-  artifacts: ParserErrorModel[];
-  traces: ParserErrorModel[];
-  allErrors: ParserErrorModel[];
-}
 
 /**
  * Defines a project.

@@ -7,6 +7,7 @@
     @click="definition.handler"
     class="mr-2"
     :disabled="isDisabled"
+    :data-cy="definition.dataCy"
   >
     <v-icon v-if="definition.type === 'icon'">
       {{ definition.icon }}
@@ -16,8 +17,8 @@
 </template>
 
 <script lang="ts">
-import { IconDefinition } from "@/types";
 import Vue, { PropType } from "vue";
+import { IconDefinition } from "@/types";
 
 /**
  * Renders an icon button.

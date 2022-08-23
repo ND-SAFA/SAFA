@@ -40,9 +40,9 @@ import {
 import { versionToString } from "@/util";
 import { GenericStepper } from "@/components/common";
 import { ProjectSelector } from "@/components/project/selector";
-import VersionSelector from "./VersionSelector.vue";
 import { handleLoadVersion } from "@/api";
-import { logModule } from "@/store";
+import { logStore } from "@/hooks";
+import VersionSelector from "./VersionSelector.vue";
 
 const SELECT_PROJECT_DEFAULT_NAME = "Select a Project";
 const SELECT_VERSION_DEFAULT_NAME = "Select a Version";
@@ -122,9 +122,9 @@ export default Vue.extend({
      */
     async handleSubmit(): Promise<void> {
       if (this.selectedProject === undefined) {
-        logModule.onWarning("Please select a project to update.");
+        logStore.onWarning("Please select a project to update.");
       } else if (this.selectedVersion === undefined) {
-        logModule.onWarning("Please select a baseline version.");
+        logStore.onWarning("Please select a baseline version.");
       } else {
         this.isLoading = true;
 

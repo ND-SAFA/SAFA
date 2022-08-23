@@ -1,30 +1,32 @@
 <template>
-  <v-snackbar v-model="showSnackbar" :timeout="timeout" :color="messageColor">
-    <v-row class="ma-0 pa-0" justify="space-around" align="center">
-      <v-col cols="1" class="ma-0 pa-0" align-self="center">
-        <v-icon> {{ messageIcon }} </v-icon>
-      </v-col>
-      <v-col :cols="hasErrors ? 6 : 9" align-self="center">
-        <typography align="center" color="white" :value="snackbarMessage" />
-      </v-col>
-      <v-col :cols="hasErrors ? 3 : 0" class="ma-0 pa-0" align-self="center">
-        <v-row justify="end" class="ma-0 pa-0">
-          <v-btn
-            v-if="hasErrors"
-            :color="messageColor"
-            @click="handleSeeError"
-            class="ma-0"
-          >
-            See Errors
-          </v-btn>
-        </v-row>
-      </v-col>
-      <v-col cols="1" class="ma-0 pa-0" align-self="center">
-        <v-btn icon @click="showSnackbar = false">
-          <v-icon> mdi-close </v-icon>
-        </v-btn>
-      </v-col>
-    </v-row>
+  <v-snackbar
+    v-model="showSnackbar"
+    :timeout="timeout"
+    :color="messageColor"
+    bottom
+    left
+    outlined
+  >
+    <flex-box
+      align="center"
+      justify="space-between"
+      :data-cy="`snackbar-${messageType}`"
+    >
+      <v-icon class="inherit-color"> {{ messageIcon }} </v-icon>
+      <typography align="center" x="2" :value="snackbarMessage" />
+      <v-btn
+        text
+        v-if="hasErrors"
+        :color="messageColor"
+        @click="handleSeeError"
+        class="ma-0"
+      >
+        See Errors
+      </v-btn>
+      <v-btn icon class="inherit-color" @click="showSnackbar = false">
+        <v-icon> mdi-close </v-icon>
+      </v-btn>
+    </flex-box>
     <ServerErrorModal :isOpen="isErrorDisplayOpen" :errors="errors" />
   </v-snackbar>
 </template>
@@ -32,8 +34,10 @@
 <script lang="ts">
 import Vue from "vue";
 import { MessageType, SnackbarMessage } from "@/types";
-import { appModule, logModule } from "@/store";
+import { appStore, logStore } from "@/hooks";
 import { ServerErrorModal } from "@/components/common/modals";
+import { ThemeColors } from "@/util";
+import FlexBox from "@/components/common/display/FlexBox.vue";
 import Typography from "./Typography.vue";
 
 /**
@@ -42,14 +46,13 @@ import Typography from "./Typography.vue";
 export default Vue.extend({
   name: "Snackbar",
   components: {
+    FlexBox,
     Typography,
     ServerErrorModal,
   },
-  props: {
-    timeout: Number,
-  },
   data() {
     return {
+      timeout: 5000,
       showSnackbar: false,
       snackbarMessage: "",
       messageType: MessageType.CLEAR as MessageType,
@@ -71,7 +74,7 @@ export default Vue.extend({
      * Opens the error display panel.
      */
     handleSeeError(): void {
-      appModule.toggleErrorDisplay();
+      appStore.toggleErrorDisplay();
     },
   },
   computed: {
@@ -85,13 +88,13 @@ export default Vue.extend({
      * @return The current message.
      */
     message() {
-      return logModule.getMessage;
+      return logStore.message;
     },
     /**
      * @return Whether the error display is open.
      */
     isErrorDisplayOpen(): boolean {
-      return appModule.getIsErrorDisplayOpen;
+      return appStore.isErrorDisplayOpen;
     },
     /**
      * @return The message color for the current message.
@@ -99,15 +102,15 @@ export default Vue.extend({
     messageColor(): string {
       switch (this.messageType) {
         case MessageType.INFO:
-          return "blue";
+          return "primary";
         case MessageType.WARNING:
-          return "orange";
+          return "accent";
         case MessageType.ERROR:
-          return "red";
+          return "error";
         case MessageType.SUCCESS:
-          return "green";
+          return ThemeColors.added;
         default:
-          return "info";
+          return ThemeColors.modified;
       }
     },
     /**
@@ -136,7 +139,7 @@ export default Vue.extend({
       if (newMessage.type === MessageType.CLEAR) return;
 
       this.showMessage(newMessage);
-      logModule.CLEAR_MESSAGE();
+      logStore.clearMessage();
     },
   },
 });

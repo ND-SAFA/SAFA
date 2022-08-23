@@ -1,3 +1,4 @@
+import { NodeSingular } from "cytoscape";
 import {
   KlayLayoutSettings,
   LayoutHook,
@@ -6,8 +7,7 @@ import {
   CytoCore,
   CytoEventHandlers,
 } from "@/types";
-import { layoutModule } from "@/store";
-import { NodeSingular } from "cytoscape";
+import { layoutStore } from "@/hooks";
 
 /**
  * Defines a graph layout.
@@ -54,7 +54,7 @@ export default class GraphLayout implements IGraphLayout {
         positions: (node: NodeSingular | string) => {
           const id = typeof node === "string" ? node : node.data().id;
 
-          return layoutModule.getArtifactPosition(id);
+          return layoutStore.getArtifactPosition(id);
         },
       }).run();
     }

@@ -14,7 +14,7 @@
 </template>
 <script lang="ts">
 import Vue from "vue";
-import { appModule } from "@/store";
+import { appStore } from "@/hooks";
 import SelectedNodeTab from "./SelectedNodeTab.vue";
 
 /**
@@ -29,7 +29,7 @@ export default Vue.extend({
     /**
      * @return Whether the left panel is open.
      */
-    isLeftOpen: () => appModule.getIsLeftOpen,
+    isLeftOpen: () => appStore.isLeftPanelOpen,
   },
 });
 </script>

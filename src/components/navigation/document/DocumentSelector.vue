@@ -56,7 +56,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { DocumentModel } from "@/types";
-import { documentModule } from "@/store";
+import { documentStore } from "@/hooks";
 import { GenericIconButton, FlexBox } from "@/components/common";
 import DocumentModal from "./DocumentModal.vue";
 
@@ -73,13 +73,13 @@ export default Vue.extend({
      * @return The current documents.
      */
     items() {
-      return documentModule.projectDocuments;
+      return documentStore.projectDocuments;
     },
     /**
      * @return The toggle document view icon.
      */
     toggleViewIcon(): string {
-      return documentModule.isTableDocument
+      return documentStore.isTableDocument
         ? "mdi-file-tree"
         : "mdi-table-multiple";
     },
@@ -87,7 +87,7 @@ export default Vue.extend({
      * @return The toggle document view tooltip.
      */
     toggleViewTooltip(): string {
-      return documentModule.isTableDocument
+      return documentStore.isTableDocument
         ? "Switch to tree view"
         : "Switch to table view";
     },
@@ -96,13 +96,13 @@ export default Vue.extend({
      */
     select: {
       get() {
-        return documentModule.document;
+        return documentStore.currentDocument;
       },
       set(documentName: string) {
         const document = this.items.find(({ name }) => documentName === name);
 
         if (document) {
-          documentModule.switchDocuments(document);
+          documentStore.switchDocuments(document);
         }
       },
     },
@@ -134,7 +134,7 @@ export default Vue.extend({
      * Switches between document views.
      */
     handleToggleTableView() {
-      documentModule.toggleTableView();
+      documentStore.toggleTableView();
     },
   },
 });

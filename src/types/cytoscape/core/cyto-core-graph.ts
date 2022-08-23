@@ -1,5 +1,5 @@
-import { CytoCore } from "@/types/cytoscape/core";
 import { CytoscapeOptions } from "cytoscape";
+import { CytoCore } from "@/types/cytoscape/core";
 
 /**
  * Background: Cytoscape has to be wrapped in a promise in order to

@@ -1,7 +1,7 @@
 describe("Canvas", () => {
   beforeEach(() => {
     cy.visit(
-      "http://localhost:8080/project?version=13801fc6-2483-4be4-920e-322edb9d8722"
+      "http://localhost:8080/project?version=daaa6838-a446-4b14-bb7a-dd343f855e06"
     );
   });
 

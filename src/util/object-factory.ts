@@ -17,7 +17,9 @@ import {
   SafetyCaseType,
   SessionModel,
   SnackbarMessage,
+  ArtifactTypeIcons,
 } from "@/types";
+import { defaultTypeIcon } from "@/util/icons";
 
 /**
  * @return An empty snackbar message.
@@ -204,11 +206,11 @@ export function createCommit(version: VersionModel): Commit {
  */
 export function createDefaultTypeIcons(
   artifactTypes: ArtifactTypeModel[] = []
-): Record<string, string> {
+): ArtifactTypeIcons {
   return artifactTypes
     .map((t) => ({ [t.name]: t.icon }))
     .reduce((acc, cur) => ({ ...acc, ...cur }), {
-      default: "mdi-alpha-a-box-outline",
+      default: defaultTypeIcon,
     });
 }
 
@@ -227,7 +229,7 @@ export function createDocument(
       owner: "",
       members: [],
     },
-    name: document?.name || "Default",
+    name: document?.name || "",
     type: document?.type || DocumentType.ARTIFACT_TREE,
     artifactIds: document?.artifactIds || [],
     description: document?.description || "",

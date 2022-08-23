@@ -8,3 +8,5 @@ export * from "./theme";
 export * from "./enum-helper";
 export * from "./object-factory";
 export * from "./query-helper";
+export * from "./sub-tree-operations";
+export * from "./icons";

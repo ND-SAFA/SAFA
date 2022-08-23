@@ -1,6 +1,6 @@
+import { Stylesheet } from "cytoscape";
 import { ARTIFACT_HEIGHT, ARTIFACT_WIDTH } from "@/cytoscape/styles/config";
 import { CytoStyleSheet } from "@/types/cytoscape";
-import { Stylesheet } from "cytoscape";
 import { ThemeColors } from "@/util";
 import {
   ArtifactDeltaState,

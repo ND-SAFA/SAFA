@@ -5,6 +5,7 @@
     size="m"
     :actions-height="isUploadOpen ? 0 : 50"
     :is-loading="isLoading"
+    data-cy="modal-project-edit"
     @close="handleClose"
   >
     <template v-slot:body>
@@ -32,6 +33,7 @@
         color="primary"
         class="ml-auto"
         :disabled="isDisabled"
+        data-cy="button-project-save"
       >
         Save
       </v-btn>
@@ -44,8 +46,8 @@ import Vue, { PropType } from "vue";
 import { IdentifierModel } from "@/types";
 import { createProjectIdentifier } from "@/util";
 import { GenericModal } from "@/components/common";
-import ProjectIdentifierInput from "./ProjectIdentifierInput.vue";
 import ProjectFilesInput from "./ProjectFilesInput.vue";
+import ProjectIdentifierInput from "./ProjectIdentifierInput.vue";
 
 /**
  * A modal for renaming a project.

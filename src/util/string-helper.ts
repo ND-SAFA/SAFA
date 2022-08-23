@@ -118,14 +118,13 @@ export function enumToDisplay(value: string): string {
  */
 export function timestampToDisplay(timestamp: string): string {
   const date = new Date(timestamp);
-  const options = {
+
+  return date.toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
     day: "numeric",
     weekday: "long",
     hour: "numeric",
     minute: "numeric",
-  };
-
-  return date.toLocaleDateString("en-US", options);
+  });
 }

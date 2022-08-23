@@ -22,7 +22,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { appModule } from "@/store";
+import { appStore } from "@/hooks";
 import GenericModal from "./GenericModal.vue";
 
 /**
@@ -44,7 +44,7 @@ export default Vue.extend({
   },
   methods: {
     handleClose() {
-      appModule.toggleErrorDisplay();
+      appStore.toggleErrorDisplay();
     },
   },
 });

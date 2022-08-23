@@ -7,7 +7,7 @@ import {
   handleReloadWarnings,
   handleSetProject,
 } from "@/api";
-import { sessionModule } from "@/store";
+import { sessionStore } from "@/hooks";
 
 /**
  * TODO: Delete
@@ -28,7 +28,7 @@ export async function handleVersionMessage(
       return handleReloadWarnings(versionId);
   }
   // Handlers for manual entity updates.
-  if (sessionModule.userEmail !== message.user) {
+  if (sessionStore.userEmail !== message.user) {
     switch (message.type) {
       case "VERSION":
         return getProjectVersion(versionId).then(handleSetProject);

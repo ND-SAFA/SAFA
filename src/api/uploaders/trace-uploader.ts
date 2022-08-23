@@ -10,7 +10,7 @@ import {
 } from "@/types";
 import { parseTraceFile, createGeneratedLinks } from "@/api";
 import { extractTraceId } from "@/util";
-import { logModule } from "@/store";
+import { logStore } from "@/hooks";
 
 const DEFAULT_IS_GENERATED = false;
 
@@ -36,7 +36,7 @@ export function createTraceUploader(): IGenericUploader<
 function createNewPanel(traceLink: LinkModel): TracePanel {
   const emptyArtifactFile: TraceFile = createTraceFile(traceLink);
   return {
-    title: extractTraceId(traceLink),
+    title: `${traceLink.sourceName} X ${traceLink.targetName}`,
     entityNames: [],
     projectFile: emptyArtifactFile,
     getIsValid(): boolean {
@@ -159,7 +159,7 @@ function createParsedArtifactFile(
       panel.entityNames = entities.map(extractTraceId);
     })
     .catch((e) => {
-      logModule.onDevError(e);
+      logStore.onDevError(e);
       panel.projectFile.isValid = false;
       panel.projectFile.errors = ["Unable to parse file"];
     });

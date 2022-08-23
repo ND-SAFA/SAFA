@@ -20,7 +20,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { appModule, artifactSelectionModule } from "@/store";
+import { appStore, selectionStore } from "@/hooks";
 import {
   ArtifactTree,
   ArtifactTable,
@@ -48,19 +48,19 @@ export default Vue.extend({
      * Returns whether the artifact creator is open.
      */
     isArtifactCreatorOpen() {
-      return appModule.getIsArtifactCreatorOpen;
+      return appStore.isArtifactCreatorOpen;
     },
     /**
      * Returns whether the trace link creator is open.
      */
     isTraceLinkCreatorOpen() {
-      return appModule.getIsTraceLinkCreatorOpen;
+      return appStore.isTraceLinkCreatorOpen;
     },
     /**
      * @return The selected artifact.
      */
     selectedArtifact() {
-      return artifactSelectionModule.getSelectedArtifact;
+      return selectionStore.selectedArtifact;
     },
   },
   methods: {
@@ -68,13 +68,13 @@ export default Vue.extend({
      * Closes the artifact creator.
      */
     closeArtifactCreator(): void {
-      appModule.closeArtifactCreator();
+      appStore.closeArtifactCreator();
     },
     /**
      * Closes the trace link creator.
      */
     closeTraceLinkCreator(): void {
-      appModule.toggleTraceLinkCreator();
+      appStore.toggleTraceLinkCreator();
     },
   },
 });

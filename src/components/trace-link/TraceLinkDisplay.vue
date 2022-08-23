@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-row class="my-1">
+    <v-row class="my-1" v-if="!showOnly">
       <v-col cols="6">
         <generic-artifact-body-display
           :artifact="sourceArtifact"
@@ -19,6 +19,15 @@
         />
       </v-col>
     </v-row>
+
+    <typography
+      v-else
+      defaultExpanded
+      secondary
+      t="1"
+      variant="expandable"
+      :value="showOnly === 'source' ? sourceArtifact.body : targetArtifact.body"
+    />
 
     <flex-box justify="end">
       <v-btn
@@ -82,13 +91,14 @@ import {
   TraceType,
 } from "@/types";
 import { GenericArtifactBodyDisplay } from "@/components";
-import { artifactModule, deltaModule } from "@/store";
+import { artifactStore, deltaStore } from "@/hooks";
 import { FlexBox } from "@/components/common";
 import {
   handleApproveLink,
   handleDeclineLink,
   handleUnreviewLink,
 } from "@/api";
+import Typography from "@/components/common/display/Typography.vue";
 
 /**
  * Displays a trace link.
@@ -102,6 +112,7 @@ import {
 export default Vue.extend({
   name: "TraceLinkDisplay",
   components: {
+    Typography,
     FlexBox,
     GenericArtifactBodyDisplay,
   },
@@ -110,6 +121,8 @@ export default Vue.extend({
       type: Object as PropType<TraceLinkModel>,
       required: true,
     },
+    hideActions: Boolean,
+    showOnly: String as PropType<"source" | "target">,
   },
   data() {
     return {
@@ -126,26 +139,28 @@ export default Vue.extend({
     /**
      * @return The artifact this link comes from.
      */
-    sourceArtifact(): ArtifactModel {
-      return artifactModule.getAllArtifactsById[this.link.sourceId];
+    sourceArtifact(): ArtifactModel | undefined {
+      return artifactStore.getArtifactById(this.link.sourceId);
     },
     /**
      * @return The artifact this link goes towards.
      */
-    targetArtifact(): ArtifactModel {
-      return artifactModule.getAllArtifactsById[this.link.targetId];
+    targetArtifact(): ArtifactModel | undefined {
+      return artifactStore.getArtifactById(this.link.targetId);
     },
     /**
      * @return Whether this link can be modified.
      */
     canBeModified(): boolean {
-      return this.link?.traceType === TraceType.GENERATED;
+      return !this.hideActions && this.link?.traceType === TraceType.GENERATED;
     },
     /**
      * @return Whether this link can be deleted.
      */
     showDelete(): boolean {
-      return !this.canBeModified && !deltaModule.inDeltaView;
+      return (
+        !this.canBeModified && !this.hideActions && !deltaStore.inDeltaView
+      );
     },
     /**
      * @return Whether this link can be approved.

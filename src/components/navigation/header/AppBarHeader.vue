@@ -46,7 +46,7 @@ import {
   VersionModel,
 } from "@/types";
 import { getParams, navigateTo, Routes } from "@/router";
-import { logModule, projectModule } from "@/store";
+import { logStore, projectStore } from "@/hooks";
 import { handleLoadVersion } from "@/api";
 import { ButtonRow, SafaIcon, Typography, FlexBox } from "@/components/common";
 import {
@@ -54,9 +54,9 @@ import {
   BaselineVersionModal,
   UploadNewVersionModal,
 } from "@/components/project";
-import AccountDropdown from "./AccountDropdown.vue";
-import VersionLabel from "./VersionLabel.vue";
 import SavingIcon from "./SavingIcon.vue";
+import VersionLabel from "./VersionLabel.vue";
+import AccountDropdown from "./AccountDropdown.vue";
 
 export default Vue.extend({
   name: "AppBarHeader",
@@ -85,7 +85,7 @@ export default Vue.extend({
      * @return The current project.
      */
     project() {
-      return projectModule.getProject;
+      return projectStore.project;
     },
     /**
      * @return The menu items for projects.
@@ -114,7 +114,7 @@ export default Vue.extend({
         },
       ];
 
-      return projectModule.projectId ? options : options.slice(0, -1);
+      return projectStore.projectId ? options : options.slice(0, -1);
     },
     /**
      * @return The dropdown menus displayed on the nav bar.
@@ -125,6 +125,7 @@ export default Vue.extend({
           type: ButtonType.LIST_MENU,
           label: "Project",
           buttonIsText: true,
+          dataCy: "button-nav-project",
           menuItems: this.projectMenuItems,
         },
         {
@@ -132,6 +133,7 @@ export default Vue.extend({
           type: ButtonType.LIST_MENU,
           label: "Version",
           buttonIsText: true,
+          dataCy: "button-nav-version",
           menuItems: [
             {
               name: "Change Version",
@@ -155,6 +157,7 @@ export default Vue.extend({
           type: ButtonType.LIST_MENU,
           label: "Trace Links",
           buttonIsText: true,
+          dataCy: "button-nav-links",
           menuItems: [
             {
               name: "Approve Generated Trace Links",
@@ -189,20 +192,20 @@ export default Vue.extend({
      * Opens the project version selector.
      */
     handleChangeVersion(): void {
-      if (projectModule.versionId) {
+      if (projectStore.versionId) {
         this.changeVersionOpen = true;
       } else {
-        logModule.onWarning("Please select a project.");
+        logStore.onWarning("Please select a project.");
       }
     },
     /**
      * Opens the project version creator.
      */
     handleCreateVersion(): void {
-      if (projectModule.projectId) {
+      if (projectStore.projectId) {
         this.createVersionOpen = true;
       } else {
-        logModule.onWarning("Please select a project.");
+        logStore.onWarning("Please select a project.");
       }
     },
     /**

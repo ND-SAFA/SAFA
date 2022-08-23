@@ -20,8 +20,8 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { artifactSelectionModule } from "@/store";
 import { Typography } from "@/components/common";
+import { selectionStore } from "@/hooks";
 import ArtifactTitle from "./ArtifactTitle.vue";
 import ArtifactTraces from "./ArtifactTraces.vue";
 import ArtifactDocuments from "./ArtifactDocuments.vue";
@@ -44,7 +44,7 @@ export default Vue.extend({
      * @return The selected artifact.
      */
     selectedArtifact() {
-      return artifactSelectionModule.getSelectedArtifact;
+      return selectionStore.selectedArtifact;
     },
     artifactBody(): string {
       const isCode = this.selectedArtifact?.type.toLowerCase().includes("code");

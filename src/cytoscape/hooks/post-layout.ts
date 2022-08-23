@@ -7,7 +7,7 @@ import {
   CytoEvent,
   ArtifactData,
 } from "@/types";
-import { artifactSelectionModule, viewportModule } from "@/store";
+import { selectionStore } from "@/hooks";
 import { cyCenterNodes, cyZoomReset, timTreeCyPromise } from "@/cytoscape";
 import { MenuItem } from "@/types/cytoscape/plugins/context-menus";
 import { isArtifactData } from "@/util";
@@ -78,13 +78,13 @@ export const applyCytoEvents: LayoutHook = (
  * Centers on the selected or root node of the graph.
  */
 export const centerViewOnNode: LayoutHook = (): void => {
-  const selectedArtifacts = artifactSelectionModule.getSelectedArtifactId;
+  const selectedArtifacts = selectionStore.selectedArtifactId;
 
   if (!selectedArtifacts) {
     cyZoomReset();
     cyCenterNodes();
   } else {
-    viewportModule.centerOnArtifacts([selectedArtifacts]);
+    selectionStore.centerOnArtifacts([selectedArtifacts]);
   }
 };
 

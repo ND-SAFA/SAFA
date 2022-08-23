@@ -7,6 +7,7 @@
         :color="buttonColor"
         v-on="on"
         :disabled="disabled"
+        :data-cy="definition.dataCy"
       >
         <v-icon>mdi-chevron-down</v-icon>
         {{ buttonLabel }}

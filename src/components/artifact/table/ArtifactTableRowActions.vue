@@ -16,7 +16,7 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { ArtifactModel } from "@/types";
-import { appModule, artifactSelectionModule } from "@/store";
+import { appStore, selectionStore } from "@/hooks";
 import { handleDeleteArtifact } from "@/api";
 import { FlexBox, GenericIconButton } from "@/components/common";
 
@@ -38,8 +38,8 @@ export default Vue.extend({
      * @param artifact - The artifact to edit.
      */
     handleEdit(artifact: ArtifactModel) {
-      artifactSelectionModule.selectArtifact(artifact.id);
-      appModule.openArtifactCreatorTo({
+      selectionStore.selectArtifact(artifact.id);
+      appStore.openArtifactCreatorTo({
         isNewArtifact: false,
       });
     },

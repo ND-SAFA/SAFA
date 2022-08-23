@@ -13,7 +13,7 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { CytoCore, CytoCoreGraph } from "@/types";
-import { logModule } from "@/store";
+import { logStore } from "@/hooks";
 
 /**
  * Abstracts setting up a cytoscape instance and corresponding plugins.
@@ -45,7 +45,7 @@ export default Vue.extend({
         try {
           plugin.initialize(cy);
         } catch (e) {
-          logModule.onDevError(`Plugin installation error: ${e}`);
+          logStore.onDevError(`Plugin installation error: ${e}`);
         }
       });
     },
@@ -57,7 +57,7 @@ export default Vue.extend({
       if (this.cytoCoreGraph.saveCy) {
         this.cytoCoreGraph.saveCy(cy);
       } else {
-        logModule.onDevError(
+        logStore.onDevError(
           `Unable to save cytoscape instance in: ${this.cytoCoreGraph.name}`
         );
       }

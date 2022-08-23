@@ -1,17 +1,12 @@
-import { PanelType, RouterCheck } from "@/types";
 import { NavigationGuardNext, Route } from "vue-router";
+import { NavigationGuard } from "vue-router/types/router";
 import {
   QueryParams,
   Routes,
   routesPublic,
   routesWithRequiredProject,
 } from "@/router/routes";
-import {
-  appModule,
-  projectModule,
-  sessionModule,
-  viewportModule,
-} from "@/store";
+import { appStore, layoutStore, projectStore, sessionStore } from "@/hooks";
 import { handleLoadVersion } from "@/api";
 
 /**
@@ -23,13 +18,13 @@ import { handleLoadVersion } from "@/api";
  * that once a check has used the `next` function the remaining checks
  * are ignored.
  */
-export const routerChecks: Record<string, RouterCheck> = {
+export const routerChecks: Record<string, NavigationGuard> = {
   redirectToLoginIfNoSessionFound(
     to: Route,
     from: Route,
     next: NavigationGuardNext
   ) {
-    if (sessionModule.getDoesSessionExist || routesPublic.includes(to.path)) {
+    if (sessionStore.doesSessionExist || routesPublic.includes(to.path)) {
       return;
     }
 
@@ -43,7 +38,7 @@ export const routerChecks: Record<string, RouterCheck> = {
   },
   requireProjectForRoutes(to: Route) {
     if (
-      projectModule.isProjectDefined ||
+      projectStore.isProjectDefined ||
       !routesWithRequiredProject.includes(to.path)
     )
       return;
@@ -57,16 +52,16 @@ export const routerChecks: Record<string, RouterCheck> = {
   closePanelsIfNotInGraph(to: Route) {
     if (to.path === Routes.ARTIFACT) return;
 
-    appModule.closePanel(PanelType.left);
-    appModule.closePanel(PanelType.right);
+    appStore.closeSidePanels();
   },
   refocusGraph(to: Route) {
     if (to.path !== Routes.ARTIFACT) return;
 
-    appModule.onLoadStart();
+    appStore.onLoadStart();
 
     setTimeout(() => {
-      viewportModule.setArtifactTreeLayout().then(appModule.onLoadEnd);
+      layoutStore.setArtifactTreeLayout();
+      appStore.onLoadEnd();
     }, 200);
   },
 };

@@ -11,7 +11,7 @@ import {
   DEFAULT_ARTIFACT_TREE_ZOOM,
   ZOOM_INCREMENT,
 } from "@/cytoscape/styles";
-import { artifactSelectionModule, logModule } from "@/store";
+import { selectionStore } from "@/hooks";
 import { areArraysEqual } from "@/util";
 import { applyAutoMoveEvents } from "@/cytoscape";
 
@@ -141,9 +141,7 @@ export function cyCenterOnArtifacts(
         currentCenteringCollection !== undefined &&
         areArraysEqual(currentCenteringCollection, artifactIds)
       ) {
-        return logModule.onDevWarning(
-          `Collection is already being rendered: ${artifactIds}`
-        );
+        return;
       } else {
         cy.stop(false, false);
       }
@@ -228,10 +226,10 @@ export function cyDisplayAll(
 export function cyResetTree(
   cyPromise: CyPromise = artifactTreeCyPromise
 ): void {
-  const selectedId = artifactSelectionModule.getSelectedArtifactId;
+  const selectedId = selectionStore.selectedArtifactId;
 
   if (selectedId) {
-    artifactSelectionModule.selectArtifact(selectedId);
+    selectionStore.selectArtifact(selectedId);
   } else {
     cyCenterNodes(cyPromise);
   }

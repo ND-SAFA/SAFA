@@ -22,12 +22,16 @@ export const useJobs = defineStore("jobs", {
     /**
      * Adds job to list of jobs if new job, otherwise updates previous one.
      * New or updated job will be first element of the list of jobs.
+     *
+     * @param job - The job to update.
      */
     updateJob(job: JobModel): void {
       this.jobs = [job, ...this.jobs.filter(({ id }) => id !== job.id)];
     },
     /**
      * Selects the given job.
+     *
+     * @param job - The job to select.
      */
     selectJob(job: JobModel): void {
       this.jobs.forEach(({ id }, idx) => {
@@ -37,6 +41,9 @@ export const useJobs = defineStore("jobs", {
       });
     },
     /**
+     * Finds a job.
+     *
+     * @param jobId - The job id to get.
      * @returns The job with given id.
      */
     getJob(jobId: string): JobModel | undefined {
@@ -44,6 +51,8 @@ export const useJobs = defineStore("jobs", {
     },
     /**
      * Removes job matching id of given job.
+     *
+     * @param job - The job to delete.
      */
     deleteJob(job: JobModel): void {
       this.$patch({

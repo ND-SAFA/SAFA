@@ -14,7 +14,7 @@ export async function saveCommit(commit: Commit): Promise<Commit> {
     appStore.$patch({ isSaving: true });
 
     const commitResponse = await persistCommit(commit);
-    await commitStore.saveCommit(commitResponse);
+    commitStore.saveCommit(commitResponse);
 
     return commitResponse;
   } finally {

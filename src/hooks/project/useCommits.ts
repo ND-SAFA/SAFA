@@ -40,6 +40,9 @@ export const useCommits = defineStore("commits", {
      * Given a commit, all added entities are deleted, all deleted entities are
      * re-added, and modified entities are reverted to their state before the last
      * client change.
+     *
+     * @param commit - The commit to create a reversion for.
+     * @return The reversion commit.
      */
     getRevert(commit: Commit): Commit {
       return {
@@ -67,7 +70,7 @@ export const useCommits = defineStore("commits", {
      *
      * @param commit - The commit to save.
      */
-    async saveCommit(commit: Commit): Promise<void> {
+    saveCommit(commit: Commit): void {
       this.commits = [
         ...this.commits,
         { commit, revert: this.getRevert(commit) },

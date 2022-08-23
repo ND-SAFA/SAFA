@@ -52,6 +52,8 @@ export const useTypeOptions = defineStore("typeOptions", {
   actions: {
     /**
      * Changes what directions of trace links between artifacts are allowed.
+     *
+     * @param allArtifactTypes - The artifact types to set.
      */
     initializeTypeIcons(allArtifactTypes: ArtifactTypeModel[]): void {
       this.$patch({
@@ -61,6 +63,9 @@ export const useTypeOptions = defineStore("typeOptions", {
     },
     /**
      * Changes what directions of trace links between artifacts are allowed.
+     *
+     * @param type - The type to update.
+     * @param allowedTypes - The allowed types to set.
      */
     updateLinkDirections({ type, allowedTypes }: TraceDirectionModel): void {
       this.artifactTypeDirections = {
@@ -70,6 +75,9 @@ export const useTypeOptions = defineStore("typeOptions", {
     },
     /**
      * Changes what icons each artifact uses.
+     *
+     * @param type - The type to update.
+     * @param icon - The icon to set.
      */
     updateArtifactIcon({ type, icon }: LabelledTraceDirectionModel): void {
       this.artifactTypeIcons = {
@@ -79,6 +87,8 @@ export const useTypeOptions = defineStore("typeOptions", {
     },
     /**
      * Adds a new artifact type if it does not yet exist.
+     *
+     * @param newArtifacts - The artifact to add types from.
      */
     addArtifactTypes(newArtifacts: ArtifactModel[]): void {
       newArtifacts.forEach(({ type }) => {

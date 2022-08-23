@@ -4,7 +4,7 @@ import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
 /**
  * Creates artifact type if typeId is null, otherwise updates the entity.
  *
- * @param projectId - The project whose the type will be created for.
+ * @param projectId - The project who's the type will be created for.
  * @param artifactType - The artifact type to create or update.
  * @return The saved artifact type.
  */

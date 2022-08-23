@@ -26,13 +26,13 @@
 import Vue from "vue";
 import { CreatorTypes } from "@/types";
 import { getParam, QueryParams, updateParam } from "@/router";
+import Typography from "@/components/common/display/Typography.vue";
 import {
   ProjectCreatorStepper,
   JiraCreatorStepper,
   GitHubCreatorStepper,
   ProjectBulkUpload,
 } from "./workflows";
-import Typography from "@/components/common/display/Typography.vue";
 
 /**
  * Allows for creating a project.

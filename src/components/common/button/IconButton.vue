@@ -17,8 +17,8 @@
 </template>
 
 <script lang="ts">
-import { IconDefinition } from "@/types";
 import Vue, { PropType } from "vue";
+import { IconDefinition } from "@/types";
 
 /**
  * Renders an icon button.

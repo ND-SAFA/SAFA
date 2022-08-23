@@ -4,8 +4,7 @@ import {
   ProjectModel,
 } from "@/types";
 import { navigateTo, Routes } from "@/router";
-import { appStore } from "@/hooks";
-import { logStore } from "@/hooks";
+import { appStore, logStore } from "@/hooks";
 import {
   createJiraProject,
   createProjectCreationJob,

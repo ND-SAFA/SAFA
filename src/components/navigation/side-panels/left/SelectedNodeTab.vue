@@ -20,8 +20,8 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { selectionStore } from "@/hooks";
 import { Typography } from "@/components/common";
+import { selectionStore } from "@/hooks";
 import ArtifactTitle from "./ArtifactTitle.vue";
 import ArtifactTraces from "./ArtifactTraces.vue";
 import ArtifactDocuments from "./ArtifactDocuments.vue";

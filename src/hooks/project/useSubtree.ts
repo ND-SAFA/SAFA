@@ -14,8 +14,8 @@ import {
   getMatchingChildren,
 } from "@/util";
 import { cyDisplayAll, cySetDisplay } from "@/cytoscape";
-import artifactStore from "./useArtifacts";
 import traceStore from "./useTraces";
+import artifactStore from "./useArtifacts";
 
 /**
  * This module keeps track of the tree of artifacts.

@@ -40,8 +40,8 @@
 import Vue from "vue";
 import { handleReloadProject } from "@/api";
 import { deltaStore, projectStore } from "@/hooks";
-import DeltaVersionsModal from "./DeltaVersionsModal.vue";
 import { Typography } from "@/components/common";
+import DeltaVersionsModal from "./DeltaVersionsModal.vue";
 
 /**
  * Displays the delta panel navigation.

@@ -1,8 +1,8 @@
 import { ArtifactData, SvgStyle } from "@/types";
 import { capitalize, getTextColor } from "@/util";
-import { getBody } from "./artifact-helper";
-import { svgFooter } from "./artifact-footer";
 import { ARTIFACT_CHILDREN_HEIGHT } from "@/cytoscape/styles/config";
+import { svgFooter } from "./artifact-footer";
+import { getBody } from "./artifact-helper";
 
 /**
  * Creates the SVG standard node.

@@ -9,8 +9,8 @@ import {
 } from "@/hooks";
 import { enableDrawMode } from "@/cytoscape";
 import { handleDeleteArtifact, handleDuplicateArtifact } from "@/api";
-import { ftaMenuItem } from "./fta-menu-options";
 import { safetyCaseMenuOption } from "./safety-case-menu-option";
+import { ftaMenuItem } from "./fta-menu-options";
 
 /**
  * List of menu items

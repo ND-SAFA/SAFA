@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-
+import { createProject } from "@/util";
 import { pinia } from "@/plugins";
 import {
   ArtifactModel,
@@ -8,15 +8,14 @@ import {
   TraceLinkModel,
   VersionModel,
 } from "@/types";
-import { createProject } from "@/util";
-import documentStore from "./useDocuments";
+import { warningStore } from "@/hooks";
 import layoutStore from "../graph/useLayout";
+import logStore from "../core/useLog";
+import documentStore from "./useDocuments";
 import subtreeStore from "./useSubtree";
 import typeOptionsStore from "./useTypeOptions";
 import artifactStore from "./useArtifacts";
 import traceStore from "./useTraces";
-import logStore from "../core/useLog";
-import { warningStore } from "@/hooks";
 
 /**
  * Manages the selected project.

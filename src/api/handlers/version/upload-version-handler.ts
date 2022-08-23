@@ -1,5 +1,4 @@
-import { appStore } from "@/hooks";
-import { logStore } from "@/hooks";
+import { appStore, logStore } from "@/hooks";
 import { navigateTo, Routes } from "@/router";
 import { handleSelectVersion } from "@/api/notifications";
 import { handleJobSubmission } from "@/api/handlers/project/job-handler";

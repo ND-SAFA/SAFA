@@ -38,9 +38,10 @@ import { timGraph, cyResetTim } from "@/cytoscape";
 import {
   GenericGraphLink,
   GenericCytoscapeController,
+  Typography,
+  FlexBox,
 } from "@/components/common";
 import ArtifactTypeNode from "./ArtifactTypeNode.vue";
-import { Typography, FlexBox } from "@/components/common";
 
 /**
  * Creates a Cytoscape graph containing artifact types are nodes

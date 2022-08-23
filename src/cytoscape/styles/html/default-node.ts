@@ -1,7 +1,7 @@
 import { ArtifactData } from "@/types";
 import { getBackgroundColor, ThemeColors } from "@/util";
-import { svgNode } from "./core-svg";
 import { ARTIFACT_BORDER_WIDTH } from "@/cytoscape";
+import { svgNode } from "./core-svg";
 
 /**
  * Creates the SVG safety case context.

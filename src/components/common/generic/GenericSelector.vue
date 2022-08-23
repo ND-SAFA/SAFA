@@ -74,8 +74,8 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { DataItemProps, DataTableHeader } from "vuetify";
-import GenericIconButton from "./GenericIconButton.vue";
 import FlexBox from "@/components/common/display/FlexBox.vue";
+import GenericIconButton from "./GenericIconButton.vue";
 
 /**
  * Displays a generic selector.

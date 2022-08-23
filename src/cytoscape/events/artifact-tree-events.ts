@@ -1,7 +1,7 @@
+import { EventObject } from "cytoscape";
 import { CytoCore, CytoEvent, CytoEventHandlers } from "@/types/cytoscape/core";
 import { ArtifactModel } from "@/types";
 import { selectionStore } from "@/hooks";
-import { EventObject } from "cytoscape";
 import { DefaultCytoEvents } from "@/cytoscape/events/cyto-events";
 import { disableDrawMode } from "@/cytoscape";
 

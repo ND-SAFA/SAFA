@@ -1,8 +1,8 @@
 import { ArtifactData, SvgStyle } from "@/types";
 import { ThemeColors } from "@/util";
-import { svgStoplight } from "./artifact-stoplight";
-import { getWarnings } from "./artifact-helper";
 import { ARTIFACT_BORDER_WIDTH, ARTIFACT_CHILDREN_HEIGHT } from "@/cytoscape";
+import { getWarnings } from "./artifact-helper";
+import { svgStoplight } from "./artifact-stoplight";
 
 /**
  * Creates the SVG for representing a safety case node's footer.

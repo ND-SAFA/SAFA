@@ -1,6 +1,5 @@
 import Vue from "vue";
 import VueRouter, { NavigationGuardNext, Route, RouteConfig } from "vue-router";
-import { Routes } from "./routes";
 import {
   ApproveLinksView,
   ArtifactView,
@@ -17,6 +16,7 @@ import {
 } from "@/views";
 import { routerChecks } from "@/router/checks";
 import { NextPayload } from "@/types";
+import { Routes } from "./routes";
 
 export { Routes };
 

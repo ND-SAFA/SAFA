@@ -37,8 +37,8 @@ import Vue from "vue";
 import { DeltaType, DeltaArtifact, ChangedArtifact } from "@/types";
 import { deltaStore } from "@/hooks";
 import { Typography } from "@/components/common";
-import DeltaButtonGroup from "./DeltaButtonGroup.vue";
 import ArtifactDeltaDiff from "./ArtifactDeltaDiff.vue";
+import DeltaButtonGroup from "./DeltaButtonGroup.vue";
 
 /**
  * Displays artifact delta information.

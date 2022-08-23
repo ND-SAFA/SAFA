@@ -19,8 +19,8 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { PasswordField, Typography } from "@/components";
 import { handleChangePassword } from "@/api";
+import { PasswordField, Typography } from "@/components";
 
 /**
  * Allows for password updating.

@@ -7,8 +7,8 @@
 </template>
 
 <script lang="ts">
-import { DeltaType } from "@/types";
 import Vue, { PropType } from "vue";
+import { DeltaType } from "@/types";
 
 /**
  * Displays an artifact delta button.

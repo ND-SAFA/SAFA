@@ -55,8 +55,8 @@ import {
   Typography,
   GenericIconButton,
 } from "@/components/common";
-import SectionControls from "./SectionControls.vue";
 import { artifactStore } from "@/hooks";
+import SectionControls from "./SectionControls.vue";
 
 /**
  * Renders a group header in a table.

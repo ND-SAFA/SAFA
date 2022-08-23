@@ -89,9 +89,9 @@ import {
 import { sessionStore } from "@/hooks";
 import { GenericStepper } from "@/components/common";
 import { ProjectIdentifierInput } from "@/components/project/shared";
-import { TimTree } from "../tim-tree-view";
-import { GenericUploader } from "../validation-panels";
 import { ArtifactTypeCreator, TraceFileCreator } from "../panels";
+import { GenericUploader } from "../validation-panels";
+import { TimTree } from "../tim-tree-view";
 
 const PROJECT_IDENTIFIER_STEP_NAME = "Name Project";
 

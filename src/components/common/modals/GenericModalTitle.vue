@@ -18,9 +18,9 @@
 
 <script lang="ts">
 import Vue from "vue";
-import GenericIconButton from "../generic/GenericIconButton.vue";
 import Typography from "@/components/common/display/Typography.vue";
 import FlexBox from "@/components/common/display/FlexBox.vue";
+import GenericIconButton from "../generic/GenericIconButton.vue";
 
 /**
  * Displays a generic modal title.

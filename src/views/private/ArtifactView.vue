@@ -20,8 +20,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { artifactSelectionModule } from "@/store";
-import { appStore } from "@/hooks";
+import { appStore, selectionStore } from "@/hooks";
 import {
   ArtifactTree,
   ArtifactTable,
@@ -61,7 +60,7 @@ export default Vue.extend({
      * @return The selected artifact.
      */
     selectedArtifact() {
-      return artifactSelectionModule.getSelectedArtifact;
+      return selectionStore.selectedArtifact;
     },
   },
   methods: {

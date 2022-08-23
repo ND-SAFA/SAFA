@@ -32,8 +32,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { IdentifierModel, VersionModel } from "@/types";
-import { projectModule } from "@/store";
-import { logStore } from "@/hooks";
+import { logStore, projectStore } from "@/hooks";
 import { handleUploadProjectVersion } from "@/api";
 import { GenericFileSelector } from "@/components/common";
 import ProjectVersionStepperModal from "./ProjectVersionStepperModal.vue";
@@ -71,7 +70,7 @@ export default Vue.extend({
      * Sets the current project and version when opened.
      */
     isOpen(open: boolean) {
-      const currentProject = projectModule.getProject;
+      const currentProject = projectStore.project;
       const currentVersion = currentProject.projectVersion;
 
       if (!open || !currentProject.projectId) return;

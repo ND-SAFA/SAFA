@@ -1,6 +1,6 @@
 import { ArtifactTypeModel, LabelledTraceDirectionModel } from "@/types";
-import { saveArtifactType } from "@/api/endpoints/artifact-type-api";
-import { projectModule } from "@/store";
+import { saveArtifactType } from "@/api/endpoints";
+import { projectStore } from "@/hooks";
 import { typeOptionsStore } from "@/hooks";
 
 /**
@@ -12,11 +12,11 @@ export async function handleSaveArtifactType(
   artifactType: ArtifactTypeModel
 ): Promise<void> {
   const updatedArtifactType = await saveArtifactType(
-    projectModule.projectId,
+    projectStore.projectId,
     artifactType
   );
 
-  projectModule.addOrUpdateArtifactType(updatedArtifactType);
+  projectStore.addOrUpdateArtifactType(updatedArtifactType);
 }
 
 /**
@@ -27,7 +27,7 @@ export async function handleSaveArtifactType(
 export async function handleSaveArtifactTypeIcon(
   labeledType: LabelledTraceDirectionModel
 ): Promise<void> {
-  const type = projectModule.getProject.artifactTypes.find(
+  const type = projectStore.project.artifactTypes.find(
     ({ name }) => name === labeledType.type
   );
 

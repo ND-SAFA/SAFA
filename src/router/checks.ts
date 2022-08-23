@@ -6,8 +6,7 @@ import {
   routesPublic,
   routesWithRequiredProject,
 } from "@/router/routes";
-import { projectModule, viewportModule } from "@/store";
-import { appStore } from "@/hooks";
+import { appStore, layoutStore, projectStore, selectionStore } from "@/hooks";
 import { handleLoadVersion } from "@/api";
 import { sessionStore } from "@/hooks";
 
@@ -40,7 +39,7 @@ export const routerChecks: Record<string, RouterCheck> = {
   },
   requireProjectForRoutes(to: Route) {
     if (
-      projectModule.isProjectDefined ||
+      projectStore.isProjectDefined ||
       !routesWithRequiredProject.includes(to.path)
     )
       return;
@@ -62,7 +61,8 @@ export const routerChecks: Record<string, RouterCheck> = {
     appStore.onLoadStart();
 
     setTimeout(() => {
-      viewportModule.setArtifactTreeLayout().then(appStore.onLoadEnd);
+      layoutStore.setArtifactTreeLayout();
+      appStore.onLoadEnd();
     }, 200);
   },
 };

@@ -87,8 +87,7 @@
 import Vue, { PropType } from "vue";
 import { ArtifactModel, DocumentType, SelectOption } from "@/types";
 import { documentTypeMap, logicTypeOptions, safetyCaseOptions } from "@/util";
-import { projectModule } from "@/store";
-import { typeOptionsStore, documentStore } from "@/hooks";
+import { typeOptionsStore, documentStore, projectStore } from "@/hooks";
 import { getDoesArtifactExist } from "@/api";
 import {
   ArtifactInput,
@@ -186,7 +185,7 @@ export default Vue.extend({
           this.isNameValid = true;
           this.nameCheckIsLoading = false;
         } else {
-          getDoesArtifactExist(projectModule.versionId, newName).then(
+          getDoesArtifactExist(projectStore.versionId, newName).then(
             (nameExists) => {
               this.nameCheckIsLoading = false;
               this.isNameValid = !nameExists;

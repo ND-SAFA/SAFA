@@ -11,7 +11,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { versionToString } from "@/util";
-import { projectModule } from "@/store";
+import { projectStore } from "@/hooks";
 import { Typography } from "@/components/common";
 
 const DEFAULT_PROJECT_NAME = "Untitled";
@@ -45,13 +45,13 @@ export default Vue.extend({
      * @return The current project.
      */
     project() {
-      return projectModule.getProject;
+      return projectStore.project;
     },
     /**
      * @return Whether there is currently a project loaded.
      */
     projectExists(): boolean {
-      return projectModule.isProjectDefined;
+      return projectStore.isProjectDefined;
     },
   },
   methods: {
@@ -59,7 +59,7 @@ export default Vue.extend({
      * Updates the project name.
      */
     setProjectName() {
-      const { name, projectVersion, projectId } = projectModule.getProject;
+      const { name, projectVersion, projectId } = projectStore.project;
 
       if (projectId) {
         this.projectName = name;

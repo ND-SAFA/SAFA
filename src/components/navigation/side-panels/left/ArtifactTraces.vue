@@ -38,8 +38,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { artifactSelectionModule } from "@/store";
-import { artifactStore, traceStore } from "@/hooks";
+import { artifactStore, traceStore, selectionStore } from "@/hooks";
 import { ListItem } from "@/types";
 import {
   GenericListItem,
@@ -59,7 +58,7 @@ export default Vue.extend({
      * @return The selected artifact.
      */
     selectedArtifact() {
-      return artifactSelectionModule.getSelectedArtifact;
+      return selectionStore.selectedArtifact;
     },
     /**
      * @return The selected artifact's parents.
@@ -122,7 +121,7 @@ export default Vue.extend({
 
       if (!artifact) return;
 
-      artifactSelectionModule.selectArtifact(artifact.id);
+      selectionStore.selectArtifact(artifact.id);
     },
   },
 });

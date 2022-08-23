@@ -6,4 +6,5 @@ export { default as warningStore } from "./useWarnings";
 export { default as documentStore } from "./useDocuments";
 export { default as commitStore } from "./useCommits";
 export { default as subtreeStore } from "./useSubtree";
+export { default as projectStore } from "./useProject";
 export { default as deltaStore } from "./useDelta";

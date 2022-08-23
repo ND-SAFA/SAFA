@@ -11,7 +11,7 @@ import {
   DEFAULT_ARTIFACT_TREE_ZOOM,
   ZOOM_INCREMENT,
 } from "@/cytoscape/styles";
-import { artifactSelectionModule } from "@/store";
+import { selectionStore } from "@/hooks";
 import { areArraysEqual } from "@/util";
 import { applyAutoMoveEvents } from "@/cytoscape";
 
@@ -226,10 +226,10 @@ export function cyDisplayAll(
 export function cyResetTree(
   cyPromise: CyPromise = artifactTreeCyPromise
 ): void {
-  const selectedId = artifactSelectionModule.getSelectedArtifactId;
+  const selectedId = selectionStore.selectedArtifactId;
 
   if (selectedId) {
-    artifactSelectionModule.selectArtifact(selectedId);
+    selectionStore.selectArtifact(selectedId);
   } else {
     cyCenterNodes(cyPromise);
   }

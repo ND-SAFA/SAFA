@@ -1,11 +1,12 @@
 import { EventObject } from "cytoscape";
 import { ArtifactModel, ArtifactData, MenuItem } from "@/types";
 import {
-  artifactSelectionModule,
-  projectModule,
-  viewportModule,
-} from "@/store";
-import { appStore, artifactStore, subtreeStore } from "@/hooks";
+  appStore,
+  artifactStore,
+  subtreeStore,
+  projectStore,
+  selectionStore,
+} from "@/hooks";
 import { enableDrawMode } from "@/cytoscape";
 import { handleDeleteArtifact, handleDuplicateArtifact } from "@/api";
 import { ftaMenuItem } from "./fta-menu-options";
@@ -21,7 +22,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
     tooltipText: "Create a new artifact",
     coreAsWell: true,
     onClickFunction(): void {
-      projectModule.ifProjectDefined(() => {
+      projectStore.ifProjectDefined(() => {
         appStore.openArtifactCreatorTo({ isNewArtifact: true });
       });
     },
@@ -33,7 +34,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
     tooltipText: "Create a new trace link",
     coreAsWell: true,
     onClickFunction(): void {
-      projectModule.ifProjectDefined(() => {
+      projectStore.ifProjectDefined(() => {
         appStore.toggleTraceLinkCreator();
       });
     },
@@ -45,7 +46,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
     coreAsWell: true,
     hasTrailingDivider: true,
     onClickFunction(): void {
-      projectModule.ifProjectDefined(() => {
+      projectStore.ifProjectDefined(() => {
         enableDrawMode();
       });
     },
@@ -58,7 +59,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
     coreAsWell: false,
     onClickFunction(event: EventObject): void {
       handleOnClick(event, (artifact: ArtifactModel) => {
-        artifactSelectionModule.selectArtifact(artifact.id);
+        selectionStore.selectArtifact(artifact.id);
       });
     },
     isVisible(artifactData: ArtifactData | undefined): boolean {
@@ -73,7 +74,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
     coreAsWell: false,
     onClickFunction(event: EventObject): void {
       handleOnClick(event, (artifact: ArtifactModel) => {
-        artifactSelectionModule.selectArtifact(artifact.id);
+        selectionStore.selectArtifact(artifact.id);
         appStore.toggleArtifactBody();
       });
     },
@@ -90,7 +91,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
     hasTrailingDivider: true,
     onClickFunction(event: EventObject): void {
       handleOnClick(event, async (artifact: ArtifactModel) => {
-        artifactSelectionModule.selectArtifact(artifact.id);
+        selectionStore.selectArtifact(artifact.id);
         appStore.openArtifactCreatorTo({});
       });
     },
@@ -136,7 +137,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
     selector: "node",
     coreAsWell: false,
     onClickFunction(event: EventObject): void {
-      handleOnClick(event, ({ id }) => viewportModule.viewArtifactSubtree(id));
+      handleOnClick(event, ({ id }) => selectionStore.viewArtifactSubtree(id));
     },
     isVisible: hasSubtree,
   },

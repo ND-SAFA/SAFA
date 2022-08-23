@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 
 import { pinia } from "@/plugins";
 import { PanelOpenState, PanelType } from "@/types";
-import { artifactSelectionModule } from "@/store";
+import selectionStore from "../graph/useSelection";
 
 /**
  * This module defines state shared across the entire app.
@@ -172,8 +172,7 @@ export const useApp = defineStore("app", {
     }): void {
       const { type, isNewArtifact } = openTo;
 
-      // TODO: remove module
-      if (isNewArtifact) artifactSelectionModule.clearSelections();
+      if (isNewArtifact) selectionStore.clearSelections();
 
       this.isOpen[PanelType.artifactCreator] = type || true;
     },

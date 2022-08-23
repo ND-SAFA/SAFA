@@ -20,8 +20,7 @@
 import Vue from "vue";
 import { DocumentModel } from "@/types";
 import { documentTypeOptions } from "@/util";
-import { artifactSelectionModule } from "@/store";
-import { documentStore } from "@/hooks";
+import { documentStore, selectionStore } from "@/hooks";
 import { Typography, GenericListItem } from "@/components/common";
 
 /**
@@ -35,7 +34,7 @@ export default Vue.extend({
      * @return The selected artifact.
      */
     selectedArtifact() {
-      return artifactSelectionModule.getSelectedArtifact;
+      return selectionStore.selectedArtifact;
     },
     /**
      * @return The selected artifact's documents.

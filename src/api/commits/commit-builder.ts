@@ -1,6 +1,6 @@
 import { ArtifactModel, Commit, VersionModel, TraceLinkModel } from "@/types";
 import { createCommit } from "@/util";
-import { projectModule } from "@/store";
+import { projectStore } from "@/hooks";
 import { saveCommit } from "@/api";
 
 /**
@@ -81,10 +81,12 @@ export class CommitBuilder {
    * Creates a new commit based on the current project version.
    */
   static withCurrentVersion(): CommitBuilder {
-    const { projectVersion } = projectModule.getProject;
-    if (projectVersion === undefined) {
+    const version = projectStore.version;
+
+    if (version === undefined) {
       throw Error("No project version is selected.");
     }
-    return new CommitBuilder(projectVersion);
+
+    return new CommitBuilder(version);
   }
 }

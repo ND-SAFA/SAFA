@@ -41,8 +41,13 @@
 <script lang="ts">
 import Vue from "vue";
 import { ButtonDefinition, ButtonType } from "@/types";
-import { artifactSelectionModule, viewportModule } from "@/store";
-import { artifactStore, documentStore, commitStore } from "@/hooks";
+import {
+  artifactStore,
+  documentStore,
+  commitStore,
+  selectionStore,
+  layoutStore,
+} from "@/hooks";
 import { redoCommit, undoCommit } from "@/api";
 import { cyZoomIn, cyZoomOut } from "@/cytoscape";
 import { GenericIconButton, CheckmarkMenu, FlexBox } from "@/components/common";
@@ -114,8 +119,8 @@ export default Vue.extend({
         },
         {
           type: ButtonType.ICON,
-          handler: async () => {
-            await artifactSelectionModule.filterGraph({
+          handler: () => {
+            selectionStore.filterGraph({
               type: "subtree",
               artifactsInSubtree: [],
             });
@@ -125,7 +130,7 @@ export default Vue.extend({
         },
         {
           type: ButtonType.ICON,
-          handler: viewportModule.setArtifactTreeLayout,
+          handler: layoutStore.setArtifactTreeLayout,
           label: "Reformat Graph",
           icon: "mdi-refresh",
         },
@@ -163,7 +168,7 @@ export default Vue.extend({
 
       Vue.set(this.menuItems, index, [type, newState]);
 
-      artifactSelectionModule.filterGraph({
+      selectionStore.filterGraph({
         type: "ignore",
         ignoreType: type,
         action: newState ? "remove" : "add",

@@ -19,8 +19,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { artifactSelectionModule } from "@/store";
-import { appStore } from "@/hooks";
+import { appStore, selectionStore } from "@/hooks";
 import { GenericModal, Typography } from "@/components/common";
 
 /**
@@ -40,7 +39,7 @@ export default Vue.extend({
      * @return The selected artifact.
      */
     selectedArtifact() {
-      return artifactSelectionModule.getSelectedArtifact;
+      return selectionStore.selectedArtifact;
     },
     /**
      * @return The selected artifact's name.

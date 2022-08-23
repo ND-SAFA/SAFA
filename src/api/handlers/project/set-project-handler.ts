@@ -1,7 +1,6 @@
 import { ProjectModel } from "@/types";
 import { createProject } from "@/util";
 import { QueryParams, removeParams, updateParam } from "@/router";
-import { artifactSelectionModule, projectModule } from "@/store";
 import {
   appStore,
   layoutStore,
@@ -9,6 +8,8 @@ import {
   documentStore,
   deltaStore,
   subtreeStore,
+  projectStore,
+  selectionStore,
 } from "@/hooks";
 import {
   handleLoadTraceMatrices,
@@ -32,7 +33,7 @@ export async function handleResetGraph(
   }
 
   disableDrawMode();
-  artifactSelectionModule.clearSelections();
+  selectionStore.clearSelections();
   deltaStore.clear();
   appStore.closeSidePanels();
 }
@@ -43,7 +44,7 @@ export async function handleResetGraph(
 export async function handleClearProject(): Promise<void> {
   const project = createProject();
 
-  await projectModule.initializeProject(project);
+  projectStore.initializeProject(project);
   await handleResetGraph();
   typeOptionsStore.$reset();
   subtreeStore.$reset();
@@ -58,13 +59,13 @@ export async function handleClearProject(): Promise<void> {
 export async function handleSetProject(project: ProjectModel): Promise<void> {
   const projectId = project.projectId;
   const versionId = project.projectVersion?.versionId || "";
-  const isDifferentProject = projectModule.versionId !== versionId;
+  const isDifferentProject = projectStore.versionId !== versionId;
 
   project.artifactTypes = await getProjectArtifactTypes(projectId);
 
   await handleSelectVersion(projectId, versionId);
-  artifactSelectionModule.clearSelections();
-  await projectModule.initializeProject(project);
+  selectionStore.clearSelections();
+  projectStore.initializeProject(project);
   await handleResetGraph(isDifferentProject);
   await handleLoadTraceMatrices();
   await setCurrentDocument(project);
@@ -76,7 +77,7 @@ export async function handleSetProject(project: ProjectModel): Promise<void> {
  */
 export async function handleReloadProject(): Promise<void> {
   await handleLoadVersion(
-    projectModule.versionId,
+    projectStore.versionId,
     documentStore.currentDocument
   );
 }

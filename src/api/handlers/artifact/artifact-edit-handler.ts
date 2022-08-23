@@ -1,6 +1,5 @@
 import { ArtifactModel, ConfirmationType, IOHandlerCallback } from "@/types";
-import { artifactSelectionModule, projectModule } from "@/store";
-import { layoutStore, logStore } from "@/hooks";
+import { layoutStore, logStore, projectStore, selectionStore } from "@/hooks";
 import {
   createArtifact,
   deleteArtifact,
@@ -25,19 +24,19 @@ export async function handleSaveArtifact(
   { onSuccess, onError }: IOHandlerCallback
 ): Promise<void> {
   try {
-    const versionId = projectModule.versionIdWithLog;
+    const versionId = projectStore.versionIdWithLog;
 
     if (isUpdate) {
       const updatedArtifacts = await updateArtifact(versionId, artifact);
 
-      await projectModule.addOrUpdateArtifacts(updatedArtifacts);
+      projectStore.addOrUpdateArtifacts(updatedArtifacts);
     } else {
       const createdArtifacts = await createArtifact(versionId, artifact);
 
-      await projectModule.addOrUpdateArtifacts(createdArtifacts);
-      artifactSelectionModule.selectArtifact(createdArtifacts[0].id);
+      projectStore.addOrUpdateArtifacts(createdArtifacts);
+      selectionStore.selectArtifact(createdArtifacts[0].id);
       // TODO: load new layout
-      await layoutStore.setArtifactTreeLayout();
+      layoutStore.setArtifactTreeLayout();
 
       if (!parentArtifact) {
         onSuccess?.();
@@ -101,9 +100,9 @@ export function handleDeleteArtifact(
         if (!isConfirmed) return;
 
         deleteArtifact(artifact)
-          .then(async () => {
-            await artifactSelectionModule.UNSELECT_ARTIFACT();
-            await projectModule.deleteArtifacts([artifact]);
+          .then(() => {
+            selectionStore.clearSelections();
+            projectStore.deleteArtifacts([artifact]);
             onSuccess?.();
           })
           .catch(onError);

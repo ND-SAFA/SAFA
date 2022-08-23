@@ -11,10 +11,10 @@ import {
 } from "@/types";
 import { createProjectDelta } from "@/util";
 import { disableDrawMode } from "@/cytoscape";
-import { projectModule } from "@/store";
 import appStore from "../core/useApp";
 import layoutStore from "../graph/useLayout";
 import subtreeStore from "./useSubtree";
+import projectStore from "./useProject";
 
 /**
  * This module tracks the delta state of a project.
@@ -88,9 +88,9 @@ export const useDelta = defineStore("delta", {
     /**
      * Removes delta artifacts and traces from the current project.
      */
-    async removeDeltaAdditions(): Promise<void> {
-      await projectModule.deleteArtifacts(Object.values(this.addedArtifacts));
-      await projectModule.deleteTraceLinks(Object.values(this.addedTraces));
+    removeDeltaAdditions(): void {
+      projectStore.deleteArtifacts(Object.values(this.addedArtifacts));
+      projectStore.deleteTraceLinks(Object.values(this.addedTraces));
     },
     /**
      * Sets the current artifact deltas.
@@ -98,15 +98,14 @@ export const useDelta = defineStore("delta", {
      * @param payload - All artifact deltas.
      */
     async setDeltaPayload(payload: ProjectDelta): Promise<void> {
-      await this.removeDeltaAdditions();
-
+      this.removeDeltaAdditions();
       this.projectDelta = payload;
 
-      await projectModule.addOrUpdateArtifacts([
+      projectStore.addOrUpdateArtifacts([
         ...Object.values(payload.artifacts.added),
         ...Object.values(payload.artifacts.removed),
       ]);
-      await projectModule.addOrUpdateTraceLinks([
+      projectStore.addOrUpdateTraceLinks([
         ...Object.values(payload.traces.added),
         ...Object.values(payload.traces.removed),
       ]);

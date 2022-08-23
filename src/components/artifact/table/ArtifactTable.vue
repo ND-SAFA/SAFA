@@ -76,8 +76,13 @@
 <script lang="ts">
 import Vue from "vue";
 import { ArtifactModel, ArtifactDeltaState, FlatArtifact } from "@/types";
-import { artifactSelectionModule } from "@/store";
-import { appStore, artifactStore, documentStore, deltaStore } from "@/hooks";
+import {
+  appStore,
+  artifactStore,
+  documentStore,
+  deltaStore,
+  selectionStore,
+} from "@/hooks";
 import {
   Typography,
   AttributeChip,
@@ -194,11 +199,11 @@ export default Vue.extend({
      * @param artifact - The artifact to view.
      */
     handleView(artifact: ArtifactModel) {
-      if (artifactSelectionModule.getSelectedArtifactId === artifact.id) {
-        artifactSelectionModule.clearSelections();
+      if (selectionStore.selectedArtifactId === artifact.id) {
+        selectionStore.clearSelections();
         this.expanded = [];
       } else {
-        artifactSelectionModule.selectArtifact(artifact.id);
+        selectionStore.selectArtifact(artifact.id);
         this.expanded = [artifact];
       }
     },
@@ -208,7 +213,7 @@ export default Vue.extend({
      * @return The class name to add to the artifact.
      */
     getItemBackground(item: ArtifactModel): string {
-      if (artifactSelectionModule.getSelectedArtifactId === item.id) {
+      if (selectionStore.selectedArtifactId === item.id) {
         return "artifact-row-selected";
       }
 

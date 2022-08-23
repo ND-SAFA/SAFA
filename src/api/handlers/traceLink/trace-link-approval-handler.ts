@@ -8,8 +8,7 @@ import {
   GeneratedLinksModel,
   FlatTraceLink,
 } from "@/types";
-import { projectModule } from "@/store";
-import { appStore, logStore, artifactStore } from "@/hooks";
+import { appStore, logStore, artifactStore, projectStore } from "@/hooks";
 import {
   createLink,
   getGeneratedLinks,
@@ -28,7 +27,7 @@ export async function handleGetGeneratedLinks({
   onSuccess,
   onError,
 }: IOHandlerCallback<GeneratedLinksModel>): Promise<void> {
-  if (!projectModule.isProjectDefined) return;
+  if (!projectStore.isProjectDefined) return;
 
   const links: FlatTraceLink[] = [];
   const approved: string[] = [];
@@ -37,7 +36,7 @@ export async function handleGetGeneratedLinks({
   try {
     appStore.onLoadStart();
 
-    const generatedLinks = await getGeneratedLinks(projectModule.versionId);
+    const generatedLinks = await getGeneratedLinks(projectStore.versionId);
 
     generatedLinks.forEach((link) => {
       const source = artifactStore.getArtifactById(link.sourceId);
@@ -99,7 +98,7 @@ export async function handleCreateLink(
   try {
     const createdLinks = await createLink(traceLink);
 
-    await projectModule.addOrUpdateTraceLinks(createdLinks);
+    projectStore.addOrUpdateTraceLinks(createdLinks);
   } catch (e) {
     logStore.onError(
       `Unable to create trace link: ${sourceName} -> ${targetName}`
@@ -123,7 +122,7 @@ export async function handleApproveLink(
 
   linkAPIHandler(link, updateApprovedLink, {
     onSuccess: async () => {
-      await projectModule.addOrUpdateTraceLinks([link]);
+      await projectStore.addOrUpdateTraceLinks([link]);
       onSuccess?.();
     },
     onError: (e) => {
@@ -149,7 +148,7 @@ export async function handleDeclineLink(
 
   linkAPIHandler(link, updateDeclinedLink, {
     onSuccess: async () => {
-      await projectModule.deleteTraceLinks([link]);
+      projectStore.deleteTraceLinks([link]);
       onSuccess?.();
     },
     onError: (e) => {

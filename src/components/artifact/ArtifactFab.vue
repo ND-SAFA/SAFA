@@ -51,8 +51,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { projectModule } from "@/store";
-import { appStore, documentStore } from "@/hooks";
+import { appStore, documentStore, projectStore } from "@/hooks";
 import { GenericIconButton } from "@/components";
 import { disableDrawMode, enableDrawMode } from "@/cytoscape";
 
@@ -86,7 +85,7 @@ export default Vue.extend({
      * Opens the add artifact modal.
      */
     handleAddArtifact(): void {
-      projectModule.ifProjectDefined(() => {
+      projectStore.ifProjectDefined(() => {
         appStore.openArtifactCreatorTo({ isNewArtifact: true });
       });
     },
@@ -94,7 +93,7 @@ export default Vue.extend({
      * Opens the add trace link modal.
      */
     handleAddTraceLink(): void {
-      projectModule.ifProjectDefined(() => {
+      projectStore.ifProjectDefined(() => {
         appStore.toggleTraceLinkCreator();
       });
     },
@@ -102,7 +101,7 @@ export default Vue.extend({
      * Enables the trace link creator.
      */
     handleDrawTraceLink(): void {
-      projectModule.ifProjectDefined(() => {
+      projectStore.ifProjectDefined(() => {
         if (this.isCreateLinkEnabled) {
           disableDrawMode();
         } else {

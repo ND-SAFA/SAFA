@@ -1,13 +1,11 @@
 import {
-  ArtifactModel,
   ColumnModel,
   DocumentType,
   IOHandlerCallback,
   DocumentModel,
 } from "@/types";
 import { createDocument } from "@/util";
-import { projectModule } from "@/store";
-import { logStore, documentStore } from "@/hooks";
+import { logStore, documentStore, projectStore } from "@/hooks";
 import {
   saveDocument,
   deleteDocument,
@@ -28,11 +26,11 @@ export async function handleCreateDocument(
   type: DocumentType,
   artifactIds: string[]
 ): Promise<void> {
-  const versionId = projectModule.versionIdWithLog;
+  const versionId = projectStore.versionIdWithLog;
   const createdDocument = await saveDocument(
     versionId,
     createDocument({
-      project: projectModule.getProject,
+      project: projectStore.project,
       artifactIds,
       name,
       type,
@@ -50,7 +48,7 @@ export async function handleCreateDocument(
 export async function handleUpdateDocument(
   document: DocumentModel
 ): Promise<void> {
-  const versionId = projectModule.versionIdWithLog;
+  const versionId = projectStore.versionIdWithLog;
   const updatedDocument = await saveDocument(versionId, document);
 
   await documentStore.updateDocuments([updatedDocument]);
@@ -94,8 +92,8 @@ export function handleDeleteDocument(
  * @param artifacts - The full list of artifacts.
  */
 export async function handleDocumentReload(
-  versionId = projectModule.versionId,
-  artifacts: ArtifactModel[] = projectModule.getProject.artifacts
+  versionId = projectStore.versionId,
+  artifacts = projectStore.project.artifacts
 ): Promise<void> {
   const documents = await getDocuments(versionId);
 

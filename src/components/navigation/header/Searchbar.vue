@@ -33,8 +33,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { ArtifactSearchItem } from "@/types";
-import { artifactSelectionModule, viewportModule } from "@/store";
-import { typeOptionsStore, artifactStore } from "@/hooks";
+import { typeOptionsStore, artifactStore, selectionStore } from "@/hooks";
 import { GenericArtifactBodyDisplay, Typography } from "@/components/common";
 import { filterArtifacts } from "@/util";
 import FlexBox from "@/components/common/display/FlexBox.vue";
@@ -96,13 +95,13 @@ export default Vue.extend({
     },
     value: {
       get() {
-        return artifactSelectionModule.getSelectedArtifactId;
+        return selectionStore.selectedArtifactId;
       },
       set(artifactId: string | null) {
         if (artifactId) {
-          viewportModule.viewArtifactSubtree(artifactId);
+          selectionStore.viewArtifactSubtree(artifactId);
         } else {
-          artifactSelectionModule.clearSelections();
+          selectionStore.clearSelections();
         }
       },
     },

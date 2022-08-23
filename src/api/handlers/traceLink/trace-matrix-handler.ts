@@ -1,5 +1,4 @@
-import { projectModule } from "@/store";
-import { typeOptionsStore } from "@/hooks";
+import { typeOptionsStore, projectStore } from "@/hooks";
 import { deleteTraceMatrix, getTraceMatrices } from "@/api";
 import { LabelledTraceDirectionModel } from "@/types";
 
@@ -9,9 +8,7 @@ import { LabelledTraceDirectionModel } from "@/types";
  * @return The current trace matrices.
  */
 export async function handleLoadTraceMatrices(): Promise<void> {
-  const artifactTypeDirections = await getTraceMatrices(
-    projectModule.projectId
-  );
+  const artifactTypeDirections = await getTraceMatrices(projectStore.projectId);
 
   typeOptionsStore.$patch({ artifactTypeDirections });
 }
@@ -27,7 +24,7 @@ export async function handleRemoveTraceType(
   targetArtifactTypeName: string
 ): Promise<void> {
   await deleteTraceMatrix(
-    projectModule.projectId,
+    projectStore.projectId,
     sourceArtifactTypeName,
     targetArtifactTypeName
   );

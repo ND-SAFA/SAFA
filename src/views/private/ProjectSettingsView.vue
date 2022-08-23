@@ -12,7 +12,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { projectModule } from "@/store";
+import { projectStore } from "@/hooks";
 import {
   PrivatePage,
   SettingsGeneralSection,
@@ -36,7 +36,7 @@ export default Vue.extend({
      * @return The current project.
      */
     project() {
-      return projectModule.getProject;
+      return projectStore.project;
     },
   },
 });

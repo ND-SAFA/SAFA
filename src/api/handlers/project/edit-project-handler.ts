@@ -1,6 +1,5 @@
 import { IOHandlerCallback, ProjectModel, IdentifierModel } from "@/types";
-import { projectModule } from "@/store";
-import { logStore } from "@/hooks";
+import { logStore, projectStore } from "@/hooks";
 import {
   deleteProject,
   deleteProjectVersion,
@@ -47,7 +46,7 @@ export function handleDeleteProject(
       logStore.onSuccess(`Project has been deleted: ${project.name}`);
       onSuccess?.(project);
 
-      if (project.name !== projectModule.getProject.name) return;
+      if (project.name !== projectStore.project.name) return;
 
       // Clear the current project if it has been deleted.
       await handleClearProject();

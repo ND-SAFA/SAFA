@@ -38,11 +38,9 @@
 <script lang="ts">
 import Vue from "vue";
 import { PanelType } from "@/types";
-import { artifactSelectionModule } from "@/store";
-import { appStore } from "@/hooks";
+import { appStore, selectionStore } from "@/hooks";
 import { handleDeleteArtifact } from "@/api";
-import { GenericIconButton } from "@/components/common";
-import Typography from "@/components/common/display/Typography.vue";
+import { GenericIconButton, Typography } from "@/components/common";
 
 /**
  * Displays the selected node's title and option buttons.
@@ -58,7 +56,7 @@ export default Vue.extend({
      * @return The selected artifact.
      */
     selectedArtifact() {
-      return artifactSelectionModule.getSelectedArtifact;
+      return selectionStore.selectedArtifact;
     },
     /**
      * @return The selected artifact's name.

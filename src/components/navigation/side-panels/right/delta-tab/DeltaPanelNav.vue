@@ -38,10 +38,8 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { ProjectModel } from "@/types";
 import { handleReloadProject } from "@/api";
-import { projectModule } from "@/store";
-import { deltaStore } from "@/hooks";
+import { deltaStore, projectStore } from "@/hooks";
 import DeltaVersionsModal from "./DeltaVersionsModal.vue";
 import { Typography } from "@/components/common";
 
@@ -62,8 +60,8 @@ export default Vue.extend({
     /**
      * @return The current project.
      */
-    project(): ProjectModel {
-      return projectModule.getProject;
+    project() {
+      return projectStore.project;
     },
     /**
      * @return Whether the current project is defined

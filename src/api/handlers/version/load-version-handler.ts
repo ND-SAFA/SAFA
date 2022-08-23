@@ -1,11 +1,11 @@
 import { DocumentModel } from "@/types";
-import { projectModule } from "@/store";
 import {
   appStore,
   layoutStore,
   warningStore,
   sessionStore,
   documentStore,
+  projectStore,
 } from "@/hooks";
 import {
   navigateTo,
@@ -68,9 +68,9 @@ export async function handleLoadVersion(
  */
 export async function handleReloadArtifacts(versionId: string): Promise<void> {
   const artifacts = await getArtifactsInVersion(versionId);
-  const currentArtifactCount = projectModule.getProject.artifacts.length;
+  const currentArtifactCount = projectStore.project.artifacts.length;
 
-  await projectModule.addOrUpdateArtifacts(artifacts);
+  await projectStore.addOrUpdateArtifacts(artifacts);
   await handleLoadTraceMatrices();
 
   if (artifacts.length > currentArtifactCount) {
@@ -87,7 +87,7 @@ export async function handleReloadArtifacts(versionId: string): Promise<void> {
 export async function handleReloadTraceLinks(versionId: string): Promise<void> {
   const traces = await getTracesInVersion(versionId);
 
-  await projectModule.addOrUpdateTraceLinks(traces);
+  await projectStore.addOrUpdateTraceLinks(traces);
   await handleLoadTraceMatrices();
   layoutStore.applyAutomove();
 }

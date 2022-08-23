@@ -62,8 +62,7 @@
 import Vue from "vue";
 import { ArtifactModel } from "@/types";
 import { filterArtifacts } from "@/util";
-import { viewportModule } from "@/store";
-import { typeOptionsStore, artifactStore } from "@/hooks";
+import { typeOptionsStore, artifactStore, selectionStore } from "@/hooks";
 import {
   Typography,
   GenericArtifactBodyDisplay,
@@ -163,7 +162,7 @@ export default Vue.extend({
      * @param artifact - The artifact focus on.
      */
     async handleArtifactClick(artifact: ArtifactModel): Promise<void> {
-      await viewportModule.viewArtifactSubtree(artifact.id);
+      await selectionStore.viewArtifactSubtree(artifact.id);
     },
   },
 });

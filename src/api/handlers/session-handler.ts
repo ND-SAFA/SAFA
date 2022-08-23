@@ -4,7 +4,15 @@ import {
   PasswordChangeModel,
   UserModel,
 } from "@/types";
-import { getParam, getParams, navigateTo, QueryParams, Routes } from "@/router";
+import {
+  getParam,
+  getParams,
+  navigateTo,
+  QueryParams,
+  router,
+  Routes,
+  routesPublic,
+} from "@/router";
 import {
   handleClearProject,
   createLoginSession,
@@ -38,9 +46,9 @@ export async function handleLogin(user: UserModel): Promise<void> {
  * Logs a user out.
  */
 export async function handleLogout(): Promise<void> {
-  sessionStore.clearSession();
-  await navigateTo(Routes.LOGIN_ACCOUNT);
   await handleClearProject();
+  await navigateTo(Routes.LOGIN_ACCOUNT);
+  sessionStore.clearSession();
 }
 
 /**
@@ -48,6 +56,8 @@ export async function handleLogout(): Promise<void> {
  * If the token does not, is expired, or is otherwise invalid, the user will be sent back to login.
  */
 export async function handleAuthentication(): Promise<void> {
+  if (routesPublic.includes(router.currentRoute.path)) return;
+
   try {
     const isAuthorized = await sessionStore.hasAuthorization;
 

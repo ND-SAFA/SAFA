@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 import jwt_decode from "jwt-decode";
 
 import { pinia } from "@/plugins";
-import { AuthToken, SessionModel } from "@/types";
+import { AuthToken, LocalStorageKeys, SessionModel } from "@/types";
 import { createSession } from "@/util";
 import logStore from "./useLog";
 
@@ -12,7 +12,11 @@ import logStore from "./useLog";
 export const useSession = defineStore("session", {
   state() {
     try {
-      return { session: JSON.parse(localStorage.getItem("session") || "") };
+      return {
+        session: JSON.parse(
+          localStorage.getItem(LocalStorageKeys.SESSION_TOKEN) || ""
+        ),
+      };
     } catch (e) {
       return { session: createSession() };
     }
@@ -83,14 +87,20 @@ export const useSession = defineStore("session", {
      */
     updateSession(session: Partial<SessionModel>) {
       this.session = { ...this.session, ...session };
-      localStorage.setItem("session", JSON.stringify(this.session));
+      localStorage.setItem(
+        LocalStorageKeys.SESSION_TOKEN,
+        JSON.stringify(this.session)
+      );
     },
     /**
      * Clears the current session.
      */
     clearSession() {
       this.session = createSession();
-      localStorage.setItem("session", JSON.stringify(this.session));
+      localStorage.setItem(
+        LocalStorageKeys.SESSION_TOKEN,
+        JSON.stringify(this.session)
+      );
     },
   },
 });

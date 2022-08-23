@@ -87,7 +87,7 @@
 import Vue, { PropType } from "vue";
 import { ArtifactModel, DocumentType, SelectOption } from "@/types";
 import { documentTypeMap, logicTypeOptions, safetyCaseOptions } from "@/util";
-import { documentModule, projectModule, typeOptionsModule } from "@/store";
+import { typeOptionsStore, documentStore, projectStore } from "@/hooks";
 import { getDoesArtifactExist } from "@/api";
 import {
   ArtifactInput,
@@ -157,13 +157,13 @@ export default Vue.extend({
      * @return The document types allowed on the current document.
      */
     documentTypes(): SelectOption[] {
-      return documentTypeMap()[documentModule.type];
+      return documentTypeMap()[documentStore.currentType];
     },
     /**
      * @return The types of artifacts that exist so far.
      */
     artifactTypes(): string[] {
-      return typeOptionsModule.artifactTypes;
+      return typeOptionsStore.artifactTypes;
     },
   },
   watch: {
@@ -185,7 +185,7 @@ export default Vue.extend({
           this.isNameValid = true;
           this.nameCheckIsLoading = false;
         } else {
-          getDoesArtifactExist(projectModule.versionId, newName).then(
+          getDoesArtifactExist(projectStore.versionId, newName).then(
             (nameExists) => {
               this.nameCheckIsLoading = false;
               this.isNameValid = !nameExists;

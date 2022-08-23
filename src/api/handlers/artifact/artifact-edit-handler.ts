@@ -1,10 +1,5 @@
 import { ArtifactModel, ConfirmationType, IOHandlerCallback } from "@/types";
-import {
-  artifactSelectionModule,
-  logModule,
-  projectModule,
-  viewportModule,
-} from "@/store";
+import { layoutStore, logStore, projectStore, selectionStore } from "@/hooks";
 import {
   createArtifact,
   deleteArtifact,
@@ -29,19 +24,19 @@ export async function handleSaveArtifact(
   { onSuccess, onError }: IOHandlerCallback
 ): Promise<void> {
   try {
-    const versionId = projectModule.versionIdWithLog;
+    const versionId = projectStore.versionIdWithLog;
 
     if (isUpdate) {
       const updatedArtifacts = await updateArtifact(versionId, artifact);
 
-      await projectModule.addOrUpdateArtifacts(updatedArtifacts);
+      projectStore.addOrUpdateArtifacts(updatedArtifacts);
     } else {
       const createdArtifacts = await createArtifact(versionId, artifact);
 
-      await projectModule.addOrUpdateArtifacts(createdArtifacts);
-      artifactSelectionModule.selectArtifact(createdArtifacts[0].id);
+      projectStore.addOrUpdateArtifacts(createdArtifacts);
+      selectionStore.selectArtifact(createdArtifacts[0].id);
       // TODO: load new layout
-      await viewportModule.setArtifactTreeLayout();
+      layoutStore.setArtifactTreeLayout();
 
       if (!parentArtifact) {
         onSuccess?.();
@@ -55,9 +50,9 @@ export async function handleSaveArtifact(
 
     onSuccess?.();
   } catch (e) {
-    logModule.onDevError(e);
-    logModule.onError(`Unable to create artifact: ${artifact.name}`);
-    onError?.(e);
+    logStore.onDevError(String(e));
+    logStore.onError(`Unable to create artifact: ${artifact.name}`);
+    onError?.(e as Error);
   }
 }
 
@@ -95,9 +90,9 @@ export function handleDuplicateArtifact(
 export function handleDeleteArtifact(
   artifact: ArtifactModel,
   { onSuccess, onError }: IOHandlerCallback
-): Promise<void> {
-  return new Promise((resolve, reject) => {
-    logModule.SET_CONFIRMATION_MESSAGE({
+): void {
+  logStore.$patch({
+    confirmation: {
       type: ConfirmationType.INFO,
       title: `Delete ${artifact.name}?`,
       body: `Are you sure you would like to delete this artifact?`,
@@ -105,17 +100,13 @@ export function handleDeleteArtifact(
         if (!isConfirmed) return;
 
         deleteArtifact(artifact)
-          .then(async () => {
-            await artifactSelectionModule.UNSELECT_ARTIFACT();
-            await projectModule.deleteArtifacts([artifact]);
+          .then(() => {
+            selectionStore.clearSelections();
+            projectStore.deleteArtifacts([artifact]);
             onSuccess?.();
-            resolve();
           })
-          .catch((e) => {
-            onError?.(e);
-            reject(e);
-          });
+          .catch(onError);
       },
-    });
+    },
   });
 }

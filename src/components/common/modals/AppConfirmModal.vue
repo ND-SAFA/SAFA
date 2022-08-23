@@ -18,7 +18,7 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { ConfirmationType, ConfirmDialogueMessage } from "@/types";
-import { logModule } from "@/store";
+import { logStore } from "@/hooks";
 import GenericModal from "./GenericModal.vue";
 import Typography from "@/components/common/display/Typography.vue";
 
@@ -71,7 +71,7 @@ export default Vue.extend({
     handleConfirm(): void {
       if (!this.message) return;
 
-      logModule.CLEAR_CONFIRMATION_MESSAGE();
+      logStore.clearConfirmation();
       this.message.statusCallback(true);
     },
     /**
@@ -80,7 +80,7 @@ export default Vue.extend({
     handleClose(): void {
       if (!this.message) return;
 
-      logModule.CLEAR_CONFIRMATION_MESSAGE();
+      logStore.clearConfirmation();
       this.message.statusCallback(false);
     },
   },

@@ -4,7 +4,7 @@ import {
   MembershipModel,
   ProjectRole,
 } from "@/types";
-import { logModule } from "@/store";
+import { logStore } from "@/hooks";
 import { deleteProjectMember, saveProjectMember } from "@/api";
 
 /**
@@ -24,12 +24,12 @@ export function handleInviteMember(
 ): void {
   saveProjectMember(projectId, memberEmail, projectRole)
     .then(() => {
-      logModule.onSuccess(`Member added to the project: ${memberEmail}`);
+      logStore.onSuccess(`Member added to the project: ${memberEmail}`);
       onSuccess?.();
     })
     .catch((e) => {
-      logModule.onSuccess(`Unable to add member: ${memberEmail}`);
-      logModule.onDevError(e.message);
+      logStore.onSuccess(`Unable to add member: ${memberEmail}`);
+      logStore.onDevError(e.message);
       onError?.(e);
     });
 }
@@ -40,14 +40,16 @@ export function handleInviteMember(
  * @param member - The member to delete.
  */
 export function handleDeleteMember(member: MembershipModel): void {
-  logModule.SET_CONFIRMATION_MESSAGE({
-    type: ConfirmationType.INFO,
-    title: "Remove User from Project",
-    body: `Are you sure you want to remove ${member.email} from project?`,
-    statusCallback: async (isConfirmed: boolean) => {
-      if (!isConfirmed) return;
+  logStore.$patch({
+    confirmation: {
+      type: ConfirmationType.INFO,
+      title: "Remove User from Project",
+      body: `Are you sure you want to remove ${member.email} from project?`,
+      statusCallback: async (isConfirmed: boolean) => {
+        if (!isConfirmed) return;
 
-      await deleteProjectMember(member);
+        await deleteProjectMember(member);
+      },
     },
   });
 }

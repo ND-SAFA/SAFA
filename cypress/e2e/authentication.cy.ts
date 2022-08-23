@@ -55,10 +55,11 @@ describe("Authentication", () => {
         cy.login(validUser.email, validUser.password);
         cy.logout();
 
-        const store = JSON.parse(localStorage.getItem("vuex"));
+        const store = JSON.parse(localStorage.getItem("t"));
 
         expect(store).to.deep.equal({
-          session: { session: { token: "", versionId: "" } },
+          token: "",
+          versionId: "",
         });
       });
     });

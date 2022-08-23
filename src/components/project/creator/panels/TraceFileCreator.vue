@@ -25,7 +25,7 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { ButtonDefinition, ButtonType, LinkModel, TraceFile } from "@/types";
-import { logModule } from "@/store";
+import { logStore } from "@/hooks";
 import { ButtonRow, FlexBox } from "@/components/common";
 
 /**
@@ -66,7 +66,7 @@ export default Vue.extend({
      */
     handleSubmit(): void {
       if (this.source === "" || this.target === "") {
-        logModule.onWarning(
+        logStore.onWarning(
           "Please select valid source and target artifact types."
         );
         return;

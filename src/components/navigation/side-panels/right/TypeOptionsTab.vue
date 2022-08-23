@@ -14,7 +14,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { LabelledTraceDirectionModel } from "@/types";
-import { typeOptionsModule } from "@/store";
+import { typeOptionsStore } from "@/hooks";
 import {
   Typography,
   TypeDirectionInput,
@@ -32,7 +32,7 @@ export default Vue.extend({
      * @return The current project's artifact types.
      */
     artifactDirections(): LabelledTraceDirectionModel[] {
-      return typeOptionsModule.labeledTypeDirections();
+      return typeOptionsStore.labeledTypeDirections();
     },
   },
 });

@@ -13,7 +13,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { JobModel } from "@/types";
-import { appModule, jobModule } from "@/store";
+import { appStore, jobStore } from "@/hooks";
 import { handleReloadJobs } from "@/api";
 import { Typography } from "@/components/common";
 import JobPanel from "./JobPanel.vue";
@@ -42,19 +42,19 @@ export default Vue.extend({
      * @return Whether the app is loading.
      */
     isLoading(): boolean {
-      return appModule.getIsLoading;
+      return appStore.isLoading > 0;
     },
     /**
      * return The current jobs.
      */
     uploads(): JobModel[] {
-      return jobModule.currentJobs;
+      return jobStore.jobs;
     },
     /**
      * return The current selected job index.
      */
     selectedJobIndex(): number {
-      return jobModule.selectedJobIndex;
+      return jobStore.selectedJob;
     },
   },
   watch: {

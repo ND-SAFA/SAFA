@@ -15,7 +15,7 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { ArtifactModel, ColumnModel } from "@/types";
-import { documentModule } from "@/store";
+import { documentStore } from "@/hooks";
 import { Typography } from "@/components/common/display";
 import SingleCustomFieldInput from "./SingleCustomFieldInput.vue";
 
@@ -44,7 +44,7 @@ export default Vue.extend({
      * @return The current document columns.
      */
     columns(): ColumnModel[] {
-      return documentModule.tableColumns;
+      return documentStore.tableColumns;
     },
   },
 });

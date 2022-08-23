@@ -39,7 +39,7 @@
 import Vue, { PropType } from "vue";
 import { IdentifierModel, VersionModel, DataItem } from "@/types";
 import { getProjectVersions, handleDeleteVersion } from "@/api";
-import { projectModule } from "@/store";
+import { projectStore } from "@/hooks";
 import { GenericSelector } from "@/components/common";
 import VersionCreator from "./VersionCreator.vue";
 import ConfirmVersionDelete from "./ConfirmVersionDelete.vue";
@@ -131,7 +131,7 @@ export default Vue.extend({
     displayedVersions(): VersionModel[] {
       return this.hideCurrentVersion
         ? this.versions.filter(
-            ({ versionId }) => versionId !== projectModule.versionId
+            ({ versionId }) => versionId !== projectStore.versionId
           )
         : this.versions;
     },

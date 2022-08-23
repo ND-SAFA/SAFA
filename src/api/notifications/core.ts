@@ -1,6 +1,6 @@
 import SockJS from "sockjs-client";
 import Stomp, { Client } from "webstomp-client";
-import { logModule } from "@/store";
+import { logStore } from "@/hooks";
 import {
   MAX_RECONNECT_ATTEMPTS,
   RECONNECT_WAIT_TIME,
@@ -41,7 +41,7 @@ function getStompClient(reconnect = false): Client {
     try {
       sock = new SockJS(WEBSOCKET_URL(), { DEBUG: false });
       sock.onclose = () => {
-        logModule.onDevMessage("Closing WebSocket.");
+        logStore.onDevInfo("Closing WebSocket.");
         connect().then();
       };
       stompClient = Stomp.over(sock, { debug: false });
@@ -73,15 +73,13 @@ export function connect(
     const stomp = getStompClient(isReconnect);
 
     if (stomp.connected) {
-      logModule.onDevMessage("Client is connected to WebSocket.");
+      logStore.onDevInfo("Client is connected to WebSocket.");
       clearInterval(reconnectInterval);
       return resolve();
     }
 
     if (nReconnectAttempts > 0) {
-      logModule.onDevMessage(
-        `Websocket reconnect attempt:${nReconnectAttempts}`
-      );
+      logStore.onDevInfo(`Websocket reconnect attempt:${nReconnectAttempts}`);
     }
 
     nReconnectAttempts++;
@@ -90,10 +88,10 @@ export function connect(
       { host: WEBSOCKET_URL() },
       () => {
         if (nReconnectAttempts > 1) {
-          logModule.onDevMessage("Web Socket reconnected to server.");
+          logStore.onDevInfo("Web Socket reconnected to server.");
         }
-        logModule.onDevMessage("Websocket connection successful.");
-        logModule.onDevMessage(
+        logStore.onDevInfo("Websocket connection successful.");
+        logStore.onDevInfo(
           `Subscriptions: ${JSON.stringify(stomp.subscriptions)}`
         );
         clearInterval(reconnectInterval);
@@ -101,7 +99,7 @@ export function connect(
         resolve();
       },
       () => {
-        logModule.onDevMessage("Re-connecting with WebSocket.");
+        logStore.onDevInfo("Re-connecting with WebSocket.");
         clearInterval(reconnectInterval);
         reconnectInterval = setInterval(function () {
           if (nReconnectAttempts < maxReconnectAttempts) {
@@ -112,7 +110,7 @@ export function connect(
             clearInterval(reconnectInterval);
             const error =
               "Web Socket lost connection to server, please reload page.";
-            logModule.onDevError(error);
+            logStore.onDevError(error);
             reject(error);
           }
         }, reconnectWaitTime);

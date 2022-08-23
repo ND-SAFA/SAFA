@@ -4,15 +4,22 @@ import {
   PasswordChangeModel,
   UserModel,
 } from "@/types";
-import { createSession } from "@/util";
-import { getParam, getParams, navigateTo, QueryParams, Routes } from "@/router";
-import { logModule, sessionModule } from "@/store";
+import {
+  getParam,
+  getParams,
+  navigateTo,
+  QueryParams,
+  router,
+  Routes,
+  routesPublic,
+} from "@/router";
 import {
   handleClearProject,
   createLoginSession,
   savePassword,
   deleteAccount,
 } from "@/api";
+import { sessionStore, logStore } from "@/hooks";
 
 /**
  * Attempts to log a user in.
@@ -26,7 +33,7 @@ export async function handleLogin(user: UserModel): Promise<void> {
 
   delete query[QueryParams.LOGIN_PATH];
 
-  sessionModule.SET_SESSION(session);
+  sessionStore.updateSession(session);
 
   if (typeof goToPath === "string") {
     await navigateTo(goToPath, query);
@@ -39,9 +46,9 @@ export async function handleLogin(user: UserModel): Promise<void> {
  * Logs a user out.
  */
 export async function handleLogout(): Promise<void> {
-  sessionModule.SET_SESSION(createSession());
-  await navigateTo(Routes.LOGIN_ACCOUNT);
   await handleClearProject();
+  await navigateTo(Routes.LOGIN_ACCOUNT);
+  sessionStore.clearSession();
 }
 
 /**
@@ -49,8 +56,10 @@ export async function handleLogout(): Promise<void> {
  * If the token does not, is expired, or is otherwise invalid, the user will be sent back to login.
  */
 export async function handleAuthentication(): Promise<void> {
+  if (routesPublic.includes(router.currentRoute.path)) return;
+
   try {
-    const isAuthorized = await sessionModule.hasAuthorization();
+    const isAuthorized = await sessionStore.hasAuthorization;
 
     if (isAuthorized) return;
 
@@ -73,12 +82,12 @@ export function handleChangePassword(
 ): void {
   savePassword(password)
     .then(() => {
-      logModule.onSuccess("Your password has been updated.");
+      logStore.onSuccess("Your password has been updated.");
       onSuccess?.();
     })
     .catch((e) => {
-      logModule.onError("Unable to update your password.");
-      logModule.onDevError(e);
+      logStore.onError("Unable to update your password.");
+      logStore.onDevError(e);
       onError?.(e);
     });
 }
@@ -89,14 +98,16 @@ export function handleChangePassword(
  * @param password - The user's current password.
  */
 export function handleDeleteAccount(password: string): void {
-  logModule.SET_CONFIRMATION_MESSAGE({
-    type: ConfirmationType.INFO,
-    title: `Delete your account?`,
-    body: `This action cannot be undone.`,
-    statusCallback: (isConfirmed: boolean) => {
-      if (!isConfirmed) return;
+  logStore.$patch({
+    confirmation: {
+      type: ConfirmationType.INFO,
+      title: `Delete your account?`,
+      body: `This action cannot be undone.`,
+      statusCallback: (isConfirmed: boolean) => {
+        if (!isConfirmed) return;
 
-      deleteAccount(password).then(handleLogout);
+        deleteAccount(password).then(handleLogout);
+      },
     },
   });
 }

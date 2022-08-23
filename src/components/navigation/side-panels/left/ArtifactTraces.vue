@@ -38,7 +38,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { artifactModule, artifactSelectionModule, traceModule } from "@/store";
+import { artifactStore, traceStore, selectionStore } from "@/hooks";
 import { ListItem } from "@/types";
 import {
   GenericListItem,
@@ -58,7 +58,7 @@ export default Vue.extend({
      * @return The selected artifact.
      */
     selectedArtifact() {
-      return artifactSelectionModule.getSelectedArtifact;
+      return selectionStore.selectedArtifact;
     },
     /**
      * @return The selected artifact's parents.
@@ -66,11 +66,11 @@ export default Vue.extend({
     parents(): ListItem[] {
       if (!this.selectedArtifact) return [];
 
-      return traceModule.traces
+      return traceStore.currentTraces
         .filter(({ sourceName }) => sourceName === this.selectedArtifact?.name)
         .map(({ targetName, targetId }) => ({
           title: targetName,
-          subtitle: artifactModule.getArtifactById(targetId)?.type,
+          subtitle: artifactStore.getArtifactById(targetId)?.type,
         }));
     },
     /**
@@ -79,11 +79,11 @@ export default Vue.extend({
     children(): ListItem[] {
       if (!this.selectedArtifact) return [];
 
-      return traceModule.traces
+      return traceStore.currentTraces
         .filter(({ targetName }) => targetName === this.selectedArtifact?.name)
         .map(({ sourceName, sourceId }) => ({
           title: sourceName,
-          subtitle: artifactModule.getArtifactById(sourceId)?.type,
+          subtitle: artifactStore.getArtifactById(sourceId)?.type,
         }));
     },
     /**
@@ -117,11 +117,11 @@ export default Vue.extend({
      * @param artifactName - The artifact to select.
      */
     handleArtifactClick(artifactName: string): void {
-      const artifact = artifactModule.getArtifactByName(artifactName);
+      const artifact = artifactStore.getArtifactByName(artifactName);
 
       if (!artifact) return;
 
-      artifactSelectionModule.selectArtifact(artifact.id);
+      selectionStore.selectArtifact(artifact.id);
     },
   },
 });

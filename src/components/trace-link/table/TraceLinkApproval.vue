@@ -28,13 +28,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import {
-  ApprovalType,
-  ArtifactModel,
-  TraceLinkModel,
-  TraceType,
-} from "@/types";
-import { artifactModule, deltaModule } from "@/store";
+import { ApprovalType, TraceLinkModel, TraceType } from "@/types";
 import { FlexBox, GenericIconButton } from "@/components/common";
 import {
   handleApproveLink,
@@ -74,28 +68,10 @@ export default Vue.extend({
   },
   computed: {
     /**
-     * @return The artifact this link comes from.
-     */
-    sourceArtifact(): ArtifactModel {
-      return artifactModule.getAllArtifactsById[this.link.sourceId];
-    },
-    /**
-     * @return The artifact this link goes towards.
-     */
-    targetArtifact(): ArtifactModel {
-      return artifactModule.getAllArtifactsById[this.link.targetId];
-    },
-    /**
      * @return Whether this link can be modified.
      */
     canBeModified(): boolean {
       return this.link?.traceType === TraceType.GENERATED;
-    },
-    /**
-     * @return Whether this link can be deleted.
-     */
-    showDelete(): boolean {
-      return !this.canBeModified && !deltaModule.inDeltaView;
     },
     /**
      * @return Whether this link can be approved.
@@ -162,23 +138,6 @@ export default Vue.extend({
         },
         onError: () => (this.isDeclineLoading = false),
       });
-    },
-    /**
-     * Attempts to delete the link, after confirming.
-     */
-    handleDelete() {
-      if (!this.confirmDelete) {
-        this.confirmDelete = true;
-      } else {
-        this.isDeleteLoading = true;
-        handleDeclineLink(this.link, {
-          onSuccess: () => {
-            this.isDeleteLoading = false;
-            this.$emit("link:delete", this.link);
-          },
-          onError: () => (this.isDeleteLoading = false),
-        });
-      }
     },
   },
 });

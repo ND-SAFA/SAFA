@@ -27,6 +27,7 @@ export enum PanelType {
   errorDisplay,
   artifactBody,
   traceLinkCreator,
+  traceLinkDraw,
 }
 
 export type PanelOpenState =
@@ -105,6 +106,7 @@ export type EmptyLambda = () => void;
  * Enumerates keys used in local storage.
  */
 export enum LocalStorageKeys {
+  SESSION_TOKEN = "t",
   JIRA_REFRESH_TOKEN = "jrt",
   JIRA_CLOUD_ID = "jci",
   GIT_HUB_REFRESH_TOKEN = "grt",

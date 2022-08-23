@@ -6,7 +6,7 @@ import {
   CytoCore,
   CytoEventHandlers,
 } from "@/types";
-import { layoutModule } from "@/store";
+import { layoutStore } from "@/hooks";
 import { NodeSingular } from "cytoscape";
 
 /**
@@ -54,7 +54,7 @@ export default class GraphLayout implements IGraphLayout {
         positions: (node: NodeSingular | string) => {
           const id = typeof node === "string" ? node : node.data().id;
 
-          return layoutModule.getArtifactPosition(id);
+          return layoutStore.getArtifactPosition(id);
         },
       }).run();
     }

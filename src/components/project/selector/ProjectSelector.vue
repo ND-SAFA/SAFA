@@ -48,7 +48,8 @@
 <script lang="ts">
 import Vue from "vue";
 import { DataItem, IdentifierModel, ProjectRole } from "@/types";
-import { logModule, sessionModule } from "@/store";
+import { logStore } from "@/hooks";
+import { sessionStore } from "@/hooks";
 import { getProjects, handleDeleteProject, handleSaveProject } from "@/api";
 import { GenericSelector } from "@/components/common";
 import { ProjectIdentifierModal } from "@/components/project/shared";
@@ -140,7 +141,7 @@ export default Vue.extend({
      * @returns The indexes that the current user has delete permissions for.
      */
     getDeletableProjects(): number[] {
-      const userEmail = sessionModule.userEmail;
+      const userEmail = sessionStore.userEmail;
 
       return this.projects
         .map((project, projectIndex) => {
@@ -231,7 +232,7 @@ export default Vue.extend({
      * Fetches all projects.
      */
     fetchProjects(): void {
-      if (!sessionModule.getDoesSessionExist) return;
+      if (!sessionStore.doesSessionExist) return;
 
       this.isLoading = true;
 
@@ -241,7 +242,7 @@ export default Vue.extend({
           this.deletableProjects = this.getDeletableProjects();
         })
         .catch((e) => {
-          logModule.onDevError(e);
+          logStore.onDevError(e);
         })
         .finally(() => (this.isLoading = false));
     },

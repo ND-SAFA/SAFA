@@ -1,12 +1,12 @@
 import { getParam, navigateTo, QueryParams, Routes } from "@/router";
 import { getCurrentVersion, getProjects, handleLoadVersion } from "@/api";
-import { logModule, sessionModule } from "@/store";
+import { sessionStore, logStore } from "@/hooks";
 
 /**
  * Loads the last stored project.
  */
 export async function handleLoadLastProject(): Promise<void> {
-  if (!sessionModule.getDoesSessionExist) return;
+  if (!sessionStore.doesSessionExist) return;
 
   let versionId = getParam(QueryParams.VERSION);
 
@@ -19,7 +19,7 @@ export async function handleLoadLastProject(): Promise<void> {
   }
   if (typeof versionId === "string") {
     await handleLoadVersion(versionId).catch((e) => {
-      logModule.onDevError(e);
+      logStore.onDevInfo(e);
       navigateTo(Routes.HOME);
     });
   } else {

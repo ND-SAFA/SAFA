@@ -77,7 +77,7 @@ import {
   ColumnModel,
   FlatArtifact,
 } from "@/types";
-import { artifactModule } from "@/store";
+import { artifactStore } from "@/hooks";
 import { ThemeColors } from "@/util";
 import {
   GenericIconButton,
@@ -123,7 +123,7 @@ export default Vue.extend({
      * Returns the associated artifact for this cell.
      */
     artifact(): ArtifactModel {
-      return artifactModule.getArtifactById(this.item.id) || this.item;
+      return artifactStore.getArtifactById(this.item.id) || this.item;
     },
   },
   methods: {
@@ -154,7 +154,7 @@ export default Vue.extend({
      * @return The artifact name.
      */
     getArtifactName(id: string): string {
-      return artifactModule.getArtifactById(id)?.name || "";
+      return artifactStore.getArtifactById(id)?.name || "";
     },
     /**
      * Returns the value of an array custom field.

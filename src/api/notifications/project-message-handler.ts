@@ -1,7 +1,7 @@
 import { Frame } from "webstomp-client";
 import { ProjectMessageModel } from "@/types";
 import { getProjectMembers, handleDocumentReload } from "@/api";
-import { projectModule } from "@/store";
+import { projectStore } from "@/hooks";
 
 /**
  * Handles revision messages.
@@ -16,7 +16,9 @@ export async function handleProjectMessage(
   const message: ProjectMessageModel = JSON.parse(frame.body);
   switch (message.type) {
     case "MEMBERS":
-      return getProjectMembers(projectId).then(projectModule.SET_MEMBERS);
+      return getProjectMembers(projectId).then((members) =>
+        projectStore.updateProject({ members })
+      );
     case "DOCUMENTS":
       return handleDocumentReload();
   }

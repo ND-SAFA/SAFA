@@ -35,7 +35,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { DeltaType, DeltaArtifact, ChangedArtifact } from "@/types";
-import { deltaModule } from "@/store";
+import { deltaStore } from "@/hooks";
 import { Typography } from "@/components/common";
 import DeltaButtonGroup from "./DeltaButtonGroup.vue";
 import ArtifactDeltaDiff from "./ArtifactDeltaDiff.vue";
@@ -59,25 +59,25 @@ export default Vue.extend({
      * @return All added artifacts.
      */
     addedArtifacts() {
-      return deltaModule.addedArtifacts;
+      return deltaStore.addedArtifacts;
     },
     /**
      * @return All removed artifacts.
      */
     removedArtifacts() {
-      return deltaModule.removedArtifacts;
+      return deltaStore.removedArtifacts;
     },
     /**
      * @return All modified artifacts.
      */
     modifiedArtifacts() {
-      return deltaModule.modifiedArtifacts;
+      return deltaStore.modifiedArtifacts;
     },
     /**
      * @return Whether the app is in delta view.
      */
     isDeltaMode(): boolean {
-      return deltaModule.inDeltaView;
+      return deltaStore.inDeltaView;
     },
   },
   methods: {

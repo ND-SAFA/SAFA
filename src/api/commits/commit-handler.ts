@@ -1,5 +1,6 @@
 import { Commit } from "@/types";
-import { projectModule, commitModule, appModule } from "@/store";
+import { projectStore } from "@/hooks";
+import { appStore, commitStore } from "@/hooks";
 import { persistCommit } from "@/api";
 
 /**
@@ -10,14 +11,14 @@ import { persistCommit } from "@/api";
  */
 export async function saveCommit(commit: Commit): Promise<Commit> {
   try {
-    appModule.SET_IS_SAVING(true);
+    appStore.$patch({ isSaving: true });
 
     const commitResponse = await persistCommit(commit);
-    await commitModule.saveCommit(commitResponse);
+    await commitStore.saveCommit(commitResponse);
 
     return commitResponse;
   } finally {
-    appModule.SET_IS_SAVING(false);
+    appStore.$patch({ isSaving: false });
   }
 }
 
@@ -26,14 +27,17 @@ export async function saveCommit(commit: Commit): Promise<Commit> {
  */
 export async function undoCommit(): Promise<void> {
   try {
-    appModule.SET_IS_SAVING(true);
+    appStore.$patch({ isSaving: true });
 
-    const commit = await commitModule.undoLastCommit();
+    const commit = await commitStore.undoLastCommit();
+
+    if (!commit) return;
+
     const commitResponse = await persistCommit(commit);
 
     await applyArtifactChanges(commitResponse);
   } finally {
-    appModule.SET_IS_SAVING(false);
+    appStore.$patch({ isSaving: false });
   }
 }
 
@@ -42,14 +46,17 @@ export async function undoCommit(): Promise<void> {
  */
 export async function redoCommit(): Promise<void> {
   try {
-    appModule.SET_IS_SAVING(true);
+    appStore.$patch({ isSaving: true });
 
-    const commit = await commitModule.redoLastUndoneCommit();
+    const commit = await commitStore.redoLastUndoneCommit();
+
+    if (!commit) return;
+
     const commitResponse = await persistCommit(commit);
 
     await applyArtifactChanges(commitResponse);
   } finally {
-    appModule.SET_IS_SAVING(false);
+    appStore.$patch({ isSaving: false });
   }
 }
 
@@ -59,14 +66,14 @@ export async function redoCommit(): Promise<void> {
  * @param commit - The commit to apply.
  */
 async function applyArtifactChanges(commit: Commit): Promise<void> {
-  await projectModule.addOrUpdateArtifacts([
+  await projectStore.addOrUpdateArtifacts([
     ...commit.artifacts.added,
     ...commit.artifacts.modified,
   ]);
-  await projectModule.deleteArtifacts(commit.artifacts.removed);
-  await projectModule.addOrUpdateTraceLinks([
+  await projectStore.deleteArtifacts(commit.artifacts.removed);
+  await projectStore.addOrUpdateTraceLinks([
     ...commit.traces.added,
     ...commit.traces.modified,
   ]);
-  await projectModule.deleteTraceLinks(commit.traces.removed);
+  await projectStore.deleteTraceLinks(commit.traces.removed);
 }

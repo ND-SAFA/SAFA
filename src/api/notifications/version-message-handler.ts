@@ -7,7 +7,7 @@ import {
   handleReloadWarnings,
   handleSetProject,
 } from "@/api";
-import { sessionModule } from "@/store";
+import { sessionStore } from "@/hooks";
 
 /**
  * Handles revision messages related to versioned entities of the project.
@@ -27,7 +27,7 @@ export async function handleVersionMessage(
       return handleReloadWarnings(versionId);
   }
   // Handlers for manual entity updates.
-  if (sessionModule.userEmail !== message.user) {
+  if (sessionStore.userEmail !== message.user) {
     switch (message.type) {
       case "VERSION":
         return getProjectVersion(versionId).then(handleSetProject);

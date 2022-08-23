@@ -10,7 +10,7 @@ import {
 } from "@/types";
 import { parseTraceFile, createGeneratedLinks } from "@/api";
 import { extractTraceId } from "@/util";
-import { logModule } from "@/store";
+import { logStore } from "@/hooks";
 
 const DEFAULT_IS_GENERATED = false;
 
@@ -159,7 +159,7 @@ function createParsedArtifactFile(
       panel.entityNames = entities.map(extractTraceId);
     })
     .catch((e) => {
-      logModule.onDevError(e);
+      logStore.onDevError(e);
       panel.projectFile.isValid = false;
       panel.projectFile.errors = ["Unable to parse file"];
     });

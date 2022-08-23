@@ -39,15 +39,14 @@
 import Vue from "vue";
 import { TraceLinkModel, ArtifactModel, CytoCoreGraph } from "@/types";
 import {
-  appModule,
-  artifactModule,
-  artifactSelectionModule,
-  deltaModule,
-  documentModule,
-  subtreeModule,
-  traceModule,
-  viewportModule,
-} from "@/store";
+  appStore,
+  artifactStore,
+  traceStore,
+  documentStore,
+  deltaStore,
+  subtreeStore,
+  selectionStore,
+} from "@/hooks";
 import { artifactTreeGraph, cyResetTree } from "@/cytoscape";
 import {
   GenericGraphLink,
@@ -76,7 +75,7 @@ export default Vue.extend({
      * @return Whether the tree should be rendered at all.
      */
     isInView(): boolean {
-      return !documentModule.isTableDocument;
+      return !documentStore.isTableDocument;
     },
     /**
      * @return The class name for the artifact tree.
@@ -84,7 +83,7 @@ export default Vue.extend({
     className(): string {
       if (!this.isInView) {
         return "artifact-view disabled";
-      } else if (!appModule.getIsLoading) {
+      } else if (!appStore.isLoading) {
         return "artifact-view visible";
       } else {
         return "artifact-view";
@@ -100,33 +99,33 @@ export default Vue.extend({
      * @return All visible artifacts.
      */
     artifacts(): ArtifactModel[] {
-      return artifactModule.artifacts;
+      return artifactStore.currentArtifacts;
     },
     /**
      * @return All visible trace links.
      */
     traceLinks(): TraceLinkModel[] {
-      return deltaModule.inDeltaView
-        ? traceModule.traces
-        : traceModule.nonDeclinedTraces;
+      return deltaStore.inDeltaView
+        ? traceStore.currentTraces
+        : traceStore.visibleTraces;
     },
     /**
      * @return All subtree trace links.
      */
     subtreeLinks() {
-      return subtreeModule.getSubtreeLinks;
+      return subtreeStore.subtreeLinks;
     },
     /**
      * @return The artifact ids currently in view.
      */
     nodesInView(): string[] {
-      return viewportModule.getNodesInView;
+      return selectionStore.artifactsInView;
     },
     /**
      * @return The artifact ids that are currently hidden in closed subtrees.
      */
     hiddenSubtreeIds(): string[] {
-      return subtreeModule.getHiddenSubtreeIds;
+      return subtreeStore.hiddenSubtreeNodes;
     },
   },
   mounted() {
@@ -137,9 +136,14 @@ export default Vue.extend({
       this.artifactsInView = this.nodesInView;
     },
     isInView(inView: boolean): void {
-      if (!inView || !artifactSelectionModule.getSelectedArtifactId) return;
+      if (!inView) return;
 
-      setTimeout(() => cyResetTree(), 200);
+      appStore.onLoadStart();
+
+      setTimeout(() => {
+        cyResetTree();
+        appStore.onLoadEnd();
+      }, 200);
     },
   },
   methods: {

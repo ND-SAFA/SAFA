@@ -56,7 +56,7 @@ import {
   GenericIconButton,
 } from "@/components/common";
 import SectionControls from "./SectionControls.vue";
-import { artifactModule } from "@/store";
+import { artifactStore } from "@/hooks";
 
 /**
  * Renders a group header in a table.
@@ -117,7 +117,7 @@ export default Vue.extend({
      */
     headerDescription(): undefined | string {
       return this.displayArtifact
-        ? artifactModule.getArtifactByName(this.data.group)?.body
+        ? artifactStore.getArtifactByName(this.data.group)?.body
         : undefined;
     },
     /**
@@ -125,7 +125,7 @@ export default Vue.extend({
      */
     headerType(): undefined | string {
       return this.displayArtifact
-        ? artifactModule.getArtifactByName(this.data.group)?.type
+        ? artifactStore.getArtifactByName(this.data.group)?.type
         : undefined;
     },
   },

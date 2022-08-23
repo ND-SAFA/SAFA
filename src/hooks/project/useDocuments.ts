@@ -1,0 +1,209 @@
+import { defineStore } from "pinia";
+
+import { pinia } from "@/plugins";
+import {
+  ColumnModel,
+  DocumentModel,
+  DocumentType,
+  ProjectModel,
+} from "@/types";
+import { createDocument, isTableDocument } from "@/util";
+import { handleResetGraph, handleUpdateCurrentDocument } from "@/api";
+import artifactStore from "./useArtifacts";
+import traceStore from "./useTraces";
+import layoutStore from "../graph/useLayout";
+import projectStore from "./useProject";
+
+/**
+ * This module keeps track of the different document views for a project.
+ */
+export const useDocuments = defineStore("documents", {
+  state() {
+    const baseDocument = createDocument();
+
+    return {
+      /**
+       * Whether the document is currently in table view.
+       */
+      isTableView: false,
+      /**
+       * The base document with all artifacts.
+       */
+      baseDocument,
+      /**
+       * The currently visible document.
+       */
+      currentDocument: baseDocument,
+      /**
+       * All custom project documents.
+       */
+      allDocuments: [baseDocument],
+    };
+  },
+  getters: {
+    /**
+     * @return All custom documents & the base document.
+     */
+    projectDocuments(): DocumentModel[] {
+      return [...this.allDocuments, this.baseDocument];
+    },
+    /**
+     * @return The current document id.
+     */
+    currentId(): string {
+      return this.currentDocument.documentId;
+    },
+    /**
+     * @return The current document type.
+     */
+    currentType(): DocumentType {
+      return this.currentDocument.type;
+    },
+    /**
+     * @return Whether the current document type is for editing a table.
+     */
+    isEditableTableDocument(): boolean {
+      return isTableDocument(this.currentDocument.type);
+    },
+    /**
+     * @return Whether the current document type is for rendering a table.
+     */
+    isTableDocument(): boolean {
+      return this.isTableView || this.isEditableTableDocument;
+    },
+    /**
+     * @returns The column definitions for a table document.
+     */
+    tableColumns(): ColumnModel[] {
+      return (this.isTableDocument && this.currentDocument.columns) || [];
+    },
+  },
+  actions: {
+    /**
+     * Initializes the current artifacts and traces visible in the current document.
+     */
+    initializeProject(project: ProjectModel): void {
+      const {
+        artifacts,
+        traces,
+        currentDocumentId = this.currentDocument.documentId,
+        documents = [],
+      } = project;
+
+      const defaultDocument = createDocument({
+        name: "Default",
+        project,
+        artifactIds: artifacts.map(({ id }) => id),
+      });
+
+      const loadedDocument =
+        documents.find(({ documentId }) => documentId === currentDocumentId) ||
+        defaultDocument;
+      const currentArtifactIds = loadedDocument.artifactIds;
+
+      this.$patch({
+        allDocuments: documents,
+        baseDocument: defaultDocument,
+        currentDocument: loadedDocument,
+      });
+
+      artifactStore.initializeArtifacts({ artifacts, currentArtifactIds });
+      traceStore.initializeTraces({ traces, currentArtifactIds });
+    },
+    /**
+     * Updates matching documents.
+     *
+     * @param updatedDocuments - The updated documents.
+     */
+    async updateDocuments(updatedDocuments: DocumentModel[]): Promise<void> {
+      const updatedDocumentIds = updatedDocuments.map((d) => d.documentId);
+
+      this.$patch({
+        allDocuments: [
+          ...this.allDocuments.filter(
+            ({ documentId }) => !updatedDocumentIds.includes(documentId)
+          ),
+          ...updatedDocuments,
+        ],
+        currentDocument:
+          updatedDocuments.find(
+            ({ documentId }) => documentId === this.currentDocument.documentId
+          ) || this.currentDocument,
+      });
+    },
+    /**
+     * Sets the current document and initializes its artifacts and traces.
+     *
+     * @param document - The document to switch to.
+     */
+    async switchDocuments(document: DocumentModel): Promise<void> {
+      const currentArtifactIds = document.artifactIds;
+
+      this.currentDocument = document;
+      await handleUpdateCurrentDocument(document);
+      artifactStore.initializeArtifacts({ currentArtifactIds });
+      traceStore.initializeTraces({ currentArtifactIds });
+
+      if (document.documentId !== "") {
+        layoutStore.artifactPositions = document.layout;
+      } else {
+        layoutStore.artifactPositions = projectStore.project.layout;
+      }
+
+      await handleResetGraph();
+    },
+    /**
+     * Adds a new document.
+     *
+     * @param document - The document to add.
+     */
+    async addDocument(document: DocumentModel): Promise<void> {
+      this.allDocuments = [...this.allDocuments, document];
+
+      await this.switchDocuments(document);
+    },
+    /**
+     * Removes an existing document.
+     *
+     * @param document - The document to delete.
+     */
+    async removeDocument(document: DocumentModel): Promise<void> {
+      const remainingDocuments = this.allDocuments.filter(
+        ({ documentId }) => documentId !== document.documentId
+      );
+
+      this.allDocuments = remainingDocuments;
+
+      if (this.currentDocument.documentId !== document.documentId) return;
+
+      await this.switchDocuments(remainingDocuments[0] || this.baseDocument);
+    },
+    /**
+     * Toggles whether the current document is in table view.
+     */
+    toggleTableView(): void {
+      this.isTableView = !this.isTableView;
+    },
+
+    /**
+     * Returns whether the given document name already exists.
+     *
+     * @param name - The name to search for.
+     * @return Whether the name exists.
+     */
+    doesDocumentExist(name: string): boolean {
+      return !!this.projectDocuments.find((document) => document.name === name);
+    },
+    /**
+     * Returns whether the given column name already exists.
+     *
+     * @param name - The name to search for.
+     * @return Whether the name exists.
+     */
+    doesColumnExist(name: string): boolean {
+      return !!this.tableColumns.find((column) => column.name === name);
+    },
+  },
+});
+
+export default useDocuments(pinia);

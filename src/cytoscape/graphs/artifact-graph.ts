@@ -5,7 +5,6 @@ import contextMenus from "cytoscape-context-menus";
 import edgehandles from "cytoscape-edgehandles";
 
 import { CytoCore, CytoCoreGraph } from "@/types";
-import { viewportModule } from "@/store";
 import { artifactTreeCyPromise, artifactTreeResolveCy } from "@/cytoscape/cy";
 import {
   artifactTreeContextMenuOptions,
@@ -18,6 +17,7 @@ import {
   MOTION_BLUE_OPACITY,
   USE_MOTION_BLUR,
 } from "@/cytoscape/styles";
+import { layoutStore } from "@/hooks";
 
 /**
  * Defines the initialization of the artifact tree graph.
@@ -62,6 +62,6 @@ export const artifactTreeGraph: CytoCoreGraph = {
     },
   ],
   async afterInit() {
-    await viewportModule.setArtifactTreeLayout();
+    await layoutStore.setArtifactTreeLayout();
   },
 };

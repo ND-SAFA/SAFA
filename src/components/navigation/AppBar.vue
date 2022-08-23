@@ -42,7 +42,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { Route } from "vue-router";
-import { appModule, documentModule } from "@/store";
+import { appStore, documentStore } from "@/hooks";
 import { router, Routes } from "@/router";
 import { GenericIconButton, FlexBox } from "@/components/common";
 import { AppBarHeader, GraphButtons, Searchbar } from "./header";
@@ -80,16 +80,16 @@ export default Vue.extend({
     /**
      * @return Whether the left panel is open.
      */
-    isLeftOpen: () => appModule.getIsLeftOpen,
+    isLeftOpen: () => appStore.isLeftPanelOpen,
     /**
      * @return Whether the right panel is open.
      */
-    isRightOpen: () => appModule.getIsRightOpen,
+    isRightOpen: () => appStore.isRightPanelOpen,
     /**
      * @return Whether to disable graphing buttons.
      */
     doDisableButtons(): boolean {
-      return documentModule.isTableDocument;
+      return documentStore.isTableDocument;
     },
     /**
      * @return The left panel button icon to display.
@@ -123,13 +123,13 @@ export default Vue.extend({
      * Toggles the left panel.
      */
     handleLeftPanelClick() {
-      appModule.toggleLeftPanel();
+      appStore.toggleLeftPanel();
     },
     /**
      * Toggles the right panel.
      */
     handleRightPanelClick() {
-      appModule.toggleRightPanel();
+      appStore.toggleRightPanel();
     },
   },
 });

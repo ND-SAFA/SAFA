@@ -1,4 +1,4 @@
-import { appModule, documentModule } from "@/store";
+import { appStore, documentStore } from "@/hooks";
 import { ArtifactData, DocumentType, FTANodeType, MenuItem } from "@/types";
 
 /**
@@ -9,14 +9,14 @@ export const ftaMenuItem: MenuItem = {
   content: "Add FTA Node",
   tooltipText: "Create a logical node (e.g. AND / OR)",
   onClickFunction(): void {
-    appModule.openArtifactCreatorTo({
+    appStore.openArtifactCreatorTo({
       type: FTANodeType.AND,
       isNewArtifact: true,
     });
   },
   isVisible: (artifactData: ArtifactData | undefined): boolean => {
     if (artifactData === undefined) {
-      return documentModule.type === DocumentType.FTA;
+      return documentStore.currentType === DocumentType.FTA;
     }
     return false;
   },
@@ -26,7 +26,7 @@ export const ftaMenuItem: MenuItem = {
       content: "AND",
       tooltipText: "Asserts all conditions must be met.",
       onClickFunction(): void {
-        appModule.openArtifactCreatorTo({
+        appStore.openArtifactCreatorTo({
           type: FTANodeType.AND,
           isNewArtifact: true,
         });
@@ -37,7 +37,7 @@ export const ftaMenuItem: MenuItem = {
       content: "OR",
       tooltipText: "Asserts at least one condition must be met.",
       onClickFunction(): void {
-        appModule.openArtifactCreatorTo({
+        appStore.openArtifactCreatorTo({
           type: FTANodeType.OR,
           isNewArtifact: true,
         });

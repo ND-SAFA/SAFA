@@ -1,5 +1,5 @@
 import { MenuItem } from "@/types/cytoscape/plugins/context-menus";
-import { appModule, documentModule } from "@/store";
+import { appStore, documentStore } from "@/hooks";
 import { ArtifactData, DocumentType, SafetyCaseType } from "@/types";
 
 /**
@@ -10,14 +10,14 @@ export const safetyCaseMenuOption: MenuItem = {
   content: "Add Safety Case Node",
   tooltipText: "Goal, Solution, Context, Evidence",
   onClickFunction(): void {
-    appModule.openArtifactCreatorTo({
+    appStore.openArtifactCreatorTo({
       type: SafetyCaseType.GOAL,
       isNewArtifact: true,
     });
   },
   isVisible: (artifactData: ArtifactData | undefined): boolean => {
     if (artifactData === undefined) {
-      return documentModule.type === DocumentType.SAFETY_CASE;
+      return documentStore.currentType === DocumentType.SAFETY_CASE;
     }
     return false;
   },
@@ -27,7 +27,7 @@ export const safetyCaseMenuOption: MenuItem = {
       content: "Goal Node",
       tooltipText: "Define an expected system property.",
       onClickFunction(): void {
-        appModule.openArtifactCreatorTo({
+        appStore.openArtifactCreatorTo({
           type: SafetyCaseType.GOAL,
           isNewArtifact: true,
         });
@@ -38,7 +38,7 @@ export const safetyCaseMenuOption: MenuItem = {
       content: "Strategy Node",
       tooltipText: "Define the safety strategy of an argument.",
       onClickFunction(): void {
-        appModule.openArtifactCreatorTo({
+        appStore.openArtifactCreatorTo({
           type: SafetyCaseType.STRATEGY,
           isNewArtifact: true,
         });
@@ -49,7 +49,7 @@ export const safetyCaseMenuOption: MenuItem = {
       content: "Context Node",
       tooltipText: "Define the expected system environment assumptions.",
       onClickFunction(): void {
-        appModule.openArtifactCreatorTo({
+        appStore.openArtifactCreatorTo({
           type: SafetyCaseType.CONTEXT,
           isNewArtifact: true,
         });
@@ -60,7 +60,7 @@ export const safetyCaseMenuOption: MenuItem = {
       content: "Evidence Node",
       tooltipText: "Define a container for ground-truth resources.",
       onClickFunction(): void {
-        appModule.openArtifactCreatorTo({
+        appStore.openArtifactCreatorTo({
           type: SafetyCaseType.SOLUTION,
           isNewArtifact: true,
         });

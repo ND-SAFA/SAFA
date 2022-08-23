@@ -77,12 +77,12 @@
 import Vue from "vue";
 import { ArtifactModel, ArtifactDeltaState, FlatArtifact } from "@/types";
 import {
-  appModule,
-  artifactModule,
-  artifactSelectionModule,
-  deltaModule,
-  documentModule,
-} from "@/store";
+  appStore,
+  artifactStore,
+  documentStore,
+  deltaStore,
+  selectionStore,
+} from "@/hooks";
 import {
   Typography,
   AttributeChip,
@@ -123,19 +123,19 @@ export default Vue.extend({
      * @return Whether to render the artifact table.
      */
     isVisible(): boolean {
-      return !appModule.getIsLoading && documentModule.isTableDocument;
+      return !appStore.isLoading && documentStore.isTableDocument;
     },
     /**
      * @return Whether delta view is enabled.
      */
     inDeltaView(): boolean {
-      return deltaModule.inDeltaView;
+      return deltaStore.inDeltaView;
     },
     /**
      * @return Whether table view is enabled.
      */
     isTableView(): boolean {
-      return documentModule.isTableDocument;
+      return documentStore.isTableDocument;
     },
     /**
      * @return The artifact table's headers.
@@ -156,7 +156,7 @@ export default Vue.extend({
           filterable: true,
           divider: true,
         },
-        ...documentModule.tableColumns.map((col) => ({
+        ...documentStore.tableColumns.map((col) => ({
           text: col.name,
           value: col.id,
           width: "300px",
@@ -178,7 +178,7 @@ export default Vue.extend({
      * @return The artifact table's columns.
      */
     columns() {
-      return documentModule.tableColumns;
+      return documentStore.tableColumns;
     },
     /**
      * @return The artifact table's items.
@@ -186,10 +186,10 @@ export default Vue.extend({
     items(): FlatArtifact[] {
       const selectedTypes = this.inDeltaView ? this.selectedDeltaTypes : [];
 
-      return artifactModule.flatArtifacts.filter(
+      return artifactStore.flatArtifacts.filter(
         ({ id }) =>
           selectedTypes.length === 0 ||
-          selectedTypes.includes(deltaModule.getArtifactDeltaType(id))
+          selectedTypes.includes(deltaStore.getArtifactDeltaType(id))
       );
     },
   },
@@ -199,11 +199,11 @@ export default Vue.extend({
      * @param artifact - The artifact to view.
      */
     handleView(artifact: ArtifactModel) {
-      if (artifactSelectionModule.getSelectedArtifactId === artifact.id) {
-        artifactSelectionModule.clearSelections();
+      if (selectionStore.selectedArtifactId === artifact.id) {
+        selectionStore.clearSelections();
         this.expanded = [];
       } else {
-        artifactSelectionModule.selectArtifact(artifact.id);
+        selectionStore.selectArtifact(artifact.id);
         this.expanded = [artifact];
       }
     },
@@ -213,7 +213,7 @@ export default Vue.extend({
      * @return The class name to add to the artifact.
      */
     getItemBackground(item: ArtifactModel): string {
-      if (artifactSelectionModule.getSelectedArtifactId === item.id) {
+      if (selectionStore.selectedArtifactId === item.id) {
         return "artifact-row-selected";
       }
 

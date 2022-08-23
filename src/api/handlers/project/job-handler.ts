@@ -7,7 +7,7 @@ import {
   getUserJobs,
   stompClient,
 } from "@/api";
-import { appModule, jobModule, logModule } from "@/store";
+import { appStore, logStore, jobStore } from "@/hooks";
 
 /**
  * Subscribes to updates for job with given id.
@@ -24,8 +24,8 @@ export async function connectAndSubscribeToJob(jobId: string): Promise<void> {
   stompClient.subscribe(fillEndpoint(Endpoint.jobTopic, { jobId }), (frame) => {
     const incomingJob: JobModel = JSON.parse(frame.body);
 
-    jobModule.addOrUpdateJob(incomingJob);
-    logModule.onDevMessage(`New Job message: ${incomingJob.id}`);
+    jobStore.updateJob(incomingJob);
+    logStore.onDevInfo(`New Job message: ${incomingJob.id}`);
   });
 }
 
@@ -35,8 +35,8 @@ export async function connectAndSubscribeToJob(jobId: string): Promise<void> {
  */
 export async function handleJobSubmission(job: JobModel): Promise<void> {
   await connectAndSubscribeToJob(job.id);
-  jobModule.addOrUpdateJob(job);
-  jobModule.selectJob(job);
+  jobStore.updateJob(job);
+  jobStore.selectJob(job);
 }
 
 /**
@@ -52,7 +52,7 @@ export function handleDeleteJob(
 ): void {
   deleteJobById(job.id)
     .then(() => {
-      jobModule.deleteJob(job);
+      jobStore.deleteJob(job);
       onSuccess?.();
     })
     .catch(onError);
@@ -63,7 +63,7 @@ export function handleDeleteJob(
  */
 export async function handleReloadJobs(): Promise<void> {
   try {
-    appModule.onLoadStart();
+    appStore.onLoadStart();
 
     const jobs = await getUserJobs();
 
@@ -71,12 +71,12 @@ export async function handleReloadJobs(): Promise<void> {
       await connectAndSubscribeToJob(job.id);
     }
 
-    jobModule.SET_JOBS(jobs);
+    jobStore.$patch({ jobs });
 
     if (jobs.length === 0) return;
 
-    jobModule.selectJob(jobs[0]);
+    jobStore.selectJob(jobs[0]);
   } finally {
-    appModule.onLoadEnd();
+    appStore.onLoadEnd();
   }
 }

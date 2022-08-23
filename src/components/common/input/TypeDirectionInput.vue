@@ -23,8 +23,8 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { LabelledTraceDirectionModel } from "@/types";
-import { getArtifactTypePrintName } from "@/util";
 import { handleRemoveDirection } from "@/api";
+import { typeOptionsStore } from "@/hooks";
 import { Typography } from "@/components/common/display";
 
 /**
@@ -43,7 +43,7 @@ export default Vue.extend({
      * @return The type display name.
      */
     getTypeLabel(type: string) {
-      return getArtifactTypePrintName(type);
+      return typeOptionsStore.getArtifactTypeDisplay(type);
     },
     /**
      * Removes an artifact type direction.

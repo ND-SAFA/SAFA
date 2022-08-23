@@ -42,7 +42,7 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { ProjectModel, MembershipModel, ProjectRole } from "@/types";
-import { sessionModule } from "@/store";
+import { sessionStore } from "@/hooks";
 import { getProjectMembers, handleDeleteMember } from "@/api";
 import { GenericSelector, Typography } from "@/components/common";
 import SettingsMemberInformationModal from "./SettingsMemberInformationModal.vue";
@@ -82,7 +82,7 @@ export default Vue.extend({
      * @return Whether the current user is an admin.
      */
     isAdmin(): boolean {
-      const userEmail = sessionModule.userEmail;
+      const userEmail = sessionStore.userEmail;
       const allowedRoles = [ProjectRole.ADMIN, ProjectRole.OWNER];
       const userQuery = this.project.members.filter(
         (m) => m.email === userEmail && allowedRoles.includes(m.role)

@@ -1,11 +1,12 @@
+import { DocumentModel } from "@/types";
 import {
-  appModule,
-  documentModule,
-  errorModule,
-  projectModule,
-  sessionModule,
-  viewportModule,
-} from "@/store";
+  appStore,
+  layoutStore,
+  warningStore,
+  sessionStore,
+  documentStore,
+  projectStore,
+} from "@/hooks";
 import {
   navigateTo,
   QueryParams,
@@ -21,7 +22,6 @@ import {
   handleSetProject,
   getWarningsInProjectVersion,
 } from "@/api";
-import { DocumentModel } from "@/types";
 
 /**
  * Load the given project version of given Id. Navigates to the artifact
@@ -36,8 +36,8 @@ export async function handleLoadVersion(
   document?: DocumentModel,
   doNavigate = true
 ): Promise<void> {
-  appModule.onLoadStart();
-  await sessionModule.updateSession({ versionId });
+  appStore.onLoadStart();
+  sessionStore.updateSession({ versionId });
 
   const navigateIfNeeded = async () => {
     if (
@@ -54,10 +54,10 @@ export async function handleLoadVersion(
     .then(async () => {
       if (!document) return;
 
-      await documentModule.switchDocuments(document);
+      await documentStore.switchDocuments(document);
     })
     .then(navigateIfNeeded)
-    .finally(() => appModule.onLoadEnd());
+    .finally(() => appStore.onLoadEnd());
 }
 
 /**
@@ -68,13 +68,13 @@ export async function handleLoadVersion(
  */
 export async function handleReloadArtifacts(versionId: string): Promise<void> {
   const artifacts = await getArtifactsInVersion(versionId);
-  const currentArtifactCount = projectModule.getProject.artifacts.length;
+  const currentArtifactCount = projectStore.project.artifacts.length;
 
-  await projectModule.addOrUpdateArtifacts(artifacts);
+  await projectStore.addOrUpdateArtifacts(artifacts);
   await handleLoadTraceMatrices();
 
   if (artifacts.length > currentArtifactCount) {
-    await viewportModule.setArtifactTreeLayout();
+    await layoutStore.setArtifactTreeLayout();
   }
 }
 
@@ -87,9 +87,9 @@ export async function handleReloadArtifacts(versionId: string): Promise<void> {
 export async function handleReloadTraceLinks(versionId: string): Promise<void> {
   const traces = await getTracesInVersion(versionId);
 
-  await projectModule.addOrUpdateTraceLinks(traces);
+  await projectStore.addOrUpdateTraceLinks(traces);
   await handleLoadTraceMatrices();
-  viewportModule.applyAutomove();
+  layoutStore.applyAutomove();
 }
 
 /**
@@ -98,7 +98,5 @@ export async function handleReloadTraceLinks(versionId: string): Promise<void> {
  * @param versionId - The project version to load from.
  */
 export async function handleReloadWarnings(versionId: string): Promise<void> {
-  const warnings = await getWarningsInProjectVersion(versionId);
-
-  errorModule.setArtifactWarnings(warnings);
+  warningStore.artifactWarnings = await getWarningsInProjectVersion(versionId);
 }

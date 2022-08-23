@@ -1,5 +1,5 @@
 import { EmptyLambda, ProjectDelta, VersionModel } from "@/types";
-import { deltaModule, logModule } from "@/store";
+import { logStore, deltaStore } from "@/hooks";
 import { getProjectDelta } from "@/api";
 
 /**
@@ -16,13 +16,13 @@ export function handleSetProjectDelta(
 ): void {
   getProjectDelta(sourceVersion.versionId, targetVersion.versionId)
     .then(async (deltaPayload: ProjectDelta) => {
-      await deltaModule.setDeltaPayload(deltaPayload);
-      deltaModule.setAfterVersion(targetVersion);
-      logModule.onSuccess("Delta state was updated successfully.");
+      deltaStore.afterVersion = targetVersion;
+      await deltaStore.setDeltaPayload(deltaPayload);
+      logStore.onSuccess("Delta state was updated successfully.");
       onComplete();
     })
     .catch((e) => {
-      logModule.onError("Unable to set delta state.");
-      logModule.onDevError(e.message);
+      logStore.onError("Unable to set delta state.");
+      logStore.onDevError(e.message);
     });
 }

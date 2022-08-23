@@ -50,7 +50,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { artifactModule, traceModule, typeOptionsModule } from "@/store";
+import { typeOptionsStore, artifactStore, traceStore } from "@/hooks";
 import { handleCreateLink } from "@/api";
 import { ArtifactModel, LabelledTraceDirectionModel } from "@/types";
 import {
@@ -93,13 +93,13 @@ export default Vue.extend({
      * @return The source artifact.
      */
     sourceArtifact(): ArtifactModel | undefined {
-      return artifactModule.getArtifactById(this.sourceArtifactId);
+      return artifactStore.getArtifactById(this.sourceArtifactId);
     },
     /**
      * @return The source artifact.
      */
     targetArtifact(): ArtifactModel | undefined {
-      return artifactModule.getArtifactById(this.targetArtifactId);
+      return artifactStore.getArtifactById(this.targetArtifactId);
     },
     /**
      * @return Any errors in trying to create this link.
@@ -110,7 +110,7 @@ export default Vue.extend({
 
       if (!source || !target) return "";
 
-      const isLinkAllowed = traceModule.isLinkAllowed(source, target);
+      const isLinkAllowed = traceStore.isLinkAllowed(source, target);
 
       return isLinkAllowed === true
         ? ""
@@ -130,7 +130,7 @@ export default Vue.extend({
      * @return The current project's artifact types.
      */
     artifactDirections(): LabelledTraceDirectionModel[] {
-      return typeOptionsModule.labeledTypeDirections();
+      return typeOptionsStore.labeledTypeDirections();
     },
   },
   methods: {

@@ -8,7 +8,7 @@ import {
   GeneratedLinksModel,
   FlatTraceLink,
 } from "@/types";
-import { appModule, artifactModule, logModule, projectModule } from "@/store";
+import { appStore, logStore, artifactStore, projectStore } from "@/hooks";
 import {
   createLink,
   getGeneratedLinks,
@@ -27,20 +27,20 @@ export async function handleGetGeneratedLinks({
   onSuccess,
   onError,
 }: IOHandlerCallback<GeneratedLinksModel>): Promise<void> {
-  if (!projectModule.isProjectDefined) return;
+  if (!projectStore.isProjectDefined) return;
 
   const links: FlatTraceLink[] = [];
   const approved: string[] = [];
   const declined: string[] = [];
 
   try {
-    appModule.onLoadStart();
+    appStore.onLoadStart();
 
-    const generatedLinks = await getGeneratedLinks(projectModule.versionId);
+    const generatedLinks = await getGeneratedLinks(projectStore.versionId);
 
     generatedLinks.forEach((link) => {
-      const source = artifactModule.getArtifactById(link.sourceId);
-      const target = artifactModule.getArtifactById(link.targetId);
+      const source = artifactStore.getArtifactById(link.sourceId);
+      const target = artifactStore.getArtifactById(link.targetId);
 
       if (link.approvalStatus === ApprovalType.APPROVED) {
         approved.push(link.traceLinkId);
@@ -63,9 +63,9 @@ export async function handleGetGeneratedLinks({
       declined,
     });
   } catch (e) {
-    onError?.(e);
+    onError?.(e as Error);
   } finally {
-    appModule.onLoadEnd();
+    appStore.onLoadEnd();
   }
 }
 
@@ -98,12 +98,12 @@ export async function handleCreateLink(
   try {
     const createdLinks = await createLink(traceLink);
 
-    await projectModule.addOrUpdateTraceLinks(createdLinks);
+    projectStore.addOrUpdateTraceLinks(createdLinks);
   } catch (e) {
-    logModule.onError(
+    logStore.onError(
       `Unable to create trace link: ${sourceName} -> ${targetName}`
     );
-    logModule.onDevError(e);
+    logStore.onDevError(String(e));
   }
 }
 
@@ -122,12 +122,12 @@ export async function handleApproveLink(
 
   linkAPIHandler(link, updateApprovedLink, {
     onSuccess: async () => {
-      await projectModule.addOrUpdateTraceLinks([link]);
+      await projectStore.addOrUpdateTraceLinks([link]);
       onSuccess?.();
     },
     onError: (e) => {
       link.approvalStatus = currentStatus;
-      logModule.onError("Unable to approve this link");
+      logStore.onError("Unable to approve this link");
       onError?.(e);
     },
   });
@@ -148,12 +148,12 @@ export async function handleDeclineLink(
 
   linkAPIHandler(link, updateDeclinedLink, {
     onSuccess: async () => {
-      await projectModule.deleteTraceLinks([link]);
+      projectStore.deleteTraceLinks([link]);
       onSuccess?.();
     },
     onError: (e) => {
       link.approvalStatus = currentStatus;
-      logModule.onError("Unable to decline this link");
+      logStore.onError("Unable to decline this link");
       onError?.(e);
     },
   });
@@ -178,7 +178,7 @@ export async function handleUnreviewLink(
     },
     onError: (e) => {
       link.approvalStatus = currentStatus;
-      logModule.onError("Unable to reset this link");
+      logStore.onError("Unable to reset this link");
       onError?.(e);
     },
   });
@@ -197,9 +197,9 @@ function linkAPIHandler(
   linkAPI: (traceLink: TraceLinkModel) => Promise<TraceLinkModel[]>,
   { onSuccess, onError }: IOHandlerCallback
 ): void {
-  appModule.onLoadStart();
+  appStore.onLoadStart();
   linkAPI(link)
     .then(() => onSuccess?.())
     .catch((e) => onError?.(e))
-    .finally(() => appModule.onLoadEnd());
+    .finally(() => appStore.onLoadEnd());
 }

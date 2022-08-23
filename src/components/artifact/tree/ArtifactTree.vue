@@ -136,9 +136,14 @@ export default Vue.extend({
       this.artifactsInView = this.nodesInView;
     },
     isInView(inView: boolean): void {
-      if (!inView || !selectionStore.selectedArtifactId) return;
+      if (!inView) return;
 
-      setTimeout(() => cyResetTree(), 200);
+      appStore.onLoadStart();
+
+      setTimeout(() => {
+        cyResetTree();
+        appStore.onLoadEnd();
+      }, 200);
     },
   },
   methods: {

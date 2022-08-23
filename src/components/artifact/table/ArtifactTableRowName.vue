@@ -35,7 +35,7 @@ export default Vue.extend({
      * @return Whether the artifact has warnings.
      */
     getHasWarnings(item: ArtifactModel): boolean {
-      return warningStore.artifactWarnings[item.id].length > 0;
+      return warningStore.artifactWarnings[item.id]?.length > 0;
     },
   },
 });

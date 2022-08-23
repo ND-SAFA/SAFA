@@ -52,7 +52,7 @@ export default Vue.extend({
     definition(): ArtifactCytoCoreElement {
       const { id, body, type, name, safetyCaseType, logicType } =
         this.artifactDefinition;
-      const warnings = warningStore.artifactWarnings[id];
+      const warnings = warningStore.artifactWarnings[id] || [];
       const hiddenChildren = subtreeStore.getHiddenChildren(id);
       const hiddenChildWarnings =
         warningStore.getArtifactWarnings(hiddenChildren);

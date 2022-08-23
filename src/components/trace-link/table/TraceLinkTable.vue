@@ -146,7 +146,7 @@ export default Vue.extend({
      * @return Whether the app is loading.
      */
     isLoading() {
-      return appStore.isLoading;
+      return appStore.isLoading > 0;
     },
     /**
      * @return The current project version.

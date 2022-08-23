@@ -1,6 +1,7 @@
 <template>
   <v-autocomplete
     filled
+    ref="artifactTypeInput"
     :label="label"
     :multiple="multiple"
     v-model="model"
@@ -11,6 +12,14 @@
     item-value="type"
     @blur="$emit('blur')"
   >
+    <template v-slot:append>
+      <generic-icon-button
+        small
+        icon-id="mdi-content-save-outline"
+        tooltip="Save Types"
+        @click="handleClose"
+      />
+    </template>
     <template v-slot:selection="{ item }">
       <attribute-chip artifact-type :value="item.type" />
     </template>
@@ -21,6 +30,7 @@
 import Vue, { PropType } from "vue";
 import { typeOptionsStore } from "@/hooks";
 import { LabelledTraceDirectionModel } from "@/types";
+import { GenericIconButton } from "@/components/common/generic";
 import AttributeChip from "@/components/common/display/AttributeChip.vue";
 
 /**
@@ -30,7 +40,7 @@ import AttributeChip from "@/components/common/display/AttributeChip.vue";
  */
 export default Vue.extend({
   name: "ArtifactTypeInput",
-  components: { AttributeChip },
+  components: { AttributeChip, GenericIconButton },
   props: {
     value: {
       type: [Array, String] as PropType<string[] | string | undefined>,
@@ -58,6 +68,14 @@ export default Vue.extend({
      */
     typeDirections(): LabelledTraceDirectionModel[] {
       return typeOptionsStore.typeDirections();
+    },
+  },
+  methods: {
+    /**
+     * Closes the selection window.
+     */
+    handleClose(): void {
+      (this.$refs.artifactTypeInput as HTMLElement).blur();
     },
   },
   watch: {

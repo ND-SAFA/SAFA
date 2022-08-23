@@ -2,6 +2,8 @@
   <v-autocomplete
     chips
     deletable-chips
+    hide-details
+    ref="artifactInput"
     :filled="filled"
     :multiple="multiple"
     :label="label"
@@ -9,10 +11,17 @@
     :items="artifacts"
     item-text="name"
     item-value="id"
-    hide-details
     :filter="filterArtifacts"
     @keydown.enter="$emit('enter')"
   >
+    <template v-slot:append>
+      <generic-icon-button
+        small
+        icon-id="mdi-content-save-outline"
+        tooltip="Save Artifacts"
+        @click="handleClose"
+      />
+    </template>
     <template v-slot:item="{ item, on, attrs }">
       <v-list-item v-on="on" v-bind="attrs" dense>
         <v-checkbox :value="isSelected(item)" />
@@ -38,7 +47,10 @@ import Vue, { PropType } from "vue";
 import { ArtifactModel } from "@/types";
 import { artifactStore } from "@/hooks";
 import { filterArtifacts } from "@/util";
-import { GenericArtifactBodyDisplay } from "@/components/common/generic";
+import {
+  GenericArtifactBodyDisplay,
+  GenericIconButton,
+} from "@/components/common/generic";
 import { Typography } from "@/components/common/display";
 
 /**
@@ -50,6 +62,7 @@ import { Typography } from "@/components/common/display";
 export default Vue.extend({
   name: "ArtifactInput",
   components: {
+    GenericIconButton,
     Typography,
     GenericArtifactBodyDisplay,
   },
@@ -108,6 +121,12 @@ export default Vue.extend({
       } else if (Array.isArray(this.model)) {
         this.model = this.model.filter((id) => id !== item.id);
       }
+    },
+    /**
+     * Closes the selection window.
+     */
+    handleClose(): void {
+      (this.$refs.artifactInput as HTMLElement).blur();
     },
   },
   computed: {

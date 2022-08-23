@@ -14,9 +14,11 @@
       item-text="name"
       item-value="id"
       class="mx-1 mt-1"
-      append-icon="mdi-magnify"
       :filter="filterArtifacts"
     >
+      <template v-slot:append>
+        <v-icon class="input-no-icon-rotate"> mdi-magnify </v-icon>
+      </template>
       <template v-slot:prepend-item>
         <flex-box x="3">
           <v-spacer />

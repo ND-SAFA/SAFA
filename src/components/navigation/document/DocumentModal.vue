@@ -159,9 +159,18 @@ export default Vue.extend({
      * Generates children to save on this document.
      */
     handleSaveTypes() {
-      this.editingDocument.artifactIds = artifactStore.allArtifacts
-        .filter(({ type }) => this.includedTypes.includes(type))
-        .map(({ id }) => id);
+      const baseArtifacts = this.document?.artifactIds || [];
+
+      this.editingDocument.artifactIds =
+        this.includedTypes.length > 0
+          ? artifactStore.allArtifacts
+              .filter(
+                ({ id, type }) =>
+                  this.includedTypes.includes(type) ||
+                  baseArtifacts.includes(id)
+              )
+              .map(({ id }) => id)
+          : baseArtifacts;
     },
     /**
      * Generates children to save on this document.
@@ -221,8 +230,6 @@ export default Vue.extend({
       if (!open) return;
 
       this.editingDocument = createDocument(this.document);
-      this.includeChildren = false;
-      this.includedChildTypes = [];
     },
   },
 });

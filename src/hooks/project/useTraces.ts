@@ -13,7 +13,7 @@ import subtreeStore from "@/hooks/project/useSubtree";
 import layoutStore from "@/hooks/graph/useLayout";
 import projectStore from "@/hooks/project/useProject";
 import typeOptionsStore from "@/hooks/project/useTypeOptions";
-import { removeMatches, standardizeValueArray } from "@/util";
+import { matchTrace, removeMatches, standardizeValueArray } from "@/util";
 
 /**
  * This module defines the state of the current project's trace links.
@@ -109,9 +109,7 @@ export const useTraces = defineStore("traces", {
       sourceId: string,
       targetId: string
     ): TraceLinkModel | undefined {
-      return this.allTraces.find(
-        (trace) => trace.sourceId === sourceId && trace.targetId === targetId
-      );
+      return this.allTraces.find(matchTrace(sourceId, targetId));
     },
     /**
      * Returns whether the link exists.
@@ -120,15 +118,8 @@ export const useTraces = defineStore("traces", {
      * @param targetId - The target artifact id.
      * @return Whether a link exists.
      */
-    doesLinkExist(
-      sourceId: string,
-      targetId: string
-    ): TraceLinkModel | undefined {
-      return this.allTraces.find(
-        (trace) =>
-          (trace.sourceId === sourceId && trace.targetId === targetId) ||
-          (trace.targetId === sourceId && trace.sourceId === targetId)
-      );
+    doesLinkExist(sourceId: string, targetId: string): boolean {
+      return !!this.allTraces.find(matchTrace(sourceId, targetId, true));
     },
     /**
      * Returns whether the link is allowed.

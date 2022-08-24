@@ -2,7 +2,6 @@ import { defineStore } from "pinia";
 
 import { pinia } from "@/plugins";
 import {
-  allowedSafetyCaseTypes,
   ArtifactData,
   ArtifactModel,
   ArtifactTypeDirections,
@@ -16,6 +15,7 @@ import {
   createDefaultTypeIcons,
   defaultTypeIcon,
   getArtifactTypePrintName,
+  isLinkAllowedByType,
   removeMatches,
 } from "@/util";
 import projectStore from "@/hooks/project/useProject";
@@ -158,29 +158,7 @@ export const useTypeOptions = defineStore("typeOptions", {
       source: ArtifactModel | ArtifactData,
       target: ArtifactModel | ArtifactData
     ): boolean {
-      const sourceType =
-        "artifactType" in source ? source.artifactType : source.type;
-      const targetType =
-        "artifactType" in target ? target.artifactType : target.type;
-      const isSourceDefaultArtifact =
-        !source.safetyCaseType && !source.logicType;
-      const isTargetDefaultArtifact =
-        !target.safetyCaseType && !target.logicType;
-
-      if (isSourceDefaultArtifact) {
-        return !this.artifactTypeDirections[targetType]?.includes(sourceType);
-      } else if (source.safetyCaseType) {
-        if (isTargetDefaultArtifact) return true;
-        if (target.logicType || !target.safetyCaseType) return false;
-
-        return allowedSafetyCaseTypes[source.safetyCaseType].includes(
-          target.safetyCaseType
-        );
-      } else if (source.logicType) {
-        return isTargetDefaultArtifact;
-      }
-
-      return false;
+      return isLinkAllowedByType(source, target, this.artifactTypeDirections);
     },
     /**
      * Returns the display name for the given type.

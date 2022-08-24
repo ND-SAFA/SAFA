@@ -3,13 +3,14 @@ import { createProject } from "@/util";
 import { pinia } from "@/plugins";
 import {
   ArtifactModel,
+  ArtifactPositions,
   ArtifactTypeModel,
   MembershipModel,
   ProjectModel,
   TraceLinkModel,
   VersionModel,
 } from "@/types";
-import { warningStore } from "@/hooks";
+import { projectStore, warningStore } from "@/hooks";
 import layoutStore from "../graph/useLayout";
 import logStore from "../core/useLog";
 import documentStore from "./useDocuments";
@@ -81,6 +82,18 @@ export const useProject = defineStore("project", {
         ...this.project,
         ...project,
       };
+    },
+    /**
+     * Updates the current project layout.
+     *
+     * @param layout - The updated layout.
+     */
+    updateLayout(layout: ArtifactPositions): void {
+      projectStore.updateProject({ layout });
+
+      if (documentStore.currentId === "") {
+        layoutStore.artifactPositions = layout;
+      }
     },
     /**
      * Updates the current project members.

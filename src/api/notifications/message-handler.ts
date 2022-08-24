@@ -9,15 +9,14 @@ import {
 import { getChanges } from "@/api/endpoints/sync-api";
 import {
   handleClearProject,
-  handleGetMembers,
   handleLoadVersion,
   handleReloadJobs,
   handleReloadWarnings,
 } from "@/api";
 import {
-  artifactStore,
   documentStore,
   jobStore,
+  layoutStore,
   projectStore,
   typeOptionsStore,
 } from "@/hooks";
@@ -46,7 +45,7 @@ export async function handleEntityChangeMessage(
 
   // Step - Update default layout.
   if (message.updateLayout) {
-    // TODO: Set project layout (updated layout included in project.layout)
+    projectStore.updateLayout(project.layout);
   }
 }
 
@@ -140,7 +139,7 @@ async function handleUpdateChange(change: ChangeModel, project: ProjectModel) {
     case EntityType.JOBS:
       return handleReloadJobs();
     case EntityType.LAYOUT:
-      // Never called, case here for completion.
+      projectStore.updateLayout(project.layout);
       break;
   }
 }

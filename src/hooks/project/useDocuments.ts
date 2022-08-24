@@ -117,6 +117,15 @@ export const useDocuments = defineStore("documents", {
      */
     async updateDocuments(updatedDocuments: DocumentModel[]): Promise<void> {
       const updatedDocumentIds = updatedDocuments.map((d) => d.documentId);
+      const currentDocument =
+        updatedDocuments.find(
+          ({ documentId }) => documentId === this.currentDocument.documentId
+        ) || this.currentDocument;
+
+      if (currentDocument !== this.currentDocument) {
+        // Update the layout if the current document changed.
+        layoutStore.artifactPositions = currentDocument.layout;
+      }
 
       this.$patch({
         allDocuments: [
@@ -125,10 +134,7 @@ export const useDocuments = defineStore("documents", {
           ),
           ...updatedDocuments,
         ],
-        currentDocument:
-          updatedDocuments.find(
-            ({ documentId }) => documentId === this.currentDocument.documentId
-          ) || this.currentDocument,
+        currentDocument,
       });
     },
     /**

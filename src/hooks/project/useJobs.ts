@@ -52,11 +52,13 @@ export const useJobs = defineStore("jobs", {
     /**
      * Removes job matching id of given job.
      *
-     * @param job - The job to delete.
+     * @param job - The job, or id, to delete.
      */
-    deleteJob(job: JobModel): void {
+    deleteJob(job: JobModel | string): void {
+      const deleteId = typeof job === "string" ? job : job.id;
+
       this.$patch({
-        jobs: this.jobs.filter(({ id }) => id !== job.id),
+        jobs: this.jobs.filter(({ id }) => id !== deleteId),
         selectedJob: 0,
       });
     },

@@ -23,8 +23,8 @@ export enum Endpoint {
   getUserJobs = "jobs",
   deleteJobById = "jobs/:jobId",
   jobTopic = "/topic/jobs/:jobId",
-  projectTopic = "/topic/projects/:projectId",
-  versionTopic = "/topic/revisions/:versionId",
+  projectTopic = "/topic/:projectId",
+  versionTopic = "/topic/:versionId",
 
   // Projects
   project = "projects",
@@ -37,6 +37,7 @@ export enum Endpoint {
   // Commits
   commit = "projects/versions/:versionId/commit",
   isArtifactNameTaken = "projects/versions/:versionId/artifacts/validate/",
+  sync = "projects/versions/:versionId/changes",
 
   // Types
   getProjectArtifactTypes = "projects/:projectId/artifactTypes",

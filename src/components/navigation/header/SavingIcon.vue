@@ -9,6 +9,9 @@
 import Vue from "vue";
 import { appStore } from "@/hooks";
 
+/**
+ * Renders app saving state.
+ */
 export default Vue.extend({
   name: "SavingIcon",
   computed: {

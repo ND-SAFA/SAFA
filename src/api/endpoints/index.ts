@@ -10,3 +10,4 @@ export * from "./warning-api";
 export * from "./job-api";
 export * from "./github-api";
 export * from "./artifact-type-api";
+export * from "./sync-api";

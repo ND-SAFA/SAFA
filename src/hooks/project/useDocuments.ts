@@ -60,6 +60,12 @@ export const useDocuments = defineStore("documents", {
       return this.currentDocument.type;
     },
     /**
+     * @return The current artifact ids.
+     */
+    currentArtifactIds(): string[] {
+      return this.currentDocument.artifactIds;
+    },
+    /**
      * @return Whether the current document type is for editing a table.
      */
     isEditableTableDocument(): boolean {
@@ -117,6 +123,15 @@ export const useDocuments = defineStore("documents", {
      */
     async updateDocuments(updatedDocuments: DocumentModel[]): Promise<void> {
       const updatedDocumentIds = updatedDocuments.map((d) => d.documentId);
+      const currentDocument =
+        updatedDocuments.find(
+          ({ documentId }) => documentId === this.currentDocument.documentId
+        ) || this.currentDocument;
+
+      if (currentDocument !== this.currentDocument) {
+        // Update the layout if the current document changed.
+        layoutStore.artifactPositions = currentDocument.layout;
+      }
 
       this.$patch({
         allDocuments: [
@@ -125,10 +140,7 @@ export const useDocuments = defineStore("documents", {
           ),
           ...updatedDocuments,
         ],
-        currentDocument:
-          updatedDocuments.find(
-            ({ documentId }) => documentId === this.currentDocument.documentId
-          ) || this.currentDocument,
+        currentDocument,
       });
     },
     /**
@@ -163,18 +175,34 @@ export const useDocuments = defineStore("documents", {
       await this.switchDocuments(document);
     },
     /**
+     * Adds artifacts to the current document.
+     *
+     * @param newIds - The new artifacts to add.
+     */
+    addDocumentArtifacts(newIds: string[]): void {
+      this.currentDocument.artifactIds = [
+        ...this.currentDocument.artifactIds.filter(
+          (id) => !newIds.includes(id)
+        ),
+        ...newIds,
+      ];
+    },
+    /**
      * Removes an existing document.
      *
-     * @param document - The document to delete.
+     * @param document - The document, or document id, to delete.
      */
-    async removeDocument(document: DocumentModel): Promise<void> {
+    async removeDocument(document: string | DocumentModel): Promise<void> {
+      const deleteDocumentId =
+        typeof document === "string" ? document : document.documentId;
+
       const remainingDocuments = this.allDocuments.filter(
-        ({ documentId }) => documentId !== document.documentId
+        ({ documentId }) => documentId !== deleteDocumentId
       );
 
       this.allDocuments = remainingDocuments;
 
-      if (this.currentDocument.documentId !== document.documentId) return;
+      if (this.currentDocument.documentId !== deleteDocumentId) return;
 
       await this.switchDocuments(remainingDocuments[0] || this.baseDocument);
     },

@@ -5,6 +5,7 @@
       <typography el="h1" variant="large" l="4" color="white" value="SAFA" />
       <button-row :definitions="definitions" class="mx-3" />
       <saving-icon />
+      <update-button />
     </flex-box>
 
     <div class="mr-5">
@@ -57,10 +58,12 @@ import {
 import SavingIcon from "./SavingIcon.vue";
 import VersionLabel from "./VersionLabel.vue";
 import AccountDropdown from "./AccountDropdown.vue";
+import UpdateButton from "./UpdateButton.vue";
 
 export default Vue.extend({
   name: "AppBarHeader",
   components: {
+    UpdateButton,
     FlexBox,
     Typography,
     VersionLabel,

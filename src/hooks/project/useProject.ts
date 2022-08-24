@@ -245,6 +245,19 @@ export const useProject = defineStore("project", {
       typeOptionsStore.initializeTypeIcons(allArtifactTypes);
     },
     /**
+     * Removes artifact types.
+     *
+     * @param removedTypeIds - The artifact type ids to remove.
+     */
+    removeArtifactTypes(removedTypeIds: string[]): void {
+      this.updateProject({
+        artifactTypes: this.project.artifactTypes.filter(
+          ({ typeId }) => !removedTypeIds.includes(typeId || "")
+        ),
+      });
+      typeOptionsStore.removeArtifactTypes(removedTypeIds);
+    },
+    /**
      * Runs the callback only if the project is defined. Otherwise logs a warning.
      *
      * @param cb - The callback to run.

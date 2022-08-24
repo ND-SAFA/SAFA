@@ -13,13 +13,7 @@ import {
   handleReloadJobs,
   handleReloadWarnings,
 } from "@/api";
-import {
-  documentStore,
-  jobStore,
-  layoutStore,
-  projectStore,
-  typeOptionsStore,
-} from "@/hooks";
+import { documentStore, jobStore, projectStore } from "@/hooks";
 
 /**
  * Handles changes messages by updating affected parts of the app.
@@ -72,7 +66,7 @@ async function handleDeleteChange(change: ChangeModel) {
       return handleClearProject();
     case EntityType.TYPES:
       // (entityIds = type id)
-      typeOptionsStore.removeArtifactTypes(change.entityIds);
+      projectStore.removeArtifactTypes(change.entityIds);
       break;
     case EntityType.DOCUMENT:
       // (entityIds = document id)

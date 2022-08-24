@@ -109,11 +109,11 @@ export const useTypeOptions = defineStore("typeOptions", {
     /**
      * Removes artifact types.
      *
-     * @param artifactTypeIds - The artifact type ids to remove.
+     * @param removedTypeIds - The artifact type ids to remove.
      */
-    removeArtifactTypes(artifactTypeIds: string[]): void {
+    removeArtifactTypes(removedTypeIds: string[]): void {
       const removedArtifactTypes = this.allArtifactTypes.filter(({ typeId }) =>
-        artifactTypeIds.includes(typeId || "")
+        removedTypeIds.includes(typeId || "")
       );
       const removedTypeNames = removedArtifactTypes.map(({ typeId }) => typeId);
 

@@ -62,10 +62,9 @@ export async function handleSetProject(project: ProjectModel): Promise<void> {
   const isDifferentProject = projectStore.versionId !== versionId;
 
   project.artifactTypes = await getProjectArtifactTypes(projectId);
+  projectStore.initializeProject(project);
 
   await handleSelectVersion(projectId, versionId);
-  selectionStore.clearSelections();
-  projectStore.initializeProject(project);
   await handleResetGraph(isDifferentProject);
   await handleLoadTraceMatrices();
   await setCurrentDocument(project);
@@ -89,13 +88,13 @@ export async function handleReloadProject(): Promise<void> {
  * @param project The project possibly containing a currentDocumentId.
  */
 async function setCurrentDocument(project: ProjectModel): Promise<void> {
-  if (project.currentDocumentId) {
-    const documents = project.documents.filter(
-      (d) => d.documentId === project.currentDocumentId
-    );
-    if (documents.length === 1) {
-      const document = documents[0];
-      await documentStore.switchDocuments(document);
-    }
-  }
+  if (!project.currentDocumentId) return;
+
+  const document = project.documents.find(
+    (d) => d.documentId === project.currentDocumentId
+  );
+
+  if (!document) return;
+
+  await documentStore.switchDocuments(document);
 }

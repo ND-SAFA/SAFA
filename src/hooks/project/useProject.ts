@@ -7,6 +7,7 @@ import {
   ProjectModel,
   VersionModel,
 } from "@/types";
+import selectionStore from "@/hooks/graph/useSelection";
 import layoutStore from "../graph/useLayout";
 import logStore from "../core/useLog";
 import warningStore from "./useWarnings";
@@ -125,6 +126,7 @@ export const useProject = defineStore("project", {
     initializeProject(project: ProjectModel): void {
       this.project = project;
 
+      selectionStore.clearSelections();
       layoutStore.artifactPositions = project.layout;
       typeOptionsStore.initializeTypeIcons(project.artifactTypes);
       documentStore.initializeProject(project);

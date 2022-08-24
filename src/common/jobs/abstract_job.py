@@ -14,16 +14,11 @@ class AbstractJob:
         self.args = arg_builder.build()
 
     @abstractmethod
-    def __start(self) -> JobResult:
+    def start(self) -> JobResult:
         """
         Runs the logic of the specific job
         :return: result of the job
         """
         pass
 
-    def start(self) -> JobResult:
-        """
-        Starts the job
-        :return: result of the job
-        """
-        return self.__start()
+

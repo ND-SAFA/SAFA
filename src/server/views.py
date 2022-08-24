@@ -9,40 +9,85 @@ from trace.config.constants import VALIDATION_PERCENTAGE_DEFAULT
 from trace.jobs.trace_args_builder import TraceArgsBuilder
 from server.job_type import JobType
 import json
+import numpy as np
 
 
 def predict(request: HttpRequest) -> JsonResponse:
-    body_json = json.loads(request.body)
-    print("RequestBODY:", body_json)
+    """
+    For generating trace links from artifacts
+    :param request: request from client containing model and artifact information
+    :return: output of prediction
+    """
     return _run_job(request, JobType.PREDICT)
 
 
 def fine_tune(request: HttpRequest) -> JsonResponse:
+    """
+    For fine-tuning a model on project data
+    :param request: request from client containing model and artifact information
+    :return: output of training
+    """
     return _run_job(request, JobType.TRAIN)
 
 
-def _run_job(request, job_type):
-    args = _make_job_params_from_request(request.POST)
+def _run_job(request: HttpRequest, job_type: JobType) -> JsonResponse:
+    """
+    Runs the specified job using params from a given request
+    :param request: request from client
+    :param job_type: job type to run
+    :return: the output of the job as json
+    """
+    request_dict = _request_to_dict(request)
+    args = _make_job_params_from_request(request_dict)
     job = job_type.value(args)
     job_results = job.start()
-    return _as_json(job_results.output)
+    return _output_as_json(job_results.output)
 
 
-def _make_job_params_from_request(params: Dict):
-    params = deepcopy(params)
+def _make_job_params_from_request(request_dict: Dict) -> TraceArgsBuilder:
+    """
+    Extracts necessary information from a request and creates an arg builder from it
+    :param request_dict: a dictionary from the request body
+    :return: a TraceArgsBuilder for the request
+    """
+    params = deepcopy(request_dict)
     model_path = params.pop(Api.MODEL_PATH.value)
     sources = params.pop(Api.SOURCES.value)
     targets = params.pop(Api.TARGETS.value)
     base_model = params.pop(Api.BASE_MODEL.value)
-    links = _safe_pop(params, Api.LINKS.value)
-    output_path = _safe_pop(params, Api.OUTPUT_PATH.value)
+    output_path = params.pop(Api.OUTPUT_PATH.value)
+    links = _safe_pop(params, Api.LINKS.value)  # optional
     return TraceArgsBuilder(base_model, model_path, output_path, sources, targets, links, VALIDATION_PERCENTAGE_DEFAULT,
                             prediction_ids_key=Api.PREDICTION_IDS, **params)
 
 
-def _safe_pop(dict_: Dict, key: any, default: any = None):
+def _safe_pop(dict_: Dict, key: any, default: any = None) -> any:
+    """
+    Safely removes a value from dictionary, returning a default value if the key is not in the dictionary
+    :param dict_: the dictionary
+    :param key: the key to pop
+    :param default: default value to return if key is not in the dictionary
+    :return: dictionary element that was popped or default
+    """
     return dict_.pop(key) if key in dict_ else default
 
 
-def _as_json(response_object: Dict) -> JsonResponse:
-    return JsonResponse(response_object, safe=False)
+def _output_as_json(output_dict: Dict) -> JsonResponse:
+    """
+    Converts a dictionary to a JsonResponse
+    :param output_dict: output dictionary
+    :return: a JsonResponse containing output information
+    """
+    for key, value in output_dict.items():
+        if isinstance(value, np.ndarray):
+            output_dict[key] = value.tolist()
+    return JsonResponse(output_dict, safe=False)
+
+
+def _request_to_dict(request: HttpRequest) -> Dict:
+    """
+    Converts a HttpRequest to a dictionary
+    :param request: the HttpRequest
+    :return: a dictionary containing the information from the request body
+    """
+    return json.loads(request.body)

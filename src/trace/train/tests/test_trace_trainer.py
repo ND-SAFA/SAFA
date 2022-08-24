@@ -1,5 +1,4 @@
 from copy import copy, deepcopy
-from unittest.mock import create_autospec
 
 from django.test import TestCase
 
@@ -7,6 +6,7 @@ from unittest.mock import patch
 import mock
 
 from common.models.model_generator import ModelGenerator
+from test.config.paths import TEST_OUTPUT_DIR
 from test.test_data import TEST_S_ARTS, TEST_T_ARTS, TEST_POS_LINKS
 from test.test_model import get_test_model
 from test.test_tokenizer import get_test_tokenizer
@@ -107,5 +107,5 @@ class TestTraceTrainer(TestCase):
                                                         validation_percentage=self.VAlIDATION_PERCENTAGE)
             args = TraceArgs(model_generator=model_generator,
                              trace_dataset_creator=trace_dataset_creator,
-                             output_path="output", **kwargs)
+                             output_path=TEST_OUTPUT_DIR, **kwargs)
         return TraceTrainer(args)

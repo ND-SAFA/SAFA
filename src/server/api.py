@@ -10,4 +10,5 @@ class Api(Enum):
     LINKS = "links"
     PREDICTION_IDS = "ids"
     SETTINGS = "settings"
+    PREDICTIONS = "predictions"
 

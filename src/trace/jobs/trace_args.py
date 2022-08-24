@@ -18,7 +18,7 @@ class TraceArgs(TrainingArguments):
 
     def __init__(self, model_generator: ModelGenerator,
                  trace_dataset_creator: TraceDatasetCreator,
-                 output_path: str = None, ** kwargs):
+                 output_path: str, ** kwargs):
         """
         Arguments for Learning Model
         :param model_generator: generates model with specified base model and path.

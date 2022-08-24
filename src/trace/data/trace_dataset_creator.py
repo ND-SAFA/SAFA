@@ -37,8 +37,6 @@ class TraceDatasetCreator:
                                                                               true_links)
         self.validation_percentage = validation_percentage
         self.linked_target_ids = self._get_linked_targets_only(true_links) if true_links else set()
-        random.shuffle(self.pos_link_ids)
-        random.shuffle(self.neg_link_ids)
 
     def get_training_dataset(self, resample_rate: int = RESAMPLE_RATE_DEFAULT) -> TraceDataset:
         """
@@ -203,14 +201,13 @@ class TraceDatasetCreator:
         :return: a dictionary of the links, a list of the positive link ids, and a list of the negative link ids
         """
         links = {}
-        pos_link_ids = set()
-        neg_link_ids = set()
         for s_id, s_token in s_arts.items():
             source = Artifact(s_id, s_token, model_generator.get_feature)
             for t_id, t_token in t_arts.items():
                 target = Artifact(t_id, t_token, model_generator.get_feature)
                 link = TraceLink(source, target, model_generator.get_feature)
                 links[link.id_] = link
+        neg_link_ids = pos_link_ids = None
         if true_links:
             pos_link_ids, neg_link_ids = TraceDatasetCreator._create_pos_and_neg_links(true_links, links)
         return links, pos_link_ids, neg_link_ids
@@ -232,6 +229,8 @@ class TraceDatasetCreator:
             pos_link_ids.add(link_id)
         neg_link_ids = [link_id for link_id in all_links.keys() if link_id not in pos_link_ids]
         pos_link_ids = list(pos_link_ids)
+        random.shuffle(pos_link_ids)
+        random.shuffle(neg_link_ids)
         return pos_link_ids, neg_link_ids
 
     @staticmethod

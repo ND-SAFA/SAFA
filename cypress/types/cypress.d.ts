@@ -109,5 +109,13 @@ declare namespace Cypress {
      * Opens the project selection modal.
      */
     openProjectSelector(): Chainable<void>;
+
+    /**
+     * Creates artifacts - inputs description and uploads file
+     *
+     * @param name - The name of the artifact you want
+     * @param file - The file that belongs to the artifact
+     */
+    createArtifactPanel(name: string, string: string): Chainable<void>;
   }
 }

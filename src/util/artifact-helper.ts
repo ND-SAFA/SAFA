@@ -1,4 +1,4 @@
-import { ArtifactModel } from "@/types";
+import { ArtifactModel, FlatArtifact } from "@/types";
 
 /**
  * Decides whether to filter an artifact out of view.
@@ -19,4 +19,17 @@ export function filterArtifacts(
     type.toLowerCase().includes(lowercaseQuery) ||
     body.toLowerCase().includes(lowercaseQuery)
   );
+}
+
+/**
+ * Flattens an artifacts custom fields into the same object.
+ *
+ * @param artifact -The artifact to flatten.
+ * @return The flattened artifact.
+ */
+export function flattenArtifact(artifact: ArtifactModel): FlatArtifact {
+  return {
+    ...artifact,
+    ...(artifact.customFields || {}),
+  } as FlatArtifact;
 }

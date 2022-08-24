@@ -1,5 +1,6 @@
 export * from "./array-helper";
 export * from "./string-helper";
+export * from "./object-helper";
 export * from "./to-string";
 export * from "./artifact-helper";
 export * from "./trace-helper";

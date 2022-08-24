@@ -13,6 +13,7 @@ import subtreeStore from "@/hooks/project/useSubtree";
 import layoutStore from "@/hooks/graph/useLayout";
 import projectStore from "@/hooks/project/useProject";
 import typeOptionsStore from "@/hooks/project/useTypeOptions";
+import { removeMatches, standardizeValueArray } from "@/util";
 
 /**
  * This module defines the state of the current project's trace links.
@@ -64,9 +65,7 @@ export const useTraces = defineStore("traces", {
     addOrUpdateTraceLinks(newTraces: TraceLinkModel[]): void {
       const newIds = newTraces.map(({ traceLinkId }) => traceLinkId);
       const updatedTraces = [
-        ...this.allTraces.filter(
-          ({ traceLinkId }) => !newIds.includes(traceLinkId)
-        ),
+        ...removeMatches(this.allTraces, "traceLinkId", newIds),
         ...newTraces,
       ];
 
@@ -88,18 +87,12 @@ export const useTraces = defineStore("traces", {
     ): Promise<void> {
       if (deletedTraces.length === 0) return;
 
-      const deletedIds = deletedTraces.map((trace) =>
-        typeof trace === "string" ? trace : trace.traceLinkId
-      );
-      const removeTraces = (currentTraces: TraceLinkModel[]) =>
-        currentTraces.filter(
-          ({ traceLinkId }) => !deletedIds.includes(traceLinkId)
-        );
-      const allTraces = removeTraces(this.allTraces);
+      const ids = standardizeValueArray(deletedTraces, "traceLinkId");
+      const allTraces = removeMatches(this.allTraces, "traceLinkId", ids);
 
       this.$patch({
         allTraces,
-        currentTraces: removeTraces(this.currentTraces),
+        currentTraces: removeMatches(this.currentTraces, "traceLinkId", ids),
       });
       projectStore.updateProject({ traces: allTraces });
       subtreeStore.updateSubtreeMap();

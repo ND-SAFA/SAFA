@@ -39,9 +39,14 @@ export async function handleSaveArtifact(
     } else {
       const createdArtifacts = await createArtifact(versionId, artifact);
 
+      layoutStore.setArtifactToSavedPosition(createdArtifacts[0].id);
       artifactStore.addOrUpdateArtifacts(createdArtifacts);
-      selectionStore.selectArtifact(createdArtifacts[0].id);
-      layoutStore.setArtifactTreeLayout();
+
+      setTimeout(() => {
+        // Wait for node to render before resetting layout.
+        layoutStore.setArtifactTreeLayout();
+        selectionStore.selectArtifact(createdArtifacts[0].id);
+      }, 200);
 
       if (!parentArtifact) {
         onSuccess?.();

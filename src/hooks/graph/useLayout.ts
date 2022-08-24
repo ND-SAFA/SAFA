@@ -29,6 +29,10 @@ export const useLayout = defineStore("layout", {
      */
     artifactPositions: {} as ArtifactPositions,
     /**
+     * A saved position for a node to be added.
+     */
+    savedPosition: undefined as LayoutPosition | undefined,
+    /**
      * The current graph layout.
      */
     layout: undefined as IGraphLayout | undefined,
@@ -43,6 +47,22 @@ export const useLayout = defineStore("layout", {
      */
     getArtifactPosition(artifactId: string): LayoutPosition {
       return this.artifactPositions[artifactId] || { x: 0, y: 0 };
+    },
+    /**
+     * Sets the position of an artifact to the saved one, and clears the saved position.
+     *
+     * @param artifactId - The artifact id to set.
+     */
+    setArtifactToSavedPosition(artifactId: string): void {
+      if (!this.savedPosition) return;
+
+      this.$patch({
+        savedPosition: undefined,
+        artifactPositions: {
+          ...this.artifactPositions,
+          [artifactId]: this.savedPosition,
+        },
+      });
     },
     /**
      * Resets all automove events.

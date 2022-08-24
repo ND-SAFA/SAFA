@@ -16,6 +16,7 @@ import {
   createDefaultTypeIcons,
   defaultTypeIcon,
   getArtifactTypePrintName,
+  removeMatches,
 } from "@/util";
 import projectStore from "@/hooks/project/useProject";
 
@@ -92,11 +93,11 @@ export const useTypeOptions = defineStore("typeOptions", {
      * @param artifactTypes - The artifact types to add.
      */
     addOrUpdateArtifactTypes(artifactTypes: ArtifactTypeModel[]): void {
-      const updatedIds = artifactTypes.map(({ typeId }) => typeId);
-      const unaffectedTypes = this.allArtifactTypes.filter(
-        ({ typeId }) => !updatedIds.includes(typeId)
-      );
-      const allArtifactTypes = [...unaffectedTypes, ...artifactTypes];
+      const ids = artifactTypes.map(({ typeId }) => typeId);
+      const allArtifactTypes = [
+        ...removeMatches(this.allArtifactTypes, "typeId", ids),
+        ...artifactTypes,
+      ];
 
       this.initializeTypeIcons(allArtifactTypes);
       projectStore.updateProject({ artifactTypes: allArtifactTypes });
@@ -128,13 +129,15 @@ export const useTypeOptions = defineStore("typeOptions", {
      * @param removedTypeIds - The artifact type ids to remove.
      */
     removeArtifactTypes(removedTypeIds: string[]): void {
-      const preservedArtifactTypes = this.allArtifactTypes.filter(
-        ({ typeId }) => !removedTypeIds.includes(typeId || "")
+      const preservedTypes = removeMatches(
+        this.allArtifactTypes,
+        "typeId",
+        removedTypeIds
       );
-      const preservedTypeNames = preservedArtifactTypes.map(({ name }) => name);
+      const preservedTypeNames = preservedTypes.map(({ name }) => name);
 
       this.$patch({
-        allArtifactTypes: preservedArtifactTypes,
+        allArtifactTypes: preservedTypes,
         artifactTypeIcons: Object.entries(this.artifactTypeIcons)
           .filter(([typeName]) => preservedTypeNames.includes(typeName))
           .reduce((acc, cur) => ({ ...acc, ...cur }), {}),
@@ -142,7 +145,7 @@ export const useTypeOptions = defineStore("typeOptions", {
           .filter(([typeName]) => preservedTypeNames.includes(typeName))
           .reduce((acc, cur) => ({ ...acc, ...cur }), {}),
       });
-      projectStore.updateProject({ artifactTypes: preservedArtifactTypes });
+      projectStore.updateProject({ artifactTypes: preservedTypes });
     },
     /**
      * Determines if the trace link is allowed based on the type of the nodes.

@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { createProject } from "@/util";
+import { createProject, removeMatches } from "@/util";
 import { pinia } from "@/plugins";
 import {
   ArtifactPositions,
@@ -96,15 +96,11 @@ export const useProject = defineStore("project", {
      * @param updatedMembers - The updated members.
      */
     updateMembers(updatedMembers: MembershipModel[]): void {
-      const updatedIds = updatedMembers.map(
-        (member) => member.projectMembershipId
-      );
+      const ids = updatedMembers.map((member) => member.projectMembershipId);
 
       this.updateProject({
         members: [
-          ...this.project.members.filter(
-            (member) => !updatedIds.includes(member.projectMembershipId)
-          ),
+          ...removeMatches(this.project.members, "projectMembershipId", ids),
           ...updatedMembers,
         ],
       });
@@ -116,8 +112,10 @@ export const useProject = defineStore("project", {
      */
     deleteMembers(deletedMembers: string[]): void {
       this.updateProject({
-        members: this.project.members.filter(
-          (member) => !deletedMembers.includes(member.projectMembershipId)
+        members: removeMatches(
+          this.project.members,
+          "projectMembershipId",
+          deletedMembers
         ),
       });
     },

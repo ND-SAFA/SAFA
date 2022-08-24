@@ -83,8 +83,9 @@ export async function handleReloadProject(): Promise<void> {
 }
 
 /**
- * Moves user to the document if one is set by currentDocumentId
+ * Moves user to the document if one is set by currentDocumentId.
  * Otherwise default document would continue to be in view.
+ *
  * @param project The project possibly containing a currentDocumentId.
  */
 async function setCurrentDocument(project: ProjectModel): Promise<void> {

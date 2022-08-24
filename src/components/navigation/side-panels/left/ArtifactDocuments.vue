@@ -22,6 +22,7 @@ import { DocumentModel } from "@/types";
 import { documentTypeOptions } from "@/util";
 import { documentStore, selectionStore } from "@/hooks";
 import { Typography, GenericListItem } from "@/components/common";
+import { handleSwitchDocuments } from "@/api";
 
 /**
  * Displays the selected node's documents.
@@ -53,7 +54,7 @@ export default Vue.extend({
      * @param document - The document to switch to.
      */
     handleSwitchDocument(document: DocumentModel): void {
-      documentStore.switchDocuments(document);
+      handleSwitchDocuments(document);
     },
     /**
      * Converts the document type into a display name.

@@ -21,7 +21,7 @@ class TestTraceArgsBuilder(TestCase):
         self.assertEquals(args.model_generator.model_name.lower(), self.EXPECTED_VALUES["base_model_name"])
         self.assertEquals(args.model_generator.model_path, self.EXPECTED_VALUES["model_path"])
         self.assertEquals(args.output_dir, self.EXPECTED_VALUES["output_path"])
-        for link in self.TEST_POS_LINKS:
+        for link in TEST_POS_LINKS:
             link_id = TraceLink.generate_link_id(link[0], link[1])
             self.assertIn(link_id, args.trace_dataset_creator.pos_link_ids)
 

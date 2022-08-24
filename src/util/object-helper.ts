@@ -79,3 +79,32 @@ export function collectByField<O, K extends keyof O>(
     {}
   );
 }
+
+/**
+ * Converts object entries to an array.
+ *
+ * @param obj - The object to reduce.
+ * @param map - The mapping function to convert an entry into an array.
+ * @return The reduced array of items.
+ */
+export function objectToArray<O, I>(
+  obj: Record<string, O>,
+  map: (entry: [string, O], idx: number) => I[]
+): I[] {
+  return Object.entries(obj)
+    .map(map)
+    .reduce((acc, cur) => [...acc, ...cur], []);
+}
+
+/**
+ * Removes all keys in the object besides those listed.
+ *
+ * @param obj - The object to remove from.
+ * @param keys - The keys to preserve.
+ * @return A new object with only the preserved keys.
+ */
+export function preserveObjectKeys<O>(obj: O, keys: string[]): O {
+  return Object.entries(obj)
+    .filter(([key]) => keys.includes(key))
+    .reduce((acc, cur) => ({ ...acc, ...cur }), {} as O);
+}

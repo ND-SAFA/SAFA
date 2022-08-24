@@ -16,6 +16,7 @@ import {
   defaultTypeIcon,
   getArtifactTypePrintName,
   isLinkAllowedByType,
+  preserveObjectKeys,
   removeMatches,
 } from "@/util";
 import projectStore from "@/hooks/project/useProject";
@@ -134,16 +135,15 @@ export const useTypeOptions = defineStore("typeOptions", {
         "typeId",
         removedTypeIds
       );
-      const preservedTypeNames = preservedTypes.map(({ name }) => name);
+      const names = preservedTypes.map(({ name }) => name);
 
       this.$patch({
         allArtifactTypes: preservedTypes,
-        artifactTypeIcons: Object.entries(this.artifactTypeIcons)
-          .filter(([typeName]) => preservedTypeNames.includes(typeName))
-          .reduce((acc, cur) => ({ ...acc, ...cur }), {}),
-        artifactTypeDirections: Object.entries(this.artifactTypeDirections)
-          .filter(([typeName]) => preservedTypeNames.includes(typeName))
-          .reduce((acc, cur) => ({ ...acc, ...cur }), {}),
+        artifactTypeIcons: preserveObjectKeys(this.artifactTypeIcons, names),
+        artifactTypeDirections: preserveObjectKeys(
+          this.artifactTypeDirections,
+          names
+        ),
       });
       projectStore.updateProject({ artifactTypes: preservedTypes });
     },

@@ -36,9 +36,12 @@
 import Vue from "vue";
 import { ArtifactSearchItem } from "@/types";
 import { typeOptionsStore, artifactStore, selectionStore } from "@/hooks";
-import { GenericArtifactBodyDisplay, Typography } from "@/components/common";
-import { filterArtifacts } from "@/util";
-import FlexBox from "@/components/common/display/FlexBox.vue";
+import {
+  GenericArtifactBodyDisplay,
+  Typography,
+  FlexBox,
+} from "@/components/common";
+import { filterArtifacts, objectToArray } from "@/util";
 
 /**
  * Artifact search bar.
@@ -88,12 +91,13 @@ export default Vue.extend({
      * @return The artifacts to select from.
      */
     artifacts(): ArtifactSearchItem[] {
-      return Object.entries(artifactStore.getArtifactsByType)
-        .map(([type, artifacts]) => [
+      return objectToArray(
+        artifactStore.getArtifactsByType,
+        ([type, artifacts]) => [
           { header: typeOptionsStore.getArtifactTypeDisplay(type) },
           ...artifacts,
-        ])
-        .reduce((acc, cur) => [...acc, ...cur], []);
+        ]
+      );
     },
     value: {
       get() {

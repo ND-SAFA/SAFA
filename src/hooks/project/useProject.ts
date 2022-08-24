@@ -88,7 +88,7 @@ export const useProject = defineStore("project", {
       this.updateProject({ layout });
 
       if (documentStore.currentId === "") {
-        layoutStore.artifactPositions = layout;
+        layoutStore.updatePositions(layout);
       }
     },
     /**
@@ -127,7 +127,6 @@ export const useProject = defineStore("project", {
       this.project = project;
 
       selectionStore.clearSelections();
-      layoutStore.artifactPositions = project.layout;
       typeOptionsStore.initializeTypeIcons(project.artifactTypes);
       documentStore.initializeProject(project);
       subtreeStore.initializeProject(project);

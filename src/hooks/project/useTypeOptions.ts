@@ -62,6 +62,7 @@ export const useTypeOptions = defineStore("typeOptions", {
       this.$patch({
         artifactTypeIcons: createDefaultTypeIcons(allArtifactTypes),
         allArtifactTypes,
+        artifactTypeDirections: {},
       });
     },
     /**

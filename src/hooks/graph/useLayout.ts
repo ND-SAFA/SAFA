@@ -14,10 +14,14 @@ import {
   cyCreateLayout,
   cyResetTim,
   cyResetTree,
+  disableDrawMode,
   TimGraphLayout,
   timTreeCyPromise,
 } from "@/cytoscape";
 import { appStore } from "@/hooks/core";
+import selectionStore from "@/hooks/graph/useSelection";
+import subtreeStore from "@/hooks/project/useSubtree";
+import deltaStore from "@/hooks/project/useDelta";
 
 /**
  * This module handles the layout positions of the graph.
@@ -105,6 +109,33 @@ export const useLayout = defineStore("layout", {
       const payload = { layout, cyPromise: timTreeCyPromise };
 
       this.setGraphLayout(payload);
+    },
+    /**
+     * Resets the layout of the graph.
+     */
+    async resetLayout(): Promise<void> {
+      appStore.onLoadStart();
+
+      disableDrawMode();
+      subtreeStore.resetHiddenNodes();
+      selectionStore.clearSelections();
+      deltaStore.clear();
+      appStore.closeSidePanels();
+
+      setTimeout(() => {
+        this.setArtifactTreeLayout();
+        appStore.onLoadEnd();
+      }, 200);
+    },
+    /**
+     * Updates artifact positions and resets the layout.
+     *
+     * @param positions - The new positions to set.
+     */
+    async updatePositions(positions: ArtifactPositions): Promise<void> {
+      this.artifactPositions = positions;
+
+      await this.resetLayout();
     },
   },
 });

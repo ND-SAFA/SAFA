@@ -12,7 +12,6 @@ import {
   getDocuments,
   setCurrentDocument,
   clearCurrentDocument,
-  handleResetGraph,
 } from "@/api";
 
 /**
@@ -257,6 +256,4 @@ export async function handleSwitchDocuments(
   } else {
     await clearCurrentDocument();
   }
-
-  await handleResetGraph();
 }

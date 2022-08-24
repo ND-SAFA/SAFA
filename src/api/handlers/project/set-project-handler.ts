@@ -1,42 +1,13 @@
 import { ProjectModel } from "@/types";
 import { createProject } from "@/util";
 import { QueryParams, removeParams, updateParam } from "@/router";
-import {
-  appStore,
-  layoutStore,
-  typeOptionsStore,
-  documentStore,
-  deltaStore,
-  subtreeStore,
-  projectStore,
-  selectionStore,
-} from "@/hooks";
+import { documentStore, subtreeStore, projectStore } from "@/hooks";
 import {
   handleLoadTraceMatrices,
   handleLoadVersion,
   handleSelectVersion,
 } from "@/api";
-import { disableDrawMode } from "@/cytoscape";
 import { getProjectArtifactTypes } from "@/api/endpoints";
-
-/**
- * Resets graph state when some or all of a project gets reloaded.
- *
- * @param isDifferentProject - If true, all nodes will be unhidden and the viewport will be reset.
- */
-export async function handleResetGraph(
-  isDifferentProject = true
-): Promise<void> {
-  if (isDifferentProject) {
-    await subtreeStore.resetHiddenNodes();
-    await layoutStore.setArtifactTreeLayout();
-  }
-
-  disableDrawMode();
-  selectionStore.clearSelections();
-  deltaStore.clear();
-  appStore.closeSidePanels();
-}
 
 /**
  * Clears project store data.
@@ -45,8 +16,6 @@ export async function handleClearProject(): Promise<void> {
   const project = createProject();
 
   projectStore.initializeProject(project);
-  await handleResetGraph();
-  typeOptionsStore.$reset();
   subtreeStore.$reset();
   await removeParams();
 }
@@ -59,13 +28,11 @@ export async function handleClearProject(): Promise<void> {
 export async function handleSetProject(project: ProjectModel): Promise<void> {
   const projectId = project.projectId;
   const versionId = project.projectVersion?.versionId || "";
-  const isDifferentProject = projectStore.versionId !== versionId;
 
   project.artifactTypes = await getProjectArtifactTypes(projectId);
   projectStore.initializeProject(project);
 
   await handleSelectVersion(projectId, versionId);
-  await handleResetGraph(isDifferentProject);
   await handleLoadTraceMatrices();
   await setCurrentDocument(project);
   await updateParam(QueryParams.VERSION, versionId);

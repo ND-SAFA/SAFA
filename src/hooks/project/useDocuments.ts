@@ -94,6 +94,7 @@ export const useDocuments = defineStore("documents", {
         traces,
         currentDocumentId = this.currentDocument.documentId,
         documents = [],
+        layout,
       } = project;
 
       const defaultDocument = createDocument({
@@ -115,6 +116,9 @@ export const useDocuments = defineStore("documents", {
 
       artifactStore.initializeArtifacts({ artifacts, currentArtifactIds });
       traceStore.initializeTraces({ traces, currentArtifactIds });
+      layoutStore.updatePositions(
+        loadedDocument.documentId ? loadedDocument.layout : layout
+      );
     },
     /**
      * Updates matching documents.
@@ -149,9 +153,9 @@ export const useDocuments = defineStore("documents", {
       traceStore.initializeTraces({ currentArtifactIds });
 
       if (document.documentId !== "") {
-        layoutStore.artifactPositions = document.layout;
+        layoutStore.updatePositions(document.layout);
       } else {
-        layoutStore.artifactPositions = projectStore.project.layout;
+        layoutStore.updatePositions(projectStore.project.layout);
       }
     },
     /**

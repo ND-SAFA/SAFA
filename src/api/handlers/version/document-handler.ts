@@ -37,6 +37,7 @@ export async function handleCreateDocument(
     })
   );
 
+  await setCurrentDocument(createdDocument.documentId);
   await documentStore.addDocument(createdDocument);
 }
 

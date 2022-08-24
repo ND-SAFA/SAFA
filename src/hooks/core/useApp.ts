@@ -18,6 +18,10 @@ export const useApp = defineStore("app", {
      */
     isSaving: false,
     /**
+     * Whether the app is currently saving.
+     */
+    runUpdate: undefined as (() => Promise<void>) | undefined,
+    /**
      * The open state for each type of panel.
      */
     isOpen: {
@@ -181,6 +185,19 @@ export const useApp = defineStore("app", {
      */
     closeArtifactCreator(): void {
       this.closePanel(PanelType.artifactCreator);
+    },
+    /**
+     * Runs any pending changes to the app.
+     */
+    async loadAppChanges(): Promise<void> {
+      try {
+        this.onLoadStart();
+
+        this.runUpdate?.();
+      } finally {
+        this.runUpdate = undefined;
+        this.onLoadEnd();
+      }
     },
   },
 });

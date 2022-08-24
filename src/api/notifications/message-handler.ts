@@ -6,7 +6,7 @@ import {
   ChangeMessageModel,
   ProjectModel,
 } from "@/types";
-import { getChanges } from "@/api/endpoints/sync-api";
+import { getChanges } from "@/api/endpoints";
 import {
   handleClearProject,
   handleLoadVersion,
@@ -14,6 +14,7 @@ import {
   handleReloadWarnings,
 } from "@/api";
 import {
+  appStore,
   artifactStore,
   documentStore,
   jobStore,
@@ -35,19 +36,21 @@ export async function handleEntityChangeMessage(
   const message: ChangeMessageModel = JSON.parse(frame.body);
   const project = await getChanges(versionId, message);
 
-  // Step - Iterate through message and delete entities.
-  for (const change of message.changes) {
-    if (change.action === ActionType.DELETE) {
-      await handleDeleteChange(change);
-    } else {
-      await handleUpdateChange(change, project);
+  appStore.runUpdate = async () => {
+    // Step - Iterate through message and delete entities.
+    for (const change of message.changes) {
+      if (change.action === ActionType.DELETE) {
+        await handleDeleteChange(change);
+      } else {
+        await handleUpdateChange(change, project);
+      }
     }
-  }
 
-  // Step - Update default layout.
-  if (message.updateLayout) {
-    projectStore.updateLayout(project.layout);
-  }
+    // Step - Update default layout.
+    if (message.updateLayout) {
+      projectStore.updateLayout(project.layout);
+    }
+  };
 }
 
 /**
@@ -107,7 +110,7 @@ async function handleDeleteChange(change: ChangeModel) {
  * @param project - The updated project.
  */
 async function handleUpdateChange(change: ChangeModel, project: ProjectModel) {
-  const versionId = project.projectVersion?.versionId || "";
+  const versionId = projectStore.versionId;
 
   switch (change.entity) {
     case EntityType.PROJECT:
@@ -120,8 +123,6 @@ async function handleUpdateChange(change: ChangeModel, project: ProjectModel) {
       projectStore.updateMembers(project.members);
       break;
     case EntityType.VERSION:
-      if (versionId !== projectStore.versionId) return;
-
       return handleLoadVersion(versionId);
     case EntityType.TYPES:
       typeOptionsStore.addOrUpdateArtifactTypes(project.artifactTypes);

@@ -60,6 +60,12 @@ export const useDocuments = defineStore("documents", {
       return this.currentDocument.type;
     },
     /**
+     * @return The current artifact ids.
+     */
+    currentArtifactIds(): string[] {
+      return this.currentDocument.artifactIds;
+    },
+    /**
      * @return Whether the current document type is for editing a table.
      */
     isEditableTableDocument(): boolean {
@@ -167,6 +173,19 @@ export const useDocuments = defineStore("documents", {
       this.allDocuments = [...this.allDocuments, document];
 
       await this.switchDocuments(document);
+    },
+    /**
+     * Adds artifacts to the current document.
+     *
+     * @param newIds - The new artifacts to add.
+     */
+    addDocumentArtifacts(newIds: string[]): void {
+      this.currentDocument.artifactIds = [
+        ...this.currentDocument.artifactIds.filter(
+          (id) => !newIds.includes(id)
+        ),
+        ...newIds,
+      ];
     },
     /**
      * Removes an existing document.

@@ -72,9 +72,10 @@ export const useArtifacts = defineStore("artifacts", {
         ...newArtifacts,
       ];
 
+      documentStore.addDocumentArtifacts(newIds);
       this.initializeArtifacts({
         artifacts: updatedArtifacts,
-        currentArtifactIds: documentStore.currentDocument.artifactIds,
+        currentArtifactIds: documentStore.currentArtifactIds,
       });
       projectStore.updateProject({
         artifacts: updatedArtifacts,

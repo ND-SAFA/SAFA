@@ -4,8 +4,24 @@ import {
   MembershipModel,
   ProjectRole,
 } from "@/types";
-import { logStore } from "@/hooks";
-import { deleteProjectMember, saveProjectMember } from "@/api";
+import { logStore, projectStore } from "@/hooks";
+import {
+  deleteProjectMember,
+  getProjectMembers,
+  saveProjectMember,
+} from "@/api";
+
+/**
+ * Returns the current project's members.
+ */
+export function handleGetMembers(): Promise<MembershipModel[]> {
+  return getProjectMembers(projectStore.projectId).catch((e) => {
+    logStore.onSuccess(`Unable to get members`);
+    logStore.onDevError(e.message);
+
+    return [];
+  });
+}
 
 /**
  * Adds a user to a project and logs the status.

@@ -107,6 +107,27 @@ export const useTypeOptions = defineStore("typeOptions", {
       });
     },
     /**
+     * Removes artifact types.
+     *
+     * @param artifactTypeIds - The artifact type ids to remove.
+     */
+    removeArtifactTypes(artifactTypeIds: string[]): void {
+      const removedArtifactTypes = this.allArtifactTypes.filter(({ typeId }) =>
+        artifactTypeIds.includes(typeId || "")
+      );
+      const removedTypeNames = removedArtifactTypes.map(({ typeId }) => typeId);
+
+      this.$patch({
+        allArtifactTypes: removedArtifactTypes,
+        artifactTypeIcons: Object.entries(this.artifactTypeIcons)
+          .filter(([typeName]) => !removedTypeNames.includes(typeName))
+          .reduce((acc, cur) => ({ ...acc, ...cur }), {}),
+        artifactTypeDirections: Object.entries(this.artifactTypeDirections)
+          .filter(([typeName]) => !removedTypeNames.includes(typeName))
+          .reduce((acc, cur) => ({ ...acc, ...cur }), {}),
+      });
+    },
+    /**
      * Determines if the trace link is allowed based on the type of the nodes.
      *
      * @param source - The source artifact.

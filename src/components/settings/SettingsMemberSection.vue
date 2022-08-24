@@ -43,7 +43,7 @@
 import Vue, { PropType } from "vue";
 import { ProjectModel, MembershipModel, ProjectRole } from "@/types";
 import { sessionStore } from "@/hooks";
-import { getProjectMembers, handleDeleteMember } from "@/api";
+import { handleDeleteMember, handleGetMembers } from "@/api";
 import { GenericSelector, Typography } from "@/components/common";
 import SettingsMemberInformationModal from "./SettingsMemberInformationModal.vue";
 
@@ -95,23 +95,16 @@ export default Vue.extend({
     members() {
       return this.project.members;
     },
-    /**
-     * @return Whether the project has a description.
-     */
-    hasDescription(): boolean {
-      return this.project.description !== "";
-    },
   },
   methods: {
     /**
      * Loads the project's members.
      */
     async handleRetrieveMembers(): Promise<void> {
-      if (this.project.projectId !== "") {
-        this.isLoading = true;
-        this.project.members = await getProjectMembers(this.project.projectId);
-        this.isLoading = false;
-      }
+      if (this.project.projectId === "") return;
+
+      this.isLoading = true;
+      handleGetMembers().then(() => (this.isLoading = false));
     },
     /**
      * Opens the add member modal.

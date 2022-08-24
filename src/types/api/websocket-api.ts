@@ -81,6 +81,7 @@ export enum EntityType {
   TRACES = "TRACES",
   WARNINGS = "WARNINGS",
   JOBS = "JOBS",
+  LAYOUT = "LAYOUT",
 }
 
 /**

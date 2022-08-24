@@ -4,6 +4,7 @@ import { pinia } from "@/plugins";
 import {
   ArtifactModel,
   ArtifactTypeModel,
+  MembershipModel,
   ProjectModel,
   TraceLinkModel,
   VersionModel,
@@ -82,6 +83,37 @@ export const useProject = defineStore("project", {
       };
     },
     /**
+     * Updates the current project members.
+     *
+     * @param updatedMembers - The updated members.
+     */
+    updateMembers(updatedMembers: MembershipModel[]): void {
+      const updatedIds = updatedMembers.map(
+        (member) => member.projectMembershipId
+      );
+
+      this.updateProject({
+        members: [
+          ...this.project.members.filter(
+            (member) => !updatedIds.includes(member.projectMembershipId)
+          ),
+          ...updatedMembers,
+        ],
+      });
+    },
+    /**
+     * Deletes from the current project members.
+     *
+     * @param deletedMembers - The member ids to delete.
+     */
+    deleteMembers(deletedMembers: string[]): void {
+      this.updateProject({
+        members: this.project.members.filter(
+          (member) => !deletedMembers.includes(member.projectMembershipId)
+        ),
+      });
+    },
+    /**
      * Initializes the current project.
      */
     initializeProject(project: ProjectModel): void {
@@ -119,20 +151,22 @@ export const useProject = defineStore("project", {
     /**
      * Deletes the given artifacts.
      *
-     * @param artifacts - The artifacts to delete.
+     * @param artifacts - The artifacts, or ids, to delete.
      */
-    deleteArtifacts(artifacts: ArtifactModel[]): void {
+    deleteArtifacts(artifacts: ArtifactModel[] | string[]): void {
       if (artifacts.length === 0) return;
 
-      const deletedNames = artifacts.map(({ name }) => name);
+      const deletedIds = artifacts.map((artifact) =>
+        typeof artifact === "string" ? artifact : artifact.id
+      );
 
       this.updateProject({
         artifacts: this.project.artifacts.filter(
-          ({ name }) => !deletedNames.includes(name)
+          ({ id }) => !deletedIds.includes(id)
         ),
       });
 
-      artifactStore.deleteArtifacts(artifacts);
+      artifactStore.deleteArtifacts(deletedIds);
       subtreeStore.updateSubtreeMap();
     },
     /**
@@ -161,12 +195,16 @@ export const useProject = defineStore("project", {
     /**
      * Deletes the given trace link.
      *
-     * @param traceLinks - The trace link to remove.
+     * @param traceLinks - The trace links, or ids, to remove.
      */
-    async deleteTraceLinks(traceLinks: TraceLinkModel[]): Promise<void> {
+    async deleteTraceLinks(
+      traceLinks: TraceLinkModel[] | string[]
+    ): Promise<void> {
       if (traceLinks.length === 0) return;
 
-      const deletedIds = traceLinks.map(({ traceLinkId }) => traceLinkId);
+      const deletedIds = traceLinks.map((trace) =>
+        typeof trace === "string" ? trace : trace.traceLinkId
+      );
 
       this.updateProject({
         traces: this.project.traces.filter(
@@ -174,26 +212,24 @@ export const useProject = defineStore("project", {
         ),
       });
 
-      traceStore.deleteTraceLinks(traceLinks);
+      traceStore.deleteTraceLinks(deletedIds);
       subtreeStore.updateSubtreeMap();
       layoutStore.applyAutomove();
     },
     /**
      * Adds a new artifact type.
      *
-     * @param artifactType - The artifact type to add.
+     * @param artifactTypes - The artifact types to add.
      */
-    addOrUpdateArtifactType(artifactType: ArtifactTypeModel): void {
+    addOrUpdateArtifactTypes(artifactTypes: ArtifactTypeModel[]): void {
+      const updatedIds = artifactTypes.map(({ typeId }) => typeId);
       const unaffectedTypes = this.project.artifactTypes.filter(
-        (a) => a.typeId !== artifactType.typeId
+        ({ typeId }) => !updatedIds.includes(typeId)
       );
-      const allArtifactTypes = [...unaffectedTypes, artifactType];
+      const allArtifactTypes = [...unaffectedTypes, ...artifactTypes];
 
-      this.updateProject({
-        artifactTypes: allArtifactTypes,
-      });
-
-      typeOptionsStore.allArtifactTypes = allArtifactTypes;
+      this.updateProject({ artifactTypes: allArtifactTypes });
+      typeOptionsStore.initializeTypeIcons(allArtifactTypes);
     },
     /**
      * Runs the callback only if the project is defined. Otherwise logs a warning.

@@ -56,10 +56,9 @@ export const useTraces = defineStore("traces", {
      * DO NOT CALL THIS OUTSIDE OF THE STORES.
      * Deletes the given trace links.
      *
-     * @param traceLinks - The trace links to remove.
+     * @param deletedIds - The trace link ids to remove.
      */
-    async deleteTraceLinks(traceLinks: TraceLinkModel[]): Promise<void> {
-      const deletedIds = traceLinks.map(({ traceLinkId }) => traceLinkId);
+    async deleteTraceLinks(deletedIds: string[]): Promise<void> {
       const removeLink = (currentTraces: TraceLinkModel[]) =>
         currentTraces.filter(
           ({ traceLinkId }) => !deletedIds.includes(traceLinkId)

@@ -165,16 +165,19 @@ export const useDocuments = defineStore("documents", {
     /**
      * Removes an existing document.
      *
-     * @param document - The document to delete.
+     * @param document - The document, or document id, to delete.
      */
-    async removeDocument(document: DocumentModel): Promise<void> {
+    async removeDocument(document: string | DocumentModel): Promise<void> {
+      const deleteDocumentId =
+        typeof document === "string" ? document : document.documentId;
+
       const remainingDocuments = this.allDocuments.filter(
-        ({ documentId }) => documentId !== document.documentId
+        ({ documentId }) => documentId !== deleteDocumentId
       );
 
       this.allDocuments = remainingDocuments;
 
-      if (this.currentDocument.documentId !== document.documentId) return;
+      if (this.currentDocument.documentId !== deleteDocumentId) return;
 
       await this.switchDocuments(remainingDocuments[0] || this.baseDocument);
     },

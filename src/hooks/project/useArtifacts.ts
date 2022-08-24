@@ -60,12 +60,11 @@ export const useArtifacts = defineStore("artifacts", {
      * DO NOT CALL THIS OUTSIDE OF THE STORES.
      * Deletes the artifacts with the given names.
      *
-     * @param artifacts - The artifacts to delete.
+     * @param deletedIds - The artifacts ids to delete.
      */
-    deleteArtifacts(artifacts: ArtifactModel[]): void {
-      const deletedNames = artifacts.map(({ name }) => name);
+    deleteArtifacts(deletedIds: string[]): void {
       const removeArtifact = (currentArtifacts: ArtifactModel[]) =>
-        currentArtifacts.filter(({ name }) => !deletedNames.includes(name));
+        currentArtifacts.filter(({ id }) => !deletedIds.includes(id));
 
       this.$patch({
         allArtifacts: removeArtifact(this.allArtifacts),

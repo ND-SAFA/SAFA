@@ -15,7 +15,7 @@ export async function handleSaveArtifactType(
     artifactType
   );
 
-  projectStore.addOrUpdateArtifactType(updatedArtifactType);
+  projectStore.addOrUpdateArtifactTypes([updatedArtifactType]);
 }
 
 /**

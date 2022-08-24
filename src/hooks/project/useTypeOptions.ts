@@ -2,7 +2,6 @@ import { defineStore } from "pinia";
 
 import { pinia } from "@/plugins";
 import {
-  allowedSafetyCaseTypes,
   ArtifactData,
   ArtifactModel,
   ArtifactTypeDirections,
@@ -16,6 +15,9 @@ import {
   createDefaultTypeIcons,
   defaultTypeIcon,
   getArtifactTypePrintName,
+  isLinkAllowedByType,
+  preserveObjectKeys,
+  removeMatches,
 } from "@/util";
 import projectStore from "@/hooks/project/useProject";
 
@@ -92,11 +94,11 @@ export const useTypeOptions = defineStore("typeOptions", {
      * @param artifactTypes - The artifact types to add.
      */
     addOrUpdateArtifactTypes(artifactTypes: ArtifactTypeModel[]): void {
-      const updatedIds = artifactTypes.map(({ typeId }) => typeId);
-      const unaffectedTypes = this.allArtifactTypes.filter(
-        ({ typeId }) => !updatedIds.includes(typeId)
-      );
-      const allArtifactTypes = [...unaffectedTypes, ...artifactTypes];
+      const ids = artifactTypes.map(({ typeId }) => typeId);
+      const allArtifactTypes = [
+        ...removeMatches(this.allArtifactTypes, "typeId", ids),
+        ...artifactTypes,
+      ];
 
       this.initializeTypeIcons(allArtifactTypes);
       projectStore.updateProject({ artifactTypes: allArtifactTypes });
@@ -128,21 +130,22 @@ export const useTypeOptions = defineStore("typeOptions", {
      * @param removedTypeIds - The artifact type ids to remove.
      */
     removeArtifactTypes(removedTypeIds: string[]): void {
-      const preservedArtifactTypes = this.allArtifactTypes.filter(
-        ({ typeId }) => !removedTypeIds.includes(typeId || "")
+      const preservedTypes = removeMatches(
+        this.allArtifactTypes,
+        "typeId",
+        removedTypeIds
       );
-      const preservedTypeNames = preservedArtifactTypes.map(({ name }) => name);
+      const names = preservedTypes.map(({ name }) => name);
 
       this.$patch({
-        allArtifactTypes: preservedArtifactTypes,
-        artifactTypeIcons: Object.entries(this.artifactTypeIcons)
-          .filter(([typeName]) => preservedTypeNames.includes(typeName))
-          .reduce((acc, cur) => ({ ...acc, ...cur }), {}),
-        artifactTypeDirections: Object.entries(this.artifactTypeDirections)
-          .filter(([typeName]) => preservedTypeNames.includes(typeName))
-          .reduce((acc, cur) => ({ ...acc, ...cur }), {}),
+        allArtifactTypes: preservedTypes,
+        artifactTypeIcons: preserveObjectKeys(this.artifactTypeIcons, names),
+        artifactTypeDirections: preserveObjectKeys(
+          this.artifactTypeDirections,
+          names
+        ),
       });
-      projectStore.updateProject({ artifactTypes: preservedArtifactTypes });
+      projectStore.updateProject({ artifactTypes: preservedTypes });
     },
     /**
      * Determines if the trace link is allowed based on the type of the nodes.
@@ -155,29 +158,7 @@ export const useTypeOptions = defineStore("typeOptions", {
       source: ArtifactModel | ArtifactData,
       target: ArtifactModel | ArtifactData
     ): boolean {
-      const sourceType =
-        "artifactType" in source ? source.artifactType : source.type;
-      const targetType =
-        "artifactType" in target ? target.artifactType : target.type;
-      const isSourceDefaultArtifact =
-        !source.safetyCaseType && !source.logicType;
-      const isTargetDefaultArtifact =
-        !target.safetyCaseType && !target.logicType;
-
-      if (isSourceDefaultArtifact) {
-        return !this.artifactTypeDirections[targetType]?.includes(sourceType);
-      } else if (source.safetyCaseType) {
-        if (isTargetDefaultArtifact) return true;
-        if (target.logicType || !target.safetyCaseType) return false;
-
-        return allowedSafetyCaseTypes[source.safetyCaseType].includes(
-          target.safetyCaseType
-        );
-      } else if (source.logicType) {
-        return isTargetDefaultArtifact;
-      }
-
-      return false;
+      return isLinkAllowedByType(source, target, this.artifactTypeDirections);
     },
     /**
      * Returns the display name for the given type.

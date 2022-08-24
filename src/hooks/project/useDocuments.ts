@@ -7,8 +7,7 @@ import {
   DocumentType,
   ProjectModel,
 } from "@/types";
-import { createDocument, isTableDocument } from "@/util";
-import { handleResetGraph, handleUpdateCurrentDocument } from "@/api";
+import { createDocument, isTableDocument, removeMatches } from "@/util";
 import layoutStore from "../graph/useLayout";
 import projectStore from "./useProject";
 import traceStore from "./useTraces";
@@ -122,10 +121,10 @@ export const useDocuments = defineStore("documents", {
      * @param updatedDocuments - The updated documents.
      */
     async updateDocuments(updatedDocuments: DocumentModel[]): Promise<void> {
-      const updatedDocumentIds = updatedDocuments.map((d) => d.documentId);
+      const updatedIds = updatedDocuments.map((d) => d.documentId);
       const currentDocument =
         updatedDocuments.find(
-          ({ documentId }) => documentId === this.currentDocument.documentId
+          ({ documentId }) => documentId === this.currentId
         ) || this.currentDocument;
 
       if (currentDocument !== this.currentDocument) {
@@ -135,9 +134,7 @@ export const useDocuments = defineStore("documents", {
 
       this.$patch({
         allDocuments: [
-          ...this.allDocuments.filter(
-            ({ documentId }) => !updatedDocumentIds.includes(documentId)
-          ),
+          ...removeMatches(this.allDocuments, "documentId", updatedIds),
           ...updatedDocuments,
         ],
         currentDocument,
@@ -152,7 +149,6 @@ export const useDocuments = defineStore("documents", {
       const currentArtifactIds = document.artifactIds;
 
       this.currentDocument = document;
-      await handleUpdateCurrentDocument(document);
       artifactStore.initializeArtifacts({ currentArtifactIds });
       traceStore.initializeTraces({ currentArtifactIds });
 
@@ -161,8 +157,6 @@ export const useDocuments = defineStore("documents", {
       } else {
         layoutStore.artifactPositions = projectStore.project.layout;
       }
-
-      await handleResetGraph();
     },
     /**
      * Adds a new document.

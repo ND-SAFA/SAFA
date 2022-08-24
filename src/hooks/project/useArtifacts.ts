@@ -6,6 +6,13 @@ import documentStore from "@/hooks/project/useDocuments";
 import typeOptionsStore from "@/hooks/project/useTypeOptions";
 import subtreeStore from "@/hooks/project/useSubtree";
 import projectStore from "@/hooks/project/useProject";
+import {
+  standardizeValueArray,
+  flattenArtifact,
+  preserveMatches,
+  removeMatches,
+  collectByField,
+} from "@/util";
 
 /**
  * This module defines the state of the current project's artifacts.
@@ -20,29 +27,13 @@ export const useArtifacts = defineStore("artifacts", {
      * @return The flattened artifacts for the current document.
      */
     flatArtifacts(): FlatArtifact[] {
-      return this.currentArtifacts.map(
-        ({ customFields, ...artifact }) =>
-          ({
-            ...artifact,
-            ...customFields,
-          } as FlatArtifact)
-      );
+      return this.currentArtifacts.map(flattenArtifact);
     },
     /**
      * @return A collection of current artifact lists, keyed by their type.
      */
     getArtifactsByType(): Record<string, ArtifactModel[]> {
-      const artifactsByType: Record<string, ArtifactModel[]> = {};
-
-      this.currentArtifacts.forEach((artifact) => {
-        if (!artifactsByType[artifact.type]) {
-          artifactsByType[artifact.type] = [];
-        }
-
-        artifactsByType[artifact.type].push(artifact);
-      });
-
-      return artifactsByType;
+      return collectByField(this.currentArtifacts, "type");
     },
   },
   actions: {
@@ -56,7 +47,7 @@ export const useArtifacts = defineStore("artifacts", {
       this.$patch({
         allArtifacts: artifacts,
         currentArtifacts: currentArtifactIds
-          ? artifacts.filter(({ id }) => currentArtifactIds.includes(id))
+          ? preserveMatches(artifacts, "id", currentArtifactIds)
           : artifacts,
       });
     },
@@ -68,7 +59,7 @@ export const useArtifacts = defineStore("artifacts", {
     addOrUpdateArtifacts(newArtifacts: ArtifactModel[]): void {
       const newIds = newArtifacts.map(({ id }) => id);
       const updatedArtifacts = [
-        ...this.allArtifacts.filter(({ id }) => !newIds.includes(id)),
+        ...removeMatches(this.allArtifacts, "id", newIds),
         ...newArtifacts,
       ];
 
@@ -91,16 +82,12 @@ export const useArtifacts = defineStore("artifacts", {
     deleteArtifacts(deletedArtifacts: ArtifactModel[] | string[]): void {
       if (deletedArtifacts.length === 0) return;
 
-      const deletedIds = deletedArtifacts.map((artifact) =>
-        typeof artifact === "string" ? artifact : artifact.id
-      );
-      const removeArtifacts = (currentArtifacts: ArtifactModel[]) =>
-        currentArtifacts.filter(({ id }) => !deletedIds.includes(id));
-      const allArtifacts = removeArtifacts(this.allArtifacts);
+      const ids = standardizeValueArray(deletedArtifacts, "id");
+      const allArtifacts = removeMatches(this.allArtifacts, "id", ids);
 
       this.$patch({
         allArtifacts,
-        currentArtifacts: removeArtifacts(this.currentArtifacts),
+        currentArtifacts: removeMatches(this.currentArtifacts, "id", ids),
       });
       projectStore.updateProject({ artifacts: allArtifacts });
       subtreeStore.updateSubtreeMap();

@@ -12,6 +12,7 @@ import {
   getDocuments,
   setCurrentDocument,
   clearCurrentDocument,
+  handleResetGraph,
 } from "@/api";
 
 /**
@@ -246,16 +247,20 @@ export function handleColumnDelete(
 }
 
 /**
- * Updates the currently saved document.
+ * Switches documents and updates the currently saved document.
  *
  * @param document - The current document.
  */
-export async function handleUpdateCurrentDocument(
+export async function handleSwitchDocuments(
   document: DocumentModel
 ): Promise<void> {
+  documentStore.switchDocuments(document);
+
   if (document.documentId) {
     await setCurrentDocument(document.documentId);
   } else {
     await clearCurrentDocument();
   }
+
+  await handleResetGraph();
 }

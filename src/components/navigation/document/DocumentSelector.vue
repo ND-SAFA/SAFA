@@ -58,6 +58,7 @@ import Vue from "vue";
 import { DocumentModel } from "@/types";
 import { documentStore } from "@/hooks";
 import { GenericIconButton, FlexBox } from "@/components/common";
+import { handleSwitchDocuments } from "@/api";
 import DocumentModal from "./DocumentModal.vue";
 
 export default Vue.extend({
@@ -102,7 +103,7 @@ export default Vue.extend({
         const document = this.items.find(({ name }) => documentName === name);
 
         if (document) {
-          documentStore.switchDocuments(document);
+          handleSwitchDocuments(document);
         }
       },
     },

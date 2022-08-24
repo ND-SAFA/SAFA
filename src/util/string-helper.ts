@@ -1,3 +1,5 @@
+import { VersionModel } from "@/types";
+
 /**
  * Returns given string with newlines inserted after maxWordCount
  * has been reached.
@@ -127,4 +129,18 @@ export function timestampToDisplay(timestamp: string): string {
     hour: "numeric",
     minute: "numeric",
   });
+}
+
+/**
+ * Stringifies the version number.
+ *
+ * @param currentVersion - The current version number.
+ *
+ * @return The stringified version number.
+ */
+export function versionToString(currentVersion?: VersionModel): string {
+  if (currentVersion === undefined) {
+    return "X.X.X";
+  }
+  return `${currentVersion.majorVersion}.${currentVersion.minorVersion}.${currentVersion.revision}`;
 }

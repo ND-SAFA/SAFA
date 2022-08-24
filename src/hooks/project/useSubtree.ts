@@ -132,13 +132,13 @@ export const useSubtree = defineStore("subtrees", {
     async showSubtree(rootId: string): Promise<void> {
       const subtreeNodes = this.subtreeMap[rootId];
       const hiddenSubtreeNodes = this.hiddenSubtreeNodes.filter(
-        (n) => !subtreeNodes.includes(n)
+        (id) => !subtreeNodes.includes(id)
       );
 
       this.$patch({
         hiddenSubtreeNodes,
         collapsedParentNodes: this.collapsedParentNodes.filter(
-          (n) => n !== rootId
+          (id) => id !== rootId
         ),
         subtreeLinks: this.subtreeLinks.filter(
           (link) =>

@@ -1,4 +1,11 @@
-import { LinkModel } from "@/types";
+import {
+  allowedSafetyCaseTypes,
+  ArtifactData,
+  ArtifactModel,
+  ArtifactTypeDirections,
+  LinkModel,
+  TraceLinkModel,
+} from "@/types";
 
 /**
  * Returns the trace ID made from the given source and target IDs.
@@ -19,4 +26,60 @@ export function getTraceId(source: string, target: string): string {
  */
 export function extractTraceId(traceLink: LinkModel): string {
   return `${traceLink.sourceName}-${traceLink.targetName}`;
+}
+
+/**
+ * Creates a predicate for matching a trace.
+ *
+ * @param sourceId - The source to match.
+ * @param targetId - The target to match.
+ * @param ignoreDirection - If true, will match traces in both directions.
+ * @return A predicate for finding matching links.
+ */
+export function matchTrace(
+  sourceId: string,
+  targetId: string,
+  ignoreDirection = false
+) {
+  return (trace: TraceLinkModel): boolean =>
+    ignoreDirection
+      ? (trace.sourceId === sourceId && trace.targetId === targetId) ||
+        (trace.targetId === sourceId && trace.sourceId === targetId)
+      : trace.sourceId === sourceId && trace.targetId === targetId;
+}
+
+/**
+ * Determines if the trace link is allowed based on the type of the nodes.
+ *
+ * @param source - The source artifact.
+ * @param target - The target artifact.
+ * @param artifactTypeDirections - The allowed directions of traces.
+ * @return Whether the link is allowed.
+ */
+export function isLinkAllowedByType(
+  source: ArtifactModel | ArtifactData,
+  target: ArtifactModel | ArtifactData,
+  artifactTypeDirections: ArtifactTypeDirections
+): boolean {
+  const sourceType =
+    "artifactType" in source ? source.artifactType : source.type;
+  const targetType =
+    "artifactType" in target ? target.artifactType : target.type;
+  const isSourceDefaultArtifact = !source.safetyCaseType && !source.logicType;
+  const isTargetDefaultArtifact = !target.safetyCaseType && !target.logicType;
+
+  if (isSourceDefaultArtifact) {
+    return !artifactTypeDirections[targetType]?.includes(sourceType);
+  } else if (source.safetyCaseType) {
+    if (isTargetDefaultArtifact) return true;
+    if (target.logicType || !target.safetyCaseType) return false;
+
+    return allowedSafetyCaseTypes[source.safetyCaseType].includes(
+      target.safetyCaseType
+    );
+  } else if (source.logicType) {
+    return isTargetDefaultArtifact;
+  }
+
+  return false;
 }

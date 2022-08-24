@@ -13,6 +13,7 @@ import subtreeStore from "@/hooks/project/useSubtree";
 import layoutStore from "@/hooks/graph/useLayout";
 import projectStore from "@/hooks/project/useProject";
 import typeOptionsStore from "@/hooks/project/useTypeOptions";
+import { matchTrace, removeMatches, standardizeValueArray } from "@/util";
 
 /**
  * This module defines the state of the current project's trace links.
@@ -64,9 +65,7 @@ export const useTraces = defineStore("traces", {
     addOrUpdateTraceLinks(newTraces: TraceLinkModel[]): void {
       const newIds = newTraces.map(({ traceLinkId }) => traceLinkId);
       const updatedTraces = [
-        ...this.allTraces.filter(
-          ({ traceLinkId }) => !newIds.includes(traceLinkId)
-        ),
+        ...removeMatches(this.allTraces, "traceLinkId", newIds),
         ...newTraces,
       ];
 
@@ -88,18 +87,12 @@ export const useTraces = defineStore("traces", {
     ): Promise<void> {
       if (deletedTraces.length === 0) return;
 
-      const deletedIds = deletedTraces.map((trace) =>
-        typeof trace === "string" ? trace : trace.traceLinkId
-      );
-      const removeTraces = (currentTraces: TraceLinkModel[]) =>
-        currentTraces.filter(
-          ({ traceLinkId }) => !deletedIds.includes(traceLinkId)
-        );
-      const allTraces = removeTraces(this.allTraces);
+      const ids = standardizeValueArray(deletedTraces, "traceLinkId");
+      const allTraces = removeMatches(this.allTraces, "traceLinkId", ids);
 
       this.$patch({
         allTraces,
-        currentTraces: removeTraces(this.currentTraces),
+        currentTraces: removeMatches(this.currentTraces, "traceLinkId", ids),
       });
       projectStore.updateProject({ traces: allTraces });
       subtreeStore.updateSubtreeMap();
@@ -116,9 +109,7 @@ export const useTraces = defineStore("traces", {
       sourceId: string,
       targetId: string
     ): TraceLinkModel | undefined {
-      return this.allTraces.find(
-        (trace) => trace.sourceId === sourceId && trace.targetId === targetId
-      );
+      return this.allTraces.find(matchTrace(sourceId, targetId));
     },
     /**
      * Returns whether the link exists.
@@ -127,15 +118,8 @@ export const useTraces = defineStore("traces", {
      * @param targetId - The target artifact id.
      * @return Whether a link exists.
      */
-    doesLinkExist(
-      sourceId: string,
-      targetId: string
-    ): TraceLinkModel | undefined {
-      return this.allTraces.find(
-        (trace) =>
-          (trace.sourceId === sourceId && trace.targetId === targetId) ||
-          (trace.targetId === sourceId && trace.sourceId === targetId)
-      );
+    doesLinkExist(sourceId: string, targetId: string): boolean {
+      return !!this.allTraces.find(matchTrace(sourceId, targetId, true));
     },
     /**
      * Returns whether the link is allowed.

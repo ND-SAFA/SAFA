@@ -15,7 +15,7 @@ export async function handleSaveArtifactType(
     artifactType
   );
 
-  projectStore.addOrUpdateArtifactTypes([updatedArtifactType]);
+  typeOptionsStore.addOrUpdateArtifactTypes([updatedArtifactType]);
 }
 
 /**
@@ -26,7 +26,7 @@ export async function handleSaveArtifactType(
 export async function handleSaveArtifactTypeIcon(
   labeledType: LabelledTraceDirectionModel
 ): Promise<void> {
-  const type = projectStore.project.artifactTypes.find(
+  const type = typeOptionsStore.allArtifactTypes.find(
     ({ name }) => name === labeledType.type
   );
 

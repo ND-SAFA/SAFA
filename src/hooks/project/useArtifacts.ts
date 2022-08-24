@@ -2,6 +2,10 @@ import { defineStore } from "pinia";
 
 import { pinia } from "@/plugins";
 import { ArtifactModel, DocumentArtifacts, FlatArtifact } from "@/types";
+import documentStore from "@/hooks/project/useDocuments";
+import typeOptionsStore from "@/hooks/project/useTypeOptions";
+import subtreeStore from "@/hooks/project/useSubtree";
+import projectStore from "@/hooks/project/useProject";
 
 /**
  * This module defines the state of the current project's artifacts.
@@ -57,19 +61,48 @@ export const useArtifacts = defineStore("artifacts", {
       });
     },
     /**
-     * DO NOT CALL THIS OUTSIDE OF THE STORES.
+     * Updates the current artifacts in the project, preserving any that already existed.
+     *
+     * @param newArtifacts - The new artifacts to add.
+     */
+    addOrUpdateArtifacts(newArtifacts: ArtifactModel[]): void {
+      const newIds = newArtifacts.map(({ id }) => id);
+      const updatedArtifacts = [
+        ...this.allArtifacts.filter(({ id }) => !newIds.includes(id)),
+        ...newArtifacts,
+      ];
+
+      this.initializeArtifacts({
+        artifacts: updatedArtifacts,
+        currentArtifactIds: documentStore.currentDocument.artifactIds,
+      });
+      projectStore.updateProject({
+        artifacts: updatedArtifacts,
+      });
+      typeOptionsStore.addTypesFromArtifacts(newArtifacts);
+      subtreeStore.updateSubtreeMap();
+    },
+    /**
      * Deletes the artifacts with the given names.
      *
-     * @param deletedIds - The artifacts ids to delete.
+     * @param deletedArtifacts - The artifacts, or ids, to delete.
      */
-    deleteArtifacts(deletedIds: string[]): void {
-      const removeArtifact = (currentArtifacts: ArtifactModel[]) =>
+    deleteArtifacts(deletedArtifacts: ArtifactModel[] | string[]): void {
+      if (deletedArtifacts.length === 0) return;
+
+      const deletedIds = deletedArtifacts.map((artifact) =>
+        typeof artifact === "string" ? artifact : artifact.id
+      );
+      const removeArtifacts = (currentArtifacts: ArtifactModel[]) =>
         currentArtifacts.filter(({ id }) => !deletedIds.includes(id));
+      const allArtifacts = removeArtifacts(this.allArtifacts);
 
       this.$patch({
-        allArtifacts: removeArtifact(this.allArtifacts),
-        currentArtifacts: removeArtifact(this.currentArtifacts),
+        allArtifacts,
+        currentArtifacts: removeArtifacts(this.currentArtifacts),
       });
+      projectStore.updateProject({ artifacts: allArtifacts });
+      subtreeStore.updateSubtreeMap();
     },
     /**
      * Finds the given artifact by name.

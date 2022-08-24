@@ -17,6 +17,7 @@ import {
   defaultTypeIcon,
   getArtifactTypePrintName,
 } from "@/util";
+import projectStore from "@/hooks/project/useProject";
 
 /**
  * This module tracks the directions of links between artifacts that are
@@ -86,11 +87,26 @@ export const useTypeOptions = defineStore("typeOptions", {
       };
     },
     /**
+     * Adds a new artifact types.
+     *
+     * @param artifactTypes - The artifact types to add.
+     */
+    addOrUpdateArtifactTypes(artifactTypes: ArtifactTypeModel[]): void {
+      const updatedIds = artifactTypes.map(({ typeId }) => typeId);
+      const unaffectedTypes = this.allArtifactTypes.filter(
+        ({ typeId }) => !updatedIds.includes(typeId)
+      );
+      const allArtifactTypes = [...unaffectedTypes, ...artifactTypes];
+
+      this.initializeTypeIcons(allArtifactTypes);
+      projectStore.updateProject({ artifactTypes: allArtifactTypes });
+    },
+    /**
      * Adds a new artifact type if it does not yet exist.
      *
      * @param newArtifacts - The artifact to add types from.
      */
-    addArtifactTypes(newArtifacts: ArtifactModel[]): void {
+    addTypesFromArtifacts(newArtifacts: ArtifactModel[]): void {
       newArtifacts.forEach(({ type }) => {
         if (this.artifactTypeDirections[type]) return;
 
@@ -112,20 +128,21 @@ export const useTypeOptions = defineStore("typeOptions", {
      * @param removedTypeIds - The artifact type ids to remove.
      */
     removeArtifactTypes(removedTypeIds: string[]): void {
-      const removedArtifactTypes = this.allArtifactTypes.filter(({ typeId }) =>
-        removedTypeIds.includes(typeId || "")
+      const preservedArtifactTypes = this.allArtifactTypes.filter(
+        ({ typeId }) => !removedTypeIds.includes(typeId || "")
       );
-      const removedTypeNames = removedArtifactTypes.map(({ typeId }) => typeId);
+      const preservedTypeNames = preservedArtifactTypes.map(({ name }) => name);
 
       this.$patch({
-        allArtifactTypes: removedArtifactTypes,
+        allArtifactTypes: preservedArtifactTypes,
         artifactTypeIcons: Object.entries(this.artifactTypeIcons)
-          .filter(([typeName]) => !removedTypeNames.includes(typeName))
+          .filter(([typeName]) => preservedTypeNames.includes(typeName))
           .reduce((acc, cur) => ({ ...acc, ...cur }), {}),
         artifactTypeDirections: Object.entries(this.artifactTypeDirections)
-          .filter(([typeName]) => !removedTypeNames.includes(typeName))
+          .filter(([typeName]) => preservedTypeNames.includes(typeName))
           .reduce((acc, cur) => ({ ...acc, ...cur }), {}),
       });
+      projectStore.updateProject({ artifactTypes: preservedArtifactTypes });
     },
     /**
      * Determines if the trace link is allowed based on the type of the nodes.

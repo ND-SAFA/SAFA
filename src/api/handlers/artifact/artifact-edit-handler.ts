@@ -1,5 +1,11 @@
 import { ArtifactModel, ConfirmationType, IOHandlerCallback } from "@/types";
-import { layoutStore, logStore, projectStore, selectionStore } from "@/hooks";
+import {
+  artifactStore,
+  layoutStore,
+  logStore,
+  projectStore,
+  selectionStore,
+} from "@/hooks";
 import {
   createArtifact,
   deleteArtifact,
@@ -29,13 +35,12 @@ export async function handleSaveArtifact(
     if (isUpdate) {
       const updatedArtifacts = await updateArtifact(versionId, artifact);
 
-      projectStore.addOrUpdateArtifacts(updatedArtifacts);
+      artifactStore.addOrUpdateArtifacts(updatedArtifacts);
     } else {
       const createdArtifacts = await createArtifact(versionId, artifact);
 
-      projectStore.addOrUpdateArtifacts(createdArtifacts);
+      artifactStore.addOrUpdateArtifacts(createdArtifacts);
       selectionStore.selectArtifact(createdArtifacts[0].id);
-      // TODO: load new layout
       layoutStore.setArtifactTreeLayout();
 
       if (!parentArtifact) {
@@ -102,7 +107,7 @@ export function handleDeleteArtifact(
         deleteArtifact(artifact)
           .then(() => {
             selectionStore.clearSelections();
-            projectStore.deleteArtifacts([artifact]);
+            artifactStore.deleteArtifacts([artifact]);
             onSuccess?.();
           })
           .catch(onError);

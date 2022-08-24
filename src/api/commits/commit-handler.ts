@@ -1,5 +1,11 @@
 import { Commit } from "@/types";
-import { projectStore, appStore, commitStore } from "@/hooks";
+import {
+  projectStore,
+  appStore,
+  commitStore,
+  traceStore,
+  artifactStore,
+} from "@/hooks";
 import { persistCommit } from "@/api";
 
 /**
@@ -65,14 +71,14 @@ export async function redoCommit(): Promise<void> {
  * @param commit - The commit to apply.
  */
 async function applyArtifactChanges(commit: Commit): Promise<void> {
-  await projectStore.addOrUpdateArtifacts([
+  await artifactStore.addOrUpdateArtifacts([
     ...commit.artifacts.added,
     ...commit.artifacts.modified,
   ]);
-  await projectStore.deleteArtifacts(commit.artifacts.removed);
-  await projectStore.addOrUpdateTraceLinks([
+  await artifactStore.deleteArtifacts(commit.artifacts.removed);
+  await traceStore.addOrUpdateTraceLinks([
     ...commit.traces.added,
     ...commit.traces.modified,
   ]);
-  await projectStore.deleteTraceLinks(commit.traces.removed);
+  await traceStore.deleteTraceLinks(commit.traces.removed);
 }

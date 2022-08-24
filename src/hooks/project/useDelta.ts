@@ -11,9 +11,9 @@ import {
 } from "@/types";
 import { createProjectDelta } from "@/util";
 import { disableDrawMode } from "@/cytoscape";
+import { artifactStore, traceStore } from "@/hooks";
 import layoutStore from "../graph/useLayout";
 import appStore from "../core/useApp";
-import projectStore from "./useProject";
 import subtreeStore from "./useSubtree";
 
 /**
@@ -89,8 +89,8 @@ export const useDelta = defineStore("delta", {
      * Removes delta artifacts and traces from the current project.
      */
     removeDeltaAdditions(): void {
-      projectStore.deleteArtifacts(Object.values(this.addedArtifacts));
-      projectStore.deleteTraceLinks(Object.values(this.addedTraces));
+      artifactStore.deleteArtifacts(Object.values(this.addedArtifacts));
+      traceStore.deleteTraceLinks(Object.values(this.addedTraces));
     },
     /**
      * Sets the current artifact deltas.
@@ -101,11 +101,11 @@ export const useDelta = defineStore("delta", {
       this.removeDeltaAdditions();
       this.projectDelta = payload;
 
-      projectStore.addOrUpdateArtifacts([
+      artifactStore.addOrUpdateArtifacts([
         ...Object.values(payload.artifacts.added),
         ...Object.values(payload.artifacts.removed),
       ]);
-      projectStore.addOrUpdateTraceLinks([
+      traceStore.addOrUpdateTraceLinks([
         ...Object.values(payload.traces.added),
         ...Object.values(payload.traces.removed),
       ]);

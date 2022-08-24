@@ -8,7 +8,13 @@ import {
   GeneratedLinksModel,
   FlatTraceLink,
 } from "@/types";
-import { appStore, logStore, artifactStore, projectStore } from "@/hooks";
+import {
+  appStore,
+  logStore,
+  artifactStore,
+  projectStore,
+  traceStore,
+} from "@/hooks";
 import {
   createLink,
   getGeneratedLinks,
@@ -98,7 +104,7 @@ export async function handleCreateLink(
   try {
     const createdLinks = await createLink(traceLink);
 
-    projectStore.addOrUpdateTraceLinks(createdLinks);
+    traceStore.addOrUpdateTraceLinks(createdLinks);
   } catch (e) {
     logStore.onError(
       `Unable to create trace link: ${sourceName} -> ${targetName}`
@@ -121,8 +127,8 @@ export async function handleApproveLink(
   const currentStatus = link.approvalStatus;
 
   linkAPIHandler(link, updateApprovedLink, {
-    onSuccess: async () => {
-      await projectStore.addOrUpdateTraceLinks([link]);
+    onSuccess: () => {
+      traceStore.addOrUpdateTraceLinks([link]);
       onSuccess?.();
     },
     onError: (e) => {
@@ -147,8 +153,8 @@ export async function handleDeclineLink(
   const currentStatus = link.approvalStatus;
 
   linkAPIHandler(link, updateDeclinedLink, {
-    onSuccess: async () => {
-      projectStore.deleteTraceLinks([link]);
+    onSuccess: () => {
+      traceStore.deleteTraceLinks([link]);
       onSuccess?.();
     },
     onError: (e) => {

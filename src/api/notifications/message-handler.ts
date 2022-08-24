@@ -13,7 +13,14 @@ import {
   handleReloadJobs,
   handleReloadWarnings,
 } from "@/api";
-import { documentStore, jobStore, projectStore } from "@/hooks";
+import {
+  artifactStore,
+  documentStore,
+  jobStore,
+  projectStore,
+  traceStore,
+  typeOptionsStore,
+} from "@/hooks";
 
 /**
  * Handles changes messages by updating affected parts of the app.
@@ -66,7 +73,7 @@ async function handleDeleteChange(change: ChangeModel) {
       return handleClearProject();
     case EntityType.TYPES:
       // (entityIds = type id)
-      projectStore.removeArtifactTypes(change.entityIds);
+      typeOptionsStore.removeArtifactTypes(change.entityIds);
       break;
     case EntityType.DOCUMENT:
       // (entityIds = document id)
@@ -74,11 +81,11 @@ async function handleDeleteChange(change: ChangeModel) {
       break;
     case EntityType.ARTIFACTS:
       // (entityIds = artifact ids)
-      projectStore.deleteArtifacts(change.entityIds);
+      artifactStore.deleteArtifacts(change.entityIds);
       break;
     case EntityType.TRACES:
       // (entityIds = trace link ids)
-      projectStore.deleteTraceLinks(change.entityIds);
+      traceStore.deleteTraceLinks(change.entityIds);
       break;
     case EntityType.WARNINGS:
       // Never called, case here for completion.
@@ -117,16 +124,16 @@ async function handleUpdateChange(change: ChangeModel, project: ProjectModel) {
 
       return handleLoadVersion(versionId);
     case EntityType.TYPES:
-      projectStore.addOrUpdateArtifactTypes(project.artifactTypes);
+      typeOptionsStore.addOrUpdateArtifactTypes(project.artifactTypes);
       break;
     case EntityType.DOCUMENT:
       documentStore.updateDocuments(project.documents);
       break;
     case EntityType.ARTIFACTS:
-      projectStore.addOrUpdateArtifacts(project.artifacts);
+      artifactStore.addOrUpdateArtifacts(project.artifacts);
       break;
     case EntityType.TRACES:
-      projectStore.addOrUpdateTraceLinks(project.traces);
+      traceStore.addOrUpdateTraceLinks(project.traces);
       break;
     case EntityType.WARNINGS:
       return handleReloadWarnings(versionId);

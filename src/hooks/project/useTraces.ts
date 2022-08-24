@@ -8,7 +8,11 @@ import {
   DocumentTraces,
   TraceLinkModel,
 } from "@/types";
-import typeOptionsStore from "./useTypeOptions";
+import documentStore from "@/hooks/project/useDocuments";
+import subtreeStore from "@/hooks/project/useSubtree";
+import layoutStore from "@/hooks/graph/useLayout";
+import projectStore from "@/hooks/project/useProject";
+import typeOptionsStore from "@/hooks/project/useTypeOptions";
 
 /**
  * This module defines the state of the current project's trace links.
@@ -53,21 +57,53 @@ export const useTraces = defineStore("traces", {
       });
     },
     /**
-     * DO NOT CALL THIS OUTSIDE OF THE STORES.
+     * Updates the current trace links in the project, preserving any that already existed.
+     *
+     * @param newTraces - The trace links to add.
+     */
+    addOrUpdateTraceLinks(newTraces: TraceLinkModel[]): void {
+      const newIds = newTraces.map(({ traceLinkId }) => traceLinkId);
+      const updatedTraces = [
+        ...this.allTraces.filter(
+          ({ traceLinkId }) => !newIds.includes(traceLinkId)
+        ),
+        ...newTraces,
+      ];
+
+      this.initializeTraces({
+        traces: updatedTraces,
+        currentArtifactIds: documentStore.currentDocument.artifactIds,
+      });
+      projectStore.updateProject({ traces: updatedTraces });
+      subtreeStore.updateSubtreeMap();
+      layoutStore.applyAutomove();
+    },
+    /**
      * Deletes the given trace links.
      *
-     * @param deletedIds - The trace link ids to remove.
+     * @param deletedTraces - The trace links, or ids, to remove.
      */
-    async deleteTraceLinks(deletedIds: string[]): Promise<void> {
-      const removeLink = (currentTraces: TraceLinkModel[]) =>
+    async deleteTraceLinks(
+      deletedTraces: TraceLinkModel[] | string[]
+    ): Promise<void> {
+      if (deletedTraces.length === 0) return;
+
+      const deletedIds = deletedTraces.map((trace) =>
+        typeof trace === "string" ? trace : trace.traceLinkId
+      );
+      const removeTraces = (currentTraces: TraceLinkModel[]) =>
         currentTraces.filter(
           ({ traceLinkId }) => !deletedIds.includes(traceLinkId)
         );
+      const allTraces = removeTraces(this.allTraces);
 
       this.$patch({
-        allTraces: removeLink(this.allTraces),
-        currentTraces: removeLink(this.currentTraces),
+        allTraces,
+        currentTraces: removeTraces(this.currentTraces),
       });
+      projectStore.updateProject({ traces: allTraces });
+      subtreeStore.updateSubtreeMap();
+      layoutStore.applyAutomove();
     },
     /**
      * Returns the trace link between artifacts.

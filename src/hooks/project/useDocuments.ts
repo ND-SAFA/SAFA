@@ -8,6 +8,7 @@ import {
   ProjectModel,
 } from "@/types";
 import { createDocument, isTableDocument, removeMatches } from "@/util";
+import { documentStore } from "@/hooks";
 import layoutStore from "../graph/useLayout";
 import projectStore from "./useProject";
 import traceStore from "./useTraces";
@@ -122,23 +123,18 @@ export const useDocuments = defineStore("documents", {
      */
     async updateDocuments(updatedDocuments: DocumentModel[]): Promise<void> {
       const updatedIds = updatedDocuments.map((d) => d.documentId);
-      const currentDocument =
-        updatedDocuments.find(
-          ({ documentId }) => documentId === this.currentId
-        ) || this.currentDocument;
+      const currentDocument = updatedDocuments.find(
+        ({ documentId }) => documentId === this.currentId
+      );
 
-      if (currentDocument !== this.currentDocument) {
-        // Update the layout if the current document changed.
-        layoutStore.artifactPositions = currentDocument.layout;
+      if (currentDocument) {
+        await documentStore.switchDocuments(currentDocument);
       }
 
-      this.$patch({
-        allDocuments: [
-          ...removeMatches(this.allDocuments, "documentId", updatedIds),
-          ...updatedDocuments,
-        ],
-        currentDocument,
-      });
+      this.allDocuments = [
+        ...removeMatches(this.allDocuments, "documentId", updatedIds),
+        ...updatedDocuments,
+      ];
     },
     /**
      * Sets the current document and initializes its artifacts and traces.

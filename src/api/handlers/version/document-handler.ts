@@ -53,10 +53,6 @@ export async function handleUpdateDocument(
   const updatedDocument = await saveDocument(versionId, document);
 
   await documentStore.updateDocuments([updatedDocument]);
-
-  if (documentStore.currentId !== updatedDocument.documentId) return;
-
-  await documentStore.switchDocuments(updatedDocument);
 }
 
 /**

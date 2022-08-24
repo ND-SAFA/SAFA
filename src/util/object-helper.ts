@@ -103,8 +103,11 @@ export function objectToArray<O, I>(
  * @param keys - The keys to preserve.
  * @return A new object with only the preserved keys.
  */
-export function preserveObjectKeys<O>(obj: O, keys: string[]): O {
+export function preserveObjectKeys<O, K extends keyof O>(
+  obj: O,
+  keys: K[]
+): Pick<O, K> {
   return Object.entries(obj)
-    .filter(([key]) => keys.includes(key))
+    .filter(([key]) => (keys as string[]).includes(key))
     .reduce((acc, cur) => ({ ...acc, ...cur }), {} as O);
 }

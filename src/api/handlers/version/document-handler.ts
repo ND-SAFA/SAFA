@@ -4,7 +4,7 @@ import {
   IOHandlerCallback,
   DocumentModel,
 } from "@/types";
-import { createDocument } from "@/util";
+import { createDocument, preserveObjectKeys } from "@/util";
 import { logStore, documentStore, projectStore } from "@/hooks";
 import {
   saveDocument,
@@ -30,7 +30,13 @@ export async function handleCreateDocument(
   const createdDocument = await saveDocument(
     versionId,
     createDocument({
-      project: projectStore.project,
+      project: preserveObjectKeys(projectStore.project, [
+        "name",
+        "description",
+        "projectId",
+        "members",
+        "owner",
+      ]),
       artifactIds,
       name,
       type,

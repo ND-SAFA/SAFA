@@ -22,6 +22,15 @@ declare namespace Cypress {
     ): Chainable<JQuery<HTMLElement>>;
 
     /**
+     * Returns whether an element exists.
+     * Should not be used in tests, only in before-each cleanup calls.
+     *
+     * @param dataCy - The testing selector to find.
+     * @return Whether the element exists.
+     */
+    doesExist(dataCy: string): Chainable<boolean>;
+
+    /**
      * Sets the value of an input field.
      *
      * @param dataCy - The testing selector of the input being set.

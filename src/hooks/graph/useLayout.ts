@@ -95,9 +95,10 @@ export const useLayout = defineStore("layout", {
       this.applyAutomove();
 
       setTimeout(() => {
-        appStore.onLoadEnd();
+        // Wait for the graph to render.
         cyResetTim();
         cyResetTree();
+        appStore.onLoadEnd();
       }, 200);
     },
     /**

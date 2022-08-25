@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 
 import { pinia } from "@/plugins";
 import {
+  ArtifactPositions,
   ColumnModel,
   DocumentModel,
   DocumentType,
@@ -66,6 +67,12 @@ export const useDocuments = defineStore("documents", {
       return this.currentDocument.artifactIds;
     },
     /**
+     * @return Whether the selected document is the base document.
+     */
+    isBaseDocument(): boolean {
+      return this.currentId === "";
+    },
+    /**
      * @return Whether the current document type is for editing a table.
      */
     isEditableTableDocument(): boolean {
@@ -101,6 +108,7 @@ export const useDocuments = defineStore("documents", {
         name: "Default",
         project,
         artifactIds: artifacts.map(({ id }) => id),
+        layout,
       });
 
       const loadedDocument =
@@ -116,9 +124,20 @@ export const useDocuments = defineStore("documents", {
 
       artifactStore.initializeArtifacts({ artifacts, currentArtifactIds });
       traceStore.initializeTraces({ traces, currentArtifactIds });
-      layoutStore.updatePositions(
-        loadedDocument.documentId ? loadedDocument.layout : layout
-      );
+      layoutStore.updatePositions(loadedDocument.layout);
+    },
+    /**
+     * Updates the base document's layout, and reruns the layout if on the base document.
+     * @param layout
+     */
+    updateBaseLayout(layout: ArtifactPositions): void {
+      projectStore.updateProject({ layout });
+
+      this.baseDocument.layout = layout;
+
+      if (!this.isBaseDocument) return;
+
+      layoutStore.updatePositions(layout);
     },
     /**
      * Updates matching documents.
@@ -151,12 +170,7 @@ export const useDocuments = defineStore("documents", {
       this.currentDocument = document;
       artifactStore.initializeArtifacts({ currentArtifactIds });
       traceStore.initializeTraces({ currentArtifactIds });
-
-      if (document.documentId !== "") {
-        layoutStore.updatePositions(document.layout);
-      } else {
-        layoutStore.updatePositions(projectStore.project.layout);
-      }
+      layoutStore.updatePositions(document.layout);
     },
     /**
      * Adds a new document.

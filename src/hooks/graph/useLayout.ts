@@ -23,7 +23,6 @@ import { appStore } from "@/hooks/core";
 import selectionStore from "@/hooks/graph/useSelection";
 import subtreeStore from "@/hooks/project/useSubtree";
 import deltaStore from "@/hooks/project/useDelta";
-import { documentStore, projectStore } from "@/hooks";
 
 /**
  * This module handles the layout positions of the graph.
@@ -146,19 +145,6 @@ export const useLayout = defineStore("layout", {
       this.artifactPositions = positions;
 
       await this.resetLayout();
-    },
-    /**
-     * Updates artifact base positions.
-     * If thee current document is the default, resets the layout.
-     *
-     * @param positions - The new positions to set.
-     */
-    async updateBasePositions(positions: ArtifactPositions): Promise<void> {
-      projectStore.updateProject({ layout: positions });
-
-      if (documentStore.currentId !== "") return;
-
-      await this.updatePositions(positions);
     },
   },
 });

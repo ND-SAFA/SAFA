@@ -18,7 +18,6 @@ import {
   artifactStore,
   documentStore,
   jobStore,
-  layoutStore,
   projectStore,
   sessionStore,
   traceStore,
@@ -53,7 +52,7 @@ export async function handleEntityChangeMessage(
 
     // Step - Update default layout.
     if (message.updateLayout) {
-      layoutStore.updateBasePositions(project.layout);
+      documentStore.updateBaseLayout(project.layout);
     }
   };
 }
@@ -146,7 +145,7 @@ async function handleUpdateChange(change: ChangeModel, project: ProjectModel) {
     case EntityType.JOBS:
       return handleReloadJobs();
     case EntityType.LAYOUT:
-      layoutStore.updateBasePositions(project.layout);
+      documentStore.updateBaseLayout(project.layout);
       break;
   }
 }

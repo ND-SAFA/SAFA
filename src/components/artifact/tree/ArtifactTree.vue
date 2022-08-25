@@ -134,8 +134,6 @@ export default Vue.extend({
   mounted() {
     this.artifactsInView = this.nodesInView;
     layoutStore.resetLayout();
-
-    console.log("!");
   },
   watch: {
     nodesInView(): void {

@@ -49,13 +49,13 @@
 import Vue, { PropType } from "vue";
 import { DataTableGroup } from "@/types";
 import { camelcaseToDisplay } from "@/util";
+import { artifactStore } from "@/hooks";
 import {
   FlexBox,
   AttributeChip,
   Typography,
   GenericIconButton,
 } from "@/components/common";
-import { artifactStore } from "@/hooks";
 import SectionControls from "./SectionControls.vue";
 
 /**

@@ -8,9 +8,9 @@ import {
   TraceLinkModel,
   TracePanel,
 } from "@/types";
-import { parseTraceFile, createGeneratedLinks } from "@/api";
 import { extractTraceId } from "@/util";
 import { logStore } from "@/hooks";
+import { parseTraceFile, createGeneratedLinks } from "@/api";
 
 const DEFAULT_IS_GENERATED = false;
 

@@ -4,6 +4,7 @@ import {
   PasswordChangeModel,
   UserModel,
 } from "@/types";
+import { sessionStore, logStore } from "@/hooks";
 import {
   getParam,
   getParams,
@@ -20,7 +21,6 @@ import {
   deleteAccount,
   handleLoadLastProject,
 } from "@/api";
-import { sessionStore, logStore } from "@/hooks";
 
 /**
  * Attempts to log a user in.

@@ -1,13 +1,13 @@
 import { NavigationGuardNext, Route } from "vue-router";
 import { NavigationGuard } from "vue-router/types/router";
+import { appStore, projectStore, sessionStore } from "@/hooks";
+import { handleLoadVersion } from "@/api";
 import {
   QueryParams,
   Routes,
   routesPublic,
   routesWithRequiredProject,
 } from "@/router/routes";
-import { appStore, projectStore, sessionStore } from "@/hooks";
-import { handleLoadVersion } from "@/api";
 
 /**
  * Defines list of functions that are run before navigating to a new page.

@@ -1,8 +1,8 @@
 import { defineStore } from "pinia";
 
-import { pinia } from "@/plugins";
 import { ArtifactModel, Commit, CommitHistory, TraceLinkModel } from "@/types";
 import { createCommit } from "@/util";
+import { pinia } from "@/plugins";
 import traceStore from "./useTraces";
 import artifactStore from "./useArtifacts";
 

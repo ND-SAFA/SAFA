@@ -49,13 +49,13 @@ import {
   selectionStore,
   layoutStore,
 } from "@/hooks";
+import { Routes } from "@/router";
 import { artifactTreeGraph, cyResetTree } from "@/cytoscape";
 import {
   GenericGraphLink,
   GenericCytoscapeController,
 } from "@/components/common";
 import { TraceLinkApprovalModal } from "@/components/trace-link";
-import { Routes } from "@/router";
 import ArtifactNode from "./ArtifactNode.vue";
 
 export default Vue.extend({
@@ -134,8 +134,6 @@ export default Vue.extend({
   mounted() {
     this.artifactsInView = this.nodesInView;
     layoutStore.resetLayout();
-
-    console.log("!");
   },
   watch: {
     nodesInView(): void {

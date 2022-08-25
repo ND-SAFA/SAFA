@@ -1,4 +1,5 @@
 import { IOHandlerCallback, JobModel } from "@/types";
+import { appStore, jobStore } from "@/hooks";
 import {
   connect,
   deleteJobById,
@@ -7,7 +8,6 @@ import {
   getUserJobs,
   stompClient,
 } from "@/api";
-import { appStore, jobStore } from "@/hooks";
 
 /**
  * Subscribes to updates for job with given id.

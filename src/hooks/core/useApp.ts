@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 
-import { pinia } from "@/plugins";
 import { PanelOpenState, PanelType } from "@/types";
+import { pinia } from "@/plugins";
 import selectionStore from "../graph/useSelection";
 
 /**

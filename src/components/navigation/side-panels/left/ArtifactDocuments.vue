@@ -21,8 +21,8 @@ import Vue from "vue";
 import { DocumentModel } from "@/types";
 import { documentTypeOptions } from "@/util";
 import { documentStore, selectionStore } from "@/hooks";
-import { Typography, GenericListItem } from "@/components/common";
 import { handleSwitchDocuments } from "@/api";
+import { Typography, GenericListItem } from "@/components/common";
 
 /**
  * Displays the selected node's documents.

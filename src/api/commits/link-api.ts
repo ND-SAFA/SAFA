@@ -1,6 +1,6 @@
 import { ApprovalType, TraceLinkModel, ArtifactModel } from "@/types";
-import { Endpoint, fillEndpoint, authHttpClient } from "@/api/util";
 import { CommitBuilder } from "@/api";
+import { Endpoint, fillEndpoint, authHttpClient } from "@/api/util";
 
 /**
  * Returns all generated links for this project.

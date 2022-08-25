@@ -1,6 +1,6 @@
-import { MenuItem } from "@/types/cytoscape/plugins/context-menus";
-import { appStore, documentStore } from "@/hooks";
 import { ArtifactData, DocumentType, SafetyCaseType } from "@/types";
+import { appStore, documentStore } from "@/hooks";
+import { MenuItem } from "@/types/cytoscape/plugins/context-menus";
 
 /**
  * The menu option for creating safety case artifacts.

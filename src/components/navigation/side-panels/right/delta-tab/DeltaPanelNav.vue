@@ -38,8 +38,8 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { handleReloadProject } from "@/api";
 import { deltaStore, projectStore } from "@/hooks";
+import { handleReloadProject } from "@/api";
 import { Typography } from "@/components/common";
 import DeltaVersionsModal from "./DeltaVersionsModal.vue";
 

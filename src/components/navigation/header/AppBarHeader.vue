@@ -46,8 +46,8 @@ import {
   ButtonType,
   VersionModel,
 } from "@/types";
-import { getParams, navigateTo, Routes } from "@/router";
 import { logStore, projectStore } from "@/hooks";
+import { getParams, navigateTo, Routes } from "@/router";
 import { handleLoadVersion } from "@/api";
 import { ButtonRow, SafaIcon, Typography, FlexBox } from "@/components/common";
 import {

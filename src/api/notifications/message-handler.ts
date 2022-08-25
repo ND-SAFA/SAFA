@@ -6,13 +6,6 @@ import {
   EntityType,
   ProjectModel,
 } from "@/types";
-import { getChanges } from "@/api/endpoints";
-import {
-  handleClearProject,
-  handleLoadVersion,
-  handleReloadJobs,
-  handleReloadWarnings,
-} from "@/api";
 import {
   appStore,
   artifactStore,
@@ -23,6 +16,13 @@ import {
   traceStore,
   typeOptionsStore,
 } from "@/hooks";
+import {
+  handleClearProject,
+  handleLoadVersion,
+  handleReloadJobs,
+  handleReloadWarnings,
+} from "@/api";
+import { getChanges } from "@/api/endpoints";
 
 /**
  * Handles changes messages by updating affected parts of the app.

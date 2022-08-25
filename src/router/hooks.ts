@@ -1,6 +1,6 @@
+import { URLParameter } from "@/types";
 import { QueryParams, Routes } from "@/router/routes";
 import router from "@/router/router";
-import { URLParameter } from "@/types";
 
 /**
  * Navigates app to given route, if app is already on the route then

@@ -7,6 +7,7 @@ import {
   LocalStorageKeys,
   URLParameter,
 } from "@/types";
+import { logStore } from "@/hooks";
 import {
   getGitHubRefreshToken,
   getGitHubToken,
@@ -15,7 +16,6 @@ import {
   getJiraToken,
   saveJiraCredentials,
 } from "@/api";
-import { logStore } from "@/hooks";
 
 /**
  * Handles Jira authentication when the app loads.

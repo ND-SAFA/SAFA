@@ -1,6 +1,5 @@
 import { defineStore } from "pinia";
 
-import { pinia } from "@/plugins";
 import {
   ApprovalType,
   ArtifactData,
@@ -8,12 +7,13 @@ import {
   DocumentTraces,
   TraceLinkModel,
 } from "@/types";
+import { matchTrace, removeMatches, standardizeValueArray } from "@/util";
+import { pinia } from "@/plugins";
 import documentStore from "@/hooks/project/useDocuments";
 import subtreeStore from "@/hooks/project/useSubtree";
 import layoutStore from "@/hooks/graph/useLayout";
 import projectStore from "@/hooks/project/useProject";
 import typeOptionsStore from "@/hooks/project/useTypeOptions";
-import { matchTrace, removeMatches, standardizeValueArray } from "@/util";
 
 /**
  * This module defines the state of the current project's trace links.

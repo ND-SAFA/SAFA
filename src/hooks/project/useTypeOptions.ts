@@ -1,6 +1,5 @@
 import { defineStore } from "pinia";
 
-import { pinia } from "@/plugins";
 import {
   ArtifactData,
   ArtifactModel,
@@ -19,6 +18,7 @@ import {
   preserveObjectKeys,
   removeMatches,
 } from "@/util";
+import { pinia } from "@/plugins";
 import projectStore from "@/hooks/project/useProject";
 
 /**

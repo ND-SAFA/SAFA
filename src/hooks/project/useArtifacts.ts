@@ -1,13 +1,6 @@
 import { defineStore } from "pinia";
 
-import { pinia } from "@/plugins";
 import { ArtifactModel, DocumentArtifacts, FlatArtifact } from "@/types";
-import documentStore from "@/hooks/project/useDocuments";
-import typeOptionsStore from "@/hooks/project/useTypeOptions";
-import subtreeStore from "@/hooks/project/useSubtree";
-import projectStore from "@/hooks/project/useProject";
-import layoutStore from "@/hooks/graph/useLayout";
-import selectionStore from "@/hooks/graph/useSelection";
 import {
   standardizeValueArray,
   flattenArtifact,
@@ -15,6 +8,13 @@ import {
   removeMatches,
   collectByField,
 } from "@/util";
+import { pinia } from "@/plugins";
+import documentStore from "@/hooks/project/useDocuments";
+import typeOptionsStore from "@/hooks/project/useTypeOptions";
+import subtreeStore from "@/hooks/project/useSubtree";
+import projectStore from "@/hooks/project/useProject";
+import layoutStore from "@/hooks/graph/useLayout";
+import selectionStore from "@/hooks/graph/useSelection";
 
 /**
  * This module defines the state of the current project's artifacts.

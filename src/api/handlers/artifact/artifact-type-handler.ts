@@ -1,6 +1,6 @@
 import { ArtifactTypeModel, LabelledTraceDirectionModel } from "@/types";
-import { saveArtifactType } from "@/api/endpoints";
 import { projectStore, typeOptionsStore } from "@/hooks";
+import { saveArtifactType } from "@/api/endpoints";
 
 /**
  * Creates or updates the given artifact type.

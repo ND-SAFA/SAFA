@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 
-import { pinia } from "@/plugins";
 import { FlatTraceLink, GeneratedLinksModel, TraceLinkModel } from "@/types";
+import { pinia } from "@/plugins";
 
 /**
  * A module for managing generated trace link approval.

@@ -23,8 +23,8 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { LabelledTraceDirectionModel } from "@/types";
-import { handleRemoveDirection } from "@/api";
 import { typeOptionsStore } from "@/hooks";
+import { handleRemoveDirection } from "@/api";
 import { Typography } from "@/components/common/display";
 
 /**

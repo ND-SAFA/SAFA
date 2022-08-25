@@ -1,4 +1,5 @@
 import { Stylesheet } from "cytoscape";
+import { ThemeColors } from "@/util";
 import { CytoStyleSheet } from "@/types/cytoscape";
 import {
   TIM_EDGE_ARROW_SHAPE,
@@ -11,7 +12,6 @@ import {
   TIM_NODE_SHAPE,
   TIM_NODE_WIDTH,
 } from "@/cytoscape/styles/config/tim-tree-config";
-import { ThemeColors } from "@/util";
 
 export const TIM_NODE_SELECTOR = "node[graph='tim']";
 export const TIM_EDGE_SELECTOR = "edge[graph='tim']";

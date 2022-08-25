@@ -57,8 +57,8 @@
 import Vue from "vue";
 import { DocumentModel } from "@/types";
 import { documentStore } from "@/hooks";
-import { GenericIconButton, FlexBox } from "@/components/common";
 import { handleSwitchDocuments } from "@/api";
+import { GenericIconButton, FlexBox } from "@/components/common";
 import DocumentModal from "./DocumentModal.vue";
 
 export default Vue.extend({

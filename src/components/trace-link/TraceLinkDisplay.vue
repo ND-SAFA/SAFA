@@ -85,15 +85,15 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { ArtifactModel, TraceLinkModel, TraceType } from "@/types";
-import { GenericArtifactBodyDisplay } from "@/components";
-import { artifactStore, deltaStore } from "@/hooks";
-import { FlexBox, Typography } from "@/components/common";
 import { linkStatus } from "@/util";
+import { artifactStore, deltaStore } from "@/hooks";
 import {
   handleApproveLink,
   handleDeclineLink,
   handleUnreviewLink,
 } from "@/api";
+import { FlexBox, Typography } from "@/components/common";
+import { GenericArtifactBodyDisplay } from "@/components";
 
 /**
  * Displays a trace link.

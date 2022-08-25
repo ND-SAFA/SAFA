@@ -62,9 +62,9 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { handleLogout } from "@/api";
-import { navigateTo, Routes } from "@/router";
 import { sessionStore } from "@/hooks";
+import { navigateTo, Routes } from "@/router";
+import { handleLogout } from "@/api";
 import { Typography } from "@/components/common";
 
 export default Vue.extend({

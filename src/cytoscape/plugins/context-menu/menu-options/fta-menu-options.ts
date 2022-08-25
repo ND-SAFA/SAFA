@@ -1,5 +1,5 @@
-import { appStore, documentStore } from "@/hooks";
 import { ArtifactData, DocumentType, FTANodeType, MenuItem } from "@/types";
+import { appStore, documentStore } from "@/hooks";
 
 /**
  * The menu item for creating FTA related nodes.

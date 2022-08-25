@@ -1,6 +1,5 @@
 import { defineStore } from "pinia";
 
-import { pinia } from "@/plugins";
 import {
   ArtifactPositions,
   ColumnModel,
@@ -10,6 +9,7 @@ import {
 } from "@/types";
 import { createDocument, isTableDocument, removeMatches } from "@/util";
 import { documentStore } from "@/hooks";
+import { pinia } from "@/plugins";
 import layoutStore from "../graph/useLayout";
 import projectStore from "./useProject";
 import traceStore from "./useTraces";

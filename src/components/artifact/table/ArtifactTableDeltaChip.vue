@@ -7,8 +7,8 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { ArtifactModel, ArtifactDeltaState } from "@/types";
-import { deltaStore } from "@/hooks";
 import { capitalize, getBackgroundColor } from "@/util";
+import { deltaStore } from "@/hooks";
 import Typography from "@/components/common/display/Typography.vue";
 
 /**

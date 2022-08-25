@@ -1,6 +1,6 @@
+import { LabelledTraceDirectionModel } from "@/types";
 import { typeOptionsStore, projectStore } from "@/hooks";
 import { deleteTraceMatrix, getTraceMatrices } from "@/api";
-import { LabelledTraceDirectionModel } from "@/types";
 
 /**
  * Updates the trace matrices for the project.

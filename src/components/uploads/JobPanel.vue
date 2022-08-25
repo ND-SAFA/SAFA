@@ -115,8 +115,8 @@
 import Vue, { PropType } from "vue";
 import { JobModel, JobStatus } from "@/types";
 import { enumToDisplay, getJobStatusColor, timestampToDisplay } from "@/util";
-import { handleDeleteJob, handleLoadVersion } from "@/api";
 import { logStore } from "@/hooks";
+import { handleDeleteJob, handleLoadVersion } from "@/api";
 import { Typography } from "@/components/common";
 import FlexBox from "@/components/common/display/FlexBox.vue";
 

@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 
-import { pinia } from "@/plugins";
 import { JobModel } from "@/types";
+import { pinia } from "@/plugins";
 
 /**
  * This module tracks the jobs submitted by the user.

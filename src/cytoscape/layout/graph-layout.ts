@@ -1,4 +1,3 @@
-import { NodeSingular } from "cytoscape";
 import {
   KlayLayoutSettings,
   LayoutHook,
@@ -47,16 +46,7 @@ export default class GraphLayout implements IGraphLayout {
         klay: this.klaySettings,
       }).run();
     } else {
-      cy.layout({
-        name: "preset",
-        fit: true,
-        padding: 0,
-        positions: (node: NodeSingular | string) => {
-          const id = typeof node === "string" ? node : node.data().id;
-
-          return layoutStore.getArtifactPosition(id);
-        },
-      }).run();
+      cy.layout(layoutStore.layoutOptions).run();
     }
 
     this.postLayoutHook(cy);

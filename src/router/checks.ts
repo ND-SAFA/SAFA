@@ -57,11 +57,6 @@ export const routerChecks: Record<string, NavigationGuard> = {
   refocusGraph(to: Route) {
     if (to.path !== Routes.ARTIFACT) return;
 
-    appStore.onLoadStart();
-
-    setTimeout(() => {
-      layoutStore.setArtifactTreeLayout();
-      appStore.onLoadEnd();
-    }, 200);
+    layoutStore.resetLayout();
   },
 };

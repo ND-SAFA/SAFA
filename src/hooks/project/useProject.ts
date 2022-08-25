@@ -1,14 +1,8 @@
 import { defineStore } from "pinia";
 import { createProject, removeMatches } from "@/util";
 import { pinia } from "@/plugins";
-import {
-  ArtifactPositions,
-  MembershipModel,
-  ProjectModel,
-  VersionModel,
-} from "@/types";
+import { MembershipModel, ProjectModel, VersionModel } from "@/types";
 import selectionStore from "@/hooks/graph/useSelection";
-import layoutStore from "../graph/useLayout";
 import logStore from "../core/useLog";
 import warningStore from "./useWarnings";
 import documentStore from "./useDocuments";
@@ -78,18 +72,6 @@ export const useProject = defineStore("project", {
         ...this.project,
         ...project,
       };
-    },
-    /**
-     * Updates the current project layout.
-     *
-     * @param layout - The updated layout.
-     */
-    updateLayout(layout: ArtifactPositions): void {
-      this.updateProject({ layout });
-
-      if (documentStore.currentId === "") {
-        layoutStore.updatePositions(layout);
-      }
     },
     /**
      * Updates the current project members.

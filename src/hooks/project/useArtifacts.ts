@@ -82,14 +82,9 @@ export const useArtifacts = defineStore("artifacts", {
      * @param artifact - The newly created artifact.
      */
     addCreatedArtifact(artifact: ArtifactModel): void {
-      this.addOrUpdateArtifacts([artifact]);
       layoutStore.setArtifactToSavedPosition(artifact.id);
-
-      setTimeout(() => {
-        // Wait for node to render before resetting layout.
-        layoutStore.setArtifactTreeLayout();
-        selectionStore.selectArtifact(artifact.id);
-      }, 200);
+      this.addOrUpdateArtifacts([artifact]);
+      selectionStore.selectArtifact(artifact.id);
     },
     /**
      * Deletes the artifacts with the given names.

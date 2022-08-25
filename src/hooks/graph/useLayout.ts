@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 
+import { LayoutOptions, NodeSingular } from "cytoscape";
 import { pinia } from "@/plugins";
 import {
   ArtifactPositions,
@@ -22,6 +23,7 @@ import { appStore } from "@/hooks/core";
 import selectionStore from "@/hooks/graph/useSelection";
 import subtreeStore from "@/hooks/project/useSubtree";
 import deltaStore from "@/hooks/project/useDelta";
+import { documentStore, projectStore } from "@/hooks";
 
 /**
  * This module handles the layout positions of the graph.
@@ -41,17 +43,23 @@ export const useLayout = defineStore("layout", {
      */
     layout: undefined as IGraphLayout | undefined,
   }),
-  getters: {},
-  actions: {
+  getters: {
     /**
-     * Returns the position of an artifact.
-     *
-     * @param artifactId - The artifact id to find.
-     * @return Its position.
+     * @return Layout options for the graph.
      */
-    getArtifactPosition(artifactId: string): LayoutPosition {
-      return this.artifactPositions[artifactId] || { x: 0, y: 0 };
+    layoutOptions(): LayoutOptions {
+      return {
+        name: "preset",
+        fit: false,
+        positions: (node: NodeSingular | string) => {
+          const id = typeof node === "string" ? node : node.data().id;
+
+          return this.artifactPositions[id] || { x: 0, y: 0 };
+        },
+      };
     },
+  },
+  actions: {
     /**
      * Sets the position of an artifact to the saved one, and clears the saved position.
      *
@@ -123,6 +131,7 @@ export const useLayout = defineStore("layout", {
       appStore.closeSidePanels();
 
       setTimeout(() => {
+        // Wait for graph to render.
         this.setArtifactTreeLayout();
         appStore.onLoadEnd();
       }, 200);
@@ -136,6 +145,19 @@ export const useLayout = defineStore("layout", {
       this.artifactPositions = positions;
 
       await this.resetLayout();
+    },
+    /**
+     * Updates artifact base positions.
+     * If thee current document is the default, resets the layout.
+     *
+     * @param positions - The new positions to set.
+     */
+    async updateBasePositions(positions: ArtifactPositions): Promise<void> {
+      projectStore.updateProject({ layout: positions });
+
+      if (documentStore.currentId !== "") return;
+
+      await this.updatePositions(positions);
     },
   },
 });

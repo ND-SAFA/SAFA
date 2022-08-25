@@ -1,11 +1,5 @@
 import { ArtifactModel, ConfirmationType, IOHandlerCallback } from "@/types";
-import {
-  artifactStore,
-  layoutStore,
-  logStore,
-  projectStore,
-  selectionStore,
-} from "@/hooks";
+import { artifactStore, logStore, projectStore } from "@/hooks";
 import {
   createArtifact,
   deleteArtifact,
@@ -39,17 +33,12 @@ export async function handleSaveArtifact(
     } else {
       const createdArtifacts = await createArtifact(versionId, artifact);
 
-      artifactStore.addOrUpdateArtifacts(createdArtifacts);
-      selectionStore.selectArtifact(createdArtifacts[0].id);
-      layoutStore.setArtifactTreeLayout();
+      artifactStore.addCreatedArtifact(createdArtifacts[0]);
 
-      if (!parentArtifact) {
-        onSuccess?.();
-        return;
-      }
-
-      for (const createdArtifact of createdArtifacts) {
-        await handleCreateLink(createdArtifact, parentArtifact);
+      if (parentArtifact) {
+        for (const createdArtifact of createdArtifacts) {
+          await handleCreateLink(createdArtifact, parentArtifact);
+        }
       }
     }
 
@@ -106,7 +95,6 @@ export function handleDeleteArtifact(
 
         deleteArtifact(artifact)
           .then(() => {
-            selectionStore.clearSelections();
             artifactStore.deleteArtifacts([artifact]);
             onSuccess?.();
           })

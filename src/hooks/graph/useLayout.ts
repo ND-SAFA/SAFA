@@ -14,10 +14,14 @@ import {
   cyCreateLayout,
   cyResetTim,
   cyResetTree,
+  disableDrawMode,
   TimGraphLayout,
   timTreeCyPromise,
 } from "@/cytoscape";
 import { appStore } from "@/hooks/core";
+import selectionStore from "@/hooks/graph/useSelection";
+import subtreeStore from "@/hooks/project/useSubtree";
+import deltaStore from "@/hooks/project/useDelta";
 
 /**
  * This module handles the layout positions of the graph.
@@ -28,6 +32,10 @@ export const useLayout = defineStore("layout", {
      * A mapping from artifact ID to its position.
      */
     artifactPositions: {} as ArtifactPositions,
+    /**
+     * A saved position for a node to be added.
+     */
+    savedPosition: undefined as LayoutPosition | undefined,
     /**
      * The current graph layout.
      */
@@ -43,6 +51,22 @@ export const useLayout = defineStore("layout", {
      */
     getArtifactPosition(artifactId: string): LayoutPosition {
       return this.artifactPositions[artifactId] || { x: 0, y: 0 };
+    },
+    /**
+     * Sets the position of an artifact to the saved one, and clears the saved position.
+     *
+     * @param artifactId - The artifact id to set.
+     */
+    setArtifactToSavedPosition(artifactId: string): void {
+      if (!this.savedPosition) return;
+
+      this.$patch({
+        savedPosition: undefined,
+        artifactPositions: {
+          ...this.artifactPositions,
+          [artifactId]: this.savedPosition,
+        },
+      });
     },
     /**
      * Resets all automove events.
@@ -85,6 +109,33 @@ export const useLayout = defineStore("layout", {
       const payload = { layout, cyPromise: timTreeCyPromise };
 
       this.setGraphLayout(payload);
+    },
+    /**
+     * Resets the layout of the graph.
+     */
+    async resetLayout(): Promise<void> {
+      appStore.onLoadStart();
+
+      disableDrawMode();
+      subtreeStore.resetHiddenNodes();
+      selectionStore.clearSelections();
+      deltaStore.clear();
+      appStore.closeSidePanels();
+
+      setTimeout(() => {
+        this.setArtifactTreeLayout();
+        appStore.onLoadEnd();
+      }, 200);
+    },
+    /**
+     * Updates artifact positions and resets the layout.
+     *
+     * @param positions - The new positions to set.
+     */
+    async updatePositions(positions: ArtifactPositions): Promise<void> {
+      this.artifactPositions = positions;
+
+      await this.resetLayout();
     },
   },
 });

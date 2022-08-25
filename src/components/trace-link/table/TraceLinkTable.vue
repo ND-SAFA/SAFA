@@ -8,7 +8,7 @@
       multi-sort
       :headers="visibleHeaders"
       :items="visibleLinks"
-      :expanded="expanded"
+      :expanded="selectedLinks"
       :search="searchText"
       :loading="isLoading"
       :sort-by.sync="sortBy"
@@ -66,12 +66,7 @@
 
       <template v-slot:[`item.actions`]="{ item }">
         <td class="v-data-table__divider" @click.stop="">
-          <trace-link-approval
-            :link="item"
-            @link:approve="handleApprove($event)"
-            @link:decline="handleDecline($event)"
-            @link:unreview="handleUnreview($event)"
-          />
+          <trace-link-approval :link="item" />
         </td>
       </template>
 
@@ -87,13 +82,8 @@
 <script lang="ts">
 import Vue from "vue";
 import { DataTableHeader } from "vuetify";
-import {
-  ApprovalType,
-  FlatTraceLink,
-  TraceTableGroup,
-  VersionModel,
-} from "@/types";
-import { appStore, projectStore } from "@/hooks";
+import { ApprovalType, FlatTraceLink, TraceTableGroup } from "@/types";
+import { approvalStore, appStore, projectStore } from "@/hooks";
 import { handleGetGeneratedLinks } from "@/api";
 import { AttributeChip, TableGroupHeader } from "@/components/common";
 import TraceLinkDisplay from "../TraceLinkDisplay.vue";
@@ -121,24 +111,20 @@ export default Vue.extend({
       sortDesc: true,
       groupDesc: false,
       headers: traceLinkTableHeaders,
-      links: [] as FlatTraceLink[],
-      expanded: [] as FlatTraceLink[],
-      approved: [] as string[],
-      declined: [] as string[],
       approvalTypes: [ApprovalType.UNREVIEWED],
     };
   },
   mounted() {
-    this.loadGeneratedLinks();
+    handleGetGeneratedLinks({});
   },
   watch: {
     /**
      * Loads generated links when the version changes.
      */
-    projectVersion(newVersion?: VersionModel) {
-      if (!newVersion) return;
+    versionId(newVersionId: string) {
+      if (!newVersionId) return;
 
-      this.loadGeneratedLinks();
+      handleGetGeneratedLinks({});
     },
   },
   computed: {
@@ -151,8 +137,8 @@ export default Vue.extend({
     /**
      * @return The current project version.
      */
-    projectVersion() {
-      return projectStore.version;
+    versionId() {
+      return projectStore.versionId;
     },
     /**
      * @return What parts of the expansion panel to show.
@@ -170,9 +156,15 @@ export default Vue.extend({
      * @return All visible links.
      */
     visibleLinks(): FlatTraceLink[] {
-      return this.links.filter(({ approvalStatus }) =>
+      return approvalStore.traceLinks.filter(({ approvalStatus }) =>
         this.approvalTypes.includes(approvalStatus)
       );
+    },
+    /**
+     * @return All selected links.
+     */
+    selectedLinks(): FlatTraceLink[] {
+      return approvalStore.selectedLinks;
     },
     /**
      * @return All visible links.
@@ -192,97 +184,27 @@ export default Vue.extend({
   },
   methods: {
     /**
-     * Loads the generated links for the current project.
-     */
-    async loadGeneratedLinks() {
-      this.expanded = [];
-
-      await handleGetGeneratedLinks({
-        onSuccess: (generated) => {
-          this.links = generated.links;
-          this.approved = generated.approved;
-          this.declined = generated.declined;
-        },
-        onError: () => {
-          this.links = [];
-          this.approved = [];
-          this.declined = [];
-        },
-      });
-    },
-    /**
-     * Opens all panels.
+     * Opens all panels in the group.
+     * @param data - The current grouping information.
      */
     handleOpenAll(data: TraceTableGroup) {
-      this.expanded = this.links.filter(
-        (link) => link[data.groupBy[0]] === data.group
-      );
+      approvalStore.selectLinks((link) => link[data.groupBy[0]] === data.group);
     },
     /**
-     * Closes all panels.
+     * Closes all panels in the group.
+     * @param data - The current grouping information.
      */
     handleCloseAll(data: TraceTableGroup) {
-      this.expanded = this.expanded.filter(
+      approvalStore.deselectLinks(
         (link) => link[data.groupBy[0]] !== data.group
       );
     },
     /**
-     * Approves the given link and updates the stored links.
-     *
-     * @param link - The link to approve.
-     */
-    handleApprove(link: FlatTraceLink) {
-      this.declined = this.declined.filter(
-        (declinedId) => declinedId != link.traceLinkId
-      );
-      this.approved.push(link.traceLinkId);
-      this.expanded = this.expanded.filter(
-        (expandedLink) => expandedLink.traceLinkId !== link.traceLinkId
-      );
-    },
-    /**
-     * Declines the given link and updates the stored links.
-     *
-     * @param link - The link to decline.
-     */
-    handleDecline(link: FlatTraceLink) {
-      this.approved = this.approved.filter(
-        (declinedId) => declinedId != link.traceLinkId
-      );
-      this.declined.push(link.traceLinkId);
-      this.expanded = this.expanded.filter(
-        (expandedLink) => expandedLink.traceLinkId !== link.traceLinkId
-      );
-    },
-    /**
-     * Unreivews the given link and updates the stored links.
-     *
-     * @param link - The link to unreview.
-     */
-    handleUnreview(link: FlatTraceLink) {
-      this.approved = this.approved.filter(
-        (declinedId) => declinedId != link.traceLinkId
-      );
-      this.declined = this.declined.filter(
-        (declinedId) => declinedId != link.traceLinkId
-      );
-      this.expanded = this.expanded.filter(
-        (expandedLink) => expandedLink.traceLinkId !== link.traceLinkId
-      );
-    },
-    /**
      * Handles viewing a trace link.
-     *
      * @param link - The link to view.
      */
     handleView(link: FlatTraceLink) {
-      if (this.expanded.includes(link)) {
-        this.expanded = this.expanded.filter(
-          (expandedLink) => link.traceLinkId !== expandedLink.traceLinkId
-        );
-      } else {
-        this.expanded = [...this.expanded, link];
-      }
+      approvalStore.toggleLink(link);
     },
   },
 });

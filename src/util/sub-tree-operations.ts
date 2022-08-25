@@ -2,6 +2,7 @@ import {
   ArtifactModel,
   ArtifactQueryFunction,
   InternalTraceType,
+  SubtreeItem,
   SubtreeLinkModel,
   SubtreeMap,
   TraceLinkModel,
@@ -98,6 +99,7 @@ export function createSubtreeMap(
   traces: TraceLinkModel[]
 ): SubtreeMap {
   const computedSubtrees = {};
+
   return artifacts
     .map((artifact) => ({
       [artifact.id]: getSubtree(
@@ -124,12 +126,17 @@ function getSubtree(
   traces: TraceLinkModel[],
   artifactId: string,
   subtreeMapCache: SubtreeMap
-): string[] {
-  let currentSubtree: string[] = [];
+): SubtreeItem {
+  const currentItem: SubtreeItem = {
+    parents: [],
+    children: [],
+    subtree: [],
+  };
 
   if (artifactId in subtreeMapCache) {
     return subtreeMapCache[artifactId];
   }
+
   for (const childId of getChildren(artifacts, traces, artifactId)) {
     if (!(childId in subtreeMapCache)) {
       subtreeMapCache[childId] = getSubtree(
@@ -140,15 +147,19 @@ function getSubtree(
       );
     }
 
-    const childSubtreeIds = [...subtreeMapCache[childId], childId];
-    const newSubtreeIds = childSubtreeIds.filter(
-      (id) => !currentSubtree.includes(id)
-    );
-
-    currentSubtree = [...currentSubtree, ...newSubtreeIds];
+    subtreeMapCache[childId].parents.push(artifactId);
+    currentItem.children.push(childId);
+    currentItem.subtree = [
+      ...currentItem.subtree,
+      ...[...subtreeMapCache[childId].subtree, childId].filter(
+        (id) => !currentItem.subtree.includes(id)
+      ),
+    ];
   }
 
-  return currentSubtree;
+  subtreeMapCache[artifactId] = currentItem;
+
+  return currentItem;
 }
 
 /**

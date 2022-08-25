@@ -139,13 +139,13 @@ export interface GeneratedLinksModel {
   /**
    * All generated links.
    */
-  links: FlatTraceLink[];
+  traceLinks: FlatTraceLink[];
   /**
    * Approved generated link ids.
    */
-  approved: string[];
+  approvedIds: string[];
   /**
    * Declined generated link ids.
    */
-  declined: string[];
+  declinedIds: string[];
 }

@@ -4,7 +4,7 @@ import {
   IOHandlerCallback,
   DocumentModel,
 } from "@/types";
-import { createDocument } from "@/util";
+import { createDocument, preserveObjectKeys } from "@/util";
 import { logStore, documentStore, projectStore } from "@/hooks";
 import {
   saveDocument,
@@ -12,7 +12,6 @@ import {
   getDocuments,
   setCurrentDocument,
   clearCurrentDocument,
-  handleResetGraph,
 } from "@/api";
 
 /**
@@ -31,13 +30,20 @@ export async function handleCreateDocument(
   const createdDocument = await saveDocument(
     versionId,
     createDocument({
-      project: projectStore.project,
+      project: preserveObjectKeys(projectStore.project, [
+        "name",
+        "description",
+        "projectId",
+        "members",
+        "owner",
+      ]),
       artifactIds,
       name,
       type,
     })
   );
 
+  await setCurrentDocument(createdDocument.documentId);
   await documentStore.addDocument(createdDocument);
 }
 
@@ -53,10 +59,6 @@ export async function handleUpdateDocument(
   const updatedDocument = await saveDocument(versionId, document);
 
   await documentStore.updateDocuments([updatedDocument]);
-
-  if (documentStore.currentId !== updatedDocument.documentId) return;
-
-  await documentStore.switchDocuments(updatedDocument);
 }
 
 /**
@@ -261,6 +263,4 @@ export async function handleSwitchDocuments(
   } else {
     await clearCurrentDocument();
   }
-
-  await handleResetGraph();
 }

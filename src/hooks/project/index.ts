@@ -8,3 +8,4 @@ export { default as commitStore } from "./useCommits";
 export { default as subtreeStore } from "./useSubtree";
 export { default as projectStore } from "./useProject";
 export { default as deltaStore } from "./useDelta";
+export { default as approvalStore } from "./useTraceApproval";

@@ -28,20 +28,21 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { ApprovalType, TraceLinkModel, TraceType } from "@/types";
+import { TraceLinkModel } from "@/types";
 import { FlexBox, GenericIconButton } from "@/components/common";
 import {
   handleApproveLink,
   handleDeclineLink,
   handleUnreviewLink,
 } from "@/api";
+import { linkStatus } from "@/util";
 
 /**
  * Displays trace link approval buttons.
  *
  * @emits-1 `link:approve` - On Link Approval.
  * @emits-2 `link:decline` - On Link Decline.
- * @emits-2 `link:unreview` - On Link Unreview.
+ * @emits-2 `link:unreview` - On Link Un-review.
  */
 export default Vue.extend({
   name: "TraceLinkApproval",
@@ -68,35 +69,22 @@ export default Vue.extend({
   },
   computed: {
     /**
-     * @return Whether this link can be modified.
-     */
-    canBeModified(): boolean {
-      return this.link?.traceType === TraceType.GENERATED;
-    },
-    /**
      * @return Whether this link can be approved.
      */
     showApproved(): boolean {
-      return (
-        this.canBeModified && this.link.approvalStatus !== ApprovalType.APPROVED
-      );
+      return linkStatus(this.link).canBeApproved();
     },
     /**
      * @return Whether this link can be declined.
      */
     showDeclined(): boolean {
-      return (
-        this.canBeModified && this.link.approvalStatus !== ApprovalType.DECLINED
-      );
+      return linkStatus(this.link).canBeDeclined();
     },
     /**
      * @return Whether this link can be unreviewed.
      */
     showUnreviewed(): boolean {
-      return (
-        this.canBeModified &&
-        this.link.approvalStatus !== ApprovalType.UNREVIEWED
-      );
+      return linkStatus(this.link).canBeReset();
     },
   },
   methods: {

@@ -19,6 +19,7 @@ import {
   documentStore,
   jobStore,
   projectStore,
+  sessionStore,
   traceStore,
   typeOptionsStore,
 } from "@/hooks";
@@ -35,6 +36,9 @@ export async function handleEntityChangeMessage(
 ): Promise<void> {
   const message: ChangeMessageModel = JSON.parse(frame.body);
   const project = await getChanges(versionId, message);
+
+  // Skip updates by the current user.
+  if (message.user === sessionStore.userEmail) return;
 
   appStore.runUpdate = async () => {
     // Step - Iterate through message and delete entities.

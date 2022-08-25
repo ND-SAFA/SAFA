@@ -6,6 +6,8 @@ import documentStore from "@/hooks/project/useDocuments";
 import typeOptionsStore from "@/hooks/project/useTypeOptions";
 import subtreeStore from "@/hooks/project/useSubtree";
 import projectStore from "@/hooks/project/useProject";
+import layoutStore from "@/hooks/graph/useLayout";
+import selectionStore from "@/hooks/graph/useSelection";
 import {
   standardizeValueArray,
   flattenArtifact,
@@ -75,6 +77,21 @@ export const useArtifacts = defineStore("artifacts", {
       subtreeStore.updateSubtreeMap();
     },
     /**
+     * Adds a created artifact and updates the layout.
+     *
+     * @param artifact - The newly created artifact.
+     */
+    addCreatedArtifact(artifact: ArtifactModel): void {
+      this.addOrUpdateArtifacts([artifact]);
+      layoutStore.setArtifactToSavedPosition(artifact.id);
+
+      setTimeout(() => {
+        // Wait for node to render before resetting layout.
+        layoutStore.setArtifactTreeLayout();
+        selectionStore.selectArtifact(artifact.id);
+      }, 200);
+    },
+    /**
      * Deletes the artifacts with the given names.
      *
      * @param deletedArtifacts - The artifacts, or ids, to delete.
@@ -91,6 +108,10 @@ export const useArtifacts = defineStore("artifacts", {
       });
       projectStore.updateProject({ artifacts: allArtifacts });
       subtreeStore.updateSubtreeMap();
+
+      if (ids.includes(selectionStore.selectedArtifactId)) {
+        selectionStore.clearSelections();
+      }
     },
     /**
      * Finds the given artifact by name.

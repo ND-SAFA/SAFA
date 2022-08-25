@@ -7,6 +7,7 @@ import {
   ProjectModel,
   VersionModel,
 } from "@/types";
+import selectionStore from "@/hooks/graph/useSelection";
 import layoutStore from "../graph/useLayout";
 import logStore from "../core/useLog";
 import warningStore from "./useWarnings";
@@ -87,7 +88,7 @@ export const useProject = defineStore("project", {
       this.updateProject({ layout });
 
       if (documentStore.currentId === "") {
-        layoutStore.artifactPositions = layout;
+        layoutStore.updatePositions(layout);
       }
     },
     /**
@@ -125,7 +126,7 @@ export const useProject = defineStore("project", {
     initializeProject(project: ProjectModel): void {
       this.project = project;
 
-      layoutStore.artifactPositions = project.layout;
+      selectionStore.clearSelections();
       typeOptionsStore.initializeTypeIcons(project.artifactTypes);
       documentStore.initializeProject(project);
       subtreeStore.initializeProject(project);

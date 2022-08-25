@@ -6,6 +6,7 @@ import {
   subtreeStore,
   projectStore,
   selectionStore,
+  layoutStore,
 } from "@/hooks";
 import { enableDrawMode } from "@/cytoscape";
 import { handleDeleteArtifact, handleDuplicateArtifact } from "@/api";
@@ -21,8 +22,9 @@ export const artifactTreeMenuItems: MenuItem[] = [
     content: "Add Artifact",
     tooltipText: "Create a new artifact",
     coreAsWell: true,
-    onClickFunction(): void {
+    onClickFunction(event: EventObject): void {
       projectStore.ifProjectDefined(() => {
+        layoutStore.savedPosition = event.position;
         appStore.openArtifactCreatorTo({ isNewArtifact: true });
       });
     },

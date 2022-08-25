@@ -38,7 +38,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { artifactStore, traceStore, selectionStore } from "@/hooks";
+import { artifactStore, selectionStore, subtreeStore } from "@/hooks";
 import { ListItem } from "@/types";
 import {
   GenericListItem,
@@ -66,12 +66,13 @@ export default Vue.extend({
     parents(): ListItem[] {
       if (!this.selectedArtifact) return [];
 
-      return traceStore.currentTraces
-        .filter(({ sourceName }) => sourceName === this.selectedArtifact?.name)
-        .map(({ targetName, targetId }) => ({
-          title: targetName,
-          subtitle: artifactStore.getArtifactById(targetId)?.type,
-        }));
+      return subtreeStore
+        .getParents(this.selectedArtifact.id)
+        .map((artifactId) => {
+          const artifact = artifactStore.getArtifactById(artifactId);
+
+          return { title: artifact?.name || "", subtitle: artifact?.type };
+        });
     },
     /**
      * @return The selected artifact's children.
@@ -79,12 +80,13 @@ export default Vue.extend({
     children(): ListItem[] {
       if (!this.selectedArtifact) return [];
 
-      return traceStore.currentTraces
-        .filter(({ targetName }) => targetName === this.selectedArtifact?.name)
-        .map(({ sourceName, sourceId }) => ({
-          title: sourceName,
-          subtitle: artifactStore.getArtifactById(sourceId)?.type,
-        }));
+      return subtreeStore
+        .getChildren(this.selectedArtifact.id)
+        .map((artifactId) => {
+          const artifact = artifactStore.getArtifactById(artifactId);
+
+          return { title: artifact?.name || "", subtitle: artifact?.type };
+        });
     },
     /**
      * Determines the width of trace link buttons.

@@ -1,10 +1,12 @@
 import {
   allowedSafetyCaseTypes,
+  ApprovalType,
   ArtifactData,
   ArtifactModel,
   ArtifactTypeDirections,
   LinkModel,
   TraceLinkModel,
+  TraceType,
 } from "@/types";
 
 /**
@@ -82,4 +84,26 @@ export function isLinkAllowedByType(
   }
 
   return false;
+}
+
+/**
+ * Returns helper functions for determining a link's status.
+ *
+ * @param traceLink - The link to check.
+ * @return Status callbacks.
+ */
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+export function linkStatus(traceLink?: TraceLinkModel) {
+  const canBeModified = () => traceLink?.traceType === TraceType.GENERATED;
+
+  return {
+    canBeModified,
+    canBeDeleted: () => !canBeModified(),
+    canBeApproved: () =>
+      canBeModified() && traceLink?.approvalStatus !== ApprovalType.APPROVED,
+    canBeDeclined: () =>
+      canBeModified() && traceLink?.approvalStatus !== ApprovalType.DECLINED,
+    canBeReset: () =>
+      canBeModified() && traceLink?.approvalStatus !== ApprovalType.UNREVIEWED,
+  };
 }

@@ -6,7 +6,7 @@ import {
   routesPublic,
   routesWithRequiredProject,
 } from "@/router/routes";
-import { appStore, layoutStore, projectStore, sessionStore } from "@/hooks";
+import { appStore, projectStore, sessionStore } from "@/hooks";
 import { handleLoadVersion } from "@/api";
 
 /**
@@ -53,10 +53,5 @@ export const routerChecks: Record<string, NavigationGuard> = {
     if (to.path === Routes.ARTIFACT) return;
 
     appStore.closeSidePanels();
-  },
-  refocusGraph(to: Route) {
-    if (to.path !== Routes.ARTIFACT) return;
-
-    layoutStore.resetLayout();
   },
 };

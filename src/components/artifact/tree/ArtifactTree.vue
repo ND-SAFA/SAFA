@@ -37,6 +37,7 @@
 
 <script lang="ts">
 import Vue from "vue";
+import { Route } from "vue-router";
 import { TraceLinkModel, ArtifactModel, CytoCoreGraph } from "@/types";
 import {
   appStore,
@@ -46,6 +47,7 @@ import {
   deltaStore,
   subtreeStore,
   selectionStore,
+  layoutStore,
 } from "@/hooks";
 import { artifactTreeGraph, cyResetTree } from "@/cytoscape";
 import {
@@ -53,6 +55,7 @@ import {
   GenericCytoscapeController,
 } from "@/components/common";
 import { TraceLinkApprovalModal } from "@/components/trace-link";
+import { Routes } from "@/router";
 import ArtifactNode from "./ArtifactNode.vue";
 
 export default Vue.extend({
@@ -130,11 +133,17 @@ export default Vue.extend({
   },
   mounted() {
     this.artifactsInView = this.nodesInView;
+    layoutStore.resetLayout();
+
+    console.log("!");
   },
   watch: {
     nodesInView(): void {
       this.artifactsInView = this.nodesInView;
     },
+    /**
+     * Re-centers the graph when switching from the table to the tree.
+     */
     isInView(inView: boolean): void {
       if (!inView) return;
 
@@ -144,6 +153,14 @@ export default Vue.extend({
         cyResetTree();
         appStore.onLoadEnd();
       }, 200);
+    },
+    /**
+     * Resets the layout when the route changes.
+     */
+    $route(to: Route) {
+      if (to.path !== Routes.ARTIFACT) return;
+
+      layoutStore.resetLayout();
     },
   },
   methods: {

@@ -7,14 +7,19 @@ import {
 
 describe("Project Selection", () => {
   beforeEach(() => {
-    cy.visit("http://localhost:8080")
-      .login(validUser.email, validUser.password)
-      .openProjectSelector();
+    cy.visit("http://localhost:8080").login(
+      validUser.email,
+      validUser.password
+    );
+
+    cy.location("pathname", { timeout: 2000 }).should("equal", "/");
+
+    cy.openProjectSelector();
   });
 
   afterEach(() => {
     // Wait for projects to load
-    cy.wait(500).logout();
+    cy.logout();
   });
 
   describe("Project List", () => {

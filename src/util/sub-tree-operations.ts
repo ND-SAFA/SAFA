@@ -149,14 +149,15 @@ function getSubtree(
 
     subtreeMapCache[childId].parents.push(artifactId);
     currentItem.children.push(childId);
-    currentItem.subtree = Array.from(
-      new Set([
-        ...currentItem.subtree,
-        ...subtreeMapCache[childId].subtree,
-        childId,
-      ])
-    );
+    currentItem.subtree = [
+      ...currentItem.subtree,
+      ...[...subtreeMapCache[childId].subtree, childId].filter(
+        (id) => !currentItem.subtree.includes(id)
+      ),
+    ];
   }
+
+  subtreeMapCache[artifactId] = currentItem;
 
   return currentItem;
 }

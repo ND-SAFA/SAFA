@@ -32,6 +32,7 @@ public class JobAppEntity extends JobDbEntity {
                 f.setAccessible(true);
                 f.set(jobAppEntity, f.get(jobDbEntity));
             }
+            //  jobAppEntity.setCurrentStep(jobAppEntity.getCurrentStep() + 1); // 1 Index steps
             jobAppEntity.steps = JobSteps.getJobSteps(jobAppEntity.jobType);
             return jobAppEntity;
         } catch (IllegalAccessException e) {

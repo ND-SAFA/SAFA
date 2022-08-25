@@ -168,6 +168,7 @@ public abstract class AbstractJob implements Job {
 
     protected abstract UUID getCompletedEntityId();
 
+    @IJobStep(name = "Done", position = -1)
     public void done() {
         this.jobDbEntity.setCompletedEntityId(this.getCompletedEntityId());
         this.serviceProvider.getJobService().completeJob(jobDbEntity);

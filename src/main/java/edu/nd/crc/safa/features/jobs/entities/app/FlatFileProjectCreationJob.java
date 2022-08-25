@@ -85,7 +85,12 @@ public class FlatFileProjectCreationJob extends CommitJob {
         this.flatFileParser = new FlatFileParser(timFileParser);
     }
 
-    @IJobStep(name = "Parsing Artifact Files", position = 2)
+    @IJobStep(name = "Parsing Files", position = 2)
+    public void parsingFiles() {
+        parsingArtifactFiles();
+        parsingTraceFiles();
+    }
+
     public void parsingArtifactFiles() throws SafaError {
         EntityParsingResult<ArtifactAppEntity, String> artifactCreationResponse = flatFileParser.parseArtifacts();
         projectCommit.getArtifacts().setAdded(artifactCreationResponse.getEntities());
@@ -93,7 +98,6 @@ public class FlatFileProjectCreationJob extends CommitJob {
         projectCommit.getErrors().addAll(artifactErrors);
     }
 
-    @IJobStep(name = "Parsing Trace Files", position = 3)
     public void parsingTraceFiles() throws SafaError {
         List<ArtifactAppEntity> artifactsCreated = projectCommit.getArtifacts().getAdded();
         EntityParsingResult<TraceAppEntity, String> traceCreationResponse =
@@ -114,7 +118,7 @@ public class FlatFileProjectCreationJob extends CommitJob {
                 .collect(Collectors.toList());
     }
 
-    @IJobStep(name = "Generating Trace Links", position = 4)
+    @IJobStep(name = "Generating Trace Links", position = 3)
     public void generatingTraces() {
         FlatFileService flatFileService = this.getServiceProvider().getFlatFileService();
         List<TraceAppEntity> generatedLinks = flatFileService.generateTraceLinks(

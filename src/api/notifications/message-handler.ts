@@ -1,18 +1,7 @@
 import { Frame } from "webstomp-client";
-import {
-  ActionType,
-  ChangeModel,
-  EntityType,
-  ChangeMessageModel,
-  ProjectModel,
-} from "@/types";
+import { ActionType, ChangeMessageModel, ChangeModel, EntityType, ProjectModel } from "@/types";
 import { getChanges } from "@/api/endpoints";
-import {
-  handleClearProject,
-  handleLoadVersion,
-  handleReloadJobs,
-  handleReloadWarnings,
-} from "@/api";
+import { handleClearProject, handleLoadVersion, handleReloadJobs, handleReloadWarnings } from "@/api";
 import {
   appStore,
   artifactStore,
@@ -21,7 +10,7 @@ import {
   projectStore,
   sessionStore,
   traceStore,
-  typeOptionsStore,
+  typeOptionsStore
 } from "@/hooks";
 
 /**

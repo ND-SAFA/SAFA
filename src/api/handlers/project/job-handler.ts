@@ -1,13 +1,6 @@
 import { IOHandlerCallback, JobModel } from "@/types";
-import {
-  connect,
-  deleteJobById,
-  Endpoint,
-  fillEndpoint,
-  getUserJobs,
-  stompClient,
-} from "@/api";
-import { appStore, logStore, jobStore } from "@/hooks";
+import { connect, deleteJobById, Endpoint, fillEndpoint, getUserJobs, stompClient } from "@/api";
+import { appStore, jobStore } from "@/hooks";
 
 /**
  * Subscribes to updates for job with given id.
@@ -21,12 +14,9 @@ export async function connectAndSubscribeToJob(jobId: string): Promise<void> {
 
   await connect();
 
-  stompClient.subscribe(fillEndpoint(Endpoint.jobTopic, { jobId }), (frame) => {
-    const incomingJob: JobModel = JSON.parse(frame.body);
-
-    jobStore.updateJob(incomingJob);
-    logStore.onDevInfo(`New Job message: ${incomingJob.id}`);
-  });
+  stompClient.subscribe(fillEndpoint(Endpoint.jobTopic, { jobId }), (frame) =>
+    handleReloadJobs()
+  );
 }
 
 /**

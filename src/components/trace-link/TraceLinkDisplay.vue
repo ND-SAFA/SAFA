@@ -84,21 +84,16 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import {
-  ApprovalType,
-  ArtifactModel,
-  TraceLinkModel,
-  TraceType,
-} from "@/types";
+import { ArtifactModel, TraceLinkModel, TraceType } from "@/types";
 import { GenericArtifactBodyDisplay } from "@/components";
 import { artifactStore, deltaStore } from "@/hooks";
-import { FlexBox } from "@/components/common";
+import { FlexBox, Typography } from "@/components/common";
+import { linkStatus } from "@/util";
 import {
   handleApproveLink,
   handleDeclineLink,
   handleUnreviewLink,
 } from "@/api";
-import Typography from "@/components/common/display/Typography.vue";
 
 /**
  * Displays a trace link.
@@ -158,34 +153,25 @@ export default Vue.extend({
      * @return Whether this link can be deleted.
      */
     showDelete(): boolean {
-      return (
-        !this.canBeModified && !this.hideActions && !deltaStore.inDeltaView
-      );
+      return linkStatus(this.link).canBeDeleted() && !deltaStore.inDeltaView;
     },
     /**
      * @return Whether this link can be approved.
      */
     showApproved(): boolean {
-      return (
-        this.canBeModified && this.link.approvalStatus !== ApprovalType.APPROVED
-      );
+      return !this.hideActions && linkStatus(this.link).canBeApproved();
     },
     /**
      * @return Whether this link can be declined.
      */
     showDeclined(): boolean {
-      return (
-        this.canBeModified && this.link.approvalStatus !== ApprovalType.DECLINED
-      );
+      return !this.hideActions && linkStatus(this.link).canBeDeclined();
     },
     /**
      * @return Whether this link can be unreviewed.
      */
     showUnreviewed(): boolean {
-      return (
-        this.canBeModified &&
-        this.link.approvalStatus !== ApprovalType.UNREVIEWED
-      );
+      return !this.hideActions && linkStatus(this.link).canBeReset();
     },
   },
   methods: {

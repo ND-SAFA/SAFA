@@ -5,7 +5,6 @@ import {
   TraceLinkModel,
   TraceType,
   IOHandlerCallback,
-  GeneratedLinksModel,
   FlatTraceLink,
 } from "@/types";
 import {
@@ -14,6 +13,7 @@ import {
   artifactStore,
   projectStore,
   traceStore,
+  approvalStore,
 } from "@/hooks";
 import {
   createLink,
@@ -32,12 +32,12 @@ import {
 export async function handleGetGeneratedLinks({
   onSuccess,
   onError,
-}: IOHandlerCallback<GeneratedLinksModel>): Promise<void> {
+}: IOHandlerCallback): Promise<void> {
   if (!projectStore.isProjectDefined) return;
 
-  const links: FlatTraceLink[] = [];
-  const approved: string[] = [];
-  const declined: string[] = [];
+  const traceLinks: FlatTraceLink[] = [];
+  const approvedIds: string[] = [];
+  const declinedIds: string[] = [];
 
   try {
     appStore.onLoadStart();
@@ -49,12 +49,12 @@ export async function handleGetGeneratedLinks({
       const target = artifactStore.getArtifactById(link.targetId);
 
       if (link.approvalStatus === ApprovalType.APPROVED) {
-        approved.push(link.traceLinkId);
+        approvedIds.push(link.traceLinkId);
       } else if (link.approvalStatus === ApprovalType.DECLINED) {
-        declined.push(link.traceLinkId);
+        declinedIds.push(link.traceLinkId);
       }
 
-      links.push({
+      traceLinks.push({
         ...link,
         sourceType: source?.type || "",
         sourceBody: source?.body || "",
@@ -63,11 +63,9 @@ export async function handleGetGeneratedLinks({
       });
     });
 
-    onSuccess?.({
-      links,
-      approved,
-      declined,
-    });
+    approvalStore.initializeTraces({ traceLinks, approvedIds, declinedIds });
+
+    onSuccess?.();
   } catch (e) {
     onError?.(e as Error);
   } finally {
@@ -129,6 +127,7 @@ export async function handleApproveLink(
   linkAPIHandler(link, updateApprovedLink, {
     onSuccess: () => {
       traceStore.addOrUpdateTraceLinks([link]);
+      approvalStore.approveLink(link);
       onSuccess?.();
     },
     onError: (e) => {
@@ -155,6 +154,7 @@ export async function handleDeclineLink(
   linkAPIHandler(link, updateDeclinedLink, {
     onSuccess: () => {
       traceStore.deleteTraceLinks([link]);
+      approvalStore.declineLink(link);
       onSuccess?.();
     },
     onError: (e) => {
@@ -180,6 +180,7 @@ export async function handleUnreviewLink(
 
   linkAPIHandler(link, updateUnreviewedLink, {
     onSuccess: () => {
+      approvalStore.resetLink(link);
       onSuccess?.();
     },
     onError: (e) => {

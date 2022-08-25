@@ -126,8 +126,8 @@ export default Vue.extend({
     /**
      * Loads generated links when the version changes.
      */
-    projectVersion(newVersion?: VersionModel) {
-      if (!newVersion) return;
+    versionId(newVersionId: string) {
+      if (!newVersionId) return;
 
       handleGetGeneratedLinks({});
     },
@@ -142,8 +142,8 @@ export default Vue.extend({
     /**
      * @return The current project version.
      */
-    projectVersion() {
-      return projectStore.version;
+    versionId() {
+      return projectStore.versionId;
     },
     /**
      * @return What parts of the expansion panel to show.

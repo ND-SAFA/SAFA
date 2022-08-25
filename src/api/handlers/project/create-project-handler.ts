@@ -3,8 +3,8 @@ import {
   IOHandlerCallback,
   ProjectModel,
 } from "@/types";
-import { navigateTo, Routes } from "@/router";
 import { appStore, logStore } from "@/hooks";
+import { navigateTo, Routes } from "@/router";
 import {
   createJiraProject,
   createProjectCreationJob,

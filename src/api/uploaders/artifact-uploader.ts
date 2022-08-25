@@ -6,8 +6,8 @@ import {
   ArtifactFile,
   ArtifactPanel,
 } from "@/types";
-import { parseArtifactFile } from "@/api";
 import { logStore } from "@/hooks";
+import { parseArtifactFile } from "@/api";
 
 /**
  * Creates an artifact uploader.

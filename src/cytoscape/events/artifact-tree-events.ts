@@ -1,9 +1,9 @@
 import { EventObject } from "cytoscape";
-import { CytoCore, CytoEvent, CytoEventHandlers } from "@/types/cytoscape/core";
 import { ArtifactModel } from "@/types";
 import { layoutStore, selectionStore } from "@/hooks";
-import { DefaultCytoEvents } from "@/cytoscape/events/cyto-events";
 import { disableDrawMode } from "@/cytoscape";
+import { DefaultCytoEvents } from "@/cytoscape/events/cyto-events";
+import { CytoCore, CytoEvent, CytoEventHandlers } from "@/types/cytoscape/core";
 
 const doubleClickDelayMs = 350;
 let previousTapStamp = doubleClickDelayMs;

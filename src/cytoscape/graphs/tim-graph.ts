@@ -2,6 +2,7 @@ import klay from "cytoscape-klay";
 import nodeHtmlLabel from "cytoscape-node-html-label";
 
 import { CytoCoreGraph } from "@/types";
+import { layoutStore } from "@/hooks";
 import { timTreeResolveCy } from "@/cytoscape/cy";
 import {
   DEFAULT_ARTIFACT_TREE_ZOOM,
@@ -9,7 +10,6 @@ import {
   USE_MOTION_BLUR,
   TimStyleSheets,
 } from "@/cytoscape/styles";
-import { layoutStore } from "@/hooks";
 
 /**
  * Defines the initialization of the tim graph.

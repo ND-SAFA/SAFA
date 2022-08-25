@@ -1,11 +1,11 @@
 import { IOHandlerCallback, VersionModel, VersionType } from "@/types";
+import { versionToString } from "@/util";
+import { logStore } from "@/hooks";
 import {
   createMajorVersion,
   createMinorVersion,
   createRevisionVersion,
 } from "@/api";
-import { logStore } from "@/hooks";
-import { versionToString } from "@/util";
 
 /**
  * Creates a new version.

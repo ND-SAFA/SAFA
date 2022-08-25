@@ -1,9 +1,9 @@
 import { defineStore } from "pinia";
 import jwt_decode from "jwt-decode";
 
-import { pinia } from "@/plugins";
 import { AuthToken, LocalStorageKeys, SessionModel } from "@/types";
 import { createSession } from "@/util";
+import { pinia } from "@/plugins";
 import logStore from "./useLog";
 
 /**

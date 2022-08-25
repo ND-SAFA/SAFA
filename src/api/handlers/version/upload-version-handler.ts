@@ -1,8 +1,8 @@
 import { appStore, logStore } from "@/hooks";
 import { navigateTo, Routes } from "@/router";
+import { createFlatFileUploadJob } from "@/api";
 import { handleSelectVersion } from "@/api/notifications";
 import { handleJobSubmission } from "@/api/handlers/project/job-handler";
-import { createFlatFileUploadJob } from "@/api";
 
 /**
  * Responsible for validating and uploading the flat files to a project at a specified version.

@@ -4,6 +4,9 @@ import {
   InternalTraceType,
   LayoutPayload,
 } from "@/types";
+import { areArraysEqual } from "@/util";
+import { selectionStore } from "@/hooks";
+import { applyAutoMoveEvents } from "@/cytoscape";
 import { artifactTreeCyPromise, timTreeCyPromise } from "@/cytoscape/cy";
 import {
   ANIMATION_DURATION,
@@ -11,9 +14,6 @@ import {
   DEFAULT_ARTIFACT_TREE_ZOOM,
   ZOOM_INCREMENT,
 } from "@/cytoscape/styles";
-import { selectionStore } from "@/hooks";
-import { areArraysEqual } from "@/util";
-import { applyAutoMoveEvents } from "@/cytoscape";
 
 /**
  * Runs the given callback if cy is not animated.

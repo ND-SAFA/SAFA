@@ -1,6 +1,6 @@
+import { sessionStore, logStore } from "@/hooks";
 import { getParam, navigateTo, QueryParams, Routes } from "@/router";
 import { getCurrentVersion, getProjects, handleLoadVersion } from "@/api";
-import { sessionStore, logStore } from "@/hooks";
 
 /**
  * Loads the last stored project.

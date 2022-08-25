@@ -1,7 +1,7 @@
 import { ProjectModel } from "@/types";
 import { createProject } from "@/util";
-import { QueryParams, removeParams, updateParam } from "@/router";
 import { documentStore, subtreeStore, projectStore } from "@/hooks";
+import { QueryParams, removeParams, updateParam } from "@/router";
 import {
   handleLoadTraceMatrices,
   handleLoadVersion,

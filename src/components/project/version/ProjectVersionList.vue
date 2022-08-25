@@ -38,10 +38,10 @@ import {
   VersionModel,
 } from "@/types";
 import { versionToString } from "@/util";
+import { logStore } from "@/hooks";
+import { handleLoadVersion } from "@/api";
 import { GenericStepper } from "@/components/common";
 import { ProjectSelector } from "@/components/project/selector";
-import { handleLoadVersion } from "@/api";
-import { logStore } from "@/hooks";
 import VersionSelector from "./VersionSelector.vue";
 
 const SELECT_PROJECT_DEFAULT_NAME = "Select a Project";

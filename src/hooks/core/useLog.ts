@@ -1,8 +1,8 @@
 import { defineStore } from "pinia";
 
-import { pinia } from "@/plugins";
 import { APIErrorBody, MessageType } from "@/types";
 import { createConfirmDialogueMessage, createSnackbarMessage } from "@/util";
+import { pinia } from "@/plugins";
 
 /**
  * This module controls logging and snackbar messages.

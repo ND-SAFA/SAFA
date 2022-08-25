@@ -28,8 +28,8 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { typeOptionsStore } from "@/hooks";
 import { LabelledTraceDirectionModel } from "@/types";
+import { typeOptionsStore } from "@/hooks";
 import { GenericIconButton } from "@/components/common/generic";
 import AttributeChip from "@/components/common/display/AttributeChip.vue";
 

@@ -35,13 +35,13 @@
 <script lang="ts">
 import Vue from "vue";
 import { ArtifactSearchItem } from "@/types";
+import { filterArtifacts, objectToArray } from "@/util";
 import { typeOptionsStore, artifactStore, selectionStore } from "@/hooks";
 import {
   GenericArtifactBodyDisplay,
   Typography,
   FlexBox,
 } from "@/components/common";
-import { filterArtifacts, objectToArray } from "@/util";
 
 /**
  * Artifact search bar.

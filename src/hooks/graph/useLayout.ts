@@ -1,7 +1,6 @@
 import { defineStore } from "pinia";
 
 import { LayoutOptions, NodeSingular } from "cytoscape";
-import { pinia } from "@/plugins";
 import {
   ArtifactPositions,
   IGraphLayout,
@@ -19,6 +18,7 @@ import {
   TimGraphLayout,
   timTreeCyPromise,
 } from "@/cytoscape";
+import { pinia } from "@/plugins";
 import { appStore } from "@/hooks/core";
 import selectionStore from "@/hooks/graph/useSelection";
 import subtreeStore from "@/hooks/project/useSubtree";

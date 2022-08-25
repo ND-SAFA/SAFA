@@ -25,8 +25,8 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { ProjectModel, IdentifierModel } from "@/types";
-import { handleSaveProject } from "@/api";
 import { projectStore } from "@/hooks";
+import { handleSaveProject } from "@/api";
 import { GenericIconButton, Typography, FlexBox } from "@/components/common";
 import { ProjectIdentifierModal } from "@/components/project/shared";
 

@@ -1,4 +1,5 @@
 import { Core, EventObject, LayoutOptions, Layouts } from "cytoscape";
+import { ArtifactData, TimNodeData } from "@/types";
 import {
   AutoMoveOptions,
   AutoMoveRule,
@@ -9,7 +10,6 @@ import {
   KlayLayoutOptions,
   ContextMenuOptions,
 } from "@/types/cytoscape";
-import { ArtifactData, TimNodeData } from "@/types";
 
 /**
  * The HtmlDefinitions used with in the application.

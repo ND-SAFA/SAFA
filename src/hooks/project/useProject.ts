@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
+import { MembershipModel, ProjectModel, VersionModel } from "@/types";
 import { createProject, removeMatches } from "@/util";
 import { pinia } from "@/plugins";
-import { MembershipModel, ProjectModel, VersionModel } from "@/types";
 import selectionStore from "@/hooks/graph/useSelection";
 import logStore from "../core/useLog";
 import warningStore from "./useWarnings";

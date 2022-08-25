@@ -8,8 +8,8 @@ import {
   selectionStore,
   layoutStore,
 } from "@/hooks";
-import { enableDrawMode } from "@/cytoscape";
 import { handleDeleteArtifact, handleDuplicateArtifact } from "@/api";
+import { enableDrawMode } from "@/cytoscape";
 import { safetyCaseMenuOption } from "./safety-case-menu-option";
 import { ftaMenuItem } from "./fta-menu-options";
 

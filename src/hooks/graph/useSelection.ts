@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-import { pinia } from "@/plugins";
+import { ArtifactModel, FilterAction, PanelType } from "@/types";
 import {
   artifactTreeCyPromise,
   cyCenterOnArtifacts,
@@ -8,7 +8,7 @@ import {
   doesNotContainType,
   isInSubtree,
 } from "@/cytoscape";
-import { ArtifactModel, FilterAction, PanelType } from "@/types";
+import { pinia } from "@/plugins";
 import subtreeStore from "../project/useSubtree";
 import artifactStore from "../project/useArtifacts";
 import appStore from "../core/useApp";

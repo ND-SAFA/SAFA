@@ -6,8 +6,8 @@ import {
   JiraProjectListModel,
   JobModel,
 } from "@/types";
-import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
 import { sessionStore } from "@/hooks";
+import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
 
 /**
  * The formatted scopes of Jira permissions being requested.

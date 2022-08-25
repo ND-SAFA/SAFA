@@ -81,12 +81,12 @@ import {
   TraceLinkModel,
 } from "@/types";
 import { createProject } from "@/util";
+import { sessionStore } from "@/hooks";
 import {
   handleImportProject,
   createArtifactUploader,
   createTraceUploader,
 } from "@/api";
-import { sessionStore } from "@/hooks";
 import { GenericStepper } from "@/components/common";
 import { ProjectIdentifierInput } from "@/components/project/shared";
 import { ArtifactTypeCreator, TraceFileCreator } from "../panels";

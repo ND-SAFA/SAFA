@@ -38,8 +38,8 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { artifactStore, selectionStore, subtreeStore } from "@/hooks";
 import { ListItem } from "@/types";
+import { artifactStore, selectionStore, subtreeStore } from "@/hooks";
 import {
   GenericListItem,
   Typography,

@@ -1,12 +1,11 @@
 <template>
   <v-combobox
     filled
-    clearable
     ref="artifactTypeInput"
     :label="label"
     :multiple="multiple"
     v-model="model"
-    :items="typeDirections"
+    :items="types"
     :hint="hint"
     :persistent-hint="persistentHint"
     item-text="label"
@@ -23,17 +22,13 @@
       />
     </template>
     <template v-slot:selection="{ item }">
-      <attribute-chip
-        artifact-type
-        :value="typeof item === 'string' ? item : item.type"
-      />
+      <attribute-chip artifact-type :value="item" />
     </template>
   </v-combobox>
 </template>
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { LabelledTraceDirectionModel } from "@/types";
 import { typeOptionsStore } from "@/hooks";
 import { GenericIconButton } from "@/components/common/generic";
 import AttributeChip from "@/components/common/display/AttributeChip.vue";
@@ -72,8 +67,8 @@ export default Vue.extend({
     /**
      * @return The current project's artifact types.
      */
-    typeDirections(): LabelledTraceDirectionModel[] {
-      return typeOptionsStore.typeDirections();
+    types(): string[] {
+      return typeOptionsStore.artifactTypes;
     },
   },
   methods: {
@@ -94,20 +89,7 @@ export default Vue.extend({
     /**
      * Emits changes to the model.
      */
-    model(
-      currentValue:
-        | string[]
-        | string
-        | LabelledTraceDirectionModel
-        | LabelledTraceDirectionModel[]
-        | null
-    ) {
-      if (Array.isArray(currentValue)) {
-        currentValue.map((val) => (typeof val === "string" ? val : val.type));
-      } else if (currentValue !== null && typeof currentValue === "object") {
-        currentValue = currentValue.type;
-      }
-
+    model(currentValue: string[] | string | null) {
       this.$emit("input", currentValue);
     },
   },

@@ -77,8 +77,9 @@ import {
   ColumnModel,
   FlatArtifact,
 } from "@/types";
-import { artifactStore } from "@/hooks";
 import { ThemeColors } from "@/util";
+import { artifactStore } from "@/hooks";
+import { handleSaveArtifact } from "@/api";
 import {
   GenericIconButton,
   SingleCustomFieldInput,
@@ -86,7 +87,6 @@ import {
   FlexBox,
   AttributeChip,
 } from "@/components/common";
-import { handleSaveArtifact } from "@/api";
 
 /**
  * Displays a cell in the artifact table.

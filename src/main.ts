@@ -3,8 +3,8 @@ import Vue from "vue";
 import "@/plugins/vue-cytoscape";
 import "@mdi/font/css/materialdesignicons.css";
 
-import App from "@/App.vue";
 import { router } from "@/router";
+import App from "@/App.vue";
 import { vuetify, pinia } from "@/plugins";
 
 Vue.config.productionTip = false;

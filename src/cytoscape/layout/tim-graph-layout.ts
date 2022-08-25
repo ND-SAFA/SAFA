@@ -1,5 +1,5 @@
-import { DefaultCytoEvents } from "@/cytoscape/events";
 import { TIMPostLayoutHooks, TIMPreLayoutHooks } from "@/cytoscape";
+import { DefaultCytoEvents } from "@/cytoscape/events";
 import { TimKlaySettings } from "./tim-klay-settings";
 import GraphLayout from "./graph-layout";
 

@@ -34,9 +34,9 @@
 <script lang="ts">
 import Vue from "vue";
 import { MessageType, SnackbarMessage } from "@/types";
+import { ThemeColors } from "@/util";
 import { appStore, logStore } from "@/hooks";
 import { ServerErrorModal } from "@/components/common/modals";
-import { ThemeColors } from "@/util";
 import FlexBox from "@/components/common/display/FlexBox.vue";
 import Typography from "./Typography.vue";
 

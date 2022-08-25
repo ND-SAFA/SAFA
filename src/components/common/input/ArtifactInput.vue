@@ -45,8 +45,8 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { ArtifactModel } from "@/types";
-import { artifactStore } from "@/hooks";
 import { filterArtifacts } from "@/util";
+import { artifactStore } from "@/hooks";
 import {
   GenericArtifactBodyDisplay,
   GenericIconButton,

@@ -1,7 +1,4 @@
 import { Stylesheet } from "cytoscape";
-import { ARTIFACT_HEIGHT, ARTIFACT_WIDTH } from "@/cytoscape/styles/config";
-import { CytoStyleSheet } from "@/types/cytoscape";
-import { ThemeColors } from "@/util";
 import {
   ArtifactDeltaState,
   FTANodeType,
@@ -9,6 +6,9 @@ import {
   ApprovalType,
   TraceType,
 } from "@/types";
+import { ThemeColors } from "@/util";
+import { ARTIFACT_HEIGHT, ARTIFACT_WIDTH } from "@/cytoscape/styles/config";
+import { CytoStyleSheet } from "@/types/cytoscape";
 
 export const ARTIFACT_NODE_SELECTOR = "node[graph='artifact']";
 export const ARTIFACT_EDGE_SELECTOR = "edge[graph='artifact']";

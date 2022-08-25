@@ -1,6 +1,5 @@
 import { defineStore } from "pinia";
 
-import { pinia } from "@/plugins";
 import {
   ArtifactModel,
   ProjectModel,
@@ -14,6 +13,7 @@ import {
   getMatchingChildren,
 } from "@/util";
 import { cyDisplayAll, cySetDisplay } from "@/cytoscape";
+import { pinia } from "@/plugins";
 import traceStore from "./useTraces";
 import artifactStore from "./useArtifacts";
 

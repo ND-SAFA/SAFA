@@ -38,8 +38,8 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { IdentifierModel, VersionModel, DataItem } from "@/types";
-import { getProjectVersions, handleDeleteVersion } from "@/api";
 import { projectStore } from "@/hooks";
+import { getProjectVersions, handleDeleteVersion } from "@/api";
 import { GenericSelector } from "@/components/common";
 import ConfirmVersionDelete from "./ConfirmVersionDelete.vue";
 import VersionCreator from "./VersionCreator.vue";

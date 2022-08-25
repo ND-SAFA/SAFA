@@ -1,5 +1,6 @@
 import Vue from "vue";
 import VueRouter, { NavigationGuardNext, Route, RouteConfig } from "vue-router";
+import { routerChecks } from "@/router/checks";
 import {
   ApproveLinksView,
   ArtifactView,
@@ -14,7 +15,6 @@ import {
   HomeView,
   MyAccountView,
 } from "@/views";
-import { routerChecks } from "@/router/checks";
 import { Routes } from "./routes";
 
 export { Routes };

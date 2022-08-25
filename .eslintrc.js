@@ -28,12 +28,51 @@ module.exports = {
           "external",
           "type",
           "internal",
-          "object",
-          "index",
           "parent",
           "sibling",
+          "index",
+          "object",
         ],
         pathGroups: [
+          {
+            pattern: "@/types",
+            group: "type",
+          },
+          {
+            pattern: "@/util",
+            group: "internal",
+            position: "before",
+          },
+          {
+            pattern: "@/hooks",
+            group: "internal",
+            position: "before",
+          },
+          {
+            pattern: "@/router",
+            group: "internal",
+            position: "before",
+          },
+          {
+            pattern: "@/api",
+            group: "internal",
+            position: "before",
+          },
+          {
+            pattern: "@/cytoscape",
+            group: "internal",
+            position: "before",
+          },
+          {
+            pattern: "@/components",
+            group: "internal",
+            position: "after",
+          },
+          {
+            pattern: "@/views",
+            group: "internal",
+            position: "after",
+          },
           {
             pattern: "@/**",
             group: "internal",

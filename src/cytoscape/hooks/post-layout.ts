@@ -7,10 +7,10 @@ import {
   CytoEvent,
   ArtifactData,
 } from "@/types";
+import { isArtifactData } from "@/util";
 import { selectionStore } from "@/hooks";
 import { cyCenterNodes, cyZoomReset, timTreeCyPromise } from "@/cytoscape";
 import { MenuItem } from "@/types/cytoscape/plugins/context-menus";
-import { isArtifactData } from "@/util";
 import { artifactTreeMenuItems } from "@/cytoscape/plugins";
 
 /**

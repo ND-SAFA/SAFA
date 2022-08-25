@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 
-import { pinia } from "@/plugins";
 import { ProjectWarnings } from "@/types";
+import { pinia } from "@/plugins";
 
 /**
  * This module defines the state of warnings generated for

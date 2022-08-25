@@ -29,13 +29,13 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { TraceLinkModel } from "@/types";
-import { FlexBox, GenericIconButton } from "@/components/common";
+import { linkStatus } from "@/util";
 import {
   handleApproveLink,
   handleDeclineLink,
   handleUnreviewLink,
 } from "@/api";
-import { linkStatus } from "@/util";
+import { FlexBox, GenericIconButton } from "@/components/common";
 
 /**
  * Displays trace link approval buttons.

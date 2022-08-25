@@ -1,8 +1,8 @@
+import { ArtifactData, HtmlDefinition, TimNodeData } from "@/types";
 import {
   ARTIFACT_NODE_SELECTOR,
   TIM_NODE_SELECTOR,
 } from "@/cytoscape/styles/stylesheets";
-import { ArtifactData, HtmlDefinition, TimNodeData } from "@/types";
 import { svgTIM } from "./tim-node";
 import { svgDefault } from "./default-node";
 import { svgSafetyCase } from "./sc-node";

@@ -50,9 +50,9 @@
 
 <script lang="ts">
 import Vue from "vue";
+import { ArtifactModel, LabelledTraceDirectionModel } from "@/types";
 import { typeOptionsStore, artifactStore, traceStore } from "@/hooks";
 import { handleCreateLink } from "@/api";
-import { ArtifactModel, LabelledTraceDirectionModel } from "@/types";
 import {
   GenericModal,
   Typography,

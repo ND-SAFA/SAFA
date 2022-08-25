@@ -52,8 +52,8 @@
 <script lang="ts">
 import Vue from "vue";
 import { appStore, documentStore, projectStore } from "@/hooks";
-import { GenericIconButton } from "@/components";
 import { disableDrawMode, enableDrawMode } from "@/cytoscape";
+import { GenericIconButton } from "@/components";
 
 /**
  * Displays the artifact tree action buttons.

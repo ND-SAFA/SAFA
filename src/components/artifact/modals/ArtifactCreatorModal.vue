@@ -4,6 +4,7 @@
     :isOpen="!!isOpen"
     :isLoading="isLoading"
     size="l"
+    data-cy="modal-artifact-save"
     @close="$emit('close')"
   >
     <template v-slot:body>
@@ -14,12 +15,16 @@
         @change:parent="parentId = $event"
         @change:documentType="handleDocumentTypeChange"
         @change:valid="isNameValid = $event"
-        data-cy="create-new-artifact-button"
       />
     </template>
     <template v-slot:actions>
       <v-row justify="end">
-        <v-btn color="primary" :disabled="!canSave" @click="handleSubmit">
+        <v-btn
+          color="primary"
+          :disabled="!canSave"
+          data-cy="button-artifact-save"
+          @click="handleSubmit"
+        >
           Save
         </v-btn>
       </v-row>

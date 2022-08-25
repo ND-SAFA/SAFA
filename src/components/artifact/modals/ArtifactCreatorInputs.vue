@@ -12,6 +12,7 @@
           hint="Please select an identifier for the artifact"
           :error-messages="nameError"
           :loading="nameCheckIsLoading"
+          data-cy="input-artifact-name"
         />
         <artifact-type-input
           persistent-hint
@@ -19,6 +20,7 @@
           v-model="artifact.type"
           label="Artifact Type"
           hint="Required"
+          data-cy="input-artifact-type"
         />
         <v-select
           filled
@@ -28,6 +30,7 @@
           item-text="name"
           item-value="id"
           hint="Which type of document this artifact belongs to"
+          data-cy="input-artifact-document"
         />
         <v-select
           filled
@@ -37,6 +40,7 @@
           :items="safetyCaseTypes"
           item-text="name"
           item-value="id"
+          data-cy="input-artifact-sc"
         />
         <v-select
           filled
@@ -46,6 +50,7 @@
           :items="logicTypes"
           item-text="name"
           item-value="id"
+          data-cy="input-artifact-logic"
         />
         <artifact-input
           only-document-artifacts
@@ -53,6 +58,7 @@
           v-model="parentId"
           :multiple="false"
           label="Parent Artifact"
+          data-cy="input-artifact-parent"
         />
       </v-col>
       <v-col cols="7" v-if="!isFTA">
@@ -66,6 +72,7 @@
           v-model="artifact.body"
           rows="3"
           hint="Required"
+          data-cy="input-artifact-body"
         />
         <v-textarea
           filled
@@ -74,6 +81,7 @@
           v-model="artifact.summary"
           rows="3"
           hint="A brief summary of the artifact content"
+          data-cy="input-artifact-summary"
         />
       </v-col>
     </v-row>

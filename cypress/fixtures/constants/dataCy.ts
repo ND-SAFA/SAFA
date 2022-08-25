@@ -86,4 +86,17 @@ export enum DataCy {
 
   versionUploadModal = "modal-version-upload",
   versionUploadFilesInput = "input-files-version",
+
+  // Artifact View
+
+  artifactFabToggle = "button-fab-toggle",
+  artifactFabCreateArtifact = "button-fab-create-artifact",
+  artifactFabCreateTrace = "button-fab-create-trace",
+  artifactFabDrawTrace = "button-fab-draw-trace",
+
+  artifactSaveModal = "modal-artifact-save",
+  artifactSaveNameInput = "input-artifact-name",
+  artifactSaveTypeInput = "input-artifact-type",
+  artifactSaveBodyInput = "input-artifact-body",
+  artifactSaveSubmitButton = "button-artifact-save",
 }

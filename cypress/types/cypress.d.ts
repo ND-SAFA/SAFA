@@ -147,5 +147,21 @@ declare namespace Cypress {
      * Creates a new version of the given type.
      */
     createNewVersion(type: "major" | "minor" | "revision"): Chainable<void>;
+
+    // Artifact View
+
+    /**
+     * Creates a new artifact from the artifact fab button.
+     * Does not click the save button on the artifact, leaving the modal open.
+     *
+     * @param name - A specific name to set.
+     * @param type - A specific type to set.
+     * @param body - A specific body to set.
+     */
+    createNewArtifact(
+      name?: string,
+      type?: string,
+      body?: string
+    ): Chainable<void>;
   }
 }

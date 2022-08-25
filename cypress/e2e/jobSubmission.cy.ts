@@ -5,7 +5,7 @@ describe("Job Submission", () => {
   beforeEach(() => {
     // TODO: clean up existing jobs instead of after tests.
 
-    cy.visit("//create?tab=bulk").login(validUser.email, validUser.password);
+    cy.visit("/create?tab=bulk").login(validUser.email, validUser.password);
 
     cy.location("pathname", { timeout: 2000 }).should("equal", "/create");
 

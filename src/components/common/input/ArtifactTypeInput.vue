@@ -1,6 +1,7 @@
 <template>
-  <v-autocomplete
+  <v-combobox
     filled
+    clearable
     ref="artifactTypeInput"
     :label="label"
     :multiple="multiple"
@@ -11,6 +12,7 @@
     item-text="label"
     item-value="type"
     @blur="$emit('blur')"
+    @submit="$emit('blur')"
   >
     <template v-slot:append>
       <generic-icon-button
@@ -21,9 +23,12 @@
       />
     </template>
     <template v-slot:selection="{ item }">
-      <attribute-chip artifact-type :value="item.type" />
+      <attribute-chip
+        artifact-type
+        :value="typeof item === 'string' ? item : item.type"
+      />
     </template>
-  </v-autocomplete>
+  </v-combobox>
 </template>
 
 <script lang="ts">
@@ -37,13 +42,14 @@ import AttributeChip from "@/components/common/display/AttributeChip.vue";
  * An input for selecting artifact types.
  *
  * @emits-1 `blur` - On input blur.
+ * @emits-2 `input` (string[] | string | undefined) - On input change.
  */
 export default Vue.extend({
   name: "ArtifactTypeInput",
   components: { AttributeChip, GenericIconButton },
   props: {
     value: {
-      type: [Array, String] as PropType<string[] | string | undefined>,
+      type: [Array, String] as PropType<string[] | string | null>,
       required: false,
     },
     multiple: {
@@ -82,13 +88,26 @@ export default Vue.extend({
     /**
      * Updates the model if the value changes.
      */
-    value(currentValue: string[] | string | undefined) {
+    value(currentValue: string[] | string | null) {
       this.model = currentValue;
     },
     /**
      * Emits changes to the model.
      */
-    model(currentValue: string[] | string | undefined) {
+    model(
+      currentValue:
+        | string[]
+        | string
+        | LabelledTraceDirectionModel
+        | LabelledTraceDirectionModel[]
+        | null
+    ) {
+      if (Array.isArray(currentValue)) {
+        currentValue.map((val) => (typeof val === "string" ? val : val.type));
+      } else if (currentValue !== null && typeof currentValue === "object") {
+        currentValue = currentValue.type;
+      }
+
       this.$emit("input", currentValue);
     },
   },

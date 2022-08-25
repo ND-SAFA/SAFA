@@ -92,6 +92,7 @@ export function isLinkAllowedByType(
  * @param traceLink - The link to check.
  * @return Status callbacks.
  */
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function linkStatus(traceLink?: TraceLinkModel) {
   const canBeModified = () => traceLink?.traceType === TraceType.GENERATED;
 

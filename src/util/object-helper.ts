@@ -1,5 +1,3 @@
-import { ArtifactModel } from "@/types";
-
 /**
  * Converts a value or an object containing that value to the value itself.
  *

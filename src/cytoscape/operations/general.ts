@@ -3,7 +3,6 @@ import {
   IGraphLayout,
   InternalTraceType,
   LayoutPayload,
-  LayoutPosition,
 } from "@/types";
 import { artifactTreeCyPromise, timTreeCyPromise } from "@/cytoscape/cy";
 import {
@@ -80,25 +79,6 @@ export function cyCenterNodes(
     cy.center(cy.nodes());
   });
 }
-
-// /**
-//  * Sets the position of a node.
-//  *
-//  * @param id - The node id to set.
-//  * @param pos - The position to set to.
-//  * @param cyPromise - The cy instance.
-//  */
-// export function cySetPosition(
-//   id: string,
-//   pos: LayoutPosition,
-//   cyPromise: CyPromise = artifactTreeCyPromise
-// ): void {
-//   cyPromise.then((cy) => {
-//     cy.nodes(`[id="${id}"]`).forEach((node) => {
-//
-//     });
-//   });
-// }
 
 /**
  * Creates the given layout.

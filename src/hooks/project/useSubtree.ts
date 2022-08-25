@@ -106,7 +106,7 @@ export const useSubtree = defineStore("subtrees", {
      * @param rootId - The Id of the root artifact whose subtree is being hidden.
      */
     async hideSubtree(rootId: string): Promise<void> {
-      const childrenInSubtree = this.subtreeMap[rootId];
+      const childrenInSubtree = this.subtreeMap[rootId].children;
       const nodesInSubtree = [...childrenInSubtree, rootId];
       const visibleChildren = childrenInSubtree.filter(
         (id) => !this.hiddenSubtreeNodes.includes(id)
@@ -130,7 +130,7 @@ export const useSubtree = defineStore("subtrees", {
      * @param rootId - The Id of artifact whose subtree showed by un-hidden.
      */
     async showSubtree(rootId: string): Promise<void> {
-      const subtreeNodes = this.subtreeMap[rootId];
+      const subtreeNodes = this.subtreeMap[rootId].subtree;
       const hiddenSubtreeNodes = this.hiddenSubtreeNodes.filter(
         (id) => !subtreeNodes.includes(id)
       );
@@ -175,7 +175,7 @@ export const useSubtree = defineStore("subtrees", {
      * @return The ids of all hidden child artifacts.
      */
     getHiddenChildren(parentId: string): string[] {
-      return this.subtreeMap[parentId].filter((id) =>
+      return this.subtreeMap[parentId].subtree.filter((id) =>
         this.hiddenSubtreeNodes.includes(id)
       );
     },
@@ -190,7 +190,7 @@ export const useSubtree = defineStore("subtrees", {
       return getMatchingChildren(
         parentIds,
         childTypes,
-        (id) => this.subtreeMap[id],
+        (id) => this.subtreeMap[id].subtree,
         artifactStore.getArtifactById
       );
     },

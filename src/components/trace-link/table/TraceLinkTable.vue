@@ -82,12 +82,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { DataTableHeader } from "vuetify";
-import {
-  ApprovalType,
-  FlatTraceLink,
-  TraceTableGroup,
-  VersionModel,
-} from "@/types";
+import { ApprovalType, FlatTraceLink, TraceTableGroup } from "@/types";
 import { approvalStore, appStore, projectStore } from "@/hooks";
 import { handleGetGeneratedLinks } from "@/api";
 import { AttributeChip, TableGroupHeader } from "@/components/common";

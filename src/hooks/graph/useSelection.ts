@@ -79,7 +79,7 @@ export const useSelection = defineStore("selection", {
      */
     viewArtifactSubtree(artifactId: string): void {
       const artifactsInSubtree = [
-        ...(subtreeStore.subtreeMap[artifactId] || []),
+        ...(subtreeStore.subtreeMap[artifactId].subtree || []),
         artifactId,
       ];
 

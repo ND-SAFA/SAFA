@@ -119,9 +119,6 @@ export default Vue.extend({
     this.fetchProjects();
   },
   watch: {
-    $route() {
-      this.fetchProjects();
-    },
     /**
      * When opened, fetches projects and selects the first if there is only one.
      */

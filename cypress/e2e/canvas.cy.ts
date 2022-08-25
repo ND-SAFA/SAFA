@@ -1,4 +1,4 @@
-describe("Canvas", () => {
+describe.skip("Canvas", () => {
   beforeEach(() => {
     cy.visit(
       "http://localhost:8080/project?version=daaa6838-a446-4b14-bb7a-dd343f855e06"

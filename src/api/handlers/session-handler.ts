@@ -18,6 +18,7 @@ import {
   createLoginSession,
   savePassword,
   deleteAccount,
+  handleLoadLastProject,
 } from "@/api";
 import { sessionStore, logStore } from "@/hooks";
 
@@ -35,7 +36,9 @@ export async function handleLogin(user: UserModel): Promise<void> {
 
   sessionStore.updateSession(session);
 
-  if (typeof goToPath === "string") {
+  if (goToPath === Routes.ARTIFACT) {
+    await handleLoadLastProject();
+  } else if (typeof goToPath === "string") {
     await navigateTo(goToPath, query);
   } else {
     await navigateTo(Routes.HOME, query);

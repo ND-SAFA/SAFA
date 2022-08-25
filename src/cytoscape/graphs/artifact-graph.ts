@@ -17,7 +17,6 @@ import {
   MOTION_BLUE_OPACITY,
   USE_MOTION_BLUR,
 } from "@/cytoscape/styles";
-import { layoutStore } from "@/hooks";
 
 /**
  * Defines the initialization of the artifact tree graph.
@@ -61,7 +60,5 @@ export const artifactTreeGraph: CytoCoreGraph = {
       },
     },
   ],
-  async afterInit() {
-    await layoutStore.setArtifactTreeLayout();
-  },
+  afterInit: () => undefined,
 };

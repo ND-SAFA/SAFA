@@ -1,5 +1,12 @@
 import { IOHandlerCallback, JobModel } from "@/types";
-import { connect, deleteJobById, Endpoint, fillEndpoint, getUserJobs, stompClient } from "@/api";
+import {
+  connect,
+  deleteJobById,
+  Endpoint,
+  fillEndpoint,
+  getUserJobs,
+  stompClient,
+} from "@/api";
 import { appStore, jobStore } from "@/hooks";
 
 /**
@@ -14,7 +21,7 @@ export async function connectAndSubscribeToJob(jobId: string): Promise<void> {
 
   await connect();
 
-  stompClient.subscribe(fillEndpoint(Endpoint.jobTopic, { jobId }), (frame) =>
+  stompClient.subscribe(fillEndpoint(Endpoint.jobTopic, { jobId }), () =>
     handleReloadJobs()
   );
 }

@@ -15,10 +15,17 @@ export async function connectAndSubscribeToJob(jobId: string): Promise<void> {
 
   await connect();
 
-  stompClient.subscribe(fillEndpoint(Endpoint.jobTopic, { jobId }), updateJob);
+  stompClient.subscribe(
+    fillEndpoint(Endpoint.jobTopic, { jobId }),
+    updateJobFromWebsocketMessage
+  );
 }
 
-export async function updateJob(frame: Frame) {
+/**
+ * Extracts job from websocket message and updates the according job.
+ * @param frame The frame to be
+ */
+export async function updateJobFromWebsocketMessage(frame: Frame) {
   const job: JobModel = JSON.parse(frame.body);
   jobStore.updateJob(job);
 }

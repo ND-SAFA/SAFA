@@ -71,7 +71,7 @@ public abstract class AbstractCrudTest<T extends IAppEntity> extends Application
     }
 
     private List<T> getEntities(ProjectVersion projectVersion, UUID entityId) {
-        return this.getAppService().getAppEntitiesByIds(projectVersion, List.of(entityId.toString()));
+        return this.getAppService().getAppEntitiesByIds(projectVersion, List.of(entityId));
     }
 
     /**

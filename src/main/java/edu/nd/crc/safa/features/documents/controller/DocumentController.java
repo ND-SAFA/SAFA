@@ -69,8 +69,8 @@ public class DocumentController extends BaseDocumentController {
         document.setProject(project);
         this.documentRepository.save(document);
 
-        if (documentAppEntity.getDocumentId().isEmpty()) {
-            documentAppEntity.setDocumentId(document.getDocumentId().toString());
+        if (documentAppEntity.getDocumentId() == null) {
+            documentAppEntity.setDocumentId(document.getDocumentId());
         }
 
         // Create or update: artifact links
@@ -79,10 +79,14 @@ public class DocumentController extends BaseDocumentController {
             document,
             documentAppEntity.getArtifactIds());
         List<UUID> affectedArtifactIds =
-            documentAppEntity.getArtifactIds().stream().map(UUID::fromString).collect(Collectors.toList());
+            documentAppEntity.getArtifactIds().stream().collect(Collectors.toList());
 
         // Create or update: columns
         documentService.updateFMEAColumns(documentAppEntity, document);
+
+        // Generate layout
+        Map<UUID, LayoutPosition> documentLayout = createDocumentLayout(projectVersion, documentAppEntity);
+        documentAppEntity.setLayout(documentLayout);
 
         // Update version subscribers
         notificationService.broadcastChange(
@@ -91,17 +95,13 @@ public class DocumentController extends BaseDocumentController {
                 .withArtifactsUpdate(affectedArtifactIds)
         );
 
-        // Generate layout
-        Map<String, LayoutPosition> documentLayout = createDocumentLayout(projectVersion, documentAppEntity);
-        documentAppEntity.setLayout(documentLayout);
-
         return documentAppEntity;
     }
 
-    public Map<String, LayoutPosition> createDocumentLayout(ProjectVersion projectVersion,
-                                                            DocumentAppEntity documentAppEntity) {
+    public Map<UUID, LayoutPosition> createDocumentLayout(ProjectVersion projectVersion,
+                                                          DocumentAppEntity documentAppEntity) {
         LayoutManager projectLayout = new LayoutManager(serviceProvider, projectVersion);
-        return projectLayout.generateDocumentLayout(documentAppEntity.toDocument(), true);
+        return projectLayout.generateDocumentLayout(documentAppEntity.toDocument());
     }
 
     /**

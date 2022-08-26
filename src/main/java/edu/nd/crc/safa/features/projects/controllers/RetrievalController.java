@@ -70,7 +70,7 @@ public class RetrievalController extends BaseController {
      */
     @GetMapping(AppRoutes.Retrieval.GET_ARTIFACT_IDS_IN_VERSION)
     public List<ArtifactAppEntity> queryArtifactInVersion(@PathVariable UUID versionId,
-                                                          @RequestBody List<String> artifactIds) throws SafaError {
+                                                          @RequestBody List<UUID> artifactIds) throws SafaError {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
         return this.serviceProvider.getArtifactService().getAppEntitiesByIds(projectVersion, artifactIds);
     }

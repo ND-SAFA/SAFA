@@ -3,6 +3,7 @@ package edu.nd.crc.safa.features.rules.services;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
@@ -34,9 +35,9 @@ public class RuleService {
      * @param traceLinks The links between artifacts.
      * @return Returns a map of artifact id's to a list of warning associated with that artifact.
      */
-    public Map<String, List<RuleName>> generateWarningsOnEntities(Project project,
-                                                                  List<ArtifactVersion> artifacts,
-                                                                  List<TraceLink> traceLinks) {
+    public Map<UUID, List<RuleName>> generateWarningsOnEntities(Project project,
+                                                                List<ArtifactVersion> artifacts,
+                                                                List<TraceLink> traceLinks) {
         TreeVerifier verifier = new TreeVerifier();
         List<ParserRule> rulesToApply = new ArrayList<>();
         rulesToApply.addAll(DefaultTreeRules.getDefaultRules());

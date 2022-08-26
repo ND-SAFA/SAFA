@@ -1,7 +1,5 @@
 package features.notifications.documentartifact;
 
-import java.util.UUID;
-
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
@@ -37,7 +35,7 @@ public class DocumentArtifactNotificationTestService {
         // VP - Verify commit message
         EntityChangeMessage commitMessage = this.notificationService.getNextMessage(test.getShareeEmail());
         this.changeMessageVerifies.verifyArtifactMessage(commitMessage,
-            UUID.fromString(artifactAdded.getId()),
+            artifactAdded.getId(),
             Change.Action.UPDATE
         );
 

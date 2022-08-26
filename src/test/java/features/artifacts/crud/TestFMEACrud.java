@@ -13,7 +13,7 @@ public class TestFMEACrud extends AbstractArtifactCrudTest {
     protected ArtifactAppEntity getStartingArtifact() {
         Map<String, String> customFields = new HashMap<>();
         customFields.put("key", "value");
-        return new ArtifactAppEntity("",
+        return new ArtifactAppEntity(null,
             DocumentType.FMEA.toString(),
             "RE-20",
             "summary",

@@ -36,24 +36,20 @@ public abstract class AbstractDocumentNotificationTest extends AbstractNotificat
     }
 
     protected void createDocument() throws Exception {
-        JSONObject response = this.creationService.createOrUpdateDocumentJson(
+        DocumentAppEntity documentAppEntity = this.documentConstants.document;
+        JSONObject response = this.creationService.createOrUpdateDocument(
             this.projectVersion,
-            this.documentConstants.document);
-        setDocumentId(response.getString("documentId"));
-    }
-
-    public void setDocumentId(String documentId) {
-        this.documentId = UUID.fromString(documentId);
-        this.documentConstants.document.setDocumentId(this.documentId.toString());
+            documentAppEntity);
+        this.documentId = documentAppEntity.getDocumentId();
     }
 
     public static class DocumentConstants {
         private final String name = "document-name";
         private final String description = "document-description";
-        private final List<String> artifactIds = new ArrayList<>();
+        private final List<UUID> artifactIds = new ArrayList<>();
         private final List<DocumentColumnAppEntity> columns = new ArrayList();
         public final DocumentAppEntity document = new DocumentAppEntity(
-            "",
+            null,
             DocumentType.ARTIFACT_TREE,
             name,
             description,

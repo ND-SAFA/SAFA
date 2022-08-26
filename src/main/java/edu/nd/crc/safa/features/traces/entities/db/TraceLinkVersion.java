@@ -192,7 +192,7 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
     }
 
     @Override
-    public String getBaseEntityId() {
+    public UUID getBaseEntityId() {
         return traceLink.getBaseEntityId();
     }
 

@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
@@ -30,14 +31,14 @@ class TestGraphCreation extends AbstractLayoutTest {
     @Test
     void testInternalMethods() {
         String d1Name = "D1";
-        String parentId = "F5";
+        String parentName = "F5";
         int nChildren = 0;
 
         ElkNode d1Node = getArtifact(d1Name);
         List<ElkNode> artifactChildren = getChildren(d1Node);
         ElkNode d1Parent = getParent(d1Node);
         assert d1Parent != null;
-        assertThat(d1Parent.getIdentifier()).isEqualTo(getArtifactId(parentId));
+        assertThat(d1Parent.getIdentifier()).isEqualTo(getArtifactId(parentName).toString());
         assertThat(artifactChildren).hasSize(nChildren);
     }
 
@@ -45,7 +46,7 @@ class TestGraphCreation extends AbstractLayoutTest {
     void testName2Node() {
         assertThat(name2nodes).hasSize(DefaultProjectConstants.Entities.N_ARTIFACTS);
         for (ArtifactAppEntity artifact : projectAppEntity.getArtifacts()) {
-            assertThat(name2nodes).containsKey(artifact.id);
+            assertThat(name2nodes).containsKey(artifact.getId());
         }
     }
 
@@ -63,7 +64,9 @@ class TestGraphCreation extends AbstractLayoutTest {
     @Test
     void testChildrenOfTwoArtifactProject() {
         String rootId = "Root";
-        List<String> artifactIds = List.of("R1", "R2");
+        UUID r1Id = UUID.randomUUID();
+        UUID r2Id = UUID.randomUUID();
+        List<UUID> artifactIds = List.of(r1Id, r2Id);
         List<ArtifactAppEntity> artifacts = artifactIds
             .stream()
             .map(this::createArtifact)
@@ -71,13 +74,13 @@ class TestGraphCreation extends AbstractLayoutTest {
         List<TraceAppEntity> traces = List.of(createTrace(artifactIds.get(0), artifactIds.get(1)));
 
         // Create Graph
-        Pair<ElkNode, Map<String, ElkNode>> result = ElkGraphCreator
+        Pair<ElkNode, Map<UUID, ElkNode>> result = ElkGraphCreator
             .createGraphFromProject(artifacts, traces);
 
         // Extract information
         ElkNode graph = result.getValue0();
         graph.setIdentifier(rootId);
-        Map<String, ElkNode> name2Node = result.getValue1();
+        Map<UUID, ElkNode> name2Node = result.getValue1();
 
         // VP - Verify that root node has correct children
         List<ElkNode> children = graph.getChildren();
@@ -86,24 +89,24 @@ class TestGraphCreation extends AbstractLayoutTest {
             .map(ElkGraphElement::getIdentifier)
             .collect(Collectors.toList());
         assertThat(children).hasSize(2);
-        assertThat(childrenNames).contains("R2").contains("R1");
+        assertThat(childrenNames).contains(r2Id.toString()).contains(r1Id.toString());
 
         // VP - Verify that R1 is a child of R2.
-        ElkNode parent = getParent(name2Node.get("R1"));
+        ElkNode parent = getParent(name2Node.get(r1Id));
         assert parent != null;
-        assertThat(parent.getIdentifier()).isEqualTo("R2");
+        assertThat(parent.getIdentifier()).isEqualTo(r2Id.toString());
     }
 
-    private ArtifactAppEntity createArtifact(String artifactName) {
+    private ArtifactAppEntity createArtifact(UUID artifactId) {
         ArtifactAppEntity artifactAppEntity = new ArtifactAppEntity();
-        artifactAppEntity.setId(artifactName);
+        artifactAppEntity.setId(artifactId);
         return artifactAppEntity;
     }
 
-    private TraceAppEntity createTrace(String sourceName, String targetName) {
+    private TraceAppEntity createTrace(UUID sourceId, UUID targetId) {
         TraceAppEntity traceAppEntity = new TraceAppEntity();
-        traceAppEntity.setSourceId(sourceName);
-        traceAppEntity.setTargetId(targetName);
+        traceAppEntity.setSourceId(sourceId);
+        traceAppEntity.setTargetId(targetId);
         return traceAppEntity;
     }
 

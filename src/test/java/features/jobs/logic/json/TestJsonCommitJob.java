@@ -61,10 +61,10 @@ class TestJsonCommitJob extends ApplicationBaseTest {
 
         // VP - Verify artifact was created
         ArtifactAppEntity artifact = project.getArtifacts().get(0);
-        assertThat(artifact.name).isEqualTo(artifactConstants.name);
-        assertThat(artifact.type).isEqualTo(artifactConstants.type);
-        assertThat(artifact.summary).isEqualTo(artifactConstants.summary);
-        assertThat(artifact.body).isEqualTo(artifactConstants.body);
+        assertThat(artifact.getName()).isEqualTo(artifactConstants.name);
+        assertThat(artifact.getType()).isEqualTo(artifactConstants.type);
+        assertThat(artifact.getSummary()).isEqualTo(artifactConstants.summary);
+        assertThat(artifact.getBody()).isEqualTo(artifactConstants.body);
         assertThat(artifact.getDocumentType()).isEqualTo(artifactConstants.documentType);
     }
 }

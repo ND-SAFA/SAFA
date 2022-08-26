@@ -36,7 +36,7 @@ public class TestViewPermissionViolation extends AbstractPermissionViolationTest
         private static final String body = "body";
         private static final DocumentType documentType = DocumentType.ARTIFACT_TREE;
         static final ArtifactAppEntity artifact = new ArtifactAppEntity(
-            "",
+            null,
             type,
             name,
             summary,

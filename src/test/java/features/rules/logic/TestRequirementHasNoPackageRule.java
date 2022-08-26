@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
@@ -47,12 +48,12 @@ class TestRequirementHasNoPackageRule extends ApplicationBaseTest {
             .stream()
             .map(TraceLinkVersion::getTraceLink)
             .collect(Collectors.toList());
-        Map<String, List<RuleName>> violations = ruleService.generateWarningsOnEntities(project,
+        Map<UUID, List<RuleName>> violations = ruleService.generateWarningsOnEntities(project,
             projectBodies,
             traceLinks);
 
         // VP - Verify that target triggered warning
-        String targetId = this.dbEntityBuilder.getArtifact(projectName, targetName).getArtifactId().toString();
+        UUID targetId = this.dbEntityBuilder.getArtifact(projectName, targetName).getArtifactId();
         assertThat(violations).containsKey(targetId);
     }
 }

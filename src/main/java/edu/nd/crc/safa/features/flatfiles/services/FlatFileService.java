@@ -141,11 +141,11 @@ public class FlatFileService {
 
             List<ArtifactAppEntity> sourceArtifacts = artifacts
                 .stream()
-                .filter(a -> a.type.equalsIgnoreCase(sourceArtifactType))
+                .filter(a -> a.getType().equalsIgnoreCase(sourceArtifactType))
                 .collect(Collectors.toList());
             List<ArtifactAppEntity> targetArtifacts = artifacts
                 .stream()
-                .filter(a -> a.type.equalsIgnoreCase(targetArtifactType))
+                .filter(a -> a.getType().equalsIgnoreCase(targetArtifactType))
                 .collect(Collectors.toList());
 
             List<TraceAppEntity> generatedLinkInRequest = traceGenerationService

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import javax.validation.Valid;
@@ -27,8 +28,7 @@ import lombok.Data;
  */
 @Data
 public class ProjectAppEntity implements IAppEntity {
-    @NotNull
-    String projectId;
+    UUID projectId;
     @NotNull
     String name;
     @NotNull
@@ -45,10 +45,10 @@ public class ProjectAppEntity implements IAppEntity {
     String currentDocumentId;
     List<@Valid @NotNull DocumentAppEntity> documents;
     List<@Valid @NotNull TypeAppEntity> artifactTypes;
-    Map<String, List<@Valid @NotNull RuleName>> warnings;
+    Map<UUID, List<@Valid @NotNull RuleName>> warnings;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     ProjectParsingErrors errors;
-    Map<String, LayoutPosition> layout;
+    Map<UUID, LayoutPosition> layout;
 
     public ProjectAppEntity() {
         this.name = "";
@@ -70,12 +70,12 @@ public class ProjectAppEntity implements IAppEntity {
                             List<DocumentAppEntity> documents,
                             @Nullable String currentDocumentId,
                             List<TypeAppEntity> artifactTypes,
-                            Map<String, List<@Valid @NotNull RuleName>> warnings,
+                            Map<UUID, List<@Valid @NotNull RuleName>> warnings,
                             ProjectParsingErrors errors,
-                            Map<String, LayoutPosition> layout) {
+                            Map<UUID, LayoutPosition> layout) {
         this();
         Project project = projectVersion.getProject();
-        this.projectId = project.getProjectId().toString();
+        this.projectId = project.getProjectId();
         this.name = project.getName();
         this.description = project.getDescription();
         this.projectVersion = projectVersion;
@@ -98,12 +98,12 @@ public class ProjectAppEntity implements IAppEntity {
     }
 
     @Override
-    public String getId() {
+    public UUID getId() {
         return this.projectId;
     }
 
     @Override
-    public void setId(String id) {
+    public void setId(UUID id) {
         this.projectId = id;
     }
 }

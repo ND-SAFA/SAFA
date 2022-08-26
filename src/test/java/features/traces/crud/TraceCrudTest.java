@@ -18,11 +18,11 @@ import common.AbstractCrudTest;
 
 public class TraceCrudTest extends AbstractCrudTest<TraceAppEntity> {
     private final TraceAppEntity trace = new TraceAppEntity(
-        "",
+        null,
         "R0",
-        "",
+        null,
         "D0",
-        "",
+        null,
         ApprovalStatus.UNREVIEWED,
         0.5,
         TraceType.GENERATED
@@ -56,7 +56,7 @@ public class TraceCrudTest extends AbstractCrudTest<TraceAppEntity> {
         trace.setTargetId(traceAdded.getTargetId());
         trace.setTraceLinkId(traceAdded.getTraceLinkId());
 
-        return UUID.fromString(traceAdded.getTraceLinkId());
+        return traceAdded.getTraceLinkId();
     }
 
     @Override

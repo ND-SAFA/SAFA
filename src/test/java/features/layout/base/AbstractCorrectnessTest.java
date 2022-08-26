@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
@@ -66,7 +67,7 @@ public abstract class AbstractCorrectnessTest extends ApplicationBaseTest {
 
     protected JSONObject createArtifact(String artifactName) {
         return jsonBuilder.withArtifactAndReturn(
-            projectName, "", artifactName, artifactType, artifactBody
+            projectName, null, artifactName, artifactType, artifactBody
         );
     }
 
@@ -75,17 +76,17 @@ public abstract class AbstractCorrectnessTest extends ApplicationBaseTest {
             project
                 .getArtifacts()
                 .stream()
-                .filter(a -> a.name.equals(artifactName))
+                .filter(a -> a.getName().equals(artifactName))
                 .collect(Collectors.toList())
                 .get(0);
-        String id = artifact.getId();
+        UUID id = artifact.getId();
         return project.getLayout().get(id);
     }
 
     protected LayoutPosition getLayoutPositionInDocument(ProjectAppEntity project,
-                                                         String documentId,
+                                                         UUID documentId,
                                                          String artifactName) {
-        String artifactId = retrievalService.getArtifactId(project.getArtifacts(), artifactName);
+        UUID artifactId = retrievalService.getArtifactId(project.getArtifacts(), artifactName);
         List<DocumentAppEntity> documents = project.getDocuments()
             .stream()
             .filter(d -> d.getDocumentId().equals(documentId))
@@ -97,7 +98,7 @@ public abstract class AbstractCorrectnessTest extends ApplicationBaseTest {
             throw new IllegalStateException("Found more than one document with id:" + documentId);
         }
 
-        Map<String, LayoutPosition> documentLayout = documents.get(0).getLayout();
+        Map<UUID, LayoutPosition> documentLayout = documents.get(0).getLayout();
 
         if (!documentLayout.containsKey(artifactId)) {
             throw new IllegalArgumentException("Could not find layout position for artifact id:" + artifactId);
@@ -105,11 +106,11 @@ public abstract class AbstractCorrectnessTest extends ApplicationBaseTest {
         return documentLayout.get(artifactId);
     }
 
-    protected List<String> getArtifactIds(ProjectCommit projectCommit) {
+    protected List<UUID> getArtifactIds(ProjectCommit projectCommit) {
         return new ArrayList<>(getArtifactNameToIdMap(projectCommit).values());
     }
 
-    protected String getArtifactIdFromProjectCommit(ProjectCommit projectCommit, String artifactName) {
+    protected UUID getArtifactIdFromProjectCommit(ProjectCommit projectCommit, String artifactName) {
         return getArtifactNameToIdMap(projectCommit).get(artifactName);
     }
 
@@ -121,14 +122,14 @@ public abstract class AbstractCorrectnessTest extends ApplicationBaseTest {
         return artifactNames
             .stream()
             .map(artifactName -> {
-                String artifactId = getArtifactIdFromProjectCommit(projectCommit, artifactName);
+                UUID artifactId = getArtifactIdFromProjectCommit(projectCommit, artifactName);
                 return document.getLayout().get(artifactId);
             })
             .collect(Collectors.toList());
     }
 
-    private Map<String, String> getArtifactNameToIdMap(ProjectCommit projectCommit) {
-        Map<String, String> name2id = new Hashtable<>();
+    private Map<String, UUID> getArtifactNameToIdMap(ProjectCommit projectCommit) {
+        Map<String, UUID> name2id = new Hashtable<>();
         projectCommit.getArtifacts().getAdded().forEach(artifact -> {
             name2id.put(artifact.getName(), artifact.getId());
         });

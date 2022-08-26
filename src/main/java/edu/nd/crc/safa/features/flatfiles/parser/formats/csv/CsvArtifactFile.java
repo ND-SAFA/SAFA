@@ -69,8 +69,8 @@ public class CsvArtifactFile extends AbstractArtifactFile<CSVRecord> {
     }
 
     private String[] getArtifactRow(ArtifactAppEntity artifact) {
-        return new String[]{artifact.summary,
-            artifact.body,
+        return new String[]{artifact.getSummary(),
+            artifact.getBody(),
             artifact.getLogicType().toString(),
             artifact.getSafetyCaseType().toString()};
     }
@@ -98,7 +98,7 @@ public class CsvArtifactFile extends AbstractArtifactFile<CSVRecord> {
             artifactSummary = artifactSummary == null ? "" : artifactSummary;
             artifactContent = artifactContent == null ? "" : artifactContent;
             ArtifactAppEntity artifactAppEntity = new ArtifactAppEntity(
-                "",
+                null,
                 artifactType,
                 artifactName,
                 artifactSummary,

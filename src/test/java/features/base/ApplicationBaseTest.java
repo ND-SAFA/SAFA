@@ -19,6 +19,7 @@ import services.AssertionTestService;
 import services.AuthorizationTestService;
 import services.CommitTestService;
 import services.CreationTestService;
+import services.LayoutTestService;
 import services.MessageVerificationTestService;
 import services.NotificationTestService;
 import services.RetrievalTestService;
@@ -47,7 +48,7 @@ public abstract class ApplicationBaseTest extends EntityBaseTest {
     protected RetrievalTestService retrievalService;
     protected AuthorizationTestService authorizationService;
     protected MessageVerificationTestService changeMessageVerifies = new MessageVerificationTestService();
-
+    protected LayoutTestService layoutTestService = new LayoutTestService();
     /**
      * Builders
      */

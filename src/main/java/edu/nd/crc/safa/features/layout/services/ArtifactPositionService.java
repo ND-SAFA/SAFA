@@ -13,6 +13,7 @@ import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
 import edu.nd.crc.safa.features.layout.entities.db.ArtifactPosition;
 import edu.nd.crc.safa.features.layout.repositories.ArtifactPositionRepository;
+import edu.nd.crc.safa.features.versions.VersionCalculator;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import lombok.AllArgsConstructor;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 @Service
 public class ArtifactPositionService {
+    private final VersionCalculator versionCalculator = new VersionCalculator();
     ArtifactPositionRepository artifactPositionRepository;
     ArtifactRepository artifactRepository;
 
@@ -72,15 +74,27 @@ public class ArtifactPositionService {
         return artifactPosition;
     }
 
-    public Map<String, LayoutPosition> retrieveDocumentLayout(ProjectVersion projectVersion, UUID documentId) {
-        Map<String, LayoutPosition> layout = new HashMap<>();
-        List<ArtifactPosition> artifactPositions = this.artifactPositionRepository
-            .findByProjectVersionAndDocumentDocumentId(projectVersion, documentId);
-        for (ArtifactPosition artifactPosition : artifactPositions) {
-            String artifactId = artifactPosition.getArtifact().getArtifactId().toString();
+    public Map<UUID, LayoutPosition> retrieveDocumentLayout(ProjectVersion projectVersion, UUID documentId) {
+        Map<UUID, LayoutPosition> layout = new HashMap<>();
+        List<ArtifactPosition> artifactPositionsAcrossVersions =
+            this.artifactPositionRepository.findByDocumentDocumentId(documentId);
+        Map<UUID, List<ArtifactPosition>> id2pos = versionCalculator.groupEntityVersionsByEntityId(
+            artifactPositionsAcrossVersions,
+            ArtifactPosition::getId);
+        for (Map.Entry<UUID, List<ArtifactPosition>> entry : id2pos.entrySet()) {
+            List<ArtifactPosition> artifactPositions = entry.getValue();
+            ArtifactPosition artifactPosition = versionCalculator.getEntityAtVersion(
+                artifactPositions,
+                projectVersion,
+                ArtifactPosition::getProjectVersion);
+            if (artifactPosition == null) { // layout for version not available, provide default
+                artifactPosition = artifactPositions.get(0);
+            }
             LayoutPosition layoutPosition = new LayoutPosition(artifactPosition.getX(), artifactPosition.getY());
+            UUID artifactId = artifactPosition.getArtifact().getArtifactId();
             layout.put(artifactId, layoutPosition);
         }
+
         return layout;
     }
 }

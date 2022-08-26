@@ -1,0 +1,21 @@
+package services;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
+
+public class LayoutTestService {
+
+    public void verifyLayout(Map<UUID, LayoutPosition> layout, List<UUID> artifactIds) {
+        assertThat(layout).hasSize(artifactIds.size());
+        for (UUID artifactId : artifactIds) {
+            assertThat(layout.get(artifactId))
+                .as("artifact id has layout:" + artifactId)
+                .isNotNull();
+        }
+    }
+}

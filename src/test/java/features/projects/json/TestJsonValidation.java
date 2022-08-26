@@ -7,13 +7,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import requests.SafaRequest;
-
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
+import requests.SafaRequest;
 
 /**
  * Tests that each entity present in ProjectAppEntity is validated upon parsing.
@@ -35,10 +34,10 @@ class TestJsonValidation extends AbstractProjectJsonTest {
         // Step - Create an update project payload containing two artifacts and a trace links between them.
         JSONObject payload = jsonBuilder
             .withProject(projectId, projectName, projectDescription)
-            .withArtifact(projectName, "", a1Name, a1Type, "this is a requirement")
-            .withArtifact(projectName, "", a2Name, a2Type, "this is a design")
+            .withArtifact(projectName, null, a1Name, a1Type, "this is a requirement")
+            .withArtifact(projectName, null, a2Name, a2Type, "this is a design")
             .withTrace(projectName, a1Name, a2Name)
-            .withProjectVersion(projectName, "", 1, 1, 1)
+            .withProjectVersion(projectName, null, 1, 1, 1)
             .getProjectJson(projectName);
 
         // Step - Send update request
@@ -62,7 +61,7 @@ class TestJsonValidation extends AbstractProjectJsonTest {
             .newProject(projectName)
             .newVersionWithReturn(projectName);
         String projectId = projectVersion.getProject().getProjectId().toString();
-        String mockVersionId = UUID.randomUUID().toString();
+        UUID mockVersionId = UUID.randomUUID();
 
         // Step - Create JSON payload containing 2 artifacts, a trace, and an invalid major version number .
         JSONObject payload = jsonBuilder
@@ -90,7 +89,7 @@ class TestJsonValidation extends AbstractProjectJsonTest {
         // Step - Create invalid artifact - empty type name
         JSONObject invalidArtifact = jsonBuilder
             .withProject(projectName, projectName, projectDescription)
-            .withArtifactAndReturn(projectName, "", "RE-1", "", "");
+            .withArtifactAndReturn(projectName, null, "RE-1", "", "");
 
         // Step - Send creation request
         JSONObject responseBody = buildProjectValidationRequest(

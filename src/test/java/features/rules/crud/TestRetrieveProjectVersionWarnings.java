@@ -71,9 +71,9 @@ class TestRetrieveProjectVersionWarnings extends ApplicationBaseTest {
             this.jsonBuilder
                 .withProject(projectName, projectName, "")
                 .withArtifactAndReturn(projectName,
-                    "",
+                    null,
                     Design.name, Design.type,
-                    ""
+                    null
                 );
         JSONObject traceJson = this.jsonBuilder.withTraceAndReturn(projectName, Design.name, Requirement.name);
         CommitBuilder commitBuilder = CommitBuilder

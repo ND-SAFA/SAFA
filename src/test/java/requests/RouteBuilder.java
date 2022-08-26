@@ -1,5 +1,7 @@
 package requests;
 
+import java.util.UUID;
+
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
@@ -42,7 +44,7 @@ public class RouteBuilder<T extends RouteBuilder<T>> {
     }
 
     public T withType(TypeAppEntity type) {
-        this.path = this.path.replace("{typeId}", type.getTypeId());
+        this.path = this.path.replace("{typeId}", type.getTypeId().toString());
         return (T) this;
     }
 
@@ -52,7 +54,7 @@ public class RouteBuilder<T extends RouteBuilder<T>> {
     }
 
     public T withDocument(DocumentAppEntity document) {
-        this.path = this.path.replace("{documentId}", document.getDocumentId());
+        this.path = this.path.replace("{documentId}", document.getDocumentId().toString());
         return (T) this;
     }
 
@@ -72,11 +74,11 @@ public class RouteBuilder<T extends RouteBuilder<T>> {
     }
 
     public T withArtifactId(Artifact artifact) {
-        return this.withArtifactId(artifact.getArtifactId().toString());
+        return this.withArtifactId(artifact.getArtifactId());
     }
 
-    public T withArtifactId(String artifactId) {
-        this.path = this.path.replace("{artifactId}", artifactId);
+    public T withArtifactId(UUID artifactId) {
+        this.path = this.path.replace("{artifactId}", artifactId.toString());
         return (T) this;
     }
 

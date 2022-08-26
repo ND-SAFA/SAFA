@@ -47,7 +47,7 @@ public class SyncController extends BaseController {
         }
 
         if (message.isUpdateLayout()) {
-            Map<String, LayoutPosition> defaultDocumentLayout = this.serviceProvider
+            Map<UUID, LayoutPosition> defaultDocumentLayout = this.serviceProvider
                 .getArtifactPositionService().retrieveDocumentLayout(projectVersion, null);
             projectAppEntity.setLayout(defaultDocumentLayout);
         }
@@ -58,7 +58,7 @@ public class SyncController extends BaseController {
                                                     ProjectVersion projectVersion,
                                                     Change change) {
         Project project = projectVersion.getProject();
-        List<String> entityIds = change.getStringEntityIds();
+        List<UUID> entityIds = change.getEntityIds();
         switch (change.getEntity()) {
             case PROJECT:
                 projectAppEntity.setName(project.getName());
@@ -98,7 +98,7 @@ public class SyncController extends BaseController {
                     .getProjectRetrievalService()
                     .getProjectAppEntity(projectVersion);
             case WARNINGS:
-                Map<String, List<RuleName>> warnings = this.serviceProvider
+                Map<UUID, List<RuleName>> warnings = this.serviceProvider
                     .getWarningService()
                     .retrieveWarningsInProjectVersion(projectVersion);
                 projectAppEntity.setWarnings(warnings);

@@ -4,18 +4,16 @@ import java.util.UUID;
 
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
-import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.IProjectVersionGetter;
 
 /**
  * Interface that generalizing similarities between all versioned entities.
  */
-public interface IVersionEntity<A extends IAppEntity> {
-
-    ProjectVersion getProjectVersion();
+public interface IVersionEntity<A extends IAppEntity> extends IProjectVersionGetter {
 
     ModificationType getModificationType();
 
-    String getBaseEntityId();
+    UUID getBaseEntityId();
 
     UUID getVersionEntityId();
 

@@ -2,9 +2,8 @@ package services;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
-
-import requests.SafaRequest;
 
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
@@ -17,6 +16,7 @@ import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import builders.DbEntityBuilder;
 import lombok.AllArgsConstructor;
 import org.json.JSONArray;
+import requests.SafaRequest;
 
 @AllArgsConstructor
 public class RetrievalTestService {
@@ -51,11 +51,11 @@ public class RetrievalTestService {
             .getWithJsonArray();
     }
 
-    public String getArtifactId(List<ArtifactAppEntity> artifacts, String artifactName) {
+    public UUID getArtifactId(List<ArtifactAppEntity> artifacts, String artifactName) {
         ArtifactAppEntity artifact =
             artifacts
                 .stream()
-                .filter(a -> a.name.equals(artifactName))
+                .filter(a -> a.getName().equals(artifactName))
                 .collect(Collectors.toList())
                 .get(0);
         return artifact.getId();

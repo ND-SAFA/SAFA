@@ -4,10 +4,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.memberships.entities.api.ProjectMembershipRequest;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
@@ -77,27 +79,26 @@ public class CreationTestService {
         return new Pair<>(beforeVersion, afterVersion);
     }
 
-    public Pair<ProjectVersion, JSONObject> createProjectWithDocument(
-        String projectName,
-        JSONObject documentJson) throws Exception {
-        // Step - Create empty project
-        ProjectVersion projectVersion = dbEntityBuilder
-            .newProject(projectName)
-            .newVersionWithReturn(projectName);
+    public JSONObject createOrUpdateDocument(ProjectVersion projectVersion,
+                                             DocumentAppEntity documentAppEntity) throws Exception {
+        JSONObject response =
+            SafaRequest
+                .withRoute(AppRoutes.Documents.CREATE_OR_UPDATE_DOCUMENT)
+                .withVersion(projectVersion)
+                .postWithJsonObject(documentAppEntity);
 
-        // Step - Send creation request.
-        JSONObject docCreated = createOrUpdateDocumentJson(projectVersion, documentJson);
-
-        return new Pair<>(projectVersion, docCreated);
+        UUID documentId = UUID.fromString(response.getString("documentId"));
+        documentAppEntity.setDocumentId(documentId);
+        return response;
     }
 
     public JSONObject createOrUpdateDocumentJson(ProjectVersion projectVersion,
                                                  Object docJson) throws Exception {
-        return
-            SafaRequest
-                .withRoute(AppRoutes.Documents.CREATE_OR_UPDATE_DOCUMENT)
-                .withVersion(projectVersion)
-                .postWithJsonObject(docJson);
+        return SafaRequest
+            .withRoute(AppRoutes.Documents.CREATE_OR_UPDATE_DOCUMENT)
+            .withVersion(projectVersion)
+            .postWithJsonObject(docJson);
+
     }
 
     public JSONArray addArtifactToDocument(ProjectVersion projectVersion,

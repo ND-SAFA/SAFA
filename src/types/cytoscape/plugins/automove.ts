@@ -1,6 +1,6 @@
 import { NodeSingular, NodeCollection, EventObject } from "cytoscape";
-import { CytoEvent } from "@/types/cytoscape";
 import { EmptyLambda } from "@/types";
+import { CytoEvent } from "@/types/cytoscape";
 
 /**
  * Types were manually constructed from: https://github.com/cytoscape/cytoscape.js-automove

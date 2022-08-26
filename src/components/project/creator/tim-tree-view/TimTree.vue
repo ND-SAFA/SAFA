@@ -33,14 +33,15 @@
 import Vue, { PropType } from "vue";
 import { TracePanel, CytoCoreGraph, ArtifactPanel } from "@/types";
 import { getTraceId } from "@/util";
-import { viewportModule } from "@/store";
+import { layoutStore } from "@/hooks";
 import { timGraph, cyResetTim } from "@/cytoscape";
 import {
   GenericGraphLink,
   GenericCytoscapeController,
+  Typography,
+  FlexBox,
 } from "@/components/common";
 import ArtifactTypeNode from "./ArtifactTypeNode.vue";
-import { Typography, FlexBox } from "@/components/common";
 
 /**
  * Creates a Cytoscape graph containing artifact types are nodes
@@ -100,7 +101,7 @@ export default Vue.extend({
     async inView(inView: boolean): Promise<void> {
       if (!inView) return;
 
-      await viewportModule.setTimTreeLayout();
+      await layoutStore.setTimTreeLayout();
     },
   },
 });

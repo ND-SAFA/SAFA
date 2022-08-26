@@ -14,9 +14,11 @@
       item-text="name"
       item-value="id"
       class="mx-1 mt-1"
-      append-icon="mdi-magnify"
       :filter="filterArtifacts"
     >
+      <template v-slot:append>
+        <v-icon class="input-no-icon-rotate"> mdi-magnify </v-icon>
+      </template>
       <template v-slot:prepend-item>
         <flex-box x="3">
           <v-spacer />
@@ -33,14 +35,13 @@
 <script lang="ts">
 import Vue from "vue";
 import { ArtifactSearchItem } from "@/types";
+import { filterArtifacts, objectToArray } from "@/util";
+import { typeOptionsStore, artifactStore, selectionStore } from "@/hooks";
 import {
-  artifactModule,
-  artifactSelectionModule,
-  viewportModule,
-} from "@/store";
-import { GenericArtifactBodyDisplay, Typography } from "@/components/common";
-import { filterArtifacts, getArtifactTypePrintName } from "@/util";
-import FlexBox from "@/components/common/display/FlexBox.vue";
+  GenericArtifactBodyDisplay,
+  Typography,
+  FlexBox,
+} from "@/components/common";
 
 /**
  * Artifact search bar.
@@ -80,7 +81,7 @@ export default Vue.extend({
     matchText(): string {
       if (!this.queryText) return "";
 
-      const count = artifactModule.artifacts.filter((artifact) =>
+      const count = artifactStore.currentArtifacts.filter((artifact) =>
         filterArtifacts(artifact, this.queryText || "")
       ).length;
 
@@ -90,22 +91,23 @@ export default Vue.extend({
      * @return The artifacts to select from.
      */
     artifacts(): ArtifactSearchItem[] {
-      return Object.entries(artifactModule.getArtifactsByType)
-        .map(([type, artifacts]) => [
-          { header: getArtifactTypePrintName(type) },
+      return objectToArray(
+        artifactStore.getArtifactsByType,
+        ([type, artifacts]) => [
+          { header: typeOptionsStore.getArtifactTypeDisplay(type) },
           ...artifacts,
-        ])
-        .reduce((acc, cur) => [...acc, ...cur], []);
+        ]
+      );
     },
     value: {
       get() {
-        return artifactSelectionModule.getSelectedArtifactId;
+        return selectionStore.selectedArtifactId;
       },
       set(artifactId: string | null) {
         if (artifactId) {
-          viewportModule.viewArtifactSubtree(artifactId);
+          selectionStore.viewArtifactSubtree(artifactId);
         } else {
-          artifactSelectionModule.clearSelections();
+          selectionStore.clearSelections();
         }
       },
     },

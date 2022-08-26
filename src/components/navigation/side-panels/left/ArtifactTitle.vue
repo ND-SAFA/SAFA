@@ -38,10 +38,9 @@
 <script lang="ts">
 import Vue from "vue";
 import { PanelType } from "@/types";
-import { appModule, artifactSelectionModule } from "@/store";
+import { appStore, selectionStore } from "@/hooks";
 import { handleDeleteArtifact } from "@/api";
-import { GenericIconButton } from "@/components/common";
-import Typography from "@/components/common/display/Typography.vue";
+import { GenericIconButton, Typography } from "@/components/common";
 
 /**
  * Displays the selected node's title and option buttons.
@@ -57,7 +56,7 @@ export default Vue.extend({
      * @return The selected artifact.
      */
     selectedArtifact() {
-      return artifactSelectionModule.getSelectedArtifact;
+      return selectionStore.selectedArtifact;
     },
     /**
      * @return The selected artifact's name.
@@ -87,7 +86,7 @@ export default Vue.extend({
     handleDeleteArtifact(): void {
       if (this.selectedArtifact !== undefined) {
         handleDeleteArtifact(this.selectedArtifact, {
-          onSuccess: () => appModule.closePanel(PanelType.left),
+          onSuccess: () => appStore.closePanel(PanelType.left),
         });
       }
     },
@@ -95,13 +94,13 @@ export default Vue.extend({
      * Opens the artifact creator.
      */
     handleEditArtifact(): void {
-      appModule.openArtifactCreatorTo({});
+      appStore.openArtifactCreatorTo({});
     },
     /**
      * Opens the artifact body display.
      */
     handleViewBody(): void {
-      appModule.toggleArtifactBody();
+      appStore.toggleArtifactBody();
     },
   },
 });

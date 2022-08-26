@@ -57,7 +57,7 @@
 import Vue from "vue";
 import { ColumnModel } from "@/types";
 import { columnTypeOptions } from "@/util";
-import { documentModule } from "@/store";
+import { documentStore } from "@/hooks";
 import { handleColumnMove } from "@/api";
 import { GenericIconButton, FlexBox, Typography } from "@/components/common";
 import TableColumnModal from "./TableColumnModal.vue";
@@ -70,7 +70,7 @@ export default Vue.extend({
       isCreateOpen: false,
       isEditOpen: false,
       editingColumn: undefined as ColumnModel | undefined,
-      items: documentModule.tableColumns,
+      items: documentStore.tableColumns,
       dataTypes: columnTypeOptions(),
     };
   },
@@ -79,9 +79,9 @@ export default Vue.extend({
      * @return The select display name.
      */
     selectDisplay(): string {
-      return documentModule.tableColumns.length === 1
+      return documentStore.tableColumns.length === 1
         ? "1 Custom Column"
-        : `${documentModule.tableColumns.length} Custom Columns`;
+        : `${documentStore.tableColumns.length} Custom Columns`;
     },
     /**
      * Emulates a select value to open the column editor on click.
@@ -99,7 +99,7 @@ export default Vue.extend({
      * Returns whether the table columns can be edited.
      */
     isFixedTable(): boolean {
-      return !documentModule.isEditableTableDocument;
+      return !documentStore.isEditableTableDocument;
     },
   },
   methods: {
@@ -148,7 +148,7 @@ export default Vue.extend({
      * Loads the current table columns.
      */
     handleLoadItems() {
-      this.items = documentModule.tableColumns;
+      this.items = documentStore.tableColumns;
     },
     /**
      * Changes the order of two columns.

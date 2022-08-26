@@ -6,8 +6,7 @@ import {
   CytoCore,
   CytoEventHandlers,
 } from "@/types";
-import { layoutModule } from "@/store";
-import { NodeSingular } from "cytoscape";
+import { layoutStore } from "@/hooks";
 
 /**
  * Defines a graph layout.
@@ -47,16 +46,7 @@ export default class GraphLayout implements IGraphLayout {
         klay: this.klaySettings,
       }).run();
     } else {
-      cy.layout({
-        name: "preset",
-        fit: true,
-        padding: 0,
-        positions: (node: NodeSingular | string) => {
-          const id = typeof node === "string" ? node : node.data().id;
-
-          return layoutModule.getArtifactPosition(id);
-        },
-      }).run();
+      cy.layout(layoutStore.layoutOptions).run();
     }
 
     this.postLayoutHook(cy);

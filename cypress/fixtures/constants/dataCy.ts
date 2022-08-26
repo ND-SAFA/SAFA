@@ -4,7 +4,29 @@
 export enum DataCy {
   // General
 
-  stepperContinueButton = "generic-stepper-continue",
+  appLoading = "app-loading",
+
+  // Navigation
+
+  navProjectButton = "button-nav-project",
+  navVersionButton = "button-nav-version",
+  navLinksButton = "button-nav-links",
+
+  // Steppers
+
+  stepperContinueButton = "button-stepper-continue",
+  stepperBackButton = "button-stepper-back",
+
+  // Selector Tables
+
+  selectorAddButton = "button-selector-add",
+  selectorEditButton = "button-selector-edit",
+  selectorDeleteButton = "button-selector-delete",
+
+  // Modals
+
+  modalTitle = "modal-title",
+  modalClose = "button-close",
 
   // Authentication
 
@@ -12,6 +34,13 @@ export enum DataCy {
   emailInput = "input-email",
   passwordInput = "input-password",
   loginButton = "button-login",
+
+  // Snackbar
+
+  snackbarInfo = "snackbar-info",
+  snackbarSuccess = "snackbar-success",
+  snackbarWarning = "snackbar-warning",
+  snackbarError = "snackbar-error",
 
   // Project Creation
 
@@ -42,7 +71,45 @@ export enum DataCy {
 
   selectionModal = "modal-project-select",
   selectionProjectList = "table-project",
+  selectionVersionList = "table-version",
   selectionSearch = "input-selector-search",
   selectionReload = "button-selector-reload",
-  selectionClose = "button-close",
+
+  projectEditModal = "modal-project-edit",
+  projectEditNameInput = "input-project-name-modal",
+  projectEditDescriptionInput = "input-project-description-modal",
+  projectEditSaveButton = "button-project-save",
+
+  projectDeleteModal = "modal-project-delete",
+  projectDeleteNameInput = "input-project-delete-name",
+  projectDeleteConfirmButton = "button-project-delete",
+
+  versionCreateModal = "modal-version-create",
+  versionCreateMajorButton = "button-create-major-version",
+  versionCreateMinorButton = "button-create-minor-version",
+  versionCreateRevisionButton = "button-create-revision-version",
+
+  versionDeleteModal = "modal-version-delete",
+  versionDeleteConfirmButton = "button-version-delete",
+
+  versionUploadModal = "modal-version-upload",
+  versionUploadFilesInput = "input-files-version",
+
+  // Artifact View
+
+  artifactFabToggle = "button-fab-toggle",
+  artifactFabCreateArtifact = "button-fab-create-artifact",
+  artifactFabCreateTrace = "button-fab-create-trace",
+  artifactFabDrawTrace = "button-fab-draw-trace",
+
+  artifactSaveModal = "modal-artifact-save",
+  artifactSaveNameInput = "input-artifact-name",
+  artifactSaveTypeInput = "input-artifact-type",
+  artifactSaveBodyInput = "input-artifact-body",
+  artifactSaveSubmitButton = "button-artifact-save",
+
+  // Artifact Tree
+
+  artifactTreeNode = "node-artifact-tree",
+  artifactTreeSelectedNode = "node-artifact-tree-selected",
 }

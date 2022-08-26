@@ -8,7 +8,7 @@ import {
   validUser
 } from "../fixtures";
 
-describe("Project Creation", () => {
+describe.skip("Project Creation", () => {
   beforeEach(() => {
     cy.visit("http://localhost:8080/create").login(
       validUser.email,

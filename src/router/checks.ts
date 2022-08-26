@@ -1,18 +1,13 @@
-import { PanelType, RouterCheck } from "@/types";
 import { NavigationGuardNext, Route } from "vue-router";
+import { NavigationGuard } from "vue-router/types/router";
+import { appStore, projectStore, sessionStore } from "@/hooks";
+import { handleLoadVersion } from "@/api";
 import {
   QueryParams,
   Routes,
   routesPublic,
   routesWithRequiredProject,
 } from "@/router/routes";
-import {
-  appModule,
-  projectModule,
-  sessionModule,
-  viewportModule,
-} from "@/store";
-import { handleLoadVersion } from "@/api";
 
 /**
  * Defines list of functions that are run before navigating to a new page.
@@ -23,13 +18,13 @@ import { handleLoadVersion } from "@/api";
  * that once a check has used the `next` function the remaining checks
  * are ignored.
  */
-export const routerChecks: Record<string, RouterCheck> = {
+export const routerChecks: Record<string, NavigationGuard> = {
   redirectToLoginIfNoSessionFound(
     to: Route,
     from: Route,
     next: NavigationGuardNext
   ) {
-    if (sessionModule.getDoesSessionExist || routesPublic.includes(to.path)) {
+    if (sessionStore.doesSessionExist || routesPublic.includes(to.path)) {
       return;
     }
 
@@ -43,7 +38,7 @@ export const routerChecks: Record<string, RouterCheck> = {
   },
   requireProjectForRoutes(to: Route) {
     if (
-      projectModule.isProjectDefined ||
+      projectStore.isProjectDefined ||
       !routesWithRequiredProject.includes(to.path)
     )
       return;
@@ -57,16 +52,6 @@ export const routerChecks: Record<string, RouterCheck> = {
   closePanelsIfNotInGraph(to: Route) {
     if (to.path === Routes.ARTIFACT) return;
 
-    appModule.closePanel(PanelType.left);
-    appModule.closePanel(PanelType.right);
-  },
-  refocusGraph(to: Route) {
-    if (to.path !== Routes.ARTIFACT) return;
-
-    appModule.onLoadStart();
-
-    setTimeout(() => {
-      viewportModule.setArtifactTreeLayout().then(appModule.onLoadEnd);
-    }, 200);
+    appStore.closeSidePanels();
   },
 };

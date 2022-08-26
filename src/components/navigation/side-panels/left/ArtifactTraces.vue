@@ -38,8 +38,8 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { artifactModule, artifactSelectionModule, traceModule } from "@/store";
 import { ListItem } from "@/types";
+import { artifactStore, selectionStore, subtreeStore } from "@/hooks";
 import {
   GenericListItem,
   Typography,
@@ -58,7 +58,7 @@ export default Vue.extend({
      * @return The selected artifact.
      */
     selectedArtifact() {
-      return artifactSelectionModule.getSelectedArtifact;
+      return selectionStore.selectedArtifact;
     },
     /**
      * @return The selected artifact's parents.
@@ -66,12 +66,13 @@ export default Vue.extend({
     parents(): ListItem[] {
       if (!this.selectedArtifact) return [];
 
-      return traceModule.traces
-        .filter(({ sourceName }) => sourceName === this.selectedArtifact?.name)
-        .map(({ targetName, targetId }) => ({
-          title: targetName,
-          subtitle: artifactModule.getArtifactById(targetId)?.type,
-        }));
+      return subtreeStore
+        .getParents(this.selectedArtifact.id)
+        .map((artifactId) => {
+          const artifact = artifactStore.getArtifactById(artifactId);
+
+          return { title: artifact?.name || "", subtitle: artifact?.type };
+        });
     },
     /**
      * @return The selected artifact's children.
@@ -79,12 +80,13 @@ export default Vue.extend({
     children(): ListItem[] {
       if (!this.selectedArtifact) return [];
 
-      return traceModule.traces
-        .filter(({ targetName }) => targetName === this.selectedArtifact?.name)
-        .map(({ sourceName, sourceId }) => ({
-          title: sourceName,
-          subtitle: artifactModule.getArtifactById(sourceId)?.type,
-        }));
+      return subtreeStore
+        .getChildren(this.selectedArtifact.id)
+        .map((artifactId) => {
+          const artifact = artifactStore.getArtifactById(artifactId);
+
+          return { title: artifact?.name || "", subtitle: artifact?.type };
+        });
     },
     /**
      * Determines the width of trace link buttons.
@@ -117,11 +119,11 @@ export default Vue.extend({
      * @param artifactName - The artifact to select.
      */
     handleArtifactClick(artifactName: string): void {
-      const artifact = artifactModule.getArtifactByName(artifactName);
+      const artifact = artifactStore.getArtifactByName(artifactName);
 
       if (!artifact) return;
 
-      artifactSelectionModule.selectArtifact(artifact.id);
+      selectionStore.selectArtifact(artifact.id);
     },
   },
 });

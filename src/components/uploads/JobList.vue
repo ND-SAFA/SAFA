@@ -13,11 +13,10 @@
 <script lang="ts">
 import Vue from "vue";
 import { JobModel } from "@/types";
-import { appModule, jobModule } from "@/store";
+import { appStore, jobStore } from "@/hooks";
 import { handleReloadJobs } from "@/api";
-import { Typography } from "@/components/common";
+import { Typography, FlexBox } from "@/components/common";
 import JobPanel from "./JobPanel.vue";
-import FlexBox from "@/components/common/display/FlexBox.vue";
 
 /**
  * Displays all jobs.
@@ -31,7 +30,7 @@ export default Vue.extend({
   },
   data() {
     return {
-      selectedJobs: [] as number[],
+      selectedJobs: [0] as number[],
     };
   },
   mounted() {
@@ -42,19 +41,19 @@ export default Vue.extend({
      * @return Whether the app is loading.
      */
     isLoading(): boolean {
-      return appModule.getIsLoading;
+      return appStore.isLoading > 0;
     },
     /**
      * return The current jobs.
      */
     uploads(): JobModel[] {
-      return jobModule.currentJobs;
+      return jobStore.jobs;
     },
     /**
      * return The current selected job index.
      */
     selectedJobIndex(): number {
-      return jobModule.selectedJobIndex;
+      return jobStore.selectedJob;
     },
   },
   watch: {
@@ -67,6 +66,12 @@ export default Vue.extend({
       } else {
         this.selectedJobs = [newIndex];
       }
+    },
+    /**
+     * Selects the first job when the uploads change.
+     */
+    uploads(): void {
+      this.selectedJobs = [0];
     },
   },
   methods: {

@@ -2,7 +2,7 @@ import klay from "cytoscape-klay";
 import nodeHtmlLabel from "cytoscape-node-html-label";
 
 import { CytoCoreGraph } from "@/types";
-import { viewportModule } from "@/store";
+import { layoutStore } from "@/hooks";
 import { timTreeResolveCy } from "@/cytoscape/cy";
 import {
   DEFAULT_ARTIFACT_TREE_ZOOM,
@@ -34,6 +34,6 @@ export const timGraph: CytoCoreGraph = {
     },
   ],
   async afterInit() {
-    await viewportModule.setTimTreeLayout();
+    await layoutStore.setTimTreeLayout();
   },
 };

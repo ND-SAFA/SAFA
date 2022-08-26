@@ -21,7 +21,7 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { ArtifactModel } from "@/types";
-import { getArtifactTypePrintName } from "@/util";
+import { typeOptionsStore } from "@/hooks";
 import { Typography, FlexBox } from "@/components/common/display";
 
 /**
@@ -43,7 +43,7 @@ export default Vue.extend({
      * Returns the display name for the artifact type.
      */
     artifactType(): string {
-      return getArtifactTypePrintName(this.artifact.type);
+      return typeOptionsStore.getArtifactTypeDisplay(this.artifact.type);
     },
   },
 });

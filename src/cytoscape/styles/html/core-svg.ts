@@ -1,8 +1,8 @@
 import { ArtifactData, SvgStyle } from "@/types";
 import { capitalize, getTextColor } from "@/util";
-import { getBody } from "./artifact-helper";
-import { svgFooter } from "./artifact-footer";
 import { ARTIFACT_CHILDREN_HEIGHT } from "@/cytoscape/styles/config";
+import { svgFooter } from "./artifact-footer";
+import { getBody } from "./artifact-helper";
 
 /**
  * Creates the SVG standard node.
@@ -28,6 +28,9 @@ export function svgNode(
     : capitalize(data.artifactType);
   const footer = svgFooter(data, outerStyle);
   const heightOffset = footer ? ARTIFACT_CHILDREN_HEIGHT + 6 : 6;
+  const dataCy = data.isSelected
+    ? "node-artifact-tree-selected"
+    : "node-artifact-tree";
 
   return `
     <div style="opacity: ${data.opacity}">
@@ -36,6 +39,7 @@ export function svgNode(
         height="${outerStyle.height + heightOffset}" 
         style="margin-top: ${outerStyle.marginTop + heightOffset}px"
         class="artifact-svg-wrapper ${deltaClass}"
+        data-cy="${dataCy}"
       >
         ${svgShape}
         ${svgTitle(title, textColor, y)}
@@ -66,9 +70,11 @@ export function svgNode(
 export function svgTitle(title: string, color: string, yPos: number): string {
   return `
    <text 
-      x="50%" y="${yPos}" text-anchor="middle"
+      x="50%" y="${yPos}" 
+      text-anchor="middle"
       fill="${color}" 
       font-weight="600"
+      font-size="${title.length > 20 ? "x-small" : "medium"}"
     >
       ${title}
     </text>

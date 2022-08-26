@@ -1,5 +1,5 @@
-import { IdentifierModel } from "@/types/domain/project";
 import { ArtifactPositions } from "@/types";
+import { IdentifierModel } from "@/types/domain/project";
 
 /**
  * Enumerates the type of documents supported by SAFA.

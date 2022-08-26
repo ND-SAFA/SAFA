@@ -7,8 +7,8 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { ArtifactModel, ArtifactDeltaState } from "@/types";
-import { deltaModule } from "@/store";
 import { capitalize, getBackgroundColor } from "@/util";
+import { deltaStore } from "@/hooks";
 import Typography from "@/components/common/display/Typography.vue";
 
 /**
@@ -25,7 +25,7 @@ export default Vue.extend({
      * @return The delta state of this artifact.
      */
     deltaState(): ArtifactDeltaState {
-      return deltaModule.getArtifactDeltaType(this.artifact.id);
+      return deltaStore.getArtifactDeltaType(this.artifact.id);
     },
     /**
      * @return Whether to render this delta state chip.

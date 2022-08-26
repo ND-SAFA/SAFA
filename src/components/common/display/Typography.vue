@@ -6,7 +6,7 @@
     <div
       v-else
       :class="className + ' text-ellipsis'"
-      style="white-space: nowrap; width: inherit"
+      style="white-space: nowrap; width: inherit; max-width: 60vw"
     >
       {{ value }}
     </div>
@@ -60,6 +60,7 @@ export default Vue.extend({
     defaultExpanded: Boolean,
     ellipsis: Boolean,
     secondary: Boolean,
+    bold: Boolean,
     variant: {
       type: String as PropType<TextType>,
       default: "body",
@@ -121,6 +122,7 @@ export default Vue.extend({
       if (this.error) classNames += ` error--text`;
       if (this.ellipsis) classNames += ` text-ellipsis`;
       if (this.secondary) classNames += ` text--secondary`;
+      if (this.bold) classNames += ` font-weight-bold`;
       if (this.x) classNames += ` mx-${this.x}`;
       if (this.l) classNames += ` ml-${this.l}`;
       if (this.r) classNames += ` mr-${this.r}`;

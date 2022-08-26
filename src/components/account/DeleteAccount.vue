@@ -15,8 +15,8 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { PasswordField, Typography } from "@/components";
 import { handleDeleteAccount } from "@/api";
+import { PasswordField, Typography } from "@/components";
 
 /**
  * Displays account deletion.

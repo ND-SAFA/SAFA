@@ -1,5 +1,5 @@
-import { ArtifactModel } from "@/types";
 import { SingularElementArgument } from "cytoscape";
+import { ArtifactModel } from "@/types";
 
 /**
  * Returns whether the element is either:

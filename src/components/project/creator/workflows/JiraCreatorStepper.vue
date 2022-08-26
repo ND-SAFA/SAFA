@@ -51,7 +51,7 @@ import {
 import {
   handleAuthorizeJira,
   handleLoadJiraProjects,
-} from "@/api/handlers/integration-handler";
+} from "@/api/handlers/project/integration-handler";
 
 /**
  * Allows for creating a project from Jira.

@@ -25,8 +25,8 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { ProjectModel, IdentifierModel } from "@/types";
+import { projectStore } from "@/hooks";
 import { handleSaveProject } from "@/api";
-import { projectModule } from "@/store";
 import { GenericIconButton, Typography, FlexBox } from "@/components/common";
 import { ProjectIdentifierModal } from "@/components/project/shared";
 
@@ -77,7 +77,7 @@ export default Vue.extend({
         },
         {
           onSuccess: () => {
-            projectModule.SET_PROJECT_IDENTIFIER(project);
+            projectStore.updateProject(project);
             this.isEditLoading = false;
             this.isEditOpen = false;
           },

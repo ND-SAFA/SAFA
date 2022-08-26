@@ -62,9 +62,9 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { sessionModule } from "@/store";
-import { handleLogout } from "@/api";
+import { sessionStore } from "@/hooks";
 import { navigateTo, Routes } from "@/router";
+import { handleLogout } from "@/api";
 import { Typography } from "@/components/common";
 
 export default Vue.extend({
@@ -75,7 +75,7 @@ export default Vue.extend({
      * @return The current user's email.
      */
     userEmail() {
-      return sessionModule.userEmail;
+      return sessionStore.userEmail;
     },
     /**
      * @return The current user's name.

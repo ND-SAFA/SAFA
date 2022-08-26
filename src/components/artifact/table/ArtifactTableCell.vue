@@ -77,8 +77,9 @@ import {
   ColumnModel,
   FlatArtifact,
 } from "@/types";
-import { artifactModule } from "@/store";
 import { ThemeColors } from "@/util";
+import { artifactStore } from "@/hooks";
+import { handleSaveArtifact } from "@/api";
 import {
   GenericIconButton,
   SingleCustomFieldInput,
@@ -86,7 +87,6 @@ import {
   FlexBox,
   AttributeChip,
 } from "@/components/common";
-import { handleSaveArtifact } from "@/api";
 
 /**
  * Displays a cell in the artifact table.
@@ -123,7 +123,7 @@ export default Vue.extend({
      * Returns the associated artifact for this cell.
      */
     artifact(): ArtifactModel {
-      return artifactModule.getArtifactById(this.item.id) || this.item;
+      return artifactStore.getArtifactById(this.item.id) || this.item;
     },
   },
   methods: {
@@ -154,7 +154,7 @@ export default Vue.extend({
      * @return The artifact name.
      */
     getArtifactName(id: string): string {
-      return artifactModule.getArtifactById(id)?.name || "";
+      return artifactStore.getArtifactById(id)?.name || "";
     },
     /**
      * Returns the value of an array custom field.

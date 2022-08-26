@@ -22,16 +22,25 @@ declare namespace Cypress {
     ): Chainable<JQuery<HTMLElement>>;
 
     /**
+     * Returns whether an element exists.
+     * Should not be used in tests, only in before-each cleanup calls.
+     *
+     * @param dataCy - The testing selector to find.
+     * @return Whether the element exists.
+     */
+    doesExist(dataCy: string): Chainable<boolean>;
+
+    /**
      * Sets the value of an input field.
      *
      * @param dataCy - The testing selector of the input being set.
      * @param inputValue - The value to set.
-     * @param elementPosition - The specific element to grab, if there are multiple.
+     * @param clear - If true, the input will be cleared first.
      */
     inputText(
       dataCy: string,
       inputValue: string,
-      elementPosition?: ElementPosition
+      clear?: boolean
     ): Chainable<void>;
 
     /**
@@ -79,6 +88,17 @@ declare namespace Cypress {
      */
     closeModal(dataCy: string): Chainable<void>;
 
+    /**
+     * Runs a callback on all rows of a table.
+     *
+     * @param dataCy - The testing selector of the table.
+     * @param fn - A callback run on each row of the table.
+     */
+    withinTableRows(
+      dataCy: string,
+      fn: (tr: Chainable<JQuery<HTMLElement>>) => void
+    ): Chainable<void>;
+
     // Authentication Commands
 
     /**
@@ -101,14 +121,7 @@ declare namespace Cypress {
      *
      * @param type - The type of project identifier to set.
      */
-    setProjectIdentifier(type: "bulk" | "standard"): Chainable<void>;
-
-    // Project Selection
-
-    /**
-     * Opens the project selection modal.
-     */
-    openProjectSelector(): Chainable<void>;
+    setProjectIdentifier(type: "bulk" | "standard" | "modal"): Chainable<void>;
 
     /**
      * Creates artifacts - inputs description and uploads file
@@ -116,13 +129,13 @@ declare namespace Cypress {
      * @param name - The name of the artifact you want
      * @param file - The file that belongs to the artifact
      */
-    createArtifactPanel(name: string, string: string): Chainable<void>;
+    createArtifactPanel(name: string, file: string): Chainable<void>;
 
     /**
      * Creates trace matrix - selects source or target then selects artifact
      *
      * @param name - Name is the first type artifact you want to select in the source (ex. requirement)
-     * @param artifact - Artifact is the second type of artifact you want to cselect for target (ex. hazard)
+     * @param artifact - Artifact is the second type of artifact you want to select for target (ex. hazard)
      */
     createTraceMatrix(name: string, artifact: string): Chainable<void>;
 
@@ -132,5 +145,46 @@ declare namespace Cypress {
      * @param file - The file that belongs to the trace link (ex. hazard2hazard)
      */
     uploadingTraceLinks(file: string): Chainable<void>;
+
+    /**
+     * Opens the upload flat files modal.
+     */
+    openUploadFiles(): Chainable<void>;
+
+    // Project Selection
+
+    /**
+     * Opens the project selection modal.
+     */
+    openProjectSelector(): Chainable<void>;
+
+    /**
+     * Must have the project selector open.
+     * On the project step: Selects the current project, continuing to the version step.
+     * On the version step: Selects the current version, continuing to the project page.
+     */
+    projectSelectorContinue(): Chainable<void>;
+
+    /**
+     * Must have the project selector open to the version step.
+     * Creates a new version of the given type.
+     */
+    createNewVersion(type: "major" | "minor" | "revision"): Chainable<void>;
+
+    // Artifact View
+
+    /**
+     * Creates a new artifact from the artifact fab button.
+     * Does not click the save button on the artifact, leaving the modal open.
+     *
+     * @param name - A specific name to set.
+     * @param type - A specific type to set.
+     * @param body - A specific body to set.
+     */
+    createNewArtifact(
+      name?: string,
+      type?: string,
+      body?: string
+    ): Chainable<void>;
   }
 }

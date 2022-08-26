@@ -2,18 +2,31 @@ import "cypress-file-upload";
 import { DataCy } from "../fixtures";
 
 Cypress.Commands.add("getCy", (dataCy, elementPosition, timeout) => {
-  const elementList = cy.get(`[data-cy="${dataCy}"]`, { timeout });
+  const elements = cy.get(`[data-cy="${dataCy}"]`, { timeout });
+
   if (elementPosition === "first") {
-    return elementList.first();
+    return elements.first();
   } else if (elementPosition === "last") {
-    return elementList.last();
+    return elements.last();
   } else {
-    return elementList;
+    return elements;
   }
 });
 
-Cypress.Commands.add("inputText", (dataCy, inputValue, elementPosition) => {
-  cy.getCy(dataCy, elementPosition).type(inputValue);
+Cypress.Commands.add("doesExist", (dataCy) => {
+  return cy.get("body").then((body) => {
+    return body.find(`[data-cy="${dataCy}"]`).length > 0;
+  });
+});
+
+Cypress.Commands.add("inputText", (dataCy, inputValue, clear) => {
+  if (clear) {
+    cy.getCy(dataCy).clear();
+  }
+
+  if (inputValue.length > 0) {
+    cy.getCy(dataCy).type(inputValue);
+  }
 });
 
 Cypress.Commands.add("clickButton", (dataCy, elementPosition = "first") => {
@@ -40,5 +53,11 @@ Cypress.Commands.add("switchTab", (tabLabel) => {
 });
 
 Cypress.Commands.add("closeModal", (dataCy) => {
-  cy.getCy(dataCy).within(() => cy.clickButton(DataCy.selectionClose));
+  cy.getCy(dataCy).within(() => cy.clickButton(DataCy.modalClose));
+});
+
+Cypress.Commands.add("withinTableRows", (dataCy, fn) => {
+  cy.getCy(dataCy).within(() => {
+    fn(cy.get("tr"));
+  });
 });

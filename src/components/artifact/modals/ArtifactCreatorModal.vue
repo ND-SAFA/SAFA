@@ -4,6 +4,7 @@
     :isOpen="!!isOpen"
     :isLoading="isLoading"
     size="l"
+    data-cy="modal-artifact-save"
     @close="$emit('close')"
   >
     <template v-slot:body>
@@ -14,12 +15,16 @@
         @change:parent="parentId = $event"
         @change:documentType="handleDocumentTypeChange"
         @change:valid="isNameValid = $event"
-        data-cy="create-new-artifact-button"
       />
     </template>
     <template v-slot:actions>
       <v-row justify="end">
-        <v-btn color="primary" :disabled="!canSave" @click="handleSubmit">
+        <v-btn
+          color="primary"
+          :disabled="!canSave"
+          data-cy="button-artifact-save"
+          @click="handleSubmit"
+        >
           Save
         </v-btn>
       </v-row>
@@ -31,7 +36,7 @@
 import Vue, { PropType } from "vue";
 import { ArtifactModel, DocumentType } from "@/types";
 import { createArtifact, createArtifactOfType } from "@/util";
-import { artifactModule, documentModule } from "@/store";
+import { artifactStore, documentStore } from "@/hooks";
 import { handleSaveArtifact } from "@/api";
 import { GenericModal } from "@/components/common";
 import ArtifactCreatorInputs from "./ArtifactCreatorInputs.vue";
@@ -115,7 +120,7 @@ export default Vue.extend({
      */
     parentArtifact(): ArtifactModel | undefined {
       return this.parentId
-        ? artifactModule.getArtifactById(this.parentId)
+        ? artifactStore.getArtifactById(this.parentId)
         : undefined;
     },
     /**
@@ -187,7 +192,7 @@ export default Vue.extend({
      * Attempts to save the artifact.
      */
     handleSubmit(): void {
-      const { documentId } = documentModule.document;
+      const { documentId } = documentStore.currentDocument;
       const { logicType, safetyCaseType } = this.editedArtifact;
       const isUpdate = this.artifact !== undefined;
       const artifact = createArtifact({

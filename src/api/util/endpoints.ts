@@ -22,9 +22,9 @@ export enum Endpoint {
   updateProjectThroughFlatFiles = "jobs/projects/versions/:versionId",
   getUserJobs = "jobs",
   deleteJobById = "jobs/:jobId",
-  jobTopic = "/topic/jobs/:jobId",
-  projectTopic = "/topic/projects/:projectId",
-  versionTopic = "/topic/revisions/:versionId",
+  jobTopic = "/topic/:jobId",
+  projectTopic = "/topic/:projectId",
+  versionTopic = "/topic/:versionId",
 
   // Projects
   project = "projects",
@@ -37,6 +37,7 @@ export enum Endpoint {
   // Commits
   commit = "projects/versions/:versionId/commit",
   isArtifactNameTaken = "projects/versions/:versionId/artifacts/validate/",
+  sync = "projects/versions/:versionId/changes",
 
   // Types
   getProjectArtifactTypes = "projects/:projectId/artifactTypes",
@@ -61,7 +62,7 @@ export enum Endpoint {
 
   // Documents
   createOrUpdateDocument = "projects/versions/:versionId/documents",
-  getProjectDocuments = "projects/:projectId/documents",
+  getProjectDocuments = "projects/versions/:versionId/documents",
   deleteDocument = "projects/documents/:documentId",
 
   // Document Artifacts
@@ -78,8 +79,8 @@ export enum Endpoint {
   parseTraceFile = "projects/parse/traces",
 
   // Trace Matrices
-  createTraceMatrix = "projects/:projectId/matrices/:sourceArtifactTypeName/:targetArtifactTypeName",
-  deleteTraceMatrix = "projects/matrices/:traceMatrixId",
+  createTraceMatrix = "projects/:projectId/matrices/:sourceType/:targetType",
+  deleteTraceMatrix = "projects/:projectId/matrices/:sourceType/:targetType",
   retrieveTraceMatrices = "projects/:projectId/matrices",
 
   // Warnings

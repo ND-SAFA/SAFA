@@ -81,17 +81,17 @@ import {
   TraceLinkModel,
 } from "@/types";
 import { createProject } from "@/util";
+import { sessionStore } from "@/hooks";
 import {
   handleImportProject,
   createArtifactUploader,
   createTraceUploader,
 } from "@/api";
-import { sessionModule } from "@/store";
 import { GenericStepper } from "@/components/common";
 import { ProjectIdentifierInput } from "@/components/project/shared";
-import { TimTree } from "../tim-tree-view";
-import { GenericUploader } from "../validation-panels";
 import { ArtifactTypeCreator, TraceFileCreator } from "../panels";
+import { GenericUploader } from "../validation-panels";
+import { TimTree } from "../tim-tree-view";
 
 const PROJECT_IDENTIFIER_STEP_NAME = "Name Project";
 
@@ -191,7 +191,7 @@ export default Vue.extend({
     project(): ProjectModel {
       const user: MembershipModel = {
         projectMembershipId: "",
-        email: sessionModule.userEmail,
+        email: sessionStore.userEmail,
         role: ProjectRole.OWNER,
       };
 

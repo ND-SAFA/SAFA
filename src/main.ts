@@ -1,16 +1,17 @@
 import Vue from "vue";
-import App from "@/App.vue";
+
 import "@/plugins/vue-cytoscape";
-import vuetify from "@/plugins/vuetify";
-import store from "@/store";
-import { router } from "@/router";
 import "@mdi/font/css/materialdesignicons.css";
+
+import { router } from "@/router";
+import App from "@/App.vue";
+import { vuetify, pinia } from "@/plugins";
 
 Vue.config.productionTip = false;
 
 export default new Vue({
   router,
-  store,
   vuetify,
+  pinia,
   render: (h) => h(App),
 }).$mount("#app");

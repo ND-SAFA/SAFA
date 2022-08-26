@@ -40,13 +40,13 @@ import {
   GitHubCredentialsModel,
   StepState,
 } from "@/types";
+import { getParam, QueryParams } from "@/router";
 import {
   getGitHubInstallations,
   getGitHubRepositories,
   handleImportGitHubProject,
 } from "@/api";
-import { getParam, QueryParams } from "@/router";
-import { handleAuthorizeGitHub } from "@/api/handlers/integration-handler";
+import { handleAuthorizeGitHub } from "@/api/handlers/project/integration-handler";
 import { GenericStepper } from "@/components/common";
 import {
   GitHubAuthentication,

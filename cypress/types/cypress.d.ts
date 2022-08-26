@@ -123,17 +123,62 @@ declare namespace Cypress {
      */
     setProjectIdentifier(type: "bulk" | "standard" | "modal"): Chainable<void>;
 
+    /**
+     * Opens the last file panel after waiting for it to close when files are parsed.
+     */
+    openPanelAfterClose(): Chainable<void>;
+
+    /**
+     * Creates artifacts - inputs description and uploads file.
+     *
+     * @param name - The name of the artifact typeto create.
+     * @param file - The file that belongs to the artifact.
+     * @param next - If true, proceeds to the next step.
+     */
+    createArtifactPanel(
+      name: string,
+      file: string,
+      next?: boolean
+    ): Chainable<void>;
+
+    /**
+     * Creates trace matrix - selects source or target then selects artifact.
+     *
+     * @param sourceType - The first type artifact you want to select in the source (ex. requirement).
+     * @param targetType - The second type of artifact you want to select for target (ex. hazard).
+     * @param file - The file that belongs to the trace link (ex. hazard2hazard).
+     *               If none, is set, this will not be uploaded, and the stepper will not continue.
+     * @param next - If true, proceeds to the next step.
+     */
+    createTraceMatrix(
+      sourceType: string,
+      targetType: string,
+      file?: string,
+      next?: boolean
+    ): Chainable<void>;
+
+    /**
+     * Creates artifacts & a trace matrix for requirements and hazards.
+     *
+     * @param createTraces - If true, traces will be created between the artifact types.
+     * @param next - If true, proceeds to the final step.
+     */
+    createReqToHazardFiles(
+      createTraces?: boolean,
+      next?: boolean
+    ): Chainable<void>;
+
+    /**
+     * Opens the upload flat files modal.
+     */
+    openUploadFiles(): Chainable<void>;
+
     // Project Selection
 
     /**
      * Opens the project selection modal.
      */
     openProjectSelector(): Chainable<void>;
-
-    /**
-     * Opens the upload flat files modal.
-     */
-    openUploadFiles(): Chainable<void>;
 
     /**
      * Must have the project selector open.

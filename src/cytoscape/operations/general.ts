@@ -234,7 +234,6 @@ export function cyResetTree(
  */
 export function cyResetTim(cyPromise: CyPromise = timTreeCyPromise): void {
   cyPromise.then((cy) => {
-    cy.zoom(1);
-    cy.center(cy.nodes());
+    cy.fit(cy.nodes(), 150);
   });
 }

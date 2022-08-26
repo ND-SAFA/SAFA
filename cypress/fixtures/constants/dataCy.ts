@@ -44,8 +44,6 @@ export enum DataCy {
 
   // Project Creation
 
-  creationUploadButton = "button-create-project",
-
   creationBulkNameInput = "input-project-name-bulk",
   creationBulkDescriptionInput = "input-project-description-bulk",
   creationBulkFilesInput = "input-files-bulk",
@@ -56,10 +54,13 @@ export enum DataCy {
   creationCreatePanelButton = "button-create-panel",
   creationTypeInput = "input-artifact-type",
   creationTypeButton = "button-artifact-type",
-  creationArtifactButton = "button-artifact-dropbox",
   creationArtifactDeleteButton = "button-delete-artifact",
   creationEntitiesButton = "button-file-entities",
   creationIgnoreErrorsButton = "button-ignore-errors",
+  creationDeletePanel = "button-delete-artifact",
+  creationEntityButton = "button-created-entity",
+  creationFilePanel = "panel-files",
+  creationUploadButton = "button-create-project",
 
   // Jobs
 

@@ -33,6 +33,5 @@ Cypress.Commands.add("createTraceMatrix", (name: string, artifact: string) => {
 Cypress.Commands.add("uploadingTraceLinks", (file: string) => {
   cy.clickButtonWithName("Create trace matrix");
   cy.uploadFiles(DataCy.creationStandardFilesInput, file);
-  cy.clickButton(DataCy.creationIgnoreErrorsButton, "last");
   cy.clickButton(DataCy.stepperContinueButton);
 });

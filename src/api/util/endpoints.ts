@@ -22,7 +22,7 @@ export enum Endpoint {
   updateProjectThroughFlatFiles = "jobs/projects/versions/:versionId",
   getUserJobs = "jobs",
   deleteJobById = "jobs/:jobId",
-  jobTopic = "/topic/jobs/:jobId",
+  jobTopic = "/topic/:jobId",
   projectTopic = "/topic/:projectId",
   versionTopic = "/topic/:versionId",
 

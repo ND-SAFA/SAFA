@@ -1,5 +1,6 @@
+import { Frame } from "webstomp-client";
 import { IOHandlerCallback, JobModel } from "@/types";
-import { appStore, logStore, jobStore } from "@/hooks";
+import { appStore, jobStore } from "@/hooks";
 import {
   connect,
   deleteJobById,
@@ -21,12 +22,19 @@ export async function connectAndSubscribeToJob(jobId: string): Promise<void> {
 
   await connect();
 
-  stompClient.subscribe(fillEndpoint(Endpoint.jobTopic, { jobId }), (frame) => {
-    const incomingJob: JobModel = JSON.parse(frame.body);
+  stompClient.subscribe(
+    fillEndpoint(Endpoint.jobTopic, { jobId }),
+    updateJobFromWebsocketMessage
+  );
+}
 
-    jobStore.updateJob(incomingJob);
-    logStore.onDevInfo(`New Job message: ${incomingJob.id}`);
-  });
+/**
+ * Extracts job from websocket message and updates the according job.
+ * @param frame - The websocket frame including job update message.
+ */
+export function updateJobFromWebsocketMessage(frame: Frame): void {
+  const job: JobModel = JSON.parse(frame.body);
+  jobStore.updateJob(job);
 }
 
 /**

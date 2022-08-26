@@ -1,9 +1,9 @@
 import { Frame } from "webstomp-client";
 import {
   ActionType,
+  ChangeMessageModel,
   ChangeModel,
   EntityType,
-  ChangeMessageModel,
   ProjectModel,
 } from "@/types";
 import {

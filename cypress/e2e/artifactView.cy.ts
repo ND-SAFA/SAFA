@@ -54,6 +54,8 @@ describe("Artifact View", () => {
         });
       });
 
+      // it("Creates a new artifact from the right click menu", () => {});
+
       // it("Cannot create a new artifact with the same name", () => {})
 
       // it("Creates an artifact with a new type", () => {})

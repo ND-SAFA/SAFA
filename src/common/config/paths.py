@@ -1,3 +1,3 @@
-import os
+from os.path import dirname, abspath
 
-PROJ_PATH = os.path.dirname(os.path.abspath(__file__))
+PROJ_PATH = dirname(dirname(dirname(abspath(__file__))))

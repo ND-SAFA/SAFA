@@ -1,4 +1,5 @@
-from transformers import AutoModel, BertPreTrainedModel
+from transformers.models.auto.modeling_auto import AutoModel
+from transformers.models.bert.modeling_bert import BertPreTrainedModel
 from transformers.models.electra.modeling_electra import (
     ElectraClassificationHead,
 )

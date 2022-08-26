@@ -1,15 +1,17 @@
-from typing import Dict, List
+from typing import Dict, List, NamedTuple
 
 import numpy as np
 from datasets import load_metric
-from torch.utils.data import DataLoader, RandomSampler
+from torch.utils.data import DataLoader
 from torch.utils.data.distributed import DistributedSampler
+from torch.utils.data.sampler import RandomSampler
 from transformers.trainer import Trainer
 from transformers.trainer_pt_utils import get_tpu_sampler, is_torch_tpu_available
 from transformers.trainer_utils import PredictionOutput
 
-from trace.jobs.trace_args import ModelTraceArgs
-from trace.metrics.supported_metrics import get_metric_path
+from trace.config.constants import LINKED_TARGETS_ONLY_DEFAULT
+from trace.jobs.trace_args import TraceArgs
+from trace.metrics.supported_trace_metric import get_metric_path
 
 
 class TraceTrainer(Trainer):
@@ -17,7 +19,7 @@ class TraceTrainer(Trainer):
     Responsible for using given model for training and prediction using given dataset.
     """
 
-    def __init__(self, args: ModelTraceArgs):
+    def __init__(self, args: TraceArgs):
         """
         Handles the training and evaluation of learning models
         :param args: the learning model arguments
@@ -30,41 +32,55 @@ class TraceTrainer(Trainer):
         tokenizer = self.model_generator.get_tokenizer()
         super().__init__(model=model, args=args, tokenizer=tokenizer)
 
-    # TODO
     def perform_training(self, checkpoint: str = None) -> Dict:
         """
         Performs the model training
         :param checkpoint: path to checkpoint
         :return: a dictionary containing the results
         """
-        self.train_dataset = self.trace_dataset_creator.get_training_dataset(self.args.resample_rate)
+        self.train_dataset = self.trace_dataset_creator.get_training_dataset(self.args.resample_rate).data
+        self.eval_dataset = self.trace_dataset_creator.get_validation_dataset(self.args.eval_dataset_size,
+                                                                              linked_targets_only=LINKED_TARGETS_ONLY_DEFAULT).data
         output = self.train(resume_from_checkpoint=checkpoint)
         self.save_model()
-        return dict(output)
+        return TraceTrainer.output_to_dict(output)
 
-    # TODO
     def perform_prediction(self) -> Dict:
         """
         Performs the prediction and (optionally) evaluation for the model
         :return: a dictionary containing the results
         """
-        self.eval_dataset = self.trace_dataset_creator.get_validation_dataset(self.args.dataset_size)
+        dataset = self.trace_dataset_creator.get_prediction_dataset()
+        self.eval_dataset = dataset.data
         output = self.predict(self.eval_dataset)
         if self.args.metrics:
-            output.metrics = self._eval(output, self.args.metrics)
-        return dict(output)
+            self._eval(output, self.args.metrics)
+        output_dict = TraceTrainer.output_to_dict(output)
+        output_dict[self.args.prediction_ids_key] = dataset.source_target_pairs
+        return output_dict
 
-    def _eval(self, output: PredictionOutput, metric_names: List) -> Dict:
+    @staticmethod
+    def output_to_dict(output: NamedTuple) -> Dict:
+        """
+        Converts train/prediction output to a dictionary
+        :param output: output from training or prediction
+        :return: the output represented as a dictionary
+        """
+        return {field: getattr(output, field) for field in output._fields}
+
+    @staticmethod
+    def _eval(output: PredictionOutput, metric_names: List):
         """
         Performs the evaluation of the model (use this instead of Trainer.evaluation to utilize predefined metrics from datasets)
         :param output: the output from predictions
         :param metric_names: name of metrics desired for evaluation
-        :return: metric name, result mappings
         """
-        metric_paths = [get_metric_path(name) for name in metric_names]
-        metric = load_metric(*metric_paths)
         preds = np.argmax(output.predictions, axis=-1)
-        return metric.compute(predictions=preds, references=output.predictions.label_ids)
+        metric_paths = [get_metric_path(name) for name in metric_names]
+        for metric_path in metric_paths:
+            metric = load_metric(metric_path)
+            results = metric.compute(predictions=preds, references=output.label_ids)
+            output.metrics.update(results)
 
     def get_train_dataloader(self) -> DataLoader:
         """

@@ -1,5 +1,5 @@
 
-from transformers import ElectraPreTrainedModel
+from transformers.models.electra.modeling_electra import ElectraPreTrainedModel
 from transformers.models.electra.modeling_electra import ElectraClassificationHead, ElectraModel
 
 from common.models.base_models.single_model_forward_pass import single_model_forward_pass

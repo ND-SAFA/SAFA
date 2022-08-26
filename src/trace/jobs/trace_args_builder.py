@@ -1,25 +1,24 @@
 from typing import Dict, List, Tuple
 
-from trace.config.constants import LINKED_TARGETS_ONLY_DEFAULT
-from common.jobs.arg_builder import ArgBuilder
+from common.jobs.abstract_args_builder import AbstractArgsBuilder
 from common.models.model_generator import ModelGenerator
 from trace.data.trace_dataset_creator import TraceDatasetCreator
 
-from trace.jobs.trace_args import ModelTraceArgs
+from trace.jobs.trace_args import TraceArgs
 
 
-class TraceArgBuilder(ArgBuilder):
+class TraceArgsBuilder(AbstractArgsBuilder):
 
-    def __init__(self, base_model_name: str, links: List[Tuple[str, str]], model_path: str, output_path: str,
-                sources: Dict[str, str], targets: Dict[str, str], **kwargs):
+    def __init__(self, base_model_name: str, model_path: str, output_path: str, sources: Dict[str, str],
+                 targets: Dict[str, str], links: List[Tuple[str, str]], validation_percentage: float, **kwargs):
         """
         Responsible for building training arguments for some pretrained model.
         :param base_model_name: supported base model name
-        :param links: list of true links to fine-tune on
         :param model_path: where the pretrained model will be loaded from
         :param output_path: where the model will be saved to
         :param sources: mapping between source artifact ids and their tokens
         :param targets: mapping between target artifact ids and their tokens
+        :param links: list of true links to fine-tune on
         :param kwargs: additional parameters passed into ModelTraceArgs
         """
         self.base_model_name = base_model_name
@@ -28,9 +27,10 @@ class TraceArgBuilder(ArgBuilder):
         self.output_path = output_path
         self.sources = sources
         self.targets = targets
+        self.validation_percentage = validation_percentage
         self.kwargs = kwargs
 
-    def build(self) -> ModelTraceArgs:
+    def build(self) -> TraceArgs:
         """
         Builds training arguments for some pretrained model.
         :return: Arguments for trace job including training and predicting trace links
@@ -40,8 +40,8 @@ class TraceArgBuilder(ArgBuilder):
         trace_dataset_creator = TraceDatasetCreator(source_artifacts=self.sources, target_artifacts=self.targets,
                                                     true_links=self.links,
                                                     model_generator=model_generator,
-                                                    linked_targets_only=LINKED_TARGETS_ONLY_DEFAULT)
-        return ModelTraceArgs(model_generator=model_generator,
-                              trace_dataset_creator=trace_dataset_creator,
-                              output_path=self.output_path,
-                              kwargs=self.kwargs)
+                                                    validation_percentage=self.validation_percentage)
+        return TraceArgs(model_generator=model_generator,
+                         trace_dataset_creator=trace_dataset_creator,
+                         output_path=self.output_path,
+                         kwargs=self.kwargs)

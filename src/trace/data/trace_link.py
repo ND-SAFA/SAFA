@@ -1,5 +1,5 @@
 from collections.abc import Callable
-from typing import Dict
+from typing import Dict, Tuple
 
 from trace.data.artifact import Artifact
 
@@ -36,6 +36,13 @@ class TraceLink:
                                                  add_special_tokens=True)
         return self.__feature
 
+    def get_source_target_ids(self) -> Tuple[str, str]:
+        """
+        Gets the ids of the source and target
+        :return: the ids of the source and target
+        """
+        return self.source.id_, self.target.id_
+
     @staticmethod
     def generate_link_id(source_id: str, target_id: str) -> int:
         """
@@ -47,4 +54,4 @@ class TraceLink:
         return hash(source_id) + hash(target_id)
 
     def __hash__(self):
-        return hash(self.id_)
+        return self.id_

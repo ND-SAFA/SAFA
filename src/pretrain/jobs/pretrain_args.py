@@ -1,16 +1,16 @@
 from pretrain.config.constants import PRETRAIN_BATCH_SIZE_DEFAULT, PRETRAIN_LEARNING_RATE_DEFAULT, \
     PRETRAIN_MODEL_NAME, PRETRAIN_VOCAB_FILE
-from pretrain.config.paths import PRETRAIN_DATA_PATH
+from pretrain.config.paths import DATA_PATH
 from common.models.model_generator import ModelGenerator
 from pretrain.data.corpuses.domain import Domain, get_path
 from pretrain.electra.configure_pretraining import PretrainingConfig
 
 
-class ModelPretrainArgs(PretrainingConfig):
+class PretrainArgs(PretrainingConfig):
     num_processes: int = 1
     blanks_separate_docs: bool = False
     strip_accents: bool = True
-    data_dir = PRETRAIN_DATA_PATH
+    data_dir = DATA_PATH
     vocab_file: str = PRETRAIN_VOCAB_FILE
     train_batch_size: int = PRETRAIN_BATCH_SIZE_DEFAULT
     learning_rate: float = PRETRAIN_LEARNING_RATE_DEFAULT

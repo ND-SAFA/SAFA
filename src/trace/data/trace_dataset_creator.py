@@ -1,97 +1,105 @@
 import math
 import random
-from typing import Dict, Iterable, List, Tuple
+from typing import Dict, Iterable, List, Tuple, Set, Sized
 
 import torch
 
 from trace.config.constants import EVAL_DATASET_SIZE_DEFAULT, LINKED_TARGETS_ONLY_DEFAULT, RESAMPLE_RATE_DEFAULT
 from trace.data.artifact import Artifact
 from trace.data.data_key import DataKey
+from trace.data.trace_dataset import TraceDataset
 from trace.data.trace_link import TraceLink
 from common.models.model_generator import ModelGenerator, ArchitectureType
 
 
 class TraceDatasetCreator:
+    __training_dataset: TraceDataset = None
+    __validation_dataset: TraceDataset = None
+    __prediction_dataset: TraceDataset = None
+
     """
     Responsible for creating dataset in format for defined models.
     """
-    links: Dict = {}
-    pos_link_ids: set = set()
-    neg_link_ids: set = set()
-    __training_dataset: List[Dict] = None
-    __validation_dataset: List[Dict] = None
-    __prediction_dataset: List[Dict] = None
 
     def __init__(self, source_artifacts: Dict[str, str], target_artifacts: Dict[str, str], model_generator: ModelGenerator,
-                 true_links: List[Tuple[str, str]] = None, linked_targets_only: bool = LINKED_TARGETS_ONLY_DEFAULT):
+                 true_links: List[Tuple[str, str]] = None, validation_percentage: float = 0.0):
         """
         Constructs datasets for trace link training and validation
         :param source_artifacts: source artifacts represented as mapping between id and token
         :param target_artifacts: target artifacts represented as mapping between id and token
         :param true_links: list of tuples containing linked source and target ids
         :param model_generator: the ModelGenerator
-        :param linked_targets_only: if True, uses only targets that have at least one true link to a source
+        :param validation_percentage: percentage of dataset used for validation, if no value is supplied then data will not be split
         """
-        self.model_generator = model_generator
-        target_artifacts = self._get_linked_targets_only(target_artifacts,
-                                                         true_links) if linked_targets_only else target_artifacts
-        self._create_links(source_artifacts, target_artifacts, true_links)
 
-    def get_training_dataset(self, resample_rate: int = RESAMPLE_RATE_DEFAULT) -> List[Dict]:
+        self.model_generator = model_generator
+        self.links, self.pos_link_ids, self.neg_link_ids = self._create_links(self.model_generator, source_artifacts, target_artifacts,
+                                                                              true_links)
+        self.validation_percentage = validation_percentage
+        self.linked_target_ids = self._get_linked_targets_only(true_links) if true_links else set()
+
+    def get_training_dataset(self, resample_rate: int = RESAMPLE_RATE_DEFAULT) -> TraceDataset:
         """
         Gets the dataset used for training
         :param resample_rate: specifies the rate to resample the links to balance the dataset
         :return: the training dataset
         """
         if self.__training_dataset is None:
-            self.__training_dataset = self._get_feature_entries(self.pos_link_ids, resample_rate)
-            reduced_neg_link_ids = self._reduce_data_size(list(self.neg_link_ids),
-                                                          len(self.pos_link_ids) * resample_rate)
-            self.__training_dataset.extend(self._get_feature_entries(reduced_neg_link_ids, 1))
+            train_pos_link_ids = self._get_data_split(self.pos_link_ids)
+            train_neg_link_ids = self._get_data_split(self.neg_link_ids)
+
+            train_pos_link_ids = TraceDataset.resample_data(train_pos_link_ids, resample_rate)
+            train_neg_link_ids = TraceDataset.resize_data(train_neg_link_ids, len(train_pos_link_ids), include_duplicates=True)
+
+            link_ids = [*train_pos_link_ids, *train_neg_link_ids]
+            self.__training_dataset = self._create_dataset(link_ids)
+
         return self.__training_dataset
 
-    def get_validation_dataset(self, dataset_size: int = EVAL_DATASET_SIZE_DEFAULT) -> List[Dict]:
+    def get_validation_dataset(self, dataset_size: int = EVAL_DATASET_SIZE_DEFAULT,
+                               linked_targets_only: bool = LINKED_TARGETS_ONLY_DEFAULT) -> TraceDataset:
         """
         Gets the dataset used for validation
         :param dataset_size: desired size for dataset (if larger than original dataset, the entire dataset is used)
+        :param linked_targets_only: reduce dataset size to include only targets that have at least one true link
         :return: the validation dataset
         """
         if self.__validation_dataset is None:
-            new_length = min(dataset_size, len(self.links))
-            reduced_link_ids = self._reduce_data_size(list(self.links.keys()), new_length, include_duplicates=False)
-            self.__validation_dataset = self._get_feature_entries(reduced_link_ids)
+            val_pos_link_ids = self._get_data_split(self.pos_link_ids, for_validation=True)
+            val_neg_link_ids = self._get_data_split(self.neg_link_ids, for_validation=True)
+
+            if linked_targets_only:
+                val_neg_link_ids = self._reduce_to_linked_targets_only(val_neg_link_ids)
+
+            link_ids = [*val_pos_link_ids, *val_neg_link_ids]
+
+            if dataset_size < len(link_ids):
+                link_ids = TraceDataset.resize_data(link_ids, dataset_size)
+
+            self.__validation_dataset = self._create_dataset(link_ids)
+
         return self.__validation_dataset
 
-    def get_prediction_dataset(self) -> List[Dict]:
+    def get_prediction_dataset(self) -> TraceDataset:
         """
         Gets the dataset used for validation
         :return: the prediction dataset
         """
         if self.__prediction_dataset is None:
-            self.__prediction_dataset = self._get_feature_entries(self.links.keys())
+            self.__prediction_dataset = self._create_dataset(list(self.links.keys()))
         return self.__prediction_dataset
 
-    # TODO is this needed? incorporate into training/validation?
-    # TODO clean this up
-    def split_links(self, weights: Dict[str, int]) -> Dict[str, List[TraceLink]]:
+    def _create_dataset(self, link_ids: List[int]) -> TraceDataset:
         """
-        Splits the links to divide dataset
-        :param weights: split name, weight mappings specifying what proportion of links each split should take
-        :return: split name, list of links mappings
+        Creates a TraceDataset from the identified links
+        :param link_ids: ids of links to be in dataset
+        :return: the TraceDataset created from the links
         """
-        total_w = sum(weights.values())
-        links_by_splice = {slice_name: [] for slice_name in weights.keys()}
-        link_ids_lists = [list(self.neg_link_ids), list(self.pos_link_ids)]
-        n_link_ids = [len(self.neg_link_ids), len(self.pos_link_ids)]
-        start = [0, 0]
-        end = [0, 0]
-        for slice_name, weight in weights.items():
-            for i, link_ids_list in enumerate(link_ids_lists):
-                end[i] = end[i] + min(math.ceil(weight * n_link_ids[i] / total_w), n_link_ids[i])
-                subset = link_ids_list[start[i]:end[i]]
-                links_by_splice[slice_name].extend([self.links[link_id] for link_id in subset])
-                start[i] = end[i]
-        return links_by_splice
+        dataset = TraceDataset()
+        feature_entries = self._get_feature_entries(link_ids)
+        source_target_pairs = [self.links[link_id].get_source_target_ids() for link_id in link_ids]
+        dataset.add_entries(feature_entries, source_target_pairs)
+        return dataset
 
     # TODO is this needed?
     def update_embeddings(self) -> None:
@@ -139,55 +147,91 @@ class TraceDatasetCreator:
                      **self._extract_feature_info(link.target.get_feature(), DataKey.TARGET_PRE + "_")}
         else:
             entry = self._extract_feature_info(link.get_feature())
-        entry[DataKey.SOURCE_PRE + DataKey.ID_KEY] = link.source.id_
-        entry[DataKey.TARGET_PRE + DataKey.ID_KEY] = link.target.id_
         entry[DataKey.LABEL_KEY] = int(link.is_true_link)
         return entry
 
-    def _get_feature_entries(self, link_ids: Iterable[str], resample_rate: int = RESAMPLE_RATE_DEFAULT) -> List[Dict]:
+    def _get_feature_entries(self, link_ids: Iterable[int]) -> List[Dict]:
         """
         Gets a list of link features to be used in the dataset
         :param link_ids: ids of links to create dataset from
-        :param resample_rate: specifies the rate to resample the links to balance the dataset
         :return: a list of the feature entries
         """
-        feature_entries = []
-        for link_id in link_ids:
-            feature_entry = self._get_feature_entry(self.links[link_id])
-            feature_entries.extend([feature_entry for i in range(resample_rate)])
-        return feature_entries
+        return [self._get_feature_entry(self.links[link_id]) for link_id in link_ids]
 
-    def _create_links(self, s_arts: Dict[str, str], t_arts: Dict, true_links: List[Tuple[str, str]] = None) -> None:
+    def _get_data_split(self, data: List, for_validation: bool = False) -> List:
+        """
+        Splits the data and returns the split
+        :param data: a list of the data
+        :param for_validation: if True, returns the validation portion
+        :return: the subsection of the data in the split
+        """
+        split_size = self._get_train_split_size(data)
+        return data[split_size:] if for_validation else data[:split_size]
+
+    def _get_train_split_size(self, data: Sized) -> int:
+        """
+        Gets the size of the data for the train split
+        :param data: a list of the data
+        :return: the size of the data split
+        """
+        return len(data) - round(len(data) * self.validation_percentage)
+
+    def _reduce_to_linked_targets_only(self, orig_link_ids: Iterable) -> List[int]:
+        """
+        Reduces a list of link ids to only those that use a target with at least one true link
+        :param orig_link_ids: a list of link ids
+        :return: a list of link ids to only those that use a target with at least one true link
+        """
+        reduced_links = []
+        for link_id in orig_link_ids:
+            link = self.links[link_id]
+            if link.target.id_ in self.linked_target_ids:
+                reduced_links.append(link.id_)
+        return reduced_links
+
+    @staticmethod
+    def _create_links(model_generator: ModelGenerator, s_arts: Dict[str, str], t_arts: Dict,
+                      true_links: List[Tuple[str, str]] = None) -> Tuple[Dict, list, list]:
         """
         Creates Trace Links from all source and target pairs
+        :param model_generator: the ModelGenerator
         :param s_arts: source artifacts represented as id, token mappings
         :param t_arts: target artifacts represented as id, token mappings
         :param true_links: list of tuples containing linked source and target ids
-        :return: None
+        :return: a dictionary of the links, a list of the positive link ids, and a list of the negative link ids
         """
-        self.links = {}
+        links = {}
         for s_id, s_token in s_arts.items():
-            source = Artifact(s_id, s_token, self.model_generator.get_feature)
+            source = Artifact(s_id, s_token, model_generator.get_feature)
             for t_id, t_token in t_arts.items():
-                target = Artifact(t_id, t_token, self.model_generator.get_feature)
-                link = TraceLink(source, target, self.model_generator.get_feature)
-                self.links[link.id_] = link
+                target = Artifact(t_id, t_token, model_generator.get_feature)
+                link = TraceLink(source, target, model_generator.get_feature)
+                links[link.id_] = link
+        neg_link_ids = pos_link_ids = None
         if true_links:
-            self._create_pos_and_neg_links(true_links)
+            pos_link_ids, neg_link_ids = TraceDatasetCreator._create_pos_and_neg_links(true_links, links)
+        return links, pos_link_ids, neg_link_ids
 
-    def _create_pos_and_neg_links(self, true_links: List[Tuple[str, str]]) -> None:
+    @staticmethod
+    def _create_pos_and_neg_links(true_links: List[Tuple[str, str]], all_links: Dict[int, TraceLink]) \
+            -> Tuple[List, List]:
         """
-          Creates a set of all positive and negative link ids
-          :param true_links: list of tuples containing linked source and target ids
-          :return: None
-          """
-        self.pos_link_ids = set()
+        Creates a set of all positive and negative link ids
+        :param true_links: list of tuples containing linked source and target ids
+        :param true_links: dictionary of all possible TraceLinks
+        :return: a list of the positive link ids, and a list of the negative link ids
+        """
+        pos_link_ids = set()
         for s_id, t_id in true_links:
             link_id = TraceLink.generate_link_id(s_id, t_id)
-            true_link = self.links.get(link_id)
-            true_link.is_linked = True
-            self.pos_link_ids.add(link_id)
-        self.neg_link_ids = set(self.links.keys()).difference(self.pos_link_ids)
+            true_link = all_links.get(link_id)
+            true_link.is_true_link = True
+            pos_link_ids.add(link_id)
+        neg_link_ids = [link_id for link_id in all_links.keys() if link_id not in pos_link_ids]
+        pos_link_ids = list(pos_link_ids)
+        random.shuffle(pos_link_ids)
+        random.shuffle(neg_link_ids)
+        return pos_link_ids, neg_link_ids
 
     @staticmethod
     def _extract_feature_info(feature: Dict[str, any], prefix: str = '') -> Dict[str, any]:
@@ -204,24 +248,10 @@ class TraceDatasetCreator:
         return feature_info
 
     @staticmethod
-    def _reduce_data_size(data: List, new_length: int, include_duplicates: bool = True) -> List:
+    def _get_linked_targets_only(true_links: List) -> Set:
         """
-        Reduces the size of the given dataset by using random choice or sample
-        :param data: list of data
-        :param new_length: desired length
-        :param include_duplicates: if True, uses sampling
-        :return: a list with the reduced data
-        """
-        reduction_func = random.choices if include_duplicates else random.sample
-        return reduction_func(data, k=new_length)
-
-    @staticmethod
-    def _get_linked_targets_only(t_arts: Dict, true_links: List) -> Dict:
-        """
-        Gets a dictionary containing only targets that are part of at least one positive link
-        :param t_arts: original target artifacts represented as id, token mappings
+        Gets a set containing only ids of targets that are part of at least one positive link
         :param true_links: list of tuples containing linked source and target ids
-        :return: dictionary containing only targets that are part of at least one positive link
+        :return: a set containing only ids of targets that are part of at least one positive link
         """
-        linked_target_ids = {t_id for _, t_id in true_links}
-        return {t_id: token for t_id, token in t_arts.items() if t_id in linked_target_ids}
+        return {t_id for _, t_id in true_links}

@@ -1,6 +1,6 @@
-import os
+from os.path import dirname, join, abspath
 
-from common.config.paths import PROJ_PATH
-
-PRETRAIN_DATA_PATH = os.path.join(PROJ_PATH, "pretrain", "data")  # TODO - better way to do this?
-ELECTRA_PATH = os.path.join(PROJ_PATH, "electra")  # TODO - better way to do this?
+PRETRAIN_PATH = dirname(dirname(abspath(__file__)))
+DATA_PATH = join(PRETRAIN_PATH, "data")
+CORPUS_DIR = join(DATA_PATH, "corpuses")
+ELECTRA_PATH = join(PRETRAIN_PATH, "electra")

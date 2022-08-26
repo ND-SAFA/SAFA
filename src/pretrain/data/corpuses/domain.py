@@ -1,7 +1,7 @@
 import os
 from enum import Enum
 
-from common.config.constants import PROJ_PATH
+from pretrain.config.paths import CORPUS_DIR
 
 
 class Domain(Enum):
@@ -24,5 +24,4 @@ def get_path(domain: Domain):
     :param domain: the Domain
     :return: the path to the domain corpus
     """
-    dir_ = os.path.dirname(os.path.relpath(__file__, PROJ_PATH))
-    return os.path.join(dir_, domain.value)
+    return os.path.join(CORPUS_DIR, domain.value)

@@ -18,6 +18,6 @@ from django.urls import path
 from server import views
 
 urlpatterns = [
-    path('/predict', views.predict),
-    path('/fine-tune', views.fine_tune),
+    path('predict/', views.predict),
+    path('fine-tune/', views.fine_tune),
 ]

@@ -72,12 +72,12 @@ public class ArtifactPositionService {
         return artifactPosition;
     }
 
-    public Map<String, LayoutPosition> retrieveDocumentLayout(ProjectVersion projectVersion, UUID documentId) {
-        Map<String, LayoutPosition> layout = new HashMap<>();
+    public Map<UUID, LayoutPosition> retrieveDocumentLayout(ProjectVersion projectVersion, UUID documentId) {
+        Map<UUID, LayoutPosition> layout = new HashMap<>();
         List<ArtifactPosition> artifactPositions = this.artifactPositionRepository
             .findByProjectVersionAndDocumentDocumentId(projectVersion, documentId);
         for (ArtifactPosition artifactPosition : artifactPositions) {
-            String artifactId = artifactPosition.getArtifact().getArtifactId().toString();
+            UUID artifactId = artifactPosition.getArtifact().getArtifactId();
             LayoutPosition layoutPosition = new LayoutPosition(artifactPosition.getX(), artifactPosition.getY());
             layout.put(artifactId, layoutPosition);
         }

@@ -103,12 +103,12 @@ public class LayoutManager {
      * @param sendNotification Whether to send notification to subscribers
      * @return Map of artifact id to their layout position.
      */
-    public Map<String, LayoutPosition> generateDocumentLayout(Document document, boolean sendNotification) {
+    public Map<UUID, LayoutPosition> generateDocumentLayout(Document document, boolean sendNotification) {
         // Step - Get entities in document
         ProjectEntities entities = this.projectEntities.getEntitiesInDocument(document);
 
         // Step - Generate layout
-        Map<String, LayoutPosition> artifact2position = generateLayout(entities);
+        Map<UUID, LayoutPosition> artifact2position = generateLayout(entities);
 
         // Step - Persist layout
         createOrUpdateArtifactPositions(document, artifact2position);
@@ -117,7 +117,7 @@ public class LayoutManager {
     }
 
     private void generateDefaultDocumentLayout() {
-        Map<String, LayoutPosition> layout = generateLayout(this.projectEntities);
+        Map<UUID, LayoutPosition> layout = generateLayout(this.projectEntities);
         createOrUpdateArtifactPositions(null, layout);
     }
 
@@ -140,17 +140,18 @@ public class LayoutManager {
     }
 
     private void createOrUpdateArtifactPositions(Document document,
-                                                 Map<String, LayoutPosition> layout) {
+                                                 Map<UUID, LayoutPosition> layout) {
         // Step - Persist new layout
-        for (Map.Entry<String, LayoutPosition> artifact2pos : layout.entrySet()) {
+        for (Map.Entry<UUID, LayoutPosition> artifact2pos : layout.entrySet()) {
             createOrUpdateArtifactPosition(document, artifact2pos);
         }
     }
 
     private void createOrUpdateArtifactPosition(Document document,
-                                                Map.Entry<String, LayoutPosition> artifact2pos) {
+                                                Map.Entry<UUID, LayoutPosition> artifact2pos) {
         // Step - Retrieve necessary entries for ArtifactPosition
-        ArtifactAppEntity artifactAppEntity = this.projectEntities.getArtifactById(artifact2pos.getKey());
+        UUID artifactId = artifact2pos.getKey();
+        ArtifactAppEntity artifactAppEntity = this.projectEntities.getArtifactById(artifactId);
         LayoutPosition layoutPosition = artifact2pos.getValue();
 
         // Step - Create artifact position
@@ -164,14 +165,14 @@ public class LayoutManager {
             .save(artifactPosition);
     }
 
-    private Map<String, LayoutPosition> generateLayout(ProjectEntities entities) {
+    private Map<UUID, LayoutPosition> generateLayout(ProjectEntities entities) {
         List<ArtifactAppEntity> documentArtifacts = entities.getArtifacts();
         List<TraceAppEntity> documentTraces = entities.getTraces();
         return generateLayout(documentArtifacts, documentTraces);
     }
 
-    private Map<String, LayoutPosition> generateLayout(List<ArtifactAppEntity> artifacts,
-                                                       List<TraceAppEntity> traces) {
+    private Map<UUID, LayoutPosition> generateLayout(List<ArtifactAppEntity> artifacts,
+                                                     List<TraceAppEntity> traces) {
         // Step - Generate layout
         KlayLayoutGenerator layoutGenerator = new KlayLayoutGenerator(
             artifacts, traces);

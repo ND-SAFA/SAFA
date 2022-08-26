@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.features.delta.entities.app;
 
 import java.util.Map;
+import java.util.UUID;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,7 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EntityDelta<E> {
-    Map<String, E> added;
-    Map<String, ModifiedEntity<E>> modified;
-    Map<String, E> removed;
+    Map<UUID, E> added;
+    Map<UUID, ModifiedEntity<E>> modified;
+    Map<UUID, E> removed;
 }

@@ -2,6 +2,7 @@ package edu.nd.crc.safa.features.rules.services;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
@@ -30,7 +31,7 @@ public class WarningService {
      * @param projectVersion - Finds violations in artifact tree at time of this version
      * @return A mapping of  artifact name's to their resulting violations
      */
-    public Map<String, List<RuleName>> retrieveWarningsInProjectVersion(ProjectVersion projectVersion) {
+    public Map<UUID, List<RuleName>> retrieveWarningsInProjectVersion(ProjectVersion projectVersion) {
         List<ArtifactVersion> artifacts = this.artifactVersionRepository
             .retrieveVersionEntitiesByProjectVersion(projectVersion);
         List<TraceLink> traceLinks =

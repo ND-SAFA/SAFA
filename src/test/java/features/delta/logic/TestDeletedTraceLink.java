@@ -43,9 +43,9 @@ class TestDeletedTraceLink extends ApplicationBaseTest {
         // Step - Upload before version
         jsonBuilder.withProject(projectName, projectName, "");
         JSONObject artifactOne = jsonBuilder
-            .withArtifactAndReturn(projectName, "", artifactOneName, artifactType, artifactBody);
+            .withArtifactAndReturn(projectName, null, artifactOneName, artifactType, artifactBody);
         JSONObject artifactTwo = jsonBuilder
-            .withArtifactAndReturn(projectName, "", artifactTwoName, artifactType, artifactBody);
+            .withArtifactAndReturn(projectName, null, artifactTwoName, artifactType, artifactBody);
         JSONObject traceJson = jsonBuilder
             .withTraceAndReturn(projectName, artifactOneName, artifactTwoName);
 
@@ -54,7 +54,8 @@ class TestDeletedTraceLink extends ApplicationBaseTest {
             .withAddedArtifact(artifactOne)
             .withAddedArtifact(artifactTwo)
             .withAddedTrace(traceJson));
-        ArtifactAppEntity firstArtifact = addCommit.getArtifacts().filterAdded(a -> a.name.equals(artifactOneName));
+        ArtifactAppEntity firstArtifact =
+            addCommit.getArtifacts().filterAdded(a -> a.getName().equals(artifactOneName));
 
         // Step - Commit deleted artifactOne
         commitService.commit(CommitBuilder

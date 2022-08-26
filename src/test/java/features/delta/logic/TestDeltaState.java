@@ -6,9 +6,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import requests.SafaRequest;
-
 import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 
@@ -16,6 +15,7 @@ import features.base.DefaultProjectConstants;
 import features.delta.base.AbstractDeltaTest;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
+import requests.SafaRequest;
 
 /**
  * Tests that changes to the content of artifacts are retrieved.
@@ -68,7 +68,7 @@ class TestDeltaState extends AbstractDeltaTest {
         List<String> afterArtifactNames = afterAppEntity
             .getArtifacts()
             .stream()
-            .map(a -> a.name)
+            .map(ArtifactAppEntity::getName)
             .collect(Collectors.toList());
 
         // VP - Verify that removed artifact not included

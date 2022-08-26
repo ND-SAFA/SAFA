@@ -82,8 +82,8 @@ public class ArtifactVersionRepositoryImpl
         return new ArtifactVersion(projectVersion,
             modificationType,
             artifact,
-            artifactAppEntity.summary,
-            artifactAppEntity.body,
+            artifactAppEntity.getSummary(),
+            artifactAppEntity.getBody(),
             JsonFileUtilities.toJson(artifactAppEntity.getCustomFields()).toString());
     }
 
@@ -110,8 +110,8 @@ public class ArtifactVersionRepositoryImpl
     }
 
     @Override
-    public Optional<Artifact> findBaseEntityById(String baseEntityId) {
-        return this.artifactRepository.findById(UUID.fromString(baseEntityId));
+    public Optional<Artifact> findBaseEntityById(UUID baseEntityId) {
+        return this.artifactRepository.findById(baseEntityId);
     }
 
     @Override
@@ -139,7 +139,7 @@ public class ArtifactVersionRepositoryImpl
         Map<String, String> customFields = JsonFileUtilities.parse(artifactVersion.getCustomFields(), typeReference);
 
         ArtifactAppEntity artifactAppEntity =
-            new ArtifactAppEntity(artifactVersion.getArtifact().getArtifactId().toString(),
+            new ArtifactAppEntity(artifactVersion.getArtifact().getArtifactId(),
                 artifactVersion.getTypeName(),
                 artifactVersion.getName(),
                 artifactVersion.getSummary(),
@@ -268,12 +268,12 @@ public class ArtifactVersionRepositoryImpl
 
     private Artifact createOrUpdateArtifactFromAppEntity(Project project,
                                                          ArtifactAppEntity artifactAppEntity) throws SafaError {
-        String artifactId = artifactAppEntity.getId();
-        String typeName = artifactAppEntity.type;
-        String artifactName = artifactAppEntity.name;
+        UUID artifactId = artifactAppEntity.getId();
+        String typeName = artifactAppEntity.getType();
+        String artifactName = artifactAppEntity.getName();
         ArtifactType artifactType = findOrCreateArtifactType(project, typeName);
         DocumentType documentType = artifactAppEntity.getDocumentType();
-        if (artifactId.equals("")) {
+        if (artifactId == null) {
             Artifact newArtifact = this.artifactRepository
                 .findByProjectAndName(project, artifactName)
                 .orElseGet(() -> new Artifact(project, artifactType, artifactName, documentType));
@@ -281,7 +281,7 @@ public class ArtifactVersionRepositoryImpl
             return newArtifact;
         } else {
             Optional<Artifact> artifactOptional = this.artifactRepository
-                .findById(UUID.fromString(artifactId));
+                .findById(artifactId);
             if (artifactOptional.isEmpty()) {
                 throw new SafaError("Could not find artifact with id: %s", artifactId);
             }

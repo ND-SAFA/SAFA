@@ -25,8 +25,8 @@ public class Type2TraceMap {
         ProjectEntities projectEntityMaps
     ) {
         for (TraceAppEntity trace : projectAppEntity.getTraces()) {
-            String sourceType = projectEntityMaps.getArtifactByName(trace.getSourceName()).type;
-            String targetType = projectEntityMaps.getArtifactByName(trace.getTargetName()).type;
+            String sourceType = projectEntityMaps.getArtifactByName(trace.getSourceName()).getType();
+            String targetType = projectEntityMaps.getArtifactByName(trace.getTargetName()).getType();
 
             if (type2traces.containsKey(sourceType)) {
                 Map<String, List<TraceAppEntity>> sourceTypeTraces = type2traces.get(sourceType);

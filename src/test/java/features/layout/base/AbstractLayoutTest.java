@@ -3,6 +3,7 @@ package features.layout.base;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.config.ProjectPaths;
@@ -29,7 +30,7 @@ public abstract class AbstractLayoutTest extends ApplicationBaseTest {
     protected ProjectVersion projectVersion;
     protected ProjectAppEntity projectAppEntity;
     protected ElkNode rootGraphNode;
-    protected Map<String, ElkNode> name2nodes;
+    protected Map<UUID, ElkNode> name2nodes;
 
     public static List<ElkNode> getChildren(ElkNode elkNode) {
         List<ElkNode> children = new ArrayList<>();
@@ -58,24 +59,24 @@ public abstract class AbstractLayoutTest extends ApplicationBaseTest {
             .newVersionWithReturn(projectName);
         FlatFileRequest.updateProjectVersionFromFlatFiles(projectVersion, ProjectPaths.Tests.DefaultProject.V1);
         this.projectAppEntity = retrievalService.getProjectAtVersion(projectVersion);
-        Pair<ElkNode, Map<String, ElkNode>> response =
+        Pair<ElkNode, Map<UUID, ElkNode>> response =
             ElkGraphCreator.createGraphFromProject(projectAppEntity.getArtifacts(), projectAppEntity.getTraces());
         rootGraphNode = response.getValue0();
         name2nodes = response.getValue1();
     }
 
     protected ElkNode getArtifact(String artifactName) {
-        String artifactId = getArtifactId(artifactName);
+        UUID artifactId = getArtifactId(artifactName);
         return name2nodes.get(artifactId);
     }
 
-    protected String getArtifactId(String name) {
+    protected UUID getArtifactId(String name) {
         return this.projectAppEntity
             .getArtifacts()
             .stream()
-            .filter(a -> a.name.equals(name))
+            .filter(a -> a.getName().equals(name))
             .collect(Collectors.toList())
             .get(0)
-            .id;
+            .getId();
     }
 }

@@ -71,11 +71,11 @@ public class DocumentService implements IAppEntityService<DocumentAppEntity> {
      */
     public int createOrUpdateArtifactIds(ProjectVersion projectVersion,
                                          Document document,
-                                         List<String> artifactIds) throws SafaError {
+                                         List<UUID> artifactIds) throws SafaError {
         List<DocumentArtifact> documentArtifacts = this.documentArtifactRepository.findByDocument(document);
-        List<String> artifactIdsLinkedToDocument = documentArtifacts
+        List<UUID> artifactIdsLinkedToDocument = documentArtifacts
             .stream()
-            .map(da -> da.getArtifact().getArtifactId().toString())
+            .map(da -> da.getArtifact().getArtifactId())
             .collect(Collectors.toList());
         int nUpdated = 0;
 
@@ -123,14 +123,14 @@ public class DocumentService implements IAppEntityService<DocumentAppEntity> {
     }
 
     private int removeDeletedDocumentArtifactLinks(Document document,
-                                                   List<String> artifactIds,
-                                                   List<String> artifactIdsLinkedToDocument) {
+                                                   List<UUID> artifactIds,
+                                                   List<UUID> artifactIdsLinkedToDocument) {
         int nUpdated = 0;
-        for (String linkedArtifactId : artifactIdsLinkedToDocument) {
+        for (UUID linkedArtifactId : artifactIdsLinkedToDocument) {
             if (!artifactIds.contains(linkedArtifactId)) {
                 Optional<DocumentArtifact> documentArtifactOptional =
                     this.documentArtifactRepository.findByDocumentAndArtifactArtifactId(document,
-                        UUID.fromString(linkedArtifactId));
+                        linkedArtifactId);
                 if (documentArtifactOptional.isPresent()) {
                     DocumentArtifact documentArtifact = documentArtifactOptional.get();
                     this.documentArtifactRepository.delete(documentArtifact);
@@ -143,12 +143,12 @@ public class DocumentService implements IAppEntityService<DocumentAppEntity> {
 
     private int createNewDocumentArtifactLinks(ProjectVersion projectVersion,
                                                Document document,
-                                               List<String> artifactIds,
-                                               List<String> artifactIdsLinkedToDocument) throws SafaError {
+                                               List<UUID> artifactIds,
+                                               List<UUID> artifactIdsLinkedToDocument) throws SafaError {
         int nUpdated = 0;
-        for (String artifactId : artifactIds) {
+        for (UUID artifactId : artifactIds) {
             if (!artifactIdsLinkedToDocument.contains(artifactId)) {
-                Optional<Artifact> artifactOptional = this.artifactRepository.findById(UUID.fromString(artifactId));
+                Optional<Artifact> artifactOptional = this.artifactRepository.findById(artifactId);
                 if (artifactOptional.isPresent()) {
                     Artifact artifact = artifactOptional.get();
                     DocumentArtifact documentArtifact = new DocumentArtifact(
@@ -177,13 +177,13 @@ public class DocumentService implements IAppEntityService<DocumentAppEntity> {
      */
     public DocumentAppEntity createDocumentAppEntity(Document document, ProjectVersion projectVersion) {
         // Step - Retrieve linked artifact Ids
-        List<String> artifactIds = this.documentArtifactRepository.findByDocument(document)
+        List<UUID> artifactIds = this.documentArtifactRepository.findByDocument(document)
             .stream()
-            .map(da -> da.getArtifact().getArtifactId().toString())
+            .map(da -> da.getArtifact().getArtifactId())
             .collect(Collectors.toList());
 
         // Step - Retrieve artifact layout
-        Map<String, LayoutPosition> documentLayout =
+        Map<UUID, LayoutPosition> documentLayout =
             this.artifactPositionService.retrieveDocumentLayout(projectVersion, document.getDocumentId());
 
         // Step - Create document app entity

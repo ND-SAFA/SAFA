@@ -73,7 +73,7 @@ class TestCheckArtifactName extends ApplicationBaseTest {
     private JSONObject getArtifactJson(String artifactName, int versionIndex) {
         ArtifactVersion artifactVersion = this.dbEntityBuilder.getArtifactBody(projectName, artifactName, versionIndex);
         ArtifactAppEntity artifactAppEntity = new ArtifactAppEntity();
-        artifactAppEntity.setId(artifactVersion.getArtifact().getArtifactId().toString());
+        artifactAppEntity.setId(artifactVersion.getArtifact().getArtifactId());
         artifactAppEntity.setName(artifactVersion.getName());
         return JsonFileUtilities.toJson(artifactAppEntity);
     }

@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.features.traces.services;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
@@ -24,7 +25,7 @@ public class TraceService implements IAppEntityService<TraceAppEntity> {
     public List<TraceAppEntity> getAppEntities(ProjectVersion projectVersion) {
         List<ArtifactAppEntity> projectVersionArtifacts = artifactService
             .getAppEntities(projectVersion);
-        List<String> projectVersionArtifactIds = projectVersionArtifacts
+        List<UUID> projectVersionArtifactIds = projectVersionArtifacts
             .stream()
             .map(ArtifactAppEntity::getId)
             .collect(Collectors.toList());
@@ -39,7 +40,7 @@ public class TraceService implements IAppEntityService<TraceAppEntity> {
      * @return List of {@link TraceAppEntity} Traces associated with existing artifact IDs.
      */
     public List<TraceAppEntity> retrieveTracesInProjectVersion(ProjectVersion projectVersion,
-                                                               List<String> existingArtifactIds) {
+                                                               List<UUID> existingArtifactIds) {
         return this.traceLinkVersionRepository
             .retrieveAppEntitiesByProjectVersion(projectVersion)
             .stream()

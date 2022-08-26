@@ -11,7 +11,7 @@ import features.artifacts.base.AbstractArtifactCrudTest;
 public class TestFTACrud extends AbstractArtifactCrudTest {
     @Override
     protected ArtifactAppEntity getStartingArtifact() {
-        ArtifactAppEntity artifact = new ArtifactAppEntity("",
+        ArtifactAppEntity artifact = new ArtifactAppEntity(null,
             DocumentType.FMEA.toString(),
             "RE-20",
             "summary",

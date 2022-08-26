@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
@@ -24,10 +25,10 @@ public class TreeVerifier {
      * @param rulesToApply   - The list of rules to apply to the artifact tree
      * @return A mapping between artifact Ids and the list of rules it violated
      */
-    public final Map<String, List<RuleName>> findRuleViolations(List<ArtifactVersion> artifactBodies,
-                                                                List<TraceLink> traceLinks,
-                                                                List<ParserRule> rulesToApply) {
-        Map<String, List<RuleName>> results = new HashMap<>();
+    public final Map<UUID, List<RuleName>> findRuleViolations(List<ArtifactVersion> artifactBodies,
+                                                              List<TraceLink> traceLinks,
+                                                              List<ParserRule> rulesToApply) {
+        Map<UUID, List<RuleName>> results = new HashMap<>();
 
         artifactBodies.forEach(artifactBody -> {
 
@@ -56,7 +57,7 @@ public class TreeVerifier {
                 }
             }
             if (!artifactWarnings.isEmpty()) {
-                String artifactId = artifactBody.getArtifact().getArtifactId().toString();
+                UUID artifactId = artifactBody.getArtifact().getArtifactId();
                 results.put(artifactId, artifactWarnings);
             }
         });

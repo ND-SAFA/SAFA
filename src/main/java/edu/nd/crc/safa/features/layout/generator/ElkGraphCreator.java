@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.layout.LayoutSettings;
@@ -28,11 +29,11 @@ public class ElkGraphCreator {
 
     static ElkGraphFactory factory = ElkGraphFactory.eINSTANCE;
 
-    public static Pair<ElkNode, Map<String, ElkNode>> createGraphFromProject(
+    public static Pair<ElkNode, Map<UUID, ElkNode>> createGraphFromProject(
         List<ArtifactAppEntity> artifacts,
         List<TraceAppEntity> traces
     ) {
-        Map<String, ElkNode> name2node = createName2ElkNode(artifacts);
+        Map<UUID, ElkNode> name2node = createName2ElkNode(artifacts);
         connectNodesWithTraces(name2node, traces);
         ElkNode graph = connectToRootNode(getNodes(name2node));
         return new Pair<>(graph, name2node);
@@ -44,25 +45,25 @@ public class ElkGraphCreator {
         return graph;
     }
 
-    public static List<ElkNode> getNodes(Map<String, ElkNode> name2node) {
+    public static List<ElkNode> getNodes(Map<UUID, ElkNode> name2node) {
         return new ArrayList<>(name2node.values());
     }
 
-    public static Map<String, ElkNode> createName2ElkNode(List<ArtifactAppEntity> artifacts) {
-        Map<String, ElkNode> nodes = new HashMap<>();
+    public static Map<UUID, ElkNode> createName2ElkNode(List<ArtifactAppEntity> artifacts) {
+        Map<UUID, ElkNode> nodes = new HashMap<>();
         for (ArtifactAppEntity artifact : artifacts) {
-            nodes.put(artifact.id, createElkNodeFromArtifact(artifact));
+            nodes.put(artifact.getId(), createElkNodeFromArtifact(artifact));
         }
         return nodes;
     }
 
     private static ElkNode createElkNodeFromArtifact(ArtifactAppEntity artifact) {
         ElkNode elkNode = createNode();
-        elkNode.setIdentifier(artifact.id);
+        elkNode.setIdentifier(artifact.getId().toString());
         return elkNode;
     }
 
-    public static void connectNodesWithTraces(Map<String, ElkNode> name2node,
+    public static void connectNodesWithTraces(Map<UUID, ElkNode> name2node,
                                               List<TraceAppEntity> traces) {
         traces
             .stream()
@@ -71,7 +72,9 @@ public class ElkGraphCreator {
                 ElkNode sourceNode = name2node.get(t.getSourceId());
                 ElkNode targetNode = name2node.get(t.getTargetId());
 
-                ElkGraphUtil.createSimpleEdge(targetNode, sourceNode);
+                if (sourceNode != null && targetNode != null) { // TODO: Figure out why this needed with docs
+                    ElkGraphUtil.createSimpleEdge(targetNode, sourceNode);
+                }
             });
     }
 

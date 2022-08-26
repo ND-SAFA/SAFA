@@ -80,7 +80,7 @@ public class Artifact implements Serializable, IBaseEntity, IArtifact {
     }
 
     @Override
-    public String getBaseEntityId() {
-        return this.artifactId.toString();
+    public UUID getBaseEntityId() {
+        return this.artifactId;
     }
 }

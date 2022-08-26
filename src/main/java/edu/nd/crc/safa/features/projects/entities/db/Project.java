@@ -66,8 +66,8 @@ public class Project implements Serializable {
      * @param projectAppEntity The project to update from.
      */
     public void updateFromAppEntity(ProjectAppEntity projectAppEntity) {
-        if (!projectAppEntity.getProjectId().equals("")) {
-            this.projectId = UUID.fromString(projectAppEntity.getProjectId());
+        if (!(projectAppEntity.getProjectId() == null)) {
+            this.projectId = projectAppEntity.getProjectId();
         }
         this.name = projectAppEntity.getName();
         this.description = projectAppEntity.getDescription();

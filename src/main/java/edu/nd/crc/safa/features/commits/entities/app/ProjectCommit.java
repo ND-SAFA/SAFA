@@ -95,7 +95,29 @@ public class ProjectCommit {
 
     @JsonIgnore
     public ArtifactAppEntity getArtifact(ModificationType modificationType, int index) {
-        return this.generateMod2Entities(this.artifacts).get(modificationType).get(index);
+        return getArtifactList(modificationType).get(index);
+    }
+
+    @JsonIgnore
+    public ArtifactAppEntity getArtifact(ModificationType modificationType, String name) {
+        List<ArtifactAppEntity> queryByName =
+            this.getArtifactList(modificationType)
+                .stream()
+                .filter(a -> a.getName().equals(name))
+                .collect(Collectors.toList());
+        if (queryByName.isEmpty()) {
+            throw new IllegalArgumentException("Could not find artifact with name:" + name);
+        }
+        if (queryByName.size() > 1) {
+            String error = String.format("More than one artifact with name [%s] found (%s).", name, queryByName.size());
+            throw new IllegalArgumentException(error);
+        }
+        return queryByName.get(0);
+    }
+
+    @JsonIgnore
+    public List<ArtifactAppEntity> getArtifactList(ModificationType modificationType) {
+        return this.generateMod2Entities(this.artifacts).get(modificationType);
     }
 
     private <T extends IAppEntity> void addEntities(ModificationType modificationType,

@@ -15,7 +15,7 @@ public interface IVersionEntity<A extends IAppEntity> {
 
     ModificationType getModificationType();
 
-    String getBaseEntityId();
+    UUID getBaseEntityId();
 
     UUID getVersionEntityId();
 

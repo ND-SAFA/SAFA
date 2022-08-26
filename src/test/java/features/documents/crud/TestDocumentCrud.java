@@ -14,7 +14,6 @@ import edu.nd.crc.safa.features.notifications.entities.Change;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
 
 import common.AbstractCrudTest;
-import org.json.JSONObject;
 import requests.SafaRequest;
 
 /**
@@ -23,7 +22,7 @@ import requests.SafaRequest;
 public class TestDocumentCrud extends AbstractCrudTest<DocumentAppEntity> {
     String newName = "new-name";
     DocumentAppEntity document = new DocumentAppEntity(
-        "",
+        null,
         DocumentType.ARTIFACT_TREE,
         "document-name",
         "document-description",
@@ -44,18 +43,14 @@ public class TestDocumentCrud extends AbstractCrudTest<DocumentAppEntity> {
 
     @Override
     protected UUID createEntity() throws Exception {
-        JSONObject documentJson = SafaRequest
-            .withRoute(AppRoutes.Documents.CREATE_OR_UPDATE_DOCUMENT)
-            .withVersion(projectVersion)
-            .postWithJsonObject(document);
-        String id = documentJson.getString("documentId");
-        this.document.setDocumentId(id);
-        return UUID.fromString(id);
+        creationService.createOrUpdateDocument(projectVersion, document);
+        return document.getDocumentId();
     }
 
     @Override
     protected void verifyCreatedEntity(DocumentAppEntity retrievedEntity) {
         this.assertionService.assertMatch(document, retrievedEntity);
+        this.layoutTestService.verifyLayout(retrievedEntity.getLayout(), retrievedEntity.getArtifactIds());
     }
 
     @Override
@@ -80,6 +75,7 @@ public class TestDocumentCrud extends AbstractCrudTest<DocumentAppEntity> {
     protected void verifyUpdatedEntity(DocumentAppEntity retrievedEntity) {
         assertionService.assertMatch(document, retrievedEntity);
         assertThat(retrievedEntity.getName()).isEqualTo(newName);
+        this.layoutTestService.verifyLayout(retrievedEntity.getLayout(), retrievedEntity.getArtifactIds());
     }
 
     @Override

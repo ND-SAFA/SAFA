@@ -116,7 +116,7 @@ public class ArtifactVersion implements Serializable, IVersionEntity<ArtifactApp
     }
 
     @Override
-    public String getBaseEntityId() {
+    public UUID getBaseEntityId() {
         return this.artifact.getBaseEntityId();
     }
 
@@ -140,7 +140,7 @@ public class ArtifactVersion implements Serializable, IVersionEntity<ArtifactApp
     }
 
     public boolean hasSameContent(ArtifactAppEntity a) {
-        return hasSameContent(a.name, a.summary, a.body, a.getCustomFields().toString());
+        return hasSameContent(a.getName(), a.getSummary(), a.getBody(), a.getCustomFields().toString());
     }
 
     private boolean hasSameContent(String name, String summary, String content, String customFields) {

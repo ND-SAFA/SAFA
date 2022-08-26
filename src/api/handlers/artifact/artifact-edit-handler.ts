@@ -42,6 +42,7 @@ export async function handleSaveArtifact(
       }
     }
 
+    logStore.onSuccess(`Created a new artifact: ${artifact.name}`);
     onSuccess?.();
   } catch (e) {
     logStore.onDevError(String(e));

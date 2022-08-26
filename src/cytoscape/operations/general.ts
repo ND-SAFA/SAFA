@@ -4,7 +4,6 @@ import {
   InternalTraceType,
   LayoutPayload,
 } from "@/types";
-import { areArraysEqual } from "@/util";
 import { selectionStore } from "@/hooks";
 import { applyAutoMoveEvents } from "@/cytoscape";
 import { artifactTreeCyPromise, timTreeCyPromise } from "@/cytoscape/cy";
@@ -137,14 +136,7 @@ export function cyCenterOnArtifacts(
 ): void {
   cyPromise.then((cy) => {
     if (cy.animated()) {
-      if (
-        currentCenteringCollection !== undefined &&
-        areArraysEqual(currentCenteringCollection, artifactIds)
-      ) {
-        return;
-      } else {
-        cy.stop(false, false);
-      }
+      cy.stop(false, false);
     }
 
     setCenteredArtifacts(artifactIds);

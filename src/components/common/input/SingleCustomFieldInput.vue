@@ -7,6 +7,7 @@
       :hint="column.required ? 'Requires a non-empty value' : ''"
       :value="getStringModel()"
       @input="setStringModel($event)"
+      :data-cy="`input-artifact-${column.name}`"
     />
     <v-combobox
       :filled="filled"
@@ -17,6 +18,7 @@
       :label="column.name"
       :hint="column.required ? 'Requires a non-empty value' : ''"
       :value="getArrayModel()"
+      :data-cy="`input-artifact-${column.name}`"
       @input="setArrayModel($event)"
     />
     <artifact-input
@@ -26,6 +28,7 @@
       :label="column.name"
       :hint="column.required ? 'Requires a non-empty value' : ''"
       :value="getArrayModel()"
+      :data-cy="`input-artifact-${column.name}`"
       @input="setArrayModel($event)"
     />
   </div>

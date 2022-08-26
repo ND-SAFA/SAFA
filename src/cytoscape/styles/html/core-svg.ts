@@ -28,6 +28,9 @@ export function svgNode(
     : capitalize(data.artifactType);
   const footer = svgFooter(data, outerStyle);
   const heightOffset = footer ? ARTIFACT_CHILDREN_HEIGHT + 6 : 6;
+  const dataCy = data.isSelected
+    ? "node-artifact-tree-selected"
+    : "node-artifact-tree";
 
   return `
     <div style="opacity: ${data.opacity}">
@@ -36,6 +39,7 @@ export function svgNode(
         height="${outerStyle.height + heightOffset}" 
         style="margin-top: ${outerStyle.marginTop + heightOffset}px"
         class="artifact-svg-wrapper ${deltaClass}"
+        data-cy="${dataCy}"
       >
         ${svgShape}
         ${svgTitle(title, textColor, y)}

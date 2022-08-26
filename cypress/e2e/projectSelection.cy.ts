@@ -7,26 +7,16 @@ import {
 
 describe("Project Selection", () => {
   beforeEach(() => {
-    cy.visit("http://localhost:8080").login(
-      validUser.email,
-      validUser.password
-    );
+    // TODO: clean up all created projects.
+
+    cy.visit("/login").login(validUser.email, validUser.password);
 
     cy.location("pathname", { timeout: 2000 }).should("equal", "/");
 
     cy.openProjectSelector();
   });
 
-  afterEach(() => {
-    // Wait for projects to load
-    cy.logout();
-  });
-
   describe("Project List", () => {
-    afterEach(() => {
-      cy.closeModal(DataCy.selectionModal);
-    });
-
     describe("I can reload my list of projects", () => {
       it("Shows the list of projects", () => {
         cy.getCy(DataCy.selectionModal).within(() => {
@@ -93,10 +83,6 @@ describe("Project Selection", () => {
   });
 
   describe("Project CRUD", () => {
-    afterEach(() => {
-      cy.closeModal(DataCy.selectionModal);
-    });
-
     it("I can create an empty project", () => {
       cy.getCy(DataCy.selectionModal).within(() => {
         cy.clickButton(DataCy.selectorAddButton);
@@ -150,10 +136,6 @@ describe("Project Selection", () => {
 
   describe("Project Version List", () => {
     describe("I can reload my list of project versions", () => {
-      afterEach(() => {
-        cy.closeModal(DataCy.selectionModal);
-      });
-
       it("Displays project versions", () => {
         cy.projectSelectorContinue();
 
@@ -202,10 +184,6 @@ describe("Project Selection", () => {
 
   describe("Project Version CRUD", () => {
     describe("I can create a new major, minor, or revision version", () => {
-      afterEach(() => {
-        cy.closeModal(DataCy.selectionModal);
-      });
-
       it("Can create a new major version", () => {
         cy.projectSelectorContinue().createNewVersion("major");
 

@@ -12,6 +12,7 @@
         :color="isCreateLinkEnabled ? 'secondary darken-1' : 'primary'"
         dark
         fab
+        data-cy="button-fab-toggle"
       >
         <v-icon v-if="fab"> mdi-close </v-icon>
         <v-icon
@@ -30,6 +31,7 @@
       :icon-style="isCreateLinkEnabled ? '' : 'transform: rotate(-45deg)'"
       :icon-id="isCreateLinkEnabled ? 'mdi-close' : 'mdi-ray-start-arrow'"
       :tooltip="isCreateLinkEnabled ? 'Cancel Trace Link' : 'Draw Trace Link'"
+      data-cy="button-fab-draw-trace"
       @click="handleDrawTraceLink"
     />
     <generic-icon-button
@@ -37,6 +39,7 @@
       small
       icon-id="mdi-ray-start-end"
       tooltip="Add Trace Link"
+      data-cy="button-fab-create-trace"
       @click="handleAddTraceLink"
     />
     <generic-icon-button
@@ -44,6 +47,7 @@
       small
       icon-id="mdi-folder-plus-outline"
       tooltip="Add Artifact"
+      data-cy="button-fab-create-artifact"
       @click="handleAddArtifact"
     />
   </v-speed-dial>

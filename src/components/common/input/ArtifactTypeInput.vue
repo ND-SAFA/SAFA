@@ -1,16 +1,17 @@
 <template>
-  <v-autocomplete
+  <v-combobox
     filled
     ref="artifactTypeInput"
     :label="label"
     :multiple="multiple"
     v-model="model"
-    :items="typeDirections"
+    :items="types"
     :hint="hint"
     :persistent-hint="persistentHint"
     item-text="label"
     item-value="type"
     @blur="$emit('blur')"
+    @submit="$emit('blur')"
   >
     <template v-slot:append>
       <generic-icon-button
@@ -21,14 +22,13 @@
       />
     </template>
     <template v-slot:selection="{ item }">
-      <attribute-chip artifact-type :value="item.type" />
+      <attribute-chip artifact-type :value="item" />
     </template>
-  </v-autocomplete>
+  </v-combobox>
 </template>
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { LabelledTraceDirectionModel } from "@/types";
 import { typeOptionsStore } from "@/hooks";
 import { GenericIconButton } from "@/components/common/generic";
 import AttributeChip from "@/components/common/display/AttributeChip.vue";
@@ -37,13 +37,14 @@ import AttributeChip from "@/components/common/display/AttributeChip.vue";
  * An input for selecting artifact types.
  *
  * @emits-1 `blur` - On input blur.
+ * @emits-2 `input` (string[] | string | undefined) - On input change.
  */
 export default Vue.extend({
   name: "ArtifactTypeInput",
   components: { AttributeChip, GenericIconButton },
   props: {
     value: {
-      type: [Array, String] as PropType<string[] | string | undefined>,
+      type: [Array, String] as PropType<string[] | string | null>,
       required: false,
     },
     multiple: {
@@ -66,8 +67,8 @@ export default Vue.extend({
     /**
      * @return The current project's artifact types.
      */
-    typeDirections(): LabelledTraceDirectionModel[] {
-      return typeOptionsStore.typeDirections();
+    types(): string[] {
+      return typeOptionsStore.artifactTypes;
     },
   },
   methods: {
@@ -82,13 +83,13 @@ export default Vue.extend({
     /**
      * Updates the model if the value changes.
      */
-    value(currentValue: string[] | string | undefined) {
+    value(currentValue: string[] | string | null) {
       this.model = currentValue;
     },
     /**
      * Emits changes to the model.
      */
-    model(currentValue: string[] | string | undefined) {
+    model(currentValue: string[] | string | null) {
       this.$emit("input", currentValue);
     },
   },

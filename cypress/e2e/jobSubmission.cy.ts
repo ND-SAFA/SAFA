@@ -3,10 +3,11 @@ import { validUser, simpleProjectFiles, DataCy } from "../fixtures";
 
 describe("Job Submission", () => {
   beforeEach(() => {
-    cy.visit("http://localhost:8080/create?tab=bulk").login(
-      validUser.email,
-      validUser.password
-    );
+    // TODO: clean up existing jobs instead of after tests.
+
+    cy.visit("/create?tab=bulk").login(validUser.email, validUser.password);
+
+    cy.location("pathname", { timeout: 2000 }).should("equal", "/create");
 
     cy.setProjectIdentifier("bulk")
       .uploadFiles(DataCy.creationBulkFilesInput, ...simpleProjectFiles)
@@ -31,6 +32,8 @@ describe("Job Submission", () => {
         "contain.text",
         "In Progress"
       );
+
+      cy.getCy(DataCy.jobPanel).clickButton(DataCy.jobDeleteButton);
     });
 
     it.skip("Shows completed jobs", () => {
@@ -38,10 +41,8 @@ describe("Job Submission", () => {
         "contain.text",
         "Completed"
       );
-    });
 
-    afterEach(() => {
-      cy.clickButton(DataCy.jobPanel).clickButton(DataCy.jobDeleteButton);
+      cy.getCy(DataCy.jobPanel).clickButton(DataCy.jobDeleteButton);
     });
   });
 

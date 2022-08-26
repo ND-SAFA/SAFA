@@ -33,6 +33,8 @@ class TestDocumentLayoutRegeneration extends ApplicationBaseTest {
         // Step - Create small project
         createSmallProject();
 
+        this.projectVersion = this.dbEntityBuilder.newVersionWithReturn(projectName);
+
         // Step - Create document
         createDocument();
 

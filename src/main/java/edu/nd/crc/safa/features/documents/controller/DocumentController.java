@@ -101,7 +101,7 @@ public class DocumentController extends BaseDocumentController {
     public Map<UUID, LayoutPosition> createDocumentLayout(ProjectVersion projectVersion,
                                                           DocumentAppEntity documentAppEntity) {
         LayoutManager projectLayout = new LayoutManager(serviceProvider, projectVersion);
-        return projectLayout.generateDocumentLayout(documentAppEntity.toDocument(), true);
+        return projectLayout.generateDocumentLayout(documentAppEntity.toDocument());
     }
 
     /**

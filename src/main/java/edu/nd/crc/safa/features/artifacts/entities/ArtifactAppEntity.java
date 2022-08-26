@@ -65,7 +65,7 @@ public class ArtifactAppEntity implements IAppEntity {
     /**
      * List of document Ids this artifact belongs to.
      */
-    List<String> documentIds = new ArrayList<>();
+    List<UUID> documentIds = new ArrayList<>();
 
     public ArtifactAppEntity() {
         this.name = "";
@@ -90,7 +90,7 @@ public class ArtifactAppEntity implements IAppEntity {
         this.customFields = customFields;
     }
 
-    public void addDocumentId(String documentId) {
+    public void addDocumentId(UUID documentId) {
         this.documentIds.add(documentId);
     }
 }

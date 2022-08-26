@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.features.artifacts.repositories;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -23,6 +24,7 @@ import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;
 import edu.nd.crc.safa.features.traces.repositories.TraceLinkVersionRepository;
 import edu.nd.crc.safa.features.types.ArtifactType;
+import edu.nd.crc.safa.features.versions.VersionCalculator;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.utilities.JsonFileUtilities;
 
@@ -59,6 +61,8 @@ public class ArtifactVersionRepositoryImpl
 
     @Autowired
     TraceLinkVersionRepository traceLinkVersionRepository;
+
+    VersionCalculator versionCalculator = new VersionCalculator();
 
     @Override
     public ArtifactVersion save(ArtifactVersion artifactVersion) {
@@ -148,7 +152,7 @@ public class ArtifactVersionRepositoryImpl
                 customFields);
 
         // Step 2 - Attach document links
-        attachDocumentLinks(projectVersion, artifactVersion, artifactAppEntity);
+        attachDocumentLinks(artifactVersion, artifactAppEntity);
 
         // Step 3 - Attach Safety Case or FTA information
         attachDocumentNodeInformation(artifactAppEntity, artifactVersion.getArtifact());
@@ -159,16 +163,16 @@ public class ArtifactVersionRepositoryImpl
      * Private helper methods
      */
 
-    private void attachDocumentLinks(ProjectVersion projectVersion,
-                                     ArtifactVersion artifactVersion,
+    private void attachDocumentLinks(ArtifactVersion artifactVersion,
                                      ArtifactAppEntity artifactAppEntity) {
+        //TODO: Skipping versioning system, currently using artifact version which is not usually the user wants.
         Artifact artifact = artifactVersion.getArtifact();
-        List<String> documentIds =
-            this.documentArtifactRepository
-                .findByProjectVersionAndArtifact(projectVersion, artifact)
-                .stream()
-                .map(da -> da.getDocument().getDocumentId().toString())
-                .collect(Collectors.toList());
+        List<DocumentArtifact> allDocumentArtifactVersions = this.documentArtifactRepository.findByArtifact(artifact);
+        List<UUID> documentIds = new ArrayList<>();
+        for (DocumentArtifact documentArtifact : allDocumentArtifactVersions) {
+            documentIds.add(documentArtifact.getDocument().getDocumentId());
+        }
+
         artifactAppEntity.setDocumentIds(documentIds);
     }
 
@@ -231,21 +235,21 @@ public class ArtifactVersionRepositoryImpl
 
     private void createOrUpdateDocumentIds(ProjectVersion projectVersion,
                                            Artifact artifact,
-                                           List<String> incomingDocumentIds) {
-        List<String> persistedDocumentIds = documentArtifactRepository
+                                           List<UUID> incomingDocumentIds) {
+        List<UUID> persistedDocumentIds = documentArtifactRepository
             //TODO: Implement document versioning
             .findByProjectVersionProjectAndArtifact(projectVersion.getProject(), artifact)
             .stream()
-            .map(da -> da.getDocument().getDocumentId().toString())
+            .map(da -> da.getDocument().getDocumentId())
             .collect(Collectors.toList());
 
-        List<String> newDocumentIds = incomingDocumentIds
+        List<UUID> newDocumentIds = incomingDocumentIds
             .stream()
             .filter(newDocumentId -> !persistedDocumentIds.contains(newDocumentId))
             .collect(Collectors.toList());
 
-        for (String newDocumentId : newDocumentIds) {
-            Optional<Document> documentQuery = this.documentRepository.findById(UUID.fromString(newDocumentId));
+        for (UUID newDocumentId : newDocumentIds) {
+            Optional<Document> documentQuery = this.documentRepository.findById(newDocumentId);
             if (documentQuery.isPresent()) {
                 Document document = documentQuery.get();
                 DocumentArtifact documentArtifact = new DocumentArtifact(projectVersion, document, artifact);
@@ -253,14 +257,14 @@ public class ArtifactVersionRepositoryImpl
             }
         }
 
-        List<String> removedDocumentIds = persistedDocumentIds
+        List<UUID> removedDocumentIds = persistedDocumentIds
             .stream()
             .filter(persistedDocumentId -> !incomingDocumentIds.contains(persistedDocumentId))
             .collect(Collectors.toList());
 
-        for (String removedDocumentId : removedDocumentIds) {
+        for (UUID removedDocumentId : removedDocumentIds) {
             Optional<DocumentArtifact> documentArtifactQuery =
-                documentArtifactRepository.findByDocumentDocumentIdAndArtifact(UUID.fromString(removedDocumentId),
+                documentArtifactRepository.findByDocumentDocumentIdAndArtifact(removedDocumentId,
                     artifact);
             documentArtifactQuery.ifPresent(documentArtifactRepository::delete);
         }

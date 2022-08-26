@@ -70,11 +70,11 @@ public class DocumentArtifactController extends BaseDocumentController {
             Artifact artifact = getArtifactById(artifactId);
             DocumentArtifact documentArtifact = new DocumentArtifact(projectVersion, document, artifact);
             this.documentArtifactRepository.save(documentArtifact);
-            a.addDocumentId(document.getDocumentId().toString());
+            a.addDocumentId(document.getDocumentId());
         }
 
         LayoutManager layoutManager = new LayoutManager(serviceProvider, projectVersion);
-        layoutManager.generateDocumentLayout(document, true);
+        layoutManager.generateDocumentLayout(document);
         List<UUID> artifactIds = artifacts
             .stream()
             .map(ArtifactAppEntity::getId)

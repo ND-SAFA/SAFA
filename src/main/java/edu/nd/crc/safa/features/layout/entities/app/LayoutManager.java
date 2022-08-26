@@ -66,7 +66,7 @@ public class LayoutManager {
         this.serviceProvider
             .getDocumentRepository()
             .findByProject(this.project)
-            .forEach(d -> generateDocumentLayout(d, false));
+            .forEach(d -> generateDocumentLayout(d));
     }
 
     /**
@@ -89,7 +89,7 @@ public class LayoutManager {
 
         // Step - Generate layout for those documents
         for (Document affectedDocument : affectedDocuments) {
-            generateDocumentLayout(affectedDocument, true);
+            generateDocumentLayout(affectedDocument);
         }
 
         // Step - Generate layout for default document
@@ -99,11 +99,10 @@ public class LayoutManager {
     /**
      * Creates layout for given document
      *
-     * @param document         Document whose layout will be generated.
-     * @param sendNotification Whether to send notification to subscribers
+     * @param document Document whose layout will be generated.
      * @return Map of artifact id to their layout position.
      */
-    public Map<UUID, LayoutPosition> generateDocumentLayout(Document document, boolean sendNotification) {
+    public Map<UUID, LayoutPosition> generateDocumentLayout(Document document) {
         // Step - Get entities in document
         ProjectEntities entities = this.projectEntities.getEntitiesInDocument(document);
 
@@ -122,17 +121,16 @@ public class LayoutManager {
     }
 
     private List<Document> retrieveAffectedDocuments(List<ArtifactAppEntity> affectedArtifacts) {
-        List<String> affectedDocumentIds = new ArrayList<>();
+        List<UUID> affectedDocumentIds = new ArrayList<>();
         List<Document> affectedDocuments = new ArrayList<>();
         affectedArtifacts.forEach(artifactAppEntity -> {
-            for (String documentIdString : artifactAppEntity.getDocumentIds()) {
-                if (!affectedDocumentIds.contains(documentIdString)) {
-                    UUID documentId = UUID.fromString(documentIdString);
+            for (UUID documentId : artifactAppEntity.getDocumentIds()) {
+                if (!affectedDocumentIds.contains(documentId)) {
                     Optional<Document> documentOptional =
                         this.serviceProvider.getDocumentRepository().findById(documentId);
                     assert documentOptional.isPresent();
                     affectedDocuments.add(documentOptional.get());
-                    affectedDocumentIds.add(documentIdString);
+                    affectedDocumentIds.add(documentId);
                 }
             }
         });

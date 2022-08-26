@@ -21,6 +21,7 @@ import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;
+import edu.nd.crc.safa.features.versions.VersionCalculator;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.utilities.ProjectVersionFilter;
 
@@ -40,70 +41,7 @@ public abstract class GenericVersionRepository<
     A extends IAppEntity>
     implements IVersionRepository<V, A> {
 
-    /**
-     * @param project The project whose entities are retrieved.
-     * @return Returns all versions of the base entities in a project.
-     */
-    protected abstract List<V> retrieveVersionEntitiesByProject(Project project);
-
-    /**
-     * @param entity The base entities whose versions are retrieved
-     * @return List of versions associated with given base entities.
-     */
-    protected abstract List<V> retrieveVersionEntitiesByBaseEntity(B entity);
-
-    /**
-     * @param project The project whose entities are retrieved.
-     * @return Returns list of base entities existing in project.
-     */
-    protected abstract List<B> retrieveBaseEntitiesByProject(Project project);
-
-    /**
-     * @param baseEntityId The name of the base entity.
-     * @return Returns the base entity in given project with given name.
-     */
-    protected abstract Optional<B> findBaseEntityById(UUID baseEntityId);
-
-    /**
-     * Creates or updates any entities related to AppEntity and returns the corresponding base entity.
-     *
-     * @param projectVersion    The project version associated with given app entity.
-     * @param artifactAppEntity The application entity whose sub entities are being created.
-     * @return Returns the base entity associated with given app entity.
-     */
-    protected abstract B createOrUpdateRelatedEntities(ProjectVersion projectVersion,
-                                                       A artifactAppEntity) throws SafaError;
-
-    /**
-     * Creates an entity version with content of app entity and containing
-     * given modification type.
-     *
-     * @param projectVersion   The project version where version entity is created.
-     * @param modificationType The type of change required to move from last commit to given app entity.
-     * @param b                The base entity represented by app entity.
-     * @param appEntity        The app entity whose content is being compared to previous commits.
-     * @return The version entity for saving the app entity content to project version.
-     */
-    protected abstract V instantiateVersionEntityWithModification(ProjectVersion projectVersion,
-                                                                  ModificationType modificationType,
-                                                                  B b,
-                                                                  A appEntity) throws JsonProcessingException;
-
-    /**
-     * Returns the type of project entity this version repository corresponds to.
-     *
-     * @return ProjectEntity associated with this repository.
-     */
-    protected abstract ProjectEntity getProjectActivity();
-
-    /**
-     * Given a VersionEntity this methods returns an optional possibly containing the source entity this
-     * corresponds with.
-     *
-     * @param versionEntity The version entity being saved.
-     * @return Optional possibly containing existing version entity.
-     */
-    protected abstract Optional<V> findExistingVersionEntity(V versionEntity);
+    VersionCalculator versionCalculator = new VersionCalculator();
 
     protected abstract V save(V versionEntity);
 
@@ -317,10 +255,10 @@ public abstract class GenericVersionRepository<
         ProjectVersion targetVersion) {
         List<V> bodies = this.retrieveVersionEntitiesByBaseEntity(b);
 
-        V beforeEntity = this.getEntityAtVersion(bodies,
-            baseVersion);
-        V afterEntity = this.getEntityAtVersion(bodies,
-            targetVersion);
+        V beforeEntity = this.versionCalculator.getEntityAtVersion(bodies,
+            baseVersion, IVersionEntity::getProjectVersion);
+        V afterEntity = this.versionCalculator.getEntityAtVersion(bodies,
+            targetVersion, IVersionEntity::getProjectVersion);
 
         ModificationType modificationType = this
             .calculateModificationType(beforeEntity, afterEntity);
@@ -441,28 +379,8 @@ public abstract class GenericVersionRepository<
     }
 
     private Map<UUID, List<V>> groupEntityVersionsByEntityId(ProjectVersion projectVersion) {
-        Map<UUID, List<V>> entityHashtable = new HashMap<>();
         List<V> versionEntities = this.retrieveVersionEntitiesByProject(projectVersion.getProject());
-        for (V versionEntity : versionEntities) {
-            UUID entityId = versionEntity.getBaseEntityId();
-            if (entityHashtable.containsKey(entityId)) {
-                entityHashtable.get(entityId).add(versionEntity);
-            } else {
-                List<V> newList = new ArrayList<>();
-                newList.add(versionEntity);
-                entityHashtable.put(entityId, newList);
-            }
-        }
-        return entityHashtable;
-    }
-
-    private V getEntityAtVersion(List<V> bodies, ProjectVersion version) {
-        return this
-            .getLatestEntityVersionWithFilter(bodies, target -> target.isLessThanOrEqualTo(version));
-    }
-
-    private V getEntityBeforeVersion(List<V> bodies, ProjectVersion version) {
-        return this.getLatestEntityVersionWithFilter(bodies, target -> target.isLessThan(version));
+        return versionCalculator.groupEntityVersionsByEntityId(versionEntities, IVersionEntity::getBaseEntityId);
     }
 
     private V instantiateVersionEntityFromAppEntity(ProjectVersion projectVersion,
@@ -481,8 +399,10 @@ public abstract class GenericVersionRepository<
     private ModificationType calculateModificationTypeForAppEntity(ProjectVersion projectVersion,
                                                                    B b,
                                                                    A appEntity) {
-        V previousBody =
-            getEntityBeforeVersion(this.retrieveVersionEntitiesByBaseEntity(b), projectVersion);
+        V previousBody = versionCalculator
+            .getEntityBeforeVersion(this.retrieveVersionEntitiesByBaseEntity(b),
+                projectVersion,
+                IVersionEntity::getProjectVersion);
         if (previousBody == null) {
             return appEntity == null ? ModificationType.NO_MODIFICATION : ModificationType.ADDED;
         } else {
@@ -498,4 +418,69 @@ public abstract class GenericVersionRepository<
             }
         }
     }
+
+    /**
+     * @param project The project whose entities are retrieved.
+     * @return Returns all versions of the base entities in a project.
+     */
+    protected abstract List<V> retrieveVersionEntitiesByProject(Project project);
+
+    /**
+     * @param entity The base entities whose versions are retrieved
+     * @return List of versions associated with given base entities.
+     */
+    protected abstract List<V> retrieveVersionEntitiesByBaseEntity(B entity);
+
+    /**
+     * @param project The project whose entities are retrieved.
+     * @return Returns list of base entities existing in project.
+     */
+    protected abstract List<B> retrieveBaseEntitiesByProject(Project project);
+
+    /**
+     * @param baseEntityId The name of the base entity.
+     * @return Returns the base entity in given project with given name.
+     */
+    protected abstract Optional<B> findBaseEntityById(UUID baseEntityId);
+
+    /**
+     * Creates or updates any entities related to AppEntity and returns the corresponding base entity.
+     *
+     * @param projectVersion    The project version associated with given app entity.
+     * @param artifactAppEntity The application entity whose sub entities are being created.
+     * @return Returns the base entity associated with given app entity.
+     */
+    protected abstract B createOrUpdateRelatedEntities(ProjectVersion projectVersion,
+                                                       A artifactAppEntity) throws SafaError;
+
+    /**
+     * Creates an entity version with content of app entity and containing
+     * given modification type.
+     *
+     * @param projectVersion   The project version where version entity is created.
+     * @param modificationType The type of change required to move from last commit to given app entity.
+     * @param b                The base entity represented by app entity.
+     * @param appEntity        The app entity whose content is being compared to previous commits.
+     * @return The version entity for saving the app entity content to project version.
+     */
+    protected abstract V instantiateVersionEntityWithModification(ProjectVersion projectVersion,
+                                                                  ModificationType modificationType,
+                                                                  B b,
+                                                                  A appEntity) throws JsonProcessingException;
+
+    /**
+     * Returns the type of project entity this version repository corresponds to.
+     *
+     * @return ProjectEntity associated with this repository.
+     */
+    protected abstract ProjectEntity getProjectActivity();
+
+    /**
+     * Given a VersionEntity this methods returns an optional possibly containing the source entity this
+     * corresponds with.
+     *
+     * @param versionEntity The version entity being saved.
+     * @return Optional possibly containing existing version entity.
+     */
+    protected abstract Optional<V> findExistingVersionEntity(V versionEntity);
 }

@@ -1,4 +1,3 @@
-/* eslint-disable max-lines */
 import {
   DataCy,
   simpleProjectFilesMap,
@@ -13,6 +12,8 @@ describe("Project Creation", () => {
       validUser.email,
       validUser.password
     );
+
+    cy.location("pathname", { timeout: 5000 }).should("equal", "/create");
   });
 
   describe("Manual Project Creation", () => {
@@ -47,6 +48,8 @@ describe("Project Creation", () => {
         cy.createArtifactPanel("hazard", simpleProjectFilesMap.hazard);
         //Step - Able to create a new panel after creating an artifact
         cy.clickButton(DataCy.creationCreatePanelButton);
+
+        cy.getCy(DataCy.creationFilePanel).should("be.visible");
       });
     });
 
@@ -58,8 +61,10 @@ describe("Project Creation", () => {
         cy.createArtifactPanel("hazard", simpleProjectFilesMap.hazard);
 
         // Step - opens up artifact drop box and deletes artifact
-        cy.clickButton(DataCy.creationArtifactButton);
+        cy.openPanelAfterClose();
         cy.clickButton(DataCy.creationArtifactDeleteButton);
+
+        cy.getCy(DataCy.creationFilePanel).should("not.exist");
       });
 
       it("Cannot continue after deleted valid artifacts", () => {
@@ -67,8 +72,9 @@ describe("Project Creation", () => {
         cy.setProjectIdentifier("standard");
         // Step - Created Hazard artifact
         cy.createArtifactPanel("hazard", simpleProjectFilesMap.hazard);
+
         // Step - opens up artifact drop box and deletes artifact
-        cy.clickButton(DataCy.creationArtifactButton);
+        cy.openPanelAfterClose();
         cy.clickButton(DataCy.creationArtifactDeleteButton);
 
         // Step - Cannot continue after artifact is deleted
@@ -85,8 +91,14 @@ describe("Project Creation", () => {
         cy.createArtifactPanel("hazard", simpleProjectFilesMap.hazard);
 
         // Step - Opens up artifact dropbox and is able to view entities within artifact
-        cy.clickButton(DataCy.creationArtifactButton);
-        cy.clickButton(DataCy.creationEntitiesButton);
+        cy.openPanelAfterClose();
+
+        // Step - making sure entities are viewable
+        cy.getCy(DataCy.creationEntitiesButton)
+          .should("be.visible")
+          .clickButton(DataCy.creationEntitiesButton, "last");
+
+        cy.getCy(DataCy.creationEntityButton).should("have.length", 5);
       });
     });
 
@@ -98,7 +110,7 @@ describe("Project Creation", () => {
         cy.createArtifactPanel("hazard", simpleProjectFilesMap.hazard);
 
         // Step - Can continue after uploading artifact
-        cy.clickButton(DataCy.stepperContinueButton);
+        cy.getCy(DataCy.stepperContinueButton).should("not.be.disabled");
       });
 
       it("Can continue with bad file if errors are ignored", () => {
@@ -112,7 +124,9 @@ describe("Project Creation", () => {
 
         // Step - Pressing ignore errors so user can continue
         cy.clickButton(DataCy.creationIgnoreErrorsButton, undefined);
-        cy.clickButton(DataCy.stepperContinueButton);
+
+        // Step - Can continue after ignoring errors
+        cy.getCy(DataCy.stepperContinueButton).should("not.be.disabled");
       });
     });
   });
@@ -120,96 +134,49 @@ describe("Project Creation", () => {
   describe("Project Trace Link Uploading", () => {
     describe("I can create sets of trace links between two artifact types", () => {
       it("Can create a new panel of trace links", () => {
-        // Step - Inputs Project name and description
-        cy.setProjectIdentifier("standard");
-
-        // Step - creates requirement artifact
-        cy.createArtifactPanel(
-          "requirement",
-          simpleProjectFilesMap.requirement
-        );
-
-        // Step - creates hazard artifact
-        cy.createArtifactPanel("hazard", simpleProjectFilesMap.hazard);
+        cy.createReqToHazardFiles();
 
         // Step - Creates Trace Matrix, Selects source + target w/ artifact of users choice
         cy.createTraceMatrix("requirement", "hazard");
 
-        // Step -Can create a new panel of trace links
-        cy.clickButtonWithName("Create trace matrix");
+        cy.getCy(DataCy.creationFilePanel).should("be.visible");
       });
 
       it("Cannot create a new panel without selecting two artifact types", () => {
-        // Step - Inputs Project name and description
-        cy.setProjectIdentifier("standard");
-
-        // Step - creates requirement artifact
-        cy.createArtifactPanel(
-          "requirement",
-          simpleProjectFilesMap.requirement
-        );
-
-        // Step - creates hazard artifact
-        cy.createArtifactPanel("hazard", simpleProjectFilesMap.hazard);
+        cy.createReqToHazardFiles();
 
         // Step - Checks that the user cannot create a new panel without selecting two artifact types
-        cy.clickButton(DataCy.stepperContinueButton);
         cy.clickButtonWithName("Create new trace matrix");
+
         cy.contains("Create new trace matrix").should("be.disabled");
       });
     });
 
     describe("I can delete a set of trace links", () => {
       it("Can delete a set of trace links", () => {
-        // Step - Inputs Project name and description
-        cy.setProjectIdentifier("standard");
-
-        // Step - creates requirement artifact
-        cy.createArtifactPanel(
-          "requirement",
-          simpleProjectFilesMap.requirement
-        );
-
-        // Step - creates hazard artifact
-        cy.createArtifactPanel("hazard", simpleProjectFilesMap.hazard);
-
-        // Step - creates Trace Matrix, Selects source + target w/ artifact of users choice
-        cy.createTraceMatrix("requirement", "hazard");
-
-        // Step - Create trace matrix panel
-        cy.clickButtonWithName("Create trace matrix");
+        cy.createReqToHazardFiles(true);
 
         // Step - being able to delete a set of trace links
-        cy.clickButton("button-delete-artifact", "last");
+        cy.openPanelAfterClose();
+        cy.clickButton(DataCy.creationDeletePanel, "last");
+
+        cy.contains("requirement X hazard").should("not.exist");
       });
     });
 
     describe("I can preview the list of trace links loaded from a file", () => {
       it("Displays buttons for all of the trace links in the file", () => {
-        // Step - Inputs Project name and description
-        cy.setProjectIdentifier("standard");
+        cy.createReqToHazardFiles(true);
 
-        // Step - creates requirement artifact
-        cy.createArtifactPanel(
-          "requirement",
-          simpleProjectFilesMap.requirement
-        );
-
-        // Step - creates hazard artifact
-        cy.createArtifactPanel("hazard", simpleProjectFilesMap.hazard);
-
-        // Step - creates Trace Matrix, Selects source + target w/ artifact of users choice
-        cy.createTraceMatrix("requirement", "hazard");
-
-        // Step - Uploads trace link files
-        cy.uploadingTraceLinks(simpleProjectFilesMap.requirement2hazard);
-
-        // Step - going back a tab and opening dropbox to check entities
-        cy.clickButtonWithName("Go back");
-        cy.clickButtonWithName("requirement-hazard");
+        // Step -  Open the entity dropbox
+        cy.openPanelAfterClose();
 
         // Step - making sure entities are viewable
-        cy.clickButton(DataCy.creationEntitiesButton, "last");
+        cy.getCy(DataCy.creationEntitiesButton)
+          .should("be.visible")
+          .clickButton(DataCy.creationEntitiesButton, "last");
+
+        cy.getCy(DataCy.creationEntityButton).should("have.length", 5);
       });
     });
 
@@ -219,204 +186,97 @@ describe("Project Creation", () => {
         cy.setProjectIdentifier("standard");
 
         // Step - Creates Empty design2design artifact
-        cy.createArtifactPanel("Empty Design", testFileMap.Emptydesign2design);
+        cy.createArtifactPanel("Empty Design", testFileMap.emptyDesign2Design);
         cy.clickButton(DataCy.creationIgnoreErrorsButton, undefined);
 
         // Step - Creates Empty design artifact
-        cy.createArtifactPanel("Empty design", testFileMap.Emptydesign);
-
-        // Step - Ignores errors
-        //cy.clickButton(DataCy.creationIgnoreErrorsButton, "last");
+        cy.createArtifactPanel("Empty design", testFileMap.emptyDesign, true);
 
         // Step - Creates Trace Matrix, Selects source + target w/ artifact of users choice
-        cy.createTraceMatrix("design", "design");
+        cy.createTraceMatrix(
+          "design",
+          "design",
+          testFileMap.emptyDesign2Design
+        );
 
-        // Step - Uploads trace link files (Emptydesign2design)
-        cy.uploadingTraceLinks(testFileMap.Emptydesign2design);
+        cy.getCy(DataCy.stepperContinueButton).should("not.be.disabled");
       });
 
       it("Can continue after uploading trace links", () => {
-        // Step - Inputs Project name and description
-        cy.setProjectIdentifier("standard");
+        cy.createReqToHazardFiles(true);
 
-        // Step - creates requirement artifact
-        cy.createArtifactPanel(
-          "requirement",
-          simpleProjectFilesMap.requirement
-        );
-
-        // Step - creates hazard artifact
-        cy.createArtifactPanel("hazard", simpleProjectFilesMap.hazard);
-
-        // Step - Creates Trace Matrix, Selects source + target w/ artifact of users choice
-        cy.createTraceMatrix("requirement", "hazard");
-
-        // Step - Uploads trace link files (requirement2hazard)
-        cy.uploadingTraceLinks(simpleProjectFilesMap.requirement2hazard);
+        cy.getCy(DataCy.stepperContinueButton).should("not.be.disabled");
       });
 
       it("Can continue with a bad file if errors are ignored", () => {
-        // Step - Inputs Project name and description
-        cy.setProjectIdentifier("standard");
-
-        // Step - creates requirement artifact
-        cy.createArtifactPanel("hazard", simpleProjectFilesMap.hazard);
-
-        // Step - creates hazard2hazard artifact
-        cy.createArtifactPanel(
-          "hazard2hazard",
-          simpleProjectFilesMap.hazard2hazard
-        );
-
-        // Step - Ignore errors
-        cy.clickButton(DataCy.creationIgnoreErrorsButton, "last");
+        cy.createReqToHazardFiles();
 
         // Step - Creates Trace Matrix, Selects source + target w/ artifact of users choice
         cy.createTraceMatrix("hazard", "hazard");
 
-        // Step - Uploads trace link files (hazard2hazard)
-        cy.uploadingTraceLinks(simpleProjectFilesMap.hazard2hazard);
+        cy.getCy(DataCy.stepperContinueButton).should("be.disabled");
+
+        // Step - Ignore errors
+        cy.clickButton(DataCy.creationIgnoreErrorsButton, "last");
+
+        cy.getCy(DataCy.stepperContinueButton).should("not.be.disabled");
       });
     });
 
     describe("I can generate trace links between artifacts", () => {
       it("Can continue with trace links set to be generated", () => {
-        // Step - Inputs Project name and description
-        cy.setProjectIdentifier("standard");
-
-        // Step - Creates requirement artifact
-        cy.createArtifactPanel(
-          "requirement",
-          simpleProjectFilesMap.requirement
-        );
-
-        // Step - Creates hazard artifact
-        cy.createArtifactPanel("hazard", simpleProjectFilesMap.hazard);
+        cy.createReqToHazardFiles();
 
         // Step - Creates Trace Matrix, Selects source + target w/ artifact of users choice
         cy.createTraceMatrix("requirement", "hazard");
 
-        // Step - Creates trace matrix
-        cy.clickButtonWithName("Create trace matrix");
+        cy.openPanelAfterClose();
 
         // Step - Able to generate Trace Links and continue
         cy.clickButtonWithName("Generate Trace Links");
+
+        cy.getCy(DataCy.stepperContinueButton).should("not.be.disabled");
       });
     });
   });
 
   describe("Project Tim Preview", () => {
-    it("Displays artifact types on the graph", () => {
-      // Step - Inputs Project name and description
-      cy.setProjectIdentifier("standard");
+    beforeEach(() => {
+      // Step - Create project with requirements and hazards.
+      cy.createReqToHazardFiles(true, true);
+    });
 
-      // Step - Creates requirement artifact
-      cy.createArtifactPanel("requirement", simpleProjectFilesMap.requirement);
-
-      // Step - Creates hazard artifact
-      cy.createArtifactPanel("hazard", simpleProjectFilesMap.hazard);
-
-      // Step - Creates Trace Matrix, Selects source + target w/ artifact of users choice
-      cy.createTraceMatrix("requirement", "hazard");
-
-      // Step - Uploads trace link files (requirement2hazard)
-      cy.uploadingTraceLinks(simpleProjectFilesMap.requirement2hazard);
-
-      // Step - Checks that correct artifacts are displayed in the Tim Tree
-      cy.contains("Hazard");
-      cy.contains("Requirement");
+    it("Displays all nodes on the graph within the current view", () => {
+      // Step - Checks that there are the correct number of nodes within each artifact
+      cy.get(".artifact-svg-wrapper")
+        .should("be.visible")
+        .within(() => {
+          cy.contains("text", "requirement").should("be.visible");
+          cy.contains("text", "hazard").should("be.visible");
+          cy.contains("text", "5 Nodes").should("be.visible");
+        });
     });
 
     it.skip("Displays trace links between artifact types on the graph", () => {
-      // Step - Inputs Project name and description
-      cy.setProjectIdentifier("standard");
+      // Wait for graph to load.
+      cy.getCy(DataCy.appLoading).should("be.visible");
+      cy.get(".artifact-svg-wrapper").should("be.visible");
 
-      // Step - creates requirement artifact
-      cy.createArtifactPanel("requirement", simpleProjectFilesMap.requirement);
-
-      // Step - creates hazard artifact
-      cy.createArtifactPanel("hazard", simpleProjectFilesMap.hazard);
-
-      // Step - creates Trace Matrix, Selects source + target w/ artifact of users choice
-      cy.createTraceMatrix("requirement", "hazard");
-
-      // Step - Uploads trace link files
-      cy.uploadingTraceLinks(simpleProjectFilesMap.requirement2hazard);
-
-      // Step - Checks the displayed Trace Links between artifacts
-      cy.contains("5");
-    });
-
-    it.skip("Displays all nodes on the graph within the current view", () => {
-      // Step - Inputs Project name and description
-      cy.setProjectIdentifier("standard");
-
-      // Step - creates requirement artifact
-      cy.createArtifactPanel("requirement", simpleProjectFilesMap.requirement);
-
-      // Step - creates hazard artifact
-      cy.createArtifactPanel("hazard", simpleProjectFilesMap.hazard);
-
-      // Step - creates Trace Matrix, Selects source + target w/ artifact of users choice
-      cy.createTraceMatrix("requirement", "hazard");
-
-      // Step - Uploads trace link files
-      cy.uploadingTraceLinks(simpleProjectFilesMap.requirement2hazard);
-
-      // Step - Checks that there are the correct number of nodes within each artifact
-      cy.contains("5 Nodes");
-      cy.contains("5 Nodes");
-    });
-
-    it.skip("Displays the correct count of artifacts and links", () => {
-      // Step - Inputs Project name and description
-      cy.setProjectIdentifier("standard");
-
-      // Step - creates requirement artifact
-      cy.createArtifactPanel("requirement", simpleProjectFilesMap.requirement);
-
-      // Step - creates hazard artifact
-      cy.createArtifactPanel("hazard", simpleProjectFilesMap.hazard);
-
-      // Step - creates Trace Matrix, Selects source + target w/ artifact of users choice
-      cy.createTraceMatrix("requirement", "hazard");
-
-      // Step - Uploads trace link files
-      cy.uploadingTraceLinks(simpleProjectFilesMap.requirement2hazard);
-
-      // Step - Checks for display of Artifacts, Nodes and Trace Links within the Tim Tree
-      cy.contains("hazard");
-      cy.contains("Requirement");
-      cy.contains("5");
-      cy.contains("5 Nodes");
+      // Step - Checks the displayed Trace Links between artifacts & their counts
+      // TODO: set up screenshot comparisons: https://valor-software.com/articles/testing-canvas-could-be-easier.html
+      cy.get("canvas").last().screenshot();
     });
   });
 
   describe("I can manually create a Project", () => {
-    it.skip("Can create a project with valid data", () => {
-      // Step - Inputs Project name and description
-      cy.setProjectIdentifier("standard");
-
-      // Step - creates requirement artifact
-      cy.createArtifactPanel("requirement", simpleProjectFilesMap.requirement);
-
-      // Step - creates hazard artifact
-      cy.createArtifactPanel("hazard", simpleProjectFilesMap.hazard);
-
-      // Step - creates Trace Matrix, Selects source + target w/ artifact of users choice
-      cy.createTraceMatrix("requirement", "hazard");
-
-      // Step - Uploads trace link files
-      cy.uploadingTraceLinks(simpleProjectFilesMap.requirement2hazard);
-
-      // Step - Checks for display of Artifacts, Nodes and Trace Links within the Tim Tree
-      cy.contains("hazard");
-      cy.contains("Requirement");
-      cy.contains("5");
-      cy.contains("5 Nodes");
-
+    it("Can create a project with valid data", () => {
       // Step - Finalizes project by creating it
-      cy.clickButtonWithName("Create Project");
+      cy.getCy(DataCy.stepperContinueButton).should("not.be.disabled").click();
+
+      // Step - Check for creation success message
+      cy.getCy(DataCy.snackbarSuccess).should("be.visible");
+
+      cy.clickButton(DataCy.jobPanel).clickButton(DataCy.jobDeleteButton);
     });
   });
 });

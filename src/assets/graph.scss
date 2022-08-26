@@ -12,10 +12,15 @@ $graph-border-radius: 8px;
 
 .cy-container,
 #cytoscape-div,
-#cytoscape-artifact,
-#cytoscape-tim {
+#cytoscape-artifact {
   height: 100% !important;
   max-height: 100vh !important;
+}
+
+#cytoscape-tim, #cytoscape-tim > #cytoscape-div {
+  //height: 100% !important;
+  //max-height: 60vh !important;
+  //min-height: 40vh !important;
 }
 
 .artifact-view {

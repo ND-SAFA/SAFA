@@ -1,12 +1,8 @@
 <template>
-  <v-expansion-panel>
+  <v-expansion-panel data-cy="panel-files">
     <v-expansion-panel-header>
       <flex-box align="center">
-        <v-icon
-          class="mr-1"
-          :color="iconColor"
-          data-cy="button-artifact-dropbox"
-        >
+        <v-icon class="mr-1" :color="iconColor">
           {{ iconName }}
         </v-icon>
         <slot name="title" />
@@ -44,6 +40,7 @@
               class="ma-1"
               v-for="entityName in entityNames"
               :key="entityName"
+              data-cy="button-created-entity"
               @click="underDevelopmentError()"
             >
               {{ entityName }}

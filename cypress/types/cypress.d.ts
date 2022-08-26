@@ -124,27 +124,49 @@ declare namespace Cypress {
     setProjectIdentifier(type: "bulk" | "standard" | "modal"): Chainable<void>;
 
     /**
-     * Creates artifacts - inputs description and uploads file
-     *
-     * @param name - The name of the artifact you want
-     * @param file - The file that belongs to the artifact
+     * Opens the last file panel after waiting for it to close when files are parsed.
      */
-    createArtifactPanel(name: string, file: string): Chainable<void>;
+    openPanelAfterClose(): Chainable<void>;
 
     /**
-     * Creates trace matrix - selects source or target then selects artifact
+     * Creates artifacts - inputs description and uploads file.
      *
-     * @param name - Name is the first type artifact you want to select in the source (ex. requirement)
-     * @param artifact - Artifact is the second type of artifact you want to select for target (ex. hazard)
+     * @param name - The name of the artifact typeto create.
+     * @param file - The file that belongs to the artifact.
+     * @param next - If true, proceeds to the next step.
      */
-    createTraceMatrix(name: string, artifact: string): Chainable<void>;
+    createArtifactPanel(
+      name: string,
+      file: string,
+      next?: boolean
+    ): Chainable<void>;
 
     /**
-     * Uploads files to make Trace links
+     * Creates trace matrix - selects source or target then selects artifact.
      *
-     * @param file - The file that belongs to the trace link (ex. hazard2hazard)
+     * @param sourceType - The first type artifact you want to select in the source (ex. requirement).
+     * @param targetType - The second type of artifact you want to select for target (ex. hazard).
+     * @param file - The file that belongs to the trace link (ex. hazard2hazard).
+     *               If none, is set, this will not be uploaded, and the stepper will not continue.
+     * @param next - If true, proceeds to the next step.
      */
-    uploadingTraceLinks(file: string): Chainable<void>;
+    createTraceMatrix(
+      sourceType: string,
+      targetType: string,
+      file?: string,
+      next?: boolean
+    ): Chainable<void>;
+
+    /**
+     * Creates artifacts & a trace matrix for requirements and hazards.
+     *
+     * @param createTraces - If true, traces will be created between the artifact types.
+     * @param next - If true, proceeds to the final step.
+     */
+    createReqToHazardFiles(
+      createTraces?: boolean,
+      next?: boolean
+    ): Chainable<void>;
 
     /**
      * Opens the upload flat files modal.

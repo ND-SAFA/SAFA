@@ -11,6 +11,7 @@
       data-cy="input-artifact-type"
     />
     <v-btn
+      :disabled="artifactName.length === 0"
       @click="handleSubmit"
       color="primary"
       class="ml-1 mt-2"

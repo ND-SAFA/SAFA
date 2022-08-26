@@ -270,6 +270,8 @@ describe("Project Creation", () => {
 
   describe("I can manually create a Project", () => {
     it("Can create a project with valid data", () => {
+      cy.createReqToHazardFiles(true, true);
+
       // Step - Finalizes project by creating it
       cy.getCy(DataCy.stepperContinueButton).should("not.be.disabled").click();
 

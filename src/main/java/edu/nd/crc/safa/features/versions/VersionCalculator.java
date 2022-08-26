@@ -52,8 +52,10 @@ public class VersionCalculator {
     /**
      * Returns the most recent entity version that passes given filter
      *
-     * @param bodies The bodies to filter through
-     * @param filter The filter deciding whether an entity's version is valid.
+     * @param bodies                 The bodies to filter through
+     * @param filter                 The filter deciding whether an entity's version is valid.
+     * @param projectVersionFunction Function to extract project version from generic entity V.
+     * @param <V>                    The type of entity with some version to return from.
      * @return The latest entity version passing given filter.
      */
     public <V> V getLatestEntityVersionWithFilter(List<V> bodies,

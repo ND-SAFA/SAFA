@@ -96,7 +96,7 @@ public class ProjectEntities {
     public ProjectEntities getEntitiesInDocument(Document document) {
         List<ArtifactAppEntity> documentArtifacts = this.artifacts
             .stream()
-            .filter((a) -> a.getDocumentIds().contains(document.getDocumentId().toString()))
+            .filter(a -> a.getDocumentIds().contains(document.getDocumentId()))
             .collect(Collectors.toList());
         List<String> documentArtifactNames = documentArtifacts
             .stream()
@@ -104,7 +104,7 @@ public class ProjectEntities {
             .collect(Collectors.toList());
         List<TraceAppEntity> documentTraces = this.traces
             .stream()
-            .filter((t) -> documentArtifactNames.contains(t.getSourceName())
+            .filter(t -> documentArtifactNames.contains(t.getSourceName())
                 || documentArtifactNames.contains(t.getTargetName()))
             .collect(Collectors.toList());
         return new ProjectEntities(documentArtifacts, documentTraces);

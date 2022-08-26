@@ -76,7 +76,6 @@ public class ArtifactPositionService {
 
     public Map<UUID, LayoutPosition> retrieveDocumentLayout(ProjectVersion projectVersion, UUID documentId) {
         Map<UUID, LayoutPosition> layout = new HashMap<>();
-        Iterable<ArtifactPosition> all = this.artifactPositionRepository.findAll();
         List<ArtifactPosition> artifactPositionsAcrossVersions =
             this.artifactPositionRepository.findByDocumentDocumentId(documentId);
         Map<UUID, List<ArtifactPosition>> id2pos = versionCalculator.groupEntityVersionsByEntityId(
@@ -88,6 +87,9 @@ public class ArtifactPositionService {
                 artifactPositions,
                 projectVersion,
                 ArtifactPosition::getProjectVersion);
+            if (artifactPosition == null) { // layout for version not available, provide default
+                artifactPosition = artifactPositions.get(0);
+            }
             LayoutPosition layoutPosition = new LayoutPosition(artifactPosition.getX(), artifactPosition.getY());
             UUID artifactId = artifactPosition.getArtifact().getArtifactId();
             layout.put(artifactId, layoutPosition);

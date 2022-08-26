@@ -4,8 +4,10 @@ import java.lang.reflect.Field;
 import java.util.List;
 
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
+import edu.nd.crc.safa.features.notifications.services.NotificationService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -38,5 +40,10 @@ public class JobAppEntity extends JobDbEntity {
             String errorMessage = "Illegally accessed field while creating job app entity. %s";
             throw new SafaError(errorMessage, e.getMessage());
         }
+    }
+
+    @JsonIgnore
+    public String getTopic() {
+        return NotificationService.getTopic(this.getId());
     }
 }

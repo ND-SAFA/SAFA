@@ -23,7 +23,7 @@ import requests.SafaRequest;
  */
 class TestJsonCommitJob extends ApplicationBaseTest {
     final String description = "description";
-    final int N_STEPS = 1;
+    final int N_STEPS = 2;
     EntityConstants.ArtifactConstants artifactConstants = new EntityConstants.ArtifactConstants();
 
     @Test

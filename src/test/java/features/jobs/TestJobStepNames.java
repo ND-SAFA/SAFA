@@ -14,49 +14,67 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests that the correct steps are retrieved for each available job.
  */
-public class TestJobStepNames extends ApplicationBaseTest {
+class TestJobStepNames extends ApplicationBaseTest {
     @Test
-    public void negativeIndices() {
+    void negativeIndices() {
         assertThat(AbstractJob.getStepIndex(-1, 1)).isEqualTo(0);
         assertThat(AbstractJob.getStepIndex(-2, 5)).isEqualTo(3);
     }
 
     @Test
-    public void testCommitJobSteps() {
+    void testCommitJobSteps() {
         List<String> stepNames = JobSteps.getJobSteps(JobType.PROJECT_CREATION);
-        assertThat(stepNames).hasSize(1).contains("Committing Entities");
+        String[] expectedStepNames = new String[]{
+            "Committing Entities",
+            "Done"
+        };
+        testStepNames(expectedStepNames, stepNames);
     }
 
     @Test
-    public void testFlatFileProjectCreationSteps() {
+    void testFlatFileProjectCreationSteps() {
         List<String> stepNames = JobSteps.getJobSteps(JobType.FLAT_FILE_PROJECT_CREATION);
-        assertThat(stepNames).hasSize(5);
-        assertThat(stepNames.get(0)).isEqualTo("Uploading Flat Files");
-        assertThat(stepNames.get(1)).isEqualTo("Parsing Artifact Files");
-        assertThat(stepNames.get(2)).isEqualTo("Parsing Trace Files");
-        assertThat(stepNames.get(3)).isEqualTo("Generating Trace Links");
-        assertThat(stepNames.get(4)).isEqualTo("Committing Entities");
+        String[] expectedStepNames = new String[]{
+            "Uploading Flat Files",
+            "Parsing Files",
+            "Generating Trace Links",
+            "Committing Entities",
+            "Done"
+        };
+        testStepNames(expectedStepNames, stepNames);
     }
 
     @Test
-    public void testJiraProjectCreationSteps() {
+    void testJiraProjectCreationSteps() {
         List<String> stepNames = JobSteps.getJobSteps(JobType.JIRA_PROJECT_CREATION);
-        assertThat(stepNames).hasSize(5);
-        assertThat(stepNames.get(0)).isEqualTo("Authenticating User Credentials");
-        assertThat(stepNames.get(1)).isEqualTo("Retrieving Jira Project");
-        assertThat(stepNames.get(2)).isEqualTo("Creating SAFA Project");
-        assertThat(stepNames.get(3)).isEqualTo("Importing Issues and Links");
-        assertThat(stepNames.get(4)).isEqualTo("Committing Entities");
+        String[] expectedStepNames = getJiraStepNames();
+        testStepNames(expectedStepNames, stepNames);
     }
 
     @Test
-    public void testJiraProjectUpdateSteps() {
+    void testJiraProjectUpdateSteps() {
         List<String> stepNames = JobSteps.getJobSteps(JobType.JIRA_PROJECT_UPDATE);
-        assertThat(stepNames).hasSize(5);
-        assertThat(stepNames.get(0)).isEqualTo("Authenticating User Credentials");
-        assertThat(stepNames.get(1)).isEqualTo("Retrieving Jira Project");
-        assertThat(stepNames.get(2)).isEqualTo("Creating SAFA Project");
-        assertThat(stepNames.get(3)).isEqualTo("Importing Issues and Links");
-        assertThat(stepNames.get(4)).isEqualTo("Committing Entities");
+        String[] expectedStepNames = getJiraStepNames();
+        testStepNames(expectedStepNames, stepNames);
+    }
+
+    private String[] getJiraStepNames() {
+        return new String[]{
+            "Authenticating User Credentials",
+            "Retrieving Jira Project",
+            "Creating SAFA Project",
+            "Importing Issues and Links",
+            "Committing Entities",
+            "Done"
+        };
+    }
+
+    private void testStepNames(String[] expectedNames, List<String> stepNames) {
+        assertThat(stepNames).hasSize(expectedNames.length);
+        for (int i = 0; i < expectedNames.length; i++) {
+            String expectedStepName = expectedNames[i];
+            String stepName = stepNames.get(i);
+            assertThat(stepName).isEqualTo(expectedStepName);
+        }
     }
 }

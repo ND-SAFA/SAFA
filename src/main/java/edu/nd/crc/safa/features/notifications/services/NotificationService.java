@@ -2,6 +2,7 @@ package edu.nd.crc.safa.features.notifications.services;
 
 import java.util.UUID;
 
+import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
 import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
@@ -46,6 +47,20 @@ public class NotificationService {
     public void broadcastChange(EntityChangeBuilder builder) {
         SafaUser safaUser = this.safaUserService.getCurrentUser();
         EntityChangeMessage message = builder.get(safaUser.getEmail());
-        messagingTemplate.convertAndSend(builder.getTopic(), message);
+        this.broadcastObject(builder.getTopic(), message);
+    }
+
+    public void broadcastJob(JobAppEntity jobAppEntity) {
+        this.broadcastObject(jobAppEntity.getTopic(), jobAppEntity);
+    }
+
+    /**
+     * Sends given object to topic as JSON.
+     *
+     * @param topic   The destination for the object.
+     * @param payload Object to be sent to topic
+     */
+    private void broadcastObject(String topic, Object payload) {
+        messagingTemplate.convertAndSend(topic, payload);
     }
 }

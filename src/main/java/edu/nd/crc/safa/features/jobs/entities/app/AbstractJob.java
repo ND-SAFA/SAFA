@@ -12,7 +12,6 @@ import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.jobs.entities.IJobStep;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.jobs.services.JobService;
-import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
 import edu.nd.crc.safa.features.notifications.services.NotificationService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 
@@ -122,18 +121,19 @@ public abstract class AbstractJob implements Job {
                 }
                 // Pre-step
                 jobService.startStep(jobDbEntity);
-                notificationService.broadcastChange(EntityChangeBuilder.createJobUpdate(jobDbEntity));
+                notificationService.broadcastJob(JobAppEntity.createFromJob(jobDbEntity));
+
                 // Pre-step
                 stepImplementation.method.invoke(this);
 
                 // Post-step
                 jobService.endStep(jobDbEntity);
-                notificationService.broadcastChange(EntityChangeBuilder.createJobUpdate(jobDbEntity));
+                notificationService.broadcastJob(JobAppEntity.createFromJob(jobDbEntity));
             }
         } catch (Exception e) {
             jobService.failJob(jobDbEntity);
             e.printStackTrace();
-            notificationService.broadcastChange(EntityChangeBuilder.createJobUpdate(jobDbEntity));
+            notificationService.broadcastJob(JobAppEntity.createFromJob(jobDbEntity));
             throw new SafaError(e.getMessage());
         }
 
@@ -168,6 +168,7 @@ public abstract class AbstractJob implements Job {
 
     protected abstract UUID getCompletedEntityId();
 
+    @IJobStep(name = "Done", position = -1)
     public void done() {
         this.jobDbEntity.setCompletedEntityId(this.getCompletedEntityId());
         this.serviceProvider.getJobService().completeJob(jobDbEntity);

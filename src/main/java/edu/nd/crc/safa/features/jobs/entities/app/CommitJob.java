@@ -41,7 +41,7 @@ public class CommitJob extends AbstractJob {
         this.projectChanger = new ProjectChanger(projectVersion, serviceProvider);
     }
 
-    @IJobStep(name = "Committing Entities", position = -1)
+    @IJobStep(name = "Committing Entities", position = -2)
     public void commitArtifactsAndTraceLinks() throws SafaError {
         projectChanger.commit(projectCommit);
     }

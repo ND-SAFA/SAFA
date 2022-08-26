@@ -35,7 +35,6 @@ import { timGraph, cyResetTim } from "@/cytoscape";
 import {
   GenericGraphLink,
   GenericCytoscapeController,
-  Typography,
   FlexBox,
 } from "@/components/common";
 import ArtifactTypeNode from "./ArtifactTypeNode.vue";
@@ -48,7 +47,6 @@ export default Vue.extend({
   name: "TimTree",
   components: {
     FlexBox,
-    Typography,
     ArtifactTypeNode,
     GenericCytoscapeController,
     GenericGraphLink,

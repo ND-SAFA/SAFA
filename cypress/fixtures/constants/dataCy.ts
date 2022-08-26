@@ -6,18 +6,27 @@ export enum DataCy {
 
   appLoading = "app-loading",
 
+  // Navigation
+
   navProjectButton = "button-nav-project",
   navVersionButton = "button-nav-version",
   navLinksButton = "button-nav-links",
 
+  // Steppers
+
   stepperContinueButton = "button-stepper-continue",
   stepperBackButton = "button-stepper-back",
+
+  // Selector Tables
 
   selectorAddButton = "button-selector-add",
   selectorEditButton = "button-selector-edit",
   selectorDeleteButton = "button-selector-delete",
 
+  // Modals
+
   modalTitle = "modal-title",
+  modalClose = "button-close",
 
   // Authentication
 
@@ -65,7 +74,6 @@ export enum DataCy {
   selectionVersionList = "table-version",
   selectionSearch = "input-selector-search",
   selectionReload = "button-selector-reload",
-  selectionClose = "button-close",
 
   projectEditModal = "modal-project-edit",
   projectEditNameInput = "input-project-name-modal",
@@ -99,4 +107,9 @@ export enum DataCy {
   artifactSaveTypeInput = "input-artifact-type",
   artifactSaveBodyInput = "input-artifact-body",
   artifactSaveSubmitButton = "button-artifact-save",
+
+  // Artifact Tree
+
+  artifactTreeNode = "node-artifact-tree",
+  artifactTreeSelectedNode = "node-artifact-tree-selected",
 }

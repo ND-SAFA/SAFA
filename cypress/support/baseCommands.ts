@@ -19,8 +19,14 @@ Cypress.Commands.add("doesExist", (dataCy) => {
   });
 });
 
-Cypress.Commands.add("inputText", (dataCy, inputValue, elementPosition) => {
-  cy.getCy(dataCy, elementPosition).type(inputValue);
+Cypress.Commands.add("inputText", (dataCy, inputValue, clear) => {
+  if (clear) {
+    cy.getCy(dataCy).clear();
+  }
+
+  if (inputValue.length > 0) {
+    cy.getCy(dataCy).type(inputValue);
+  }
 });
 
 Cypress.Commands.add("clickButton", (dataCy, elementPosition = "first") => {
@@ -47,7 +53,7 @@ Cypress.Commands.add("switchTab", (tabLabel) => {
 });
 
 Cypress.Commands.add("closeModal", (dataCy) => {
-  cy.getCy(dataCy).within(() => cy.clickButton(DataCy.selectionClose));
+  cy.getCy(dataCy).within(() => cy.clickButton(DataCy.modalClose));
 });
 
 Cypress.Commands.add("withinTableRows", (dataCy, fn) => {

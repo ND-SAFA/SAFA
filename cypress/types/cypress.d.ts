@@ -35,12 +35,12 @@ declare namespace Cypress {
      *
      * @param dataCy - The testing selector of the input being set.
      * @param inputValue - The value to set.
-     * @param elementPosition - The specific element to grab, if there are multiple.
+     * @param clear - If true, the input will be cleared first.
      */
     inputText(
       dataCy: string,
       inputValue: string,
-      elementPosition?: ElementPosition
+      clear?: boolean
     ): Chainable<void>;
 
     /**

@@ -16,13 +16,9 @@ describe("Project Creation", () => {
     );
   });
 
-  afterEach(() => {
-    cy.logout();
-  });
-
   describe("Manual Project Creation", () => {
     describe("Project Artifact Uploading", () => {
-      it("cant continue without name", () => {
+      it("cannot create a project without a name", () => {
         cy.inputText(
           DataCy.creationStandardDescriptionInput,
           testProject.description
@@ -30,32 +26,29 @@ describe("Project Creation", () => {
 
         cy.getCy(DataCy.stepperContinueButton).should("be.disabled");
       });
-
-      it("can continue with a name set", () => {
-        cy.setProjectIdentifier("standard");
-
-        cy.getCy(DataCy.stepperContinueButton).should("not.be.disabled");
-      });
     });
 
     describe("I can Create sets of artifacts by type", () => {
       it("cannot create a new panel with an empty name", () => {
+        // Step - Inputs Project name and description
         cy.setProjectIdentifier("standard");
 
         cy.clickButton(DataCy.creationCreatePanelButton);
-        cy.wait(500);
         cy.getCy(DataCy.creationCreatePanelButton).should("be.disabled");
       });
-
-      it("Can create a new panel of artifacts", () => {
+      it("can create a new panel of artifacts", () => {
         cy.setProjectIdentifier("standard");
 
         // Step - Created Hazard artifact
         cy.createArtifactPanel("hazard", simpleProjectFilesMap.hazard);
+
+        cy.clickButton(DataCy.creationCreatePanelButton);
       });
     });
+
     describe("I can delete artifacts", () => {
       it("can delete artifacts", () => {
+        // Step - Inputs Project name and description
         cy.setProjectIdentifier("standard");
 
         // Step - Created Hazard artifact
@@ -66,6 +59,7 @@ describe("Project Creation", () => {
         cy.clickButton(DataCy.creationArtifactDeleteButton);
       });
       it("cannot continue after deleted", () => {
+        // Step - Inputs Project name and description
         cy.setProjectIdentifier("standard");
         // Step - Created Hazard artifact
         cy.createArtifactPanel("hazard", simpleProjectFilesMap.hazard);
@@ -81,6 +75,7 @@ describe("Project Creation", () => {
 
     describe("I can preview the list of artifacts loaded from a file", () => {
       it("displays buttons for all of the artifacts in the file", () => {
+        // Step - Inputs Project name and description
         cy.setProjectIdentifier("standard");
 
         // Step - Created Hazard artifact
@@ -93,6 +88,7 @@ describe("Project Creation", () => {
 
     describe("I can upload a file containing the artifacts I want to create", () => {
       it("can continue after uploading artifacts", () => {
+        // Step - Inputs Project name and description
         cy.setProjectIdentifier("standard");
 
         // Step - Created Hazard artifact
@@ -109,6 +105,7 @@ describe("Project Creation", () => {
 
         cy.getCy(DataCy.stepperContinueButton).should("be.disabled");
         cy.clickButton(DataCy.creationIgnoreErrorsButton, undefined);
+        cy.clickButton(DataCy.stepperContinueButton);
       });
     });
   });
@@ -116,6 +113,7 @@ describe("Project Creation", () => {
   describe("Project Trace Link Uploading", () => {
     describe("I can create sets of trace links between two artifact types", () => {
       it("can create a new panel of trace links", () => {
+        // Step - Inputs Project name and description
         cy.setProjectIdentifier("standard");
 
         // Step - creates requirement artifact
@@ -127,24 +125,15 @@ describe("Project Creation", () => {
         // Step - creates hazard artifact
         cy.createArtifactPanel("hazard", simpleProjectFilesMap.hazard);
 
-        // Step - Move to step 3 (creating trace panels)
-        cy.clickButton(DataCy.stepperContinueButton);
+        // Step - Creates Trace Matrix, just type the types of artifact
+        cy.createTraceMatrix("requirement", "hazard");
 
-        cy.clickButtonWithName("Create new trace matrix");
-        // Step - Select source artifact as "hazard"
-        cy.clickButtonWithName("Select Source");
-        cy.clickMenuOption("requirement");
-
-        // Step - Select target artifact as "hazard"
-        cy.clickButtonWithName("Select Target");
-        cy.clickMenuOption("hazard");
-
-        // Step - Create trace matrix panel
         cy.clickButtonWithName("Create trace matrix");
       });
     });
     describe("I can delete a set of trace links", () => {
       it("can delete a set of trace links", () => {
+        // Step - Inputs Project name and description
         cy.setProjectIdentifier("standard");
 
         // Step - creates requirement artifact
@@ -156,18 +145,8 @@ describe("Project Creation", () => {
         // Step - creates hazard artifact
         cy.createArtifactPanel("hazard", simpleProjectFilesMap.hazard);
 
-        // Step - Move to step 3 (creating trace panels)
-        cy.clickButton(DataCy.stepperContinueButton);
-
-        cy.clickButtonWithName("Create new trace matrix");
-
-        // Step - Select source artifact as "hazard"
-        cy.clickButtonWithName("Select Source");
-        cy.clickMenuOption("requirement");
-
-        // Step - Select target artifact as "hazard"
-        cy.clickButtonWithName("Select Target");
-        cy.clickMenuOption("hazard");
+        // Step - creates Trace Matrix, just type the types of artifact
+        cy.createTraceMatrix("requirement", "hazard");
 
         // Step - Create trace matrix panel
         cy.clickButtonWithName("Create trace matrix");
@@ -179,6 +158,7 @@ describe("Project Creation", () => {
 
     describe("I can preview the list of trace links loaded from a file", () => {
       it("displays buttons for all of the trace links in the file", () => {
+        // Step - Inputs Project name and description
         cy.setProjectIdentifier("standard");
 
         // Step - creates requirement artifact
@@ -190,30 +170,16 @@ describe("Project Creation", () => {
         // Step - creates hazard artifact
         cy.createArtifactPanel("hazard", simpleProjectFilesMap.hazard);
 
-        // Step - Move to step 3 (creating trace panels)
-        cy.clickButton(DataCy.stepperContinueButton);
+        // Step - creates Trace Matrix, just type the types of artifact
+        cy.createTraceMatrix("requirement", "hazard");
 
-        cy.clickButtonWithName("Create new trace matrix");
+        // Step - Uploads trace link files
+        cy.uploadingTraceLinks(simpleProjectFilesMap.requirement2hazard);
 
-        // Step - Select source artifact as "hazard"
-        cy.clickButtonWithName("Select Source");
-        cy.clickMenuOption("requirement");
+        cy.clickButtonWithName("Go back");
 
-        // Step - Select target artifact as "hazard"
-        cy.clickButtonWithName("Select Target");
-        cy.clickMenuOption("hazard");
-
-        // Step - Create trace matrix panel
-        cy.clickButtonWithName("Create trace matrix");
-
-        // Step - uploads trace link files (Requirement2Hazard)
-        cy.uploadFiles(
-          DataCy.creationStandardFilesInput,
-          simpleProjectFilesMap.requirement2hazard
-        );
         // Step - opening dropbox to check entities
         cy.clickButtonWithName("requirement-hazard");
-        cy.wait(500);
 
         // Step - making sure entities are viewable
         cy.clickButton(DataCy.creationEntitiesButton, "last");
@@ -222,8 +188,8 @@ describe("Project Creation", () => {
     // NEED THE BEFORE EACH TO STOP WORKING FOR THIS TEST DUE TO DIFFERENT ARTIFACTS USED ---------------------------------------------
     describe("I can upload a file containing the trace links I want to create", () => {
       it("can continue with no trace links", () => {
+        // Step - Inputs Project name and description
         cy.setProjectIdentifier("standard");
-        //cy.getCy(DataCy.stepperContinueButton).should("not.be.disabled");
 
         cy.createArtifactPanel("Empty Design", testFileMap.Emptydesign2design);
         cy.clickButton(DataCy.creationIgnoreErrorsButton, undefined);
@@ -233,37 +199,18 @@ describe("Project Creation", () => {
           simpleProjectFilesMap.design2design
         );
 
-        cy.getCy(DataCy.creationIgnoreErrorsButton).click(); // IGNORE BUTTONS ISNT WORKING
-
-        cy.wait(1000);
-        // Step - Move to step 3 (creating trace panels)
-        cy.clickButton(DataCy.stepperContinueButton);
-        // Step - wait 500ms (.5 sec) for app to parse file and gather errors
-        cy.wait(500);
+        cy.clickButton(DataCy.creationIgnoreErrorsButton, "last"); // IGNORE BUTTONS ISNT WORKING
 
         // Step - Move to step 3 (creating trace panels)
-        cy.clickButton(DataCy.stepperContinueButton);
 
-        // Step - Create new trace matrix
-        cy.clickButtonWithName("Create new trace matrix");
+        // Step - creates Trace Matrix, just type the types of artifact
+        cy.createTraceMatrix("design", "design");
 
-        // Step - Select source artifact as "hazard"
-        cy.clickButtonWithName("Select Source");
-        cy.clickMenuOption("design");
-
-        cy.clickButtonWithName("Select Target");
-        cy.clickMenuOption("design");
-
-        cy.clickButtonWithName("Create trace matrix");
-
-        cy.uploadFiles(
-          DataCy.creationStandardFilesInput,
-          testFileMap.Emptydesign2design
-        );
-
-        cy.clickButton(DataCy.stepperContinueButton);
+        // Step - Uploads trace link files
+        cy.uploadingTraceLinks(testFileMap.Emptydesign2design);
       });
       it("can continue after uploading trace links", () => {
+        // Step - Inputs Project name and description
         cy.setProjectIdentifier("standard");
 
         // Step - creates requirement artifact
@@ -275,78 +222,41 @@ describe("Project Creation", () => {
         // Step - creates hazard artifact
         cy.createArtifactPanel("hazard", simpleProjectFilesMap.hazard);
 
-        // Step - Move to step 3 (creating trace panels)
-        cy.clickButton(DataCy.stepperContinueButton);
+        // Step - creates Trace Matrix, just type the types of artifact
+        cy.createTraceMatrix("requirement", "hazard");
 
-        // Step - wait 500ms (.5 sec) for app to parse file and gather errors
-        cy.wait(500);
-
-        // Step - Create new trace matrix
-        cy.clickButtonWithName("Create new trace matrix");
-
-        // Step - Select source artifact as "hazard"
-        cy.clickButtonWithName("Select Source");
-        cy.clickMenuOption("requirement");
-
-        // Step - Select target artifact as "hazard"
-        cy.clickButtonWithName("Select Target");
-        cy.clickMenuOption("hazard");
-
-        // Step - Create trace matrix panel
-        cy.clickButtonWithName("Create trace matrix");
-
-        //uploads trace link files (requirement2Hazard)
-        cy.uploadFiles(
-          DataCy.creationStandardFilesInput,
-          simpleProjectFilesMap.requirement2hazard
-        );
-        //Step - finalizes trace links and is able to continue with project TIM
-        cy.clickButton(DataCy.stepperContinueButton);
+        // Step - Uploads trace link files
+        cy.uploadingTraceLinks(simpleProjectFilesMap.requirement2hazard);
       });
 
       it("can continue with a bad file if errors are ignored", () => {
+        // Step - Inputs Project name and description
         cy.setProjectIdentifier("standard");
 
         // Step - creates requirement artifact
-        cy.createArtifactPanel(
-          "requirement",
-          simpleProjectFilesMap.requirement
-        );
-
-        // Step - creates hazard artifact
         cy.createArtifactPanel("hazard", simpleProjectFilesMap.hazard);
 
-        // Step - Move to step 3 (creating trace panels)
-        cy.clickButton(DataCy.stepperContinueButton);
-
-        cy.clickButton(DataCy.creationIgnoreErrorsButton, "last");
-
-        cy.clickButton(DataCy.stepperContinueButton);
-
-        cy.clickButtonWithName("Create new trace matrix");
-
-        cy.clickButtonWithName("Select Source");
-        cy.clickMenuOption("hazard");
-
-        // Step - Select target artifact as "hazard"
-        cy.clickButtonWithName("Select Target");
-        cy.clickMenuOption("hazard2hazard");
-
-        // Step - Create trace matrix panel
-        cy.clickButtonWithName("Create trace matrix");
-
-        //uploads trace link files (Hazard2Hazrd)
-        cy.uploadFiles(
-          DataCy.creationStandardFilesInput,
+        // Step - creates hazard artifact - type artifact and file
+        cy.createArtifactPanel(
+          "hazard2hazard",
           simpleProjectFilesMap.hazard2hazard
         );
-        //Step - being able to continue after ignoring errors from hazard2hazard errors
+
         cy.clickButton(DataCy.creationIgnoreErrorsButton, "last");
-        cy.clickButton(DataCy.stepperContinueButton);
+
+        // Step - creates Trace Matrix, just type the types of artifact
+        cy.createTraceMatrix("hazard", "hazard");
+
+        // Step - Uploads trace link files
+        cy.uploadingTraceLinks(simpleProjectFilesMap.hazard2hazard);
+
+        //Step - being able to continue after ignoring errors from hazard2hazard errors
+        //cy.clickButton(DataCy.creationIgnoreErrorsButton, "last");
       });
     });
     describe("I can generate trace links between artifacts", () => {
       it("can continue with trace links set to be generated", () => {
+        // Step - Inputs Project name and description
         cy.setProjectIdentifier("standard");
 
         // Step - creates requirement artifact
@@ -358,33 +268,21 @@ describe("Project Creation", () => {
         // Step - creates hazard artifact
         cy.createArtifactPanel("hazard", simpleProjectFilesMap.hazard);
 
-        // Step - Move to step 3 (creating trace panels)
-        cy.clickButton(DataCy.stepperContinueButton);
-        // Step - wait 500ms (.5 sec) for app to parse file and gather errors
-        cy.wait(500);
-
-        // Step - Create new trace matrix
-        cy.clickButtonWithName("Create new trace matrix");
-
-        // Step - Select source artifact as "hazard"
-        cy.clickButtonWithName("Select Source");
-        cy.clickMenuOption("requirement");
-
-        // Step - Select target artifact as "hazard"
-        cy.clickButtonWithName("Select Target");
-        cy.clickMenuOption("hazard");
+        // Step - creates Trace Matrix, just type the types of artifact
+        cy.createTraceMatrix("requirement", "hazard");
 
         // Step - Create trace matrix panel
         cy.clickButtonWithName("Create trace matrix");
 
         // Step - Able to generate Trace Links and continue
         cy.clickButtonWithName("Generate Trace Links");
-        cy.clickButton(DataCy.stepperContinueButton);
       });
     });
   });
-  describe("Project Tim Preview", () => {
+
+  describe.only("Project Tim Preview", () => {
     it("displays artifact types on the graph", () => {
+      // Step - Inputs Project name and description
       cy.setProjectIdentifier("standard");
 
       // Step - creates requirement artifact
@@ -393,45 +291,19 @@ describe("Project Creation", () => {
       // Step - creates hazard artifact
       cy.createArtifactPanel("hazard", simpleProjectFilesMap.hazard);
 
-      // Step - Move to step 3 (creating trace panels)
-      cy.clickButton(DataCy.stepperContinueButton);
+      // Step - creates Trace Matrix, just type the types of artifact
+      cy.createTraceMatrix("requirement", "hazard");
 
-      // Step - wait 500ms (.5 sec) for app to parse file and gather errors
-      cy.wait(500);
+      // Step - Uploads trace link files
+      cy.uploadingTraceLinks(simpleProjectFilesMap.requirement2hazard);
 
-      // Step - Move to step 3 (creating trace panels)
-      cy.clickButton(DataCy.stepperContinueButton);
-
-      // Step - Create new trace matrix
-      cy.clickButtonWithName("Create new trace matrix");
-
-      // Step - Select source artifact as "hazard"
-      cy.clickButtonWithName("Select Source");
-      cy.clickMenuOption("requirement");
-
-      // Step - Select target artifact as "hazard"
-      cy.clickButtonWithName("Select Target");
-      cy.clickMenuOption("hazard");
-
-      // Step - Create trace matrix panel
-      cy.clickButtonWithName("Create trace matrix");
-
-      //uploads trace link files (requirement2Hazard)
-      cy.uploadFiles(
-        DataCy.creationStandardFilesInput,
-        simpleProjectFilesMap.requirement2hazard
-      );
-      //Step - finalizes trace links and is able to continue with project TIM
-      cy.clickButton(DataCy.stepperContinueButton);
-
-      cy.wait(3000);
-
+      // Step - Checks that correct artifacts are displayed in the Tim Tree
       cy.contains("Hazard");
       cy.contains("Requirement");
-
-      // NEED TO CREATE COMMAND TO CHECK BOTH REQUIREMENT AND HAZARD ARE INDEED ARTIFACTS ON THE TIM TREE ----------------------------------
     });
+
     it("displays trace links between artifact types on the graph", () => {
+      // Step - Inputs Project name and description
       cy.setProjectIdentifier("standard");
 
       // Step - creates requirement artifact
@@ -440,44 +312,17 @@ describe("Project Creation", () => {
       // Step - creates hazard artifact
       cy.createArtifactPanel("hazard", simpleProjectFilesMap.hazard);
 
-      // Step - Move to step 3 (creating trace panels)
-      cy.clickButton(DataCy.stepperContinueButton);
+      // Step - creates Trace Matrix, just type the types of artifact
+      cy.createTraceMatrix("requirement", "hazard");
 
-      // Step - wait 500ms (.5 sec) for app to parse file and gather errors
-      cy.wait(500);
+      // Step - Uploads trace link files
+      cy.uploadingTraceLinks(simpleProjectFilesMap.requirement2hazard);
 
-      // Step - Move to step 3 (creating trace panels)
-      cy.clickButton(DataCy.stepperContinueButton);
-
-      // Step - Create new trace matrix
-      cy.clickButtonWithName("Create new trace matrix");
-
-      // Step - Select source artifact as "hazard"
-      cy.clickButtonWithName("Select Source");
-      cy.clickMenuOption("requirement");
-
-      // Step - Select target artifact as "hazard"
-      cy.clickButtonWithName("Select Target");
-      cy.clickMenuOption("hazard");
-
-      // Step - Create trace matrix panel
-      cy.clickButtonWithName("Create trace matrix");
-
-      //uploads trace link files (requirement2Hazard)
-      cy.uploadFiles(
-        DataCy.creationStandardFilesInput,
-        simpleProjectFilesMap.requirement2hazard
-      );
-      //Step - finalizes trace links and is able to continue with project TIM
-      cy.clickButton(DataCy.stepperContinueButton);
-
-      // NEED TO MAKE COMMAND TO CHECK THE AMOUNT OF LINKS ---------------------------------------------------------------------------
-
-      cy.wait(1000);
-
+      // Step - Checks the displayed Trace Links between artifacts
       cy.contains("5");
     });
     it("displays all nodes on the graph within the current view", () => {
+      // Step - Inputs Project name and description
       cy.setProjectIdentifier("standard");
 
       // Step - creates requirement artifact
@@ -486,43 +331,18 @@ describe("Project Creation", () => {
       // Step - creates hazard artifact
       cy.createArtifactPanel("hazard", simpleProjectFilesMap.hazard);
 
-      // Step - Move to step 3 (creating trace panels)
-      cy.clickButton(DataCy.stepperContinueButton);
+      // Step - creates Trace Matrix, just type the types of artifact
+      cy.createTraceMatrix("requirement", "hazard");
 
-      // Step - wait 500ms (.5 sec) for app to parse file and gather errors
-      cy.wait(500);
+      // Step - Uploads trace link files
+      cy.uploadingTraceLinks(simpleProjectFilesMap.requirement2hazard);
 
-      // Step - Move to step 3 (creating trace panels)
-      cy.clickButton(DataCy.stepperContinueButton);
-
-      // Step - Create new trace matrix
-      cy.clickButtonWithName("Create new trace matrix");
-
-      // Step - Select source artifact as "hazard"
-      cy.clickButtonWithName("Select Source");
-      cy.clickMenuOption("requirement");
-
-      // Step - Select target artifact as "hazard"
-      cy.clickButtonWithName("Select Target");
-      cy.clickMenuOption("hazard");
-
-      // Step - Create trace matrix panel
-      cy.clickButtonWithName("Create trace matrix");
-
-      //uploads trace link files (requirement2Hazard)
-      cy.uploadFiles(
-        DataCy.creationStandardFilesInput,
-        simpleProjectFilesMap.requirement2hazard
-      );
-      //Step - finalizes trace links and is able to continue with project TIM
-      cy.clickButton(DataCy.stepperContinueButton);
-
-      // NEED TO MAKE COMMAND WHERE IT CHECKS ALL THE CURRENT NODES ON THE GRAPH -------------------------------------------------------
-
+      // Step - Checks that there are the correct number of nodes within each artifact
       cy.contains("5 Nodes");
       cy.contains("5 Nodes");
     });
     it("displays the correct count of artifacts and links", () => {
+      // Step - Inputs Project name and description
       cy.setProjectIdentifier("standard");
 
       // Step - creates requirement artifact
@@ -531,38 +351,13 @@ describe("Project Creation", () => {
       // Step - creates hazard artifact
       cy.createArtifactPanel("hazard", simpleProjectFilesMap.hazard);
 
-      // Step - Move to step 3 (creating trace panels)
-      cy.clickButton(DataCy.stepperContinueButton);
+      // Step - creates Trace Matrix, just type the types of artifact
+      cy.createTraceMatrix("requirement", "hazard");
 
-      // Step - wait 500ms (.5 sec) for app to parse file and gather errors
-      cy.wait(500);
+      // Step - Uploads trace link files
+      cy.uploadingTraceLinks(simpleProjectFilesMap.requirement2hazard);
 
-      // Step - Move to step 3 (creating trace panels)
-      cy.clickButton(DataCy.stepperContinueButton);
-
-      // Step - Create new trace matrix
-      cy.clickButtonWithName("Create new trace matrix");
-
-      // Step - Select source artifact as "hazard"
-      cy.clickButtonWithName("Select Source");
-      cy.clickMenuOption("requirement");
-
-      // Step - Select target artifact as "hazard"
-      cy.clickButtonWithName("Select Target");
-      cy.clickMenuOption("hazard");
-
-      // Step - Create trace matrix panel
-      cy.clickButtonWithName("Create trace matrix");
-
-      //uploads trace link files (requirement2Hazard)
-      cy.uploadFiles(
-        DataCy.creationStandardFilesInput,
-        simpleProjectFilesMap.requirement2hazard
-      );
-      //Step - finalizes trace links and is able to continue with project TIM
-      cy.clickButton(DataCy.stepperContinueButton);
-
-      // ADD COMMANDS FROM FIRST AND SECOND TESTS FROM THE PROJECT TIM PREVIEW ----------------------------------------------------
+      // Step - Checks for display of Artifacts, Nodes and Trace Links within the Tim Tree
       cy.contains("hazard");
       cy.contains("Requirement");
       cy.contains("5");
@@ -571,6 +366,7 @@ describe("Project Creation", () => {
   });
   describe("I can manuualy create a Project", () => {
     it("can create a project with valid data", () => {
+      // Step - Inputs Project name and description
       cy.setProjectIdentifier("standard");
 
       // Step - creates requirement artifact
@@ -579,48 +375,20 @@ describe("Project Creation", () => {
       // Step - creates hazard artifact
       cy.createArtifactPanel("hazard", simpleProjectFilesMap.hazard);
 
-      // Step - Move to step 3 (creating trace panels)
-      cy.clickButton(DataCy.stepperContinueButton);
+      // Step - creates Trace Matrix, Selects source + target w/ artifact of users choice
+      cy.createTraceMatrix("requirement", "hazard");
 
-      // Step - wait 500ms (.5 sec) for app to parse file and gather errors
-      cy.wait(500);
+      // Step - Uploads trace link files
+      cy.uploadingTraceLinks(simpleProjectFilesMap.requirement2hazard);
 
-      // Step - Move to step 3 (creating trace panels)
-      cy.clickButton(DataCy.stepperContinueButton);
-
-      // Step - Create new trace matrix
-      cy.clickButtonWithName("Create new trace matrix");
-
-      // Step - Select source artifact as "hazard"
-      cy.clickButtonWithName("Select Source");
-      cy.clickMenuOption("requirement");
-
-      // Step - Select target artifact as "hazard"
-      cy.clickButtonWithName("Select Target");
-      cy.clickMenuOption("hazard");
-
-      // Step - Create trace matrix panel
-      cy.clickButtonWithName("Create trace matrix");
-
-      //uploads trace link files (requirement2Hazard)
-      cy.uploadFiles(
-        DataCy.creationStandardFilesInput,
-        simpleProjectFilesMap.requirement2hazard
-      );
-      //Step - finalizes trace links and is able to continue with project TIM
-      cy.clickButton(DataCy.stepperContinueButton);
-
-      // STEP - checking artifacts
-      // STEP - checking tracelinks
-      // STEP - checking nodes
-      // STEP -
-      cy.clickButtonWithName("Create Project");
-
-      cy.wait(1000);
+      // Step - Checks for display of Artifacts, Nodes and Trace Links within the Tim Tree
       cy.contains("hazard");
       cy.contains("Requirement");
       cy.contains("5");
       cy.contains("5 nodes");
+
+      // Step - Finalizes project by creating it
+      cy.clickButtonWithName("Create Project");
     });
   });
 });

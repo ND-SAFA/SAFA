@@ -19,3 +19,20 @@ Cypress.Commands.add("createArtifactPanel", (name: string, file: string) => {
   cy.clickButton(DataCy.creationTypeButton);
   cy.uploadFiles(DataCy.creationStandardFilesInput, file);
 });
+
+Cypress.Commands.add("createTraceMatrix", (name: string, artifact: string) => {
+  cy.clickButton(DataCy.stepperContinueButton);
+  cy.clickButtonWithName("Create new trace matrix");
+  cy.clickButtonWithName("Select source");
+  cy.clickMenuOption(name);
+
+  cy.clickButtonWithName("Select target");
+  cy.clickMenuOption(artifact);
+});
+
+Cypress.Commands.add("uploadingTraceLinks", (file: string) => {
+  cy.clickButtonWithName("Create trace matrix");
+  cy.uploadFiles(DataCy.creationStandardFilesInput, file);
+  cy.clickButton(DataCy.creationIgnoreErrorsButton, "last");
+  cy.clickButton(DataCy.stepperContinueButton);
+});

@@ -117,5 +117,20 @@ declare namespace Cypress {
      * @param file - The file that belongs to the artifact
      */
     createArtifactPanel(name: string, string: string): Chainable<void>;
+
+    /**
+     * Creates trace matrix - selects source or target then selects artifact
+     *
+     * @param name - Name is the first type artifact you want to select in the source (ex. requirement)
+     * @param artifact - Artifact is the second type of artifact you want to cselect for target (ex. hazard)
+     */
+    createTraceMatrix(name: string, artifact: string): Chainable<void>;
+
+    /**
+     * Uploads files to make Trace links
+     *
+     * @param file - The file that belongs to the trace link (ex. hazard2hazard)
+     */
+    uploadingTraceLinks(file: string): Chainable<void>;
   }
 }

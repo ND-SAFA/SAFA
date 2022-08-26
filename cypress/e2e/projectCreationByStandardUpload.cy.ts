@@ -4,11 +4,10 @@ import {
   simpleProjectFilesMap,
   testFileMap,
   testProject,
-  // eslint-disable-next-line prettier/prettier
-  validUser
+  validUser,
 } from "../fixtures";
 
-describe.skip("Project Creation", () => {
+describe("Project Creation", () => {
   beforeEach(() => {
     cy.visit("http://localhost:8080/create").login(
       validUser.email,
@@ -18,7 +17,7 @@ describe.skip("Project Creation", () => {
 
   describe("Manual Project Creation", () => {
     describe("Project Artifact Uploading", () => {
-      it("cannot create a project without a name", () => {
+      it("Cannot create a project without a name", () => {
         // Step - inputting description
         cy.inputText(
           DataCy.creationStandardDescriptionInput,
@@ -31,7 +30,7 @@ describe.skip("Project Creation", () => {
     });
 
     describe("I can Create sets of artifacts by type", () => {
-      it("cannot create a new panel with an empty name", () => {
+      it("Cannot create a new panel with an empty name", () => {
         // Step - Inputs Project name and description
         cy.setProjectIdentifier("standard");
 
@@ -39,7 +38,8 @@ describe.skip("Project Creation", () => {
         cy.clickButton(DataCy.creationCreatePanelButton);
         cy.getCy(DataCy.creationCreatePanelButton).should("be.disabled");
       });
-      it("can create a new panel of artifacts", () => {
+
+      it("Can create a new panel of artifacts", () => {
         // Step - Inputs Project name and description
         cy.setProjectIdentifier("standard");
 
@@ -51,7 +51,7 @@ describe.skip("Project Creation", () => {
     });
 
     describe("I can delete artifacts", () => {
-      it("can delete artifacts", () => {
+      it("Can delete artifacts", () => {
         // Step - Inputs Project name and description
         cy.setProjectIdentifier("standard");
         // Step - Created Hazard artifact
@@ -61,7 +61,8 @@ describe.skip("Project Creation", () => {
         cy.clickButton(DataCy.creationArtifactButton);
         cy.clickButton(DataCy.creationArtifactDeleteButton);
       });
-      it("cannot continue after deleted valid artifacts", () => {
+
+      it("Cannot continue after deleted valid artifacts", () => {
         // Step - Inputs Project name and description
         cy.setProjectIdentifier("standard");
         // Step - Created Hazard artifact
@@ -76,7 +77,7 @@ describe.skip("Project Creation", () => {
     });
 
     describe("I can preview the list of artifacts loaded from a file", () => {
-      it("displays buttons for all of the artifacts in the file", () => {
+      it("Displays buttons for all of the artifacts in the file", () => {
         // Step - Inputs Project name and description
         cy.setProjectIdentifier("standard");
 
@@ -90,7 +91,7 @@ describe.skip("Project Creation", () => {
     });
 
     describe("I can upload a file containing the artifacts I want to create", () => {
-      it("can continue after uploading artifacts", () => {
+      it("Can continue after uploading artifacts", () => {
         // Step - Inputs Project name and description
         cy.setProjectIdentifier("standard");
         // Step - Created Hazard artifact
@@ -99,7 +100,8 @@ describe.skip("Project Creation", () => {
         // Step - Can continue after uploading artifact
         cy.clickButton(DataCy.stepperContinueButton);
       });
-      it("can continue with bad file if errors are ignored", () => {
+
+      it("Can continue with bad file if errors are ignored", () => {
         // Step - Inputs Project name and description
         cy.setProjectIdentifier("standard");
         // Step - Creating a bad artifact file
@@ -117,7 +119,7 @@ describe.skip("Project Creation", () => {
 
   describe("Project Trace Link Uploading", () => {
     describe("I can create sets of trace links between two artifact types", () => {
-      it("can create a new panel of trace links", () => {
+      it("Can create a new panel of trace links", () => {
         // Step - Inputs Project name and description
         cy.setProjectIdentifier("standard");
 
@@ -136,7 +138,8 @@ describe.skip("Project Creation", () => {
         // Step -Can create a new panel of trace links
         cy.clickButtonWithName("Create trace matrix");
       });
-      it("cannot create a new panel without selecting two artifact types", () => {
+
+      it("Cannot create a new panel without selecting two artifact types", () => {
         // Step - Inputs Project name and description
         cy.setProjectIdentifier("standard");
 
@@ -155,8 +158,9 @@ describe.skip("Project Creation", () => {
         cy.contains("Create new trace matrix").should("be.disabled");
       });
     });
+
     describe("I can delete a set of trace links", () => {
-      it("can delete a set of trace links", () => {
+      it("Can delete a set of trace links", () => {
         // Step - Inputs Project name and description
         cy.setProjectIdentifier("standard");
 
@@ -181,7 +185,7 @@ describe.skip("Project Creation", () => {
     });
 
     describe("I can preview the list of trace links loaded from a file", () => {
-      it("displays buttons for all of the trace links in the file", () => {
+      it("Displays buttons for all of the trace links in the file", () => {
         // Step - Inputs Project name and description
         cy.setProjectIdentifier("standard");
 
@@ -208,8 +212,9 @@ describe.skip("Project Creation", () => {
         cy.clickButton(DataCy.creationEntitiesButton, "last");
       });
     });
+
     describe("I can upload a file containing the trace links I want to create", () => {
-      it("can continue with no trace links", () => {
+      it("Can continue with no trace links", () => {
         // Step - Inputs Project name and description
         cy.setProjectIdentifier("standard");
 
@@ -229,7 +234,8 @@ describe.skip("Project Creation", () => {
         // Step - Uploads trace link files (Emptydesign2design)
         cy.uploadingTraceLinks(testFileMap.Emptydesign2design);
       });
-      it("can continue after uploading trace links", () => {
+
+      it("Can continue after uploading trace links", () => {
         // Step - Inputs Project name and description
         cy.setProjectIdentifier("standard");
 
@@ -249,7 +255,7 @@ describe.skip("Project Creation", () => {
         cy.uploadingTraceLinks(simpleProjectFilesMap.requirement2hazard);
       });
 
-      it("can continue with a bad file if errors are ignored", () => {
+      it("Can continue with a bad file if errors are ignored", () => {
         // Step - Inputs Project name and description
         cy.setProjectIdentifier("standard");
 
@@ -272,8 +278,9 @@ describe.skip("Project Creation", () => {
         cy.uploadingTraceLinks(simpleProjectFilesMap.hazard2hazard);
       });
     });
+
     describe("I can generate trace links between artifacts", () => {
-      it("can continue with trace links set to be generated", () => {
+      it("Can continue with trace links set to be generated", () => {
         // Step - Inputs Project name and description
         cy.setProjectIdentifier("standard");
 
@@ -299,7 +306,7 @@ describe.skip("Project Creation", () => {
   });
 
   describe("Project Tim Preview", () => {
-    it("displays artifact types on the graph", () => {
+    it("Displays artifact types on the graph", () => {
       // Step - Inputs Project name and description
       cy.setProjectIdentifier("standard");
 
@@ -319,7 +326,8 @@ describe.skip("Project Creation", () => {
       cy.contains("Hazard");
       cy.contains("Requirement");
     });
-    it.skip("displays trace links between artifact types on the graph", () => {
+
+    it.skip("Displays trace links between artifact types on the graph", () => {
       // Step - Inputs Project name and description
       cy.setProjectIdentifier("standard");
 
@@ -338,7 +346,8 @@ describe.skip("Project Creation", () => {
       // Step - Checks the displayed Trace Links between artifacts
       cy.contains("5");
     });
-    it.skip("displays all nodes on the graph within the current view", () => {
+
+    it.skip("Displays all nodes on the graph within the current view", () => {
       // Step - Inputs Project name and description
       cy.setProjectIdentifier("standard");
 
@@ -358,7 +367,8 @@ describe.skip("Project Creation", () => {
       cy.contains("5 Nodes");
       cy.contains("5 Nodes");
     });
-    it.skip("displays the correct count of artifacts and links", () => {
+
+    it.skip("Displays the correct count of artifacts and links", () => {
       // Step - Inputs Project name and description
       cy.setProjectIdentifier("standard");
 
@@ -381,8 +391,9 @@ describe.skip("Project Creation", () => {
       cy.contains("5 Nodes");
     });
   });
-  describe("I can manuualy create a Project", () => {
-    it.skip("can create a project with valid data", () => {
+
+  describe("I can manually create a Project", () => {
+    it.skip("Can create a project with valid data", () => {
       // Step - Inputs Project name and description
       cy.setProjectIdentifier("standard");
 

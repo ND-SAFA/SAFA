@@ -1,17 +1,19 @@
+import json
 from copy import deepcopy
 from typing import Dict
 
-from server.api import Api
+import numpy as np
 from django.http.request import HttpRequest
 from django.http.response import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 
+from server.api import Api
+from server.job_type import JobType
 from trace.config.constants import VALIDATION_PERCENTAGE_DEFAULT
 from trace.jobs.trace_args_builder import TraceArgsBuilder
-from server.job_type import JobType
-import json
-import numpy as np
 
 
+@csrf_exempt
 def predict(request: HttpRequest) -> JsonResponse:
     """
     For generating trace links from artifacts

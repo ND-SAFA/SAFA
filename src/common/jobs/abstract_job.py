@@ -1,14 +1,15 @@
+import json
 import os
-from abc import abstractmethod, ABC
+import uuid
+from abc import ABC, abstractmethod
+from threading import Thread
 from typing import Dict
+
+import numpy as np
 
 from common.jobs.abstract_args_builder import AbstractArgsBuilder
 from common.jobs.job_result_key import JobResultKey
 from common.jobs.job_status import Status
-from threading import Thread
-import uuid
-import json
-import numpy as np
 
 
 class AbstractJob(Thread, ABC):
@@ -43,6 +44,7 @@ class AbstractJob(Thread, ABC):
             self.result.update(output)
             self.status = Status.SUCCESS
         except Exception as e:
+            print(e)
             self.result[JobResultKey.EXCEPTION.value] = str(e)
             self.status = Status.FAILURE
 

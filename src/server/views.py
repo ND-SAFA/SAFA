@@ -2,7 +2,6 @@ import json
 from copy import deepcopy
 from typing import Dict
 
-import numpy as np
 from django.http.request import HttpRequest
 from django.http.response import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -11,8 +10,6 @@ from server.api import Api
 from server.job_type import JobType
 from trace.config.constants import VALIDATION_PERCENTAGE_DEFAULT
 from trace.jobs.trace_args_builder import TraceArgsBuilder
-from server.job_type import JobType
-import json
 
 
 @csrf_exempt
@@ -61,7 +58,8 @@ def _make_job_params_from_request(request_dict: Dict) -> TraceArgsBuilder:
     base_model = params.pop(Api.BASE_MODEL.value)
     output_path = params.pop(Api.OUTPUT_PATH.value)
     links = _safe_pop(params, Api.LINKS.value)  # optional
-    return TraceArgsBuilder(base_model, model_path, output_path, sources, targets, links, VALIDATION_PERCENTAGE_DEFAULT, **params)
+    return TraceArgsBuilder(base_model, model_path, output_path, sources, targets, links, VALIDATION_PERCENTAGE_DEFAULT,
+                            **params)
 
 
 def _safe_pop(dict_: Dict, key: any, default: any = None) -> any:

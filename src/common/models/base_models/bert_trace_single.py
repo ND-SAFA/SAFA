@@ -1,11 +1,6 @@
-from transformers.models.auto.modeling_auto import AutoModel
-from transformers.models.bert.modeling_bert import BertPreTrainedModel
-from transformers.models.electra.modeling_electra import (
-    ElectraClassificationHead,
-)
+from transformers import RobertaForSequenceClassification
 
 
-from common.models.base_models.single_model_forward_pass import single_model_forward_pass
 
 
 class BertTraceSingle(BertPreTrainedModel):

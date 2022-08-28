@@ -9,6 +9,7 @@ from transformers.trainer import Trainer
 from transformers.trainer_pt_utils import get_tpu_sampler, is_torch_tpu_available
 from transformers.trainer_utils import PredictionOutput
 
+from common.jobs.job_result_key import JobResultKey
 from trace.config.constants import LINKED_TARGETS_ONLY_DEFAULT
 from trace.jobs.trace_args import TraceArgs
 from trace.metrics.supported_trace_metric import get_metric_path
@@ -56,7 +57,7 @@ class TraceTrainer(Trainer):
         if self.args.metrics:
             self._eval(output, self.args.metrics)
         output_dict = TraceTrainer.output_to_dict(output)
-        output_dict[self.args.prediction_ids_key] = dataset.source_target_pairs
+        output_dict[JobResultKey.ARTIFACT_IDS.value] = dataset.source_target_pairs
         return output_dict
 
     @staticmethod

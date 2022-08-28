@@ -8,7 +8,6 @@ class Api(Enum):
     OUTPUT_PATH = "outputPath"
     BASE_MODEL = "baseModel"
     LINKS = "links"
-    PREDICTION_IDS = "ids"
-    SETTINGS = "settings"
-    PREDICTIONS = "predictions"
+    JOB_ID = "jobID"
+
 

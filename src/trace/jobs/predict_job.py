@@ -1,13 +1,14 @@
-from common.jobs.job_result import JobResult
+from typing import Dict
+
 from trace.jobs.abstract_trace_job import AbstractTraceJob
 
 
 class PredictJob(AbstractTraceJob):
 
-    def start(self) -> JobResult:
+    def _run(self) -> Dict:
         """
         Performs predictions and (optionally) evaluation of model
-        :return: result of prediction including predictions, metrics (if evaluating), etc.
+        :return: results of the prediction including prediction values and associated ids
         """
-        output = self.trainer.perform_prediction()
-        return JobResult(output)
+        result = self.trainer.perform_prediction()
+        return result

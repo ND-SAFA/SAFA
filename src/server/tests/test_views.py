@@ -3,7 +3,6 @@ from typing import Dict
 
 from django.test import TestCase
 from django.test import Client
-from django.http.response import JsonResponse
 from common.models.model_generator import ModelGenerator
 from server.api import Api
 from test.config.paths import TEST_OUTPUT_DIR
@@ -25,20 +24,6 @@ class TestViews(TestCase):
                    "max_seq_length": 100,
                    "pad_to_max_length": True,
                    "should_save": False}
-    TEST_METRIC_RESULTS = {'test_loss': 0.6929082870483398}
-    TEST_PREDICTIONS = np.array([[0.50035876, 0.49964124],
-                                 [0.50035876, 0.49964124],
-                                 [0.50035876, 0.49964124],
-                                 [0.50035876, 0.49964124],
-                                 [0.50035876, 0.49964124],
-                                 [0.50035876, 0.49964124],
-                                 [0.50035876, 0.49964124],
-                                 [0.50035876, 0.49964124],
-                                 [0.50035876, 0.49964124]])
-    TEST_LABEL_IDS = np.array([1, 0, 0, 1, 0, 0, 0, 1, 0])
-    TEST_PREDICTION_OUTPUT = {"predictions": TEST_PREDICTIONS,
-                              "label_ids": TEST_LABEL_IDS,
-                              "metrics": TEST_METRIC_RESULTS}
 
     @patch.object(ModelGenerator, '_ModelGenerator__load_model')
     @patch.object(ModelGenerator, 'get_tokenizer')
@@ -48,7 +33,7 @@ class TestViews(TestCase):
         load_model_mock.return_value = get_test_model()
         get_tokenizer_mock.return_value = get_test_tokenizer()
         response_dict = self.make_test_request('/fine-tune/', fine_tune_params)
-        self.assertIn('training_loss', response_dict)
+        self.assertIn(Api.JOB_ID.value, response_dict)
 
     @patch.object(ModelGenerator, '_ModelGenerator__load_model')
     @patch.object(ModelGenerator, 'get_tokenizer')
@@ -56,9 +41,7 @@ class TestViews(TestCase):
         load_model_mock.return_value = get_test_model()
         get_tokenizer_mock.return_value = get_test_tokenizer()
         response_dict = self.make_test_request('/predict/', self.TEST_PARAMS)
-        self.assertIn(Api.PREDICTIONS.value, response_dict)
-        self.assertIn(Api.PREDICTION_IDS.value, response_dict)
-        self.assertEqual(len(response_dict[Api.PREDICTIONS.value]), len(response_dict[Api.PREDICTION_IDS.value]))
+        self.assertIn(Api.JOB_ID.value, response_dict)
 
     def make_test_request(self, url: str, params: dict) -> Dict:
         c = Client()

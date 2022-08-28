@@ -1,13 +1,12 @@
-from common.jobs.job_result import JobResult
 from trace.jobs.abstract_trace_job import AbstractTraceJob
 
 
 class TrainJob(AbstractTraceJob):
 
-    def start(self) -> JobResult:
+    def _run(self):
         """
         Runs the training and obtains results
-        :return: the results of the training
+        :return: results of the training including as loss and time
         """
-        output = self.trainer.perform_training()
-        return JobResult(output)
+        result = self.trainer.perform_training()
+        return result

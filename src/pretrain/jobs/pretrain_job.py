@@ -1,13 +1,14 @@
-from common.jobs.job_result import JobResult
+from typing import Dict
+
 from pretrain.jobs.abstract_pretrain_job import AbstractPreTrainJob
 
 
 class PretrainJob(AbstractPreTrainJob):
 
-    def start(self) -> JobResult:
+    def _run(self) -> Dict:
         """
         Runs the pretraining
         :return: the results of the pretraining
         """
         self.pretrainer.train()
-        return JobResult()
+        return None  # TODO

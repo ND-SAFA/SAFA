@@ -9,7 +9,6 @@ from trace.config.constants import VALIDATION_PERCENTAGE_DEFAULT
 from trace.jobs.trace_args_builder import TraceArgsBuilder
 from server.job_type import JobType
 import json
-import numpy as np
 
 
 def predict(request: HttpRequest) -> JsonResponse:
@@ -35,13 +34,13 @@ def _run_job(request: HttpRequest, job_type: JobType) -> JsonResponse:
     Runs the specified job using params from a given request
     :param request: request from client
     :param job_type: job type to run
-    :return: the output of the job as json
+    :return: the job name
     """
     request_dict = _request_to_dict(request)
     args = _make_job_params_from_request(request_dict)
     job = job_type.value(args)
-    job_results = job.start()
-    return _output_as_json(job_results.output)
+    job.start()
+    return JsonResponse({Api.JOB_ID.value: job.id})
 
 
 def _make_job_params_from_request(request_dict: Dict) -> TraceArgsBuilder:
@@ -57,8 +56,7 @@ def _make_job_params_from_request(request_dict: Dict) -> TraceArgsBuilder:
     base_model = params.pop(Api.BASE_MODEL.value)
     output_path = params.pop(Api.OUTPUT_PATH.value)
     links = _safe_pop(params, Api.LINKS.value)  # optional
-    return TraceArgsBuilder(base_model, model_path, output_path, sources, targets, links, VALIDATION_PERCENTAGE_DEFAULT,
-                            prediction_ids_key=Api.PREDICTION_IDS, **params)
+    return TraceArgsBuilder(base_model, model_path, output_path, sources, targets, links, VALIDATION_PERCENTAGE_DEFAULT, **params)
 
 
 def _safe_pop(dict_: Dict, key: any, default: any = None) -> any:
@@ -70,18 +68,6 @@ def _safe_pop(dict_: Dict, key: any, default: any = None) -> any:
     :return: dictionary element that was popped or default
     """
     return dict_.pop(key) if key in dict_ else default
-
-
-def _output_as_json(output_dict: Dict) -> JsonResponse:
-    """
-    Converts a dictionary to a JsonResponse
-    :param output_dict: output dictionary
-    :return: a JsonResponse containing output information
-    """
-    for key, value in output_dict.items():
-        if isinstance(value, np.ndarray):
-            output_dict[key] = value.tolist()
-    return JsonResponse(output_dict, safe=False)
 
 
 def _request_to_dict(request: HttpRequest) -> Dict:

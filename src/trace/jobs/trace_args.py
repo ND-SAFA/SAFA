@@ -14,7 +14,6 @@ class TraceArgs(TrainingArguments):
     max_seq_length: int = MAX_SEQ_LENGTH_DEFAULT
     eval_dataset_size: int = EVAL_DATASET_SIZE_DEFAULT
     metrics: List[str] = None
-    prediction_ids_key: str = 'ids'
 
     def __init__(self, model_generator: ModelGenerator,
                  trace_dataset_creator: TraceDatasetCreator,

@@ -5,19 +5,20 @@ from django.test import TestCase
 from unittest.mock import patch
 import mock
 
+from common.jobs.job_result_key import JobResultKey
 from common.models.model_generator import ModelGenerator
 from test.config.paths import TEST_OUTPUT_DIR
 from test.test_data import TEST_S_ARTS, TEST_T_ARTS, TEST_POS_LINKS
 from test.test_model import get_test_model
+from test.test_prediction_output import TEST_PREDICTION_OUTPUT
 from test.test_tokenizer import get_test_tokenizer
 from trace.data.trace_dataset_creator import TraceDatasetCreator
 from trace.jobs.trace_args import TraceArgs
 from trace.train.trace_trainer import TraceTrainer
-import numpy as np
+
 
 from torch.utils.data.distributed import DistributedSampler
 from torch.utils.data.sampler import RandomSampler
-from transformers.trainer_utils import PredictionOutput
 
 
 class TestTraceTrainer(TestCase):
@@ -25,20 +26,6 @@ class TestTraceTrainer(TestCase):
     EXPECTED_VALIDATION_SIZE = 3
     EXPECTED_PREDICTION_SIZE = len(TEST_T_ARTS) * len(TEST_S_ARTS)
     TEST_METRIC_NAMES = ["accuracy", "map_at_k"]
-    TEST_METRIC_RESULTS = {'test_loss': 0.6929082870483398}
-    TEST_PREDICTIONS = np.array([[0.50035876, 0.49964124],
-                                 [0.50035876, 0.49964124],
-                                 [0.50035876, 0.49964124],
-                                 [0.50035876, 0.49964124],
-                                 [0.50035876, 0.49964124],
-                                 [0.50035876, 0.49964124],
-                                 [0.50035876, 0.49964124],
-                                 [0.50035876, 0.49964124],
-                                 [0.50035876, 0.49964124]])
-    TEST_LABEL_IDS = np.array([1, 0, 0, 1, 0, 0, 0, 1, 0])
-    TEST_PREDICTION_OUTPUT = PredictionOutput(predictions=TEST_PREDICTIONS,
-                                              label_ids=TEST_LABEL_IDS,
-                                              metrics=TEST_METRIC_RESULTS)
 
     @patch.object(TraceTrainer, "save_model")
     def test_perform_training(self, save_model_mock: mock.MagicMock):
@@ -53,7 +40,7 @@ class TestTraceTrainer(TestCase):
         test_trace_trainer = self.get_test_trace_trainer()
         output = test_trace_trainer.perform_prediction()
         self.assertEquals(len(output["predictions"]), self.EXPECTED_PREDICTION_SIZE)
-        self.assertEquals(len(output[test_trace_trainer.args.prediction_ids_key]), len(output["predictions"]))
+        self.assertEquals(len(output[JobResultKey.ARTIFACT_IDS.value]), len(output["predictions"]))
         self.assertFalse(eval_mock.called)
 
     def test_perform_prediction_with_metrics(self):
@@ -63,14 +50,14 @@ class TestTraceTrainer(TestCase):
             self.assertIn(metric, output["metrics"])
 
     def test_output_to_dict(self):
-        output_dict = TraceTrainer.output_to_dict(self.TEST_PREDICTION_OUTPUT)
+        output_dict = TraceTrainer.output_to_dict(TEST_PREDICTION_OUTPUT)
         self.assertIsInstance(output_dict, dict)
         self.assertIn("predictions", output_dict)
         self.assertIn("label_ids", output_dict)
         self.assertIn("metrics", output_dict)
 
     def test_eval(self):
-        output = deepcopy(self.TEST_PREDICTION_OUTPUT)
+        output = deepcopy(TEST_PREDICTION_OUTPUT)
         TraceTrainer._eval(output, self.TEST_METRIC_NAMES)
         for metric in self.TEST_METRIC_NAMES:
             self.assertIn(metric, output.metrics)

@@ -42,7 +42,6 @@ class TestViews(TestCase):
         get_tokenizer_mock.return_value = get_test_tokenizer()
         response_dict = self.make_test_request('/predict/', self.TEST_PARAMS)
         self.assertIn(Api.JOB_ID.value, response_dict)
-        print("JOB_ID", response_dict[Api.JOB_ID.value])
 
     def make_test_request(self, url: str, params: dict) -> Dict:
         c = Client()

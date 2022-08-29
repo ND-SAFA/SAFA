@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import edu.nd.crc.safa.common.SafaRequestBuilder;
 import edu.nd.crc.safa.features.jira.entities.app.JiraIssuesResponseDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraProjectResponseDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraRefreshTokenDTO;
@@ -41,6 +42,7 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
 
     private final Logger log = LoggerFactory.getLogger(JiraConnectionServiceImpl.class);
     private final JiraProjectRepository jiraProjectRepository;
+    private final SafaRequestBuilder safaRequestBuilder;
     private final WebClient webClient;
 
     private String buildBaseURI(String cloudId) {
@@ -62,7 +64,7 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
     @Override
     public JiraProjectResponseDTO retrieveJIRAProject(JiraAccessCredentials credentials, Long jiraProjectId) {
         String uri = this.buildApiRequestURI(credentials.getCloudId(), ApiRoute.PROJECT);
-
+        //TODO : Use SafaRequestBuilder to generate all our webclient requests
         return this.blockOptional(
             this.webClient
                 .method(ApiRoute.PROJECT.getMethod())

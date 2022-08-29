@@ -7,7 +7,7 @@ import java.io.File;
 import java.io.IOException;
 
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.utilities.OSHelper;
+import edu.nd.crc.safa.utilities.FileUtilities;
 
 import org.junit.jupiter.api.Test;
 
@@ -21,10 +21,10 @@ class TestOSHelperTest {
         String pathToDummyFolder = ProjectPaths.BUILD + "/dummy_folder";
         File folder = new File(pathToDummyFolder);
         assertFalse(folder.exists());
-        OSHelper.clearOrCreateDirectory(pathToDummyFolder);
+        FileUtilities.clearOrCreateDirectory(pathToDummyFolder);
         assertTrue(folder.exists());
 
-        OSHelper.deletePath(pathToDummyFolder);
+        FileUtilities.deletePath(pathToDummyFolder);
         assertFalse(folder.exists());
     }
 
@@ -41,12 +41,12 @@ class TestOSHelperTest {
         assertFalse(childFolder.exists());
 
         //VP 2: Verify able to create subdirectories
-        OSHelper.clearOrCreateDirectory(pathToChild);
+        FileUtilities.clearOrCreateDirectory(pathToChild);
         assertTrue(parentFolder.exists());
         assertTrue(childFolder.exists());
 
         //VP 3: Verify able to delete subdirectories
-        OSHelper.deletePath(pathToParent);
+        FileUtilities.deletePath(pathToParent);
         assertFalse(parentFolder.exists());
         assertFalse(childFolder.exists());
     }

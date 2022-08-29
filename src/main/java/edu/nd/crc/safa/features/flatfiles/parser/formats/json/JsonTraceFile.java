@@ -42,7 +42,7 @@ public class JsonTraceFile extends AbstractTraceFile<JSONObject> {
 
     @Override
     public List<JSONObject> readFileRecords(String pathToFile) throws IOException {
-        JSONObject fileContent = FileUtilities.readJSONFile(pathToFile);
+        JSONObject fileContent = JsonFileUtilities.readJSONFile(pathToFile);
         return JsonFileUtilities.getArrayAsRecords(fileContent, Constants.JSON_TRACE_KEY);
     }
 

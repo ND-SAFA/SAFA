@@ -25,7 +25,7 @@ public class JobSteps {
             case FLAT_FILE_PROJECT_CREATION:
                 return AbstractJob.getJobSteps(FlatFileProjectCreationJob.class);
             case JIRA_PROJECT_CREATION:
-                return AbstractJob.getJobSteps(JiraProjectCreationJob.class);
+                return AbstractJob.getJobSteps(CreateProjectViaJiraJob.class);
             case JIRA_PROJECT_UPDATE:
                 return AbstractJob.getJobSteps(JiraProjectUpdateJob.class);
             case PROJECT_CREATION:

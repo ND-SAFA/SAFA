@@ -24,7 +24,7 @@ import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
-import edu.nd.crc.safa.utilities.FileUtilities;
+import edu.nd.crc.safa.utilities.JsonFileUtilities;
 
 import org.json.JSONObject;
 import org.springframework.web.multipart.MultipartFile;
@@ -80,7 +80,7 @@ public class FlatFileProjectCreationJob extends CommitJob {
             throw new SafaError("TIM.json file was not uploaded for this project");
         }
 
-        JSONObject timFileJson = FileUtilities.readJSONFile(this.pathToTIMFile);
+        JSONObject timFileJson = JsonFileUtilities.readJSONFile(this.pathToTIMFile);
         TimFileParser timFileParser = new TimFileParser(timFileJson, this.pathToFiles);
         this.flatFileParser = new FlatFileParser(timFileParser);
     }

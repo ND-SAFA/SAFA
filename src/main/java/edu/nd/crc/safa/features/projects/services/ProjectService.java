@@ -15,7 +15,7 @@ import edu.nd.crc.safa.features.projects.repositories.ProjectRepository;
 import edu.nd.crc.safa.features.users.entities.db.ProjectRole;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
-import edu.nd.crc.safa.utilities.OSHelper;
+import edu.nd.crc.safa.utilities.FileUtilities;
 
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Scope;
@@ -41,7 +41,7 @@ public class ProjectService {
      */
     public void deleteProject(Project project) throws SafaError, IOException {
         this.projectRepository.delete(project);
-        OSHelper.deletePath(ProjectPaths.Storage.projectPath(project, false));
+        FileUtilities.deletePath(ProjectPaths.Storage.projectPath(project, false));
     }
 
     /**

@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.features.common;
 
 import edu.nd.crc.safa.authentication.TokenService;
+import edu.nd.crc.safa.common.SafaRequestBuilder;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
@@ -132,6 +133,8 @@ public class ServiceProvider {
     private final AccountLookupService accountLookupService;
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
+    // HTTP
+    private final SafaRequestBuilder safaRequestBuilder;
     // Jobs
-    JobLauncher jobLauncher;
+    JobLauncher jobLauncher; // not private because settings change on runtime
 }

@@ -70,7 +70,7 @@ public class TimFileParser implements IProjectDefinitionParser {
                 ? DocumentType.valueOf(artifactDefinition.getString(Constants.TYPE_PARAM)) : DocumentType.ARTIFACT_TREE;
 
             // Step - Create artifact file parser
-            String pathToFile = FileUtilities.builtPath(this.pathToFiles, fileName);
+            String pathToFile = FileUtilities.buildPath(this.pathToFiles, fileName);
             AbstractArtifactFile<?> artifactFile = DataFileBuilder.createArtifactFileParser(artifactType,
                 documentType,
                 pathToFile);
@@ -117,7 +117,7 @@ public class TimFileParser implements IProjectDefinitionParser {
             // Step - If file is defined, create trace file parser
             if (traceFileDefinition.has(Constants.FILE_PARAM)) {
                 String fileName = traceFileDefinition.getString(Constants.FILE_PARAM);
-                String pathToFile = FileUtilities.builtPath(this.pathToFiles, fileName);
+                String pathToFile = FileUtilities.buildPath(this.pathToFiles, fileName);
                 AbstractTraceFile<?> traceFile = DataFileBuilder.createTraceFileParser(pathToFile);
                 traceFiles.add(traceFile);
             }

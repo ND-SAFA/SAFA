@@ -126,7 +126,7 @@ public class FlatFileService {
                 projectChanger.commit(projectCommit);
             }
             this.commitErrorRepository.saveAll(projectCommit.getErrors());
-        } catch (IOException | JSONException e) {
+        } catch (IOException | JSONException | InterruptedException e) {
             throw new SafaError("An error occurred while parsing TIM file.", e);
         }
     }
@@ -227,6 +227,6 @@ public class FlatFileService {
         if (!Files.exists(Paths.get(pathToTimFile))) {
             throw new SafaError("TIM.json file was not uploaded for this project");
         }
-        return FileUtilities.readJSONFile(pathToTimFile);
+        return JsonFileUtilities.readJSONFile(pathToTimFile);
     }
 }

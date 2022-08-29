@@ -2,7 +2,7 @@ package edu.nd.crc.safa.features.jobs.entities.builders;
 
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.jira.entities.api.JiraIdentifier;
-import edu.nd.crc.safa.features.jobs.entities.app.JiraProjectCreationJob;
+import edu.nd.crc.safa.features.jobs.entities.app.CreateProjectViaJiraJob;
 import edu.nd.crc.safa.features.jobs.entities.app.JobType;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
@@ -33,17 +33,17 @@ public class CreateProjectViaJiraBuilder extends AbstractJobBuilder<JiraIdentifi
 
     @Override
     JobDefinition constructJobForWork() {
-        String jobName = JiraProjectCreationJob.createJobName(this.jiraIdentifier);
+        String jobName = CreateProjectViaJiraJob.createJobName(this.jiraIdentifier);
         JobDbEntity jobDbEntity = this.serviceProvider
             .getJobService()
             .createNewJob(JobType.JIRA_PROJECT_CREATION, jobName);
 
         // Step - Create jira project creation job
-        JiraProjectCreationJob jiraProjectCreationjob = new JiraProjectCreationJob(
+        CreateProjectViaJiraJob createProjectCreationjob = new CreateProjectViaJiraJob(
             jobDbEntity,
             serviceProvider,
             this.identifier
         );
-        return new JobDefinition(jobDbEntity, jiraProjectCreationjob);
+        return new JobDefinition(jobDbEntity, createProjectCreationjob);
     }
 }

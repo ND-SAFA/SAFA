@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import requests.MultipartRequestService;
-
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.features.flatfiles.parser.FlatFileParser;
@@ -16,12 +14,13 @@ import edu.nd.crc.safa.features.flatfiles.parser.TimFileParser;
 import edu.nd.crc.safa.features.flatfiles.parser.formats.csv.CsvTraceFile;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
-import edu.nd.crc.safa.utilities.FileUtilities;
+import edu.nd.crc.safa.utilities.JsonFileUtilities;
 
 import features.base.ApplicationBaseTest;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.multipart.MultipartFile;
+import requests.MultipartRequestService;
 
 class TestTimParser extends ApplicationBaseTest {
     String projectName = "default-project";
@@ -37,7 +36,7 @@ class TestTimParser extends ApplicationBaseTest {
 
         // Step - Start processing for
         String pathToTimFile = ProjectPaths.Storage.uploadedProjectFilePath(project, ProjectVariables.TIM_FILENAME);
-        JSONObject timJson = FileUtilities.readJSONFile(pathToTimFile);
+        JSONObject timJson = JsonFileUtilities.readJSONFile(pathToTimFile);
         TimFileParser timFileParser = new TimFileParser(timJson, ProjectPaths.Storage.projectUploadsPath(project,
             false));
         FlatFileParser flatFileParser = new FlatFileParser(timFileParser);

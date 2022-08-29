@@ -9,7 +9,7 @@ import java.nio.file.Paths;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
-import edu.nd.crc.safa.utilities.OSHelper;
+import edu.nd.crc.safa.utilities.FileUtilities;
 
 import features.base.ApplicationBaseTest;
 import org.junit.jupiter.api.Test;
@@ -26,10 +26,10 @@ class TestUploadFiles extends ApplicationBaseTest {
         String pathToTestProject = ProjectPaths.Storage.projectUploadsPath(project, false);
 
         assertThat(Files.exists(Paths.get(pathToTestProject))).as("dir not created").isFalse();
-        OSHelper.clearOrCreateDirectory(pathToTestProject);
+        FileUtilities.clearOrCreateDirectory(pathToTestProject);
         assertThat(Files.exists(Paths.get(pathToTestProject))).as("dir is created").isTrue();
 
-        OSHelper.deletePath(pathToTestProject);
+        FileUtilities.deletePath(pathToTestProject);
         assertThat(Files.exists(Paths.get(pathToTestProject))).as("dir is cleaned up").isFalse();
     }
 }

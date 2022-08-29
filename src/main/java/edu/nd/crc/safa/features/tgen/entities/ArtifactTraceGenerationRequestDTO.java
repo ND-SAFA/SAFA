@@ -12,8 +12,13 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
-public class TraceLinkGenerationRequest {
-
+public class ArtifactTraceGenerationRequestDTO {
+    /**
+     * List of source artifacts.
+     */
     List<ArtifactAppEntity> sourceArtifacts;
+    /**
+     * List of target artifacts
+     */
     List<ArtifactAppEntity> targetArtifacts;
 }

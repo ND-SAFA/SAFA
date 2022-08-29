@@ -20,24 +20,12 @@ describe("Artifact View", () => {
     cy.visit("/project").login(validUser.email, validUser.password);
 
     cy.location("pathname", { timeout: 5000 }).should("equal", "/project");
+
+    cy.get(".artifact-svg-wrapper").should("be.visible");
   });
 
   describe("Artifact CRUD", () => {
     describe("I can create a new artifact", () => {
-      it("Creates a simple new artifact", () => {
-        const name = `New ${Math.random()}`;
-
-        cy.createNewArtifact(name);
-
-        cy.getCy(DataCy.artifactSaveModal).within(() => {
-          cy.clickButton(DataCy.artifactSaveSubmitButton);
-        });
-
-        cy.getCy(DataCy.snackbarSuccess).should("be.visible");
-        cy.getCy(DataCy.artifactTreeSelectedNode).should("be.visible");
-        cy.getCy(DataCy.artifactTreeSelectedName).should("contain", name);
-      });
-
       it("Cannot create an artifact without a name, type, or body", () => {
         cy.createNewArtifact("");
 
@@ -63,11 +51,76 @@ describe("Artifact View", () => {
         });
       });
 
-      // it("Creates a new artifact from the right click menu", () => {});
+      it("Cannot create a new artifact with the same name", () => {
+        const name = `New ${Math.random()}`;
 
-      // it("Cannot create a new artifact with the same name", () => {})
+        cy.createNewArtifact(name);
 
-      // it("Creates an artifact with a new type", () => {})
+        cy.getCy(DataCy.artifactSaveModal).within(() => {
+          cy.clickButton(DataCy.artifactSaveSubmitButton);
+        });
+
+        cy.createNewArtifact(name);
+
+        cy.getCy(DataCy.artifactSaveModal).within(() => {
+          cy.contains("Name is already used");
+          cy.getCy(DataCy.artifactSaveSubmitButton).should("be.disabled");
+        });
+      });
+
+      it("Creates a simple new artifact", () => {
+        const name = `New ${Math.random()}`;
+
+        cy.createNewArtifact(name);
+
+        cy.getCy(DataCy.artifactSaveModal).within(() => {
+          cy.clickButton(DataCy.artifactSaveSubmitButton);
+        });
+
+        cy.getCy(DataCy.snackbarSuccess).should("be.visible");
+        cy.getCy(DataCy.artifactTreeSelectedNode).should("be.visible");
+        cy.getCy(DataCy.artifactTreeSelectedName).should("contain", name);
+      });
+
+      it("Creates a new artifact from the right click menu", () => {
+        const name = `New ${Math.random()}`;
+
+        // Opens the right click window.
+        cy.get("canvas")
+          .first()
+          .then(($el) =>
+            cy.wrap($el).rightclick($el.width() / 4, $el.height() / 4)
+          );
+
+        // Click the add artifact button.
+        cy.get("#add-artifact")
+          .should("be.visible")
+          .then(($el) => $el.click());
+
+        cy.fillArtifactModal(name);
+
+        cy.getCy(DataCy.artifactSaveModal).within(() => {
+          cy.clickButton(DataCy.artifactSaveSubmitButton);
+        });
+
+        cy.getCy(DataCy.snackbarSuccess).should("be.visible");
+        cy.getCy(DataCy.artifactTreeSelectedNode).should("be.visible");
+        cy.getCy(DataCy.artifactTreeSelectedName).should("contain", name);
+      });
+
+      it.only("Creates an artifact with a new type", () => {
+        const name = `New ${Math.random()}`;
+
+        cy.createNewArtifact(name, "New Type{enter}");
+
+        cy.getCy(DataCy.artifactSaveModal).within(() => {
+          cy.clickButton(DataCy.artifactSaveSubmitButton);
+        });
+
+        cy.getCy(DataCy.snackbarSuccess).should("be.visible");
+        cy.getCy(DataCy.artifactTreeSelectedNode).should("be.visible");
+        cy.getCy(DataCy.artifactTreeSelectedName).should("contain", name);
+      });
     });
   });
 });

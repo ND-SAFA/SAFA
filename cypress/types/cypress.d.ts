@@ -218,6 +218,19 @@ declare namespace Cypress {
     // Artifact View
 
     /**
+     * Fills inputs in the artifact modal.
+     *
+     * @param name - A specific name to set.
+     * @param type - A specific type to set.
+     * @param body - A specific body to set.
+     */
+    fillArtifactModal(
+      name?: string,
+      type?: string,
+      body?: string
+    ): Chainable<void>;
+
+    /**
      * Creates a new artifact from the artifact fab button.
      * Does not click the save button on the artifact, leaving the modal open.
      *

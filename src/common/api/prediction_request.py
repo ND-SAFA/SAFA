@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class Api(Enum):
+class PredictionRequest(Enum):
     MODEL_PATH = "modelPath"
     SOURCES = "sources"
     TARGETS = "targets"
@@ -9,5 +9,3 @@ class Api(Enum):
     BASE_MODEL = "baseModel"
     LINKS = "links"
     JOB_ID = "jobID"
-
-

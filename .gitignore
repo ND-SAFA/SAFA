@@ -10,3 +10,7 @@
 
 # Transformers
 src/test/output/runs/**
+
+# Secrets
+application-credentials.json
+.env

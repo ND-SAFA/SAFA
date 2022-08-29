@@ -1,24 +1,21 @@
-from copy import copy, deepcopy
-
-from django.test import TestCase
-
+from copy import deepcopy
 from unittest.mock import patch
-import mock
 
-from common.jobs.job_result_key import JobResultKey
+import mock
+from django.test import TestCase
+from torch.utils.data.distributed import DistributedSampler
+from torch.utils.data.sampler import RandomSampler
+
+from common.api.prediction_response import PredictionResponse
 from common.models.model_generator import ModelGenerator
 from test.config.paths import TEST_OUTPUT_DIR
-from test.test_data import TEST_S_ARTS, TEST_T_ARTS, TEST_POS_LINKS
+from test.test_data import TEST_POS_LINKS, TEST_S_ARTS, TEST_T_ARTS
 from test.test_model import get_test_model
 from test.test_prediction_output import TEST_PREDICTION_OUTPUT
 from test.test_tokenizer import get_test_tokenizer
 from trace.data.trace_dataset_creator import TraceDatasetCreator
 from trace.jobs.trace_args import TraceArgs
 from trace.train.trace_trainer import TraceTrainer
-
-
-from torch.utils.data.distributed import DistributedSampler
-from torch.utils.data.sampler import RandomSampler
 
 
 class TestTraceTrainer(TestCase):
@@ -39,8 +36,8 @@ class TestTraceTrainer(TestCase):
     def test_perform_prediction(self, eval_mock: mock.MagicMock):
         test_trace_trainer = self.get_test_trace_trainer()
         output = test_trace_trainer.perform_prediction()
-        self.assertEquals(len(output["predictions"]), self.EXPECTED_PREDICTION_SIZE)
-        self.assertEquals(len(output[JobResultKey.ARTIFACT_IDS.value]), len(output["predictions"]))
+        self.assertEquals(len(output[PredictionResponse.PREDICTIONS]), self.EXPECTED_PREDICTION_SIZE)
+        self.assertEquals(len(output[PredictionResponse.ARTIFACT_IDS]), len(output[PredictionResponse.PREDICTIONS]))
         self.assertFalse(eval_mock.called)
 
     def test_perform_prediction_with_metrics(self):
@@ -64,7 +61,8 @@ class TestTraceTrainer(TestCase):
 
     @patch("torch.distributed.get_rank")
     @patch("torch.distributed.get_world_size")
-    def test_get_train_dataloader_local_rank_not_neg_one(self, get_world_size_mock: mock.MagicMock, get_rank_mock: mock.MagicMock):
+    def test_get_train_dataloader_local_rank_not_neg_one(self, get_world_size_mock: mock.MagicMock,
+                                                         get_rank_mock: mock.MagicMock):
         get_world_size_mock.return_value = 5
         get_rank_mock.return_value = 3
         test_trace_trainer = self.get_test_trace_trainer()

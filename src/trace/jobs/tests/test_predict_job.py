@@ -1,20 +1,21 @@
-from django.test import TestCase
+import json
+
 import mock
+import numpy as np
+from django.test import TestCase
 from mock import patch
 
-from common.jobs.job_result_key import JobResultKey
+from common.api.prediction_response import PredictionResponse
 from common.jobs.job_status import Status
 from common.models.model_generator import ModelGenerator
 from test.config.paths import TEST_OUTPUT_DIR
-from test.test_data import TEST_S_ARTS, TEST_POS_LINKS, TEST_T_ARTS
+from test.test_data import TEST_POS_LINKS, TEST_S_ARTS, TEST_T_ARTS
 from test.test_model import get_test_model
 from test.test_prediction_output import TEST_PREDICTION_OUTPUT
 from test.test_tokenizer import get_test_tokenizer
 from trace.config.constants import VALIDATION_PERCENTAGE_DEFAULT
 from trace.jobs.predict_job import PredictJob
 from trace.jobs.trace_args_builder import TraceArgsBuilder
-import json
-import numpy as np
 
 
 class TestPredictJob(TestCase):
@@ -83,8 +84,9 @@ class TestPredictJob(TestCase):
     def test_get_output_filepath(self, exists_mock: mock.MagicMock):
         exists_mock.return_value = True
         test_predict_job = self.get_test_predict_job()
-        output_filepath = test_predict_job._get_output_filepath()
-        self.assertEquals(output_filepath, self.get_expected_output_path(test_predict_job.id) + "/" + PredictJob.OUTPUT_FILENAME)
+        output_filepath = test_predict_job.args.output_dir
+        self.assertEquals(output_filepath,
+                          self.get_expected_output_path(test_predict_job.id) + "/" + PredictJob.OUTPUT_FILENAME)
 
     @patch.object(ModelGenerator, "get_tokenizer")
     @patch.object(ModelGenerator, "get_model")
@@ -115,14 +117,14 @@ class TestPredictJob(TestCase):
                                 self.assertLessEqual(abs(x - expected_value[i][j]), 0.05)
                             continue
                     self.assertEquals(ele, expected_value[i])
-        self.assertIn(JobResultKey.STATUS.value, output_dict)
-        self.assertEquals(output_dict[JobResultKey.STATUS.value], Status.SUCCESS)
+        self.assertIn(PredictionResponse.STATUS, output_dict)
+        self.assertEquals(output_dict[PredictionResponse.STATUS], Status.SUCCESS)
 
     def output_test_failure(self, output):
         output_dict = json.loads(output)
-        self.assertIn(JobResultKey.EXCEPTION.value, output_dict)
-        self.assertIn(JobResultKey.STATUS.value, output_dict)
-        self.assertEquals(output_dict[JobResultKey.STATUS.value], Status.FAILURE)
+        self.assertIn(PredictionResponse.EXCEPTION, output_dict)
+        self.assertIn(PredictionResponse.STATUS, output_dict)
+        self.assertEquals(output_dict[PredictionResponse.STATUS], Status.FAILURE)
 
     def get_expected_output_path(self, predict_job_id):
         return TEST_OUTPUT_DIR + "/" + str(predict_job_id)

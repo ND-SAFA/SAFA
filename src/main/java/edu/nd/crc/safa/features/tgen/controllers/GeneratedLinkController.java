@@ -10,7 +10,7 @@ import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
-import edu.nd.crc.safa.features.tgen.entities.TraceLinkGenerationRequest;
+import edu.nd.crc.safa.features.tgen.entities.ArtifactTraceGenerationRequestDTO;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.TraceType;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
@@ -56,13 +56,13 @@ public class GeneratedLinkController extends BaseController {
     /**
      * Generates links between source and target artifacts.
      *
-     * @param traceLinkGenerationRequest Request containing source and target artifacts.
+     * @param artifactTraceGenerationRequestDTO Request containing source and target artifacts.
      * @return Returns list of trace app entities
      */
     @PostMapping(value = AppRoutes.Links.GENERATE_LINKS)
-    public List<TraceAppEntity> generateTraceLinks(@RequestBody TraceLinkGenerationRequest traceLinkGenerationRequest) {
-        List<ArtifactAppEntity> sourceArtifacts = traceLinkGenerationRequest.getSourceArtifacts();
-        List<ArtifactAppEntity> targetArtifacts = traceLinkGenerationRequest.getTargetArtifacts();
+    public List<TraceAppEntity> generateTraceLinks(@RequestBody ArtifactTraceGenerationRequestDTO artifactTraceGenerationRequestDTO) {
+        List<ArtifactAppEntity> sourceArtifacts = artifactTraceGenerationRequestDTO.getSourceArtifacts();
+        List<ArtifactAppEntity> targetArtifacts = artifactTraceGenerationRequestDTO.getTargetArtifacts();
         return this.serviceProvider
             .getTraceGenerationService()
             .generateLinksBetweenArtifactAppEntities(sourceArtifacts, targetArtifacts);

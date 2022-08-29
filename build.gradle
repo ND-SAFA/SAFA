@@ -40,16 +40,21 @@ dependencies {
     implementation 'commons-io:commons-io:2.11.0' // TODO: Upgrade contains breaking changes
     implementation 'org.json:json:20220320'
 
-    //database
+    // cloud storage
+    implementation 'com.google.cloud:google-cloud-storage:2.11.3'
+    implementation 'com.google.api-client:google-api-client:1.35.2'
+
+
+    // database
     implementation 'mysql:mysql-connector-java:8.0.29'
-    implementation 'com.google.cloud.sql:mysql-socket-factory-connector-j-8:1.6.2'
+    implementation 'com.google.cloud.sql:mysql-socket-factory-connector-j-8:1.6.3'
     implementation 'javax.annotation:javax.annotation-api:1.3.2'
     implementation 'org.hibernate:hibernate-core:5.6.1.Final' // TODO: Upgrading contains breaking changes
     implementation 'com.zaxxer:HikariCP:5.0.1'
     implementation 'org.flywaydb:flyway-core:9.0.4'
     implementation 'org.flywaydb:flyway-mysql:9.1.2'
 
-    //Spring
+    // spring
     implementation 'org.springframework.boot:spring-boot-starter-web:2.7.2'
     implementation 'org.springframework.data:spring-data-commons:2.7.2'
     implementation 'org.springframework.data:spring-data-jpa:2.7.2'
@@ -62,7 +67,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-webflux:2.7.2'
     implementation 'org.springframework.batch:spring-batch-core:4.3.6'
 
-    //authentication
+    // authentication
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'

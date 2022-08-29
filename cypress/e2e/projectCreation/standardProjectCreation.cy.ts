@@ -279,8 +279,6 @@ describe("Project Creation", () => {
 
       // Step - Check for creation success message
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
-
-      cy.clickButton(DataCy.jobPanel).clickButton(DataCy.jobDeleteButton);
     });
   });
 });

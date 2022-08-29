@@ -15,6 +15,8 @@ describe("Project Creation", () => {
       validUser.email,
       validUser.password
     );
+
+    cy.location("pathname", { timeout: 2000 }).should("equal", "/create");
   });
 
   describe("I can create a project from files uploaded in bulk", () => {

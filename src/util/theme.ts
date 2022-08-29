@@ -14,10 +14,21 @@ export enum ThemeColors {
   lightGrey = "#DDDDDD", // Backgrounds
   darkGrey = "#969696", // Borders
 
-  added = "#00AD69",
-  modified = "#5975B8",
-  removed = "#E11F26",
-  warning = "#F5B53F",
+  added = "#00AD69", // Text
+  addedLight = "#6CD8A9", // Backgrounds
+  addedDark = "#188958", // Borders
+
+  modified = "#5975B8", // Text
+  modifiedLight = "#8DA5D3", // Backgrounds
+  modifiedDark = "#204184", // Borders
+
+  removed = "#E11F26", // Text
+  removedLight = "#E27171", // Backgrounds
+  removedDark = "#AF001E", // Borders
+
+  warning = "#F5B53F", // Text
+  warningLight = "#FFD592", // Backgrounds
+  warningDark = "#DD8300", // Borders
 }
 
 /**
@@ -30,16 +41,37 @@ export function getBackgroundColor(
 ): string {
   switch (state) {
     case ApprovalType.APPROVED:
-    case ArtifactDeltaState.ADDED:
       return ThemeColors.added;
+    case ArtifactDeltaState.ADDED:
+      return ThemeColors.addedLight;
     case ApprovalType.UNREVIEWED:
-    case ArtifactDeltaState.MODIFIED:
       return ThemeColors.modified;
+    case ArtifactDeltaState.MODIFIED:
+      return ThemeColors.modifiedLight;
     case ApprovalType.DECLINED:
-    case ArtifactDeltaState.REMOVED:
       return ThemeColors.removed;
+    case ArtifactDeltaState.REMOVED:
+      return ThemeColors.removedLight;
     default:
       return ThemeColors.lightGrey;
+  }
+}
+
+/**
+ * Returns the border color for the given state.
+ * @param state - The state to get the color for.
+ * @return The color.
+ */
+export function getBorderColor(state?: ArtifactDeltaState | string): string {
+  switch (state) {
+    case ArtifactDeltaState.ADDED:
+      return ThemeColors.addedDark;
+    case ArtifactDeltaState.MODIFIED:
+      return ThemeColors.modifiedDark;
+    case ArtifactDeltaState.REMOVED:
+      return ThemeColors.removedDark;
+    default:
+      return ThemeColors.darkGrey;
   }
 }
 
@@ -60,19 +92,6 @@ export function getScoreColor(score: number | string): string {
     return ThemeColors.accent;
   } else {
     return ThemeColors.error;
-  }
-}
-
-/**
- * Returns the text color for the given delta state.
- * @param deltaState - The delta state to get the color for.
- * @return The color.
- */
-export function getTextColor(deltaState?: ArtifactDeltaState): string {
-  if (!deltaState || deltaState === ArtifactDeltaState.NO_CHANGE) {
-    return ThemeColors.black;
-  } else {
-    return ThemeColors.white;
   }
 }
 

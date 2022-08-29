@@ -1,5 +1,5 @@
 import { ArtifactData } from "@/types";
-import { getBackgroundColor, ThemeColors } from "@/util";
+import { getBackgroundColor, getBorderColor } from "@/util";
 import { ARTIFACT_BORDER_WIDTH } from "@/cytoscape";
 import { svgDefault } from "./default-node";
 import { svgNode } from "./core-svg";
@@ -48,7 +48,7 @@ function svgGoal(data: ArtifactData): string {
     `
       <rect 
         width="${outerWidth}" height="${outerHeight}"
-        fill="${ThemeColors.darkGrey}"
+        fill="${getBorderColor(data.artifactDeltaState)}"
         class="artifact-border"
       />
       <rect
@@ -86,7 +86,7 @@ function svgSolution(data: ArtifactData): string {
     `
       <circle 
         cx="100" cy="100" r="${radius}"
-        fill="${ThemeColors.darkGrey}"
+        fill="${getBorderColor(data.artifactDeltaState)}"
         class="artifact-border"
       />
       <circle 
@@ -121,7 +121,7 @@ function svgStrategy(data: ArtifactData): string {
           ${outerWidth + xOffset},0 
           ${outerWidth},${outerHeight} 
           0,${outerHeight}"
-        fill="${ThemeColors.darkGrey}"
+        fill="${getBorderColor(data.artifactDeltaState)}"
         class="artifact-border"
       />
       <polygon

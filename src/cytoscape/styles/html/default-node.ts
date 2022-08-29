@@ -1,5 +1,5 @@
 import { ArtifactData } from "@/types";
-import { getBackgroundColor, ThemeColors } from "@/util";
+import { getBackgroundColor, getBorderColor } from "@/util";
 import { ARTIFACT_BORDER_WIDTH } from "@/cytoscape";
 import { svgNode } from "./core-svg";
 
@@ -21,7 +21,7 @@ export function svgDefault(data: ArtifactData): string {
     `
       <rect 
         rx="8" width="${outerWidth}" height="${outerHeight}"
-        fill="${ThemeColors.darkGrey}"
+        fill="${getBorderColor(data.artifactDeltaState)}"
         class="artifact-border"
       />
       <rect

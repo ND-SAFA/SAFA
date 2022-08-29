@@ -63,9 +63,10 @@ export function svgFooter(
           y="${iconY - 1}" 
           width="20" height="20"
         >
-          <div style="font-family: Material Icons; color: ${
-            ThemeColors.warning
-          }">
+          <div 
+            style="font-family: Material Icons; 
+                   color: ${ThemeColors.warningDark}"
+          >
             warning
           </div>
         </foreignObject>

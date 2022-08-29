@@ -30,10 +30,14 @@ export async function handleSaveArtifact(
       const updatedArtifacts = await updateArtifact(versionId, artifact);
 
       artifactStore.addOrUpdateArtifacts(updatedArtifacts);
+
+      logStore.onSuccess(`Edited artifact: ${artifact.name}`);
     } else {
       const createdArtifacts = await createArtifact(versionId, artifact);
 
       artifactStore.addCreatedArtifact(createdArtifacts[0]);
+
+      logStore.onSuccess(`Created a new artifact: ${artifact.name}`);
 
       if (parentArtifact) {
         for (const createdArtifact of createdArtifacts) {
@@ -41,8 +45,6 @@ export async function handleSaveArtifact(
         }
       }
     }
-
-    logStore.onSuccess(`Created a new artifact: ${artifact.name}`);
     onSuccess?.();
   } catch (e) {
     logStore.onDevError(String(e));

@@ -1,6 +1,6 @@
-from scipy.special import softmax
+from typing import List
 
-from common.config.constants import METRICS_KEY
+from scipy.special import softmax
 
 
 class PredictionResponse:
@@ -13,14 +13,21 @@ class PredictionResponse:
     SOURCE = "source"
     TARGET = "target"
     SCORE = "score"
+    METRIC = "metrics"
 
     @staticmethod
-    def from_output(output: dict) -> dict:
+    def from_output(output: dict, artifact_id_pairs: List[tuple]) -> dict:
+        """
+        Creates a prediction response from the output of the prediction
+        :param output: output from the prediction
+        :param artifact_id_pairs: the list of source, target pair ids corresponding to the entries
+        :return: response dictionary
+        """
         response = {
             PredictionResponse.PREDICTIONS: [],
-            METRICS_KEY: output[METRICS_KEY]
+            PredictionResponse.METRIC: output[PredictionResponse.METRIC],
         }
-        artifact_ids = output[PredictionResponse.ARTIFACT_IDS]
+        artifact_ids = artifact_id_pairs
         scores = output[PredictionResponse.PREDICTIONS]
         for pred_ids, pred_scores in zip(artifact_ids, scores):
             entry = {

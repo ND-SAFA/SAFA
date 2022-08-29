@@ -57,8 +57,7 @@ class TraceTrainer(Trainer):
         if self.args.metrics:
             self._eval(output, self.args.metrics)
         output_dict = TraceTrainer.output_to_dict(output)
-        output_dict[PredictionResponse.ARTIFACT_IDS] = dataset.source_target_pairs
-        return PredictionResponse.from_output(output_dict)
+        return PredictionResponse.from_output(output_dict, dataset.source_target_pairs)
 
     @staticmethod
     def output_to_dict(output: NamedTuple) -> Dict:

@@ -4,15 +4,13 @@ import traceback
 from abc import ABC, abstractmethod
 from threading import Thread
 from typing import Dict
-
-import numpy as np
+import uuid
 
 from common.api.prediction_response import PredictionResponse
+from common.config.constants import IS_DEV
 from common.jobs.abstract_args_builder import AbstractArgsBuilder
 from common.jobs.job_status import Status
 from common.storage.gcp_cloud_storage import GCPCloudStorage
-
-DEV = False
 
 
 class AbstractJob(Thread, ABC):
@@ -27,6 +25,10 @@ class AbstractJob(Thread, ABC):
         self.args = arg_builder.build()
         self.status = Status.NOT_STARTED
         self.result = {}
+        self.id = uuid.uuid4()
+        self.output_dir = os.path.join(self.args.output_dir, str(self.id))
+        self.output_filepath = os.path.join(self.output_dir, self.OUTPUT_FILENAME)
+        self._save_method = AbstractJob._save_to_filesystem if IS_DEV else AbstractJob._save_to_storage
 
     @abstractmethod
     def _run(self) -> Dict:
@@ -58,23 +60,9 @@ class AbstractJob(Thread, ABC):
         Returns the job output as json
         :return: the output as json
         """
-        output = self.serialize_output(self.result)
+        output = self.result
         output[PredictionResponse.STATUS] = self.status.value
         return json.dumps(output)
-
-    def _get_output_dir(self) -> str:
-        """
-        Creates an output dir if non exists and returns the path
-        :return: the path to the directory
-        """
-        return self.args.output_dir
-
-    def _get_output_filepath(self) -> str:
-        """
-        Gets the path to the output file
-        :return: the path to the output file
-        """
-        return self.args.output_dir
 
     def _save(self, output: str) -> bool:
         """
@@ -82,9 +70,7 @@ class AbstractJob(Thread, ABC):
         :return: True if save was successful else false
         """
         try:
-
-            output_file_path = self.args.output_dir
-            AbstractJob._save_to_storage(output, output_file_path)
+            self._save_method(output, self.output_filepath)
             return True
         except Exception:
             print(traceback.format_exc())  # to save in logs
@@ -110,18 +96,7 @@ class AbstractJob(Thread, ABC):
             file.write(content)
 
     @staticmethod
-    def serialize_output(output_dict: Dict) -> Dict:
-        """
-        Makes dictionary values json serializable and returns serializable dict
-        :param output_dict: output dictionary
-        :return: a dictionary that is json serializable
-        """
-        for key, value in output_dict.items():
-            if isinstance(value, np.ndarray):
-                output_dict[key] = value.tolist()
-        return output_dict
-
-    @staticmethod
     def safe_open_w(path):
-        os.makedirs(os.path.dirname(path))
+        if not os.path.exists(os.path.dirname(path)):
+            os.makedirs(os.path.dirname(path))
         return open(path, 'w')

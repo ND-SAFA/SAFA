@@ -1,6 +1,8 @@
 # -------------- MODELS --------------
+import os
+
 LOGITS = "logits"
 LOSS = "loss"
 
-# -------------- EVAL --------------
-METRICS_KEY = "metrics"
+# -------------- MODELS --------------
+IS_DEV = os.getenv('DEVELOPMENT') != "test"

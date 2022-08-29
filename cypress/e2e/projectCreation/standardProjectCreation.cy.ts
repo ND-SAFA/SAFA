@@ -4,10 +4,12 @@ import {
   testFileMap,
   testProject,
   validUser,
-} from "../fixtures";
+} from "../../fixtures";
 
 describe("Project Creation", () => {
   beforeEach(() => {
+    cy.dbResetJobs();
+
     cy.visit("http://localhost:8080/create").login(
       validUser.email,
       validUser.password

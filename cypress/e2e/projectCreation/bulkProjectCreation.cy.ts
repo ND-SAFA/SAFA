@@ -4,10 +4,13 @@ import {
   simpleProjectFilesMap,
   DataCy,
   testProject,
-} from "../fixtures";
+} from "../../fixtures";
 
 describe("Project Creation", () => {
   beforeEach(() => {
+    cy.dbResetJobs();
+    cy.dbResetProjects();
+
     cy.visit("http://localhost:8080/create?tab=bulk").login(
       validUser.email,
       validUser.password

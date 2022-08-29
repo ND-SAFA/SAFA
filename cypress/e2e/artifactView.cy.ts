@@ -1,16 +1,23 @@
 import { DataCy, validUser } from "../fixtures";
 
 describe("Artifact View", () => {
+  before(() => {
+    cy.dbResetJobs();
+    cy.dbResetProjects();
+
+    cy.visit("/create").login(validUser.email, validUser.password);
+
+    cy.location("pathname", { timeout: 5000 }).should("equal", "/create");
+
+    cy.createBulkProject()
+      .getCy(DataCy.jobStatus, "first", 20000)
+      .should("contain.text", "Completed");
+
+    cy.logout();
+  });
+
   beforeEach(() => {
-    // TODO: clean up existing projects and create a new one.
-
-    cy.visit("/").login(validUser.email, validUser.password);
-
-    cy.location("pathname", { timeout: 5000 }).should("equal", "/");
-
-    cy.openProjectSelector()
-      .projectSelectorContinue()
-      .projectSelectorContinue();
+    cy.visit("/project").login(validUser.email, validUser.password);
 
     cy.location("pathname", { timeout: 5000 }).should("equal", "/project");
   });
@@ -18,15 +25,17 @@ describe("Artifact View", () => {
   describe("Artifact CRUD", () => {
     describe("I can create a new artifact", () => {
       it("Creates a simple new artifact", () => {
-        cy.createNewArtifact();
+        const name = `New ${Math.random()}`;
+
+        cy.createNewArtifact(name);
 
         cy.getCy(DataCy.artifactSaveModal).within(() => {
           cy.clickButton(DataCy.artifactSaveSubmitButton);
         });
 
         cy.getCy(DataCy.snackbarSuccess).should("be.visible");
-
         cy.getCy(DataCy.artifactTreeSelectedNode).should("be.visible");
+        cy.getCy(DataCy.artifactTreeSelectedName).should("contain", name);
       });
 
       it("Cannot create an artifact without a name, type, or body", () => {

@@ -1,4 +1,9 @@
-import { DataCy, simpleProjectFilesMap, testProject } from "../fixtures";
+import {
+  DataCy,
+  simpleProjectFiles,
+  simpleProjectFilesMap,
+  testProject,
+} from "../fixtures";
 
 Cypress.Commands.add("setProjectIdentifier", (type) => {
   if (type === "standard") {
@@ -14,6 +19,16 @@ Cypress.Commands.add("setProjectIdentifier", (type) => {
     cy.getCy(DataCy.creationBulkNameInput).type(testProject.name);
     cy.getCy(DataCy.creationBulkDescriptionInput).type(testProject.description);
   }
+});
+
+Cypress.Commands.add("createBulkProject", () => {
+  cy.visit("/create?tab=bulk")
+    .location("pathname", { timeout: 2000 })
+    .should("equal", "/create");
+
+  cy.setProjectIdentifier("bulk")
+    .uploadFiles(DataCy.creationBulkFilesInput, ...simpleProjectFiles)
+    .clickButton(DataCy.creationUploadButton);
 });
 
 Cypress.Commands.add("openPanelAfterClose", () => {

@@ -7,13 +7,13 @@ import {
 
 describe("Project Selection", () => {
   beforeEach(() => {
-    // TODO: clean up all created projects.
+    cy.dbResetProjects();
 
-    cy.visit("/login").login(validUser.email, validUser.password);
+    cy.visit("/create").login(validUser.email, validUser.password);
 
-    cy.location("pathname", { timeout: 2000 }).should("equal", "/");
+    cy.location("pathname", { timeout: 2000 }).should("equal", "/create");
 
-    cy.openProjectSelector();
+    cy.createBulkProject().openProjectSelector();
   });
 
   describe("Project List", () => {
@@ -63,7 +63,7 @@ describe("Project Selection", () => {
       it("Selects a project and continues to the version step", () => {
         cy.getCy(DataCy.selectionModal).within(() => {
           cy.withinTableRows(DataCy.selectionProjectList, (tr) => {
-            tr.get(".v-simple-checkbox").last().click();
+            tr.get(".v-simple-checkbox").first().click().click();
           });
 
           cy.getCy(DataCy.stepperBackButton).should("not.be.disabled");
@@ -205,7 +205,7 @@ describe("Project Selection", () => {
 
     describe("I can delete a project version", () => {
       it("Deletes a version", () => {
-        cy.projectSelectorContinue();
+        cy.projectSelectorContinue().createNewVersion("revision");
 
         cy.getCy(DataCy.selectionModal).within(() => {
           cy.getCy(DataCy.selectionVersionList).within(() => {

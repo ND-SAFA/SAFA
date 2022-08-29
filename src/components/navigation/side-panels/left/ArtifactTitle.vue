@@ -1,24 +1,27 @@
 <template>
-  <div class="mt-2">
-    <v-row justify="end" class="mr-1 mb-1">
-      <generic-icon-button
-        tooltip="View Artifact Body"
-        icon-id="mdi-application-array-outline"
-        @click="handleViewBody"
-      />
-      <generic-icon-button
-        v-if="!selectedArtifact.logicType"
-        tooltip="Edit"
-        icon-id="mdi-pencil"
-        @click="handleEditArtifact"
-      />
-      <generic-icon-button
-        color="error"
-        tooltip="Delete"
-        icon-id="mdi-delete"
-        @click="handleDeleteArtifact"
-      />
-    </v-row>
+  <div>
+    <flex-box align="center" justify="space-between">
+      <attribute-chip artifact-type :value="selectedArtifactType" />
+      <flex-box>
+        <generic-icon-button
+          tooltip="View Artifact Body"
+          icon-id="mdi-application-array-outline"
+          @click="handleViewBody"
+        />
+        <generic-icon-button
+          v-if="!selectedArtifact.logicType"
+          tooltip="Edit"
+          icon-id="mdi-pencil"
+          @click="handleEditArtifact"
+        />
+        <generic-icon-button
+          color="error"
+          tooltip="Delete"
+          icon-id="mdi-delete"
+          @click="handleDeleteArtifact"
+        />
+      </flex-box>
+    </flex-box>
     <v-tooltip bottom>
       <template v-slot:activator="{ on, attrs }">
         <typography
@@ -28,6 +31,7 @@
           variant="subtitle"
           el="h1"
           :value="selectedArtifactName"
+          data-cy="text-artifact-selected-name"
         />
       </template>
       {{ selectedArtifactName }}
@@ -41,6 +45,8 @@ import { PanelType } from "@/types";
 import { appStore, selectionStore } from "@/hooks";
 import { handleDeleteArtifact } from "@/api";
 import { GenericIconButton, Typography } from "@/components/common";
+import FlexBox from "@/components/common/display/FlexBox.vue";
+import AttributeChip from "@/components/common/display/AttributeChip.vue";
 
 /**
  * Displays the selected node's title and option buttons.
@@ -48,6 +54,8 @@ import { GenericIconButton, Typography } from "@/components/common";
 export default Vue.extend({
   name: "ArtifactTitle",
   components: {
+    AttributeChip,
+    FlexBox,
     Typography,
     GenericIconButton,
   },
@@ -63,6 +71,12 @@ export default Vue.extend({
      */
     selectedArtifactName(): string {
       return this.selectedArtifact?.name || "";
+    },
+    /**
+     * @return The selected artifact's type.
+     */
+    selectedArtifactType(): string {
+      return this.selectedArtifact?.type || "";
     },
     /**
      * @return The selected artifact's body.

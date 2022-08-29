@@ -5,6 +5,23 @@ type ElementPosition = "first" | "last";
 
 declare namespace Cypress {
   interface Chainable<Subject> {
+    // Database Cleanup
+
+    /**
+     * Gets an api token.
+     */
+    dbToken(): Chainable<Cypress.Response<{ token: string }>>;
+
+    /**
+     * Removes all stored jobs.
+     */
+    dbResetJobs(): Chainable<void>;
+
+    /**
+     * Removes all stored projects.
+     */
+    dbResetProjects(): Chainable<void>;
+
     // Base Commands
 
     /**
@@ -122,6 +139,11 @@ declare namespace Cypress {
      * @param type - The type of project identifier to set.
      */
     setProjectIdentifier(type: "bulk" | "standard" | "modal"): Chainable<void>;
+
+    /**
+     * Creates a new bulk upload project.
+     */
+    createBulkProject(): Chainable<void>;
 
     /**
      * Opens the last file panel after waiting for it to close when files are parsed.

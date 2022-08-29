@@ -102,6 +102,7 @@
         <v-btn
           color="primary"
           :disabled="!isCompleted(job.status)"
+          data-cy="button-open-job"
           @click="viewProject(job)"
         >
           View Project

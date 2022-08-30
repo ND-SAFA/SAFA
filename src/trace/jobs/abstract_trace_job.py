@@ -1,7 +1,7 @@
 from abc import ABC
 
-from common.jobs.abstract_job import AbstractJob
 from common.jobs.abstract_args_builder import AbstractArgsBuilder
+from common.jobs.abstract_job import AbstractJob
 from trace.train.trace_trainer import TraceTrainer
 
 
@@ -10,7 +10,12 @@ class AbstractTraceJob(AbstractJob, ABC):
     def __init__(self, args_builder: AbstractArgsBuilder):
         """
         Base job for task using a model (i.e. training, prediction, evaluation...)
-        :param args: arguments used for configuring the model
+        :param args_builder: arguments used for configuring the model
         """
         super().__init__(args_builder)
-        self.trainer = TraceTrainer(args=self.args)
+        self.__trainer = None
+
+    def get_trainer(self) -> TraceTrainer:
+        if self.__trainer is None:
+            self.__trainer = TraceTrainer(args=self.args)
+        return self.__trainer

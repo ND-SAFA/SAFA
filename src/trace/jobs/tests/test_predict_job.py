@@ -40,8 +40,14 @@ class TestPredictJob(BaseTest):
         self.output_test_success(json_str)
 
     @patch("trace.train.trace_trainer.TraceTrainer.perform_prediction")
+    @patch.object(ModelGenerator, "get_tokenizer")
+    @patch.object(ModelGenerator, "get_model")
     @patch.object(PredictJob, "_save")
-    def test_run_success(self, save_mock: mock.MagicMock, perform_prediction_mock: mock.MagicMock):
+    def test_run_success(self, save_mock: mock.MagicMock, get_model_mock: mock.MagicMock,
+                         get_tokenizer_mock: mock.MagicMock,
+                         perform_prediction_mock: mock.MagicMock):
+        get_model_mock.return_value = get_test_model()
+        get_tokenizer_mock.return_value = get_test_tokenizer()
         save_mock.side_effect = self.output_test_success
         perform_prediction_mock.return_value = TEST_PREDICTION_RESPONSE_OUTPUT
         test_predict_job = self.get_test_predict_job()
@@ -49,9 +55,15 @@ class TestPredictJob(BaseTest):
         self.assertTrue(perform_prediction_mock.called)
 
     @patch("trace.train.trace_trainer.TraceTrainer.perform_prediction")
+    @patch.object(ModelGenerator, "get_model")
+    @patch.object(ModelGenerator, "get_tokenizer")
     @patch.object(PredictJob, "_save")
-    def test_run_failure(self, save_mock: mock.MagicMock, perform_prediction_mock: mock.MagicMock):
+    def test_run_failure(self, save_mock: mock.MagicMock, get_tokenizer_mock: mock.MagicMock,
+                         get_model_mock: mock.MagicMock,
+                         perform_prediction_mock: mock.MagicMock):
         save_mock.side_effect = self.output_test_failure
+        get_model_mock.return_value = get_test_model()
+        get_tokenizer_mock.return_value = get_test_tokenizer()
         perform_prediction_mock.return_value = ValueError()
         test_predict_job = self.get_test_predict_job()
         test_predict_job.run()

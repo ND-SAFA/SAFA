@@ -8,5 +8,5 @@ class TrainJob(AbstractTraceJob):
         Runs the training and obtains results
         :return: results of the training including as loss and time
         """
-        result = self.trainer.perform_training()
+        result = self.get_trainer().perform_training()
         return result

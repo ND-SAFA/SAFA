@@ -69,7 +69,7 @@ class AbstractJob(Thread, ABC):
         :return: True if save was successful else false
         """
         try:
-            self._save_method(output, self.output_filepath)
+            SafaStorage.save_to_file(output, self.output_filepath)
             return True
         except Exception:
             print(traceback.format_exc())  # to save in logs

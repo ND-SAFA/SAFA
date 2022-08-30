@@ -1,13 +1,12 @@
 import json
 
 import mock
-import numpy as np
-from django.test import TestCase
 from mock import patch
 
 from common.api.prediction_response import PredictionResponse
 from common.jobs.job_status import Status
 from common.models.model_generator import ModelGenerator
+from test.base_test import BaseTest
 from test.config.paths import TEST_OUTPUT_DIR
 from test.test_data import TEST_POS_LINKS, TEST_S_ARTS, TEST_T_ARTS
 from test.test_model import get_test_model
@@ -18,7 +17,7 @@ from trace.jobs.predict_job import PredictJob
 from trace.jobs.trace_args_builder import TraceArgsBuilder
 
 
-class TestPredictJob(TestCase):
+class TestPredictJob(BaseTest):
     test_args = {"base_model_name": "bert_trace_single",
                  "model_path": "model",
                  "output_path": TEST_OUTPUT_DIR,

@@ -1,5 +1,4 @@
-from django.test import TestCase
-
+from test.base_test import BaseTest
 from trace.data.artifact import Artifact
 from trace.data.trace_link import TraceLink
 
@@ -10,7 +9,7 @@ def fake_method(text, text_pair, return_token_type_ids, add_special_tokens):
     return {"feature_name": FEATURE_VALUE.format(text, text_pair)}
 
 
-class TestTraceLink(TestCase):
+class TestTraceLink(BaseTest):
     S_ID = "sid"
     T_ID = "tid"
     S_TOKEN = "s_token"

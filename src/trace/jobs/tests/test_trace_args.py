@@ -1,13 +1,11 @@
-from django.test import TestCase
-from mock import patch
-
 from common.models.model_generator import ModelGenerator
-from test.test_data import TEST_S_ARTS, TEST_T_ARTS, TEST_POS_LINKS
+from test.base_test import BaseTest
+from test.test_data import TEST_POS_LINKS, TEST_S_ARTS, TEST_T_ARTS
 from trace.data.trace_dataset_creator import TraceDatasetCreator
 from trace.jobs.trace_args import TraceArgs
 
 
-class TestTraceArgs(TestCase):
+class TestTraceArgs(BaseTest):
     validation_percentage = 0.25
 
     def test_set_args(self):

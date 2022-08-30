@@ -1,6 +1,6 @@
-from django.test import TestCase
-
-
 # TODO
-class TestPrecisionAtKMetric(TestCase):
+from test.base_test import BaseTest
+
+
+class TestPrecisionAtKMetric(BaseTest):
     pass

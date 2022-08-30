@@ -1,11 +1,11 @@
-from django.test import TestCase
-
-from common.config.paths import PROJ_PATH
-from pretrain.data.corpuses.domain import get_path, Domain
 import os
 
+from common.config.paths import PROJ_PATH
+from pretrain.data.corpuses.domain import Domain, get_path
+from test.base_test import BaseTest
 
-class TestDomain(TestCase):
+
+class TestDomain(BaseTest):
     EXPECTED_PATH = os.path.join(PROJ_PATH, "pretrain", "data", "corpuses", "base")
 
     def test_get_path(self):

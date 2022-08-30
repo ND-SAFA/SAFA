@@ -1,6 +1,6 @@
-from django.test import TestCase
-
-
 # TODO
-class TestSingleModelForwardPass(TestCase):
+from test.base_test import BaseTest
+
+
+class TestSingleModelForwardPass(BaseTest):
     pass

@@ -1,5 +1,6 @@
-from django.test import TestCase
-
 # TODO
-class TestBertTraceSiamese(TestCase):
+from test.base_test import BaseTest
+
+
+class TestBertTraceSiamese(BaseTest):
     pass

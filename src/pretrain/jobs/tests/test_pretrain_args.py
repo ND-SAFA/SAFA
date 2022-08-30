@@ -1,11 +1,11 @@
-from django.test import TestCase
 from mock import patch
 
 from common.models.model_generator import ModelGenerator
 from pretrain.jobs.pretrain_args import PretrainArgs
+from test.base_test import BaseTest
 
 
-class TestPretrainArgs(TestCase):
+class TestPretrainArgs(BaseTest):
 
     @patch("pretrain.electra.configure_pretraining.PretrainingConfig.__init__")
     def test_set_do_train_true(self, mock):

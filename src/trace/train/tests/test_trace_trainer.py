@@ -2,22 +2,22 @@ from copy import deepcopy
 from unittest.mock import patch
 
 import mock
-from django.test import TestCase
 from torch.utils.data.distributed import DistributedSampler
 from torch.utils.data.sampler import RandomSampler
 
 from common.models.model_generator import ModelGenerator
+from test.base_test import BaseTest
 from test.config.paths import TEST_OUTPUT_DIR
 from test.test_data import TEST_POS_LINKS, TEST_S_ARTS, TEST_T_ARTS
 from test.test_model import get_test_model
-from test.test_prediction_output import TEST_PREDICTION_OUTPUT, TEST_PREDICTION_RESPONSE_OUTPUT, assert_output_matches_expected
+from test.test_prediction_output import TEST_PREDICTION_OUTPUT, assert_output_matches_expected
 from test.test_tokenizer import get_test_tokenizer
 from trace.data.trace_dataset_creator import TraceDatasetCreator
 from trace.jobs.trace_args import TraceArgs
 from trace.train.trace_trainer import TraceTrainer
 
 
-class TestTraceTrainer(TestCase):
+class TestTraceTrainer(BaseTest):
     VAlIDATION_PERCENTAGE = 0.3
     EXPECTED_VALIDATION_SIZE = 3
     EXPECTED_PREDICTION_SIZE = len(TEST_T_ARTS) * len(TEST_S_ARTS)

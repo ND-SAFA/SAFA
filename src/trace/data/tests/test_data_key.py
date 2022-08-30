@@ -1,8 +1,8 @@
-from django.test import TestCase
+from test.base_test import BaseTest
 from trace.data.data_key import DataKey
 
 
-class TestDataKey(TestCase):
+class TestDataKey(BaseTest):
 
     def test_get_feature_entry_keys(self):
         expected_keys = ["input_ids", "token_type_ids", "attention_mask"]

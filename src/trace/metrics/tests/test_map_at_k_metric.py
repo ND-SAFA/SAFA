@@ -1,6 +1,6 @@
-from django.test import TestCase
-
-
 # TODO
-class TestMapAtKMetric(TestCase):
+from test.base_test import BaseTest
+
+
+class TestMapAtKMetric(BaseTest):
     pass

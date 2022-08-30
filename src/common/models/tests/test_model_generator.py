@@ -1,12 +1,13 @@
-from django.test import TestCase
 import mock
 from mock import patch
 from transformers.modeling_utils import PreTrainedModel
 from transformers.models.auto.tokenization_auto import AutoTokenizer
-from common.models.model_generator import ModelGenerator
-from common.models.base_models.supported_base_model import SupportedBaseModel
-from common.models.model_properties import ArchitectureType
+
 from common.models.base_models.bert_trace_siamese import BertTraceSiamese
+from common.models.base_models.supported_base_model import SupportedBaseModel
+from common.models.model_generator import ModelGenerator
+from common.models.model_properties import ArchitectureType
+from test.base_test import BaseTest
 from test.test_tokenizer import get_test_tokenizer
 
 
@@ -14,7 +15,7 @@ class TestTokenizer:
     model_max_length = 5
 
 
-class TestModelGenerator(TestCase):
+class TestModelGenerator(BaseTest):
     TEST_BASE_MODEL = {
         "base_model_name": "bert_trace_siamese",
         "arch_type": ArchitectureType.SIAMESE,
@@ -95,4 +96,3 @@ class TestModelGenerator(TestCase):
         test_model_generator = self.get_test_model_generator()
         feature = test_model_generator.get_feature(text="token", return_token_type_ids=False)
         self.assertNotIn("token_type_ids", feature)
-

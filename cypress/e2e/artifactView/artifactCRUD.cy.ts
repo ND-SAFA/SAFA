@@ -167,7 +167,17 @@ describe("Artifact CRUD", () => {
 
   describe("I can duplicate an artifact", () => {
     it("Duplicates an artifact in view", () => {
-      cy.getCy(DataCy.treeNode).filter(":visible").first().rightclick();
+      cy.getCy(DataCy.appLoading).should("not.be.visible");
+
+      // Wait for graph to center.
+      cy.clickButton(DataCy.navGraphCenterButton).wait(200);
+
+      // Right click on a visible node.
+      cy.getCy(DataCy.treeNode)
+        .should("be.visible")
+        .filter(":visible")
+        .first()
+        .rightclick();
 
       cy.get(DataIds.rightClickDuplicateArtifact)
         .should("be.visible")

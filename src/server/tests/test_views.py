@@ -32,7 +32,7 @@ class TestViews(TestCase):
         load_model_mock.return_value = get_test_model()
         get_tokenizer_mock.return_value = get_test_tokenizer()
         response_dict = self.make_test_request('/fine-tune/', fine_tune_params)
-        self.assertIn(PredictionRequest.JOB_ID.value, response_dict)
+        self.assertIn(PredictionRequest.OUTPUT_PATH.value, response_dict)
 
     @patch.object(ModelGenerator, '_ModelGenerator__load_model')
     @patch.object(ModelGenerator, 'get_tokenizer')
@@ -40,7 +40,7 @@ class TestViews(TestCase):
         load_model_mock.return_value = get_test_model()
         get_tokenizer_mock.return_value = get_test_tokenizer()
         response_dict = self.make_test_request('/predict/', self.TEST_PARAMS)
-        self.assertIn(PredictionRequest.JOB_ID.value, response_dict)
+        self.assertIn(PredictionRequest.OUTPUT_PATH.value, response_dict)
 
     def make_test_request(self, url: str, params: dict) -> Dict:
         c = Client()

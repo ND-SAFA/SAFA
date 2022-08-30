@@ -65,31 +65,6 @@ class TestTrainJob(TestCase):
         test_train_job.run()
         self.assertTrue(perform_training_mock.called)
 
-    @patch("os.makedirs")
-    @patch("os.path.exists")
-    def test_get_output_dir_exists(self, exists_mock: mock.MagicMock, makedirs_mock: mock.MagicMock):
-        exists_mock.return_value = True
-        test_train_job = self.get_test_train_job()
-        output_dir = test_train_job._get_output_dir()
-        self.assertEquals(output_dir, self.get_expected_output_path(test_train_job.id))
-
-    @patch("os.makedirs")
-    @patch("os.path.exists")
-    def test_get_output_dir_not_exists(self, exists_mock: mock.MagicMock, makedirs_mock: mock.MagicMock):
-        exists_mock.return_value = False
-        test_train_job = self.get_test_train_job()
-        output_dir = test_train_job._get_output_dir()
-        self.assertEquals(output_dir, self.get_expected_output_path(test_train_job.id))
-        self.assertTrue(makedirs_mock.called)
-
-    @patch("os.path.exists")
-    def test_get_output_filepath(self, exists_mock: mock.MagicMock):
-        exists_mock.return_value = True
-        test_train_job = self.get_test_train_job()
-        output_filepath = test_train_job.args.output_dir
-        self.assertEquals(output_filepath,
-                          self.get_expected_output_path(test_train_job.id) + "/" + TrainJob.OUTPUT_FILENAME)
-
     @patch.object(ModelGenerator, "get_tokenizer")
     @patch.object(ModelGenerator, "get_model")
     def get_test_train_job(self, get_model_mock: mock.MagicMock, get_tokenizer_mock: mock.MagicMock):
@@ -97,14 +72,6 @@ class TestTrainJob(TestCase):
         get_tokenizer_mock.return_value = get_test_tokenizer()
         arg_builder = TraceArgsBuilder(**self.test_args)
         return TrainJob(arg_builder)
-
-    def test_output_as_json(self):
-        test_train_job = self.get_test_train_job()
-        test_train_job.result = self.TEST_OUTPUT
-        test_train_job.status = Status.SUCCESS
-        json_str = test_train_job.get_output_as_json()
-        self.assertTrue(isinstance(json_str, str))
-        self.output_test_success(json_str)
 
     def output_test_success(self, output: str):
         output_dict = json.loads(output)

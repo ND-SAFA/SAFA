@@ -74,5 +74,5 @@ class PreTrainer:
         """
         output = {}
         self.config.set_do_train(False)
-        output[PredictionResponse.METRIC] = train_or_eval(self.config)
+        output[PredictionResponse.METRICS] = train_or_eval(self.config)
         return output

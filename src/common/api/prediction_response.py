@@ -13,7 +13,6 @@ class PredictionResponse:
     SOURCE = "source"
     TARGET = "target"
     SCORE = "score"
-    METRIC = "metrics"
 
     @staticmethod
     def from_output(output: dict, artifact_id_pairs: List[tuple]) -> dict:
@@ -25,7 +24,7 @@ class PredictionResponse:
         """
         response = {
             PredictionResponse.PREDICTIONS: [],
-            PredictionResponse.METRIC: output[PredictionResponse.METRIC],
+            PredictionResponse.METRICS: output[PredictionResponse.METRICS],
         }
         artifact_ids = artifact_id_pairs
         scores = output[PredictionResponse.PREDICTIONS]

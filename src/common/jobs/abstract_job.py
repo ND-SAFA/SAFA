@@ -7,7 +7,7 @@ from typing import Dict
 import uuid
 
 from common.api.prediction_response import PredictionResponse
-from common.config.constants import IS_DEV
+from common.config.constants import IS_TEST
 from common.jobs.abstract_args_builder import AbstractArgsBuilder
 from common.jobs.job_status import Status
 from common.storage.gcp_cloud_storage import GCPCloudStorage
@@ -28,7 +28,7 @@ class AbstractJob(Thread, ABC):
         self.id = uuid.uuid4()
         self.output_dir = os.path.join(self.args.output_dir, str(self.id))
         self.output_filepath = os.path.join(self.output_dir, self.OUTPUT_FILENAME)
-        self._save_method = AbstractJob._save_to_filesystem if IS_DEV else AbstractJob._save_to_storage
+        self._save_method = AbstractJob._save_to_filesystem if IS_TEST else AbstractJob._save_to_storage
 
     @abstractmethod
     def _run(self) -> Dict:

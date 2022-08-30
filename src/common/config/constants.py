@@ -5,4 +5,4 @@ LOGITS = "logits"
 LOSS = "loss"
 
 # -------------- MODELS --------------
-IS_DEV = os.getenv('DEVELOPMENT') != "test"
+IS_TEST = os.getenv("DEPLOYMENT", "development") == "test"

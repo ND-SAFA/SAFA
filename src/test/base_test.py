@@ -14,7 +14,7 @@ class BaseTest(TestCase):
             SafaStorage.create_dir(TEST_OUTPUT_DIR)
 
     def tearDown(self):
-        if DELETE_TEST_OUTPUT:
+        if DELETE_TEST_OUTPUT and os.path.isdir(TEST_OUTPUT_DIR):
             for file in os.listdir(TEST_OUTPUT_DIR):
                 file_path = os.path.join(TEST_OUTPUT_DIR, file)
                 if os.path.isfile(file_path):

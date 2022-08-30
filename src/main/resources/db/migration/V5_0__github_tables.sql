@@ -1,11 +1,11 @@
 CREATE TABLE github_access_credentials (
-  artifact_id char(36) NOT NULL,
+   artifact_id varchar(255) NOT NULL,
    version SMALLINT NULL,
    access_token VARCHAR(64) NULL,
    refresh_token VARCHAR(128) NULL,
    client_secret VARCHAR(64) NULL,
    client_id VARCHAR(64) NULL,
-   user_id char(36) NOT NULL,
+   user_id varchar(255) NOT NULL,
    access_token_expiration_date datetime NULL,
    refresh_token_expiration_date datetime NULL,
    github_handler VARCHAR(255) NULL,
@@ -13,12 +13,12 @@ CREATE TABLE github_access_credentials (
 );
 
 CREATE TABLE github_project (
-  mapping_id char(36) NOT NULL,
-   safa_project_id char(36) NOT NULL,
+   mapping_id VARCHAR(255) NOT NULL,
+   safa_project_id VARCHAR(255) NOT NULL,
    repository_name VARCHAR(255) NOT NULL,
    branch VARCHAR(32) NOT NULL,
    last_commit_sha VARCHAR(64) NOT NULL,
-   user_id char(36) NOT NULL,
+   user_id VARCHAR(255) NOT NULL,
    CONSTRAINT pk_github_project PRIMARY KEY (mapping_id)
 );
 

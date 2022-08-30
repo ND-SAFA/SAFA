@@ -10,7 +10,7 @@ class TestSupportedTraceMetric(BaseTest):
 
     def test_get_metric_path(self):
         path = get_metric_path("map_at_k")
-        self.assertEquals("trace/metrics/map_at_k_metric.py", path)
+        self.assertIn("src/trace/metrics/map_at_k_metric.py", path)
 
     @patch("datasets.list_metrics")
     def test_get_metric_path_from_datasets(self, list_metrics_mock: mock.MagicMock):

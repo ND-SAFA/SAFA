@@ -163,7 +163,7 @@ public class GithubProjectCreationJob extends CommitJob {
             String body = blobDTO.getContent();
 
             ArtifactAppEntity artifact = new ArtifactAppEntity(
-                "",
+                null,
                 type,
                 name,
                 summary,

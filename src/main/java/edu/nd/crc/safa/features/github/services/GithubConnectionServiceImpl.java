@@ -3,7 +3,6 @@ package edu.nd.crc.safa.features.github.services;
 import java.util.List;
 
 import edu.nd.crc.safa.config.WebApiConfiguration;
-import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.github.entities.app.GithubCommitDiffResponseDTO;
 import edu.nd.crc.safa.features.github.entities.app.GithubFileBlobDTO;
 import edu.nd.crc.safa.features.github.entities.app.GithubRefreshTokenDTO;
@@ -13,6 +12,7 @@ import edu.nd.crc.safa.features.github.entities.app.GithubRepositoryFiletreeResp
 import edu.nd.crc.safa.features.github.entities.app.GithubSelfResponseDTO;
 import edu.nd.crc.safa.features.github.entities.db.GithubAccessCredentials;
 import edu.nd.crc.safa.features.github.repositories.GithubProjectRepository;
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.utilities.WebApiUtils;
 
 import lombok.AllArgsConstructor;
@@ -211,9 +211,9 @@ public class GithubConnectionServiceImpl implements GithubConnectionService {
 
     private UriBuilder setAuthorizationQueryParameters(UriBuilder builder, GithubAccessCredentials credentials) {
         return builder
-                .queryParam(CLIENT_ID_PARAM, credentials.getClientId())
-                .queryParam(CLIENT_SECRET_PARAM, credentials.getClientSecret())
-                .queryParam(REFRESH_TOKEN_PARAM, credentials.getRefreshToken());
+            .queryParam(CLIENT_ID_PARAM, credentials.getClientId())
+            .queryParam(CLIENT_SECRET_PARAM, credentials.getClientSecret())
+            .queryParam(REFRESH_TOKEN_PARAM, credentials.getRefreshToken());
     }
 
     @Getter

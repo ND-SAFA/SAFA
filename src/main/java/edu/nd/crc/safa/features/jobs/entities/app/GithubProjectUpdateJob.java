@@ -62,7 +62,7 @@ public class GithubProjectUpdateJob extends GithubProjectCreationJob {
             String body = diff.getBlobUrl();
 
             ArtifactAppEntity artifact = new ArtifactAppEntity(
-                "",
+                null,
                 type,
                 name,
                 summary,

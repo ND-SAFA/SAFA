@@ -1,16 +1,15 @@
 import json
 import os
 import traceback
+import uuid
 from abc import ABC, abstractmethod
 from threading import Thread
 from typing import Dict
-import uuid
 
 from common.api.prediction_response import PredictionResponse
-from common.config.constants import IS_TEST
 from common.jobs.abstract_args_builder import AbstractArgsBuilder
 from common.jobs.job_status import Status
-from common.storage.gcp_cloud_storage import GCPCloudStorage
+from common.storage.safa_storage import SafaStorage
 
 
 class AbstractJob(Thread, ABC):
@@ -28,7 +27,7 @@ class AbstractJob(Thread, ABC):
         self.id = uuid.uuid4()
         self.output_dir = os.path.join(self.args.output_dir, str(self.id))
         self.output_filepath = os.path.join(self.output_dir, self.OUTPUT_FILENAME)
-        self._save_method = AbstractJob._save_to_filesystem if IS_TEST else AbstractJob._save_to_storage
+        self._save_method = SafaStorage.get_save()
 
     @abstractmethod
     def _run(self) -> Dict:
@@ -75,28 +74,3 @@ class AbstractJob(Thread, ABC):
         except Exception:
             print(traceback.format_exc())  # to save in logs
             return False
-
-    @staticmethod
-    def _save_to_storage(content: str, output_file_path: str):
-        """
-        Saves output to file at given path in cloud storage solution.
-        :param content: The content of the file to create.
-        :param output_file_path: The path to save the file to.
-        """
-        GCPCloudStorage.upload_file(content, output_file_path)
-
-    @staticmethod
-    def _save_to_filesystem(content: str, output_file_path: str):
-        """
-        Soon to be mock function for saving files to storage but using the filesystem instead.
-        :param content: The content of the file to create.
-        :param output_file_path: The path to save the file to.
-        """
-        with AbstractJob.safe_open_w(output_file_path) as file:
-            file.write(content)
-
-    @staticmethod
-    def safe_open_w(path):
-        if not os.path.exists(os.path.dirname(path)):
-            os.makedirs(os.path.dirname(path))
-        return open(path, 'w')

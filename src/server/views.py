@@ -1,6 +1,4 @@
 import json
-import os
-import uuid
 from copy import deepcopy
 from typing import Dict
 
@@ -44,8 +42,7 @@ def _run_job(request: HttpRequest, job_type: JobType) -> JsonResponse:
     args = _make_job_params_from_request(request_dict)
     job = job_type.value(args)
     job.start()
-    output_path = args.output_path
-    return JsonResponse({"outputPath": output_path})
+    return JsonResponse({"outputPath": job.output_dir})
 
 
 def _make_job_params_from_request(request_dict: Dict) -> TraceArgsBuilder:

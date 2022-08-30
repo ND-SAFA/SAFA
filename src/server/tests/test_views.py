@@ -15,11 +15,11 @@ from test.test_tokenizer import get_test_tokenizer
 
 
 class TestViews(TestCase):
-    TEST_PARAMS = {PredictionRequest.SOURCES.value: TEST_S_ARTS,
-                   PredictionRequest.TARGETS.value: TEST_T_ARTS,
-                   PredictionRequest.MODEL_PATH.value: "path/to/model",
-                   PredictionRequest.BASE_MODEL.value: "bert_trace_single",
-                   PredictionRequest.OUTPUT_PATH.value: TEST_OUTPUT_DIR,
+    TEST_PARAMS = {PredictionRequest.SOURCES: TEST_S_ARTS,
+                   PredictionRequest.TARGETS: TEST_T_ARTS,
+                   PredictionRequest.MODEL_PATH: "path/to/model",
+                   PredictionRequest.BASE_MODEL: "bert_trace_single",
+                   PredictionRequest.OUTPUT_PATH: TEST_OUTPUT_DIR,
                    "max_seq_length": 100,
                    "pad_to_max_length": True,
                    "should_save": False}
@@ -28,11 +28,11 @@ class TestViews(TestCase):
     @patch.object(ModelGenerator, 'get_tokenizer')
     def test_fine_tune(self, get_tokenizer_mock: mock.MagicMock, load_model_mock: mock.MagicMock):
         fine_tune_params = deepcopy(self.TEST_PARAMS)
-        fine_tune_params[PredictionRequest.LINKS.value] = TEST_POS_LINKS
+        fine_tune_params[PredictionRequest.LINKS] = TEST_POS_LINKS
         load_model_mock.return_value = get_test_model()
         get_tokenizer_mock.return_value = get_test_tokenizer()
         response_dict = self.make_test_request('/fine-tune/', fine_tune_params)
-        self.assertIn(PredictionRequest.OUTPUT_PATH.value, response_dict)
+        self.assertIn(PredictionRequest.OUTPUT_PATH, response_dict)
 
     @patch.object(ModelGenerator, '_ModelGenerator__load_model')
     @patch.object(ModelGenerator, 'get_tokenizer')
@@ -40,7 +40,7 @@ class TestViews(TestCase):
         load_model_mock.return_value = get_test_model()
         get_tokenizer_mock.return_value = get_test_tokenizer()
         response_dict = self.make_test_request('/predict/', self.TEST_PARAMS)
-        self.assertIn(PredictionRequest.OUTPUT_PATH.value, response_dict)
+        self.assertIn(PredictionRequest.OUTPUT_PATH, response_dict)
 
     def make_test_request(self, url: str, params: dict) -> Dict:
         c = Client()

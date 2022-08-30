@@ -1,7 +1,5 @@
-from enum import Enum
 
-
-class PredictionRequest(Enum):
+class PredictionRequest:
     MODEL_PATH = "modelPath"
     SOURCES = "sources"
     TARGETS = "targets"

@@ -48,14 +48,6 @@ def _run_job(request: HttpRequest, job_type: JobType) -> JsonResponse:
     return JsonResponse({"outputPath": output_path})
 
 
-def create_output_path(job_id: uuid):
-    """
-    Generates the output path based on the job id.
-    :param job_id: UUID of job.
-    """
-    return os.path.join("prediction", "output", str(job_id), "output.json")
-
-
 def _make_job_params_from_request(request_dict: Dict) -> TraceArgsBuilder:
     """
     Extracts necessary information from a request and creates an arg builder from it
@@ -63,12 +55,12 @@ def _make_job_params_from_request(request_dict: Dict) -> TraceArgsBuilder:
     :return: a TraceArgsBuilder for the request
     """
     params = deepcopy(request_dict)
-    model_path = params.pop(PredictionRequest.MODEL_PATH.value)
-    sources = params.pop(PredictionRequest.SOURCES.value)
-    targets = params.pop(PredictionRequest.TARGETS.value)
-    base_model = params.pop(PredictionRequest.BASE_MODEL.value)
-    output_path = create_output_path(uuid.uuid4())
-    links = _safe_pop(params, PredictionRequest.LINKS.value)  # optional
+    model_path = params.pop(PredictionRequest.MODEL_PATH)
+    sources = params.pop(PredictionRequest.SOURCES)
+    targets = params.pop(PredictionRequest.TARGETS)
+    base_model = params.pop(PredictionRequest.BASE_MODEL)
+    output_path = params.pop(PredictionRequest.OUTPUT_PATH)
+    links = _safe_pop(params, PredictionRequest.LINKS)  # optional
     return TraceArgsBuilder(base_model, model_path, output_path, sources, targets, links, VALIDATION_PERCENTAGE_DEFAULT,
                             **params)
 

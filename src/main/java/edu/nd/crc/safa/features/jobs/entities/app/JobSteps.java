@@ -20,7 +20,7 @@ public class JobSteps {
         "Convert Issues To Artifacts And Trace Links"
     };
 
-    public static String[] getJobSteps(JobType jobType) {
+    public static List<String> getJobSteps(JobType jobType) {
         switch (jobType) {
             case FLAT_FILE_PROJECT_CREATION:
                 return AbstractJob.getJobSteps(FlatFileProjectCreationJob.class);
@@ -29,7 +29,9 @@ public class JobSteps {
             case JIRA_PROJECT_UPDATE:
                 return AbstractJob.getJobSteps(JiraProjectUpdateJob.class);
             case GITHUB_PROJECT_CREATION:
-                return concatWithStream(githubProjectCreationSteps, projectCreationSteps);
+                return AbstractJob.getJobSteps(GithubProjectCreationJob.class);
+            case GITHUB_PROJECT_UPDATE:
+                return AbstractJob.getJobSteps(GithubProjectUpdateJob.class);
             case PROJECT_CREATION:
                 return AbstractJob.getJobSteps(CommitJob.class);
             default:

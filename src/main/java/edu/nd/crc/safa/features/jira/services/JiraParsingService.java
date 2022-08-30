@@ -3,6 +3,7 @@ package edu.nd.crc.safa.features.jira.services;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Objects;
 
 import edu.nd.crc.safa.common.ProjectEntities;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
@@ -91,13 +92,18 @@ public class JiraParsingService {
      */
     private String getIssueDescription(JiraIssueDTO issue) {
         StringBuilder contentString = new StringBuilder();
-        JiraIssueDTO.JiraIssueFields.JiraDescription jiraDescription = issue.getFields().getDescription();
-        if (jiraDescription == null) {
+
+        if (Objects.isNull(issue.getFields())) {
             return "";
         }
-        for (JiraIssueDTO.JiraIssueFields.JiraDescription.Content content : jiraDescription.getContent()) {
-            for (JiraIssueDTO.JiraIssueFields.JiraDescription.ContentContent contentContent :
-                content.getContent()) {
+        if (Objects.isNull(issue.getFields().getDescription())) {
+            return "";
+        }
+
+        JiraIssueDTO.JiraIssueFields.JiraDescription jiraDescription = issue.getFields().getDescription();
+
+        for (var content : jiraDescription.getContent()) {
+            for (var contentContent : content.getContent()) {
                 contentString.append(contentContent.getText());
             }
         }

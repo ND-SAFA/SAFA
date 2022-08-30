@@ -3,7 +3,6 @@ package edu.nd.crc.safa.features.jobs.entities.app;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 import edu.nd.crc.safa.common.ProjectEntities;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
@@ -25,6 +24,8 @@ import edu.nd.crc.safa.features.users.services.SafaUserService;
 
 import lombok.Setter;
 
+;
+
 /**
  * Responsible for providing step implementations for:
  * 1. Connecting to JIRA and accessing project
@@ -33,7 +34,6 @@ import lombok.Setter;
  * 4. Returning project created
  */
 public class JiraProjectCreationJob extends CommitJob {
-public class JiraProjectCreationJob extends ProjectCreationJob {
 
     private static final String EMPTY_STRING = "";
 

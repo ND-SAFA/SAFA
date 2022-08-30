@@ -1,10 +1,10 @@
-package edu.nd.crc.safa.server.entities.api.github;
+package edu.nd.crc.safa.features.github.entities.app;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import edu.nd.crc.safa.server.entities.api.github.GithubRepositoryFileDTO.GithubRepositoryFileType;
+import edu.nd.crc.safa.features.github.entities.app.GithubRepositoryFileDTO.GithubRepositoryFileType;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;

@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.server.entities.api.github;
+package edu.nd.crc.safa.features.github.entities.app;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

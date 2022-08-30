@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.server.entities.db;
+package edu.nd.crc.safa.features.github.entities.db;
 
 import java.util.UUID;
 import javax.persistence.Column;
@@ -42,7 +42,7 @@ public class GithubProject {
     @NonNull
     @OneToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "safa_project_id", nullable = false, unique = true)
+    @JoinColumn(name = "safa_project_id", nullable = false)
     private Project project;
 
     /**
@@ -52,7 +52,7 @@ public class GithubProject {
      * by {@link RequiredArgsConstructor}
      */
     @NonNull
-    @Column(name = "repository_name", nullable = false, unique = true)
+    @Column(name = "repository_name", nullable = false)
     private String repositoryName;
 
     /**
@@ -66,7 +66,7 @@ public class GithubProject {
      * Latest commit sha used to pull artifacts
      */
     @NonNull
-    @Column(name = "last_commit_sha", nullable = false, length = 64)
+    @Column(name = "last_commit_sha", length = 64)
     private String lastCommitSha;
 
     /**

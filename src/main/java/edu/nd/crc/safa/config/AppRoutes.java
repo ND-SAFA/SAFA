@@ -23,22 +23,6 @@ public class AppRoutes {
         public static final String FORGOT_PASSWORD = Accounts.PREFIX + "/forgot";
         public static final String CREATE_ACCOUNT = Accounts.PREFIX + "/create";
         public static final String DELETE_ACCOUNT = Accounts.PREFIX + "/delete";
-        private static final String ACCOUNTS_PREFIX = "/accounts";
-        public static final String CREATE_ACCOUNT = ACCOUNTS_PREFIX + "/create";
-        public static final String DELETE_ACCOUNT = ACCOUNTS_PREFIX + "/delete";
-
-        @NoArgsConstructor(access = AccessLevel.PRIVATE)
-        public static class Jira {
-            public static final String JIRA_CREDENTIALS = ACCOUNTS_PREFIX + "/jira/credentials";
-            public static final String JIRA_CREDENTIALS_REFRESH = ACCOUNTS_PREFIX + "/jira/credentials/{cloudId}";
-            public static final String JIRA_CREDENTIALS_VALIDATE = ACCOUNTS_PREFIX + "/jira/credentials/validate";
-        }
-
-        @NoArgsConstructor(access = AccessLevel.PRIVATE)
-        public static class Github {
-            public static final String GITHUB_CREDENTIALS = ACCOUNTS_PREFIX + "/github/credentials";
-            public static final String GITHUB_ACCESS_CREDENTIALS_REFRESH = ACCOUNTS_PREFIX + "/github/credentials";
-        }
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -58,12 +42,6 @@ public class AppRoutes {
         public static final String DELETE_PROJECT_BY_ID = ROOT + "/{projectId}";
         public static final String CREATE_OR_UPDATE_PROJECT_META = ROOT;
         public static final String GET_PROJECTS = ROOT;
-        private static final String PROJECT_PREFIX = "/projects";
-        public static final String RETRIEVE_JIRA_PROJECTS = PROJECT_PREFIX + "/jira/{cloudId}";
-        public static final String DELETE_PROJECT_BY_ID = PROJECT_PREFIX + "/{projectId}";
-        public static final String CREATE_OR_UPDATE_PROJECT_META = PROJECT_PREFIX;
-        public static final String GET_PROJECTS = PROJECT_PREFIX;
-        public static final String RETRIEVE_GITHUB_REPOSITORIES = PROJECT_PREFIX + "/github";
 
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
         public static class Membership {
@@ -71,10 +49,6 @@ public class AppRoutes {
             public static final String GET_PROJECT_MEMBERS = ROOT + "/{projectId}/members";
             public static final String DELETE_PROJECT_MEMBERSHIP = ROOT + "/members/{projectMembershipId}";
             public static final String GET_USER_PROJECTS = ROOT;
-        public static class Import {
-            public static final String IMPORT_PREFIX = PROJECT_PREFIX + "/import";
-            public static final String CREATE_PROJECT_FROM_JIRA = IMPORT_PREFIX + "/jira/{cloudId}/{id}";
-            public static final String PULL_GITHUB_REPOSITORY = PROJECT_PREFIX + "/github/{repositoryName}";
         }
 
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -166,6 +140,24 @@ public class AppRoutes {
             public static final String ROOT = Projects.ROOT + "/import";
             public static final String BY_ID = Import.ROOT + "/jira/{cloudId}/{id}";
             public static final String UPDATE = Versions.BY_ID + "/import/jira/{cloudId}/{id}";
+        }
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class Github {
+        public static final String RETRIEVE_GITHUB_REPOSITORIES = Projects.ROOT + "/github";
+
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        public static class Credentials {
+            public static final String ROOT = Accounts.PREFIX + "/github/credentials";
+            public static final String REFRESH = Accounts.PREFIX + "/github/credentials";
+        }
+
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        public static class Import {
+            private static final String ROOT = Projects.ROOT + "/import";
+            public static final String BY_NAME = Import.ROOT + "/github/{repositoryName}";
+            public static final String UPDATE = Versions.BY_ID + "/import/github/{repositoryName}";
         }
     }
 

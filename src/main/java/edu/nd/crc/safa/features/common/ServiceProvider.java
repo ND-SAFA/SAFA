@@ -44,16 +44,15 @@ import edu.nd.crc.safa.features.users.repositories.SafaUserRepository;
 import edu.nd.crc.safa.features.users.services.AccountLookupService;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
 import edu.nd.crc.safa.features.versions.repositories.ProjectVersionRepository;
-import edu.nd.crc.safa.server.repositories.github.GithubAccessCredentialsRepository;
-import edu.nd.crc.safa.server.repositories.github.GithubProjectRepository;
-import edu.nd.crc.safa.server.services.github.GithubConnectionService;
 import edu.nd.crc.safa.features.versions.services.VersionService;
+import edu.nd.crc.safa.features.github.repositories.GithubAccessCredentialsRepository;
+import edu.nd.crc.safa.features.github.repositories.GithubProjectRepository;
+import edu.nd.crc.safa.features.github.services.GithubConnectionService;
 import edu.nd.crc.safa.utilities.ExecutorDelegate;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -136,8 +135,6 @@ public class ServiceProvider {
     private final AccountLookupService accountLookupService;
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
-    // Jobs
-    JobLauncher jobLauncher;
     // Jobs(not final since is set while testing)
     private JobLauncher jobLauncher;
     // GitHub

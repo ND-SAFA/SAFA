@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.server.entities.db;
+package edu.nd.crc.safa.features.github.entities.db;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

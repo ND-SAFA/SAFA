@@ -1,9 +1,9 @@
-package edu.nd.crc.safa.server.entities.api.github;
+package edu.nd.crc.safa.features.github.entities.app;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-import edu.nd.crc.safa.server.entities.db.GithubAccessCredentials;
+import edu.nd.crc.safa.features.github.entities.db.GithubAccessCredentials;
 
 import lombok.Data;
 

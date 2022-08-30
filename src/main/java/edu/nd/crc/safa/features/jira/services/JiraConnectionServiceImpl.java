@@ -39,7 +39,6 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
 
     private static final String JIRA_ISSUE_UPDATE_DATE_FORMAT = "yyyy-MM-dd HH:mm";
 
-    private final Logger log = LoggerFactory.getLogger(JiraConnectionServiceImpl.class);
     private final JiraProjectRepository jiraProjectRepository;
     private final WebClient webClient;
 

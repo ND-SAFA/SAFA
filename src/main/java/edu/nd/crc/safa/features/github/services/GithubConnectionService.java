@@ -1,15 +1,15 @@
-package edu.nd.crc.safa.server.services.github;
+package edu.nd.crc.safa.features.github.services;
 
 import java.util.List;
 
-import edu.nd.crc.safa.server.entities.api.github.GithubCommitDiffResponseDTO;
-import edu.nd.crc.safa.server.entities.api.github.GithubFileBlobDTO;
-import edu.nd.crc.safa.server.entities.api.github.GithubRefreshTokenDTO;
-import edu.nd.crc.safa.server.entities.api.github.GithubRepositoryBranchDTO;
-import edu.nd.crc.safa.server.entities.api.github.GithubRepositoryDTO;
-import edu.nd.crc.safa.server.entities.api.github.GithubRepositoryFiletreeResponseDTO;
-import edu.nd.crc.safa.server.entities.api.github.GithubSelfResponseDTO;
-import edu.nd.crc.safa.server.entities.db.GithubAccessCredentials;
+import edu.nd.crc.safa.features.github.entities.app.GithubCommitDiffResponseDTO;
+import edu.nd.crc.safa.features.github.entities.app.GithubFileBlobDTO;
+import edu.nd.crc.safa.features.github.entities.app.GithubRefreshTokenDTO;
+import edu.nd.crc.safa.features.github.entities.app.GithubRepositoryBranchDTO;
+import edu.nd.crc.safa.features.github.entities.app.GithubRepositoryDTO;
+import edu.nd.crc.safa.features.github.entities.app.GithubRepositoryFiletreeResponseDTO;
+import edu.nd.crc.safa.features.github.entities.app.GithubSelfResponseDTO;
+import edu.nd.crc.safa.features.github.entities.db.GithubAccessCredentials;
 
 public interface GithubConnectionService {
 

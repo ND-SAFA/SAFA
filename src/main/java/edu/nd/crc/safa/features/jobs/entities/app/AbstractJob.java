@@ -18,7 +18,10 @@ import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParametersIncrementer;
@@ -33,6 +36,8 @@ import org.springframework.batch.core.JobParametersValidator;
 @Getter
 @Setter
 public abstract class AbstractJob implements Job {
+
+    private static final Logger log = LoggerFactory.getLogger(AbstractJob.class);
 
     /**
      * The job identifying information that is being performed.
@@ -109,7 +114,7 @@ public abstract class AbstractJob implements Job {
      * @param execution JobExecution used for restarting jobs (WIP).
      */
     @Override
-    public void execute(JobExecution execution) {
+    public void execute(@NonNull JobExecution execution) {
         JobService jobService = this.serviceProvider.getJobService();
         NotificationService notificationService = this.serviceProvider.getNotificationService();
 
@@ -124,6 +129,7 @@ public abstract class AbstractJob implements Job {
                 jobService.startStep(jobDbEntity);
                 notificationService.broadcastChange(EntityChangeBuilder.createJobUpdate(jobDbEntity));
                 // Pre-step
+                log.info("Running job step " + stepImplementation.method.getName());
                 stepImplementation.method.invoke(this);
 
                 // Post-step

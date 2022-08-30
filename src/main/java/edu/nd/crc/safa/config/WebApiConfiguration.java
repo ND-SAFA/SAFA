@@ -1,11 +1,11 @@
 package edu.nd.crc.safa.config;
 
+import edu.nd.crc.safa.features.github.repositories.GithubProjectRepository;
+import edu.nd.crc.safa.features.github.services.GithubConnectionService;
+import edu.nd.crc.safa.features.github.services.GithubConnectionServiceImpl;
 import edu.nd.crc.safa.features.jira.repositories.JiraProjectRepository;
 import edu.nd.crc.safa.features.jira.services.JiraConnectionService;
 import edu.nd.crc.safa.features.jira.services.JiraConnectionServiceImpl;
-import edu.nd.crc.safa.server.repositories.github.GithubProjectRepository;
-import edu.nd.crc.safa.server.services.github.GithubConnectionService;
-import edu.nd.crc.safa.server.services.github.GithubConnectionServiceImpl;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,7 +33,7 @@ public class WebApiConfiguration {
 
     public static final String JSON_CONTENT_TYPE_HEADER_VALUE = "application/json";
 
-    private static final Integer WEBCLIENT_MAX_MEMORY = 16 * 1024 * 1024;
+    private static final Integer WEBCLIENT_MAX_MEMORY = 256 * 1024 * 1024;
     private static final Logger log = LoggerFactory.getLogger(WebApiConfiguration.class);
 
     private JiraProjectRepository jiraProjectRepository;

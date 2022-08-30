@@ -13,6 +13,5 @@ import org.springframework.batch.core.repository.JobRestartException;
 @FunctionalInterface
 public interface ExecutorTask {
 
-    void run() throws SafaError, JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException,
-        JobParametersInvalidException, JobRestartException;
+    void run() throws Exception;
 }

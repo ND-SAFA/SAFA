@@ -28,10 +28,7 @@ describe("Job Submission", () => {
     });
 
     it("Shows completed jobs", () => {
-      cy.getCy(DataCy.jobStatus, "first", 20000).should(
-        "contain.text",
-        "Completed"
-      );
+      cy.getCy(DataCy.jobStatus, "first").should("contain.text", "Completed");
     });
   });
 

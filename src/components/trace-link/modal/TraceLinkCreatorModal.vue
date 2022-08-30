@@ -4,7 +4,7 @@
     :is-open="isOpen"
     @close="$emit('close')"
     size="l"
-    data-cy="button-create-trace-matrix"
+    data-cy="modal-trace-save"
   >
     <template v-slot:body>
       <v-row class="my-2">
@@ -13,7 +13,7 @@
             v-model="sourceArtifactId"
             label="Source Artifact"
             :multiple="false"
-            data-cy="button-select-source"
+            data-cy="button-trace-save-source"
           />
         </v-col>
         <v-col cols="6">
@@ -21,7 +21,7 @@
             v-model="targetArtifactId"
             label="Target Artifact"
             :multiple="false"
-            data-cy="button-select-target"
+            data-cy="button-trace-save-target"
           />
         </v-col>
       </v-row>
@@ -41,7 +41,12 @@
     <template v-slot:actions>
       <v-spacer />
       <typography color="error" r="2" :value="errorMessage" />
-      <v-btn color="primary" :disabled="!canSave" @click="handleSubmit">
+      <v-btn
+        color="primary"
+        :disabled="!canSave"
+        data-cy="button-trace-save"
+        @click="handleSubmit"
+      >
         Create
       </v-btn>
     </template>

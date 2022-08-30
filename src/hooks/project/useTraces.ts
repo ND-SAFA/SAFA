@@ -99,17 +99,30 @@ export const useTraces = defineStore("traces", {
       layoutStore.applyAutomove();
     },
     /**
+     * Returns the trace link that matches an id.
+     *
+     * @param id - The trace link id.
+     * @return The trace link, if one exists.
+     */
+    getTraceLinkById(id: string): TraceLinkModel | undefined {
+      return this.allTraces.find(({ traceLinkId }) => traceLinkId === id);
+    },
+    /**
      * Returns the trace link between artifacts.
      *
      * @param sourceId - The source artifact id.
      * @param targetId - The target artifact id.
+     * @param ignoreDirection - If true, will match traces in both directions.
      * @return The trace link between artifacts, if one exists.
      */
     getTraceLinkByArtifacts(
       sourceId: string,
-      targetId: string
+      targetId: string,
+      ignoreDirection = false
     ): TraceLinkModel | undefined {
-      return this.allTraces.find(matchTrace(sourceId, targetId));
+      return this.allTraces.find(
+        matchTrace(sourceId, targetId, ignoreDirection)
+      );
     },
     /**
      * Returns whether the link exists.

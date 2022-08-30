@@ -4,3 +4,4 @@ import "./authenticationCommands";
 import "./projectCreatorCommands";
 import "./projectSelectionCommands";
 import "./artifactViewCommands";
+import "./artifactTreeCommands";

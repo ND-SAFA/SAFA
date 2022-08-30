@@ -103,6 +103,9 @@ export async function handleCreateLink(
     const createdLinks = await createLink(traceLink);
 
     traceStore.addOrUpdateTraceLinks(createdLinks);
+    logStore.onSuccess(
+      `Created a new trace link: ${sourceName} -> ${targetName}`
+    );
   } catch (e) {
     logStore.onError(
       `Unable to create trace link: ${sourceName} -> ${targetName}`
@@ -128,11 +131,16 @@ export async function handleApproveLink(
     onSuccess: () => {
       traceStore.addOrUpdateTraceLinks([link]);
       approvalStore.approveLink(link);
+      logStore.onSuccess(
+        `Link has been approved: ${link.sourceName} -> ${link.targetName}`
+      );
       onSuccess?.();
     },
     onError: (e) => {
       link.approvalStatus = currentStatus;
-      logStore.onError("Unable to approve this link");
+      logStore.onError(
+        `Unable to approve link: ${link.sourceName} -> ${link.targetName}`
+      );
       onError?.(e);
     },
   });
@@ -155,11 +163,16 @@ export async function handleDeclineLink(
     onSuccess: () => {
       traceStore.deleteTraceLinks([link]);
       approvalStore.declineLink(link);
+      logStore.onSuccess(
+        `Link has been removed: ${link.sourceName} -> ${link.targetName}`
+      );
       onSuccess?.();
     },
     onError: (e) => {
       link.approvalStatus = currentStatus;
-      logStore.onError("Unable to decline this link");
+      logStore.onError(
+        `Unable to decline link: ${link.sourceName} -> ${link.targetName}`
+      );
       onError?.(e);
     },
   });
@@ -181,11 +194,16 @@ export async function handleUnreviewLink(
   linkAPIHandler(link, updateUnreviewedLink, {
     onSuccess: () => {
       approvalStore.resetLink(link);
+      logStore.onSuccess(
+        `Link has been reset: ${link.sourceName} -> ${link.targetName}`
+      );
       onSuccess?.();
     },
     onError: (e) => {
       link.approvalStatus = currentStatus;
-      logStore.onError("Unable to reset this link");
+      logStore.onError(
+        `Unable to reset link: ${link.sourceName} -> ${link.targetName}`
+      );
       onError?.(e);
     },
   });

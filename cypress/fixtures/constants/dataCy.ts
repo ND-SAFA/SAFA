@@ -113,19 +113,35 @@ export enum DataCy {
   artifactSaveParentInput = "input-artifact-parent",
   artifactSaveSubmitButton = "button-artifact-save",
 
-  // Artifact Tree
+  traceSaveModal = "modal-trace-save",
+  traceSaveSourceInput = "button-trace-save-source",
+  traceSaveTargetInput = "button-trace-save-target",
+  traceSaveSubmitButton = "button-trace-save",
 
-  treeNode = "node-artifact-tree",
-  treeSelectedNode = "node-artifact-tree-selected",
+  traceApproveModal = "modal-trace-approve",
+  traceUnreviewButton = "button-trace-unreview",
+  traceApproveButton = "button-trace-approve",
+  traceDeclineButton = "button-trace-decline",
+  traceDeleteButton = "button-trace-delete",
+
+  // Selection Panel
 
   selectedPanelName = "text-selected-name",
   selectedPanelBodyButton = "button-selected-body",
   selectedPanelEditButton = "button-selected-edit",
   selectedPanelDeleteButton = "button-selected-delete",
+
   selectedPanelParents = "list-selected-parents",
   selectedPanelParentItem = "list-selected-parent-item",
+  selectedPanelParentLinkButton = "button-selected-parent-link",
   selectedPanelChildren = "list-selected-children",
   selectedPanelChildItem = "list-selected-child-item",
+  selectedPanelChildLinkButton = "button-selected-child-link",
+
+  // Artifact Tree
+
+  treeNode = "node-artifact-tree",
+  treeSelectedNode = "node-artifact-tree-selected",
 }
 
 export enum DataIds {

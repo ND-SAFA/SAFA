@@ -22,7 +22,16 @@
               :item="parent"
               data-cy="list-selected-parent-item"
               @click="handleArtifactClick(parent.title)"
-            />
+            >
+              <v-list-item-action @click.stop="">
+                <generic-icon-button
+                  icon-id="mdi-ray-start-end"
+                  tooltip="View Trace Link"
+                  data-cy="button-selected-parent-link"
+                  @click="handleTraceLinkClick(parent.title)"
+                />
+              </v-list-item-action>
+            </generic-list-item>
           </template>
         </v-list>
       </toggle-list>
@@ -38,7 +47,16 @@
               :item="child"
               data-cy="list-selected-child-item"
               @click="handleArtifactClick(child.title)"
-            />
+            >
+              <v-list-item-action @click.stop="">
+                <generic-icon-button
+                  icon-id="mdi-ray-start-end"
+                  tooltip="View Trace Link"
+                  data-cy="button-selected-child-link"
+                  @click="handleTraceLinkClick(child.title)"
+                />
+              </v-list-item-action>
+            </generic-list-item>
           </template>
         </v-list>
       </toggle-list>
@@ -49,12 +67,18 @@
 <script lang="ts">
 import Vue from "vue";
 import { ListItem } from "@/types";
-import { artifactStore, selectionStore, subtreeStore } from "@/hooks";
+import {
+  artifactStore,
+  selectionStore,
+  subtreeStore,
+  traceStore,
+} from "@/hooks";
 import {
   GenericListItem,
   Typography,
   FlexBox,
   ToggleList,
+  GenericIconButton,
 } from "@/components/common";
 
 /**
@@ -62,7 +86,13 @@ import {
  */
 export default Vue.extend({
   name: "ArtifactTraces",
-  components: { FlexBox, Typography, GenericListItem, ToggleList },
+  components: {
+    GenericIconButton,
+    FlexBox,
+    Typography,
+    GenericListItem,
+    ToggleList,
+  },
   computed: {
     /**
      * @return The selected artifact.
@@ -134,6 +164,22 @@ export default Vue.extend({
       if (!artifact) return;
 
       selectionStore.selectArtifact(artifact.id);
+    },
+    /**
+     * Selects the trace link to an artifact.
+     * @param artifactName - The artifact to select the link to.
+     */
+    handleTraceLinkClick(artifactName: string): void {
+      const artifact = artifactStore.getArtifactByName(artifactName);
+
+      if (!artifact || !this.selectedArtifact) return;
+
+      selectionStore.selectedTraceLinkId =
+        traceStore.getTraceLinkByArtifacts(
+          artifact.id,
+          this.selectedArtifact.id,
+          true
+        )?.traceLinkId || "";
     },
   },
 });

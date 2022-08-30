@@ -2,31 +2,32 @@ import { DataCy, DataIds, validUser } from "../../fixtures";
 
 describe("Artifact CRUD", () => {
   before(() => {
-    cy.dbResetJobs();
-    cy.dbResetProjects();
+    cy.dbResetJobs().dbResetProjects();
 
-    cy.visit("/create").login(validUser.email, validUser.password);
-
-    cy.location("pathname", { timeout: 5000 }).should("equal", "/create");
+    cy.visit("/create")
+      .login(validUser.email, validUser.password)
+      .location("pathname", { timeout: 5000 })
+      .should("equal", "/create");
 
     cy.createBulkProject()
-      .getCy(DataCy.jobStatus, "first", 20000)
+      .getCy(DataCy.jobStatus, "first")
       .should("contain.text", "Completed");
 
     cy.logout();
   });
 
   beforeEach(() => {
-    cy.visit("/project").login(validUser.email, validUser.password);
+    cy.visit("/project")
+      .login(validUser.email, validUser.password)
+      .location("pathname", { timeout: 5000 })
+      .should("equal", "/project");
 
-    cy.location("pathname", { timeout: 5000 }).should("equal", "/project");
-
-    cy.get(".artifact-svg-wrapper").should("be.visible");
+    cy.getNodes().should("be.visible");
   });
 
   describe("I can create a new artifact", () => {
     it("Cannot create an artifact without a name, type, or body", () => {
-      cy.createNewArtifact("");
+      cy.createNewArtifact({ name: "" });
 
       cy.getCy(DataCy.artifactSaveModal).within(() => {
         cy.getCy(DataCy.artifactSaveSubmitButton).should("be.disabled");
@@ -50,13 +51,9 @@ describe("Artifact CRUD", () => {
     it("Cannot create a new artifact with the same name", () => {
       const name = `New ${Math.random()}`;
 
-      cy.createNewArtifact(name);
+      cy.createNewArtifact({ name }).saveArtifact();
 
-      cy.getCy(DataCy.artifactSaveModal).within(() => {
-        cy.clickButton(DataCy.artifactSaveSubmitButton);
-      });
-
-      cy.createNewArtifact(name);
+      cy.createNewArtifact({ name });
 
       cy.getCy(DataCy.artifactSaveModal).within(() => {
         cy.contains("Name is already used");
@@ -67,10 +64,10 @@ describe("Artifact CRUD", () => {
     it("Creates a simple new artifact", () => {
       const name = `New ${Math.random()}`;
 
-      cy.createNewArtifact(name).saveArtifact();
+      cy.createNewArtifact({ name }).saveArtifact();
 
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
-      cy.getCy(DataCy.treeSelectedNode).should("be.visible");
+      cy.getNodes(true).should("be.visible");
       cy.getCy(DataCy.selectedPanelName).should("contain", name);
     });
 
@@ -89,34 +86,29 @@ describe("Artifact CRUD", () => {
         .should("be.visible")
         .then(($el) => $el.click());
 
-      cy.fillArtifactModal(name).saveArtifact();
+      cy.fillArtifactModal({ name }).saveArtifact();
 
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
-      cy.getCy(DataCy.treeSelectedNode).should("be.visible");
+      cy.getNodes(true).should("be.visible");
       cy.getCy(DataCy.selectedPanelName).should("contain", name);
     });
 
     it("Creates an artifact with a new type", () => {
       const name = `New ${Math.random()}`;
 
-      cy.createNewArtifact(name, "New Type{enter}");
+      cy.createNewArtifact({ name, type: "New Type{enter}" });
 
       cy.getCy(DataCy.artifactSaveModal).within(() => {
         cy.clickButton(DataCy.artifactSaveSubmitButton);
       });
 
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
-      cy.getCy(DataCy.treeSelectedNode).should("be.visible");
+      cy.getNodes(true).should("be.visible");
       cy.getCy(DataCy.selectedPanelName).should("contain", name);
     });
 
     it("Adds an artifact as a child of another artifact", () => {
-      cy.createNewArtifact();
-
-      cy.getCy(DataCy.artifactSaveModal).within(() => {
-        cy.inputText(DataCy.artifactSaveParentInput, "{downArrow}{enter}");
-        cy.clickButton(DataCy.artifactSaveSubmitButton);
-      });
+      cy.createNewArtifact({ parent: "{downArrow}{enter}" }).saveArtifact();
 
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
       cy.getCy(DataCy.selectedPanelName).should("be.visible");
@@ -130,14 +122,14 @@ describe("Artifact CRUD", () => {
 
   describe("I can delete an artifact", () => {
     it("Deletes a new artifact", () => {
-      cy.createNewArtifact().saveArtifact();
+      cy.createNewArtifact({}).saveArtifact();
 
       cy.getCy(DataCy.selectedPanelDeleteButton).click();
       cy.getCy(DataCy.confirmModalButton).click();
 
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
       cy.getCy(DataCy.selectedPanelName).should("not.exist");
-      cy.getCy(DataCy.treeSelectedNode).should("not.exist");
+      cy.getNodes(true).should("not.exist");
     });
   });
 
@@ -146,7 +138,7 @@ describe("Artifact CRUD", () => {
       const name = `New ${Math.random()}`;
       const editedName = `New ${Math.random()}`;
 
-      cy.createNewArtifact(name).saveArtifact();
+      cy.createNewArtifact({ name }).saveArtifact();
 
       cy.getCy(DataCy.selectedPanelEditButton).click();
 
@@ -160,24 +152,18 @@ describe("Artifact CRUD", () => {
       });
 
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
-      cy.getCy(DataCy.treeSelectedNode).should("be.visible");
+      cy.getNodes(true).should("be.visible");
       cy.getCy(DataCy.selectedPanelName).should("contain.text", editedName);
     });
   });
 
   describe("I can duplicate an artifact", () => {
     it("Duplicates an artifact in view", () => {
-      cy.getCy(DataCy.appLoading).should("not.be.visible");
-
       // Wait for graph to center.
       cy.clickButton(DataCy.navGraphCenterButton).wait(200);
 
       // Right click on a visible node.
-      cy.getCy(DataCy.treeNode)
-        .should("be.visible")
-        .filter(":visible")
-        .first()
-        .rightclick();
+      cy.getNodes().should("be.visible").first().rightclick();
 
       cy.get(DataIds.rightClickDuplicateArtifact)
         .should("be.visible")

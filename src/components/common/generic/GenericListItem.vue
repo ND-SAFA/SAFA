@@ -13,6 +13,7 @@
         <v-list-item-subtitle v-if="!!item.subtitle">
           <typography secondary :value="item.subtitle" />
         </v-list-item-subtitle>
+        <slot />
       </v-list-item>
     </template>
     <span>

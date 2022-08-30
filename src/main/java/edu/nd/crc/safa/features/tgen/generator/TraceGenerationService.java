@@ -33,7 +33,9 @@ public class TraceGenerationService {
     private final SafaRequestBuilder safaRequestBuilder;
 
     public List<TraceAppEntity> generateTraceLinks(List<ArtifactAppEntity> artifacts,
-                                                   List<ArtifactTypeTraceGenerationRequestDTO> artifactTypeTraceGenerationRequestDTOS) throws IOException, InterruptedException {
+                                                   List<ArtifactTypeTraceGenerationRequestDTO>
+                                                       artifactTypeTraceGenerationRequestDTOS)
+        throws IOException, InterruptedException {
         List<TraceAppEntity> generatedLinks = new ArrayList<>();
 
         for (ArtifactTypeTraceGenerationRequestDTO request : artifactTypeTraceGenerationRequestDTOS) {

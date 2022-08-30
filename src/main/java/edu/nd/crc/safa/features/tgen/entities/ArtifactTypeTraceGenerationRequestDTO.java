@@ -14,7 +14,7 @@ public class ArtifactTypeTraceGenerationRequestDTO {
     /**
      * The algorithm for generating similarity scores in trace links.
      */
-    TraceGenerationMethod traceGenerationMethod = TraceGenerationMethod.TBERT;
+    TraceGenerationMethod traceGenerationMethod = TraceGenerationMethod.VSM;
     /**
      * The name of the artifact type for source artifacts.
      */

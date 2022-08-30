@@ -13,6 +13,15 @@ public enum TraceGenerationMethod {
      */
     VSM;
 
+    public static TraceGenerationMethod getMethodWithDefault(String name, TraceGenerationMethod defaultMethod) {
+        for (TraceGenerationMethod method : TraceGenerationMethod.values()) {
+            if (method.name().equals(name)) {
+                return method;
+            }
+        }
+        return defaultMethod;
+    }
+
     @Override
     public String toString() {
         return this.name();

@@ -19,3 +19,9 @@ Cypress.Commands.add("createNewArtifact", (name, type, description) => {
 
   cy.fillArtifactModal(name, type, description);
 });
+
+Cypress.Commands.add("saveArtifact", () => {
+  cy.getCy(DataCy.artifactSaveModal).within(() => {
+    cy.clickButton(DataCy.artifactSaveSubmitButton);
+  });
+});

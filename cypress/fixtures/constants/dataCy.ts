@@ -26,7 +26,8 @@ export enum DataCy {
   // Modals
 
   modalTitle = "modal-title",
-  modalClose = "button-close",
+  modalCloseButton = "button-close",
+  confirmModalButton = "button-confirm-modal",
 
   // Authentication
 
@@ -108,11 +109,25 @@ export enum DataCy {
   artifactSaveNameInput = "input-artifact-name",
   artifactSaveTypeInput = "input-artifact-type",
   artifactSaveBodyInput = "input-artifact-body",
+  artifactSaveParentInput = "input-artifact-parent",
   artifactSaveSubmitButton = "button-artifact-save",
 
   // Artifact Tree
 
-  artifactTreeNode = "node-artifact-tree",
-  artifactTreeSelectedNode = "node-artifact-tree-selected",
-  artifactTreeSelectedName = "text-artifact-selected-name",
+  treeNode = "node-artifact-tree",
+  treeSelectedNode = "node-artifact-tree-selected",
+
+  selectedPanelName = "text-selected-name",
+  selectedPanelBodyButton = "button-selected-body",
+  selectedPanelEditButton = "button-selected-edit",
+  selectedPanelDeleteButton = "button-selected-delete",
+  selectedPanelParents = "list-selected-parents",
+  selectedPanelParentItem = "list-selected-parent-item",
+  selectedPanelChildren = "list-selected-children",
+  selectedPanelChildItem = "list-selected-child-item",
+}
+
+export enum DataIds {
+  rightClickAddArtifact = "#add-artifact",
+  rightClickDuplicateArtifact = "#duplicate-artifact",
 }

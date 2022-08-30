@@ -10,23 +10,33 @@
     <v-divider />
 
     <v-list expand>
-      <toggle-list v-if="parents.length > 0" :title="parentTitle">
+      <toggle-list
+        v-if="parents.length > 0"
+        :title="parentTitle"
+        data-cy="list-selected-parents"
+      >
         <v-list dense style="max-height: 300px" class="overflow-y-auto">
           <template v-for="parent in parents">
             <generic-list-item
               :key="parent.title"
               :item="parent"
+              data-cy="list-selected-parent-item"
               @click="handleArtifactClick(parent.title)"
             />
           </template>
         </v-list>
       </toggle-list>
-      <toggle-list v-if="children.length > 0" :title="childTitle">
+      <toggle-list
+        v-if="children.length > 0"
+        :title="childTitle"
+        data-cy="list-selected-children"
+      >
         <v-list dense style="max-height: 300px" class="overflow-y-auto">
           <template v-for="child in children">
             <generic-list-item
               :key="child.title"
               :item="child"
+              data-cy="list-selected-child-item"
               @click="handleArtifactClick(child.title)"
             />
           </template>

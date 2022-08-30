@@ -243,5 +243,10 @@ declare namespace Cypress {
       type?: string,
       body?: string
     ): Chainable<void>;
+
+    /**
+     * Saves the artifact that is currently open in the creator modal.
+     */
+    saveArtifact(): Chainable<void>;
   }
 }

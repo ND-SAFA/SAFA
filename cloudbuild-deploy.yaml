@@ -10,7 +10,7 @@ steps:
   # Deploy container image to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: gcloud
-    args: [ 'compute', 'instances', 'update-container', '${_SERVICE_NAME}', '--container-image','gcr.io/$PROJECT_ID/safa-tgen-${_STAGE}' ]
+    args: [ 'compute', 'instances', 'update-container', '${_SERVICE_NAME}', '--container-image','gcr.io/$PROJECT_ID/safa-tgen-${_STAGE}', '--zone', 'us-central1-a' ]
 images:
   - gcr.io/$PROJECT_ID/safa-tgen-${_STAGE}
 timeout: 1200s

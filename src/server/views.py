@@ -58,9 +58,9 @@ def _make_job_params_from_request(request_dict: Dict) -> TraceArgsBuilder:
     sources = params.pop(PredictionRequest.SOURCES)
     targets = params.pop(PredictionRequest.TARGETS)
     base_model = params.pop(PredictionRequest.BASE_MODEL)
-    output_path = params.pop(PredictionRequest.OUTPUT_PATH)
+    output_dir = params.pop(PredictionRequest.OUTPUT_DIR)
     links = _safe_pop(params, PredictionRequest.LINKS)  # optional
-    return TraceArgsBuilder(base_model, model_path, output_path, sources, targets, links, VALIDATION_PERCENTAGE_DEFAULT,
+    return TraceArgsBuilder(base_model, model_path, output_dir, sources, targets, links, VALIDATION_PERCENTAGE_DEFAULT,
                             **params)
 
 

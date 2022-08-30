@@ -2,10 +2,10 @@ from typing import List
 
 from transformers.training_args import TrainingArguments
 
+from common.models.model_generator import ModelGenerator
 from trace.config.constants import EVAL_DATASET_SIZE_DEFAULT, MAX_SEQ_LENGTH_DEFAULT, \
     PAD_TO_MAX_LENGTH_DEFAULT, RESAMPLE_RATE_DEFAULT
 from trace.data.trace_dataset_creator import TraceDatasetCreator
-from common.models.model_generator import ModelGenerator
 
 
 class TraceArgs(TrainingArguments):
@@ -17,18 +17,18 @@ class TraceArgs(TrainingArguments):
 
     def __init__(self, model_generator: ModelGenerator,
                  trace_dataset_creator: TraceDatasetCreator,
-                 output_path: str, ** kwargs):
+                 output_dir: str, **kwargs):
         """
         Arguments for Learning Model
         :param model_generator: generates model with specified base model and path.
-        :param output_path: destination for model
+        :param output_dir: destination for model
         :param trace_dataset_creator: creates dataset containing traces to train/predict
         :param kwargs: optional arguments for Trainer as identified at link below + other class attributes (i.e. resample_rate)
         https://huggingface.co/docs/transformers/v4.21.0/en/main_classes/trainer#transformers.TrainingArguments
         """
         self.model_generator = model_generator
         self.trace_dataset_creator = trace_dataset_creator
-        super().__init__(log_level="info", log_level_replica="info", output_dir=output_path)
+        super().__init__(log_level="info", log_level_replica="info", output_dir=output_dir)
         self.__set_args(**kwargs)
 
     def __set_args(self, **kwargs) -> None:

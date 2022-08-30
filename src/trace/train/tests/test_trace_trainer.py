@@ -92,5 +92,5 @@ class TestTraceTrainer(BaseTest):
                                                         validation_percentage=self.VAlIDATION_PERCENTAGE)
             args = TraceArgs(model_generator=model_generator,
                              trace_dataset_creator=trace_dataset_creator,
-                             output_path=TEST_OUTPUT_DIR, **kwargs)
+                             output_dir=TEST_OUTPUT_DIR, **kwargs)
         return TraceTrainer(args)

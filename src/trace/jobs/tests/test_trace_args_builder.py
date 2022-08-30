@@ -8,7 +8,7 @@ from trace.jobs.trace_args_builder import TraceArgsBuilder
 class TestTraceArgsBuilder(BaseTest):
     EXPECTED_VALUES = {"base_model_name": "bert_trace_single",
                        "model_path": "model",
-                       "output_path": "output",
+                       "output_dir": "output",
                        "sources": TEST_S_ARTS,
                        "targets": TEST_T_ARTS,
                        "links": TEST_POS_LINKS,
@@ -19,7 +19,7 @@ class TestTraceArgsBuilder(BaseTest):
         args = test_trace_args_buidler.build()
         self.assertEquals(args.model_generator.model_name.lower(), self.EXPECTED_VALUES["base_model_name"])
         self.assertEquals(args.model_generator.model_path, self.EXPECTED_VALUES["model_path"])
-        self.assertEquals(args.output_dir, self.EXPECTED_VALUES["output_path"])
+        self.assertEquals(args.output_dir, self.EXPECTED_VALUES["output_dir"])
         for link in TEST_POS_LINKS:
             link_id = TraceLink.generate_link_id(link[0], link[1])
             self.assertIn(link_id, args.trace_dataset_creator.pos_link_ids)

@@ -6,6 +6,7 @@ import mock
 from django.test import Client, TestCase
 from mock import patch
 
+from common.api.job_response import JobResponse
 from common.api.prediction_request import PredictionRequest
 from common.models.model_generator import ModelGenerator
 from test.config.paths import TEST_OUTPUT_DIR
@@ -19,7 +20,7 @@ class TestViews(TestCase):
                    PredictionRequest.TARGETS: TEST_T_ARTS,
                    PredictionRequest.MODEL_PATH: "path/to/model",
                    PredictionRequest.BASE_MODEL: "bert_trace_single",
-                   PredictionRequest.OUTPUT_PATH: TEST_OUTPUT_DIR,
+                   PredictionRequest.OUTPUT_DIR: TEST_OUTPUT_DIR,
                    "max_seq_length": 100,
                    "pad_to_max_length": True,
                    "should_save": False}

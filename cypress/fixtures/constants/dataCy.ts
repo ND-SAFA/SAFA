@@ -67,6 +67,7 @@ export enum DataCy {
   jobStatus = "job-status",
   jobPanel = "job-panel",
   jobDeleteButton = "button-delete-job",
+  jobOpenButton = "button-open-job",
 
   // Project Selection
 
@@ -113,4 +114,5 @@ export enum DataCy {
 
   artifactTreeNode = "node-artifact-tree",
   artifactTreeSelectedNode = "node-artifact-tree-selected",
+  artifactTreeSelectedName = "text-artifact-selected-name",
 }

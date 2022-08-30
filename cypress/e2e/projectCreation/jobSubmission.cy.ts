@@ -1,17 +1,15 @@
 import { describe } from "mocha";
-import { validUser, simpleProjectFiles, DataCy } from "../fixtures";
+import { validUser, DataCy } from "../../fixtures";
 
 describe("Job Submission", () => {
   beforeEach(() => {
-    // TODO: clean up existing jobs instead of after tests.
+    cy.dbResetJobs();
 
-    cy.visit("/create?tab=bulk").login(validUser.email, validUser.password);
+    cy.visit("/create").login(validUser.email, validUser.password);
 
     cy.location("pathname", { timeout: 2000 }).should("equal", "/create");
 
-    cy.setProjectIdentifier("bulk")
-      .uploadFiles(DataCy.creationBulkFilesInput, ...simpleProjectFiles)
-      .clickButton(DataCy.creationUploadButton);
+    cy.createBulkProject();
   });
 
   describe("I can view projects being imported", () => {
@@ -21,28 +19,19 @@ describe("Job Submission", () => {
       );
 
       cy.getCy(DataCy.jobPanel).should("have.length.above", 0);
-
-      cy.clickButton(DataCy.jobPanel).clickButton(DataCy.jobDeleteButton);
     });
   });
 
   describe("I can see the current import status of a project being imported", () => {
     it("Shows in progress jobs", () => {
-      cy.getCy(DataCy.jobStatus, "first", 5000).should(
-        "contain.text",
-        "In Progress"
-      );
-
-      cy.getCy(DataCy.jobPanel).clickButton(DataCy.jobDeleteButton);
+      cy.getCy(DataCy.jobStatus, "first").should("contain.text", "In Progress");
     });
 
-    it.skip("Shows completed jobs", () => {
-      cy.getCy(DataCy.jobStatus, "first", 5000).should(
+    it("Shows completed jobs", () => {
+      cy.getCy(DataCy.jobStatus, "first", 20000).should(
         "contain.text",
         "Completed"
       );
-
-      cy.getCy(DataCy.jobPanel).clickButton(DataCy.jobDeleteButton);
     });
   });
 

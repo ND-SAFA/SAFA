@@ -5,6 +5,23 @@ type ElementPosition = "first" | "last";
 
 declare namespace Cypress {
   interface Chainable<Subject> {
+    // Database Cleanup
+
+    /**
+     * Gets an api token.
+     */
+    dbToken(): Chainable<Cypress.Response<{ token: string }>>;
+
+    /**
+     * Removes all stored jobs.
+     */
+    dbResetJobs(): Chainable<void>;
+
+    /**
+     * Removes all stored projects.
+     */
+    dbResetProjects(): Chainable<void>;
+
     // Base Commands
 
     /**
@@ -124,6 +141,11 @@ declare namespace Cypress {
     setProjectIdentifier(type: "bulk" | "standard" | "modal"): Chainable<void>;
 
     /**
+     * Creates a new bulk upload project.
+     */
+    createBulkProject(): Chainable<void>;
+
+    /**
      * Opens the last file panel after waiting for it to close when files are parsed.
      */
     openPanelAfterClose(): Chainable<void>;
@@ -194,6 +216,19 @@ declare namespace Cypress {
     createNewVersion(type: "major" | "minor" | "revision"): Chainable<void>;
 
     // Artifact View
+
+    /**
+     * Fills inputs in the artifact modal.
+     *
+     * @param name - A specific name to set.
+     * @param type - A specific type to set.
+     * @param body - A specific body to set.
+     */
+    fillArtifactModal(
+      name?: string,
+      type?: string,
+      body?: string
+    ): Chainable<void>;
 
     /**
      * Creates a new artifact from the artifact fab button.

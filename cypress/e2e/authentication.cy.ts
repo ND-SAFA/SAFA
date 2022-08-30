@@ -32,7 +32,10 @@ describe("Authentication", () => {
       });
 
       it("fails to log in with invalidUser credentials", () => {
-        cy.login(invalidUser.email, invalidUser.password);
+        cy.inputText(DataCy.emailInput, invalidUser.email).inputText(
+          DataCy.passwordInput,
+          invalidUser.password
+        );
 
         cy.getCy(DataCy.accountDropdown).should("not.exist");
       });
@@ -49,12 +52,8 @@ describe("Authentication", () => {
         cy.login(validUser.email, validUser.password).logout();
 
         cy.getCy(DataCy.loginButton).should("exist");
-      });
 
-      it("clears my session on logout", () => {
-        cy.login(validUser.email, validUser.password)
-          .logout()
-          .visit("http://localhost:8080");
+        cy.visit("http://localhost:8080");
 
         cy.getCy(DataCy.loginButton).should("exist");
       });

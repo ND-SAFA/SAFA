@@ -4,10 +4,12 @@ import {
   testFileMap,
   testProject,
   validUser,
-} from "../fixtures";
+} from "../../fixtures";
 
 describe("Project Creation", () => {
   beforeEach(() => {
+    cy.dbResetJobs();
+
     cy.visit("http://localhost:8080/create").login(
       validUser.email,
       validUser.password
@@ -277,8 +279,6 @@ describe("Project Creation", () => {
 
       // Step - Check for creation success message
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
-
-      cy.clickButton(DataCy.jobPanel).clickButton(DataCy.jobDeleteButton);
     });
   });
 });

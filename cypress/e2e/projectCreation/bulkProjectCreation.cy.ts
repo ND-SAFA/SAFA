@@ -4,14 +4,19 @@ import {
   simpleProjectFilesMap,
   DataCy,
   testProject,
-} from "../fixtures";
+} from "../../fixtures";
 
 describe("Project Creation", () => {
   beforeEach(() => {
+    cy.dbResetJobs();
+    cy.dbResetProjects();
+
     cy.visit("http://localhost:8080/create?tab=bulk").login(
       validUser.email,
       validUser.password
     );
+
+    cy.location("pathname", { timeout: 2000 }).should("equal", "/create");
   });
 
   describe("I can create a project from files uploaded in bulk", () => {

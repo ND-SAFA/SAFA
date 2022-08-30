@@ -78,7 +78,7 @@ class TraceTrainer(Trainer):
         preds = np.argmax(output.predictions, axis=-1)
         metric_paths = [get_metric_path(name) for name in metric_names]
         for metric_path in metric_paths:
-            metric = load_metric(metric_path)
+            metric = load_metric(metric_path, keep_in_memory=True)
             results = metric.compute(predictions=preds, references=output.label_ids)
             output.metrics.update(results)
 

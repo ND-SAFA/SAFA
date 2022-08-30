@@ -46,8 +46,8 @@ ENV TRANSFORMERS_CACHE=/mnt/gcs/model-cache/
 ENV MNT_DIR /mnt/gcs
 
 # 5. Setup cloud file system
-ENV GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS:-/app/application-credentials.json}
-COPY application-credentials.json /app/
+# ENV GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS:-/app/application-credentials.json}
+# COPY application-credentials.json /app/
 COPY gcsfuse_run.sh /app/
 RUN chmod +x /app/gcsfuse_run.sh
 

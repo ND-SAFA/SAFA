@@ -3,7 +3,7 @@ import { validUser, DataCy } from "../../fixtures";
 
 describe("Job Submission", () => {
   beforeEach(() => {
-    cy.dbResetJobs();
+    cy.dbResetJobs().dbResetProjects();
 
     cy.visit("/create").login(validUser.email, validUser.password);
 

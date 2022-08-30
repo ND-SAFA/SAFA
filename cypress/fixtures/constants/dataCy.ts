@@ -116,6 +116,8 @@ export enum DataCy {
   traceSaveModal = "modal-trace-save",
   traceSaveSourceInput = "button-trace-save-source",
   traceSaveTargetInput = "button-trace-save-target",
+  traceSaveDirectionsPanel = "panel-trace-directions",
+  traceSaveDirectionsChip = "chip-type-direction",
   traceSaveSubmitButton = "button-trace-save",
 
   traceApproveModal = "modal-trace-approve",

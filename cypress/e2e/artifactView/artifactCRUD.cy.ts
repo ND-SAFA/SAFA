@@ -22,7 +22,10 @@ describe("Artifact CRUD", () => {
       .location("pathname", { timeout: 5000 })
       .should("equal", "/project");
 
-    cy.getNodes().should("be.visible");
+    cy.getCy(DataCy.appLoading)
+      .should("not.be.visible")
+      .getNodes()
+      .should("be.visible");
   });
 
   describe("I can create a new artifact", () => {

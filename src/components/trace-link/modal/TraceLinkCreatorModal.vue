@@ -26,7 +26,7 @@
         </v-col>
       </v-row>
       <v-expansion-panels flat>
-        <v-expansion-panel>
+        <v-expansion-panel data-cy="panel-trace-directions">
           <v-expansion-panel-header>
             <typography value="Allowed Trace Directions" />
           </v-expansion-panel-header>

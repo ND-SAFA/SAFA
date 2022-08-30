@@ -9,6 +9,7 @@
         v-for="type in entry.allowedTypes"
         :key="type"
         close
+        data-cy="chip-type-direction"
         @click:close="handleDeleteDirection(entry, type)"
       >
         <typography :value="getTypeLabel(type)" />

@@ -26,8 +26,8 @@ RUN /app/venv/bin/pip install -r /app/requirements.txt
 
 # 5. Uncomment for local builds
 # TODO: Conditionally run these commands in deployment type is local
-ENV GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS:-/app/application-credentials.json}
-COPY application-credentials.json /app/
+# ENV GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS:-/app/application-credentials.json}
+# COPY application-credentials.json /app/
 
 
 # 6. Run commands

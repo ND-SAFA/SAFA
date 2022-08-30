@@ -1,7 +1,9 @@
 steps:
   # Build the container image
   - name: 'gcr.io/cloud-builders/docker'
-    args: [ 'buildx', 'build', '--progress=plain', '-t','gcr.io/$PROJECT_ID/safa-tgen-${_STAGE}', '.' ]
+    args: [  'build', '--progress=plain', '--build-arg', 'BUCKET=${_BUCKET}', '-t','gcr.io/$PROJECT_ID/safa-tgen-${_STAGE}', '.' ]
+    env:
+      - "DOCKER_BUILDKIT=1"
   # Push the container image to Container Registry
   - name: 'gcr.io/cloud-builders/docker'
     args: [ 'push', 'gcr.io/$PROJECT_ID/safa-tgen-${_STAGE}' ]

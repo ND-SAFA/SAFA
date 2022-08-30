@@ -6,7 +6,9 @@ from django.http.request import HttpRequest
 from django.http.response import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
+from common.api.job_response import JobResponse
 from common.api.prediction_request import PredictionRequest
+from common.storage.safa_storage import SafaStorage
 from server.job_type import JobType
 from trace.config.constants import VALIDATION_PERCENTAGE_DEFAULT
 from trace.jobs.trace_args_builder import TraceArgsBuilder
@@ -42,7 +44,7 @@ def _run_job(request: HttpRequest, job_type: JobType) -> JsonResponse:
     args = _make_job_params_from_request(request_dict)
     job = job_type.value(args)
     job.start()
-    return JsonResponse({"outputPath": job.output_filepath})
+    return JsonResponse({JobResponse.OUTPUT_PATH: SafaStorage.remove_mount_directory(job.output_filepath)})
 
 
 def _make_job_params_from_request(request_dict: Dict) -> TraceArgsBuilder:

@@ -25,9 +25,9 @@ class AbstractJob(Thread, ABC):
         self.status = Status.NOT_STARTED
         self.result = {}
         self.id = uuid.uuid4()
-        self.output_dir = os.path.join(self.args.output_dir, str(self.id))
+        output_dir = os.path.join(self.args.output_dir, str(self.id))
+        self.output_dir = SafaStorage.add_mount_directory(output_dir)
         self.output_filepath = os.path.join(self.output_dir, self.OUTPUT_FILENAME)
-        self._save_method = SafaStorage.get_save()
 
     @abstractmethod
     def _run(self) -> Dict:

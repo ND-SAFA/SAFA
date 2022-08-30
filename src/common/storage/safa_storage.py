@@ -1,5 +1,7 @@
 import os
 
+from common.config.constants import IS_TEST, MNT_DIR
+
 
 class SafaStorage:
     """
@@ -25,3 +27,19 @@ class SafaStorage:
     def create_dir(dir_path: str):
         if not os.path.exists(os.path.dirname(dir_path)):
             os.makedirs(os.path.dirname(dir_path))
+
+    @staticmethod
+    def add_mount_directory(target_path: str):
+        """
+        Adds mounting directory to given target path.
+        :param target_path: The path to add mount directory to.
+        """
+        return os.path.join(MNT_DIR, target_path) if not IS_TEST else target_path
+
+    @staticmethod
+    def remove_mount_directory(target_path: str):
+        """
+        Removes the mount directory in output path if in development mode.
+        :param target_path: Path to remove mount directory if in dev mode.
+        """
+        return target_path.replace(MNT_DIR, "") if not IS_TEST else target_path

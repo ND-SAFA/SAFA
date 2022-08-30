@@ -69,11 +69,11 @@ public class TraceLink implements Serializable, IBaseEntity {
     }
 
     public String getSourceName() {
-        return this.sourceArtifact.getBaseEntityId();
+        return this.sourceArtifact.getName();
     }
 
     public String getTargetName() {
-        return this.targetArtifact.getBaseEntityId();
+        return this.targetArtifact.getName();
     }
 
     public ArtifactType getSourceType() {
@@ -93,7 +93,7 @@ public class TraceLink implements Serializable, IBaseEntity {
     }
 
     @Override
-    public String getBaseEntityId() {
-        return this.getTraceLinkId().toString();
+    public UUID getBaseEntityId() {
+        return this.getTraceLinkId();
     }
 }

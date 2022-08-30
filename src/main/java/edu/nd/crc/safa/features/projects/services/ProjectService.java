@@ -14,7 +14,6 @@ import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.repositories.ProjectRepository;
 import edu.nd.crc.safa.features.users.entities.db.ProjectRole;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
-import edu.nd.crc.safa.features.users.repositories.SafaUserRepository;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
 import edu.nd.crc.safa.utilities.OSHelper;
 
@@ -32,7 +31,6 @@ public class ProjectService {
 
     private final ProjectRepository projectRepository;
     private final ProjectMembershipRepository projectMembershipRepository;
-    private final SafaUserRepository safaUserRepository;
     private final SafaUserService safaUserService;
 
     /**

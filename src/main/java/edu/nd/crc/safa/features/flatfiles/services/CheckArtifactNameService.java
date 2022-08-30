@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.features.flatfiles.services;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
@@ -32,7 +33,7 @@ public class CheckArtifactNameService {
                 artifactNameCheck.getArtifactName());
         boolean artifactExists = false;
         if (artifactQuery.isPresent()) {
-            String artifactId = artifactQuery.get().getArtifactId().toString();
+            UUID artifactId = artifactQuery.get().getArtifactId();
             Optional<ArtifactVersion> artifactVersionQuery =
                 this.artifactVersionRepository.findVersionEntityByProjectVersionAndBaseEntityId(
                     projectVersion,

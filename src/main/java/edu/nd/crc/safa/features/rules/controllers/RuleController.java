@@ -43,7 +43,7 @@ public class RuleController extends BaseController {
      * @throws SafaError Throws error if user does not have read permission on project version.
      */
     @GetMapping(AppRoutes.Rules.GET_WARNINGS_IN_PROJECT_VERSION)
-    public Map<String, List<RuleName>> getWarningsInProjectVersion(@PathVariable UUID versionId) throws SafaError {
+    public Map<UUID, List<RuleName>> getWarningsInProjectVersion(@PathVariable UUID versionId) throws SafaError {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
         return this.serviceProvider.getWarningService().retrieveWarningsInProjectVersion(projectVersion);
     }

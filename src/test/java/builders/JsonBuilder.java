@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import edu.nd.crc.safa.features.documents.entities.app.DocumentColumnDataType;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
@@ -52,7 +53,7 @@ public class JsonBuilder extends AbstractBuilder {
     }
 
     public JsonBuilder withProjectVersion(String projectName,
-                                          String versionId,
+                                          UUID versionId,
                                           int majorVersion,
                                           int minorVersion,
                                           int revision) {
@@ -72,7 +73,7 @@ public class JsonBuilder extends AbstractBuilder {
     }
 
     public JSONObject withArtifactAndReturn(String projectName,
-                                            String artifactId,
+                                            UUID artifactId,
                                             String name,
                                             String type,
                                             String body) {
@@ -82,7 +83,7 @@ public class JsonBuilder extends AbstractBuilder {
     }
 
     public JsonBuilder withArtifact(String projectName,
-                                    String artifactId,
+                                    UUID artifactId,
                                     String name,
                                     String type,
                                     String body) {
@@ -90,7 +91,7 @@ public class JsonBuilder extends AbstractBuilder {
     }
 
     public JsonBuilder withArtifact(String projectName,
-                                    String artifactId,
+                                    UUID artifactId,
                                     String name,
                                     String type,
                                     String body,
@@ -147,7 +148,7 @@ public class JsonBuilder extends AbstractBuilder {
     public JSONObject createDocument(String docName,
                                      String description,
                                      DocumentType documentType,
-                                     List<String> artifactIds) {
+                                     List<UUID> artifactIds) {
         JSONObject docJson = new JSONObject();
         docJson.put(Constants.NAME, docName);
         docJson.put("description", description);
@@ -163,7 +164,7 @@ public class JsonBuilder extends AbstractBuilder {
         return fmeaJson;
     }
 
-    public JSONObject createDocumentColumn(String id, String name, DocumentColumnDataType dataType) {
+    public JSONObject createDocumentColumn(UUID id, String name, DocumentColumnDataType dataType) {
         JSONObject columnJson = new JSONObject();
         columnJson.put("id", id);
         columnJson.put("name", name);

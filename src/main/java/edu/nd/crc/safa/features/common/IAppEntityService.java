@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.features.common;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
@@ -24,7 +25,7 @@ public interface IAppEntityService<T extends IAppEntity> {
      */
     List<T> getAppEntities(ProjectVersion projectVersion);
 
-    default List<T> getAppEntitiesByIds(ProjectVersion projectVersion, List<String> entityIds) {
+    default List<T> getAppEntitiesByIds(ProjectVersion projectVersion, List<UUID> entityIds) {
         return this.getAppEntities(projectVersion)
             .stream()
             .filter(e -> entityIds.contains(e.getId()))

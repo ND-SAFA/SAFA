@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
@@ -23,7 +24,7 @@ public class ProjectEntities {
     @Getter
     List<TraceAppEntity> traces;
     Map<String, ArtifactAppEntity> name2artifact;
-    Map<String, ArtifactAppEntity> id2artifact;
+    Map<UUID, ArtifactAppEntity> id2artifact;
     Map<String, List<ArtifactAppEntity>> type2artifacts;
 
     private ProjectEntities() {
@@ -54,7 +55,7 @@ public class ProjectEntities {
 
     private void createMaps() {
         for (ArtifactAppEntity artifact : this.artifacts) {
-            String artifactType = artifact.type;
+            String artifactType = artifact.getType();
             if (type2artifacts.containsKey(artifactType)) {
                 type2artifacts.get(artifactType).add(artifact);
             } else {
@@ -62,8 +63,8 @@ public class ProjectEntities {
                 typeArtifacts.add(artifact);
                 type2artifacts.put(artifactType, typeArtifacts);
             }
-            name2artifact.put(artifact.name, artifact);
-            id2artifact.put(artifact.id, artifact);
+            name2artifact.put(artifact.getName(), artifact);
+            id2artifact.put(artifact.getId(), artifact);
         }
     }
 
@@ -79,12 +80,12 @@ public class ProjectEntities {
         return getArtifactByKey(this.name2artifact, artifactName);
     }
 
-    public ArtifactAppEntity getArtifactById(String artifactId) {
+    public ArtifactAppEntity getArtifactById(UUID artifactId) {
         return getArtifactByKey(this.id2artifact, artifactId);
     }
 
-    private ArtifactAppEntity getArtifactByKey(Map<String, ArtifactAppEntity> key2artifact,
-                                               String key) {
+    private <T> ArtifactAppEntity getArtifactByKey(Map<T, ArtifactAppEntity> key2artifact,
+                                                   T key) {
         if (!key2artifact.containsKey(key)) {
             String error = String.format("Artifact not in map: %s", key);
             throw new IllegalArgumentException(error);
@@ -95,7 +96,7 @@ public class ProjectEntities {
     public ProjectEntities getEntitiesInDocument(Document document) {
         List<ArtifactAppEntity> documentArtifacts = this.artifacts
             .stream()
-            .filter((a) -> a.getDocumentIds().contains(document.getDocumentId().toString()))
+            .filter(a -> a.getDocumentIds().contains(document.getDocumentId()))
             .collect(Collectors.toList());
         List<String> documentArtifactNames = documentArtifacts
             .stream()
@@ -103,7 +104,7 @@ public class ProjectEntities {
             .collect(Collectors.toList());
         List<TraceAppEntity> documentTraces = this.traces
             .stream()
-            .filter((t) -> documentArtifactNames.contains(t.getSourceName())
+            .filter(t -> documentArtifactNames.contains(t.getSourceName())
                 || documentArtifactNames.contains(t.getTargetName()))
             .collect(Collectors.toList());
         return new ProjectEntities(documentArtifacts, documentTraces);

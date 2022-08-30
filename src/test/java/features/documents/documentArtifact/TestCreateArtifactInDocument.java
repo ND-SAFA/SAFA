@@ -57,7 +57,7 @@ class TestCreateArtifactInDocument extends ApplicationBaseTest {
         // Step - Create new document payload
         JSONObject artifactJson = jsonBuilder
             .withProject(projectName, projectName, "")
-            .withArtifactAndReturn(projectName, artifact.getArtifactId().toString(),
+            .withArtifactAndReturn(projectName, artifact.getArtifactId(),
                 artifactName, artifactType,
                 artifactContent);
         List<Object> documentIds = artifactJson.getJSONArray("documentIds").toList();

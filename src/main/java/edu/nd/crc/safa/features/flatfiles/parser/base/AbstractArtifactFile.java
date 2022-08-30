@@ -41,7 +41,7 @@ public abstract class AbstractArtifactFile<I> extends AbstractDataFile<ArtifactA
     public Pair<List<ArtifactAppEntity>, List<String>> validateInProject(ProjectAppEntity projectAppEntity) {
         HashMap<String, ArtifactAppEntity> name2artifact = new HashMap<>();
         for (ArtifactAppEntity artifact : projectAppEntity.getArtifacts()) {
-            name2artifact.put(artifact.name, artifact);
+            name2artifact.put(artifact.getName(), artifact);
         }
         return checkForDuplicates(name2artifact);
     }
@@ -57,11 +57,11 @@ public abstract class AbstractArtifactFile<I> extends AbstractDataFile<ArtifactA
         List<String> errors = new ArrayList<>();
         List<ArtifactAppEntity> validArtifacts = new ArrayList<>();
         entities.forEach(artifact -> {
-            if (artifactsProcessed.containsKey(artifact.name)) {
-                String errorMessage = String.format("Duplicate artifact artifact found: %s", artifact.name);
+            if (artifactsProcessed.containsKey(artifact.getName())) {
+                String errorMessage = String.format("Duplicate artifact artifact found: %s", artifact.getName());
                 errors.add(errorMessage);
             } else {
-                artifactsProcessed.put(artifact.name, artifact);
+                artifactsProcessed.put(artifact.getName(), artifact);
                 validArtifacts.add(artifact);
             }
         });

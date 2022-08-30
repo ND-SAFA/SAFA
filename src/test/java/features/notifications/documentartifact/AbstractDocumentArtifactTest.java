@@ -40,6 +40,6 @@ public abstract class AbstractDocumentArtifactTest extends TestUpdateDocumentNot
     @Override
     public void setArtifact(ArtifactAppEntity artifact) {
         this.artifactConstants.artifact.setId(artifact.getId());
-        this.artifactId = UUID.fromString(artifact.getId());
+        this.artifactId = artifact.getId();
     }
 }

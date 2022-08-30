@@ -4,6 +4,7 @@ package features.layout.crud;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Map;
+import java.util.UUID;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.layout.LayoutSettings;
@@ -19,13 +20,13 @@ class TestLayoutRetrieved extends AbstractLayoutTest {
 
     @Test
     void testValidLayoutExistsInDefaultProject() {
-        Map<String, LayoutPosition> layout = projectAppEntity.getLayout();
+        Map<UUID, LayoutPosition> layout = projectAppEntity.getLayout();
 
         // VP - Verify position created for every artifact
         for (ArtifactAppEntity artifact : this.projectAppEntity.getArtifacts()) {
-            boolean hasArtifact = layout.containsKey(artifact.id);
+            boolean hasArtifact = layout.containsKey(artifact.getId());
             assertThat(hasArtifact).isTrue();
-            LayoutPosition artifactPosition = layout.get(artifact.id);
+            LayoutPosition artifactPosition = layout.get(artifact.getId());
             double x = artifactPosition.getX();
             double y = artifactPosition.getY();
             assertThat(x).isPositive();

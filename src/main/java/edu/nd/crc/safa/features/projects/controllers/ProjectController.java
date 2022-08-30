@@ -50,11 +50,11 @@ public class ProjectController extends BaseController {
     public ProjectAppEntity createOrUpdateProject(@RequestBody @Valid ProjectAppEntity projectAppEntity)
         throws SafaError {
 
-        if (projectAppEntity.getProjectId().isEmpty()) { // new projects expected to have no projectId or projectVersion
+        if (projectAppEntity.getProjectId() == null) { // new projects expected to have no projectId or projectVersion
             // Step - Create project identifier
             Project projectEntity = Project.fromAppEntity(projectAppEntity);
             this.serviceProvider.getProjectService().saveProjectWithCurrentUserAsOwner(projectEntity);
-            projectAppEntity.setProjectId(projectEntity.getProjectId().toString());
+            projectAppEntity.setProjectId(projectEntity.getProjectId());
 
             // Step - Create version
             ProjectVersion projectVersion = this.serviceProvider
@@ -63,7 +63,7 @@ public class ProjectController extends BaseController {
             projectAppEntity.setProjectVersion(projectVersion);
         } else {
             // Step - Finding project identifier
-            UUID projectId = UUID.fromString(projectAppEntity.getProjectId());
+            UUID projectId = projectAppEntity.getProjectId();
             Project project = this.serviceProvider.getProjectRepository().findByProjectId(projectId);
 
             // Step - Update meta information

@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
@@ -130,11 +131,11 @@ class SmokeTests extends ApplicationBaseTest {
 
         // Step - Calculate violated rules.
         TreeVerifier verifier = new TreeVerifier();
-        Map<String, List<RuleName>> violatedRules = verifier.findRuleViolations(projectBodies, traceLinks,
+        Map<UUID, List<RuleName>> violatedRules = verifier.findRuleViolations(projectBodies, traceLinks,
             DefaultTreeRules.getDefaultRules());
 
         // VP - Verify that right warnings were triggered.
-        String targetId = dbEntityBuilder.getArtifact(projectName, targetName).getArtifactId().toString();
+        UUID targetId = dbEntityBuilder.getArtifact(projectName, targetName).getArtifactId();
         assertThat(violatedRules).hasSize(1);
         assertThat(violatedRules.get(targetId)).hasSize(2);
         String targetRule = violatedRules.get(targetId).get(0).toString();

@@ -32,9 +32,9 @@ public abstract class AbstractArtifactCrudTest extends AbstractCrudTest<Artifact
                 .withVersion(projectVersion)
                 .withAddedArtifact(artifact));
 
-        String artifactId = commit.getArtifact(ModificationType.ADDED, 0).getId();
+        UUID artifactId = commit.getArtifact(ModificationType.ADDED, 0).getId();
         artifact.setId(artifactId);
-        return UUID.fromString(artifactId);
+        return artifactId;
     }
 
     @Override

@@ -30,8 +30,8 @@ public class Change {
      */
     List<UUID> entityIds = new ArrayList<>();
 
-    public List<String> getStringEntityIds() {
-        return this.entityIds.stream().map(UUID::toString).collect(Collectors.toList());
+    public List<UUID> getEntityIds() {
+        return this.entityIds.stream().collect(Collectors.toList());
     }
 
     /**

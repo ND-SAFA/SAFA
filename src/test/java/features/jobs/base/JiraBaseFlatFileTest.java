@@ -27,7 +27,7 @@ import services.MappingTestService;
 public abstract class JiraBaseFlatFileTest extends BaseFlatFileTest {
 
     protected String jiraProjectName = "test-jira-project";
-    protected int N_STEPS = 3;
+    protected int N_STEPS = 4;
     protected String cloudId = UUID.randomUUID().toString();
     protected Long jiraProjectId = (long) 1;
 

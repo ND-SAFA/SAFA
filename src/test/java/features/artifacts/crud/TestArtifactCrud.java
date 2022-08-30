@@ -10,7 +10,7 @@ import features.artifacts.base.AbstractArtifactCrudTest;
 public class TestArtifactCrud extends AbstractArtifactCrudTest {
     @Override
     protected ArtifactAppEntity getStartingArtifact() {
-        return new ArtifactAppEntity("",
+        return new ArtifactAppEntity(null,
             "Requirements",
             "RE-20",
             "summary",

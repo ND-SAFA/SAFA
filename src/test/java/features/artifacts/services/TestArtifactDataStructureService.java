@@ -146,9 +146,8 @@ class TestArtifactDataStructureService extends ApplicationBaseTest {
         // Step - Create new version and updated artifact
         ProjectVersion projectVersion = dbEntityBuilder.newVersionWithReturn(projectName);
         Artifact artifact = dbEntityBuilder.getArtifact(projectName, artifactName);
-        String artifactId = artifact.getArtifactId().toString();
         ArtifactAppEntity appEntity = new ArtifactAppEntity(
-            artifactId,
+            artifact.getArtifactId(),
             typeName,
             artifactName,
             artifactSummary,

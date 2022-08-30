@@ -2,6 +2,7 @@ package edu.nd.crc.safa.features.projects.services;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.common.ProjectEntities;
@@ -85,10 +86,10 @@ public class ProjectRetrievalService {
         ProjectParsingErrors errors = this.commitErrorRetrievalService.collectErrorsInVersion(projectVersion);
 
         // Artifact warnings
-        Map<String, List<RuleName>> warnings = this.warningService.retrieveWarningsInProjectVersion(projectVersion);
+        Map<UUID, List<RuleName>> warnings = this.warningService.retrieveWarningsInProjectVersion(projectVersion);
 
         // Layout
-        Map<String, LayoutPosition> layout = artifactPositionService.retrieveDocumentLayout(projectVersion, null);
+        Map<UUID, LayoutPosition> layout = artifactPositionService.retrieveDocumentLayout(projectVersion, null);
 
         return new ProjectAppEntity(projectVersion,
             entities.getArtifacts(),
@@ -111,7 +112,7 @@ public class ProjectRetrievalService {
     public ProjectEntities retrieveProjectEntitiesAtProjectVersion(ProjectVersion projectVersion) {
         List<ArtifactAppEntity> artifacts = this.artifactService
             .getAppEntities(projectVersion);
-        List<String> artifactIds = artifacts
+        List<UUID> artifactIds = artifacts
             .stream()
             .map(ArtifactAppEntity::getId)
             .collect(Collectors.toList());

@@ -2,6 +2,7 @@ package edu.nd.crc.safa.features.artifacts.repositories;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import edu.nd.crc.safa.features.common.IVersionEntity;
 import edu.nd.crc.safa.features.delta.entities.app.EntityDelta;
@@ -45,7 +46,7 @@ public interface IVersionRepository<
      * @return Optional of entity version at given project version.
      */
     Optional<V> findVersionEntityByProjectVersionAndBaseEntityId(ProjectVersion projectVersion,
-                                                                 String entityId);
+                                                                 UUID entityId);
 
     /**
      * Defines a method for constructing AppEntities for attaching sub-entities.
@@ -90,7 +91,7 @@ public interface IVersionRepository<
      */
     Pair<V, CommitError> deleteVersionEntityByBaseEntityId(
         ProjectVersion projectVersion,
-        String baseEntityName);
+        UUID baseEntityName);
 
     /**
      * Calculates and returns the delta between the versions

@@ -24,8 +24,7 @@ public class TestAddArtifactSync extends AbstractSyncTest {
         ProjectCommit projectCommit = this.commitService.commit(CommitBuilder
             .withVersion(this.projectVersion)
             .withAddedArtifact(artifactConstants.artifact));
-        String artifactIdString = projectCommit.getArtifact(ModificationType.ADDED, 0).getId();
-        this.artifactId = UUID.fromString(artifactIdString);
+        this.artifactId = projectCommit.getArtifact(ModificationType.ADDED, 0).getId();
     }
 
     @Override

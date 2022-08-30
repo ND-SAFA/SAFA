@@ -1,6 +1,7 @@
 package features.layout.crud;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
@@ -36,7 +37,7 @@ class TestDocumentLayoutIsRetrieved extends AbstractCorrectnessTest {
         ProjectAppEntity project = retrievalService.getProjectAtVersion(projectVersion);
 
         // Step - Extract artifact positions
-        String documentId = document.getDocumentId().toString();
+        UUID documentId = document.getDocumentId();
         LayoutPosition a1Pos = getLayoutPositionInDocument(project, documentId, a1Name);
         LayoutPosition a2Pos = getLayoutPositionInDocument(project, documentId, a2Name);
         LayoutPosition a3Pos = getLayoutPositionInDocument(project, documentId, a3Name);
@@ -53,7 +54,7 @@ class TestDocumentLayoutIsRetrieved extends AbstractCorrectnessTest {
 
         // Step - Create project
         ProjectCommit projectCommit = createProject();
-        List<String> artifactIds = projectCommit
+        List<UUID> artifactIds = projectCommit
             .getArtifacts()
             .getAdded()
             .stream()

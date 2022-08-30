@@ -1,7 +1,7 @@
 package edu.nd.crc.safa.features.traces.entities.app;
 
+import java.util.UUID;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
@@ -16,23 +16,22 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class TraceAppEntity implements IAppEntity {
-    @NotNull
-    String traceLinkId = "";
+    UUID traceLinkId;
     @NotEmpty
     String sourceName;
-    String sourceId;
+    UUID sourceId;
     @NotEmpty
     String targetName;
-    String targetId;
+    UUID targetId;
     ApprovalStatus approvalStatus;
     double score;
     TraceType traceType;
 
-    public TraceAppEntity(String traceLinkId,
+    public TraceAppEntity(UUID traceLinkId,
                           String sourceName,
-                          String sourceId,
+                          UUID sourceId,
                           String targetName,
-                          String targetId,
+                          UUID targetId,
                           ApprovalStatus approvalStatus,
                           double score,
                           TraceType traceType) {
@@ -67,12 +66,12 @@ public class TraceAppEntity implements IAppEntity {
     }
 
     @Override
-    public String getId() {
+    public UUID getId() {
         return this.traceLinkId;
     }
 
     @Override
-    public void setId(String id) {
+    public void setId(UUID id) {
         this.traceLinkId = id;
     }
 }

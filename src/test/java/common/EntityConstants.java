@@ -19,7 +19,7 @@ public class EntityConstants {
         public final String type = "requirement";
         public final DocumentType documentType = DocumentType.ARTIFACT_TREE;
         public final ArtifactAppEntity artifact = new ArtifactAppEntity(
-            "",
+            null,
             type,
             name,
             summary,

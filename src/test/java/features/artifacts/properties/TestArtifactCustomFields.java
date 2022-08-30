@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
@@ -45,7 +46,7 @@ class TestArtifactCustomFields extends ApplicationBaseTest {
         // Step - Create artifact json
         JSONObject artifactJson = this.jsonBuilder
             .withProject(projectName, projectName, "")
-            .withArtifact(projectName, "", artifactName, type, body)
+            .withArtifact(projectName, null, artifactName, type, body)
             .getArtifact(projectName, artifactName);
 
         // Step - Add custom fields
@@ -64,7 +65,7 @@ class TestArtifactCustomFields extends ApplicationBaseTest {
 
         // Step - Extract artifact
         ArtifactAppEntity artifact = artifactsAdded.get(0);
-        String artifactId = artifact.getId();
+        UUID artifactId = artifact.getId();
 
         // VP - Verify that custom fields persisted
         ArtifactAppEntity appEntity =
@@ -84,7 +85,7 @@ class TestArtifactCustomFields extends ApplicationBaseTest {
         // Step - Get delta
         EntityDelta<ArtifactAppEntity> delta = this.artifactVersionRepository.calculateEntityDelta(projectVersion,
             afterVersion);
-        Map<String, ModifiedEntity<ArtifactAppEntity>> modifiedArtifacts = delta.getModified();
+        Map<UUID, ModifiedEntity<ArtifactAppEntity>> modifiedArtifacts = delta.getModified();
 
         // VP - Verify change detected
         assertThat(modifiedArtifacts).containsKey(artifactId);

@@ -85,8 +85,8 @@ public class TraceLinkVersionRepositoryImpl
     }
 
     @Override
-    public Optional<TraceLink> findBaseEntityById(String baseEntityId) {
-        return this.traceLinkRepository.findById(UUID.fromString(baseEntityId));
+    public Optional<TraceLink> findBaseEntityById(UUID baseEntityId) {
+        return this.traceLinkRepository.findById(baseEntityId);
     }
 
     @Override
@@ -120,11 +120,11 @@ public class TraceLinkVersionRepositoryImpl
         Artifact targetArtifact = trace.getTraceLink().getTargetArtifact();
 
         return new TraceAppEntity(
-            traceLinkId != null ? traceLinkId.toString() : "",
+            traceLinkId,
             sourceArtifact.getName(),
-            sourceArtifact.getArtifactId().toString(),
+            sourceArtifact.getArtifactId(),
             targetArtifact.getName(),
-            targetArtifact.getArtifactId().toString(),
+            targetArtifact.getArtifactId(),
             trace.getApprovalStatus(),
             trace.getScore(),
             trace.getTraceType()

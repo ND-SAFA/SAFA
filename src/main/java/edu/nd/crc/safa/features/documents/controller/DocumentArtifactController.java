@@ -66,19 +66,18 @@ public class DocumentArtifactController extends BaseDocumentController {
         ProjectVersion projectVersion = resourceBuilder.fetchVersion(versionId).withEditVersion();
         Document document = getDocumentById(this.documentRepository, documentId);
         for (ArtifactAppEntity a : artifacts) {
-            UUID artifactId = UUID.fromString(a.getId());
+            UUID artifactId = a.getId();
             Artifact artifact = getArtifactById(artifactId);
             DocumentArtifact documentArtifact = new DocumentArtifact(projectVersion, document, artifact);
             this.documentArtifactRepository.save(documentArtifact);
-            a.addDocumentId(document.getDocumentId().toString());
+            a.addDocumentId(document.getDocumentId());
         }
 
         LayoutManager layoutManager = new LayoutManager(serviceProvider, projectVersion);
-        layoutManager.generateDocumentLayout(document, true);
+        layoutManager.generateDocumentLayout(document);
         List<UUID> artifactIds = artifacts
             .stream()
             .map(ArtifactAppEntity::getId)
-            .map(UUID::fromString)
             .collect(Collectors.toList());
 
         this.notificationService.broadcastChange(

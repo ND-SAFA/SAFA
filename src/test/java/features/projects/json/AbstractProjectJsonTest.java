@@ -5,14 +5,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.UUID;
 
-import requests.SafaRequest;
-
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 
 import features.base.ApplicationBaseTest;
 import org.json.JSONObject;
 import org.springframework.test.web.servlet.ResultMatcher;
+import requests.SafaRequest;
 
 /**
  * Creates a constant environment and functions for creating or updating projects
@@ -30,7 +29,6 @@ public abstract class AbstractProjectJsonTest extends ApplicationBaseTest {
     protected final String a2Body = "this is a design";
     protected final String projectName = "test-project";
     protected final String projectDescription = "test-description";
-    protected final String EMPTY = "";
 
     protected JSONObject postProjectJson(JSONObject projectJson) throws Exception {
         return postProjectJson(projectJson, status().isCreated());
@@ -50,7 +48,7 @@ public abstract class AbstractProjectJsonTest extends ApplicationBaseTest {
      * @return JSONObject formatted for a ProjectAppEntity
      */
     protected JSONObject createBaseProjectJson() {
-        return createBaseProjectJson(EMPTY, a1Body, EMPTY, a2Body);
+        return createBaseProjectJson(null, a1Body, null, a2Body);
 
     }
 
@@ -61,9 +59,9 @@ public abstract class AbstractProjectJsonTest extends ApplicationBaseTest {
     }
 
     private JSONObject createBaseProjectJson(
-        String a1Id,
+        UUID a1Id,
         String a1Body,
-        String a2Id,
+        UUID a2Id,
         String a2Body) {
         return jsonBuilder
             .withProject("", projectName, projectDescription)

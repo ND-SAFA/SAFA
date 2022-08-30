@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DocumentAppEntity implements IAppEntity {
-    private String documentId = "";
+    private UUID documentId = null;
     @NotNull
     private DocumentType type;
     @NotEmpty
@@ -29,15 +29,15 @@ public class DocumentAppEntity implements IAppEntity {
     @NotNull
     private String description;
     @NotNull
-    private List<String> artifactIds = new ArrayList<>();
+    private List<UUID> artifactIds = new ArrayList<>();
     @NotNull
     private List<DocumentColumnAppEntity> columns = new ArrayList<>();
-    private Map<String, LayoutPosition> layout = new HashMap<>();
+    private Map<UUID, LayoutPosition> layout = new HashMap<>();
 
     public DocumentAppEntity(Document document,
-                             List<String> artifactIds,
-                             Map<String, LayoutPosition> layout) {
-        this.documentId = document.getDocumentId().toString();
+                             List<UUID> artifactIds,
+                             Map<UUID, LayoutPosition> layout) {
+        this.documentId = document.getDocumentId();
         this.type = document.getType();
         this.name = document.getName();
         this.description = document.getDescription();
@@ -47,9 +47,8 @@ public class DocumentAppEntity implements IAppEntity {
     }
 
     public Document toDocument() {
-        UUID documentId = this.documentId.isEmpty() ? null : UUID.fromString(this.documentId);
         return new Document(
-            documentId,
+            this.documentId,
             null,
             this.type,
             this.name,
@@ -57,12 +56,12 @@ public class DocumentAppEntity implements IAppEntity {
     }
 
     @Override
-    public String getId() {
+    public UUID getId() {
         return this.getDocumentId();
     }
 
     @Override
-    public void setId(String id) {
-        this.setDocumentId(id);
+    public void setId(UUID id) {
+        this.documentId = id;
     }
 }

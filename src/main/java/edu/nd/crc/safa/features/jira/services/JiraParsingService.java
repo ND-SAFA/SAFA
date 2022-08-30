@@ -70,7 +70,7 @@ public class JiraParsingService {
         String description = getIssueDescription(issue);
 
         ArtifactAppEntity artifactAppEntity = new ArtifactAppEntity(
-            "",
+            null,
             type,
             name,
             summary,

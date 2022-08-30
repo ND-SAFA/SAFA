@@ -42,7 +42,7 @@ def _run_job(request: HttpRequest, job_type: JobType) -> JsonResponse:
     args = _make_job_params_from_request(request_dict)
     job = job_type.value(args)
     job.start()
-    return JsonResponse({"outputPath": job.output_dir})
+    return JsonResponse({"outputPath": job.output_filepath})
 
 
 def _make_job_params_from_request(request_dict: Dict) -> TraceArgsBuilder:

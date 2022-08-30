@@ -1,16 +1,18 @@
+import json
 from copy import deepcopy
 from typing import Dict
 
-from server.api import Api
 from django.http.request import HttpRequest
 from django.http.response import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 
+from common.api.prediction_request import PredictionRequest
+from server.job_type import JobType
 from trace.config.constants import VALIDATION_PERCENTAGE_DEFAULT
 from trace.jobs.trace_args_builder import TraceArgsBuilder
-from server.job_type import JobType
-import json
 
 
+@csrf_exempt
 def predict(request: HttpRequest) -> JsonResponse:
     """
     For generating trace links from artifacts
@@ -40,7 +42,7 @@ def _run_job(request: HttpRequest, job_type: JobType) -> JsonResponse:
     args = _make_job_params_from_request(request_dict)
     job = job_type.value(args)
     job.start()
-    return JsonResponse({Api.JOB_ID.value: job.id})
+    return JsonResponse({"outputPath": job.output_filepath})
 
 
 def _make_job_params_from_request(request_dict: Dict) -> TraceArgsBuilder:
@@ -50,13 +52,14 @@ def _make_job_params_from_request(request_dict: Dict) -> TraceArgsBuilder:
     :return: a TraceArgsBuilder for the request
     """
     params = deepcopy(request_dict)
-    model_path = params.pop(Api.MODEL_PATH.value)
-    sources = params.pop(Api.SOURCES.value)
-    targets = params.pop(Api.TARGETS.value)
-    base_model = params.pop(Api.BASE_MODEL.value)
-    output_path = params.pop(Api.OUTPUT_PATH.value)
-    links = _safe_pop(params, Api.LINKS.value)  # optional
-    return TraceArgsBuilder(base_model, model_path, output_path, sources, targets, links, VALIDATION_PERCENTAGE_DEFAULT, **params)
+    model_path = params.pop(PredictionRequest.MODEL_PATH)
+    sources = params.pop(PredictionRequest.SOURCES)
+    targets = params.pop(PredictionRequest.TARGETS)
+    base_model = params.pop(PredictionRequest.BASE_MODEL)
+    output_path = params.pop(PredictionRequest.OUTPUT_PATH)
+    links = _safe_pop(params, PredictionRequest.LINKS)  # optional
+    return TraceArgsBuilder(base_model, model_path, output_path, sources, targets, links, VALIDATION_PERCENTAGE_DEFAULT,
+                            **params)
 
 
 def _safe_pop(dict_: Dict, key: any, default: any = None) -> any:

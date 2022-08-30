@@ -1,6 +1,6 @@
-from django.test import TestCase
-
-
 # TODO
-class TestMRRMetric(TestCase):
+from test.base_test import BaseTest
+
+
+class TestMRRMetric(BaseTest):
     pass

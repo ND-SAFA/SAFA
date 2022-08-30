@@ -1,6 +1,6 @@
-from django.test import TestCase
-
-
 # TODO
-class TestBuildPretrainDataJob(TestCase):
+from test.base_test import BaseTest
+
+
+class TestBuildPretrainDataJob(BaseTest):
     pass

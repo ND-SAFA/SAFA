@@ -9,7 +9,7 @@ from transformers.trainer import Trainer
 from transformers.trainer_pt_utils import get_tpu_sampler, is_torch_tpu_available
 from transformers.trainer_utils import PredictionOutput
 
-from common.jobs.job_result_key import JobResultKey
+from common.api.prediction_response import PredictionResponse
 from trace.config.constants import LINKED_TARGETS_ONLY_DEFAULT
 from trace.jobs.trace_args import TraceArgs
 from trace.metrics.supported_trace_metric import get_metric_path
@@ -57,8 +57,7 @@ class TraceTrainer(Trainer):
         if self.args.metrics:
             self._eval(output, self.args.metrics)
         output_dict = TraceTrainer.output_to_dict(output)
-        output_dict[JobResultKey.ARTIFACT_IDS.value] = dataset.source_target_pairs
-        return output_dict
+        return PredictionResponse.from_output(output_dict, dataset.source_target_pairs)
 
     @staticmethod
     def output_to_dict(output: NamedTuple) -> Dict:
@@ -79,7 +78,7 @@ class TraceTrainer(Trainer):
         preds = np.argmax(output.predictions, axis=-1)
         metric_paths = [get_metric_path(name) for name in metric_names]
         for metric_path in metric_paths:
-            metric = load_metric(metric_path)
+            metric = load_metric(metric_path, keep_in_memory=True)
             results = metric.compute(predictions=preds, references=output.label_ids)
             output.metrics.update(results)
 

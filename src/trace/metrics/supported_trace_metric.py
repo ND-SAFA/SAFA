@@ -1,15 +1,13 @@
-import os
+import inspect
 from enum import Enum
 from typing import Type
 
 from datasets import list_metrics
 
-from common.config.paths import PROJ_PATH
 from trace.metrics.abstract_trace_metric import AbstractTraceMetric
 from trace.metrics.map_at_k_metric import MapAtKMetric
 from trace.metrics.mrr_metric import MRRMetric
 from trace.metrics.precision_at_k_metric import PrecisionAtKMetric
-import inspect
 
 
 class SupportedTraceMetric(Enum):
@@ -41,5 +39,4 @@ def _get_metric_path_from_class(trace_metric_class: Type[AbstractTraceMetric]) -
     :param trace_metric_class: the metric class to get the path of
     :return: the path to the metric
     """
-    full_path = inspect.getfile(trace_metric_class)
-    return os.path.relpath(full_path, PROJ_PATH)
+    return inspect.getfile(trace_metric_class)

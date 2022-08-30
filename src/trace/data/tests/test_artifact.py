@@ -1,5 +1,4 @@
-from django.test import TestCase
-
+from test.base_test import BaseTest
 from trace.data.artifact import Artifact
 
 
@@ -7,7 +6,7 @@ def fake_method(text):
     return {"feature_name": text}
 
 
-class TestArtifact(TestCase):
+class TestArtifact(BaseTest):
     TOKEN = "token"
 
     def test_get_feature(self):

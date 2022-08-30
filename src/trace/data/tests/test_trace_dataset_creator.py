@@ -1,20 +1,20 @@
-from django.test import TestCase
+import mock
+from mock import patch
 
 from common.models.model_generator import ModelGenerator
+from test.base_test import BaseTest
+from test.test_data import TEST_POS_LINKS, TEST_S_ARTS, TEST_T_ARTS
 from test.test_tokenizer import get_test_tokenizer
 from trace.data.artifact import Artifact
 from trace.data.trace_dataset_creator import TraceDatasetCreator
-from mock import patch
-import mock
 from trace.data.trace_link import TraceLink
-from test.test_data import TEST_T_ARTS, TEST_S_ARTS, TEST_POS_LINKS
 
 
 def fake_extract_feature_info(feature, prefix=''):
     return {prefix + "feature_info": feature}
 
 
-class TestTraceDatasetCreator(TestCase):
+class TestTraceDatasetCreator(BaseTest):
     ALL_LINKS = [("s1", "t1"), ("s2", "t1"), ("s3", "t1"),
                  ("s1", "t2"), ("s2", "t2"), ("s3", "t2"),
                  ("s1", "t3"), ("s2", "t3"), ("s3", "t3")]
@@ -183,7 +183,8 @@ class TestTraceDatasetCreator(TestCase):
     def test_get_feature_entry_siamese(self, extract_feature_info_mock: mock.MagicMock):
         extract_feature_info_mock.side_effect = fake_extract_feature_info
 
-        test_trace_dataset_creator = self.get_test_trace_dataset_creator(model_generator=ModelGenerator("bert_trace_siamese", "path"))
+        test_trace_dataset_creator = self.get_test_trace_dataset_creator(
+            model_generator=ModelGenerator("bert_trace_siamese", "path"))
         source, target = TEST_POS_LINKS[0]
         test_link = self.get_test_link(source, target)
         feature_entry = test_trace_dataset_creator._get_feature_entry(test_link)
@@ -331,13 +332,15 @@ class TestTraceDatasetCreator(TestCase):
     def get_test_link(self, source, target):
         s = Artifact(source, TEST_S_ARTS[source], lambda text: text)
         t = Artifact(target, TEST_T_ARTS[target], lambda text: text)
-        return TraceLink(s, t, lambda text_pair, text, return_token_type_ids, add_special_tokens: text + "_" + text_pair)
+        return TraceLink(s, t,
+                         lambda text_pair, text, return_token_type_ids, add_special_tokens: text + "_" + text_pair)
 
     def get_expected_train_dataset_size(self, resample_rate, validation_percentage=VAlIDATION_PERCENTAGE):
         num_train_pos_links = round(len(TEST_POS_LINKS) * (1 - validation_percentage))
         return resample_rate * num_train_pos_links * 2  # equal number pos and neg links
 
-    def get_test_trace_dataset_creator(self, validation_percentage=VAlIDATION_PERCENTAGE, include_links=True, model_generator=None):
+    def get_test_trace_dataset_creator(self, validation_percentage=VAlIDATION_PERCENTAGE, include_links=True,
+                                       model_generator=None):
         if model_generator is None:
             model_generator = self.TEST_MODEL_GENERATOR
         return TraceDatasetCreator(TEST_S_ARTS, TEST_T_ARTS, model_generator=model_generator,

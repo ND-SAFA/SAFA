@@ -1,10 +1,9 @@
-from django.test import TestCase
-
+from test.base_test import BaseTest
 from test.test_data import TEST_POS_LINKS, TEST_S_ARTS, TEST_T_ARTS
 from trace.data.trace_dataset import TraceDataset
 
 
-class TestTraceDataset(TestCase):
+class TestTraceDataset(BaseTest):
     TEST_ENTRIES = [{"id": 1}, {"id": 2}, {"id": 3}]
     SOURCE_TARGET_PAIRS = list(zip(TEST_S_ARTS.keys(), TEST_T_ARTS.keys()))
 

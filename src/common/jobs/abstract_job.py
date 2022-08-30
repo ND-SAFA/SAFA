@@ -1,14 +1,15 @@
+import json
 import os
-from abc import abstractmethod, ABC
+import traceback
+import uuid
+from abc import ABC, abstractmethod
+from threading import Thread
 from typing import Dict
 
+from common.api.prediction_response import PredictionResponse
 from common.jobs.abstract_args_builder import AbstractArgsBuilder
-from common.jobs.job_result_key import JobResultKey
 from common.jobs.job_status import Status
-from threading import Thread
-import uuid
-import json
-import numpy as np
+from common.storage.safa_storage import SafaStorage
 
 
 class AbstractJob(Thread, ABC):
@@ -20,10 +21,13 @@ class AbstractJob(Thread, ABC):
         :param arg_builder: job arguments
         """
         super().__init__()
-        self.id = uuid.uuid4()
         self.args = arg_builder.build()
         self.status = Status.NOT_STARTED
         self.result = {}
+        self.id = uuid.uuid4()
+        self.output_dir = os.path.join(self.args.output_dir, str(self.id))
+        self.output_filepath = os.path.join(self.output_dir, self.OUTPUT_FILENAME)
+        self._save_method = SafaStorage.get_save()
 
     @abstractmethod
     def _run(self) -> Dict:
@@ -43,28 +47,21 @@ class AbstractJob(Thread, ABC):
             self.result.update(output)
             self.status = Status.SUCCESS
         except Exception as e:
-            self.result[JobResultKey.EXCEPTION.value] = str(e)
+            print(traceback.format_exc())
+            self.result[PredictionResponse.EXCEPTION] = str(e)
             self.status = Status.FAILURE
 
         output = self.get_output_as_json()
         self._save(output)
 
-    def _get_output_dir(self) -> str:
+    def get_output_as_json(self) -> str:
         """
-        Creates an output dir if non exists and returns the path
-        :return: the path to the directory
+        Returns the job output as json
+        :return: the output as json
         """
-        output_dir = os.path.join(self.args.output_dir, str(self.id))
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
-        return output_dir
-
-    def _get_output_filepath(self) -> str:
-        """
-        Gets the path to the output file
-        :return: the path to the output file
-        """
-        return os.path.join(self._get_output_dir(), self.OUTPUT_FILENAME)
+        output = self.result
+        output[PredictionResponse.STATUS] = self.status.value
+        return json.dumps(output)
 
     def _save(self, output: str) -> bool:
         """
@@ -72,30 +69,8 @@ class AbstractJob(Thread, ABC):
         :return: True if save was successful else false
         """
         try:
-            output_file_path = self._get_output_filepath()
-            with open(output_file_path, "w") as outfile:
-                outfile.write(output)
+            self._save_method(output, self.output_filepath)
             return True
         except Exception:
+            print(traceback.format_exc())  # to save in logs
             return False
-
-    def get_output_as_json(self) -> str:
-        """
-        Returns the job output as json
-        :return: the output as json
-        """
-        output = self.serialize_output(self.result)
-        output[JobResultKey.STATUS.value] = self.status.value
-        return json.dumps(output)
-
-    @staticmethod
-    def serialize_output(output_dict: Dict) -> Dict:
-        """
-        Makes dictionary values json serializable and returns serializable dict
-        :param output_dict: output dictionary
-        :return: a dictionary that is json serializable
-        """
-        for key, value in output_dict.items():
-            if isinstance(value, np.ndarray):
-                output_dict[key] = value.tolist()
-        return output_dict

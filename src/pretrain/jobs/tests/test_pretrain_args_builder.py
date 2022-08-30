@@ -1,13 +1,12 @@
-from django.test import TestCase
+from mock import patch
 
 from common.models.model_properties import ModelSize
 from pretrain.data.corpuses.domain import Domain
 from pretrain.jobs.pretrain_args_builder import PretrainArgBuilder
+from test.base_test import BaseTest
 
-from mock import patch
 
-
-class TestPretrainArgsBuilder(TestCase):
+class TestPretrainArgsBuilder(BaseTest):
     EXPECTED_VALUES = {"model_name": "electra_trace_single",
                        "model_size": ModelSize.BASE,
                        "output_dir": "output",
@@ -26,5 +25,6 @@ class TestPretrainArgsBuilder(TestCase):
         self.assertEquals(args.corpus_dir, self.EXPECTED_VALUES["corpus_dir"])
 
     def get_test_pretrain_arg_builder(self):
-        return PretrainArgBuilder(output_path=self.EXPECTED_VALUES["output_dir"], corpus_dir=self.EXPECTED_VALUES["corpus_dir"],
+        return PretrainArgBuilder(output_path=self.EXPECTED_VALUES["output_dir"],
+                                  corpus_dir=self.EXPECTED_VALUES["corpus_dir"],
                                   domain=self.EXPECTED_VALUES["domain"], model_size=self.EXPECTED_VALUES["model_size"])

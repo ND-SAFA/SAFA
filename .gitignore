@@ -1,0 +1,18 @@
+# Python
+/**/venv
+/**/__pycache__
+
+# IDEs
+.idea
+
+# Mac
+/**/.DS_Store
+
+# Transformers
+src/test/output/runs/**
+/**/output.json
+/**/output
+
+# Secrets
+application-credentials.json
+.env

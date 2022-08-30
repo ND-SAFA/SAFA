@@ -1,0 +1,1 @@
+DOCKER_BUILDKIT=1 docker build --build-arg DEPLOYMENT_TYPE=local -t safa-tgen:latest . && docker container rm safa-tgen && docker run -p 4050:80 --name safa-tgen safa-tgen

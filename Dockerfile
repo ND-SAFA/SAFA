@@ -44,8 +44,8 @@ RUN set -e; \
     && apt-get clean spo
 
 # 5. Setup cloud file system
-ENV GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS:-/app/application-credentials.json}
-COPY gcsfuse_run.sh application-credentials.json* /app/
+# ENV GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS:-/app/application-credentials.json}
+# COPY gcsfuse_run.sh application-credentials.json* /app/
 RUN chmod +x /app/gcsfuse_run.sh
 ENV MNT_DIR /mnt/gcs
 

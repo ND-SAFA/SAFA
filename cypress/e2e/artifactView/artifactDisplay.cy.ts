@@ -11,9 +11,14 @@ describe("Artifact Display", () => {
 
   describe("I can select an artifact to view more details", () => {
     it("Selects an artifact that is double clicked", () => {
+      // Wait for graph to center.
+      cy.clickButton(DataCy.navGraphCenterButton).wait(200);
+
+      // Double click node (doesnt allow chaining click).
       cy.getNodes().first().click();
       cy.getNodes().first().click();
 
+      // Affirm node is selected.
       cy.getNodes(true).should("be.visible");
       cy.getCy(DataCy.selectedPanelName).should("be.visible");
     });
@@ -48,9 +53,11 @@ describe("Artifact Display", () => {
         parent: `${parent}{downArrow}{enter}`,
       }).saveArtifact();
 
+      // Affirm created artifact is selected.
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
       cy.getCy(DataCy.selectedPanelParents).should("be.visible").click();
 
+      // Affirm parents are shown, and click first parent's link.
       cy.getCy(DataCy.selectedPanelParentItem)
         .should("have.length", 1)
         .first()
@@ -59,15 +66,21 @@ describe("Artifact Display", () => {
           cy.clickButton(DataCy.selectedPanelParentLinkButton);
         });
 
+      // Affirm link is visible and close.
       cy.getCy(DataCy.traceApproveModal)
         .should("be.visible")
         .closeModal(DataCy.traceApproveModal);
 
+      // Affirm viewing parent artifact.
       cy.getCy(DataCy.selectedPanelParentItem)
         .first()
         .click()
         .getCy(DataCy.selectedPanelName)
-        .should("contain", parent);
+        .should("contain", parent)
+        .getCy(DataCy.treeSelectedNode)
+        .within(() => {
+          cy.getCy(DataCy.treeNodeName).should("contain", parent);
+        });
     });
 
     it("I can see and select listed child artifacts", () => {
@@ -79,6 +92,7 @@ describe("Artifact Display", () => {
         parent: `${parent}{downArrow}{enter}`,
       }).saveArtifact();
 
+      // Affirm created artifact is selected, and select parent.
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
       cy.getCy(DataCy.selectedPanelParents)
         .should("be.visible")
@@ -87,6 +101,7 @@ describe("Artifact Display", () => {
         .first()
         .click();
 
+      // Affirm children are shown, and click first child's link.
       cy.getCy(DataCy.selectedPanelChildren)
         .should("be.visible")
         .getCy(DataCy.selectedPanelChildItem)
@@ -97,15 +112,21 @@ describe("Artifact Display", () => {
           cy.clickButton(DataCy.selectedPanelChildLinkButton);
         });
 
+      // Affirm link is visible and close.
       cy.getCy(DataCy.traceApproveModal)
         .should("be.visible")
         .closeModal(DataCy.traceApproveModal);
 
+      // Affirm viewing created child artifact.
       cy.getCy(DataCy.selectedPanelChildItem)
         .first()
         .click()
         .getCy(DataCy.selectedPanelName)
-        .should("contain", child);
+        .should("contain", child)
+        .getCy(DataCy.treeSelectedNode)
+        .within(() => {
+          cy.getCy(DataCy.treeNodeName).should("contain", child);
+        });
     });
   });
 });

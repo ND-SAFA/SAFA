@@ -35,6 +35,7 @@
         v-if="showUnreviewed"
         :loading="isUnreviewLoading"
         class="ma-1"
+        data-cy="button-trace-unreview"
         @click="handleUnreview"
       >
         Unreview
@@ -45,6 +46,7 @@
         :loading="isApproveLoading"
         color="primary"
         class="ma-1"
+        data-cy="button-trace-approve"
         @click="handleApprove"
       >
         Approve
@@ -55,6 +57,7 @@
         :loading="isDeclineLoading"
         color="error"
         class="ma-1"
+        data-cy="button-trace-decline"
         @click="handleDecline"
       >
         Decline
@@ -65,10 +68,10 @@
         color="error"
         class="ma-1"
         :text="!confirmDelete"
-        :outlined="confirmDelete"
+        data-cy="button-trace-delete"
         @click="handleDelete"
       >
-        Delete
+        {{ confirmDelete ? "Confirm Delete" : "Delete" }}
       </v-btn>
       <v-btn
         outlined

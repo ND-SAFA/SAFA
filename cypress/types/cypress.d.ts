@@ -1,7 +1,18 @@
+/* eslint-disable max-lines */
 /**
  * The position of an element within a list.
  */
 type ElementPosition = "first" | "last";
+
+/**
+ * Represents the fields that can be filled in to create an artifact.
+ */
+interface ArtifactFields {
+  name?: string;
+  type?: string;
+  body?: string;
+  parent?: string;
+}
 
 declare namespace Cypress {
   interface Chainable<Subject> {
@@ -219,29 +230,46 @@ declare namespace Cypress {
 
     /**
      * Fills inputs in the artifact modal.
+     * The artifact name, type, and body will be filled with preset values if not set.
      *
-     * @param name - A specific name to set.
-     * @param type - A specific type to set.
-     * @param body - A specific body to set.
+     * @param props - The artifact fields to set.
      */
-    fillArtifactModal(
-      name?: string,
-      type?: string,
-      body?: string
-    ): Chainable<void>;
+    fillArtifactModal(props: ArtifactFields): Chainable<void>;
 
     /**
      * Creates a new artifact from the artifact fab button.
      * Does not click the save button on the artifact, leaving the modal open.
      *
-     * @param name - A specific name to set.
-     * @param type - A specific type to set.
-     * @param body - A specific body to set.
+     * @param props - The artifact fields to set.
      */
-    createNewArtifact(
-      name?: string,
-      type?: string,
-      body?: string
+    createNewArtifact(props: ArtifactFields): Chainable<void>;
+
+    /**
+     * Saves the artifact that is currently open in the creator modal.
+     */
+    saveArtifact(): Chainable<void>;
+
+    /**
+     * Fills in inputs within the trace link modal.
+     *
+     * @param sourceName - The name of the source artifact.
+     * @param targetName - The name of the target artifact.
+     */
+    fillTraceLinkModal(
+      sourceName?: string,
+      targetName?: string
+    ): Chainable<void>;
+
+    /**
+     * Creates a new trace link from the artifact fab button.
+     * Does not click the save button on the trace link, leaving the modal open.
+     *
+     * @param sourceName - The name of the source artifact.
+     * @param targetName - The name of the target artifact.
+     */
+    createNewTraceLink(
+      sourceName?: string,
+      targetName?: string
     ): Chainable<void>;
 
     /**
@@ -252,5 +280,19 @@ declare namespace Cypress {
      * @param password - The password to create the account with.
      */
     createNewAccount(email: string, password: string): Chainable<void>;
+
+    /**
+     * Saves the trace link that is currently open in the creator modal.
+     */
+    saveTraceLink(): Chainable<void>;
+
+    // Artifact Tree
+
+    /**
+     * Gets nodes on the graph.
+     *
+     * @param selected - If true, only the selected node is returned.
+     */
+    getNodes(selected?: boolean): Chainable<JQuery<HTMLElement>>;
   }
 } 

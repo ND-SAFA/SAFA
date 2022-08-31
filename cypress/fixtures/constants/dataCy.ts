@@ -11,6 +11,7 @@ export enum DataCy {
   navProjectButton = "button-nav-project",
   navVersionButton = "button-nav-version",
   navLinksButton = "button-nav-links",
+  navGraphCenterButton = "button-nav-graph=center",
 
   // Steppers
 
@@ -26,7 +27,8 @@ export enum DataCy {
   // Modals
 
   modalTitle = "modal-title",
-  modalClose = "button-close",
+  modalCloseButton = "button-close",
+  confirmModalButton = "button-confirm-modal",
 
   // Account Creation
   newAccountEmailInput = "input-new-email",
@@ -122,11 +124,43 @@ export enum DataCy {
   artifactSaveNameInput = "input-artifact-name",
   artifactSaveTypeInput = "input-artifact-type",
   artifactSaveBodyInput = "input-artifact-body",
+  artifactSaveParentInput = "input-artifact-parent",
   artifactSaveSubmitButton = "button-artifact-save",
+
+  traceSaveModal = "modal-trace-save",
+  traceSaveSourceInput = "button-trace-save-source",
+  traceSaveTargetInput = "button-trace-save-target",
+  traceSaveDirectionsPanel = "panel-trace-directions",
+  traceSaveDirectionsChip = "chip-type-direction",
+  traceSaveSubmitButton = "button-trace-save",
+
+  traceApproveModal = "modal-trace-approve",
+  traceUnreviewButton = "button-trace-unreview",
+  traceApproveButton = "button-trace-approve",
+  traceDeclineButton = "button-trace-decline",
+  traceDeleteButton = "button-trace-delete",
+
+  // Selection Panel
+
+  selectedPanelName = "text-selected-name",
+  selectedPanelBodyButton = "button-selected-body",
+  selectedPanelEditButton = "button-selected-edit",
+  selectedPanelDeleteButton = "button-selected-delete",
+
+  selectedPanelParents = "list-selected-parents",
+  selectedPanelParentItem = "list-selected-parent-item",
+  selectedPanelParentLinkButton = "button-selected-parent-link",
+  selectedPanelChildren = "list-selected-children",
+  selectedPanelChildItem = "list-selected-child-item",
+  selectedPanelChildLinkButton = "button-selected-child-link",
 
   // Artifact Tree
 
-  artifactTreeNode = "node-artifact-tree",
-  artifactTreeSelectedNode = "node-artifact-tree-selected",
-  artifactTreeSelectedName = "text-artifact-selected-name",
+  treeNode = "node-artifact-tree",
+  treeSelectedNode = "node-artifact-tree-selected",
+}
+
+export enum DataIds {
+  rightClickAddArtifact = "#add-artifact",
+  rightClickDuplicateArtifact = "#duplicate-artifact",
 }

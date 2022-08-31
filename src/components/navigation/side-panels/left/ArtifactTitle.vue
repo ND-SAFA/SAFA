@@ -6,18 +6,21 @@
         <generic-icon-button
           tooltip="View Artifact Body"
           icon-id="mdi-application-array-outline"
+          data-cy="button-selected-body"
           @click="handleViewBody"
         />
         <generic-icon-button
           v-if="!selectedArtifact.logicType"
           tooltip="Edit"
           icon-id="mdi-pencil"
+          data-cy="button-selected-edit"
           @click="handleEditArtifact"
         />
         <generic-icon-button
           color="error"
           tooltip="Delete"
           icon-id="mdi-delete"
+          data-cy="button-selected-delete"
           @click="handleDeleteArtifact"
         />
       </flex-box>
@@ -31,7 +34,7 @@
           variant="subtitle"
           el="h1"
           :value="selectedArtifactName"
-          data-cy="text-artifact-selected-name"
+          data-cy="text-selected-name"
         />
       </template>
       {{ selectedArtifactName }}

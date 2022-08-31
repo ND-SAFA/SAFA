@@ -10,7 +10,11 @@
     </template>
     <template v-slot:actions>
       <v-spacer />
-      <v-btn color="primary" @click="handleConfirm" data-cy="button-i-accept">
+      <v-btn
+        color="primary"
+        data-cy="button-confirm-modal"
+        @click="handleConfirm"
+      >
         I accept
       </v-btn>
     </template>

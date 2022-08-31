@@ -53,7 +53,7 @@ Cypress.Commands.add("switchTab", (tabLabel) => {
 });
 
 Cypress.Commands.add("closeModal", (dataCy) => {
-  cy.getCy(dataCy).within(() => cy.clickButton(DataCy.modalClose));
+  cy.getCy(dataCy).within(() => cy.clickButton(DataCy.modalCloseButton));
 });
 
 Cypress.Commands.add("withinTableRows", (dataCy, fn) => {

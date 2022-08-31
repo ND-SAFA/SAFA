@@ -1,13 +1,19 @@
 <template>
   <v-tooltip bottom :disabled="tooltip.length < 20">
     <template v-slot:activator="{ on, attrs }">
-      <v-list-item v-on="on" v-bind="attrs" @click="handleClick">
+      <v-list-item
+        v-on="on"
+        v-bind="attrs"
+        :data-cy="dataCy"
+        @click="handleClick"
+      >
         <v-list-item-title>
           <typography :value="item.title" />
         </v-list-item-title>
         <v-list-item-subtitle v-if="!!item.subtitle">
           <typography secondary :value="item.subtitle" />
         </v-list-item-subtitle>
+        <slot />
       </v-list-item>
     </template>
     <span>
@@ -31,6 +37,7 @@ export default Vue.extend({
   components: { Typography },
   props: {
     item: Object as PropType<ListItem>,
+    dataCy: String,
   },
   computed: {
     tooltip(): string {

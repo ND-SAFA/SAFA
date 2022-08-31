@@ -72,8 +72,12 @@ function containsFields(object: unknown, fields: string[]): boolean {
  * @return Whether this file is a trace file.
  */
 export function isTraceFile(file: ProjectFile): file is TraceFile {
-  const requiredFields = ["sourceId", "targetId", "isGenerated", "traces"];
-  return containsFields(file, requiredFields);
+  return (
+    "sourceId" in file &&
+    "targetId" in file &&
+    "isGenerated" in file &&
+    "traces" in file
+  );
 }
 
 /**

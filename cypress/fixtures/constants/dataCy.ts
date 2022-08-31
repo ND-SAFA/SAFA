@@ -12,6 +12,8 @@ export enum DataCy {
   navVersionButton = "button-nav-version",
   navLinksButton = "button-nav-links",
   navGraphCenterButton = "button-nav-graph=center",
+  navToggleLeftPanel = "button-left-panel-toggle",
+  navToggleRightPanel = "button-right-panel-toggle",
 
   // Steppers
 
@@ -149,6 +151,19 @@ export enum DataCy {
   treeNodeType = "tree-node-type",
   treeNodeBody = "tree-node-body",
   treeSelectedNode = "tree-node-selected",
+
+  // Artifact Search
+
+  artifactSearchNavInput = "input-artifact-search-nav",
+  artifactSearchSideInput = "input-artifact-search-side",
+  artifactSearchCount = "text-artifact-search-count",
+  artifactSearchTypeList = "list-artifact-search-type",
+  artifactSearchItem = "text-artifact-search-item",
+
+  // Type Options
+
+  typeOptionsList = "list-type-options",
+  typeOptionsIconButton = "button-type-options-icon",
 }
 
 export enum DataIds {

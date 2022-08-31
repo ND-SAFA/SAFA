@@ -8,6 +8,7 @@
         v-for="entry in typeDirections"
         :key="entry.type"
         :icon="entry.icon"
+        data-cy="list-type-options"
       >
         <template v-slot:activator>
           <v-tooltip bottom open-delay="300">

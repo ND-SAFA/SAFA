@@ -77,20 +77,6 @@ describe("Artifact CRUD", () => {
       cy.getCy(DataCy.selectedPanelName).should("contain", name);
     });
 
-    it("Creates an artifact with a new type", () => {
-      const name = `New ${Math.random()}`;
-
-      cy.createNewArtifact({ name, type: "New Type{enter}" });
-
-      cy.getCy(DataCy.artifactSaveModal).within(() => {
-        cy.clickButton(DataCy.artifactSaveSubmitButton);
-      });
-
-      cy.getCy(DataCy.snackbarSuccess).should("be.visible");
-      cy.getNodes(true).should("be.visible");
-      cy.getCy(DataCy.selectedPanelName).should("contain", name);
-    });
-
     it("Adds an artifact as a child of another artifact", () => {
       cy.createNewArtifact({ parent: "{downArrow}{enter}" }).saveArtifact();
 

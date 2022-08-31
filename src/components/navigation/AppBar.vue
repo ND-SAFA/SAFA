@@ -14,6 +14,7 @@
               color="white"
               :tooltip="leftPanelTooltip"
               :icon-id="leftPanelIcon"
+              data-cy="button-left-panel-toggle"
               @click="handleLeftPanelClick"
             />
             <document-selector />
@@ -27,6 +28,7 @@
               color="white"
               :tooltip="rightPanelTooltip"
               :icon-id="rightPanelIcon"
+              data-cy="button-right-panel-toggle"
               @click="handleRightPanelClick"
             />
           </flex-box>

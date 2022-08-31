@@ -12,6 +12,7 @@
       v-model="searchText"
       @click:clear="searchText = ''"
       hint="Search by artifact name or type"
+      data-cy="input-artifact-search-side"
     />
 
     <typography
@@ -20,6 +21,7 @@
       variant="body"
       align="right"
       :value="searchHint"
+      data-cy="text-artifact-search-count"
     />
 
     <v-list class="search-container full-width" expand>
@@ -28,6 +30,7 @@
         :key="type"
         :icon="getIconName(type)"
         :value="!!searchText"
+        data-cy="list-artifact-search-type"
       >
         <template v-slot:activator>
           <v-tooltip bottom open-delay="300">
@@ -50,6 +53,7 @@
           v-for="artifact in artifactTypeHashTable[type]"
           :key="artifact.name"
           @click="handleArtifactClick(artifact)"
+          data-cy="text-artifact-search-item"
         >
           <generic-artifact-body-display display-title :artifact="artifact" />
         </v-list-item>

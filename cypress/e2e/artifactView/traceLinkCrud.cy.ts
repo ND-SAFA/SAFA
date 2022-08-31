@@ -10,7 +10,7 @@ describe("Trace Link CRUD", () => {
       .should("equal", "/create");
 
     cy.createBulkProject()
-      .getCy(DataCy.jobStatus, "first")
+      .getCy(DataCy.jobStatus, "first", 20000)
       .should("contain.text", "Completed");
 
     cy.logout();
@@ -62,7 +62,7 @@ describe("Trace Link CRUD", () => {
 
   describe("Trace Link Direction Rules", () => {
     describe("I cannot create trace links between types in both directions", () => {
-      it("Cannot create restricted links", () => {
+      it.only("Cannot create restricted links", () => {
         // Selects two of the same artifact.
         cy.createNewTraceLink()
           .getCy(DataCy.traceSaveSubmitButton)
@@ -74,7 +74,7 @@ describe("Trace Link CRUD", () => {
           .should("be.disabled");
 
         // Selects an invalid link direction.
-        cy.fillTraceLinkModal("F5", "D3")
+        cy.fillTraceLinkModal("F5", "D9")
           .getCy(DataCy.traceSaveSubmitButton)
           .should("be.disabled");
       });
@@ -82,7 +82,7 @@ describe("Trace Link CRUD", () => {
 
     describe("I can remove a rule on what types of artifacts a trace link is allowed between", () => {
       it("Can create a link after removing the rule blocking it", () => {
-        cy.createNewTraceLink("F5", "D3")
+        cy.createNewTraceLink("F5", "D9")
           .getCy(DataCy.traceSaveSubmitButton)
           .should("be.disabled");
 

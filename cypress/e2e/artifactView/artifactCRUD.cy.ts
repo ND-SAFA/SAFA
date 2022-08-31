@@ -10,7 +10,7 @@ describe("Artifact CRUD", () => {
       .should("equal", "/create");
 
     cy.createBulkProject()
-      .getCy(DataCy.jobStatus, "first")
+      .getCy(DataCy.jobStatus, "first", 20000)
       .should("contain.text", "Completed");
 
     cy.logout();

@@ -12,6 +12,8 @@ export enum DataCy {
   navVersionButton = "button-nav-version",
   navLinksButton = "button-nav-links",
   navGraphCenterButton = "button-nav-graph=center",
+  navToggleLeftPanel = "button-left-panel-toggle",
+  navToggleRightPanel = "button-right-panel-toggle",
 
   // Steppers
 
@@ -129,6 +131,8 @@ export enum DataCy {
   // Selection Panel
 
   selectedPanelName = "text-selected-name",
+  selectedPanelType = "text-selected-type",
+  selectedPanelBody = "text-selected-body",
   selectedPanelBodyButton = "button-selected-body",
   selectedPanelEditButton = "button-selected-edit",
   selectedPanelDeleteButton = "button-selected-delete",
@@ -142,8 +146,24 @@ export enum DataCy {
 
   // Artifact Tree
 
-  treeNode = "node-artifact-tree",
-  treeSelectedNode = "node-artifact-tree-selected",
+  treeNode = "tree-node",
+  treeNodeName = "tree-node-name",
+  treeNodeType = "tree-node-type",
+  treeNodeBody = "tree-node-body",
+  treeSelectedNode = "tree-node-selected",
+
+  // Artifact Search
+
+  artifactSearchNavInput = "input-artifact-search-nav",
+  artifactSearchSideInput = "input-artifact-search-side",
+  artifactSearchCount = "text-artifact-search-count",
+  artifactSearchTypeList = "list-artifact-search-type",
+  artifactSearchItem = "text-artifact-search-item",
+
+  // Type Options
+
+  typeOptionsList = "list-type-options",
+  typeOptionsIconButton = "button-type-options-icon",
 }
 
 export enum DataIds {

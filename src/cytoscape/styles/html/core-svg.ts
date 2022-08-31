@@ -28,9 +28,7 @@ export function svgNode(
   const color = getBorderColor(data.artifactDeltaState);
   const footer = svgFooter(data, outerStyle);
   const heightOffset = footer ? ARTIFACT_CHILDREN_HEIGHT + 6 : 6;
-  const dataCy = data.isSelected
-    ? "node-artifact-tree-selected"
-    : "node-artifact-tree";
+  const dataCy = data.isSelected ? "tree-node-selected" : "tree-node";
 
   return `
     <div style="opacity: ${data.opacity}">
@@ -78,6 +76,7 @@ export function svgTitle(title: string, yPos: number): string {
       text-anchor="middle"
       font-weight="600"
       font-size="${title.length > 20 ? "x-small" : "medium"}"
+      data-cy="tree-node-type"
     >
       ${title}
     </text>
@@ -120,6 +119,7 @@ export function svgDetails(title: string, yPos: number): string {
       text-anchor="middle" 
       shape-rendering="crispEdges"
       font-weight="600"
+      data-cy="tree-node-name"
     >
       ${title}
     </text>
@@ -146,6 +146,7 @@ function svgBody(
     >
      <span
        class="text-body-1" 
+       data-cy="tree-node-body"
        style="
          display: block;
          width: ${style.width}px;

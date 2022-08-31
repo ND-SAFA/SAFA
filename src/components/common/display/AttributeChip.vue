@@ -14,6 +14,7 @@
         class="mr-1"
         :outlined="outlined"
         :color="color"
+        :data-cy="dataCy"
       >
         <v-icon v-if="iconId" small>{{ iconId }}</v-icon>
         <typography
@@ -57,6 +58,7 @@ export default Vue.extend({
     icon: String,
     artifactType: Boolean,
     confidenceScore: Boolean,
+    dataCy: String,
   },
   computed: {
     /**

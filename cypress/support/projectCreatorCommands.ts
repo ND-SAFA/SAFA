@@ -4,6 +4,7 @@ import {
   testProject,
   miniProjectFiles,
 } from "../fixtures";
+import { validUser } from "../fixtures/data/user.json";
 
 Cypress.Commands.add("setProjectIdentifier", (type) => {
   if (type === "standard") {
@@ -77,4 +78,17 @@ Cypress.Commands.add("createReqToHazardFiles", (createTraces, next) => {
       next
     );
   }
+});
+
+Cypress.Commands.add("loadNewProject", () => {
+  cy.visit("/create")
+    .login(validUser.email, validUser.password)
+    .location("pathname", { timeout: 5000 })
+    .should("equal", "/create");
+
+  cy.createBulkProject()
+    .getCy(DataCy.jobStatus, "first", 20000)
+    .should("contain.text", "Completed");
+
+  cy.logout();
 });

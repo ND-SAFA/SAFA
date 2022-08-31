@@ -1,31 +1,12 @@
-import { DataCy, DataIds, validUser } from "../../fixtures";
+import { DataCy, DataIds } from "../../fixtures";
 
 describe("Artifact CRUD", () => {
   before(() => {
-    cy.dbResetJobs().dbResetProjects();
-
-    cy.visit("/create")
-      .login(validUser.email, validUser.password)
-      .location("pathname", { timeout: 5000 })
-      .should("equal", "/create");
-
-    cy.createBulkProject()
-      .getCy(DataCy.jobStatus, "first", 20000)
-      .should("contain.text", "Completed");
-
-    cy.logout();
+    cy.dbResetJobs().dbResetProjects().loadNewProject();
   });
 
   beforeEach(() => {
-    cy.visit("/project")
-      .login(validUser.email, validUser.password)
-      .location("pathname", { timeout: 5000 })
-      .should("equal", "/project");
-
-    cy.getCy(DataCy.appLoading)
-      .should("not.be.visible")
-      .getNodes()
-      .should("be.visible");
+    cy.loadCurrentProject();
   });
 
   describe("I can create a new artifact", () => {
@@ -90,20 +71,6 @@ describe("Artifact CRUD", () => {
         .then(($el) => $el.click());
 
       cy.fillArtifactModal({ name }).saveArtifact();
-
-      cy.getCy(DataCy.snackbarSuccess).should("be.visible");
-      cy.getNodes(true).should("be.visible");
-      cy.getCy(DataCy.selectedPanelName).should("contain", name);
-    });
-
-    it("Creates an artifact with a new type", () => {
-      const name = `New ${Math.random()}`;
-
-      cy.createNewArtifact({ name, type: "New Type{enter}" });
-
-      cy.getCy(DataCy.artifactSaveModal).within(() => {
-        cy.clickButton(DataCy.artifactSaveSubmitButton);
-      });
 
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
       cy.getNodes(true).should("be.visible");

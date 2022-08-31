@@ -15,6 +15,7 @@
       item-value="id"
       class="mx-1 mt-1"
       :filter="filterArtifacts"
+      data-cy="input-artifact-search-nav"
     >
       <template v-slot:append>
         <v-icon class="input-no-icon-rotate"> mdi-magnify </v-icon>
@@ -22,11 +23,20 @@
       <template v-slot:prepend-item>
         <flex-box x="3">
           <v-spacer />
-          <typography align="end" variant="caption" :value="matchText" />
+          <typography
+            align="end"
+            variant="caption"
+            :value="matchText"
+            data-cy="text-artifact-search-count"
+          />
         </flex-box>
       </template>
       <template v-slot:item="{ item }">
-        <generic-artifact-body-display display-title :artifact="item" />
+        <generic-artifact-body-display
+          display-title
+          :artifact="item"
+          data-cy="text-artifact-search-item"
+        />
       </template>
     </v-autocomplete>
   </v-form>

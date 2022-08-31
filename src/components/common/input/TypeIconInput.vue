@@ -8,6 +8,7 @@
       <v-btn
         v-for="option in icons"
         :key="option"
+        data-cy="button-type-options-icon"
         @change="handleIconChange(entry, option)"
       >
         <v-icon>{{ option }}</v-icon>

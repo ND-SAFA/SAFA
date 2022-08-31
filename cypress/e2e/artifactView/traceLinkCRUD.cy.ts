@@ -1,31 +1,12 @@
-import { DataCy, validUser } from "../../fixtures";
+import { DataCy } from "../../fixtures";
 
 describe("Trace Link CRUD", () => {
   before(() => {
-    cy.dbResetJobs().dbResetProjects();
-
-    cy.visit("/create")
-      .login(validUser.email, validUser.password)
-      .location("pathname", { timeout: 5000 })
-      .should("equal", "/create");
-
-    cy.createBulkProject()
-      .getCy(DataCy.jobStatus, "first", 20000)
-      .should("contain.text", "Completed");
-
-    cy.logout();
+    cy.dbResetJobs().dbResetProjects().loadNewProject();
   });
 
   beforeEach(() => {
-    cy.visit("/project")
-      .login(validUser.email, validUser.password)
-      .location("pathname", { timeout: 5000 })
-      .should("equal", "/project");
-
-    cy.getCy(DataCy.appLoading)
-      .should("not.be.visible")
-      .getNodes()
-      .should("be.visible");
+    cy.loadCurrentProject();
   });
 
   describe("I can create a new trace link", () => {
@@ -62,7 +43,7 @@ describe("Trace Link CRUD", () => {
 
   describe("Trace Link Direction Rules", () => {
     describe("I cannot create trace links between types in both directions", () => {
-      it.only("Cannot create restricted links", () => {
+      it("Cannot create restricted links", () => {
         // Selects two of the same artifact.
         cy.createNewTraceLink()
           .getCy(DataCy.traceSaveSubmitButton)

@@ -2,13 +2,6 @@
   <v-container class="mb-10">
     <div v-if="selectedArtifact !== undefined">
       <artifact-title />
-      <v-divider />
-      <typography
-        defaultExpanded
-        y="2"
-        variant="expandable"
-        :value="artifactBody"
-      />
       <artifact-traces />
       <artifact-documents />
       <artifact-errors />
@@ -45,11 +38,6 @@ export default Vue.extend({
      */
     selectedArtifact() {
       return selectionStore.selectedArtifact;
-    },
-    artifactBody(): string {
-      const isCode = this.selectedArtifact?.type.toLowerCase().includes("code");
-
-      return isCode ? "" : this.selectedArtifact?.body || "";
     },
   },
 });

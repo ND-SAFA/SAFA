@@ -206,6 +206,11 @@ declare namespace Cypress {
      */
     openUploadFiles(): Chainable<void>;
 
+    /**
+     * Logs into the create project page, uploads a project, and waits for it to complete.
+     */
+    loadNewProject(): Chainable<void>;
+
     // Project Selection
 
     /**
@@ -285,5 +290,10 @@ declare namespace Cypress {
      * @param selected - If true, only the selected node is returned.
      */
     getNodes(selected?: boolean): Chainable<JQuery<HTMLElement>>;
+
+    /**
+     * Logs in to the project page and waits for the most recent project to load.
+     */
+    loadCurrentProject(): Chainable<void>;
   }
 }

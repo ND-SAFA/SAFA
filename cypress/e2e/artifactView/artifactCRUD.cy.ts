@@ -1,31 +1,12 @@
-import { DataCy, DataIds, validUser } from "../../fixtures";
+import { DataCy, DataIds } from "../../fixtures";
 
 describe("Artifact CRUD", () => {
   before(() => {
-    cy.dbResetJobs().dbResetProjects();
-
-    cy.visit("/create")
-      .login(validUser.email, validUser.password)
-      .location("pathname", { timeout: 5000 })
-      .should("equal", "/create");
-
-    cy.createBulkProject()
-      .getCy(DataCy.jobStatus, "first", 20000)
-      .should("contain.text", "Completed");
-
-    cy.logout();
+    cy.dbResetJobs().dbResetProjects().loadNewProject();
   });
 
   beforeEach(() => {
-    cy.visit("/project")
-      .login(validUser.email, validUser.password)
-      .location("pathname", { timeout: 5000 })
-      .should("equal", "/project");
-
-    cy.getCy(DataCy.appLoading)
-      .should("not.be.visible")
-      .getNodes()
-      .should("be.visible");
+    cy.loadCurrentProject();
   });
 
   describe("I can create a new artifact", () => {

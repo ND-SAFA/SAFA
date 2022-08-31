@@ -1,7 +1,11 @@
 <template>
   <div>
     <flex-box align="center" justify="space-between">
-      <attribute-chip artifact-type :value="selectedArtifactType" />
+      <attribute-chip
+        artifact-type
+        :value="selectedArtifactType"
+        data-cy="text-selected-type"
+      />
       <flex-box>
         <generic-icon-button
           tooltip="View Artifact Body"
@@ -39,6 +43,14 @@
       </template>
       {{ selectedArtifactName }}
     </v-tooltip>
+    <v-divider />
+    <typography
+      defaultExpanded
+      y="2"
+      variant="expandable"
+      :value="selectedArtifactBody"
+      data-cy="text-selected-body"
+    />
   </div>
 </template>
 

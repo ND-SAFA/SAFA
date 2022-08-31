@@ -243,5 +243,14 @@ declare namespace Cypress {
       type?: string,
       body?: string
     ): Chainable<void>;
+
+    /**
+     * Creates a new account on start page.
+     * Should ideally be used before running a test that requires a new account.
+     * 
+     * @param email - The email to create the account with.
+     * @param password - The password to create the account with.
+     */
+    createNewAccount(email: string, password: string): Chainable<void>;
   }
-}
+} 

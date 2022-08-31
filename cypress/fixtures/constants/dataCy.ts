@@ -28,6 +28,12 @@ export enum DataCy {
   modalTitle = "modal-title",
   modalClose = "button-close",
 
+  // Account Creation
+  newAccountEmailInput = "input-new-email",
+  newAccountPasswordInput = "input-new-password",
+  createAccountButton = "button-create-account",
+  createAccountLoginButton = "button-create-account-login",
+
   // Authentication
 
   accountDropdown = "account-dropdown",

@@ -27,7 +27,7 @@
         graph="artifact"
       />
       <trace-link-approval-modal
-        :is-open="isTraceModalOpen"
+        :is-open="!!selectedLink"
         :link="selectedLink"
         @close="handleTraceModalClose"
       />
@@ -68,8 +68,6 @@ export default Vue.extend({
   },
   data() {
     return {
-      isTraceModalOpen: false,
-      selectedLink: undefined as TraceLinkModel | undefined,
       artifactsInView: [] as string[],
     };
   },
@@ -129,6 +127,12 @@ export default Vue.extend({
      */
     hiddenSubtreeIds(): string[] {
       return subtreeStore.hiddenSubtreeNodes;
+    },
+    /**
+     * @return The currently selected trace link.
+     */
+    selectedLink(): TraceLinkModel | undefined {
+      return selectionStore.selectedTraceLink;
     },
   },
   mounted() {
@@ -194,15 +198,13 @@ export default Vue.extend({
      * @param traceLink - The trace link to select.
      */
     handleLinkRightClick(traceLink: TraceLinkModel): void {
-      this.selectedLink = traceLink;
-      this.isTraceModalOpen = true;
+      selectionStore.selectedTraceLinkId = traceLink.traceLinkId;
     },
     /**
      * Closes the trace link modal.
      */
     handleTraceModalClose(): void {
-      this.selectedLink = undefined;
-      this.isTraceModalOpen = false;
+      selectionStore.selectedTraceLinkId = "";
     },
   },
 });

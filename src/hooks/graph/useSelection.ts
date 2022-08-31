@@ -1,6 +1,12 @@
 import { defineStore } from "pinia";
 
-import { ArtifactModel, FilterAction, PanelType } from "@/types";
+import {
+  ArtifactModel,
+  FilterAction,
+  PanelType,
+  TraceLinkModel,
+} from "@/types";
+import { traceStore } from "@/hooks";
 import {
   artifactTreeCyPromise,
   cyCenterOnArtifacts,
@@ -26,6 +32,10 @@ export const useSelection = defineStore("selection", {
      * The currently selected artifact.
      */
     selectedArtifactId: "",
+    /**
+     * The currently selected trace link.
+     */
+    selectedTraceLinkId: "",
     /**
      * The currently selected artifact subtree.
      */
@@ -60,6 +70,12 @@ export const useSelection = defineStore("selection", {
      */
     selectedArtifact(): ArtifactModel | undefined {
       return artifactStore.getArtifactById(this.selectedArtifactId);
+    },
+    /**
+     * @return The currently selected artifact.
+     */
+    selectedTraceLink(): TraceLinkModel | undefined {
+      return traceStore.getTraceLinkById(this.selectedTraceLinkId);
     },
   },
   actions: {

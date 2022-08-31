@@ -1,8 +1,8 @@
 import {
   DataCy,
-  simpleProjectFiles,
   simpleProjectFilesMap,
   testProject,
+  miniProjectFiles,
 } from "../fixtures";
 
 Cypress.Commands.add("setProjectIdentifier", (type) => {
@@ -27,7 +27,7 @@ Cypress.Commands.add("createBulkProject", () => {
     .should("equal", "/create");
 
   cy.setProjectIdentifier("bulk")
-    .uploadFiles(DataCy.creationBulkFilesInput, ...simpleProjectFiles)
+    .uploadFiles(DataCy.creationBulkFilesInput, ...miniProjectFiles)
     .clickButton(DataCy.creationUploadButton);
 });
 

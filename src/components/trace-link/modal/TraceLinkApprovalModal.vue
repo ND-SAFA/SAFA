@@ -5,6 +5,7 @@
     :actions-height="0"
     @close="$emit('close')"
     size="l"
+    data-cy="modal-trace-approve"
   >
     <template v-slot:body>
       <trace-link-display

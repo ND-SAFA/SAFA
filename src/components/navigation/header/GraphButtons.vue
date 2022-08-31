@@ -9,8 +9,9 @@
         color="white"
         :tooltip="definition.label"
         :icon-id="definition.icon"
-        @click="definition.handler"
         :is-disabled="isButtonDisabled(definition)"
+        :data-cy="definition.dataCy"
+        @click="definition.handler"
       />
     </template>
 
@@ -23,8 +24,9 @@
         color="white"
         :tooltip="definition.label"
         :icon-id="definition.icon"
-        @click="definition.handler"
         :is-disabled="isButtonDisabled(definition)"
+        :data-cy="definition.dataCy"
+        @click="definition.handler"
       />
     </template>
 
@@ -127,6 +129,7 @@ export default Vue.extend({
           },
           label: "Center Graph",
           icon: "mdi-graphql",
+          dataCy: "button-nav-graph=center",
         },
         {
           type: ButtonType.ICON,

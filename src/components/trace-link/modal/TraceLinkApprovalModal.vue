@@ -34,7 +34,10 @@ import TraceLinkDisplay from "../TraceLinkDisplay.vue";
  */
 export default Vue.extend({
   name: "TraceLinkApprovalModal",
-  components: { GenericModal, TraceLinkDisplay },
+  components: {
+    GenericModal,
+    TraceLinkDisplay,
+  },
   props: {
     isOpen: {
       type: Boolean,

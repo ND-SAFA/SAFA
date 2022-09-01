@@ -29,58 +29,70 @@
       :value="showOnly === 'source' ? sourceArtifact.body : targetArtifact.body"
     />
 
-    <flex-box justify="end">
-      <v-btn
-        text
-        v-if="showUnreviewed"
-        :loading="isUnreviewLoading"
-        class="ma-1"
-        data-cy="button-trace-unreview"
-        @click="handleUnreview"
-      >
-        Unreview
-      </v-btn>
-      <v-btn
-        outlined
-        v-if="showApproved"
-        :loading="isApproveLoading"
-        color="primary"
-        class="ma-1"
-        data-cy="button-trace-approve"
-        @click="handleApprove"
-      >
-        Approve
-      </v-btn>
-      <v-btn
-        outlined
-        v-if="showDeclined"
-        :loading="isDeclineLoading"
-        color="error"
-        class="ma-1"
-        data-cy="button-trace-decline"
-        @click="handleDecline"
-      >
-        Decline
-      </v-btn>
-      <v-btn
-        v-if="showDelete"
-        :loading="isDeleteLoading"
-        color="error"
-        class="ma-1"
-        :text="!confirmDelete"
-        data-cy="button-trace-delete"
-        @click="handleDelete"
-      >
-        {{ confirmDelete ? "Confirm Delete" : "Delete" }}
-      </v-btn>
-      <v-btn
-        outlined
-        v-if="confirmDelete"
-        @click="confirmDelete = false"
-        class="ma-1"
-      >
-        Cancel
-      </v-btn>
+    <flex-box
+      full-width
+      align="center"
+      :justify="showScore ? 'space-between' : 'end'"
+      v-if="!hideActions"
+    >
+      <flex-box align="center" v-if="showScore">
+        <typography value="Confidence Score:" r="2" />
+        <attribute-chip style="width: 200px" confidence-score :value="score" />
+      </flex-box>
+
+      <flex-box>
+        <v-btn
+          text
+          v-if="showUnreviewed"
+          :loading="isUnreviewLoading"
+          class="ma-1"
+          data-cy="button-trace-unreview"
+          @click="handleUnreview"
+        >
+          Unreview
+        </v-btn>
+        <v-btn
+          outlined
+          v-if="showApproved"
+          :loading="isApproveLoading"
+          color="primary"
+          class="ma-1"
+          data-cy="button-trace-approve"
+          @click="handleApprove"
+        >
+          Approve
+        </v-btn>
+        <v-btn
+          outlined
+          v-if="showDeclined"
+          :loading="isDeclineLoading"
+          color="error"
+          class="ma-1"
+          data-cy="button-trace-decline"
+          @click="handleDecline"
+        >
+          Decline
+        </v-btn>
+        <v-btn
+          v-if="showDelete"
+          :loading="isDeleteLoading"
+          color="error"
+          class="ma-1"
+          :text="!confirmDelete"
+          data-cy="button-trace-delete"
+          @click="handleDelete"
+        >
+          {{ confirmDelete ? "Confirm Delete" : "Delete" }}
+        </v-btn>
+        <v-btn
+          outlined
+          v-if="confirmDelete"
+          @click="confirmDelete = false"
+          class="ma-1"
+        >
+          Cancel
+        </v-btn>
+      </flex-box>
     </flex-box>
   </div>
 </template>
@@ -95,7 +107,7 @@ import {
   handleDeclineLink,
   handleUnreviewLink,
 } from "@/api";
-import { FlexBox, Typography } from "@/components/common";
+import { FlexBox, Typography, AttributeChip } from "@/components/common";
 import { GenericArtifactBodyDisplay } from "@/components";
 
 /**
@@ -113,6 +125,7 @@ export default Vue.extend({
     Typography,
     FlexBox,
     GenericArtifactBodyDisplay,
+    AttributeChip,
   },
   props: {
     link: {
@@ -175,6 +188,18 @@ export default Vue.extend({
      */
     showUnreviewed(): boolean {
       return !this.hideActions && linkStatus(this.link).canBeReset();
+    },
+    /**
+     * @return The score of generated links.
+     */
+    score(): string {
+      return this.canBeModified ? String(this.link.score) : "";
+    },
+    /**
+     * @return Whether to display the score of generated links.
+     */
+    showScore(): boolean {
+      return this.canBeModified ? !!this.score : false;
     },
   },
   methods: {

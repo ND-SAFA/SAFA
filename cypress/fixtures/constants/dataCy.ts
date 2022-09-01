@@ -11,9 +11,11 @@ export enum DataCy {
   navProjectButton = "button-nav-project",
   navVersionButton = "button-nav-version",
   navLinksButton = "button-nav-links",
-  navGraphCenterButton = "button-nav-graph=center",
+  navGraphCenterButton = "button-nav-graph-center",
   navToggleLeftPanel = "button-left-panel-toggle",
   navToggleRightPanel = "button-right-panel-toggle",
+  navGraphFilterButton = "button-nav-graph-filter",
+  navGraphFilterOption = "button-checkmark-menu-item",
 
   // Steppers
 

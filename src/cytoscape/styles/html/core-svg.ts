@@ -31,11 +31,14 @@ export function svgNode(
   const dataCy = data.isSelected ? "tree-node-selected" : "tree-node";
 
   return `
-    <div style="opacity: ${data.opacity}">
+    <div>
       <svg 
         width="${outerStyle.width}" 
         height="${outerStyle.height + heightOffset}" 
-        style="margin-top: ${outerStyle.marginTop + heightOffset}px"
+        style="
+          margin-top: ${outerStyle.marginTop + heightOffset}px;
+          opacity: ${data.opacity};
+        "
         class="artifact-svg-wrapper ${deltaClass}"
         data-cy="${dataCy}"
       >

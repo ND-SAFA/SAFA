@@ -20,3 +20,8 @@ Cypress.Commands.add("loadCurrentProject", () => {
     .getNodes()
     .should("be.visible");
 });
+
+Cypress.Commands.add("centerGraph", () => {
+  // Wait for graph to center.
+  cy.clickButton(DataCy.navGraphCenterButton).wait(200);
+});

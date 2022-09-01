@@ -129,8 +129,7 @@ describe("Artifact CRUD", () => {
 
   describe("I can duplicate an artifact", () => {
     it("Duplicates an artifact in view", () => {
-      // Wait for graph to center.
-      cy.clickButton(DataCy.navGraphCenterButton).wait(200);
+      cy.centerGraph();
 
       // Right click on a visible node.
       cy.getNodes().should("be.visible").first().rightclick();

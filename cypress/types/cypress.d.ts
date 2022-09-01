@@ -280,7 +280,7 @@ declare namespace Cypress {
     /**
      * Creates a new account on start page.
      * Should ideally be used before running a test that requires a new account.
-     * 
+     *
      * @param email - The email to create the account with.
      * @param password - The password to create the account with.
      */
@@ -304,5 +304,10 @@ declare namespace Cypress {
      * Logs in to the project page and waits for the most recent project to load.
      */
     loadCurrentProject(): Chainable<void>;
+
+    /**
+     * Centers the graph.
+     */
+    centerGraph(): Chainable<void>;
   }
-} 
+}

@@ -11,8 +11,7 @@ describe("Artifact Display", () => {
 
   describe("I can select an artifact to view more details", () => {
     it("Selects an artifact that is double clicked", () => {
-      // Wait for graph to center.
-      cy.clickButton(DataCy.navGraphCenterButton).wait(200);
+      cy.centerGraph();
 
       // Double click node (doesnt allow chaining click).
       cy.getNodes().first().click();

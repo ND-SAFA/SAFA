@@ -129,7 +129,7 @@ export default Vue.extend({
           },
           label: "Center Graph",
           icon: "mdi-graphql",
-          dataCy: "button-nav-graph=center",
+          dataCy: "button-nav-graph-center",
         },
         {
           type: ButtonType.ICON,
@@ -147,6 +147,7 @@ export default Vue.extend({
         type: ButtonType.CHECKMARK_MENU,
         label: "Filter Artifacts",
         icon: "mdi-filter",
+        dataCy: "button-nav-graph-filter",
         menuItems: this.menuItems.map(([name], itemIndex) => ({
           name,
           onClick: () => this.filterTypeHandler(itemIndex),

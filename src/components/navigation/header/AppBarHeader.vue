@@ -48,7 +48,12 @@ import {
   VersionModel,
 } from "@/types";
 import { appStore, projectStore } from "@/hooks";
-import { getParams, navigateTo, Routes } from "@/router";
+import {
+  getParams,
+  navigateTo,
+  Routes,
+  routesWithRequiredProject,
+} from "@/router";
 import { handleLoadVersion } from "@/api";
 import { ButtonRow, SafaIcon, Typography, FlexBox } from "@/components/common";
 import {
@@ -183,7 +188,7 @@ export default Vue.extend({
           menuItems: this.projectMenuItems,
         },
         {
-          isHidden: !this.$route.path.includes(Routes.ARTIFACT),
+          isHidden: !routesWithRequiredProject.includes(this.$route.path),
           type: ButtonType.LIST_MENU,
           label: "Version",
           buttonIsText: true,
@@ -191,7 +196,7 @@ export default Vue.extend({
           menuItems: this.versionMenuItems,
         },
         {
-          isHidden: !this.$route.path.includes(Routes.ARTIFACT),
+          isHidden: !routesWithRequiredProject.includes(this.$route.path),
           type: ButtonType.LIST_MENU,
           label: "Trace Links",
           buttonIsText: true,

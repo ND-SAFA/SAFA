@@ -63,7 +63,6 @@ export default Vue.extend({
      * @return Whether this is a trace panel.
      */
     isTracePanel(): boolean {
-      console.log(isTracePanel(this.panel), this.panel);
       return isTracePanel(this.panel);
     },
     /**

@@ -1,10 +1,10 @@
 <template>
   <div style="max-width: 300px">
     <typography variant="subtitle" el="h2" value="Danger Zone" y="2" />
-    <password-field 
-      label="Password" 
-      v-model="deletePassword" 
-      data-cy="input-delete-password"  
+    <password-field
+      label="Password"
+      v-model="deletePassword"
+      data-cy="input-delete-password"
     />
     <v-btn
       outlined

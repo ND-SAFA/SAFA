@@ -61,6 +61,16 @@ export class CommitBuilder {
   }
 
   /**
+   * Adds multiple new trace links to this commit.
+   *
+   * @param traceLinks - The links to add.
+   */
+  withNewTraceLinks(traceLinks: TraceLinkModel[]): this {
+    this.commit.traces.added.push(...traceLinks);
+    return this;
+  }
+
+  /**
    * Adds a modified trace link to this commit.
    *
    * @param traceLink - The link to modify.

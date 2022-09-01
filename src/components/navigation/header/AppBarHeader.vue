@@ -35,6 +35,7 @@
       @close="createVersionOpen = false"
       @create="handleVersionCreated"
     />
+    <trace-link-generator-modal />
   </flex-box>
 </template>
 
@@ -46,8 +47,13 @@ import {
   ButtonType,
   VersionModel,
 } from "@/types";
-import { logStore, projectStore } from "@/hooks";
-import { getParams, navigateTo, Routes } from "@/router";
+import { appStore, projectStore } from "@/hooks";
+import {
+  getParams,
+  navigateTo,
+  Routes,
+  routesWithRequiredProject,
+} from "@/router";
 import { handleLoadVersion } from "@/api";
 import { ButtonRow, SafaIcon, Typography, FlexBox } from "@/components/common";
 import {
@@ -55,6 +61,7 @@ import {
   BaselineVersionModal,
   UploadNewVersionModal,
 } from "@/components/project";
+import { TraceLinkGeneratorModal } from "@/components/trace-link";
 import SavingIcon from "./SavingIcon.vue";
 import VersionLabel from "./VersionLabel.vue";
 import AccountDropdown from "./AccountDropdown.vue";
@@ -63,6 +70,7 @@ import UpdateButton from "./UpdateButton.vue";
 export default Vue.extend({
   name: "AppBarHeader",
   components: {
+    TraceLinkGeneratorModal,
     UpdateButton,
     FlexBox,
     Typography,
@@ -98,12 +106,12 @@ export default Vue.extend({
         {
           name: "Open Project",
           tooltip: "Open another project",
-          onClick: this.handleOpenProject,
+          onClick: () => (this.openProjectOpen = true),
         },
         {
           name: "Create Project",
           tooltip: "Create a new project",
-          onClick: this.handleCreateProject,
+          onClick: () => navigateTo(Routes.PROJECT_CREATOR),
         },
         {
           name: "Project Uploads",
@@ -120,6 +128,54 @@ export default Vue.extend({
       return projectStore.projectId ? options : options.slice(0, -1);
     },
     /**
+     * @return The menu items for versions.
+     */
+    versionMenuItems(): ButtonMenuItem[] {
+      return [
+        {
+          name: "Change Version",
+          tooltip: "Change to a different version of this project",
+          onClick: () =>
+            projectStore.ifProjectDefined(
+              () => (this.changeVersionOpen = true)
+            ),
+        },
+        {
+          name: "Create Version",
+          tooltip: "Create a new version of this project",
+          onClick: () =>
+            projectStore.ifProjectDefined(
+              () => (this.createVersionOpen = true)
+            ),
+        },
+        {
+          name: "Upload Flat Files",
+          tooltip: "Upload project files in bulk",
+          onClick: () =>
+            projectStore.ifProjectDefined(
+              () => (this.uploadVersionOpen = true)
+            ),
+        },
+      ];
+    },
+    /**
+     * @return The menu items for links.
+     */
+    linkMenuItems(): ButtonMenuItem[] {
+      return [
+        {
+          name: "Approve Generated Trace Links",
+          tooltip: "Review automatically created graph links",
+          onClick: () => navigateTo(Routes.TRACE_LINK, getParams()),
+        },
+        {
+          name: "Generate New Trace Links",
+          tooltip: "Generate new trace links within the current project view",
+          onClick: () => appStore.toggleTraceLinkGenerator(),
+        },
+      ];
+    },
+    /**
      * @return The dropdown menus displayed on the nav bar.
      */
     definitions(): ButtonDefinition[] {
@@ -132,85 +188,26 @@ export default Vue.extend({
           menuItems: this.projectMenuItems,
         },
         {
-          isHidden: !this.$route.path.includes(Routes.ARTIFACT),
+          isHidden: !routesWithRequiredProject.includes(this.$route.path),
           type: ButtonType.LIST_MENU,
           label: "Version",
           buttonIsText: true,
           dataCy: "button-nav-version",
-          menuItems: [
-            {
-              name: "Change Version",
-              tooltip: "Change to a different version of this project",
-              onClick: this.handleChangeVersion,
-            },
-            {
-              name: "Create Version",
-              tooltip: "Create a new version of this project",
-              onClick: this.handleCreateVersion,
-            },
-            {
-              name: "Upload Flat Files",
-              tooltip: "Upload project files in bulk",
-              onClick: this.handleUploadVersion,
-            },
-          ],
+          menuItems: this.versionMenuItems,
         },
         {
-          isHidden: !this.$route.path.includes(Routes.ARTIFACT),
+          isHidden: !routesWithRequiredProject.includes(this.$route.path),
           type: ButtonType.LIST_MENU,
           label: "Trace Links",
           buttonIsText: true,
           dataCy: "button-nav-links",
-          menuItems: [
-            {
-              name: "Approve Generated Trace Links",
-              tooltip: "Review automatically created graph links",
-              onClick: () => navigateTo(Routes.TRACE_LINK, getParams()),
-            },
-          ],
+          menuItems: this.linkMenuItems,
         },
       ];
     },
   },
   methods: {
     /**
-     * Opens the project selector.
-     */
-    handleOpenProject(): void {
-      this.openProjectOpen = true;
-    },
-    /**
-     * Navigates to the create project page.
-     */
-    async handleCreateProject(): Promise<void> {
-      await navigateTo(Routes.PROJECT_CREATOR);
-    },
-    /**
-     * Opens the project version uploader.
-     */
-    handleUploadVersion(): void {
-      this.uploadVersionOpen = true;
-    },
-    /**
-     * Opens the project version selector.
-     */
-    handleChangeVersion(): void {
-      if (projectStore.versionId) {
-        this.changeVersionOpen = true;
-      } else {
-        logStore.onWarning("Please select a project.");
-      }
-    },
-    /**
-     * Opens the project version creator.
-     */
-    handleCreateVersion(): void {
-      if (projectStore.projectId) {
-        this.createVersionOpen = true;
-      } else {
-        logStore.onWarning("Please select a project.");
-      }
-    },
     /**
      * Closes the version creator and loads the created version.
      */

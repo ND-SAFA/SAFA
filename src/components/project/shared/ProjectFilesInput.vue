@@ -1,6 +1,15 @@
 <template>
   <v-container style="max-width: 30em">
-    <generic-file-selector v-model="selectedFiles" data-cy="input-files-bulk" />
+    <v-switch
+      class="mt-0"
+      v-model="emptyFiles"
+      label="Create an empty project"
+    />
+    <generic-file-selector
+      v-if="!emptyFiles"
+      v-model="selectedFiles"
+      data-cy="input-files-bulk"
+    />
     <v-btn
       block
       color="primary"
@@ -44,6 +53,7 @@ export default Vue.extend({
     return {
       selectedFiles: [] as File[],
       isLoading: false,
+      emptyFiles: false,
     };
   },
 
@@ -52,7 +62,10 @@ export default Vue.extend({
      * Whether the submit button is disabled.
      */
     isDisabled(): boolean {
-      return this.name.length === 0 || this.selectedFiles.length === 0;
+      return (
+        this.name.length === 0 ||
+        (this.selectedFiles.length === 0 && !this.emptyFiles)
+      );
     },
   },
   methods: {

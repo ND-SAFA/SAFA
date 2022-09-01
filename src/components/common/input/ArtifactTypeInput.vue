@@ -7,6 +7,7 @@
     v-model="model"
     :items="types"
     :hint="hint"
+    :hide-details="hideDetails"
     :persistent-hint="persistentHint"
     item-text="label"
     item-value="type"
@@ -57,6 +58,7 @@ export default Vue.extend({
     },
     hint: String,
     persistentHint: Boolean,
+    hideDetails: Boolean,
   },
   data() {
     return {

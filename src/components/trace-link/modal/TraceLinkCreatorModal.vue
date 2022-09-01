@@ -2,7 +2,7 @@
   <generic-modal
     title="Create Trace Link"
     :is-open="isOpen"
-    @close="$emit('close')"
+    @close="handleClose"
     size="l"
     data-cy="modal-trace-save"
   >
@@ -56,7 +56,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { ArtifactModel, LabelledTraceDirectionModel } from "@/types";
-import { typeOptionsStore, artifactStore, traceStore } from "@/hooks";
+import { typeOptionsStore, artifactStore, traceStore, appStore } from "@/hooks";
 import { handleCreateLink } from "@/api";
 import {
   GenericModal,
@@ -67,18 +67,10 @@ import {
 
 /**
  * A modal for creating trace links.
- *
- * @emits `close` - On close.
  */
 export default Vue.extend({
   name: "TraceLinkCreatorModal",
   components: { Typography, ArtifactInput, GenericModal, TypeDirectionInput },
-  props: {
-    isOpen: {
-      type: Boolean,
-      required: true,
-    },
-  },
   data() {
     return {
       sourceArtifactId: "",
@@ -94,6 +86,12 @@ export default Vue.extend({
     },
   },
   computed: {
+    /**
+     * Returns whether the trace link creator is open.
+     */
+    isOpen() {
+      return appStore.isTraceLinkCreatorOpen;
+    },
     /**
      * @return The source artifact.
      */
@@ -149,7 +147,13 @@ export default Vue.extend({
       if (!source || !target) return;
 
       await handleCreateLink(source, target);
-      this.$emit("close");
+      this.handleClose();
+    },
+    /**
+     * Closes the trace link creator.
+     */
+    handleClose(): void {
+      appStore.toggleTraceLinkCreator();
     },
   },
 });

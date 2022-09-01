@@ -9,9 +9,9 @@ export interface ResourceModel {
 }
 
 /**
- * Defines a trace matrix file.
+ * Defines a type matrix.
  */
-export interface TraceMatrixModel extends ResourceModel {
+export interface TypeMatrixModel {
   /**
    * The source type to trace from.
    */
@@ -21,6 +21,11 @@ export interface TraceMatrixModel extends ResourceModel {
    */
   target: string;
 }
+
+/**
+ * Defines a trace matrix file.
+ */
+export interface TraceMatrixModel extends ResourceModel, TypeMatrixModel {}
 
 /**
  * A collection of resources.

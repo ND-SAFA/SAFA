@@ -3,6 +3,7 @@ import {
   IOHandlerCallback,
   FlatTraceLink,
   TraceLinkModel,
+  TypeMatrixModel,
 } from "@/types";
 import {
   appStore,
@@ -12,7 +13,11 @@ import {
   logStore,
   traceStore,
 } from "@/hooks";
-import { createGeneratedLinks, createLink, getGeneratedLinks } from "@/api";
+import {
+  createGeneratedLinks,
+  getGeneratedLinks,
+  saveGeneratedLinks,
+} from "@/api";
 
 /**
  * Returns all generated links.
@@ -65,42 +70,43 @@ export async function handleGetGeneratedLinks({
 }
 
 /**
- * Generates links between two types of artifacts, and adds them to the project.
+ * Generates links between sets of artifact types and adds them to the project.
  *
- * @param sourceType - The source artifact type.
- * @param targetType - The target artifact type.
+ * @param matrices - An array of source and target artifact types to generate traces between.
  * @param onSuccess - Called if the action is successful.
  * @param onError - Called if the action fails.
  */
 export async function handleGenerateLinks(
-  sourceType: string,
-  targetType: string,
+  matrices: TypeMatrixModel[],
   { onSuccess, onError }: IOHandlerCallback<TraceLinkModel[]>
 ): Promise<void> {
+  const generatedLinks: TraceLinkModel[] = [];
+  const matricesName = matrices
+    .map(({ source, target }) => `${source} -> ${target}`)
+    .join(", ");
+
   try {
     appStore.onLoadStart();
 
-    const sourceArtifacts = artifactStore.getArtifactsByType[sourceType] || [];
-    const targetArtifacts = artifactStore.getArtifactsByType[targetType] || [];
-    const traceLinks = await createGeneratedLinks(
-      sourceArtifacts,
-      targetArtifacts
-    );
-    const createdLinks: TraceLinkModel[] = [];
-
-    for (const traceLink of traceLinks) {
-      createdLinks.push(...(await createLink(traceLink)));
+    for (const { source, target } of matrices) {
+      const sourceArtifacts = artifactStore.getArtifactsByType[source] || [];
+      const targetArtifacts = artifactStore.getArtifactsByType[target] || [];
+      const traceLinks = await createGeneratedLinks(
+        sourceArtifacts,
+        targetArtifacts
+      );
+      generatedLinks.push(...traceLinks);
     }
+
+    const createdLinks = await saveGeneratedLinks(generatedLinks);
 
     traceStore.addOrUpdateTraceLinks(createdLinks);
     logStore.onSuccess(
-      `Generated ${createdLinks.length} new trace links: ${sourceType} -> ${targetType}`
+      `Generated ${createdLinks.length} new trace links: ${matricesName}`
     );
     onSuccess?.(createdLinks);
   } catch (e) {
-    logStore.onError(
-      `Unable to generate new trace links: ${sourceType} -> ${targetType}`
-    );
+    logStore.onError(`Unable to generate new trace links: ${matricesName}`);
     onError?.(e as Error);
   } finally {
     appStore.onLoadEnd();

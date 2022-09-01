@@ -21,13 +21,31 @@ export enum PanelType {
   artifactBody,
   traceLinkCreator,
   traceLinkDraw,
+  traceLinkGenerator,
 }
 
+/**
+ * Represents the open state of the artifact creator.
+ */
 export type PanelOpenState =
   | boolean
   | SafetyCaseType
   | FTANodeType
   | DocumentType;
+
+/**
+ * Represents the states of all openable panels.
+ */
+export interface PanelStateMap {
+  [PanelType.left]: boolean;
+  [PanelType.right]: boolean;
+  [PanelType.artifactCreator]: PanelOpenState;
+  [PanelType.errorDisplay]: boolean;
+  [PanelType.artifactBody]: boolean;
+  [PanelType.traceLinkCreator]: boolean;
+  [PanelType.traceLinkDraw]: boolean;
+  [PanelType.traceLinkGenerator]: boolean;
+}
 
 /**
  * Defines a title and message for a confirmation dialog.

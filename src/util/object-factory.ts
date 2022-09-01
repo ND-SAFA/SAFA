@@ -136,7 +136,7 @@ export function createArtifact(
  */
 export function createArtifactOfType(
   artifact: Partial<ArtifactModel> | undefined,
-  type: true | string
+  type?: true | string
 ): ArtifactModel {
   if (typeof type === "string") {
     const isFTA = type in FTANodeType;

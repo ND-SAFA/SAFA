@@ -5,22 +5,14 @@
       <artifact-tree />
       <artifact-fab />
 
-      <artifact-creator-modal
-        :is-open="isArtifactCreatorOpen"
-        :artifact="selectedArtifact"
-        @close="closeArtifactCreator"
-      />
-      <trace-link-creator-modal
-        :is-open="isTraceLinkCreatorOpen"
-        @close="closeTraceLinkCreator"
-      />
+      <artifact-creator-modal />
+      <trace-link-creator-modal />
     </template>
   </private-page>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { appStore, selectionStore } from "@/hooks";
 import {
   ArtifactTree,
   ArtifactTable,
@@ -42,40 +34,6 @@ export default Vue.extend({
     PrivatePage,
     ArtifactTree,
     ArtifactCreatorModal,
-  },
-  computed: {
-    /**
-     * Returns whether the artifact creator is open.
-     */
-    isArtifactCreatorOpen() {
-      return appStore.isArtifactCreatorOpen;
-    },
-    /**
-     * Returns whether the trace link creator is open.
-     */
-    isTraceLinkCreatorOpen() {
-      return appStore.isTraceLinkCreatorOpen;
-    },
-    /**
-     * @return The selected artifact.
-     */
-    selectedArtifact() {
-      return selectionStore.selectedArtifact;
-    },
-  },
-  methods: {
-    /**
-     * Closes the artifact creator.
-     */
-    closeArtifactCreator(): void {
-      appStore.closeArtifactCreator();
-    },
-    /**
-     * Closes the trace link creator.
-     */
-    closeTraceLinkCreator(): void {
-      appStore.toggleTraceLinkCreator();
-    },
   },
 });
 </script>

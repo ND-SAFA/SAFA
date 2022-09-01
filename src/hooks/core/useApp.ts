@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-import { PanelOpenState, PanelType } from "@/types";
+import { PanelOpenState, PanelStateMap, PanelType } from "@/types";
 import { pinia } from "@/plugins";
 import selectionStore from "../graph/useSelection";
 
@@ -32,20 +32,21 @@ export const useApp = defineStore("app", {
       [PanelType.artifactBody]: false,
       [PanelType.traceLinkCreator]: false,
       [PanelType.traceLinkDraw]: false,
-    } as Record<PanelType, PanelOpenState>,
+      [PanelType.traceLinkGenerator]: false,
+    } as PanelStateMap,
   }),
   getters: {
     /**
      * @return Whether the left panel is open.
      */
     isLeftPanelOpen(): boolean {
-      return !!this.isOpen[PanelType.left];
+      return this.isOpen[PanelType.left];
     },
     /**
      * @return Whether the right panel is open.
      */
     isRightPanelOpen(): boolean {
-      return !!this.isOpen[PanelType.right];
+      return this.isOpen[PanelType.right];
     },
     /**
      * @return Whether the artifact creator is open.
@@ -57,25 +58,31 @@ export const useApp = defineStore("app", {
      * @return Whether the error display is open.
      */
     isErrorDisplayOpen(): boolean {
-      return !!this.isOpen[PanelType.errorDisplay];
+      return this.isOpen[PanelType.errorDisplay];
     },
     /**
      * @return Whether the artifact body is open.
      */
     isArtifactBodyOpen(): boolean {
-      return !!this.isOpen[PanelType.artifactBody];
+      return this.isOpen[PanelType.artifactBody];
     },
     /**
      * @return Whether the trace link creator is open.
      */
     isTraceLinkCreatorOpen(): boolean {
-      return !!this.isOpen[PanelType.traceLinkCreator];
+      return this.isOpen[PanelType.traceLinkCreator];
+    },
+    /**
+     * @return Whether the trace link creator is open.
+     */
+    isTraceLinkGeneratorOpen(): boolean {
+      return this.isOpen[PanelType.traceLinkGenerator];
     },
     /**
      * @return Whether trace link drawing is enabled.
      */
     isCreateLinkEnabled(): boolean {
-      return !!this.isOpen[PanelType.traceLinkDraw];
+      return this.isOpen[PanelType.traceLinkDraw];
     },
   },
   actions: {
@@ -152,6 +159,12 @@ export const useApp = defineStore("app", {
      */
     toggleTraceLinkCreator(): void {
       this.togglePanel(PanelType.traceLinkCreator);
+    },
+    /**
+     * Toggles whether the trace link generator is open.
+     */
+    toggleTraceLinkGenerator(): void {
+      this.togglePanel(PanelType.traceLinkGenerator);
     },
     /**
      * Enables the draw link mode.

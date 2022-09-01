@@ -17,61 +17,10 @@ import {
 } from "@/hooks";
 import {
   createLink,
-  getGeneratedLinks,
   updateApprovedLink,
   updateDeclinedLink,
   updateUnreviewedLink,
 } from "@/api";
-
-/**
- * Returns all generated links.
- *
- * @param onSuccess - Called if the action is successful.
- * @param onError - Called if the action fails.
- */
-export async function handleGetGeneratedLinks({
-  onSuccess,
-  onError,
-}: IOHandlerCallback): Promise<void> {
-  if (!projectStore.isProjectDefined) return;
-
-  const traceLinks: FlatTraceLink[] = [];
-  const approvedIds: string[] = [];
-  const declinedIds: string[] = [];
-
-  try {
-    appStore.onLoadStart();
-
-    const generatedLinks = await getGeneratedLinks(projectStore.versionId);
-
-    generatedLinks.forEach((link) => {
-      const source = artifactStore.getArtifactById(link.sourceId);
-      const target = artifactStore.getArtifactById(link.targetId);
-
-      if (link.approvalStatus === ApprovalType.APPROVED) {
-        approvedIds.push(link.traceLinkId);
-      } else if (link.approvalStatus === ApprovalType.DECLINED) {
-        declinedIds.push(link.traceLinkId);
-      }
-
-      traceLinks.push({
-        ...link,
-        sourceType: source?.type || "",
-        sourceBody: source?.body || "",
-        targetType: target?.type || "",
-        targetBody: target?.body || "",
-      });
-    });
-
-    approvalStore.initializeTraces({ traceLinks, approvedIds, declinedIds });
-
-    onSuccess?.();
-  } catch (e) {
-    onError?.(e as Error);
-  } finally {
-    appStore.onLoadEnd();
-  }
-}
 
 /**
  * Creates a new trace link.

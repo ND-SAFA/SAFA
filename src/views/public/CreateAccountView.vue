@@ -20,9 +20,9 @@
           label="Email"
           v-model="email"
           :error-messages="isError ? ['Unable to create an account'] : []"
-          data-cy="input-email"
+          data-cy="input-new-email"
         />
-        <password-field v-model="password" />
+        <password-field v-model="password" data-cy="input-new-password" />
       </div>
 
       <typography
@@ -47,7 +47,14 @@
       <span class="ml-auto text-right text-body-1">
         <typography value="Already have an account?" />
 
-        <v-btn text small class="px-1" color="primary" @click="handleLogin">
+        <v-btn
+          text
+          small
+          class="px-1"
+          color="primary"
+          @click="handleLogin"
+          data-cy="button-create-account-login"
+        >
           Login
         </v-btn>
       </span>

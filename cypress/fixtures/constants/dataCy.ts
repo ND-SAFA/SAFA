@@ -32,12 +32,26 @@ export enum DataCy {
   modalCloseButton = "button-close",
   confirmModalButton = "button-confirm-modal",
 
+  // Account Creation
+  newAccountEmailInput = "input-new-email",
+  newAccountPasswordInput = "input-new-password",
+  createAccountButton = "button-create-account",
+  createAccountLoginButton = "button-create-account-login",
+
   // Authentication
 
   accountDropdown = "account-dropdown",
   emailInput = "input-email",
   passwordInput = "input-password",
   loginButton = "button-login",
+
+  // Account Editing
+  passwordCurrentInput = "input-current-password",
+  passwordNewInput = "input-new-password",
+  passwordChangeButton = "button-update-password",
+  accountDeletePasswordInput = "input-delete-password",
+  accountDeleteButton = "button-delete-my-account",
+  popUpAcceptButton = "button-confirm-modal",
 
   // Snackbar
 

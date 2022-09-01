@@ -278,6 +278,15 @@ declare namespace Cypress {
     ): Chainable<void>;
 
     /**
+     * Creates a new account on start page.
+     * Should ideally be used before running a test that requires a new account.
+     * 
+     * @param email - The email to create the account with.
+     * @param password - The password to create the account with.
+     */
+    createNewAccount(email: string, password: string): Chainable<void>;
+
+    /**
      * Saves the trace link that is currently open in the creator modal.
      */
     saveTraceLink(): Chainable<void>;
@@ -296,4 +305,4 @@ declare namespace Cypress {
      */
     loadCurrentProject(): Chainable<void>;
   }
-}
+} 

@@ -72,7 +72,7 @@ export async function handleGetGeneratedLinks({
  * @param onSuccess - Called if the action is successful.
  * @param onError - Called if the action fails.
  */
-export async function generateNewLinks(
+export async function handleGenerateLinks(
   sourceType: string,
   targetType: string,
   { onSuccess, onError }: IOHandlerCallback<TraceLinkModel[]>

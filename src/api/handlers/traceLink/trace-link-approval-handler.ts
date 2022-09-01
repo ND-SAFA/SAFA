@@ -5,16 +5,8 @@ import {
   TraceLinkModel,
   TraceType,
   IOHandlerCallback,
-  FlatTraceLink,
 } from "@/types";
-import {
-  appStore,
-  logStore,
-  artifactStore,
-  projectStore,
-  traceStore,
-  approvalStore,
-} from "@/hooks";
+import { appStore, logStore, traceStore, approvalStore } from "@/hooks";
 import {
   createLink,
   updateApprovedLink,

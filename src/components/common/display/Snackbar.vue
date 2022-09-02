@@ -49,7 +49,7 @@ import { MessageType, SnackbarMessage } from "@/types";
 import { ThemeColors } from "@/util";
 import { appStore, logStore } from "@/hooks";
 import { ServerErrorModal } from "@/components/common/modals";
-import { GenericIconButton } from "@/components/common/generic";
+import GenericIconButton from "@/components/common/generic/GenericIconButton.vue";
 import Typography from "./Typography.vue";
 import FlexBox from "./FlexBox.vue";
 

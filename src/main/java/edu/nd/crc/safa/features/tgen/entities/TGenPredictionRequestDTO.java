@@ -12,6 +12,10 @@ import lombok.Data;
 @Data
 public class TGenPredictionRequestDTO {
     /**
+     * The folder container the prediction on the TGEN bucket.
+     */
+    final String outputDir = "prediction/output";
+    /**
      * The base model architecture.
      */
     String baseModel;

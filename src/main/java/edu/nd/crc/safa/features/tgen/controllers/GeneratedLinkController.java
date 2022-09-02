@@ -3,6 +3,7 @@ package edu.nd.crc.safa.features.tgen.controllers;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import javax.validation.Valid;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
@@ -10,7 +11,8 @@ import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
-import edu.nd.crc.safa.features.tgen.entities.ArtifactTraceGenerationRequestDTO;
+import edu.nd.crc.safa.features.tgen.entities.TraceGenerationMethod;
+import edu.nd.crc.safa.features.tgen.entities.TraceGenerationRequest;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.TraceType;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
@@ -56,15 +58,18 @@ public class GeneratedLinkController extends BaseController {
     /**
      * Generates links between source and target artifacts.
      *
-     * @param artifactTraceGenerationRequestDTO Request containing source and target artifacts.
+     * @param request Request containing source and target artifacts.
      * @return Returns list of trace app entities
      */
     @PostMapping(value = AppRoutes.Links.GENERATE_LINKS)
-    public List<TraceAppEntity> generateTraceLinks(@RequestBody ArtifactTraceGenerationRequestDTO artifactTraceGenerationRequestDTO) {
-        List<ArtifactAppEntity> sourceArtifacts = artifactTraceGenerationRequestDTO.getSourceArtifacts();
-        List<ArtifactAppEntity> targetArtifacts = artifactTraceGenerationRequestDTO.getTargetArtifacts();
+    public List<TraceAppEntity> generateTraceLinks(@RequestBody @Valid TraceGenerationRequest request) {
+        System.out.println("Request:" + request);
+        List<ArtifactAppEntity> sourceArtifacts = request.getSourceArtifacts();
+        List<ArtifactAppEntity> targetArtifacts = request.getTargetArtifacts();
+        TraceGenerationMethod method = request.getMethod();
+
         return this.serviceProvider
             .getTraceGenerationService()
-            .generateLinksBetweenArtifactAppEntities(sourceArtifacts, targetArtifacts);
+            .generateLinksWithMethod(sourceArtifacts, targetArtifacts, method);
     }
 }

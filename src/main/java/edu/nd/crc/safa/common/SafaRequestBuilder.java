@@ -18,6 +18,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Service
 public class SafaRequestBuilder {
     private final WebClient webClient;
+    private final int DEFAULT_TIMEOUT = 30;
 
     public <T> T sendPost(String endpoint,
                           Object object,
@@ -28,14 +29,14 @@ public class SafaRequestBuilder {
         headerMap.put("Accept", MediaType.APPLICATION_JSON);
 
         // Step - Build request
-        int defaultTimeout = 10;
+
         RequestMeta<T> requestMeta = new RequestMeta<>(
             endpoint,
             HttpMethod.POST,
             headerMap,
             object,
             responseClass,
-            Duration.of(defaultTimeout, ChronoUnit.SECONDS));
+            Duration.of(DEFAULT_TIMEOUT, ChronoUnit.SECONDS));
 
         // Step - Send request
         return sendRequest(requestMeta);
@@ -77,6 +78,6 @@ public class SafaRequestBuilder {
         Map<String, Object> headers;
         Object payload;
         Class<T> responseClass;
-        Duration timeout = Duration.of(10, ChronoUnit.SECONDS);
+        Duration timeout = Duration.of(DEFAULT_TIMEOUT, ChronoUnit.SECONDS);
     }
 }

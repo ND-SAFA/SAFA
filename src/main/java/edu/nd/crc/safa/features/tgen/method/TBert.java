@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.tgen;
+package edu.nd.crc.safa.features.tgen.method;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -8,7 +8,10 @@ import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.common.SafaRequestBuilder;
 import edu.nd.crc.safa.config.ProjectVariables;
+import edu.nd.crc.safa.config.TBertConfig;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.tgen.entities.ITraceLinkGeneration;
 import edu.nd.crc.safa.features.tgen.entities.TGenJobResponseDTO;
 import edu.nd.crc.safa.features.tgen.entities.TGenPredictionOutput;
 import edu.nd.crc.safa.features.tgen.entities.TGenPredictionRequestDTO;
@@ -16,7 +19,6 @@ import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.traces.entities.db.TraceType;
 import edu.nd.crc.safa.utilities.CloudStorage;
-import edu.nd.crc.safa.utilities.FileUtilities;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.cloud.storage.Blob;
@@ -27,17 +29,17 @@ import org.json.JSONObject;
 /**
  * Responsible for providing an API for predicting trace links using TBert.
  */
-public class TBert {
+public class TBert implements ITraceLinkGeneration {
 
     private final SafaRequestBuilder safaRequestBuilder;
     private final ObjectMapper mapper = new ObjectMapper();
+
 
     public TBert(SafaRequestBuilder safaRequestBuilder) {
         this.safaRequestBuilder = safaRequestBuilder;
     }
 
-    public List<TraceAppEntity> predict(List<ArtifactAppEntity> sources, List<ArtifactAppEntity> targets)
-        throws IOException, InterruptedException {
+    public List<TraceAppEntity> generateLinks(List<ArtifactAppEntity> sources, List<ArtifactAppEntity> targets) {
         // Step - Build request
         TGenPredictionRequestDTO genRequest = new TGenPredictionRequestDTO(
             Defaults.TBERT_BASE_MODEL,
@@ -46,8 +48,9 @@ public class TBert {
             createArtifactPayload(targets));
 
         // Step - Send request
+        String predictEndpoint = TBertConfig.get().getPredictEndpoint();
         TGenJobResponseDTO response = this.safaRequestBuilder
-            .sendPost(Constants.PREDICT_ENDPOINT, genRequest, TGenJobResponseDTO.class);
+            .sendPost(predictEndpoint, genRequest, TGenJobResponseDTO.class);
 
         // Step - Convert to response
         TGenPredictionOutput output = getOutput(response.getOutputPath());
@@ -76,15 +79,20 @@ public class TBert {
         return artifactMap;
     }
 
-    private TGenPredictionOutput getOutput(String outputFile) throws InterruptedException, IOException {
+    private TGenPredictionOutput getOutput(String outputFile) {
         //TODO: Use scheduled tasks instead of constant pinging.
-
-        while (!CloudStorage.exists(outputFile)) {
-            Thread.sleep(1000 * Defaults.WAIT_SECONDS);
+        try {
+            while (!CloudStorage.exists(outputFile)) {
+                Thread.sleep(1000 * Defaults.WAIT_SECONDS);
+            }
+            Blob blob = CloudStorage.getBlob(outputFile);
+            JSONObject json = CloudStorage.downloadJsonFileBlob(blob);
+            return mapper.readValue(json.toString(), TGenPredictionOutput.class);
+        } catch (InterruptedException e) {
+            throw new SafaError("Interrupted while waiting for output of generated links.");
+        } catch (IOException e) {
+            throw new SafaError("IOException occurred while reading output of generated links.");
         }
-        Blob blob = CloudStorage.getBlob(outputFile);
-        JSONObject json = CloudStorage.downloadJsonFileBlob(blob);
-        return mapper.readValue(json.toString(), TGenPredictionOutput.class);
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -92,12 +100,5 @@ public class TBert {
         static final int WAIT_SECONDS = 5;
         static final String TBERT_BASE_MODEL = "bert_trace_single";
         static final String TBERT_PATH = "thearod5/tbert";
-    }
-
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    static class Constants {
-        private static final String BASE_ENDPOINT = "http://localhost:4050";
-        private static final String PREDICT_ENDPOINT = FileUtilities
-            .buildPath(BASE_ENDPOINT + "predict") + "/";
     }
 }

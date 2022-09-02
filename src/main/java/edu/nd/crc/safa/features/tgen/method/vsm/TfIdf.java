@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.tgen.vsm;
+package edu.nd.crc.safa.features.tgen.method.vsm;
 
 import java.util.ArrayList;
 import java.util.Collection;

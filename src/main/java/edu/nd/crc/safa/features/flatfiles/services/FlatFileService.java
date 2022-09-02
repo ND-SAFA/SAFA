@@ -90,7 +90,7 @@ public class FlatFileService {
     public void parseFlatFilesAndCommitEntities(ProjectVersion projectVersion,
                                                 ServiceProvider serviceProvider,
                                                 JSONObject timFileJson,
-                                                boolean asCompleteSet) throws SafaError {
+                                                boolean asCompleteSet) {
         try {
             // Step - Parse artifacts, traces, and trace generation requests
             Pair<ProjectCommit, List<ArtifactTypeTraceGenerationRequestDTO>> parseTIMResponse = parseTIMIntoCommit(
@@ -101,7 +101,8 @@ public class FlatFileService {
             ProjectCommit projectCommit = parseTIMResponse.getValue0();
 
             // Step - Generate trace link requests (post-artifact construction if successful)
-            List<ArtifactTypeTraceGenerationRequestDTO> artifactTypeTraceGenerationRequestDTOS = parseTIMResponse.getValue1();
+            List<ArtifactTypeTraceGenerationRequestDTO> artifactTypeTraceGenerationRequestDTOS = parseTIMResponse
+                .getValue1();
             List<TraceAppEntity> generatedLinks = this.traceGenerationService.generateTraceLinks(
                 projectCommit.getArtifacts().getAdded(),
                 artifactTypeTraceGenerationRequestDTOS);
@@ -124,7 +125,7 @@ public class FlatFileService {
                 projectChanger.commit(projectCommit);
             }
             this.commitErrorRepository.saveAll(projectCommit.getErrors());
-        } catch (IOException | JSONException | InterruptedException e) {
+        } catch (IOException | JSONException e) {
             throw new SafaError("An error occurred while parsing TIM file.", e);
         }
     }

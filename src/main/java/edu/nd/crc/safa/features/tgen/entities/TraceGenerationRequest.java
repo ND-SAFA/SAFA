@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.features.tgen.entities;
 
 import java.util.List;
+import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 
@@ -12,13 +13,19 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
-public class ArtifactTraceGenerationRequestDTO {
+public class TraceGenerationRequest {
     /**
      * List of source artifacts.
      */
+    @NotNull
     List<ArtifactAppEntity> sourceArtifacts;
     /**
      * List of target artifacts
      */
+    @NotNull
     List<ArtifactAppEntity> targetArtifacts;
+    /**
+     * The method to generate trace links tih
+     */
+    TraceGenerationMethod method;
 }

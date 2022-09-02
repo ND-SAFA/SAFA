@@ -48,6 +48,7 @@
       color="white"
       :icon-id="toggleViewIcon"
       :tooltip="toggleViewTooltip"
+      data-cy="button-view-toggle"
       @click="handleToggleTableView"
     />
   </flex-box>

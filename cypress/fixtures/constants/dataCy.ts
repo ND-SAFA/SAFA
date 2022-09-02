@@ -16,6 +16,7 @@ export enum DataCy {
   navToggleRightPanel = "button-right-panel-toggle",
   navGraphFilterButton = "button-nav-graph-filter",
   navGraphFilterOption = "button-checkmark-menu-item",
+  navToggleView = "button-view-toggle",
 
   // Steppers
 
@@ -35,6 +36,7 @@ export enum DataCy {
   confirmModalButton = "button-confirm-modal",
 
   // Account Creation
+
   newAccountEmailInput = "input-new-email",
   newAccountPasswordInput = "input-new-password",
   createAccountButton = "button-create-account",
@@ -48,6 +50,7 @@ export enum DataCy {
   loginButton = "button-login",
 
   // Account Editing
+
   passwordCurrentInput = "input-current-password",
   passwordNewInput = "input-new-password",
   passwordChangeButton = "button-update-password",

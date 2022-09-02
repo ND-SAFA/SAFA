@@ -91,7 +91,6 @@ export enum EntityType {
 export const notifyUserEntities = [
   EntityType.VERSION,
   EntityType.WARNINGS,
-  EntityType.JOBS,
   EntityType.LAYOUT,
 ];
 

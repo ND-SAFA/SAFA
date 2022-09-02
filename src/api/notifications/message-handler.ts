@@ -42,7 +42,7 @@ export async function handleEntityChangeMessage(
   // Skip updates by the current user that dont involve a layout update.
   if (isCurrentUser && !message.updateLayout) return;
 
-  appStore.runUpdate = async () => {
+  appStore.enqueueChanges(async () => {
     // Step - Iterate through message and delete entities.
     for (const change of message.changes) {
       if (!isCurrentUser || notifyUserEntities.includes(change.entity)) {
@@ -58,7 +58,7 @@ export async function handleEntityChangeMessage(
     if (message.updateLayout) {
       documentStore.updateBaseLayout(project.layout);
     }
-  };
+  });
 }
 
 /**

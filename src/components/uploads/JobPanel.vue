@@ -167,14 +167,14 @@ export default Vue.extend({
     /**
      * @returns The display name for a job status.
      */
-    formatStatus(status: JobStatus): string {
-      return enumToDisplay(status);
+    formatStatus(status?: JobStatus): string {
+      return enumToDisplay(status || "");
     },
     /**
      * @returns The color for a job status.
      */
-    getStatusColor(status: JobStatus) {
-      return getJobStatusColor(status);
+    getStatusColor(status?: JobStatus): string {
+      return status ? getJobStatusColor(status) : "";
     },
     /**
      * Attempts to delete a job.

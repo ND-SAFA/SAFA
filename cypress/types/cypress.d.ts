@@ -294,6 +294,13 @@ declare namespace Cypress {
     // Artifact Tree
 
     /**
+     * Get a node on the graph by name
+     *
+     * @param name - The name of the node to find.
+     */
+    getNode(name: string): Chainable<JQuery<HTMLElement>>;
+
+    /**
      * Gets nodes on the graph.
      *
      * @param selected - If true, only the selected node is returned.
@@ -309,5 +316,12 @@ declare namespace Cypress {
      * Centers the graph.
      */
     centerGraph(): Chainable<void>;
+
+    /**
+     * Selects an artifact on the graph.
+     * @param name - The artifact name to select.
+     * @param selectType - The type of artifact lookup to use. Default to the nav bar.
+     */
+    selectArtifact(name: string, selectType?: "nav" | "panel"): Chainable<void>;
   }
 }

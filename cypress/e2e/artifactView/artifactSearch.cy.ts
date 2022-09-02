@@ -21,21 +21,14 @@ describe("Artifact Search", () => {
 
   describe("I can search through current artifacts", () => {
     it("Searches for an artifact in the nav bar", () => {
-      cy.inputText(DataCy.artifactSearchNavInput, "F21").clickButton(
-        DataCy.artifactSearchItem,
-        "first"
-      );
+      cy.selectArtifact("F21", "nav");
 
       cy.getNodes(true).should("be.visible");
       cy.getCy(DataCy.selectedPanelName).should("contain", "F21");
     });
 
     it("Searches for an artifact in the side bar", () => {
-      cy.clickButton(DataCy.navToggleRightPanel);
-      cy.inputText(DataCy.artifactSearchSideInput, "F21").clickButton(
-        DataCy.artifactSearchItem,
-        "first"
-      );
+      cy.selectArtifact("F21", "panel");
 
       cy.getNodes(true).should("be.visible");
       cy.getCy(DataCy.selectedPanelName).should("contain", "F21");

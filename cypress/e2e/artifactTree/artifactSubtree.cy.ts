@@ -1,3 +1,5 @@
+import { DataIds } from "../../fixtures";
+
 describe("Artifact Subtree", () => {
   before(() => {
     cy.dbResetJobs().dbResetProjects().loadNewProject();
@@ -7,27 +9,87 @@ describe("Artifact Subtree", () => {
     cy.loadCurrentProject();
   });
 
+  describe("I can highlight an artifact’s subtree", () => {
+    it("Highlights the selected subtree", () => {
+      cy.selectArtifact("F11");
+
+      // Selected node is visible.
+      cy.getNodes(true)
+        .should("be.visible")
+        .should("not.have.css", "opacity", "0.1");
+
+      // Subtree nodes are visible.
+      cy.getNode("F9").should("not.have.css", "opacity", "0.1");
+      cy.getNode("F15").should("not.have.css", "opacity", "0.1");
+      cy.getNode("F17").should("not.have.css", "opacity", "0.1");
+
+      // Unrelated node is faded.
+      cy.getNode("D5").should("have.css", "opacity", "0.1");
+    });
+  });
+
   describe("I can hide an artifact’s subtree", () => {
     it("Hides the subtree below an artifact", () => {
-      // Assert that child nodes are not visible
+      cy.centerGraph();
+
+      // Assert that child node exists.
+      cy.getNode("F17").should("be.visible");
+
+      // Open the right click menu on the selected node, click to hide subtree.
+      cy.getNode("F11")
+        .rightclick()
+        .get(DataIds.rightClickHideSubtree)
+        .should("be.visible")
+        .then(($el) => $el.click());
+
+      // Assert that subtree is hidden.
+      cy.getNode("F17").should("not.be.visible");
     });
   });
 
   describe("I can show an artifact’s subtree", () => {
-    it("Hides the subtree below an artifact", () => {
-      // Assert that child nodes are made visible again
-    });
-  });
+    it("Shows the subtree below an artifact", () => {
+      cy.centerGraph();
 
-  describe("I can highlight an artifact’s subtree", () => {
-    it("Hides the subtree below an artifact", () => {
-      // Assert that old subtree is not faded
+      // Open the right click menu on the selected node, click to hide subtree.
+      cy.getNode("F11")
+        .rightclick()
+        .get(DataIds.rightClickHideSubtree)
+        .should("be.visible")
+        .then(($el) => $el.click());
+
+      // Assert that subtree is hidden.
+      cy.getNode("F17").should("not.be.visible");
+
+      // Open the right click menu on the selected node, click to show subtree.
+      cy.getNode("F11")
+        .rightclick()
+        .get(DataIds.rightClickShowSubtree)
+        .should("be.visible")
+        .then(($el) => $el.click());
+
+      // Assert that subtree is visible.
+      cy.getNode("F17").should("be.visible");
     });
   });
 
   describe("I can see how many children are hidden below a parent artifact", () => {
-    it("Hides the subtree below an artifact", () => {
-      // Assert that child node count equals hidden children
+    it("Shows the number of hidden children", () => {
+      it("Hides the subtree below an artifact", () => {
+        cy.centerGraph();
+
+        // Open the right click menu on the selected node, click to hide subtree.
+        cy.getNode("F11")
+          .rightclick()
+          .get(DataIds.rightClickHideSubtree)
+          .should("be.visible")
+          .then(($el) => $el.click());
+
+        // Assert that hidden children has correct count.
+        cy.getNode("F11").within(() => {
+          cy.get("text").should("contain", "6 Hidden");
+        });
+      });
     });
   });
 });

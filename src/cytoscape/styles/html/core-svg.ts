@@ -41,6 +41,7 @@ export function svgNode(
         "
         class="artifact-svg-wrapper ${deltaClass}"
         data-cy="${dataCy}"
+        data-cy-name="${data.artifactName}"
       >
         ${svgShape}
         ${svgTitle(title, y)}
@@ -78,7 +79,7 @@ export function svgTitle(title: string, yPos: number): string {
       x="50%" y="${yPos}" 
       text-anchor="middle"
       font-weight="600"
-      font-size="${title.length > 20 ? "x-small" : "medium"}"
+      font-size="${title.length < 20 ? "medium" : "x-small"}"
       data-cy="tree-node-type"
     >
       ${title}

@@ -185,4 +185,6 @@ export enum DataCy {
 export enum DataIds {
   rightClickAddArtifact = "#add-artifact",
   rightClickDuplicateArtifact = "#duplicate-artifact",
+  rightClickHideSubtree = "#hide-subtree",
+  rightClickShowSubtree = "#show-subtree",
 }

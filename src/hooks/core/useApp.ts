@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 
 import { PanelOpenState, PanelStateMap, PanelType } from "@/types";
+import { logStore } from "@/hooks";
 import { pinia } from "@/plugins";
 import selectionStore from "../graph/useSelection";
 
@@ -211,6 +212,11 @@ export const useApp = defineStore("app", {
         this.runUpdate = undefined;
         this.onLoadEnd();
       }
+    },
+    enqueueUpdate(update: () => Promise<void>): void {
+      this.runUpdate = update;
+
+      logStore.onInfo("Recent changes can be loaded.");
     },
   },
 });

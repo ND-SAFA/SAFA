@@ -85,6 +85,17 @@ export enum EntityType {
 }
 
 /**
+ * A list of all entities that can trigger updates
+ * through notifications when made by the current user.
+ */
+export const notifyUserEntities = [
+  EntityType.VERSION,
+  EntityType.WARNINGS,
+  EntityType.JOBS,
+  EntityType.LAYOUT,
+];
+
+/**
  * The action performed on an change to an entity.
  * Used in notifications to signal asynchronous updates.
  */

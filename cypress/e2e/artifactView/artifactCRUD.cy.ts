@@ -131,7 +131,7 @@ describe("Artifact CRUD", () => {
     it("Duplicates an artifact in view", () => {
       cy.centerGraph();
 
-      // Right click on a visible node.
+      // Open the right click menu on a visible node.
       cy.getNodes().should("be.visible").first().rightclick();
 
       cy.get(DataIds.rightClickDuplicateArtifact)

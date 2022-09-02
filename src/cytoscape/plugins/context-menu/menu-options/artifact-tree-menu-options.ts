@@ -133,7 +133,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
     },
   },
   {
-    id: "highlight-artifact-subtree",
+    id: "highlight-subtree",
     content: "Highlight Subtree",
     tooltipText: "Highlight this artifact's subtree nodes",
     selector: "node",
@@ -144,7 +144,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
     isVisible: hasSubtree,
   },
   {
-    id: "hide-artifact-subtree",
+    id: "hide-subtree",
     content: "Hide Subtree",
     tooltipText: "Hide all child nodes of this artifact",
     selector: "node",
@@ -156,7 +156,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
     isVisible: hasSubtree,
   },
   {
-    id: "show-artifact-subtree",
+    id: "show-subtree",
     content: "Show Subtree",
     tooltipText: "Display all child nodes of this artifact",
     selector: "node",

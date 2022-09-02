@@ -14,6 +14,18 @@ interface ArtifactFields {
   parent?: string;
 }
 
+/**
+ * Represents the fields that can be filled in to create a document.
+ */
+interface DocumentFields {
+  name?: string;
+  type?: string;
+  includeTypes?: string;
+  artifacts?: string;
+  includeChildTypes?: string;
+  childArtifacts?: string;
+}
+
 declare namespace Cypress {
   interface Chainable<Subject> {
     // Database Cleanup
@@ -323,5 +335,46 @@ declare namespace Cypress {
      * @param selectType - The type of artifact lookup to use. Default to the nav bar.
      */
     selectArtifact(name: string, selectType?: "nav" | "panel"): Chainable<void>;
+
+    // Project Documents
+
+    /**
+     * Opens the document selector.
+     */
+    openDocumentSelector(): Chainable<void>;
+
+    /**
+     * Opens the document creator.
+     */
+    openDocumentCreator(): Chainable<void>;
+
+    /**
+     * Opens the document editor for the first document.
+     */
+    openDocumentEditor(): Chainable<void>;
+
+    /**
+     * Fills the document modal fields.
+     * The document modal must be open.
+     *
+     * @param props - The document fields to set.
+     *                The name will be added if not set.
+     */
+    fillDocumentFields(props: DocumentFields): Chainable<void>;
+
+    /**
+     * Creates a new document.
+     * Does not save the document, leaving the modal open.
+     *
+     * @param props - The document fields to set.
+     *                The name will be added if not set.
+     */
+    createDocument(props: DocumentFields): Chainable<void>;
+
+    /**
+     * Saves the current document
+     * The document modal must be open.
+     */
+    saveDocument(): Chainable<void>;
   }
 }

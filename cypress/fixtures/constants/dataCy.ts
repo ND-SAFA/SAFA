@@ -165,6 +165,7 @@ export enum DataCy {
 
   // Artifact Tree
 
+  artifactTree = "view-artifact-tree",
   treeNode = "tree-node",
   treeNodeName = "tree-node-name",
   treeNodeType = "tree-node-type",
@@ -183,6 +184,28 @@ export enum DataCy {
 
   typeOptionsList = "list-type-options",
   typeOptionsIconButton = "button-type-options-icon",
+
+  // Project Documents
+
+  documentSelectButton = "button-document-select-open",
+  documentCreateButton = "button-document-select-create",
+  documentEditButton = "button-document-select-edit",
+  documentModal = "modal-document-save",
+  documentNameInput = "input-document-name",
+  documentTypeInput = "input-document-type",
+  documentIncludeTypesInput = "input-document-include-types",
+  documentArtifactsInput = "input-document-artifacts",
+  documentIncludeChildrenToggle = "button-document-include-children",
+  documentChildTypesInput = "input-document-include-child-types",
+  documentChildArtifactsInput = "input-document-child-artifacts",
+  documentDeleteButton = "button-document-delete",
+  documentSaveTypesButton = "button-save-types",
+  documentSaveArtifactsButton = "button-save-artifacts",
+  documentSaveButton = "button-document-save",
+
+  // Artifact Table
+
+  artifactTable = "view-artifact-table",
 }
 
 export enum DataIds {

@@ -3,6 +3,7 @@
     id="cytoscape-artifact"
     :cyto-core-graph="cytoCoreGraph"
     :class="className"
+    data-cy="view-artifact-tree"
   >
     <template v-slot:elements>
       <artifact-node

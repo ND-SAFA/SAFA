@@ -4,6 +4,7 @@ import {
   ChangeMessageModel,
   ChangeModel,
   EntityType,
+  notifyUserEntities,
   ProjectModel,
 } from "@/types";
 import {
@@ -36,25 +37,28 @@ export async function handleEntityChangeMessage(
 ): Promise<void> {
   const message: ChangeMessageModel = JSON.parse(frame.body);
   const project = await getChanges(versionId, message);
+  const isCurrentUser = message.user === sessionStore.userEmail;
 
-  // Skip updates by the current user.
-  if (message.user === sessionStore.userEmail) return;
+  // Skip updates by the current user that dont involve a layout update.
+  if (isCurrentUser && !message.updateLayout) return;
 
-  appStore.runUpdate = async () => {
+  appStore.enqueueChanges(async () => {
     // Step - Iterate through message and delete entities.
     for (const change of message.changes) {
-      if (change.action === ActionType.DELETE) {
-        await handleDeleteChange(change);
-      } else {
-        await handleUpdateChange(change, project);
+      if (!isCurrentUser || notifyUserEntities.includes(change.entity)) {
+        if (change.action === ActionType.DELETE) {
+          await handleDeleteChange(change);
+        } else {
+          await handleUpdateChange(change, project);
+        }
       }
     }
 
-    // Step - Update default layout.
+    // Step - Update default layout after changes are stored.
     if (message.updateLayout) {
       documentStore.updateBaseLayout(project.layout);
     }
-  };
+  });
 }
 
 /**

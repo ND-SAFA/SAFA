@@ -41,6 +41,14 @@ export const useLog = defineStore("log", {
       this.message = { message, type: MessageType.INFO, errors: [] };
     },
     /**
+     * Creates a snackbar for updating with the given message.
+     *
+     * @param message - The error message encountered.
+     */
+    onUpdate(message: string): void {
+      this.message = { message, type: MessageType.UPDATE, errors: [] };
+    },
+    /**
      * Creates a snackbar success with the given message.
      *
      * @param message - The error message encountered.

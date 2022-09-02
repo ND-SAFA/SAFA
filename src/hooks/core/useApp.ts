@@ -3,6 +3,7 @@ import { defineStore } from "pinia";
 import { PanelOpenState, PanelStateMap, PanelType } from "@/types";
 import { pinia } from "@/plugins";
 import selectionStore from "../graph/useSelection";
+import logStore from "./useLog";
 
 /**
  * This module defines state shared across the entire app.
@@ -198,6 +199,16 @@ export const useApp = defineStore("app", {
      */
     closeArtifactCreator(): void {
       this.closePanel(PanelType.artifactCreator);
+    },
+    /**
+     * Enqueues a new update to be loaded when the user is ready.
+     *
+     * @param update - A callback to run the update.
+     */
+    enqueueChanges(update: () => Promise<void>): void {
+      this.runUpdate = update;
+
+      logStore.onUpdate("Recent changes can be loaded.");
     },
     /**
      * Runs any pending changes to the app.

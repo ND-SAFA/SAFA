@@ -25,6 +25,7 @@
           See Errors
         </v-btn>
         <generic-icon-button
+          v-if="showAction"
           :color="messageColor"
           icon-id="mdi-download"
           tooltip="Update"

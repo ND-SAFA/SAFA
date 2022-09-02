@@ -17,6 +17,7 @@ import {
   traceStore,
   typeOptionsStore,
 } from "@/hooks";
+import { router, routesWithRequiredProject } from "@/router";
 import {
   handleClearProject,
   handleLoadVersion,
@@ -38,12 +39,16 @@ export async function handleEntityChangeMessage(
   const message: ChangeMessageModel = JSON.parse(frame.body);
   const project = await getChanges(versionId, message);
   const isCurrentUser = message.user === sessionStore.userEmail;
+  const updateLayout =
+    message.updateLayout &&
+    routesWithRequiredProject.includes(router.currentRoute.path);
 
   // Skip updates by the current user that dont involve a layout update.
-  if (isCurrentUser && !message.updateLayout) return;
+  if (isCurrentUser && !updateLayout) return;
 
   appStore.enqueueChanges(async () => {
     // Step - Iterate through message and delete entities.
+
     for (const change of message.changes) {
       if (!isCurrentUser || notifyUserEntities.includes(change.entity)) {
         if (change.action === ActionType.DELETE) {
@@ -55,7 +60,7 @@ export async function handleEntityChangeMessage(
     }
 
     // Step - Update default layout after changes are stored.
-    if (message.updateLayout) {
+    if (updateLayout) {
       documentStore.updateBaseLayout(project.layout);
     }
   });

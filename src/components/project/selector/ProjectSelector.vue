@@ -255,6 +255,7 @@ export default Vue.extend({
           this.projects = this.projects.filter(
             (p) => p.projectId !== project.projectId
           );
+          this.getDeletableProjects();
           this.$emit("unselected");
         },
         onError: () => (this.isLoading = false),

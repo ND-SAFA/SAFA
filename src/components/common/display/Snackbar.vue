@@ -51,7 +51,7 @@ import { appStore, logStore } from "@/hooks";
 import { ServerErrorModal } from "@/components/common/modals";
 import { GenericIconButton } from "@/components/common/generic";
 import Typography from "./Typography.vue";
-import FlexBox from ".FlexBox.vue";
+import FlexBox from "./FlexBox.vue";
 
 /**
  * Displays snackbar messages.

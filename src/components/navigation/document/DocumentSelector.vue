@@ -13,10 +13,11 @@
       style="max-width: 200px"
       class="mx-1"
       item-text="name"
+      data-cy="button-document-select-open"
     >
       <template v-slot:item="{ item }">
-        <v-row dense align="center">
-          <v-col>
+        <v-row dense align="center" :data-cy-name="item.name">
+          <v-col data-cy="button-document-select-item">
             {{ item.name }}
           </v-col>
           <v-col class="flex-grow-0" @click.stop="handleEditOpen(item)">
@@ -24,21 +25,26 @@
               v-if="item.name !== 'Default'"
               icon-id="mdi-dots-horizontal"
               :tooltip="`Edit ${item.name}`"
+              data-cy="button-document-select-edit"
             />
           </v-col>
         </v-row>
       </template>
 
       <template v-slot:append-item>
-        <v-btn text block color="primary" @click="handleCreateOpen">
+        <v-btn
+          text
+          block
+          color="primary"
+          data-cy="button-document-select-create"
+          @click="handleCreateOpen"
+        >
           <v-icon>mdi-plus</v-icon>
           Add View
         </v-btn>
 
-        <document-modal :is-open="isCreateOpen" @close="handleCloseMenu" />
-
         <document-modal
-          :is-open="isEditOpen"
+          :is-open="isOpen"
           :document="editingDocument"
           @close="handleCloseMenu"
         />
@@ -48,6 +54,7 @@
       color="white"
       :icon-id="toggleViewIcon"
       :tooltip="toggleViewTooltip"
+      data-cy="button-view-toggle"
       @click="handleToggleTableView"
     />
   </flex-box>
@@ -65,8 +72,7 @@ export default Vue.extend({
   name: "DocumentSelector",
   components: { FlexBox, DocumentModal, GenericIconButton },
   data: () => ({
-    isCreateOpen: false,
-    isEditOpen: false,
+    isOpen: false,
     editingDocument: undefined as DocumentModel | undefined,
   }),
   computed: {
@@ -114,22 +120,21 @@ export default Vue.extend({
      */
     handleCloseMenu() {
       (this.$refs.documentSelector as HTMLElement).blur();
-      this.isEditOpen = false;
-      this.isCreateOpen = false;
+      this.isOpen = false;
       this.editingDocument = undefined;
     },
     /**
      * Opens the create document modal.
      */
     handleCreateOpen() {
-      this.isCreateOpen = true;
+      this.isOpen = true;
     },
     /**
      * Opens the edit document modal.
      */
     handleEditOpen(document: DocumentModel) {
       this.editingDocument = document;
-      this.isEditOpen = true;
+      this.isOpen = true;
     },
     /**
      * Switches between document views.

@@ -19,6 +19,7 @@
         small
         icon-id="mdi-content-save-outline"
         tooltip="Save Artifacts"
+        data-cy="button-save-artifacts"
         @click="handleClose"
       />
     </template>

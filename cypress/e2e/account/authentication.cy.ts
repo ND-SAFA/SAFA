@@ -1,4 +1,4 @@
-import { validUser, invalidUser, DataCy } from "../fixtures";
+import { validUser, invalidUser, DataCy } from "../../fixtures";
 
 describe("Authentication", () => {
   beforeEach(() => {

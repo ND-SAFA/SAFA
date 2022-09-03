@@ -9,20 +9,27 @@ Cypress.Commands.add("getNodes", (selected) => {
   if (selected) {
     return cy.getCy(DataCy.treeSelectedNode);
   } else {
-    return cy.getCy(DataCy.treeNode, undefined, 10000).filter(":visible");
+    return cy
+      .getCy(DataCy.treeNode, undefined)
+      .filter(":visible", { timeout: 10000 });
   }
 });
 
-Cypress.Commands.add("loadCurrentProject", () => {
+Cypress.Commands.add("waitForProjectLoad", (waitForNodes = true) => {
+  cy.getCy(DataCy.appLoading).should("not.be.visible");
+
+  if (waitForNodes) {
+    cy.getNodes().should("be.visible");
+  }
+});
+
+Cypress.Commands.add("loadCurrentProject", (waitForNodes = true) => {
   cy.visit("/project")
     .login(validUser.email, validUser.password)
     .location("pathname", { timeout: 5000 })
     .should("equal", "/project");
 
-  cy.getCy(DataCy.appLoading)
-    .should("not.be.visible")
-    .getNodes()
-    .should("be.visible");
+  cy.waitForProjectLoad(waitForNodes);
 });
 
 Cypress.Commands.add("centerGraph", () => {

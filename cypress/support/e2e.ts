@@ -5,3 +5,4 @@ import "./projectCreatorCommands";
 import "./projectSelectionCommands";
 import "./artifactViewCommands";
 import "./artifactTreeCommands";
+import "./projectDocumentCommands";

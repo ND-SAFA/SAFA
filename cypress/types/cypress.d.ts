@@ -14,9 +14,25 @@ interface ArtifactFields {
   parent?: string;
 }
 
+/**
+ * Represents the fields that can be filled in to create a document.
+ */
+interface DocumentFields {
+  name?: string;
+  type?: string;
+  includeTypes?: string;
+  artifacts?: string;
+  includeChildTypes?: string;
+  childArtifacts?: string;
+}
+
 declare namespace Cypress {
   interface Chainable<Subject> {
     // Database Cleanup
+
+    chainRequest<T>(
+      cb: (data: Subject) => Partial<RequestOptions>
+    ): Chainable<Response<T>>;
 
     /**
      * Gets an api token.
@@ -32,6 +48,11 @@ declare namespace Cypress {
      * Removes all stored projects.
      */
     dbResetProjects(): Chainable<void>;
+
+    /**
+     * Removes all stored documents on the most recent project.
+     */
+    dbResetDocuments(): Chainable<void>;
 
     // Base Commands
 
@@ -76,10 +97,12 @@ declare namespace Cypress {
      *
      * @param dataCy - The testing selector of the button to click.
      * @param elementPosition - The specific element to grab, if there are multiple.
+     * @param force - If true, the click is forced.
      */
     clickButton(
       dataCy: string,
-      elementPosition?: ElementPosition
+      elementPosition?: ElementPosition,
+      force?: boolean
     ): Chainable<void>;
 
     /**
@@ -308,9 +331,18 @@ declare namespace Cypress {
     getNodes(selected?: boolean): Chainable<JQuery<HTMLElement>>;
 
     /**
-     * Logs in to the project page and waits for the most recent project to load.
+     * Waits for a project to load.
+     *
+     * @param waitForNodes - If true, this will wait for nodes to be painted on the graph.
      */
-    loadCurrentProject(): Chainable<void>;
+    waitForProjectLoad(waitForNodes?: boolean): Chainable<void>;
+
+    /**
+     * Logs in to the project page and waits for the most recent project to load.
+     *
+     * @param waitForNodes - If true, this will wait for nodes to be painted on the graph.
+     */
+    loadCurrentProject(waitForNodes?: boolean): Chainable<void>;
 
     /**
      * Centers the graph.
@@ -323,5 +355,48 @@ declare namespace Cypress {
      * @param selectType - The type of artifact lookup to use. Default to the nav bar.
      */
     selectArtifact(name: string, selectType?: "nav" | "panel"): Chainable<void>;
+
+    // Project Documents
+
+    /**
+     * Opens the document selector.
+     */
+    openDocumentSelector(): Chainable<void>;
+
+    /**
+     * Opens the document creator.
+     */
+    openDocumentCreator(): Chainable<void>;
+
+    /**
+     * Opens the document editor for the document with the given name.
+     *
+     * @param name - TRhe document to open.
+     */
+    openDocumentEditor(name: string): Chainable<void>;
+
+    /**
+     * Fills the document modal fields.
+     * The document modal must be open.
+     *
+     * @param props - The document fields to set.
+     *                The name will be added if not set.
+     */
+    fillDocumentFields(props: DocumentFields): Chainable<void>;
+
+    /**
+     * Creates a new document.
+     * Does not save the document, leaving the modal open.
+     *
+     * @param props - The document fields to set.
+     *                The name will be added if not set.
+     */
+    createDocument(props: DocumentFields): Chainable<void>;
+
+    /**
+     * Saves the current document
+     * The document modal must be open.
+     */
+    saveDocument(): Chainable<void>;
   }
 }

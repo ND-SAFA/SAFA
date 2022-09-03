@@ -35,6 +35,7 @@
           :color="messageColor"
           icon-id="mdi-close"
           tooltip="Close"
+          data-cy="button-snackbar-close"
           @click="showSnackbar = false"
         />
       </flex-box>

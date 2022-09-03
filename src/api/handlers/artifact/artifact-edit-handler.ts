@@ -99,9 +99,13 @@ export function handleDeleteArtifact(
         deleteArtifact(artifact)
           .then(() => {
             artifactStore.deleteArtifacts([artifact]);
+            logStore.onSuccess(`Deleted artifact: ${artifact.name}`);
             onSuccess?.();
           })
-          .catch(onError);
+          .catch((e) => {
+            logStore.onError(`Unable to delete artifact: ${artifact.name}`);
+            onError?.(e);
+          });
       },
     },
   });

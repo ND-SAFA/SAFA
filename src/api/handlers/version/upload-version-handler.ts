@@ -1,7 +1,6 @@
 import { appStore, logStore } from "@/hooks";
 import { navigateTo, Routes } from "@/router";
 import { createFlatFileUploadJob } from "@/api";
-import { handleSelectVersion } from "@/api/notifications";
 import { handleJobSubmission } from "@/api/handlers/project/job-handler";
 
 /**
@@ -31,12 +30,6 @@ export async function handleUploadProjectVersion(
 
     formData.append("isCompleteSet", JSON.stringify(isCompleteSet));
 
-    if (setVersionIfSuccessful) {
-      handleSelectVersion(projectId, versionId).catch((e) =>
-        logStore.onError(e.message)
-      );
-    }
-
     const uploadFlatFiles = async () => {
       const job = await createFlatFileUploadJob(versionId, formData);
       await handleJobSubmission(job);
@@ -44,19 +37,16 @@ export async function handleUploadProjectVersion(
       return job;
     };
 
-    if (setVersionIfSuccessful) {
-      try {
-        appStore.onLoadStart();
-        await handleSelectVersion(projectId, versionId);
-        await uploadFlatFiles();
-      } catch (e) {
-        logStore.onError(String(e));
-      } finally {
-        await navigateTo(Routes.UPLOAD_STATUS);
-        appStore.onLoadEnd();
-      }
-    } else {
+    try {
+      appStore.onLoadStart();
       await uploadFlatFiles();
+    } catch (e) {
+      logStore.onError(String(e));
+    } finally {
+      if (setVersionIfSuccessful) {
+        await navigateTo(Routes.UPLOAD_STATUS);
+      }
+      appStore.onLoadEnd();
     }
   }
 }

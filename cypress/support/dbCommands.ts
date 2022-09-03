@@ -12,16 +12,6 @@ Cypress.Commands.add(
   }
 );
 
-Cypress.Commands.add(
-  "requestAll",
-  {
-    prevSubject: true,
-  },
-  (subject: Cypress.Response<any>, cb) => {
-    cb(subject).forEach((restOptions) => cy.request(restOptions));
-  }
-);
-
 Cypress.Commands.add("dbToken", () => {
   return cy.request<{ token: string }>("POST", `${apiUrl}/login`, validUser);
 });
@@ -34,12 +24,14 @@ Cypress.Commands.add("dbResetJobs", () => {
       method: "GET",
       url: `${apiUrl}/jobs`,
       headers,
-    }).requestAll(({ body: jobs }) =>
-      jobs.map((job) => ({
-        method: "DELETE",
-        url: `${apiUrl}/jobs/${job.id}`,
-        headers,
-      }))
+    }).then(({ body: jobs }) =>
+      jobs.forEach((job) =>
+        cy.request({
+          method: "DELETE",
+          url: `${apiUrl}/jobs/${job.id}`,
+          headers,
+        })
+      )
     );
   });
 });
@@ -52,12 +44,14 @@ Cypress.Commands.add("dbResetProjects", () => {
       method: "GET",
       url: `${apiUrl}/projects`,
       headers,
-    }).requestAll(({ body: projects }) =>
-      projects.map(({ projectId }) => ({
-        method: "DELETE",
-        url: `${apiUrl}/projects/${projectId}`,
-        headers,
-      }))
+    }).then(({ body: projects }) =>
+      projects.forEach(({ projectId }) =>
+        cy.request({
+          method: "DELETE",
+          url: `${apiUrl}/projects/${projectId}`,
+          headers,
+        })
+      )
     );
   });
 });
@@ -83,7 +77,7 @@ Cypress.Commands.add("dbResetDocuments", () => {
           headers,
         })
       )
-      .requestAll(({ body: { documents } }) =>
+      .then(({ body: { documents } }) =>
         documents.map(({ documentId }) => ({
           method: "DELETE",
           url: `${apiUrl}/projects/documents/${documentId}`,

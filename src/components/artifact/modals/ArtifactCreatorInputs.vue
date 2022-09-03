@@ -191,15 +191,19 @@ export default Vue.extend({
           this.isNameValid = true;
           this.nameCheckIsLoading = false;
         } else {
-          getDoesArtifactExist(projectStore.versionId, newName).then(
-            (nameExists) => {
+          getDoesArtifactExist(projectStore.versionId, newName)
+            .then((nameExists) => {
               this.nameCheckIsLoading = false;
               this.isNameValid = !nameExists;
               this.nameError = this.isNameValid
                 ? ""
                 : "Name is already used, please select another.";
-            }
-          );
+            })
+            .catch(() => {
+              this.nameCheckIsLoading = false;
+              this.isNameValid = false;
+              this.nameError = "";
+            });
         }
       }, 500);
     },

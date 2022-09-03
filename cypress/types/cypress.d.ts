@@ -34,10 +34,6 @@ declare namespace Cypress {
       cb: (data: Subject) => Partial<RequestOptions>
     ): Chainable<Response<T>>;
 
-    requestAll(
-      cb: (data: Subject) => Partial<RequestOptions>[]
-    ): Chainable<void>;
-
     /**
      * Gets an api token.
      */

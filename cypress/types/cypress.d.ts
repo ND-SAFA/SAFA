@@ -45,6 +45,11 @@ declare namespace Cypress {
      */
     dbResetProjects(): Chainable<void>;
 
+    /**
+     * Removes all stored documents on the most recent project.
+     */
+    dbResetDocuments(): Chainable<void>;
+
     // Base Commands
 
     /**
@@ -88,10 +93,12 @@ declare namespace Cypress {
      *
      * @param dataCy - The testing selector of the button to click.
      * @param elementPosition - The specific element to grab, if there are multiple.
+     * @param force - If true, the click is forced.
      */
     clickButton(
       dataCy: string,
-      elementPosition?: ElementPosition
+      elementPosition?: ElementPosition,
+      force?: boolean
     ): Chainable<void>;
 
     /**
@@ -320,14 +327,18 @@ declare namespace Cypress {
     getNodes(selected?: boolean): Chainable<JQuery<HTMLElement>>;
 
     /**
-     * Logs in to the project page and waits for the most recent project to load.
+     * Waits for a project to load.
+     *
+     * @param waitForNodes - If true, this will wait for nodes to be painted on the graph.
      */
-    loadCurrentProject(): Chainable<void>;
+    waitForProjectLoad(waitForNodes?: boolean): Chainable<void>;
 
     /**
-     * Waits for a project to load.
+     * Logs in to the project page and waits for the most recent project to load.
+     *
+     * @param waitForNodes - If true, this will wait for nodes to be painted on the graph.
      */
-    waitForProjectLoad(): Chainable<void>;
+    loadCurrentProject(waitForNodes?: boolean): Chainable<void>;
 
     /**
      * Centers the graph.

@@ -1,4 +1,4 @@
-import { DataCy, editUser } from "../fixtures";
+import { DataCy, editUser } from "../../fixtures";
 
 describe("Account Editing", () => {
   beforeEach(() => {

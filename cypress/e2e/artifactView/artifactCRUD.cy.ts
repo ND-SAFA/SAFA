@@ -94,8 +94,9 @@ describe("Artifact CRUD", () => {
     it("Deletes a new artifact", () => {
       cy.createNewArtifact({}).saveArtifact();
 
-      cy.getCy(DataCy.selectedPanelDeleteButton).click();
-      cy.getCy(DataCy.confirmModalButton).click();
+      cy.clickButton(DataCy.selectedPanelDeleteButton).clickButton(
+        DataCy.confirmModalButton
+      );
 
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
       cy.getCy(DataCy.selectedPanelName).should("not.exist");

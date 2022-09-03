@@ -64,6 +64,7 @@ export enum DataCy {
   snackbarSuccess = "snackbar-success",
   snackbarWarning = "snackbar-warning",
   snackbarError = "snackbar-error",
+  snackbarCloseButton = "button-snackbar-close",
 
   // Project Creation
 

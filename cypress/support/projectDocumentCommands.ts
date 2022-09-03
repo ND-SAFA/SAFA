@@ -1,7 +1,7 @@
 import { DataCy } from "../fixtures";
 
 Cypress.Commands.add("openDocumentSelector", () => {
-  cy.clickButton(DataCy.documentSelectButton);
+  cy.clickButton(DataCy.documentSelectButton, undefined, true);
 });
 
 Cypress.Commands.add("openDocumentCreator", () => {
@@ -28,38 +28,42 @@ Cypress.Commands.add(
   }) => {
     if (name === undefined) name = `New ${Math.random()}`;
 
-    cy.clickButton(DataCy.documentIncludeChildrenToggle);
+    cy.clickButton(DataCy.documentIncludeChildrenToggle, undefined, true);
     cy.inputText(DataCy.documentNameInput, name);
 
     if (type) {
-      cy.clickButton(DataCy.documentTypeInput).clickButtonWithName(type);
+      cy.clickButton(
+        DataCy.documentTypeInput,
+        undefined,
+        true
+      ).clickButtonWithName(type);
     }
     if (includeTypes) {
       cy.inputText(DataCy.documentIncludeTypesInput, includeTypes)
         .getCy(DataCy.documentIncludeTypesInput)
         .within(() => {
-          cy.clickButton(DataCy.documentSaveTypesButton);
+          cy.clickButton(DataCy.documentSaveTypesButton, undefined, true);
         });
     }
     if (artifacts) {
       cy.inputText(DataCy.documentArtifactsInput, artifacts)
         .getCy(DataCy.documentArtifactsInput)
         .within(() => {
-          cy.clickButton(DataCy.documentSaveArtifactsButton);
+          cy.clickButton(DataCy.documentSaveArtifactsButton, undefined, true);
         });
     }
     if (includeChildTypes) {
       cy.inputText(DataCy.documentChildTypesInput, includeChildTypes)
         .getCy(DataCy.documentChildTypesInput)
         .within(() => {
-          cy.clickButton(DataCy.documentSaveTypesButton);
+          cy.clickButton(DataCy.documentSaveTypesButton, undefined, true);
         });
     }
     if (childArtifacts) {
       cy.inputText(DataCy.documentChildArtifactsInput, childArtifacts)
         .getCy(DataCy.documentChildArtifactsInput)
         .within(() => {
-          cy.clickButton(DataCy.documentSaveArtifactsButton);
+          cy.clickButton(DataCy.documentSaveArtifactsButton, undefined, true);
         });
     }
   }
@@ -71,6 +75,6 @@ Cypress.Commands.add("createDocument", (props) => {
 
 Cypress.Commands.add("saveDocument", () => {
   cy.getCy(DataCy.documentModal).within(() => {
-    cy.clickButton(DataCy.documentSaveButton);
+    cy.clickButton(DataCy.documentSaveButton, undefined, true);
   });
 });

@@ -29,9 +29,12 @@ Cypress.Commands.add("inputText", (dataCy, inputValue, clear) => {
   }
 });
 
-Cypress.Commands.add("clickButton", (dataCy, elementPosition = "first") => {
-  cy.getCy(dataCy, elementPosition).click({ force: true });
-});
+Cypress.Commands.add(
+  "clickButton",
+  (dataCy, elementPosition = "first", force = false) => {
+    cy.getCy(dataCy, elementPosition).click({ force });
+  }
+);
 
 Cypress.Commands.add("clickButtonWithName", (name) => {
   cy.contains(name, { matchCase: false }).last().click();

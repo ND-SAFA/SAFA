@@ -6,10 +6,7 @@ describe("Document CRUD", () => {
   });
 
   beforeEach(() => {
-    cy.loadCurrentProject()
-      .openDocumentSelector()
-      .clickButton(DataCy.documentItemButton, "last")
-      .waitForProjectLoad();
+    cy.dbResetDocuments().loadCurrentProject();
   });
 
   describe("I can create a new document from artifacts or their types", () => {

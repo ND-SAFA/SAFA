@@ -2,80 +2,93 @@ import { validUser } from "../fixtures";
 
 const apiUrl = "https://dev-api.safa.ai";
 
+Cypress.Commands.add(
+  "chainRequest",
+  {
+    prevSubject: true,
+  },
+  (subject: Cypress.Response<any>, cb) => {
+    return cy.request(cb(subject));
+  }
+);
+
+Cypress.Commands.add(
+  "requestAll",
+  {
+    prevSubject: true,
+  },
+  (subject: Cypress.Response<any>, cb) => {
+    cb(subject).forEach((restOptions) => cy.request(restOptions));
+  }
+);
+
 Cypress.Commands.add("dbToken", () => {
   return cy.request<{ token: string }>("POST", `${apiUrl}/login`, validUser);
 });
 
 Cypress.Commands.add("dbResetJobs", () => {
-  cy.dbToken().then((sessionRes) => {
-    const token = sessionRes.body.token;
+  cy.dbToken().then(({ body: { token } }) => {
+    const headers = { Authorization: token };
 
     cy.request<{ id: string }[]>({
       method: "GET",
       url: `${apiUrl}/jobs`,
-      headers: { Authorization: token },
-    }).then((jobJes) => {
-      jobJes.body.forEach((job) => {
-        cy.request({
-          method: "DELETE",
-          url: `${apiUrl}/jobs/${job.id}`,
-          headers: { Authorization: token },
-        });
-      });
-    });
+      headers,
+    }).requestAll(({ body: jobs }) =>
+      jobs.map((job) => ({
+        method: "DELETE",
+        url: `${apiUrl}/jobs/${job.id}`,
+        headers,
+      }))
+    );
   });
 });
 
 Cypress.Commands.add("dbResetProjects", () => {
-  cy.dbToken().then((sessionRes) => {
-    const token = sessionRes.body.token;
+  cy.dbToken().then(({ body: { token } }) => {
+    const headers = { Authorization: token };
 
     cy.request<{ projectId: string }[]>({
       method: "GET",
       url: `${apiUrl}/projects`,
-      headers: { Authorization: token },
-    }).then((projectRes) => {
-      projectRes.body.forEach((project) => {
-        cy.request({
-          method: "DELETE",
-          url: `${apiUrl}/projects/${project.projectId}`,
-          headers: { Authorization: token },
-        });
-      });
-    });
+      headers,
+    }).requestAll(({ body: projects }) =>
+      projects.map(({ projectId }) => ({
+        method: "DELETE",
+        url: `${apiUrl}/projects/${projectId}`,
+        headers,
+      }))
+    );
   });
 });
 
 Cypress.Commands.add("dbResetDocuments", () => {
-  cy.dbToken().then((sessionRes) => {
-    const token = sessionRes.body.token;
+  cy.dbToken().then(({ body: { token } }) => {
+    const headers = { Authorization: token };
 
     cy.request<{ projectId: string }[]>({
       method: "GET",
       url: `${apiUrl}/projects`,
-      headers: { Authorization: token },
-    }).then((projectRes) => {
-      const project = projectRes.body[0];
-
-      cy.request<{ versionId: string }>({
+      headers,
+    })
+      .chainRequest<{ versionId: string }>(({ body: projects }) => ({
         method: "GET",
-        url: `${apiUrl}/projects/${project.projectId}/versions/current`,
-        headers: { Authorization: token },
-      }).then((versionRes) => {
-        cy.request<{ documents: { documentId: string }[] }>({
+        url: `${apiUrl}/projects/${projects[0].projectId}/versions/current`,
+        headers,
+      }))
+      .chainRequest<{ documents: { documentId: string }[] }>(
+        ({ body: { versionId } }) => ({
           method: "GET",
-          url: `${apiUrl}/projects/versions/${versionRes.body.versionId}`,
-          headers: { Authorization: token },
-        }).then((docRes) => {
-          docRes.body.documents.forEach(({ documentId }) => {
-            cy.request({
-              method: "DELETE",
-              url: `${apiUrl}/projects/documents/${documentId}`,
-              headers: { Authorization: token },
-            });
-          });
-        });
-      });
-    });
+          url: `${apiUrl}/projects/versions/${versionId}`,
+          headers,
+        })
+      )
+      .requestAll(({ body: { documents } }) =>
+        documents.map(({ documentId }) => ({
+          method: "DELETE",
+          url: `${apiUrl}/projects/documents/${documentId}`,
+          headers,
+        }))
+      );
   });
 });

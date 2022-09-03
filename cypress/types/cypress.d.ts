@@ -30,6 +30,14 @@ declare namespace Cypress {
   interface Chainable<Subject> {
     // Database Cleanup
 
+    chainRequest<T>(
+      cb: (data: Subject) => Partial<RequestOptions>
+    ): Chainable<Response<T>>;
+
+    requestAll(
+      cb: (data: Subject) => Partial<RequestOptions>[]
+    ): Chainable<void>;
+
     /**
      * Gets an api token.
      */

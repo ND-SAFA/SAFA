@@ -9,7 +9,9 @@ Cypress.Commands.add("getNodes", (selected) => {
   if (selected) {
     return cy.getCy(DataCy.treeSelectedNode);
   } else {
-    return cy.getCy(DataCy.treeNode, undefined, 10000).filter(":visible");
+    return cy
+      .getCy(DataCy.treeNode, undefined)
+      .filter(":visible", { timeout: 10000 });
   }
 });
 

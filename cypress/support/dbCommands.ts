@@ -78,11 +78,13 @@ Cypress.Commands.add("dbResetDocuments", () => {
         })
       )
       .then(({ body: { documents } }) =>
-        documents.map(({ documentId }) => ({
-          method: "DELETE",
-          url: `${apiUrl}/projects/documents/${documentId}`,
-          headers,
-        }))
+        documents.forEach(({ documentId }) =>
+          cy.request({
+            method: "DELETE",
+            url: `${apiUrl}/projects/documents/${documentId}`,
+            headers,
+          })
+        )
       );
   });
 });

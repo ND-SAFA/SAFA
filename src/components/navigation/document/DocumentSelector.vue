@@ -16,7 +16,7 @@
       data-cy="button-document-select-open"
     >
       <template v-slot:item="{ item }">
-        <v-row dense align="center">
+        <v-row dense align="center" :data-cy-name="item.name">
           <v-col data-cy="button-document-select-item">
             {{ item.name }}
           </v-col>

@@ -354,9 +354,11 @@ declare namespace Cypress {
     openDocumentCreator(): Chainable<void>;
 
     /**
-     * Opens the document editor for the first document.
+     * Opens the document editor for the document with the given name.
+     *
+     * @param name - TRhe document to open.
      */
-    openDocumentEditor(): Chainable<void>;
+    openDocumentEditor(name: string): Chainable<void>;
 
     /**
      * Fills the document modal fields.

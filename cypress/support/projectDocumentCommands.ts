@@ -8,8 +8,12 @@ Cypress.Commands.add("openDocumentCreator", () => {
   cy.openDocumentSelector().clickButton(DataCy.documentCreateButton);
 });
 
-Cypress.Commands.add("openDocumentEditor", () => {
-  cy.openDocumentSelector().clickButton(DataCy.documentEditButton, "first");
+Cypress.Commands.add("openDocumentEditor", (name) => {
+  cy.openDocumentSelector()
+    .get(`[data-cy-name="${name}"]`)
+    .within(() => {
+      cy.clickButton(DataCy.documentEditButton);
+    });
 });
 
 Cypress.Commands.add(

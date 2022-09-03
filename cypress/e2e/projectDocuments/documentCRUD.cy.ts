@@ -98,7 +98,10 @@ describe("Document CRUD", () => {
 
   describe("I can edit a document", () => {
     it("Adds new artifacts to a document", () => {
+      const name = `New ${Math.random()}`;
+
       cy.createDocument({
+        name,
         artifacts: "F5{downArrow}{enter}",
       }).saveDocument();
 
@@ -109,7 +112,7 @@ describe("Document CRUD", () => {
         .waitForProjectLoad();
       cy.getNodes().should("have.length", 1);
 
-      cy.openDocumentEditor()
+      cy.openDocumentEditor(name)
         .fillDocumentFields({
           includeChildTypes: "Des{downArrow}{enter}",
         })
@@ -126,14 +129,17 @@ describe("Document CRUD", () => {
 
   describe("I can delete a document", () => {
     it("Deletes a document", () => {
+      const name = `New ${Math.random()}`;
+
       cy.createDocument({
+        name,
         artifacts: "F5{downArrow}{enter}",
       }).saveDocument();
 
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
       cy.getNodes().should("have.length", 1);
 
-      cy.openDocumentEditor()
+      cy.openDocumentEditor(name)
         .getCy(DataCy.documentModal)
         .within(() => {
           cy.clickButton(DataCy.documentDeleteButton).clickButton(

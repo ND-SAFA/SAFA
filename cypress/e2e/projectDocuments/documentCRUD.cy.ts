@@ -9,8 +9,7 @@ describe("Document CRUD", () => {
     cy.loadCurrentProject()
       .openDocumentSelector()
       .clickButton(DataCy.documentItemButton, "last")
-      .getCy(DataCy.appLoading)
-      .should("not.be.visible");
+      .waitForProjectLoad();
   });
 
   describe("I can create a new document from artifacts or their types", () => {

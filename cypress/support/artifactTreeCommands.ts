@@ -14,10 +14,7 @@ Cypress.Commands.add("getNodes", (selected) => {
 });
 
 Cypress.Commands.add("waitForProjectLoad", () => {
-  cy.getCy(DataCy.appLoading)
-    .should("not.be.visible")
-    .getNodes()
-    .should("be.visible");
+  cy.getCy(DataCy.appLoading).should("not.be.visible");
 });
 
 Cypress.Commands.add("loadCurrentProject", () => {

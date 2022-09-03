@@ -45,4 +45,7 @@ export enum DataCy {
   selectionSearch = "input-selector-search",
   selectionReload = "button-selector-reload",
   selectionClose = "button-close",
+
+  // Project settings
+  settingsShareProject = "button-share-project",
 }

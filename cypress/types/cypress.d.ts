@@ -132,5 +132,10 @@ declare namespace Cypress {
      * @param file - The file that belongs to the trace link (ex. hazard2hazard)
      */
     uploadingTraceLinks(file: string): Chainable<void>;
+
+    /**
+     * Opens the project settings modal.
+     */
+    projectSettingsSelector(): Chainable<void>;
   }
 }

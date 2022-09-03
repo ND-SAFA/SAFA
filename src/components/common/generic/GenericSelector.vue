@@ -62,6 +62,7 @@
           icon-id="mdi-plus"
           tooltip="Create"
           @click="$emit('item:add')"
+          data-cy="button-share-project"
         />
       </div>
     </template>
@@ -69,10 +70,10 @@
 </template>
 
 <script lang="ts">
+import FlexBox from "@/components/common/display/FlexBox.vue";
 import Vue, { PropType } from "vue";
 import { DataItemProps, DataTableHeader } from "vuetify";
 import GenericIconButton from "./GenericIconButton.vue";
-import FlexBox from "@/components/common/display/FlexBox.vue";
 
 /**
  * Displays a generic selector.

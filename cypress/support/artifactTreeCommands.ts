@@ -13,16 +13,20 @@ Cypress.Commands.add("getNodes", (selected) => {
   }
 });
 
+Cypress.Commands.add("waitForProjectLoad", () => {
+  cy.getCy(DataCy.appLoading)
+    .should("not.be.visible")
+    .getNodes()
+    .should("be.visible");
+});
+
 Cypress.Commands.add("loadCurrentProject", () => {
   cy.visit("/project")
     .login(validUser.email, validUser.password)
     .location("pathname", { timeout: 5000 })
     .should("equal", "/project");
 
-  cy.getCy(DataCy.appLoading)
-    .should("not.be.visible")
-    .getNodes()
-    .should("be.visible");
+  cy.waitForProjectLoad();
 });
 
 Cypress.Commands.add("centerGraph", () => {

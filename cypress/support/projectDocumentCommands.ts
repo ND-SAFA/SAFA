@@ -1,7 +1,7 @@
 import { DataCy } from "../fixtures";
 
 Cypress.Commands.add("openDocumentSelector", () => {
-  cy.getCy(DataCy.documentSelectButton).click({ force: true });
+  cy.clickButton(DataCy.documentSelectButton);
 });
 
 Cypress.Commands.add("openDocumentCreator", () => {
@@ -24,13 +24,11 @@ Cypress.Commands.add(
   }) => {
     if (name === undefined) name = `New ${Math.random()}`;
 
-    cy.getCy(DataCy.documentIncludeChildrenToggle).click({ force: true });
+    cy.clickButton(DataCy.documentIncludeChildrenToggle);
     cy.inputText(DataCy.documentNameInput, name);
 
     if (type) {
-      cy.getCy(DataCy.documentTypeInput)
-        .click({ force: true })
-        .clickButtonWithName(type);
+      cy.clickButton(DataCy.documentTypeInput).clickButtonWithName(type);
     }
     if (includeTypes) {
       cy.inputText(DataCy.documentIncludeTypesInput, includeTypes)

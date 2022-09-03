@@ -325,6 +325,11 @@ declare namespace Cypress {
     loadCurrentProject(): Chainable<void>;
 
     /**
+     * Waits for a project to load.
+     */
+    waitForProjectLoad(): Chainable<void>;
+
+    /**
      * Centers the graph.
      */
     centerGraph(): Chainable<void>;

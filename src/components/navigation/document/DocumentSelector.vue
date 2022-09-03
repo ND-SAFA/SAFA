@@ -17,7 +17,7 @@
     >
       <template v-slot:item="{ item }">
         <v-row dense align="center">
-          <v-col>
+          <v-col data-cy="button-document-select-item">
             {{ item.name }}
           </v-col>
           <v-col class="flex-grow-0" @click.stop="handleEditOpen(item)">

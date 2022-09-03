@@ -189,6 +189,7 @@ export enum DataCy {
 
   documentSelectButton = "button-document-select-open",
   documentCreateButton = "button-document-select-create",
+  documentItemButton = "button-document-select-item",
   documentEditButton = "button-document-select-edit",
   documentModal = "modal-document-save",
   documentNameInput = "input-document-name",

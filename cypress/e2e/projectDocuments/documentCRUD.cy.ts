@@ -6,7 +6,11 @@ describe("Document CRUD", () => {
   });
 
   beforeEach(() => {
-    cy.loadCurrentProject();
+    cy.loadCurrentProject()
+      .openDocumentSelector()
+      .clickButton(DataCy.documentItemButton, "last")
+      .getCy(DataCy.appLoading)
+      .should("not.be.visible");
   });
 
   describe("I can create a new document from artifacts or their types", () => {
@@ -20,7 +24,7 @@ describe("Document CRUD", () => {
       const name = "New Document";
 
       // Create a new document.
-      cy.createDocument({ name })
+      cy.createDocument({ name, artifacts: "F5{downArrow}{enter}" })
         .saveDocument()
         .getCy(DataCy.snackbarSuccess)
         .should("be.visible");
@@ -43,7 +47,11 @@ describe("Document CRUD", () => {
         artifacts: "{downArrow}{enter}{downArrow}{enter}",
       }).saveDocument();
 
-      cy.getCy(DataCy.snackbarSuccess).should("be.visible");
+      cy.getCy(DataCy.snackbarSuccess)
+        .should("be.visible")
+        .getCy(DataCy.documentModal)
+        .should("not.be.visible")
+        .waitForProjectLoad();
       cy.getNodes().should("have.length", 2);
     });
 
@@ -52,7 +60,11 @@ describe("Document CRUD", () => {
         includeTypes: "Req{downArrow}{enter}",
       }).saveDocument();
 
-      cy.getCy(DataCy.snackbarSuccess).should("be.visible");
+      cy.getCy(DataCy.snackbarSuccess)
+        .should("be.visible")
+        .getCy(DataCy.documentModal)
+        .should("not.be.visible")
+        .waitForProjectLoad();
       cy.getNodes().should("have.length", 5);
     });
   });
@@ -64,7 +76,11 @@ describe("Document CRUD", () => {
         includeChildTypes: "Des{downArrow}{enter}",
       }).saveDocument();
 
-      cy.getCy(DataCy.snackbarSuccess).should("be.visible");
+      cy.getCy(DataCy.snackbarSuccess)
+        .should("be.visible")
+        .getCy(DataCy.documentModal)
+        .should("not.be.visible")
+        .waitForProjectLoad();
       cy.getNodes().should("have.length", 3);
     });
   });
@@ -87,7 +103,11 @@ describe("Document CRUD", () => {
         artifacts: "F5{downArrow}{enter}",
       }).saveDocument();
 
-      cy.getCy(DataCy.snackbarSuccess).should("be.visible");
+      cy.getCy(DataCy.snackbarSuccess)
+        .should("be.visible")
+        .getCy(DataCy.documentModal)
+        .should("not.be.visible")
+        .waitForProjectLoad();
       cy.getNodes().should("have.length", 1);
 
       cy.openDocumentEditor()
@@ -96,11 +116,11 @@ describe("Document CRUD", () => {
         })
         .saveDocument();
 
-      cy.getCy(DataCy.snackbarSuccess).should("be.visible");
-      cy.getCy(DataCy.documentModal)
+      cy.getCy(DataCy.snackbarSuccess)
+        .should("be.visible")
+        .getCy(DataCy.documentModal)
         .should("not.be.visible")
-        .getCy(DataCy.appLoading)
-        .should("not.be.visible");
+        .waitForProjectLoad();
       cy.getNodes().should("have.length", 3);
     });
   });
@@ -122,11 +142,11 @@ describe("Document CRUD", () => {
           );
         });
 
-      cy.getCy(DataCy.snackbarSuccess).should("be.visible");
-      cy.getCy(DataCy.documentModal)
+      cy.getCy(DataCy.snackbarSuccess)
+        .should("be.visible")
+        .getCy(DataCy.documentModal)
         .should("not.be.visible")
-        .getCy(DataCy.appLoading)
-        .should("not.be.visible");
+        .waitForProjectLoad();
       cy.getNodes().should("have.length.above", 1);
     });
   });
@@ -137,12 +157,18 @@ describe("Document CRUD", () => {
         artifacts: "F5{downArrow}{enter}",
       }).saveDocument();
 
-      cy.getCy(DataCy.snackbarSuccess).should("be.visible");
+      cy.getCy(DataCy.snackbarSuccess)
+        .should("be.visible")
+        .getCy(DataCy.documentModal)
+        .should("not.be.visible")
+        .waitForProjectLoad();
       cy.getNodes().should("have.length", 1);
 
       cy.openDocumentSelector().clickButtonWithName("Default");
 
-      cy.getCy(DataCy.appLoading).should("not.be.visible");
+      cy.getCy(DataCy.documentModal)
+        .should("not.be.visible")
+        .waitForProjectLoad();
       cy.getNodes().should("have.length.above", 1);
     });
   });

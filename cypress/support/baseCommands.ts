@@ -30,7 +30,7 @@ Cypress.Commands.add("inputText", (dataCy, inputValue, clear) => {
 });
 
 Cypress.Commands.add("clickButton", (dataCy, elementPosition = "first") => {
-  cy.getCy(dataCy, elementPosition).click();
+  cy.getCy(dataCy, elementPosition).click({ force: true });
 });
 
 Cypress.Commands.add("clickButtonWithName", (name) => {

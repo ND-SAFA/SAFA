@@ -1,20 +1,11 @@
 package edu.nd.crc.safa.features.jobs.entities.app;
 
-import java.io.IOException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.jobs.entities.IJobStep;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.jobs.services.JobService;
 import edu.nd.crc.safa.features.notifications.services.NotificationService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,6 +13,14 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParametersIncrementer;
 import org.springframework.batch.core.JobParametersValidator;
+
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Responsible for finding methods corresponding to steps in job and running them
@@ -64,8 +63,8 @@ public abstract class AbstractJob implements Job {
             IJobStep jobStep = method.getAnnotation(IJobStep.class);
             if (jobStep != null) {
                 JobStepImplementation stepImplementation = new JobStepImplementation(
-                    jobStep,
-                    method
+                        jobStep,
+                        method
                 );
                 jobSteps.add(stepImplementation);
             }
@@ -89,9 +88,9 @@ public abstract class AbstractJob implements Job {
      */
     static <T extends AbstractJob> List<String> getJobSteps(Class<T> jobClass) {
         return getSteps(jobClass)
-            .stream()
-            .map(jobStepImplementation -> jobStepImplementation.annotation.name())
-            .collect(Collectors.toList());
+                .stream()
+                .map(jobStepImplementation -> jobStepImplementation.annotation.name())
+                .collect(Collectors.toList());
     }
 
     public static int getStepIndex(int position, int size) {
@@ -113,6 +112,7 @@ public abstract class AbstractJob implements Job {
         NotificationService notificationService = this.serviceProvider.getNotificationService();
 
         List<JobStepImplementation> jobSteps = getSteps(this.getClass());
+        int nSteps = jobSteps.size();
 
         try {
             for (JobStepImplementation stepImplementation : jobSteps) {
@@ -120,7 +120,7 @@ public abstract class AbstractJob implements Job {
                     continue;
                 }
                 // Pre-step
-                jobService.startStep(jobDbEntity);
+                jobService.startStep(jobDbEntity, nSteps);
                 notificationService.broadcastJob(JobAppEntity.createFromJob(jobDbEntity));
 
                 // Pre-step
@@ -150,9 +150,9 @@ public abstract class AbstractJob implements Job {
     public Method getMethodForStepByName(String stepName) {
         String query = stepName.replace(" ", "").toLowerCase();
         List<Method> methodQuery = Arrays
-            .stream(this.getClass().getMethods())
-            .filter(m -> m.getName().toLowerCase().contains(query))
-            .collect(Collectors.toList());
+                .stream(this.getClass().getMethods())
+                .filter(m -> m.getName().toLowerCase().contains(query))
+                .collect(Collectors.toList());
         int methodQuerySize = methodQuery.size();
 
         if (methodQuerySize == 0) {

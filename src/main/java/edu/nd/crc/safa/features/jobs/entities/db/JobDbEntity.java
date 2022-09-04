@@ -1,22 +1,9 @@
 package edu.nd.crc.safa.features.jobs.entities.db;
 
-import java.sql.Timestamp;
-import java.util.UUID;
-import javax.annotation.Nullable;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import edu.nd.crc.safa.features.jobs.entities.app.JobStatus;
 import edu.nd.crc.safa.features.jobs.entities.app.JobType;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,6 +11,14 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UpdateTimestamp;
+
+import javax.annotation.Nullable;
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import java.sql.Timestamp;
+import java.util.UUID;
+
+import static java.lang.Math.round;
 
 /**
  * Responsible for storing the information needed to create jobs.
@@ -96,8 +91,8 @@ public class JobDbEntity {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
     @JoinColumn(
-        name = "user_id",
-        nullable = false)
+            name = "user_id",
+            nullable = false)
     SafaUser user;
 
     /**
@@ -130,5 +125,10 @@ public class JobDbEntity {
 
     public void incrementStep() {
         this.currentStep++;
+    }
+
+    public void incrementProgress(int nSteps) {
+        float percentComplete = 100 * (this.currentStep / (float) nSteps);
+        this.setCurrentProgress(round(percentComplete));
     }
 }

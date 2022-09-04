@@ -16,6 +16,7 @@ export enum DataCy {
   navToggleRightPanel = "button-right-panel-toggle",
   navGraphFilterButton = "button-nav-graph-filter",
   navGraphFilterOption = "button-checkmark-menu-item",
+  navToggleView = "button-view-toggle",
 
   // Steppers
 
@@ -35,6 +36,7 @@ export enum DataCy {
   confirmModalButton = "button-confirm-modal",
 
   // Account Creation
+
   newAccountEmailInput = "input-new-email",
   newAccountPasswordInput = "input-new-password",
   createAccountButton = "button-create-account",
@@ -48,6 +50,7 @@ export enum DataCy {
   loginButton = "button-login",
 
   // Account Editing
+
   passwordCurrentInput = "input-current-password",
   passwordNewInput = "input-new-password",
   passwordChangeButton = "button-update-password",
@@ -61,6 +64,7 @@ export enum DataCy {
   snackbarSuccess = "snackbar-success",
   snackbarWarning = "snackbar-warning",
   snackbarError = "snackbar-error",
+  snackbarCloseButton = "button-snackbar-close",
 
   // Project Creation
 
@@ -162,6 +166,7 @@ export enum DataCy {
 
   // Artifact Tree
 
+  artifactTree = "view-artifact-tree",
   treeNode = "tree-node",
   treeNodeName = "tree-node-name",
   treeNodeType = "tree-node-type",
@@ -180,6 +185,29 @@ export enum DataCy {
 
   typeOptionsList = "list-type-options",
   typeOptionsIconButton = "button-type-options-icon",
+
+  // Project Documents
+
+  documentSelectButton = "button-document-select-open",
+  documentCreateButton = "button-document-select-create",
+  documentItemButton = "button-document-select-item",
+  documentEditButton = "button-document-select-edit",
+  documentModal = "modal-document-save",
+  documentNameInput = "input-document-name",
+  documentTypeInput = "input-document-type",
+  documentIncludeTypesInput = "input-document-include-types",
+  documentArtifactsInput = "input-document-artifacts",
+  documentIncludeChildrenToggle = "button-document-include-children",
+  documentChildTypesInput = "input-document-include-child-types",
+  documentChildArtifactsInput = "input-document-child-artifacts",
+  documentDeleteButton = "button-document-delete",
+  documentSaveTypesButton = "button-save-types",
+  documentSaveArtifactsButton = "button-save-artifacts",
+  documentSaveButton = "button-document-save",
+
+  // Artifact Table
+
+  artifactTable = "view-artifact-table",
 }
 
 export enum DataIds {

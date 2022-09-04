@@ -1,5 +1,5 @@
 import { Frame } from "webstomp-client";
-import { IOHandlerCallback, JobModel } from "@/types";
+import { ChangeMessageModel, IOHandlerCallback, JobModel } from "@/types";
 import { appStore, jobStore } from "@/hooks";
 import {
   connect,
@@ -33,7 +33,10 @@ export async function connectAndSubscribeToJob(jobId: string): Promise<void> {
  * @param frame - The websocket frame including job update message.
  */
 export function updateJobFromWebsocketMessage(frame: Frame): void {
-  const job: JobModel = JSON.parse(frame.body);
+  const job: JobModel | ChangeMessageModel = JSON.parse(frame.body);
+
+  if (!("jobType" in job)) return;
+
   jobStore.updateJob(job);
 }
 

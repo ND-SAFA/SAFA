@@ -3,6 +3,7 @@
     :title="title"
     size="sm"
     :is-open="isOpen"
+    data-cy="modal-document-save"
     @close="resetModalData"
   >
     <template v-slot:body>
@@ -12,6 +13,7 @@
         class="mt-4"
         v-model="editingDocument.name"
         :error-messages="nameErrors"
+        data-cy="input-document-name"
       />
       <v-select
         filled
@@ -20,26 +22,38 @@
         :items="types"
         item-text="name"
         item-value="id"
+        data-cy="input-document-type"
       />
       <artifact-type-input
         multiple
         label="Include Artifact Types"
         v-model="includedTypes"
         @blur="handleSaveTypes"
+        data-cy="input-document-include-types"
       />
-      <artifact-input label="Artifacts" v-model="editingDocument.artifactIds" />
-      <v-switch label="Include artifact children" v-model="includeChildren" />
+      <artifact-input
+        label="Artifacts"
+        v-model="editingDocument.artifactIds"
+        data-cy="input-document-artifacts"
+      />
+      <v-switch
+        label="Include artifact children"
+        v-model="includeChildren"
+        data-cy="button-document-include-children"
+      />
       <artifact-type-input
         v-if="includeChildren"
         multiple
         label="Include Child Types"
         v-model="includedChildTypes"
         @blur="handleSaveChildren"
+        data-cy="input-document-include-child-types"
       />
       <artifact-input
         v-if="includeChildren"
         label="Child Artifacts"
         v-model="childIds"
+        data-cy="input-document-child-artifacts"
       />
     </template>
     <template v-slot:actions>
@@ -49,6 +63,7 @@
         :text="!confirmDelete"
         :outlined="confirmDelete"
         @click="handleDelete"
+        data-cy="button-document-delete"
       >
         {{ deleteButtonText }}
       </v-btn>
@@ -56,7 +71,12 @@
         Cancel
       </v-btn>
       <v-spacer />
-      <v-btn color="primary" :disabled="!isValid" @click="handleSubmit">
+      <v-btn
+        color="primary"
+        :disabled="!isValid"
+        data-cy="button-document-save"
+        @click="handleSubmit"
+      >
         Confirm
       </v-btn>
     </template>

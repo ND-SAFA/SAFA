@@ -19,6 +19,7 @@
         small
         icon-id="mdi-content-save-outline"
         tooltip="Save Types"
+        data-cy="button-save-types"
         @click="handleClose"
       />
     </template>

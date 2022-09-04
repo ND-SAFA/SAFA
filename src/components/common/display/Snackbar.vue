@@ -14,19 +14,33 @@
     >
       <v-icon class="inherit-color"> {{ messageIcon }} </v-icon>
       <typography align="center" x="2" :value="snackbarMessage" />
-      <v-btn
-        text
-        v-if="hasErrors"
-        :color="messageColor"
-        @click="handleSeeError"
-        class="ma-0"
-      >
-        See Errors
-      </v-btn>
-      <v-btn icon class="inherit-color" @click="showSnackbar = false">
-        <v-icon> mdi-close </v-icon>
-      </v-btn>
+      <flex-box align="center">
+        <v-btn
+          text
+          v-if="hasErrors"
+          :color="messageColor"
+          @click="handleSeeError"
+          class="ma-0"
+        >
+          See Errors
+        </v-btn>
+        <generic-icon-button
+          v-if="showAction"
+          :color="messageColor"
+          icon-id="mdi-download"
+          tooltip="Update"
+          @click="handleAction"
+        />
+        <generic-icon-button
+          :color="messageColor"
+          icon-id="mdi-close"
+          tooltip="Close"
+          data-cy="button-snackbar-close"
+          @click="showSnackbar = false"
+        />
+      </flex-box>
     </flex-box>
+
     <ServerErrorModal :isOpen="isErrorDisplayOpen" :errors="errors" />
   </v-snackbar>
 </template>
@@ -37,8 +51,9 @@ import { MessageType, SnackbarMessage } from "@/types";
 import { ThemeColors } from "@/util";
 import { appStore, logStore } from "@/hooks";
 import { ServerErrorModal } from "@/components/common/modals";
-import FlexBox from "@/components/common/display/FlexBox.vue";
+import GenericIconButton from "@/components/common/generic/GenericIconButton.vue";
 import Typography from "./Typography.vue";
+import FlexBox from "./FlexBox.vue";
 
 /**
  * Displays snackbar messages.
@@ -46,6 +61,7 @@ import Typography from "./Typography.vue";
 export default Vue.extend({
   name: "Snackbar",
   components: {
+    GenericIconButton,
     FlexBox,
     Typography,
     ServerErrorModal,
@@ -75,6 +91,13 @@ export default Vue.extend({
      */
     handleSeeError(): void {
       appStore.toggleErrorDisplay();
+    },
+    /**
+     * Runs changes that are pending.
+     */
+    handleAction(): void {
+      this.showSnackbar = false;
+      appStore.loadAppChanges();
     },
   },
   computed: {
@@ -129,6 +152,12 @@ export default Vue.extend({
         default:
           return "mdi-alert-circle-outline";
       }
+    },
+    /**
+     * @return Whether an action if one should be run on this notification.
+     */
+    showAction(): boolean {
+      return this.messageType === MessageType.UPDATE;
     },
   },
   watch: {

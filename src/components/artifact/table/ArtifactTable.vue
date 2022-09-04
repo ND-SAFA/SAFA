@@ -19,6 +19,7 @@
       :expanded="expanded"
       :item-class="getItemBackground"
       :items-per-page="50"
+      data-cy="view-artifact-table"
       @click:row="handleView($event)"
     >
       <template v-slot:top>

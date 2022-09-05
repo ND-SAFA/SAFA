@@ -20,12 +20,12 @@ public class TraceGenerationRequest {
     @NotNull
     List<ArtifactAppEntity> sourceArtifacts;
     /**
-     * List of target artifacts
+     * List of target artifacts.
      */
     @NotNull
     List<ArtifactAppEntity> targetArtifacts;
     /**
-     * The method to generate trace links tih
+     * The method to generate trace links with.
      */
-    TraceGenerationMethod method;
+    TraceGenerationMethod method = TraceGenerationMethod.VSM;
 }

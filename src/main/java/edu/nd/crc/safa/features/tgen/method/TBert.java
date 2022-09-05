@@ -34,7 +34,6 @@ public class TBert implements ITraceLinkGeneration {
     private final SafaRequestBuilder safaRequestBuilder;
     private final ObjectMapper mapper = new ObjectMapper();
 
-
     public TBert(SafaRequestBuilder safaRequestBuilder) {
         this.safaRequestBuilder = safaRequestBuilder;
     }

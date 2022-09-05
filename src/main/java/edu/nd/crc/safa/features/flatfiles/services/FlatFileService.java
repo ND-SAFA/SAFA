@@ -140,8 +140,9 @@ public class FlatFileService {
      *                     - syntax error or unknown reference in the tim.json.
      * @throws IOException Throws IOException if an errors occurs while reading files in tim.json.
      */
-    public Pair<ProjectCommit, List<ArtifactTypeTraceGenerationRequestDTO>> parseTIMIntoCommit(ProjectVersion projectVersion,
-                                                                                               JSONObject timFileJson
+    public Pair<ProjectCommit, List<ArtifactTypeTraceGenerationRequestDTO>> parseTIMIntoCommit(
+        ProjectVersion projectVersion,
+        JSONObject timFileJson
     ) throws SafaError, IOException {
         // Step - Create project parser
         String pathToFiles = ProjectPaths.Storage.projectUploadsPath(projectVersion.getProject(), false);

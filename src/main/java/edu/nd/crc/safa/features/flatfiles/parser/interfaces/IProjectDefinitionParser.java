@@ -29,5 +29,6 @@ public interface IProjectDefinitionParser {
      * @return Parsed trace files.
      * @throws IOException Throws error if any problem occurs while reading a trace file
      */
-    Pair<List<IDataFile<TraceAppEntity>>, List<ArtifactTypeTraceGenerationRequestDTO>> parseTraceFiles() throws IOException;
+    Pair<List<IDataFile<TraceAppEntity>>, List<ArtifactTypeTraceGenerationRequestDTO>> parseTraceFiles()
+        throws IOException;
 }

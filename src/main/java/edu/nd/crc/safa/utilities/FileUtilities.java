@@ -121,8 +121,7 @@ public class FileUtilities {
         }
         return result;
     }
-
-
+    
     /**
      * Extracts files in given zip bytearray as a string.
      *

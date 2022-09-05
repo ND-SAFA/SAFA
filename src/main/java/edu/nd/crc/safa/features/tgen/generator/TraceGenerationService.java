@@ -84,6 +84,4 @@ public class TraceGenerationService {
                 throw new NotImplementedException("Trace method not implemented:" + traceGenerationMethod);
         }
     }
-
-
 }

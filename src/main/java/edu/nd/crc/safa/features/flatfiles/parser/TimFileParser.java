@@ -81,7 +81,8 @@ public class TimFileParser implements IProjectDefinitionParser {
     }
 
     @Override
-    public Pair<List<IDataFile<TraceAppEntity>>, List<ArtifactTypeTraceGenerationRequestDTO>> parseTraceFiles() throws IOException {
+    public Pair<List<IDataFile<TraceAppEntity>>, List<ArtifactTypeTraceGenerationRequestDTO>> parseTraceFiles()
+        throws IOException {
         List<IDataFile<TraceAppEntity>> traceFiles = new ArrayList<>();
         List<ArtifactTypeTraceGenerationRequestDTO> artifactTypeTraceGenerationRequestDTOS = new ArrayList<>();
 

@@ -49,7 +49,8 @@ public class JiraAccessCredentials {
     @Column(name = "client_id", length = 32)
     private String clientId;
 
-    @Column(name = "refresh_token", length = 128)
+    @Lob
+    @Column(name = "refresh_token", columnDefinition = "mediumtext")
     private String refreshToken;
 
     @OneToOne

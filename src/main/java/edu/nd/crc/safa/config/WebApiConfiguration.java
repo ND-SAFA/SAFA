@@ -1,5 +1,8 @@
 package edu.nd.crc.safa.config;
 
+import edu.nd.crc.safa.features.github.repositories.GithubProjectRepository;
+import edu.nd.crc.safa.features.github.services.GithubConnectionService;
+import edu.nd.crc.safa.features.github.services.GithubConnectionServiceImpl;
 import edu.nd.crc.safa.features.jira.repositories.JiraProjectRepository;
 import edu.nd.crc.safa.features.jira.services.JiraConnectionService;
 import edu.nd.crc.safa.features.jira.services.JiraConnectionServiceImpl;
@@ -22,22 +25,28 @@ import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 
 /**
- * Responsible for configuring the jira connection service
- * implementation for the application.
+ * Responsible for configuring the services and components responsible for linking Safa to external APIs
  */
 @Configuration
 @AllArgsConstructor
-public class JiraConfiguration {
+public class WebApiConfiguration {
 
-    private static final String CONTENT_TYPE_HEADER_VALUE = "application/json";
-    private static final Integer WEBCLIENT_MAX_MEMORY = 16 * 1024 * 1024;
-    private final Logger log = LoggerFactory.getLogger(JiraConfiguration.class);
+    public static final String JSON_CONTENT_TYPE_HEADER_VALUE = "application/json";
 
-    JiraProjectRepository jiraProjectRepository;
+    private static final Integer WEBCLIENT_MAX_MEMORY = 256 * 1024 * 1024;
+    private static final Logger log = LoggerFactory.getLogger(WebApiConfiguration.class);
+
+    private JiraProjectRepository jiraProjectRepository;
+    private GithubProjectRepository githubProjectRepository;
 
     @Bean
     public JiraConnectionService jiraConnectionService() {
         return new JiraConnectionServiceImpl(jiraProjectRepository, webClient());
+    }
+
+    @Bean
+    public GithubConnectionService githubConnectionService() {
+        return new GithubConnectionServiceImpl(githubProjectRepository, webClient());
     }
 
     private ExchangeFilterFunction logRequest() {
@@ -70,7 +79,7 @@ public class JiraConfiguration {
                     new Jackson2JsonDecoder(mapper, MediaType.APPLICATION_JSON));
             })
             .clientConnector(new ReactorClientHttpConnector(HttpClient.create().wiretap(true)))
-            .defaultHeader(HttpHeaders.CONTENT_TYPE, CONTENT_TYPE_HEADER_VALUE)
+            .defaultHeader(HttpHeaders.CONTENT_TYPE, JSON_CONTENT_TYPE_HEADER_VALUE)
             .defaultHeader(HttpHeaders.ACCEPT, "*/*")
             .filter(logRequest())
             .build();

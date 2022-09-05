@@ -24,6 +24,8 @@ import edu.nd.crc.safa.features.users.services.SafaUserService;
 
 import lombok.Setter;
 
+;
+
 /**
  * Responsible for providing step implementations for:
  * 1. Connecting to JIRA and accessing project
@@ -32,6 +34,9 @@ import lombok.Setter;
  * 4. Returning project created
  */
 public class JiraProjectCreationJob extends CommitJob {
+
+    private static final String EMPTY_STRING = "";
+
     /**
      * The project version to upload entities to.
      */

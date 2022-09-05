@@ -77,15 +77,6 @@ public class JiraCredentialsController extends BaseController {
 
             credentials.setUser(principal);
             credentials = accessCredentialsRepository.save(credentials);
-            // TODO: Use appropriate messages and a standard object output payload for API responses
-            // Payload to be something like
-            /*
-                {
-                    payload: <returned-object>
-                    isError: <true/false>
-                    status: <HttpCode>
-                    message: <SafaMessage.EnumConstant>
-             */
             output.setResult(new JiraResponseDTO<>(null, JiraResponseMessage.CREATED));
         });
 

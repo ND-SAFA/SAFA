@@ -43,7 +43,6 @@ import {
 import { getParam, QueryParams } from "@/router";
 import {
   getGitHubInstallations,
-  getGitHubRepositories,
   handleImportGitHubProject,
   handleLoadGitHubProjects,
 } from "@/api";

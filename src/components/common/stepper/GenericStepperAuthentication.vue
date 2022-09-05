@@ -1,5 +1,13 @@
 <template>
   <v-container>
+    <flex-box justify="center" v-if="isDisabled">
+      <v-alert type="info">
+        <typography
+          color="white"
+          value="Integrations will be enabled very soon!"
+        />
+      </v-alert>
+    </flex-box>
     <flex-box justify="center">
       <v-btn
         large
@@ -19,6 +27,9 @@
 <script lang="ts">
 import Vue from "vue";
 import { FlexBox } from "@/components/common/display";
+import Typography from "@/components/common/display/Typography.vue";
+
+const DISABLED = true;
 
 /**
  * Displays an authentication stepper step.
@@ -27,7 +38,7 @@ import { FlexBox } from "@/components/common/display";
  */
 export default Vue.extend({
   name: "GenericStepperAuthentication",
-  components: { FlexBox },
+  components: { Typography, FlexBox },
   props: {
     hasCredentials: {
       type: Boolean,
@@ -59,7 +70,7 @@ export default Vue.extend({
      * Returns whether the button is enabled.
      */
     isDisabled(): boolean {
-      return this.hasCredentials || this.isLoading;
+      return this.hasCredentials || this.isLoading || DISABLED;
     },
   },
 });

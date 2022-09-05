@@ -53,6 +53,7 @@ import {
 import { redoCommit, undoCommit } from "@/api";
 import { cyZoomIn, cyZoomOut } from "@/cytoscape";
 import { GenericIconButton, CheckmarkMenu, FlexBox } from "@/components/common";
+import { handleRegenerateLayout } from "@/api/handlers/version/layout-handler";
 
 export default Vue.extend({
   name: "GraphButtons",
@@ -133,8 +134,8 @@ export default Vue.extend({
         },
         {
           type: ButtonType.ICON,
-          handler: layoutStore.setArtifactTreeLayout,
-          label: "Reformat Graph",
+          handler: () => handleRegenerateLayout({}),
+          label: "Regenerate Layout",
           icon: "mdi-refresh",
         },
       ];

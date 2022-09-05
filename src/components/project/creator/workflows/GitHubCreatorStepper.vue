@@ -37,14 +37,15 @@ import Vue from "vue";
 import {
   GitHubInstallationModel,
   GitHubRepositoryModel,
-  GitHubCredentialsModel,
   StepState,
+  InternalGitHubCredentialsModel,
 } from "@/types";
 import { getParam, QueryParams } from "@/router";
 import {
   getGitHubInstallations,
   getGitHubRepositories,
   handleImportGitHubProject,
+  handleLoadGitHubProjects,
 } from "@/api";
 import { handleAuthorizeGitHub } from "@/api/handlers/project/integration-handler";
 import { GenericStepper } from "@/components/common";
@@ -68,7 +69,7 @@ export default Vue.extend({
   data() {
     return {
       accessCode: getParam(QueryParams.GITHUB_TOKEN),
-      credentials: undefined as GitHubCredentialsModel | undefined,
+      credentials: undefined as InternalGitHubCredentialsModel | undefined,
       isLoading: true,
 
       installations: [] as GitHubInstallationModel[],
@@ -139,12 +140,18 @@ export default Vue.extend({
     async loadProjects() {
       if (!this.credentials || !this.selectedInstallation) return;
 
+      if (this.selectedInstallation) {
+        this.credentials.installationId = this.selectedInstallation.id;
+      }
+
       this.repositoriesLoading = true;
-      this.repositories = await getGitHubRepositories(
-        this.credentials.accessToken,
-        this.selectedInstallation.id
-      );
-      this.repositoriesLoading = false;
+      handleLoadGitHubProjects(this.credentials, {
+        onSuccess: (repositories) => {
+          this.repositories = repositories;
+          this.repositoriesLoading = false;
+        },
+        onError: () => (this.repositoriesLoading = false),
+      });
     },
     /**
      * Selects a GitHub organization to load projects from.
@@ -183,14 +190,9 @@ export default Vue.extend({
       )
         return;
 
-      handleImportGitHubProject(
-        this.credentials,
-        this.selectedInstallation.id,
-        this.selectedRepository.id,
-        {
-          onSuccess: () => this.clearData(),
-        }
-      );
+      handleImportGitHubProject(this.selectedRepository.id, {
+        onSuccess: () => this.clearData(),
+      });
     },
   },
 });

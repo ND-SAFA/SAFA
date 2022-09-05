@@ -3,7 +3,7 @@ import {
   IOHandlerCallback,
   FlatTraceLink,
   TraceLinkModel,
-  TypeMatrixModel,
+  GeneratedMatrixModel,
 } from "@/types";
 import {
   appStore,
@@ -77,7 +77,7 @@ export async function handleGetGeneratedLinks({
  * @param onError - Called if the action fails.
  */
 export async function handleGenerateLinks(
-  matrices: TypeMatrixModel[],
+  matrices: GeneratedMatrixModel[],
   { onSuccess, onError }: IOHandlerCallback<TraceLinkModel[]>
 ): Promise<void> {
   const generatedLinks: TraceLinkModel[] = [];
@@ -88,13 +88,14 @@ export async function handleGenerateLinks(
   try {
     appStore.onLoadStart();
 
-    for (const { source, target } of matrices) {
+    for (const { source, target, method } of matrices) {
       const sourceArtifacts = artifactStore.getArtifactsByType[source] || [];
       const targetArtifacts = artifactStore.getArtifactsByType[target] || [];
-      const traceLinks = await createGeneratedLinks(
+      const traceLinks = await createGeneratedLinks({
         sourceArtifacts,
-        targetArtifacts
-      );
+        targetArtifacts,
+        method,
+      });
       generatedLinks.push(...traceLinks);
     }
 

@@ -4,7 +4,7 @@ import {
   CytoCoreElementData,
   CytoCoreElementDefinition,
   FTANodeType,
-  LayoutPosition,
+  PositionModel,
   SafetyCaseType,
   TraceLinkModel,
 } from "@/types";
@@ -79,7 +79,7 @@ export interface ArtifactCytoCoreElement extends CytoCoreElementDefinition {
   /**
    * The artifact's position in the graph
    */
-  position?: LayoutPosition;
+  position?: PositionModel;
   /**
    * The element's cytoscape classes
    */

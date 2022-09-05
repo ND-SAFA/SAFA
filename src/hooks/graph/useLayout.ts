@@ -2,10 +2,10 @@ import { defineStore } from "pinia";
 
 import { LayoutOptions, NodeSingular } from "cytoscape";
 import {
-  ArtifactPositions,
+  LayoutPositionsModel,
   IGraphLayout,
   LayoutPayload,
-  LayoutPosition,
+  PositionModel,
 } from "@/types";
 import {
   ArtifactGraphLayout,
@@ -32,11 +32,11 @@ export const useLayout = defineStore("layout", {
     /**
      * A mapping from artifact ID to its position.
      */
-    artifactPositions: {} as ArtifactPositions,
+    artifactPositions: {} as LayoutPositionsModel,
     /**
      * A saved position for a node to be added.
      */
-    savedPosition: undefined as LayoutPosition | undefined,
+    savedPosition: undefined as PositionModel | undefined,
     /**
      * The current graph layout.
      */
@@ -141,7 +141,7 @@ export const useLayout = defineStore("layout", {
      *
      * @param positions - The new positions to set.
      */
-    async updatePositions(positions: ArtifactPositions): Promise<void> {
+    async updatePositions(positions: LayoutPositionsModel): Promise<void> {
       this.artifactPositions = positions;
 
       await this.resetLayout();

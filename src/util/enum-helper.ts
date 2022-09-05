@@ -4,6 +4,7 @@ import {
   ColumnDataType,
   DocumentType,
   FTANodeType,
+  ModelType,
   SafetyCaseType,
   SelectOption,
 } from "@/types";
@@ -127,5 +128,17 @@ export function approvalTypeOptions(): SelectOption[] {
     createEnumOption(ApprovalType.UNREVIEWED),
     createEnumOption(ApprovalType.APPROVED),
     createEnumOption(ApprovalType.DECLINED),
+  ];
+}
+
+/**
+ * Returns display names for each trace model type.
+ *
+ * @return The select option names and ids.
+ */
+export function traceModelOptions(): SelectOption[] {
+  return [
+    createEnumOption(ModelType.TBERT, "TBERT"),
+    createEnumOption(ModelType.VSM, "VSM"),
   ];
 }

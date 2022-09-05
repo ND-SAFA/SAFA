@@ -1,6 +1,7 @@
 import { ApprovalType, TraceLinkModel, ArtifactModel } from "@/types";
 import { CommitBuilder } from "@/api";
 import { Endpoint, fillEndpoint, authHttpClient } from "@/api/util";
+import { GenerateLinksModel } from "@/types/api/link-api";
 
 /**
  * Returns all generated links for this project.
@@ -20,21 +21,17 @@ export async function getGeneratedLinks(
 /**
  * Generates links between source and target artifacts.
  *
- * @param sourceArtifacts - The artifacts to generate links from.
- * @param targetArtifacts - The artifacts to generate links to.
+ * @param config - Generated link configuration.
  * @return All generated links.
  */
 export async function createGeneratedLinks(
-  sourceArtifacts: ArtifactModel[],
-  targetArtifacts: ArtifactModel[]
+  config: GenerateLinksModel
 ): Promise<TraceLinkModel[]> {
-  const payload = { sourceArtifacts, targetArtifacts };
-
   return authHttpClient<TraceLinkModel[]>(
     fillEndpoint(Endpoint.generateLinks),
     {
       method: "POST",
-      body: JSON.stringify(payload),
+      body: JSON.stringify(config),
     }
   );
 }

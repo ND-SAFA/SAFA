@@ -14,7 +14,7 @@ public class ArtifactTypeTraceGenerationRequestDTO {
     /**
      * The algorithm for generating similarity scores in trace links.
      */
-    TraceGenerationMethod traceGenerationMethod = TraceGenerationMethod.VSM;
+    TraceGenerationMethod traceGenerationMethod = TraceGenerationMethod.getDefault();
     /**
      * The name of the artifact type for source artifacts.
      */

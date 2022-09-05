@@ -27,5 +27,5 @@ public class TraceGenerationRequest {
     /**
      * The method to generate trace links with.
      */
-    TraceGenerationMethod method = TraceGenerationMethod.VSM;
+    TraceGenerationMethod method = TraceGenerationMethod.getDefault();
 }

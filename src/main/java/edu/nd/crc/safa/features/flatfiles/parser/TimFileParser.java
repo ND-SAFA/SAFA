@@ -116,9 +116,9 @@ public class TimFileParser implements IProjectDefinitionParser {
                 if (traceFileDefinition.has(ITraceFIle.Constants.LINK_GENERATION_METHOD)) {
                     String methodStr = traceFileDefinition.getString(ITraceFIle.Constants.LINK_GENERATION_METHOD);
                     traceGenerationMethod = TraceGenerationMethod.getMethodWithDefault(methodStr,
-                        TraceGenerationMethod.VSM);
+                        TraceGenerationMethod.getDefault());
                 } else {
-                    traceGenerationMethod = TraceGenerationMethod.VSM;
+                    traceGenerationMethod = TraceGenerationMethod.getDefault();
                 }
                 ArtifactTypeTraceGenerationRequestDTO artifactTypeTraceGenerationRequestDTO =
                     new ArtifactTypeTraceGenerationRequestDTO(

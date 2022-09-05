@@ -22,6 +22,10 @@ public enum TraceGenerationMethod {
         return defaultMethod;
     }
 
+    public static TraceGenerationMethod getDefault() {
+        return TraceGenerationMethod.VSM;
+    }
+
     @Override
     public String toString() {
         return this.name();

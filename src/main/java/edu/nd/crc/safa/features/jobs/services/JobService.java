@@ -99,9 +99,11 @@ public class JobService {
      * Saves job with lastUpdated date at time of save.
      *
      * @param jobDbEntity The job whose lastUpdated property is being modified.
+     * @param nSteps      The number of steps in job.
      */
-    public void startStep(JobDbEntity jobDbEntity) {
+    public void startStep(JobDbEntity jobDbEntity, int nSteps) {
         jobDbEntity.incrementStep();
+        jobDbEntity.incrementProgress(nSteps - 1); // excluding done step
         this.jobDbRepository.save(jobDbEntity);
     }
 

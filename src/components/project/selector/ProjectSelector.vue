@@ -131,6 +131,9 @@ export default Vue.extend({
 
       this.$emit("selected", this.projects[0], false);
     },
+    $route(): void {
+      this.fetchProjects();
+    },
   },
   methods: {
     /**

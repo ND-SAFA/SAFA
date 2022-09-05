@@ -1,5 +1,5 @@
 import {
-  ArtifactPositions,
+  LayoutPositionsModel,
   ArtifactTypeModel,
   WarningModel,
   MembershipModel,
@@ -101,7 +101,7 @@ export interface ProjectModel extends IdentifierModel {
   /**
    * Map of artifact ids to their position in the default graph.
    */
-  layout: ArtifactPositions;
+  layout: LayoutPositionsModel;
 }
 
 export type VersionType = "major" | "minor" | "revision";

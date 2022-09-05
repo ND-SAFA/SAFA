@@ -1,10 +1,13 @@
 package services;
 
+import static features.base.ApplicationBaseTest.defaultUser;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import edu.nd.crc.safa.common.AuthorizationSetter;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
@@ -25,7 +28,8 @@ public class RetrievalTestService {
 
 
     public ProjectAppEntity getProjectAtVersion(ProjectVersion projectVersion) {
-        AuthorizationTestService.setAuthorization(this.serviceProvider); // Required because getting currentDocument
+        AuthorizationSetter.setSessionAuthorization(defaultUser, this.serviceProvider); // Required because getting
+        // currentDocument
         // requires a user be
         // logged in
         return this.serviceProvider.getProjectRetrievalService().getProjectAppEntity(projectVersion);

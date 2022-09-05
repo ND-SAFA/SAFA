@@ -2,8 +2,6 @@ package features.flatfiles.logic;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import requests.SafaRequest;
-
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.config.ProjectPaths;
 
@@ -12,6 +10,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import requests.SafaRequest;
 
 /**
  * Responsible for purposely occurring parsing errors and verifying that the correct
@@ -26,7 +25,7 @@ class TestArtifactFileParsingErrors extends ApplicationBaseTest {
         JSONObject responseBody = SafaRequest
             .withRoute(AppRoutes.FlatFiles.CREATE_NEW_PROJECT_FROM_FLAT_FILES)
             .getFlatFileHelper()
-            .postWithFilesInDirectory(ProjectPaths.Tests.TEST2,
+            .postWithFilesInDirectory(ProjectPaths.Resources.Tests.TEST2,
                 MockMvcResultMatchers.status().isBadRequest(),
                 new JSONObject());
 
@@ -41,7 +40,7 @@ class TestArtifactFileParsingErrors extends ApplicationBaseTest {
         JSONObject responseBody = SafaRequest
             .withRoute(AppRoutes.FlatFiles.CREATE_NEW_PROJECT_FROM_FLAT_FILES)
             .getFlatFileHelper()
-            .postWithFilesInDirectory(ProjectPaths.Tests.TEST3, new JSONObject());
+            .postWithFilesInDirectory(ProjectPaths.Resources.Tests.TEST3, new JSONObject());
         // VP - Verify that message contains artifact that failed constraint
         JSONObject errors = responseBody.getJSONObject("errors");
         JSONArray artifactErrors = errors.getJSONArray("artifacts");

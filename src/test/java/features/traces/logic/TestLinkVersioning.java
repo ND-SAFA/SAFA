@@ -4,8 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
-import requests.FlatFileRequest;
-
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
@@ -14,6 +12,7 @@ import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import features.base.ApplicationBaseTest;
 import org.junit.jupiter.api.Test;
+import requests.FlatFileRequest;
 
 /**
  * Tests that versioning changes are detected for trace links.
@@ -42,7 +41,7 @@ class TestLinkVersioning extends ApplicationBaseTest {
         Project project = v1.getProject();
 
         // Step - Create base trace link
-        String flatFilesPath = ProjectPaths.Tests.MINI;
+        String flatFilesPath = ProjectPaths.Resources.Tests.MINI;
         FlatFileRequest.updateProjectVersionFromFlatFiles(v1, flatFilesPath);
 
         // VP - Verify that link is stored as added

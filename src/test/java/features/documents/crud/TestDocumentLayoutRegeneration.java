@@ -22,7 +22,13 @@ import org.junit.jupiter.api.Test;
  * Test that editing an artifact will trigger layout regenerations in affected documents.
  */
 class TestDocumentLayoutRegeneration extends ApplicationBaseTest {
+    /**
+     * The version of the layout to verify.
+     */
     ProjectVersion projectVersion;
+    /**
+     * The project who layout this test verifies.
+     */
     ProjectAppEntity project;
 
     @Test

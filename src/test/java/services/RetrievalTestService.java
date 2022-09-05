@@ -28,10 +28,7 @@ public class RetrievalTestService {
 
 
     public ProjectAppEntity getProjectAtVersion(ProjectVersion projectVersion) {
-        AuthorizationSetter.setSessionAuthorization(defaultUser, this.serviceProvider); // Required because getting
-        // currentDocument
-        // requires a user be
-        // logged in
+        AuthorizationSetter.setSessionAuthorization(defaultUser, this.serviceProvider);
         return this.serviceProvider.getProjectRetrievalService().getProjectAppEntity(projectVersion);
     }
 

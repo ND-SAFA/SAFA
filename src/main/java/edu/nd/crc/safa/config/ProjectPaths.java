@@ -19,7 +19,6 @@ public class ProjectPaths {
     // Flat files
     public static final String ROOT = System.getProperty("user.dir");
     public static final String BUILD = ProjectPaths.ROOT + "/build";
-    public static final String RESOURCES = ProjectPaths.ROOT + "/resources";
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Storage {
@@ -55,26 +54,32 @@ public class ProjectPaths {
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class Tests {
-        protected static final String PATH = ProjectPaths.RESOURCES + "/tests"; // PRIVATE scope results in null path
-        public static final String MINI = PATH + "/mini";
-        public static final String TEST2 = PATH + "/test2";
-        public static final String TEST3 = PATH + "/test3";
-        public static final String MISSING_DATA_FILE = PATH + "/missing_data_file";
+    public static class Resources {
+        public static final String BASE = ProjectPaths.ROOT + "/resources";
 
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
-        public static class DefaultProject {
-            public static final String V1 = PATH + "/before";
-            public static final String V2 = PATH + "/after";
+        public static class Tests {
+            protected static final String PATH = ProjectPaths.Resources.BASE + "/tests"; // PRIVATE scope results in
+            // null path
+            public static final String MINI = PATH + "/mini";
+            public static final String TEST2 = PATH + "/test2";
+            public static final String TEST3 = PATH + "/test3";
+            public static final String MISSING_DATA_FILE = PATH + "/missing_data_file";
 
-            public static String getPathToFile(String fileName) {
-                return FileUtilities.builtPath(V1, fileName);
+            @NoArgsConstructor(access = AccessLevel.PRIVATE)
+            public static class DefaultProject {
+                public static final String V1 = PATH + "/before";
+                public static final String V2 = PATH + "/after";
+
+                public static String getPathToFile(String fileName) {
+                    return FileUtilities.builtPath(V1, fileName);
+                }
             }
-        }
 
-        public static class Jira {
-            public static final String DRONE_ISSUES = PATH + "/jira"
-                + "/drone_response.json";
+            public static class Jira {
+                public static final String DRONE_ISSUES = PATH + "/jira"
+                    + "/drone_response.json";
+            }
         }
     }
 }

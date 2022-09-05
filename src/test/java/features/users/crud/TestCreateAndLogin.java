@@ -40,6 +40,6 @@ class TestCreateAndLogin extends ApplicationBaseTest {
 
         // VP - Verify that user is able to be authenticated and no projects are assigned to it.
         JSONArray response = new SafaRequest(AppRoutes.Projects.GET_PROJECTS).getWithJsonArray();
-        assertThat(response.length()).isZero();
+        assertThat(response.length()).isOne();
     }
 }

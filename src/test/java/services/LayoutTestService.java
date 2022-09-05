@@ -12,6 +12,9 @@ import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
 import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 
+/**
+ * Container for verification of layout methods.
+ */
 public class LayoutTestService {
 
     /**

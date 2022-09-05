@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Optional;
 
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.features.users.entities.app.UserPassword;
+import edu.nd.crc.safa.features.users.entities.app.UserPasswordDTO;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.utilities.JsonFileUtilities;
 
@@ -31,8 +31,8 @@ class TestDeleteAccount extends ApplicationBaseTest {
         assertThat(safaUserOptional).isPresent();
 
         // Step 2 - Delete account
-        UserPassword userPassword = new UserPassword(defaultUserPassword);
-        JSONObject userJson = JsonFileUtilities.toJson(userPassword);
+        UserPasswordDTO userPasswordDTO = new UserPasswordDTO(defaultUserPassword);
+        JSONObject userJson = JsonFileUtilities.toJson(userPasswordDTO);
         SafaRequest
             .withRoute(AppRoutes.Accounts.DELETE_ACCOUNT)
             .postWithJsonObject(userJson);

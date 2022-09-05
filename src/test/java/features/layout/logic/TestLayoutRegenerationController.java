@@ -9,6 +9,7 @@ import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.layout.entities.api.LayoutGenerationRequestDTO;
 import edu.nd.crc.safa.features.layout.entities.db.ArtifactPosition;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import features.base.ApplicationBaseTest;
@@ -32,7 +33,8 @@ class TestLayoutRegenerationController extends ApplicationBaseTest {
         Pair<ProjectVersion, ProjectVersion> dualVersions = creationService.createDualVersions(projectName);
         ProjectVersion v1 = dualVersions.getValue0();
         ProjectVersion v2 = dualVersions.getValue1();
-
+        Project project = v1.getProject();
+        
         // VP - Verify V1 layout
         ProjectAppEntity project1 = retrievalService.getProjectAtVersion(v1);
         layoutTestService.verifyProjectLayout(project1);
@@ -66,7 +68,9 @@ class TestLayoutRegenerationController extends ApplicationBaseTest {
 
         // VP - Verify that a position was persisted for each artifact
         List<ArtifactPosition> defaultDocumentArtifactPositions =
-            this.serviceProvider.getArtifactPositionRepository().findByDocumentDocumentId(null);
+            this.serviceProvider.getArtifactPositionRepository().findByProjectVersionProjectAndDocumentDocumentId(
+                project,
+                null);
         assertThat(defaultDocumentArtifactPositions).hasSize(project2.getArtifacts().size());
     }
 }

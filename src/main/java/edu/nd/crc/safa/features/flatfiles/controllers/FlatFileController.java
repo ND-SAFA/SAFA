@@ -90,30 +90,11 @@ public class FlatFileController extends BaseController {
     @ResponseStatus(HttpStatus.CREATED)
     public ProjectAppEntity createNewProjectFromFlatFiles(@RequestParam List<MultipartFile> files)
         throws SafaError, IOException {
-        if (files.length == 0) {
-            throw new SafaError("Could not create project because no files were received.");
-        }
-        Project project = new Project("", "");
-        this.serviceProvider
-            .getProjectService()
-            .saveProjectWithCurrentUserAsOwner(project);
-        ProjectVersion projectVersion = this.serviceProvider
-            .getVersionService()
-            .createInitialProjectVersion(project);
-        ProjectAppEntity projectAppEntity = this.serviceProvider
+        return this.serviceProvider
             .getFlatFileService()
-            .createProjectFromFlatFiles(project,
-                projectVersion,
-                serviceProvider,
+            .createProjectFromFlatFiles(new Project("", ""),
                 files,
-                true);
-        this.serviceProvider
-            .getNotificationService()
-            .broadcastChange(EntityChangeBuilder
-                .create(projectVersion)
-                .withVersionUpdate(projectVersion.getVersionId())
-            );
-        return projectAppEntity;
+                this.serviceProvider);
     }
 
     @GetMapping(AppRoutes.FlatFiles.DOWNLOAD_FLAT_FILES)

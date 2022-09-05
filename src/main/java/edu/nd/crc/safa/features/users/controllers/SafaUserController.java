@@ -161,4 +161,18 @@ public class SafaUserController extends BaseController {
         principal = this.safaUserRepository.save(principal);
         return new UserIdentifierDTO(principal);
     }
+
+    private void createSampleProject(CreateAccountRequest newUser) throws IOException {
+        AuthorizationSetter.setSessionAuthorization(newUser.getEmail(), serviceProvider);
+        List<MultipartFile> files = MultipartRequestService
+            .readDirectoryAsMultipartFiles(ProjectPaths.Resources.Tests.DefaultProject.V1,
+                "files");
+
+        this.serviceProvider
+            .getFlatFileService()
+            .createProjectFromFlatFiles(
+                new Project("Sample project", "Sample project for new user."),
+                files,
+                serviceProvider);
+    }
 }

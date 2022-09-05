@@ -17,6 +17,7 @@ import edu.nd.crc.safa.features.flatfiles.services.CheckArtifactNameService;
 import edu.nd.crc.safa.features.flatfiles.services.FileDownloadService;
 import edu.nd.crc.safa.features.flatfiles.services.FileUploadService;
 import edu.nd.crc.safa.features.flatfiles.services.FlatFileService;
+import edu.nd.crc.safa.features.flatfiles.services.MultipartRequestService;
 import edu.nd.crc.safa.features.flatfiles.services.ZipFileService;
 import edu.nd.crc.safa.features.jira.repositories.JiraAccessCredentialsRepository;
 import edu.nd.crc.safa.features.jira.repositories.JiraProjectRepository;
@@ -42,6 +43,7 @@ import edu.nd.crc.safa.features.traces.services.TraceService;
 import edu.nd.crc.safa.features.types.TypeService;
 import edu.nd.crc.safa.features.users.repositories.SafaUserRepository;
 import edu.nd.crc.safa.features.users.services.AccountLookupService;
+import edu.nd.crc.safa.features.users.services.DefaultProjectCreatorService;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
 import edu.nd.crc.safa.features.versions.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.features.versions.services.VersionService;
@@ -132,6 +134,9 @@ public class ServiceProvider {
     private final AccountLookupService accountLookupService;
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
+    private final DefaultProjectCreatorService defaultProjectCreatorService;
+    // Requests
+    private final MultipartRequestService multipartRequestService;
     // Jobs
-    JobLauncher jobLauncher;
+    JobLauncher jobLauncher; // Not final because runtime changes on test vs dev.
 }

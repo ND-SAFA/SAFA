@@ -6,6 +6,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.Table;
 
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
@@ -39,8 +40,12 @@ public class Project implements Serializable {
     String name;
     /**
      * Description of project.
+     * Lob to support GitHub repository descriptions
      */
-    @Column(name = "description", nullable = false)
+    @Lob
+    @Column(name = "description",
+        nullable = false,
+        columnDefinition = "mediumtext")
     String description;
 
     public Project(String name, String description) {

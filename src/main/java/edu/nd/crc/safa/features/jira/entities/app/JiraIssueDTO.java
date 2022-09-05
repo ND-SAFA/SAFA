@@ -66,12 +66,13 @@ public class JiraIssueDTO {
         public static class JiraDescription {
             int version;
             String type;
-            List<Content> content;
+            List<Content> content = new ArrayList<>();
 
             @Data
             public static class Content {
                 String type;
-                List<ContentContent> content; // Cannot rename because this is the format defined by JIRA
+                // Cannot rename because this is the format defined by JIRA
+                List<ContentContent> content = new ArrayList<>();
             }
 
             @Data

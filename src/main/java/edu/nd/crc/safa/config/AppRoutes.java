@@ -144,6 +144,24 @@ public class AppRoutes {
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class Github {
+        public static final String RETRIEVE_GITHUB_REPOSITORIES = Projects.ROOT + "/github";
+
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        public static class Credentials {
+            public static final String ROOT = Accounts.PREFIX + "/github/credentials";
+            public static final String REFRESH = Accounts.PREFIX + "/github/credentials";
+        }
+
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        public static class Import {
+            private static final String ROOT = Projects.ROOT + "/import";
+            public static final String BY_NAME = Import.ROOT + "/github/{repositoryName}";
+            public static final String UPDATE = Versions.BY_ID + "/import/github/{repositoryName}";
+        }
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Links {
         public static final String GET_GENERATED_LINKS_IN_PROJECT_VERSION = Projects.ROOT
             + "/versions/{versionId}/links/generated";

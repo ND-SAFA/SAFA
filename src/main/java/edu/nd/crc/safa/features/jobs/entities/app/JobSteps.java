@@ -28,6 +28,10 @@ public class JobSteps {
                 return AbstractJob.getJobSteps(CreateProjectViaJiraJob.class);
             case JIRA_PROJECT_UPDATE:
                 return AbstractJob.getJobSteps(JiraProjectUpdateJob.class);
+            case GITHUB_PROJECT_CREATION:
+                return AbstractJob.getJobSteps(GithubProjectCreationJob.class);
+            case GITHUB_PROJECT_UPDATE:
+                return AbstractJob.getJobSteps(GithubProjectUpdateJob.class);
             case PROJECT_CREATION:
                 return AbstractJob.getJobSteps(CommitJob.class);
             default:

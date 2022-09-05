@@ -42,4 +42,4 @@ class SafaStorage:
         Removes the mount directory in output path if in development mode.
         :param target_path: Path to remove mount directory if in dev mode.
         """
-        return target_path.replace(MNT_DIR, "") if not IS_TEST else target_path
+        return target_path.replace(MNT_DIR + "/", "") if not IS_TEST else target_path

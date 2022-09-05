@@ -7,6 +7,7 @@ from threading import Thread
 from typing import Dict
 
 from common.api.prediction_response import PredictionResponse
+from common.config.constants import IS_TEST
 from common.jobs.abstract_args_builder import AbstractArgsBuilder
 from common.jobs.job_status import Status
 from common.storage.safa_storage import SafaStorage

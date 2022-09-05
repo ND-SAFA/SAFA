@@ -1,5 +1,11 @@
 package edu.nd.crc.safa.features.jobs.services;
 
+import java.sql.Timestamp;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.jobs.entities.app.AbstractJob;
 import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
@@ -10,6 +16,7 @@ import edu.nd.crc.safa.features.jobs.repositories.JobDbRepository;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
+
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.JobParametersInvalidException;
@@ -20,12 +27,6 @@ import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
-
-import java.sql.Timestamp;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * Responsible for creating units-of-work to be used in JobController.
@@ -61,10 +62,10 @@ public class JobService {
     public List<JobAppEntity> retrieveCurrentUserJobs() {
         SafaUser currentUser = this.safaUserService.getCurrentUser();
         return this.jobDbRepository
-                .findByUserOrderByLastUpdatedAtDesc(currentUser)
-                .stream()
-                .map(JobAppEntity::createFromJob)
-                .collect(Collectors.toList());
+            .findByUserOrderByLastUpdatedAtDesc(currentUser)
+            .stream()
+            .map(JobAppEntity::createFromJob)
+            .collect(Collectors.toList());
     }
 
     /**
@@ -80,15 +81,15 @@ public class JobService {
     public JobDbEntity createNewJob(JobType jobType, String name) {
         SafaUser currentUser = this.safaUserService.getCurrentUser();
         JobDbEntity jobDbEntity = new JobDbEntity(
-                currentUser,
-                name,
-                jobType,
-                JobStatus.IN_PROGRESS,
-                now(),
-                now(),
-                null,
-                0,
-                -1
+            currentUser,
+            name,
+            jobType,
+            JobStatus.IN_PROGRESS,
+            now(),
+            now(),
+            null,
+            0,
+            -1
         );
         this.jobDbRepository.save(jobDbEntity);
         return jobDbEntity;
@@ -164,10 +165,10 @@ public class JobService {
     public void executeJob(JobDbEntity jobDbEntity,
                            ServiceProvider serviceProvider,
                            AbstractJob jobCreationThread) throws
-            JobExecutionAlreadyRunningException, JobRestartException,
-            JobInstanceAlreadyCompleteException, JobParametersInvalidException {
+        JobExecutionAlreadyRunningException, JobRestartException,
+        JobInstanceAlreadyCompleteException, JobParametersInvalidException {
         JobParameters jobParameters = new JobParametersBuilder()
-                .addLong("time", System.currentTimeMillis()).toJobParameters();
+            .addLong("time", System.currentTimeMillis()).toJobParameters();
 
         try {
             jobCreationThread.initJobData();

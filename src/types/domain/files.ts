@@ -28,6 +28,16 @@ export interface TypeMatrixModel {
 export interface TraceMatrixModel extends ResourceModel, TypeMatrixModel {}
 
 /**
+ * Defines a request for generating trace matrices.
+ */
+export interface GenerateMatrixModel extends TypeMatrixModel {
+  /**
+   * The type of model to generate with.
+   */
+  model: string;
+}
+
+/**
  * A collection of resources.
  */
 export interface FileModel {

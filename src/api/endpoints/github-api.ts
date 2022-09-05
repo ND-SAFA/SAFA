@@ -4,7 +4,10 @@ import {
   GitHubRepositoryModel,
   GitHubRepositoryListModel,
   GitHubCredentialsModel,
+  InternalGitHubCredentialsModel,
+  JobModel,
 } from "@/types";
+import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
 
 /**
  * The formatted scopes of GitHub permissions being requested.
@@ -173,4 +176,37 @@ export async function getGitHubRepositories(
   );
 
   return repositories;
+}
+
+/**
+ * Saves a user's GitHub credentials and primary organization.
+ *
+ * @param credentials - The access and refresh token received from authorizing GitHub.
+ */
+export async function saveGitHubCredentials(
+  credentials: InternalGitHubCredentialsModel
+): Promise<void> {
+  return authHttpClient<void>(Endpoint.githubCredentials, {
+    method: "POST",
+    body: JSON.stringify(credentials),
+  });
+}
+
+/**
+ * Creates a new project based on a github project.
+ *
+ * @param repositoryName - The repository to create a project from.
+ * @return The created import job.
+ */
+export async function createGitHubProject(
+  repositoryName: string
+): Promise<JobModel> {
+  const response = await authHttpClient<{ payload: JobModel }>(
+    fillEndpoint(Endpoint.githubProject, { repositoryName }),
+    {
+      method: "POST",
+    }
+  );
+
+  return response.payload;
 }

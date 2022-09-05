@@ -99,3 +99,37 @@ export interface GitHubRepositoryListModel {
    */
   total_count: number;
 }
+
+/**
+ * Represents the internally stored Jira credentials.
+ */
+export interface InternalGitHubCredentialsModel {
+  /**
+   * The API bearer access token.
+   */
+  accessToken: string;
+  /**
+   * The API refresh token.
+   */
+  refreshToken: string;
+  /**
+   * The current GitHub installation to chose projects in.
+   */
+  installationId: string;
+  /**
+   * Our GitHub app client id.
+   */
+  clientId: string;
+  /**
+   * Our GitHub app client secret.
+   */
+  clientSecret: string;
+  /**
+   * The access token expiration time.
+   */
+  accessTokenExpiration: number;
+  /**
+   * The refresh token expiration time.
+   */
+  refreshTokenExpiration: number;
+}

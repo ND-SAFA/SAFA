@@ -5,7 +5,7 @@ import {
   DocumentModel,
 } from "@/types";
 import { createDocument, preserveObjectKeys } from "@/util";
-import { logStore, documentStore, projectStore } from "@/hooks";
+import { logStore, documentStore, projectStore, appStore } from "@/hooks";
 import {
   saveDocument,
   deleteDocument,
@@ -120,28 +120,37 @@ export function handleSaveDocument(
 ): void {
   const { name, type, artifactIds } = document;
 
+  appStore.onLoadStart();
+
+  const handleSuccess = (isNew: boolean) => () => {
+    logStore.onSuccess(
+      isNew
+        ? `Document has been created: ${name}`
+        : `Document has been edited: ${name}`
+    );
+    onSuccess?.();
+    appStore.onLoadEnd();
+  };
+
+  const handleError = (isNew: boolean) => (e: Error) => {
+    logStore.onSuccess(
+      isNew
+        ? `Unable to create document: ${name}`
+        : `Unable to edit document: ${name}`
+    );
+    logStore.onDevError(String(e));
+    onError?.(e);
+    appStore.onLoadEnd();
+  };
+
   if (isUpdate) {
     handleUpdateDocument(document)
-      .then(() => {
-        logStore.onSuccess(`Document has been edited: ${name}`);
-        onSuccess?.();
-      })
-      .catch((e) => {
-        logStore.onError(`Unable to edit document: ${name}`);
-        logStore.onDevError(e);
-        onError?.(e);
-      });
+      .then(handleSuccess(false))
+      .catch(handleError(false));
   } else {
     handleCreateDocument(name, type, artifactIds)
-      .then(() => {
-        logStore.onSuccess(`Document has been created: ${name}`);
-        onSuccess?.();
-      })
-      .catch((e) => {
-        logStore.onError(`Unable to create document: ${name}`);
-        logStore.onDevError(e);
-        onError?.(e);
-      });
+      .then(handleSuccess(true))
+      .catch(handleError(true));
   }
 }
 

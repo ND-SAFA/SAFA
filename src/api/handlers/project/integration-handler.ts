@@ -1,5 +1,7 @@
 import {
   GitHubCredentialsModel,
+  GitHubRepositoryModel,
+  InternalGitHubCredentialsModel,
   InternalJiraCredentialsModel,
   IOHandlerCallback,
   JiraAccessTokenModel,
@@ -10,10 +12,12 @@ import {
 import { logStore } from "@/hooks";
 import {
   getGitHubRefreshToken,
+  getGitHubRepositories,
   getGitHubToken,
   getJiraProjects,
   getJiraRefreshToken,
   getJiraToken,
+  saveGitHubCredentials,
   saveJiraCredentials,
 } from "@/api";
 
@@ -54,7 +58,7 @@ export function handleAuthorizeJira(
 }
 
 /**
- * Loads jira projects and sets the currently selected cloud id.
+ * Loads Jira projects and sets the currently selected cloud id.
  *
  * @param credentials - The access and refresh token received from authorizing Jira.
  * @param onSuccess - Called if the action is successful, with the jira project list.
@@ -85,15 +89,23 @@ export function handleLoadJiraProjects(
  */
 export function handleAuthorizeGitHub(
   accessCode: URLParameter,
-  { onSuccess, onError }: IOHandlerCallback<GitHubCredentialsModel>
+  { onSuccess, onError }: IOHandlerCallback<InternalGitHubCredentialsModel>
 ): void {
   const handleSuccess = (token: GitHubCredentialsModel) => {
-    onSuccess?.(token);
-
     localStorage.setItem(
       LocalStorageKeys.GIT_HUB_REFRESH_TOKEN,
       token.refreshToken
     );
+
+    onSuccess?.({
+      ...token,
+      installationId:
+        localStorage.getItem(LocalStorageKeys.GIT_HUB_INSTALLATION_ID) || "",
+      clientId: process.env.VUE_APP_GITHUB_CLIENT_ID || "",
+      clientSecret: process.env.VUE_APP_GITHUB_CLIENT_SECRET || "",
+      accessTokenExpiration: 0, // TODO
+      refreshTokenExpiration: 0, // TODO
+    });
   };
 
   if (accessCode) {
@@ -104,4 +116,30 @@ export function handleAuthorizeGitHub(
 
     getGitHubRefreshToken(refreshToken).then(handleSuccess).catch(onError);
   }
+}
+
+/**
+ * Loads GitHub projects and sets the currently selected cloud id.
+ *
+ * @param credentials - The access and refresh token received from authorizing GitHub.
+ * @param onSuccess - Called if the action is successful, with the jira project list.
+ * @param onError - Called if the action fails.
+ */
+export function handleLoadGitHubProjects(
+  credentials: InternalGitHubCredentialsModel,
+  { onSuccess, onError }: IOHandlerCallback<GitHubRepositoryModel[]>
+): void {
+  localStorage.setItem(
+    LocalStorageKeys.GIT_HUB_INSTALLATION_ID,
+    credentials.installationId
+  );
+
+  saveGitHubCredentials(credentials).catch(onError);
+
+  getGitHubRepositories(credentials.accessToken, credentials.installationId)
+    .then(onSuccess)
+    .catch((e) => {
+      onError?.(e);
+      logStore.onError(e);
+    });
 }

@@ -1,11 +1,13 @@
 import {
   GitHubCredentialsModel,
+  InternalGitHubCredentialsModel,
   IOHandlerCallback,
   ProjectModel,
 } from "@/types";
 import { appStore, logStore } from "@/hooks";
 import { navigateTo, Routes } from "@/router";
 import {
+  createGitHubProject,
   createJiraProject,
   createProjectCreationJob,
   handleJobSubmission,
@@ -74,7 +76,7 @@ export function handleBulkImportProject(
 }
 
 /**
- * Imports a Jira project, sets related app state, and logs the status.
+ * Imports a Jira project, sets related app state, and moves to the upload page.
  *
  * @param cloudId - The Jira cloud id for this project.
  * @param projectId - The Jira project id to import.
@@ -104,23 +106,29 @@ export function handleImportJiraProject(
 }
 
 /**
- * Imports a GitHub project, sets related app state, and logs the status.
+ * Imports a GitHub project, sets related app state, and moves to the upload page.
  *
- * @param credentials - The access token received from authorizing GitHub.
- * @param orgId - The GitHub organization id for the current company.
  * @param projectId - The GitHub project id to import.
  * @param onSuccess - Called if the action is successful.
  * @param onError - Called if the action fails.
  */
 export function handleImportGitHubProject(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  credentials: GitHubCredentialsModel,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  orgId: string,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   projectId: string,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   { onSuccess, onError }: IOHandlerCallback
 ): void {
-  logStore.onInfo("Importing from GitHub is not yet enabled.");
+  appStore.onLoadStart();
+
+  createGitHubProject(projectId)
+    .then(async (job) => {
+      await handleJobSubmission(job);
+      logStore.onSuccess(`GitHub project has been created: ${projectId}`);
+      await navigateTo(Routes.UPLOAD_STATUS);
+      onSuccess?.();
+    })
+    .catch((e) => {
+      logStore.onError(`GitHub to import jira project: ${projectId}`);
+      logStore.onDevError(e.message);
+      onError?.(e);
+    })
+    .finally(() => appStore.onLoadEnd());
 }

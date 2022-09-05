@@ -398,6 +398,11 @@ declare namespace Cypress {
      * The document modal must be open.
      */
     saveDocument(): Chainable<void>;
+
+    /**
+     * Uploads file containing trace links.
+     * @param file - Contains trace links.
+     */
     uploadingTraceLinks(file: string): Chainable<void>;
 
     /**

@@ -154,14 +154,29 @@ public class FileDownloadService {
         return timFile;
     }
 
+    /**
+     * Identifies a flat file defining a set of artifacts with the same type.
+     */
     @AllArgsConstructor
     @Data
     static class ArtifactFileIdentifier {
+        /**
+         * The name of the file.
+         */
         String fileName;
+        /**
+         * The artifact type of the artifacts in file
+         */
         String artifactType;
+        /**
+         * The type of document these artifact belong to.
+         */
         DocumentType documentType;
     }
 
+    /**
+     * A flat file defining a set of trace links.
+     */
     @AllArgsConstructor
     @Data
     static class TraceFileIdentifier {

@@ -12,6 +12,7 @@ import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.features.flatfiles.parser.FlatFileParser;
 import edu.nd.crc.safa.features.flatfiles.parser.TimFileParser;
 import edu.nd.crc.safa.features.flatfiles.parser.formats.csv.CsvTraceFile;
+import edu.nd.crc.safa.features.flatfiles.services.MultipartRequestService;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.utilities.JsonFileUtilities;
@@ -30,7 +31,7 @@ class TestTimParser extends ApplicationBaseTest {
         // Step - Upload files for project
         Project project = this.dbEntityBuilder.newProjectWithReturn(projectName);
         List<MultipartFile> files = MultipartRequestService.readDirectoryAsMultipartFiles(
-            ProjectPaths.Tests.DefaultProject.V1,
+            ProjectPaths.Resources.Tests.DefaultProject.V1,
             "files");
         this.fileUploadService.uploadFilesToServer(project, files);
 
@@ -50,7 +51,7 @@ class TestTimParser extends ApplicationBaseTest {
     void testTraceFile() throws IOException {
         Project project = this.dbEntityBuilder.newProjectWithReturn(projectName);
         List<MultipartFile> files = MultipartRequestService.readDirectoryAsMultipartFiles(
-            ProjectPaths.Tests.DefaultProject.V1,
+            ProjectPaths.Resources.Tests.DefaultProject.V1,
             "files");
         this.fileUploadService.uploadFilesToServer(project, files);
         MultipartFile file =

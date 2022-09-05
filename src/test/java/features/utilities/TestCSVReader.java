@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Test;
 class TestCSVReader extends EntityBaseTest {
     @Test
     void readCSVFile() throws Exception {
-        String pathToFile = ProjectPaths.Tests.DefaultProject.getPathToFile(
+        String pathToFile = ProjectPaths.Resources.Tests.DefaultProject.getPathToFile(
             DefaultProjectConstants.File.DESIGN_FILE
         );
         CSVParser designFile = FileUtilities.readCSVFile(pathToFile);

@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import edu.nd.crc.safa.common.AuthorizationSetter;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.entities.FTAType;
@@ -22,7 +23,6 @@ import features.base.ApplicationBaseTest;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import requests.SafaRequest;
-import services.AuthorizationTestService;
 
 /**
  * Creates a project containing one of each type of artifact and attempts to download and
@@ -33,7 +33,7 @@ class TestDownloadAndReuploadFlatFiles extends ApplicationBaseTest {
 
     @Test
     void downloadAndReuploadFlatFiles() throws Exception {
-        AuthorizationTestService.setAuthorization(this.serviceProvider);
+        AuthorizationSetter.setSessionAuthorization(defaultUser, this.serviceProvider);
         // Step - Create project with artifacts from docs: artifact tree, safety case, fta
         ProjectVersion projectVersion = ProjectBuilder
             .withProject(projectName)

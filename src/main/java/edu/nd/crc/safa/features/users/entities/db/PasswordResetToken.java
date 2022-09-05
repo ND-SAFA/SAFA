@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.users.entities.app;
+package edu.nd.crc.safa.features.users.entities.db;
 
 import java.util.Date;
 import java.util.UUID;
@@ -10,12 +10,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import edu.nd.crc.safa.features.users.entities.db.SafaUser;
-
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
@@ -25,9 +20,6 @@ import org.hibernate.annotations.Type;
  */
 @Entity
 @Table(name = "password_reset_token")
-@Data
-@RequiredArgsConstructor
-@NoArgsConstructor
 public class PasswordResetToken {
 
     private static final int EXPIRATION = 60 * 60 * 24;
@@ -49,17 +41,25 @@ public class PasswordResetToken {
     @Type(type = "uuid-char")
     @JoinColumn(name = "user_id", nullable = false, unique = true, columnDefinition = "VARCHAR(36)")
     @NonNull
-    private SafaUser user;
+    private final SafaUser user;
 
     /**
      * The token used to verify the identity of the user.
      */
     @Column(nullable = false)
     @NonNull
-    private String token;
+    private final String token;
 
     @Column(name = "expiration_date", nullable = false)
     @NonNull
-    private Date expirationDate;
+    private final Date expirationDate;
+
+    public PasswordResetToken(SafaUser user,
+                              String token,
+                              Date expirationDate) {
+        this.user = user;
+        this.token = token;
+        this.expirationDate = expirationDate;
+    }
 
 }

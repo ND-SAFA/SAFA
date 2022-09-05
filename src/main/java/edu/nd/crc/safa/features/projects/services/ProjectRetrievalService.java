@@ -18,7 +18,6 @@ import edu.nd.crc.safa.features.memberships.entities.app.ProjectMemberAppEntity;
 import edu.nd.crc.safa.features.memberships.services.MemberService;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectParsingErrors;
-import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.rules.parser.RuleName;
 import edu.nd.crc.safa.features.rules.services.WarningService;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
@@ -64,9 +63,6 @@ public class ProjectRetrievalService {
      * @return ProjectAppEntity Entity containing project name, description, artifacts, and traces.
      */
     public ProjectAppEntity getProjectAppEntity(ProjectVersion projectVersion) {
-
-        Project project = projectVersion.getProject();
-
         // Versioned Entities
         ProjectEntities entities = retrieveProjectEntitiesAtProjectVersion(projectVersion);
 

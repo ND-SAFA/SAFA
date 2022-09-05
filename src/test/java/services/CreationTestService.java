@@ -11,6 +11,7 @@ import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
+import edu.nd.crc.safa.features.flatfiles.services.MultipartRequestService;
 import edu.nd.crc.safa.features.memberships.entities.api.ProjectMembershipRequest;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
@@ -25,7 +26,6 @@ import org.json.JSONObject;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.web.multipart.MultipartFile;
 import requests.FlatFileRequest;
-import requests.MultipartRequestService;
 import requests.SafaRequest;
 
 @AllArgsConstructor
@@ -50,7 +50,7 @@ public class CreationTestService {
         ProjectVersion projectVersion = createProjectWithNewVersion(projectName);
         Project project = projectVersion.getProject();
         List<MultipartFile> files = MultipartRequestService.readDirectoryAsMultipartFiles(
-            ProjectPaths.Tests.DefaultProject.V1,
+            ProjectPaths.Resources.Tests.DefaultProject.V1,
             "files");
         this.serviceProvider.getFileUploadService().uploadFilesToServer(project, files);
         return projectVersion;
@@ -72,8 +72,9 @@ public class CreationTestService {
 
         if (uploadFiles) {
             FlatFileRequest.updateProjectVersionFromFlatFiles(beforeVersion,
-                ProjectPaths.Tests.DefaultProject.V1);
-            FlatFileRequest.updateProjectVersionFromFlatFiles(afterVersion, ProjectPaths.Tests.DefaultProject.V2);
+                ProjectPaths.Resources.Tests.DefaultProject.V1);
+            FlatFileRequest.updateProjectVersionFromFlatFiles(afterVersion,
+                ProjectPaths.Resources.Tests.DefaultProject.V2);
         }
 
         return new Pair<>(beforeVersion, afterVersion);

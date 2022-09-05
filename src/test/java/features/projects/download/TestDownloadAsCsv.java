@@ -5,8 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.File;
 import java.util.List;
 
-import requests.SafaRequest;
-
+import edu.nd.crc.safa.common.AuthorizationSetter;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.flatfiles.services.DataFileBuilder;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
@@ -15,7 +14,7 @@ import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import features.base.ApplicationBaseTest;
 import org.javatuples.Pair;
 import org.junit.jupiter.api.Test;
-import services.AuthorizationTestService;
+import requests.SafaRequest;
 
 /**
  * Tests that a project's flat files is able to be downloaded as zip file.
@@ -26,7 +25,7 @@ class TestDownloadAsCsv extends ApplicationBaseTest {
     void downloadDefaultProject() throws Exception {
         Pair<ProjectVersion, ProjectVersion> response = creationService.createDualVersions(projectName, true);
         ProjectVersion projectVersion = response.getValue0();
-        AuthorizationTestService.setAuthorization(serviceProvider);
+        AuthorizationSetter.setSessionAuthorization(defaultUser, serviceProvider);
         ProjectAppEntity projectAppEntity = this.serviceProvider
             .getProjectRetrievalService().getProjectAppEntity(projectVersion);
         List<File> projectFiles = new SafaRequest(AppRoutes.FlatFiles.DOWNLOAD_FLAT_FILES)

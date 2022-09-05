@@ -1,5 +1,7 @@
 package edu.nd.crc.safa.features.jobs.entities.db;
 
+import static java.lang.Math.round;
+
 import java.sql.Timestamp;
 import java.util.UUID;
 import javax.annotation.Nullable;
@@ -130,5 +132,10 @@ public class JobDbEntity {
 
     public void incrementStep() {
         this.currentStep++;
+    }
+
+    public void incrementProgress(int nSteps) {
+        float percentComplete = 100 * (this.currentStep / (float) nSteps);
+        this.setCurrentProgress(round(percentComplete));
     }
 }

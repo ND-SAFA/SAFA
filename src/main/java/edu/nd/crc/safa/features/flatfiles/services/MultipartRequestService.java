@@ -1,4 +1,4 @@
-package requests;
+package edu.nd.crc.safa.features.flatfiles.services;
 
 import java.io.File;
 import java.io.IOException;
@@ -75,6 +75,17 @@ public interface MultipartRequestService {
      * @throws IOException If file cannot be read.
      */
     static MockMultipartFile readAsMockMultipartFile(String pathToFile, String paramNameInRequest)
+        throws IOException {
+        File file = new File(pathToFile);
+        byte[] fileContent = FileUtils.readFileToByteArray(file);
+        return new MockMultipartFile(
+            paramNameInRequest,
+            file.getName(),
+            Files.probeContentType(Paths.get(pathToFile)),
+            fileContent);
+    }
+
+    static MockMultipartFile readAsMultipartFile(String pathToFile, String paramNameInRequest)
         throws IOException {
         File file = new File(pathToFile);
         byte[] fileContent = FileUtils.readFileToByteArray(file);

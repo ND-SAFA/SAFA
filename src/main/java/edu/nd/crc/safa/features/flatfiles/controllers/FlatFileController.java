@@ -54,10 +54,10 @@ public class FlatFileController extends BaseController {
     @ResponseStatus(HttpStatus.CREATED)
     public ProjectAppEntity updateProjectVersionFromFlatFiles(
         @PathVariable UUID versionId,
-        @RequestParam("files") MultipartFile[] files,
+        @RequestParam("files") List<MultipartFile> files,
         @RequestPart(value = ProjectVariables.AS_COMPLETE_SET, required = false) Boolean asCompleteSet)
         throws SafaError, IOException {
-        if (files.length == 0) {
+        if (files.isEmpty()) {
             throw new SafaError("Could not create project because no files were received.");
         }
         if (asCompleteSet == null) {
@@ -65,7 +65,7 @@ public class FlatFileController extends BaseController {
         }
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersion();
         Project project = projectVersion.getProject();
-        ProjectAppEntity projectCreated = this.serviceProvider.getFlatFileService().createProjectFromFlatFiles(
+        ProjectAppEntity projectCreated = this.serviceProvider.getFlatFileService().updateProjectFromFlatFiles(
             project,
             projectVersion,
             serviceProvider,
@@ -88,32 +88,13 @@ public class FlatFileController extends BaseController {
      */
     @PostMapping(value = AppRoutes.FlatFiles.CREATE_NEW_PROJECT_FROM_FLAT_FILES)
     @ResponseStatus(HttpStatus.CREATED)
-    public ProjectAppEntity createNewProjectFromFlatFiles(@RequestParam MultipartFile[] files)
+    public ProjectAppEntity createNewProjectFromFlatFiles(@RequestParam List<MultipartFile> files)
         throws SafaError, IOException {
-        if (files.length == 0) {
-            throw new SafaError("Could not create project because no files were received.");
-        }
-        Project project = new Project("", "");
-        this.serviceProvider
-            .getProjectService()
-            .saveProjectWithCurrentUserAsOwner(project);
-        ProjectVersion projectVersion = this.serviceProvider
-            .getVersionService()
-            .createInitialProjectVersion(project);
-        ProjectAppEntity projectAppEntity = this.serviceProvider
+        return this.serviceProvider
             .getFlatFileService()
-            .createProjectFromFlatFiles(project,
-                projectVersion,
-                serviceProvider,
+            .createProjectFromFlatFiles(new Project("", ""),
                 files,
-                true);
-        this.serviceProvider
-            .getNotificationService()
-            .broadcastChange(EntityChangeBuilder
-                .create(projectVersion)
-                .withVersionUpdate(projectVersion.getVersionId())
-            );
-        return projectAppEntity;
+                this.serviceProvider);
     }
 
     @GetMapping(AppRoutes.FlatFiles.DOWNLOAD_FLAT_FILES)

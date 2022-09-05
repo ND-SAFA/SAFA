@@ -32,7 +32,7 @@ class TestFlatFileJiraProjectCreation extends JiraBaseFlatFileTest {
         JobDbEntity jobDbEntity = createJIRAJob();
 
         // Step - Read test json file
-        List<JiraIssueDTO> issues = readJiraIssues(ProjectPaths.Tests.Jira.DRONE_ISSUES);
+        List<JiraIssueDTO> issues = readJiraIssues(ProjectPaths.Resources.Tests.Jira.DRONE_ISSUES);
         /**
          * Now counts inward + outward issues not accounted for
          * Note, this includes an extra one because it is referenced there.

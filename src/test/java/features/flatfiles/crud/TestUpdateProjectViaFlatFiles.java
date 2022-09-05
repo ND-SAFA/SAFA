@@ -4,8 +4,6 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 import java.util.List;
 
-import requests.FlatFileRequest;
-
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
@@ -15,6 +13,7 @@ import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import features.base.ApplicationBaseTest;
 import features.base.DefaultProjectConstants;
 import org.junit.jupiter.api.Test;
+import requests.FlatFileRequest;
 
 class TestUpdateProjectViaFlatFiles extends ApplicationBaseTest {
 
@@ -34,7 +33,8 @@ class TestUpdateProjectViaFlatFiles extends ApplicationBaseTest {
         ProjectVersion noChangeVersion = dbEntityBuilder.getProjectVersion(projectName, 2);
 
         // Step - Create request to update project via flat files
-        FlatFileRequest.updateProjectVersionFromFlatFiles(updateVersion, ProjectPaths.Tests.DefaultProject.V1);
+        FlatFileRequest.updateProjectVersionFromFlatFiles(updateVersion,
+            ProjectPaths.Resources.Tests.DefaultProject.V1);
 
         // VP - Verify that no artifacts associated with empty version
         List<ArtifactVersion> initialBodies = this.artifactVersionRepository.findByProjectVersion(emptyVersion);
@@ -51,7 +51,8 @@ class TestUpdateProjectViaFlatFiles extends ApplicationBaseTest {
         assertThat(updateTraces).hasSize(DefaultProjectConstants.Entities.N_LINKS);
 
         // Step - Create request to parse same flat files at different version
-        FlatFileRequest.updateProjectVersionFromFlatFiles(noChangeVersion, ProjectPaths.Tests.DefaultProject.V1);
+        FlatFileRequest.updateProjectVersionFromFlatFiles(noChangeVersion,
+            ProjectPaths.Resources.Tests.DefaultProject.V1);
 
         // VP - No new artifacts were created
         List<ArtifactVersion> noChangeBodies = this.artifactVersionRepository.findByProjectVersion(noChangeVersion);

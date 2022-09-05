@@ -22,7 +22,7 @@ public class TestUpdateProject extends AbstractNotificationTest {
         FlatFileRequest
             .updateProjectVersionFromFlatFiles(
                 projectVersion,
-                ProjectPaths.Tests.DefaultProject.V1);
+                ProjectPaths.Resources.Tests.DefaultProject.V1);
     }
 
     @Override

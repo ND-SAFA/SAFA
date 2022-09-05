@@ -11,14 +11,14 @@ describe("Project Members CRUD", () => {
 
     cy.clickButton(DataCy.stepperContinueButton);
     cy.clickButtonWithName("submit");
-    cy.wait(2000);
+    cy.wait(100);
 
     cy.projectSettingsSelector();
   });
   describe("As an owner, I can add a new member to a project", () => {
     it.only("Cant add an invalid member", () => {
       cy.clickButton(DataCy.settingsShareProject);
-      cy.contains("User Email").type("Alex Rodriguez");
+      cy.clickButtonWithName("User Email").type("Alex Rodriguez");
     });
     it("Adds a new member to a project", () => {});
   });

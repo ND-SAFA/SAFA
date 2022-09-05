@@ -72,7 +72,7 @@ public class ProjectPaths {
                 public static final String V2 = PATH + "/after";
 
                 public static String getPathToFile(String fileName) {
-                    return FileUtilities.builtPath(V1, fileName);
+                    return FileUtilities.buildPath(V1, fileName);
                 }
             }
 

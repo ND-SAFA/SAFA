@@ -21,7 +21,6 @@ import features.base.ApplicationBaseTest;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.multipart.MultipartFile;
-import requests.MultipartRequestService;
 
 class TestTimParser extends ApplicationBaseTest {
     String projectName = "default-project";

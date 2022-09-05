@@ -67,7 +67,7 @@ public class FlatFileService {
      * @return FlatFileResponse containing uploaded, parsed, and generated files.
      * @throws SafaError on any parsing error of tim.json, artifacts, or trace links
      */
-    public ProjectAppEntity createProjectFromFlatFiles(Project project,
+    public ProjectAppEntity updateProjectFromFlatFiles(Project project,
                                                        ProjectVersion projectVersion,
                                                        ServiceProvider serviceProvider,
                                                        MultipartFile[] files,

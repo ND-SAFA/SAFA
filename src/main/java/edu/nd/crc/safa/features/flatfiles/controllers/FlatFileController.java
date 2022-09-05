@@ -65,7 +65,7 @@ public class FlatFileController extends BaseController {
         }
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersion();
         Project project = projectVersion.getProject();
-        ProjectAppEntity projectCreated = this.serviceProvider.getFlatFileService().createProjectFromFlatFiles(
+        ProjectAppEntity projectCreated = this.serviceProvider.getFlatFileService().updateProjectFromFlatFiles(
             project,
             projectVersion,
             serviceProvider,

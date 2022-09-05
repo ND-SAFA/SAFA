@@ -1,17 +1,17 @@
 <template>
   <v-data-table
-    :show-select="hasSelect"
-    dense
-    single-select
     v-model="selected"
-    checkbox-color="primary"
     :headers="headers"
+    :item-key="itemKey"
     :items="items"
     :items-per-page="5"
-    :item-key="itemKey"
     :loading="isLoading"
-    :search="search"
     :no-data-text="noDataText"
+    :search="search"
+    :show-select="hasSelect"
+    checkbox-color="primary"
+    dense
+    single-select
     @item-selected="$emit('item:select', $event, true)"
   >
     <template v-slot:top>
@@ -21,18 +21,18 @@
       <flex-box v-if="!minimal" align="center" justify="space-between" y="2">
         <v-text-field
           v-model="search"
-          label="Search"
-          outlined
+          class="mr-1"
+          data-cy="input-selector-search"
           dense
           hide-details
-          class="mr-1"
+          label="Search"
+          outlined
           prepend-inner-icon="mdi-magnify"
-          data-cy="input-selector-search"
         />
         <generic-icon-button
-          tooltip="Refresh"
-          icon-id="mdi-refresh"
           data-cy="button-selector-reload"
+          icon-id="mdi-refresh"
+          tooltip="Refresh"
           @click="$emit('refresh')"
         />
       </flex-box>
@@ -41,16 +41,16 @@
       <flex-box>
         <generic-icon-button
           v-if="hasEdit"
+          data-cy="button-selector-edit"
           icon-id="mdi-pencil"
           tooltip="Edit"
-          data-cy="button-selector-edit"
           @click="$emit('item:edit', item)"
         />
         <generic-icon-button
           v-if="isDeleteEnabled(item)"
+          data-cy="button-selector-delete"
           icon-id="mdi-delete"
           tooltip="Delete"
-          data-cy="button-selector-delete"
           @click="$emit('item:delete', item)"
         />
       </flex-box>
@@ -59,13 +59,13 @@
       <div class="py-3">
         <generic-icon-button
           v-if="!minimal"
-          fab
           color="primary"
+          data-cy="button-selector-add"
+          data-cy="button-share-project"
+          fab
           icon-id="mdi-plus"
           tooltip="Create"
-          data-cy="button-selector-add"
           @click="$emit('item:add')"
-          data-cy="button-share-project"
         />
       </div>
     </template>
@@ -73,7 +73,6 @@
 </template>
 
 <script lang="ts">
-import FlexBox from "@/components/common/display/FlexBox.vue";
 import Vue, { PropType } from "vue";
 import { DataItemProps, DataTableHeader } from "vuetify";
 import FlexBox from "@/components/common/display/FlexBox.vue";

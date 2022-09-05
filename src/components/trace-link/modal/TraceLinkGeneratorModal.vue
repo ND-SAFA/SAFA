@@ -18,6 +18,16 @@
         v-for="(matrix, idx) in matrices"
         :key="idx"
       >
+        <v-select
+          filled
+          hide-details
+          label="Model"
+          v-model="matrix.method"
+          :items="modelOptions"
+          class="mr-2"
+          item-value="id"
+          item-text="name"
+        />
         <artifact-type-input
           hide-details
           v-model="matrix.source"
@@ -63,14 +73,20 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { TypeMatrixModel } from "@/types";
+import {
+  GeneratedMatrixModel,
+  ModelType,
+  SelectOption,
+  TypeMatrixModel,
+} from "@/types";
+import { traceModelOptions } from "@/util";
 import { appStore } from "@/hooks";
 import { handleGenerateLinks } from "@/api";
 import {
-  GenericModal,
-  GenericIconButton,
-  FlexBox,
   ArtifactTypeInput,
+  FlexBox,
+  GenericIconButton,
+  GenericModal,
   Typography,
 } from "@/components/common";
 
@@ -92,7 +108,9 @@ export default Vue.extend({
     return {
       isLoading: false,
       isValid: false,
-      matrices: [{ source: "", target: "" }] as TypeMatrixModel[],
+      matrices: [
+        { source: "", target: "", method: ModelType.TBERT },
+      ] as GeneratedMatrixModel[],
     };
   },
   watch: {
@@ -101,7 +119,7 @@ export default Vue.extend({
 
       this.isLoading = false;
       this.isValid = false;
-      this.matrices = [{ source: "", target: "" }];
+      this.matrices = [{ source: "", target: "", method: ModelType.TBERT }];
     },
     matrices: {
       deep: true,
@@ -119,13 +137,19 @@ export default Vue.extend({
     isOpen(): boolean {
       return appStore.isTraceLinkGeneratorOpen;
     },
+    /**
+     * @return The trace generation model types.
+     */
+    modelOptions(): SelectOption[] {
+      return traceModelOptions();
+    },
   },
   methods: {
     /**
      * Creates a new trace matrix.
      */
     handleCreateMatrix(): void {
-      this.matrices.push({ source: "", target: "" });
+      this.matrices.push({ source: "", target: "", method: ModelType.TBERT });
     },
     /**
      * Removes a matrix from the list.
@@ -140,6 +164,7 @@ export default Vue.extend({
      * Attempts to generate the selected trace links.
      */
     handleSubmit(): void {
+      this.isLoading = true;
       handleGenerateLinks(this.matrices, {
         onSuccess: () => {
           this.isLoading = false;

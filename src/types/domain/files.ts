@@ -1,6 +1,8 @@
 /**
  * Defines a resource file.
  */
+import { ModelType } from "@/types";
+
 export interface ResourceModel {
   /**
    * The file path.
@@ -28,13 +30,13 @@ export interface TypeMatrixModel {
 export interface TraceMatrixModel extends ResourceModel, TypeMatrixModel {}
 
 /**
- * Defines a request for generating trace matrices.
+ * Defines a trace matrix generation request.
  */
-export interface GenerateMatrixModel extends TypeMatrixModel {
+export interface GeneratedMatrixModel extends TypeMatrixModel {
   /**
-   * The type of model to generate with.
+   * The model to use to generate links.
    */
-  model: string;
+  method: ModelType;
 }
 
 /**

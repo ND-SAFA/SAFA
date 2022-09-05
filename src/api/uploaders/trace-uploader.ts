@@ -1,16 +1,17 @@
 import {
   ArtifactMap,
-  IGenericUploader,
   ArtifactModel,
-  TraceFile,
-  ParseTraceFileModel,
+  IGenericUploader,
   LinkModel,
+  ModelType,
+  ParseTraceFileModel,
+  TraceFile,
   TraceLinkModel,
   TracePanel,
 } from "@/types";
 import { extractTraceId } from "@/util";
 import { logStore } from "@/hooks";
-import { parseTraceFile, createGeneratedLinks } from "@/api";
+import { createGeneratedLinks, parseTraceFile } from "@/api";
 
 const DEFAULT_IS_GENERATED = false;
 
@@ -74,12 +75,14 @@ function generateTraceLinks(
     (a) => a.type === targetType
   );
 
-  return createGeneratedLinks(sourceArtifacts, targetArtifacts).then(
-    (traceLinks) => {
-      panel.projectFile.traces = traceLinks;
-      panel.entityNames = traceLinks.map(extractTraceId);
-    }
-  );
+  return createGeneratedLinks({
+    sourceArtifacts,
+    targetArtifacts,
+    method: ModelType.TBERT,
+  }).then((traceLinks) => {
+    panel.projectFile.traces = traceLinks;
+    panel.entityNames = traceLinks.map(extractTraceId);
+  });
 }
 
 /**

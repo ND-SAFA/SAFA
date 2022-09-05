@@ -143,7 +143,7 @@ public class NotificationTestService {
      * @throws InterruptedException Throws error if some thread error occurs.
      */
     public int getQueueSize(String clientId) throws InterruptedException {
-        Thread.sleep(750);
+        Thread.sleep(Constants.TIME_TO_POLL_SECONDS);
         return idToQueue.get(clientId).size();
     }
 
@@ -162,6 +162,6 @@ public class NotificationTestService {
 
     static class Constants {
         private static final String WEBSOCKET_URI = "ws://localhost:%s/websocket";
-        private static final int TIME_TO_POLL_SECONDS = 10; // # of seconds to wait for a message until failing
+        private static final int TIME_TO_POLL_SECONDS = 30; // # of seconds to wait for a message until failing
     }
 }

@@ -118,6 +118,7 @@ public abstract class AbstractJob implements Job {
         NotificationService notificationService = this.serviceProvider.getNotificationService();
 
         List<JobStepImplementation> jobSteps = getSteps(this.getClass());
+        int nSteps = jobSteps.size();
 
         try {
             for (JobStepImplementation stepImplementation : jobSteps) {
@@ -125,7 +126,7 @@ public abstract class AbstractJob implements Job {
                     continue;
                 }
                 // Pre-step
-                jobService.startStep(jobDbEntity);
+                jobService.startStep(jobDbEntity, nSteps);
                 notificationService.broadcastJob(JobAppEntity.createFromJob(jobDbEntity));
 
                 // Pre-step

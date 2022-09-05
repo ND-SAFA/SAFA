@@ -25,7 +25,7 @@ class TestProjectCreationWorkerFlatFile extends AbstractUpdateProjectViaFlatFile
     void testDefaultProjectCompletes() throws Exception {
 
         // Step - Find Job
-        UUID jobId = updateProjectViaFlatFiles(ProjectPaths.Tests.DefaultProject.V1);
+        UUID jobId = updateProjectViaFlatFiles(ProjectPaths.Resources.Tests.DefaultProject.V1);
 
         // Step - Get Job and subscribe for updates
         this.notificationService

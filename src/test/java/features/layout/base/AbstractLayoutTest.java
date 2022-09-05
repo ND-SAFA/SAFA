@@ -57,7 +57,8 @@ public abstract class AbstractLayoutTest extends ApplicationBaseTest {
         this.projectVersion = this.dbEntityBuilder
             .newProject(projectName)
             .newVersionWithReturn(projectName);
-        FlatFileRequest.updateProjectVersionFromFlatFiles(projectVersion, ProjectPaths.Tests.DefaultProject.V1);
+        FlatFileRequest.updateProjectVersionFromFlatFiles(projectVersion,
+            ProjectPaths.Resources.Tests.DefaultProject.V1);
         this.projectAppEntity = retrievalService.getProjectAtVersion(projectVersion);
         Pair<ElkNode, Map<UUID, ElkNode>> response =
             ElkGraphCreator.createGraphFromProject(projectAppEntity.getArtifacts(), projectAppEntity.getTraces());

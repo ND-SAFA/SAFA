@@ -192,4 +192,9 @@ public class AppRoutes {
     public static class Sync {
         public static final String GET_CHANGES = Versions.BY_ID + "/changes";
     }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class Layout {
+        public static final String REGENERATE_LAYOUT = Versions.BY_ID + "/layout";
+    }
 }

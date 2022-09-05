@@ -2,14 +2,13 @@ package features.projects.crud;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import requests.SafaRequest;
-
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
 import features.base.ApplicationBaseTest;
 import org.json.JSONArray;
 import org.junit.jupiter.api.Test;
+import requests.SafaRequest;
 
 /**
  * Tests that projects defined in database are able to be retrieved by user.
@@ -20,7 +19,7 @@ class TestProjectRetrieval extends ApplicationBaseTest {
         JSONArray response = SafaRequest
             .withRoute(AppRoutes.Projects.GET_PROJECTS)
             .getWithJsonArray();
-        assertThat(response.length()).isZero();
+        assertThat(response.length()).isOne(); // sample project
     }
 
     /**
@@ -40,7 +39,7 @@ class TestProjectRetrieval extends ApplicationBaseTest {
             .newProject("secondProject")
             .newProject("other project", otherUser);
         JSONArray response = SafaRequest.withRoute(AppRoutes.Projects.GET_PROJECTS).getWithJsonArray();
-        assertThat(response.length()).isEqualTo(2);
+        assertThat(response.length()).isEqualTo(3); // firstProject, secondProject, and default sample project.
     }
 
 }

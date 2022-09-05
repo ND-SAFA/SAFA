@@ -17,7 +17,7 @@ class TestMissingArtifactFile extends AbstractUpdateProjectViaFlatFileTest {
     @Test
     void createProjectWithMissingArtifactFile() throws Exception {
         String missingArtifactFile = "Requirement.csv";
-        JSONObject response = updateProjectViaFlatFiles(ProjectPaths.Tests.MISSING_DATA_FILE,
+        JSONObject response = updateProjectViaFlatFiles(ProjectPaths.Resources.Tests.MISSING_DATA_FILE,
             status().is4xxClientError());
         String errorMessage = response.getString("message");
         assertThat(errorMessage).contains(missingArtifactFile);

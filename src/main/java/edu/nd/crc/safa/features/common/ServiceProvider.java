@@ -45,6 +45,7 @@ import edu.nd.crc.safa.features.traces.services.TraceService;
 import edu.nd.crc.safa.features.types.TypeService;
 import edu.nd.crc.safa.features.users.repositories.SafaUserRepository;
 import edu.nd.crc.safa.features.users.services.AccountLookupService;
+import edu.nd.crc.safa.features.users.services.DefaultProjectCreatorService;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
 import edu.nd.crc.safa.features.versions.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.features.versions.services.VersionService;
@@ -135,8 +136,9 @@ public class ServiceProvider {
     private final AccountLookupService accountLookupService;
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
-    // Jobs(not final since is set while testing)
-    private JobLauncher jobLauncher;
+    private final DefaultProjectCreatorService defaultProjectCreatorService;
+    // Jobs
+    JobLauncher jobLauncher; // Not final because runtime changes on test vs dev.
     // GitHub
     private final GithubAccessCredentialsRepository githubAccessCredentialsRepository;
     private final GithubConnectionService githubConnectionService;

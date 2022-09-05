@@ -2,14 +2,13 @@ package features.flatfiles.base;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import requests.SafaRequest;
-
 import edu.nd.crc.safa.config.ProjectPaths;
 
 import features.base.ApplicationBaseTest;
 import features.base.DefaultProjectConstants;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import requests.SafaRequest;
 
 /**
  * Provides a base of functions for testing the parsing of data files.
@@ -47,7 +46,7 @@ public abstract class ParseBaseTest extends ApplicationBaseTest {
 
     protected JSONObject parseFileAndReturnBody(String routeName, String fileName) throws Exception {
         // Step - Upload flat files
-        String pathToFile = ProjectPaths.Tests.DefaultProject.getPathToFile(fileName);
+        String pathToFile = ProjectPaths.Resources.Tests.DefaultProject.getPathToFile(fileName);
         return SafaRequest
             .withRoute(routeName)
             .getFlatFileHelper()

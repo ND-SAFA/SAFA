@@ -4,7 +4,7 @@ import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.authentication.SafaUserDetails;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
-import edu.nd.crc.safa.features.users.entities.app.UserAppEntity;
+import edu.nd.crc.safa.features.users.entities.app.UserIdentifierDTO;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.repositories.SafaUserRepository;
 
@@ -41,13 +41,13 @@ public class SafaUserService {
      *
      * @param email    User's email. Must be unique.
      * @param password Account password
-     * @return {@link UserAppEntity} representing created user
+     * @return {@link UserIdentifierDTO} representing created user
      */
-    public UserAppEntity createUser(String email, String password) {
+    public UserIdentifierDTO createUser(String email, String password) {
         String encodedPassword = this.passwordEncoder.encode(password);
         SafaUser safaUser = new SafaUser(email, encodedPassword);
         this.safaUserRepository.save(safaUser);
-        return new UserAppEntity(safaUser);
+        return new UserIdentifierDTO(safaUser);
     }
 
     /**

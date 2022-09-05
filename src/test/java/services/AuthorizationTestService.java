@@ -15,9 +15,6 @@ import builders.DbEntityBuilder;
 import features.base.ApplicationBaseTest;
 import lombok.AllArgsConstructor;
 import org.json.JSONObject;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.web.servlet.ResultMatcher;
 import requests.SafaRequest;
 
@@ -27,16 +24,6 @@ public class AuthorizationTestService {
     ServiceProvider serviceProvider;
     DbEntityBuilder dbEntityBuilder;
 
-    public static void setAuthorization(ServiceProvider serviceProvider) {
-        String userName = ApplicationBaseTest.defaultUser;
-        UserDetails userDetails = serviceProvider.getUserDetailsService().loadUserByUsername(userName);
-        UsernamePasswordAuthenticationToken authorization = new UsernamePasswordAuthenticationToken(
-            userDetails,
-            null,
-            userDetails.getAuthorities());
-
-        SecurityContextHolder.getContext().setAuthentication(authorization);
-    }
 
     public void defaultLogin() throws Exception {
         String defaultUser = ApplicationBaseTest.defaultUser;

@@ -11,7 +11,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class PasswordChangeDTO {
+public class PasswordChangeRequest {
 
     @NotNull
     @NotEmpty

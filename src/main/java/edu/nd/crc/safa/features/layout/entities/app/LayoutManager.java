@@ -115,9 +115,15 @@ public class LayoutManager {
         return artifact2position;
     }
 
-    private void generateDefaultDocumentLayout() {
+    /**
+     * Generates the layout for the default document.
+     *
+     * @return Map of artifact Id to its position in default document.
+     */
+    public Map<UUID, LayoutPosition> generateDefaultDocumentLayout() {
         Map<UUID, LayoutPosition> layout = generateLayout(this.projectEntities);
         createOrUpdateArtifactPositions(null, layout);
+        return layout;
     }
 
     private List<Document> retrieveAffectedDocuments(List<ArtifactAppEntity> affectedArtifacts) {

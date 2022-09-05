@@ -1,5 +1,5 @@
+import { LayoutPositionsModel } from "@/types";
 import { IdentifierModel } from "@/types/domain/project";
-import { ArtifactPositions } from "@/types";
 
 /**
  * Enumerates the type of documents supported by SAFA.
@@ -74,7 +74,7 @@ export interface DocumentModel {
   /**
    * Map of document ids to their artifact positions.
    */
-  layout: ArtifactPositions;
+  layout: LayoutPositionsModel;
   /**
    * Defines the columns of a table-like document.
    */

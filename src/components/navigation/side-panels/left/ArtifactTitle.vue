@@ -1,24 +1,34 @@
 <template>
-  <div class="mt-2">
-    <v-row justify="end" class="mr-1 mb-1">
-      <generic-icon-button
-        tooltip="View Artifact Body"
-        icon-id="mdi-application-array-outline"
-        @click="handleViewBody"
+  <div>
+    <flex-box align="center" justify="space-between">
+      <attribute-chip
+        artifact-type
+        :value="selectedArtifactType"
+        data-cy="text-selected-type"
       />
-      <generic-icon-button
-        v-if="!selectedArtifact.logicType"
-        tooltip="Edit"
-        icon-id="mdi-pencil"
-        @click="handleEditArtifact"
-      />
-      <generic-icon-button
-        color="error"
-        tooltip="Delete"
-        icon-id="mdi-delete"
-        @click="handleDeleteArtifact"
-      />
-    </v-row>
+      <flex-box>
+        <generic-icon-button
+          tooltip="View Artifact Body"
+          icon-id="mdi-application-array-outline"
+          data-cy="button-selected-body"
+          @click="handleViewBody"
+        />
+        <generic-icon-button
+          v-if="!selectedArtifact.logicType"
+          tooltip="Edit"
+          icon-id="mdi-pencil"
+          data-cy="button-selected-edit"
+          @click="handleEditArtifact"
+        />
+        <generic-icon-button
+          color="error"
+          tooltip="Delete"
+          icon-id="mdi-delete"
+          data-cy="button-selected-delete"
+          @click="handleDeleteArtifact"
+        />
+      </flex-box>
+    </flex-box>
     <v-tooltip bottom>
       <template v-slot:activator="{ on, attrs }">
         <typography
@@ -28,20 +38,30 @@
           variant="subtitle"
           el="h1"
           :value="selectedArtifactName"
+          data-cy="text-selected-name"
         />
       </template>
       {{ selectedArtifactName }}
     </v-tooltip>
+    <v-divider />
+    <typography
+      defaultExpanded
+      y="2"
+      variant="expandable"
+      :value="selectedArtifactBody"
+      data-cy="text-selected-body"
+    />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import { PanelType } from "@/types";
-import { appModule, artifactSelectionModule } from "@/store";
+import { appStore, selectionStore } from "@/hooks";
 import { handleDeleteArtifact } from "@/api";
-import { GenericIconButton } from "@/components/common";
-import Typography from "@/components/common/display/Typography.vue";
+import { GenericIconButton, Typography } from "@/components/common";
+import FlexBox from "@/components/common/display/FlexBox.vue";
+import AttributeChip from "@/components/common/display/AttributeChip.vue";
 
 /**
  * Displays the selected node's title and option buttons.
@@ -49,6 +69,8 @@ import Typography from "@/components/common/display/Typography.vue";
 export default Vue.extend({
   name: "ArtifactTitle",
   components: {
+    AttributeChip,
+    FlexBox,
     Typography,
     GenericIconButton,
   },
@@ -57,13 +79,19 @@ export default Vue.extend({
      * @return The selected artifact.
      */
     selectedArtifact() {
-      return artifactSelectionModule.getSelectedArtifact;
+      return selectionStore.selectedArtifact;
     },
     /**
      * @return The selected artifact's name.
      */
     selectedArtifactName(): string {
       return this.selectedArtifact?.name || "";
+    },
+    /**
+     * @return The selected artifact's type.
+     */
+    selectedArtifactType(): string {
+      return this.selectedArtifact?.type || "";
     },
     /**
      * @return The selected artifact's body.
@@ -87,7 +115,7 @@ export default Vue.extend({
     handleDeleteArtifact(): void {
       if (this.selectedArtifact !== undefined) {
         handleDeleteArtifact(this.selectedArtifact, {
-          onSuccess: () => appModule.closePanel(PanelType.left),
+          onSuccess: () => appStore.closePanel(PanelType.left),
         });
       }
     },
@@ -95,13 +123,13 @@ export default Vue.extend({
      * Opens the artifact creator.
      */
     handleEditArtifact(): void {
-      appModule.openArtifactCreatorTo({});
+      appStore.openArtifactCreatorTo({});
     },
     /**
      * Opens the artifact body display.
      */
     handleViewBody(): void {
-      appModule.toggleArtifactBody();
+      appStore.toggleArtifactBody();
     },
   },
 });

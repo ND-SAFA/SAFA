@@ -102,6 +102,7 @@
         <v-btn
           color="primary"
           :disabled="!isCompleted(job.status)"
+          data-cy="button-open-job"
           @click="viewProject(job)"
         >
           View Project
@@ -115,8 +116,8 @@
 import Vue, { PropType } from "vue";
 import { JobModel, JobStatus } from "@/types";
 import { enumToDisplay, getJobStatusColor, timestampToDisplay } from "@/util";
+import { logStore } from "@/hooks";
 import { handleDeleteJob, handleLoadVersion } from "@/api";
-import { logModule } from "@/store";
 import { Typography } from "@/components/common";
 import FlexBox from "@/components/common/display/FlexBox.vue";
 
@@ -166,14 +167,14 @@ export default Vue.extend({
     /**
      * @returns The display name for a job status.
      */
-    formatStatus(status: JobStatus): string {
-      return enumToDisplay(status);
+    formatStatus(status?: JobStatus): string {
+      return enumToDisplay(status || "");
     },
     /**
      * @returns The color for a job status.
      */
-    getStatusColor(status: JobStatus) {
-      return getJobStatusColor(status);
+    getStatusColor(status?: JobStatus): string {
+      return status ? getJobStatusColor(status) : "";
     },
     /**
      * Attempts to delete a job.
@@ -189,7 +190,7 @@ export default Vue.extend({
       if (job.completedEntityId) {
         await handleLoadVersion(job.completedEntityId);
       } else {
-        logModule.onError("Project creation contains empty ID.");
+        logStore.onError("Unable to view this project right now.");
       }
     },
   },

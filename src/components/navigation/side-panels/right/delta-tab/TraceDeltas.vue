@@ -29,7 +29,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { TraceLinkModel } from "@/types";
-import { deltaModule } from "@/store";
+import { deltaStore } from "@/hooks";
 import { Typography } from "@/components/common";
 import { TraceLinkApprovalModal } from "@/components/trace-link";
 import DeltaButtonGroup from "./DeltaButtonGroup.vue";
@@ -54,19 +54,19 @@ export default Vue.extend({
      * @return All added traces.
      */
     addedTraces() {
-      return deltaModule.addedTraces;
+      return deltaStore.addedTraces;
     },
     /**
      * @return All removed traces.
      */
     removedTraces() {
-      return deltaModule.removedTraces;
+      return deltaStore.removedTraces;
     },
     /**
      * @return Whether the app is in delta view.
      */
     isDeltaMode(): boolean {
-      return deltaModule.inDeltaView;
+      return deltaStore.inDeltaView;
     },
   },
   methods: {

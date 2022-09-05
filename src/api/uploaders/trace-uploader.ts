@@ -1,16 +1,17 @@
 import {
   ArtifactMap,
-  IGenericUploader,
   ArtifactModel,
-  TraceFile,
-  ParseTraceFileModel,
+  IGenericUploader,
   LinkModel,
+  ModelType,
+  ParseTraceFileModel,
+  TraceFile,
   TraceLinkModel,
   TracePanel,
 } from "@/types";
-import { parseTraceFile, createGeneratedLinks } from "@/api";
 import { extractTraceId } from "@/util";
-import { logModule } from "@/store";
+import { logStore } from "@/hooks";
+import { createGeneratedLinks, parseTraceFile } from "@/api";
 
 const DEFAULT_IS_GENERATED = false;
 
@@ -36,7 +37,7 @@ export function createTraceUploader(): IGenericUploader<
 function createNewPanel(traceLink: LinkModel): TracePanel {
   const emptyArtifactFile: TraceFile = createTraceFile(traceLink);
   return {
-    title: extractTraceId(traceLink),
+    title: `${traceLink.sourceName} X ${traceLink.targetName}`,
     entityNames: [],
     projectFile: emptyArtifactFile,
     getIsValid(): boolean {
@@ -74,12 +75,14 @@ function generateTraceLinks(
     (a) => a.type === targetType
   );
 
-  return createGeneratedLinks(sourceArtifacts, targetArtifacts).then(
-    (traceLinks) => {
-      panel.projectFile.traces = traceLinks;
-      panel.entityNames = traceLinks.map(extractTraceId);
-    }
-  );
+  return createGeneratedLinks({
+    sourceArtifacts,
+    targetArtifacts,
+    method: ModelType.TBERT,
+  }).then((traceLinks) => {
+    panel.projectFile.traces = traceLinks;
+    panel.entityNames = traceLinks.map(extractTraceId);
+  });
 }
 
 /**
@@ -159,7 +162,7 @@ function createParsedArtifactFile(
       panel.entityNames = entities.map(extractTraceId);
     })
     .catch((e) => {
-      logModule.onDevError(e);
+      logStore.onDevError(e);
       panel.projectFile.isValid = false;
       panel.projectFile.errors = ["Unable to parse file"];
     });

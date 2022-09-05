@@ -12,7 +12,7 @@ import {
   TraceCytoCoreElement,
   TraceLinkModel,
 } from "@/types";
-import { deltaModule } from "@/store";
+import { deltaStore } from "@/hooks";
 
 /**
  * Displays trace link edge.
@@ -38,12 +38,12 @@ export default Vue.extend({
      * @return The delta state of this trace link.
      */
     linkDeltaState(): ArtifactDeltaState {
-      if (!deltaModule.inDeltaView) {
+      if (!deltaStore.inDeltaView) {
         return ArtifactDeltaState.NO_CHANGE;
       }
 
       return (
-        deltaModule.getTraceDeltaType(this.traceDefinition.traceLinkId) ||
+        deltaStore.getTraceDeltaType(this.traceDefinition.traceLinkId) ||
         ArtifactDeltaState.NO_CHANGE
       );
     },

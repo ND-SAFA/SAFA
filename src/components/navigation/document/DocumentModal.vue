@@ -3,6 +3,7 @@
     :title="title"
     size="sm"
     :is-open="isOpen"
+    data-cy="modal-document-save"
     @close="resetModalData"
   >
     <template v-slot:body>
@@ -12,6 +13,7 @@
         class="mt-4"
         v-model="editingDocument.name"
         :error-messages="nameErrors"
+        data-cy="input-document-name"
       />
       <v-select
         filled
@@ -20,25 +22,38 @@
         :items="types"
         item-text="name"
         item-value="id"
+        data-cy="input-document-type"
+      />
+      <artifact-type-input
+        multiple
+        label="Include Artifact Types"
+        v-model="includedTypes"
+        @blur="handleSaveTypes"
+        data-cy="input-document-include-types"
       />
       <artifact-input
-        label="Document Artifacts"
+        label="Artifacts"
         v-model="editingDocument.artifactIds"
+        data-cy="input-document-artifacts"
       />
-      <v-switch label="Include artifact children" v-model="includeChildren" />
-      <v-autocomplete
+      <v-switch
+        label="Include artifact children"
+        v-model="includeChildren"
+        data-cy="button-document-include-children"
+      />
+      <artifact-type-input
         v-if="includeChildren"
-        filled
         multiple
-        label="Included Child Types"
+        label="Include Child Types"
         v-model="includedChildTypes"
-        :items="artifactTypes"
         @blur="handleSaveChildren"
+        data-cy="input-document-include-child-types"
       />
       <artifact-input
         v-if="includeChildren"
         label="Child Artifacts"
         v-model="childIds"
+        data-cy="input-document-child-artifacts"
       />
     </template>
     <template v-slot:actions>
@@ -48,6 +63,7 @@
         :text="!confirmDelete"
         :outlined="confirmDelete"
         @click="handleDelete"
+        data-cy="button-document-delete"
       >
         {{ deleteButtonText }}
       </v-btn>
@@ -55,7 +71,12 @@
         Cancel
       </v-btn>
       <v-spacer />
-      <v-btn color="primary" :disabled="!isValid" @click="handleSubmit">
+      <v-btn
+        color="primary"
+        :disabled="!isValid"
+        data-cy="button-document-save"
+        @click="handleSubmit"
+      >
         Confirm
       </v-btn>
     </template>
@@ -66,9 +87,13 @@
 import Vue, { PropType } from "vue";
 import { DocumentModel } from "@/types";
 import { createDocument, documentTypeOptions } from "@/util";
-import { documentModule, subtreeModule, typeOptionsModule } from "@/store";
+import { artifactStore, documentStore, subtreeStore } from "@/hooks";
 import { handleDeleteDocument, handleSaveDocument } from "@/api";
-import { ArtifactInput, GenericModal } from "@/components/common";
+import {
+  ArtifactInput,
+  GenericModal,
+  ArtifactTypeInput,
+} from "@/components/common";
 
 /**
  * A modal for adding or editing documents.
@@ -77,7 +102,7 @@ import { ArtifactInput, GenericModal } from "@/components/common";
  */
 export default Vue.extend({
   name: "DocumentModal",
-  components: { GenericModal, ArtifactInput },
+  components: { ArtifactTypeInput, GenericModal, ArtifactInput },
   props: {
     isOpen: Boolean,
     document: {
@@ -91,6 +116,7 @@ export default Vue.extend({
       confirmDelete: false,
       isValid: false,
       types: documentTypeOptions(),
+      includedTypes: [] as string[],
       includeChildren: false,
       includedChildTypes: [] as string[],
       childIds: [] as string[],
@@ -114,7 +140,7 @@ export default Vue.extend({
      */
     isNameValid(): boolean {
       return (
-        !documentModule.doesDocumentExist(this.editingDocument?.name) ||
+        !documentStore.doesDocumentExist(this.editingDocument?.name) ||
         this.editingDocument.name === this.document?.name
       );
     },
@@ -136,12 +162,6 @@ export default Vue.extend({
     deleteButtonText(): string {
       return this.confirmDelete ? "Delete" : "Delete Document";
     },
-    /**
-     * @return All types of artifacts
-     */
-    artifactTypes(): string[] {
-      return typeOptionsModule.artifactTypes;
-    },
   },
   methods: {
     /**
@@ -158,8 +178,25 @@ export default Vue.extend({
     /**
      * Generates children to save on this document.
      */
+    handleSaveTypes() {
+      const baseArtifacts = this.document?.artifactIds || [];
+
+      this.editingDocument.artifactIds =
+        this.includedTypes.length > 0
+          ? artifactStore.allArtifacts
+              .filter(
+                ({ id, type }) =>
+                  this.includedTypes.includes(type) ||
+                  baseArtifacts.includes(id)
+              )
+              .map(({ id }) => id)
+          : baseArtifacts;
+    },
+    /**
+     * Generates children to save on this document.
+     */
     handleSaveChildren() {
-      this.childIds = subtreeModule.getMatchingChildren(
+      this.childIds = subtreeStore.getMatchingChildren(
         this.editingDocument.artifactIds,
         this.includedChildTypes
       );
@@ -213,8 +250,6 @@ export default Vue.extend({
       if (!open) return;
 
       this.editingDocument = createDocument(this.document);
-      this.includeChildren = false;
-      this.includedChildTypes = [];
     },
   },
 });

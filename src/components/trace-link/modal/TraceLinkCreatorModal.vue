@@ -2,18 +2,18 @@
   <generic-modal
     title="Create Trace Link"
     :is-open="isOpen"
-    @close="$emit('close')"
+    @close="handleClose"
     size="l"
-    data-cy="button-create-trace-matrix"
+    data-cy="modal-trace-save"
   >
     <template v-slot:body>
-      <v-row class="mt-2">
+      <v-row class="my-2">
         <v-col cols="6">
           <artifact-input
             v-model="sourceArtifactId"
             label="Source Artifact"
             :multiple="false"
-            data-cy="button-select-source"
+            data-cy="button-trace-save-source"
           />
         </v-col>
         <v-col cols="6">
@@ -21,15 +21,32 @@
             v-model="targetArtifactId"
             label="Target Artifact"
             :multiple="false"
-            data-cy="button-select-target"
+            data-cy="button-trace-save-target"
           />
         </v-col>
       </v-row>
+      <v-expansion-panels flat>
+        <v-expansion-panel data-cy="panel-trace-directions">
+          <v-expansion-panel-header>
+            <typography value="Allowed Trace Directions" />
+          </v-expansion-panel-header>
+          <v-expansion-panel-content>
+            <div v-for="entry in typeDirections" :key="entry.label">
+              <type-direction-input :entry="entry" />
+            </div>
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+      </v-expansion-panels>
     </template>
     <template v-slot:actions>
       <v-spacer />
       <typography color="error" r="2" :value="errorMessage" />
-      <v-btn color="primary" :disabled="!canSave" @click="handleSubmit">
+      <v-btn
+        color="primary"
+        :disabled="!canSave"
+        data-cy="button-trace-save"
+        @click="handleSubmit"
+      >
         Create
       </v-btn>
     </template>
@@ -38,25 +55,22 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { GenericModal, Typography, ArtifactInput } from "@/components/common";
-import { artifactModule, traceModule } from "@/store";
+import { ArtifactModel, LabelledTraceDirectionModel } from "@/types";
+import { typeOptionsStore, artifactStore, traceStore, appStore } from "@/hooks";
 import { handleCreateLink } from "@/api";
-import { ArtifactModel } from "@/types";
+import {
+  GenericModal,
+  Typography,
+  ArtifactInput,
+  TypeDirectionInput,
+} from "@/components/common";
 
 /**
  * A modal for creating trace links.
- *
- * @emits `close` - On close.
  */
 export default Vue.extend({
   name: "TraceLinkCreatorModal",
-  components: { Typography, ArtifactInput, GenericModal },
-  props: {
-    isOpen: {
-      type: Boolean,
-      required: true,
-    },
-  },
+  components: { Typography, ArtifactInput, GenericModal, TypeDirectionInput },
   data() {
     return {
       sourceArtifactId: "",
@@ -73,16 +87,22 @@ export default Vue.extend({
   },
   computed: {
     /**
+     * Returns whether the trace link creator is open.
+     */
+    isOpen() {
+      return appStore.isTraceLinkCreatorOpen;
+    },
+    /**
      * @return The source artifact.
      */
     sourceArtifact(): ArtifactModel | undefined {
-      return artifactModule.getArtifactById(this.sourceArtifactId);
+      return artifactStore.getArtifactById(this.sourceArtifactId);
     },
     /**
      * @return The source artifact.
      */
     targetArtifact(): ArtifactModel | undefined {
-      return artifactModule.getArtifactById(this.targetArtifactId);
+      return artifactStore.getArtifactById(this.targetArtifactId);
     },
     /**
      * @return Any errors in trying to create this link.
@@ -93,7 +113,7 @@ export default Vue.extend({
 
       if (!source || !target) return "";
 
-      const isLinkAllowed = traceModule.isLinkAllowed(source, target);
+      const isLinkAllowed = traceStore.isLinkAllowed(source, target);
 
       return isLinkAllowed === true
         ? ""
@@ -109,6 +129,12 @@ export default Vue.extend({
         this.errorMessage === ""
       );
     },
+    /**
+     * @return The current project's artifact types.
+     */
+    typeDirections(): LabelledTraceDirectionModel[] {
+      return typeOptionsStore.typeDirections();
+    },
   },
   methods: {
     /**
@@ -121,7 +147,13 @@ export default Vue.extend({
       if (!source || !target) return;
 
       await handleCreateLink(source, target);
-      this.$emit("close");
+      this.handleClose();
+    },
+    /**
+     * Closes the trace link creator.
+     */
+    handleClose(): void {
+      appStore.toggleTraceLinkCreator();
     },
   },
 });

@@ -12,6 +12,7 @@
         :color="isCreateLinkEnabled ? 'secondary darken-1' : 'primary'"
         dark
         fab
+        data-cy="button-fab-toggle"
       >
         <v-icon v-if="fab"> mdi-close </v-icon>
         <v-icon
@@ -30,6 +31,7 @@
       :icon-style="isCreateLinkEnabled ? '' : 'transform: rotate(-45deg)'"
       :icon-id="isCreateLinkEnabled ? 'mdi-close' : 'mdi-ray-start-arrow'"
       :tooltip="isCreateLinkEnabled ? 'Cancel Trace Link' : 'Draw Trace Link'"
+      data-cy="button-fab-draw-trace"
       @click="handleDrawTraceLink"
     />
     <generic-icon-button
@@ -37,6 +39,7 @@
       small
       icon-id="mdi-ray-start-end"
       tooltip="Add Trace Link"
+      data-cy="button-fab-create-trace"
       @click="handleAddTraceLink"
     />
     <generic-icon-button
@@ -44,6 +47,7 @@
       small
       icon-id="mdi-folder-plus-outline"
       tooltip="Add Artifact"
+      data-cy="button-fab-create-artifact"
       @click="handleAddArtifact"
     />
   </v-speed-dial>
@@ -51,9 +55,9 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { appModule, documentModule, projectModule } from "@/store";
-import { GenericIconButton } from "@/components";
+import { appStore, documentStore, projectStore } from "@/hooks";
 import { disableDrawMode, enableDrawMode } from "@/cytoscape";
+import { GenericIconButton } from "@/components";
 
 /**
  * Displays the artifact tree action buttons.
@@ -71,13 +75,13 @@ export default Vue.extend({
      * @return Whether to render the artifact tree.
      */
     isVisible(): boolean {
-      return !appModule.getIsLoading && !documentModule.isTableDocument;
+      return !appStore.isLoading && !documentStore.isTableDocument;
     },
     /**
      * @return Whether trace link draw mode is currently enabled.
      */
     isCreateLinkEnabled(): boolean {
-      return appModule.getIsCreateLinkEnabled;
+      return appStore.isCreateLinkEnabled;
     },
   },
   methods: {
@@ -85,23 +89,23 @@ export default Vue.extend({
      * Opens the add artifact modal.
      */
     handleAddArtifact(): void {
-      projectModule.ifProjectDefined(() => {
-        appModule.openArtifactCreatorTo({ isNewArtifact: true });
+      projectStore.ifProjectDefined(() => {
+        appStore.openArtifactCreatorTo({ isNewArtifact: true });
       });
     },
     /**
      * Opens the add trace link modal.
      */
     handleAddTraceLink(): void {
-      projectModule.ifProjectDefined(() => {
-        appModule.toggleTraceLinkCreator();
+      projectStore.ifProjectDefined(() => {
+        appStore.toggleTraceLinkCreator();
       });
     },
     /**
      * Enables the trace link creator.
      */
     handleDrawTraceLink(): void {
-      projectModule.ifProjectDefined(() => {
+      projectStore.ifProjectDefined(() => {
         if (this.isCreateLinkEnabled) {
           disableDrawMode();
         } else {

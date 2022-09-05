@@ -1,10 +1,59 @@
+/* eslint-disable max-lines */
 /**
  * The position of an element within a list.
  */
 type ElementPosition = "first" | "last";
 
+/**
+ * Represents the fields that can be filled in to create an artifact.
+ */
+interface ArtifactFields {
+  name?: string;
+  type?: string;
+  body?: string;
+  parent?: string;
+}
+
+/**
+ * Represents the fields that can be filled in to create a document.
+ */
+interface DocumentFields {
+  name?: string;
+  type?: string;
+  includeTypes?: string;
+  artifacts?: string;
+  includeChildTypes?: string;
+  childArtifacts?: string;
+}
+
 declare namespace Cypress {
   interface Chainable<Subject> {
+    // Database Cleanup
+
+    chainRequest<T>(
+      cb: (data: Subject) => Partial<RequestOptions>
+    ): Chainable<Response<T>>;
+
+    /**
+     * Gets an api token.
+     */
+    dbToken(): Chainable<Cypress.Response<{ token: string }>>;
+
+    /**
+     * Removes all stored jobs.
+     */
+    dbResetJobs(): Chainable<void>;
+
+    /**
+     * Removes all stored projects.
+     */
+    dbResetProjects(): Chainable<void>;
+
+    /**
+     * Removes all stored documents on the most recent project.
+     */
+    dbResetDocuments(): Chainable<void>;
+
     // Base Commands
 
     /**
@@ -22,16 +71,25 @@ declare namespace Cypress {
     ): Chainable<JQuery<HTMLElement>>;
 
     /**
+     * Returns whether an element exists.
+     * Should not be used in tests, only in before-each cleanup calls.
+     *
+     * @param dataCy - The testing selector to find.
+     * @return Whether the element exists.
+     */
+    doesExist(dataCy: string): Chainable<boolean>;
+
+    /**
      * Sets the value of an input field.
      *
      * @param dataCy - The testing selector of the input being set.
      * @param inputValue - The value to set.
-     * @param elementPosition - The specific element to grab, if there are multiple.
+     * @param clear - If true, the input will be cleared first.
      */
     inputText(
       dataCy: string,
       inputValue: string,
-      elementPosition?: ElementPosition
+      clear?: boolean
     ): Chainable<void>;
 
     /**
@@ -39,10 +97,12 @@ declare namespace Cypress {
      *
      * @param dataCy - The testing selector of the button to click.
      * @param elementPosition - The specific element to grab, if there are multiple.
+     * @param force - If true, the click is forced.
      */
     clickButton(
       dataCy: string,
-      elementPosition?: ElementPosition
+      elementPosition?: ElementPosition,
+      force?: boolean
     ): Chainable<void>;
 
     /**
@@ -79,6 +139,17 @@ declare namespace Cypress {
      */
     closeModal(dataCy: string): Chainable<void>;
 
+    /**
+     * Runs a callback on all rows of a table.
+     *
+     * @param dataCy - The testing selector of the table.
+     * @param fn - A callback run on each row of the table.
+     */
+    withinTableRows(
+      dataCy: string,
+      fn: (tr: Chainable<JQuery<HTMLElement>>) => void
+    ): Chainable<void>;
+
     // Authentication Commands
 
     /**
@@ -101,7 +172,67 @@ declare namespace Cypress {
      *
      * @param type - The type of project identifier to set.
      */
-    setProjectIdentifier(type: "bulk" | "standard"): Chainable<void>;
+    setProjectIdentifier(type: "bulk" | "standard" | "modal"): Chainable<void>;
+
+    /**
+     * Creates a new bulk upload project.
+     */
+    createBulkProject(): Chainable<void>;
+
+    /**
+     * Opens the last file panel after waiting for it to close when files are parsed.
+     */
+    openPanelAfterClose(): Chainable<void>;
+
+    /**
+     * Creates artifacts - inputs description and uploads file.
+     *
+     * @param name - The name of the artifact typeto create.
+     * @param file - The file that belongs to the artifact.
+     * @param next - If true, proceeds to the next step.
+     */
+    createArtifactPanel(
+      name: string,
+      file: string,
+      next?: boolean
+    ): Chainable<void>;
+
+    /**
+     * Creates trace matrix - selects source or target then selects artifact.
+     *
+     * @param sourceType - The first type artifact you want to select in the source (ex. requirement).
+     * @param targetType - The second type of artifact you want to select for target (ex. hazard).
+     * @param file - The file that belongs to the trace link (ex. hazard2hazard).
+     *               If none, is set, this will not be uploaded, and the stepper will not continue.
+     * @param next - If true, proceeds to the next step.
+     */
+    createTraceMatrix(
+      sourceType: string,
+      targetType: string,
+      file?: string,
+      next?: boolean
+    ): Chainable<void>;
+
+    /**
+     * Creates artifacts & a trace matrix for requirements and hazards.
+     *
+     * @param createTraces - If true, traces will be created between the artifact types.
+     * @param next - If true, proceeds to the final step.
+     */
+    createReqToHazardFiles(
+      createTraces?: boolean,
+      next?: boolean
+    ): Chainable<void>;
+
+    /**
+     * Opens the upload flat files modal.
+     */
+    openUploadFiles(): Chainable<void>;
+
+    /**
+     * Logs into the create project page, uploads a project, and waits for it to complete.
+     */
+    loadNewProject(): Chainable<void>;
 
     // Project Selection
 
@@ -111,26 +242,162 @@ declare namespace Cypress {
     openProjectSelector(): Chainable<void>;
 
     /**
-     * Creates artifacts - inputs description and uploads file
-     *
-     * @param name - The name of the artifact you want
-     * @param file - The file that belongs to the artifact
+     * Must have the project selector open.
+     * On the project step: Selects the current project, continuing to the version step.
+     * On the version step: Selects the current version, continuing to the project page.
      */
-    createArtifactPanel(name: string, string: string): Chainable<void>;
+    projectSelectorContinue(): Chainable<void>;
 
     /**
-     * Creates trace matrix - selects source or target then selects artifact
-     *
-     * @param name - Name is the first type artifact you want to select in the source (ex. requirement)
-     * @param artifact - Artifact is the second type of artifact you want to cselect for target (ex. hazard)
+     * Must have the project selector open to the version step.
+     * Creates a new version of the given type.
      */
-    createTraceMatrix(name: string, artifact: string): Chainable<void>;
+    createNewVersion(type: "major" | "minor" | "revision"): Chainable<void>;
+
+    // Artifact View
 
     /**
-     * Uploads files to make Trace links
+     * Fills inputs in the artifact modal.
+     * The artifact name, type, and body will be filled with preset values if not set.
      *
-     * @param file - The file that belongs to the trace link (ex. hazard2hazard)
+     * @param props - The artifact fields to set.
      */
+    fillArtifactModal(props: ArtifactFields): Chainable<void>;
+
+    /**
+     * Creates a new artifact from the artifact fab button.
+     * Does not click the save button on the artifact, leaving the modal open.
+     *
+     * @param props - The artifact fields to set.
+     */
+    createNewArtifact(props: ArtifactFields): Chainable<void>;
+
+    /**
+     * Saves the artifact that is currently open in the creator modal.
+     */
+    saveArtifact(): Chainable<void>;
+
+    /**
+     * Fills in inputs within the trace link modal.
+     *
+     * @param sourceName - The name of the source artifact.
+     * @param targetName - The name of the target artifact.
+     */
+    fillTraceLinkModal(
+      sourceName?: string,
+      targetName?: string
+    ): Chainable<void>;
+
+    /**
+     * Creates a new trace link from the artifact fab button.
+     * Does not click the save button on the trace link, leaving the modal open.
+     *
+     * @param sourceName - The name of the source artifact.
+     * @param targetName - The name of the target artifact.
+     */
+    createNewTraceLink(
+      sourceName?: string,
+      targetName?: string
+    ): Chainable<void>;
+
+    /**
+     * Creates a new account on start page.
+     * Should ideally be used before running a test that requires a new account.
+     *
+     * @param email - The email to create the account with.
+     * @param password - The password to create the account with.
+     */
+    createNewAccount(email: string, password: string): Chainable<void>;
+
+    /**
+     * Saves the trace link that is currently open in the creator modal.
+     */
+    saveTraceLink(): Chainable<void>;
+
+    // Artifact Tree
+
+    /**
+     * Get a node on the graph by name
+     *
+     * @param name - The name of the node to find.
+     */
+    getNode(name: string): Chainable<JQuery<HTMLElement>>;
+
+    /**
+     * Gets nodes on the graph.
+     *
+     * @param selected - If true, only the selected node is returned.
+     */
+    getNodes(selected?: boolean): Chainable<JQuery<HTMLElement>>;
+
+    /**
+     * Waits for a project to load.
+     *
+     * @param waitForNodes - If true, this will wait for nodes to be painted on the graph.
+     */
+    waitForProjectLoad(waitForNodes?: boolean): Chainable<void>;
+
+    /**
+     * Logs in to the project page and waits for the most recent project to load.
+     *
+     * @param waitForNodes - If true, this will wait for nodes to be painted on the graph.
+     */
+    loadCurrentProject(waitForNodes?: boolean): Chainable<void>;
+
+    /**
+     * Centers the graph.
+     */
+    centerGraph(): Chainable<void>;
+
+    /**
+     * Selects an artifact on the graph.
+     * @param name - The artifact name to select.
+     * @param selectType - The type of artifact lookup to use. Default to the nav bar.
+     */
+    selectArtifact(name: string, selectType?: "nav" | "panel"): Chainable<void>;
+
+    // Project Documents
+
+    /**
+     * Opens the document selector.
+     */
+    openDocumentSelector(): Chainable<void>;
+
+    /**
+     * Opens the document creator.
+     */
+    openDocumentCreator(): Chainable<void>;
+
+    /**
+     * Opens the document editor for the document with the given name.
+     *
+     * @param name - TRhe document to open.
+     */
+    openDocumentEditor(name: string): Chainable<void>;
+
+    /**
+     * Fills the document modal fields.
+     * The document modal must be open.
+     *
+     * @param props - The document fields to set.
+     *                The name will be added if not set.
+     */
+    fillDocumentFields(props: DocumentFields): Chainable<void>;
+
+    /**
+     * Creates a new document.
+     * Does not save the document, leaving the modal open.
+     *
+     * @param props - The document fields to set.
+     *                The name will be added if not set.
+     */
+    createDocument(props: DocumentFields): Chainable<void>;
+
+    /**
+     * Saves the current document
+     * The document modal must be open.
+     */
+    saveDocument(): Chainable<void>;
     uploadingTraceLinks(file: string): Chainable<void>;
 
     /**

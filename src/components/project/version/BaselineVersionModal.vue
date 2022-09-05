@@ -16,7 +16,7 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { IdentifierModel, VersionModel } from "@/types";
-import { logModule } from "@/store";
+import { logStore } from "@/hooks";
 import { handleLoadVersion } from "@/api";
 import ProjectVersionStepperModal from "./ProjectVersionStepperModal.vue";
 
@@ -88,9 +88,9 @@ export default Vue.extend({
      */
     async onSubmit() {
       if (this.selectedProject === undefined) {
-        logModule.onWarning("Please select a project to update.");
+        logStore.onWarning("Please select a project to update.");
       } else if (this.selectedVersion === undefined) {
-        logModule.onWarning("Please select a baseline version.");
+        logStore.onWarning("Please select a baseline version.");
       } else {
         this.isLoading = true;
 

@@ -1,6 +1,6 @@
 import { validUser } from "../fixtures";
 
-describe("Artifact Table", () => {
+describe.skip("Artifact Table", () => {
   beforeEach(() => {
     cy.visit("http://localhost:8080/project").login(
       validUser.email,

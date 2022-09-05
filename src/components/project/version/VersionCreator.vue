@@ -5,6 +5,7 @@
     :is-open="isOpen"
     :actions-height="0"
     v-bind:isLoading.sync="isLoading"
+    data-cy="modal-version-create"
     @close="handleClose"
   >
     <template v-slot:body>
@@ -15,6 +16,7 @@
             text
             block
             color="primary"
+            data-cy="button-create-major-version"
             @click="() => handleClick('major')"
           >
             New Major Version: {{ nextVersion("major") }}
@@ -26,6 +28,7 @@
             text
             block
             color="primary"
+            data-cy="button-create-minor-version"
             @click="() => handleClick('minor')"
           >
             New Minor Version: {{ nextVersion("minor") }}
@@ -37,10 +40,11 @@
             text
             block
             color="primary"
+            data-cy="button-create-revision-version"
             @click="() => handleClick('revision')"
           >
-            New Revision: {{ nextVersion("revision") }}</v-btn
-          >
+            New Revision: {{ nextVersion("revision") }}
+          </v-btn>
         </v-row>
       </v-container>
     </template>
@@ -51,12 +55,7 @@
 import Vue, { PropType } from "vue";
 import { IdentifierModel, VersionModel, VersionType } from "@/types";
 import { versionToString } from "@/util";
-import {
-  createMajorVersion,
-  createMinorVersion,
-  createRevisionVersion,
-  getCurrentVersion,
-} from "@/api";
+import { getCurrentVersion, handleCreateVersion } from "@/api";
 import { GenericModal } from "@/components/common";
 
 /**
@@ -116,34 +115,21 @@ export default Vue.extend({
       }
     },
     /**
-     * Attempts to create a new version.
+     * Creates a new version.
      * @param versionType - The version type to create.
      */
     handleClick(versionType: VersionType) {
       if (!this.project) return;
 
-      const createVersionFrom = async (
-        createVersion: (projectId: string) => Promise<VersionModel>
-      ) => {
-        this.isLoading = true;
+      this.isLoading = true;
 
-        const version = await createVersion(this.project.projectId);
-
-        this.$emit("create", version);
-        this.isLoading = false;
-      };
-
-      switch (versionType) {
-        case "major":
-          createVersionFrom(createMajorVersion);
-          break;
-        case "minor":
-          createVersionFrom(createMinorVersion);
-          break;
-        case "revision":
-          createVersionFrom(createRevisionVersion);
-          break;
-      }
+      handleCreateVersion(this.project.projectId, versionType, {
+        onSuccess: (version) => {
+          this.isLoading = false;
+          this.$emit("create", version);
+        },
+        onError: () => (this.isLoading = false),
+      });
     },
     /**
      * Emits a request to close the modal.

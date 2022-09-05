@@ -4,6 +4,8 @@ import {
   InternalTraceType,
   LayoutPayload,
 } from "@/types";
+import { selectionStore } from "@/hooks";
+import { applyAutoMoveEvents } from "@/cytoscape";
 import { artifactTreeCyPromise, timTreeCyPromise } from "@/cytoscape/cy";
 import {
   ANIMATION_DURATION,
@@ -11,9 +13,6 @@ import {
   DEFAULT_ARTIFACT_TREE_ZOOM,
   ZOOM_INCREMENT,
 } from "@/cytoscape/styles";
-import { artifactSelectionModule, logModule } from "@/store";
-import { areArraysEqual } from "@/util";
-import { applyAutoMoveEvents } from "@/cytoscape";
 
 /**
  * Runs the given callback if cy is not animated.
@@ -137,16 +136,7 @@ export function cyCenterOnArtifacts(
 ): void {
   cyPromise.then((cy) => {
     if (cy.animated()) {
-      if (
-        currentCenteringCollection !== undefined &&
-        areArraysEqual(currentCenteringCollection, artifactIds)
-      ) {
-        return logModule.onDevWarning(
-          `Collection is already being rendered: ${artifactIds}`
-        );
-      } else {
-        cy.stop(false, false);
-      }
+      cy.stop(false, false);
     }
 
     setCenteredArtifacts(artifactIds);
@@ -228,10 +218,10 @@ export function cyDisplayAll(
 export function cyResetTree(
   cyPromise: CyPromise = artifactTreeCyPromise
 ): void {
-  const selectedId = artifactSelectionModule.getSelectedArtifactId;
+  const selectedId = selectionStore.selectedArtifactId;
 
   if (selectedId) {
-    artifactSelectionModule.selectArtifact(selectedId);
+    selectionStore.selectArtifact(selectedId);
   } else {
     cyCenterNodes(cyPromise);
   }
@@ -244,7 +234,6 @@ export function cyResetTree(
  */
 export function cyResetTim(cyPromise: CyPromise = timTreeCyPromise): void {
   cyPromise.then((cy) => {
-    cy.zoom(1);
-    cy.center(cy.nodes());
+    cy.fit(cy.nodes(), 150);
   });
 }

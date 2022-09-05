@@ -6,5 +6,11 @@
   "invalidUser": {
     "email": "test@test.com",
     "password": "321"
+  },
+  "editUser": {
+    "email": "edited.test@test.com",
+    "password": "123",
+    "invalidPassword": "invalidPassword",
+    "newPassword": "newPassword"
   }
 }

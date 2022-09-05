@@ -48,7 +48,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { DataItem, IdentifierModel, ProjectRole } from "@/types";
-import { logModule, sessionModule } from "@/store";
+import { logStore, sessionStore } from "@/hooks";
 import { getProjects, handleDeleteProject, handleSaveProject } from "@/api";
 import { GenericSelector } from "@/components/common";
 import { ProjectIdentifierModal } from "@/components/project/shared";
@@ -119,9 +119,6 @@ export default Vue.extend({
     this.fetchProjects();
   },
   watch: {
-    $route() {
-      this.fetchProjects();
-    },
     /**
      * When opened, fetches projects and selects the first if there is only one.
      */
@@ -134,13 +131,16 @@ export default Vue.extend({
 
       this.$emit("selected", this.projects[0], false);
     },
+    $route(): void {
+      this.fetchProjects();
+    },
   },
   methods: {
     /**
      * @returns The indexes that the current user has delete permissions for.
      */
     getDeletableProjects(): number[] {
-      const userEmail = sessionModule.userEmail;
+      const userEmail = sessionStore.userEmail;
 
       return this.projects
         .map((project, projectIndex) => {
@@ -231,14 +231,17 @@ export default Vue.extend({
      * Fetches all projects.
      */
     fetchProjects(): void {
+      if (!sessionStore.doesSessionExist) return;
+
       this.isLoading = true;
+
       getProjects()
         .then((projects) => {
           this.projects = projects;
           this.deletableProjects = this.getDeletableProjects();
         })
         .catch((e) => {
-          logModule.onDevError(e);
+          logStore.onDevError(e);
         })
         .finally(() => (this.isLoading = false));
     },
@@ -255,6 +258,7 @@ export default Vue.extend({
           this.projects = this.projects.filter(
             (p) => p.projectId !== project.projectId
           );
+          this.deletableProjects = this.getDeletableProjects();
           this.$emit("unselected");
         },
         onError: () => (this.isLoading = false),

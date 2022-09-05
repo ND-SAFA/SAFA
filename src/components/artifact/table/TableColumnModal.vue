@@ -51,7 +51,7 @@
 import Vue, { PropType } from "vue";
 import { ColumnModel } from "@/types";
 import { columnTypeOptions, createColumn } from "@/util";
-import { documentModule } from "@/store";
+import { documentStore } from "@/hooks";
 import { handleColumnDelete, handleColumnSave } from "@/api";
 import { GenericModal } from "@/components/common";
 
@@ -96,7 +96,7 @@ export default Vue.extend({
      */
     isNameValid(): boolean {
       return (
-        !documentModule.doesColumnExist(this.editingColumn.name) ||
+        !documentStore.doesColumnExist(this.editingColumn.name) ||
         this.column?.name === this.editingColumn.name
       );
     },

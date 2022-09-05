@@ -12,6 +12,7 @@
       <button-row :definitions="[targetDefinition]" />
     </flex-box>
     <v-btn
+      :disabled="disabled"
       @click="handleSubmit"
       color="primary"
       class="ml-10"
@@ -25,7 +26,7 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { ButtonDefinition, ButtonType, LinkModel, TraceFile } from "@/types";
-import { logModule } from "@/store";
+import { logStore } from "@/hooks";
 import { ButtonRow, FlexBox } from "@/components/common";
 
 /**
@@ -65,8 +66,8 @@ export default Vue.extend({
      * Attempts to create a new trace file panel.
      */
     handleSubmit(): void {
-      if (this.source === "" || this.target === "") {
-        logModule.onWarning(
+      if (this.disabled) {
+        logStore.onWarning(
           "Please select valid source and target artifact types."
         );
         return;
@@ -142,6 +143,12 @@ export default Vue.extend({
         showSelectedValue: true,
         isDisabled: this.targetTypes.length === 0,
       };
+    },
+    /**
+     * @return Whether this matrix creation is disabled.
+     */
+    disabled(): boolean {
+      return this.source === "" || this.target === "";
     },
   },
 });

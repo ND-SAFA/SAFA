@@ -30,10 +30,10 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { ProjectModel, VersionModel } from "@/types";
-import { logModule } from "@/store";
+import { logStore } from "@/hooks";
 import { GenericModal } from "@/components/common";
 import { VersionSelector } from "@/components/project";
-import { handleSetProjectDelta } from "@/api/handlers/delta-handler";
+import { handleSetProjectDelta } from "@/api/handlers/version/delta-handler";
 
 /**
  * A modal for displaying delta versions.
@@ -83,9 +83,9 @@ export default Vue.extend({
      */
     handleSubmit() {
       if (!this.selectedVersion) {
-        logModule.onWarning("Please select a version to upload to.");
+        logStore.onWarning("Please select a version to upload to.");
       } else if (!this.project.projectVersion) {
-        logModule.onWarning("Project source version is not selected.");
+        logStore.onWarning("Project source version is not selected.");
       } else {
         handleSetProjectDelta(
           this.project.projectVersion,

@@ -37,7 +37,7 @@ import {
   MembershipModel,
   ProjectRole,
 } from "@/types";
-import { logModule } from "@/store";
+import { logStore } from "@/hooks";
 import { handleInviteMember } from "@/api";
 import { GenericModal, ButtonRow, FlexBox } from "@/components/common";
 
@@ -160,7 +160,7 @@ export default Vue.extend({
           onSuccess: () => this.$emit("confirm", project),
         });
       } else {
-        logModule.onWarning("Please define project role.");
+        logStore.onWarning("Please define project role.");
       }
     },
     /**

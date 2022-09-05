@@ -10,6 +10,7 @@
     :minimal="minimal"
     :has-edit="false"
     :can-delete-last-item="false"
+    data-cy="table-version"
     @item:select="handleSelectVersion"
     @item:delete="handleDeleteVersion"
     @item:add="handleAddItem"
@@ -37,11 +38,11 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { IdentifierModel, VersionModel, DataItem } from "@/types";
+import { projectStore } from "@/hooks";
 import { getProjectVersions, handleDeleteVersion } from "@/api";
-import { projectModule } from "@/store";
 import { GenericSelector } from "@/components/common";
-import VersionCreator from "./VersionCreator.vue";
 import ConfirmVersionDelete from "./ConfirmVersionDelete.vue";
+import VersionCreator from "./VersionCreator.vue";
 
 /**
  * Displays list of project versions available to given project and allows them
@@ -130,7 +131,7 @@ export default Vue.extend({
     displayedVersions(): VersionModel[] {
       return this.hideCurrentVersion
         ? this.versions.filter(
-            ({ versionId }) => versionId !== projectModule.versionId
+            ({ versionId }) => versionId !== projectStore.versionId
           )
         : this.versions;
     },
@@ -140,7 +141,7 @@ export default Vue.extend({
      * Loads project versions.
      */
     handleLoadProjectVersions() {
-      if (!this.project) return;
+      if (!this.project?.projectId) return;
 
       this.isLoading = true;
 

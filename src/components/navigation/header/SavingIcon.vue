@@ -7,13 +7,16 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { appModule } from "@/store";
+import { appStore } from "@/hooks";
 
+/**
+ * Renders app saving state.
+ */
 export default Vue.extend({
   name: "SavingIcon",
   computed: {
     isSaving(): boolean {
-      return appModule.getIsSaving;
+      return appStore.isSaving;
     },
   },
 });

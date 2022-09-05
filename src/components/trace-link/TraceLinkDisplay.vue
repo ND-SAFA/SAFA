@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-row class="my-1">
+    <v-row class="my-1" v-if="!showOnly">
       <v-col cols="6">
         <generic-artifact-body-display
           :artifact="sourceArtifact"
@@ -20,75 +20,95 @@
       </v-col>
     </v-row>
 
-    <flex-box justify="end">
-      <v-btn
-        text
-        v-if="showUnreviewed"
-        :loading="isUnreviewLoading"
-        class="ma-1"
-        @click="handleUnreview"
-      >
-        Unreview
-      </v-btn>
-      <v-btn
-        outlined
-        v-if="showApproved"
-        :loading="isApproveLoading"
-        color="primary"
-        class="ma-1"
-        @click="handleApprove"
-      >
-        Approve
-      </v-btn>
-      <v-btn
-        outlined
-        v-if="showDeclined"
-        :loading="isDeclineLoading"
-        color="error"
-        class="ma-1"
-        @click="handleDecline"
-      >
-        Decline
-      </v-btn>
-      <v-btn
-        v-if="showDelete"
-        :loading="isDeleteLoading"
-        color="error"
-        class="ma-1"
-        :text="!confirmDelete"
-        :outlined="confirmDelete"
-        @click="handleDelete"
-      >
-        Delete
-      </v-btn>
-      <v-btn
-        outlined
-        v-if="confirmDelete"
-        @click="confirmDelete = false"
-        class="ma-1"
-      >
-        Cancel
-      </v-btn>
+    <typography
+      v-else
+      defaultExpanded
+      secondary
+      t="1"
+      variant="expandable"
+      :value="showOnly === 'source' ? sourceArtifact.body : targetArtifact.body"
+    />
+
+    <flex-box
+      full-width
+      align="center"
+      :justify="showScore ? 'space-between' : 'end'"
+      v-if="!hideActions"
+    >
+      <flex-box align="center" v-if="showScore">
+        <typography value="Confidence Score:" r="2" />
+        <attribute-chip style="width: 200px" confidence-score :value="score" />
+      </flex-box>
+
+      <flex-box>
+        <v-btn
+          text
+          v-if="showUnreviewed"
+          :loading="isUnreviewLoading"
+          class="ma-1"
+          data-cy="button-trace-unreview"
+          @click="handleUnreview"
+        >
+          Unreview
+        </v-btn>
+        <v-btn
+          outlined
+          v-if="showApproved"
+          :loading="isApproveLoading"
+          color="primary"
+          class="ma-1"
+          data-cy="button-trace-approve"
+          @click="handleApprove"
+        >
+          Approve
+        </v-btn>
+        <v-btn
+          outlined
+          v-if="showDeclined"
+          :loading="isDeclineLoading"
+          color="error"
+          class="ma-1"
+          data-cy="button-trace-decline"
+          @click="handleDecline"
+        >
+          Decline
+        </v-btn>
+        <v-btn
+          v-if="showDelete"
+          :loading="isDeleteLoading"
+          color="error"
+          class="ma-1"
+          :text="!confirmDelete"
+          data-cy="button-trace-delete"
+          @click="handleDelete"
+        >
+          {{ confirmDelete ? "Confirm Delete" : "Delete" }}
+        </v-btn>
+        <v-btn
+          outlined
+          v-if="confirmDelete"
+          @click="confirmDelete = false"
+          class="ma-1"
+        >
+          Cancel
+        </v-btn>
+      </flex-box>
     </flex-box>
   </div>
 </template>
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import {
-  ApprovalType,
-  ArtifactModel,
-  TraceLinkModel,
-  TraceType,
-} from "@/types";
-import { GenericArtifactBodyDisplay } from "@/components";
-import { artifactModule, deltaModule } from "@/store";
-import { FlexBox } from "@/components/common";
+import { ArtifactModel, TraceLinkModel, TraceType } from "@/types";
+import { linkStatus } from "@/util";
+import { artifactStore, deltaStore } from "@/hooks";
 import {
   handleApproveLink,
   handleDeclineLink,
   handleUnreviewLink,
 } from "@/api";
+import { FlexBox, Typography, AttributeChip } from "@/components/common";
+import { GenericArtifactBodyDisplay } from "@/components";
 
 /**
  * Displays a trace link.
@@ -102,14 +122,18 @@ import {
 export default Vue.extend({
   name: "TraceLinkDisplay",
   components: {
+    Typography,
     FlexBox,
     GenericArtifactBodyDisplay,
+    AttributeChip,
   },
   props: {
     link: {
       type: Object as PropType<TraceLinkModel>,
       required: true,
     },
+    hideActions: Boolean,
+    showOnly: String as PropType<"source" | "target">,
   },
   data() {
     return {
@@ -126,51 +150,56 @@ export default Vue.extend({
     /**
      * @return The artifact this link comes from.
      */
-    sourceArtifact(): ArtifactModel {
-      return artifactModule.getAllArtifactsById[this.link.sourceId];
+    sourceArtifact(): ArtifactModel | undefined {
+      return artifactStore.getArtifactById(this.link.sourceId);
     },
     /**
      * @return The artifact this link goes towards.
      */
-    targetArtifact(): ArtifactModel {
-      return artifactModule.getAllArtifactsById[this.link.targetId];
+    targetArtifact(): ArtifactModel | undefined {
+      return artifactStore.getArtifactById(this.link.targetId);
     },
     /**
      * @return Whether this link can be modified.
      */
     canBeModified(): boolean {
-      return this.link?.traceType === TraceType.GENERATED;
+      return !this.hideActions && this.link?.traceType === TraceType.GENERATED;
     },
     /**
      * @return Whether this link can be deleted.
      */
     showDelete(): boolean {
-      return !this.canBeModified && !deltaModule.inDeltaView;
+      return linkStatus(this.link).canBeDeleted() && !deltaStore.inDeltaView;
     },
     /**
      * @return Whether this link can be approved.
      */
     showApproved(): boolean {
-      return (
-        this.canBeModified && this.link.approvalStatus !== ApprovalType.APPROVED
-      );
+      return !this.hideActions && linkStatus(this.link).canBeApproved();
     },
     /**
      * @return Whether this link can be declined.
      */
     showDeclined(): boolean {
-      return (
-        this.canBeModified && this.link.approvalStatus !== ApprovalType.DECLINED
-      );
+      return !this.hideActions && linkStatus(this.link).canBeDeclined();
     },
     /**
      * @return Whether this link can be unreviewed.
      */
     showUnreviewed(): boolean {
-      return (
-        this.canBeModified &&
-        this.link.approvalStatus !== ApprovalType.UNREVIEWED
-      );
+      return !this.hideActions && linkStatus(this.link).canBeReset();
+    },
+    /**
+     * @return The score of generated links.
+     */
+    score(): string {
+      return this.canBeModified ? String(this.link.score) : "";
+    },
+    /**
+     * @return Whether to display the score of generated links.
+     */
+    showScore(): boolean {
+      return this.canBeModified ? !!this.score : false;
     },
   },
   methods: {

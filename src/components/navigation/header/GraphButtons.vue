@@ -9,8 +9,9 @@
         color="white"
         :tooltip="definition.label"
         :icon-id="definition.icon"
-        @click="definition.handler"
         :is-disabled="isButtonDisabled(definition)"
+        :data-cy="definition.dataCy"
+        @click="definition.handler"
       />
     </template>
 
@@ -23,8 +24,9 @@
         color="white"
         :tooltip="definition.label"
         :icon-id="definition.icon"
-        @click="definition.handler"
         :is-disabled="isButtonDisabled(definition)"
+        :data-cy="definition.dataCy"
+        @click="definition.handler"
       />
     </template>
 
@@ -42,15 +44,16 @@
 import Vue from "vue";
 import { ButtonDefinition, ButtonType } from "@/types";
 import {
-  artifactModule,
-  artifactSelectionModule,
-  commitModule,
-  documentModule,
-  viewportModule,
-} from "@/store";
+  artifactStore,
+  documentStore,
+  commitStore,
+  selectionStore,
+  layoutStore,
+} from "@/hooks";
 import { redoCommit, undoCommit } from "@/api";
 import { cyZoomIn, cyZoomOut } from "@/cytoscape";
 import { GenericIconButton, CheckmarkMenu, FlexBox } from "@/components/common";
+import { handleRegenerateLayout } from "@/api/handlers/version/layout-handler";
 
 export default Vue.extend({
   name: "GraphButtons",
@@ -75,7 +78,7 @@ export default Vue.extend({
      * @return The visible project artifacts.
      */
     artifacts() {
-      return artifactModule.artifacts;
+      return artifactStore.currentArtifacts;
     },
     /**
      * @return The change buttons.
@@ -89,14 +92,14 @@ export default Vue.extend({
           },
           label: "Undo",
           icon: "mdi-undo",
-          isDisabled: !commitModule.canUndo,
+          isDisabled: !commitStore.canUndo,
         },
         {
           type: ButtonType.ICON,
           handler: () => redoCommit().then(),
           label: "Redo",
           icon: "mdi-redo",
-          isDisabled: !commitModule.canRedo,
+          isDisabled: !commitStore.canRedo,
         },
       ];
     },
@@ -119,19 +122,20 @@ export default Vue.extend({
         },
         {
           type: ButtonType.ICON,
-          handler: async () => {
-            await artifactSelectionModule.filterGraph({
+          handler: () => {
+            selectionStore.filterGraph({
               type: "subtree",
               artifactsInSubtree: [],
             });
           },
           label: "Center Graph",
           icon: "mdi-graphql",
+          dataCy: "button-nav-graph-center",
         },
         {
           type: ButtonType.ICON,
-          handler: viewportModule.setArtifactTreeLayout,
-          label: "Reformat Graph",
+          handler: () => handleRegenerateLayout({}),
+          label: "Regenerate Layout",
           icon: "mdi-refresh",
         },
       ];
@@ -144,6 +148,7 @@ export default Vue.extend({
         type: ButtonType.CHECKMARK_MENU,
         label: "Filter Artifacts",
         icon: "mdi-filter",
+        dataCy: "button-nav-graph-filter",
         menuItems: this.menuItems.map(([name], itemIndex) => ({
           name,
           onClick: () => this.filterTypeHandler(itemIndex),
@@ -157,7 +162,7 @@ export default Vue.extend({
      * @return Whether to disable a graph button.
      */
     isButtonDisabled(button: ButtonDefinition): boolean {
-      return button.isDisabled || documentModule.isTableDocument;
+      return button.isDisabled || documentStore.isTableDocument;
     },
     /**
      * Filters the visible artifacts on the graph.
@@ -168,7 +173,7 @@ export default Vue.extend({
 
       Vue.set(this.menuItems, index, [type, newState]);
 
-      artifactSelectionModule.filterGraph({
+      selectionStore.filterGraph({
         type: "ignore",
         ignoreType: type,
         action: newState ? "remove" : "add",

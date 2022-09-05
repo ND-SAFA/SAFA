@@ -1,6 +1,6 @@
 import { ArtifactModel, Commit, VersionModel, TraceLinkModel } from "@/types";
 import { createCommit } from "@/util";
-import { projectModule } from "@/store";
+import { projectStore } from "@/hooks";
 import { saveCommit } from "@/api";
 
 /**
@@ -61,6 +61,16 @@ export class CommitBuilder {
   }
 
   /**
+   * Adds multiple new trace links to this commit.
+   *
+   * @param traceLinks - The links to add.
+   */
+  withNewTraceLinks(traceLinks: TraceLinkModel[]): this {
+    this.commit.traces.added.push(...traceLinks);
+    return this;
+  }
+
+  /**
    * Adds a modified trace link to this commit.
    *
    * @param traceLink - The link to modify.
@@ -81,10 +91,12 @@ export class CommitBuilder {
    * Creates a new commit based on the current project version.
    */
   static withCurrentVersion(): CommitBuilder {
-    const { projectVersion } = projectModule.getProject;
-    if (projectVersion === undefined) {
+    const version = projectStore.version;
+
+    if (version === undefined) {
       throw Error("No project version is selected.");
     }
-    return new CommitBuilder(projectVersion);
+
+    return new CommitBuilder(version);
   }
 }

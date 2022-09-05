@@ -3,6 +3,7 @@
  */
 export enum MessageType {
   INFO = "info",
+  UPDATE = "update",
   SUCCESS = "success",
   ERROR = "error",
   WARNING = "warning",

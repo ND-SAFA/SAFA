@@ -1,8 +1,10 @@
 import {
+  ApprovalType,
   ArtifactDeltaState,
   ColumnDataType,
   DocumentType,
   FTANodeType,
+  ModelType,
   SafetyCaseType,
   SelectOption,
 } from "@/types";
@@ -113,5 +115,30 @@ export function deltaTypeOptions(): SelectOption[] {
     createEnumOption(ArtifactDeltaState.ADDED),
     createEnumOption(ArtifactDeltaState.MODIFIED),
     createEnumOption(ArtifactDeltaState.REMOVED),
+  ];
+}
+
+/**
+ * Returns display names for each approval type.
+ *
+ * @return The select option names and ids.
+ */
+export function approvalTypeOptions(): SelectOption[] {
+  return [
+    createEnumOption(ApprovalType.UNREVIEWED),
+    createEnumOption(ApprovalType.APPROVED),
+    createEnumOption(ApprovalType.DECLINED),
+  ];
+}
+
+/**
+ * Returns display names for each trace model type.
+ *
+ * @return The select option names and ids.
+ */
+export function traceModelOptions(): SelectOption[] {
+  return [
+    createEnumOption(ModelType.TBERT, "TBERT"),
+    createEnumOption(ModelType.VSM, "VSM"),
   ];
 }

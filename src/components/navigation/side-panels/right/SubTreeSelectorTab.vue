@@ -12,6 +12,7 @@
       v-model="searchText"
       @click:clear="searchText = ''"
       hint="Search by artifact name or type"
+      data-cy="input-artifact-search-side"
     />
 
     <typography
@@ -20,6 +21,7 @@
       variant="body"
       align="right"
       :value="searchHint"
+      data-cy="text-artifact-search-count"
     />
 
     <v-list class="search-container full-width" expand>
@@ -28,6 +30,7 @@
         :key="type"
         :icon="getIconName(type)"
         :value="!!searchText"
+        data-cy="list-artifact-search-type"
       >
         <template v-slot:activator>
           <v-tooltip bottom open-delay="300">
@@ -50,6 +53,7 @@
           v-for="artifact in artifactTypeHashTable[type]"
           :key="artifact.name"
           @click="handleArtifactClick(artifact)"
+          data-cy="text-artifact-search-item"
         >
           <generic-artifact-body-display display-title :artifact="artifact" />
         </v-list-item>
@@ -61,8 +65,8 @@
 <script lang="ts">
 import Vue from "vue";
 import { ArtifactModel } from "@/types";
-import { filterArtifacts, getArtifactTypePrintName } from "@/util";
-import { typeOptionsModule, viewportModule, artifactModule } from "@/store";
+import { filterArtifacts } from "@/util";
+import { typeOptionsStore, artifactStore, selectionStore } from "@/hooks";
 import {
   Typography,
   GenericArtifactBodyDisplay,
@@ -99,7 +103,7 @@ export default Vue.extend({
      * Returns all visible artifacts.
      */
     allArtifacts(): ArtifactModel[] {
-      return artifactModule.artifacts;
+      return artifactStore.currentArtifacts;
     },
   },
   watch: {
@@ -121,7 +125,7 @@ export default Vue.extend({
      * Updates the saved list of artifacts to match the current search.
      */
     updateArtifacts(): void {
-      const artifacts = artifactModule.artifacts;
+      const artifacts = artifactStore.currentArtifacts;
       const hashTable: Record<string, ArtifactModel[]> = {};
 
       this.artifacts = this.searchText
@@ -146,21 +150,23 @@ export default Vue.extend({
      * @param type - The artifact type.
      * @return The type display name.
      */
-    getTypePrintName: getArtifactTypePrintName,
+    getTypePrintName(type: string): string {
+      return typeOptionsStore.getArtifactTypeDisplay(type);
+    },
     /**
      * Returns the icon for this artifact type.
      * @param type - The artifact type.
      * @return The type icon.
      */
     getIconName(type: string): string {
-      return typeOptionsModule.getArtifactTypeIcon(type);
+      return typeOptionsStore.getArtifactTypeIcon(type);
     },
     /**
      * Focuses the graph on the given artifact's subtree.
      * @param artifact - The artifact focus on.
      */
     async handleArtifactClick(artifact: ArtifactModel): Promise<void> {
-      await viewportModule.viewArtifactSubtree(artifact.id);
+      await selectionStore.viewArtifactSubtree(artifact.id);
     },
   },
 });

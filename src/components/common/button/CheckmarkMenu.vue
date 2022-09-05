@@ -8,6 +8,7 @@
             v-bind="attrs"
             color="white"
             icon
+            :data-cy="definition.dataCy"
             :class="isDisabled ? 'disable-events' : ''"
           >
             <v-icon>{{ definition.icon }}</v-icon>
@@ -25,6 +26,7 @@
         <v-list-item
           :style="hover ? `background-color: ${hoverColor};` : ''"
           @click.stop="item.onClick"
+          data-cy="button-checkmark-menu-item"
         >
           <v-checkbox
             readonly

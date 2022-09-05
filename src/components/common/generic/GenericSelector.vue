@@ -43,12 +43,14 @@
           v-if="hasEdit"
           icon-id="mdi-pencil"
           tooltip="Edit"
+          data-cy="button-selector-edit"
           @click="$emit('item:edit', item)"
         />
         <generic-icon-button
           v-if="isDeleteEnabled(item)"
           icon-id="mdi-delete"
           tooltip="Delete"
+          data-cy="button-selector-delete"
           @click="$emit('item:delete', item)"
         />
       </flex-box>
@@ -61,6 +63,7 @@
           color="primary"
           icon-id="mdi-plus"
           tooltip="Create"
+          data-cy="button-selector-add"
           @click="$emit('item:add')"
           data-cy="button-share-project"
         />
@@ -73,6 +76,7 @@
 import FlexBox from "@/components/common/display/FlexBox.vue";
 import Vue, { PropType } from "vue";
 import { DataItemProps, DataTableHeader } from "vuetify";
+import FlexBox from "@/components/common/display/FlexBox.vue";
 import GenericIconButton from "./GenericIconButton.vue";
 
 /**

@@ -1,3 +1,5 @@
+import { VersionModel } from "@/types";
+
 /**
  * Returns given string with newlines inserted after maxWordCount
  * has been reached.
@@ -118,14 +120,27 @@ export function enumToDisplay(value: string): string {
  */
 export function timestampToDisplay(timestamp: string): string {
   const date = new Date(timestamp);
-  const options = {
+
+  return date.toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
     day: "numeric",
     weekday: "long",
     hour: "numeric",
     minute: "numeric",
-  };
+  });
+}
 
-  return date.toLocaleDateString("en-US", options);
+/**
+ * Stringifies the version number.
+ *
+ * @param currentVersion - The current version number.
+ *
+ * @return The stringified version number.
+ */
+export function versionToString(currentVersion?: VersionModel): string {
+  if (currentVersion === undefined) {
+    return "X.X.X";
+  }
+  return `${currentVersion.majorVersion}.${currentVersion.minorVersion}.${currentVersion.revision}`;
 }

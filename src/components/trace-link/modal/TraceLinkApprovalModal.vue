@@ -5,6 +5,7 @@
     :actions-height="0"
     @close="$emit('close')"
     size="l"
+    data-cy="modal-trace-approve"
   >
     <template v-slot:body>
       <trace-link-display
@@ -33,7 +34,10 @@ import TraceLinkDisplay from "../TraceLinkDisplay.vue";
  */
 export default Vue.extend({
   name: "TraceLinkApprovalModal",
-  components: { GenericModal, TraceLinkDisplay },
+  components: {
+    GenericModal,
+    TraceLinkDisplay,
+  },
   props: {
     isOpen: {
       type: Boolean,

@@ -1,8 +1,8 @@
 import { ArtifactData, SvgStyle } from "@/types";
-import { capitalize, getTextColor } from "@/util";
-import { getBody } from "./artifact-helper";
-import { svgFooter } from "./artifact-footer";
+import { capitalize, getBorderColor } from "@/util";
 import { ARTIFACT_CHILDREN_HEIGHT } from "@/cytoscape/styles/config";
+import { svgFooter } from "./artifact-footer";
+import { getBody } from "./artifact-helper";
 
 /**
  * Creates the SVG standard node.
@@ -22,25 +22,36 @@ export function svgNode(
 ): string {
   const { x, y, width, height, truncateLength, bodyWidth } = innerStyle;
   const deltaClass = `artifact-svg-delta-${data.artifactDeltaState}`;
-  const textColor = getTextColor(data.artifactDeltaState);
   const title = data.safetyCaseType
     ? capitalize(data.safetyCaseType)
     : capitalize(data.artifactType);
+  const color = getBorderColor(data.artifactDeltaState);
   const footer = svgFooter(data, outerStyle);
   const heightOffset = footer ? ARTIFACT_CHILDREN_HEIGHT + 6 : 6;
+  const dataCy = data.isSelected ? "tree-node-selected" : "tree-node";
 
   return `
-    <div style="opacity: ${data.opacity}">
+    <div>
       <svg 
         width="${outerStyle.width}" 
         height="${outerStyle.height + heightOffset}" 
-        style="margin-top: ${outerStyle.marginTop + heightOffset}px"
+        style="
+          margin-top: ${outerStyle.marginTop + heightOffset}px;
+          opacity: ${data.opacity};
+        "
         class="artifact-svg-wrapper ${deltaClass}"
+        data-cy="${dataCy}"
+        data-cy-name="${data.artifactName}"
       >
         ${svgShape}
-        ${svgTitle(title, textColor, y)}
-        ${svgDiv({ x, y: y + 7, width })}
-        ${svgDetails(data.artifactName, textColor, y + 27)}
+        ${svgTitle(title, y)}
+        ${svgDiv({
+          x,
+          y: y + 7,
+          width,
+          color,
+        })}
+        ${svgDetails(data.artifactName, y + 27)}
         ${svgBody(data, {
           x,
           y: y + 35,
@@ -58,17 +69,18 @@ export function svgNode(
  * Creates the SVG for representing a safety case node's title.
  *
  * @param title - The title to render.
- * @param color - The text color to render.
  * @param yPos - The y position to start drawing at.
  *
  * @return stringified SVG for the node.
  */
-export function svgTitle(title: string, color: string, yPos: number): string {
+export function svgTitle(title: string, yPos: number): string {
   return `
    <text 
-      x="50%" y="${yPos}" text-anchor="middle"
-      fill="${color}" 
+      x="50%" y="${yPos}" 
+      text-anchor="middle"
       font-weight="600"
+      font-size="${title.length < 20 ? "medium" : "x-small"}"
+      data-cy="tree-node-type"
     >
       ${title}
     </text>
@@ -82,12 +94,14 @@ export function svgTitle(title: string, color: string, yPos: number): string {
  *
  * @return stringified SVG for the node.
  */
-export function svgDiv(style: Omit<SvgStyle, "height">): string {
+export function svgDiv(
+  style: Omit<SvgStyle, "height"> & { color: string }
+): string {
   return `
      <line 
         x1="${style.x}" y1="${style.y}" 
         x2="${style.x + style.width}" y2="${style.y}" 
-        stroke="rgb(136, 136, 136)" 
+        stroke="${style.color}" 
         stroke-width="2"
         class="artifact-svg-div"
       />
@@ -98,19 +112,18 @@ export function svgDiv(style: Omit<SvgStyle, "height">): string {
  * Creates the SVG for representing a safety case node's warnings and collapsed children.
  *
  * @param title - The title to render.
- * @param color - The text color to render.
  * @param yPos - The y position to start drawing at.
  *
  * @return stringified SVG for the node.
  */
-export function svgDetails(title: string, color: string, yPos: number): string {
+export function svgDetails(title: string, yPos: number): string {
   return `
     <text 
       x="50%" y="${yPos}" 
       text-anchor="middle" 
       shape-rendering="crispEdges"
       font-weight="600"
-      fill="${color}"
+      data-cy="tree-node-name"
     >
       ${title}
     </text>
@@ -137,13 +150,14 @@ function svgBody(
     >
      <span
        class="text-body-1" 
+       data-cy="tree-node-body"
        style="
          display: block;
          width: ${style.width}px;
          height: ${style.height}px;
          line-height: 1rem;
          text-align: center;
-         color: ${getTextColor(data.artifactDeltaState)}"
+       "
      >
        ${getBody(data.body, style.truncateLength)}
      </span>

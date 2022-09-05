@@ -6,8 +6,8 @@ import {
   ArtifactFile,
   ArtifactPanel,
 } from "@/types";
+import { logStore } from "@/hooks";
 import { parseArtifactFile } from "@/api";
-import { logModule } from "@/store";
 
 /**
  * Creates an artifact uploader.
@@ -126,7 +126,7 @@ function createParsedArtifactFile(
       panel.entityNames = entities.map(({ name }) => name);
     })
     .catch((e) => {
-      logModule.onDevError(e);
+      logStore.onDevError(e);
       panel.projectFile.isValid = false;
       panel.projectFile.errors = ["Unable to parse file"];
     });

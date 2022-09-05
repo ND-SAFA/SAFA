@@ -15,7 +15,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { appModule } from "@/store";
+import { appStore } from "@/hooks";
 import ProjectDetailsPanel from "./ProjectDetailsPanel.vue";
 
 /**
@@ -30,7 +30,7 @@ export default Vue.extend({
     /**
      * @return Whether the right panel is open.
      */
-    isRightOpen: () => appModule.getIsRightOpen,
+    isRightOpen: () => appStore.isRightPanelOpen,
   },
 });
 </script>

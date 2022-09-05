@@ -1,17 +1,17 @@
 import { EventObject } from "cytoscape";
 import { ArtifactModel, ArtifactData, MenuItem } from "@/types";
 import {
-  appModule,
-  artifactModule,
-  artifactSelectionModule,
-  projectModule,
-  subtreeModule,
-  viewportModule,
-} from "@/store";
-import { enableDrawMode } from "@/cytoscape";
+  appStore,
+  artifactStore,
+  subtreeStore,
+  projectStore,
+  selectionStore,
+  layoutStore,
+} from "@/hooks";
 import { handleDeleteArtifact, handleDuplicateArtifact } from "@/api";
-import { ftaMenuItem } from "./fta-menu-options";
+import { enableDrawMode } from "@/cytoscape";
 import { safetyCaseMenuOption } from "./safety-case-menu-option";
+import { ftaMenuItem } from "./fta-menu-options";
 
 /**
  * List of menu items
@@ -22,9 +22,10 @@ export const artifactTreeMenuItems: MenuItem[] = [
     content: "Add Artifact",
     tooltipText: "Create a new artifact",
     coreAsWell: true,
-    onClickFunction(): void {
-      projectModule.ifProjectDefined(() => {
-        appModule.openArtifactCreatorTo({ isNewArtifact: true });
+    onClickFunction(event: EventObject): void {
+      projectStore.ifProjectDefined(() => {
+        layoutStore.savedPosition = event.position;
+        appStore.openArtifactCreatorTo({ isNewArtifact: true });
       });
     },
     isVisible: () => true,
@@ -35,8 +36,8 @@ export const artifactTreeMenuItems: MenuItem[] = [
     tooltipText: "Create a new trace link",
     coreAsWell: true,
     onClickFunction(): void {
-      projectModule.ifProjectDefined(() => {
-        appModule.toggleTraceLinkCreator();
+      projectStore.ifProjectDefined(() => {
+        appStore.toggleTraceLinkCreator();
       });
     },
   },
@@ -47,7 +48,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
     coreAsWell: true,
     hasTrailingDivider: true,
     onClickFunction(): void {
-      projectModule.ifProjectDefined(() => {
+      projectStore.ifProjectDefined(() => {
         enableDrawMode();
       });
     },
@@ -60,7 +61,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
     coreAsWell: false,
     onClickFunction(event: EventObject): void {
       handleOnClick(event, (artifact: ArtifactModel) => {
-        artifactSelectionModule.selectArtifact(artifact.id);
+        selectionStore.selectArtifact(artifact.id);
       });
     },
     isVisible(artifactData: ArtifactData | undefined): boolean {
@@ -75,8 +76,8 @@ export const artifactTreeMenuItems: MenuItem[] = [
     coreAsWell: false,
     onClickFunction(event: EventObject): void {
       handleOnClick(event, (artifact: ArtifactModel) => {
-        artifactSelectionModule.selectArtifact(artifact.id);
-        appModule.toggleArtifactBody();
+        selectionStore.selectArtifact(artifact.id);
+        appStore.toggleArtifactBody();
       });
     },
     isVisible(artifactData: ArtifactData | undefined): boolean {
@@ -92,8 +93,8 @@ export const artifactTreeMenuItems: MenuItem[] = [
     hasTrailingDivider: true,
     onClickFunction(event: EventObject): void {
       handleOnClick(event, async (artifact: ArtifactModel) => {
-        artifactSelectionModule.selectArtifact(artifact.id);
-        appModule.openArtifactCreatorTo({});
+        selectionStore.selectArtifact(artifact.id);
+        appStore.openArtifactCreatorTo({});
       });
     },
     isVisible(artifactData: ArtifactData | undefined): boolean {
@@ -108,7 +109,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
     coreAsWell: false,
     onClickFunction(event: EventObject): void {
       handleOnClick(event, async (artifact: ArtifactModel) => {
-        await handleDeleteArtifact(artifact, {});
+        handleDeleteArtifact(artifact, {});
       });
     },
     isVisible(artifactData: ArtifactData | undefined): boolean {
@@ -132,41 +133,41 @@ export const artifactTreeMenuItems: MenuItem[] = [
     },
   },
   {
-    id: "highlight-artifact-subtree",
+    id: "highlight-subtree",
     content: "Highlight Subtree",
     tooltipText: "Highlight this artifact's subtree nodes",
     selector: "node",
     coreAsWell: false,
     onClickFunction(event: EventObject): void {
-      handleOnClick(event, ({ id }) => viewportModule.viewArtifactSubtree(id));
+      handleOnClick(event, ({ id }) => selectionStore.viewArtifactSubtree(id));
     },
     isVisible: hasSubtree,
   },
   {
-    id: "hide-artifact-subtree",
+    id: "hide-subtree",
     content: "Hide Subtree",
     tooltipText: "Hide all child nodes of this artifact",
     selector: "node",
     async onClickFunction(event: EventObject): Promise<void> {
       const artifactId: string = event.target.data().id;
 
-      await subtreeModule.hideSubtree(artifactId);
+      await subtreeStore.hideSubtree(artifactId);
     },
     isVisible: hasSubtree,
   },
   {
-    id: "show-artifact-subtree",
+    id: "show-subtree",
     content: "Show Subtree",
     tooltipText: "Display all child nodes of this artifact",
     selector: "node",
     async onClickFunction(event: EventObject): Promise<void> {
       const artifactId: string = event.target.data().id;
 
-      await subtreeModule.showSubtree(artifactId);
+      await subtreeStore.showSubtree(artifactId);
     },
     isVisible(artifactData: ArtifactData | undefined): boolean {
       if (artifactData !== undefined) {
-        return subtreeModule.getCollapsedParentNodes.includes(artifactData.id);
+        return subtreeStore.collapsedParentNodes.includes(artifactData.id);
       }
       return false;
     },
@@ -177,7 +178,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
 
 function hasSubtree(artifactData: ArtifactData | undefined): boolean {
   if (artifactData !== undefined) {
-    return !subtreeModule.getCollapsedParentNodes.includes(artifactData.id);
+    return !subtreeStore.collapsedParentNodes.includes(artifactData.id);
   }
   return false;
 }
@@ -192,7 +193,7 @@ type ArtifactHandler = (a: ArtifactModel) => void | Promise<void>;
 function handleOnClick(event: EventObject, handler: ArtifactHandler): void {
   if (event.target !== null) {
     const artifactData: ArtifactData = event.target.data();
-    const artifact = artifactModule.getArtifactById(artifactData.id);
+    const artifact = artifactStore.getArtifactById(artifactData.id);
 
     if (!artifact) return;
 

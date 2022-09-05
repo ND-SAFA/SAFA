@@ -1,6 +1,6 @@
 import { NodeSingular } from "cytoscape";
 import { ArtifactData } from "@/types";
-import { traceModule } from "@/store";
+import { traceStore } from "@/hooks";
 
 /**
  * Return whether any two nodes can be traced.
@@ -18,5 +18,5 @@ export function canConnect(
 
   if (!sourceData || !targetData) return false;
 
-  return traceModule.isLinkAllowed(sourceData, targetData) === true;
+  return traceStore.isLinkAllowed(sourceData, targetData) === true;
 }

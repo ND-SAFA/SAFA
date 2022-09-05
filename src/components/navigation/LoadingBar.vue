@@ -7,12 +7,13 @@
     absolute
     bottom
     color="secondary"
+    data-cy="app-loading"
   />
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { appModule } from "@/store";
+import { appStore } from "@/hooks";
 
 /**
  * Loading bar used in application header.
@@ -24,7 +25,7 @@ export default Vue.extend({
      * @return Whether the app is loading
      */
     isLoading(): boolean {
-      return appModule.getIsLoading;
+      return appStore.isLoading > 0;
     },
   },
 });

@@ -1,19 +1,16 @@
 $color-warning: #F5B53F;
-$color-added: #00AD69;
-$color-removed: #E11F26;
-$color-modified: #5975B8;
+$color-added: #6CD8A9;
+$color-removed: #E27171;
+$color-modified: #8DA5D3;
 $color-selected: #EEEEEE;
 $color-border: #969696;
 $color-text: #969696;
 $graph-border-width: 1px;
 $graph-border-radius: 8px;
 
-// Artifact Tree
-
 .cy-container,
 #cytoscape-div,
-#cytoscape-artifact,
-#cytoscape-tim {
+#cytoscape-artifact {
   height: 100% !important;
   max-height: 100vh !important;
 }
@@ -46,17 +43,6 @@ $graph-border-radius: 8px;
     stroke: darken($color-border, 50);
   }
 
-  &.artifact-svg-delta-ADDED,
-  &.artifact-svg-delta-MODIFIED,
-  &.artifact-svg-delta-REMOVED {
-    .artifact-border {
-      fill: darken($color-border, 30);
-    }
-    .artifact-svg-div {
-      stroke: darken($color-border, 30);
-    }
-  }
-
   &.artifact-svg-delta-ADDED:hover > .artifact-svg {
     fill: lighten($color-added, 10);
   }
@@ -68,4 +54,9 @@ $graph-border-radius: 8px;
   &.artifact-svg-delta-REMOVED:hover > .artifact-svg {
     fill: lighten($color-removed, 10);
   }
+}
+
+.no-icon-rotate {
+  cursor: pointer !important;
+  transform: none !important;
 }

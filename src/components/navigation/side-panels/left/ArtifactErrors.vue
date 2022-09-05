@@ -22,7 +22,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { WarningModel } from "@/types";
-import { artifactSelectionModule, errorModule } from "@/store";
+import { warningStore, selectionStore } from "@/hooks";
 import { Typography, FlexBox, ToggleList } from "@/components/common";
 
 /**
@@ -36,7 +36,7 @@ export default Vue.extend({
      * @return The selected artifact.
      */
     selectedArtifact() {
-      return artifactSelectionModule.getSelectedArtifact;
+      return selectionStore.selectedArtifact;
     },
     /**
      * @return The selected artifact's warnings.
@@ -44,7 +44,7 @@ export default Vue.extend({
     selectedArtifactWarnings(): WarningModel[] {
       const id = this.selectedArtifact?.id || "";
 
-      return errorModule.getArtifactWarnings[id] || [];
+      return warningStore.artifactWarnings[id] || [];
     },
   },
 });

@@ -10,25 +10,53 @@
     <v-divider />
 
     <v-list expand>
-      <toggle-list v-if="parents.length > 0" :title="parentTitle">
+      <toggle-list
+        v-if="parents.length > 0"
+        :title="parentTitle"
+        data-cy="list-selected-parents"
+      >
         <v-list dense style="max-height: 300px" class="overflow-y-auto">
           <template v-for="parent in parents">
             <generic-list-item
               :key="parent.title"
               :item="parent"
+              data-cy="list-selected-parent-item"
               @click="handleArtifactClick(parent.title)"
-            />
+            >
+              <v-list-item-action @click.stop="">
+                <generic-icon-button
+                  icon-id="mdi-ray-start-end"
+                  tooltip="View Trace Link"
+                  data-cy="button-selected-parent-link"
+                  @click="handleTraceLinkClick(parent.title)"
+                />
+              </v-list-item-action>
+            </generic-list-item>
           </template>
         </v-list>
       </toggle-list>
-      <toggle-list v-if="children.length > 0" :title="childTitle">
+      <toggle-list
+        v-if="children.length > 0"
+        :title="childTitle"
+        data-cy="list-selected-children"
+      >
         <v-list dense style="max-height: 300px" class="overflow-y-auto">
           <template v-for="child in children">
             <generic-list-item
               :key="child.title"
               :item="child"
+              data-cy="list-selected-child-item"
               @click="handleArtifactClick(child.title)"
-            />
+            >
+              <v-list-item-action @click.stop="">
+                <generic-icon-button
+                  icon-id="mdi-ray-start-end"
+                  tooltip="View Trace Link"
+                  data-cy="button-selected-child-link"
+                  @click="handleTraceLinkClick(child.title)"
+                />
+              </v-list-item-action>
+            </generic-list-item>
           </template>
         </v-list>
       </toggle-list>
@@ -38,13 +66,19 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { artifactModule, artifactSelectionModule, traceModule } from "@/store";
 import { ListItem } from "@/types";
+import {
+  artifactStore,
+  selectionStore,
+  subtreeStore,
+  traceStore,
+} from "@/hooks";
 import {
   GenericListItem,
   Typography,
   FlexBox,
   ToggleList,
+  GenericIconButton,
 } from "@/components/common";
 
 /**
@@ -52,13 +86,19 @@ import {
  */
 export default Vue.extend({
   name: "ArtifactTraces",
-  components: { FlexBox, Typography, GenericListItem, ToggleList },
+  components: {
+    GenericIconButton,
+    FlexBox,
+    Typography,
+    GenericListItem,
+    ToggleList,
+  },
   computed: {
     /**
      * @return The selected artifact.
      */
     selectedArtifact() {
-      return artifactSelectionModule.getSelectedArtifact;
+      return selectionStore.selectedArtifact;
     },
     /**
      * @return The selected artifact's parents.
@@ -66,12 +106,13 @@ export default Vue.extend({
     parents(): ListItem[] {
       if (!this.selectedArtifact) return [];
 
-      return traceModule.traces
-        .filter(({ sourceName }) => sourceName === this.selectedArtifact?.name)
-        .map(({ targetName, targetId }) => ({
-          title: targetName,
-          subtitle: artifactModule.getArtifactById(targetId)?.type,
-        }));
+      return subtreeStore
+        .getParents(this.selectedArtifact.id)
+        .map((artifactId) => {
+          const artifact = artifactStore.getArtifactById(artifactId);
+
+          return { title: artifact?.name || "", subtitle: artifact?.type };
+        });
     },
     /**
      * @return The selected artifact's children.
@@ -79,12 +120,13 @@ export default Vue.extend({
     children(): ListItem[] {
       if (!this.selectedArtifact) return [];
 
-      return traceModule.traces
-        .filter(({ targetName }) => targetName === this.selectedArtifact?.name)
-        .map(({ sourceName, sourceId }) => ({
-          title: sourceName,
-          subtitle: artifactModule.getArtifactById(sourceId)?.type,
-        }));
+      return subtreeStore
+        .getChildren(this.selectedArtifact.id)
+        .map((artifactId) => {
+          const artifact = artifactStore.getArtifactById(artifactId);
+
+          return { title: artifact?.name || "", subtitle: artifact?.type };
+        });
     },
     /**
      * Determines the width of trace link buttons.
@@ -117,11 +159,27 @@ export default Vue.extend({
      * @param artifactName - The artifact to select.
      */
     handleArtifactClick(artifactName: string): void {
-      const artifact = artifactModule.getArtifactByName(artifactName);
+      const artifact = artifactStore.getArtifactByName(artifactName);
 
       if (!artifact) return;
 
-      artifactSelectionModule.selectArtifact(artifact.id);
+      selectionStore.selectArtifact(artifact.id);
+    },
+    /**
+     * Selects the trace link to an artifact.
+     * @param artifactName - The artifact to select the link to.
+     */
+    handleTraceLinkClick(artifactName: string): void {
+      const artifact = artifactStore.getArtifactByName(artifactName);
+
+      if (!artifact || !this.selectedArtifact) return;
+
+      selectionStore.selectedTraceLinkId =
+        traceStore.getTraceLinkByArtifacts(
+          artifact.id,
+          this.selectedArtifact.id,
+          true
+        )?.traceLinkId || "";
     },
   },
 });

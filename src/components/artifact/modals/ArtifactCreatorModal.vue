@@ -4,7 +4,8 @@
     :isOpen="!!isOpen"
     :isLoading="isLoading"
     size="l"
-    @close="$emit('close')"
+    data-cy="modal-artifact-save"
+    @close="handleClose"
   >
     <template v-slot:body>
       <artifact-creator-inputs
@@ -14,12 +15,16 @@
         @change:parent="parentId = $event"
         @change:documentType="handleDocumentTypeChange"
         @change:valid="isNameValid = $event"
-        data-cy="create-new-artifact-button"
       />
     </template>
     <template v-slot:actions>
       <v-row justify="end">
-        <v-btn color="primary" :disabled="!canSave" @click="handleSubmit">
+        <v-btn
+          color="primary"
+          :disabled="!canSave"
+          data-cy="button-artifact-save"
+          @click="handleSubmit"
+        >
           Save
         </v-btn>
       </v-row>
@@ -28,18 +33,21 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import Vue from "vue";
 import { ArtifactModel, DocumentType } from "@/types";
 import { createArtifact, createArtifactOfType } from "@/util";
-import { artifactModule, documentModule } from "@/store";
+import {
+  appStore,
+  artifactStore,
+  documentStore,
+  selectionStore,
+} from "@/hooks";
 import { handleSaveArtifact } from "@/api";
 import { GenericModal } from "@/components/common";
 import ArtifactCreatorInputs from "./ArtifactCreatorInputs.vue";
 
 /**
  * Modal for artifact creation.
- *
- * @emits `close` - Emitted when modal is exited or artifact is created.
  */
 export default Vue.extend({
   name: "ArtifactCreator",
@@ -47,19 +55,9 @@ export default Vue.extend({
     GenericModal,
     ArtifactCreatorInputs,
   },
-  props: {
-    isOpen: {
-      type: [Boolean, String],
-      required: true,
-    },
-    artifact: {
-      type: Object as PropType<ArtifactModel>,
-      required: false,
-    },
-  },
   data() {
     return {
-      editedArtifact: createArtifact(this.artifact),
+      editedArtifact: createArtifact(selectionStore.selectedArtifact),
       parentId: "",
       isNameValid: false,
       isLoading: false,
@@ -70,7 +68,19 @@ export default Vue.extend({
     /**
      * @return The selected artifact.
      */
-    creatorTitle() {
+    artifact(): ArtifactModel | undefined {
+      return selectionStore.selectedArtifact;
+    },
+    /**
+     * Returns whether the artifact creator is open.
+     */
+    isOpen(): string | boolean {
+      return appStore.isArtifactCreatorOpen;
+    },
+    /**
+     * @return The selected artifact.
+     */
+    creatorTitle(): string {
       return this.artifact ? "Edit Artifact" : "Create Artifact";
     },
     currentArtifactName(): string {
@@ -115,7 +125,7 @@ export default Vue.extend({
      */
     parentArtifact(): ArtifactModel | undefined {
       return this.parentId
-        ? artifactModule.getArtifactById(this.parentId)
+        ? artifactStore.getArtifactById(this.parentId)
         : undefined;
     },
     /**
@@ -187,7 +197,7 @@ export default Vue.extend({
      * Attempts to save the artifact.
      */
     handleSubmit(): void {
-      const { documentId } = documentModule.document;
+      const { documentId } = documentStore.currentDocument;
       const { logicType, safetyCaseType } = this.editedArtifact;
       const isUpdate = this.artifact !== undefined;
       const artifact = createArtifact({
@@ -203,11 +213,17 @@ export default Vue.extend({
 
       handleSaveArtifact(artifact, isUpdate, this.parentArtifact, {
         onSuccess: () => {
-          this.$emit("close");
           this.isLoading = false;
+          this.handleClose();
         },
         onError: () => (this.isLoading = false),
       });
+    },
+    /**
+     * Closes the artifact creator.
+     */
+    handleClose(): void {
+      appStore.closeArtifactCreator();
     },
   },
 });

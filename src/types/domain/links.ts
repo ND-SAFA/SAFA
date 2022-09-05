@@ -23,6 +23,14 @@ export enum InternalTraceType {
 }
 
 /**
+ * Enumerates the type of generated trace models.
+ */
+export enum ModelType {
+  TBERT = "TBERT",
+  VSM = "VSM",
+}
+
+/**
  * Defines a link.
  */
 export interface LinkModel {
@@ -75,9 +83,17 @@ export interface FlatTraceLink extends TraceLinkModel {
    */
   sourceType: string;
   /**
+   * The body of source artifact.
+   */
+  sourceBody: string;
+  /**
    * The type of target artifact.
    */
   targetType: string;
+  /**
+   * The body of target artifact.
+   */
+  targetBody: string;
 }
 
 /**
@@ -122,4 +138,22 @@ export interface LabelledTraceDirectionModel extends TraceDirectionModel {
    * The index of the icon representing this artifact type.
    */
   iconIndex: number;
+}
+
+/**
+ * Represents links generated for a project.
+ */
+export interface GeneratedLinksModel {
+  /**
+   * All generated links.
+   */
+  traceLinks: FlatTraceLink[];
+  /**
+   * Approved generated link ids.
+   */
+  approvedIds: string[];
+  /**
+   * Declined generated link ids.
+   */
+  declinedIds: string[];
 }

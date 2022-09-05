@@ -1,7 +1,7 @@
-import { CytoCore, CytoEvent, EdgeHandleCore } from "@/types";
-import { onArtifactTreeEdgeComplete } from "@/cytoscape/plugins/edge-handles/on-complete";
 import { CollectionReturnValue, NodeSingular } from "cytoscape";
-import { appModule, logModule } from "@/store";
+import { CytoCore, CytoEvent, EdgeHandleCore } from "@/types";
+import { appStore } from "@/hooks";
+import { onArtifactTreeEdgeComplete } from "./on-complete";
 
 let edgeHandlesCore: EdgeHandleCore | undefined = undefined;
 
@@ -31,38 +31,23 @@ export function setEdgeHandlesCore(
 }
 
 /**
- * Returns the edge handle core.
- */
-export function getEdgeHandlesCore(): EdgeHandleCore | undefined {
-  if (edgeHandlesCore === undefined) {
-    logModule.onDevMessage("EdgeHandles has not been instantiated");
-  }
-
-  return edgeHandlesCore;
-}
-
-/**
  * Enables edge drawing mode.
  */
 export function enableDrawMode(): void {
-  const core = getEdgeHandlesCore();
+  if (!edgeHandlesCore) return;
 
-  if (!core) return;
-
-  core.enable();
-  core.enableDrawMode();
-  appModule.SET_CREATE_LINK_ENABLED(true);
+  edgeHandlesCore.enable();
+  edgeHandlesCore.enableDrawMode();
+  appStore.enableDrawLink();
 }
 
 /**
  * Disables edge drawing mode.
  */
 export function disableDrawMode(): void {
-  const core = getEdgeHandlesCore();
+  if (!edgeHandlesCore) return;
 
-  if (!core) return;
-
-  core.disableDrawMode();
-  core.disable();
-  appModule.SET_CREATE_LINK_ENABLED(false);
+  edgeHandlesCore.disableDrawMode();
+  edgeHandlesCore.disable();
+  appStore.disableDrawLink();
 }

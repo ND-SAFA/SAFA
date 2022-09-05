@@ -1,31 +1,28 @@
 <template>
   <v-container>
-    <flex-box justify="space-between">
-      <typography el="h1" variant="subtitle" value="Project TIM" />
+    <flex-box justify="end">
       <v-btn text @click="handleResetGraph"> Reset Graph </v-btn>
     </flex-box>
-    <v-container class="elevation-3 overflow-hidden" style="max-height: 50vh">
-      <generic-cytoscape-controller
-        id="cytoscape-tim"
-        :cyto-core-graph="cytoCoreGraph"
-        style="max-height: 50vh !important"
-      >
-        <template v-slot:elements>
-          <artifact-type-node
-            v-for="artifactPanel in artifactPanels"
-            :artifact-panel="artifactPanel"
-            :key="artifactPanel.title"
-          />
-          <generic-graph-link
-            v-for="tracePanel in tracePanels"
-            :key="getTraceId(tracePanel)"
-            :trace-definition="tracePanel.projectFile"
-            :count="tracePanel.projectFile.traces.length"
-            graph="tim"
-          />
-        </template>
-      </generic-cytoscape-controller>
-    </v-container>
+    <generic-cytoscape-controller
+      id="cytoscape-tim"
+      :cyto-core-graph="cytoCoreGraph"
+      :class="className"
+    >
+      <template v-slot:elements>
+        <artifact-type-node
+          v-for="artifactPanel in artifactPanels"
+          :artifact-panel="artifactPanel"
+          :key="artifactPanel.title"
+        />
+        <generic-graph-link
+          v-for="tracePanel in tracePanels"
+          :key="getTraceId(tracePanel)"
+          :trace-definition="tracePanel.projectFile"
+          :count="tracePanel.projectFile.traces.length"
+          graph="tim"
+        />
+      </template>
+    </generic-cytoscape-controller>
   </v-container>
 </template>
 
@@ -33,14 +30,14 @@
 import Vue, { PropType } from "vue";
 import { TracePanel, CytoCoreGraph, ArtifactPanel } from "@/types";
 import { getTraceId } from "@/util";
-import { viewportModule } from "@/store";
+import { appStore, layoutStore } from "@/hooks";
 import { timGraph, cyResetTim } from "@/cytoscape";
 import {
   GenericGraphLink,
   GenericCytoscapeController,
+  FlexBox,
 } from "@/components/common";
 import ArtifactTypeNode from "./ArtifactTypeNode.vue";
-import { Typography, FlexBox } from "@/components/common";
 
 /**
  * Creates a Cytoscape graph containing artifact types are nodes
@@ -50,7 +47,6 @@ export default Vue.extend({
   name: "TimTree",
   components: {
     FlexBox,
-    Typography,
     ArtifactTypeNode,
     GenericCytoscapeController,
     GenericGraphLink,
@@ -92,6 +88,18 @@ export default Vue.extend({
     cytoCoreGraph(): CytoCoreGraph {
       return timGraph;
     },
+    /**
+     * @return The class name for the tim tree.
+     */
+    className(): string {
+      if (!this.inView) {
+        return "artifact-view disabled";
+      } else if (!appStore.isLoading) {
+        return "artifact-view visible elevation-3";
+      } else {
+        return "artifact-view";
+      }
+    },
   },
   watch: {
     /**
@@ -100,7 +108,7 @@ export default Vue.extend({
     async inView(inView: boolean): Promise<void> {
       if (!inView) return;
 
-      await viewportModule.setTimTreeLayout();
+      await layoutStore.setTimTreeLayout();
     },
   },
 });

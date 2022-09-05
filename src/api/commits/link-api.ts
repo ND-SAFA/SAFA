@@ -1,6 +1,7 @@
 import { ApprovalType, TraceLinkModel, ArtifactModel } from "@/types";
-import { Endpoint, fillEndpoint, authHttpClient } from "@/api/util";
 import { CommitBuilder } from "@/api";
+import { Endpoint, fillEndpoint, authHttpClient } from "@/api/util";
+import { GenerateLinksModel } from "@/types/api/link-api";
 
 /**
  * Returns all generated links for this project.
@@ -20,21 +21,17 @@ export async function getGeneratedLinks(
 /**
  * Generates links between source and target artifacts.
  *
- * @param sourceArtifacts - The artifacts to generate links from.
- * @param targetArtifacts - The artifacts to generate links to.
+ * @param config - Generated link configuration.
  * @return All generated links.
  */
 export async function createGeneratedLinks(
-  sourceArtifacts: ArtifactModel[],
-  targetArtifacts: ArtifactModel[]
+  config: GenerateLinksModel
 ): Promise<TraceLinkModel[]> {
-  const payload = { sourceArtifacts, targetArtifacts };
-
   return authHttpClient<TraceLinkModel[]>(
     fillEndpoint(Endpoint.generateLinks),
     {
       method: "POST",
-      body: JSON.stringify(payload),
+      body: JSON.stringify(config),
     }
   );
 }
@@ -91,7 +88,7 @@ export async function updateUnreviewedLink(
 }
 
 /**
- * Creates a trace link from the source to the target ID for the given version ID.
+ * Creates new trace links.
  *
  * @param traceLink - The trace link to persist.
  * @return The created trace links.
@@ -100,8 +97,24 @@ export async function createLink(
   traceLink: TraceLinkModel
 ): Promise<TraceLinkModel[]> {
   traceLink.approvalStatus = ApprovalType.APPROVED;
+
   return CommitBuilder.withCurrentVersion()
     .withNewTraceLink(traceLink)
+    .save()
+    .then(async ({ traces }) => traces.added);
+}
+
+/**
+ * Saves new generated trace links.
+ *
+ * @param traceLinks - The trace links to persist.
+ * @return The created trace links.
+ */
+export async function saveGeneratedLinks(
+  traceLinks: TraceLinkModel[]
+): Promise<TraceLinkModel[]> {
+  return CommitBuilder.withCurrentVersion()
+    .withNewTraceLinks(traceLinks)
     .save()
     .then(async ({ traces }) => traces.added);
 }

@@ -1,16 +1,31 @@
 package edu.nd.crc.safa.features.tgen.entities;
 
-import lombok.AllArgsConstructor;
+import java.util.List;
+import javax.validation.constraints.NotNull;
+
+import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Represents a request to generate links between two artifact types;
+ * Request to generate trace links between artifacts.
  */
-@AllArgsConstructor
-@NoArgsConstructor
 @Data
+@NoArgsConstructor
 public class TraceGenerationRequest {
-    String source;
-    String target;
+    /**
+     * List of source artifacts.
+     */
+    @NotNull
+    List<ArtifactAppEntity> sourceArtifacts;
+    /**
+     * List of target artifacts.
+     */
+    @NotNull
+    List<ArtifactAppEntity> targetArtifacts;
+    /**
+     * The method to generate trace links with.
+     */
+    TraceGenerationMethod method = TraceGenerationMethod.getDefault();
 }

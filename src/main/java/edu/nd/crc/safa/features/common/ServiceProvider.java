@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.features.common;
 
 import edu.nd.crc.safa.authentication.TokenService;
+import edu.nd.crc.safa.common.SafaRequestBuilder;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
@@ -137,6 +138,8 @@ public class ServiceProvider {
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
     private final DefaultProjectCreatorService defaultProjectCreatorService;
+    // HTTP
+    private final SafaRequestBuilder safaRequestBuilder;
     // Jobs
     JobLauncher jobLauncher; // Not final because runtime changes on test vs dev.
     // GitHub

@@ -33,7 +33,7 @@ import lombok.Setter;
  * 3. Saving issues as artifacts
  * 4. Returning project created
  */
-public class JiraProjectCreationJob extends CommitJob {
+public class CreateProjectViaJiraJob extends CommitJob {
 
     private static final String EMPTY_STRING = "";
 
@@ -60,7 +60,7 @@ public class JiraProjectCreationJob extends CommitJob {
      */
     JiraProject jiraProject;
 
-    public JiraProjectCreationJob(
+    public CreateProjectViaJiraJob(
         JobDbEntity jobDbEntity,
         ServiceProvider serviceProvider,
         JiraIdentifier jiraIdentifier) {

@@ -12,7 +12,7 @@ import edu.nd.crc.safa.features.jira.entities.db.JiraAccessCredentials;
 import edu.nd.crc.safa.features.jobs.entities.app.JobSteps;
 import edu.nd.crc.safa.features.jobs.entities.app.JobType;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
-import edu.nd.crc.safa.utilities.FileUtilities;
+import edu.nd.crc.safa.utilities.JsonFileUtilities;
 
 import features.flatfiles.base.BaseFlatFileTest;
 import org.json.JSONArray;
@@ -51,7 +51,7 @@ public abstract class JiraBaseFlatFileTest extends BaseFlatFileTest {
 
     @NotNull
     protected List<JiraIssueDTO> readJiraIssues(String pathToFile) throws IOException {
-        JSONObject testProjectJson = FileUtilities.readJSONFile(pathToFile);
+        JSONObject testProjectJson = JsonFileUtilities.readJSONFile(pathToFile);
         JSONArray issuesJson = testProjectJson.getJSONArray("issues");
         List<JiraIssueDTO> issues = new ArrayList<>();
         for (int i = 0; i < issuesJson.length(); i++) {

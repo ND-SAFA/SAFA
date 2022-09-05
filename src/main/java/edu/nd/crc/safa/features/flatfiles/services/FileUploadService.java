@@ -9,7 +9,7 @@ import java.util.List;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
-import edu.nd.crc.safa.utilities.OSHelper;
+import edu.nd.crc.safa.utilities.FileUtilities;
 
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Scope;
@@ -34,7 +34,7 @@ public class FileUploadService {
      */
     public void uploadFilesToServer(Project project, List<MultipartFile> requestFiles) throws SafaError, IOException {
         String pathToStorage = ProjectPaths.Storage.projectUploadsPath(project, true);
-        OSHelper.clearOrCreateDirectory(pathToStorage);
+        FileUtilities.clearOrCreateDirectory(pathToStorage);
 
         for (MultipartFile requestFile : requestFiles) {
             try {

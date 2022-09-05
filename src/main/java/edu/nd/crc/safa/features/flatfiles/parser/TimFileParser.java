@@ -18,7 +18,8 @@ import edu.nd.crc.safa.features.flatfiles.parser.interfaces.IProjectDefinitionPa
 import edu.nd.crc.safa.features.flatfiles.parser.interfaces.ITraceFIle;
 import edu.nd.crc.safa.features.flatfiles.services.DataFileBuilder;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
-import edu.nd.crc.safa.features.tgen.entities.TraceGenerationRequest;
+import edu.nd.crc.safa.features.tgen.entities.ArtifactTypeTraceGenerationRequestDTO;
+import edu.nd.crc.safa.features.tgen.entities.TraceGenerationMethod;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
@@ -70,7 +71,7 @@ public class TimFileParser implements IProjectDefinitionParser {
                 ? DocumentType.valueOf(artifactDefinition.getString(Constants.TYPE_PARAM)) : DocumentType.ARTIFACT_TREE;
 
             // Step - Create artifact file parser
-            String pathToFile = FileUtilities.builtPath(this.pathToFiles, fileName);
+            String pathToFile = FileUtilities.buildPath(this.pathToFiles, fileName);
             AbstractArtifactFile<?> artifactFile = DataFileBuilder.createArtifactFileParser(artifactType,
                 documentType,
                 pathToFile);
@@ -80,9 +81,10 @@ public class TimFileParser implements IProjectDefinitionParser {
     }
 
     @Override
-    public Pair<List<IDataFile<TraceAppEntity>>, List<TraceGenerationRequest>> parseTraceFiles() throws IOException {
+    public Pair<List<IDataFile<TraceAppEntity>>, List<ArtifactTypeTraceGenerationRequestDTO>> parseTraceFiles()
+        throws IOException {
         List<IDataFile<TraceAppEntity>> traceFiles = new ArrayList<>();
-        List<TraceGenerationRequest> traceGenerationRequests = new ArrayList<>();
+        List<ArtifactTypeTraceGenerationRequestDTO> artifactTypeTraceGenerationRequestDTOS = new ArrayList<>();
 
         for (Iterator<String> keyIterator = timFileJson.keys(); keyIterator.hasNext(); ) {
             String traceMatrixKey = keyIterator.next();
@@ -110,19 +112,31 @@ public class TimFileParser implements IProjectDefinitionParser {
                 traceFileDefinition.has(AbstractTraceFile.Constants.GENERATE_LINKS_PARAM)
                     && traceFileDefinition.getBoolean(AbstractTraceFile.Constants.GENERATE_LINKS_PARAM);
             if (isGenerated) {
-                TraceGenerationRequest traceGenerationRequest = new TraceGenerationRequest(source, target);
-                traceGenerationRequests.add(traceGenerationRequest);
+                TraceGenerationMethod traceGenerationMethod;
+                if (traceFileDefinition.has(ITraceFIle.Constants.LINK_GENERATION_METHOD)) {
+                    String methodStr = traceFileDefinition.getString(ITraceFIle.Constants.LINK_GENERATION_METHOD);
+                    traceGenerationMethod = TraceGenerationMethod.getMethodWithDefault(methodStr,
+                        TraceGenerationMethod.getDefault());
+                } else {
+                    traceGenerationMethod = TraceGenerationMethod.getDefault();
+                }
+                ArtifactTypeTraceGenerationRequestDTO artifactTypeTraceGenerationRequestDTO =
+                    new ArtifactTypeTraceGenerationRequestDTO(
+                        traceGenerationMethod,
+                        source,
+                        target);
+                artifactTypeTraceGenerationRequestDTOS.add(artifactTypeTraceGenerationRequestDTO);
             }
 
             // Step - If file is defined, create trace file parser
             if (traceFileDefinition.has(Constants.FILE_PARAM)) {
                 String fileName = traceFileDefinition.getString(Constants.FILE_PARAM);
-                String pathToFile = FileUtilities.builtPath(this.pathToFiles, fileName);
+                String pathToFile = FileUtilities.buildPath(this.pathToFiles, fileName);
                 AbstractTraceFile<?> traceFile = DataFileBuilder.createTraceFileParser(pathToFile);
                 traceFiles.add(traceFile);
             }
         }
-        return new Pair<>(traceFiles, traceGenerationRequests);
+        return new Pair<>(traceFiles, artifactTypeTraceGenerationRequestDTOS);
     }
 
     protected JSONObject getDefinitionForDataFiles() {

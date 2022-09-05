@@ -15,7 +15,7 @@ import edu.nd.crc.safa.features.flatfiles.parser.formats.csv.CsvTraceFile;
 import edu.nd.crc.safa.features.flatfiles.services.MultipartRequestService;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
-import edu.nd.crc.safa.utilities.FileUtilities;
+import edu.nd.crc.safa.utilities.JsonFileUtilities;
 
 import features.base.ApplicationBaseTest;
 import org.json.JSONObject;
@@ -36,7 +36,7 @@ class TestTimParser extends ApplicationBaseTest {
 
         // Step - Start processing for
         String pathToTimFile = ProjectPaths.Storage.uploadedProjectFilePath(project, ProjectVariables.TIM_FILENAME);
-        JSONObject timJson = FileUtilities.readJSONFile(pathToTimFile);
+        JSONObject timJson = JsonFileUtilities.readJSONFile(pathToTimFile);
         TimFileParser timFileParser = new TimFileParser(timJson, ProjectPaths.Storage.projectUploadsPath(project,
             false));
         FlatFileParser flatFileParser = new FlatFileParser(timFileParser);

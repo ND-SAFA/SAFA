@@ -121,19 +121,7 @@ public class FileUtilities {
         }
         return result;
     }
-
-    /**
-     * Returns the JSONObject parsed from path to JSON file.
-     *
-     * @param path The path to the JSON file.
-     * @return JSONObject
-     * @throws IOException If file is missing or not able to be read.
-     */
-    public static JSONObject readJSONFile(String path) throws IOException {
-        String fileContent = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8);
-        return new JSONObject(fileContent);
-    }
-
+    
     /**
      * Extracts files in given zip bytearray as a string.
      *
@@ -148,7 +136,7 @@ public class FileUtilities {
         List<File> filesCreated = new ArrayList<>();
         while ((entry = zin.getNextEntry()) != null) {
             String name = entry.getName();
-            String pathToFile = builtPath(temporaryFolder, name);
+            String pathToFile = buildPath(temporaryFolder, name);
             try (FileOutputStream outputStream = new FileOutputStream(pathToFile)) {
                 for (var c = zin.read(); c != -1; c = zin.read()) {
                     outputStream.write(c);
@@ -204,7 +192,7 @@ public class FileUtilities {
      * @param directories Directories that once joined create path.
      * @return String representing built path.
      */
-    public static String builtPath(String... directories) {
+    public static String buildPath(String... directories) {
         StringBuilder finalPath = new StringBuilder();
         for (int i = 0; i < directories.length; i++) {
             String p = directories[i];
@@ -215,5 +203,44 @@ public class FileUtilities {
             }
         }
         return finalPath.toString();
+    }
+
+    /**
+     * Deletes file or folder located at given path
+     *
+     * @param path path to a file or directory which to delete
+     * @throws SafaError If an error occurs while deleting file, directory, or children of directory.
+     */
+    public static void deletePath(String path) throws SafaError, IOException {
+        File objectAtPath = new File(path);
+
+        if (objectAtPath.exists()) {
+            if (objectAtPath.isDirectory()) {
+                FileUtils.deleteDirectory(objectAtPath);
+            } else {
+                if (!objectAtPath.delete()) {
+                    String errorMessage = String.format("Could not delete file at: %s", path);
+                    throw new IOException(errorMessage);
+                }
+            }
+        }
+    }
+
+    /**
+     * Removes any children of given directory includes
+     * all sub-folders and files. If directory has not
+     * been created then new directory is created.
+     *
+     * @param pathToDir path to a directory
+     * @throws SafaError If failure to delete any files or folders.
+     */
+    public static void clearOrCreateDirectory(String pathToDir) throws IOException {
+        File myDir = new File(pathToDir);
+
+        if (!myDir.exists()) {
+            myDir.mkdirs();
+        }
+
+        FileUtils.cleanDirectory(myDir);
     }
 }

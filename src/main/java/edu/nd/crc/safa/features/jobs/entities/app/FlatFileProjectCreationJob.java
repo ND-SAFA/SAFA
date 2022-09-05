@@ -16,15 +16,15 @@ import edu.nd.crc.safa.features.errors.entities.db.CommitError;
 import edu.nd.crc.safa.features.errors.repositories.CommitErrorRepository;
 import edu.nd.crc.safa.features.flatfiles.parser.FlatFileParser;
 import edu.nd.crc.safa.features.flatfiles.parser.TimFileParser;
-import edu.nd.crc.safa.features.flatfiles.services.FlatFileService;
 import edu.nd.crc.safa.features.jobs.entities.IJobStep;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;
+import edu.nd.crc.safa.features.tgen.generator.TraceGenerationService;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
-import edu.nd.crc.safa.utilities.FileUtilities;
+import edu.nd.crc.safa.utilities.JsonFileUtilities;
 
 import org.json.JSONObject;
 import org.springframework.web.multipart.MultipartFile;
@@ -80,7 +80,7 @@ public class FlatFileProjectCreationJob extends CommitJob {
             throw new SafaError("TIM.json file was not uploaded for this project");
         }
 
-        JSONObject timFileJson = FileUtilities.readJSONFile(this.pathToTIMFile);
+        JSONObject timFileJson = JsonFileUtilities.readJSONFile(this.pathToTIMFile);
         TimFileParser timFileParser = new TimFileParser(timFileJson, this.pathToFiles);
         this.flatFileParser = new FlatFileParser(timFileParser);
     }
@@ -119,12 +119,12 @@ public class FlatFileProjectCreationJob extends CommitJob {
     }
 
     @IJobStep(name = "Generating Trace Links", position = 3)
-    public void generatingTraces() {
-        FlatFileService flatFileService = this.getServiceProvider().getFlatFileService();
-        List<TraceAppEntity> generatedLinks = flatFileService.generateTraceLinks(
+    public void generatingTraces() throws IOException, InterruptedException {
+        TraceGenerationService traceGenerationService = this.getServiceProvider().getTraceGenerationService();
+        List<TraceAppEntity> generatedLinks = traceGenerationService.generateTraceLinks(
             projectCommit.getArtifacts().getAdded(),
-            flatFileParser.getTraceGenerationRequests());
-        generatedLinks = flatFileService.filterDuplicateGeneratedLinks(projectCommit.getTraces().getAdded(),
+            flatFileParser.getArtifactTypeTraceGenerationRequestDTOS());
+        generatedLinks = traceGenerationService.filterDuplicateGeneratedLinks(projectCommit.getTraces().getAdded(),
             generatedLinks);
         projectCommit.getTraces().getAdded().addAll(generatedLinks);
     }

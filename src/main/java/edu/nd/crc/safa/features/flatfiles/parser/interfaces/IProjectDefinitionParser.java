@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.tgen.entities.TraceGenerationRequest;
+import edu.nd.crc.safa.features.tgen.entities.ArtifactTypeTraceGenerationRequestDTO;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 
 import org.javatuples.Pair;
@@ -29,5 +29,6 @@ public interface IProjectDefinitionParser {
      * @return Parsed trace files.
      * @throws IOException Throws error if any problem occurs while reading a trace file
      */
-    Pair<List<IDataFile<TraceAppEntity>>, List<TraceGenerationRequest>> parseTraceFiles() throws IOException;
+    Pair<List<IDataFile<TraceAppEntity>>, List<ArtifactTypeTraceGenerationRequestDTO>> parseTraceFiles()
+        throws IOException;
 }

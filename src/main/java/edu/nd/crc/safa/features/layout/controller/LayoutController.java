@@ -47,7 +47,6 @@ public class LayoutController extends BaseController {
         }
         notificationBuilder.withDocumentUpdate(layoutGeneration.getDocumentIds());
 
-
         this.serviceProvider.getNotificationService().broadcastChange(notificationBuilder);
         return response;
     }

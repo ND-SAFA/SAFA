@@ -27,27 +27,27 @@ public class ProjectPaths {
 
         public static String createTemporaryDirectory() throws IOException {
             String randomId = UUID.randomUUID().toString();
-            String pathToTemporary = FileUtilities.builtPath(Storage.PATH, randomId);
+            String pathToTemporary = FileUtilities.buildPath(Storage.PATH, randomId);
             Files.createDirectories(Paths.get(pathToTemporary));
             return pathToTemporary;
         }
 
         public static String getPathToProjectFile(Project project, String fileName) throws IOException {
-            return FileUtilities.builtPath(Storage.projectPath(project, true), fileName);
+            return FileUtilities.buildPath(Storage.projectPath(project, true), fileName);
         }
 
         public static String uploadedProjectFilePath(Project project, String fileName) throws IOException {
-            return FileUtilities.builtPath(projectUploadsPath(project, true), fileName);
+            return FileUtilities.buildPath(projectUploadsPath(project, true), fileName);
         }
 
         public static String projectUploadsPath(Project project, boolean createIfEmpty) throws IOException {
-            String path = FileUtilities.builtPath(Storage.projectPath(project, createIfEmpty), "uploaded");
+            String path = FileUtilities.buildPath(Storage.projectPath(project, createIfEmpty), "uploaded");
             FileUtilities.createDirectoryIfEmpty(path, createIfEmpty);
             return path;
         }
 
         public static String projectPath(Project project, boolean createIfEmpty) throws IOException {
-            String pathToLocalStorage = FileUtilities.builtPath(Storage.PATH, project.getProjectId().toString());
+            String pathToLocalStorage = FileUtilities.buildPath(Storage.PATH, project.getProjectId().toString());
             FileUtilities.createDirectoryIfEmpty(pathToLocalStorage, createIfEmpty);
             return pathToLocalStorage;
         }
@@ -72,7 +72,7 @@ public class ProjectPaths {
                 public static final String V2 = PATH + "/after";
 
                 public static String getPathToFile(String fileName) {
-                    return FileUtilities.builtPath(V1, fileName);
+                    return FileUtilities.buildPath(V1, fileName);
                 }
             }
 

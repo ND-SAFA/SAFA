@@ -70,10 +70,10 @@ public class FlatFileService {
     public ProjectAppEntity updateProjectFromFlatFiles(Project project,
                                                        ProjectVersion projectVersion,
                                                        ServiceProvider serviceProvider,
-                                                       MultipartFile[] files,
+                                                       List<MultipartFile> files,
                                                        boolean asCompleteSet)
         throws SafaError, IOException {
-        this.fileUploadService.uploadFilesToServer(project, Arrays.asList(files));
+        this.fileUploadService.uploadFilesToServer(project, files);
         JSONObject timFileContent = getTimFileContent(project);
         this.parseFlatFilesAndCommitEntities(projectVersion, serviceProvider, timFileContent, asCompleteSet);
         return this.projectRetrievalService.getProjectAppEntity(projectVersion);

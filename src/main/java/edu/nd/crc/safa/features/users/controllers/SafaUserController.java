@@ -68,10 +68,13 @@ public class SafaUserController extends BaseController {
      * @return Created user entity
      */
     @PostMapping(AppRoutes.Accounts.CREATE_ACCOUNT)
-    public UserAppEntity createNewUser(@RequestBody SafaUser newUser) {
-        return this.serviceProvider
+    public UserIdentifierDTO createNewUser(@RequestBody CreateAccountRequest newUser) throws IOException {
+        // Step - Create user
+        UserIdentifierDTO newUserIdentifierDTO = this.serviceProvider
             .getSafaUserService()
             .createUser(newUser.getEmail(), newUser.getPassword());
+        createSampleProject(newUser);
+        return newUserIdentifierDTO;
     }
 
     /**
@@ -91,9 +94,13 @@ public class SafaUserController extends BaseController {
             .deleteUser(confirmationPassword);
     }
 
+    /**
+     * Sends email to authorized user email enabling them to create a new password.
+     *
+     * @param user The user to send the reset password email to.
+     */
     @PutMapping(AppRoutes.Accounts.FORGOT_PASSWORD)
-    // TODO: usually it's not a good idea to use entities as DTOs since Hibernate could create the given entity
-    public void forgotPassword(@RequestBody SafaUser user) {
+    public void forgotPassword(@RequestBody UserIdentifierDTO user) {
         String username = user.getEmail();
         SafaUser retrievedUser = safaUserRepository.findByEmail(username)
             .orElseThrow(() -> new UsernameNotFoundException("Username does not exist: " + username));
@@ -103,9 +110,14 @@ public class SafaUserController extends BaseController {
         PasswordResetToken passwordResetToken = new PasswordResetToken(retrievedUser, token, expirationDate);
 
         //TODO: Send email with reset token
-
     }
 
+    /**
+     * Under construction. Sends email to reset password for
+     *
+     * @param passwordResetRequest Request containing token signed by user and their new password
+     * @return {@link UserIdentifierDTO} The user identifier whose password was changed.
+     */
     @PutMapping(AppRoutes.Accounts.RESET_PASSWORD)
     public UserIdentifierDTO resetPassword(@RequestBody ResetPasswordRequestDTO passwordResetRequest) {
         // Step - Extract required information
@@ -127,6 +139,12 @@ public class SafaUserController extends BaseController {
         return new UserIdentifierDTO(retrievedUser);
     }
 
+    /**
+     * Updates the user's password to new one if their current password is validated.
+     *
+     * @param passwordChangeRequest Password change request containing current and new password.
+     * @return {@link UserIdentifierDTO} The user entity whose password was set.
+     */
     @PutMapping(AppRoutes.Accounts.CHANGE_PASSWORD)
     public UserIdentifierDTO changePassword(@Valid @RequestBody PasswordChangeRequest passwordChangeRequest) {
         SafaUser principal = safaUserService.getCurrentUser();
@@ -141,6 +159,6 @@ public class SafaUserController extends BaseController {
 
         principal.setPassword(passwordEncoder.encode(passwordChangeRequest.getNewPassword()));
         principal = this.safaUserRepository.save(principal);
-        return new UserAppEntity(principal);
+        return new UserIdentifierDTO(principal);
     }
 }

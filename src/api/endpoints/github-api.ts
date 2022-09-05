@@ -186,9 +186,13 @@ export async function getGitHubRepositories(
 export async function saveGitHubCredentials(
   credentials: InternalGitHubCredentialsModel
 ): Promise<void> {
+  const savedCredentials = Object.entries(credentials)
+    .filter(([field]) => field !== "installationId")
+    .reduce((acc, [key, val]) => ({ ...acc, [key]: val }), {});
+
   return authHttpClient<void>(Endpoint.githubCredentials, {
     method: "POST",
-    body: JSON.stringify(credentials),
+    body: JSON.stringify(savedCredentials),
   });
 }
 

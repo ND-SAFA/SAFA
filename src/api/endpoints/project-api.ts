@@ -1,67 +1,33 @@
 import {
-  MemberRequest,
-  Project,
-  ProjectCreationResponse,
+  JobModel,
+  MemberRequestModel,
+  ProjectModel,
   ProjectDelta,
-  ProjectIdentifier,
-  ProjectMembership,
+  IdentifierModel,
+  MembershipModel,
   ProjectRole,
 } from "@/types";
-import { Endpoint, fillEndpoint, authHttpClient } from "@/api/util";
+import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
 
 /**
- * Creates a new project from the given flat files.
- *
- * @param formData - Form data containing the project files.
- *
- * @return The created project.
- */
-export async function createProjectFromFlatFiles(
-  formData: FormData
-): Promise<ProjectCreationResponse> {
-  return authHttpClient<ProjectCreationResponse>(
-    Endpoint.createProjectFromFlatFiles,
-    {
-      method: "POST",
-      body: formData,
-    },
-    false
-  );
-}
-
-/**
- * Updates an existing project from the given flat files.
- *
- * @param versionId - The project version to update.
- * @param formData - Form data containing the project files.
- *
- * @return The updated project.
- */
-export async function updateProjectThroughFlatFiles(
-  versionId: string,
-  formData: FormData
-): Promise<ProjectCreationResponse> {
-  return authHttpClient<ProjectCreationResponse>(
-    fillEndpoint(Endpoint.updateProjectThroughFlatFiles, { versionId }),
-    {
-      method: "POST",
-      body: formData,
-    },
-    false
-  );
-}
-
-/**
- * Saves or updates the given project.
+ * Creates or updates the given project.
  *
  * @param project - The project to save.
- *
  * @return The saved project.
  */
-export async function saveOrUpdateProject(
-  project: Project
-): Promise<ProjectCreationResponse> {
-  return authHttpClient<ProjectCreationResponse>(Endpoint.project, {
+export async function saveProject(
+  project: Pick<ProjectModel, "projectId" | "name" | "description">
+): Promise<ProjectModel> {
+  return authHttpClient<ProjectModel>(Endpoint.project, {
+    method: "POST",
+    body: JSON.stringify(project),
+  });
+}
+
+export async function createProjectCreationJob(
+  project: ProjectModel
+): Promise<JobModel> {
+  return authHttpClient<JobModel>(Endpoint.createProjectJob, {
     method: "POST",
     body: JSON.stringify(project),
   });
@@ -72,8 +38,8 @@ export async function saveOrUpdateProject(
  *
  * @return All project identifiers.
  */
-export async function getProjects(): Promise<ProjectIdentifier[]> {
-  return authHttpClient<ProjectIdentifier[]>(Endpoint.project, {
+export async function getProjects(): Promise<IdentifierModel[]> {
+  return authHttpClient<IdentifierModel[]>(Endpoint.project, {
     method: "GET",
   });
 }
@@ -97,12 +63,11 @@ export async function deleteProject(projectId: string): Promise<void> {
  *
  * @param sourceVersionId - The source version of the project.
  * @param targetVersionId - The target version of the project.
- *
  * @return The delta from the source to the target versions.
  */
 export async function getProjectDelta(
-  sourceVersionId: string,
-  targetVersionId: string
+  targetVersionId: string,
+  sourceVersionId: string
 ): Promise<ProjectDelta> {
   return authHttpClient<ProjectDelta>(
     fillEndpoint(Endpoint.getProjectDelta, {
@@ -120,8 +85,8 @@ export async function getProjectDelta(
  */
 export async function getProjectMembers(
   projectId: string
-): Promise<ProjectMembership[]> {
-  return authHttpClient<ProjectMembership[]>(
+): Promise<MembershipModel[]> {
+  return authHttpClient<MembershipModel[]>(
     fillEndpoint(Endpoint.getProjectMembers, {
       projectId,
     }),
@@ -132,40 +97,43 @@ export async function getProjectMembers(
 }
 
 /**
- * Shares project with given user containing email at set role.
+ * Shares a project with a user.
+ *
+ * @param projectId - The project to add this user to.
+ * @param memberEmail - The email of the given user.
+ * @param projectRole - The role to set for the given user.
  */
-
-export async function addOrUpdateProjectMember(
+export async function saveProjectMember(
   projectId: string,
   memberEmail: string,
   projectRole: ProjectRole
-): Promise<ProjectMembership[]> {
-  const payload: MemberRequest = {
-    memberEmail,
-    projectRole,
-  };
-  return authHttpClient<ProjectMembership[]>(
+): Promise<MembershipModel[]> {
+  return authHttpClient<MembershipModel[]>(
     fillEndpoint(Endpoint.getProjectMembers, {
       projectId,
     }),
     {
       method: "POST",
-      body: JSON.stringify(payload),
+      body: JSON.stringify({
+        memberEmail,
+        projectRole,
+      } as MemberRequestModel),
     }
   );
 }
 
 /**
- * Shares project with given user containing email at set role.
+ * Deletes a user from a project.
+ *
+ * @param projectMember - The user to delete.
+ * @return The remaining users.
  */
-
-export async function deleteProjectMember(
-  projectMember: ProjectMembership
-): Promise<ProjectMembership[]> {
-  const projectMemberId = projectMember.projectMembershipId;
-  return authHttpClient<ProjectMembership[]>(
+export async function deleteProjectMember({
+  projectMembershipId,
+}: MembershipModel): Promise<MembershipModel[]> {
+  return authHttpClient<MembershipModel[]>(
     fillEndpoint(Endpoint.deleteProjectMember, {
-      projectMemberId,
+      projectMemberId: projectMembershipId,
     }),
     {
       method: "DELETE",

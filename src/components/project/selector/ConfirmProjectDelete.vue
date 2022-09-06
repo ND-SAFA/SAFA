@@ -1,19 +1,27 @@
 <template>
-  <generic-modal size="md" :is-open="isOpen" :title="title" @close="onCancel">
+  <generic-modal
+    size="md"
+    :is-open="isOpen"
+    :title="title"
+    data-cy="modal-project-delete"
+    @close="handleCancel"
+  >
     <template v-slot:body>
       <v-text-field
         v-model="confirmText"
         :label="textboxLabel"
         class="ma-3"
         filled
+        data-cy="input-project-delete-name"
       />
     </template>
     <template v-slot:actions>
       <v-btn
         :disabled="!validated"
         color="error"
-        @click="onConfirm"
+        @click="handleConfirm"
         class="ml-auto"
+        data-cy="button-project-delete"
       >
         Delete
       </v-btn>
@@ -22,8 +30,8 @@
 </template>
 
 <script lang="ts">
-import { ProjectIdentifier } from "@/types";
 import Vue, { PropType } from "vue";
+import { IdentifierModel } from "@/types";
 import { GenericModal } from "@/components/common";
 
 /**
@@ -33,6 +41,7 @@ import { GenericModal } from "@/components/common";
  * @emits-2 `cancel` - On delete cancel.
  */
 export default Vue.extend({
+  name: "ConfirmProjectDelete",
   components: { GenericModal },
   props: {
     isOpen: {
@@ -40,7 +49,7 @@ export default Vue.extend({
       required: true,
     },
     project: {
-      type: Object as PropType<ProjectIdentifier>,
+      type: Object as PropType<IdentifierModel>,
       required: false,
     },
   },
@@ -53,41 +62,51 @@ export default Vue.extend({
     };
   },
   methods: {
+    /**
+     * Clears modal data.
+     */
     clearData(): void {
       this.confirmText = "";
       this.validated = false;
     },
-    onConfirm() {
-      const project = this.$props.project;
+    /**
+     * Emits a request to confirm deleting this project.
+     */
+    handleConfirm() {
       if (this.validated) {
-        this.$emit("confirm", project);
+        this.$emit("confirm", this.project);
       }
     },
-    onCancel() {
+    /**
+     * Emits a request to cancel deleting this project.
+     */
+    handleCancel() {
       this.$emit("cancel");
     },
   },
   watch: {
-    project(project: ProjectIdentifier) {
-      if (project !== undefined) {
-        this.textboxLabel = `Type "${project.name}"`;
-        this.title = `Deleting: ${project.name}`;
-      }
+    /**
+     * Updates the modal text when the project changes.
+     */
+    project(project: IdentifierModel | undefined) {
+      if (!project) return;
+
+      this.textboxLabel = `Type "${project.name}"`;
+      this.title = `Deleting: ${project.name}`;
     },
+    /**
+     * Updates the validated status when the text changes.
+     */
     confirmText() {
-      const project = this.$props.project;
-      if (project !== undefined) {
-        if (this.confirmText === project.name) {
-          this.validated = true;
-          return;
-        }
-      }
-      this.validated = false;
+      this.validated = this.project && this.confirmText === this.project.name;
     },
-    isOpen(isOpen: boolean) {
-      if (isOpen) {
-        this.clearData();
-      }
+    /**
+     * Clears the modal data when opened.
+     */
+    isOpen(open: boolean) {
+      if (!open) return;
+
+      this.clearData();
     },
   },
 });

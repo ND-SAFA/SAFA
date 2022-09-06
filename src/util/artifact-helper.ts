@@ -1,23 +1,35 @@
-import { Artifact } from "@/types";
+import { ArtifactModel, FlatArtifact } from "@/types";
 
 /**
- * Returns the artifact in list if single item exists.
+ * Decides whether to filter an artifact out of view.
  *
- * @param query - List of artifacts representing some query for an artifact.
- * @param queryName - The name of the operation to log if operation fails.
- * @return The found artifact.
- * @throws Error if query contains multiple or no results.
+ * @param artifact - The artifact to check.
+ * @param queryText - The current query text.
+ * @return If true, the artifact should be kept.
  */
-export function getSingleQueryResult(
-  query: Artifact[],
-  queryName: string
-): Artifact {
-  switch (query.length) {
-    case 1:
-      return query[0];
-    case 0:
-      throw Error(`Query resulted in empty results: ${queryName}`);
-    default:
-      throw Error(`Found more than one result in query: ${queryName}`);
-  }
+export function filterArtifacts(
+  artifact: ArtifactModel,
+  queryText: string
+): boolean {
+  const lowercaseQuery = queryText.toLowerCase();
+  const { name, type, body } = artifact;
+
+  return (
+    name.toLowerCase().includes(lowercaseQuery) ||
+    type.toLowerCase().includes(lowercaseQuery) ||
+    body.toLowerCase().includes(lowercaseQuery)
+  );
+}
+
+/**
+ * Flattens an artifacts custom fields into the same object.
+ *
+ * @param artifact -The artifact to flatten.
+ * @return The flattened artifact.
+ */
+export function flattenArtifact(artifact: ArtifactModel): FlatArtifact {
+  return {
+    ...artifact,
+    ...(artifact.customFields || {}),
+  } as FlatArtifact;
 }

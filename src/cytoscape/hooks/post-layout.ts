@@ -4,8 +4,14 @@ import {
   AutoMoveReposition,
   CytoCore,
   IGraphLayout,
+  CytoEvent,
+  ArtifactData,
 } from "@/types";
-import { artifactSelectionModule, viewportModule } from "@/store";
+import { isArtifactData } from "@/util";
+import { selectionStore } from "@/hooks";
+import { cyCenterNodes, cyZoomReset, timTreeCyPromise } from "@/cytoscape";
+import { MenuItem } from "@/types/cytoscape/plugins/context-menus";
+import { artifactTreeMenuItems } from "@/cytoscape/plugins";
 
 /**
  * Adds auto-move handlers to a node, so that its child nodes are dragged along with it.
@@ -72,17 +78,65 @@ export const applyCytoEvents: LayoutHook = (
  * Centers on the selected or root node of the graph.
  */
 export const centerViewOnNode: LayoutHook = (): void => {
-  const selectedArtifacts = artifactSelectionModule.getSelectedArtifactId;
+  const selectedArtifacts = selectionStore.selectedArtifactId;
 
   if (!selectedArtifacts) {
-    viewportModule.centerOnRootNode();
+    cyZoomReset();
+    cyCenterNodes();
   } else {
-    viewportModule.centerOnArtifacts([selectedArtifacts]);
+    selectionStore.centerOnArtifacts([selectedArtifacts]);
   }
 };
 
+let initDynamic = true;
+
+/**
+ * Attaches hook to every right click on the cytoscape instance enabling
+ * the dynamic showing of context menu items through lambda `isVisible`.
+ *
+ * @param cy The cytoscape instance
+ */
+export const dynamicVisibilityHookForContextMenuItems = (
+  cy: CytoCore
+): void => {
+  if (!initDynamic) return;
+
+  initDynamic = false;
+
+  cy.on(CytoEvent.CXT_TAP, (event: EventObject) => {
+    const data = event.target.data();
+    const artifactData: ArtifactData | undefined = isArtifactData(data)
+      ? data
+      : undefined;
+    const contextMenuInstance = cy.contextMenus("get");
+
+    artifactTreeMenuItems.forEach((menuItem: MenuItem) => {
+      if (
+        menuItem.coreAsWell ||
+        (menuItem.isVisible !== undefined && menuItem.isVisible(artifactData))
+      ) {
+        contextMenuInstance.showMenuItem(menuItem.id);
+      } else {
+        contextMenuInstance.hideMenuItem(menuItem.id);
+      }
+    });
+  });
+};
+
+/**
+ * Post layout hooks for the artifact tree.
+ */
 export const DefaultPostLayoutHooks: LayoutHook[] = [
   centerViewOnNode,
   applyAutoMoveEvents,
+  applyCytoEvents,
+  dynamicVisibilityHookForContextMenuItems,
+];
+
+/**
+ * Post layout hooks for the TIM tree.
+ */
+export const TIMPostLayoutHooks: LayoutHook[] = [
+  (): void => cyCenterNodes(timTreeCyPromise),
   applyCytoEvents,
 ];

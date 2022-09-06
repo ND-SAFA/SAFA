@@ -1,55 +1,22 @@
-import { ProjectMembership, TraceLink } from "@/types";
-import { Artifact } from "./artifact";
-
-/**
- * Enumerates the states of parsing.
- */
-export enum ApplicationActivity {
-  PARSING_TIM,
-  PARSING_ARTIFACTS,
-  PARSING_TRACES,
-  UNKNOWN,
-}
-
-/**
- * Defines a parser error.
- */
-export interface ParserError {
-  /**
-   * The id of the error.
-   */
-  errorId: string;
-  /**
-   * The message of the error.
-   */
-  message: string;
-  /**
-   * The state of the parser when this error was encountered.
-   */
-  activity: ApplicationActivity;
-  /**
-   * The location of the error.
-   */
-  location: string;
-}
-
-/**
- * Defines a collection of all parser errors.
- */
-export interface ProjectErrors {
-  tim: ParserError[];
-  artifacts: ParserError[];
-  traces: ParserError[];
-}
+import {
+  LayoutPositionsModel,
+  ArtifactTypeModel,
+  WarningModel,
+  MembershipModel,
+  TraceLinkModel,
+  ArtifactModel,
+  DocumentModel,
+} from "@/types";
 
 /**
  * Defines a project.
  */
-export interface ProjectIdentifier {
+export interface IdentifierModel {
   /**
    * The ID of the project.
    */
   projectId: string;
+
   /**
    * The name of the project.
    */
@@ -58,12 +25,22 @@ export interface ProjectIdentifier {
    * The description of the project.
    */
   description: string;
+
+  /**
+   * List of members and roles in project.
+   */
+  members: MembershipModel[];
+
+  /**
+   * The primary owner of this project.
+   */
+  owner: string;
 }
 
 /**
  * Defines the version of a project.
  */
-export interface ProjectVersion {
+export interface VersionModel {
   /**
    * The project version id.
    */
@@ -71,7 +48,7 @@ export interface ProjectVersion {
   /**
    * The project.
    */
-  project?: ProjectIdentifier;
+  project?: IdentifierModel;
   /**
    * The major version number.
    */
@@ -87,65 +64,22 @@ export interface ProjectVersion {
 }
 
 /**
- * Enumerates the type of documents supported by SAFA
- */
-export enum DocumentType {
-  ARTIFACT_TREE = "ARTIFACT_TREE",
-  FTA = "FTA",
-}
-
-/**
- * Defines a specific document.
- */
-export interface ProjectDocument {
-  /**
-   * The id of this document.
-   */
-  documentId: string;
-  /**
-   * The project associated with this document.
-   */
-  project: ProjectIdentifier;
-  /**
-   * The name of the document.
-   */
-  name: string;
-  /**
-   * The description of the document.
-   */
-  description: string;
-  /**
-   * The type of document.
-   */
-  type: DocumentType;
-  /**
-   * The ids of artifacts displayed within this document.
-   */
-  artifactIds: string[];
-}
-
-/**
  * Defines a versioned and parsed project.
  */
-export interface Project extends ProjectIdentifier {
+export interface ProjectModel extends IdentifierModel {
   /**
    * The project's version.
    */
-  projectVersion?: ProjectVersion;
+  projectVersion?: VersionModel;
 
   /**
    * The project's artifacts.
    */
-  artifacts: Artifact[];
+  artifacts: ArtifactModel[];
   /**
    * The project's traces.
    */
-  traces: TraceLink[];
-
-  /**
-   * Map of project members and their role.
-   */
-  members: ProjectMembership[];
+  traces: TraceLinkModel[];
 
   /**
    * The current document id.
@@ -154,7 +88,20 @@ export interface Project extends ProjectIdentifier {
   /**
    * The different documents for this project.
    */
-  documents?: ProjectDocument[];
+  documents: DocumentModel[];
+
+  /**
+   * The artifact types present in the project.
+   */
+  artifactTypes: ArtifactTypeModel[];
+  /**
+   * A collection of warnings on project artifacts.
+   */
+  warnings: Record<string, WarningModel[]>;
+  /**
+   * Map of artifact ids to their position in the default graph.
+   */
+  layout: LayoutPositionsModel;
 }
 
 export type VersionType = "major" | "minor" | "revision";

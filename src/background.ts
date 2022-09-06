@@ -17,9 +17,6 @@ async function createWindow() {
     width: 800,
     height: 600,
     webPreferences: {
-      // Required for Spectron testing
-      enableRemoteModule: true,
-
       // Use pluginOptions.nodeIntegration, leave this alone
       // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
       nodeIntegration: process.env
@@ -63,7 +60,7 @@ app.on("ready", async () => {
     try {
       await installExtension(VUEJS_DEVTOOLS);
     } catch (e) {
-      console.error("Vue Devtools failed to install:", e.toString());
+      console.error("Vue Devtools failed to install:", String(e));
     }
   }
   createWindow();

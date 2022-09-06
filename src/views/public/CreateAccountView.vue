@@ -1,43 +1,60 @@
 <template>
   <card-page>
     <template v-slot:form>
-      <h2 class="text-h4 mb-3 text-center">Welcome to SAFA!</h2>
+      <typography
+        align="center"
+        variant="title"
+        el="h1"
+        class="mb-3"
+        value="Welcome to SAFA!"
+      />
 
       <div v-if="!isCreated">
-        <p class="text-body-1">
-          There are just a few key pieces of info we need to set up your
-          account.
-        </p>
+        <typography
+          el="p"
+          value="There are just a few key pieces of info we need to set up your account."
+        />
 
         <v-text-field
           filled
           label="Email"
           v-model="email"
           :error-messages="isError ? ['Unable to create an account'] : []"
+          data-cy="input-new-email"
         />
-        <password-field v-model="password" />
+        <password-field v-model="password" data-cy="input-new-password" />
       </div>
 
-      <p v-else class="text-body-1">
-        Your account has been successfully created. Please check your email to
-        complete the sign up process.
-      </p>
+      <typography
+        v-else
+        el="p"
+        value="Your account has been successfully created. Please check your email to
+        complete the sign up process."
+      />
     </template>
 
     <template v-slot:actions>
       <v-btn
         v-if="!isCreated"
         color="primary"
-        @click="handleCreateAccount"
         :disabled="password.length === 0"
+        data-cy="button-create-account"
+        @click="handleCreateAccount"
       >
         Create Account
       </v-btn>
 
       <span class="ml-auto text-right text-body-1">
-        Already have an account?
+        <typography value="Already have an account?" />
 
-        <v-btn text small class="px-1" color="primary" @click="handleLogin">
+        <v-btn
+          text
+          small
+          class="px-1"
+          color="primary"
+          @click="handleLogin"
+          data-cy="button-create-account-login"
+        >
           Login
         </v-btn>
       </span>
@@ -47,36 +64,48 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { CardPage, PasswordField } from "@/components";
 import { navigateTo, Routes } from "@/router";
 import { createUser } from "@/api";
+import { CardPage, PasswordField, Typography } from "@/components";
 
 /**
- * Presents the create account page.
+ * Displays the create account page.
  */
 export default Vue.extend({
-  name: "create-account-view",
-  components: { CardPage, PasswordField },
-  data: () => ({
-    email: "",
-    password: "",
-    isError: false,
-    isCreated: false,
-  }),
+  name: "CreateAccountView",
+  components: { CardPage, PasswordField, Typography },
+  data() {
+    return {
+      email: "",
+      password: "",
+      isError: false,
+      isLoading: false,
+      isCreated: false,
+    };
+  },
   methods: {
+    /**
+     * Navigates to the login page.
+     */
     handleLogin() {
       navigateTo(Routes.LOGIN_ACCOUNT);
     },
+    /**
+     * Attempts to create a new account.
+     */
     handleCreateAccount() {
+      this.isLoading = true;
+
       createUser({
         email: this.email,
         password: this.password,
       })
         .then(() => {
-          this.isCreated = true;
           this.isError = false;
+          this.isCreated = true;
         })
-        .catch(() => (this.isError = true));
+        .catch(() => (this.isError = true))
+        .finally(() => (this.isLoading = false));
     },
   },
 });

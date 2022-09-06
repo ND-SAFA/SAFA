@@ -1,7 +1,7 @@
-import { Artifact, Commit, ProjectVersion, TraceLink } from "@/types";
-import { projectModule } from "@/store";
+import { ArtifactModel, Commit, VersionModel, TraceLinkModel } from "@/types";
 import { createCommit } from "@/util";
-import { saveCommit } from "./commit-handler";
+import { projectStore } from "@/hooks";
+import { saveCommit } from "@/api";
 
 /**
  * Responsible for creating a commit and saving it to the database.
@@ -12,44 +12,99 @@ export class CommitBuilder {
    */
   commit: Commit;
 
-  constructor(version: ProjectVersion) {
+  /**
+   * Creates a commit builder.
+   * @param version - The project version to commit to.
+   */
+  constructor(version: VersionModel) {
     this.commit = createCommit(version);
   }
 
-  withNewArtifact(artifact: Artifact): this {
+  /**
+   * Hides errors from the commit.
+   */
+  hideErrors(): this {
+    this.commit.failOnError = false;
+    return this;
+  }
+
+  /**
+   * Adds a new artifact to this commit.
+   *
+   * @param artifact - The artifact to create.
+   */
+  withNewArtifact(artifact: ArtifactModel): this {
     this.commit.artifacts.added.push(artifact);
     return this;
   }
 
-  withModifiedArtifact(artifact: Artifact): this {
+  /**
+   * Adds a modified artifact to this commit.
+   *
+   * @param artifact - The artifact to modify.
+   */
+  withModifiedArtifact(artifact: ArtifactModel): this {
     this.commit.artifacts.modified.push(artifact);
     return this;
   }
 
-  withRemovedArtifact(artifact: Artifact): this {
+  /**
+   * Adds a removed artifact to this commit.
+   *
+   * @param artifact - The artifact to remove.
+   */
+  withRemovedArtifact(artifact: ArtifactModel): this {
     this.commit.artifacts.removed.push(artifact);
     return this;
   }
 
-  withNewTraceLink(traceLink: TraceLink): this {
+  /**
+   * Adds a new trace link to this commit.
+   *
+   * @param traceLink - The link to add.
+   */
+  withNewTraceLink(traceLink: TraceLinkModel): this {
     this.commit.traces.added.push(traceLink);
     return this;
   }
 
-  withModifiedTraceLink(traceLink: TraceLink): this {
+  /**
+   * Adds multiple new trace links to this commit.
+   *
+   * @param traceLinks - The links to add.
+   */
+  withNewTraceLinks(traceLinks: TraceLinkModel[]): this {
+    this.commit.traces.added.push(...traceLinks);
+    return this;
+  }
+
+  /**
+   * Adds a modified trace link to this commit.
+   *
+   * @param traceLink - The link to modify.
+   */
+  withModifiedTraceLink(traceLink: TraceLinkModel): this {
     this.commit.traces.modified.push(traceLink);
     return this;
   }
 
-  save(): Promise<void> {
+  /**
+   * Saves this commit.
+   */
+  save(): Promise<Commit> {
     return saveCommit(this.commit);
   }
 
+  /**
+   * Creates a new commit based on the current project version.
+   */
   static withCurrentVersion(): CommitBuilder {
-    const { projectVersion } = projectModule.getProject;
-    if (projectVersion === undefined) {
+    const version = projectStore.version;
+
+    if (version === undefined) {
       throw Error("No project version is selected.");
     }
-    return new CommitBuilder(projectVersion);
+
+    return new CommitBuilder(version);
   }
 }

@@ -1,11 +1,13 @@
-import { PanelType, RouterCheck } from "@/types";
 import { NavigationGuardNext, Route } from "vue-router";
+import { NavigationGuard } from "vue-router/types/router";
+import { appStore, projectStore, sessionStore } from "@/hooks";
+import { handleLoadVersion } from "@/api";
 import {
+  QueryParams,
   Routes,
   routesPublic,
   routesWithRequiredProject,
 } from "@/router/routes";
-import { appModule, logModule, projectModule, sessionModule } from "@/store";
 
 /**
  * Defines list of functions that are run before navigating to a new page.
@@ -16,31 +18,40 @@ import { appModule, logModule, projectModule, sessionModule } from "@/store";
  * that once a check has used the `next` function the remaining checks
  * are ignored.
  */
-export const routerChecks: Record<string, RouterCheck> = {
+export const routerChecks: Record<string, NavigationGuard> = {
   redirectToLoginIfNoSessionFound(
     to: Route,
     from: Route,
     next: NavigationGuardNext
   ) {
-    if (!routesPublic.includes(to.path) && !sessionModule.getDoesSessionExist) {
-      next({ path: Routes.LOGIN_ACCOUNT, query: { to: to.path } });
+    if (sessionStore.doesSessionExist || routesPublic.includes(to.path)) {
       return;
     }
-  },
-  requireProjectForRoutes(to: Route, from: Route, next: NavigationGuardNext) {
-    const isProjectDefined = projectModule.projectId !== "";
 
-    if (routesWithRequiredProject.includes(to.path) && !isProjectDefined) {
-      logModule.onWarning(
-        "Project must be selected before approving trace links."
-      );
-      next(Routes.HOME);
+    next({
+      path: Routes.LOGIN_ACCOUNT,
+      query: {
+        ...to.query,
+        [QueryParams.LOGIN_PATH]: to.path,
+      },
+    });
+  },
+  requireProjectForRoutes(to: Route) {
+    if (
+      projectStore.isProjectDefined ||
+      !routesWithRequiredProject.includes(to.path)
+    )
+      return;
+
+    const versionId = to.query[QueryParams.VERSION];
+
+    if (typeof versionId === "string") {
+      handleLoadVersion(versionId, undefined, false);
     }
   },
   closePanelsIfNotInGraph(to: Route) {
-    if (to.path !== Routes.ARTIFACT_TREE) {
-      appModule.closePanel(PanelType.left);
-      appModule.closePanel(PanelType.right);
-    }
+    if (to.path === Routes.ARTIFACT) return;
+
+    appStore.closeSidePanels();
   },
 };

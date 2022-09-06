@@ -1,18 +1,18 @@
-import { TraceApproval, TraceLink, Artifact } from "@/types";
+import { ApprovalType, TraceLinkModel, ArtifactModel } from "@/types";
+import { CommitBuilder } from "@/api";
 import { Endpoint, fillEndpoint, authHttpClient } from "@/api/util";
-import { CommitBuilder } from "./commit-builder";
+import { GenerateLinksModel } from "@/types/api/link-api";
 
 /**
  * Returns all generated links for this project.
  *
  * @param versionId - The project version id whose related links are retrieved.
- *
  * @return The generated links.
  */
 export async function getGeneratedLinks(
   versionId: string
-): Promise<TraceLink[]> {
-  return authHttpClient<TraceLink[]>(
+): Promise<TraceLinkModel[]> {
+  return authHttpClient<TraceLinkModel[]>(
     fillEndpoint(Endpoint.getGeneratedLinks, { versionId }),
     { method: "GET" }
   );
@@ -21,55 +21,101 @@ export async function getGeneratedLinks(
 /**
  * Generates links between source and target artifacts.
  *
- * @param sourceArtifacts - The artifacts to generate links from.
- * @param targetArtifacts - The artifacts to generate links to.
- *
+ * @param config - Generated link configuration.
  * @return All generated links.
  */
-export async function generateLinks(
-  sourceArtifacts: Artifact[],
-  targetArtifacts: Artifact[]
-): Promise<TraceLink[]> {
-  const payload = { sourceArtifacts, targetArtifacts };
-
-  return authHttpClient<TraceLink[]>(fillEndpoint(Endpoint.generateLinks), {
-    method: "POST",
-    body: JSON.stringify(payload),
-  });
+export async function createGeneratedLinks(
+  config: GenerateLinksModel
+): Promise<TraceLinkModel[]> {
+  return authHttpClient<TraceLinkModel[]>(
+    fillEndpoint(Endpoint.generateLinks),
+    {
+      method: "POST",
+      body: JSON.stringify(config),
+    }
+  );
 }
 
 /**
  * Approves the given trace link ID.
  *
  * @param traceLink - The trace link to approve.
+ * @return The modified trace links.
  */
-export async function approveLink(traceLink: TraceLink): Promise<void> {
-  traceLink.approvalStatus = TraceApproval.APPROVED;
+export async function updateApprovedLink(
+  traceLink: TraceLinkModel
+): Promise<TraceLinkModel[]> {
+  traceLink.approvalStatus = ApprovalType.APPROVED;
+
   return CommitBuilder.withCurrentVersion()
     .withModifiedTraceLink(traceLink)
-    .save();
+    .save()
+    .then(async ({ traces }) => traces.modified);
 }
 
 /**
  * Declines the given trace link ID.
  *
  * @param traceLink - The trace link to decline.
+ * @return The removed trace links.
  */
-export async function declineLink(traceLink: TraceLink): Promise<void> {
-  traceLink.approvalStatus = TraceApproval.DECLINED;
+export async function updateDeclinedLink(
+  traceLink: TraceLinkModel
+): Promise<TraceLinkModel[]> {
+  traceLink.approvalStatus = ApprovalType.DECLINED;
+
   return CommitBuilder.withCurrentVersion()
     .withModifiedTraceLink(traceLink)
-    .save();
+    .save()
+    .then(async ({ traces }) => traces.removed);
 }
 
 /**
- * Creates a trace link from the source to the target ID for the given version ID.
+ * Declines the given trace link ID.
+ *
+ * @param traceLink - The trace link to decline.
+ * @return The removed trace links.
+ */
+export async function updateUnreviewedLink(
+  traceLink: TraceLinkModel
+): Promise<TraceLinkModel[]> {
+  traceLink.approvalStatus = ApprovalType.UNREVIEWED;
+
+  return CommitBuilder.withCurrentVersion()
+    .withModifiedTraceLink(traceLink)
+    .save()
+    .then(async ({ traces }) => traces.modified);
+}
+
+/**
+ * Creates new trace links.
  *
  * @param traceLink - The trace link to persist.
- *
- * @return The created trace link.
+ * @return The created trace links.
  */
-export async function createLink(traceLink: TraceLink): Promise<void> {
-  traceLink.approvalStatus = TraceApproval.APPROVED;
-  return CommitBuilder.withCurrentVersion().withNewTraceLink(traceLink).save();
+export async function createLink(
+  traceLink: TraceLinkModel
+): Promise<TraceLinkModel[]> {
+  traceLink.approvalStatus = ApprovalType.APPROVED;
+
+  return CommitBuilder.withCurrentVersion()
+    .withNewTraceLink(traceLink)
+    .save()
+    .then(async ({ traces }) => traces.added);
+}
+
+/**
+ * Saves new generated trace links.
+ *
+ * @param traceLinks - The trace links to persist.
+ * @return The created trace links.
+ */
+export async function saveGeneratedLinks(
+  traceLinks: TraceLinkModel[]
+): Promise<TraceLinkModel[]> {
+  return CommitBuilder.withCurrentVersion()
+    .hideErrors()
+    .withNewTraceLinks(traceLinks)
+    .save()
+    .then(async ({ traces }) => traces.added);
 }

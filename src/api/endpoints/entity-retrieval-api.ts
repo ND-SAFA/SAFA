@@ -1,46 +1,46 @@
-import { Artifact, ProjectCreationResponse, TraceLink } from "@/types";
+import { ArtifactModel, ProjectModel, TraceLinkModel } from "@/types";
 import { Endpoint, fillEndpoint, authHttpClient } from "@/api/util";
 
 /**
  * Gets a specific version of a project.
  *
  * @param versionId - The project version ID to get.
- *
  * @return The matching project.
  */
 export async function getProjectVersion(
   versionId: string
-): Promise<ProjectCreationResponse> {
-  return authHttpClient<ProjectCreationResponse>(
+): Promise<ProjectModel> {
+  return authHttpClient<ProjectModel>(
     fillEndpoint(Endpoint.projectVersion, { versionId }),
     { method: "GET" }
   );
 }
 
 /**
- * Returns the current list of artifacts present in given version.
- * @param versionId The id of the version whose artifacts are returned.
+ * Returns the list of artifacts in the given version.
  *
- * @return Promise returning list of artifacts in given version.
+ * @param versionId - The version whose artifacts are returned.
+ * @return The list of artifacts.
  */
 export async function getArtifactsInVersion(
   versionId: string
-): Promise<Artifact[]> {
-  return authHttpClient<Artifact[]>(
+): Promise<ArtifactModel[]> {
+  return authHttpClient<ArtifactModel[]>(
     fillEndpoint(Endpoint.getArtifactsInVersion, { versionId }),
     { method: "GET" }
   );
 }
 
 /**
- * Returns the current list of traces in specified version.
- * @param versionId The version id whose traces are being returned.
- * @return list of traces in version
+ * Returns the list of trace links in the given version.
+ *
+ * @param versionId - The version whose trace links are returned.
+ * @return The list of trace links.
  */
 export async function getTracesInVersion(
   versionId: string
-): Promise<TraceLink[]> {
-  return authHttpClient<TraceLink[]>(
+): Promise<TraceLinkModel[]> {
+  return authHttpClient<TraceLinkModel[]>(
     fillEndpoint(Endpoint.getTracesInVersion, { versionId }),
     { method: "GET" }
   );

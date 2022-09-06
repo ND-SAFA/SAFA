@@ -1,7 +1,18 @@
 steps:
   # Build the container image
   - name: "gcr.io/cloud-builders/docker"
-    args: ["build", "--build-arg", "API_ENDPOINT=${_API_ENDPOINT}", "-t", "gcr.io/$PROJECT_ID/safa-fend-${_STAGE}", "."]
+    args: [
+        "build",
+        "--build-arg", "API_ENDPOINT=${_API_ENDPOINT}",
+        "--build-arg", "JIRA_CLIENT_ID=${_JIRA_CLIENT_ID}",
+        "--build-arg", "JIRA_CLIENT_SECRET=${_JIRA_CLIENT_SECRET}",
+        "--build-arg", "JIRA_REDIRECT_LINK=${_JIRA_REDIRECT_LINK}",
+        "--build-arg", "GITHUB_CLIENT_ID=${_GITHUB_CLIENT_ID}",
+        "--build-arg", "GITHUB_CLIENT_SECRET=${_GITHUB_CLIENT_SECRET}",
+        "--build-arg", "GITHUB_REDIRECT_LINK=${_GITHUB_REDIRECT_LINK}",
+        "-t", "gcr.io/$PROJECT_ID/safa-fend-${_STAGE}",
+        "."
+    ]
   # Push the container image to Container Registry
   - name: "gcr.io/cloud-builders/docker"
     args: ["push", "gcr.io/$PROJECT_ID/safa-fend-${_STAGE}"]
@@ -13,4 +24,4 @@ steps:
 images:
   - gcr.io/$PROJECT_ID/safa-fend-${_STAGE}
 
-timeout: 900s
+timeout: 1200s

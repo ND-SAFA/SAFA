@@ -1,19 +1,16 @@
-import { ProjectVersion } from "@/types";
-import { Endpoint, fillEndpoint, authHttpClient } from "@/api/util";
+import { VersionModel } from "@/types";
+import { Endpoint, fillEndpoint, authHttpClient } from "@/api";
 
 /**
  * Gets all versions of the given project.
  *
- * @param projectId - The project ID to return versions of.
+ * @param projectId - The project to return versions of.
+ * @return All project versions.
  */
 export async function getProjectVersions(
-  projectId?: string
-): Promise<ProjectVersion[]> {
-  if (!projectId) {
-    throw Error("Undefined project identifier");
-  }
-
-  return authHttpClient<ProjectVersion[]>(
+  projectId: string
+): Promise<VersionModel[]> {
+  return authHttpClient<VersionModel[]>(
     fillEndpoint(Endpoint.getProjectVersions, { projectId }),
     { method: "GET" }
   );
@@ -22,16 +19,13 @@ export async function getProjectVersions(
 /**
  * Returns the current version of the given project.
  *
- * @param projectId - The project ID to return the current version of.
+ * @param projectId - The project to return the current version of.
+ * @return The current version.
  */
 export async function getCurrentVersion(
-  projectId?: string
-): Promise<ProjectVersion> {
-  if (!projectId) {
-    throw Error("Undefined project identifier");
-  }
-
-  return authHttpClient<ProjectVersion>(
+  projectId: string
+): Promise<VersionModel> {
+  return authHttpClient<VersionModel>(
     fillEndpoint(Endpoint.getCurrentVersion, { projectId }),
     { method: "GET" }
   );
@@ -40,14 +34,13 @@ export async function getCurrentVersion(
 /**
  * Creates a new major version of the project.
  *
- * @param projectId - The project ID to create a new version of.
- *
+ * @param projectId - The project to create a new version of.
  * @return The new project version.
  */
-export async function createNewMajorVersion(
+export async function createMajorVersion(
   projectId: string
-): Promise<ProjectVersion> {
-  return authHttpClient<ProjectVersion>(
+): Promise<VersionModel> {
+  return authHttpClient<VersionModel>(
     fillEndpoint(Endpoint.createNewMajorVersion, { projectId }),
     { method: "POST" }
   );
@@ -56,14 +49,13 @@ export async function createNewMajorVersion(
 /**
  * Creates a new minor version of the project.
  *
- * @param projectId - The project ID to create a new version of.
- *
+ * @param projectId - The project to create a new version of.
  * @return The new project version.
  */
-export async function createNewMinorVersion(
+export async function createMinorVersion(
   projectId: string
-): Promise<ProjectVersion> {
-  return authHttpClient<ProjectVersion>(
+): Promise<VersionModel> {
+  return authHttpClient<VersionModel>(
     fillEndpoint(Endpoint.createNewMinorVersion, { projectId }),
     { method: "POST" }
   );
@@ -72,14 +64,13 @@ export async function createNewMinorVersion(
 /**
  * Creates a new revision version of the project.
  *
- * @param projectId - The project ID to create a new version of.
- *
+ * @param projectId - The project to create a new version of.
  * @return The new project version.
  */
-export async function createNewRevisionVersion(
+export async function createRevisionVersion(
   projectId: string
-): Promise<ProjectVersion> {
-  return authHttpClient<ProjectVersion>(
+): Promise<VersionModel> {
+  return authHttpClient<VersionModel>(
     fillEndpoint(Endpoint.createNewRevisionVersion, { projectId }),
     {
       method: "POST",

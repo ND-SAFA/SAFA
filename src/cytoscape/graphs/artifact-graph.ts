@@ -5,7 +5,6 @@ import contextMenus from "cytoscape-context-menus";
 import edgehandles from "cytoscape-edgehandles";
 
 import { CytoCore, CytoCoreGraph } from "@/types";
-import { viewportModule } from "@/store";
 import { artifactTreeCyPromise, artifactTreeResolveCy } from "@/cytoscape/cy";
 import {
   artifactTreeContextMenuOptions,
@@ -29,6 +28,7 @@ export const artifactTreeGraph: CytoCoreGraph = {
     motionBlur: USE_MOTION_BLUR,
     motionBlurOpacity: MOTION_BLUE_OPACITY,
     zoom: DEFAULT_ARTIFACT_TREE_ZOOM,
+    boxSelectionEnabled: true,
   },
   saveCy: artifactTreeResolveCy,
   plugins: [
@@ -52,14 +52,13 @@ export const artifactTreeGraph: CytoCoreGraph = {
     },
     {
       initialize: edgehandles,
-      afterInit: async (cy: CytoCore) =>
-        await setEdgeHandlesCore(
+      afterInit(cy: CytoCore): Promise<void> {
+        return setEdgeHandlesCore(
           artifactTreeCyPromise,
           cy.edgehandles(artifactTreeEdgeHandleOptions)
-        ),
+        );
+      },
     },
   ],
-  async afterInit() {
-    await viewportModule.setArtifactTreeLayout();
-  },
+  afterInit: () => undefined,
 };

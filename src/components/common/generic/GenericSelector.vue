@@ -18,62 +18,64 @@
       <slot name="deleteItemDialogue" />
       <slot name="editItemDialogue" />
       <slot name="addItemDialogue" />
-      <v-row class="ma-1">
-        <v-col cols="11" class="ma-0 pa-0">
-          <v-text-field
-            v-model="search"
-            label="Search"
-            rounded
-            solo
-            dense
-            prepend-inner-icon="mdi-magnify"
-          />
-        </v-col>
-        <v-col cols="1" class="ma-0 pa-0">
-          <v-row justify="center" class="ma-0 pa-0">
-            <generic-icon-button
-              tooltip="Refresh"
-              icon-id="mdi-refresh"
-              @click="$emit('refresh')"
-            />
-          </v-row>
-        </v-col>
-      </v-row>
+      <flex-box v-if="!minimal" align="center" justify="space-between" y="2">
+        <v-text-field
+          v-model="search"
+          label="Search"
+          outlined
+          dense
+          hide-details
+          class="mr-1"
+          prepend-inner-icon="mdi-magnify"
+          data-cy="input-selector-search"
+        />
+        <generic-icon-button
+          tooltip="Refresh"
+          icon-id="mdi-refresh"
+          data-cy="button-selector-reload"
+          @click="$emit('refresh')"
+        />
+      </flex-box>
     </template>
     <template v-slot:[`item.actions`]="{ item }">
-      <generic-icon-button
-        v-if="hasEdit"
-        icon-id="mdi-pencil"
-        tooltip="Edit"
-        @click="$emit('item:edit', item)"
-      />
-      <generic-icon-button
-        v-if="isDeleteEnabled(item)"
-        icon-id="mdi-delete"
-        tooltip="Delete"
-        @click="$emit('item:delete', item)"
-      />
-    </template>
-    <template v-slot:footer>
-      <v-row justify="end" class="mr-2 mt-1">
+      <flex-box>
         <generic-icon-button
+          v-if="hasEdit"
+          icon-id="mdi-pencil"
+          tooltip="Edit"
+          data-cy="button-selector-edit"
+          @click="$emit('item:edit', item)"
+        />
+        <generic-icon-button
+          v-if="isDeleteEnabled(item)"
+          icon-id="mdi-delete"
+          tooltip="Delete"
+          data-cy="button-selector-delete"
+          @click="$emit('item:delete', item)"
+        />
+      </flex-box>
+    </template>
+    <template v-slot:[`footer.prepend`]>
+      <div class="py-3">
+        <generic-icon-button
+          v-if="!minimal"
           fab
           color="primary"
           icon-id="mdi-plus"
           tooltip="Create"
+          data-cy="button-selector-add"
           @click="$emit('item:add')"
         />
-      </v-row>
+      </div>
     </template>
   </v-data-table>
 </template>
 
 <script lang="ts">
-/* eslint-disable @typescript-eslint/no-explicit-any */
-//waiting for generics to be added to vue: https://github.com/vuejs/rfcs/pull/310
-import { DataItemProps, DataTableHeader } from "vuetify";
 import Vue, { PropType } from "vue";
-import GenericIconButton from "@/components/common/generic/GenericIconButton.vue";
+import { DataItemProps, DataTableHeader } from "vuetify";
+import FlexBox from "@/components/common/display/FlexBox.vue";
+import GenericIconButton from "./GenericIconButton.vue";
 
 /**
  * Displays a generic selector.
@@ -85,8 +87,8 @@ import GenericIconButton from "@/components/common/generic/GenericIconButton.vue
  * @emits-5 `item:add` - On add item.
  */
 export default Vue.extend({
-  name: "generic-selector",
-  components: { GenericIconButton },
+  name: "GenericSelector",
+  components: { FlexBox, GenericIconButton },
   props: {
     headers: {
       type: Array as PropType<DataTableHeader[]>,
@@ -120,6 +122,10 @@ export default Vue.extend({
       required: false,
       default: true,
     },
+    hasDeleteForIndexes: {
+      type: Array,
+      required: false,
+    },
     canDeleteLastItem: {
       type: Boolean,
       required: false,
@@ -134,6 +140,10 @@ export default Vue.extend({
       type: Boolean,
       required: true,
     },
+    minimal: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -143,16 +153,31 @@ export default Vue.extend({
     };
   },
   methods: {
+    /**
+     * Clears all selected data.
+     */
     clearData() {
       this.selected = [];
       this.search = "";
     },
+    /**
+     * Returns whether delete is enabled for the given item.
+     * @param item - The item to check.
+     * @return Whether the item is deletable.
+     */
     isDeleteEnabled(item: DataItemProps): boolean {
-      const isNotLastItem = this.items.indexOf(item) !== this.items.length - 1;
+      const index = this.items.indexOf(item);
+      const isNotLastItem = index !== this.items.length - 1;
 
-      return this.hasDelete && (this.canDeleteLastItem || isNotLastItem);
+      return (
+        (this.hasDelete || this.hasDeleteForIndexes?.includes(index)) &&
+        (this.canDeleteLastItem || isNotLastItem)
+      );
     },
   },
+  /**
+   * If no item is selected, the first item will be selected on mount.
+   */
   mounted() {
     if (this.selected.length === 0 && this.items.length > 0) {
       this.selected = [this.items[0]];
@@ -160,15 +185,21 @@ export default Vue.extend({
     }
   },
   watch: {
+    /**
+     * Select the first item when new items are loaded.
+     */
     items(newItems: DataItemProps[]) {
       this.selected = [this.items[0]];
       this.previousItems = newItems;
       this.$emit("item:select", { item: this.items[0], value: true });
     },
-    isOpen(isOpen: boolean) {
-      if (isOpen) {
-        this.clearData();
-      }
+    /**
+     * Clears data when the selector opens.
+     */
+    isOpen(open: boolean) {
+      if (!open) return;
+
+      this.clearData();
     },
   },
 });

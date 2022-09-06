@@ -1,19 +1,21 @@
 import Vue from "vue";
 import VueRouter, { NavigationGuardNext, Route, RouteConfig } from "vue-router";
-import { Routes } from "./routes";
+import { routerChecks } from "@/router/checks";
 import {
   ApproveLinksView,
-  ArtifactTreeView,
+  ArtifactView,
   CreateAccountView,
   ErrorPageView,
   ForgotPasswordView,
   LoginView,
   ProjectCreatorView,
-  ProjectSettings,
+  ProjectSettingsView,
   ResetPasswordView,
+  UploadStatusView,
+  HomeView,
+  MyAccountView,
 } from "@/views";
-import { routerChecks } from "@/router/checks";
-import { NextPayload } from "@/types";
+import { Routes } from "./routes";
 
 export { Routes };
 
@@ -44,12 +46,17 @@ const routes: Array<RouteConfig> = [
   {
     path: Routes.HOME,
     name: "Home",
-    component: ProjectCreatorView,
+    component: HomeView,
   },
   {
-    path: Routes.ARTIFACT_TREE,
-    name: "Artifact Tree",
-    component: ArtifactTreeView,
+    path: Routes.ACCOUNT,
+    name: "My Account",
+    component: MyAccountView,
+  },
+  {
+    path: Routes.ARTIFACT,
+    name: "Project",
+    component: ArtifactView,
   },
   {
     path: Routes.TRACE_LINK,
@@ -64,12 +71,17 @@ const routes: Array<RouteConfig> = [
   {
     path: Routes.PROJECT_SETTINGS,
     name: "Project Settings",
-    component: ProjectSettings,
+    component: ProjectSettingsView,
   },
   {
     path: Routes.ERROR,
     name: "Error Page",
     component: ErrorPageView,
+  },
+  {
+    path: Routes.UPLOAD_STATUS,
+    name: "Upload Status",
+    component: UploadStatusView,
   },
 ];
 
@@ -87,7 +99,7 @@ router.beforeResolve((to: Route, from: Route, next: NavigationGuardNext) => {
   let exit = false;
   for (const check of Object.values(routerChecks)) {
     if (exit) return;
-    check(to, from, (p: NextPayload) => {
+    check(to, from, (p) => {
       next(p);
       exit = true;
     });

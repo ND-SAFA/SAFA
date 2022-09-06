@@ -1,3 +1,5 @@
+import { VersionModel } from "@/types";
+
 /**
  * Returns given string with newlines inserted after maxWordCount
  * has been reached.
@@ -33,7 +35,32 @@ export function splitIntoLines(str: string, maxWordCount: number): string {
  * @return The capitalized string.
  */
 export function capitalize(str: string): string {
-  return str.charAt(0).toUpperCase() + str.slice(1);
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+}
+
+/**
+ * Converts `camelCase` to `Sentence Case`.
+ *
+ * @param str - The string to convert.ize.
+ *
+ * @return The capitalized string.
+ */
+export function camelcaseToDisplay(str: string): string {
+  return capitalize(str.replace(/([A-Z])/g, " $1"));
+}
+
+/**
+ * Converts `UPPER_CASE` to `Sentence Case`.
+ *
+ * @param str - The string to convert.
+ *
+ * @return The capitalized string.
+ */
+export function uppercaseToDisplay(str: string): string {
+  return str
+    .split("_")
+    .map((word) => capitalize(word))
+    .join(" ");
 }
 
 /**
@@ -71,4 +98,49 @@ export function getArtifactTypePrintName(type?: string): string {
   return type
     ? nameMap[type.toLowerCase()] || capitalizeSentence(type.toLowerCase())
     : "Unknown Type";
+}
+
+/**
+ * Converts an enum value in capital snake case into a title case string.
+ *
+ * @param value - The value to convert.
+ * @return The displayable value.
+ */
+export function enumToDisplay(value: string): string {
+  return value
+    .split("_")
+    .map((word) => capitalize(word.toLowerCase()))
+    .join(" ");
+}
+/**
+ * Converts a timestamp to a display value.
+ *
+ * @param timestamp - The timestamp to convert.
+ * @return The displayable value.
+ */
+export function timestampToDisplay(timestamp: string): string {
+  const date = new Date(timestamp);
+
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    weekday: "long",
+    hour: "numeric",
+    minute: "numeric",
+  });
+}
+
+/**
+ * Stringifies the version number.
+ *
+ * @param currentVersion - The current version number.
+ *
+ * @return The stringified version number.
+ */
+export function versionToString(currentVersion?: VersionModel): string {
+  if (currentVersion === undefined) {
+    return "X.X.X";
+  }
+  return `${currentVersion.majorVersion}.${currentVersion.minorVersion}.${currentVersion.revision}`;
 }

@@ -2,34 +2,52 @@
   <generic-modal
     :is-open="isOpen"
     :title="title"
-    size="s"
-    :actions-height="50"
+    size="m"
+    :actions-height="isUploadOpen ? 0 : 50"
     :is-loading="isLoading"
-    @close="onClose"
+    data-cy="modal-project-edit"
+    @close="handleClose"
   >
     <template v-slot:body>
       <project-identifier-input
-        v-bind:name.sync="name"
-        v-bind:description.sync="description"
+        v-bind:name.sync="identifier.name"
+        v-bind:description.sync="identifier.description"
+        data-cy-name="input-project-name-modal"
+        data-cy-description="input-project-description-modal"
+      />
+      <v-switch
+        style="margin-left: 80px"
+        v-if="doShowUpload"
+        v-model="isUploadOpen"
+        label="Upload Flat Files"
+      />
+      <project-files-input
+        v-if="doShowUpload && isUploadOpen"
+        v-bind:name.sync="identifier.name"
+        v-bind:description.sync="identifier.description"
       />
     </template>
-    <template v-slot:actions>
-      <v-container>
-        <v-row justify="center">
-          <v-btn @click="onSave" color="primary">
-            <v-icon>mdi-check</v-icon>
-          </v-btn>
-        </v-row>
-      </v-container>
+    <template v-slot:actions v-if="!isUploadOpen">
+      <v-btn
+        @click="handleSave"
+        color="primary"
+        class="ml-auto"
+        :disabled="isDisabled"
+        data-cy="button-project-save"
+      >
+        Save
+      </v-btn>
     </template>
   </generic-modal>
 </template>
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { ProjectIdentifier } from "@/types";
+import { IdentifierModel } from "@/types";
+import { createProjectIdentifier } from "@/util";
 import { GenericModal } from "@/components/common";
-import { ProjectIdentifierInput } from "@/components/project/shared";
+import ProjectFilesInput from "./ProjectFilesInput.vue";
+import ProjectIdentifierInput from "./ProjectIdentifierInput.vue";
 
 /**
  * A modal for renaming a project.
@@ -38,9 +56,11 @@ import { ProjectIdentifierInput } from "@/components/project/shared";
  * @emits-2 `save` (ProjectIdentifier) - On project save.
  */
 export default Vue.extend({
+  name: "ProjectIdentifierModal",
   components: {
     GenericModal,
     ProjectIdentifierInput,
+    ProjectFilesInput,
   },
   props: {
     isOpen: {
@@ -48,7 +68,7 @@ export default Vue.extend({
       required: true,
     },
     project: {
-      type: Object as PropType<ProjectIdentifier>,
+      type: Object as PropType<IdentifierModel>,
       required: false,
     },
     title: {
@@ -60,44 +80,48 @@ export default Vue.extend({
       required: false,
       default: false,
     },
+    doShowUpload: Boolean,
   },
   data() {
     return {
-      name: "",
-      description: "",
+      identifier: createProjectIdentifier(this.project),
+      isUploadOpen: false,
+      isDisabled: true,
     };
   },
-  mounted() {
-    this.clearData();
-  },
   watch: {
-    isOpen(isOpen: boolean) {
-      if (!isOpen) {
-        this.clearData();
-      }
+    /**
+     * Resets identifier data when opened.
+     */
+    isOpen(open: boolean) {
+      if (!open) return;
+
+      this.identifier = createProjectIdentifier(this.project);
     },
-    project(project: ProjectIdentifier | undefined): void {
-      if (project !== undefined) {
-        this.name = project.name;
-        this.description = project.description;
-      }
+    /**
+     * Verified fields when the identifier changes.
+     */
+    identifier: {
+      deep: true,
+      handler() {
+        this.isDisabled =
+          this.identifier.name.length === 0 ||
+          (this.doShowUpload && this.isUploadOpen);
+      },
     },
   },
   methods: {
-    clearData() {
-      this.name = this.project?.name || "";
-      this.description = this.project?.description || "";
-    },
-    onClose() {
+    /**
+     * Emits a request to close.
+     */
+    handleClose() {
       this.$emit("close");
     },
-    onSave() {
-      const projectId = this.project?.projectId || "";
-      this.$emit("save", {
-        projectId: projectId,
-        name: this.name,
-        description: this.description,
-      } as ProjectIdentifier);
+    /**
+     * Emits a request to save a project.
+     */
+    handleSave() {
+      this.$emit("save", this.identifier);
     },
   },
 });

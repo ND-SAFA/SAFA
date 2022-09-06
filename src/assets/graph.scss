@@ -1,95 +1,62 @@
-$color-warning: #EEBC3D;
-$color-added: #81c784;
-$color-removed: #e57373;
-$color-modified: #64b5f6;
-$color-border: #888888;
+$color-warning: #F5B53F;
+$color-added: #6CD8A9;
+$color-removed: #E27171;
+$color-modified: #8DA5D3;
+$color-selected: #EEEEEE;
+$color-border: #969696;
+$color-text: #969696;
 $graph-border-width: 1px;
 $graph-border-radius: 8px;
 
-.artifact-tree {
+.cy-container,
+#cytoscape-div,
+#cytoscape-artifact {
+  height: 100% !important;
+  max-height: 100vh !important;
+}
+
+.artifact-view {
   opacity: 0;
 
   &.visible {
-    transition: opacity 0.25s ease-in-out;
+    transition: opacity 0.2s ease-in-out;
+    transition-delay: 0.2s;
     opacity: 100;
   }
-}
 
-.artifact-container {
-  display: flex;
-  flex-direction: column;
-  white-space: nowrap;
-  overflow: hidden;
-  border-radius: $graph-border-radius;
-  border: $graph-border-width solid $color-border;
-}
-
-.artifact-header {
-  text-align: center;
-  border-bottom: $graph-border-width solid $color-border;
-  margin: 0 5px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.artifact-sub-header {
-  text-align: center;
-}
-
-.artifact-body {
-  padding: 0 5px 5px 5px;
-  text-align: center;
-  white-space: initial;
-  flex-grow: 1;
-  line-height: 1 !important;
-}
-
-.artifact-footer {
-  height: 25px;
-  text-align: center;
-  display: flex;
-  align-items: center;
-  width: 100%;
-
-  & > * {
-    justify-content: center;
-  }
-
-  & > :nth-child(2) {
-    border-top-left-radius: $graph-border-radius;
-  }
-
-  & > div > span {
-    text-overflow: ellipsis;
-    overflow: hidden;
-  }
-
-  .warning-text {
-    overflow: hidden;
-    background-color: $color-warning;
-    height: 110%;
+  &.disabled {
+    display: none;
   }
 }
 
-.artifact-stoplight {
-  height: 10px;
-  border-top: 1px solid $color-border;
-
-  .artifact-added {
-    background: $color-added;
+.artifact-svg-wrapper {
+  &:hover > .artifact-svg {
+    fill: #FFFFFF;
+    filter: drop-shadow(0px 2px 2px rgb(0 0 0 / 0.3));
   }
 
-  .artifact-removed {
-    background: $color-removed;
+  &:hover > .artifact-border {
+    fill: darken($color-border, 50);
   }
 
-  .artifact-modified {
-    background: $color-modified;
+  &:hover > .artifact-svg-div {
+    stroke: darken($color-border, 50);
+  }
+
+  &.artifact-svg-delta-ADDED:hover > .artifact-svg {
+    fill: lighten($color-added, 10);
+  }
+
+  &.artifact-svg-delta-MODIFIED:hover > .artifact-svg {
+    fill: lighten($color-modified, 10);
+  }
+
+  &.artifact-svg-delta-REMOVED:hover > .artifact-svg {
+    fill: lighten($color-removed, 10);
   }
 }
 
-#cy-container,
-#cytoscape-div {
-  height: 100% !important;
-  max-height: 100% !important;
+.no-icon-rotate {
+  cursor: pointer !important;
+  transform: none !important;
 }

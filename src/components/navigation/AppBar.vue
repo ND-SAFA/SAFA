@@ -2,45 +2,40 @@
   <v-app-bar app clipped-right clipped-left color="primary">
     <v-flex>
       <app-bar-header />
-      <v-divider class="blue-grey" v-if="doShowGraphButtons" />
-      <loading-bar v-if="!doShowGraphButtons" :isLoading="isLoading" />
+      <v-divider class="white faded mt-1" v-if="doShowGraphButtons" />
+      <loading-bar v-if="!doShowGraphButtons" />
     </v-flex>
 
     <template v-slot:extension v-if="doShowGraphButtons">
-      <v-row dense class="pt-1 full-width">
-        <v-col cols="4">
-          <v-row dense align="center">
-            <v-col class="flex-grow-0">
-              <generic-icon-button
-                color="secondary"
-                :tooltip="leftPanelTooltip"
-                :icon-id="
-                  isLeftOpen ? 'mdi-arrow-left' : 'mdi-information-outline'
-                "
-                @click="onLeftPanelClick"
-              />
-            </v-col>
-            <v-col>
-              <document-selector />
-            </v-col>
-          </v-row>
-        </v-col>
-        <v-col cols="4">
-          <graph-nav-icons />
-        </v-col>
-        <v-col cols="4">
-          <v-row justify="end" class="ma-0 pa-0">
+      <v-row dense class="full-width">
+        <v-col cols="8">
+          <flex-box>
             <generic-icon-button
-              color="secondary"
-              :tooltip="rightPanelTooltip"
-              :icon-id="isRightOpen ? 'mdi-arrow-right' : 'mdi-family-tree'"
-              @click="onRightPanelClick"
+              color="white"
+              :tooltip="leftPanelTooltip"
+              :icon-id="leftPanelIcon"
+              data-cy="button-left-panel-toggle"
+              @click="handleLeftPanelClick"
             />
-          </v-row>
+            <document-selector />
+            <graph-buttons />
+            <searchbar />
+          </flex-box>
+        </v-col>
+        <v-col cols="4">
+          <flex-box justify="end">
+            <generic-icon-button
+              color="white"
+              :tooltip="rightPanelTooltip"
+              :icon-id="rightPanelIcon"
+              data-cy="button-right-panel-toggle"
+              @click="handleRightPanelClick"
+            />
+          </flex-box>
         </v-col>
       </v-row>
       <v-row>
-        <loading-bar :isLoading="isLoading" />
+        <loading-bar />
       </v-row>
     </template>
   </v-app-bar>
@@ -48,55 +43,96 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { appModule } from "@/store";
-import { GenericIconButton } from "@/components/common";
+import { Route } from "vue-router";
+import { appStore, documentStore } from "@/hooks";
 import { router, Routes } from "@/router";
-import AppBarHeader from "./AppBarHeader.vue";
-import GraphNavIcons from "./GraphNavIcons.vue";
+import { GenericIconButton, FlexBox } from "@/components/common";
 import LoadingBar from "./LoadingBar.vue";
-import DocumentSelector from "@/components/navigation/DocumentSelector.vue";
+import { DocumentSelector } from "./document";
+import { AppBarHeader, GraphButtons, Searchbar } from "./header";
 
+/**
+ * Displays the navigation top bar.
+ */
 export default Vue.extend({
+  name: "AppBar",
   components: {
+    FlexBox,
+    Searchbar,
     DocumentSelector,
-    GraphNavIcons,
+    GraphButtons,
     AppBarHeader,
     GenericIconButton,
     LoadingBar,
   },
-  props: {
-    isLeftOpen: Boolean,
-    isRightOpen: Boolean,
+  data() {
+    return {
+      doShowGraphButtons: router.currentRoute.path === Routes.ARTIFACT,
+    };
+  },
+  watch: {
+    /**
+     * Checks whether the graph buttons should be visible when the route changes.
+     */
+    $route(to: Route) {
+      this.doShowGraphButtons = to.path === Routes.ARTIFACT;
+    },
   },
   computed: {
-    doShowGraphButtons(): boolean {
-      return router.currentRoute.path === Routes.ARTIFACT_TREE;
+    /**
+     * @return Whether the left panel is open.
+     */
+    isLeftOpen: () => appStore.isLeftPanelOpen,
+    /**
+     * @return Whether the right panel is open.
+     */
+    isRightOpen: () => appStore.isRightPanelOpen,
+    /**
+     * @return Whether to disable graphing buttons.
+     */
+    doDisableButtons(): boolean {
+      return documentStore.isTableDocument;
     },
-    isLoading(): boolean {
-      return appModule.getIsLoading;
+    /**
+     * @return The left panel button icon to display.
+     */
+    leftPanelIcon(): string {
+      return this.isLeftOpen ? "mdi-arrow-left" : "mdi-information-outline";
     },
+    /**
+     * @return The left panel button tooltip to display.
+     */
     leftPanelTooltip(): string {
       return this.isLeftOpen
         ? "Close Artifact Details"
         : "Open Artifact Details";
     },
+    /**
+     * @return The right panel button icon to display.
+     */
+    rightPanelIcon(): string {
+      return this.isRightOpen ? "mdi-arrow-right" : "mdi-family-tree";
+    },
+    /**
+     * @return The right panel button tooltip to display.
+     */
     rightPanelTooltip(): string {
       return this.isRightOpen ? "Close Graph Options" : "Open Graph Options";
     },
   },
   methods: {
-    onLeftPanelClick() {
-      appModule.toggleLeftPanel();
+    /**
+     * Toggles the left panel.
+     */
+    handleLeftPanelClick() {
+      appStore.toggleLeftPanel();
     },
-    onRightPanelClick() {
-      appModule.toggleRightPanel();
+    /**
+     * Toggles the right panel.
+     */
+    handleRightPanelClick() {
+      appStore.toggleRightPanel();
     },
   },
 });
 </script>
-
-<style scoped>
-.divider-theme {
-  border-right: 1px solid grey;
-}
-</style>

@@ -1,25 +1,20 @@
 import {
   SessionModel,
-  UserChangeModel,
+  PasswordResetModel,
   UserModel,
   UserResetModel,
+  PasswordChangeModel,
 } from "@/types";
-import { baseURL, Endpoint, fillEndpoint, authHttpClient } from "@/api/util";
-
-/**
- * TODO: remove once endpoints exist.
- */
-const TEST_ENDPOINTS = true;
+import { baseURL, Endpoint, fillEndpoint, authHttpClient } from "@/api";
 
 /**
  * Custom fetch call for session endpoints.
  *
  * @param args - Args to pass to fetch.
- *
  * @throws Error - Response status was not 200.
  */
 async function sessionFetch<T>(...args: Parameters<typeof fetch>): Promise<T> {
-  const response = await fetch(...args);
+  const response = await fetch(`${baseURL}/${args[0]}`, args[1]);
 
   if (!response.ok) {
     throw Error("Unable to find a session.");
@@ -32,43 +27,33 @@ async function sessionFetch<T>(...args: Parameters<typeof fetch>): Promise<T> {
  * Creates a new account.
  *
  * @param user - The user to create.
- *
- * @return SessionModel - The session for the logged in user.
- *
- * @throws Error - If the account cannot be created.
+ * @return The session for the logged in user.
+ * @throws If the account cannot be created.
  */
 export async function createUser(user: UserModel): Promise<SessionModel> {
-  return sessionFetch<SessionModel>(
-    `${baseURL}/${fillEndpoint(Endpoint.createAccount)}`,
-    {
-      method: "POST",
-      body: JSON.stringify(user),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }
-  );
+  return sessionFetch<SessionModel>(fillEndpoint(Endpoint.createAccount), {
+    method: "POST",
+    body: JSON.stringify(user),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
 }
 
 /**
- * Logs the given user in and stores authorization token in the current session.
- * This function uses the core fetch because it needs to intercept the HttpStatus
- * to validate if the call failed or succeeded.
+ * Logs the given user in.
  *
  * @param user - The user to log in.
- *
- * @return SessionModel - The session for the logged in user.
- *
- * @throws Error - If no session exists.
+ * @return The session for the logged in user.
+ * @throws If no session exists.
  */
-export async function loginUser(user: UserModel): Promise<SessionModel> {
-  return sessionFetch<SessionModel>(
-    `${baseURL}/${fillEndpoint(Endpoint.login)}`,
-    {
-      method: "POST",
-      body: JSON.stringify(user),
-    }
-  );
+export async function createLoginSession(
+  user: UserModel
+): Promise<SessionModel> {
+  return sessionFetch<SessionModel>(fillEndpoint(Endpoint.login), {
+    method: "POST",
+    body: JSON.stringify(user),
+  });
 }
 
 /**
@@ -76,11 +61,7 @@ export async function loginUser(user: UserModel): Promise<SessionModel> {
  *
  * @param user - The user to reset.
  */
-export async function forgotPassword(user: UserResetModel): Promise<void> {
-  if (TEST_ENDPOINTS) {
-    return;
-  }
-
+export async function createPasswordReset(user: UserResetModel): Promise<void> {
   await authHttpClient(fillEndpoint(Endpoint.forgotPassword), {
     method: "PUT",
     body: JSON.stringify(user),
@@ -88,21 +69,44 @@ export async function forgotPassword(user: UserResetModel): Promise<void> {
 }
 
 /**
+ * Requests to update a user's reset password.
+ *
+ * @param password - The password change information.
+ * @throws The password change request was unsuccessful.
+ */
+export async function updatePassword(
+  password: PasswordResetModel
+): Promise<void> {
+  await authHttpClient(fillEndpoint(Endpoint.resetPassword), {
+    method: "PUT",
+    body: JSON.stringify(password),
+  });
+}
+
+/**
  * Requests to change a user's password.
  *
- * @param user - The user to change the password.
- *
- * @return SessionModel - The session for the logged in user.
- *
- * @throws Error - The password change request was unsuccessful.
+ * @param password - The password change information.
+ * @throws The password change request was unsuccessful.
  */
-export async function resetPassword(user: UserChangeModel): Promise<void> {
-  if (TEST_ENDPOINTS) {
-    return;
-  }
-
-  await authHttpClient<SessionModel>(fillEndpoint(Endpoint.resetPassword), {
+export async function savePassword(
+  password: PasswordChangeModel
+): Promise<void> {
+  await authHttpClient(fillEndpoint(Endpoint.updatePassword), {
     method: "PUT",
-    body: JSON.stringify(user),
+    body: JSON.stringify(password),
+  });
+}
+
+/**
+ * Requests to delete a user's account.
+ *
+ * @param password - The current password.
+ * @throws The delete request was unsuccessful.
+ */
+export async function deleteAccount(password: string): Promise<void> {
+  await authHttpClient(fillEndpoint(Endpoint.deleteAccount), {
+    method: "POST",
+    body: JSON.stringify({ password }),
   });
 }

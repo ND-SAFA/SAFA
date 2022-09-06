@@ -4,15 +4,13 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { Artifact } from "@/types";
-import { ArtifactPanel } from "@/components/project/creator/uploaders";
-import { TimNodeDefinition } from "@/types/components/tim-tree";
+import { ArtifactPanel, TimNodeDefinition } from "@/types";
 
 /**
  * The node representing an artifact type in the tim tree.
  */
 export default Vue.extend({
-  name: "artifact-type-node",
+  name: "ArtifactTypeNode",
   props: {
     artifactPanel: {
       type: Object as PropType<ArtifactPanel>,
@@ -20,21 +18,16 @@ export default Vue.extend({
     },
   },
   computed: {
-    artifacts(): Artifact[] {
-      return this.artifactPanel.projectFile.artifacts;
-    },
-    type(): string {
-      return this.artifactPanel.projectFile.type;
-    },
-    count(): number {
-      return this.artifacts.length;
-    },
+    /**
+     * @return The artifact tim node to render.
+     */
     definition(): TimNodeDefinition {
       return {
         data: {
-          id: this.type,
+          id: this.artifactPanel.projectFile.type,
           type: "node",
-          count: this.count,
+          graph: "tim",
+          count: this.artifactPanel.projectFile.artifacts.length,
         },
       };
     },

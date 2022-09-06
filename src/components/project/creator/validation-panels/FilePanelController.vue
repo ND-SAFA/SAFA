@@ -1,7 +1,7 @@
 <template>
   <file-panel
     :show-file-uploader="!isGeneratedToggle"
-    @change="onChange"
+    @change="handleChange"
     @delete="$emit('delete')"
     @validate="setValidationState"
     :errors="errors"
@@ -10,7 +10,7 @@
     v-bind:ignore-errors-flag.sync="ignoreErrors"
   >
     <template v-slot:title>
-      <h1 class="text-h5">{{ title }}</h1>
+      <typography el="h2" variant="subtitle" :value="title" />
     </template>
 
     <template v-slot:before-rows v-if="isTracePanel">
@@ -26,7 +26,7 @@
 import Vue, { PropType } from "vue";
 import { ArtifactMap, IGenericFilePanel, ValidFileTypes } from "@/types";
 import { isTracePanel } from "@/util";
-import { GenericSwitch } from "@/components/common";
+import { GenericSwitch, Typography } from "@/components/common";
 import FilePanel from "./FilePanel.vue";
 
 /**
@@ -36,9 +36,11 @@ import FilePanel from "./FilePanel.vue";
  * @emits-2 `validate` (isValid: boolean) - On validate.
  */
 export default Vue.extend({
+  name: "FilePanelController",
   components: {
     GenericSwitch,
     FilePanel,
+    Typography,
   },
   props: {
     artifactMap: {
@@ -57,44 +59,71 @@ export default Vue.extend({
     };
   },
   computed: {
+    /**
+     * @return Whether this is a trace panel.
+     */
     isTracePanel(): boolean {
       return isTracePanel(this.panel);
     },
+    /**
+     * @return Whether this panel is valid.
+     */
     isValid(): boolean {
       return this.panel.getIsValid();
     },
+    /**
+     * @return Any errors in this panel.
+     */
     errors(): string[] {
       return this.panel.projectFile.errors;
     },
+    /**
+     * @return The title of the panel.
+     */
     title(): string {
       return this.panel.title;
     },
+    /**
+     * @return The names of the entities in the panel.
+     */
     entityNames(): string[] {
       return this.panel.entityNames;
     },
   },
   methods: {
-    async onChange(file: File | undefined): Promise<void> {
+    /**
+     * Parses added files.
+     * @param file - The file to parse.
+     */
+    async handleChange(file: File | undefined): Promise<void> {
       if (file === undefined) {
         this.panel.clearPanel();
       } else {
         await this.panel.parseFile(this.artifactMap, file);
       }
     },
+    /**
+     * Sets whether the panel is valid, and emits that change.
+     * @param isValid - Whether the panel is valid.
+     */
     setValidationState(isValid: boolean): void {
       this.panel.projectFile.isValid = isValid;
       this.$emit("validate", isValid);
     },
   },
   watch: {
+    /**
+     * Generates trace files when generate is toggled on.
+     */
     async isGeneratedToggle(isGenerated: boolean) {
-      if (isTracePanel(this.panel)) {
-        this.panel.projectFile.isGenerated = isGenerated;
-        if (isGenerated) {
-          await this.panel.generateTraceLinks(this.artifactMap);
-        } else {
-          this.panel.clearPanel();
-        }
+      if (!isTracePanel(this.panel)) return;
+
+      this.panel.projectFile.isGenerated = isGenerated;
+
+      if (isGenerated) {
+        await this.panel.generateTraceLinks(this.artifactMap);
+      } else {
+        this.panel.clearPanel();
       }
     },
   },

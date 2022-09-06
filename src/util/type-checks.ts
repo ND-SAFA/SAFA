@@ -1,40 +1,67 @@
-import { Artifact, EntityModification } from "@/types/domain";
-import { APIError, APIResponse } from "@/types/api/base-api";
 import {
+  ArtifactModel,
+  ArtifactData,
+  DeltaArtifact,
+  EntityModification,
   IGenericFilePanel,
   ProjectFile,
   TraceFile,
   TracePanel,
-} from "@/types/components";
+} from "@/types";
 
 /**
- * Returns whether the given APIResponse is an API error.
- *
- * @param blob - The response to check.
- *
- * @return Whether this item is an error.
- */
-export function isAPIError<T>(
-  blob: APIResponse<T> | APIError
-): blob is APIError {
-  return blob.status > 0;
-}
-
-/**
- * Returns whether the given ArtifactDelta is an modified artifact.
+ * Returns whether the given artifact or delta is a modified artifact.
  *
  * @param artifact - The artifact to check.
- *
- * @return Whether this item is an modified artifact.
+ * @return Whether this item is a modified artifact.
  */
 export function isModifiedArtifact(
-  artifact: any
-): artifact is EntityModification<Artifact> {
-  return "before" in artifact && "after" in artifact;
+  artifact: DeltaArtifact
+): artifact is EntityModification<ArtifactModel> {
+  const requiredFields = ["before", "after"];
+  return containsFields(artifact, requiredFields);
 }
 
-export function isArtifact(obj: any): obj is Artifact {
-  return "id" in obj && "summary" in obj && "body" in obj && "type" in obj;
+/**
+ * Returns whether the given artifact or delta is an artifact.
+ *
+ * @param artifact - The artifact to check.
+ * @return Whether this item is an artifact.
+ */
+export function isArtifact(artifact: DeltaArtifact): artifact is ArtifactModel {
+  const requiredFields = ["id", "summary", "body", "type"];
+  return containsFields(artifact, requiredFields);
+}
+
+/**
+ * Returns whether the given cytoscape data is an artifact.
+ *
+ * @param artifact - The artifact to check.
+ * @return Whether this item is an artifact.
+ */
+export function isArtifactData(artifact: unknown): artifact is ArtifactData {
+  const requiredFields = [
+    "body",
+    "artifactName",
+    "artifactType",
+    "artifactDeltaState",
+    "isSelected",
+    "opacity",
+  ];
+  return containsFields(artifact, requiredFields);
+}
+
+/**
+ * Returns whether an object contains certain fields.
+ *
+ * @param object - The object to check.
+ * @param fields - The fields required to exist on the object.
+ * @return Whether this object has all required fields.
+ */
+function containsFields(object: unknown, fields: string[]): boolean {
+  return fields
+    .map((field) => field in (object as Record<string, unknown>))
+    .reduce((prev, curr) => prev && curr, true);
 }
 
 /**
@@ -45,12 +72,8 @@ export function isArtifact(obj: any): obj is Artifact {
  * @return Whether this file is a trace file.
  */
 export function isTraceFile(file: ProjectFile): file is TraceFile {
-  return (
-    "source" in file &&
-    "target" in file &&
-    "isGenerated" in file &&
-    "traces" in file
-  );
+  const requiredFields = ["sourceId", "targetId", "isGenerated", "traces"];
+  return containsFields(file, requiredFields);
 }
 
 /**
@@ -61,7 +84,7 @@ export function isTraceFile(file: ProjectFile): file is TraceFile {
  * @return Whether this panel is a trace panel.
  */
 export function isTracePanel(
-  panel: IGenericFilePanel<any, any>
+  panel: IGenericFilePanel<Record<string, unknown>, ProjectFile>
 ): panel is TracePanel {
   return isTraceFile(panel.projectFile);
 }

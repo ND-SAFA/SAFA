@@ -1,42 +1,11 @@
-import { typeOptionsModule, traceModule } from "@/store";
+import { NodeSingular, EdgeDataDefinition } from "cytoscape";
 import { EdgeHandlersOptions } from "@/types";
 import { getTraceId } from "@/util";
-import { NodeSingular, EdgeDataDefinition } from "cytoscape";
+import { canConnect } from "@/cytoscape/plugins/edge-handles/can-connect";
 
 // the default values of each option are outlined below:
 export const artifactTreeEdgeHandleOptions: EdgeHandlersOptions = {
-  /**
-   * Return whether any two nodes can be traced. Criteria includes:
-   * - source != target.
-   * - trace link between source and target doesn't already exist.
-   *
-   * @param sourceNode - The source node on the graph.
-   * @param targetNode - The target node on the graph.
-   * @returns Whether the two nodes can be traced.
-   */
-  canConnect(sourceNode: NodeSingular, targetNode: NodeSingular): boolean {
-    if (sourceNode.data() === undefined || targetNode.data() === undefined) {
-      // If either link doesn't have any data, the link cannot be created.
-      return false;
-    }
-
-    // If this link already exists, the link cannot be created.
-    const linkDoesNotExist = !traceModule.doesLinkExist(
-      sourceNode.data().id,
-      targetNode.data().id
-    );
-
-    // If this link is to itself, the link cannot be created.
-    const isNotSameNode = !sourceNode.same(targetNode);
-
-    // If the link is not between allowed artifact directions, thee link cannot be created.
-    const linkIsAllowedByType = typeOptionsModule.isLinkAllowedByType(
-      sourceNode.data().artifactType,
-      targetNode.data().artifactType
-    );
-
-    return linkDoesNotExist && isNotSameNode && linkIsAllowedByType;
-  },
+  canConnect,
 
   /**
    * Handler that determines the data to be added to cytoscape upon the edge snap

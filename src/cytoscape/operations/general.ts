@@ -1,13 +1,18 @@
-import { CyPromise, LayoutPayload } from "@/types";
-import { artifactTreeCyPromise } from "@/cytoscape/cy";
+import {
+  CyPromise,
+  IGraphLayout,
+  InternalTraceType,
+  LayoutPayload,
+} from "@/types";
+import { selectionStore } from "@/hooks";
+import { applyAutoMoveEvents } from "@/cytoscape";
+import { artifactTreeCyPromise, timTreeCyPromise } from "@/cytoscape/cy";
 import {
   ANIMATION_DURATION,
   CENTER_GRAPH_PADDING,
   DEFAULT_ARTIFACT_TREE_ZOOM,
   ZOOM_INCREMENT,
 } from "@/cytoscape/styles";
-import { appModule, logModule, viewportModule } from "@/store";
-import { areArraysEqual } from "@/util";
 
 /**
  * Runs the given callback if cy is not animated.
@@ -47,7 +52,6 @@ export function cyZoomReset(
 export function cyZoomIn(cyPromise: CyPromise = artifactTreeCyPromise): void {
   cyPromise.then((cy) => {
     cy.zoom(cy.zoom() + ZOOM_INCREMENT);
-    cy.center(cy.nodes());
   });
 }
 
@@ -59,7 +63,6 @@ export function cyZoomIn(cyPromise: CyPromise = artifactTreeCyPromise): void {
 export function cyZoomOut(cyPromise: CyPromise = artifactTreeCyPromise): void {
   cyPromise.then((cy) => {
     cy.zoom(cy.zoom() - ZOOM_INCREMENT);
-    cy.center(cy.nodes());
   });
 }
 
@@ -88,6 +91,34 @@ export function cyCreateLayout(layoutPayload: LayoutPayload): void {
 }
 
 /**
+ * Re-applies automove to all nodes.
+ *
+ * @param layout - The graph layout.
+ * @param cyPromise - The cy instance.
+ */
+export function cyApplyAutomove(
+  layout: IGraphLayout,
+  cyPromise: CyPromise = artifactTreeCyPromise
+): void {
+  cyPromise.then((cy) => {
+    applyAutoMoveEvents(cy, layout);
+  });
+}
+
+/**
+ * Re-moves automove from all nodes.
+ *
+ * @param cyPromise - The cy instance.
+ */
+export function cyRemoveAutomove(
+  cyPromise: CyPromise = artifactTreeCyPromise
+): void {
+  cyPromise.then((cy) => {
+    cy.automove("destroy");
+  });
+}
+
+/**
  * Moves the viewport such that given set of artifacts is in the middle of the viewport.
  * If no artifacts are given, the entire collection of nodes is centered.
  * Request is ignored if current animation is in progress to center the same collection of artifacts.
@@ -105,16 +136,7 @@ export function cyCenterOnArtifacts(
 ): void {
   cyPromise.then((cy) => {
     if (cy.animated()) {
-      if (
-        currentCenteringCollection !== undefined &&
-        areArraysEqual(currentCenteringCollection, artifactIds)
-      ) {
-        return logModule.onDevWarning(
-          `Collection is already being rendered: ${artifactIds}`
-        );
-      } else {
-        cy.stop(false, false);
-      }
+      cy.stop(false, false);
     }
 
     setCenteredArtifacts(artifactIds);
@@ -166,7 +188,8 @@ export function cySetDisplay(
     cy.edges()
       .filter(
         (e) =>
-          artifactIds.includes(e.target().data().id) ||
+          e.data().type !== InternalTraceType.SUBTREE &&
+          artifactIds.includes(e.target().data().id) &&
           artifactIds.includes(e.source().data().id)
       )
       .style({ display });
@@ -184,5 +207,33 @@ export function cyDisplayAll(
   cyPromise.then((cy) => {
     cy.nodes().style({ display: "element" });
     cy.edges().style({ display: "element" });
+  });
+}
+
+/**
+ * Centers the viewport on all graph nodes.
+ *
+ * @param cyPromise - The cy instance.
+ */
+export function cyResetTree(
+  cyPromise: CyPromise = artifactTreeCyPromise
+): void {
+  const selectedId = selectionStore.selectedArtifactId;
+
+  if (selectedId) {
+    selectionStore.selectArtifact(selectedId);
+  } else {
+    cyCenterNodes(cyPromise);
+  }
+}
+
+/**
+ * Centers the viewport on all graph nodes.
+ *
+ * @param cyPromise - The cy instance.
+ */
+export function cyResetTim(cyPromise: CyPromise = timTreeCyPromise): void {
+  cyPromise.then((cy) => {
+    cy.fit(cy.nodes(), 150);
   });
 }

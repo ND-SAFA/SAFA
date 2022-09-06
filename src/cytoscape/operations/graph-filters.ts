@@ -1,5 +1,5 @@
-import { Artifact } from "@/types";
 import { SingularElementArgument } from "cytoscape";
+import { ArtifactModel } from "@/types";
 
 /**
  * Returns whether the element is either:
@@ -31,7 +31,10 @@ export function isRelatedToArtifacts(
  * @param artifact - The artifact to find.
  * @return Whether the element in the subtree or the subtree is empty.
  */
-export function isInSubtree(subtreeIds: string[], artifact: Artifact): boolean {
+export function isInSubtree(
+  subtreeIds: string[],
+  artifact: ArtifactModel
+): boolean {
   return subtreeIds.length === 0 || subtreeIds.includes(artifact.id);
 }
 
@@ -44,7 +47,7 @@ export function isInSubtree(subtreeIds: string[], artifact: Artifact): boolean {
  */
 export function doesNotContainType(
   ignoreTypes: string[] | undefined,
-  artifact: Artifact
+  artifact: ArtifactModel
 ): boolean {
   return ignoreTypes === undefined || !ignoreTypes.includes(artifact.type);
 }

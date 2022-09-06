@@ -1,7 +1,7 @@
 /**
  * Enumerates the type of trace approvals.
  */
-export enum TraceApproval {
+export enum ApprovalType {
   UNREVIEWED = "UNREVIEWED",
   APPROVED = "APPROVED",
   DECLINED = "DECLINED",
@@ -16,9 +16,24 @@ export enum TraceType {
 }
 
 /**
+ * Enumerates the type of traces used internally.
+ */
+export enum InternalTraceType {
+  SUBTREE = "SUBTREE",
+}
+
+/**
+ * Enumerates the type of generated trace models.
+ */
+export enum ModelType {
+  TBERT = "TBERT",
+  VSM = "VSM",
+}
+
+/**
  * Defines a link.
  */
-export interface Link {
+export interface LinkModel {
   /**
    * The source node ID.
    */
@@ -40,7 +55,7 @@ export interface Link {
 /**
  * Defines a trace link.
  */
-export interface TraceLink extends Link {
+export interface TraceLinkModel extends LinkModel {
   /**
    * The trace link ID.
    */
@@ -48,7 +63,7 @@ export interface TraceLink extends Link {
   /**
    * The approval status of the trace.
    */
-  approvalStatus: TraceApproval;
+  approvalStatus: ApprovalType;
   /**
    * The confidence score of the trace.
    */
@@ -60,15 +75,23 @@ export interface TraceLink extends Link {
 }
 
 /**
- * Defines a displayable trace link.
+ * Represents a trace link merged with other properties.
  */
-export interface TraceLinkDisplayData extends TraceLink {
+export interface FlatTraceLink extends TraceLinkModel {
   /**
-   * The body of the source of the link.
+   * The type of source artifact.
+   */
+  sourceType: string;
+  /**
+   * The body of source artifact.
    */
   sourceBody: string;
   /**
-   * The body of the target of the link.
+   * The type of target artifact.
+   */
+  targetType: string;
+  /**
+   * The body of target artifact.
    */
   targetBody: string;
 }
@@ -77,8 +100,8 @@ export interface TraceLinkDisplayData extends TraceLink {
  * Link used when hiding subtrees to summarize the links of the children
  * of some root node.
  */
-export interface SubtreeLink extends TraceLink {
-  type: "SUBTREE";
+export interface SubtreeLinkModel extends TraceLinkModel {
+  type: InternalTraceType.SUBTREE;
   /**
    * The id of the artifact.
    */
@@ -88,7 +111,7 @@ export interface SubtreeLink extends TraceLink {
 /**
  * The direction of trace links allowed by an artifact type.
  */
-export interface ArtifactDirection {
+export interface TraceDirectionModel {
   /**
    * The name of source the artifact type.
    */
@@ -102,7 +125,7 @@ export interface ArtifactDirection {
 /**
  * The direction of trace links allowed by an artifact type, with a label.
  */
-export interface LabeledArtifactDirection extends ArtifactDirection {
+export interface LabelledTraceDirectionModel extends TraceDirectionModel {
   /**
    * The label to present an artifact direction.
    */
@@ -115,4 +138,22 @@ export interface LabeledArtifactDirection extends ArtifactDirection {
    * The index of the icon representing this artifact type.
    */
   iconIndex: number;
+}
+
+/**
+ * Represents links generated for a project.
+ */
+export interface GeneratedLinksModel {
+  /**
+   * All generated links.
+   */
+  traceLinks: FlatTraceLink[];
+  /**
+   * Approved generated link ids.
+   */
+  approvedIds: string[];
+  /**
+   * Declined generated link ids.
+   */
+  declinedIds: string[];
 }

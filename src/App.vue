@@ -7,23 +7,25 @@
         </keep-alive>
       </transition>
     </v-main>
-
-    <snackbar :timeout="5000" />
+    <navigation />
   </v-app>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { verifyAuthentication } from "@/api";
-import { Snackbar } from "@/components";
+import { handleAuthentication } from "@/api";
+import { Navigation } from "@/components";
 
+/**
+ * Renders the SAFA app.
+ */
 export default Vue.extend({
-  name: "app",
+  name: "App",
   components: {
-    Snackbar,
+    Navigation,
   },
   async mounted() {
-    await verifyAuthentication();
+    await handleAuthentication();
   },
 });
 </script>

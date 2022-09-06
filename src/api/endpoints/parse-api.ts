@@ -1,23 +1,22 @@
-import { ParseArtifactFileResponse, ParseTraceFileResponse } from "@/types";
-import { Endpoint, fillEndpoint, authHttpClient } from "@/api/util";
+import { ParseArtifactFileModel, ParseTraceFileModel } from "@/types";
+import { Endpoint, fillEndpoint, authHttpClient } from "@/api";
 
 /**
- * Sends BEND an ArtifactDefinition file and returns parsed artifacts and errors.
+ * Parses an artifact file into artifacts.
  *
  * @param artifactType - The type of artifact to parse.
  * @param file - The artifact file to parse.
- *
  * @return The parsed artifact file.
  */
 export async function parseArtifactFile(
   artifactType: string,
   file: File
-): Promise<ParseArtifactFileResponse> {
+): Promise<ParseArtifactFileModel> {
   const formData = new FormData();
 
   formData.append("file", file);
 
-  return authHttpClient<ParseArtifactFileResponse>(
+  return authHttpClient<ParseArtifactFileModel>(
     fillEndpoint(Endpoint.parseArtifactFile, { artifactType }),
     {
       method: "POST",
@@ -28,20 +27,17 @@ export async function parseArtifactFile(
 }
 
 /**
- * Parses a trace file.
+ * Parses a trace file into trace links.
  *
  * @param file - The trace file to parse.
- *
  * @return The parsed trace file.
  */
-export async function parseTraceFile(
-  file: File
-): Promise<ParseTraceFileResponse> {
+export async function parseTraceFile(file: File): Promise<ParseTraceFileModel> {
   const formData = new FormData();
 
   formData.append("file", file);
 
-  return authHttpClient<ParseTraceFileResponse>(
+  return authHttpClient<ParseTraceFileModel>(
     Endpoint.parseTraceFile,
     {
       method: "POST",

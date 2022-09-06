@@ -1,5 +1,6 @@
 @import "./typography.scss";
 @import "./graph.scss";
+@import "./table.scss";
 @import "./context-menu.scss";
 
 .full-window-page {
@@ -10,6 +11,27 @@
 
 .full-width {
   width: 100%;
+}
+
+.width {
+  &-min {
+    width: min-content;
+  }
+  &-max {
+    width: max-content;
+  }
+  &-fit {
+    width: fit-content;
+  }
+}
+
+.faded {
+  opacity: 0.6;
+}
+
+.disable-events {
+  pointer-events: none;
+  opacity: 0.6;
 }
 
 // Fixes code-diff's broken styling

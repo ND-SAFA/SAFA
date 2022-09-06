@@ -1,10 +1,18 @@
 <template>
-  <v-container class="mb-0 pb-0" style="max-width: 30em">
-    <v-text-field v-model="currentName" label="Project Name" required />
+  <v-container style="max-width: 30em">
     <v-text-field
+      filled
+      v-model="currentName"
+      label="Project Name"
+      :data-cy="dataCyName"
+    />
+    <v-textarea
+      filled
+      hide-details
       v-model="currentDescription"
-      label="Project description"
-      required
+      label="Project Description"
+      rows="3"
+      :data-cy="dataCyDescription"
     />
   </v-container>
 </template>
@@ -20,6 +28,7 @@ import Vue from "vue";
  * @emits-3 `close` - On close.
  */
 export default Vue.extend({
+  name: "ProjectIdentifierInput",
   props: {
     name: {
       type: String,
@@ -29,8 +38,19 @@ export default Vue.extend({
       type: String,
       required: true,
     },
+    dataCyName: {
+      type: String,
+      default: "input-project-name",
+    },
+    dataCyDescription: {
+      type: String,
+      default: "input-project-description",
+    },
   },
   computed: {
+    /**
+     * Emits changes to the name.
+     */
     currentName: {
       get(): string {
         return this.name;
@@ -39,6 +59,9 @@ export default Vue.extend({
         this.$emit("update:name", newName);
       },
     },
+    /**
+     * Emits changes to the description.
+     */
     currentDescription: {
       get(): string {
         return this.description;
@@ -46,16 +69,6 @@ export default Vue.extend({
       set(newDescription: string): void {
         this.$emit("update:description", newDescription);
       },
-    },
-  },
-  methods: {
-    clearData() {
-      this.currentName = "";
-      this.currentDescription = "";
-    },
-    onClose() {
-      this.$emit("close");
-      this.clearData();
     },
   },
 });

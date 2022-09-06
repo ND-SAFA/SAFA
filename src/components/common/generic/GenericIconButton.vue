@@ -1,5 +1,5 @@
 <template>
-  <v-tooltip bottom>
+  <v-tooltip bottom z-index="10000">
     <template v-slot:activator="{ on, attrs }">
       <v-btn
         v-on="on"
@@ -7,10 +7,13 @@
         :color="color"
         :icon="!fab"
         :fab="fab"
+        :class="disabled ? 'disable-events' : ''"
+        :small="small"
+        :hidden="isHidden"
+        :data-cy="dataCy"
         @click="$emit('click')"
-        :disabled="disabled"
       >
-        <v-icon>{{ iconId }}</v-icon>
+        <v-icon :style="iconStyle">{{ iconId }}</v-icon>
       </v-btn>
     </template>
     <span>{{ tooltip }}</span>
@@ -26,8 +29,9 @@ import Vue from "vue";
  * @emits `click` - On button click.
  */
 export default Vue.extend({
-  name: "generic-icon-button",
+  name: "GenericIconButton",
   props: {
+    dataCy: String,
     tooltip: {
       type: String,
       required: true,
@@ -37,10 +41,16 @@ export default Vue.extend({
       required: true,
     },
     color: String,
+    iconStyle: String,
     fab: Boolean,
+    small: Boolean,
     isDisabled: Boolean,
+    isHidden: Boolean,
   },
   computed: {
+    /**
+     * @return Whether the button is disabled.
+     */
     disabled(): boolean {
       return this.isDisabled === undefined ? false : this.isDisabled;
     },

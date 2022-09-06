@@ -11,7 +11,7 @@ import Vue from "vue";
  * @emits `input` (boolean) - On input change.
  */
 export default Vue.extend({
-  name: "generic-switch",
+  name: "GenericSwitch",
   props: {
     label: {
       type: String,
@@ -23,6 +23,9 @@ export default Vue.extend({
     },
   },
   computed: {
+    /**
+     * @return The current value, and emits the value when changed.
+     */
     switchValue: {
       get(): boolean {
         return this.value;

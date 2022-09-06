@@ -1,15 +1,14 @@
 import klay from "cytoscape-klay";
 import nodeHtmlLabel from "cytoscape-node-html-label";
 
-import { CytoCoreGraph, CytoCore } from "@/types";
-import { viewportModule } from "@/store";
+import { CytoCoreGraph } from "@/types";
+import { layoutStore } from "@/hooks";
 import { timTreeResolveCy } from "@/cytoscape/cy";
 import {
   DEFAULT_ARTIFACT_TREE_ZOOM,
   MOTION_BLUE_OPACITY,
   USE_MOTION_BLUR,
   TimStyleSheets,
-  timNodeHtml,
 } from "@/cytoscape/styles";
 
 /**
@@ -31,10 +30,10 @@ export const timGraph: CytoCoreGraph = {
     },
     {
       initialize: nodeHtmlLabel,
-      afterInit: (cy: CytoCore) => cy.nodeHtmlLabel([timNodeHtml]),
+      afterInit: () => undefined,
     },
   ],
-  afterInit: async () => {
-    await viewportModule.setTimTreeLayout();
+  async afterInit() {
+    await layoutStore.setTimTreeLayout();
   },
 };

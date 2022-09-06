@@ -1,8 +1,8 @@
+import { DocumentType, FTANodeType, SafetyCaseType } from "@/types";
+
 /**
  * Enumerates the allowed trace link directions between artifact types.
  */
-import { TraceLink } from "@/types";
-
 export type ArtifactTypeDirections = Record<string, string[]>;
 
 /**
@@ -18,45 +18,34 @@ export enum PanelType {
   right,
   artifactCreator,
   errorDisplay,
+  artifactBody,
+  traceLinkCreator,
+  traceLinkDraw,
+  traceLinkGenerator,
 }
 
 /**
- * Defines the state of a panel.
+ * Represents the open state of the artifact creator.
  */
-export interface PanelState {
-  /**
-   * The type of panel.
-   */
-  type: PanelType;
-  /**
-   * Whether the panel is open.
-   */
-  isOpen: boolean;
+export type PanelOpenState =
+  | boolean
+  | SafetyCaseType
+  | FTANodeType
+  | DocumentType;
+
+/**
+ * Represents the states of all openable panels.
+ */
+export interface PanelStateMap {
+  [PanelType.left]: boolean;
+  [PanelType.right]: boolean;
+  [PanelType.artifactCreator]: PanelOpenState;
+  [PanelType.errorDisplay]: boolean;
+  [PanelType.artifactBody]: boolean;
+  [PanelType.traceLinkCreator]: boolean;
+  [PanelType.traceLinkDraw]: boolean;
+  [PanelType.traceLinkGenerator]: boolean;
 }
-
-/**
- * Defines a channel subscription.
- */
-export interface ChannelSubscriptionId {
-  /**
-   * The project's id.
-   */
-  projectId?: string;
-  /**
-   * The version's id.
-   */
-  versionId?: string;
-}
-
-/**
- * Returns whether a link exists from the given source to the given target ID.
- */
-export type LinkValidator = (sourceId: string, targetId: string) => boolean;
-
-/**
- * Returns the trace link between the given artifact ids.
- */
-export type LinkFinder = (sourceId: string, targetId: string) => TraceLink;
 
 /**
  * Defines a title and message for a confirmation dialog.
@@ -77,3 +66,14 @@ export enum ConfirmationType {
  * General type for representing an empty callback
  */
 export type EmptyLambda = () => void;
+
+/**
+ * Enumerates keys used in local storage.
+ */
+export enum LocalStorageKeys {
+  SESSION_TOKEN = "t",
+  JIRA_REFRESH_TOKEN = "jrt",
+  JIRA_CLOUD_ID = "jci",
+  GIT_HUB_REFRESH_TOKEN = "grt",
+  GIT_HUB_INSTALLATION_ID = "gid",
+}

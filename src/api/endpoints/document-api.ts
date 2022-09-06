@@ -1,98 +1,133 @@
-import { Artifact, Project, ProjectDocument } from "@/types";
+import { ArtifactModel, DocumentModel } from "@/types";
 import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
 
 /**
- * Creates given document under project specified.
+ * Creates or updates given document under project specified.
+ *
  * @param versionId - The version to mark the document as created.
- * @param document The document to be created.
+ * @param document - The document to be created.
+ * @return The saved document.
  */
-export async function createOrUpdateDocument(
+export async function saveDocument(
   versionId: string,
-  document: ProjectDocument
-): Promise<ProjectDocument> {
-  const url = fillEndpoint(Endpoint.createOrUpdateDocument, {
-    versionId,
-  });
-  return authHttpClient<ProjectDocument>(url, {
-    method: "POST",
-    body: JSON.stringify(document),
-  });
+  document: DocumentModel
+): Promise<DocumentModel> {
+  return authHttpClient<DocumentModel>(
+    fillEndpoint(Endpoint.createOrUpdateDocument, {
+      versionId,
+    }),
+    {
+      method: "POST",
+      body: JSON.stringify(document),
+    }
+  );
 }
 
 /**
  * Returns list of documents associated with given project.
- * @param projectId The UUID of the project whose documents are retrieved.
+ *
+ * @param versionId - The project version to get documents for.
+ * @return The project's documents.
  */
-export async function getProjectDocuments(
-  projectId: string
-): Promise<ProjectDocument[]> {
-  const url = fillEndpoint(Endpoint.getProjectDocuments, {
-    projectId,
-  });
-  return authHttpClient<ProjectDocument[]>(url, {
-    method: "GET",
-  });
+export async function getDocuments(
+  versionId: string
+): Promise<DocumentModel[]> {
+  return authHttpClient<DocumentModel[]>(
+    fillEndpoint(Endpoint.getProjectDocuments, {
+      versionId,
+    }),
+    {
+      method: "GET",
+    }
+  );
 }
 
 /**
- * Deletes the given document from the database. User must have edit
- * permissions on the project.
- * @param document The document to be deleted.
+ * Deletes the given document from the database.
+ * User must have edit permissions on the project.
+ *
+ * @param document - The document to be deleted.
  */
-export async function deleteDocument(
-  document: ProjectDocument
-): Promise<ProjectDocument> {
-  const url = fillEndpoint(Endpoint.deleteDocument, {
-    documentId: document.documentId,
-  });
-
-  await authHttpClient<void>(url, {
-    method: "DELETE",
-  });
-
-  return document;
+export async function deleteDocument(document: DocumentModel): Promise<void> {
+  await authHttpClient<void>(
+    fillEndpoint(Endpoint.deleteDocument, {
+      documentId: document.documentId,
+    }),
+    {
+      method: "DELETE",
+    }
+  );
 }
 
 /**
- * Attaches the given artifact to specified document marked at the
- * given version.
- * @param versionId The id of the version to mark the addition to.
- * @param documentId The id of the document to which the artifacts are added to.
- * @param artifacts The artifacts being added to the document.
+ * Attaches artifacts to a document.
+ *
+ * @param versionId - The version to mark the addition to.
+ * @param documentId - The document to which the artifacts are added to.
+ * @param artifacts - The artifacts being added to the document.
+ * @return The attached artifacts.
  */
-export async function addArtifactToDocument(
+export async function saveDocumentArtifacts(
   versionId: string,
   documentId: string,
-  artifacts: Artifact[]
-): Promise<Artifact[]> {
-  const url = fillEndpoint(Endpoint.addArtifactsToDocument, {
-    versionId,
-    documentId,
-  });
-  return authHttpClient<Artifact[]>(url, {
-    method: "POST",
-    body: JSON.stringify(artifacts),
-  });
+  artifacts: ArtifactModel[]
+): Promise<ArtifactModel[]> {
+  return authHttpClient<ArtifactModel[]>(
+    fillEndpoint(Endpoint.addArtifactsToDocument, {
+      versionId,
+      documentId,
+    }),
+    {
+      method: "POST",
+      body: JSON.stringify(artifacts),
+    }
+  );
 }
 
 /**
- * Removed specified artifact from document marked at given
- * version.
- * @param versionId The version to mark the removal at.
- * @param documentId The document to remove the artifacts to.
- * @param artifactId The artifact to remove from the document.
+ * Removed artifacts from a document.
+ *
+ * @param versionId - The version to mark the removal at.
+ * @param documentId - The document to remove the artifacts from.
+ * @param artifactId - The artifact to remove from the document.
  */
-export async function removeArtifactFromDocument(
+export async function deleteDocumentArtifact(
   versionId: string,
   documentId: string,
   artifactId: string
 ): Promise<void> {
-  const url = fillEndpoint(Endpoint.removeArtifactFromDocument, {
-    versionId,
-    documentId,
-    artifactId,
-  });
-  return authHttpClient<void>(url, {
+  return authHttpClient<void>(
+    fillEndpoint(Endpoint.removeArtifactFromDocument, {
+      versionId,
+      documentId,
+      artifactId,
+    }),
+    {
+      method: "DELETE",
+    }
+  );
+}
+
+/**
+ * Sets the document to be the user's current document.
+ * @param documentId The document to save.
+ */
+export async function setCurrentDocument(documentId: string): Promise<void> {
+  return authHttpClient<void>(
+    fillEndpoint(Endpoint.setCurrentDocument, {
+      documentId,
+    }),
+    {
+      method: "POST",
+    }
+  );
+}
+
+/**
+ * Removes the current document affiliated with current user.
+ */
+export async function clearCurrentDocument(): Promise<void> {
+  return authHttpClient<void>(fillEndpoint(Endpoint.clearCurrentDocument, {}), {
     method: "DELETE",
   });
 }

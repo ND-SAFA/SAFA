@@ -1,14 +1,46 @@
-import { ArtifactDeltaState } from "./delta";
-import { CytoCoreElementData } from "@/types/cytoscape";
+import { DocumentType } from "@/types/domain/document";
 
 /**
- * Defines an artifact file.
+ * Enumerates the types of FTA nodes.
  */
-export interface Artifact {
+export enum FTANodeType {
+  OR = "OR",
+  AND = "AND",
+}
+
+/**
+ * Enumerates the types of safety cases.
+ */
+export enum SafetyCaseType {
+  GOAL = "GOAL",
+  SOLUTION = "SOLUTION",
+  CONTEXT = "CONTEXT",
+  STRATEGY = "STRATEGY",
+}
+
+/**
+ * A map from each safety case types to what they can trace to.
+ */
+export const allowedSafetyCaseTypes: Record<SafetyCaseType, SafetyCaseType[]> =
+  {
+    [SafetyCaseType.GOAL]: [SafetyCaseType.GOAL, SafetyCaseType.STRATEGY],
+    [SafetyCaseType.SOLUTION]: [SafetyCaseType.GOAL],
+    [SafetyCaseType.CONTEXT]: [SafetyCaseType.GOAL],
+    [SafetyCaseType.STRATEGY]: [SafetyCaseType.GOAL],
+  };
+
+/**
+ * Defines an artifact of a project.
+ */
+export interface ArtifactModel {
   /**
    * A unique UUID identifying an artifact across versions.
    */
   id: string;
+  /**
+   * A unique UUID identifying an artifact across versions.
+   */
+  baseEntityId?: string;
   /**
    * The name of the artifact.
    */
@@ -29,59 +61,33 @@ export interface Artifact {
    * The ids of documents that display this artifact.
    */
   documentIds: string[];
+  /**
+   * The type of document this artifact is displayed in.
+   */
+  documentType?: DocumentType;
+  /**
+   * For FTA logic nodes,  the logical operator of this node.
+   */
+  logicType?: FTANodeType;
+  /**
+   * For safety case nodes, the type of safety case node.
+   */
+  safetyCaseType?: SafetyCaseType;
+  /**
+   * Represents a collection of custom attributes on an artifact.
+   */
+  customFields?: Record<string, string>;
 }
 
 /**
- * Defines an artifact's data.
+ * Defines an artifact with its custom fields flattened into the artifact data.
  */
-export interface ArtifactData extends CytoCoreElementData {
-  /**
-   * The content of the artifact.
-   */
-  body: string;
-  /**
-   * Any warnings generated from the artifact.
-   */
-  warnings?: ArtifactWarning[];
-  /**
-   * The name of the artifact.
-   */
-  artifactName: string;
-  /**
-   * The type of the artifact.
-   */
-  artifactType: string;
-  /**
-   * The state of changes to the artifact.
-   */
-  artifactDeltaState: ArtifactDeltaState;
-  /**
-   * Whether the artifact is selected.
-   */
-  isSelected: boolean;
-  /**
-   * The opacity of this artifact.
-   */
-  opacity: number;
-
-  /**
-   * The number of hidden child elements.
-   */
-  hiddenChildren?: number;
-  /**
-   * The delta states of any hidden children.
-   */
-  childDeltaStates?: ArtifactDeltaState[];
-  /**
-   * Any warnings in child elements.
-   */
-  childWarnings?: ArtifactWarning[];
-}
+export type FlatArtifact = ArtifactModel & Record<string, string>;
 
 /**
  * Defines an artifact warning.
  */
-export interface ArtifactWarning {
+export interface WarningModel {
   /**
    * The artifact rule name.
    */
@@ -95,9 +101,9 @@ export interface ArtifactWarning {
 /**
  * A collection of warnings for all artifacts.
  */
-export type ProjectWarnings = Record<string, ArtifactWarning[]>;
+export type ProjectWarnings = Record<string, WarningModel[]>;
 
 /**
  * Returns an artifact matching the given query, if one exists.
  */
-export type ArtifactQueryFunction = (q: string) => Artifact;
+export type ArtifactQueryFunction = (q: string) => ArtifactModel | undefined;

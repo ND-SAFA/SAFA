@@ -3,13 +3,20 @@
     size="xs"
     :isOpen="isMessageDefined"
     :title="title"
-    @close="onClose"
+    @close="handleClose"
   >
-    <template v-slot:body>{{ body }}</template>
+    <template v-slot:body>
+      <typography y="2" el="p" :value="body" />
+    </template>
     <template v-slot:actions>
-      <v-row justify="center">
-        <v-btn outlined color="primary" @click="onConfirm"> I accept </v-btn>
-      </v-row>
+      <v-spacer />
+      <v-btn
+        color="primary"
+        data-cy="button-confirm-modal"
+        @click="handleConfirm"
+      >
+        I accept
+      </v-btn>
     </template>
   </generic-modal>
 </template>
@@ -17,11 +24,16 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { ConfirmationType, ConfirmDialogueMessage } from "@/types";
-import { logModule } from "@/store";
-import { GenericModal } from "@/components/common/generic";
+import { logStore } from "@/hooks";
+import Typography from "@/components/common/display/Typography.vue";
+import GenericModal from "./GenericModal.vue";
 
+/**
+ * Displays a modal for confirming sensitive actions.
+ */
 export default Vue.extend({
-  components: { GenericModal },
+  name: "AppConfirmModal",
+  components: { Typography, GenericModal },
   props: {
     message: {
       type: Object as PropType<ConfirmDialogueMessage>,
@@ -33,34 +45,49 @@ export default Vue.extend({
       default: "500",
     },
   },
-  computed: {
-    isMessageDefined(): boolean {
-      return !!this.message && this.message.type !== ConfirmationType.CLEAR;
-    },
-    title(): string {
-      return this.message?.title || "";
-    },
-    body(): string {
-      return this.message?.body || "";
-    },
-  },
   data() {
     return {
       dialog: false,
     };
   },
-  methods: {
-    onConfirm(): void {
-      if (this.message !== undefined) {
-        logModule.CLEAR_CONFIRMATION_MESSAGE();
-        this.message.statusCallback(true);
-      }
+  computed: {
+    /**
+     * @return Whether the current message exists.
+     */
+    isMessageDefined(): boolean {
+      return !!this.message && this.message.type !== ConfirmationType.CLEAR;
     },
-    onClose(): void {
-      if (this.message !== undefined) {
-        logModule.CLEAR_CONFIRMATION_MESSAGE();
-        this.message.statusCallback(false);
-      }
+    /**
+     * @return The message title.
+     */
+    title(): string {
+      return this.message?.title || "";
+    },
+    /**
+     * @return The message body.
+     */
+    body(): string {
+      return this.message?.body || "";
+    },
+  },
+  methods: {
+    /**
+     * Confirms the confirmation message.
+     */
+    handleConfirm(): void {
+      if (!this.message) return;
+
+      logStore.clearConfirmation();
+      this.message.statusCallback(true);
+    },
+    /**
+     * Closes the confirmation message.
+     */
+    handleClose(): void {
+      if (!this.message) return;
+
+      logStore.clearConfirmation();
+      this.message.statusCallback(false);
     },
   },
 });

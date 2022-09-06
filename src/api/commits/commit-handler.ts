@@ -1,25 +1,42 @@
 import { Commit } from "@/types";
-import { commitModule } from "@/store";
-import { persistCommit } from "./commit-api";
+import { appStore, commitStore, traceStore, artifactStore } from "@/hooks";
+import { persistCommit } from "@/api";
 
 /**
  * Saves commit to the application store, and persist the commit.
  *
  * @param commit - The commit to save.
+ * @return The saved commit.
  */
-export async function saveCommit(commit: Commit): Promise<void> {
-  await commitModule.saveCommit(commit);
-  await persistCommit(commit);
+export async function saveCommit(commit: Commit): Promise<Commit> {
+  try {
+    appStore.$patch({ isSaving: true });
+
+    const commitResponse = await persistCommit(commit);
+    commitStore.saveCommit(commitResponse);
+
+    return commitResponse;
+  } finally {
+    appStore.$patch({ isSaving: false });
+  }
 }
 
 /**
  * Undoes the last commit.
  */
 export async function undoCommit(): Promise<void> {
-  const commit = await commitModule.undoCommit();
+  try {
+    appStore.$patch({ isSaving: true });
 
-  if (commit) {
-    await persistCommit(commit);
+    const commit = await commitStore.undoLastCommit();
+
+    if (!commit) return;
+
+    const commitResponse = await persistCommit(commit);
+
+    await applyArtifactChanges(commitResponse);
+  } finally {
+    appStore.$patch({ isSaving: false });
   }
 }
 
@@ -27,9 +44,35 @@ export async function undoCommit(): Promise<void> {
  * Reattempts the last undone commit.
  */
 export async function redoCommit(): Promise<void> {
-  const commit = await commitModule.redoCommit();
+  try {
+    appStore.$patch({ isSaving: true });
 
-  if (commit) {
-    await saveCommit(commit);
+    const commit = await commitStore.redoLastUndoneCommit();
+
+    if (!commit) return;
+
+    const commitResponse = await persistCommit(commit);
+
+    await applyArtifactChanges(commitResponse);
+  } finally {
+    appStore.$patch({ isSaving: false });
   }
+}
+
+/**
+ * Applies all artifact changes from a commit.
+ *
+ * @param commit - The commit to apply.
+ */
+async function applyArtifactChanges(commit: Commit): Promise<void> {
+  await artifactStore.addOrUpdateArtifacts([
+    ...commit.artifacts.added,
+    ...commit.artifacts.modified,
+  ]);
+  await artifactStore.deleteArtifacts(commit.artifacts.removed);
+  await traceStore.addOrUpdateTraceLinks([
+    ...commit.traces.added,
+    ...commit.traces.modified,
+  ]);
+  await traceStore.deleteTraceLinks(commit.traces.removed);
 }

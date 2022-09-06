@@ -1,4 +1,3 @@
-import { ArtifactData } from "@/types/domain";
 import { CytoCoreElementData } from "@/types";
 
 /**
@@ -47,4 +46,36 @@ export interface HtmlDefinition<T extends CytoCoreElementData> {
    * Returns the stringified html of a given artifact.
    */
   tpl: HtmlDefinitionFunction<T>;
+}
+
+/**
+ * Represents position styling for an SVG.
+ */
+export interface SvgStyle {
+  /**
+   * The x position to draw at.
+   */
+  x: number;
+  /**
+   * The y position to draw at.
+   */
+  y: number;
+  /**
+   * The width to draw.
+   */
+  width: number;
+  /**
+   * The height to draw.
+   */
+  height: number;
+}
+
+/**
+ * Represents a type of child delta to render on a parent artifact.
+ */
+export interface NodeChildDelta {
+  /**
+   * The color of delta to render.
+   */
+  color: string;
 }

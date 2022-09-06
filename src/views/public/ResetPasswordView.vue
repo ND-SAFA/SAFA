@@ -1,17 +1,25 @@
 <template>
   <card-page>
     <template v-slot:form>
-      <h2 class="text-h4 mb-3 text-center">Reset Password</h2>
+      <typography
+        align="center"
+        variant="title"
+        el="h1"
+        class="mb-3"
+        value="Reset Password"
+      />
 
       <div v-if="!isSubmitted">
-        <p class="text-body-1">Please enter a new password.</p>
+        <typography el="p" value="Please enter a new password." />
 
         <password-field v-model="password" />
       </div>
 
-      <p v-else class="text-body-1">
-        Your password has been successfully updated.
-      </p>
+      <typography
+        v-else
+        el="p"
+        value="Your password has been successfully updated."
+      />
     </template>
 
     <template v-slot:actions>
@@ -20,6 +28,7 @@
         color="primary"
         @click="handleReset"
         :disabled="password.length === 0"
+        :loading="isLoading"
       >
         Update Password
       </v-btn>
@@ -35,28 +44,39 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { CardPage, PasswordField } from "@/components";
 import { navigateTo, Routes } from "@/router";
-import { resetPassword } from "@/api";
+import { updatePassword } from "@/api";
+import { CardPage, PasswordField, Typography } from "@/components";
 
 /**
- * Presents the reset password page.
+ * Displays the reset password page.
  */
 export default Vue.extend({
-  name: "reset-password-view",
-  components: { PasswordField, CardPage },
-  data: () => ({
-    password: "",
-    token: "",
-    isSubmitted: false,
-    isError: false,
-  }),
+  name: "ResetPasswordView",
+  components: { PasswordField, CardPage, Typography },
+  data() {
+    return {
+      password: "",
+      token: "",
+      isSubmitted: false,
+      isError: false,
+      isLoading: false,
+    };
+  },
   methods: {
+    /**
+     * Navigates to the login page.
+     */
     handleLogin() {
       navigateTo(Routes.LOGIN_ACCOUNT);
     },
+    /**
+     * Attempts to reset a user's password.
+     */
     handleReset() {
-      resetPassword({
+      this.isLoading = true;
+
+      updatePassword({
         password: this.password,
         token: this.token,
       })
@@ -64,7 +84,8 @@ export default Vue.extend({
           this.isSubmitted = true;
           this.isError = false;
         })
-        .catch(() => (this.isError = true));
+        .catch(() => (this.isError = true))
+        .finally(() => (this.isLoading = false));
     },
   },
 });

@@ -3,14 +3,17 @@
     :headers="headers"
     :items="projects"
     :is-open="isOpen"
+    :minimal="minimal"
     item-key="projectId"
     no-data-text="No projects created."
     :is-loading="isLoading"
-    :has-delete="hasDeletePermission"
-    @item:edit="onEditProject"
-    @item:select="onSelectProject"
-    @item:delete="onDeleteProject"
-    @item:add="onAddItem"
+    :has-delete-for-indexes="deletableProjects"
+    :has-delete="false"
+    data-cy="table-project"
+    @item:edit="handleEditProject"
+    @item:select="handleSelectProject"
+    @item:delete="handleDeleteProject"
+    @item:add="handleAddItem"
     @refresh="fetchProjects"
   >
     <template v-slot:editItemDialogue>
@@ -18,24 +21,25 @@
         title="Edit Project"
         :is-open="editProjectDialogue"
         :project="projectToEdit"
-        @save="onUpdateProject"
-        @close="onCloseProjectEdit"
+        @save="handleConfirmEditProject"
+        @close="handleCloseProjectEdit"
       />
     </template>
     <template v-slot:addItemDialogue>
       <project-identifier-modal
+        do-show-upload
         title="Create New Project"
         :is-open="addProjectDialogue"
-        @save="onSaveNewProject"
-        @close="onCloseAddProject"
+        @save="handleConfirmAddProject"
+        @close="handleCloseAddProject"
       />
     </template>
     <template v-slot:deleteItemDialogue>
       <confirm-project-delete
         :is-open="deleteProjectDialogue"
         :project="projectToDelete"
-        @confirm="onConfirmDeleteProject"
-        @cancel="onCancelDeleteProject"
+        @confirm="handleConfirmDeleteProject"
+        @cancel="handleCancelDeleteProject"
       />
     </template>
   </generic-selector>
@@ -43,24 +47,12 @@
 
 <script lang="ts">
 import Vue from "vue";
-import {
-  DataItem,
-  Project,
-  ProjectCreationResponse,
-  ProjectIdentifier,
-  ProjectRole,
-} from "@/types";
-import {
-  clearProject,
-  deleteProject,
-  getProjects,
-  saveOrUpdateProject,
-} from "@/api";
-import { logModule, projectModule, sessionModule } from "@/store";
+import { DataItem, IdentifierModel, ProjectRole } from "@/types";
+import { logStore, sessionStore } from "@/hooks";
+import { getProjects, handleDeleteProject, handleSaveProject } from "@/api";
 import { GenericSelector } from "@/components/common";
 import { ProjectIdentifierModal } from "@/components/project/shared";
 import ConfirmProjectDelete from "./ConfirmProjectDelete.vue";
-import { projectSelectorHeaders } from "./headers";
 
 /**
  * Displays list of project available to current user and allows them to
@@ -71,7 +63,7 @@ import { projectSelectorHeaders } from "./headers";
  * @emits-1 `unselected` - On project unselected.
  */
 export default Vue.extend({
-  name: "project-selector",
+  name: "ProjectSelector",
   components: {
     GenericSelector,
     ProjectIdentifierModal,
@@ -86,137 +78,212 @@ export default Vue.extend({
       type: Boolean,
       required: true,
     },
+    minimal: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
-      selected: undefined as ProjectIdentifier | undefined,
-      projects: [] as ProjectIdentifier[],
-      headers: projectSelectorHeaders,
+      selected: undefined as IdentifierModel | undefined,
+      projects: [] as IdentifierModel[],
+      deletableProjects: [] as number[],
+      headers: this.minimal
+        ? [{ text: "Name", value: "name", sortable: true, isSelectable: true }]
+        : [
+            { text: "Name", value: "name", sortable: true, isSelectable: true },
+            {
+              text: "Description",
+              sortable: false,
+              value: "description",
+            },
+            {
+              text: "Owner",
+              sortable: false,
+              value: "owner",
+            },
+            { text: "Actions", value: "actions", sortable: false },
+          ],
       editProjectDialogue: false,
       deleteProjectDialogue: false,
       addProjectDialogue: false,
       isLoading: false,
-      projectToEdit: { name: "", description: "" } as ProjectIdentifier,
-      projectToDelete: undefined as ProjectIdentifier | undefined,
+      projectToEdit: { name: "", description: "" } as IdentifierModel,
+      projectToDelete: undefined as IdentifierModel | undefined,
     };
   },
+  /**
+   * When mounted, load all projects.
+   */
   mounted() {
     this.fetchProjects();
   },
   watch: {
-    isOpen(isOpen: boolean): void {
-      if (isOpen) {
-        this.fetchProjects();
-        if (this.projects.length === 1) {
-          this.$emit("selected", this.projects[0], true);
-        }
-      }
+    /**
+     * When opened, fetches projects and selects the first if there is only one.
+     */
+    isOpen(open: boolean): void {
+      if (!open) return;
+
+      this.fetchProjects();
+
+      if (this.projects.length !== 1) return;
+
+      this.$emit("selected", this.projects[0], false);
     },
-  },
-  computed: {
-    hasDeletePermission(): boolean {
-      const userEmail = sessionModule.authenticationToken?.sub || "";
-      const projectMembershipQuery = projectModule.getProject.members.filter(
-        (m) => m.email === userEmail
-      );
-      if (projectMembershipQuery.length === 1) {
-        return projectMembershipQuery[0].role === ProjectRole.OWNER;
-      }
-      return false;
+    $route(): void {
+      this.fetchProjects();
     },
   },
   methods: {
-    onUpdateProject(project: ProjectIdentifier) {
-      this.isLoading = true;
-      this.saveOrUpdateProjectHandler(project);
-      this.editProjectDialogue = false;
-      this.selected = project;
+    /**
+     * @returns The indexes that the current user has delete permissions for.
+     */
+    getDeletableProjects(): number[] {
+      const userEmail = sessionStore.userEmail;
+
+      return this.projects
+        .map((project, projectIndex) => {
+          const adminMember = project.members.find(
+            (m) => m.email === userEmail && m.role === ProjectRole.OWNER
+          );
+          return adminMember ? projectIndex : -1;
+        })
+        .filter((idx) => idx !== -1);
     },
-    onSaveNewProject(newProject: ProjectIdentifier) {
-      this.isLoading = true;
-      this.saveOrUpdateProjectHandler(newProject);
-      this.addProjectDialogue = false;
-      this.selected = newProject;
-    },
-    onCloseProjectEdit() {
-      this.editProjectDialogue = false;
-    },
-    onSelectProject(item: DataItem<ProjectIdentifier>, goToNextStep = false) {
+    /**
+     * Emits changes to the selected item.
+     * @param item - The selected project.
+     * @param goToNextStep - If true with a valid project, the next step will be navigated to.
+     */
+    handleSelectProject(item: DataItem<IdentifierModel>, goToNextStep = false) {
       if (item.value) {
         this.$emit("selected", item.item, goToNextStep);
       } else {
         this.$emit("unselected");
       }
     },
-    onAddItem() {
+    /**
+     * Opens the add project modal.
+     */
+    handleAddItem() {
       this.addProjectDialogue = true;
     },
-    onCloseAddProject() {
+    /**
+     * Closes the add project modal.
+     */
+    handleCloseAddProject() {
       this.addProjectDialogue = false;
     },
-    onEditProject(item: ProjectIdentifier) {
+    /**
+     * Attempts to create a project, and closes the add modal.
+     * @param project - The project to create.
+     */
+    handleConfirmAddProject(project: IdentifierModel) {
+      this.saveOrUpdateProjectHandler(project);
+      this.addProjectDialogue = false;
+    },
+    /**
+     * Opens the edit project modal.
+     * @param item - The project to edit.
+     */
+    handleEditProject(item: IdentifierModel) {
       this.projectToEdit = item;
       this.editProjectDialogue = true;
     },
-    onDeleteProject(item: ProjectIdentifier) {
+    /**
+     * Closes the edit project modal.
+     */
+    handleCloseProjectEdit() {
+      this.editProjectDialogue = false;
+    },
+    /**
+     * Attempts to update a project, and closes the edit modal.
+     * @param project - The project to update.
+     */
+    handleConfirmEditProject(project: IdentifierModel) {
+      this.saveOrUpdateProjectHandler(project);
+      this.editProjectDialogue = false;
+    },
+    /**
+     * Opens the delete project modal.
+     * @param item - The project to delete.
+     */
+    handleDeleteProject(item: IdentifierModel) {
       this.deleteProjectDialogue = true;
       this.projectToDelete = item;
     },
-    onCancelDeleteProject() {
+    /**
+     * Closes the delete project modal.
+     */
+    handleCancelDeleteProject() {
       this.deleteProjectDialogue = false;
     },
-    onConfirmDeleteProject(project: ProjectIdentifier) {
+    /**
+     * Attempts to delete a project, and closes the delete modal.
+     * @param project - The project to delete.
+     */
+    handleConfirmDeleteProject(project: IdentifierModel) {
       this.deleteProjectHandler(project);
       this.deleteProjectDialogue = false;
     },
+    /**
+     * Fetches all projects.
+     */
     fetchProjects(): void {
+      if (!sessionStore.doesSessionExist) return;
+
       this.isLoading = true;
+
       getProjects()
         .then((projects) => {
           this.projects = projects;
+          this.deletableProjects = this.getDeletableProjects();
+        })
+        .catch((e) => {
+          logStore.onDevError(e);
         })
         .finally(() => (this.isLoading = false));
     },
-    deleteProjectHandler(project: ProjectIdentifier) {
+    /**
+     * Attempts to delete a project.
+     * @param project - The project to delete.
+     */
+    deleteProjectHandler(project: IdentifierModel) {
       this.isLoading = true;
-      deleteProject(project.projectId)
-        .then(async () => {
-          logModule.onSuccess(`${project.name} successfully deleted.`);
 
+      handleDeleteProject(project, {
+        onSuccess: () => {
+          this.isLoading = false;
           this.projects = this.projects.filter(
             (p) => p.projectId !== project.projectId
           );
-
-          if (project.name === projectModule.getProject.name) {
-            // Clear the current project if it has been deleted.
-            await clearProject();
-          }
-        })
-        .finally(() => (this.isLoading = false));
+          this.deletableProjects = this.getDeletableProjects();
+          this.$emit("unselected");
+        },
+        onError: () => (this.isLoading = false),
+      });
     },
-    saveOrUpdateProjectHandler(project: ProjectIdentifier): Promise<Project> {
-      return saveOrUpdateProject({
-        projectId: project.projectId,
-        description: project.description,
-        name: project.name,
-        members: [],
-        artifacts: [],
-        traces: [],
-      })
-        .then((res: ProjectCreationResponse) => {
-          const project = res.project;
-          projectModule.SET_PROJECT_IDENTIFIER(project);
+    /**
+     * Attempts to save a project.
+     * @param project - The project to save.
+     */
+    saveOrUpdateProjectHandler(project: IdentifierModel) {
+      this.isLoading = true;
+
+      handleSaveProject(project, {
+        onSuccess: (project) => {
           const projectRemoved = this.projects.filter(
             (p) => project.projectId !== p.projectId
           );
 
-          this.projects = [project as ProjectIdentifier].concat(projectRemoved);
-          this.$emit("selected", project, true);
-          return project;
-        })
-        .finally(() => {
           this.isLoading = false;
-        });
+          this.projects = [project, ...projectRemoved];
+          this.selected = project;
+          this.$emit("selected", project, true);
+        },
+        onError: () => (this.isLoading = false),
+      });
     },
   },
 });

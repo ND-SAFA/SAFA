@@ -1,35 +1,38 @@
-import { Artifact, ArtifactNameValidationResponse } from "@/types";
-import { Endpoint, fillEndpoint, authHttpClient } from "@/api/util";
-import { CommitBuilder } from "./commit-builder";
+import { ArtifactModel, NameValidationModel } from "@/types";
+import { Endpoint, fillEndpoint, authHttpClient, CommitBuilder } from "@/api";
 
 /**
  * Returns whether the given artifact name already exists.
  *
  * @param versionId - The project version to search within.
  * @param artifactName - The artifact name to search for.
- *
  * @return Whether the artifact name is already taken.
  */
-export async function isArtifactNameTaken(
+export async function getDoesArtifactExist(
   versionId: string,
   artifactName: string
-): Promise<ArtifactNameValidationResponse> {
-  return authHttpClient<ArtifactNameValidationResponse>(
-    fillEndpoint(Endpoint.isArtifactNameTaken, { versionId, artifactName }),
-    { method: "GET" }
+): Promise<boolean> {
+  const res = await authHttpClient<NameValidationModel>(
+    fillEndpoint(Endpoint.isArtifactNameTaken, { versionId }),
+    { method: "POST", body: JSON.stringify({ artifactName }) }
   );
+
+  return res.artifactExists;
 }
 
 /**
- * Deletes artifact body in project version specified.
+ * Deletes artifact in project version specified.
  *
  * @param artifact - The artifact to delete.
- *
+ * @return The deleted artifact.
  */
-export async function deleteArtifactBody(artifact: Artifact): Promise<void> {
+export async function deleteArtifact(
+  artifact: ArtifactModel
+): Promise<ArtifactModel> {
   return CommitBuilder.withCurrentVersion()
     .withRemovedArtifact(artifact)
-    .save();
+    .save()
+    .then(({ artifacts }) => artifacts.removed[0]);
 }
 
 /**
@@ -37,29 +40,31 @@ export async function deleteArtifactBody(artifact: Artifact): Promise<void> {
  *
  * @param versionId - The version that the artifact is stored within.
  * @param artifact - The artifact to create.
- *
  * @return The created artifact.
  */
 export async function createArtifact(
   versionId: string,
-  artifact: Artifact
-): Promise<void> {
-  return CommitBuilder.withCurrentVersion().withNewArtifact(artifact).save();
+  artifact: ArtifactModel
+): Promise<ArtifactModel[]> {
+  return CommitBuilder.withCurrentVersion()
+    .withNewArtifact(artifact)
+    .save()
+    .then(({ artifacts }) => artifacts.added);
 }
 
 /**
  * Updates artifact to the given version.
  *
  * @param versionId - The version that the artifact is stored within.
- * @param artifact - The artifact to create.
- *
- * @return The created artifact.
+ * @param artifact - The artifact to updated.
+ * @return The updated artifact.
  */
 export async function updateArtifact(
   versionId: string,
-  artifact: Artifact
-): Promise<void> {
+  artifact: ArtifactModel
+): Promise<ArtifactModel[]> {
   return CommitBuilder.withCurrentVersion()
     .withModifiedArtifact(artifact)
-    .save();
+    .save()
+    .then(({ artifacts }) => artifacts.modified);
 }

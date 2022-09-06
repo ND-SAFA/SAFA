@@ -1,0 +1,45 @@
+import { JobModel } from "@/types";
+import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
+
+/**
+ * Updates an existing project from the given flat files.
+ *
+ * @param versionId - The project version to update.
+ * @param formData - Form data containing the project files.
+ * @return The updated project.
+ */
+export async function createFlatFileUploadJob(
+  versionId: string,
+  formData: FormData
+): Promise<JobModel> {
+  return authHttpClient<JobModel>(
+    fillEndpoint(Endpoint.updateProjectThroughFlatFiles, { versionId }),
+    {
+      method: "POST",
+      body: formData,
+    },
+    false
+  );
+}
+
+/**
+ * Returns list of jobs created by user.
+ *
+ * @return Uses list.
+ */
+export async function getUserJobs(): Promise<JobModel[]> {
+  return authHttpClient<JobModel[]>(fillEndpoint(Endpoint.getUserJobs, {}), {
+    method: "GET",
+  });
+}
+
+/**
+ * Deletes the job with given id.
+ *
+ * @param jobId - The job to delete.
+ */
+export async function deleteJobById(jobId: string): Promise<void> {
+  return authHttpClient<void>(fillEndpoint(Endpoint.deleteJobById, { jobId }), {
+    method: "DELETE",
+  });
+}

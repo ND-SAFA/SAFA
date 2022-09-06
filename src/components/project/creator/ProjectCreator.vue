@@ -1,207 +1,98 @@
 <template>
-  <generic-stepper
-    v-model="currentStep"
-    :steps="steps"
-    submitText="Create Project"
-    @submit="saveProject()"
-  >
-    <v-row>Create a new project</v-row>
-    <template v-slot:items>
-      <v-stepper-content step="1">
-        <v-container>
-          <project-identifier-input
-            v-bind:name.sync="name"
-            v-bind:description.sync="description"
-          />
-        </v-container>
-      </v-stepper-content>
-
-      <v-stepper-content step="2">
-        <v-container>
-          <generic-uploader
-            item-name="artifact"
-            :uploader="artifactUploader"
-            :artifact-map="artifactMap"
-            @change="artifactUploader.panels = $event"
-            @upload:valid="setStepIsValid(1, true)"
-            @upload:invalid="setStepIsValid(1, false)"
-          >
-            <template v-slot:creator="{ isCreatorOpen, onAddFile, onClose }">
-              <artifact-type-creator
-                :is-open="isCreatorOpen"
-                :artifact-types="artifactTypes"
-                @submit="onAddFile"
-                @close="onClose"
-              />
-            </template>
-          </generic-uploader>
-        </v-container>
-      </v-stepper-content>
-
-      <v-stepper-content step="3">
-        <v-container>
-          <generic-uploader
-            item-name="trace link"
-            :uploader="traceUploader"
-            :artifact-map="artifactMap"
-            :default-valid-state="true"
-            @change="traceUploader.panels = $event"
-            @upload:valid="setStepIsValid(2, true)"
-            @upload:invalid="setStepIsValid(2, false)"
-          >
-            <template v-slot:creator="{ isCreatorOpen, onAddFile, onClose }">
-              <trace-file-creator
-                :is-open="isCreatorOpen"
-                :trace-files="traceFiles"
-                :artifact-types="artifactTypes"
-                @submit="onAddFile"
-                @close="onClose"
-              />
-            </template>
-          </generic-uploader>
-        </v-container>
-      </v-stepper-content>
-
-      <v-stepper-content step="4">
-        <v-container>
-          <v-row justify="center">
-            <v-col>
-              <h1 class="text-h6">Project TIM</h1>
-            </v-col>
-          </v-row>
-          <tim-tree
-            :artifact-panels="artifactUploader.panels"
-            :trace-panels="traceUploader.panels"
-            :in-view="currentStep === 4"
-          />
-        </v-container>
-      </v-stepper-content>
-    </template>
-  </generic-stepper>
+  <v-container>
+    <v-tabs v-model="tab">
+      <v-tab v-for="{ name } in tabs" :key="name">
+        <typography :value="name" />
+      </v-tab>
+    </v-tabs>
+    <v-tabs-items v-model="tab" class="mt-1">
+      <v-tab-item key="1">
+        <project-creator-stepper />
+      </v-tab-item>
+      <v-tab-item key="2">
+        <project-bulk-upload />
+      </v-tab-item>
+      <v-tab-item key="3">
+        <jira-creator-stepper />
+      </v-tab-item>
+      <v-tab-item key="4">
+        <git-hub-creator-stepper />
+      </v-tab-item>
+    </v-tabs-items>
+  </v-container>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { Artifact, Project, StepState, TraceFile, TraceLink } from "@/types";
-import { saveOrUpdateProject, setCreatedProject } from "@/api";
-import { appModule } from "@/store";
-import { GenericStepper } from "@/components/common";
-import { ProjectIdentifierInput } from "@/components/project/shared";
-import { createTraceUploader, createArtifactUploader } from "./uploaders";
-import { TraceFileCreator, ArtifactTypeCreator } from "./panels";
-import { TimTree } from "./tim-tree-view";
-import { GenericUploader } from "./validation-panels";
-import { navigateTo, Routes } from "@/router";
+import { CreatorTypes } from "@/types";
+import { getParam, QueryParams, updateParam } from "@/router";
+import Typography from "@/components/common/display/Typography.vue";
+import {
+  ProjectCreatorStepper,
+  JiraCreatorStepper,
+  GitHubCreatorStepper,
+  ProjectBulkUpload,
+} from "./workflows";
 
-const PROJECT_IDENTIFIER_STEP_NAME = "Name Project";
-
+/**
+ * Allows for creating a project.
+ */
 export default Vue.extend({
+  name: "ProjectCreator",
   components: {
-    GenericStepper,
-    ProjectIdentifierInput,
-    GenericUploader,
-    ArtifactTypeCreator,
-    TraceFileCreator,
-    TimTree,
+    Typography,
+    GitHubCreatorStepper,
+    ProjectCreatorStepper,
+    ProjectBulkUpload,
+    JiraCreatorStepper,
   },
   data() {
     return {
-      steps: [
-        [PROJECT_IDENTIFIER_STEP_NAME, false],
-        ["Upload Artifacts", false],
-        ["Upload Trace Links", true],
-        ["View TIM", true],
-      ] as StepState[],
-      name: "",
-      description: "",
-      currentStep: 1,
-      isConfirmOpen: false,
-      artifactUploader: createArtifactUploader(),
-      traceUploader: createTraceUploader(),
+      tab: 0,
+      tabs: [
+        { id: CreatorTypes.standard, name: "Standard Upload" },
+        { id: CreatorTypes.bulk, name: "Bulk Upload" },
+        { id: CreatorTypes.jira, name: "Jira Upload" },
+        { id: CreatorTypes.github, name: "GitHub Upload" },
+      ],
     };
   },
-  methods: {
-    setStepIsValid(stepIndex: number, isValid: boolean): void {
-      Vue.set(this.steps, stepIndex, [this.steps[stepIndex][0], isValid]);
-    },
-    clearData() {
-      this.name = "";
-      this.description = "";
-      this.currentStep = 1;
-      this.artifactUploader = createArtifactUploader();
-      this.traceUploader = createTraceUploader();
-    },
-
-    saveProject: function (): void {
-      appModule.SET_IS_LOADING(true);
-      saveOrUpdateProject(this.project)
-        .then(async (res) => {
-          await navigateTo(Routes.ARTIFACT_TREE);
-          await setCreatedProject(res);
-        })
-        .then(() => this.clearData())
-        .finally(() => {
-          appModule.SET_IS_LOADING(false);
-        });
-    },
-    onConfirmClose(): void {
-      this.isConfirmOpen = false;
-    },
+  /**
+   * When the page loads, switch to any set tab in the query.
+   */
+  mounted() {
+    this.openCurrentTab();
   },
-  computed: {
-    artifactMap(): Record<string, Artifact> {
-      return this.artifacts
-        .map((artifact) => ({ [artifact.name]: artifact }))
-        .reduce((acc, cur) => ({ ...acc, ...cur }), {});
-    },
-    artifacts(): Artifact[] {
-      let artifacts: Artifact[] = [];
-      this.artifactUploader.panels.forEach(({ projectFile }) => {
-        if (projectFile.artifacts !== undefined) {
-          artifacts = artifacts.concat(projectFile.artifacts);
-        }
-      });
-      return artifacts;
-    },
-    artifactTypes(): string[] {
-      return this.artifactUploader.panels.map((p) => p.projectFile.type);
-    },
-    traces(): TraceLink[] {
-      let traces: TraceLink[] = [];
-      this.traceUploader.panels.forEach(({ projectFile }) => {
-        if (projectFile.traces !== undefined) {
-          traces = traces.concat(projectFile.traces);
-        }
-      });
-      return traces;
-    },
-    traceFiles(): TraceFile[] {
-      return this.traceUploader.panels.map((p) => p.projectFile);
-    },
-    project(): Project {
-      return {
-        projectId: "",
-        name: this.name,
-        description: this.description,
-        members: [], // TODO: Add current user as owner?
-        artifacts: this.artifacts,
-        traces: this.traces,
-      };
+  methods: {
+    /**
+     * Switch to any set tab in the query.
+     */
+    openCurrentTab() {
+      const tabId = getParam(QueryParams.TAB);
+      const tabIndex = this.tabs.findIndex(({ id }) => id === tabId);
+
+      if (!tabId || tabIndex === -1 || this.tab === tabIndex) return;
+
+      this.tab = tabIndex;
     },
   },
   watch: {
-    currentStep(stepNumber: number): void {
-      if (stepNumber === 1) {
-        const hasName = this.name !== "";
-        Vue.set(this.steps, 0, [PROJECT_IDENTIFIER_STEP_NAME, hasName]);
-      }
-      if (stepNumber === 2) {
-        Vue.set(this.steps, 0, [this.name, true]);
+    /**
+     * When the tab changes, update the query tab id.
+     */
+    tab(index: number) {
+      const currentTabId = this.tabs[index].id;
+      const routeTabId = getParam(QueryParams.TAB);
+
+      if (currentTabId !== routeTabId) {
+        updateParam(QueryParams.TAB, currentTabId);
       }
     },
-    name(): void {
-      const hasName = this.name !== "";
-      Vue.set(this.steps, 0, [PROJECT_IDENTIFIER_STEP_NAME, hasName]);
+    /**
+     * Opens the current tab when the route changes.
+     */
+    $route() {
+      this.openCurrentTab();
     },
   },
 });

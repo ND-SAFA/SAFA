@@ -1,11 +1,12 @@
 <template>
-  <card-page>
+  <card-page id="login-view">
     <template v-slot:form>
       <v-text-field
         filled
         label="Email"
         v-model="email"
         :error-messages="isError ? ['Invalid username or password'] : []"
+        data-cy="input-email"
         @keydown.enter="handleLogin"
       />
       <password-field v-model="password" @enter="handleLogin" />
@@ -15,18 +16,26 @@
       <v-btn
         color="primary"
         width="8em"
-        @click="handleLogin"
         :disabled="password.length === 0"
         :loading="isLoading"
+        data-cy="button-login"
+        @click="handleLogin"
       >
         Login
       </v-btn>
 
       <div class="ml-auto text-right">
-        <span class="text-body-1">
-          Dont have an account yet?
+        <span>
+          <typography value="Dont have an account yet?" />
 
-          <v-btn text small class="px-1" color="primary" @click="handleSignUp">
+          <v-btn
+            text
+            small
+            class="px-1"
+            color="primary"
+            data-cy="button-create-account-redirect"
+            @click="handleSignUp"
+          >
             Sign Up
           </v-btn>
         </span>
@@ -47,52 +56,51 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { CardPage, PasswordField } from "@/components";
 import { navigateTo, Routes } from "@/router";
-import { loadLastProject } from "@/api";
-import { login } from "@/api/handlers/session-handler";
+import { handleLogin } from "@/api";
+import Typography from "@/components/common/display/Typography.vue";
+import { CardPage, PasswordField } from "@/components";
 
 /**
- * Presents the login page.
+ * Displays the login page.
  */
 export default Vue.extend({
-  name: "login-view",
-  components: { PasswordField, CardPage },
-  data: () => ({
-    email: "",
-    password: "",
-    isError: false,
-    isLoading: false,
-  }),
+  name: "LoginView",
+  components: { Typography, PasswordField, CardPage },
+  data() {
+    return {
+      email: "",
+      password: "",
+      isError: false,
+      isLoading: false,
+    };
+  },
   methods: {
-    handleLogin() {
-      const goToPage = new URLSearchParams(window.location.search).get("to");
-
-      this.isLoading = true;
-
-      login({
-        email: this.email,
-        password: this.password,
-      })
-        .then(async () => {
-          this.isLoading = false;
-
-          if (goToPage && goToPage !== Routes.ARTIFACT_TREE) {
-            await navigateTo(goToPage);
-          } else {
-            await loadLastProject();
-          }
-        })
-        .catch(() => {
-          this.isError = true;
-          this.isLoading = false;
-        });
-    },
+    /**
+     * Navigate to the sign up page.
+     */
     handleSignUp() {
       navigateTo(Routes.CREATE_ACCOUNT);
     },
+    /**
+     * Navigate to the forgot password page.
+     */
     handleForgotPassword() {
       navigateTo(Routes.FORGOT_PASSWORD);
+    },
+    /**
+     * Attempts to log the user in.
+     */
+    handleLogin() {
+      this.isLoading = true;
+
+      handleLogin({
+        email: this.email,
+        password: this.password,
+      })
+        .then(() => (this.isError = false))
+        .catch(() => (this.isError = true))
+        .finally(() => (this.isLoading = false));
     },
   },
 });

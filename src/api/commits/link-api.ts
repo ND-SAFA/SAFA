@@ -114,6 +114,7 @@ export async function saveGeneratedLinks(
   traceLinks: TraceLinkModel[]
 ): Promise<TraceLinkModel[]> {
   return CommitBuilder.withCurrentVersion()
+    .hideErrors()
     .withNewTraceLinks(traceLinks)
     .save()
     .then(async ({ traces }) => traces.added);

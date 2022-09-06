@@ -84,7 +84,7 @@ public class SyncController extends BaseController {
             case TRACES:
                 List<TraceAppEntity> traces = this.serviceProvider
                     .getTraceService()
-                    .retrieveTracesInProjectVersion(projectVersion, entityIds);
+                    .retrieveActiveTracesInProjectVersion(projectVersion, entityIds);
                 projectAppEntity.setTraces(traces);
                 break;
             case DOCUMENT:

@@ -49,7 +49,7 @@ public class GeneratedLinkController extends BaseController {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withViewVersion();
         return this.serviceProvider
             .getTraceService()
-            .getAppEntities(projectVersion)
+            .getAppEntities(projectVersion, (t) -> true)
             .stream()
             .filter(t -> t.getTraceType().equals(TraceType.GENERATED))
             .collect(Collectors.toList());

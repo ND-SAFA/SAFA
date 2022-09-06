@@ -2,6 +2,7 @@ package edu.nd.crc.safa.features.traces.services;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
@@ -23,13 +24,18 @@ public class TraceService implements IAppEntityService<TraceAppEntity> {
 
     @Override
     public List<TraceAppEntity> getAppEntities(ProjectVersion projectVersion) {
+        return getAppEntities(projectVersion, t -> t.getApprovalStatus() != ApprovalStatus.DECLINED);
+    }
+
+    public List<TraceAppEntity> getAppEntities(ProjectVersion projectVersion,
+                                               Predicate<TraceAppEntity> tracePredicate) {
         List<ArtifactAppEntity> projectVersionArtifacts = artifactService
             .getAppEntities(projectVersion);
         List<UUID> projectVersionArtifactIds = projectVersionArtifacts
             .stream()
             .map(ArtifactAppEntity::getId)
             .collect(Collectors.toList());
-        return retrieveTracesInProjectVersion(projectVersion, projectVersionArtifactIds);
+        return retrieveActiveTracesInProjectVersion(projectVersion, projectVersionArtifactIds, tracePredicate);
     }
 
     /**
@@ -39,14 +45,21 @@ public class TraceService implements IAppEntityService<TraceAppEntity> {
      * @param existingArtifactIds Artifact IDs of trace links to retrieve.
      * @return List of {@link TraceAppEntity} Traces associated with existing artifact IDs.
      */
-    public List<TraceAppEntity> retrieveTracesInProjectVersion(ProjectVersion projectVersion,
-                                                               List<UUID> existingArtifactIds) {
+    public List<TraceAppEntity> retrieveActiveTracesInProjectVersion(ProjectVersion projectVersion,
+                                                                     List<UUID> existingArtifactIds) {
+        return retrieveActiveTracesInProjectVersion(projectVersion, existingArtifactIds,
+            t -> t.getApprovalStatus() != ApprovalStatus.DECLINED);
+    }
+
+    public List<TraceAppEntity> retrieveActiveTracesInProjectVersion(ProjectVersion projectVersion,
+                                                                     List<UUID> existingArtifactIds,
+                                                                     Predicate<TraceAppEntity> tracePredicate) {
         return this.traceLinkVersionRepository
             .retrieveAppEntitiesByProjectVersion(projectVersion)
             .stream()
             .filter(t -> existingArtifactIds.contains(t.getSourceId())
-                && existingArtifactIds.contains(t.getTargetId())
-                && t.getApprovalStatus() != ApprovalStatus.DECLINED)
+                && existingArtifactIds.contains(t.getTargetId()))
+            .filter(tracePredicate)
             .collect(Collectors.toList());
         //TODO: Look at absorbing filter method into the retrieval method by default.
     }

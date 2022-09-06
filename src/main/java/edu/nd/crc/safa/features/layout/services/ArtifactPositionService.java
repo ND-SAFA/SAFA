@@ -58,16 +58,12 @@ public class ArtifactPositionService {
         Optional<ArtifactPosition> artifactPositionOptional =
             artifactPositionRepository.findByProjectVersionAndArtifactAndDocumentDocumentId(
                 projectVersion, artifact, documentId);
-        if (artifactPositionOptional.isPresent()) {
-            artifactPosition = artifactPositionOptional.get();
-        } else {
-            // Step 2 - Set properties document
-            artifactPosition.setArtifact(artifact);
-            artifactPosition.setProjectVersion(projectVersion);
-            artifactPosition.setDocument(document);
-        }
+        artifactPositionOptional.ifPresent(position -> artifactPosition.setId(position.getId()));
 
         // Step 3 - Set position
+        artifactPosition.setArtifact(artifact);
+        artifactPosition.setProjectVersion(projectVersion);
+        artifactPosition.setDocument(document);
         artifactPosition.setX(layoutPosition.getX());
         artifactPosition.setY(layoutPosition.getY());
 
@@ -76,13 +72,11 @@ public class ArtifactPositionService {
 
     public Map<UUID, LayoutPosition> retrieveDocumentLayout(ProjectVersion projectVersion, UUID documentId) {
         Map<UUID, LayoutPosition> layout = new HashMap<>();
-        List<ArtifactPosition> artifactPositionsAcrossVersions =
-            this.artifactPositionRepository.findByProjectVersionProjectAndDocumentDocumentId(
-                projectVersion.getProject(),
-                documentId);
+        List<ArtifactPosition> artifactPositionsAcrossVersions = this.artifactPositionRepository
+            .getByProjectAndDocumentId(projectVersion.getProject(), documentId);
         Map<UUID, List<ArtifactPosition>> id2pos = versionCalculator.groupEntityVersionsByEntityId(
             artifactPositionsAcrossVersions,
-            ArtifactPosition::getId);
+            ap -> ap.getArtifact().getArtifactId());
         for (Map.Entry<UUID, List<ArtifactPosition>> entry : id2pos.entrySet()) {
             List<ArtifactPosition> artifactPositions = entry.getValue();
             ArtifactPosition artifactPosition = versionCalculator.getEntityAtVersion(

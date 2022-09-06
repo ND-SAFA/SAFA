@@ -19,4 +19,8 @@ public interface ArtifactPositionRepository extends CrudRepository<ArtifactPosit
 
     List<ArtifactPosition> findByProjectVersionProjectAndDocumentDocumentId(Project project,
                                                                             UUID documentId);
+
+    default List<ArtifactPosition> getByProjectAndDocumentId(Project project, UUID documentId) {
+        return findByProjectVersionProjectAndDocumentDocumentId(project, documentId);
+    }
 }

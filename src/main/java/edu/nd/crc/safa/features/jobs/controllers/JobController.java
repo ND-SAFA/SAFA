@@ -5,32 +5,23 @@ import java.util.UUID;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.features.commits.services.EntityVersionService;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
-import edu.nd.crc.safa.features.jobs.entities.app.FlatFileProjectCreationJob;
 import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
-import edu.nd.crc.safa.features.jobs.entities.app.JobType;
-import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
+import edu.nd.crc.safa.features.jobs.entities.builders.CreateProjectByJsonJobBuilder;
+import edu.nd.crc.safa.features.jobs.entities.builders.UpdateProjectByFlatFileJobBuilder;
 import edu.nd.crc.safa.features.jobs.services.JobService;
-import edu.nd.crc.safa.features.notifications.NotificationService;
+import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
+import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
-import edu.nd.crc.safa.features.projects.repositories.ProjectRepository;
-import edu.nd.crc.safa.features.projects.services.AppEntityRetrievalService;
-import edu.nd.crc.safa.features.projects.services.ProjectService;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
 
-import org.springframework.batch.core.JobParametersInvalidException;
-import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
-import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
-import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -42,34 +33,13 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 public class JobController extends BaseController {
 
-    JobService jobService;
-    EntityVersionService entityVersionService;
-    ProjectService projectService;
-    ProjectRepository projectRepository; //TODO: Extract into service?
-    AppEntityRetrievalService appEntityRetrievalService;
-    NotificationService notificationService;
-    TaskExecutor taskExecutor;
-    ServiceProvider serviceProvider;
+    private final JobService jobService;
 
     @Autowired
     public JobController(ResourceBuilder resourceBuilder,
-                         JobService jobService,
-                         EntityVersionService entityVersionService,
-                         ProjectService projectService,
-                         ProjectRepository projectRepository,
-                         AppEntityRetrievalService appEntityRetrievalService,
-                         NotificationService notificationService,
-                         TaskExecutor taskExecutor,
                          ServiceProvider serviceProvider) {
-        super(resourceBuilder);
-        this.jobService = jobService;
-        this.entityVersionService = entityVersionService;
-        this.projectService = projectService;
-        this.projectRepository = projectRepository;
-        this.appEntityRetrievalService = appEntityRetrievalService;
-        this.notificationService = notificationService;
-        this.taskExecutor = taskExecutor;
-        this.serviceProvider = serviceProvider;
+        super(resourceBuilder, serviceProvider);
+        this.jobService = serviceProvider.getJobService();
     }
 
     @GetMapping(AppRoutes.Jobs.GET_JOBS)
@@ -85,8 +55,12 @@ public class JobController extends BaseController {
      */
     @DeleteMapping(AppRoutes.Jobs.DELETE_JOB)
     public void deleteJob(@PathVariable UUID jobId) throws SafaError {
-        //TODO: Find a way to stop jobs
         this.jobService.deleteJob(jobId);
+        this.serviceProvider.getNotificationService().broadcastChange(
+            EntityChangeBuilder
+                .create(jobId)
+                .withJobDelete(jobId)
+        );
     }
 
     /**
@@ -97,28 +71,20 @@ public class JobController extends BaseController {
      * @return The current status of the job created.
      * @throws SafaError Throws error if job failed to start or is under construction.
      */
-    @PostMapping(AppRoutes.Jobs.FLAT_FILE_PROJECT_UPDATE_JOB)
+    @PostMapping(AppRoutes.Jobs.UPDATE_PROJECT_VIA_FLAT_FILES)
     @ResponseStatus(HttpStatus.CREATED)
     public JobAppEntity flatFileProjectUpdateJob(@PathVariable UUID versionId,
-                                                 @RequestParam MultipartFile[] files) throws SafaError,
-        JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException,
-        JobParametersInvalidException, JobRestartException {
-        // Step 1 - Fetch version and assert permissions
-        ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersion();
-
-        // Step 2 - Create new job
-        String name = "Uploading flat files to: " + projectVersion.getProject().getName();
-        JobDbEntity jobDbEntity = this.jobService.createNewJob(JobType.FLAT_FILE_PROJECT_CREATION, name);
-
-        // Step 3 - Create job worker
-        FlatFileProjectCreationJob jobCreationThread = new FlatFileProjectCreationJob(jobDbEntity,
+                                                 @RequestParam MultipartFile[] files) throws Exception {
+        UpdateProjectByFlatFileJobBuilder updateProjectByFlatFileJobBuilder = new UpdateProjectByFlatFileJobBuilder(
             serviceProvider,
-            projectVersion,
-            files);
+            versionId, files);
+        return updateProjectByFlatFileJobBuilder.perform();
+    }
 
-        jobService.executeJob(jobDbEntity, serviceProvider, jobCreationThread);
-
-        // Step 4 - Create job response
-        return JobAppEntity.createFromJob(jobDbEntity);
+    @PostMapping(AppRoutes.Jobs.CREATE_PROJECT_VIA_JSON)
+    public JobAppEntity createProjectFromJSON(@RequestBody ProjectAppEntity projectAppEntity) throws Exception {
+        CreateProjectByJsonJobBuilder createProjectByJsonJobBuilder = new CreateProjectByJsonJobBuilder(
+            serviceProvider, projectAppEntity);
+        return createProjectByJsonJobBuilder.perform();
     }
 }

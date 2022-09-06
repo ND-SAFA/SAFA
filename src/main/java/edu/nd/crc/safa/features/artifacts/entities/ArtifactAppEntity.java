@@ -1,9 +1,10 @@
 package edu.nd.crc.safa.features.artifacts.entities;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
@@ -20,36 +21,35 @@ public class ArtifactAppEntity implements IAppEntity {
     /**
      * UUID uniquely identifying artifact.
      */
-    @NotNull
-    public String id;
+    UUID id;
     /**
      * The user-defined identifier for the artifact.
      */
     @NotNull
     @NotEmpty
-    public String name;
+    String name;
     /**
      * Summary of the artifact body used for short displays of what the
      * artifact contains.
      */
     @NotNull
-    public String summary;
+    String summary;
     /**
      * The string representation of an artifact's content. Could be string, code, or other
      * file type like JSON.
      */
     @NotNull
-    public String body;
+    String body;
     /**
      * The name of the ArtifactType this pertains to.
      */
     @NotNull
     @NotEmpty
-    public String type;
+    String type;
     /**
      * Mapping of columns ids to column values for this artifact.
      */
-    Map<String, String> customFields;
+    Map<String, String> customFields = new HashMap<>();
     /**
      * The type of document this artifact is displayed in.
      */
@@ -65,18 +65,15 @@ public class ArtifactAppEntity implements IAppEntity {
     /**
      * List of document Ids this artifact belongs to.
      */
-    List<String> documentIds;
+    List<UUID> documentIds = new ArrayList<>();
 
     public ArtifactAppEntity() {
-        this.id = "";
         this.name = "";
         this.body = "";
         this.summary = "";
-        this.documentIds = new ArrayList<>();
-        this.customFields = new Hashtable<>();
     }
 
-    public ArtifactAppEntity(String artifactId,
+    public ArtifactAppEntity(UUID artifactId,
                              String type,
                              String name,
                              String summary,
@@ -93,15 +90,7 @@ public class ArtifactAppEntity implements IAppEntity {
         this.customFields = customFields;
     }
 
-    public void addDocumentId(String documentId) {
+    public void addDocumentId(UUID documentId) {
         this.documentIds.add(documentId);
-    }
-
-    public String getBaseEntityId() {
-        return id;
-    }
-
-    public void setBaseEntityId(String id) {
-        this.id = id;
     }
 }

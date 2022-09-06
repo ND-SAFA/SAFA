@@ -17,7 +17,7 @@ import edu.nd.crc.safa.config.AppConstraints;
 import edu.nd.crc.safa.features.common.IVersionEntity;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import lombok.Data;
 import org.hibernate.annotations.OnDelete;
@@ -192,7 +192,7 @@ public class TraceLinkVersion implements Serializable, IVersionEntity<TraceAppEn
     }
 
     @Override
-    public String getBaseEntityId() {
+    public UUID getBaseEntityId() {
         return traceLink.getBaseEntityId();
     }
 

@@ -1,16 +1,16 @@
-# Summary
-*Describe what new functionality has been introduced and if any previous functionality has changed.* <br>
-**[Notion Issue]()** <br>
+### Summary
+---
 
-> [SUMMARY]
+[SUMMARY]
 
-**Acceptance Criteria** <br>
+* [ISSUE](LINK)
 
-*What has changed?*
+### Change Set
+---
 
-- [CHARACTERISTIC 1]
+- [CHANGE]
 
-# Review
-**Test Case** <br>
-*Please describe how these changes were tested.*
-- [TEST STEP 1]
+### Test
+---
+
+- [UNITTEST]

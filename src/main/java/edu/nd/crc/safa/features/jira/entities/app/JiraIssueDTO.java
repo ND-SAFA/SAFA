@@ -3,6 +3,7 @@ package edu.nd.crc.safa.features.jira.entities.app;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import javax.annotation.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -50,6 +51,7 @@ public class JiraIssueDTO {
         /**
          * The text defining this issue.
          */
+        @Nullable
         JiraDescription description;
         Date updated;
         Date created;
@@ -64,12 +66,13 @@ public class JiraIssueDTO {
         public static class JiraDescription {
             int version;
             String type;
-            List<Content> content;
+            List<Content> content = new ArrayList<>();
 
             @Data
             public static class Content {
                 String type;
-                List<ContentContent> content; // Cannot rename because this is the format defined by JIRA
+                // Cannot rename because this is the format defined by JIRA
+                List<ContentContent> content = new ArrayList<>();
             }
 
             @Data

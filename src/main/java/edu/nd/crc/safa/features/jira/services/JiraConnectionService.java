@@ -1,11 +1,13 @@
 package edu.nd.crc.safa.features.jira.services;
 
+import java.util.Date;
 import java.util.List;
 
 import edu.nd.crc.safa.features.jira.entities.app.JiraIssuesResponseDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraProjectResponseDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraRefreshTokenDTO;
 import edu.nd.crc.safa.features.jira.entities.db.JiraAccessCredentials;
+import edu.nd.crc.safa.features.jira.entities.db.JiraProject;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 
 import org.springframework.context.annotation.Scope;
@@ -54,7 +56,7 @@ public interface JiraConnectionService {
      *
      * @param credentials   The credentials of the user accessing JIRA.
      * @param jiraProjectId The JIRA project id.
-     * @return JIRA API Response
+     * @return JIRA issues for the given project
      */
     JiraIssuesResponseDTO retrieveJIRAIssues(JiraAccessCredentials credentials, Long jiraProjectId);
 
@@ -63,6 +65,19 @@ public interface JiraConnectionService {
      *
      * @param project       The safa project associated with the JIRA project.
      * @param jiraProjectId The id of the JIRA project.
+     * @return JiraProject The jira project created.
      */
-    void createJiraProjectMapping(Project project, Long jiraProjectId);
+    JiraProject createJiraProjectMapping(Project project, Long jiraProjectId);
+
+    /**
+     * Retrieve updated issues associated with a JIRA project after a certain timestamp
+     *
+     * @param credentials   The credentials of the user accessing JIRA.
+     * @param jiraProjectId The JIRA project id.
+     * @param timestamp     Timestamp after which issues were updated
+     * @return JIRA the updated issues for the given project
+     */
+    JiraIssuesResponseDTO retrieveUpdatedJIRAIssues(JiraAccessCredentials credentials,
+                                                    Long jiraProjectId,
+                                                    Date timestamp);
 }

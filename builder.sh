@@ -8,10 +8,15 @@ runProd(){
   runServer safa-prod
 }
 
+runLocalWithCredentials(){
+  setGoogleCredentials
+  runLocal
+}
+
 setGoogleCredentials(){
     export GOOGLE_APPLICATION_CREDENTIALS="$PWD/application-credentials.json"
-
 }
+
 runLocal() {
   runServer dev
 }
@@ -71,6 +76,10 @@ fi
 
 if [ $2 == "local" ]; then
   build $3 && runLocal
+fi
+
+if [ $2 == "local-creds" ]; then
+  build $3 && runLocalWithCredentials
 fi
 
 if [ $2 == "dev" ]; then

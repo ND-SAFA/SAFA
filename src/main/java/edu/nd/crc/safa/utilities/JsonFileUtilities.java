@@ -1,5 +1,8 @@
 package edu.nd.crc.safa.utilities;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,6 +11,7 @@ import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -15,6 +19,18 @@ import org.json.JSONObject;
  * Extracts list of records in JSON files containing entities to be extracted as records.
  */
 public interface JsonFileUtilities {
+    /**
+     * Returns the JSONObject parsed from path to JSON file.
+     *
+     * @param path The path to the JSON file.
+     * @return JSONObject
+     * @throws IOException If file is missing or not able to be read.
+     */
+    static JSONObject readJSONFile(String path) throws IOException {
+        String fileContent = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8);
+        return new JSONObject(fileContent);
+    }
+
     /**
      * Reads JSON file and extracts array using given key and converts them to a list of
      * json objects.
@@ -25,7 +41,7 @@ public interface JsonFileUtilities {
      */
     static List<JSONObject> getArrayAsRecords(JSONObject jsonFile, String arrayKeyName) {
         if (!jsonFile.has(arrayKeyName)) {
-            throw new SafaError("Expected file to contain key: " + arrayKeyName);
+            throw new SafaError("Expected file to contain key: %s", arrayKeyName);
         }
         JSONArray jsonArtifactArray = jsonFile.getJSONArray(arrayKeyName);
         List<JSONObject> jsonArtifacts = new ArrayList<>();
@@ -69,6 +85,14 @@ public interface JsonFileUtilities {
         return wrapReturnValue(() -> {
             String objectJsonString = objectMapper.writeValueAsString(object);
             return new JSONObject(objectJsonString);
+        });
+    }
+
+    static JSONArray toJsonArray(Object object) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        return wrapReturnValue(() -> {
+            String objectJsonString = objectMapper.writeValueAsString(object);
+            return new JSONArray(objectJsonString);
         });
     }
 

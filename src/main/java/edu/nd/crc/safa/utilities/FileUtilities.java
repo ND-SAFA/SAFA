@@ -7,6 +7,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -33,34 +35,28 @@ import org.springframework.web.multipart.MultipartFile;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class FileUtilities {
 
-    public static CSVParser readCSVFile(String pathToFile) throws SafaError {
-        try {
-            File csvData = new File(pathToFile);
-            if (!csvData.exists()) {
-                throw new SafaError("CSV file does not exist: " + pathToFile);
-            }
-
-            CSVFormat fileFormat = createUnknownHeaderCsvFileFormat();
-            return CSVParser.parse(csvData, Charset.defaultCharset(), fileFormat);
-        } catch (IOException e) {
-            String error = String.format("Could not read CSV file at path: %s", pathToFile);
-            throw new SafaError(error, e);
+    public static CSVParser readCSVFile(String pathToFile) throws IOException {
+        File csvData = new File(pathToFile);
+        if (!csvData.exists()) {
+            String errorMessage = String.format("Could not find CSV file %s.", csvData.getAbsolutePath());
+            throw new IOException(errorMessage);
         }
+
+        CSVFormat fileFormat = createUnknownHeaderCsvFileFormat();
+        return CSVParser.parse(csvData, Charset.defaultCharset(), fileFormat);
     }
 
     public static CSVParser readMultiPartCSVFile(MultipartFile file, String[] requiredColumns) throws
         SafaError {
-        String requiredColumnsLabel = String.join(", ", requiredColumns);
         if (!Objects.requireNonNull(file.getOriginalFilename()).contains(".csv")) {
-            throw new SafaError("Expected a CSV file with columns: " + requiredColumnsLabel);
+            throw new SafaError("Expected a CSV file with columns: %s", (Object) requiredColumns);
         }
         try {
             CSVParser parsedFile = CSVParser.parse(new String(file.getBytes()), createUnknownHeaderCsvFileFormat());
             assertHasColumns(parsedFile, requiredColumns);
             return parsedFile;
         } catch (IOException e) {
-            String error = "Unable to read csv file: " + file.getOriginalFilename();
-            throw new SafaError(error, e);
+            throw new SafaError("Unable to read csv file %s.", file.getOriginalFilename());
         }
     }
 
@@ -86,8 +82,9 @@ public class FileUtilities {
         for (String rColumn : requiredColumns) {
             if (!headerNamesLower.contains(rColumn)) {
                 String requiredColumnsLabel = String.join(", ", requiredColumns);
-                String error = "Expected CSV to have column(s) [%s] but found: %s";
-                throw new SafaError(String.format(error, requiredColumnsLabel, file.getHeaderNames()));
+                throw new SafaError("Expected CSV to have column(s) %s but found: %s",
+                    requiredColumnsLabel,
+                    file.getHeaderNames());
             }
         }
     }
@@ -95,8 +92,7 @@ public class FileUtilities {
     public static void assertHasKeys(JSONObject obj, List<String> keys) throws SafaError {
         for (String key : keys) {
             if (!obj.has(key)) {
-                String error = String.format("Expected %s to have key: %s", obj, key);
-                throw new SafaError(error);
+                throw new SafaError("Expected %s to have key: %s", obj, key);
             }
         }
     }
@@ -125,19 +121,7 @@ public class FileUtilities {
         }
         return result;
     }
-
-    /**
-     * Returns the JSONObject parsed from path to JSON file.
-     *
-     * @param path The path to the JSON file.
-     * @return JSONObject
-     * @throws IOException If file is missing or not able to be read.
-     */
-    public static JSONObject readJSONFile(String path) throws IOException {
-        String fileContent = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8);
-        return new JSONObject(fileContent);
-    }
-
+    
     /**
      * Extracts files in given zip bytearray as a string.
      *
@@ -148,11 +132,11 @@ public class FileUtilities {
     public static List<File> extractFilesFromZipContent(String content) throws IOException {
         ZipEntry entry;
         final var zin = new ZipInputStream(new ByteArrayInputStream(content.getBytes(StandardCharsets.ISO_8859_1)));
-        String temporaryFolder = ProjectPaths.createTemporaryDirectory();
+        String temporaryFolder = ProjectPaths.Storage.createTemporaryDirectory();
         List<File> filesCreated = new ArrayList<>();
         while ((entry = zin.getNextEntry()) != null) {
             String name = entry.getName();
-            String pathToFile = ProjectPaths.joinPaths(temporaryFolder, name);
+            String pathToFile = buildPath(temporaryFolder, name);
             try (FileOutputStream outputStream = new FileOutputStream(pathToFile)) {
                 for (var c = zin.read(); c != -1; c = zin.read()) {
                     outputStream.write(c);
@@ -165,18 +149,98 @@ public class FileUtilities {
         return filesCreated;
     }
 
+    /**
+     * Writes content to file.
+     *
+     * @param file        The file to write to.
+     * @param fileContent The content to write to file.
+     * @throws IOException Throws error if problem opening file.
+     */
     public static void writeToFile(File file, String fileContent) throws IOException {
         try (FileWriter myWriter = new FileWriter(file)) {
             myWriter.write(fileContent);
         }
     }
 
-    public void hasRequiredFields(JSONObject json, Iterator<String> fields) {
-        for (Iterator<String> it = fields; it.hasNext(); ) {
-            String field = it.next();
-            if (!json.has(field)) {
-                throw new SafaError("Expected object:\n" + json + "\n to contain field:" + field);
+    /**
+     * Attempts to create directory to given path.
+     *
+     * @param pathToDirectory Path to directory to create.
+     * @param createIfEmpty   Flag used to disable attempt
+     */
+    public static void createDirectoryIfEmpty(String pathToDirectory, boolean createIfEmpty) throws IOException {
+        if (createIfEmpty) {
+            createDirectoryIfEmpty(pathToDirectory);
+        }
+    }
+
+    /**
+     * Creates directory at given path if it does not exist.
+     *
+     * @param pathToDirectory Path to directory to create.
+     * @throws IOException If error occurs while creating directory.
+     */
+    public static void createDirectoryIfEmpty(String pathToDirectory) throws IOException {
+        if (!Files.exists(Paths.get(pathToDirectory))) {
+            Files.createDirectories(Paths.get(pathToDirectory));
+        }
+    }
+
+    /**
+     * Creates OS-aware path of given directory.
+     *
+     * @param directories Directories that once joined create path.
+     * @return String representing built path.
+     */
+    public static String buildPath(String... directories) {
+        StringBuilder finalPath = new StringBuilder();
+        for (int i = 0; i < directories.length; i++) {
+            String p = directories[i];
+            if (i < directories.length - 1) {
+                finalPath.append(p).append(File.separator);
+            } else {
+                finalPath.append(p);
             }
         }
+        return finalPath.toString();
+    }
+
+    /**
+     * Deletes file or folder located at given path
+     *
+     * @param path path to a file or directory which to delete
+     * @throws SafaError If an error occurs while deleting file, directory, or children of directory.
+     */
+    public static void deletePath(String path) throws SafaError, IOException {
+        File objectAtPath = new File(path);
+
+        if (objectAtPath.exists()) {
+            if (objectAtPath.isDirectory()) {
+                FileUtils.deleteDirectory(objectAtPath);
+            } else {
+                if (!objectAtPath.delete()) {
+                    String errorMessage = String.format("Could not delete file at: %s", path);
+                    throw new IOException(errorMessage);
+                }
+            }
+        }
+    }
+
+    /**
+     * Removes any children of given directory includes
+     * all sub-folders and files. If directory has not
+     * been created then new directory is created.
+     *
+     * @param pathToDir path to a directory
+     * @throws SafaError If failure to delete any files or folders.
+     */
+    public static void clearOrCreateDirectory(String pathToDir) throws IOException {
+        File myDir = new File(pathToDir);
+
+        if (!myDir.exists()) {
+            myDir.mkdirs();
+        }
+
+        FileUtils.cleanDirectory(myDir);
     }
 }

@@ -5,10 +5,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
+import edu.nd.crc.safa.features.artifacts.repositories.ArtifactRepository;
 import edu.nd.crc.safa.features.commits.repositories.GenericVersionRepository;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.matrices.services.TraceMatrixService;
-import edu.nd.crc.safa.features.projects.entities.app.ProjectRetriever;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;
@@ -17,7 +17,7 @@ import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.traces.entities.db.TraceLink;
 import edu.nd.crc.safa.features.traces.entities.db.TraceLinkVersion;
 import edu.nd.crc.safa.features.traces.entities.db.TraceType;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -32,7 +32,7 @@ public class TraceLinkVersionRepositoryImpl
     @Autowired
     TraceLinkRepository traceLinkRepository;
     @Autowired
-    ProjectRetriever artifactRepository;
+    ArtifactRepository artifactRepository;
     @Autowired
     TraceMatrixRepository traceMatrixRepository;
     @Autowired
@@ -85,8 +85,8 @@ public class TraceLinkVersionRepositoryImpl
     }
 
     @Override
-    public Optional<TraceLink> findBaseEntityById(String baseEntityId) {
-        return this.traceLinkRepository.findById(UUID.fromString(baseEntityId));
+    public Optional<TraceLink> findBaseEntityById(UUID baseEntityId) {
+        return this.traceLinkRepository.findById(baseEntityId);
     }
 
     @Override
@@ -120,11 +120,11 @@ public class TraceLinkVersionRepositoryImpl
         Artifact targetArtifact = trace.getTraceLink().getTargetArtifact();
 
         return new TraceAppEntity(
-            traceLinkId != null ? traceLinkId.toString() : "",
+            traceLinkId,
             sourceArtifact.getName(),
-            sourceArtifact.getArtifactId().toString(),
+            sourceArtifact.getArtifactId(),
             targetArtifact.getName(),
-            targetArtifact.getArtifactId().toString(),
+            targetArtifact.getArtifactId(),
             trace.getApprovalStatus(),
             trace.getScore(),
             trace.getTraceType()

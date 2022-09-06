@@ -6,6 +6,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.Table;
 
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
@@ -39,8 +40,12 @@ public class Project implements Serializable {
     String name;
     /**
      * Description of project.
+     * Lob to support GitHub repository descriptions
      */
-    @Column(name = "description", nullable = false)
+    @Lob
+    @Column(name = "description",
+        nullable = false,
+        columnDefinition = "mediumtext")
     String description;
 
     public Project(String name, String description) {
@@ -66,8 +71,8 @@ public class Project implements Serializable {
      * @param projectAppEntity The project to update from.
      */
     public void updateFromAppEntity(ProjectAppEntity projectAppEntity) {
-        if (!projectAppEntity.getProjectId().equals("")) {
-            this.projectId = UUID.fromString(projectAppEntity.getProjectId());
+        if (!(projectAppEntity.getProjectId() == null)) {
+            this.projectId = projectAppEntity.getProjectId();
         }
         this.name = projectAppEntity.getName();
         this.description = projectAppEntity.getDescription();

@@ -9,5 +9,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ProjectRepository extends CrudRepository<Project, UUID> {
-    Project findByProjectId(UUID projectId); // TODO: remove and use findById and deal with optional.
+    Project findByProjectId(UUID projectId);
 }

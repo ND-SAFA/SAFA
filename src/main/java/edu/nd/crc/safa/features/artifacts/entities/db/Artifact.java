@@ -17,6 +17,7 @@ import edu.nd.crc.safa.config.AppConstraints;
 import edu.nd.crc.safa.features.common.IBaseEntity;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.types.ArtifactType;
 
 import lombok.Data;
 import org.hibernate.annotations.OnDelete;
@@ -79,7 +80,7 @@ public class Artifact implements Serializable, IBaseEntity, IArtifact {
     }
 
     @Override
-    public String getBaseEntityId() {
-        return this.artifactId.toString();
+    public UUID getBaseEntityId() {
+        return this.artifactId;
     }
 }

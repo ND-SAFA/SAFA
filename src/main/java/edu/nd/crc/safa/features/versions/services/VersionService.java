@@ -5,7 +5,7 @@ import java.util.Optional;
 
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.features.versions.repositories.ProjectVersionRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,12 +58,26 @@ public class VersionService {
         return newVersion;
     }
 
+    /**
+     * Returns the current version of given project.
+     *
+     * @param project The project whose current version is returned.
+     * @return {@link ProjectVersion} Current version.
+     * @throws SafaError Throws error if
+     */
     public ProjectVersion getCurrentVersion(Project project) throws SafaError {
         Optional<ProjectVersion> projectVersionQuery = this.projectVersionRepository.getCurrentVersion(project);
         if (projectVersionQuery.isPresent()) {
             return projectVersionQuery.get();
         } else {
-            throw new SafaError("Expected given project to contain an initial version");
+            throw new SafaError("Expected given project to contain an initial version.");
         }
+    }
+
+    public ProjectVersion createInitialProjectVersion(Project project) {
+        ProjectVersion projectVersion = new ProjectVersion(project, 1, 1, 1);
+        this.projectVersionRepository.save(projectVersion);
+        projectVersion.setProject(project);
+        return projectVersion;
     }
 }

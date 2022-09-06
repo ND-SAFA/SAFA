@@ -9,7 +9,7 @@ import java.util.List;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
-import edu.nd.crc.safa.utilities.OSHelper;
+import edu.nd.crc.safa.utilities.FileUtilities;
 
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Scope;
@@ -32,13 +32,14 @@ public class FileUploadService {
      * @param requestFiles The files being stored on the server.
      * @throws SafaError Throws error if error occurs while creating necessary directory structure or writing to disk.
      */
-    public void uploadFilesToServer(Project project, List<MultipartFile> requestFiles) throws SafaError {
-        String pathToStorage = ProjectPaths.getPathToUploadedFiles(project, true);
-        OSHelper.clearOrCreateDirectory(pathToStorage);
+    public void uploadFilesToServer(Project project, List<MultipartFile> requestFiles) throws SafaError, IOException {
+        String pathToStorage = ProjectPaths.Storage.projectUploadsPath(project, true);
+        FileUtilities.clearOrCreateDirectory(pathToStorage);
 
         for (MultipartFile requestFile : requestFiles) {
             try {
-                String pathToFile = ProjectPaths.getPathToFlatFile(project, requestFile.getOriginalFilename());
+                String pathToFile = ProjectPaths.Storage.uploadedProjectFilePath(project,
+                    requestFile.getOriginalFilename());
                 Path pathToUploadedFile = Paths.get(pathToFile);
                 File newFile = new File(pathToUploadedFile.toString());
                 File parentFile = newFile.getParentFile();

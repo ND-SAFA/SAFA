@@ -4,20 +4,21 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactType;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
-import edu.nd.crc.safa.features.layout.entities.LayoutPosition;
+import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
+import edu.nd.crc.safa.features.memberships.entities.app.ProjectMemberAppEntity;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.rules.parser.RuleName;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
-import edu.nd.crc.safa.features.users.entities.app.ProjectMemberAppEntity;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.types.TypeAppEntity;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
@@ -26,35 +27,32 @@ import lombok.Data;
  * Represents the front-end model of a project.
  */
 @Data
-public class ProjectAppEntity {
+public class ProjectAppEntity implements IAppEntity {
+    UUID projectId;
     @NotNull
-    public String projectId;
+    String name;
     @NotNull
-    public String name;
-    @NotNull
-    public String description;
+    String description;
     @Valid
-    public ProjectVersion projectVersion;
+    ProjectVersion projectVersion;
     @NotNull
-    public List<@Valid @NotNull ArtifactAppEntity> artifacts;
+    List<@Valid @NotNull ArtifactAppEntity> artifacts;
     @NotNull
-    public List<@Valid @NotNull TraceAppEntity> traces;
+    List<@Valid @NotNull TraceAppEntity> traces;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    public List<ProjectMemberAppEntity> members;
+    List<ProjectMemberAppEntity> members;
     @Nullable
-    public String currentDocumentId;
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    public List<@Valid @NotNull DocumentAppEntity> documents;
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    public List<@Valid @NotNull ArtifactType> artifactTypes;
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    Map<String, List<@Valid @NotNull RuleName>> warnings;
+    String currentDocumentId;
+    List<@Valid @NotNull DocumentAppEntity> documents;
+    List<@Valid @NotNull TypeAppEntity> artifactTypes;
+    Map<UUID, List<@Valid @NotNull RuleName>> warnings;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     ProjectParsingErrors errors;
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    Map<String, LayoutPosition> layout;
+    Map<UUID, LayoutPosition> layout;
 
     public ProjectAppEntity() {
+        this.name = "";
+        this.description = "";
         this.artifacts = new ArrayList<>();
         this.traces = new ArrayList<>();
         this.members = new ArrayList<>();
@@ -71,13 +69,13 @@ public class ProjectAppEntity {
                             List<ProjectMemberAppEntity> members,
                             List<DocumentAppEntity> documents,
                             @Nullable String currentDocumentId,
-                            List<ArtifactType> artifactTypes,
-                            Map<String, List<@Valid @NotNull RuleName>> warnings,
+                            List<TypeAppEntity> artifactTypes,
+                            Map<UUID, List<@Valid @NotNull RuleName>> warnings,
                             ProjectParsingErrors errors,
-                            Map<String, LayoutPosition> layout) {
+                            Map<UUID, LayoutPosition> layout) {
         this();
         Project project = projectVersion.getProject();
-        this.projectId = project.getProjectId().toString();
+        this.projectId = project.getProjectId();
         this.name = project.getName();
         this.description = project.getDescription();
         this.projectVersion = projectVersion;
@@ -97,5 +95,15 @@ public class ProjectAppEntity {
             .stream()
             .map(ArtifactAppEntity::getName)
             .collect(Collectors.toList());
+    }
+
+    @Override
+    public UUID getId() {
+        return this.projectId;
+    }
+
+    @Override
+    public void setId(UUID id) {
+        this.projectId = id;
     }
 }

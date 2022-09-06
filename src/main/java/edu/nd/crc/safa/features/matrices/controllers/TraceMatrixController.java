@@ -9,13 +9,14 @@ import java.util.UUID;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactType;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.features.common.BaseController;
+import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.matrices.entities.TraceMatrix;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.traces.repositories.TraceMatrixRepository;
+import edu.nd.crc.safa.features.types.ArtifactType;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -30,16 +31,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class TraceMatrixController extends BaseController {
 
-    TraceMatrixRepository traceMatrixRepository;
-    ArtifactTypeRepository artifactTypeRepository;
+    private final TraceMatrixRepository traceMatrixRepository;
+    private final ArtifactTypeRepository artifactTypeRepository;
 
     @Autowired
     public TraceMatrixController(ResourceBuilder resourceBuilder,
-                                 TraceMatrixRepository traceMatrixRepository,
-                                 ArtifactTypeRepository artifactTypeRepository) {
-        super(resourceBuilder);
-        this.traceMatrixRepository = traceMatrixRepository;
-        this.artifactTypeRepository = artifactTypeRepository;
+                                 ServiceProvider serviceProvider) {
+        super(resourceBuilder, serviceProvider);
+        this.traceMatrixRepository = serviceProvider.getTraceMatrixRepository();
+        this.artifactTypeRepository = serviceProvider.getArtifactTypeRepository();
     }
 
     /**
@@ -49,7 +49,7 @@ public class TraceMatrixController extends BaseController {
      * @return List of project matrices defined in project.
      * @throws SafaError Throws error if project with ID is not found.
      */
-    @GetMapping(AppRoutes.Projects.TraceMatrix.GET_TRACE_MATRICES)
+    @GetMapping(AppRoutes.TraceMatrix.GET_TRACE_MATRICES)
     public Map<String, List<String>> getTraceMatricesInProject(@PathVariable UUID projectId) throws SafaError {
         Project project = this.resourceBuilder.fetchProject(projectId).withViewProject();
         List<TraceMatrix> projectTraceMatrices = traceMatrixRepository.findByProject(project);
@@ -83,11 +83,11 @@ public class TraceMatrixController extends BaseController {
      * @param targetArtifactTypeName The name of the target artifact type.
      * @throws SafaError Throws error if project with ID is not found.
      */
-    @PostMapping(AppRoutes.Projects.TraceMatrix.CREATE_TRACE_MATRIX)
+    @PostMapping(AppRoutes.TraceMatrix.CREATE_TRACE_MATRIX)
     public void createTraceMatrix(@PathVariable UUID projectId,
                                   @PathVariable String sourceArtifactTypeName,
                                   @PathVariable String targetArtifactTypeName) throws SafaError {
-        Project project = this.resourceBuilder.fetchProject(projectId).withViewProject();
+        Project project = this.resourceBuilder.fetchProject(projectId).withEditProject();
         Optional<TraceMatrix> traceMatrixQuery = traceMatrixRepository.queryForMatrixInProject(project,
             sourceArtifactTypeName, targetArtifactTypeName);
         if (traceMatrixQuery.isPresent()) {
@@ -111,7 +111,7 @@ public class TraceMatrixController extends BaseController {
      * @param targetArtifactTypeName The target artifact type name of the matrix.
      * @throws SafaError Throws error if user does not have edit permission on project.
      */
-    @DeleteMapping(AppRoutes.Projects.TraceMatrix.DELETE_TRACE_MATRIX)
+    @DeleteMapping(AppRoutes.TraceMatrix.DELETE_TRACE_MATRIX)
     public void deleteTraceMatrix(@PathVariable UUID projectId,
                                   @PathVariable String sourceArtifactTypeName,
                                   @PathVariable String targetArtifactTypeName) throws SafaError {

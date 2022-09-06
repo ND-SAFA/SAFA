@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.config;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import javax.annotation.Resource;
 
@@ -30,14 +31,16 @@ import org.springframework.web.cors.CorsConfiguration;
 @Configuration
 public class AuthenticationConfig extends WebSecurityConfigurerAdapter {
 
-    private final List<String> allowedOrigins = Arrays.asList(
+    private static final List<String> allowedOrigins = Arrays.asList(
         "http://localhost:8080",
         "http://localhost:8081",
         "https://safa-fend-dev-5asg6qsnba-uc.a.run.app",
-        "https://safa-fend-prod-5asg6qsnba-uc.a.run.app"
+        "https://safa-fend-prod-5asg6qsnba-uc.a.run.app",
+        "https://dev.safa.ai",
+        "https://app.safa.ai"
     );
 
-    private final List<String> allowedMethods = Arrays.asList("GET", "POST", "PUT", "DELETE");
+    private static final List<String> allowedMethods = Arrays.asList("GET", "POST", "PUT", "DELETE");
 
     @Resource
     private UserDetailsService userDetailsService;
@@ -55,37 +58,45 @@ public class AuthenticationConfig extends WebSecurityConfigurerAdapter {
         http
             // CORS
             .cors().configurationSource(request -> {
-                var cors = new CorsConfiguration();
+                CorsConfiguration cors = new CorsConfiguration();
+
                 cors.setAllowedOrigins(allowedOrigins);
                 cors.setAllowedMethods(allowedMethods);
-                cors.setAllowedHeaders(List.of("*"));
+                cors.setAllowedHeaders(Collections.singletonList("*"));
                 cors.setAllowCredentials(true);
                 return cors;
-            }).and()
-            .csrf().disable()
-            // Endpoint Settings
-            .authorizeRequests()
-            .antMatchers(
-                AppRoutes.Accounts.LOGIN,
-                AppRoutes.Accounts.CREATE_ACCOUNT,
-                "/websocket/**").permitAll()
-            // API Generation
-            .antMatchers(
-                "/swagger-ui/**", // Needed to get configu
-                "/v3/api-docs/**",
-                "/docs").permitAll()
-            // Close authentication settings
-            .anyRequest().authenticated()
+            })
+            .and()
+                .csrf()
+                .disable()
+                // Endpoint Settings
+                .authorizeRequests()
+                .antMatchers(
+                    AppRoutes.Accounts.LOGIN,
+                    AppRoutes.Accounts.CREATE_ACCOUNT,
+                    AppRoutes.Accounts.FORGOT_PASSWORD,
+                    AppRoutes.Accounts.RESET_PASSWORD,
+                    "/websocket/**",
+                    "/swagger-ui/**", // Needed to get config
+                    "/v3/api-docs/**",
+                    "/docs")
+                .permitAll()
+            .and()
+                .authorizeRequests()
+                // Close authentication settings
+                .anyRequest()
+                .authenticated()
             // Authentication Filters
             .and()
-            .addFilter(new AuthenticationFilter(authenticationManager(), tokenService))
-            .addFilter(new AuthorizationFilter(authenticationManager(), tokenService, userDetailsService))
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                .addFilter(new AuthenticationFilter(authenticationManager(), tokenService))
+                .addFilter(new AuthorizationFilter(authenticationManager(), tokenService, userDetailsService))
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
 
     @Bean
     public DaoAuthenticationProvider authProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+
         authProvider.setUserDetailsService(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;

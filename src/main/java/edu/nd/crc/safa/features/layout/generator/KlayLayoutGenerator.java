@@ -3,9 +3,10 @@ package edu.nd.crc.safa.features.layout.generator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.layout.entities.LayoutPosition;
+import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 
 import lombok.Getter;
@@ -44,30 +45,30 @@ public class KlayLayoutGenerator {
      *
      * @return EkNode representing parent of all nodes (including islands).
      */
-    public Map<String, LayoutPosition> layout() {
+    public Map<UUID, LayoutPosition> layout() {
         progressMonitor.logGraph(graph, "start");
         graphLayoutEngine.layout(graph, progressMonitor);
         return createPositionMap();
     }
 
-    private Map<String, LayoutPosition> createPositionMap() {
-        Map<String, LayoutPosition> positionMap = new HashMap<>();
-        addChildrenToMap(positionMap, graph);
+    private Map<UUID, LayoutPosition> createPositionMap() {
+        Map<UUID, LayoutPosition> positionMap = new HashMap<>();
+        addChildrenToPositionMap(positionMap, graph);
         return positionMap;
     }
 
-    private void addPositionToMap(Map<String, LayoutPosition> map, ElkNode graph) {
-        String id = graph.getIdentifier();
-        map.computeIfAbsent(id, newKey -> {
-            LayoutPosition graphPosition = new LayoutPosition(graph.getX(), graph.getY());
-            addChildrenToMap(map, graph);
-            return graphPosition;
-        });
-    }
-
-    private void addChildrenToMap(Map<String, LayoutPosition> map, ElkNode graph) {
+    private void addChildrenToPositionMap(Map<UUID, LayoutPosition> map, ElkNode graph) {
         for (ElkNode child : graph.getChildren()) {
             addPositionToMap(map, child);
         }
+    }
+
+    private void addPositionToMap(Map<UUID, LayoutPosition> map, ElkNode graph) {
+        UUID id = UUID.fromString(graph.getIdentifier());
+        map.computeIfAbsent(id, newKey -> {
+            LayoutPosition graphPosition = new LayoutPosition(graph.getX(), graph.getY());
+            addChildrenToPositionMap(map, graph);
+            return graphPosition;
+        });
     }
 }

@@ -38,7 +38,7 @@ ADD resources/ /app/resources/
 COPY --from=config /app/src /app/src
 
 WORKDIR /app
-RUN gradle build --stacktrace
+RUN gradle build --stacktrace -x test -x checkstyleMain -x checkstyleTest
 
 # Copy build and configuration settings then create entry point.
 #

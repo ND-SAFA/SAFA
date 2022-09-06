@@ -10,7 +10,7 @@ import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.traces.entities.db.TraceLink;
 import edu.nd.crc.safa.features.traces.entities.db.TraceLinkVersion;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;

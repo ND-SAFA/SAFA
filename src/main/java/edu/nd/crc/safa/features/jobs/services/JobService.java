@@ -6,7 +6,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import edu.nd.crc.safa.authentication.SafaUserService;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.jobs.entities.app.AbstractJob;
 import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
@@ -16,6 +15,7 @@ import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.jobs.repositories.JobDbRepository;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
+import edu.nd.crc.safa.features.users.services.SafaUserService;
 
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
@@ -99,9 +99,11 @@ public class JobService {
      * Saves job with lastUpdated date at time of save.
      *
      * @param jobDbEntity The job whose lastUpdated property is being modified.
+     * @param nSteps      The number of steps in job.
      */
-    public void startStep(JobDbEntity jobDbEntity) {
+    public void startStep(JobDbEntity jobDbEntity, int nSteps) {
         jobDbEntity.incrementStep();
+        jobDbEntity.incrementProgress(nSteps - 1); // excluding done step
         this.jobDbRepository.save(jobDbEntity);
     }
 
@@ -166,15 +168,14 @@ public class JobService {
                            AbstractJob jobCreationThread) throws
         JobExecutionAlreadyRunningException, JobRestartException,
         JobInstanceAlreadyCompleteException, JobParametersInvalidException {
-        JobParameters jobParameters =
-            new JobParametersBuilder()
-                .addLong("time", System.currentTimeMillis()).toJobParameters();
+        JobParameters jobParameters = new JobParametersBuilder()
+            .addLong("time", System.currentTimeMillis()).toJobParameters();
 
         try {
             jobCreationThread.initJobData();
         } catch (Exception e) {
             serviceProvider.getJobService().failJob(jobDbEntity);
-            throw new SafaError("Failed to start job.");
+            throw new SafaError("Failed to start job. %s", e.getMessage());
         }
         JobLauncher jobLauncher = serviceProvider.getJobLauncher();
         jobLauncher.run(jobCreationThread, jobParameters);

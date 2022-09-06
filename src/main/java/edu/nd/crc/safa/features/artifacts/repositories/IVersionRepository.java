@@ -2,13 +2,14 @@ package edu.nd.crc.safa.features.artifacts.repositories;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import edu.nd.crc.safa.features.common.IVersionEntity;
 import edu.nd.crc.safa.features.delta.entities.app.EntityDelta;
 import edu.nd.crc.safa.features.errors.entities.db.CommitError;
 import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
-import edu.nd.crc.safa.features.versions.entities.db.ProjectVersion;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import org.javatuples.Pair;
 
@@ -45,7 +46,7 @@ public interface IVersionRepository<
      * @return Optional of entity version at given project version.
      */
     Optional<V> findVersionEntityByProjectVersionAndBaseEntityId(ProjectVersion projectVersion,
-                                                                 String entityId);
+                                                                 UUID entityId);
 
     /**
      * Defines a method for constructing AppEntities for attaching sub-entities.
@@ -72,12 +73,14 @@ public interface IVersionRepository<
      *
      * @param projectVersion The project version whose changes are committed to.
      * @param appEntities    The app entities whose states are saved.
+     * @param asCompleteSet  Whether entities create entire set of entities in project.
      * @return List of parsing errors occurring while saving app entities.
      * @throws SafaError Throws error if a fatal constraint or condition is not met.
      */
     List<Pair<V, CommitError>> commitAllAppEntitiesToProjectVersion(
         ProjectVersion projectVersion,
-        List<A> appEntities) throws SafaError;
+        List<A> appEntities,
+        boolean asCompleteSet) throws SafaError;
 
     /**
      * Deletes entity version with given name and commits to given project version.
@@ -88,7 +91,7 @@ public interface IVersionRepository<
      */
     Pair<V, CommitError> deleteVersionEntityByBaseEntityId(
         ProjectVersion projectVersion,
-        String baseEntityName);
+        UUID baseEntityName);
 
     /**
      * Calculates and returns the delta between the versions

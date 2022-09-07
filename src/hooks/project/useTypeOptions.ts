@@ -6,6 +6,7 @@ import {
   ArtifactTypeDirections,
   ArtifactTypeModel,
   LabelledTraceDirectionModel,
+  ProjectModel,
   SafetyCaseType,
   TraceDirectionModel,
 } from "@/types";
@@ -54,12 +55,20 @@ export const useTypeOptions = defineStore("typeOptions", {
   },
   actions: {
     /**
+     *Initializes project data.
+     *
+     * @param project - The project to load.
+     */
+    initializeProject(project: ProjectModel): void {
+      this.artifactTypeDirections = {};
+      this.initializeTypeIcons(project.artifactTypes);
+    },
+    /**
      * Changes what directions of trace links between artifacts are allowed.
      *
      * @param allArtifactTypes - The artifact types to set.
      */
     initializeTypeIcons(allArtifactTypes: ArtifactTypeModel[]): void {
-      this.artifactTypeDirections = {};
       this.$patch({
         artifactTypeIcons: createDefaultTypeIcons(allArtifactTypes),
         allArtifactTypes,

@@ -46,8 +46,8 @@ public class ProjectMembershipController extends BaseController {
      * @return {@link ProjectMembership} Updated project membership.
      */
     @PostMapping(AppRoutes.Projects.Membership.ADD_PROJECT_MEMBER)
-    public ProjectMembership addOrUpdateProjectMembership(@PathVariable UUID projectId,
-                                                          @RequestBody ProjectMembershipRequest request)
+    public ProjectMemberAppEntity addOrUpdateProjectMembership(@PathVariable UUID projectId,
+                                                               @RequestBody ProjectMembershipRequest request)
         throws SafaError {
         Project project = this.resourceBuilder.fetchProject(projectId).withViewProject();
         ProjectMembership updatedProjectMembership = this.serviceProvider
@@ -58,7 +58,7 @@ public class ProjectMembershipController extends BaseController {
             .broadcastChange(EntityChangeBuilder
                 .create(projectId)
                 .withMembersUpdate(updatedProjectMembership.getMembershipId()));
-        return updatedProjectMembership;
+        return new ProjectMemberAppEntity(updatedProjectMembership);
     }
 
     /**

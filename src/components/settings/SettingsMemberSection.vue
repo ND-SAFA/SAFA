@@ -21,7 +21,7 @@
         <settings-member-information-modal
           :is-open="isNewOpen"
           :project="project"
-          @cancel="isNewOpen = false"
+          @cancel="handleConfirmAdd"
           @confirm="handleConfirmAdd"
         />
       </template>
@@ -31,7 +31,7 @@
           :clear-on-close="false"
           :project="project"
           :member="memberToEdit"
-          @cancel="isEditOpen = false"
+          @cancel="handleConfirmEdit"
           @confirm="handleConfirmEdit"
         />
       </template>

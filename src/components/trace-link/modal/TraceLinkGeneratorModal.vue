@@ -189,14 +189,8 @@ export default Vue.extend({
      * Attempts to generate the selected trace links.
      */
     handleSubmit(): void {
-      this.isLoading = true;
-      handleGenerateLinks(this.matrices, {
-        onSuccess: () => {
-          this.isLoading = false;
-          this.handleClose();
-        },
-        onError: () => (this.isLoading = false),
-      });
+      handleGenerateLinks(this.matrices, {});
+      this.handleClose();
     },
     /**
      * Closes the modal.

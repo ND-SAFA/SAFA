@@ -43,7 +43,6 @@ public class CommitController extends BaseController {
                                       @RequestBody ProjectCommit projectCommit) {
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersion();
         projectCommit.setCommitVersion(projectVersion);
-        projectCommit.setFailOnError(true);
         ProjectChanger projectChanger = new ProjectChanger(projectVersion, serviceProvider);
         return projectChanger.commit(projectCommit);
     }

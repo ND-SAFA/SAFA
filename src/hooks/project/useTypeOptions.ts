@@ -59,10 +59,10 @@ export const useTypeOptions = defineStore("typeOptions", {
      * @param allArtifactTypes - The artifact types to set.
      */
     initializeTypeIcons(allArtifactTypes: ArtifactTypeModel[]): void {
+      this.artifactTypeDirections = {};
       this.$patch({
         artifactTypeIcons: createDefaultTypeIcons(allArtifactTypes),
         allArtifactTypes,
-        artifactTypeDirections: {},
       });
     },
     /**
@@ -137,14 +137,19 @@ export const useTypeOptions = defineStore("typeOptions", {
         removedTypeIds
       );
       const names = preservedTypes.map(({ name }) => name);
+      const artifactTypeIcons = preserveObjectKeys(
+        this.artifactTypeIcons,
+        names
+      );
+      const artifactTypeDirections = preserveObjectKeys(
+        this.artifactTypeDirections,
+        names
+      );
 
-      this.$patch({
-        allArtifactTypes: preservedTypes,
-        artifactTypeIcons: preserveObjectKeys(this.artifactTypeIcons, names),
-        artifactTypeDirections: preserveObjectKeys(
-          this.artifactTypeDirections,
-          names
-        ),
+      this.$patch((state) => {
+        state.allArtifactTypes = preservedTypes;
+        state.artifactTypeIcons = artifactTypeIcons;
+        state.artifactTypeDirections = artifactTypeDirections;
       });
       projectStore.updateProject({ artifactTypes: preservedTypes });
     },

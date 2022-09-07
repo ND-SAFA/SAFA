@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.server.controllers;
+package edu.nd.crc.safa.features.github.controllers;
 
 import java.util.List;
 import java.util.UUID;

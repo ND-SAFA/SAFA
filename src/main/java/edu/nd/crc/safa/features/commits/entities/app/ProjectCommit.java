@@ -17,37 +17,28 @@ import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * The model used to commit a change to the versioning system.
  */
-@Getter
-@Setter
+@NoArgsConstructor
+@Data
 public class ProjectCommit {
     ProjectVersion commitVersion;
-    ProjectChange<@Valid ArtifactAppEntity> artifacts;
-    ProjectChange<@Valid TraceAppEntity> traces;
-    List<CommitError> errors;
-    boolean failOnError;
-
-    public ProjectCommit() {
-        this.artifacts = new ProjectChange<>();
-        this.traces = new ProjectChange<>();
-        this.errors = new ArrayList<>();
-        this.failOnError = true;
-    }
+    ProjectChange<@Valid ArtifactAppEntity> artifacts = new ProjectChange<>();
+    ProjectChange<@Valid TraceAppEntity> traces = new ProjectChange<>();
+    List<CommitError> errors = new ArrayList<>();
+    boolean failOnError = true;
 
     public ProjectCommit(ProjectAppEntity projectAppEntity) {
-        this();
         this.commitVersion = projectAppEntity.getProjectVersion();
         this.addArtifacts(ModificationType.ADDED, projectAppEntity.getArtifacts());
         this.addTraces(ModificationType.ADDED, projectAppEntity.getTraces());
     }
 
     public ProjectCommit(ProjectVersion commitVersion, boolean failOnError) {
-        this();
         this.commitVersion = commitVersion;
         this.failOnError = failOnError;
     }
@@ -57,7 +48,6 @@ public class ProjectCommit {
                          ProjectChange<TraceAppEntity> traces,
                          List<CommitError> errors,
                          boolean failOnError) {
-        this();
         this.commitVersion = projectVersion;
         this.artifacts = artifacts;
         this.traces = traces;

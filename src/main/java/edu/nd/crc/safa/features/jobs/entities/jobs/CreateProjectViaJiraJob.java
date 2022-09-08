@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.jobs.entities.app;
+package edu.nd.crc.safa.features.jobs.entities.jobs;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -16,6 +16,7 @@ import edu.nd.crc.safa.features.jira.entities.db.JiraProject;
 import edu.nd.crc.safa.features.jira.repositories.JiraAccessCredentialsRepository;
 import edu.nd.crc.safa.features.jira.services.JiraConnectionService;
 import edu.nd.crc.safa.features.jobs.entities.IJobStep;
+import edu.nd.crc.safa.features.jobs.entities.app.CommitJob;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;

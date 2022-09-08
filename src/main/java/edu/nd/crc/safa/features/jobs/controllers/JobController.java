@@ -42,8 +42,14 @@ public class JobController extends BaseController {
         this.jobService = serviceProvider.getJobService();
     }
 
-    @GetMapping(AppRoutes.Jobs.GET_JOBS)
-    public List<JobAppEntity> getJobStatus() throws SafaError {
+    /**
+     * Returns the list of jobs created by the authenticated user.
+     *
+     * @return The list of jobs created by user.
+     * @throws SafaError If authentication error occurs.
+     */
+    @GetMapping(AppRoutes.Jobs.Meta.GET_JOBS)
+    public List<JobAppEntity> getUserJobs() throws SafaError {
         return this.jobService.retrieveCurrentUserJobs();
     }
 
@@ -53,7 +59,7 @@ public class JobController extends BaseController {
      * @param jobId The UUID for the job to stop.
      * @throws SafaError Throws error because still in construction.
      */
-    @DeleteMapping(AppRoutes.Jobs.DELETE_JOB)
+    @DeleteMapping(AppRoutes.Jobs.Meta.DELETE_JOB)
     public void deleteJob(@PathVariable UUID jobId) throws SafaError {
         this.jobService.deleteJob(jobId);
         this.serviceProvider.getNotificationService().broadcastChange(
@@ -71,7 +77,7 @@ public class JobController extends BaseController {
      * @return The current status of the job created.
      * @throws SafaError Throws error if job failed to start or is under construction.
      */
-    @PostMapping(AppRoutes.Jobs.UPDATE_PROJECT_VIA_FLAT_FILES)
+    @PostMapping(AppRoutes.Jobs.Projects.UPDATE_PROJECT_VIA_FLAT_FILES)
     @ResponseStatus(HttpStatus.CREATED)
     public JobAppEntity flatFileProjectUpdateJob(@PathVariable UUID versionId,
                                                  @RequestParam MultipartFile[] files) throws Exception {
@@ -81,7 +87,14 @@ public class JobController extends BaseController {
         return updateProjectByFlatFileJobBuilder.perform();
     }
 
-    @PostMapping(AppRoutes.Jobs.CREATE_PROJECT_VIA_JSON)
+    /**
+     * Creates a project by saving project entities.
+     *
+     * @param projectAppEntity The project entities to save (e.g. artifacts, traces.
+     * @return {@link JobAppEntity} The job created for this task.
+     * @throws Exception If an error occurs while setting up job.
+     */
+    @PostMapping(AppRoutes.Jobs.Projects.CREATE_PROJECT_VIA_JSON)
     public JobAppEntity createProjectFromJSON(@RequestBody ProjectAppEntity projectAppEntity) throws Exception {
         CreateProjectByJsonJobBuilder createProjectByJsonJobBuilder = new CreateProjectByJsonJobBuilder(
             serviceProvider, projectAppEntity);

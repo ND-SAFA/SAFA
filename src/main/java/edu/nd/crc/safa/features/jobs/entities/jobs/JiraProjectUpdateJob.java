@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.jobs.entities.app;
+package edu.nd.crc.safa.features.jobs.entities.jobs;
 
 import edu.nd.crc.safa.common.ProjectEntities;
 import edu.nd.crc.safa.features.common.ServiceProvider;

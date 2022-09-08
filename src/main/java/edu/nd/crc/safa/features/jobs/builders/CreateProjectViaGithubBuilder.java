@@ -1,12 +1,10 @@
-package edu.nd.crc.safa.features.jobs.entities.builders;
-
-import java.io.IOException;
+package edu.nd.crc.safa.features.jobs.builders;
 
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.github.entities.api.GithubIdentifier;
-import edu.nd.crc.safa.features.jobs.entities.app.GithubProjectCreationJob;
+import edu.nd.crc.safa.features.jobs.entities.app.AbstractJob;
 import edu.nd.crc.safa.features.jobs.entities.app.JobType;
-import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
+import edu.nd.crc.safa.features.jobs.entities.jobs.GithubProjectCreationJob;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
@@ -15,6 +13,9 @@ import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
  */
 public class CreateProjectViaGithubBuilder extends AbstractJobBuilder<GithubIdentifier> {
 
+    /**
+     * Identifier GitHub project to import.
+     */
     GithubIdentifier githubIdentifier;
 
     public CreateProjectViaGithubBuilder(
@@ -35,14 +36,17 @@ public class CreateProjectViaGithubBuilder extends AbstractJobBuilder<GithubIden
     }
 
     @Override
-    JobDefinition constructJobForWork() throws IOException {
-        String jobName = GithubProjectCreationJob.createJobName(this.githubIdentifier);
-        JobDbEntity jobDbEntity = this.serviceProvider
-            .getJobService()
-            .createNewJob(JobType.GITHUB_PROJECT_CREATION, jobName);
-        GithubProjectCreationJob job = new GithubProjectCreationJob(jobDbEntity,
-            serviceProvider, this.githubIdentifier);
+    AbstractJob constructJobForWork() {
+        return new GithubProjectCreationJob(this.jobDbEntity, serviceProvider, this.githubIdentifier);
+    }
 
-        return new JobDefinition(jobDbEntity, job);
+    @Override
+    String getJobName() {
+        return GithubProjectCreationJob.createJobName(this.githubIdentifier);
+    }
+
+    @Override
+    JobType getJobType() {
+        return JobType.GITHUB_PROJECT_CREATION;
     }
 }

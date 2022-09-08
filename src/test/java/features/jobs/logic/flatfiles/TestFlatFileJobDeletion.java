@@ -22,7 +22,7 @@ class TestFlatFileJobDeletion extends AbstractUpdateProjectViaFlatFileTest {
         UUID jobId = updateProjectViaFlatFiles(ProjectPaths.Resources.Tests.DefaultProject.V1);
         JobDbEntity job = this.jobService.getJobById(jobId);
         String route = RouteBuilder
-            .withRoute(AppRoutes.Jobs.DELETE_JOB)
+            .withRoute(AppRoutes.Jobs.Meta.DELETE_JOB)
             .withJob(job)
             .buildEndpoint();
 

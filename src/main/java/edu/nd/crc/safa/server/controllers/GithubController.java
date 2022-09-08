@@ -47,13 +47,12 @@ public class GithubController extends BaseController {
 
     public GithubController(ResourceBuilder resourceBuilder,
                             SafaUserService safaUserService,
-                            GithubConnectionService githubConnectionService,
                             GithubAccessCredentialsRepository githubAccessCredentialsRepository,
                             ExecutorDelegate executorDelegate,
                             ServiceProvider serviceProvider) {
         super(resourceBuilder, serviceProvider);
         this.safaUserService = safaUserService;
-        this.githubConnectionService = githubConnectionService;
+        this.githubConnectionService = serviceProvider.getGithubConnectionService();
         this.githubAccessCredentialsRepository = githubAccessCredentialsRepository;
         this.executorDelegate = executorDelegate;
     }

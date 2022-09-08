@@ -144,6 +144,6 @@ public class ServiceProvider {
     JobLauncher jobLauncher; // Not final because runtime changes on test vs dev.
     // GitHub
     private final GithubAccessCredentialsRepository githubAccessCredentialsRepository;
-    private final GithubConnectionService githubConnectionService;
+    GithubConnectionService githubConnectionService;
     private final GithubProjectRepository githubProjectRepository;
 }

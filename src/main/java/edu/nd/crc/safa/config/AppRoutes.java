@@ -158,6 +158,7 @@ public class AppRoutes {
             private static final String ROOT = Projects.ROOT + "/import";
             public static final String BY_NAME = Import.ROOT + "/github/{repositoryName}";
             public static final String UPDATE = Versions.BY_ID + "/import/github/{repositoryName}";
+            public static final String ADD_INTO_EXISTING = Versions.BY_ID + "/add/github/{repositoryName}";
         }
     }
 

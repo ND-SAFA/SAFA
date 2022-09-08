@@ -42,4 +42,10 @@ class TestCreateAndLogin extends ApplicationBaseTest {
         JSONArray response = new SafaRequest(AppRoutes.Projects.GET_PROJECTS).getWithJsonArray();
         assertThat(response.length()).isOne();
     }
+
+    @Test
+    void testCreateDuplicateAccount() throws Exception {
+        authorizationService.createUser(testEmail, testPassword, status().is2xxSuccessful());
+        authorizationService.createUser(testEmail, testPassword, status().is4xxClientError());
+    }
 }

@@ -42,6 +42,13 @@ public class AuthorizationTestService {
             .postWithJsonObject(user);
     }
 
+    public void createUser(String email, String password, ResultMatcher test) throws Exception {
+        SafaUser user = new SafaUser(email, password);
+        SafaRequest
+            .withRoute(AppRoutes.Accounts.CREATE_ACCOUNT)
+            .postWithJsonObject(user, test);
+    }
+
     public void loginUser(String email, String password) throws Exception {
         this.loginUser(email, password, true);
     }

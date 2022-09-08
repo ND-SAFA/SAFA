@@ -75,11 +75,11 @@ if [ $1 == "build" ]; then
 fi
 
 if [ $2 == "local" ]; then
-  build $3 && runLocal
+  build $3 && runLocalWithCredentials
 fi
 
-if [ $2 == "local-creds" ]; then
-  build $3 && runLocalWithCredentials
+if [ $2 == "local-nocreds" ]; then
+  build $3 && runLocal
 fi
 
 if [ $2 == "dev" ]; then

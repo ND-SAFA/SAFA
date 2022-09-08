@@ -13,4 +13,10 @@ public enum JobType {
     TRAIN_MODEL,
     GITHUB_PROJECT_CREATION,
     GITHUB_PROJECT_UPDATE,
+    GENERATE_LINKS;
+
+    @Override
+    public String toString() {
+        return this.name();
+    }
 }

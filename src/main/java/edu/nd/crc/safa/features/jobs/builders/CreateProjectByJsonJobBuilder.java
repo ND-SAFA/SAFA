@@ -1,10 +1,10 @@
-package edu.nd.crc.safa.features.jobs.entities.builders;
+package edu.nd.crc.safa.features.jobs.builders;
 
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.jobs.entities.app.AbstractJob;
 import edu.nd.crc.safa.features.jobs.entities.app.CommitJob;
 import edu.nd.crc.safa.features.jobs.entities.app.JobType;
-import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
@@ -37,22 +37,27 @@ public class CreateProjectByJsonJobBuilder extends AbstractJobBuilder<ProjectVer
     }
 
     @Override
-    JobDefinition constructJobForWork() {
+    AbstractJob constructJobForWork() {
         // Step - Create initial commit
         projectAppEntity.setProjectVersion(this.identifier);
         ProjectCommit projectCommit = new ProjectCommit(projectAppEntity);
 
         // Step - Create job
-        String projectName = this.identifier.getProject().getName();
-        String jobName = String.format("Creating project %s.", projectName);
-        JobDbEntity jobDbEntity = this.serviceProvider
-            .getJobService()
-            .createNewJob(JobType.PROJECT_CREATION, jobName);
-        CommitJob commitJob = new CommitJob(
-            jobDbEntity,
+        return new CommitJob(
+            this.jobDbEntity,
             serviceProvider,
             projectCommit
         );
-        return new JobDefinition(jobDbEntity, commitJob);
+    }
+
+    @Override
+    String getJobName() {
+        String projectName = this.identifier.getProject().getName();
+        return String.format("Creating project %s.", projectName);
+    }
+
+    @Override
+    JobType getJobType() {
+        return JobType.PROJECT_CREATION;
     }
 }

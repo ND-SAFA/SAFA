@@ -40,7 +40,7 @@ public class TBert implements ITraceLinkGeneration {
 
     public List<TraceAppEntity> generateLinks(List<ArtifactAppEntity> sources, List<ArtifactAppEntity> targets) {
         // Step - Build request
-        TGenPredictionRequestDTO genRequest = new TGenPredictionRequestDTO(
+        TGenPredictionRequestDTO predictionRequest = new TGenPredictionRequestDTO(
             Defaults.TBERT_BASE_MODEL,
             Defaults.TBERT_PATH,
             createArtifactPayload(sources),
@@ -49,7 +49,7 @@ public class TBert implements ITraceLinkGeneration {
         // Step - Send request
         String predictEndpoint = TBertConfig.get().getPredictEndpoint();
         TGenJobResponseDTO response = this.safaRequestBuilder
-            .sendPost(predictEndpoint, genRequest, TGenJobResponseDTO.class);
+            .sendPost(predictEndpoint, predictionRequest, TGenJobResponseDTO.class);
 
         // Step - Convert to response
         TGenPredictionOutput output = getOutput(response.getOutputPath());
@@ -86,11 +86,20 @@ public class TBert implements ITraceLinkGeneration {
             }
             Blob blob = CloudStorage.getBlob(outputFile);
             JSONObject json = CloudStorage.downloadJsonFileBlob(blob);
-            return mapper.readValue(json.toString(), TGenPredictionOutput.class);
+
+            if (json.getInt("status") == -1) {
+                throw new SafaError("TBert failed while generating links: " + json.getString("exception"));
+            }
+            TGenPredictionOutput predictionOutput = mapper.readValue(json.toString(), TGenPredictionOutput.class);
+            return predictionOutput;
         } catch (InterruptedException e) {
             throw new SafaError("Interrupted while waiting for output of generated links.");
         } catch (IOException e) {
             throw new SafaError("IOException occurred while reading output of generated links.");
+        } finally {
+            if (CloudStorage.exists(outputFile)) {
+                CloudStorage.getBlob(outputFile).delete();
+            }
         }
     }
 

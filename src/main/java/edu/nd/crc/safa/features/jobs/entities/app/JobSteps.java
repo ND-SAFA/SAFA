@@ -2,6 +2,12 @@ package edu.nd.crc.safa.features.jobs.entities.app;
 
 import java.util.List;
 
+import edu.nd.crc.safa.features.jobs.entities.jobs.CreateProjectViaJiraJob;
+import edu.nd.crc.safa.features.jobs.entities.jobs.FlatFileProjectCreationJob;
+import edu.nd.crc.safa.features.jobs.entities.jobs.GenerateLinksJob;
+import edu.nd.crc.safa.features.jobs.entities.jobs.GithubProjectCreationJob;
+import edu.nd.crc.safa.features.jobs.entities.jobs.GithubProjectUpdateJob;
+import edu.nd.crc.safa.features.jobs.entities.jobs.JiraProjectUpdateJob;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 
 import lombok.AccessLevel;
@@ -34,6 +40,8 @@ public class JobSteps {
                 return AbstractJob.getJobSteps(GithubProjectUpdateJob.class);
             case PROJECT_CREATION:
                 return AbstractJob.getJobSteps(CommitJob.class);
+            case GENERATE_LINKS:
+                return AbstractJob.getJobSteps(GenerateLinksJob.class);
             default:
                 throw new SafaError("Unknown job type: %s.", jobType);
         }

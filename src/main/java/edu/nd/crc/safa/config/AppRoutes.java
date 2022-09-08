@@ -28,11 +28,24 @@ public class AppRoutes {
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Jobs {
         protected static final String JOBS_PREFIX = "/jobs";
-        public static final String UPDATE_PROJECT_VIA_FLAT_FILES = JOBS_PREFIX + "/projects/versions/{versionId}";
-        public static final String GET_JOBS = JOBS_PREFIX;
-        public static final String CREATE_PROJECT_VIA_JSON = JOBS_PREFIX + Projects.ROOT;
-        private static final String JOB_ID = JOBS_PREFIX + "/{jobId}";
-        public static final String DELETE_JOB = JOB_ID;
+
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        public static class Traces {
+            public static final String GENERATE = JOBS_PREFIX + Links.GENERATE_LINKS;
+        }
+
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        public static class Projects {
+            public static final String CREATE_PROJECT_VIA_JSON = JOBS_PREFIX + AppRoutes.Projects.ROOT;
+            public static final String UPDATE_PROJECT_VIA_FLAT_FILES = JOBS_PREFIX + "/projects/versions/{versionId}";
+        }
+
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        public static class Meta {
+            public static final String GET_JOBS = JOBS_PREFIX;
+            private static final String JOB_ID = JOBS_PREFIX + "/{jobId}";
+            public static final String DELETE_JOB = JOB_ID;
+        }
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -155,9 +168,9 @@ public class AppRoutes {
 
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
         public static class Import {
+            public static final String UPDATE = Versions.BY_ID + "/import/github/{repositoryName}";
             private static final String ROOT = Projects.ROOT + "/import";
             public static final String BY_NAME = Import.ROOT + "/github/{repositoryName}";
-            public static final String UPDATE = Versions.BY_ID + "/import/github/{repositoryName}";
         }
     }
 

@@ -41,7 +41,7 @@ public abstract class AbstractUpdateProjectViaFlatFileTest extends BaseFlatFileT
         JSONObject kwargs = new JSONObject();
         kwargs.put(ProjectVariables.AS_COMPLETE_SET, false);
         return FlatFileRequest
-            .withRoute(AppRoutes.Jobs.UPDATE_PROJECT_VIA_FLAT_FILES)
+            .withRoute(AppRoutes.Jobs.Projects.UPDATE_PROJECT_VIA_FLAT_FILES)
             .withVersion(projectVersion)
             .getFlatFileHelper()
             .postWithFilesInDirectory(pathToProjectFiles, resultMatcher, kwargs);

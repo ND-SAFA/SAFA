@@ -2,18 +2,22 @@ package edu.nd.crc.safa.features.jobs.controllers;
 
 import java.util.List;
 import java.util.UUID;
+import javax.validation.Valid;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.jobs.builders.CreateProjectByJsonJobBuilder;
+import edu.nd.crc.safa.features.jobs.builders.GenerateLinksJobBuilder;
+import edu.nd.crc.safa.features.jobs.builders.UpdateProjectByFlatFileJobBuilder;
 import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
-import edu.nd.crc.safa.features.jobs.entities.builders.CreateProjectByJsonJobBuilder;
-import edu.nd.crc.safa.features.jobs.entities.builders.UpdateProjectByFlatFileJobBuilder;
 import edu.nd.crc.safa.features.jobs.services.JobService;
 import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.tgen.entities.TraceGenerationRequest;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -99,5 +103,21 @@ public class JobController extends BaseController {
         CreateProjectByJsonJobBuilder createProjectByJsonJobBuilder = new CreateProjectByJsonJobBuilder(
             serviceProvider, projectAppEntity);
         return createProjectByJsonJobBuilder.perform();
+    }
+
+    /**
+     * Creates a job for generating trace links between source and target artifacts with specified method.
+     *
+     * @param request Request identifying source and target artifacts along with the method to generate links with.
+     * @return The {@link JobAppEntity} create for this job.
+     * @throws Exception If an error occurs while starting job.
+     */
+    @PostMapping(AppRoutes.Jobs.Traces.GENERATE)
+    public JobAppEntity generateTraceLinks(@RequestBody @Valid TraceGenerationRequest request) throws Exception {
+        ProjectVersion projectVersion = resourceBuilder.fetchVersion(request.getProjectVersion().getVersionId())
+            .withEditVersion(); // Makes sure all persistent properties are available
+        request.setProjectVersion(projectVersion);
+        GenerateLinksJobBuilder jobBuilder = new GenerateLinksJobBuilder(this.serviceProvider, request);
+        return jobBuilder.perform();
     }
 }

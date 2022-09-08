@@ -16,6 +16,7 @@ import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.NotImplementedException;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 /**
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @AllArgsConstructor
+@Scope("singleton")
 public class TraceGenerationService {
     private static final String DELIMITER = "*";
     private final SafaRequestBuilder safaRequestBuilder;

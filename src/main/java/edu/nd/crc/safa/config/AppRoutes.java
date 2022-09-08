@@ -30,6 +30,11 @@ public class AppRoutes {
         protected static final String JOBS_PREFIX = "/jobs";
 
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        public static class Traces {
+            public static final String GENERATE = JOBS_PREFIX + Links.GENERATE_LINKS;
+        }
+
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
         public static class Projects {
             public static final String CREATE_PROJECT_VIA_JSON = JOBS_PREFIX + AppRoutes.Projects.ROOT;
             public static final String UPDATE_PROJECT_VIA_FLAT_FILES = JOBS_PREFIX + "/projects/versions/{versionId}";

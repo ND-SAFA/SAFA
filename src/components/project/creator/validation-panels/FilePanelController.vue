@@ -127,16 +127,13 @@ export default Vue.extend({
     /**
      * Generates trace files when generate is toggled on.
      */
-    async isGeneratedToggle(isGenerated: boolean) {
+    isGeneratedToggle(isGenerated: boolean) {
       if (!isTracePanel(this.panel)) return;
 
       this.panel.projectFile.isGenerated = isGenerated;
+      this.panel.clearPanel();
 
-      if (isGenerated) {
-        // TODO: set job to generate
-      } else {
-        this.panel.clearPanel();
-      }
+      // TODO: set job to generate
     },
   },
 });

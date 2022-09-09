@@ -35,20 +35,17 @@ export default Vue.extend({
   props: {
     value: String,
   },
+  data() {
+    return {
+      model: this.value,
+    };
+  },
   computed: {
     /**
      * @return The trace generation model types.
      */
     modelOptions(): SelectOption[] {
       return traceModelOptions();
-    },
-    model: {
-      get(): string {
-        return this.value;
-      },
-      set(newValue: string): void {
-        this.$emit("update:value", newValue);
-      },
     },
   },
   methods: {
@@ -69,6 +66,20 @@ export default Vue.extend({
       } else {
         return "";
       }
+    },
+  },
+  watch: {
+    /**
+     * Updates the model if the value changes.
+     */
+    value(currentValue: ModelType) {
+      this.model = currentValue;
+    },
+    /**
+     * Emits changes to the model.
+     */
+    model(currentValue: ModelType) {
+      this.$emit("input", currentValue);
     },
   },
 });

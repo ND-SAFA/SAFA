@@ -33,7 +33,7 @@ import {
   ValidFileTypes,
 } from "@/types";
 import { isTracePanel } from "@/util";
-import { GenericSwitch, Typography, GenMethodInput } from "@/components/common";
+import { GenericSwitch, GenMethodInput, Typography } from "@/components/common";
 import FilePanel from "./FilePanel.vue";
 
 /**
@@ -65,7 +65,6 @@ export default Vue.extend({
       isLoading: false,
       ignoreErrors: false,
       isGeneratedToggle: false,
-      method: ModelType.TBERT,
     };
   },
   computed: {
@@ -99,6 +98,21 @@ export default Vue.extend({
     entityNames(): string[] {
       return this.panel.entityNames;
     },
+    method: {
+      get(): ModelType {
+        if (isTracePanel(this.panel)) {
+          return this.panel.projectFile.method;
+        } else {
+          return ModelType.TBERT;
+        }
+      },
+      set(newMethod: ModelType): void {
+        if (isTracePanel(this.panel)) {
+          this.panel.projectFile.method = newMethod;
+          console.log(this.panel.projectFile.method);
+        }
+      },
+    },
   },
   methods: {
     /**
@@ -130,7 +144,6 @@ export default Vue.extend({
     isGeneratedToggle(isGenerated: boolean) {
       if (!isTracePanel(this.panel)) return;
 
-      this.panel.projectFile.method = this.method;
       this.panel.projectFile.isGenerated = isGenerated;
       this.panel.clearPanel();
     },

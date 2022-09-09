@@ -1,9 +1,4 @@
-import {
-  GitHubCredentialsModel,
-  InternalGitHubCredentialsModel,
-  IOHandlerCallback,
-  ProjectModel,
-} from "@/types";
+import { IOHandlerCallback, ProjectModel } from "@/types";
 import { appStore, logStore } from "@/hooks";
 import { navigateTo, Routes } from "@/router";
 import {

@@ -3,7 +3,6 @@ import {
   FlatTraceLink,
   GeneratedMatrixModel,
   IOHandlerCallback,
-  TraceLinkModel,
 } from "@/types";
 import {
   approvalStore,
@@ -11,13 +10,11 @@ import {
   artifactStore,
   logStore,
   projectStore,
-  traceStore,
 } from "@/hooks";
 import {
   createGeneratedLinks,
   getGeneratedLinks,
   handleJobSubmission,
-  saveGeneratedLinks,
 } from "@/api";
 
 /**
@@ -79,9 +76,8 @@ export async function handleGetGeneratedLinks({
  */
 export async function handleGenerateLinks(
   matrices: GeneratedMatrixModel[],
-  { onSuccess, onError }: IOHandlerCallback<TraceLinkModel[]>
+  { onSuccess, onError }: IOHandlerCallback
 ): Promise<void> {
-  const generatedLinks: TraceLinkModel[] = [];
   const matricesName = matrices
     .map(({ source, target }) => `${source} -> ${target}`)
     .join(", ");
@@ -98,16 +94,14 @@ export async function handleGenerateLinks(
         method,
         projectVersion: projectStore.version,
       });
+
       await handleJobSubmission(job);
     }
 
-    const createdLinks = await saveGeneratedLinks(generatedLinks);
-
-    traceStore.addOrUpdateTraceLinks(createdLinks);
-    logStore.onSuccess(
-      `Generated ${createdLinks.length} new trace links: ${matricesName}`
+    logStore.onInfo(
+      `Started generating new trace links: ${matricesName}. You'll receive a notification once they are added.`
     );
-    onSuccess?.(createdLinks);
+    onSuccess?.();
   } catch (e) {
     logStore.onError(`Unable to generate new trace links: ${matricesName}`);
     onError?.(e as Error);

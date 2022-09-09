@@ -67,7 +67,7 @@ public class FlatFileProjectCreationJob extends CommitJob {
     }
 
     @Override
-    @IJobStep(name = "Uploading Flat Files", position = 1)
+    @IJobStep(value = "Uploading Flat Files", position = 1)
     public void initJobData() throws SafaError, IOException {
         super.initJobData();
         Project project = this.projectVersion.getProject();
@@ -86,7 +86,7 @@ public class FlatFileProjectCreationJob extends CommitJob {
         this.flatFileParser = new FlatFileParser(timFileParser);
     }
 
-    @IJobStep(name = "Parsing Files", position = 2)
+    @IJobStep(value = "Parsing Files", position = 2)
     public void parsingFiles() {
         parsingArtifactFiles();
         parsingTraceFiles();
@@ -119,7 +119,7 @@ public class FlatFileProjectCreationJob extends CommitJob {
                 .collect(Collectors.toList());
     }
 
-    @IJobStep(name = "Generating Trace Links", position = 3)
+    @IJobStep(value = "Generating Trace Links", position = 3)
     public void generatingTraces() throws IOException, InterruptedException {
         TraceGenerationService traceGenerationService = this.getServiceProvider().getTraceGenerationService();
         List<TraceAppEntity> generatedLinks = traceGenerationService.generateTraceLinks(

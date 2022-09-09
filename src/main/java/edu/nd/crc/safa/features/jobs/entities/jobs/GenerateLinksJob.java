@@ -46,7 +46,7 @@ public class GenerateLinksJob extends CommitJob {
         return String.format("Generating %s links with %s.", request.size(), request.getMethod());
     }
 
-    @IJobStep(name = "Generating links", position = 1)
+    @IJobStep(value = "Generating links", position = 1)
     public void generateLinks() {
         if (this.request.size() == 0) {
             return;
@@ -54,7 +54,7 @@ public class GenerateLinksJob extends CommitJob {
         List<ArtifactAppEntity> sourceArtifacts = request.getSourceArtifacts();
         List<ArtifactAppEntity> targetArtifacts = request.getTargetArtifacts();
         TraceGenerationMethod method = request.getMethod();
-        
+
         this.generatedTraces = this.serviceProvider
             .getTraceGenerationService()
             .generateLinksWithMethod(sourceArtifacts, targetArtifacts, method);

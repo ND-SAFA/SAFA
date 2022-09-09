@@ -1,4 +1,4 @@
-import { ArtifactModel, ModelType } from "@/types";
+import { ArtifactModel, ModelType, VersionModel } from "@/types";
 
 /**
  * Represents a matrix to generate links between.
@@ -16,4 +16,8 @@ export interface GenerateLinksModel {
    * The generation method.
    */
   method: ModelType;
+  /**
+   * The version to commit the entities to.
+   */
+  projectVersion?: VersionModel;
 }

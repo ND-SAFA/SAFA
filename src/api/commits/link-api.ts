@@ -1,6 +1,6 @@
-import { ApprovalType, TraceLinkModel, ArtifactModel } from "@/types";
+import { ApprovalType, JobModel, TraceLinkModel } from "@/types";
 import { CommitBuilder } from "@/api";
-import { Endpoint, fillEndpoint, authHttpClient } from "@/api/util";
+import { authHttpClient, Endpoint, fillEndpoint } from "@/api/util";
 import { GenerateLinksModel } from "@/types/api/link-api";
 
 /**
@@ -26,14 +26,11 @@ export async function getGeneratedLinks(
  */
 export async function createGeneratedLinks(
   config: GenerateLinksModel
-): Promise<TraceLinkModel[]> {
-  return authHttpClient<TraceLinkModel[]>(
-    fillEndpoint(Endpoint.generateLinks),
-    {
-      method: "POST",
-      body: JSON.stringify(config),
-    }
-  );
+): Promise<JobModel> {
+  return authHttpClient<JobModel>(fillEndpoint(Endpoint.generateLinksJob), {
+    method: "POST",
+    body: JSON.stringify(config),
+  });
 }
 
 /**

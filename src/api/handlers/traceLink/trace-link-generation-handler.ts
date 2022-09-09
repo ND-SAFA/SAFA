@@ -1,21 +1,22 @@
 import {
   ApprovalType,
-  IOHandlerCallback,
   FlatTraceLink,
-  TraceLinkModel,
   GeneratedMatrixModel,
+  IOHandlerCallback,
+  TraceLinkModel,
 } from "@/types";
 import {
+  approvalStore,
   appStore,
   artifactStore,
-  projectStore,
-  approvalStore,
   logStore,
+  projectStore,
   traceStore,
 } from "@/hooks";
 import {
   createGeneratedLinks,
   getGeneratedLinks,
+  handleJobSubmission,
   saveGeneratedLinks,
 } from "@/api";
 
@@ -91,12 +92,13 @@ export async function handleGenerateLinks(
     for (const { source, target, method } of matrices) {
       const sourceArtifacts = artifactStore.getArtifactsByType[source] || [];
       const targetArtifacts = artifactStore.getArtifactsByType[target] || [];
-      const traceLinks = await createGeneratedLinks({
+      const job = await createGeneratedLinks({
         sourceArtifacts,
         targetArtifacts,
         method,
+        projectVersion: projectStore.version,
       });
-      generatedLinks.push(...traceLinks);
+      await handleJobSubmission(job);
     }
 
     const createdLinks = await saveGeneratedLinks(generatedLinks);

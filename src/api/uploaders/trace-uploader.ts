@@ -10,8 +10,12 @@ import {
   TracePanel,
 } from "@/types";
 import { extractTraceId } from "@/util";
-import { logStore } from "@/hooks";
-import { createGeneratedLinks, parseTraceFile } from "@/api";
+import { logStore, projectStore } from "@/hooks";
+import {
+  createGeneratedLinks,
+  handleJobSubmission,
+  parseTraceFile,
+} from "@/api";
 
 const DEFAULT_IS_GENERATED = false;
 
@@ -79,10 +83,8 @@ function generateTraceLinks(
     sourceArtifacts,
     targetArtifacts,
     method: ModelType.TBERT,
-  }).then((traceLinks) => {
-    panel.projectFile.traces = traceLinks;
-    panel.entityNames = traceLinks.map(extractTraceId);
-  });
+    projectVersion: projectStore.version,
+  }).then((job) => handleJobSubmission(job));
 }
 
 /**

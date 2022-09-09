@@ -7,6 +7,7 @@
     :errors="errors"
     :entity-names="entityNames"
     :entities-are-fab="!isTracePanel"
+    :is-loading="isLoading"
     v-bind:ignore-errors-flag.sync="ignoreErrors"
   >
     <template v-slot:title>
@@ -61,6 +62,7 @@ export default Vue.extend({
   },
   data() {
     return {
+      isLoading: false,
       ignoreErrors: false,
       isGeneratedToggle: false,
       model: ModelType.TBERT,
@@ -107,7 +109,9 @@ export default Vue.extend({
       if (file === undefined) {
         this.panel.clearPanel();
       } else {
+        this.isLoading = true;
         await this.panel.parseFile(this.artifactMap, file);
+        this.isLoading = false;
       }
     },
     /**

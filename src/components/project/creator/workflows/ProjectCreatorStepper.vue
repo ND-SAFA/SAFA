@@ -79,7 +79,6 @@ import {
   StepState,
   TraceFile,
   TraceLinkModel,
-  TraceMatrixModel,
   GeneratedMatrixModel,
 } from "@/types";
 import { createProject } from "@/util";

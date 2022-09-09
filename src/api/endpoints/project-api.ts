@@ -107,8 +107,8 @@ export async function saveProjectMember(
   projectId: string,
   memberEmail: string,
   projectRole: ProjectRole
-): Promise<MembershipModel[]> {
-  return authHttpClient<MembershipModel[]>(
+): Promise<MembershipModel> {
+  return authHttpClient<MembershipModel>(
     fillEndpoint(Endpoint.getProjectMembers, {
       projectId,
     }),

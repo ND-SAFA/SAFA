@@ -84,7 +84,7 @@
                 :value="job.steps[stepIndex]"
               />
             </v-stepper-step>
-            <v-divider :key="step" />
+            <v-divider :key="step" v-if="stepIndex < job.steps.length - 1" />
           </template>
         </v-stepper-header>
       </v-stepper>

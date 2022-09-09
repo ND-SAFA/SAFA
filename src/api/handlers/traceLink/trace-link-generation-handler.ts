@@ -83,7 +83,9 @@ export async function handleGenerateLinks(
     .join(", ");
 
   try {
-    appStore.onLoadStart();
+    logStore.onInfo(
+      `Generating trace links, you will receive a notification when complete.`
+    );
 
     for (const { source, target, method } of matrices) {
       const sourceArtifacts = artifactStore.getArtifactsByType[source] || [];
@@ -97,7 +99,6 @@ export async function handleGenerateLinks(
 
       await handleJobSubmission(job);
     }
-
     logStore.onInfo(
       `Started generating new trace links: ${matricesName}. You'll receive a notification once they are added.`
     );
@@ -105,7 +106,5 @@ export async function handleGenerateLinks(
   } catch (e) {
     logStore.onError(`Unable to generate new trace links: ${matricesName}`);
     onError?.(e as Error);
-  } finally {
-    appStore.onLoadEnd();
   }
 }

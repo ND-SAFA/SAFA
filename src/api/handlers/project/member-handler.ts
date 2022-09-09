@@ -39,12 +39,15 @@ export function handleInviteMember(
   { onSuccess, onError }: IOHandlerCallback
 ): void {
   saveProjectMember(projectId, memberEmail, projectRole)
-    .then(() => {
+    .then((member) => {
+      projectStore.updateProject({
+        members: [...projectStore.project.members, member],
+      });
       logStore.onSuccess(`Member added to the project: ${memberEmail}`);
       onSuccess?.();
     })
     .catch((e) => {
-      logStore.onSuccess(`Unable to add member: ${memberEmail}`);
+      logStore.onError(`Unable to add member: ${memberEmail}`);
       logStore.onDevError(e.message);
       onError?.(e);
     });
@@ -61,10 +64,23 @@ export function handleDeleteMember(member: MembershipModel): void {
       type: ConfirmationType.INFO,
       title: "Remove User from Project",
       body: `Are you sure you want to remove ${member.email} from project?`,
-      statusCallback: async (isConfirmed: boolean) => {
+      statusCallback: (isConfirmed: boolean) => {
         if (!isConfirmed) return;
 
-        await deleteProjectMember(member);
+        deleteProjectMember(member)
+          .then(() => {
+            projectStore.updateProject({
+              members: projectStore.project.members.filter(
+                ({ projectMembershipId }) =>
+                  member.projectMembershipId !== projectMembershipId
+              ),
+            });
+            logStore.onSuccess(`Deleted a member: ${member.email}`);
+          })
+          .catch((e) => {
+            logStore.onError(`Unable to delete member: ${member.email}`);
+            logStore.onDevError(e.message);
+          });
       },
     },
   });

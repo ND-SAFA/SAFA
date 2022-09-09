@@ -33,10 +33,8 @@ export const useTraceApproval = defineStore("traceApproval", {
      * @param generated - The generated links and their states.
      */
     initializeTraces(generated: GeneratedLinksModel) {
-      this.$patch({
-        ...generated,
-        selectedLinks: [],
-      });
+      this.selectedLinks = [];
+      this.$patch(generated);
     },
     /**
      * Selects all links that meet the filter predicate.

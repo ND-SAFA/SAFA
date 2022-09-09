@@ -25,6 +25,8 @@ export function handleImportProject(
 ): void {
   appStore.onLoadStart();
 
+  //TODO: add `generatedTraces` to creation job.
+
   createProjectCreationJob(project)
     .then(async (job) => {
       await handleJobSubmission(job);

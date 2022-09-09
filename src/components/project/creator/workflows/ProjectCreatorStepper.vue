@@ -79,6 +79,8 @@ import {
   StepState,
   TraceFile,
   TraceLinkModel,
+  TraceMatrixModel,
+  GeneratedMatrixModel,
 } from "@/types";
 import { createProject } from "@/util";
 import { sessionStore } from "@/hooks";
@@ -145,7 +147,9 @@ export default Vue.extend({
      * Attempts to create a project.
      */
     saveProject(): void {
-      handleImportProject(this.project, { onSuccess: () => this.clearData() });
+      handleImportProject(this.project, this.generatedTraces, {
+        onSuccess: () => this.clearData(),
+      });
     },
   },
   computed: {
@@ -184,6 +188,18 @@ export default Vue.extend({
      */
     traceFiles(): TraceFile[] {
       return this.traceUploader.panels.map((p) => p.projectFile);
+    },
+    /**
+     * @return All trace files.
+     */
+    generatedTraces(): GeneratedMatrixModel[] {
+      return this.traceUploader.panels
+        .filter(({ projectFile }) => projectFile.isGenerated)
+        .map(({ projectFile }) => ({
+          source: projectFile.sourceId,
+          target: projectFile.targetId,
+          method: projectFile.method,
+        }));
     },
     /**
      * @return The project to create.

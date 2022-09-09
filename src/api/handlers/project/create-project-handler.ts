@@ -1,4 +1,4 @@
-import { IOHandlerCallback, ProjectModel } from "@/types";
+import { GeneratedMatrixModel, IOHandlerCallback, ProjectModel } from "@/types";
 import { appStore, logStore } from "@/hooks";
 import { navigateTo, Routes } from "@/router";
 import {
@@ -14,11 +14,13 @@ import {
  * Creates a new project, sets related app state, and logs the status.
  *
  * @param project - The project to create.
+ * @param generatedTraces - The trace links to generate.
  * @param onSuccess - Called if the action is successful.
  * @param onError - Called if the action fails.
  */
 export function handleImportProject(
   project: ProjectModel,
+  generatedTraces: GeneratedMatrixModel[],
   { onSuccess, onError }: IOHandlerCallback
 ): void {
   appStore.onLoadStart();

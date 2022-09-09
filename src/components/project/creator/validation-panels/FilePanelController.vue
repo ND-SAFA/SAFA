@@ -19,7 +19,7 @@
         v-model="isGeneratedToggle"
         label="Generate Trace Links"
       />
-      <gen-method-input v-if="isGeneratedToggle" v-model="model" />
+      <gen-method-input v-if="isGeneratedToggle" v-model="method" />
     </template>
   </file-panel>
 </template>
@@ -65,7 +65,7 @@ export default Vue.extend({
       isLoading: false,
       ignoreErrors: false,
       isGeneratedToggle: false,
-      model: ModelType.TBERT,
+      method: ModelType.TBERT,
     };
   },
   computed: {
@@ -130,10 +130,9 @@ export default Vue.extend({
     isGeneratedToggle(isGenerated: boolean) {
       if (!isTracePanel(this.panel)) return;
 
+      this.panel.projectFile.method = this.method;
       this.panel.projectFile.isGenerated = isGenerated;
       this.panel.clearPanel();
-
-      // TODO: set job to generate
     },
   },
 });

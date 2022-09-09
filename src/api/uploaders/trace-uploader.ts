@@ -3,19 +3,14 @@ import {
   ArtifactModel,
   IGenericUploader,
   LinkModel,
-  ModelType,
   ParseTraceFileModel,
   TraceFile,
   TraceLinkModel,
   TracePanel,
 } from "@/types";
 import { extractTraceId } from "@/util";
-import { logStore, projectStore } from "@/hooks";
-import {
-  createGeneratedLinks,
-  handleJobSubmission,
-  parseTraceFile,
-} from "@/api";
+import { logStore } from "@/hooks";
+import { parseTraceFile } from "@/api";
 
 const DEFAULT_IS_GENERATED = false;
 
@@ -53,38 +48,7 @@ function createNewPanel(traceLink: LinkModel): TracePanel {
     parseFile(artifactMap: ArtifactMap, file: File): Promise<void> {
       return createParsedArtifactFile(artifactMap, this, file);
     },
-    generateTraceLinks(artifactMap: ArtifactMap): Promise<void> {
-      return generateTraceLinks(artifactMap, this);
-    },
   };
-}
-
-/**
- * Generates all trace links between artifacts.
- *
- * @param artifactMap - A collection of all artifacts.
- * @param panel - The trace panel to generate for.
- */
-function generateTraceLinks(
-  artifactMap: ArtifactMap,
-  panel: TracePanel
-): Promise<void> {
-  const sourceType = panel.projectFile.sourceId;
-  const targetType = panel.projectFile.targetId;
-  const artifacts: ArtifactModel[] = Object.values(artifactMap);
-  const sourceArtifacts: ArtifactModel[] = artifacts.filter(
-    (a) => a.type === sourceType
-  );
-  const targetArtifacts: ArtifactModel[] = artifacts.filter(
-    (a) => a.type === targetType
-  );
-
-  return createGeneratedLinks({
-    sourceArtifacts,
-    targetArtifacts,
-    method: ModelType.TBERT,
-    projectVersion: projectStore.version,
-  }).then((job) => handleJobSubmission(job));
 }
 
 /**

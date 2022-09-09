@@ -5,3 +5,4 @@ export { default as SingleCustomFieldInput } from "./SingleCustomFieldInput.vue"
 export { default as CustomFieldInput } from "./CustomFieldInput.vue";
 export { default as TypeIconInput } from "./TypeIconInput.vue";
 export { default as TypeDirectionInput } from "./TypeDirectionInput.vue";
+export { default as GenMethodInput } from "./GenMethodInput.vue";

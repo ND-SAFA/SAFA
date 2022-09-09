@@ -18,15 +18,21 @@
         v-model="isGeneratedToggle"
         label="Generate Trace Links"
       />
+      <gen-method-input v-if="isGeneratedToggle" v-model="model" />
     </template>
   </file-panel>
 </template>
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { ArtifactMap, IGenericFilePanel, ValidFileTypes } from "@/types";
+import {
+  ArtifactMap,
+  IGenericFilePanel,
+  ModelType,
+  ValidFileTypes,
+} from "@/types";
 import { isTracePanel } from "@/util";
-import { GenericSwitch, Typography } from "@/components/common";
+import { GenericSwitch, Typography, GenMethodInput } from "@/components/common";
 import FilePanel from "./FilePanel.vue";
 
 /**
@@ -38,6 +44,7 @@ import FilePanel from "./FilePanel.vue";
 export default Vue.extend({
   name: "FilePanelController",
   components: {
+    GenMethodInput,
     GenericSwitch,
     FilePanel,
     Typography,
@@ -56,6 +63,7 @@ export default Vue.extend({
     return {
       ignoreErrors: false,
       isGeneratedToggle: false,
+      model: ModelType.TBERT,
     };
   },
   computed: {
@@ -121,7 +129,7 @@ export default Vue.extend({
       this.panel.projectFile.isGenerated = isGenerated;
 
       if (isGenerated) {
-        await this.panel.generateTraceLinks(this.artifactMap);
+        // TODO: set job to generate
       } else {
         this.panel.clearPanel();
       }

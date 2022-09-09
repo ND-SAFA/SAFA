@@ -1,5 +1,6 @@
 package requests;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -129,6 +130,27 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
             localAuthorizationToken,
             responseParser
         );
+    }
+
+    public JSONObject postWithoutBody(ResultMatcher resultMatcher) throws Exception {
+        MockHttpServletRequestBuilder request = post(this.buildEndpoint());
+
+        if (authorizationToken != null && !authorizationToken.equals("")) {
+            request = request.header("Authorization", authorizationToken);
+        }
+
+        MvcResult result = mockMvc
+            .perform(request)
+            .andReturn();
+
+        String response = mockMvc
+            .perform(asyncDispatch(result))
+            .andExpect(resultMatcher)
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+        return ResponseParser.jsonCreator(response);
     }
 
     private String stringify(Object body) {

@@ -12,8 +12,6 @@ import { extractTraceId } from "@/util";
 import { logStore } from "@/hooks";
 import { parseTraceFile } from "@/api";
 
-const DEFAULT_IS_GENERATED = false;
-
 /**
  * Creates a trace file uploader.
  */
@@ -34,11 +32,10 @@ export function createTraceUploader(): IGenericUploader<
  * @param traceLink - The like to create the panel for.
  */
 function createNewPanel(traceLink: LinkModel): TracePanel {
-  const emptyArtifactFile: TraceFile = createTraceFile(traceLink);
   return {
     title: `${traceLink.sourceName} X ${traceLink.targetName}`,
     entityNames: [],
-    projectFile: emptyArtifactFile,
+    projectFile: createTraceFile(traceLink),
     getIsValid(): boolean {
       return isArtifactPanelValid(this);
     },
@@ -60,7 +57,7 @@ function createTraceFile(traceLink: LinkModel): TraceFile {
   return {
     sourceId: traceLink.sourceId,
     targetId: traceLink.targetId,
-    isGenerated: DEFAULT_IS_GENERATED,
+    isGenerated: false,
     isValid: false,
     errors: [],
     traces: [],

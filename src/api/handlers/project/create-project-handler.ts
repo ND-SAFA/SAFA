@@ -27,6 +27,7 @@ export function handleImportProject(
   { onSuccess, onError }: IOHandlerCallback
 ): void {
   appStore.onLoadStart();
+  const project = projectCreationRequest.project;
 
   createProjectCreationJob(projectCreationRequest)
     .then(async (job) => {

@@ -14,20 +14,19 @@ import {
  * Creates a new project, sets related app state, and logs the status.
  *
  * @param project - The project to create.
- * @param generatedTraces - The trace links to generate.
+ * @param requests - The requests to generate trace links.
  * @param onSuccess - Called if the action is successful.
  * @param onError - Called if the action fails.
  */
 export function handleImportProject(
   project: ProjectModel,
-  generatedTraces: GeneratedMatrixModel[],
+  requests: GeneratedMatrixModel[],
   { onSuccess, onError }: IOHandlerCallback
 ): void {
   appStore.onLoadStart();
 
-  //TODO: add `generatedTraces` to creation job.
-
-  createProjectCreationJob(project)
+  const payload = { project, requests };
+  createProjectCreationJob(payload)
     .then(async (job) => {
       await handleJobSubmission(job);
       await navigateTo(Routes.UPLOAD_STATUS);

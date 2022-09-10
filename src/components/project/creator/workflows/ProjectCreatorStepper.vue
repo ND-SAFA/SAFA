@@ -8,28 +8,28 @@
     <template v-slot:items>
       <v-stepper-content step="1">
         <project-identifier-input
-          v-bind:name.sync="name"
-          v-bind:description.sync="description"
-          data-cy-name="input-project-name-standard"
           data-cy-description="input-project-description-standard"
+          data-cy-name="input-project-name-standard"
+          v-bind:description.sync="description"
+          v-bind:name.sync="name"
         />
       </v-stepper-content>
 
       <v-stepper-content step="2">
         <generic-uploader
-          item-name="artifact"
-          :uploader="artifactUploader"
           :artifact-map="artifactMap"
+          :uploader="artifactUploader"
+          item-name="artifact"
           @change="artifactUploader.panels = $event"
           @upload:valid="setStepIsValid(1, true)"
           @upload:invalid="setStepIsValid(1, false)"
         >
           <template v-slot:creator="{ isCreatorOpen, onAddFile, onClose }">
             <artifact-type-creator
-              :is-open="isCreatorOpen"
               :artifact-types="artifactTypes"
-              @submit="onAddFile"
+              :is-open="isCreatorOpen"
               @close="onClose"
+              @submit="onAddFile"
             />
           </template>
         </generic-uploader>
@@ -37,21 +37,21 @@
 
       <v-stepper-content step="3">
         <generic-uploader
-          item-name="trace matrix"
-          :uploader="traceUploader"
           :artifact-map="artifactMap"
           :default-valid-state="true"
+          :uploader="traceUploader"
+          item-name="trace matrix"
           @change="traceUploader.panels = $event"
           @upload:valid="setStepIsValid(2, true)"
           @upload:invalid="setStepIsValid(2, false)"
         >
           <template v-slot:creator="{ isCreatorOpen, onAddFile, onClose }">
             <trace-file-creator
+              :artifact-types="artifactTypes"
               :is-open="isCreatorOpen"
               :trace-files="traceFiles"
-              :artifact-types="artifactTypes"
-              @submit="onAddFile"
               @close="onClose"
+              @submit="onAddFile"
             />
           </template>
         </generic-uploader>
@@ -60,8 +60,8 @@
       <v-stepper-content step="4">
         <tim-tree
           :artifact-panels="artifactUploader.panels"
-          :trace-panels="traceUploader.panels"
           :in-view="currentStep === 4"
+          :trace-panels="traceUploader.panels"
         />
       </v-stepper-content>
     </template>
@@ -71,22 +71,22 @@
 <script lang="ts">
 import Vue from "vue";
 import {
-  ArtifactModel,
   ArtifactMap,
-  ProjectModel,
+  ArtifactModel,
+  GeneratedMatrixModel,
   MembershipModel,
+  ProjectModel,
   ProjectRole,
   StepState,
   TraceFile,
   TraceLinkModel,
-  GeneratedMatrixModel,
 } from "@/types";
 import { createProject } from "@/util";
 import { sessionStore } from "@/hooks";
 import {
-  handleImportProject,
   createArtifactUploader,
   createTraceUploader,
+  handleImportProject,
 } from "@/api";
 import { GenericStepper } from "@/components/common";
 import { ProjectIdentifierInput } from "@/components/project/shared";
@@ -146,9 +146,15 @@ export default Vue.extend({
      * Attempts to create a project.
      */
     saveProject(): void {
-      handleImportProject(this.project, this.generatedTraces, {
-        onSuccess: () => this.clearData(),
-      });
+      handleImportProject(
+        {
+          project: this.project,
+          requests: this.generatedTraces,
+        },
+        {
+          onSuccess: () => this.clearData(),
+        }
+      );
     },
   },
   computed: {

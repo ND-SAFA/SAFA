@@ -1,4 +1,8 @@
-import { GeneratedMatrixModel, IOHandlerCallback, ProjectModel } from "@/types";
+import {
+  CreateProjectByJsonModel,
+  IOHandlerCallback,
+  ProjectModel,
+} from "@/types";
 import { appStore, logStore } from "@/hooks";
 import { navigateTo, Routes } from "@/router";
 import {
@@ -19,14 +23,12 @@ import {
  * @param onError - Called if the action fails.
  */
 export function handleImportProject(
-  project: ProjectModel,
-  requests: GeneratedMatrixModel[],
+  projectCreationRequest: CreateProjectByJsonModel,
   { onSuccess, onError }: IOHandlerCallback
 ): void {
   appStore.onLoadStart();
 
-  const payload = { project, requests };
-  createProjectCreationJob(payload)
+  createProjectCreationJob(projectCreationRequest)
     .then(async (job) => {
       await handleJobSubmission(job);
       await navigateTo(Routes.UPLOAD_STATUS);

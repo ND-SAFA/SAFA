@@ -63,7 +63,7 @@ public class UpdateProjectByFlatFileJobBuilder extends AbstractJobBuilder<Projec
 
     @Override
     JobType getJobType() {
-        return JobType.FLAT_FILE_PROJECT_CREATION;
+        return JobType.PROJECT_CREATION_VIA_FLAT_FILE;
     }
 
     private void uploadFlatFiles(Project project) throws IOException {

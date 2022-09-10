@@ -3,6 +3,7 @@ package edu.nd.crc.safa.features.jobs.entities.app;
 import java.util.List;
 
 import edu.nd.crc.safa.features.jobs.entities.jobs.CreateProjectViaJiraJob;
+import edu.nd.crc.safa.features.jobs.entities.jobs.CreateProjectViaJsonJob;
 import edu.nd.crc.safa.features.jobs.entities.jobs.FlatFileProjectCreationJob;
 import edu.nd.crc.safa.features.jobs.entities.jobs.GenerateLinksJob;
 import edu.nd.crc.safa.features.jobs.entities.jobs.GithubProjectCreationJob;
@@ -28,18 +29,18 @@ public class JobSteps {
 
     public static List<String> getJobSteps(JobType jobType) {
         switch (jobType) {
-            case FLAT_FILE_PROJECT_CREATION:
+            case PROJECT_CREATION_VIA_FLAT_FILE:
                 return AbstractJob.getJobSteps(FlatFileProjectCreationJob.class);
-            case JIRA_PROJECT_CREATION:
+            case PROJECT_CREATION_VIA_JIRA:
                 return AbstractJob.getJobSteps(CreateProjectViaJiraJob.class);
-            case JIRA_PROJECT_UPDATE:
-                return AbstractJob.getJobSteps(JiraProjectUpdateJob.class);
-            case GITHUB_PROJECT_CREATION:
+            case PROJECT_CREATION_VIA_GITHUB:
                 return AbstractJob.getJobSteps(GithubProjectCreationJob.class);
-            case GITHUB_PROJECT_UPDATE:
+            case PROJECT_CREATION_VIA_JSON:
+                return AbstractJob.getJobSteps(CreateProjectViaJsonJob.class);
+            case PROJECT_UPDATE_VIA_JIRA:
+                return AbstractJob.getJobSteps(JiraProjectUpdateJob.class);
+            case PROJECT_UPDATE_VIA_GITHUB:
                 return AbstractJob.getJobSteps(GithubProjectUpdateJob.class);
-            case PROJECT_CREATION:
-                return AbstractJob.getJobSteps(CommitJob.class);
             case GENERATE_LINKS:
                 return AbstractJob.getJobSteps(GenerateLinksJob.class);
             default:

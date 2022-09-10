@@ -95,7 +95,7 @@ public abstract class AbstractJob implements Job {
     static <T extends AbstractJob> List<String> getJobSteps(Class<T> jobClass) {
         return getSteps(jobClass)
             .stream()
-            .map(jobStepImplementation -> jobStepImplementation.annotation.name())
+            .map(jobStepImplementation -> jobStepImplementation.annotation.value())
             .collect(Collectors.toList());
     }
 
@@ -175,7 +175,7 @@ public abstract class AbstractJob implements Job {
 
     protected abstract UUID getCompletedEntityId();
 
-    @IJobStep(name = "Done", position = -1)
+    @IJobStep(value = "Done", position = -1)
     public void done() {
         this.jobDbEntity.setCompletedEntityId(this.getCompletedEntityId());
         this.serviceProvider.getJobService().completeJob(jobDbEntity);

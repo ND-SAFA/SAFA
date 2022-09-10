@@ -99,7 +99,9 @@ public class JobController extends BaseController {
      * @throws Exception If an error occurs while setting up job.
      */
     @PostMapping(AppRoutes.Jobs.Projects.CREATE_PROJECT_VIA_JSON)
-    public JobAppEntity createProjectFromJSON(@RequestBody CreateProjectByJsonPayload payload) throws Exception {
+    public JobAppEntity createProjectFromJSON(@RequestBody @Valid CreateProjectByJsonPayload payload) throws Exception {
+        System.out.println("Request:" + payload);
+        // Step - Create and start job.
         CreateProjectByJsonJobBuilder createProjectByJsonJobBuilder = new CreateProjectByJsonJobBuilder(
             serviceProvider, payload.getProject(), payload.getRequests());
         return createProjectByJsonJobBuilder.perform();
@@ -114,9 +116,12 @@ public class JobController extends BaseController {
      */
     @PostMapping(AppRoutes.Jobs.Traces.GENERATE)
     public JobAppEntity generateTraceLinks(@RequestBody @Valid TraceGenerationRequest request) throws Exception {
-        ProjectVersion projectVersion = resourceBuilder.fetchVersion(request.getProjectVersion().getVersionId())
-            .withEditVersion(); // Makes sure all persistent properties are available
+        // Step - Check permissions and retrieve persistent properties
+        UUID versionId = request.getProjectVersion().getVersionId();
+        ProjectVersion projectVersion = resourceBuilder.fetchVersion(versionId).withEditVersion();
         request.setProjectVersion(projectVersion);
+
+        // Step - Create and start job.
         GenerateLinksJobBuilder jobBuilder = new GenerateLinksJobBuilder(this.serviceProvider, request);
         return jobBuilder.perform();
     }

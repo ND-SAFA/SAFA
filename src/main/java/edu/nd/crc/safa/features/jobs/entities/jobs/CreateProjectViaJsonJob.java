@@ -13,25 +13,26 @@ import edu.nd.crc.safa.features.tgen.entities.TraceGenerationMethod;
 import edu.nd.crc.safa.features.tgen.entities.TraceGenerationRequest;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 
-public class ProjectProjectViaJsonJob extends CommitJob {
+public class CreateProjectViaJsonJob extends CommitJob {
     /**
      * Trace links to generate.
      */
     List<TraceGenerationRequest> generationRequests;
 
-    public ProjectProjectViaJsonJob(JobDbEntity jobDbEntity,
-                                    ServiceProvider serviceProvider,
-                                    ProjectCommit projectCommit,
-                                    List<TraceGenerationRequest> generationRequests) {
+    public CreateProjectViaJsonJob(JobDbEntity jobDbEntity,
+                                   ServiceProvider serviceProvider,
+                                   ProjectCommit projectCommit,
+                                   List<TraceGenerationRequest> generationRequests) {
         super(jobDbEntity, serviceProvider, projectCommit);
         this.generationRequests = generationRequests;
         this.projectCommit = projectCommit;
     }
 
-    @IJobStep(value = "Generating trace links", position = 1)
+    @IJobStep(value = "Generating Trace Links", position = 1)
     public void generateLinks() {
         for (TraceGenerationRequest request : this.generationRequests) {
             if (request.size() == 0) {
+                System.out.println("No generated trace link requests...");
                 return;
             }
             List<ArtifactAppEntity> sourceArtifacts = request.getSourceArtifacts();
@@ -41,6 +42,7 @@ public class ProjectProjectViaJsonJob extends CommitJob {
             List<TraceAppEntity> generatedTraces = this.serviceProvider
                 .getTraceGenerationService()
                 .generateLinksWithMethod(sourceArtifacts, targetArtifacts, method);
+            System.out.println("Generated traces:" + generatedTraces.size());
             this.projectCommit.addTraces(ModificationType.ADDED, generatedTraces);
         }
     }

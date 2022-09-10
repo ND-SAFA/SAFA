@@ -34,8 +34,8 @@ public class TraceGenerationService {
         List<TraceAppEntity> generatedLinks = new ArrayList<>();
 
         for (ArtifactTypeTraceGenerationRequestDTO request : requests) {
-            String sourceArtifactType = request.getSourceTypeName();
-            String targetArtifactType = request.getTargetTypeName();
+            String sourceArtifactType = request.getSource();
+            String targetArtifactType = request.getTarget();
 
             List<ArtifactAppEntity> sourceArtifacts = artifacts
                 .stream()
@@ -48,7 +48,7 @@ public class TraceGenerationService {
             generatedLinks.addAll(generateLinksWithMethod(
                 sourceArtifacts,
                 targetArtifacts,
-                request.getTraceGenerationMethod()));
+                request.getMethod()));
         }
         return generatedLinks;
     }

@@ -1,16 +1,17 @@
 steps:
   # Build the container image with cacheing
-  - name: 'gcr.io/kaniko-project/executor:latest'
-    args: ['--build-arg', 'BUCKET=${_BUCKET}', '--snapshotMode=time', '--destination=gcr.io/$PROJECT_ID/safa-tgen-${_STAGE}' ,'--cache=true', '--cache-ttl=72h']
+  - name: "gcr.io/cloud-builders/docker"
+    args: ['--build-arg', 'BUCKET=${_BUCKET}', '-t', 'gcr.io/$PROJECT_ID/safa-tgen-${_STAGE}' ]
     env:
       - "DOCKER_BUILDKIT=1"
-      - "IFS=''"
+  # Push the container image to Container Registry
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["push", "gcr.io/$PROJECT_ID/safa-tgen-${_STAGE}"]
   # Deploy container image to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: gcloud
     args: ['run', 'deploy', '${_SERVICE_NAME}', '--container-image','gcr.io/$PROJECT_ID/safa-tgen-${_STAGE}', '--zone', '${_ZONE}' ]
 options:
-  logging: CLOUD_LOGGING_ONLY
   machineType: 'E2_HIGHCPU_8'
   diskSizeGb: '200'
 timeout: 1200s

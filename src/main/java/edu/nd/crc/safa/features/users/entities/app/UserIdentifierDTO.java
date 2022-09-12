@@ -1,5 +1,7 @@
 package edu.nd.crc.safa.features.users.entities.app;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
@@ -16,10 +18,14 @@ public class UserIdentifierDTO {
     /**
      * Unique identifier for user.
      */
+    @NotNull
     UUID userId;
+
     /**
      * User's email.
      */
+    @NotNull
+    @NotEmpty
     String email;
 
     public UserIdentifierDTO(SafaUser safaUser) {

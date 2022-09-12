@@ -86,6 +86,9 @@ dependencies {
     implementation 'org.eclipse.elk:org.eclipse.elk.core:0.8.1'
     implementation 'org.eclipse.elk:org.eclipse.elk.alg.mrtree:0.8.1'
 
+    // email
+    implementation 'com.infobip:infobip-api-java-client:3.2.0'
+
     // testing
     implementation 'org.springframework.boot:spring-boot-starter-test:2.7.2'
     testImplementation 'com.h2database:h2:2.1.210' // Most up-to-date version compatible with flyway

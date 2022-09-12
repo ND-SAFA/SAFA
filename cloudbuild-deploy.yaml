@@ -1,7 +1,7 @@
 steps:
   # Build the container image with cacheing
   - name: "gcr.io/cloud-builders/docker"
-    args: ['--build-arg', 'BUCKET=${_BUCKET}', '-t', 'gcr.io/$PROJECT_ID/safa-tgen-${_STAGE}' ]
+    args: ['build','--progress=plain', '--build-arg', 'BUCKET=${_BUCKET}', '-t', 'gcr.io/$PROJECT_ID/safa-tgen-${_STAGE}', '.' ]
     env:
       - "DOCKER_BUILDKIT=1"
   # Push the container image to Container Registry

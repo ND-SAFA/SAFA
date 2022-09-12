@@ -1,7 +1,7 @@
 steps:
   # Build the container image with cacheing
   - name: 'gcr.io/kaniko-project/executor:latest'
-    args: ['--build-arg', 'BUCKET=${_BUCKET}', '--snapshotMode=redo', '--destination=gcr.io/$PROJECT_ID/safa-tgen-${_STAGE}' ,'--cache=true', '--cache-ttl=72h']
+    args: ['--build-arg', 'BUCKET=${_BUCKET}', '--snapshotMode=time', '--destination=gcr.io/$PROJECT_ID/safa-tgen-${_STAGE}' ,'--cache=true', '--cache-ttl=72h']
     env:
       - "DOCKER_BUILDKIT=1"
       - "IFS=''"

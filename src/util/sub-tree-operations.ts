@@ -99,6 +99,7 @@ export function createSubtreeMap(
   traces: TraceLinkModel[]
 ): SubtreeMap {
   const computedSubtrees = {};
+  const traversedIds: string[] = [];
 
   return artifacts
     .map((artifact) => ({
@@ -106,7 +107,8 @@ export function createSubtreeMap(
         artifacts,
         traces,
         artifact.id,
-        computedSubtrees
+        computedSubtrees,
+        traversedIds
       ),
     }))
     .reduce((acc, cur) => ({ ...acc, ...cur }), {});
@@ -119,13 +121,15 @@ export function createSubtreeMap(
  * @param traces - All traces in the system.
  * @param artifactId - The id of the root artifact whose subtree is being calculated.
  * @param subtreeMapCache - A cache of previously calculated subtrees.
+ * @param traversedIds - A cache of previously traversed artifacts.
  * @return The child ids in the subtree.
  */
 function getSubtree(
   artifacts: ArtifactModel[],
   traces: TraceLinkModel[],
   artifactId: string,
-  subtreeMapCache: SubtreeMap
+  subtreeMapCache: SubtreeMap,
+  traversedIds: string[]
 ): SubtreeItem {
   const currentItem: SubtreeItem = {
     parents: [],
@@ -133,9 +137,11 @@ function getSubtree(
     subtree: [],
   };
 
-  if (artifactId in subtreeMapCache) {
-    return subtreeMapCache[artifactId];
+  if (artifactId in subtreeMapCache || traversedIds.includes(artifactId)) {
+    return subtreeMapCache[artifactId] || currentItem;
   }
+
+  traversedIds.push(artifactId);
 
   for (const childId of getChildren(artifacts, traces, artifactId)) {
     if (!(childId in subtreeMapCache)) {
@@ -143,7 +149,8 @@ function getSubtree(
         artifacts,
         traces,
         childId,
-        subtreeMapCache
+        subtreeMapCache,
+        traversedIds
       );
     }
 

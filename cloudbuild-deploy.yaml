@@ -11,7 +11,4 @@ steps:
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: gcloud
     args: ['run', 'deploy', '${_SERVICE_NAME}', '--image','gcr.io/$PROJECT_ID/safa-tgen-${_STAGE}', '--region', '${_REGION}' ]
-options:
-  machineType: 'E2_HIGHCPU_8'
-  diskSizeGb: '200'
 timeout: 1200s

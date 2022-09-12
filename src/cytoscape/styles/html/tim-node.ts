@@ -5,7 +5,7 @@ import {
   TIM_NODE_HEIGHT,
   TIM_NODE_WIDTH,
 } from "@/cytoscape/styles/config";
-import { svgDetails, svgDiv, svgTitle } from "./core-svg";
+import { svgDiv, svgTitle } from "./core-svg";
 
 /**
  * Creates the SVG TIM node.
@@ -16,7 +16,7 @@ import { svgDetails, svgDiv, svgTitle } from "./core-svg";
  */
 export function svgTIM(data: TimNodeData): string {
   const x = 10;
-  const y = 30;
+  const y = 10;
   const color = ThemeColors.darkGrey;
 
   return `
@@ -38,8 +38,8 @@ export function svgTIM(data: TimNodeData): string {
         class="artifact-svg"
       />
       ${svgTitle(data.id, y)}
-      ${svgDiv({ x, y: y + 17, width: TIM_NODE_WIDTH - x * 2, color })}
-      ${svgDetails(`${data.count} Nodes`, y + 47)}
+      ${svgDiv({ x, y: y + 37, width: TIM_NODE_WIDTH - x * 2, color })}
+      ${svgTitle(`${data.count} Nodes`, y + 50)}
     </svg>
     `;
 }

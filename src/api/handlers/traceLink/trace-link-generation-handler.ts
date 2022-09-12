@@ -1,22 +1,20 @@
 import {
   ApprovalType,
-  IOHandlerCallback,
   FlatTraceLink,
-  TraceLinkModel,
   GeneratedMatrixModel,
+  IOHandlerCallback,
 } from "@/types";
 import {
+  approvalStore,
   appStore,
   artifactStore,
-  projectStore,
-  approvalStore,
   logStore,
-  traceStore,
+  projectStore,
 } from "@/hooks";
 import {
   createGeneratedLinks,
   getGeneratedLinks,
-  saveGeneratedLinks,
+  handleJobSubmission,
 } from "@/api";
 
 /**
@@ -78,9 +76,8 @@ export async function handleGetGeneratedLinks({
  */
 export async function handleGenerateLinks(
   matrices: GeneratedMatrixModel[],
-  { onSuccess, onError }: IOHandlerCallback<TraceLinkModel[]>
+  { onSuccess, onError }: IOHandlerCallback
 ): Promise<void> {
-  const generatedLinks: TraceLinkModel[] = [];
   const matricesName = matrices
     .map(({ source, target }) => `${source} -> ${target}`)
     .join(", ");
@@ -93,20 +90,19 @@ export async function handleGenerateLinks(
     for (const { source, target, method } of matrices) {
       const sourceArtifacts = artifactStore.getArtifactsByType[source] || [];
       const targetArtifacts = artifactStore.getArtifactsByType[target] || [];
-      const traceLinks = await createGeneratedLinks({
+      const job = await createGeneratedLinks({
         sourceArtifacts,
         targetArtifacts,
         method,
+        projectVersion: projectStore.version,
       });
-      generatedLinks.push(...traceLinks);
+
+      await handleJobSubmission(job);
     }
-
-    const createdLinks = await saveGeneratedLinks(generatedLinks);
-
-    logStore.onSuccess(
-      `Generated ${createdLinks.length} new trace links: ${matricesName}`
+    logStore.onInfo(
+      `Started generating new trace links: ${matricesName}. You'll receive a notification once they are added.`
     );
-    onSuccess?.(createdLinks);
+    onSuccess?.();
   } catch (e) {
     logStore.onError(`Unable to generate new trace links: ${matricesName}`);
     onError?.(e as Error);

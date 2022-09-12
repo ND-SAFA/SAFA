@@ -168,6 +168,7 @@ export default Vue.extend({
      * Resets all modal data.
      */
     resetModalData() {
+      this.includedTypes = [];
       this.includeChildren = false;
       this.includedChildTypes = [];
       this.childIds = [];

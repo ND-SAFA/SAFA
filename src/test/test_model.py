@@ -1,9 +1,10 @@
 from transformers.models.bert.configuration_bert import BertConfig
-from common.models.base_models.bert_trace_single import BertTraceSingle
+
+from common.models.base_models.bert_trace_single import TBertSingle
 
 
 def get_test_model():
-    return BertTraceSingle(get_test_config())
+    return TBertSingle(get_test_config())
 
 
 def get_test_config():

@@ -94,6 +94,7 @@ dependencies {
     testImplementation 'com.h2database:h2:2.1.210' // Most up-to-date version compatible with flyway
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
     testImplementation 'org.springframework.security:spring-security-test:5.7.2'
+    testImplementation 'org.mockito:mockito-core:4.7.0'
 }
 
 test {

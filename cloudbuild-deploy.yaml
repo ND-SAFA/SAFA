@@ -10,6 +10,6 @@ steps:
     entrypoint: gcloud
     args: ['run', 'deploy', '${_SERVICE_NAME}', '--container-image','gcr.io/$PROJECT_ID/safa-tgen-${_STAGE}', '--zone', '${_ZONE}' ]
 options:
-  logging: CLOUD_LOGGING_ONLY
+  machineType: 'E2_HIGHCPU_8'
   diskSizeGb: '200'
 timeout: 1200s

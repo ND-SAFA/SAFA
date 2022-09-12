@@ -31,7 +31,7 @@ class TestProjectRetrievalWithSharing extends AbstractSharingTest {
 
         assertThat(projects.length())
             .as("Sharee has single project shared with them")
-            .isEqualTo(2);
+            .isEqualTo(1);
 
         String projectName = projects.getJSONObject(0).getString("name");
         assertThat(projectName)

@@ -1,6 +1,11 @@
-# Creates application-prod.properties with database connection details.
-# Copies configuration files to test and build server.
-#
+# Step 1 - Install necessary dependencies
+FROM gradle:6.9-jdk11 AS builder
+ADD src /app/src
+ADD build.gradle /app/
+RUN gradle build --stacktrace -x test -x checkstyleMain -x checkstyleTest
+
+# Step 2 - Create production environment
+ARG PathToProperties="/app/src/main/resources/application-deployment.properties"
 FROM ubuntu:12.04 as config
 
 ARG DB_URL=jdbc:mysql://host.docker.internal/safa-db
@@ -14,13 +19,11 @@ RUN test -n "$DB_USER"
 RUN test -n "$DB_PASSWORD"
 RUN test -n "$JWT_KEY"
 
-ARG PathToProperties="/app/src/main/resources/application-prod.properties"
-
-ADD src /app/src
 
 RUN sed -i -e "s,url=,url=$DB_URL,g" $PathToProperties
 RUN sed -i -e "s,username=,username=$DB_USER,g" $PathToProperties
 RUN sed -i -e "s,password=,password=$DB_PASSWORD,g" $PathToProperties
+RUN sed -i -e "s,jwt.key=,jwt.key=$JWT_KEY,g" $PathToProperties
 RUN sed -i -e "s,jwt.key=,jwt.key=$JWT_KEY,g" $PathToProperties
 
 RUN if [ ! -z "$DB_INSTANCE" ] ; \
@@ -30,15 +33,15 @@ RUN if [ ! -z "$DB_INSTANCE" ] ; \
     fi
 RUN cat $PathToProperties
 
-FROM gradle:6.9-jdk11 AS builder
 
-ADD build.gradle /app/
 ADD checkstyle.xml /app/
-ADD resources/ /app/resources/
+
 COPY --from=config /app/src /app/src
 
+
+# Step - Test application
 WORKDIR /app
-RUN gradle build --stacktrace -x checkstyleMain -x checkstyleTest
+ADD resources/ /app/resources/
 
 # Copy build and configuration settings then create entry point.
 #

@@ -9,7 +9,9 @@ echo "Mounting GCS Fuse."
 gcsfuse --debug_fuse --debug_fs --debug_gcs --debug_http "$BUCKET" "$MNT_DIR"
 echo "Mounting completed."
 
-exec /app/venv/bin/python3 /app/src/manage.py runserver 0.0.0.0:80 &
+cd /app/src
+
+exec gunicorn --bind :80 --workers 1 --threads 8 --timeout 0 server.wsgi &
 
 # Exit immediately when one of the background processes terminate.
 wait -n

@@ -16,9 +16,7 @@ ARG BUCKET
 # 4. Install libraries
 # Step - Install python libraries
 COPY requirements.txt /app/
-RUN python3 -m venv /app/venv
-RUN /app/venv/bin/pip install --upgrade pip
-RUN /app/venv/bin/pip install -r /app/requirements.txt
+RUN pip install -r /app/requirements.txt
 
 # Step - Install tini and gcsfuse
 RUN set -e; \
@@ -48,6 +46,8 @@ ENV MNT_DIR /mnt/gcs
 # 5. Setup cloud file system
 # ENV GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS:-/app/application-credentials.json}
 # COPY application-credentials.json /app/
+
+# 6. Add run script
 COPY gcsfuse_run.sh /app/
 RUN chmod +x /app/gcsfuse_run.sh
 

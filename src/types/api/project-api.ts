@@ -54,7 +54,7 @@ export interface CreateProjectByJsonModel {
    */
   project: ProjectModel;
   /**
-   * The trace generation request to perform and commit
+   * The trace generation request to perform and commit.
    */
   requests: GeneratedMatrixModel[];
 }

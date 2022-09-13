@@ -7,13 +7,14 @@ import {
 
 describe("Project Selection", () => {
   beforeEach(() => {
-    cy.dbResetProjects();
+    cy.dbResetProjects().loadNewProject();
 
-    cy.visit("/create").login(validUser.email, validUser.password);
+    cy.visit("/create")
+      .login(validUser.email, validUser.password)
+      .location("pathname", { timeout: 2000 })
+      .should("equal", "/create");
 
-    cy.location("pathname", { timeout: 2000 }).should("equal", "/create");
-
-    cy.createBulkProject().openProjectSelector();
+    cy.openProjectSelector();
   });
 
   describe("Project List", () => {

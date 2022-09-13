@@ -48,12 +48,10 @@ import {
   documentStore,
   commitStore,
   selectionStore,
-  layoutStore,
 } from "@/hooks";
-import { redoCommit, undoCommit } from "@/api";
+import { redoCommit, undoCommit, handleRegenerateLayout } from "@/api";
 import { cyZoomIn, cyZoomOut } from "@/cytoscape";
 import { GenericIconButton, CheckmarkMenu, FlexBox } from "@/components/common";
-import { handleRegenerateLayout } from "@/api/handlers/version/layout-handler";
 
 export default Vue.extend({
   name: "GraphButtons",

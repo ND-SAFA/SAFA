@@ -26,7 +26,8 @@ export enum InternalTraceType {
  * Enumerates the type of generated trace models.
  */
 export enum ModelType {
-  TBERT = "TBERT",
+  NLBert = "NLBert",
+  PLBert = "PLBert",
   VSM = "VSM",
 }
 

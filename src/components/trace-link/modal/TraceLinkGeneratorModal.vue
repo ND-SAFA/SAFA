@@ -18,23 +18,7 @@
         v-for="(matrix, idx) in matrices"
         :key="idx"
       >
-        <v-select
-          filled
-          hide-details
-          label="Model"
-          v-model="matrix.method"
-          :items="modelOptions"
-          class="mr-2"
-          item-value="id"
-          item-text="name"
-        >
-          <template v-slot:item="{ item }">
-            <div class="my-1">
-              <typography el="div" :value="item.name" />
-              <typography variant="caption" :value="getModelDetails(item.id)" />
-            </div>
-          </template>
-        </v-select>
+        <gen-method-input v-model="matrix.method" />
         <artifact-type-input
           hide-details
           v-model="matrix.source"
@@ -80,13 +64,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import {
-  GeneratedMatrixModel,
-  ModelType,
-  SelectOption,
-  TypeMatrixModel,
-} from "@/types";
-import { traceModelOptions } from "@/util";
+import { GeneratedMatrixModel, ModelType, TypeMatrixModel } from "@/types";
 import { appStore } from "@/hooks";
 import { handleGenerateLinks } from "@/api";
 import {
@@ -95,6 +73,7 @@ import {
   GenericIconButton,
   GenericModal,
   Typography,
+  GenMethodInput,
 } from "@/components/common";
 
 /**
@@ -105,6 +84,7 @@ import {
 export default Vue.extend({
   name: "TraceLinkGeneratorModal",
   components: {
+    GenMethodInput,
     GenericIconButton,
     Typography,
     ArtifactTypeInput,
@@ -116,7 +96,7 @@ export default Vue.extend({
       isLoading: false,
       isValid: false,
       matrices: [
-        { source: "", target: "", method: ModelType.TBERT },
+        { source: "", target: "", method: ModelType.NLBert },
       ] as GeneratedMatrixModel[],
     };
   },
@@ -126,7 +106,7 @@ export default Vue.extend({
 
       this.isLoading = false;
       this.isValid = false;
-      this.matrices = [{ source: "", target: "", method: ModelType.TBERT }];
+      this.matrices = [{ source: "", target: "", method: ModelType.NLBert }];
     },
     matrices: {
       deep: true,
@@ -144,37 +124,13 @@ export default Vue.extend({
     isOpen(): boolean {
       return appStore.isTraceLinkGeneratorOpen;
     },
-    /**
-     * @return The trace generation model types.
-     */
-    modelOptions(): SelectOption[] {
-      return traceModelOptions();
-    },
   },
   methods: {
-    /**
-     * @return The detail method for a model.
-     */
-    getModelDetails(method: ModelType | ""): string {
-      if (method === ModelType.VSM) {
-        return (
-          "Faster, lower quality links. The vector-space model computes the similarity of two documents " +
-          "using their word counts with common words account for."
-        );
-      } else if (method === ModelType.TBERT) {
-        return (
-          "Slower, higher quality links. A deep-learning algorithm leveraging a RoBERTa model trained " +
-          "on open source projects for trace link prediction."
-        );
-      } else {
-        return "";
-      }
-    },
     /**
      * Creates a new trace matrix.
      */
     handleCreateMatrix(): void {
-      this.matrices.push({ source: "", target: "", method: ModelType.TBERT });
+      this.matrices.push({ source: "", target: "", method: ModelType.NLBert });
     },
     /**
      * Removes a matrix from the list.
@@ -189,14 +145,8 @@ export default Vue.extend({
      * Attempts to generate the selected trace links.
      */
     handleSubmit(): void {
-      this.isLoading = true;
-      handleGenerateLinks(this.matrices, {
-        onSuccess: () => {
-          this.isLoading = false;
-          this.handleClose();
-        },
-        onError: () => (this.isLoading = false),
-      });
+      handleGenerateLinks(this.matrices, {});
+      this.handleClose();
     },
     /**
      * Closes the modal.

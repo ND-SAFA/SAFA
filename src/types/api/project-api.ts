@@ -1,4 +1,9 @@
-import { ArtifactModel, TraceLinkModel } from "@/types/domain";
+import {
+  ArtifactModel,
+  GeneratedMatrixModel,
+  ProjectModel,
+  TraceLinkModel,
+} from "@/types/domain";
 
 /**
  * Defines the response from checking if an artifact exists.
@@ -38,4 +43,18 @@ export interface ParseTraceFileModel extends ParseFileModel {
    * The traces parsed.
    */
   entities: TraceLinkModel[];
+}
+
+/**
+ * The request payload for creating a project via JSON.
+ */
+export interface CreateProjectByJsonModel {
+  /**
+   * The project entities to commit.
+   */
+  project: ProjectModel;
+  /**
+   * The trace generation request to perform and commit.
+   */
+  requests: GeneratedMatrixModel[];
 }

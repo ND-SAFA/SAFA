@@ -44,14 +44,14 @@ export function svgNode(
         data-cy-name="${data.artifactName}"
       >
         ${svgShape}
-        ${svgTitle(title, y)}
+        ${svgTitle(title, y - 18, "type")}
         ${svgDiv({
           x,
           y: y + 7,
           width,
           color,
         })}
-        ${svgDetails(data.artifactName, y + 27)}
+        ${svgTitle(data.artifactName, y + 10, "name")}
         ${svgBody(data, {
           x,
           y: y + 35,
@@ -70,20 +70,20 @@ export function svgNode(
  *
  * @param title - The title to render.
  * @param yPos - The y position to start drawing at.
+ * @param dataCy - The data cy selector to append.
  *
  * @return stringified SVG for the node.
  */
-export function svgTitle(title: string, yPos: number): string {
+export function svgTitle(title: string, yPos: number, dataCy = "name"): string {
   return `
-   <text 
-      x="50%" y="${yPos}" 
-      text-anchor="middle"
-      font-weight="600"
-      font-size="${title.length < 20 ? "medium" : "x-small"}"
-      data-cy="tree-node-type"
-    >
-      ${title}
-    </text>
+    <foreignObject y="${yPos}" height="24" width="100%">
+      <span 
+        class="text-body-1 align-center mx-2 text-ellipsis artifact-text" 
+        data-cy="tree-node-${dataCy}"
+      >
+        ${title}
+      </span >
+    </foreignObject>
   `;
 }
 
@@ -105,28 +105,6 @@ export function svgDiv(
         stroke-width="2"
         class="artifact-svg-div"
       />
-  `;
-}
-
-/**
- * Creates the SVG for representing a safety case node's warnings and collapsed children.
- *
- * @param title - The title to render.
- * @param yPos - The y position to start drawing at.
- *
- * @return stringified SVG for the node.
- */
-export function svgDetails(title: string, yPos: number): string {
-  return `
-    <text 
-      x="50%" y="${yPos}" 
-      text-anchor="middle" 
-      shape-rendering="crispEdges"
-      font-weight="600"
-      data-cy="tree-node-name"
-    >
-      ${title}
-    </text>
   `;
 }
 

@@ -70,7 +70,9 @@ export function isLinkAllowedByType(
   const isSourceDefaultArtifact = !source.safetyCaseType && !source.logicType;
   const isTargetDefaultArtifact = !target.safetyCaseType && !target.logicType;
 
-  if (isSourceDefaultArtifact) {
+  if (sourceType === targetType) {
+    return true;
+  } else if (isSourceDefaultArtifact) {
     return !artifactTypeDirections[targetType]?.includes(sourceType);
   } else if (source.safetyCaseType) {
     if (isTargetDefaultArtifact) return true;

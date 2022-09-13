@@ -1,5 +1,5 @@
 <template>
-  <v-chip outlined small label color="secondary" v-if="isSaving">
+  <v-chip outlined small label color="secondary" v-if="isSaving" class="mx-2">
     <v-progress-circular indeterminate class="mr-2" size="16" />
     Saving
   </v-chip>

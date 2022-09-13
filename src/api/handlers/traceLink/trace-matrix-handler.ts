@@ -8,9 +8,9 @@ import { deleteTraceMatrix, getTraceMatrices } from "@/api";
  * @return The current trace matrices.
  */
 export async function handleLoadTraceMatrices(): Promise<void> {
-  const artifactTypeDirections = await getTraceMatrices(projectStore.projectId);
-
-  typeOptionsStore.$patch({ artifactTypeDirections });
+  typeOptionsStore.artifactTypeDirections = await getTraceMatrices(
+    projectStore.projectId
+  );
 }
 
 /**

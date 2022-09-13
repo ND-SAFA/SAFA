@@ -85,6 +85,9 @@ export enum DataCy {
   creationEntityButton = "button-created-entity",
   creationFilePanel = "panel-files",
   creationUploadButton = "button-create-project",
+  creationTraceSourceInput = "input-source-type",
+  creationTraceTargetInput = "input-target-type",
+  creationTraceCreateButton = "button-create-trace-matrix",
 
   // Jobs
 

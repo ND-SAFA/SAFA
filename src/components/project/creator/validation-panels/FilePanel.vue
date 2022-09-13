@@ -2,7 +2,8 @@
   <v-expansion-panel data-cy="panel-files">
     <v-expansion-panel-header>
       <flex-box align="center">
-        <v-icon class="mr-1" :color="iconColor">
+        <v-progress-circular indeterminate v-if="isLoading" class="mr-2" />
+        <v-icon v-else class="mr-1" :color="iconColor">
           {{ iconName }}
         </v-icon>
         <slot name="title" />
@@ -132,6 +133,10 @@ export default Vue.extend({
       default: true,
     },
     ignoreErrorsFlag: {
+      type: Boolean,
+      required: true,
+    },
+    isLoading: {
       type: Boolean,
       required: true,
     },

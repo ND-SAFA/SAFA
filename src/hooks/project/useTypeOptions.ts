@@ -6,6 +6,7 @@ import {
   ArtifactTypeDirections,
   ArtifactTypeModel,
   LabelledTraceDirectionModel,
+  ProjectModel,
   SafetyCaseType,
   TraceDirectionModel,
 } from "@/types";
@@ -54,6 +55,15 @@ export const useTypeOptions = defineStore("typeOptions", {
   },
   actions: {
     /**
+     *Initializes project data.
+     *
+     * @param project - The project to load.
+     */
+    initializeProject(project: ProjectModel): void {
+      this.artifactTypeDirections = {};
+      this.initializeTypeIcons(project.artifactTypes);
+    },
+    /**
      * Changes what directions of trace links between artifacts are allowed.
      *
      * @param allArtifactTypes - The artifact types to set.
@@ -62,7 +72,6 @@ export const useTypeOptions = defineStore("typeOptions", {
       this.$patch({
         artifactTypeIcons: createDefaultTypeIcons(allArtifactTypes),
         allArtifactTypes,
-        artifactTypeDirections: {},
       });
     },
     /**
@@ -137,14 +146,19 @@ export const useTypeOptions = defineStore("typeOptions", {
         removedTypeIds
       );
       const names = preservedTypes.map(({ name }) => name);
+      const artifactTypeIcons = preserveObjectKeys(
+        this.artifactTypeIcons,
+        names
+      );
+      const artifactTypeDirections = preserveObjectKeys(
+        this.artifactTypeDirections,
+        names
+      );
 
-      this.$patch({
-        allArtifactTypes: preservedTypes,
-        artifactTypeIcons: preserveObjectKeys(this.artifactTypeIcons, names),
-        artifactTypeDirections: preserveObjectKeys(
-          this.artifactTypeDirections,
-          names
-        ),
+      this.$patch((state) => {
+        state.allArtifactTypes = preservedTypes;
+        state.artifactTypeIcons = artifactTypeIcons;
+        state.artifactTypeDirections = artifactTypeDirections;
       });
       projectStore.updateProject({ artifactTypes: preservedTypes });
     },

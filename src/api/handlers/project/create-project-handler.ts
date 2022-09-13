@@ -1,6 +1,5 @@
 import {
-  GitHubCredentialsModel,
-  InternalGitHubCredentialsModel,
+  CreateProjectByJsonModel,
   IOHandlerCallback,
   ProjectModel,
 } from "@/types";
@@ -18,25 +17,27 @@ import {
 /**
  * Creates a new project, sets related app state, and logs the status.
  *
- * @param project - The project to create.
+ * @param projectCreationRequest - The project to create and requests to generate trace links.
  * @param onSuccess - Called if the action is successful.
  * @param onError - Called if the action fails.
  */
 export function handleImportProject(
-  project: ProjectModel,
+  projectCreationRequest: CreateProjectByJsonModel,
   { onSuccess, onError }: IOHandlerCallback
 ): void {
+  const name = projectCreationRequest.project.name;
+
   appStore.onLoadStart();
 
-  createProjectCreationJob(project)
+  createProjectCreationJob(projectCreationRequest)
     .then(async (job) => {
       await handleJobSubmission(job);
       await navigateTo(Routes.UPLOAD_STATUS);
-      logStore.onSuccess(`Project is being created: ${project.name}`);
+      logStore.onSuccess(`Project is being created: ${name}`);
       onSuccess?.();
     })
     .catch((e) => {
-      logStore.onError(`Unable to import project: ${project.name}`);
+      logStore.onError(`Unable to import project: ${name}`);
       logStore.onDevError(e);
       onError?.(e);
     })

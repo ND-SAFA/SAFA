@@ -1,6 +1,7 @@
 package requests;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.File;
@@ -96,6 +97,17 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
 
     public JSONObject postWithJsonObject(Object body, ResultMatcher resultMatcher) throws Exception {
         return postWithResponseParser(body, ResponseParser::jsonCreator, resultMatcher);
+    }
+
+    public void putWithJsonObject(Object body, ResultMatcher resultMatcher) throws Exception {
+        sendAuthenticatedRequest(
+            put(this.buildEndpoint())
+                .content(stringify(body))
+                .contentType(MediaType.APPLICATION_JSON),
+            resultMatcher,
+            SafaRequest.authorizationToken,
+            ResponseParser::jsonCreator
+        );
     }
 
     public <T> T postWithResponseParser(Object body,

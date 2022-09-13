@@ -31,6 +31,7 @@ import io.jsonwebtoken.Claims;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.Assert;
@@ -52,6 +53,12 @@ import org.springframework.web.multipart.MultipartFile;
 public class SafaUserController extends BaseController {
 
     private static final Logger log = LoggerFactory.getLogger(SafaUserController.class);
+
+    @Value("${fend.base}")
+    private String fendBase;
+
+    @Value("${fend.reset-email-path}")
+    private String fendPath;
 
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
@@ -125,7 +132,7 @@ public class SafaUserController extends BaseController {
         try {
             emailService.send(
                 "Requested password reset token",
-                token,
+                this.buildResetURL(token),
                 user.getEmail()
             );
         } catch (Exception e) {
@@ -206,5 +213,9 @@ public class SafaUserController extends BaseController {
                 new Project("Sample project", "Sample project for new user."),
                 files,
                 serviceProvider);
+    }
+
+    private String buildResetURL(String token) {
+        return String.format(fendBase + fendPath, token);
     }
 }

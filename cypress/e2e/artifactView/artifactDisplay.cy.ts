@@ -38,9 +38,11 @@ describe("Artifact Display", () => {
       cy.getCy(DataCy.selectedPanelName).should("contain", artifact.name);
       cy.getCy(DataCy.selectedPanelType).should("contain", artifactType);
       cy.getCy(DataCy.selectedPanelBody).should("contain", artifact.body);
-      cy.getCy(DataCy.treeNodeName).should("contain", artifact.name);
-      cy.getCy(DataCy.treeNodeType).should("contain", artifactType);
-      cy.getCy(DataCy.treeNodeBody).should("contain", artifact.body);
+      cy.getNodes(true).within(() => {
+        cy.getCy(DataCy.treeNodeName).should("contain", artifact.name);
+        cy.getCy(DataCy.treeNodeType).should("contain", artifactType);
+        cy.getCy(DataCy.treeNodeBody).should("contain", artifact.body);
+      });
     });
   });
 

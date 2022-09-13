@@ -44,14 +44,14 @@ export function svgNode(
         data-cy-name="${data.artifactName}"
       >
         ${svgShape}
-        ${svgTitle(title, y - 18)}
+        ${svgTitle(title, y - 18, "type")}
         ${svgDiv({
           x,
           y: y + 7,
           width,
           color,
         })}
-        ${svgTitle(data.artifactName, y + 10)}
+        ${svgTitle(data.artifactName, y + 10, "name")}
         ${svgBody(data, {
           x,
           y: y + 35,
@@ -70,13 +70,17 @@ export function svgNode(
  *
  * @param title - The title to render.
  * @param yPos - The y position to start drawing at.
+ * @param dataCy - The data cy selector to append.
  *
  * @return stringified SVG for the node.
  */
-export function svgTitle(title: string, yPos: number): string {
+export function svgTitle(title: string, yPos: number, dataCy = "name"): string {
   return `
     <foreignObject y="${yPos}" height="24" width="100%">
-      <span class="text-body-1 align-center mx-2 text-ellipsis artifact-text">
+      <span 
+        class="text-body-1 align-center mx-2 text-ellipsis artifact-text" 
+        data-cy="tree-node-${dataCy}"
+      >
         ${title}
       </span >
     </foreignObject>

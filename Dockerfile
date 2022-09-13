@@ -21,12 +21,17 @@ ARG DB_INSTANCE
 ARG JWT_KEY=3s6v9y$B&E)H@MbQeThWmZq4t7w!z%C*F-JaNdRfUjXn2r5u8x/A?D(G+KbPeShV
 ARG TGEN_ENDPOINT=https://tgen-dev-5asg6qsnba-uc.a.run.app
 
-RUN test -n "$DB_URL" && sed -i -e "s,url=,url=$DB_URL,g" $PathToProperties
-RUN test -n "$DB_USER" && sed -i -e "s,username=,username=$DB_USER,g" $PathToProperties
-RUN test -n "$DB_PASSWORD" && sed -i -e "s,password=,password=$DB_PASSWORD,g" $PathToProperties
-RUN test -n "$JWT_KEY" && sed -i -e "s,jwt.key=,jwt.key=$JWT_KEY,g" $PathToProperties
-RUN test -n "$TGEN_ENDPOINT" && sed -i -e "s,tgen.endpoint=,tgen.endpoint=$TGEN_ENDPOINT,g" $PathToProperties
+RUN test -n "$DB_URL"
+RUN test -n "$DB_USER"
+RUN test -n "$DB_PASSWORD"
+RUN test -n "$JWT_KEY"
+RUN test -n "$TGEN_ENDPOINT"
 
+RUN sed -i -e "s,url=,url=$DB_URL,g" $PathToProperties
+RUN sed -i -e "s,username=,username=$DB_USER,g" $PathToProperties
+RUN sed -i -e "s,password=,password=$DB_PASSWORD,g" $PathToProperties
+RUN sed -i -e "s,jwt.key=,jwt.key=$JWT_KEY,g" $PathToProperties
+RUN sed -i -e "s,tgen.endpoint=,tgen.endpoint=$TGEN_ENDPOINT,g" $PathToProperties
 RUN if [ ! -z "$DB_INSTANCE" ] ; \
     then \
       echo "spring.datasource.hikari.data-source-properties.cloudSqlInstance=$DB_INSTANCE" >> $PathToProperties && \

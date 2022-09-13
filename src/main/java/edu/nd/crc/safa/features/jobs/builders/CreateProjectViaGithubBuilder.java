@@ -47,6 +47,6 @@ public class CreateProjectViaGithubBuilder extends AbstractJobBuilder<GithubIden
 
     @Override
     JobType getJobType() {
-        return JobType.GITHUB_PROJECT_CREATION;
+        return JobType.PROJECT_CREATION_VIA_GITHUB;
     }
 }

@@ -87,7 +87,7 @@ public class ProjectEntities {
     private <T> ArtifactAppEntity getArtifactByKey(Map<T, ArtifactAppEntity> key2artifact,
                                                    T key) {
         if (!key2artifact.containsKey(key)) {
-            String error = String.format("Artifact not in map: %s", key);
+            String error = String.format("Artifact not in map: %s.", key);
             throw new IllegalArgumentException(error);
         }
         return key2artifact.get(key);

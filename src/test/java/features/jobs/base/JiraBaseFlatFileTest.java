@@ -67,6 +67,6 @@ public abstract class JiraBaseFlatFileTest extends BaseFlatFileTest {
     }
 
     public JobDbEntity createJIRAJob() {
-        return this.jobService.createNewJob(JobType.JIRA_PROJECT_CREATION, jiraProjectName);
+        return this.jobService.createNewJob(JobType.PROJECT_CREATION_VIA_JIRA, jiraProjectName);
     }
 }

@@ -48,6 +48,6 @@ public class CreateProjectViaJiraBuilder extends AbstractJobBuilder<JiraIdentifi
 
     @Override
     JobType getJobType() {
-        return JobType.JIRA_PROJECT_CREATION;
+        return JobType.PROJECT_CREATION_VIA_JIRA;
     }
 }

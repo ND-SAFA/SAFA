@@ -59,7 +59,7 @@ function createTraceFile(traceLink: LinkModel): TraceFile {
     sourceId: traceLink.sourceId,
     targetId: traceLink.targetId,
     isGenerated: false,
-    method: ModelType.TBERT,
+    method: ModelType.NLBert,
     isValid: false,
     errors: [],
     traces: [],

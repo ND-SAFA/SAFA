@@ -138,7 +138,14 @@ export function approvalTypeOptions(): SelectOption[] {
  */
 export function traceModelOptions(): SelectOption[] {
   return [
-    createEnumOption(ModelType.TBERT, "TBERT"),
-    createEnumOption(ModelType.VSM, "VSM"),
+    createEnumOption(
+      ModelType.NLBert,
+      "Slower, higher quality links. Traces free-text artifacts to other free-text artifacts."
+    ),
+    createEnumOption(
+      ModelType.PLBert,
+      "Slower, higher quality links. Traces free-text artifacts to source code."
+    ),
+    createEnumOption(ModelType.VSM, "Faster, lower quality links."),
   ];
 }

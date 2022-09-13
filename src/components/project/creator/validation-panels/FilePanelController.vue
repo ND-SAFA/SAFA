@@ -103,7 +103,7 @@ export default Vue.extend({
         if (isTracePanel(this.panel)) {
           return this.panel.projectFile.method;
         } else {
-          return ModelType.TBERT;
+          return ModelType.NLBert;
         }
       },
       set(newMethod: ModelType): void {

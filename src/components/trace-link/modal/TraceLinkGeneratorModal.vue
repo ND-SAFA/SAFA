@@ -96,7 +96,7 @@ export default Vue.extend({
       isLoading: false,
       isValid: false,
       matrices: [
-        { source: "", target: "", method: ModelType.TBERT },
+        { source: "", target: "", method: ModelType.NLBert },
       ] as GeneratedMatrixModel[],
     };
   },
@@ -106,7 +106,7 @@ export default Vue.extend({
 
       this.isLoading = false;
       this.isValid = false;
-      this.matrices = [{ source: "", target: "", method: ModelType.TBERT }];
+      this.matrices = [{ source: "", target: "", method: ModelType.NLBert }];
     },
     matrices: {
       deep: true,
@@ -130,7 +130,7 @@ export default Vue.extend({
      * Creates a new trace matrix.
      */
     handleCreateMatrix(): void {
-      this.matrices.push({ source: "", target: "", method: ModelType.TBERT });
+      this.matrices.push({ source: "", target: "", method: ModelType.NLBert });
     },
     /**
      * Removes a matrix from the list.

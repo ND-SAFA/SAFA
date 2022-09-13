@@ -55,17 +55,21 @@ public class SafaRequestBuilder {
             requestHeadersSpec.header(keyValue.getKey(), keyValue.getValue().toString());
         }
 
-        ResponseEntity<T> response = requestHeadersSpec
-            .retrieve()
-            .toEntity(requestMeta.responseClass)
-            .timeout(requestMeta.timeout)
-            .block();
-
-        // check response status code
-        if (response != null
-            && response.getStatusCode() != HttpStatus.BAD_REQUEST) {
-            return response.getBody();
-        } else {
+        try {
+            ResponseEntity<T> response = requestHeadersSpec
+                .retrieve()
+                .toEntity(requestMeta.responseClass)
+                .timeout(requestMeta.timeout)
+                .block();
+            // check response status code
+            if (response != null
+                && response.getStatusCode() != HttpStatus.BAD_REQUEST) {
+                return response.getBody();
+            } else {
+                return null;
+            }
+        } catch (Exception exception) {
+            exception.printStackTrace();
             return null;
         }
     }

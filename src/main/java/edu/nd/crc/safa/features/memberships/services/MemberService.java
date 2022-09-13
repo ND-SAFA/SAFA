@@ -42,7 +42,7 @@ public class MemberService implements IAppEntityService<ProjectMemberAppEntity> 
         Optional<ProjectMembership> projectMembershipQuery =
             this.projectMembershipRepository.findById(projectMembershipId);
         if (projectMembershipQuery.isEmpty()) {
-            throw new SafaError("Could not find membership with id: %s", projectMembershipId);
+            throw new SafaError("Could not find membership with id: %s.", projectMembershipId);
         }
         return projectMembershipQuery.get();
     }
@@ -72,7 +72,8 @@ public class MemberService implements IAppEntityService<ProjectMemberAppEntity> 
         // Step - Find member being added and the current member.
         Optional<SafaUser> newMemberQuery = this.safaUserRepository.findByEmail(newMemberEmail);
         if (newMemberQuery.isEmpty()) {
-            throw new SafaError("No user exists with given email: " + newMemberEmail);
+            String message = String.format("No user exists with given email: %s.", newMemberEmail);
+            throw new SafaError(message);
         }
         SafaUser newMember = newMemberQuery.get();
         SafaUser currentUser = this.safaUserService.getCurrentUser();

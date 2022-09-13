@@ -5,9 +5,13 @@ package edu.nd.crc.safa.features.tgen.entities;
  */
 public enum TraceGenerationMethod {
     /**
+     * Bert model trained on NL-NL trace links.
+     */
+    NLBert,
+    /**
      * TBert as described in Traceability Transformed: Generating more Accurate Links with Pre-Trained BERT Models.
      */
-    TBERT,
+    PLBert,
     /**
      * Vector-space-model with cosine similarity.
      */

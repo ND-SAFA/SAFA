@@ -253,9 +253,9 @@ describe("Project Creation", () => {
       cy.get(".artifact-svg-wrapper")
         .should("be.visible")
         .within(() => {
-          cy.contains("text", "requirement").should("be.visible");
-          cy.contains("text", "hazard").should("be.visible");
-          cy.contains("text", "5 Nodes").should("be.visible");
+          cy.contains("requirement").should("be.visible");
+          cy.contains("hazard").should("be.visible");
+          cy.contains("5 Nodes").should("be.visible");
         });
     });
 

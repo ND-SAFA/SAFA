@@ -112,6 +112,13 @@ declare namespace Cypress {
     clickButtonWithName(name: string): Chainable<void>;
 
     /**
+     * Clicks option with given name in first select menu found.
+     * @param dataCy - The select input to open.
+     * @param optionName - Name of option to click.
+     */
+    clickSelectOption(dataCy: string, optionName: string): Chainable<void>;
+
+    /**
      * Clicks option with given name in first menu found.
      * @param optionName - Name of option to click.
      */

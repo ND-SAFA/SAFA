@@ -5,6 +5,7 @@
       label="Source Type"
       v-model="source"
       :items="artifactTypes"
+      data-cy="input-source-type"
     />
     <v-icon class="mx-2 mt-5">mdi-arrow-right</v-icon>
     <v-select
@@ -12,6 +13,7 @@
       label="Target Type"
       v-model="target"
       :items="artifactTypes"
+      data-cy="input-target-type"
     />
     <v-btn
       :disabled="disabled"

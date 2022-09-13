@@ -78,7 +78,7 @@ public class FlatFileProjectCreationJob extends CommitJob {
 
     private void parseTimFile() throws IOException {
         if (!Files.exists(Paths.get(this.pathToTIMFile))) {
-            throw new SafaError("TIM.json file was not uploaded for this project");
+            throw new SafaError("TIM.json file was not uploaded for this project.");
         }
 
         JSONObject timFileJson = JsonFileUtilities.readJSONFile(this.pathToTIMFile);

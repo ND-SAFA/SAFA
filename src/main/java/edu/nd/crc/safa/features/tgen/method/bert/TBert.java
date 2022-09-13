@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.tgen.method;
+package edu.nd.crc.safa.features.tgen.method.bert;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -29,7 +29,7 @@ import org.json.JSONObject;
 /**
  * Responsible for providing an API for predicting trace links using TBert.
  */
-public class TBert implements ITraceLinkGeneration {
+public abstract class TBert implements ITraceLinkGeneration {
 
     private final SafaRequestBuilder safaRequestBuilder;
     private final ObjectMapper mapper = new ObjectMapper();
@@ -40,14 +40,17 @@ public class TBert implements ITraceLinkGeneration {
 
     public List<TraceAppEntity> generateLinks(List<ArtifactAppEntity> sources, List<ArtifactAppEntity> targets) {
         // Step - Build request
+        BertMethodIdentifier methodId = this.getBertMethodIdentifier();
         TGenPredictionRequestDTO predictionRequest = new TGenPredictionRequestDTO(
-            Defaults.TBERT_BASE_MODEL,
-            Defaults.TBERT_PATH,
+            methodId.getBaseModel(),
+            methodId.getModelPath(),
             createArtifactPayload(sources),
             createArtifactPayload(targets));
 
         // Step - Send request
         String predictEndpoint = TBertConfig.get().getPredictEndpoint();
+        System.out.println("Sending request:" + predictEndpoint);
+        System.out.println("Request: " + predictionRequest);
         TGenJobResponseDTO response = this.safaRequestBuilder
             .sendPost(predictEndpoint, predictionRequest, TGenJobResponseDTO.class);
 
@@ -103,10 +106,12 @@ public class TBert implements ITraceLinkGeneration {
         }
     }
 
+    abstract BertMethodIdentifier getBertMethodIdentifier();
+
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     static class Defaults {
         static final int WAIT_SECONDS = 5;
-        static final String TBERT_BASE_MODEL = "bert_trace_single";
+        static final String TBERT_BASE_MODEL = "t_bert_single";
         static final String TBERT_PATH = "thearod5/tbert";
     }
 }

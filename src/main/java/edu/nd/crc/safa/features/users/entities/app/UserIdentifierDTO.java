@@ -1,8 +1,8 @@
 package edu.nd.crc.safa.features.users.entities.app;
 
+import java.util.UUID;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.util.UUID;
 
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 

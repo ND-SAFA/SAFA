@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.jobs.entities.app;
+package edu.nd.crc.safa.features.jobs.entities.jobs;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -19,6 +19,7 @@ import edu.nd.crc.safa.features.github.entities.db.GithubProject;
 import edu.nd.crc.safa.features.github.repositories.GithubAccessCredentialsRepository;
 import edu.nd.crc.safa.features.github.services.GithubConnectionService;
 import edu.nd.crc.safa.features.jobs.entities.IJobStep;
+import edu.nd.crc.safa.features.jobs.entities.app.CommitJob;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
@@ -75,7 +76,7 @@ public class GithubProjectCreationJob extends CommitJob {
         return createJobName(identifier.getRepositoryName());
     }
 
-    @IJobStep(name = "Authenticating User Credentials", position = 1)
+    @IJobStep(value = "Authenticating User Credentials", position = 1)
     public void authenticateUserCredentials() {
         SafaUserService safaUserService = this.serviceProvider.getSafaUserService();
         GithubAccessCredentialsRepository accessCredentialsRepository = this.serviceProvider
@@ -89,7 +90,7 @@ public class GithubProjectCreationJob extends CommitJob {
     /**
      * Separate method for retrieving the GitHub project such that it can be mocked
      */
-    @IJobStep(name = "Retrieving Github Repository", position = 2)
+    @IJobStep(value = "Retrieving Github Repository", position = 2)
     public void retrieveGitHubRepository() {
         GithubConnectionService connectionService = serviceProvider.getGithubConnectionService();
         String repositoryName = this.githubIdentifier.getRepositoryName();
@@ -97,7 +98,7 @@ public class GithubProjectCreationJob extends CommitJob {
         this.githubRepositoryDTO = connectionService.getUserRepository(this.credentials, repositoryName);
     }
 
-    @IJobStep(name = "Creating SAFA Project", position = 3)
+    @IJobStep(value = "Creating SAFA Project", position = 3)
     public void createSafaProject() {
         ProjectService projectService = this.serviceProvider.getProjectService();
 
@@ -133,7 +134,7 @@ public class GithubProjectCreationJob extends CommitJob {
         return this.serviceProvider.getGithubProjectRepository().save(githubProject);
     }
 
-    @IJobStep(name = "Convert Filetree To Artifacts And TraceLinks", position = 4)
+    @IJobStep(value = "Convert Filetree To Artifacts And TraceLinks", position = 4)
     public void convertFiletreeToArtifactsAndTraceLinks() {
         GithubConnectionService connectionService = serviceProvider.getGithubConnectionService();
         String repositoryName = this.githubIdentifier.getRepositoryName();

@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.jobs.entities.app;
+package edu.nd.crc.safa.features.jobs.entities.jobs;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -17,6 +17,7 @@ import edu.nd.crc.safa.features.errors.repositories.CommitErrorRepository;
 import edu.nd.crc.safa.features.flatfiles.parser.FlatFileParser;
 import edu.nd.crc.safa.features.flatfiles.parser.TimFileParser;
 import edu.nd.crc.safa.features.jobs.entities.IJobStep;
+import edu.nd.crc.safa.features.jobs.entities.app.CommitJob;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
@@ -66,7 +67,7 @@ public class FlatFileProjectCreationJob extends CommitJob {
     }
 
     @Override
-    @IJobStep(name = "Uploading Flat Files", position = 1)
+    @IJobStep(value = "Uploading Flat Files", position = 1)
     public void initJobData() throws SafaError, IOException {
         super.initJobData();
         Project project = this.projectVersion.getProject();
@@ -77,7 +78,7 @@ public class FlatFileProjectCreationJob extends CommitJob {
 
     private void parseTimFile() throws IOException {
         if (!Files.exists(Paths.get(this.pathToTIMFile))) {
-            throw new SafaError("TIM.json file was not uploaded for this project");
+            throw new SafaError("TIM.json file was not uploaded for this project.");
         }
 
         JSONObject timFileJson = JsonFileUtilities.readJSONFile(this.pathToTIMFile);
@@ -85,7 +86,7 @@ public class FlatFileProjectCreationJob extends CommitJob {
         this.flatFileParser = new FlatFileParser(timFileParser);
     }
 
-    @IJobStep(name = "Parsing Files", position = 2)
+    @IJobStep(value = "Parsing Files", position = 2)
     public void parsingFiles() {
         parsingArtifactFiles();
         parsingTraceFiles();
@@ -118,7 +119,7 @@ public class FlatFileProjectCreationJob extends CommitJob {
                 .collect(Collectors.toList());
     }
 
-    @IJobStep(name = "Generating Trace Links", position = 3)
+    @IJobStep(value = "Generating Trace Links", position = 3)
     public void generatingTraces() throws IOException, InterruptedException {
         TraceGenerationService traceGenerationService = this.getServiceProvider().getTraceGenerationService();
         List<TraceAppEntity> generatedLinks = traceGenerationService.generateTraceLinks(

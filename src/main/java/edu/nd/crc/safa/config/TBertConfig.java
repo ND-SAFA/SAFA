@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Configuration;
 @Getter
 public class TBertConfig {
     private static TBertConfig staticConfig;
-    @Value("${tbert.endpoint}")
+    @Value("${tgen.endpoint}")
     private String baseEndpoint;
 
     public static TBertConfig get() {

@@ -16,5 +16,5 @@ public @interface IJobStep {
     /**
      * @return {@link String} The name of the job.
      */
-    String name();
+    String value();
 }

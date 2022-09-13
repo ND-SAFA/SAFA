@@ -15,6 +15,7 @@ import javax.persistence.Table;
 import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
@@ -63,6 +64,7 @@ public class CommitError implements Serializable {
         this.applicationActivity = projectParsingActivity;
     }
 
+    @JsonIgnore
     public String getErrorId() {
         return this.id.toString();
     }

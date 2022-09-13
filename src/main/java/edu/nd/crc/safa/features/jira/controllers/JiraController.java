@@ -14,9 +14,9 @@ import edu.nd.crc.safa.features.jira.entities.app.JiraResponseDTO.JiraResponseMe
 import edu.nd.crc.safa.features.jira.entities.db.JiraAccessCredentials;
 import edu.nd.crc.safa.features.jira.repositories.JiraAccessCredentialsRepository;
 import edu.nd.crc.safa.features.jira.services.JiraConnectionService;
+import edu.nd.crc.safa.features.jobs.builders.CreateProjectViaJiraBuilder;
+import edu.nd.crc.safa.features.jobs.builders.UpdateProjectViaJiraBuilder;
 import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
-import edu.nd.crc.safa.features.jobs.entities.builders.CreateProjectViaJiraBuilder;
-import edu.nd.crc.safa.features.jobs.entities.builders.UpdateProjectViaJiraBuilder;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.services.SafaUserService;

@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.jobs.entities.app;
+package edu.nd.crc.safa.features.jobs.entities.jobs;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -16,6 +16,7 @@ import edu.nd.crc.safa.features.jira.entities.db.JiraProject;
 import edu.nd.crc.safa.features.jira.repositories.JiraAccessCredentialsRepository;
 import edu.nd.crc.safa.features.jira.services.JiraConnectionService;
 import edu.nd.crc.safa.features.jobs.entities.IJobStep;
+import edu.nd.crc.safa.features.jobs.entities.app.CommitJob;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
@@ -23,8 +24,6 @@ import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
 
 import lombok.Setter;
-
-;
 
 /**
  * Responsible for providing step implementations for:
@@ -77,7 +76,7 @@ public class CreateProjectViaJiraJob extends CommitJob {
         return "Importing JIRA project:" + jiraProjectName;
     }
 
-    @IJobStep(name = "Authenticating User Credentials", position = 1)
+    @IJobStep(value = "Authenticating User Credentials", position = 1)
     public void authenticateUserCredentials() {
         // Step - Get services needed
         SafaUserService safaUserService = this.serviceProvider.getSafaUserService();
@@ -90,7 +89,7 @@ public class CreateProjectViaJiraJob extends CommitJob {
             .orElseThrow(() -> new SafaError("No JIRA credentials found"));
     }
 
-    @IJobStep(name = "Retrieving Jira Project", position = 2)
+    @IJobStep(value = "Retrieving Jira Project", position = 2)
     public void retrieveJiraProject() {
         // Step - Get required services
         JiraConnectionService jiraConnectionService = this.serviceProvider.getJiraConnectionService();
@@ -101,7 +100,7 @@ public class CreateProjectViaJiraJob extends CommitJob {
         this.issues = jiraConnectionService.retrieveJIRAIssues(credentials, jiraProjectId).getIssues();
     }
 
-    @IJobStep(name = "Creating SAFA Project", position = 3)
+    @IJobStep(value = "Creating SAFA Project", position = 3)
     public void createSafaProject() {
         // Step - Save as SAFA project
         String projectName = this.jiraProjectResponse.getName();
@@ -122,7 +121,7 @@ public class CreateProjectViaJiraJob extends CommitJob {
                 this.jiraIdentifier.getJiraProjectId());
     }
 
-    @IJobStep(name = "Importing Issues and Links", position = 4)
+    @IJobStep(value = "Importing Issues and Links", position = 4)
     public void convertIssuesToArtifactsAndTraceLinks() {
         ProjectEntities projectEntities = this.retrieveJiraEntities();
         this.projectCommit.addArtifacts(ModificationType.ADDED, projectEntities.getArtifacts());

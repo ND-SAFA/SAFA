@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.server.controllers;
+package edu.nd.crc.safa.features.github.controllers;
 
 import java.util.List;
 import java.util.UUID;
@@ -14,9 +14,9 @@ import edu.nd.crc.safa.features.github.entities.app.GithubResponseDTO.GithubResp
 import edu.nd.crc.safa.features.github.entities.db.GithubAccessCredentials;
 import edu.nd.crc.safa.features.github.repositories.GithubAccessCredentialsRepository;
 import edu.nd.crc.safa.features.github.services.GithubConnectionService;
+import edu.nd.crc.safa.features.jobs.builders.CreateProjectViaGithubBuilder;
+import edu.nd.crc.safa.features.jobs.builders.UpdateProjectViaGithubBuilder;
 import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
-import edu.nd.crc.safa.features.jobs.entities.builders.CreateProjectViaGithubBuilder;
-import edu.nd.crc.safa.features.jobs.entities.builders.UpdateProjectViaGithubBuilder;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.services.SafaUserService;

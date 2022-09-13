@@ -63,7 +63,6 @@ public class GeneratedLinkController extends BaseController {
      */
     @PostMapping(value = AppRoutes.Links.GENERATE_LINKS)
     public List<TraceAppEntity> generateTraceLinks(@RequestBody @Valid TraceGenerationRequest request) {
-        System.out.println("Request:" + request);
         List<ArtifactAppEntity> sourceArtifacts = request.getSourceArtifacts();
         List<ArtifactAppEntity> targetArtifacts = request.getTargetArtifacts();
         TraceGenerationMethod method = request.getMethod();

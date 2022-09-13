@@ -15,7 +15,7 @@ import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
  * The worker responsible for providing method implementations for
  * the steps to create projects.
  */
-public class CommitJob extends AbstractJob {
+public abstract class CommitJob extends AbstractJob {
     /**
      * The project version of the
      */
@@ -41,7 +41,7 @@ public class CommitJob extends AbstractJob {
         this.projectChanger = new ProjectChanger(projectVersion, serviceProvider);
     }
 
-    @IJobStep(name = "Committing Entities", position = -2)
+    @IJobStep(value = "Committing Entities", position = -2)
     public void commitArtifactsAndTraceLinks() throws SafaError {
         projectChanger.commit(projectCommit);
     }

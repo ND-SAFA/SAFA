@@ -19,7 +19,7 @@ class TestProjectRetrieval extends ApplicationBaseTest {
         JSONArray response = SafaRequest
             .withRoute(AppRoutes.Projects.GET_PROJECTS)
             .getWithJsonArray();
-        assertThat(response.length()).isOne(); // sample project
+        assertThat(response.length()).isZero(); // sample project
     }
 
     /**
@@ -39,7 +39,7 @@ class TestProjectRetrieval extends ApplicationBaseTest {
             .newProject("secondProject")
             .newProject("other project", otherUser);
         JSONArray response = SafaRequest.withRoute(AppRoutes.Projects.GET_PROJECTS).getWithJsonArray();
-        assertThat(response.length()).isEqualTo(3); // firstProject, secondProject, and default sample project.
+        assertThat(response.length()).isEqualTo(2); // firstProject, secondProject, and default sample project.
     }
 
 }

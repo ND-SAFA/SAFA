@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.tgen.method;
+package edu.nd.crc.safa.features.tgen.method.bert;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -29,7 +29,7 @@ import org.json.JSONObject;
 /**
  * Responsible for providing an API for predicting trace links using TBert.
  */
-public class TBert implements ITraceLinkGeneration {
+public abstract class TBert implements ITraceLinkGeneration {
 
     private final SafaRequestBuilder safaRequestBuilder;
     private final ObjectMapper mapper = new ObjectMapper();
@@ -40,16 +40,19 @@ public class TBert implements ITraceLinkGeneration {
 
     public List<TraceAppEntity> generateLinks(List<ArtifactAppEntity> sources, List<ArtifactAppEntity> targets) {
         // Step - Build request
-        TGenPredictionRequestDTO genRequest = new TGenPredictionRequestDTO(
-            Defaults.TBERT_BASE_MODEL,
-            Defaults.TBERT_PATH,
+        BertMethodIdentifier methodId = this.getBertMethodIdentifier();
+        TGenPredictionRequestDTO predictionRequest = new TGenPredictionRequestDTO(
+            methodId.getBaseModel(),
+            methodId.getModelPath(),
             createArtifactPayload(sources),
             createArtifactPayload(targets));
 
         // Step - Send request
         String predictEndpoint = TBertConfig.get().getPredictEndpoint();
+        System.out.println("Sending request:" + predictEndpoint);
+        System.out.println("Request: " + predictionRequest);
         TGenJobResponseDTO response = this.safaRequestBuilder
-            .sendPost(predictEndpoint, genRequest, TGenJobResponseDTO.class);
+            .sendPost(predictEndpoint, predictionRequest, TGenJobResponseDTO.class);
 
         // Step - Convert to response
         TGenPredictionOutput output = getOutput(response.getOutputPath());
@@ -86,18 +89,29 @@ public class TBert implements ITraceLinkGeneration {
             }
             Blob blob = CloudStorage.getBlob(outputFile);
             JSONObject json = CloudStorage.downloadJsonFileBlob(blob);
-            return mapper.readValue(json.toString(), TGenPredictionOutput.class);
+
+            if (json.getInt("status") == -1) {
+                throw new SafaError("TBert failed while generating links: " + json.getString("exception"));
+            }
+            TGenPredictionOutput predictionOutput = mapper.readValue(json.toString(), TGenPredictionOutput.class);
+            return predictionOutput;
         } catch (InterruptedException e) {
             throw new SafaError("Interrupted while waiting for output of generated links.");
         } catch (IOException e) {
             throw new SafaError("IOException occurred while reading output of generated links.");
+        } finally {
+            if (CloudStorage.exists(outputFile)) {
+                CloudStorage.getBlob(outputFile).delete();
+            }
         }
     }
+
+    abstract BertMethodIdentifier getBertMethodIdentifier();
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     static class Defaults {
         static final int WAIT_SECONDS = 5;
-        static final String TBERT_BASE_MODEL = "bert_trace_single";
+        static final String TBERT_BASE_MODEL = "t_bert_single";
         static final String TBERT_PATH = "thearod5/tbert";
     }
 }

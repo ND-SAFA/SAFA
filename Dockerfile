@@ -1,17 +1,6 @@
-# Step 1 - Install necessary dependencies
-FROM gradle:6.9-jdk11 AS builder
-
-# ... - Copy source code
-ADD src/main/java /app/src/main/java
-ADD src/test /app/src/test
-ADD build.gradle /app/
-
-# ... - Compile code
-WORKDIR /app
-RUN gradle build --stacktrace -x Test -x checkstyleMain -x checkstyleTest
-
-# Step 2 - Create production environment
+# Step 1 - Create production environment
 FROM ubuntu:12.04 as config
+ADD src/main/resources /app/src/main/resources
 ARG PathToProperties="/app/src/main/resources/application-deployment.properties"
 
 ARG DB_URL=jdbc:mysql://host.docker.internal/safa-db
@@ -39,6 +28,19 @@ RUN if [ ! -z "$DB_INSTANCE" ] ; \
     fi
 RUN cat $PathToProperties
 
+# Step 1 - Install necessary dependencies
+FROM gradle:6.9-jdk11 AS builder
+
+# ... - Copy source code
+COPY --from=config /app/src/main/resources /app/src/main/resources
+ADD src/main/java /app/src/main/java
+ADD src/test /app/src/test
+ADD build.gradle /app/
+
+# ... - Compile code
+WORKDIR /app
+RUN gradle build --stacktrace -x Test -x checkstyleMain -x checkstyleTest
+
 # Step - Lint source code
 ADD checkstyle.xml /app/
 RUN gradle checkstyleMain
@@ -49,5 +51,6 @@ RUN gradle test
 
 # Step - Create endpoint
 FROM openjdk:11 AS runner
+COPY --from=config /app/src/main/resources /app/src/main/resources
 COPY --from=builder /app/build/libs/edu.nd.crc.safa-0.1.0.jar /app.jar
-ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom", "-jar", "-Dspring.profiles.active=prod","/app.jar"]
+ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom", "-jar", "-Dspring.profiles.active=deployment","/app.jar"]

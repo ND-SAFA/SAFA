@@ -3,7 +3,7 @@
     <v-container class="fill-height">
       <v-card rounded elevation="2" class="mx-auto py-4 px-6" width="30em">
         <v-card-title class="mx-auto width-max my-2">
-          <safa-icon />
+          <safa-icon variant="primary" />
         </v-card-title>
 
         <v-form class="px-2">

@@ -10,7 +10,7 @@ describe("Artifact Display", () => {
   });
 
   describe("I can select an artifact to view more details", () => {
-    it.only("Selects an artifact that is double clicked", () => {
+    it("Selects an artifact that is double clicked", () => {
       cy.centerGraph();
 
       // Double click node (doesnt allow chaining click).

@@ -2,7 +2,7 @@ import { ArtifactData, SvgStyle } from "@/types";
 import { capitalize, getBorderColor } from "@/util";
 import { ARTIFACT_CHILDREN_HEIGHT } from "@/cytoscape/styles/config";
 import { svgFooter } from "./artifact-footer";
-import { getBody } from "./artifact-helper";
+import { getBody, sanitizeText } from "./artifact-helper";
 
 /**
  * Creates the SVG standard node.
@@ -41,7 +41,7 @@ export function svgNode(
         "
         class="artifact-svg-wrapper ${deltaClass}"
         data-cy="${dataCy}"
-        data-cy-name="${data.artifactName}"
+        data-cy-name="${sanitizeText(data.artifactName)}"
       >
         ${svgShape}
         ${svgTitle(title, y - 18, "type")}
@@ -81,7 +81,7 @@ export function svgTitle(title: string, yPos: number, dataCy = "name"): string {
         class="text-body-1 align-center mx-2 text-ellipsis artifact-text" 
         data-cy="tree-node-${dataCy}"
       >
-        ${title}
+        ${sanitizeText(title)}
       </span >
     </foreignObject>
   `;

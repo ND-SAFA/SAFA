@@ -1,5 +1,5 @@
 <template>
-  <flex-box align="center" justify="start">
+  <flex-box align="center" justify="center">
     <v-btn
       v-if="showUnreviewed"
       text

@@ -244,6 +244,12 @@ export default Vue.extend({
     name(newName: string): void {
       Vue.set(this.steps, 0, [PROJECT_IDENTIFIER_STEP_NAME, newName !== ""]);
     },
+    /**
+     * Opens the current tab when the route changes.
+     */
+    $route() {
+      this.clearData();
+    },
   },
 });
 </script>

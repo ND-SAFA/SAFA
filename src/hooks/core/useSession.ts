@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import jwt_decode from "jwt-decode";
+import { datadogRum } from "@datadog/browser-rum";
 
 import { AuthToken, LocalStorageKeys, SessionModel } from "@/types";
 import { createSession } from "@/util";
@@ -91,16 +92,23 @@ export const useSession = defineStore("session", {
         LocalStorageKeys.SESSION_TOKEN,
         JSON.stringify(this.session)
       );
+
+      if (session.token) {
+        datadogRum.startSessionReplayRecording();
+      }
     },
     /**
      * Clears the current session.
      */
     clearSession() {
       this.session = createSession();
+
       localStorage.setItem(
         LocalStorageKeys.SESSION_TOKEN,
         JSON.stringify(this.session)
       );
+
+      datadogRum.startSessionReplayRecording();
     },
   },
 });

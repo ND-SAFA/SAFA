@@ -1,8 +1,8 @@
 import { datadogRum } from "@datadog/browser-rum";
 
 datadogRum.init({
-  applicationId: "4470d612-52c0-4667-9b83-f7158df0c432",
-  clientToken: "pubbd23f8a1ec0d66645eb858fe01bf45b6",
+  applicationId: process.env.VUE_APP_DDOG_APP_ID || "",
+  clientToken: process.env.VUE_APP_DDOG_DDOG_TOKEN || "",
   site: "datadoghq.com",
   service: "safa",
   version: "1.0.0",

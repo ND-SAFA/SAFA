@@ -5,7 +5,7 @@ datadogRum.init({
   clientToken: "pubbd23f8a1ec0d66645eb858fe01bf45b6",
   site: "datadoghq.com",
   service: "safa",
-  version: process.version,
+  version: "1.0.0",
   sampleRate: 100,
   premiumSampleRate: 100,
   trackInteractions: true,

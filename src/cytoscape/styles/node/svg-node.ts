@@ -1,44 +1,42 @@
-import { ArtifactData, SvgStyle } from "@/types";
+import { ArtifactData, SvgNodeStyle, SvgStyle } from "@/types";
 import { capitalize, getBorderColor } from "@/util";
-import { ARTIFACT_CHILDREN_HEIGHT } from "@/cytoscape/styles/config";
-import { svgFooter } from "./artifact-footer";
-import { getBody, sanitizeText } from "./artifact-helper";
+import { ARTIFACT_CHILDREN_HEIGHT } from "@/cytoscape";
+import { svgFooter } from "./node-footer";
+import { getBody, sanitizeText } from "./node-helper";
 
 /**
  * Creates the SVG standard node.
  *
  * @param data - The artifact data to render.
- * @param outerStyle - The styles to render the SVG with.
- * @param innerStyle - The styles to render the inner content with.
+ * @param style - The styles to render the SVG with.
  * @param svgShape - The SVG for rendering the node's shape.
  *
  * @return stringified SVG for the node.
  */
 export function svgNode(
   data: ArtifactData,
-  outerStyle: Pick<SvgStyle, "width" | "height"> & { marginTop: number },
-  innerStyle: SvgStyle & { truncateLength: number; bodyWidth?: number },
+  style: SvgNodeStyle,
   svgShape: string
 ): string {
-  const { x, y, width, height, truncateLength, bodyWidth } = innerStyle;
+  const { outer, inner, marginTop, truncateLength, bodyWidth } = style;
+  const { x, y, width, height } = inner;
   const deltaClass = `artifact-svg-delta-${data.artifactDeltaState}`;
   const title = data.safetyCaseType
     ? capitalize(data.safetyCaseType)
     : capitalize(data.artifactType);
   const color = getBorderColor(data.artifactDeltaState);
-  const footer = svgFooter(data, outerStyle);
+  const footer = svgFooter(data, outer);
   const heightOffset = footer ? ARTIFACT_CHILDREN_HEIGHT + 6 : 6;
+  const outerHeight = outer.height + heightOffset;
+  const margin = `${marginTop + heightOffset}px`;
   const dataCy = data.isSelected ? "tree-node-selected" : "tree-node";
 
   return `
     <div>
       <svg 
-        width="${outerStyle.width}" 
-        height="${outerStyle.height + heightOffset}" 
-        style="
-          margin-top: ${outerStyle.marginTop + heightOffset}px;
-          opacity: ${data.opacity};
-        "
+        width="${outer.width}" 
+        height="${outerHeight}" 
+        style="margin-top: ${margin}; opacity: ${data.opacity};"
         class="artifact-svg-wrapper ${deltaClass}"
         data-cy="${dataCy}"
         data-cy-name="${sanitizeText(data.artifactName)}"
@@ -52,12 +50,11 @@ export function svgNode(
           color,
         })}
         ${svgTitle(data.artifactName, y + 10, "name")}
-        ${svgBody(data, {
+        ${svgBody(data.body, truncateLength, {
           x,
           y: y + 35,
           width: bodyWidth || width,
           height,
-          truncateLength,
         })}
         ${footer}
       </svg>
@@ -66,7 +63,7 @@ export function svgNode(
 }
 
 /**
- * Creates the SVG for representing a safety case node's title.
+ * Creates the SVG for representing a node's title.
  *
  * @param title - The title to render.
  * @param yPos - The y position to start drawing at.
@@ -74,7 +71,7 @@ export function svgNode(
  *
  * @return stringified SVG for the node.
  */
-export function svgTitle(title: string, yPos: number, dataCy = "name"): string {
+export function svgTitle(title: string, yPos: number, dataCy: string): string {
   return `
     <foreignObject y="${yPos}" height="24" width="100%">
       <span 
@@ -88,15 +85,13 @@ export function svgTitle(title: string, yPos: number, dataCy = "name"): string {
 }
 
 /**
- * Creates the SVG for representing a safety case node's divider.
+ * Creates the SVG for representing a node's divider.
  *
- * @param style - The position style to draw with.
+ * @param style - The style to draw with.
  *
  * @return stringified SVG for the node.
  */
-export function svgDiv(
-  style: Omit<SvgStyle, "height"> & { color: string }
-): string {
+export function svgDiv(style: Omit<SvgStyle, "height">): string {
   return `
      <line 
         x1="${style.x}" y1="${style.y}" 
@@ -109,17 +104,22 @@ export function svgDiv(
 }
 
 /**
- * Creates the SVG for representing a safety case node's body.
+ * Creates the SVG for representing an node's body.
  *
- * @param data - The artifact data to render.
- * @param style - The position style to draw with.
+ * @param body - The body to render.
+ * @param truncateLength - The maximum characters of text to render.
+ * @param style - The style to draw with.
  *
  * @return stringified SVG for the node.
  */
 function svgBody(
-  data: ArtifactData,
-  style: SvgStyle & { truncateLength: number }
+  body: string,
+  truncateLength: number,
+  style: SvgStyle
 ): string {
+  const width = `${style.width}px`;
+  const height = `${style.height}px`;
+
   return `
     <foreignObject 
       x="${style.x}" y="${style.y}" 
@@ -131,13 +131,13 @@ function svgBody(
        data-cy="tree-node-body"
        style="
          display: block;
-         width: ${style.width}px;
-         height: ${style.height}px;
+         width: ${width};
+         height: ${height};
          line-height: 1rem;
          text-align: center;
        "
      >
-       ${getBody(data.body, style.truncateLength)}
+       ${getBody(body, truncateLength)}
      </span>
     </foreignObject>
   `;

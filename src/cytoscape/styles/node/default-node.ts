@@ -1,7 +1,7 @@
 import { ArtifactData } from "@/types";
 import { getBackgroundColor, getBorderColor } from "@/util";
 import { ARTIFACT_BORDER_WIDTH } from "@/cytoscape";
-import { svgNode } from "./core-svg";
+import { svgNode } from "./svg-node";
 
 /**
  * Creates the SVG safety case context.
@@ -16,8 +16,12 @@ export function svgDefault(data: ArtifactData): string {
 
   return svgNode(
     data,
-    { width: outerWidth, height: outerHeight, marginTop: 6 },
-    { x: 10, y: 20, width: 180, height: 100, truncateLength: 90 },
+    {
+      marginTop: 6,
+      truncateLength: 90,
+      outer: { width: outerWidth, height: outerHeight },
+      inner: { x: 10, y: 20, width: 180, height: 100 },
+    },
     `
       <rect 
         rx="8" width="${outerWidth}" height="${outerHeight}"

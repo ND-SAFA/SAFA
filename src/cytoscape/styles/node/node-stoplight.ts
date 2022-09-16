@@ -7,7 +7,7 @@ import {
 import { ThemeColors } from "@/util";
 
 /**
- * Creates the SVG for representing a safety case node's child delta states.
+ * Creates the SVG for representing a node's child delta states.
  *
  * @param data - The artifact data to render.
  * @param style - The position style to draw with.

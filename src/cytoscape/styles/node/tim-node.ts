@@ -5,7 +5,7 @@ import {
   TIM_NODE_HEIGHT,
   TIM_NODE_WIDTH,
 } from "@/cytoscape/styles/config";
-import { svgDiv, svgTitle } from "./core-svg";
+import { svgDiv, svgTitle } from "./svg-node";
 
 /**
  * Creates the SVG TIM node.
@@ -37,9 +37,9 @@ export function svgTIM(data: TimNodeData): string {
         fill="${ThemeColors.lightGrey}"
         class="artifact-svg"
       />
-      ${svgTitle(data.id, y)}
+      ${svgTitle(data.id, y, "type")}
       ${svgDiv({ x, y: y + 37, width: TIM_NODE_WIDTH - x * 2, color })}
-      ${svgTitle(`${data.count} Nodes`, y + 50)}
+      ${svgTitle(`${data.count} Nodes`, y + 50, "count")}
     </svg>
     `;
 }

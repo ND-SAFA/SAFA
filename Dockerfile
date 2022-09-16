@@ -1,12 +1,12 @@
 # syntax=docker/dockerfile:1
 ARG CUDA=10.2
 ARG UBUNTU_VERSION=18.04
-ARG BUCKET
+
 # Steps
 # ---
-# 1. Install wget, python, pip
-# 2. Env Variables
-# 3. Copy source + build files
+# 1. Install build tools (e.g. wget)
+# 2. Install python and pip
+# 3. Install requirements
 # 4. Install librarires
 # 5. Setup cloud file system
 # 6. Run Commands
@@ -21,7 +21,6 @@ FROM nvidia/cuda:${CUDA}-base-ubuntu${UBUNTU_VERSION} as base
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys A4B469963BF863CC
 RUN apt-get update && apt-get install --no-install-recommends --no-install-suggests -y curl
 RUN apt-get install unzip
-
 
 # Step - Install python
 ARG PYTHON=python3.9
@@ -60,9 +59,8 @@ RUN chmod +x start.sh
 ENV DEPLOYMENT_TYPE=local
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
-ENV BUCKET="$BUCKET"
-ENV TRANSFORMERS_CACHE=/mnt/gcs/model-cache/
-ENV MNT_DIR /tgen
+ENV TRANSFORMERS_CACHE=/model-cache/
+ENV MNT_DIR=/tgen
 
 
 # 6. Run commands

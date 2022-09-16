@@ -8,4 +8,3 @@ export * from "./enum-helper";
 export * from "./object-factory";
 export * from "./sub-tree-operations";
 export * from "./icons";
-import "./metrics-helper";

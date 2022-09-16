@@ -1,6 +1,7 @@
 import { ArtifactData } from "@/types";
 import { getBackgroundColor, getBorderColor } from "@/util";
 import { ARTIFACT_BORDER_WIDTH } from "@/cytoscape";
+import { svgCircle, svgRect, svgRhombus } from "./node-shapes";
 import { svgDefault } from "./default-node";
 import { svgNode } from "./svg-node";
 
@@ -34,31 +35,21 @@ export function svgSafetyCase(data: ArtifactData): string {
  * @return stringified SVG for the node.
  */
 function svgGoal(data: ArtifactData): string {
-  const outerHeight = 160;
-  const outerWidth = 206;
+  const outer = { width: 206, height: 160 };
 
   return svgNode(
     data,
     {
       marginTop: 6,
       truncateLength: 90,
-      outer: { width: outerWidth, height: outerHeight },
+      outer,
       inner: { x: 10, y: 20, width: 180, height: 100 },
     },
-    `
-      <rect 
-        width="${outerWidth}" height="${outerHeight}"
-        fill="${getBorderColor(data.artifactDeltaState)}"
-        class="artifact-border"
-      />
-      <rect
-          x="${ARTIFACT_BORDER_WIDTH}" y="${ARTIFACT_BORDER_WIDTH}"
-        width="${outerWidth - ARTIFACT_BORDER_WIDTH * 2}" 
-        height="${outerHeight - ARTIFACT_BORDER_WIDTH * 2}"
-        fill="${getBackgroundColor(data.artifactDeltaState)}"
-        class="artifact-svg"
-      />
-    `
+    svgRect(
+      outer,
+      getBorderColor(data.artifactDeltaState),
+      getBackgroundColor(data.artifactDeltaState)
+    )
   );
 }
 
@@ -77,21 +68,15 @@ function svgSolution(data: ArtifactData): string {
     {
       marginTop: 7,
       truncateLength: 60,
+      bodyWidth: 120,
       outer: { width: 200, height: 200 },
       inner: { x: 40, y: 35, width: 120, height: 82 },
     },
-    `
-      <circle 
-        cx="100" cy="100" r="${radius}"
-        fill="${getBorderColor(data.artifactDeltaState)}"
-        class="artifact-border"
-      />
-      <circle 
-        cx="100" cy="100" r="${radius - ARTIFACT_BORDER_WIDTH}"
-        fill="${getBackgroundColor(data.artifactDeltaState)}"
-        class="artifact-svg"
-      />
-    `
+    svgCircle(
+      radius,
+      getBorderColor(data.artifactDeltaState),
+      getBackgroundColor(data.artifactDeltaState)
+    )
   );
 }
 
@@ -115,29 +100,11 @@ function svgStrategy(data: ArtifactData): string {
       outer: { width: outerWidth + xOffset, height: outerHeight },
       inner: { x: 30, y: 20, width: 180, height: 100 },
     },
-    `
-      <polygon 
-        points="
-          ${xOffset},0 
-          ${outerWidth + xOffset},0 
-          ${outerWidth},${outerHeight} 
-          0,${outerHeight}"
-        fill="${getBorderColor(data.artifactDeltaState)}"
-        class="artifact-border"
-      />
-      <polygon
-        points="
-          ${xOffset + ARTIFACT_BORDER_WIDTH},
-            ${ARTIFACT_BORDER_WIDTH}
-          ${outerWidth + xOffset - ARTIFACT_BORDER_WIDTH},
-            ${ARTIFACT_BORDER_WIDTH}
-          ${outerWidth - ARTIFACT_BORDER_WIDTH},
-            ${outerHeight - ARTIFACT_BORDER_WIDTH} 
-          ${ARTIFACT_BORDER_WIDTH},
-            ${outerHeight - ARTIFACT_BORDER_WIDTH}"
-        fill="${getBackgroundColor(data.artifactDeltaState)}"
-        class="artifact-svg"
-      />
-    `
+    svgRhombus(
+      { width: outerWidth, height: outerHeight },
+      xOffset,
+      getBorderColor(data.artifactDeltaState),
+      getBackgroundColor(data.artifactDeltaState)
+    )
   );
 }

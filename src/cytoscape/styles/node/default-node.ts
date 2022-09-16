@@ -1,6 +1,6 @@
 import { ArtifactData } from "@/types";
 import { getBackgroundColor, getBorderColor } from "@/util";
-import { ARTIFACT_BORDER_WIDTH } from "@/cytoscape";
+import { svgRect } from "./node-shapes";
 import { svgNode } from "./svg-node";
 
 /**
@@ -11,30 +11,21 @@ import { svgNode } from "./svg-node";
  * @return stringified SVG for the node.
  */
 export function svgDefault(data: ArtifactData): string {
-  const outerHeight = 160;
-  const outerWidth = 206;
+  const outer = { width: 206, height: 160 };
 
   return svgNode(
     data,
     {
       marginTop: 6,
       truncateLength: 90,
-      outer: { width: outerWidth, height: outerHeight },
+      outer,
       inner: { x: 10, y: 20, width: 180, height: 100 },
     },
-    `
-      <rect 
-        rx="8" width="${outerWidth}" height="${outerHeight}"
-        fill="${getBorderColor(data.artifactDeltaState)}"
-        class="artifact-border"
-      />
-      <rect
-        x="${ARTIFACT_BORDER_WIDTH}" y="${ARTIFACT_BORDER_WIDTH}" rx="7" 
-        width="${outerWidth - ARTIFACT_BORDER_WIDTH * 2}" 
-        height="${outerHeight - ARTIFACT_BORDER_WIDTH * 2}"
-        fill="${getBackgroundColor(data.artifactDeltaState)}"
-        class="artifact-svg"
-      />
-    `
+    svgRect(
+      outer,
+      getBorderColor(data.artifactDeltaState),
+      getBackgroundColor(data.artifactDeltaState),
+      8
+    )
   );
 }

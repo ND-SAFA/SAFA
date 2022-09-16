@@ -12,11 +12,11 @@ import logStore from "./useLog";
 export const useSession = defineStore("session", {
   state() {
     try {
-      return {
-        session: JSON.parse(
-          localStorage.getItem(LocalStorageKeys.SESSION_TOKEN) || ""
-        ),
-      };
+      const session: SessionModel = JSON.parse(
+        localStorage.getItem(LocalStorageKeys.SESSION_TOKEN) || ""
+      );
+
+      return { session };
     } catch (e) {
       return { session: createSession() };
     }
@@ -87,6 +87,7 @@ export const useSession = defineStore("session", {
      */
     updateSession(session: Partial<SessionModel>) {
       this.session = { ...this.session, ...session };
+
       localStorage.setItem(
         LocalStorageKeys.SESSION_TOKEN,
         JSON.stringify(this.session)
@@ -97,6 +98,7 @@ export const useSession = defineStore("session", {
      */
     clearSession() {
       this.session = createSession();
+
       localStorage.setItem(
         LocalStorageKeys.SESSION_TOKEN,
         JSON.stringify(this.session)

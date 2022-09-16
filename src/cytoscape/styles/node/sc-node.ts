@@ -1,6 +1,5 @@
 import { ArtifactData } from "@/types";
 import { getBackgroundColor, getBorderColor } from "@/util";
-import { ARTIFACT_BORDER_WIDTH } from "@/cytoscape";
 import { svgCircle, svgRect, svgRhombus } from "./node-shapes";
 import { svgDefault } from "./default-node";
 import { svgNode } from "./svg-node";

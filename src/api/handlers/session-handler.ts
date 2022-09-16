@@ -1,3 +1,5 @@
+import { datadogRum } from "@datadog/browser-rum";
+
 import {
   ConfirmationType,
   IOHandlerCallback,
@@ -35,6 +37,7 @@ export async function handleLogin(user: UserModel): Promise<void> {
   delete query[QueryParams.LOGIN_PATH];
 
   sessionStore.updateSession(session);
+  datadogRum.startSessionReplayRecording();
 
   if (goToPath === Routes.ARTIFACT) {
     await handleLoadLastProject();
@@ -52,6 +55,7 @@ export async function handleLogout(): Promise<void> {
   await handleClearProject();
   await navigateTo(Routes.LOGIN_ACCOUNT);
   sessionStore.clearSession();
+  datadogRum.startSessionReplayRecording();
 }
 
 /**
@@ -62,9 +66,26 @@ export async function handleAuthentication(): Promise<void> {
   if (routesPublic.includes(router.currentRoute.path)) return;
 
   try {
+    datadogRum.init({
+      applicationId: process.env.VUE_APP_DDOG_APP_ID || "",
+      clientToken: process.env.VUE_APP_DDOG_DDOG_TOKEN || "",
+      env: process.env.NODE_ENV || "",
+      site: "datadoghq.com",
+      service: "safa",
+      version: "1.0.0",
+      sampleRate: 100,
+      premiumSampleRate: 100,
+      trackInteractions: true,
+      defaultPrivacyLevel: "mask-user-input",
+    });
+
     const isAuthorized = await sessionStore.hasAuthorization;
 
-    if (isAuthorized) return;
+    if (isAuthorized) {
+      datadogRum.startSessionReplayRecording();
+
+      return;
+    }
 
     await handleLogout();
   } catch (e) {

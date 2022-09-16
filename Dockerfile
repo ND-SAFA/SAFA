@@ -1,22 +1,40 @@
 # syntax=docker/dockerfile:1
-FROM python:3.8-buster as base
-
-# Sections
+ARG CUDA=10.2
+ARG UBUNTU_VERSION=18.04
+ARG BUCKET
+# Steps
 # ---
-# 1. Build Arguments
+# 1. Install wget, python, pip
 # 2. Env Variables
 # 3. Copy source + build files
 # 4. Install librarires
 # 5. Setup cloud file system
 # 6. Run Commands
 
-# 1. Build Arguments
-ARG BUCKET
+# Step - Build Arguments
+# Options: https://hub.docker.com/r/nvidia/cuda
+ARG CUDA=11.7.1
+ARG UBUNTU_VERSION=20.04
+FROM nvidia/cuda:${CUDA}-base-ubuntu${UBUNTU_VERSION} as base
 
-# 4. Install libraries
+# Step - Setup build tools
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys A4B469963BF863CC
+RUN apt-get update && apt-get install --no-install-recommends --no-install-suggests -y curl
+RUN apt-get install unzip
+
+
+# Step - Install python
+ARG PYTHON=python3.9
+RUN apt-get install -y software-properties-common && \
+    add-apt-repository ppa:deadsnakes/ppa && \
+    apt-get update && \
+    apt-get install -y ${PYTHON} python3-pip && \
+    rm -rf /var/lib/apt/lists/*
+
+# 4. Install python libraries
 # Step - Install python libraries
 COPY requirements.txt /app/
-RUN pip install -r /app/requirements.txt
+RUN pip3 install -r /app/requirements.txt
 
 # Step - Install tini and gcsfuse
 RUN set -e; \
@@ -33,7 +51,10 @@ RUN set -e; \
     && apt-get clean spo
 
 # 3. Copy source and build files
-COPY /src /app/src/
+WORKDIR /app/src
+COPY /src .
+ADD start.sh .
+RUN chmod +x start.sh
 
 # 2. Environment variables
 ENV DEPLOYMENT_TYPE=local
@@ -41,18 +62,10 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ENV BUCKET="$BUCKET"
 ENV TRANSFORMERS_CACHE=/mnt/gcs/model-cache/
-ENV MNT_DIR /mnt/gcs
-
-# 5. Setup cloud file system
-# ENV GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS:-/app/application-credentials.json}
-# COPY application-credentials.json /app/
-
-# 6. Add run script
-COPY gcsfuse_run.sh /app/
-RUN chmod +x /app/gcsfuse_run.sh
+ENV MNT_DIR /tgen
 
 
 # 6. Run commands
 EXPOSE 80
 ENTRYPOINT ["/usr/bin/tini", "--"]
-CMD ["/app/gcsfuse_run.sh"]
+CMD ["/app/src/start.sh"]

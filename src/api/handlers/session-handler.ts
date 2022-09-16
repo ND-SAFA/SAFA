@@ -1,3 +1,5 @@
+import { datadogRum } from "@datadog/browser-rum";
+
 import {
   ConfirmationType,
   IOHandlerCallback,
@@ -35,6 +37,7 @@ export async function handleLogin(user: UserModel): Promise<void> {
   delete query[QueryParams.LOGIN_PATH];
 
   sessionStore.updateSession(session);
+  datadogRum.startSessionReplayRecording();
 
   if (goToPath === Routes.ARTIFACT) {
     await handleLoadLastProject();
@@ -52,6 +55,7 @@ export async function handleLogout(): Promise<void> {
   await handleClearProject();
   await navigateTo(Routes.LOGIN_ACCOUNT);
   sessionStore.clearSession();
+  datadogRum.startSessionReplayRecording();
 }
 
 /**
@@ -64,7 +68,11 @@ export async function handleAuthentication(): Promise<void> {
   try {
     const isAuthorized = await sessionStore.hasAuthorization;
 
-    if (isAuthorized) return;
+    if (isAuthorized) {
+      datadogRum.startSessionReplayRecording();
+
+      return;
+    }
 
     await handleLogout();
   } catch (e) {

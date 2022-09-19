@@ -1,5 +1,6 @@
 <template>
   <v-container>
+    <file-format-alert />
     <validated-panels
       :itemName="itemName"
       :showError="showError"
@@ -44,6 +45,7 @@ import {
   ValidPayloads,
   LinkModel,
 } from "@/types";
+import { FileFormatAlert } from "@/components/common";
 import FilePanelController from "./FilePanelController.vue";
 import ValidatedPanels from "./ValidatedPanels.vue";
 
@@ -57,6 +59,7 @@ import ValidatedPanels from "./ValidatedPanels.vue";
 export default Vue.extend({
   name: "GenericUploader",
   components: {
+    FileFormatAlert,
     ValidatedPanels,
     FilePanelController,
   },

@@ -12,7 +12,7 @@
       <div v-if="!isSubmitted">
         <typography el="p" value="Please enter a new password." />
 
-        <password-field v-model="password" />
+        <password-field v-model="password" :errors="errors" />
       </div>
 
       <typography
@@ -69,6 +69,14 @@ export default Vue.extend({
     if (!token) return;
 
     this.token = String(token);
+  },
+  computed: {
+    /**
+     * @return Any errors encountered.
+     */
+    errors(): string[] {
+      return this.isError ? ["Unable to reset your password."] : [];
+    },
   },
   methods: {
     /**

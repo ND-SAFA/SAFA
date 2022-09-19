@@ -10,5 +10,5 @@ steps:
   # Deploy container image to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: gcloud
-    args: ['compute', 'instance-groups', 'managed', 'update-instances', 'tgen-dev-instance-group', 'all-instances', '--zone=us-central1-a' ]
+    args: ['compute', 'instance-groups', 'managed', 'rolling-action', 'restart', 'tgen-dev-instance-group', '--zone=us-central1-a' ]
 timeout: 1200s

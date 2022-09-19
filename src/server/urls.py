@@ -20,7 +20,7 @@ from server import views
 
 
 def homePageView(request):
-    return HttpResponse("Welcome to TGEN!")
+    return HttpResponse("Welcome to SAFA's trace generation server!")
 
 
 urlpatterns = [

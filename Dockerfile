@@ -63,8 +63,8 @@ ADD start.sh .
 RUN chmod +x start.sh
 
 # Step - LOCAL ONLY
-ENV GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS:-/app/application-credentials.json}
-COPY application-credentials.json /app/
+# ENV GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS:-/app/application-credentials.json}
+# COPY application-credentials.json /app/
 
 # Step - Environment variables
 ENV DEPLOYMENT_TYPE=local

@@ -20,7 +20,7 @@ from server import views
 
 
 def homePageView(request):
-    return HttpResponse("Hello, World!")
+    return HttpResponse("Welcome to TGEN!")
 
 
 urlpatterns = [

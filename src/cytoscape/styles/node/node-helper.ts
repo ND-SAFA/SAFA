@@ -23,7 +23,27 @@ export function getWarnings(data: ArtifactData): number {
  * @return how many warnings to display.
  */
 export function getBody(body: string, truncateLength: number): string {
-  return body.length > truncateLength
-    ? body.slice(0, truncateLength) + "..."
-    : body;
+  return sanitizeText(
+    body.length > truncateLength ? body.slice(0, truncateLength) + "..." : body
+  );
+}
+
+/**
+ * Sanitizes the given artifact text.
+ *
+ * @param text - The artifact text.
+ *
+ * @return The sanitized text.
+ */
+export function sanitizeText(text: string): string {
+  return (
+    text
+      // eslint-disable-next-line no-control-regex
+      .replace(/[^\x00-\x7F]/g, "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;")
+  );
 }

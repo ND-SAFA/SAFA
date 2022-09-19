@@ -10,6 +10,8 @@ steps:
         "--build-arg", "GITHUB_CLIENT_ID=${_GITHUB_CLIENT_ID}",
         "--build-arg", "GITHUB_CLIENT_SECRET=${_GITHUB_CLIENT_SECRET}",
         "--build-arg", "GITHUB_REDIRECT_LINK=${_GITHUB_REDIRECT_LINK}",
+        "--build-arg", "DDOG_APP_ID=${_DDOG_APP_ID}",
+        "--build-arg", "DDOG_DDOG_TOKEN=${_DDOG_DDOG_TOKEN}",
         "-t", "gcr.io/$PROJECT_ID/safa-fend-${_STAGE}",
         "."
     ]

@@ -34,6 +34,7 @@ export default Vue.extend({
   },
   props: {
     value: String,
+    onlyTrainable: Boolean,
   },
   data() {
     return {
@@ -45,7 +46,9 @@ export default Vue.extend({
      * @return The trace generation model types.
      */
     modelOptions(): SelectOption[] {
-      return traceModelOptions();
+      return this.onlyTrainable
+        ? traceModelOptions().slice(0, 2)
+        : traceModelOptions();
     },
   },
   watch: {

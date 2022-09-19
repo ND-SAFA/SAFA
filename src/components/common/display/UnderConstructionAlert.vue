@@ -1,0 +1,18 @@
+<template>
+  <v-alert border="left" color="accent" class="mt-2">
+    <typography color="white" value="This page is still under construction." />
+  </v-alert>
+</template>
+
+<script lang="ts">
+import Vue from "vue";
+import Typography from "./Typography.vue";
+
+/**
+ * An alert for components that are still under construction.
+ */
+export default Vue.extend({
+  name: "UnderConstructionAlert",
+  components: { Typography },
+});
+</script>

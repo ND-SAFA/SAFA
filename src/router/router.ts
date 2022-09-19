@@ -14,6 +14,7 @@ import {
   UploadStatusView,
   HomeView,
   MyAccountView,
+  ProjectModelsView,
 } from "@/views";
 import { Routes } from "./routes";
 
@@ -72,6 +73,11 @@ const routes: Array<RouteConfig> = [
     path: Routes.PROJECT_SETTINGS,
     name: "Project Settings",
     component: ProjectSettingsView,
+  },
+  {
+    path: Routes.PROJECT_MODELS,
+    name: "Project Models",
+    component: ProjectModelsView,
   },
   {
     path: Routes.ERROR,

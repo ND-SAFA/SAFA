@@ -12,8 +12,10 @@
     :loading="isLoading"
     :search="search"
     :no-data-text="noDataText"
+    :show-expand="showExpand"
     @item-selected="$emit('item:select', $event, true)"
   >
+    <slot />
     <template v-slot:top>
       <slot name="deleteItemDialogue" />
       <slot name="editItemDialogue" />
@@ -67,6 +69,11 @@
           @click="$emit('item:add')"
         />
       </div>
+    </template>
+    <template v-slot:expanded-item="{ headers, item }">
+      <td :colspan="headers.length">
+        <slot name="expanded-item" :item="item" />
+      </td>
     </template>
   </v-data-table>
 </template>
@@ -141,6 +148,10 @@ export default Vue.extend({
       required: true,
     },
     minimal: {
+      type: Boolean,
+      default: false,
+    },
+    showExpand: {
       type: Boolean,
       default: false,
     },

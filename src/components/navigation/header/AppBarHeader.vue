@@ -124,9 +124,14 @@ export default Vue.extend({
           tooltip: "View this project's settings",
           onClick: () => navigateTo(Routes.PROJECT_SETTINGS, getParams()),
         },
+        {
+          name: "Project Models",
+          tooltip: "View this project's models",
+          onClick: () => navigateTo(Routes.PROJECT_MODELS, getParams()),
+        },
       ];
 
-      return projectStore.projectId ? options : options.slice(0, -1);
+      return projectStore.projectId ? options : options.slice(0, -2);
     },
     /**
      * @return The menu items for versions.

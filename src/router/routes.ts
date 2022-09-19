@@ -21,6 +21,7 @@ export enum Routes {
  */
 export enum QueryParams {
   LOGIN_PATH = "to",
+  PW_RESET = "token",
   TAB = "tab",
   VERSION = "version",
   JIRA_TOKEN = "code",

@@ -38,11 +38,11 @@ export interface PasswordResetModel {
   /**
    * The token generated and included by email as a query param to securely change a user's password.
    */
-  token: string;
+  resetToken: string;
   /**
    * The new password to set.
    */
-  password: string;
+  newPassword: string;
 }
 
 /**

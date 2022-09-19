@@ -26,6 +26,61 @@ public class AppRoutes {
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class ArtifactType {
+        public static final String GET_PROJECT_ARTIFACT_TYPES = Projects.ROOT + "/{projectId}/artifactTypes";
+        public static final String CREATE_OR_UPDATE_ARTIFACT_TYPE = GET_PROJECT_ARTIFACT_TYPES;
+        public static final String DELETE_ARTIFACT_TYPE = Projects.ROOT + "/artifactTypes/{typeId}";
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class Commits {
+        public static final String COMMIT_CHANGE = Projects.ROOT + "/versions/{versionId}/commit";
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class Delta {
+        public static final String CALCULATE_PROJECT_DELTA = Projects.ROOT
+            + "/delta/{baselineVersionId}/{targetVersionId}";
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class Documents {
+        public static final String GET_PROJECT_DOCUMENTS = Versions.BY_ID + "/documents";
+        protected static final String ROOT = "/documents";
+        public static final String CREATE_OR_UPDATE_DOCUMENT = Versions.BY_ID + Documents.ROOT;
+        public static final String SET_CURRENT_DOCUMENT = Projects.ROOT + Documents.ROOT + "/current/{documentId}";
+        public static final String CLEAR_CURRENT_DOCUMENT = Projects.ROOT + Documents.ROOT + "/current";
+        protected static final String BY_ID = ROOT + "/{documentId}";
+        public static final String GET_DOCUMENT_BY_ID = Versions.BY_ID + Documents.BY_ID;
+        public static final String DELETE_DOCUMENT_BY_ID = Projects.ROOT + Documents.BY_ID;
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class DocumentArtifact {
+        public static final String ADD_ARTIFACTS_TO_DOCUMENT = Projects.ROOT + "/versions/{versionId}/documents"
+            + "/{documentId}/artifacts";
+        public static final String REMOVE_ARTIFACT_FROM_DOCUMENT = ADD_ARTIFACTS_TO_DOCUMENT + "/{artifactId}";
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class FlatFiles {
+        public static final String UPDATE_PROJECT_VERSION_FROM_FLAT_FILES = Projects.ROOT
+            + "/versions/{versionId}/flat-files";
+        public static final String DOWNLOAD_FLAT_FILES = UPDATE_PROJECT_VERSION_FROM_FLAT_FILES + "/{fileType}";
+        public static final String CREATE_NEW_PROJECT_FROM_FLAT_FILES = Projects.ROOT + "/flat-files";
+        public static final String PARSE_ARTIFACT_FILE = Projects.ROOT + "/parse/artifacts/{artifactType}";
+        public static final String PARSE_TRACE_FILE = Projects.ROOT + "/parse/traces";
+
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class Links {
+        public static final String GET_GENERATED_LINKS_IN_PROJECT_VERSION = Projects.ROOT
+            + "/versions/{versionId}/links/generated";
+        public static final String GENERATE_LINKS = Projects.ROOT + "/links/generate";
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Jobs {
         protected static final String JOBS_PREFIX = "/jobs";
 
@@ -73,59 +128,12 @@ public class AppRoutes {
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class ArtifactType {
-        public static final String GET_PROJECT_ARTIFACT_TYPES = Projects.ROOT + "/{projectId}/artifactTypes";
-        public static final String CREATE_OR_UPDATE_ARTIFACT_TYPE = GET_PROJECT_ARTIFACT_TYPES;
-        public static final String DELETE_ARTIFACT_TYPE = Projects.ROOT + "/artifactTypes/{typeId}";
-    }
-
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class Commits {
-        public static final String COMMIT_CHANGE = Projects.ROOT + "/versions/{versionId}/commit";
-    }
-
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class Delta {
-        public static final String CALCULATE_PROJECT_DELTA = Projects.ROOT
-            + "/delta/{baselineVersionId}/{targetVersionId}";
-    }
-
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class Documents {
-        public static final String GET_PROJECT_DOCUMENTS = Versions.BY_ID + "/documents";
-        protected static final String ROOT = "/documents";
-        public static final String CREATE_OR_UPDATE_DOCUMENT = Versions.BY_ID + Documents.ROOT;
-        public static final String SET_CURRENT_DOCUMENT = Projects.ROOT + Documents.ROOT + "/current/{documentId}";
-        public static final String CLEAR_CURRENT_DOCUMENT = Projects.ROOT + Documents.ROOT + "/current";
-        protected static final String BY_ID = ROOT + "/{documentId}";
-        public static final String GET_DOCUMENT_BY_ID = Versions.BY_ID + Documents.BY_ID;
-        public static final String DELETE_DOCUMENT_BY_ID = Projects.ROOT + Documents.BY_ID;
-    }
-
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class DocumentArtifact {
-        public static final String ADD_ARTIFACTS_TO_DOCUMENT = Projects.ROOT + "/versions/{versionId}/documents"
-            + "/{documentId}/artifacts";
-        public static final String REMOVE_ARTIFACT_FROM_DOCUMENT = ADD_ARTIFACTS_TO_DOCUMENT + "/{artifactId}";
-    }
-
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Rules {
         public static final String CREATE_WARNING_IN_PROJECT = "/project/{projectId}/rules";
         public static final String GET_WARNINGS_IN_PROJECT_VERSION = Projects.ROOT
             + "/versions/{versionId}/warnings";
     }
 
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class FlatFiles {
-        public static final String UPDATE_PROJECT_VERSION_FROM_FLAT_FILES = Projects.ROOT
-            + "/versions/{versionId}/flat-files";
-        public static final String DOWNLOAD_FLAT_FILES = UPDATE_PROJECT_VERSION_FROM_FLAT_FILES + "/{fileType}";
-        public static final String CREATE_NEW_PROJECT_FROM_FLAT_FILES = Projects.ROOT + "/flat-files";
-        public static final String PARSE_ARTIFACT_FILE = Projects.ROOT + "/parse/artifacts/{artifactType}";
-        public static final String PARSE_TRACE_FILE = Projects.ROOT + "/parse/traces";
-
-    }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class TraceMatrix {
@@ -172,13 +180,6 @@ public class AppRoutes {
             private static final String ROOT = Projects.ROOT + "/import";
             public static final String BY_NAME = Import.ROOT + "/github/{repositoryName}";
         }
-    }
-
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class Links {
-        public static final String GET_GENERATED_LINKS_IN_PROJECT_VERSION = Projects.ROOT
-            + "/versions/{versionId}/links/generated";
-        public static final String GENERATE_LINKS = Projects.ROOT + "/links/generate";
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)

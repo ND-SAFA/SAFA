@@ -9,7 +9,7 @@ import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.jobs.entities.IJobStep;
 import edu.nd.crc.safa.features.jobs.entities.app.CommitJob;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
-import edu.nd.crc.safa.features.tgen.entities.TraceGenerationMethod;
+import edu.nd.crc.safa.features.tgen.entities.BaseGenerationModels;
 import edu.nd.crc.safa.features.tgen.entities.TraceGenerationRequest;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 
@@ -37,7 +37,7 @@ public class CreateProjectViaJsonJob extends CommitJob {
             }
             List<ArtifactAppEntity> sourceArtifacts = request.getSourceArtifacts();
             List<ArtifactAppEntity> targetArtifacts = request.getTargetArtifacts();
-            TraceGenerationMethod method = request.getMethod();
+            BaseGenerationModels method = request.getMethod();
 
             List<TraceAppEntity> generatedTraces = this.serviceProvider
                 .getTraceGenerationService()

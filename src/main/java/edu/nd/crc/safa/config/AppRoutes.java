@@ -74,6 +74,12 @@ public class AppRoutes {
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class Models {
+        public static final String MODEL_ROOT = Projects.BY_ID + "/models";
+        public static final String DELETE_MODEL_BY_ID = Models.MODEL_ROOT + "/{modelId}";
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Links {
         public static final String GET_GENERATED_LINKS_IN_PROJECT_VERSION = Projects.ROOT
             + "/versions/{versionId}/links/generated";

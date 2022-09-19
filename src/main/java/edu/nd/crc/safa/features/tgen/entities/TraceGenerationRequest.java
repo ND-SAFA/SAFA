@@ -31,7 +31,7 @@ public class TraceGenerationRequest {
     /**
      * The method to generate trace links with.
      */
-    TraceGenerationMethod method = TraceGenerationMethod.getDefault();
+    BaseGenerationModels method = BaseGenerationModels.getDefault();
     /**
      * The project version to commit them too.
      */

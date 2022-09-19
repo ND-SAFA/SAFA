@@ -27,7 +27,6 @@ RUN apt-get install -y software-properties-common && \
     apt-get install -y ${PYTHON} python3-pip && \
     rm -rf /var/lib/apt/lists/*
 
-# 4. Install python libraries
 # Step - Install python libraries
 COPY requirements.txt /app/
 RUN pip3 install -r /app/requirements.txt
@@ -36,23 +35,45 @@ RUN pip3 install -r /app/requirements.txt
 RUN set -e; \
     apt-get update -y && apt-get install -y \
     tini \
-    lsb-release && apt-get clean spo
+    lsb-release; \
+    gcsFuseRepo=gcsfuse-`lsb_release -c -s`; \
+    echo "deb http://packages.cloud.google.com/apt $gcsFuseRepo main" | \
+    tee /etc/apt/sources.list.d/gcsfuse.list; \
+    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | \
+    apt-key add -; \
+    apt-get update; \
+    apt-get install -y gcsfuse \
+    && apt-get clean spo
 
-# 3. Copy source and build files
+# Step - Copy source and build files
+COPY /src /app/src/
+
+# Step - Environment variables
+ENV DEPLOYMENT_TYPE=local
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV BUCKET=safa-tgen-models
+ENV TRANSFORMERS_CACHE=/mnt/gcs/model-cache/
+ENV MNT_DIR /mnt/gcs
+
+# Step - Copy source and build files
 WORKDIR /app/src
 COPY /src .
 ADD start.sh .
 RUN chmod +x start.sh
 
-# 2. Environment variables
+# Step - LOCAL ONLY
+ENV GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS:-/app/application-credentials.json}
+COPY application-credentials.json /app/
+
+# Step - Environment variables
 ENV DEPLOYMENT_TYPE=local
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ENV TRANSFORMERS_CACHE=/model-cache/
 ENV MNT_DIR=/tgen
 
-
-# 6. Run commands
+# Step - Run commands
 EXPOSE 80
 ENTRYPOINT ["/usr/bin/tini", "--"]
 CMD ["/app/src/start.sh"]

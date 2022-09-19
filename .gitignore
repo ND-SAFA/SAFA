@@ -13,6 +13,9 @@ src/test/output/runs/**
 /**/output.json
 /**/output
 
+# Deployment
+/deployment/**
+
 # Secrets
 application-credentials.json
 *.pem

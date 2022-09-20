@@ -18,20 +18,16 @@ from trace.jobs.trace_args_builder import TraceArgsBuilder
 @csrf_exempt
 def create_model(request: HttpRequest) -> HttpResponse:
     body = _request_to_dict(request)
-    base_class_name = body["base_class_name"]
-    model_path = body["model_path"]
-    output_path = body["output_path"]
+    base_class_name = body["baseModelClass"]
+    model_path = body["statePath"]
+    output_path = body["outputPath"]
     new_model_path = SafaStorage.add_mount_directory(output_path)
     model_generator = ModelGenerator(base_class_name, model_path)
-    print("Loading model...")
     model = model_generator.get_model()
-    print("Saving model...")
     model.save_pretrained(new_model_path)
-    print("Loading tokenizer...")
     tokenizer = model_generator.get_tokenizer()
-    print("Saving tokenizer")
     tokenizer.save_pretrained(new_model_path)
-    return HttpResponse()
+    return JsonResponse(body)
 
 
 @csrf_exempt
@@ -51,10 +47,11 @@ def fine_tune(request: HttpRequest) -> JsonResponse:
     :param request: request from client containing model and artifact information
     :return: output of training
     """
-    return _run_job(request, JobType.TRAIN)
+    print("starting fine tube...")
+    return _run_job(request, JobType.TRAIN, True)
 
 
-def _run_job(request: HttpRequest, job_type: JobType) -> JsonResponse:
+def _run_job(request: HttpRequest, job_type: JobType, add_mount=False) -> JsonResponse:
     """
     Runs the specified job using params from a given request
     :param request: request from client
@@ -62,13 +59,13 @@ def _run_job(request: HttpRequest, job_type: JobType) -> JsonResponse:
     :return: the job name
     """
     request_dict = _request_to_dict(request)
-    args = _make_job_params_from_request(request_dict)
+    args = _make_job_params_from_request(request_dict, add_mount=add_mount)
     job = job_type.value(args)
     job.start()
     return JsonResponse({JobResponse.OUTPUT_PATH: SafaStorage.remove_mount_directory(job.output_filepath)})
 
 
-def _make_job_params_from_request(request_dict: Dict) -> TraceArgsBuilder:
+def _make_job_params_from_request(request_dict: Dict, add_mount=False) -> TraceArgsBuilder:
     """
     Extracts necessary information from a request and creates an arg builder from it
     :param request_dict: a dictionary from the request body
@@ -81,6 +78,8 @@ def _make_job_params_from_request(request_dict: Dict) -> TraceArgsBuilder:
     base_model = params.pop(PredictionRequest.BASE_MODEL)
     output_dir = params.pop(PredictionRequest.OUTPUT_DIR)
     links = _safe_pop(params, PredictionRequest.LINKS)  # optional
+    if add_mount:
+        model_path = SafaStorage.add_mount_directory(model_path)
     return TraceArgsBuilder(base_model, model_path, output_dir, sources, targets, links, VALIDATION_PERCENTAGE_DEFAULT,
                             **params)
 

@@ -69,7 +69,7 @@ export default Vue.extend({
       isModalOpen: false,
       headers: [
         { text: "Name", value: "name" },
-        { text: "Model", value: "model" },
+        { text: "Base Model", value: "baseModel" },
         { text: "Actions", value: "actions", sortable: false },
       ],
       currentItem: undefined as TrainedModel | undefined,

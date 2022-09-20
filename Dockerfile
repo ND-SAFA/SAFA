@@ -62,16 +62,19 @@ COPY /src .
 ADD start.sh .
 RUN chmod +x start.sh
 
-# Step - LOCAL ONLY
-# ENV GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS:-/app/application-credentials.json}
-# COPY application-credentials.json /app/
-
 # Step - Environment variables
 ENV DEPLOYMENT_TYPE=development
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ENV TRANSFORMERS_CACHE=/gcp/model-cache/
 ENV MNT_DIR=/gcp/
+
+# Step - LOCAL ONLY
+# ENV GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS:-/app/application-credentials.json}
+# COPY application-credentials.json /app/
+# ENV DEPLOYMENT_TYPE=development
+# ENV MNT_DIR=/Users/albertorodriguez/Projects/SAFA/tgen/storage
+# ENV TRANSFORMERS_CACHE=/Users/albertorodriguez/Projects/SAFA/tgen/cache
 
 # Step - Run commands
 EXPOSE 80

@@ -4,10 +4,12 @@ import java.util.Map;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * The payload to the prediction endpoint of TGEN.
  */
+@NoArgsConstructor
 @AllArgsConstructor
 @Data
 public class TGenPredictionRequestDTO {

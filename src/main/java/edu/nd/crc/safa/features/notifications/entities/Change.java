@@ -58,6 +58,7 @@ public class Change {
         DOCUMENT,
         ARTIFACTS,
         TRACES,
+        MODELS,
         WARNINGS,
         JOBS;
 

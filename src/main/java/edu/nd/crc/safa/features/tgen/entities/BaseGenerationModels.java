@@ -3,7 +3,7 @@ package edu.nd.crc.safa.features.tgen.entities;
 /**
  * The algorithm for computing the similarity scores between a pair of artifacts.
  */
-public enum TraceGenerationMethod {
+public enum BaseGenerationModels {
     /**
      * Bert model trained on NL-NL trace links.
      */
@@ -17,8 +17,8 @@ public enum TraceGenerationMethod {
      */
     VSM;
 
-    public static TraceGenerationMethod getMethodWithDefault(String name, TraceGenerationMethod defaultMethod) {
-        for (TraceGenerationMethod method : TraceGenerationMethod.values()) {
+    public static BaseGenerationModels getMethodWithDefault(String name, BaseGenerationModels defaultMethod) {
+        for (BaseGenerationModels method : BaseGenerationModels.values()) {
             if (method.name().equals(name)) {
                 return method;
             }
@@ -26,8 +26,8 @@ public enum TraceGenerationMethod {
         return defaultMethod;
     }
 
-    public static TraceGenerationMethod getDefault() {
-        return TraceGenerationMethod.VSM;
+    public static BaseGenerationModels getDefault() {
+        return BaseGenerationModels.VSM;
     }
 
     @Override

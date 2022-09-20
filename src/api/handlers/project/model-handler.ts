@@ -22,6 +22,10 @@ export function handleSaveModel(
   isUpdate: boolean,
   { onSuccess, onError }: IOHandlerCallback<TrainedModel>
 ): void {
+  logStore.onInfo(
+    `Model is being saved, you'll receive a notification when it is ready: ${model.name}`
+  );
+
   createModel(projectStore.projectId, model)
     .then(() => {
       projectStore.models.push(model);
@@ -29,7 +33,7 @@ export function handleSaveModel(
       onSuccess?.(model);
     })
     .catch((e) => {
-      logStore.onSuccess(`Unable to create saved: ${model.name}`);
+      logStore.onError(`Unable to create saved: ${model.name}`);
       logStore.onDevError(e.message);
       onError?.(e);
     });
@@ -57,7 +61,7 @@ export function handleDeleteModel(model: TrainedModel): void {
             logStore.onSuccess(`Model has been deleted: ${model.name}`);
           })
           .catch((e) => {
-            logStore.onSuccess(`Unable to delete model: ${model.name}`);
+            logStore.onError(`Unable to delete model: ${model.name}`);
             logStore.onDevError(e.message);
           });
       },

@@ -16,7 +16,7 @@ import {
  */
 export function handleGetMembers(): Promise<MembershipModel[]> {
   return getProjectMembers(projectStore.projectId).catch((e) => {
-    logStore.onSuccess(`Unable to get members`);
+    logStore.onError(`Unable to get members`);
     logStore.onDevError(e.message);
 
     return [];

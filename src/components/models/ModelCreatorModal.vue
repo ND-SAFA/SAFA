@@ -1,10 +1,5 @@
 <template>
-  <generic-modal
-    :is-open="!!isOpen"
-    :is-loading="isLoading"
-    :title="creatorTitle"
-    @close="handleClose"
-  >
+  <generic-modal :is-open="!!isOpen" :title="creatorTitle" @close="handleClose">
     <template v-slot:body>
       <flex-box t="4">
         <v-text-field
@@ -34,6 +29,7 @@
 import Vue, { PropType } from "vue";
 import { TrainedModel } from "@/types";
 import { createModel } from "@/util";
+import { handleSaveModel } from "@/api";
 import { GenericModal, GenMethodInput, FlexBox } from "@/components/common";
 
 /**
@@ -54,7 +50,6 @@ export default Vue.extend({
   },
   data() {
     return {
-      isLoading: false,
       canSave: false,
       editedModel: createModel(this.model),
     };
@@ -77,7 +72,11 @@ export default Vue.extend({
     /**
      * Saves the current model.
      */
-    handleSave() {},
+    handleSave() {
+      handleSaveModel(this.editedModel, !!this.model, {});
+
+      this.handleClose();
+    },
   },
   watch: {
     /**

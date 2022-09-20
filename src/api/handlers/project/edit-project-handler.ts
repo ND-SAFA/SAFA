@@ -24,7 +24,7 @@ export function handleSaveProject(
       onSuccess?.(project);
     })
     .catch((e) => {
-      logStore.onSuccess(`Unable to save project: ${project.name}`);
+      logStore.onError(`Unable to save project: ${project.name}`);
       logStore.onDevError(e.message);
       onError?.(e);
     });
@@ -52,7 +52,7 @@ export function handleDeleteProject(
       await handleClearProject();
     })
     .catch((e) => {
-      logStore.onSuccess(`Unable to delete project: ${project.name}.`);
+      logStore.onError(`Unable to delete project: ${project.name}.`);
       logStore.onDevError(e.message);
       onError?.(e);
     });
@@ -75,7 +75,7 @@ export function handleDeleteVersion(
       onSuccess?.();
     })
     .catch((e) => {
-      logStore.onSuccess(`Unable to delete version.`);
+      logStore.onError(`Unable to delete version.`);
       logStore.onDevError(e.message);
       onError?.(e);
     });

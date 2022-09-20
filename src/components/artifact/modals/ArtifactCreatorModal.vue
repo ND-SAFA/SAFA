@@ -1,8 +1,8 @@
 <template>
   <generic-modal
     :title="creatorTitle"
-    :isOpen="!!isOpen"
-    :isLoading="isLoading"
+    :is-open="!!isOpen"
+    :is-loading="isLoading"
     size="l"
     data-cy="modal-artifact-save"
     @close="handleClose"
@@ -78,11 +78,14 @@ export default Vue.extend({
       return appStore.isArtifactCreatorOpen;
     },
     /**
-     * @return The selected artifact.
+     * @return The name of the modal.
      */
     creatorTitle(): string {
       return this.artifact ? "Edit Artifact" : "Create Artifact";
     },
+    /**
+     * The artifact's name.
+     */
     currentArtifactName(): string {
       return this.artifact?.name || "";
     },

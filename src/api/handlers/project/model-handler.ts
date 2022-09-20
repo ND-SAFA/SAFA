@@ -13,21 +13,23 @@ export async function handleLoadModels(): Promise<void> {
  * Saves a model, updates app state, and logs the status.
  *
  * @param model - The model to create.
+ * @param isUpdate - If true, this model already exists and is being updated.
  * @param onSuccess - Called if the action is successful.
  * @param onError - Called if the action fails.
  */
-export function handleCreateModel(
+export function handleSaveModel(
   model: TrainedModel,
+  isUpdate: boolean,
   { onSuccess, onError }: IOHandlerCallback<TrainedModel>
 ): void {
   createModel(projectStore.projectId, model)
     .then(() => {
       projectStore.models.push(model);
-      logStore.onSuccess(`Model has been created: ${model.name}`);
+      logStore.onSuccess(`Model has been saved: ${model.name}`);
       onSuccess?.(model);
     })
     .catch((e) => {
-      logStore.onSuccess(`Unable to create model: ${model.name}`);
+      logStore.onSuccess(`Unable to create saved: ${model.name}`);
       logStore.onDevError(e.message);
       onError?.(e);
     });

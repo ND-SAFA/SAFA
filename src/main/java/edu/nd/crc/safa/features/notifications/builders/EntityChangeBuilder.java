@@ -127,6 +127,14 @@ public class EntityChangeBuilder {
         return this;
     }
 
+    public EntityChangeBuilder withModelUpdate(UUID modelId) {
+        return withEntityUpdate(Change.Entity.MODELS, List.of(modelId));
+    }
+
+    public EntityChangeBuilder withModelDelete(UUID modelId) {
+        return withEntityDelete(Change.Entity.MODELS, List.of(modelId));
+    }
+
     private EntityChangeBuilder withEntityUpdate(Change.Entity entity, List<UUID> entityIds) {
         return withEntityUpdate(entity, entityIds, true);
     }

@@ -9,6 +9,7 @@ import edu.nd.crc.safa.features.jobs.entities.jobs.GenerateLinksJob;
 import edu.nd.crc.safa.features.jobs.entities.jobs.GithubProjectCreationJob;
 import edu.nd.crc.safa.features.jobs.entities.jobs.GithubProjectUpdateJob;
 import edu.nd.crc.safa.features.jobs.entities.jobs.JiraProjectUpdateJob;
+import edu.nd.crc.safa.features.jobs.entities.jobs.TrainModelJob;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 
 import lombok.AccessLevel;
@@ -43,6 +44,8 @@ public class JobSteps {
                 return AbstractJob.getJobSteps(GithubProjectUpdateJob.class);
             case GENERATE_LINKS:
                 return AbstractJob.getJobSteps(GenerateLinksJob.class);
+            case TRAIN_MODEL:
+                return AbstractJob.getJobSteps(TrainModelJob.class);
             default:
                 throw new SafaError("Unknown job type: %s.", jobType);
         }

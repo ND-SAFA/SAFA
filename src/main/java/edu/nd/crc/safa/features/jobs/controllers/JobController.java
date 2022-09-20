@@ -10,12 +10,15 @@ import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.jobs.builders.CreateProjectByJsonJobBuilder;
 import edu.nd.crc.safa.features.jobs.builders.GenerateLinksJobBuilder;
+import edu.nd.crc.safa.features.jobs.builders.TrainModelJobBuilder;
 import edu.nd.crc.safa.features.jobs.builders.UpdateProjectByFlatFileJobBuilder;
 import edu.nd.crc.safa.features.jobs.entities.app.CreateProjectByJsonPayload;
 import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
 import edu.nd.crc.safa.features.jobs.services.JobService;
+import edu.nd.crc.safa.features.models.entities.api.TrainingRequest;
 import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.tgen.entities.TraceGenerationRequest;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
@@ -100,7 +103,6 @@ public class JobController extends BaseController {
      */
     @PostMapping(AppRoutes.Jobs.Projects.CREATE_PROJECT_VIA_JSON)
     public JobAppEntity createProjectFromJSON(@RequestBody @Valid CreateProjectByJsonPayload payload) throws Exception {
-        System.out.println("Request:" + payload);
         // Step - Create and start job.
         CreateProjectByJsonJobBuilder createProjectByJsonJobBuilder = new CreateProjectByJsonJobBuilder(
             serviceProvider, payload.getProject(), payload.getRequests());
@@ -124,5 +126,23 @@ public class JobController extends BaseController {
         // Step - Create and start job.
         GenerateLinksJobBuilder jobBuilder = new GenerateLinksJobBuilder(this.serviceProvider, request);
         return jobBuilder.perform();
+    }
+
+    /**
+     * Trains model defined in request with data given.
+     *
+     * @param trainingRequest Details model and data to train with.
+     * @return {@link JobAppEntity} The job to keep track of status.
+     * @throws Exception Throws error if any error occurs while setting up job.
+     */
+    @PostMapping(AppRoutes.Jobs.Models.TRAIN)
+    public JobAppEntity trainModel(@RequestBody @Valid TrainingRequest trainingRequest) throws Exception {
+        Project project = this.resourceBuilder.fetchProject(trainingRequest.getProjectId()).withEditProject();
+        TrainModelJobBuilder trainModelJobBuilder = new TrainModelJobBuilder(
+            serviceProvider,
+            trainingRequest,
+            project
+        );
+        return trainModelJobBuilder.perform();
     }
 }

@@ -7,8 +7,8 @@ import java.util.stream.Collectors;
 import edu.nd.crc.safa.common.SafaRequestBuilder;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.tgen.entities.ArtifactTypeTraceGenerationRequestDTO;
+import edu.nd.crc.safa.features.tgen.entities.BaseGenerationModels;
 import edu.nd.crc.safa.features.tgen.entities.ITraceLinkGeneration;
-import edu.nd.crc.safa.features.tgen.entities.TraceGenerationMethod;
 import edu.nd.crc.safa.features.tgen.method.bert.NLBert;
 import edu.nd.crc.safa.features.tgen.method.bert.PLBert;
 import edu.nd.crc.safa.features.tgen.method.vsm.VSMController;
@@ -56,8 +56,8 @@ public class TraceGenerationService {
 
     public List<TraceAppEntity> generateLinksWithMethod(List<ArtifactAppEntity> sourceArtifacts,
                                                         List<ArtifactAppEntity> targetArtifacts,
-                                                        TraceGenerationMethod traceGenerationMethod) {
-        ITraceLinkGeneration generationMethod = buildGenerationMethod(traceGenerationMethod);
+                                                        BaseGenerationModels baseGenerationModels) {
+        ITraceLinkGeneration generationMethod = buildGenerationMethod(baseGenerationModels);
         return generationMethod.generateLinks(sourceArtifacts, targetArtifacts);
     }
 
@@ -77,8 +77,8 @@ public class TraceGenerationService {
             .collect(Collectors.toList());
     }
 
-    private ITraceLinkGeneration buildGenerationMethod(TraceGenerationMethod traceGenerationMethod) {
-        switch (traceGenerationMethod) {
+    public ITraceLinkGeneration buildGenerationMethod(BaseGenerationModels baseGenerationModel) {
+        switch (baseGenerationModel) {
             case VSM:
                 return new VSMController();
             case PLBert:
@@ -86,7 +86,7 @@ public class TraceGenerationService {
             case NLBert:
                 return new NLBert(safaRequestBuilder);
             default:
-                throw new NotImplementedException("Trace method not implemented:" + traceGenerationMethod);
+                throw new NotImplementedException("Trace method not implemented:" + baseGenerationModel);
         }
     }
 }

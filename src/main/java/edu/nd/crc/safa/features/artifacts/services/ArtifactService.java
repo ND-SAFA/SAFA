@@ -7,6 +7,7 @@ import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
 import edu.nd.crc.safa.features.common.IAppEntityService;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import lombok.AllArgsConstructor;
@@ -19,10 +20,19 @@ public class ArtifactService implements IAppEntityService<ArtifactAppEntity> {
 
     @Override
     public List<ArtifactAppEntity> getAppEntities(ProjectVersion projectVersion) {
-        List<ArtifactVersion> artifactBodies = this.artifactVersionRepository
+        List<ArtifactVersion> artifactVersions = this.artifactVersionRepository
             .retrieveVersionEntitiesByProjectVersion(projectVersion);
+        return versionToAppEntity(artifactVersions);
+    }
+
+    public List<ArtifactAppEntity> getAppEntities(Project project) {
+        List<ArtifactVersion> artifactVersions = this.artifactVersionRepository.findByProjectVersionProject(project);
+        return versionToAppEntity(artifactVersions);
+    }
+
+    private List<ArtifactAppEntity> versionToAppEntity(List<ArtifactVersion> artifactVersions) {
         List<ArtifactAppEntity> artifacts = new ArrayList<>();
-        for (ArtifactVersion artifactVersion : artifactBodies) {
+        for (ArtifactVersion artifactVersion : artifactVersions) {
             ArtifactAppEntity artifactAppEntity = this.artifactVersionRepository
                 .retrieveAppEntityFromVersionEntity(artifactVersion);
             artifacts.add(artifactAppEntity);

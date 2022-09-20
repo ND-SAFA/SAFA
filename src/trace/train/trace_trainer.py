@@ -43,7 +43,8 @@ class TraceTrainer(Trainer):
         self.eval_dataset = self.trace_dataset_creator.get_validation_dataset(self.args.eval_dataset_size,
                                                                               linked_targets_only=LINKED_TARGETS_ONLY_DEFAULT).data
         output = self.train(resume_from_checkpoint=checkpoint)
-        self.save_model()
+
+        self.save_model(self.args.model_generator.model_path)
         return TraceTrainer.output_to_dict(output)
 
     def perform_prediction(self) -> Dict:

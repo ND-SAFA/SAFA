@@ -186,6 +186,7 @@ export async function saveJiraCredentials(
  *
  * @param cloudId - The Jira cloud id for this project.
  * @param projectId - The Jira project id to import.
+ * @return The created import job.
  */
 export async function createJiraProject(
   cloudId: string,

@@ -1,18 +1,17 @@
 import {
   ArtifactMap,
-  IGenericUploader,
   ArtifactModel,
-  TraceFile,
-  ParseTraceFileModel,
+  IGenericUploader,
   LinkModel,
+  ModelType,
+  ParseTraceFileModel,
+  TraceFile,
   TraceLinkModel,
   TracePanel,
 } from "@/types";
 import { extractTraceId } from "@/util";
 import { logStore } from "@/hooks";
-import { parseTraceFile, createGeneratedLinks } from "@/api";
-
-const DEFAULT_IS_GENERATED = false;
+import { parseTraceFile } from "@/api";
 
 /**
  * Creates a trace file uploader.
@@ -34,11 +33,10 @@ export function createTraceUploader(): IGenericUploader<
  * @param traceLink - The like to create the panel for.
  */
 function createNewPanel(traceLink: LinkModel): TracePanel {
-  const emptyArtifactFile: TraceFile = createTraceFile(traceLink);
   return {
     title: `${traceLink.sourceName} X ${traceLink.targetName}`,
     entityNames: [],
-    projectFile: emptyArtifactFile,
+    projectFile: createTraceFile(traceLink),
     getIsValid(): boolean {
       return isArtifactPanelValid(this);
     },
@@ -48,38 +46,7 @@ function createNewPanel(traceLink: LinkModel): TracePanel {
     parseFile(artifactMap: ArtifactMap, file: File): Promise<void> {
       return createParsedArtifactFile(artifactMap, this, file);
     },
-    generateTraceLinks(artifactMap: ArtifactMap): Promise<void> {
-      return generateTraceLinks(artifactMap, this);
-    },
   };
-}
-
-/**
- * Generates all trace links between artifacts.
- *
- * @param artifactMap - A collection of all artifacts.
- * @param panel - The trace panel to generate for.
- */
-function generateTraceLinks(
-  artifactMap: ArtifactMap,
-  panel: TracePanel
-): Promise<void> {
-  const sourceType = panel.projectFile.sourceId;
-  const targetType = panel.projectFile.targetId;
-  const artifacts: ArtifactModel[] = Object.values(artifactMap);
-  const sourceArtifacts: ArtifactModel[] = artifacts.filter(
-    (a) => a.type === sourceType
-  );
-  const targetArtifacts: ArtifactModel[] = artifacts.filter(
-    (a) => a.type === targetType
-  );
-
-  return createGeneratedLinks(sourceArtifacts, targetArtifacts).then(
-    (traceLinks) => {
-      panel.projectFile.traces = traceLinks;
-      panel.entityNames = traceLinks.map(extractTraceId);
-    }
-  );
 }
 
 /**
@@ -91,7 +58,8 @@ function createTraceFile(traceLink: LinkModel): TraceFile {
   return {
     sourceId: traceLink.sourceId,
     targetId: traceLink.targetId,
-    isGenerated: DEFAULT_IS_GENERATED,
+    isGenerated: false,
+    method: ModelType.NLBert,
     isValid: false,
     errors: [],
     traces: [],

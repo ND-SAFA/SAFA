@@ -32,7 +32,9 @@ export enum Endpoint {
   getProjectMembers = "projects/:projectId/members",
   deleteProjectMember = "projects/members/:projectMemberId",
   jiraCredentials = "accounts/jira/credentials",
+  githubCredentials = "accounts/github/credentials",
   jiraProject = "projects/import/jira/:cloudId/:projectId",
+  githubProject = "projects/import/github/:repositoryName",
 
   // Commits
   commit = "projects/versions/:versionId/commit",
@@ -47,6 +49,7 @@ export enum Endpoint {
   // Links
   getGeneratedLinks = "projects/versions/:versionId/links/generated",
   generateLinks = "projects/links/generate",
+  generateLinksJob = "jobs/projects/links/generate",
 
   // Entity Retrieval
   projectVersion = "projects/versions/:versionId",
@@ -59,6 +62,9 @@ export enum Endpoint {
   createNewMajorVersion = "projects/:projectId/versions/major",
   createNewMinorVersion = "projects/:projectId/versions/minor",
   createNewRevisionVersion = "projects/:projectId/versions/revision",
+
+  // Layout
+  refreshLayout = "projects/versions/:versionId/layout",
 
   // Documents
   createOrUpdateDocument = "projects/versions/:versionId/documents",

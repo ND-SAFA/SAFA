@@ -40,6 +40,15 @@ Cypress.Commands.add("clickButtonWithName", (name) => {
   cy.contains(name, { matchCase: false }).last().click();
 });
 
+Cypress.Commands.add("clickSelectOption", (dataCy, optionName) => {
+  cy.getCy(dataCy).parent().click();
+  cy.get(".v-menu__content")
+    .filter(":visible")
+    .contains(optionName, { matchCase: false })
+    .click();
+  cy.get(".v-menu__content").should("not.be.visible");
+});
+
 Cypress.Commands.add("clickMenuOption", (optionName) => {
   cy.get(`[role="menu"]`)
     .contains(optionName, { matchCase: false })

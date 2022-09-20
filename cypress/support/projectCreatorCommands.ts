@@ -48,13 +48,11 @@ Cypress.Commands.add("createArtifactPanel", (name, file, next) => {
   }
 });
 
-Cypress.Commands.add("createTraceMatrix", (name, artifact, file, next) => {
-  cy.clickButtonWithName("Create new trace matrix");
-  cy.clickButtonWithName("Select source");
-  cy.clickMenuOption(name);
-  cy.clickButtonWithName("Select target");
-  cy.clickMenuOption(artifact);
-  cy.clickButtonWithName("Create trace matrix");
+Cypress.Commands.add("createTraceMatrix", (source, target, file, next) => {
+  cy.clickButtonWithName("Create new trace matrix")
+    .clickSelectOption(DataCy.creationTraceSourceInput, source)
+    .clickSelectOption(DataCy.creationTraceTargetInput, target)
+    .clickButton(DataCy.creationTraceCreateButton);
 
   if (file) {
     cy.uploadFiles(DataCy.creationStandardFilesInput, file);

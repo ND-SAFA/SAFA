@@ -10,6 +10,7 @@
       v-model="selectedFiles"
       data-cy="input-files-bulk"
     />
+    <file-format-alert />
     <v-btn
       block
       color="primary"
@@ -26,7 +27,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { handleBulkImportProject } from "@/api";
-import { GenericFileSelector } from "@/components/common";
+import { GenericFileSelector, FileFormatAlert } from "@/components/common";
 
 /**
  * Togglable input for project files.
@@ -37,6 +38,7 @@ import { GenericFileSelector } from "@/components/common";
 export default Vue.extend({
   name: "ProjectFilesInput",
   components: {
+    FileFormatAlert,
     GenericFileSelector,
   },
   props: {

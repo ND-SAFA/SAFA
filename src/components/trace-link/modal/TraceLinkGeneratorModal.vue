@@ -18,6 +18,7 @@
         v-for="(matrix, idx) in matrices"
         :key="idx"
       >
+        <gen-method-input v-model="matrix.method" />
         <artifact-type-input
           hide-details
           v-model="matrix.source"
@@ -63,15 +64,16 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { TypeMatrixModel } from "@/types";
+import { GeneratedMatrixModel, ModelType, TypeMatrixModel } from "@/types";
 import { appStore } from "@/hooks";
 import { handleGenerateLinks } from "@/api";
 import {
-  GenericModal,
-  GenericIconButton,
-  FlexBox,
   ArtifactTypeInput,
+  FlexBox,
+  GenericIconButton,
+  GenericModal,
   Typography,
+  GenMethodInput,
 } from "@/components/common";
 
 /**
@@ -82,6 +84,7 @@ import {
 export default Vue.extend({
   name: "TraceLinkGeneratorModal",
   components: {
+    GenMethodInput,
     GenericIconButton,
     Typography,
     ArtifactTypeInput,
@@ -92,7 +95,9 @@ export default Vue.extend({
     return {
       isLoading: false,
       isValid: false,
-      matrices: [{ source: "", target: "" }] as TypeMatrixModel[],
+      matrices: [
+        { source: "", target: "", method: ModelType.NLBert },
+      ] as GeneratedMatrixModel[],
     };
   },
   watch: {
@@ -101,7 +106,7 @@ export default Vue.extend({
 
       this.isLoading = false;
       this.isValid = false;
-      this.matrices = [{ source: "", target: "" }];
+      this.matrices = [{ source: "", target: "", method: ModelType.NLBert }];
     },
     matrices: {
       deep: true,
@@ -125,7 +130,7 @@ export default Vue.extend({
      * Creates a new trace matrix.
      */
     handleCreateMatrix(): void {
-      this.matrices.push({ source: "", target: "" });
+      this.matrices.push({ source: "", target: "", method: ModelType.NLBert });
     },
     /**
      * Removes a matrix from the list.
@@ -140,13 +145,8 @@ export default Vue.extend({
      * Attempts to generate the selected trace links.
      */
     handleSubmit(): void {
-      handleGenerateLinks(this.matrices, {
-        onSuccess: () => {
-          this.isLoading = false;
-          this.handleClose();
-        },
-        onError: () => (this.isLoading = false),
-      });
+      handleGenerateLinks(this.matrices, {});
+      this.handleClose();
     },
     /**
      * Closes the modal.

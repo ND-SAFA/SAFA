@@ -3,25 +3,25 @@
     <typography el="h1" variant="subtitle" value="Members" />
     <v-divider />
     <generic-selector
+      is-open
       :headers="headers"
       :items="members"
-      :is-open="true"
       :has-delete="isAdmin"
       :has-edit="isAdmin"
       :has-select="false"
       :is-loading="isLoading"
       item-key="email"
+      class="mt-5"
       @item:add="handleAddMember"
       @item:edit="handleEditMember"
       @item:delete="handleDeleteMember"
       @refresh="handleRetrieveMembers"
-      class="mt-5"
     >
       <template v-slot:addItemDialogue>
         <settings-member-information-modal
           :is-open="isNewOpen"
           :project="project"
-          @cancel="isNewOpen = false"
+          @cancel="handleConfirmAdd"
           @confirm="handleConfirmAdd"
         />
       </template>
@@ -31,7 +31,7 @@
           :clear-on-close="false"
           :project="project"
           :member="memberToEdit"
-          @cancel="isEditOpen = false"
+          @cancel="handleConfirmEdit"
           @confirm="handleConfirmEdit"
         />
       </template>
@@ -66,13 +66,8 @@ export default Vue.extend({
       isNewOpen: false,
       isEditOpen: false,
       headers: [
-        { text: "Email", value: "email", sortable: false, isSelectable: false },
-        {
-          text: "Role",
-          value: "role",
-          sortable: true,
-          isSelectable: true,
-        },
+        { text: "Email", value: "email" },
+        { text: "Role", value: "role" },
         { text: "Actions", value: "actions", sortable: false },
       ],
     };

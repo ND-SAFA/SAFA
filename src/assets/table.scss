@@ -1,7 +1,8 @@
 $color-selected: #EEEEEE;
 
 .artifact-view,
-.trace-link-table {
+.trace-link-table,
+.model-table {
   .artifact-row-selected {
     background-color: $color-selected;
   }

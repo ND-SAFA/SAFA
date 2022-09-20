@@ -19,6 +19,7 @@
           v-model="selectedFiles"
           data-cy="input-files-version"
         />
+        <file-format-alert />
         <v-switch
           v-model="replaceAllArtifacts"
           label="Replace all artifacts"
@@ -34,7 +35,7 @@ import Vue from "vue";
 import { IdentifierModel, VersionModel } from "@/types";
 import { logStore, projectStore } from "@/hooks";
 import { handleUploadProjectVersion } from "@/api";
-import { GenericFileSelector } from "@/components/common";
+import { GenericFileSelector, FileFormatAlert } from "@/components/common";
 import ProjectVersionStepperModal from "./ProjectVersionStepperModal.vue";
 
 /**
@@ -45,6 +46,7 @@ import ProjectVersionStepperModal from "./ProjectVersionStepperModal.vue";
 export default Vue.extend({
   name: "UploadNewVersionModal",
   components: {
+    FileFormatAlert,
     GenericFileSelector,
     ProjectVersionStepperModal,
   },

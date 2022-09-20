@@ -1,4 +1,4 @@
-import { ArtifactPositions } from "@/types";
+import { LayoutPositionsModel } from "@/types";
 import { IdentifierModel } from "@/types/domain/project";
 
 /**
@@ -74,7 +74,7 @@ export interface DocumentModel {
   /**
    * Map of document ids to their artifact positions.
    */
-  layout: ArtifactPositions;
+  layout: LayoutPositionsModel;
   /**
    * Defines the columns of a table-like document.
    */

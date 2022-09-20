@@ -109,7 +109,7 @@ export const useProject = defineStore("project", {
       this.project = project;
 
       selectionStore.clearSelections();
-      typeOptionsStore.initializeTypeIcons(project.artifactTypes);
+      typeOptionsStore.initializeProject(project);
       documentStore.initializeProject(project);
       subtreeStore.initializeProject(project);
       warningStore.artifactWarnings = project.warnings;

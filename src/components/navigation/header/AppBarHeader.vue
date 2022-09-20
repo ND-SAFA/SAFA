@@ -1,8 +1,10 @@
 <template>
   <flex-box align="center">
     <flex-box full-width align="center">
-      <safa-icon />
-      <typography el="h1" variant="large" l="4" color="white" value="SAFA" />
+      <safa-icon
+        style="width: 200px; cursor: pointer"
+        @click="handleLogoClick"
+      />
       <button-row :definitions="definitions" class="mx-3" />
       <saving-icon />
       <update-button />
@@ -55,7 +57,7 @@ import {
   routesWithRequiredProject,
 } from "@/router";
 import { handleLoadVersion } from "@/api";
-import { ButtonRow, SafaIcon, Typography, FlexBox } from "@/components/common";
+import { ButtonRow, SafaIcon, FlexBox } from "@/components/common";
 import {
   VersionCreator,
   BaselineVersionModal,
@@ -73,7 +75,6 @@ export default Vue.extend({
     TraceLinkGeneratorModal,
     UpdateButton,
     FlexBox,
-    Typography,
     VersionLabel,
     AccountDropdown,
     SafaIcon,
@@ -123,9 +124,14 @@ export default Vue.extend({
           tooltip: "View this project's settings",
           onClick: () => navigateTo(Routes.PROJECT_SETTINGS, getParams()),
         },
+        {
+          name: "Project Models",
+          tooltip: "View this project's models",
+          onClick: () => navigateTo(Routes.PROJECT_MODELS, getParams()),
+        },
       ];
 
-      return projectStore.projectId ? options : options.slice(0, -1);
+      return projectStore.projectId ? options : options.slice(0, -2);
     },
     /**
      * @return The menu items for versions.
@@ -215,6 +221,12 @@ export default Vue.extend({
       handleLoadVersion(version.versionId);
 
       this.createVersionOpen = false;
+    },
+    /**
+     * Navigates to the project creator when the logo is clicked.
+     */
+    handleLogoClick() {
+      navigateTo(Routes.HOME);
     },
   },
 });

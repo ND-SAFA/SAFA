@@ -77,7 +77,7 @@ export async function createPasswordReset(user: UserResetModel): Promise<void> {
 export async function updatePassword(
   password: PasswordResetModel
 ): Promise<void> {
-  await authHttpClient(fillEndpoint(Endpoint.resetPassword), {
+  await sessionFetch(fillEndpoint(Endpoint.resetPassword), {
     method: "PUT",
     body: JSON.stringify(password),
   });

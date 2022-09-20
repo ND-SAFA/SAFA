@@ -48,9 +48,8 @@ import {
   documentStore,
   commitStore,
   selectionStore,
-  layoutStore,
 } from "@/hooks";
-import { redoCommit, undoCommit } from "@/api";
+import { redoCommit, undoCommit, handleRegenerateLayout } from "@/api";
 import { cyZoomIn, cyZoomOut } from "@/cytoscape";
 import { GenericIconButton, CheckmarkMenu, FlexBox } from "@/components/common";
 
@@ -133,8 +132,8 @@ export default Vue.extend({
         },
         {
           type: ButtonType.ICON,
-          handler: layoutStore.setArtifactTreeLayout,
-          label: "Reformat Graph",
+          handler: () => handleRegenerateLayout({}),
+          label: "Regenerate Layout",
           icon: "mdi-refresh",
         },
       ];

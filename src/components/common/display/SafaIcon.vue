@@ -1,12 +1,14 @@
 <template>
-  <v-avatar :size="size" @click="onAvatarClick" style="cursor: pointer">
-    <img :src="pathToLogo" alt="SAFA" />
-  </v-avatar>
+  <img
+    :src="pathToLogo"
+    alt="SAFA"
+    class="full-width"
+    @click="$emit('click')"
+  />
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { navigateTo, Routes } from "@/router";
+import Vue, { PropType } from "vue";
 
 /**
  * Displays the SAFA icon.
@@ -14,24 +16,15 @@ import { navigateTo, Routes } from "@/router";
 export default Vue.extend({
   name: "SafaIcon",
   props: {
-    size: {
-      type: Number,
-      required: false,
-      default: 50,
-    },
+    variant: String as PropType<"primary" | "secondary">,
   },
   data() {
     return {
-      pathToLogo: require("@/assets/SAFA.png"),
+      pathToLogo:
+        this.variant === "primary"
+          ? require("@/assets/SAFA-primary.svg")
+          : require("@/assets/SAFA-secondary.svg"),
     };
-  },
-  methods: {
-    /**
-     * Navigates to the project creator when the logo is clicked.
-     */
-    onAvatarClick() {
-      navigateTo(Routes.HOME);
-    },
   },
 });
 </script>

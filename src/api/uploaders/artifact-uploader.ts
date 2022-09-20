@@ -29,11 +29,10 @@ export function createArtifactUploader(): IGenericUploader<
  * @param artifactName - The title of the panel.
  */
 function createNewPanel(artifactName: string): ArtifactPanel {
-  const emptyArtifactFile: ArtifactFile = createArtifactFile(artifactName);
   return {
     title: artifactName,
     entityNames: [],
-    projectFile: emptyArtifactFile,
+    projectFile: createArtifactFile(artifactName),
     getIsValid(): boolean {
       return isArtifactPanelValid(this);
     },

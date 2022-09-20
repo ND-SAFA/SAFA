@@ -21,6 +21,14 @@ export class CommitBuilder {
   }
 
   /**
+   * Hides errors from the commit.
+   */
+  hideErrors(): this {
+    this.commit.failOnError = false;
+    return this;
+  }
+
+  /**
    * Adds a new artifact to this commit.
    *
    * @param artifact - The artifact to create.

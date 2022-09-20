@@ -143,12 +143,11 @@ export default Vue.extend({
     async loadProjects() {
       if (!this.credentials) return;
 
-      this.projectsLoading = true;
-
       if (this.selectedSite) {
         this.credentials.cloudId = this.selectedSite.id;
       }
 
+      this.projectsLoading = true;
       handleLoadJiraProjects(this.credentials, {
         onSuccess: (projects) => {
           this.projects = projects;

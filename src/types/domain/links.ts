@@ -23,6 +23,15 @@ export enum InternalTraceType {
 }
 
 /**
+ * Enumerates the type of generated trace models.
+ */
+export enum ModelType {
+  NLBert = "NLBert",
+  PLBert = "PLBert",
+  VSM = "VSM",
+}
+
+/**
  * Defines a link.
  */
 export interface LinkModel {

@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 
 import {
-  ArtifactPositions,
+  LayoutPositionsModel,
   ColumnModel,
   DocumentModel,
   DocumentType,
@@ -127,10 +127,31 @@ export const useDocuments = defineStore("documents", {
       layoutStore.updatePositions(loadedDocument.layout);
     },
     /**
-     * Updates the base document's layout, and reruns the layout if on the base document.
-     * @param layout
+     * Updates the given document's layout, and reruns the layout if on the base document.
+     * @param documentId - The document to update.
+     * @param layout - The new layout to set.
      */
-    updateBaseLayout(layout: ArtifactPositions): void {
+    updateDocumentLayout(
+      documentId: string,
+      layout: LayoutPositionsModel
+    ): void {
+      const document = this.allDocuments.find(
+        (document) => documentId === document.documentId
+      );
+
+      if (!document) return;
+
+      document.layout = layout;
+
+      if (document.documentId !== this.currentId) return;
+
+      layoutStore.updatePositions(layout);
+    },
+    /**
+     * Updates the base document's layout, and reruns the layout if on the base document.
+     * @param layout - The new layout to set.
+     */
+    updateBaseLayout(layout: LayoutPositionsModel): void {
       projectStore.updateProject({ layout });
 
       this.baseDocument.layout = layout;

@@ -1,22 +1,20 @@
 import {
   ApprovalType,
-  IOHandlerCallback,
   FlatTraceLink,
-  TraceLinkModel,
-  TypeMatrixModel,
+  GeneratedMatrixModel,
+  IOHandlerCallback,
 } from "@/types";
 import {
+  approvalStore,
   appStore,
   artifactStore,
-  projectStore,
-  approvalStore,
   logStore,
-  traceStore,
+  projectStore,
 } from "@/hooks";
 import {
   createGeneratedLinks,
   getGeneratedLinks,
-  saveGeneratedLinks,
+  handleJobSubmission,
 } from "@/api";
 
 /**
@@ -77,38 +75,36 @@ export async function handleGetGeneratedLinks({
  * @param onError - Called if the action fails.
  */
 export async function handleGenerateLinks(
-  matrices: TypeMatrixModel[],
-  { onSuccess, onError }: IOHandlerCallback<TraceLinkModel[]>
+  matrices: GeneratedMatrixModel[],
+  { onSuccess, onError }: IOHandlerCallback
 ): Promise<void> {
-  const generatedLinks: TraceLinkModel[] = [];
   const matricesName = matrices
     .map(({ source, target }) => `${source} -> ${target}`)
     .join(", ");
 
   try {
-    appStore.onLoadStart();
+    logStore.onInfo(
+      `Generating trace links, you will receive a notification when complete.`
+    );
 
-    for (const { source, target } of matrices) {
+    for (const { source, target, method } of matrices) {
       const sourceArtifacts = artifactStore.getArtifactsByType[source] || [];
       const targetArtifacts = artifactStore.getArtifactsByType[target] || [];
-      const traceLinks = await createGeneratedLinks(
+      const job = await createGeneratedLinks({
         sourceArtifacts,
-        targetArtifacts
-      );
-      generatedLinks.push(...traceLinks);
+        targetArtifacts,
+        method,
+        projectVersion: projectStore.version,
+      });
+
+      await handleJobSubmission(job);
     }
-
-    const createdLinks = await saveGeneratedLinks(generatedLinks);
-
-    traceStore.addOrUpdateTraceLinks(createdLinks);
-    logStore.onSuccess(
-      `Generated ${createdLinks.length} new trace links: ${matricesName}`
+    logStore.onInfo(
+      `Started generating new trace links: ${matricesName}. You'll receive a notification once they are added.`
     );
-    onSuccess?.(createdLinks);
+    onSuccess?.();
   } catch (e) {
     logStore.onError(`Unable to generate new trace links: ${matricesName}`);
     onError?.(e as Error);
-  } finally {
-    appStore.onLoadEnd();
   }
 }

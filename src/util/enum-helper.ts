@@ -4,6 +4,7 @@ import {
   ColumnDataType,
   DocumentType,
   FTANodeType,
+  ModelType,
   SafetyCaseType,
   SelectOption,
 } from "@/types";
@@ -127,5 +128,24 @@ export function approvalTypeOptions(): SelectOption[] {
     createEnumOption(ApprovalType.UNREVIEWED),
     createEnumOption(ApprovalType.APPROVED),
     createEnumOption(ApprovalType.DECLINED),
+  ];
+}
+
+/**
+ * Returns display names for each trace model type.
+ *
+ * @return The select option names and ids.
+ */
+export function traceModelOptions(): SelectOption[] {
+  return [
+    createEnumOption(
+      ModelType.NLBert,
+      "Slower, higher quality links. Traces free-text artifacts to other free-text artifacts."
+    ),
+    createEnumOption(
+      ModelType.PLBert,
+      "Slower, higher quality links. Traces free-text artifacts to source code."
+    ),
+    createEnumOption(ModelType.VSM, "Faster, lower quality links."),
   ];
 }

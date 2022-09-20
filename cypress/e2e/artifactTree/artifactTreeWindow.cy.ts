@@ -9,10 +9,19 @@ describe("Artifact Tree Window", () => {
     cy.loadCurrentProject();
   });
 
+  describe("I can re-center the graph", () => {
+    it("Makes all nodes centered and visible", () => {
+      cy.getNodes().should("not.have.length", 19);
+      cy.centerGraph();
+      cy.getNodes().should("have.length", 19);
+    });
+  });
+
   describe("I can see the graph interactions load on initial page load", () => {
     it("Loads the graph and is responsive", () => {
       // Assert that right clicking works to know that the graph is responsive.
-      cy.getNodes()
+      cy.centerGraph()
+        .getNodes()
         .first()
         .rightclick()
         .get(DataIds.rightClickAddArtifact)
@@ -36,7 +45,8 @@ describe("Artifact Tree Window", () => {
         .should("not.be.visible");
 
       // Assert that right clicking works to know that the graph is responsive.
-      cy.getNodes()
+      cy.centerGraph()
+        .getNodes()
         .first()
         .rightclick()
         .get(DataIds.rightClickAddArtifact)
@@ -53,7 +63,8 @@ describe("Artifact Tree Window", () => {
         .should("not.be.visible");
 
       // Assert that right clicking works to know that the graph is responsive.
-      cy.getNodes()
+      cy.centerGraph()
+        .getNodes()
         .first()
         .rightclick()
         .get(DataIds.rightClickAddArtifact)
@@ -68,15 +79,7 @@ describe("Artifact Tree Window", () => {
         .filter(":visible")
         .each((el) => cy.wrap(el).click());
 
-      cy.getNodes().should("have.css", "opacity", "0.1");
-    });
-  });
-
-  describe("I can re-center the graph", () => {
-    it("Makes all nodes centered and visible", () => {
-      cy.getNodes().should("not.have.length", 19);
-      cy.centerGraph();
-      cy.getNodes().should("have.length", 19);
+      cy.centerGraph().getNodes().should("have.css", "opacity", "0.1");
     });
   });
 });

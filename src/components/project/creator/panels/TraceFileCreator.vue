@@ -1,21 +1,25 @@
 <template>
-  <flex-box
-    v-if="isOpen"
-    align="center"
-    justify="space-between"
-    full-width
-    y="3"
-  >
-    <flex-box>
-      <button-row :definitions="[sourceDefinition]" />
-      <v-icon class="mx-2">mdi-arrow-right</v-icon>
-      <button-row :definitions="[targetDefinition]" />
-    </flex-box>
+  <flex-box v-if="isOpen" align="start" justify="center" full-width y="3">
+    <v-select
+      filled
+      label="Source Type"
+      v-model="source"
+      :items="artifactTypes"
+      data-cy="input-source-type"
+    />
+    <v-icon class="mx-2 mt-5">mdi-arrow-right</v-icon>
+    <v-select
+      filled
+      label="Target Type"
+      v-model="target"
+      :items="artifactTypes"
+      data-cy="input-target-type"
+    />
     <v-btn
       :disabled="disabled"
       @click="handleSubmit"
       color="primary"
-      class="ml-10"
+      class="ml-10 mt-3"
       data-cy="button-create-trace-matrix"
     >
       Create Trace Matrix
@@ -25,9 +29,9 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { ButtonDefinition, ButtonType, LinkModel, TraceFile } from "@/types";
+import { LinkModel, TraceFile } from "@/types";
 import { logStore } from "@/hooks";
-import { ButtonRow, FlexBox } from "@/components/common";
+import { FlexBox } from "@/components/common";
 
 /**
  * Trace file creator.
@@ -39,7 +43,6 @@ export default Vue.extend({
   name: "TraceFileCreator",
   components: {
     FlexBox,
-    ButtonRow,
   },
   props: {
     isOpen: {
@@ -94,56 +97,6 @@ export default Vue.extend({
     },
   },
   computed: {
-    /**
-     * Returns all target artifact types.
-     */
-    targetTypes(): string[] {
-      if (this.source === "") {
-        return [];
-      }
-
-      const traceIds = this.traceFiles.map(
-        (f) => `${f.sourceId}-${f.targetId}`
-      );
-
-      return this.artifactTypes.filter((t) => {
-        const currentTraceId = `${this.source}-${t}`;
-        return !traceIds.includes(currentTraceId);
-      });
-    },
-    /**
-     * Defines the source button.
-     */
-    sourceDefinition(): ButtonDefinition {
-      return {
-        type: ButtonType.LIST_MENU,
-        label: this.source === "" ? "Select Source" : this.source,
-        menuItems: this.artifactTypes.map((type) => ({
-          name: type,
-          onClick: () => (this.source = type),
-        })),
-        buttonColor: "primary",
-        buttonIsText: false,
-        showSelectedValue: true,
-      };
-    },
-    /**
-     * Defines the target button.
-     */
-    targetDefinition(): ButtonDefinition {
-      return {
-        type: ButtonType.LIST_MENU,
-        label: this.target === "" ? "Select Target" : this.target,
-        menuItems: this.targetTypes.map((type) => ({
-          name: type,
-          onClick: () => (this.target = type),
-        })),
-        buttonColor: "primary",
-        buttonIsText: false,
-        showSelectedValue: true,
-        isDisabled: this.targetTypes.length === 0,
-      };
-    },
     /**
      * @return Whether this matrix creation is disabled.
      */

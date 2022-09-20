@@ -91,6 +91,12 @@ export enum Endpoint {
 
   // Warnings
   getWarningsInProjectVersion = "projects/versions/:versionId/warnings",
+
+  // Models
+  getModels = "projects/:projectId/models",
+  createModel = "projects/:projectId/models",
+  editModel = "projects/:projectId/models/:modelId",
+  deleteModel = "projects/:projectId/models/:modelId",
 }
 
 /**

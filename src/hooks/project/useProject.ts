@@ -1,5 +1,10 @@
 import { defineStore } from "pinia";
-import { MembershipModel, ProjectModel, VersionModel } from "@/types";
+import {
+  MembershipModel,
+  ProjectModel,
+  TrainedModel,
+  VersionModel,
+} from "@/types";
 import { createProject, removeMatches } from "@/util";
 import { pinia } from "@/plugins";
 import selectionStore from "@/hooks/graph/useSelection";
@@ -18,6 +23,10 @@ export const useProject = defineStore("project", {
      * The currently loaded project.
      */
     project: createProject(),
+    /**
+     * The current project's models.
+     */
+    models: [] as TrainedModel[],
   }),
   getters: {
     /**

@@ -86,7 +86,6 @@
 import Vue from "vue";
 import { ConfirmationType, ModelType } from "@/types";
 import { logStore } from "@/hooks";
-import AttributeChip from "@/components/common/display/AttributeChip.vue";
 import {
   BackButton,
   GenericModal,
@@ -96,6 +95,7 @@ import {
   Typography,
   FlexBox,
   UnderConstructionAlert,
+  AttributeChip,
 } from "@/components";
 
 interface GenModel {

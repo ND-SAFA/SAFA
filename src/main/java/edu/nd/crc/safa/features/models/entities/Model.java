@@ -25,7 +25,7 @@ import org.hibernate.annotations.Type;
  * Represents the database entity for a trace generation model
  */
 @Entity
-@Table(name = "trace_generation_models")
+@Table(name = "trace_generation_model")
 @Getter
 @Setter
 @NoArgsConstructor

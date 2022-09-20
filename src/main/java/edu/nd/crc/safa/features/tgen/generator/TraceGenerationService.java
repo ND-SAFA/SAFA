@@ -77,8 +77,8 @@ public class TraceGenerationService {
             .collect(Collectors.toList());
     }
 
-    private ITraceLinkGeneration buildGenerationMethod(BaseGenerationModels baseGenerationModels) {
-        switch (baseGenerationModels) {
+    public ITraceLinkGeneration buildGenerationMethod(BaseGenerationModels baseGenerationModel) {
+        switch (baseGenerationModel) {
             case VSM:
                 return new VSMController();
             case PLBert:
@@ -86,7 +86,7 @@ public class TraceGenerationService {
             case NLBert:
                 return new NLBert(safaRequestBuilder);
             default:
-                throw new NotImplementedException("Trace method not implemented:" + baseGenerationModels);
+                throw new NotImplementedException("Trace method not implemented:" + baseGenerationModel);
         }
     }
 }

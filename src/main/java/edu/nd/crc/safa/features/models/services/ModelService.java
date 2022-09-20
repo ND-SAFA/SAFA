@@ -52,19 +52,7 @@ public class ModelService implements IAppEntityService<ModelAppEntity> {
             project);
         this.modelRepository.save(model);
         modelAppEntity.setId(model.getId());
-        return modelAppEntity;
-    }
 
-    /**
-     * Updates given model app entity.
-     *
-     * @param modelAppEntity The model to update.
-     * @return Updated {@link ModelAppEntity}.
-     */
-    public ModelAppEntity updateModel(ModelAppEntity modelAppEntity) {
-        Model previousModel = getModelById(modelAppEntity.getId());
-        Model model = new Model(modelAppEntity, previousModel.getProject());
-        modelRepository.save(model);
         return modelAppEntity;
     }
 

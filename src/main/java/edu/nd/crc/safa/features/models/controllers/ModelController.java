@@ -11,18 +11,19 @@ import edu.nd.crc.safa.features.models.entities.Model;
 import edu.nd.crc.safa.features.models.entities.ModelAppEntity;
 import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.tgen.method.bert.TBert;
 
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Provides endpoints for performing CRUD operations on models
  */
-@Controller
+@RestController
 public class ModelController extends BaseController {
     public ModelController(ResourceBuilder resourceBuilder, ServiceProvider serviceProvider) {
         super(resourceBuilder, serviceProvider);
@@ -41,7 +42,7 @@ public class ModelController extends BaseController {
     }
 
     /**
-     * Creates model if ID is null (or empty) and updates it is ID is set.
+     * Creates model given model by copying the base model into the project storage.
      *
      * @param projectId      The project to create the project under,
      * @param modelAppEntity The model to create or update.
@@ -51,12 +52,21 @@ public class ModelController extends BaseController {
     public ModelAppEntity createModel(@PathVariable UUID projectId,
                                       @RequestBody ModelAppEntity modelAppEntity) {
         Project project = this.resourceBuilder.fetchProject(projectId).withViewProject();
-        if (modelAppEntity.getId() == null) {
-            modelAppEntity = this.serviceProvider.getModelService().createModel(project, modelAppEntity);
-        } else {
-            modelAppEntity = this.serviceProvider.getModelService().updateModel(modelAppEntity);
+        if (modelAppEntity.getId() != null) {
+            throw new IllegalArgumentException("Model cannot be updated. Please delete and create new one.");
         }
 
+        // Step - Create path for model state
+        modelAppEntity = this.serviceProvider.getModelService().createModel(project, modelAppEntity);
+
+        // Step - Copy model to project
+        TBert bertModel = this.serviceProvider.getBertService().getBertModel(
+            modelAppEntity.getBaseModel(),
+            serviceProvider.getSafaRequestBuilder()
+        );
+        bertModel.createModel(modelAppEntity.getStatePath(project));
+
+        // Step - Notify project users of new model
         this.serviceProvider.getNotificationService().broadcastChange(
             EntityChangeBuilder
                 .create(project)

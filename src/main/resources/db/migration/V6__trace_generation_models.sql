@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS trace_generation_models
+CREATE TABLE IF NOT EXISTS trace_generation_model
 (
     id         varchar(255) NOT NULL PRIMARY KEY,
     name       varchar(255) NOT NULL,

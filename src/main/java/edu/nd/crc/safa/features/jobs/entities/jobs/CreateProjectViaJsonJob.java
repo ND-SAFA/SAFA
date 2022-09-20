@@ -32,7 +32,6 @@ public class CreateProjectViaJsonJob extends CommitJob {
     public void generateLinks() {
         for (TraceGenerationRequest request : this.generationRequests) {
             if (request.size() == 0) {
-                System.out.println("No generated trace link requests...");
                 return;
             }
             List<ArtifactAppEntity> sourceArtifacts = request.getSourceArtifacts();
@@ -42,7 +41,6 @@ public class CreateProjectViaJsonJob extends CommitJob {
             List<TraceAppEntity> generatedTraces = this.serviceProvider
                 .getTraceGenerationService()
                 .generateLinksWithMethod(sourceArtifacts, targetArtifacts, method);
-            System.out.println("Generated traces:" + generatedTraces.size());
             this.projectCommit.addTraces(ModificationType.ADDED, generatedTraces);
         }
     }

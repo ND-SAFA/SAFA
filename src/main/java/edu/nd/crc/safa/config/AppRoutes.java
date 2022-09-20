@@ -76,7 +76,10 @@ public class AppRoutes {
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Models {
         public static final String MODEL_ROOT = Projects.BY_ID + "/models";
-        public static final String DELETE_MODEL_BY_ID = Models.MODEL_ROOT + "/{modelId}";
+        public static final String MODEL_BY_ID = Models.MODEL_ROOT + "/{modelId}";
+        public static final String DELETE_MODEL_BY_ID = MODEL_BY_ID;
+        public static final String TRAIN_MODEL = MODEL_BY_ID;
+
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -106,6 +109,11 @@ public class AppRoutes {
             public static final String GET_JOBS = JOBS_PREFIX;
             private static final String JOB_ID = JOBS_PREFIX + "/{jobId}";
             public static final String DELETE_JOB = JOB_ID;
+        }
+
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        public static class Models {
+            public static final String TRAIN = JOBS_PREFIX + AppRoutes.Projects.BY_ID + "/models/train";
         }
     }
 

@@ -14,16 +14,16 @@
   >
     <template v-slot:afterItems>
       <v-stepper-content step="3">
+        <file-format-alert />
         <generic-file-selector
           v-if="selectedVersion !== undefined"
           v-model="selectedFiles"
           data-cy="input-files-version"
         />
-        <file-format-alert />
-        <v-switch
+        <generic-switch
           v-model="replaceAllArtifacts"
           label="Replace all artifacts"
-          class="ml-1"
+          class="ml-4"
         />
       </v-stepper-content>
     </template>
@@ -35,7 +35,11 @@ import Vue from "vue";
 import { IdentifierModel, VersionModel } from "@/types";
 import { logStore, projectStore } from "@/hooks";
 import { handleUploadProjectVersion } from "@/api";
-import { GenericFileSelector, FileFormatAlert } from "@/components/common";
+import {
+  GenericFileSelector,
+  FileFormatAlert,
+  GenericSwitch,
+} from "@/components/common";
 import ProjectVersionStepperModal from "./ProjectVersionStepperModal.vue";
 
 /**
@@ -46,6 +50,7 @@ import ProjectVersionStepperModal from "./ProjectVersionStepperModal.vue";
 export default Vue.extend({
   name: "UploadNewVersionModal",
   components: {
+    GenericSwitch,
     FileFormatAlert,
     GenericFileSelector,
     ProjectVersionStepperModal,

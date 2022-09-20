@@ -13,24 +13,40 @@
         value="Select which sets of artifact types that you would like to generate links between."
       />
       <flex-box
-        y="2"
+        full-width
+        y="4"
         align="center"
         v-for="(matrix, idx) in matrices"
         :key="idx"
       >
-        <gen-method-input v-model="matrix.method" />
-        <artifact-type-input
-          hide-details
-          v-model="matrix.source"
-          label="Source Type"
-          class="mr-2"
-        />
-        <artifact-type-input
-          hide-details
-          v-model="matrix.target"
-          label="Target Type"
-          class="mr-2"
-        />
+        <flex-box column full-width>
+          <flex-box b="2">
+            <artifact-type-input
+              hide-details
+              v-model="matrix.source"
+              label="Source Type"
+              class="mr-2"
+            />
+            <artifact-type-input
+              hide-details
+              v-model="matrix.target"
+              label="Target Type"
+              class="mr-2"
+            />
+          </flex-box>
+          <flex-box>
+            <generic-switch
+              :value="isCustomModel(idx)"
+              label="Use Custom Model"
+              @input="toggleCustomModel(idx)"
+            />
+            <gen-method-input
+              v-if="!isCustomModel(idx)"
+              v-model="matrix.method"
+            />
+            <custom-model-input v-else />
+          </flex-box>
+        </flex-box>
         <generic-icon-button
           icon-id="mdi-close"
           color="error"
@@ -74,6 +90,8 @@ import {
   GenericModal,
   Typography,
   GenMethodInput,
+  CustomModelInput,
+  GenericSwitch,
 } from "@/components/common";
 
 /**
@@ -84,6 +102,8 @@ import {
 export default Vue.extend({
   name: "TraceLinkGeneratorModal",
   components: {
+    GenericSwitch,
+    CustomModelInput,
     GenMethodInput,
     GenericIconButton,
     Typography,
@@ -95,6 +115,7 @@ export default Vue.extend({
     return {
       isLoading: false,
       isValid: false,
+      customModels: [] as number[],
       matrices: [
         { source: "", target: "", method: ModelType.NLBert },
       ] as GeneratedMatrixModel[],
@@ -108,6 +129,9 @@ export default Vue.extend({
       this.isValid = false;
       this.matrices = [{ source: "", target: "", method: ModelType.NLBert }];
     },
+    /**
+     * Validates that all matrices are valid on change.
+     */
     matrices: {
       deep: true,
       handler(matrices: TypeMatrixModel[]) {
@@ -126,6 +150,25 @@ export default Vue.extend({
     },
   },
   methods: {
+    /**
+     * Returns whether the model is custom.
+     * @param modelIdx - The model index to check.
+     * @return Whether it uses a custom model.
+     */
+    isCustomModel(modelIdx: number): boolean {
+      return this.customModels.includes(modelIdx);
+    },
+    /**
+     * Toggles whether a model is set to custom.
+     * @param modelIdx - The model index to toggle.
+     */
+    toggleCustomModel(modelIdx: number): void {
+      if (this.isCustomModel(modelIdx)) {
+        this.customModels = this.customModels.filter((idx) => idx !== modelIdx);
+      } else {
+        this.customModels.push(modelIdx);
+      }
+    },
     /**
      * Creates a new trace matrix.
      */

@@ -36,7 +36,8 @@
         v-model="editingDocument.artifactIds"
         data-cy="input-document-artifacts"
       />
-      <v-switch
+      <generic-switch
+        class="ml-1"
         label="Include artifact children"
         v-model="includeChildren"
         data-cy="button-document-include-children"
@@ -93,6 +94,7 @@ import {
   ArtifactInput,
   GenericModal,
   ArtifactTypeInput,
+  GenericSwitch,
 } from "@/components/common";
 
 /**
@@ -102,7 +104,7 @@ import {
  */
 export default Vue.extend({
   name: "DocumentModal",
-  components: { ArtifactTypeInput, GenericModal, ArtifactInput },
+  components: { GenericSwitch, ArtifactTypeInput, GenericModal, ArtifactInput },
   props: {
     isOpen: Boolean,
     document: {

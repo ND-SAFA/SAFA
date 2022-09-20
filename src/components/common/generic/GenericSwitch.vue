@@ -1,5 +1,5 @@
 <template>
-  <v-switch v-model="switchValue" :label="label" class="generic-switch" />
+  <v-switch inset v-model="switchValue" :label="label" class="mr-2" />
 </template>
 
 <script lang="ts">

@@ -13,7 +13,11 @@
     @refresh="handleRefresh"
   >
     <template v-slot:addItemDialogue>
-      <model-creator-modal :model="currentItem" :is-open="isModalOpen" />
+      <model-creator-modal
+        :model="currentItem"
+        :is-open="isModalOpen"
+        @close="isModalOpen = false"
+      />
     </template>
     <template v-slot:expanded-item="{ item }">
       <div class="my-2">

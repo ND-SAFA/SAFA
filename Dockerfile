@@ -67,11 +67,11 @@ RUN chmod +x start.sh
 # COPY application-credentials.json /app/
 
 # Step - Environment variables
-ENV DEPLOYMENT_TYPE=local
+ENV DEPLOYMENT_TYPE=development
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
-ENV TRANSFORMERS_CACHE=/model-cache/
-ENV MNT_DIR=/tgen
+ENV TRANSFORMERS_CACHE=/gcp/model-cache/
+ENV MNT_DIR=/gcp/
 
 # Step - Run commands
 EXPOSE 80

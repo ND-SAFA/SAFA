@@ -3,15 +3,35 @@ from copy import deepcopy
 from typing import Dict
 
 from django.http.request import HttpRequest
-from django.http.response import JsonResponse
+from django.http.response import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
 from common.api.job_response import JobResponse
 from common.api.prediction_request import PredictionRequest
+from common.models.model_generator import ModelGenerator
 from common.storage.safa_storage import SafaStorage
 from server.job_type import JobType
 from trace.config.constants import VALIDATION_PERCENTAGE_DEFAULT
 from trace.jobs.trace_args_builder import TraceArgsBuilder
+
+
+@csrf_exempt
+def create_model(request: HttpRequest) -> HttpResponse:
+    body = _request_to_dict(request)
+    base_class_name = body["base_class_name"]
+    model_path = body["model_path"]
+    output_path = body["output_path"]
+    new_model_path = SafaStorage.add_mount_directory(output_path)
+    model_generator = ModelGenerator(base_class_name, model_path)
+    print("Loading model...")
+    model = model_generator.get_model()
+    print("Saving model...")
+    model.save_pretrained(new_model_path)
+    print("Loading tokenizer...")
+    tokenizer = model_generator.get_tokenizer()
+    print("Saving tokenizer")
+    tokenizer.save_pretrained(new_model_path)
+    return HttpResponse()
 
 
 @csrf_exempt
@@ -24,6 +44,7 @@ def predict(request: HttpRequest) -> JsonResponse:
     return _run_job(request, JobType.PREDICT)
 
 
+@csrf_exempt
 def fine_tune(request: HttpRequest) -> JsonResponse:
     """
     For fine-tuning a model on project data

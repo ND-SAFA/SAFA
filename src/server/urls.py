@@ -27,4 +27,5 @@ urlpatterns = [
     path('', homePageView),
     path('predict/', views.predict),
     path('fine-tune/', views.fine_tune),
+    path('models/', views.create_model)
 ]

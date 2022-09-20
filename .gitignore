@@ -1,6 +1,8 @@
 # Python
 /**/venv
 /**/__pycache__
+cache
+storage
 
 # IDEs
 .idea

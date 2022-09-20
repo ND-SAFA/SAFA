@@ -148,7 +148,6 @@ public class AppRoutes {
             + "/versions/{versionId}/warnings";
     }
 
-
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class TraceMatrix {
         public static final String GET_TRACE_MATRICES = Projects.ROOT + "/{projectId}/matrices";

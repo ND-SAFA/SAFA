@@ -63,8 +63,8 @@ public class ModelService implements IAppEntityService<ModelAppEntity> {
      * @return The list of models.
      */
     public List<ModelAppEntity> getProjectModels(Project project) {
-        return this.modelRepository.
-            findByProject(project)
+        return this.modelRepository
+            .findByProject(project)
             .stream()
             .map(ModelAppEntity::new)
             .collect(Collectors.toList());

@@ -14,6 +14,7 @@ public interface ITraceLinkGeneration {
      * Generates trace links between each source and target artifact pair.
      *
      * @param statePath       Path to the state of model.
+     * @param loadFromStorage Whether statePath reference cloud storage.
      * @param sourceArtifacts List of source artifacts.
      * @param targetArtifacts List o target artifacts.
      * @return List of generated trace links.

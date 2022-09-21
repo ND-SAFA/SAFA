@@ -80,4 +80,13 @@ public interface JiraConnectionService {
     JiraIssuesResponseDTO retrieveUpdatedJIRAIssues(JiraAccessCredentials credentials,
                                                     Long jiraProjectId,
                                                     Date timestamp);
+
+    /**
+     * Check whether the 'ADMINISTER_PROJECTS' permissions is set for a given user and project id.
+     *
+     * @param credentials   The credentials of the user accessing JIRA.
+     * @param jiraProjectId The JIRA project id.
+     * @return A flag indicating the permission existence.
+     */
+    boolean checkUserCanViewProjectIssues(JiraAccessCredentials credentials, Long jiraProjectId);
 }

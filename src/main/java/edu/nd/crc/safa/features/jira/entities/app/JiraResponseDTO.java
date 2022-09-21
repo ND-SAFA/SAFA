@@ -21,7 +21,8 @@ public class JiraResponseDTO<T> {
         UPDATED("updated"),
         OK("ok"),
         ERROR("error"),
-        IMPORTED("imported");
+        IMPORTED("imported"),
+        CANNOT_PARSE_PROJECT("cannot parse project");
 
         private final String value;
     }

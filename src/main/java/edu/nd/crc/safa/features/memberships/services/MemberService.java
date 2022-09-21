@@ -79,6 +79,7 @@ public class MemberService implements IAppEntityService<ProjectMemberAppEntity> 
             && projectMemberships.get(0).getMember().getEmail().equals(newMemberEmail)) {
             throw new SafaError("Unable to edit permission of only member of project.");
         }
+        long nOwners = projectMemberships.stream().filter(pm -> pm.getRole().equals(ProjectRole.OWNER)).count();
 
         // Step - Validate current user
         validateCurrentUserPermissions(newMemberRole, currentUser, projectMemberships);
@@ -89,6 +90,9 @@ public class MemberService implements IAppEntityService<ProjectMemberAppEntity> 
         ProjectMembership updatedProjectMembership;
         if (projectMembershipQuery.isPresent()) {
             ProjectMembership existingProjectMembership = projectMembershipQuery.get();
+            if (existingProjectMembership.getRole().equals(ProjectRole.OWNER) && nOwners == 1) {
+                throw new SafaError("Cannot edit role of last project owner.");
+            }
             existingProjectMembership.setRole(newMemberRole);
             updatedProjectMembership = existingProjectMembership;
         } else {

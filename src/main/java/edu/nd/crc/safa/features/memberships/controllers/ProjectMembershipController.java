@@ -91,8 +91,14 @@ public class ProjectMembershipController extends BaseController {
             .getMemberService()
             .getMembershipById(projectMembershipId);
 
-        // Step - Verify user has sufficient permissions
+        // Step - Verify last member not being deleted.
         Project project = projectMembership.getProject();
+        List<ProjectMembership> projectMemberships = this.serviceProvider.getMemberService().getProjectMembers(project);
+        if (projectMemberships.size() == 1) {
+            throw new SafaError("Cannot delete last member of project.");
+        }
+
+        // Step - Verify user has sufficient permissions
         this.resourceBuilder.setProject(project).withEditProject();
 
         // Step - Delete membership

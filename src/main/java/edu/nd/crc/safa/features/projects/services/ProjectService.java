@@ -8,7 +8,7 @@ import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.features.memberships.entities.app.ProjectMemberAppEntity;
 import edu.nd.crc.safa.features.memberships.entities.db.ProjectMembership;
 import edu.nd.crc.safa.features.memberships.repositories.ProjectMembershipRepository;
-import edu.nd.crc.safa.features.projects.entities.app.ProjectIdentifier;
+import edu.nd.crc.safa.features.projects.entities.app.ProjectIdAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.repositories.ProjectRepository;
@@ -49,7 +49,7 @@ public class ProjectService {
      *
      * @return List of projects where given user has access to.
      */
-    public List<ProjectIdentifier> getProjectsForCurrentUser() {
+    public List<ProjectIdAppEntity> getProjectsForCurrentUser() {
         SafaUser user = this.safaUserService.getCurrentUser();
         return this.projectMembershipRepository
             .findByMember(user)
@@ -60,7 +60,7 @@ public class ProjectService {
                     .stream()
                     .map(ProjectMemberAppEntity::new)
                     .collect(Collectors.toList());
-                return new ProjectIdentifier(project, members);
+                return new ProjectIdAppEntity(project, members);
             })
             .collect(Collectors.toList());
     }

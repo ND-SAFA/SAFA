@@ -9,7 +9,7 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
-import edu.nd.crc.safa.features.projects.entities.app.ProjectIdentifier;
+import edu.nd.crc.safa.features.projects.entities.app.ProjectIdAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
@@ -80,7 +80,7 @@ public class ProjectController extends BaseController {
      * @return List of project identifiers.
      */
     @GetMapping(AppRoutes.Projects.Membership.GET_USER_PROJECTS)
-    public List<ProjectIdentifier> getUserProjects() {
+    public List<ProjectIdAppEntity> getUserProjects() {
         return this.serviceProvider.getProjectService().getProjectsForCurrentUser();
     }
 

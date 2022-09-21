@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.features.users.services;
 
+import java.util.Optional;
 import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.authentication.SafaUserDetails;
@@ -65,5 +66,19 @@ public class SafaUserService {
         } else {
             throw new SafaError("Given password does not match our records");
         }
+    }
+
+    /**
+     * Retrieves user with given email or throws error otherwise.
+     *
+     * @param email The email of the user to retrieve.
+     * @return The user queried for
+     */
+    public SafaUser getUserByEmail(String email) {
+        Optional<SafaUser> newMemberQuery = this.safaUserRepository.findByEmail(email);
+        if (newMemberQuery.isEmpty()) {
+            throw new SafaError("No user exists with given email: %s.", email);
+        }
+        return newMemberQuery.get();
     }
 }

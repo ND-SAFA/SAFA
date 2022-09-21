@@ -87,13 +87,14 @@ export async function handleGenerateLinks(
       `Generating trace links, you will receive a notification when complete.`
     );
 
-    for (const { source, target, method } of matrices) {
+    for (const { source, target, method, model } of matrices) {
       const sourceArtifacts = artifactStore.getArtifactsByType[source] || [];
       const targetArtifacts = artifactStore.getArtifactsByType[target] || [];
       const job = await createGeneratedLinks({
         sourceArtifacts,
         targetArtifacts,
         method,
+        model,
         projectVersion: projectStore.version,
       });
 

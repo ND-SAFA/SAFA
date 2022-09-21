@@ -178,6 +178,11 @@ export default Vue.extend({
     linkMenuItems(): ButtonMenuItem[] {
       return [
         {
+          name: "Train Custom Models",
+          tooltip: "Train your project's models to improve their performance.",
+          onClick: () => appStore.openTraceLinkGenerator("train"),
+        },
+        {
           name: "Approve Generated Trace Links",
           tooltip: "Review automatically created graph links",
           onClick: () => navigateTo(Routes.TRACE_LINK, getParams()),
@@ -185,7 +190,7 @@ export default Vue.extend({
         {
           name: "Generate New Trace Links",
           tooltip: "Generate new trace links within the current project view",
-          onClick: () => appStore.toggleTraceLinkGenerator(),
+          onClick: () => appStore.openTraceLinkGenerator("generate"),
         },
       ];
     },

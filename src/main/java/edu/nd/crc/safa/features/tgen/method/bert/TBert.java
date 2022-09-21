@@ -58,16 +58,33 @@ public abstract class TBert implements ITraceLinkGeneration {
                 ModelCreationRequest.class);
     }
 
+    @Override
+    public List<TraceAppEntity> generateLinksWithBaselineState(
+        List<ArtifactAppEntity> sources,
+        List<ArtifactAppEntity> targets) {
+        return this.generateLinksWithState(this.getBertMethodIdentifier().getModelPath(),
+            sources,
+            targets);
+    }
+
     /**
-     * Generates trace link predictions for each source and target pair of artifacts.
+     * Generates trace link predictions for each pair of source and target artifacts.
      *
-     * @param sources The source artifacts.
-     * @param targets The target artifacts.
+     * @param statePath The path to the initial model state.
+     * @param sources   The source artifacts.
+     * @param targets   The target artifacts.
      * @return List of generated trace links.
      */
-    public List<TraceAppEntity> generateLinks(List<ArtifactAppEntity> sources, List<ArtifactAppEntity> targets) {
+    public List<TraceAppEntity> generateLinksWithState(
+        String statePath,
+        List<ArtifactAppEntity> sources,
+        List<ArtifactAppEntity> targets) {
         // Step - Build request
-        TGenPredictionRequestDTO payload = createTraceGenerationPayload(sources, targets);
+        TGenPredictionRequestDTO payload = createTraceGenerationPayload(
+            statePath,
+            sources,
+            targets);
+        System.out.println("Prediction payload" + payload);
 
         // Step - Send request
         String predictEndpoint = TBertConfig.get().getPredictEndpoint();
@@ -120,12 +137,14 @@ public abstract class TBert implements ITraceLinkGeneration {
             )).collect(Collectors.toList());
     }
 
-    private TGenPredictionRequestDTO createTraceGenerationPayload(List<ArtifactAppEntity> sources,
-                                                                  List<ArtifactAppEntity> targets) {
+    private TGenPredictionRequestDTO createTraceGenerationPayload(
+        String statePath,
+        List<ArtifactAppEntity> sources,
+        List<ArtifactAppEntity> targets) {
         BertMethodIdentifier methodId = this.getBertMethodIdentifier();
         return new TGenPredictionRequestDTO(
             methodId.getBaseModel(),
-            methodId.getModelPath(),
+            statePath,
             createArtifactPayload(sources),
             createArtifactPayload(targets));
     }

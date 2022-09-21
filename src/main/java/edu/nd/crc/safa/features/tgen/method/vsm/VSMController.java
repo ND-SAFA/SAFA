@@ -20,6 +20,14 @@ import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 public class VSMController implements ITraceLinkGeneration {
     private Map<String, Double> idf;
 
+    @Override
+    public List<TraceAppEntity> generateLinksWithState(String statePath,
+                                                       List<ArtifactAppEntity> sourceDocs,
+                                                       List<ArtifactAppEntity> targetDocs) {
+        //Note, VSM has not state (yet).
+        return generateLinksWithBaselineState(sourceDocs, targetDocs);
+    }
+
     /**
      * Generates set of trace links between source and target pairs of artifacts using the
      * vector-space model
@@ -28,8 +36,9 @@ public class VSMController implements ITraceLinkGeneration {
      * @param targetDocs List of target artifacts.
      * @return List of trace links.
      */
-    public List<TraceAppEntity> generateLinks(List<ArtifactAppEntity> sourceDocs,
-                                              List<ArtifactAppEntity> targetDocs) {
+    @Override
+    public List<TraceAppEntity> generateLinksWithBaselineState(List<ArtifactAppEntity> sourceDocs,
+                                                               List<ArtifactAppEntity> targetDocs) {
         Map<String, Collection<String>> sourceTokens = tokenizeArtifactAppEntities(sourceDocs);
         Map<String, Collection<String>> targetTokens = tokenizeArtifactAppEntities(targetDocs);
         TraceLinkConstructor<String, TraceAppEntity> traceLinkConstructor = (s, t, score) -> new TraceAppEntity()

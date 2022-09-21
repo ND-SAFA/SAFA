@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
+import edu.nd.crc.safa.features.models.entities.ModelAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
@@ -31,7 +32,11 @@ public class TraceGenerationRequest {
     /**
      * The method to generate trace links with.
      */
-    BaseGenerationModels method = BaseGenerationModels.getDefault();
+    BaseGenerationModels method;
+    /**
+     * The model to use to generate trace links.
+     */
+    ModelAppEntity model;
     /**
      * The project version to commit them too.
      */

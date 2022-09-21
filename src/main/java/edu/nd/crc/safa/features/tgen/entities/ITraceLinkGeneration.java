@@ -13,10 +13,22 @@ public interface ITraceLinkGeneration {
     /**
      * Generates trace links between each source and target artifact pair.
      *
+     * @param statePath       Path to the state of model.
      * @param sourceArtifacts List of source artifacts.
      * @param targetArtifacts List o target artifacts.
      * @return List of generated trace links.
      */
-    List<TraceAppEntity> generateLinks(List<ArtifactAppEntity> sourceArtifacts,
-                                       List<ArtifactAppEntity> targetArtifacts);
+    List<TraceAppEntity> generateLinksWithState(String statePath,
+                                                List<ArtifactAppEntity> sourceArtifacts,
+                                                List<ArtifactAppEntity> targetArtifacts);
+
+    /**
+     * Generates trace links between source and target artifacts used default state path.
+     *
+     * @param sourceArtifacts List of source artifacts.
+     * @param targetArtifacts List of target artifacts.
+     * @return List of generated trace links.
+     */
+    List<TraceAppEntity> generateLinksWithBaselineState(List<ArtifactAppEntity> sourceArtifacts,
+                                                        List<ArtifactAppEntity> targetArtifacts);
 }

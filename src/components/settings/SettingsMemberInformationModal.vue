@@ -1,11 +1,12 @@
 <template>
   <generic-modal :is-open="isOpen" :title="title" @close="handleCancel">
     <template v-slot:body>
-      <flex-box align="center" t="4">
+      <flex-box align="center" t="4" data-cy="button-project-role">
         <v-text-field
           filled
           v-model="userEmail"
           label="User Email"
+          data-cy="settings-input-user-email"
           dense
           hide-details
           class="mr-1"
@@ -19,7 +20,12 @@
     </template>
     <template v-slot:actions>
       <v-spacer />
-      <v-btn :disabled="!validated" color="primary" @click="handleConfirm">
+      <v-btn
+        :disabled="!validated"
+        color="primary"
+        @click="handleConfirm"
+        data-cy="button-add-to-project"
+      >
         Add to Project
       </v-btn>
     </template>
@@ -27,19 +33,19 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
-import {
-  ButtonDefinition,
-  ButtonMenuItem,
-  ButtonType,
-  ListMenuDefinition,
-  IdentifierModel,
-  MembershipModel,
-  ProjectRole,
-} from "@/types";
-import { logStore } from "@/hooks";
 import { handleInviteMember } from "@/api";
-import { GenericModal, ButtonRow, FlexBox } from "@/components/common";
+import { ButtonRow, FlexBox, GenericModal } from "@/components/common";
+import { logStore } from "@/hooks";
+import {
+ButtonDefinition,
+ButtonMenuItem,
+ButtonType,
+IdentifierModel,
+ListMenuDefinition,
+MembershipModel,
+ProjectRole
+} from "@/types";
+import Vue, { PropType } from "vue";
 
 /**
  * The modal for sharing a project with a user.

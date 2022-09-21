@@ -186,6 +186,12 @@ export enum DataCy {
   typeOptionsList = "list-type-options",
   typeOptionsIconButton = "button-type-options-icon",
 
+  // Project settings
+
+  projectSettingsAddEmail = "settings-input-user-email",
+  projectSettingsAddToProjectButton = "button-add-to-project",
+  projectSettingsEditTitle = "settings-edit-project-title",
+  projectSettingsProjectRole = "button-project-role",
   // Project Documents
 
   documentSelectButton = "button-document-select-open",

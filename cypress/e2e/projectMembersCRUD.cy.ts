@@ -1,31 +1,41 @@
-import { DataCy, validUser } from "../fixtures";
+import { DataCy } from "../fixtures";
 
 describe("Project Members CRUD", () => {
   beforeEach(() => {
-    cy.visit("http://localhost:8080/settings").login(
-      validUser.email,
-      validUser.password
-    );
-
-    cy.openProjectSelector();
-
-    cy.clickButton(DataCy.stepperContinueButton);
-    cy.clickButtonWithName("submit");
-    cy.wait(100);
-
-    cy.projectSettingsSelector();
+    cy.dbResetJobs().createProjectSettings();
   });
   describe("As an owner, I can add a new member to a project", () => {
-    it.only("Cant add an invalid member", () => {
-      cy.clickButton(DataCy.settingsShareProject);
-      cy.clickButtonWithName("User Email").type("Alex Rodriguez");
+    it("Cant add an invalid member", () => {
+      cy.clickButton(DataCy.selectorAddButton)
+        .getCy(DataCy.projectSettingsAddEmail)
+        .type("Adrian Rodriguez")
+        .clickButtonWithName("Project Role")
+        .clickButtonWithName("Viewer");
+      cy.getCy(DataCy.projectSettingsAddToProjectButton).should("be.disabled");
     });
-    it("Adds a new member to a project", () => {});
+    it("Adds a new member to a project", () => {
+      cy.addingNewMember("Adrian.R6driguez@gmail.com", "Editor");
+    });
   });
-  describe.skip("As an owner, I can edit a project members permissions", () => {
-    it("Edits the permissions of a project member", () => {});
+  describe("As an owner, I can edit a project members permissions", () => {
+    it("Edits the permissions of a project member", () => {
+      cy.addingNewMember("Adrian.R6driguez@gmail.com", "Editor");
+      cy.clickButton(DataCy.selectorEditButton);
+
+      //below is the command I cant seem to find (its essentially the Project-Role button)
+      cy.clickButton(DataCy.projectSettingsProjectRole);
+      cy.clickButtonWithName("Viewer");
+    });
   });
-  describe.skip("As an owner, I can remove a member from a project", () => {
-    it("Removes a project member", () => {});
+  describe("As an owner, I can remove a member from a project", () => {
+    it("Removes a project member", () => {
+      cy.addingNewMember("Adrian.R6driguez@gmail.com", "Editor");
+
+      cy.addingNewMember("Test@test.com", "Admin");
+
+      cy.clickButton(DataCy.selectorDeleteButton).clickButtonWithName(
+        "I accept"
+      );
+    });
   });
 });

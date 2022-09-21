@@ -40,11 +40,11 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
-import { ProjectModel, MembershipModel, ProjectRole } from "@/types";
-import { sessionStore } from "@/hooks";
 import { handleDeleteMember, handleGetMembers } from "@/api";
 import { GenericSelector, Typography } from "@/components/common";
+import { sessionStore } from "@/hooks";
+import { MembershipModel, ProjectModel, ProjectRole } from "@/types";
+import Vue, { PropType } from "vue";
 import SettingsMemberInformationModal from "./SettingsMemberInformationModal.vue";
 
 /**

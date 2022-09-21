@@ -59,10 +59,9 @@
       <div class="py-3">
         <generic-icon-button
           v-if="!minimal"
+          fab
           color="primary"
           data-cy="button-selector-add"
-          data-cy="button-share-project"
-          fab
           icon-id="mdi-plus"
           tooltip="Create"
           @click="$emit('item:add')"
@@ -73,9 +72,9 @@
 </template>
 
 <script lang="ts">
+import FlexBox from "@/components/common/display/FlexBox.vue";
 import Vue, { PropType } from "vue";
 import { DataItemProps, DataTableHeader } from "vuetify";
-import FlexBox from "@/components/common/display/FlexBox.vue";
 import GenericIconButton from "./GenericIconButton.vue";
 
 /**

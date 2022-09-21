@@ -409,5 +409,19 @@ declare namespace Cypress {
      * Opens the project settings modal.
      */
     projectSettingsSelector(): Chainable<void>;
+
+    /**
+     * Adds New member into a project.
+     * Must be in project settings.
+     * @param name - Input email of new member.
+     * @param projectRole - Input project role such as "owner", "Editor", "Viewer", "Admin"
+     */
+    addingNewMember(name: string, projectRole: string): Chainable<void>;
+
+    /**
+     * Logs into the create project page, uploads a project, and waits for it to complete.
+     * Goes into the Project Settings
+     */
+    createProjectSettings(): Chainable<void>;
   }
 }

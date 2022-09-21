@@ -14,6 +14,7 @@
     <project-identifier-modal
       title="Edit Project"
       :is-open="isEditOpen"
+      data-cy="settings-edit-project-title"
       v-bind:project.sync="projectToEdit"
       :is-loading="isEditLoading"
       @close="isEditOpen = false"

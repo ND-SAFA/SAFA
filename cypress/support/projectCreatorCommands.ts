@@ -1,8 +1,8 @@
 import {
   DataCy,
-  simpleProjectFilesMap,
-  testProject,
   miniProjectFiles,
+  simpleProjectFilesMap,
+  testProject
 } from "../fixtures";
 import { validUser } from "../fixtures/data/user.json";
 
@@ -91,4 +91,30 @@ Cypress.Commands.add("loadNewProject", () => {
     .should("contain.text", "Completed");
 
   cy.logout();
+});
+
+Cypress.Commands.add("createProjectSettings", () => {
+  cy.visit("/create")
+    .login(validUser.email, validUser.password)
+    .location("pathname", { timeout: 5000 })
+    .should("equal", "/create");
+
+  cy.createBulkProject()
+    .getCy(DataCy.jobStatus, "first", 20000)
+    .should("contain.text", "Completed");
+  cy.clickButtonWithName("View Project")
+    .clickButton(DataCy.navProjectButton)
+    .clickButtonWithName("Project Settings");
+});
+
+Cypress.Commands.add("addingNewMember", (name, projectRole) => {
+  cy.clickButton(DataCy.selectorAddButton);
+  cy.getCy(DataCy.projectSettingsAddEmail).type(name);
+  cy.clickButtonWithName("Project Role");
+  cy.clickButtonWithName(projectRole);
+  cy.clickButtonWithName("Add to project");
+});
+
+Cypress.Commands.add("projectSettingsSelector", () => {
+  cy.clickButtonWithName("Project").clickButtonWithName("Project Settings");
 });

@@ -33,7 +33,3 @@ Cypress.Commands.add("createNewVersion", (type) => {
     cy.clickButton(selectors[type]);
   });
 });
-
-Cypress.Commands.add("projectSettingsSelector", () => {
-  cy.clickButtonWithName("Project").clickButtonWithName("Project Settings");
-});

@@ -61,11 +61,11 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { sessionStore } from "@/hooks";
-import { navigateTo, Routes } from "@/router";
 import { handleLogout } from "@/api";
 import { Typography } from "@/components/common";
+import { sessionStore } from "@/hooks";
+import { navigateTo, Routes } from "@/router";
+import Vue from "vue";
 
 export default Vue.extend({
   name: "AccountDropdown",

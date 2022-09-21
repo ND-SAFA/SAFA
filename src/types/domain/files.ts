@@ -1,7 +1,7 @@
 /**
  * Defines a resource file.
  */
-import { ModelType } from "@/types";
+import { ModelType, TrainedModel } from "@/types";
 
 export interface ResourceModel {
   /**
@@ -34,9 +34,13 @@ export interface TraceMatrixModel extends ResourceModel, TypeMatrixModel {}
  */
 export interface GeneratedMatrixModel extends TypeMatrixModel {
   /**
-   * The model to use to generate links.
+   * The default model to use to generate links.
    */
   method: ModelType;
+  /**
+   * The custom model used to generate links.
+   */
+  model?: TrainedModel;
 }
 
 /**

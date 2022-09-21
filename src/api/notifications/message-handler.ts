@@ -113,6 +113,9 @@ async function handleDeleteChange(change: ChangeModel) {
     case EntityType.LAYOUT:
       // Never called, case here for completion.
       break;
+    case EntityType.MODELS:
+      // TODO: Delete model from store
+      break;
   }
 }
 
@@ -155,6 +158,9 @@ async function handleUpdateChange(change: ChangeModel, project: ProjectModel) {
       return handleReloadJobs();
     case EntityType.LAYOUT:
       documentStore.updateBaseLayout(project.layout);
+      break;
+    case EntityType.MODELS:
+      //TODO:Update store with updated model
       break;
   }
 }

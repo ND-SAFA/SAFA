@@ -93,7 +93,7 @@ async function handleDeleteChange(change: ChangeModel) {
       break;
     case EntityType.DOCUMENT:
       // (entityIds = document id)
-      documentStore.removeDocument(change.entityIds[0]);
+      change.entityIds.forEach((id) => documentStore.removeDocument(id));
       break;
     case EntityType.ARTIFACTS:
       // (entityIds = artifact ids)
@@ -108,13 +108,18 @@ async function handleDeleteChange(change: ChangeModel) {
       break;
     case EntityType.JOBS:
       // (entityIds = jobId)
-      jobStore.deleteJob(change.entityIds[0]);
+      change.entityIds.forEach((id) => jobStore.deleteJob(id));
       break;
     case EntityType.LAYOUT:
       // Never called, case here for completion.
       break;
     case EntityType.MODELS:
-      // TODO: Delete model from store
+      // (entityIds = modelIds)
+      projectStore.updateProject({
+        models: projectStore.models.filter(
+          ({ id }) => !change.entityIds.includes(id)
+        ),
+      });
       break;
   }
 }

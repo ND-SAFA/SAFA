@@ -22,6 +22,7 @@ public class VSMController implements ITraceLinkGeneration {
 
     @Override
     public List<TraceAppEntity> generateLinksWithState(String statePath,
+                                                       boolean loadFromStorage,
                                                        List<ArtifactAppEntity> sourceDocs,
                                                        List<ArtifactAppEntity> targetDocs) {
         //Note, VSM has not state (yet).

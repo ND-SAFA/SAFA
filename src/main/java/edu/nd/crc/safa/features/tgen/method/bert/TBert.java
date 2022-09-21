@@ -63,6 +63,7 @@ public abstract class TBert implements ITraceLinkGeneration {
         List<ArtifactAppEntity> sources,
         List<ArtifactAppEntity> targets) {
         return this.generateLinksWithState(this.getBertMethodIdentifier().getModelPath(),
+            false,
             sources,
             targets);
     }
@@ -75,24 +76,30 @@ public abstract class TBert implements ITraceLinkGeneration {
      * @param targets   The target artifacts.
      * @return List of generated trace links.
      */
+    @Override
     public List<TraceAppEntity> generateLinksWithState(
         String statePath,
+        boolean loadFromStorage,
         List<ArtifactAppEntity> sources,
         List<ArtifactAppEntity> targets) {
         // Step - Build request
         TGenPredictionRequestDTO payload = createTraceGenerationPayload(
             statePath,
+            loadFromStorage,
             sources,
             targets);
-        System.out.println("Prediction payload" + payload);
 
         // Step - Send request
         String predictEndpoint = TBertConfig.get().getPredictEndpoint();
         TGenJobResponseDTO response = this.safaRequestBuilder
             .sendPost(predictEndpoint, payload, TGenJobResponseDTO.class);
+        System.out.println("Response:" + response);
 
         // Step - Convert to response
-        TGenPredictionOutput output = getOutput(response.getOutputPath());
+        String outputPath = response.getOutputPath();
+        outputPath = outputPath.contains("/gcp") ? outputPath.replace("/gcp/", "") : outputPath;
+        System.out.println("OutputPath: " + outputPath);
+        TGenPredictionOutput output = getOutput(outputPath);
         return convertPredictionsToLinks(output.getPredictions());
     }
 
@@ -139,12 +146,14 @@ public abstract class TBert implements ITraceLinkGeneration {
 
     private TGenPredictionRequestDTO createTraceGenerationPayload(
         String statePath,
+        boolean loadFromStorage,
         List<ArtifactAppEntity> sources,
         List<ArtifactAppEntity> targets) {
         BertMethodIdentifier methodId = this.getBertMethodIdentifier();
         return new TGenPredictionRequestDTO(
             methodId.getBaseModel(),
             statePath,
+            loadFromStorage,
             createArtifactPayload(sources),
             createArtifactPayload(targets));
     }
@@ -181,6 +190,10 @@ public abstract class TBert implements ITraceLinkGeneration {
                 throw new SafaError("TBert failed while generating links: " + json.getString("exception"));
             }
             TGenPredictionOutput predictionOutput = mapper.readValue(json.toString(), TGenPredictionOutput.class);
+            System.out.println("Prediction output:" + predictionOutput);
+            if (predictionOutput.getStatus() == -1) {
+                throw new SafaError(predictionOutput.getException());
+            }
             return predictionOutput;
         } catch (InterruptedException e) {
             throw new SafaError("Interrupted while waiting for output of generated links.");

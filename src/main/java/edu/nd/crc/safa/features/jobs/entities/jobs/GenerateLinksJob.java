@@ -45,7 +45,8 @@ public class GenerateLinksJob extends CommitJob {
      * @return Job Name.
      */
     public static String getJobName(TraceGenerationRequest request) {
-        return String.format("Generating %s links with %s.", request.size(), request.getMethod());
+        String method = request.getMethod() == null ? request.getModel().getName() : request.getMethod().toString();
+        return String.format("Generating %s links with %s.", request.size(), method);
     }
 
     @IJobStep(value = "Generating links", position = 1)
@@ -70,6 +71,7 @@ public class GenerateLinksJob extends CommitJob {
             String statePath = model.getStatePath(projectVersion.getProject());
             this.generatedTraces = bertModel.generateLinksWithState(
                 statePath,
+                true,
                 sourceArtifacts,
                 targetArtifacts);
         }

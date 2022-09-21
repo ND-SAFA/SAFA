@@ -34,6 +34,8 @@ class SafaStorage:
         Adds mounting directory to given target path.
         :param target_path: The path to add mount directory to.
         """
+        if MNT_DIR == "":
+            raise Exception("Mounting directory is undefined.")
         return os.path.join(MNT_DIR, target_path) if not IS_TEST else target_path
 
     @staticmethod

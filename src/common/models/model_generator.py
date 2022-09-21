@@ -79,6 +79,7 @@ class ModelGenerator:
         :return: the Tokenizer
         """
         if self.__tokenizer is None:
+            print("Loading tokenizer from:", self.model_path)
             self.__tokenizer = AutoTokenizer.from_pretrained(self.model_path)
         return self.__tokenizer
 

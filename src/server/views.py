@@ -78,7 +78,8 @@ def _make_job_params_from_request(request_dict: Dict, add_mount=False) -> TraceA
     base_model = params.pop(PredictionRequest.BASE_MODEL)
     output_dir = params.pop(PredictionRequest.OUTPUT_DIR)
     links = _safe_pop(params, PredictionRequest.LINKS)  # optional
-    if add_mount:
+    load_from_storage = _safe_pop(params, PredictionRequest.LOAD_FROM_STORAGE, add_mount)
+    if add_mount or load_from_storage:
         model_path = SafaStorage.add_mount_directory(model_path)
     return TraceArgsBuilder(base_model, model_path, output_dir, sources, targets, links, VALIDATION_PERCENTAGE_DEFAULT,
                             **params)

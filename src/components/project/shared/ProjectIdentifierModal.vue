@@ -15,7 +15,7 @@
         data-cy-name="input-project-name-modal"
         data-cy-description="input-project-description-modal"
       />
-      <v-switch
+      <generic-switch
         style="margin-left: 80px"
         v-if="doShowUpload"
         v-model="isUploadOpen"
@@ -45,7 +45,7 @@
 import Vue, { PropType } from "vue";
 import { IdentifierModel } from "@/types";
 import { createProjectIdentifier } from "@/util";
-import { GenericModal } from "@/components/common";
+import { GenericModal, GenericSwitch } from "@/components/common";
 import ProjectFilesInput from "./ProjectFilesInput.vue";
 import ProjectIdentifierInput from "./ProjectIdentifierInput.vue";
 
@@ -58,6 +58,7 @@ import ProjectIdentifierInput from "./ProjectIdentifierInput.vue";
 export default Vue.extend({
   name: "ProjectIdentifierModal",
   components: {
+    GenericSwitch,
     GenericModal,
     ProjectIdentifierInput,
     ProjectFilesInput,

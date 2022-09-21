@@ -19,34 +19,30 @@ export async function handleUploadProjectVersion(
   setVersionIfSuccessful: boolean,
   isCompleteSet = false
 ): Promise<void> {
-  if (selectedFiles.length === 0) {
-    logStore.onWarning("Please add at least one file to upload.");
-  } else {
-    const formData = new FormData();
+  const formData = new FormData();
 
-    selectedFiles.forEach((file: File) => {
-      formData.append("files", file);
-    });
+  selectedFiles.forEach((file: File) => {
+    formData.append("files", file);
+  });
 
-    formData.append("isCompleteSet", JSON.stringify(isCompleteSet));
+  formData.append("isCompleteSet", JSON.stringify(isCompleteSet));
 
-    const uploadFlatFiles = async () => {
-      const job = await createFlatFileUploadJob(versionId, formData);
-      await handleJobSubmission(job);
-      logStore.onSuccess(`Project upload has been submitted.`);
-      return job;
-    };
+  const uploadFlatFiles = async () => {
+    const job = await createFlatFileUploadJob(versionId, formData);
+    await handleJobSubmission(job);
+    logStore.onSuccess(`Project upload has been submitted.`);
+    return job;
+  };
 
-    try {
-      appStore.onLoadStart();
-      await uploadFlatFiles();
-    } catch (e) {
-      logStore.onError(String(e));
-    } finally {
-      if (setVersionIfSuccessful) {
-        await navigateTo(Routes.UPLOAD_STATUS);
-      }
-      appStore.onLoadEnd();
+  try {
+    appStore.onLoadStart();
+    await uploadFlatFiles();
+  } catch (e) {
+    logStore.onError(String(e));
+  } finally {
+    if (setVersionIfSuccessful) {
+      await navigateTo(Routes.UPLOAD_STATUS);
     }
+    appStore.onLoadEnd();
   }
 }

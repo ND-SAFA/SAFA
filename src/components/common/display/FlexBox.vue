@@ -48,6 +48,7 @@ export default Vue.extend({
     },
     maxWidth: Number,
     fullWidth: Boolean,
+    column: Boolean,
   },
   computed: {
     /**
@@ -69,6 +70,7 @@ export default Vue.extend({
       if (this.align) classNames += ` align-${this.align}`;
       if (this.justify) classNames += ` justify-${this.justify}`;
       if (this.fullWidth) classNames += ` full-width`;
+      if (this.column) classNames += ` flex-column`;
       if (this.x) classNames += ` mx-${this.x}`;
       if (this.l) classNames += ` ml-${this.l}`;
       if (this.r) classNames += ` mr-${this.r}`;

@@ -49,7 +49,7 @@ import {
   ButtonType,
   VersionModel,
 } from "@/types";
-import { appStore, projectStore } from "@/hooks";
+import { appStore, projectStore, sessionStore } from "@/hooks";
 import {
   getParams,
   navigateTo,
@@ -100,6 +100,12 @@ export default Vue.extend({
       return projectStore.project;
     },
     /**
+     * @return Whether the current user is an editor of the current project.
+     */
+    isEditor(): boolean {
+      return sessionStore.isEditor(projectStore.project);
+    },
+    /**
      * @return The menu items for projects.
      */
     projectMenuItems(): ButtonMenuItem[] {
@@ -137,7 +143,7 @@ export default Vue.extend({
      * @return The menu items for versions.
      */
     versionMenuItems(): ButtonMenuItem[] {
-      return [
+      const options: ButtonMenuItem[] = [
         {
           name: "Change Version",
           tooltip: "Change to a different version of this project",
@@ -163,6 +169,8 @@ export default Vue.extend({
             ),
         },
       ];
+
+      return this.isEditor ? options : [options[0]];
     },
     /**
      * @return The menu items for links.
@@ -202,7 +210,9 @@ export default Vue.extend({
           menuItems: this.versionMenuItems,
         },
         {
-          isHidden: !routesWithRequiredProject.includes(this.$route.path),
+          isHidden:
+            !routesWithRequiredProject.includes(this.$route.path) ||
+            !this.isEditor,
           type: ButtonType.LIST_MENU,
           label: "Trace Links",
           buttonIsText: true,

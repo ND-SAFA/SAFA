@@ -1,7 +1,13 @@
 import { defineStore } from "pinia";
 import jwt_decode from "jwt-decode";
 
-import { AuthToken, LocalStorageKeys, SessionModel } from "@/types";
+import {
+  AuthToken,
+  IdentifierModel,
+  LocalStorageKeys,
+  ProjectRole,
+  SessionModel,
+} from "@/types";
 import { createSession } from "@/util";
 import { pinia } from "@/plugins";
 import logStore from "./useLog";
@@ -103,6 +109,38 @@ export const useSession = defineStore("session", {
         LocalStorageKeys.SESSION_TOKEN,
         JSON.stringify(this.session)
       );
+    },
+    /**
+     * @return Whether the current user owns this project.
+     */
+    isOwner(project: IdentifierModel): boolean {
+      const member = project.members.find(
+        (member) => member.email === this.userEmail
+      );
+
+      return !!member && member.role === ProjectRole.OWNER;
+    },
+    /**
+     * @return Whether the current user can administrate this project.
+     */
+    isAdmin(project: IdentifierModel): boolean {
+      const member = project.members.find(
+        (member) => member.email === this.userEmail
+      );
+
+      return (
+        !!member && [ProjectRole.OWNER, ProjectRole.ADMIN].includes(member.role)
+      );
+    },
+    /**
+     * @return Whether the current user can edit this project.
+     */
+    isEditor(project: IdentifierModel): boolean {
+      const member = project.members.find(
+        (member) => member.email === this.userEmail
+      );
+
+      return !!member && member.role !== ProjectRole.VIEWER;
     },
   },
 });

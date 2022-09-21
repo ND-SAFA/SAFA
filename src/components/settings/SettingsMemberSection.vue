@@ -41,8 +41,8 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { ProjectModel, MembershipModel, ProjectRole } from "@/types";
-import { sessionStore } from "@/hooks";
+import { MembershipModel, ProjectModel, ProjectRole } from "@/types";
+import { logStore, sessionStore } from "@/hooks";
 import { handleDeleteMember, handleGetMembers } from "@/api";
 import { GenericSelector, Typography } from "@/components/common";
 import SettingsMemberInformationModal from "./SettingsMemberInformationModal.vue";
@@ -77,12 +77,7 @@ export default Vue.extend({
      * @return Whether the current user is an admin.
      */
     isAdmin(): boolean {
-      const userEmail = sessionStore.userEmail;
-      const allowedRoles = [ProjectRole.ADMIN, ProjectRole.OWNER];
-      const userQuery = this.project.members.filter(
-        (m) => m.email === userEmail && allowedRoles.includes(m.role)
-      );
-      return userQuery.length === 1;
+      return sessionStore.isAdmin(this.project);
     },
     /**
      * @return All project members.
@@ -120,7 +115,15 @@ export default Vue.extend({
      * @param member - The member to delete.
      */
     handleDeleteMember(member: MembershipModel): void {
-      handleDeleteMember(member);
+      if (
+        member.role === ProjectRole.OWNER &&
+        this.members.filter(({ role }) => role === ProjectRole.OWNER).length ===
+          1
+      ) {
+        logStore.onInfo("You cannot delete the only owner of this project.");
+      } else {
+        handleDeleteMember(member);
+      }
     },
     /**
      * Closes the add member modal.

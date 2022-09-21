@@ -14,13 +14,14 @@
           @click="handleViewBody"
         />
         <generic-icon-button
-          v-if="!selectedArtifact.logicType"
+          v-if="isEditor && !selectedArtifact.logicType"
           tooltip="Edit"
           icon-id="mdi-pencil"
           data-cy="button-selected-edit"
           @click="handleEditArtifact"
         />
         <generic-icon-button
+          v-if="isEditor"
           color="error"
           tooltip="Delete"
           icon-id="mdi-delete"
@@ -57,7 +58,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { PanelType } from "@/types";
-import { appStore, selectionStore } from "@/hooks";
+import { appStore, projectStore, selectionStore, sessionStore } from "@/hooks";
 import { handleDeleteArtifact } from "@/api";
 import { GenericIconButton, Typography } from "@/components/common";
 import FlexBox from "@/components/common/display/FlexBox.vue";
@@ -106,6 +107,12 @@ export default Vue.extend({
      */
     isCodeDisplay(): boolean {
       return this.selectedArtifact?.type.includes("code") || false;
+    },
+    /**
+     * @return Whether the current user is an editor of the current project.
+     */
+    isEditor(): boolean {
+      return sessionStore.isEditor(projectStore.project);
     },
   },
   methods: {

@@ -28,7 +28,7 @@ Cypress.Commands.add(
   }) => {
     if (name === undefined) name = `New ${Math.random()}`;
 
-    cy.clickButton(DataCy.documentIncludeChildrenToggle, undefined, true);
+    cy.clickButton(DataCy.documentIncludeChildrenToggle);
     cy.inputText(DataCy.documentNameInput, name);
 
     if (type) {

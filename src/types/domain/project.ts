@@ -1,11 +1,12 @@
 import {
-  LayoutPositionsModel,
+  ArtifactModel,
   ArtifactTypeModel,
-  WarningModel,
+  DocumentModel,
+  LayoutPositionsModel,
   MembershipModel,
   TraceLinkModel,
-  ArtifactModel,
-  DocumentModel,
+  TrainedModel,
+  WarningModel,
 } from "@/types";
 
 /**
@@ -102,6 +103,10 @@ export interface ProjectModel extends IdentifierModel {
    * Map of artifact ids to their position in the default graph.
    */
   layout: LayoutPositionsModel;
+  /**
+   * List of trained project models.
+   */
+  models: TrainedModel[];
 }
 
 export type VersionType = "major" | "minor" | "revision";

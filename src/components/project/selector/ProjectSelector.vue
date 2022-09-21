@@ -47,7 +47,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { DataItem, IdentifierModel, ProjectRole } from "@/types";
+import { DataItem, IdentifierModel } from "@/types";
 import { logStore, sessionStore } from "@/hooks";
 import { getProjects, handleDeleteProject, handleSaveProject } from "@/api";
 import { GenericSelector } from "@/components/common";
@@ -140,15 +140,10 @@ export default Vue.extend({
      * @returns The indexes that the current user has delete permissions for.
      */
     getDeletableProjects(): number[] {
-      const userEmail = sessionStore.userEmail;
-
       return this.projects
-        .map((project, projectIndex) => {
-          const adminMember = project.members.find(
-            (m) => m.email === userEmail && m.role === ProjectRole.OWNER
-          );
-          return adminMember ? projectIndex : -1;
-        })
+        .map((project, projectIndex) =>
+          sessionStore.isAdmin(project) ? projectIndex : -1
+        )
         .filter((idx) => idx !== -1);
     },
     /**

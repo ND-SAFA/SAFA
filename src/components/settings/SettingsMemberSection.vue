@@ -77,12 +77,7 @@ export default Vue.extend({
      * @return Whether the current user is an admin.
      */
     isAdmin(): boolean {
-      const userEmail = sessionStore.userEmail;
-      const allowedRoles = [ProjectRole.ADMIN, ProjectRole.OWNER];
-      const userQuery = this.project.members.filter(
-        (m) => m.email === userEmail && allowedRoles.includes(m.role)
-      );
-      return userQuery.length === 1;
+      return sessionStore.isAdmin(this.project);
     },
     /**
      * @return All project members.

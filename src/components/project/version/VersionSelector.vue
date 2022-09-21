@@ -9,6 +9,7 @@
     :is-loading="isLoading"
     :minimal="minimal"
     :has-edit="false"
+    :has-add="showAdd"
     :can-delete-last-item="false"
     data-cy="table-version"
     @item:select="handleSelectVersion"
@@ -37,8 +38,8 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { IdentifierModel, VersionModel, DataItem } from "@/types";
-import { projectStore } from "@/hooks";
+import { IdentifierModel, VersionModel, DataItem, ProjectRole } from "@/types";
+import { projectStore, sessionStore } from "@/hooks";
 import { getProjectVersions, handleDeleteVersion } from "@/api";
 import { GenericSelector } from "@/components/common";
 import ConfirmVersionDelete from "./ConfirmVersionDelete.vue";
@@ -134,6 +135,12 @@ export default Vue.extend({
             ({ versionId }) => versionId !== projectStore.versionId
           )
         : this.versions;
+    },
+    /**
+     * @return Whether to allow this user to add a version.
+     */
+    showAdd(): boolean {
+      return sessionStore.isEditor(this.project);
     },
   },
   methods: {

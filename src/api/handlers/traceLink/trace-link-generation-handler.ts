@@ -3,6 +3,8 @@ import {
   FlatTraceLink,
   GeneratedMatrixModel,
   IOHandlerCallback,
+  TraceType,
+  TrainedModel,
 } from "@/types";
 import {
   approvalStore,
@@ -10,9 +12,11 @@ import {
   artifactStore,
   logStore,
   projectStore,
+  traceStore,
 } from "@/hooks";
 import {
   createGeneratedLinks,
+  createModelTraining,
   getGeneratedLinks,
   handleJobSubmission,
 } from "@/api";
@@ -83,10 +87,6 @@ export async function handleGenerateLinks(
     .join(", ");
 
   try {
-    logStore.onInfo(
-      `Generating trace links, you will receive a notification when complete.`
-    );
-
     for (const { source, target, method, model } of matrices) {
       const sourceArtifacts = artifactStore.getArtifactsByType[source] || [];
       const targetArtifacts = artifactStore.getArtifactsByType[target] || [];
@@ -106,6 +106,54 @@ export async function handleGenerateLinks(
     onSuccess?.();
   } catch (e) {
     logStore.onError(`Unable to generate new trace links: ${matricesName}`);
+    onError?.(e as Error);
+  }
+}
+
+/**
+ * Trains models on created trace links.
+ *
+ * @param model - The model to train.
+ * @param matrices - An array of source and target artifact types to train on traces between.
+ * @param onSuccess - Called if the action is successful.
+ * @param onError - Called if the action fails.
+ */
+export async function handleTrainModel(
+  model: TrainedModel,
+  matrices: GeneratedMatrixModel[],
+  { onSuccess, onError }: IOHandlerCallback
+): Promise<void> {
+  const matricesName = matrices
+    .map(({ source, target }) => `${source} -> ${target}`)
+    .join(", ");
+
+  try {
+    for (const { source, target } of matrices) {
+      const sources = artifactStore.getArtifactsByType[source] || [];
+      const targets = artifactStore.getArtifactsByType[target] || [];
+      const traces = traceStore.allTraces.filter(
+        ({ sourceId, targetId, approvalStatus, traceType }) =>
+          !!sources.find(({ id }) => id === sourceId) &&
+          !!targets.find(({ id }) => id === targetId) &&
+          (traceType === TraceType.MANUAL ||
+            approvalStatus === ApprovalType.APPROVED)
+      );
+      const job = await createModelTraining({
+        projectId: projectStore.projectId,
+        sources,
+        targets,
+        traces,
+        model,
+      });
+
+      await handleJobSubmission(job);
+    }
+    logStore.onInfo(
+      `Started training model on: ${matricesName}. You'll receive a notification once complete.`
+    );
+    onSuccess?.();
+  } catch (e) {
+    logStore.onError(`Unable to train model on: ${matricesName}`);
     onError?.(e as Error);
   }
 }

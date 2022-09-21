@@ -10,8 +10,10 @@ import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.jobs.entities.IJobStep;
 import edu.nd.crc.safa.features.jobs.entities.app.CommitJob;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
+import edu.nd.crc.safa.features.models.entities.ModelAppEntity;
 import edu.nd.crc.safa.features.tgen.entities.BaseGenerationModels;
 import edu.nd.crc.safa.features.tgen.entities.TraceGenerationRequest;
+import edu.nd.crc.safa.features.tgen.method.bert.TBert;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 
 /**
@@ -43,7 +45,8 @@ public class GenerateLinksJob extends CommitJob {
      * @return Job Name.
      */
     public static String getJobName(TraceGenerationRequest request) {
-        return String.format("Generating %s links with %s.", request.size(), request.getMethod());
+        String method = request.getMethod() == null ? request.getModel().getName() : request.getMethod().toString();
+        return String.format("Generating %s links with %s.", request.size(), method);
     }
 
     @IJobStep(value = "Generating links", position = 1)
@@ -53,11 +56,26 @@ public class GenerateLinksJob extends CommitJob {
         }
         List<ArtifactAppEntity> sourceArtifacts = request.getSourceArtifacts();
         List<ArtifactAppEntity> targetArtifacts = request.getTargetArtifacts();
+        System.out.println("Request:" + request);
         BaseGenerationModels method = request.getMethod();
+        if (method != null) {
+            this.generatedTraces = this.serviceProvider
+                .getTraceGenerationService()
+                .generateLinksWithMethod(sourceArtifacts, targetArtifacts, method);
+        } else {
+            ModelAppEntity model = request.getModel();
+            TBert bertModel = this.serviceProvider.getBertService().getBertModel(
+                model.getBaseModel(),
+                this.serviceProvider.getSafaRequestBuilder()
+            );
+            String statePath = model.getStatePath(projectVersion.getProject());
+            this.generatedTraces = bertModel.generateLinksWithState(
+                statePath,
+                true,
+                sourceArtifacts,
+                targetArtifacts);
+        }
 
-        this.generatedTraces = this.serviceProvider
-            .getTraceGenerationService()
-            .generateLinksWithMethod(sourceArtifacts, targetArtifacts, method);
         this.projectCommit.addTraces(ModificationType.ADDED, this.generatedTraces);
     }
 }

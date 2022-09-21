@@ -12,6 +12,7 @@ import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
 import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
 import edu.nd.crc.safa.features.memberships.entities.app.ProjectMemberAppEntity;
+import edu.nd.crc.safa.features.models.entities.ModelAppEntity;
 import edu.nd.crc.safa.features.notifications.entities.Change;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
@@ -102,6 +103,12 @@ public class SyncController extends BaseController {
                     .getWarningService()
                     .retrieveWarningsInProjectVersion(projectVersion);
                 projectAppEntity.setWarnings(warnings);
+                break;
+            case MODELS:
+                List<ModelAppEntity> models = this.serviceProvider
+                    .getModelService()
+                    .getProjectModels(projectVersion.getProject());
+                projectAppEntity.setModels(models);
                 break;
             default:
                 throw new UnsupportedOperationException("Could not identify entity: " + change.getEntity());

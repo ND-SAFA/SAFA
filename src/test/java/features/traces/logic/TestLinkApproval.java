@@ -11,6 +11,7 @@ import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.tgen.entities.BaseGenerationModels;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.traces.entities.db.TraceLinkVersion;
@@ -22,7 +23,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import requests.FlatFileRequest;
-import requests.RouteBuilder;
 import requests.SafaRequest;
 
 /**
@@ -162,15 +162,13 @@ class TestLinkApproval extends AbstractTraceTest {
             targetArtifacts.add(artifactVersionRepository.retrieveAppEntityFromVersionEntity(targetBody));
         }
 
-        // Send to generate route
-        String generateRoute = RouteBuilder.withRoute(AppRoutes.Links.GENERATE_LINKS).buildEndpoint();
-
         JSONObject generateTraceLinkBody = new JSONObject();
         generateTraceLinkBody.put("sourceArtifacts", sourceArtifacts);
         generateTraceLinkBody.put("targetArtifacts", targetArtifacts);
+        generateTraceLinkBody.put("method", BaseGenerationModels.VSM);
 
         JSONArray generatedLinks = SafaRequest
-            .withRoute(generateRoute)
+            .withRoute(AppRoutes.Links.GENERATE_LINKS)
             .postWithJsonArray(generateTraceLinkBody);
 
         // VP - Verify that same number of links were generated.

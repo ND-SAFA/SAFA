@@ -67,6 +67,11 @@ public class GeneratedLinkController extends BaseController {
         List<ArtifactAppEntity> targetArtifacts = request.getTargetArtifacts();
         BaseGenerationModels method = request.getMethod();
 
+        if (request.getModel() != null) {
+            throw new IllegalArgumentException("Unable to generate links using custom models from this endpoint. "
+                + "Please use job controller endpoint.");
+        }
+
         return this.serviceProvider
             .getTraceGenerationService()
             .generateLinksWithMethod(sourceArtifacts, targetArtifacts, method);

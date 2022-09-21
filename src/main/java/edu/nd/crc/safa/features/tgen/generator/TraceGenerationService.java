@@ -58,7 +58,7 @@ public class TraceGenerationService {
                                                         List<ArtifactAppEntity> targetArtifacts,
                                                         BaseGenerationModels baseGenerationModels) {
         ITraceLinkGeneration generationMethod = buildGenerationMethod(baseGenerationModels);
-        return generationMethod.generateLinks(sourceArtifacts, targetArtifacts);
+        return generationMethod.generateLinksWithBaselineState(sourceArtifacts, targetArtifacts);
     }
 
     public List<TraceAppEntity> filterDuplicateGeneratedLinks(List<TraceAppEntity> manualLinks,

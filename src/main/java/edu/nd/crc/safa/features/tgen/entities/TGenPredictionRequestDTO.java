@@ -26,6 +26,10 @@ public class TGenPredictionRequestDTO {
      */
     String modelPath;
     /**
+     * Whether to load model state from cloud storage.
+     */
+    boolean loadFromStorage;
+    /**
      * Map of source artifact ids to content body.
      */
     Map<String, String> sources;

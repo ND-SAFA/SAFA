@@ -4,5 +4,5 @@ CREATE TABLE IF NOT EXISTS trace_generation_model
     name       varchar(255) NOT NULL,
     base_model varchar(255) NOT NULL,
     project_id varchar(255) NOT NULL,
-    FOREIGN KEY (project_id) REFERENCES project (project_id)
+    CONSTRAINT trace_generation_model_ibfk_1 FOREIGN KEY (project_id) REFERENCES project (project_id)
 );

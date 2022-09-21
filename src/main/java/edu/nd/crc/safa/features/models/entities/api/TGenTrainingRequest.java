@@ -22,7 +22,7 @@ public class TGenTrainingRequest extends TGenPredictionRequestDTO {
                                Map<String, String> sources,
                                Map<String, String> targets,
                                List<TraceAppEntity> traces) {
-        super(baseModel, modelPath, sources, targets);
+        super(baseModel, modelPath, true, sources, targets);
         this.links = traces
             .stream()
             .map(t -> List.of(t.getSourceName(), t.getTargetName()))

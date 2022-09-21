@@ -6,7 +6,9 @@ import { createModel, deleteModel, getProjectModels } from "@/api/endpoints";
  * Loads models for the current project.
  */
 export async function handleLoadModels(): Promise<void> {
-  projectStore.models = await getProjectModels(projectStore.projectId);
+  projectStore.updateProject({
+    models: await getProjectModels(projectStore.projectId),
+  });
 }
 
 /**
@@ -55,9 +57,9 @@ export function handleDeleteModel(model: TrainedModel): void {
 
         deleteModel(projectStore.projectId, model.id)
           .then(() => {
-            projectStore.models = projectStore.models.filter(
-              ({ id }) => id !== model.id
-            );
+            projectStore.updateProject({
+              models: projectStore.models.filter(({ id }) => id !== model.id),
+            });
             logStore.onSuccess(`Model has been deleted: ${model.name}`);
           })
           .catch((e) => {

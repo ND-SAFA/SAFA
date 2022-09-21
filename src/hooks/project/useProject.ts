@@ -23,10 +23,6 @@ export const useProject = defineStore("project", {
      * The currently loaded project.
      */
     project: createProject(),
-    /**
-     * The current project's models.
-     */
-    models: [] as TrainedModel[],
   }),
   getters: {
     /**
@@ -68,6 +64,12 @@ export const useProject = defineStore("project", {
       }
 
       return this.versionId;
+    },
+    /**
+     * @return The current project's models.
+     */
+    models(): TrainedModel[] {
+      return this.project.models;
     },
   },
   actions: {

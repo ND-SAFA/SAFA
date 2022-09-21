@@ -81,7 +81,7 @@ export default Vue.extend({
   },
   computed: {
     /**
-     * @return ALl project models.
+     * @return All project models.
      */
     items(): TrainedModel[] {
       return projectStore.models;

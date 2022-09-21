@@ -3,7 +3,6 @@ import { createProject } from "@/util";
 import { documentStore, subtreeStore, projectStore } from "@/hooks";
 import { QueryParams, removeParams, updateParam } from "@/router";
 import {
-  handleLoadModels,
   handleLoadTraceMatrices,
   handleLoadVersion,
   handleSelectVersion,
@@ -36,7 +35,6 @@ export async function handleSetProject(project: ProjectModel): Promise<void> {
   await handleSelectVersion(projectId, versionId);
   await handleLoadTraceMatrices();
   await setCurrentDocument(project);
-  await handleLoadModels();
   await updateParam(QueryParams.VERSION, versionId);
 }
 

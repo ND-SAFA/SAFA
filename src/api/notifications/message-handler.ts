@@ -160,7 +160,7 @@ async function handleUpdateChange(change: ChangeModel, project: ProjectModel) {
       documentStore.updateBaseLayout(project.layout);
       break;
     case EntityType.MODELS:
-      //TODO:Update store with updated model
+      projectStore.updateProject({ models: project.models });
       break;
   }
 }

@@ -44,7 +44,7 @@
               v-if="!isCustomModel(idx)"
               v-model="matrix.method"
             />
-            <custom-model-input v-else />
+            <custom-model-input v-else v-model="matrix.model" />
           </flex-box>
         </flex-box>
         <generic-icon-button
@@ -168,6 +168,9 @@ export default Vue.extend({
       } else {
         this.customModels.push(modelIdx);
       }
+
+      this.matrices[modelIdx].model = undefined;
+      this.matrices[modelIdx].method = ModelType.NLBert;
     },
     /**
      * Creates a new trace matrix.

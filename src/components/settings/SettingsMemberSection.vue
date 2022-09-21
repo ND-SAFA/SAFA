@@ -41,8 +41,8 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { ProjectModel, MembershipModel, ProjectRole } from "@/types";
-import { sessionStore } from "@/hooks";
+import { MembershipModel, ProjectModel, ProjectRole } from "@/types";
+import { logStore, sessionStore } from "@/hooks";
 import { handleDeleteMember, handleGetMembers } from "@/api";
 import { GenericSelector, Typography } from "@/components/common";
 import SettingsMemberInformationModal from "./SettingsMemberInformationModal.vue";
@@ -120,7 +120,15 @@ export default Vue.extend({
      * @param member - The member to delete.
      */
     handleDeleteMember(member: MembershipModel): void {
-      handleDeleteMember(member);
+      if (
+        member.role === ProjectRole.OWNER &&
+        this.members.filter(({ role }) => role === ProjectRole.OWNER).length ===
+          1
+      ) {
+        logStore.onInfo("You cannot delete the only owner of this project.");
+      } else {
+        handleDeleteMember(member);
+      }
     },
     /**
      * Closes the add member modal.

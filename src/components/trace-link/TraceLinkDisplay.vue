@@ -101,7 +101,7 @@
 import Vue, { PropType } from "vue";
 import { ArtifactModel, TraceLinkModel, TraceType } from "@/types";
 import { linkStatus } from "@/util";
-import { artifactStore, deltaStore } from "@/hooks";
+import { artifactStore, deltaStore, projectStore, sessionStore } from "@/hooks";
 import {
   handleApproveLink,
   handleDeclineLink,
@@ -160,16 +160,30 @@ export default Vue.extend({
       return artifactStore.getArtifactById(this.link.targetId);
     },
     /**
+     * @return Whether the current user is an editor of the current project.
+     */
+    isEditor(): boolean {
+      return sessionStore.isEditor(projectStore.project);
+    },
+    /**
      * @return Whether this link can be modified.
      */
     canBeModified(): boolean {
-      return !this.hideActions && this.link?.traceType === TraceType.GENERATED;
+      return (
+        !this.hideActions &&
+        this.link?.traceType === TraceType.GENERATED &&
+        this.isEditor
+      );
     },
     /**
      * @return Whether this link can be deleted.
      */
     showDelete(): boolean {
-      return linkStatus(this.link).canBeDeleted() && !deltaStore.inDeltaView;
+      return (
+        linkStatus(this.link).canBeDeleted() &&
+        !deltaStore.inDeltaView &&
+        this.isEditor
+      );
     },
     /**
      * @return Whether this link can be approved.

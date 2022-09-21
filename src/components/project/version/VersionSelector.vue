@@ -9,7 +9,8 @@
     :is-loading="isLoading"
     :minimal="minimal"
     :has-edit="false"
-    :has-add="showAdd"
+    :has-add="showEdit"
+    :has-delete="showEdit"
     :can-delete-last-item="false"
     data-cy="table-version"
     @item:select="handleSelectVersion"
@@ -137,9 +138,9 @@ export default Vue.extend({
         : this.versions;
     },
     /**
-     * @return Whether to allow this user to add a version.
+     * @return Whether to allow this user to add or delete a version.
      */
-    showAdd(): boolean {
+    showEdit(): boolean {
       return sessionStore.isEditor(this.project);
     },
   },

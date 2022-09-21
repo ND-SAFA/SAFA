@@ -6,6 +6,7 @@
     </span>
     <v-btn-toggle v-model="entry.iconIndex" class="my-1" borderless>
       <v-btn
+        :disabled="!allowEditing"
         v-for="option in icons"
         :key="option"
         data-cy="button-type-options-icon"
@@ -21,6 +22,7 @@
 import Vue, { PropType } from "vue";
 import { LabelledTraceDirectionModel } from "@/types";
 import { allTypeIcons } from "@/util";
+import { projectStore, sessionStore } from "@/hooks";
 import { handleSaveArtifactTypeIcon } from "@/api";
 import { Typography } from "@/components/common/display";
 
@@ -35,6 +37,14 @@ export default Vue.extend({
   },
   data() {
     return { icons: allTypeIcons };
+  },
+  computed: {
+    /**
+     * @return Whether to allow editing.
+     */
+    allowEditing(): boolean {
+      return sessionStore.isEditor(projectStore.project);
+    },
   },
   methods: {
     /**

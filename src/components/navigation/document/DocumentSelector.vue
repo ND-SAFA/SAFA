@@ -22,7 +22,7 @@
           </v-col>
           <v-col class="flex-grow-0" @click.stop="handleEditOpen(item)">
             <generic-icon-button
-              v-if="item.name !== 'Default'"
+              v-if="canEdit(item.name)"
               icon-id="mdi-dots-horizontal"
               :tooltip="`Edit ${item.name}`"
               data-cy="button-document-select-edit"
@@ -33,6 +33,7 @@
 
       <template v-slot:append-item>
         <v-btn
+          v-if="canEdit()"
           text
           block
           color="primary"
@@ -63,7 +64,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { DocumentModel } from "@/types";
-import { documentStore } from "@/hooks";
+import { documentStore, projectStore, sessionStore } from "@/hooks";
 import { handleSwitchDocuments } from "@/api";
 import { GenericIconButton, FlexBox } from "@/components/common";
 import DocumentModal from "./DocumentModal.vue";
@@ -115,6 +116,14 @@ export default Vue.extend({
     },
   },
   methods: {
+    /**
+     * Returns whether a document can be edited.
+     * @param name - The document name, or none to check for general editing ability.
+     * @return Whether editing is allowed.
+     */
+    canEdit(name = ""): boolean {
+      return name !== "Default" && sessionStore.isEditor(projectStore.project);
+    },
     /**
      * Closes the selector menu and resets all data.
      */

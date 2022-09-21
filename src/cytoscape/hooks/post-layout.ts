@@ -112,8 +112,8 @@ export const dynamicVisibilityHookForContextMenuItems = (
 
     artifactTreeMenuItems.forEach((menuItem: MenuItem) => {
       if (
-        menuItem.coreAsWell ||
-        (menuItem.isVisible !== undefined && menuItem.isVisible(artifactData))
+        menuItem.isVisible !== undefined &&
+        menuItem.isVisible(artifactData)
       ) {
         contextMenuInstance.showMenuItem(menuItem.id);
       } else {

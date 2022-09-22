@@ -6,6 +6,7 @@ import {
   TraceType,
   TrainedModel,
 } from "@/types";
+import { linkFilter } from "@/util";
 import {
   approvalStore,
   appStore,
@@ -132,11 +133,10 @@ export async function handleTrainModel(
       const sources = artifactStore.getArtifactsByType[source] || [];
       const targets = artifactStore.getArtifactsByType[target] || [];
       const traces = traceStore.allTraces.filter(
-        ({ sourceId, targetId, approvalStatus, traceType }) =>
-          !!sources.find(({ id }) => id === sourceId) &&
-          !!targets.find(({ id }) => id === targetId) &&
-          (traceType === TraceType.MANUAL ||
-            approvalStatus === ApprovalType.APPROVED)
+        linkFilter()
+          .fromSources(sources)
+          .fromTargets(targets)
+          .approvedOrManual().filter
       );
       const job = await createModelTraining({
         projectId: projectStore.projectId,

@@ -45,6 +45,11 @@
             />
             <custom-model-input v-else v-model="matrix.model" />
           </flex-box>
+          <typography
+            secondary
+            align="center"
+            :value="getMatrixDetails(matrix)"
+          />
         </flex-box>
         <generic-icon-button
           icon-id="mdi-close"
@@ -86,7 +91,8 @@ import {
   TrainedModel,
   TypeMatrixModel,
 } from "@/types";
-import { appStore } from "@/hooks";
+import { linkFilter } from "@/util";
+import { appStore, artifactStore, traceStore } from "@/hooks";
 import { handleGenerateLinks, handleTrainModel } from "@/api";
 import {
   ArtifactTypeInput,
@@ -213,6 +219,23 @@ export default Vue.extend({
 
       this.matrices[modelIdx].model = undefined;
       this.matrices[modelIdx].method = ModelType.NLBert;
+    },
+    getMatrixDetails(matrix: GeneratedMatrixModel): string {
+      const sources = artifactStore.getArtifactsByType[matrix.source] || [];
+      const targets = artifactStore.getArtifactsByType[matrix.target] || [];
+      const manual = traceStore.allTraces.filter(
+        linkFilter().fromSources(sources).fromTargets(targets).onlyManual()
+          .filter
+      );
+      const approved = traceStore.allTraces.filter(
+        linkFilter().fromSources(sources).fromTargets(targets).onlyApproved()
+          .filter
+      );
+
+      return (
+        `Source Artifacts: ${sources.length} | Target Artifacts: ${targets.length} | ` +
+        `Manual Links: ${manual.length} | Approved Links: ${approved.length}`
+      );
     },
     /**
      * Creates a new trace matrix.

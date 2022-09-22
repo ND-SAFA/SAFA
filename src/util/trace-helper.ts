@@ -109,3 +109,51 @@ export function linkStatus(traceLink?: TraceLinkModel) {
       canBeModified() && traceLink?.approvalStatus !== ApprovalType.UNREVIEWED,
   };
 }
+
+/**
+ * Returns a filter builder for filtering trace links.
+ *
+ * @param filter - The initial filter to start with, if there is one.
+ * @return filtering callbacks. `filter` will return the filter function itself.
+ */
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+export function linkFilter(
+  filter: (link: TraceLinkModel) => boolean = () => true
+) {
+  return {
+    fromSources(sources: ArtifactModel[]) {
+      return linkFilter(
+        (link) =>
+          !!sources.find(({ id }) => id === link.sourceId) && filter(link)
+      );
+    },
+    fromTargets(targets: ArtifactModel[]) {
+      return linkFilter(
+        (link) =>
+          !!targets.find(({ id }) => id === link.targetId) && filter(link)
+      );
+    },
+    onlyManual() {
+      return linkFilter(
+        (link) => link.traceType === TraceType.MANUAL && filter(link)
+      );
+    },
+    onlyApproved() {
+      return linkFilter(
+        (link) =>
+          link.traceType === TraceType.GENERATED &&
+          link.approvalStatus === ApprovalType.APPROVED &&
+          filter(link)
+      );
+    },
+    approvedOrManual() {
+      return linkFilter(
+        (link) =>
+          (link.approvalStatus === ApprovalType.APPROVED ||
+            link.traceType === TraceType.MANUAL) &&
+          filter(link)
+      );
+    },
+    filter,
+  };
+}

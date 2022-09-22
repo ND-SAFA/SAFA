@@ -24,7 +24,7 @@ public class TrainModelJob extends AbstractJob {
     }
 
     @IJobStep(value = "Training model", position = 1)
-    public void creatingTrainingData() {
+    public void trainModel() {
         TBert bertModel = this.serviceProvider.getBertService().getBertModel(
             trainingRequest.getModel().getBaseModel(),
             this.serviceProvider.getSafaRequestBuilder());

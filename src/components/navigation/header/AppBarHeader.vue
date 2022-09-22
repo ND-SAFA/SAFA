@@ -130,14 +130,9 @@ export default Vue.extend({
           tooltip: "View this project's settings",
           onClick: () => navigateTo(Routes.PROJECT_SETTINGS, getParams()),
         },
-        {
-          name: "Project Models",
-          tooltip: "View this project's models",
-          onClick: () => navigateTo(Routes.PROJECT_MODELS, getParams()),
-        },
       ];
 
-      return projectStore.projectId ? options : options.slice(0, -2);
+      return projectStore.projectId ? options : options.slice(0, -1);
     },
     /**
      * @return The menu items for versions.
@@ -178,19 +173,24 @@ export default Vue.extend({
     linkMenuItems(): ButtonMenuItem[] {
       return [
         {
-          name: "Train Custom Models",
-          tooltip: "Train your project's models to improve their performance.",
-          onClick: () => appStore.openTraceLinkGenerator("train"),
+          name: "Project Models",
+          tooltip: "View this project's models",
+          onClick: () => navigateTo(Routes.PROJECT_MODELS, getParams()),
         },
         {
-          name: "Approve Generated Trace Links",
-          tooltip: "Review automatically created graph links",
-          onClick: () => navigateTo(Routes.TRACE_LINK, getParams()),
+          name: "Train Models",
+          tooltip: "Train your project's models to improve their performance.",
+          onClick: () => appStore.openTraceLinkGenerator("train"),
         },
         {
           name: "Generate New Trace Links",
           tooltip: "Generate new trace links within the current project view",
           onClick: () => appStore.openTraceLinkGenerator("generate"),
+        },
+        {
+          name: "Approve Generated Trace Links",
+          tooltip: "Review automatically created graph links",
+          onClick: () => navigateTo(Routes.TRACE_LINK, getParams()),
         },
       ];
     },

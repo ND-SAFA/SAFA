@@ -31,7 +31,9 @@ export function handleSaveModel(
   createModel(projectStore.projectId, model)
     .then(() => {
       projectStore.models.push(model);
-      logStore.onSuccess(`Model has been saved: ${model.name}`);
+      logStore.onSuccess(
+        `Model has been saved: ${model.name}. Navigate to "Trace Links" -> "Train Models" to train your new model.`
+      );
       onSuccess?.(model);
     })
     .catch((e) => {

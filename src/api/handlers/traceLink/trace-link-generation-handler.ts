@@ -3,10 +3,8 @@ import {
   FlatTraceLink,
   GeneratedMatrixModel,
   IOHandlerCallback,
-  TraceType,
   TrainedModel,
 } from "@/types";
-import { linkFilter } from "@/util";
 import {
   approvalStore,
   appStore,
@@ -132,12 +130,10 @@ export async function handleTrainModel(
     for (const { source, target } of matrices) {
       const sources = artifactStore.getArtifactsByType[source] || [];
       const targets = artifactStore.getArtifactsByType[target] || [];
-      const traces = traceStore.allTraces.filter(
-        linkFilter()
-          .fromSources(sources)
-          .fromTargets(targets)
-          .approvedOrManual().filter
-      );
+      const traces = traceStore.getTraceLinksByArtifactSets(sources, targets, [
+        "manual",
+        "approved",
+      ]);
       const job = await createModelTraining({
         projectId: projectStore.projectId,
         sources,

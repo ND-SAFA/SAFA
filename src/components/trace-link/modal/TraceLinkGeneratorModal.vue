@@ -91,7 +91,6 @@ import {
   TrainedModel,
   TypeMatrixModel,
 } from "@/types";
-import { linkFilter } from "@/util";
 import { appStore, artifactStore, traceStore } from "@/hooks";
 import { handleGenerateLinks, handleTrainModel } from "@/api";
 import {
@@ -223,13 +222,13 @@ export default Vue.extend({
     getMatrixDetails(matrix: GeneratedMatrixModel): string {
       const sources = artifactStore.getArtifactsByType[matrix.source] || [];
       const targets = artifactStore.getArtifactsByType[matrix.target] || [];
-      const manual = traceStore.allTraces.filter(
-        linkFilter().fromSources(sources).fromTargets(targets).onlyManual()
-          .filter
-      );
-      const approved = traceStore.allTraces.filter(
-        linkFilter().fromSources(sources).fromTargets(targets).onlyApproved()
-          .filter
+      const manual = traceStore.getTraceLinksByArtifactSets(sources, targets, [
+        "manual",
+      ]);
+      const approved = traceStore.getTraceLinksByArtifactSets(
+        sources,
+        targets,
+        ["approved"]
       );
 
       return (

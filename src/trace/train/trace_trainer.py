@@ -10,7 +10,7 @@ from transformers.trainer_pt_utils import get_tpu_sampler, is_torch_tpu_availabl
 from transformers.trainer_utils import PredictionOutput
 
 from common.api.prediction_response import PredictionResponse
-from trace.config.constants import LINKED_TARGETS_ONLY_DEFAULT
+from trace.config.constants import LINKED_TARGETS_ONLY_DEFAULT, N_EPOCHS
 from trace.jobs.trace_args import TraceArgs
 from trace.metrics.supported_trace_metric import get_metric_path
 
@@ -26,6 +26,7 @@ class TraceTrainer(Trainer):
         :param args: the learning model arguments
         """
         self.args = args
+        self.args.max_steps = N_EPOCHS
         self.model_generator = args.model_generator
         self.model_generator.set_max_seq_length(self.args.max_seq_length)
         self.trace_dataset_creator = args.trace_dataset_creator

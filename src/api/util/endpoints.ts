@@ -98,6 +98,9 @@ export enum Endpoint {
   createModel = "projects/:projectId/models",
   editModel = "projects/:projectId/models/:modelId",
   deleteModel = "projects/:projectId/models/:modelId",
+
+  // Files
+  getProjectFiles = "projects/versions/:versionId/flat-files/:fileType",
 }
 
 /**

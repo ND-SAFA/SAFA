@@ -86,6 +86,23 @@ export async function updateDeclinedLink(
 }
 
 /**
+ * Declines all given links.
+ *
+ * @param traceLinks - The trace links to decline.
+ * @return The removed trace links.
+ */
+export async function updateDeclinedLinks(
+  traceLinks: TraceLinkModel[]
+): Promise<TraceLinkModel[]> {
+  traceLinks.map((link) => (link.approvalStatus = ApprovalType.DECLINED));
+
+  return CommitBuilder.withCurrentVersion()
+    .withModifiedTraceLinks(traceLinks)
+    .save()
+    .then(async ({ traces }) => traces.removed);
+}
+
+/**
  * Declines the given trace link ID.
  *
  * @param traceLink - The trace link to decline.

@@ -41,13 +41,19 @@ export function handleInviteMember(
   saveProjectMember(projectId, memberEmail, projectRole)
     .then((member) => {
       projectStore.updateProject({
-        members: [...projectStore.project.members, member],
+        members: [
+          ...projectStore.project.members.filter(
+            ({ projectMembershipId }) =>
+              member.projectMembershipId !== projectMembershipId
+          ),
+          member,
+        ],
       });
-      logStore.onSuccess(`Member added to the project: ${memberEmail}`);
+      logStore.onSuccess(`Member saved on the project: ${memberEmail}`);
       onSuccess?.();
     })
     .catch((e) => {
-      logStore.onError(`Unable to add member: ${memberEmail}`);
+      logStore.onError(`Unable save member: ${memberEmail}`);
       logStore.onDevError(e.message);
       onError?.(e);
     });

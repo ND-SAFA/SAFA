@@ -11,7 +11,10 @@
         v-model="currentSearch"
         append-icon="mdi-magnify"
       />
-      <commit-buttons color="primary" class="mt-2" />
+      <flex-box align="center">
+        <commit-buttons color="primary" class="mt-2" />
+        <slot name="bottom" />
+      </flex-box>
     </div>
     <div>
       <slot name="right" />

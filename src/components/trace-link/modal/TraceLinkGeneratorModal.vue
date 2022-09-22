@@ -186,7 +186,8 @@ export default Vue.extend({
     modalDescription(): string {
       return this.isTraining
         ? "Select which sets of artifact types that you would like to train your model on. " +
-            "All manually created or approved links will inform the model's future predictions."
+            "Make sure that all links between these artifacts are complete, as both existing and non-existing links " +
+            "will inform the model."
         : "Select which sets of artifact types that you would like to generate links between.";
     },
   },

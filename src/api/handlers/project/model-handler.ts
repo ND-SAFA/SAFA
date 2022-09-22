@@ -1,4 +1,4 @@
-import { ConfirmationType, IOHandlerCallback, TrainedModel } from "@/types";
+import { IOHandlerCallback, TrainedModel } from "@/types";
 import { logStore, projectStore } from "@/hooks";
 import { createModel, deleteModel, getProjectModels } from "@/api/endpoints";
 
@@ -49,26 +49,23 @@ export function handleSaveModel(
  * @param model - The model to create.
  */
 export function handleDeleteModel(model: TrainedModel): void {
-  logStore.$patch({
-    confirmation: {
-      type: ConfirmationType.INFO,
-      title: "Delete Model",
-      body: `Are you sure you want to delete ${model.name}?`,
-      statusCallback: (isConfirmed: boolean) => {
-        if (!isConfirmed) return;
+  logStore.confirm(
+    "Delete Model",
+    `Are you sure you want to delete ${model.name}?`,
+    async (isConfirmed) => {
+      if (!isConfirmed) return;
 
-        deleteModel(projectStore.projectId, model.id)
-          .then(() => {
-            projectStore.updateProject({
-              models: projectStore.models.filter(({ id }) => id !== model.id),
-            });
-            logStore.onSuccess(`Model has been deleted: ${model.name}`);
-          })
-          .catch((e) => {
-            logStore.onError(`Unable to delete model: ${model.name}`);
-            logStore.onDevError(e.message);
+      deleteModel(projectStore.projectId, model.id)
+        .then(() => {
+          projectStore.updateProject({
+            models: projectStore.models.filter(({ id }) => id !== model.id),
           });
-      },
-    },
-  });
+          logStore.onSuccess(`Model has been deleted: ${model.name}`);
+        })
+        .catch((e) => {
+          logStore.onError(`Unable to delete model: ${model.name}`);
+          logStore.onDevError(e.message);
+        });
+    }
+  );
 }

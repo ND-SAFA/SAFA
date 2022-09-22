@@ -1,11 +1,6 @@
 import { datadogRum } from "@datadog/browser-rum";
 
-import {
-  ConfirmationType,
-  IOHandlerCallback,
-  PasswordChangeModel,
-  UserModel,
-} from "@/types";
+import { IOHandlerCallback, PasswordChangeModel, UserModel } from "@/types";
 import { sessionStore, logStore } from "@/hooks";
 import {
   getParam,
@@ -122,16 +117,13 @@ export function handleChangePassword(
  * @param password - The user's current password.
  */
 export function handleDeleteAccount(password: string): void {
-  logStore.$patch({
-    confirmation: {
-      type: ConfirmationType.INFO,
-      title: `Delete your account?`,
-      body: `This action cannot be undone.`,
-      statusCallback: (isConfirmed: boolean) => {
-        if (!isConfirmed) return;
+  logStore.confirm(
+    "Delete your account?",
+    "This action cannot be undone.",
+    async (isConfirmed) => {
+      if (!isConfirmed) return;
 
-        deleteAccount(password).then(handleLogout);
-      },
-    },
-  });
+      deleteAccount(password).then(handleLogout);
+    }
+  );
 }

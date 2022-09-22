@@ -5,7 +5,6 @@ import {
   TraceLinkModel,
   TraceType,
   IOHandlerCallback,
-  ConfirmationType,
 } from "@/types";
 import { appStore, logStore, traceStore, approvalStore } from "@/hooks";
 import {
@@ -125,37 +124,34 @@ export async function handleDeclineLink(
  * Declines all unreviewed links, setting the app state to loading in between, and updating trace links afterwards.
  */
 export async function handleDeclineAll(): Promise<void> {
-  logStore.$patch({
-    confirmation: {
-      type: ConfirmationType.INFO,
-      title: "Clear Unreviewed Links",
-      body: `Are you sure you want to remove all unreviewed links?`,
-      statusCallback: async (isConfirmed: boolean) => {
-        if (!isConfirmed) return;
+  logStore.confirm(
+    "Clear Unreviewed Links",
+    "Are you sure you want to remove all unreviewed links?",
+    async (isConfirmed) => {
+      if (!isConfirmed) return;
 
-        const unreviewed = approvalStore.unreviewedLinks;
+      const unreviewed = approvalStore.unreviewedLinks;
 
-        try {
-          appStore.onLoadStart();
+      try {
+        appStore.onLoadStart();
 
-          await updateDeclinedLinks(unreviewed);
+        await updateDeclinedLinks(unreviewed);
 
-          traceStore.deleteTraceLinks(unreviewed);
-          unreviewed.map((link) => approvalStore.declineLink(link));
+        traceStore.deleteTraceLinks(unreviewed);
+        unreviewed.map((link) => approvalStore.declineLink(link));
 
-          logStore.onSuccess(`Removed unreviewed links: ${unreviewed.length}`);
-        } catch (e) {
-          unreviewed.map(
-            (link) => (link.approvalStatus = ApprovalType.UNREVIEWED)
-          );
+        logStore.onSuccess(`Removed unreviewed links: ${unreviewed.length}`);
+      } catch (e) {
+        unreviewed.map(
+          (link) => (link.approvalStatus = ApprovalType.UNREVIEWED)
+        );
 
-          logStore.onError(`Unable to clear all links: ${unreviewed.length}`);
-        } finally {
-          appStore.onLoadEnd();
-        }
-      },
-    },
-  });
+        logStore.onError(`Unable to clear all links: ${unreviewed.length}`);
+      } finally {
+        appStore.onLoadEnd();
+      }
+    }
+  );
 }
 
 /**

@@ -1,4 +1,4 @@
-import { ArtifactModel, ConfirmationType, IOHandlerCallback } from "@/types";
+import { ArtifactModel, IOHandlerCallback } from "@/types";
 import { artifactStore, logStore, projectStore } from "@/hooks";
 import {
   createArtifact,
@@ -88,25 +88,22 @@ export function handleDeleteArtifact(
   artifact: ArtifactModel,
   { onSuccess, onError }: IOHandlerCallback
 ): void {
-  logStore.$patch({
-    confirmation: {
-      type: ConfirmationType.INFO,
-      title: `Delete ${artifact.name}?`,
-      body: `Are you sure you would like to delete this artifact?`,
-      statusCallback: (isConfirmed: boolean) => {
-        if (!isConfirmed) return;
+  logStore.confirm(
+    "Delete Artifact",
+    `Are you sure you would like to delete "${artifact.name}"?`,
+    async (isConfirmed: boolean) => {
+      if (!isConfirmed) return;
 
-        deleteArtifact(artifact)
-          .then(() => {
-            artifactStore.deleteArtifacts([artifact]);
-            logStore.onSuccess(`Deleted artifact: ${artifact.name}`);
-            onSuccess?.();
-          })
-          .catch((e) => {
-            logStore.onError(`Unable to delete artifact: ${artifact.name}`);
-            onError?.(e);
-          });
-      },
-    },
-  });
+      deleteArtifact(artifact)
+        .then(() => {
+          artifactStore.deleteArtifacts([artifact]);
+          logStore.onSuccess(`Deleted artifact: ${artifact.name}`);
+          onSuccess?.();
+        })
+        .catch((e) => {
+          logStore.onError(`Unable to delete artifact: ${artifact.name}`);
+          onError?.(e);
+        });
+    }
+  );
 }

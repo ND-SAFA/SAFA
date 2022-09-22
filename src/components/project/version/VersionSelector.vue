@@ -39,7 +39,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { IdentifierModel, VersionModel, DataItem, ProjectRole } from "@/types";
+import { IdentifierModel, VersionModel, DataItem } from "@/types";
 import { projectStore, sessionStore } from "@/hooks";
 import { getProjectVersions, handleDeleteVersion } from "@/api";
 import { GenericSelector } from "@/components/common";

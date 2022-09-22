@@ -58,7 +58,7 @@ public class GenerateLinksJob extends CommitJob {
         List<ArtifactAppEntity> targetArtifacts = request.getTargetArtifacts();
         System.out.println("Request:" + request);
         BaseGenerationModels method = request.getMethod();
-        if (method != null) {
+        if (request.getModel() == null) {
             this.generatedTraces = this.serviceProvider
                 .getTraceGenerationService()
                 .generateLinksWithMethod(sourceArtifacts, targetArtifacts, method);

@@ -45,7 +45,7 @@ public class GenerateLinksJob extends CommitJob {
      * @return Job Name.
      */
     public static String getJobName(TraceGenerationRequest request) {
-        String method = request.getMethod() == null ? request.getModel().getName() : request.getMethod().toString();
+        String method = request.getModel() == null ? request.getMethod().toString() : request.getModel().getName();
         return String.format("Generating %s links with %s.", request.size(), method);
     }
 

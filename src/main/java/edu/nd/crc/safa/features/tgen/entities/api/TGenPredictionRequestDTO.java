@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.tgen.entities;
+package edu.nd.crc.safa.features.tgen.entities.api;
 
 import java.util.Map;
 

@@ -14,9 +14,11 @@ import edu.nd.crc.safa.features.models.entities.api.ModelCreationRequest;
 import edu.nd.crc.safa.features.models.entities.api.TGenTrainingRequest;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.tgen.entities.ITraceLinkGeneration;
-import edu.nd.crc.safa.features.tgen.entities.TGenJobResponseDTO;
-import edu.nd.crc.safa.features.tgen.entities.TGenPredictionOutput;
-import edu.nd.crc.safa.features.tgen.entities.TGenPredictionRequestDTO;
+import edu.nd.crc.safa.features.tgen.entities.api.AbstractTGenResponse;
+import edu.nd.crc.safa.features.tgen.entities.api.TGenJobResponseDTO;
+import edu.nd.crc.safa.features.tgen.entities.api.TGenPredictionOutput;
+import edu.nd.crc.safa.features.tgen.entities.api.TGenPredictionRequestDTO;
+import edu.nd.crc.safa.features.tgen.entities.api.TGenTrainingResponse;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.traces.entities.db.TraceType;
@@ -97,9 +99,8 @@ public abstract class TBert implements ITraceLinkGeneration {
 
         // Step - Convert to response
         String outputPath = response.getOutputPath();
-        outputPath = outputPath.contains("/gcp") ? outputPath.replace("/gcp/", "") : outputPath;
         System.out.println("OutputPath: " + outputPath);
-        TGenPredictionOutput output = getOutput(outputPath);
+        TGenPredictionOutput output = getOutput(outputPath, TGenPredictionOutput.class);
         return convertPredictionsToLinks(output.getPredictions());
     }
 
@@ -123,9 +124,10 @@ public abstract class TBert implements ITraceLinkGeneration {
         String trainEndpoint = TBertConfig.get().getTrainEndpoint();
         TGenJobResponseDTO response = this.safaRequestBuilder
             .sendPost(trainEndpoint, trainingPayload, TGenJobResponseDTO.class);
+        System.out.println("Response: " + response);
 
         // Step - Convert to response
-        getOutput(response.getOutputPath());
+        getOutput(response.getOutputPath(), TGenTrainingResponse.class);
     }
 
     private List<TraceAppEntity> convertPredictionsToLinks(List<TGenPredictionOutput.PredictedLink> predictions) {
@@ -177,7 +179,7 @@ public abstract class TBert implements ITraceLinkGeneration {
         return artifactMap;
     }
 
-    private TGenPredictionOutput getOutput(String outputFile) {
+    private <T extends AbstractTGenResponse> T getOutput(String outputFile, Class<T> responseClass) {
         //TODO: Use scheduled tasks instead of constant pinging.
         try {
             while (!CloudStorage.exists(outputFile)) {
@@ -186,19 +188,26 @@ public abstract class TBert implements ITraceLinkGeneration {
             Blob blob = CloudStorage.getBlob(outputFile);
             JSONObject json = CloudStorage.downloadJsonFileBlob(blob);
 
+            System.out.println("File Json:" + json);
+
             if (json.getInt("status") == -1) {
                 throw new SafaError("TBert failed while generating links: " + json.getString("exception"));
             }
-            TGenPredictionOutput predictionOutput = mapper.readValue(json.toString(), TGenPredictionOutput.class);
+            T predictionOutput = mapper.readValue(json.toString(), responseClass);
             System.out.println("Prediction output:" + predictionOutput);
             if (predictionOutput.getStatus() == -1) {
                 throw new SafaError(predictionOutput.getException());
             }
             return predictionOutput;
         } catch (InterruptedException e) {
+            e.printStackTrace();
             throw new SafaError("Interrupted while waiting for output of generated links.");
         } catch (IOException e) {
+            e.printStackTrace();
             throw new SafaError("IOException occurred while reading output of generated links.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new SafaError("An error occurred while training the model", e);
         } finally {
             if (CloudStorage.exists(outputFile)) {
                 CloudStorage.getBlob(outputFile).delete();

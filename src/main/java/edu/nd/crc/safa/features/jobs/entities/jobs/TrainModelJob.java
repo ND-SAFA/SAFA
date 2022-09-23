@@ -29,7 +29,7 @@ public class TrainModelJob extends AbstractJob {
             trainingRequest.getModel().getBaseModel(),
             this.serviceProvider.getSafaRequestBuilder());
         bertModel.trainModel(
-            trainingRequest.getModel().getStatePath(project),
+            trainingRequest.getModel().getStatePath(),
             trainingRequest.getSources(),
             trainingRequest.getTargets(),
             trainingRequest.getTraces());

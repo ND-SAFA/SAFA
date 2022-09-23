@@ -37,8 +37,9 @@ public class ModelController extends BaseController {
      */
     @GetMapping(AppRoutes.Models.MODEL_ROOT)
     public List<ModelAppEntity> getProjectModels(@PathVariable UUID projectId) {
+        //TODO: Remove project id from this root.
         Project project = this.resourceBuilder.fetchProject(projectId).withViewProject();
-        return this.serviceProvider.getModelService().getProjectModels(project);
+        return this.serviceProvider.getModelService().getUserModels();
     }
 
     /**
@@ -64,7 +65,7 @@ public class ModelController extends BaseController {
             modelAppEntity.getBaseModel(),
             serviceProvider.getSafaRequestBuilder()
         );
-        bertModel.createModel(modelAppEntity.getStatePath(project));
+        bertModel.createModel(modelAppEntity.getStatePath());
 
         // Step - Notify project users of new model
         this.serviceProvider.getNotificationService().broadcastChange(
@@ -85,10 +86,13 @@ public class ModelController extends BaseController {
     public void deleteModelById(@PathVariable UUID modelId) {
         Model model = this.serviceProvider.getModelService().getModelById(modelId);
         this.serviceProvider.getModelRepository().delete(model);
-        this.serviceProvider.getNotificationService().broadcastChange(
-            EntityChangeBuilder
-                .create(model.getProject())
-                .withModelDelete(modelId)
-        );
+
+        this.serviceProvider.getModelProjectRepository().findByModel(model).forEach((mp) -> {
+            this.serviceProvider.getNotificationService().broadcastChange(
+                EntityChangeBuilder
+                    .create(mp.getProject())
+                    .withModelDelete(modelId)
+            );
+        });
     }
 }

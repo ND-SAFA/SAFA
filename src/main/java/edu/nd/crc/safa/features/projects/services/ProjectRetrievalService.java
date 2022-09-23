@@ -90,7 +90,7 @@ public class ProjectRetrievalService {
         // Layout
         Map<UUID, LayoutPosition> layout = artifactPositionService.retrieveDocumentLayout(projectVersion, null);
 
-        List<ModelAppEntity> models = this.modelService.getProjectModels(projectVersion.getProject());
+        List<ModelAppEntity> models = this.modelService.getUserModels();
 
         return new ProjectAppEntity(projectVersion,
             entities.getArtifacts(),

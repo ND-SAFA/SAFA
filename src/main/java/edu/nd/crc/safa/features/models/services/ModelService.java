@@ -8,9 +8,13 @@ import java.util.stream.Collectors;
 import edu.nd.crc.safa.features.common.IAppEntityService;
 import edu.nd.crc.safa.features.models.entities.Model;
 import edu.nd.crc.safa.features.models.entities.ModelAppEntity;
+import edu.nd.crc.safa.features.models.entities.ModelProject;
+import edu.nd.crc.safa.features.models.repositories.ModelProjectRepository;
 import edu.nd.crc.safa.features.models.repositories.ModelRepository;
+import edu.nd.crc.safa.features.projects.entities.app.ProjectIdAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.projects.services.ProjectService;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import lombok.AllArgsConstructor;
@@ -23,7 +27,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class ModelService implements IAppEntityService<ModelAppEntity> {
 
+    private final ModelProjectRepository modelProjectRepository;
     private final ModelRepository modelRepository;
+    private final ProjectService projectService;
 
     /**
      * Queries database for model with given id and returns it if found. Otherwise, error is thrown.
@@ -48,30 +54,41 @@ public class ModelService implements IAppEntityService<ModelAppEntity> {
      * @return Created {@link ModelAppEntity}.
      */
     public ModelAppEntity createModel(Project project, ModelAppEntity modelAppEntity) {
-        Model model = new Model(modelAppEntity,
-            project);
+        // Step - Create model
+        Model model = new Model(modelAppEntity);
         this.modelRepository.save(model);
         modelAppEntity.setId(model.getId());
+
+        // Step - Create link between model and project
+        ModelProject modelProject = new ModelProject(model, project);
+        this.modelProjectRepository.save(modelProject);
 
         return modelAppEntity;
     }
 
     /**
-     * Returns list of models under given project.
+     * Returns list of models user has access to.
      *
-     * @param project The project whose models are returned.
      * @return The list of models.
      */
-    public List<ModelAppEntity> getProjectModels(Project project) {
-        return this.modelRepository
-            .findByProject(project)
+    public List<ModelAppEntity> getUserModels() {
+        List<String> projectIds = this.projectService
+            .getProjectsForCurrentUser()
             .stream()
+            .map(ProjectIdAppEntity::getProjectId)
+            .collect(Collectors.toList());
+
+        return this.modelProjectRepository
+            .getAllModels()
+            .stream()
+            .filter(mp -> projectIds.contains(mp.getProject().getProjectId().toString()))
+            .map(ModelProject::getModel)
             .map(ModelAppEntity::new)
             .collect(Collectors.toList());
     }
 
     @Override
     public List<ModelAppEntity> getAppEntities(ProjectVersion projectVersion) {
-        return getProjectModels(projectVersion.getProject());
+        return getUserModels();
     }
 }

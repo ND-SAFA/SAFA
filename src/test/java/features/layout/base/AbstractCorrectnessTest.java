@@ -18,7 +18,7 @@ import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import builders.CommitBuilder;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import features.base.ApplicationBaseTest;
+import common.ApplicationBaseTest;
 import org.json.JSONObject;
 import org.webjars.NotFoundException;
 import services.MappingTestService;

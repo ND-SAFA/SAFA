@@ -11,7 +11,6 @@ import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
-import features.base.ApplicationBaseTest;
 import org.junit.jupiter.api.Test;
 
 public abstract class AbstractCrudTest<T extends IAppEntity> extends ApplicationBaseTest {

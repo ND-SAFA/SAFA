@@ -14,7 +14,7 @@ import edu.nd.crc.safa.features.rules.services.RuleService;
 import edu.nd.crc.safa.features.traces.entities.db.TraceLink;
 import edu.nd.crc.safa.features.traces.entities.db.TraceLinkVersion;
 
-import features.base.ApplicationBaseTest;
+import common.ApplicationBaseTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 

@@ -11,7 +11,7 @@ import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.jobs.entities.jobs.CreateProjectViaJsonJob;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
-import features.base.ApplicationBaseTest;
+import common.ApplicationBaseTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 

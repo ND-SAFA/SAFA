@@ -9,7 +9,7 @@ import edu.nd.crc.safa.features.users.entities.app.UserPasswordDTO;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.utilities.JsonFileUtilities;
 
-import features.base.ApplicationBaseTest;
+import common.ApplicationBaseTest;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import requests.SafaRequest;

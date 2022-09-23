@@ -8,7 +8,7 @@ import java.util.UUID;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 
-import features.base.ApplicationBaseTest;
+import common.ApplicationBaseTest;
 import org.json.JSONObject;
 import org.springframework.test.web.servlet.ResultMatcher;
 import requests.SafaRequest;

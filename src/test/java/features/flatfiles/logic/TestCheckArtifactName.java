@@ -12,7 +12,7 @@ import edu.nd.crc.safa.utilities.JsonFileUtilities;
 
 import builders.CommitBuilder;
 import builders.ProjectBuilder;
-import features.base.ApplicationBaseTest;
+import common.ApplicationBaseTest;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import requests.SafaRequest;

@@ -12,7 +12,7 @@ import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import common.EntityConstants;
-import features.base.ApplicationBaseTest;
+import common.ApplicationBaseTest;
 import features.jobs.base.JobTestService;
 import org.junit.jupiter.api.Test;
 import requests.SafaRequest;

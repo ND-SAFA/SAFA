@@ -11,7 +11,7 @@ import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 
-import features.base.DefaultProjectConstants;
+import common.DefaultProjectConstants;
 import features.delta.base.AbstractDeltaTest;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;

@@ -12,7 +12,7 @@ import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.layout.generator.ElkGraphCreator;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 
-import features.base.DefaultProjectConstants;
+import common.DefaultProjectConstants;
 import features.layout.base.AbstractLayoutTest;
 import org.eclipse.elk.graph.ElkGraphElement;
 import org.eclipse.elk.graph.ElkNode;

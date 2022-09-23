@@ -9,7 +9,7 @@ import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.utilities.JsonFileUtilities;
 
 import builders.CommitBuilder;
-import features.base.ApplicationBaseTest;
+import common.ApplicationBaseTest;
 import org.javatuples.Pair;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;

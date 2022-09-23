@@ -15,7 +15,7 @@ import edu.nd.crc.safa.features.delta.entities.app.ModifiedEntity;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import builders.CommitBuilder;
-import features.base.ApplicationBaseTest;
+import common.ApplicationBaseTest;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

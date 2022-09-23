@@ -1,6 +1,6 @@
 package services;
 
-import static features.base.ApplicationBaseTest.defaultUser;
+import static common.ApplicationBaseTest.defaultUser;
 
 import java.util.List;
 import java.util.Optional;

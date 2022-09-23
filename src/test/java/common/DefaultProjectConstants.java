@@ -1,4 +1,4 @@
-package features.base;
+package common;
 
 /**
  * The testing constants for the "before" test project.

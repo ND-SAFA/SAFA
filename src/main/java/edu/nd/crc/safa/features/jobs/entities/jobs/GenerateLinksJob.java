@@ -1,7 +1,9 @@
 package edu.nd.crc.safa.features.jobs.entities.jobs;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
@@ -15,6 +17,8 @@ import edu.nd.crc.safa.features.tgen.entities.BaseGenerationModels;
 import edu.nd.crc.safa.features.tgen.entities.TraceGenerationRequest;
 import edu.nd.crc.safa.features.tgen.method.bert.TBert;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
+import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
+import edu.nd.crc.safa.features.traces.entities.db.TraceType;
 
 /**
  * Generates trace links between artifacts defined in request.
@@ -76,6 +80,28 @@ public class GenerateLinksJob extends CommitJob {
                 targetArtifacts);
         }
 
-        this.projectCommit.addTraces(ModificationType.ADDED, this.generatedTraces);
+        // Step - Filter our trace links overriding manual or approved links
+        HashMap<String, List<String>> traceHashMap = new HashMap<>();
+        this.serviceProvider
+            .getTraceService()
+            .getAppEntities(projectVersion, t -> t.getApprovalStatus().equals(ApprovalStatus.APPROVED)
+                || t.getTraceType().equals(TraceType.MANUAL))
+            .forEach(t -> {
+                if (traceHashMap.containsKey(t.getSourceName())) {
+                    traceHashMap.get(t.getSourceName()).add(t.getTargetName());
+                } else {
+                    ArrayList<String> targets = new ArrayList<>();
+                    targets.add(t.getTargetName());
+                    traceHashMap.put(t.getSourceName(), targets);
+                }
+            });
+
+        List<TraceAppEntity> filteredGeneratedLinks = this.generatedTraces
+            .stream()
+            .filter(t -> !traceHashMap.containsKey(t.getSourceName())
+                || !traceHashMap.get(t.getSourceName()).contains(t.getTargetName())).collect(Collectors.toList());
+        System.out.println("End:" + filteredGeneratedLinks.size());
+
+        this.projectCommit.addTraces(ModificationType.ADDED, filteredGeneratedLinks);
     }
 }

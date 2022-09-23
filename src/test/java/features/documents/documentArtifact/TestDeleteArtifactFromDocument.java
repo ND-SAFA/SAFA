@@ -16,7 +16,7 @@ import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import common.EntityConstants;
-import features.base.ApplicationBaseTest;
+import common.ApplicationBaseTest;
 import org.junit.jupiter.api.Test;
 import requests.RouteBuilder;
 import requests.SafaRequest;

@@ -6,11 +6,12 @@ import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
 import edu.nd.crc.safa.features.tgen.entities.BaseGenerationModels;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * The model to create for project.
  */
-
+@NoArgsConstructor
 @Data
 public class ModelAppEntity implements IAppEntity {
 
@@ -28,18 +29,17 @@ public class ModelAppEntity implements IAppEntity {
      */
     BaseGenerationModels baseModel;
 
-    public ModelAppEntity(String name, BaseGenerationModels baseModel) {
-        this.name = name;
-        this.baseModel = baseModel;
-    }
-
     public ModelAppEntity(Model model) {
         this.id = model.getId();
         this.name = model.getName();
         this.baseModel = model.getBaseModel();
     }
 
+    public static String getStatePath(UUID modelId) {
+        return String.format("models/%s", modelId);
+    }
+
     public String getStatePath() {
-        return String.format("models/%s", this.id);
+        return ModelAppEntity.getStatePath(this.id);
     }
 }

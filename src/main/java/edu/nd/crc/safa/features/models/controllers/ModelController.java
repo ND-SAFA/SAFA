@@ -9,6 +9,8 @@ import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.models.entities.Model;
 import edu.nd.crc.safa.features.models.entities.ModelAppEntity;
+import edu.nd.crc.safa.features.models.entities.ShareMethod;
+import edu.nd.crc.safa.features.models.entities.api.ShareModelRequest;
 import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.tgen.method.bert.TBert;
@@ -53,19 +55,19 @@ public class ModelController extends BaseController {
     public ModelAppEntity createOrUpdateModel(@PathVariable UUID projectId,
                                               @RequestBody ModelAppEntity modelAppEntity) {
         Project project = this.resourceBuilder.fetchProject(projectId).withViewProject();
-        if (modelAppEntity.getId() != null) {
-            throw new IllegalArgumentException("Model cannot be updated. Please delete and create new one.");
-        }
+        boolean createModel = modelAppEntity.getId() == null;
 
         // Step - Create path for model state
-        modelAppEntity = this.serviceProvider.getModelService().createModel(project, modelAppEntity);
+        modelAppEntity = this.serviceProvider.getModelService().createOrUpdateModel(project, modelAppEntity);
 
         // Step - Copy model to project
-        TBert bertModel = this.serviceProvider.getBertService().getBertModel(
-            modelAppEntity.getBaseModel(),
-            serviceProvider.getSafaRequestBuilder()
-        );
-        bertModel.createModel(modelAppEntity.getStatePath());
+        if (createModel) {
+            TBert bertModel = this.serviceProvider.getBertService().getBertModel(
+                modelAppEntity.getBaseModel(),
+                serviceProvider.getSafaRequestBuilder()
+            );
+            bertModel.createModel(modelAppEntity.getStatePath());
+        }
 
         // Step - Notify project users of new model
         this.serviceProvider.getNotificationService().broadcastChange(
@@ -94,5 +96,39 @@ public class ModelController extends BaseController {
                     .withModelDelete(modelId)
             );
         });
+    }
+
+    /**
+     * Shares a model with a given project. Copy can be by value or reference.
+     * Copy by value directly copies the model to new the project.
+     * Copy by reference only references model on the other project.
+     *
+     * @param shareModelRequest Request containing target project, model, and share method.
+     */
+    @PostMapping(AppRoutes.Models.SHARE_MODEL)
+    public void shareModel(@RequestBody ShareModelRequest shareModelRequest) {
+        Project project = this.resourceBuilder.fetchProject(shareModelRequest.getTargetProject()).withEditProject();
+        ModelAppEntity modelAppEntity = shareModelRequest.getModel();
+        ShareMethod shareMethod = shareModelRequest.getShareMethod();
+
+        if (shareMethod.equals(ShareMethod.COPY_BY_VALUE)) {
+            UUID sourceId = modelAppEntity.getId();
+
+            // Step - Create model-project association for new project
+            modelAppEntity.setId(null);
+            this.serviceProvider.getModelService().createOrUpdateModel(project, modelAppEntity);
+            UUID targetId = modelAppEntity.getId();
+
+            // Step - Copy model to new project
+            TBert bertModel = this.serviceProvider.getBertService().getBertModel(
+                modelAppEntity.getBaseModel(),
+                serviceProvider.getSafaRequestBuilder()
+            );
+            bertModel.copyModel(
+                ModelAppEntity.getStatePath(sourceId),
+                ModelAppEntity.getStatePath(targetId));
+        } else if (shareMethod.equals(ShareMethod.COPY_BY_REFERENCE)) {
+            this.serviceProvider.getModelService().createOrUpdateModel(project, shareModelRequest.getModel());
+        }
     }
 }

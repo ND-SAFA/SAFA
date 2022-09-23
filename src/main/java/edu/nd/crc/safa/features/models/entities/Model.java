@@ -7,18 +7,13 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.tgen.entities.BaseGenerationModels;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
 
 /**
@@ -40,15 +35,10 @@ public class Model {
     @Column
     @Enumerated(EnumType.STRING)
     BaseGenerationModels baseModel;
-    @ManyToOne
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "project_id", nullable = false, unique = true)
-    Project project;
 
-    public Model(ModelAppEntity modelAppEntity, Project project) {
+    public Model(ModelAppEntity modelAppEntity) {
         this.id = modelAppEntity.getId();
         this.name = modelAppEntity.getName();
         this.baseModel = modelAppEntity.getBaseModel();
-        this.project = project;
     }
 }

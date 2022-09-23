@@ -72,7 +72,7 @@ public class GenerateLinksJob extends CommitJob {
                 model.getBaseModel(),
                 this.serviceProvider.getSafaRequestBuilder()
             );
-            String statePath = model.getStatePath(projectVersion.getProject());
+            String statePath = model.getStatePath();
             this.generatedTraces = bertModel.generateLinksWithState(
                 statePath,
                 true,

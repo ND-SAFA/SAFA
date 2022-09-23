@@ -108,7 +108,7 @@ public class SyncController extends BaseController {
             case MODELS:
                 List<ModelAppEntity> models = this.serviceProvider
                     .getModelService()
-                    .getProjectModels(projectVersion.getProject());
+                    .getUserModels();
                 projectAppEntity.setModels(models);
                 break;
             default:

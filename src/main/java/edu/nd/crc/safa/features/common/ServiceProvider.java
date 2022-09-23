@@ -31,6 +31,7 @@ import edu.nd.crc.safa.features.layout.repositories.ArtifactPositionRepository;
 import edu.nd.crc.safa.features.layout.services.ArtifactPositionService;
 import edu.nd.crc.safa.features.memberships.repositories.ProjectMembershipRepository;
 import edu.nd.crc.safa.features.memberships.services.MemberService;
+import edu.nd.crc.safa.features.models.repositories.ModelProjectRepository;
 import edu.nd.crc.safa.features.models.repositories.ModelRepository;
 import edu.nd.crc.safa.features.models.services.BertService;
 import edu.nd.crc.safa.features.models.services.ModelService;
@@ -101,6 +102,7 @@ public class ServiceProvider {
     // models
     private final ModelRepository modelRepository;
     private final ModelService modelService;
+    private final ModelProjectRepository modelProjectRepository;
     private final BertService bertService;
     // Matrix
     private final TraceMatrixRepository traceMatrixRepository;

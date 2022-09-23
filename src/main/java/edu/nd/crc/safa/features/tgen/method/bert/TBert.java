@@ -45,14 +45,25 @@ public abstract class TBert implements ITraceLinkGeneration {
     /**
      * Copies model defined by given subclass and saves it in new output path.
      *
-     * @param outputPath The path to save the new model to.
+     * @param newModelPath The path to save the new model to.
      */
-    public void createModel(String outputPath) {
+    public void createModel(String newModelPath) {
+        BertMethodIdentifier methodId = this.getBertMethodIdentifier();
+        copyModel(methodId.getStatePath(), newModelPath);
+    }
+
+    /**
+     * Copies model state in source path to target path.
+     *
+     * @param sourceStatePath The path to the state of the model to copy.
+     * @param targetStatePath The path to store the new model at.
+     */
+    public void copyModel(String sourceStatePath, String targetStatePath) {
         BertMethodIdentifier methodId = this.getBertMethodIdentifier();
         ModelCreationRequest creationRequest = new ModelCreationRequest(
             methodId.getBaseModel(),
-            methodId.getModelPath(),
-            outputPath
+            sourceStatePath,
+            targetStatePath
         );
         this.safaRequestBuilder
             .sendPost(TBertConfig.get().getCreateModelEndpoint(),
@@ -64,7 +75,7 @@ public abstract class TBert implements ITraceLinkGeneration {
     public List<TraceAppEntity> generateLinksWithBaselineState(
         List<ArtifactAppEntity> sources,
         List<ArtifactAppEntity> targets) {
-        return this.generateLinksWithState(this.getBertMethodIdentifier().getModelPath(),
+        return this.generateLinksWithState(this.getBertMethodIdentifier().getStatePath(),
             false,
             sources,
             targets);

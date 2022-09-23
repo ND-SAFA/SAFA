@@ -79,6 +79,7 @@ public class AppRoutes {
         public static final String MODEL_BY_ID = Models.MODEL_ROOT + "/{modelId}";
         public static final String DELETE_MODEL_BY_ID = MODEL_BY_ID;
         public static final String TRAIN_MODEL = MODEL_BY_ID;
+        public static final String SHARE_MODEL = Projects.ROOT + "/models/share";
 
     }
 

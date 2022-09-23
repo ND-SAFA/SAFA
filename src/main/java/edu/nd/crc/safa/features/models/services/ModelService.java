@@ -1,5 +1,7 @@
 package edu.nd.crc.safa.features.models.services;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -81,13 +83,21 @@ public class ModelService implements IAppEntityService<ModelAppEntity> {
             .map(ProjectIdAppEntity::getProjectId)
             .collect(Collectors.toList());
 
-        return this.modelProjectRepository
+        HashMap<UUID, Model> modelProjectHashMap = new HashMap<>();
+        List<ModelAppEntity> userModels = new ArrayList<>();
+
+        this.modelProjectRepository
             .getAllModels()
             .stream()
             .filter(mp -> projectIds.contains(mp.getProject().getProjectId().toString()))
-            .map(ModelProject::getModel)
-            .map(ModelAppEntity::new)
-            .collect(Collectors.toList());
+            .forEach(mp -> {
+                Model model = mp.getModel();
+                if (!modelProjectHashMap.containsKey(model.getId())) {
+                    modelProjectHashMap.put(mp.getModel().getId(), mp.getModel());
+                    userModels.add(new ModelAppEntity(model));
+                }
+            });
+        return userModels;
     }
 
     @Override

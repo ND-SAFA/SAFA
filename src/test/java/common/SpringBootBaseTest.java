@@ -1,4 +1,4 @@
-package features.base;
+package common;
 
 import javax.sql.DataSource;
 

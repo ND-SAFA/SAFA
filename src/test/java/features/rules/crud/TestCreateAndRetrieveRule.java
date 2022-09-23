@@ -15,7 +15,7 @@ import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.utilities.JsonFileUtilities;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import features.base.ApplicationBaseTest;
+import common.ApplicationBaseTest;
 import features.rules.logic.AtLeastOneRule;
 import features.rules.logic.IRuleTest;
 import org.json.JSONObject;

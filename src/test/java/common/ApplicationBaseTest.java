@@ -1,4 +1,4 @@
-package features.base;
+package common;
 
 import java.io.IOException;
 import java.sql.Connection;

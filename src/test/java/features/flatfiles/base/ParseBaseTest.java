@@ -4,8 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import edu.nd.crc.safa.config.ProjectPaths;
 
-import features.base.ApplicationBaseTest;
-import features.base.DefaultProjectConstants;
+import common.ApplicationBaseTest;
+import common.DefaultProjectConstants;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import requests.SafaRequest;

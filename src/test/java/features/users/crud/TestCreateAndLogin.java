@@ -8,7 +8,7 @@ import java.util.Optional;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
-import features.base.ApplicationBaseTest;
+import common.ApplicationBaseTest;
 import org.json.JSONArray;
 import org.junit.jupiter.api.Test;
 import requests.SafaRequest;

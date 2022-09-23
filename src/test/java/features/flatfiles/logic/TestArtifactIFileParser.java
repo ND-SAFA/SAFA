@@ -11,8 +11,8 @@ import edu.nd.crc.safa.features.flatfiles.parser.TimFileParser;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
-import features.base.ApplicationBaseTest;
-import features.base.DefaultProjectConstants;
+import common.ApplicationBaseTest;
+import common.DefaultProjectConstants;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 

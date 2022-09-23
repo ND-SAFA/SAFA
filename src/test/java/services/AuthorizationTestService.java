@@ -12,7 +12,7 @@ import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
 import builders.DbEntityBuilder;
-import features.base.ApplicationBaseTest;
+import common.ApplicationBaseTest;
 import lombok.AllArgsConstructor;
 import org.json.JSONObject;
 import org.springframework.test.web.servlet.ResultMatcher;

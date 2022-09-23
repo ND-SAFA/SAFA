@@ -11,6 +11,7 @@ import {
   createLink,
   updateApprovedLink,
   updateDeclinedLink,
+  updateDeclinedLinks,
   updateUnreviewedLink,
 } from "@/api";
 
@@ -117,6 +118,40 @@ export async function handleDeclineLink(
       onError?.(e);
     },
   });
+}
+
+/**
+ * Declines all unreviewed links, setting the app state to loading in between, and updating trace links afterwards.
+ */
+export async function handleDeclineAll(): Promise<void> {
+  logStore.confirm(
+    "Clear Unreviewed Links",
+    "Are you sure you want to remove all unreviewed links?",
+    async (isConfirmed) => {
+      if (!isConfirmed) return;
+
+      const unreviewed = approvalStore.unreviewedLinks;
+
+      try {
+        appStore.onLoadStart();
+
+        await updateDeclinedLinks(unreviewed);
+
+        traceStore.deleteTraceLinks(unreviewed);
+        unreviewed.map((link) => approvalStore.declineLink(link));
+
+        logStore.onSuccess(`Removed unreviewed links: ${unreviewed.length}`);
+      } catch (e) {
+        unreviewed.map(
+          (link) => (link.approvalStatus = ApprovalType.UNREVIEWED)
+        );
+
+        logStore.onError(`Unable to clear all links: ${unreviewed.length}`);
+      } finally {
+        appStore.onLoadEnd();
+      }
+    }
+  );
 }
 
 /**

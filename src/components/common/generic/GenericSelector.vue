@@ -12,8 +12,10 @@
     :loading="isLoading"
     :search="search"
     :no-data-text="noDataText"
+    :show-expand="showExpand"
     @item-selected="$emit('item:select', $event, true)"
   >
+    <slot />
     <template v-slot:top>
       <slot name="deleteItemDialogue" />
       <slot name="editItemDialogue" />
@@ -58,7 +60,7 @@
     <template v-slot:[`footer.prepend`]>
       <div class="py-3">
         <generic-icon-button
-          v-if="!minimal"
+          v-if="!minimal && hasAdd"
           fab
           color="primary"
           icon-id="mdi-plus"
@@ -67,6 +69,11 @@
           @click="$emit('item:add')"
         />
       </div>
+    </template>
+    <template v-slot:expanded-item="{ headers, item }">
+      <td :colspan="headers.length">
+        <slot name="expanded-item" :item="item" />
+      </td>
     </template>
   </v-data-table>
 </template>
@@ -112,6 +119,11 @@ export default Vue.extend({
       required: false,
       default: false,
     },
+    hasAdd: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
     hasEdit: {
       type: Boolean,
       required: false,
@@ -141,6 +153,10 @@ export default Vue.extend({
       required: true,
     },
     minimal: {
+      type: Boolean,
+      default: false,
+    },
+    showExpand: {
       type: Boolean,
       default: false,
     },

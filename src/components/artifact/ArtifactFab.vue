@@ -1,5 +1,6 @@
 <template>
   <v-speed-dial
+    v-if="isEditor"
     fixed
     bottom
     right
@@ -55,7 +56,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { appStore, documentStore, projectStore } from "@/hooks";
+import { appStore, documentStore, projectStore, sessionStore } from "@/hooks";
 import { disableDrawMode, enableDrawMode } from "@/cytoscape";
 import { GenericIconButton } from "@/components";
 
@@ -82,6 +83,12 @@ export default Vue.extend({
      */
     isCreateLinkEnabled(): boolean {
       return appStore.isCreateLinkEnabled;
+    },
+    /**
+     * @return Whether the current user is an editor of the current project.
+     */
+    isEditor(): boolean {
+      return sessionStore.isEditor(projectStore.project);
     },
   },
   methods: {

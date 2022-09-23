@@ -133,7 +133,7 @@ export function handleSaveDocument(
   };
 
   const handleError = (isNew: boolean) => (e: Error) => {
-    logStore.onSuccess(
+    logStore.onError(
       isNew
         ? `Unable to create document: ${name}`
         : `Unable to edit document: ${name}`

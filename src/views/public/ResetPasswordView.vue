@@ -12,7 +12,7 @@
       <div v-if="!isSubmitted">
         <typography el="p" value="Please enter a new password." />
 
-        <password-field v-model="password" />
+        <password-field v-model="password" :errors="errors" />
       </div>
 
       <typography
@@ -44,7 +44,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { navigateTo, Routes } from "@/router";
+import { getParam, navigateTo, QueryParams, Routes } from "@/router";
 import { updatePassword } from "@/api";
 import { CardPage, PasswordField, Typography } from "@/components";
 
@@ -63,6 +63,21 @@ export default Vue.extend({
       isLoading: false,
     };
   },
+  mounted() {
+    const token = getParam(QueryParams.PW_RESET);
+
+    if (!token) return;
+
+    this.token = String(token);
+  },
+  computed: {
+    /**
+     * @return Any errors encountered.
+     */
+    errors(): string[] {
+      return this.isError ? ["Unable to reset your password."] : [];
+    },
+  },
   methods: {
     /**
      * Navigates to the login page.
@@ -77,8 +92,8 @@ export default Vue.extend({
       this.isLoading = true;
 
       updatePassword({
-        password: this.password,
-        token: this.token,
+        newPassword: this.password,
+        resetToken: this.token,
       })
         .then(() => {
           this.isSubmitted = true;

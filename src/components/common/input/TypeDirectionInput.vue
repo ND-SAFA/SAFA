@@ -8,7 +8,7 @@
       <v-chip
         v-for="type in entry.allowedTypes"
         :key="type"
-        close
+        :close="allowEditing"
         data-cy="chip-type-direction"
         @click:close="handleDeleteDirection(entry, type)"
       >
@@ -24,7 +24,7 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { LabelledTraceDirectionModel } from "@/types";
-import { typeOptionsStore } from "@/hooks";
+import { projectStore, sessionStore, typeOptionsStore } from "@/hooks";
 import { handleRemoveDirection } from "@/api";
 import { Typography } from "@/components/common/display";
 
@@ -36,6 +36,14 @@ export default Vue.extend({
   components: { Typography },
   props: {
     entry: Object as PropType<LabelledTraceDirectionModel>,
+  },
+  computed: {
+    /**
+     * @return Whether to allow editing.
+     */
+    allowEditing(): boolean {
+      return sessionStore.isEditor(projectStore.project);
+    },
   },
   methods: {
     /**

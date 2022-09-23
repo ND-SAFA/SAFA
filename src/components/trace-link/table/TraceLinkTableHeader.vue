@@ -21,6 +21,12 @@
         class="mb-1"
       />
     </template>
+    <template v-slot:bottom>
+      <v-btn text color="error" @click="handleClear">
+        <v-icon class="mr-1">mdi-close-circle-multiple-outline</v-icon>
+        Clear Unreviewed
+      </v-btn>
+    </template>
   </table-header>
 </template>
 
@@ -28,6 +34,7 @@
 import Vue, { PropType } from "vue";
 import { DataTableHeader } from "vuetify";
 import { approvalTypeOptions } from "@/util";
+import { handleDeclineAll } from "@/api";
 import { TableHeader } from "@/components/common";
 
 /**
@@ -126,6 +133,14 @@ export default Vue.extend({
       set(newDesc: boolean): void {
         this.$emit("update:groupDesc", newDesc);
       },
+    },
+  },
+  methods: {
+    /**
+     * Clears all unreviewed links.
+     */
+    handleClear(): void {
+      handleDeclineAll();
     },
   },
 });

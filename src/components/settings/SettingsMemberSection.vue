@@ -3,19 +3,19 @@
     <typography el="h1" variant="subtitle" value="Members" />
     <v-divider />
     <generic-selector
+      is-open
       :headers="headers"
       :items="members"
-      :is-open="true"
       :has-delete="isAdmin"
       :has-edit="isAdmin"
       :has-select="false"
       :is-loading="isLoading"
       item-key="email"
+      class="mt-5"
       @item:add="handleAddMember"
       @item:edit="handleEditMember"
       @item:delete="handleDeleteMember"
       @refresh="handleRetrieveMembers"
-      class="mt-5"
     >
       <template v-slot:addItemDialogue>
         <settings-member-information-modal
@@ -41,8 +41,8 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { ProjectModel, MembershipModel, ProjectRole } from "@/types";
-import { sessionStore } from "@/hooks";
+import { MembershipModel, ProjectModel, ProjectRole } from "@/types";
+import { logStore, sessionStore } from "@/hooks";
 import { handleDeleteMember, handleGetMembers } from "@/api";
 import { GenericSelector, Typography } from "@/components/common";
 import SettingsMemberInformationModal from "./SettingsMemberInformationModal.vue";
@@ -66,13 +66,8 @@ export default Vue.extend({
       isNewOpen: false,
       isEditOpen: false,
       headers: [
-        { text: "Email", value: "email", sortable: false, isSelectable: false },
-        {
-          text: "Role",
-          value: "role",
-          sortable: true,
-          isSelectable: true,
-        },
+        { text: "Email", value: "email" },
+        { text: "Role", value: "role" },
         { text: "Actions", value: "actions", sortable: false },
       ],
     };
@@ -82,12 +77,7 @@ export default Vue.extend({
      * @return Whether the current user is an admin.
      */
     isAdmin(): boolean {
-      const userEmail = sessionStore.userEmail;
-      const allowedRoles = [ProjectRole.ADMIN, ProjectRole.OWNER];
-      const userQuery = this.project.members.filter(
-        (m) => m.email === userEmail && allowedRoles.includes(m.role)
-      );
-      return userQuery.length === 1;
+      return sessionStore.isAdmin(this.project);
     },
     /**
      * @return All project members.
@@ -125,7 +115,15 @@ export default Vue.extend({
      * @param member - The member to delete.
      */
     handleDeleteMember(member: MembershipModel): void {
-      handleDeleteMember(member);
+      if (
+        member.role === ProjectRole.OWNER &&
+        this.members.filter(({ role }) => role === ProjectRole.OWNER).length ===
+          1
+      ) {
+        logStore.onInfo("You cannot delete the only owner of this project.");
+      } else {
+        handleDeleteMember(member);
+      }
     },
     /**
      * Closes the add member modal.

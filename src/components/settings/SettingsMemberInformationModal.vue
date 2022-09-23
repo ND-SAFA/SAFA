@@ -6,7 +6,6 @@
           filled
           v-model="userEmail"
           label="User Email"
-          dense
           hide-details
           class="mr-1"
           style="min-width: 300px"
@@ -14,7 +13,15 @@
           :rules="emailRules"
           @update:error="handleErrorUpdate"
         />
-        <button-row :definitions="buttonDefinition" />
+        <v-select
+          filled
+          hide-details
+          label="Role"
+          v-model="userRole"
+          :items="projectRoles"
+          item-value="id"
+          item-text="name"
+        />
       </flex-box>
     </template>
     <template v-slot:actions>
@@ -28,25 +35,18 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import {
-  ButtonDefinition,
-  ButtonMenuItem,
-  ButtonType,
-  ListMenuDefinition,
-  IdentifierModel,
-  MembershipModel,
-  ProjectRole,
-} from "@/types";
+import { IdentifierModel, MembershipModel, ProjectRole } from "@/types";
+import { projectRoleOptions } from "@/util";
 import { logStore } from "@/hooks";
 import { handleInviteMember } from "@/api";
-import { GenericModal, ButtonRow, FlexBox } from "@/components/common";
+import { GenericModal, FlexBox } from "@/components/common";
 
 /**
  * The modal for sharing a project with a user.
  */
 export default Vue.extend({
   name: "SettingsMemberInformation",
-  components: { FlexBox, ButtonRow, GenericModal },
+  components: { FlexBox, GenericModal },
   props: {
     isOpen: {
       type: Boolean,
@@ -82,12 +82,7 @@ export default Vue.extend({
           /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v) ||
           "E-mail must be valid",
       ],
-      projectRoles: [
-        ProjectRole.OWNER,
-        ProjectRole.ADMIN,
-        ProjectRole.EDITOR,
-        ProjectRole.VIEWER,
-      ],
+      projectRoles: projectRoleOptions(),
     };
   },
   computed: {
@@ -100,33 +95,6 @@ export default Vue.extend({
         this.userEmail.length > 0 &&
         this.userRole !== undefined
       );
-    },
-    /**
-     * @return All project role menu items.
-     */
-    menuItems(): ButtonMenuItem[] {
-      return this.projectRoles.map((role) => ({
-        name: role,
-        onClick: () => {
-          this.userRole = this.getProjectRole(role);
-        },
-      }));
-    },
-    /**
-     * @return The project menu button.
-     */
-    buttonDefinition(): ButtonDefinition[] {
-      return [
-        {
-          type: ButtonType.LIST_MENU,
-          label: "Project Role",
-          menuItems: this.menuItems,
-          buttonColor: "primary",
-          buttonIsText: false,
-          showSelectedValue: true,
-          selectedItem: this.userRole,
-        } as ListMenuDefinition,
-      ];
     },
   },
   methods: {
@@ -168,13 +136,6 @@ export default Vue.extend({
      */
     handleCancel() {
       this.$emit("cancel");
-    },
-    /**
-     * Returns the correct role id for a role.
-     * @param role - The role to find.
-     */
-    getProjectRole(role: string): ProjectRole {
-      return ProjectRole[role.toUpperCase() as keyof typeof ProjectRole];
     },
   },
   watch: {

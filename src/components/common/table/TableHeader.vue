@@ -1,14 +1,21 @@
 <template>
   <flex-box justify="space-between" b="2">
-    <v-text-field
-      dense
-      outlined
-      clearable
-      label="Search"
-      style="max-width: 30vw"
-      v-model="currentSearch"
-      append-icon="mdi-magnify"
-    />
+    <div>
+      <v-text-field
+        dense
+        outlined
+        clearable
+        hide-details
+        label="Search"
+        style="width: 30vw"
+        v-model="currentSearch"
+        append-icon="mdi-magnify"
+      />
+      <flex-box align="center">
+        <commit-buttons color="primary" class="mt-2" />
+        <slot name="bottom" />
+      </flex-box>
+    </div>
     <div>
       <slot name="right" />
       <flex-box>
@@ -54,6 +61,7 @@
 import Vue, { PropType } from "vue";
 import { DataTableHeader } from "vuetify";
 import { FlexBox } from "@/components/common";
+import CommitButtons from "@/components/navigation/header/CommitButtons.vue";
 /**
  * Renders the header for a table.
  *
@@ -63,7 +71,7 @@ import { FlexBox } from "@/components/common";
  */
 export default Vue.extend({
   name: "TableHeader",
-  components: { FlexBox },
+  components: { FlexBox, CommitButtons },
   props: {
     headers: {
       type: Array as PropType<DataTableHeader[]>,

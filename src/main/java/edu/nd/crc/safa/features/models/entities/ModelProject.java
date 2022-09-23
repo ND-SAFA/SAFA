@@ -8,7 +8,9 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
+import edu.nd.crc.safa.config.AppConstraints;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 
 import lombok.Getter;
@@ -22,7 +24,12 @@ import org.hibernate.annotations.Type;
  * Represents the database entity for a trace generation model
  */
 @Entity
-@Table(name = "model_project")
+@Table(name = "model_project",
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = {
+            "model_id", "project_id"
+        }, name = AppConstraints.UNIQUE_MODEL_PROJECT_RECORD)
+    })
 @Getter
 @Setter
 @NoArgsConstructor

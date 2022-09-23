@@ -1,0 +1,2 @@
+ALTER TABLE model_project
+    ADD CONSTRAINT UNIQUE_MODEL_PROJECT_RECORD UNIQUE (model_id, project_id);

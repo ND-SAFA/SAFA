@@ -60,8 +60,11 @@ public class ModelService implements IAppEntityService<ModelAppEntity> {
         modelAppEntity.setId(model.getId());
 
         // Step - Create link between model and project
-        ModelProject modelProject = new ModelProject(model, project);
-        this.modelProjectRepository.save(modelProject);
+        Optional<ModelProject> modelProjectOptional = this.modelProjectRepository.findByModelAndProject(model, project);
+        if (modelProjectOptional.isEmpty()) {
+            ModelProject modelProject = new ModelProject(model, project);
+            this.modelProjectRepository.save(modelProject);
+        }
 
         return modelAppEntity;
     }

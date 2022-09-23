@@ -53,7 +53,7 @@ public class ModelService implements IAppEntityService<ModelAppEntity> {
      * @param modelAppEntity The model to create.
      * @return Created {@link ModelAppEntity}.
      */
-    public ModelAppEntity createModel(Project project, ModelAppEntity modelAppEntity) {
+    public ModelAppEntity createOrUpdateModel(Project project, ModelAppEntity modelAppEntity) {
         // Step - Create model
         Model model = new Model(modelAppEntity);
         this.modelRepository.save(model);

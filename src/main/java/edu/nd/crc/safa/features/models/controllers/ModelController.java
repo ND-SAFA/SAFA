@@ -50,8 +50,8 @@ public class ModelController extends BaseController {
      * @return {@link ModelAppEntity} The model created.
      */
     @PostMapping(AppRoutes.Models.MODEL_ROOT)
-    public ModelAppEntity createModel(@PathVariable UUID projectId,
-                                      @RequestBody ModelAppEntity modelAppEntity) {
+    public ModelAppEntity createOrUpdateModel(@PathVariable UUID projectId,
+                                              @RequestBody ModelAppEntity modelAppEntity) {
         Project project = this.resourceBuilder.fetchProject(projectId).withViewProject();
         if (modelAppEntity.getId() != null) {
             throw new IllegalArgumentException("Model cannot be updated. Please delete and create new one.");

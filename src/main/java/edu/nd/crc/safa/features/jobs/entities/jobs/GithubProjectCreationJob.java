@@ -132,8 +132,6 @@ public class GithubProjectCreationJob extends CommitJob {
         githubProject.setProject(project);
         githubProject.setBranch(this.githubRepositoryDTO.getDefaultBranch());
         githubProject.setRepositoryName(this.githubRepositoryDTO.getName());
-        // For some reason H2 throws a constraint validation error if this is null during testing
-        githubProject.setLastCommitSha("");
 
         return this.serviceProvider.getGithubProjectRepository().save(githubProject);
     }

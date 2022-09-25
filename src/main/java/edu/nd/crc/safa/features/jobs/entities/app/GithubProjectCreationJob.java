@@ -26,6 +26,8 @@ import edu.nd.crc.safa.features.projects.services.ProjectService;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
 
+import org.springframework.util.StringUtils;
+
 /**
  * Responsible for providing step implementations for importing a GitHub project:
  * 1. Connecting to GitHub and accessing project
@@ -129,7 +131,9 @@ public class GithubProjectCreationJob extends CommitJob {
         githubProject.setProject(project);
         githubProject.setBranch(this.githubRepositoryDTO.getDefaultBranch());
         githubProject.setRepositoryName(this.githubRepositoryDTO.getName());
-        githubProject.setUser(principal);
+        // For some reason H2 throws a constraint validation error if this is null during testing
+        githubProject.setLastCommitSha("");
+
         return this.serviceProvider.getGithubProjectRepository().save(githubProject);
     }
 
@@ -160,7 +164,11 @@ public class GithubProjectCreationJob extends CommitJob {
             String name = file.getPath();
             String type = file.getType().name();
             String summary = file.getSha();
-            String body = blobDTO.getContent();
+            String body = "";
+
+            if (blobDTO != null && StringUtils.hasLength(blobDTO.getContent())) {
+                body = blobDTO.getContent();
+            }
 
             ArtifactAppEntity artifact = new ArtifactAppEntity(
                 null,

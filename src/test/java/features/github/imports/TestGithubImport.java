@@ -2,12 +2,10 @@ package features.github.imports;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.features.github.entities.app.GithubResponseDTO;
-import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
 import features.github.base.AbstractGithubTest;
 
+import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.features.github.entities.db.GithubProject;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -26,13 +24,17 @@ public class TestGithubImport extends AbstractGithubTest {
 
         // We should have one version created
         Assertions.assertEquals(1, serviceProvider.getGithubProjectRepository().count());
-        // We should have one GitHub project created
-        Assertions.assertEquals(1, serviceProvider.getProjectVersionRepository().count());
-        // We should have as many artifacts as the number of files produces by the mock service
+
+        GithubProject githubProject = serviceProvider.getGithubProjectRepository().findAll().get(0);
+
+        // We should have the corespondent project and user set
+        Assertions.assertNotNull(githubProject.getProject());
+        // We should have as many artifacts as the number of files produced by the mock service
         Assertions.assertEquals(
             serviceMock.getRepositoryFiles(credentials, repositoryName, "sha")
-                .getTree().size(),
-            serviceProvider.getArtifactRepository().count()
+                .filterOutFolders().getTree().size(),
+            serviceProvider.getArtifactRepository()
+                .findByProject(githubProject.getProject()).size()
         );
     }
 }

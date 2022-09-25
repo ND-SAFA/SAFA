@@ -1,6 +1,7 @@
 package features.github.base;
 
 import java.io.File;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,8 +14,11 @@ import edu.nd.crc.safa.features.github.repositories.GithubAccessCredentialsRepos
 import edu.nd.crc.safa.features.github.services.GithubConnectionService;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import features.base.ApplicationBaseTest;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.io.ClassPathResource;
 
 /**
@@ -29,21 +33,30 @@ public abstract class AbstractGithubTest extends ApplicationBaseTest {
     protected String githubLogin = "safaGithub";
     protected GithubAccessCredentials credentials = new GithubAccessCredentials();
 
+    @MockBean
     protected GithubConnectionService serviceMock;
+
+    @MockBean
     protected GithubAccessCredentialsRepository repositoryMock;
+
+    protected AutoCloseable closeable;
 
     @BeforeEach
     public void setup() {
-        mockGithubService();
-        mockRepository();
+        this.mockGithubService();
+        this.mockRepository();
 
-        serviceProvider.setGithubConnectionService(serviceMock);
-        serviceProvider.setGithubAccessCredentialsRepository(repositoryMock);
+        closeable = MockitoAnnotations.openMocks(this);
+    }
+
+    @AfterEach
+    public void destroy() throws Exception {
+        if (closeable != null) {
+            closeable.close();
+        }
     }
 
     private void mockGithubService() {
-        serviceMock = Mockito.mock(GithubConnectionService.class);
-
         Mockito.when(serviceMock.getSelf(Mockito.any(GithubAccessCredentials.class)))
             .thenReturn(new GithubSelfResponseDTO(githubLogin));
 
@@ -69,17 +82,17 @@ public abstract class AbstractGithubTest extends ApplicationBaseTest {
         )).thenReturn(
             this.readResourceFile(FILETREE_RESPONSE_FILE, GithubRepositoryFiletreeResponseDTO.class)
         );
+
+        credentials.setAccessTokenExpirationDate(LocalDateTime.MAX);
+        credentials.setRefreshTokenExpirationDate(LocalDateTime.MAX);
     }
 
     private void mockRepository() {
-        repositoryMock = Mockito.mock(GithubAccessCredentialsRepository.class);
-
         Mockito.when(repositoryMock.findByUser(Mockito.any(SafaUser.class)))
             .thenReturn(Optional.of(this.credentials));
     }
 
-    private <T> T readResourceFile(String filepath, Class<T> clazz) {
-
+    protected <T> T readResourceFile(String filepath, Class<T> clazz) {
         try {
             File file = new ClassPathResource(filepath).getFile();
 

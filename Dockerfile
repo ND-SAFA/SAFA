@@ -1,28 +1,26 @@
-# Creates application-prod.properties with database connection details.
-# Copies configuration files to test and build server.
-#
+# Step 1 - Create production environment
 FROM ubuntu:12.04 as config
+ADD src/main/resources /app/src/main/resources
+ARG PathToProperties="/app/src/main/resources/application-deployment.properties"
 
 ARG DB_URL=jdbc:mysql://host.docker.internal/safa-db
 ARG DB_USER=root
 ARG DB_PASSWORD=secret2
 ARG DB_INSTANCE
 ARG JWT_KEY=3s6v9y$B&E)H@MbQeThWmZq4t7w!z%C*F-JaNdRfUjXn2r5u8x/A?D(G+KbPeShV
+ARG TGEN_ENDPOINT=http://35.184.232.43
 
 RUN test -n "$DB_URL"
 RUN test -n "$DB_USER"
 RUN test -n "$DB_PASSWORD"
 RUN test -n "$JWT_KEY"
-
-ARG PathToProperties="/app/src/main/resources/application-prod.properties"
-
-ADD src /app/src
+RUN test -n "$TGEN_ENDPOINT"
 
 RUN sed -i -e "s,url=,url=$DB_URL,g" $PathToProperties
 RUN sed -i -e "s,username=,username=$DB_USER,g" $PathToProperties
 RUN sed -i -e "s,password=,password=$DB_PASSWORD,g" $PathToProperties
 RUN sed -i -e "s,jwt.key=,jwt.key=$JWT_KEY,g" $PathToProperties
-
+RUN sed -i -e "s,tgen.endpoint=,tgen.endpoint=$TGEN_ENDPOINT,g" $PathToProperties
 RUN if [ ! -z "$DB_INSTANCE" ] ; \
     then \
       echo "spring.datasource.hikari.data-source-properties.cloudSqlInstance=$DB_INSTANCE" >> $PathToProperties && \
@@ -30,19 +28,29 @@ RUN if [ ! -z "$DB_INSTANCE" ] ; \
     fi
 RUN cat $PathToProperties
 
+# Step 1 - Install necessary dependencies
 FROM gradle:6.9-jdk11 AS builder
 
+# ... - Copy source code
+COPY --from=config /app/src/main/resources /app/src/main/resources
+ADD src/main/java /app/src/main/java
+ADD src/test /app/src/test
 ADD build.gradle /app/
-ADD checkstyle.xml /app/
-ADD resources/ /app/resources/
-COPY --from=config /app/src /app/src
 
+# ... - Compile code
 WORKDIR /app
-RUN gradle build --stacktrace -x test -x checkstyleMain -x checkstyleTest
+RUN gradle build --stacktrace -x Test -x checkstyleMain -x checkstyleTest
 
-# Copy build and configuration settings then create entry point.
-#
-#
+# Step - Lint source code
+ADD checkstyle.xml /app/
+RUN gradle checkstyleMain
+
+# Step - Test application
+ADD resources/ /app/resources/
+RUN gradle test
+
+# Step - Create endpoint
 FROM openjdk:11 AS runner
+COPY --from=config /app/src/main/resources /app/src/main/resources
 COPY --from=builder /app/build/libs/edu.nd.crc.safa-0.1.0.jar /app.jar
-ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom", "-jar", "-Dspring.profiles.active=prod","/app.jar"]
+ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom", "-jar", "-Dspring.profiles.active=deployment","/app.jar"]

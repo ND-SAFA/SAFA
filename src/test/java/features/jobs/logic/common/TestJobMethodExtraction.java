@@ -3,14 +3,15 @@ package features.jobs.logic.common;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.common.ServiceProvider;
-import edu.nd.crc.safa.features.jobs.entities.app.CommitJob;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
+import edu.nd.crc.safa.features.jobs.entities.jobs.CreateProjectViaJsonJob;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
-import features.base.ApplicationBaseTest;
+import common.ApplicationBaseTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -31,11 +32,12 @@ class TestJobMethodExtraction extends ApplicationBaseTest {
         });
     }
 
-    private CommitJob buildProjectCreationJob() {
-        return new CommitJob(
+    private CreateProjectViaJsonJob buildProjectCreationJob() {
+        return new CreateProjectViaJsonJob(
             new JobDbEntity(),
             serviceProvider,
-            new ProjectCommit(projectVersion, false)
+            new ProjectCommit(projectVersion, false),
+            new ArrayList<>()
         );
     }
 }

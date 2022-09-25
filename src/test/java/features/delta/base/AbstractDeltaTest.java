@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
-import features.base.ApplicationBaseTest;
+import common.ApplicationBaseTest;
 import org.javatuples.Pair;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;

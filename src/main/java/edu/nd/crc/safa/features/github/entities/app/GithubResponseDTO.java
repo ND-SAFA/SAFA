@@ -16,7 +16,7 @@ public class GithubResponseDTO<T> {
 
     @AllArgsConstructor
     public enum GithubResponseMessage {
-        TOKEN_REFRESH_REQUIRED("token has expired. refresh it"),
+        TOKEN_REFRESH_REQUIRED("Authorization token has expired. Please refresh."),
         CREATED("created"),
         UPDATED("updated"),
         OK("ok"),

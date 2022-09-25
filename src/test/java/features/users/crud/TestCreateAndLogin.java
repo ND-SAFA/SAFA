@@ -8,7 +8,7 @@ import java.util.Optional;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
-import features.base.ApplicationBaseTest;
+import common.ApplicationBaseTest;
 import org.json.JSONArray;
 import org.junit.jupiter.api.Test;
 import requests.SafaRequest;
@@ -40,7 +40,7 @@ class TestCreateAndLogin extends ApplicationBaseTest {
 
         // VP - Verify that user is able to be authenticated and no projects are assigned to it.
         JSONArray response = new SafaRequest(AppRoutes.Projects.GET_PROJECTS).getWithJsonArray();
-        assertThat(response.length()).isOne();
+        assertThat(response.length()).isZero();
     }
 
     @Test

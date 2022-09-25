@@ -11,7 +11,7 @@ import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
-import edu.nd.crc.safa.features.tgen.entities.TraceGenerationMethod;
+import edu.nd.crc.safa.features.tgen.entities.BaseGenerationModels;
 import edu.nd.crc.safa.features.tgen.entities.TraceGenerationRequest;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.TraceType;
@@ -63,10 +63,14 @@ public class GeneratedLinkController extends BaseController {
      */
     @PostMapping(value = AppRoutes.Links.GENERATE_LINKS)
     public List<TraceAppEntity> generateTraceLinks(@RequestBody @Valid TraceGenerationRequest request) {
-        System.out.println("Request:" + request);
         List<ArtifactAppEntity> sourceArtifacts = request.getSourceArtifacts();
         List<ArtifactAppEntity> targetArtifacts = request.getTargetArtifacts();
-        TraceGenerationMethod method = request.getMethod();
+        BaseGenerationModels method = request.getMethod();
+
+        if (request.getModel() != null) {
+            throw new IllegalArgumentException("Unable to generate links using custom models from this endpoint. "
+                + "Please use job controller endpoint.");
+        }
 
         return this.serviceProvider
             .getTraceGenerationService()

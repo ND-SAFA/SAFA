@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Configuration;
 @Getter
 public class TBertConfig {
     private static TBertConfig staticConfig;
-    @Value("${tbert.endpoint}")
+    @Value("${tgen.endpoint}")
     private String baseEndpoint;
 
     public static TBertConfig get() {
@@ -24,6 +24,14 @@ public class TBertConfig {
 
     public String getPredictEndpoint() {
         return FileUtilities.buildPath(baseEndpoint, "predict") + "/";
+    }
+
+    public String getTrainEndpoint() {
+        return FileUtilities.buildPath(baseEndpoint, "fine-tune") + "/";
+    }
+
+    public String getCreateModelEndpoint() {
+        return FileUtilities.buildPath(baseEndpoint, "models") + "/";
     }
 
     @PostConstruct

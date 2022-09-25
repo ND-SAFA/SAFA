@@ -46,8 +46,8 @@ public class ProjectMembershipController extends BaseController {
      * @return {@link ProjectMembership} Updated project membership.
      */
     @PostMapping(AppRoutes.Projects.Membership.ADD_PROJECT_MEMBER)
-    public ProjectMembership addOrUpdateProjectMembership(@PathVariable UUID projectId,
-                                                          @RequestBody ProjectMembershipRequest request)
+    public ProjectMemberAppEntity addOrUpdateProjectMembership(@PathVariable UUID projectId,
+                                                               @RequestBody ProjectMembershipRequest request)
         throws SafaError {
         Project project = this.resourceBuilder.fetchProject(projectId).withViewProject();
         ProjectMembership updatedProjectMembership = this.serviceProvider
@@ -58,7 +58,7 @@ public class ProjectMembershipController extends BaseController {
             .broadcastChange(EntityChangeBuilder
                 .create(projectId)
                 .withMembersUpdate(updatedProjectMembership.getMembershipId()));
-        return updatedProjectMembership;
+        return new ProjectMemberAppEntity(updatedProjectMembership);
     }
 
     /**
@@ -91,8 +91,14 @@ public class ProjectMembershipController extends BaseController {
             .getMemberService()
             .getMembershipById(projectMembershipId);
 
-        // Step - Verify user has sufficient permissions
+        // Step - Verify last member not being deleted.
         Project project = projectMembership.getProject();
+        List<ProjectMembership> projectMemberships = this.serviceProvider.getMemberService().getProjectMembers(project);
+        if (projectMemberships.size() == 1) {
+            throw new SafaError("Cannot delete last member of project.");
+        }
+
+        // Step - Verify user has sufficient permissions
         this.resourceBuilder.setProject(project).withEditProject();
 
         // Step - Delete membership

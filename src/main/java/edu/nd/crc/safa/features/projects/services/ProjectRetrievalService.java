@@ -16,6 +16,8 @@ import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
 import edu.nd.crc.safa.features.layout.services.ArtifactPositionService;
 import edu.nd.crc.safa.features.memberships.entities.app.ProjectMemberAppEntity;
 import edu.nd.crc.safa.features.memberships.services.MemberService;
+import edu.nd.crc.safa.features.models.entities.ModelAppEntity;
+import edu.nd.crc.safa.features.models.services.ModelService;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectParsingErrors;
 import edu.nd.crc.safa.features.rules.parser.RuleName;
@@ -54,6 +56,7 @@ public class ProjectRetrievalService {
     private final ArtifactPositionService artifactPositionService;
     private final WarningService warningService;
     private final CommitErrorRetrievalService commitErrorRetrievalService;
+    private final ModelService modelService;
 
     /**
      * Creates a project application entity containing the entities (e.g. traces, artifacts) from
@@ -87,6 +90,8 @@ public class ProjectRetrievalService {
         // Layout
         Map<UUID, LayoutPosition> layout = artifactPositionService.retrieveDocumentLayout(projectVersion, null);
 
+        List<ModelAppEntity> models = this.modelService.getUserModels();
+
         return new ProjectAppEntity(projectVersion,
             entities.getArtifacts(),
             entities.getTraces(),
@@ -96,7 +101,8 @@ public class ProjectRetrievalService {
             artifactTypes,
             warnings,
             errors,
-            layout);
+            layout,
+            models);
     }
 
     /**
@@ -113,7 +119,7 @@ public class ProjectRetrievalService {
             .map(ArtifactAppEntity::getId)
             .collect(Collectors.toList());
         List<TraceAppEntity> traces = this.traceService
-            .retrieveActiveTracesInProjectVersion(projectVersion, artifactIds);
+            .retrieveActiveTraces(projectVersion, artifactIds);
         return new ProjectEntities(artifacts, traces);
     }
 }

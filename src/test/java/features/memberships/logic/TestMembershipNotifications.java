@@ -8,7 +8,7 @@ import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.ProjectRole;
 
-import features.base.ApplicationBaseTest;
+import common.ApplicationBaseTest;
 import org.junit.jupiter.api.Test;
 
 /**

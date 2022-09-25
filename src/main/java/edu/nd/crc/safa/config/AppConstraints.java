@@ -43,6 +43,8 @@ public class AppConstraints {
     public static final String NULL_VALUE = "NULL not allowed for column";
     //Documents
     public static final String SINGLE_DEFAULT_DOCUMENT_PER_USER = "SINGLE_DEFAULT_DOCUMENT_PER_USER";
+    //Models
+    public static final String UNIQUE_MODEL_PROJECT_RECORD = "UNIQUE_MODEL_PROJECT_RECORD";
 
     protected static final String[] registeredConstraints = new String[]{
         AppConstraints.UNIQUE_ARTIFACT_NAME_PER_PROJECT,
@@ -57,6 +59,7 @@ public class AppConstraints {
         AppConstraints.UNIQUE_ARTIFACT_PARENT_PER_FTA_ARTIFACT,
         AppConstraints.UNIQUE_ARTIFACT_PARENT_PER_SAFETY_ARTIFACT,
         AppConstraints.UNIQUE_EMAIL,
+        AppConstraints.UNIQUE_MODEL_PROJECT_RECORD,
         AppConstraints.NULL_VALUE
     };
 
@@ -100,6 +103,8 @@ public class AppConstraints {
                 return "Attempted to create Safety artifact already associated with another Safety artifact.";
             case AppConstraints.NULL_VALUE:
                 return createNullError(cause);
+            case AppConstraints.UNIQUE_MODEL_PROJECT_RECORD:
+                return "Model is already associated with project, second record of this was attempted.";
             default:
                 throw new SafaError("Database constraint was violated. %s", cause);
         }

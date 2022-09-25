@@ -7,12 +7,12 @@ import java.util.UUID;
 
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
+import edu.nd.crc.safa.features.jobs.entities.app.CreateProjectByJsonPayload;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
-import edu.nd.crc.safa.utilities.JsonFileUtilities;
 
 import common.EntityConstants;
-import features.base.ApplicationBaseTest;
+import common.ApplicationBaseTest;
 import features.jobs.base.JobTestService;
 import org.junit.jupiter.api.Test;
 import requests.SafaRequest;
@@ -23,7 +23,7 @@ import requests.SafaRequest;
  */
 class TestJsonCommitJob extends ApplicationBaseTest {
     final String description = "description";
-    final int N_STEPS = 2;
+    final int N_STEPS = 3;
     EntityConstants.ArtifactConstants artifactConstants = new EntityConstants.ArtifactConstants();
 
     @Test
@@ -35,9 +35,11 @@ class TestJsonCommitJob extends ApplicationBaseTest {
         projectAppEntity.setArtifacts(List.of(artifactConstants.artifact));
 
         // Step 2 - Submit project to be created
+        CreateProjectByJsonPayload payload = new CreateProjectByJsonPayload();
+        payload.setProject(projectAppEntity);
         String jobIdString = SafaRequest
-            .withRoute(AppRoutes.Jobs.CREATE_PROJECT_VIA_JSON)
-            .postWithJsonObject(JsonFileUtilities.toJson(projectAppEntity))
+            .withRoute(AppRoutes.Jobs.Projects.CREATE_PROJECT_VIA_JSON)
+            .postWithJsonObject(payload)
             .getString("id");
         UUID jobId = UUID.fromString(jobIdString);
 

@@ -2,18 +2,25 @@ package edu.nd.crc.safa.features.jobs.controllers;
 
 import java.util.List;
 import java.util.UUID;
+import javax.validation.Valid;
 
 import edu.nd.crc.safa.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.jobs.builders.CreateProjectByJsonJobBuilder;
+import edu.nd.crc.safa.features.jobs.builders.GenerateLinksJobBuilder;
+import edu.nd.crc.safa.features.jobs.builders.TrainModelJobBuilder;
+import edu.nd.crc.safa.features.jobs.builders.UpdateProjectByFlatFileJobBuilder;
+import edu.nd.crc.safa.features.jobs.entities.app.CreateProjectByJsonPayload;
 import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
-import edu.nd.crc.safa.features.jobs.entities.builders.CreateProjectByJsonJobBuilder;
-import edu.nd.crc.safa.features.jobs.entities.builders.UpdateProjectByFlatFileJobBuilder;
 import edu.nd.crc.safa.features.jobs.services.JobService;
+import edu.nd.crc.safa.features.models.entities.api.TrainingRequest;
 import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
-import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.tgen.entities.TraceGenerationRequest;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -42,8 +49,14 @@ public class JobController extends BaseController {
         this.jobService = serviceProvider.getJobService();
     }
 
-    @GetMapping(AppRoutes.Jobs.GET_JOBS)
-    public List<JobAppEntity> getJobStatus() throws SafaError {
+    /**
+     * Returns the list of jobs created by the authenticated user.
+     *
+     * @return The list of jobs created by user.
+     * @throws SafaError If authentication error occurs.
+     */
+    @GetMapping(AppRoutes.Jobs.Meta.GET_JOBS)
+    public List<JobAppEntity> getUserJobs() throws SafaError {
         return this.jobService.retrieveCurrentUserJobs();
     }
 
@@ -53,7 +66,7 @@ public class JobController extends BaseController {
      * @param jobId The UUID for the job to stop.
      * @throws SafaError Throws error because still in construction.
      */
-    @DeleteMapping(AppRoutes.Jobs.DELETE_JOB)
+    @DeleteMapping(AppRoutes.Jobs.Meta.DELETE_JOB)
     public void deleteJob(@PathVariable UUID jobId) throws SafaError {
         this.jobService.deleteJob(jobId);
         this.serviceProvider.getNotificationService().broadcastChange(
@@ -71,7 +84,7 @@ public class JobController extends BaseController {
      * @return The current status of the job created.
      * @throws SafaError Throws error if job failed to start or is under construction.
      */
-    @PostMapping(AppRoutes.Jobs.UPDATE_PROJECT_VIA_FLAT_FILES)
+    @PostMapping(AppRoutes.Jobs.Projects.UPDATE_PROJECT_VIA_FLAT_FILES)
     @ResponseStatus(HttpStatus.CREATED)
     public JobAppEntity flatFileProjectUpdateJob(@PathVariable UUID versionId,
                                                  @RequestParam MultipartFile[] files) throws Exception {
@@ -81,10 +94,55 @@ public class JobController extends BaseController {
         return updateProjectByFlatFileJobBuilder.perform();
     }
 
-    @PostMapping(AppRoutes.Jobs.CREATE_PROJECT_VIA_JSON)
-    public JobAppEntity createProjectFromJSON(@RequestBody ProjectAppEntity projectAppEntity) throws Exception {
+    /**
+     * Creates a project by saving project entities.
+     *
+     * @param payload The project entities to save (e.g. artifacts, traces) and traces to generate.
+     * @return {@link JobAppEntity} The job created for this task.
+     * @throws Exception If an error occurs while setting up job.
+     */
+    @PostMapping(AppRoutes.Jobs.Projects.CREATE_PROJECT_VIA_JSON)
+    public JobAppEntity createProjectFromJSON(@RequestBody @Valid CreateProjectByJsonPayload payload) throws Exception {
+        // Step - Create and start job.
         CreateProjectByJsonJobBuilder createProjectByJsonJobBuilder = new CreateProjectByJsonJobBuilder(
-            serviceProvider, projectAppEntity);
+            serviceProvider, payload.getProject(), payload.getRequests());
         return createProjectByJsonJobBuilder.perform();
+    }
+
+    /**
+     * Creates a job for generating trace links between source and target artifacts with specified method.
+     *
+     * @param request Request identifying source and target artifacts along with the method to generate links with.
+     * @return The {@link JobAppEntity} create for this job.
+     * @throws Exception If an error occurs while starting job.
+     */
+    @PostMapping(AppRoutes.Jobs.Traces.GENERATE)
+    public JobAppEntity generateTraceLinks(@RequestBody @Valid TraceGenerationRequest request) throws Exception {
+        // Step - Check permissions and retrieve persistent properties
+        UUID versionId = request.getProjectVersion().getVersionId();
+        ProjectVersion projectVersion = resourceBuilder.fetchVersion(versionId).withEditVersion();
+        request.setProjectVersion(projectVersion);
+
+        // Step - Create and start job.
+        GenerateLinksJobBuilder jobBuilder = new GenerateLinksJobBuilder(this.serviceProvider, request);
+        return jobBuilder.perform();
+    }
+
+    /**
+     * Trains model defined in request with data given.
+     *
+     * @param trainingRequest Details model and data to train with.
+     * @return {@link JobAppEntity} The job to keep track of status.
+     * @throws Exception Throws error if any error occurs while setting up job.
+     */
+    @PostMapping(AppRoutes.Jobs.Models.TRAIN)
+    public JobAppEntity trainModel(@RequestBody @Valid TrainingRequest trainingRequest) throws Exception {
+        Project project = this.resourceBuilder.fetchProject(trainingRequest.getProjectId()).withEditProject();
+        TrainModelJobBuilder trainModelJobBuilder = new TrainModelJobBuilder(
+            serviceProvider,
+            trainingRequest,
+            project
+        );
+        return trainModelJobBuilder.perform();
     }
 }

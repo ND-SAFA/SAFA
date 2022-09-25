@@ -107,6 +107,11 @@ public class RouteBuilder<T extends RouteBuilder<T>> {
         return (T) this;
     }
 
+    public T withModelId(UUID modelId) {
+        this.path = this.path.replace("{modelId}", modelId.toString());
+        return (T) this;
+    }
+
     public T withRepositoryName(String repositoryName) {
         this.path = this.path.replace("{repositoryName}", repositoryName);
         return (T) this;

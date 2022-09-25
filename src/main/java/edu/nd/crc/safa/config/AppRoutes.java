@@ -26,40 +26,6 @@ public class AppRoutes {
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class Jobs {
-        protected static final String JOBS_PREFIX = "/jobs";
-        public static final String UPDATE_PROJECT_VIA_FLAT_FILES = JOBS_PREFIX + "/projects/versions/{versionId}";
-        public static final String GET_JOBS = JOBS_PREFIX;
-        public static final String CREATE_PROJECT_VIA_JSON = JOBS_PREFIX + Projects.ROOT;
-        private static final String JOB_ID = JOBS_PREFIX + "/{jobId}";
-        public static final String DELETE_JOB = JOB_ID;
-    }
-
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class Projects {
-        protected static final String ROOT = "/projects";
-        public static final String BY_ID = ROOT + "/{projectId}";
-        public static final String DELETE_PROJECT_BY_ID = ROOT + "/{projectId}";
-        public static final String CREATE_OR_UPDATE_PROJECT_META = ROOT;
-        public static final String GET_PROJECTS = ROOT;
-
-        @NoArgsConstructor(access = AccessLevel.PRIVATE)
-        public static class Membership {
-            public static final String ADD_PROJECT_MEMBER = ROOT + "/{projectId}/members";
-            public static final String GET_PROJECT_MEMBERS = ROOT + "/{projectId}/members";
-            public static final String DELETE_PROJECT_MEMBERSHIP = ROOT + "/members/{projectMembershipId}";
-            public static final String GET_USER_PROJECTS = ROOT;
-        }
-
-        @NoArgsConstructor(access = AccessLevel.PRIVATE)
-        public static class Entities {
-            public static final String CHECK_IF_ARTIFACT_EXISTS = ROOT
-                + "/versions/{versionId}/artifacts/validate";
-        }
-
-    }
-
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class ArtifactType {
         public static final String GET_PROJECT_ARTIFACT_TYPES = Projects.ROOT + "/{projectId}/artifactTypes";
         public static final String CREATE_OR_UPDATE_ARTIFACT_TYPE = GET_PROJECT_ARTIFACT_TYPES;
@@ -97,13 +63,6 @@ public class AppRoutes {
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class Rules {
-        public static final String CREATE_WARNING_IN_PROJECT = "/project/{projectId}/rules";
-        public static final String GET_WARNINGS_IN_PROJECT_VERSION = Projects.ROOT
-            + "/versions/{versionId}/warnings";
-    }
-
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class FlatFiles {
         public static final String UPDATE_PROJECT_VERSION_FROM_FLAT_FILES = Projects.ROOT
             + "/versions/{versionId}/flat-files";
@@ -112,6 +71,82 @@ public class AppRoutes {
         public static final String PARSE_ARTIFACT_FILE = Projects.ROOT + "/parse/artifacts/{artifactType}";
         public static final String PARSE_TRACE_FILE = Projects.ROOT + "/parse/traces";
 
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class Models {
+        public static final String MODEL_ROOT = Projects.BY_ID + "/models";
+        public static final String MODEL_BY_ID = Models.MODEL_ROOT + "/{modelId}";
+        public static final String DELETE_MODEL_BY_ID = MODEL_BY_ID;
+        public static final String TRAIN_MODEL = MODEL_BY_ID;
+        public static final String SHARE_MODEL = Projects.ROOT + "/models/share";
+
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class Links {
+        public static final String GET_GENERATED_LINKS_IN_PROJECT_VERSION = Projects.ROOT
+            + "/versions/{versionId}/links/generated";
+        public static final String GENERATE_LINKS = Projects.ROOT + "/links/generate";
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class Jobs {
+        protected static final String JOBS_PREFIX = "/jobs";
+
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        public static class Traces {
+            public static final String GENERATE = JOBS_PREFIX + Links.GENERATE_LINKS;
+        }
+
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        public static class Projects {
+            public static final String CREATE_PROJECT_VIA_JSON = JOBS_PREFIX + AppRoutes.Projects.ROOT;
+            public static final String UPDATE_PROJECT_VIA_FLAT_FILES = JOBS_PREFIX + "/projects/versions/{versionId}";
+        }
+
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        public static class Meta {
+            public static final String GET_JOBS = JOBS_PREFIX;
+            private static final String JOB_ID = JOBS_PREFIX + "/{jobId}";
+            public static final String DELETE_JOB = JOB_ID;
+        }
+
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        public static class Models {
+            public static final String TRAIN = JOBS_PREFIX + AppRoutes.Projects.BY_ID + "/models/train";
+        }
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class Projects {
+        protected static final String ROOT = "/projects";
+        public static final String BY_ID = ROOT + "/{projectId}";
+        public static final String DELETE_PROJECT_BY_ID = ROOT + "/{projectId}";
+        public static final String CREATE_OR_UPDATE_PROJECT_META = ROOT;
+        public static final String GET_PROJECTS = ROOT;
+
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        public static class Membership {
+            public static final String ADD_PROJECT_MEMBER = ROOT + "/{projectId}/members";
+            public static final String GET_PROJECT_MEMBERS = ROOT + "/{projectId}/members";
+            public static final String DELETE_PROJECT_MEMBERSHIP = ROOT + "/members/{projectMembershipId}";
+            public static final String GET_USER_PROJECTS = ROOT;
+        }
+
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        public static class Entities {
+            public static final String CHECK_IF_ARTIFACT_EXISTS = ROOT
+                + "/versions/{versionId}/artifacts/validate";
+        }
+
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class Rules {
+        public static final String CREATE_WARNING_IN_PROJECT = "/project/{projectId}/rules";
+        public static final String GET_WARNINGS_IN_PROJECT_VERSION = Projects.ROOT
+            + "/versions/{versionId}/warnings";
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -155,18 +190,11 @@ public class AppRoutes {
 
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
         public static class Import {
+            public static final String UPDATE = Versions.BY_ID + "/import/github/{repositoryName}";
             private static final String ROOT = Projects.ROOT + "/import";
             public static final String BY_NAME = Import.ROOT + "/github/{repositoryName}";
             public static final String UPDATE = Versions.BY_ID + "/import/github/{repositoryName}";
-            public static final String ADD_INTO_EXISTING = Versions.BY_ID + "/add/github/{repositoryName}";
         }
-    }
-
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class Links {
-        public static final String GET_GENERATED_LINKS_IN_PROJECT_VERSION = Projects.ROOT
-            + "/versions/{versionId}/links/generated";
-        public static final String GENERATE_LINKS = Projects.ROOT + "/links/generate";
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)

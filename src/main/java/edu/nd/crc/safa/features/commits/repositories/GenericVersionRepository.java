@@ -47,12 +47,12 @@ public abstract class GenericVersionRepository<
 
     @Override
     public List<A> retrieveAppEntitiesByProjectVersion(ProjectVersion projectVersion) {
-        List<V> artifactBodies = this.retrieveVersionEntitiesByProjectVersion(projectVersion);
-        List<A> artifacts = new ArrayList<>();
-        for (V artifactVersion : artifactBodies) {
-            artifacts.add(this.retrieveAppEntityFromVersionEntity(artifactVersion));
+        List<V> versionEntities = this.retrieveVersionEntitiesByProjectVersion(projectVersion);
+        List<A> appEntities = new ArrayList<>();
+        for (V versionEntity : versionEntities) {
+            appEntities.add(this.retrieveAppEntityFromVersionEntity(versionEntity));
         }
-        return artifacts;
+        return appEntities;
     }
 
     /**

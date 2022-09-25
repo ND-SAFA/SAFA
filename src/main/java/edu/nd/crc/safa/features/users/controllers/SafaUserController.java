@@ -73,7 +73,6 @@ public class SafaUserController extends BaseController {
         UserIdentifierDTO newUserIdentifierDTO = this.serviceProvider
             .getSafaUserService()
             .createUser(newUser.getEmail(), newUser.getPassword());
-        createSampleProject(newUser);
         return newUserIdentifierDTO;
     }
 

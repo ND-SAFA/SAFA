@@ -6,7 +6,7 @@ import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import features.base.ApplicationBaseTest;
+import common.ApplicationBaseTest;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import requests.SafaRequest;

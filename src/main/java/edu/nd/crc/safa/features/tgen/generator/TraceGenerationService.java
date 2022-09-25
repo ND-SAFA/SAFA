@@ -7,15 +7,17 @@ import java.util.stream.Collectors;
 import edu.nd.crc.safa.common.SafaRequestBuilder;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.tgen.entities.ArtifactTypeTraceGenerationRequestDTO;
+import edu.nd.crc.safa.features.tgen.entities.BaseGenerationModels;
 import edu.nd.crc.safa.features.tgen.entities.ITraceLinkGeneration;
-import edu.nd.crc.safa.features.tgen.entities.TraceGenerationMethod;
-import edu.nd.crc.safa.features.tgen.method.TBert;
+import edu.nd.crc.safa.features.tgen.method.bert.NLBert;
+import edu.nd.crc.safa.features.tgen.method.bert.PLBert;
 import edu.nd.crc.safa.features.tgen.method.vsm.VSMController;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.NotImplementedException;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 /**
@@ -23,6 +25,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @AllArgsConstructor
+@Scope("singleton")
 public class TraceGenerationService {
     private static final String DELIMITER = "*";
     private final SafaRequestBuilder safaRequestBuilder;
@@ -32,8 +35,8 @@ public class TraceGenerationService {
         List<TraceAppEntity> generatedLinks = new ArrayList<>();
 
         for (ArtifactTypeTraceGenerationRequestDTO request : requests) {
-            String sourceArtifactType = request.getSourceTypeName();
-            String targetArtifactType = request.getTargetTypeName();
+            String sourceArtifactType = request.getSource();
+            String targetArtifactType = request.getTarget();
 
             List<ArtifactAppEntity> sourceArtifacts = artifacts
                 .stream()
@@ -46,16 +49,16 @@ public class TraceGenerationService {
             generatedLinks.addAll(generateLinksWithMethod(
                 sourceArtifacts,
                 targetArtifacts,
-                request.getTraceGenerationMethod()));
+                request.getMethod()));
         }
         return generatedLinks;
     }
 
     public List<TraceAppEntity> generateLinksWithMethod(List<ArtifactAppEntity> sourceArtifacts,
                                                         List<ArtifactAppEntity> targetArtifacts,
-                                                        TraceGenerationMethod traceGenerationMethod) {
-        ITraceLinkGeneration generationMethod = buildGenerationMethod(traceGenerationMethod);
-        return generationMethod.generateLinks(sourceArtifacts, targetArtifacts);
+                                                        BaseGenerationModels baseGenerationModels) {
+        ITraceLinkGeneration generationMethod = buildGenerationMethod(baseGenerationModels);
+        return generationMethod.generateLinksWithBaselineState(sourceArtifacts, targetArtifacts);
     }
 
     public List<TraceAppEntity> filterDuplicateGeneratedLinks(List<TraceAppEntity> manualLinks,
@@ -74,14 +77,16 @@ public class TraceGenerationService {
             .collect(Collectors.toList());
     }
 
-    private ITraceLinkGeneration buildGenerationMethod(TraceGenerationMethod traceGenerationMethod) {
-        switch (traceGenerationMethod) {
+    public ITraceLinkGeneration buildGenerationMethod(BaseGenerationModels baseGenerationModel) {
+        switch (baseGenerationModel) {
             case VSM:
                 return new VSMController();
-            case TBERT:
-                return new TBert(safaRequestBuilder);
+            case PLBert:
+                return new PLBert(safaRequestBuilder);
+            case NLBert:
+                return new NLBert(safaRequestBuilder);
             default:
-                throw new NotImplementedException("Trace method not implemented:" + traceGenerationMethod);
+                throw new NotImplementedException("Trace method not implemented:" + baseGenerationModel);
         }
     }
 }

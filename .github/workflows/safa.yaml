@@ -15,6 +15,3 @@ jobs:
 
       - name: Lint Source Code
         run: ./gradlew checkstyleMain
-
-      - name: Run Tests
-        run: ./gradlew test --debug

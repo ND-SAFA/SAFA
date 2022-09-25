@@ -14,9 +14,9 @@ import edu.nd.crc.safa.features.jira.entities.app.JiraResponseDTO.JiraResponseMe
 import edu.nd.crc.safa.features.jira.entities.db.JiraAccessCredentials;
 import edu.nd.crc.safa.features.jira.repositories.JiraAccessCredentialsRepository;
 import edu.nd.crc.safa.features.jira.services.JiraConnectionService;
+import edu.nd.crc.safa.features.jobs.builders.CreateProjectViaJiraBuilder;
+import edu.nd.crc.safa.features.jobs.builders.UpdateProjectViaJiraBuilder;
 import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
-import edu.nd.crc.safa.features.jobs.entities.builders.CreateProjectViaJiraBuilder;
-import edu.nd.crc.safa.features.jobs.entities.builders.UpdateProjectViaJiraBuilder;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
@@ -73,25 +73,43 @@ public class JiraController extends BaseController {
     }
 
     @PostMapping(AppRoutes.Jira.Import.BY_ID)
-    public JobAppEntity createJiraProject(@PathVariable("id") Long jiraProjectId,
+    public JiraResponseDTO<JobAppEntity> createJiraProject(@PathVariable("id") Long jiraProjectId,
                                           @PathVariable("cloudId") String cloudId) throws Exception {
+
+        SafaUser principal = safaUserService.getCurrentUser();
+        JiraAccessCredentials jiraAccessCredentials = accessCredentialsRepository
+            .findByUserAndCloudId(principal, cloudId).orElseThrow(() -> new SafaError("No JIRA credentials found"));
+
+        if (!jiraConnectionService.checkUserCanViewProjectIssues(jiraAccessCredentials, jiraProjectId)) {
+            return new JiraResponseDTO<>(null, JiraResponseMessage.CANNOT_PARSE_PROJECT);
+        }
 
         CreateProjectViaJiraBuilder createProjectViaJira = new CreateProjectViaJiraBuilder(
             serviceProvider,
             new JiraIdentifier(null, jiraProjectId, cloudId)); // version created in job
-        return createProjectViaJira.perform();
+
+        return new JiraResponseDTO<>(createProjectViaJira.perform(), JiraResponseMessage.OK);
     }
 
     @PutMapping(AppRoutes.Jira.Import.UPDATE)
-    public JobAppEntity updateJiraProject(@PathVariable UUID versionId,
+    public JiraResponseDTO<JobAppEntity> updateJiraProject(@PathVariable UUID versionId,
                                           @PathVariable("id") Long jiraProjectId,
                                           @PathVariable("cloudId") String cloudId) throws Exception {
+        SafaUser principal = safaUserService.getCurrentUser();
+        JiraAccessCredentials jiraAccessCredentials = accessCredentialsRepository
+            .findByUserAndCloudId(principal, cloudId).orElseThrow(() -> new SafaError("No JIRA credentials found"));
+
+        if (!jiraConnectionService.checkUserCanViewProjectIssues(jiraAccessCredentials, jiraProjectId)) {
+            return new JiraResponseDTO<>(null, JiraResponseMessage.CANNOT_PARSE_PROJECT);
+        }
+
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersion();
         JiraIdentifier jiraIdentifier = new JiraIdentifier(projectVersion, jiraProjectId, cloudId);
         UpdateProjectViaJiraBuilder updateProjectViaJira = new UpdateProjectViaJiraBuilder(
             this.serviceProvider,
             jiraIdentifier
         );
-        return updateProjectViaJira.perform();
+
+        return new JiraResponseDTO<>(updateProjectViaJira.perform(), JiraResponseMessage.OK);
     }
 }

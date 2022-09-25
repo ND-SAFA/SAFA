@@ -8,7 +8,7 @@ import edu.nd.crc.safa.features.jobs.entities.app.AbstractJob;
 import edu.nd.crc.safa.features.jobs.entities.app.JobSteps;
 import edu.nd.crc.safa.features.jobs.entities.app.JobType;
 
-import features.base.ApplicationBaseTest;
+import common.ApplicationBaseTest;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -23,8 +23,9 @@ class TestJobStepNames extends ApplicationBaseTest {
 
     @Test
     void testCommitJobSteps() {
-        List<String> stepNames = JobSteps.getJobSteps(JobType.PROJECT_CREATION);
+        List<String> stepNames = JobSteps.getJobSteps(JobType.PROJECT_CREATION_VIA_JSON);
         String[] expectedStepNames = new String[]{
+            "Generating Trace Links",
             "Committing Entities",
             "Done"
         };
@@ -33,7 +34,7 @@ class TestJobStepNames extends ApplicationBaseTest {
 
     @Test
     void testFlatFileProjectCreationSteps() {
-        List<String> stepNames = JobSteps.getJobSteps(JobType.FLAT_FILE_PROJECT_CREATION);
+        List<String> stepNames = JobSteps.getJobSteps(JobType.PROJECT_CREATION_VIA_FLAT_FILE);
         String[] expectedStepNames = new String[]{
             "Uploading Flat Files",
             "Parsing Files",
@@ -46,14 +47,14 @@ class TestJobStepNames extends ApplicationBaseTest {
 
     @Test
     void testJiraProjectCreationSteps() {
-        List<String> stepNames = JobSteps.getJobSteps(JobType.JIRA_PROJECT_CREATION);
+        List<String> stepNames = JobSteps.getJobSteps(JobType.PROJECT_CREATION_VIA_JIRA);
         String[] expectedStepNames = getJiraStepNames();
         testStepNames(expectedStepNames, stepNames);
     }
 
     @Test
     void testJiraProjectUpdateSteps() {
-        List<String> stepNames = JobSteps.getJobSteps(JobType.JIRA_PROJECT_UPDATE);
+        List<String> stepNames = JobSteps.getJobSteps(JobType.PROJECT_UPDATE_VIA_JIRA);
         String[] expectedStepNames = getJiraStepNames();
         testStepNames(expectedStepNames, stepNames);
     }
@@ -74,7 +75,7 @@ class TestJobStepNames extends ApplicationBaseTest {
         for (int i = 0; i < expectedNames.length; i++) {
             String expectedStepName = expectedNames[i];
             String stepName = stepNames.get(i);
-            assertThat(stepName).isEqualTo(expectedStepName);
+            assertThat(stepName).isEqualToIgnoringCase(expectedStepName);
         }
     }
 }

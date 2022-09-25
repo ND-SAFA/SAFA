@@ -60,10 +60,8 @@ public class SafaRequestBuilder {
             .toEntity(requestMeta.responseClass)
             .timeout(requestMeta.timeout)
             .block();
-
         // check response status code
-        if (response != null
-            && response.getStatusCode() != HttpStatus.BAD_REQUEST) {
+        if (response != null && response.getStatusCode() != HttpStatus.BAD_REQUEST) {
             return response.getBody();
         } else {
             return null;

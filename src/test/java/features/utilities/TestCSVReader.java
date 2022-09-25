@@ -4,6 +4,7 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.List;
 
 import edu.nd.crc.safa.config.ProjectPaths;
@@ -53,6 +54,8 @@ class TestCSVReader extends EntityBaseTest {
         Exception exception = assertThrows(IOException.class, () -> {
             FileUtilities.readCSVFile("/abc/123");
         });
-        assertThat(exception.getMessage()).contains("/abc/123");
+        // Check file path independent of the operating system
+        assertThat(exception.getMessage())
+            .contains(Paths.get("abc", "123").toString());
     }
 }

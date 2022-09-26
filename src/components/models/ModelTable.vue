@@ -15,8 +15,13 @@
     <template v-slot:addItemDialogue>
       <model-creator-modal
         :model="currentItem"
-        :is-open="isModalOpen"
-        @close="isModalOpen = false"
+        :is-open="isSaveOpen"
+        @close="handleClose"
+      />
+      <model-share-modal
+        :model="currentItem"
+        :is-open="isShareOpen"
+        @close="handleClose"
       />
     </template>
     <template v-slot:expanded-item="{ item }">
@@ -40,6 +45,13 @@
         <typography secondary value="There are no evaluation runs." />
       </div>
     </template>
+    <template v-slot:[`item.actions`]="{ item }">
+      <generic-icon-button
+        icon-id="mdi-share-variant"
+        tooltip="Share Model"
+        @click="handleShare(item)"
+      />
+    </template>
   </generic-selector>
 </template>
 
@@ -53,7 +65,9 @@ import {
   FlexBox,
   GenericSelector,
   Typography,
+  GenericIconButton,
 } from "@/components/common";
+import ModelShareModal from "./ModelShareModal.vue";
 import ModelCreatorModal from "./ModelCreatorModal.vue";
 
 /**
@@ -62,6 +76,8 @@ import ModelCreatorModal from "./ModelCreatorModal.vue";
 export default Vue.extend({
   name: "ModelTable",
   components: {
+    ModelShareModal,
+    GenericIconButton,
     ModelCreatorModal,
     AttributeChip,
     FlexBox,
@@ -70,7 +86,8 @@ export default Vue.extend({
   },
   data() {
     return {
-      isModalOpen: false,
+      isSaveOpen: false,
+      isShareOpen: false,
       headers: [
         { text: "Name", value: "name" },
         { text: "Base Model", value: "baseModel" },
@@ -92,13 +109,15 @@ export default Vue.extend({
      * Closes the model modal.
      */
     handleClose() {
-      this.isModalOpen = false;
+      this.isSaveOpen = false;
+      this.isShareOpen = false;
+      this.currentItem = undefined;
     },
     /**
      * Opens the modal to add a model.
      */
     handleAdd() {
-      this.isModalOpen = true;
+      this.isSaveOpen = true;
     },
     /**
      * Opens the modal to edit a model.
@@ -106,7 +125,15 @@ export default Vue.extend({
      */
     handleEdit(model: TrainedModel) {
       this.currentItem = model;
-      this.isModalOpen = true;
+      this.isSaveOpen = true;
+    },
+    /**
+     * Opens the modal to share a model.
+     * @param model - The model to share.
+     */
+    handleShare(model: TrainedModel) {
+      this.currentItem = model;
+      this.isShareOpen = true;
     },
     /**
      * Opens the modal to delete a model.

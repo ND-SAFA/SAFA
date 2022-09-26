@@ -41,6 +41,7 @@
     </template>
     <template v-slot:[`item.actions`]="{ item }">
       <flex-box>
+        <slot name="item.actions" :item="item" />
         <generic-icon-button
           v-if="hasEdit"
           icon-id="mdi-pencil"

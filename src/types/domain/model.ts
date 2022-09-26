@@ -19,3 +19,11 @@ export interface TrainedModel {
    */
   defaultTraceDirections?: { source: string; target: string }[];
 }
+
+/**
+ * Lists the methods by which a model can be shared.
+ */
+export enum ModelShareType {
+  CLONE = "COPY_BY_VALUE",
+  REUSE = "COPY_BY_REFERENCE",
+}

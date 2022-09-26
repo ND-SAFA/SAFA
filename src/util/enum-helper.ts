@@ -4,6 +4,7 @@ import {
   ColumnDataType,
   DocumentType,
   FTANodeType,
+  ModelShareType,
   ModelType,
   ProjectRole,
   SafetyCaseType,
@@ -162,5 +163,17 @@ export function projectRoleOptions(): SelectOption[] {
     createEnumOption(ProjectRole.ADMIN),
     createEnumOption(ProjectRole.EDITOR),
     createEnumOption(ProjectRole.VIEWER),
+  ];
+}
+
+/**
+ * Returns display names for model share options.
+ *
+ * @return The select option names and ids.
+ */
+export function modelShareOptions(): SelectOption[] {
+  return [
+    createEnumOption(ModelShareType.CLONE, "Clone the model"),
+    createEnumOption(ModelShareType.REUSE, "Reuse the same model"),
   ];
 }

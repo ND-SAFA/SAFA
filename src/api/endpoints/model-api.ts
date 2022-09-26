@@ -1,4 +1,4 @@
-import { TrainedModel } from "@/types";
+import { ModelShareType, TrainedModel } from "@/types";
 import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
 
 /**
@@ -84,4 +84,26 @@ export async function deleteModel(
       method: "DELETE",
     }
   );
+}
+
+/**
+ * Shares a model with another project.
+ *
+ * @param targetProject - The id of the project to share the model to.
+ * @param model - The model to share.
+ * @param shareMethod - The method by which to share.
+ */
+export async function shareModel(
+  targetProject: string,
+  model: TrainedModel,
+  shareMethod: ModelShareType
+): Promise<void> {
+  await authHttpClient(fillEndpoint(Endpoint.shareModel), {
+    method: "POST",
+    body: JSON.stringify({
+      model,
+      targetProject,
+      shareMethod,
+    }),
+  });
 }

@@ -20,6 +20,15 @@ export function handleSaveProject(
 ): void {
   saveProject(project)
     .then((project) => {
+      projectStore.$patch(({ allProjects }) => ({
+        allProjects: [
+          project,
+          ...allProjects.filter(
+            ({ projectId }) => projectId !== project.projectId
+          ),
+        ],
+      }));
+
       logStore.onSuccess(`Project has been saved: ${project.name}`);
       onSuccess?.(project);
     })
@@ -43,6 +52,12 @@ export function handleDeleteProject(
 ): void {
   deleteProject(project.projectId)
     .then(async () => {
+      projectStore.$patch(({ allProjects }) => ({
+        allProjects: allProjects.filter(
+          ({ projectId }) => projectId !== project.projectId
+        ),
+      }));
+
       logStore.onSuccess(`Project has been deleted: ${project.name}`);
       onSuccess?.(project);
 

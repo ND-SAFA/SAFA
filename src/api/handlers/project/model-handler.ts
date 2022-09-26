@@ -1,6 +1,11 @@
-import { IOHandlerCallback, TrainedModel } from "@/types";
+import { IOHandlerCallback, ModelShareType, TrainedModel } from "@/types";
 import { logStore, projectStore } from "@/hooks";
-import { createModel, deleteModel, getProjectModels } from "@/api/endpoints";
+import {
+  createModel,
+  deleteModel,
+  getProjectModels,
+  shareModel,
+} from "@/api/endpoints";
 
 /**
  * Loads models for the current project.
@@ -68,4 +73,26 @@ export function handleDeleteModel(model: TrainedModel): void {
         });
     }
   );
+}
+
+/**
+ * Shares a model with another project.
+ *
+ * @param targetProject - The id of the project to share the model to.
+ * @param model - The model to share.
+ * @param shareMethod - The method by which to share.
+ */
+export function handleShareModel(
+  targetProject: string,
+  model: TrainedModel,
+  shareMethod: ModelShareType
+): void {
+  shareModel(targetProject, model, shareMethod)
+    .then(() => {
+      logStore.onSuccess(`Successfully shared model: "${model.name}`);
+    })
+    .catch((e) => {
+      logStore.onError(`Unable to share model: "${model.name}`);
+      logStore.onDevError(e);
+    });
 }

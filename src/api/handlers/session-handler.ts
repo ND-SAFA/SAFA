@@ -17,6 +17,7 @@ import {
   savePassword,
   deleteAccount,
   handleLoadLastProject,
+  handleGetProjects,
 } from "@/api";
 
 /**
@@ -33,6 +34,7 @@ export async function handleLogin(user: UserModel): Promise<void> {
 
   sessionStore.updateSession(session);
   datadogRum.startSessionReplayRecording();
+  await handleGetProjects({});
 
   if (goToPath === Routes.ARTIFACT) {
     await handleLoadLastProject();
@@ -78,6 +80,7 @@ export async function handleAuthentication(): Promise<void> {
 
     if (isAuthorized) {
       datadogRum.startSessionReplayRecording();
+      await handleGetProjects({});
 
       return;
     }

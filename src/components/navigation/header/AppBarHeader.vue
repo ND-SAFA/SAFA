@@ -10,9 +10,11 @@
       <update-button />
     </flex-box>
 
-    <div class="mr-5">
+    <div class="mr-2">
       <version-label />
     </div>
+
+    <notifications />
 
     <account-dropdown />
 
@@ -68,10 +70,12 @@ import SavingIcon from "./SavingIcon.vue";
 import VersionLabel from "./VersionLabel.vue";
 import AccountDropdown from "./AccountDropdown.vue";
 import UpdateButton from "./UpdateButton.vue";
+import Notifications from "./Notifications.vue";
 
 export default Vue.extend({
   name: "AppBarHeader",
   components: {
+    Notifications,
     TraceLinkGeneratorModal,
     UpdateButton,
     FlexBox,

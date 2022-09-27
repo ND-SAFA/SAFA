@@ -26,6 +26,10 @@ export const useLog = defineStore("log", {
      * The timestamp of the last message displayed.
      */
     lastMessageTimestamp: 0,
+    /**
+     * A list of all messages displayed in the current session.
+     */
+    notifications: [] as SnackbarMessage[],
   }),
   getters: {},
   actions: {
@@ -51,6 +55,7 @@ export const useLog = defineStore("log", {
       }
 
       this.lastMessageTimestamp = Date.now();
+      this.notifications = [message, ...this.notifications];
     },
     /**
      * Creates a snackbar with the given message.

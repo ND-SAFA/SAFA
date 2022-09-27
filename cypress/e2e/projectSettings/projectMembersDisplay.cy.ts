@@ -1,4 +1,4 @@
-import { DataCy } from "../fixtures";
+import { DataCy } from "../../fixtures";
 
 describe("Porject members display", () => {
   before(() => {

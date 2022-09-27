@@ -1,4 +1,4 @@
-import { DataCy } from "../fixtures";
+import { DataCy } from "../../fixtures";
 
 describe("Project Members CRUD", () => {
   beforeEach(() => {
@@ -28,7 +28,7 @@ describe("Project Members CRUD", () => {
     });
   });
   describe("As an owner, I can remove a member from a project", () => {
-    it("Removes a project member", () => {
+    it.skip("Removes a project member", () => {
       cy.addingNewMember("Adrian.R6driguez@gmail.com", "Editor");
 
       cy.addingNewMember("Test@test.com", "Admin");

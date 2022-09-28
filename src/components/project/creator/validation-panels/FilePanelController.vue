@@ -109,7 +109,6 @@ export default Vue.extend({
       set(newMethod: ModelType): void {
         if (isTracePanel(this.panel)) {
           this.panel.projectFile.method = newMethod;
-          console.log(this.panel.projectFile.method);
         }
       },
     },

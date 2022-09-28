@@ -1,17 +1,8 @@
 <template>
   <generic-modal :is-open="!!isOpen" title="Share Model" @close="handleClose">
     <template v-slot:body>
-      <flex-box t="4">
-        <v-select
-          filled
-          hide-details
-          label="My Projects"
-          v-model="projectId"
-          :items="projects"
-          item-value="projectId"
-          item-text="name"
-          class="mr-1"
-        />
+      <flex-box column t="4">
+        <project-input v-model="projectId" exclude-current-project />
         <v-select
           filled
           hide-details
@@ -39,6 +30,7 @@ import { modelShareOptions } from "@/util";
 import { projectStore } from "@/hooks";
 import { handleShareModel } from "@/api";
 import { FlexBox, GenericModal } from "@/components/common";
+import ProjectInput from "@/components/common/input/ProjectInput.vue";
 
 /**
  * A modal for sharing models.
@@ -48,6 +40,7 @@ import { FlexBox, GenericModal } from "@/components/common";
 export default Vue.extend({
   name: "ModelShareModal",
   components: {
+    ProjectInput,
     GenericModal,
     FlexBox,
   },

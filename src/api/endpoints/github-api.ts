@@ -118,7 +118,7 @@ export async function getGitHubRefreshToken(
       client_id: process.env.VUE_APP_GITHUB_CLIENT_ID || "",
       client_secret: process.env.VUE_APP_GITHUB_CLIENT_SECRET || "",
     },
-    "https://github.com/login/oauth/access_token",
+    "https://cors-anywhere.herokuapp.com/https://github.com/login/oauth/access_token",
     {
       method: "POST",
     }

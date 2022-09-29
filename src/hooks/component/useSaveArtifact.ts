@@ -1,5 +1,4 @@
 import { defineStore } from "pinia";
-import { watch } from "@vue/composition-api";
 
 import { ArtifactModel, DocumentType } from "@/types";
 import { createArtifact, createArtifactOfType } from "@/util";
@@ -36,6 +35,12 @@ export const useSaveArtifact = defineStore("useArtifact", {
      */
     isUpdate(): boolean {
       return !!selectionStore.selectedArtifact;
+    },
+    /**
+     * @return Whether the artifact name has changed.
+     */
+    hasNameChanged(): boolean {
+      return selectionStore.selectedArtifact?.name !== this.editedArtifact.name;
     },
     /**
      * @return Whether the artifact type is for an FTA node.
@@ -141,27 +146,4 @@ export const useSaveArtifact = defineStore("useArtifact", {
   },
 });
 
-const artifactSaveStore = useSaveArtifact(pinia);
-
-/**
- * Check for artifact validity when fields change.
- */
-watch(
-  artifactSaveStore.editedArtifact,
-  () => artifactSaveStore.updateCanSave(),
-  {
-    deep: true,
-  }
-);
-watch([artifactSaveStore.isNameValid, artifactSaveStore.parentId], () =>
-  artifactSaveStore.updateCanSave()
-);
-
-/**
- * Update artifact fields when the type changes.
- */
-watch([artifactSaveStore.editedArtifact.type], () =>
-  artifactSaveStore.updateArtifactType()
-);
-
-export default artifactSaveStore;
+export default useSaveArtifact(pinia);

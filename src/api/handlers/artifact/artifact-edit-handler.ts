@@ -16,12 +16,13 @@ import {
  * @param parentArtifact - The parent artifact to link to.
  * @param onSuccess - Called if the save is successful.
  * @param onError - Called if the save fails.
+ * @param onComplete - Called after the action.
  */
 export async function handleSaveArtifact(
   artifact: ArtifactModel,
   isUpdate: boolean,
   parentArtifact: ArtifactModel | undefined,
-  { onSuccess, onError }: IOHandlerCallback
+  { onSuccess, onError, onComplete }: IOHandlerCallback
 ): Promise<void> {
   try {
     const versionId = projectStore.versionIdWithLog;
@@ -50,6 +51,8 @@ export async function handleSaveArtifact(
     logStore.onDevError(String(e));
     logStore.onError(`Unable to create artifact: ${artifact.name}`);
     onError?.(e as Error);
+  } finally {
+    onComplete?.();
   }
 }
 

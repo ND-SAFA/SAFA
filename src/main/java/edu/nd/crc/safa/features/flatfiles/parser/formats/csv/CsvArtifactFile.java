@@ -92,7 +92,8 @@ public class CsvArtifactFile extends AbstractArtifactFile<CSVRecord> {
         }
         try {
             String artifactName = entityRecord.get(Constants.NAME_PARAM);
-            String artifactSummary = entityRecord.get(Constants.SUMMARY_PARAM);
+            String artifactSummary = entityRecord.isSet(Constants.SUMMARY_PARAM) ?
+                entityRecord.get(Constants.SUMMARY_PARAM) : "";
             String artifactContent = entityRecord.get(Constants.CONTENT_PARAM);
 
             artifactSummary = artifactSummary == null ? "" : artifactSummary;
@@ -153,7 +154,7 @@ public class CsvArtifactFile extends AbstractArtifactFile<CSVRecord> {
         public static final String LOGIC_TYPE_PARAM = "logic_type";
         public static final String SAFETY_CASE_TYPE_PARAM = "safety_case_type";
 
-        public static final String[] REQUIRED_COLUMNS = new String[]{NAME_PARAM, SUMMARY_PARAM, CONTENT_PARAM};
+        public static final String[] REQUIRED_COLUMNS = new String[]{NAME_PARAM, CONTENT_PARAM};
         public static final String[] ALL_COLUMNS = new String[]{NAME_PARAM, SUMMARY_PARAM, CONTENT_PARAM,
             LOGIC_TYPE_PARAM, SAFETY_CASE_TYPE_PARAM};
     }

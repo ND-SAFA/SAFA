@@ -174,6 +174,7 @@ public class JobService {
         try {
             jobCreationThread.initJobData();
         } catch (Exception e) {
+            e.printStackTrace();
             serviceProvider.getJobService().failJob(jobDbEntity);
             throw new SafaError("Failed to start job. %s", e.getMessage());
         }

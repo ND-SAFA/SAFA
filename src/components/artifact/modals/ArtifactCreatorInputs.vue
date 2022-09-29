@@ -10,7 +10,7 @@
           v-model="store.editedArtifact.name"
           label="Artifact Name"
           hint="Please select an identifier for the artifact"
-          :error-messages="nameError"
+          :error-messages="nameErrors"
           :loading="nameCheckIsLoading"
           data-cy="input-artifact-name"
         />
@@ -115,7 +115,6 @@ export default Vue.extend({
   },
   data() {
     return {
-      nameError: "",
       nameCheckTimer: undefined as ReturnType<typeof setTimeout> | undefined,
       nameCheckIsLoading: false,
 
@@ -129,6 +128,12 @@ export default Vue.extend({
      */
     documentTypes(): SelectOption[] {
       return documentTypeMap()[documentStore.currentType];
+    },
+    /**
+     * @return The document types allowed on the current document.
+     */
+    nameErrors(): string[] {
+      return this.nameCheckIsLoading ? [] : artifactSaveStore.nameErrors;
     },
     /**
      * @return The artifact save store.
@@ -146,8 +151,8 @@ export default Vue.extend({
         clearTimeout(this.nameCheckTimer);
       }
 
-      this.nameCheckIsLoading = true;
       artifactSaveStore.isNameValid = false;
+      this.nameCheckIsLoading = true;
       this.nameCheckTimer = setTimeout(() => {
         if (!newName) {
           artifactSaveStore.isNameValid = false;
@@ -160,32 +165,16 @@ export default Vue.extend({
             .then((nameExists) => {
               artifactSaveStore.isNameValid = !nameExists;
               this.nameCheckIsLoading = false;
-              this.nameError = artifactSaveStore.isNameValid
-                ? ""
-                : "Name is already used, please select another.";
             })
             .catch(() => {
               artifactSaveStore.isNameValid = false;
               this.nameCheckIsLoading = false;
-              this.nameError = "";
             });
         }
       }, 500);
     },
-    "store.isNameValid"() {
-      artifactSaveStore.updateCanSave();
-    },
-    "store.parentId"() {
-      artifactSaveStore.updateCanSave();
-    },
     "store.editedArtifact.type"() {
       artifactSaveStore.updateArtifactType();
-    },
-    "store.editedArtifact": {
-      deep: true,
-      handler() {
-        artifactSaveStore.updateCanSave();
-      },
     },
   },
 });

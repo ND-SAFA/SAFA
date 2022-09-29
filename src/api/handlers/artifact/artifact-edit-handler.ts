@@ -60,12 +60,11 @@ export async function handleSaveArtifact(
  * Duplicates an artifact, and updates the app state.
  *
  * @param artifact  - The artifact to duplicate.
- * @param onSuccess - Called if the duplicate is successful.
- * @param onError - Called if the duplicate fails.
+ * @param cb - Callbacks for this action.
  */
 export function handleDuplicateArtifact(
   artifact: ArtifactModel,
-  { onSuccess, onError }: IOHandlerCallback
+  cb: IOHandlerCallback
 ): Promise<void> {
   return handleSaveArtifact(
     {
@@ -76,7 +75,7 @@ export function handleDuplicateArtifact(
     },
     false,
     undefined,
-    { onSuccess, onError }
+    cb
   );
 }
 
@@ -86,10 +85,11 @@ export function handleDuplicateArtifact(
  * @param artifact  - The artifact to delete.
  * @param onSuccess - Called if the delete is successful.
  * @param onError - Called if the delete fails.
+ * @param onComplete - Called after the action.
  */
 export function handleDeleteArtifact(
   artifact: ArtifactModel,
-  { onSuccess, onError }: IOHandlerCallback
+  { onSuccess, onError, onComplete }: IOHandlerCallback
 ): void {
   logStore.confirm(
     "Delete Artifact",
@@ -106,7 +106,8 @@ export function handleDeleteArtifact(
         .catch((e) => {
           logStore.onError(`Unable to delete artifact: ${artifact.name}`);
           onError?.(e);
-        });
+        })
+        .finally(onComplete);
     }
   );
 }

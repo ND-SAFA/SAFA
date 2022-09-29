@@ -7,10 +7,12 @@ import { getProjects } from "@/api";
  *
  * @param onSuccess - Called if the action is successful.
  * @param onError - Called if the action fails.
+ * @param onComplete - Called after the action.
  */
 export async function handleGetProjects({
   onSuccess,
   onError,
+  onComplete,
 }: IOHandlerCallback): Promise<void> {
   if (!sessionStore.doesSessionExist) {
     onSuccess?.();
@@ -25,5 +27,7 @@ export async function handleGetProjects({
     logStore.onError("Unable to load your projects.");
     logStore.onDevError(String(e));
     onError?.(e as Error);
+  } finally {
+    onComplete?.();
   }
 }

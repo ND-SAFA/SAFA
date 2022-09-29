@@ -8,9 +8,9 @@ import artifactStore from "../project/useArtifacts";
 import documentStore from "../project/useDocuments";
 
 /**
- * The use artifact store assists in creating and editing artifacts.
+ * The save artifact store assists in creating and editing artifacts.
  */
-export const useSaveArtifact = defineStore("useArtifact", {
+export const useSaveArtifact = defineStore("saveArtifact", {
   state: () => ({
     /**
      * The artifact being created or edited.
@@ -24,10 +24,6 @@ export const useSaveArtifact = defineStore("useArtifact", {
      * Whether the artifact's name is valid.
      */
     isNameValid: false,
-    /**
-     * Whether the edited artifact can be saved.
-     */
-    canSave: false,
   }),
   getters: {
     /**
@@ -89,6 +85,27 @@ export const useSaveArtifact = defineStore("useArtifact", {
         : name;
     },
     /**
+     * @return Any errors to report on the name.
+     */
+    nameErrors(): string[] {
+      return this.isNameValid || this.editedArtifact.name === ""
+        ? []
+        : ["This name is already used, please select another."];
+    },
+    canSave(): boolean {
+      const { logicType, safetyCaseType, type, body } = this.editedArtifact;
+
+      if (this.isFTA) {
+        return !!(logicType && this.parentId);
+      } else if (this.isSafetyCase) {
+        return !!(this.isNameValid && body && safetyCaseType);
+      } else if (this.isFMEA) {
+        return !!(this.isNameValid && body);
+      } else {
+        return !!(this.isNameValid && body && type);
+      }
+    },
+    /**
      * @return The savable artifact data based on the edited artifact's fields.
      */
     finalizedArtifact(): ArtifactModel {
@@ -116,7 +133,6 @@ export const useSaveArtifact = defineStore("useArtifact", {
 
       this.editedArtifact = createArtifactOfType(artifact, type);
       this.isNameValid = !!artifact?.name;
-      this.updateCanSave();
     },
     /**
      * Updates the edited artifact to a new type.
@@ -126,22 +142,6 @@ export const useSaveArtifact = defineStore("useArtifact", {
         this.editedArtifact,
         this.editedArtifact.type
       );
-    },
-    /**
-     * Updates whether the edited artifact can be saved.
-     */
-    updateCanSave(): void {
-      const { logicType, safetyCaseType, type, body } = this.editedArtifact;
-
-      if (this.isFTA) {
-        this.canSave = !!(logicType && this.parentId);
-      } else if (this.isSafetyCase) {
-        this.canSave = !!(this.isNameValid && body && safetyCaseType);
-      } else if (this.isFMEA) {
-        this.canSave = !!(this.isNameValid && body);
-      } else {
-        this.canSave = !!(this.isNameValid && body && type);
-      }
     },
   },
 });

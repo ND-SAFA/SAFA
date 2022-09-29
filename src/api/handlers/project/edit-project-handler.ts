@@ -13,10 +13,11 @@ import {
  * @param project - The project to save.
  * @param onSuccess - Called if the action is successful.
  * @param onError - Called if the action fails.
+ * @param onComplete - Called after the action.
  */
 export function handleSaveProject(
   project: Pick<IdentifierModel, "projectId" | "name" | "description">,
-  { onSuccess, onError }: IOHandlerCallback<ProjectModel>
+  { onSuccess, onError, onComplete }: IOHandlerCallback<ProjectModel>
 ): void {
   saveProject(project)
     .then((project) => {
@@ -34,7 +35,8 @@ export function handleSaveProject(
       logStore.onError(`Unable to save project: ${project.name}`);
       logStore.onDevError(e.message);
       onError?.(e);
-    });
+    })
+    .finally(onComplete);
 }
 
 /**
@@ -43,10 +45,11 @@ export function handleSaveProject(
  * @param project - The project to delete.
  * @param onSuccess - Called if the action is successful.
  * @param onError - Called if the action fails.
+ * @param onComplete - Called after the action.
  */
 export function handleDeleteProject(
   project: IdentifierModel,
-  { onSuccess, onError }: IOHandlerCallback<IdentifierModel>
+  { onSuccess, onError, onComplete }: IOHandlerCallback<IdentifierModel>
 ): void {
   deleteProject(project.projectId)
     .then(async () => {
@@ -66,7 +69,8 @@ export function handleDeleteProject(
       logStore.onError(`Unable to delete project: ${project.name}.`);
       logStore.onDevError(e.message);
       onError?.(e);
-    });
+    })
+    .finally(onComplete);
 }
 
 /**

@@ -3,7 +3,7 @@
     :title="title"
     size="sm"
     :is-open="isOpen"
-    @close="resetModalData"
+    @close="handleClose"
   >
     <template v-slot:body>
       <v-text-field
@@ -90,7 +90,6 @@ export default Vue.extend({
     title(): string {
       return this.isEditMode ? "Edit Column" : "Add Column";
     },
-
     /**
      * @return Whether the current name is valid.
      */
@@ -110,16 +109,16 @@ export default Vue.extend({
      * @return Any errors to report on the name.
      */
     nameErrors(): string[] {
-      return this.isNameValid ? [] : ["This name already exists"];
+      return this.isNameValid
+        ? []
+        : ["This name is already used, please select another."];
     },
   },
   methods: {
     /**
      * Resets modal data and closes the modal.
      */
-    resetModalData() {
-      this.editingColumn = createColumn(this.column);
-      this.confirmDelete = false;
+    handleClose() {
       this.$emit("close");
     },
     /**
@@ -127,7 +126,7 @@ export default Vue.extend({
      */
     handleSubmit() {
       handleColumnSave(this.editingColumn, this.isEditMode, {
-        onSuccess: () => this.resetModalData(),
+        onSuccess: () => this.handleClose(),
       });
     },
     /**
@@ -138,7 +137,7 @@ export default Vue.extend({
         this.confirmDelete = true;
       } else {
         handleColumnDelete(this.editingColumn, {
-          onSuccess: () => this.resetModalData(),
+          onSuccess: () => this.handleClose(),
         });
       }
     },
@@ -150,6 +149,7 @@ export default Vue.extend({
     isOpen(open: boolean) {
       if (!open) return;
 
+      this.confirmDelete = false;
       this.editingColumn = createColumn(this.column);
     },
   },

@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.List;
 
 import edu.nd.crc.safa.features.jira.entities.app.JiraIssuesResponseDTO;
+import edu.nd.crc.safa.features.jira.entities.app.JiraProjectPermissionDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraProjectResponseDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraRefreshTokenDTO;
 import edu.nd.crc.safa.features.jira.entities.db.JiraAccessCredentials;
@@ -142,6 +143,32 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
         return this.getJIRAIssues(credentials, jqlQuery);
     }
 
+    @Override
+    public boolean checkUserCanViewProjectIssues(JiraAccessCredentials credentials, Long jiraProjectId) {
+        String uri = this.buildApiRequestURI(credentials.getCloudId(), ApiRoute.PERMISSIONS);
+
+        JiraProjectPermissionDTO permissionDTO = WebApiUtils.blockOptional(
+            this.webClient
+                .method(ApiRoute.PERMISSIONS.getMethod())
+                .uri(uri, builder ->
+                    builder
+                        .queryParam("permissions", JiraProjectPermissionDTO.ADMINISTER_PROJECTS_PERMISSION)
+                        .queryParam("projectId", jiraProjectId)
+                        .build()
+                ).header(HttpHeaders.AUTHORIZATION,
+                    this.buildAuthorizationHeaderValue(credentials.getBearerAccessToken()))
+                .retrieve()
+                .bodyToMono(JiraProjectPermissionDTO.class)
+        ).orElseThrow(() -> new SafaError("Error while trying to retrieve JIRA permission"));
+
+        if (!permissionDTO.getPermissions().containsKey(JiraProjectPermissionDTO.ADMINISTER_PROJECTS_PERMISSION)) {
+            return false;
+        }
+
+        return permissionDTO.getPermissions()
+            .get(JiraProjectPermissionDTO.ADMINISTER_PROJECTS_PERMISSION).getHavePermission();
+    }
+
     private String encodeValue(String value) {
         try {
             return URLEncoder.encode(value, StandardCharsets.UTF_8.toString());
@@ -159,7 +186,6 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
                 .uri(baseUri, builder ->
                     builder
                         .queryParam("jql", jqlQuery)
-                        .queryParam("fields")
                         .queryParam("fields")
                         .build()
                 )
@@ -183,7 +209,8 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
         PROJECTS_PREVIEW(ATLASSIAN_API_URL, "/project", HttpMethod.GET),
         MYSELF(ATLASSIAN_API_URL, "/myself", HttpMethod.GET),
         REFRESH_TOKEN(ATLASSIAN_AUTH_URL, "/oauth/token", HttpMethod.POST),
-        ISSUES(ATLASSIAN_API_URL, "/search", HttpMethod.GET);
+        ISSUES(ATLASSIAN_API_URL, "/search", HttpMethod.GET),
+        PERMISSIONS(ATLASSIAN_API_URL, "/mypermissions", HttpMethod.GET);
 
         private final String url;
 

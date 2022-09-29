@@ -9,8 +9,8 @@ import java.util.List;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
-import features.base.DefaultProjectConstants;
-import features.base.EntityBaseTest;
+import common.DefaultProjectConstants;
+import common.EntityBaseTest;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.junit.jupiter.api.Test;

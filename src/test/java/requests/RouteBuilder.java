@@ -107,6 +107,11 @@ public class RouteBuilder<T extends RouteBuilder<T>> {
         return (T) this;
     }
 
+    public T withModelId(UUID modelId) {
+        this.path = this.path.replace("{modelId}", modelId.toString());
+        return (T) this;
+    }
+
     public String buildEndpoint() {
         if (this.path.contains("{")) {
             throw new SafaError("Path is not fully configured: %s", this.path);

@@ -6,7 +6,6 @@ import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.jobs.entities.IJobStep;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
-import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.versions.ProjectChanger;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
@@ -21,20 +20,20 @@ public abstract class CommitJob extends AbstractJob {
      */
     protected ProjectCommit projectCommit;
     /**
-     * The entities created during job.
+     * The project version the commit is applied to.
      */
-    ProjectAppEntity projectAppEntity;
+    protected ProjectVersion projectVersion;
     /**
      * The service used for creating entities.
      */
     ProjectChanger projectChanger;
 
-    public CommitJob(JobDbEntity jobDbEntity,
-                     ServiceProvider serviceProvider,
-                     ProjectCommit projectCommit) {
+    protected CommitJob(JobDbEntity jobDbEntity,
+                        ServiceProvider serviceProvider,
+                        ProjectCommit projectCommit) {
         super(jobDbEntity, serviceProvider);
-        ProjectVersion projectVersion = projectCommit.getCommitVersion();
-        if (projectVersion == null) {
+        this.projectVersion = projectCommit.getCommitVersion();
+        if (this.projectVersion == null) {
             throw new IllegalArgumentException("Project version is null!");
         }
         this.projectCommit = projectCommit;

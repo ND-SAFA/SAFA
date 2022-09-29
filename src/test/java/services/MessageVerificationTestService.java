@@ -64,6 +64,17 @@ public class MessageVerificationTestService {
             Change.Action.UPDATE);
     }
 
+    public void verifyModelMessage(EntityChangeMessage message,
+                                   UUID entityId,
+                                   Change.Action action) {
+        verifyChangeInMessage(
+            message,
+            entityId,
+            Change.Entity.MODELS,
+            action
+        );
+    }
+
     public void verifyChangeInMessage(EntityChangeMessage message,
                                       UUID typeId,
                                       Change.Entity entity,

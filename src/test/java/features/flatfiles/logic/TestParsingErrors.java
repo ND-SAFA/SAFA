@@ -6,7 +6,7 @@ import requests.RouteBuilder;
 
 import edu.nd.crc.safa.config.AppRoutes;
 
-import features.base.DefaultProjectConstants;
+import common.DefaultProjectConstants;
 import features.flatfiles.base.ParseBaseTest;
 import org.junit.jupiter.api.Test;
 

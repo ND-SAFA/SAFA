@@ -26,6 +26,14 @@ public class TBertConfig {
         return FileUtilities.buildPath(baseEndpoint, "predict") + "/";
     }
 
+    public String getTrainEndpoint() {
+        return FileUtilities.buildPath(baseEndpoint, "fine-tune") + "/";
+    }
+
+    public String getCreateModelEndpoint() {
+        return FileUtilities.buildPath(baseEndpoint, "models") + "/";
+    }
+
     @PostConstruct
     public void init() {
         TBertConfig.staticConfig = this;

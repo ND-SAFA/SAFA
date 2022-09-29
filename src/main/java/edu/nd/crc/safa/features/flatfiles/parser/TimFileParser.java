@@ -19,7 +19,7 @@ import edu.nd.crc.safa.features.flatfiles.parser.interfaces.ITraceFIle;
 import edu.nd.crc.safa.features.flatfiles.services.DataFileBuilder;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.tgen.entities.ArtifactTypeTraceGenerationRequestDTO;
-import edu.nd.crc.safa.features.tgen.entities.TraceGenerationMethod;
+import edu.nd.crc.safa.features.tgen.entities.BaseGenerationModels;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
@@ -112,17 +112,17 @@ public class TimFileParser implements IProjectDefinitionParser {
                 traceFileDefinition.has(AbstractTraceFile.Constants.GENERATE_LINKS_PARAM)
                     && traceFileDefinition.getBoolean(AbstractTraceFile.Constants.GENERATE_LINKS_PARAM);
             if (isGenerated) {
-                TraceGenerationMethod traceGenerationMethod;
+                BaseGenerationModels baseGenerationModels;
                 if (traceFileDefinition.has(ITraceFIle.Constants.LINK_GENERATION_METHOD)) {
                     String methodStr = traceFileDefinition.getString(ITraceFIle.Constants.LINK_GENERATION_METHOD);
-                    traceGenerationMethod = TraceGenerationMethod.getMethodWithDefault(methodStr,
-                        TraceGenerationMethod.getDefault());
+                    baseGenerationModels = BaseGenerationModels.getMethodWithDefault(methodStr,
+                        BaseGenerationModels.getDefault());
                 } else {
-                    traceGenerationMethod = TraceGenerationMethod.getDefault();
+                    baseGenerationModels = BaseGenerationModels.getDefault();
                 }
                 ArtifactTypeTraceGenerationRequestDTO artifactTypeTraceGenerationRequestDTO =
                     new ArtifactTypeTraceGenerationRequestDTO(
-                        traceGenerationMethod,
+                        baseGenerationModels,
                         source,
                         target);
                 artifactTypeTraceGenerationRequestDTOS.add(artifactTypeTraceGenerationRequestDTO);

@@ -3,7 +3,7 @@ package features.matrices.base;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.traces.repositories.TraceMatrixRepository;
 
-import features.base.ApplicationBaseTest;
+import common.ApplicationBaseTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**

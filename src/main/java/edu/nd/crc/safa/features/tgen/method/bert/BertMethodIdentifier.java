@@ -13,5 +13,5 @@ public class BertMethodIdentifier {
     /**
      * Path to model weights.
      */
-    String modelPath;
+    String statePath;
 }

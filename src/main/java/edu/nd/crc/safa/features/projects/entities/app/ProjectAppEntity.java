@@ -14,6 +14,7 @@ import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
 import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
 import edu.nd.crc.safa.features.memberships.entities.app.ProjectMemberAppEntity;
+import edu.nd.crc.safa.features.models.entities.ModelAppEntity;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.rules.parser.RuleName;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
@@ -49,6 +50,7 @@ public class ProjectAppEntity implements IAppEntity {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     ProjectParsingErrors errors;
     Map<UUID, LayoutPosition> layout;
+    List<ModelAppEntity> models;
 
     public ProjectAppEntity() {
         this.name = "";
@@ -61,6 +63,7 @@ public class ProjectAppEntity implements IAppEntity {
         this.warnings = new Hashtable<>();
         this.errors = new ProjectParsingErrors();
         this.layout = new Hashtable<>();
+        this.models = new ArrayList<>();
     }
 
     public ProjectAppEntity(ProjectVersion projectVersion,
@@ -72,7 +75,8 @@ public class ProjectAppEntity implements IAppEntity {
                             List<TypeAppEntity> artifactTypes,
                             Map<UUID, List<@Valid @NotNull RuleName>> warnings,
                             ProjectParsingErrors errors,
-                            Map<UUID, LayoutPosition> layout) {
+                            Map<UUID, LayoutPosition> layout,
+                            List<ModelAppEntity> models) {
         this();
         Project project = projectVersion.getProject();
         this.projectId = project.getProjectId();
@@ -88,6 +92,7 @@ public class ProjectAppEntity implements IAppEntity {
         this.warnings = warnings;
         this.errors = errors;
         this.layout = layout;
+        this.models = models;
     }
 
     public List<String> getArtifactNames() {

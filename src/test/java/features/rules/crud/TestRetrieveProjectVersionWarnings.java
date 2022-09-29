@@ -14,7 +14,7 @@ import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import builders.CommitBuilder;
-import features.base.ApplicationBaseTest;
+import common.ApplicationBaseTest;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;

@@ -1,13 +1,15 @@
-package edu.nd.crc.safa.features.tgen.entities;
+package edu.nd.crc.safa.features.tgen.entities.api;
 
 import java.util.Map;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * The payload to the prediction endpoint of TGEN.
  */
+@NoArgsConstructor
 @AllArgsConstructor
 @Data
 public class TGenPredictionRequestDTO {
@@ -23,6 +25,10 @@ public class TGenPredictionRequestDTO {
      * Path to model weights.
      */
     String modelPath;
+    /**
+     * Whether to load model state from cloud storage.
+     */
+    boolean loadFromStorage;
     /**
      * Map of source artifact ids to content body.
      */

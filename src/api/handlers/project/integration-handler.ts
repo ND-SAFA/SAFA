@@ -103,8 +103,8 @@ export function handleAuthorizeGitHub(
         localStorage.getItem(LocalStorageKeys.GIT_HUB_INSTALLATION_ID) || "",
       clientId: process.env.VUE_APP_GITHUB_CLIENT_ID || "",
       clientSecret: process.env.VUE_APP_GITHUB_CLIENT_SECRET || "",
-      accessTokenExpiration: 28800, // 8 hours in s.
-      refreshTokenExpiration: 7776000, // 90 days in s.
+      accessTokenExpiration: Date.now() + 28800000, // 8 hours in ms.
+      refreshTokenExpiration: Date.now() + 7776000000, // 90 days in ms.
     });
   };
 

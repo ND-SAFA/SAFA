@@ -21,9 +21,9 @@ export async function handleGetProjects({
     projectStore.allProjects = await getProjects();
 
     onSuccess?.();
-  } catch (e: any) {
+  } catch (e) {
     logStore.onError("Unable to load your projects.");
-    logStore.onDevError(e);
-    onError?.(e);
+    logStore.onDevError(String(e));
+    onError?.(e as Error);
   }
 }

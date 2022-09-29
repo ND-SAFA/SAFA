@@ -19,7 +19,7 @@ class TestViews(TestCase):
     TEST_PARAMS = {PredictionRequest.SOURCES: TEST_S_ARTS,
                    PredictionRequest.TARGETS: TEST_T_ARTS,
                    PredictionRequest.MODEL_PATH: "path/to/model",
-                   PredictionRequest.BASE_MODEL: "bert_trace_single",
+                   PredictionRequest.BASE_MODEL: "pl_bert",
                    PredictionRequest.OUTPUT_DIR: TEST_OUTPUT_DIR,
                    "max_seq_length": 100,
                    "pad_to_max_length": True,

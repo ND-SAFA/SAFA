@@ -6,7 +6,7 @@ from trace.jobs.trace_args_builder import TraceArgsBuilder
 
 
 class TestTraceArgsBuilder(BaseTest):
-    EXPECTED_VALUES = {"base_model_name": "bert_trace_single",
+    EXPECTED_VALUES = {"base_model_name": "pl_bert",
                        "model_path": "model",
                        "output_dir": "output",
                        "sources": TEST_S_ARTS,

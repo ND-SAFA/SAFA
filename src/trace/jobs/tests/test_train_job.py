@@ -19,7 +19,7 @@ from trace.train.trace_trainer import TraceTrainer
 
 
 class TestTrainJob(BaseTest):
-    test_args = {"base_model_name": "bert_trace_single",
+    test_args = {"base_model_name": "pl_bert",
                  "model_path": "model",
                  "output_dir": TEST_OUTPUT_DIR,
                  "sources": TEST_S_ARTS,

@@ -5,6 +5,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.Objects;
 import java.util.Optional;
 
+import common.ApplicationBaseTest;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.email.EmailService;
 import edu.nd.crc.safa.features.users.entities.app.ResetPasswordRequestDTO;
@@ -13,7 +14,6 @@ import edu.nd.crc.safa.features.users.entities.db.PasswordResetToken;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.repositories.PasswordResetTokenRepository;
 import edu.nd.crc.safa.features.users.repositories.SafaUserRepository;
-import features.base.ApplicationBaseTest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

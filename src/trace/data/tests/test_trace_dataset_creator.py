@@ -40,7 +40,7 @@ class TestTraceDatasetCreator(BaseTest):
     def test_get_training_and_validation_dataset_with_transformers(self, get_tokenizer_mock: mock.MagicMock):
         get_tokenizer_mock.return_value = get_test_tokenizer()
         test_trace_dataset_creator = self.get_test_trace_dataset_creator()
-        training_dataset = test_trace_dataset_creator.get_training_dataset().data
+        training_dataset = test_trace_dataset_creator.get_training_dataset(resample_rate=1).data
         validation_dataset = test_trace_dataset_creator.get_validation_dataset().data
 
         self.assertEquals(len(training_dataset), self.get_expected_train_dataset_size(1))

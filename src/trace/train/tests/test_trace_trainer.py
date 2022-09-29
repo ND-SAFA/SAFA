@@ -83,7 +83,7 @@ class TestTraceTrainer(BaseTest):
 
     def get_test_trace_trainer(self, args=None, **kwargs):
         if args is None:
-            model_generator = ModelGenerator("bert_trace_single", "path")
+            model_generator = ModelGenerator("pl_bert", "path")
             model_generator.get_model = mock.MagicMock(return_value=get_test_model())
             model_generator.get_tokenizer = mock.MagicMock(return_value=get_test_tokenizer())
             trace_dataset_creator = TraceDatasetCreator(source_layers=TEST_SOURCE_LAYERS, target_layers=TEST_TARGET_LAYERS,

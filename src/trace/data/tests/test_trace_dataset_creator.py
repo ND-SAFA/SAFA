@@ -33,7 +33,7 @@ class TestTraceDatasetCreator(BaseTest):
     EXPECTED_VALIDATION_SIZE = 6
     EXPECTED_FEATURE_KEYS = ["input_ids", "token_type_ids", "attention_mask"]
     IRRELEVANT_FEATURE_KEYS = ["irrelevant_key1", "irrelevant_key2"]
-    TEST_MODEL_GENERATOR = ModelGenerator("bert_trace_single", "path")
+    TEST_MODEL_GENERATOR = ModelGenerator("pl_bert", "path")
 
     # ========================= high-level testing (ensure all functionality works together) =========================
     @patch.object(ModelGenerator, "get_tokenizer")

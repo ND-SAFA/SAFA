@@ -18,7 +18,7 @@ from trace.jobs.trace_args_builder import TraceArgsBuilder
 
 
 class TestPredictJob(BaseTest):
-    test_args = {"base_model_name": "bert_trace_single",
+    test_args = {"base_model_name": "pl_bert",
                  "model_path": "model",
                  "output_dir": TEST_OUTPUT_DIR,
                  "source_layers": TEST_SOURCE_LAYERS,

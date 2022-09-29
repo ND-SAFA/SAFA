@@ -1,5 +1,5 @@
 from test.base_test import BaseTest
-from test.test_data import TEST_POS_LINKS, TEST_S_ARTS, TEST_T_ARTS
+from test.test_data import TEST_POS_LINKS, TEST_SOURCE_LAYERS, TEST_TARGET_LAYERS
 from trace.config.constants import VALIDATION_PERCENTAGE_DEFAULT
 from trace.data.trace_link import TraceLink
 from trace.jobs.trace_args_builder import TraceArgsBuilder
@@ -9,8 +9,8 @@ class TestTraceArgsBuilder(BaseTest):
     EXPECTED_VALUES = {"base_model_name": "bert_trace_single",
                        "model_path": "model",
                        "output_dir": "output",
-                       "sources": TEST_S_ARTS,
-                       "targets": TEST_T_ARTS,
+                       "source_layers": TEST_SOURCE_LAYERS,
+                       "target_layers": TEST_TARGET_LAYERS,
                        "links": TEST_POS_LINKS,
                        "validation_percentage": VALIDATION_PERCENTAGE_DEFAULT}
 

@@ -3,7 +3,7 @@ from mock import patch
 
 from common.models.model_generator import ModelGenerator
 from test.base_test import BaseTest
-from test.test_data import TEST_POS_LINKS, TEST_S_ARTS, TEST_T_ARTS
+from test.test_data import TEST_POS_LINKS, TEST_SOURCE_LAYERS, TEST_TARGET_LAYERS, ALL_TEST_SOURCES, ALL_TEST_TARGETS
 from test.test_tokenizer import get_test_tokenizer
 from trace.data.artifact import Artifact
 from trace.data.trace_dataset_creator import TraceDatasetCreator
@@ -17,8 +17,11 @@ def fake_extract_feature_info(feature, prefix=''):
 class TestTraceDatasetCreator(BaseTest):
     ALL_LINKS = [("s1", "t1"), ("s2", "t1"), ("s3", "t1"),
                  ("s1", "t2"), ("s2", "t2"), ("s3", "t2"),
-                 ("s1", "t3"), ("s2", "t3"), ("s3", "t3")]
-    LINKED_TARGETS = ["t1", "t2"]
+                 ("s1", "t3"), ("s2", "t3"), ("s3", "t3"),
+                 ("s4", "t4"), ("s5", "t4"), ("s6", "t4"),
+                 ("s4", "t5"), ("s5", "t5"), ("s6", "t5"),
+                 ("s4", "t6"), ("s5", "t6"), ("s6", "t6")]
+    LINKED_TARGETS = ["t1", "t2", "t4", "t5", "t6"]
     UNLINKED_TARGET = "t3"
 
     TEST_FEATURE = {"irrelevant_key1": "k",
@@ -27,7 +30,7 @@ class TestTraceDatasetCreator(BaseTest):
                     "attention_mask": 4,
                     "irrelevant_key2": "evr"}
     VAlIDATION_PERCENTAGE = 0.3
-    EXPECTED_VALIDATION_SIZE = 3
+    EXPECTED_VALIDATION_SIZE = 6
     EXPECTED_FEATURE_KEYS = ["input_ids", "token_type_ids", "attention_mask"]
     IRRELEVANT_FEATURE_KEYS = ["irrelevant_key1", "irrelevant_key2"]
     TEST_MODEL_GENERATOR = ModelGenerator("bert_trace_single", "path")
@@ -81,8 +84,8 @@ class TestTraceDatasetCreator(BaseTest):
 
         test_trace_dataset_creator = self.get_test_trace_dataset_creator()
         training_dataset = test_trace_dataset_creator.get_training_dataset(resample_rate).data
-        self.assertEquals(len(get_feature_entry_mock.mock_calls), expected_dataset_size)
         self.assertEquals(len(training_dataset), expected_dataset_size)
+        self.assertEquals(len(get_feature_entry_mock.mock_calls), expected_dataset_size)
 
         pos_links = self.get_links(TEST_POS_LINKS)
         train_dataset_links = self.get_dataset_link_attrs(training_dataset)
@@ -219,24 +222,26 @@ class TestTraceDatasetCreator(BaseTest):
 
     def test_get_data_split(self):
         test_trace_dataset_creator = self.get_test_trace_dataset_creator()
-        test_split = test_trace_dataset_creator._get_data_split(self.ALL_LINKS)
+        train_split = test_trace_dataset_creator._get_data_split(self.ALL_LINKS)
         val_split = test_trace_dataset_creator._get_data_split(self.ALL_LINKS, for_validation=True)
 
-        self.assertEquals(len(test_split), len(self.ALL_LINKS) - self.EXPECTED_VALIDATION_SIZE)
-        self.assertEquals(len(val_split), self.EXPECTED_VALIDATION_SIZE)
+        self.assertEquals(len(train_split) + len(val_split), len(self.ALL_LINKS))
+        self.assertLessEqual(len(train_split) - (len(self.ALL_LINKS) - self.EXPECTED_VALIDATION_SIZE), 1)
+        self.assertLessEqual(len(val_split) - self.EXPECTED_VALIDATION_SIZE, 1)
 
         for link in val_split:
-            self.assertNotIn(link, test_split)
+            self.assertNotIn(link, train_split)
 
     def test_get_train_split_size(self):
         test_trace_dataset_creator = self.get_test_trace_dataset_creator()
         split_size = test_trace_dataset_creator._get_train_split_size(self.ALL_LINKS)
-        self.assertEquals(split_size, len(self.ALL_LINKS) - self.EXPECTED_VALIDATION_SIZE)
+        self.assertLessEqual(split_size - (len(self.ALL_LINKS) - self.EXPECTED_VALIDATION_SIZE), 1)
 
     def test_reduce_to_linked_targets_only(self):
         test_trace_dataset_creator = self.get_test_trace_dataset_creator()
         orig_links = self.get_links(self.ALL_LINKS)
-        expected_links = self.get_links(self.ALL_LINKS[:6])  # exclude links with t3
+        links = self.ALL_LINKS[:6] + self.ALL_LINKS[9:]
+        expected_links = self.get_links(links)  # exclude links with t3
 
         linked_targets_only = test_trace_dataset_creator._reduce_to_linked_targets_only(orig_links.keys())
 
@@ -244,24 +249,14 @@ class TestTraceDatasetCreator(BaseTest):
         for link_id in linked_targets_only:
             self.assertIn(link_id, expected_links)
 
-    @patch.object(TraceDatasetCreator, '_create_pos_and_neg_links')
-    def test_create_links_with_no_true_links(self, create_pos_and_neg_links_mock: mock.MagicMock):
-        links, pos_link_ids, neg_link_ids = TraceDatasetCreator._create_links(self.TEST_MODEL_GENERATOR, TEST_S_ARTS,
-                                                                              TEST_T_ARTS)
+    def test_create_links(self):
+        test_trace_dataset_creator = self.get_test_trace_dataset_creator()
+        links = test_trace_dataset_creator._generate_all_links(TEST_SOURCE_LAYERS, TEST_TARGET_LAYERS)
         self.links_test(links)
-        self.assertFalse(create_pos_and_neg_links_mock.called)
-
-    @patch.object(TraceDatasetCreator, '_create_pos_and_neg_links')
-    def test_create_links_with_true_links(self, create_pos_and_neg_links_mock: mock.MagicMock):
-        create_pos_and_neg_links_mock.return_value = ([1, 2, 3], [4, 5, 6])
-        links, pos_link_ids, neg_link_ids = TraceDatasetCreator._create_links(self.TEST_MODEL_GENERATOR, TEST_S_ARTS,
-                                                                              TEST_T_ARTS, TEST_POS_LINKS)
-        self.links_test(links)
-        self.assertTrue(create_pos_and_neg_links_mock.called)
 
     def test_create_pos_and_neg_links(self):
         all_links = self.get_links(self.ALL_LINKS)
-        pos_link_ids, neg_link_ids = TraceDatasetCreator._create_pos_and_neg_links(TEST_POS_LINKS, all_links)
+        pos_link_ids, neg_link_ids = TraceDatasetCreator._get_pos_and_neg_links(TEST_POS_LINKS, all_links)
 
         self.assertEquals(len(pos_link_ids), len(TEST_POS_LINKS))
         self.assertEquals(len(neg_link_ids), len(self.ALL_LINKS) - len(TEST_POS_LINKS))
@@ -330,8 +325,8 @@ class TestTraceDatasetCreator(BaseTest):
         return links
 
     def get_test_link(self, source, target):
-        s = Artifact(source, TEST_S_ARTS[source], lambda text: text)
-        t = Artifact(target, TEST_T_ARTS[target], lambda text: text)
+        s = Artifact(source, ALL_TEST_SOURCES[source], lambda text: text)
+        t = Artifact(target, ALL_TEST_TARGETS[target], lambda text: text)
         return TraceLink(s, t,
                          lambda text_pair, text, return_token_type_ids, add_special_tokens: text + "_" + text_pair)
 
@@ -343,6 +338,6 @@ class TestTraceDatasetCreator(BaseTest):
                                        model_generator=None):
         if model_generator is None:
             model_generator = self.TEST_MODEL_GENERATOR
-        return TraceDatasetCreator(TEST_S_ARTS, TEST_T_ARTS, model_generator=model_generator,
+        return TraceDatasetCreator(TEST_SOURCE_LAYERS, TEST_TARGET_LAYERS, model_generator=model_generator,
                                    true_links=TEST_POS_LINKS if include_links else None,
                                    validation_percentage=validation_percentage)

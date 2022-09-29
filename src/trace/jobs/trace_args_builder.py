@@ -8,15 +8,15 @@ from trace.jobs.trace_args import TraceArgs
 
 class TraceArgsBuilder(AbstractArgsBuilder):
 
-    def __init__(self, base_model_name: str, model_path: str, output_dir: str, sources: Dict[str, str],
-                 targets: Dict[str, str], links: List[Tuple[str, str]], validation_percentage: float, **kwargs):
+    def __init__(self, base_model_name: str, model_path: str, output_dir: str, source_layers: List[Dict[str, str]],
+                 target_layers: List[Dict[str, str]], links: List[Tuple[str, str]], validation_percentage: float, **kwargs):
         """
         Responsible for building training arguments for some pretrained model.
         :param base_model_name: supported base model name
         :param model_path: where the pretrained model will be loaded from
         :param output_dir: where the model will be saved to
-        :param sources: mapping between source artifact ids and their tokens
-        :param targets: mapping between target artifact ids and their tokens
+        :param source_layers: mapping between source artifact ids and their tokens
+        :param target_layers: mapping between target artifact ids and their tokens
         :param links: list of true links to fine-tune on
         :param kwargs: additional parameters passed into ModelTraceArgs
         """
@@ -24,8 +24,8 @@ class TraceArgsBuilder(AbstractArgsBuilder):
         self.links = links
         self.model_path = model_path
         self.output_dir = output_dir
-        self.sources = sources
-        self.targets = targets
+        self.source_layers = source_layers
+        self.target_layers = target_layers
         self.validation_percentage = validation_percentage
         self.kwargs = kwargs
 
@@ -36,7 +36,7 @@ class TraceArgsBuilder(AbstractArgsBuilder):
         """
 
         model_generator = ModelGenerator(self.base_model_name, self.model_path)
-        trace_dataset_creator = TraceDatasetCreator(source_artifacts=self.sources, target_artifacts=self.targets,
+        trace_dataset_creator = TraceDatasetCreator(source_layers=self.source_layers, target_layers=self.target_layers,
                                                     true_links=self.links,
                                                     model_generator=model_generator,
                                                     validation_percentage=self.validation_percentage)

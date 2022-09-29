@@ -8,7 +8,7 @@ from torch.utils.data.sampler import RandomSampler
 from common.models.model_generator import ModelGenerator
 from test.base_test import BaseTest
 from test.config.paths import TEST_OUTPUT_DIR
-from test.test_data import TEST_POS_LINKS, TEST_S_ARTS, TEST_T_ARTS
+from test.test_data import TEST_POS_LINKS, TEST_SOURCE_LAYERS, TEST_TARGET_LAYERS
 from test.test_model import get_test_model
 from test.test_prediction_output import TEST_PREDICTION_OUTPUT, assert_output_matches_expected
 from test.test_tokenizer import get_test_tokenizer
@@ -20,7 +20,7 @@ from trace.train.trace_trainer import TraceTrainer
 class TestTraceTrainer(BaseTest):
     VAlIDATION_PERCENTAGE = 0.3
     EXPECTED_VALIDATION_SIZE = 3
-    EXPECTED_PREDICTION_SIZE = len(TEST_T_ARTS) * len(TEST_S_ARTS)
+    EXPECTED_PREDICTION_SIZE = len(TEST_TARGET_LAYERS) * len(TEST_SOURCE_LAYERS)
     TEST_METRIC_NAMES = ["accuracy", "map_at_k"]
 
     @patch.object(TraceTrainer, "save_model")
@@ -86,7 +86,7 @@ class TestTraceTrainer(BaseTest):
             model_generator = ModelGenerator("bert_trace_single", "path")
             model_generator.get_model = mock.MagicMock(return_value=get_test_model())
             model_generator.get_tokenizer = mock.MagicMock(return_value=get_test_tokenizer())
-            trace_dataset_creator = TraceDatasetCreator(source_artifacts=TEST_S_ARTS, target_artifacts=TEST_T_ARTS,
+            trace_dataset_creator = TraceDatasetCreator(source_layers=TEST_SOURCE_LAYERS, target_layers=TEST_TARGET_LAYERS,
                                                         true_links=TEST_POS_LINKS,
                                                         model_generator=model_generator,
                                                         validation_percentage=self.VAlIDATION_PERCENTAGE)

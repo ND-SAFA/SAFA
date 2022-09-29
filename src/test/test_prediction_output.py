@@ -18,18 +18,26 @@ TEST_LABEL_IDS = np.array([1, 0, 0, 1, 0, 0, 0, 1, 0])
 TEST_PREDICTION_OUTPUT = PredictionOutput(predictions=TEST_PREDICTIONS,
                                           label_ids=TEST_LABEL_IDS,
                                           metrics=TEST_METRIC_RESULTS)
-TEST_PREDICTION_RESPONSE_OUTPUT = {PredictionResponse.PREDICTIONS: [{'source': 's1', 'target': 't1', 'score': 0.5032135844230652},
-                                                                    {'source': 's1', 'target': 't2', 'score': 0.5032135844230652},
-                                                                    {'source': 's1', 'target': 't3', 'score': 0.5032135844230652},
-                                                                    {'source': 's2', 'target': 't1', 'score': 0.5032135844230652},
-                                                                    {'source': 's2', 'target': 't2', 'score': 0.5032135844230652},
-                                                                    {'source': 's2', 'target': 't3', 'score': 0.5032135844230652},
-                                                                    {'source': 's3', 'target': 't1', 'score': 0.5032135844230652},
-                                                                    {'source': 's3', 'target': 't2', 'score': 0.5032135844230652},
-                                                                    {'source': 's3', 'target': 't3', 'score': 0.5032135844230652}],
-                                   PredictionResponse.METRICS: {'test_loss': 0.6953101754188538, 'test_runtime': 0.0583,
-                                                                'test_samples_per_second': 154.289,
-                                                                'test_steps_per_second': 34.286}}
+TEST_PREDICTION_RESPONSE_OUTPUT = {PredictionResponse.PREDICTIONS: [{'source': 's1', 'target': 't1', 'score': 0.5025688409805298},
+                                                                    {'source': 's1', 'target': 't2', 'score': 0.5025688409805298},
+                                                                    {'source': 's1', 'target': 't3', 'score': 0.5025688409805298},
+                                                                    {'source': 's2', 'target': 't1', 'score': 0.5025688409805298},
+                                                                    {'source': 's2', 'target': 't2', 'score': 0.5025688409805298},
+                                                                    {'source': 's2', 'target': 't3', 'score': 0.5025688409805298},
+                                                                    {'source': 's3', 'target': 't1', 'score': 0.5025688409805298},
+                                                                    {'source': 's3', 'target': 't2', 'score': 0.5025688409805298},
+                                                                    {'source': 's3', 'target': 't3', 'score': 0.5025688409805298},
+                                                                    {'source': 's4', 'target': 't4', 'score': 0.5025688409805298},
+                                                                    {'source': 's4', 'target': 't5', 'score': 0.5025688409805298},
+                                                                    {'source': 's4', 'target': 't6', 'score': 0.5025688409805298},
+                                                                    {'source': 's5', 'target': 't4', 'score': 0.5025688409805298},
+                                                                    {'source': 's5', 'target': 't5', 'score': 0.5025688409805298},
+                                                                    {'source': 's5', 'target': 't6', 'score': 0.5025688409805298},
+                                                                    {'source': 's6', 'target': 't4', 'score': 0.5025688409805298},
+                                                                    {'source': 's6', 'target': 't5', 'score': 0.5025688409805298},
+                                                                    {'source': 's6', 'target': 't6', 'score': 0.5025688409805298}],
+                                   PredictionResponse.METRICS: {'test_loss': 0.6948729753494263, 'test_runtime': 0.0749,
+                                                                'test_samples_per_second': 240.328, 'test_steps_per_second': 40.055}}
 KEY_ERROR_MESSAGE = "{} not in {}"
 VAL_ERROR_MESSAGE = "{} with value {} does not equal expected value of {} {}"
 LEN_ERROR = "Length of {} does not match expected"

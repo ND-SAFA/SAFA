@@ -1,6 +1,6 @@
 from common.models.model_generator import ModelGenerator
 from test.base_test import BaseTest
-from test.test_data import TEST_POS_LINKS, TEST_S_ARTS, TEST_T_ARTS
+from test.test_data import TEST_POS_LINKS, TEST_SOURCE_LAYERS, TEST_TARGET_LAYERS
 from trace.data.trace_dataset_creator import TraceDatasetCreator
 from trace.jobs.trace_args import TraceArgs
 
@@ -21,7 +21,7 @@ class TestTraceArgs(BaseTest):
     def get_test_trace_args(self, **kwargs):
         model_generator = ModelGenerator("bert_trace_siamese", "path")
         return TraceArgs(model_generator,
-                         TraceDatasetCreator(source_artifacts=TEST_S_ARTS, target_artifacts=TEST_T_ARTS,
+                         TraceDatasetCreator(source_layers=TEST_SOURCE_LAYERS, target_layers=TEST_TARGET_LAYERS,
                                              true_links=TEST_POS_LINKS,
                                              model_generator=model_generator,
                                              validation_percentage=self.validation_percentage),

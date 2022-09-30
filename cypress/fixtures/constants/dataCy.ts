@@ -211,6 +211,19 @@ export enum DataCy {
   // Artifact Table
 
   artifactTable = "view-artifact-table",
+  artifactTableRow = "table-row-artifact",
+  artifactTableSortBy = "artifact-table-sort-by",
+  artifactTableGroupBy = "artifact-table-group-by",
+  artifactTableGroupByTableHeader = "artifact-table-group-sort-header",
+  artifactTableListItems = "button-checkmark-menu-item",
+  artifactTableColumnHeader = "artifact-table-column-header",
+  artifactTableNameHeaderNotSorted = '*[aria-label= "Name: Not sorted. Activate to sort ascending."][aria-sort= "none"]',
+  artifactTableTypeHeaderNotSorted = '*[aria-label= "Type: Not sorted. Activate to sort ascending."][aria-sort= "none"]',
+  artifactTableNameHeaderSortedAsc = '*[aria-label= "Name: Sorted ascending. Activate to sort descending."][aria-sort= "ascending"]',
+  artifactTableTypeHeaderSortedAsc = '*[aria-label= "Type: Sorted ascending. Activate to sort descending."][aria-sort= "ascending"]',
+  artifactTableArtifact = "artifact-table-artifact",
+  artifactTableArtifactWarning = "artifact-table-artifact-warning",
+  artifactTableArtifactWarningLabel = "artifact-table-panel-warnings-title",
 }
 
 export enum DataIds {

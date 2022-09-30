@@ -352,6 +352,23 @@ declare namespace Cypress {
     loadCurrentProject(waitForNodes?: boolean): Chainable<void>;
 
     /**
+     * Switches to table view.
+     */
+    switchToTableView(): Chainable<void>;
+
+    /**
+     * Looks up the first element in the artifact table view by node name.
+     */
+    artifactTableFirstElementLookUp(): Chainable<void>;
+
+    /**
+     * Sorts the artifact table by the given sort type.
+     *
+     * @param sortType - The type of sort to use.
+     */
+    artifactTableChangeSort(sortType: string): Chainable<void>;
+
+    /**
      * Centers the graph.
      */
     centerGraph(): Chainable<void>;

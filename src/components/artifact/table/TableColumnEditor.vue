@@ -42,13 +42,7 @@
         Add Column
       </v-btn>
 
-      <table-column-modal :is-open="isCreateOpen" @close="handleCloseModal" />
-
-      <table-column-modal
-        :is-open="isEditOpen"
-        :column="editingColumn"
-        @close="handleCloseModal"
-      />
+      <table-column-modal :is-open="isSaveOpen" @close="handleCloseModal" />
     </template>
   </v-select>
 </template>
@@ -57,7 +51,7 @@
 import Vue from "vue";
 import { ColumnModel } from "@/types";
 import { columnTypeOptions } from "@/util";
-import { documentStore } from "@/hooks";
+import { documentStore, tableColumnSaveStore } from "@/hooks";
 import { handleColumnMove } from "@/api";
 import { GenericIconButton, FlexBox, Typography } from "@/components/common";
 import TableColumnModal from "./TableColumnModal.vue";
@@ -67,9 +61,7 @@ export default Vue.extend({
   components: { Typography, FlexBox, TableColumnModal, GenericIconButton },
   data() {
     return {
-      isCreateOpen: false,
-      isEditOpen: false,
-      editingColumn: undefined as ColumnModel | undefined,
+      isSaveOpen: false,
       items: documentStore.tableColumns,
       dataTypes: columnTypeOptions(),
     };
@@ -108,23 +100,22 @@ export default Vue.extend({
      */
     handleCloseModal() {
       (this.$refs.tableColumnEditor as HTMLElement).blur();
-      this.isCreateOpen = false;
-      this.isEditOpen = false;
-      this.editingColumn = undefined;
+      this.isSaveOpen = false;
     },
     /**
      * Opens the create modal.
      */
     handleCreateOpen() {
-      this.isCreateOpen = true;
+      tableColumnSaveStore.baseColumn = undefined;
+      this.isSaveOpen = true;
     },
     /**
      * Opens the edit modal.
      * @param column - The column to edit.
      */
     handleEditOpen(column: ColumnModel) {
-      this.editingColumn = column;
-      this.isEditOpen = true;
+      tableColumnSaveStore.baseColumn = column;
+      this.isSaveOpen = true;
     },
 
     /**

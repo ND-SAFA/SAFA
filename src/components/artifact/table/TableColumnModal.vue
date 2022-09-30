@@ -1,6 +1,6 @@
 <template>
   <generic-modal
-    :title="title"
+    :title="modalTitle"
     size="sm"
     :is-open="isOpen"
     @close="handleClose"
@@ -10,20 +10,20 @@
         filled
         label="Name"
         class="mt-4"
-        v-model="editingColumn.name"
+        v-model="editedColumn.name"
         :error-messages="nameErrors"
       />
       <v-select
         filled
         label="Type"
         :items="dataTypes"
-        v-model="editingColumn.dataType"
+        v-model="editedColumn.dataType"
         item-text="name"
         item-value="id"
       />
       <v-checkbox
         label="Requires a non-empty value"
-        v-model="editingColumn.required"
+        v-model="editedColumn.required"
       />
     </template>
     <template v-slot:actions>
@@ -40,7 +40,7 @@
         Cancel
       </v-btn>
       <v-spacer />
-      <v-btn color="primary" :disabled="!isColumnValid" @click="handleSubmit">
+      <v-btn color="primary" :disabled="!canSave" @click="handleSubmit">
         Confirm
       </v-btn>
     </template>
@@ -48,10 +48,10 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import Vue from "vue";
 import { ColumnModel } from "@/types";
-import { columnTypeOptions, createColumn } from "@/util";
-import { documentStore } from "@/hooks";
+import { columnTypeOptions } from "@/util";
+import { tableColumnSaveStore } from "@/hooks";
 import { handleColumnDelete, handleColumnSave } from "@/api";
 import { GenericModal } from "@/components/common";
 
@@ -65,53 +65,45 @@ export default Vue.extend({
   components: { GenericModal },
   props: {
     isOpen: Boolean,
-    column: {
-      type: Object as PropType<ColumnModel>,
-      required: false,
-    },
   },
   data() {
     return {
-      editingColumn: createColumn(this.column),
       confirmDelete: false,
       dataTypes: columnTypeOptions(),
     };
   },
   computed: {
     /**
-     * @return Whether the modal is in edit mode.
+     * @return Whether an existing column is being updated.
      */
-    isEditMode(): boolean {
-      return !!this.column;
+    isUpdate(): boolean {
+      return tableColumnSaveStore.isUpdate;
+    },
+    /**
+     * @return The column being edited
+     */
+    editedColumn(): ColumnModel {
+      return tableColumnSaveStore.editedColumn;
     },
     /**
      * @return The modal title.
      */
-    title(): string {
-      return this.isEditMode ? "Edit Column" : "Add Column";
+    modalTitle(): string {
+      return this.isUpdate ? "Edit Column" : "Add Column";
     },
     /**
-     * @return Whether the current name is valid.
+     * @return Whether the column can be saved.
      */
-    isNameValid(): boolean {
-      return (
-        !documentStore.doesColumnExist(this.editingColumn.name) ||
-        this.column?.name === this.editingColumn.name
-      );
-    },
-    /**
-     * @return Whether the current column is valid.
-     */
-    isColumnValid(): boolean {
-      return !!this.editingColumn.name && this.isNameValid;
+    canSave(): boolean {
+      return tableColumnSaveStore.canSave;
     },
     /**
      * @return Any errors to report on the name.
      */
     nameErrors(): string[] {
-      return this.isNameValid
+      return tableColumnSaveStore.editedColumn.name === ""
         ? []
-        : ["This name is already used, please select another."];
+        : tableColumnSaveStore.nameErrors;
     },
   },
   methods: {
@@ -125,7 +117,7 @@ export default Vue.extend({
      * Attempts to save a column.
      */
     handleSubmit() {
-      handleColumnSave(this.editingColumn, this.isEditMode, {
+      handleColumnSave({
         onSuccess: () => this.handleClose(),
       });
     },
@@ -136,7 +128,7 @@ export default Vue.extend({
       if (!this.confirmDelete) {
         this.confirmDelete = true;
       } else {
-        handleColumnDelete(this.editingColumn, {
+        handleColumnDelete({
           onSuccess: () => this.handleClose(),
         });
       }
@@ -150,7 +142,7 @@ export default Vue.extend({
       if (!open) return;
 
       this.confirmDelete = false;
-      this.editingColumn = createColumn(this.column);
+      tableColumnSaveStore.resetColumn();
     },
   },
 });

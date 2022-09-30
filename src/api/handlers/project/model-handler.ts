@@ -1,5 +1,5 @@
 import { IOHandlerCallback, ModelShareType, TrainedModel } from "@/types";
-import { logStore, projectStore } from "@/hooks";
+import { logStore, modelSaveStore, projectStore } from "@/hooks";
 import {
   createModel,
   deleteModel,
@@ -19,16 +19,14 @@ export async function handleLoadModels(): Promise<void> {
 /**
  * Saves a model, updates app state, and logs the status.
  *
- * @param model - The model to create.
- * @param isUpdate - If true, this model already exists and is being updated.
  * @param onSuccess - Called if the action is successful.
  * @param onError - Called if the action fails.
  */
-export function handleSaveModel(
-  model: TrainedModel,
-  isUpdate: boolean,
-  { onSuccess, onError }: IOHandlerCallback<TrainedModel>
-): void {
+export function handleSaveModel({
+  onSuccess,
+  onError,
+}: IOHandlerCallback<TrainedModel>): void {
+  const model = modelSaveStore.editedModel;
   logStore.onInfo(
     `Model is being saved, you'll receive a notification when it is ready: ${model.name}`
   );

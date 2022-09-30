@@ -62,10 +62,11 @@ export async function handleCreateLink(
  * @param link - The trace link to process.
  * @param onSuccess - Called if the action is successful.
  * @param onError - Called if the action fails.
+ * @param onComplete - Called after the action.
  */
 export async function handleApproveLink(
   link: TraceLinkModel,
-  { onSuccess, onError }: IOHandlerCallback
+  { onSuccess, onError, onComplete }: IOHandlerCallback
 ): Promise<void> {
   const currentStatus = link.approvalStatus;
 
@@ -85,6 +86,7 @@ export async function handleApproveLink(
       );
       onError?.(e);
     },
+    onComplete,
   });
 }
 
@@ -94,10 +96,11 @@ export async function handleApproveLink(
  * @param link - The trace link to process.
  * @param onSuccess - Called if the action is successful.
  * @param onError - Called if the action fails.
+ * @param onComplete - Called after the action.
  */
 export async function handleDeclineLink(
   link: TraceLinkModel,
-  { onSuccess, onError }: IOHandlerCallback
+  { onSuccess, onError, onComplete }: IOHandlerCallback
 ): Promise<void> {
   const currentStatus = link.approvalStatus;
 
@@ -117,6 +120,7 @@ export async function handleDeclineLink(
       );
       onError?.(e);
     },
+    onComplete,
   });
 }
 
@@ -160,10 +164,11 @@ export async function handleDeclineAll(): Promise<void> {
  * @param link - The trace link to process.
  * @param onSuccess - Called if the action is successful.
  * @param onError - Called if the action fails.
+ * @param onComplete - Called after the action.
  */
 export async function handleUnreviewLink(
   link: TraceLinkModel,
-  { onSuccess, onError }: IOHandlerCallback
+  { onSuccess, onError, onComplete }: IOHandlerCallback
 ): Promise<void> {
   const currentStatus = link.approvalStatus;
 
@@ -182,6 +187,7 @@ export async function handleUnreviewLink(
       );
       onError?.(e);
     },
+    onComplete,
   });
 }
 
@@ -192,15 +198,19 @@ export async function handleUnreviewLink(
  * @param linkAPI - The endpoint to call with the link.
  * @param onSuccess - Called if the action is successful.
  * @param onError - Called if the action fails.
+ * @param onComplete - Called after the action.
  */
 function linkAPIHandler(
   link: TraceLinkModel,
   linkAPI: (traceLink: TraceLinkModel) => Promise<TraceLinkModel[]>,
-  { onSuccess, onError }: IOHandlerCallback
+  { onSuccess, onError, onComplete }: IOHandlerCallback
 ): void {
   appStore.onLoadStart();
   linkAPI(link)
     .then(() => onSuccess?.())
     .catch((e) => onError?.(e))
-    .finally(() => appStore.onLoadEnd());
+    .finally(() => {
+      appStore.onLoadEnd();
+      onComplete?.();
+    });
 }

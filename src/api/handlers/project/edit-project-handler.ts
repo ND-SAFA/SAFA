@@ -1,5 +1,5 @@
 import { IOHandlerCallback, ProjectModel, IdentifierModel } from "@/types";
-import { logStore, projectStore } from "@/hooks";
+import { identifierSaveStore, logStore, projectStore } from "@/hooks";
 import {
   deleteProject,
   deleteProjectVersion,
@@ -10,16 +10,18 @@ import {
 /**
  * Saves a project, updates app state, and logs the status.
  *
- * @param project - The project to save.
  * @param onSuccess - Called if the action is successful.
  * @param onError - Called if the action fails.
  * @param onComplete - Called after the action.
  */
-export function handleSaveProject(
-  project: Pick<IdentifierModel, "projectId" | "name" | "description">,
-  { onSuccess, onError, onComplete }: IOHandlerCallback<ProjectModel>
-): void {
-  saveProject(project)
+export function handleSaveProject({
+  onSuccess,
+  onError,
+  onComplete,
+}: IOHandlerCallback<ProjectModel>): void {
+  const identifier = identifierSaveStore.editedIdentifier;
+
+  saveProject(identifier)
     .then((project) => {
       projectStore.allProjects = [
         project,
@@ -32,7 +34,7 @@ export function handleSaveProject(
       onSuccess?.(project);
     })
     .catch((e) => {
-      logStore.onError(`Unable to save project: ${project.name}`);
+      logStore.onError(`Unable to save project: ${identifier.name}`);
       logStore.onDevError(e.message);
       onError?.(e);
     })
@@ -42,15 +44,19 @@ export function handleSaveProject(
 /**
  * Deletes a project, updates app state, and logs the status.
  *
- * @param project - The project to delete.
  * @param onSuccess - Called if the action is successful.
  * @param onError - Called if the action fails.
  * @param onComplete - Called after the action.
  */
-export function handleDeleteProject(
-  project: IdentifierModel,
-  { onSuccess, onError, onComplete }: IOHandlerCallback<IdentifierModel>
-): void {
+export function handleDeleteProject({
+  onSuccess,
+  onError,
+  onComplete,
+}: IOHandlerCallback<IdentifierModel>): void {
+  const project = identifierSaveStore.baseIdentifier;
+
+  if (!project) return;
+
   deleteProject(project.projectId)
     .then(async () => {
       projectStore.allProjects = projectStore.allProjects.filter(

@@ -2,22 +2,23 @@
   <generic-modal
     size="md"
     :is-open="isOpen"
-    :title="title"
+    title="Delete Project"
     data-cy="modal-project-delete"
     @close="handleCancel"
   >
     <template v-slot:body>
       <v-text-field
+        hide-details
         v-model="confirmText"
-        :label="textboxLabel"
-        class="ma-3"
+        :label="label"
+        class="mt-4"
         filled
         data-cy="input-project-delete-name"
       />
     </template>
     <template v-slot:actions>
       <v-btn
-        :disabled="!validated"
+        :disabled="!canDelete"
         color="error"
         @click="handleConfirm"
         class="ml-auto"
@@ -30,14 +31,14 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
-import { IdentifierModel } from "@/types";
+import Vue from "vue";
+import { identifierSaveStore } from "@/hooks";
 import { GenericModal } from "@/components/common";
 
 /**
  * A modal for confirming project deletion.
  *
- * @emits-1 `confirm` (string) - On delete confirm.
+ * @emits-1 `confirm` - On delete confirm.
  * @emits-2 `cancel` - On delete cancel.
  */
 export default Vue.extend({
@@ -48,18 +49,31 @@ export default Vue.extend({
       type: Boolean,
       required: true,
     },
-    project: {
-      type: Object as PropType<IdentifierModel>,
-      required: false,
-    },
   },
   data() {
     return {
       confirmText: "",
-      textboxLabel: "",
-      title: "",
-      validated: false,
     };
+  },
+  computed: {
+    /**
+     * @return The name of the project being deleted.
+     */
+    projectName(): string {
+      return identifierSaveStore.baseIdentifier?.name || "";
+    },
+    /**
+     * @return The project name input label.
+     */
+    label(): string {
+      return `Type "${this.projectName}"`;
+    },
+    /**
+     * @return Whether the project can be deleted.
+     */
+    canDelete(): boolean {
+      return this.confirmText === this.projectName;
+    },
   },
   methods: {
     /**
@@ -67,15 +81,12 @@ export default Vue.extend({
      */
     clearData(): void {
       this.confirmText = "";
-      this.validated = false;
     },
     /**
      * Emits a request to confirm deleting this project.
      */
     handleConfirm() {
-      if (this.validated) {
-        this.$emit("confirm", this.project);
-      }
+      this.$emit("confirm");
     },
     /**
      * Emits a request to cancel deleting this project.
@@ -85,21 +96,6 @@ export default Vue.extend({
     },
   },
   watch: {
-    /**
-     * Updates the modal text when the project changes.
-     */
-    project(project: IdentifierModel | undefined) {
-      if (!project) return;
-
-      this.textboxLabel = `Type "${project.name}"`;
-      this.title = `Deleting: ${project.name}`;
-    },
-    /**
-     * Updates the validated status when the text changes.
-     */
-    confirmText() {
-      this.validated = this.project && this.confirmText === this.project.name;
-    },
     /**
      * Clears the modal data when opened.
      */

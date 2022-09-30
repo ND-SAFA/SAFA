@@ -26,7 +26,6 @@
     <template v-slot:deleteItemDialogue>
       <confirm-project-delete
         :is-open="isDeleteOpen"
-        :project="projectToDelete"
         @confirm="handleConfirmDeleteProject"
         @cancel="handleCancelDeleteProject"
       />
@@ -98,7 +97,6 @@ export default Vue.extend({
       isSaveOpen: false,
       isDeleteOpen: false,
       isLoading: false,
-      projectToDelete: undefined as IdentifierModel | undefined,
     };
   },
   computed: {
@@ -171,8 +169,8 @@ export default Vue.extend({
      * @param item - The project to delete.
      */
     handleDeleteProject(item: IdentifierModel) {
+      identifierSaveStore.baseIdentifier = item;
       this.isDeleteOpen = true;
-      this.projectToDelete = item;
     },
     /**
      * Closes the delete project modal.
@@ -182,12 +180,11 @@ export default Vue.extend({
     },
     /**
      * Attempts to delete a project, and closes the delete modal.
-     * @param project - The project to delete.
      */
-    handleConfirmDeleteProject(project: IdentifierModel) {
+    handleConfirmDeleteProject() {
       this.isLoading = true;
 
-      handleDeleteProject(project, {
+      handleDeleteProject({
         onSuccess: () => {
           this.isDeleteOpen = false;
           this.$emit("unselected");
@@ -201,7 +198,7 @@ export default Vue.extend({
     handleConfirmSaveProject() {
       this.isLoading = true;
 
-      handleSaveProject(identifierSaveStore.editedIdentifier, {
+      handleSaveProject({
         onSuccess: (project) => {
           this.selected = project;
           this.isSaveOpen = false;

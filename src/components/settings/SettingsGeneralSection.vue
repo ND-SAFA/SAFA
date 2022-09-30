@@ -74,7 +74,7 @@ export default Vue.extend({
     handleSave(): void {
       this.isEditLoading = true;
 
-      handleSaveProject(identifierSaveStore.editedIdentifier, {
+      handleSaveProject({
         onSuccess: (project) => projectStore.updateProject(project),
         onComplete: () => {
           this.isEditLoading = false;

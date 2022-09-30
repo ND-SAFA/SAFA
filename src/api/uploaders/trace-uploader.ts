@@ -1,13 +1,13 @@
 import {
   ArtifactMap,
   ArtifactModel,
-  IGenericUploader,
   LinkModel,
   ModelType,
   ParseTraceFileModel,
   TraceFile,
   TraceLinkModel,
   TracePanel,
+  TraceUploader,
 } from "@/types";
 import { extractTraceId } from "@/util";
 import { logStore } from "@/hooks";
@@ -16,11 +16,7 @@ import { parseTraceFile } from "@/api";
 /**
  * Creates a trace file uploader.
  */
-export function createTraceUploader(): IGenericUploader<
-  ArtifactMap,
-  LinkModel,
-  TraceFile
-> {
+export function createTraceUploader(): TraceUploader {
   return {
     panels: [],
     createNewPanel,

@@ -1,10 +1,10 @@
 import {
   ArtifactMap,
-  IGenericUploader,
   ArtifactModel,
   ParseArtifactFileModel,
   ArtifactFile,
   ArtifactPanel,
+  ArtifactUploader,
 } from "@/types";
 import { logStore } from "@/hooks";
 import { parseArtifactFile } from "@/api";
@@ -12,11 +12,7 @@ import { parseArtifactFile } from "@/api";
 /**
  * Creates an artifact uploader.
  */
-export function createArtifactUploader(): IGenericUploader<
-  ArtifactMap,
-  string,
-  ArtifactFile
-> {
+export function createArtifactUploader(): ArtifactUploader {
   return {
     panels: [],
     createNewPanel,

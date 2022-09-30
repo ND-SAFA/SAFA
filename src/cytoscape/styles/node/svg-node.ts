@@ -1,6 +1,7 @@
 import { ArtifactData, SvgNodeStyle, SvgStyle } from "@/types";
 import { capitalize, getBorderColor } from "@/util";
 import { ARTIFACT_CHILDREN_HEIGHT } from "@/cytoscape";
+import { svgText } from "@/cytoscape/styles/node/svg-text";
 import { svgFooter } from "./node-footer";
 import { getBody, sanitizeText } from "./node-helper";
 
@@ -66,22 +67,23 @@ export function svgNode(
  * Creates the SVG for representing a node's title.
  *
  * @param title - The title to render.
- * @param yPos - The y position to start drawing at.
+ * @param y - The y position to start drawing at.
  * @param dataCy - The data cy selector to append.
  *
  * @return stringified SVG for the node.
  */
-export function svgTitle(title: string, yPos: number, dataCy: string): string {
-  return `
-    <foreignObject y="${yPos}" height="24" width="100%">
-      <span 
-        class="text-body-1 align-center mx-2 text-ellipsis artifact-text" 
-        data-cy="tree-node-${dataCy}"
-      >
-        ${sanitizeText(title)}
-      </span >
-    </foreignObject>
-  `;
+export function svgTitle(title: string, y: number, dataCy: string): string {
+  return svgText(
+    title,
+    {
+      class: "align-center mx-2 text-ellipsis artifact-text",
+      x: 0,
+      y,
+      width: "100%",
+      height: 24,
+    },
+    dataCy
+  );
 }
 
 /**
@@ -117,28 +119,16 @@ function svgBody(
   truncateLength: number,
   style: SvgStyle
 ): string {
-  const width = `${style.width}px`;
-  const height = `${style.height}px`;
-
-  return `
-    <foreignObject 
-      x="${style.x}" y="${style.y}" 
-      width="${style.width}" 
-      height="${style.height}"
-    >
-     <span
-       class="text-body-1" 
-       data-cy="tree-node-body"
-       style="
-         display: block;
-         width: ${width};
-         height: ${height};
-         line-height: 1rem;
-         text-align: center;
-       "
-     >
-       ${getBody(body, truncateLength)}
-     </span>
-    </foreignObject>
-  `;
+  return svgText(
+    getBody(body, truncateLength),
+    style,
+    "body",
+    `
+      display: block;
+      width: ${style.width}px;
+      height: ${style.height}px;
+      line-height: 1rem;
+      text-align: center;
+    `
+  );
 }

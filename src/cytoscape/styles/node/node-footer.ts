@@ -1,6 +1,7 @@
 import { ArtifactData, SvgStyle } from "@/types";
 import { ThemeColors } from "@/util";
 import { ARTIFACT_BORDER_WIDTH, ARTIFACT_CHILDREN_HEIGHT } from "@/cytoscape";
+import { svgText } from "./svg-text";
 import { svgStoplight } from "./node-stoplight";
 import { getWarnings } from "./node-helper";
 
@@ -18,8 +19,8 @@ export function svgFooter(
 ): string {
   const baseY = outerStyle.height + 4;
   const textY = data.childDeltaStates?.length
-    ? outerStyle.height + 20
-    : outerStyle.height + 26;
+    ? outerStyle.height + 2
+    : outerStyle.height + 8;
   const warningCount = getWarnings(data);
   const hasWarnings = warningCount > 0;
   const hasChildren = (data.hiddenChildren || 0) > 0;
@@ -51,7 +52,7 @@ export function svgFooter(
     ${svgWarnings(warningCount, hasChildren, textY, outerStyle.width)}
     ${svgStoplight(data, {
       x: 6,
-      y: textY + 4,
+      y: textY + 22,
       width: outerStyle.width - 12,
     })}
   `;
@@ -71,26 +72,20 @@ function svgChildren(
   hasWarnings: boolean,
   textY: number
 ): string {
-  const iconY = textY - 16;
-
   if (hiddenChildren === 0) return "";
 
-  return `
-        <text 
-          y="${textY}"
-          x="${hasWarnings ? 20 : 80}"
-          fill="${ThemeColors.black}"
-        >
-          ${hiddenChildren} Hidden
-        </text>
-        <foreignObject 
-          x="${hasWarnings ? 5 : 62}"
-          y="${iconY}" 
-          width="20" height="20"
-        >
-          <div style="font-family: Material Icons;">expand_more</div>
-        </foreignObject>
-  `;
+  return svgText(
+    `${hiddenChildren} Hidden`,
+    {
+      y: textY,
+      x: hasWarnings ? 5 : 62,
+      width: 120,
+      height: 30,
+    },
+    "children",
+    "",
+    { id: "expand_more" }
+  );
 }
 
 /**
@@ -109,29 +104,18 @@ function svgWarnings(
   textY: number,
   width: number
 ): string {
-  const iconY = textY - 17;
-
   if (warningCount === 0) return "";
 
-  return `
-        <text 
-          x="${hasChildren ? width - 80 : 80}"
-          y="${textY}" 
-          fill="${ThemeColors.black}"
-        >
-          ${warningCount} Warning${warningCount !== 1 ? "s" : ""}
-        </text>
-        <foreignObject 
-          x="${hasChildren ? width - 100 : 62}" 
-          y="${iconY - 1}" 
-          width="20" height="20"
-        >
-          <div 
-            style="font-family: Material Icons; 
-                   color: ${ThemeColors.warningDark}"
-          >
-            warning
-          </div>
-        </foreignObject>
-  `;
+  return svgText(
+    `${warningCount} Warning${warningCount !== 1 ? "s" : ""}`,
+    {
+      x: hasChildren ? width - 106 : 62,
+      y: textY,
+      width: 120,
+      height: 30,
+    },
+    "warnings",
+    "",
+    { id: "warning", color: ThemeColors.warningDark }
+  );
 }

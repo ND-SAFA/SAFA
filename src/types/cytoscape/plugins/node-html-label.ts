@@ -72,6 +72,10 @@ export interface SvgStyle {
    * The color to render.
    */
   color?: string;
+  /**
+   * The class names to append.
+   */
+  class?: string;
 }
 
 /**

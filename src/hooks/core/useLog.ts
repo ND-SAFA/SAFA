@@ -1,6 +1,11 @@
 import { defineStore } from "pinia";
 
-import { APIErrorBody, MessageType, SnackbarMessage } from "@/types";
+import {
+  APIErrorBody,
+  ConfirmationType,
+  MessageType,
+  SnackbarMessage,
+} from "@/types";
 import { createConfirmDialogueMessage, createSnackbarMessage } from "@/util";
 import { pinia } from "@/plugins";
 
@@ -21,6 +26,10 @@ export const useLog = defineStore("log", {
      * The timestamp of the last message displayed.
      */
     lastMessageTimestamp: 0,
+    /**
+     * A list of all messages displayed in the current session.
+     */
+    notifications: [] as SnackbarMessage[],
   }),
   getters: {},
   actions: {
@@ -46,6 +55,7 @@ export const useLog = defineStore("log", {
       }
 
       this.lastMessageTimestamp = Date.now();
+      this.notifications = [message, ...this.notifications];
     },
     /**
      * Creates a snackbar with the given message.
@@ -114,6 +124,27 @@ export const useLog = defineStore("log", {
       if (process.env.NODE_ENV === "production") return;
 
       console.error(message);
+    },
+    /**
+     * Opens a confirm window to run the given callback.
+     *
+     * @param title - The window's title.
+     * @param body - The window's body.
+     * @param statusCallback - The callback to run if confirmed or closed.
+     */
+    confirm(
+      title: string,
+      body: string,
+      statusCallback: (confirmed: boolean) => Promise<void>
+    ): void {
+      this.$patch({
+        confirmation: {
+          type: ConfirmationType.INFO,
+          title,
+          body,
+          statusCallback,
+        },
+      });
     },
   },
 });

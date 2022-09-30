@@ -6,6 +6,7 @@ import {
   ArtifactModel,
   DocumentTraces,
   TraceLinkModel,
+  TraceType,
 } from "@/types";
 import { matchTrace, removeMatches, standardizeValueArray } from "@/util";
 import { pinia } from "@/plugins";
@@ -123,6 +124,43 @@ export const useTraces = defineStore("traces", {
       return this.allTraces.find(
         matchTrace(sourceId, targetId, ignoreDirection)
       );
+    },
+    /**
+     * Returns the trace link between sets of artifacts.
+     *
+     * @param sources - The source artifacts.
+     * @param targets - The target artifacts.
+     * @param filters - Whether to additionally filter by manual or approved links.
+     * @return All trace links from source to target artifacts.
+     */
+    getTraceLinksByArtifactSets(
+      sources: ArtifactModel[],
+      targets: ArtifactModel[],
+      filters: ("manual" | "approved")[] = []
+    ): TraceLinkModel[] {
+      const linksBetweenSets = this.allTraces.filter(
+        ({ sourceId, targetId }) =>
+          !!sources.find(({ id }) => id === sourceId) &&
+          !!targets.find(({ id }) => id === targetId)
+      );
+
+      if (filters.includes("manual") && filters.includes("approved")) {
+        return linksBetweenSets.filter(
+          ({ approvalStatus }) => approvalStatus === ApprovalType.APPROVED
+        );
+      } else if (filters.includes("manual")) {
+        return linksBetweenSets.filter(
+          ({ traceType }) => traceType === TraceType.MANUAL
+        );
+      } else if (filters.includes("approved")) {
+        return linksBetweenSets.filter(
+          ({ traceType, approvalStatus }) =>
+            traceType === TraceType.GENERATED &&
+            approvalStatus === ApprovalType.APPROVED
+        );
+      } else {
+        return linksBetweenSets;
+      }
     },
     /**
      * Returns whether the link exists.

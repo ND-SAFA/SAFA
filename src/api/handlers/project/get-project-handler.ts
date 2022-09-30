@@ -1,0 +1,29 @@
+import { IOHandlerCallback } from "@/types";
+import { logStore, projectStore, sessionStore } from "@/hooks";
+import { getProjects } from "@/api";
+
+/**
+ * Stores all projects for the current user.
+ *
+ * @param onSuccess - Called if the action is successful.
+ * @param onError - Called if the action fails.
+ */
+export async function handleGetProjects({
+  onSuccess,
+  onError,
+}: IOHandlerCallback): Promise<void> {
+  if (!sessionStore.doesSessionExist) {
+    onSuccess?.();
+    return;
+  }
+
+  try {
+    projectStore.allProjects = await getProjects();
+
+    onSuccess?.();
+  } catch (e: any) {
+    logStore.onError("Unable to load your projects.");
+    logStore.onDevError(e);
+    onError?.(e);
+  }
+}

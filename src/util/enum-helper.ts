@@ -4,7 +4,9 @@ import {
   ColumnDataType,
   DocumentType,
   FTANodeType,
+  ModelShareType,
   ModelType,
+  ProjectRole,
   SafetyCaseType,
   SelectOption,
 } from "@/types";
@@ -147,5 +149,31 @@ export function traceModelOptions(): SelectOption[] {
       "Slower, higher quality links. Traces free-text artifacts to source code."
     ),
     createEnumOption(ModelType.VSM, "Faster, lower quality links."),
+  ];
+}
+
+/**
+ * Returns display names for project role type.
+ *
+ * @return The select option names and ids.
+ */
+export function projectRoleOptions(): SelectOption[] {
+  return [
+    createEnumOption(ProjectRole.OWNER),
+    createEnumOption(ProjectRole.ADMIN),
+    createEnumOption(ProjectRole.EDITOR),
+    createEnumOption(ProjectRole.VIEWER),
+  ];
+}
+
+/**
+ * Returns display names for model share options.
+ *
+ * @return The select option names and ids.
+ */
+export function modelShareOptions(): SelectOption[] {
+  return [
+    createEnumOption(ModelShareType.CLONE, "Clone the model"),
+    createEnumOption(ModelShareType.REUSE, "Reuse the same model"),
   ];
 }

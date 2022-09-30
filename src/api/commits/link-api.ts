@@ -1,7 +1,7 @@
 import { ApprovalType, JobModel, TraceLinkModel } from "@/types";
 import { CommitBuilder } from "@/api";
 import { authHttpClient, Endpoint, fillEndpoint } from "@/api/util";
-import { GenerateLinksModel } from "@/types/api/link-api";
+import { GenerateLinksModel, TrainOnLinksModel } from "@/types/api/link-api";
 
 /**
  * Returns all generated links for this project.
@@ -22,7 +22,7 @@ export async function getGeneratedLinks(
  * Generates links between source and target artifacts.
  *
  * @param config - Generated link configuration.
- * @return All generated links.
+ * @return The created job.
  */
 export async function createGeneratedLinks(
   config: GenerateLinksModel
@@ -31,6 +31,24 @@ export async function createGeneratedLinks(
     method: "POST",
     body: JSON.stringify(config),
   });
+}
+
+/**
+ * Trains a model between source and target artifacts.
+ *
+ * @param config - Model training configuration.
+ * @return The created job.
+ */
+export async function createModelTraining(
+  config: TrainOnLinksModel
+): Promise<JobModel> {
+  return authHttpClient<JobModel>(
+    fillEndpoint(Endpoint.trainModelJob, { projectId: config.projectId }),
+    {
+      method: "POST",
+      body: JSON.stringify(config),
+    }
+  );
 }
 
 /**
@@ -63,6 +81,23 @@ export async function updateDeclinedLink(
 
   return CommitBuilder.withCurrentVersion()
     .withModifiedTraceLink(traceLink)
+    .save()
+    .then(async ({ traces }) => traces.removed);
+}
+
+/**
+ * Declines all given links.
+ *
+ * @param traceLinks - The trace links to decline.
+ * @return The removed trace links.
+ */
+export async function updateDeclinedLinks(
+  traceLinks: TraceLinkModel[]
+): Promise<TraceLinkModel[]> {
+  traceLinks.map((link) => (link.approvalStatus = ApprovalType.DECLINED));
+
+  return CommitBuilder.withCurrentVersion()
+    .withModifiedTraceLinks(traceLinks)
     .save()
     .then(async ({ traces }) => traces.removed);
 }

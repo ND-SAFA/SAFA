@@ -1,28 +1,34 @@
 <template>
   <flex-box align="center" justify="center">
-    <generic-icon-button
+    <v-btn
       v-if="showUnreviewed"
+      text
       :loading="isUnreviewLoading"
-      icon-id="mdi-checkbox-blank-circle-outline"
-      tooltip="Unreview"
       @click="handleUnreview"
-    />
-    <generic-icon-button
+    >
+      <v-icon class="mr-1">mdi-checkbox-blank-circle-outline</v-icon>
+      Un-Review
+    </v-btn>
+    <v-btn
       v-if="showApproved"
+      text
       :loading="isApproveLoading"
       color="primary"
-      icon-id="mdi-check-circle-outline"
-      tooltip="Approve"
       @click="handleApprove"
-    />
-    <generic-icon-button
+    >
+      <v-icon class="mr-1">mdi-check-circle-outline</v-icon>
+      Approve
+    </v-btn>
+    <v-btn
       v-if="showDeclined"
+      text
       :loading="isDeclineLoading"
       color="error"
-      icon-id="mdi-close-circle-outline"
-      tooltip="Decline"
       @click="handleDecline"
-    />
+    >
+      <v-icon class="mr-1">mdi-close-circle-outline</v-icon>
+      Decline
+    </v-btn>
   </flex-box>
 </template>
 
@@ -35,7 +41,7 @@ import {
   handleDeclineLink,
   handleUnreviewLink,
 } from "@/api";
-import { FlexBox, GenericIconButton } from "@/components/common";
+import { FlexBox } from "@/components/common";
 
 /**
  * Displays trace link approval buttons.
@@ -47,7 +53,6 @@ import { FlexBox, GenericIconButton } from "@/components/common";
 export default Vue.extend({
   name: "TraceLinkApproval",
   components: {
-    GenericIconButton,
     FlexBox,
   },
   props: {

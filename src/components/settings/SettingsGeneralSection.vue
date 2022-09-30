@@ -2,11 +2,18 @@
   <v-container>
     <flex-box justify="space-between">
       <typography el="h1" variant="title" :value="project.name" />
-      <generic-icon-button
-        tooltip="Edit title"
-        icon-id="mdi-pencil"
-        @click="handleEdit"
-      />
+      <flex-box>
+        <generic-icon-button
+          tooltip="Download Project Files"
+          icon-id="mdi-download"
+          @click="handleDownload"
+        />
+        <generic-icon-button
+          tooltip="Edit title"
+          icon-id="mdi-pencil"
+          @click="handleEdit"
+        />
+      </flex-box>
     </flex-box>
     <v-divider />
     <typography :value="project.description" />
@@ -26,7 +33,7 @@
 import Vue, { PropType } from "vue";
 import { ProjectModel, IdentifierModel } from "@/types";
 import { projectStore } from "@/hooks";
-import { handleSaveProject } from "@/api";
+import { getProjectFiles, handleSaveProject } from "@/api";
 import { GenericIconButton, Typography, FlexBox } from "@/components/common";
 import { ProjectIdentifierModal } from "@/components/project/shared";
 
@@ -87,6 +94,12 @@ export default Vue.extend({
           },
         }
       );
+    },
+    /**
+     * Downloads project files
+     */
+    handleDownload(): void {
+      getProjectFiles(projectStore.versionId);
     },
   },
 });

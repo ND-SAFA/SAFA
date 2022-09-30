@@ -1,6 +1,6 @@
 <template>
   <v-container style="max-width: 30em">
-    <v-switch
+    <generic-switch
       class="mt-0"
       v-model="emptyFiles"
       label="Create an empty project"
@@ -27,7 +27,11 @@
 <script lang="ts">
 import Vue from "vue";
 import { handleBulkImportProject } from "@/api";
-import { GenericFileSelector, FileFormatAlert } from "@/components/common";
+import {
+  GenericFileSelector,
+  FileFormatAlert,
+  GenericSwitch,
+} from "@/components/common";
 
 /**
  * Togglable input for project files.
@@ -38,6 +42,7 @@ import { GenericFileSelector, FileFormatAlert } from "@/components/common";
 export default Vue.extend({
   name: "ProjectFilesInput",
   components: {
+    GenericSwitch,
     FileFormatAlert,
     GenericFileSelector,
   },

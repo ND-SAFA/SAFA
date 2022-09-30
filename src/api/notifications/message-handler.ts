@@ -38,7 +38,8 @@ export async function handleEntityChangeMessage(
 ): Promise<void> {
   const message: ChangeMessageModel = JSON.parse(frame.body);
   const project = await getChanges(versionId, message);
-  const isCurrentUser = message.user === sessionStore.userEmail;
+  //TODO: current user check is disabled. Evaluate a better way of filtering updates by the current user.
+  const isCurrentUser = message.user === sessionStore.userEmail && false;
   const updateLayout =
     message.updateLayout &&
     routesWithRequiredProject.includes(router.currentRoute.path);
@@ -93,7 +94,7 @@ async function handleDeleteChange(change: ChangeModel) {
       break;
     case EntityType.DOCUMENT:
       // (entityIds = document id)
-      documentStore.removeDocument(change.entityIds[0]);
+      change.entityIds.forEach((id) => documentStore.removeDocument(id));
       break;
     case EntityType.ARTIFACTS:
       // (entityIds = artifact ids)
@@ -108,10 +109,18 @@ async function handleDeleteChange(change: ChangeModel) {
       break;
     case EntityType.JOBS:
       // (entityIds = jobId)
-      jobStore.deleteJob(change.entityIds[0]);
+      change.entityIds.forEach((id) => jobStore.deleteJob(id));
       break;
     case EntityType.LAYOUT:
       // Never called, case here for completion.
+      break;
+    case EntityType.MODELS:
+      // (entityIds = modelIds)
+      projectStore.updateProject({
+        models: projectStore.models.filter(
+          ({ id }) => !change.entityIds.includes(id)
+        ),
+      });
       break;
   }
 }
@@ -155,6 +164,9 @@ async function handleUpdateChange(change: ChangeModel, project: ProjectModel) {
       return handleReloadJobs();
     case EntityType.LAYOUT:
       documentStore.updateBaseLayout(project.layout);
+      break;
+    case EntityType.MODELS:
+      projectStore.updateProject({ models: project.models });
       break;
   }
 }

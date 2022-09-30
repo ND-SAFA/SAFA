@@ -1,6 +1,6 @@
-import { sessionStore, logStore } from "@/hooks";
+import { sessionStore, logStore, projectStore } from "@/hooks";
 import { getParam, navigateTo, QueryParams, Routes } from "@/router";
-import { getCurrentVersion, getProjects, handleLoadVersion } from "@/api";
+import { getCurrentVersion, handleLoadVersion } from "@/api";
 
 /**
  * Loads the last stored project.
@@ -11,7 +11,7 @@ export async function handleLoadLastProject(): Promise<void> {
   let versionId = getParam(QueryParams.VERSION);
 
   if (!versionId) {
-    const projects = await getProjects();
+    const projects = projectStore.allProjects;
 
     if (projects.length > 0) {
       versionId = (await getCurrentVersion(projects[0].projectId)).versionId;

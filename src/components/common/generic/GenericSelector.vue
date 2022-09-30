@@ -41,6 +41,7 @@
     </template>
     <template v-slot:[`item.actions`]="{ item }">
       <flex-box>
+        <slot name="item.actions" :item="item" />
         <generic-icon-button
           v-if="hasEdit"
           icon-id="mdi-pencil"
@@ -60,7 +61,7 @@
     <template v-slot:[`footer.prepend`]>
       <div class="py-3">
         <generic-icon-button
-          v-if="!minimal"
+          v-if="!minimal && hasAdd"
           fab
           color="primary"
           icon-id="mdi-plus"
@@ -118,6 +119,11 @@ export default Vue.extend({
       type: Boolean,
       required: false,
       default: false,
+    },
+    hasAdd: {
+      type: Boolean,
+      required: false,
+      default: true,
     },
     hasEdit: {
       type: Boolean,

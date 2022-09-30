@@ -50,6 +50,7 @@ export enum Endpoint {
   getGeneratedLinks = "projects/versions/:versionId/links/generated",
   generateLinks = "projects/links/generate",
   generateLinksJob = "jobs/projects/links/generate",
+  trainModelJob = "jobs/projects/:projectId/models/train",
 
   // Entity Retrieval
   projectVersion = "projects/versions/:versionId",
@@ -91,6 +92,16 @@ export enum Endpoint {
 
   // Warnings
   getWarningsInProjectVersion = "projects/versions/:versionId/warnings",
+
+  // Models
+  getModels = "projects/:projectId/models",
+  createModel = "projects/:projectId/models",
+  editModel = "projects/:projectId/models/:modelId",
+  deleteModel = "projects/:projectId/models/:modelId",
+  shareModel = "projects/models/share",
+
+  // Files
+  getProjectFiles = "projects/versions/:versionId/flat-files/:fileType",
 }
 
 /**

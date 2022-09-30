@@ -2,18 +2,7 @@
   <flex-box>
     <v-divider inset vertical class="white mx-1 faded" />
 
-    <template v-for="definition in changeButtons">
-      <generic-icon-button
-        v-if="definition.handler"
-        :key="definition.label"
-        color="white"
-        :tooltip="definition.label"
-        :icon-id="definition.icon"
-        :is-disabled="isButtonDisabled(definition)"
-        :data-cy="definition.dataCy"
-        @click="definition.handler"
-      />
-    </template>
+    <commit-buttons />
 
     <v-divider inset vertical class="white mx-1 faded" />
 
@@ -43,15 +32,11 @@
 <script lang="ts">
 import Vue from "vue";
 import { ButtonDefinition, ButtonType } from "@/types";
-import {
-  artifactStore,
-  documentStore,
-  commitStore,
-  selectionStore,
-} from "@/hooks";
-import { redoCommit, undoCommit, handleRegenerateLayout } from "@/api";
+import { artifactStore, documentStore, selectionStore } from "@/hooks";
+import { handleRegenerateLayout } from "@/api";
 import { cyZoomIn, cyZoomOut } from "@/cytoscape";
 import { GenericIconButton, CheckmarkMenu, FlexBox } from "@/components/common";
+import CommitButtons from "./CommitButtons.vue";
 
 export default Vue.extend({
   name: "GraphButtons",
@@ -59,6 +44,7 @@ export default Vue.extend({
     FlexBox,
     GenericIconButton,
     CheckmarkMenu,
+    CommitButtons,
   },
   data() {
     return {
@@ -77,29 +63,6 @@ export default Vue.extend({
      */
     artifacts() {
       return artifactStore.currentArtifacts;
-    },
-    /**
-     * @return The change buttons.
-     */
-    changeButtons(): ButtonDefinition[] {
-      return [
-        {
-          type: ButtonType.ICON,
-          handler: () => {
-            undoCommit().then();
-          },
-          label: "Undo",
-          icon: "mdi-undo",
-          isDisabled: !commitStore.canUndo,
-        },
-        {
-          type: ButtonType.ICON,
-          handler: () => redoCommit().then(),
-          label: "Redo",
-          icon: "mdi-redo",
-          isDisabled: !commitStore.canRedo,
-        },
-      ];
     },
     /**
      * @return The view buttons.

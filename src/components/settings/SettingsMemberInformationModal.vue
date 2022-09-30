@@ -1,26 +1,32 @@
 <template>
-  <generic-modal :is-open="isOpen" :title="title" @close="handleCancel">
+  <generic-modal :is-open="isOpen" :title="modelTitle" @close="handleCancel">
     <template v-slot:body>
       <flex-box align="center" t="4">
         <v-text-field
           filled
           v-model="userEmail"
           label="User Email"
-          dense
-          hide-details
           class="mr-1"
           style="min-width: 300px"
           :readonly="member !== undefined"
           :rules="emailRules"
           @update:error="handleErrorUpdate"
         />
-        <button-row :definitions="buttonDefinition" />
+        <v-select
+          filled
+          label="Role"
+          v-model="userRole"
+          :items="projectRoles"
+          item-value="id"
+          item-text="name"
+        />
       </flex-box>
+      <project-input v-if="!member" v-model="projectIds" multiple />
     </template>
     <template v-slot:actions>
       <v-spacer />
       <v-btn :disabled="!validated" color="primary" @click="handleConfirm">
-        Add to Project
+        {{ buttonLabel }}
       </v-btn>
     </template>
   </generic-modal>
@@ -28,37 +34,22 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import {
-  ButtonDefinition,
-  ButtonMenuItem,
-  ButtonType,
-  ListMenuDefinition,
-  IdentifierModel,
-  MembershipModel,
-  ProjectRole,
-} from "@/types";
-import { logStore } from "@/hooks";
+import { MembershipModel, ProjectRole } from "@/types";
+import { projectRoleOptions } from "@/util";
+import { projectStore } from "@/hooks";
 import { handleInviteMember } from "@/api";
-import { GenericModal, ButtonRow, FlexBox } from "@/components/common";
+import { GenericModal, FlexBox, ProjectInput } from "@/components/common";
 
 /**
  * The modal for sharing a project with a user.
  */
 export default Vue.extend({
   name: "SettingsMemberInformation",
-  components: { FlexBox, ButtonRow, GenericModal },
+  components: { ProjectInput, FlexBox, GenericModal },
   props: {
     isOpen: {
       type: Boolean,
       required: true,
-    },
-    project: {
-      type: Object as PropType<IdentifierModel>,
-      required: true,
-    },
-    title: {
-      type: String,
-      default: "Share Project",
     },
     member: {
       type: Object as PropType<MembershipModel>,
@@ -72,6 +63,7 @@ export default Vue.extend({
   },
   data() {
     return {
+      projectIds: [projectStore.projectId],
       userEmail: "",
       userRole: undefined as ProjectRole | undefined,
       submitButtonLabel: "",
@@ -82,15 +74,22 @@ export default Vue.extend({
           /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v) ||
           "E-mail must be valid",
       ],
-      projectRoles: [
-        ProjectRole.OWNER,
-        ProjectRole.ADMIN,
-        ProjectRole.EDITOR,
-        ProjectRole.VIEWER,
-      ],
+      projectRoles: projectRoleOptions(),
     };
   },
   computed: {
+    /**
+     * @return The label for the modal.
+     */
+    modelTitle(): string {
+      return this.member ? "Edit Member" : "Share Project";
+    },
+    /**
+     * @return The label for the submit button.
+     */
+    buttonLabel(): string {
+      return this.member ? "Save" : "Add To Project";
+    },
     /**
      * @return Whether the user is validated.
      */
@@ -98,35 +97,9 @@ export default Vue.extend({
       return (
         !this.hasErrors &&
         this.userEmail.length > 0 &&
+        this.projectIds.length > 0 &&
         this.userRole !== undefined
       );
-    },
-    /**
-     * @return All project role menu items.
-     */
-    menuItems(): ButtonMenuItem[] {
-      return this.projectRoles.map((role) => ({
-        name: role,
-        onClick: () => {
-          this.userRole = this.getProjectRole(role);
-        },
-      }));
-    },
-    /**
-     * @return The project menu button.
-     */
-    buttonDefinition(): ButtonDefinition[] {
-      return [
-        {
-          type: ButtonType.LIST_MENU,
-          label: "Project Role",
-          menuItems: this.menuItems,
-          buttonColor: "primary",
-          buttonIsText: false,
-          showSelectedValue: true,
-          selectedItem: this.userRole,
-        } as ListMenuDefinition,
-      ];
     },
   },
   methods: {
@@ -143,38 +116,25 @@ export default Vue.extend({
     clearData(): void {
       this.userEmail = "";
       this.userRole = undefined;
+      this.projectIds = [projectStore.projectId];
     },
     /**
      * Attempts to save a change to a project member.
      */
     async handleConfirm() {
-      const project = this.$props.project;
-      const projectId = this.project?.projectId;
-      const projectRole = this.userRole;
-      if (
-        this.validated &&
-        projectId !== undefined &&
-        projectRole !== undefined
-      ) {
-        handleInviteMember(projectId, this.userEmail, projectRole, {
-          onSuccess: () => this.$emit("confirm", project),
+      this.projectIds.forEach((projectId) => {
+        if (!this.validated || !this.userRole) return;
+
+        handleInviteMember(projectId, this.userEmail, this.userRole, {
+          onSuccess: () => this.$emit("confirm"),
         });
-      } else {
-        logStore.onWarning("Please define project role.");
-      }
+      });
     },
     /**
      * Closes the modal.
      */
     handleCancel() {
       this.$emit("cancel");
-    },
-    /**
-     * Returns the correct role id for a role.
-     * @param role - The role to find.
-     */
-    getProjectRole(role: string): ProjectRole {
-      return ProjectRole[role.toUpperCase() as keyof typeof ProjectRole];
     },
   },
   watch: {

@@ -89,6 +89,16 @@ export class CommitBuilder {
   }
 
   /**
+   * Adds modified trace links to this commit.
+   *
+   * @param traceLinks - The links to modify.
+   */
+  withModifiedTraceLinks(traceLinks: TraceLinkModel[]): this {
+    this.commit.traces.modified.push(...traceLinks);
+    return this;
+  }
+
+  /**
    * Saves this commit.
    */
   save(): Promise<Commit> {

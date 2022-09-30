@@ -6,3 +6,5 @@ export { default as CustomFieldInput } from "./CustomFieldInput.vue";
 export { default as TypeIconInput } from "./TypeIconInput.vue";
 export { default as TypeDirectionInput } from "./TypeDirectionInput.vue";
 export { default as GenMethodInput } from "./GenMethodInput.vue";
+export { default as CustomModelInput } from "./CustomModelInput.vue";
+export { default as ProjectInput } from "./ProjectInput.vue";

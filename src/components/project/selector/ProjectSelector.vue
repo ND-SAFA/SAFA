@@ -47,9 +47,13 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { DataItem, IdentifierModel, ProjectRole } from "@/types";
-import { logStore, sessionStore } from "@/hooks";
-import { getProjects, handleDeleteProject, handleSaveProject } from "@/api";
+import { DataItem, IdentifierModel } from "@/types";
+import { projectStore, sessionStore } from "@/hooks";
+import {
+  handleDeleteProject,
+  handleGetProjects,
+  handleSaveProject,
+} from "@/api";
 import { GenericSelector } from "@/components/common";
 import { ProjectIdentifierModal } from "@/components/project/shared";
 import ConfirmProjectDelete from "./ConfirmProjectDelete.vue";
@@ -86,8 +90,6 @@ export default Vue.extend({
   data() {
     return {
       selected: undefined as IdentifierModel | undefined,
-      projects: [] as IdentifierModel[],
-      deletableProjects: [] as number[],
       headers: this.minimal
         ? [{ text: "Name", value: "name", sortable: true, isSelectable: true }]
         : [
@@ -112,11 +114,19 @@ export default Vue.extend({
       projectToDelete: undefined as IdentifierModel | undefined,
     };
   },
-  /**
-   * When mounted, load all projects.
-   */
-  mounted() {
-    this.fetchProjects();
+  computed: {
+    /**
+     * @return All projects for the current user.
+     */
+    projects(): IdentifierModel[] {
+      return projectStore.allProjects;
+    },
+    /**
+     * @return All deletable project indexes for the current user.
+     */
+    deletableProjects(): number[] {
+      return projectStore.deletableProjects;
+    },
   },
   watch: {
     /**
@@ -136,21 +146,6 @@ export default Vue.extend({
     },
   },
   methods: {
-    /**
-     * @returns The indexes that the current user has delete permissions for.
-     */
-    getDeletableProjects(): number[] {
-      const userEmail = sessionStore.userEmail;
-
-      return this.projects
-        .map((project, projectIndex) => {
-          const adminMember = project.members.find(
-            (m) => m.email === userEmail && m.role === ProjectRole.OWNER
-          );
-          return adminMember ? projectIndex : -1;
-        })
-        .filter((idx) => idx !== -1);
-    },
     /**
      * Emits changes to the selected item.
      * @param item - The selected project.
@@ -235,15 +230,10 @@ export default Vue.extend({
 
       this.isLoading = true;
 
-      getProjects()
-        .then((projects) => {
-          this.projects = projects;
-          this.deletableProjects = this.getDeletableProjects();
-        })
-        .catch((e) => {
-          logStore.onDevError(e);
-        })
-        .finally(() => (this.isLoading = false));
+      handleGetProjects({
+        onSuccess: () => (this.isLoading = false),
+        onError: () => (this.isLoading = false),
+      });
     },
     /**
      * Attempts to delete a project.
@@ -255,10 +245,6 @@ export default Vue.extend({
       handleDeleteProject(project, {
         onSuccess: () => {
           this.isLoading = false;
-          this.projects = this.projects.filter(
-            (p) => p.projectId !== project.projectId
-          );
-          this.deletableProjects = this.getDeletableProjects();
           this.$emit("unselected");
         },
         onError: () => (this.isLoading = false),
@@ -273,12 +259,7 @@ export default Vue.extend({
 
       handleSaveProject(project, {
         onSuccess: (project) => {
-          const projectRemoved = this.projects.filter(
-            (p) => project.projectId !== p.projectId
-          );
-
           this.isLoading = false;
-          this.projects = [project, ...projectRemoved];
           this.selected = project;
           this.$emit("selected", project, true);
         },

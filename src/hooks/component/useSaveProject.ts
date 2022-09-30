@@ -8,7 +8,7 @@ import {
   TraceUploader,
 } from "@/types";
 import { createProject } from "@/util";
-import { sessionStore } from "@/hooks";
+import sessionStore from "@/hooks/core/useSession";
 import { pinia } from "@/plugins";
 
 /**

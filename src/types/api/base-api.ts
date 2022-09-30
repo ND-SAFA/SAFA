@@ -63,6 +63,10 @@ export interface IOHandlerCallback<Res = void> {
    * @param err - The returned error.
    */
   onError?: (err: Error) => void;
+  /**
+   * Called regardless of whether the action succeeds or fails once complete.
+   */
+  onComplete?: () => void;
 }
 
 /**

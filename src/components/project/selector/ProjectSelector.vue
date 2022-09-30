@@ -18,26 +18,14 @@
   >
     <template v-slot:editItemDialogue>
       <project-identifier-modal
-        title="Edit Project"
-        :is-open="editProjectDialogue"
-        :project="projectToEdit"
-        @save="handleConfirmEditProject"
-        @close="handleCloseProjectEdit"
-      />
-    </template>
-    <template v-slot:addItemDialogue>
-      <project-identifier-modal
-        do-show-upload
-        title="Create New Project"
-        :is-open="addProjectDialogue"
-        @save="handleConfirmAddProject"
-        @close="handleCloseAddProject"
+        :is-open="isSaveOpen"
+        @save="handleConfirmSaveProject"
+        @close="handleCloseSaveProject"
       />
     </template>
     <template v-slot:deleteItemDialogue>
       <confirm-project-delete
-        :is-open="deleteProjectDialogue"
-        :project="projectToDelete"
+        :is-open="isDeleteOpen"
         @confirm="handleConfirmDeleteProject"
         @cancel="handleCancelDeleteProject"
       />
@@ -48,7 +36,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { DataItem, IdentifierModel } from "@/types";
-import { projectStore, sessionStore } from "@/hooks";
+import { identifierSaveStore, projectStore, sessionStore } from "@/hooks";
 import {
   handleDeleteProject,
   handleGetProjects,
@@ -63,7 +51,7 @@ import ConfirmProjectDelete from "./ConfirmProjectDelete.vue";
  * select, edit, delete, or create projects. Project list is refreshed whenever
  * mounted or isOpen is changed to true.
  *
- * @emits-1 `selected` (ProjectIdentifier) - On project selected.
+ * @emits-1 `selected` (IdentifierModal) - On project selected.
  * @emits-1 `unselected` - On project unselected.
  */
 export default Vue.extend({
@@ -106,12 +94,9 @@ export default Vue.extend({
             },
             { text: "Actions", value: "actions", sortable: false },
           ],
-      editProjectDialogue: false,
-      deleteProjectDialogue: false,
-      addProjectDialogue: false,
+      isSaveOpen: false,
+      isDeleteOpen: false,
       isLoading: false,
-      projectToEdit: { name: "", description: "" } as IdentifierModel,
-      projectToDelete: undefined as IdentifierModel | undefined,
     };
   },
   computed: {
@@ -162,65 +147,65 @@ export default Vue.extend({
      * Opens the add project modal.
      */
     handleAddItem() {
-      this.addProjectDialogue = true;
+      identifierSaveStore.baseIdentifier = undefined;
+      this.isSaveOpen = true;
     },
     /**
      * Closes the add project modal.
      */
-    handleCloseAddProject() {
-      this.addProjectDialogue = false;
-    },
-    /**
-     * Attempts to create a project, and closes the add modal.
-     * @param project - The project to create.
-     */
-    handleConfirmAddProject(project: IdentifierModel) {
-      this.saveOrUpdateProjectHandler(project);
-      this.addProjectDialogue = false;
+    handleCloseSaveProject() {
+      this.isSaveOpen = false;
     },
     /**
      * Opens the edit project modal.
      * @param item - The project to edit.
      */
     handleEditProject(item: IdentifierModel) {
-      this.projectToEdit = item;
-      this.editProjectDialogue = true;
-    },
-    /**
-     * Closes the edit project modal.
-     */
-    handleCloseProjectEdit() {
-      this.editProjectDialogue = false;
-    },
-    /**
-     * Attempts to update a project, and closes the edit modal.
-     * @param project - The project to update.
-     */
-    handleConfirmEditProject(project: IdentifierModel) {
-      this.saveOrUpdateProjectHandler(project);
-      this.editProjectDialogue = false;
+      identifierSaveStore.baseIdentifier = item;
+      this.isSaveOpen = true;
     },
     /**
      * Opens the delete project modal.
      * @param item - The project to delete.
      */
     handleDeleteProject(item: IdentifierModel) {
-      this.deleteProjectDialogue = true;
-      this.projectToDelete = item;
+      identifierSaveStore.baseIdentifier = item;
+      this.isDeleteOpen = true;
     },
     /**
      * Closes the delete project modal.
      */
     handleCancelDeleteProject() {
-      this.deleteProjectDialogue = false;
+      this.isDeleteOpen = false;
     },
     /**
      * Attempts to delete a project, and closes the delete modal.
-     * @param project - The project to delete.
      */
-    handleConfirmDeleteProject(project: IdentifierModel) {
-      this.deleteProjectHandler(project);
-      this.deleteProjectDialogue = false;
+    handleConfirmDeleteProject() {
+      this.isLoading = true;
+
+      handleDeleteProject({
+        onSuccess: () => {
+          this.isDeleteOpen = false;
+          this.$emit("unselected");
+        },
+        onComplete: () => (this.isLoading = false),
+      });
+    },
+    /**
+     * Attempts to save a project.
+     */
+    handleConfirmSaveProject() {
+      this.isLoading = true;
+
+      handleSaveProject({
+        onSuccess: (project) => {
+          this.selected = project;
+          this.isSaveOpen = false;
+          this.$emit("selected", project, true);
+        },
+        onComplete: () => (this.isLoading = false),
+      });
     },
     /**
      * Fetches all projects.
@@ -231,39 +216,7 @@ export default Vue.extend({
       this.isLoading = true;
 
       handleGetProjects({
-        onSuccess: () => (this.isLoading = false),
-        onError: () => (this.isLoading = false),
-      });
-    },
-    /**
-     * Attempts to delete a project.
-     * @param project - The project to delete.
-     */
-    deleteProjectHandler(project: IdentifierModel) {
-      this.isLoading = true;
-
-      handleDeleteProject(project, {
-        onSuccess: () => {
-          this.isLoading = false;
-          this.$emit("unselected");
-        },
-        onError: () => (this.isLoading = false),
-      });
-    },
-    /**
-     * Attempts to save a project.
-     * @param project - The project to save.
-     */
-    saveOrUpdateProjectHandler(project: IdentifierModel) {
-      this.isLoading = true;
-
-      handleSaveProject(project, {
-        onSuccess: (project) => {
-          this.isLoading = false;
-          this.selected = project;
-          this.$emit("selected", project, true);
-        },
-        onError: () => (this.isLoading = false),
+        onComplete: () => (this.isLoading = false),
       });
     },
   },

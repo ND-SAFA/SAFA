@@ -13,11 +13,7 @@
     @refresh="handleRefresh"
   >
     <template v-slot:addItemDialogue>
-      <model-creator-modal
-        :model="currentItem"
-        :is-open="isSaveOpen"
-        @close="handleClose"
-      />
+      <model-creator-modal :is-open="isSaveOpen" @close="handleClose" />
       <model-share-modal
         :model="currentItem"
         :is-open="isShareOpen"
@@ -58,7 +54,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { TrainedModel } from "@/types";
-import { projectStore } from "@/hooks";
+import { modelSaveStore, projectStore } from "@/hooks";
 import { handleDeleteModel, handleLoadModels } from "@/api";
 import {
   AttributeChip,
@@ -117,6 +113,7 @@ export default Vue.extend({
      * Opens the modal to add a model.
      */
     handleAdd() {
+      modelSaveStore.baseModel = undefined;
       this.isSaveOpen = true;
     },
     /**
@@ -124,6 +121,7 @@ export default Vue.extend({
      * @param model - The model to edit.
      */
     handleEdit(model: TrainedModel) {
+      modelSaveStore.baseModel = model;
       this.currentItem = model;
       this.isSaveOpen = true;
     },

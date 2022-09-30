@@ -1,29 +1,29 @@
 <template>
   <generic-modal
-    :title="title"
+    :title="modalTitle"
     size="sm"
     :is-open="isOpen"
-    @close="resetModalData"
+    @close="handleClose"
   >
     <template v-slot:body>
       <v-text-field
         filled
         label="Name"
         class="mt-4"
-        v-model="editingColumn.name"
+        v-model="editedColumn.name"
         :error-messages="nameErrors"
       />
       <v-select
         filled
         label="Type"
         :items="dataTypes"
-        v-model="editingColumn.dataType"
+        v-model="editedColumn.dataType"
         item-text="name"
         item-value="id"
       />
       <v-checkbox
         label="Requires a non-empty value"
-        v-model="editingColumn.required"
+        v-model="editedColumn.required"
       />
     </template>
     <template v-slot:actions>
@@ -40,7 +40,7 @@
         Cancel
       </v-btn>
       <v-spacer />
-      <v-btn color="primary" :disabled="!isColumnValid" @click="handleSubmit">
+      <v-btn color="primary" :disabled="!canSave" @click="handleSubmit">
         Confirm
       </v-btn>
     </template>
@@ -48,10 +48,10 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import Vue from "vue";
 import { ColumnModel } from "@/types";
-import { columnTypeOptions, createColumn } from "@/util";
-import { documentStore } from "@/hooks";
+import { columnTypeOptions } from "@/util";
+import { tableColumnSaveStore } from "@/hooks";
 import { handleColumnDelete, handleColumnSave } from "@/api";
 import { GenericModal } from "@/components/common";
 
@@ -65,69 +65,60 @@ export default Vue.extend({
   components: { GenericModal },
   props: {
     isOpen: Boolean,
-    column: {
-      type: Object as PropType<ColumnModel>,
-      required: false,
-    },
   },
   data() {
     return {
-      editingColumn: createColumn(this.column),
       confirmDelete: false,
       dataTypes: columnTypeOptions(),
     };
   },
   computed: {
     /**
-     * @return Whether the modal is in edit mode.
+     * @return Whether an existing column is being updated.
      */
-    isEditMode(): boolean {
-      return !!this.column;
+    isUpdate(): boolean {
+      return tableColumnSaveStore.isUpdate;
+    },
+    /**
+     * @return The column being edited
+     */
+    editedColumn(): ColumnModel {
+      return tableColumnSaveStore.editedColumn;
     },
     /**
      * @return The modal title.
      */
-    title(): string {
-      return this.isEditMode ? "Edit Column" : "Add Column";
-    },
-
-    /**
-     * @return Whether the current name is valid.
-     */
-    isNameValid(): boolean {
-      return (
-        !documentStore.doesColumnExist(this.editingColumn.name) ||
-        this.column?.name === this.editingColumn.name
-      );
+    modalTitle(): string {
+      return this.isUpdate ? "Edit Column" : "Add Column";
     },
     /**
-     * @return Whether the current column is valid.
+     * @return Whether the column can be saved.
      */
-    isColumnValid(): boolean {
-      return !!this.editingColumn.name && this.isNameValid;
+    canSave(): boolean {
+      return tableColumnSaveStore.canSave;
     },
     /**
      * @return Any errors to report on the name.
      */
     nameErrors(): string[] {
-      return this.isNameValid ? [] : ["This name already exists"];
+      return tableColumnSaveStore.editedColumn.name === ""
+        ? []
+        : tableColumnSaveStore.nameErrors;
     },
   },
   methods: {
     /**
      * Resets modal data and closes the modal.
      */
-    resetModalData() {
-      this.editingColumn = createColumn(this.column);
-      this.confirmDelete = false;
+    handleClose() {
       this.$emit("close");
     },
     /**
      * Attempts to save a column.
      */
     handleSubmit() {
-      handleColumnSave(this.editingColumn, this.isEditMode, {
-        onSuccess: () => this.resetModalData(),
+      handleColumnSave({
+        onSuccess: () => this.handleClose(),
       });
     },
     /**
@@ -137,8 +128,8 @@ export default Vue.extend({
       if (!this.confirmDelete) {
         this.confirmDelete = true;
       } else {
-        handleColumnDelete(this.editingColumn, {
-          onSuccess: () => this.resetModalData(),
+        handleColumnDelete({
+          onSuccess: () => this.handleClose(),
         });
       }
     },
@@ -150,7 +141,8 @@ export default Vue.extend({
     isOpen(open: boolean) {
       if (!open) return;
 
-      this.editingColumn = createColumn(this.column);
+      this.confirmDelete = false;
+      tableColumnSaveStore.resetColumn();
     },
   },
 });

@@ -5,7 +5,14 @@ import {
   DocumentModel,
 } from "@/types";
 import { createDocument, preserveObjectKeys } from "@/util";
-import { logStore, documentStore, projectStore, appStore } from "@/hooks";
+import {
+  logStore,
+  documentStore,
+  projectStore,
+  appStore,
+  tableColumnSaveStore,
+  documentSaveStore,
+} from "@/hooks";
 import {
   saveDocument,
   deleteDocument,
@@ -65,14 +72,14 @@ export async function handleUpdateDocument(
  * Deletes the document and updates app state.
  * Switches documents if the current one has been deleted.
  *
- * @param document - The document to delete.
  * @param onSuccess - Called if the operation is successful.
  * @param onError - Called if the operation fails.
  */
-export function handleDeleteDocument(
-  document: DocumentModel,
-  { onSuccess, onError }: IOHandlerCallback
-): void {
+export function handleDeleteDocument({
+  onSuccess,
+  onError,
+}: IOHandlerCallback): void {
+  const document = documentSaveStore.editedDocument;
   const { name } = document;
 
   deleteDocument(document)
@@ -108,16 +115,15 @@ export async function handleDocumentReload(
 /**
  * Creates or updates a document, updates app state, and logs the result.
  *
- * @param document - The document to save.
- * @param isUpdate - Set to true if the document already exists.
  * @param onSuccess - Called if the operation is successful.
  * @param onError - Called if the operation fails.
  */
-export function handleSaveDocument(
-  document: DocumentModel,
-  isUpdate: boolean,
-  { onSuccess, onError }: IOHandlerCallback
-): void {
+export function handleSaveDocument({
+  onSuccess,
+  onError,
+}: IOHandlerCallback): void {
+  const document = documentSaveStore.finalizedDocument;
+  const isUpdate = documentSaveStore.isUpdate;
   const { name, type, artifactIds } = document;
 
   appStore.onLoadStart();
@@ -193,21 +199,19 @@ export function handleColumnMove(
 
 /**
  * Creates or updates a column.
- *
- * @param column - The column to save.
- * @param isEditMode - If false, this column will be added to the current document.
  * @param onSuccess - Called if the operation is successful.
  * @param onError - Called if the operation fails.
  */
-export function handleColumnSave(
-  column: ColumnModel,
-  isEditMode: boolean,
-  { onSuccess, onError }: IOHandlerCallback
-): void {
+export function handleColumnSave({
+  onSuccess,
+  onError,
+}: IOHandlerCallback): void {
+  const column = tableColumnSaveStore.editedColumn;
+  const isUpdate = tableColumnSaveStore.isUpdate;
   const document = documentStore.currentDocument;
   const { id: columnId, name } = column;
 
-  if (!isEditMode) {
+  if (!isUpdate) {
     document.columns = [...(document.columns || []), column];
   } else if (document.columns) {
     const index = document.columns.findIndex(({ id }) => id === columnId);
@@ -230,14 +234,14 @@ export function handleColumnSave(
 /**
  * Deletes a column.
  *
- * @param column - The column to delete.
  * @param onSuccess - Called if the operation is successful.
  * @param onError - Called if the operation fails.
  */
-export function handleColumnDelete(
-  column: ColumnModel,
-  { onSuccess, onError }: IOHandlerCallback
-): void {
+export function handleColumnDelete({
+  onSuccess,
+  onError,
+}: IOHandlerCallback): void {
+  const column = tableColumnSaveStore.editedColumn;
   const document = documentStore.currentDocument;
   const { id: columnId, name } = column;
 

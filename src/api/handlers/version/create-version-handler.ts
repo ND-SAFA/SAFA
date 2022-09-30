@@ -14,12 +14,13 @@ import {
  * @param versionType - The version type to create.
  * @param onSuccess - Called if the action is successful.
  * @param onError - Called if the action fails.
+ * @param onComplete - Called after the action.
  */
 
 export async function handleCreateVersion(
   projectId: string,
   versionType: VersionType,
-  { onSuccess, onError }: IOHandlerCallback<VersionModel>
+  { onSuccess, onError, onComplete }: IOHandlerCallback<VersionModel>
 ): Promise<void> {
   const createVersion = () => {
     if (versionType === "major") {
@@ -39,5 +40,6 @@ export async function handleCreateVersion(
     .catch((e) => {
       logStore.onError("Unable to create a new version.");
       onError?.(e);
-    });
+    })
+    .finally(onComplete);
 }

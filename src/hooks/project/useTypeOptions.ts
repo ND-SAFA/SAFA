@@ -14,7 +14,6 @@ import {
   allTypeIcons,
   createDefaultTypeIcons,
   defaultTypeIcon,
-  getArtifactTypePrintName,
   isLinkAllowedByType,
   preserveObjectKeys,
   removeMatches,
@@ -182,7 +181,10 @@ export const useTypeOptions = defineStore("typeOptions", {
      * @return The artifact type icon id.
      */
     getArtifactTypeDisplay(type: string): string {
-      return getArtifactTypePrintName(type);
+      return (
+        this.allArtifactTypes.find(({ typeId }) => typeId === type)?.name ||
+        type
+      );
     },
     /**
      * Finds the icon id for the given artifact type.
@@ -204,7 +206,7 @@ export const useTypeOptions = defineStore("typeOptions", {
           return {
             type,
             allowedTypes,
-            label: getArtifactTypePrintName(type),
+            label: type,
             icon,
             iconIndex: allTypeIcons.indexOf(icon),
           };

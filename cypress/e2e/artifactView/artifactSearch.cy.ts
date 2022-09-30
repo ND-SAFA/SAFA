@@ -14,8 +14,8 @@ describe("Artifact Search", () => {
       cy.clickButton(DataCy.navToggleRightPanel);
 
       cy.getCy(DataCy.artifactSearchTypeList)
-        .should("contain", "Designs")
-        .should("contain", "Requirements");
+        .should("contain", "design")
+        .should("contain", "requirement");
     });
   });
 

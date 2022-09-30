@@ -5,7 +5,7 @@ import { createModel } from "@/util";
 import { pinia } from "@/plugins";
 
 /**
- * The save model store assists in creating and editing project identifiers.
+ * The save model store assists in creating and editing project models.
  */
 export const useSaveModel = defineStore("saveModel", {
   state: () => ({

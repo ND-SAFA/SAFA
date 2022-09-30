@@ -11,6 +11,7 @@ import {
   projectStore,
   appStore,
   tableColumnSaveStore,
+  documentSaveStore,
 } from "@/hooks";
 import {
   saveDocument,
@@ -71,14 +72,14 @@ export async function handleUpdateDocument(
  * Deletes the document and updates app state.
  * Switches documents if the current one has been deleted.
  *
- * @param document - The document to delete.
  * @param onSuccess - Called if the operation is successful.
  * @param onError - Called if the operation fails.
  */
-export function handleDeleteDocument(
-  document: DocumentModel,
-  { onSuccess, onError }: IOHandlerCallback
-): void {
+export function handleDeleteDocument({
+  onSuccess,
+  onError,
+}: IOHandlerCallback): void {
+  const document = documentSaveStore.editedDocument;
   const { name } = document;
 
   deleteDocument(document)
@@ -114,16 +115,15 @@ export async function handleDocumentReload(
 /**
  * Creates or updates a document, updates app state, and logs the result.
  *
- * @param document - The document to save.
- * @param isUpdate - Set to true if the document already exists.
  * @param onSuccess - Called if the operation is successful.
  * @param onError - Called if the operation fails.
  */
-export function handleSaveDocument(
-  document: DocumentModel,
-  isUpdate: boolean,
-  { onSuccess, onError }: IOHandlerCallback
-): void {
+export function handleSaveDocument({
+  onSuccess,
+  onError,
+}: IOHandlerCallback): void {
+  const document = documentSaveStore.editedDocument;
+  const isUpdate = documentSaveStore.isUpdate;
   const { name, type, artifactIds } = document;
 
   appStore.onLoadStart();

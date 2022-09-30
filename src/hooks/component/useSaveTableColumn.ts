@@ -5,6 +5,9 @@ import { createColumn } from "@/util";
 import { pinia } from "@/plugins";
 import documentStore from "../project/useDocuments";
 
+/**
+ * The save column store assists in creating and editing document columns.
+ */
 export const useSaveTableColumn = defineStore("saveTableColumn", {
   state: () => ({
     /**

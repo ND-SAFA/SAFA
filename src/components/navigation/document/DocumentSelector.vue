@@ -44,11 +44,7 @@
           Add View
         </v-btn>
 
-        <document-modal
-          :is-open="isOpen"
-          :document="editingDocument"
-          @close="handleCloseMenu"
-        />
+        <document-modal :is-open="isOpen" @close="handleCloseMenu" />
       </template>
     </v-select>
     <generic-icon-button
@@ -64,7 +60,12 @@
 <script lang="ts">
 import Vue from "vue";
 import { DocumentModel } from "@/types";
-import { documentStore, projectStore, sessionStore } from "@/hooks";
+import {
+  documentSaveStore,
+  documentStore,
+  projectStore,
+  sessionStore,
+} from "@/hooks";
 import { handleSwitchDocuments } from "@/api";
 import { GenericIconButton, FlexBox } from "@/components/common";
 import DocumentModal from "./DocumentModal.vue";
@@ -74,7 +75,6 @@ export default Vue.extend({
   components: { FlexBox, DocumentModal, GenericIconButton },
   data: () => ({
     isOpen: false,
-    editingDocument: undefined as DocumentModel | undefined,
   }),
   computed: {
     /**
@@ -130,19 +130,19 @@ export default Vue.extend({
     handleCloseMenu() {
       (this.$refs.documentSelector as HTMLElement).blur();
       this.isOpen = false;
-      this.editingDocument = undefined;
     },
     /**
      * Opens the create document modal.
      */
     handleCreateOpen() {
+      documentSaveStore.baseDocument = undefined;
       this.isOpen = true;
     },
     /**
      * Opens the edit document modal.
      */
     handleEditOpen(document: DocumentModel) {
-      this.editingDocument = document;
+      documentSaveStore.baseDocument = document;
       this.isOpen = true;
     },
     /**

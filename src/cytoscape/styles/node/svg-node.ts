@@ -23,7 +23,7 @@ export function svgNode(
   const deltaClass = `artifact-svg-delta-${data.artifactDeltaState}`;
   const title = data.safetyCaseType
     ? capitalize(data.safetyCaseType)
-    : capitalize(data.artifactType);
+    : data.artifactType;
   const color = getBorderColor(data.artifactDeltaState);
   const footer = svgFooter(data, outer);
   const heightOffset = footer ? ARTIFACT_CHILDREN_HEIGHT + 6 : 6;

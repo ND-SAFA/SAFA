@@ -122,7 +122,7 @@ export function handleSaveDocument({
   onSuccess,
   onError,
 }: IOHandlerCallback): void {
-  const document = documentSaveStore.editedDocument;
+  const document = documentSaveStore.finalizedDocument;
   const isUpdate = documentSaveStore.isUpdate;
   const { name, type, artifactIds } = document;
 

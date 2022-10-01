@@ -209,7 +209,6 @@ export enum DataCy {
   documentSaveButton = "button-document-save",
 
   // Artifact Table
-
   artifactTable = "view-artifact-table",
   artifactTableRow = "table-row-artifact",
   artifactTableSortBy = "artifact-table-sort-by",
@@ -224,6 +223,21 @@ export enum DataCy {
   artifactTableArtifact = "artifact-table-artifact",
   artifactTableArtifactWarning = "artifact-table-artifact-warning",
   artifactTableArtifactWarningLabel = "artifact-table-panel-warnings-title",
+
+  // Artifact Table - Create New Artifact
+  artifactTableAddContentButton = "button-fab-toggle",
+  artifactTableAddArtifactButton = "button-fab-create-artifact",
+  artifactTableCreateArtifactNameInput = "input-artifact-name",
+  artifactTableCreateArtifactTypeInput = "input-artifact-type",
+  artifactTableCreateArtifactDocumentTypeInput = "input-artifact-document",
+  artifactTableCreateArtifactParentArtifactInput = "input-artifact-parent",
+  artifactTableCreateArtifactBodyInput = "input-artifact-body",
+  artifactTableCreateArtifactSummaryInput = "input-artifact-summary",
+  artifactTableCreateArtifactSaveButton = "button-artifact-save",
+  artifactTableEditArtifactRowButton = "button-artifact-edit-icon",
+  artifactTableDeleteArtifactRowButton = "button-artifact-delete-icon",
+  artifactTableArtifactPanelBody = "text-selected-body",
+  artifactTableArtifactDeleteIAcceptButton = "button-confirm-modal",
 }
 
 export enum DataIds {

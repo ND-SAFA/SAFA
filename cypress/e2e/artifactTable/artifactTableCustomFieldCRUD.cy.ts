@@ -1,9 +1,13 @@
 import { DataCy, validUser } from "../../fixtures";
 
 describe("Artifact Table Custom Field CRUD", () => {
+  before(() => {
+    cy.dbResetJobs().dbResetProjects().loadNewProject();
+  });
+
   beforeEach(() => {
-    cy.visit("/login").login(validUser.email, validUser.password);
-    cy.location("pathname", { timeout: 10000 }).should("equal", "/account");
+    cy.loadCurrentProject();
+    cy.switchToTableView();
   });
 
   describe("In a table document, I can edit an artifact’s custom fields", () => {

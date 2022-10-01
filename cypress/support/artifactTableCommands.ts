@@ -15,3 +15,32 @@ Cypress.Commands.add("artifactTableChangeSort", (sortType: string) => {
       .contains(sortType);
     */
 });
+
+Cypress.Commands.add(
+  "addTableArtifact",
+  (
+    name: string,
+    type: string,
+    docType: string,
+    parentArtifact: string,
+    body: string,
+    summary: string
+  ) => {
+    cy.inputText(DataCy.artifactTableCreateArtifactNameInput, name);
+    cy.clickButton(DataCy.artifactTableCreateArtifactTypeInput)
+      .type("{backspace}{esc}")
+      .inputText(DataCy.artifactTableCreateArtifactTypeInput, type)
+      .type("{enter}");
+    cy.clickButton(DataCy.artifactTableCreateArtifactParentArtifactInput)
+      .type("{backspace}{esc}")
+      .inputText(
+        DataCy.artifactTableCreateArtifactParentArtifactInput,
+        parentArtifact
+      )
+      .type("{downArrow}{enter}");
+
+    cy.inputText(DataCy.artifactTableCreateArtifactBodyInput, body);
+    cy.inputText(DataCy.artifactTableCreateArtifactSummaryInput, summary);
+    cy.clickButton(DataCy.artifactTableCreateArtifactSaveButton);
+  }
+);

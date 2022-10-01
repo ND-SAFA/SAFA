@@ -92,8 +92,8 @@ public class CsvArtifactFile extends AbstractArtifactFile<CSVRecord> {
         }
         try {
             String artifactName = entityRecord.get(Constants.NAME_PARAM);
-            String artifactSummary = entityRecord.isSet(Constants.SUMMARY_PARAM) ?
-                entityRecord.get(Constants.SUMMARY_PARAM) : "";
+            String artifactSummary = entityRecord.isSet(Constants.SUMMARY_PARAM)
+                ? entityRecord.get(Constants.SUMMARY_PARAM) : "";
             String artifactContent = entityRecord.get(Constants.CONTENT_PARAM);
 
             artifactSummary = artifactSummary == null ? "" : artifactSummary;

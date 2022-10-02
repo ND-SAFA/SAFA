@@ -9,7 +9,7 @@ from trace.jobs.trace_args_builder import TraceArgsBuilder
 class ModelJob(AbstractTraceJob):
 
     def __init__(self, args_builder: TraceArgsBuilder):
-        super().__init__(args_builder, output_dir=args_builder.output_dir)
+        super().__init__(args_builder, output_dir=args_builder.output_dir, save_output=False)
 
     def _run(self) -> Dict:
         """

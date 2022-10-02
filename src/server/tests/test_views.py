@@ -16,7 +16,7 @@ class TestViews(BaseTest):
     def test_model(self, get_tokenizer_mock, load_model_mock):
         load_model_mock.return_value = self.get_test_model()
         get_tokenizer_mock.return_value = self.get_test_tokenizer()
-        response_dict = self.make_test_request('/models/', self.get_test_args(include_artifacts=False))
+        response_dict = self.make_test_request('/models/', self.get_test_params(include_artifacts=False))
         self.assertIn(BaseResponse.MODEL_PATH, response_dict)
 
     @patch.object(ModelGenerator, '_ModelGenerator__load_model')
@@ -24,7 +24,7 @@ class TestViews(BaseTest):
     def test_train(self, get_tokenizer_mock, load_model_mock):
         load_model_mock.return_value = self.get_test_model()
         get_tokenizer_mock.return_value = self.get_test_tokenizer()
-        response_dict = self.make_test_request('/train/', self.get_test_args())
+        response_dict = self.make_test_request('/train/', self.get_test_params())
         self.assertIn(BaseResponse.JOB_ID, response_dict)
 
     @patch.object(ModelGenerator, '_ModelGenerator__load_model')
@@ -32,7 +32,7 @@ class TestViews(BaseTest):
     def test_predict(self, get_tokenizer_mock: mock.MagicMock, load_model_mock: mock.MagicMock):
         load_model_mock.return_value = self.get_test_model()
         get_tokenizer_mock.return_value = self.get_test_tokenizer()
-        response_dict = self.make_test_request('/predict/', self.get_test_args(include_links=False))
+        response_dict = self.make_test_request('/predict/', self.get_test_params(include_links=False))
         self.assertIn(BaseResponse.JOB_ID, response_dict)
 
     def make_test_request(self, url: str, params: dict) -> Dict:

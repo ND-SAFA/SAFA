@@ -7,13 +7,10 @@ from torch.utils.data.sampler import RandomSampler
 
 from common.models.model_generator import ModelGenerator
 from test.base_test import BaseTest
-from test.config.paths import TEST_OUTPUT_DIR
-from test.test_data import TEST_POS_LINKS, TEST_SOURCE_LAYERS, TEST_TARGET_LAYERS
+from test.test_data import TEST_SOURCE_LAYERS, TEST_TARGET_LAYERS
 from test.test_prediction_output import TEST_PREDICTION_OUTPUT, assert_output_matches_expected
-from trace.data.trace_dataset_creator import TraceDatasetCreator
 from trace.jobs.trace_args import TraceArgs
 from trace.train.trace_trainer import TraceTrainer
-from common.api.responses import PredictionResponse
 
 
 class TestTraceTrainer(BaseTest):
@@ -32,7 +29,7 @@ class TestTraceTrainer(BaseTest):
 
     @patch.object(TraceTrainer, "_eval")
     def test_perform_prediction(self, eval_mock: mock.MagicMock):
-        test_trace_trainer = self.get_test_trace_trainer()
+        test_trace_trainer = self.get_test_trace_trainer(include_links=False)
         output = test_trace_trainer.perform_prediction()
         matches, msg = assert_output_matches_expected(output)
         if not matches:
@@ -40,7 +37,7 @@ class TestTraceTrainer(BaseTest):
         self.assertFalse(eval_mock.called)
 
     def test_perform_prediction_with_metrics(self):
-        test_trace_trainer = self.get_test_trace_trainer(metrics=self.TEST_METRIC_NAMES)
+        test_trace_trainer = self.get_test_trace_trainer(include_links=False, metrics=self.TEST_METRIC_NAMES)
         output = test_trace_trainer.perform_prediction()
         for metric in self.TEST_METRIC_NAMES:
             self.assertIn(metric, output["metrics"])
@@ -80,16 +77,12 @@ class TestTraceTrainer(BaseTest):
     def set_train_dataset(self, test_trace_trainer):
         test_trace_trainer.train_dataset = test_trace_trainer.trace_dataset_creator.get_training_dataset(1)
 
-    def get_test_trace_trainer(self, args=None, **kwargs):
+    def get_test_trace_trainer(self, args=None, include_links=True, **kwargs):
         if args is None:
             model_generator = ModelGenerator("pl_bert", "path")
             model_generator.get_model = mock.MagicMock(return_value=self.get_test_model())
             model_generator.get_tokenizer = mock.MagicMock(return_value=self.get_test_tokenizer())
-            trace_dataset_creator = TraceDatasetCreator(source_layers=TEST_SOURCE_LAYERS, target_layers=TEST_TARGET_LAYERS,
-                                                        true_links=TEST_POS_LINKS,
-                                                        model_generator=model_generator,
-                                                        validation_percentage=self.VAlIDATION_PERCENTAGE)
-            args = TraceArgs(model_generator=model_generator,
-                             trace_dataset_creator=trace_dataset_creator,
-                             output_dir=TEST_OUTPUT_DIR, **kwargs)
+            test_params = self.get_test_params(include_links=include_links)
+            test_params["validation_percentage"] = self.VAlIDATION_PERCENTAGE
+            args = TraceArgs(**test_params, model_generator=model_generator, **kwargs)
         return TraceTrainer(args)

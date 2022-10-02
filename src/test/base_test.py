@@ -40,7 +40,7 @@ class BaseTest(TestCase):
                     shutil.rmtree(file_path)
 
     @staticmethod
-    def get_test_args(include_artifacts=True, include_links=True):
+    def get_test_params(include_artifacts=True, include_links=True):
         test_args = deepcopy(BaseTest._TEST_ARGS_BASE)
         if include_artifacts:
             test_args.update(BaseTest._TEST_ARGS_ARTIFACTS)

@@ -21,10 +21,5 @@ class TestTraceArgs(BaseTest):
     def get_test_trace_args(self, **kwargs):
         model_generator = ModelGenerator("bert_trace_siamese", "path")
         return TraceArgs(model_generator,
-                         TraceDatasetCreator(source_layers=TEST_SOURCE_LAYERS, target_layers=TEST_TARGET_LAYERS,
-                                             true_links=TEST_POS_LINKS,
-                                             model_generator=model_generator,
-                                             validation_percentage=self.validation_percentage),
-
-                         "output_path",
+                         **self.get_test_params(),
                          **kwargs)

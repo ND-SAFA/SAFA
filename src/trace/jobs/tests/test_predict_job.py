@@ -63,7 +63,7 @@ class TestPredictJob(BaseTest):
     def get_test_predict_job(self, get_model_mock: mock.MagicMock, get_tokenizer_mock: mock.MagicMock):
         get_model_mock.return_value = self.get_test_model()
         get_tokenizer_mock.return_value = self.get_test_tokenizer()
-        arg_builder = TraceArgsBuilder(**self.get_test_args(include_links=False))
+        arg_builder = TraceArgsBuilder(**self.get_test_params(include_links=False))
         return PredictJob(arg_builder)
 
     def output_test_success(self, output: str):

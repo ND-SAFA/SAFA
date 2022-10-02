@@ -14,7 +14,7 @@ from trace.jobs.trace_args_builder import TraceArgsBuilder
 
 
 class TestModelJob(BaseTest):
-    TEST_PARAMS = BaseTest.get_test_args(include_artifacts=False)
+    TEST_PARAMS = BaseTest.get_test_params(include_artifacts=False)
 
     @patch.object(ModelGenerator, '_ModelGenerator__load_model')
     @patch.object(ModelGenerator, 'get_tokenizer')

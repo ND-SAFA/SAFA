@@ -67,7 +67,7 @@ class TestTrainJob(BaseTest):
     def get_test_train_job(self, get_model_mock: mock.MagicMock, get_tokenizer_mock: mock.MagicMock):
         get_model_mock.return_value = self.get_test_model()
         get_tokenizer_mock.return_value = self.get_test_tokenizer()
-        arg_builder = TraceArgsBuilder(**self.get_test_args())
+        arg_builder = TraceArgsBuilder(**self.get_test_params())
         return TrainJob(arg_builder)
 
     def output_test_success(self, output: str):

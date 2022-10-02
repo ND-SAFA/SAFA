@@ -7,7 +7,7 @@ from trace.jobs.trace_args_builder import TraceArgsBuilder
 
 class TestTraceArgsBuilder(BaseTest):
 
-    EXPECTED_VALUES = BaseTest.get_test_args()
+    EXPECTED_VALUES = BaseTest.get_test_params()
 
     def test_build(self, ):
         test_trace_args_buidler = self.get_test_trace_arg_builder()

@@ -4,7 +4,6 @@ from mock import patch
 from common.models.model_generator import ModelGenerator
 from test.base_test import BaseTest
 from test.test_data import TEST_POS_LINKS, TEST_SOURCE_LAYERS, TEST_TARGET_LAYERS, ALL_TEST_SOURCES, ALL_TEST_TARGETS
-from test.test_tokenizer import get_test_tokenizer
 from trace.data.artifact import Artifact
 from trace.data.trace_dataset_creator import TraceDatasetCreator
 from trace.data.trace_link import TraceLink
@@ -38,7 +37,7 @@ class TestTraceDatasetCreator(BaseTest):
     # ========================= high-level testing (ensure all functionality works together) =========================
     @patch.object(ModelGenerator, "get_tokenizer")
     def test_get_training_and_validation_dataset_with_transformers(self, get_tokenizer_mock: mock.MagicMock):
-        get_tokenizer_mock.return_value = get_test_tokenizer()
+        get_tokenizer_mock.return_value = self.get_test_tokenizer()
         test_trace_dataset_creator = self.get_test_trace_dataset_creator()
         training_dataset = test_trace_dataset_creator.get_training_dataset(resample_rate=1).data
         validation_dataset = test_trace_dataset_creator.get_validation_dataset().data
@@ -48,7 +47,7 @@ class TestTraceDatasetCreator(BaseTest):
 
     @patch.object(ModelGenerator, "get_tokenizer")
     def test_get_prediction_dataset_with_transformers(self, get_tokenizer_mock: mock.MagicMock):
-        get_tokenizer_mock.return_value = get_test_tokenizer()
+        get_tokenizer_mock.return_value = self.get_test_tokenizer()
         test_trace_dataset_creator = self.get_test_trace_dataset_creator(include_links=False)
         prediction_dataset = test_trace_dataset_creator.get_prediction_dataset().data
 
@@ -56,7 +55,7 @@ class TestTraceDatasetCreator(BaseTest):
 
     @patch.object(ModelGenerator, "get_tokenizer")
     def test_create_dataset_full(self, get_tokenizer_mock: mock.MagicMock):
-        get_tokenizer_mock.return_value = get_test_tokenizer()
+        get_tokenizer_mock.return_value = self.get_test_tokenizer()
         test_trace_dataset_creator = self.get_test_trace_dataset_creator(include_links=False)
         links = self.get_links(TEST_POS_LINKS)
         dataset = test_trace_dataset_creator._create_dataset(list(links.keys()))

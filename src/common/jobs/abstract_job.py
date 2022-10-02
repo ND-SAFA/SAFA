@@ -6,7 +6,7 @@ from abc import ABC, abstractmethod
 from threading import Thread
 from typing import Dict
 
-from common.api.prediction_response import PredictionResponse
+from common.api.responses import BaseResponse
 from common.jobs.abstract_args_builder import AbstractArgsBuilder
 from common.jobs.job_status import Status
 from common.storage.safa_storage import SafaStorage
@@ -15,7 +15,7 @@ from common.storage.safa_storage import SafaStorage
 class AbstractJob(Thread, ABC):
     OUTPUT_FILENAME = "output.json"
 
-    def __init__(self, arg_builder: AbstractArgsBuilder):
+    def __init__(self, arg_builder: AbstractArgsBuilder, output_dir: str = None):
         """
         Base job class
         :param arg_builder: job arguments
@@ -25,7 +25,8 @@ class AbstractJob(Thread, ABC):
         self.status = Status.NOT_STARTED
         self.result = {}
         self.id = uuid.uuid4()
-        output_dir = os.path.join(self.args.output_dir, str(self.id))
+        if output_dir is None:
+            output_dir = os.path.join(self.args.output_dir, str(self.id))
         self.output_dir = SafaStorage.add_mount_directory(output_dir)
         self.output_filepath = os.path.join(self.output_dir, self.OUTPUT_FILENAME)
 
@@ -48,7 +49,7 @@ class AbstractJob(Thread, ABC):
             self.status = Status.SUCCESS
         except Exception as e:
             print(traceback.format_exc())
-            self.result[PredictionResponse.EXCEPTION] = str(e)
+            self.result[BaseResponse.EXCEPTION] = str(e)
             self.status = Status.FAILURE
 
         output = self.get_output_as_json()
@@ -60,7 +61,7 @@ class AbstractJob(Thread, ABC):
         :return: the output as json
         """
         output = self.result
-        output[PredictionResponse.STATUS] = self.status.value
+        output[BaseResponse.STATUS] = self.status.value
         return json.dumps(output, indent=4)
 
     def _save(self, output: str) -> bool:

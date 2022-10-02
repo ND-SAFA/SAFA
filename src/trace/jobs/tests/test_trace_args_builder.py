@@ -6,18 +6,13 @@ from trace.jobs.trace_args_builder import TraceArgsBuilder
 
 
 class TestTraceArgsBuilder(BaseTest):
-    EXPECTED_VALUES = {"base_model_name": "pl_bert",
-                       "model_path": "model",
-                       "output_dir": "output",
-                       "source_layers": TEST_SOURCE_LAYERS,
-                       "target_layers": TEST_TARGET_LAYERS,
-                       "links": TEST_POS_LINKS,
-                       "validation_percentage": VALIDATION_PERCENTAGE_DEFAULT}
+
+    EXPECTED_VALUES = BaseTest.get_test_args()
 
     def test_build(self, ):
         test_trace_args_buidler = self.get_test_trace_arg_builder()
         args = test_trace_args_buidler.build()
-        self.assertEquals(args.model_generator.model_name.lower(), self.EXPECTED_VALUES["base_model_name"])
+        self.assertEquals(args.model_generator.model_name.lower(), self.EXPECTED_VALUES["base_model"])
         self.assertEquals(args.model_generator.model_path, self.EXPECTED_VALUES["model_path"])
         self.assertEquals(args.output_dir, self.EXPECTED_VALUES["output_dir"])
         for link in TEST_POS_LINKS:

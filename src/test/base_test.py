@@ -1,14 +1,31 @@
 import os
 import shutil
+from copy import deepcopy
 
 from django.test import TestCase
 
 from common.config.constants import DELETE_TEST_OUTPUT
 from common.storage.safa_storage import SafaStorage
 from test.config.paths import TEST_OUTPUT_DIR
+from test.test_data import TEST_SOURCE_LAYERS, TEST_TARGET_LAYERS, TEST_POS_LINKS
+from trace.config.constants import VALIDATION_PERCENTAGE_DEFAULT
+from transformers.models.bert.configuration_bert import BertConfig
+
+from common.models.base_models.pl_bert import PLBert
+from transformers.models.bert.tokenization_bert import BertTokenizer
+import mock
+from test.config.paths import TEST_VOCAB_FILE
 
 
 class BaseTest(TestCase):
+    _TEST_ARGS_BASE = {"base_model": "pl_bert",
+                       "model_path": "model",
+                       "output_dir": TEST_OUTPUT_DIR}
+    _TEST_ARGS_ARTIFACTS = {"source_layers": TEST_SOURCE_LAYERS,
+                            "target_layers": TEST_TARGET_LAYERS,
+                            "links": TEST_POS_LINKS,
+                            "validation_percentage": VALIDATION_PERCENTAGE_DEFAULT}
+
     def setup(self):
         if not os.path.isdir(TEST_OUTPUT_DIR):
             SafaStorage.create_dir(TEST_OUTPUT_DIR)
@@ -21,3 +38,42 @@ class BaseTest(TestCase):
                     os.remove(file_path)
                 else:
                     shutil.rmtree(file_path)
+
+    @staticmethod
+    def get_test_args(include_artifacts=True, include_links=True):
+        test_args = deepcopy(BaseTest._TEST_ARGS_BASE)
+        if include_artifacts:
+            test_args.update(BaseTest._TEST_ARGS_ARTIFACTS)
+        if not include_links and "links" in test_args:
+            test_args.pop("links")
+        return test_args
+
+    @staticmethod
+    def get_test_model():
+        return PLBert(BaseTest.get_test_config())
+
+    @staticmethod
+    def get_test_config():
+        """
+        Returns a tiny configuration by default.
+        """
+        return BertConfig(
+            vocab_size=99,
+            hidden_size=32,
+            num_hidden_layers=5,
+            num_attention_heads=4,
+            intermediate_size=37,
+            hidden_act="gelu",
+            hidden_dropout_prob=0.1,
+            attention_probs_dropout_prob=0.1,
+            max_position_embeddings=512,
+            type_vocab_size=16,
+            is_decoder=False,
+            initializer_range=0.02,
+        )
+
+    @staticmethod
+    def get_test_tokenizer():
+        tokenizer = BertTokenizer(vocab_file=TEST_VOCAB_FILE)
+        tokenizer._convert_token_to_id = mock.MagicMock(return_value=24)
+        return tokenizer

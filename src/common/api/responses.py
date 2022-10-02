@@ -3,10 +3,15 @@ from typing import List
 from scipy.special import softmax
 
 
-class PredictionResponse:
-    PREDICTIONS = "predictions"
+class BaseResponse:
+    JOB_ID = "jobID"
     EXCEPTION = "exception"
     STATUS = "status"
+    MODEL_PATH = "modelPath"
+
+
+class PredictionResponse(BaseResponse):
+    PREDICTIONS = "predictions"
     ARTIFACT_IDS = "ids"
     METRICS = "metrics"
     IDS = "ids"

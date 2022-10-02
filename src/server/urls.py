@@ -26,6 +26,6 @@ def homePageView(request):
 urlpatterns = [
     path('', homePageView),
     path('predict/', views.predict),
-    path('fine-tune/', views.fine_tune),
+    path('train/', views.train),
     path('models/', views.create_model)
 ]

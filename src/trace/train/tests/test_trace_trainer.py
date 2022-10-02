@@ -9,12 +9,11 @@ from common.models.model_generator import ModelGenerator
 from test.base_test import BaseTest
 from test.config.paths import TEST_OUTPUT_DIR
 from test.test_data import TEST_POS_LINKS, TEST_SOURCE_LAYERS, TEST_TARGET_LAYERS
-from test.test_model import get_test_model
 from test.test_prediction_output import TEST_PREDICTION_OUTPUT, assert_output_matches_expected
-from test.test_tokenizer import get_test_tokenizer
 from trace.data.trace_dataset_creator import TraceDatasetCreator
 from trace.jobs.trace_args import TraceArgs
 from trace.train.trace_trainer import TraceTrainer
+from common.api.responses import PredictionResponse
 
 
 class TestTraceTrainer(BaseTest):
@@ -84,8 +83,8 @@ class TestTraceTrainer(BaseTest):
     def get_test_trace_trainer(self, args=None, **kwargs):
         if args is None:
             model_generator = ModelGenerator("pl_bert", "path")
-            model_generator.get_model = mock.MagicMock(return_value=get_test_model())
-            model_generator.get_tokenizer = mock.MagicMock(return_value=get_test_tokenizer())
+            model_generator.get_model = mock.MagicMock(return_value=self.get_test_model())
+            model_generator.get_tokenizer = mock.MagicMock(return_value=self.get_test_tokenizer())
             trace_dataset_creator = TraceDatasetCreator(source_layers=TEST_SOURCE_LAYERS, target_layers=TEST_TARGET_LAYERS,
                                                         true_links=TEST_POS_LINKS,
                                                         model_generator=model_generator,

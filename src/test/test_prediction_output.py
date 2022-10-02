@@ -2,7 +2,7 @@ import numpy as np
 
 from transformers.trainer_utils import PredictionOutput
 
-from common.api.prediction_response import PredictionResponse
+from common.api.responses import PredictionResponse
 
 TEST_METRIC_RESULTS = {'test_loss': 0.6929082870483398}
 TEST_PREDICTIONS = np.array([[0.50035876, 0.49964124],

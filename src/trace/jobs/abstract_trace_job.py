@@ -7,12 +7,12 @@ from trace.train.trace_trainer import TraceTrainer
 
 class AbstractTraceJob(AbstractJob, ABC):
 
-    def __init__(self, args_builder: AbstractArgsBuilder):
+    def __init__(self, args_builder: AbstractArgsBuilder, output_dir: str = None):
         """
         Base job for task using a model (i.e. training, prediction, evaluation...)
         :param args_builder: arguments used for configuring the model
         """
-        super().__init__(args_builder)
+        super().__init__(args_builder, output_dir)
         self.__trainer = None
 
     def get_trainer(self) -> TraceTrainer:

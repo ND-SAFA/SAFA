@@ -43,5 +43,6 @@ urlpatterns = [
     path('', homePageView),
     path('predict/', views.PredictView.as_view()),
     path('train/', views.TrainView.as_view()),
-    path('models/', views.ModelView.as_view())
+    path('create-model/', views.CreateModelView.as_view()),
+    path('delete-model/', views.DeleteModelView.as_view())
 ]

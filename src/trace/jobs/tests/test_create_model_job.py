@@ -7,7 +7,7 @@ from common.api.responses import BaseResponse
 from common.jobs.job_status import Status
 from common.models.model_generator import ModelGenerator
 from test.base_test import BaseTest
-from trace.jobs.model_job import ModelJob
+from trace.jobs.create_model_job import CreateModelJob
 from trace.jobs.trace_args_builder import TraceArgsBuilder
 
 
@@ -38,7 +38,7 @@ class TestModelJob(BaseTest):
         get_model_mock.return_value = self.get_test_model()
         get_tokenizer_mock.return_value = self.get_test_tokenizer()
         arg_builder = TraceArgsBuilder(**self.TEST_PARAMS)
-        return ModelJob(arg_builder)
+        return CreateModelJob(arg_builder)
 
     def output_test_success(self, output_dict: dict):
         self.assertIn(BaseResponse.MODEL_PATH, output_dict)

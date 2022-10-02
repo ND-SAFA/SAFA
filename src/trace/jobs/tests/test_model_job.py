@@ -7,8 +7,6 @@ from common.api.responses import BaseResponse
 from common.jobs.job_status import Status
 from common.models.model_generator import ModelGenerator
 from test.base_test import BaseTest
-from test.config.paths import TEST_OUTPUT_DIR
-from test.test_prediction_output import TEST_PREDICTION_RESPONSE_OUTPUT, assert_output_matches_expected
 from trace.jobs.model_job import ModelJob
 from trace.jobs.trace_args_builder import TraceArgsBuilder
 

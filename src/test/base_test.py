@@ -20,11 +20,12 @@ from test.config.paths import TEST_VOCAB_FILE
 class BaseTest(TestCase):
     _TEST_ARGS_BASE = {"base_model": "pl_bert",
                        "model_path": "model",
-                       "output_dir": TEST_OUTPUT_DIR}
+                       "output_dir": TEST_OUTPUT_DIR,
+                       "settings": {"validation_percentage": VALIDATION_PERCENTAGE_DEFAULT}}
     _TEST_ARGS_ARTIFACTS = {"source_layers": TEST_SOURCE_LAYERS,
                             "target_layers": TEST_TARGET_LAYERS,
                             "links": TEST_POS_LINKS,
-                            "validation_percentage": VALIDATION_PERCENTAGE_DEFAULT}
+                            }
 
     def setup(self):
         if not os.path.isdir(TEST_OUTPUT_DIR):
@@ -40,12 +41,14 @@ class BaseTest(TestCase):
                     shutil.rmtree(file_path)
 
     @staticmethod
-    def get_test_params(include_artifacts=True, include_links=True):
+    def get_test_params(include_artifacts=True, include_links=True, include_settings=True):
         test_args = deepcopy(BaseTest._TEST_ARGS_BASE)
+        if not include_settings:
+            test_args.pop("settings")
         if include_artifacts:
             test_args.update(BaseTest._TEST_ARGS_ARTIFACTS)
-        if not include_links and "links" in test_args:
-            test_args.pop("links")
+            if not include_links:
+                test_args.pop("links")
         return test_args
 
     @staticmethod

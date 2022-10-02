@@ -35,6 +35,12 @@ class TestViews(BaseTest):
         response_dict = self.make_test_request('/predict/', self.get_test_params(include_links=False))
         self.assertIn(BaseResponse.JOB_ID, response_dict)
 
+    def test_bad_request(self):
+        bad_params = self.get_test_params()
+        bad_params["settings"] = {"unknown_arg": 10}
+        response_dict = self.make_test_request('/train/', bad_params)
+        self.assertIn("settings", response_dict)
+
     def make_test_request(self, url: str, params: dict) -> Dict:
         c = Client()
         response = c.post(url, data=params, content_type="application/json")

@@ -10,16 +10,16 @@ from common.api.job_response import JobResponse
 from common.api.prediction_request import PredictionRequest
 from common.models.model_generator import ModelGenerator
 from test.config.paths import TEST_OUTPUT_DIR
-from test.test_data import TEST_POS_LINKS, TEST_S_ARTS, TEST_T_ARTS
+from test.test_data import TEST_POS_LINKS, TEST_SOURCE_LAYERS, TEST_TARGET_LAYERS
 from test.test_model import get_test_model
 from test.test_tokenizer import get_test_tokenizer
 
 
 class TestViews(TestCase):
-    TEST_PARAMS = {PredictionRequest.SOURCES: TEST_S_ARTS,
-                   PredictionRequest.TARGETS: TEST_T_ARTS,
+    TEST_PARAMS = {PredictionRequest.SOURCES: TEST_SOURCE_LAYERS,
+                   PredictionRequest.TARGETS: TEST_TARGET_LAYERS,
                    PredictionRequest.MODEL_PATH: "path/to/model",
-                   PredictionRequest.BASE_MODEL: "bert_trace_single",
+                   PredictionRequest.BASE_MODEL: "pl_bert",
                    PredictionRequest.OUTPUT_DIR: TEST_OUTPUT_DIR,
                    "max_seq_length": 100,
                    "pad_to_max_length": True,

@@ -1,6 +1,6 @@
 import math
 import random
-from typing import Dict, Iterable, List, Tuple, Set, Sized
+from typing import Dict, Iterable, List, Tuple, Set, Sized, Callable, Optional
 
 import torch
 
@@ -13,28 +13,27 @@ from common.models.model_generator import ModelGenerator, ArchitectureType
 
 
 class TraceDatasetCreator:
-    __training_dataset: TraceDataset = None
-    __validation_dataset: TraceDataset = None
-    __prediction_dataset: TraceDataset = None
-
     """
     Responsible for creating dataset in format for defined models.
     """
 
-    def __init__(self, source_artifacts: Dict[str, str], target_artifacts: Dict[str, str], model_generator: ModelGenerator,
+    def __init__(self, source_layers: List[Dict[str, str]], target_layers: List[Dict[str, str]], model_generator: ModelGenerator,
                  true_links: List[Tuple[str, str]] = None, validation_percentage: float = 0.0):
         """
         Constructs datasets for trace link training and validation
-        :param source_artifacts: source artifacts represented as mapping between id and token
-        :param target_artifacts: target artifacts represented as mapping between id and token
+        :param source_layers: a list of source artifacts across all layers
+        :param target_layers: a list of target artifacts across all layers
         :param true_links: list of tuples containing linked source and target ids
         :param model_generator: the ModelGenerator
         :param validation_percentage: percentage of dataset used for validation, if no value is supplied then data will not be split
         """
+        self.__training_dataset: Optional[TraceDataset] = None
+        self.__validation_dataset: Optional[TraceDataset] = None
+        self.__prediction_dataset: Optional[TraceDataset] = None
 
         self.model_generator = model_generator
-        self.links, self.pos_link_ids, self.neg_link_ids = self._create_links(self.model_generator, source_artifacts, target_artifacts,
-                                                                              true_links)
+        self.links = self._generate_all_links(source_layers, target_layers)
+        self.pos_link_ids, self.neg_link_ids = self._get_pos_and_neg_links(true_links, self.links) if true_links else (None, None)
         self.validation_percentage = validation_percentage
         self.linked_target_ids = self._get_linked_targets_only(true_links) if true_links else set()
 
@@ -189,32 +188,40 @@ class TraceDatasetCreator:
                 reduced_links.append(link.id_)
         return reduced_links
 
-    @staticmethod
-    def _create_links(model_generator: ModelGenerator, s_arts: Dict[str, str], t_arts: Dict,
-                      true_links: List[Tuple[str, str]] = None) -> Tuple[Dict, list, list]:
+    def _generate_all_links(self, source_layers: List[Dict[str, str]], target_layers: List[Dict[str, str]]) -> Dict[int, TraceLink]:
         """
-        Creates Trace Links from all source and target pairs
-        :param model_generator: the ModelGenerator
-        :param s_arts: source artifacts represented as id, token mappings
-        :param t_arts: target artifacts represented as id, token mappings
-        :param true_links: list of tuples containing linked source and target ids
+        Generates Trace Links between source and target pairs within each layer
+        :param source_layers: a list of source artifacts across all layers
+        :param target_layers: a list of target artifacts across all layers
         :return: a dictionary of the links, a list of the positive link ids, and a list of the negative link ids
         """
         links = {}
-        for s_id, s_token in s_arts.items():
-            source = Artifact(s_id, s_token, model_generator.get_feature)
-            for t_id, t_token in t_arts.items():
-                target = Artifact(t_id, t_token, model_generator.get_feature)
-                link = TraceLink(source, target, model_generator.get_feature)
-                links[link.id_] = link
-        neg_link_ids = pos_link_ids = None
-        if true_links:
-            pos_link_ids, neg_link_ids = TraceDatasetCreator._create_pos_and_neg_links(true_links, links)
-        return links, pos_link_ids, neg_link_ids
+        for layer in range(len(source_layers)):
+            layer_links = self._make_links(self.model_generator.get_feature, source_layers[layer], target_layers[layer])
+            links.update(layer_links)
+        return links
 
     @staticmethod
-    def _create_pos_and_neg_links(true_links: List[Tuple[str, str]], all_links: Dict[int, TraceLink]) \
-            -> Tuple[List, List]:
+    def _make_links(feature_func: Callable, source_artifacts: Dict[str, str],
+                    target_artifacts: Dict[str, str]) -> Dict[int, TraceLink]:
+        """
+        Creates Trace Links from all source and target pairs
+        :param feature_func: function from which the artifact features can be generated
+        :param source_artifacts: source artifacts represented as id, token mappings
+        :param target_artifacts: target artifacts represented as id, token mappings
+        :return: a dictionary of the id, link mappings
+        """
+        links = {}
+        for s_id, s_token in source_artifacts.items():
+            source = Artifact(s_id, s_token, feature_func)
+            for t_id, t_token in target_artifacts.items():
+                target = Artifact(t_id, t_token, feature_func)
+                link = TraceLink(source, target, feature_func)
+                links[link.id_] = link
+        return links
+
+    @staticmethod
+    def _get_pos_and_neg_links(true_links: List[Tuple[str, str]], all_links: Dict[int, TraceLink]) -> Tuple[List, List]:
         """
         Creates a set of all positive and negative link ids
         :param true_links: list of tuples containing linked source and target ids
@@ -224,10 +231,11 @@ class TraceDatasetCreator:
         pos_link_ids = set()
         for s_id, t_id in true_links:
             link_id = TraceLink.generate_link_id(s_id, t_id)
-            true_link = all_links.get(link_id)
-            true_link.is_true_link = True
-            pos_link_ids.add(link_id)
-        neg_link_ids = [link_id for link_id in all_links.keys() if link_id not in pos_link_ids]
+            true_link = all_links.get(link_id, None)
+            if true_link:
+                true_link.is_true_link = True
+                pos_link_ids.add(link_id)
+        neg_link_ids = list(set(all_links.keys()).difference(pos_link_ids))
         pos_link_ids = list(pos_link_ids)
         random.shuffle(pos_link_ids)
         random.shuffle(neg_link_ids)

@@ -1,11 +1,12 @@
 from test.base_test import BaseTest
-from test.test_data import TEST_POS_LINKS, TEST_S_ARTS, TEST_T_ARTS
+from test.test_data import TEST_POS_LINKS, TEST_SOURCE_LAYERS, TEST_TARGET_LAYERS
 from trace.data.trace_dataset import TraceDataset
 
 
 class TestTraceDataset(BaseTest):
-    TEST_ENTRIES = [{"id": 1}, {"id": 2}, {"id": 3}]
-    SOURCE_TARGET_PAIRS = list(zip(TEST_S_ARTS.keys(), TEST_T_ARTS.keys()))
+    TEST_ENTRIES = [{"id": 1}, {"id": 2}, {"id": 3}, {"id": 4}, {"id": 5}, {"id": 6}]
+    SOURCE_TARGET_PAIRS = [(s_id, t_id) for source_artifacts, target_artifacts in zip(TEST_SOURCE_LAYERS, TEST_TARGET_LAYERS)
+                           for s_id, t_id in zip(source_artifacts.keys(), target_artifacts.keys())]
 
     def test_resize_data_bigger(self):
         new_dataset = TraceDataset.resize_data(TEST_POS_LINKS, 5)

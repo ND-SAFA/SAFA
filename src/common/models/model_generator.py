@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Optional
 
 from transformers import AutoConfig
 from transformers.modeling_utils import PreTrainedModel
@@ -14,8 +14,6 @@ class ModelGenerator:
     """
     Represents a learning model
     """
-    __tokenizer: AutoTokenizer = None
-    __model: PreTrainedModel = None
     _max_seq_length: int = MAX_SEQ_LENGTH_DEFAULT
 
     def __init__(self, base_model_name: str, model_path: str, model_size: ModelSize = ModelSize.BASE):
@@ -23,6 +21,9 @@ class ModelGenerator:
         Handles loading model and related functions
         :param model_path: the path to the saved model
         """
+
+        self.__tokenizer: Optional[AutoTokenizer] = None
+        self.__model: Optional[PreTrainedModel] = None
         self.model_path = model_path
         self.model_name = base_model_name
         self.base_model = self.get_supported_base_model(self.model_name)

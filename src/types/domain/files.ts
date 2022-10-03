@@ -1,8 +1,8 @@
+import { ArtifactLevelModel, ModelType, TrainedModel } from "@/types/domain";
+
 /**
  * Defines a resource file.
  */
-import { ModelType, TrainedModel } from "@/types";
-
 export interface ResourceModel {
   /**
    * The file path.
@@ -11,28 +11,14 @@ export interface ResourceModel {
 }
 
 /**
- * Defines a type matrix.
- */
-export interface TypeMatrixModel {
-  /**
-   * The source type to trace from.
-   */
-  source: string;
-  /**
-   * The target type to trace to.
-   */
-  target: string;
-}
-
-/**
  * Defines a trace matrix file.
  */
-export interface TraceMatrixModel extends ResourceModel, TypeMatrixModel {}
+export interface TraceMatrixModel extends ResourceModel, ArtifactLevelModel {}
 
 /**
  * Defines a trace matrix generation request.
  */
-export interface GeneratedMatrixModel extends TypeMatrixModel {
+export interface GeneratedMatrixModel extends ArtifactLevelModel {
   /**
    * The default model to use to generate links.
    */

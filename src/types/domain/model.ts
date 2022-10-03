@@ -1,4 +1,4 @@
-import { ModelType } from "@/types";
+import { ModelType, VersionModel } from "@/types";
 
 export interface TrainedModel {
   /**
@@ -26,4 +26,40 @@ export interface TrainedModel {
 export enum ModelShareType {
   CLONE = "COPY_BY_VALUE",
   REUSE = "COPY_BY_REFERENCE",
+}
+
+/**
+ * Describes a matrix of artifacts.
+ */
+export interface ArtifactLevelModel {
+  /**
+   * The source artifact type.
+   */
+  source: string;
+  /**
+   * The target artifact type.
+   */
+  target: string;
+}
+
+/**
+ * Represents a matrix to generate or train links on.
+ */
+export interface TrainOrGenerateLinksModel {
+  /**
+   * The generation method.
+   */
+  method?: ModelType;
+  /**
+   * The custom trained model to use for generation/training.
+   */
+  model?: TrainedModel;
+  /**
+   * The version to commit the entities to.
+   */
+  projectVersion?: VersionModel;
+  /**
+   * The sets of matrices to generate or train on.
+   */
+  artifactLevels: ArtifactLevelModel[];
 }

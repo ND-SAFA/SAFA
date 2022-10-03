@@ -1,7 +1,11 @@
-import { ApprovalType, JobModel, TraceLinkModel } from "@/types";
+import {
+  ApprovalType,
+  JobModel,
+  TraceLinkModel,
+  TrainOrGenerateLinksModel,
+} from "@/types";
 import { CommitBuilder } from "@/api";
 import { authHttpClient, Endpoint, fillEndpoint } from "@/api/util";
-import { GenerateLinksModel, TrainOnLinksModel } from "@/types/api/link-api";
 
 /**
  * Returns all generated links for this project.
@@ -25,7 +29,7 @@ export async function getGeneratedLinks(
  * @return The created job.
  */
 export async function createGeneratedLinks(
-  config: GenerateLinksModel
+  config: TrainOrGenerateLinksModel
 ): Promise<JobModel> {
   return authHttpClient<JobModel>(fillEndpoint(Endpoint.generateLinksJob), {
     method: "POST",
@@ -36,14 +40,16 @@ export async function createGeneratedLinks(
 /**
  * Trains a model between source and target artifacts.
  *
+ * @param projectId - The project to train for.
  * @param config - Model training configuration.
  * @return The created job.
  */
 export async function createModelTraining(
-  config: TrainOnLinksModel
+  projectId: string,
+  config: TrainOrGenerateLinksModel
 ): Promise<JobModel> {
   return authHttpClient<JobModel>(
-    fillEndpoint(Endpoint.trainModelJob, { projectId: config.projectId }),
+    fillEndpoint(Endpoint.trainModelJob, { projectId }),
     {
       method: "POST",
       body: JSON.stringify(config),

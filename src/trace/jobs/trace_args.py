@@ -31,7 +31,7 @@ class TraceArgs(TrainingArguments):
         super().__init__(log_level="info", log_level_replica="info", output_dir=output_dir)
         self.__set_args(**kwargs)
 
-    def __set_args(self, **kwargs) -> None:
+    def __set_args(self, kwargs) -> None:
         """
         Sets class args
         :param kwargs: optional arguments for Trainer

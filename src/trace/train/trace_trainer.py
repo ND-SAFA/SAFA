@@ -1,7 +1,7 @@
 from typing import Dict, List, NamedTuple
 
-import numpy as np
 from datasets import load_metric
+from scipy.special import softmax
 from torch.utils.data import DataLoader
 from torch.utils.data.distributed import DistributedSampler
 from torch.utils.data.sampler import RandomSampler
@@ -48,14 +48,15 @@ class TraceTrainer(Trainer):
         self.save_model(self.args.model_generator.model_path)
         return TraceTrainer.output_to_dict(output)
 
-    def perform_prediction(self) -> Dict:
+    def perform_prediction(self, dataset) -> Dict:
         """
         Performs the prediction and (optionally) evaluation for the model
         :return: a dictionary containing the results
         """
-        dataset = self.trace_dataset_creator.get_prediction_dataset()
+        dataset = self.trace_dataset_creator.get_prediction_dataset() if dataset is None else dataset
         self.eval_dataset = dataset.data
         output = self.predict(self.eval_dataset)
+        print(self.args.metrics)
         if self.args.metrics:
             self._eval(output, self.args.metrics)
         output_dict = TraceTrainer.output_to_dict(output)
@@ -77,7 +78,7 @@ class TraceTrainer(Trainer):
         :param output: the output from predictions
         :param metric_names: name of metrics desired for evaluation
         """
-        preds = np.argmax(output.predictions, axis=-1)
+        preds = TraceTrainer.get_similarity_scores(output.predictions)
         metric_paths = [get_metric_path(name) for name in metric_names]
         for metric_path in metric_paths:
             metric = load_metric(metric_path, keep_in_memory=True)
@@ -106,3 +107,11 @@ class TraceTrainer(Trainer):
             drop_last=self.args.dataloader_drop_last,
         )
         return data_loader
+
+    @staticmethod
+    def get_similarity_scores(predictions):
+        similarity_scores = []
+        for pred_i in range(predictions.shape[0]):
+            prediction = predictions[pred_i]
+            similarity_scores.append(softmax(prediction)[1])
+        return similarity_scores

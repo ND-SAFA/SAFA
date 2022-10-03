@@ -1,6 +1,8 @@
-from trace.metrics.abstract_trace_metric import AbstractTraceMetric
-from trace.config.constants import K_METRIC_DEFAULT
 import datasets
+from sklearn.metrics import average_precision_score
+
+from trace.config.constants import K_METRIC_DEFAULT
+from trace.metrics.abstract_trace_metric import AbstractTraceMetric
 
 _DESCRIPTION = """
 Mean Average Precision@K metric measures the average precision over k for recommendations shown for 
@@ -9,7 +11,7 @@ different links and averages them over all queries in the dataset.
 
 _KWARGS_DESCRIPTION = """
 Args:
-    predictions (`list` of `int`): Predicted labels.
+    predictions (`list` of `float`): Predicted labels.
     references (`list` of `int`): Ground truth labels.
     k (int): considers only the subset of recommendations from rank 1 through k
 Returns:
@@ -35,7 +37,7 @@ class MapAtKMetric(AbstractTraceMetric):
         :param kwargs: any other necessary params
         :return: Mean Average Precision@K score.
         """
-        return 0
+        return average_precision_score(labels, predictions)
 
     def _info(self) -> datasets.MetricInfo:
         """

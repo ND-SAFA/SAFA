@@ -1,7 +1,7 @@
-from typing import Dict, List, re
+from abc import ABC, abstractmethod
+from typing import Dict, List
 
 import datasets
-from abc import abstractmethod, ABC
 
 
 class AbstractTraceMetric(datasets.Metric, ABC):
@@ -14,12 +14,12 @@ class AbstractTraceMetric(datasets.Metric, ABC):
         """
         return datasets.Features(
             {
-                "predictions": datasets.Sequence(datasets.Value("int32")),
+                "predictions": datasets.Sequence(datasets.Value("float32")),
                 "references": datasets.Sequence(datasets.Value("int32")),
             }
             if self.config_name == "multilabel"
             else {
-                "predictions": datasets.Value("int32"),
+                "predictions": datasets.Value("float32"),
                 "references": datasets.Value("int32"),
             }
         )

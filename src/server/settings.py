@@ -125,5 +125,5 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 APPEND_SLASH = True
 CSRF_COOKIE_SECURE = False
-
+CORS_ALLOWED_ORIGIN_REGEXES = ["*"]
 load_dotenv()

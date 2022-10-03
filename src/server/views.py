@@ -4,16 +4,15 @@ from typing import Dict, Union
 
 from django.http.request import HttpRequest
 from django.http.response import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from common.api.responses import BaseResponse
-from common.api.request_serializers import PredictSerializer, TrainSerializer, BaseTraceSerializer
-from common.jobs.abstract_job import AbstractJob
-from common.storage.safa_storage import SafaStorage
-from server.job_type import JobType
-from rest_framework.views import APIView
-from drf_yasg.utils import swagger_auto_schema
-from rest_framework import status, permissions
 from drf_yasg.openapi import Schema, TYPE_OBJECT
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework import permissions, status
+from rest_framework.views import APIView
+
+from common.api.request_serializers import BaseTraceSerializer, PredictSerializer, TrainSerializer
+from common.api.responses import BaseResponse
+from common.jobs.abstract_job import AbstractJob
+from server.job_type import JobType
 
 SERIALIZERS = {JobType.CREATE_MODEL: BaseTraceSerializer,
                JobType.PREDICT: PredictSerializer,
@@ -53,7 +52,8 @@ class BaseTraceJobView(APIView, ABC):
         return JsonResponse(dict_)
 
     @staticmethod
-    def run_job(request: HttpRequest, job_type: JobType, job: AbstractJob = None, run_async: bool = True) -> JsonResponse:
+    def run_job(request: HttpRequest, job_type: JobType, job: AbstractJob = None,
+                run_async: bool = True) -> JsonResponse:
         """
         Runs the specified job using params from a given request
         :param request: request from client
@@ -96,7 +96,6 @@ class CreateModelView(BaseTraceJobView):
     job_type = JobType.CREATE_MODEL
     responses = BaseTraceJobView.get_responses([BaseResponse.MODEL_PATH, BaseResponse.STATUS, BaseResponse.EXCEPTION])
 
-    @csrf_exempt
     @swagger_auto_schema(request_body=SERIALIZERS[job_type], responses=responses)
     def post(self, request: HttpRequest) -> JsonResponse:
         """
@@ -111,7 +110,6 @@ class PredictView(BaseTraceJobView):
     job_type = JobType.PREDICT
     responses = BaseTraceJobView.get_responses([BaseResponse.JOB_ID])
 
-    @csrf_exempt
     @swagger_auto_schema(request_body=SERIALIZERS[job_type], responses=responses)
     def post(self, request: HttpRequest) -> JsonResponse:
         """
@@ -126,7 +124,6 @@ class TrainView(BaseTraceJobView):
     job_type = JobType.TRAIN
     responses = BaseTraceJobView.get_responses([BaseResponse.JOB_ID])
 
-    @csrf_exempt
     @swagger_auto_schema(request_body=SERIALIZERS[job_type], responses=responses)
     def post(self, request: HttpRequest) -> JsonResponse:
         """
@@ -142,7 +139,6 @@ class DeleteModelView(BaseTraceJobView):
     request = Schema(type=TYPE_OBJECT, properties=BaseResponse.get_properties([BaseResponse.MODEL_PATH]))
     responses = BaseTraceJobView.get_responses([BaseResponse.STATUS, BaseResponse.EXCEPTION])
 
-    @csrf_exempt
     @swagger_auto_schema(request_body=request, responses=responses)
     def post(self, request: HttpRequest) -> JsonResponse:
         """

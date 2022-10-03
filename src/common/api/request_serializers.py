@@ -7,8 +7,8 @@ from trace.jobs.trace_args_builder import TraceArgsBuilder
 class BaseTraceSerializer(serializers.Serializer):
     model_path = serializers.CharField(max_length=255)  # The path to the model weights / state.
     output_dir = serializers.CharField(max_length=255)  # Path to directory of output file.
-    base_model = serializers.CharField(max_length=255)  # The base model class to use.
     settings = serializers.DictField(required=False)
+    baseModel = EnumField(choices=SupportedBaseModel, to_repr=lambda a: a)  # The base model class to use.
 
     def create(self, validated_data):
         return TraceArgsBuilder(**validated_data)

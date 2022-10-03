@@ -30,7 +30,7 @@ class PretrainArgBuilder(AbstractArgsBuilder):
         Creates Pretraining arguments for pretraining a model.
         :return: Arguments for pretraining a model
         """
-        model_generator = ModelGenerator(SupportedBaseModel.ELECTRA_TRACE_SINGLE.name,
+        model_generator = ModelGenerator(SupportedBaseModel.ELECTRA_TRACE_SINGLE,
                                          PRETRAIN_MODEL_PATH.format(self.model_size.value),
                                          model_size=self.model_size)
         return PretrainArgs(

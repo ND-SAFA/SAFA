@@ -1,6 +1,5 @@
 from test.base_test import BaseTest
-from test.test_data import TEST_POS_LINKS, TEST_SOURCE_LAYERS, TEST_TARGET_LAYERS
-from trace.config.constants import VALIDATION_PERCENTAGE_DEFAULT
+from test.test_data import TEST_POS_LINKS
 from trace.data.trace_link import TraceLink
 from trace.jobs.trace_args_builder import TraceArgsBuilder
 
@@ -22,7 +21,7 @@ class TestTraceArgsBuilder(BaseTest):
         self.build_test(args)
 
     def build_test(self, args):
-        self.assertEquals(args.model_generator.model_name.lower(), self.EXPECTED_VALUES["base_model"])
+        self.assertEquals(args.model_generator.base_model, self.EXPECTED_VALUES["base_model"])
         self.assertEquals(args.model_generator.model_path, self.EXPECTED_VALUES["model_path"])
         self.assertEquals(args.output_dir, self.EXPECTED_VALUES["output_dir"])
         for link in TEST_POS_LINKS:

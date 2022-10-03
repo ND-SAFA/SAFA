@@ -78,7 +78,7 @@ class TestModelGenerator(BaseTest):
         self.assertEquals(test_generator._max_seq_length, 5)
 
     def get_test_model_generator(self):
-        return ModelGenerator(self.TEST_BASE_MODEL["base_model_name"], "path")
+        return ModelGenerator(self.TEST_BASE_MODEL["supported_base_model"], "path")
 
     @patch.object(ModelGenerator, 'get_tokenizer')
     def test_get_feature_with_return_token_type_ids(self, get_tokenizer_mock: mock.MagicMock):

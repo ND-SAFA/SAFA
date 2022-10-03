@@ -16,7 +16,7 @@ class ModelGenerator:
     """
     _max_seq_length: int = MAX_SEQ_LENGTH_DEFAULT
 
-    def __init__(self, base_model_name: str, model_path: str, model_size: ModelSize = ModelSize.BASE):
+    def __init__(self, base_model: SupportedBaseModel, model_path: str, model_size: ModelSize = ModelSize.BASE):
         """
         Handles loading model and related functions
         :param model_path: the path to the saved model
@@ -25,8 +25,8 @@ class ModelGenerator:
         self.__tokenizer: Optional[AutoTokenizer] = None
         self.__model: Optional[PreTrainedModel] = None
         self.model_path = model_path
-        self.model_name = base_model_name
-        self.base_model = self.get_supported_base_model(self.model_name)
+        self.base_model = base_model
+        self.model_name = base_model.name
         self.base_model_class = self.base_model.value
         self.arch_type = self._get_model_architecture_type(self.model_name)
         self.model_size = model_size

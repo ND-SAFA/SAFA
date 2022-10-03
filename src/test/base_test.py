@@ -14,7 +14,7 @@ from trace.config.constants import VALIDATION_PERCENTAGE_DEFAULT
 
 
 class BaseTest(TestCase):
-    _TEST_ARGS_BASE = {"base_model": "pl_bert",
+    _TEST_ARGS_BASE = {"base_model": SupportedBaseModel.PL_BERT,
                        "model_path": "model",
                        "output_dir": TEST_OUTPUT_DIR,
                        "settings": {"validation_percentage": VALIDATION_PERCENTAGE_DEFAULT}}

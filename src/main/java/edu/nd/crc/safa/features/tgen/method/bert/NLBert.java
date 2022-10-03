@@ -13,7 +13,7 @@ public class NLBert extends TBert {
     @Override
     BertMethodIdentifier getBertMethodIdentifier() {
         return new BertMethodIdentifier(
-            "se_bert",
+            "nl_bert",
             "thearod5/sebert-task-cls"
         );
     }

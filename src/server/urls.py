@@ -34,7 +34,7 @@ schema_view = get_schema_view(
         contact=openapi.Contact(email="alberto@safa.ai"),
     ),
     public=True,
-    permission_classes=(permissions.AllowAny,),
+    permission_classes=[permissions.AllowAny],
 )
 
 urlpatterns = [

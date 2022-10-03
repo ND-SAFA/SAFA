@@ -4,6 +4,7 @@ from typing import Dict, Union
 
 from django.http.request import HttpRequest
 from django.http.response import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 from drf_yasg.openapi import Schema, TYPE_OBJECT
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import permissions, status
@@ -69,7 +70,9 @@ class BaseTraceJobView(APIView, ABC):
             if run_async:
                 response_dict = {BaseResponse.JOB_ID: str(job.id)}
             else:
+                print("Job is starting...")
                 job.join()
+                print("JOINED.")
                 response_dict = job.result
         else:
             response_dict = job
@@ -96,6 +99,7 @@ class CreateModelView(BaseTraceJobView):
     job_type = JobType.CREATE_MODEL
     responses = BaseTraceJobView.get_responses([BaseResponse.MODEL_PATH, BaseResponse.STATUS, BaseResponse.EXCEPTION])
 
+    @csrf_exempt
     @swagger_auto_schema(request_body=SERIALIZERS[job_type], responses=responses)
     def post(self, request: HttpRequest) -> JsonResponse:
         """
@@ -110,6 +114,7 @@ class PredictView(BaseTraceJobView):
     job_type = JobType.PREDICT
     responses = BaseTraceJobView.get_responses([BaseResponse.JOB_ID])
 
+    @csrf_exempt
     @swagger_auto_schema(request_body=SERIALIZERS[job_type], responses=responses)
     def post(self, request: HttpRequest) -> JsonResponse:
         """
@@ -124,6 +129,7 @@ class TrainView(BaseTraceJobView):
     job_type = JobType.TRAIN
     responses = BaseTraceJobView.get_responses([BaseResponse.JOB_ID])
 
+    @csrf_exempt
     @swagger_auto_schema(request_body=SERIALIZERS[job_type], responses=responses)
     def post(self, request: HttpRequest) -> JsonResponse:
         """
@@ -139,6 +145,7 @@ class DeleteModelView(BaseTraceJobView):
     request = Schema(type=TYPE_OBJECT, properties=BaseResponse.get_properties([BaseResponse.MODEL_PATH]))
     responses = BaseTraceJobView.get_responses([BaseResponse.STATUS, BaseResponse.EXCEPTION])
 
+    @csrf_exempt
     @swagger_auto_schema(request_body=request, responses=responses)
     def post(self, request: HttpRequest) -> JsonResponse:
         """

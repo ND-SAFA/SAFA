@@ -3,19 +3,18 @@ package edu.nd.crc.safa.features.tgen.method.bert;
 import edu.nd.crc.safa.common.SafaRequestBuilder;
 
 /**
- * Bert model trained to predict traces between natural language to programming language artifacts.
+ * Bert model trained to predict traces between (natural language) NL to NL artifacts.
  */
-public class PLBert extends TBert {
-
-    public PLBert(SafaRequestBuilder safaRequestBuilder) {
+public class AutomotiveBert extends TBert {
+    public AutomotiveBert(SafaRequestBuilder safaRequestBuilder) {
         super(safaRequestBuilder);
     }
 
     @Override
     BertMethodIdentifier getBertMethodIdentifier() {
         return new BertMethodIdentifier(
-            "pl_bert",
-            "thearod5/tbert"
+            "nl_bert",
+            "thearod5/automotive"
         );
     }
 }

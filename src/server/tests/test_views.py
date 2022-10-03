@@ -19,7 +19,7 @@ class TestViews(BaseTest):
     def test_create_model(self, get_tokenizer_mock, load_model_mock):
         load_model_mock.return_value = self.get_test_model()
         get_tokenizer_mock.return_value = self.get_test_tokenizer()
-        response_dict = self.make_test_request('/create-model/',
+        response_dict = self.make_test_request('/model/create/',
                                                self.get_test_params(include_artifacts=False, as_api=True))
         self.assertIn(BaseResponse.MODEL_PATH, response_dict)
 
@@ -40,7 +40,7 @@ class TestViews(BaseTest):
         self.assertIn(BaseResponse.JOB_ID, response_dict)
 
     def test_delete_model(self):
-        response_dict = self.make_test_request('/delete-model/', {BaseResponse.MODEL_PATH: TEST_OUTPUT_DIR})
+        response_dict = self.make_test_request('/model/delete/', {BaseResponse.MODEL_PATH: TEST_OUTPUT_DIR})
         self.assertIn(BaseResponse.STATUS, response_dict)
         self.assertEqual(response_dict[BaseResponse.STATUS], Status.SUCCESS.value)
 

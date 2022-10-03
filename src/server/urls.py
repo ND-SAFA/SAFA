@@ -44,6 +44,6 @@ urlpatterns = [
     path('', homePageView),
     path('predict/', views.PredictView.as_view()),
     path('train/', views.TrainView.as_view()),
-    path('model/create', views.CreateModelView.as_view()),
-    path('model/delete', views.DeleteModelView.as_view())
+    path('model/create/', views.CreateModelView.as_view()),
+    path('model/delete/', views.DeleteModelView.as_view())
 ]

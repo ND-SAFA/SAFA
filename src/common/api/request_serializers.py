@@ -25,10 +25,11 @@ class BaseTraceSerializer(serializers.Serializer):
                                      help_text="Dictionary of custom fields to initialize trainer with.")
 
     def create(self, validated_data):
+        settings = validated_data["settings"] if "settings" in validated_data else None
         return TraceArgsBuilder(base_model=validated_data["baseModel"],
                                 model_path=validated_data["modelPath"],
                                 output_dir=validated_data["outputDir"],
-                                settings=validated_data["settings"])
+                                settings=settings)
 
 
 class PredictSerializer(BaseTraceSerializer):

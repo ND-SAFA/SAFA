@@ -2,23 +2,22 @@ import os
 import shutil
 from copy import deepcopy
 
+import mock
 from django.test import TestCase
+from transformers.models.bert.configuration_bert import BertConfig
+from transformers.models.bert.tokenization_bert import BertTokenizer
 
 from common.config.constants import DELETE_TEST_OUTPUT
-from common.storage.safa_storage import SafaStorage
-from test.config.paths import TEST_OUTPUT_DIR
-from test.test_data import TEST_SOURCE_LAYERS, TEST_TARGET_LAYERS, TEST_POS_LINKS
-from trace.config.constants import VALIDATION_PERCENTAGE_DEFAULT
-from transformers.models.bert.configuration_bert import BertConfig
-
 from common.models.base_models.pl_bert import PLBert
-from transformers.models.bert.tokenization_bert import BertTokenizer
-import mock
-from test.config.paths import TEST_VOCAB_FILE
+from common.models.base_models.supported_base_model import SupportedBaseModel
+from common.storage.safa_storage import SafaStorage
+from test.config.paths import TEST_OUTPUT_DIR, TEST_VOCAB_FILE
+from test.test_data import TEST_POS_LINKS, TEST_SOURCE_LAYERS, TEST_TARGET_LAYERS
+from trace.config.constants import VALIDATION_PERCENTAGE_DEFAULT
 
 
 class BaseTest(TestCase):
-    _TEST_ARGS_BASE = {"base_model": "pl_bert",
+    _TEST_ARGS_BASE = {"base_model": SupportedBaseModel.PL_BERT,
                        "model_path": "model",
                        "output_dir": TEST_OUTPUT_DIR,
                        "settings": {"validation_percentage": VALIDATION_PERCENTAGE_DEFAULT}}
@@ -36,7 +35,7 @@ class BaseTest(TestCase):
             shutil.rmtree(TEST_OUTPUT_DIR)
 
     @staticmethod
-    def get_test_params(include_artifacts=True, include_links=True, include_settings=True):
+    def get_test_params(include_artifacts=True, include_links=True, include_settings=True, as_api=False):
         test_args = deepcopy(BaseTest._TEST_ARGS_BASE)
         if not include_settings:
             test_args.pop("settings")
@@ -44,7 +43,19 @@ class BaseTest(TestCase):
             test_args.update(BaseTest._TEST_ARGS_ARTIFACTS)
             if not include_links:
                 test_args.pop("links")
-        return test_args
+
+        # Step - Replaces casing to snake case
+        if as_api:
+            # Step - Converts base model to string
+            parsed_kwargs = {}
+            for key, value in test_args.items():
+                snake_case_key = ''.join(word.title() for word in key.split('_'))
+                snake_case_key = snake_case_key[0:1].lower() + snake_case_key[1:]
+                parsed_kwargs[snake_case_key] = value
+            parsed_kwargs["baseModel"] = parsed_kwargs["baseModel"].name
+            return parsed_kwargs
+        else:
+            return test_args
 
     @staticmethod
     def get_test_model():

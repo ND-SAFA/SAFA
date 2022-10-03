@@ -5,6 +5,7 @@ import mock
 from torch.utils.data.distributed import DistributedSampler
 from torch.utils.data.sampler import RandomSampler
 
+from common.models.base_models.supported_base_model import SupportedBaseModel
 from common.models.model_generator import ModelGenerator
 from test.base_test import BaseTest
 from test.test_data import TEST_SOURCE_LAYERS, TEST_TARGET_LAYERS
@@ -79,7 +80,7 @@ class TestTraceTrainer(BaseTest):
 
     def get_test_trace_trainer(self, args=None, include_links=True, **kwargs):
         if args is None:
-            model_generator = ModelGenerator("pl_bert", "path")
+            model_generator = ModelGenerator(SupportedBaseModel.PL_BERT, "path")
             model_generator.get_model = mock.MagicMock(return_value=self.get_test_model())
             model_generator.get_tokenizer = mock.MagicMock(return_value=self.get_test_tokenizer())
             test_params = self.get_test_params(include_links=include_links)

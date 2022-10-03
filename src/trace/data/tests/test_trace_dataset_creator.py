@@ -1,9 +1,10 @@
 import mock
 from mock import patch
 
+from common.models.base_models.supported_base_model import SupportedBaseModel
 from common.models.model_generator import ModelGenerator
 from test.base_test import BaseTest
-from test.test_data import TEST_POS_LINKS, TEST_SOURCE_LAYERS, TEST_TARGET_LAYERS, ALL_TEST_SOURCES, ALL_TEST_TARGETS
+from test.test_data import ALL_TEST_SOURCES, ALL_TEST_TARGETS, TEST_POS_LINKS, TEST_SOURCE_LAYERS, TEST_TARGET_LAYERS
 from trace.data.artifact import Artifact
 from trace.data.trace_dataset_creator import TraceDatasetCreator
 from trace.data.trace_link import TraceLink
@@ -32,7 +33,7 @@ class TestTraceDatasetCreator(BaseTest):
     EXPECTED_VALIDATION_SIZE = 6
     EXPECTED_FEATURE_KEYS = ["input_ids", "token_type_ids", "attention_mask"]
     IRRELEVANT_FEATURE_KEYS = ["irrelevant_key1", "irrelevant_key2"]
-    TEST_MODEL_GENERATOR = ModelGenerator("pl_bert", "path")
+    TEST_MODEL_GENERATOR = ModelGenerator(SupportedBaseModel.PL_BERT, "path")
 
     # ========================= high-level testing (ensure all functionality works together) =========================
     @patch.object(ModelGenerator, "get_tokenizer")
@@ -186,7 +187,7 @@ class TestTraceDatasetCreator(BaseTest):
         extract_feature_info_mock.side_effect = fake_extract_feature_info
 
         test_trace_dataset_creator = self.get_test_trace_dataset_creator(
-            model_generator=ModelGenerator("bert_trace_siamese", "path"))
+            model_generator=ModelGenerator(SupportedBaseModel.BERT_TRACE_SIAMESE, "path"))
         source, target = TEST_POS_LINKS[0]
         test_link = self.get_test_link(source, target)
         feature_entry = test_trace_dataset_creator._get_feature_entry(test_link)

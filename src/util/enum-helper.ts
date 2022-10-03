@@ -148,6 +148,10 @@ export function traceModelOptions(): SelectOption[] {
       ModelType.PLBert,
       "Slower, higher quality links. Traces free-text artifacts to source code."
     ),
+    createEnumOption(
+      ModelType.AutomotiveBert,
+      "Slower, high quality links for automotive projects."
+    ),
     createEnumOption(ModelType.VSM, "Faster, lower quality links."),
   ];
 }

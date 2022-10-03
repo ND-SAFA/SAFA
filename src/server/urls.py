@@ -14,11 +14,12 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.http import HttpResponse
-from django.urls import path, include, re_path
-from rest_framework import permissions
-from server import views
-from drf_yasg.views import get_schema_view
+from django.urls import path, re_path
 from drf_yasg import openapi
+from drf_yasg.views import get_schema_view
+from rest_framework import permissions
+
+from server import views
 
 
 def homePageView(request):
@@ -43,6 +44,6 @@ urlpatterns = [
     path('', homePageView),
     path('predict/', views.PredictView.as_view()),
     path('train/', views.TrainView.as_view()),
-    path('create-model/', views.CreateModelView.as_view()),
-    path('delete-model/', views.DeleteModelView.as_view())
+    path('model/create', views.CreateModelView.as_view()),
+    path('model/delete', views.DeleteModelView.as_view())
 ]

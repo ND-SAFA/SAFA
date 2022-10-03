@@ -4,6 +4,7 @@ from typing import Dict
 import mock
 from django.test import Client
 from mock import patch
+
 from common.api.responses import BaseResponse
 from common.jobs.job_status import Status
 from common.models.model_generator import ModelGenerator

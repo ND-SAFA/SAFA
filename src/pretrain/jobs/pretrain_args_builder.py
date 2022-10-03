@@ -1,8 +1,8 @@
-from pretrain.config.constants import PRETRAIN_MODEL_PATH
 from common.jobs.abstract_args_builder import AbstractArgsBuilder
 from common.models.base_models.supported_base_model import SupportedBaseModel
 from common.models.model_generator import ModelGenerator
 from common.models.model_properties import ModelSize
+from pretrain.config.constants import PRETRAIN_MODEL_PATH
 from pretrain.data.corpuses.domain import Domain
 from pretrain.jobs.pretrain_args import PretrainArgs
 

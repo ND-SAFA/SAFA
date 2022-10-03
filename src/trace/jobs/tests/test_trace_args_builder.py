@@ -6,7 +6,6 @@ from trace.jobs.trace_args_builder import TraceArgsBuilder
 
 
 class TestTraceArgsBuilder(BaseTest):
-
     EXPECTED_VALUES = BaseTest.get_test_params(include_settings=False)
 
     def test_build(self):

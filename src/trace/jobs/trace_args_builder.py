@@ -1,9 +1,8 @@
 from typing import Dict, List, Tuple
 
 from common.jobs.abstract_args_builder import AbstractArgsBuilder
+from common.models.base_models.supported_base_model import SupportedBaseModel
 from common.models.model_generator import ModelGenerator
-from trace.config.constants import VALIDATION_PERCENTAGE_DEFAULT
-from trace.data.trace_dataset_creator import TraceDatasetCreator
 from trace.jobs.trace_args import TraceArgs
 
 

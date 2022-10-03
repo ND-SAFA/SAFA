@@ -3,7 +3,7 @@ from mock import patch
 
 from common.models.model_generator import ModelGenerator
 from test.base_test import BaseTest
-from test.test_data import TEST_POS_LINKS, TEST_SOURCE_LAYERS, TEST_TARGET_LAYERS, ALL_TEST_SOURCES, ALL_TEST_TARGETS
+from test.test_data import ALL_TEST_SOURCES, ALL_TEST_TARGETS, TEST_POS_LINKS, TEST_SOURCE_LAYERS, TEST_TARGET_LAYERS
 from trace.data.artifact import Artifact
 from trace.data.trace_dataset_creator import TraceDatasetCreator
 from trace.data.trace_link import TraceLink

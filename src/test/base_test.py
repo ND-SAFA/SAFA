@@ -5,16 +5,12 @@ from copy import deepcopy
 from django.test import TestCase
 
 from common.config.constants import DELETE_TEST_OUTPUT
-from common.storage.safa_storage import SafaStorage
-from test.config.paths import TEST_OUTPUT_DIR
-from test.test_data import TEST_SOURCE_LAYERS, TEST_TARGET_LAYERS, TEST_POS_LINKS
-from trace.config.constants import VALIDATION_PERCENTAGE_DEFAULT
-from transformers.models.bert.configuration_bert import BertConfig
-
 from common.models.base_models.pl_bert import PLBert
-from transformers.models.bert.tokenization_bert import BertTokenizer
-import mock
-from test.config.paths import TEST_VOCAB_FILE
+from common.models.base_models.supported_base_model import SupportedBaseModel
+from common.storage.safa_storage import SafaStorage
+from test.config.paths import TEST_OUTPUT_DIR, TEST_VOCAB_FILE
+from test.test_data import TEST_POS_LINKS, TEST_SOURCE_LAYERS, TEST_TARGET_LAYERS
+from trace.config.constants import VALIDATION_PERCENTAGE_DEFAULT
 
 
 class BaseTest(TestCase):

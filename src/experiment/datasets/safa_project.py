@@ -5,10 +5,13 @@ from typing import Dict, List, Tuple
 from trace.data.trace_dataset_creator import TraceDatasetCreator
 
 
-class LHPDataset:
-    PATH = "/Users/albertorodriguez/desktop/safa data/validation/LHP Test"
+class SafaProject:
+    """
+    Represents a project in the safa data format.
+    """
 
-    def __init__(self):
+    def __init__(self, project_path: str):
+        self.project_path = project_path
         self.safety_goals = self.__read_safa_artifacts("sg.json")  # sg
         self.functional_requirements = self.__read_safa_artifacts("fsr.json")  # fr
         self.system_requirements = self.__read_safa_artifacts("SYS.json")  # sr
@@ -40,7 +43,7 @@ class LHPDataset:
         return trace_dataset_creator
 
     def __read_safa_artifacts(self, data_file_name: str) -> Dict[str, str]:
-        data_file_path = os.path.join(LHPDataset.PATH, data_file_name)
+        data_file_path = os.path.join(self.project_path, data_file_name)
         data_file = self.__read_json_file(data_file_path)
         artifacts = {}
         for a in data_file["artifacts"]:
@@ -48,7 +51,7 @@ class LHPDataset:
         return artifacts
 
     def __read_safa_traces(self, data_file_name: str) -> List[Tuple[str, str]]:
-        data_file_path = os.path.join(LHPDataset.PATH, data_file_name)
+        data_file_path = os.path.join(self.project_path, data_file_name)
         data_file = self.__read_json_file(data_file_path)
         traces = []
         for t in data_file["traces"]:

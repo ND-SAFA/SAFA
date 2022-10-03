@@ -10,7 +10,7 @@ from experiment.common.model_architecture import ModelArchitecture
 from experiment.common.pretraining_data import PretrainingData
 from experiment.common.project import Project
 from experiment.common.run_mode import RunMode
-from experiment.datasets.lhp_dataset import LHPDataset
+from experiment.datasets.safa_project import SafaProject
 from trace.jobs.trace_args_builder import TraceArgsBuilder
 from trace.train.trace_trainer import TraceTrainer
 
@@ -21,12 +21,14 @@ class ExperimentRun:
                  pretraining: PretrainingData,
                  training_repositories: List[str],
                  metrics: List[str],
+                 validation_project_path: str,
                  architecture: ModelArchitecture = ModelArchitecture.NL_BERT,
                  ):
         self.model_state_path = model_state_path
         self.training_repositories = training_repositories
         self.metrics = metrics
         self.architecture = architecture
+        self.validation_project_path = validation_project_path
         self.run_name = "_".join([model_state_path, pretraining.value])
 
     def push(self):
@@ -45,7 +47,7 @@ class ExperimentRun:
         links: List[Tuple[str, str]] = training_data[2]
 
         # Trace Trainer
-        lhp_dataset = LHPDataset()
+        validation_project = SafaProject(self.validation_project_path)
         trace_args = TraceArgsBuilder(self.architecture.value,
                                       self.model_state_path,
                                       output_dir,
@@ -63,7 +65,7 @@ class ExperimentRun:
             trace_trainer.perform_training()
             trace_trainer.save_model(run_save_path)
         if run_mode in [RunMode.EVAL, RunMode.TRAINEVAL]:
-            eval_dataset = lhp_dataset.get_dataset(trace_args.model_generator).get_prediction_dataset()
+            eval_dataset = validation_project.get_dataset(trace_args.model_generator).get_prediction_dataset()
             predictions = trace_trainer.perform_prediction(eval_dataset)
             print("Predictions", "-" * 25)
             for metric in self.metrics:

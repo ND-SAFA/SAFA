@@ -11,7 +11,7 @@ from experiment.common.experiment_run import ExperimentRun
 from experiment.common.pretraining_data import PretrainingData
 from experiment.common.run_mode import RunMode
 
-OUTPUT_DIR = "/Users/albertorodriguez/Projects/SAFA/tgen/experiment"
+OUTPUT_DIR = "/Users/albertorodriguez/Desktop/safa data/automotive/models"
 REPOSITORIES = ["ApolloAuto/apollo",
                 "autorope/donkeycar",
                 "Autonomous-Racing-PG/ar-tu-do",
@@ -21,11 +21,12 @@ N_TRAINING_EPOCHS = 10
 PRETRAINING_DATA = PretrainingData.AUTOMOTIVE
 STATE_PATHS = ["base-bert-uncased",
                "thearod5/sebert-task-cls",
-               "/Users/albertorodriguez/Projects/SAFA/tgen/experiment/thearod5/sebert-task-cls_automotive",
-               "/Users/albertorodriguez/Projects/SAFA/tgen/experiment/thearod5/sebert-task-cls_automotive_lm",
-               "/Users/albertorodriguez/Projects/SAFA/tgen/experiment/thearod5/sebert-task-cls_automotive_lm_automotive",
-               "/Users/albertorodriguez/Projects/SAFA/tgen/experiment/nl_bert_automotive"]
+               "/Users/albertorodriguez/Desktop/safa data/automotive/models/thearod5/sebert-task-cls_automotive",
+               "/Users/albertorodriguez/Desktop/safa data/automotive/models/thearod5/sebert-task-cls_automotive_lm",
+               "/Users/albertorodriguez/Desktop/safa data/automotive/models/thearod5/sebert-task-cls_automotive_lm_automotive",
+               "/Users/albertorodriguez/Desktop/safa data/automotive/models/nl_bert_automotive"]
 METRICS = ["map_at_k"]
+TEST_PROJECT_PATH = "/Users/albertorodriguez/Desktop/safa data/validation/lhp/answer"
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -50,7 +51,8 @@ if __name__ == "__main__":
             STATE_PATHS[model_state_path_index],
             PRETRAINING_DATA,
             args.training_repos,
-            metrics=METRICS
+            METRICS,
+            TEST_PROJECT_PATH,
         )
         if args.mode == "lm":
             file_path = "/Users/albertorodriguez/desktop/safa data/automotive/txt"

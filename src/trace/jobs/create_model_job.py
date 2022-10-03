@@ -1,20 +1,19 @@
 from typing import Dict
 
-from common.storage.safa_storage import SafaStorage
-from trace.jobs.abstract_trace_job import AbstractTraceJob
+from common.jobs.abstract_job import AbstractJob
 from common.api.responses import BaseResponse
 from trace.jobs.trace_args_builder import TraceArgsBuilder
 
 
-class ModelJob(AbstractTraceJob):
+class CreateModelJob(AbstractJob):
 
     def __init__(self, args_builder: TraceArgsBuilder):
         super().__init__(args_builder, output_dir=args_builder.output_dir, save_output=False)
 
     def _run(self) -> Dict:
         """
-        Performs predictions and (optionally) evaluation of model
-        :return: results of the prediction including prediction values and associated ids
+        Creates a new model
+        :return: the model path
         """
         model_generator = self.args.model_generator
         model = model_generator.get_model()

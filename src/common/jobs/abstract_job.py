@@ -15,7 +15,7 @@ from common.storage.safa_storage import SafaStorage
 class AbstractJob(Thread, ABC):
     OUTPUT_FILENAME = "output.json"
 
-    def __init__(self, arg_builder: AbstractArgsBuilder, output_dir: str = None, save_output: bool = True):
+    def __init__(self, arg_builder: AbstractArgsBuilder = None, output_dir: str = '', save_output: bool = True):
         """
         Base job class
         :param arg_builder: job arguments
@@ -23,12 +23,12 @@ class AbstractJob(Thread, ABC):
         :param save_output: if True, saves the output of the job
         """
         super().__init__()
-        self.args = arg_builder.build()
+        self.args = arg_builder.build() if arg_builder else None
         self.status = Status.NOT_STARTED
         self.result = {}
         self.id = uuid.uuid4()
         self.save_output = save_output
-        if output_dir is None:
+        if not output_dir:
             output_dir = os.path.join(self.args.output_dir, str(self.id))
         self.output_dir = SafaStorage.add_mount_directory(output_dir)
         self.output_filepath = os.path.join(self.output_dir, self.OUTPUT_FILENAME)

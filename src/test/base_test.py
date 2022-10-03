@@ -32,13 +32,8 @@ class BaseTest(TestCase):
             SafaStorage.create_dir(TEST_OUTPUT_DIR)
 
     def tearDown(self):
-        if DELETE_TEST_OUTPUT and os.path.isdir(TEST_OUTPUT_DIR):
-            for file in os.listdir(TEST_OUTPUT_DIR):
-                file_path = os.path.join(TEST_OUTPUT_DIR, file)
-                if os.path.isfile(file_path):
-                    os.remove(file_path)
-                else:
-                    shutil.rmtree(file_path)
+        if DELETE_TEST_OUTPUT and os.path.exists(TEST_OUTPUT_DIR):
+            shutil.rmtree(TEST_OUTPUT_DIR)
 
     @staticmethod
     def get_test_params(include_artifacts=True, include_links=True, include_settings=True):

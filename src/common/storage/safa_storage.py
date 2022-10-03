@@ -29,7 +29,7 @@ class SafaStorage:
             os.makedirs(os.path.dirname(dir_path))
 
     @staticmethod
-    def add_mount_directory(target_path: str):
+    def add_mount_directory(target_path: str = ''):
         """
         Adds mounting directory to given target path.
         :param target_path: The path to add mount directory to.

@@ -18,10 +18,11 @@ def validate_settings(value):
 
 
 class BaseTraceSerializer(serializers.Serializer):
-    modelPath = serializers.CharField(max_length=255)  # The path to the model weights / state.
-    outputDir = serializers.CharField(max_length=255)  # Path to directory of output file.
-    baseModel = EnumField(choices=SupportedBaseModel, to_repr=lambda a: a)  # The base model class to use.
-    settings = serializers.DictField(required=False, validators=[validate_settings])
+    modelPath = serializers.CharField(max_length=255, help_text="The path to the model weights / state.")
+    outputDir = serializers.CharField(max_length=255, help_text="Path to directory of output file.")
+    baseModel = EnumField(choices=SupportedBaseModel, to_repr=lambda a: a, help_text="The base model class to use.")
+    settings = serializers.DictField(required=False, validators=[validate_settings],
+                                     help_text="Dictionary of custom fields to initialize trainer with.")
 
     def create(self, validated_data):
         return TraceArgsBuilder(base_model=validated_data["baseModel"],
@@ -32,15 +33,19 @@ class BaseTraceSerializer(serializers.Serializer):
 
 class PredictSerializer(BaseTraceSerializer):
     sourceLayers = serializers.ListField(
-        child=serializers.DictField(child=serializers.CharField())
-    )  # List of dictionaries corresponding to the source artifacts at each layer
+        child=serializers.DictField(child=serializers.CharField()),
+        help_text="List of dictionaries corresponding to the source artifacts at each layer."
+    )
     targetLayers = serializers.ListField(
-        child=serializers.DictField(child=serializers.CharField())
-    )  # List of dictionaries corresponding to the target artifacts at each layer
-    loadFromStorage = serializers.BooleanField(required=False)  # Whether model weights should reference cloud storage
+        child=serializers.DictField(child=serializers.CharField()),
+        help_text="List of dictionaries corresponding to the target artifacts at each layer"
+    )
+    loadFromStorage = serializers.BooleanField(required=False,
+                                               help_text="Whether model weights should reference cloud storage.")
 
 
 class TrainSerializer(PredictSerializer):
     links = serializers.ListField(
-        child=serializers.ListField(child=serializers.CharField())
-    )  # List of true links between source and target artifacts
+        child=serializers.ListField(child=serializers.CharField()),
+        help_text="List of true links between source and target artifacts"
+    )

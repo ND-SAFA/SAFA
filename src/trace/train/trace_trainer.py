@@ -8,8 +8,7 @@ from torch.utils.data.sampler import RandomSampler
 from transformers.trainer import Trainer
 from transformers.trainer_pt_utils import get_tpu_sampler, is_torch_tpu_available
 from transformers.trainer_utils import PredictionOutput
-
-from common.api.prediction_response import PredictionResponse
+from common.api.responses import PredictionResponse
 from trace.config.constants import LINKED_TARGETS_ONLY_DEFAULT, N_EPOCHS
 from trace.jobs.trace_args import TraceArgs
 from trace.metrics.supported_trace_metric import get_metric_path

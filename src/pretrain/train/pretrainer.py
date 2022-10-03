@@ -4,10 +4,10 @@ from typing import Dict
 
 from transformers.convert_tf_hub_seq_to_seq_bert_to_pytorch import convert_tf_checkpoint_to_pytorch
 
-from common.api.prediction_response import PredictionResponse
 from pretrain.electra.build_pretraining_dataset import write_examples
 from pretrain.electra.run_pretraining import train_or_eval
 from pretrain.jobs.pretrain_args import PretrainArgs
+from common.api.responses import BaseResponse
 
 
 class PreTrainer:
@@ -74,5 +74,5 @@ class PreTrainer:
         """
         output = {}
         self.config.set_do_train(False)
-        output[PredictionResponse.METRICS] = train_or_eval(self.config)
+        output[BaseResponse.METRICS] = train_or_eval(self.config)
         return output

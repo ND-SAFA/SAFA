@@ -1,105 +1,112 @@
 import json
-from copy import deepcopy
-from typing import Dict
+from abc import ABC
+from typing import Dict, Union
 
 from django.http.request import HttpRequest
-from django.http.response import HttpResponse, JsonResponse
+from django.http.response import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-
-from common.api.job_response import JobResponse
-from common.api.prediction_request import PredictionRequest
-from common.models.model_generator import ModelGenerator
+from common.api.responses import BaseResponse
+from common.api.request_serializers import PredictSerializer, TrainSerializer, BaseTraceSerializer
 from common.storage.safa_storage import SafaStorage
 from server.job_type import JobType
-from trace.config.constants import VALIDATION_PERCENTAGE_DEFAULT
-from trace.jobs.trace_args_builder import TraceArgsBuilder
+from rest_framework.views import APIView
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework import status, permissions
+from drf_yasg.openapi import Schema, TYPE_OBJECT
+
+SERIALIZERS = {JobType.MODEL: BaseTraceSerializer,
+               JobType.PREDICT: PredictSerializer,
+               JobType.TRAIN: TrainSerializer}
 
 
-@csrf_exempt
-def create_model(request: HttpRequest) -> HttpResponse:
-    body = _request_to_dict(request)
-    base_class_name = body["baseModelClass"]
-    model_path = body["statePath"]
-    output_path = body["outputPath"]
-    new_model_path = SafaStorage.add_mount_directory(output_path)
-    model_generator = ModelGenerator(base_class_name, model_path)
-    model = model_generator.get_model()
-    model.save_pretrained(new_model_path)
-    tokenizer = model_generator.get_tokenizer()
-    tokenizer.save_pretrained(new_model_path)
-    return JsonResponse(body)
+class BaseTraceJobView(APIView, ABC):
+    permission_classes = (permissions.AllowAny,)
+
+    @staticmethod
+    def get_responses(response_keys: Union[str, list]) -> Dict:
+        """
+        Gets properties used to generate response documentation
+        :param response_keys: either a single response key or a list of response keys to get properties for
+        :return: the response dictionary
+        """
+        return {
+            status.HTTP_200_OK: Schema(type=TYPE_OBJECT,
+                                       properties=BaseResponse.get_properties(response_keys))}
+
+    @staticmethod
+    def _request_to_dict(request: HttpRequest) -> Dict:
+        """
+        Converts a HttpRequest to a dictionary
+        :param request: the HttpRequest
+        :return: a dictionary containing the information from the request body
+        """
+        return json.loads(request.body)
+
+    @staticmethod
+    def _run_job(request: HttpRequest, job_type: JobType, run_async: bool = True) -> JsonResponse:
+        """
+        Runs the specified job using params from a given request
+        :param request: request from client
+        :param job_type: job type to run
+        :param run_async:
+        :return: the job name
+        """
+        data = BaseTraceJobView._request_to_dict(request)
+        serializer = SERIALIZERS[job_type](data=data)
+        if serializer.is_valid():
+            args_builder = serializer.save()
+            job = job_type.value(args_builder)
+            job.start()
+            if run_async:
+                response_dict = {BaseResponse.JOB_ID: str(job.id)}
+            else:
+                job.join()
+                response_dict = job.result
+            SafaStorage.remove_mount_directory(job.output_filepath)
+            return JsonResponse(response_dict)
+        return JsonResponse(serializer.errors)
 
 
-@csrf_exempt
-def predict(request: HttpRequest) -> JsonResponse:
-    """
-    For generating trace links from artifacts
-    :param request: request from client containing model and artifact information
-    :return: output of prediction
-    """
-    return _run_job(request, JobType.PREDICT)
+class ModelView(BaseTraceJobView):
+    job_type = JobType.MODEL
+    responses = BaseTraceJobView.get_responses([BaseResponse.MODEL_PATH, BaseResponse.STATUS, BaseResponse.EXCEPTION])
+
+    @csrf_exempt
+    @swagger_auto_schema(request_body=SERIALIZERS[job_type], responses=responses)
+    def post(self, request: HttpRequest) -> JsonResponse:
+        """
+        For creating a new model
+        :param: the http request
+        :return JSONResponse including the model path or exception and status of the job
+        """
+        return self._run_job(request, self.job_type, run_async=False)
 
 
-@csrf_exempt
-def fine_tune(request: HttpRequest) -> JsonResponse:
-    """
-    For fine-tuning a model on project data
-    :param request: request from client containing model and artifact information
-    :return: output of training
-    """
-    print("starting fine tube...")
-    return _run_job(request, JobType.TRAIN, True)
+class PredictView(BaseTraceJobView):
+    job_type = JobType.PREDICT
+    responses = BaseTraceJobView.get_responses([BaseResponse.JOB_ID])
+
+    @csrf_exempt
+    @swagger_auto_schema(request_body=SERIALIZERS[job_type], responses=responses)
+    def post(self, request: HttpRequest) -> JsonResponse:
+        """
+        For generating trace links from artifacts
+        :param: the http request
+        :return JSONResponse including the job id
+        """
+        return self._run_job(request, self.job_type)
 
 
-def _run_job(request: HttpRequest, job_type: JobType, add_mount=False) -> JsonResponse:
-    """
-    Runs the specified job using params from a given request
-    :param request: request from client
-    :param job_type: job type to run
-    :return: the job name
-    """
-    request_dict = _request_to_dict(request)
-    args = _make_job_params_from_request(request_dict, add_mount=add_mount)
-    job = job_type.value(args)
-    job.start()
-    return JsonResponse({JobResponse.OUTPUT_PATH: SafaStorage.remove_mount_directory(job.output_filepath)})
+class TrainView(BaseTraceJobView):
+    job_type = JobType.TRAIN
+    responses = BaseTraceJobView.get_responses([BaseResponse.JOB_ID])
 
-
-def _make_job_params_from_request(request_dict: Dict, add_mount=False) -> TraceArgsBuilder:
-    """
-    Extracts necessary information from a request and creates an arg builder from it
-    :param request_dict: a dictionary from the request body
-    :return: a TraceArgsBuilder for the request
-    """
-    params = deepcopy(request_dict)
-    model_path = params.pop(PredictionRequest.MODEL_PATH)
-    sources = params.pop(PredictionRequest.SOURCES)
-    targets = params.pop(PredictionRequest.TARGETS)
-    base_model = params.pop(PredictionRequest.BASE_MODEL)
-    output_dir = params.pop(PredictionRequest.OUTPUT_DIR)
-    links = _safe_pop(params, PredictionRequest.LINKS)  # optional
-    load_from_storage = _safe_pop(params, PredictionRequest.LOAD_FROM_STORAGE, add_mount)
-    if add_mount or load_from_storage:
-        model_path = SafaStorage.add_mount_directory(model_path)
-    return TraceArgsBuilder(base_model, model_path, output_dir, sources, targets, links, VALIDATION_PERCENTAGE_DEFAULT,
-                            **params)
-
-
-def _safe_pop(dict_: Dict, key: any, default: any = None) -> any:
-    """
-    Safely removes a value from dictionary, returning a default value if the key is not in the dictionary
-    :param dict_: the dictionary
-    :param key: the key to pop
-    :param default: default value to return if key is not in the dictionary
-    :return: dictionary element that was popped or default
-    """
-    return dict_.pop(key) if key in dict_ else default
-
-
-def _request_to_dict(request: HttpRequest) -> Dict:
-    """
-    Converts a HttpRequest to a dictionary
-    :param request: the HttpRequest
-    :return: a dictionary containing the information from the request body
-    """
-    return json.loads(request.body)
+    @csrf_exempt
+    @swagger_auto_schema(request_body=SERIALIZERS[job_type], responses=responses)
+    def post(self, request: HttpRequest) -> JsonResponse:
+        """
+        For training a model on project data
+        :param: the http request
+        :return JSONResponse including the job id
+        """
+        return self._run_job(request, self.job_type)

@@ -1,47 +1,45 @@
 import json
-from copy import deepcopy
 from typing import Dict
 
 import mock
-from django.test import Client, TestCase
+from django.test import Client
 from mock import patch
-
-from common.api.job_response import JobResponse
-from common.api.prediction_request import PredictionRequest
+from common.api.responses import BaseResponse
 from common.models.model_generator import ModelGenerator
-from test.config.paths import TEST_OUTPUT_DIR
-from test.test_data import TEST_POS_LINKS, TEST_SOURCE_LAYERS, TEST_TARGET_LAYERS
-from test.test_model import get_test_model
-from test.test_tokenizer import get_test_tokenizer
+from test.base_test import BaseTest
 
 
-class TestViews(TestCase):
-    TEST_PARAMS = {PredictionRequest.SOURCES: TEST_SOURCE_LAYERS,
-                   PredictionRequest.TARGETS: TEST_TARGET_LAYERS,
-                   PredictionRequest.MODEL_PATH: "path/to/model",
-                   PredictionRequest.BASE_MODEL: "pl_bert",
-                   PredictionRequest.OUTPUT_DIR: TEST_OUTPUT_DIR,
-                   "max_seq_length": 100,
-                   "pad_to_max_length": True,
-                   "should_save": False}
+class TestViews(BaseTest):
 
     @patch.object(ModelGenerator, '_ModelGenerator__load_model')
-    @patch.object(ModelGenerator, 'get_tokenizer')
-    def test_fine_tune(self, get_tokenizer_mock: mock.MagicMock, load_model_mock: mock.MagicMock):
-        fine_tune_params = deepcopy(self.TEST_PARAMS)
-        fine_tune_params[PredictionRequest.LINKS] = TEST_POS_LINKS
-        load_model_mock.return_value = get_test_model()
-        get_tokenizer_mock.return_value = get_test_tokenizer()
-        response_dict = self.make_test_request('/fine-tune/', fine_tune_params)
-        self.assertIn(JobResponse.OUTPUT_PATH, response_dict)
+    @patch('common.models.model_generator.ModelGenerator.get_tokenizer')
+    def test_model(self, get_tokenizer_mock, load_model_mock):
+        load_model_mock.return_value = self.get_test_model()
+        get_tokenizer_mock.return_value = self.get_test_tokenizer()
+        response_dict = self.make_test_request('/models/', self.get_test_params(include_artifacts=False))
+        self.assertIn(BaseResponse.MODEL_PATH, response_dict)
+
+    @patch.object(ModelGenerator, '_ModelGenerator__load_model')
+    @patch('common.models.model_generator.ModelGenerator.get_tokenizer')
+    def test_train(self, get_tokenizer_mock, load_model_mock):
+        load_model_mock.return_value = self.get_test_model()
+        get_tokenizer_mock.return_value = self.get_test_tokenizer()
+        response_dict = self.make_test_request('/train/', self.get_test_params())
+        self.assertIn(BaseResponse.JOB_ID, response_dict)
 
     @patch.object(ModelGenerator, '_ModelGenerator__load_model')
     @patch.object(ModelGenerator, 'get_tokenizer')
     def test_predict(self, get_tokenizer_mock: mock.MagicMock, load_model_mock: mock.MagicMock):
-        load_model_mock.return_value = get_test_model()
-        get_tokenizer_mock.return_value = get_test_tokenizer()
-        response_dict = self.make_test_request('/predict/', self.TEST_PARAMS)
-        self.assertIn(JobResponse.OUTPUT_PATH, response_dict)
+        load_model_mock.return_value = self.get_test_model()
+        get_tokenizer_mock.return_value = self.get_test_tokenizer()
+        response_dict = self.make_test_request('/predict/', self.get_test_params(include_links=False))
+        self.assertIn(BaseResponse.JOB_ID, response_dict)
+
+    def test_bad_request(self):
+        bad_params = self.get_test_params()
+        bad_params["settings"] = {"unknown_arg": 10}
+        response_dict = self.make_test_request('/train/', bad_params)
+        self.assertIn("settings", response_dict)
 
     def make_test_request(self, url: str, params: dict) -> Dict:
         c = Client()

@@ -144,6 +144,7 @@ public class GithubProjectCreationJob extends CommitJob {
         this.commitSha = connectionService.getRepositoryBranch(this.credentials, repositoryName,
             this.githubRepositoryDTO.getDefaultBranch()).getLastCommitSha();
         this.projectCommit.addArtifacts(ModificationType.ADDED, getArtifacts());
+        System.out.println("HERE I AM " + projectCommit.getArtifacts().getSize());
         this.githubProject.setLastCommitSha(this.commitSha);
         this.serviceProvider.getGithubProjectRepository().save(githubProject);
     }

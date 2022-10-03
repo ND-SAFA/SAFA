@@ -53,6 +53,7 @@ public class GithubProjectUpdateJob extends GithubProjectCreationJob {
             githubProject.getLastCommitSha()
         );
 
+        log.info("Retrieving diff");
         for (GithubCommitDiffResponseDTO.GithubFileDiffDTO diff : diffResponseDTO.getFiles()) {
             log.info(diff.toString());
             String name = diff.getFilename();

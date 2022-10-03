@@ -3,9 +3,11 @@ package features.github.base;
 import java.io.File;
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import common.ApplicationBaseTest;
+import edu.nd.crc.safa.features.github.entities.app.GithubCommitDiffResponseDTO;
 import edu.nd.crc.safa.features.github.entities.app.GithubRepositoryBranchDTO;
 import edu.nd.crc.safa.features.github.entities.app.GithubRepositoryDTO;
 import edu.nd.crc.safa.features.github.entities.app.GithubRepositoryFiletreeResponseDTO;
@@ -29,7 +31,9 @@ public abstract class AbstractGithubTest extends ApplicationBaseTest {
     private static final String REPOSITORY_RESPONSE_FILE = "mock/github/repository_response.json";
     private static final String MASTER_BRANCH_RESPONSE_FILE = "mock/github/master_branch_response.json";
     private static final String FILETREE_RESPONSE_FILE = "mock/github/filetree_response.json";
+    private static final String DIFF_RESPONSE_FILE = "mock/github/diff_response.json";
 
+    protected String repositoryName = "home_assistant_ro";
     protected String githubLogin = "safaGithub";
     protected GithubAccessCredentials credentials = new GithubAccessCredentials();
 
@@ -83,6 +87,14 @@ public abstract class AbstractGithubTest extends ApplicationBaseTest {
             this.readResourceFile(FILETREE_RESPONSE_FILE, GithubRepositoryFiletreeResponseDTO.class)
         );
 
+        Mockito.when(serviceMock.getDiffBetweenOldCommitAndHead(
+                Mockito.any(GithubAccessCredentials.class),
+                Mockito.any(String.class),
+                Mockito.any(String.class)
+        )).thenReturn(
+            this.readResourceFile(DIFF_RESPONSE_FILE, GithubCommitDiffResponseDTO.class)
+        );
+
         credentials.setAccessTokenExpirationDate(LocalDateTime.MAX);
         credentials.setRefreshTokenExpirationDate(LocalDateTime.MAX);
     }
@@ -101,5 +113,18 @@ public abstract class AbstractGithubTest extends ApplicationBaseTest {
             ex.printStackTrace();
             return null;
         }
+    }
+
+    protected void createBaseSafaProject(String projectName, int initialArtifactCount) {
+        String artifactTypeName = "requirement";
+
+        dbEntityBuilder
+            .newProject(projectName)
+            .newVersion(projectName)
+            .newType(projectName, artifactTypeName);
+
+        IntStream.range(0, initialArtifactCount).mapToObj(String::valueOf).forEach(name -> {
+            dbEntityBuilder.newArtifact(projectName, artifactTypeName, name);
+        });
     }
 }

@@ -15,6 +15,7 @@ import edu.nd.crc.safa.features.github.entities.db.GithubAccessCredentials;
 import edu.nd.crc.safa.features.github.repositories.GithubAccessCredentialsRepository;
 import edu.nd.crc.safa.features.github.services.GithubConnectionService;
 import edu.nd.crc.safa.features.jobs.builders.CreateProjectViaGithubBuilder;
+import edu.nd.crc.safa.features.jobs.builders.ImportIntoProjectViaGithubBuilder;
 import edu.nd.crc.safa.features.jobs.builders.UpdateProjectViaGithubBuilder;
 import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
@@ -111,6 +112,28 @@ public class GithubController extends BaseController {
             ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersion();
             GithubIdentifier identifier = new GithubIdentifier(projectVersion, repositoryName);
             UpdateProjectViaGithubBuilder builder = new UpdateProjectViaGithubBuilder(serviceProvider, identifier);
+            GithubResponseDTO<JobAppEntity> responseDTO = new GithubResponseDTO<>(builder.perform(),
+                GithubResponseMessage.OK);
+
+            output.setResult(responseDTO);
+        });
+
+        return output;
+    }
+
+    @PostMapping(AppRoutes.Github.Import.IMPORT_INTO_EXISTING)
+    public DeferredResult<GithubResponseDTO<JobAppEntity>> importIntoExistingProject(
+        @PathVariable("versionId") UUID versionId,
+        @PathVariable("repositoryName") String repositoryName) {
+        DeferredResult<GithubResponseDTO<JobAppEntity>> output = executorDelegate.createOutput(5000L);
+
+        executorDelegate.submit(output, () -> {
+            this.checkCredentials();
+
+            ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersion();
+            GithubIdentifier identifier = new GithubIdentifier(projectVersion, repositoryName);
+            ImportIntoProjectViaGithubBuilder builder = new ImportIntoProjectViaGithubBuilder(serviceProvider,
+                identifier);
             GithubResponseDTO<JobAppEntity> responseDTO = new GithubResponseDTO<>(builder.perform(),
                 GithubResponseMessage.OK);
 

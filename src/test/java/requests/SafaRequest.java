@@ -2,6 +2,7 @@ package requests;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.File;
@@ -9,7 +10,6 @@ import java.util.List;
 import java.util.function.Function;
 
 import edu.nd.crc.safa.utilities.JsonFileUtilities;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.http.MediaType;
@@ -133,7 +133,15 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
     }
 
     public JSONObject postWithoutBody(ResultMatcher resultMatcher) throws Exception {
-        MockHttpServletRequestBuilder request = post(this.buildEndpoint());
+        return makeRequestWithoutBody(post(this.buildEndpoint()), resultMatcher);
+    }
+
+    public JSONObject putWithoutBody(ResultMatcher resultMatcher) throws Exception {
+        return makeRequestWithoutBody(put(this.buildEndpoint()), resultMatcher);
+    }
+
+    public JSONObject makeRequestWithoutBody(MockHttpServletRequestBuilder request,
+                                       ResultMatcher resultMatcher) throws Exception {
 
         if (authorizationToken != null && !authorizationToken.equals("")) {
             request = request.header("Authorization", authorizationToken);

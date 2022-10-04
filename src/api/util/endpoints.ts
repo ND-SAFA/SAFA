@@ -48,7 +48,6 @@ export enum Endpoint {
 
   // Links
   getGeneratedLinks = "projects/versions/:versionId/links/generated",
-  generateLinks = "projects/links/generate",
   generateLinksJob = "jobs/projects/links/generate",
   trainModelJob = "jobs/projects/:projectId/models/train",
 

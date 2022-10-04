@@ -18,7 +18,7 @@ export interface TraceMatrixModel extends ResourceModel, ArtifactLevelModel {}
 /**
  * Defines a trace matrix generation request.
  */
-export interface GeneratedMatrixModel extends ArtifactLevelModel {
+export interface GeneratedMatrixModel {
   /**
    * The default model to use to generate links.
    */
@@ -27,6 +27,10 @@ export interface GeneratedMatrixModel extends ArtifactLevelModel {
    * The custom model used to generate links.
    */
   model?: TrainedModel;
+  /**
+   * The artifact levels to trace with method.
+   */
+  artifactLevels: ArtifactLevelModel[];
 }
 
 /**

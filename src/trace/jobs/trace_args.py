@@ -36,7 +36,7 @@ class TraceArgs(TrainingArguments):
                                                          validation_percentage=self.validation_percentage) \
             if source_layers and target_layers else None
 
-    def __set_args(self, **kwargs) -> None:
+    def __set_args(self, kwargs) -> None:
         """
         Sets class args
         :param kwargs: optional arguments for Trainer

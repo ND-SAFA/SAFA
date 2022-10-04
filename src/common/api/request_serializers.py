@@ -60,3 +60,4 @@ class TrainSerializer(PredictSerializer):
     def create(self, validated_data):
         trace_args_builder = super().create(validated_data)
         trace_args_builder.links = validated_data["links"]
+        return trace_args_builder

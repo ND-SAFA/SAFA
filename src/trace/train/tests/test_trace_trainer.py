@@ -85,5 +85,11 @@ class TestTraceTrainer(BaseTest):
             model_generator.get_tokenizer = mock.MagicMock(return_value=self.get_test_tokenizer())
             test_params = self.get_test_params(include_links=include_links)
             test_params["validation_percentage"] = self.VAlIDATION_PERCENTAGE
-            args = TraceArgs(**test_params, model_generator=model_generator, **kwargs)
+            # Tried expanding test_params, but didn't know what to do with base_model param
+            args = TraceArgs(output_dir=test_params["output_dir"],
+                             source_layers=test_params["source_layers"],
+                             target_layers=test_params["target_layers"],
+                             links=test_params["links"] if include_links else None,
+                             model_generator=model_generator,
+                             **kwargs)
         return TraceTrainer(args)

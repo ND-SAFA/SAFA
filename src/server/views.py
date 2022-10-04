@@ -70,9 +70,7 @@ class BaseTraceJobView(APIView, ABC):
             if run_async:
                 response_dict = {BaseResponse.JOB_ID: str(job.id)}
             else:
-                print("Job is starting...")
                 job.join()
-                print("JOINED.")
                 response_dict = job.result
         else:
             response_dict = job

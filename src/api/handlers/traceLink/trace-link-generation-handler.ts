@@ -91,10 +91,9 @@ export async function handleGenerateLinks(
     .map(({ source, target }) => `${source} -> ${target}`)
     .join(", ");
 
-  console.log("Method:", method);
   try {
     const job = await createGeneratedLinks({
-      requests: [createTrainingRequests(artifactLevels, method, model)],
+      requests: [createGeneratedMatrix(artifactLevels, method, model)],
       projectVersion: projectStore.version,
     });
 
@@ -132,9 +131,7 @@ export async function handleTrainModel(
 
   try {
     const job = await createModelTraining(projectStore.projectId, {
-      requests: [
-        createTrainingRequests(artifactLevels, model.baseModel, model),
-      ],
+      requests: [createGeneratedMatrix(artifactLevels, model.baseModel, model)],
     });
 
     await handleJobSubmission(job);
@@ -150,12 +147,18 @@ export async function handleTrainModel(
   }
 }
 
-function createTrainingRequests(
+/**
+ * Creates a generated trace matrix defined over many artifact levels for
+ * some tracing method or custom model.
+ * @param artifactLevels - The artifact levels to train on.
+ * @param method - If a baseline method is used, this defines that method.
+ * @param model - If a custom model is used,
+ */
+function createGeneratedMatrix(
   artifactLevels: ArtifactLevelModel[],
   method?: ModelType,
   model?: TrainedModel
 ): GeneratedMatrixModel {
-  console.log("CreatingTrainingRequest: ", model);
   return {
     method: model?.baseModel || method || ModelType.NLBert,
     model,

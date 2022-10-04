@@ -1,7 +1,6 @@
+from common.models.base_models.supported_base_model import SupportedBaseModel
 from common.models.model_generator import ModelGenerator
 from test.base_test import BaseTest
-from test.test_data import TEST_POS_LINKS, TEST_SOURCE_LAYERS, TEST_TARGET_LAYERS
-from trace.data.trace_dataset_creator import TraceDatasetCreator
 from trace.jobs.trace_args import TraceArgs
 
 
@@ -19,12 +18,7 @@ class TestTraceArgs(BaseTest):
             self.fail(e)
 
     def get_test_trace_args(self, **kwargs):
-        model_generator = ModelGenerator("bert_trace_siamese", "path")
+        model_generator = ModelGenerator(SupportedBaseModel.BERT_TRACE_SIAMESE, "path")
         return TraceArgs(model_generator,
-                         TraceDatasetCreator(source_layers=TEST_SOURCE_LAYERS, target_layers=TEST_TARGET_LAYERS,
-                                             true_links=TEST_POS_LINKS,
-                                             model_generator=model_generator,
-                                             validation_percentage=self.validation_percentage),
-
-                         "output_path",
+                         **self.get_test_params(),
                          **kwargs)

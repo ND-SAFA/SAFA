@@ -8,7 +8,6 @@ from common.models.base_models.supported_base_model import SupportedBaseModel
 from common.models.model_generator import ModelGenerator
 from common.models.model_properties import ArchitectureType
 from test.base_test import BaseTest
-from test.test_tokenizer import get_test_tokenizer
 
 
 class TestTokenizer:
@@ -79,11 +78,11 @@ class TestModelGenerator(BaseTest):
         self.assertEquals(test_generator._max_seq_length, 5)
 
     def get_test_model_generator(self):
-        return ModelGenerator(self.TEST_BASE_MODEL["base_model_name"], "path")
+        return ModelGenerator(self.TEST_BASE_MODEL["supported_base_model"], "path")
 
     @patch.object(ModelGenerator, 'get_tokenizer')
     def test_get_feature_with_return_token_type_ids(self, get_tokenizer_mock: mock.MagicMock):
-        get_tokenizer_mock.return_value = get_test_tokenizer()
+        get_tokenizer_mock.return_value = self.get_test_tokenizer()
 
         test_model_generator = self.get_test_model_generator()
         feature = test_model_generator.get_feature(text="token", return_token_type_ids=True)
@@ -91,7 +90,7 @@ class TestModelGenerator(BaseTest):
 
     @patch.object(ModelGenerator, 'get_tokenizer')
     def test_get_feature_without_return_token_type_ids(self, get_tokenizer_mock: mock.MagicMock):
-        get_tokenizer_mock.return_value = get_test_tokenizer()
+        get_tokenizer_mock.return_value = self.get_test_tokenizer()
 
         test_model_generator = self.get_test_model_generator()
         feature = test_model_generator.get_feature(text="token", return_token_type_ids=False)

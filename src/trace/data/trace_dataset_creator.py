@@ -4,7 +4,8 @@ from typing import Dict, Iterable, List, Tuple, Set, Sized, Callable, Optional
 
 import torch
 
-from trace.config.constants import EVAL_DATASET_SIZE_DEFAULT, LINKED_TARGETS_ONLY_DEFAULT, RESAMPLE_RATE_DEFAULT
+from trace.config.constants import EVAL_DATASET_SIZE_DEFAULT, LINKED_TARGETS_ONLY_DEFAULT, RESAMPLE_RATE_DEFAULT, \
+    VALIDATION_PERCENTAGE_DEFAULT
 from trace.data.artifact import Artifact
 from trace.data.data_key import DataKey
 from trace.data.trace_dataset import TraceDataset
@@ -18,7 +19,7 @@ class TraceDatasetCreator:
     """
 
     def __init__(self, source_layers: List[Dict[str, str]], target_layers: List[Dict[str, str]], model_generator: ModelGenerator,
-                 true_links: List[Tuple[str, str]] = None, validation_percentage: float = 0.0):
+                 true_links: List[Tuple[str, str]] = None, validation_percentage: float = VALIDATION_PERCENTAGE_DEFAULT):
         """
         Constructs datasets for trace link training and validation
         :param source_layers: a list of source artifacts across all layers

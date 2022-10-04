@@ -1,10 +1,10 @@
 import mock
 from mock import patch
 
+from common.models.base_models.supported_base_model import SupportedBaseModel
 from common.models.model_generator import ModelGenerator
 from test.base_test import BaseTest
-from test.test_data import TEST_POS_LINKS, TEST_SOURCE_LAYERS, TEST_TARGET_LAYERS, ALL_TEST_SOURCES, ALL_TEST_TARGETS
-from test.test_tokenizer import get_test_tokenizer
+from test.test_data import ALL_TEST_SOURCES, ALL_TEST_TARGETS, TEST_POS_LINKS, TEST_SOURCE_LAYERS, TEST_TARGET_LAYERS
 from trace.data.artifact import Artifact
 from trace.data.trace_dataset_creator import TraceDatasetCreator
 from trace.data.trace_link import TraceLink
@@ -33,12 +33,12 @@ class TestTraceDatasetCreator(BaseTest):
     EXPECTED_VALIDATION_SIZE = 6
     EXPECTED_FEATURE_KEYS = ["input_ids", "token_type_ids", "attention_mask"]
     IRRELEVANT_FEATURE_KEYS = ["irrelevant_key1", "irrelevant_key2"]
-    TEST_MODEL_GENERATOR = ModelGenerator("pl_bert", "path")
+    TEST_MODEL_GENERATOR = ModelGenerator(SupportedBaseModel.PL_BERT, "path")
 
     # ========================= high-level testing (ensure all functionality works together) =========================
     @patch.object(ModelGenerator, "get_tokenizer")
     def test_get_training_and_validation_dataset_with_transformers(self, get_tokenizer_mock: mock.MagicMock):
-        get_tokenizer_mock.return_value = get_test_tokenizer()
+        get_tokenizer_mock.return_value = self.get_test_tokenizer()
         test_trace_dataset_creator = self.get_test_trace_dataset_creator()
         training_dataset = test_trace_dataset_creator.get_training_dataset(resample_rate=1).data
         validation_dataset = test_trace_dataset_creator.get_validation_dataset().data
@@ -48,7 +48,7 @@ class TestTraceDatasetCreator(BaseTest):
 
     @patch.object(ModelGenerator, "get_tokenizer")
     def test_get_prediction_dataset_with_transformers(self, get_tokenizer_mock: mock.MagicMock):
-        get_tokenizer_mock.return_value = get_test_tokenizer()
+        get_tokenizer_mock.return_value = self.get_test_tokenizer()
         test_trace_dataset_creator = self.get_test_trace_dataset_creator(include_links=False)
         prediction_dataset = test_trace_dataset_creator.get_prediction_dataset().data
 
@@ -56,7 +56,7 @@ class TestTraceDatasetCreator(BaseTest):
 
     @patch.object(ModelGenerator, "get_tokenizer")
     def test_create_dataset_full(self, get_tokenizer_mock: mock.MagicMock):
-        get_tokenizer_mock.return_value = get_test_tokenizer()
+        get_tokenizer_mock.return_value = self.get_test_tokenizer()
         test_trace_dataset_creator = self.get_test_trace_dataset_creator(include_links=False)
         links = self.get_links(TEST_POS_LINKS)
         dataset = test_trace_dataset_creator._create_dataset(list(links.keys()))
@@ -187,7 +187,7 @@ class TestTraceDatasetCreator(BaseTest):
         extract_feature_info_mock.side_effect = fake_extract_feature_info
 
         test_trace_dataset_creator = self.get_test_trace_dataset_creator(
-            model_generator=ModelGenerator("bert_trace_siamese", "path"))
+            model_generator=ModelGenerator(SupportedBaseModel.BERT_TRACE_SIAMESE, "path"))
         source, target = TEST_POS_LINKS[0]
         test_link = self.get_test_link(source, target)
         feature_entry = test_trace_dataset_creator._get_feature_entry(test_link)

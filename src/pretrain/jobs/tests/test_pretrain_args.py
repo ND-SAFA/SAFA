@@ -1,5 +1,6 @@
 from mock import patch
 
+from common.models.base_models.supported_base_model import SupportedBaseModel
 from common.models.model_generator import ModelGenerator
 from pretrain.jobs.pretrain_args import PretrainArgs
 from test.base_test import BaseTest
@@ -22,4 +23,4 @@ class TestPretrainArgs(BaseTest):
         self.assertTrue(test_pretrain_args.do_eval)
 
     def get_test_pretrain_args(self):
-        return PretrainArgs(ModelGenerator("bert_trace_siamese", "path"), "output_path")
+        return PretrainArgs(ModelGenerator(SupportedBaseModel.BERT_TRACE_SIAMESE, "path"), "output_path")

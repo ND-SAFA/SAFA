@@ -1,8 +1,8 @@
-from pretrain.config.constants import PRETRAIN_MODEL_PATH
 from common.jobs.abstract_args_builder import AbstractArgsBuilder
 from common.models.base_models.supported_base_model import SupportedBaseModel
 from common.models.model_generator import ModelGenerator
 from common.models.model_properties import ModelSize
+from pretrain.config.constants import PRETRAIN_MODEL_PATH
 from pretrain.data.corpuses.domain import Domain
 from pretrain.jobs.pretrain_args import PretrainArgs
 
@@ -30,7 +30,7 @@ class PretrainArgBuilder(AbstractArgsBuilder):
         Creates Pretraining arguments for pretraining a model.
         :return: Arguments for pretraining a model
         """
-        model_generator = ModelGenerator(SupportedBaseModel.ELECTRA_TRACE_SINGLE.name,
+        model_generator = ModelGenerator(SupportedBaseModel.ELECTRA_TRACE_SINGLE,
                                          PRETRAIN_MODEL_PATH.format(self.model_size.value),
                                          model_size=self.model_size)
         return PretrainArgs(

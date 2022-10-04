@@ -3,6 +3,7 @@ from rest_enumfield import EnumField
 from rest_framework import serializers
 
 from common.models.base_models.supported_base_model import SupportedBaseModel
+from common.storage.safa_storage import SafaStorage
 from trace.jobs.trace_args_builder import TraceArgsBuilder
 
 
@@ -42,12 +43,15 @@ class PredictSerializer(BaseTraceSerializer):
         help_text="List of dictionaries corresponding to the target artifacts at each layer"
     )
     loadFromStorage = serializers.BooleanField(required=False,
-                                               help_text="Whether model weights should reference cloud storage.")
+                                               help_text="Whether model weights should reference cloud storage.",
+                                               default=False)
 
     def create(self, validated_data):
         trace_args_builder = super().create(validated_data)
         trace_args_builder.source_layers = validated_data["sourceLayers"]
         trace_args_builder.target_layers = validated_data["targetLayers"]
+        if validated_data["loadFromStorage"]:
+            trace_args_builder.model_path = SafaStorage.add_mount_directory(validated_data["modelPath"])
         return trace_args_builder
 
 

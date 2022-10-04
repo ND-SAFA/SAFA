@@ -19,6 +19,7 @@ import edu.nd.crc.safa.features.flatfiles.parser.TimFileParser;
 import edu.nd.crc.safa.features.jobs.entities.IJobStep;
 import edu.nd.crc.safa.features.jobs.entities.app.CommitJob;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
+import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;
@@ -122,9 +123,10 @@ public class FlatFileProjectCreationJob extends CommitJob {
     @IJobStep(value = "Generating Trace Links", position = 3)
     public void generatingTraces() throws IOException, InterruptedException {
         TraceGenerationService traceGenerationService = this.getServiceProvider().getTraceGenerationService();
+        ProjectAppEntity projectAppEntity = new ProjectAppEntity(this.projectCommit);
         List<TraceAppEntity> generatedLinks = traceGenerationService.generateTraceLinks(
-            projectCommit.getArtifacts().getAdded(),
-            flatFileParser.getArtifactTypeTraceGenerationRequestDTOS());
+            flatFileParser.getTraceGenerationRequest(),
+            projectAppEntity);
         generatedLinks = traceGenerationService.filterDuplicateGeneratedLinks(projectCommit.getTraces().getAdded(),
             generatedLinks);
         projectCommit.getTraces().getAdded().addAll(generatedLinks);

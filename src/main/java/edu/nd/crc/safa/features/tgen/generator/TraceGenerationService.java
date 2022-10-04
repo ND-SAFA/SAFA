@@ -6,9 +6,15 @@ import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.common.SafaRequestBuilder;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.tgen.entities.ArtifactTypeTraceGenerationRequestDTO;
+import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
+import edu.nd.crc.safa.features.tgen.entities.ArtifactLevel;
+import edu.nd.crc.safa.features.tgen.entities.ArtifactLevelRequest;
 import edu.nd.crc.safa.features.tgen.entities.BaseGenerationModels;
 import edu.nd.crc.safa.features.tgen.entities.ITraceLinkGeneration;
+import edu.nd.crc.safa.features.tgen.entities.TraceGenerationRequest;
+import edu.nd.crc.safa.features.tgen.entities.TracingPayload;
+import edu.nd.crc.safa.features.tgen.entities.TracingRequest;
+import edu.nd.crc.safa.features.tgen.method.bert.AutomotiveBert;
 import edu.nd.crc.safa.features.tgen.method.bert.NLBert;
 import edu.nd.crc.safa.features.tgen.method.bert.PLBert;
 import edu.nd.crc.safa.features.tgen.method.vsm.VSMController;
@@ -30,35 +36,35 @@ public class TraceGenerationService {
     private static final String DELIMITER = "*";
     private final SafaRequestBuilder safaRequestBuilder;
 
-    public List<TraceAppEntity> generateTraceLinks(List<ArtifactAppEntity> artifacts,
-                                                   List<ArtifactTypeTraceGenerationRequestDTO> requests) {
-        List<TraceAppEntity> generatedLinks = new ArrayList<>();
-
-        for (ArtifactTypeTraceGenerationRequestDTO request : requests) {
-            String sourceArtifactType = request.getSource();
-            String targetArtifactType = request.getTarget();
-
-            List<ArtifactAppEntity> sourceArtifacts = artifacts
-                .stream()
-                .filter(a -> a.getType().equalsIgnoreCase(sourceArtifactType))
-                .collect(Collectors.toList());
-            List<ArtifactAppEntity> targetArtifacts = artifacts
-                .stream()
-                .filter(a -> a.getType().equalsIgnoreCase(targetArtifactType))
-                .collect(Collectors.toList());
-            generatedLinks.addAll(generateLinksWithMethod(
-                sourceArtifacts,
-                targetArtifacts,
-                request.getMethod()));
+    public static TracingPayload extractPayload(TracingRequest tracingRequest,
+                                                ProjectAppEntity projectAppEntity) {
+        List<ArtifactLevel> artifactLevels = new ArrayList<>();
+        for (ArtifactLevelRequest artifactLevelRequest : tracingRequest.getArtifactLevels()) {
+            List<ArtifactAppEntity> sources = projectAppEntity.getByArtifactType(artifactLevelRequest.getSource());
+            List<ArtifactAppEntity> targets = projectAppEntity.getByArtifactType(artifactLevelRequest.getTarget());
+            ArtifactLevel artifactLevel = new ArtifactLevel(sources, targets);
+            artifactLevels.add(artifactLevel);
         }
-        return generatedLinks;
+        return new TracingPayload(
+            tracingRequest.getMethod(),
+            tracingRequest.getModel(),
+            artifactLevels
+        );
     }
 
-    public List<TraceAppEntity> generateLinksWithMethod(List<ArtifactAppEntity> sourceArtifacts,
-                                                        List<ArtifactAppEntity> targetArtifacts,
-                                                        BaseGenerationModels baseGenerationModels) {
-        ITraceLinkGeneration generationMethod = buildGenerationMethod(baseGenerationModels);
-        return generationMethod.generateLinksWithBaselineState(sourceArtifacts, targetArtifacts);
+    public List<TraceAppEntity> generateTraceLinks(TraceGenerationRequest traceGenerationRequest,
+                                                   ProjectAppEntity projectAppEntity) {
+        List<TraceAppEntity> generatedTraces = new ArrayList<>();
+        for (TracingRequest tracingRequest : traceGenerationRequest.getRequests()) {
+            TracingPayload tracingPayload = extractPayload(tracingRequest, projectAppEntity);
+            generatedTraces.addAll(generateLinksWithMethod(tracingPayload));
+        }
+        return generatedTraces;
+    }
+
+    public List<TraceAppEntity> generateLinksWithMethod(TracingPayload tracingPayload) {
+        ITraceLinkGeneration generationMethod = buildGenerationMethod(tracingPayload.getMethod());
+        return new ArrayList<>(generationMethod.generateLinksWithBaselineState(tracingPayload));
     }
 
     public List<TraceAppEntity> filterDuplicateGeneratedLinks(List<TraceAppEntity> manualLinks,
@@ -77,16 +83,18 @@ public class TraceGenerationService {
             .collect(Collectors.toList());
     }
 
-    public ITraceLinkGeneration buildGenerationMethod(BaseGenerationModels baseGenerationModel) {
-        switch (baseGenerationModel) {
+    public ITraceLinkGeneration buildGenerationMethod(BaseGenerationModels baseGenerationModels) {
+        switch (baseGenerationModels) {
             case VSM:
                 return new VSMController();
             case PLBert:
                 return new PLBert(safaRequestBuilder);
             case NLBert:
                 return new NLBert(safaRequestBuilder);
+            case AutomotiveBert:
+                return new AutomotiveBert(safaRequestBuilder);
             default:
-                throw new NotImplementedException("Trace method not implemented:" + baseGenerationModel);
+                throw new NotImplementedException("Trace method not implemented:" + baseGenerationModels);
         }
     }
 }

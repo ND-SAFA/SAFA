@@ -41,7 +41,8 @@ public class TrainModelJobBuilder extends AbstractJobBuilder<TrainingRequest> {
 
     @Override
     String getJobName() {
-        return String.format("Training model: [%s].", this.identifier.getModel().getName());
+        String modelName = this.identifier.getRequests().get(0).getModel().getName();
+        return String.format("Training model: [%s].", modelName);
     }
 
     @Override

@@ -104,6 +104,7 @@ public class JobController extends BaseController {
     @PostMapping(AppRoutes.Jobs.Projects.CREATE_PROJECT_VIA_JSON)
     public JobAppEntity createProjectFromJSON(@RequestBody @Valid CreateProjectByJsonPayload payload) throws Exception {
         // Step - Create and start job.
+        System.out.println("Payload:" + payload);
         CreateProjectByJsonJobBuilder createProjectByJsonJobBuilder = new CreateProjectByJsonJobBuilder(
             serviceProvider, payload.getProject(), payload.getRequests());
         return createProjectByJsonJobBuilder.perform();
@@ -131,13 +132,15 @@ public class JobController extends BaseController {
     /**
      * Trains model defined in request with data given.
      *
+     * @param projectId       The id of the project whose artifact is used to train on.
      * @param trainingRequest Details model and data to train with.
      * @return {@link JobAppEntity} The job to keep track of status.
      * @throws Exception Throws error if any error occurs while setting up job.
      */
     @PostMapping(AppRoutes.Jobs.Models.TRAIN)
-    public JobAppEntity trainModel(@RequestBody @Valid TrainingRequest trainingRequest) throws Exception {
-        Project project = this.resourceBuilder.fetchProject(trainingRequest.getProjectId()).withEditProject();
+    public JobAppEntity trainModel(@PathVariable UUID projectId,
+                                   @RequestBody @Valid TrainingRequest trainingRequest) throws Exception {
+        Project project = this.resourceBuilder.fetchProject(projectId).withEditProject();
         TrainModelJobBuilder trainModelJobBuilder = new TrainModelJobBuilder(
             serviceProvider,
             trainingRequest,

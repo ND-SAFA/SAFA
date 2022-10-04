@@ -5,24 +5,36 @@ import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 @AllArgsConstructor
 @Service
 public class SafaRequestBuilder {
     private final WebClient webClient;
     private final int DEFAULT_TIMEOUT = 30;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public <T> T sendPost(String endpoint,
                           Object object,
                           Class<T> responseClass) {
+        // Step - Send request
+        return sendJsonRequest(endpoint, object, responseClass, HttpMethod.POST);
+    }
+
+    public <T> T sendJsonRequest(String endpoint,
+                                 Object object,
+                                 Class<T> responseClass,
+                                 HttpMethod method) {
         // Step - Create headers
         Map<String, Object> headerMap = new HashMap<>();
         headerMap.put("Content-Type", MediaType.APPLICATION_JSON);
@@ -32,7 +44,7 @@ public class SafaRequestBuilder {
 
         RequestMeta<T> requestMeta = new RequestMeta<>(
             endpoint,
-            HttpMethod.POST,
+            method,
             headerMap,
             object,
             responseClass,
@@ -55,16 +67,14 @@ public class SafaRequestBuilder {
             requestHeadersSpec.header(keyValue.getKey(), keyValue.getValue().toString());
         }
 
-        ResponseEntity<T> response = requestHeadersSpec
+        Mono<String> responseStr = requestHeadersSpec
             .retrieve()
-            .toEntity(requestMeta.responseClass)
-            .timeout(requestMeta.timeout)
-            .block();
-        // check response status code
-        if (response != null && response.getStatusCode() != HttpStatus.BAD_REQUEST) {
-            return response.getBody();
-        } else {
-            return null;
+            .bodyToMono(String.class);
+
+        try {
+            return objectMapper.readValue(responseStr.block(), requestMeta.responseClass);
+        } catch (JsonProcessingException e) {
+            throw new SafaError("Unable to parse TGEN response.", e);
         }
     }
 

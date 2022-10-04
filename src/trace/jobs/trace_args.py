@@ -4,7 +4,7 @@ from transformers.training_args import TrainingArguments
 
 from common.models.model_generator import ModelGenerator
 from trace.config.constants import EVAL_DATASET_SIZE_DEFAULT, MAX_SEQ_LENGTH_DEFAULT, \
-    PAD_TO_MAX_LENGTH_DEFAULT, RESAMPLE_RATE_DEFAULT, VALIDATION_PERCENTAGE_DEFAULT
+    N_EPOCHS_DEFAULT, PAD_TO_MAX_LENGTH_DEFAULT, RESAMPLE_RATE_DEFAULT, VALIDATION_PERCENTAGE_DEFAULT
 from trace.data.trace_dataset_creator import TraceDatasetCreator
 
 
@@ -14,9 +14,10 @@ class TraceArgs(TrainingArguments):
     max_seq_length: int = MAX_SEQ_LENGTH_DEFAULT
     eval_dataset_size: int = EVAL_DATASET_SIZE_DEFAULT
     validation_percentage: float = VALIDATION_PERCENTAGE_DEFAULT
+    num_train_epochs: int = N_EPOCHS_DEFAULT
     metrics: List[str] = None
 
-    def __init__(self,  model_generator: ModelGenerator, output_dir: str, source_layers: List[Dict[str, str]] = None,
+    def __init__(self, model_generator: ModelGenerator, output_dir: str, source_layers: List[Dict[str, str]] = None,
                  target_layers: List[Dict[str, str]] = None, links: List[Tuple[str, str]] = None, **kwargs):
         """
         Arguments for Learning Model
@@ -29,8 +30,9 @@ class TraceArgs(TrainingArguments):
         https://huggingface.co/docs/transformers/v4.21.0/en/main_classes/trainer#transformers.TrainingArguments
         """
         self.model_generator = model_generator
-        super().__init__(log_level="info", log_level_replica="info", output_dir=output_dir)
-        self.__set_args(**kwargs)
+        self.__set_args(kwargs)
+        super().__init__(log_level="info", log_level_replica="info", output_dir=output_dir,
+                         num_train_epochs=self.num_train_epochs)
         self.trace_dataset_creator = TraceDatasetCreator(source_layers=source_layers, target_layers=target_layers,
                                                          true_links=links, model_generator=model_generator,
                                                          validation_percentage=self.validation_percentage) \

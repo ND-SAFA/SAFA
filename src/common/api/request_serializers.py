@@ -12,7 +12,6 @@ def validate_settings(value):
     Check that the blog post is about Django.
     """
     for arg_name in value.keys():
-        print(arg_name, TraceArgsBuilder.is_a_training_arg(arg_name))
         if not TraceArgsBuilder.is_a_training_arg(arg_name):
             raise serializers.ValidationError("%s is not a known Training argument" % arg_name)
     return value

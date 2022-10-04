@@ -2,6 +2,7 @@ import {
   ApprovalType,
   ArtifactLevelModel,
   FlatTraceLink,
+  GeneratedMatrixModel,
   IOHandlerCallback,
   ModelType,
   TrainedModel,
@@ -90,11 +91,10 @@ export async function handleGenerateLinks(
     .map(({ source, target }) => `${source} -> ${target}`)
     .join(", ");
 
+  console.log("Method:", method);
   try {
     const job = await createGeneratedLinks({
-      artifactLevels,
-      method,
-      model,
+      requests: [createTrainingRequests(artifactLevels, method, model)],
       projectVersion: projectStore.version,
     });
 
@@ -132,8 +132,9 @@ export async function handleTrainModel(
 
   try {
     const job = await createModelTraining(projectStore.projectId, {
-      model,
-      artifactLevels,
+      requests: [
+        createTrainingRequests(artifactLevels, model.baseModel, model),
+      ],
     });
 
     await handleJobSubmission(job);
@@ -147,4 +148,17 @@ export async function handleTrainModel(
   } finally {
     onComplete?.();
   }
+}
+
+function createTrainingRequests(
+  artifactLevels: ArtifactLevelModel[],
+  method?: ModelType,
+  model?: TrainedModel
+): GeneratedMatrixModel {
+  console.log("CreatingTrainingRequest: ", model);
+  return {
+    method: model?.baseModel || method || ModelType.NLBert,
+    model,
+    artifactLevels: artifactLevels,
+  };
 }

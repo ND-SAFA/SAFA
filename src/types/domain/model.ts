@@ -1,4 +1,4 @@
-import { ModelType, VersionModel } from "@/types";
+import { GeneratedMatrixModel, ModelType, VersionModel } from "@/types";
 
 export interface TrainedModel {
   /**
@@ -47,19 +47,11 @@ export interface ArtifactLevelModel {
  */
 export interface TrainOrGenerateLinksModel {
   /**
-   * The generation method.
-   */
-  method?: ModelType;
-  /**
-   * The custom trained model to use for generation/training.
-   */
-  model?: TrainedModel;
-  /**
    * The version to commit the entities to.
    */
   projectVersion?: VersionModel;
   /**
    * The sets of matrices to generate or train on.
    */
-  artifactLevels: ArtifactLevelModel[];
+  requests: GeneratedMatrixModel[];
 }

@@ -1,8 +1,10 @@
 import {
   ApprovalType,
+  ArtifactLevelModel,
   FlatTraceLink,
   GeneratedMatrixModel,
   IOHandlerCallback,
+  ModelType,
   TrainedModel,
 } from "@/types";
 import {
@@ -11,7 +13,6 @@ import {
   artifactStore,
   logStore,
   projectStore,
-  traceStore,
 } from "@/hooks";
 import {
   createGeneratedLinks,
@@ -73,32 +74,31 @@ export async function handleGetGeneratedLinks({
 /**
  * Generates links between sets of artifact types and adds them to the project.
  *
- * @param matrices - An array of source and target artifact types to generate traces between.
+ * @param method - The base model to generate with.
+ * @param model - The model to generate with. Used over the method.
+ * @param artifactLevels - An array of source and target artifact types to generate traces between.
  * @param onSuccess - Called if the action is successful.
  * @param onError - Called if the action fails.
+ * @param onComplete - Called after the action.
  */
 export async function handleGenerateLinks(
-  matrices: GeneratedMatrixModel[],
-  { onSuccess, onError }: IOHandlerCallback
+  method: ModelType | undefined,
+  model: TrainedModel | undefined,
+  artifactLevels: ArtifactLevelModel[],
+  { onSuccess, onError, onComplete }: IOHandlerCallback
 ): Promise<void> {
-  const matricesName = matrices
+  const matricesName = artifactLevels
     .map(({ source, target }) => `${source} -> ${target}`)
     .join(", ");
 
   try {
-    for (const { source, target, method, model } of matrices) {
-      const sourceArtifacts = artifactStore.getArtifactsByType[source] || [];
-      const targetArtifacts = artifactStore.getArtifactsByType[target] || [];
-      const job = await createGeneratedLinks({
-        sourceArtifacts,
-        targetArtifacts,
-        method,
-        model,
-        projectVersion: projectStore.version,
-      });
+    const job = await createGeneratedLinks({
+      requests: [createGeneratedMatrix(artifactLevels, method, model)],
+      projectVersion: projectStore.version,
+    });
 
-      await handleJobSubmission(job);
-    }
+    await handleJobSubmission(job);
+
     logStore.onInfo(
       `Started generating new trace links: ${matricesName}. You'll receive a notification once they are added.`
     );
@@ -106,6 +106,8 @@ export async function handleGenerateLinks(
   } catch (e) {
     logStore.onError(`Unable to generate new trace links: ${matricesName}`);
     onError?.(e as Error);
+  } finally {
+    onComplete?.();
   }
 }
 
@@ -113,37 +115,26 @@ export async function handleGenerateLinks(
  * Trains models on created trace links.
  *
  * @param model - The model to train.
- * @param matrices - An array of source and target artifact types to train on traces between.
+ * @param artifactLevels - An array of source and target artifact types to train on traces between.
  * @param onSuccess - Called if the action is successful.
  * @param onError - Called if the action fails.
+ * @param onComplete - Called after the action.
  */
 export async function handleTrainModel(
   model: TrainedModel,
-  matrices: GeneratedMatrixModel[],
-  { onSuccess, onError }: IOHandlerCallback
+  artifactLevels: ArtifactLevelModel[],
+  { onSuccess, onError, onComplete }: IOHandlerCallback
 ): Promise<void> {
-  const matricesName = matrices
+  const matricesName = artifactLevels
     .map(({ source, target }) => `${source} -> ${target}`)
     .join(", ");
 
   try {
-    for (const { source, target } of matrices) {
-      const sources = artifactStore.getArtifactsByType[source] || [];
-      const targets = artifactStore.getArtifactsByType[target] || [];
-      const traces = traceStore.getTraceLinksByArtifactSets(sources, targets, [
-        "manual",
-        "approved",
-      ]);
-      const job = await createModelTraining({
-        projectId: projectStore.projectId,
-        sources,
-        targets,
-        traces,
-        model,
-      });
+    const job = await createModelTraining(projectStore.projectId, {
+      requests: [createGeneratedMatrix(artifactLevels, model.baseModel, model)],
+    });
 
-      await handleJobSubmission(job);
-    }
+    await handleJobSubmission(job);
     logStore.onInfo(
       `Started training model on: ${matricesName}. You'll receive a notification once complete.`
     );
@@ -151,5 +142,26 @@ export async function handleTrainModel(
   } catch (e) {
     logStore.onError(`Unable to train model on: ${matricesName}`);
     onError?.(e as Error);
+  } finally {
+    onComplete?.();
   }
+}
+
+/**
+ * Creates a generated trace matrix defined over many artifact levels for
+ * some tracing method or custom model.
+ * @param artifactLevels - The artifact levels to train on.
+ * @param method - If a baseline method is used, this defines that method.
+ * @param model - If a custom model is used,
+ */
+function createGeneratedMatrix(
+  artifactLevels: ArtifactLevelModel[],
+  method?: ModelType,
+  model?: TrainedModel
+): GeneratedMatrixModel {
+  return {
+    method: model?.baseModel || method || ModelType.NLBert,
+    model,
+    artifactLevels: artifactLevels,
+  };
 }

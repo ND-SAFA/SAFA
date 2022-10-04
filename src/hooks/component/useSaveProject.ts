@@ -48,8 +48,12 @@ export const useSaveProject = defineStore("saveProject", {
       const requests = traceUploader.panels
         .filter(({ projectFile }) => projectFile.isGenerated)
         .map(({ projectFile }) => ({
-          source: projectFile.sourceId,
-          target: projectFile.targetId,
+          artifactLevels: [
+            {
+              source: projectFile.sourceId,
+              target: projectFile.targetId,
+            },
+          ],
           method: projectFile.method,
         }));
       const user: MembershipModel = {

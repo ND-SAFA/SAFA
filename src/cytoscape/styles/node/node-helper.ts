@@ -20,12 +20,12 @@ export function getWarnings(data: ArtifactData): number {
  * @param body - The artifact body text.
  * @param truncateLength - The number of characters to print before truncating.
  *
- * @return how many warnings to display.
+ * @return The truncated text.
  */
 export function getBody(body: string, truncateLength: number): string {
-  return sanitizeText(
-    body.length > truncateLength ? body.slice(0, truncateLength) + "..." : body
-  );
+  return body.length > truncateLength
+    ? body.slice(0, truncateLength) + "..."
+    : body;
 }
 
 /**

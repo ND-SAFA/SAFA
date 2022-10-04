@@ -19,9 +19,7 @@
     <typography :value="project.description" />
 
     <project-identifier-modal
-      title="Edit Project"
       :is-open="isEditOpen"
-      v-bind:project.sync="projectToEdit"
       :is-loading="isEditLoading"
       @close="isEditOpen = false"
       @save="handleSave"
@@ -31,8 +29,8 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { ProjectModel, IdentifierModel } from "@/types";
-import { projectStore } from "@/hooks";
+import { ProjectModel } from "@/types";
+import { identifierSaveStore, projectStore } from "@/hooks";
 import { getProjectFiles, handleSaveProject } from "@/api";
 import { GenericIconButton, Typography, FlexBox } from "@/components/common";
 import { ProjectIdentifierModal } from "@/components/project/shared";
@@ -67,33 +65,22 @@ export default Vue.extend({
      * Opens the edit modal.
      */
     handleEdit(): void {
-      this.projectToEdit = this.project;
+      identifierSaveStore.baseIdentifier = this.project;
       this.isEditOpen = true;
     },
     /**
      * Attempts to save the project.
      */
-    handleSave(project: IdentifierModel): void {
+    handleSave(): void {
       this.isEditLoading = true;
 
-      handleSaveProject(
-        {
-          projectId: this.project.projectId,
-          name: project.name,
-          description: project.description,
+      handleSaveProject({
+        onSuccess: (project) => projectStore.updateProject(project),
+        onComplete: () => {
+          this.isEditLoading = false;
+          this.isEditOpen = false;
         },
-        {
-          onSuccess: () => {
-            projectStore.updateProject(project);
-            this.isEditLoading = false;
-            this.isEditOpen = false;
-          },
-          onError: () => {
-            this.isEditLoading = false;
-            this.isEditOpen = false;
-          },
-        }
-      );
+      });
     },
     /**
      * Downloads project files

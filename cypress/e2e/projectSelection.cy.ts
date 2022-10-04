@@ -121,11 +121,8 @@ describe("Project Selection", () => {
       cy.getCy(DataCy.projectDeleteModal).within(() => {
         cy.getCy(DataCy.modalTitle)
           .invoke("text")
-          .then((text) =>
-            cy.inputText(
-              DataCy.projectDeleteNameInput,
-              text.split(":")[1].trim()
-            )
+          .then(() =>
+            cy.inputText(DataCy.projectDeleteNameInput, testProject.name)
           );
 
         cy.clickButton(DataCy.projectDeleteConfirmButton);

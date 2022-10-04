@@ -9,7 +9,19 @@
     <template v-slot:body>
       <typography el="p" y="2" :value="modalDescription" />
 
-      <custom-model-input v-if="isTraining" v-model="model" />
+      <flex-box>
+        <generic-switch
+          v-if="!isTraining"
+          :value="isCustomModel"
+          label="Use Custom Model"
+          @input="toggleCustomModel"
+        />
+        <gen-method-input
+          v-if="!isCustomModel && !isTraining"
+          v-model="method"
+        />
+        <custom-model-input v-else v-model="model" />
+      </flex-box>
 
       <flex-box
         full-width
@@ -32,18 +44,6 @@
               label="Target Type"
               class="mr-2"
             />
-          </flex-box>
-          <flex-box v-if="!isTraining">
-            <generic-switch
-              :value="isCustomModel(idx)"
-              label="Use Custom Model"
-              @input="toggleCustomModel(idx)"
-            />
-            <gen-method-input
-              v-if="!isCustomModel(idx)"
-              v-model="matrix.method"
-            />
-            <custom-model-input v-else v-model="matrix.model" />
           </flex-box>
           <typography
             secondary
@@ -85,11 +85,10 @@
 <script lang="ts">
 import Vue from "vue";
 import {
-  GeneratedMatrixModel,
+  ArtifactLevelModel,
   GeneratorOpenState,
   ModelType,
   TrainedModel,
-  TypeMatrixModel,
 } from "@/types";
 import { appStore, artifactStore, traceStore } from "@/hooks";
 import { handleGenerateLinks, handleTrainModel } from "@/api";
@@ -125,11 +124,10 @@ export default Vue.extend({
     return {
       isLoading: false,
       isValid: false,
-      customModels: [] as number[],
+      isCustomModel: false,
+      method: undefined as ModelType | undefined,
       model: undefined as TrainedModel | undefined,
-      matrices: [
-        { source: "", target: "", method: ModelType.NLBert },
-      ] as GeneratedMatrixModel[],
+      matrices: [{ source: "", target: "" }] as ArtifactLevelModel[],
     };
   },
   watch: {
@@ -138,26 +136,25 @@ export default Vue.extend({
 
       this.isLoading = false;
       this.isValid = false;
-      this.matrices = [{ source: "", target: "", method: ModelType.NLBert }];
+      this.isCustomModel = false;
+      this.method = undefined;
+      this.model = undefined;
+      this.matrices = [{ source: "", target: "" }];
     },
     /**
      * Validates that all matrices are valid on change.
      */
     matrices: {
       deep: true,
-      handler(matrices: TypeMatrixModel[]) {
-        if (this.isTraining) {
-          this.isValid =
-            !!this.model &&
-            matrices
-              .map((matrix) => !!matrix.source && !!matrix.target)
-              .reduce((acc, cur) => acc && cur, true);
-        } else {
-          this.isValid = matrices
-            .map((matrix) => !!matrix.source && !!matrix.target)
-            .reduce((acc, cur) => acc && cur, true);
-        }
+      handler() {
+        this.isValid = this.isEverythingValid;
       },
+    },
+    model() {
+      this.isValid = this.isEverythingValid;
+    },
+    method() {
+      this.isValid = this.isEverythingValid;
     },
   },
   computed: {
@@ -195,31 +192,39 @@ export default Vue.extend({
             "will inform the model."
         : "Select which sets of artifact types that you would like to generate links between.";
     },
+    /**
+     * @return Whether the current matrices are valid.
+     */
+    areMatricesValid(): boolean {
+      return this.matrices
+        .map((matrix) => !!matrix.source && !!matrix.target)
+        .reduce((acc, cur) => acc && cur, true);
+    },
+    /**
+     * @return Whether the current request is valid.
+     */
+    isEverythingValid(): boolean {
+      if (this.isTraining) {
+        return !!this.model && this.areMatricesValid;
+      } else {
+        return (!!this.model || !!this.method) && this.areMatricesValid;
+      }
+    },
   },
   methods: {
     /**
-     * Returns whether the model is custom.
-     * @param modelIdx - The model index to check.
-     * @return Whether it uses a custom model.
+     * Toggles whether a model is set to custom.
      */
-    isCustomModel(modelIdx: number): boolean {
-      return this.customModels.includes(modelIdx);
+    toggleCustomModel(): void {
+      this.isCustomModel = !this.isCustomModel;
+      this.model = undefined;
+      this.method = undefined;
     },
     /**
-     * Toggles whether a model is set to custom.
-     * @param modelIdx - The model index to toggle.
+     * Gets the details information on a matrix of artifacts.
+     * @param matrix - The matrix to get details for.
      */
-    toggleCustomModel(modelIdx: number): void {
-      if (this.isCustomModel(modelIdx)) {
-        this.customModels = this.customModels.filter((idx) => idx !== modelIdx);
-      } else {
-        this.customModels.push(modelIdx);
-      }
-
-      this.matrices[modelIdx].model = undefined;
-      this.matrices[modelIdx].method = ModelType.NLBert;
-    },
-    getMatrixDetails(matrix: GeneratedMatrixModel): string {
+    getMatrixDetails(matrix: ArtifactLevelModel): string {
       const sources = artifactStore.getArtifactsByType[matrix.source] || [];
       const targets = artifactStore.getArtifactsByType[matrix.target] || [];
       const manual = traceStore.getTraceLinksByArtifactSets(sources, targets, [
@@ -240,7 +245,7 @@ export default Vue.extend({
      * Creates a new trace matrix.
      */
     handleCreateMatrix(): void {
-      this.matrices.push({ source: "", target: "", method: ModelType.NLBert });
+      this.matrices.push({ source: "", target: "" });
     },
     /**
      * Removes a matrix from the list.
@@ -255,12 +260,16 @@ export default Vue.extend({
      * Attempts to generate the selected trace links.
      */
     handleSubmit(): void {
-      if (this.isTraining) {
-        if (!this.model) return;
-
-        handleTrainModel(this.model, this.matrices, {});
+      if (this.isTraining && this.model) {
+        this.isLoading = true;
+        handleTrainModel(this.model, this.matrices, {
+          onComplete: () => (this.isLoading = false),
+        });
       } else {
-        handleGenerateLinks(this.matrices, {});
+        this.isLoading = true;
+        handleGenerateLinks(this.method, this.model, this.matrices, {
+          onComplete: () => (this.isLoading = false),
+        });
       }
 
       this.handleClose();

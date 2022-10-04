@@ -1,5 +1,5 @@
 <template>
-  <generic-modal :is-open="!!isOpen" :title="creatorTitle" @close="handleClose">
+  <generic-modal :is-open="!!isOpen" :title="modalTitle" @close="handleClose">
     <template v-slot:body>
       <flex-box t="4">
         <v-text-field
@@ -26,9 +26,9 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import Vue from "vue";
 import { TrainedModel } from "@/types";
-import { createModel } from "@/util";
+import { modelSaveStore } from "@/hooks";
 import { handleSaveModel } from "@/api";
 import { GenericModal, GenMethodInput, FlexBox } from "@/components/common";
 
@@ -46,20 +46,31 @@ export default Vue.extend({
   },
   props: {
     isOpen: Boolean,
-    model: Object as PropType<TrainedModel | undefined>,
-  },
-  data() {
-    return {
-      canSave: false,
-      editedModel: createModel(this.model),
-    };
   },
   computed: {
     /**
+     * @return Whether an existing model is being updated.
+     */
+    isUpdate(): boolean {
+      return modelSaveStore.isUpdate;
+    },
+    /**
+     * @return The model being edited.
+     */
+    editedModel(): TrainedModel {
+      return modelSaveStore.editedModel;
+    },
+    /**
      * @return The name of the modal.
      */
-    creatorTitle(): string {
-      return this.model ? "Edit Model" : "Create Model";
+    modalTitle(): string {
+      return this.isUpdate ? "Edit Model" : "Create Model";
+    },
+    /**
+     * @return Whether the model can be saved.
+     */
+    canSave(): boolean {
+      return modelSaveStore.canSave;
     },
   },
   methods: {
@@ -73,9 +84,9 @@ export default Vue.extend({
      * Saves the current model.
      */
     handleSave() {
-      handleSaveModel(this.editedModel, !!this.model, {});
-
-      this.handleClose();
+      handleSaveModel({
+        onSuccess: () => this.handleClose(),
+      });
     },
   },
   watch: {
@@ -85,17 +96,7 @@ export default Vue.extend({
     isOpen(open: boolean) {
       if (!open) return;
 
-      this.editedModel = createModel(this.model);
-      this.canSave = this.editedModel.name !== "";
-    },
-    /**
-     * Checks whether the model is valid when it changes.
-     */
-    editedModel: {
-      handler(): void {
-        this.canSave = this.editedModel.name !== "";
-      },
-      deep: true,
+      modelSaveStore.resetModel();
     },
   },
 });

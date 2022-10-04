@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import {
+  IdentifierModel,
   MembershipModel,
   ProjectModel,
   TrainedModel,
@@ -7,7 +8,8 @@ import {
 } from "@/types";
 import { createProject, removeMatches } from "@/util";
 import { pinia } from "@/plugins";
-import selectionStore from "@/hooks/graph/useSelection";
+import sessionStore from "../core/useSession";
+import selectionStore from "../graph/useSelection";
 import logStore from "../core/useLog";
 import warningStore from "./useWarnings";
 import documentStore from "./useDocuments";
@@ -19,6 +21,10 @@ import typeOptionsStore from "./useTypeOptions";
  */
 export const useProject = defineStore("project", {
   state: () => ({
+    /**
+     * All projects available to the current user.
+     */
+    allProjects: [] as IdentifierModel[],
     /**
      * The currently loaded project.
      */
@@ -70,6 +76,24 @@ export const useProject = defineStore("project", {
      */
     models(): TrainedModel[] {
       return this.project.models;
+    },
+    /**
+     * @return A list of indexes for deletable projects.
+     */
+    deletableProjects(): number[] {
+      return this.allProjects
+        .map((project, projectIndex) =>
+          sessionStore.isAdmin(project) ? projectIndex : -1
+        )
+        .filter((idx) => idx !== -1);
+    },
+    /**
+     * @return All projects that arent currently loaded.
+     */
+    unloadedProjects(): IdentifierModel[] {
+      return this.allProjects.filter(
+        ({ projectId }) => projectId !== this.projectId
+      );
     },
   },
   actions: {

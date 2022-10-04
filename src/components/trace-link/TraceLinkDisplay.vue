@@ -223,11 +223,8 @@ export default Vue.extend({
     handleApprove() {
       this.isApproveLoading = true;
       handleApproveLink(this.link, {
-        onSuccess: () => {
-          this.isApproveLoading = false;
-          this.$emit("link:approve", this.link);
-        },
-        onError: () => (this.isApproveLoading = false),
+        onSuccess: () => this.$emit("link:approve", this.link),
+        onComplete: () => (this.isApproveLoading = false),
       });
     },
     /**
@@ -236,11 +233,8 @@ export default Vue.extend({
     handleDecline() {
       this.isDeclineLoading = true;
       handleDeclineLink(this.link, {
-        onSuccess: () => {
-          this.isDeclineLoading = false;
-          this.$emit("link:decline", this.link);
-        },
-        onError: () => (this.isDeclineLoading = false),
+        onSuccess: () => this.$emit("link:decline", this.link),
+        onComplete: () => (this.isDeclineLoading = false),
       });
     },
     /**
@@ -249,11 +243,8 @@ export default Vue.extend({
     handleUnreview() {
       this.isDeclineLoading = true;
       handleUnreviewLink(this.link, {
-        onSuccess: () => {
-          this.isDeclineLoading = false;
-          this.$emit("link:unreview", this.link);
-        },
-        onError: () => (this.isDeclineLoading = false),
+        onSuccess: () => this.$emit("link:unreview", this.link),
+        onComplete: () => (this.isDeclineLoading = false),
       });
     },
     /**
@@ -265,11 +256,8 @@ export default Vue.extend({
       } else {
         this.isDeleteLoading = true;
         handleDeclineLink(this.link, {
-          onSuccess: () => {
-            this.isDeleteLoading = false;
-            this.$emit("link:delete", this.link);
-          },
-          onError: () => (this.isDeleteLoading = false),
+          onSuccess: () => this.$emit("link:delete", this.link),
+          onComplete: () => (this.isDeleteLoading = false),
         });
       }
     },

@@ -29,6 +29,7 @@ export const artifactTreeGraph: CytoCoreGraph = {
     motionBlurOpacity: MOTION_BLUE_OPACITY,
     zoom: DEFAULT_ARTIFACT_TREE_ZOOM,
     boxSelectionEnabled: true,
+    wheelSensitivity: 0.5,
   },
   saveCy: artifactTreeResolveCy,
   plugins: [

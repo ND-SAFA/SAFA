@@ -48,7 +48,6 @@ export enum Endpoint {
 
   // Links
   getGeneratedLinks = "projects/versions/:versionId/links/generated",
-  generateLinks = "projects/links/generate",
   generateLinksJob = "jobs/projects/links/generate",
   trainModelJob = "jobs/projects/:projectId/models/train",
 
@@ -98,6 +97,7 @@ export enum Endpoint {
   createModel = "projects/:projectId/models",
   editModel = "projects/:projectId/models/:modelId",
   deleteModel = "projects/:projectId/models/:modelId",
+  shareModel = "projects/models/share",
 
   // Files
   getProjectFiles = "projects/versions/:versionId/flat-files/:fileType",

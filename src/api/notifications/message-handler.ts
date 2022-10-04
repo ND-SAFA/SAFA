@@ -38,7 +38,8 @@ export async function handleEntityChangeMessage(
 ): Promise<void> {
   const message: ChangeMessageModel = JSON.parse(frame.body);
   const project = await getChanges(versionId, message);
-  const isCurrentUser = message.user === sessionStore.userEmail;
+  //TODO: current user check is disabled. Evaluate a better way of filtering updates by the current user.
+  const isCurrentUser = message.user === sessionStore.userEmail && false;
   const updateLayout =
     message.updateLayout &&
     routesWithRequiredProject.includes(router.currentRoute.path);

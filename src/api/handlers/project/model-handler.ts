@@ -1,6 +1,11 @@
-import { IOHandlerCallback, TrainedModel } from "@/types";
-import { logStore, projectStore } from "@/hooks";
-import { createModel, deleteModel, getProjectModels } from "@/api/endpoints";
+import { IOHandlerCallback, ModelShareType, TrainedModel } from "@/types";
+import { logStore, modelSaveStore, projectStore } from "@/hooks";
+import {
+  createModel,
+  deleteModel,
+  getProjectModels,
+  shareModel,
+} from "@/api/endpoints";
 
 /**
  * Loads models for the current project.
@@ -14,16 +19,14 @@ export async function handleLoadModels(): Promise<void> {
 /**
  * Saves a model, updates app state, and logs the status.
  *
- * @param model - The model to create.
- * @param isUpdate - If true, this model already exists and is being updated.
  * @param onSuccess - Called if the action is successful.
  * @param onError - Called if the action fails.
  */
-export function handleSaveModel(
-  model: TrainedModel,
-  isUpdate: boolean,
-  { onSuccess, onError }: IOHandlerCallback<TrainedModel>
-): void {
+export function handleSaveModel({
+  onSuccess,
+  onError,
+}: IOHandlerCallback<TrainedModel>): void {
+  const model = modelSaveStore.editedModel;
   logStore.onInfo(
     `Model is being saved, you'll receive a notification when it is ready: ${model.name}`
   );
@@ -68,4 +71,26 @@ export function handleDeleteModel(model: TrainedModel): void {
         });
     }
   );
+}
+
+/**
+ * Shares a model with another project.
+ *
+ * @param targetProject - The id of the project to share the model to.
+ * @param model - The model to share.
+ * @param shareMethod - The method by which to share.
+ */
+export function handleShareModel(
+  targetProject: string,
+  model: TrainedModel,
+  shareMethod: ModelShareType
+): void {
+  shareModel(targetProject, model, shareMethod)
+    .then(() => {
+      logStore.onSuccess(`Successfully shared model: "${model.name}`);
+    })
+    .catch((e) => {
+      logStore.onError(`Unable to share model: "${model.name}`);
+      logStore.onDevError(e);
+    });
 }

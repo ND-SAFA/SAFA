@@ -78,29 +78,6 @@ export function capitalizeSentence(str: string): string {
 }
 
 /**
- * @deprecated Remove when project creator done.
- *
- * Returns the sentence case name of the artifact type.
- *
- * @param type - The type to stringify.
- *
- * @return The sentence case type name.
- */
-export function getArtifactTypePrintName(type?: string): string {
-  const nameMap: Record<string, string> = {
-    requirement: "Requirements",
-    design: "Designs",
-    hazard: "Hazards",
-    environmentalassumption: "Environmental Assumptions",
-    safetyrequirement: "Safety Requirement",
-  };
-
-  return type
-    ? nameMap[type.toLowerCase()] || capitalizeSentence(type.toLowerCase())
-    : "Unknown Type";
-}
-
-/**
  * Converts an enum value in capital snake case into a title case string.
  *
  * @param value - The value to convert.

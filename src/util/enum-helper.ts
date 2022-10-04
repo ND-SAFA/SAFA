@@ -4,6 +4,7 @@ import {
   ColumnDataType,
   DocumentType,
   FTANodeType,
+  ModelShareType,
   ModelType,
   ProjectRole,
   SafetyCaseType,
@@ -147,6 +148,10 @@ export function traceModelOptions(): SelectOption[] {
       ModelType.PLBert,
       "Slower, higher quality links. Traces free-text artifacts to source code."
     ),
+    createEnumOption(
+      ModelType.AutomotiveBert,
+      "Slower, high quality links for automotive projects."
+    ),
     createEnumOption(ModelType.VSM, "Faster, lower quality links."),
   ];
 }
@@ -162,5 +167,17 @@ export function projectRoleOptions(): SelectOption[] {
     createEnumOption(ProjectRole.ADMIN),
     createEnumOption(ProjectRole.EDITOR),
     createEnumOption(ProjectRole.VIEWER),
+  ];
+}
+
+/**
+ * Returns display names for model share options.
+ *
+ * @return The select option names and ids.
+ */
+export function modelShareOptions(): SelectOption[] {
+  return [
+    createEnumOption(ModelShareType.CLONE, "Clone the model"),
+    createEnumOption(ModelShareType.REUSE, "Reuse the same model"),
   ];
 }

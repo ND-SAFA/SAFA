@@ -20,7 +20,6 @@
       <template v-slot:addItemDialogue>
         <settings-member-information-modal
           :is-open="isNewOpen"
-          :project="project"
           @cancel="handleConfirmAdd"
           @confirm="handleConfirmAdd"
         />
@@ -29,7 +28,6 @@
         <settings-member-information-modal
           :is-open="isEditOpen"
           :clear-on-close="false"
-          :project="project"
           :member="memberToEdit"
           @cancel="handleConfirmEdit"
           @confirm="handleConfirmEdit"

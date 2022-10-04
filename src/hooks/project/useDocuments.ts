@@ -8,7 +8,6 @@ import {
   ProjectModel,
 } from "@/types";
 import { createDocument, isTableDocument, removeMatches } from "@/util";
-import { documentStore } from "@/hooks";
 import { pinia } from "@/plugins";
 import layoutStore from "../graph/useLayout";
 import projectStore from "./useProject";
@@ -172,7 +171,7 @@ export const useDocuments = defineStore("documents", {
       );
 
       if (currentDocument) {
-        await documentStore.switchDocuments(currentDocument);
+        await this.switchDocuments(currentDocument);
       }
 
       this.allDocuments = [

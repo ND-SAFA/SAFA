@@ -47,7 +47,7 @@ export default Vue.extend({
      */
     modelOptions(): SelectOption[] {
       return this.onlyTrainable
-        ? traceModelOptions().slice(0, 2)
+        ? traceModelOptions().slice(0, 3)
         : traceModelOptions();
     },
   },

@@ -40,7 +40,7 @@ describe("Artifact CRUD", () => {
       cy.createNewArtifact({ name });
 
       cy.getCy(DataCy.artifactSaveModal).within(() => {
-        cy.contains("Name is already used");
+        cy.contains("This name is already used, please select another.");
         cy.getCy(DataCy.artifactSaveSubmitButton).should("be.disabled");
       });
     });

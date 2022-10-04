@@ -2,16 +2,17 @@ package features.traces.logic;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
+import edu.nd.crc.safa.features.jobs.entities.app.JobStatus;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.tgen.entities.ArtifactLevelRequest;
 import edu.nd.crc.safa.features.tgen.entities.BaseGenerationModels;
+import edu.nd.crc.safa.features.tgen.entities.TraceGenerationRequest;
+import edu.nd.crc.safa.features.tgen.entities.TracingRequest;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.traces.entities.db.TraceLinkVersion;
@@ -144,35 +145,30 @@ class TestLinkApproval extends AbstractTraceTest {
         // Step - Get all trace links that were generated.
         String url = getGeneratedLinkEndpoint(projectVersion);
         JSONArray links = SafaRequest.withRoute(url).getWithJsonArray();
+
+        // VP - Verify that links were generated
         int numberOfLinks = links.length();
+        assertThat(numberOfLinks).isPositive();
 
-        // Step - Construct list of artifact app entities from the generated links
-        List<ArtifactAppEntity> sourceArtifacts = new ArrayList<>();
-        List<ArtifactAppEntity> targetArtifacts = new ArrayList<>();
+        // Step - Create artifact level
+        ArtifactLevelRequest artifactLevelRequest = new ArtifactLevelRequest("design", "requirement");
 
-        for (int i = 0; i < links.length(); i++) {
-            JSONObject link = links.getJSONObject(i);
-            String source = link.getString("sourceName");
-            String target = link.getString("targetName");
+        // Step - Create tracing request
+        TracingRequest tracingRequest = new TracingRequest();
+        tracingRequest.setArtifactLevels(List.of(artifactLevelRequest));
+        tracingRequest.setMethod(BaseGenerationModels.VSM);
 
-            ArtifactVersion sourceBody = artifactVersionRepository.getBodiesWithName(project, source).get(0);
-            ArtifactVersion targetBody = artifactVersionRepository.getBodiesWithName(project, target).get(0);
+        // Step - Create trace generation request
+        TraceGenerationRequest traceGenerationRequest = new TraceGenerationRequest();
+        traceGenerationRequest.setRequests(List.of(tracingRequest));
+        traceGenerationRequest.setProjectVersion(projectVersion);
 
-            sourceArtifacts.add(artifactVersionRepository.retrieveAppEntityFromVersionEntity(sourceBody));
-            targetArtifacts.add(artifactVersionRepository.retrieveAppEntityFromVersionEntity(targetBody));
-        }
-
-        JSONObject generateTraceLinkBody = new JSONObject();
-        generateTraceLinkBody.put("sourceArtifacts", sourceArtifacts);
-        generateTraceLinkBody.put("targetArtifacts", targetArtifacts);
-        generateTraceLinkBody.put("method", BaseGenerationModels.VSM);
-
-        JSONArray generatedLinks = SafaRequest
-            .withRoute(AppRoutes.Links.GENERATE_LINKS)
-            .postWithJsonArray(generateTraceLinkBody);
+        JSONObject generatedLinks = SafaRequest
+            .withRoute(AppRoutes.Jobs.Traces.GENERATE)
+            .postWithJsonObject(traceGenerationRequest);
 
         // VP - Verify that same number of links were generated.
-        assertThat(generatedLinks.length()).isPositive();
+        assertThat(generatedLinks.getString("status")).isEqualTo(JobStatus.COMPLETED.name());
     }
 
     /**

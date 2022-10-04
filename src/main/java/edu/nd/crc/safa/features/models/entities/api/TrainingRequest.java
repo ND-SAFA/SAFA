@@ -1,13 +1,9 @@
 package edu.nd.crc.safa.features.models.entities.api;
 
 import java.util.List;
-import java.util.UUID;
-import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 
-import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.models.entities.ModelAppEntity;
-import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
+import edu.nd.crc.safa.features.tgen.entities.TracingRequest;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,12 +14,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class TrainingRequest {
-    @Valid UUID projectId;
     @NotEmpty
-    List<ArtifactAppEntity> sources;
-    @NotEmpty
-    List<ArtifactAppEntity> targets;
-    @NotEmpty
-    List<TraceAppEntity> traces;
-    @Valid ModelAppEntity model;
+    List<TracingRequest> requests;
 }

@@ -18,8 +18,8 @@ import edu.nd.crc.safa.features.flatfiles.parser.interfaces.IProjectDefinitionPa
 import edu.nd.crc.safa.features.flatfiles.parser.interfaces.ITraceFIle;
 import edu.nd.crc.safa.features.flatfiles.services.DataFileBuilder;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
-import edu.nd.crc.safa.features.tgen.entities.ArtifactTypeTraceGenerationRequestDTO;
 import edu.nd.crc.safa.features.tgen.entities.BaseGenerationModels;
+import edu.nd.crc.safa.features.tgen.entities.TraceGenerationRequest;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.utilities.FileUtilities;
 
@@ -81,10 +81,10 @@ public class TimFileParser implements IProjectDefinitionParser {
     }
 
     @Override
-    public Pair<List<IDataFile<TraceAppEntity>>, List<ArtifactTypeTraceGenerationRequestDTO>> parseTraceFiles()
+    public Pair<List<IDataFile<TraceAppEntity>>, TraceGenerationRequest> parseTraceFiles()
         throws IOException {
         List<IDataFile<TraceAppEntity>> traceFiles = new ArrayList<>();
-        List<ArtifactTypeTraceGenerationRequestDTO> artifactTypeTraceGenerationRequestDTOS = new ArrayList<>();
+        TraceGenerationRequest traceGenerationRequest = new TraceGenerationRequest();
 
         for (Iterator<String> keyIterator = timFileJson.keys(); keyIterator.hasNext(); ) {
             String traceMatrixKey = keyIterator.next();
@@ -120,12 +120,7 @@ public class TimFileParser implements IProjectDefinitionParser {
                 } else {
                     baseGenerationModels = BaseGenerationModels.getDefault();
                 }
-                ArtifactTypeTraceGenerationRequestDTO artifactTypeTraceGenerationRequestDTO =
-                    new ArtifactTypeTraceGenerationRequestDTO(
-                        baseGenerationModels,
-                        source,
-                        target);
-                artifactTypeTraceGenerationRequestDTOS.add(artifactTypeTraceGenerationRequestDTO);
+                traceGenerationRequest.addTracingRequest(baseGenerationModels, null, source, target);
             }
 
             // Step - If file is defined, create trace file parser
@@ -136,7 +131,7 @@ public class TimFileParser implements IProjectDefinitionParser {
                 traceFiles.add(traceFile);
             }
         }
-        return new Pair<>(traceFiles, artifactTypeTraceGenerationRequestDTOS);
+        return new Pair<>(traceFiles, traceGenerationRequest);
     }
 
     protected JSONObject getDefinitionForDataFiles() {

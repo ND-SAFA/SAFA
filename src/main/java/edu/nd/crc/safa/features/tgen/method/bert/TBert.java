@@ -1,24 +1,31 @@
 package edu.nd.crc.safa.features.tgen.method.bert;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.common.SafaRequestBuilder;
 import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.config.TBertConfig;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.models.entities.api.ModelCreationRequest;
+import edu.nd.crc.safa.features.models.entities.api.ModelIdentifierDTO;
 import edu.nd.crc.safa.features.models.entities.api.TGenTrainingRequest;
+import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.tgen.entities.ArtifactLevel;
 import edu.nd.crc.safa.features.tgen.entities.ITraceLinkGeneration;
+import edu.nd.crc.safa.features.tgen.entities.TracingPayload;
+import edu.nd.crc.safa.features.tgen.entities.TracingRequest;
 import edu.nd.crc.safa.features.tgen.entities.api.AbstractTGenResponse;
 import edu.nd.crc.safa.features.tgen.entities.api.TGenJobResponseDTO;
 import edu.nd.crc.safa.features.tgen.entities.api.TGenPredictionOutput;
 import edu.nd.crc.safa.features.tgen.entities.api.TGenPredictionRequestDTO;
 import edu.nd.crc.safa.features.tgen.entities.api.TGenTrainingResponse;
+import edu.nd.crc.safa.features.tgen.generator.TraceGenerationService;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.traces.entities.db.TraceType;
@@ -60,7 +67,7 @@ public abstract class TBert implements ITraceLinkGeneration {
      */
     public void copyModel(String sourceStatePath, String targetStatePath) {
         BertMethodIdentifier methodId = this.getBertMethodIdentifier();
-        ModelCreationRequest creationRequest = new ModelCreationRequest(
+        ModelIdentifierDTO creationRequest = new ModelIdentifierDTO(
             methodId.getBaseModel(),
             sourceStatePath,
             targetStatePath
@@ -68,49 +75,56 @@ public abstract class TBert implements ITraceLinkGeneration {
         this.safaRequestBuilder
             .sendPost(TBertConfig.get().getCreateModelEndpoint(),
                 creationRequest,
-                ModelCreationRequest.class);
+                ModelIdentifierDTO.class);
+    }
+
+    /**
+     * Deletes model by sending request to TGEN to delete model files
+     */
+    public void deleteModel() {
+        BertMethodIdentifier methodId = this.getBertMethodIdentifier();
+        ModelIdentifierDTO creationRequest = new ModelIdentifierDTO();
+        creationRequest.setModelPath(methodId.getStatePath());
+        this.safaRequestBuilder
+            .sendPost(TBertConfig.get().getDeleteModelEndpoint(),
+                creationRequest,
+                ModelIdentifierDTO.class);
     }
 
     @Override
-    public List<TraceAppEntity> generateLinksWithBaselineState(
-        List<ArtifactAppEntity> sources,
-        List<ArtifactAppEntity> targets) {
-        return this.generateLinksWithState(this.getBertMethodIdentifier().getStatePath(),
-            false,
-            sources,
-            targets);
+    public List<TraceAppEntity> generateLinksWithBaselineState(TracingPayload tracingPayload) {
+        return this.generateLinksWithState(this.getBertMethodIdentifier().getStatePath(), false, tracingPayload);
     }
 
     /**
      * Generates trace link predictions for each pair of source and target artifacts.
      *
-     * @param statePath The path to the initial model state.
-     * @param sources   The source artifacts.
-     * @param targets   The target artifacts.
+     * @param statePath      The path to the initial model state.
+     * @param tracingPayload Levels of artifacts defining sources and targets.
      * @return List of generated trace links.
      */
     @Override
     public List<TraceAppEntity> generateLinksWithState(
         String statePath,
         boolean loadFromStorage,
-        List<ArtifactAppEntity> sources,
-        List<ArtifactAppEntity> targets) {
+        TracingPayload tracingPayload) {
         // Step - Build request
         TGenPredictionRequestDTO payload = createTraceGenerationPayload(
             statePath,
             loadFromStorage,
-            sources,
-            targets);
+            tracingPayload);
 
         // Step - Send request
         String predictEndpoint = TBertConfig.get().getPredictEndpoint();
         TGenJobResponseDTO response = this.safaRequestBuilder
             .sendPost(predictEndpoint, payload, TGenJobResponseDTO.class);
-        System.out.println("Response:" + response);
+
+        if (response.getJobID() == null) {
+            throw new SafaError("Received null output path from TGEN.");
+        }
 
         // Step - Convert to response
-        String outputPath = response.getOutputPath();
-        System.out.println("OutputPath: " + outputPath);
+        String outputPath = response.getJobID();
         TGenPredictionOutput output = getOutput(outputPath, TGenPredictionOutput.class);
         return convertPredictionsToLinks(output.getPredictions());
     }
@@ -119,26 +133,23 @@ public abstract class TBert implements ITraceLinkGeneration {
      * Trains model defined by subclass to predict the given trace links.
      * Trace links not present in `traces` are assumed to be non-links (score = 0).
      *
-     * @param statePath Path to starting weights of model.
-     * @param sources   The source artifacts.
-     * @param targets   The target artifacts.
-     * @param traces    The traces between source and target artifacts.
+     * @param statePath        Path to starting weights of model.
+     * @param tracingRequests  Levels of artifacts defining sources and targets.
+     * @param projectAppEntity The project to extract the artifacts from.
      */
     public void trainModel(String statePath,
-                           List<ArtifactAppEntity> sources,
-                           List<ArtifactAppEntity> targets,
-                           List<TraceAppEntity> traces) {
+                           TracingRequest tracingRequests,
+                           ProjectAppEntity projectAppEntity) {
         // Step - Build request
-        TGenTrainingRequest trainingPayload = createTrainingPayload(statePath, sources, targets, traces);
+        TGenTrainingRequest trainingPayload = createTrainingPayload(statePath, tracingRequests, projectAppEntity);
 
         // Step - Send request
         String trainEndpoint = TBertConfig.get().getTrainEndpoint();
         TGenJobResponseDTO response = this.safaRequestBuilder
             .sendPost(trainEndpoint, trainingPayload, TGenJobResponseDTO.class);
-        System.out.println("Response: " + response);
-
+        
         // Step - Convert to response
-        getOutput(response.getOutputPath(), TGenTrainingResponse.class);
+        getOutput(response.getJobID(), TGenTrainingResponse.class);
     }
 
     private List<TraceAppEntity> convertPredictionsToLinks(List<TGenPredictionOutput.PredictedLink> predictions) {
@@ -160,38 +171,45 @@ public abstract class TBert implements ITraceLinkGeneration {
     private TGenPredictionRequestDTO createTraceGenerationPayload(
         String statePath,
         boolean loadFromStorage,
-        List<ArtifactAppEntity> sources,
-        List<ArtifactAppEntity> targets) {
+        TracingPayload tracingPayload) {
         BertMethodIdentifier methodId = this.getBertMethodIdentifier();
         return new TGenPredictionRequestDTO(
             methodId.getBaseModel(),
             statePath,
             loadFromStorage,
-            createArtifactPayload(sources),
-            createArtifactPayload(targets));
+            createArtifactPayload(tracingPayload, ArtifactLevel::getSources),
+            createArtifactPayload(tracingPayload, ArtifactLevel::getTargets),
+            new HashMap<>());
     }
 
     private TGenTrainingRequest createTrainingPayload(String statePath,
-                                                      List<ArtifactAppEntity> sources,
-                                                      List<ArtifactAppEntity> targets,
-                                                      List<TraceAppEntity> traces) {
+                                                      TracingRequest tracingRequest,
+                                                      ProjectAppEntity projectAppEntity) {
         BertMethodIdentifier methodId = this.getBertMethodIdentifier();
+        TracingPayload tracingPayload = TraceGenerationService.extractPayload(tracingRequest, projectAppEntity);
         return new TGenTrainingRequest(
             methodId.getBaseModel(),
             statePath,
-            createArtifactPayload(sources),
-            createArtifactPayload(targets),
-            traces);
+            createArtifactPayload(tracingPayload, ArtifactLevel::getSources),
+            createArtifactPayload(tracingPayload, ArtifactLevel::getTargets),
+            projectAppEntity.getTraces());
     }
 
-    private Map<String, String> createArtifactPayload(List<ArtifactAppEntity> artifacts) {
-        Map<String, String> artifactMap = new HashMap<>();
-        artifacts.forEach(a -> artifactMap.put(a.getName(), a.getBody()));
-        return artifactMap;
+    private List<Map<String, String>> createArtifactPayload(TracingPayload tracingPayload, Function<ArtifactLevel,
+        List<ArtifactAppEntity>> getter) {
+        List<Map<String, String>> artifactLevelsMap = new ArrayList<>();
+
+        tracingPayload.getArtifactLevels().stream().map(getter).forEach(artifacts -> {
+            Map<String, String> artifactLevelsArtifactMap = new HashMap<>();
+            artifacts.forEach(a -> artifactLevelsArtifactMap.put(a.getName(), a.getBody()));
+            artifactLevelsMap.add(artifactLevelsArtifactMap);
+        });
+        return artifactLevelsMap;
     }
 
-    private <T extends AbstractTGenResponse> T getOutput(String outputFile, Class<T> responseClass) {
+    private <T extends AbstractTGenResponse> T getOutput(String jobId, Class<T> responseClass) {
         //TODO: Use scheduled tasks instead of constant pinging.
+        String outputFile = "prediction/output/" + jobId + "/output.json";
         try {
             while (!CloudStorage.exists(outputFile)) {
                 Thread.sleep(1000 * Defaults.WAIT_SECONDS);

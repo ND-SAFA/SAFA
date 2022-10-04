@@ -24,7 +24,7 @@ import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;
 import edu.nd.crc.safa.features.projects.services.ProjectRetrievalService;
 import edu.nd.crc.safa.features.projects.services.ProjectService;
-import edu.nd.crc.safa.features.tgen.entities.ArtifactTypeTraceGenerationRequestDTO;
+import edu.nd.crc.safa.features.tgen.entities.TraceGenerationRequest;
 import edu.nd.crc.safa.features.tgen.generator.TraceGenerationService;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.versions.ProjectChanger;
@@ -127,7 +127,7 @@ public class FlatFileService {
                                                 boolean asCompleteSet) {
         try {
             // Step - Parse artifacts, traces, and trace generation requests
-            Pair<ProjectCommit, List<ArtifactTypeTraceGenerationRequestDTO>> parseTIMResponse = parseTIMIntoCommit(
+            Pair<ProjectCommit, TraceGenerationRequest> parseTIMResponse = parseTIMIntoCommit(
                 projectVersion,
                 timFileJson);
 
@@ -135,11 +135,12 @@ public class FlatFileService {
             ProjectCommit projectCommit = parseTIMResponse.getValue0();
 
             // Step - Generate trace link requests (post-artifact construction if successful)
-            List<ArtifactTypeTraceGenerationRequestDTO> artifactTypeTraceGenerationRequestDTOS = parseTIMResponse
-                .getValue1();
+            TraceGenerationRequest traceGenerationRequest = parseTIMResponse.getValue1();
+            ProjectAppEntity projectAppEntity = new ProjectAppEntity(projectCommit);
             List<TraceAppEntity> generatedLinks = this.traceGenerationService.generateTraceLinks(
-                projectCommit.getArtifacts().getAdded(),
-                artifactTypeTraceGenerationRequestDTOS);
+                traceGenerationRequest,
+                projectAppEntity
+            );
             generatedLinks = this.traceGenerationService.filterDuplicateGeneratedLinks(
                 projectCommit.getTraces().getAdded(),
                 generatedLinks);
@@ -174,7 +175,7 @@ public class FlatFileService {
      *                     - syntax error or unknown reference in the tim.json.
      * @throws IOException Throws IOException if an errors occurs while reading files in tim.json.
      */
-    public Pair<ProjectCommit, List<ArtifactTypeTraceGenerationRequestDTO>> parseTIMIntoCommit(
+    public Pair<ProjectCommit, TraceGenerationRequest> parseTIMIntoCommit(
         ProjectVersion projectVersion,
         JSONObject timFileJson
     ) throws SafaError, IOException {
@@ -201,7 +202,7 @@ public class FlatFileService {
             projectVersion,
             ProjectEntity.TRACES);
 
-        return new Pair<>(projectCommit, flatFileParser.getArtifactTypeTraceGenerationRequestDTOS());
+        return new Pair<>(projectCommit, flatFileParser.getTraceGenerationRequest());
     }
 
     private void addErrorsToCommit(ProjectCommit projectCommit,

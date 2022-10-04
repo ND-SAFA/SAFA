@@ -9,7 +9,9 @@ import java.util.Map;
 
 import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
+import edu.nd.crc.safa.features.tgen.entities.ArtifactLevel;
 import edu.nd.crc.safa.features.tgen.entities.ITraceLinkGeneration;
+import edu.nd.crc.safa.features.tgen.entities.TracingPayload;
 import edu.nd.crc.safa.features.tgen.generator.TraceLinkConstructor;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 
@@ -23,29 +25,31 @@ public class VSMController implements ITraceLinkGeneration {
     @Override
     public List<TraceAppEntity> generateLinksWithState(String statePath,
                                                        boolean loadFromStorage,
-                                                       List<ArtifactAppEntity> sourceDocs,
-                                                       List<ArtifactAppEntity> targetDocs) {
+                                                       TracingPayload tracingPayload) {
         //Note, VSM has not state (yet).
-        return generateLinksWithBaselineState(sourceDocs, targetDocs);
+        return generateLinksWithBaselineState(tracingPayload);
     }
 
     /**
      * Generates set of trace links between source and target pairs of artifacts using the
      * vector-space model
      *
-     * @param sourceDocs List of source artifacts.
-     * @param targetDocs List of target artifacts.
+     * @param tracingPayload List of artifact levels defining set of source and target artifacts.
      * @return List of trace links.
      */
     @Override
-    public List<TraceAppEntity> generateLinksWithBaselineState(List<ArtifactAppEntity> sourceDocs,
-                                                               List<ArtifactAppEntity> targetDocs) {
-        Map<String, Collection<String>> sourceTokens = tokenizeArtifactAppEntities(sourceDocs);
-        Map<String, Collection<String>> targetTokens = tokenizeArtifactAppEntities(targetDocs);
-        TraceLinkConstructor<String, TraceAppEntity> traceLinkConstructor = (s, t, score) -> new TraceAppEntity()
-            .asGeneratedTrace(score)
-            .betweenArtifacts(s, t);
-        return generateLinksFromTokens(sourceTokens, targetTokens, traceLinkConstructor);
+    public List<TraceAppEntity> generateLinksWithBaselineState(TracingPayload tracingPayload) {
+        List<TraceAppEntity> generatedLinks = new ArrayList<>();
+        for (ArtifactLevel artifactLevel : tracingPayload.getArtifactLevels()) {
+            Map<String, Collection<String>> sourceTokens = tokenizeArtifactAppEntities(artifactLevel.getSources());
+            Map<String, Collection<String>> targetTokens = tokenizeArtifactAppEntities(artifactLevel.getTargets());
+            TraceLinkConstructor<String, TraceAppEntity> traceLinkConstructor = (s, t, score) -> new TraceAppEntity()
+                .asGeneratedTrace(score)
+                .betweenArtifacts(s, t);
+            generatedLinks.addAll(generateLinksFromTokens(sourceTokens, targetTokens, traceLinkConstructor));
+        }
+
+        return generatedLinks;
     }
 
     private <K, L> List<L> generateLinksFromTokens(Map<K, Collection<String>> sTokens,

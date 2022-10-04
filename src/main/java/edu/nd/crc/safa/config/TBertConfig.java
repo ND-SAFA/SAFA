@@ -27,11 +27,16 @@ public class TBertConfig {
     }
 
     public String getTrainEndpoint() {
-        return FileUtilities.buildPath(baseEndpoint, "fine-tune") + "/";
+        return FileUtilities.buildPath(baseEndpoint, "train") + "/";
     }
 
     public String getCreateModelEndpoint() {
-        return FileUtilities.buildPath(baseEndpoint, "models") + "/";
+        return FileUtilities.buildPath(baseEndpoint, "model", "create") + "/";
+    }
+
+    public String getDeleteModelEndpoint() {
+        return FileUtilities.buildPath(baseEndpoint, "model", "delete") + "/";
+
     }
 
     @PostConstruct

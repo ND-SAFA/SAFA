@@ -14,7 +14,7 @@ public class PLBert extends TBert {
     @Override
     BertMethodIdentifier getBertMethodIdentifier() {
         return new BertMethodIdentifier(
-            "t_bert_single",
+            "PL_BERT",
             "thearod5/tbert"
         );
     }

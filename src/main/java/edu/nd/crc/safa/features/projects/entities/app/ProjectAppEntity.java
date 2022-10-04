@@ -11,6 +11,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
+import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
 import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
 import edu.nd.crc.safa.features.memberships.entities.app.ProjectMemberAppEntity;
@@ -21,6 +22,7 @@ import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.types.TypeAppEntity;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
@@ -95,6 +97,17 @@ public class ProjectAppEntity implements IAppEntity {
         this.models = models;
     }
 
+    public ProjectAppEntity(ProjectCommit projectCommit) {
+        this.artifacts = projectCommit.getArtifacts().getAdded();
+        this.traces = projectCommit.getTraces().getAdded();
+        this.projectVersion = projectCommit.getCommitVersion();
+    }
+
+    @JsonIgnore
+    public static List<ArtifactAppEntity> filterByArtifactType(List<ArtifactAppEntity> artifacts, String artifactType) {
+        return artifacts.stream().filter(a -> a.getType().equalsIgnoreCase(artifactType)).collect(Collectors.toList());
+    }
+
     public List<String> getArtifactNames() {
         return this.artifacts
             .stream()
@@ -110,5 +123,10 @@ public class ProjectAppEntity implements IAppEntity {
     @Override
     public void setId(UUID id) {
         this.projectId = id;
+    }
+
+    @JsonIgnore
+    public List<ArtifactAppEntity> getByArtifactType(String artifactType) {
+        return filterByArtifactType(this.artifacts, artifactType);
     }
 }

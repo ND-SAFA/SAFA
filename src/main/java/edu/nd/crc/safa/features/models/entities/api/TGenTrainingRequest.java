@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.features.models.entities.api;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -19,10 +20,10 @@ public class TGenTrainingRequest extends TGenPredictionRequestDTO {
 
     public TGenTrainingRequest(String baseModel,
                                String modelPath,
-                               Map<String, String> sources,
-                               Map<String, String> targets,
+                               List<Map<String, String>> sources,
+                               List<Map<String, String>> targets,
                                List<TraceAppEntity> traces) {
-        super(baseModel, modelPath, true, sources, targets);
+        super(baseModel, modelPath, true, sources, targets, new HashMap<>());
         this.links = traces
             .stream()
             .map(t -> List.of(t.getSourceName(), t.getTargetName()))

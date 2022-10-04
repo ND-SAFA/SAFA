@@ -1,6 +1,5 @@
 package edu.nd.crc.safa.features.models.entities.api;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -8,20 +7,29 @@ import lombok.NoArgsConstructor;
  * Represents a request to create a tranformers model.
  */
 @NoArgsConstructor
-@AllArgsConstructor
 @Data
-public class ModelCreationRequest {
+public class ModelIdentifierDTO {
 
     /**
      * The base model class to create model from.
      */
-    String baseModelClass;
+    String baseModel;
+    /**
+     * The status of the request.
+     */
+    int status;
     /**
      * The state of the model base class containing starting weights.
      */
-    String statePath;
+    String modelPath;
     /**
      * The path to the output file within storage.
      */
-    String outputPath;
+    String outputDir;
+
+    public ModelIdentifierDTO(String baseModel, String modelPath, String outputDir) {
+        this.baseModel = baseModel;
+        this.modelPath = modelPath;
+        this.outputDir = outputDir;
+    }
 }

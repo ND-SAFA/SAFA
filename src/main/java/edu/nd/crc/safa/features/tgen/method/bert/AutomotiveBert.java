@@ -5,8 +5,8 @@ import edu.nd.crc.safa.common.SafaRequestBuilder;
 /**
  * Bert model trained to predict traces between (natural language) NL to NL artifacts.
  */
-public class NLBert extends TBert {
-    public NLBert(SafaRequestBuilder safaRequestBuilder) {
+public class AutomotiveBert extends TBert {
+    public AutomotiveBert(SafaRequestBuilder safaRequestBuilder) {
         super(safaRequestBuilder);
     }
 
@@ -14,7 +14,7 @@ public class NLBert extends TBert {
     BertMethodIdentifier getBertMethodIdentifier() {
         return new BertMethodIdentifier(
             "NL_BERT",
-            "thearod5/sebert-task-cls"
+            "thearod5/automotive"
         );
     }
 }

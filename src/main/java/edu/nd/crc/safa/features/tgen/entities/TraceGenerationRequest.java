@@ -1,12 +1,10 @@
 package edu.nd.crc.safa.features.tgen.entities;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotEmpty;
 
-import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.models.entities.ModelAppEntity;
-import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -16,50 +14,35 @@ import lombok.NoArgsConstructor;
 /**
  * Request to generate trace links between artifacts.
  */
-@Data
 @NoArgsConstructor
+@Data
 public class TraceGenerationRequest {
     /**
-     * List of source artifacts.
+     * The artifact levels being traced against.
      */
-    @NotNull
-    List<ArtifactAppEntity> sourceArtifacts;
-    /**
-     * List of target artifacts.
-     */
-    @NotNull
-    List<ArtifactAppEntity> targetArtifacts;
-    /**
-     * The method to generate trace links with.
-     */
-    BaseGenerationModels method;
-    /**
-     * The model to use to generate trace links.
-     */
-    ModelAppEntity model;
+    @NotEmpty
+    List<TracingRequest> requests = new ArrayList<>();
+
     /**
      * The project version to commit them too.
      */
     ProjectVersion projectVersion = new ProjectVersion();
 
-    public TraceGenerationRequest(ArtifactTypeTraceGenerationRequestDTO artifactTypeGenerationRequest,
-                                  ProjectAppEntity project) {
-        this.sourceArtifacts = getArtifactsWithType(project, artifactTypeGenerationRequest.getSource());
-        this.targetArtifacts = getArtifactsWithType(project, artifactTypeGenerationRequest.getTarget());
-        this.method = artifactTypeGenerationRequest.getMethod();
-    }
-
-    private List<ArtifactAppEntity> getArtifactsWithType(ProjectAppEntity project,
-                                                         String artifactType) {
-        return project
-            .getArtifacts()
-            .stream()
-            .filter(a -> a.getType().equals(artifactType))
-            .collect(Collectors.toList());
-    }
-
     @JsonIgnore
     public int size() {
-        return this.sourceArtifacts.size() * this.targetArtifacts.size();
+        return this.getRequests().size();
+    }
+
+    public void addTracingRequest(BaseGenerationModels method,
+                                  ModelAppEntity model,
+                                  String source,
+                                  String target) {
+        ArtifactLevelRequest artifactLevelRequest = new ArtifactLevelRequest(source, target);
+        TracingRequest tracingRequest = new TracingRequest(
+            method,
+            model,
+            new ArrayList<>(List.of(artifactLevelRequest))
+        );
+        this.requests.add(tracingRequest);
     }
 }

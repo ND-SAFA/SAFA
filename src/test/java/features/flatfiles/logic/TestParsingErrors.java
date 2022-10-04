@@ -2,13 +2,12 @@ package features.flatfiles.logic;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import requests.RouteBuilder;
-
 import edu.nd.crc.safa.config.AppRoutes;
 
 import common.DefaultProjectConstants;
 import features.flatfiles.base.ParseBaseTest;
 import org.junit.jupiter.api.Test;
+import requests.RouteBuilder;
 
 class TestParsingErrors extends ParseBaseTest {
 
@@ -22,7 +21,7 @@ class TestParsingErrors extends ParseBaseTest {
 
         // VP - Verify error message informs that columns are wrong
         String c = uploadEntityFileAndGetError(routeName, fileName);
-        assertThat(c).contains("id, summary, content");
+        assertThat(c).contains("id, content");
     }
 
     @Test

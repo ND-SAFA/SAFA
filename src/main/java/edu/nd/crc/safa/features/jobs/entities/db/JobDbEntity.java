@@ -10,6 +10,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
@@ -45,7 +46,8 @@ public class JobDbEntity {
     /**
      * The name of the job used for as a human readable description / id.
      */
-    @Column(name = "name", nullable = false)
+    @Lob
+    @Column(name = "name", nullable = false, columnDefinition = "mediumtext")
     String name;
     /**
      * The unique identifier for job.

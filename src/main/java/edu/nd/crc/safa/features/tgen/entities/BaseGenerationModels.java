@@ -5,6 +5,10 @@ package edu.nd.crc.safa.features.tgen.entities;
  */
 public enum BaseGenerationModels {
     /**
+     * The Bert model trained on automotive data.
+     */
+    AutomotiveBert,
+    /**
      * Bert model trained on NL-NL trace links.
      */
     NLBert,

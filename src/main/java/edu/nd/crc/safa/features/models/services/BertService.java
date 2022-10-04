@@ -2,6 +2,7 @@ package edu.nd.crc.safa.features.models.services;
 
 import edu.nd.crc.safa.common.SafaRequestBuilder;
 import edu.nd.crc.safa.features.tgen.entities.BaseGenerationModels;
+import edu.nd.crc.safa.features.tgen.method.bert.AutomotiveBert;
 import edu.nd.crc.safa.features.tgen.method.bert.NLBert;
 import edu.nd.crc.safa.features.tgen.method.bert.PLBert;
 import edu.nd.crc.safa.features.tgen.method.bert.TBert;
@@ -15,6 +16,8 @@ public class BertService {
     public TBert getBertModel(BaseGenerationModels generationModel,
                               SafaRequestBuilder safaRequestBuilder) {
         switch (generationModel) {
+            case AutomotiveBert:
+                return new AutomotiveBert(safaRequestBuilder);
             case PLBert:
                 return new PLBert(safaRequestBuilder);
             case NLBert:

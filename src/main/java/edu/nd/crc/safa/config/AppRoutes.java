@@ -87,7 +87,7 @@ public class AppRoutes {
     public static class Links {
         public static final String GET_GENERATED_LINKS_IN_PROJECT_VERSION = Projects.ROOT
             + "/versions/{versionId}/links/generated";
-        public static final String GENERATE_LINKS = Projects.ROOT + "/links/generate";
+        protected static final String GENERATE_LINKS = Projects.ROOT + "/links/generate";
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)

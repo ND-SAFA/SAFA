@@ -3,12 +3,12 @@ package features.jobs.logic.common;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.jobs.entities.jobs.CreateProjectViaJsonJob;
+import edu.nd.crc.safa.features.tgen.entities.TraceGenerationRequest;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import common.ApplicationBaseTest;
@@ -37,7 +37,7 @@ class TestJobMethodExtraction extends ApplicationBaseTest {
             new JobDbEntity(),
             serviceProvider,
             new ProjectCommit(projectVersion, false),
-            new ArrayList<>()
+            new TraceGenerationRequest()
         );
     }
 }

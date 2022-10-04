@@ -44,9 +44,19 @@ class PredictSerializer(BaseTraceSerializer):
     loadFromStorage = serializers.BooleanField(required=False,
                                                help_text="Whether model weights should reference cloud storage.")
 
+    def create(self, validated_data):
+        trace_args_builder = super().create(validated_data)
+        trace_args_builder.source_layers = validated_data["sourceLayers"]
+        trace_args_builder.target_layers = validated_data["targetLayers"]
+        return trace_args_builder
+
 
 class TrainSerializer(PredictSerializer):
     links = serializers.ListField(
         child=serializers.ListField(child=serializers.CharField()),
         help_text="List of true links between source and target artifacts"
     )
+
+    def create(self, validated_data):
+        trace_args_builder = super().create(validated_data)
+        trace_args_builder.links = validated_data["links"]

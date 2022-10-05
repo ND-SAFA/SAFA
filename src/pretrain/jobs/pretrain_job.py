@@ -10,5 +10,5 @@ class PretrainJob(AbstractPreTrainJob):
         Runs the pretraining
         :return: the results of the pretraining
         """
-        self.pretrainer.train()
+        self.pretrainer.build()
         return None  # TODO

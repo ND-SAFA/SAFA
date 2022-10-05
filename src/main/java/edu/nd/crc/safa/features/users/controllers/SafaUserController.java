@@ -30,6 +30,7 @@ import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -159,6 +160,11 @@ public class SafaUserController extends BaseController {
         principal.setPassword(passwordEncoder.encode(passwordChangeRequest.getNewPassword()));
         principal = this.safaUserRepository.save(principal);
         return new UserIdentifierDTO(principal);
+    }
+
+    @GetMapping(AppRoutes.Accounts.SELF)
+    public UserIdentifierDTO retrieveCurrentUser() {
+        return new UserIdentifierDTO(safaUserService.getCurrentUser());
     }
 
     private void createSampleProject(CreateAccountRequest newUser) throws IOException {

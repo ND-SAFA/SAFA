@@ -23,6 +23,7 @@ public class AppRoutes {
         public static final String FORGOT_PASSWORD = Accounts.PREFIX + "/forgot";
         public static final String CREATE_ACCOUNT = Accounts.PREFIX + "/create";
         public static final String DELETE_ACCOUNT = Accounts.PREFIX + "/delete";
+        public static final String SELF = Accounts.PREFIX + "/self";
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)

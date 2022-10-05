@@ -11,16 +11,16 @@ import org.springframework.stereotype.Service;
 /**
  * Responsible for constructing and sending emails.
  */
-@Service
-public class MailService {
+public class EmailServiceImpl implements EmailService {
     private final JavaMailSender javaMailSender;
 
     @Autowired
-    public MailService(JavaMailSender javaMailSender) {
+    public EmailServiceImpl(JavaMailSender javaMailSender) {
         this.javaMailSender = javaMailSender;
     }
 
-    public void createAndSendEmail(String subject, String messageContent, String recipient) throws MessagingException {
+    @Override
+    public void send(String subject, String messageContent, String recipient) throws Exception {
         sendMessage(createEmail(subject, messageContent, recipient));
     }
 

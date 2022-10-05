@@ -9,10 +9,12 @@ module.exports = {
     },
   },
   lintOnSave: true,
-  devServer: {
-    https: {
-      key: fs.readFileSync("./certs/localhost-key.pem"),
-      cert: fs.readFileSync("./certs/localhost.pem"),
-    },
-  },
+  devServer: fs.existsSync("./certs/localhost-key.pem")
+    ? {
+        https: {
+          key: fs.readFileSync("./certs/localhost-key.pem"),
+          cert: fs.readFileSync("./certs/localhost.pem"),
+        },
+      }
+    : {},
 };

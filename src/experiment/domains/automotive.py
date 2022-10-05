@@ -11,6 +11,8 @@ from experiment.common.experiment_run import ExperimentRun
 from experiment.common.pretraining_data import PretrainingData
 from experiment.common.run_mode import RunMode
 
+GREADER_PATH = "/Users/albertorodriguez/Projects/SAFA/greader"
+SAFA_PATH = os.path.join(GREADER_PATH, "safa")
 OUTPUT_DIR = "/Users/albertorodriguez/Desktop/safa data/automotive/models"
 REPOSITORIES = ["ApolloAuto/apollo",
                 "autorope/donkeycar",
@@ -19,7 +21,7 @@ REPOSITORIES = ["ApolloAuto/apollo",
 VALIDATION_PERCENTAGE_DEFAULT = .1
 N_TRAINING_EPOCHS = 10
 PRETRAINING_DATA = PretrainingData.AUTOMOTIVE
-STATE_PATHS = ["base-bert-uncased",
+STATE_PATHS = ["bert-base-uncased",
                "thearod5/sebert-task-cls",
                "/Users/albertorodriguez/Desktop/safa data/automotive/models/thearod5/sebert-task-cls_automotive",
                "/Users/albertorodriguez/Desktop/safa data/automotive/models/thearod5/sebert-task-cls_automotive_lm",
@@ -50,7 +52,7 @@ if __name__ == "__main__":
         experiment = ExperimentRun(
             STATE_PATHS[model_state_path_index],
             PRETRAINING_DATA,
-            args.training_repos,
+            [os.path.join(SAFA_PATH, r) for r in args.training_repos],
             METRICS,
             TEST_PROJECT_PATH,
         )
@@ -65,5 +67,8 @@ if __name__ == "__main__":
         else:
             experiment.perform_run(
                 OUTPUT_DIR,
-                args.mode
+                args.mode,
+                load_best_model_at_end=True,
+                metric_for_best_model="eval_map_at_k",
+                greater_is_better=True
             )

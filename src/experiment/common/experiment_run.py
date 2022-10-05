@@ -6,11 +6,11 @@ from transformers import AutoModel, AutoTokenizer, BertForMaskedLM, DataCollator
     Trainer, \
     TrainingArguments
 
-from experiment.common.model_architecture import ModelArchitecture
+from common.models.base_models.supported_base_model import SupportedBaseModel
 from experiment.common.pretraining_data import PretrainingData
-from experiment.common.project import Project
 from experiment.common.run_mode import RunMode
-from experiment.datasets.safa_project import SafaProject
+from experiment.models.repository import Repository
+from experiment.models.safa_project import SafaProject
 from trace.jobs.trace_args_builder import TraceArgsBuilder
 from trace.train.trace_trainer import TraceTrainer
 
@@ -19,13 +19,13 @@ class ExperimentRun:
     def __init__(self,
                  model_state_path: str,
                  pretraining: PretrainingData,
-                 training_repositories: List[str],
+                 training_repository_paths: List[str],
                  metrics: List[str],
                  validation_project_path: str,
-                 architecture: ModelArchitecture = ModelArchitecture.NL_BERT,
+                 architecture: SupportedBaseModel = SupportedBaseModel.NL_BERT,
                  ):
         self.model_state_path = model_state_path
-        self.training_repositories = training_repositories
+        self.training_repository_paths = training_repository_paths
         self.metrics = metrics
         self.architecture = architecture
         self.validation_project_path = validation_project_path
@@ -48,15 +48,16 @@ class ExperimentRun:
 
         # Trace Trainer
         validation_project = SafaProject(self.validation_project_path)
-        trace_args = TraceArgsBuilder(self.architecture.value,
+        settings = kwargs
+        settings["metrics"] = self.metrics
+        settings["validation_percentage"] = 0
+        trace_args = TraceArgsBuilder(self.architecture,
                                       self.model_state_path,
                                       output_dir,
                                       sources,
                                       targets,
                                       links,
-                                      metrics=self.metrics,
-                                      validation_percentage=0,
-                                      **kwargs).build()
+                                      settings=settings).build()
 
         trace_trainer = TraceTrainer(args=trace_args)
 
@@ -114,37 +115,41 @@ class ExperimentRun:
 
         trainer.save_model(run_save_path)
 
-    def collect_text_files(self, dir_path: str) -> str:
+    @staticmethod
+    def collect_text_files(dir_path: str) -> str:
         clean_text = ""
         for file_name in os.listdir(dir_path):
             if file_name in ["aggregate.txt", ".DS_Store"]:
                 continue
             file_path = os.path.join(dir_path, file_name)
-            clean_text += self.clean_text(file_path)
+            clean_text += ExperimentRun.clean_text(file_path)
         aggregate_file_path = os.path.join(dir_path, "aggregate.txt")
         with open(aggregate_file_path, "w") as aggregate_file:
             aggregate_file.write(clean_text)
         return aggregate_file_path
 
-    def clean_text(self, file_path: str):
+    @staticmethod
+    def clean_text(file_path: str):
         clean_lines = []
-        for file_line in self.__read_text(file_path).split("\n"):
+        for file_line in ExperimentRun.__read_text(file_path).split("\n"):
             if len(file_line.strip()) == 0:
                 continue
             clean_lines.append(file_line)
         return "\n".join(clean_lines)
 
-    def __read_text(self, file_path: str):
+    @staticmethod
+    def __read_text(file_path: str):
         with open(file_path, "r") as file:
             return file.read()
 
-    def __create_training_data(self, training_repositories: List[str]):
+    @staticmethod
+    def __create_training_data(training_repository_paths: List[str]):
         training_sources = []
         training_targets = []
         training_links = []
-        for repo_name in training_repositories:
-            project = Project(repo_name)
-            for level in project.get_levels():
+        for repo_name in training_repository_paths:
+            repository = Repository(repo_name)
+            for level in repository.get_levels():
                 training_sources.append(level.sources)
                 training_targets.append(level.targets)
                 training_links.extend(level.links)

@@ -1,4 +1,3 @@
-import math
 import random
 from typing import Dict, Iterable, List, Tuple, Set, Sized, Callable, Optional
 
@@ -11,6 +10,18 @@ from trace.data.data_key import DataKey
 from trace.data.trace_dataset import TraceDataset
 from trace.data.trace_link import TraceLink
 from common.models.model_generator import ModelGenerator, ArchitectureType
+import random
+from typing import Callable, Dict, Iterable, List, Optional, Set, Sized, Tuple
+
+import torch
+
+from common.models.model_generator import ArchitectureType, ModelGenerator
+from trace.config.constants import EVAL_DATASET_SIZE_DEFAULT, LINKED_TARGETS_ONLY_DEFAULT, RESAMPLE_RATE_DEFAULT, \
+    VALIDATION_PERCENTAGE_DEFAULT
+from trace.data.artifact import Artifact
+from trace.data.data_key import DataKey
+from trace.data.trace_dataset import TraceDataset
+from trace.data.trace_link import TraceLink
 
 
 class TraceDatasetCreator:
@@ -18,10 +29,12 @@ class TraceDatasetCreator:
     Responsible for creating dataset in format for defined models.
     """
 
-    def __init__(self, source_layers: List[Dict[str, str]], target_layers: List[Dict[str, str]], model_generator: ModelGenerator,
-                 true_links: List[Tuple[str, str]] = None, validation_percentage: float = VALIDATION_PERCENTAGE_DEFAULT):
+    def __init__(self, source_layers: List[Dict[str, str]], target_layers: List[Dict[str, str]],
+                 model_generator: ModelGenerator,
+                 true_links: List[Tuple[str, str]] = None,
+                 validation_percentage: float = VALIDATION_PERCENTAGE_DEFAULT):
         """
-        Constructs datasets for trace link training and validation
+        Constructs models for trace link training and validation
         :param source_layers: a list of source artifacts across all layers
         :param target_layers: a list of target artifacts across all layers
         :param true_links: list of tuples containing linked source and target ids
@@ -34,7 +47,8 @@ class TraceDatasetCreator:
 
         self.model_generator = model_generator
         self.links = self._generate_all_links(source_layers, target_layers)
-        self.pos_link_ids, self.neg_link_ids = self._get_pos_and_neg_links(true_links, self.links) if true_links else (None, None)
+        self.pos_link_ids, self.neg_link_ids = self._get_pos_and_neg_links(true_links, self.links) if true_links else (
+        None, None)
         self.validation_percentage = validation_percentage
         self.linked_target_ids = self._get_linked_targets_only(true_links) if true_links else set()
 
@@ -49,7 +63,8 @@ class TraceDatasetCreator:
             train_neg_link_ids = self._get_data_split(self.neg_link_ids)
 
             train_pos_link_ids = TraceDataset.resample_data(train_pos_link_ids, resample_rate)
-            train_neg_link_ids = TraceDataset.resize_data(train_neg_link_ids, len(train_pos_link_ids), include_duplicates=True)
+            train_neg_link_ids = TraceDataset.resize_data(train_neg_link_ids, len(train_pos_link_ids),
+                                                          include_duplicates=True)
 
             link_ids = [*train_pos_link_ids, *train_neg_link_ids]
             self.__training_dataset = self._create_dataset(link_ids)
@@ -189,7 +204,8 @@ class TraceDatasetCreator:
                 reduced_links.append(link.id_)
         return reduced_links
 
-    def _generate_all_links(self, source_layers: List[Dict[str, str]], target_layers: List[Dict[str, str]]) -> Dict[int, TraceLink]:
+    def _generate_all_links(self, source_layers: List[Dict[str, str]], target_layers: List[Dict[str, str]]) -> Dict[
+        int, TraceLink]:
         """
         Generates Trace Links between source and target pairs within each layer
         :param source_layers: a list of source artifacts across all layers

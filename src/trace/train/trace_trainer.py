@@ -73,7 +73,7 @@ class TraceTrainer(Trainer):
     @staticmethod
     def _eval(output: PredictionOutput, metric_names: List):
         """
-        Performs the evaluation of the model (use this instead of Trainer.evaluation to utilize predefined metrics from datasets)
+        Performs the evaluation of the model (use this instead of Trainer.evaluation to utilize predefined metrics from models)
         :param output: the output from predictions
         :param metric_names: name of metrics desired for evaluation
         """

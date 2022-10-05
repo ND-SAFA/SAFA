@@ -19,54 +19,37 @@ export default async function authHttpClient<T>(
   options: APIOptions,
   setJsonContentType = true
 ): Promise<T> {
-  const token = sessionStore.getToken;
-  const URL = `${baseURL}/${relativeUrl}`;
+  const res = await fetch(`${baseURL}/${relativeUrl}`, {
+    ...options,
+    credentials: "include",
+    headers: setJsonContentType
+      ? {
+          ...(options.headers || {}),
+          "Content-Type": "application/json",
+        }
+      : options.headers,
+  });
+  const content = await res.text();
 
-  if (setJsonContentType) {
-    options.headers = {
-      "Content-Type": "application/json",
-    };
+  if (res.status === 403) {
+    const message = "Session has timed out. Please log back in.";
+
+    await handleLogout();
+
+    logStore.onWarning(message);
+    throw Error(message);
+  } else if (res.status === 204 || content === "" || content === "created") {
+    // TODO: is this legacy code even necessary?
+    return {} as T;
   }
 
-  if (token === undefined) {
-    const error = `${relativeUrl} requires token.`;
+  const data = JSON.parse(content);
 
-    logStore.onDevError(error);
+  if (!res.ok) {
+    logStore.onServerError(data);
 
-    throw Error(error);
+    throw Error(data.error);
   } else {
-    options.headers = {
-      ...options.headers,
-      Authorization: token,
-    };
-  }
-
-  const fetchResponse = await fetch(URL, options);
-
-  let message;
-  let resContent;
-  switch (fetchResponse.status) {
-    case 403:
-      message = "Session has timed out. Please log back in.";
-      logStore.onWarning(message);
-      await handleLogout();
-      throw Error(message);
-    case 204:
-      return {} as T;
-    default:
-      resContent = await fetchResponse.text();
-      if (resContent === "" || resContent === "created") {
-        return {} as T;
-      }
-  }
-
-  const resJson = JSON.parse(resContent);
-
-  if (!fetchResponse.ok) {
-    logStore.onServerError(resJson);
-
-    throw Error(resJson.error);
-  } else {
-    return resJson;
+    return data;
   }
 }

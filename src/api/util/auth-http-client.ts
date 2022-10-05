@@ -1,5 +1,5 @@
 import { APIOptions } from "@/types";
-import { logStore, sessionStore } from "@/hooks";
+import { logStore } from "@/hooks";
 import { baseURL } from "@/api";
 import { handleLogout } from "@/api/handlers";
 

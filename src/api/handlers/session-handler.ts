@@ -6,15 +6,7 @@ import {
   UserPasswordModel,
 } from "@/types";
 import { sessionStore, logStore } from "@/hooks";
-import {
-  getParam,
-  getParams,
-  navigateTo,
-  QueryParams,
-  router,
-  Routes,
-  routesPublic,
-} from "@/router";
+import { getParam, getParams, navigateTo, QueryParams, Routes } from "@/router";
 import {
   handleClearProject,
   createLoginSession,
@@ -71,29 +63,23 @@ export async function handleLogout(): Promise<void> {
  * If the token does not, is expired, or is otherwise invalid, the user will be sent back to login.
  */
 export async function handleAuthentication(): Promise<void> {
-  if (routesPublic.includes(router.currentRoute.path)) return;
+  sessionStore.user = await getCurrentUser();
 
-  try {
-    sessionStore.user = await getCurrentUser();
+  datadogRum.init({
+    applicationId: process.env.VUE_APP_DDOG_APP_ID || "",
+    clientToken: process.env.VUE_APP_DDOG_DDOG_TOKEN || "",
+    env: process.env.NODE_ENV || "",
+    site: "datadoghq.com",
+    service: "safa",
+    version: "1.0.0",
+    sampleRate: 100,
+    premiumSampleRate: 100,
+    trackInteractions: true,
+    defaultPrivacyLevel: "mask-user-input",
+  });
+  datadogRum.startSessionReplayRecording();
 
-    datadogRum.init({
-      applicationId: process.env.VUE_APP_DDOG_APP_ID || "",
-      clientToken: process.env.VUE_APP_DDOG_DDOG_TOKEN || "",
-      env: process.env.NODE_ENV || "",
-      site: "datadoghq.com",
-      service: "safa",
-      version: "1.0.0",
-      sampleRate: 100,
-      premiumSampleRate: 100,
-      trackInteractions: true,
-      defaultPrivacyLevel: "mask-user-input",
-    });
-    datadogRum.startSessionReplayRecording();
-
-    await handleGetProjects({});
-  } catch (e) {
-    await handleLogout();
-  }
+  await handleGetProjects({});
 }
 
 /**

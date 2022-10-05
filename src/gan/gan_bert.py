@@ -282,6 +282,7 @@ class GanBert:
                     'Test Time': test_time
                 }
             )
+            return transformer, tokenizer
 
     @staticmethod
     def format_time(elapsed):

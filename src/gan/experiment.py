@@ -11,6 +11,9 @@ from gan.schedular_args import SchedulerArgs
 
 # Path to [data](https://www.notion.so/nd-safa/Test-Project-Data-856f9df9092742d097f5984e03069bd2)
 PROJECT_PATH = "/Users/albertorodriguez/desktop/safa data/validation/LHP/answer"
+SAVE_PATH = "/Users/albertorodriguez/desktop/safa data/validation/LHP/answer"
+MODEL_NAME = "gan-bert"
+MODEL_PATH = os.path.join(PROJECT_PATH, MODEL_NAME)
 EXPORT_PATH = "results.csv"
 
 ID_PARAM = "ID"
@@ -81,13 +84,16 @@ def read_json_file(file_path: str):
         return json.loads(json_file.read())
 
 
-def run_gan(file_path: str):
+def run_gan(file_path: str, save_path: str):
     gan_args = GanArgs(file_path, model_name="thearod5/automotive")
-    optimizer_args = OptimizerArgs()
+    optimizer_args = OptimizerArgs(num_train_epochs=1)
     scheduler_args = SchedulerArgs()
 
     gan_bert = GanBert(gan_args, optimizer_args, scheduler_args)
-    gan_bert.train()
+    bert_model, tokenizer = gan_bert.train()
+    bert_model.save_pretrained(save_path)
+    tokenizer.save_pretrained(save_path)
+    tokenizer.save_vocabulary(save_path)
 
 
 if __name__ == "__main__":
@@ -99,4 +105,5 @@ if __name__ == "__main__":
     ])
     print(len(data_df), EXPORT_PATH)
     data_df.to_csv(EXPORT_PATH, index=False)
-    run_gan(EXPORT_PATH)
+
+    run_gan(EXPORT_PATH, MODEL_PATH)

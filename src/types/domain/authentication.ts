@@ -3,6 +3,20 @@
  */
 export interface UserModel {
   /**
+   * The user's id.
+   */
+  userId: string;
+  /**
+   * The user's email.
+   */
+  email: string;
+}
+
+/**
+ * Defines a user & password model.
+ */
+export interface UserPasswordModel {
+  /**
    * The user's email.
    */
   email: string;
@@ -29,7 +43,7 @@ export interface SessionModel {
 /**
  * Defines a user model for password reset.
  */
-export type UserResetModel = Omit<UserModel, "password">;
+export type UserResetModel = Omit<UserPasswordModel, "password">;
 
 /**
  * Defines a user model for password reset.

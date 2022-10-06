@@ -99,46 +99,48 @@ class GanBert:
 
                 # Encode real data in the Transformer
                 model_outputs = transformer(b_input_ids, attention_mask=b_input_mask)
-                hidden_states = model_outputs[-1]
+                real_embeddings = model_outputs[-1]
 
                 # Generate fake data that should have the same distribution of the ones
                 # encoded by the transformer.
                 # First noisy input are used in input to the Generator
                 noise = torch.zeros(real_batch_size, self.args.noise_size, device=device).uniform_(0, 1)
-                # Gnerate Fake data
-                gen_rep = generator(noise)
+                # Generate Fake data
+                gen_embeddings = generator(noise)
 
                 # Generate the output of the Discriminator for real and fake data.
-                # First, we put together the output of the tranformer and the generator
-                disciminator_input = torch.cat([hidden_states, gen_rep], dim=0)
+                # First, we put together the output of the transformer and the generator
+                dis_input = torch.cat([real_embeddings, gen_embeddings], dim=0)
                 # Then, we select the output of the disciminator
-                features, logits, probs = discriminator(disciminator_input)
+                features, logits, probs = discriminator(dis_input)
 
                 # Finally, we separate the discriminator's output for the real and fake
                 # data
                 features_list = torch.split(features, real_batch_size)
-                D_real_features = features_list[0]
-                D_fake_features = features_list[1]
+                dis_real_features = features_list[0]
+                dis_fake_features = features_list[1]
 
                 logits_list = torch.split(logits, real_batch_size)
-                D_real_logits = logits_list[0]
-                D_fake_logits = logits_list[1]
+                dis_real_logits = logits_list[0]
+                dis_fake_logits = logits_list[1]
 
                 probs_list = torch.split(probs, real_batch_size)
-                D_real_probs = probs_list[0]
-                D_fake_probs = probs_list[1]
+                dis_real_probs = probs_list[0]
+                dis_fake_probs = probs_list[1]
 
                 # ---------------------------------
                 #  LOSS evaluation
                 # ---------------------------------
                 # Generator's LOSS estimation
-                g_loss_d = -1 * torch.mean(torch.log(1 - D_fake_probs[:, -1] + self.optimizer_args.epsilon))
+                g_loss_d = -1 * torch.mean(torch.log(1 - dis_fake_probs[:, -1] + self.optimizer_args.epsilon))
                 g_feat_reg = torch.mean(
-                    torch.pow(torch.mean(D_real_features, dim=0) - torch.mean(D_fake_features, dim=0), 2))
+                    torch.pow(
+                        torch.mean(dis_real_features, dim=0) - torch.mean(dis_fake_features, dim=0),
+                        2))
                 g_loss = g_loss_d + g_feat_reg
 
                 # Disciminator's LOSS estimation
-                logits = D_real_logits[:, 0:-1]
+                logits = dis_real_logits[:, 0:-1]
                 log_probs = F.log_softmax(logits, dim=-1)
                 # The discriminator provides an output for labeled and unlabeled real data
                 # so the loss evaluated for unlabeled data is ignored (masked)
@@ -150,13 +152,15 @@ class GanBert:
                 # It may be the case that a batch does not contain labeled examples,
                 # so the "supervised loss" in this case is not evaluated
                 if labeled_example_count == 0:
-                    D_L_Supervised = 0
+                    dis_loss_supervised = 0
                 else:
-                    D_L_Supervised = torch.div(torch.sum(per_example_loss.to(device)), labeled_example_count)
+                    dis_loss_supervised = torch.div(torch.sum(per_example_loss.to(device)), labeled_example_count)
 
-                D_L_unsupervised1U = -1 * torch.mean(torch.log(1 - D_real_probs[:, -1] + self.optimizer_args.epsilon))
-                D_L_unsupervised2U = -1 * torch.mean(torch.log(D_fake_probs[:, -1] + self.optimizer_args.epsilon))
-                d_loss = D_L_Supervised + D_L_unsupervised1U + D_L_unsupervised2U
+                dis_loss_unsupervised_real = -1 * torch.mean(
+                    torch.log(1 - dis_real_probs[:, -1] + self.optimizer_args.epsilon))
+                dis_loss_unsupervised_fake = -1 * torch.mean(
+                    torch.log(dis_fake_probs[:, -1] + self.optimizer_args.epsilon))
+                d_loss = dis_loss_supervised + dis_loss_unsupervised_real + dis_loss_unsupervised_fake
 
                 # ---------------------------------
                 #  OPTIMIZATION
@@ -239,8 +243,8 @@ class GanBert:
                 # the forward pass, since this is only needed for backprop (training).
                 with torch.no_grad():
                     model_outputs = transformer(b_input_ids, attention_mask=b_input_mask)
-                    hidden_states = model_outputs[-1]
-                    _, logits, probs = discriminator(hidden_states)
+                    real_embeddings = model_outputs[-1]
+                    _, logits, probs = discriminator(real_embeddings)
                     ###log_probs = F.log_softmax(probs[:,1:], dim=-1)
                     filtered_logits = logits[:, 0:-1]
                     # Accumulate the test loss.

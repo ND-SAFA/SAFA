@@ -34,6 +34,8 @@ public class AuthenticationConfig extends WebSecurityConfigurerAdapter {
     private static final List<String> allowedOrigins = Arrays.asList(
         "http://localhost:8080",
         "http://localhost:8081",
+        "https://localhost:8080",
+        "https://localhost:8081",
         "https://safa-fend-dev-5asg6qsnba-uc.a.run.app",
         "https://safa-fend-prod-5asg6qsnba-uc.a.run.app",
         "https://dev.safa.ai",

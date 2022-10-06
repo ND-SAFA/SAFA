@@ -1,11 +1,4 @@
-import {
-  InternalJiraCredentialsModel,
-  JiraAccessTokenModel,
-  JiraCloudSiteModel,
-  JiraProjectModel,
-  JiraProjectListModel,
-  JobModel,
-} from "@/types";
+import { JiraCloudSiteModel, JiraProjectModel, JobModel } from "@/types";
 import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
 
 /**
@@ -31,24 +24,6 @@ const scopes = encodeURI(
     // "read:project.component:jira",
   ].join(" ")
 );
-/**
- * Runs a fetch call to the Atlassian API.
- *
- * @param args - The fetch parameters to use.
- * @return The returned data.
- */
-async function fetchAtlassian<T>(
-  ...args: Parameters<typeof fetch>
-): Promise<T> {
-  const response = await fetch(...args);
-  const resJson = (await response.json()) as T;
-
-  if (!response.ok) {
-    throw Error("Unable to connect to Atlassian.");
-  } else {
-    return resJson;
-  }
-}
 
 /**
  * Opens an external link to authorize Jira.
@@ -67,117 +42,33 @@ export function authorizeJira(): void {
 }
 
 /**
- * Exchanges an Atlassian access code for an API token.
+ * TODO
+ *
+ * Save an Atlassian access code.
  *
  * @param accessCode - The access code received from authorizing Jira.
- * @return The Jira access token.
  */
-export async function getJiraToken(
-  accessCode: string
-): Promise<JiraAccessTokenModel> {
-  return fetchAtlassian<JiraAccessTokenModel>(
-    "https://auth.atlassian.com/oauth/token",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        code: accessCode,
-        grant_type: "authorization_code",
-        client_id: process.env.VUE_APP_JIRA_CLIENT_ID,
-        client_secret: process.env.VUE_APP_JIRA_CLIENT_SECRET,
-        redirect_uri: process.env.VUE_APP_JIRA_REDIRECT_LINK,
-      }),
-    }
-  );
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+export async function saveJiraCredentials(accessCode: string): Promise<void> {}
+
+/**
+ * TODO
+ *
+ * Checks if the saved Jira credentials are valid.
+ */
+export async function getJiraCredentials(): Promise<boolean> {
+  return false;
 }
 
 /**
- * Exchanges an Atlassian refresh token for an auth token.
+ * TODO
  *
- * @param refreshToken - The atlassian refresh token.
- * @return The Jira access token.
- */
-export async function getJiraRefreshToken(
-  refreshToken: string
-): Promise<JiraAccessTokenModel> {
-  return fetchAtlassian<JiraAccessTokenModel>(
-    "https://auth.atlassian.com/oauth/token",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        refresh_token: refreshToken,
-        grant_type: "refresh_token",
-        client_id: process.env.VUE_APP_JIRA_CLIENT_ID,
-        client_secret: process.env.VUE_APP_JIRA_CLIENT_SECRET,
-      }),
-    }
-  );
-}
-
-/**
- * Exchanges an Atlassian access code for the list of cloud sites associated with the given user.
+ * Gets the list of cloud sites associated with the saved user.
  *
- * @param accessToken - The access token received from authorizing Jira.
  * @return The Jira sites for this user.
  */
-export async function getJiraCloudSites(
-  accessToken: string
-): Promise<JiraCloudSiteModel[]> {
-  return fetchAtlassian<JiraCloudSiteModel[]>(
-    "https://api.atlassian.com/oauth/token/accessible-resources",
-    {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    }
-  );
-}
-
-/**
- * TODO: update to internal GET `/projects/jira/{cloudId}`
- *
- * Returns all Jira projects for the given user and cloud site.
- *
- * @param accessToken - The access token received from authorizing Jira.
- * @param cloudId - The Jira cloud id to return projects for.
- * @return The user's projects associated with this cloud.
- */
-export async function getJiraProjects(
-  accessToken: string,
-  cloudId: string
-): Promise<JiraProjectModel[]> {
-  const projects = await fetchAtlassian<JiraProjectListModel>(
-    `https://api.atlassian.com/ex/jira/${cloudId}/rest/api/3/project/search?expand=insight`,
-    {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        Accept: "application/json",
-      },
-    }
-  );
-
-  return projects.values;
-}
-
-/**
- * Saves a user's Jira credentials and primary organization.
- *
- * @param credentials - The access and refresh token received from authorizing Jira.
- */
-export async function saveJiraCredentials(
-  credentials: InternalJiraCredentialsModel
-): Promise<void> {
-  return authHttpClient<void>(Endpoint.jiraCredentials, {
-    method: "POST",
-    body: JSON.stringify(credentials),
-  });
+export async function getJiraOrganizations(): Promise<JiraCloudSiteModel[]> {
+  return [];
 }
 
 /**
@@ -186,12 +77,33 @@ export async function saveJiraCredentials(
  * @param cloudId - The Jira cloud id to get projects for.
  * @return The created import job.
  */
-export async function NEWgetJiraProjects(
+export async function getJiraProjects(
   cloudId: string
 ): Promise<JiraProjectModel[]> {
   return (
     await authHttpClient<{ payload: JiraProjectModel[] }>(
-      fillEndpoint(Endpoint.jiraProject, { cloudId }),
+      fillEndpoint(Endpoint.jiraGetProjects, { cloudId }),
+      {
+        method: "GET",
+      }
+    )
+  ).payload;
+}
+
+/**
+ * Creates a new project based on a Jira project.
+ *
+ * @param cloudId - The Jira cloud id for this project.
+ * @param id - The Jira project id to import.
+ * @return The created import job.
+ */
+export async function createJiraProject(
+  cloudId: string,
+  id: string
+): Promise<JobModel> {
+  return (
+    await authHttpClient<{ payload: JobModel }>(
+      fillEndpoint(Endpoint.jiraCreateProject, { cloudId, id }),
       {
         method: "POST",
       }
@@ -200,24 +112,36 @@ export async function NEWgetJiraProjects(
 }
 
 /**
- * NEW ENDPOINTS.
- */
-
-/**
  * Creates a new project based on a Jira project.
  *
+ * @param versionId - The project version to sync.
  * @param cloudId - The Jira cloud id for this project.
- * @param projectId - The Jira project id to import.
- * @return The created import job.
+ * @param id - The Jira project id to import.
  */
-export async function createJiraProject(
+export async function createJiraProjectSync(
+  versionId: string,
   cloudId: string,
-  projectId: string
+  id: string
 ): Promise<JobModel> {
-  return authHttpClient<JobModel>(
-    fillEndpoint(Endpoint.jiraProject, { cloudId, projectId }),
-    {
-      method: "POST",
-    }
-  );
+  return (
+    await authHttpClient<{ payload: JobModel }>(
+      fillEndpoint(Endpoint.jiraSyncProject, { versionId, cloudId, id }),
+      {
+        method: "POST",
+      }
+    )
+  ).payload;
+}
+
+/**
+ * TODO
+ *
+ * Gets the stored Jira project credentials for a specific project.
+ *
+ * @param projectId - The project to get Jira credentials for.
+ */
+export async function getJiraProject(
+  projectId: string
+): Promise<{ cloudId: string; id: string }> {
+  return { cloudId: "", id: "" };
 }

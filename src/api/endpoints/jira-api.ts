@@ -112,7 +112,7 @@ export async function createJiraProject(
 }
 
 /**
- * Creates a new project based on a Jira project.
+ * Synchronizes the state of Jira artifacts in a project.
  *
  * @param versionId - The project version to sync.
  * @param cloudId - The Jira cloud id for this project.
@@ -127,7 +127,7 @@ export async function createJiraProjectSync(
     await authHttpClient<{ payload: JobModel }>(
       fillEndpoint(Endpoint.jiraSyncProject, { versionId, cloudId, id }),
       {
-        method: "POST",
+        method: "PUT",
       }
     )
   ).payload;
@@ -136,7 +136,7 @@ export async function createJiraProjectSync(
 /**
  * TODO
  *
- * Gets the stored Jira project credentials for a specific project.
+ * Gets the stored Jira project information for a specific project.
  *
  * @param projectId - The project to get Jira credentials for.
  */

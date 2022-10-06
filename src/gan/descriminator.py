@@ -23,7 +23,7 @@ class Discriminator(nn.Module):
 
     def forward(self, input_rep):
         input_rep = self.input_dropout(input_rep)
-        last_rep = self.layers(input_rep)
-        logits = self.logit(last_rep)
+        features = self.layers(input_rep)
+        logits = self.logit(features)
         probs = self.softmax(logits)
-        return last_rep, logits, probs
+        return features, logits, probs

@@ -52,6 +52,8 @@ export async function handleLogin(user: UserPasswordModel): Promise<void> {
  * Logs a user out.
  */
 export async function handleLogout(): Promise<void> {
+  document.cookie = "";
+
   await handleClearProject();
   await navigateTo(Routes.LOGIN_ACCOUNT);
   sessionStore.clearSession();

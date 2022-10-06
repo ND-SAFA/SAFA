@@ -4,6 +4,6 @@ export default defineConfig({
   projectId: "5kk96a",
   videoUploadOnPasses: false,
   e2e: {
-    baseUrl: "https://localhost:8080",
+    baseUrl: "https://localhost.safa.ai:8080",
   },
 });

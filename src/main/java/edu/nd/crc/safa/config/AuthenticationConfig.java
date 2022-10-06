@@ -36,6 +36,7 @@ public class AuthenticationConfig extends WebSecurityConfigurerAdapter {
         "http://localhost:8081",
         "https://localhost:8080",
         "https://localhost:8081",
+        "https://localhost.safa.ai:8080",
         "https://safa-fend-dev-5asg6qsnba-uc.a.run.app",
         "https://safa-fend-prod-5asg6qsnba-uc.a.run.app",
         "https://dev.safa.ai",

@@ -40,6 +40,7 @@ export const useSession = defineStore("session", {
      * Clears the current session.
      */
     clearSession() {
+      document.cookie = "SAFA-TOKEN= ; expires = Thu, 01 Jan 1970 00:00:00 GMT";
       this.session = createSession();
       this.user = createUser();
     },

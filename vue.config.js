@@ -2,7 +2,7 @@
 const fs = require("fs");
 
 module.exports = {
-  transpileDependencies: ["vuetify", "vuex-module-decorators", "vuex-persist"],
+  transpileDependencies: ["vuetify"],
   pluginOptions: {
     electronBuilder: {
       nodeIntegration: true,

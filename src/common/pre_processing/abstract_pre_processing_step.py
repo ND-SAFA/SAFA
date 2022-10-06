@@ -3,18 +3,14 @@ from abc import abstractmethod, ABC
 from enum import IntEnum
 from functools import total_ordering
 from typing import List
+import math
 
 
-@total_ordering
 class Order(IntEnum):
-    FIRST = enum.auto()
-    ANY = enum.auto()
-    LAST = enum.auto()
-
-    def __lt__(self, other):
-        if other == Order.FIRST or self == Order.LAST:
-            return False
-        return True
+    BEFORE = -1
+    FIRST = 0
+    ANY = 100
+    LAST = math.inf
 
 
 @total_ordering

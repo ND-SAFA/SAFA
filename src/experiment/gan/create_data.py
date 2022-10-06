@@ -4,26 +4,26 @@ from typing import List, Tuple
 
 import numpy as np
 import pandas as pd
-
-from gan.gan_args import Examples, GanArgs
-from gan.gan_bert import GanBert
-from gan.optimizer_args import OptimizerArgs
-from gan.schedular_args import SchedulerArgs
+from sklearn.model_selection import train_test_split
 
 ID_PARAM = "ID"
 CONTENT_PARAM = "Content"
 SOURCE_PARAM = "Source"
 TARGET_PARAM = "Target"
+TEXT_PARAM = "text"
+LABEL_PARAM = "label"
 
 
-def read_examples(data_file_path: str) -> Examples:
-    examples = []
-    examples_df = pd.read_csv(data_file_path).sample(n=100)
+def read_examples(data_file_path: str) -> pd.DataFrame:
+    texts = []
+    labels = []
+    examples_df = pd.read_csv(data_file_path)
     for i, example in examples_df.iterrows():
-        ex_text = example["text"]
-        ex_label = int(example["label"])
-        examples.append((ex_text, ex_label))
-    return examples
+        ex_text = example[TEXT_PARAM]
+        ex_label = int(example[LABEL_PARAM])
+        texts.append(ex_text)
+        labels.append(ex_label)
+    return create_df(texts, labels)
 
 
 def create_data(artifact_levels: List[Tuple[str, str, str]]):
@@ -38,13 +38,13 @@ def create_data(artifact_levels: List[Tuple[str, str, str]]):
             layer_texts, layer_labels = read_json_layer(artifact_level[0], artifact_level[1], artifact_level[2])
             texts.extend(layer_texts)
             labels.extend(layer_labels)
-    return [(text, label) for text, label in zip(texts, labels)]
+    return create_df(texts, labels)
 
 
 def read_csv_layer(source_file_name: str, target_file_name: str, link_file_name: str):
-    source_df = pd.read_csv(os.path.join(PROJECT_PATH, source_file_name))
-    target_df = pd.read_csv(os.path.join(PROJECT_PATH, target_file_name))
-    links_df = pd.read_csv(os.path.join(PROJECT_PATH, link_file_name))
+    source_df = pd.read_csv(os.path.join(LHP_DATA_PATH, source_file_name))
+    target_df = pd.read_csv(os.path.join(LHP_DATA_PATH, target_file_name))
+    links_df = pd.read_csv(os.path.join(LHP_DATA_PATH, link_file_name))
 
     texts = []
     labels = []
@@ -61,21 +61,28 @@ def read_csv_layer(source_file_name: str, target_file_name: str, link_file_name:
 
 
 def read_json_layer(source_file_name: str, target_file_name: str, link_file_name: str):
-    source_df = read_json_file(os.path.join(PROJECT_PATH, source_file_name))
-    target_df = read_json_file(os.path.join(PROJECT_PATH, target_file_name))
-    links_df = read_json_file(os.path.join(PROJECT_PATH, link_file_name))
+    source_df = read_json_file(os.path.join(LHP_DATA_PATH, source_file_name))
+    target_df = read_json_file(os.path.join(LHP_DATA_PATH, target_file_name))
+    links_df = read_json_file(os.path.join(LHP_DATA_PATH, link_file_name))
 
     texts = []
     labels = []
+    seen_traces = []
     for source_artifact in source_df["artifacts"]:
         for target_artifact in target_df["artifacts"]:
-            query = list(filter(lambda t: t["sourceName"] == source_artifact["name"] and
-                                          t["targetName"] == target_artifact["name"],
+            source_name = source_artifact["name"]
+            target_name = target_artifact["name"]
+            trace_key = "%s-%s" % (source_name, target_name)
+            if trace_key in seen_traces:
+                continue
+            query = list(filter(lambda t: t["sourceName"] == source_name and
+                                          t["targetName"] == target_name,
                                 links_df["traces"]))
             text = source_artifact["body"] + " [SEP] " + target_artifact["body"]
             label = 1 if len(query) > 0 else 0
             texts.append(text)
             labels.append(label)
+            seen_traces.append(trace_key)
 
     return texts, labels
 
@@ -129,35 +136,45 @@ def read_artifact_file(base_path: str, source_index: int):
     return pd.read_csv(source_file_path)
 
 
+def create_df(text_examples: List[str], label_examples: List[int]) -> pd.DataFrame:
+    df = pd.DataFrame()
+    df[TEXT_PARAM] = text_examples
+    df[LABEL_PARAM] = label_examples
+    return df
+
+
 # Path to [data](https://www.notion.so/nd-safa/Test-Project-Data-856f9df9092742d097f5984e03069bd2)
-FOLDER_PATH = "/Users/albertorodriguez/projects/calpoly/LeveragingIntermediateArtifacts/datasets"
-PROJECT_PATH = "/Users/albertorodriguez/desktop/safa data/validation/LHP/answer"
-SAVE_PATH = "/Users/albertorodriguez/desktop/safa data/validation/LHP/answer"
+SOFTWARE_DATA_PATH = "/Users/albertorodriguez/projects/calpoly/LeveragingIntermediateArtifacts/datasets"
+LHP_DATA_PATH = "/Users/albertorodriguez/desktop/safa data/validation/LHP/answer"
+TRAINING_DATA_PATH = "/Users/albertorodriguez/desktop/safa data/validation/LHP/experiments"
 BASE_MODEL_NAME = "bert-base-uncased"
 MODEL_EXPORT_NAME = "gan-bert"
-MODEL_EXPORT_PATH = os.path.join(PROJECT_PATH, MODEL_EXPORT_NAME)
-DATA_FILE_PATH = "se_projects.csv"
+MODEL_EXPORT_PATH = os.path.join(LHP_DATA_PATH, MODEL_EXPORT_NAME)
+DATA_FILE_PATH = "../../gan/se_projects.csv"
 SKIP = ["TrainController", "Drone"]
+TEST_SIZE = 0.5
 
 if __name__ == "__main__":
     if not os.path.isfile(DATA_FILE_PATH):
-        read_dataset_folder(FOLDER_PATH).to_csv(DATA_FILE_PATH, index=False)
+        read_dataset_folder(SOFTWARE_DATA_PATH).to_csv(DATA_FILE_PATH, index=False)
 
     print("Data file created...")
-    train_examples = read_examples(DATA_FILE_PATH)
-    test_examples = create_data([
+    software_df = read_examples(DATA_FILE_PATH)
+    lhp_df = create_data([
         ("swr.json", "SYS.json", "swr2SYS.json"),
         ("hwr.json", "SYS.json", "hwr2SYS.json"),
         ("SYS.json", "fsr.json", "SYS2fsr.json"),
         ("fsr.json", "sg.json", "fsr2sg.json")
     ])
+    train_df, test_df = train_test_split(lhp_df, test_size=TEST_SIZE)
 
-    gan_args = GanArgs(train_examples, test_examples=test_examples, model_name=BASE_MODEL_NAME)
-    optimizer_args = OptimizerArgs(num_train_epochs=10)
-    scheduler_args = SchedulerArgs()
+    train_df = pd.concat([train_df, software_df])
 
-    gan_bert = GanBert(gan_args, optimizer_args, scheduler_args)
-    bert_model, tokenizer = gan_bert.train()
-    bert_model.save_pretrained(MODEL_EXPORT_PATH)
-    tokenizer.save_pretrained(MODEL_EXPORT_PATH)
-    tokenizer.save_vocabulary(MODEL_EXPORT_PATH)
+    train_export_path = os.path.join(TRAINING_DATA_PATH, "train.csv")
+    test_export_path = os.path.join(TRAINING_DATA_PATH, "test.csv")
+    train_df.to_csv(train_export_path, index=False)
+    test_df.to_csv(test_export_path, index=False)
+
+    print("Train", "-" * 25)
+    print(len(train_df))
+    print(train_df[LABEL_PARAM].value_counts())

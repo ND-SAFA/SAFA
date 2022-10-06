@@ -18,7 +18,7 @@ class GanBuilder:
         device = get_device()
         transformer = AutoModel.from_pretrained(self.args.model_name)
         tokenizer = AutoTokenizer.from_pretrained(self.args.model_name)
-        dataset = GanDataset(self.args, tokenizer)
+        dataset = GanDataset(tokenizer=tokenizer, args=self.args)
 
         config = AutoConfig.from_pretrained(self.args.model_name)
         hidden_size = int(config.hidden_size)
@@ -42,4 +42,4 @@ class GanBuilder:
             transformer.cuda()
             if self.optimizer_args.multi_gpu:
                 transformer = torch.nn.DataParallel(transformer)
-        return generator, discriminator, transformer, tokenizer, device
+        return generator, discriminator, transformer, dataset, tokenizer, device

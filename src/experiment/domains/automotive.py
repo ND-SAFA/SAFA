@@ -5,7 +5,6 @@ import sys
 
 SRC_PATH = os.path.normpath(os.path.dirname(os.path.join(__file__, "..", "../..", "..")))
 sys.path.append(SRC_PATH)
-print(SRC_PATH)
 
 from experiment.common.experiment_run import ExperimentRun
 from experiment.common.pretraining_data import PretrainingData

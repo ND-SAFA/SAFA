@@ -8,7 +8,6 @@ from transformers import get_constant_schedule_with_warmup
 
 from gan.gan_args import GanArgs
 from gan.gan_builder import GanBuilder
-from gan.gan_dataset import GanDataset
 from gan.optimizer_args import OptimizerArgs
 from gan.schedular_args import SchedulerArgs
 
@@ -19,19 +18,17 @@ class GanBert:
     Github: https://github.com/crux82/ganbert-pytorch/blob/main/GANBERT_pytorch.ipynb
     """
 
-    def __init__(self, gan_args: GanArgs, optimizer_args: OptimizerArgs, scheduler_args: SchedulerArgs):
-        self.args = gan_args
+    def __init__(self, args: GanArgs, optimizer_args: OptimizerArgs, scheduler_args: SchedulerArgs):
+        self.args = args
         self.optimizer_args = optimizer_args
         self.scheduler_args = scheduler_args
 
     def train(self):
-
         # Step - Build Gan
         gan_builder = GanBuilder(self.args, self.optimizer_args)
-        generator, discriminator, transformer, tokenizer, device = gan_builder.build()
+        generator, discriminator, transformer, dataset, tokenizer, device = gan_builder.build()
 
         # Step - Load dataset from args
-        dataset = GanDataset(self.args, tokenizer)
         train_dataloader, test_dataloader, train_examples = dataset.build()
 
         training_stats = []
@@ -282,7 +279,7 @@ class GanBert:
                     'Test Time': test_time
                 }
             )
-            return transformer, tokenizer
+        return transformer, tokenizer
 
     @staticmethod
     def format_time(elapsed):

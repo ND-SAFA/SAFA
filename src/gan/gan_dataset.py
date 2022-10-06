@@ -1,17 +1,13 @@
-from typing import List, Tuple
-
 import math
 import numpy as np
 import pandas as pd
 import torch
-from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
 from torch.utils.data.dataset import TensorDataset
-from transformers import PreTrainedTokenizerFast
 
-from gan.gan_args import GanArgs
+from gan.gan_args import Examples, GanArgs
 
-Examples = List[Tuple[str, int]]
+BINARY_LABEL_LIST = [0, 1]
 
 
 class GanDataset:
@@ -21,18 +17,20 @@ class GanDataset:
     representing traced or not traced.
     """
 
-    def __init__(self, gan_args: GanArgs, tokenizer: PreTrainedTokenizerFast):
-        self.gan_args = gan_args
+    def __init__(self, args: GanArgs, tokenizer, label_list=BINARY_LABEL_LIST):
+        self.args = args
         self.tokenizer = tokenizer
-        self.labeled_file_path = gan_args.labeled_file_path
-        self.unlabeled_file_path = gan_args.unlabeled_file_path
-        labeled_examples = self.__get_examples(gan_args.labeled_file_path)
-        train_examples, test_examples = train_test_split(labeled_examples, test_size=gan_args.test_size)
-        self.labeled_examples = train_examples
-        self.test_examples = test_examples
-        self.unlabeled_examples = None if gan_args.unlabeled_file_path is None else self.__get_examples(
-            gan_args.unlabeled_file_path)
-        self.label_list = [0, 1]
+        self.labeled_examples = args.train_examples
+        self.test_examples = args.test_examples
+        self.unlabeled_examples = args.unlabeled_examples
+        self.label_list = label_list
+
+    def __add__(self, other: "GanDataset"):
+        tokenizer = self.tokenizer
+        combined_labeled_examples = self.labeled_examples + self.test_examples + other.labeled_examples + other.test_examples
+        combined_unlabeled_examples = self.unlabeled_examples + other.unlabeled_examples
+        combined_dataset = GanDataset(tokenizer, combined_labeled_examples, combined_unlabeled_examples)
+        return combined_dataset
 
     def build(self):
         """
@@ -54,13 +52,13 @@ class GanDataset:
             tmp_masks = np.zeros(len(self.unlabeled_examples), dtype=bool)
             train_label_masks = np.concatenate([train_label_masks, tmp_masks])
 
-        train_dataloader = self.__generate_data_loader(self.gan_args,
+        train_dataloader = self.__generate_data_loader(self.args,
                                                        train_examples,
                                                        train_label_masks,
                                                        label_map,
                                                        self.tokenizer,
                                                        do_shuffle=True,
-                                                       balance_label_examples=self.gan_args.apply_balance)
+                                                       balance_label_examples=self.args.apply_balance)
 
         # ------------------------------
         #   Load the test dataset
@@ -68,7 +66,7 @@ class GanDataset:
         # The labeled (test) dataset is assigned with a mask set to True
         test_label_masks = np.ones(len(self.test_examples), dtype=bool)
 
-        test_dataloader = self.__generate_data_loader(self.gan_args, self.test_examples, test_label_masks, label_map,
+        test_dataloader = self.__generate_data_loader(self.args, self.test_examples, test_label_masks, label_map,
                                                       self.tokenizer,
                                                       do_shuffle=False,
                                                       balance_label_examples=False)

@@ -31,9 +31,6 @@ jobs:
   cypress-run:
     name: Cypress E2E Tests
     runs-on: ubuntu-latest
-    env:
-      - name: SSL_CERT_DIR
-        value: "certs"
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -53,6 +50,9 @@ jobs:
 
       - name: Cypress run
         uses: cypress-io/github-action@v4
+        env:
+          - name: SSL_CERT_DIR
+            value: "certs"
         with:
           start: npm start
           wait-on: 'https://localhost.safa.ai:8080'

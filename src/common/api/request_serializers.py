@@ -82,5 +82,4 @@ class PreTrainSerializer(BaseTraceSerializer):
     def create(self, validated_data):
         trace_args_builder = super().create(validated_data)
         trace_args_builder.pretraining_data_path = validated_data["pretrain_data_path"]
-        print("ArgBuilderDataPath:", trace_args_builder.pretraining_data_path)
         return trace_args_builder

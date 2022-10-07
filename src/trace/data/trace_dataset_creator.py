@@ -1,21 +1,11 @@
 import random
-from typing import Dict, Iterable, List, Tuple, Set, Sized, Callable, Optional
-
-import torch
-
-from trace.config.constants import EVAL_DATASET_SIZE_DEFAULT, LINKED_TARGETS_ONLY_DEFAULT, RESAMPLE_RATE_DEFAULT, \
-    VALIDATION_PERCENTAGE_DEFAULT
-from trace.data.artifact import Artifact
-from trace.data.data_key import DataKey
-from trace.data.trace_dataset import TraceDataset
-from trace.data.trace_link import TraceLink
-from common.models.model_generator import ModelGenerator, ArchitectureType
-import random
 from typing import Callable, Dict, Iterable, List, Optional, Set, Sized, Tuple
 
+import pandas as pd
 import torch
 
 from common.models.model_generator import ArchitectureType, ModelGenerator
+from experiment.gan.constants import LABEL_PARAM, SOURCE_ID_PARAM, SOURCE_PARAM, TARGET_ID_PARAM, TARGET_PARAM
 from trace.config.constants import EVAL_DATASET_SIZE_DEFAULT, LINKED_TARGETS_ONLY_DEFAULT, RESAMPLE_RATE_DEFAULT, \
     VALIDATION_PERCENTAGE_DEFAULT
 from trace.data.artifact import Artifact
@@ -29,10 +19,11 @@ class TraceDatasetCreator:
     Responsible for creating dataset in format for defined models.
     """
 
-    def __init__(self, source_layers: List[Dict[str, str]], target_layers: List[Dict[str, str]],
-                 model_generator: ModelGenerator,
+    def __init__(self, source_layers: List[Dict[str, str]] = None, target_layers: List[Dict[str, str]] = None,
+                 model_generator: ModelGenerator = None,
                  true_links: List[Tuple[str, str]] = None,
-                 validation_percentage: float = VALIDATION_PERCENTAGE_DEFAULT):
+                 validation_percentage: float = VALIDATION_PERCENTAGE_DEFAULT,
+                 data_path: str = None):
         """
         Constructs models for trace link training and validation
         :param source_layers: a list of source artifacts across all layers
@@ -46,9 +37,13 @@ class TraceDatasetCreator:
         self.__prediction_dataset: Optional[TraceDataset] = None
 
         self.model_generator = model_generator
-        self.links = self._generate_all_links(source_layers, target_layers)
-        self.pos_link_ids, self.neg_link_ids = self._get_pos_and_neg_links(true_links, self.links) if true_links else (
-        None, None)
+        if source_layers and target_layers:
+            self.links = self._generate_all_links(source_layers, target_layers)
+            self.pos_link_ids, self.neg_link_ids = self._get_pos_and_neg_links(true_links,
+                                                                               self.links) if true_links else (
+                None, None)
+        else:
+            self.links = self._generate_all_links_from_csv(data_path)
         self.validation_percentage = validation_percentage
         self.linked_target_ids = self._get_linked_targets_only(true_links) if true_links else set()
 
@@ -216,6 +211,26 @@ class TraceDatasetCreator:
         for layer in range(len(source_layers)):
             layer_links = self._make_links(self.model_generator.get_feature, source_layers[layer], target_layers[layer])
             links.update(layer_links)
+        return links
+
+    def _generate_all_links_from_csv(self, data_file_path: str):
+        data_df = pd.read_csv(data_file_path)
+        links = {}
+        self.pos_link_ids = list()
+        self.neg_link_ids = list()
+        for row_i, row in data_df.iterrows():
+            source_artifact = Artifact(row[SOURCE_ID_PARAM], row[SOURCE_PARAM], self.model_generator.get_feature)
+            target_artifact = Artifact(row[TARGET_ID_PARAM], row[TARGET_PARAM], self.model_generator.get_feature)
+            is_true_link = row[LABEL_PARAM] == 1
+            trace_link = TraceLink(source_artifact, target_artifact, self.model_generator.get_feature,
+                                   is_true_link=is_true_link)
+            links[trace_link.id_] = trace_link
+            if is_true_link:
+                self.pos_link_ids.append(trace_link.id_)
+            else:
+                self.neg_link_ids.append(trace_link.id_)
+        random.shuffle(self.pos_link_ids)
+        random.shuffle(self.neg_link_ids)
         return links
 
     @staticmethod

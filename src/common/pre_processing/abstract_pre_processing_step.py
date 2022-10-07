@@ -1,12 +1,12 @@
 import enum
-from abc import abstractmethod, ABC
-from enum import IntEnum
+from abc import ABC, abstractmethod
 from functools import total_ordering
 from typing import List
+
 import math
 
 
-class Order(IntEnum):
+class Order(enum.Enum):
     BEFORE = -1
     FIRST = 0
     ANY = 100
@@ -24,7 +24,7 @@ class AbstractPreProcessingStep(ABC):
         pass
 
     def __eq__(self, other):
-        return self.order == other.order
+        return self.order.value == other.order.value
 
     def __lt__(self, other):
-        return self.order < other.order
+        return self.order.value < other.order.value

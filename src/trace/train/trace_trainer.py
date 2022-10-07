@@ -31,7 +31,7 @@ class TraceTrainer(Trainer):
         self.trace_dataset_creator = args.trace_dataset_creator
         model = self.model_generator.get_model()
         tokenizer = self.model_generator.get_tokenizer()
-        super().__init__(model=model, args=args, tokenizer=tokenizer)
+        super().__init__(model=model, args=args, tokenizer=tokenizer, callbacks=args.callbacks)
 
     def perform_training(self, checkpoint: str = None) -> Dict:
         """

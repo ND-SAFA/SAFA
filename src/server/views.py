@@ -8,11 +8,13 @@ from django.views.decorators.csrf import csrf_exempt
 from drf_yasg.openapi import Schema, TYPE_OBJECT
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import permissions, status
+from rest_framework.serializers import Serializer
 from rest_framework.views import APIView
 
 from common.api.request_serializers import BaseTraceSerializer, PredictSerializer, TrainSerializer
 from common.api.responses import BaseResponse
 from common.jobs.abstract_job import AbstractJob
+from experiment.common.run_mode import RunMode
 from server.job_type import JobType
 
 SERIALIZERS = {JobType.CREATE_MODEL: BaseTraceSerializer,
@@ -77,6 +79,18 @@ class BaseTraceJobView(APIView, ABC):
         return BaseTraceJobView.dict_to_response(response_dict)
 
     @staticmethod
+    def _create_serializer(request: HttpRequest, job_type: JobType) -> Serializer:
+        """
+        Serializes the request data
+        :param request: the HTTP request
+        :param job_type: the job type
+        :return serializer associated with given job type
+        """
+        data = BaseTraceJobView.request_to_dict(request)
+        serializer = SERIALIZERS[job_type](data=data)
+        return serializer
+
+    @staticmethod
     def _create_job_from_request(request: HttpRequest, job_type: JobType) -> Union[AbstractJob, dict]:
         """
         Serializes the request data
@@ -84,8 +98,7 @@ class BaseTraceJobView(APIView, ABC):
         :param job_type: the job type
         :return either the job or a dictionary containing the serializer errors
         """
-        data = BaseTraceJobView.request_to_dict(request)
-        serializer = SERIALIZERS[job_type](data=data)
+        serializer = BaseTraceJobView._create_serializer(request, job_type)
         if serializer.is_valid():
             args_builder = serializer.save()
             job = job_type.value(args_builder)
@@ -159,3 +172,25 @@ class DeleteModelView(BaseTraceJobView):
             self.run_job(request, self.job_type, job, run_async=False)
             response_dict = job.result
         return BaseTraceJobView.dict_to_response(response_dict)
+
+
+class ExperimentView(BaseTraceJobView):
+    job_type = JobType.EXPERIMENT
+    responses = BaseTraceJobView.get_responses([BaseResponse.MODEL_PATH, BaseResponse.STATUS, BaseResponse.EXCEPTION])
+
+    @csrf_exempt
+    @swagger_auto_schema(request_body=SERIALIZERS[job_type], responses=responses)
+    def post(self, request: HttpRequest) -> JsonResponse:
+        """
+        For creating a new model
+        :param: the http request
+        :return JSONResponse including the model path or exception and status of the job
+        """
+        serializer = self._create_serializer(request, job_type=JobType.EXPERIMENT)
+        if serializer.is_valid():
+            run_mode: RunMode = serializer.validated_data["run_mode"]
+            if run_mode == RunMode.TRAIN or run_mode == RunMode.TRAINEVAL:
+                job_type = JobType.TRAIN
+            
+            return self.run_job(request, job_type, run_async=False)
+        return serializer.errors

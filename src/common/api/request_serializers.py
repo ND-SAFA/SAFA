@@ -4,6 +4,7 @@ from rest_framework import serializers
 
 from common.models.base_models.supported_base_model import SupportedBaseModel
 from common.storage.safa_storage import SafaStorage
+from experiment.common.run_mode import RunMode
 from trace.jobs.trace_args_builder import TraceArgsBuilder
 
 
@@ -64,3 +65,11 @@ class TrainSerializer(PredictSerializer):
         trace_args_builder = super().create(validated_data)
         trace_args_builder.links = validated_data["links"]
         return trace_args_builder
+
+
+class ExperimentSerializer(BaseTraceSerializer):
+    run_mode = EnumField(choices=RunMode, to_repr=lambda a: a, help_text="The types of experiments to run.")
+
+    def create(self, validated_data):
+        trace_args_builder = super().create(validated_data)
+       

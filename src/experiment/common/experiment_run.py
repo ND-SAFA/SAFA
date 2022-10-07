@@ -1,16 +1,19 @@
 import os
 from typing import Dict, List, Tuple
 
+import tensorflow as tf
 from transformers import AutoModel, AutoTokenizer, BertForMaskedLM, DataCollatorForLanguageModeling, \
     LineByLineTextDataset, \
     Trainer, \
     TrainingArguments
+from transformers.integrations import TensorBoardCallback
 
 from common.models.base_models.supported_base_model import SupportedBaseModel
 from experiment.common.pretraining_data import PretrainingData
 from experiment.common.run_mode import RunMode
 from experiment.models.repository import Repository
 from experiment.models.safa_project import SafaProject
+from trace.data.trace_dataset_creator import TraceDatasetCreator
 from trace.jobs.trace_args_builder import TraceArgsBuilder
 from trace.train.trace_trainer import TraceTrainer
 
@@ -19,16 +22,20 @@ class ExperimentRun:
     def __init__(self,
                  model_state_path: str,
                  pretraining: PretrainingData,
-                 training_repository_paths: List[str],
                  metrics: List[str],
-                 validation_project_path: str,
+                 training_project: TraceDatasetCreator = None,
+                 training_repository_paths: List[str] = None,
+                 validation_project_path: str = None,
+                 validation_project=None,
                  architecture: SupportedBaseModel = SupportedBaseModel.NL_BERT,
                  ):
         self.model_state_path = model_state_path
+        self.training_project = training_project
         self.training_repository_paths = training_repository_paths
         self.metrics = metrics
         self.architecture = architecture
         self.validation_project_path = validation_project_path
+        self.validation_project = validation_project
         self.run_name = "_".join([model_state_path, pretraining.value])
 
     def push(self):
@@ -41,32 +48,37 @@ class ExperimentRun:
                     **kwargs: Dict):
         run_mode = RunMode[run_mode_str.upper()]
         run_save_path = os.path.join(output_dir, self.run_name)
-        training_data = self.__create_training_data(self.training_repositories)
-        sources: List[Dict[str, str]] = training_data[0]
-        targets: List[Dict[str, str]] = training_data[1]
-        links: List[Tuple[str, str]] = training_data[2]
 
         # Trace Trainer
-        validation_project = SafaProject(self.validation_project_path)
         settings = kwargs
         settings["metrics"] = self.metrics
         settings["validation_percentage"] = 0
-        trace_args = TraceArgsBuilder(self.architecture,
-                                      self.model_state_path,
-                                      output_dir,
-                                      sources,
-                                      targets,
-                                      links,
-                                      settings=settings).build()
+        file_writer = tf.summary.FileWriter('/path/to/logs', sess.graph)
+        settings["callbacks"] = [TensorBoardCallback()]
+        trace_args_builder = TraceArgsBuilder(self.architecture, self.model_state_path,
+                                              output_dir, settings=settings)
+        if self.training_project:
+            trace_args_builder.trace_dataset_creator = self.training_project
+        if self.training_repository_paths:
+            training_data = self.__create_training_data(self.training_repository_paths)
+            sources: List[Dict[str, str]] = training_data[0] if self.training_repository_paths else None
+            targets: List[Dict[str, str]] = training_data[1]
+            links: List[Tuple[str, str]] = training_data[2]
+            trace_args_builder.source_layers = sources
+            trace_args_builder.target_layers = targets
+            trace_args_builder.links = links
+        trace_args = trace_args_builder.build()
 
         trace_trainer = TraceTrainer(args=trace_args)
-
+        validation_project_creator = self.validation_project if self.validation_project else SafaProject(
+            self.validation_project_path).get_dataset(
+            trace_args.model_generator)
         # Run
         if run_mode in [RunMode.TRAIN, RunMode.TRAINEVAL]:
             trace_trainer.perform_training()
             trace_trainer.save_model(run_save_path)
         if run_mode in [RunMode.EVAL, RunMode.TRAINEVAL]:
-            eval_dataset = validation_project.get_dataset(trace_args.model_generator).get_prediction_dataset()
+            eval_dataset = validation_project_creator.get_prediction_dataset()
             predictions = trace_trainer.perform_prediction(eval_dataset)
             print("Predictions", "-" * 25)
             for metric in self.metrics:
@@ -76,8 +88,6 @@ class ExperimentRun:
         self.run_name = "nl_bert_automotive"
         run_save_path = os.path.join(output_dir, self.run_name)
         os.mkdir(run_save_path)
-        print("MODEL STATE PATH:", self.model_state_path)
-        print("RUN NAME:", run_save_path)
 
         aggregate_file_path = self.collect_text_files(dir_path)
         tokenizer = AutoTokenizer.from_pretrained(self.model_state_path)

@@ -1,10 +1,9 @@
-from typing import List, Dict
+from typing import Dict, List
 
 from common.pre_processing.abstract_pre_processing_step import AbstractPreProcessingStep, Order
 
 
 class ReplaceWordsStep(AbstractPreProcessingStep):
-
     ORDER = Order.BEFORE
 
     def __init__(self, word_replace_mappings: Dict[str, str]):
@@ -12,8 +11,10 @@ class ReplaceWordsStep(AbstractPreProcessingStep):
         super().__init__(self.ORDER)
 
     def run(self, word_list: List[str]) -> List[str]:
-        for i, word in enumerate(word_list):
+        new_word_list = []
+        for word in word_list:
             if word in self.word_replace_mappings:
-                word_list[i] = self.word_replace_mappings[word]
-        return word_list
-
+                new_word_list.extend(self.word_replace_mappings[word].split())
+            else:
+                new_word_list.append(word)
+        return new_word_list

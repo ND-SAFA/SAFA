@@ -16,9 +16,13 @@ class TraceArgs(TrainingArguments):
     validation_percentage: float = VALIDATION_PERCENTAGE_DEFAULT
     num_train_epochs: int = N_EPOCHS_DEFAULT
     metrics: List[str] = None
+    callbacks: List = None
 
-    def __init__(self, model_generator: ModelGenerator, output_dir: str, source_layers: List[Dict[str, str]] = None,
-                 target_layers: List[Dict[str, str]] = None, links: List[Tuple[str, str]] = None, **kwargs):
+    def __init__(self, model_generator: ModelGenerator, output_dir: str,
+                 trace_dataset_creator: TraceDatasetCreator,
+                 source_layers: List[Dict[str, str]] = None,
+                 target_layers: List[Dict[str, str]] = None, links: List[Tuple[str, str]] = None,
+                 **kwargs):
         """
         Arguments for Learning Model
         :param model_generator: generates model with specified base model and path.
@@ -30,13 +34,15 @@ class TraceArgs(TrainingArguments):
         https://huggingface.co/docs/transformers/v4.21.0/en/main_classes/trainer#transformers.TrainingArguments
         """
         self.model_generator = model_generator
-        self.__set_args(kwargs)
+        self.__set_args(**kwargs)
         super().__init__(log_level="info", log_level_replica="info", output_dir=output_dir,
                          num_train_epochs=self.num_train_epochs)
         self.trace_dataset_creator = TraceDatasetCreator(source_layers=source_layers, target_layers=target_layers,
                                                          true_links=links, model_generator=model_generator,
                                                          validation_percentage=self.validation_percentage) \
             if source_layers and target_layers else None
+        if trace_dataset_creator:
+            self.trace_dataset_creator = trace_dataset_creator
 
     def __set_args(self, kwargs) -> None:
         """
@@ -46,4 +52,6 @@ class TraceArgs(TrainingArguments):
         """
         for arg_name, arg_value in kwargs.items():
             if hasattr(self, arg_name):
-                self.__setattr__(arg_name, arg_value)
+                setattr(self, arg_name, arg_value)
+            else:
+                print("Unrecognized training arg: ", arg_name)

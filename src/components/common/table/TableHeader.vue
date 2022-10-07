@@ -34,6 +34,7 @@
             currentGroupDesc ? 'up' : 'down'
           }-thin-circle-outline`"
           @click:prepend-inner="currentGroupDesc = !currentGroupDesc"
+          data-cy="artifact-table-group-by"
         />
         <v-autocomplete
           outlined
@@ -51,6 +52,7 @@
             currentSortDesc ? 'up' : 'down'
           }-thin-circle-outline`"
           @click:prepend-inner="currentSortDesc = !currentSortDesc"
+          data-cy="artifact-table-sort-by"
         />
       </flex-box>
     </div>

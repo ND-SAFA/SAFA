@@ -40,7 +40,10 @@
 
       <template v-slot:[`item.name`]="{ item }">
         <td class="v-data-table__divider">
-          <artifact-table-row-name :artifact="item" />
+          <artifact-table-row-name
+            :artifact="item"
+            data-cy="table-row-artifact"
+          />
         </td>
       </template>
 

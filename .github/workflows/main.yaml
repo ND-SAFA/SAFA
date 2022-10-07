@@ -31,6 +31,9 @@ jobs:
   cypress-run:
     name: Cypress E2E Tests
     runs-on: ubuntu-latest
+    env:
+      - name: SSL_CERT_DIR
+        value: "certs"
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -42,7 +45,7 @@ jobs:
           chmod +x mkcert-v*-linux-amd64;
           sudo cp mkcert-v*-linux-amd64 /usr/local/bin/mkcert;
           mkcert -install;
-          cd certs; ls;
+          cd certs;
           mkcert localhost.safa.ai
 
       - name: Add hosts to /etc/hosts

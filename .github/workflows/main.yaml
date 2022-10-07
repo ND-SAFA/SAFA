@@ -37,7 +37,10 @@ jobs:
 
       - name: Add hosts to /etc/hosts
         run: |
-          sudo echo "192.0.78.234 https://localhost.safa.ai" | sudo tee -a /etc/hosts
+          sudo echo "127.0.0.1 https://localhost.safa.ai" | sudo tee -a /etc/hosts
+
+      - name: Display hosts
+        run: cat /etc/hosts
 
       - name: Cypress run
         uses: cypress-io/github-action@v4

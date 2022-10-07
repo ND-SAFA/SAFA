@@ -48,11 +48,12 @@ jobs:
       - name: Add hosts to /etc/hosts
         run: sudo sed -i "2i 127.0.0.1 localhost.safa.ai" /etc/hosts
 
+      - name: Use generated certificates
+        run: |
+          openssl x509 -in localhost.safa.ai.pem -noout -text
+
       - name: Cypress run
         uses: cypress-io/github-action@v4
-        env:
-          - name: SSL_CERT_DIR
-            value: "certs"
         with:
           start: npm start
           wait-on: 'https://localhost.safa.ai:8080'

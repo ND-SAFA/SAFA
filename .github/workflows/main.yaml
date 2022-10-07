@@ -39,8 +39,8 @@ jobs:
         run: |
           sudo echo "127.0.0.1 https://localhost.safa.ai" | sudo tee -a /etc/hosts
 
-      - name: Display hosts
-        run: cat /etc/hosts
+      - name: Display open ports
+        run: sudo lsof -i -P -n | grep LISTEN
 
       - name: Cypress run
         uses: cypress-io/github-action@v4

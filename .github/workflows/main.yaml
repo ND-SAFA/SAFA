@@ -42,7 +42,7 @@ jobs:
           chmod +x mkcert-v*-linux-amd64;
           sudo cp mkcert-v*-linux-amd64 /usr/local/bin/mkcert;
           mkcert -install;
-          cd certs;
+          cd certs; ls;
           mkcert localhost.safa.ai
 
       - name: Add hosts to /etc/hosts

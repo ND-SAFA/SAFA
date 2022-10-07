@@ -44,7 +44,7 @@ jobs:
         with:
           # build: npm run build
           start: npm start
-          wait-on: 'https://localhost.safa.ai'
+          wait-on: 'https://localhost.safa.ai:8080'
           wait-on-timeout: 120
           browser: chrome
           headed: true

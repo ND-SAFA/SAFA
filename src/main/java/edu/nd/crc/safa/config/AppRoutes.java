@@ -17,6 +17,7 @@ public class AppRoutes {
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Accounts {
         public static final String LOGIN = "/login";
+        public static final String LOGOUT = "/logout";
         protected static final String PREFIX = "/accounts";
         public static final String CHANGE_PASSWORD = Accounts.PREFIX + "/change";
         public static final String RESET_PASSWORD = Accounts.PREFIX + "/reset";

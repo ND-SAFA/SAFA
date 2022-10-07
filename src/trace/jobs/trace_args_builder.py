@@ -13,7 +13,7 @@ class TraceArgsBuilder(AbstractArgsBuilder):
                  trace_dataset_creator: TraceDatasetCreator = None,
                  source_layers: List[Dict[str, str]] = None,
                  target_layers: List[Dict[str, str]] = None, links: List[Tuple[str, str]] = None,
-                 settings: dict = None):
+                 pretraining_data_path: str = None, settings: dict = None):
         """
         Responsible for building training arguments for some pretrained model.
         :param base_model: supported base model name
@@ -31,6 +31,7 @@ class TraceArgsBuilder(AbstractArgsBuilder):
         self.output_dir = output_dir
         self.source_layers = source_layers
         self.target_layers = target_layers
+        self.pretraining_data_path = pretraining_data_path
         self.settings = settings if settings else {}
 
     @staticmethod
@@ -47,5 +48,5 @@ class TraceArgsBuilder(AbstractArgsBuilder):
         return TraceArgs(source_layers=self.source_layers, target_layers=self.target_layers,
                          trace_dataset_creator=self.trace_dataset_creator,
                          links=self.links, model_generator=model_generator,
-                         output_dir=self.output_dir,
+                         output_dir=self.output_dir, pretraining_data_path=self.pretraining_data_path,
                          kwargs=self.settings)

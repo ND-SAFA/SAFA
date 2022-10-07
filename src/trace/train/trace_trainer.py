@@ -20,7 +20,7 @@ class TraceTrainer(Trainer):
     Responsible for using given model for training and prediction using given dataset.
     """
 
-    def __init__(self, args: TraceArgs):
+    def __init__(self, args: TraceArgs, **kwargs):
         """
         Handles the training and evaluation of learning models
         :param args: the learning model arguments
@@ -31,7 +31,7 @@ class TraceTrainer(Trainer):
         self.trace_dataset_creator = args.trace_dataset_creator
         model = self.model_generator.get_model()
         tokenizer = self.model_generator.get_tokenizer()
-        super().__init__(model=model, args=args, tokenizer=tokenizer, callbacks=args.callbacks)
+        super().__init__(model=model, args=args, tokenizer=tokenizer, callbacks=args.callbacks, **kwargs)
 
     def perform_training(self, checkpoint: str = None) -> Dict:
         """

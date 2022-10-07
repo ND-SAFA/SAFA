@@ -15,7 +15,7 @@ class AbstractTraceJob(AbstractJob, ABC):
         super().__init__(args_builder)
         self.__trainer = None
 
-    def get_trainer(self) -> TraceTrainer:
+    def get_trainer(self, **kwargs) -> TraceTrainer:
         if self.__trainer is None:
-            self.__trainer = TraceTrainer(args=self.args)
+            self.__trainer = TraceTrainer(args=self.args, **kwargs)
         return self.__trainer

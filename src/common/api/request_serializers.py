@@ -21,9 +21,8 @@ def validate_settings(value):
 class BaseTraceSerializer(serializers.Serializer):
     modelPath = serializers.CharField(max_length=255, help_text="The path to the model weights / state.")
     outputDir = serializers.CharField(max_length=255, help_text="Path to directory of output file.")
-    baseModel = EnumField(choices=SupportedBaseModel, to_repr=lambda a: a, help_text="The base model class to use.")
-    settings = serializers.DictField(required=False, validators=[validate_settings],
-                                     help_text="Dictionary of custom fields to initialize trainer with.")
+    baseModel = EnumField(choices=SupportedBaseModel, to_repr=lambda a: a, help_text="The base model class to use.",
+                          default=SupportedBaseModel.BERT_FOR_MASKED_LM)
 
     def create(self, validated_data):
         settings = validated_data["settings"] if "settings" in validated_data else None
@@ -72,4 +71,16 @@ class ExperimentSerializer(BaseTraceSerializer):
 
     def create(self, validated_data):
         trace_args_builder = super().create(validated_data)
-       
+        return trace_args_builder
+
+
+class PreTrainSerializer(BaseTraceSerializer):
+    HELP_MESSAGE = "The path to the pretraining data. Expect path to txt file or folder containing many files."
+    pretrain_data_path = serializers.CharField(max_length=500,
+                                               help_text=HELP_MESSAGE)
+
+    def create(self, validated_data):
+        trace_args_builder = super().create(validated_data)
+        trace_args_builder.pretraining_data_path = validated_data["pretrain_data_path"]
+        print("ArgBuilderDataPath:", trace_args_builder.pretraining_data_path)
+        return trace_args_builder

@@ -22,7 +22,7 @@ class PreProcessor:
 
     @staticmethod
     def get_word_list(content: str) -> List[str]:
-        return content.replace("�", " ").split()
+        return list(filter(lambda w: len(w.strip()) > 0, content.replace("�", " ").split()))
 
     @staticmethod
     def reconstruct_content(word_list: List[str]) -> str:

@@ -17,12 +17,13 @@ class TraceArgs(TrainingArguments):
     num_train_epochs: int = N_EPOCHS_DEFAULT
     metrics: List[str] = None
     callbacks: List = None
+    pretraining_data_dir: str = None
 
     def __init__(self, model_generator: ModelGenerator, output_dir: str,
                  trace_dataset_creator: TraceDatasetCreator,
                  source_layers: List[Dict[str, str]] = None,
                  target_layers: List[Dict[str, str]] = None, links: List[Tuple[str, str]] = None,
-                 **kwargs):
+                 pretraining_data_path: str = None, **kwargs):
         """
         Arguments for Learning Model
         :param model_generator: generates model with specified base model and path.
@@ -34,6 +35,7 @@ class TraceArgs(TrainingArguments):
         https://huggingface.co/docs/transformers/v4.21.0/en/main_classes/trainer#transformers.TrainingArguments
         """
         self.model_generator = model_generator
+        self.pretraining_data_path = pretraining_data_path
         self.__set_args(**kwargs)
         super().__init__(log_level="info", log_level_replica="info", output_dir=output_dir,
                          num_train_epochs=self.num_train_epochs)

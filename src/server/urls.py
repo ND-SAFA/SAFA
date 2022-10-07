@@ -46,6 +46,6 @@ urlpatterns = [
     path('train/', views.TrainView.as_view()),
     path('model/create/', views.CreateModelView.as_view()),
     path('model/delete/', views.DeleteModelView.as_view()),
-    path('experiment', views.ExperimentView.as_view()),
-    
+    path('experiment/', views.ExperimentView.as_view()),
+    path('pretrain/', views.PreTrainView.as_view())
 ]

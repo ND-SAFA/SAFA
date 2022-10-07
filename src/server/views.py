@@ -11,7 +11,8 @@ from rest_framework import permissions, status
 from rest_framework.serializers import Serializer
 from rest_framework.views import APIView
 
-from common.api.request_serializers import BaseTraceSerializer, PredictSerializer, TrainSerializer
+from common.api.request_serializers import BaseTraceSerializer, ExperimentSerializer, PreTrainSerializer, \
+    PredictSerializer, TrainSerializer
 from common.api.responses import BaseResponse
 from common.jobs.abstract_job import AbstractJob
 from experiment.common.run_mode import RunMode
@@ -19,7 +20,9 @@ from server.job_type import JobType
 
 SERIALIZERS = {JobType.CREATE_MODEL: BaseTraceSerializer,
                JobType.PREDICT: PredictSerializer,
-               JobType.TRAIN: TrainSerializer}
+               JobType.EXPERIMENT: ExperimentSerializer,
+               JobType.TRAIN: TrainSerializer,
+               JobType.PRETRAIN: PreTrainSerializer}
 
 
 class BaseTraceJobView(APIView, ABC):
@@ -191,6 +194,22 @@ class ExperimentView(BaseTraceJobView):
             run_mode: RunMode = serializer.validated_data["run_mode"]
             if run_mode == RunMode.TRAIN or run_mode == RunMode.TRAINEVAL:
                 job_type = JobType.TRAIN
-            
+
             return self.run_job(request, job_type, run_async=False)
         return serializer.errors
+
+
+class PreTrainView(BaseTraceJobView):
+    job_type = JobType.PRETRAIN
+    responses = BaseTraceJobView.get_responses([BaseResponse.MODEL_PATH, BaseResponse.STATUS, BaseResponse.EXCEPTION])
+
+    @csrf_exempt
+    @swagger_auto_schema(request_body=SERIALIZERS[job_type], responses=responses)
+    def post(self, request: HttpRequest) -> JsonResponse:
+        """
+        Pre-trains the language model of a sequence classification model.
+        :param: Http request containing training parameters
+        :return JSONResponse including the model path or exception and status of the job
+        """
+        # TODO: Be able to set `baseModel` to BertForMaskedLM
+        return self.run_job(request, self.job_type)

@@ -17,7 +17,7 @@ class AbstractJob(Thread, ABC):
 
     def __init__(self, arg_builder: AbstractArgsBuilder = None, output_dir: str = '', save_output: bool = True):
         """
-        Base job class
+        Creates trace arguments and mounts cloud directory to the output directory.
         :param arg_builder: job arguments
         :param output_dir: where to save the results (if not provided, defaults to job_id dir inside output_dir provided in args)
         :param save_output: if True, saves the output of the job

@@ -46,7 +46,8 @@ jobs:
         uses: cypress-io/github-action@v4
         with:
           # build: npm run build
-          wait-on: 'https://localhost.safa.ai'
           start: npm start
+          wait-on: 'https://localhost.safa.ai'
+          wait-on-timeout: 120
           browser: chrome
           headed: true

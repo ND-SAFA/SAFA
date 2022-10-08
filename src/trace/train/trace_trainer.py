@@ -55,7 +55,6 @@ class TraceTrainer(Trainer):
         dataset = self.trace_dataset_creator.get_prediction_dataset() if dataset is None else dataset
         self.eval_dataset = dataset.data
         output = self.predict(self.eval_dataset)
-        print(self.args.metrics)
         if self.args.metrics:
             self._eval(output, self.args.metrics)
         output_dict = TraceTrainer.output_to_dict(output)

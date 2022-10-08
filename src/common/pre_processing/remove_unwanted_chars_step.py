@@ -10,8 +10,8 @@ class RemoveUnwantedCharsStep(AbstractPreProcessingStep):
         return char.isdigit() or char.isalpha()
 
     @staticmethod
-    def _remove_unwanted_chars_from_word(word_list: str) -> str:
-        return "".join(filter(RemoveUnwantedCharsStep._char2keep, word_list))
+    def _remove_unwanted_chars_from_word(word: str) -> str:
+        return "".join(filter(RemoveUnwantedCharsStep._char2keep, word))
 
     def run(self, word_list: List[str]) -> List[str]:
         return [self._remove_unwanted_chars_from_word(word) for word in word_list]

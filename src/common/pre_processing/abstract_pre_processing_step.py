@@ -7,7 +7,6 @@ import math
 
 
 class Order(enum.Enum):
-    BEFORE = -1
     FIRST = 0
     ANY = 100
     LAST = math.inf
@@ -16,8 +15,9 @@ class Order(enum.Enum):
 @total_ordering
 class AbstractPreProcessingStep(ABC):
 
-    def __init__(self, order: Order = Order.ANY):
+    def __init__(self, order: Order = Order.ANY, run_before: bool = False):
         self.order = order
+        self.run_before = run_before
 
     @abstractmethod
     def run(self, word_list: List[str]) -> List[str]:
@@ -28,3 +28,13 @@ class AbstractPreProcessingStep(ABC):
 
     def __lt__(self, other):
         return self.order.value < other.order.value
+
+
+class AbstractPreProcessingBeforeStep(AbstractPreProcessingStep, ABC):
+
+    def __init__(self, order: Order = Order.ANY):
+        super().__init__(order, True)
+
+    @abstractmethod
+    def run(self, content: str) -> str:
+        pass

@@ -10,15 +10,13 @@ class SeparateJoinedWordsStep(AbstractPreProcessingStep):
         super().__init__(self.ORDER)
 
     @staticmethod
-    def _capitalize_first_letter(word: str) -> str:
-        first_letter = word[0].upper()
-        return first_letter + word[1:] if len(word) > 1 else first_letter
-
-    @staticmethod
     def _separate_camel_case_word(word: str) -> List[str]:
-        word = SeparateJoinedWordsStep._capitalize_first_letter(word)
-        separated_words = re.findall(r'[A-Z](?:[a-z]+|[A-Z]*(?=[A-Z]|$))', word)
-        return separated_words
+        split_start = [0]
+        for i, char in enumerate(word):
+            if char.isupper() and i != 0:
+                split_start.append(i)
+        split_end = split_start[1:] + [len(word)]
+        return [word[i:j] for i, j in zip(split_start, split_end)]
 
     @staticmethod
     def _separate_snake_case_word(word: str) -> List[str]:

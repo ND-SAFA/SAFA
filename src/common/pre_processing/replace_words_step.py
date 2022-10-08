@@ -1,20 +1,18 @@
 from typing import Dict, List
 
-from common.pre_processing.abstract_pre_processing_step import AbstractPreProcessingStep, Order
+from common.pre_processing.abstract_pre_processing_step import Order, AbstractPreProcessingBeforeStep
 
 
-class ReplaceWordsStep(AbstractPreProcessingStep):
-    ORDER = Order.BEFORE
+class ReplaceWordsStep(AbstractPreProcessingBeforeStep):
+
+    ORDER = Order.FIRST
 
     def __init__(self, word_replace_mappings: Dict[str, str]):
-        self.word_replace_mappings = word_replace_mappings
         super().__init__(self.ORDER)
+        self.word_replace_mappings = word_replace_mappings
 
-    def run(self, word_list: List[str]) -> List[str]:
-        new_word_list = []
-        for word in word_list:
-            if word in self.word_replace_mappings:
-                new_word_list.extend(self.word_replace_mappings[word].split())
-            else:
-                new_word_list.append(word)
-        return new_word_list
+    def run(self, content: str) -> str:
+        for orig_word, new_word in self.word_replace_mappings.items():
+            content = content.replace(orig_word, new_word)
+        return content
+

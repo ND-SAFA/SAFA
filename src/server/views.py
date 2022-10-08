@@ -189,7 +189,7 @@ class ExperimentView(BaseTraceJobView):
         :param: the http request
         :return JSONResponse including the model path or exception and status of the job
         """
-        serializer = self._create_serializer(request, job_type=JobType.EXPERIMENT)
+        serializer = self._create_serializer(request, job_type=self.job_type)
         if serializer.is_valid():
             run_mode: RunMode = serializer.validated_data["run_mode"]
             if run_mode == RunMode.TRAIN or run_mode == RunMode.TRAINEVAL:

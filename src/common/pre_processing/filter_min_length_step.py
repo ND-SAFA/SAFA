@@ -1,18 +1,14 @@
-import random
-from copy import copy
 from typing import List
 
 from common.pre_processing.abstract_pre_processing_step import AbstractPreProcessingStep, Order
 
 
-class ShuffleWordsStep(AbstractPreProcessingStep):
-
+class FilterMinLengthStep(AbstractPreProcessingStep):
     ORDER = Order.LAST
 
-    def __init__(self):
+    def __init__(self, min_length: int = 1):
         super().__init__(self.ORDER)
+        self.min_length = min_length
 
     def run(self, word_list: List[str]) -> List[str]:
-        shuffled_word_list = copy(word_list)
-        random.shuffle(shuffled_word_list)
-        return shuffled_word_list
+        return list(filter(lambda w: len(w.strip()) > self.min_length, word_list))

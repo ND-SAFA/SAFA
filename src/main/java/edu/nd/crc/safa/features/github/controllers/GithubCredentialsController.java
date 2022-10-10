@@ -130,7 +130,7 @@ public class GithubCredentialsController extends BaseController {
                 return;
             }
 
-            output.setResult(this.checkCredentials(credentials.get()));
+            output.setResult(githubControllerUtils.checkCredentials(credentials.get()));
         });
 
         return output;

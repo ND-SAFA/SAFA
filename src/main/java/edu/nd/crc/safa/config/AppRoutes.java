@@ -189,7 +189,7 @@ public class AppRoutes {
             public static final String REGISTER = Accounts.PREFIX + "/github/credentials/{accessCode}";
             public static final String REFRESH = Accounts.PREFIX + "/github/credentials";
             public static final String DELETE = Accounts.PREFIX + "/github/credentials";
-            public static final String VALID = Accounts.PREFIX + "/github/credentials";
+            public static final String VALID = Accounts.PREFIX + "/github/credentials/check";
         }
 
         @NoArgsConstructor(access = AccessLevel.PRIVATE)

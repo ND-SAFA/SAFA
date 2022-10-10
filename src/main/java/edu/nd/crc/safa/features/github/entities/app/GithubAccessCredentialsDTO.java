@@ -55,7 +55,7 @@ public class GithubAccessCredentialsDTO {
     private String errorDescription;
 
     public boolean isError() {
-        return Objects.isNull(this.error);
+        return !Objects.isNull(this.error);
     }
 
     public GithubAccessCredentials toEntity() {

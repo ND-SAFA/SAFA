@@ -109,8 +109,7 @@ public class GithubConnectionServiceImpl implements GithubConnectionService {
                     this.buildAuthorizationHeaderValue(credentials.getAccessToken()))
                 .header(HttpHeaders.ACCEPT, WebApiConfiguration.JSON_CONTENT_TYPE_HEADER_VALUE)
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<List<GithubRepositoryDTO>>() {
-                })
+                .bodyToMono(new ParameterizedTypeReference<List<GithubRepositoryDTO>>() {})
         ).orElseThrow(() -> new SafaError("Error while trying to retrieve repositories"));
     }
 
@@ -141,8 +140,7 @@ public class GithubConnectionServiceImpl implements GithubConnectionService {
                     this.buildAuthorizationHeaderValue(credentials.getAccessToken()))
                 .header(HttpHeaders.ACCEPT, WebApiConfiguration.JSON_CONTENT_TYPE_HEADER_VALUE)
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<List<GithubRepositoryBranchDTO>>() {
-                })
+                .bodyToMono(new ParameterizedTypeReference<List<GithubRepositoryBranchDTO>>() {})
         ).orElseThrow(() -> new SafaError("Error while trying to retrieve repository branches for " + repositoryName));
     }
 
@@ -222,7 +220,7 @@ public class GithubConnectionServiceImpl implements GithubConnectionService {
 
     @Override
     public GithubAccessCredentialsDTO useAccessCode(String accessCode) {
-        return WebApiUtils.blockOptional(
+        GithubAccessCredentialsDTO dto = WebApiUtils.blockOptional(
             this.webClient
                 .method(ApiRoute.ACCESS_CODE.getMethod())
                 .uri(ApiRoute.ACCESS_CODE.getFullPath(), builder ->
@@ -239,6 +237,10 @@ public class GithubConnectionServiceImpl implements GithubConnectionService {
                 .retrieve()
                 .bodyToMono(GithubAccessCredentialsDTO.class)
         ).orElseThrow(() -> new SafaError("Error while trying to retrieve access token"));
+
+        dto.setClientId(this.clientId);
+        dto.setClientSecret(this.clientSecret);
+        return dto;
     }
 
     private String buildAuthorizationHeaderValue(String token) {

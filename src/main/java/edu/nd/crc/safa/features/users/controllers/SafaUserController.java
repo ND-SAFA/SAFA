@@ -13,6 +13,7 @@ import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.config.SecurityConstants;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.email.EmailService;
 import edu.nd.crc.safa.features.flatfiles.services.MultipartRequestService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
@@ -23,13 +24,18 @@ import edu.nd.crc.safa.features.users.entities.app.UserIdentifierDTO;
 import edu.nd.crc.safa.features.users.entities.app.UserPasswordDTO;
 import edu.nd.crc.safa.features.users.entities.db.PasswordResetToken;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
+import edu.nd.crc.safa.features.users.repositories.PasswordResetTokenRepository;
 import edu.nd.crc.safa.features.users.repositories.SafaUserRepository;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
 
 import io.jsonwebtoken.Claims;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -45,19 +51,34 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @RestController
 public class SafaUserController extends BaseController {
+
+    private static final Logger log = LoggerFactory.getLogger(SafaUserController.class);
+
+    @Value("${fend.base}")
+    private String fendBase;
+
+    @Value("${fend.reset-email-path}")
+    private String fendPath;
+
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
     private final SafaUserRepository safaUserRepository;
     private final SafaUserService safaUserService;
+    private final EmailService emailService;
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
 
     @Autowired
     public SafaUserController(ResourceBuilder resourceBuilder,
-                              ServiceProvider serviceProvider) {
+                              ServiceProvider serviceProvider,
+                              EmailService emailService,
+                              PasswordResetTokenRepository passwordResetTokenRepository) {
         super(resourceBuilder, serviceProvider);
         this.tokenService = serviceProvider.getTokenService();
         this.passwordEncoder = serviceProvider.getPasswordEncoder();
         this.safaUserRepository = serviceProvider.getSafaUserRepository();
         this.safaUserService = serviceProvider.getSafaUserService();
+        this.emailService = emailService;
+        this.passwordResetTokenRepository = passwordResetTokenRepository;
     }
 
     /**
@@ -99,16 +120,26 @@ public class SafaUserController extends BaseController {
      * @param user The user to send the reset password email to.
      */
     @PutMapping(AppRoutes.Accounts.FORGOT_PASSWORD)
-    public void forgotPassword(@RequestBody UserIdentifierDTO user) {
+    public void forgotPassword(@Valid @RequestBody UserIdentifierDTO user) {
         String username = user.getEmail();
         SafaUser retrievedUser = safaUserRepository.findByEmail(username)
             .orElseThrow(() -> new UsernameNotFoundException("Username does not exist: " + username));
-
         Date expirationDate = new Date(System.currentTimeMillis() + SecurityConstants.FORGOT_PASSWORD_EXPIRATION_TIME);
         String token = tokenService.createTokenForUsername(username, expirationDate);
         PasswordResetToken passwordResetToken = new PasswordResetToken(retrievedUser, token, expirationDate);
 
-        //TODO: Send email with reset token
+        try {
+            emailService.send(
+                "Requested password reset token",
+                this.buildResetURL(token),
+                user.getEmail()
+            );
+        } catch (Exception e) {
+            log.error("Error occurred while trying to send email to {} " + e, user.getEmail());
+            throw new SafaError("Could not send email");
+        }
+
+        this.passwordResetTokenRepository.save(passwordResetToken);
     }
 
     /**
@@ -118,10 +149,16 @@ public class SafaUserController extends BaseController {
      * @return {@link UserIdentifierDTO} The user identifier whose password was changed.
      */
     @PutMapping(AppRoutes.Accounts.RESET_PASSWORD)
-    public UserIdentifierDTO resetPassword(@RequestBody ResetPasswordRequestDTO passwordResetRequest) {
+    public UserIdentifierDTO resetPassword(@Valid @RequestBody ResetPasswordRequestDTO passwordResetRequest) {
         // Step - Extract required information
         String resetToken = passwordResetRequest.getResetToken();
         String newPassword = passwordResetRequest.getNewPassword();
+
+        // Step - check the reset token was issues by us
+        PasswordResetToken passwordResetToken = passwordResetTokenRepository.findByToken(resetToken)
+            .orElseThrow(() -> new SafaError("Illegal expiration token"));
+
+        resetToken = passwordResetToken.getToken();
 
         // Step - Decode token and extract user
         Claims userClaims = this.tokenService.getTokenClaims(resetToken);
@@ -129,12 +166,14 @@ public class SafaUserController extends BaseController {
         SafaUser retrievedUser = this.safaUserRepository.findByEmail(username)
             .orElseThrow(() -> new UsernameNotFoundException("Username does not exist:" + username));
 
+        // Step - Check the token has no expired
         if (userClaims.getExpiration().before(new Date())) {
             throw new SafaError("Reset password token has expired.");
         }
 
         retrievedUser.setPassword(passwordEncoder.encode(newPassword));
         retrievedUser = this.safaUserRepository.save(retrievedUser);
+        this.passwordResetTokenRepository.delete(passwordResetToken);
         return new UserIdentifierDTO(retrievedUser);
     }
 
@@ -161,6 +200,11 @@ public class SafaUserController extends BaseController {
         return new UserIdentifierDTO(principal);
     }
 
+    @GetMapping(AppRoutes.Accounts.SELF)
+    public UserIdentifierDTO retrieveCurrentUser() {
+        return new UserIdentifierDTO(safaUserService.getCurrentUser());
+    }
+
     private void createSampleProject(CreateAccountRequest newUser) throws IOException {
         AuthorizationSetter.setSessionAuthorization(newUser.getEmail(), serviceProvider);
         List<MultipartFile> files = MultipartRequestService
@@ -173,5 +217,9 @@ public class SafaUserController extends BaseController {
                 new Project("Sample project", "Sample project for new user."),
                 files,
                 serviceProvider);
+    }
+
+    private String buildResetURL(String token) {
+        return String.format(fendBase + fendPath, token);
     }
 }

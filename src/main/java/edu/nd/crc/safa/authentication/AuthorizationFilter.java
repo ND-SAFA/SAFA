@@ -1,9 +1,11 @@
 package edu.nd.crc.safa.authentication;
 
 import java.io.IOException;
-import java.util.Objects;
+import java.util.Arrays;
+import java.util.Optional;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -39,16 +41,25 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain chain) throws IOException, ServletException {
-        String header = request.getHeader(SecurityConstants.AUTHORIZATION_HEADER);
+        if (request.getCookies() == null) {
+            chain.doFilter(request, response);
+            return;
+        }
 
-        if (header == null) {
+        Optional<String> token = Arrays.stream(request.getCookies())
+            .filter(c -> c.getName().equals(SecurityConstants.JWT_COOKIE_NAME))
+            .findFirst()
+            .map(Cookie::getValue);
+
+        if (token.isEmpty()) {
             chain.doFilter(request, response);
             return;
         }
 
         UsernamePasswordAuthenticationToken authenticationToken = null;
+
         try {
-            authenticationToken = authenticate(request);
+            authenticationToken = authenticate(token.get());
         } catch (SafaError e) {
             e.printStackTrace();
             return;
@@ -59,18 +70,12 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
     }
 
     /**
-     * Retrieves JWT token from request header and parses the principal user within it.
+     * Parses the principal user within the JWT request token.
      *
-     * @param request An incoming http request.
+     * @param token Request JWT
      * @return Successful authorization token if successful otherwise null.
      */
-    private UsernamePasswordAuthenticationToken authenticate(HttpServletRequest request) throws SafaError {
-        String token = request.getHeader(SecurityConstants.AUTHORIZATION_HEADER);
-
-        if (Objects.isNull(token)) {
-            throw new SafaError("No token found.");
-        }
-
+    private UsernamePasswordAuthenticationToken authenticate(String token) throws SafaError {
         Claims userClaims = this.tokenService.getTokenClaims(token);
         String username = userClaims.getSubject();
         UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);

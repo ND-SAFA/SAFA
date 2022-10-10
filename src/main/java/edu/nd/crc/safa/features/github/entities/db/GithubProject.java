@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
@@ -24,7 +25,6 @@ import org.hibernate.annotations.Type;
 @Table(name = "github_project")
 @Data
 @NoArgsConstructor
-@RequiredArgsConstructor
 public class GithubProject {
 
     /**
@@ -39,7 +39,6 @@ public class GithubProject {
     /**
      * ID of associated safa project
      */
-    @NonNull
     @OneToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "safa_project_id", nullable = false)
@@ -47,33 +46,19 @@ public class GithubProject {
 
     /**
      * Repository name
-     *
-     * {@link NonNull} annotated properties are included in the constructor
-     * by {@link RequiredArgsConstructor}
      */
-    @NonNull
     @Column(name = "repository_name", nullable = false)
     private String repositoryName;
 
     /**
      * GitHub branch used to pull the artifacts
      */
-    @NonNull
     @Column(name = "branch", nullable = false, length = 32)
     private String branch;
 
     /**
      * Latest commit sha used to pull artifacts
      */
-    @NonNull
     @Column(name = "last_commit_sha", length = 64)
     private String lastCommitSha;
-
-    /**
-     * User that created the project
-     */
-    @OneToOne
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = SafaUser.ID_COLUMN, nullable = false)
-    private SafaUser user;
 }

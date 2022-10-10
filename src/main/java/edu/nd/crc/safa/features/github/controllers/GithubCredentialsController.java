@@ -19,6 +19,7 @@ import edu.nd.crc.safa.features.github.services.GithubConnectionService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
+import edu.nd.crc.safa.server.controllers.utils.GithubControllerUtils;
 import edu.nd.crc.safa.utilities.ExecutorDelegate;
 
 import org.slf4j.Logger;
@@ -43,18 +44,21 @@ public class GithubCredentialsController extends BaseController {
     private final GithubConnectionService githubConnectionService;
     private final GithubAccessCredentialsRepository githubAccessCredentialsRepository;
     private final ExecutorDelegate executorDelegate;
+    private final GithubControllerUtils githubControllerUtils;
 
     public GithubCredentialsController(ResourceBuilder resourceBuilder,
                                        SafaUserService safaUserService,
                                        GithubConnectionService githubConnectionService,
                                        GithubAccessCredentialsRepository githubAccessCredentialsRepository,
                                        ExecutorDelegate executorDelegate,
-                                       ServiceProvider serviceProvider) {
+                                       ServiceProvider serviceProvider,
+                                       GithubControllerUtils githubControllerUtils) {
         super(resourceBuilder, serviceProvider);
         this.safaUserService = safaUserService;
         this.githubConnectionService = githubConnectionService;
         this.githubAccessCredentialsRepository = githubAccessCredentialsRepository;
         this.executorDelegate = executorDelegate;
+        this.githubControllerUtils = githubControllerUtils;
     }
 
     @PostMapping(AppRoutes.Github.Credentials.REGISTER)
@@ -141,7 +145,7 @@ public class GithubCredentialsController extends BaseController {
             GithubAccessCredentials githubAccessCredentials = githubAccessCredentialsRepository.findByUser(principal)
                 .orElseThrow(() -> new SafaError("No GitHub credentials found"));
 
-            GithubResponseDTO<Void> responseDTO = this.checkCredentials(githubAccessCredentials);
+            GithubResponseDTO<Void> responseDTO = githubControllerUtils.checkCredentials(githubAccessCredentials);
 
             if (GithubResponseMessage.EXPIRED.equals(responseDTO.getMessage())) {
                 log.error("Trying to refresh expired credentials");
@@ -165,18 +169,4 @@ public class GithubCredentialsController extends BaseController {
 
         return output;
     }
-
-    private <T> GithubResponseDTO<T> checkCredentials(GithubAccessCredentials credentials) {
-        if (credentials.areCredentialsExpired()) {
-            log.info("Deleting GitHub credentials");
-            githubAccessCredentialsRepository.delete(credentials);
-            return new GithubResponseDTO<>(null, GithubResponseMessage.EXPIRED);
-        }
-        if (credentials.isTokenExpired()) {
-            return new GithubResponseDTO<>(null, GithubResponseMessage.TOKEN_REFRESH_REQUIRED);
-        }
-
-        return new GithubResponseDTO<>(null, GithubResponseMessage.OK);
-    }
-
 }

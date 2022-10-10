@@ -1,0 +1,286 @@
+{
+  "sha": "00cb43782b9a46f7362ce16f24f3d03c9285b409",
+  "tree": [
+    {
+      "mode": "100644",
+      "path": ".gitignore",
+      "sha": "84ccac49f63d3c70a39ff57697f792dbedb0ae68",
+      "size": 2079,
+      "type": "blob",
+      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/blobs/84ccac49f63d3c70a39ff57697f792dbedb0ae68"
+    },
+    {
+      "mode": "100644",
+      "path": "LICENSE",
+      "sha": "fe04d34afdd9a18fe3acbc894ebfe4ad33dddc48",
+      "size": 1067,
+      "type": "blob",
+      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/blobs/fe04d34afdd9a18fe3acbc894ebfe4ad33dddc48"
+    },
+    {
+      "mode": "100644",
+      "path": "README.md",
+      "sha": "bac154fb7c29981584fd6cfebee2209daa83e900",
+      "size": 11667,
+      "type": "blob",
+      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/blobs/bac154fb7c29981584fd6cfebee2209daa83e900"
+    },
+    {
+      "mode": "040000",
+      "path": "diagrams",
+      "sha": "178640dc39ef24ffb2ae30700fd48c9d0d35a097",
+      "type": "tree",
+      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/trees/178640dc39ef24ffb2ae30700fd48c9d0d35a097"
+    },
+    {
+      "mode": "100644",
+      "path": "diagrams/fsm_home_assis.drawio",
+      "sha": "d9dccd6429d487f2c20ae632f035f3e23f1af0ff",
+      "size": 3751,
+      "type": "blob",
+      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/blobs/d9dccd6429d487f2c20ae632f035f3e23f1af0ff"
+    },
+    {
+      "mode": "100644",
+      "path": "diagrams/system diagram.drawio",
+      "sha": "1c5f9dc244bb61474c85d15d0c804e7cf9112b2e",
+      "size": 1434,
+      "type": "blob",
+      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/blobs/1c5f9dc244bb61474c85d15d0c804e7cf9112b2e"
+    },
+    {
+      "mode": "100644",
+      "path": "home assistant.postman_collection.json",
+      "sha": "30e31020fa332116a19d24317abf19e17f7d536d",
+      "size": 10537,
+      "type": "blob",
+      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/blobs/30e31020fa332116a19d24317abf19e17f7d536d"
+    },
+    {
+      "mode": "040000",
+      "path": "images",
+      "sha": "9cccc12a697f054e291db86d0bcdd02d875a3587",
+      "type": "tree",
+      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/trees/9cccc12a697f054e291db86d0bcdd02d875a3587"
+    },
+    {
+      "mode": "100644",
+      "path": "images/entity_replacement.jpg",
+      "sha": "d28edb19e32a8734f6b78d83997bdf5c10655e2a",
+      "size": 20658,
+      "type": "blob",
+      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/blobs/d28edb19e32a8734f6b78d83997bdf5c10655e2a"
+    },
+    {
+      "mode": "100644",
+      "path": "images/fsm.PNG",
+      "sha": "cc693df4d12d36c8fbc3f2ca408bffa4fc8301f1",
+      "size": 89687,
+      "type": "blob",
+      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/blobs/cc693df4d12d36c8fbc3f2ca408bffa4fc8301f1"
+    },
+    {
+      "mode": "100644",
+      "path": "images/system diagram.png",
+      "sha": "277c675851ec91b4c555b8128066df7ea8c76872",
+      "size": 35928,
+      "type": "blob",
+      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/blobs/277c675851ec91b4c555b8128066df7ea8c76872"
+    },
+    {
+      "mode": "040000",
+      "path": "modules",
+      "sha": "dc723422859f309e3778d1ebb794c5f91b5411d3",
+      "type": "tree",
+      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/trees/dc723422859f309e3778d1ebb794c5f91b5411d3"
+    },
+    {
+      "mode": "040000",
+      "path": "modules/calendar",
+      "sha": "6391e9f55a34d05cd04995c2ed33396f0b1b3b69",
+      "type": "tree",
+      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/trees/6391e9f55a34d05cd04995c2ed33396f0b1b3b69"
+    },
+    {
+      "mode": "100644",
+      "path": "modules/calendar/api_delegate.py",
+      "sha": "4b7adf2b0a1630cd8350e25f275a6d1aa975fbe6",
+      "size": 7702,
+      "type": "blob",
+      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/blobs/4b7adf2b0a1630cd8350e25f275a6d1aa975fbe6"
+    },
+    {
+      "mode": "100644",
+      "path": "modules/calendar/calendar.pl",
+      "sha": "9c930d9b4c8ce4ad220cb70c226ed672ca8fb1c4",
+      "size": 4917,
+      "type": "blob",
+      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/blobs/9c930d9b4c8ce4ad220cb70c226ed672ca8fb1c4"
+    },
+    {
+      "mode": "100644",
+      "path": "modules/calendar/install.pl",
+      "sha": "ec1d8d80361ae3b010e0e2cd432fe45593063263",
+      "size": 28,
+      "type": "blob",
+      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/blobs/ec1d8d80361ae3b010e0e2cd432fe45593063263"
+    },
+    {
+      "mode": "100644",
+      "path": "modules/calendar/requirements.txt",
+      "sha": "122195cbf3abfcb5fc326f55faa498c6cf3a53b5",
+      "size": 113,
+      "type": "blob",
+      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/blobs/122195cbf3abfcb5fc326f55faa498c6cf3a53b5"
+    },
+    {
+      "mode": "040000",
+      "path": "modules/intents",
+      "sha": "5b8c1109c29dd0e12d8d3042687c0f5e252e1f0e",
+      "type": "tree",
+      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/trees/5b8c1109c29dd0e12d8d3042687c0f5e252e1f0e"
+    },
+    {
+      "mode": "100644",
+      "path": "modules/intents/calendar_kb.pl",
+      "sha": "e753e31441d3767e430a793ccbd972ae306f1ef8",
+      "size": 3959,
+      "type": "blob",
+      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/blobs/e753e31441d3767e430a793ccbd972ae306f1ef8"
+    },
+    {
+      "mode": "040000",
+      "path": "modules/intents/chatito",
+      "sha": "f6ad3f5fdf93f3722a4a99a03c04baac25f0f9a5",
+      "type": "tree",
+      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/trees/f6ad3f5fdf93f3722a4a99a03c04baac25f0f9a5"
+    },
+    {
+      "mode": "100644",
+      "path": "modules/intents/chatito/answer.chatito",
+      "sha": "d31363b94fd6915a293a420811df198aa8f4215b",
+      "size": 347,
+      "type": "blob",
+      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/blobs/d31363b94fd6915a293a420811df198aa8f4215b"
+    },
+    {
+      "mode": "100644",
+      "path": "modules/intents/chatito/calendarAdd.chatito",
+      "sha": "1ee0bae01eb0d17d9cffe45c6cd6c8b79b9243c9",
+      "size": 1524,
+      "type": "blob",
+      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/blobs/1ee0bae01eb0d17d9cffe45c6cd6c8b79b9243c9"
+    },
+    {
+      "mode": "100644",
+      "path": "modules/intents/chatito/calendarAsk.chatito",
+      "sha": "97efcbe09778a50766e5f78114e71c2370f8b4e1",
+      "size": 1801,
+      "type": "blob",
+      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/blobs/97efcbe09778a50766e5f78114e71c2370f8b4e1"
+    },
+    {
+      "mode": "100644",
+      "path": "modules/intents/chatito/calendarUpdate.chatito",
+      "sha": "32d218385eca49c30ae1ed22f2a6b3c8df6348be",
+      "size": 698,
+      "type": "blob",
+      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/blobs/32d218385eca49c30ae1ed22f2a6b3c8df6348be"
+    },
+    {
+      "mode": "100644",
+      "path": "modules/intents/chatito/weather.chatito",
+      "sha": "315f5e488846b1880c51d9a76b9bd634de745a5a",
+      "size": 1769,
+      "type": "blob",
+      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/blobs/315f5e488846b1880c51d9a76b9bd634de745a5a"
+    },
+    {
+      "mode": "100644",
+      "path": "modules/intents/fsm.pl",
+      "sha": "a6ec308d5e0083528c49a348578c8d1406220bd0",
+      "size": 14118,
+      "type": "blob",
+      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/blobs/a6ec308d5e0083528c49a348578c8d1406220bd0"
+    },
+    {
+      "mode": "100644",
+      "path": "modules/intents/kb.pl",
+      "sha": "f15eb6920603ba4e2149b2e59df4039b1bbc1f28",
+      "size": 3575,
+      "type": "blob",
+      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/blobs/f15eb6920603ba4e2149b2e59df4039b1bbc1f28"
+    },
+    {
+      "mode": "100644",
+      "path": "modules/intents/weather_kb.pl",
+      "sha": "134eac06523dff0070d4136e05d71b46a6d878eb",
+      "size": 6041,
+      "type": "blob",
+      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/blobs/134eac06523dff0070d4136e05d71b46a6d878eb"
+    },
+    {
+      "mode": "100644",
+      "path": "modules/intents/weekdays_kb.pl",
+      "sha": "4809de64fe719cb48d8d2417f41de540f8d7d996",
+      "size": 1104,
+      "type": "blob",
+      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/blobs/4809de64fe719cb48d8d2417f41de540f8d7d996"
+    },
+    {
+      "mode": "040000",
+      "path": "modules/text2Speech",
+      "sha": "8483b029d0102424e0f0d5786aee50d021b91877",
+      "type": "tree",
+      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/trees/8483b029d0102424e0f0d5786aee50d021b91877"
+    },
+    {
+      "mode": "040000",
+      "path": "modules/text2Speech/audio",
+      "sha": "0bda1460fc252d0550bce8003e9c66742f4765ef",
+      "type": "tree",
+      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/trees/0bda1460fc252d0550bce8003e9c66742f4765ef"
+    },
+    {
+      "mode": "100644",
+      "path": "modules/text2Speech/audio/trial.mp3",
+      "sha": "3ad5ad9e579444929fce148e2256c6d72bb26be3",
+      "size": 11232,
+      "type": "blob",
+      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/blobs/3ad5ad9e579444929fce148e2256c6d72bb26be3"
+    },
+    {
+      "mode": "100644",
+      "path": "modules/text2Speech/notes.md",
+      "sha": "bbe7510d636a50cf6e5e92cc561d3615bc3d254c",
+      "size": 110,
+      "type": "blob",
+      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/blobs/bbe7510d636a50cf6e5e92cc561d3615bc3d254c"
+    },
+    {
+      "mode": "100644",
+      "path": "modules/text2Speech/text2SpeechWrapper.py",
+      "sha": "cebcfaef4c04455325b7018f2f40288f1d237c0f",
+      "size": 2255,
+      "type": "blob",
+      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/blobs/cebcfaef4c04455325b7018f2f40288f1d237c0f"
+    },
+    {
+      "mode": "040000",
+      "path": "modules/weather",
+      "sha": "54bbc5b5594a5aa92c5f619fbf688eeee3bf1b7f",
+      "type": "tree",
+      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/trees/54bbc5b5594a5aa92c5f619fbf688eeee3bf1b7f"
+    },
+    {
+      "mode": "100644",
+      "path": "modules/weather/weather.pl",
+      "sha": "50df3de868b0fc71611a3df4a39a4cf2511ab644",
+      "size": 941,
+      "type": "blob",
+      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/blobs/50df3de868b0fc71611a3df4a39a4cf2511ab644"
+    }
+  ],
+  "truncated": false,
+  "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/trees/00cb43782b9a46f7362ce16f24f3d03c9285b409"
+}

@@ -1,6 +1,5 @@
 package edu.nd.crc.safa.features.users.services;
 
-import java.util.Optional;
 import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.authentication.SafaUserDetails;
@@ -47,7 +46,12 @@ public class SafaUserService {
     public UserIdentifierDTO createUser(String email, String password) {
         String encodedPassword = this.passwordEncoder.encode(password);
         SafaUser safaUser = new SafaUser(email, encodedPassword);
-        this.safaUserRepository.save(safaUser);
+
+        if (this.safaUserRepository.findByEmail(email).isPresent()) {
+            throw new SafaError("Email already in use: " + email);
+        }
+
+        safaUser = this.safaUserRepository.save(safaUser);
         return new UserIdentifierDTO(safaUser);
     }
 
@@ -61,11 +65,12 @@ public class SafaUserService {
         SafaUser currentUser = this.getCurrentUser();
         String encodedPassword = currentUser.getPassword();
         boolean confirmDelete = this.passwordEncoder.matches(password, encodedPassword);
-        if (confirmDelete) {
-            this.safaUserRepository.delete(currentUser);
-        } else {
+
+        if (!confirmDelete) {
             throw new SafaError("Given password does not match our records");
         }
+
+        this.safaUserRepository.delete(currentUser);
     }
 
     /**
@@ -75,10 +80,8 @@ public class SafaUserService {
      * @return The user queried for
      */
     public SafaUser getUserByEmail(String email) {
-        Optional<SafaUser> newMemberQuery = this.safaUserRepository.findByEmail(email);
-        if (newMemberQuery.isEmpty()) {
-            throw new SafaError("No user exists with given email: %s.", email);
-        }
-        return newMemberQuery.get();
+        return this.safaUserRepository
+            .findByEmail(email)
+            .orElseThrow(() ->  new SafaError("No user exists with given email: %s.", email));
     }
 }

@@ -27,6 +27,8 @@ import edu.nd.crc.safa.features.projects.services.ProjectService;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
 
+import org.springframework.util.StringUtils;
+
 /**
  * Responsible for providing step implementations for importing a GitHub project:
  * 1. Connecting to GitHub and accessing project
@@ -130,7 +132,7 @@ public class GithubProjectCreationJob extends CommitJob {
         githubProject.setProject(project);
         githubProject.setBranch(this.githubRepositoryDTO.getDefaultBranch());
         githubProject.setRepositoryName(this.githubRepositoryDTO.getName());
-        githubProject.setUser(principal);
+
         return this.serviceProvider.getGithubProjectRepository().save(githubProject);
     }
 
@@ -142,6 +144,7 @@ public class GithubProjectCreationJob extends CommitJob {
         this.commitSha = connectionService.getRepositoryBranch(this.credentials, repositoryName,
             this.githubRepositoryDTO.getDefaultBranch()).getLastCommitSha();
         this.projectCommit.addArtifacts(ModificationType.ADDED, getArtifacts());
+        System.out.println("HERE I AM " + projectCommit.getArtifacts().getSize());
         this.githubProject.setLastCommitSha(this.commitSha);
         this.serviceProvider.getGithubProjectRepository().save(githubProject);
     }
@@ -161,7 +164,11 @@ public class GithubProjectCreationJob extends CommitJob {
             String name = file.getPath();
             String type = file.getType().name();
             String summary = file.getSha();
-            String body = blobDTO.getContent();
+            String body = "";
+
+            if (blobDTO != null && StringUtils.hasLength(blobDTO.getContent())) {
+                body = blobDTO.getContent();
+            }
 
             ArtifactAppEntity artifact = new ArtifactAppEntity(
                 null,

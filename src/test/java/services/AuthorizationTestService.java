@@ -2,9 +2,11 @@ package services;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import javax.servlet.http.Cookie;
 import java.util.Optional;
 
 import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.config.SecurityConstants;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.memberships.entities.db.ProjectMembership;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
@@ -14,7 +16,6 @@ import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import builders.DbEntityBuilder;
 import common.ApplicationBaseTest;
 import lombok.AllArgsConstructor;
-import org.json.JSONObject;
 import org.springframework.test.web.servlet.ResultMatcher;
 import requests.SafaRequest;
 
@@ -40,6 +41,13 @@ public class AuthorizationTestService {
         SafaRequest
             .withRoute(AppRoutes.Accounts.CREATE_ACCOUNT)
             .postWithJsonObject(user);
+    }
+
+    public void createUser(String email, String password, ResultMatcher test) throws Exception {
+        SafaUser user = new SafaUser(email, password);
+        SafaRequest
+            .withRoute(AppRoutes.Accounts.CREATE_ACCOUNT)
+            .postWithJsonObject(user, test);
     }
 
     public void loginUser(String email, String password) throws Exception {
@@ -74,13 +82,13 @@ public class AuthorizationTestService {
             SafaRequest.clearAuthorizationToken();
         }
 
-        JSONObject response = SafaRequest
+        Optional<Cookie> token = SafaRequest
             .withRoute(AppRoutes.Accounts.LOGIN)
-            .postWithJsonObject(new SafaUser(email, password), resultMatcher);
+            .sendPostRequestAndRetrieveCookie(new SafaUser(email, password),
+                resultMatcher, SecurityConstants.JWT_COOKIE_NAME);
 
-        if (setToken) {
-            String token = response.getString("token");
-            SafaRequest.setAuthorizationToken(token);
+        if (setToken && token.isPresent()) {
+            SafaRequest.setAuthorizationToken(token.get());
         }
     }
 

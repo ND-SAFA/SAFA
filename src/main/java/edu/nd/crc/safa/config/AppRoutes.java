@@ -89,7 +89,7 @@ public class AppRoutes {
     public static class Links {
         public static final String GET_GENERATED_LINKS_IN_PROJECT_VERSION = Projects.ROOT
             + "/versions/{versionId}/links/generated";
-        protected static final String GENERATE_LINKS = Projects.ROOT + "/links/generate";
+        public static final String GENERATE_LINKS = Projects.ROOT + "/links/generate";
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -195,6 +195,7 @@ public class AppRoutes {
             public static final String UPDATE = Versions.BY_ID + "/import/github/{repositoryName}";
             private static final String ROOT = Projects.ROOT + "/import";
             public static final String BY_NAME = Import.ROOT + "/github/{repositoryName}";
+            public static final String IMPORT_INTO_EXISTING = Versions.BY_ID + "/import/github/{repositoryName}";
         }
     }
 

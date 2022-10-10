@@ -3,11 +3,11 @@ package features.users.crud;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.Optional;
+
+import common.ApplicationBaseTest;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
-import common.ApplicationBaseTest;
-
-import java.util.Optional;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;

@@ -5,12 +5,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import javax.servlet.http.Cookie;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+import javax.servlet.http.Cookie;
 
 import edu.nd.crc.safa.utilities.JsonFileUtilities;
 import org.json.JSONArray;
@@ -157,8 +157,8 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
     public JSONObject makeRequestWithoutBody(MockHttpServletRequestBuilder request,
                                        ResultMatcher resultMatcher) throws Exception {
 
-        if (authorizationToken != null && !authorizationToken.equals("")) {
-            request = request.header("Authorization", authorizationToken);
+        if (authorizationToken != null) {
+            request = request.cookie(authorizationToken);
         }
 
         MvcResult result = mockMvc
@@ -234,7 +234,7 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
         MockHttpServletResponse response = requestResult.getResponse();
         Cookie[] cookies = response.getCookies();
 
-        if (cookies == null || cookies.length == 0) {
+        if (cookies.length == 0) {
             return Optional.empty();
         }
 

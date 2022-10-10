@@ -71,8 +71,8 @@ public class CsvArtifactFile extends AbstractArtifactFile<CSVRecord> {
     private String[] getArtifactRow(ArtifactAppEntity artifact) {
         return new String[]{artifact.getSummary(),
             artifact.getBody(),
-            artifact.getLogicType().toString(),
-            artifact.getSafetyCaseType().toString()};
+            artifact.getLogicType() == null ? null : artifact.getLogicType().toString(),
+            artifact.getSafetyCaseType() == null ? null : artifact.getSafetyCaseType().toString()};
     }
 
     @Override

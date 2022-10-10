@@ -45,12 +45,12 @@ public class SafaUserService {
      * @return {@link UserIdentifierDTO} representing created user
      */
     public UserIdentifierDTO createUser(String email, String password) {
-        if (this.safaUserRepository.findByEmail(email).isPresent()) {
-            throw new SafaError("Cannot create another account with this email address" + email);
-        }
-
         String encodedPassword = this.passwordEncoder.encode(password);
         SafaUser safaUser = new SafaUser(email, encodedPassword);
+
+        if (this.safaUserRepository.findByEmail(email).isPresent()) {
+            throw new SafaError("Email already in use: " + email);
+        }
 
         this.safaUserRepository.save(safaUser);
         return new UserIdentifierDTO(safaUser);

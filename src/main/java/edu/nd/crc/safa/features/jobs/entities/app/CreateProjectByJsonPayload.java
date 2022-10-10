@@ -2,10 +2,9 @@ package edu.nd.crc.safa.features.jobs.entities.app;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.validation.Valid;
 
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
-import edu.nd.crc.safa.features.tgen.entities.ArtifactTypeTraceGenerationRequestDTO;
+import edu.nd.crc.safa.features.tgen.entities.TracingRequest;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,5 +22,5 @@ public class CreateProjectByJsonPayload {
     /**
      * The traces to generate.
      */
-    List<@Valid ArtifactTypeTraceGenerationRequestDTO> requests = new ArrayList<>();
+    List<TracingRequest> requests = new ArrayList<>();
 }

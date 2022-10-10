@@ -12,6 +12,7 @@ import edu.nd.crc.safa.features.models.entities.ModelAppEntity;
 import edu.nd.crc.safa.features.models.entities.ShareMethod;
 import edu.nd.crc.safa.features.models.entities.api.ShareModelRequest;
 import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.tgen.method.bert.TBert;
 
@@ -56,17 +57,24 @@ public class ModelController extends BaseController {
                                               @RequestBody ModelAppEntity modelAppEntity) {
         Project project = this.resourceBuilder.fetchProject(projectId).withViewProject();
         boolean createModel = modelAppEntity.getId() == null;
-
         // Step - Create path for model state
         modelAppEntity = this.serviceProvider.getModelService().createOrUpdateModel(project, modelAppEntity);
 
         // Step - Copy model to project
         if (createModel) {
-            TBert bertModel = this.serviceProvider.getBertService().getBertModel(
-                modelAppEntity.getBaseModel(),
-                serviceProvider.getSafaRequestBuilder()
-            );
-            bertModel.createModel(modelAppEntity.getStatePath());
+            try {
+                TBert bertModel = this.serviceProvider.getBertService().getBertModel(
+                    modelAppEntity.getBaseModel(),
+                    serviceProvider.getSafaRequestBuilder()
+                );
+
+                bertModel.createModel(modelAppEntity.getStatePath());
+            } catch (Exception e) {
+                Model model = this.serviceProvider.getModelService().getModelById(modelAppEntity.getId());
+                this.serviceProvider.getModelRepository().delete(model);
+                e.printStackTrace();
+                throw new SafaError("Failed to create model.", e);
+            }
         }
 
         // Step - Notify project users of new model
@@ -87,15 +95,24 @@ public class ModelController extends BaseController {
     @DeleteMapping(AppRoutes.Models.DELETE_MODEL_BY_ID)
     public void deleteModelById(@PathVariable UUID modelId) {
         Model model = this.serviceProvider.getModelService().getModelById(modelId);
+        ModelAppEntity modelAppEntity = new ModelAppEntity(model);
+
+        // Step - Delete model record
         this.serviceProvider.getModelRepository().delete(model);
 
-        this.serviceProvider.getModelProjectRepository().findByModel(model).forEach((mp) -> {
+        // Step - Delete model files
+        TBert bertModel = this.serviceProvider.getBertService().getBertModel(
+            modelAppEntity.getBaseModel(),
+            serviceProvider.getSafaRequestBuilder()
+        );
+        bertModel.deleteModel();
+
+        this.serviceProvider.getModelProjectRepository().findByModel(model).forEach(mp ->
             this.serviceProvider.getNotificationService().broadcastChange(
                 EntityChangeBuilder
                     .create(mp.getProject())
                     .withModelDelete(modelId)
-            );
-        });
+            ));
     }
 
     /**

@@ -1,7 +1,6 @@
 package edu.nd.crc.safa.features.jobs.builders;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.common.ServiceProvider;
@@ -10,8 +9,8 @@ import edu.nd.crc.safa.features.jobs.entities.app.JobType;
 import edu.nd.crc.safa.features.jobs.entities.jobs.CreateProjectViaJsonJob;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
-import edu.nd.crc.safa.features.tgen.entities.ArtifactTypeTraceGenerationRequestDTO;
 import edu.nd.crc.safa.features.tgen.entities.TraceGenerationRequest;
+import edu.nd.crc.safa.features.tgen.entities.TracingRequest;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 /**
@@ -26,17 +25,15 @@ public class CreateProjectByJsonJobBuilder extends AbstractJobBuilder<ProjectVer
     /**
      * Requests to generate trace links.
      */
-    List<TraceGenerationRequest> traceGenerationRequests;
+    TraceGenerationRequest traceGenerationRequest;
 
     public CreateProjectByJsonJobBuilder(ServiceProvider serviceProvider,
                                          ProjectAppEntity projectAppEntity,
-                                         List<ArtifactTypeTraceGenerationRequestDTO> traceGenerationRequests) {
+                                         List<TracingRequest> tracingRequests) {
         super(serviceProvider);
         this.projectAppEntity = projectAppEntity;
-        this.traceGenerationRequests = traceGenerationRequests
-            .stream()
-            .map(r -> new TraceGenerationRequest(r, projectAppEntity))
-            .collect(Collectors.toList());
+        this.traceGenerationRequest = new TraceGenerationRequest();
+        this.traceGenerationRequest.setRequests(tracingRequests);
     }
 
     @Override
@@ -54,7 +51,7 @@ public class CreateProjectByJsonJobBuilder extends AbstractJobBuilder<ProjectVer
     AbstractJob constructJobForWork() {
         // Step - Create initial commit
         this.projectAppEntity.setProjectVersion(this.identifier);
-        this.traceGenerationRequests.forEach(r -> r.setProjectVersion(this.identifier));
+        this.traceGenerationRequest.setProjectVersion(this.identifier);
         ProjectCommit projectCommit = new ProjectCommit(projectAppEntity);
 
         // Step - Create job
@@ -62,7 +59,7 @@ public class CreateProjectByJsonJobBuilder extends AbstractJobBuilder<ProjectVer
             this.jobDbEntity,
             this.serviceProvider,
             projectCommit,
-            this.traceGenerationRequests
+            this.traceGenerationRequest
         );
     }
 

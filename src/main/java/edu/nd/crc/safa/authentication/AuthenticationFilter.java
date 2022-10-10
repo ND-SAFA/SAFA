@@ -2,7 +2,9 @@ package edu.nd.crc.safa.authentication;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import javax.servlet.FilterChain;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -12,6 +14,8 @@ import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.json.JSONObject;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -66,10 +70,17 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         String username = ((SafaUserDetails) auth.getPrincipal()).getUsername();
         String token = this.tokenService.createTokenForUsername(username, SecurityConstants.LOGIN_EXPIRATION_TIME);
         JSONObject responseJson = new JSONObject();
+        ResponseCookie cookie = ResponseCookie.from(SecurityConstants.JWT_COOKIE_NAME, token)
+            .secure(true)
+            .httpOnly(true)
+            .sameSite("strict")
+            .maxAge(SecurityConstants.LOGIN_EXPIRATION_TIME)
+            .build();
 
         responseJson.put(SecurityConstants.TOKEN_NAME, token);
         res.setContentType("application/json");
         res.setCharacterEncoding("UTF-8");
+        res.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
         res.getWriter().write(responseJson.toString());
     }
 }

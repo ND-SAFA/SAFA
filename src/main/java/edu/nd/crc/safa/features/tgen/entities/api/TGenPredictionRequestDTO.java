@@ -1,5 +1,7 @@
 package edu.nd.crc.safa.features.tgen.entities.api;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import lombok.AllArgsConstructor;
@@ -32,9 +34,13 @@ public class TGenPredictionRequestDTO {
     /**
      * Map of source artifact ids to content body.
      */
-    Map<String, String> sources;
+    List<Map<String, String>> sourceLayers;
     /**
      * Map of target artifact ids to content body.
      */
-    Map<String, String> targets;
+    List<Map<String, String>> targetLayers;
+    /**
+     * Map of custom key-value pairs to set on trainer
+     */
+    Map<String, String> settings = new HashMap<>();
 }

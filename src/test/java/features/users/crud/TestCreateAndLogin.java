@@ -3,13 +3,13 @@ package features.users.crud;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.Optional;
-
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
-
 import common.ApplicationBaseTest;
+
+import java.util.Optional;
 import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import requests.SafaRequest;
 
@@ -41,6 +41,16 @@ class TestCreateAndLogin extends ApplicationBaseTest {
         // VP - Verify that user is able to be authenticated and no projects are assigned to it.
         JSONArray response = new SafaRequest(AppRoutes.Projects.GET_PROJECTS).getWithJsonArray();
         assertThat(response.length()).isZero();
+    }
+
+    @Test
+    void testSelfEndpoint() throws Exception {
+        authorizationService.createUser(testEmail, testPassword);
+        authorizationService.loginUser(testEmail, testPassword, status().isOk());
+
+        JSONObject response = new SafaRequest(AppRoutes.Accounts.SELF).getWithJsonObject(status().isOk());
+
+        assertThat(response.get("email")).isEqualTo(testEmail);
     }
 
     @Test

@@ -5,9 +5,9 @@ from common.models.base_models.supported_base_model import SupportedBaseModel
 from common.models.model_generator import ModelGenerator
 from test.base_test import BaseTest
 from test.test_data import ALL_TEST_SOURCES, ALL_TEST_TARGETS, TEST_POS_LINKS, TEST_SOURCE_LAYERS, TEST_TARGET_LAYERS
-from trace.data.artifact import Artifact
-from trace.data.trace_dataset_creator import TraceDatasetCreator
-from trace.data.trace_link import TraceLink
+from trace.data.data_objects.artifact import Artifact
+from trace.data.datasets.trace_dataset_creator import TraceDatasetCreator
+from trace.data.data_objects.trace_link import TraceLink
 
 
 def fake_extract_feature_info(feature, prefix=''):
@@ -143,7 +143,7 @@ class TestTraceDatasetCreator(BaseTest):
 
         validation_dataset_targets = self.get_dataset_link_attrs(validation_dataset, attr="target")
         for target in validation_dataset_targets:
-            self.assertNotEquals(target.id_, self.UNLINKED_TARGET)
+            self.assertNotEquals(target.id, self.UNLINKED_TARGET)
 
     @patch.object(TraceDatasetCreator, "_get_feature_entry")
     def test_get_prediction_dataset(self, get_feature_entry_mock: mock.MagicMock):
@@ -314,14 +314,14 @@ class TestTraceDatasetCreator(BaseTest):
         for link in self.ALL_LINKS:
             id_ = TraceLink.generate_link_id(link[0], link[1])
             self.assertIn(id_, links)
-            self.assertEquals(link[0], links[id_].source.id_)
-            self.assertEquals(link[1], links[id_].target.id_)
+            self.assertEquals(link[0], links[id_].source.id)
+            self.assertEquals(link[1], links[id_].target.id)
 
     def get_links(self, link_list):
         links = {}
         for source, target in link_list:
             link = self.get_test_link(source, target)
-            links[link.id_] = link
+            links[link.id] = link
         return links
 
     def get_test_link(self, source, target):

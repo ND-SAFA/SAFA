@@ -1,5 +1,5 @@
 from test.base_test import BaseTest
-from trace.data.artifact import Artifact
+from trace.data.data_objects.artifact import Artifact
 
 
 def fake_method(text):

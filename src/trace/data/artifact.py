@@ -13,7 +13,7 @@ class Artifact:
         :param token: artifact token
         :param feature_func: function from which the artifact features can be generated
         """
-        self.id_ = id_
+        self.id = id_
         self.token = token
         self.__feature_func = feature_func  # delay execution in case not needed
         self.__feature = None
@@ -27,3 +27,6 @@ class Artifact:
         if self.__feature is None:
             self.__feature = self.__feature_func(text=self.token)
         return self.__feature
+
+    def __hash__(self):
+        return hash(self.id)

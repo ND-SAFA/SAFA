@@ -12,8 +12,8 @@ from common.models.base_models.supported_base_model import SupportedBaseModel
 from experiment.common.pretraining_data import PretrainingData
 from experiment.common.run_mode import RunMode
 from experiment.models.repository import Repository
-from experiment.models.safa_project import SafaProject
-from trace.data.trace_dataset_creator import TraceDatasetCreator
+from trace.data.datasets.safa_dataset_creator import SafaDatasetCreator
+from trace.data.datasets.trace_dataset_creator import TraceDatasetCreator
 from trace.jobs.trace_args_builder import TraceArgsBuilder
 from trace.train.trace_trainer import TraceTrainer
 
@@ -70,9 +70,8 @@ class ExperimentRun:
         trace_args = trace_args_builder.build()
 
         trace_trainer = TraceTrainer(args=trace_args)
-        validation_project_creator = self.validation_project if self.validation_project else SafaProject(
-            self.validation_project_path).get_dataset(
-            trace_args.model_generator)
+        validation_project_creator = self.validation_project if self.validation_project\
+            else SafaDatasetCreator(trace_args.model_generator, self.validation_project_path)
         # Run
         if run_mode in [RunMode.TRAIN, RunMode.TRAINEVAL]:
             trace_trainer.perform_training()
@@ -160,8 +159,8 @@ class ExperimentRun:
         for repo_name in training_repository_paths:
             repository = Repository(repo_name)
             for level in repository.get_levels():
-                training_sources.append(level.sources)
-                training_targets.append(level.targets)
+                training_sources.append(level.source_artifacts)
+                training_targets.append(level.target_artifacts)
                 training_links.extend(level.links)
 
         return training_sources, training_targets, training_links

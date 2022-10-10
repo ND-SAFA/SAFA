@@ -1,6 +1,6 @@
 from test.base_test import BaseTest
 from test.test_data import TEST_POS_LINKS, TEST_SOURCE_LAYERS, TEST_TARGET_LAYERS
-from trace.data.trace_dataset import TraceDataset
+from trace.data.datasets.dataset_split import DatasetSplit
 
 
 class TestTraceDataset(BaseTest):
@@ -9,19 +9,19 @@ class TestTraceDataset(BaseTest):
                            for s_id, t_id in zip(source_artifacts.keys(), target_artifacts.keys())]
 
     def test_resize_data_bigger(self):
-        new_dataset = TraceDataset.resize_data(TEST_POS_LINKS, 5)
+        new_dataset = DatasetSplit.resize_data(TEST_POS_LINKS, 5)
         self.assertEquals(len(new_dataset), 5)
 
     def test_resize_data_duplicates(self):
-        new_dataset = TraceDataset.resize_data(TEST_POS_LINKS, 2, True)
+        new_dataset = DatasetSplit.resize_data(TEST_POS_LINKS, 2, True)
         self.assertEquals(len(new_dataset), 2)
 
     def test_resize_data_size_smaller_no_duplicates(self):
-        new_dataset = TraceDataset.resize_data(TEST_POS_LINKS, 2, False)
+        new_dataset = DatasetSplit.resize_data(TEST_POS_LINKS, 2, False)
         self.assertEquals(len(set(new_dataset)), 2)
 
     def test_resample_data(self):
-        new_dataset = TraceDataset.resample_data(TEST_POS_LINKS, 3)
+        new_dataset = DatasetSplit.resample_data(TEST_POS_LINKS, 3)
         self.assertEquals(len(new_dataset), len(TEST_POS_LINKS) * 3)
 
     def test_add_entry(self):
@@ -39,4 +39,4 @@ class TestTraceDataset(BaseTest):
         self.assertListEqual(test_trace_dataset.source_target_pairs, self.SOURCE_TARGET_PAIRS)
 
     def get_test_trace_dataset(self):
-        return TraceDataset()
+        return DatasetSplit()

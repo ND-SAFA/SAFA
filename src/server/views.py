@@ -211,5 +211,5 @@ class PreTrainView(BaseTraceJobView):
         :param: Http request containing training parameters
         :return JSONResponse including the model path or exception and status of the job
         """
-        # TODO: Be able to set `baseModel` to BertForMaskedLM
+
         return self.run_job(request, self.job_type)

@@ -1,5 +1,5 @@
 from test.base_test import BaseTest
-from trace.data.data_key import DataKey
+from trace.data.data_objects.data_key import DataKey
 
 
 class TestDataKey(BaseTest):

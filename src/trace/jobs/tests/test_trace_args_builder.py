@@ -1,6 +1,6 @@
 from test.base_test import BaseTest
 from test.test_data import TEST_POS_LINKS
-from trace.data.trace_link import TraceLink
+from trace.data.data_objects.trace_link import TraceLink
 from trace.jobs.trace_args_builder import TraceArgsBuilder
 
 

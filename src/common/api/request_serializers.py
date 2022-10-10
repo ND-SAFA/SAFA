@@ -31,6 +31,8 @@ class BaseTraceSerializer(serializers.Serializer):
                                 output_dir=validated_data["outputDir"],
                                 settings=settings)
 
+    def save_with_extra_attrs(self, **kwargs):
+
 
 class PredictSerializer(BaseTraceSerializer):
     sourceLayers = serializers.ListField(

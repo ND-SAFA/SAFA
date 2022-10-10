@@ -1,6 +1,6 @@
 from test.base_test import BaseTest
-from trace.data.artifact import Artifact
-from trace.data.trace_link import TraceLink
+from trace.data.data_objects.artifact import Artifact
+from trace.data.data_objects.trace_link import TraceLink
 
 FEATURE_VALUE = "({}, {})"
 

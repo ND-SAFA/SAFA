@@ -5,7 +5,7 @@ from transformers.training_args import TrainingArguments
 from common.models.model_generator import ModelGenerator
 from trace.config.constants import EVAL_DATASET_SIZE_DEFAULT, MAX_SEQ_LENGTH_DEFAULT, \
     N_EPOCHS_DEFAULT, PAD_TO_MAX_LENGTH_DEFAULT, RESAMPLE_RATE_DEFAULT, VALIDATION_PERCENTAGE_DEFAULT
-from trace.data.trace_dataset_creator import TraceDatasetCreator
+from trace.data.datasets.trace_dataset_creator import TraceDatasetCreator
 
 
 class TraceArgs(TrainingArguments):
@@ -19,10 +19,7 @@ class TraceArgs(TrainingArguments):
     callbacks: List = None
     pretraining_data_dir: str = None
 
-    def __init__(self, model_generator: ModelGenerator, output_dir: str,
-                 trace_dataset_creator: TraceDatasetCreator,
-                 source_layers: List[Dict[str, str]] = None,
-                 target_layers: List[Dict[str, str]] = None, links: List[Tuple[str, str]] = None,
+    def __init__(self, model_generator: ModelGenerator, output_dir: str, trace_dataset_creator: TraceDatasetCreator,
                  pretraining_data_path: str = None, **kwargs):
         """
         Arguments for Learning Model
@@ -36,15 +33,10 @@ class TraceArgs(TrainingArguments):
         """
         self.model_generator = model_generator
         self.pretraining_data_path = pretraining_data_path
+        self.trace_dataset_creator = trace_dataset_creator
         self.__set_args(**kwargs)
         super().__init__(log_level="info", log_level_replica="info", output_dir=output_dir,
                          num_train_epochs=self.num_train_epochs)
-        self.trace_dataset_creator = TraceDatasetCreator(source_layers=source_layers, target_layers=target_layers,
-                                                         true_links=links, model_generator=model_generator,
-                                                         validation_percentage=self.validation_percentage) \
-            if source_layers and target_layers else None
-        if trace_dataset_creator:
-            self.trace_dataset_creator = trace_dataset_creator
 
     def __set_args(self, kwargs) -> None:
         """

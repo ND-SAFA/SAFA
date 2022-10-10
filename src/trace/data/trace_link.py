@@ -19,7 +19,7 @@ class TraceLink:
         """
         self.source = source
         self.target = target
-        self.id_ = self.generate_link_id(self.source.id_, self.target.id_)
+        self.id = self.generate_link_id(self.source.id, self.target.id)
         self.is_true_link = is_true_link
         self.__feature_func = feature_func  # delay execution in case not needed
         self.__feature = None
@@ -41,7 +41,7 @@ class TraceLink:
         Gets the ids of the source and target
         :return: the ids of the source and target
         """
-        return self.source.id_, self.target.id_
+        return self.source.id, self.target.id
 
     @staticmethod
     def generate_link_id(source_id: str, target_id: str) -> int:
@@ -54,4 +54,4 @@ class TraceLink:
         return hash(source_id) + hash(target_id)
 
     def __hash__(self):
-        return self.id_
+        return self.id

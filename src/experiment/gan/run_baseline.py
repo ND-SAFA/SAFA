@@ -7,7 +7,7 @@ from experiment.common.pretraining_data import PretrainingData
 from experiment.common.run_mode import RunMode
 from experiment.domains.automotive import METRICS
 from experiment.gan.constants import BASE_MODEL_NAME, TEST_EXPORT_PATH, TRAINING_DATA_PATH, TRAIN_EXPORT_PATH
-from trace.data.trace_dataset_creator import TraceDatasetCreator
+from trace.data.datasets.trace_dataset_creator import TraceDatasetCreator
 
 BASE_OUTPUT_DIR = os.path.join(TRAINING_DATA_PATH, "baseline")
 

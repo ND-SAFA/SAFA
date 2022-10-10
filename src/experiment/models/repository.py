@@ -1,9 +1,10 @@
 import os
+from collections import namedtuple
 from typing import Dict, List, Tuple
 
 import pandas as pd
 
-from experiment.models.artifact_level import ArtifactLevel
+from trace.data.data_objects.artifact_level import ArtifactLevel
 
 
 class Repository:
@@ -31,13 +32,14 @@ class Repository:
     def __read_data_file(self, data_file_name: str):
         return pd.read_csv(os.path.join(self.repo_path, data_file_name))
 
-    def get_levels(self) -> List[ArtifactLevel]:
+    def get_levels(self) -> List[namedtuple]:
+        Level = namedtuple("Level", ["source_artifacts", "target_artifacts", "links"])
         return [
-            ArtifactLevel(
+            Level(
                 self.__get_artifact_dict(self.commits),
                 self.__get_artifact_dict(self.issues),
                 self.__get_links(self.commit2issue)),
-            ArtifactLevel(
+            Level(
                 self.__get_artifact_dict(self.pulls),
                 self.__get_artifact_dict(self.issues),
                 self.__get_links(self.pull2issue))

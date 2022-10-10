@@ -22,11 +22,3 @@ MODEL_EXPORT_PATH = os.path.join(LHP_DATA_PATH, MODEL_EXPORT_NAME)
 ProjectData = Tuple[List[Tuple[str, str]], List[Tuple[str, str]], List[int]]
 
 # Data
-ID_PARAM = "ID"
-SOURCE_ID_PARAM = "source_id"
-TARGET_ID_PARAM = "target_id"
-CONTENT_PARAM = "Content"
-SOURCE_PARAM = "Source"
-TARGET_PARAM = "Target"
-TEXT_PARAM = "text"
-LABEL_PARAM = "label"

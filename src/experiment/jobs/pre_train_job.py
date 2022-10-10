@@ -14,7 +14,7 @@ from trace.jobs.trace_args import TraceArgs
 
 
 class MLMPreTrainJob(AbstractTraceJob):
-    TRAINING_DIR = SafaStorage.add_mount_directory("jobs/pretrain")
+    TRAINING_DIR = SafaStorage.add_mount_directory("jobs/pretrain/mlm")
     BLOCK_SIZE = 128
     MLM_PROBABILITY = 0.15
 
@@ -23,7 +23,6 @@ class MLMPreTrainJob(AbstractTraceJob):
 
     def _run(self):
         args: TraceArgs = self.args
-        args.model_generator.base_model_class = SupportedBaseModel.BERT_FOR_MASKED_LM.value
         tokenizer = args.model_generator.get_tokenizer()
 
         # Step - Create training file

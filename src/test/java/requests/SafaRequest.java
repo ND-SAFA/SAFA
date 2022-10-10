@@ -1,15 +1,16 @@
 package requests;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import javax.servlet.http.Cookie;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+import javax.servlet.http.Cookie;
 
 import edu.nd.crc.safa.utilities.JsonFileUtilities;
 import org.json.JSONArray;
@@ -145,6 +146,35 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
         );
     }
 
+    public JSONObject postWithoutBody(ResultMatcher resultMatcher) throws Exception {
+        return makeRequestWithoutBody(post(this.buildEndpoint()), resultMatcher);
+    }
+
+    public JSONObject putWithoutBody(ResultMatcher resultMatcher) throws Exception {
+        return makeRequestWithoutBody(put(this.buildEndpoint()), resultMatcher);
+    }
+
+    public JSONObject makeRequestWithoutBody(MockHttpServletRequestBuilder request,
+                                       ResultMatcher resultMatcher) throws Exception {
+
+        if (authorizationToken != null) {
+            request = request.cookie(authorizationToken);
+        }
+
+        MvcResult result = mockMvc
+            .perform(request)
+            .andReturn();
+
+        String response = mockMvc
+            .perform(asyncDispatch(result))
+            .andExpect(resultMatcher)
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+        return ResponseParser.jsonCreator(response);
+    }
+
     private String stringify(Object body) {
         String content;
         if (body instanceof JSONObject || body instanceof JSONArray) {
@@ -204,7 +234,7 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
         MockHttpServletResponse response = requestResult.getResponse();
         Cookie[] cookies = response.getCookies();
 
-        if (cookies == null || cookies.length == 0) {
+        if (cookies.length == 0) {
             return Optional.empty();
         }
 

@@ -112,6 +112,11 @@ public class RouteBuilder<T extends RouteBuilder<T>> {
         return (T) this;
     }
 
+    public T withRepositoryName(String repositoryName) {
+        this.path = this.path.replace("{repositoryName}", repositoryName);
+        return (T) this;
+    }
+
     public String buildEndpoint() {
         if (this.path.contains("{")) {
             throw new SafaError("Path is not fully configured: %s", this.path);

@@ -1,4 +1,5 @@
 import { SvgStyle } from "@/types";
+import { ThemeColors } from "@/util";
 import { sanitizeText } from "./node-helper";
 
 /**
@@ -8,7 +9,6 @@ import { sanitizeText } from "./node-helper";
  * @param style - The style to draw with.
  * @param dataCy - The data cy selector to append.
  * @param spanStyle - Any style to add to the span.
- * @param icon - Any icon to prepend to the text.
  *
  * @return stringified SVG for the node.
  */
@@ -16,35 +16,51 @@ export function svgText(
   text: string,
   style: { width: string | number } & Omit<SvgStyle, "width">,
   dataCy: string,
-  spanStyle = "",
-  icon?: { id: string; color?: string }
+  spanStyle = ""
 ): string {
-  const htmlIcon = icon
-    ? `
-      <span style="
-        font-family: Material Icons;  
-        color: ${icon.color};
-        font-size: 12px;
-        font-weight: 600;
-      ">
-        ${icon.id}
-      </span>
-    `
-    : "";
-
   return `
     <foreignObject 
       x="${style.x}" y="${style.y}" 
       width="${style.width}" 
       height="${style.height}"
     >
-      ${htmlIcon}
       <span
         class="text-body-1 ${style.class || ""}" 
         data-cy="tree-node-${dataCy}"
         style="${spanStyle}"
       >
         ${sanitizeText(text)}
+      </span>
+    </foreignObject>
+  `;
+}
+
+/**
+ * Creates the SVG for representing an icon.
+ *
+ * @param style - The style to draw with.
+ * @param iconId - The icon to display.
+ * @param color - The icon color to set.
+ *
+ * @return stringified SVG for the node.
+ */
+export function svgIcon(
+  style: SvgStyle,
+  iconId: string,
+  color?: string
+): string {
+  return `
+    <foreignObject 
+      x="${style.x}" y="${style.y}" 
+      width="${style.width}" 
+      height="${style.height}"
+    >
+      <span style="
+        font-family: Material Icons;  
+        color: ${color};
+        font-size: 20px;
+      ">
+        ${iconId}
       </span>
     </foreignObject>
   `;

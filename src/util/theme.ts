@@ -11,7 +11,7 @@ export enum ThemeColors {
 
   white = "#FFFFFF", // Text
   black = "#000000", // Text
-  lightGrey = "#DDDDDD", // Backgrounds
+  lightGrey = "#EEEEEE", // Backgrounds
   darkGrey = "#969696", // Borders
 
   added = "#00AD69", // Text

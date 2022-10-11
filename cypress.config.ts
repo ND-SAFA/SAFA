@@ -8,12 +8,12 @@ export default defineConfig({
   },
   clientCertificates: [
     {
-      url: "/",
-      ca: ["./certs/localhost.safa.ai.pem"],
+      url: "https://localhost.safa.ai/",
+      ca: ["certs/localhost.safa.ai.pem"],
       certs: [
         {
-          key: "./certs/localhost.safa.ai-key.pem",
-          cert: "./certs/localhost.safa.ai.pem",
+          key: "certs/localhost.safa.ai-key.pem",
+          cert: "certs/localhost.safa.ai.pem",
         },
       ],
     },

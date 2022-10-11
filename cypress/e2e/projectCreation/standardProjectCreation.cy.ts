@@ -10,10 +10,7 @@ describe("Project Creation", () => {
   beforeEach(() => {
     cy.dbResetJobs();
 
-    cy.visit("http://localhost:8080/create").login(
-      validUser.email,
-      validUser.password
-    );
+    cy.visit("/create").login(validUser.email, validUser.password);
 
     cy.location("pathname", { timeout: 5000 }).should("equal", "/create");
   });

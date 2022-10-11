@@ -25,7 +25,7 @@ Cypress.Commands.add("waitForProjectLoad", (waitForNodes = true) => {
 });
 
 Cypress.Commands.add("loadCurrentProject", (waitForNodes = true) => {
-  cy.visit("/")
+  cy.visit("/login")
     .login(validUser.email, validUser.password)
     .openProjectSelector()
     .projectSelectorContinue()

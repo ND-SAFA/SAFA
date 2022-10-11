@@ -8,11 +8,13 @@ import edu.nd.crc.safa.config.AppConstraints;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.documents.repositories.DocumentRepository;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.utilities.exception.ExternalAPIException;
 
 import lombok.AllArgsConstructor;
 import org.apache.tomcat.util.http.fileupload.impl.FileSizeLimitExceededException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
@@ -75,6 +77,13 @@ public abstract class BaseController {
     public SafaError handleServerError(SafaError safaError) {
         safaError.printError();
         return safaError;
+    }
+
+    @ExceptionHandler(ExternalAPIException.class)
+    public ResponseEntity<SafaError> handleExternalApiException(ExternalAPIException ex) {
+        return ResponseEntity
+            .status(ex.getStatus())
+            .body(new SafaError(ex.getMessage()));
     }
 
     @ExceptionHandler(Exception.class)

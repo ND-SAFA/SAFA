@@ -48,7 +48,7 @@ public abstract class AbstractGithubTest extends ApplicationBaseTest {
     @BeforeEach
     public void setup() {
         this.mockGithubService();
-        this.mockRepository();
+        this.mockRepositoryFindByUser();
 
         closeable = MockitoAnnotations.openMocks(this);
     }
@@ -99,9 +99,18 @@ public abstract class AbstractGithubTest extends ApplicationBaseTest {
         credentials.setRefreshTokenExpirationDate(LocalDateTime.MAX);
     }
 
-    private void mockRepository() {
+    protected void mockRepositoryFindByUser() {
+        this.mockRepositoryFindByUser(this.credentials);
+    }
+
+    protected void mockRepositoryFindByUser(GithubAccessCredentials credentials) {
         Mockito.when(repositoryMock.findByUser(Mockito.any(SafaUser.class)))
-            .thenReturn(Optional.of(this.credentials));
+            .thenReturn(Optional.of(credentials));
+    }
+
+    protected void mockRepositoryDelete() {
+        Mockito.doNothing()
+            .when(repositoryMock).delete(Mockito.any(GithubAccessCredentials.class));
     }
 
     protected <T> T readResourceFile(String filepath, Class<T> clazz) {

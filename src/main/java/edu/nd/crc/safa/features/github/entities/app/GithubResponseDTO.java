@@ -17,12 +17,14 @@ public class GithubResponseDTO<T> {
     @AllArgsConstructor
     public enum GithubResponseMessage {
         TOKEN_REFRESH_REQUIRED("Authorization token has expired. Please refresh."),
-        CREATED("created"),
-        UPDATED("updated"),
-        OK("ok"),
-        ERROR("error"),
-        IMPORTED("imported"),
-        EXPIRED("expired credentials");
+        CREATED("Created"),
+        UPDATED("Updated"),
+        OK("Ok"),
+        ERROR("Error"),
+        IMPORTED("Imported"),
+        EXPIRED("Expired credentials. Will deleted them"),
+        MISSING("No credentials found"),
+        DELETED("Deleted existing GitHub credentials");
 
         private final String value;
     }

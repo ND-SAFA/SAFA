@@ -77,7 +77,6 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
             .maxAge(SecurityConstants.LOGIN_EXPIRATION_TIME)
             .build();
 
-        responseJson.put(SecurityConstants.TOKEN_NAME, token);
         res.setContentType("application/json");
         res.setCharacterEncoding("UTF-8");
         res.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());

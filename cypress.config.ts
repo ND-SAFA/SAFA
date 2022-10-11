@@ -6,4 +6,16 @@ export default defineConfig({
   e2e: {
     baseUrl: "https://localhost.safa.ai:8080",
   },
+  clientCertificates: [
+    {
+      url: "/",
+      ca: ["./certs/localhost.safa.ai.pem"],
+      certs: [
+        {
+          key: "./certs/localhost.safa.ai-key.pem",
+          cert: "./certs/localhost.safa.ai.pem",
+        },
+      ],
+    },
+  ],
 });

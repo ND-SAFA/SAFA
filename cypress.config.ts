@@ -1,7 +1,5 @@
 import { defineConfig } from "cypress";
 
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-
 export default defineConfig({
   projectId: "5kk96a",
   videoUploadOnPasses: false,

@@ -8,8 +8,8 @@ import edu.nd.crc.safa.config.AppConstraints;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.documents.repositories.DocumentRepository;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
-
 import edu.nd.crc.safa.utilities.exception.ExternalAPIException;
+
 import lombok.AllArgsConstructor;
 import org.apache.tomcat.util.http.fileupload.impl.FileSizeLimitExceededException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
-import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @AllArgsConstructor

@@ -9,6 +9,12 @@ module.exports = {
     },
   },
   lintOnSave: true,
+  pwa: {
+    iconPaths: {
+      favicon16: "favicon.ico",
+      favicon32: "favicon.ico",
+    },
+  },
   devServer: fs.existsSync("./certs/localhost.safa.ai.pem")
     ? {
         https: {

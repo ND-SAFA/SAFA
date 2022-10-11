@@ -1,5 +1,4 @@
 import { SvgStyle } from "@/types";
-import { ThemeColors } from "@/util";
 import { sanitizeText } from "./node-helper";
 
 /**

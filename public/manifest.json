@@ -1,0 +1,23 @@
+{
+  "short_name": "SAFA",
+  "name": "SAFA",
+  "id": "/",
+  "start_url": "/",
+  "background_color": "#FFFFFF",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#5975B8",
+  "description": "SAFA",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "type": "image/x-icon",
+      "sizes": "48x48"
+    },
+    {
+      "src": "/SAFA-large.svg",
+      "type": "image/x-icon",
+      "sizes": "196x150"
+    }
+  ]
+}

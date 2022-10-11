@@ -1,16 +1,10 @@
-import {
-  DataCy,
-  simpleProjectFiles,
-  testProject,
-  validUser,
-} from "../fixtures";
+import { DataCy, simpleProjectFiles, testProject } from "../fixtures";
 
 describe("Project Selection", () => {
   beforeEach(() => {
     cy.dbResetProjects().loadNewProject();
 
     cy.visit("/create")
-      .login(validUser.email, validUser.password)
       .location("pathname", { timeout: 2000 })
       .should("equal", "/create");
 

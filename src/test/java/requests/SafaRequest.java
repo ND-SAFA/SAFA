@@ -1,6 +1,7 @@
 package requests;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -76,7 +77,7 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
     }
 
     public JSONObject getWithJsonObject(ResultMatcher expectedResultMatcher) throws Exception {
-        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get(this.buildEndpoint());
+        MockHttpServletRequestBuilder requestBuilder = get(this.buildEndpoint());
         return sendAuthenticatedRequest(requestBuilder,
             expectedResultMatcher,
             authorizationToken,
@@ -84,7 +85,7 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
     }
 
     protected <T> T sendGet(Function<String, T> responseParser) throws Exception {
-        return sendAuthenticatedRequest(MockMvcRequestBuilders.get(this.buildEndpoint()),
+        return sendAuthenticatedRequest(get(this.buildEndpoint()),
             status().isOk(),
             authorizationToken,
             responseParser);
@@ -147,15 +148,19 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
     }
 
     public JSONObject postWithoutBody(ResultMatcher resultMatcher) throws Exception {
-        return makeRequestWithoutBody(post(this.buildEndpoint()), resultMatcher);
+        return makeAsyncRequestWithoutBody(post(this.buildEndpoint()), resultMatcher);
     }
 
     public JSONObject putWithoutBody(ResultMatcher resultMatcher) throws Exception {
-        return makeRequestWithoutBody(put(this.buildEndpoint()), resultMatcher);
+        return makeAsyncRequestWithoutBody(put(this.buildEndpoint()), resultMatcher);
     }
 
-    public JSONObject makeRequestWithoutBody(MockHttpServletRequestBuilder request,
-                                       ResultMatcher resultMatcher) throws Exception {
+    public JSONObject getWithoutBody(ResultMatcher resultMatcher) throws Exception {
+        return makeAsyncRequestWithoutBody(get(this.buildEndpoint()), resultMatcher);
+    }
+
+    public JSONObject makeAsyncRequestWithoutBody(MockHttpServletRequestBuilder request,
+                                                  ResultMatcher resultMatcher) throws Exception {
 
         if (authorizationToken != null) {
             request = request.cookie(authorizationToken);

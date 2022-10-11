@@ -130,6 +130,7 @@ public class GithubCredentialsController extends BaseController {
                 return;
             }
 
+
             output.setResult(githubControllerUtils.checkCredentials(credentials.get()));
         });
 
@@ -149,7 +150,6 @@ public class GithubCredentialsController extends BaseController {
 
             if (GithubResponseMessage.EXPIRED.equals(responseDTO.getMessage())) {
                 log.error("Trying to refresh expired credentials");
-                githubAccessCredentialsRepository.delete(githubAccessCredentials);
                 output.setErrorResult(responseDTO);
                 return;
             }

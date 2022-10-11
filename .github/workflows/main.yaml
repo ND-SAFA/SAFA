@@ -57,3 +57,4 @@ jobs:
           headed: true
         env:
           DEBUG: '@cypress/github-action'
+          NODE_TLS_REJECT_UNAUTHORIZED: 0

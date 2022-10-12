@@ -12,6 +12,7 @@ export enum ThemeColors {
   white = "#FFFFFF", // Text
   black = "#000000", // Text
   lightGrey = "#EEEEEE", // Backgrounds
+  grey = "#DDDDDD",
   darkGrey = "#969696", // Borders
 
   added = "#00AD69", // Text
@@ -53,7 +54,7 @@ export function getBackgroundColor(
     case ArtifactDeltaState.REMOVED:
       return ThemeColors.removedLight;
     default:
-      return ThemeColors.lightGrey;
+      return ThemeColors.grey;
   }
 }
 

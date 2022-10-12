@@ -54,7 +54,7 @@ export function getBackgroundColor(
     case ArtifactDeltaState.REMOVED:
       return ThemeColors.removedLight;
     default:
-      return ThemeColors.grey;
+      return ThemeColors.lightGrey;
   }
 }
 

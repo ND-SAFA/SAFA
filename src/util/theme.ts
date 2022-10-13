@@ -6,7 +6,7 @@ import { ApprovalType, ArtifactDeltaState, JobStatus } from "@/types";
 export enum ThemeColors {
   primary = "#5975B8",
   secondary = "#F5B53F",
-  accent = "#F5871F",
+  accent = "#FFD592",
   error = "#E11F26",
 
   white = "#FFFFFF", // Text
@@ -90,7 +90,7 @@ export function getScoreColor(score: number | string): string {
   } else if (["6", "7"].includes(tenths)) {
     return ThemeColors.secondary;
   } else if (["4", "5"].includes(tenths)) {
-    return ThemeColors.accent;
+    return ThemeColors.warning;
   } else {
     return ThemeColors.error;
   }

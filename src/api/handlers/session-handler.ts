@@ -57,8 +57,9 @@ export async function handleLogout(): Promise<void> {
 
   await handleClearProject();
   await navigateTo(Routes.LOGIN_ACCOUNT);
-  // await deleteSession().then(() => {});
   sessionStore.clearSession();
+  logStore.notifications = [];
+  await deleteSession();
   // datadogRum.startSessionReplayRecording();
 }
 

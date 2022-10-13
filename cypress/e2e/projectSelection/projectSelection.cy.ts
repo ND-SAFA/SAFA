@@ -1,4 +1,4 @@
-import { DataCy, simpleProjectFiles, testProject } from "../fixtures";
+import { DataCy, simpleProjectFiles, testProject } from "../../fixtures";
 
 describe("Project Selection", () => {
   beforeEach(() => {

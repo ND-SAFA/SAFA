@@ -15,7 +15,6 @@ import {
   handleLoadLastProject,
   handleGetProjects,
   getCurrentUser,
-  deleteSession,
 } from "@/api";
 
 /**
@@ -59,7 +58,7 @@ export async function handleLogout(): Promise<void> {
   await navigateTo(Routes.LOGIN_ACCOUNT);
   sessionStore.clearSession();
   logStore.notifications = [];
-  await deleteSession();
+  // await deleteSession();
   // datadogRum.startSessionReplayRecording();
 }
 

@@ -1,7 +1,6 @@
 <template>
   <div>
-    <generic-file-selector v-model="selectedFiles" :data-cy="dataCy" />
-    <v-expansion-panels class="mb-2 elevation-0">
+    <v-expansion-panels class="mb-2" flat>
       <v-expansion-panel>
         <v-expansion-panel-header>
           Manage Uploaded Files
@@ -35,6 +34,7 @@
         </v-expansion-panel-content>
       </v-expansion-panel>
     </v-expansion-panels>
+    <generic-file-selector v-model="selectedFiles" :data-cy="dataCy" />
     <file-format-alert />
   </div>
 </template>

@@ -1,26 +1,34 @@
 <template>
-  <v-container style="max-width: 40em">
-    <generic-switch
-      class="mt-0"
-      v-model="emptyFiles"
-      label="Create an empty project"
+  <div>
+    <project-identifier-input
+      v-bind:name.sync="currentName"
+      v-bind:description.sync="currentDescription"
+      :data-cy-name="dataCyName"
+      :data-cy-description="dataCyDescription"
     />
-    <project-files-input
-      v-if="!emptyFiles"
-      v-model="selectedFiles"
-      data-cy="input-files-bulk"
-    />
-    <v-btn
-      block
-      color="primary"
-      :disabled="isDisabled"
-      @click="handleCreate"
-      :loading="isLoading"
-      data-cy="button-create-project"
-    >
-      Create Project From Files
-    </v-btn>
-  </v-container>
+    <v-container style="max-width: 40em">
+      <generic-switch
+        class="mt-0"
+        v-model="emptyFiles"
+        label="Create an empty project"
+      />
+      <project-files-input
+        v-if="!emptyFiles"
+        v-model="selectedFiles"
+        data-cy="input-files-bulk"
+      />
+      <v-btn
+        block
+        color="primary"
+        :disabled="isDisabled"
+        @click="handleCreate"
+        :loading="isLoading"
+        data-cy="button-create-project"
+      >
+        Create Project From Files
+      </v-btn>
+    </v-container>
+  </div>
 </template>
 
 <script lang="ts">
@@ -28,6 +36,7 @@ import Vue from "vue";
 import { handleBulkImportProject } from "@/api";
 import { GenericSwitch } from "@/components/common";
 import ProjectFilesInput from "./ProjectFilesInput.vue";
+import ProjectIdentifierInput from "./ProjectIdentifierInput.vue";
 
 /**
  * Togglable input for uploading project files.
@@ -39,6 +48,7 @@ export default Vue.extend({
   components: {
     ProjectFilesInput,
     GenericSwitch,
+    ProjectIdentifierInput,
   },
   props: {
     name: {
@@ -65,17 +75,40 @@ export default Vue.extend({
       emptyFiles: false,
     };
   },
-
   computed: {
+    /**
+     * Emits changes to the name.
+     */
+    currentName: {
+      get(): string {
+        return this.name;
+      },
+      set(newName: string): void {
+        this.$emit("update:name", newName);
+      },
+    },
+    /**
+     * Emits changes to the description.
+     */
+    currentDescription: {
+      get(): string {
+        return this.description;
+      },
+      set(newDescription: string): void {
+        this.$emit("update:description", newDescription);
+      },
+    },
     /**
      * Whether the submit button is disabled.
      */
     isDisabled(): boolean {
+      const isNameInvalid = this.name.length === 0;
+
       if (this.emptyFiles) {
-        return this.name.length === 0;
+        return isNameInvalid;
       } else {
         return (
-          this.name.length === 0 ||
+          isNameInvalid ||
           (this.selectedFiles.length === 0 && !this.emptyFiles) ||
           !this.selectedFiles.find(({ name }) => name === "tim.json")
         );

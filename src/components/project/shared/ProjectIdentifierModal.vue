@@ -5,16 +5,10 @@
     size="m"
     :is-loading="isLoading"
     data-cy="modal-project-edit"
-    actions-height="0"
+    :actions-height="0"
     @close="handleClose"
   >
     <template v-slot:body>
-      <project-identifier-input
-        v-bind:name.sync="identifier.name"
-        v-bind:description.sync="identifier.description"
-        data-cy-name="input-project-name-modal"
-        data-cy-description="input-project-description-modal"
-      />
       <project-files-uploader
         v-if="doShowUpload"
         v-bind:name.sync="identifier.name"
@@ -32,7 +26,6 @@ import { IdentifierModel } from "@/types";
 import { identifierSaveStore } from "@/hooks";
 import { GenericModal } from "@/components/common";
 import ProjectFilesUploader from "./ProjectFilesUploader.vue";
-import ProjectIdentifierInput from "./ProjectIdentifierInput.vue";
 
 /**
  * A modal for creating or editing a project.
@@ -44,7 +37,6 @@ export default Vue.extend({
   name: "ProjectIdentifierModal",
   components: {
     GenericModal,
-    ProjectIdentifierInput,
     ProjectFilesUploader,
   },
   props: {

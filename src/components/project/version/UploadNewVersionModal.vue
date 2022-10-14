@@ -4,7 +4,7 @@
     title="Upload Flat Files"
     :is-open="isOpen"
     :startStep="startStep"
-    :after-steps="[['Upload Files', selectedFiles.length > 0]]"
+    :after-steps="[['Upload Files', isUploadStepValid]]"
     v-bind:isLoading.sync="isLoading"
     v-bind:project.sync="selectedProject"
     v-bind:version.sync="selectedVersion"
@@ -14,11 +14,10 @@
   >
     <template v-slot:afterItems>
       <v-stepper-content step="3">
-        <file-format-alert />
-        <generic-file-selector
-          v-if="selectedVersion !== undefined"
+        <project-files-input
           v-model="selectedFiles"
           data-cy="input-files-version"
+          class="mx-2"
         />
         <generic-switch
           v-model="replaceAllArtifacts"
@@ -35,11 +34,8 @@ import Vue from "vue";
 import { IdentifierModel, VersionModel } from "@/types";
 import { logStore, projectStore } from "@/hooks";
 import { handleUploadProjectVersion } from "@/api";
-import {
-  GenericFileSelector,
-  FileFormatAlert,
-  GenericSwitch,
-} from "@/components/common";
+import { GenericSwitch } from "@/components/common";
+import { ProjectFilesInput } from "../shared";
 import ProjectVersionStepperModal from "./ProjectVersionStepperModal.vue";
 
 /**
@@ -51,8 +47,7 @@ export default Vue.extend({
   name: "UploadNewVersionModal",
   components: {
     GenericSwitch,
-    FileFormatAlert,
-    GenericFileSelector,
+    ProjectFilesInput,
     ProjectVersionStepperModal,
   },
   props: {
@@ -96,6 +91,15 @@ export default Vue.extend({
      */
     startStep(): number {
       return this.selectedProject === undefined ? 1 : 2;
+    },
+    /**
+     * @return Whether the uploaded files are valid.
+     */
+    isUploadStepValid(): boolean {
+      return (
+        this.selectedFiles.length > 0 &&
+        !!this.selectedFiles.find(({ name }) => name === "tim.json")
+      );
     },
   },
   methods: {

@@ -23,7 +23,7 @@
             :items="typeOptions"
             hint="Select the artifact files. Reads the file name <type>.csv"
             persistent-hint
-            @change="handleTimChange"
+            @change="handleTypesChange"
           />
           <v-autocomplete
             filled
@@ -109,6 +109,18 @@ export default Vue.extend({
       this.tim = undefined;
       this.artifactTypes = [];
       this.traceMatrices = [];
+    },
+    /**
+     * Selects relevant trace matrices when the types change, and updates the tim file.
+     */
+    handleTypesChange(): void {
+      this.traceMatrices = this.matrixOptions.filter(({ source, target }) =>
+        this.selectedFiles.find(
+          ({ name }) => name === `${source}2${target}.csv`
+        )
+      );
+
+      this.handleTimChange();
     },
     /**
      * Creates a new tim file when the inputs change.

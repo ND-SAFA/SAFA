@@ -5,7 +5,7 @@
     size="m"
     :is-loading="isLoading"
     data-cy="modal-project-edit"
-    :actions-height="0"
+    :actions-height="doShowUpload ? 0 : 50"
     @close="handleClose"
   >
     <template v-slot:body>
@@ -16,6 +16,24 @@
         data-cy-name="input-project-name-modal"
         data-cy-description="input-project-description-modal"
       />
+      <project-identifier-input
+        v-else
+        v-bind:name.sync="identifier.name"
+        v-bind:description.sync="identifier.description"
+        data-cy-name="input-project-name-modal"
+        data-cy-description="input-project-description-modal"
+      />
+    </template>
+    <template v-slot:actions v-if="!doShowUpload">
+      <v-btn
+        @click="handleSave"
+        color="primary"
+        class="ml-auto"
+        :disabled="!canSave"
+        data-cy="button-project-save"
+      >
+        Save
+      </v-btn>
     </template>
   </generic-modal>
 </template>
@@ -26,6 +44,7 @@ import { IdentifierModel } from "@/types";
 import { identifierSaveStore } from "@/hooks";
 import { GenericModal } from "@/components/common";
 import ProjectFilesUploader from "./ProjectFilesUploader.vue";
+import ProjectIdentifierInput from "./ProjectIdentifierInput.vue";
 
 /**
  * A modal for creating or editing a project.
@@ -38,6 +57,7 @@ export default Vue.extend({
   components: {
     GenericModal,
     ProjectFilesUploader,
+    ProjectIdentifierInput,
   },
   props: {
     isOpen: {
@@ -71,6 +91,12 @@ export default Vue.extend({
      */
     doShowUpload(): boolean {
       return !this.isUpdate;
+    },
+    /**
+     * @return Whether the identifier can be saved.
+     */
+    canSave(): boolean {
+      return identifierSaveStore.canSave;
     },
   },
   methods: {

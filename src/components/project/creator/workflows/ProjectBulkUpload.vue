@@ -1,8 +1,6 @@
 <template>
   <v-card outlined elevation="1" data-cy="tab-bulk-upload">
     <project-files-uploader
-      v-bind:name.sync="name"
-      v-bind:description.sync="description"
       data-cy-name="input-project-name-bulk"
       data-cy-description="input-project-description-bulk"
     />
@@ -20,12 +18,6 @@ export default Vue.extend({
   name: "ProjectBulkUpload",
   components: {
     ProjectFilesUploader,
-  },
-  data() {
-    return {
-      name: "",
-      description: "",
-    };
   },
 });
 </script>

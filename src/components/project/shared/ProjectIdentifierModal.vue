@@ -11,8 +11,6 @@
     <template v-slot:body>
       <project-files-uploader
         v-if="doShowUpload"
-        v-bind:name.sync="identifier.name"
-        v-bind:description.sync="identifier.description"
         data-cy-name="input-project-name-modal"
         data-cy-description="input-project-description-modal"
         @submit="handleClose"

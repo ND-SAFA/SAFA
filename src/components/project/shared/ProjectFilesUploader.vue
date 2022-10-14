@@ -1,8 +1,8 @@
 <template>
   <div>
     <project-identifier-input
-      v-bind:name.sync="currentName"
-      v-bind:description.sync="currentDescription"
+      v-bind:name.sync="identifier.name"
+      v-bind:description.sync="identifier.description"
       :data-cy-name="dataCyName"
       :data-cy-description="dataCyDescription"
     />
@@ -34,18 +34,17 @@
 
 <script lang="ts">
 import Vue from "vue";
+import { IdentifierModel } from "@/types";
+import { identifierSaveStore } from "@/hooks";
 import { handleBulkImportProject } from "@/api";
 import { GenericSwitch } from "@/components/common";
 import ProjectFilesInput from "./ProjectFilesInput.vue";
 import ProjectIdentifierInput from "./ProjectIdentifierInput.vue";
 
 /**
- * Togglable input for uploading project files.
+ * Creates projects with bulk uploaded files.
  *
- * @emits-1 `update:name` (string) - On name updated.
- * @emits-2 `update:description` (string) - On description updated.
- * @emits-3 `update:files` (File[]) - On flat files updated.
- * @emits-3 `submit` - On project creation submitted.
+ * @emits-1 `submit` - On project creation submitted.
  */
 export default Vue.extend({
   name: "ProjectFilesUploader",
@@ -55,14 +54,6 @@ export default Vue.extend({
     ProjectIdentifierInput,
   },
   props: {
-    name: {
-      type: String,
-      required: true,
-    },
-    description: {
-      type: String,
-      required: true,
-    },
     dataCyName: {
       type: String,
       default: "input-project-name",
@@ -81,32 +72,16 @@ export default Vue.extend({
   },
   computed: {
     /**
-     * Emits changes to the name.
+     * @return  The identifier being updated.
      */
-    currentName: {
-      get(): string {
-        return this.name;
-      },
-      set(newName: string): void {
-        this.$emit("update:name", newName);
-      },
-    },
-    /**
-     * Emits changes to the description.
-     */
-    currentDescription: {
-      get(): string {
-        return this.description;
-      },
-      set(newDescription: string): void {
-        this.$emit("update:description", newDescription);
-      },
+    identifier(): IdentifierModel {
+      return identifierSaveStore.editedIdentifier;
     },
     /**
      * Whether the submit button is disabled.
      */
     isDisabled(): boolean {
-      const isNameInvalid = this.name.length === 0;
+      const isNameInvalid = this.identifier.name.length === 0;
 
       if (this.emptyFiles) {
         return isNameInvalid;
@@ -126,35 +101,16 @@ export default Vue.extend({
     async handleCreate() {
       this.isLoading = true;
 
-      handleBulkImportProject(
-        {
-          projectId: "",
-          name: this.name,
-          description: this.description,
+      handleBulkImportProject(this.identifier, this.selectedFiles, {
+        onSuccess: () => {
+          this.selectedFiles = [];
+          this.isLoading = false;
+          this.$emit("submit");
         },
-        this.selectedFiles,
-        {
-          onSuccess: () => {
-            this.selectedFiles = [];
-            this.isLoading = false;
-            this.$emit("submit");
-            this.$emit("update:name", "");
-            this.$emit("update:description", "");
-            this.$emit("update:files", []);
-          },
-          onError: () => {
-            this.isLoading = false;
-          },
-        }
-      );
-    },
-  },
-  watch: {
-    /**
-     * Emits changes to selected files.
-     */
-    selectedFiles(files: File[]) {
-      this.$emit("update:files", files);
+        onError: () => {
+          this.isLoading = false;
+        },
+      });
     },
   },
 });

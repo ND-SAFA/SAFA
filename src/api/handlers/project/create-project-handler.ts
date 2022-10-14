@@ -69,15 +69,14 @@ export function handleBulkImportProject(
         logStore.onSuccess(`Project has been created: ${project.name}`);
         projectStore.addProject(project);
         await handleLoadVersion(project.projectVersion?.versionId || "");
-        return;
+      } else {
+        await handleUploadProjectVersion(
+          project.projectId,
+          project.projectVersion?.versionId || "",
+          files,
+          true
+        );
       }
-
-      await handleUploadProjectVersion(
-        project.projectId,
-        project.projectVersion?.versionId || "",
-        files,
-        true
-      );
     })
     .then(onSuccess)
     .catch(onError)

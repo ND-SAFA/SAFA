@@ -11,6 +11,7 @@
         class="mt-0"
         v-model="emptyFiles"
         label="Create an empty project"
+        data-cy="toggle-create-empty-project"
       />
       <project-files-input
         v-if="!emptyFiles"
@@ -41,7 +42,10 @@ import ProjectIdentifierInput from "./ProjectIdentifierInput.vue";
 /**
  * Togglable input for uploading project files.
  *
- * @emits-1 `update:files` (File[]) - On flat files updated.
+ * @emits-1 `update:name` (string) - On name updated.
+ * @emits-2 `update:description` (string) - On description updated.
+ * @emits-3 `update:files` (File[]) - On flat files updated.
+ * @emits-3 `submit` - On project creation submitted.
  */
 export default Vue.extend({
   name: "ProjectFilesUploader",
@@ -133,8 +137,10 @@ export default Vue.extend({
           onSuccess: () => {
             this.selectedFiles = [];
             this.isLoading = false;
+            this.$emit("submit");
             this.$emit("update:name", "");
             this.$emit("update:description", "");
+            this.$emit("update:files", []);
           },
           onError: () => {
             this.isLoading = false;

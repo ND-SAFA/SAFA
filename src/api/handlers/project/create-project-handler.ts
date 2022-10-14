@@ -3,7 +3,7 @@ import {
   IOHandlerCallback,
   ProjectModel,
 } from "@/types";
-import { appStore, logStore } from "@/hooks";
+import { appStore, logStore, projectStore } from "@/hooks";
 import { navigateTo, Routes } from "@/router";
 import {
   createGitHubProject,
@@ -63,14 +63,20 @@ export function handleBulkImportProject(
   appStore.onLoadStart();
 
   saveProject(project)
-    .then(async (project) =>
-      handleUploadProjectVersion(
+    .then(async (project) => {
+      if (files.length === 0) {
+        projectStore.addProject(project);
+        logStore.onSuccess(`Project has been created: ${project.name}`);
+        return;
+      }
+
+      await handleUploadProjectVersion(
         project.projectId,
         project.projectVersion?.versionId || "",
         files,
         true
-      )
-    )
+      );
+    })
     .then(onSuccess)
     .catch(onError)
     .finally(() => appStore.onLoadEnd());

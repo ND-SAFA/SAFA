@@ -15,6 +15,7 @@
         v-bind:description.sync="identifier.description"
         data-cy-name="input-project-name-modal"
         data-cy-description="input-project-description-modal"
+        @submit="handleClose"
       />
       <project-identifier-input
         v-else

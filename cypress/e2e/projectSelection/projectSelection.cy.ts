@@ -86,7 +86,8 @@ describe("Project Selection", () => {
       cy.getCy(DataCy.projectEditModal).within(() =>
         cy
           .setProjectIdentifier("modal")
-          .clickButton(DataCy.projectEditSaveButton)
+          .clickButton(DataCy.creationEmptyToggle)
+          .clickButton(DataCy.creationUploadButton)
       );
 
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");

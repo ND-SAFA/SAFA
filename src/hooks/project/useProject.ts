@@ -161,6 +161,19 @@ export const useProject = defineStore("project", {
         logStore.onWarning("Please select a project.");
       }
     },
+    /**
+     * Adds or replaces a project in the project list.
+     *
+     * @param project - The project to add.
+     */
+    addProject(project: IdentifierModel): void {
+      this.allProjects = [
+        project,
+        ...this.allProjects.filter(
+          ({ projectId }) => projectId !== project.projectId
+        ),
+      ];
+    },
   },
 });
 

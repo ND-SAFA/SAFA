@@ -1,5 +1,5 @@
 import { APIOptions } from "@/types";
-import { logStore, sessionStore } from "@/hooks";
+import { logStore } from "@/hooks";
 import { baseURL } from "@/api";
 import { handleLogout } from "@/api/handlers";
 
@@ -7,9 +7,10 @@ import { handleLogout } from "@/api/handlers";
  * Executes an http request with the given parameters containing current
  * session token in request headers.
  *
- * @param relativeUrl The URL relative to the BEND API endpoint.
- * @param options Any options for this request, such as the method and any data.
- * @param setJsonContentType If true, sets the content type of the request.
+ * @param relativeUrl - The URL relative to the BEND API endpoint.
+ * @param options - Any options for this request, such as the method and any data.
+ * @param setJsonContentType - If true, sets the content type of the request.
+ * @param parseResponse - If true, the response will be parsed as JSON.
  *
  * @return The request's response data.
  * @throws Any errors received from the request.
@@ -17,56 +18,41 @@ import { handleLogout } from "@/api/handlers";
 export default async function authHttpClient<T>(
   relativeUrl: string,
   options: APIOptions,
-  setJsonContentType = true
+  { setJsonContentType = true, parseResponse = true } = {}
 ): Promise<T> {
-  const token = sessionStore.getToken;
-  const URL = `${baseURL}/${relativeUrl}`;
+  const res = await fetch(`${baseURL}/${relativeUrl}`, {
+    ...options,
+    credentials: "include",
+    headers: setJsonContentType
+      ? {
+          ...(options.headers || {}),
+          "Content-Type": "application/json",
+        }
+      : options.headers,
+  });
+  const content = await res.text();
 
-  if (setJsonContentType) {
-    options.headers = {
-      "Content-Type": "application/json",
-    };
+  if (res.status === 403) {
+    const message = "Session has timed out. Please log back in.";
+
+    await handleLogout();
+
+    logStore.onWarning(message);
+    throw Error(message);
+  } else if (res.status === 204 || content === "" || content === "created") {
+    // TODO: is this legacy code even necessary?
+    return {} as T;
+  } else if (!parseResponse) {
+    return content as unknown as T;
   }
 
-  if (token === undefined) {
-    const error = `${relativeUrl} requires token.`;
+  const data = JSON.parse(content);
 
-    logStore.onDevError(error);
+  if (!res.ok) {
+    logStore.onServerError(data);
 
-    throw Error(error);
+    throw Error(data.error);
   } else {
-    options.headers = {
-      ...options.headers,
-      Authorization: token,
-    };
-  }
-
-  const fetchResponse = await fetch(URL, options);
-
-  let message;
-  let resContent;
-  switch (fetchResponse.status) {
-    case 403:
-      message = "Session has timed out. Please log back in.";
-      logStore.onWarning(message);
-      await handleLogout();
-      throw Error(message);
-    case 204:
-      return {} as T;
-    default:
-      resContent = await fetchResponse.text();
-      if (resContent === "" || resContent === "created") {
-        return {} as T;
-      }
-  }
-
-  const resJson = JSON.parse(resContent);
-
-  if (!fetchResponse.ok) {
-    logStore.onServerError(resJson);
-
-    throw Error(resJson.error);
-  } else {
-    return resJson;
+    return data;
   }
 }

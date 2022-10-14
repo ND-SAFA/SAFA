@@ -1,7 +1,7 @@
 import { NavigationGuardNext, Route } from "vue-router";
 import { NavigationGuard } from "vue-router/types/router";
 import { appStore, projectStore, sessionStore } from "@/hooks";
-import { handleLoadVersion } from "@/api";
+import { handleAuthentication, handleLoadVersion } from "@/api";
 import {
   QueryParams,
   Routes,
@@ -19,7 +19,7 @@ import {
  * are ignored.
  */
 export const routerChecks: Record<string, NavigationGuard> = {
-  redirectToLoginIfNoSessionFound(
+  async redirectToLoginIfNoSessionFound(
     to: Route,
     from: Route,
     next: NavigationGuardNext
@@ -28,13 +28,19 @@ export const routerChecks: Record<string, NavigationGuard> = {
       return;
     }
 
-    next({
-      path: Routes.LOGIN_ACCOUNT,
-      query: {
-        ...to.query,
-        [QueryParams.LOGIN_PATH]: to.path,
-      },
-    });
+    try {
+      await handleAuthentication();
+
+      return;
+    } catch (e) {
+      next({
+        path: Routes.LOGIN_ACCOUNT,
+        query: {
+          ...to.query,
+          [QueryParams.LOGIN_PATH]: to.path,
+        },
+      });
+    }
   },
   requireProjectForRoutes(to: Route) {
     if (

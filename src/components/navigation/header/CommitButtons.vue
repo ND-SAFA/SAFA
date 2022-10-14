@@ -31,7 +31,7 @@ export default Vue.extend({
   props: {
     color: {
       type: String,
-      default: "white",
+      default: "accent",
     },
   },
   computed: {

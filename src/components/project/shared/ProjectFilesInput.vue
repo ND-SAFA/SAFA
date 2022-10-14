@@ -4,12 +4,13 @@
     <generic-file-selector
       v-model="selectedFiles"
       :data-cy="dataCy"
+      :errors="errors"
       @clear="handleClear"
     />
-    <v-expansion-panels class="mb-4">
+    <v-expansion-panels class="mb-4" v-if="selectedFiles.length > 0">
       <v-expansion-panel>
         <v-expansion-panel-header>
-          Manage Uploaded Files
+          Manage Project TIM
         </v-expansion-panel-header>
         <v-expansion-panel-content>
           <v-autocomplete
@@ -59,6 +60,7 @@ type TimModel = {
   [traceType: string]: {
     Source: string;
     Target: string;
+    File: string;
   };
 };
 
@@ -97,6 +99,12 @@ export default Vue.extend({
         )
         .reduce((acc, cur) => [...acc, ...cur], []);
     },
+    errors(): string[] {
+      return this.selectedFiles.length === 0 ||
+        this.selectedFiles.find(({ name }) => name === "tim.json")
+        ? []
+        : ["Missing project TIM. Please create one below."];
+    },
   },
   methods: {
     handleClear(): void {
@@ -111,7 +119,11 @@ export default Vue.extend({
           .reduce((acc, cur) => ({ ...acc, ...cur }), {}),
         ...this.traceMatrices
           .map(({ source, target }) => ({
-            [`${source}2${target}`]: { Source: source, Target: target },
+            [`${source}2${target}`]: {
+              Source: source,
+              Target: target,
+              File: `${source}2${target}.csv`,
+            },
           }))
           .reduce((acc, cur) => ({ ...acc, ...cur }), {}),
       } as TimModel;
@@ -122,6 +134,8 @@ export default Vue.extend({
           type: "application/json",
         }),
       ];
+
+      console.log(this.tim);
     },
   },
   watch: {

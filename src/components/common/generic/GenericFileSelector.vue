@@ -3,13 +3,13 @@
     clearable
     filled
     small-chips
-    hide-details
     label="Upload Files"
     :multiple="multiple"
     truncate-length="30"
-    class="my-3"
+    class="mt-4"
     v-model="model"
     :data-cy="dataCy"
+    :error-messages="errors"
     @click:clear="$emit('clear')"
   />
 </template>
@@ -35,6 +35,10 @@ export default Vue.extend({
     dataCy: {
       type: String,
       default: "input-files",
+    },
+    errors: {
+      type: Array as PropType<string[]>,
+      default: () => [],
     },
   },
   data() {

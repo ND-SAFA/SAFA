@@ -9,6 +9,8 @@
     <project-files-uploader
       v-bind:name.sync="name"
       v-bind:description.sync="description"
+      data-cy-name="input-project-name-bulk"
+      data-cy-description="input-project-description-bulk"
     />
   </v-card>
 </template>

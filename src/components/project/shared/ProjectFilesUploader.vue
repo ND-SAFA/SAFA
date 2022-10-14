@@ -1,5 +1,5 @@
 <template>
-  <v-container style="max-width: 30em">
+  <v-container style="max-width: 40em">
     <generic-switch
       class="mt-0"
       v-model="emptyFiles"
@@ -49,6 +49,14 @@ export default Vue.extend({
       type: String,
       required: true,
     },
+    dataCyName: {
+      type: String,
+      default: "input-project-name",
+    },
+    dataCyDescription: {
+      type: String,
+      default: "input-project-description",
+    },
   },
   data() {
     return {
@@ -63,10 +71,15 @@ export default Vue.extend({
      * Whether the submit button is disabled.
      */
     isDisabled(): boolean {
-      return (
-        this.name.length === 0 ||
-        (this.selectedFiles.length === 0 && !this.emptyFiles)
-      );
+      if (this.emptyFiles) {
+        return this.name.length === 0;
+      } else {
+        return (
+          this.name.length === 0 ||
+          (this.selectedFiles.length === 0 && !this.emptyFiles) ||
+          !this.selectedFiles.find(({ name }) => name === "tim.json")
+        );
+      }
     },
   },
   methods: {

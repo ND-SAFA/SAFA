@@ -10,6 +10,7 @@ import {
   createJiraProject,
   createProjectCreationJob,
   handleJobSubmission,
+  handleLoadVersion,
   handleUploadProjectVersion,
   saveProject,
 } from "@/api";
@@ -65,8 +66,9 @@ export function handleBulkImportProject(
   saveProject(project)
     .then(async (project) => {
       if (files.length === 0) {
-        projectStore.addProject(project);
         logStore.onSuccess(`Project has been created: ${project.name}`);
+        projectStore.addProject(project);
+        await handleLoadVersion(project.projectVersion?.versionId || "");
         return;
       }
 

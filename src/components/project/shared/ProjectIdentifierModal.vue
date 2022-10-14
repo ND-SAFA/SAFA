@@ -21,7 +21,7 @@
         v-model="isUploadOpen"
         label="Upload Flat Files"
       />
-      <project-files-input
+      <project-files-uploader
         v-if="doShowUpload && isUploadOpen"
         v-bind:name.sync="identifier.name"
         v-bind:description.sync="identifier.description"
@@ -46,7 +46,7 @@ import Vue from "vue";
 import { IdentifierModel } from "@/types";
 import { identifierSaveStore } from "@/hooks";
 import { GenericModal, GenericSwitch } from "@/components/common";
-import ProjectFilesInput from "./ProjectFilesInput.vue";
+import ProjectFilesUploader from "./ProjectFilesUploader.vue";
 import ProjectIdentifierInput from "./ProjectIdentifierInput.vue";
 
 /**
@@ -61,7 +61,7 @@ export default Vue.extend({
     GenericSwitch,
     GenericModal,
     ProjectIdentifierInput,
-    ProjectFilesInput,
+    ProjectFilesUploader,
   },
   props: {
     isOpen: {

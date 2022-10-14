@@ -6,7 +6,7 @@
       data-cy-name="input-project-name-bulk"
       data-cy-description="input-project-description-bulk"
     />
-    <project-files-input
+    <project-files-uploader
       v-bind:name.sync="name"
       v-bind:description.sync="description"
     />
@@ -16,7 +16,7 @@
 <script lang="ts">
 import Vue from "vue";
 import {
-  ProjectFilesInput,
+  ProjectFilesUploader,
   ProjectIdentifierInput,
 } from "@/components/project/shared";
 
@@ -26,7 +26,7 @@ import {
 export default Vue.extend({
   name: "ProjectBulkUpload",
   components: {
-    ProjectFilesInput,
+    ProjectFilesUploader,
     ProjectIdentifierInput,
   },
   data() {

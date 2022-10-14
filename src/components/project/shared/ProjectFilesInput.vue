@@ -1,106 +1,112 @@
 <template>
-  <v-container style="max-width: 30em">
-    <generic-switch
-      class="mt-0"
-      v-model="emptyFiles"
-      label="Create an empty project"
-    />
-    <generic-file-selector
-      v-if="!emptyFiles"
-      v-model="selectedFiles"
-      data-cy="input-files-bulk"
-    />
+  <div>
+    <generic-file-selector v-model="selectedFiles" :data-cy="dataCy" />
+    <v-expansion-panels class="mb-2 elevation-0">
+      <v-expansion-panel>
+        <v-expansion-panel-header>
+          Manage Uploaded Files
+        </v-expansion-panel-header>
+        <v-expansion-panel-content>
+          <v-combobox
+            filled
+            chips
+            deletable-chips
+            multiple
+            v-model="artifactTypes"
+            label="Artifact Types"
+            @change="handleTimChange"
+            hint="Enter the prefixes of artifact files."
+            persistent-hint
+          />
+          <v-autocomplete
+            filled
+            multiple
+            chips
+            deletable-chips
+            return-object
+            v-model="traceMatrices"
+            label="Trace Matrices"
+            :items="matrixOptions"
+            :item-text="(item) => `${item.source} -> ${item.target}`"
+            hint="Select the trace matrices files."
+            persistent-hint
+            @change="handleTimChange"
+          />
+        </v-expansion-panel-content>
+      </v-expansion-panel>
+    </v-expansion-panels>
     <file-format-alert />
-    <v-btn
-      block
-      color="primary"
-      :disabled="isDisabled"
-      @click="handleCreate"
-      :loading="isLoading"
-      data-cy="button-create-project"
-    >
-      Create Project From Files
-    </v-btn>
-  </v-container>
+  </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { handleBulkImportProject } from "@/api";
-import {
-  GenericFileSelector,
-  FileFormatAlert,
-  GenericSwitch,
-} from "@/components/common";
+import { ArtifactLevelModel } from "@/types";
+import { GenericFileSelector, FileFormatAlert } from "@/components/common";
+
+type TimModel = {
+  DataFiles: {
+    [artifactType: string]: {
+      File: string;
+    };
+  };
+} & {
+  [traceType: string]: {
+    Source: string;
+    Target: string;
+  };
+};
 
 /**
- * Togglable input for project files.
+ * An input for project files.
  *
- * @emits-1 `update:files` (File[]) - On flat files updated.
- * @emits-2 `close` - On close.
+ * @emits-1 `input` (File[]) - On flat files updated.
  */
 export default Vue.extend({
   name: "ProjectFilesInput",
   components: {
-    GenericSwitch,
     FileFormatAlert,
     GenericFileSelector,
   },
   props: {
-    name: {
-      type: String,
-      required: true,
-    },
-    description: {
-      type: String,
-      required: true,
-    },
+    dataCy: String,
   },
   data() {
     return {
       selectedFiles: [] as File[],
-      isLoading: false,
-      emptyFiles: false,
+      tim: undefined as TimModel | undefined,
+      artifactTypes: [] as string[],
+      traceMatrices: [] as ArtifactLevelModel[],
     };
   },
-
   computed: {
-    /**
-     * Whether the submit button is disabled.
-     */
-    isDisabled(): boolean {
-      return (
-        this.name.length === 0 ||
-        (this.selectedFiles.length === 0 && !this.emptyFiles)
-      );
+    matrixOptions(): ArtifactLevelModel[] {
+      return this.artifactTypes
+        .map((source) =>
+          this.artifactTypes.map((target) => ({ source, target }))
+        )
+        .reduce((acc, cur) => [...acc, ...cur], []);
     },
   },
   methods: {
-    /**
-     * Attempts to save the project.
-     */
-    async handleCreate() {
-      this.isLoading = true;
+    handleTimChange() {
+      this.tim = {
+        DataFiles: this.artifactTypes
+          .map((type) => ({ [type]: { File: `${type}.csv` } }))
+          .reduce((acc, cur) => ({ ...acc, ...cur }), {}),
+        ...this.traceMatrices
+          .map(({ source, target }) => ({
+            [`${source}2${target}`]: { Source: source, Target: target },
+          }))
+          .reduce((acc, cur) => ({ ...acc, ...cur }), {}),
+      } as TimModel;
 
-      handleBulkImportProject(
-        {
-          projectId: "",
-          name: this.name,
-          description: this.description,
-        },
-        this.selectedFiles,
-        {
-          onSuccess: () => {
-            this.selectedFiles = [];
-            this.isLoading = false;
-            this.$emit("update:name", "");
-            this.$emit("update:description", "");
-          },
-          onError: () => {
-            this.isLoading = false;
-          },
-        }
-      );
+      this.selectedFiles = [
+        ...this.selectedFiles.filter(({ name }) => name !== "tim.json"),
+        new File([JSON.stringify(this.tim)], "tim.json", {
+          type: "application/json",
+        }),
+      ];
     },
   },
   watch: {
@@ -108,7 +114,27 @@ export default Vue.extend({
      * Emits changes to selected files.
      */
     selectedFiles(files: File[]) {
-      this.$emit("update:files", files);
+      this.$emit("input", files);
+
+      const timFile = files.find(({ name }) => name === "tim.json");
+
+      if (!timFile) return;
+
+      const reader = new FileReader();
+
+      reader.addEventListener("load", (event) => {
+        this.tim = JSON.parse(String(event.target?.result));
+
+        this.artifactTypes = Object.keys(this.tim?.DataFiles || {});
+        this.traceMatrices = Object.values(this.tim || {})
+          .filter(({ Source, Target }) => Source && Target)
+          .map(({ Source, Target }) => ({
+            source: String(Source),
+            target: String(Target),
+          }));
+      });
+
+      reader.readAsText(timFile);
     },
   },
 });

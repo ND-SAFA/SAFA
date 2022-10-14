@@ -72,6 +72,9 @@ export enum DataCy {
   creationBulkDescriptionInput = "input-project-description-bulk",
   creationBulkFilesInput = "input-files-bulk",
   creationEmptyToggle = "toggle-create-empty-project",
+  creationTimToggle = "toggle-tim-manage",
+  creationTimArtifactsInput = "input-tim-artifacts",
+  creationTimTracesInput = "input-tim-traces",
 
   creationStandardNameInput = "input-project-name-standard",
   creationStandardDescriptionInput = "input-project-description-standard",

@@ -8,7 +8,7 @@
       @clear="handleClear"
     />
     <v-expansion-panels class="mb-4" v-if="selectedFiles.length > 0">
-      <v-expansion-panel>
+      <v-expansion-panel data-cy="toggle-tim-manage">
         <v-expansion-panel-header>
           Manage Project TIM
         </v-expansion-panel-header>
@@ -23,6 +23,7 @@
             :items="typeOptions"
             hint="Select the artifact files. Reads the file name <type>.csv"
             persistent-hint
+            data-cy="input-tim-artifacts"
             @change="handleTypesChange"
           />
           <v-autocomplete
@@ -37,6 +38,7 @@
             :item-text="(item) => `${item.source} To ${item.target}`"
             hint="Select the trace matrix files. Reads the file name <source>2<target>.csv"
             persistent-hint
+            data-cy="input-tim-traces"
             @change="handleTimChange"
           />
         </v-expansion-panel-content>

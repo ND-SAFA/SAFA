@@ -56,7 +56,6 @@ describe("Artifact Table Display", () => {
   });
 
   describe("I can see project warnings in the artifact table", () => {
-    //TODO: Add tests for seeing project warnings in the artifact table
     it("Shows a project warning on the artifact table for this project", () => {
       cy.clickButton(DataCy.artifactTableSortBy).type(
         "{backspace}{backspace}{backspace}{backspace}{esc}"

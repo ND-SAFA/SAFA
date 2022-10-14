@@ -3,10 +3,11 @@
     clearable
     filled
     small-chips
+    hide-details
     label="Upload Files"
     :multiple="multiple"
     truncate-length="30"
-    class="mt-3"
+    class="my-3"
     v-model="model"
     :data-cy="dataCy"
     @click:clear="$emit('clear')"

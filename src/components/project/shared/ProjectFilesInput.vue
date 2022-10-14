@@ -1,21 +1,28 @@
 <template>
   <div>
-    <v-expansion-panels class="mb-2" flat>
+    <file-format-alert />
+    <generic-file-selector
+      v-model="selectedFiles"
+      :data-cy="dataCy"
+      @clear="handleClear"
+    />
+    <v-expansion-panels class="mb-4">
       <v-expansion-panel>
         <v-expansion-panel-header>
           Manage Uploaded Files
         </v-expansion-panel-header>
         <v-expansion-panel-content>
-          <v-combobox
+          <v-autocomplete
             filled
             chips
             deletable-chips
             multiple
             v-model="artifactTypes"
             label="Artifact Types"
-            @change="handleTimChange"
-            hint="Enter the prefixes of artifact files."
+            :items="typeOptions"
+            hint="Select the artifact files. Reads the file name <type>.csv"
             persistent-hint
+            @change="handleTimChange"
           />
           <v-autocomplete
             filled
@@ -26,16 +33,14 @@
             v-model="traceMatrices"
             label="Trace Matrices"
             :items="matrixOptions"
-            :item-text="(item) => `${item.source} -> ${item.target}`"
-            hint="Select the trace matrices files."
+            :item-text="(item) => `${item.source} To ${item.target}`"
+            hint="Select the trace matrix files. Reads the file name <source>2<target>.csv"
             persistent-hint
             @change="handleTimChange"
           />
         </v-expansion-panel-content>
       </v-expansion-panel>
     </v-expansion-panels>
-    <generic-file-selector v-model="selectedFiles" :data-cy="dataCy" />
-    <file-format-alert />
   </div>
 </template>
 
@@ -80,6 +85,11 @@ export default Vue.extend({
     };
   },
   computed: {
+    typeOptions(): string[] {
+      return this.selectedFiles
+        .map(({ name }) => name.split(".")[0])
+        .filter((name) => name !== "tim");
+    },
     matrixOptions(): ArtifactLevelModel[] {
       return this.artifactTypes
         .map((source) =>
@@ -89,7 +99,12 @@ export default Vue.extend({
     },
   },
   methods: {
-    handleTimChange() {
+    handleClear(): void {
+      this.tim = undefined;
+      this.artifactTypes = [];
+      this.traceMatrices = [];
+    },
+    handleTimChange(): void {
       this.tim = {
         DataFiles: this.artifactTypes
           .map((type) => ({ [type]: { File: `${type}.csv` } }))

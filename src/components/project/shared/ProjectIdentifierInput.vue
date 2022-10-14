@@ -5,6 +5,8 @@
       v-model="currentName"
       label="Project Name"
       :data-cy="dataCyName"
+      hint="Required"
+      persistent-hint
     />
     <v-textarea
       filled

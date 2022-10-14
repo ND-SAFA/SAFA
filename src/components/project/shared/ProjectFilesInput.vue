@@ -47,22 +47,8 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { ArtifactLevelModel } from "@/types";
+import { ArtifactLevelModel, TimModel } from "@/types";
 import { GenericFileSelector, FileFormatAlert } from "@/components/common";
-
-type TimModel = {
-  DataFiles: {
-    [artifactType: string]: {
-      File: string;
-    };
-  };
-} & {
-  [traceType: string]: {
-    Source: string;
-    Target: string;
-    File: string;
-  };
-};
 
 /**
  * An input for project files.
@@ -87,11 +73,17 @@ export default Vue.extend({
     };
   },
   computed: {
+    /**
+     * @return Generated artifact types based on file names.
+     */
     typeOptions(): string[] {
       return this.selectedFiles
         .map(({ name }) => name.split(".")[0])
         .filter((name) => name !== "tim");
     },
+    /**
+     * @return Generated trace matrices based on file names.
+     */
     matrixOptions(): ArtifactLevelModel[] {
       return this.artifactTypes
         .map((source) =>
@@ -99,6 +91,9 @@ export default Vue.extend({
         )
         .reduce((acc, cur) => [...acc, ...cur], []);
     },
+    /**
+     * @return Any errors on uploaded files.
+     */
     errors(): string[] {
       return this.selectedFiles.length === 0 ||
         this.selectedFiles.find(({ name }) => name === "tim.json")
@@ -107,11 +102,17 @@ export default Vue.extend({
     },
   },
   methods: {
+    /**
+     * Clears the current tim file data.
+     */
     handleClear(): void {
       this.tim = undefined;
       this.artifactTypes = [];
       this.traceMatrices = [];
     },
+    /**
+     * Creates a new tim file when the inputs change.
+     */
     handleTimChange(): void {
       this.tim = {
         DataFiles: this.artifactTypes
@@ -134,13 +135,12 @@ export default Vue.extend({
           type: "application/json",
         }),
       ];
-
-      console.log(this.tim);
     },
   },
   watch: {
     /**
      * Emits changes to selected files.
+     * If a tim file is loaded, it is parsed so that it can be edited.
      */
     selectedFiles(files: File[]) {
       this.$emit("input", files);

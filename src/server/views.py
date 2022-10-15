@@ -11,11 +11,11 @@ from rest_framework import permissions, status
 from rest_framework.serializers import Serializer
 from rest_framework.views import APIView
 
-from common.api.request_serializers import BaseTraceSerializer, ExperimentSerializer, PreTrainSerializer, \
-    PredictSerializer, TrainSerializer
-from common.api.responses import BaseResponse
-from common.jobs.abstract_job import AbstractJob
+from api.request_serializers import BaseTraceSerializer, ExperimentSerializer, PreTrainSerializer, PredictSerializer, \
+    TrainSerializer
+from api.responses import BaseResponse
 from experiment.common.run_mode import RunMode
+from jobs.abstract_job import AbstractJob
 from server.job_type import JobType
 
 SERIALIZERS = {JobType.CREATE_MODEL: BaseTraceSerializer,
@@ -84,7 +84,7 @@ class BaseTraceJobView(APIView, ABC):
     @staticmethod
     def _create_serializer(request: HttpRequest, job_type: JobType) -> Serializer:
         """
-        Serializes the request data
+        Serializes the request dataset
         :param request: the HTTP request
         :param job_type: the job type
         :return serializer associated with given job type
@@ -96,7 +96,7 @@ class BaseTraceJobView(APIView, ABC):
     @staticmethod
     def _create_job_from_request(request: HttpRequest, job_type: JobType) -> Union[AbstractJob, dict]:
         """
-        Serializes the request data
+        Serializes the request dataset
         :param request: the HTTP request
         :param job_type: the job type
         :return either the job or a dictionary containing the serializer errors
@@ -147,7 +147,7 @@ class TrainView(BaseTraceJobView):
     @swagger_auto_schema(request_body=SERIALIZERS[job_type], responses=responses)
     def post(self, request: HttpRequest) -> JsonResponse:
         """
-        For training a model on project data
+        For training a model on project dataset
         :param: the http request
         :return JSONResponse including the job id
         """

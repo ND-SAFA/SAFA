@@ -4,8 +4,6 @@ from typing import Dict, List, Tuple
 
 import pandas as pd
 
-from trace.data.data_objects.artifact_level import ArtifactLevel
-
 
 class Repository:
     """

@@ -155,7 +155,7 @@ class GanDataset:
     @staticmethod
     def __get_examples(data_file_path: str) -> Examples:
         """
-        Returns data examples for the GAN.
+        Returns dataset examples for the GAN.
         :return: List of examples where each example contains the text being classified and the classification label.
         """
         data_df = pd.read_csv(data_file_path)

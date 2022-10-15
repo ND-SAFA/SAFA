@@ -22,7 +22,7 @@ class GanArgs:
         :param num_hidden_layers_d: number of hidden layers in the discriminator, each of the size of the input space
         :param noise_size: size of the generator's input noisy vectors.
         :param out_dropout_rate: dropout to be applied to discriminator's input vectors.
-        :param apply_balance: Replicate labeled data to balance poorly represented datasets.
+        :param apply_balance: Replicate labeled dataset to balance poorly represented datasets.
         :param print_each_n_step: After now many steps should log be printed.
         """
         self.train_examples = train_examples

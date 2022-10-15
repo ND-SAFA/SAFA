@@ -1,12 +1,12 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
-from common.pre_processing.pre_processing_options import PreProcessingOptions
-from common.pre_processing.pre_processor import PreProcessor
 from experiment.gan.constants import DATA_FILE_PATH, LABEL_PARAM, SOFTWARE_DATA_PATH, SOURCE_PARAM, TARGET_PARAM, \
     TEST_EXPORT_PATH, TEST_SIZE, TRAIN_EXPORT_PATH
 from experiment.gan.data.safa_port import read_safa_project
 from experiment.gan.data.traceability_port import read_traceability_projects
+from pre_processing.pre_processing_options import PreProcessingOptions
+from pre_processing.pre_processor import PreProcessor
 
 if __name__ == "__main__":
     software_df = read_traceability_projects(SOFTWARE_DATA_PATH)

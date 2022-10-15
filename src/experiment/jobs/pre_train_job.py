@@ -4,13 +4,12 @@ from typing import List
 
 from transformers import DataCollatorForLanguageModeling, LineByLineTextDataset
 
-from common.jobs.abstract_args_builder import AbstractArgsBuilder
-from common.models.base_models.supported_base_model import SupportedBaseModel
-from common.pre_processing.pre_processing_options import PreProcessingOptions
-from common.pre_processing.pre_processor import PreProcessor
-from common.storage.safa_storage import SafaStorage
-from trace.jobs.abstract_trace_job import AbstractTraceJob
-from trace.jobs.trace_args import TraceArgs
+from jobs.abstract_args_builder import AbstractArgsBuilder
+from jobs.abstract_trace_job import AbstractTraceJob
+from jobs.trace_args import TraceArgs
+from pre_processing.pre_processing_options import PreProcessingOptions
+from pre_processing.pre_processor import PreProcessor
+from storage.safa_storage import SafaStorage
 
 
 class MLMPreTrainJob(AbstractTraceJob):
@@ -62,7 +61,7 @@ class MLMPreTrainJob(AbstractTraceJob):
                 file_path = os.path.join(data_path, file_name)
                 training_examples.extend(self._read_file_examples(file_path))
         else:
-            raise Exception("Unable to read data path:" + data_path)
+            raise Exception("Unable to read dataset path:" + data_path)
         return self._write_training_examples(training_examples)
 
     @staticmethod

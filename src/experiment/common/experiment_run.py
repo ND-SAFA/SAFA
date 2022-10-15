@@ -8,14 +8,13 @@ from transformers import AutoModel, AutoTokenizer, BertForMaskedLM, DataCollator
     TrainingArguments
 from transformers.integrations import TensorBoardCallback
 
-from common.models.base_models.supported_base_model import SupportedBaseModel
+from dataset import SafaDatasetCreator, TraceDatasetCreator
 from experiment.common.pretraining_data import PretrainingData
 from experiment.common.run_mode import RunMode
 from experiment.models.repository import Repository
-from trace.data.datasets.safa_dataset_creator import SafaDatasetCreator
-from trace.data.datasets.trace_dataset_creator import TraceDatasetCreator
-from trace.jobs.trace_args_builder import TraceArgsBuilder
-from trace.train.trace_trainer import TraceTrainer
+from jobs.trace_args_builder import TraceArgsBuilder
+from models.base_models.supported_base_model import SupportedBaseModel
+from train.trace_trainer import TraceTrainer
 
 
 class ExperimentRun:
@@ -70,7 +69,7 @@ class ExperimentRun:
         trace_args = trace_args_builder.build()
 
         trace_trainer = TraceTrainer(args=trace_args)
-        validation_project_creator = self.validation_project if self.validation_project\
+        validation_project_creator = self.validation_project if self.validation_project \
             else SafaDatasetCreator(trace_args.model_generator, self.validation_project_path)
         # Run
         if run_mode in [RunMode.TRAIN, RunMode.TRAINEVAL]:

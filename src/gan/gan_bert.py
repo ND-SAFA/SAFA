@@ -78,7 +78,7 @@ class GanBert:
             generator.train()
             discriminator.train()
 
-            # For each batch of training data...
+            # For each batch of training dataset...
             for step, batch in enumerate(train_dataloader):
 
                 # Progress update every print_each_n_step batches.
@@ -97,25 +97,25 @@ class GanBert:
 
                 real_batch_size = b_input_ids.shape[0]
 
-                # Encode real data in the Transformer
+                # Encode real dataset in the Transformer
                 model_outputs = transformer(b_input_ids, attention_mask=b_input_mask)
                 real_embeddings = model_outputs[-1]
 
-                # Generate fake data that should have the same distribution of the ones
+                # Generate fake dataset that should have the same distribution of the ones
                 # encoded by the transformer.
                 # First noisy input are used in input to the Generator
                 noise = torch.zeros(real_batch_size, self.args.noise_size, device=device).uniform_(0, 1)
-                # Generate Fake data
+                # Generate Fake dataset
                 gen_embeddings = generator(noise)
 
-                # Generate the output of the Discriminator for real and fake data.
+                # Generate the output of the Discriminator for real and fake dataset.
                 # First, we put together the output of the transformer and the generator
                 dis_input = torch.cat([real_embeddings, gen_embeddings], dim=0)
                 # Then, we select the output of the disciminator
                 features, logits, probs = discriminator(dis_input)
 
                 # Finally, we separate the discriminator's output for the real and fake
-                # data
+                # dataset
                 features_list = torch.split(features, real_batch_size)
                 dis_real_features = features_list[0]
                 dis_fake_features = features_list[1]
@@ -142,8 +142,8 @@ class GanBert:
                 # Disciminator's LOSS estimation
                 logits = dis_real_logits[:, 0:-1]
                 log_probs = F.log_softmax(logits, dim=-1)
-                # The discriminator provides an output for labeled and unlabeled real data
-                # so the loss evaluated for unlabeled data is ignored (masked)
+                # The discriminator provides an output for labeled and unlabeled real dataset
+                # so the loss evaluated for unlabeled dataset is ignored (masked)
                 label2one_hot = torch.nn.functional.one_hot(b_labels, len(dataset.label_list))
                 per_example_loss = -torch.sum(label2one_hot * log_probs, dim=-1)
                 per_example_loss = torch.masked_select(per_example_loss, b_label_mask.to(device))
@@ -232,7 +232,7 @@ class GanBert:
             # loss
             nll_loss = torch.nn.CrossEntropyLoss(ignore_index=-1)
 
-            # Evaluate data for one epoch
+            # Evaluate dataset for one epoch
             for batch in test_dataloader:
                 # Unpack this training batch from our dataloader.
                 b_input_ids = batch[0].to(device)

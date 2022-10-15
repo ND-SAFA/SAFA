@@ -22,10 +22,10 @@ N_TRAINING_EPOCHS = 10
 PRETRAINING_DATA = PretrainingData.AUTOMOTIVE
 STATE_PATHS = ["bert-base-uncased",
                "thearod5/sebert-task-cls",
-               "/Users/albertorodriguez/Desktop/safa data/automotive/models/thearod5/sebert-task-cls_automotive",
-               "/Users/albertorodriguez/Desktop/safa data/automotive/models/thearod5/sebert-task-cls_automotive_lm",
-               "/Users/albertorodriguez/Desktop/safa data/automotive/models/thearod5/sebert-task-cls_automotive_lm_automotive",
-               "/Users/albertorodriguez/Desktop/safa data/automotive/models/nl_bert_automotive"]
+               "/Users/albertorodriguez/Desktop/safa dataset/automotive/models/thearod5/sebert-task-cls_automotive",
+               "/Users/albertorodriguez/Desktop/safa dataset/automotive/models/thearod5/sebert-task-cls_automotive_lm",
+               "/Users/albertorodriguez/Desktop/safa dataset/automotive/models/thearod5/sebert-task-cls_automotive_lm_automotive",
+               "/Users/albertorodriguez/Desktop/safa dataset/automotive/models/nl_bert_automotive"]
 METRICS = ["map_at_k"]
 TEST_PROJECT_PATH = "/Users/albertorodriguez/Desktop/safa data/validation/lhp/answer"
 
@@ -56,7 +56,7 @@ if __name__ == "__main__":
             TEST_PROJECT_PATH,
         )
         if args.mode == "lm":
-            file_path = "/Users/albertorodriguez/desktop/safa data/automotive/txt"
+            file_path = "/Users/albertorodriguez/desktop/safa dataset/automotive/txt"
             experiment.perform_language_modeling(
                 file_path,
                 OUTPUT_DIR

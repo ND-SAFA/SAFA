@@ -1,13 +1,13 @@
 import os
 
-from common.models.base_models.supported_base_model import SupportedBaseModel
-from common.models.model_generator import ModelGenerator
+from dataset import TraceDatasetCreator
 from experiment.common.experiment_run import ExperimentRun
 from experiment.common.pretraining_data import PretrainingData
 from experiment.common.run_mode import RunMode
 from experiment.domains.automotive import METRICS
 from experiment.gan.constants import BASE_MODEL_NAME, TEST_EXPORT_PATH, TRAINING_DATA_PATH, TRAIN_EXPORT_PATH
-from trace.data.datasets.trace_dataset_creator import TraceDatasetCreator
+from models.base_models.supported_base_model import SupportedBaseModel
+from models.model_generator import ModelGenerator
 
 BASE_OUTPUT_DIR = os.path.join(TRAINING_DATA_PATH, "baseline")
 

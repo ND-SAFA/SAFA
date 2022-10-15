@@ -5,9 +5,9 @@ import mock
 from django.test import Client
 from mock import patch
 
-from common.api.responses import BaseResponse
-from common.jobs.job_status import Status
-from common.models.model_generator import ModelGenerator
+from api.responses import BaseResponse
+from jobs.job_status import Status
+from models.model_generator import ModelGenerator
 from test.base_test import BaseTest
 from test.config.paths import TEST_OUTPUT_DIR
 

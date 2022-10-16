@@ -61,9 +61,6 @@ if __name__ == "__main__":
                 file_path,
                 OUTPUT_DIR
             )
-        if args.mode == "push":
-            experiment.push()
-        else:
             experiment.perform_run(
                 OUTPUT_DIR,
                 args.mode,

@@ -2,7 +2,7 @@ import os
 from typing import Dict, List, Tuple
 
 import tensorflow as tf
-from transformers import AutoModel, AutoTokenizer, BertForMaskedLM, DataCollatorForLanguageModeling, \
+from transformers import AutoTokenizer, BertForMaskedLM, DataCollatorForLanguageModeling, \
     LineByLineTextDataset, \
     Trainer, \
     TrainingArguments
@@ -36,10 +36,6 @@ class ExperimentRun:
         self.validation_project_path = validation_project_path
         self.validation_project = validation_project
         self.run_name = "_".join([model_state_path, pretraining.value])
-
-    def push(self):
-        model = AutoModel.from_pretrained(self.model_state_path)
-        model.push_to_hub("thearod5/automotive")
 
     def perform_run(self,
                     output_dir: str,

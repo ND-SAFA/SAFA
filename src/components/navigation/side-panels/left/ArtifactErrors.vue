@@ -1,14 +1,8 @@
 <template>
   <div v-if="selectedArtifactWarnings.length > 0">
-    <flex-box data-cy="artifact-warnings">
+    <flex-box>
       <v-icon color="secondary">mdi-hazard-lights</v-icon>
-      <typography
-        el="h2"
-        l="1"
-        variant="subtitle"
-        value="Warnings"
-        data-cy="artifact-table-panel-warnings-title"
-      />
+      <typography el="h2" l="1" variant="subtitle" value="Warnings" />
     </flex-box>
 
     <v-divider />

@@ -1,18 +1,10 @@
 <template>
   <flex-box align="center">
     <artifact-table-delta-chip :artifact="artifact" />
-    <v-icon
-      v-if="getHasWarnings(artifact)"
-      color="secondary"
-      data-cy="artifact-table-artifact-warning"
-    >
+    <v-icon v-if="getHasWarnings(artifact)" color="secondary">
       mdi-hazard-lights
     </v-icon>
-    <typography
-      l="1"
-      :value="artifact.name"
-      data-cy="artifact-table-artifact"
-    />
+    <typography l="1" :value="artifact.name" />
   </flex-box>
 </template>
 

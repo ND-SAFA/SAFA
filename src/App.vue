@@ -13,6 +13,7 @@
 
 <script lang="ts">
 import Vue from "vue";
+import { handleAuthentication } from "@/api";
 import { Navigation } from "@/components";
 
 /**
@@ -22,6 +23,9 @@ export default Vue.extend({
   name: "App",
   components: {
     Navigation,
+  },
+  async mounted() {
+    await handleAuthentication();
   },
 });
 </script>

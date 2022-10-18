@@ -23,7 +23,13 @@ export function handleSaveProject({
 
   saveProject(identifier)
     .then((project) => {
-      projectStore.addProject(project);
+      projectStore.allProjects = [
+        project,
+        ...projectStore.allProjects.filter(
+          ({ projectId }) => projectId !== project.projectId
+        ),
+      ];
+
       logStore.onSuccess(`Project has been saved: ${project.name}`);
       onSuccess?.(project);
     })

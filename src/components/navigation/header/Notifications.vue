@@ -1,15 +1,13 @@
 <template>
   <v-menu offset-y @input="handleOpen">
     <template v-slot:activator="{ on, attrs }">
-      <v-btn icon large color="accent" v-bind="attrs" v-on="on" class="mx-2">
-        <v-badge overlap color="secondary" :value="newNotifications > 0">
-          <template v-slot:badge>
-            <typography
-              color="primary"
-              :value="newNotifications"
-              style="line-height: unset; font-size: 12px !important"
-            />
-          </template>
+      <v-btn icon large color="secondary" v-bind="attrs" v-on="on">
+        <v-badge
+          overlap
+          color="secondary"
+          :content="newNotifications"
+          :value="newNotifications > 0"
+        >
           <v-icon>mdi-bell-outline</v-icon>
         </v-badge>
       </v-btn>

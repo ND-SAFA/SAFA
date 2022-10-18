@@ -19,7 +19,6 @@ import {
   SessionModel,
   SnackbarMessage,
   TrainedModel,
-  UserModel,
   VersionModel,
 } from "@/types";
 import { defaultTypeIcon } from "@/util/icons";
@@ -44,16 +43,6 @@ export function createConfirmDialogueMessage(): ConfirmDialogueMessage {
     title: "",
     body: "",
     statusCallback: () => null,
-  };
-}
-
-/**
- * @return An empty user.
- */
-export function createUser(): UserModel {
-  return {
-    userId: "",
-    email: "",
   };
 }
 

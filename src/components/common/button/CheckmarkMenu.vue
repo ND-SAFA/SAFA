@@ -6,7 +6,7 @@
           <v-btn
             v-on="{ ...menuOn, ...on }"
             v-bind="attrs"
-            color="accent"
+            color="white"
             icon
             :data-cy="definition.dataCy"
             :class="isDisabled ? 'disable-events' : ''"

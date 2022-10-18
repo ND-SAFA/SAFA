@@ -1,18 +1,13 @@
 import { DataCy, editUser } from "../../fixtures";
 
 describe("Account Editing", () => {
-  before(() => {
+  beforeEach(() => {
     cy.visit("/create-account").createNewAccount(
       editUser.email,
       editUser.password
     );
-  });
-
-  beforeEach(() => {
-    cy.visit("/account")
-      .login(editUser.email, editUser.password)
-      .location("pathname", { timeout: 10000 })
-      .should("equal", "/account");
+    cy.visit("/account").login(editUser.email, editUser.password);
+    cy.location("pathname", { timeout: 10000 }).should("equal", "/account");
   });
 
   describe("Password Change", () => {
@@ -43,23 +38,22 @@ describe("Account Editing", () => {
     });
 
     describe("I can delete my account", () => {
-      it("Cannot delete my account with an invalid password", () => {
+      it("Cannot delete my account with an invalid passowrd", () => {
         cy.inputText(
           DataCy.accountDeletePasswordInput,
           editUser.invalidPassword
         );
         cy.getCy(DataCy.accountDeleteButton).click();
         cy.getCy(DataCy.popUpAcceptButton).click();
-        cy.location("pathname", { timeout: 5000 }).should(
-          "not.equal",
-          "/login"
-        );
+        //cy.getCy(DataCy.snackbarError).should("be.visible");
       });
 
-      it.skip("Successfully deletes my account", () => {
+      it("Successfully deletes my account", () => {
         cy.inputText(DataCy.accountDeletePasswordInput, editUser.password);
         cy.getCy(DataCy.accountDeleteButton).click();
         cy.getCy(DataCy.popUpAcceptButton).click();
+        cy.location("pathname", { timeout: 5000 }).should("equal", "/login");
+        cy.getCy(DataCy.loginButton).click();
         cy.location("pathname", { timeout: 5000 }).should("equal", "/login");
       });
     });

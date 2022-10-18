@@ -10,8 +10,12 @@
       <update-button />
     </flex-box>
 
-    <version-label />
+    <div class="mr-2">
+      <version-label />
+    </div>
+
     <notifications />
+
     <account-dropdown />
 
     <upload-new-version-modal

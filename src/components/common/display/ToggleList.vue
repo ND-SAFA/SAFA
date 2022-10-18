@@ -2,7 +2,7 @@
   <v-list-group :prepend-icon="icon" :value="value">
     <template v-slot:activator>
       <v-list-item-title>
-        <typography v-if="title" :value="title" data-cy="generic-list-item" />
+        <typography v-if="title" :value="title" />
         <slot name="activator" />
       </v-list-item-title>
     </template>

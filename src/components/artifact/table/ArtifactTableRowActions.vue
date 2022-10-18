@@ -4,13 +4,11 @@
       icon-id="mdi-pencil"
       :tooltip="`Edit '${artifact.name}'`"
       @click="handleEdit(artifact)"
-      data-cy="button-artifact-edit-icon"
     />
     <generic-icon-button
       icon-id="mdi-delete"
       :tooltip="`Delete '${artifact.name}'`"
       @click="handleDelete(artifact)"
-      data-cy="button-artifact-delete-icon"
     />
   </flex-box>
 </template>

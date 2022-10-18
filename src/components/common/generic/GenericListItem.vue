@@ -8,7 +8,7 @@
         @click="handleClick"
       >
         <v-list-item-title>
-          <typography :value="item.title" data-cy="generic-list-item" />
+          <typography :value="item.title" />
         </v-list-item-title>
         <v-list-item-subtitle v-if="!!item.subtitle">
           <typography secondary :value="item.subtitle" />

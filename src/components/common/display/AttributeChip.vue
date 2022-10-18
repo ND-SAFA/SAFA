@@ -97,8 +97,6 @@ export default Vue.extend({
     color(): string {
       if (this.confidenceScore) {
         return getScoreColor(this.value || "");
-      } else if (this.artifactType) {
-        return "";
       } else {
         return getBackgroundColor(this.value || "");
       }
@@ -107,7 +105,7 @@ export default Vue.extend({
      * @return Whether the chip is outlined.
      */
     outlined(): boolean {
-      return this.enumerated || this.confidenceScore || this.artifactType;
+      return this.enumerated || this.confidenceScore;
     },
     /**
      * @return Thee current progress %.

@@ -3,7 +3,7 @@
     :icon="definition.type !== 'text'"
     :text="definition.type === 'text'"
     small
-    color="accent"
+    color="secondary"
     @click="definition.handler"
     class="mr-2"
     :disabled="isDisabled"

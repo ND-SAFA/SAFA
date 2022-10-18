@@ -3,11 +3,11 @@
     <flex-box justify="space-between">
       <typography el="h1" variant="title" :value="project.name" />
       <flex-box>
-        <!--        <generic-icon-button-->
-        <!--          tooltip="Download Project Files"-->
-        <!--          icon-id="mdi-download"-->
-        <!--          @click="handleDownload"-->
-        <!--        />-->
+        <generic-icon-button
+          tooltip="Download Project Files"
+          icon-id="mdi-download"
+          @click="handleDownload"
+        />
         <generic-icon-button
           tooltip="Edit title"
           icon-id="mdi-pencil"
@@ -31,7 +31,7 @@
 import Vue, { PropType } from "vue";
 import { ProjectModel } from "@/types";
 import { identifierSaveStore, projectStore } from "@/hooks";
-import { handleSaveProject, handleDownloadProjectCSV } from "@/api";
+import { getProjectFiles, handleSaveProject } from "@/api";
 import { GenericIconButton, Typography, FlexBox } from "@/components/common";
 import { ProjectIdentifierModal } from "@/components/project/shared";
 
@@ -86,7 +86,7 @@ export default Vue.extend({
      * Downloads project files
      */
     handleDownload(): void {
-      handleDownloadProjectCSV();
+      getProjectFiles(projectStore.versionId);
     },
   },
 });

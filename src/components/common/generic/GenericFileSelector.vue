@@ -6,10 +6,9 @@
     label="Upload Files"
     :multiple="multiple"
     truncate-length="30"
-    class="mt-4"
+    class="mt-3"
     v-model="model"
     :data-cy="dataCy"
-    :error-messages="errors"
     @click:clear="$emit('clear')"
   />
 </template>
@@ -35,10 +34,6 @@ export default Vue.extend({
     dataCy: {
       type: String,
       default: "input-files",
-    },
-    errors: {
-      type: Array as PropType<string[]>,
-      default: () => [],
     },
   },
   data() {

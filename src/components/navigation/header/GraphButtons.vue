@@ -1,16 +1,16 @@
 <template>
   <flex-box>
-    <v-divider inset vertical class="accent mx-1 faded" />
+    <v-divider inset vertical class="white mx-1 faded" />
 
     <commit-buttons />
 
-    <v-divider inset vertical class="accent mx-1 faded" />
+    <v-divider inset vertical class="white mx-1 faded" />
 
     <template v-for="definition in viewButtons">
       <generic-icon-button
         v-if="definition.handler"
         :key="definition.label"
-        color="accent"
+        color="white"
         :tooltip="definition.label"
         :icon-id="definition.icon"
         :is-disabled="isButtonDisabled(definition)"
@@ -19,7 +19,7 @@
       />
     </template>
 
-    <v-divider inset vertical class="accent mx-1 faded" />
+    <v-divider inset vertical class="white mx-1 faded" />
 
     <checkmark-menu
       :key="filterButton.label"

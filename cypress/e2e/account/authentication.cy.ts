@@ -53,9 +53,9 @@ describe("Authentication", () => {
 
         cy.getCy(DataCy.loginButton).should("exist");
 
-        // cy.visit("/");
+        cy.visit("http://localhost:8080");
 
-        // cy.getCy(DataCy.loginButton).should("exist");
+        cy.getCy(DataCy.loginButton).should("exist");
       });
     });
   });

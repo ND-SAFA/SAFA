@@ -1,12 +1,10 @@
 <template>
-  <v-container style="max-width: 40em">
+  <v-container style="max-width: 30em">
     <v-text-field
       filled
       v-model="currentName"
       label="Project Name"
       :data-cy="dataCyName"
-      hint="Required"
-      persistent-hint
     />
     <v-textarea
       filled
@@ -27,6 +25,7 @@ import Vue from "vue";
  *
  * @emits-1 `update:name` (string) - On name updated.
  * @emits-2 `update:description` (string) - On description updated.
+ * @emits-3 `close` - On close.
  */
 export default Vue.extend({
   name: "ProjectIdentifierInput",

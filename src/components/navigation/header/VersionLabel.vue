@@ -2,8 +2,8 @@
   <typography
     el="h1"
     variant="subtitle"
-    color="accent"
-    style="white-space: nowrap"
+    color="white"
+    classes="width-max"
     :value="versionDisplayName"
   />
 </template>

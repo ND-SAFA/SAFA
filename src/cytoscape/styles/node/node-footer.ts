@@ -1,7 +1,7 @@
 import { ArtifactData, SvgStyle } from "@/types";
 import { ThemeColors } from "@/util";
 import { ARTIFACT_BORDER_WIDTH, ARTIFACT_CHILDREN_HEIGHT } from "@/cytoscape";
-import { svgIcon, svgText } from "./svg-text";
+import { svgText } from "./svg-text";
 import { svgStoplight } from "./node-stoplight";
 import { getWarnings } from "./node-helper";
 
@@ -36,7 +36,7 @@ export function svgFooter(
       rx="8" 
       width="${outerStyle.width}" 
       height="${ARTIFACT_CHILDREN_HEIGHT}"
-      fill="${hasWarnings ? ThemeColors.warningDark : ThemeColors.darkGrey}"
+      fill="${ThemeColors.darkGrey}"
       class="artifact-border"
     />
     <rect
@@ -45,7 +45,7 @@ export function svgFooter(
       rx="7" 
       width="${outerStyle.width - ARTIFACT_BORDER_WIDTH * 2}" 
       height="${ARTIFACT_CHILDREN_HEIGHT - ARTIFACT_BORDER_WIDTH * 2}"
-      fill="${hasWarnings ? ThemeColors.warningLight : ThemeColors.lightGrey}"
+      fill="${ThemeColors.lightGrey}"
       class="artifact-svg"
     />
     ${svgChildren(data.hiddenChildren || 0, hasWarnings, textY)}
@@ -74,29 +74,17 @@ function svgChildren(
 ): string {
   if (hiddenChildren === 0) return "";
 
-  const style = {
-    y: textY,
-    x: hasWarnings ? 5 : 62,
-    width: 120,
-    height: 30,
-  };
-
-  return (
-    svgIcon(
-      {
-        ...style,
-        y: style.y - 2,
-      },
-      "expand_more"
-    ) +
-    svgText(
-      `${hiddenChildren} Hidden`,
-      {
-        ...style,
-        x: style.x + 20,
-      },
-      "children"
-    )
+  return svgText(
+    `${hiddenChildren} Hidden`,
+    {
+      y: textY,
+      x: hasWarnings ? 5 : 62,
+      width: 120,
+      height: 30,
+    },
+    "children",
+    "",
+    { id: "expand_more" }
   );
 }
 
@@ -118,29 +106,16 @@ function svgWarnings(
 ): string {
   if (warningCount === 0) return "";
 
-  const style = {
-    x: hasChildren ? width - 106 : 60,
-    y: textY,
-    width: 120,
-    height: 30,
-  };
-
-  return (
-    svgIcon(
-      {
-        ...style,
-        y: style.y - 2,
-      },
-      "warning",
-      ThemeColors.warningDark
-    ) +
-    svgText(
-      `${warningCount} Warning${warningCount !== 1 ? "s" : ""}`,
-      {
-        ...style,
-        x: style.x + 22,
-      },
-      "warnings"
-    )
+  return svgText(
+    `${warningCount} Warning${warningCount !== 1 ? "s" : ""}`,
+    {
+      x: hasChildren ? width - 106 : 62,
+      y: textY,
+      width: 120,
+      height: 30,
+    },
+    "warnings",
+    "",
+    { id: "warning", color: ThemeColors.warningDark }
   );
 }

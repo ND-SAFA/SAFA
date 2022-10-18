@@ -22,7 +22,7 @@ export async function parseArtifactFile(
       method: "POST",
       body: formData,
     },
-    { setJsonContentType: false }
+    false
   );
 }
 
@@ -43,6 +43,6 @@ export async function parseTraceFile(file: File): Promise<ParseTraceFileModel> {
       method: "POST",
       body: formData,
     },
-    { setJsonContentType: false }
+    false
   );
 }

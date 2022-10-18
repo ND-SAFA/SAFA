@@ -6,7 +6,6 @@
     :sort-by.sync="currentSort"
     :sort-desc.sync="currentSortDesc"
     :group-desc.sync="currentGroupDesc"
-    data-cy="table-header"
   >
     <template slot="right">
       <flex-box b="1">

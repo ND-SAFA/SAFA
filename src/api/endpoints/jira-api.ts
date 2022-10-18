@@ -6,6 +6,7 @@ import {
   JiraProjectListModel,
   JobModel,
 } from "@/types";
+import { sessionStore } from "@/hooks";
 import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
 
 /**
@@ -60,7 +61,7 @@ export function authorizeJira(): void {
       `client_id=${process.env.VUE_APP_JIRA_CLIENT_ID}&` +
       `scope=${scopes}&` +
       `redirect_uri=${process.env.VUE_APP_JIRA_REDIRECT_LINK}&` +
-      `state=${String(Math.random()).slice(0, 10)}&` +
+      `state=${sessionStore.getToken}&` +
       `response_type=code&` +
       `prompt=consent`
   );

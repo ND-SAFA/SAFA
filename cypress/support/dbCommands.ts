@@ -2,11 +2,6 @@ import { validUser } from "../fixtures";
 
 const apiUrl = "https://dev-api.safa.ai";
 
-Cypress.on("window:before:load", (window) => {
-  // Disable the cookie banner.
-  window.document.cookie = `wpcc=dismiss`;
-});
-
 Cypress.Commands.add(
   "chainRequest",
   {
@@ -22,66 +17,74 @@ Cypress.Commands.add("dbToken", () => {
 });
 
 Cypress.Commands.add("dbResetJobs", () => {
-  cy.dbToken()
-    .then(() => {
-      cy.request<{ id: string }[]>({
-        method: "GET",
-        url: `${apiUrl}/jobs`,
-      }).then(({ body: jobs }) =>
-        jobs.forEach((job) =>
-          cy.request({
-            method: "DELETE",
-            url: `${apiUrl}/jobs/${job.id}`,
-          })
-        )
-      );
-    })
-    .clearCookies();
+  cy.dbToken().then(({ body: { token } }) => {
+    const headers = { Authorization: token };
+
+    cy.request<{ id: string }[]>({
+      method: "GET",
+      url: `${apiUrl}/jobs`,
+      headers,
+    }).then(({ body: jobs }) =>
+      jobs.forEach((job) =>
+        cy.request({
+          method: "DELETE",
+          url: `${apiUrl}/jobs/${job.id}`,
+          headers,
+        })
+      )
+    );
+  });
 });
 
 Cypress.Commands.add("dbResetProjects", () => {
-  cy.dbToken()
-    .then(() => {
-      cy.request<{ projectId: string }[]>({
-        method: "GET",
-        url: `${apiUrl}/projects`,
-      }).then(({ body: projects }) =>
-        projects.forEach(({ projectId }) =>
-          cy.request({
-            method: "DELETE",
-            url: `${apiUrl}/projects/${projectId}`,
-          })
-        )
-      );
-    })
-    .clearCookies();
+  cy.dbToken().then(({ body: { token } }) => {
+    const headers = { Authorization: token };
+
+    cy.request<{ projectId: string }[]>({
+      method: "GET",
+      url: `${apiUrl}/projects`,
+      headers,
+    }).then(({ body: projects }) =>
+      projects.forEach(({ projectId }) =>
+        cy.request({
+          method: "DELETE",
+          url: `${apiUrl}/projects/${projectId}`,
+          headers,
+        })
+      )
+    );
+  });
 });
 
 Cypress.Commands.add("dbResetDocuments", () => {
-  cy.dbToken()
-    .then(() => {
-      cy.request<{ projectId: string }[]>({
+  cy.dbToken().then(({ body: { token } }) => {
+    const headers = { Authorization: token };
+
+    cy.request<{ projectId: string }[]>({
+      method: "GET",
+      url: `${apiUrl}/projects`,
+      headers,
+    })
+      .chainRequest<{ versionId: string }>(({ body: projects }) => ({
         method: "GET",
-        url: `${apiUrl}/projects`,
-      })
-        .chainRequest<{ versionId: string }>(({ body: projects }) => ({
+        url: `${apiUrl}/projects/${projects[0].projectId}/versions/current`,
+        headers,
+      }))
+      .chainRequest<{ documents: { documentId: string }[] }>(
+        ({ body: { versionId } }) => ({
           method: "GET",
-          url: `${apiUrl}/projects/${projects[0].projectId}/versions/current`,
-        }))
-        .chainRequest<{ documents: { documentId: string }[] }>(
-          ({ body: { versionId } }) => ({
-            method: "GET",
-            url: `${apiUrl}/projects/versions/${versionId}`,
+          url: `${apiUrl}/projects/versions/${versionId}`,
+          headers,
+        })
+      )
+      .then(({ body: { documents } }) =>
+        documents.forEach(({ documentId }) =>
+          cy.request({
+            method: "DELETE",
+            url: `${apiUrl}/projects/documents/${documentId}`,
+            headers,
           })
         )
-        .then(({ body: { documents } }) =>
-          documents.forEach(({ documentId }) =>
-            cy.request({
-              method: "DELETE",
-              url: `${apiUrl}/projects/documents/${documentId}`,
-            })
-          )
-        );
-    })
-    .clearCookies();
+      );
+  });
 });

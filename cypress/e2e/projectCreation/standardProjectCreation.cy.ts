@@ -6,28 +6,33 @@ import {
   validUser,
 } from "../../fixtures";
 
-describe("Manual Project Creation", () => {
+describe("Project Creation", () => {
   beforeEach(() => {
     cy.dbResetJobs();
 
-    cy.visit("/create").login(validUser.email, validUser.password);
+    cy.visit("http://localhost:8080/create").login(
+      validUser.email,
+      validUser.password
+    );
 
     cy.location("pathname", { timeout: 5000 }).should("equal", "/create");
   });
 
-  describe("Project Artifact Uploading", () => {
-    it("Cannot create a project without a name", () => {
-      // Step - inputting description
-      cy.inputText(
-        DataCy.creationStandardDescriptionInput,
-        testProject.description
-      );
+  describe("Manual Project Creation", () => {
+    describe("Project Artifact Uploading", () => {
+      it("Cannot create a project without a name", () => {
+        // Step - inputting description
+        cy.inputText(
+          DataCy.creationStandardDescriptionInput,
+          testProject.description
+        );
 
-      // Step - Checking that the user cannot continue without a project name
-      cy.getCy(DataCy.stepperContinueButton).should("be.disabled");
+        // Step - Checking that the user cannot continue without a project name
+        cy.getCy(DataCy.stepperContinueButton).should("be.disabled");
+      });
     });
 
-    describe("I can create sets of artifacts by type", () => {
+    describe("I can Create sets of artifacts by type", () => {
       it("Cannot create a new panel with an empty name", () => {
         // Step - Inputs Project name and description
         cy.setProjectIdentifier("standard");

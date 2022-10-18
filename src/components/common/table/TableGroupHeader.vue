@@ -8,11 +8,7 @@
           :tooltip="data.isOpen ? 'Hide Group' : 'Show Group'"
           @click="data.toggle"
         />
-        <typography
-          :value="groupHeader"
-          x="2"
-          data-cy="artifact-table-group-sort-header"
-        />
+        <typography :value="groupHeader" x="2" />
         <attribute-chip
           :value="data.group"
           :artifact-type="artifactType"

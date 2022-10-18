@@ -18,7 +18,7 @@ export async function createFlatFileUploadJob(
       method: "POST",
       body: formData,
     },
-    { setJsonContentType: false }
+    false
   );
 }
 

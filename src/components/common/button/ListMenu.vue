@@ -86,7 +86,7 @@ export default Vue.extend({
      * @return The button color.
      */
     buttonColor(): string {
-      return this.definition.buttonColor || "accent";
+      return this.definition.buttonColor || "white";
     },
     /**
      * @return The item color.

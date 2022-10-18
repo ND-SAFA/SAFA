@@ -1,12 +1,16 @@
-// import { datadogRum } from "@datadog/browser-rum";
+import { datadogRum } from "@datadog/browser-rum";
 
-import {
-  IOHandlerCallback,
-  PasswordChangeModel,
-  UserPasswordModel,
-} from "@/types";
+import { IOHandlerCallback, PasswordChangeModel, UserModel } from "@/types";
 import { sessionStore, logStore } from "@/hooks";
-import { getParam, getParams, navigateTo, QueryParams, Routes } from "@/router";
+import {
+  getParam,
+  getParams,
+  navigateTo,
+  QueryParams,
+  router,
+  Routes,
+  routesPublic,
+} from "@/router";
 import {
   handleClearProject,
   createLoginSession,
@@ -14,52 +18,41 @@ import {
   deleteAccount,
   handleLoadLastProject,
   handleGetProjects,
-  getCurrentUser,
 } from "@/api";
 
 /**
  * Attempts to log a user in.
  *
  * @param user - The user to log in.
- * @throws If login is unsuccessful.
  */
-export async function handleLogin(user: UserPasswordModel): Promise<void> {
+export async function handleLogin(user: UserModel): Promise<void> {
   const session = await createLoginSession(user);
   const goToPath = getParam(QueryParams.LOGIN_PATH);
   const query = { ...getParams() };
 
   delete query[QueryParams.LOGIN_PATH];
 
-  sessionStore.user = await getCurrentUser();
   sessionStore.updateSession(session);
+  datadogRum.startSessionReplayRecording();
+  await handleGetProjects({});
 
-  // datadogRum.startSessionReplayRecording();
-
-  await handleGetProjects({
-    onComplete: async () => {
-      if (goToPath === Routes.ARTIFACT) {
-        await handleLoadLastProject();
-      } else if (typeof goToPath === "string") {
-        await navigateTo(goToPath, query);
-      } else {
-        await navigateTo(Routes.HOME, query);
-      }
-    },
-  });
+  if (goToPath === Routes.ARTIFACT) {
+    await handleLoadLastProject();
+  } else if (typeof goToPath === "string") {
+    await navigateTo(goToPath, query);
+  } else {
+    await navigateTo(Routes.HOME, query);
+  }
 }
 
 /**
  * Logs a user out.
  */
 export async function handleLogout(): Promise<void> {
-  document.cookie = "";
-
   await handleClearProject();
   await navigateTo(Routes.LOGIN_ACCOUNT);
   sessionStore.clearSession();
-  logStore.notifications = [];
-  // await deleteSession();
-  // datadogRum.startSessionReplayRecording();
+  datadogRum.startSessionReplayRecording();
 }
 
 /**
@@ -67,23 +60,35 @@ export async function handleLogout(): Promise<void> {
  * If the token does not, is expired, or is otherwise invalid, the user will be sent back to login.
  */
 export async function handleAuthentication(): Promise<void> {
-  sessionStore.user = await getCurrentUser();
+  if (routesPublic.includes(router.currentRoute.path)) return;
 
-  // datadogRum.init({
-  //   applicationId: process.env.VUE_APP_DDOG_APP_ID || "",
-  //   clientToken: process.env.VUE_APP_DDOG_DDOG_TOKEN || "",
-  //   env: process.env.NODE_ENV || "",
-  //   site: "datadoghq.com",
-  //   service: "safa",
-  //   version: "1.0.0",
-  //   sampleRate: 100,
-  //   premiumSampleRate: 100,
-  //   trackInteractions: true,
-  //   defaultPrivacyLevel: "mask-user-input",
-  // });
-  // datadogRum.startSessionReplayRecording();
+  try {
+    datadogRum.init({
+      applicationId: process.env.VUE_APP_DDOG_APP_ID || "",
+      clientToken: process.env.VUE_APP_DDOG_DDOG_TOKEN || "",
+      env: process.env.NODE_ENV || "",
+      site: "datadoghq.com",
+      service: "safa",
+      version: "1.0.0",
+      sampleRate: 100,
+      premiumSampleRate: 100,
+      trackInteractions: true,
+      defaultPrivacyLevel: "mask-user-input",
+    });
 
-  await handleGetProjects({});
+    const isAuthorized = await sessionStore.hasAuthorization;
+
+    if (isAuthorized) {
+      datadogRum.startSessionReplayRecording();
+      await handleGetProjects({});
+
+      return;
+    }
+
+    await handleLogout();
+  } catch (e) {
+    await handleLogout();
+  }
 }
 
 /**

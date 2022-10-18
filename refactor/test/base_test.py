@@ -8,11 +8,10 @@ from transformers.models.bert.configuration_bert import BertConfig
 from transformers.models.bert.tokenization_bert import BertTokenizer
 
 from config.constants import DELETE_TEST_OUTPUT, VALIDATION_PERCENTAGE_DEFAULT
-from models.base_models.pl_bert import PLBert
-from models.base_models.supported_base_model import SupportedBaseModel
-from storage.safa_storage import SafaStorage
+from server.storage import SafaStorage
 from test.config.paths import TEST_OUTPUT_DIR, TEST_VOCAB_FILE
 from test.test_data import TEST_POS_LINKS, TEST_SOURCE_LAYERS, TEST_TARGET_LAYERS
+from tracer.models import PLBert, SupportedBaseModel
 
 
 class BaseTest(TestCase):

@@ -1,9 +1,11 @@
 import random
-from typing import Dict, List, Sized, Tuple
+from collections import OrderedDict
+from typing import Callable, Dict, List, Sized, Tuple
 
 from config.constants import RESAMPLE_RATE_DEFAULT
 from tracer.dataset.data_key import DataKey
 from tracer.dataset.trace_link import TraceLink
+from tracer.models.model_generator import ModelGenerator
 from tracer.models.model_properties import ArchitectureType
 
 
@@ -16,7 +18,7 @@ class TraceDataset:
         :param pos_link_ids: The set of trace link ids representing positive links.
         :param neg_link_ids: The set of trace link ids representing negative links.
         """
-        self.links = links
+        self.links = OrderedDict(links)
         self.pos_link_ids = pos_link_ids if pos_link_ids else list()
         self.neg_link_ids = neg_link_ids if neg_link_ids else list()
 
@@ -35,13 +37,14 @@ class TraceDataset:
                                                            percent_split, True)
         return first_slice, second_slice
 
-    def to_trainer_dataset(self, arch_type: ArchitectureType) -> List[Dict]:
+    def to_trainer_dataset(self, model_generator: ModelGenerator) -> List[Dict]:
         """
         Converts trace links in dataset to feature entries used by Huggingface (HF) trainer.
-        :param arch_type: The model architecture determining features.
+        :param model_generator: The model generator determining architecture and feature function for trace links.
         :return: A dataset used by the HF trainer.
         """
-        return [self._get_feature_entry(self.links[link_id], arch_type) for link_id in self.links]
+        return [self._get_feature_entry(self.links[link_id], model_generator.arch_type, model_generator.get_feature) for
+                link_id in self.links]
 
     def train_test_split(self, percent_test: float, resample_rate: int = RESAMPLE_RATE_DEFAULT):
         train, test = self.split(percent_test)
@@ -122,7 +125,8 @@ class TraceDataset:
         }
         return TraceDataset(slice_links, slice_pos_link_ids, slice_neg_link_ids)
 
-    def _get_feature_entry(self, link: TraceLink, arch_type: ArchitectureType) -> Dict[str, any]:
+    def _get_feature_entry(self, link: TraceLink, arch_type: ArchitectureType, feature_func: Callable) -> Dict[
+        str, any]:
         """
         Gets a representational dictionary of the feature to be used in the dataset
         :param link: link to extract features from
@@ -130,10 +134,10 @@ class TraceDataset:
         :return: feature name, value mappings
         """
         if arch_type == ArchitectureType.SIAMESE:
-            entry = {**self._extract_feature_info(link.source.get_feature(), DataKey.SOURCE_PRE + "_"),
-                     **self._extract_feature_info(link.target.get_feature(), DataKey.TARGET_PRE + "_")}
+            entry = {**self._extract_feature_info(link.source.get_feature(feature_func), DataKey.SOURCE_PRE + "_"),
+                     **self._extract_feature_info(link.target.get_feature(feature_func), DataKey.TARGET_PRE + "_")}
         else:
-            entry = self._extract_feature_info(link.get_feature())
+            entry = self._extract_feature_info(link.get_feature(feature_func))
         entry[DataKey.LABEL_KEY] = int(link.is_true_link)
         return entry
 

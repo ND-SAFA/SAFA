@@ -24,17 +24,15 @@ class TraceLink:
         self.__feature_func = feature_func  # delay execution in case not needed
         self.__feature = None
 
-    def get_feature(self) -> Dict:
+    def get_feature(self, feature_func: Callable) -> Dict:
         """
          Calls the feature function to get the link feature
          :return: a dictionary of features
          """
-        if self.__feature is None:
-            self.__feature = self.__feature_func(text=self.source.token,
-                                                 text_pair=self.target.token,
-                                                 return_token_type_ids=True,
-                                                 add_special_tokens=True)
-        return self.__feature
+        return feature_func(text=self.source.token,
+                            text_pair=self.target.token,
+                            return_token_type_ids=True,
+                            add_special_tokens=True)
 
     def get_source_target_ids(self) -> Tuple[str, str]:
         """

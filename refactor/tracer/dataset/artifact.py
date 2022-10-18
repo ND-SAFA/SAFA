@@ -19,14 +19,12 @@ class Artifact:
         self.__feature = None
         self.embedding = None  # TODO: When is this used?
 
-    def get_feature(self) -> Dict:
+    def get_feature(self, feature_func: Callable) -> Dict:
         """
         Calls the feature function to get the artifact feature
         :return: feature name, value mappings
         """
-        if self.__feature is None:
-            self.__feature = self.__feature_func(text=self.token)
-        return self.__feature
+        return feature_func(text=self.token)
 
     def __hash__(self):
         return hash(self.id)

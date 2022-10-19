@@ -23,7 +23,7 @@ class MRRMetric(AbstractTraceMetric):
     metric_name = "mrr"
 
     # TODO
-    def _perform_compute(self, predictions, labels, **kwargs) -> float:
+    def _compute(self, predictions, labels, **kwargs) -> float:
         """
         Computes the Mean Reciprocal Rank or how far down the ranking the first relevant link is
         :param predictions: predicted labels

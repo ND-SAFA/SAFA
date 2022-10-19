@@ -3,10 +3,13 @@ from enum import Enum
 from typing import Type
 
 from datasets import list_metrics
+from tensorflow.python.tpu import datasets
 
 from tracer.metrics import MRRMetric, PrecisionAtKMetric
 from tracer.metrics.abstract_trace_metric import AbstractTraceMetric
 from tracer.metrics.map_at_k_metric import MapAtKMetric
+
+metric_suffix = "Metric"
 
 
 class SupportedTraceMetric(Enum):
@@ -30,6 +33,16 @@ def get_metric_path(metric_name: str) -> str:
         else:
             raise NameError("Metric %s is unknown" % metric_name)
     return path
+
+
+def get_metric_name(metric_class: datasets.Metric) -> str:
+    """
+    Gets the metric name from its class
+    :param metric_class: the class of the metric
+    :return: the name
+    """
+    name = metric_class.__class__.__name__
+    return name.split(metric_suffix)[0]
 
 
 def _get_metric_path_from_class(trace_metric_class: Type[AbstractTraceMetric]) -> str:

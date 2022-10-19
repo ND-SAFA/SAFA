@@ -25,7 +25,7 @@ class PrecisionAtKMetric(AbstractTraceMetric):
     metric_name = "precision_at_k"
 
     # TODO
-    def _perform_compute(self, predictions, labels, k=K_METRIC_DEFAULT, **kwargs) -> float:
+    def _compute(self, predictions, labels, k=K_METRIC_DEFAULT, **kwargs) -> float:
         """
         Computes the Precision@K or the percentage of links that were correctly predicted
         :param predictions: predicted labels

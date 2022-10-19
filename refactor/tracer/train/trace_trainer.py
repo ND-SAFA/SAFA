@@ -1,7 +1,7 @@
 from typing import Dict, List, NamedTuple, Tuple, Union
 
 import numpy as np
-from api.responses import PredictionResponse
+from api.responses.prediction_response import PredictionResponse
 from datasets import load_metric
 from jobs.trace_args import TraceArgs
 from scipy.special import softmax
@@ -10,10 +10,9 @@ from torch.utils.data.distributed import DistributedSampler
 from torch.utils.data.sampler import RandomSampler
 from transformers.trainer import Trainer
 from transformers.trainer_pt_utils import get_tpu_sampler, is_torch_tpu_available
-from transformers.trainer_utils import PredictionOutput
 
-from tracer.dataset import TraceDataset
-from tracer.metrics import get_metric_path
+from tracer.dataset.trace_dataset import TraceDataset
+from tracer.metrics.supported_trace_metric import get_metric_path, get_metric_name
 
 
 class TraceTrainer(Trainer):
@@ -55,8 +54,10 @@ class TraceTrainer(Trainer):
         """
         self.eval_dataset = eval_dataset
         output = self.predict(self.eval_dataset)
+        output.predictions = TraceTrainer.get_similarity_scores(output.predictions)
         if self.args.metrics:
-            self._eval(output, self.args.metrics)
+            results = self._eval(output.predictions, output.label_ids, self.args.metrics)
+            output.metrics.update(results)
         output_dict = TraceTrainer.output_to_dict(output)
         return PredictionResponse.from_output(output_dict, eval_dataset.source_target_pairs)
 
@@ -70,18 +71,20 @@ class TraceTrainer(Trainer):
         return {field: getattr(output, field) for field in output._fields}
 
     @staticmethod
-    def _eval(output: PredictionOutput, metric_names: List):
+    def _eval(preds: Union[np.ndarray, Tuple[np.ndarray]], label_ids: np.ndarray, metric_names: List) -> Dict:
         """
         Performs the evaluation of the model (use this instead of Trainer.evaluation to utilize predefined metrics from models)
         :param output: the output from predictions
         :param metric_names: name of metrics desired for evaluation
+        :return: a dictionary of metric_name to result
         """
-        preds = TraceTrainer.get_similarity_scores(output.predictions)
         metric_paths = [get_metric_path(name) for name in metric_names]
+        results = {}
         for metric_path in metric_paths:
             metric = load_metric(metric_path, keep_in_memory=True)
-            results = metric.compute(predictions=preds, references=output.label_ids)
-            output.metrics.update(results)
+            metric_result = metric.compute(predictions=preds, references=label_ids)
+            results[get_metric_name(metric)] = metric_result
+        return results
 
     def get_train_dataloader(self) -> DataLoader:
         """

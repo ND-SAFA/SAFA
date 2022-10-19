@@ -27,7 +27,7 @@ class MapAtKMetric(AbstractTraceMetric):
     metric_name = "map_at_k"
 
     # TODO
-    def _perform_compute(self, predictions, labels, k=K_METRIC_DEFAULT, **kwargs) -> float:
+    def _compute(self, predictions, labels, k=K_METRIC_DEFAULT, **kwargs) -> float:
         """
         computes the Mean Average Precision@K or the average precision over k for recommendations shown for different links
          and averages them over all queries in the dataset.

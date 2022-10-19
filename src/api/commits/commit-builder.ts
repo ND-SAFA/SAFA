@@ -21,6 +21,14 @@ export class CommitBuilder {
   }
 
   /**
+   * Hides errors from the commit.
+   */
+  hideErrors(): this {
+    this.commit.failOnError = false;
+    return this;
+  }
+
+  /**
    * Adds a new artifact to this commit.
    *
    * @param artifact - The artifact to create.
@@ -77,6 +85,16 @@ export class CommitBuilder {
    */
   withModifiedTraceLink(traceLink: TraceLinkModel): this {
     this.commit.traces.modified.push(traceLink);
+    return this;
+  }
+
+  /**
+   * Adds modified trace links to this commit.
+   *
+   * @param traceLinks - The links to modify.
+   */
+  withModifiedTraceLinks(traceLinks: TraceLinkModel[]): this {
+    this.commit.traces.modified.push(...traceLinks);
     return this;
   }
 

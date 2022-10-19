@@ -1,1 +1,1 @@
-export const GENERATED_TRACE_MAX_WIDTH = 5;
+export const GENERATED_TRACE_MAX_WIDTH = 4;

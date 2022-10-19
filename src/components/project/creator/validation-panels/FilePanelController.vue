@@ -7,6 +7,7 @@
     :errors="errors"
     :entity-names="entityNames"
     :entities-are-fab="!isTracePanel"
+    :is-loading="isLoading"
     v-bind:ignore-errors-flag.sync="ignoreErrors"
   >
     <template v-slot:title>
@@ -18,15 +19,21 @@
         v-model="isGeneratedToggle"
         label="Generate Trace Links"
       />
+      <gen-method-input v-if="isGeneratedToggle" v-model="method" />
     </template>
   </file-panel>
 </template>
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { ArtifactMap, IGenericFilePanel, ValidFileTypes } from "@/types";
+import {
+  ArtifactMap,
+  IGenericFilePanel,
+  ModelType,
+  ValidFileTypes,
+} from "@/types";
 import { isTracePanel } from "@/util";
-import { GenericSwitch, Typography } from "@/components/common";
+import { GenericSwitch, GenMethodInput, Typography } from "@/components/common";
 import FilePanel from "./FilePanel.vue";
 
 /**
@@ -38,6 +45,7 @@ import FilePanel from "./FilePanel.vue";
 export default Vue.extend({
   name: "FilePanelController",
   components: {
+    GenMethodInput,
     GenericSwitch,
     FilePanel,
     Typography,
@@ -54,6 +62,7 @@ export default Vue.extend({
   },
   data() {
     return {
+      isLoading: false,
       ignoreErrors: false,
       isGeneratedToggle: false,
     };
@@ -89,6 +98,20 @@ export default Vue.extend({
     entityNames(): string[] {
       return this.panel.entityNames;
     },
+    method: {
+      get(): ModelType {
+        if (isTracePanel(this.panel)) {
+          return this.panel.projectFile.method;
+        } else {
+          return ModelType.NLBert;
+        }
+      },
+      set(newMethod: ModelType): void {
+        if (isTracePanel(this.panel)) {
+          this.panel.projectFile.method = newMethod;
+        }
+      },
+    },
   },
   methods: {
     /**
@@ -99,7 +122,9 @@ export default Vue.extend({
       if (file === undefined) {
         this.panel.clearPanel();
       } else {
+        this.isLoading = true;
         await this.panel.parseFile(this.artifactMap, file);
+        this.isLoading = false;
       }
     },
     /**
@@ -115,16 +140,11 @@ export default Vue.extend({
     /**
      * Generates trace files when generate is toggled on.
      */
-    async isGeneratedToggle(isGenerated: boolean) {
+    isGeneratedToggle(isGenerated: boolean) {
       if (!isTracePanel(this.panel)) return;
 
       this.panel.projectFile.isGenerated = isGenerated;
-
-      if (isGenerated) {
-        await this.panel.generateTraceLinks(this.artifactMap);
-      } else {
-        this.panel.clearPanel();
-      }
+      this.panel.clearPanel();
     },
   },
 });

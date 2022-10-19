@@ -40,14 +40,26 @@ export type ArtifactMap = Record<string, ArtifactModel>;
 /**
  * Defines a panel for parsing trace link files.
  */
-export interface TracePanel extends IGenericFilePanel<ArtifactMap, TraceFile> {
-  generateTraceLinks(artifactMap: ArtifactMap): Promise<void>;
-}
+export type TracePanel = IGenericFilePanel<ArtifactMap, TraceFile>;
+
+/**
+ * Defines a set of panels for parsing trace link files.
+ */
+export type TraceUploader = IGenericUploader<ArtifactMap, LinkModel, TraceFile>;
 
 /**
  * Defines a panel for parsing artifact files.
  */
 export type ArtifactPanel = IGenericFilePanel<ArtifactMap, ArtifactFile>;
+
+/**
+ * Defines a set of panels for parsing artifact files.
+ */
+export type ArtifactUploader = IGenericUploader<
+  ArtifactMap,
+  string,
+  ArtifactFile
+>;
 
 export enum CreatorTypes {
   standard = "standard",

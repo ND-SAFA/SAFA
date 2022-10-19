@@ -85,6 +85,7 @@ export const useArtifacts = defineStore("artifacts", {
       layoutStore.setArtifactToSavedPosition(artifact.id);
       this.addOrUpdateArtifacts([artifact]);
       selectionStore.selectArtifact(artifact.id);
+      typeOptionsStore.addTypesFromArtifacts([artifact]);
     },
     /**
      * Deletes the artifacts with the given names.

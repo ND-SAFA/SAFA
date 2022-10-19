@@ -1,16 +1,16 @@
 import {
-  GitHubCredentialsModel,
-  InternalGitHubCredentialsModel,
+  CreateProjectByJsonModel,
   IOHandlerCallback,
   ProjectModel,
 } from "@/types";
-import { appStore, logStore } from "@/hooks";
+import { appStore, logStore, projectStore } from "@/hooks";
 import { navigateTo, Routes } from "@/router";
 import {
   createGitHubProject,
   createJiraProject,
   createProjectCreationJob,
   handleJobSubmission,
+  handleLoadVersion,
   handleUploadProjectVersion,
   saveProject,
 } from "@/api";
@@ -18,25 +18,27 @@ import {
 /**
  * Creates a new project, sets related app state, and logs the status.
  *
- * @param project - The project to create.
+ * @param projectCreationRequest - The project to create and requests to generate trace links.
  * @param onSuccess - Called if the action is successful.
  * @param onError - Called if the action fails.
  */
 export function handleImportProject(
-  project: ProjectModel,
+  projectCreationRequest: CreateProjectByJsonModel,
   { onSuccess, onError }: IOHandlerCallback
 ): void {
+  const name = projectCreationRequest.project.name;
+
   appStore.onLoadStart();
 
-  createProjectCreationJob(project)
+  createProjectCreationJob(projectCreationRequest)
     .then(async (job) => {
       await handleJobSubmission(job);
       await navigateTo(Routes.UPLOAD_STATUS);
-      logStore.onSuccess(`Project is being created: ${project.name}`);
+      logStore.onSuccess(`Project is being created: ${name}`);
       onSuccess?.();
     })
     .catch((e) => {
-      logStore.onError(`Unable to import project: ${project.name}`);
+      logStore.onError(`Unable to import project: ${name}`);
       logStore.onDevError(e);
       onError?.(e);
     })
@@ -62,14 +64,20 @@ export function handleBulkImportProject(
   appStore.onLoadStart();
 
   saveProject(project)
-    .then(async (project) =>
-      handleUploadProjectVersion(
-        project.projectId,
-        project.projectVersion?.versionId || "",
-        files,
-        true
-      )
-    )
+    .then(async (project) => {
+      if (files.length === 0) {
+        logStore.onSuccess(`Project has been created: ${project.name}`);
+        projectStore.addProject(project);
+        await handleLoadVersion(project.projectVersion?.versionId || "");
+      } else {
+        await handleUploadProjectVersion(
+          project.projectId,
+          project.projectVersion?.versionId || "",
+          files,
+          true
+        );
+      }
+    })
     .then(onSuccess)
     .catch(onError)
     .finally(() => appStore.onLoadEnd());

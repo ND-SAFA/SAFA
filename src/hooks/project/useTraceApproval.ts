@@ -1,6 +1,11 @@
 import { defineStore } from "pinia";
 
-import { FlatTraceLink, GeneratedLinksModel, TraceLinkModel } from "@/types";
+import {
+  ApprovalType,
+  FlatTraceLink,
+  GeneratedLinksModel,
+  TraceLinkModel,
+} from "@/types";
 import { pinia } from "@/plugins";
 
 /**
@@ -25,7 +30,16 @@ export const useTraceApproval = defineStore("traceApproval", {
      */
     declinedIds: [] as string[],
   }),
-  getters: {},
+  getters: {
+    /**
+     * @return All unreviewed links.
+     */
+    unreviewedLinks(): FlatTraceLink[] {
+      return this.traceLinks.filter(
+        ({ approvalStatus }) => approvalStatus === ApprovalType.UNREVIEWED
+      );
+    },
+  },
   actions: {
     /**
      * Initializes the state of generated traces.
@@ -33,10 +47,8 @@ export const useTraceApproval = defineStore("traceApproval", {
      * @param generated - The generated links and their states.
      */
     initializeTraces(generated: GeneratedLinksModel) {
-      this.$patch({
-        ...generated,
-        selectedLinks: [],
-      });
+      this.selectedLinks = [];
+      this.$patch(generated);
     },
     /**
      * Selects all links that meet the filter predicate.

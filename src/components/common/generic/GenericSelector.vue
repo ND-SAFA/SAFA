@@ -1,19 +1,21 @@
 <template>
   <v-data-table
-    v-model="selected"
-    :headers="headers"
-    :item-key="itemKey"
-    :items="items"
-    :items-per-page="5"
-    :loading="isLoading"
-    :no-data-text="noDataText"
-    :search="search"
     :show-select="hasSelect"
-    checkbox-color="primary"
     dense
     single-select
+    v-model="selected"
+    checkbox-color="primary"
+    :headers="headers"
+    :items="items"
+    :items-per-page="5"
+    :item-key="itemKey"
+    :loading="isLoading"
+    :search="search"
+    :no-data-text="noDataText"
+    :show-expand="showExpand"
     @item-selected="$emit('item:select', $event, true)"
   >
+    <slot />
     <template v-slot:top>
       <slot name="deleteItemDialogue" />
       <slot name="editItemDialogue" />
@@ -21,36 +23,37 @@
       <flex-box v-if="!minimal" align="center" justify="space-between" y="2">
         <v-text-field
           v-model="search"
-          class="mr-1"
-          data-cy="input-selector-search"
-          dense
-          hide-details
           label="Search"
           outlined
+          dense
+          hide-details
+          class="mr-1"
           prepend-inner-icon="mdi-magnify"
+          data-cy="input-selector-search"
         />
         <generic-icon-button
-          data-cy="button-selector-reload"
-          icon-id="mdi-refresh"
           tooltip="Refresh"
+          icon-id="mdi-refresh"
+          data-cy="button-selector-reload"
           @click="$emit('refresh')"
         />
       </flex-box>
     </template>
     <template v-slot:[`item.actions`]="{ item }">
       <flex-box>
+        <slot name="item.actions" :item="item" />
         <generic-icon-button
           v-if="hasEdit"
-          data-cy="button-selector-edit"
           icon-id="mdi-pencil"
           tooltip="Edit"
+          data-cy="button-selector-edit"
           @click="$emit('item:edit', item)"
         />
         <generic-icon-button
           v-if="isDeleteEnabled(item)"
-          data-cy="button-selector-delete"
           icon-id="mdi-delete"
           tooltip="Delete"
+          data-cy="button-selector-delete"
           @click="$emit('item:delete', item)"
         />
       </flex-box>
@@ -58,23 +61,28 @@
     <template v-slot:[`footer.prepend`]>
       <div class="py-3">
         <generic-icon-button
-          v-if="!minimal"
+          v-if="!minimal && hasAdd"
           fab
           color="primary"
-          data-cy="button-selector-add"
           icon-id="mdi-plus"
           tooltip="Create"
+          data-cy="button-selector-add"
           @click="$emit('item:add')"
         />
       </div>
+    </template>
+    <template v-slot:expanded-item="{ headers, item }">
+      <td :colspan="headers.length">
+        <slot name="expanded-item" :item="item" />
+      </td>
     </template>
   </v-data-table>
 </template>
 
 <script lang="ts">
-import FlexBox from "@/components/common/display/FlexBox.vue";
 import Vue, { PropType } from "vue";
 import { DataItemProps, DataTableHeader } from "vuetify";
+import FlexBox from "@/components/common/display/FlexBox.vue";
 import GenericIconButton from "./GenericIconButton.vue";
 
 /**
@@ -112,6 +120,11 @@ export default Vue.extend({
       required: false,
       default: false,
     },
+    hasAdd: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
     hasEdit: {
       type: Boolean,
       required: false,
@@ -141,6 +154,10 @@ export default Vue.extend({
       required: true,
     },
     minimal: {
+      type: Boolean,
+      default: false,
+    },
+    showExpand: {
       type: Boolean,
       default: false,
     },

@@ -1,7 +1,11 @@
-import { ApprovalType, TraceLinkModel, ArtifactModel } from "@/types";
+import {
+  ApprovalType,
+  JobModel,
+  TraceLinkModel,
+  TrainOrGenerateLinksModel,
+} from "@/types";
 import { CommitBuilder } from "@/api";
-import { Endpoint, fillEndpoint, authHttpClient } from "@/api/util";
-import { GenerateLinksModel } from "@/types/api/link-api";
+import { authHttpClient, Endpoint, fillEndpoint } from "@/api/util";
 
 /**
  * Returns all generated links for this project.
@@ -22,13 +26,30 @@ export async function getGeneratedLinks(
  * Generates links between source and target artifacts.
  *
  * @param config - Generated link configuration.
- * @return All generated links.
+ * @return The created job.
  */
 export async function createGeneratedLinks(
-  config: GenerateLinksModel
-): Promise<TraceLinkModel[]> {
-  return authHttpClient<TraceLinkModel[]>(
-    fillEndpoint(Endpoint.generateLinks),
+  config: TrainOrGenerateLinksModel
+): Promise<JobModel> {
+  return authHttpClient<JobModel>(fillEndpoint(Endpoint.generateLinksJob), {
+    method: "POST",
+    body: JSON.stringify(config),
+  });
+}
+
+/**
+ * Trains a model between source and target artifacts.
+ *
+ * @param projectId - The project to train for.
+ * @param config - Model training configuration.
+ * @return The created job.
+ */
+export async function createModelTraining(
+  projectId: string,
+  config: TrainOrGenerateLinksModel
+): Promise<JobModel> {
+  return authHttpClient<JobModel>(
+    fillEndpoint(Endpoint.trainModelJob, { projectId }),
     {
       method: "POST",
       body: JSON.stringify(config),
@@ -66,6 +87,23 @@ export async function updateDeclinedLink(
 
   return CommitBuilder.withCurrentVersion()
     .withModifiedTraceLink(traceLink)
+    .save()
+    .then(async ({ traces }) => traces.removed);
+}
+
+/**
+ * Declines all given links.
+ *
+ * @param traceLinks - The trace links to decline.
+ * @return The removed trace links.
+ */
+export async function updateDeclinedLinks(
+  traceLinks: TraceLinkModel[]
+): Promise<TraceLinkModel[]> {
+  traceLinks.map((link) => (link.approvalStatus = ApprovalType.DECLINED));
+
+  return CommitBuilder.withCurrentVersion()
+    .withModifiedTraceLinks(traceLinks)
     .save()
     .then(async ({ traces }) => traces.removed);
 }
@@ -114,6 +152,7 @@ export async function saveGeneratedLinks(
   traceLinks: TraceLinkModel[]
 ): Promise<TraceLinkModel[]> {
   return CommitBuilder.withCurrentVersion()
+    .hideErrors()
     .withNewTraceLinks(traceLinks)
     .save()
     .then(async ({ traces }) => traces.added);

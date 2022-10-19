@@ -1,4 +1,4 @@
-import { ArtifactModel, ConfirmationType, IOHandlerCallback } from "@/types";
+import { ArtifactModel, IOHandlerCallback } from "@/types";
 import { artifactStore, logStore, projectStore } from "@/hooks";
 import {
   createArtifact,
@@ -16,12 +16,13 @@ import {
  * @param parentArtifact - The parent artifact to link to.
  * @param onSuccess - Called if the save is successful.
  * @param onError - Called if the save fails.
+ * @param onComplete - Called after the action.
  */
 export async function handleSaveArtifact(
   artifact: ArtifactModel,
   isUpdate: boolean,
   parentArtifact: ArtifactModel | undefined,
-  { onSuccess, onError }: IOHandlerCallback
+  { onSuccess, onError, onComplete }: IOHandlerCallback
 ): Promise<void> {
   try {
     const versionId = projectStore.versionIdWithLog;
@@ -50,6 +51,8 @@ export async function handleSaveArtifact(
     logStore.onDevError(String(e));
     logStore.onError(`Unable to create artifact: ${artifact.name}`);
     onError?.(e as Error);
+  } finally {
+    onComplete?.();
   }
 }
 
@@ -57,12 +60,11 @@ export async function handleSaveArtifact(
  * Duplicates an artifact, and updates the app state.
  *
  * @param artifact  - The artifact to duplicate.
- * @param onSuccess - Called if the duplicate is successful.
- * @param onError - Called if the duplicate fails.
+ * @param cb - Callbacks for this action.
  */
 export function handleDuplicateArtifact(
   artifact: ArtifactModel,
-  { onSuccess, onError }: IOHandlerCallback
+  cb: IOHandlerCallback
 ): Promise<void> {
   return handleSaveArtifact(
     {
@@ -73,7 +75,7 @@ export function handleDuplicateArtifact(
     },
     false,
     undefined,
-    { onSuccess, onError }
+    cb
   );
 }
 
@@ -83,30 +85,29 @@ export function handleDuplicateArtifact(
  * @param artifact  - The artifact to delete.
  * @param onSuccess - Called if the delete is successful.
  * @param onError - Called if the delete fails.
+ * @param onComplete - Called after the action.
  */
 export function handleDeleteArtifact(
   artifact: ArtifactModel,
-  { onSuccess, onError }: IOHandlerCallback
+  { onSuccess, onError, onComplete }: IOHandlerCallback
 ): void {
-  logStore.$patch({
-    confirmation: {
-      type: ConfirmationType.INFO,
-      title: `Delete ${artifact.name}?`,
-      body: `Are you sure you would like to delete this artifact?`,
-      statusCallback: (isConfirmed: boolean) => {
-        if (!isConfirmed) return;
+  logStore.confirm(
+    "Delete Artifact",
+    `Are you sure you would like to delete "${artifact.name}"?`,
+    async (isConfirmed: boolean) => {
+      if (!isConfirmed) return;
 
-        deleteArtifact(artifact)
-          .then(() => {
-            artifactStore.deleteArtifacts([artifact]);
-            logStore.onSuccess(`Deleted artifact: ${artifact.name}`);
-            onSuccess?.();
-          })
-          .catch((e) => {
-            logStore.onError(`Unable to delete artifact: ${artifact.name}`);
-            onError?.(e);
-          });
-      },
-    },
-  });
+      deleteArtifact(artifact)
+        .then(() => {
+          artifactStore.deleteArtifacts([artifact]);
+          logStore.onSuccess(`Deleted artifact: ${artifact.name}`);
+          onSuccess?.();
+        })
+        .catch((e) => {
+          logStore.onError(`Unable to delete artifact: ${artifact.name}`);
+          onError?.(e);
+        })
+        .finally(onComplete);
+    }
+  );
 }

@@ -17,6 +17,10 @@ export interface Commit {
    * The changes occurring to project traces.
    */
   traces: EntityCommit<TraceLinkModel>;
+  /**
+   * If false, errors will be silent.
+   */
+  failOnError?: boolean;
 }
 
 /**

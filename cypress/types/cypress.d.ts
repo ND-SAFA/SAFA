@@ -112,6 +112,13 @@ declare namespace Cypress {
     clickButtonWithName(name: string): Chainable<void>;
 
     /**
+     * Clicks option with given name in first select menu found.
+     * @param dataCy - The select input to open.
+     * @param optionName - Name of option to click.
+     */
+    clickSelectOption(dataCy: string, optionName: string): Chainable<void>;
+
+    /**
      * Clicks option with given name in first menu found.
      * @param optionName - Name of option to click.
      */
@@ -343,6 +350,42 @@ declare namespace Cypress {
      * @param waitForNodes - If true, this will wait for nodes to be painted on the graph.
      */
     loadCurrentProject(waitForNodes?: boolean): Chainable<void>;
+
+    /**
+     * Switches to table view.
+     */
+    switchToTableView(): Chainable<void>;
+
+    /**
+     * Looks up the first element in the artifact table view by node name.
+     */
+    artifactTableFirstElementLookUp(): Chainable<void>;
+
+    /**
+     * Sorts the artifact table by the given sort type.
+     *
+     * @param sortType - The type of sort to use.
+     */
+    artifactTableChangeSort(sortType: string): Chainable<void>;
+
+    /**
+     * Adds a new artifact to the table view.
+     *
+     * @param name - The name of the artifact to add.
+     * @param type - The type of the artifact to add.
+     * @param docType - The document type of the artifact to add.
+     * @param parentArtifact - The parent type of the artifact to add.
+     * @param body - The body of the artifact to add.
+     * @param summary - The summary of the artifact to add.
+     */
+    addTableArtifact(
+      name: string,
+      type: string,
+      docType: string,
+      parentArtifact: string,
+      body: string,
+      summary: string
+    ): Chainable<void>;
 
     /**
      * Centers the graph.

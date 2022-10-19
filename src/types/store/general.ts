@@ -27,11 +27,16 @@ export enum PanelType {
 /**
  * Represents the open state of the artifact creator.
  */
-export type PanelOpenState =
+export type CreatorOpenState =
   | boolean
   | SafetyCaseType
   | FTANodeType
   | DocumentType;
+
+/**
+ * Represents the open state of the trace link generator.
+ */
+export type GeneratorOpenState = boolean | "generate" | "train";
 
 /**
  * Represents the states of all openable panels.
@@ -39,12 +44,12 @@ export type PanelOpenState =
 export interface PanelStateMap {
   [PanelType.left]: boolean;
   [PanelType.right]: boolean;
-  [PanelType.artifactCreator]: PanelOpenState;
+  [PanelType.artifactCreator]: CreatorOpenState;
   [PanelType.errorDisplay]: boolean;
   [PanelType.artifactBody]: boolean;
   [PanelType.traceLinkCreator]: boolean;
   [PanelType.traceLinkDraw]: boolean;
-  [PanelType.traceLinkGenerator]: boolean;
+  [PanelType.traceLinkGenerator]: GeneratorOpenState;
 }
 
 /**

@@ -4,3 +4,5 @@ export { default as Typography } from "./Typography.vue";
 export { default as FlexBox } from "./FlexBox.vue";
 export { default as ToggleList } from "./ToggleList.vue";
 export { default as AttributeChip } from "./AttributeChip.vue";
+export { default as FileFormatAlert } from "./FileFormatAlert.vue";
+export { default as UnderConstructionAlert } from "./UnderConstructionAlert.vue";

@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <flex-box justify="center" v-if="isDisabled">
+    <flex-box justify="center" v-if="showWIP">
       <v-alert type="info">
         <typography
           color="white"
@@ -28,8 +28,6 @@
 import Vue from "vue";
 import { FlexBox } from "@/components/common/display";
 import Typography from "@/components/common/display/Typography.vue";
-
-const DISABLED = true;
 
 /**
  * Displays an authentication stepper step.
@@ -66,11 +64,14 @@ export default Vue.extend({
     },
   },
   computed: {
+    showWIP(): boolean {
+      return false;
+    },
     /**
      * Returns whether the button is enabled.
      */
     isDisabled(): boolean {
-      return this.hasCredentials || this.isLoading || DISABLED;
+      return this.hasCredentials || this.isLoading || this.showWIP;
     },
   },
 });

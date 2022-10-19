@@ -119,6 +119,12 @@ export default Vue.extend({
   },
   watch: {
     /**
+     * Loads generated links when the route changes.
+     */
+    $route() {
+      handleGetGeneratedLinks({});
+    },
+    /**
      * Loads generated links when the version changes.
      */
     versionId(newVersionId: string) {

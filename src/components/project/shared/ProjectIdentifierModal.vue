@@ -1,38 +1,34 @@
 <template>
   <generic-modal
     :is-open="isOpen"
-    :title="title"
+    :title="modelTitle"
     size="m"
-    :actions-height="isUploadOpen ? 0 : 50"
     :is-loading="isLoading"
     data-cy="modal-project-edit"
+    :actions-height="doShowUpload ? 0 : 50"
     @close="handleClose"
   >
     <template v-slot:body>
+      <project-files-uploader
+        v-if="doShowUpload"
+        data-cy-name="input-project-name-modal"
+        data-cy-description="input-project-description-modal"
+        @submit="handleClose"
+      />
       <project-identifier-input
+        v-else
         v-bind:name.sync="identifier.name"
         v-bind:description.sync="identifier.description"
         data-cy-name="input-project-name-modal"
         data-cy-description="input-project-description-modal"
       />
-      <v-switch
-        style="margin-left: 80px"
-        v-if="doShowUpload"
-        v-model="isUploadOpen"
-        label="Upload Flat Files"
-      />
-      <project-files-input
-        v-if="doShowUpload && isUploadOpen"
-        v-bind:name.sync="identifier.name"
-        v-bind:description.sync="identifier.description"
-      />
     </template>
-    <template v-slot:actions v-if="!isUploadOpen">
+    <template v-slot:actions v-if="!doShowUpload">
       <v-btn
         @click="handleSave"
         color="primary"
         class="ml-auto"
-        :disabled="isDisabled"
+        :disabled="!canSave"
         data-cy="button-project-save"
       >
         Save
@@ -42,37 +38,29 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import Vue from "vue";
 import { IdentifierModel } from "@/types";
-import { createProjectIdentifier } from "@/util";
+import { identifierSaveStore } from "@/hooks";
 import { GenericModal } from "@/components/common";
-import ProjectFilesInput from "./ProjectFilesInput.vue";
+import ProjectFilesUploader from "./ProjectFilesUploader.vue";
 import ProjectIdentifierInput from "./ProjectIdentifierInput.vue";
 
 /**
- * A modal for renaming a project.
+ * A modal for creating or editing a project.
  *
  * @emits-1 `close` - On close.
- * @emits-2 `save` (ProjectIdentifier) - On project save.
+ * @emits-2 `save` - On project save.
  */
 export default Vue.extend({
   name: "ProjectIdentifierModal",
   components: {
     GenericModal,
+    ProjectFilesUploader,
     ProjectIdentifierInput,
-    ProjectFilesInput,
   },
   props: {
     isOpen: {
       type: Boolean,
-      required: true,
-    },
-    project: {
-      type: Object as PropType<IdentifierModel>,
-      required: false,
-    },
-    title: {
-      type: String,
       required: true,
     },
     isLoading: {
@@ -80,34 +68,34 @@ export default Vue.extend({
       required: false,
       default: false,
     },
-    doShowUpload: Boolean,
   },
-  data() {
-    return {
-      identifier: createProjectIdentifier(this.project),
-      isUploadOpen: false,
-      isDisabled: true,
-    };
-  },
-  watch: {
+  computed: {
     /**
-     * Resets identifier data when opened.
+     * @return  The identifier being updated.
      */
-    isOpen(open: boolean) {
-      if (!open) return;
-
-      this.identifier = createProjectIdentifier(this.project);
+    identifier(): IdentifierModel {
+      return identifierSaveStore.editedIdentifier;
     },
     /**
-     * Verified fields when the identifier changes.
+     * @return Whether an existing identifier is being updated.
      */
-    identifier: {
-      deep: true,
-      handler() {
-        this.isDisabled =
-          this.identifier.name.length === 0 ||
-          (this.doShowUpload && this.isUploadOpen);
-      },
+    isUpdate(): boolean {
+      return identifierSaveStore.isUpdate;
+    },
+    modelTitle(): string {
+      return this.isUpdate ? "Edit Project" : "Create Project";
+    },
+    /**
+     * @return Whether to show the file upload.
+     */
+    doShowUpload(): boolean {
+      return !this.isUpdate;
+    },
+    /**
+     * @return Whether the identifier can be saved.
+     */
+    canSave(): boolean {
+      return identifierSaveStore.canSave;
     },
   },
   methods: {
@@ -121,7 +109,17 @@ export default Vue.extend({
      * Emits a request to save a project.
      */
     handleSave() {
-      this.$emit("save", this.identifier);
+      this.$emit("save");
+    },
+  },
+  watch: {
+    /**
+     * Resets identifier data when opened.
+     */
+    isOpen(open: boolean) {
+      if (!open) return;
+
+      identifierSaveStore.resetIdentifier();
     },
   },
 });

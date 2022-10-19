@@ -8,28 +8,28 @@
     <template v-slot:items>
       <v-stepper-content step="1">
         <project-identifier-input
-          v-bind:name.sync="name"
-          v-bind:description.sync="description"
-          data-cy-name="input-project-name-standard"
           data-cy-description="input-project-description-standard"
+          data-cy-name="input-project-name-standard"
+          v-bind:description.sync="store.description"
+          v-bind:name.sync="store.name"
         />
       </v-stepper-content>
 
       <v-stepper-content step="2">
         <generic-uploader
-          item-name="artifact"
-          :uploader="artifactUploader"
           :artifact-map="artifactMap"
+          :uploader="artifactUploader"
+          item-name="artifact"
           @change="artifactUploader.panels = $event"
           @upload:valid="setStepIsValid(1, true)"
           @upload:invalid="setStepIsValid(1, false)"
         >
           <template v-slot:creator="{ isCreatorOpen, onAddFile, onClose }">
             <artifact-type-creator
-              :is-open="isCreatorOpen"
               :artifact-types="artifactTypes"
-              @submit="onAddFile"
+              :is-open="isCreatorOpen"
               @close="onClose"
+              @submit="onAddFile"
             />
           </template>
         </generic-uploader>
@@ -37,21 +37,21 @@
 
       <v-stepper-content step="3">
         <generic-uploader
-          item-name="trace matrix"
-          :uploader="traceUploader"
           :artifact-map="artifactMap"
           :default-valid-state="true"
+          :uploader="traceUploader"
+          item-name="trace matrix"
           @change="traceUploader.panels = $event"
           @upload:valid="setStepIsValid(2, true)"
           @upload:invalid="setStepIsValid(2, false)"
         >
           <template v-slot:creator="{ isCreatorOpen, onAddFile, onClose }">
             <trace-file-creator
+              :artifact-types="artifactTypes"
               :is-open="isCreatorOpen"
               :trace-files="traceFiles"
-              :artifact-types="artifactTypes"
-              @submit="onAddFile"
               @close="onClose"
+              @submit="onAddFile"
             />
           </template>
         </generic-uploader>
@@ -60,8 +60,8 @@
       <v-stepper-content step="4">
         <tim-tree
           :artifact-panels="artifactUploader.panels"
-          :trace-panels="traceUploader.panels"
           :in-view="currentStep === 4"
+          :trace-panels="traceUploader.panels"
         />
       </v-stepper-content>
     </template>
@@ -70,22 +70,12 @@
 
 <script lang="ts">
 import Vue from "vue";
+import { ArtifactMap, StepState, TraceFile } from "@/types";
+import { projectSaveStore } from "@/hooks";
 import {
-  ArtifactModel,
-  ArtifactMap,
-  ProjectModel,
-  MembershipModel,
-  ProjectRole,
-  StepState,
-  TraceFile,
-  TraceLinkModel,
-} from "@/types";
-import { createProject } from "@/util";
-import { sessionStore } from "@/hooks";
-import {
-  handleImportProject,
   createArtifactUploader,
   createTraceUploader,
+  handleImportProject,
 } from "@/api";
 import { GenericStepper } from "@/components/common";
 import { ProjectIdentifierInput } from "@/components/project/shared";
@@ -115,12 +105,39 @@ export default Vue.extend({
       ] as StepState[],
       currentStep: 1,
 
-      name: "",
-      description: "",
-
       artifactUploader: createArtifactUploader(),
       traceUploader: createTraceUploader(),
     };
+  },
+  computed: {
+    /**
+     * @return The store for creating a project.
+     */
+    store(): typeof projectSaveStore {
+      return projectSaveStore;
+    },
+    /**
+     * @return A collection of all artifacts.
+     */
+    artifactMap(): ArtifactMap {
+      return this.artifactUploader.panels
+        .map(({ projectFile }) => projectFile.artifacts || [])
+        .reduce((acc, cur) => [...acc, ...cur], [])
+        .map((artifact) => ({ [artifact.name]: artifact }))
+        .reduce((acc, cur) => ({ ...acc, ...cur }), {});
+    },
+    /**
+     * @return All artifacts types.
+     */
+    artifactTypes(): string[] {
+      return this.artifactUploader.panels.map((p) => p.projectFile.type);
+    },
+    /**
+     * @return All trace files.
+     */
+    traceFiles(): TraceFile[] {
+      return this.traceUploader.panels.map((p) => p.projectFile);
+    },
   },
   methods: {
     /**
@@ -135,8 +152,7 @@ export default Vue.extend({
      * Clears stepper data.
      */
     clearData() {
-      this.name = "";
-      this.description = "";
+      projectSaveStore.resetProject();
       this.currentStep = 1;
       this.artifactUploader = createArtifactUploader();
       this.traceUploader = createTraceUploader();
@@ -145,64 +161,15 @@ export default Vue.extend({
      * Attempts to create a project.
      */
     saveProject(): void {
-      handleImportProject(this.project, { onSuccess: () => this.clearData() });
-    },
-  },
-  computed: {
-    /**
-     * @return All artifacts.
-     */
-    artifacts(): ArtifactModel[] {
-      return this.artifactUploader.panels
-        .map(({ projectFile }) => projectFile.artifacts || [])
-        .reduce((acc, cur) => [...acc, ...cur], []);
-    },
-    /**
-     * @return A collection of all artifacts.
-     */
-    artifactMap(): ArtifactMap {
-      return this.artifacts
-        .map((artifact) => ({ [artifact.name]: artifact }))
-        .reduce((acc, cur) => ({ ...acc, ...cur }), {});
-    },
-    /**
-     * @return All artifacts types.
-     */
-    artifactTypes(): string[] {
-      return this.artifactUploader.panels.map((p) => p.projectFile.type);
-    },
-    /**
-     * @return All trace links.
-     */
-    traces(): TraceLinkModel[] {
-      return this.traceUploader.panels
-        .map(({ projectFile }) => projectFile.traces || [])
-        .reduce((acc, cur) => [...acc, ...cur], []);
-    },
-    /**
-     * @return All trace files.
-     */
-    traceFiles(): TraceFile[] {
-      return this.traceUploader.panels.map((p) => p.projectFile);
-    },
-    /**
-     * @return The project to create.
-     */
-    project(): ProjectModel {
-      const user: MembershipModel = {
-        projectMembershipId: "",
-        email: sessionStore.userEmail,
-        role: ProjectRole.OWNER,
-      };
-
-      return createProject({
-        name: this.name,
-        description: this.description,
-        owner: user.email,
-        members: [user],
-        artifacts: this.artifacts,
-        traces: this.traces,
-      });
+      handleImportProject(
+        projectSaveStore.getCreationRequest(
+          this.artifactUploader,
+          this.traceUploader
+        ),
+        {
+          onSuccess: () => this.clearData(),
+        }
+      );
     },
   },
   watch: {
@@ -211,17 +178,23 @@ export default Vue.extend({
      */
     currentStep(stepNumber: number): void {
       if (stepNumber === 1) {
-        const hasName = this.name !== "";
+        const hasName = this.store.name !== "";
         Vue.set(this.steps, 0, [PROJECT_IDENTIFIER_STEP_NAME, hasName]);
       } else if (stepNumber === 2) {
-        Vue.set(this.steps, 0, [this.name, true]);
+        Vue.set(this.steps, 0, [this.store.name, true]);
       }
     },
     /**
      * When the name changes, update the project step to the new name.
      */
-    name(newName: string): void {
+    "store.name"(newName: string): void {
       Vue.set(this.steps, 0, [PROJECT_IDENTIFIER_STEP_NAME, newName !== ""]);
+    },
+    /**
+     * Opens the current tab when the route changes.
+     */
+    $route() {
+      this.clearData();
     },
   },
 });

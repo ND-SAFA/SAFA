@@ -1,8 +1,15 @@
 import { defineStore } from "pinia";
-import { MembershipModel, ProjectModel, VersionModel } from "@/types";
+import {
+  IdentifierModel,
+  MembershipModel,
+  ProjectModel,
+  TrainedModel,
+  VersionModel,
+} from "@/types";
 import { createProject, removeMatches } from "@/util";
 import { pinia } from "@/plugins";
-import selectionStore from "@/hooks/graph/useSelection";
+import sessionStore from "../core/useSession";
+import selectionStore from "../graph/useSelection";
 import logStore from "../core/useLog";
 import warningStore from "./useWarnings";
 import documentStore from "./useDocuments";
@@ -14,6 +21,10 @@ import typeOptionsStore from "./useTypeOptions";
  */
 export const useProject = defineStore("project", {
   state: () => ({
+    /**
+     * All projects available to the current user.
+     */
+    allProjects: [] as IdentifierModel[],
     /**
      * The currently loaded project.
      */
@@ -59,6 +70,30 @@ export const useProject = defineStore("project", {
       }
 
       return this.versionId;
+    },
+    /**
+     * @return The current project's models.
+     */
+    models(): TrainedModel[] {
+      return this.project.models;
+    },
+    /**
+     * @return A list of indexes for deletable projects.
+     */
+    deletableProjects(): number[] {
+      return this.allProjects
+        .map((project, projectIndex) =>
+          sessionStore.isAdmin(project) ? projectIndex : -1
+        )
+        .filter((idx) => idx !== -1);
+    },
+    /**
+     * @return All projects that arent currently loaded.
+     */
+    unloadedProjects(): IdentifierModel[] {
+      return this.allProjects.filter(
+        ({ projectId }) => projectId !== this.projectId
+      );
     },
   },
   actions: {
@@ -109,7 +144,7 @@ export const useProject = defineStore("project", {
       this.project = project;
 
       selectionStore.clearSelections();
-      typeOptionsStore.initializeTypeIcons(project.artifactTypes);
+      typeOptionsStore.initializeProject(project);
       documentStore.initializeProject(project);
       subtreeStore.initializeProject(project);
       warningStore.artifactWarnings = project.warnings;
@@ -125,6 +160,19 @@ export const useProject = defineStore("project", {
       } else {
         logStore.onWarning("Please select a project.");
       }
+    },
+    /**
+     * Adds or replaces a project in the project list.
+     *
+     * @param project - The project to add.
+     */
+    addProject(project: IdentifierModel): void {
+      this.allProjects = [
+        project,
+        ...this.allProjects.filter(
+          ({ projectId }) => projectId !== project.projectId
+        ),
+      ];
     },
   },
 });

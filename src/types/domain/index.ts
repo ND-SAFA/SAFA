@@ -8,3 +8,4 @@ export * from "./layout";
 export * from "./project";
 export * from "./links";
 export * from "./delta";
+export * from "./model";

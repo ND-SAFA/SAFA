@@ -68,6 +68,40 @@ export interface SvgStyle {
    * The height to draw.
    */
   height: number;
+  /**
+   * The color to render.
+   */
+  color?: string;
+  /**
+   * The class names to append.
+   */
+  class?: string;
+}
+
+/**
+ * Represents position styling for an SVG.
+ */
+export interface SvgNodeStyle {
+  /**
+   * The outer dimensions of the node.
+   */
+  outer: Pick<SvgStyle, "width" | "height">;
+  /**
+   * THe style of the inner content of the node.
+   */
+  inner: SvgStyle;
+  /**
+   * The top margin to to add to the node.
+   */
+  marginTop: number;
+  /**
+   * The maximum amount of body characters to render.
+   */
+  truncateLength: number;
+  /**
+   * The width of the node's body, if it is different than the inner style.
+   */
+  bodyWidth?: number;
 }
 
 /**

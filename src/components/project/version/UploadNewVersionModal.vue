@@ -4,7 +4,7 @@
     title="Upload Flat Files"
     :is-open="isOpen"
     :startStep="startStep"
-    :after-steps="[['Upload Files', selectedFiles.length > 0]]"
+    :after-steps="[['Upload Files', isUploadStepValid]]"
     v-bind:isLoading.sync="isLoading"
     v-bind:project.sync="selectedProject"
     v-bind:version.sync="selectedVersion"
@@ -14,15 +14,15 @@
   >
     <template v-slot:afterItems>
       <v-stepper-content step="3">
-        <generic-file-selector
-          v-if="selectedVersion !== undefined"
+        <project-files-input
           v-model="selectedFiles"
           data-cy="input-files-version"
+          class="mx-2"
         />
-        <v-switch
+        <generic-switch
           v-model="replaceAllArtifacts"
           label="Replace all artifacts"
-          class="ml-1"
+          class="ml-4"
         />
       </v-stepper-content>
     </template>
@@ -34,7 +34,8 @@ import Vue from "vue";
 import { IdentifierModel, VersionModel } from "@/types";
 import { logStore, projectStore } from "@/hooks";
 import { handleUploadProjectVersion } from "@/api";
-import { GenericFileSelector } from "@/components/common";
+import { GenericSwitch } from "@/components/common";
+import { ProjectFilesInput } from "../shared";
 import ProjectVersionStepperModal from "./ProjectVersionStepperModal.vue";
 
 /**
@@ -45,7 +46,8 @@ import ProjectVersionStepperModal from "./ProjectVersionStepperModal.vue";
 export default Vue.extend({
   name: "UploadNewVersionModal",
   components: {
-    GenericFileSelector,
+    GenericSwitch,
+    ProjectFilesInput,
     ProjectVersionStepperModal,
   },
   props: {
@@ -89,6 +91,15 @@ export default Vue.extend({
      */
     startStep(): number {
       return this.selectedProject === undefined ? 1 : 2;
+    },
+    /**
+     * @return Whether the uploaded files are valid.
+     */
+    isUploadStepValid(): boolean {
+      return (
+        this.selectedFiles.length > 0 &&
+        !!this.selectedFiles.find(({ name }) => name === "tim.json")
+      );
     },
   },
   methods: {

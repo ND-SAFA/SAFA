@@ -124,11 +124,8 @@ export default Vue.extend({
       this.isLoading = true;
 
       handleCreateVersion(this.project.projectId, versionType, {
-        onSuccess: (version) => {
-          this.isLoading = false;
-          this.$emit("create", version);
-        },
-        onError: () => (this.isLoading = false),
+        onSuccess: (version) => this.$emit("create", version),
+        onComplete: () => (this.isLoading = false),
       });
     },
     /**

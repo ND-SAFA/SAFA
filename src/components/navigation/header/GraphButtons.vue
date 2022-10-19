@@ -1,27 +1,16 @@
 <template>
   <flex-box>
-    <v-divider inset vertical class="white mx-1 faded" />
+    <v-divider inset vertical class="accent mx-1 faded" />
 
-    <template v-for="definition in changeButtons">
-      <generic-icon-button
-        v-if="definition.handler"
-        :key="definition.label"
-        color="white"
-        :tooltip="definition.label"
-        :icon-id="definition.icon"
-        :is-disabled="isButtonDisabled(definition)"
-        :data-cy="definition.dataCy"
-        @click="definition.handler"
-      />
-    </template>
+    <commit-buttons />
 
-    <v-divider inset vertical class="white mx-1 faded" />
+    <v-divider inset vertical class="accent mx-1 faded" />
 
     <template v-for="definition in viewButtons">
       <generic-icon-button
         v-if="definition.handler"
         :key="definition.label"
-        color="white"
+        color="accent"
         :tooltip="definition.label"
         :icon-id="definition.icon"
         :is-disabled="isButtonDisabled(definition)"
@@ -30,7 +19,7 @@
       />
     </template>
 
-    <v-divider inset vertical class="white mx-1 faded" />
+    <v-divider inset vertical class="accent mx-1 faded" />
 
     <checkmark-menu
       :key="filterButton.label"
@@ -43,17 +32,11 @@
 <script lang="ts">
 import Vue from "vue";
 import { ButtonDefinition, ButtonType } from "@/types";
-import {
-  artifactStore,
-  documentStore,
-  commitStore,
-  selectionStore,
-  layoutStore,
-} from "@/hooks";
-import { redoCommit, undoCommit } from "@/api";
+import { artifactStore, documentStore, selectionStore } from "@/hooks";
+import { handleRegenerateLayout } from "@/api";
 import { cyZoomIn, cyZoomOut } from "@/cytoscape";
 import { GenericIconButton, CheckmarkMenu, FlexBox } from "@/components/common";
-import { handleRegenerateLayout } from "@/api/handlers/version/layout-handler";
+import CommitButtons from "./CommitButtons.vue";
 
 export default Vue.extend({
   name: "GraphButtons",
@@ -61,6 +44,7 @@ export default Vue.extend({
     FlexBox,
     GenericIconButton,
     CheckmarkMenu,
+    CommitButtons,
   },
   data() {
     return {
@@ -79,29 +63,6 @@ export default Vue.extend({
      */
     artifacts() {
       return artifactStore.currentArtifacts;
-    },
-    /**
-     * @return The change buttons.
-     */
-    changeButtons(): ButtonDefinition[] {
-      return [
-        {
-          type: ButtonType.ICON,
-          handler: () => {
-            undoCommit().then();
-          },
-          label: "Undo",
-          icon: "mdi-undo",
-          isDisabled: !commitStore.canUndo,
-        },
-        {
-          type: ButtonType.ICON,
-          handler: () => redoCommit().then(),
-          label: "Redo",
-          icon: "mdi-redo",
-          isDisabled: !commitStore.canRedo,
-        },
-      ];
     },
     /**
      * @return The view buttons.

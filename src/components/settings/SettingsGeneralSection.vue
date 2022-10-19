@@ -2,20 +2,24 @@
   <v-container>
     <flex-box justify="space-between">
       <typography el="h1" variant="title" :value="project.name" />
-      <generic-icon-button
-        tooltip="Edit title"
-        icon-id="mdi-pencil"
-        @click="handleEdit"
-      />
+      <flex-box>
+        <!--        <generic-icon-button-->
+        <!--          tooltip="Download Project Files"-->
+        <!--          icon-id="mdi-download"-->
+        <!--          @click="handleDownload"-->
+        <!--        />-->
+        <generic-icon-button
+          tooltip="Edit title"
+          icon-id="mdi-pencil"
+          @click="handleEdit"
+        />
+      </flex-box>
     </flex-box>
     <v-divider />
     <typography :value="project.description" />
 
     <project-identifier-modal
-      title="Edit Project"
       :is-open="isEditOpen"
-      data-cy="settings-edit-project-title"
-      v-bind:project.sync="projectToEdit"
       :is-loading="isEditLoading"
       @close="isEditOpen = false"
       @save="handleSave"
@@ -25,9 +29,9 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { ProjectModel, IdentifierModel } from "@/types";
-import { projectStore } from "@/hooks";
-import { handleSaveProject } from "@/api";
+import { ProjectModel } from "@/types";
+import { identifierSaveStore, projectStore } from "@/hooks";
+import { handleSaveProject, handleDownloadProjectCSV } from "@/api";
 import { GenericIconButton, Typography, FlexBox } from "@/components/common";
 import { ProjectIdentifierModal } from "@/components/project/shared";
 
@@ -61,33 +65,28 @@ export default Vue.extend({
      * Opens the edit modal.
      */
     handleEdit(): void {
-      this.projectToEdit = this.project;
+      identifierSaveStore.baseIdentifier = this.project;
       this.isEditOpen = true;
     },
     /**
      * Attempts to save the project.
      */
-    handleSave(project: IdentifierModel): void {
+    handleSave(): void {
       this.isEditLoading = true;
 
-      handleSaveProject(
-        {
-          projectId: this.project.projectId,
-          name: project.name,
-          description: project.description,
+      handleSaveProject({
+        onSuccess: (project) => projectStore.updateProject(project),
+        onComplete: () => {
+          this.isEditLoading = false;
+          this.isEditOpen = false;
         },
-        {
-          onSuccess: () => {
-            projectStore.updateProject(project);
-            this.isEditLoading = false;
-            this.isEditOpen = false;
-          },
-          onError: () => {
-            this.isEditLoading = false;
-            this.isEditOpen = false;
-          },
-        }
-      );
+      });
+    },
+    /**
+     * Downloads project files
+     */
+    handleDownload(): void {
+      handleDownloadProjectCSV();
     },
   },
 });

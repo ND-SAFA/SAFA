@@ -1,9 +1,4 @@
-import {
-  ConfirmationType,
-  IOHandlerCallback,
-  MembershipModel,
-  ProjectRole,
-} from "@/types";
+import { IOHandlerCallback, MembershipModel, ProjectRole } from "@/types";
 import { logStore, projectStore } from "@/hooks";
 import {
   deleteProjectMember,
@@ -16,7 +11,7 @@ import {
  */
 export function handleGetMembers(): Promise<MembershipModel[]> {
   return getProjectMembers(projectStore.projectId).catch((e) => {
-    logStore.onSuccess(`Unable to get members`);
+    logStore.onError(`Unable to get members`);
     logStore.onDevError(e.message);
 
     return [];
@@ -39,12 +34,21 @@ export function handleInviteMember(
   { onSuccess, onError }: IOHandlerCallback
 ): void {
   saveProjectMember(projectId, memberEmail, projectRole)
-    .then(() => {
-      logStore.onSuccess(`Member added to the project: ${memberEmail}`);
+    .then((member) => {
+      projectStore.updateProject({
+        members: [
+          ...projectStore.project.members.filter(
+            ({ projectMembershipId }) =>
+              member.projectMembershipId !== projectMembershipId
+          ),
+          member,
+        ],
+      });
+      logStore.onSuccess(`Member saved on the project: ${memberEmail}`);
       onSuccess?.();
     })
     .catch((e) => {
-      logStore.onSuccess(`Unable to add member: ${memberEmail}`);
+      logStore.onError(`Unable save member: ${memberEmail}`);
       logStore.onDevError(e.message);
       onError?.(e);
     });
@@ -56,16 +60,26 @@ export function handleInviteMember(
  * @param member - The member to delete.
  */
 export function handleDeleteMember(member: MembershipModel): void {
-  logStore.$patch({
-    confirmation: {
-      type: ConfirmationType.INFO,
-      title: "Remove User from Project",
-      body: `Are you sure you want to remove ${member.email} from project?`,
-      statusCallback: async (isConfirmed: boolean) => {
-        if (!isConfirmed) return;
+  logStore.confirm(
+    "Remove User from Project",
+    `Are you sure you want to remove ${member.email} from project?`,
+    async (isConfirmed: boolean) => {
+      if (!isConfirmed) return;
 
-        await deleteProjectMember(member);
-      },
-    },
-  });
+      deleteProjectMember(member)
+        .then(() => {
+          projectStore.updateProject({
+            members: projectStore.project.members.filter(
+              ({ projectMembershipId }) =>
+                member.projectMembershipId !== projectMembershipId
+            ),
+          });
+          logStore.onSuccess(`Deleted a member: ${member.email}`);
+        })
+        .catch((e) => {
+          logStore.onError(`Unable to delete member: ${member.email}`);
+          logStore.onDevError(e.message);
+        });
+    }
+  );
 }

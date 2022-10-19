@@ -25,11 +25,6 @@ export async function handleSelectVersion(
 
   clearSubscriptions();
 
-  /**
-   * Project and Version topics are transmit {@link EntityChangeMessage}.
-   * The difference is that the project topic transmits non-version specific
-   * data (e.g. artifact types) while the version topic does.
-   */
   stompClient.subscribe(
     fillEndpoint(Endpoint.projectTopic, { projectId }),
     (frame) => handleEntityChangeMessage(versionId, frame)

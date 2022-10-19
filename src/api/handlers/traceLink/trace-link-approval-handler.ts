@@ -11,6 +11,7 @@ import {
   createLink,
   updateApprovedLink,
   updateDeclinedLink,
+  updateDeclinedLinks,
   updateUnreviewedLink,
 } from "@/api";
 
@@ -61,10 +62,11 @@ export async function handleCreateLink(
  * @param link - The trace link to process.
  * @param onSuccess - Called if the action is successful.
  * @param onError - Called if the action fails.
+ * @param onComplete - Called after the action.
  */
 export async function handleApproveLink(
   link: TraceLinkModel,
-  { onSuccess, onError }: IOHandlerCallback
+  { onSuccess, onError, onComplete }: IOHandlerCallback
 ): Promise<void> {
   const currentStatus = link.approvalStatus;
 
@@ -84,6 +86,7 @@ export async function handleApproveLink(
       );
       onError?.(e);
     },
+    onComplete,
   });
 }
 
@@ -93,10 +96,11 @@ export async function handleApproveLink(
  * @param link - The trace link to process.
  * @param onSuccess - Called if the action is successful.
  * @param onError - Called if the action fails.
+ * @param onComplete - Called after the action.
  */
 export async function handleDeclineLink(
   link: TraceLinkModel,
-  { onSuccess, onError }: IOHandlerCallback
+  { onSuccess, onError, onComplete }: IOHandlerCallback
 ): Promise<void> {
   const currentStatus = link.approvalStatus;
 
@@ -116,7 +120,42 @@ export async function handleDeclineLink(
       );
       onError?.(e);
     },
+    onComplete,
   });
+}
+
+/**
+ * Declines all unreviewed links, setting the app state to loading in between, and updating trace links afterwards.
+ */
+export async function handleDeclineAll(): Promise<void> {
+  logStore.confirm(
+    "Clear Unreviewed Links",
+    "Are you sure you want to remove all unreviewed links?",
+    async (isConfirmed) => {
+      if (!isConfirmed) return;
+
+      const unreviewed = approvalStore.unreviewedLinks;
+
+      try {
+        appStore.onLoadStart();
+
+        await updateDeclinedLinks(unreviewed);
+
+        traceStore.deleteTraceLinks(unreviewed);
+        unreviewed.map((link) => approvalStore.declineLink(link));
+
+        logStore.onSuccess(`Removed unreviewed links: ${unreviewed.length}`);
+      } catch (e) {
+        unreviewed.map(
+          (link) => (link.approvalStatus = ApprovalType.UNREVIEWED)
+        );
+
+        logStore.onError(`Unable to clear all links: ${unreviewed.length}`);
+      } finally {
+        appStore.onLoadEnd();
+      }
+    }
+  );
 }
 
 /**
@@ -125,10 +164,11 @@ export async function handleDeclineLink(
  * @param link - The trace link to process.
  * @param onSuccess - Called if the action is successful.
  * @param onError - Called if the action fails.
+ * @param onComplete - Called after the action.
  */
 export async function handleUnreviewLink(
   link: TraceLinkModel,
-  { onSuccess, onError }: IOHandlerCallback
+  { onSuccess, onError, onComplete }: IOHandlerCallback
 ): Promise<void> {
   const currentStatus = link.approvalStatus;
 
@@ -147,6 +187,7 @@ export async function handleUnreviewLink(
       );
       onError?.(e);
     },
+    onComplete,
   });
 }
 
@@ -157,15 +198,19 @@ export async function handleUnreviewLink(
  * @param linkAPI - The endpoint to call with the link.
  * @param onSuccess - Called if the action is successful.
  * @param onError - Called if the action fails.
+ * @param onComplete - Called after the action.
  */
 function linkAPIHandler(
   link: TraceLinkModel,
   linkAPI: (traceLink: TraceLinkModel) => Promise<TraceLinkModel[]>,
-  { onSuccess, onError }: IOHandlerCallback
+  { onSuccess, onError, onComplete }: IOHandlerCallback
 ): void {
   appStore.onLoadStart();
   linkAPI(link)
     .then(() => onSuccess?.())
     .catch((e) => onError?.(e))
-    .finally(() => appStore.onLoadEnd());
+    .finally(() => {
+      appStore.onLoadEnd();
+      onComplete?.();
+    });
 }

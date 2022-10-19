@@ -127,7 +127,7 @@ export default Vue.extend({
         case MessageType.INFO:
           return "primary";
         case MessageType.WARNING:
-          return "accent";
+          return "warning";
         case MessageType.ERROR:
           return "error";
         case MessageType.SUCCESS:

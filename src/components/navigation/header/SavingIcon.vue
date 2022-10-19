@@ -1,8 +1,18 @@
 <template>
-  <v-chip outlined small label color="secondary" v-if="isSaving">
-    <v-progress-circular indeterminate class="mr-2" size="16" />
-    Saving
-  </v-chip>
+  <v-tooltip bottom z-index="10000" v-if="isSaving">
+    <template v-slot:activator="{ on, attrs }">
+      <v-progress-circular
+        v-on="on"
+        v-bind="attrs"
+        indeterminate
+        size="36"
+        color="accent"
+      >
+        <v-icon color="accent"> mdi-cloud-upload-outline </v-icon>
+      </v-progress-circular>
+    </template>
+    <span>Saving...</span>
+  </v-tooltip>
 </template>
 
 <script lang="ts">

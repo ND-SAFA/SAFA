@@ -1,10 +1,10 @@
 import {
   ArtifactMap,
-  IGenericUploader,
   ArtifactModel,
   ParseArtifactFileModel,
   ArtifactFile,
   ArtifactPanel,
+  ArtifactUploader,
 } from "@/types";
 import { logStore } from "@/hooks";
 import { parseArtifactFile } from "@/api";
@@ -12,11 +12,7 @@ import { parseArtifactFile } from "@/api";
 /**
  * Creates an artifact uploader.
  */
-export function createArtifactUploader(): IGenericUploader<
-  ArtifactMap,
-  string,
-  ArtifactFile
-> {
+export function createArtifactUploader(): ArtifactUploader {
   return {
     panels: [],
     createNewPanel,
@@ -29,11 +25,10 @@ export function createArtifactUploader(): IGenericUploader<
  * @param artifactName - The title of the panel.
  */
 function createNewPanel(artifactName: string): ArtifactPanel {
-  const emptyArtifactFile: ArtifactFile = createArtifactFile(artifactName);
   return {
     title: artifactName,
     entityNames: [],
-    projectFile: emptyArtifactFile,
+    projectFile: createArtifactFile(artifactName),
     getIsValid(): boolean {
       return isArtifactPanelValid(this);
     },

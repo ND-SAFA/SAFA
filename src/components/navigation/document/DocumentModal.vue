@@ -1,24 +1,24 @@
 <template>
   <generic-modal
-    :title="title"
+    :title="modalTitle"
     size="sm"
     :is-open="isOpen"
     data-cy="modal-document-save"
-    @close="resetModalData"
+    @close="handleClose"
   >
     <template v-slot:body>
       <v-text-field
         filled
         label="Name"
         class="mt-4"
-        v-model="editingDocument.name"
+        v-model="store.editedDocument.name"
         :error-messages="nameErrors"
         data-cy="input-document-name"
       />
       <v-select
         filled
         label="Type"
-        v-model="editingDocument.type"
+        v-model="store.editedDocument.type"
         :items="types"
         item-text="name"
         item-value="id"
@@ -27,38 +27,39 @@
       <artifact-type-input
         multiple
         label="Include Artifact Types"
-        v-model="includedTypes"
+        v-model="store.includedTypes"
         @blur="handleSaveTypes"
         data-cy="input-document-include-types"
       />
       <artifact-input
         label="Artifacts"
-        v-model="editingDocument.artifactIds"
+        v-model="store.editedDocument.artifactIds"
         data-cy="input-document-artifacts"
       />
-      <v-switch
+      <generic-switch
+        class="ml-1"
         label="Include artifact children"
-        v-model="includeChildren"
+        v-model="store.includeChildren"
         data-cy="button-document-include-children"
       />
       <artifact-type-input
-        v-if="includeChildren"
+        v-if="store.includeChildren"
         multiple
         label="Include Child Types"
-        v-model="includedChildTypes"
+        v-model="store.includedChildTypes"
         @blur="handleSaveChildren"
         data-cy="input-document-include-child-types"
       />
       <artifact-input
-        v-if="includeChildren"
+        v-if="store.includeChildren"
         label="Child Artifacts"
-        v-model="childIds"
+        v-model="store.childIds"
         data-cy="input-document-child-artifacts"
       />
     </template>
     <template v-slot:actions>
       <v-btn
-        v-if="isEditMode"
+        v-if="isUpdate"
         color="error"
         :text="!confirmDelete"
         :outlined="confirmDelete"
@@ -73,7 +74,7 @@
       <v-spacer />
       <v-btn
         color="primary"
-        :disabled="!isValid"
+        :disabled="!canSave"
         data-cy="button-document-save"
         @click="handleSubmit"
       >
@@ -84,15 +85,15 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
-import { DocumentModel } from "@/types";
-import { createDocument, documentTypeOptions } from "@/util";
-import { artifactStore, documentStore, subtreeStore } from "@/hooks";
+import Vue from "vue";
+import { documentTypeOptions } from "@/util";
+import { documentSaveStore } from "@/hooks";
 import { handleDeleteDocument, handleSaveDocument } from "@/api";
 import {
   ArtifactInput,
   GenericModal,
   ArtifactTypeInput,
+  GenericSwitch,
 } from "@/components/common";
 
 /**
@@ -102,59 +103,48 @@ import {
  */
 export default Vue.extend({
   name: "DocumentModal",
-  components: { ArtifactTypeInput, GenericModal, ArtifactInput },
+  components: { GenericSwitch, ArtifactTypeInput, GenericModal, ArtifactInput },
   props: {
     isOpen: Boolean,
-    document: {
-      type: Object as PropType<DocumentModel>,
-      required: false,
-    },
   },
   data() {
     return {
-      editingDocument: createDocument(this.document),
       confirmDelete: false,
-      isValid: false,
       types: documentTypeOptions(),
-      includedTypes: [] as string[],
-      includeChildren: false,
-      includedChildTypes: [] as string[],
-      childIds: [] as string[],
     };
   },
   computed: {
     /**
-     * @return Whether the document is in edit mode.
+     * @return Whether an existing document is being updated.
      */
-    isEditMode(): boolean {
-      return !!this.document;
+    isUpdate(): boolean {
+      return documentSaveStore.isUpdate;
     },
     /**
      * @return The modal title.
      */
-    title(): string {
-      return this.isEditMode ? "Edit View" : "Add View";
+    modalTitle(): string {
+      return this.isUpdate ? "Edit View" : "Add View";
     },
     /**
      * @return Whether the current document name is valid.
      */
     isNameValid(): boolean {
-      return (
-        !documentStore.doesDocumentExist(this.editingDocument?.name) ||
-        this.editingDocument.name === this.document?.name
-      );
+      return documentSaveStore.isNameValid;
     },
     /**
      * @return Whether the current document is valid.
      */
-    isDocumentValid(): boolean {
-      return !!this.editingDocument.name && this.isNameValid;
+    canSave(): boolean {
+      return documentSaveStore.canSave;
     },
     /**
      * @return Document name errors to display.
      */
     nameErrors(): string[] {
-      return this.isNameValid ? [] : ["This name already exists"];
+      return documentSaveStore.editedDocument.name === ""
+        ? []
+        : documentSaveStore.nameErrors;
     },
     /**
      * @return The text to display on the delete button.
@@ -162,63 +152,39 @@ export default Vue.extend({
     deleteButtonText(): string {
       return this.confirmDelete ? "Delete" : "Delete Document";
     },
+    /**
+     * @return The store for saving documents.
+     */
+    store(): typeof documentSaveStore {
+      return documentSaveStore;
+    },
   },
   methods: {
     /**
-     * Resets all modal data.
+     * Emits a request to close the modal.
      */
-    resetModalData() {
-      this.includeChildren = false;
-      this.includedChildTypes = [];
-      this.childIds = [];
-      this.editingDocument = createDocument(this.document);
-      this.confirmDelete = false;
+    handleClose() {
       this.$emit("close");
     },
     /**
-     * Generates children to save on this document.
+     * Generates artifacts to save on this document.
      */
     handleSaveTypes() {
-      const baseArtifacts = this.document?.artifactIds || [];
-
-      this.editingDocument.artifactIds =
-        this.includedTypes.length > 0
-          ? artifactStore.allArtifacts
-              .filter(
-                ({ id, type }) =>
-                  this.includedTypes.includes(type) ||
-                  baseArtifacts.includes(id)
-              )
-              .map(({ id }) => id)
-          : baseArtifacts;
+      documentSaveStore.updateArtifacts();
     },
     /**
-     * Generates children to save on this document.
+     * Generates child artifacts to save on this document.
      */
     handleSaveChildren() {
-      this.childIds = subtreeStore.getMatchingChildren(
-        this.editingDocument.artifactIds,
-        this.includedChildTypes
-      );
+      documentSaveStore.updateChildArtifacts();
     },
     /**
      * Attempts to save the document.
      */
     handleSubmit() {
-      const artifactIds = this.includeChildren
-        ? [...this.editingDocument.artifactIds, ...this.childIds]
-        : this.editingDocument.artifactIds;
-
-      handleSaveDocument(
-        {
-          ...this.editingDocument,
-          artifactIds,
-        },
-        this.isEditMode,
-        {
-          onSuccess: () => this.resetModalData(),
-        }
-      );
+      handleSaveDocument({
+        onSuccess: () => this.handleClose(),
+      });
     },
     /**
      * Attempts to delete the document, after confirming.
@@ -226,30 +192,21 @@ export default Vue.extend({
     handleDelete() {
       if (!this.confirmDelete) {
         this.confirmDelete = true;
-      } else if (this.editingDocument) {
-        handleDeleteDocument(this.editingDocument, {
-          onSuccess: () => this.resetModalData(),
+      } else {
+        handleDeleteDocument({
+          onSuccess: () => this.handleClose(),
         });
       }
     },
   },
   watch: {
     /**
-     * Whenever any document field changes, check whether the document is valid.
-     */
-    editingDocument: {
-      handler() {
-        this.isValid = this.isDocumentValid;
-      },
-      deep: true,
-    },
-    /**
      * Reset the document when the modal is opened.
      */
     isOpen(open: boolean) {
       if (!open) return;
 
-      this.editingDocument = createDocument(this.document);
+      documentSaveStore.resetDocument();
     },
   },
 });

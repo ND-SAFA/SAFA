@@ -7,6 +7,7 @@ import {
   projectStore,
   selectionStore,
   layoutStore,
+  sessionStore,
 } from "@/hooks";
 import { handleDeleteArtifact, handleDuplicateArtifact } from "@/api";
 import { enableDrawMode } from "@/cytoscape";
@@ -28,7 +29,9 @@ export const artifactTreeMenuItems: MenuItem[] = [
         appStore.openArtifactCreatorTo({ isNewArtifact: true });
       });
     },
-    isVisible: () => true,
+    isVisible(): boolean {
+      return sessionStore.isEditor(projectStore.project);
+    },
   },
   {
     id: "add-link",
@@ -39,6 +42,9 @@ export const artifactTreeMenuItems: MenuItem[] = [
       projectStore.ifProjectDefined(() => {
         appStore.toggleTraceLinkCreator();
       });
+    },
+    isVisible(): boolean {
+      return sessionStore.isEditor(projectStore.project);
     },
   },
   {
@@ -51,6 +57,9 @@ export const artifactTreeMenuItems: MenuItem[] = [
       projectStore.ifProjectDefined(() => {
         enableDrawMode();
       });
+    },
+    isVisible(): boolean {
+      return sessionStore.isEditor(projectStore.project);
     },
   },
   {
@@ -98,7 +107,10 @@ export const artifactTreeMenuItems: MenuItem[] = [
       });
     },
     isVisible(artifactData: ArtifactData | undefined): boolean {
-      return artifactData !== undefined;
+      return (
+        artifactData !== undefined &&
+        sessionStore.isEditor(projectStore.project)
+      );
     },
   },
   {
@@ -113,7 +125,10 @@ export const artifactTreeMenuItems: MenuItem[] = [
       });
     },
     isVisible(artifactData: ArtifactData | undefined): boolean {
-      return artifactData !== undefined;
+      return (
+        artifactData !== undefined &&
+        sessionStore.isEditor(projectStore.project)
+      );
     },
   },
   {
@@ -129,7 +144,10 @@ export const artifactTreeMenuItems: MenuItem[] = [
       });
     },
     isVisible(artifactData: ArtifactData | undefined): boolean {
-      return artifactData !== undefined;
+      return (
+        artifactData !== undefined &&
+        sessionStore.isEditor(projectStore.project)
+      );
     },
   },
   {

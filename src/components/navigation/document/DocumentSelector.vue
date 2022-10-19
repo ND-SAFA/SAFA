@@ -6,7 +6,7 @@
       :items="items"
       label="View"
       outlined
-      color="secondary"
+      color="accent"
       dense
       hide-details
       dark
@@ -22,7 +22,7 @@
           </v-col>
           <v-col class="flex-grow-0" @click.stop="handleEditOpen(item)">
             <generic-icon-button
-              v-if="item.name !== 'Default'"
+              v-if="canEdit(item.name)"
               icon-id="mdi-dots-horizontal"
               :tooltip="`Edit ${item.name}`"
               data-cy="button-document-select-edit"
@@ -33,6 +33,7 @@
 
       <template v-slot:append-item>
         <v-btn
+          v-if="canEdit()"
           text
           block
           color="primary"
@@ -43,15 +44,11 @@
           Add View
         </v-btn>
 
-        <document-modal
-          :is-open="isOpen"
-          :document="editingDocument"
-          @close="handleCloseMenu"
-        />
+        <document-modal :is-open="isOpen" @close="handleCloseMenu" />
       </template>
     </v-select>
     <generic-icon-button
-      color="white"
+      color="accent"
       :icon-id="toggleViewIcon"
       :tooltip="toggleViewTooltip"
       data-cy="button-view-toggle"
@@ -63,7 +60,12 @@
 <script lang="ts">
 import Vue from "vue";
 import { DocumentModel } from "@/types";
-import { documentStore } from "@/hooks";
+import {
+  documentSaveStore,
+  documentStore,
+  projectStore,
+  sessionStore,
+} from "@/hooks";
 import { handleSwitchDocuments } from "@/api";
 import { GenericIconButton, FlexBox } from "@/components/common";
 import DocumentModal from "./DocumentModal.vue";
@@ -73,7 +75,6 @@ export default Vue.extend({
   components: { FlexBox, DocumentModal, GenericIconButton },
   data: () => ({
     isOpen: false,
-    editingDocument: undefined as DocumentModel | undefined,
   }),
   computed: {
     /**
@@ -116,24 +117,32 @@ export default Vue.extend({
   },
   methods: {
     /**
+     * Returns whether a document can be edited.
+     * @param name - The document name, or none to check for general editing ability.
+     * @return Whether editing is allowed.
+     */
+    canEdit(name = ""): boolean {
+      return name !== "Default" && sessionStore.isEditor(projectStore.project);
+    },
+    /**
      * Closes the selector menu and resets all data.
      */
     handleCloseMenu() {
       (this.$refs.documentSelector as HTMLElement).blur();
       this.isOpen = false;
-      this.editingDocument = undefined;
     },
     /**
      * Opens the create document modal.
      */
     handleCreateOpen() {
+      documentSaveStore.baseDocument = undefined;
       this.isOpen = true;
     },
     /**
      * Opens the edit document modal.
      */
     handleEditOpen(document: DocumentModel) {
-      this.editingDocument = document;
+      documentSaveStore.baseDocument = document;
       this.isOpen = true;
     },
     /**

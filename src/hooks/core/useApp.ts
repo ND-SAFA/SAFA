@@ -1,6 +1,11 @@
 import { defineStore } from "pinia";
 
-import { PanelOpenState, PanelStateMap, PanelType } from "@/types";
+import {
+  CreatorOpenState,
+  GeneratorOpenState,
+  PanelStateMap,
+  PanelType,
+} from "@/types";
 import { pinia } from "@/plugins";
 import selectionStore from "../graph/useSelection";
 import logStore from "./useLog";
@@ -52,7 +57,7 @@ export const useApp = defineStore("app", {
     /**
      * @return Whether the artifact creator is open.
      */
-    isArtifactCreatorOpen(): PanelOpenState {
+    isArtifactCreatorOpen(): CreatorOpenState {
       return this.isOpen[PanelType.artifactCreator];
     },
     /**
@@ -76,7 +81,7 @@ export const useApp = defineStore("app", {
     /**
      * @return Whether the trace link creator is open.
      */
-    isTraceLinkGeneratorOpen(): boolean {
+    isTraceLinkGeneratorOpen(): GeneratorOpenState {
       return this.isOpen[PanelType.traceLinkGenerator];
     },
     /**
@@ -123,7 +128,6 @@ export const useApp = defineStore("app", {
     togglePanel(panel: PanelType): void {
       this.isOpen[panel] = !this.isOpen[panel];
     },
-
     /**
      * Toggles whether the right panel is open.
      */
@@ -162,10 +166,16 @@ export const useApp = defineStore("app", {
       this.togglePanel(PanelType.traceLinkCreator);
     },
     /**
+     * Opens the trace link generator.
+     */
+    openTraceLinkGenerator(state: GeneratorOpenState): void {
+      this.isOpen[PanelType.traceLinkGenerator] = state;
+    },
+    /**
      * Toggles whether the trace link generator is open.
      */
-    toggleTraceLinkGenerator(): void {
-      this.togglePanel(PanelType.traceLinkGenerator);
+    closeTraceLinkGenerator(): void {
+      this.closePanel(PanelType.traceLinkGenerator);
     },
     /**
      * Enables the draw link mode.
@@ -185,7 +195,7 @@ export const useApp = defineStore("app", {
      * @param openTo - What to open to.
      */
     openArtifactCreatorTo(openTo: {
-      type?: PanelOpenState;
+      type?: CreatorOpenState;
       isNewArtifact?: boolean;
     }): void {
       const { type, isNewArtifact } = openTo;

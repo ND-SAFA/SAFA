@@ -1,23 +1,26 @@
 import {
   ArtifactModel,
+  ArtifactTypeIcons,
   ArtifactTypeModel,
   ColumnDataType,
+  ColumnModel,
   Commit,
   ConfirmationType,
   ConfirmDialogueMessage,
-  ColumnModel,
+  DocumentModel,
   DocumentType,
   FTANodeType,
-  MessageType,
-  ProjectModel,
-  ProjectDelta,
-  DocumentModel,
   IdentifierModel,
-  VersionModel,
+  MessageType,
+  ModelType,
+  ProjectDelta,
+  ProjectModel,
   SafetyCaseType,
   SessionModel,
   SnackbarMessage,
-  ArtifactTypeIcons,
+  TrainedModel,
+  UserModel,
+  VersionModel,
 } from "@/types";
 import { defaultTypeIcon } from "@/util/icons";
 
@@ -41,6 +44,16 @@ export function createConfirmDialogueMessage(): ConfirmDialogueMessage {
     title: "",
     body: "",
     statusCallback: () => null,
+  };
+}
+
+/**
+ * @return An empty user.
+ */
+export function createUser(): UserModel {
+  return {
+    userId: "",
+    email: "",
   };
 }
 
@@ -82,6 +95,7 @@ export function createProject(project?: Partial<ProjectModel>): ProjectModel {
     documents: project?.documents || [],
     warnings: project?.warnings || {},
     layout: project?.layout || {},
+    models: project?.models || [],
   };
 }
 
@@ -234,5 +248,16 @@ export function createDocument(
     artifactIds: document?.artifactIds || [],
     description: document?.description || "",
     layout: document?.layout || {},
+  };
+}
+
+/**
+ * @return A model initialized to the given props.
+ */
+export function createModel(model?: Partial<TrainedModel>): TrainedModel {
+  return {
+    id: model?.id || "",
+    name: model?.name || "",
+    baseModel: model?.baseModel || ModelType.NLBert,
   };
 }

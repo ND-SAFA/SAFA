@@ -6,6 +6,7 @@ import {
   ArtifactTypeDirections,
   ArtifactTypeModel,
   LabelledTraceDirectionModel,
+  ProjectModel,
   SafetyCaseType,
   TraceDirectionModel,
 } from "@/types";
@@ -13,7 +14,6 @@ import {
   allTypeIcons,
   createDefaultTypeIcons,
   defaultTypeIcon,
-  getArtifactTypePrintName,
   isLinkAllowedByType,
   preserveObjectKeys,
   removeMatches,
@@ -54,6 +54,15 @@ export const useTypeOptions = defineStore("typeOptions", {
   },
   actions: {
     /**
+     *Initializes project data.
+     *
+     * @param project - The project to load.
+     */
+    initializeProject(project: ProjectModel): void {
+      this.artifactTypeDirections = {};
+      this.initializeTypeIcons(project.artifactTypes);
+    },
+    /**
      * Changes what directions of trace links between artifacts are allowed.
      *
      * @param allArtifactTypes - The artifact types to set.
@@ -62,7 +71,6 @@ export const useTypeOptions = defineStore("typeOptions", {
       this.$patch({
         artifactTypeIcons: createDefaultTypeIcons(allArtifactTypes),
         allArtifactTypes,
-        artifactTypeDirections: {},
       });
     },
     /**
@@ -137,14 +145,19 @@ export const useTypeOptions = defineStore("typeOptions", {
         removedTypeIds
       );
       const names = preservedTypes.map(({ name }) => name);
+      const artifactTypeIcons = preserveObjectKeys(
+        this.artifactTypeIcons,
+        names
+      );
+      const artifactTypeDirections = preserveObjectKeys(
+        this.artifactTypeDirections,
+        names
+      );
 
-      this.$patch({
-        allArtifactTypes: preservedTypes,
-        artifactTypeIcons: preserveObjectKeys(this.artifactTypeIcons, names),
-        artifactTypeDirections: preserveObjectKeys(
-          this.artifactTypeDirections,
-          names
-        ),
+      this.$patch((state) => {
+        state.allArtifactTypes = preservedTypes;
+        state.artifactTypeIcons = artifactTypeIcons;
+        state.artifactTypeDirections = artifactTypeDirections;
       });
       projectStore.updateProject({ artifactTypes: preservedTypes });
     },
@@ -168,7 +181,10 @@ export const useTypeOptions = defineStore("typeOptions", {
      * @return The artifact type icon id.
      */
     getArtifactTypeDisplay(type: string): string {
-      return getArtifactTypePrintName(type);
+      return (
+        this.allArtifactTypes.find(({ typeId }) => typeId === type)?.name ||
+        type
+      );
     },
     /**
      * Finds the icon id for the given artifact type.
@@ -190,7 +206,7 @@ export const useTypeOptions = defineStore("typeOptions", {
           return {
             type,
             allowedTypes,
-            label: getArtifactTypePrintName(type),
+            label: type,
             icon,
             iconIndex: allTypeIcons.indexOf(icon),
           };

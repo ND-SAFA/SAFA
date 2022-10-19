@@ -6,33 +6,28 @@ import {
   validUser,
 } from "../../fixtures";
 
-describe("Project Creation", () => {
+describe("Manual Project Creation", () => {
   beforeEach(() => {
     cy.dbResetJobs();
 
-    cy.visit("http://localhost:8080/create").login(
-      validUser.email,
-      validUser.password
-    );
+    cy.visit("/create").login(validUser.email, validUser.password);
 
     cy.location("pathname", { timeout: 5000 }).should("equal", "/create");
   });
 
-  describe("Manual Project Creation", () => {
-    describe("Project Artifact Uploading", () => {
-      it("Cannot create a project without a name", () => {
-        // Step - inputting description
-        cy.inputText(
-          DataCy.creationStandardDescriptionInput,
-          testProject.description
-        );
+  describe("Project Artifact Uploading", () => {
+    it("Cannot create a project without a name", () => {
+      // Step - inputting description
+      cy.inputText(
+        DataCy.creationStandardDescriptionInput,
+        testProject.description
+      );
 
-        // Step - Checking that the user cannot continue without a project name
-        cy.getCy(DataCy.stepperContinueButton).should("be.disabled");
-      });
+      // Step - Checking that the user cannot continue without a project name
+      cy.getCy(DataCy.stepperContinueButton).should("be.disabled");
     });
 
-    describe("I can Create sets of artifacts by type", () => {
+    describe("I can create sets of artifacts by type", () => {
       it("Cannot create a new panel with an empty name", () => {
         // Step - Inputs Project name and description
         cy.setProjectIdentifier("standard");
@@ -253,9 +248,9 @@ describe("Project Creation", () => {
       cy.get(".artifact-svg-wrapper")
         .should("be.visible")
         .within(() => {
-          cy.contains("text", "requirement").should("be.visible");
-          cy.contains("text", "hazard").should("be.visible");
-          cy.contains("text", "5 Nodes").should("be.visible");
+          cy.contains("requirement").should("be.visible");
+          cy.contains("hazard").should("be.visible");
+          cy.contains("5 Nodes").should("be.visible");
         });
     });
 

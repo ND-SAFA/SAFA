@@ -12,3 +12,5 @@ export * from "./github-api";
 export * from "./artifact-type-api";
 export * from "./layout-api";
 export * from "./sync-api";
+export * from "./model-api";
+export * from "./files-api";

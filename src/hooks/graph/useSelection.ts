@@ -6,7 +6,6 @@ import {
   PanelType,
   TraceLinkModel,
 } from "@/types";
-import { traceStore } from "@/hooks";
 import {
   artifactTreeCyPromise,
   cyCenterOnArtifacts,
@@ -15,6 +14,7 @@ import {
   isInSubtree,
 } from "@/cytoscape";
 import { pinia } from "@/plugins";
+import traceStore from "../project/useTraces";
 import subtreeStore from "../project/useSubtree";
 import artifactStore from "../project/useArtifacts";
 import appStore from "../core/useApp";

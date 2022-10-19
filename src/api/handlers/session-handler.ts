@@ -1,57 +1,65 @@
+// import { datadogRum } from "@datadog/browser-rum";
+
 import {
-  ConfirmationType,
   IOHandlerCallback,
   PasswordChangeModel,
-  UserModel,
+  UserPasswordModel,
 } from "@/types";
 import { sessionStore, logStore } from "@/hooks";
-import {
-  getParam,
-  getParams,
-  navigateTo,
-  QueryParams,
-  router,
-  Routes,
-  routesPublic,
-} from "@/router";
+import { getParam, getParams, navigateTo, QueryParams, Routes } from "@/router";
 import {
   handleClearProject,
   createLoginSession,
   savePassword,
   deleteAccount,
   handleLoadLastProject,
+  handleGetProjects,
+  getCurrentUser,
 } from "@/api";
 
 /**
  * Attempts to log a user in.
  *
  * @param user - The user to log in.
+ * @throws If login is unsuccessful.
  */
-export async function handleLogin(user: UserModel): Promise<void> {
+export async function handleLogin(user: UserPasswordModel): Promise<void> {
   const session = await createLoginSession(user);
   const goToPath = getParam(QueryParams.LOGIN_PATH);
   const query = { ...getParams() };
 
   delete query[QueryParams.LOGIN_PATH];
 
+  sessionStore.user = await getCurrentUser();
   sessionStore.updateSession(session);
 
-  if (goToPath === Routes.ARTIFACT) {
-    await handleLoadLastProject();
-  } else if (typeof goToPath === "string") {
-    await navigateTo(goToPath, query);
-  } else {
-    await navigateTo(Routes.HOME, query);
-  }
+  // datadogRum.startSessionReplayRecording();
+
+  await handleGetProjects({
+    onComplete: async () => {
+      if (goToPath === Routes.ARTIFACT) {
+        await handleLoadLastProject();
+      } else if (typeof goToPath === "string") {
+        await navigateTo(goToPath, query);
+      } else {
+        await navigateTo(Routes.HOME, query);
+      }
+    },
+  });
 }
 
 /**
  * Logs a user out.
  */
 export async function handleLogout(): Promise<void> {
+  document.cookie = "";
+
   await handleClearProject();
   await navigateTo(Routes.LOGIN_ACCOUNT);
   sessionStore.clearSession();
+  logStore.notifications = [];
+  // await deleteSession();
+  // datadogRum.startSessionReplayRecording();
 }
 
 /**
@@ -59,17 +67,23 @@ export async function handleLogout(): Promise<void> {
  * If the token does not, is expired, or is otherwise invalid, the user will be sent back to login.
  */
 export async function handleAuthentication(): Promise<void> {
-  if (routesPublic.includes(router.currentRoute.path)) return;
+  sessionStore.user = await getCurrentUser();
 
-  try {
-    const isAuthorized = await sessionStore.hasAuthorization;
+  // datadogRum.init({
+  //   applicationId: process.env.VUE_APP_DDOG_APP_ID || "",
+  //   clientToken: process.env.VUE_APP_DDOG_DDOG_TOKEN || "",
+  //   env: process.env.NODE_ENV || "",
+  //   site: "datadoghq.com",
+  //   service: "safa",
+  //   version: "1.0.0",
+  //   sampleRate: 100,
+  //   premiumSampleRate: 100,
+  //   trackInteractions: true,
+  //   defaultPrivacyLevel: "mask-user-input",
+  // });
+  // datadogRum.startSessionReplayRecording();
 
-    if (isAuthorized) return;
-
-    await handleLogout();
-  } catch (e) {
-    await handleLogout();
-  }
+  await handleGetProjects({});
 }
 
 /**
@@ -101,16 +115,13 @@ export function handleChangePassword(
  * @param password - The user's current password.
  */
 export function handleDeleteAccount(password: string): void {
-  logStore.$patch({
-    confirmation: {
-      type: ConfirmationType.INFO,
-      title: `Delete your account?`,
-      body: `This action cannot be undone.`,
-      statusCallback: (isConfirmed: boolean) => {
-        if (!isConfirmed) return;
+  logStore.confirm(
+    "Delete your account?",
+    "This action cannot be undone.",
+    async (isConfirmed) => {
+      if (!isConfirmed) return;
 
-        deleteAccount(password).then(handleLogout);
-      },
-    },
-  });
+      deleteAccount(password).then(handleLogout);
+    }
+  );
 }

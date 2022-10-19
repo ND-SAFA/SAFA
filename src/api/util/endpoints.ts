@@ -11,11 +11,12 @@ export enum Endpoint {
   session = "accounts/session",
   login = "login",
   createAccount = "accounts/create",
-  logout = "accounts/logout",
+  logout = "logout",
   forgotPassword = "accounts/forgot",
   resetPassword = "accounts/reset",
   updatePassword = "accounts/change",
   deleteAccount = "accounts/delete",
+  getAccount = "accounts/self",
 
   // Jobs
   createProjectJob = "jobs/projects",
@@ -48,7 +49,8 @@ export enum Endpoint {
 
   // Links
   getGeneratedLinks = "projects/versions/:versionId/links/generated",
-  generateLinks = "projects/links/generate",
+  generateLinksJob = "jobs/projects/links/generate",
+  trainModelJob = "jobs/projects/:projectId/models/train",
 
   // Entity Retrieval
   projectVersion = "projects/versions/:versionId",
@@ -90,6 +92,16 @@ export enum Endpoint {
 
   // Warnings
   getWarningsInProjectVersion = "projects/versions/:versionId/warnings",
+
+  // Models
+  getModels = "projects/:projectId/models",
+  createModel = "projects/:projectId/models",
+  editModel = "projects/:projectId/models/:modelId",
+  deleteModel = "projects/:projectId/models/:modelId",
+  shareModel = "projects/models/share",
+
+  // Files
+  getProjectFiles = "projects/versions/:versionId/flat-files/:fileType",
 }
 
 /**

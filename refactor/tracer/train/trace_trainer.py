@@ -87,6 +87,21 @@ class TraceTrainer(Trainer):
             results[get_metric_name(metric)] = metric_result
         return results
 
+    @staticmethod
+    def get_similarity_scores(predictions: Union[np.ndarray, Tuple[np.ndarray]]) -> List[float]:
+        """
+        Transforms predictions into similarity scores.
+        :param predictions: The model predictions.
+        :return: List of similarity scores associated with predictions.
+        """
+        similarity_scores = []
+        for pred_i in range(predictions.shape[0]):
+            prediction = predictions[pred_i]
+            similarity_scores.append(softmax(prediction)[1])
+        return similarity_scores
+
+    ################## FUNCTIONS BELOW ARE OVERRIDDEN FROM TRANSFORMERS ##################
+
     def get_train_dataloader(self) -> DataLoader:
         """
         Gets the dataloader for training
@@ -110,15 +125,4 @@ class TraceTrainer(Trainer):
         )
         return data_loader
 
-    @staticmethod
-    def get_similarity_scores(predictions: Union[np.ndarray, Tuple[np.ndarray]]) -> List[float]:
-        """
-        Transforms predictions into similarity scores.
-        :param predictions: The model predictions.
-        :return: List of similarity scores associated with predictions.
-        """
-        similarity_scores = []
-        for pred_i in range(predictions.shape[0]):
-            prediction = predictions[pred_i]
-            similarity_scores.append(softmax(prediction)[1])
-        return similarity_scores
+

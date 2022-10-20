@@ -5,36 +5,30 @@ from tracer.pre_processing.pre_processing_options import PreProcessingOptions
 
 
 class PreProcessor:
-    OPTION2PARAM = {PreProcessingOptions.REPLACE_WORDS: "word_replace_mappings",
-                    PreProcessingOptions.FILTER_MIN_LENGTH: "min_length"}
 
-    def __init__(self, selected_options: Dict[PreProcessingOptions, bool], **kwargs):
+    def __init__(self, selected_options: Dict[PreProcessingOptions, Dict]):
         """
         Handles Pre-Processing
         :param selected_options: the selected pre-process options to run
         """
-        step_params = self._get_step_params(**kwargs)
-        self.ordered_before_steps, self.ordered_regular_steps = self._get_ordered_steps(selected_options, step_params)
+        self.ordered_before_steps, self.ordered_regular_steps = self._get_ordered_steps(selected_options)
 
     @staticmethod
-    def _get_ordered_steps(selected_options: Dict[PreProcessingOptions, bool],
-                           step_params: Dict[PreProcessingOptions, Dict]) \
+    def _get_ordered_steps(selected_options: Dict[PreProcessingOptions, Dict]) \
             -> Tuple[List[AbstractPreProcessingStep], List[AbstractPreProcessingStep]]:
         """
         Gets the steps in the order they should be run
         :param selected_options: the selected pre-process options to run
-        :param step_params: parameters used to initialize steps
         :return: the ordered list of steps to run before and the ordered list of steps to run after words are split into word list
         """
         before_steps = []
         regular_steps = []
-        for option, should_run in selected_options.items():
-            if should_run:
-                step = option.value(**step_params[option]) if option in step_params else option.value()
-                if step.run_before:
-                    before_steps.append(step)
-                else:
-                    regular_steps.append(step)
+        for option, step_params in selected_options.items():
+            step = option.value(**step_params[option])
+            if step.run_before:
+                before_steps.append(step)
+            else:
+                regular_steps.append(step)
         return PreProcessor._order_steps(before_steps), PreProcessor._order_steps(regular_steps)
 
     @staticmethod
@@ -45,18 +39,6 @@ class PreProcessor:
         :return: the list of steps in order
         """
         return sorted(steps)
-
-    @staticmethod
-    def _get_step_params(**kwargs) -> Dict[PreProcessingOptions, Dict]:
-        """
-        Creates a dictionary mapping pre-processor option to the parameters used to initialize that step
-        :return: a dictionary mapping pre-processor option to the parameters used to initialize that step
-        """
-        step_params = {}
-        for option, param in PreProcessor.OPTION2PARAM.items():
-            if param in kwargs:
-                step_params[option] = {param: kwargs[param]}
-        return step_params
 
     @staticmethod
     def _get_word_list(content: str) -> List[str]:

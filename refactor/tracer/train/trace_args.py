@@ -1,9 +1,10 @@
 from typing import List
-
+import datasets
 from transformers.training_args import TrainingArguments
 
 from config.constants import EVAL_DATASET_SIZE_DEFAULT, MAX_SEQ_LENGTH_DEFAULT, \
-    N_EPOCHS_DEFAULT, PAD_TO_MAX_LENGTH_DEFAULT, RESAMPLE_RATE_DEFAULT, VALIDATION_PERCENTAGE_DEFAULT
+    N_EPOCHS_DEFAULT, PAD_TO_MAX_LENGTH_DEFAULT, RESAMPLE_RATE_DEFAULT, VALIDATION_PERCENTAGE_DEFAULT, EVALUATION_STRATEGY_DEFAULT, \
+    SAVE_STRATEGY_DEFAULT, SAVE_TOTAL_LIMIT_DEFAULT, LOAD_BEST_MODEL_AT_END_DEFAULT, METRIC_FOR_BEST_MODEL_DEFAULT
 
 
 class TraceArgs(TrainingArguments):
@@ -13,6 +14,11 @@ class TraceArgs(TrainingArguments):
     eval_dataset_size: int = EVAL_DATASET_SIZE_DEFAULT
     validation_percentage: float = VALIDATION_PERCENTAGE_DEFAULT
     num_train_epochs: int = N_EPOCHS_DEFAULT
+    evaluation_strategy: str = EVALUATION_STRATEGY_DEFAULT
+    save_strategy: str = SAVE_STRATEGY_DEFAULT
+    save_total_limit: int = SAVE_TOTAL_LIMIT_DEFAULT
+    load_best_model_at_end: bool = LOAD_BEST_MODEL_AT_END_DEFAULT
+    metric_for_best_model_default: str = METRIC_FOR_BEST_MODEL_DEFAULT
     metrics: List[str] = None
     callbacks: List = None
 

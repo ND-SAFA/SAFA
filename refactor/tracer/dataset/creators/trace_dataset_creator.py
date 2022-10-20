@@ -10,9 +10,8 @@ from tracer.models.model_generator import ModelGenerator
 
 class TraceDatasetCreator(AbstractDatasetCreator):
 
-    def __init__(self, source_layers: List[Dict[str, str]], target_layers: List[Dict[str, str]],
-                 model_generator: ModelGenerator, true_links: List[Tuple[str, str]] = None,
-                 validation_percentage: float = VALIDATION_PERCENTAGE_DEFAULT):
+    def __init__(self, source_layers: List[Dict[str, str]], target_layers: List[Dict[str, str]], model_generator: ModelGenerator,
+                 true_links: List[Tuple[str, str]] = None, validation_percentage: float = VALIDATION_PERCENTAGE_DEFAULT):
         """
         Constructs dataset in classic trace format
         :param source_layers: a list of source artifacts across all layers
@@ -21,6 +20,7 @@ class TraceDatasetCreator(AbstractDatasetCreator):
         :param model_generator: the ModelGenerator
         :param validation_percentage: percentage of dataset used for validation, if no value is supplied then dataset will not be split
         """
+        super().__init__()
         links = self._generate_all_links(source_layers, target_layers, model_generator.get_feature)
         pos_link_ids, neg_link_ids = self._get_pos_and_neg_links(true_links, links) if true_links else (None, None)
         self.arch_type = model_generator.arch_type

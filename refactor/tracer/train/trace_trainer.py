@@ -1,9 +1,4 @@
-from typing import Dict, List, NamedTuple, Tuple, Union
-
-import numpy as np
-from api.responses.prediction_response import PredictionResponse
 from datasets import load_metric
-from jobs.trace_args import TraceArgs
 from scipy.special import softmax
 from torch.utils.data import DataLoader
 from torch.utils.data.distributed import DistributedSampler
@@ -11,6 +6,12 @@ from torch.utils.data.sampler import RandomSampler
 from transformers.trainer import Trainer
 from transformers.trainer_pt_utils import get_tpu_sampler, is_torch_tpu_available
 
+from typing import Dict, List, NamedTuple, Tuple, Union
+
+import numpy as np
+from api.responses.prediction_response import PredictionResponse
+from tracer.models.model_generator import ModelGenerator
+from tracer.train.trace_args import TraceArgs
 from tracer.dataset.trace_dataset import TraceDataset
 from tracer.metrics.supported_trace_metric import get_metric_path, get_metric_name
 
@@ -20,13 +21,13 @@ class TraceTrainer(Trainer):
     Responsible for using given model for training and prediction using given dataset.
     """
 
-    def __init__(self, args: TraceArgs, **kwargs):
+    def __init__(self, args: TraceArgs, model_generator: ModelGenerator, **kwargs):
         """
         Handles the training and evaluation of learning models
         :param args: the learning model arguments
         """
         self.args = args
-        self.model_generator = args.model_generator
+        self.model_generator = model_generator
         self.model_generator.set_max_seq_length(self.args.max_seq_length)
         self.trace_dataset_creator = args.trace_dataset_creator
         model = self.model_generator.get_model()
@@ -41,25 +42,25 @@ class TraceTrainer(Trainer):
         :param checkpoint: path to checkpoint.
         :return: a dictionary containing the results
         """
-        self.train_dataset = train_dataset
-        self.eval_dataset = eval_dataset
+        self.train_dataset = train_dataset.to_trainer_dataset(self.model_generator)
+        self.eval_dataset = eval_dataset.to_trainer_dataset(self.model_generator)
         output = self.train(resume_from_checkpoint=checkpoint)
         return TraceTrainer.output_to_dict(output)
 
-    def perform_prediction(self, eval_dataset) -> Dict:
+    def perform_prediction(self, eval_dataset: TraceDataset) -> Dict:
         """
         Performs the prediction and (optionally) evaluation for the model
         :param eval_dataset: The dataset being predicted and/or evaluated.
         :return: A dictionary containing the results.
         """
-        self.eval_dataset = eval_dataset
+        self.eval_dataset = eval_dataset.to_trainer_dataset(self.model_generator)
         output = self.predict(self.eval_dataset)
         output.predictions = TraceTrainer.get_similarity_scores(output.predictions)
         if self.args.metrics:
             results = self._eval(output.predictions, output.label_ids, self.args.metrics)
             output.metrics.update(results)
         output_dict = TraceTrainer.output_to_dict(output)
-        return PredictionResponse.from_output(output_dict, eval_dataset.source_target_pairs)
+        return PredictionResponse.from_output(output_dict, eval_dataset.get_source_target_pairs())
 
     @staticmethod
     def output_to_dict(output: NamedTuple) -> Dict:

@@ -47,6 +47,7 @@ class SafaDatasetCreator(AbstractDatasetCreator):
         :param model_generator: the model generator for the project
         :param validation_percentage: percentage of dataset used for validation, if no value is supplied then dataset will not be split
         """
+        super().__init__()
         artifact_layers = self._create_artifacts(project_path, model_generator.get_feature)
         pos_link_ids = self._get_pos_link_ids(project_path)
         links = self._create_links(artifact_layers, pos_link_ids, model_generator.get_feature)

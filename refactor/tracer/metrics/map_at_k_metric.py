@@ -24,7 +24,6 @@ _CITATION = """
 
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
 class MapAtKMetric(AbstractTraceMetric):
-    metric_name = "map_at_k"
 
     # TODO
     def _compute(self, predictions, labels, k=K_METRIC_DEFAULT, **kwargs) -> float:

@@ -2,7 +2,10 @@ from enum import Enum
 
 from transformers import BertForMaskedLM
 
-from tracer.models import BertTraceSiamese, ElectraTraceSingle, NLBert, PLBert
+from tracer.models.base_models.nl_bert import NLBert
+from tracer.models.base_models.pl_bert import PLBert
+from tracer.models.base_models.electra_trace_single import ElectraTraceSingle
+from tracer.models.base_models.bert_trace_siamese import BertTraceSiamese
 
 
 class SupportedBaseModel(Enum):

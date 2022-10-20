@@ -46,6 +46,13 @@ class TraceDataset:
         return [self._get_feature_entry(self.links[link_id], model_generator.arch_type, model_generator.get_feature) for
                 link_id in self.links]
 
+    def get_source_target_pairs(self) -> List[Tuple]:
+        """
+        Gets the list of source target pairs in the order corresponding to the trainer dataset
+        :return: list of tuples containing source id and target id
+        """
+        return [(link.source.id, link.target.id) for link in self.links.values()]
+
     def train_test_split(self, percent_test: float, resample_rate: int = RESAMPLE_RATE_DEFAULT):
         train, test = self.split(percent_test)
         train = self._prepare_train_split(train, resample_rate)

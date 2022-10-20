@@ -32,6 +32,7 @@ class CSVDatasetCreator(AbstractDatasetCreator):
         :param validation_percentage: percentage of dataset used for validation, if no value is supplied then dataset will not be split
         """
 
+        super().__init__()
         data_df = pd.read_csv(data_file_path)
         links = self._generate_all_links(data_df, model_generator.get_feature)
         pos_link_ids, neg_link_ids = self._get_pos_and_neg_links(links.values())

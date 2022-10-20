@@ -20,7 +20,6 @@ _CITATION = """
 
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
 class MRRMetric(AbstractTraceMetric):
-    metric_name = "mrr"
 
     # TODO
     def _compute(self, predictions, labels, **kwargs) -> float:

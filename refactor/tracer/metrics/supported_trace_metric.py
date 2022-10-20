@@ -5,7 +5,8 @@ from typing import Type
 from datasets import list_metrics
 from tensorflow.python.tpu import datasets
 
-from tracer.metrics import MRRMetric, PrecisionAtKMetric
+from tracer.metrics.mrr_metric import MRRMetric
+from tracer.metrics.precision_at_k_metric import PrecisionAtKMetric
 from tracer.metrics.abstract_trace_metric import AbstractTraceMetric
 from tracer.metrics.map_at_k_metric import MapAtKMetric
 
@@ -28,7 +29,7 @@ def get_metric_path(metric_name: str) -> str:
         trace_metric_class = SupportedTraceMetric[metric_name.upper()].value
         path = _get_metric_path_from_class(trace_metric_class)
     except KeyError:
-        if metric_name in list_metrics():
+        if metric_name.lower() in list_metrics():
             path = metric_name
         else:
             raise NameError("Metric %s is unknown" % metric_name)

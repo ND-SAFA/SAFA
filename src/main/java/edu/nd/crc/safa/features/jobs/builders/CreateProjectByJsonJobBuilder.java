@@ -9,8 +9,8 @@ import edu.nd.crc.safa.features.jobs.entities.app.JobType;
 import edu.nd.crc.safa.features.jobs.entities.jobs.CreateProjectViaJsonJob;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
-import edu.nd.crc.safa.features.tgen.entities.TraceGenerationRequest;
-import edu.nd.crc.safa.features.tgen.entities.TracingRequest;
+import edu.nd.crc.safa.features.models.tgen.entities.TraceGenerationRequest;
+import edu.nd.crc.safa.features.models.tgen.entities.TracingRequest;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 /**

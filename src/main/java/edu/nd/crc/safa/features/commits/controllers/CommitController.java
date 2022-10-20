@@ -2,7 +2,7 @@ package edu.nd.crc.safa.features.commits.controllers;
 
 import java.util.UUID;
 
-import edu.nd.crc.safa.builders.ResourceBuilder;
+import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.common.BaseController;

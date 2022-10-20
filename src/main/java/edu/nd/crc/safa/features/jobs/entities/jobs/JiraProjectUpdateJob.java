@@ -1,6 +1,6 @@
 package edu.nd.crc.safa.features.jobs.entities.jobs;
 
-import edu.nd.crc.safa.common.ProjectEntities;
+import edu.nd.crc.safa.features.common.ProjectEntities;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.jira.entities.api.JiraIdentifier;
 import edu.nd.crc.safa.features.jira.entities.app.JiraIssuesResponseDTO;

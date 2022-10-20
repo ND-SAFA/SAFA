@@ -9,8 +9,8 @@ import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.models.entities.api.TrainingRequest;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
-import edu.nd.crc.safa.features.tgen.entities.TracingRequest;
-import edu.nd.crc.safa.features.tgen.method.bert.TBert;
+import edu.nd.crc.safa.features.models.tgen.entities.TracingRequest;
+import edu.nd.crc.safa.features.models.tgen.method.bert.TBert;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 public class TrainModelJob extends AbstractJob {

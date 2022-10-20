@@ -18,8 +18,8 @@ import edu.nd.crc.safa.features.flatfiles.parser.interfaces.IProjectDefinitionPa
 import edu.nd.crc.safa.features.flatfiles.parser.interfaces.ITraceFIle;
 import edu.nd.crc.safa.features.flatfiles.services.DataFileBuilder;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
-import edu.nd.crc.safa.features.tgen.entities.BaseGenerationModels;
-import edu.nd.crc.safa.features.tgen.entities.TraceGenerationRequest;
+import edu.nd.crc.safa.features.models.tgen.entities.BaseGenerationModels;
+import edu.nd.crc.safa.features.models.tgen.entities.TraceGenerationRequest;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.utilities.FileUtilities;
 

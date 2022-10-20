@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import edu.nd.crc.safa.builders.ResourceBuilder;
-import edu.nd.crc.safa.common.EntityParsingResult;
+import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
+import edu.nd.crc.safa.features.common.EntityParsingResult;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;

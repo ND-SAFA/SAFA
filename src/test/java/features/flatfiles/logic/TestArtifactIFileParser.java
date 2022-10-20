@@ -3,7 +3,7 @@ package features.flatfiles.logic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import edu.nd.crc.safa.common.EntityParsingResult;
+import edu.nd.crc.safa.features.common.EntityParsingResult;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.flatfiles.parser.FlatFileParser;

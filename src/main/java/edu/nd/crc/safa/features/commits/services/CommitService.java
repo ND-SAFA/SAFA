@@ -3,7 +3,7 @@ package edu.nd.crc.safa.features.commits.services;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.nd.crc.safa.common.EntityParsingResult;
+import edu.nd.crc.safa.features.common.EntityParsingResult;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.IVersionRepository;

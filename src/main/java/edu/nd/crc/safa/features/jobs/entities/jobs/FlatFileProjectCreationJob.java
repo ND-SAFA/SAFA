@@ -6,7 +6,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import edu.nd.crc.safa.common.EntityParsingResult;
+import edu.nd.crc.safa.features.common.EntityParsingResult;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
@@ -23,7 +23,7 @@ import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;
-import edu.nd.crc.safa.features.tgen.generator.TraceGenerationService;
+import edu.nd.crc.safa.features.models.tgen.generator.TraceGenerationService;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.utilities.JsonFileUtilities;

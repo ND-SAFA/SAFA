@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import edu.nd.crc.safa.common.ProjectEntities;
+import edu.nd.crc.safa.features.common.ProjectEntities;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.common.ServiceProvider;

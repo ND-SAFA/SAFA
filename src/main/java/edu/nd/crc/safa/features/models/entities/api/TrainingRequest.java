@@ -3,7 +3,7 @@ package edu.nd.crc.safa.features.models.entities.api;
 import java.util.List;
 import javax.validation.constraints.NotEmpty;
 
-import edu.nd.crc.safa.features.tgen.entities.TracingRequest;
+import edu.nd.crc.safa.features.models.tgen.entities.TracingRequest;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import edu.nd.crc.safa.common.ProjectEntities;
+import edu.nd.crc.safa.features.common.ProjectEntities;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;

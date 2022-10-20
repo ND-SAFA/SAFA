@@ -5,7 +5,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Objects;
 
-import edu.nd.crc.safa.common.ProjectEntities;
+import edu.nd.crc.safa.features.common.ProjectEntities;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.jira.entities.app.JiraIssueDTO;

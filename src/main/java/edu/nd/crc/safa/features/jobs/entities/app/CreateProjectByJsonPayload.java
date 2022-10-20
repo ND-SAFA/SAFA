@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
-import edu.nd.crc.safa.features.tgen.entities.TracingRequest;
+import edu.nd.crc.safa.features.models.tgen.entities.TracingRequest;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

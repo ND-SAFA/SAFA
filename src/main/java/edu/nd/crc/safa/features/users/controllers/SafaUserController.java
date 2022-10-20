@@ -6,8 +6,8 @@ import java.util.List;
 import javax.validation.Valid;
 
 import edu.nd.crc.safa.authentication.TokenService;
-import edu.nd.crc.safa.builders.ResourceBuilder;
-import edu.nd.crc.safa.common.AuthorizationSetter;
+import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
+import edu.nd.crc.safa.authentication.AuthorizationSetter;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.config.SecurityConstants;

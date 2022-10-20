@@ -3,7 +3,7 @@ package edu.nd.crc.safa.features.jira.controllers;
 import java.util.List;
 import java.util.UUID;
 
-import edu.nd.crc.safa.builders.ResourceBuilder;
+import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
@@ -74,7 +74,7 @@ public class JiraController extends BaseController {
 
     @PostMapping(AppRoutes.Jira.Import.BY_ID)
     public JiraResponseDTO<JobAppEntity> createJiraProject(@PathVariable("id") Long jiraProjectId,
-                                          @PathVariable("cloudId") String cloudId) throws Exception {
+                                                           @PathVariable("cloudId") String cloudId) throws Exception {
 
         SafaUser principal = safaUserService.getCurrentUser();
         JiraAccessCredentials jiraAccessCredentials = accessCredentialsRepository
@@ -93,8 +93,8 @@ public class JiraController extends BaseController {
 
     @PutMapping(AppRoutes.Jira.Import.UPDATE)
     public JiraResponseDTO<JobAppEntity> updateJiraProject(@PathVariable UUID versionId,
-                                          @PathVariable("id") Long jiraProjectId,
-                                          @PathVariable("cloudId") String cloudId) throws Exception {
+                                                           @PathVariable("id") Long jiraProjectId,
+                                                           @PathVariable("cloudId") String cloudId) throws Exception {
         SafaUser principal = safaUserService.getCurrentUser();
         JiraAccessCredentials jiraAccessCredentials = accessCredentialsRepository
             .findByUserAndCloudId(principal, cloudId).orElseThrow(() -> new SafaError("No JIRA credentials found"));

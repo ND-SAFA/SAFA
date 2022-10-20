@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import edu.nd.crc.safa.common.AuthorizationSetter;
+import edu.nd.crc.safa.authentication.AuthorizationSetter;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.entities.FTAType;

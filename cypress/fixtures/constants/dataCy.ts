@@ -196,9 +196,14 @@ export enum DataCy {
   // Project settings
 
   projectSettingsAddEmail = "settings-input-user-email",
-  projectSettingsAddToProjectButton = "button-add-to-project",
-  projectSettingsEditTitle = "settings-edit-project-title",
-  projectSettingsProjectRole = "button-project-role",
+  projectSettingsAddRole = "settings-input-user-role",
+  projectSettingsAddToProject = "button-add-user-to-project",
+  projectSettingsEditUserButton = "button-selector-edit",
+  projectSettingsDeleteUserButton = "button-selector-delete",
+  projectSettingsIAcceptButton = "button-confirm-modal",
+  projectSettingsSearchUser = "input-selector-search",
+  projectSettingsTable = "generic-selector-table",
+
   // Project Documents
 
   documentSelectButton = "button-document-select-open",

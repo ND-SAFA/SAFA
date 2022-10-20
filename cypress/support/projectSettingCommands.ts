@@ -4,9 +4,12 @@ Cypress.Commands.add("projectSettingsSelector", () => {
   cy.clickButtonWithName("Project").clickButtonWithName("Project Settings");
 });
 
-Cypress.Commands.add("addingNewMember", (name, projectRole) => {
+Cypress.Commands.add("projectAddNewMember", (name, projectRole) => {
   cy.clickButton(DataCy.selectorAddButton);
   cy.getCy(DataCy.projectSettingsAddEmail).type(name);
-  cy.clickButtonWithName("Project Role");
-  cy.clickButtonWithName(projectRole);
+  cy.getCy(DataCy.projectSettingsAddRole)
+    .click({ force: true })
+    .type(projectRole, { force: true })
+    .type("{enter}", { force: true });
+  cy.clickButton(DataCy.projectSettingsAddToProject);
 });

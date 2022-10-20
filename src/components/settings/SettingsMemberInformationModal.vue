@@ -11,6 +11,7 @@
           :readonly="member !== undefined"
           :rules="emailRules"
           @update:error="handleErrorUpdate"
+          data-cy="settings-input-user-email"
         />
         <v-select
           filled
@@ -19,13 +20,19 @@
           :items="projectRoles"
           item-value="id"
           item-text="name"
+          data-cy="settings-input-user-role"
         />
       </flex-box>
       <project-input v-if="!member" v-model="projectIds" multiple />
     </template>
     <template v-slot:actions>
       <v-spacer />
-      <v-btn :disabled="!validated" color="primary" @click="handleConfirm">
+      <v-btn
+        :disabled="!validated"
+        color="primary"
+        @click="handleConfirm"
+        data-cy="button-add-user-to-project"
+      >
         {{ buttonLabel }}
       </v-btn>
     </template>

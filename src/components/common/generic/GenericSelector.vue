@@ -14,6 +14,7 @@
     :no-data-text="noDataText"
     :show-expand="showExpand"
     @item-selected="$emit('item:select', $event, true)"
+    data-cy="generic-selector-table"
   >
     <slot />
     <template v-slot:top>
@@ -72,7 +73,7 @@
       </div>
     </template>
     <template v-slot:expanded-item="{ headers, item }">
-      <td :colspan="headers.length">
+      <td :colspan="headers.length" data-cy="table-generic-selector">
         <slot name="expanded-item" :item="item" />
       </td>
     </template>

@@ -1,27 +1,35 @@
 import { DataCy } from "../../fixtures";
+import "cypress-wait-until";
 
-describe("Porject members display", () => {
+describe("Project Members Display", () => {
   before(() => {
-    cy.dbResetJobs().createProjectSettings();
-
-    cy.addingNewMember("Adrian.R6driguez@gmail.com", "Editor");
+    cy.dbResetJobs().dbResetProjects().createProjectSettings();
   });
-  describe("I can search through a projects members", () => {
-    it("searches for a specific project member", () => {
-      cy.clickButton(DataCy.selectionSearch)
-        .type("Adrian.r6driguez@gmail.com")
-        .contains("Adrian.R6driguez@gmail.com");
+
+  beforeEach(() => {
+    cy.loadCurrentProject();
+    cy.projectSettingsSelector();
+    cy.projectAddNewMember("test2@test.com", "Admin");
+    cy.waitUntil(function () {
+      return cy.getCy(DataCy.snackbarSuccess).should("be.visible");
     });
   });
-  describe("I can see a projects members", () => {
-    it("Displays all members of the project", () => {
-      cy.addingNewMember(
-        "Adrian.R6driguez@gmail.com",
-        "Viewer"
-      ).addingNewMember("test@test.com", "Admin");
-      cy.clickButton(DataCy.selectionSearch)
-        .contains("Adrian.R6driguez.com")
-        .contains("test@test.com");
+
+  describe("I can search through a project’s members", () => {
+    it("Can search for a specific member", () => {
+      cy.getCy(DataCy.projectSettingsSearchUser).first().type("test2");
+      cy.getCy(DataCy.projectSettingsTable)
+        .find('td:contains("test2")')
+        .should("have.length", 1);
+    });
+  });
+
+  describe("I can see a project’s members", () => {
+    it("Can display all project members", () => {
+      cy.getCy(DataCy.projectSettingsTable)
+        .find("tr")
+        // There should be 3 (Heading, owner, and added user)
+        .should("have.length", 3);
     });
   });
 });

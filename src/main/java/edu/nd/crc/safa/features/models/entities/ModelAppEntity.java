@@ -2,8 +2,8 @@ package edu.nd.crc.safa.features.models.entities;
 
 import java.util.UUID;
 
-import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
 import edu.nd.crc.safa.features.models.tgen.entities.BaseGenerationModels;
+import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

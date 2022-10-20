@@ -10,15 +10,14 @@ import java.util.Map;
 import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.models.tgen.entities.ArtifactLevel;
+import edu.nd.crc.safa.features.models.tgen.entities.ITraceLinkGeneration;
 import edu.nd.crc.safa.features.models.tgen.entities.TracingPayload;
 import edu.nd.crc.safa.features.models.tgen.generator.TraceLinkConstructor;
-import edu.nd.crc.safa.features.models.tgen.entities.ITraceLinkGeneration;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 
 /**
  * Vector Space Model using TF-IDF scores for evaluating document relevance
  */
-
 public class VSMController implements ITraceLinkGeneration {
     private Map<String, Double> idf;
 

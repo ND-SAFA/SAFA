@@ -8,10 +8,10 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import edu.nd.crc.safa.features.common.SafaRequestBuilder;
 import edu.nd.crc.safa.config.ProjectVariables;
 import edu.nd.crc.safa.config.TBertConfig;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
+import edu.nd.crc.safa.features.common.SafaRequestBuilder;
 import edu.nd.crc.safa.features.models.entities.api.ModelIdentifierDTO;
 import edu.nd.crc.safa.features.models.entities.api.TGenTrainingRequest;
 import edu.nd.crc.safa.features.models.tgen.entities.ArtifactLevel;

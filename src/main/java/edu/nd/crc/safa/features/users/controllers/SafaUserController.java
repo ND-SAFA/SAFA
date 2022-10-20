@@ -5,9 +5,9 @@ import java.util.Date;
 import java.util.List;
 import javax.validation.Valid;
 
+import edu.nd.crc.safa.authentication.AuthorizationSetter;
 import edu.nd.crc.safa.authentication.TokenService;
 import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
-import edu.nd.crc.safa.authentication.AuthorizationSetter;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.config.SecurityConstants;
@@ -53,19 +53,16 @@ import org.springframework.web.multipart.MultipartFile;
 public class SafaUserController extends BaseController {
 
     private static final Logger log = LoggerFactory.getLogger(SafaUserController.class);
-
-    @Value("${fend.base}")
-    private String fendBase;
-
-    @Value("${fend.reset-email-path}")
-    private String fendPath;
-
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
     private final SafaUserRepository safaUserRepository;
     private final SafaUserService safaUserService;
     private final EmailService emailService;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
+    @Value("${fend.base}")
+    private String fendBase;
+    @Value("${fend.reset-email-path}")
+    private String fendPath;
 
     @Autowired
     public SafaUserController(ResourceBuilder resourceBuilder,

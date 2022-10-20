@@ -11,10 +11,10 @@ import edu.nd.crc.safa.features.models.entities.Model;
 import edu.nd.crc.safa.features.models.entities.ModelAppEntity;
 import edu.nd.crc.safa.features.models.entities.ShareMethod;
 import edu.nd.crc.safa.features.models.entities.api.ShareModelRequest;
+import edu.nd.crc.safa.features.models.tgen.method.bert.TBert;
 import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
-import edu.nd.crc.safa.features.models.tgen.method.bert.TBert;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;

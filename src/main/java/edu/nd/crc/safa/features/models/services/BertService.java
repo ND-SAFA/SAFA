@@ -1,11 +1,11 @@
 package edu.nd.crc.safa.features.models.services;
 
-import edu.nd.crc.safa.common.SafaRequestBuilder;
-import edu.nd.crc.safa.features.tgen.entities.BaseGenerationModels;
-import edu.nd.crc.safa.features.tgen.method.bert.AutomotiveBert;
-import edu.nd.crc.safa.features.tgen.method.bert.NLBert;
-import edu.nd.crc.safa.features.tgen.method.bert.PLBert;
-import edu.nd.crc.safa.features.tgen.method.bert.TBert;
+import edu.nd.crc.safa.features.common.SafaRequestBuilder;
+import edu.nd.crc.safa.features.models.tgen.entities.BaseGenerationModels;
+import edu.nd.crc.safa.features.models.tgen.method.bert.AutomotiveBert;
+import edu.nd.crc.safa.features.models.tgen.method.bert.NLBert;
+import edu.nd.crc.safa.features.models.tgen.method.bert.PLBert;
+import edu.nd.crc.safa.features.models.tgen.method.bert.TBert;
 
 import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.stereotype.Service;

@@ -3,7 +3,7 @@ package edu.nd.crc.safa.features.common;
 import java.util.Optional;
 import java.util.UUID;
 
-import edu.nd.crc.safa.builders.ResourceBuilder;
+import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppConstraints;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.documents.repositories.DocumentRepository;

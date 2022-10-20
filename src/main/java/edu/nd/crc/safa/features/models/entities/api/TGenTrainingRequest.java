@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import edu.nd.crc.safa.features.tgen.entities.api.TGenPredictionRequestDTO;
+import edu.nd.crc.safa.features.models.tgen.entities.api.TGenPredictionRequestDTO;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 
 import lombok.Data;

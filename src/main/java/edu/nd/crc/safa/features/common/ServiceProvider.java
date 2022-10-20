@@ -1,7 +1,6 @@
 package edu.nd.crc.safa.features.common;
 
 import edu.nd.crc.safa.authentication.TokenService;
-import edu.nd.crc.safa.common.SafaRequestBuilder;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
@@ -35,6 +34,7 @@ import edu.nd.crc.safa.features.models.repositories.ModelProjectRepository;
 import edu.nd.crc.safa.features.models.repositories.ModelRepository;
 import edu.nd.crc.safa.features.models.services.BertService;
 import edu.nd.crc.safa.features.models.services.ModelService;
+import edu.nd.crc.safa.features.models.tgen.generator.TraceGenerationService;
 import edu.nd.crc.safa.features.notifications.services.NotificationService;
 import edu.nd.crc.safa.features.projects.repositories.ProjectRepository;
 import edu.nd.crc.safa.features.projects.services.ProjectRetrievalService;
@@ -42,7 +42,6 @@ import edu.nd.crc.safa.features.projects.services.ProjectService;
 import edu.nd.crc.safa.features.rules.repositories.RuleRepository;
 import edu.nd.crc.safa.features.rules.services.RuleService;
 import edu.nd.crc.safa.features.rules.services.WarningService;
-import edu.nd.crc.safa.features.tgen.generator.TraceGenerationService;
 import edu.nd.crc.safa.features.traces.repositories.TraceLinkRepository;
 import edu.nd.crc.safa.features.traces.repositories.TraceLinkVersionRepository;
 import edu.nd.crc.safa.features.traces.repositories.TraceMatrixRepository;

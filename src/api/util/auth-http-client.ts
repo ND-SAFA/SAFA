@@ -11,6 +11,7 @@ import { handleLogout } from "@/api/handlers";
  * @param options - Any options for this request, such as the method and any data.
  * @param setJsonContentType - If true, sets the content type of the request.
  * @param parseResponse - If true, the response will be parsed as JSON.
+ * @param arrayBuffer - If true, the response will be parsed as an array buffer
  *
  * @return The request's response data.
  * @throws Any errors received from the request.
@@ -18,7 +19,7 @@ import { handleLogout } from "@/api/handlers";
 export default async function authHttpClient<T>(
   relativeUrl: string,
   options: APIOptions,
-  { setJsonContentType = true, parseResponse = true } = {}
+  { setJsonContentType = true, parseResponse = true, arrayBuffer = false } = {}
 ): Promise<T> {
   const res = await fetch(`${baseURL}/${relativeUrl}`, {
     ...options,
@@ -30,6 +31,11 @@ export default async function authHttpClient<T>(
         }
       : options.headers,
   });
+
+  if (arrayBuffer) {
+    return (await res.arrayBuffer()) as unknown as T;
+  }
+
   const content = await res.text();
 
   if (res.status === 403) {

@@ -3,11 +3,11 @@
     <flex-box justify="space-between">
       <typography el="h1" variant="title" :value="project.name" />
       <flex-box>
-        <!--        <generic-icon-button-->
-        <!--          tooltip="Download Project Files"-->
-        <!--          icon-id="mdi-download"-->
-        <!--          @click="handleDownload"-->
-        <!--        />-->
+        <generic-icon-button
+          tooltip="Download Project Files"
+          icon-id="mdi-download"
+          @click="handleDownload"
+        />
         <generic-icon-button
           tooltip="Edit title"
           icon-id="mdi-pencil"

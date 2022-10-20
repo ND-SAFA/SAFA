@@ -14,6 +14,6 @@ export async function getProjectFiles(
     {
       method: "GET",
     },
-    { parseResponse: false }
+    { arrayBuffer: true }
   );
 }

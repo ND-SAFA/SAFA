@@ -9,14 +9,12 @@ import { getProjectFiles } from "@/api";
 export async function handleDownloadProjectCSV(): Promise<void> {
   const data = await getProjectFiles(projectStore.versionId);
 
-  console.log(data);
-
+  const fileName = `${projectStore.project.name}-${versionToString(
+    projectStore.version
+  )}.zip`;
   const blob = new Blob([data], {
-    type: "text/csv;charset=utf-8",
+    type: "application/octet-stream",
   });
 
-  saveAs(
-    blob,
-    `${projectStore.project.name}-${versionToString(projectStore.version)}.csv`
-  );
+  saveAs(blob, fileName);
 }

@@ -1,7 +1,7 @@
 import enum
 from abc import ABC, abstractmethod
 from functools import total_ordering
-from typing import List
+from typing import List, Tuple
 
 import math
 
@@ -49,6 +49,18 @@ class AbstractPreProcessingBeforeStep(AbstractPreProcessingStep, ABC):
 
     @abstractmethod
     def run(self, content: str) -> str:
+        """
+        Runs the pre-processing step on a given content string
+        :param content: the content string to process
+        :return: the processed string
+        """
+        pass
+
+
+class AbstractPreProcessingLinkStep(AbstractPreProcessingStep, ABC):
+
+    @abstractmethod
+    def run(self, true_links: List[Tuple[str, str]], **kwargs) -> str:
         """
         Runs the pre-processing step on a given content string
         :param content: the content string to process

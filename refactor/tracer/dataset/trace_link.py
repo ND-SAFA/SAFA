@@ -9,20 +9,17 @@ class TraceLink:
     Data structure representing link between source and target artifact.
     """
 
-    def __init__(self, source: Artifact, target: Artifact, feature_func: Callable, is_true_link: bool = False):
+    def __init__(self, source: Artifact, target: Artifact, is_true_link: bool = False):
         """
         Represents a link between source and target
         :param source: source artifact
         :param target: target artifact
-        :param feature_func: function from which the link feature can be generated
         :param is_true_link: if True, represents a positive link
         """
         self.source = source
         self.target = target
         self.id = self.generate_link_id(self.source.id, self.target.id)
         self.is_true_link = is_true_link
-        self.__feature_func = feature_func  # delay execution in case not needed
-        self.__feature = None
 
     def get_feature(self, feature_func: Callable) -> Dict:
         """

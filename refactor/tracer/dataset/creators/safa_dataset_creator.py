@@ -2,12 +2,10 @@ import json
 import os
 from typing import Callable, Dict, List, Set
 
-from config.constants import VALIDATION_PERCENTAGE_DEFAULT
 from tracer.dataset.artifact import Artifact
 from tracer.dataset.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tracer.dataset.trace_dataset import TraceDataset
 from tracer.dataset.trace_link import TraceLink
-from tracer.models.model_generator import ModelGenerator
 
 
 class SafaKey:
@@ -39,43 +37,55 @@ class SafaDatasetCreator(AbstractDatasetCreator):
                              SafaKey.HWR2SR_FILE: (
                                  SafaKey.HARDWARE_REQUIREMENTS_FILE, SafaKey.SYSTEM_REQUIREMENTS_FILE)}
 
-    def __init__(self, project_path: str, model_generator: ModelGenerator,
-                 validation_percentage: float = VALIDATION_PERCENTAGE_DEFAULT):
+    def __init__(self, project_path: str):
         """
         Creates a dataset from the SAFA dataset format.
         :param project_path: the path to the project
-        :param model_generator: the model generator for the project
-        :param validation_percentage: percentage of dataset used for validation, if no value is supplied then dataset will not be split
         """
         super().__init__()
-        artifact_layers = self._create_artifacts(project_path, model_generator.get_feature)
-        pos_link_ids = self._get_pos_link_ids(project_path)
-        links = self._create_links(artifact_layers, pos_link_ids, model_generator.get_feature)
-        neg_link_ids = set(links.keys()).difference(pos_link_ids)
-        self.arch_type = model_generator.arch_type
-        self.validation_percentage = validation_percentage
-        self.dataset = TraceDataset(links=links, pos_link_ids=list(pos_link_ids),
-                                    neg_link_ids=list(neg_link_ids))
+        self.project_path = project_path
 
     def create(self) -> TraceDataset:
-        return self.dataset
+        """
+        Creates the dataset
+        :return: the dataset
+        """
+        artifact_layers = self._create_artifacts(self.project_path)
+        pos_link_ids = self._get_pos_link_ids_from_files(self.project_path)
+        links = self._create_links(artifact_layers, pos_link_ids)
+        neg_link_ids = set(links.keys()).difference(pos_link_ids)
+        return TraceDataset(links=links, pos_link_ids=list(pos_link_ids), neg_link_ids=list(neg_link_ids))
 
-    @staticmethod
-    def _create_artifacts(project_path: str, feature_func: Callable) -> Dict[str, List[Artifact]]:
+    def _create_artifacts(self, project_path: str) -> Dict[str, List[Artifact]]:
         """
         Creates map between artifact file to their artifacts.
         :param project_path: Path to project containing artifact files.
-        :param feature_func: The function creating dataset features.
         :return: The map between artifact file to its artifacts.
         """
         artifact_layers = {}
         for artifact_file in SafaDatasetCreator.ARTIFACT_FILES:
-            artifact_layers[artifact_file] = SafaDatasetCreator._create_artifacts_from_file(project_path, artifact_file,
-                                                                                            feature_func)
+            artifact_layers[artifact_file] = self._create_artifacts_from_file(project_path, artifact_file)
         return artifact_layers
 
-    @staticmethod
-    def _get_pos_link_ids(project_path: str) -> Set[int]:
+    def _create_artifacts_from_file(self, project_path: str, data_file_name: str) -> List[Artifact]:
+        """
+        Create artifacts in artifact file.
+        :param project_path: The path to the project containing artifact file.
+        :param data_file_name: The name of the artifact file to read.
+        :return: List of artifacts in file.
+        """
+        data_file_path = os.path.join(project_path, data_file_name)
+        data_file = SafaDatasetCreator.__read_json_file(data_file_path)
+        artifacts = []
+        for artifact_entry in data_file[SafaKey.ARTIFACTS]:
+
+            artifact_tokens = self._process_artifact_tokens([SafaKey.ARTIFACT_TOKEN])
+
+            artifacts.append(
+                Artifact(artifact_entry[SafaKey.ARTIFACT_ID], artifact_tokens))
+        return artifacts
+
+    def _get_pos_link_ids_from_files(self, project_path: str) -> Set[int]:
         """
         Exracts positive trace links from trace and artifact files in project.
         :param project_path: The path to the project files.
@@ -83,82 +93,27 @@ class SafaDatasetCreator(AbstractDatasetCreator):
         """
         pos_link_ids = set()
         for trace_file, artifact_files in SafaDatasetCreator.TRACE_FILE_2_ARTIFACT.items():
-            layer_pos_link_ids = SafaDatasetCreator._get_pos_link_ids_from_file(project_path, trace_file)
+            data_file_path = os.path.join(project_path, trace_file)
+            data_file = SafaDatasetCreator.__read_json_file(data_file_path)
+            layer_pos_link_ids = self._get_pos_link_ids(
+                [(trace[SafaKey.SOURCE_ID], trace[SafaKey.TARGET_ID]) for trace in data_file[SafaKey.TRACES]])
             pos_link_ids.union(layer_pos_link_ids)
         return pos_link_ids
 
-    @staticmethod
-    def _create_links(artifact_layers: Dict[str, List[Artifact]], pos_link_ids: Set[int], feature_func: Callable) \
-            -> Dict[int, TraceLink]:
+    def _create_links(self, artifact_layers: Dict[str, List[Artifact]], pos_link_ids: Set[int]) -> Dict[int, TraceLink]:
         """
         Creates mapping of trace links ids to their trace links between artifact layers.
         :param artifact_layers: Map between artifact file and its artifacts.
         :param pos_link_ids: Set of positive link ids.
-        :param feature_func: Function for getting features from all link.
         :return: Map of trace link ids to trace links.
         """
         links = {}
         for trace_file, artifact_files in SafaDatasetCreator.TRACE_FILE_2_ARTIFACT:
             source_artifacts = artifact_layers.get(artifact_files[0])
             target_artifacts = artifact_layers.get(artifact_files[1])
-            layer_links = SafaDatasetCreator._create_links_for_layer(source_artifacts, target_artifacts, pos_link_ids,
-                                                                     feature_func)
+            layer_links = self._create_links_for_layer(source_artifacts, target_artifacts, pos_link_ids)
             links.update(layer_links)
         return links
-
-    @staticmethod
-    def _create_links_for_layer(source_artifacts: List[Artifact], target_artifacts: List[Artifact],
-                                pos_link_ids: Set[int], feature_func: Callable) -> Dict[int, TraceLink]:
-        """
-        Creates map between trace link id to trace link.
-        :param source_artifacts: The source artifacts to extract links for.
-        :param target_artifacts: The target artifacts to extract links for.
-        :param pos_link_ids: The list of all positive link ids in project.
-        :param feature_func: Function for getting features from trace links.
-        :return: Map between trace link ids and trace links for given source and target artifacts.
-        """
-        links = {}
-        for source in source_artifacts:
-            for target in target_artifacts:
-                link = TraceLink(source, target, feature_func)
-                if link.id in pos_link_ids:
-                    link.is_true_link = True
-                links[link.id] = link
-        return links
-
-    @staticmethod
-    def _create_artifacts_from_file(project_path: str, data_file_name: str, feature_func: Callable) -> List[Artifact]:
-        """
-        Create artifacts in artifact file.
-        :param project_path: The path to the project containing artifact file.
-        :param data_file_name: The name of the artifact file to read.
-        :param feature_func: Function to get features from artifacts.
-        :return: List of artifacts in file.
-        """
-        data_file_path = os.path.join(project_path, data_file_name)
-        data_file = SafaDatasetCreator.__read_json_file(data_file_path)
-        artifacts = []
-        for artifact_entry in data_file[SafaKey.ARTIFACTS]:
-            artifacts.append(
-                Artifact(artifact_entry[SafaKey.ARTIFACT_ID], artifact_entry[SafaKey.ARTIFACT_TOKEN], feature_func))
-        return artifacts
-
-    @staticmethod
-    def _get_pos_link_ids_from_file(project_path: str, data_file_name: str) -> Set[int]:
-        """
-        Gets set of positive ids in trace file.
-        :param project_path: Path to project containing trace file.
-        :param data_file_name: The name of the trace file.
-        :return: Set of trace link ids.
-        """
-        data_file_path = os.path.join(project_path, data_file_name)
-        data_file = SafaDatasetCreator.__read_json_file(data_file_path)
-        pos_link_ids = set()
-        for trace in data_file[SafaKey.TRACES]:
-            source_id = trace[SafaKey.SOURCE_ID]
-            target_id = trace[SafaKey.TARGET_ID]
-            pos_link_ids.add(TraceLink.generate_link_id(source_id, target_id))
-        return pos_link_ids
 
     @staticmethod
     def __read_json_file(path_to_file: str) -> Dict:

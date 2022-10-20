@@ -91,7 +91,7 @@ class PreProcessor:
     def run(self, artifact_content: List[str]) -> List[str]:
         """
         Runs the selected-preprocessing steps on each artifact content
-        :param artifact_content: list of artifact content strings
+        :param artifact_content: a list of artifact content strings
         :return: list of processed artifact content strings
         """
         processed_content = []

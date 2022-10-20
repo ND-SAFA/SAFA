@@ -248,12 +248,12 @@ class TestTraceDatasetCreator(BaseTest):
 
     def test_create_links(self):
         test_trace_dataset_creator = self.get_test_trace_dataset_creator()
-        links = test_trace_dataset_creator._generate_all_links(TEST_SOURCE_LAYERS, TEST_TARGET_LAYERS)
+        links = test_trace_dataset_creator._create_dataset_from_data(TEST_SOURCE_LAYERS, TEST_TARGET_LAYERS)
         self.links_test(links)
 
     def test_create_pos_and_neg_links(self):
         all_links = self.get_links(self.ALL_LINKS)
-        pos_link_ids, neg_link_ids = TraceDatasetCreator._get_pos_and_neg_links(TEST_POS_LINKS, all_links)
+        pos_link_ids, neg_link_ids = TraceDatasetCreator._get_pos_link_ids(TEST_POS_LINKS, all_links)
 
         self.assertEquals(len(pos_link_ids), len(TEST_POS_LINKS))
         self.assertEquals(len(neg_link_ids), len(self.ALL_LINKS) - len(TEST_POS_LINKS))
@@ -291,7 +291,7 @@ class TestTraceDatasetCreator(BaseTest):
             self.assertNotIn(prefix + key, feature_info)
 
     def tests_get_linked_targets_only(self):
-        linked_targets = TraceDatasetCreator._get_linked_targets_only(TEST_POS_LINKS)
+        linked_targets = TraceDatasetCreator._filter_unlinked_targets(TEST_POS_LINKS)
 
         for target in self.LINKED_TARGETS:
             self.assertIn(target, linked_targets)

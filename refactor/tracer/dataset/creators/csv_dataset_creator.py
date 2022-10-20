@@ -1,13 +1,12 @@
-from typing import Callable, Dict, Iterable, Set, Tuple
+from typing import List
 
 import pandas as pd
 
-from config.constants import VALIDATION_PERCENTAGE_DEFAULT
 from tracer.dataset.artifact import Artifact
 from tracer.dataset.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tracer.dataset.trace_dataset import TraceDataset
 from tracer.dataset.trace_link import TraceLink
-from tracer.models.model_generator import ModelGenerator
+from tracer.pre_processing.pre_processor import PreProcessor
 
 
 class CSVKey:
@@ -23,62 +22,60 @@ class CSVKey:
 
 class CSVDatasetCreator(AbstractDatasetCreator):
 
-    def __init__(self, data_file_path: str, model_generator: ModelGenerator,
-                 validation_percentage: float = VALIDATION_PERCENTAGE_DEFAULT):
+    def __init__(self, data_file_path: str):
         """
         Constructs dataset in CSV format
         :param data_file_path: path to csv
-        :param model_generator: the ModelGenerator
-        :param validation_percentage: percentage of dataset used for validation, if no value is supplied then dataset will not be split
         """
 
         super().__init__()
-        data_df = pd.read_csv(data_file_path)
-        links = self._generate_all_links(data_df, model_generator.get_feature)
-        pos_link_ids, neg_link_ids = self._get_pos_and_neg_links(links.values())
-        self.arch_type = model_generator.arch_type
-        self.validation_percentage = validation_percentage
-        self.dataset = TraceDataset(links=links,
-                                    pos_link_ids=list(pos_link_ids), neg_link_ids=list(neg_link_ids))
+        self.data_file_path = data_file_path
 
     def create(self) -> TraceDataset:
         """
-        Gets the dataset
+        Creates the dataset
         :return: the dataset
         """
-        return self.dataset
-
-    @staticmethod
-    def _generate_all_links(data_df: pd.Dataframe, feature_func: Callable) -> Dict[int, TraceLink]:
-        """
-        Generates Trace Links from the dataframe
-        :param data_df: a dataframe containing artifact and link information
-        :param feature_func: function from which the artifact features can be generated
-        :return: a dictionary of the links, a list of the positive link ids, and a list of the negative link ids
-        """
+        data_df = pd.read_csv(self.data_file_path)
         links = {}
-        for row_i, row in data_df.iterrows():
-            source = Artifact(row[CSVKey.SOURCE_ID_PARAM], row[CSVKey.SOURCE_PARAM], feature_func)
-            target = Artifact(row[CSVKey.TARGET_ID_PARAM], row[CSVKey.TARGET_PARAM], feature_func)
-            is_true_link = row[CSVKey.LABEL_PARAM] == 1
-            link = TraceLink(source, target, feature_func, is_true_link)
+        pos_link_ids, neg_link_ids = [], []
+        for i, row in data_df.iterrows():
+            source_tokens, target_tokens = self._process_artifact_tokens(artifact_tokens=[row[CSVKey.SOURCE_PARAM],
+                                                                                          row[CSVKey.TARGET_PARAM]])
+            link = self._create_trace_link(source_id=row[CSVKey.SOURCE_ID_PARAM], source_token=source_tokens,
+                                           target_id=row[CSVKey.TARGET_ID_PARAM], target_token=target_tokens,
+                                           label=row[CSVKey.LABEL_PARAM])
             links[link.id] = link
-        return links
+            self._add_to_link_ids(link, pos_link_ids, neg_link_ids)
+
+        return TraceDataset(links=links, pos_link_ids=pos_link_ids, neg_link_ids=neg_link_ids)
 
     @staticmethod
-    def _get_pos_and_neg_links(all_links: Iterable[TraceLink]) -> Tuple[Set, Set]:
+    def _add_to_link_ids(link: TraceLink, pos_link_ids: List[int], neg_link_ids: List[int]) -> None:
         """
-        Creates a list of all positive and negative link ids
-        :param all_links: list of TraceLinks
-        :return: a set of the positive link ids, and a set of the negative link ids
+        Adds the trace link id to the pos_link_ids if true link else neg_link_ids
+        :param link: the trace link to add to ids
+        :param pos_link_ids: the list of current positive link ids
+        :param neg_link_ids: the list of current negative link ids
+        :return: None
         """
-        linked_target_ids = set()
-        pos_link_ids = set()
-        neg_link_ids = set()
-        for link in all_links:
-            if link.is_true_link:
-                pos_link_ids.add(link.id)
-                linked_target_ids.add(link.target.id)
-            else:
-                neg_link_ids.add(link.id)
-        return pos_link_ids, neg_link_ids
+        if link.is_true_link:
+            pos_link_ids.append(link.id)
+        else:
+            neg_link_ids.append(link.id)
+
+    @staticmethod
+    def _create_trace_link(source_id: str, source_token: str, target_id: str, target_token: str, label: int) -> TraceLink:
+        """
+        Generates a TraceLink object from the linked artifact information
+        :param source_id: the id of the source artifact
+        :param source_token: the content of the source artifact
+        :param target_id: the id of the target artifact
+        :param target_token: the content of the target artifact
+        :param label: the label indicating if this is a true link
+        :return: the trace link
+        """
+        source = Artifact(source_id, source_token)
+        target = Artifact(target_id, target_token)
+        is_true_link = label == 1
+        return TraceLink(source, target, is_true_link)

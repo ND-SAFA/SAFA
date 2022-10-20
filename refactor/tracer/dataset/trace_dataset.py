@@ -10,8 +10,7 @@ from tracer.models.model_properties import ArchitectureType
 
 
 class TraceDataset:
-    def __init__(self, links: Dict[int, TraceLink],
-                 pos_link_ids: List[int] = None, neg_link_ids: List[int] = None):
+    def __init__(self, links: Dict[int, TraceLink], pos_link_ids: List[int] = None, neg_link_ids: List[int] = None):
         """
         Represents the common format for all datasets used by the huggingface trainer.
         :param links: The candidate links.
@@ -199,8 +198,9 @@ class TraceDataset:
         :param resample_rate: The number of copies of each positive link.
         :return: Prepared trace dataset
         """
-        train_split.resample_links(resample_rate, use_neg_links=False)
-        train_split.resize_links(len(self.pos_link_ids), include_duplicates=True, use_neg_links=True)
+        if len(self.pos_link_ids) > 0:
+            train_split.resample_links(resample_rate, use_neg_links=False)
+            train_split.resize_links(len(self.pos_link_ids), include_duplicates=True, use_neg_links=True)
         return train_split
 
     def _prepare_test_split(self, test_split: "TraceDataset") -> "TraceDataset":

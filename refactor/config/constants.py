@@ -6,6 +6,7 @@ import math
 # -------------- JOB ARGS --------------
 SAVE_OUTPUT_DEFAULT = True
 ADD_MOUNT_DIRECTORY_TO_OUTPUT_DEFAULT = True
+MLM_PROBABILITY_DEFAULT = 0.15
 
 # -------------- TRACE ARGS --------------
 MAX_SEQ_LENGTH_DEFAULT = 256
@@ -19,6 +20,14 @@ EVALUATION_STRATEGY_DEFAULT = SAVE_STRATEGY_DEFAULT = "epoch"  # should be the s
 SAVE_TOTAL_LIMIT_DEFAULT = 2
 LOAD_BEST_MODEL_AT_END_DEFAULT = True
 METRIC_FOR_BEST_MODEL_DEFAULT = "f1"  # TODO
+
+# -------------- DATASET --------------
+BLOCK_SIZE_DEFAULT = 128
+TRAINING_DATA_DIR_DEFAULT = "jobs/pretrain/mlm"
+USE_LINKED_TARGETS_ONLY_DEFAULT = False
+
+# -------------- PreProcessing --------------
+MIN_LENGTH_DEFAULT = 1
 
 # -------------- METRICS --------------
 K_METRIC_DEFAULT = 10  # TODO

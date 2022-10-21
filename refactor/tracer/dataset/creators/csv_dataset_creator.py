@@ -2,8 +2,9 @@ from typing import List
 
 import pandas as pd
 
+from config.constants import USE_LINKED_TARGETS_ONLY_DEFAULT
 from tracer.dataset.artifact import Artifact
-from tracer.dataset.creators.abstract_dataset_creator import AbstractDatasetCreator
+from tracer.dataset.creators.abstract_trace_dataset_creator import AbstractTraceDatasetCreator
 from tracer.dataset.trace_dataset import TraceDataset
 from tracer.dataset.trace_link import TraceLink
 from tracer.pre_processing.pre_processor import PreProcessor
@@ -20,15 +21,17 @@ class CSVKey:
     LABEL_PARAM = "label"
 
 
-class CSVDatasetCreator(AbstractDatasetCreator):
+class CSVDatasetCreator(AbstractTraceDatasetCreator):
 
-    def __init__(self, data_file_path: str):
+    def __init__(self, data_file_path: str, pre_processor: PreProcessor,
+                 use_linked_targets_only: bool = USE_LINKED_TARGETS_ONLY_DEFAULT):
         """
         Constructs dataset in CSV format
         :param data_file_path: path to csv
+        :param pre_processor: the pre_processor to run on the data
+        :param use_linked_targets_only: if True, uses only the targets that make up at least one true link
         """
-
-        super().__init__()
+        super().__init__(pre_processor, use_linked_targets_only)
         self.data_file_path = data_file_path
 
     def create(self) -> TraceDataset:
@@ -40,8 +43,8 @@ class CSVDatasetCreator(AbstractDatasetCreator):
         links = {}
         pos_link_ids, neg_link_ids = [], []
         for i, row in data_df.iterrows():
-            source_tokens, target_tokens = self._process_artifact_tokens(artifact_tokens=[row[CSVKey.SOURCE_PARAM],
-                                                                                          row[CSVKey.TARGET_PARAM]])
+            source_tokens, target_tokens = self._process_tokens(tokens=[row[CSVKey.SOURCE_PARAM],
+                                                                        row[CSVKey.TARGET_PARAM]])
             link = self._create_trace_link(source_id=row[CSVKey.SOURCE_ID_PARAM], source_token=source_tokens,
                                            target_id=row[CSVKey.TARGET_ID_PARAM], target_token=target_tokens,
                                            label=row[CSVKey.LABEL_PARAM])

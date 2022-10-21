@@ -5,7 +5,7 @@ from abc import abstractmethod
 from typing import Dict
 
 from api.responses.base_response import BaseResponse
-from config.constants import SAVE_OUTPUT_DEFAULT, ADD_MOUNT_DIRECTORY_TO_OUTPUT_DEFAULT, ADD_MOUNT_DIRECTORY_TO_MODEL_DEFAULT
+from config.constants import SAVE_OUTPUT_DEFAULT, ADD_MOUNT_DIRECTORY_TO_OUTPUT_DEFAULT
 from jobs.job_status import Status
 from server.storage.safa_storage import SafaStorage
 from tracer.models.base_models.supported_base_model import SupportedBaseModel

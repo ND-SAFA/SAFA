@@ -1,12 +1,14 @@
 from typing import List
 
+from config.constants import MIN_LENGTH_DEFAULT
 from tracer.pre_processing.abstract_pre_processing_step import AbstractPreProcessingStep, Order
 
 
 class FilterMinLengthStep(AbstractPreProcessingStep):
     ORDER = Order.LAST
+    min_length = MIN_LENGTH_DEFAULT
 
-    def __init__(self, min_length: int = 1):
+    def __init__(self, min_length: int = MIN_LENGTH_DEFAULT):
         """
         Handles removing all words smaller than the min_length
         min_length: the minimum length of word to allow

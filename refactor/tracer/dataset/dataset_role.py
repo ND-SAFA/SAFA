@@ -1,6 +1,6 @@
 from enum import Enum
 
 
-class DatasetRoles(Enum):
+class DatasetRole(Enum):
     TRAIN = "train"
     EVAL = "eval"

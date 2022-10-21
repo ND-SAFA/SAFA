@@ -5,6 +5,7 @@ from tracer.pre_processing.abstract_pre_processing_step import AbstractPreProces
 
 class ReplaceWordsStep(AbstractPreProcessingBeforeStep):
     ORDER = Order.FIRST
+    word_replace_mappings = None
 
     def __init__(self, word_replace_mappings: Dict[str, str]):
         """

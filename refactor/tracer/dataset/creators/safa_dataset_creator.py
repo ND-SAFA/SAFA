@@ -2,10 +2,12 @@ import json
 import os
 from typing import Callable, Dict, List, Set
 
+from config.constants import USE_LINKED_TARGETS_ONLY_DEFAULT
 from tracer.dataset.artifact import Artifact
-from tracer.dataset.creators.abstract_dataset_creator import AbstractDatasetCreator
+from tracer.dataset.creators.abstract_trace_dataset_creator import AbstractTraceDatasetCreator
 from tracer.dataset.trace_dataset import TraceDataset
 from tracer.dataset.trace_link import TraceLink
+from tracer.pre_processing.pre_processor import PreProcessor
 
 
 class SafaKey:
@@ -26,7 +28,7 @@ class SafaKey:
     TRACES = "traces"
 
 
-class SafaDatasetCreator(AbstractDatasetCreator):
+class SafaDatasetCreator(AbstractTraceDatasetCreator):
     ARTIFACT_FILES = [SafaKey.SAFETY_GOALS_FILE, SafaKey.FUNCTIONAL_REQUIREMENTS_FILE, SafaKey.SYSTEM_REQUIREMENTS_FILE,
                       SafaKey.SOFTWARE_REQUIREMENTS_FILE, SafaKey.HARDWARE_REQUIREMENTS_FILE]
     TRACE_FILE_2_ARTIFACT = {SafaKey.FR2SG_FILE: (SafaKey.FUNCTIONAL_REQUIREMENTS_FILE, SafaKey.SAFETY_GOALS_FILE),
@@ -37,12 +39,15 @@ class SafaDatasetCreator(AbstractDatasetCreator):
                              SafaKey.HWR2SR_FILE: (
                                  SafaKey.HARDWARE_REQUIREMENTS_FILE, SafaKey.SYSTEM_REQUIREMENTS_FILE)}
 
-    def __init__(self, project_path: str):
+    def __init__(self, project_path: str, pre_processor: PreProcessor,
+                 use_linked_targets_only: bool = USE_LINKED_TARGETS_ONLY_DEFAULT):
         """
         Creates a dataset from the SAFA dataset format.
         :param project_path: the path to the project
+        :param pre_processor: the pre_processor to run on the data
+        :param use_linked_targets_only: if True, uses only the targets that make up at least one true link
         """
-        super().__init__()
+        super().__init__(pre_processor, use_linked_targets_only)
         self.project_path = project_path
 
     def create(self) -> TraceDataset:
@@ -79,7 +84,7 @@ class SafaDatasetCreator(AbstractDatasetCreator):
         artifacts = []
         for artifact_entry in data_file[SafaKey.ARTIFACTS]:
 
-            artifact_tokens = self._process_artifact_tokens([SafaKey.ARTIFACT_TOKEN])
+            artifact_tokens = self._process_tokens([SafaKey.ARTIFACT_TOKEN])
 
             artifacts.append(
                 Artifact(artifact_entry[SafaKey.ARTIFACT_ID], artifact_tokens))

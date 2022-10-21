@@ -7,7 +7,7 @@ from tracer.pre_processing.separate_joined_words_step import SeparateJoinedWords
 from tracer.pre_processing.shuffle_words_step import ShuffleWordsStep
 
 
-class PreProcessingOptions(Enum):
+class PreProcessingOption(Enum):
     FILTER_MIN_LENGTH = FilterMinLengthStep
     SHUFFLE_WORDS = ShuffleWordsStep
     REMOVE_UNWANTED_CHARS = RemoveUnwantedCharsStep

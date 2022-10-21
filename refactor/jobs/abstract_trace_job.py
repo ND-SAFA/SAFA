@@ -1,15 +1,14 @@
-import os
 from abc import ABC
-from typing import Dict, Optional
+from typing import Dict, Optional, Tuple, List
 
 from config.constants import SAVE_OUTPUT_DEFAULT, ADD_MOUNT_DIRECTORY_TO_OUTPUT_DEFAULT
 from jobs.abstract_job import AbstractJob
 from server.storage.safa_storage import SafaStorage
 from tracer.dataset.creators.supported_dataset_creator import SupportedDatasetCreator
-from tracer.dataset.dataset_roles import DatasetRoles
+from tracer.dataset.dataset_role import DatasetRole
 from tracer.dataset.trace_dataset import TraceDataset
 from tracer.models.base_models.supported_base_model import SupportedBaseModel
-from tracer.pre_processing.pre_processing_options import PreProcessingOptions
+from tracer.pre_processing.pre_processing_option import PreProcessingOption
 from tracer.pre_processing.pre_processor import PreProcessor
 from tracer.train.trace_args import TraceArgs
 from tracer.train.trace_trainer import TraceTrainer
@@ -18,8 +17,8 @@ from tracer.train.trace_trainer import TraceTrainer
 class AbstractTraceJob(AbstractJob, ABC):
 
     def __init__(self, model_path: str, base_model: SupportedBaseModel, output_dir: str,
-                 datasets_map: Dict[DatasetRoles, (SupportedDatasetCreator, Dict)],
-                 dataset_pre_processing_options: Dict[DatasetRoles, (PreProcessingOptions, Dict)] = None,
+                 datasets_map: Dict[DatasetRole, Tuple[SupportedDatasetCreator, Dict]],
+                 dataset_pre_processing_options: Dict[DatasetRole, Tuple[List[PreProcessingOption], Dict]] = None,
                  trace_args_params: Dict = None,
                  add_mount_directory_to_output: bool = ADD_MOUNT_DIRECTORY_TO_OUTPUT_DEFAULT,
                  save_job_output: bool = SAVE_OUTPUT_DEFAULT):
@@ -37,15 +36,15 @@ class AbstractTraceJob(AbstractJob, ABC):
         model_path = SafaStorage.add_mount_directory(model_path)
         super().__init__(model_path, base_model, output_dir, add_mount_directory_to_output, save_job_output)
         dataset_pre_processing_options = dataset_pre_processing_options if dataset_pre_processing_options else {}
-        self.train_dataset = self._make_dataset(datasets_map, dataset_pre_processing_options, DatasetRoles.TRAIN)
-        self.eval_dataset = self._make_dataset(datasets_map, dataset_pre_processing_options, DatasetRoles.EVAL)
+        self.train_dataset = self._make_dataset(datasets_map, dataset_pre_processing_options, DatasetRole.TRAIN)
+        self.eval_dataset = self._make_dataset(datasets_map, dataset_pre_processing_options, DatasetRole.EVAL)
         self.trace_args = TraceArgs(**trace_args_params)
         self.__trainer = None
 
     @staticmethod
-    def _make_dataset(datasets_map: Dict[DatasetRoles, (SupportedDatasetCreator, Dict)],
-                      dataset_pre_processing_options: Dict[DatasetRoles, (PreProcessingOptions, Dict)],
-                      dataset_role: DatasetRoles) -> Optional[TraceDataset]:
+    def _make_dataset(datasets_map: Dict[DatasetRole, (SupportedDatasetCreator, Dict)],
+                      dataset_pre_processing_options: Dict[DatasetRole, (PreProcessingOption, Dict)],
+                      dataset_role: DatasetRole) -> Optional[TraceDataset]:
         """
         Handles making the dataset for a specified role and the given parameters
         :param datasets_map: dictionary mapping dataset role (e.g. train/eval) to the desired dataset creator and its params

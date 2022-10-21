@@ -1,6 +1,7 @@
 <template>
   <generic-selector
     is-open
+    show-expand
     :has-select="false"
     :has-edit="false"
     :headers="headers"
@@ -21,25 +22,7 @@
       />
     </template>
     <template v-slot:expanded-item="{ item }">
-      <div class="my-2">
-        <typography
-          el="h2"
-          variant="subtitle"
-          value="Default Trace Directions"
-        />
-        <flex-box
-          v-for="(direction, idx) in item.defaultTraceDirections"
-          :key="idx"
-        >
-          <attribute-chip artifact-type :value="direction.source" />
-          <v-icon>mdi-arrow-right</v-icon>
-          <attribute-chip artifact-type :value="direction.target" />
-        </flex-box>
-        <typography t="2" el="h2" variant="subtitle" value="Training Runs" />
-        <typography secondary value="There are no training runs." />
-        <typography t="2" el="h2" variant="subtitle" value="Evaluation Runs" />
-        <typography secondary value="There are no evaluation runs." />
-      </div>
+      <ModelEditor :model="item" />
     </template>
     <template v-slot:[`item.actions`]="{ item }">
       <generic-icon-button
@@ -56,29 +39,22 @@ import Vue from "vue";
 import { TrainedModel } from "@/types";
 import { modelSaveStore, projectStore } from "@/hooks";
 import { handleDeleteModel, handleLoadModels } from "@/api";
-import {
-  AttributeChip,
-  FlexBox,
-  GenericSelector,
-  Typography,
-  GenericIconButton,
-} from "@/components/common";
+import { GenericSelector, GenericIconButton } from "@/components/common";
 import ModelShareModal from "./ModelShareModal.vue";
 import ModelCreatorModal from "./ModelCreatorModal.vue";
+import ModelEditor from "./ModelEditor.vue";
 
 /**
- * Renders a table of project models
+ * Renders a table of project models.
  */
 export default Vue.extend({
   name: "ModelTable",
   components: {
     ModelShareModal,
-    GenericIconButton,
     ModelCreatorModal,
-    AttributeChip,
-    FlexBox,
+    GenericIconButton,
+    ModelEditor,
     GenericSelector,
-    Typography,
   },
   data() {
     return {

@@ -75,46 +75,15 @@
           </v-card>
         </v-col>
       </v-row>
-      <attribute-list-input
-        class="mt-10"
-        :model="{}"
-        :attributes="[
-          {
-            key: '1',
-            label: 'Some string',
-            type: 'string',
-            options: [],
-          },
-          {
-            key: '2',
-            label: 'Some number',
-            type: 'number',
-            options: [],
-          },
-          {
-            key: '3',
-            label: 'Some select',
-            type: 'select',
-            options: ['A', 'B'],
-          },
-          {
-            key: '4',
-            label: 'Some multiselect',
-            type: 'multiselect',
-            options: ['A', 'B'],
-          },
-        ]"
-      />
     </template>
   </private-page>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { CreatorTypes } from "@/types";
+import { CreatorTabTypes } from "@/types";
 import { ThemeColors } from "@/util";
 import { navigateTo, QueryParams, Routes } from "@/router";
-import AttributeListInput from "@/components/common/input/AttributeListInput.vue";
 import { PrivatePage, ProjectVersionList, Typography } from "@/components";
 
 /**
@@ -123,7 +92,6 @@ import { PrivatePage, ProjectVersionList, Typography } from "@/components";
 export default Vue.extend({
   name: "HomeView",
   components: {
-    AttributeListInput,
     PrivatePage,
     ProjectVersionList,
     Typography,
@@ -136,22 +104,22 @@ export default Vue.extend({
   methods: {
     handleOpenStandard() {
       navigateTo(Routes.PROJECT_CREATOR, {
-        [QueryParams.TAB]: CreatorTypes.standard,
+        [QueryParams.TAB]: CreatorTabTypes.standard,
       });
     },
     handleOpenBulk() {
       navigateTo(Routes.PROJECT_CREATOR, {
-        [QueryParams.TAB]: CreatorTypes.bulk,
+        [QueryParams.TAB]: CreatorTabTypes.bulk,
       });
     },
     handleOpenGitHub() {
       navigateTo(Routes.PROJECT_CREATOR, {
-        [QueryParams.TAB]: CreatorTypes.github,
+        [QueryParams.TAB]: CreatorTabTypes.github,
       });
     },
     handleOpenJira() {
       navigateTo(Routes.PROJECT_CREATOR, {
-        [QueryParams.TAB]: CreatorTypes.jira,
+        [QueryParams.TAB]: CreatorTabTypes.jira,
       });
     },
   },

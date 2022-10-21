@@ -2,9 +2,11 @@ import {
   ApprovalType,
   ArtifactDeltaState,
   ColumnDataType,
+  CreatorTabTypes,
   DocumentType,
   FTANodeType,
   ModelShareType,
+  ModelTabTypes,
   ModelType,
   ProjectRole,
   SafetyCaseType,
@@ -179,5 +181,32 @@ export function modelShareOptions(): SelectOption[] {
   return [
     createEnumOption(ModelShareType.CLONE, "Clone the model"),
     createEnumOption(ModelShareType.REUSE, "Reuse the same model"),
+  ];
+}
+
+/**
+ * Returns display names for project creator tabs.
+ *
+ * @return The select option names and ids.
+ */
+export function creatorTabOptions(): SelectOption[] {
+  return [
+    createEnumOption(CreatorTabTypes.standard, "Standard Upload"),
+    createEnumOption(CreatorTabTypes.bulk, "Bulk Upload"),
+    createEnumOption(CreatorTabTypes.jira, "Jira Upload"),
+    createEnumOption(CreatorTabTypes.github, "GitHub Upload"),
+  ];
+}
+
+/**
+ * Returns display names for model editor tabs.
+ *
+ * @return The select option names and ids.
+ */
+export function modelEditorTabOptions(): SelectOption[] {
+  return [
+    createEnumOption(ModelTabTypes.training, "Training"),
+    createEnumOption(ModelTabTypes.logs, "Training Logs"),
+    createEnumOption(ModelTabTypes.evaluation, "Evaluation"),
   ];
 }

@@ -1,6 +1,9 @@
 <template>
   <v-alert border="left" color="warning" class="mt-2">
-    <typography color="white" value="This page is still under construction." />
+    <typography
+      color="white"
+      value="This page is still under construction. Check back soon!"
+    />
   </v-alert>
 </template>
 

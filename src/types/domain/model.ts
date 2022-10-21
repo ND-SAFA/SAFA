@@ -13,11 +13,6 @@ export interface TrainedModel {
    * The base model that is being extended.
    */
   baseModel: ModelType;
-  /**
-   * NOT YET IMPLEMENTED.
-   * The trace directions that this model has been trained on.
-   */
-  defaultTraceDirections?: { source: string; target: string }[];
 }
 
 /**

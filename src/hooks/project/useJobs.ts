@@ -15,7 +15,7 @@ export const useJobs = defineStore("jobs", {
     /**
      * The index of the selected job.
      */
-    selectedJob: 0,
+    selectedJob: -1,
   }),
   getters: {},
   actions: {

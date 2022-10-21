@@ -7,17 +7,16 @@
       <typography
         el="p"
         y="2"
-        value="Select a project below to see more detailed updates on the import
-        status."
+        value="Select an upload below to see more details on its status."
       />
-      <job-list />
+      <job-table />
     </template>
   </private-page>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { JobList, PrivatePage, BackButton, Typography } from "@/components";
+import { PrivatePage, BackButton, Typography, JobTable } from "@/components";
 
 /**
  * Displays project uploads.
@@ -25,9 +24,9 @@ import { JobList, PrivatePage, BackButton, Typography } from "@/components";
 export default Vue.extend({
   name: "UploadStatusView",
   components: {
+    JobTable,
     Typography,
     BackButton,
-    JobList,
     PrivatePage,
   },
 });

@@ -17,12 +17,14 @@ public class AppRoutes {
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Accounts {
         public static final String LOGIN = "/login";
+        public static final String LOGOUT = "/logout";
         protected static final String PREFIX = "/accounts";
         public static final String CHANGE_PASSWORD = Accounts.PREFIX + "/change";
         public static final String RESET_PASSWORD = Accounts.PREFIX + "/reset";
         public static final String FORGOT_PASSWORD = Accounts.PREFIX + "/forgot";
         public static final String CREATE_ACCOUNT = Accounts.PREFIX + "/create";
         public static final String DELETE_ACCOUNT = Accounts.PREFIX + "/delete";
+        public static final String SELF = Accounts.PREFIX + "/self";
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -87,7 +89,7 @@ public class AppRoutes {
     public static class Links {
         public static final String GET_GENERATED_LINKS_IN_PROJECT_VERSION = Projects.ROOT
             + "/versions/{versionId}/links/generated";
-        protected static final String GENERATE_LINKS = Projects.ROOT + "/links/generate";
+        public static final String GENERATE_LINKS = Projects.ROOT + "/links/generate";
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -184,8 +186,10 @@ public class AppRoutes {
 
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
         public static class Credentials {
-            public static final String ROOT = Accounts.PREFIX + "/github/credentials";
+            public static final String REGISTER = Accounts.PREFIX + "/github/credentials/{accessCode}";
             public static final String REFRESH = Accounts.PREFIX + "/github/credentials";
+            public static final String DELETE = Accounts.PREFIX + "/github/credentials";
+            public static final String VALID = Accounts.PREFIX + "/github/credentials/check";
         }
 
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -193,6 +197,7 @@ public class AppRoutes {
             public static final String UPDATE = Versions.BY_ID + "/import/github/{repositoryName}";
             private static final String ROOT = Projects.ROOT + "/import";
             public static final String BY_NAME = Import.ROOT + "/github/{repositoryName}";
+            public static final String IMPORT_INTO_EXISTING = Versions.BY_ID + "/import/github/{repositoryName}";
         }
     }
 

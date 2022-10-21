@@ -50,26 +50,13 @@ public class GithubCommitDiffResponseDTO {
         private String blobUrl;
 
         public enum GitHubFileDiffStatus {
-            @JsonProperty("added")
-            ADDED,
-
-            @JsonProperty("removed")
-            REMOVED,
-
-            @JsonProperty("modified")
-            MODIFIED,
-
-            @JsonProperty("renamed")
-            RENAMED,
-
-            @JsonProperty("copied")
-            COPIED,
-
-            @JsonProperty("changed")
-            CHANGED,
-
-            @JsonProperty("unchanged")
-            UNCHANGED;
+            @JsonProperty("added")      ADDED,
+            @JsonProperty("removed")    REMOVED,
+            @JsonProperty("modified")   MODIFIED,
+            @JsonProperty("renamed")    RENAMED,
+            @JsonProperty("copied")     COPIED,
+            @JsonProperty("changed")    CHANGED,
+            @JsonProperty("unchanged")  UNCHANGED;
         }
     }
 }

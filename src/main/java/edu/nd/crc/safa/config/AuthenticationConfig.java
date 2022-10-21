@@ -34,6 +34,9 @@ public class AuthenticationConfig extends WebSecurityConfigurerAdapter {
     private static final List<String> allowedOrigins = Arrays.asList(
         "http://localhost:8080",
         "http://localhost:8081",
+        "https://localhost:8080",
+        "https://localhost:8081",
+        "https://localhost.safa.ai:8080",
         "https://safa-fend-dev-5asg6qsnba-uc.a.run.app",
         "https://safa-fend-prod-5asg6qsnba-uc.a.run.app",
         "https://dev.safa.ai",
@@ -81,6 +84,10 @@ public class AuthenticationConfig extends WebSecurityConfigurerAdapter {
                     "/v3/api-docs/**",
                     "/docs")
                 .permitAll()
+            .and()
+                .logout()
+                .logoutUrl(AppRoutes.Accounts.LOGOUT)
+                .deleteCookies(SecurityConstants.JWT_COOKIE_NAME)
             .and()
                 .authorizeRequests()
                 // Close authentication settings

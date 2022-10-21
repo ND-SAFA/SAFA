@@ -21,6 +21,6 @@ CREATE TABLE IF NOT EXISTS github_project
     branch          VARCHAR(32)  NOT NULL,
     last_commit_sha VARCHAR(64)  NOT NULL,
     user_id         VARCHAR(255) NOT NULL,
-    FOREIGN KEY (safa_project_id) REFERENCES project (project_id),
-    FOREIGN KEY (user_id) REFERENCES safa_user (user_id)
+    CONSTRAINT github_project_ibfk_1 FOREIGN KEY (safa_project_id) REFERENCES project (project_id),
+    CONSTRAINT github_project_ibfk_2 FOREIGN KEY (user_id) REFERENCES safa_user (user_id)
 );

@@ -1,6 +1,5 @@
 package edu.nd.crc.safa.config;
 
-import edu.nd.crc.safa.features.github.repositories.GithubProjectRepository;
 import edu.nd.crc.safa.features.github.services.GithubConnectionService;
 import edu.nd.crc.safa.features.github.services.GithubConnectionServiceImpl;
 import edu.nd.crc.safa.features.jira.repositories.JiraProjectRepository;
@@ -37,7 +36,6 @@ public class WebApiConfiguration {
     private static final Logger log = LoggerFactory.getLogger(WebApiConfiguration.class);
 
     private JiraProjectRepository jiraProjectRepository;
-    private GithubProjectRepository githubProjectRepository;
 
     @Bean
     public JiraConnectionService jiraConnectionService() {
@@ -46,7 +44,7 @@ public class WebApiConfiguration {
 
     @Bean
     public GithubConnectionService githubConnectionService() {
-        return new GithubConnectionServiceImpl(githubProjectRepository, webClient());
+        return new GithubConnectionServiceImpl(webClient());
     }
 
     private ExchangeFilterFunction logRequest() {

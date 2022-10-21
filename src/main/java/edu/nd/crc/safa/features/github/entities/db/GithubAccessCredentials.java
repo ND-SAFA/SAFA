@@ -17,6 +17,7 @@ import javax.persistence.Version;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
@@ -28,6 +29,7 @@ import org.hibernate.annotations.Type;
 @Entity
 @Table(name = "github_access_credentials")
 @Data
+@NoArgsConstructor
 public class GithubAccessCredentials {
 
     @Id

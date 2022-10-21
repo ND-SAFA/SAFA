@@ -10,6 +10,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -18,6 +20,8 @@ import org.hibernate.annotations.Type;
 /**
  * Represents list of tokens used to reset user password
  */
+@Data
+@NoArgsConstructor
 @Entity
 @Table(name = "password_reset_token")
 public class PasswordResetToken {
@@ -41,22 +45,22 @@ public class PasswordResetToken {
     @Type(type = "uuid-char")
     @JoinColumn(name = "user_id", nullable = false, unique = true, columnDefinition = "VARCHAR(36)")
     @NonNull
-    private final SafaUser user;
+    private SafaUser user;
 
     /**
      * The token used to verify the identity of the user.
      */
     @Column(nullable = false)
     @NonNull
-    private final String token;
+    private String token;
 
     @Column(name = "expiration_date", nullable = false)
     @NonNull
-    private final Date expirationDate;
+    private Date expirationDate;
 
-    public PasswordResetToken(SafaUser user,
-                              String token,
-                              Date expirationDate) {
+    public PasswordResetToken(@NonNull SafaUser user,
+                              @NonNull String token,
+                              @NonNull Date expirationDate) {
         this.user = user;
         this.token = token;
         this.expirationDate = expirationDate;

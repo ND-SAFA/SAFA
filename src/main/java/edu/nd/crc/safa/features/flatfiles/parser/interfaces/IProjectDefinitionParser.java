@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.tgen.entities.TraceGenerationRequest;
+import edu.nd.crc.safa.features.models.tgen.entities.TraceGenerationRequest;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 
 import org.javatuples.Pair;

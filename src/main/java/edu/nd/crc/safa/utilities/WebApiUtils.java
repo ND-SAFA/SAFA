@@ -2,11 +2,11 @@ package edu.nd.crc.safa.utilities;
 
 import java.util.Optional;
 
-import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.utilities.exception.ExternalAPIException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.reactive.function.client.WebClientException;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
 /**
@@ -20,9 +20,9 @@ public abstract class WebApiUtils {
     public static <T> Optional<T> blockOptional(Mono<T> mono) {
         try {
             return mono.blockOptional();
-        } catch (WebClientException ex) {
+        } catch (WebClientResponseException ex) {
             log.error("Exception thrown while executing blocking call", ex);
-            throw new SafaError("Exception thrown while executing blocking call", ex);
+            throw new ExternalAPIException(ex.getStatusCode(), "External API call exception");
         }
     }
 }

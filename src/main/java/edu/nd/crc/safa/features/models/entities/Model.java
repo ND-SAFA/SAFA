@@ -9,7 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import edu.nd.crc.safa.features.tgen.entities.BaseGenerationModels;
+import edu.nd.crc.safa.features.models.tgen.entities.BaseGenerationModels;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -86,11 +86,18 @@ dependencies {
     implementation 'org.eclipse.elk:org.eclipse.elk.core:0.8.1'
     implementation 'org.eclipse.elk:org.eclipse.elk.alg.mrtree:0.8.1'
 
+    // email
+    implementation 'com.infobip:infobip-api-java-client:3.2.0'
+
     // testing
     implementation 'org.springframework.boot:spring-boot-starter-test:2.7.2'
     testImplementation 'com.h2database:h2:2.1.210' // Most up-to-date version compatible with flyway
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
     testImplementation 'org.springframework.security:spring-security-test:5.7.2'
+    testImplementation 'org.mockito:mockito-core:4.7.0'
+    testImplementation 'net.bytebuddy:byte-buddy-agent:1.12.13'
+    implementation 'net.bytebuddy:byte-buddy:1.12.13'
+
 }
 
 test {

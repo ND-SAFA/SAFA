@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.UUID;
 import javax.validation.constraints.NotNull;
 
-import edu.nd.crc.safa.common.AuthorizationSetter;
+import edu.nd.crc.safa.authentication.AuthorizationSetter;
 import edu.nd.crc.safa.features.jira.entities.app.JiraIssueDTO;
 import edu.nd.crc.safa.features.jira.entities.db.JiraAccessCredentials;
 import edu.nd.crc.safa.features.jobs.entities.app.JobSteps;

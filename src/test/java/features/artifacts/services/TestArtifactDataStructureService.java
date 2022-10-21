@@ -7,8 +7,8 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Optional;
 
-import edu.nd.crc.safa.common.AuthorizationSetter;
-import edu.nd.crc.safa.common.ProjectEntities;
+import edu.nd.crc.safa.authentication.AuthorizationSetter;
+import edu.nd.crc.safa.features.common.ProjectEntities;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;

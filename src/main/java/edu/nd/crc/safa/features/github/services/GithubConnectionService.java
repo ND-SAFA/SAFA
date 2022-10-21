@@ -2,6 +2,7 @@ package edu.nd.crc.safa.features.github.services;
 
 import java.util.List;
 
+import edu.nd.crc.safa.features.github.entities.app.GithubAccessCredentialsDTO;
 import edu.nd.crc.safa.features.github.entities.app.GithubCommitDiffResponseDTO;
 import edu.nd.crc.safa.features.github.entities.app.GithubFileBlobDTO;
 import edu.nd.crc.safa.features.github.entities.app.GithubRefreshTokenDTO;
@@ -87,4 +88,10 @@ public interface GithubConnectionService {
      * @return Information blob information for the url provided.
      */
     GithubFileBlobDTO getBlobInformation(GithubAccessCredentials credentials, String url);
+
+    /**
+     * @param accessCode Code retrieved from FEND after user has authorized our application
+     * @return Set of GitHub credentials that will be saved for later use.
+     */
+    GithubAccessCredentialsDTO useAccessCode(String accessCode);
 }

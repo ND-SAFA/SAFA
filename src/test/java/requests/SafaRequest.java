@@ -1,14 +1,19 @@
 package requests;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
+import javax.servlet.http.Cookie;
 
 import edu.nd.crc.safa.utilities.JsonFileUtilities;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.http.MediaType;
@@ -25,7 +30,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
  */
 public class SafaRequest extends RouteBuilder<SafaRequest> {
     private static MockMvc mockMvc;
-    private static String authorizationToken = "";
+    private static Cookie authorizationToken = null;
 
     public SafaRequest(String path) {
         super(path);
@@ -39,20 +44,20 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
         SafaRequest.mockMvc = mockMvc;
     }
 
-    public static String getAuthorizationToken() {
+    public static Cookie getAuthorizationToken() {
         return authorizationToken;
     }
 
-    public static void setAuthorizationToken(String authorizationToken) {
+    public static void setAuthorizationToken(Cookie authorizationToken) {
         SafaRequest.authorizationToken = authorizationToken;
     }
 
     public static void assertTokenExists() {
-        assert SafaRequest.authorizationToken != null && SafaRequest.authorizationToken.length() > 0;
+        assert SafaRequest.authorizationToken != null;
     }
 
     public static void clearAuthorizationToken() {
-        SafaRequest.authorizationToken = "";
+        SafaRequest.authorizationToken = null;
     }
 
     public FlatFileRequest getFlatFileHelper() {
@@ -72,7 +77,7 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
     }
 
     public JSONObject getWithJsonObject(ResultMatcher expectedResultMatcher) throws Exception {
-        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get(this.buildEndpoint());
+        MockHttpServletRequestBuilder requestBuilder = get(this.buildEndpoint());
         return sendAuthenticatedRequest(requestBuilder,
             expectedResultMatcher,
             authorizationToken,
@@ -80,7 +85,7 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
     }
 
     protected <T> T sendGet(Function<String, T> responseParser) throws Exception {
-        return sendAuthenticatedRequest(MockMvcRequestBuilders.get(this.buildEndpoint()),
+        return sendAuthenticatedRequest(get(this.buildEndpoint()),
             status().isOk(),
             authorizationToken,
             responseParser);
@@ -96,6 +101,17 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
 
     public JSONObject postWithJsonObject(Object body, ResultMatcher resultMatcher) throws Exception {
         return postWithResponseParser(body, ResponseParser::jsonCreator, resultMatcher);
+    }
+
+    public void putWithJsonObject(Object body, ResultMatcher resultMatcher) throws Exception {
+        sendAuthenticatedRequest(
+            put(this.buildEndpoint())
+                .content(stringify(body))
+                .contentType(MediaType.APPLICATION_JSON),
+            resultMatcher,
+            SafaRequest.authorizationToken,
+            ResponseParser::jsonCreator
+        );
     }
 
     public <T> T postWithResponseParser(Object body,
@@ -119,7 +135,7 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
     private <T> T postWithResponseParser(Object body,
                                          Function<String, T> responseParser,
                                          ResultMatcher resultMatcher,
-                                         String localAuthorizationToken
+                                         Cookie localAuthorizationToken
     ) throws Exception {
         return sendAuthenticatedRequest(
             post(this.buildEndpoint())
@@ -129,6 +145,39 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
             localAuthorizationToken,
             responseParser
         );
+    }
+
+    public JSONObject postWithoutBody(ResultMatcher resultMatcher) throws Exception {
+        return makeAsyncRequestWithoutBody(post(this.buildEndpoint()), resultMatcher);
+    }
+
+    public JSONObject putWithoutBody(ResultMatcher resultMatcher) throws Exception {
+        return makeAsyncRequestWithoutBody(put(this.buildEndpoint()), resultMatcher);
+    }
+
+    public JSONObject getWithoutBody(ResultMatcher resultMatcher) throws Exception {
+        return makeAsyncRequestWithoutBody(get(this.buildEndpoint()), resultMatcher);
+    }
+
+    public JSONObject makeAsyncRequestWithoutBody(MockHttpServletRequestBuilder request,
+                                                  ResultMatcher resultMatcher) throws Exception {
+
+        if (authorizationToken != null) {
+            request = request.cookie(authorizationToken);
+        }
+
+        MvcResult result = mockMvc
+            .perform(request)
+            .andReturn();
+
+        String response = mockMvc
+            .perform(asyncDispatch(result))
+            .andExpect(resultMatcher)
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+        return ResponseParser.jsonCreator(response);
     }
 
     private String stringify(Object body) {
@@ -155,10 +204,10 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
 
     protected <T> T sendAuthenticatedRequest(MockHttpServletRequestBuilder request,
                                              ResultMatcher test,
-                                             String authorizationToken,
+                                             Cookie authorizationToken,
                                              Function<String, T> responseParser) throws Exception {
-        if (authorizationToken != null && !authorizationToken.equals("")) {
-            request = request.header("Authorization", authorizationToken);
+        if (authorizationToken != null) {
+            request = request.cookie(authorizationToken);
         }
         return sendRequestAndParseResponse(request, test, responseParser);
     }
@@ -175,5 +224,27 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
         MockHttpServletResponse response = requestResult.getResponse();
         String content = response.getContentAsString();
         return stringCreator.apply(content);
+    }
+
+    public Optional<Cookie> sendPostRequestAndRetrieveCookie(Object body,
+                                                             ResultMatcher test,
+                                                             String cookieName) throws Exception {
+        MvcResult requestResult = mockMvc
+            .perform(post(this.buildEndpoint())
+                .content(stringify(body))
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(test)
+            .andReturn();
+
+        MockHttpServletResponse response = requestResult.getResponse();
+        Cookie[] cookies = response.getCookies();
+
+        if (cookies.length == 0) {
+            return Optional.empty();
+        }
+
+        return Arrays.stream(response.getCookies())
+            .filter(c -> c.getName().equals(cookieName))
+            .findFirst();
     }
 }

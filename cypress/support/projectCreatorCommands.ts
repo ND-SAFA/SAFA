@@ -2,7 +2,7 @@ import {
   DataCy,
   miniProjectFiles,
   simpleProjectFilesMap,
-  testProject
+  testProject,
 } from "../fixtures";
 import { validUser } from "../fixtures/data/user.json";
 
@@ -103,16 +103,4 @@ Cypress.Commands.add("createProjectSettings", () => {
   cy.clickButtonWithName("View Project")
     .clickButton(DataCy.navProjectButton)
     .clickButtonWithName("Project Settings");
-});
-
-Cypress.Commands.add("addingNewMember", (name, projectRole) => {
-  cy.clickButton(DataCy.selectorAddButton);
-  cy.getCy(DataCy.projectSettingsAddEmail).type(name);
-  cy.clickButtonWithName("Project Role");
-  cy.clickButtonWithName(projectRole);
-  cy.clickButtonWithName("Add to project");
-});
-
-Cypress.Commands.add("projectSettingsSelector", () => {
-  cy.clickButtonWithName("Project").clickButtonWithName("Project Settings");
 });

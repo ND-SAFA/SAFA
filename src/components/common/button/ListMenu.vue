@@ -46,9 +46,9 @@
 </template>
 
 <script lang="ts">
+import Vue, { PropType } from "vue";
 import { ListMenuDefinition } from "@/types";
 import { ThemeColors } from "@/util";
-import Vue, { PropType } from "vue";
 
 /**
  * Renders a list menu.

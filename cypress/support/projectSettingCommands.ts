@@ -1,6 +1,6 @@
 import { DataCy } from "../fixtures";
 
-Cypress.Commands.add("projectSettingsSelector", () => {
+Cypress.Commands.add("openProjectSettings", () => {
   cy.clickButtonWithName("Project").clickButtonWithName("Project Settings");
 });
 

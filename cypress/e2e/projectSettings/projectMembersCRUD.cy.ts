@@ -7,7 +7,7 @@ describe("Project Members CRUD", () => {
 
   beforeEach(() => {
     cy.loadCurrentProject();
-    cy.projectSettingsSelector();
+    cy.openProjectSettings();
   });
 
   describe("As an owner, I can add a new member to a project", () => {

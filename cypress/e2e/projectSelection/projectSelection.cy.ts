@@ -1,16 +1,10 @@
-import {
-  DataCy,
-  simpleProjectFiles,
-  testProject,
-  validUser,
-} from "../fixtures";
+import { DataCy, simpleProjectFiles, testProject } from "../../fixtures";
 
 describe("Project Selection", () => {
   beforeEach(() => {
     cy.dbResetProjects().loadNewProject();
 
     cy.visit("/create")
-      .login(validUser.email, validUser.password)
       .location("pathname", { timeout: 2000 })
       .should("equal", "/create");
 
@@ -84,51 +78,41 @@ describe("Project Selection", () => {
   });
 
   describe("Project CRUD", () => {
-    it("I can create an empty project", () => {
-      cy.getCy(DataCy.selectionModal).within(() => {
-        cy.clickButton(DataCy.selectorAddButton);
+    describe("As an admin, I can edit a project's name and description", () => {
+      it("edits a project", () => {
+        cy.getCy(DataCy.selectionModal).within(() => {
+          cy.clickButton(DataCy.selectorEditButton, "first");
+        });
+
+        cy.getCy(DataCy.projectEditModal).within(() =>
+          cy
+            .getCy(DataCy.projectEditNameInput)
+            .type(" Edited")
+            .clickButton(DataCy.projectEditSaveButton)
+        );
+
+        cy.getCy(DataCy.snackbarSuccess).should("be.visible");
       });
-
-      cy.getCy(DataCy.projectEditModal).within(() =>
-        cy
-          .setProjectIdentifier("modal")
-          .clickButton(DataCy.projectEditSaveButton)
-      );
-
-      cy.getCy(DataCy.snackbarSuccess).should("be.visible");
     });
 
-    it("As an admin, I can edit a project's name and description", () => {
-      cy.getCy(DataCy.selectionModal).within(() => {
-        cy.clickButton(DataCy.selectorEditButton, "first");
+    describe("As an owner, I can delete a project", () => {
+      it("Deletes a project", () => {
+        cy.getCy(DataCy.selectionModal).within(() => {
+          cy.clickButton(DataCy.selectorDeleteButton, "first");
+        });
+
+        cy.getCy(DataCy.projectDeleteModal).within(() => {
+          cy.getCy(DataCy.modalTitle)
+            .invoke("text")
+            .then(() =>
+              cy.inputText(DataCy.projectDeleteNameInput, testProject.name)
+            );
+
+          cy.clickButton(DataCy.projectDeleteConfirmButton);
+        });
+
+        cy.getCy(DataCy.snackbarSuccess).should("be.visible");
       });
-
-      cy.getCy(DataCy.projectEditModal).within(() =>
-        cy
-          .getCy(DataCy.projectEditNameInput)
-          .type(" Edited")
-          .clickButton(DataCy.projectEditSaveButton)
-      );
-
-      cy.getCy(DataCy.snackbarSuccess).should("be.visible");
-    });
-
-    it("As an owner, I can delete a project", () => {
-      cy.getCy(DataCy.selectionModal).within(() => {
-        cy.clickButton(DataCy.selectorDeleteButton, "first");
-      });
-
-      cy.getCy(DataCy.projectDeleteModal).within(() => {
-        cy.getCy(DataCy.modalTitle)
-          .invoke("text")
-          .then(() =>
-            cy.inputText(DataCy.projectDeleteNameInput, testProject.name)
-          );
-
-        cy.clickButton(DataCy.projectDeleteConfirmButton);
-      });
-
-      cy.getCy(DataCy.snackbarSuccess).should("be.visible");
     });
   });
 

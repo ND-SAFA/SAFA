@@ -31,7 +31,7 @@
 import Vue, { PropType } from "vue";
 import { ProjectModel } from "@/types";
 import { identifierSaveStore, projectStore } from "@/hooks";
-import { getProjectFiles, handleSaveProject } from "@/api";
+import { handleSaveProject, handleDownloadProjectCSV } from "@/api";
 import { GenericIconButton, Typography, FlexBox } from "@/components/common";
 import { ProjectIdentifierModal } from "@/components/project/shared";
 
@@ -86,7 +86,7 @@ export default Vue.extend({
      * Downloads project files
      */
     handleDownload(): void {
-      getProjectFiles(projectStore.versionId);
+      handleDownloadProjectCSV();
     },
   },
 });

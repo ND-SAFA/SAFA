@@ -9,11 +9,17 @@ module.exports = {
     },
   },
   lintOnSave: true,
-  devServer: fs.existsSync("./certs/localhost-key.pem")
+  pwa: {
+    iconPaths: {
+      favicon16: "favicon.ico",
+      favicon32: "favicon.ico",
+    },
+  },
+  devServer: fs.existsSync("./certs/localhost.safa.ai.pem")
     ? {
         https: {
-          key: fs.readFileSync("./certs/localhost-key.pem"),
-          cert: fs.readFileSync("./certs/localhost.pem"),
+          key: fs.readFileSync("./certs/localhost.safa.ai-key.pem"),
+          cert: fs.readFileSync("./certs/localhost.safa.ai.pem"),
         },
         host: "localhost.safa.ai",
         port: 8080,

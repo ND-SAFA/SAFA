@@ -43,7 +43,16 @@ export interface SessionModel {
 /**
  * Defines a user model for password reset.
  */
-export type UserResetModel = Omit<UserPasswordModel, "password">;
+export interface UserResetModel {
+  /**
+   * The user's email.
+   */
+  email: string;
+  /**
+   * Leave this blank.
+   */
+  userId: string;
+}
 
 /**
  * Defines a user model for password reset.

@@ -1,6 +1,6 @@
 <template>
-  <v-btn v-if="hasUpdate" outlined small color="secondary" @click="handleClick">
-    <v-icon class="mr-1">mdi-reload</v-icon>
+  <v-btn v-if="hasUpdate" text small color="accent" @click="handleClick">
+    <v-icon class="mr-1">mdi-cloud-sync-outline</v-icon>
     Load Project Updates
   </v-btn>
 </template>

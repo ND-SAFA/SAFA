@@ -7,7 +7,7 @@
       dark
       clearable
       label="Search Artifacts"
-      color="secondary"
+      color="accent"
       v-model="value"
       :items="artifacts"
       :search-input.sync="queryText"
@@ -18,7 +18,9 @@
       data-cy="input-artifact-search-nav"
     >
       <template v-slot:append>
-        <v-icon class="input-no-icon-rotate"> mdi-magnify </v-icon>
+        <v-icon color="accent" class="input-no-icon-rotate">
+          mdi-magnify
+        </v-icon>
       </template>
       <template v-slot:prepend-item>
         <flex-box x="3">

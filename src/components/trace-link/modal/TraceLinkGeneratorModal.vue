@@ -23,6 +23,12 @@
         <custom-model-input v-else v-model="model" />
       </flex-box>
 
+      <typography
+        v-if="!isCustomModel"
+        error
+        value="Predefined models will not produce the best results. Please use a custom model to generate higher quality links."
+      />
+
       <flex-box
         full-width
         y="4"
@@ -124,7 +130,7 @@ export default Vue.extend({
     return {
       isLoading: false,
       isValid: false,
-      isCustomModel: false,
+      isCustomModel: true,
       method: undefined as ModelType | undefined,
       model: undefined as TrainedModel | undefined,
       matrices: [{ source: "", target: "" }] as ArtifactLevelModel[],
@@ -136,7 +142,7 @@ export default Vue.extend({
 
       this.isLoading = false;
       this.isValid = false;
-      this.isCustomModel = false;
+      this.isCustomModel = true;
       this.method = undefined;
       this.model = undefined;
       this.matrices = [{ source: "", target: "" }];

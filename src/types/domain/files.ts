@@ -1,4 +1,4 @@
-import { ArtifactLevelModel, ModelType, TrainedModel } from "@/types/domain";
+import { ArtifactLevelModel, ModelType, GenerationModel } from "@/types/domain";
 
 /**
  * Defines a resource file.
@@ -26,7 +26,7 @@ export interface GeneratedMatrixModel {
   /**
    * The custom model used to generate links.
    */
-  model?: TrainedModel;
+  model?: GenerationModel;
   /**
    * The artifact levels to trace with method.
    */

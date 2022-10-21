@@ -5,7 +5,7 @@ import {
   GeneratedMatrixModel,
   IOHandlerCallback,
   ModelType,
-  TrainedModel,
+  GenerationModel,
 } from "@/types";
 import {
   approvalStore,
@@ -83,7 +83,7 @@ export async function handleGetGeneratedLinks({
  */
 export async function handleGenerateLinks(
   method: ModelType | undefined,
-  model: TrainedModel | undefined,
+  model: GenerationModel | undefined,
   artifactLevels: ArtifactLevelModel[],
   { onSuccess, onError, onComplete }: IOHandlerCallback
 ): Promise<void> {
@@ -121,7 +121,7 @@ export async function handleGenerateLinks(
  * @param onComplete - Called after the action.
  */
 export async function handleTrainModel(
-  model: TrainedModel,
+  model: GenerationModel,
   artifactLevels: ArtifactLevelModel[],
   { onSuccess, onError, onComplete }: IOHandlerCallback
 ): Promise<void> {
@@ -157,7 +157,7 @@ export async function handleTrainModel(
 function createGeneratedMatrix(
   artifactLevels: ArtifactLevelModel[],
   method?: ModelType,
-  model?: TrainedModel
+  model?: GenerationModel
 ): GeneratedMatrixModel {
   return {
     method: model?.baseModel || method || ModelType.NLBert,

@@ -1,6 +1,9 @@
 import { GeneratedMatrixModel, ModelType, VersionModel } from "@/types";
 
-export interface TrainedModel {
+/**
+ * Represents a model trained to generate trace links.
+ */
+export interface GenerationModel {
   /**
    * The model's id.
    */

@@ -3,7 +3,7 @@ import {
   IdentifierModel,
   MembershipModel,
   ProjectModel,
-  TrainedModel,
+  GenerationModel,
   VersionModel,
 } from "@/types";
 import { createProject, removeMatches } from "@/util";
@@ -74,7 +74,7 @@ export const useProject = defineStore("project", {
     /**
      * @return The current project's models.
      */
-    models(): TrainedModel[] {
+    models(): GenerationModel[] {
       return this.project.models;
     },
     /**

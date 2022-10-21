@@ -36,13 +36,13 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { TrainedModel } from "@/types";
+import { GenerationModel } from "@/types";
 import { modelSaveStore, projectStore } from "@/hooks";
 import { handleDeleteModel, handleLoadModels } from "@/api";
 import { GenericSelector, GenericIconButton } from "@/components/common";
 import ModelShareModal from "./ModelShareModal.vue";
 import ModelCreatorModal from "./ModelCreatorModal.vue";
-import ModelEditor from "./ModelEditor.vue";
+import { ModelEditor } from "./editor";
 
 /**
  * Renders a table of project models.
@@ -65,14 +65,14 @@ export default Vue.extend({
         { text: "Base Model", value: "baseModel" },
         { text: "Actions", value: "actions", sortable: false },
       ],
-      currentItem: undefined as TrainedModel | undefined,
+      currentItem: undefined as GenerationModel | undefined,
     };
   },
   computed: {
     /**
      * @return All project models.
      */
-    items(): TrainedModel[] {
+    items(): GenerationModel[] {
       return projectStore.models;
     },
   },
@@ -96,7 +96,7 @@ export default Vue.extend({
      * Opens the modal to edit a model.
      * @param model - The model to edit.
      */
-    handleEdit(model: TrainedModel) {
+    handleEdit(model: GenerationModel) {
       modelSaveStore.baseModel = model;
       this.currentItem = model;
       this.isSaveOpen = true;
@@ -105,7 +105,7 @@ export default Vue.extend({
      * Opens the modal to share a model.
      * @param model - The model to share.
      */
-    handleShare(model: TrainedModel) {
+    handleShare(model: GenerationModel) {
       this.currentItem = model;
       this.isShareOpen = true;
     },
@@ -113,7 +113,7 @@ export default Vue.extend({
      * Opens the modal to delete a model.
      * @param model - The model to delete.
      */
-    handleDelete(model: TrainedModel) {
+    handleDelete(model: GenerationModel) {
       handleDeleteModel(model);
     },
     /**

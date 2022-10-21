@@ -29,48 +29,7 @@
         value="Predefined models will not produce the best results. Please use a custom model to generate higher quality links."
       />
 
-      <flex-box
-        full-width
-        y="4"
-        align="center"
-        v-for="(matrix, idx) in matrices"
-        :key="idx"
-      >
-        <flex-box column full-width>
-          <flex-box b="2">
-            <artifact-type-input
-              hide-details
-              v-model="matrix.source"
-              label="Source Type"
-              class="mr-2"
-            />
-            <artifact-type-input
-              hide-details
-              v-model="matrix.target"
-              label="Target Type"
-              class="mr-2"
-            />
-          </flex-box>
-          <typography
-            secondary
-            align="center"
-            :value="getMatrixDetails(matrix)"
-          />
-        </flex-box>
-        <generic-icon-button
-          icon-id="mdi-close"
-          color="error"
-          tooltip="Remove trace matrix"
-          @click="handleRemoveMatrix(idx)"
-        />
-      </flex-box>
-
-      <flex-box justify="center">
-        <v-btn text color="primary" @click="handleCreateMatrix">
-          <v-icon>mdi-plus</v-icon>
-          Add New Matrix
-        </v-btn>
-      </flex-box>
+      <trace-matrix-creator v-model="matrices" />
     </template>
 
     <template v-slot:actions>
@@ -94,20 +53,19 @@ import {
   ArtifactLevelModel,
   GeneratorOpenState,
   ModelType,
-  TrainedModel,
+  GenerationModel,
 } from "@/types";
-import { appStore, artifactStore, traceStore } from "@/hooks";
+import { appStore } from "@/hooks";
 import { handleGenerateLinks, handleTrainModel } from "@/api";
 import {
-  ArtifactTypeInput,
   FlexBox,
-  GenericIconButton,
   GenericModal,
   Typography,
   GenMethodInput,
   CustomModelInput,
   GenericSwitch,
 } from "@/components/common";
+import { TraceMatrixCreator } from "../base";
 
 /**
  * A modal for generating trace links.
@@ -117,12 +75,11 @@ import {
 export default Vue.extend({
   name: "TraceLinkGeneratorModal",
   components: {
+    TraceMatrixCreator,
     GenericSwitch,
     CustomModelInput,
     GenMethodInput,
-    GenericIconButton,
     Typography,
-    ArtifactTypeInput,
     FlexBox,
     GenericModal,
   },
@@ -132,7 +89,7 @@ export default Vue.extend({
       isValid: false,
       isCustomModel: true,
       method: undefined as ModelType | undefined,
-      model: undefined as TrainedModel | undefined,
+      model: undefined as GenerationModel | undefined,
       matrices: [{ source: "", target: "" }] as ArtifactLevelModel[],
     };
   },
@@ -225,42 +182,6 @@ export default Vue.extend({
       this.isCustomModel = !this.isCustomModel;
       this.model = undefined;
       this.method = undefined;
-    },
-    /**
-     * Gets the details information on a matrix of artifacts.
-     * @param matrix - The matrix to get details for.
-     */
-    getMatrixDetails(matrix: ArtifactLevelModel): string {
-      const sources = artifactStore.getArtifactsByType[matrix.source] || [];
-      const targets = artifactStore.getArtifactsByType[matrix.target] || [];
-      const manual = traceStore.getTraceLinksByArtifactSets(sources, targets, [
-        "manual",
-      ]);
-      const approved = traceStore.getTraceLinksByArtifactSets(
-        sources,
-        targets,
-        ["approved"]
-      );
-
-      return (
-        `Source Artifacts: ${sources.length} | Target Artifacts: ${targets.length} | ` +
-        `Manual Links: ${manual.length} | Approved Links: ${approved.length}`
-      );
-    },
-    /**
-     * Creates a new trace matrix.
-     */
-    handleCreateMatrix(): void {
-      this.matrices.push({ source: "", target: "" });
-    },
-    /**
-     * Removes a matrix from the list.
-     * @param idx - The matrix index to remove.
-     */
-    handleRemoveMatrix(idx: number) {
-      this.matrices = this.matrices.filter(
-        (_, currentIdx) => currentIdx !== idx
-      );
     },
     /**
      * Attempts to generate the selected trace links.

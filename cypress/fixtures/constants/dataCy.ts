@@ -242,6 +242,8 @@ export enum DataCy {
   artifactTableDeleteArtifactRowButton = "button-artifact-delete-icon",
   artifactTableArtifactPanelBody = "text-selected-body",
   artifactTableArtifactDeleteIAcceptButton = "button-confirm-modal",
+
+  // Trace Link Generation
 }
 
 export enum DataIds {

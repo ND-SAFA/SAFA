@@ -441,5 +441,11 @@ declare namespace Cypress {
      * The document modal must be open.
      */
     saveDocument(): Chainable<void>;
+
+    /**
+     * Navigates to the Approve Generated Trace Links page.
+     *
+     */
+    openApproveGeneratedTraceLinks(): Chainable<void>;
   }
 }

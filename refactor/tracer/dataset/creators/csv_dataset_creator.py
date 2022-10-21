@@ -3,10 +3,10 @@ from typing import List
 import pandas as pd
 
 from config.constants import USE_LINKED_TARGETS_ONLY_DEFAULT
-from tracer.dataset.artifact import Artifact
+from tracer.dataset.data_objects.artifact import Artifact
 from tracer.dataset.creators.abstract_trace_dataset_creator import AbstractTraceDatasetCreator
 from tracer.dataset.trace_dataset import TraceDataset
-from tracer.dataset.trace_link import TraceLink
+from tracer.dataset.data_objects.trace_link import TraceLink
 from tracer.pre_processing.pre_processor import PreProcessor
 
 

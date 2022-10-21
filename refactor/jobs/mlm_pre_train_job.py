@@ -16,8 +16,7 @@ from tracer.pre_processing.pre_processing_option import PreProcessingOption
 
 class MLMPreTrainJob(AbstractTraceJob):
 
-    def __init__(self, model_path: str, base_model: SupportedBaseModel, output_dir: str,
-                 orig_data_path: str,
+    def __init__(self, model_path: str, output_dir: str, orig_data_path: str,
                  training_data_dir: str = TRAINING_DATA_DIR_DEFAULT,
                  pre_processing_options: List[PreProcessingOption] = None,
                  pre_processing_params: Dict = None,
@@ -28,7 +27,6 @@ class MLMPreTrainJob(AbstractTraceJob):
                  save_job_output: bool = SAVE_OUTPUT_DEFAULT):
         """
         The base job class for tracing jobs
-        :param base_model: supported base model name
         :param model_path: where the pretrained model will be loaded from
         :param output_dir: where the model will be saved to
         :param orig_data_path: path to the original pretraining
@@ -39,19 +37,21 @@ class MLMPreTrainJob(AbstractTraceJob):
         """
         mounted_training_dir = SafaStorage.add_mount_directory(training_data_dir)
         datasets_map = {DatasetRole.TRAIN: (SupportedDatasetCreator.MLM_PRETRAIN, {"orig_data_path": orig_data_path,
-                                                                                    "training_data_dir": mounted_training_dir,
-                                                                                    "block_size": block_size})}
+                                                                                   "training_data_dir": mounted_training_dir,
+                                                                                   "block_size": block_size})}
         pre_processing_options = {DatasetRole.TRAIN: (pre_processing_options, pre_processing_params)}
-        super().__init__(model_path=model_path, base_model=base_model, output_dir=output_dir,
+        super().__init__(model_path=model_path, base_model=SupportedBaseModel.BERT_FOR_MASKED_LM, output_dir=output_dir,
                          datasets_map=datasets_map, dataset_pre_processing_options=pre_processing_options,
                          trace_args_params=trace_args_params, save_job_output=save_job_output,
                          add_mount_directory_to_output=add_mount_directory_to_output)
         self.mlm_probability = mlm_probability
 
     def _run(self):
+        tokenizer = self.model_generator.get_tokenizer()
         data_collator = DataCollatorForLanguageModeling(
-            tokenizer=self.model_generator.get_tokenizer(), mlm=True, mlm_probability=self.mlm_probability
+            tokenizer=tokenizer, mlm=True, mlm_probability=self.mlm_probability
         )
+        tokenizer.save_vocabulary(self.output_dir)
         trainer = self.get_trainer(data_collator=data_collator)
         result = trainer.train(self.train_dataset)
         trainer.save_model(trainer.args.output_dir)

@@ -2,16 +2,16 @@ from abc import ABC, abstractmethod
 from typing import List, Union, Set, Dict, Tuple
 
 from config.constants import USE_LINKED_TARGETS_ONLY_DEFAULT
-from tracer.dataset.artifact import Artifact
+from tracer.dataset.data_objects.artifact import Artifact
 from tracer.dataset.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tracer.dataset.trace_dataset import TraceDataset
-from tracer.dataset.trace_link import TraceLink
+from tracer.dataset.data_objects.trace_link import TraceLink
 from tracer.pre_processing.pre_processor import PreProcessor
 
 
 class AbstractTraceDatasetCreator(AbstractDatasetCreator, ABC):
 
-    def __init__(self, pre_processor: PreProcessor, use_linked_targets_only: bool = USE_LINKED_TARGETS_ONLY_DEFAULT):
+    def __init__(self, pre_processor: PreProcessor, use_linked_targets_only: bool):
         """
         Responsible for creating dataset in format for defined models.
         :pre_processor: the pre_processor to run on the data

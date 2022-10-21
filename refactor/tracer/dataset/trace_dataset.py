@@ -5,7 +5,7 @@ from typing import Callable, Dict, List, Sized, Tuple
 from config.constants import RESAMPLE_RATE_DEFAULT
 from tracer.dataset.abstract_dataset import AbstractDataset
 from tracer.dataset.data_key import DataKey
-from tracer.dataset.trace_link import TraceLink
+from tracer.dataset.data_objects.trace_link import TraceLink
 from tracer.models.model_generator import ModelGenerator
 from tracer.models.model_properties import ArchitectureType
 

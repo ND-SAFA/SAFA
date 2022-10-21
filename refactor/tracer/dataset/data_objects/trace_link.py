@@ -1,7 +1,7 @@
 from collections.abc import Callable
 from typing import Dict
 
-from tracer.dataset.artifact import Artifact
+from tracer.dataset.data_objects.artifact import Artifact
 
 
 class TraceLink:

@@ -5,7 +5,7 @@
         <model-trainer :model="model" />
       </v-tab-item>
       <v-tab-item key="2">
-        <under-construction-alert />
+        <model-logs :model="model" />
       </v-tab-item>
       <v-tab-item key="3">
         <under-construction-alert />
@@ -19,14 +19,15 @@ import Vue, { PropType } from "vue";
 import { GenerationModel } from "@/types";
 import { modelEditorTabOptions } from "@/util";
 import { TabList, UnderConstructionAlert } from "@/components/common";
-import ModelTrainer from "@/components/models/editor/ModelTrainer.vue";
+import ModelTrainer from "./ModelTrainer.vue";
+import ModelLogs from "./ModelLogs.vue";
 
 /**
  * Renders model configuration options.
  */
 export default Vue.extend({
   name: "ModelEditor",
-  components: { ModelTrainer, UnderConstructionAlert, TabList },
+  components: { ModelLogs, ModelTrainer, UnderConstructionAlert, TabList },
   props: {
     model: {
       type: Object as PropType<GenerationModel>,

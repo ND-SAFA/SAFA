@@ -137,7 +137,6 @@ export default Vue.extend({
         { text: "Progress", value: "currentProgress" },
         { text: "Status", value: "status" },
       ],
-      expanded: [] as JobModel[],
     };
   },
   mounted() {
@@ -159,8 +158,8 @@ export default Vue.extend({
     /**
      * return The current selected job index.
      */
-    selectedJobIndex(): number {
-      return jobStore.selectedJob;
+    expanded(): JobModel[] {
+      return jobStore.selectedJob ? [jobStore.selectedJob] : [];
     },
   },
   methods: {
@@ -217,11 +216,7 @@ export default Vue.extend({
      * @param job - The job to view.
      */
     handleView(job: JobModel): void {
-      if (job === this.expanded[0]) {
-        this.expanded = [];
-      } else {
-        this.expanded = [job];
-      }
+      jobStore.selectedJob = job;
     },
     /**
      * Attempts to delete a job.
@@ -238,18 +233,6 @@ export default Vue.extend({
         await handleLoadVersion(job.completedEntityId);
       } else {
         logStore.onError("Unable to view this project right now.");
-      }
-    },
-  },
-  watch: {
-    /**
-     * Synchronizes what jobs are selected with the selected index.
-     */
-    selectedJobIndex(newIndex: number): void {
-      if (newIndex == -1) {
-        this.expanded = [];
-      } else {
-        this.expanded = [this.jobs[newIndex]];
       }
     },
   },

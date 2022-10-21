@@ -15,7 +15,7 @@ export const useJobs = defineStore("jobs", {
     /**
      * The index of the selected job.
      */
-    selectedJob: -1,
+    selectedJob: undefined as JobModel | undefined,
   }),
   getters: {},
   actions: {
@@ -27,18 +27,6 @@ export const useJobs = defineStore("jobs", {
      */
     updateJob(job: JobModel): void {
       this.jobs = [job, ...this.jobs.filter(({ id }) => id !== job.id)];
-    },
-    /**
-     * Selects the given job.
-     *
-     * @param job - The job to select.
-     */
-    selectJob(job: JobModel): void {
-      this.jobs.forEach(({ id }, idx) => {
-        if (id === job.id) {
-          this.selectedJob = idx;
-        }
-      });
     },
     /**
      * Finds a job.
@@ -56,10 +44,11 @@ export const useJobs = defineStore("jobs", {
      */
     deleteJob(job: JobModel | string): void {
       const deleteId = typeof job === "string" ? job : job.id;
+      const jobs = this.jobs.filter(({ id }) => id !== deleteId);
 
       this.$patch({
-        jobs: this.jobs.filter(({ id }) => id !== deleteId),
-        selectedJob: 0,
+        jobs,
+        selectedJob: jobs[0],
       });
     },
   },

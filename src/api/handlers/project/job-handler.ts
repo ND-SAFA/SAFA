@@ -47,7 +47,7 @@ export function updateJobFromWebsocketMessage(frame: Frame): void {
 export async function handleJobSubmission(job: JobModel): Promise<void> {
   await connectAndSubscribeToJob(job.id);
   jobStore.updateJob(job);
-  jobStore.selectJob(job);
+  jobStore.selectedJob = job;
 }
 
 /**
@@ -86,7 +86,7 @@ export async function handleReloadJobs(): Promise<void> {
 
     if (jobs.length === 0) return;
 
-    jobStore.selectJob(jobs[0]);
+    jobStore.selectedJob = jobs[0];
   } finally {
     appStore.onLoadEnd();
   }

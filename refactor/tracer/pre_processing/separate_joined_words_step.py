@@ -1,15 +1,17 @@
-from typing import Callable, List
+from typing import Callable, List, Iterable
 
 from tracer.pre_processing.abstract_pre_processing_step import AbstractPreProcessingStep, Order
 
 
 class SeparateJoinedWordsStep(AbstractPreProcessingStep):
     ORDER = Order.FIRST
+    DELIMINATORS = ("-", "/")
 
-    def __init__(self):
+    def __init__(self, deliminators: Iterable[str] = DELIMINATORS):
         """
         Handles separating all camelCase and snake_case words
         """
+        self.deliminators = deliminators
         super().__init__(self.ORDER)
 
     @staticmethod
@@ -27,13 +29,13 @@ class SeparateJoinedWordsStep(AbstractPreProcessingStep):
         return [word[i:j] for i, j in zip(split_start, split_end)]
 
     @staticmethod
-    def _separate_snake_case_word(word: str) -> List[str]:
+    def _separate_deliminated_word(word: str, deliminator: str = "_") -> List[str]:
         """
-        Splits a snake_case word
+        Splits a deliminated word (e.g. snake_case)
         :param word: the word to split
         :return: the split up word
         """
-        return word.split("_")
+        return word.split(deliminator)
 
     @staticmethod
     def _perform_on_word_list(word_list: List[str], separator_func: Callable):
@@ -53,5 +55,8 @@ class SeparateJoinedWordsStep(AbstractPreProcessingStep):
         :param word_list: the list of words to process
         :return: the processed word_list with camelCase and snake_case separated
         """
-        separated_word_list = self._perform_on_word_list(word_list, self._separate_snake_case_word)
+        separated_word_list = word_list
+        for deliminator in self.deliminators:
+            separated_word_list = self._perform_on_word_list(word_list,
+                                                             lambda word: self._separate_deliminated_word(word, deliminator))
         return self._perform_on_word_list(separated_word_list, self._separate_camel_case_word)

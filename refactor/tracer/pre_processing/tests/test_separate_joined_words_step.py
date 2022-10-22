@@ -16,10 +16,10 @@ class TestSeparateJoinedWordsStep(BaseTest):
     def test_separate_snake_case_word(self):
         test_camel_case = "snake_case"
         expected_result = ["snake", "case"]
-        result = SeparateJoinedWordsStep._separate_snake_case_word(test_camel_case)
+        result = SeparateJoinedWordsStep._separate_deliminated_word(test_camel_case)
         self.assertListEqual(result, expected_result)
         test_regular_word = "Regular"
-        result = SeparateJoinedWordsStep._separate_snake_case_word(test_regular_word)
+        result = SeparateJoinedWordsStep._separate_deliminated_word(test_regular_word)
         self.assertListEqual(result, [test_regular_word])
 
     def test_run(self):

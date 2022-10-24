@@ -441,5 +441,30 @@ declare namespace Cypress {
      * The document modal must be open.
      */
     saveDocument(): Chainable<void>;
+
+    /**
+     * Uploads file containing trace links.
+     * @param file - Contains trace links.
+     */
+    uploadingTraceLinks(file: string): Chainable<void>;
+
+    /**
+     * Opens the project settings modal.
+     */
+    openProjectSettings(): Chainable<void>;
+
+    /**
+     * Adds New member into a project
+     * Must be in project settings.
+     * @param name - Input email of new member.
+     * @param projectRole - Input project role such as "owner", "Editor", "Viewer", "Admin"
+     */
+    projectAddNewMember(name: string, projectRole: string): Chainable<void>;
+
+    /**
+     * Logs into the create project page, uploads a project, and waits for it to complete.
+     * Goes into the Project Settings
+     */
+    createProjectSettings(): Chainable<void>;
   }
 }

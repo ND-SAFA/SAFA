@@ -7,6 +7,11 @@
     <v-combobox filled multiple chips deletable-chips label="Keywords" />
     <typography
       el="p"
+      value="Link to any code repositories that would train the model to understand code within this domain. Press enter to save a link."
+    />
+    <v-combobox filled multiple chips deletable-chips label="Repositories" />
+    <typography
+      el="p"
       value="Upload any technical documents that would train the model to understand this domain."
     />
     <generic-file-selector />

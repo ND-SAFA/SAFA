@@ -8,11 +8,11 @@ import lombok.Data;
 
 
 /**
-* POJO to be used as body payload and response when refreshing current credentials
+* POJO to be used as body payload and response when accessing auth endpoints
  */
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class JiraRefreshTokenDTO {
+public class JiraAuthResponseDTO {
     /**
      * READ_ONLY since we are only interested in sending this field, not receiving it
      */
@@ -34,8 +34,8 @@ public class JiraRefreshTokenDTO {
     @JsonProperty("refresh_token")
     private String refreshToken;
 
-    public static JiraRefreshTokenDTO fromEntity(JiraAccessCredentials credentials) {
-        JiraRefreshTokenDTO dto = new JiraRefreshTokenDTO();
+    public static JiraAuthResponseDTO fromEntity(JiraAccessCredentials credentials) {
+        JiraAuthResponseDTO dto = new JiraAuthResponseDTO();
 
         dto.setClientId(credentials.getClientId());
         dto.setClientSecret(credentials.getClientSecret());

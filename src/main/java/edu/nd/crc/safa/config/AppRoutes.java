@@ -162,14 +162,21 @@ public class AppRoutes {
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Jira {
-        public static final String RETRIEVE_JIRA_PROJECTS = Projects.ROOT + "/jira/{cloudId}";
 
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
         public static class Credentials {
             public static final String ROOT = Accounts.PREFIX + "/jira/credentials";
+            public static final String REGISTER = Credentials.ROOT + "/{accessCode}";
             public static final String REFRESH = Credentials.ROOT + "/{cloudId}";
+            public static final String DELETE = Credentials.ROOT + "/{cloudId}";
             public static final String VALIDATE = Credentials.ROOT + "/validate";
+        }
 
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        public static class Installations {
+            public static final String ROOT = Accounts.PREFIX + "/jira/installations";
+            public static final String RETRIEVE_AVAILABLE = Installations.ROOT;
+            public static final String REGISTER = Installations.ROOT + "/{cloudId}";
         }
 
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -177,6 +184,7 @@ public class AppRoutes {
             public static final String ROOT = Projects.ROOT + "/import";
             public static final String BY_ID = Import.ROOT + "/jira/{cloudId}/{id}";
             public static final String UPDATE = Versions.BY_ID + "/import/jira/{cloudId}/{id}";
+            public static final String RETRIEVE_JIRA_PROJECTS = Projects.ROOT + "/jira/{cloudId}";
         }
     }
 

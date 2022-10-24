@@ -53,7 +53,7 @@ public class JiraController extends BaseController {
         this.executorDelegate = serviceProvider.getExecutorDelegate();
     }
 
-    @GetMapping(AppRoutes.Jira.RETRIEVE_JIRA_PROJECTS)
+    @GetMapping(AppRoutes.Jira.Import.RETRIEVE_JIRA_PROJECTS)
     public DeferredResult<JiraResponseDTO<List<JiraProjectResponseDTO>>> retrieveJIRAProjects(
         @PathVariable("cloudId") String cloudId) {
         DeferredResult<JiraResponseDTO<List<JiraProjectResponseDTO>>> output =

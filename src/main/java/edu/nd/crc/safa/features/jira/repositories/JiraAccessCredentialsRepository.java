@@ -14,5 +14,7 @@ import org.springframework.stereotype.Repository;
 @Scope("singleton")
 public interface JiraAccessCredentialsRepository extends JpaRepository<JiraAccessCredentials, UUID> {
 
+    Optional<JiraAccessCredentials> findByUser(SafaUser user);
+
     Optional<JiraAccessCredentials> findByUserAndCloudId(SafaUser user, String cloudId);
 }

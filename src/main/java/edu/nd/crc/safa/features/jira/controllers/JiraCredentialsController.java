@@ -2,13 +2,15 @@ package edu.nd.crc.safa.features.jira.controllers;
 
 import java.util.Objects;
 import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.jira.entities.app.JiraAccessCredentialsDTO;
-import edu.nd.crc.safa.features.jira.entities.app.JiraRefreshTokenDTO;
+import edu.nd.crc.safa.features.jira.entities.app.JiraAuthResponseDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraResponseDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraResponseDTO.JiraResponseMessage;
 import edu.nd.crc.safa.features.jira.entities.db.JiraAccessCredentials;
@@ -53,22 +55,24 @@ public class JiraCredentialsController extends BaseController {
         this.executorDelegate = serviceProvider.getExecutorDelegate();
     }
 
-    @PostMapping(AppRoutes.Jira.Credentials.ROOT)
-    public DeferredResult<JiraResponseDTO<Void>> createCredentials(@RequestBody @Valid JiraAccessCredentialsDTO data) {
+    @PostMapping(AppRoutes.Jira.Credentials.REGISTER)
+    public DeferredResult<JiraResponseDTO<Void>> registerCredentials(
+        @NotNull @NotEmpty @PathVariable("accessCode") String accessCode) {
         DeferredResult<JiraResponseDTO<Void>> output = executorDelegate.createOutput(5000L);
 
         executorDelegate.submit(output, () -> {
             SafaUser principal = safaUserService.getCurrentUser();
+            JiraAccessCredentialsDTO data = jiraConnectionService.useAccessCode(accessCode);
             JiraAccessCredentials credentials = data.toEntity();
 
-            boolean areCredentialsValid = jiraConnectionService.checkCredentials(credentials);
-
-            if (!areCredentialsValid) {
-                throw new SafaError("User contains invalid JIRA credentials.");
-            }
+//            boolean areCredentialsValid = jiraConnectionService.checkCredentials(credentials);
+//
+//            if (!areCredentialsValid) {
+//                throw new SafaError("User contains invalid JIRA credentials.");
+//            }
 
             JiraAccessCredentials previousCredentials =
-                accessCredentialsRepository.findByUserAndCloudId(principal, credentials.getCloudId()).orElse(null);
+                accessCredentialsRepository.findByUser(principal).orElse(null);
 
             if (Objects.nonNull(previousCredentials)) {
                 log.info("Deleting previous JIRA credentials for {}", principal.getEmail());
@@ -92,7 +96,7 @@ public class JiraCredentialsController extends BaseController {
             JiraAccessCredentials credentials = accessCredentialsRepository
                 .findByUserAndCloudId(principal, cloudId).orElseThrow(() -> new SafaError("No JIRA credentials found"));
 
-            JiraRefreshTokenDTO newCredentials = jiraConnectionService.refreshAccessToken(credentials);
+            JiraAuthResponseDTO newCredentials = jiraConnectionService.refreshAccessToken(credentials);
 
             if (!StringUtils.hasText(newCredentials.getAccessToken())
                 || !StringUtils.hasText(newCredentials.getRefreshToken())) {

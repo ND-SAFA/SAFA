@@ -72,8 +72,8 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         JSONObject responseJson = new JSONObject();
         ResponseCookie cookie = ResponseCookie.from(SecurityConstants.JWT_COOKIE_NAME, token)
             .secure(true)
-            .httpOnly(true)
-            .sameSite("strict")
+//            .httpOnly(true)
+//            .sameSite("strict")
             .maxAge(SecurityConstants.LOGIN_EXPIRATION_TIME)
             .build();
 

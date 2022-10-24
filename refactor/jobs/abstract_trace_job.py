@@ -38,7 +38,7 @@ class AbstractTraceJob(AbstractJob, ABC):
         dataset_pre_processing_options = dataset_pre_processing_options if dataset_pre_processing_options else {}
         self.train_dataset = self._make_dataset(datasets_map, dataset_pre_processing_options, DatasetRole.TRAIN)
         self.eval_dataset = self._make_dataset(datasets_map, dataset_pre_processing_options, DatasetRole.EVAL)
-        self.trace_args = TraceArgs(**trace_args_params)
+        self.train_args = TraceArgs(**trace_args_params)
         self.__trainer = None
 
     @staticmethod
@@ -66,5 +66,5 @@ class AbstractTraceJob(AbstractJob, ABC):
         :return: the trainer
         """
         if self.__trainer is None:
-            self.__trainer = TraceTrainer(args=self.trace_args, model_generator=self.model_generator, **kwargs)
+            self.__trainer = TraceTrainer(args=self.train_args, model_generator=self.model_generator, **kwargs)
         return self.__trainer

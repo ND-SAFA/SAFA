@@ -1,5 +1,6 @@
 import random
 from collections import OrderedDict
+from copy import deepcopy
 from typing import Callable, Dict, List, Sized, Tuple
 
 from config.constants import RESAMPLE_RATE_DEFAULT
@@ -211,3 +212,13 @@ class TraceDataset(AbstractDataset):
         :return: Prepared trace dataset.
         """
         return test_split
+
+    def __len__(self):
+        return len(self.links)
+
+    def __add__(self, other: "TraceDataset"):
+        combined_links = deepcopy(self.links)
+        combined_links.update(other.links)
+        combined_pos_link_ids = set(self.pos_link_ids).union(set(other.pos_link_ids))
+        combined_neg_link_ids = set(self.neg_link_ids).union(set(other.neg_link_ids))
+        return TraceDataset(combined_links, list(combined_pos_link_ids), list(combined_neg_link_ids))

@@ -3,7 +3,7 @@ from torch import nn
 from transformers.models.auto.modeling_auto import AutoModel
 from transformers.models.bert.modeling_bert import BertPreTrainedModel
 
-from tracer.models import calculate_softmax_from_logits
+from tracer.models.base_models.single_model_forward_pass import calculate_softmax_from_logits
 
 
 class AvgPooler(nn.Module):

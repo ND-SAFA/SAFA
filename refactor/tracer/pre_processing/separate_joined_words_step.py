@@ -5,7 +5,7 @@ from tracer.pre_processing.abstract_pre_processing_step import AbstractPreProces
 
 class SeparateJoinedWordsStep(AbstractPreProcessingStep):
     ORDER = Order.FIRST
-    DELIMINATORS = ("-", "/")
+    DELIMINATORS = ("_", "/")
 
     def __init__(self, deliminators: Iterable[str] = DELIMINATORS):
         """
@@ -57,6 +57,6 @@ class SeparateJoinedWordsStep(AbstractPreProcessingStep):
         """
         separated_word_list = word_list
         for deliminator in self.deliminators:
-            separated_word_list = self._perform_on_word_list(word_list,
+            separated_word_list = self._perform_on_word_list(separated_word_list,
                                                              lambda word: self._separate_deliminated_word(word, deliminator))
         return self._perform_on_word_list(separated_word_list, self._separate_camel_case_word)

@@ -3,7 +3,7 @@ from tracer.pre_processing.separate_joined_words_step import SeparateJoinedWords
 
 
 class TestSeparateJoinedWordsStep(BaseTest):
-    TEST_DELIMINATORS = ("-", "/")
+    TEST_DELIMINATORS = ("_", "/")
 
     def test_separate_camel_case_word(self):
         test_camel_case = "camelCase2"
@@ -25,10 +25,10 @@ class TestSeparateJoinedWordsStep(BaseTest):
 
     def test_run(self):
         test_word_list = "This is an example of a camelCase Word. This is snake_case. This is another example/sample/examplar".split()
-        expected_result = "This is an example of a camel Case Word. This is snake case. This is antoher example sample examplar".split()
+        expected_result = "This is an example of a camel Case Word. This is snake case. This is another example sample examplar".split()
         step = self.get_test_step()
         result = step.run(test_word_list)
-        self.assertEquals(expected_result, result)
+        self.assertListEqual(expected_result, result)
 
     def get_test_step(self):
         return SeparateJoinedWordsStep(self.TEST_DELIMINATORS)

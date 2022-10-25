@@ -24,7 +24,7 @@ class PreProcessor:
         before_steps = []
         regular_steps = []
         for option in selected_options:
-            step_class = option.value()
+            step_class = option.value
             step_params = PreProcessor._get_step_params(step_class, **kwargs)
             step = step_class(**step_params)
             if step.run_before:

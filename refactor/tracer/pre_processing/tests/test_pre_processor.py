@@ -10,7 +10,6 @@ class TestPreProcessor(BaseTest):
     TEST_OPTIONS = [PreProcessingOption.REMOVE_UNWANTED_CHARS,
                     PreProcessingOption.REPLACE_WORDS,
                     PreProcessingOption.SEPARATE_JOINED_WORDS,
-                    PreProcessingOption.SHUFFLE_WORDS,
                     PreProcessingOption.FILTER_MIN_LENGTH]
     TEST_REPLACE_WORD_MAPPINGS = {"This": "Esta", "one": "uno"}
     TEST_ARTIFACT_CONTENTS = ["This is 1.0 of 2.0 testCases!", "This i$ the other_one"]

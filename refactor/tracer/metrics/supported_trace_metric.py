@@ -2,8 +2,7 @@ import inspect
 from enum import Enum
 from typing import Type
 
-from datasets import list_metrics
-from tensorflow.python.tpu import datasets
+from datasets import list_metrics, Metric
 
 from tracer.metrics.mrr_metric import MRRMetric
 from tracer.metrics.precision_at_k_metric import PrecisionAtKMetric
@@ -36,14 +35,14 @@ def get_metric_path(metric_name: str) -> str:
     return path
 
 
-def get_metric_name(metric_class: datasets.Metric) -> str:
+def get_metric_name(metric_class: Metric) -> str:
     """
     Gets the metric name from its class
     :param metric_class: the class of the metric
     :return: the name
     """
     name = metric_class.__class__.__name__
-    return name.split(metric_suffix)[0]
+    return name.split(metric_suffix)[0].lower()
 
 
 def _get_metric_path_from_class(trace_metric_class: Type[AbstractTraceMetric]) -> str:

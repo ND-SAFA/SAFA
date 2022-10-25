@@ -60,7 +60,7 @@ class ClassicTraceDatasetCreator(AbstractTraceDatasetCreator):
         :return: list of artifacts
         """
         artifacts = []
-        for artifact_id, artifact_token in artifacts_dict.values():
+        for artifact_id, artifact_token in artifacts_dict.items():
             processed_artifact_token = self._process_tokens(artifact_token)
             artifacts.append(Artifact(artifact_id, processed_artifact_token))
         return artifacts

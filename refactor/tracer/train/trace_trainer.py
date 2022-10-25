@@ -29,7 +29,6 @@ class TraceTrainer(Trainer):
         self.args = args
         self.model_generator = model_generator
         self.model_generator.set_max_seq_length(self.args.max_seq_length)
-        self.trace_dataset_creator = args.trace_dataset_creator
         model = self.model_generator.get_model()
         tokenizer = self.model_generator.get_tokenizer()
         super().__init__(model=model, args=args, tokenizer=tokenizer, callbacks=args.callbacks, **kwargs)
@@ -55,21 +54,19 @@ class TraceTrainer(Trainer):
         """
         self.eval_dataset = eval_dataset.to_trainer_dataset(self.model_generator)
         output = self.predict(self.eval_dataset)
-        output.predictions = TraceTrainer.get_similarity_scores(output.predictions)
-        if self.args.metrics:
-            results = self._eval(output.predictions, output.label_ids, self.args.metrics)
-            output.metrics.update(results)
-        output_dict = TraceTrainer.output_to_dict(output)
+        predictions = TraceTrainer.get_similarity_scores(output.predictions)
+        results = self._eval(predictions, output.label_ids, self.args.metrics) if self.args.metrics else None
+        output_dict = TraceTrainer.output_to_dict(output, metrics=results, predictions=predictions)
         return PredictionResponse.from_output(output_dict, eval_dataset.get_source_target_pairs())
 
     @staticmethod
-    def output_to_dict(output: NamedTuple) -> Dict:
+    def output_to_dict(output: NamedTuple, **kwargs) -> Dict:
         """
         Converts train/prediction output to a dictionary
         :param output: output from training or prediction
         :return: the output represented as a dictionary
         """
-        return {field: getattr(output, field) for field in output._fields}
+        return {field: kwargs[field] if (field in kwargs and kwargs[field]) else getattr(output, field) for field in output._fields}
 
     @staticmethod
     def _eval(preds: Union[np.ndarray, Tuple[np.ndarray]], label_ids: np.ndarray, metric_names: List) -> Dict:
@@ -83,8 +80,13 @@ class TraceTrainer(Trainer):
         results = {}
         for metric_path in metric_paths:
             metric = load_metric(metric_path, keep_in_memory=True)
+            print(metric)
             metric_result = metric.compute(predictions=preds, references=label_ids)
-            results[get_metric_name(metric)] = metric_result
+            metric_name = get_metric_name(metric)
+            if metric_name in metric_result:
+                results.update(metric_result)
+            else:
+                results[metric_name] = metric_result
         return results
 
     @staticmethod
@@ -124,5 +126,3 @@ class TraceTrainer(Trainer):
             drop_last=self.args.dataloader_drop_last,
         )
         return data_loader
-
-

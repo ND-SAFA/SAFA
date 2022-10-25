@@ -19,7 +19,7 @@ from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
 
-from server import views
+#from server import views
 
 
 def homePageView(request):
@@ -42,10 +42,10 @@ urlpatterns = [
     re_path(r'^playground/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     re_path(r'^docs/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     path('', homePageView),
-    path('predict/', views.PredictView.as_view()),
-    path('train/', views.TrainView.as_view()),
-    path('model/create/', views.CreateModelView.as_view()),
-    path('model/delete/', views.DeleteModelView.as_view()),
-    path('experiment/', views.ExperimentView.as_view()),
-    path('pretrain/', views.PreTrainView.as_view())
+    # path('predict/', views.PredictView.as_view()),
+    # path('train/', views.TrainView.as_view()),
+    # path('model/create/', views.CreateModelView.as_view()),
+    # path('model/delete/', views.DeleteModelView.as_view()),
+    # path('experiment/', views.ExperimentView.as_view()),
+    # path('pretrain/', views.PreTrainView.as_view())
 ]

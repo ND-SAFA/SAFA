@@ -12,6 +12,8 @@ from tracer.models.model_properties import ArchitectureType
 
 
 class TraceDataset(AbstractDataset):
+    SEED = 420
+
     def __init__(self, links: Dict[int, TraceLink], pos_link_ids: List[int] = None, neg_link_ids: List[int] = None):
         """
         Represents the common format for all datasets used by the huggingface trainer.
@@ -22,6 +24,7 @@ class TraceDataset(AbstractDataset):
         self.links = OrderedDict(links)
         self.pos_link_ids = pos_link_ids if pos_link_ids else list()
         self.neg_link_ids = neg_link_ids if neg_link_ids else list()
+        random.seed(self.SEED)
 
     def split(self, percent_split: float) -> Tuple["TraceDataset", "TraceDataset"]:
         """
@@ -29,13 +32,11 @@ class TraceDataset(AbstractDataset):
         :param percent_split: The percent of links to include in second trace dataset.
         :return: Tuple of two trace datasets.
         """
-        random_pos_link_ids = self._shuffle_link_ids(self.pos_link_ids)
-        random_neg_link_ids = self._shuffle_link_ids(self.neg_link_ids)
+        self._shuffle_link_ids(self.pos_link_ids)
+        self._shuffle_link_ids(self.neg_link_ids)
 
-        first_slice = self._create_new_dataset_from_slice(self.links, random_pos_link_ids, random_neg_link_ids,
-                                                          percent_split, False)
-        second_slice = self._create_new_dataset_from_slice(self.links, random_pos_link_ids, random_neg_link_ids,
-                                                           percent_split, True)
+        first_slice = self._create_new_dataset_from_slice(percent_split, slice_num=1)
+        second_slice = self._create_new_dataset_from_slice(percent_split, slice_num=2)
         return first_slice, second_slice
 
     def to_trainer_dataset(self, model_generator: ModelGenerator) -> List[Dict]:
@@ -113,23 +114,17 @@ class TraceDataset(AbstractDataset):
         """
         return [entry for i in range(resample_rate) for entry in data]
 
-    @staticmethod
-    def _create_new_dataset_from_slice(links: Dict[int, TraceLink], pos_link_ids: List[int],
-                                       neg_link_ids: List[int],
-                                       percent_split: float, second_slice: bool) -> "TraceDataset":
+    def _create_new_dataset_from_slice(self, percent_split: float, slice_num: int) -> "TraceDataset":
         """
         Creates a new trace dataset from the slice defined by the percent split.
-        :param links: Map of trace link id to trace link.
-        :param pos_link_ids: List of trace link ids representing positive links.
-        :param neg_link_ids: List of trace link ids representing negative links.
         :param percent_split: The percentage of links included in second slice.
-        :param second_slice: Whether to return second slice.
+        :param slice_num: Whether to return first or second slice.
         :return:
         """
-        slice_pos_link_ids = TraceDataset._get_data_split(pos_link_ids, percent_split, second_slice)
-        slice_neg_link_ids = TraceDataset._get_data_split(neg_link_ids, percent_split, second_slice)
+        slice_pos_link_ids = TraceDataset._get_data_split(self.pos_link_ids, percent_split, slice_num == 2)
+        slice_neg_link_ids = TraceDataset._get_data_split(self.neg_link_ids, percent_split, slice_num == 2)
         slice_links = {
-            link_id: links[link_id] for link_id in slice_pos_link_ids + slice_neg_link_ids
+            link_id: self.links[link_id] for link_id in slice_pos_link_ids + slice_neg_link_ids
         }
         return TraceDataset(slice_links, slice_pos_link_ids, slice_neg_link_ids)
 
@@ -164,12 +159,12 @@ class TraceDataset(AbstractDataset):
         return feature_info
 
     @staticmethod
-    def _shuffle_link_ids(link_ids: List) -> List:
+    def _shuffle_link_ids(link_ids: List) -> None:
         """
         Shuffles the link ids
         :param link_ids: a set of link ids
         """
-        return random.shuffle(link_ids)
+        random.shuffle(link_ids)
 
     @staticmethod
     def _get_data_split(data: List, percent_split: float, for_second_split: bool = False) -> List:

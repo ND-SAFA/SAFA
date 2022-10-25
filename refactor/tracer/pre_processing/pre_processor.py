@@ -6,7 +6,7 @@ from tracer.pre_processing.pre_processing_option import PreProcessingOption
 
 class PreProcessor:
 
-    def __init__(self, selected_options: List[PreProcessingOption], **kwargs):
+    def __init__(self, selected_options: List[PreProcessingOption] = None, **kwargs):
         """
         Handles Pre-Processing
         :param selected_options: the selected pre-process options to run

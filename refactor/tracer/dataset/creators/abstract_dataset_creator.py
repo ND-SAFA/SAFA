@@ -12,7 +12,7 @@ class AbstractDatasetCreator(ABC):
         Responsible for creating dataset in format for defined models.
         :pre_processor: the pre_processor to run on the data
         """
-        self.pre_processor = pre_processor
+        self.pre_processor = pre_processor if pre_processor else PreProcessor([])
 
     @abstractmethod
     def create(self) -> AbstractDataset:

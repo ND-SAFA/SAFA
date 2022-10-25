@@ -2,7 +2,7 @@ import mock
 from mock import patch
 
 from test.base_test import BaseTest
-from tracer.metrics import get_metric_path
+from tracer.metrics.supported_trace_metric import get_metric_path
 
 
 class TestSupportedTraceMetric(BaseTest):

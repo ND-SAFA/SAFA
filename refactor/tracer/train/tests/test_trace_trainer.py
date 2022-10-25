@@ -7,51 +7,52 @@ from torch.utils.data.distributed import DistributedSampler
 from torch.utils.data.sampler import RandomSampler
 
 from test.base_test import BaseTest
-from test.test_data import TEST_SOURCE_LAYERS, TEST_TARGET_LAYERS
-from test.test_prediction_output import TEST_PREDICTION_OUTPUT, assert_output_matches_expected
-from tracer.models import ModelGenerator, SupportedBaseModel
+from tracer.dataset.creators.classic_trace_dataset_creator import ClassicTraceDatasetCreator
+from tracer.models.base_models.supported_base_model import SupportedBaseModel
+from tracer.models.model_generator import ModelGenerator
 from tracer.train.trace_trainer import TraceTrainer
 
 
 class TestTraceTrainer(BaseTest):
-    VAlIDATION_PERCENTAGE = 0.3
+    VALIDATION_PERCENTAGE = 0.3
     EXPECTED_VALIDATION_SIZE = 3
-    EXPECTED_PREDICTION_SIZE = len(TEST_TARGET_LAYERS) * len(TEST_SOURCE_LAYERS)
+    EXPECTED_PREDICTION_SIZE = len(BaseTest.TEST_TARGET_LAYERS) * len(BaseTest.TEST_SOURCE_LAYERS)
     TEST_METRIC_NAMES = ["accuracy", "map_at_k"]
 
     @patch.object(TraceTrainer, "save_model")
     def test_perform_training(self, save_model_mock: mock.MagicMock):
         test_trace_trainer = self.get_test_trace_trainer(metrics=self.TEST_METRIC_NAMES)
         test_trace_trainer.model_generator.get_tokenizer().padding = True
-        output = test_trace_trainer.perform_training()
+        train_dataset, eval_dataset = self.get_dataset().split(self.VALIDATION_PERCENTAGE)
+        output = test_trace_trainer.perform_training(train_dataset, eval_dataset)
         self.assertTrue(save_model_mock.called)
         self.assertIn("training_loss", output)
 
     @patch.object(TraceTrainer, "_eval")
     def test_perform_prediction(self, eval_mock: mock.MagicMock):
-        test_trace_trainer = self.get_test_trace_trainer(include_links=False)
-        output = test_trace_trainer.perform_prediction()
-        matches, msg = assert_output_matches_expected(output)
+        test_trace_trainer = self.get_test_trace_trainer()
+        output = test_trace_trainer.perform_prediction(self.get_dataset(include_links=False))
+        matches, msg = self.assert_output_matches_expected(output)
         if not matches:
             self.fail(msg)
         self.assertFalse(eval_mock.called)
 
     def test_perform_prediction_with_metrics(self):
-        test_trace_trainer = self.get_test_trace_trainer(include_links=False, metrics=self.TEST_METRIC_NAMES)
-        output = test_trace_trainer.perform_prediction()
+        test_trace_trainer = self.get_test_trace_trainer(metrics=self.TEST_METRIC_NAMES)
+        output = test_trace_trainer.perform_prediction(self.get_dataset(include_links=False))
         for metric in self.TEST_METRIC_NAMES:
             self.assertIn(metric, output["metrics"])
 
     def test_output_to_dict(self):
-        output_dict = TraceTrainer.output_to_dict(TEST_PREDICTION_OUTPUT)
+        output_dict = TraceTrainer.output_to_dict(self.TEST_PREDICTION_OUTPUT)
         self.assertIsInstance(output_dict, dict)
         self.assertIn("predictions", output_dict)
         self.assertIn("label_ids", output_dict)
         self.assertIn("metrics", output_dict)
 
     def test_eval(self):
-        output = deepcopy(TEST_PREDICTION_OUTPUT)
-        TraceTrainer._eval(output, self.TEST_METRIC_NAMES)
+        output = deepcopy(self.TEST_PREDICTION_OUTPUT)
+        TraceTrainer._eval(output.predictions, output.label_ids, self.TEST_METRIC_NAMES)
         for metric in self.TEST_METRIC_NAMES:
             self.assertIn(metric, output.metrics)
 
@@ -77,18 +78,12 @@ class TestTraceTrainer(BaseTest):
     def set_train_dataset(self, test_trace_trainer):
         test_trace_trainer.train_dataset = test_trace_trainer.trace_dataset_creator.get_training_dataset(1)
 
-    def get_test_trace_trainer(self, args=None, include_links=True, **kwargs):
-        if args is None:
-            model_generator = ModelGenerator(SupportedBaseModel.PL_BERT, "path")
-            model_generator.get_model = mock.MagicMock(return_value=self.get_test_model())
-            model_generator.get_tokenizer = mock.MagicMock(return_value=self.get_test_tokenizer())
-            test_params = self.get_test_params(include_links=include_links)
-            test_params["validation_percentage"] = self.VAlIDATION_PERCENTAGE
-            # Tried expanding test_params, but didn't know what to do with base_model param
-            args = TraceArgs(output_dir=test_params["output_dir"],
-                             source_layers=test_params["source_layers"],
-                             target_layers=test_params["target_layers"],
-                             links=test_params["links"] if include_links else None,
-                             model_generator=model_generator,
-                             **kwargs)
-        return TraceTrainer(args)
+    def get_dataset(self, include_links=True):
+        return ClassicTraceDatasetCreator(self.TEST_SOURCE_LAYERS, self.TEST_TARGET_LAYERS,
+                                          true_links=self.TEST_POS_LINKS if include_links else None).create()
+
+    def get_test_trace_trainer(self, **kwargs):
+        model_generator = ModelGenerator(SupportedBaseModel.PL_BERT, "path")
+        model_generator.get_model = mock.MagicMock(return_value=self.get_test_model())
+        model_generator.get_tokenizer = mock.MagicMock(return_value=self.get_test_tokenizer())
+        return TraceTrainer(TraceArgs(**kwargs), model_generator)

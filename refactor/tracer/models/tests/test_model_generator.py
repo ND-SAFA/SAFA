@@ -4,7 +4,10 @@ from transformers.modeling_utils import PreTrainedModel
 from transformers.models.auto.tokenization_auto import AutoTokenizer
 
 from test.base_test import BaseTest
-from tracer.models import ArchitectureType, BertTraceSiamese, ModelGenerator, SupportedBaseModel
+from tracer.models.base_models.bert_trace_siamese import BertTraceSiamese
+from tracer.models.base_models.supported_base_model import SupportedBaseModel
+from tracer.models.model_generator import ModelGenerator
+from tracer.models.model_properties import ArchitectureType
 
 
 class TestTokenizer:
@@ -13,7 +16,7 @@ class TestTokenizer:
 
 class TestModelGenerator(BaseTest):
     TEST_BASE_MODEL = {
-        "base_model_name": "bert_trace_siamese",
+        "base_model_name": SupportedBaseModel.BERT_TRACE_SIAMESE.name.lower(),
         "arch_type": ArchitectureType.SIAMESE,
         "supported_base_model": SupportedBaseModel.BERT_TRACE_SIAMESE,
         "base_model_class": BertTraceSiamese

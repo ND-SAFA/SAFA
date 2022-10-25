@@ -1,7 +1,6 @@
 from test.base_test import BaseTest
 
 
-class TestMapAtKMetric(BaseTest):
+class TestRepositoryDatasetCreator(BaseTest):
     # TODO
     pass
-

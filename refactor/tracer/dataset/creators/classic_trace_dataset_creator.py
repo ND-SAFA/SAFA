@@ -10,8 +10,9 @@ from tracer.pre_processing.pre_processor import PreProcessor
 
 class ClassicTraceDatasetCreator(AbstractTraceDatasetCreator):
 
-    def __init__(self, source_layers: List[Dict[str, str]], target_layers: List[Dict[str, str]], pre_processor: PreProcessor,
-                 true_links: List[Tuple[str, str]] = None, use_linked_targets_only: bool = USE_LINKED_TARGETS_ONLY_DEFAULT):
+    def __init__(self, source_layers: List[Dict[str, str]], target_layers: List[Dict[str, str]],
+                 true_links: List[Tuple[str, str]] = None, pre_processor: PreProcessor = None,
+                 use_linked_targets_only: bool = USE_LINKED_TARGETS_ONLY_DEFAULT):
         """
         Constructs dataset in classic trace format
         :param source_layers: a list of source artifacts across all layers
@@ -63,3 +64,8 @@ class ClassicTraceDatasetCreator(AbstractTraceDatasetCreator):
             processed_artifact_token = self._process_tokens(artifact_token)
             artifacts.append(Artifact(artifact_id, processed_artifact_token))
         return artifacts
+
+    @staticmethod
+    def _read_data_file(project_path: str, data_file_name: str, data_key: str):
+        # TODO
+        pass

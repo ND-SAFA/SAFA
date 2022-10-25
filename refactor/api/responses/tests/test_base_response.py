@@ -1,7 +1,7 @@
 from test.base_test import BaseTest
 
 
-class TestMapAtKMetric(BaseTest):
+class TestPredictionResponse(BaseTest):
     # TODO
     pass
 

@@ -12,7 +12,7 @@ class MLMPreTrainDatasetCreator(AbstractDatasetCreator):
     DELIMINATOR = "\n"
     OUTPUT_FILE_EXT = ".txt"
 
-    def __init__(self, orig_data_path: str, training_data_dir: str, pre_processor: PreProcessor,
+    def __init__(self, orig_data_path: str, training_data_dir: str, pre_processor: PreProcessor = None,
                  block_size: int = BLOCK_SIZE_DEFAULT):
         """
         The masked learning model pretraining dataset creator

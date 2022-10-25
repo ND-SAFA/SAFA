@@ -1,3 +1,4 @@
+import os
 from typing import List
 
 import pandas as pd
@@ -23,7 +24,7 @@ class CSVKey:
 
 class CSVDatasetCreator(AbstractTraceDatasetCreator):
 
-    def __init__(self, data_file_path: str, pre_processor: PreProcessor,
+    def __init__(self, data_file_path: str, pre_processor: PreProcessor = None,
                  use_linked_targets_only: bool = USE_LINKED_TARGETS_ONLY_DEFAULT):
         """
         Constructs dataset in CSV format
@@ -39,7 +40,7 @@ class CSVDatasetCreator(AbstractTraceDatasetCreator):
         Creates the dataset
         :return: the dataset
         """
-        data_df = pd.read_csv(self.data_file_path)
+        data_df = self._read_data_file(self.data_file_path)
         links = {}
         pos_link_ids, neg_link_ids = [], []
         for i, row in data_df.iterrows():
@@ -82,3 +83,12 @@ class CSVDatasetCreator(AbstractTraceDatasetCreator):
         target = Artifact(target_id, target_token)
         is_true_link = label == 1
         return TraceLink(source, target, is_true_link)
+
+    @staticmethod
+    def _read_data_file(data_file_path: str) -> pd.Dataframe:
+        """
+        Reads the csv file and returns a dataframe containing the contents
+        :param data_file_path: the path to the data file
+        :return: a dataframe containing the contents
+        """
+        return pd.read_csv(data_file_path)

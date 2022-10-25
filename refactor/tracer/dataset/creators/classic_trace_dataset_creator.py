@@ -64,8 +64,3 @@ class ClassicTraceDatasetCreator(AbstractTraceDatasetCreator):
             processed_artifact_token = self._process_tokens(artifact_token)
             artifacts.append(Artifact(artifact_id, processed_artifact_token))
         return artifacts
-
-    @staticmethod
-    def _read_data_file(project_path: str, data_file_name: str, data_key: str):
-        # TODO
-        pass

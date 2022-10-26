@@ -79,13 +79,13 @@ class BaseTest(TestCase):
                        "output_dir": TEST_OUTPUT_DIR}
     _TEST_DATASET_PARAMS = {"source_layers": TEST_SOURCE_LAYERS,
                             "target_layers": TEST_TARGET_LAYERS,
-                            "links": TEST_POS_LINKS}
+                            "true_links": TEST_POS_LINKS}
 
     @staticmethod
     def create_dataset_map(dataset_role: DatasetRole, include_links=True):
         dataset_params = deepcopy(BaseTest._TEST_DATASET_PARAMS)
         if not include_links:
-            dataset_params.pop("links")
+            dataset_params.pop("true_links")
         return {dataset_role: (SupportedDatasetCreator.CLASSIC_TRACE, dataset_params)
                 }
 

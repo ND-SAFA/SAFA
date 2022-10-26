@@ -128,7 +128,7 @@ class SafaDatasetCreator(AbstractTraceDatasetCreator):
                                        for _, link in links_df.iterrows()])
 
     @staticmethod
-    def _read_data_file(project_path: str, data_file_name: str, data_key: str) -> pd.Dataframe:
+    def _read_data_file(project_path: str, data_file_name: str, data_key: str) -> pd.DataFrame:
         """
         Returns file content as dataframe.
         :param project_path: Path to project dir
@@ -147,7 +147,7 @@ class SafaDatasetCreator(AbstractTraceDatasetCreator):
         return data_read_method(project_path, data_file_name, data_key)
 
     @staticmethod
-    def _read_json_file(project_path: str, data_file_name: str, data_key: str) -> pd.Dataframe:
+    def _read_json_file(project_path: str, data_file_name: str, data_key: str) -> pd.DataFrame:
         """
         Returns JSON file content as dataframe.
         :param project_path: Path to project dir

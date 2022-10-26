@@ -11,6 +11,18 @@ from server.storage.safa_storage import SafaStorage
 from tracer.models.base_models.supported_base_model import SupportedBaseModel
 from tracer.models.model_generator import ModelGenerator
 import json
+import numpy as np
+
+
+class NpEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
+        if isinstance(obj, np.floating):
+            return float(obj)
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return super(NpEncoder, self).default(obj)
 
 
 class AbstractJob:
@@ -33,7 +45,7 @@ class AbstractJob:
         self.id = uuid.uuid4()
         self.output_dir = SafaStorage.add_mount_directory(output_dir) if add_mount_directory_to_output else output_dir
         self.job_output_filepath = self._get_output_filepath(self.output_dir, self.id)
-        self.save_output = save_job_output
+        self.save_job_output = save_job_output
         self.base_model = base_model
         self.model_path = model_path
         self.__model_generator = None
@@ -62,7 +74,7 @@ class AbstractJob:
             self.status = Status.FAILURE
 
         json_output = self._get_output_as_json()
-        if self.save_output:
+        if self.save_job_output:
             self._save(json_output)
 
     def _get_output_as_json(self) -> str:
@@ -72,7 +84,7 @@ class AbstractJob:
         """
         output = self.result
         output[BaseResponse.STATUS] = self.status.value
-        return json.dumps(output, indent=4)
+        return json.dumps(output, indent=4, cls=NpEncoder)
 
     @abstractmethod
     def _run(self) -> Dict:

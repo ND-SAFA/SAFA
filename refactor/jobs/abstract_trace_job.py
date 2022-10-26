@@ -1,7 +1,7 @@
 from abc import ABC
 from typing import Dict, Optional, Tuple, List
 
-from config.constants import SAVE_OUTPUT_DEFAULT, ADD_MOUNT_DIRECTORY_TO_OUTPUT_DEFAULT
+from config.constants import SAVE_OUTPUT_DEFAULT, ADD_MOUNT_DIRECTORY_TO_OUTPUT_DEFAULT, VALIDATION_PERCENTAGE_DEFAULT
 from jobs.abstract_job import AbstractJob
 from server.storage.safa_storage import SafaStorage
 from tracer.dataset.creators.supported_dataset_creator import SupportedDatasetCreator
@@ -16,10 +16,11 @@ from tracer.train.trace_trainer import TraceTrainer
 
 class AbstractTraceJob(AbstractJob, ABC):
 
-    def __init__(self,  output_dir: str, model_path: str, base_model: SupportedBaseModel,
+    def __init__(self, output_dir: str, model_path: str, base_model: SupportedBaseModel,
                  datasets_map: Dict[DatasetRole, Tuple[SupportedDatasetCreator, Dict]],
                  dataset_pre_processing_options: Dict[DatasetRole, Tuple[List[PreProcessingOption], Dict]] = None,
                  trace_args_params: Dict = None,
+                 validation_percentage: float = VALIDATION_PERCENTAGE_DEFAULT,
                  add_mount_directory_to_output: bool = ADD_MOUNT_DIRECTORY_TO_OUTPUT_DEFAULT,
                  save_job_output: bool = SAVE_OUTPUT_DEFAULT):
         """
@@ -38,12 +39,14 @@ class AbstractTraceJob(AbstractJob, ABC):
         dataset_pre_processing_options = dataset_pre_processing_options if dataset_pre_processing_options else {}
         self.train_dataset = self._make_dataset(datasets_map, dataset_pre_processing_options, DatasetRole.TRAIN)
         self.eval_dataset = self._make_dataset(datasets_map, dataset_pre_processing_options, DatasetRole.EVAL)
-        self.train_args = TraceArgs(**trace_args_params)
+        if self.train_dataset and not self.eval_dataset:
+            self.train_dataset, self.eval_dataset = self.train_dataset.split(validation_percentage)
+        self.train_args = TraceArgs(output_dir, **(trace_args_params if trace_args_params else {}))
         self.__trainer = None
 
     @staticmethod
-    def _make_dataset(datasets_map: Dict[DatasetRole, (SupportedDatasetCreator, Dict)],
-                      dataset_pre_processing_options: Dict[DatasetRole, (PreProcessingOption, Dict)],
+    def _make_dataset(datasets_map: Dict[DatasetRole, Tuple[SupportedDatasetCreator, Dict]],
+                      dataset_pre_processing_options: Dict[DatasetRole, Tuple[List[PreProcessingOption], Dict]],
                       dataset_role: DatasetRole) -> Optional[TraceDataset]:
         """
         Handles making the dataset for a specified role and the given parameters
@@ -54,10 +57,24 @@ class AbstractTraceJob(AbstractJob, ABC):
         """
         dataset_creator_reqs = datasets_map.get(dataset_role, None)
         if dataset_creator_reqs:
-            pre_processor = PreProcessor(dataset_pre_processing_options.get(dataset_role, {}))
             dataset_creator_class, dataset_creator_params = dataset_creator_reqs
-            dataset_creator = dataset_creator_class(pre_processor=pre_processor, **dataset_creator_params)
+            pre_processor = AbstractTraceJob._make_pre_processor(dataset_pre_processing_options, dataset_role)
+            dataset_creator = dataset_creator_class.value(pre_processor=pre_processor, **dataset_creator_params)
             return dataset_creator.create()
+
+    @staticmethod
+    def _make_pre_processor(dataset_pre_processing_options: Dict[DatasetRole, Tuple[List[PreProcessingOption], Dict]],
+                            dataset_role: DatasetRole) -> Optional[PreProcessor]:
+        """
+        Handles making the pre_processor for a specified dataset role and the given parameters
+        :param dataset_pre_processing_options: dictionary mapping dataset role to the desired pre-processing steps and related params
+        :param dataset_role: the role of the dataset (e.g. trail/eval)
+        :return: the pre_processor
+        """
+        pre_processor_reqs = dataset_pre_processing_options.get(dataset_role, {})
+        if pre_processor_reqs:
+            pre_processor_options, pre_processor_params = pre_processor_reqs
+            return PreProcessor(pre_processor_options, **pre_processor_params)
 
     def get_trainer(self, **kwargs) -> TraceTrainer:
         """

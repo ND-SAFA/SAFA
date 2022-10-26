@@ -13,6 +13,9 @@ from api.responses.prediction_response import PredictionResponse
 from config.constants import DELETE_TEST_OUTPUT, VALIDATION_PERCENTAGE_DEFAULT
 from server.storage.safa_storage import SafaStorage
 from test.config.paths import TEST_OUTPUT_DIR, TEST_VOCAB_FILE
+from tracer.dataset.creators.classic_trace_dataset_creator import ClassicTraceDatasetCreator
+from tracer.dataset.creators.supported_dataset_creator import SupportedDatasetCreator
+from tracer.dataset.dataset_role import DatasetRole
 from tracer.models.base_models.pl_bert import PLBert
 from tracer.models.base_models.supported_base_model import SupportedBaseModel
 
@@ -73,12 +76,18 @@ class BaseTest(TestCase):
     _LEN_ERROR = "Length of {} does not match expected"
     _TEST_ARGS_BASE = {"base_model": SupportedBaseModel.PL_BERT,
                        "model_path": "model",
-                       "output_dir": TEST_OUTPUT_DIR,
-                       "settings": {"validation_percentage": VALIDATION_PERCENTAGE_DEFAULT}}
-    _TEST_ARGS_ARTIFACTS = {"source_layers": TEST_SOURCE_LAYERS,
+                       "output_dir": TEST_OUTPUT_DIR}
+    _TEST_DATASET_PARAMS = {"source_layers": TEST_SOURCE_LAYERS,
                             "target_layers": TEST_TARGET_LAYERS,
-                            "links": TEST_POS_LINKS,
-                            }
+                            "links": TEST_POS_LINKS}
+
+    @staticmethod
+    def create_dataset_map(dataset_role: DatasetRole, include_links=True):
+        dataset_params = deepcopy(BaseTest._TEST_DATASET_PARAMS)
+        if not include_links:
+            dataset_params.pop("links")
+        return {dataset_role: (SupportedDatasetCreator.CLASSIC_TRACE, dataset_params)
+                }
 
     def setup(self):
         if not os.path.isdir(TEST_OUTPUT_DIR):
@@ -89,14 +98,10 @@ class BaseTest(TestCase):
             shutil.rmtree(TEST_OUTPUT_DIR)
 
     @staticmethod
-    def get_test_params(include_artifacts=True, include_links=True, include_settings=True, as_api=False):
+    def get_test_params(dataset_role=DatasetRole.TRAIN, include_trace_params=True, include_links=True, as_api=False):
         test_args = deepcopy(BaseTest._TEST_ARGS_BASE)
-        if not include_settings:
-            test_args.pop("settings")
-        if include_artifacts:
-            test_args.update(BaseTest._TEST_ARGS_ARTIFACTS)
-            if not include_links:
-                test_args.pop("links")
+        if include_trace_params:
+            test_args["datasets_map"] = BaseTest.create_dataset_map(dataset_role, include_links=include_links)
 
         # Step - Replaces casing to snake case
         if as_api:

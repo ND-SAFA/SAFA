@@ -85,7 +85,7 @@ class CSVDatasetCreator(AbstractTraceDatasetCreator):
         return TraceLink(source, target, is_true_link)
 
     @staticmethod
-    def _read_data_file(data_file_path: str) -> pd.Dataframe:
+    def _read_data_file(data_file_path: str) -> pd.DataFrame:
         """
         Reads the csv file and returns a dataframe containing the contents
         :param data_file_path: the path to the data file

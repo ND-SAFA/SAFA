@@ -16,14 +16,14 @@ import json
 class AbstractJob:
     OUTPUT_FILENAME = "output.json"
 
-    def __init__(self, model_path: str, base_model: SupportedBaseModel, output_dir: str,
+    def __init__(self, output_dir: str, model_path: str, base_model: SupportedBaseModel = None,
                  add_mount_directory_to_output: bool = ADD_MOUNT_DIRECTORY_TO_OUTPUT_DEFAULT,
                  save_job_output: bool = SAVE_OUTPUT_DEFAULT):
         """
         The base job class
+        :param output_dir: where the model will be saved to
         :param base_model: supported base model name
         :param model_path: where the pretrained model will be loaded from
-        :param output_dir: where the model will be saved to
         :param add_mount_directory_to_output: if True, adds mount directory to output path
         :param save_job_output: if True, saves the output to the output_dir
         """
@@ -31,10 +31,21 @@ class AbstractJob:
         self.status = Status.NOT_STARTED
         self.result = {}
         self.id = uuid.uuid4()
-        self.model_generator = ModelGenerator(base_model=base_model, model_path=model_path)
         self.output_dir = SafaStorage.add_mount_directory(output_dir) if add_mount_directory_to_output else output_dir
         self.job_output_filepath = self._get_output_filepath(self.output_dir, self.id)
         self.save_output = save_job_output
+        self.base_model = base_model
+        self.model_path = model_path
+        self.__model_generator = None
+
+    def get_model_generator(self) -> ModelGenerator:
+        """
+        Gets the model generator for the job given a base model and model path
+        :return: the model generator
+        """
+        if self.__model_generator is None:
+            self.__model_generator = ModelGenerator(base_model=self.base_model, model_path=self.model_path)
+        return self.__model_generator
 
     def run(self) -> None:
         """

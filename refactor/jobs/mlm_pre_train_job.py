@@ -47,7 +47,7 @@ class MLMPreTrainJob(AbstractTraceJob):
         self.mlm_probability = mlm_probability
 
     def _run(self):
-        tokenizer = self.model_generator.get_tokenizer()
+        tokenizer = self.get_model_generator().get_tokenizer()
         data_collator = DataCollatorForLanguageModeling(
             tokenizer=tokenizer, mlm=True, mlm_probability=self.mlm_probability
         )

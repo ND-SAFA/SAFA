@@ -16,7 +16,7 @@ from tracer.train.trace_trainer import TraceTrainer
 
 class AbstractTraceJob(AbstractJob, ABC):
 
-    def __init__(self, model_path: str, base_model: SupportedBaseModel, output_dir: str,
+    def __init__(self,  output_dir: str, model_path: str, base_model: SupportedBaseModel,
                  datasets_map: Dict[DatasetRole, Tuple[SupportedDatasetCreator, Dict]],
                  dataset_pre_processing_options: Dict[DatasetRole, Tuple[List[PreProcessingOption], Dict]] = None,
                  trace_args_params: Dict = None,
@@ -34,7 +34,7 @@ class AbstractTraceJob(AbstractJob, ABC):
         :param save_job_output: if True, saves the output to the output_dir
         """
         model_path = SafaStorage.add_mount_directory(model_path)
-        super().__init__(model_path, base_model, output_dir, add_mount_directory_to_output, save_job_output)
+        super().__init__(output_dir, model_path, base_model, add_mount_directory_to_output, save_job_output)
         dataset_pre_processing_options = dataset_pre_processing_options if dataset_pre_processing_options else {}
         self.train_dataset = self._make_dataset(datasets_map, dataset_pre_processing_options, DatasetRole.TRAIN)
         self.eval_dataset = self._make_dataset(datasets_map, dataset_pre_processing_options, DatasetRole.EVAL)
@@ -66,5 +66,5 @@ class AbstractTraceJob(AbstractJob, ABC):
         :return: the trainer
         """
         if self.__trainer is None:
-            self.__trainer = TraceTrainer(args=self.train_args, model_generator=self.model_generator, **kwargs)
+            self.__trainer = TraceTrainer(args=self.train_args, model_generator=self.get_model_generator(), **kwargs)
         return self.__trainer

@@ -1,7 +1,6 @@
 import os
 import shutil
 from typing import Dict
-
 from jobs.abstract_job import AbstractJob
 
 
@@ -12,6 +11,6 @@ class DeleteModelJob(AbstractJob):
         Deletes a new model directory
         :return: Empty Dict
         """
-        if os.path.exists(self.output_dir):
-            shutil.rmtree(self.output_dir)
+        if os.path.exists(self.model_path):
+            shutil.rmtree(self.model_path)
         return {}

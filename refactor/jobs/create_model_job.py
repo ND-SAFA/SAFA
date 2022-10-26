@@ -11,7 +11,7 @@ class CreateModelJob(AbstractJob):
         Creates a new model
         :return: the model path
         """
-        model_generator = self.model_generator
+        model_generator = self.get_model_generator()
         model = model_generator.get_model()
         model.save_pretrained(self.output_dir)
         tokenizer = model_generator.get_tokenizer()

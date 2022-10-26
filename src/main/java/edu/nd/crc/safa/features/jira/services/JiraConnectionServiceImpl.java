@@ -8,12 +8,12 @@ import java.util.Date;
 import java.util.List;
 
 import edu.nd.crc.safa.features.jira.entities.app.JiraAccessCredentialsDTO;
+import edu.nd.crc.safa.features.jira.entities.app.JiraAuthResponseDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraCredentialsRequestBodyDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraInstallationDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraIssuesResponseDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraProjectPermissionDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraProjectResponseDTO;
-import edu.nd.crc.safa.features.jira.entities.app.JiraAuthResponseDTO;
 import edu.nd.crc.safa.features.jira.entities.db.JiraAccessCredentials;
 import edu.nd.crc.safa.features.jira.entities.db.JiraProject;
 import edu.nd.crc.safa.features.jira.repositories.JiraProjectRepository;
@@ -276,7 +276,7 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
         ISSUES(ATLASSIAN_API_URL, "/search", HttpMethod.GET),
         PERMISSIONS(ATLASSIAN_API_URL, "/mypermissions", HttpMethod.GET),
         ACCESS_CODE(ATLASSIAN_AUTH_URL, "/oauth/token", HttpMethod.POST),
-        INSTALLATIONS(ATLASSIAN_AUTH_URL, "/oauth/token/accessible-resources", HttpMethod.GET);
+        INSTALLATIONS(ATLASSIAN_API_URL, "/oauth/token/accessible-resources", HttpMethod.GET);
 
         private final String url;
 

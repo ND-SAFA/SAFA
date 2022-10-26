@@ -1,7 +1,7 @@
 package edu.nd.crc.safa.features.jira.controllers;
 
 import java.util.Objects;
-import javax.validation.Valid;
+import java.util.Optional;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
@@ -26,6 +26,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -88,14 +90,20 @@ public class JiraCredentialsController extends BaseController {
     }
 
     @PutMapping(AppRoutes.Jira.Credentials.REFRESH)
-    public DeferredResult<JiraResponseDTO<Void>> createCredentials(@PathVariable("cloudId") String cloudId) {
+    public DeferredResult<JiraResponseDTO<Void>> createCredentials() {
         DeferredResult<JiraResponseDTO<Void>> output = executorDelegate.createOutput(5000L);
 
         executorDelegate.submit(output, () -> {
             SafaUser principal = safaUserService.getCurrentUser();
-            JiraAccessCredentials credentials = accessCredentialsRepository
-                .findByUserAndCloudId(principal, cloudId).orElseThrow(() -> new SafaError("No JIRA credentials found"));
+            Optional<JiraAccessCredentials> credentialsOptional = accessCredentialsRepository
+                .findByUser(principal);
 
+            if (credentialsOptional.isEmpty()) {
+                output.setResult(new JiraResponseDTO<>(null, JiraResponseMessage.NO_CREDENTIALS_REGISTERED));
+                return;
+            }
+
+            JiraAccessCredentials credentials = credentialsOptional.get();
             JiraAuthResponseDTO newCredentials = jiraConnectionService.refreshAccessToken(credentials);
 
             if (!StringUtils.hasText(newCredentials.getAccessToken())
@@ -105,7 +113,7 @@ public class JiraCredentialsController extends BaseController {
 
             credentials.setBearerAccessToken(newCredentials.getAccessToken().getBytes());
             credentials.setRefreshToken(newCredentials.getRefreshToken());
-            credentials = accessCredentialsRepository.save(credentials);
+            accessCredentialsRepository.save(credentials);
 
             output.setResult(new JiraResponseDTO<>(null, JiraResponseMessage.UPDATED));
         });
@@ -113,13 +121,21 @@ public class JiraCredentialsController extends BaseController {
         return output;
     }
 
-    @PostMapping(AppRoutes.Jira.Credentials.VALIDATE)
-    public DeferredResult<JiraResponseDTO<Boolean>> validateJIRACredentials(
-        @RequestBody @Valid JiraAccessCredentialsDTO data) {
+    @GetMapping(AppRoutes.Jira.Credentials.VALIDATE)
+    public DeferredResult<JiraResponseDTO<Boolean>> validateJIRACredentials() {
         DeferredResult<JiraResponseDTO<Boolean>> output = executorDelegate.createOutput(5000L);
 
         executorDelegate.submit(output, () -> {
-            JiraAccessCredentials credentials = data.toEntity();
+            SafaUser principal = safaUserService.getCurrentUser();
+            Optional<JiraAccessCredentials> credentialsOptional = accessCredentialsRepository
+                .findByUser(principal);
+
+            if (credentialsOptional.isEmpty()) {
+                output.setResult(new JiraResponseDTO<>(null, JiraResponseMessage.NO_CREDENTIALS_REGISTERED));
+                return;
+            }
+
+            JiraAccessCredentials credentials = credentialsOptional.get();
 
             try {
                 boolean areCredentialsValid = jiraConnectionService.checkCredentials(credentials);
@@ -128,6 +144,27 @@ public class JiraCredentialsController extends BaseController {
             } catch (Exception ex) {
                 output.setResult(new JiraResponseDTO<>(false, JiraResponseMessage.ERROR));
             }
+        });
+
+        return output;
+    }
+
+    @DeleteMapping(AppRoutes.Jira.Credentials.REFRESH)
+    public DeferredResult<JiraResponseDTO<Void>> deleteCredentials() {
+        DeferredResult<JiraResponseDTO<Void>> output = executorDelegate.createOutput(5000L);
+
+        executorDelegate.submit(output, () -> {
+            SafaUser principal = safaUserService.getCurrentUser();
+            Optional<JiraAccessCredentials> credentialsOptional = accessCredentialsRepository
+                .findByUser(principal);
+
+            if (credentialsOptional.isEmpty()) {
+                output.setResult(new JiraResponseDTO<>(null, JiraResponseMessage.NO_CREDENTIALS_REGISTERED));
+                return;
+            }
+
+            accessCredentialsRepository.delete(credentialsOptional.get());
+            output.setResult(new JiraResponseDTO<>(null, JiraResponseMessage.OK));
         });
 
         return output;

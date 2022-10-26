@@ -151,7 +151,7 @@ public class SafaUserController extends BaseController {
         String resetToken = passwordResetRequest.getResetToken();
         String newPassword = passwordResetRequest.getNewPassword();
 
-        // Step - check the reset token was issues by us
+        // Step - check the reset token was issued by us
         PasswordResetToken passwordResetToken = passwordResetTokenRepository.findByToken(resetToken)
             .orElseThrow(() -> new SafaError("Illegal expiration token"));
 

@@ -22,6 +22,9 @@ public class JiraResponseDTO<T> {
         OK("ok"),
         ERROR("error"),
         IMPORTED("imported"),
+        NO_CREDENTIALS_REGISTERED("imported"),
+        INVALID_CREDENTIALS("invalid credentials"),
+        INSTALLATION_REGISTERED("installation registered"),
         CANNOT_PARSE_PROJECT("cannot parse project");
 
         private final String value;

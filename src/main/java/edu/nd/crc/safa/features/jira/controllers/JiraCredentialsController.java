@@ -66,13 +66,6 @@ public class JiraCredentialsController extends BaseController {
             SafaUser principal = safaUserService.getCurrentUser();
             JiraAccessCredentialsDTO data = jiraConnectionService.useAccessCode(accessCode);
             JiraAccessCredentials credentials = data.toEntity();
-
-//            boolean areCredentialsValid = jiraConnectionService.checkCredentials(credentials);
-//
-//            if (!areCredentialsValid) {
-//                throw new SafaError("User contains invalid JIRA credentials.");
-//            }
-
             JiraAccessCredentials previousCredentials =
                 accessCredentialsRepository.findByUser(principal).orElse(null);
 

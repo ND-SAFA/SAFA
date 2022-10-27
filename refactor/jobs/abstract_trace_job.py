@@ -58,23 +58,9 @@ class AbstractTraceJob(AbstractJob, ABC):
         dataset_creator_reqs = datasets_map.get(dataset_role, None)
         if dataset_creator_reqs:
             dataset_creator_class, dataset_creator_params = dataset_creator_reqs
-            pre_processor = AbstractTraceJob._make_pre_processor(dataset_pre_processing_options, dataset_role)
-            dataset_creator = dataset_creator_class.value(pre_processor=pre_processor, **dataset_creator_params)
+            pre_processing_params = dataset_pre_processing_options.get(dataset_role)
+            dataset_creator = dataset_creator_class.value(pre_processing_params=pre_processing_params, **dataset_creator_params)
             return dataset_creator.create()
-
-    @staticmethod
-    def _make_pre_processor(dataset_pre_processing_options: Dict[DatasetRole, Tuple[List[PreProcessingOption], Dict]],
-                            dataset_role: DatasetRole) -> Optional[PreProcessor]:
-        """
-        Handles making the pre_processor for a specified dataset role and the given parameters
-        :param dataset_pre_processing_options: dictionary mapping dataset role to the desired pre-processing steps and related params
-        :param dataset_role: the role of the dataset (e.g. trail/eval)
-        :return: the pre_processor
-        """
-        pre_processor_reqs = dataset_pre_processing_options.get(dataset_role, {})
-        if pre_processor_reqs:
-            pre_processor_options, pre_processor_params = pre_processor_reqs
-            return PreProcessor(pre_processor_options, **pre_processor_params)
 
     def get_trainer(self, **kwargs) -> TraceTrainer:
         """

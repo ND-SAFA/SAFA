@@ -10,7 +10,7 @@ from tracer.models.model_generator import ModelGenerator
 
 
 class TestCreateModelJob(BaseTest):
-    TEST_PARAMS = BaseTest.get_test_params(include_trace_params=False, include_trace_args_params=False)
+    TEST_PARAMS = BaseTest.get_test_params(include_trace_params=False)
 
     @patch.object(ModelGenerator, '_ModelGenerator__load_model')
     @patch.object(ModelGenerator, 'get_tokenizer')

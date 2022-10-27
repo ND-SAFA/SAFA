@@ -1,10 +1,11 @@
 import os
 import uuid
-from typing import List, Dict
+from typing import List, Dict, Tuple
 
 from config.constants import BLOCK_SIZE_DEFAULT
 from tracer.dataset.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tracer.dataset.pre_train_dataset import PreTrainDataset
+from tracer.pre_processing.pre_processing_option import PreProcessingOption
 from tracer.pre_processing.pre_processor import PreProcessor
 
 
@@ -12,16 +13,17 @@ class MLMPreTrainDatasetCreator(AbstractDatasetCreator):
     DELIMINATOR = "\n"
     OUTPUT_FILE_EXT = ".txt"
 
-    def __init__(self, orig_data_path: str, training_data_dir: str, pre_processor: PreProcessor = None,
+    def __init__(self, orig_data_path: str, training_data_dir: str,
+                 pre_processing_params: Tuple[List[PreProcessingOption], Dict] = None,
                  block_size: int = BLOCK_SIZE_DEFAULT):
         """
         The masked learning model pretraining dataset creator
         :param orig_data_path: path to the original pretraining
         :param training_data_dir: path to the directory to save the training dataset file
-        :param pre_processor: the pre_processor to run on the data
+        :param pre_processing_params: tuple containing the desired pre-processing steps and related params
         :param block_size: the block size for the LineByLineDataset
         """
-        super().__init__(pre_processor)
+        super().__init__(pre_processing_params)
         self.orig_data_path = orig_data_path
         self.block_size = block_size
         self.id = str(uuid.uuid4())

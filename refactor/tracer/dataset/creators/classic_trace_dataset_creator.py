@@ -5,23 +5,24 @@ from tracer.dataset.data_objects.artifact import Artifact
 from tracer.dataset.creators.abstract_trace_dataset_creator import AbstractTraceDatasetCreator
 from tracer.dataset.trace_dataset import TraceDataset
 from tracer.dataset.data_objects.trace_link import TraceLink
+from tracer.pre_processing.pre_processing_option import PreProcessingOption
 from tracer.pre_processing.pre_processor import PreProcessor
 
 
 class ClassicTraceDatasetCreator(AbstractTraceDatasetCreator):
 
     def __init__(self, source_layers: List[Dict[str, str]], target_layers: List[Dict[str, str]],
-                 true_links: List[Tuple[str, str]] = None, pre_processor: PreProcessor = None,
+                 true_links: List[Tuple[str, str]] = None, pre_processing_params: Tuple[List[PreProcessingOption], Dict] = None,
                  use_linked_targets_only: bool = USE_LINKED_TARGETS_ONLY_DEFAULT):
         """
         Constructs dataset in classic trace format
         :param source_layers: a list of source artifacts across all layers
         :param target_layers: a list of target artifacts across all layers
         :param true_links: list of tuples containing linked source and target ids
-        :param pre_processor: the pre_processor to run on the data
+        :param pre_processing_params: tuple containing the desired pre-processing steps and related params
         :param use_linked_targets_only: if True, uses only the targets that make up at least one true link
         """
-        super().__init__(pre_processor, use_linked_targets_only)
+        super().__init__(pre_processing_params, use_linked_targets_only)
         self.source_layers = source_layers
         self.target_layers = target_layers
         self.true_links = true_links

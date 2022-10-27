@@ -5,18 +5,18 @@ from tracer.dataset.data_objects.artifact import Artifact
 from tracer.dataset.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tracer.dataset.trace_dataset import TraceDataset
 from tracer.dataset.data_objects.trace_link import TraceLink
-from tracer.pre_processing.pre_processor import PreProcessor
+from tracer.pre_processing.pre_processing_option import PreProcessingOption
 
 
 class AbstractTraceDatasetCreator(AbstractDatasetCreator, ABC):
 
-    def __init__(self, pre_processor: PreProcessor, use_linked_targets_only: bool):
+    def __init__(self, pre_processing_params: Tuple[List[PreProcessingOption], Dict], use_linked_targets_only: bool):
         """
         Responsible for creating dataset in format for defined models.
-        :pre_processor: the pre_processor to run on the data
+        :param pre_processing_params: tuple containing the desired pre-processing steps and related params
         :use_linked_targets_only: if True, uses only the targets that make up at least one true link
         """
-        super().__init__(pre_processor)
+        super().__init__(pre_processing_params)
         self._linked_targets = set()
         self.use_linked_targets_only = use_linked_targets_only
 

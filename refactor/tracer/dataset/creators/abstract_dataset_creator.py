@@ -1,18 +1,19 @@
 from abc import ABC, abstractmethod
-from typing import List, Union
+from typing import List, Union, Dict, Tuple
 
 from tracer.dataset.abstract_dataset import AbstractDataset
+from tracer.pre_processing.pre_processing_option import PreProcessingOption
 from tracer.pre_processing.pre_processor import PreProcessor
 
 
 class AbstractDatasetCreator(ABC):
 
-    def __init__(self, pre_processor: PreProcessor):
+    def __init__(self, pre_processing_params: Tuple[List[PreProcessingOption], Dict]):
         """
         Responsible for creating dataset in format for defined models.
-        :pre_processor: the pre_processor to run on the data
+        :param pre_processing_params: tuple containing the desired pre-processing steps and related params
         """
-        self.pre_processor = pre_processor if pre_processor else PreProcessor([])
+        self.pre_processor = self._make_pre_processor(pre_processing_params)
 
     @abstractmethod
     def create(self) -> AbstractDataset:
@@ -21,6 +22,18 @@ class AbstractDatasetCreator(ABC):
         :return: the dataset
         """
         pass
+
+    @staticmethod
+    def _make_pre_processor(pre_processing_params: Tuple[List[PreProcessingOption], Dict] = None) -> PreProcessor:
+        """
+        Handles making the pre_processor
+        :param pre_processing_params: tuple containing the desired pre-processing steps and related params
+        :return: the pre_processor
+        """
+        if pre_processing_params:
+            pre_processor_options, pre_processor_params = pre_processing_params
+            return PreProcessor(pre_processor_options, **pre_processor_params)
+        return PreProcessor()
 
     def _process_tokens(self, tokens: Union[List[str], str]) -> Union[List[str], str]:
         """

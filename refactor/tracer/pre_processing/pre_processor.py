@@ -11,6 +11,7 @@ class PreProcessor:
         Handles Pre-Processing
         :param selected_options: the selected pre-process options to run
         """
+        selected_options = selected_options if selected_options else []
         self.ordered_before_steps, self.ordered_regular_steps = self._get_ordered_steps(selected_options, **kwargs)
 
     @staticmethod

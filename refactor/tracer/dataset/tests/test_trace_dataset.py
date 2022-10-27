@@ -40,7 +40,7 @@ class TestTraceDataset(BaseTest):
         model_generator = ModelGenerator(**self.MODEL_GENERATOR_PARAMS)
         trainer_dataset = train_dataset.to_trainer_dataset(model_generator)
         self.assertTrue(isinstance(trainer_dataset[0], dict))
-        self.assertEquals(self.get_expected_train_dataset_size(1), len(trainer_dataset))
+        self.assertEquals(self.get_expected_train_dataset_size(resample_rate=1), len(trainer_dataset))
 
     def test_get_source_target_pairs(self):
         trace_dataset = self.get_trace_dataset()
@@ -130,27 +130,11 @@ class TestTraceDataset(BaseTest):
         size = TraceDataset._get_first_split_size(self.POS_LINKS, self.VAlIDATION_PERCENTAGE)
         self.assertEquals(size, len(self.POS_LINKS) - self.EXPECTED_VAL_SIZE_POS_LINKS)
 
-    def get_expected_train_dataset_size(self, resample_rate, validation_percentage=VAlIDATION_PERCENTAGE):
-        num_train_pos_links = round(len(self.POS_LINKS) * (1 - validation_percentage))
-        return resample_rate * num_train_pos_links * 2  # equal number pos and neg links
-
     def get_trace_dataset(self):
         links = self.get_links(self.ALL_TEST_LINKS)
         pos_links_ids = list(self.get_links(self.POS_LINKS).keys())
         neg_link_ids = list(set(links.keys()).difference(set(pos_links_ids)))
         return TraceDataset(links, pos_links_ids, neg_link_ids)
-
-    def get_links(self, link_list):
-        links = {}
-        for source, target in link_list:
-            link = self.get_test_link(source, target)
-            links[link.id] = link
-        return links
-
-    def get_test_link(self, source, target):
-        s = Artifact(source, self.ALL_TEST_SOURCES[source])
-        t = Artifact(target, self.ALL_TEST_TARGETS[target])
-        return TraceLink(s, t)
 
     def get_expected_train_dataset_size(self, resample_rate=RESAMPLE_RATE, validation_percentage=VAlIDATION_PERCENTAGE):
         num_train_pos_links = round(len(self.POS_LINKS) * (1 - validation_percentage))

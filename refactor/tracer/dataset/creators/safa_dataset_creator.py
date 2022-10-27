@@ -7,6 +7,7 @@ from tracer.dataset.data_objects.artifact import Artifact
 from tracer.dataset.creators.abstract_trace_dataset_creator import AbstractTraceDatasetCreator
 from tracer.dataset.data_objects.trace_link import TraceLink
 from tracer.dataset.trace_dataset import TraceDataset
+from tracer.pre_processing.pre_processing_option import PreProcessingOption
 from tracer.pre_processing.pre_processor import PreProcessor
 import pandas as pd
 
@@ -51,18 +52,18 @@ class SafaDatasetCreator(AbstractTraceDatasetCreator):
                                    SafaKeys.HARDWARE_REQUIREMENTS_FILE, SafaKeys.SYSTEM_REQUIREMENTS_FILE)}
     KEYS = SafaKeys()
 
-    def __init__(self, project_path: str, pre_processor: PreProcessor = None, data_keys: SafaKeys = KEYS,
-                 trace_files_2_artifacts: Dict[str, Tuple[str, str]] = None,
+    def __init__(self, project_path: str, pre_processing_params: Tuple[List[PreProcessingOption], Dict] = None,
+                 data_keys: SafaKeys = KEYS, trace_files_2_artifacts: Dict[str, Tuple[str, str]] = None,
                  use_linked_targets_only: bool = USE_LINKED_TARGETS_ONLY_DEFAULT):
         """
         Creates a dataset from the SAFA dataset format.
         :param project_path: the path to the project
-        :param pre_processor: the pre_processor to run on the data
+        :param pre_processing_params: tuple containing the desired pre-processing steps and related params
         :param data_keys: keys to use to access data
         :param trace_files_2_artifacts: maps trace files to the artifacts files that they link
         :param use_linked_targets_only: if True, uses only the targets that make up at least one true link
         """
-        super().__init__(pre_processor, use_linked_targets_only)
+        super().__init__(pre_processing_params, use_linked_targets_only)
         self.project_path = project_path
         self.keys = data_keys
         self.trace_files_2_artifacts = trace_files_2_artifacts if trace_files_2_artifacts else self.TRACE_FILES_2_ARTIFACTS

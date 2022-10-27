@@ -61,7 +61,24 @@ class BaseTest(TestCase):
                                               label_ids=TEST_LABEL_IDS,
                                               metrics=TEST_METRIC_RESULTS)
     TEST_PREDICTION_RESPONSE_OUTPUT = {
-        PredictionResponse.PREDICTIONS: {},  # TODO
+        PredictionResponse.PREDICTIONS: [{'source': 's1', 'target': 't3', 'score': 0.4997793138027191},
+                                         {'source': 's1', 'target': 't1', 'score': 0.4997793138027191},
+                                         {'source': 's4', 'target': 't5', 'score': 0.4997793138027191},
+                                         {'source': 's5', 'target': 't6', 'score': 0.4997793138027191},
+                                         {'source': 's2', 'target': 't2', 'score': 0.4997793138027191},
+                                         {'source': 's5', 'target': 't4', 'score': 0.4997793138027191},
+                                         {'source': 's1', 'target': 't2', 'score': 0.4997793138027191},
+                                         {'source': 's3', 'target': 't2', 'score': 0.4997793138027191},
+                                         {'source': 's4', 'target': 't4', 'score': 0.4997793138027191},
+                                         {'source': 's6', 'target': 't5', 'score': 0.4997793138027191},
+                                         {'source': 's2', 'target': 't3', 'score': 0.4997793138027191},
+                                         {'source': 's5', 'target': 't5', 'score': 0.4997793138027191},
+                                         {'source': 's3', 'target': 't1', 'score': 0.4997793138027191},
+                                         {'source': 's6', 'target': 't6', 'score': 0.4997793138027191},
+                                         {'source': 's4', 'target': 't6', 'score': 0.4997793138027191},
+                                         {'source': 's6', 'target': 't4', 'score': 0.4997793138027191},
+                                         {'source': 's2', 'target': 't1', 'score': 0.4997793138027191},
+                                         {'source': 's3', 'target': 't3', 'score': 0.4997793138027191}],
         PredictionResponse.METRICS: {'test_loss': 0.6948729753494263, 'test_runtime': 0.0749,
                                      'test_samples_per_second': 240.328, 'test_steps_per_second': 40.055}}
     _KEY_ERROR_MESSAGE = "{} not in {}"
@@ -191,5 +208,6 @@ class BaseTest(TestCase):
     def assert_lists_have_the_same_vals(self, list1, list2):
         diff1 = set(list1).difference(list2)
         diff2 = set(list2).difference(list1)
+        print(list1, list2)
         self.assertEquals(len(diff1), 0)
         self.assertEquals(len(diff2), 0)

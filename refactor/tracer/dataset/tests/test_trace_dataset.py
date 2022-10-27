@@ -36,7 +36,7 @@ class TestTraceDataset(BaseTest):
     @patch.object(ModelGenerator, "get_tokenizer")
     def test_to_trainer_dataset(self, get_tokenizer_mock: mock.MagicMock):
         get_tokenizer_mock.return_value = self.get_test_tokenizer()
-        train_dataset, test_dataset = self.get_trace_dataset().train_test_split(self.VAlIDATION_PERCENTAGE)
+        train_dataset, test_dataset = self.get_trace_dataset().train_test_split(self.VAlIDATION_PERCENTAGE, resample_rate=1)
         model_generator = ModelGenerator(**self.MODEL_GENERATOR_PARAMS)
         trainer_dataset = train_dataset.to_trainer_dataset(model_generator)
         self.assertTrue(isinstance(trainer_dataset[0], dict))

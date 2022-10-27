@@ -46,8 +46,9 @@ class TraceDataset(AbstractDataset):
         :param model_generator: The model generator determining architecture and feature function for trace links.
         :return: A dataset used by the HF trainer.
         """
-        return [self._get_feature_entry(self.links[link_id], model_generator.arch_type, model_generator.get_feature) for
-                link_id in self.pos_link_ids + self.neg_link_ids]
+        feature_entries = {link.id: self._get_feature_entry(link, model_generator.arch_type, model_generator.get_feature)
+                           for link in self.links.values()}
+        return [feature_entries[link_id] for link_id in self.pos_link_ids + self.neg_link_ids]
 
     def get_source_target_pairs(self) -> List[Tuple]:
         """

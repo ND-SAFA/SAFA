@@ -16,7 +16,7 @@ from tracer.train.trace_trainer import TraceTrainer
 class TestTraceTrainer(BaseTest):
     VALIDATION_PERCENTAGE = 0.3
     EXPECTED_VALIDATION_SIZE = 3
-    EXPECTED_PREDICTION_SIZE = len(BaseTest.TEST_TARGET_LAYERS) * len(BaseTest.TEST_SOURCE_LAYERS)
+    EXPECTED_PREDICTION_SIZE = len(BaseTest.TARGET_LAYERS) * len(BaseTest.SOURCE_LAYERS)
     TEST_METRIC_NAMES = ["accuracy", "map_at_k"]
 
     def test_perform_training(self):
@@ -75,8 +75,8 @@ class TestTraceTrainer(BaseTest):
         test_trace_trainer.train_dataset = self.get_dataset()
 
     def get_dataset(self, include_links=True):
-        return ClassicTraceDatasetCreator(self.TEST_SOURCE_LAYERS, self.TEST_TARGET_LAYERS,
-                                          true_links=self.TEST_POS_LINKS if include_links else None).create()
+        return ClassicTraceDatasetCreator(self.SOURCE_LAYERS, self.TARGET_LAYERS,
+                                          true_links=self.POS_LINKS if include_links else None).create()
 
     def get_test_trace_trainer(self, **kwargs):
         model_generator = ModelGenerator(SupportedBaseModel.PL_BERT, "path")

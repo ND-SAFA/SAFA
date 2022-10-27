@@ -13,6 +13,7 @@ class DataKey:
     TOKEN_TYPE_IDS = "token_type_ids"
     ATTEN_MASK = "attention_mask"
     SOURCE_TARGET_PAIRS = "source_target_pairs"
+    SEP = "_"
 
     @staticmethod
     def get_feature_entry_keys() -> List[str]:

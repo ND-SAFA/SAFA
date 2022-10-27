@@ -10,9 +10,11 @@ from tracer.dataset.data_objects.trace_link import TraceLink
 from tracer.models.model_generator import ModelGenerator
 from tracer.models.model_properties import ArchitectureType
 
+SEED = 420
+random.seed(SEED)
+
 
 class TraceDataset(AbstractDataset):
-    SEED = 420
 
     def __init__(self, links: Dict[int, TraceLink], pos_link_ids: List[int] = None, neg_link_ids: List[int] = None):
         """
@@ -24,7 +26,9 @@ class TraceDataset(AbstractDataset):
         self.links = OrderedDict(links)
         self.pos_link_ids = pos_link_ids if pos_link_ids else list()
         self.neg_link_ids = neg_link_ids if neg_link_ids else list()
-        random.seed(self.SEED)
+
+        self._shuffle_link_ids(self.pos_link_ids)
+        self._shuffle_link_ids(self.neg_link_ids)
 
     def split(self, percent_split: float) -> Tuple["TraceDataset", "TraceDataset"]:
         """
@@ -32,9 +36,6 @@ class TraceDataset(AbstractDataset):
         :param percent_split: The percent of links to include in second trace dataset.
         :return: Tuple of two trace datasets.
         """
-        self._shuffle_link_ids(self.pos_link_ids)
-        self._shuffle_link_ids(self.neg_link_ids)
-
         first_slice = self._create_new_dataset_from_slice(percent_split, slice_num=1)
         second_slice = self._create_new_dataset_from_slice(percent_split, slice_num=2)
         return first_slice, second_slice
@@ -55,40 +56,51 @@ class TraceDataset(AbstractDataset):
         """
         return [(link.source.id, link.target.id) for link in self.links.values()]
 
-    def train_test_split(self, percent_test: float, resample_rate: int = RESAMPLE_RATE_DEFAULT):
+    def get_train_test_split(self, percent_test: float, resample_rate: int = RESAMPLE_RATE_DEFAULT):
+        """
+
+        :param percent_test:
+        :param resample_rate:
+        :return:
+        """
         train, test = self.split(percent_test)
         train = self._prepare_train_split(train, resample_rate)
         test = self._prepare_test_split(test)
         return train, test
 
-    def resize_links(self, new_length: int, include_duplicates: bool = False, use_neg_links: bool = True) -> None:
+    def resize_pos_links(self, new_length: int, include_duplicates: bool = False) -> None:
         """
-        Extends or shrinks specified trace links to given size.
+        Extends or shrinks pos trace links to given size.
         :param new_length: The new size of the links.
         :param include_duplicates: Whether to include duplicate links if extending.
-        :param use_neg_links: Whether to reference negative links, otherwise positive links assumed.
         :return:  None (links are automatically set in current instance).
         """
-        link_ids = self.neg_link_ids if use_neg_links else self.pos_link_ids
-        resized_link_ids = self._resize_data(link_ids, new_length, include_duplicates=include_duplicates)
-        if use_neg_links:
-            self.neg_link_ids = resized_link_ids
-        else:
-            self.pos_link_ids = resized_link_ids
+        self.pos_link_ids = self._resize_data(self.pos_link_ids, new_length, include_duplicates=include_duplicates)
 
-    def resample_links(self, resample_rate: int, use_neg_links: bool = True) -> None:
+    def resize_neg_links(self, new_length: int, include_duplicates: bool = False) -> None:
         """
-        Copies specified links as many times defined by resample rate.
-        :param resample_rate: How many copies of each link to make.
-        :param use_neg_links: Whether to reference negative links, otherwise positive links assumed.
+        Extends or shrinks neg trace links to given size.
+        :param new_length: The new size of the links.
+        :param include_duplicates: Whether to include duplicate links if extending.
         :return:  None (links are automatically set in current instance).
         """
-        link_ids = self.neg_link_ids if use_neg_links else self.pos_link_ids
-        resized_link_ids = self._resample_data(link_ids, resample_rate)
-        if use_neg_links:
-            self.neg_link_ids = resized_link_ids
-        else:
-            self.pos_link_ids = resized_link_ids
+        self.neg_link_ids = self._resize_data(self.neg_link_ids, new_length, include_duplicates=include_duplicates)
+
+    def resample_pos_links(self, resample_rate: int) -> None:
+        """
+        Copies pos links as many times defined by resample rate.
+        :param resample_rate: How many copies of each link to make.
+        :return:  None (links are automatically set in current instance).
+        """
+        self.pos_link_ids = self._resample_data(self.pos_link_ids, resample_rate)
+
+    def resample_neg_links(self, resample_rate: int) -> None:
+        """
+        Copies neg links as many times defined by resample rate.
+        :param resample_rate: How many copies of each link to make.
+        :return:  None (links are automatically set in current instance).
+        """
+        self.neg_link_ids = self._resample_data(self.neg_link_ids, resample_rate)
 
     @staticmethod
     def _resize_data(data: List, new_length: int, include_duplicates: bool = False) -> List:
@@ -137,8 +149,8 @@ class TraceDataset(AbstractDataset):
         :return: feature name, value mappings
         """
         if arch_type == ArchitectureType.SIAMESE:
-            entry = {**self._extract_feature_info(link.source.get_feature(feature_func), DataKey.SOURCE_PRE + "_"),
-                     **self._extract_feature_info(link.target.get_feature(feature_func), DataKey.TARGET_PRE + "_")}
+            entry = {**self._extract_feature_info(link.source.get_feature(feature_func), DataKey.SOURCE_PRE + DataKey.SEP),
+                     **self._extract_feature_info(link.target.get_feature(feature_func), DataKey.TARGET_PRE + DataKey.SEP)}
         else:
             entry = self._extract_feature_info(link.get_feature(feature_func))
         entry[DataKey.LABEL_KEY] = int(link.is_true_link)
@@ -196,8 +208,8 @@ class TraceDataset(AbstractDataset):
         :return: Prepared trace dataset
         """
         if len(self.pos_link_ids) > 0:
-            train_split.resample_links(resample_rate, use_neg_links=False)
-            train_split.resize_links(len(self.pos_link_ids), include_duplicates=True, use_neg_links=True)
+            train_split.resample_pos_links(resample_rate)
+            train_split.resize_neg_links(len(self.pos_link_ids), include_duplicates=True)
         return train_split
 
     def _prepare_test_split(self, test_split: "TraceDataset") -> "TraceDataset":

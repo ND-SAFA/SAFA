@@ -21,20 +21,27 @@ from tracer.models.base_models.supported_base_model import SupportedBaseModel
 
 
 class BaseTest(TestCase):
-    TEST_SOURCE_LAYERS = [{"s1": "token1",
-                           "s2": "token2",
-                           "s3": "token3"}, {"s4": "token4",
-                                             "s5": "token5",
-                                             "s6": "token6"}]
+    SOURCE_LAYERS = [{"s1": "token1",
+                      "s2": "token2",
+                      "s3": "token3"}, {"s4": "token4",
+                                        "s5": "token5",
+                                        "s6": "token6"}]
 
-    TEST_TARGET_LAYERS = [{"t1": "token1",
-                           "t2": "token2",
-                           "t3": "token3"}, {"t4": "token4",
-                                             "t5": "token5",
-                                             "t6": "token6"}]
-    ALL_TEST_SOURCES = {id_: token for artifacts in TEST_SOURCE_LAYERS for id_, token in artifacts.items()}
-    ALL_TEST_TARGETS = {id_: token for artifacts in TEST_TARGET_LAYERS for id_, token in artifacts.items()}
-    TEST_POS_LINKS = [("s1", "t1"), ("s2", "t1"), ("s3", "t2"), ("s4", "t4"), ("s4", "t5"), ("s5", "t6")]
+    TARGET_LAYERS = [{"t1": "token1",
+                      "t2": "token2",
+                      "t3": "token3"}, {"t4": "token4",
+                                        "t5": "token5",
+                                        "t6": "token6"}]
+    ALL_TEST_SOURCES = {id_: token for artifacts in SOURCE_LAYERS for id_, token in artifacts.items()}
+    ALL_TEST_TARGETS = {id_: token for artifacts in TARGET_LAYERS for id_, token in artifacts.items()}
+    POS_LINKS = [("s1", "t1"), ("s2", "t1"), ("s3", "t2"), ("s4", "t4"), ("s4", "t5"), ("s5", "t6")]
+    ALL_TEST_LINKS = [("s1", "t1"), ("s2", "t1"), ("s3", "t1"),
+                      ("s1", "t2"), ("s2", "t2"), ("s3", "t2"),
+                      ("s1", "t3"), ("s2", "t3"), ("s3", "t3"),
+                      ("s4", "t4"), ("s5", "t4"), ("s6", "t4"),
+                      ("s4", "t5"), ("s5", "t5"), ("s6", "t5"),
+                      ("s4", "t6"), ("s5", "t6"), ("s6", "t6")]
+    LINKED_TARGETS = ["t1", "t2", "t4", "t5", "t6"]
 
     TEST_METRIC_RESULTS = {'test_loss': 0.6929082870483398}
     TEST_PREDICTIONS = np.array([[0.50035876, 0.49964124],
@@ -74,16 +81,17 @@ class BaseTest(TestCase):
     _KEY_ERROR_MESSAGE = "{} not in {}"
     _VAL_ERROR_MESSAGE = "{} with value {} does not equal expected value of {} {}"
     _LEN_ERROR = "Length of {} does not match expected"
-    _TEST_ARGS_BASE = {"base_model": SupportedBaseModel.PL_BERT,
-                       "model_path": "model",
-                       "output_dir": TEST_OUTPUT_DIR}
-    _TEST_DATASET_PARAMS = {"source_layers": TEST_SOURCE_LAYERS,
-                            "target_layers": TEST_TARGET_LAYERS,
-                            "true_links": TEST_POS_LINKS}
+    MODEL_GENERATOR_PARAMS = {"base_model": SupportedBaseModel.PL_BERT,
+                              "model_path": "model"}
+    _JOB_PARAMS_BASE = {**MODEL_GENERATOR_PARAMS,
+                        "output_dir": TEST_OUTPUT_DIR}
+    _DATASET_PARAMS = {"source_layers": SOURCE_LAYERS,
+                       "target_layers": TARGET_LAYERS,
+                       "true_links": POS_LINKS}
 
     @staticmethod
     def create_dataset_map(dataset_role: DatasetRole, include_links=True):
-        dataset_params = deepcopy(BaseTest._TEST_DATASET_PARAMS)
+        dataset_params = deepcopy(BaseTest._DATASET_PARAMS)
         if not include_links:
             dataset_params.pop("true_links")
         return {dataset_role: (SupportedDatasetCreator.CLASSIC_TRACE, dataset_params)
@@ -99,7 +107,7 @@ class BaseTest(TestCase):
 
     @staticmethod
     def get_test_params(dataset_role=DatasetRole.TRAIN, include_trace_params=True, include_links=True, as_api=False):
-        test_args = deepcopy(BaseTest._TEST_ARGS_BASE)
+        test_args = deepcopy(BaseTest._JOB_PARAMS_BASE)
         if include_trace_params:
             test_args["datasets_map"] = BaseTest.create_dataset_map(dataset_role, include_links=include_links)
 
@@ -173,3 +181,9 @@ class BaseTest(TestCase):
             if val != expected_val:
                 return False
         return True
+
+    def assert_lists_have_the_same_vals(self, list1, list2):
+        diff1 = set(list1).difference(list2)
+        diff2 = set(list2).difference(list1)
+        self.assertEquals(len(diff1), 0)
+        self.assertEquals(len(diff2), 0)

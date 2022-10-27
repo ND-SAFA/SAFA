@@ -13,12 +13,13 @@ FEATURE_VALUE = "({}, {})"
 
 
 def fake_method(text, text_pair=None, return_token_type_ids=None, add_special_tokens=None):
-    return {"feature_" + text: FEATURE_VALUE.format(text, text_pair) if text_pair else text}
+    return {"input_ids": FEATURE_VALUE.format(text, text_pair) if text_pair else text}
 
 
 class TestTraceDataset(BaseTest):
     VAlIDATION_PERCENTAGE = 0.3
-    EXPECTED_VAL_SIZE = 2
+    EXPECTED_VAL_SIZE_NEG_LINKS = round((len(BaseTest.ALL_TEST_LINKS) - len(BaseTest.POS_LINKS)) * VAlIDATION_PERCENTAGE)
+    EXPECTED_VAL_SIZE_POS_LINKS = round(len(BaseTest.POS_LINKS) * VAlIDATION_PERCENTAGE)
     TEST_FEATURE = {"irrelevant_key1": "k",
                     "input_ids": "a",
                     "token_type_ids": "l",
@@ -26,14 +27,20 @@ class TestTraceDataset(BaseTest):
     FEATURE_KEYS = DataKey.get_feature_entry_keys()
     RESAMPLE_RATE = 3
 
+    def test_train_test_dataset(self):
+        trace_dataset = self.get_trace_dataset()
+        train, test = trace_dataset.train_test_split(self.VAlIDATION_PERCENTAGE, self.RESAMPLE_RATE)
+        self.assertEquals(self.get_expected_train_dataset_size(), len(train.pos_link_ids) + len(train.neg_link_ids))
+        self.assertEquals(self.EXPECTED_VAL_SIZE_POS_LINKS + self.EXPECTED_VAL_SIZE_NEG_LINKS, len(test))
+
     @patch.object(ModelGenerator, "get_tokenizer")
     def test_to_trainer_dataset(self, get_tokenizer_mock: mock.MagicMock):
         get_tokenizer_mock.return_value = self.get_test_tokenizer()
-        trace_dataset = self.get_trace_dataset()
+        train_dataset, test_dataset = self.get_trace_dataset().train_test_split(self.VAlIDATION_PERCENTAGE)
         model_generator = ModelGenerator(**self.MODEL_GENERATOR_PARAMS)
-        trainer_dataset = trace_dataset.to_trainer_dataset(model_generator)
+        trainer_dataset = train_dataset.to_trainer_dataset(model_generator)
         self.assertTrue(isinstance(trainer_dataset[0], dict))
-        self.assertEquals(len(trace_dataset.links), len(trainer_dataset))
+        self.assertEquals(self.get_expected_train_dataset_size(1), len(trainer_dataset))
 
     def test_get_source_target_pairs(self):
         trace_dataset = self.get_trace_dataset()
@@ -78,10 +85,11 @@ class TestTraceDataset(BaseTest):
     def test_split(self):
         trace_dataset = self.get_trace_dataset()
         split1, split2 = trace_dataset.split(self.VAlIDATION_PERCENTAGE)
-        self.assertEquals(len(split1), len(self.POS_LINKS) - self.EXPECTED_VAL_SIZE)
-        self.assertEquals(len(split2), self.EXPECTED_VAL_SIZE)
+        expected_val_link_size = (self.EXPECTED_VAL_SIZE_POS_LINKS + self.EXPECTED_VAL_SIZE_NEG_LINKS)
+        self.assertEquals(len(split1), len(self.ALL_TEST_LINKS) - expected_val_link_size)
+        self.assertEquals(len(split2), expected_val_link_size)
         intersection = set(split1.links.keys()).intersection(set(split2.links.keys()))
-        self.assertEquals(intersection, 0)
+        self.assertEquals(len(intersection), 0)
 
         for split in [split1, split2]:
             link_ids = split.pos_link_ids + split.neg_link_ids
@@ -92,13 +100,13 @@ class TestTraceDataset(BaseTest):
         source, target = self.POS_LINKS[0]
         test_link = self.get_test_link(source, target)
 
-        feature_entry_single = trace_dataset._get_feature_entry(test_link, ArchitectureType.SIAMESE, fake_method)
-        self.assertIn(test_link.source.token, feature_entry_single.values())
-        self.assertIn(test_link.target.token, feature_entry_single.values())
-        self.assertIn(DataKey.LABEL_KEY, feature_entry_single)
+        feature_entry_siamese = trace_dataset._get_feature_entry(test_link, ArchitectureType.SIAMESE, fake_method)
+        self.assertIn(test_link.source.token, feature_entry_siamese.values())
+        self.assertIn(test_link.target.token, feature_entry_siamese.values())
+        self.assertIn(DataKey.LABEL_KEY, feature_entry_siamese)
 
-        feature_entry_single = trace_dataset._get_feature_entry(test_link, ArchitectureType.SIAMESE, fake_method)
-        self.assertIn(FEATURE_VALUE.format(source.token, target.token), feature_entry_single.values())
+        feature_entry_single = trace_dataset._get_feature_entry(test_link, ArchitectureType.SINGLE, fake_method)
+        self.assertIn(FEATURE_VALUE.format(test_link.source.token, test_link.target.token), feature_entry_single.values())
         self.assertIn(DataKey.LABEL_KEY, feature_entry_single)
 
     def test_extract_feature_info(self):
@@ -113,17 +121,14 @@ class TestTraceDataset(BaseTest):
     def test_get_data_split(self):
         split1 = TraceDataset._get_data_split(self.POS_LINKS, self.VAlIDATION_PERCENTAGE, for_second_split=False)
         split2 = TraceDataset._get_data_split(self.POS_LINKS, self.VAlIDATION_PERCENTAGE, for_second_split=True)
-        self.assertEquals(len(split1), len(self.POS_LINKS) - self.EXPECTED_VAL_SIZE)
-        self.assertEquals(len(split2), self.EXPECTED_VAL_SIZE)
+        self.assertEquals(len(split1), len(self.POS_LINKS) - self.EXPECTED_VAL_SIZE_POS_LINKS)
+        self.assertEquals(len(split2), self.EXPECTED_VAL_SIZE_POS_LINKS)
         intersection = set(split1).intersection(set(split2))
         self.assertEquals(len(intersection), 0)
 
     def test_get_first_split_size(self):
         size = TraceDataset._get_first_split_size(self.POS_LINKS, self.VAlIDATION_PERCENTAGE)
-        self.assertEquals(size, len(self.POS_LINKS) - self.EXPECTED_VAL_SIZE)
-
-    def test_prepare_train_split(self):
-        pass
+        self.assertEquals(size, len(self.POS_LINKS) - self.EXPECTED_VAL_SIZE_POS_LINKS)
 
     def get_expected_train_dataset_size(self, resample_rate, validation_percentage=VAlIDATION_PERCENTAGE):
         num_train_pos_links = round(len(self.POS_LINKS) * (1 - validation_percentage))
@@ -146,3 +151,7 @@ class TestTraceDataset(BaseTest):
         s = Artifact(source, self.ALL_TEST_SOURCES[source])
         t = Artifact(target, self.ALL_TEST_TARGETS[target])
         return TraceLink(s, t)
+
+    def get_expected_train_dataset_size(self, resample_rate=RESAMPLE_RATE, validation_percentage=VAlIDATION_PERCENTAGE):
+        num_train_pos_links = round(len(self.POS_LINKS) * (1 - validation_percentage))
+        return resample_rate * num_train_pos_links * 2  # equal number pos and neg links

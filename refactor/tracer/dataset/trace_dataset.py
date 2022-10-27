@@ -47,21 +47,21 @@ class TraceDataset(AbstractDataset):
         :return: A dataset used by the HF trainer.
         """
         return [self._get_feature_entry(self.links[link_id], model_generator.arch_type, model_generator.get_feature) for
-                link_id in self.links]
+                link_id in self.pos_link_ids + self.neg_link_ids]
 
     def get_source_target_pairs(self) -> List[Tuple]:
         """
         Gets the list of source target pairs in the order corresponding to the trainer dataset
         :return: list of tuples containing source id and target id
         """
-        return [(link.source.id, link.target.id) for link in self.links.values()]
+        return [(self.links[link_id].source.id, self.links[link_id].target.id) for link_id in self.pos_link_ids + self.neg_link_ids]
 
-    def get_train_test_split(self, percent_test: float, resample_rate: int = RESAMPLE_RATE_DEFAULT):
+    def train_test_split(self, percent_test: float, resample_rate: int = RESAMPLE_RATE_DEFAULT):
         """
-
-        :param percent_test:
-        :param resample_rate:
-        :return:
+        Gets the train and test dataset splits
+        :param percent_test: the percent of data used for testing
+        :param resample_rate: the rate at which to resample the positive links
+        :return: the train and test datasets
         """
         train, test = self.split(percent_test)
         train = self._prepare_train_split(train, resample_rate)
@@ -207,9 +207,9 @@ class TraceDataset(AbstractDataset):
         :param resample_rate: The number of copies of each positive link.
         :return: Prepared trace dataset
         """
-        if len(self.pos_link_ids) > 0:
+        if len(train_split.pos_link_ids) > 0:
             train_split.resample_pos_links(resample_rate)
-            train_split.resize_neg_links(len(self.pos_link_ids), include_duplicates=True)
+            train_split.resize_neg_links(len(train_split.pos_link_ids), include_duplicates=True)
         return train_split
 
     def _prepare_test_split(self, test_split: "TraceDataset") -> "TraceDataset":
@@ -221,7 +221,7 @@ class TraceDataset(AbstractDataset):
         return test_split
 
     def __len__(self):
-        return len(self.links)
+        return len(self.pos_link_ids) + len(self.neg_link_ids)
 
     def __add__(self, other: "TraceDataset"):
         combined_links = deepcopy(self.links)

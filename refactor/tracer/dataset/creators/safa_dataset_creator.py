@@ -1,6 +1,6 @@
 import json
 import os
-from typing import Callable, Dict, List, Set, Tuple, Union
+from typing import Callable, Dict, List, Set, Tuple
 
 from config.constants import USE_LINKED_TARGETS_ONLY_DEFAULT
 from tracer.dataset.data_objects.artifact import Artifact
@@ -8,7 +8,6 @@ from tracer.dataset.creators.abstract_trace_dataset_creator import AbstractTrace
 from tracer.dataset.data_objects.trace_link import TraceLink
 from tracer.dataset.trace_dataset import TraceDataset
 from tracer.pre_processing.pre_processing_option import PreProcessingOption
-from tracer.pre_processing.pre_processor import PreProcessor
 import pandas as pd
 
 
@@ -30,102 +29,92 @@ class SafaKeys:
     ARTIFACTS = "artifacts"
     TRACES = "traces"
 
+    TRACE_FILES_2_ARTIFACTS = {FR2SG_FILE: (FUNCTIONAL_REQUIREMENTS_FILE, SAFETY_GOALS_FILE),
+                               SR2FR_FILE: (
+                                   SYSTEM_REQUIREMENTS_FILE, FUNCTIONAL_REQUIREMENTS_FILE),
+                               SWR2SR_FILE: (
+                                   SOFTWARE_REQUIREMENTS_FILE, SYSTEM_REQUIREMENTS_FILE),
+                               HWR2SR_FILE: (
+                                   HARDWARE_REQUIREMENTS_FILE, SYSTEM_REQUIREMENTS_FILE)}
+
     def __init__(self, artifact_id_key: str = ARTIFACT_ID, artifact_token_key: str = ARTIFACT_TOKEN, source_id_key: str = SOURCE_ID,
-                 target_id_key: str = TARGET_ID, artifacts_key: str = ARTIFACTS, traces_key: str = TRACES):
+                 target_id_key: str = TARGET_ID, artifacts_key: str = ARTIFACTS, traces_key: str = TRACES,
+                 trace_files_2_artifacts: Dict[str, Tuple[str, str]] = None):
         self.artifact_id_key = artifact_id_key
         self.artifact_token_key = artifact_token_key
         self.source_id_key = source_id_key
         self.target_id_key = target_id_key
         self.artifacts_key = artifacts_key
         self.traces_key = traces_key
+        self.trace_files_2_artifacts = trace_files_2_artifacts if trace_files_2_artifacts else SafaKeys.TRACE_FILES_2_ARTIFACTS
 
 
 class SafaDatasetCreator(AbstractTraceDatasetCreator):
     JSON_EXT = ".json"
     CSV_EXT = ".csv"
-    TRACE_FILES_2_ARTIFACTS = {SafaKeys.FR2SG_FILE: (SafaKeys.FUNCTIONAL_REQUIREMENTS_FILE, SafaKeys.SAFETY_GOALS_FILE),
-                               SafaKeys.SR2FR_FILE: (
-                                   SafaKeys.SYSTEM_REQUIREMENTS_FILE, SafaKeys.FUNCTIONAL_REQUIREMENTS_FILE),
-                               SafaKeys.SWR2SR_FILE: (
-                                   SafaKeys.SOFTWARE_REQUIREMENTS_FILE, SafaKeys.SYSTEM_REQUIREMENTS_FILE),
-                               SafaKeys.HWR2SR_FILE: (
-                                   SafaKeys.HARDWARE_REQUIREMENTS_FILE, SafaKeys.SYSTEM_REQUIREMENTS_FILE)}
     KEYS = SafaKeys()
 
     def __init__(self, project_path: str, pre_processing_params: Tuple[List[PreProcessingOption], Dict] = None,
-                 data_keys: SafaKeys = KEYS, trace_files_2_artifacts: Dict[str, Tuple[str, str]] = None,
-                 use_linked_targets_only: bool = USE_LINKED_TARGETS_ONLY_DEFAULT):
+                 data_keys: SafaKeys = KEYS, use_linked_targets_only: bool = USE_LINKED_TARGETS_ONLY_DEFAULT):
         """
         Creates a dataset from the SAFA dataset format.
         :param project_path: the path to the project
         :param pre_processing_params: tuple containing the desired pre-processing steps and related params
         :param data_keys: keys to use to access data
-        :param trace_files_2_artifacts: maps trace files to the artifacts files that they link
         :param use_linked_targets_only: if True, uses only the targets that make up at least one true link
         """
         super().__init__(pre_processing_params, use_linked_targets_only)
         self.project_path = project_path
         self.keys = data_keys
-        self.trace_files_2_artifacts = trace_files_2_artifacts if trace_files_2_artifacts else self.TRACE_FILES_2_ARTIFACTS
 
     def create(self) -> TraceDataset:
         """
         Creates the dataset
         :return: the dataset
         """
-        links, pos_link_ids, neg_link_ids = self._create_dataset_params_from_files(SafaKeys(),
-                                                                                   self.project_path,
-                                                                                   self.TRACE_FILES_2_ARTIFACTS)
-        return TraceDataset(links, list(pos_link_ids), list(neg_link_ids))
+        return self._create_dataset_from_files(self.keys, self.project_path)
 
-    def _create_dataset_params_from_files(self, keys: SafaKeys, project_path: str,
-                                          trace_files_2_artifacts: Dict[str, Tuple[str, str]]) \
-            -> Tuple[Dict[int, TraceLink], Set[int], Set[int]]:
+    def _create_dataset_from_files(self, keys: SafaKeys, project_path: str) -> TraceDataset:
         """
         Creates dataset params from dataset files
         :param keys: keys used to access data in dataframe
-        :param project_path: the path to the project
-        :param trace_files_2_artifacts: a dictionary mapping trace file name to source and target artifact names
+        :param project_path: the path to the project\
         :return: the links, pos_link-ids, and neg_link_ids
         """
         links = {}
         pos_link_ids = set()
-        for trace_file, source_target_files in trace_files_2_artifacts.items():
-            source_artifacts = self._create_artifacts_from_file(keys, project_path, source_target_files[0])
-            target_artifacts = self._create_artifacts_from_file(keys, project_path, source_target_files[1])
-            layer_pos_link_ids = self._get_pos_link_ids_from_file(keys, project_path, trace_file)
-            pos_link_ids.union(layer_pos_link_ids)
+        for trace_file, source_target_files in keys.trace_files_2_artifacts.items():
+            source_artifacts = self._create_artifacts_from_file(source_target_files[0])
+            target_artifacts = self._create_artifacts_from_file(source_target_files[1])
+            layer_pos_link_ids = self._get_pos_link_ids_from_file(trace_file)
+            pos_link_ids = pos_link_ids.union(layer_pos_link_ids)
             links.update(self._create_links_for_layer(source_artifacts, target_artifacts, layer_pos_link_ids))
         neg_link_ids = set(links.keys()).difference(pos_link_ids)
-        return links, pos_link_ids, neg_link_ids
+        return TraceDataset(links, list(pos_link_ids), list(neg_link_ids))
 
-    def _create_artifacts_from_file(self, keys: SafaKeys, repo_path: str, data_file_name: str) -> List[Artifact]:
+    def _create_artifacts_from_file(self, data_file_name: str) -> List[Artifact]:
         """
         Create artifacts in artifact file.
-        :param keys: keys used to access data in dataframe
-        :param repo_path: The path to the project containing artifact file.
         :param data_file_name: The name of the artifact file to read.
         :return: List of artifacts in file.
         """
-        artifacts_file = self._read_data_file(repo_path, data_file_name, keys.artifacts_key)
+        artifacts_file = self._read_data_file(self.project_path, data_file_name, self.keys.artifacts_key)
 
         artifacts = []
         for i, row in artifacts_file.iterrows():
-            artifact_tokens = self._process_tokens(row[keys.artifact_token_key])
+            artifact_tokens = self._process_tokens(row[self.keys.artifact_token_key])
             if artifact_tokens:
-                artifacts.append(Artifact(row[keys.artifact_id_key], artifact_tokens))
+                artifacts.append(Artifact(row[self.keys.artifact_id_key], artifact_tokens))
 
         return artifacts
 
-    def _get_pos_link_ids_from_file(self, keys: SafaKeys, project_path: str, data_file_name: str) -> Set[int]:
+    def _get_pos_link_ids_from_file(self, data_file_name: str) -> Set[int]:
         """
         Extracts positive trace links from trace files in project.
-        :param keys: keys used to access data in dataframe
-        :param project_path: The path to the project files.
         :return: Trace link ids of positive links.
         """
-        links_df = self._read_data_file(project_path, data_file_name, keys.traces_key)
-        return self._get_pos_link_ids([(link[keys.source_id_key], link[keys.target_id_key])
+        links_df = self._read_data_file(self.project_path, data_file_name, self.keys.traces_key)
+        return self._get_pos_link_ids([(link[self.keys.source_id_key], link[self.keys.target_id_key])
                                        for _, link in links_df.iterrows()])
 
     @staticmethod

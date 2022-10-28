@@ -6,7 +6,6 @@ from tracer.dataset.creators.abstract_trace_dataset_creator import AbstractTrace
 from tracer.dataset.creators.safa_dataset_creator import SafaDatasetCreator, SafaKeys
 from tracer.dataset.trace_dataset import TraceDataset
 from tracer.pre_processing.pre_processing_option import PreProcessingOption
-from tracer.pre_processing.pre_processor import PreProcessor
 
 
 class RepositoryKeys(SafaKeys):
@@ -19,15 +18,16 @@ class RepositoryKeys(SafaKeys):
     ARTIFACT_ID = "id"
     SOURCE_ID = "source"
     TARGET_ID = "target"
+    TRACE_FILE_2_ARTIFACTS = {COMMIT2ISSUE_FILE_NAME: (COMMIT_FILE_NAME, ISSUE_FILE_NAME),
+                              PULL2ISSUE_FILE_NAME: (PULL_FILE_NAME, ISSUE_FILE_NAME)}
 
     def __init__(self):
-        super().__init__(RepositoryKeys.ARTIFACT_ID, RepositoryKeys.ARTIFACT_TOKEN, RepositoryKeys.SOURCE_ID, RepositoryKeys.TARGET_ID)
+        super().__init__(RepositoryKeys.ARTIFACT_ID, RepositoryKeys.ARTIFACT_TOKEN, RepositoryKeys.SOURCE_ID, RepositoryKeys.TARGET_ID,
+                         trace_files_2_artifacts=RepositoryKeys.TRACE_FILE_2_ARTIFACTS)
 
 
 class RepositoryDatasetCreator(AbstractTraceDatasetCreator):
     KEYS = RepositoryKeys()
-    TRACE_FILE_2_ARTIFACTS = {RepositoryKeys.COMMIT2ISSUE_FILE_NAME: (RepositoryKeys.COMMIT_FILE_NAME, RepositoryKeys.ISSUE_FILE_NAME),
-                              RepositoryKeys.PULL2ISSUE_FILE_NAME: (RepositoryKeys.PULL_FILE_NAME, RepositoryKeys.ISSUE_FILE_NAME)}
 
     def __init__(self, repo_paths: List[str], pre_processing_params: Tuple[List[PreProcessingOption], Dict] = None,
                  use_linked_targets_only: bool = USE_LINKED_TARGETS_ONLY_DEFAULT):
@@ -43,8 +43,7 @@ class RepositoryDatasetCreator(AbstractTraceDatasetCreator):
     def create(self) -> TraceDataset:
         dataset = None
         for repo_path in self.repo_paths:
-            repo_dataset = SafaDatasetCreator(repo_path, self.pre_processor, self.KEYS,
-                                              self.TRACE_FILE_2_ARTIFACTS, self.use_linked_targets_only).create()
+            repo_dataset = SafaDatasetCreator(repo_path, self.pre_processor, self.KEYS, self.use_linked_targets_only).create()
 
             dataset = dataset + repo_dataset if dataset else repo_dataset
         return dataset

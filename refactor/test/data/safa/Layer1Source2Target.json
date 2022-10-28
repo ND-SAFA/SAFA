@@ -1,0 +1,37 @@
+{
+  "traces": [
+    {
+      "sourceId": "s1",
+      "approvalStatus": "APPROVED",
+      "score": 1,
+      "traceLinkId": "f2763546-d3fd-4b25-8fd8-68a95f4eb30a",
+      "targetName": "t1",
+      "targetId": "t1",
+      "traceType": "MANUAL",
+      "sourceName": "s1",
+      "id": "f2763546-d3fd-4b25-8fd8-68a95f4eb30a"
+    },
+     {
+      "sourceId": "s2",
+      "approvalStatus": "APPROVED",
+      "score": 1,
+      "traceLinkId": "f2763546-d3fd-4b25-8fd8-68a95f4eb30a",
+      "targetName": "t1",
+      "targetId": "t1",
+      "traceType": "MANUAL",
+      "sourceName": "s2",
+      "id": "f2763546-d3fd-4b25-8fd8-68a95f4eb30a"
+    },
+     {
+      "sourceId": "s3",
+      "approvalStatus": "APPROVED",
+      "score": 1,
+      "traceLinkId": "f2763546-d3fd-4b25-8fd8-68a95f4eb30a",
+      "targetName": "t2",
+      "targetId": "t2",
+      "traceType": "MANUAL",
+      "sourceName": "s3",
+      "id": "f2763546-d3fd-4b25-8fd8-68a95f4eb30a"
+    }
+  ]
+}

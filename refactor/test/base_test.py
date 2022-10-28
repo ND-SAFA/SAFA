@@ -45,6 +45,7 @@ class BaseTest(TestCase):
                       ("s4", "t5"), ("s5", "t5"), ("s6", "t5"),
                       ("s4", "t6"), ("s5", "t6"), ("s6", "t6")]
     LINKED_TARGETS = ["t1", "t2", "t4", "t5", "t6"]
+    NEG_LINKS = set(ALL_TEST_LINKS).difference(set(POS_LINKS))
 
     TEST_METRIC_RESULTS = {'test_loss': 0.6929082870483398}
     TEST_PREDICTIONS = np.array([[0.50035876, 0.49964124],
@@ -169,6 +170,9 @@ class BaseTest(TestCase):
             links[link.id] = link
         return links
 
+    def get_link_ids(self, links_list):
+        return list(self.get_links(links_list).keys())
+
     def get_test_link(self, source, target):
         s = Artifact(source, self.ALL_TEST_SOURCES[source])
         t = Artifact(target, self.ALL_TEST_TARGETS[target])
@@ -208,6 +212,7 @@ class BaseTest(TestCase):
     def assert_lists_have_the_same_vals(self, list1, list2):
         diff1 = set(list1).difference(list2)
         diff2 = set(list2).difference(list1)
-        print(list1, list2)
         self.assertEquals(len(diff1), 0)
         self.assertEquals(len(diff2), 0)
+
+

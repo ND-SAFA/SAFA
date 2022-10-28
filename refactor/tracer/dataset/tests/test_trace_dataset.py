@@ -132,8 +132,8 @@ class TestTraceDataset(BaseTest):
 
     def get_trace_dataset(self):
         links = self.get_links(self.ALL_TEST_LINKS)
-        pos_links_ids = list(self.get_links(self.POS_LINKS).keys())
-        neg_link_ids = list(set(links.keys()).difference(set(pos_links_ids)))
+        pos_links_ids = self.get_link_ids(self.POS_LINKS)
+        neg_link_ids = self.get_link_ids(self.NEG_LINKS)
         return TraceDataset(links, pos_links_ids, neg_link_ids)
 
     def get_expected_train_dataset_size(self, resample_rate=RESAMPLE_RATE, validation_percentage=VAlIDATION_PERCENTAGE):

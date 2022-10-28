@@ -54,11 +54,32 @@ describe("Trace Link Approval", () => {
   });
 
   describe("I can decline an un-reviewed or approved trace link", () => {
-    it("Can approve a trace link and check that it is approved", () => {});
+    it("Can decline an un-reviewed trace link and check that it is declined", () => {
+      cy.clickButton(DataCy.traceLinkTableGenerateTraceLinkDeclineButton);
+      cy.getCy(DataCy.snackbarSuccess).should("be.visible");
+      cy.clickButton(DataCy.traceLinkTableApprovalTypeButton).type(
+        "{backspace}{downArrow}{downArrow}{enter}{esc}"
+      );
+      cy.withinTableRows(DataCy.traceLinkTable, (tr) => {
+        tr.should("have.length", 3);
+        tr.contains("D4").should("have.length", 1);
+      });
+    });
 
-    it("Can decline an un-reviewed trace link and check that it is declined", () => {});
-
-    it("Can decline an approved trace link and check that it is declined", () => {});
+    it("Can decline an approved trace link and check that it is declined", () => {
+      cy.clickButton(DataCy.traceLinkTableApprovalTypeButton).type(
+        "{backspace}{downArrow}{enter}{esc}"
+      );
+      cy.clickButton(DataCy.traceLinkTableGenerateTraceLinkDeclineButton);
+      cy.getCy(DataCy.snackbarSuccess).should("be.visible");
+      cy.clickButton(DataCy.traceLinkTableApprovalTypeButton).type(
+        "{backspace}{downArrow}{enter}{esc}"
+      );
+      cy.withinTableRows(DataCy.traceLinkTable, (tr) => {
+        tr.should("have.length", 4);
+        tr.contains("D10").should("have.length", 1);
+      });
+    });
   });
 
   /* These will be skipped for now
@@ -67,9 +88,33 @@ describe("Trace Link Approval", () => {
   describe("I can see un-reviewed trace links as dotted lines", () => {});
   */
   describe("I can un-review an approved or declined trace link", () => {
-    it("Can un-review an approved trace link", () => {});
+    it("Can un-review an approved trace link", () => {
+      cy.clickButton(DataCy.traceLinkTableApprovalTypeButton).type(
+        "{backspace}{downArrow}{enter}{esc}"
+      );
+      cy.clickButton(DataCy.traceLinkTableGenerateTraceLinkUnapproveButton);
+      cy.getCy(DataCy.snackbarSuccess).should("be.visible");
+      cy.clickButton(DataCy.traceLinkTableApprovalTypeButton).type(
+        "{backspace}{downArrow}{downArrow}{enter}{esc}"
+      );
+      cy.withinTableRows(DataCy.traceLinkTable, (tr) => {
+        tr.contains("D2").should("have.length", 1);
+      });
+    });
 
-    it("Can un-review a declined trace link", () => {});
+    it("Can un-review a declined trace link", () => {
+      cy.clickButton(DataCy.traceLinkTableApprovalTypeButton).type(
+        "{backspace}{downArrow}{downArrow}{enter}{esc}"
+      );
+      cy.clickButton(DataCy.traceLinkTableGenerateTraceLinkUnapproveButton);
+      cy.getCy(DataCy.snackbarSuccess).should("be.visible");
+      cy.clickButton(DataCy.traceLinkTableApprovalTypeButton).type(
+        "{backspace}{downArrow}{enter}{esc}"
+      );
+      cy.withinTableRows(DataCy.traceLinkTable, (tr) => {
+        tr.contains("D10").should("have.length", 1);
+      });
+    });
   });
 
   describe("I can sort trace links by name, type, and approval status", () => {

@@ -5,6 +5,7 @@
       text
       :loading="isUnreviewLoading"
       @click="handleUnreview"
+      data-cy="button-trace-link-generate-unapproved"
     >
       <v-icon class="mr-1">mdi-checkbox-blank-circle-outline</v-icon>
       Un-Review

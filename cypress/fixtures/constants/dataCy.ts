@@ -258,6 +258,7 @@ export enum DataCy {
   traceLinkTable = "table-trace-link",
   traceLinkTableGenerateTraceLinkApproveButton = "button-trace-link-generate-approve",
   traceLinkTableGenerateTraceLinkDeclineButton = "button-trace-link-generate-decline",
+  traceLinkTableGenerateTraceLinkUnapproveButton = "button-trace-link-generate-unapproved",
   traceLinkTableApprovalTypeButton = "button-trace-link-generate-approval-type",
 }
 

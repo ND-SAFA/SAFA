@@ -255,6 +255,10 @@ export enum DataCy {
   artifactTableArtifactDeleteIAcceptButton = "button-confirm-modal",
 
   // Trace Link Generation
+  traceLinkTable = "table-trace-link",
+  traceLinkTableGenerateTraceLinkApproveButton = "button-trace-link-generate-approve",
+  traceLinkTableGenerateTraceLinkDeclineButton = "button-trace-link-generate-decline",
+  traceLinkTableApprovalTypeButton = "button-trace-link-generate-approval-type",
 }
 
 export enum DataIds {

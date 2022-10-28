@@ -15,6 +15,7 @@
       :loading="isApproveLoading"
       color="primary"
       @click="handleApprove"
+      data-cy="button-trace-link-generate-approve"
     >
       <v-icon class="mr-1">mdi-check-circle-outline</v-icon>
       Approve
@@ -25,6 +26,7 @@
       :loading="isDeclineLoading"
       color="error"
       @click="handleDecline"
+      data-cy="button-trace-link-generate-decline"
     >
       <v-icon class="mr-1">mdi-close-circle-outline</v-icon>
       Decline

@@ -18,6 +18,7 @@
       item-key="traceLinkId"
       :items-per-page="50"
       @click:row="handleView($event)"
+      data-cy="table-trace-link"
     >
       <template v-slot:top>
         <trace-link-table-header

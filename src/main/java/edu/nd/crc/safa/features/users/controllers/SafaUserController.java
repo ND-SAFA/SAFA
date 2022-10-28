@@ -19,6 +19,7 @@ import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.app.CreateAccountRequest;
 import edu.nd.crc.safa.features.users.entities.app.PasswordChangeRequest;
+import edu.nd.crc.safa.features.users.entities.app.PasswordForgottenRequest;
 import edu.nd.crc.safa.features.users.entities.app.ResetPasswordRequestDTO;
 import edu.nd.crc.safa.features.users.entities.app.UserIdentifierDTO;
 import edu.nd.crc.safa.features.users.entities.app.UserPasswordDTO;
@@ -117,7 +118,7 @@ public class SafaUserController extends BaseController {
      * @param user The user to send the reset password email to.
      */
     @PutMapping(AppRoutes.Accounts.FORGOT_PASSWORD)
-    public void forgotPassword(@Valid @RequestBody UserIdentifierDTO user) {
+    public void forgotPassword(@Valid @RequestBody PasswordForgottenRequest user) {
         String username = user.getEmail();
         SafaUser retrievedUser = safaUserRepository.findByEmail(username)
             .orElseThrow(() -> new UsernameNotFoundException("Username does not exist: " + username));

@@ -206,7 +206,6 @@ export function creatorTabOptions(): SelectOption[] {
 export function modelEditorTabOptions(): SelectOption[] {
   return [
     createEnumOption(ModelTabTypes.training, "Training"),
-    createEnumOption(ModelTabTypes.logs, "Training Logs"),
     createEnumOption(ModelTabTypes.evaluation, "Evaluation"),
   ];
 }

@@ -4,5 +4,4 @@
 export enum ModelTabTypes {
   training = "training",
   evaluation = "training",
-  logs = "logs",
 }

@@ -72,13 +72,12 @@ class SafaDatasetCreator(AbstractTraceDatasetCreator):
         Creates the dataset
         :return: the dataset
         """
-        return self._create_dataset_from_files(self.keys, self.project_path)
+        return self._create_dataset_from_files(self.keys)
 
-    def _create_dataset_from_files(self, keys: SafaKeys, project_path: str) -> TraceDataset:
+    def _create_dataset_from_files(self, keys: SafaKeys) -> TraceDataset:
         """
         Creates dataset params from dataset files
         :param keys: keys used to access data in dataframe
-        :param project_path: the path to the project\
         :return: the links, pos_link-ids, and neg_link_ids
         """
         links = {}

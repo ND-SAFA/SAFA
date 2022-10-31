@@ -5,7 +5,7 @@
       value="Train the model on trace links in the current project. Both links that exist and those that do not will inform the model."
     />
     <trace-matrix-creator v-model="matrices" />
-    <v-btn block color="primary" class="mt-4"> Train Model </v-btn>
+    <v-btn block color="primary" class="mt-4"> Start Model Training </v-btn>
   </v-container>
 </template>
 
@@ -19,7 +19,7 @@ import { TraceMatrixCreator } from "@/components/trace-link";
  * A step for training a model with artifacts and trace links from the current project.
  */
 export default Vue.extend({
-  name: "ModelKeywordsStep",
+  name: "ModelProjectStep",
   components: { Typography, TraceMatrixCreator },
   props: {
     model: {

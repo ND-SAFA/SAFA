@@ -2,11 +2,10 @@
   <v-container style="max-width: 40em">
     <typography
       el="p"
-      value="Select which documents and repositories best fit to your domain. You can also add a new repository by pasting its link and clicking enter."
+      value="Link to any code repositories that would train the model to understand code within this domain. Press enter to save a link."
     />
-    <v-combobox filled multiple chips deletable-chips label="Documents" />
     <v-combobox filled multiple chips deletable-chips label="Repositories" />
-    <v-btn block color="primary"> Continue Model Pre-Training </v-btn>
+    <v-btn block color="primary"> Start Model Pre-Training </v-btn>
   </v-container>
 </template>
 
@@ -16,10 +15,10 @@ import { GenerationModel } from "@/types";
 import { Typography } from "@/components/common";
 
 /**
- * A step for pre-training a model with curated documents and repositories.
+ * A step for training a model on repositories.
  */
 export default Vue.extend({
-  name: "ModelKeywordsStep",
+  name: "ModelRepositoryStep",
   components: { Typography },
   props: {
     model: {

@@ -1,20 +1,19 @@
 <template>
-  <v-container style="max-width: 40em">
+  <v-container v-if="!generated" style="max-width: 40em">
     <typography
       el="p"
       value="Enter keywords for the domain that this model should be trained on. Press enter to save a keyword."
     />
     <v-combobox filled multiple chips deletable-chips label="Keywords" />
+    <v-btn block color="primary"> Generate Training Materials </v-btn>
+  </v-container>
+  <v-container v-else style="max-width: 40em">
     <typography
       el="p"
-      value="Link to any code repositories that would train the model to understand code within this domain. Press enter to save a link."
+      value="Select which documents and repositories best fit to your domain. You can also add a new repository by pasting its link and clicking enter."
     />
+    <v-combobox filled multiple chips deletable-chips label="Documents" />
     <v-combobox filled multiple chips deletable-chips label="Repositories" />
-    <typography
-      el="p"
-      value="Upload any technical documents that would train the model to understand this domain."
-    />
-    <generic-file-selector />
     <v-btn block color="primary"> Start Model Pre-Training </v-btn>
   </v-container>
 </template>
@@ -22,19 +21,20 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { GenerationModel } from "@/types";
-import { Typography, GenericFileSelector } from "@/components/common";
+import { Typography } from "@/components/common";
 
 /**
  * A step for pre-training a model with keywords and documents.
  */
 export default Vue.extend({
   name: "ModelKeywordsStep",
-  components: { Typography, GenericFileSelector },
+  components: { Typography },
   props: {
     model: {
       type: Object as PropType<GenerationModel>,
       required: true,
     },
+    generated: Boolean,
   },
 });
 </script>

@@ -53,3 +53,74 @@ export interface TrainOrGenerateLinksModel {
    */
   requests: GeneratedMatrixModel[];
 }
+
+/**
+ * Represents a step of model training.
+ */
+export interface TrainingStepModel {
+  /**
+   * The type of training being done.
+   *
+   * `keywords` - Pre-Training: Keywords
+   * `document` - Pre-Training: Documents
+   * `repository` - Intermediate-Training: Repositories
+   * `project` - Fine-Tuning: Project Data
+   */
+  type: "keywords" | "document" | "repository" | "project";
+  /**
+   * The ISO timestamp of when this step was last updated.
+   */
+  updatedAt: string;
+  /**
+   * The status of this training step.
+   */
+  status: "In Progress" | "Completed" | "Failed";
+  /**
+   * On the keywords step, any keywords to compile
+   * documents and repositories using.
+   */
+  keywords: string[];
+  /**
+   * On the documents step, any documents being trained on.
+   */
+  documents: {
+    /**
+     * The name of this document.
+     */
+    name: string;
+    /**
+     * The link to where this document is stored.
+     */
+    url: string;
+  }[];
+  /**
+   * On the repositories step, any GitHub repositories being trained on.
+   */
+  repositories: {
+    /**
+     * The name of this repository.
+     */
+    name: string;
+    /**
+     * The link to where this repository is stored.
+     */
+    url: string;
+  }[];
+  /**
+   * On the training step, any projects being trained on.
+   */
+  projects: {
+    /**
+     * The project's id.
+     */
+    id: string;
+    /**
+     * The project's name.
+     */
+    name: string;
+    /**
+     * The trace matrices being used for training.
+     */
+    levels: ArtifactLevelModel[];
+  }[];
+}

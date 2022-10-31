@@ -1,3 +1,4 @@
+export { default as ModelDocumentStep } from "./ModelDocumentStep.vue";
+export { default as ModelRepositoryStep } from "./ModelRepositoryStep.vue";
 export { default as ModelKeywordsStep } from "./ModelKeywordsStep.vue";
-export { default as ModelPreTrainingStep } from "./ModelPreTrainingStep.vue";
-export { default as ModelTrainingStep } from "./ModelTrainingStep.vue";
+export { default as ModelProjectStep } from "./ModelProjectStep.vue";

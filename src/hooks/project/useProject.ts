@@ -3,7 +3,7 @@ import {
   IdentifierModel,
   MembershipModel,
   ProjectModel,
-  TrainedModel,
+  GenerationModel,
   VersionModel,
 } from "@/types";
 import { createProject, removeMatches } from "@/util";
@@ -74,7 +74,7 @@ export const useProject = defineStore("project", {
     /**
      * @return The current project's models.
      */
-    models(): TrainedModel[] {
+    models(): GenerationModel[] {
       return this.project.models;
     },
     /**
@@ -160,6 +160,19 @@ export const useProject = defineStore("project", {
       } else {
         logStore.onWarning("Please select a project.");
       }
+    },
+    /**
+     * Adds or replaces a project in the project list.
+     *
+     * @param project - The project to add.
+     */
+    addProject(project: IdentifierModel): void {
+      this.allProjects = [
+        project,
+        ...this.allProjects.filter(
+          ({ projectId }) => projectId !== project.projectId
+        ),
+      ];
     },
   },
 });

@@ -128,3 +128,12 @@ export async function deleteAccount(password: string): Promise<void> {
     body: JSON.stringify({ password }),
   });
 }
+
+/**
+ * Logs out the current user.
+ */
+export async function deleteSession(): Promise<void> {
+  await authHttpClient(fillEndpoint(Endpoint.logout), {
+    method: "GET",
+  });
+}

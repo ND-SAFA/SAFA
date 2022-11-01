@@ -35,11 +35,26 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Install certificates
+        run: >
+          sudo apt install libnss3-tools;
+          curl -JLO "https://dl.filippo.io/mkcert/latest?for=linux/amd64";
+          chmod +x mkcert-v*-linux-amd64;
+          sudo cp mkcert-v*-linux-amd64 /usr/local/bin/mkcert;
+          mkcert -install;
+          cd certs;
+          mkcert localhost.safa.ai
+
+      - name: Add hosts to /etc/hosts
+        run: sudo sed -i "2i 127.0.0.1 localhost.safa.ai" /etc/hosts
+
       - name: Cypress run
         uses: cypress-io/github-action@v4
         with:
-          build: npm run build
-          wait-on: 'http://localhost:8080'
           start: npm start
+          wait-on: 'https://localhost.safa.ai:8080'
           browser: chrome
           headed: true
+        env:
+          DEBUG: '@cypress/github-action'
+          NODE_TLS_REJECT_UNAUTHORIZED: 0

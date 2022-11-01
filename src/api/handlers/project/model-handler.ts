@@ -1,4 +1,4 @@
-import { IOHandlerCallback, ModelShareType, TrainedModel } from "@/types";
+import { IOHandlerCallback, ModelShareType, GenerationModel } from "@/types";
 import { logStore, modelSaveStore, projectStore } from "@/hooks";
 import {
   createModel,
@@ -25,7 +25,7 @@ export async function handleLoadModels(): Promise<void> {
 export function handleSaveModel({
   onSuccess,
   onError,
-}: IOHandlerCallback<TrainedModel>): void {
+}: IOHandlerCallback<GenerationModel>): void {
   const model = modelSaveStore.editedModel;
   logStore.onInfo(
     `Model is being saved, you'll receive a notification when it is ready: ${model.name}`
@@ -51,7 +51,7 @@ export function handleSaveModel({
  *
  * @param model - The model to create.
  */
-export function handleDeleteModel(model: TrainedModel): void {
+export function handleDeleteModel(model: GenerationModel): void {
   logStore.confirm(
     "Delete Model",
     `Are you sure you want to delete ${model.name}?`,
@@ -82,7 +82,7 @@ export function handleDeleteModel(model: TrainedModel): void {
  */
 export function handleShareModel(
   targetProject: string,
-  model: TrainedModel,
+  model: GenerationModel,
   shareMethod: ModelShareType
 ): void {
   shareModel(targetProject, model, shareMethod)

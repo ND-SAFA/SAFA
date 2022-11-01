@@ -5,7 +5,7 @@ import {
   LayoutPositionsModel,
   MembershipModel,
   TraceLinkModel,
-  TrainedModel,
+  GenerationModel,
   WarningModel,
 } from "@/types";
 
@@ -106,7 +106,7 @@ export interface ProjectModel extends IdentifierModel {
   /**
    * List of trained project models.
    */
-  models: TrainedModel[];
+  models: GenerationModel[];
 }
 
 export type VersionType = "major" | "minor" | "revision";

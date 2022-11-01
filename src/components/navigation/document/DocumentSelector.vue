@@ -6,7 +6,7 @@
       :items="items"
       label="View"
       outlined
-      color="secondary"
+      color="accent"
       dense
       hide-details
       dark
@@ -48,7 +48,7 @@
       </template>
     </v-select>
     <generic-icon-button
-      color="white"
+      color="accent"
       :icon-id="toggleViewIcon"
       :tooltip="toggleViewTooltip"
       data-cy="button-view-toggle"

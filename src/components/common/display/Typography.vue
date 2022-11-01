@@ -52,7 +52,7 @@ import { TextAlignType, ElementType, SizeType, TextType } from "@/types";
 export default Vue.extend({
   name: "Typography",
   props: {
-    value: String,
+    value: [String, Number],
     classes: String,
     color: String,
     inheritColor: Boolean,
@@ -100,7 +100,7 @@ export default Vue.extend({
   },
   data() {
     return {
-      isExpanded: this.defaultExpanded && this.value.length < 500,
+      isExpanded: this.defaultExpanded && String(this.value).length < 500,
     };
   },
   computed: {

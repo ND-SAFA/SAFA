@@ -13,9 +13,24 @@ export async function saveCommit(commit: Commit): Promise<Commit> {
     appStore.isSaving = true;
 
     const commitResponse = await persistCommit(commit);
-    commitStore.saveCommit(commitResponse);
 
-    return commitResponse;
+    const fullCommit = {
+      ...commitResponse,
+      artifacts: {
+        added: commitResponse.artifacts.added,
+        modified: commitResponse.artifacts.modified,
+        removed: commit.artifacts.removed,
+      },
+      traces: {
+        added: commitResponse.traces.added,
+        modified: commitResponse.traces.modified,
+        removed: commit.traces.removed,
+      },
+    };
+
+    commitStore.saveCommit(fullCommit);
+
+    return fullCommit;
   } finally {
     appStore.isSaving = false;
   }

@@ -71,6 +71,10 @@ export enum DataCy {
   creationBulkNameInput = "input-project-name-bulk",
   creationBulkDescriptionInput = "input-project-description-bulk",
   creationBulkFilesInput = "input-files-bulk",
+  creationEmptyToggle = "toggle-create-empty-project",
+  creationTimToggle = "toggle-tim-manage",
+  creationTimArtifactsInput = "input-tim-artifacts",
+  creationTimTracesInput = "input-tim-traces",
 
   creationStandardNameInput = "input-project-name-standard",
   creationStandardDescriptionInput = "input-project-description-standard",
@@ -91,6 +95,7 @@ export enum DataCy {
 
   // Jobs
 
+  jobTable = "job-table",
   jobStatus = "job-status",
   jobPanel = "job-panel",
   jobDeleteButton = "button-delete-job",
@@ -189,6 +194,17 @@ export enum DataCy {
   typeOptionsList = "list-type-options",
   typeOptionsIconButton = "button-type-options-icon",
 
+  // Project settings
+
+  projectSettingsAddEmail = "settings-input-user-email",
+  projectSettingsAddRole = "settings-input-user-role",
+  projectSettingsAddToProject = "button-add-user-to-project",
+  projectSettingsEditUserButton = "button-selector-edit",
+  projectSettingsDeleteUserButton = "button-selector-delete",
+  projectSettingsIAcceptButton = "button-confirm-modal",
+  projectSettingsSearchUser = "input-selector-search",
+  projectSettingsTable = "generic-selector-table",
+
   // Project Documents
 
   documentSelectButton = "button-document-select-open",
@@ -209,8 +225,35 @@ export enum DataCy {
   documentSaveButton = "button-document-save",
 
   // Artifact Table
-
   artifactTable = "view-artifact-table",
+  artifactTableRow = "table-row-artifact",
+  artifactTableSortBy = "artifact-table-sort-by",
+  artifactTableGroupBy = "artifact-table-group-by",
+  artifactTableGroupByTableHeader = "artifact-table-group-sort-header",
+  artifactTableListItems = "button-checkmark-menu-item",
+  artifactTableColumnHeader = "artifact-table-column-header",
+  artifactTableNameHeaderNotSorted = '*[aria-label= "Name: Not sorted. Activate to sort ascending."][aria-sort= "none"]',
+  artifactTableTypeHeaderNotSorted = '*[aria-label= "Type: Not sorted. Activate to sort ascending."][aria-sort= "none"]',
+  artifactTableNameHeaderSortedAsc = '*[aria-label= "Name: Sorted ascending. Activate to sort descending."][aria-sort= "ascending"]',
+  artifactTableTypeHeaderSortedAsc = '*[aria-label= "Type: Sorted ascending. Activate to sort descending."][aria-sort= "ascending"]',
+  artifactTableArtifact = "artifact-table-artifact",
+  artifactTableArtifactWarning = "artifact-table-artifact-warning",
+  artifactTableArtifactWarningLabel = "artifact-table-panel-warnings-title",
+
+  // Artifact Table - Create New Artifact
+  artifactTableAddContentButton = "button-fab-toggle",
+  artifactTableAddArtifactButton = "button-fab-create-artifact",
+  artifactTableCreateArtifactNameInput = "input-artifact-name",
+  artifactTableCreateArtifactTypeInput = "input-artifact-type",
+  artifactTableCreateArtifactDocumentTypeInput = "input-artifact-document",
+  artifactTableCreateArtifactParentArtifactInput = "input-artifact-parent",
+  artifactTableCreateArtifactBodyInput = "input-artifact-body",
+  artifactTableCreateArtifactSummaryInput = "input-artifact-summary",
+  artifactTableCreateArtifactSaveButton = "button-artifact-save",
+  artifactTableEditArtifactRowButton = "button-artifact-edit-icon",
+  artifactTableDeleteArtifactRowButton = "button-artifact-delete-icon",
+  artifactTableArtifactPanelBody = "text-selected-body",
+  artifactTableArtifactDeleteIAcceptButton = "button-confirm-modal",
 }
 
 export enum DataIds {

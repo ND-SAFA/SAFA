@@ -1,4 +1,9 @@
-import { ArtifactModel, NameValidationModel } from "@/types";
+import {
+  ApprovalType,
+  ArtifactModel,
+  NameValidationModel,
+  TraceLinkModel,
+} from "@/types";
 import { Endpoint, fillEndpoint, authHttpClient, CommitBuilder } from "@/api";
 
 /**
@@ -24,13 +29,21 @@ export async function getDoesArtifactExist(
  * Deletes artifact in project version specified.
  *
  * @param artifact - The artifact to delete.
+ * @param traceLinks - Any related trace links to also delete.
  * @return The deleted artifact.
  */
 export async function deleteArtifact(
-  artifact: ArtifactModel
+  artifact: ArtifactModel,
+  traceLinks: TraceLinkModel[]
 ): Promise<ArtifactModel> {
+  traceLinks = traceLinks.map((link) => ({
+    ...link,
+    approvalStatus: ApprovalType.DECLINED,
+  }));
+
   return CommitBuilder.withCurrentVersion()
     .withRemovedArtifact(artifact)
+    .withModifiedTraceLinks(traceLinks)
     .save()
     .then(({ artifacts }) => artifacts.removed[0]);
 }

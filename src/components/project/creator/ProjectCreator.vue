@@ -1,11 +1,6 @@
 <template>
   <v-container>
-    <v-tabs v-model="tab">
-      <v-tab v-for="{ name } in tabs" :key="name">
-        <typography :value="name" />
-      </v-tab>
-    </v-tabs>
-    <v-tabs-items v-model="tab" class="mt-1">
+    <tab-list v-model="tab" :tabs="tabs">
       <v-tab-item key="1">
         <project-creator-stepper />
       </v-tab-item>
@@ -18,15 +13,15 @@
       <v-tab-item key="4">
         <git-hub-creator-stepper />
       </v-tab-item>
-    </v-tabs-items>
+    </tab-list>
   </v-container>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { CreatorTypes } from "@/types";
+import { creatorTabOptions } from "@/util";
 import { getParam, QueryParams, updateParam } from "@/router";
-import Typography from "@/components/common/display/Typography.vue";
+import { TabList } from "@/components/common";
 import {
   ProjectCreatorStepper,
   JiraCreatorStepper,
@@ -40,7 +35,7 @@ import {
 export default Vue.extend({
   name: "ProjectCreator",
   components: {
-    Typography,
+    TabList,
     GitHubCreatorStepper,
     ProjectCreatorStepper,
     ProjectBulkUpload,
@@ -49,12 +44,7 @@ export default Vue.extend({
   data() {
     return {
       tab: 0,
-      tabs: [
-        { id: CreatorTypes.standard, name: "Standard Upload" },
-        { id: CreatorTypes.bulk, name: "Bulk Upload" },
-        { id: CreatorTypes.jira, name: "Jira Upload" },
-        { id: CreatorTypes.github, name: "GitHub Upload" },
-      ],
+      tabs: creatorTabOptions(),
     };
   },
   /**

@@ -1,4 +1,4 @@
-import { datadogRum } from "@datadog/browser-rum";
+// import { datadogRum } from "@datadog/browser-rum";
 
 import {
   IOHandlerCallback,
@@ -33,7 +33,7 @@ export async function handleLogin(user: UserPasswordModel): Promise<void> {
   sessionStore.user = await getCurrentUser();
   sessionStore.updateSession(session);
 
-  datadogRum.startSessionReplayRecording();
+  // datadogRum.startSessionReplayRecording();
 
   await handleGetProjects({
     onComplete: async () => {
@@ -52,10 +52,14 @@ export async function handleLogin(user: UserPasswordModel): Promise<void> {
  * Logs a user out.
  */
 export async function handleLogout(): Promise<void> {
+  document.cookie = "";
+
   await handleClearProject();
   await navigateTo(Routes.LOGIN_ACCOUNT);
   sessionStore.clearSession();
-  datadogRum.startSessionReplayRecording();
+  logStore.notifications = [];
+  // await deleteSession();
+  // datadogRum.startSessionReplayRecording();
 }
 
 /**
@@ -65,19 +69,19 @@ export async function handleLogout(): Promise<void> {
 export async function handleAuthentication(): Promise<void> {
   sessionStore.user = await getCurrentUser();
 
-  datadogRum.init({
-    applicationId: process.env.VUE_APP_DDOG_APP_ID || "",
-    clientToken: process.env.VUE_APP_DDOG_DDOG_TOKEN || "",
-    env: process.env.NODE_ENV || "",
-    site: "datadoghq.com",
-    service: "safa",
-    version: "1.0.0",
-    sampleRate: 100,
-    premiumSampleRate: 100,
-    trackInteractions: true,
-    defaultPrivacyLevel: "mask-user-input",
-  });
-  datadogRum.startSessionReplayRecording();
+  // datadogRum.init({
+  //   applicationId: process.env.VUE_APP_DDOG_APP_ID || "",
+  //   clientToken: process.env.VUE_APP_DDOG_DDOG_TOKEN || "",
+  //   env: process.env.NODE_ENV || "",
+  //   site: "datadoghq.com",
+  //   service: "safa",
+  //   version: "1.0.0",
+  //   sampleRate: 100,
+  //   premiumSampleRate: 100,
+  //   trackInteractions: true,
+  //   defaultPrivacyLevel: "mask-user-input",
+  // });
+  // datadogRum.startSessionReplayRecording();
 
   await handleGetProjects({});
 }

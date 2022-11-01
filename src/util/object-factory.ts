@@ -18,7 +18,7 @@ import {
   SafetyCaseType,
   SessionModel,
   SnackbarMessage,
-  TrainedModel,
+  GenerationModel,
   UserModel,
   VersionModel,
 } from "@/types";
@@ -222,7 +222,7 @@ export function createDefaultTypeIcons(
   artifactTypes: ArtifactTypeModel[] = []
 ): ArtifactTypeIcons {
   return artifactTypes
-    .map((t) => ({ [t.name]: t.icon }))
+    .map((t) => ({ [t.name]: t.icon.replace("mdi-help", defaultTypeIcon) }))
     .reduce((acc, cur) => ({ ...acc, ...cur }), {
       default: defaultTypeIcon,
     });
@@ -254,7 +254,7 @@ export function createDocument(
 /**
  * @return A model initialized to the given props.
  */
-export function createModel(model?: Partial<TrainedModel>): TrainedModel {
+export function createModel(model?: Partial<GenerationModel>): GenerationModel {
   return {
     id: model?.id || "",
     name: model?.name || "",

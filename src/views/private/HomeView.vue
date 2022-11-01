@@ -81,7 +81,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { CreatorTypes } from "@/types";
+import { CreatorTabTypes } from "@/types";
 import { ThemeColors } from "@/util";
 import { navigateTo, QueryParams, Routes } from "@/router";
 import { PrivatePage, ProjectVersionList, Typography } from "@/components";
@@ -104,22 +104,22 @@ export default Vue.extend({
   methods: {
     handleOpenStandard() {
       navigateTo(Routes.PROJECT_CREATOR, {
-        [QueryParams.TAB]: CreatorTypes.standard,
+        [QueryParams.TAB]: CreatorTabTypes.standard,
       });
     },
     handleOpenBulk() {
       navigateTo(Routes.PROJECT_CREATOR, {
-        [QueryParams.TAB]: CreatorTypes.bulk,
+        [QueryParams.TAB]: CreatorTabTypes.bulk,
       });
     },
     handleOpenGitHub() {
       navigateTo(Routes.PROJECT_CREATOR, {
-        [QueryParams.TAB]: CreatorTypes.github,
+        [QueryParams.TAB]: CreatorTabTypes.github,
       });
     },
     handleOpenJira() {
       navigateTo(Routes.PROJECT_CREATOR, {
-        [QueryParams.TAB]: CreatorTypes.jira,
+        [QueryParams.TAB]: CreatorTabTypes.jira,
       });
     },
   },

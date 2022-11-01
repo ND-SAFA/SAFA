@@ -1,8 +1,8 @@
 import {
   DataCy,
+  miniProjectFiles,
   simpleProjectFilesMap,
   testProject,
-  miniProjectFiles,
 } from "../fixtures";
 import { validUser } from "../fixtures/data/user.json";
 
@@ -89,4 +89,18 @@ Cypress.Commands.add("loadNewProject", () => {
     .should("contain.text", "Completed");
 
   cy.logout();
+});
+
+Cypress.Commands.add("createProjectSettings", () => {
+  cy.visit("/create")
+    .login(validUser.email, validUser.password)
+    .location("pathname", { timeout: 5000 })
+    .should("equal", "/create");
+
+  cy.createBulkProject()
+    .getCy(DataCy.jobStatus, "first", 20000)
+    .should("contain.text", "Completed");
+  cy.clickButtonWithName("View Project")
+    .clickButton(DataCy.navProjectButton)
+    .clickButtonWithName("Project Settings");
 });

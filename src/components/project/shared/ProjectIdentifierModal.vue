@@ -3,31 +3,27 @@
     :is-open="isOpen"
     :title="modelTitle"
     size="m"
-    :actions-height="isUploadOpen ? 0 : 50"
     :is-loading="isLoading"
     data-cy="modal-project-edit"
+    :actions-height="doShowUpload ? 0 : 50"
     @close="handleClose"
   >
     <template v-slot:body>
+      <project-files-uploader
+        v-if="doShowUpload"
+        data-cy-name="input-project-name-modal"
+        data-cy-description="input-project-description-modal"
+        @submit="handleClose"
+      />
       <project-identifier-input
+        v-else
         v-bind:name.sync="identifier.name"
         v-bind:description.sync="identifier.description"
         data-cy-name="input-project-name-modal"
         data-cy-description="input-project-description-modal"
       />
-      <generic-switch
-        style="margin-left: 80px"
-        v-if="doShowUpload"
-        v-model="isUploadOpen"
-        label="Upload Flat Files"
-      />
-      <project-files-input
-        v-if="doShowUpload && isUploadOpen"
-        v-bind:name.sync="identifier.name"
-        v-bind:description.sync="identifier.description"
-      />
     </template>
-    <template v-slot:actions v-if="!isUploadOpen">
+    <template v-slot:actions v-if="!doShowUpload">
       <v-btn
         @click="handleSave"
         color="primary"
@@ -45,8 +41,8 @@
 import Vue from "vue";
 import { IdentifierModel } from "@/types";
 import { identifierSaveStore } from "@/hooks";
-import { GenericModal, GenericSwitch } from "@/components/common";
-import ProjectFilesInput from "./ProjectFilesInput.vue";
+import { GenericModal } from "@/components/common";
+import ProjectFilesUploader from "./ProjectFilesUploader.vue";
 import ProjectIdentifierInput from "./ProjectIdentifierInput.vue";
 
 /**
@@ -58,10 +54,9 @@ import ProjectIdentifierInput from "./ProjectIdentifierInput.vue";
 export default Vue.extend({
   name: "ProjectIdentifierModal",
   components: {
-    GenericSwitch,
     GenericModal,
+    ProjectFilesUploader,
     ProjectIdentifierInput,
-    ProjectFilesInput,
   },
   props: {
     isOpen: {
@@ -73,11 +68,6 @@ export default Vue.extend({
       required: false,
       default: false,
     },
-  },
-  data() {
-    return {
-      isUploadOpen: false,
-    };
   },
   computed: {
     /**
@@ -105,9 +95,7 @@ export default Vue.extend({
      * @return Whether the identifier can be saved.
      */
     canSave(): boolean {
-      return (
-        identifierSaveStore.canSave || (this.doShowUpload && this.isUploadOpen)
-      );
+      return identifierSaveStore.canSave;
     },
   },
   methods: {

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import edu.nd.crc.safa.config.ProjectPaths;
+import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
@@ -19,8 +20,6 @@ import requests.FlatFileRequest;
 
 /**
  * Tests that versioning changes are detected for trace links.
- * <p>
- * TODO: Test that removal is detected
  */
 class TestLinkVersioning extends ApplicationBaseTest {
 
@@ -131,6 +130,68 @@ class TestLinkVersioning extends ApplicationBaseTest {
     }
 
     /**
+     * Tests that deleting a trace link from V1 of a project actually deletes it instead of making
+     * a new record showing a deletion.
+     *
+     * @throws Exception When loading from flat files fails
+     */
+    @Test
+    void testDeleteFromV1() throws Exception {
+
+        // Step - Create project with two versions
+        createProjectWithTwoVersionsFromFlatFiles();
+        ProjectVersion v1 = dbEntityBuilder.getProjectVersion(projectName, 0);
+        ProjectVersion v2 = dbEntityBuilder.getProjectVersion(projectName, 1);
+        Project project = v1.getProject();
+        TraceLinkVersion link = traceLinkVersionRepository.getProjectLinks(project).get(0);
+
+        // Step - Delete in v1
+        commitDeletionOfTraceLink(link, v1);
+
+        // VP - verify updates in V1
+        Optional<TraceLinkVersion> linkDboV1 =
+                traceLinkVersionRepository.findByProjectVersionAndTraceLink(v1, link.getTraceLink());
+        assertThat(linkDboV1).isPresent();
+        assertThat(linkDboV1.get().getModificationType()).isEqualTo(ModificationType.REMOVED);
+
+        // VP - verify no update in V2
+        Optional<TraceLinkVersion> linkDboV2 =
+                traceLinkVersionRepository.findByProjectVersionAndTraceLink(v2, link.getTraceLink());
+        assertThat(linkDboV2).isNotPresent();
+    }
+
+    /**
+     * Tests that deleting a trace link from V2 of a project does not affect V1 and marks it as removed in V2.
+     *
+     * @throws Exception When loading from flat files fails
+     */
+    @Test
+    void testDeleteFromV2() throws Exception {
+
+        // Step - Create project with two versions
+        createProjectWithTwoVersionsFromFlatFiles();
+        ProjectVersion v1 = dbEntityBuilder.getProjectVersion(projectName, 0);
+        ProjectVersion v2 = dbEntityBuilder.getProjectVersion(projectName, 1);
+        Project project = v1.getProject();
+        TraceLinkVersion link = traceLinkVersionRepository.getProjectLinks(project).get(0);
+
+        // Step - Delete in v1
+        commitDeletionOfTraceLink(link, v2);
+
+        // VP - verify updates in V1
+        Optional<TraceLinkVersion> linkDboV1 =
+                traceLinkVersionRepository.findByProjectVersionAndTraceLink(v1, link.getTraceLink());
+        assertThat(linkDboV1).isPresent();
+        assertThat(linkDboV1.get().getModificationType()).isEqualTo(ModificationType.ADDED);
+
+        // VP - verify no update in V2
+        Optional<TraceLinkVersion> linkDboV2 =
+                traceLinkVersionRepository.findByProjectVersionAndTraceLink(v2, link.getTraceLink());
+        assertThat(linkDboV2).isPresent();
+        assertThat(linkDboV2.get().getModificationType()).isEqualTo(ModificationType.REMOVED);
+    }
+
+    /**
      * Creates a new project with two versions both loaded from the MINI flat file. After the data is
      * loaded this method will assert that the project has a link and that the link has a version
      * in V1 but not in V2 (as it is not modified in that version).
@@ -176,5 +237,20 @@ class TestLinkVersioning extends ApplicationBaseTest {
         commitService.commit(CommitBuilder
                 .withVersion(version)
                 .withModifiedTrace(linkAppEntity));
+    }
+
+    /**
+     * Utility method to commit a deletion of a trace link.
+     *
+     * @param link Trace link to delete
+     * @param version Project version to create change in
+     * @throws Exception If the commit fails
+     */
+    private void commitDeletionOfTraceLink(TraceLinkVersion link, ProjectVersion version) throws Exception {
+        TraceAppEntity linkAppEntity = this.traceLinkVersionRepository
+                .retrieveAppEntityFromVersionEntity(link);
+        commitService.commit(CommitBuilder
+                .withVersion(version)
+                .withRemovedTrace(linkAppEntity));
     }
 }

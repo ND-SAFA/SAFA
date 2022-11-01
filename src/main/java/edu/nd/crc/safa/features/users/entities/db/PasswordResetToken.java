@@ -43,7 +43,7 @@ public class PasswordResetToken {
     @OneToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @Type(type = "uuid-char")
-    @JoinColumn(name = "user_id", nullable = false, unique = true, columnDefinition = "VARCHAR(36)")
+    @JoinColumn(name = "user_id", nullable = false, columnDefinition = "VARCHAR(36)")
     @NonNull
     private SafaUser user;
 

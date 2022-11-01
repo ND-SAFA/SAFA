@@ -3,8 +3,6 @@ from unittest.mock import patch
 
 from test.base_test import BaseTest
 from tracer.dataset.data_key import DataKey
-from tracer.dataset.data_objects.artifact import Artifact
-from tracer.dataset.data_objects.trace_link import TraceLink
 from tracer.dataset.trace_dataset import TraceDataset
 from tracer.models.model_generator import ModelGenerator
 from tracer.models.model_properties import ArchitectureType

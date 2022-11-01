@@ -6,8 +6,9 @@ from transformers import LineByLineTextDataset
 
 class PreTrainDataset(AbstractDataset):
 
-    def __init__(self, training_file_path: str, **kwargs):
+    def __init__(self, training_file_path: str, block_size: int, **kwargs):
         self.training_file_path = training_file_path
+        self.block_size = block_size
         self.kwargs = kwargs
 
     def to_trainer_dataset(self, model_generator: ModelGenerator) -> Dataset:
@@ -18,4 +19,5 @@ class PreTrainDataset(AbstractDataset):
         """
         return LineByLineTextDataset(tokenizer=model_generator.get_tokenizer(),
                                      file_path=self.training_file_path,
+                                     block_size=self.block_size,
                                      **self.kwargs)

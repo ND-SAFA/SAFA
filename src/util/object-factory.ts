@@ -222,7 +222,7 @@ export function createDefaultTypeIcons(
   artifactTypes: ArtifactTypeModel[] = []
 ): ArtifactTypeIcons {
   return artifactTypes
-    .map((t) => ({ [t.name]: t.icon }))
+    .map((t) => ({ [t.name]: t.icon.replace("mdi-help", defaultTypeIcon) }))
     .reduce((acc, cur) => ({ ...acc, ...cur }), {
       default: defaultTypeIcon,
     });

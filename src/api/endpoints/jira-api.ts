@@ -1,4 +1,4 @@
-import { JiraCloudSiteModel, JiraProjectModel, JobModel } from "@/types";
+import { JiraProjectModel, JobModel } from "@/types";
 import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
 
 /**
@@ -42,47 +42,64 @@ export function authorizeJira(): void {
 }
 
 /**
- * TODO
- *
  * Save an Atlassian access code.
  *
  * @param accessCode - The access code received from authorizing Jira.
  */
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-export async function saveJiraCredentials(accessCode: string): Promise<void> {}
-
-/**
- * TODO
- *
- * Checks if the saved Jira credentials are valid.
- */
-export async function getJiraCredentials(): Promise<boolean> {
-  return false;
+export async function saveJiraCredentials(accessCode: string): Promise<void> {
+  await authHttpClient(
+    fillEndpoint(Endpoint.jiraCreateCredentials, { accessCode }),
+    {
+      method: "POST",
+    }
+  );
 }
 
 /**
- * TODO
+ * Checks if the saved Jira credentials are valid.
  *
- * Gets the list of cloud sites associated with the saved user.
- *
- * @return The Jira sites for this user.
+ * @return Whether the credentials are valid.
  */
-export async function getJiraOrganizations(): Promise<JiraCloudSiteModel[]> {
-  return [];
+export async function getJiraCredentials(): Promise<boolean> {
+  return (
+    await authHttpClient<{ payload: boolean }>(
+      Endpoint.jiraValidateCredentials,
+      {
+        method: "GET",
+      }
+    )
+  ).payload;
+}
+
+/**
+ * Checks if the saved Jira credentials are valid.
+ *
+ * @return Whether the credentials are valid.
+ */
+export async function refreshJiraCredentials(): Promise<void> {
+  await authHttpClient(Endpoint.jiraEditCredentials, {
+    method: "PUT",
+  });
+}
+
+/**
+ * Deletes the stored Jira credentials.
+ */
+export async function deleteJiraCredentials(): Promise<void> {
+  await authHttpClient(Endpoint.jiraEditCredentials, {
+    method: "DELETE",
+  });
 }
 
 /**
  * Gets Jira projects for an organization.
  *
- * @param cloudId - The Jira cloud id to get projects for.
- * @return The created import job.
+ * @return The user's projects.
  */
-export async function getJiraProjects(
-  cloudId: string
-): Promise<JiraProjectModel[]> {
+export async function getJiraProjects(): Promise<JiraProjectModel[]> {
   return (
     await authHttpClient<{ payload: JiraProjectModel[] }>(
-      fillEndpoint(Endpoint.jiraGetProjects, { cloudId }),
+      Endpoint.jiraGetProjects,
       {
         method: "GET",
       }
@@ -93,17 +110,13 @@ export async function getJiraProjects(
 /**
  * Creates a new project based on a Jira project.
  *
- * @param cloudId - The Jira cloud id for this project.
  * @param id - The Jira project id to import.
  * @return The created import job.
  */
-export async function createJiraProject(
-  cloudId: string,
-  id: string
-): Promise<JobModel> {
+export async function createJiraProject(id: string): Promise<JobModel> {
   return (
     await authHttpClient<{ payload: JobModel }>(
-      fillEndpoint(Endpoint.jiraCreateProject, { cloudId, id }),
+      fillEndpoint(Endpoint.jiraCreateProject, { id }),
       {
         method: "POST",
       }
@@ -115,17 +128,15 @@ export async function createJiraProject(
  * Synchronizes the state of Jira artifacts in a project.
  *
  * @param versionId - The project version to sync.
- * @param cloudId - The Jira cloud id for this project.
  * @param id - The Jira project id to import.
  */
 export async function createJiraProjectSync(
   versionId: string,
-  cloudId: string,
   id: string
 ): Promise<JobModel> {
   return (
     await authHttpClient<{ payload: JobModel }>(
-      fillEndpoint(Endpoint.jiraSyncProject, { versionId, cloudId, id }),
+      fillEndpoint(Endpoint.jiraSyncProject, { versionId, id }),
       {
         method: "PUT",
       }
@@ -140,8 +151,8 @@ export async function createJiraProjectSync(
  *
  * @param projectId - The project to get Jira credentials for.
  */
-export async function getJiraProject(
-  projectId: string
-): Promise<{ cloudId: string; id: string }> {
-  return { cloudId: "", id: "" };
-}
+// export async function getJiraProject(
+//   projectId: string
+// ): Promise<{ id: string }> {
+//   return { id: "" };
+// }

@@ -1,4 +1,4 @@
-import { GitHubRepositoryModel, JobModel } from "@/types";
+import { GitHubProjectModel, JobModel } from "@/types";
 import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
 
 /**
@@ -19,35 +19,69 @@ export function authorizeGitHub(): void {
 }
 
 /**
- * TODO
- *
  * Save an GitHub access code.
  *
  * @param accessCode - The access code received from authorizing GitHub.
  */
-export async function saveGitHubCredentials(
-  accessCode: string
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-): Promise<void> {}
-
-/**
- * TODO
- *
- * Checks if the saved GitHub credentials are valid.
- */
-export async function getGitHubCredentials(): Promise<boolean> {
-  return false;
+export async function saveGitHubCredentials(accessCode: string): Promise<void> {
+  await authHttpClient(
+    fillEndpoint(Endpoint.githubCreateCredentials, { accessCode }),
+    {
+      method: "POST",
+    }
+  );
 }
 
 /**
- * TODO
+ * Checks if the saved GitHub credentials are valid.
  *
+ * @return Whether the credentials are valid.
+ */
+export async function getGitHubCredentials(): Promise<boolean> {
+  return (
+    await authHttpClient<{ payload: boolean }>(
+      Endpoint.githubValidateCredentials,
+      {
+        method: "GET",
+      }
+    )
+  ).payload;
+}
+
+/**
+ * Checks if the saved GitHub credentials are valid.
+ *
+ * @return Whether the credentials are valid.
+ */
+export async function refreshGitHubCredentials(): Promise<void> {
+  await authHttpClient(Endpoint.githubEditCredentials, {
+    method: "PUT",
+  });
+}
+
+/**
+ * Deletes the stored GitHub credentials.
+ */
+export async function deleteGitHubCredentials(): Promise<void> {
+  await authHttpClient(Endpoint.githubEditCredentials, {
+    method: "DELETE",
+  });
+}
+
+/**
  * Gets the list of authorized repositories from GitHub.
  *
  * @return The GitHub repositories for this user.
  */
-export async function getGitHubProjects(): Promise<GitHubRepositoryModel[]> {
-  return [];
+export async function getGitHubProjects(): Promise<GitHubProjectModel[]> {
+  return (
+    await authHttpClient<{ payload: GitHubProjectModel[] }>(
+      Endpoint.githubGetProjects,
+      {
+        method: "GET",
+      }
+    )
+  ).payload;
 }
 
 /**
@@ -97,8 +131,8 @@ export async function createGitHubProjectSync(
  *
  * @param projectId - The project to get GitHub credentials for.
  */
-export async function getJiraProject(
-  projectId: string
-): Promise<{ repositoryName: string }> {
-  return { repositoryName: "" };
-}
+// export async function getGitHubProject(
+//   projectId: string
+// ): Promise<{ repositoryName: string }> {
+//   return { repositoryName: "" };
+// }

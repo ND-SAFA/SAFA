@@ -10,7 +10,7 @@
         <v-list-item :key="project.id" @click="handleProjectSelect(project)">
           <v-list-item-icon>
             <v-avatar>
-              <img :src="project.avatarUrls['48x48']" :alt="project.name" />
+              <img :src="project.mediumAvatarUrl" :alt="project.name" />
             </v-avatar>
           </v-list-item-icon>
           <v-list-item-content>
@@ -63,13 +63,9 @@ export default Vue.extend({
      * @return The subtitle.
      */
     getProjectSubtitle(project: JiraProjectModel): string {
-      const {
-        key,
-        insight: { totalIssueCount },
-      } = project;
-      const subtitle = `${key} | ${totalIssueCount} Issue`;
+      const { key, description } = project;
 
-      return totalIssueCount === 1 ? subtitle : `${subtitle}s`;
+      return `${key} | ${description}`;
     },
   },
 });

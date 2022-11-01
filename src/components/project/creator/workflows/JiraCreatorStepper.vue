@@ -8,20 +8,12 @@
     <template v-slot:items>
       <v-stepper-content step="1">
         <jira-authentication
-          :has-credentials="!!credentials"
+          :has-credentials="validCredentials"
           :is-loading="isLoading"
         />
       </v-stepper-content>
 
       <v-stepper-content step="2">
-        <jira-site-selector
-          :loading="sitesLoading"
-          :sites="sites"
-          @select="handleSiteSelect($event)"
-        />
-      </v-stepper-content>
-
-      <v-stepper-content step="3">
         <jira-project-selector
           :loading="projectsLoading"
           :projects="projects"
@@ -34,18 +26,12 @@
 
 <script lang="ts">
 import Vue from "vue";
-import {
-  InternalJiraCredentialsModel,
-  JiraCloudSiteModel,
-  JiraProjectModel,
-  StepState,
-} from "@/types";
+import { JiraProjectModel, StepState } from "@/types";
 import { getParam, QueryParams } from "@/router";
-import { getJiraCloudSites, handleImportJiraProject } from "@/api";
+import { deleteJiraCredentials, handleImportJiraProject } from "@/api";
 import { GenericStepper } from "@/components/common";
 import {
   JiraAuthentication,
-  JiraSiteSelector,
   JiraProjectSelector,
 } from "@/components/project/creator/steps";
 import {
@@ -60,19 +46,14 @@ export default Vue.extend({
   name: "JiraCreatorStepper",
   components: {
     JiraProjectSelector,
-    JiraSiteSelector,
     JiraAuthentication,
     GenericStepper,
   },
   data() {
     return {
       accessCode: getParam(QueryParams.JIRA_TOKEN),
-      credentials: undefined as InternalJiraCredentialsModel | undefined,
       isLoading: true,
-
-      sites: [] as JiraCloudSiteModel[],
-      sitesLoading: false,
-      selectedSite: undefined as JiraCloudSiteModel | undefined,
+      validCredentials: false,
 
       projects: [] as JiraProjectModel[],
       projectsLoading: false,
@@ -80,7 +61,6 @@ export default Vue.extend({
 
       steps: [
         ["Connect to Jira", false],
-        ["Select Domain", false],
         ["Select Project", false],
       ] as StepState[],
       currentStep: 1,
@@ -91,22 +71,16 @@ export default Vue.extend({
    */
   mounted() {
     handleAuthorizeJira(this.accessCode, {
-      onSuccess: (credentials) => {
+      onSuccess: () => {
         this.isLoading = false;
-        this.credentials = credentials;
-        this.loadSites();
+        this.validCredentials = true;
+        this.currentStep = 2;
         this.setStepIsValid(0, true);
-
-        if (credentials.cloudId) {
-          this.currentStep = 3;
-          this.setStepIsValid(1, true);
-          this.loadProjects();
-        } else {
-          this.currentStep = 2;
-        }
+        this.loadProjects();
       },
       onError: () => {
         this.isLoading = false;
+        this.validCredentials = false;
       },
     });
   },
@@ -123,32 +97,23 @@ export default Vue.extend({
      * Clears stepper data.
      */
     clearData(): void {
-      this.credentials = undefined;
-      this.sites = [];
+      this.validCredentials = false;
       this.projects = [];
     },
     /**
-     * Loads a user's Jira sites.
+     * Clears the saved credentials
      */
-    async loadSites() {
-      if (!this.credentials) return;
-
-      this.sitesLoading = true;
-      this.sites = await getJiraCloudSites(this.credentials.bearerAccessToken);
-      this.sitesLoading = false;
+    async handleDeleteCredentials(): Promise<void> {
+      await deleteJiraCredentials();
+      this.validCredentials = false;
+      this.currentStep = 1;
     },
     /**
      * Loads a user's Jira projects for a selected site.
      */
     async loadProjects() {
-      if (!this.credentials) return;
-
-      if (this.selectedSite) {
-        this.credentials.cloudId = this.selectedSite.id;
-      }
-
       this.projectsLoading = true;
-      handleLoadJiraProjects(this.credentials, {
+      handleLoadJiraProjects({
         onSuccess: (projects) => {
           this.projects = projects;
           this.projectsLoading = false;
@@ -157,44 +122,26 @@ export default Vue.extend({
       });
     },
     /**
-     * Selects a Jira site to load projects from.
-     */
-    handleSiteSelect(site: JiraCloudSiteModel) {
-      if (this.selectedSite?.id !== site.id) {
-        this.selectedSite = site;
-        this.setStepIsValid(1, true);
-        this.currentStep = 3;
-        this.loadProjects();
-      } else {
-        this.selectedSite = undefined;
-        this.setStepIsValid(1, false);
-      }
-    },
-    /**
      * Selects a Jira project to import.
      */
     handleProjectSelect(project: JiraProjectModel) {
       if (this.selectedProject?.id !== project.id) {
         this.selectedProject = project;
-        this.setStepIsValid(2, true);
+        this.setStepIsValid(1, true);
       } else {
         this.selectedProject = undefined;
-        this.setStepIsValid(2, false);
+        this.setStepIsValid(1, false);
       }
     },
     /**
      * Attempts to import a Jira project.
      */
     handleSaveProject(): void {
-      if (!this.credentials || !this.selectedProject) return;
+      if (!this.selectedProject) return;
 
-      handleImportJiraProject(
-        this.credentials.cloudId,
-        this.selectedProject.id,
-        {
-          onSuccess: () => this.clearData(),
-        }
-      );
+      handleImportJiraProject(this.selectedProject.id, {
+        onSuccess: () => this.clearData(),
+      });
     },
   },
 });

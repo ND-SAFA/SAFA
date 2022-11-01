@@ -34,14 +34,16 @@ export enum Endpoint {
   deleteProjectMember = "projects/members/:projectMemberId",
 
   // Integrations
-  jiraCreateCredentials = "accounts/jira/credentials",
-  jiraSaveOrganization = "accounts/jira/credentials/:cloudId",
+  jiraCreateCredentials = "accounts/jira/credentials/:accessCode",
+  jiraEditCredentials = "accounts/jira/credentials",
   jiraValidateCredentials = "accounts/jira/credentials/validate",
-  jiraGetProjects = "projects/jira/:cloudId",
-  jiraCreateProject = "projects/import/jira/:cloudId/:id",
-  jiraSyncProject = "projects/versions/:versionId/import/jira/:cloudId/:id",
+  jiraGetProjects = "projects/jira",
+  jiraCreateProject = "projects/import/jira/:id",
+  jiraSyncProject = "projects/versions/:versionId/import/jira/:id",
 
-  githubSaveCredentials = "accounts/jira/credentials",
+  githubCreateCredentials = "accounts/github/credentials/:accessCode",
+  githubEditCredentials = "accounts/github/credentials",
+  githubValidateCredentials = "accounts/github/credentials/check",
   githubGetProjects = "projects/github",
   githubCreateProject = "projects/import/github/:repositoryName",
   githubSyncProject = "projects/versions/:versionId/import/github/:repositoryName",

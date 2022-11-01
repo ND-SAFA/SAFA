@@ -48,10 +48,6 @@ export interface UserResetModel {
    * The user's email.
    */
   email: string;
-  /**
-   * Leave this blank.
-   */
-  userId: string;
 }
 
 /**

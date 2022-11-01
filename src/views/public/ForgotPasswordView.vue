@@ -86,7 +86,6 @@ export default Vue.extend({
 
       createPasswordReset({
         email: this.email,
-        userId: "822d5f34-5154-11ed-bdc3-0242ac120002",
       })
         .then(() => {
           this.isSubmitted = true;

@@ -95,6 +95,7 @@ export enum DataCy {
 
   // Jobs
 
+  jobTable = "job-table",
   jobStatus = "job-status",
   jobPanel = "job-panel",
   jobDeleteButton = "button-delete-job",

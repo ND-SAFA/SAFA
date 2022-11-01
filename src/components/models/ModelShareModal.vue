@@ -25,7 +25,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { IdentifierModel, ModelShareType, TrainedModel } from "@/types";
+import { IdentifierModel, ModelShareType, GenerationModel } from "@/types";
 import { modelShareOptions } from "@/util";
 import { projectStore } from "@/hooks";
 import { handleShareModel } from "@/api";
@@ -46,7 +46,7 @@ export default Vue.extend({
   },
   props: {
     isOpen: Boolean,
-    model: Object as PropType<TrainedModel | undefined>,
+    model: Object as PropType<GenerationModel | undefined>,
   },
   data() {
     return {

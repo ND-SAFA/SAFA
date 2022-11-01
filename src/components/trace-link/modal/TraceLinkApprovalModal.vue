@@ -25,7 +25,7 @@
 import Vue, { PropType } from "vue";
 import { TraceLinkModel } from "@/types";
 import { GenericModal } from "@/components/common";
-import TraceLinkDisplay from "../TraceLinkDisplay.vue";
+import { TraceLinkDisplay } from "../base";
 
 /**
  * A modal for approving trace links.

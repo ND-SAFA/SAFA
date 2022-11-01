@@ -17,6 +17,11 @@
     data-cy="generic-selector-table"
   >
     <slot />
+    <template v-for="{ id } in headers" v-slot:[`item.${id}`]="{ item }">
+      <div :key="id">
+        <slot :name="`item.${id}`" :item="item" />
+      </div>
+    </template>
     <template v-slot:top>
       <slot name="deleteItemDialogue" />
       <slot name="editItemDialogue" />
@@ -82,7 +87,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { DataItemProps, DataTableHeader } from "vuetify";
+import { DataTableHeader } from "vuetify";
 import FlexBox from "@/components/common/display/FlexBox.vue";
 import GenericIconButton from "./GenericIconButton.vue";
 
@@ -90,9 +95,9 @@ import GenericIconButton from "./GenericIconButton.vue";
  * Displays a generic selector.
  *
  * @emits-1 `refresh` - On refresh.
- * @emits-2 `item:select` (item: DataItemProps) - On select item.
- * @emits-3 `item:edit` (item: DataItemProps) - On edit item.
- * @emits-4 `item:delete` (item: DataItemProps) - On delete item.
+ * @emits-2 `item:select` (item: Record<string, unknown>) - On select item.
+ * @emits-3 `item:edit` (item: Record<string, unknown>) - On edit item.
+ * @emits-4 `item:delete` (item: Record<string, unknown>) - On delete item.
  * @emits-5 `item:add` - On add item.
  */
 export default Vue.extend({
@@ -104,7 +109,7 @@ export default Vue.extend({
       required: true,
     },
     items: {
-      type: Array as PropType<DataItemProps[]>,
+      type: Array as PropType<Record<string, unknown>[]>,
       required: true,
     },
     itemKey: {
@@ -166,8 +171,8 @@ export default Vue.extend({
   data() {
     return {
       search: "",
-      selected: [] as DataItemProps[],
-      previousItems: [] as DataItemProps[],
+      selected: [] as Record<string, unknown>[],
+      previousItems: [] as Record<string, unknown>[],
     };
   },
   methods: {
@@ -183,7 +188,7 @@ export default Vue.extend({
      * @param item - The item to check.
      * @return Whether the item is deletable.
      */
-    isDeleteEnabled(item: DataItemProps): boolean {
+    isDeleteEnabled(item: Record<string, unknown>): boolean {
       const index = this.items.indexOf(item);
       const isNotLastItem = index !== this.items.length - 1;
 
@@ -206,7 +211,7 @@ export default Vue.extend({
     /**
      * Select the first item when new items are loaded.
      */
-    items(newItems: DataItemProps[]) {
+    items(newItems: Record<string, unknown>[]) {
       this.selected = [this.items[0]];
       this.previousItems = newItems;
       this.$emit("item:select", { item: this.items[0], value: true });

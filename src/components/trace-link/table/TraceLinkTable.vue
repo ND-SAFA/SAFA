@@ -86,7 +86,7 @@ import { ApprovalType, FlatTraceLink, TraceTableGroup } from "@/types";
 import { approvalStore, appStore, projectStore } from "@/hooks";
 import { handleGetGeneratedLinks } from "@/api";
 import { AttributeChip, TableGroupHeader } from "@/components/common";
-import TraceLinkDisplay from "../TraceLinkDisplay.vue";
+import { TraceLinkDisplay } from "../base";
 import traceLinkTableHeaders from "./traceLinkTableHeaders";
 import TraceLinkTableHeader from "./TraceLinkTableHeader.vue";
 import TraceLinkApproval from "./TraceLinkApproval.vue";

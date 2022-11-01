@@ -18,7 +18,9 @@ describe("Job Submission", () => {
         "Project Uploads"
       );
 
-      cy.getCy(DataCy.jobPanel).should("have.length.above", 0);
+      cy.withinTableRows(DataCy.jobTable, (tr) => {
+        tr.should("have.length.above", 1);
+      });
     });
   });
 
@@ -39,7 +41,7 @@ describe("Job Submission", () => {
 
   describe("I can delete a project import", () => {
     it("Deletes a project from the list", () => {
-      cy.clickButton(DataCy.jobPanel).clickButton(DataCy.jobDeleteButton);
+      cy.clickButton(DataCy.jobDeleteButton);
 
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
     });

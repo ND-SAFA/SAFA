@@ -1,4 +1,4 @@
-import { ModelShareType, TrainedModel } from "@/types";
+import { ModelShareType, GenerationModel } from "@/types";
 import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
 
 /**
@@ -9,8 +9,8 @@ import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
  */
 export async function getProjectModels(
   projectId: string
-): Promise<TrainedModel[]> {
-  return authHttpClient<TrainedModel[]>(
+): Promise<GenerationModel[]> {
+  return authHttpClient<GenerationModel[]>(
     fillEndpoint(Endpoint.getModels, {
       projectId,
     }),
@@ -29,9 +29,9 @@ export async function getProjectModels(
  */
 export async function createModel(
   projectId: string,
-  model: TrainedModel
-): Promise<TrainedModel> {
-  return authHttpClient<TrainedModel>(
+  model: GenerationModel
+): Promise<GenerationModel> {
+  return authHttpClient<GenerationModel>(
     fillEndpoint(Endpoint.createModel, {
       projectId,
     }),
@@ -51,9 +51,9 @@ export async function createModel(
  */
 export async function editModel(
   projectId: string,
-  model: TrainedModel
-): Promise<TrainedModel> {
-  return authHttpClient<TrainedModel>(
+  model: GenerationModel
+): Promise<GenerationModel> {
+  return authHttpClient<GenerationModel>(
     fillEndpoint(Endpoint.editModel, {
       projectId,
       modelId: model.id,
@@ -75,7 +75,7 @@ export async function deleteModel(
   projectId: string,
   modelId: string
 ): Promise<void> {
-  await authHttpClient<TrainedModel>(
+  await authHttpClient<GenerationModel>(
     fillEndpoint(Endpoint.deleteModel, {
       projectId,
       modelId,
@@ -95,7 +95,7 @@ export async function deleteModel(
  */
 export async function shareModel(
   targetProject: string,
-  model: TrainedModel,
+  model: GenerationModel,
   shareMethod: ModelShareType
 ): Promise<void> {
   await authHttpClient(fillEndpoint(Endpoint.shareModel), {

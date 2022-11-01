@@ -14,7 +14,7 @@
                 :complete="currentStep > stepIndex + 1"
                 :step="stepIndex + 1"
                 :key="stepIndex"
-                :editable="currentStep > stepIndex"
+                :editable="steps[stepIndex][1]"
               >
                 <typography :value="stepName" class="width-max" el="div" />
               </v-stepper-step>
@@ -27,7 +27,7 @@
 
           <v-stepper-items>
             <slot name="items" />
-            <v-container>
+            <v-container v-if="!hideContinue">
               <v-btn
                 color="primary"
                 :outlined="currentStep !== numberOfSteps"
@@ -83,6 +83,10 @@ export default Vue.extend({
       default: "Submit",
     },
     minimal: {
+      type: Boolean,
+      default: false,
+    },
+    hideContinue: {
       type: Boolean,
       default: false,
     },

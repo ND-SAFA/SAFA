@@ -63,9 +63,7 @@ export default Vue.extend({
      * @return The subtitle.
      */
     getProjectSubtitle(project: JiraProjectModel): string {
-      const { key, description } = project;
-
-      return `${key} | ${description}`;
+      return project.key;
     },
   },
 });

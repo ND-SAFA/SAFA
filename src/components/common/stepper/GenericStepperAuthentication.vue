@@ -1,14 +1,6 @@
 <template>
   <v-container>
-    <flex-box justify="center" v-if="showWIP">
-      <v-alert type="info">
-        <typography
-          color="white"
-          value="Integrations will be enabled very soon!"
-        />
-      </v-alert>
-    </flex-box>
-    <flex-box justify="center">
+    <flex-box justify="center" align="center">
       <v-btn
         large
         color="primary"
@@ -20,6 +12,17 @@
         <span v-if="!hasCredentials">{{ disconnectedTitle }}</span>
         <span v-else>{{ connectedTitle }}</span>
       </v-btn>
+      <v-btn
+        v-if="hasCredentials"
+        large
+        color="error"
+        outlined
+        class="ml-2"
+        @click="$emit('delete')"
+      >
+        <v-icon class="mr-1">mdi-delete</v-icon>
+        Disconnect
+      </v-btn>
     </flex-box>
   </v-container>
 </template>
@@ -27,16 +30,16 @@
 <script lang="ts">
 import Vue from "vue";
 import { FlexBox } from "@/components/common/display";
-import Typography from "@/components/common/display/Typography.vue";
 
 /**
  * Displays an authentication stepper step.
  *
  * @emits `click` - On button click.
+ * @emits `delete` - On disconnect
  */
 export default Vue.extend({
   name: "GenericStepperAuthentication",
-  components: { Typography, FlexBox },
+  components: { FlexBox },
   props: {
     hasCredentials: {
       type: Boolean,
@@ -64,14 +67,11 @@ export default Vue.extend({
     },
   },
   computed: {
-    showWIP(): boolean {
-      return false;
-    },
     /**
      * Returns whether the button is enabled.
      */
     isDisabled(): boolean {
-      return this.hasCredentials || this.isLoading || this.showWIP;
+      return this.hasCredentials || this.isLoading;
     },
   },
 });

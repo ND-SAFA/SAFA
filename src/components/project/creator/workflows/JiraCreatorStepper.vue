@@ -10,6 +10,7 @@
         <jira-authentication
           :has-credentials="validCredentials"
           :is-loading="isLoading"
+          @delete="handleDeleteCredentials"
         />
       </v-stepper-content>
 

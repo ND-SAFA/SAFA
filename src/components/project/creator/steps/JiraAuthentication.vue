@@ -5,6 +5,7 @@
     :is-loading="isLoading"
     :has-credentials="hasCredentials"
     @click="handleJiraAuthentication"
+    @delete="$emit('delete')"
   />
 </template>
 
@@ -15,6 +16,8 @@ import { GenericStepperAuthentication } from "@/components";
 
 /**
  * Prompts the user to authenticate their Jira account.
+ *
+ * @emits-1 - `delete` - On credentials delete.
  */
 export default Vue.extend({
   name: "JiraAuthentication",

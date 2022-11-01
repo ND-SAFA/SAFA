@@ -73,45 +73,26 @@ class TestLinkVersioning extends ApplicationBaseTest {
     void testUpdateToV1() throws Exception {
 
         // Step - Create project with two versions
-        dbEntityBuilder
-                .newProject(projectName)
-                .newVersion(projectName)
-                .newVersion(projectName);
+        createProjectWithTwoVersionsFromFlatFiles();
         ProjectVersion v1 = dbEntityBuilder.getProjectVersion(projectName, 0);
         ProjectVersion v2 = dbEntityBuilder.getProjectVersion(projectName, 1);
         Project project = v1.getProject();
-
-        // Step - Import trace links into project versions
-        String flatFilesPath = ProjectPaths.Resources.Tests.MINI;
-        FlatFileRequest.updateProjectVersionFromFlatFiles(v1, flatFilesPath);
-        FlatFileRequest.updateProjectVersionFromFlatFiles(v2, flatFilesPath);
-
-        // VP - Verify trace link only exists in V1
-        assertThat(traceLinkVersionRepository.getProjectLinks(project)).hasSize(1);
         TraceLinkVersion link = traceLinkVersionRepository.getProjectLinks(project).get(0);
-        Optional<TraceLinkVersion> linkDboV1 =
-                traceLinkVersionRepository.findByProjectVersionAndTraceLink(v1, link.getTraceLink());
-        Optional<TraceLinkVersion> linkDboV2 =
-                traceLinkVersionRepository.findByProjectVersionAndTraceLink(v2, link.getTraceLink());
-        assertThat(linkDboV1).isPresent();
-        assertThat(linkDboV2).isNotPresent();
 
         // Step - Update in v1
         double testScore = 3.14;
         link.setScore(testScore);
-        TraceAppEntity linkAppEntity = this.traceLinkVersionRepository
-                .retrieveAppEntityFromVersionEntity(link);
-        commitService.commit(CommitBuilder
-                .withVersion(v1)
-                .withModifiedTrace(linkAppEntity));
+        commitUpdateToTraceLink(link, v1);
 
         // VP - verify updates in V1
-        linkDboV1 = traceLinkVersionRepository.findByProjectVersionAndTraceLink(v1, link.getTraceLink());
+        Optional<TraceLinkVersion> linkDboV1 =
+                traceLinkVersionRepository.findByProjectVersionAndTraceLink(v1, link.getTraceLink());
         assertThat(linkDboV1).isPresent();
         assertThat(linkDboV1.get().getScore()).isEqualTo(testScore);
 
         // VP - verify no update in V2
-        linkDboV2 = traceLinkVersionRepository.findByProjectVersionAndTraceLink(v2, link.getTraceLink());
+        Optional<TraceLinkVersion> linkDboV2 =
+                traceLinkVersionRepository.findByProjectVersionAndTraceLink(v2, link.getTraceLink());
         assertThat(linkDboV2).isNotPresent();
     }
 
@@ -123,6 +104,40 @@ class TestLinkVersioning extends ApplicationBaseTest {
     @Test
     void testUpdateToV2() throws Exception {
 
+        // Step - Create project with two versions
+        createProjectWithTwoVersionsFromFlatFiles();
+        ProjectVersion v1 = dbEntityBuilder.getProjectVersion(projectName, 0);
+        ProjectVersion v2 = dbEntityBuilder.getProjectVersion(projectName, 1);
+        Project project = v1.getProject();
+        TraceLinkVersion link = traceLinkVersionRepository.getProjectLinks(project).get(0);
+
+        // Step - Update in v2
+        double testScore = 3.14;
+        double currentScore = link.getScore();
+        link.setScore(testScore);
+        commitUpdateToTraceLink(link, v2);
+
+        // VP - verify no updates in V1
+        Optional<TraceLinkVersion> linkDboV1 =
+                traceLinkVersionRepository.findByProjectVersionAndTraceLink(v1, link.getTraceLink());
+        assertThat(linkDboV1).isPresent();
+        assertThat(linkDboV1.get().getScore()).isEqualTo(currentScore);
+
+        // VP - verify update in V2
+        Optional<TraceLinkVersion> linkDboV2 =
+                traceLinkVersionRepository.findByProjectVersionAndTraceLink(v2, link.getTraceLink());
+        assertThat(linkDboV2).isPresent();
+        assertThat(linkDboV2.get().getScore()).isEqualTo(testScore);
+    }
+
+    /**
+     * Creates a new project with two versions both loaded from the MINI flat file. After the data is
+     * loaded this method will assert that the project has a link and that the link has a version
+     * in V1 but not in V2 (as it is not modified in that version).
+     *
+     * @throws Exception When loading from flat files fails
+     */
+    private void createProjectWithTwoVersionsFromFlatFiles() throws Exception {
         // Step - Create project with two versions
         dbEntityBuilder
                 .newProject(projectName)
@@ -146,25 +161,20 @@ class TestLinkVersioning extends ApplicationBaseTest {
                 traceLinkVersionRepository.findByProjectVersionAndTraceLink(v2, link.getTraceLink());
         assertThat(linkDboV1).isPresent();
         assertThat(linkDboV2).isNotPresent();
+    }
 
-        // Step - Update in v2
-        double testScore = 3.14;
-        double currentScore = link.getScore();
-        link.setScore(testScore);
+    /**
+     * Utility method to commit changes to trace links.
+     *
+     * @param link Trace link with modifications
+     * @param version Project version to create change in
+     * @throws Exception If the commit fails
+     */
+    private void commitUpdateToTraceLink(TraceLinkVersion link, ProjectVersion version) throws Exception {
         TraceAppEntity linkAppEntity = this.traceLinkVersionRepository
                 .retrieveAppEntityFromVersionEntity(link);
         commitService.commit(CommitBuilder
-                .withVersion(v2)
+                .withVersion(version)
                 .withModifiedTrace(linkAppEntity));
-
-        // VP - verify no updates in V1
-        linkDboV1 = traceLinkVersionRepository.findByProjectVersionAndTraceLink(v1, link.getTraceLink());
-        assertThat(linkDboV1).isPresent();
-        assertThat(linkDboV1.get().getScore()).isEqualTo(currentScore);
-
-        // VP - verify update in V2
-        linkDboV2 = traceLinkVersionRepository.findByProjectVersionAndTraceLink(v2, link.getTraceLink());
-        assertThat(linkDboV2).isPresent();
-        assertThat(linkDboV2.get().getScore()).isEqualTo(testScore);
     }
 }

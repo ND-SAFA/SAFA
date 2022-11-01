@@ -3,9 +3,11 @@ package edu.nd.crc.safa.features.jira.services;
 import java.util.Date;
 import java.util.List;
 
+import edu.nd.crc.safa.features.jira.entities.app.JiraAccessCredentialsDTO;
+import edu.nd.crc.safa.features.jira.entities.app.JiraAuthResponseDTO;
+import edu.nd.crc.safa.features.jira.entities.app.JiraInstallationDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraIssuesResponseDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraProjectResponseDTO;
-import edu.nd.crc.safa.features.jira.entities.app.JiraRefreshTokenDTO;
 import edu.nd.crc.safa.features.jira.entities.db.JiraAccessCredentials;
 import edu.nd.crc.safa.features.jira.entities.db.JiraProject;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
@@ -41,7 +43,7 @@ public interface JiraConnectionService {
      * @param credentials The credentials to refresh.
      * @return Refreshed credentials.
      */
-    JiraRefreshTokenDTO refreshAccessToken(JiraAccessCredentials credentials);
+    JiraAuthResponseDTO refreshAccessToken(JiraAccessCredentials credentials);
 
     /**
      * Retrieve all JIRA projects
@@ -89,4 +91,12 @@ public interface JiraConnectionService {
      * @return A flag indicating the permission existence.
      */
     boolean checkUserCanViewProjectIssues(JiraAccessCredentials credentials, Long jiraProjectId);
+
+    /**
+     * @param accessCode Code retrieved from FEND after user has authorized our application
+     * @return Set of JIRA credentials that will be saved for later use.
+     */
+    JiraAccessCredentialsDTO useAccessCode(String accessCode);
+
+    List<JiraInstallationDTO> getInstallations(JiraAccessCredentials credentials);
 }

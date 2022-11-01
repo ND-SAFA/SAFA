@@ -7,10 +7,13 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import edu.nd.crc.safa.features.jira.entities.app.JiraAccessCredentialsDTO;
+import edu.nd.crc.safa.features.jira.entities.app.JiraAuthResponseDTO;
+import edu.nd.crc.safa.features.jira.entities.app.JiraCredentialsRequestBodyDTO;
+import edu.nd.crc.safa.features.jira.entities.app.JiraInstallationDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraIssuesResponseDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraProjectPermissionDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraProjectResponseDTO;
-import edu.nd.crc.safa.features.jira.entities.app.JiraRefreshTokenDTO;
 import edu.nd.crc.safa.features.jira.entities.db.JiraAccessCredentials;
 import edu.nd.crc.safa.features.jira.entities.db.JiraProject;
 import edu.nd.crc.safa.features.jira.repositories.JiraProjectRepository;
@@ -22,6 +25,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -29,19 +33,34 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.reactive.function.client.WebClient;
 
-@AllArgsConstructor
 public class JiraConnectionServiceImpl implements JiraConnectionService {
 
     private static final String ATLASSIAN_API_URL = "https://api.atlassian.com";
     private static final String ATLASSIAN_AUTH_URL = "https://auth.atlassian.com";
     private static final int API_VERSION = 3;
     private static final String REFRESH_TOKEN_REQUEST_GRANT_TYPE = "refresh_token";
+    private static final String ACCESS_CODE_REQUEST_GRANT_TYPE = "authorization_code";
     private static final Logger log = LoggerFactory.getLogger(JiraConnectionServiceImpl.class);
 
     private static final String JIRA_ISSUE_UPDATE_DATE_FORMAT = "yyyy-MM-dd HH:mm";
 
-    private final JiraProjectRepository jiraProjectRepository;
     private final WebClient webClient;
+    private final JiraProjectRepository jiraProjectRepository;
+
+    @Value("${integrations.jira.client-id}")
+    private String clientId;
+
+    @Value("${integrations.jira.client-secret}")
+    private String clientSecret;
+
+    @Value("${integrations.jira.redirect-link}")
+    private String redirectLink;
+
+    public JiraConnectionServiceImpl(JiraProjectRepository jiraProjectRepository,
+                                     WebClient webClient) {
+        this.webClient = webClient;
+        this.jiraProjectRepository = jiraProjectRepository;
+    }
 
     private String buildBaseURI(String cloudId) {
         return String.format("/ex/jira/%s/rest/api/%d", cloudId, API_VERSION);
@@ -91,9 +110,9 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
         return HttpStatus.OK.equals(code);
     }
 
-    public JiraRefreshTokenDTO refreshAccessToken(JiraAccessCredentials credentials) {
+    public JiraAuthResponseDTO refreshAccessToken(JiraAccessCredentials credentials) {
         String uri = this.buildAuthRequestURI(ApiRoute.REFRESH_TOKEN);
-        JiraRefreshTokenDTO body = JiraRefreshTokenDTO.fromEntity(credentials);
+        JiraAuthResponseDTO body = JiraAuthResponseDTO.fromEntity(credentials);
 
         body.setGrantType(REFRESH_TOKEN_REQUEST_GRANT_TYPE);
 
@@ -105,7 +124,7 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
                 .uri(uri)
                 .bodyValue(body)
                 .retrieve()
-                .bodyToMono(JiraRefreshTokenDTO.class)
+                .bodyToMono(JiraAuthResponseDTO.class)
         ).orElseThrow(() -> new SafaError("Error while trying to refresh JIRA credentials"));
     }
 
@@ -169,6 +188,51 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
             .get(JiraProjectPermissionDTO.ADMINISTER_PROJECTS_PERMISSION).getHavePermission();
     }
 
+    @Override
+    public JiraAccessCredentialsDTO useAccessCode(String accessCode) {
+        String uri = this.buildAuthRequestURI(ApiRoute.REFRESH_TOKEN);
+        JiraCredentialsRequestBodyDTO body = new JiraCredentialsRequestBodyDTO();
+
+        body.setCode(accessCode);
+        body.setGrantType(ACCESS_CODE_REQUEST_GRANT_TYPE);
+        body.setClientId(this.clientId);
+        body.setClientSecret(this.clientSecret);
+        body.setRedirectLink(this.redirectLink);
+
+        JiraAuthResponseDTO dto = WebApiUtils.blockOptional(
+            this.webClient
+                .method(ApiRoute.REFRESH_TOKEN.getMethod())
+                .uri(uri)
+                .bodyValue(body)
+                .retrieve()
+                .bodyToMono(JiraAuthResponseDTO.class)
+        ).orElseThrow(() -> new SafaError("Error while trying to use access code"));
+
+        JiraAccessCredentialsDTO result = new JiraAccessCredentialsDTO();
+
+        result.setBearerAccessToken(dto.getAccessToken());
+        result.setClientId(clientId);
+        result.setClientSecret(clientSecret);
+        result.setRefreshToken(dto.getRefreshToken());
+        result.setCloudId(null);
+        return result;
+    }
+
+    @Override
+    public List<JiraInstallationDTO> getInstallations(JiraAccessCredentials credentials) {
+        String uri = this.buildAuthRequestURI(ApiRoute.INSTALLATIONS);
+        
+        return WebApiUtils.blockOptional(
+            this.webClient
+                .method(ApiRoute.INSTALLATIONS.getMethod())
+                .uri(uri)
+                .header(HttpHeaders.AUTHORIZATION,
+                    this.buildAuthorizationHeaderValue(credentials.getBearerAccessToken()))
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<List<JiraInstallationDTO>>() {})
+        ).orElseThrow(() -> new SafaError("Error while trying to use access code"));
+    }
+
     private String encodeValue(String value) {
         try {
             return URLEncoder.encode(value, StandardCharsets.UTF_8.toString());
@@ -210,7 +274,9 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
         MYSELF(ATLASSIAN_API_URL, "/myself", HttpMethod.GET),
         REFRESH_TOKEN(ATLASSIAN_AUTH_URL, "/oauth/token", HttpMethod.POST),
         ISSUES(ATLASSIAN_API_URL, "/search", HttpMethod.GET),
-        PERMISSIONS(ATLASSIAN_API_URL, "/mypermissions", HttpMethod.GET);
+        PERMISSIONS(ATLASSIAN_API_URL, "/mypermissions", HttpMethod.GET),
+        ACCESS_CODE(ATLASSIAN_AUTH_URL, "/oauth/token", HttpMethod.POST),
+        INSTALLATIONS(ATLASSIAN_API_URL, "/oauth/token/accessible-resources", HttpMethod.GET);
 
         private final String url;
 

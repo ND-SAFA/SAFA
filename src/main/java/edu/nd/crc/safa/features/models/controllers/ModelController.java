@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -113,6 +114,34 @@ public class ModelController extends BaseController {
                     .create(mp.getProject())
                     .withModelDelete(modelId)
             ));
+    }
+
+    /**
+     * Edits information about a model within a given project. Currently only edits to the
+     * model name are supported. Edits to fields other than the model name will simply be
+     * ignored.
+     *
+     * @param projectId The ID of the project the model to edit exists under
+     * @param modelId The ID of the model to edit
+     * @param modelAppEntity The model object with all the data to update
+     * @return The newly updated model
+     */
+    @PutMapping(AppRoutes.Models.MODEL_BY_ID)
+    public ModelAppEntity editModelById(@PathVariable UUID projectId,
+                              @PathVariable UUID modelId,
+                              @RequestBody ModelAppEntity modelAppEntity) {
+
+        Project project = this.resourceBuilder.fetchProject(projectId).withViewProject();
+
+        // Get model object as it currently is in the database
+        Model model = this.serviceProvider.getModelService().getModelById(modelId);
+        ModelAppEntity storedModelAppEntity = new ModelAppEntity(model);
+
+        // Update fields that are allowed to be updated
+        storedModelAppEntity.setName(modelAppEntity.getName());
+
+        // Save results to database and return
+        return this.serviceProvider.getModelService().createOrUpdateModel(project, storedModelAppEntity);
     }
 
     /**

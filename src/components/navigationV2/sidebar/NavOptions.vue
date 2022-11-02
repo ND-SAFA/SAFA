@@ -94,20 +94,18 @@ export default Vue.extend({
           disabled: this.hideProjectOptions,
           divider: true,
           path: Routes.ARTIFACT,
-          subOptions: [
-            {
-              label: "Table View",
-              icon: "mdi-table-multiple",
-              // TODO: toggle table view.
-              onClick: () => undefined,
-            },
-            {
-              label: "Delta View",
-              icon: "mdi-file-compare",
-              // TODO: toggle delta view.
-              onClick: () => undefined,
-            },
-          ],
+          // subOptions: [
+          //   {
+          //     label: "Table View",
+          //     icon: "mdi-table-multiple",
+          //     onClick: () => undefined,
+          //   },
+          //   {
+          //     label: "Delta View",
+          //     icon: "mdi-file-compare",
+          //     onClick: () => undefined,
+          //   },
+          // ],
         },
         {
           label: "Trace Models",

@@ -71,10 +71,3 @@ export enum ConfirmationType {
  * General type for representing an empty callback
  */
 export type EmptyLambda = () => void;
-
-/**
- * Enumerates keys used in local storage.
- */
-export enum LocalStorageKeys {
-  SESSION_TOKEN = "t",
-}

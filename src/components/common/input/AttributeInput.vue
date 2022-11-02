@@ -33,7 +33,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { AttributeModel } from "@/types";
+import { CustomAttributeModel } from "@/types";
 
 /**
  * An input for a generic attribute.
@@ -42,7 +42,7 @@ export default Vue.extend({
   name: "AttributeInput",
   props: {
     model: Object,
-    attribute: Object as PropType<AttributeModel>,
+    attribute: Object as PropType<CustomAttributeModel>,
   },
 });
 </script>

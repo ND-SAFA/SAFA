@@ -15,8 +15,11 @@
         />
       </flex-box>
     </flex-box>
+
     <v-divider />
-    <typography :value="project.description" />
+
+    <typography el="p" :value="subtitle" />
+    <typography ep="p" :value="project.description" />
 
     <project-identifier-modal
       :is-open="isEditOpen"
@@ -59,6 +62,15 @@ export default Vue.extend({
       isEditOpen: false,
       projectToEdit: this.project,
     };
+  },
+  computed: {
+    /**
+     * @return The subtitle for this project.
+     */
+    subtitle(): string {
+      const { artifacts, traces } = this.project;
+      return `${artifacts.length} Artifacts | ${traces.length} Trace Links`;
+    },
   },
   methods: {
     /**

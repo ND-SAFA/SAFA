@@ -11,7 +11,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { AttributeModel } from "@/types";
+import { CustomAttributeModel } from "@/types";
 import { FlexBox } from "@/components/common/display";
 import AttributeInput from "./AttributeInput.vue";
 
@@ -23,7 +23,7 @@ export default Vue.extend({
   components: { FlexBox, AttributeInput },
   props: {
     model: Object,
-    attributes: Array as PropType<AttributeModel[]>,
+    attributes: Array as PropType<CustomAttributeModel[]>,
   },
 });
 </script>

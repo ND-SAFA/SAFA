@@ -8,20 +8,13 @@
     <template v-slot:items>
       <v-stepper-content step="1">
         <git-hub-authentication
-          :has-credentials="!!credentials"
+          :has-credentials="validCredentials"
           :is-loading="isLoading"
+          @delete="handleDeleteCredentials"
         />
       </v-stepper-content>
 
       <v-stepper-content step="2">
-        <git-hub-installation-selector
-          :installations="installations"
-          :loading="installationsLoading"
-          @select="handleInstallationSelect($event)"
-        />
-      </v-stepper-content>
-
-      <v-stepper-content step="3">
         <git-hub-repository-selector
           :repositories="repositories"
           :loading="repositoriesLoading"
@@ -34,15 +27,10 @@
 
 <script lang="ts">
 import Vue from "vue";
-import {
-  GitHubInstallationModel,
-  GitHubRepositoryModel,
-  StepState,
-  InternalGitHubCredentialsModel,
-} from "@/types";
+import { GitHubProjectModel, StepState } from "@/types";
 import { getParam, QueryParams } from "@/router";
 import {
-  getGitHubInstallations,
+  deleteGitHubCredentials,
   handleImportGitHubProject,
   handleLoadGitHubProjects,
 } from "@/api";
@@ -51,7 +39,6 @@ import { GenericStepper } from "@/components/common";
 import {
   GitHubAuthentication,
   GitHubRepositorySelector,
-  GitHubInstallationSelector,
 } from "@/components/project/creator/steps";
 
 /**
@@ -61,27 +48,21 @@ export default Vue.extend({
   name: "GitHubCreatorStepper",
   components: {
     GitHubRepositorySelector,
-    GitHubInstallationSelector,
     GenericStepper,
     GitHubAuthentication,
   },
   data() {
     return {
       accessCode: getParam(QueryParams.GITHUB_TOKEN),
-      credentials: undefined as InternalGitHubCredentialsModel | undefined,
       isLoading: true,
+      validCredentials: false,
 
-      installations: [] as GitHubInstallationModel[],
-      installationsLoading: false,
-      selectedInstallation: undefined as GitHubInstallationModel | undefined,
-
-      repositories: [] as GitHubRepositoryModel[],
+      repositories: [] as GitHubProjectModel[],
       repositoriesLoading: false,
-      selectedRepository: undefined as GitHubRepositoryModel | undefined,
+      selectedRepository: undefined as GitHubProjectModel | undefined,
 
       steps: [
         ["Connect to GitHub", false],
-        ["Select Installation", false],
         ["Select Repository", false],
       ] as StepState[],
       currentStep: 1,
@@ -92,15 +73,16 @@ export default Vue.extend({
    */
   mounted() {
     handleAuthorizeGitHub(this.accessCode, {
-      onSuccess: (credentials) => {
-        this.credentials = credentials;
+      onSuccess: () => {
+        this.validCredentials = true;
         this.isLoading = false;
         this.currentStep = 2;
         this.setStepIsValid(0, true);
-        this.loadInstallations();
+        this.loadProjects();
       },
       onError: () => {
         this.isLoading = false;
+        this.validCredentials = false;
       },
     });
   },
@@ -117,34 +99,23 @@ export default Vue.extend({
      * Clears stepper data.
      */
     clearData(): void {
-      this.credentials = undefined;
-      this.installations = [];
+      this.validCredentials = false;
       this.repositories = [];
     },
     /**
-     * Loads a user's GitHub organizations.
+     * Clears the saved credentials
      */
-    async loadInstallations() {
-      if (!this.credentials) return;
-
-      this.installationsLoading = true;
-      this.installations = await getGitHubInstallations(
-        this.credentials.accessToken
-      );
-      this.installationsLoading = false;
+    async handleDeleteCredentials(): Promise<void> {
+      await deleteGitHubCredentials();
+      this.validCredentials = false;
+      this.currentStep = 1;
     },
     /**
      * Loads a user's GitHub projects for a selected organization.
      */
     async loadProjects() {
-      if (!this.credentials || !this.selectedInstallation) return;
-
-      if (this.selectedInstallation) {
-        this.credentials.installationId = this.selectedInstallation.id;
-      }
-
       this.repositoriesLoading = true;
-      handleLoadGitHubProjects(this.credentials, {
+      handleLoadGitHubProjects({
         onSuccess: (repositories) => {
           this.repositories = repositories;
           this.repositoriesLoading = false;
@@ -153,43 +124,24 @@ export default Vue.extend({
       });
     },
     /**
-     * Selects a GitHub organization to load projects from.
-     */
-    handleInstallationSelect(org: GitHubInstallationModel) {
-      if (this.selectedInstallation?.id !== org.id) {
-        this.selectedInstallation = org;
-        this.setStepIsValid(1, true);
-        this.currentStep = 3;
-        this.loadProjects();
-      } else {
-        this.selectedInstallation = undefined;
-        this.setStepIsValid(1, false);
-      }
-    },
-    /**
      * Selects a GitHub project to import.
      */
-    handleProjectSelect(project: GitHubRepositoryModel) {
+    handleProjectSelect(project: GitHubProjectModel) {
       if (this.selectedRepository?.id !== project.id) {
         this.selectedRepository = project;
-        this.setStepIsValid(2, true);
+        this.setStepIsValid(1, true);
       } else {
         this.selectedRepository = undefined;
-        this.setStepIsValid(2, false);
+        this.setStepIsValid(1, false);
       }
     },
     /**
      * Attempts to import a GitHub project.
      */
     handleSaveProject(): void {
-      if (
-        !this.credentials ||
-        !this.selectedInstallation ||
-        !this.selectedRepository
-      )
-        return;
+      if (!this.selectedRepository) return;
 
-      handleImportGitHubProject(this.selectedRepository.id, {
+      handleImportGitHubProject(this.selectedRepository.name, {
         onSuccess: () => this.clearData(),
       });
     },

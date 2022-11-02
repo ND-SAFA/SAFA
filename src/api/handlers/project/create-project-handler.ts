@@ -86,19 +86,17 @@ export function handleBulkImportProject(
 /**
  * Imports a Jira project, sets related app state, and moves to the upload page.
  *
- * @param cloudId - The Jira cloud id for this project.
  * @param projectId - The Jira project id to import.
  * @param onSuccess - Called if the action is successful.
  * @param onError - Called if the action fails.
  */
 export function handleImportJiraProject(
-  cloudId: string,
   projectId: string,
   { onSuccess, onError }: IOHandlerCallback
 ): void {
   appStore.onLoadStart();
 
-  createJiraProject(cloudId, projectId)
+  createJiraProject(projectId)
     .then(async (job) => {
       await handleJobSubmission(job);
       logStore.onSuccess(`Jira project has been created: ${projectId}`);
@@ -116,25 +114,25 @@ export function handleImportJiraProject(
 /**
  * Imports a GitHub project, sets related app state, and moves to the upload page.
  *
- * @param projectId - The GitHub project id to import.
+ * @param repositoryName - The GitHub repository name to import.
  * @param onSuccess - Called if the action is successful.
  * @param onError - Called if the action fails.
  */
 export function handleImportGitHubProject(
-  projectId: string,
+  repositoryName: string,
   { onSuccess, onError }: IOHandlerCallback
 ): void {
   appStore.onLoadStart();
 
-  createGitHubProject(projectId)
+  createGitHubProject(repositoryName)
     .then(async (job) => {
       await handleJobSubmission(job);
-      logStore.onSuccess(`GitHub project has been created: ${projectId}`);
+      logStore.onSuccess(`GitHub project has been created: ${repositoryName}`);
       await navigateTo(Routes.UPLOAD_STATUS);
       onSuccess?.();
     })
     .catch((e) => {
-      logStore.onError(`GitHub to import jira project: ${projectId}`);
+      logStore.onError(`GitHub to import jira project: ${repositoryName}`);
       logStore.onDevError(e.message);
       onError?.(e);
     })

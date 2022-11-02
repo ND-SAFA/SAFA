@@ -71,14 +71,3 @@ export enum ConfirmationType {
  * General type for representing an empty callback
  */
 export type EmptyLambda = () => void;
-
-/**
- * Enumerates keys used in local storage.
- */
-export enum LocalStorageKeys {
-  SESSION_TOKEN = "t",
-  JIRA_REFRESH_TOKEN = "jrt",
-  JIRA_CLOUD_ID = "jci",
-  GIT_HUB_REFRESH_TOKEN = "grt",
-  GIT_HUB_INSTALLATION_ID = "gid",
-}

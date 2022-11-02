@@ -33,7 +33,20 @@ export interface NavOption {
    */
   disabled?: boolean;
   /**
-   * Called when this option is clicked.
+   * Sub-options to display beneath this option.
    */
-  onClick(): Promise<void>;
+  subOptions?: {
+    /**
+     * The option's name.
+     */
+    label: string;
+    /**
+     * The option's icon id.
+     */
+    icon: string;
+    /**
+     * Ran when the option is clicked.
+     */
+    onClick(): void;
+  }[];
 }

@@ -8,7 +8,7 @@
       </flex-box>
     </v-container>
     <v-divider />
-    <v-list-item @click="handleEditAccount">
+    <v-list-item :to="accountPath">
       <v-list-item-icon>
         <v-icon color="primary">mdi-account-circle</v-icon>
       </v-list-item-icon>
@@ -22,7 +22,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { appStore } from "@/hooks";
-import { navigateTo, Routes } from "@/router";
+import { Routes } from "@/router";
 import { handleLogout } from "@/api";
 import { FlexBox, Typography } from "@/components/common";
 
@@ -30,8 +30,11 @@ import { FlexBox, Typography } from "@/components/common";
  * Renders the navigation drawer.
  */
 export default Vue.extend({
-  name: "AppNavDrawerAccount",
+  name: "NavAccount",
   components: { Typography, FlexBox },
+  data() {
+    return { accountPath: Routes.ACCOUNT };
+  },
   computed: {
     /**
      * Manages changes to the panel open state.
@@ -75,12 +78,6 @@ export default Vue.extend({
      */
     handleLogout(): void {
       handleLogout();
-    },
-    /**
-     * Navigates to the account editing page.
-     */
-    handleEditAccount(): void {
-      navigateTo(Routes.ACCOUNT);
     },
   },
 });

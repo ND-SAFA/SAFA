@@ -11,8 +11,8 @@
 import Vue from "vue";
 import { logStore, sessionStore } from "@/hooks";
 import { AppConfirmModal, Snackbar } from "@/components";
-import AppNavDrawer from "./AppNavDrawer.vue";
-import AppNavBar from "./AppNavBar.vue";
+import { AppNavDrawer } from "./sidebar";
+import { AppNavBar } from "./topbar";
 
 /**
  * Renders all app navigation bars.

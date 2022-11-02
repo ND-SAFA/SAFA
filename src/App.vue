@@ -7,13 +7,13 @@
         </keep-alive>
       </transition>
     </v-main>
-    <navigation />
+    <app-nav />
   </v-app>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { Navigation } from "@/components";
+import { AppNav } from "@/components";
 
 /**
  * Renders the SAFA app.
@@ -21,7 +21,7 @@ import { Navigation } from "@/components";
 export default Vue.extend({
   name: "App",
   components: {
-    Navigation,
+    AppNav,
   },
 });
 </script>

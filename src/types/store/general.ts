@@ -14,6 +14,7 @@ export type ArtifactTypeIcons = Record<string, string>;
  * Enumerates types of panels.
  */
 export enum PanelType {
+  appPanel,
   left,
   right,
   artifactCreator,
@@ -42,6 +43,7 @@ export type GeneratorOpenState = boolean | "generate" | "train";
  * Represents the states of all openable panels.
  */
 export interface PanelStateMap {
+  [PanelType.appPanel]: boolean;
   [PanelType.left]: boolean;
   [PanelType.right]: boolean;
   [PanelType.artifactCreator]: CreatorOpenState;

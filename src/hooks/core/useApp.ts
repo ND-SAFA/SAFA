@@ -31,6 +31,7 @@ export const useApp = defineStore("app", {
      * The open state for each type of panel.
      */
     isOpen: {
+      [PanelType.appPanel]: true,
       [PanelType.left]: false,
       [PanelType.right]: false,
       [PanelType.artifactCreator]: false,
@@ -42,6 +43,12 @@ export const useApp = defineStore("app", {
     } as PanelStateMap,
   }),
   getters: {
+    /**
+     * @return Whether the left panel is open.
+     */
+    isAppPanelOpen(): boolean {
+      return this.isOpen[PanelType.appPanel];
+    },
     /**
      * @return Whether the left panel is open.
      */
@@ -127,6 +134,12 @@ export const useApp = defineStore("app", {
      */
     togglePanel(panel: PanelType): void {
       this.isOpen[panel] = !this.isOpen[panel];
+    },
+    /**
+     * Toggles whether the right panel is open.
+     */
+    toggleAppPanel(): void {
+      this.togglePanel(PanelType.appPanel);
     },
     /**
      * Toggles whether the right panel is open.

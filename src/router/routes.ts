@@ -8,6 +8,7 @@ export enum Routes {
   RESET_PASSWORD = "/reset",
   HOME = "/",
   ARTIFACT = "/project",
+  MY_PROJECTS = "/my-projects",
   PROJECT_SETTINGS = "/project/settings",
   PROJECT_MODELS = "/project/models",
   TRACE_LINK = "/project/links",

@@ -1,8 +1,7 @@
 <template>
   <private-page>
     <template v-slot:page>
-      <back-button />
-      <typography el="h1" variant="title" value="Current Uploads" />
+      <typography t="4" el="h1" variant="title" value="Project Uploads" />
       <v-divider />
       <typography
         el="p"
@@ -16,7 +15,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { PrivatePage, BackButton, Typography, JobTable } from "@/components";
+import { PrivatePage, Typography, JobTable } from "@/components";
 
 /**
  * Displays project uploads.
@@ -26,7 +25,6 @@ export default Vue.extend({
   components: {
     JobTable,
     Typography,
-    BackButton,
     PrivatePage,
   },
 });

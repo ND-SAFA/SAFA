@@ -1,8 +1,14 @@
 <template>
-  <v-menu offset-y @input="handleOpen">
+  <v-menu offset-y @input="handleOpen" top>
     <template v-slot:activator="{ on, attrs }">
-      <v-btn icon large color="accent" v-bind="attrs" v-on="on" class="mx-2">
-        <v-badge overlap color="secondary" :value="newNotifications > 0">
+      <v-btn
+        icon
+        color="primary"
+        v-bind="attrs"
+        v-on="on"
+        style="position: relative; right: 6px"
+      >
+        <v-badge overlap color="primary" :value="newNotifications > 0">
           <template v-slot:badge>
             <typography
               color="primary"

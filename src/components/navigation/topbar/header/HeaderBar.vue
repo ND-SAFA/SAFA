@@ -3,7 +3,6 @@
     <flex-box full-width justify="space-between">
       <flex-box align="center">
         <searchbar v-if="graphVisible" />
-        <notifications />
       </flex-box>
       <flex-box align="center">
         <update-button />
@@ -22,7 +21,6 @@ import { Route } from "vue-router";
 import { router, Routes } from "@/router";
 import { FlexBox } from "@/components/common";
 import Searchbar from "./Searchbar.vue";
-import Notifications from "./Notifications.vue";
 import AppVersion from "./AppVersion.vue";
 import SavingIcon from "./SavingIcon.vue";
 import UpdateButton from "./UpdateButton.vue";
@@ -35,7 +33,6 @@ export default Vue.extend({
   name: "HeaderBar",
   components: {
     Searchbar,
-    Notifications,
     SavingIcon,
     UpdateButton,
     AppVersion,

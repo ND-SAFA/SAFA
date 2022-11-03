@@ -11,7 +11,6 @@ export enum Routes {
   MY_PROJECTS = "/open",
   ARTIFACT = "/project",
   PROJECT_SETTINGS = "/settings",
-  PROJECT_MODELS = "/models",
   TRACE_LINK = "/links",
   UPLOAD_STATUS = "/uploads",
   ACCOUNT = "/account",
@@ -34,7 +33,6 @@ export const routesWithRequiredProject: string[] = [
   Routes.PROJECT_SETTINGS,
   Routes.ARTIFACT,
   Routes.TRACE_LINK,
-  Routes.PROJECT_MODELS,
 ];
 
 export const routesPublic: string[] = [

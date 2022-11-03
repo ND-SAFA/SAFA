@@ -7,7 +7,18 @@
         <v-btn text rounded @click="handleChangelog">Recent Changes</v-btn>
       </flex-box>
     </v-container>
+
+    <v-list-item>
+      <v-list-item-icon>
+        <notifications />
+      </v-list-item-icon>
+      <v-list-item-title>
+        <typography value="Notifications" />
+      </v-list-item-title>
+    </v-list-item>
+
     <v-divider />
+
     <v-list-item :to="accountPath">
       <v-list-item-icon>
         <v-icon color="primary">mdi-account-circle</v-icon>
@@ -25,13 +36,14 @@ import { appStore } from "@/hooks";
 import { Routes } from "@/router";
 import { handleLogout } from "@/api";
 import { FlexBox, Typography } from "@/components/common";
+import Notifications from "@/components/navigation/sidebar/Notifications.vue";
 
 /**
  * Renders the navigation drawer.
  */
 export default Vue.extend({
   name: "NavAccount",
-  components: { Typography, FlexBox },
+  components: { Notifications, Typography, FlexBox },
   data() {
     return { accountPath: Routes.ACCOUNT };
   },

@@ -1,62 +1,52 @@
 <template>
-  <v-container>
-    <typography el="h1" variant="subtitle" value="Members" />
-    <v-divider />
-    <generic-selector
-      is-open
-      :headers="headers"
-      :items="members"
-      :has-delete="isAdmin"
-      :has-edit="isAdmin"
-      :has-select="false"
-      :is-loading="isLoading"
-      item-key="email"
-      class="mt-5"
-      @item:add="handleAddMember"
-      @item:edit="handleEditMember"
-      @item:delete="handleDeleteMember"
-      @refresh="handleRetrieveMembers"
-    >
-      <template v-slot:addItemDialogue>
-        <settings-member-information-modal
-          :is-open="isNewOpen"
-          @cancel="handleConfirmAdd"
-          @confirm="handleConfirmAdd"
-        />
-      </template>
-      <template v-slot:editItemDialogue>
-        <settings-member-information-modal
-          :is-open="isEditOpen"
-          :clear-on-close="false"
-          :member="memberToEdit"
-          @cancel="handleConfirmEdit"
-          @confirm="handleConfirmEdit"
-        />
-      </template>
-    </generic-selector>
-  </v-container>
+  <generic-selector
+    is-open
+    :headers="headers"
+    :items="members"
+    :has-delete="isAdmin"
+    :has-edit="isAdmin"
+    :has-select="false"
+    :is-loading="isLoading"
+    item-key="email"
+    class="mt-5"
+    @item:add="handleAddMember"
+    @item:edit="handleEditMember"
+    @item:delete="handleDeleteMember"
+    @refresh="handleRetrieveMembers"
+  >
+    <template v-slot:addItemDialogue>
+      <settings-member-information-modal
+        :is-open="isNewOpen"
+        @cancel="handleConfirmAdd"
+        @confirm="handleConfirmAdd"
+      />
+    </template>
+    <template v-slot:editItemDialogue>
+      <settings-member-information-modal
+        :is-open="isEditOpen"
+        :clear-on-close="false"
+        :member="memberToEdit"
+        @cancel="handleConfirmEdit"
+        @confirm="handleConfirmEdit"
+      />
+    </template>
+  </generic-selector>
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import Vue from "vue";
 import { MembershipModel, ProjectModel, ProjectRole } from "@/types";
-import { logStore, sessionStore } from "@/hooks";
+import { logStore, projectStore, sessionStore } from "@/hooks";
 import { handleDeleteMember, handleGetMembers } from "@/api";
-import { GenericSelector, Typography } from "@/components/common";
+import { GenericSelector } from "@/components/common";
 import SettingsMemberInformationModal from "./SettingsMemberInformationModal.vue";
 
 /**
  * List the members of given project within the settings.
  */
 export default Vue.extend({
-  name: "SettingsMemberSection",
-  components: { GenericSelector, SettingsMemberInformationModal, Typography },
-  props: {
-    project: {
-      type: Object as PropType<ProjectModel>,
-      required: true,
-    },
-  },
+  name: "SettingsMembers",
+  components: { GenericSelector, SettingsMemberInformationModal },
   data() {
     return {
       memberToEdit: undefined as MembershipModel | undefined,
@@ -72,6 +62,12 @@ export default Vue.extend({
   },
   computed: {
     /**
+     * @return The current project.
+     */
+    project(): ProjectModel {
+      return projectStore.project;
+    },
+    /**
      * @return Whether the current user is an admin.
      */
     isAdmin(): boolean {
@@ -80,7 +76,7 @@ export default Vue.extend({
     /**
      * @return All project members.
      */
-    members() {
+    members(): MembershipModel[] {
       return this.project.members;
     },
   },

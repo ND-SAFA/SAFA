@@ -80,14 +80,8 @@ export default Vue.extend({
           path: { path: Routes.ARTIFACT, query: getParams() },
         },
         {
-          label: "Trace Models",
+          label: "Trace Prediction",
           icon: "mdi-link-box",
-          disabled: this.hideProjectOptions,
-          path: { path: Routes.PROJECT_MODELS, query: getParams() },
-        },
-        {
-          label: "Trace Approval",
-          icon: "mdi-link-plus",
           disabled: this.hideProjectOptions,
           path: { path: Routes.TRACE_LINK, query: getParams() },
         },

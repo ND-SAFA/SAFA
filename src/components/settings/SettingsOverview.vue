@@ -1,22 +1,20 @@
 <template>
-  <v-container>
+  <div>
     <flex-box justify="space-between">
       <typography el="h1" variant="title" :value="project.name" />
       <flex-box>
-        <generic-icon-button
-          tooltip="Download Project Files"
-          icon-id="mdi-download"
-          @click="handleDownload"
-        />
-        <generic-icon-button
-          tooltip="Edit title"
-          icon-id="mdi-pencil"
-          @click="handleEdit"
-        />
+        <v-btn text @click="handleDownload">
+          <v-icon class="mr-1">mdi-download</v-icon>
+          Download Files
+        </v-btn>
+        <v-btn text @click="handleEdit">
+          <v-icon class="mr-1">mdi-pencil</v-icon>
+          Edit Project
+        </v-btn>
       </flex-box>
     </flex-box>
 
-    <v-divider />
+    <v-divider class="mb-2" />
 
     <typography el="p" :value="subtitle" />
     <typography ep="p" :value="project.description" />
@@ -27,15 +25,14 @@
       @close="isEditOpen = false"
       @save="handleSave"
     />
-  </v-container>
+  </div>
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
-import { ProjectModel } from "@/types";
+import Vue from "vue";
 import { identifierSaveStore, projectStore } from "@/hooks";
 import { handleSaveProject, handleDownloadProjectCSV } from "@/api";
-import { GenericIconButton, Typography, FlexBox } from "@/components/common";
+import { Typography, FlexBox } from "@/components/common";
 import { ProjectIdentifierModal } from "@/components/project/shared";
 
 /**
@@ -43,27 +40,26 @@ import { ProjectIdentifierModal } from "@/components/project/shared";
  * within the settings.
  */
 export default Vue.extend({
-  name: "SettingsGeneralSection",
+  name: "SettingsOverview",
   components: {
     FlexBox,
     Typography,
-    GenericIconButton,
     ProjectIdentifierModal,
-  },
-  props: {
-    project: {
-      type: Object as PropType<ProjectModel>,
-      required: true,
-    },
   },
   data() {
     return {
       isEditLoading: false,
       isEditOpen: false,
-      projectToEdit: this.project,
+      projectToEdit: projectStore.project,
     };
   },
   computed: {
+    /**
+     * @return The current project.
+     */
+    project() {
+      return projectStore.project;
+    },
     /**
      * @return The subtitle for this project.
      */

@@ -1,20 +1,18 @@
 <template>
-  <v-container>
-    <tab-list v-model="tab" :tabs="tabs">
-      <v-tab-item key="1">
-        <project-creator-stepper />
-      </v-tab-item>
-      <v-tab-item key="2">
-        <project-bulk-upload />
-      </v-tab-item>
-      <v-tab-item key="3">
-        <jira-creator-stepper />
-      </v-tab-item>
-      <v-tab-item key="4">
-        <git-hub-creator-stepper />
-      </v-tab-item>
-    </tab-list>
-  </v-container>
+  <tab-list v-model="tab" :tabs="tabs">
+    <v-tab-item key="1">
+      <project-creator-stepper />
+    </v-tab-item>
+    <v-tab-item key="2">
+      <project-bulk-upload />
+    </v-tab-item>
+    <v-tab-item key="3">
+      <jira-creator-stepper />
+    </v-tab-item>
+    <v-tab-item key="4">
+      <git-hub-creator-stepper />
+    </v-tab-item>
+  </tab-list>
 </template>
 
 <script lang="ts">

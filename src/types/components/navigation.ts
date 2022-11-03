@@ -23,7 +23,9 @@ export interface NavOption {
   /**
    * The navigation path corresponding to this option.
    */
-  path: string;
+  path:
+    | string
+    | { path: string; query: Record<string, string | (string | null)[]> };
   /**
    * If true, a divider will be displayed above this option.
    */
@@ -32,21 +34,4 @@ export interface NavOption {
    * If true, this option will be hidden.
    */
   disabled?: boolean;
-  /**
-   * Sub-options to display beneath this option.
-   */
-  subOptions?: {
-    /**
-     * The option's name.
-     */
-    label: string;
-    /**
-     * The option's icon id.
-     */
-    icon: string;
-    /**
-     * Ran when the option is clicked.
-     */
-    onClick(): void;
-  }[];
 }

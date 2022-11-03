@@ -6,8 +6,15 @@
     height="100%"
     class="elevation-1"
   >
-    <flex-box full-width justify="center" t="3" v-if="sidebarOpen">
-      <safa-icon variant="primary" style="width: 230px" />
+    <flex-box v-if="sidebarOpen" full-width justify="center" t="3" b="3">
+      <safa-icon variant="primary" style="width: 180px" />
+      <generic-icon-button
+        large
+        icon-id="mdi-chevron-left"
+        tooltip="Close sidebar"
+        @click="sidebarOpen = false"
+        color="primary"
+      />
     </flex-box>
     <flex-box justify="center" full-width v-else t="2">
       <generic-icon-button

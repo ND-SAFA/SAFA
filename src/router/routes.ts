@@ -7,15 +7,15 @@ export enum Routes {
   FORGOT_PASSWORD = "/forgot",
   RESET_PASSWORD = "/reset",
   HOME = "/",
-  ARTIFACT = "/project",
-  MY_PROJECTS = "/my-projects",
-  PROJECT_SETTINGS = "/project/settings",
-  PROJECT_MODELS = "/project/models",
-  TRACE_LINK = "/project/links",
-  ERROR = "/error",
   PROJECT_CREATOR = "/create",
+  MY_PROJECTS = "/open",
+  ARTIFACT = "/project",
+  PROJECT_SETTINGS = "/settings",
+  PROJECT_MODELS = "/models",
+  TRACE_LINK = "/links",
   UPLOAD_STATUS = "/uploads",
   ACCOUNT = "/account",
+  ERROR = "/error",
 }
 
 /**

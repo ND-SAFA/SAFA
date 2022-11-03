@@ -1,33 +1,29 @@
 <template>
   <div>
-    <app-bar v-if="isLoggedIn" />
-    <left-nav-drawer v-if="isLoggedIn" />
-    <right-nav-drawer v-if="isLoggedIn" />
+    <app-nav-drawer v-if="isLoggedIn" />
+    <app-nav-bar v-if="isLoggedIn" />
     <snackbar />
     <app-confirm-modal :message="confirmationMessage" />
-    <artifact-body-modal v-if="isLoggedIn" />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import { logStore, sessionStore } from "@/hooks";
-import { AppConfirmModal, ArtifactBodyModal, Snackbar } from "@/components";
-import { LeftNavDrawer, RightNavDrawer } from "./side-panels";
-import AppBar from "./AppBar.vue";
+import { AppConfirmModal, Snackbar } from "@/components/common";
+import { AppNavDrawer } from "./sidebar";
+import { AppNavBar } from "./topbar";
 
 /**
- * Renders the navigation bars and top level modals.
+ * Renders all app navigation bars.
  */
 export default Vue.extend({
-  name: "Navigation",
+  name: "AppNav",
   components: {
-    Snackbar,
+    AppNavBar,
+    AppNavDrawer,
     AppConfirmModal,
-    ArtifactBodyModal,
-    AppBar,
-    LeftNavDrawer,
-    RightNavDrawer,
+    Snackbar,
   },
   computed: {
     /**
@@ -45,3 +41,5 @@ export default Vue.extend({
   },
 });
 </script>
+
+<style scoped lang="scss"></style>

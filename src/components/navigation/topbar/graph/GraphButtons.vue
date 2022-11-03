@@ -1,11 +1,11 @@
 <template>
   <flex-box>
-    <v-divider inset vertical class="accent mx-1 faded" />
-
-    <commit-buttons />
-
-    <v-divider inset vertical class="accent mx-1 faded" />
-
+    <checkmark-menu
+      :key="filterButton.label"
+      :definition="filterButton"
+      :is-disabled="isButtonDisabled(filterButton)"
+    />
+    <v-divider inset vertical class="accent mx-1 faded mb-2" />
     <template v-for="definition in viewButtons">
       <generic-icon-button
         v-if="definition.handler"
@@ -18,14 +18,6 @@
         @click="definition.handler"
       />
     </template>
-
-    <v-divider inset vertical class="accent mx-1 faded" />
-
-    <checkmark-menu
-      :key="filterButton.label"
-      :definition="filterButton"
-      :is-disabled="isButtonDisabled(filterButton)"
-    />
   </flex-box>
 </template>
 
@@ -36,7 +28,6 @@ import { artifactStore, documentStore, selectionStore } from "@/hooks";
 import { handleRegenerateLayout } from "@/api";
 import { cyZoomIn, cyZoomOut } from "@/cytoscape";
 import { GenericIconButton, CheckmarkMenu, FlexBox } from "@/components/common";
-import CommitButtons from "./CommitButtons.vue";
 
 export default Vue.extend({
   name: "GraphButtons",
@@ -44,7 +35,6 @@ export default Vue.extend({
     FlexBox,
     GenericIconButton,
     CheckmarkMenu,
-    CommitButtons,
   },
   data() {
     return {

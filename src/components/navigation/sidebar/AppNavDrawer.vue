@@ -10,7 +10,7 @@
       <safa-icon variant="primary" style="width: 180px" />
       <generic-icon-button
         large
-        icon-id="mdi-chevron-left"
+        icon-id="mdi-menu-open"
         tooltip="Close sidebar"
         @click="sidebarOpen = false"
         color="primary"
@@ -19,10 +19,11 @@
     <flex-box justify="center" full-width v-else t="2">
       <generic-icon-button
         large
-        icon-id="mdi-chevron-right"
+        icon-id="mdi-menu-open"
         tooltip="Open sidebar"
         @click="sidebarOpen = true"
         color="primary"
+        icon-style="transform: rotate(180deg)"
       />
     </flex-box>
 

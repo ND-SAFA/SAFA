@@ -67,7 +67,7 @@ class TestTrainJob(BaseTest):
     def get_test_train_job(self, get_model_mock: mock.MagicMock, get_tokenizer_mock: mock.MagicMock):
         get_model_mock.return_value = self.get_test_model()
         get_tokenizer_mock.return_value = self.get_test_tokenizer()
-        return TrainJob(**self.TEST_PARAMS)
+        return TrainJob(**self.TEST_PARAMS, split_train_dataset=True)
 
     def output_test_success(self, output: str):
         output_dict = json.loads(output)

@@ -33,7 +33,7 @@ class TraceTrainer(Trainer):
         tokenizer = self.model_generator.get_tokenizer()
         super().__init__(model=model, args=args, tokenizer=tokenizer, callbacks=args.callbacks, **kwargs)
 
-    def perform_training(self, train_dataset: TraceDataset, eval_dataset: TraceDataset, checkpoint: str = None) -> Dict:
+    def perform_training(self, train_dataset: TraceDataset, eval_dataset: TraceDataset = None, checkpoint: str = None) -> Dict:
         """
         Performs the model training.
         :param train_dataset: The dataset used to adjust model weights.
@@ -42,7 +42,7 @@ class TraceTrainer(Trainer):
         :return: a dictionary containing the results
         """
         self.train_dataset = train_dataset.to_trainer_dataset(self.model_generator)
-        self.eval_dataset = eval_dataset.to_trainer_dataset(self.model_generator)
+        self.eval_dataset = eval_dataset.to_trainer_dataset(self.model_generator) if eval_dataset else eval_dataset
         output = self.train(resume_from_checkpoint=checkpoint)
         return TraceTrainer.output_to_dict(output)
 

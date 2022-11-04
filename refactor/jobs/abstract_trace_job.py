@@ -21,6 +21,7 @@ class AbstractTraceJob(AbstractJob, ABC):
                  dataset_pre_processing_options: Dict[DatasetRole, Tuple[List[PreProcessingOption], Dict]] = None,
                  trace_args_params: Dict = None,
                  validation_percentage: float = VALIDATION_PERCENTAGE_DEFAULT,
+                 split_train_dataset: bool = False,
                  add_mount_directory_to_output: bool = ADD_MOUNT_DIRECTORY_TO_OUTPUT_DEFAULT,
                  save_job_output: bool = SAVE_OUTPUT_DEFAULT):
         """
@@ -31,6 +32,7 @@ class AbstractTraceJob(AbstractJob, ABC):
         :param datasets_map: dictionary mapping dataset role (e.g. train/eval) to the desired dataset creator and its params
         :param dataset_pre_processing_options: dictionary mapping dataset role to the desired pre-processing steps and related params
         :param trace_args_params: additional parameters for the trace args
+        :param split_train_dataset: if True, splits the training dataset for eval
         :param add_mount_directory_to_output: if True, adds mount directory to output path
         :param save_job_output: if True, saves the output to the output_dir
         """
@@ -39,7 +41,7 @@ class AbstractTraceJob(AbstractJob, ABC):
         dataset_pre_processing_options = dataset_pre_processing_options if dataset_pre_processing_options else {}
         self.train_dataset = self._make_dataset(datasets_map, dataset_pre_processing_options, DatasetRole.TRAIN)
         self.eval_dataset = self._make_dataset(datasets_map, dataset_pre_processing_options, DatasetRole.EVAL)
-        if self.train_dataset and not self.eval_dataset:
+        if self.train_dataset and split_train_dataset:
             self.train_dataset, self.eval_dataset = self.train_dataset.split(validation_percentage)
         self.train_args = TraceArgs(output_dir, **(trace_args_params if trace_args_params else {}))
         self.__trainer = None

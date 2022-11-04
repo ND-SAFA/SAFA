@@ -43,6 +43,7 @@ class MLMPreTrainJob(AbstractTraceJob):
         super().__init__(model_path=model_path, base_model=SupportedBaseModel.BERT_FOR_MASKED_LM, output_dir=output_dir,
                          datasets_map=datasets_map, dataset_pre_processing_options=pre_processing_options,
                          trace_args_params=trace_args_params, save_job_output=save_job_output,
+                         split_train_dataset=False,
                          add_mount_directory_to_output=add_mount_directory_to_output)
         self.mlm_probability = mlm_probability
 
@@ -53,7 +54,7 @@ class MLMPreTrainJob(AbstractTraceJob):
         )
         tokenizer.save_vocabulary(self.output_dir)
         trainer = self.get_trainer(data_collator=data_collator)
-        result = trainer.train(self.train_dataset)
+        result = trainer.perform_training(self.train_dataset)
         trainer.save_model(trainer.args.output_dir)
 
         os.remove(self.train_dataset.training_file_path)

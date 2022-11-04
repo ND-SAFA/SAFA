@@ -115,10 +115,15 @@ class BaseTest(TestCase):
             shutil.rmtree(TEST_OUTPUT_DIR)
 
     @staticmethod
-    def get_test_params(dataset_role=DatasetRole.TRAIN, include_trace_params=True, include_links=True, as_api=False):
+    def get_test_params(dataset_role=DatasetRole.TRAIN, include_trace_params=True, include_links=True, as_api=False,
+                        include_pre_processing=False):
         test_args = deepcopy(BaseTest._JOB_PARAMS_BASE)
         if include_trace_params:
             test_args["datasets_map"] = BaseTest.create_dataset_map(dataset_role, include_links=include_links)
+        if include_pre_processing:
+            pre_processing_options, pre_processing_params = BaseTest.PRE_PROCESSING_PARAMS
+            test_args["pre_processing_options"] = pre_processing_options
+            test_args["pre_processing_params"] = pre_processing_params
 
         # Step - Replaces casing to snake case
         if as_api:

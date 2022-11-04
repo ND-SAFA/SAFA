@@ -3,61 +3,60 @@ package features.traces.logic;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
+import java.util.Optional;
 
 import edu.nd.crc.safa.config.ProjectPaths;
-import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
+import edu.nd.crc.safa.features.traces.entities.db.TraceLinkVersion;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
-import common.ApplicationBaseTest;
-import org.junit.jupiter.api.Test;
+import builders.CommitBuilder;
+import common.AbstractVersionedEntityTest;
 import requests.FlatFileRequest;
 
-/**
- * Tests that versioning changes are detected for trace links.
- * <p>
- * TODO: Test that modification is detected
- * TODO: Test that removal is detected
- */
-class TestLinkVersioning extends ApplicationBaseTest {
+public class TestLinkVersioning extends AbstractVersionedEntityTest<TraceAppEntity, TraceLinkVersion> {
+    static String FLAT_FILES_PATH = ProjectPaths.Resources.Tests.MINI;
+    static double ORIGINAL_SCORE = 1;
+    static double MODIFIED_SCORE = 3.14;
 
-    /**
-     * Tests that an identical trace submitted to the next version is not stored
-     * as an entry.
-     *
-     * @throws Exception If http requests fails
-     */
-    @Test
-    void testNoChangeDetected() throws Exception {
+    @Override
+    protected void loadDataIntoProjectVersion(ProjectVersion projectVersion) throws Exception {
+        FlatFileRequest.updateProjectVersionFromFlatFiles(projectVersion, FLAT_FILES_PATH);
+    }
 
-        // Step - Create project with two versions: base and target
-        dbEntityBuilder
-            .newProject(projectName)
-            .newVersion(projectName)
-            .newVersion(projectName);
-        ProjectVersion v1 = dbEntityBuilder.getProjectVersion(projectName, 0);
-        ProjectVersion v2 = dbEntityBuilder.getProjectVersion(projectName, 1);
-        Project project = v1.getProject();
+    @Override
+    protected List<TraceLinkVersion> getAllVersions(Project project) {
+        return traceLinkVersionRepository.getProjectLinks(project);
+    }
 
-        // Step - Create base trace link
-        String flatFilesPath = ProjectPaths.Resources.Tests.MINI;
-        FlatFileRequest.updateProjectVersionFromFlatFiles(v1, flatFilesPath);
+    @Override
+    protected Optional<TraceLinkVersion> getEntityVersionByProjectVersion(TraceLinkVersion entity,
+                                                                          ProjectVersion projectVersion) {
 
-        // VP - Verify that link is stored as added
-        ProjectAppEntity baseEntities = retrievalService.getProjectAtVersion(v1);
-        List<TraceAppEntity> baseTraces = baseEntities.getTraces();
-        assertThat(baseTraces).hasSize(1);
+        return traceLinkVersionRepository.findByProjectVersionAndTraceLink(projectVersion, entity.getTraceLink());
+    }
 
-        // Step - Save same link to latter version
-        FlatFileRequest.updateProjectVersionFromFlatFiles(v2, flatFilesPath);
+    @Override
+    protected void modifyEntityInCommit(CommitBuilder commitBuilder, TraceLinkVersion entity) {
+        entity.setScore(MODIFIED_SCORE);
+        TraceAppEntity linkAppEntity = this.traceLinkVersionRepository.retrieveAppEntityFromVersionEntity(entity);
+        commitBuilder.withModifiedTrace(linkAppEntity);
+    }
 
-        // VP - Verify that no change is stored by system
-        assertThat(this.traceLinkVersionRepository.getProjectLinks(project)).hasSize(1);
+    @Override
+    protected void removeEntityInCommit(CommitBuilder commitBuilder, TraceLinkVersion entity) {
+        TraceAppEntity linkAppEntity = this.traceLinkVersionRepository.retrieveAppEntityFromVersionEntity(entity);
+        commitBuilder.withRemovedTrace(linkAppEntity);
+    }
 
-        // VP - Verify that retrieving link from target version.
-        ProjectAppEntity targetEntities = retrievalService.getProjectAtVersion(v1);
-        List<TraceAppEntity> targetTraces = targetEntities.getTraces();
-        assertThat(targetTraces).hasSize(1);
+    @Override
+    protected void verifyChangeToEntity(TraceLinkVersion entity) {
+        assertThat(entity.getScore()).isEqualTo(MODIFIED_SCORE);
+    }
+
+    @Override
+    protected void verifyNoChangeToEntity(TraceLinkVersion entity) {
+        assertThat(entity.getScore()).isEqualTo(ORIGINAL_SCORE);
     }
 }

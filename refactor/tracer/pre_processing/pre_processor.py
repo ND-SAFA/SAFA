@@ -96,5 +96,6 @@ class PreProcessor:
         for content in tokens:
             processed_txt = self._run_steps(self.ordered_before_steps, content)
             processed_word_list = self._run_steps(self.ordered_regular_steps, self._get_word_list(processed_txt))
-            processed_tokens.append(PreProcessor._reconstruct_content(processed_word_list))
+            if processed_word_list:
+                processed_tokens.append(PreProcessor._reconstruct_content(processed_word_list))
         return processed_tokens

@@ -1,25 +1,25 @@
 import os
 import uuid
+from os.path import dirname
 from typing import List, Dict, Tuple
 
 from config.constants import BLOCK_SIZE_DEFAULT
 from tracer.dataset.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tracer.dataset.pre_train_dataset import PreTrainDataset
 from tracer.pre_processing.pre_processing_option import PreProcessingOption
-from tracer.pre_processing.pre_processor import PreProcessor
 
 
 class MLMPreTrainDatasetCreator(AbstractDatasetCreator):
     DELIMINATOR = "\n"
     OUTPUT_FILE_EXT = ".txt"
 
-    def __init__(self, orig_data_path: str, training_data_dir: str,
+    def __init__(self, orig_data_path: str, training_data_dir: str = None,
                  pre_processing_params: Tuple[List[PreProcessingOption], Dict] = None,
                  block_size: int = BLOCK_SIZE_DEFAULT):
         """
         The masked learning model pretraining dataset creator
-        :param orig_data_path: path to the original pretraining
-        :param training_data_dir: path to the directory to save the training dataset file
+        :param orig_data_path: path to the original pretraining data
+        :param training_data_dir: path to the directory to save the training dataset file (defaults to same as orig_data_path)
         :param pre_processing_params: tuple containing the desired pre-processing steps and related params
         :param block_size: the block size for the LineByLineDataset
         """
@@ -28,19 +28,26 @@ class MLMPreTrainDatasetCreator(AbstractDatasetCreator):
         self.block_size = block_size
         self.id = str(uuid.uuid4())
         training_dataset_filename = self.id + self.OUTPUT_FILE_EXT
+        training_data_dir = training_data_dir if training_data_dir else dirname(orig_data_path)
         self.training_dataset_file = os.path.join(training_data_dir, training_dataset_filename)
 
     def create(self) -> PreTrainDataset:
-        dataset_file = self._create_training_datafile(self.orig_data_path)
+        """
+        Creates the pretrain dataset
+        :return: the dataset
+        """
+        files = self._get_file_list(self.orig_data_path)
+        training_examples = self._read_data_files(files)
+        dataset_file = self._write_training_examples(training_examples)
         return PreTrainDataset(dataset_file, block_size=self.block_size)
 
-    def _create_training_datafile(self, data_path: str) -> str:
+    @staticmethod
+    def _get_file_list(data_path: str) -> List[str]:
         """
-        Reads text files in given data_path and returns a temporary file containing collection.
-        :param data_path: Path to txt file or folder containing txt files.
-        :return: Path to temporary file containing formatted training examples.
+        Gets the list of files to use for the training
+        :param data_path: path to the original pretraining
+        :return: a list of files
         """
-
         if os.path.isfile(data_path):
             data_path, filename = os.path.split(data_path)
             files = [filename]
@@ -48,33 +55,27 @@ class MLMPreTrainDatasetCreator(AbstractDatasetCreator):
             files = os.listdir(data_path)
         else:
             raise Exception("Unable to read pretraining data file path " + data_path)
+        return files
 
-        training_examples = self._read_data_files(data_path, files)
-
-        return self._write_training_examples(training_examples)
-
-    def _read_data_files(self, data_path: str, files: List[str]) -> List[str]:
+    def _read_data_files(self, files: List[str]) -> List[str]:
         """
         Reads the data files' content and pre-processes the text
-        :param data_path: the path to the data files
         :param files: list of file names
         :return: a list of all files' content (training examples) split by new line
         """
         training_examples = []
         for file_name in files:
-            if file_name[0] == ".":
-                continue
-            file_path = os.path.join(data_path, file_name)
-            training_examples.extend(self._read_data_file(file_path))
+            if file_name[0] != ".":
+                training_examples.extend(self._read_data_file(file_name))
         return training_examples
 
-    def _read_data_file(self, file_path: str) -> List[str]:
+    def _read_data_file(self, file_name: str) -> List[str]:
         """
         Reads the data file content and pre-processes the text
-        :param file_path: the path to the file
+        :param file_name: the name of the file
         :return: a list of file content (training examples) split by new line
         """
-        with open(file_path) as data_file:
+        with open(os.path.join(self.orig_data_path, file_name)) as data_file:
             file_content = data_file.read()
         return self._process_tokens(file_content.split(self.DELIMINATOR))
 

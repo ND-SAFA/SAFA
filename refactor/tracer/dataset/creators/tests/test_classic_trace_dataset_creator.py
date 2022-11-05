@@ -1,8 +1,9 @@
-from test.base_test import BaseTest
+
+from test.base_trace_test import BaseTraceTest
 from tracer.dataset.creators.classic_trace_dataset_creator import ClassicTraceDatasetCreator
 
 
-class TestClassicTraceDatasetCreator(BaseTest):
+class TestClassicTraceDatasetCreator(BaseTraceTest):
 
     def test_create(self):
         dataset_creator = self.get_classic_trace_dataset_creator()
@@ -40,5 +41,3 @@ class TestClassicTraceDatasetCreator(BaseTest):
         return ClassicTraceDatasetCreator(source_layers=self.SOURCE_LAYERS, target_layers=self.TARGET_LAYERS,
                                           true_links=self.POS_LINKS, pre_processing_params=self.PRE_PROCESSING_PARAMS,
                                           use_linked_targets_only=use_linked_targets_only)
-
-

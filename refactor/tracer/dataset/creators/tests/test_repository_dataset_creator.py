@@ -1,11 +1,11 @@
 import os
 
-from test.base_test import BaseTest
+from test.base_trace_test import BaseTraceTest
 from test.config.paths import TEST_DATA_DIR
 from tracer.dataset.creators.repository_dataset_creator import RepositoryKeys, RepositoryDatasetCreator
 
 
-class TestRepositoryDatasetCreator(BaseTest):
+class TestRepositoryDatasetCreator(BaseTraceTest):
     TRACE_FILES_2_ARTIFACTS = {"commit2issue.csv": ("commit.csv", "issue.csv")}
     KEYS = RepositoryKeys(trace_files_2_artifacts=TRACE_FILES_2_ARTIFACTS)
     REPO_DIR = os.path.join(TEST_DATA_DIR, "repo")

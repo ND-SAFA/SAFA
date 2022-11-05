@@ -26,8 +26,7 @@ class TestMLMPreTrainJob(BaseTest):
         print(json_str)
 
     def get_job(self):
-        params = self.get_test_params(include_trace_params=False, include_pre_processing=True)
-        params.pop("base_model")
+        params = self.get_test_params(include_pre_processing=True, include_base_model=False)
         return MLMPreTrainJob(orig_data_path=self.PRETRAIN_DIR,
                               training_data_dir=TEST_OUTPUT_DIR,
                               **params)

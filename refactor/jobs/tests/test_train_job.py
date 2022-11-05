@@ -4,7 +4,7 @@ from unittest.mock import patch
 from api.responses.base_response import BaseResponse
 from jobs.job_status import Status
 from jobs.train_job import TrainJob
-from test.base_test import BaseTest
+from test.base_trace_test import BaseTraceTest
 from test.config.paths import TEST_OUTPUT_DIR
 from tracer.dataset.dataset_role import DatasetRole
 from tracer.models.model_generator import ModelGenerator
@@ -12,12 +12,13 @@ from tracer.train.trace_trainer import TraceTrainer
 import json
 import numpy as np
 
-class TestTrainJob(BaseTest):
+
+class TestTrainJob(BaseTraceTest):
     TEST_OUTPUT = {'global_step': 3, 'training_loss': 0.6927204132080078,
                    'metrics': {'train_runtime': 0.1516, 'train_samples_per_second': 79.13,
                                'train_steps_per_second': 19.782, 'train_loss': 0.6927204132080078, 'epoch': 3.0},
                    'status': 0}
-    TEST_PARAMS = BaseTest.get_test_params(dataset_role=DatasetRole.TRAIN, include_trace_params=True, include_links=True)
+    TEST_PARAMS = BaseTraceTest.get_test_params_with_dataset(dataset_role=DatasetRole.TRAIN, include_links=True)
 
     @patch.object(TraceTrainer, "save_model")
     @patch.object(ModelGenerator, '_ModelGenerator__load_model')
@@ -91,5 +92,6 @@ class TestTrainJob(BaseTest):
         self.assertIn(BaseResponse.STATUS, output_dict)
         self.assertEquals(output_dict[BaseResponse.STATUS], Status.FAILURE)
 
-    def get_expected_output_path(self, train_job_id):
+    @staticmethod
+    def get_expected_output_path(train_job_id):
         return TEST_OUTPUT_DIR + "/" + str(train_job_id)

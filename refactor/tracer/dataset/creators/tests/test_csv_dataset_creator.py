@@ -1,11 +1,11 @@
 import os
 
-from test.base_test import BaseTest
+from test.base_trace_test import BaseTraceTest
 from test.config.paths import TEST_DATA_DIR
 from tracer.dataset.creators.csv_dataset_creator import CSVDatasetCreator
 
 
-class TestCSVDatasetCreator(BaseTest):
+class TestCSVDatasetCreator(BaseTraceTest):
     TEST_DATA_FILE = "test_csv_data.csv"
     CSV_DATA_DIR = os.path.join(TEST_DATA_DIR, "csv")
 

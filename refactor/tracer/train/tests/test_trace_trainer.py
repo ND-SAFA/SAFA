@@ -5,7 +5,7 @@ import mock
 from torch.utils.data.distributed import DistributedSampler
 from torch.utils.data.sampler import RandomSampler
 
-from test.base_test import BaseTest
+from test.base_trace_test import BaseTraceTest
 from tracer.dataset.creators.classic_trace_dataset_creator import ClassicTraceDatasetCreator
 from tracer.models.base_models.supported_base_model import SupportedBaseModel
 from tracer.models.model_generator import ModelGenerator
@@ -13,10 +13,10 @@ from tracer.train.trace_args import TraceArgs
 from tracer.train.trace_trainer import TraceTrainer
 
 
-class TestTraceTrainer(BaseTest):
+class TestTraceTrainer(BaseTraceTest):
     VALIDATION_PERCENTAGE = 0.3
     EXPECTED_VALIDATION_SIZE = 3
-    EXPECTED_PREDICTION_SIZE = len(BaseTest.TARGET_LAYERS) * len(BaseTest.SOURCE_LAYERS)
+    EXPECTED_PREDICTION_SIZE = len(BaseTraceTest.TARGET_LAYERS) * len(BaseTraceTest.SOURCE_LAYERS)
     TEST_METRIC_NAMES = ["accuracy", "map_at_k"]
 
     def test_perform_training(self):
@@ -30,7 +30,7 @@ class TestTraceTrainer(BaseTest):
     def test_perform_prediction(self, eval_mock: mock.MagicMock):
         test_trace_trainer = self.get_test_trace_trainer()
         output = test_trace_trainer.perform_prediction(self.get_dataset(include_links=False))
-        self.assert_output_matches_expected(output)
+        self.assert_prediction_output_matches_expected(output)
         self.assertFalse(eval_mock.called)
 
     def test_perform_prediction_with_metrics(self):

@@ -1,11 +1,11 @@
 import os
 
-from test.base_test import BaseTest
+from test.base_trace_test import BaseTraceTest
 from test.config.paths import TEST_DATA_DIR
 from tracer.dataset.creators.safa_dataset_creator import SafaDatasetCreator, SafaKeys
 
 
-class TestSafaDatasetCreator(BaseTest):
+class TestSafaDatasetCreator(BaseTraceTest):
     TRACE_FILES_2_ARTIFACTS = {"Layer1Source2Target.json": ("Layer1Source.json", "Layer1Target.json"),
                                "Layer2Source2Target.json": ("Layer2Source.json", "Layer2Target.json"),
                                }

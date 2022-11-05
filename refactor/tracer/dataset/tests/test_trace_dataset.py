@@ -1,7 +1,7 @@
 from unittest import mock
 from unittest.mock import patch
 
-from test.base_test import BaseTest
+from test.base_trace_test import BaseTraceTest
 from tracer.dataset.data_key import DataKey
 from tracer.dataset.trace_dataset import TraceDataset
 from tracer.models.model_generator import ModelGenerator
@@ -14,10 +14,10 @@ def fake_method(text, text_pair=None, return_token_type_ids=None, add_special_to
     return {"input_ids": FEATURE_VALUE.format(text, text_pair) if text_pair else text}
 
 
-class TestTraceDataset(BaseTest):
+class TestTraceDataset(BaseTraceTest):
     VAlIDATION_PERCENTAGE = 0.3
-    EXPECTED_VAL_SIZE_NEG_LINKS = round((len(BaseTest.ALL_TEST_LINKS) - len(BaseTest.POS_LINKS)) * VAlIDATION_PERCENTAGE)
-    EXPECTED_VAL_SIZE_POS_LINKS = round(len(BaseTest.POS_LINKS) * VAlIDATION_PERCENTAGE)
+    EXPECTED_VAL_SIZE_NEG_LINKS = round((len(BaseTraceTest.ALL_TEST_LINKS) - len(BaseTraceTest.POS_LINKS)) * VAlIDATION_PERCENTAGE)
+    EXPECTED_VAL_SIZE_POS_LINKS = round(len(BaseTraceTest.POS_LINKS) * VAlIDATION_PERCENTAGE)
     TEST_FEATURE = {"irrelevant_key1": "k",
                     "input_ids": "a",
                     "token_type_ids": "l",

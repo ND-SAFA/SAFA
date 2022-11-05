@@ -10,7 +10,7 @@ from test.config.paths import TEST_OUTPUT_DIR
 class TestDeleteModelJob(BaseTest):
     DIR2DELETE = "dir2delete"
     MODEL_DIR = os.path.join(TEST_OUTPUT_DIR, DIR2DELETE)
-    TEST_PARAMS = BaseTest.get_test_params(include_trace_params=False)
+    TEST_PARAMS = BaseTest.get_test_params()
 
     def test_run_dir_exists(self):
         self.make_test_output_dir()
@@ -36,4 +36,3 @@ class TestDeleteModelJob(BaseTest):
 
     def get_test_model_job(self):
         return DeleteModelJob(model_path=self.MODEL_DIR, output_dir=TEST_OUTPUT_DIR)
-

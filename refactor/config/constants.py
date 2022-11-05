@@ -2,7 +2,9 @@ import os
 from os.path import abspath, dirname
 
 import math
+from dotenv import load_dotenv
 
+load_dotenv()
 # -------------- JOB ARGS --------------
 SAVE_OUTPUT_DEFAULT = True
 ADD_MOUNT_DIRECTORY_TO_OUTPUT_DEFAULT = True

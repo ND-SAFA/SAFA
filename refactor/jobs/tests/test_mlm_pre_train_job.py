@@ -1,6 +1,8 @@
 import os
 from unittest.mock import patch
 
+from transformers import AutoModelForMaskedLM
+
 from jobs.mlm_pre_train_job import MLMPreTrainJob
 from test.base_test import BaseTest
 from test.config.paths import TEST_DATA_DIR, TEST_OUTPUT_DIR
@@ -13,7 +15,7 @@ class TestMLMPreTrainJob(BaseTest):
     @patch.object(ModelGenerator, "get_tokenizer")
     @patch.object(ModelGenerator, "get_model")
     def test_run(self, get_model_mock, get_tokenizer_mock):
-        get_model_mock.return_value = self.get_test_model()
+        get_model_mock.return_value = AutoModelForMaskedLM.from_pretrained("bert-base-uncased")
         get_tokenizer_mock.return_value = self.get_test_tokenizer()
         job = self.get_job()
         job.run()

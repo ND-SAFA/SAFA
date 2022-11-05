@@ -3,17 +3,16 @@ import shutil
 from copy import deepcopy
 
 import mock
+import numpy as np
 from django.test import TestCase
 from transformers.models.bert.configuration_bert import BertConfig
 from transformers.models.bert.tokenization_bert import BertTokenizer
 from transformers.trainer_utils import PredictionOutput
-import numpy as np
 
 from api.responses.prediction_response import PredictionResponse
-from config.constants import DELETE_TEST_OUTPUT, VALIDATION_PERCENTAGE_DEFAULT
+from config.constants import DELETE_TEST_OUTPUT
 from server.storage.safa_storage import SafaStorage
 from test.config.paths import TEST_OUTPUT_DIR, TEST_VOCAB_FILE
-from tracer.dataset.creators.classic_trace_dataset_creator import ClassicTraceDatasetCreator
 from tracer.dataset.creators.supported_dataset_creator import SupportedDatasetCreator
 from tracer.dataset.data_objects.artifact import Artifact
 from tracer.dataset.data_objects.trace_link import TraceLink
@@ -96,7 +95,8 @@ class BaseTest(TestCase):
     PRE_PROCESSING_PARAMS = ([PreProcessingOption.REPLACE_WORDS,
                               PreProcessingOption.REMOVE_UNWANTED_CHARS,
                               PreProcessingOption.SEPARATE_JOINED_WORDS,
-                              PreProcessingOption.FILTER_MIN_LENGTH], {"word_replace_mappings": _TEST_REPLACE_WORD_MAPPINGS})
+                              PreProcessingOption.FILTER_MIN_LENGTH],
+                             {"word_replace_mappings": _TEST_REPLACE_WORD_MAPPINGS})
 
     @staticmethod
     def create_dataset_map(dataset_role: DatasetRole, include_links=True):
@@ -107,6 +107,7 @@ class BaseTest(TestCase):
                 }
 
     def setup(self):
+        
         if not os.path.isdir(TEST_OUTPUT_DIR):
             SafaStorage.create_dir(TEST_OUTPUT_DIR)
 
@@ -203,7 +204,8 @@ class BaseTest(TestCase):
         metrics = self.TEST_PREDICTION_RESPONSE_OUTPUT[PredictionResponse.METRICS]
         for metric in metrics.keys():
             if metric not in output[PredictionResponse.METRICS]:
-                self.fail(self._KEY_ERROR_MESSAGE.format(PredictionResponse.METRICS, output[PredictionResponse.METRICS]))
+                self.fail(
+                    self._KEY_ERROR_MESSAGE.format(PredictionResponse.METRICS, output[PredictionResponse.METRICS]))
 
     def assert_val_equals(self, val: any, expected_val: any, threshold: int = 0.05) -> bool:
         if isinstance(val, float):

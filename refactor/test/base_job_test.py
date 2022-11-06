@@ -9,6 +9,7 @@ from jobs.abstract_job import AbstractJob
 from jobs.job_status import Status
 from test.base_trace_test import BaseTraceTest
 from test.config.paths import TEST_OUTPUT_DIR
+from tracer.dataset.creators.supported_dataset_creator import SupportedDatasetCreator
 from tracer.dataset.dataset_role import DatasetRole
 from tracer.models.model_generator import ModelGenerator
 
@@ -16,6 +17,12 @@ from tracer.models.model_generator import ModelGenerator
 class BaseJobTest(BaseTraceTest, ABC):
     _JOB_PARAMS_BASE = {**BaseTraceTest.MODEL_GENERATOR_PARAMS,
                         "output_dir": TEST_OUTPUT_DIR}
+    _DATASET_PARAMS = {"source_layers": BaseTraceTest.SOURCE_LAYERS,
+                       "target_layers": BaseTraceTest.TARGET_LAYERS,
+                       "true_links": BaseTraceTest.POS_LINKS}
+    _TRACE_ARGS_PARAMS = {
+        "resample_rate": 3
+    }
 
     @patch.object(ModelGenerator, '_ModelGenerator__load_model')
     @patch.object(ModelGenerator, 'get_tokenizer')
@@ -36,7 +43,7 @@ class BaseJobTest(BaseTraceTest, ABC):
         self.assert_output_on_failure(self._load_job_output(job))
 
     @staticmethod
-    def get_test_params(as_api=False, include_pre_processing=False, include_base_model=True):
+    def get_test_params(as_api=False, include_pre_processing=True, include_base_model=True):
         test_args = deepcopy(BaseJobTest._JOB_PARAMS_BASE)
         if not include_base_model:
             test_args.pop("base_model")
@@ -61,11 +68,18 @@ class BaseJobTest(BaseTraceTest, ABC):
         return parsed_kwargs
 
     @staticmethod
-    def get_test_params_with_dataset(dataset_role=DatasetRole.TRAIN, include_links=True, as_api=False, include_pre_processing=False,
-                                     include_base_model=True):
+    def create_dataset_map(dataset_role: DatasetRole, include_links=True):
+        dataset_params = deepcopy(BaseJobTest._DATASET_PARAMS)
+        if not include_links:
+            dataset_params.pop("true_links")
+        return {dataset_role: (SupportedDatasetCreator.CLASSIC_TRACE, dataset_params)}
+
+    def get_test_params_for_trace(self, dataset_role=DatasetRole.TRAIN, include_links=True, as_api=False, include_pre_processing=False,
+                                  include_base_model=True):
         test_args = BaseJobTest.get_test_params(as_api=as_api, include_pre_processing=include_pre_processing,
                                                 include_base_model=include_base_model)
-        test_args["datasets_map"] = BaseJobTest.create_dataset_map(dataset_role, include_links=include_links)
+        test_args["datasets_map"] = self.create_dataset_map(dataset_role, include_links=include_links)
+        test_args["trace_args_params"] = BaseJobTest._TRACE_ARGS_PARAMS
         return test_args
 
     @patch.object(ModelGenerator, "get_tokenizer")

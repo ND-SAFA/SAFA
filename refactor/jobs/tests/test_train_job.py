@@ -1,14 +1,18 @@
+import os
 from unittest import mock
 from unittest.mock import patch
 
 from jobs.train_job import TrainJob
 from test.base_job_test import BaseJobTest
+from test.config.paths import TEST_DATA_DIR
+from tracer.dataset.creators.supported_dataset_creator import SupportedDatasetCreator
 from tracer.dataset.dataset_role import DatasetRole
 from tracer.train.trace_trainer import TraceTrainer
 
 
 class TestTrainJob(BaseJobTest):
-    TEST_PARAMS = BaseJobTest.get_test_params_with_dataset(dataset_role=DatasetRole.TRAIN, include_links=True)
+    CSV_DATA_DIR = os.path.join(TEST_DATA_DIR, "csv")
+    CSV_DATA_FILE = os.path.join(CSV_DATA_DIR, "test_csv_data.csv")
 
     @patch.object(TraceTrainer, "save_model")
     def test_run_success(self, save_model_mock: mock.MagicMock):
@@ -17,8 +21,23 @@ class TestTrainJob(BaseJobTest):
     def test_run_failure(self):
         self._test_run_failure()
 
+    def test_split_train_dataset(self):
+        job = self._get_job(split_train_dataset=True)
+        self.assertTrue(job.eval_dataset is not None)
+
+    @staticmethod
+    def create_dataset_map(dataset_role: DatasetRole, include_links=True):
+        train_dataset = BaseJobTest.create_dataset_map(DatasetRole.TRAIN)
+        test_dataset = {DatasetRole.EVAL: (SupportedDatasetCreator.CSV, {"data_file_path": TestTrainJob.CSV_DATA_FILE})}
+        return {**train_dataset, **test_dataset}
+
     def _assert_success(self, output_dict: dict):
         self.assert_training_output_matches_expected(output_dict)
 
-    def _get_job(self):
-        return TrainJob(**self.TEST_PARAMS, split_train_dataset=True)
+    def _get_job(self, split_train_dataset=False) -> TrainJob:
+        test_params = self.get_test_params_for_trace(dataset_role=DatasetRole.TRAIN, include_links=True)
+        if split_train_dataset:
+            test_params["datasets_map"].pop(DatasetRole.EVAL)
+        job = TrainJob(**test_params, split_train_dataset=split_train_dataset)
+        self.assertEquals(job.train_args.resample_rate, 3)
+        return job

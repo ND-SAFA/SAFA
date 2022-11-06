@@ -9,7 +9,6 @@ from tracer.dataset.dataset_role import DatasetRole
 from tracer.dataset.trace_dataset import TraceDataset
 from tracer.models.base_models.supported_base_model import SupportedBaseModel
 from tracer.pre_processing.pre_processing_option import PreProcessingOption
-from tracer.pre_processing.pre_processor import PreProcessor
 from tracer.train.trace_args import TraceArgs
 from tracer.train.trace_trainer import TraceTrainer
 
@@ -26,7 +25,7 @@ class AbstractTraceJob(AbstractJob, ABC):
                  save_job_output: bool = SAVE_OUTPUT_DEFAULT):
         """
         The base job class for tracing jobs
-       :param base_model: supported base model name
+        :param base_model: supported base model name
         :param model_path: where the pretrained model will be loaded from
         :param output_dir: where the model will be saved to
         :param datasets_map: dictionary mapping dataset role (e.g. train/eval) to the desired dataset creator and its params

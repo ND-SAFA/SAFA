@@ -5,7 +5,7 @@ from test.base_job_test import BaseJobTest
 
 
 class TestCreateModelJob(BaseJobTest):
-    TEST_PARAMS = BaseJobTest.get_test_params()
+    TEST_PARAMS = BaseJobTest.get_test_params(include_pre_processing=False)
 
     def test_run_success(self):
         self._test_run_success()

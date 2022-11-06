@@ -8,7 +8,6 @@ from test.config.paths import TEST_OUTPUT_DIR
 class TestDeleteModelJob(BaseJobTest):
     DIR2DELETE = "dir2delete"
     MODEL_DIR = os.path.join(TEST_OUTPUT_DIR, DIR2DELETE)
-    TEST_PARAMS = BaseJobTest.get_test_params()
 
     def test_run_success(self):
         self._test_run_success()

@@ -3,7 +3,6 @@ from typing import List, Tuple, Dict
 
 import pandas as pd
 
-from config.constants import USE_LINKED_TARGETS_ONLY_DEFAULT
 from tracer.dataset.data_objects.artifact import Artifact
 from tracer.dataset.creators.abstract_trace_dataset_creator import AbstractTraceDatasetCreator
 from tracer.dataset.trace_dataset import TraceDataset

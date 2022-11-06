@@ -1,11 +1,7 @@
-from copy import deepcopy
-
 from api.responses.prediction_response import PredictionResponse
 from test.base_test import BaseTest
-from tracer.dataset.creators.supported_dataset_creator import SupportedDatasetCreator
 from tracer.dataset.data_objects.artifact import Artifact
 from tracer.dataset.data_objects.trace_link import TraceLink
-from tracer.dataset.dataset_role import DatasetRole
 from transformers.trainer_utils import PredictionOutput
 import numpy as np
 
@@ -49,25 +45,15 @@ class BaseTraceTest(BaseTest):
                                                  label_ids=_EXAMPLE_LABEL_IDS,
                                                  metrics=_EXAMPLE_METRIC_RESULTS)
     EXAMPLE_TRAINING_OUTPUT = {'global_step': 3, 'training_loss': 0.6927204132080078,
-                            'metrics': {'train_runtime': 0.1516, 'train_samples_per_second': 79.13,
-                                        'train_steps_per_second': 19.782, 'train_loss': 0.6927204132080078, 'epoch': 3.0},
-                            'status': 0}
+                               'metrics': {'train_runtime': 0.1516, 'train_samples_per_second': 79.13,
+                                           'train_steps_per_second': 19.782, 'train_loss': 0.6927204132080078, 'epoch': 3.0},
+                               'status': 0}
     _EXAMPLE_PREDICTION_LINKS = {'source': 0, 'target': 1, 'score': 0.5}
     _EXAMPLE_PREDICTION_METRICS = {'test_loss': 0.6948729753494263, 'test_runtime': 0.0749,
                                    'test_samples_per_second': 240.328, 'test_steps_per_second': 40.055}
-    _DATASET_PARAMS = {"source_layers": SOURCE_LAYERS,
-                       "target_layers": TARGET_LAYERS,
-                       "true_links": POS_LINKS}
     _KEY_ERROR_MESSAGE = "{} not in {}"
     _VAL_ERROR_MESSAGE = "{} with value {} does not equal expected value of {} {}"
     _LEN_ERROR = "Length of {} does not match expected"
-
-    @staticmethod
-    def create_dataset_map(dataset_role: DatasetRole, include_links=True):
-        dataset_params = deepcopy(BaseTraceTest._DATASET_PARAMS)
-        if not include_links:
-            dataset_params.pop("true_links")
-        return {dataset_role: (SupportedDatasetCreator.CLASSIC_TRACE, dataset_params)}
 
     def assert_prediction_output_matches_expected(self, output: dict, threshold: int = 0.05):
         if PredictionResponse.PREDICTIONS not in output:

@@ -40,14 +40,14 @@ class TestTraceTrainer(BaseTraceTest):
             self.assertIn(metric, output["metrics"])
 
     def test_output_to_dict(self):
-        output_dict = TraceTrainer.output_to_dict(self.TEST_PREDICTION_OUTPUT)
+        output_dict = TraceTrainer.output_to_dict(self.EXAMPLE_PREDICTION_OUTPUT)
         self.assertIsInstance(output_dict, dict)
         self.assertIn("predictions", output_dict)
         self.assertIn("label_ids", output_dict)
         self.assertIn("metrics", output_dict)
 
     def test_eval(self):
-        output = deepcopy(self.TEST_PREDICTION_OUTPUT)
+        output = deepcopy(self.EXAMPLE_PREDICTION_OUTPUT)
         TraceTrainer._eval(output.predictions, output.label_ids, self.TEST_METRIC_NAMES)
         for metric in self.TEST_METRIC_NAMES:
             self.assertIn(metric, output.metrics)

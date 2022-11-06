@@ -45,9 +45,13 @@ class BaseTraceTest(BaseTest):
                                      [0.50035876, 0.49964124],
                                      [0.50035876, 0.49964124]])
     _EXAMPLE_LABEL_IDS = np.array([1, 0, 0, 1, 0, 0, 0, 1, 0])
-    TEST_PREDICTION_OUTPUT = PredictionOutput(predictions=_EXAMPLE_PREDICTIONS,
-                                              label_ids=_EXAMPLE_LABEL_IDS,
-                                              metrics=_EXAMPLE_METRIC_RESULTS)
+    EXAMPLE_PREDICTION_OUTPUT = PredictionOutput(predictions=_EXAMPLE_PREDICTIONS,
+                                                 label_ids=_EXAMPLE_LABEL_IDS,
+                                                 metrics=_EXAMPLE_METRIC_RESULTS)
+    EXAMPLE_TRAINING_OUTPUT = {'global_step': 3, 'training_loss': 0.6927204132080078,
+                            'metrics': {'train_runtime': 0.1516, 'train_samples_per_second': 79.13,
+                                        'train_steps_per_second': 19.782, 'train_loss': 0.6927204132080078, 'epoch': 3.0},
+                            'status': 0}
     _EXAMPLE_PREDICTION_LINKS = {'source': 0, 'target': 1, 'score': 0.5}
     _EXAMPLE_PREDICTION_METRICS = {'test_loss': 0.6948729753494263, 'test_runtime': 0.0749,
                                    'test_samples_per_second': 240.328, 'test_steps_per_second': 40.055}
@@ -57,14 +61,6 @@ class BaseTraceTest(BaseTest):
     _KEY_ERROR_MESSAGE = "{} not in {}"
     _VAL_ERROR_MESSAGE = "{} with value {} does not equal expected value of {} {}"
     _LEN_ERROR = "Length of {} does not match expected"
-
-    @staticmethod
-    def get_test_params_with_dataset(dataset_role=DatasetRole.TRAIN, include_links=True, as_api=False, include_pre_processing=False,
-                                     include_base_model=True):
-        test_args = BaseTraceTest.get_test_params(as_api=as_api, include_pre_processing=include_pre_processing,
-                                                  include_base_model=include_base_model)
-        test_args["datasets_map"] = BaseTraceTest.create_dataset_map(dataset_role, include_links=include_links)
-        return test_args
 
     @staticmethod
     def create_dataset_map(dataset_role: DatasetRole, include_links=True):
@@ -100,6 +96,10 @@ class BaseTraceTest(BaseTest):
             if metric not in output[PredictionResponse.METRICS]:
                 self.fail(
                     self._KEY_ERROR_MESSAGE.format(PredictionResponse.METRICS, output[PredictionResponse.METRICS]))
+
+    def assert_training_output_matches_expected(self, output_dict: dict):
+        for key, value in self.EXAMPLE_TRAINING_OUTPUT.items():
+            self.assertIn(key, output_dict)
 
     def get_link_ids(self, links_list):
         return list(self.get_links(links_list).keys())

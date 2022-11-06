@@ -1,4 +1,3 @@
-
 from test.base_trace_test import BaseTraceTest
 from tracer.dataset.creators.classic_trace_dataset_creator import ClassicTraceDatasetCreator
 
@@ -36,6 +35,15 @@ class TestClassicTraceDatasetCreator(BaseTraceTest):
                                                         self.get_test_artifacts(self.TARGET_LAYERS[0]),
                                                         pos_link_ids)
         self.assertEquals(len(links), len(self.SOURCE_LAYERS[0]) * len(self.TARGET_LAYERS[0]))
+
+    def test_create_links_for_layer_linked_targets_only(self):
+        dataset_creator = self.get_classic_trace_dataset_creator(use_linked_targets_only=True)
+        pos_link_ids = dataset_creator._get_pos_link_ids(self.POS_LINKS)
+        links = dataset_creator._create_links_for_layer(self.get_test_artifacts(self.SOURCE_LAYERS[0]),
+                                                        self.get_test_artifacts(self.TARGET_LAYERS[0]),
+                                                        pos_link_ids)
+        for link in links.values():
+            self.assertIn(link.target.id, self.LINKED_TARGETS)
 
     def get_classic_trace_dataset_creator(self, use_linked_targets_only: bool = False):
         return ClassicTraceDatasetCreator(source_layers=self.SOURCE_LAYERS, target_layers=self.TARGET_LAYERS,

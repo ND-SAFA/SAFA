@@ -4,7 +4,6 @@ from tracer.dataset.dataset_role import DatasetRole
 
 
 class TestPredictJob(BaseJobTest):
-    TEST_PARAMS = BaseJobTest.get_test_params_for_trace(dataset_role=DatasetRole.EVAL, include_links=False)
 
     def test_run_success(self):
         self._test_run_success()
@@ -13,7 +12,8 @@ class TestPredictJob(BaseJobTest):
         self._test_run_failure()
 
     def _get_job(self):
-        return PredictJob(**self.TEST_PARAMS)
+        test_params = self.get_test_params_for_trace(dataset_role=DatasetRole.EVAL, include_links=False)
+        return PredictJob(**test_params)
 
     def _assert_success(self, output_dict: dict):
         self.assert_prediction_output_matches_expected(output_dict)

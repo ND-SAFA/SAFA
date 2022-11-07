@@ -11,7 +11,9 @@
       <v-tab-item key="1">
         <model-table />
       </v-tab-item>
-      <v-tab-item key="2"> </v-tab-item>
+      <v-tab-item key="2">
+        <trace-link-generator :is-open="tab === 1" />
+      </v-tab-item>
       <v-tab-item key="3">
         <trace-link-table />
       </v-tab-item>
@@ -23,7 +25,7 @@
 import Vue from "vue";
 import { tracePredictionTabOptions } from "@/util";
 import { TabList, Typography } from "@/components/common";
-import { TraceLinkTable } from "@/components/trace-link";
+import { TraceLinkTable, TraceLinkGenerator } from "@/components/trace-link";
 import ModelTable from "./ModelTable.vue";
 
 /**
@@ -31,7 +33,13 @@ import ModelTable from "./ModelTable.vue";
  */
 export default Vue.extend({
   name: "TracePredictionTabs",
-  components: { ModelTable, TraceLinkTable, TabList, Typography },
+  components: {
+    TraceLinkGenerator,
+    ModelTable,
+    TraceLinkTable,
+    TabList,
+    Typography,
+  },
   props: {},
   data() {
     return {

@@ -1,36 +1,38 @@
 <template>
-  <generic-selector
-    is-open
-    :headers="headers"
-    :items="members"
-    :has-delete="isAdmin"
-    :has-edit="isAdmin"
-    :has-select="false"
-    :is-loading="isLoading"
-    item-key="email"
-    class="mt-5"
-    @item:add="handleAddMember"
-    @item:edit="handleEditMember"
-    @item:delete="handleDeleteMember"
-    @refresh="handleRetrieveMembers"
-  >
-    <template v-slot:addItemDialogue>
-      <settings-member-information-modal
-        :is-open="isNewOpen"
-        @cancel="handleConfirmAdd"
-        @confirm="handleConfirmAdd"
-      />
-    </template>
-    <template v-slot:editItemDialogue>
-      <settings-member-information-modal
-        :is-open="isEditOpen"
-        :clear-on-close="false"
-        :member="memberToEdit"
-        @cancel="handleConfirmEdit"
-        @confirm="handleConfirmEdit"
-      />
-    </template>
-  </generic-selector>
+  <v-container>
+    <generic-selector
+      is-open
+      :headers="headers"
+      :items="members"
+      :has-delete="isAdmin"
+      :has-edit="isAdmin"
+      :has-select="false"
+      :is-loading="isLoading"
+      item-key="email"
+      class="mt-5"
+      @item:add="handleAddMember"
+      @item:edit="handleEditMember"
+      @item:delete="handleDeleteMember"
+      @refresh="handleRetrieveMembers"
+    >
+      <template v-slot:addItemDialogue>
+        <settings-member-information-modal
+          :is-open="isNewOpen"
+          @cancel="handleConfirmAdd"
+          @confirm="handleConfirmAdd"
+        />
+      </template>
+      <template v-slot:editItemDialogue>
+        <settings-member-information-modal
+          :is-open="isEditOpen"
+          :clear-on-close="false"
+          :member="memberToEdit"
+          @cancel="handleConfirmEdit"
+          @confirm="handleConfirmEdit"
+        />
+      </template>
+    </generic-selector>
+  </v-container>
 </template>
 
 <script lang="ts">

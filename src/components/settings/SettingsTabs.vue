@@ -25,7 +25,7 @@ import { TabList } from "@/components/common";
 import { UploadNewVersion } from "@/components/project/version";
 import SettingsHeader from "./SettingsHeader.vue";
 import SettingsOverview from "./SettingsOverview.vue";
-import SettingsMembers from "./SettingsMembers.vue";
+import { SettingsMembers } from "./members";
 import TypeOptions from "./TypeOptions.vue";
 
 /**

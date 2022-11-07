@@ -11,16 +11,7 @@
         data-cy="list-type-options"
       >
         <template v-slot:activator>
-          <v-tooltip bottom open-delay="300">
-            <template v-slot:activator="{ on, attrs }">
-              <div v-on="on" v-bind="attrs">
-                <typography :value="entry.label" ellipsis />
-              </div>
-            </template>
-            <span>
-              {{ entry.label }}
-            </span>
-          </v-tooltip>
+          <typography :value="entry.label" ellipsis />
         </template>
         <v-card outlined class="my-2">
           <v-container>

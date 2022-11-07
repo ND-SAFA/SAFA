@@ -1,42 +1,44 @@
 <template>
   <div>
-    <flex-box
-      full-width
-      y="4"
-      align="center"
+    <v-card
+      outlined
+      class="my-2 pa-2"
       v-for="(matrix, idx) in model"
       :key="idx"
     >
-      <flex-box column full-width>
-        <flex-box b="2">
-          <artifact-type-input
-            hide-details
-            v-model="matrix.source"
-            label="Source Type"
-            class="mr-2"
-            style="width: 50%"
-          />
-          <artifact-type-input
-            hide-details
-            v-model="matrix.target"
-            label="Target Type"
-            class="mr-2"
-            style="width: 50%"
+      <flex-box full-width align="center">
+        <flex-box column full-width>
+          <flex-box b="2">
+            <artifact-type-input
+              hide-details
+              v-model="matrix.source"
+              label="Source Type"
+              class="mr-2"
+              style="width: 50%"
+            />
+            <artifact-type-input
+              hide-details
+              v-model="matrix.target"
+              label="Target Type"
+              class="mr-2"
+              style="width: 50%"
+            />
+          </flex-box>
+          <typography
+            secondary
+            align="center"
+            :value="getMatrixDetails(matrix)"
           />
         </flex-box>
-        <typography
-          secondary
-          align="center"
-          :value="getMatrixDetails(matrix)"
+        <generic-icon-button
+          icon-id="mdi-close"
+          color="error"
+          tooltip="Remove trace matrix"
+          @click="handleRemoveMatrix(idx)"
         />
       </flex-box>
-      <generic-icon-button
-        icon-id="mdi-close"
-        color="error"
-        tooltip="Remove trace matrix"
-        @click="handleRemoveMatrix(idx)"
-      />
-    </flex-box>
+    </v-card>
+
     <flex-box justify="center">
       <v-btn text color="primary" @click="handleCreateMatrix">
         <v-icon>mdi-plus</v-icon>

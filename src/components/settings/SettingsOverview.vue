@@ -1,45 +1,49 @@
 <template>
-  <flex-box justify="space-between">
-    <div>
-      <typography el="h2" variant="subtitle" value="Project Data" />
-      <typography el="p" :value="subtitle" />
-      <typography el="h2" variant="subtitle" value="Description" />
-      <typography ep="p" :value="project.description" />
-    </div>
+  <v-container>
+    <flex-box justify="space-between">
+      <div>
+        <typography el="h2" variant="subtitle" value="Project Data" />
+        <v-divider class="mb-2" />
+        <typography el="p" :value="subtitle" />
+        <typography el="h2" variant="subtitle" value="Description" />
+        <v-divider class="mb-2" />
+        <typography ep="p" :value="project.description" />
+      </div>
 
-    <div>
-      <v-card outlined>
-        <v-container>
-          <v-btn text @click="handleDownload">
-            <v-icon class="mr-1">mdi-download</v-icon>
-            Download Files
-          </v-btn>
-          <br />
-          <v-btn text @click="handleEdit">
-            <v-icon class="mr-1">mdi-pencil</v-icon>
-            Edit Project
-          </v-btn>
-          <br />
-          <v-btn text color="error" @click="handleDelete">
-            <v-icon class="mr-1">mdi-delete</v-icon>
-            Delete Project
-          </v-btn>
-        </v-container>
-      </v-card>
-    </div>
+      <div>
+        <v-card outlined>
+          <v-container>
+            <v-btn text @click="handleDownload">
+              <v-icon class="mr-1">mdi-download</v-icon>
+              Download Files
+            </v-btn>
+            <br />
+            <v-btn text @click="handleEdit">
+              <v-icon class="mr-1">mdi-pencil</v-icon>
+              Edit Project
+            </v-btn>
+            <br />
+            <v-btn text color="error" @click="handleDelete">
+              <v-icon class="mr-1">mdi-delete</v-icon>
+              Delete Project
+            </v-btn>
+          </v-container>
+        </v-card>
+      </div>
 
-    <project-identifier-modal
-      :is-open="isEditOpen"
-      :is-loading="isLoading"
-      @close="isEditOpen = false"
-      @save="handleSave"
-    />
-    <confirm-project-delete
-      :is-open="isDeleteOpen"
-      @confirm="handleConfirmDeleteProject"
-      @cancel="isDeleteOpen = false"
-    />
-  </flex-box>
+      <project-identifier-modal
+        :is-open="isEditOpen"
+        :is-loading="isLoading"
+        @close="isEditOpen = false"
+        @save="handleSave"
+      />
+      <confirm-project-delete
+        :is-open="isDeleteOpen"
+        @confirm="handleConfirmDeleteProject"
+        @cancel="isDeleteOpen = false"
+      />
+    </flex-box>
+  </v-container>
 </template>
 
 <script lang="ts">

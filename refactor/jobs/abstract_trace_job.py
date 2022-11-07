@@ -1,7 +1,7 @@
 from abc import ABC
-from typing import Dict, Optional, Tuple, List
+from typing import Dict, List, Optional, Tuple
 
-from config.constants import SAVE_OUTPUT_DEFAULT, ADD_MOUNT_DIRECTORY_TO_OUTPUT_DEFAULT, VALIDATION_PERCENTAGE_DEFAULT
+from config.constants import ADD_MOUNT_DIRECTORY_TO_OUTPUT_DEFAULT, SAVE_OUTPUT_DEFAULT, VALIDATION_PERCENTAGE_DEFAULT
 from jobs.abstract_job import AbstractJob
 from server.storage.safa_storage import SafaStorage
 from tracer.dataset.creators.supported_dataset_creator import SupportedDatasetCreator
@@ -43,7 +43,7 @@ class AbstractTraceJob(AbstractJob, ABC):
         if self.train_dataset and split_train_dataset:
             self.train_dataset, self.eval_dataset = self.train_dataset.split(validation_percentage)
         self.train_args = TraceArgs(output_dir, **(trace_args_params if trace_args_params else {}))
-        self.__trainer = None
+        self._trainer = None
 
     @staticmethod
     def _make_dataset(datasets_map: Dict[DatasetRole, Tuple[SupportedDatasetCreator, Dict]],
@@ -60,7 +60,8 @@ class AbstractTraceJob(AbstractJob, ABC):
         if dataset_creator_reqs:
             dataset_creator_class, dataset_creator_params = dataset_creator_reqs
             pre_processing_params = dataset_pre_processing_options.get(dataset_role)
-            dataset_creator = dataset_creator_class.value(pre_processing_params=pre_processing_params, **dataset_creator_params)
+            dataset_creator = dataset_creator_class.value(pre_processing_params=pre_processing_params,
+                                                          **dataset_creator_params)
             return dataset_creator.create()
 
     def get_trainer(self, **kwargs) -> TraceTrainer:
@@ -69,6 +70,7 @@ class AbstractTraceJob(AbstractJob, ABC):
         :param kwargs: any additional parameters for the trainer
         :return: the trainer
         """
-        if self.__trainer is None:
-            self.__trainer = TraceTrainer(args=self.train_args, model_generator=self.get_model_generator(), **kwargs)
-        return self.__trainer
+        if self._trainer is None:
+            self._trainer = TraceTrainer(args=self.train_args, model_generator=self.get_model_generator(),
+                                         **kwargs)
+        return self._trainer

@@ -1,3 +1,6 @@
+from typing import Dict, List, NamedTuple, Tuple, Union
+
+import numpy as np
 from datasets import load_metric
 from scipy.special import softmax
 from torch.utils.data import DataLoader
@@ -6,14 +9,12 @@ from torch.utils.data.sampler import RandomSampler
 from transformers.trainer import Trainer
 from transformers.trainer_pt_utils import get_tpu_sampler, is_torch_tpu_available
 
-from typing import Dict, List, NamedTuple, Tuple, Union
-
-import numpy as np
 from api.responses.prediction_response import PredictionResponse
+from common.override import overrides
+from tracer.dataset.trace_dataset import TraceDataset
+from tracer.metrics.supported_trace_metric import get_metric_name, get_metric_path
 from tracer.models.model_generator import ModelGenerator
 from tracer.train.trace_args import TraceArgs
-from tracer.dataset.trace_dataset import TraceDataset
-from tracer.metrics.supported_trace_metric import get_metric_path, get_metric_name
 
 
 class TraceTrainer(Trainer):
@@ -66,7 +67,8 @@ class TraceTrainer(Trainer):
         :param output: output from training or prediction
         :return: the output represented as a dictionary
         """
-        return {field: kwargs[field] if (field in kwargs and kwargs[field]) else getattr(output, field) for field in output._fields}
+        return {field: kwargs[field] if (field in kwargs and kwargs[field]) else getattr(output, field) for field in
+                output._fields}
 
     @staticmethod
     def _eval(preds: Union[np.ndarray, Tuple[np.ndarray]], label_ids: np.ndarray, metric_names: List) -> Dict:

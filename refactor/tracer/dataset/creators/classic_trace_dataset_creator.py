@@ -1,18 +1,18 @@
-from typing import Callable, Dict, List, Set, Tuple
+from typing import Dict, List, Set, Tuple
 
 from config.constants import USE_LINKED_TARGETS_ONLY_DEFAULT
-from tracer.dataset.data_objects.artifact import Artifact
 from tracer.dataset.creators.abstract_trace_dataset_creator import AbstractTraceDatasetCreator
-from tracer.dataset.trace_dataset import TraceDataset
+from tracer.dataset.data_objects.artifact import Artifact
 from tracer.dataset.data_objects.trace_link import TraceLink
+from tracer.dataset.trace_dataset import TraceDataset
 from tracer.pre_processing.pre_processing_option import PreProcessingOption
-from tracer.pre_processing.pre_processor import PreProcessor
 
 
 class ClassicTraceDatasetCreator(AbstractTraceDatasetCreator):
 
     def __init__(self, source_layers: List[Dict[str, str]], target_layers: List[Dict[str, str]],
-                 true_links: List[Tuple[str, str]] = None, pre_processing_params: Tuple[List[PreProcessingOption], Dict] = None,
+                 true_links: List[Tuple[str, str]] = None,
+                 pre_processing_params: Tuple[List[PreProcessingOption], Dict] = None,
                  use_linked_targets_only: bool = USE_LINKED_TARGETS_ONLY_DEFAULT):
         """
         Constructs dataset in classic trace format

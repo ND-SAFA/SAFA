@@ -6,28 +6,44 @@
     hide-overlay
     :value="drawerOpen"
     height="100%"
-    class="elevation-1"
   >
-    <v-container> </v-container>
+    <v-container>
+      <generic-icon-button
+        icon-id="mdi-close"
+        tooltip="Close panel"
+        @click="toggleOpen"
+      />
+    </v-container>
   </v-navigation-drawer>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
+import { appStore } from "@/hooks";
+import { GenericIconButton } from "@/components/common";
 
 /**
  * Renders content in a right side panel.
  */
 export default Vue.extend({
   name: "DetailsDrawer",
-  components: {},
-  data() {
-    return {
-      drawerOpen: false,
-    };
+  components: { GenericIconButton },
+  computed: {
+    /**
+     * @return Whether the details panel is open.
+     */
+    drawerOpen(): boolean {
+      return appStore.isDetailsPanelOpen;
+    },
   },
-  computed: {},
-  methods: {},
+  methods: {
+    /**
+     * Toggles whether the details panel is open.
+     */
+    toggleOpen(): void {
+      appStore.toggleDetailsPanel();
+    },
+  },
 });
 </script>
 

@@ -15,8 +15,8 @@ export type ArtifactTypeIcons = Record<string, string>;
  */
 export enum PanelType {
   appPanel,
-  left,
-  right,
+  detailsPanel,
+
   artifactCreator,
   errorDisplay,
   artifactBody,
@@ -44,8 +44,7 @@ export type GeneratorOpenState = boolean | "generate" | "train";
  */
 export interface PanelStateMap {
   [PanelType.appPanel]: boolean;
-  [PanelType.left]: boolean;
-  [PanelType.right]: boolean;
+  [PanelType.detailsPanel]: boolean;
   [PanelType.artifactCreator]: CreatorOpenState;
   [PanelType.errorDisplay]: boolean;
   [PanelType.artifactBody]: boolean;

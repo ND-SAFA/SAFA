@@ -32,8 +32,7 @@ export const useApp = defineStore("app", {
      */
     isOpen: {
       [PanelType.appPanel]: true,
-      [PanelType.left]: false,
-      [PanelType.right]: false,
+      [PanelType.detailsPanel]: false,
       [PanelType.artifactCreator]: false,
       [PanelType.errorDisplay]: false,
       [PanelType.artifactBody]: false,
@@ -44,22 +43,16 @@ export const useApp = defineStore("app", {
   }),
   getters: {
     /**
-     * @return Whether the left panel is open.
+     * @return Whether the left app panel is open.
      */
     isAppPanelOpen(): boolean {
       return this.isOpen[PanelType.appPanel];
     },
     /**
-     * @return Whether the left panel is open.
+     * @return Whether the right details panel is open.
      */
-    isLeftPanelOpen(): boolean {
-      return this.isOpen[PanelType.left];
-    },
-    /**
-     * @return Whether the right panel is open.
-     */
-    isRightPanelOpen(): boolean {
-      return this.isOpen[PanelType.right];
+    isDetailsPanelOpen(): boolean {
+      return this.isOpen[PanelType.detailsPanel];
     },
     /**
      * @return Whether the artifact creator is open.
@@ -142,23 +135,16 @@ export const useApp = defineStore("app", {
       this.togglePanel(PanelType.appPanel);
     },
     /**
-     * Toggles whether the right panel is open.
+     * Toggles whether the details panel is open.
      */
-    toggleRightPanel(): void {
-      this.togglePanel(PanelType.right);
-    },
-    /**
-     * Toggles whether the left panel is open.
-     */
-    toggleLeftPanel(): void {
-      this.togglePanel(PanelType.left);
+    toggleDetailsPanel(): void {
+      this.togglePanel(PanelType.detailsPanel);
     },
     /**
      * Closes the side panels.
      */
     closeSidePanels(): void {
-      this.closePanel(PanelType.left);
-      this.closePanel(PanelType.right);
+      this.closePanel(PanelType.detailsPanel);
     },
     /**
      * Closes the side panels.

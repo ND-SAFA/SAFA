@@ -86,7 +86,6 @@ export const useSelection = defineStore("selection", {
       this.selectedSubtreeIds = [];
       this.selectedGroupIds = [];
       this.selectedArtifactId = "";
-      appStore.closePanel(PanelType.left);
     },
     /**
      * Sets the viewport to the given artifact and its subtree.
@@ -136,8 +135,6 @@ export const useSelection = defineStore("selection", {
      */
     selectArtifact(artifactId: string): void {
       this.selectedArtifactId = artifactId;
-
-      appStore.openPanel(PanelType.left);
       this.centerOnArtifacts([artifactId]);
     },
     /**

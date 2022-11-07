@@ -21,12 +21,6 @@ export interface NavOption {
    */
   icon: string;
   /**
-   * The navigation path corresponding to this option.
-   */
-  path:
-    | string
-    | { path: string; query: Record<string, string | (string | null)[]> };
-  /**
    * If true, a divider will be displayed above this option.
    */
   divider?: boolean;
@@ -34,4 +28,10 @@ export interface NavOption {
    * If true, this option will be hidden.
    */
   disabled?: boolean;
+  /**
+   * The navigation path corresponding to this option.
+   */
+  path():
+    | string
+    | { path: string; query: Record<string, string | (string | null)[]> };
 }

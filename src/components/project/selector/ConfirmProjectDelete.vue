@@ -7,6 +7,11 @@
     @close="handleCancel"
   >
     <template v-slot:body>
+      <typography
+        t="2"
+        el="p"
+        value="Are you sure you want to delete this project? Type in the project's name to confirm deletion."
+      />
       <v-text-field
         hide-details
         v-model="confirmText"
@@ -34,6 +39,7 @@
 import Vue from "vue";
 import { identifierSaveStore } from "@/hooks";
 import { GenericModal } from "@/components/common";
+import Typography from "@/components/common/display/Typography.vue";
 
 /**
  * A modal for confirming project deletion.
@@ -43,7 +49,7 @@ import { GenericModal } from "@/components/common";
  */
 export default Vue.extend({
   name: "ConfirmProjectDelete",
-  components: { GenericModal },
+  components: { Typography, GenericModal },
   props: {
     isOpen: {
       type: Boolean,

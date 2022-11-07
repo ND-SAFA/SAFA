@@ -11,7 +11,7 @@
         <v-badge overlap color="primary" :value="newNotifications > 0">
           <template v-slot:badge>
             <typography
-              color="primary"
+              color="white"
               :value="newNotifications"
               style="line-height: unset; font-size: 12px !important"
             />

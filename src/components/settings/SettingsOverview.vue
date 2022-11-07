@@ -1,39 +1,58 @@
 <template>
-  <div>
-    <flex-box justify="space-between">
-      <typography el="h1" variant="title" :value="project.name" />
-      <flex-box>
-        <v-btn text @click="handleDownload">
-          <v-icon class="mr-1">mdi-download</v-icon>
-          Download Files
-        </v-btn>
-        <v-btn text @click="handleEdit">
-          <v-icon class="mr-1">mdi-pencil</v-icon>
-          Edit Project
-        </v-btn>
-      </flex-box>
-    </flex-box>
+  <flex-box justify="space-between">
+    <div>
+      <typography el="h2" variant="subtitle" value="Project Data" />
+      <typography el="p" :value="subtitle" />
+      <typography el="h2" variant="subtitle" value="Description" />
+      <typography ep="p" :value="project.description" />
+    </div>
 
-    <v-divider class="mb-2" />
-
-    <typography el="p" :value="subtitle" />
-    <typography ep="p" :value="project.description" />
+    <div>
+      <v-card outlined>
+        <v-container>
+          <v-btn text @click="handleDownload">
+            <v-icon class="mr-1">mdi-download</v-icon>
+            Download Files
+          </v-btn>
+          <br />
+          <v-btn text @click="handleEdit">
+            <v-icon class="mr-1">mdi-pencil</v-icon>
+            Edit Project
+          </v-btn>
+          <br />
+          <v-btn text color="error" @click="handleDelete">
+            <v-icon class="mr-1">mdi-delete</v-icon>
+            Delete Project
+          </v-btn>
+        </v-container>
+      </v-card>
+    </div>
 
     <project-identifier-modal
       :is-open="isEditOpen"
-      :is-loading="isEditLoading"
+      :is-loading="isLoading"
       @close="isEditOpen = false"
       @save="handleSave"
     />
-  </div>
+    <confirm-project-delete
+      :is-open="isDeleteOpen"
+      @confirm="handleConfirmDeleteProject"
+      @cancel="isDeleteOpen = false"
+    />
+  </flex-box>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import { identifierSaveStore, projectStore } from "@/hooks";
-import { handleSaveProject, handleDownloadProjectCSV } from "@/api";
+import {
+  handleSaveProject,
+  handleDownloadProjectCSV,
+  handleDeleteProject,
+} from "@/api";
 import { Typography, FlexBox } from "@/components/common";
 import { ProjectIdentifierModal } from "@/components/project/shared";
+import { ConfirmProjectDelete } from "@/components/project/selector";
 
 /**
  * Represents the section describing the project name and descriptions
@@ -45,11 +64,13 @@ export default Vue.extend({
     FlexBox,
     Typography,
     ProjectIdentifierModal,
+    ConfirmProjectDelete,
   },
   data() {
     return {
-      isEditLoading: false,
+      isLoading: false,
       isEditOpen: false,
+      isDeleteOpen: false,
       projectToEdit: projectStore.project,
     };
   },
@@ -77,15 +98,22 @@ export default Vue.extend({
       this.isEditOpen = true;
     },
     /**
+     * Opens the edit modal.
+     */
+    handleDelete(): void {
+      identifierSaveStore.baseIdentifier = this.project;
+      this.isDeleteOpen = true;
+    },
+    /**
      * Attempts to save the project.
      */
     handleSave(): void {
-      this.isEditLoading = true;
+      this.isLoading = true;
 
       handleSaveProject({
         onSuccess: (project) => projectStore.updateProject(project),
         onComplete: () => {
-          this.isEditLoading = false;
+          this.isLoading = false;
           this.isEditOpen = false;
         },
       });
@@ -95,6 +123,20 @@ export default Vue.extend({
      */
     handleDownload(): void {
       handleDownloadProjectCSV();
+    },
+    /**
+     * Attempts to delete a project, and closes the delete modal.
+     */
+    handleConfirmDeleteProject() {
+      this.isLoading = true;
+
+      handleDeleteProject({
+        onSuccess: () => {
+          this.isDeleteOpen = false;
+          this.$emit("unselected");
+        },
+        onComplete: () => (this.isLoading = false),
+      });
     },
   },
 });

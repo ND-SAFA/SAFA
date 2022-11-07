@@ -1,12 +1,15 @@
 <template>
   <v-container>
-    <settings-overview />
+    <settings-header />
     <tab-list v-model="tab" :tabs="tabs">
       <v-tab-item key="1">
+        <settings-overview />
+      </v-tab-item>
+      <v-tab-item key="2">
         <settings-members />
       </v-tab-item>
-      <v-tab-item key="2"> </v-tab-item>
       <v-tab-item key="3"> </v-tab-item>
+      <v-tab-item key="4"> </v-tab-item>
     </tab-list>
   </v-container>
 </template>
@@ -15,6 +18,7 @@
 import Vue from "vue";
 import { settingsTabOptions } from "@/util";
 import { TabList } from "@/components/common";
+import SettingsHeader from "./SettingsHeader.vue";
 import SettingsOverview from "./SettingsOverview.vue";
 import SettingsMembers from "./SettingsMembers.vue";
 
@@ -23,7 +27,7 @@ import SettingsMembers from "./SettingsMembers.vue";
  */
 export default Vue.extend({
   name: "TracePredictionTabs",
-  components: { TabList, SettingsOverview, SettingsMembers },
+  components: { TabList, SettingsOverview, SettingsMembers, SettingsHeader },
   props: {},
   data() {
     return {

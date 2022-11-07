@@ -63,15 +63,6 @@ public interface JiraConnectionService {
     JiraIssuesResponseDTO retrieveJIRAIssues(JiraAccessCredentials credentials, Long jiraProjectId);
 
     /**
-     * Creates a mapping between the safa project and the jira project.
-     *
-     * @param project       The safa project associated with the JIRA project.
-     * @param jiraProjectId The id of the JIRA project.
-     * @return JiraProject The jira project created.
-     */
-    JiraProject createJiraProjectMapping(Project project, Long jiraProjectId);
-
-    /**
      * Retrieve updated issues associated with a JIRA project after a certain timestamp
      *
      * @param credentials   The credentials of the user accessing JIRA.

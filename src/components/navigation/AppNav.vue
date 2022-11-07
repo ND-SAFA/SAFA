@@ -1,7 +1,8 @@
 <template>
   <div>
-    <app-nav-drawer v-if="isLoggedIn" />
     <app-nav-bar v-if="isLoggedIn" />
+    <app-nav-drawer v-if="isLoggedIn" />
+    <details-drawer v-if="isLoggedIn" />
     <snackbar />
     <app-confirm-modal :message="confirmationMessage" />
   </div>
@@ -13,6 +14,7 @@ import { logStore, sessionStore } from "@/hooks";
 import { AppConfirmModal, Snackbar } from "@/components/common";
 import { AppNavDrawer } from "./sidebar";
 import { AppNavBar } from "./topbar";
+import { DetailsDrawer } from "./detailsDrawer";
 
 /**
  * Renders all app navigation bars.
@@ -20,6 +22,7 @@ import { AppNavBar } from "./topbar";
 export default Vue.extend({
   name: "AppNav",
   components: {
+    DetailsDrawer,
     AppNavBar,
     AppNavDrawer,
     AppConfirmModal,

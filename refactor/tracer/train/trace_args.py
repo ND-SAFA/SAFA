@@ -24,6 +24,19 @@ class TraceArgs(TrainingArguments):
     load_best_model_at_end: bool = LOAD_BEST_MODEL_AT_END_DEFAULT
     metric_for_best_model_default: str = METRIC_FOR_BEST_MODEL_DEFAULT
     metrics: List[str] = None
+    # GAN
+    n_hidden_layers_g = 1
+    n_hidden_layers_d = 1
+    noise_size = 100  # size of the generator's input noisy vectors
+    out_dropout_rate = 0.9  # dropout to be applied to discriminator's input vectors
+    apply_scheduler = False
+    epsilon = 1e-8
+    print_each_n_step = 100
+    learning_rate_discriminator = 5e-5
+    learning_rate_generator = 5e-5
+    warmup_proportion = 0.1
+    apply_balance = True  # Replicate labeled data to balance poorly represented datasets,
+    shuffle = True
     # Misc
     callbacks: List = None
     multi_gpu = True

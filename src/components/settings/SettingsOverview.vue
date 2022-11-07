@@ -58,7 +58,7 @@ import { Typography, FlexBox } from "@/components/common";
 import {
   ProjectIdentifierModal,
   ConfirmProjectDelete,
-} from "@/components/project/shared";
+} from "@/components/project/base";
 
 /**
  * Represents the section describing the project name and descriptions

@@ -43,7 +43,7 @@ import {
   handleSaveProject,
 } from "@/api";
 import { GenericSelector } from "@/components/common";
-import { ConfirmProjectDelete, ProjectIdentifierModal } from "../shared";
+import { ConfirmProjectDelete, ProjectIdentifierModal } from "../base";
 
 /**
  * Displays list of project available to current user and allows them to

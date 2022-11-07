@@ -1,5 +1,10 @@
 <template>
   <v-container>
+    <typography
+      el="p"
+      b="4"
+      value="Review, approve, and decline generated trace links."
+    />
     <v-data-table
       class="trace-link-table"
       show-group-by
@@ -85,7 +90,11 @@ import { DataTableHeader } from "vuetify";
 import { ApprovalType, FlatTraceLink, TraceTableGroup } from "@/types";
 import { approvalStore, appStore, projectStore } from "@/hooks";
 import { handleGetGeneratedLinks } from "@/api";
-import { AttributeChip, TableGroupHeader } from "@/components/common";
+import {
+  AttributeChip,
+  TableGroupHeader,
+  Typography,
+} from "@/components/common";
 import { TraceLinkDisplay } from "../base";
 import traceLinkTableHeaders from "./traceLinkTableHeaders";
 import TraceLinkTableHeader from "./TraceLinkTableHeader.vue";
@@ -102,6 +111,7 @@ export default Vue.extend({
     TableGroupHeader,
     AttributeChip,
     TraceLinkDisplay,
+    Typography,
   },
   data() {
     return {

@@ -31,7 +31,7 @@ export interface NavOption {
   /**
    * The navigation path corresponding to this option.
    */
-  path():
+  path:
     | string
     | { path: string; query: Record<string, string | (string | null)[]> };
 }

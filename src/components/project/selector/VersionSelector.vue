@@ -43,7 +43,7 @@ import { IdentifierModel, VersionModel, DataItem } from "@/types";
 import { projectStore, sessionStore } from "@/hooks";
 import { getProjectVersions, handleDeleteVersion } from "@/api";
 import { GenericSelector } from "@/components/common";
-import ConfirmVersionDelete from "./ConfirmVersionDelete.vue";
+import { ConfirmVersionDelete } from "../base";
 import VersionCreator from "./VersionCreator.vue";
 
 /**

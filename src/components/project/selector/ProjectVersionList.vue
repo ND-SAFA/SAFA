@@ -41,8 +41,8 @@ import { versionToString } from "@/util";
 import { logStore } from "@/hooks";
 import { handleLoadVersion } from "@/api";
 import { GenericStepper } from "@/components/common";
-import { ProjectSelector } from "@/components/project/selector";
 import VersionSelector from "./VersionSelector.vue";
+import ProjectSelector from "./ProjectSelector.vue";
 
 const SELECT_PROJECT_DEFAULT_NAME = "Select a Project";
 const SELECT_VERSION_DEFAULT_NAME = "Select a Version";

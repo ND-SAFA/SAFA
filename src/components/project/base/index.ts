@@ -3,3 +3,4 @@ export { default as ProjectIdentifierModal } from "./ProjectIdentifierModal.vue"
 export { default as ProjectFilesInput } from "./ProjectFilesInput.vue";
 export { default as ProjectFilesUploader } from "./ProjectFilesUploader.vue";
 export { default as ConfirmProjectDelete } from "./ConfirmProjectDelete.vue";
+export { default as ConfirmVersionDelete } from "./ConfirmVersionDelete.vue";

@@ -3,7 +3,7 @@
     <v-list-item-group active-class="nav-selected">
       <template v-for="option in options">
         <v-divider v-if="option.divider" :key="option.label + '-div'" />
-        <v-list-item :key="option.label" :to="option.path()">
+        <v-list-item :key="option.label" :to="option.path">
           <v-list-item-icon>
             <v-icon>{{ option.icon }}</v-icon>
           </v-list-item-icon>
@@ -20,7 +20,7 @@
 import Vue from "vue";
 import { NavOption } from "@/types";
 import { appStore, projectStore } from "@/hooks";
-import { getParams, Routes } from "@/router";
+import { QueryParams, Routes } from "@/router";
 import { Typography } from "@/components/common";
 
 /**
@@ -51,45 +51,49 @@ export default Vue.extend({
      * @return The navigation bar options.
      */
     options(): NavOption[] {
+      const query = {
+        [QueryParams.VERSION]: projectStore.versionId,
+      };
+
       const items: NavOption[] = [
         {
           label: "Home",
           icon: "mdi-home",
-          path: () => Routes.HOME,
+          path: Routes.HOME,
         },
         {
           label: "Create Project",
           icon: "mdi-folder-plus",
-          path: () => Routes.PROJECT_CREATOR,
+          path: Routes.PROJECT_CREATOR,
         },
         {
           label: "Open Project",
           icon: "mdi-list-box",
-          path: () => Routes.MY_PROJECTS,
+          path: Routes.MY_PROJECTS,
         },
         {
           label: "Project Uploads",
           icon: "mdi-folder-upload",
-          path: () => Routes.UPLOAD_STATUS,
+          path: Routes.UPLOAD_STATUS,
         },
         {
           label: "Artifact View",
           icon: "mdi-family-tree",
           disabled: this.hideProjectOptions,
           divider: true,
-          path: () => ({ path: Routes.ARTIFACT, query: getParams() }),
+          path: { path: Routes.ARTIFACT, query },
         },
         {
           label: "Trace Prediction",
           icon: "mdi-link-box",
           disabled: this.hideProjectOptions,
-          path: () => ({ path: Routes.TRACE_LINK, query: getParams() }),
+          path: { path: Routes.TRACE_LINK, query },
         },
         {
           label: "Settings",
           icon: "mdi-cog-box",
           disabled: this.hideProjectOptions,
-          path: () => ({ path: Routes.PROJECT_SETTINGS, query: getParams() }),
+          path: { path: Routes.PROJECT_SETTINGS, query },
         },
       ];
 

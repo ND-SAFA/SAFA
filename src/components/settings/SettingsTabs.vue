@@ -22,7 +22,7 @@
 import Vue from "vue";
 import { settingsTabOptions } from "@/util";
 import { TabList } from "@/components/common";
-import { UploadNewVersion } from "@/components/project/version";
+import { UploadNewVersion } from "@/components/project/selector";
 import SettingsHeader from "./SettingsHeader.vue";
 import SettingsOverview from "./SettingsOverview.vue";
 import { SettingsMembers } from "./members";

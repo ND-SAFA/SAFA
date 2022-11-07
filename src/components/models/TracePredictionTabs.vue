@@ -2,11 +2,6 @@
   <v-container>
     <typography el="h1" variant="title" value="Trace Prediction" />
     <v-divider />
-    <typography
-      el="p"
-      y="2"
-      value="Train trace generation models, generate traces, and review the results."
-    />
     <tab-list v-model="tab" :tabs="tabs">
       <v-tab-item key="1">
         <model-table />

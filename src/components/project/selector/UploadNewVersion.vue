@@ -1,32 +1,19 @@
 <template>
-  <project-version-stepper-modal
-    v-model="currentStep"
-    title="Upload Flat Files"
-    :is-open="isOpen"
-    :startStep="startStep"
-    :after-steps="[['Upload Files', isUploadStepValid]]"
-    v-bind:isLoading.sync="isLoading"
-    v-bind:project.sync="selectedProject"
-    v-bind:version.sync="selectedVersion"
-    data-cy="modal-version-upload"
-    @submit="onSubmit"
-    @close="handleClose"
-  >
-    <template v-slot:afterItems>
-      <v-stepper-content step="3">
-        <project-files-input
-          v-model="selectedFiles"
-          data-cy="input-files-version"
-          class="mx-2"
-        />
-        <generic-switch
-          v-model="replaceAllArtifacts"
-          label="Replace all artifacts"
-          class="ml-4"
-        />
-      </v-stepper-content>
-    </template>
-  </project-version-stepper-modal>
+  <v-container style="max-width: 40em">
+    <project-files-input
+      v-model="selectedFiles"
+      data-cy="input-files-version"
+      class="mx-2"
+    />
+    <generic-switch
+      v-model="replaceAllArtifacts"
+      label="Replace all artifacts"
+      class="ml-4"
+    />
+    <v-btn block color="primary" @click="handleSubmit">
+      Upload Project Files
+    </v-btn>
+  </v-container>
 </template>
 
 <script lang="ts">
@@ -35,20 +22,16 @@ import { IdentifierModel, VersionModel } from "@/types";
 import { logStore, projectStore } from "@/hooks";
 import { handleUploadProjectVersion } from "@/api";
 import { GenericSwitch } from "@/components/common";
-import { ProjectFilesInput } from "../shared";
-import ProjectVersionStepperModal from "./ProjectVersionStepperModal.vue";
+import { ProjectFilesInput } from "../base";
 
 /**
- * Modal for uploading a new version.
- *
- * @emits `close` - On close.
+ * Displays inputs for uploading a new version.
  */
 export default Vue.extend({
-  name: "UploadNewVersionModal",
+  name: "UploadNewVersion",
   components: {
     GenericSwitch,
     ProjectFilesInput,
-    ProjectVersionStepperModal,
   },
   props: {
     isOpen: {
@@ -58,7 +41,6 @@ export default Vue.extend({
   },
   data() {
     return {
-      currentStep: 1,
       selectedProject: undefined as IdentifierModel | undefined,
       selectedVersion: undefined as VersionModel | undefined,
       selectedFiles: [] as File[],
@@ -78,24 +60,16 @@ export default Vue.extend({
       if (!open || !currentProject.projectId) return;
 
       this.selectedProject = currentProject;
-      this.currentStep = 2;
-
-      if (!currentVersion?.versionId) return;
-
       this.selectedVersion = currentVersion;
+      this.selectedFiles = [];
+      this.replaceAllArtifacts = false;
     },
   },
   computed: {
     /**
-     * @return The start step, which skips the first step if a project is already selected.
-     */
-    startStep(): number {
-      return this.selectedProject === undefined ? 1 : 2;
-    },
-    /**
      * @return Whether the uploaded files are valid.
      */
-    isUploadStepValid(): boolean {
+    isUploadValid(): boolean {
       return (
         this.selectedFiles.length > 0 &&
         !!this.selectedFiles.find(({ name }) => name === "tim.json")
@@ -106,16 +80,15 @@ export default Vue.extend({
     /**
      * Closes the modal and clears data.
      */
-    handleClose() {
+    handleReset() {
       this.selectedProject = undefined;
       this.selectedVersion = undefined;
       this.selectedFiles = [];
-      this.$emit("close");
     },
     /**
      * Attempts to upload a new project version.
      */
-    onSubmit() {
+    handleSubmit() {
       if (this.selectedProject === undefined) {
         return logStore.onWarning("No project is selected.");
       }
@@ -132,7 +105,7 @@ export default Vue.extend({
         this.setAsNewVersion,
         this.replaceAllArtifacts
       )
-        .then(() => this.handleClose())
+        .then(() => this.handleReset())
         .finally(() => (this.isLoading = false));
     },
   },

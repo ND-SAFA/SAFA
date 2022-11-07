@@ -34,7 +34,8 @@ class TraceTrainer(Trainer):
         tokenizer = self.model_generator.get_tokenizer()
         super().__init__(model=model, args=args, tokenizer=tokenizer, callbacks=args.callbacks, **kwargs)
 
-    def perform_training(self, train_dataset: TraceDataset, eval_dataset: TraceDataset = None, checkpoint: str = None) -> Dict:
+    def perform_training(self, train_dataset: TraceDataset, eval_dataset: TraceDataset = None,
+                         checkpoint: str = None) -> Dict:
         """
         Performs the model training.
         :param train_dataset: The dataset used to adjust model weights.
@@ -113,8 +114,7 @@ class TraceTrainer(Trainer):
             similarity_scores.append(softmax(prediction)[1])
         return similarity_scores
 
-    ################## FUNCTIONS BELOW ARE OVERRIDDEN FROM TRANSFORMERS ##################
-
+    @overrides(Trainer)
     def get_train_dataloader(self) -> DataLoader:
         """
         Gets the dataloader for training

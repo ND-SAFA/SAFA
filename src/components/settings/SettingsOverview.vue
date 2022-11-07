@@ -55,8 +55,10 @@ import {
   handleDeleteProject,
 } from "@/api";
 import { Typography, FlexBox } from "@/components/common";
-import { ProjectIdentifierModal } from "@/components/project/shared";
-import { ConfirmProjectDelete } from "@/components/project/selector";
+import {
+  ProjectIdentifierModal,
+  ConfirmProjectDelete,
+} from "@/components/project/shared";
 
 /**
  * Represents the section describing the project name and descriptions

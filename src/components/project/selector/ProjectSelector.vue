@@ -43,8 +43,7 @@ import {
   handleSaveProject,
 } from "@/api";
 import { GenericSelector } from "@/components/common";
-import { ProjectIdentifierModal } from "@/components/project/shared";
-import ConfirmProjectDelete from "./ConfirmProjectDelete.vue";
+import { ConfirmProjectDelete, ProjectIdentifierModal } from "../shared";
 
 /**
  * Displays list of project available to current user and allows them to

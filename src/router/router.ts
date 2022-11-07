@@ -14,6 +14,7 @@ import {
   UploadStatusView,
   HomeView,
   MyAccountView,
+  ProjectSelectorView,
 } from "@/views";
 import { Routes } from "./routes";
 
@@ -49,6 +50,16 @@ const routes: Array<RouteConfig> = [
     component: HomeView,
   },
   {
+    path: Routes.PROJECT_CREATOR,
+    name: "Create Project",
+    component: ProjectCreatorView,
+  },
+  {
+    path: Routes.MY_PROJECTS,
+    name: "My Projects",
+    component: ProjectSelectorView,
+  },
+  {
     path: Routes.ACCOUNT,
     name: "My Account",
     component: MyAccountView,
@@ -62,11 +73,6 @@ const routes: Array<RouteConfig> = [
     path: Routes.TRACE_LINK,
     name: "Trace Prediction",
     component: TracePredictionView,
-  },
-  {
-    path: Routes.PROJECT_CREATOR,
-    name: "Project Creator",
-    component: ProjectCreatorView,
   },
   {
     path: Routes.PROJECT_SETTINGS,

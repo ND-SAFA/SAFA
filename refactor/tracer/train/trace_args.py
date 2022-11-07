@@ -61,4 +61,4 @@ class TraceArgs(TrainingArguments):
             if hasattr(self, arg_name):
                 setattr(self, arg_name, arg_value)
             else:
-                print("Unrecognized training arg: ", arg_name)
+                raise Exception("Unrecognized training arg: " + arg_name)

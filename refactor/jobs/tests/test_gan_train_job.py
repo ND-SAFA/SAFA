@@ -3,6 +3,7 @@ from unittest.mock import patch
 
 from jobs.abstract_job import AbstractJob
 from jobs.gan_train_job import GanTrainJob
+from jobs.job_args import JobArgs
 from jobs.tests.test_train_job import TestTrainJob
 from test.base_job_test import BaseJobTest
 from tracer.dataset.creators.supported_dataset_creator import SupportedDatasetCreator
@@ -11,6 +12,18 @@ from tracer.train.trace_trainer import TraceTrainer
 
 
 class TestGanTrainJob(BaseJobTest):
+    """
+    Tests that GAN is able to train and test.
+    TODO: Add test that includes a pre-training dataset
+    TODO: Reduce the run time of the test to < 10 seconds
+    """
+    EXAMPLE_TRAINING_OUTPUT = {
+        "stats": [{
+            "epoch": 1,
+            "Valid. Accur.": 0
+        }]
+    }
+
     @patch.object(TraceTrainer, "save_model")
     def test_run_success(self, save_model_mock: mock.MagicMock):
         self._test_run_success()
@@ -18,7 +31,9 @@ class TestGanTrainJob(BaseJobTest):
     @staticmethod
     def create_dataset_map(dataset_role: DatasetRole, include_links=True):
         train_dataset = BaseJobTest.create_dataset_map(DatasetRole.TRAIN)
-        test_dataset = {DatasetRole.EVAL: (SupportedDatasetCreator.CSV, {"data_file_path": TestTrainJob.CSV_DATA_FILE})}
+        test_dataset = {DatasetRole.EVAL: (SupportedDatasetCreator.CSV, {
+            "data_file_path": TestTrainJob.CSV_DATA_FILE
+        })}
         return {**train_dataset, **test_dataset}
 
     def _assert_success(self, output_dict: dict):
@@ -26,5 +41,9 @@ class TestGanTrainJob(BaseJobTest):
 
     def _get_job(self) -> AbstractJob:
         test_params = self.get_test_params_for_trace(dataset_role=DatasetRole.PRE_TRAIN, include_links=True)
-        job = GanTrainJob(**test_params)
+        job_args = JobArgs(**test_params)
+        job_args.trace_args_params = {
+            "num_train_epochs": 1
+        }
+        job = GanTrainJob(job_args)
         return job

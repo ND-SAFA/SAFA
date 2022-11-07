@@ -1,9 +1,10 @@
+import numpy as np
+from transformers.trainer_utils import PredictionOutput
+
 from api.responses.prediction_response import PredictionResponse
 from test.base_test import BaseTest
 from tracer.dataset.data_objects.artifact import Artifact
 from tracer.dataset.data_objects.trace_link import TraceLink
-from transformers.trainer_utils import PredictionOutput
-import numpy as np
 
 
 class BaseTraceTest(BaseTest):
@@ -46,7 +47,8 @@ class BaseTraceTest(BaseTest):
                                                  metrics=_EXAMPLE_METRIC_RESULTS)
     EXAMPLE_TRAINING_OUTPUT = {'global_step': 3, 'training_loss': 0.6927204132080078,
                                'metrics': {'train_runtime': 0.1516, 'train_samples_per_second': 79.13,
-                                           'train_steps_per_second': 19.782, 'train_loss': 0.6927204132080078, 'epoch': 3.0},
+                                           'train_steps_per_second': 19.782, 'train_loss': 0.6927204132080078,
+                                           'epoch': 3.0},
                                'status': 0}
     _EXAMPLE_PREDICTION_LINKS = {'source': 0, 'target': 1, 'score': 0.5}
     _EXAMPLE_PREDICTION_METRICS = {'test_loss': 0.6948729753494263, 'test_runtime': 0.0749,
@@ -71,7 +73,8 @@ class BaseTraceTest(BaseTest):
                 if key == "score":
                     expected_val = self._EXAMPLE_PREDICTION_LINKS["score"]
                     if abs(val - expected_val) >= threshold:
-                        self.fail(self._VAL_ERROR_MESSAGE.format(key, val, expected_val, PredictionResponse.PREDICTIONS))
+                        self.fail(
+                            self._VAL_ERROR_MESSAGE.format(key, val, expected_val, PredictionResponse.PREDICTIONS))
                 else:
                     link[val] = link_dict[key]
             predicted_links.add(tuple(link))

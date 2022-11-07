@@ -1,9 +1,9 @@
-from abc import abstractmethod, ABC
+import json
+from abc import ABC, abstractmethod
 from copy import deepcopy
 from unittest import mock
 from unittest.mock import patch
 
-import json
 from api.responses.base_response import BaseResponse
 from jobs.abstract_job import AbstractJob
 from jobs.job_status import Status
@@ -49,8 +49,9 @@ class BaseJobTest(BaseTraceTest, ABC):
             test_args.pop("base_model")
         if include_pre_processing:
             pre_processing_options, pre_processing_params = BaseTraceTest.PRE_PROCESSING_PARAMS
-            test_args["pre_processing_options"] = pre_processing_options
-            test_args["pre_processing_params"] = pre_processing_params
+            test_args["dataset_pre_processing_options"] = {
+                DatasetRole.PRE_TRAIN: (pre_processing_options, pre_processing_params)
+            }
         # Step - Replaces casing to snake case
         if as_api:
             test_args = BaseJobTest.parse_kwargs(test_args)
@@ -74,7 +75,8 @@ class BaseJobTest(BaseTraceTest, ABC):
             dataset_params.pop("true_links")
         return {dataset_role: (SupportedDatasetCreator.CLASSIC_TRACE, dataset_params)}
 
-    def get_test_params_for_trace(self, dataset_role=DatasetRole.TRAIN, include_links=True, as_api=False, include_pre_processing=False,
+    def get_test_params_for_trace(self, dataset_role=DatasetRole.TRAIN, include_links=True, as_api=False,
+                                  include_pre_processing=False,
                                   include_base_model=True):
         test_args = BaseJobTest.get_test_params(as_api=as_api, include_pre_processing=include_pre_processing,
                                                 include_base_model=include_base_model)

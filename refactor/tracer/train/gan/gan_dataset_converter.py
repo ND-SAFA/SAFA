@@ -2,7 +2,6 @@ from typing import List, Tuple, Union
 
 import math
 import numpy as np
-import pandas as pd
 import torch
 from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
 from torch.utils.data.dataset import TensorDataset
@@ -35,22 +34,6 @@ class GanDatasetConverter:
         self.labeled_examples = self.create_labeled_examples(train_dataset)
         self.unlabeled_examples = self.create_unlabeled_exampled(pre_train_dataset) if pre_train_dataset else None
         self.label_list = label_list if label_list else BINARY_LABEL_LIST
-
-    @staticmethod
-    def create_labeled_examples(trace_dataset: TraceDataset) -> List[LabeledExample]:
-        labeled_examples: List[LabeledExample] = []
-        for trace_id, trace in trace_dataset.links.items():
-            trace_label = 1 if trace.is_true_link else 0
-            labeled_examples.append((trace.source.token, trace.target.token, trace_label))
-        return labeled_examples
-
-    def create_unlabeled_exampled(self, pre_training_dataset: PreTrainDataset) -> List[UnlabeledExample]:
-        pre_training_file = self.read_file(pre_training_dataset.training_file_path)
-        labeled_examples: List[UnlabeledExample] = []
-
-        for line in pre_training_file.split("\n"):  # TODO : remove assumption that file must be separated by newlines
-            labeled_examples.append((line, None))
-        return labeled_examples
 
     def build(self) -> DataLoader:
         """
@@ -105,7 +88,7 @@ class GanDatasetConverter:
                                                      padding="max_length", truncation=True)
             else:  # if label use sequence encoding
                 combined = text[0] + " [SEP] " + text[1]
-                encoded_sent = self.tokenizer.encode(combined, add_special_tokens=True,
+                encoded_sent = self.tokenizer.encode(text[0], text[1], add_special_tokens=True,
                                                      max_length=self.trace_args.max_seq_length,
                                                      padding="max_length", truncation=True)
             input_ids.append(encoded_sent)
@@ -151,11 +134,20 @@ class GanDatasetConverter:
         return new_examples
 
     @staticmethod
-    def resample_example(ex, label: Union[int, None], label_mask_rate: float, balance_label_examples: bool, ) -> \
-            List[Example]:
+    def resample_example(example: Example, label: Union[int, None], label_mask_rate: float, should_balance: bool, ) -> \
+            List[Tuple[Example, Union[int, None]]]:
+        """
+
+        :param example: The example to resample
+        :param label: The label of the example
+        :param label_mask_rate:
+        :param should_balance: Flag overriding balance operation
+        :return:
+        :rtype:
+        """
         new_examples = []
-        if label_mask_rate == 1 or not balance_label_examples:
-            new_examples.append((ex, label))
+        if label_mask_rate == 1 or not should_balance:
+            new_examples.append((example, label))
         else:
             # IT SIMULATE A LABELED EXAMPLE
             if label:
@@ -164,26 +156,44 @@ class GanDatasetConverter:
                 if balance < 1:
                     balance = 1
                 for b in range(0, int(balance)):
-                    new_examples.append((ex, label))
+                    new_examples.append((example, label))
             else:
-                new_examples.append((ex, label))
+                new_examples.append((example, label))
         return new_examples
 
     @staticmethod
-    def __get_examples(data_file_path: str) -> List[LabeledExample]:
+    def create_labeled_examples(trace_dataset: TraceDataset) -> List[LabeledExample]:
         """
-        Returns dataset examples for the GAN.
-        :return: List of examples where each example contains the text being classified and the classification label.
+        Creates a set of labeled examples from trace links in dataset.
+        :param trace_dataset: The dataset whose trace links are converted to labeled examples.
+        :return: List of labeled example representing trace links.
         """
-        data_df = pd.read_csv(data_file_path)
-        examples = []
-        for idx, series in data_df.iterrows():
-            text = series["text"]
-            label = series["label"]
-            examples.append((text, label))
-        return examples
+        labeled_examples: List[LabeledExample] = []
+        for trace_id, trace in trace_dataset.links.items():
+            trace_label = 1 if trace.is_true_link else 0
+            labeled_examples.append((trace.source.token, trace.target.token, trace_label))
+        return labeled_examples
 
     @staticmethod
-    def read_file(file_path: str):
+    def create_unlabeled_exampled(pre_training_dataset: PreTrainDataset) -> List[UnlabeledExample]:
+        """
+        Reads dataset and creates sets of unlabeled examples per line in file.
+        :param pre_training_dataset: The dataset containing pre-training file.
+        :return: List of unlabeled examples.
+        """
+        pre_training_file = GanDatasetConverter.read_file(pre_training_dataset.training_file_path)
+        labeled_examples: List[UnlabeledExample] = []
+
+        for line in pre_training_file.split("\n"):  # TODO : remove assumption that file must be separated by newlines
+            labeled_examples.append((line, None))
+        return labeled_examples
+
+    @staticmethod
+    def read_file(file_path: str) -> str:
+        """
+        Reads file at given path if exists.
+        :param file_path: Path of the file to read.
+        :return: The content of the file.
+        """
         with open(file_path) as file:
             return file.read()

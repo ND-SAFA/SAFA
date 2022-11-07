@@ -2,6 +2,7 @@ import os
 from unittest import mock
 from unittest.mock import patch
 
+from jobs.job_args import JobArgs
 from jobs.train_job import TrainJob
 from test.base_job_test import BaseJobTest
 from test.config.paths import TEST_DATA_DIR
@@ -38,6 +39,7 @@ class TestTrainJob(BaseJobTest):
         test_params = self.get_test_params_for_trace(dataset_role=DatasetRole.TRAIN, include_links=True)
         if split_train_dataset:
             test_params["datasets_map"].pop(DatasetRole.EVAL)
-        job = TrainJob(**test_params, split_train_dataset=split_train_dataset)
+        job_args = JobArgs(split_train_dataset=split_train_dataset, **test_params)
+        job = TrainJob(job_args)
         self.assertEquals(job.train_args.resample_rate, 3)
         return job

@@ -1,10 +1,11 @@
 import datetime
 import time
+from collections import namedtuple
 
 import numpy as np
 import torch
 import torch.nn.functional as F
-from transformers import AutoModel, AutoModelForMaskedLM, get_constant_schedule_with_warmup
+from transformers import AutoModel, get_constant_schedule_with_warmup
 
 from common.override import overrides
 from tracer.dataset.trace_dataset import TraceDataset
@@ -24,11 +25,10 @@ class GanTrainer(TraceTrainer):
 
     def __init__(self, args: GanArgs, model_generator: ModelGenerator, **kwargs):
         super().__init__(args, model_generator, **kwargs)
-        model_generator.base_model_class = AutoModelForMaskedLM
+        self.transformer = None
 
     def train(self, resume_from_checkpoint: str = None):
         device = GanTrainer.get_device()
-        tokenizer = self.model_generator.get_tokenizer()
         generator, discriminator, transformer = self.create_models()
 
         training_stats = []
@@ -285,7 +285,10 @@ class GanTrainer(TraceTrainer):
                     'Test Time': test_time
                 }
             )
-        return transformer, tokenizer
+        self.transformer = transformer
+        Output = namedtuple('Output', ['stats'])
+        output = Output(training_stats)
+        return output
 
     def create_models(self):
         transformer = AutoModel.from_pretrained("bert-base-uncased")  # self.model_generator.get_model()

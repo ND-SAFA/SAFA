@@ -1,10 +1,17 @@
-from transformers import AutoModel
-
+from jobs.job_args import JobArgs
 from jobs.train_job import TrainJob
+from tracer.models.base_models.supported_base_model import SupportedBaseModel
 from tracer.train.gan.gan_trainer import GanTrainer
 
 
 class GanTrainJob(TrainJob):
+    """
+    Job to train a GAN-BERT for trace prediction.
+    """
+    
+    def __init__(self, job_args: JobArgs):
+        job_args.base_model = SupportedBaseModel.AUTO_MODEL
+        super().__init__(job_args)
 
     def get_trainer(self, **kwargs) -> GanTrainer:
         """
@@ -13,7 +20,5 @@ class GanTrainJob(TrainJob):
         :return: the trainer
         """
         if self._trainer is None:
-            model_generator = self.get_model_generator()
-            model_generator.base_model_class = AutoModel
-            self._trainer = GanTrainer(args=self.train_args, model_generator=model_generator, **kwargs)
+            self._trainer = GanTrainer(args=self.train_args, model_generator=self.get_model_generator(), **kwargs)
         return self._trainer

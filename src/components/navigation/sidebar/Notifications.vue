@@ -26,7 +26,7 @@
         secondary
         value="There are no notifications in the current session."
       />
-      <v-list v-else style="min-width: 300px">
+      <v-list v-else class="nav-notifications">
         <v-list-item v-for="(item, index) in notifications" :key="index">
           <v-alert dense outlined :type="item.type" class="full-width my-1">
             <typography :value="item.message" />

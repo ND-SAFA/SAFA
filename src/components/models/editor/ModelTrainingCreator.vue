@@ -13,13 +13,26 @@
           v-model="trainingType"
         />
       </v-container>
-      <model-document-step v-if="trainingType === 'documents'" :model="model" />
+      <model-document-step
+        v-if="trainingType === 'documents'"
+        :model="model"
+        @submit="handleSubmit"
+      />
       <model-repository-step
         v-if="trainingType === 'repositories'"
         :model="model"
+        @submit="handleSubmit"
       />
-      <model-keywords-step v-if="trainingType === 'keywords'" :model="model" />
-      <model-project-step v-if="trainingType === 'project'" :model="model" />
+      <model-keywords-step
+        v-if="trainingType === 'keywords'"
+        :model="model"
+        @submit="handleSubmit"
+      />
+      <model-project-step
+        v-if="trainingType === 'project'"
+        :model="model"
+        @submit="handleSubmit"
+      />
     </v-card>
   </v-timeline-item>
 </template>
@@ -55,8 +68,16 @@ export default Vue.extend({
     return {
       addOpen: false,
       trainingOptions: ["documents", "repositories", "keywords", "project"],
-      trainingType: "documents",
+      trainingType: "project",
     };
+  },
+  methods: {
+    /**
+     * Called once a step has been submitted.
+     */
+    handleSubmit(): void {
+      this.addOpen = false;
+    },
   },
 });
 </script>

@@ -7,3 +7,10 @@
 .nav-selected {
   color: $color-primary !important;
 }
+
+.nav-notifications {
+  min-width: 300px;
+  max-height: 40vh;
+  overflow-y: scroll;
+
+}

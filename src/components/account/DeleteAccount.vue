@@ -1,6 +1,13 @@
 <template>
   <div style="max-width: 300px">
-    <typography variant="subtitle" el="h2" value="Danger Zone" y="2" />
+    <typography
+      variant="subtitle"
+      el="h2"
+      value="Delete Account"
+      t="10"
+      color="error"
+    />
+    <v-divider class="mb-2" />
     <password-field
       label="Password"
       v-model="deletePassword"

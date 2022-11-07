@@ -1,6 +1,7 @@
 <template>
   <div style="max-width: 300px">
-    <typography variant="subtitle" el="h2" value="Password" y="2" />
+    <typography variant="subtitle" el="h2" value="Update Password" t="4" />
+    <v-divider class="mb-2" />
     <password-field
       label="Current Password"
       v-model="oldPassword"

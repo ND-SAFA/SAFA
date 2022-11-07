@@ -12,6 +12,7 @@ import { pinia } from "@/plugins";
 import traceStore from "../project/useTraces";
 import subtreeStore from "../project/useSubtree";
 import artifactStore from "../project/useArtifacts";
+import appStore from "../core/useApp";
 
 /**
  * Manages selection of parts of the project.
@@ -130,6 +131,16 @@ export const useSelection = defineStore("selection", {
     selectArtifact(artifactId: string): void {
       this.selectedArtifactId = artifactId;
       this.centerOnArtifacts([artifactId]);
+      appStore.openDetailsPanel("displayArtifact");
+    },
+    /**
+     * Sets the given trace links as selected.
+     *
+     * @param traceLinkId - The trace link to select.
+     */
+    selectTraceLink(traceLinkId: string): void {
+      this.selectedTraceLinkId = traceLinkId;
+      appStore.openDetailsPanel("displayTrace");
     },
     /**
      * Sets the given artifact as selected if it is not already,

@@ -27,11 +27,6 @@
         :trace-definition="traceLink"
         graph="artifact"
       />
-      <trace-link-approval-modal
-        :is-open="!!selectedLink"
-        :link="selectedLink"
-        @close="handleTraceModalClose"
-      />
     </template>
   </generic-cytoscape-controller>
 </template>
@@ -56,7 +51,6 @@ import {
   GenericGraphLink,
   GenericCytoscapeController,
 } from "@/components/common";
-import { TraceLinkApprovalModal } from "@/components/trace-link";
 import ArtifactNode from "./ArtifactNode.vue";
 
 export default Vue.extend({
@@ -64,7 +58,6 @@ export default Vue.extend({
   components: {
     ArtifactNode,
     GenericGraphLink,
-    TraceLinkApprovalModal,
     GenericCytoscapeController,
   },
   data() {
@@ -128,12 +121,6 @@ export default Vue.extend({
      */
     hiddenSubtreeIds(): string[] {
       return subtreeStore.hiddenSubtreeNodes;
-    },
-    /**
-     * @return The currently selected trace link.
-     */
-    selectedLink(): TraceLinkModel | undefined {
-      return selectionStore.selectedTraceLink;
     },
   },
   mounted() {
@@ -199,13 +186,7 @@ export default Vue.extend({
      * @param traceLink - The trace link to select.
      */
     handleLinkRightClick(traceLink: TraceLinkModel): void {
-      selectionStore.selectedTraceLinkId = traceLink.traceLinkId;
-    },
-    /**
-     * Closes the trace link modal.
-     */
-    handleTraceModalClose(): void {
-      selectionStore.selectedTraceLinkId = "";
+      selectionStore.selectTraceLink(traceLink.traceLinkId);
     },
   },
 });

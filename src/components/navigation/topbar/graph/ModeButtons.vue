@@ -17,18 +17,13 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { deltaStore, documentStore } from "@/hooks";
+import { appStore, deltaStore, documentStore } from "@/hooks";
 
 /**
  * Buttons for changing the mode of the artifact view.
  */
 export default Vue.extend({
   name: "ModeButtons",
-  components: {},
-  props: {},
-  data() {
-    return {};
-  },
   computed: {
     /**
      * @return The indexes of which buttons are highlighted.
@@ -62,7 +57,7 @@ export default Vue.extend({
      * Opens delta view.
      */
     handleDeltaView(): void {
-      //TODO
+      appStore.openDetailsPanel("delta");
     },
   },
 });

@@ -15,31 +15,72 @@
       dark
       dense
       label="Version"
-      :value="versionName"
-      :items="[versionName]"
+      :value="version"
+      :items="versions"
+      item-value="versionId"
       style="width: 100px"
+    >
+      <template v-slot:selection>
+        {{ getVersionName(version) }}
+      </template>
+      <template v-slot:item="{ item }">
+        <span @click="handleLoadVersion(item)">
+          {{ getVersionName(item) }}
+        </span>
+      </template>
+      <template v-slot:append-item>
+        <v-btn text color="primary" @click="openCreateVersion = true">
+          <v-icon>mdi-plus</v-icon>
+          Add Version
+        </v-btn>
+      </template>
+    </v-select>
+
+    <version-creator
+      :is-open="openCreateVersion"
+      :project="project"
+      @close="openCreateVersion = false"
+      @create="handleVersionCreated"
     />
   </flex-box>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
+import { VersionModel } from "@/types";
 import { versionToString } from "@/util";
 import { projectStore } from "@/hooks";
+import { getProjectVersions, handleLoadVersion } from "@/api";
 import { Typography, FlexBox } from "@/components/common";
+import { VersionCreator } from "@/components/project/selector";
 
 /**
  * Displays the current project version.
  */
 export default Vue.extend({
   name: "AppVersion",
-  components: { FlexBox, Typography },
+  components: { FlexBox, Typography, VersionCreator },
+  data() {
+    return {
+      versions: [] as VersionModel[],
+      openCreateVersion: false,
+    };
+  },
+  mounted() {
+    this.loadVersions();
+  },
   computed: {
     /**
      * @return The current project.
      */
     project() {
       return projectStore.project;
+    },
+    /**
+     * @return The current version.
+     */
+    version() {
+      return projectStore.project.projectVersion;
     },
     /**
      * @return Whether a project is currently loaded.
@@ -53,13 +94,42 @@ export default Vue.extend({
     projectName(): string {
       return this.isProjectDefined ? this.project.name : "No Project Selected";
     },
+  },
+  methods: {
     /**
-     * @return The name of this version.
+     * Loads the versions of the current project.
      */
-    versionName(): string {
-      return this.isProjectDefined
-        ? versionToString(this.project.projectVersion)
-        : "";
+    async loadVersions(): Promise<void> {
+      const { projectId } = this.project;
+      this.versions = projectId ? await getProjectVersions(projectId) : [];
+    },
+    /**
+     * Returns a version's name.
+     * @param version - The version to name.
+     * @return The version's name.
+     */
+    getVersionName(version: VersionModel): string {
+      return versionToString(version);
+    },
+    /**
+     * Loads the versions of the current project.
+     */
+    async handleLoadVersion(version: VersionModel): Promise<void> {
+      await handleLoadVersion(version.versionId);
+    },
+    /**
+     * Adds the new version the version list and loads that version.
+     * @param version - The new version.
+     */
+    async handleVersionCreated(version: VersionModel): Promise<void> {
+      this.versions = [version, ...this.versions];
+      this.openCreateVersion = false;
+      await handleLoadVersion(version.versionId);
+    },
+  },
+  watch: {
+    project() {
+      this.loadVersions();
     },
   },
 });

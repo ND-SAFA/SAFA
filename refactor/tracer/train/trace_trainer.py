@@ -42,8 +42,8 @@ class TraceTrainer(Trainer):
         :param checkpoint: path to checkpoint.
         :return: a dictionary containing the results
         """
-        self.train_dataset = train_dataset.to_trainer_dataset(self.model_generator)
-        self.eval_dataset = eval_dataset.to_trainer_dataset(self.model_generator) if eval_dataset else eval_dataset
+        self.train_dataset = self.extract_dataset(train_dataset)
+        self.eval_dataset = self.extract_dataset(eval_dataset) if eval_dataset else None
         output = self.train(resume_from_checkpoint=checkpoint)
         return TraceTrainer.output_to_dict(output)
 
@@ -59,6 +59,15 @@ class TraceTrainer(Trainer):
         results = self._eval(predictions, output.label_ids, self.args.metrics) if self.args.metrics else None
         output_dict = TraceTrainer.output_to_dict(output, metrics=results, predictions=predictions)
         return PredictionResponse.from_output(output_dict, eval_dataset.get_source_target_pairs())
+
+    def extract_dataset(self, trace_dataset: TraceDataset):
+        """
+        Extracts the dataset or list of data to be passed into the dataloader for train or eval.
+        Note, this class is overriden in trainers who expect a different data format.
+        :param trace_dataset: The trace dataset whose traces are extracted.
+        :return:
+        """
+        return trace_dataset.to_trainer_dataset(self.model_generator)
 
     @staticmethod
     def output_to_dict(output: NamedTuple, **kwargs) -> Dict:

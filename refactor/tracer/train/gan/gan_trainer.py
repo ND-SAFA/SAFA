@@ -4,11 +4,14 @@ import time
 import numpy as np
 import torch
 import torch.nn.functional as F
-from transformers import get_constant_schedule_with_warmup
+from transformers import AutoModel, AutoModelForMaskedLM, get_constant_schedule_with_warmup
 
+from common.override import overrides
+from tracer.dataset.trace_dataset import TraceDataset
 from tracer.models.base_models.descriminator import Discriminator
 from tracer.models.base_models.generator import Generator
 from tracer.models.model_generator import ModelGenerator
+from tracer.train.gan.gan_dataset_converter import GanDatasetConverter
 from tracer.train.gan_args import GanArgs
 from tracer.train.trace_trainer import TraceTrainer
 
@@ -21,15 +24,12 @@ class GanTrainer(TraceTrainer):
 
     def __init__(self, args: GanArgs, model_generator: ModelGenerator, **kwargs):
         super().__init__(args, model_generator, **kwargs)
+        model_generator.base_model_class = AutoModelForMaskedLM
 
     def train(self, resume_from_checkpoint: str = None):
         device = GanTrainer.get_device()
         tokenizer = self.model_generator.get_tokenizer()
         generator, discriminator, transformer = self.create_models()
-
-        # Step - Load dataset from args
-        train_dataloader = self.get_train_dataloader()
-        test_dataloader = self.get_eval_dataloader(self.eval_dataset)
 
         training_stats = []
 
@@ -48,7 +48,7 @@ class GanTrainer(TraceTrainer):
         # scheduler
         if self.args.apply_scheduler:
             num_train_examples = len(self.train_dataset)
-            num_train_steps = int(num_train_examples / self.args.batch_size * self.args.num_train_epochs)
+            num_train_steps = int(num_train_examples / self.args.train_batch_size * self.args.num_train_epochs)
             num_warmup_steps = int(num_train_steps * self.args.warmup_proportion)
 
             scheduler_d = get_constant_schedule_with_warmup(dis_optimizer,
@@ -79,7 +79,7 @@ class GanTrainer(TraceTrainer):
             discriminator.train()
 
             # For each batch of training dataset...
-            for step, batch in enumerate(train_dataloader):
+            for step, batch in enumerate(self.train_dataset):
 
                 # Progress update every print_each_n_step batches.
                 if step % self.args.print_each_n_step == 0 and not step == 0:
@@ -87,7 +87,7 @@ class GanTrainer(TraceTrainer):
                     elapsed = self.format_time(time.time() - t0)
 
                     # Report progress.
-                    print('  Batch {:>5,}  of  {:>5,}.    Elapsed: {:}.'.format(step, len(train_dataloader), elapsed))
+                    print('  Batch {:>5,}  of  {:>5,}.    Elapsed: {:}.'.format(step, len(self.train_dataset), elapsed))
 
                 # Unpack this training batch from our dataloader.
                 b_input_ids = batch[0].to(device)
@@ -193,8 +193,8 @@ class GanTrainer(TraceTrainer):
                     scheduler_g.step()
 
             # Calculate the average loss over all of the batches.
-            avg_train_loss_g = tr_g_loss / len(train_dataloader)
-            avg_train_loss_d = tr_d_loss / len(train_dataloader)
+            avg_train_loss_g = tr_g_loss / len(self.train_dataset)
+            avg_train_loss_d = tr_d_loss / len(self.train_dataset)
 
             # Measure how long this epoch took.
             training_time = self.format_time(time.time() - t0)
@@ -232,8 +232,10 @@ class GanTrainer(TraceTrainer):
             # loss
             nll_loss = torch.nn.CrossEntropyLoss(ignore_index=-1)
 
+            if self.eval_dataset is None:
+                continue
             # Evaluate dataset for one epoch
-            for batch in test_dataloader:
+            for batch in self.eval_dataset:
                 # Unpack this training batch from our dataloader.
                 b_input_ids = batch[0].to(device)
                 b_input_mask = batch[1].to(device)
@@ -262,7 +264,7 @@ class GanTrainer(TraceTrainer):
             print("  Accuracy: {0:.3f}".format(test_accuracy))
 
             # Calculate the average loss over all of the batches.
-            avg_test_loss = total_test_loss / len(test_dataloader)
+            avg_test_loss = total_test_loss / len(self.eval_dataset)
             avg_test_loss = avg_test_loss.item()
 
             # Measure how long the validation run took.
@@ -285,24 +287,12 @@ class GanTrainer(TraceTrainer):
             )
         return transformer, tokenizer
 
-    @staticmethod
-    def format_time(elapsed):
-        """
-        Takes a time in seconds and returns a string hh:mm:ss
-        :param elapsed: TODO
-        :return:
-        """
-        # Round to the nearest second.
-        elapsed_rounded = int(round(elapsed))
-        # Format as hh:mm:ss
-        return str(datetime.timedelta(seconds=elapsed_rounded))
-
     def create_models(self):
-        transformer = self.model_generator.get_model()
+        transformer = AutoModel.from_pretrained("bert-base-uncased")  # self.model_generator.get_model()
         hidden_size = int(transformer.config.hidden_size)
         # Define the number and width of hidden layers
-        hidden_levels_g = [hidden_size for i in range(0, self.args.num_hidden_layers_g)]
-        hidden_levels_d = [hidden_size for i in range(0, self.args.num_hidden_layers_d)]
+        hidden_levels_g = [hidden_size for i in range(0, self.args.n_hidden_layers_g)]
+        hidden_levels_d = [hidden_size for i in range(0, self.args.n_hidden_layers_d)]
 
         # -------------------------------------------------
         #   Instantiate the Generator and Discriminator
@@ -322,15 +312,39 @@ class GanTrainer(TraceTrainer):
                 transformer = torch.nn.DataParallel(transformer)
         return generator, discriminator, transformer
 
+    @overrides(TraceTrainer)
+    def extract_dataset(self, trace_dataset: TraceDataset):
+        """
+        Extracts tensors from trace dataset containing different masks for architecture.
+        :param trace_dataset: The dataset whose traces are converted to tensors.
+        :return: Dataloader containing tensors representing traces.
+        """
+        gan_dataset_converter = GanDatasetConverter(self.args,
+                                                    trace_dataset,
+                                                    self.tokenizer)
+        return gan_dataset_converter.build()
+
+    @staticmethod
+    def format_time(elapsed: float):
+        """
+        Takes a time in seconds and returns a string hh:mm:ss
+        :param elapsed: The number of seconds since the epoch time.
+        :return: Formatted datatime.
+        """
+        elapsed_rounded = int(round(elapsed))  # Round to the nearest second.
+        return str(datetime.timedelta(seconds=elapsed_rounded))  # Format as hh:mm:ss
+
     @staticmethod
     def get_device():
-        # If there's a GPU available...
+        """
+        Returns the available device for running transformer.
+        :return: GPU if available, CPU otherwise.
+        :rtype:
+        """
         if torch.cuda.is_available():
-            # Tell PyTorch to use the GPU.
             device = torch.device("cuda")
             print('There are %d GPU(s) available.' % torch.cuda.device_count())
             print('We will use the GPU:', torch.cuda.get_device_name(0))
-        # If not...
         else:
             print('No GPU available, using the CPU instead.')
             device = torch.device("cpu")

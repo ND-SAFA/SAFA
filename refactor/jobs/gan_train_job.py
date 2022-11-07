@@ -1,5 +1,7 @@
+from transformers import AutoModel
+
 from jobs.train_job import TrainJob
-from tracer.train.gan_trainer import GanTrainer
+from tracer.train.gan.gan_trainer import GanTrainer
 
 
 class GanTrainJob(TrainJob):
@@ -10,6 +12,8 @@ class GanTrainJob(TrainJob):
         :param kwargs: any additional parameters for the trainer
         :return: the trainer
         """
-        if self.__trainer is None:
-            self.__trainer = GanTrainer(args=self.train_args, model_generator=self.get_model_generator(), **kwargs)
-        return self.__trainer
+        if self._trainer is None:
+            model_generator = self.get_model_generator()
+            model_generator.base_model_class = AutoModel
+            self._trainer = GanTrainer(args=self.train_args, model_generator=model_generator, **kwargs)
+        return self._trainer

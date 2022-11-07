@@ -40,7 +40,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
     coreAsWell: true,
     onClickFunction(): void {
       projectStore.ifProjectDefined(() => {
-        appStore.toggleTraceLinkCreator();
+        appStore.openDetailsPanel("saveTrace");
       });
     },
     isVisible(): boolean {
@@ -86,7 +86,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
     onClickFunction(event: EventObject): void {
       handleOnClick(event, (artifact: ArtifactModel) => {
         selectionStore.selectArtifact(artifact.id);
-        appStore.toggleArtifactBody();
+        appStore.openDetailsPanel("displayArtifactBody");
       });
     },
     isVisible(artifactData: ArtifactData | undefined): boolean {

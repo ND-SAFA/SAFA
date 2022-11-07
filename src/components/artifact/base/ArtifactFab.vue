@@ -105,7 +105,7 @@ export default Vue.extend({
      */
     handleAddTraceLink(): void {
       projectStore.ifProjectDefined(() => {
-        appStore.toggleTraceLinkCreator();
+        appStore.openDetailsPanel("saveTrace");
       });
     },
     /**

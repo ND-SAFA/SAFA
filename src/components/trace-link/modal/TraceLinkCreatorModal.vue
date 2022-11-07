@@ -90,7 +90,7 @@ export default Vue.extend({
      * Returns whether the trace link creator is open.
      */
     isOpen() {
-      return appStore.isTraceLinkCreatorOpen;
+      return false;
     },
     /**
      * @return The source artifact.
@@ -153,7 +153,7 @@ export default Vue.extend({
      * Closes the trace link creator.
      */
     handleClose(): void {
-      appStore.toggleTraceLinkCreator();
+      appStore.closeSidePanels();
     },
   },
 });

@@ -33,7 +33,7 @@ export default Vue.extend({
   },
   computed: {
     isOpen() {
-      return appStore.isArtifactBodyOpen;
+      return false;
     },
     /**
      * @return The selected artifact.
@@ -64,7 +64,7 @@ export default Vue.extend({
   },
   methods: {
     handleClose() {
-      appStore.toggleArtifactBody();
+      appStore.closeSidePanels();
     },
   },
 });

@@ -1,11 +1,6 @@
 import { defineStore } from "pinia";
 
-import {
-  ArtifactModel,
-  FilterAction,
-  PanelType,
-  TraceLinkModel,
-} from "@/types";
+import { ArtifactModel, FilterAction, TraceLinkModel } from "@/types";
 import {
   artifactTreeCyPromise,
   cyCenterOnArtifacts,
@@ -17,7 +12,6 @@ import { pinia } from "@/plugins";
 import traceStore from "../project/useTraces";
 import subtreeStore from "../project/useSubtree";
 import artifactStore from "../project/useArtifacts";
-import appStore from "../core/useApp";
 
 /**
  * Manages selection of parts of the project.

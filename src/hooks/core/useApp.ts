@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 
 import {
   CreatorOpenState,
-  GeneratorOpenState,
+  DetailsOpenState,
   PanelStateMap,
   PanelType,
 } from "@/types";
@@ -35,10 +35,7 @@ export const useApp = defineStore("app", {
       [PanelType.detailsPanel]: false,
       [PanelType.artifactCreator]: false,
       [PanelType.errorDisplay]: false,
-      [PanelType.artifactBody]: false,
-      [PanelType.traceLinkCreator]: false,
       [PanelType.traceLinkDraw]: false,
-      [PanelType.traceLinkGenerator]: false,
     } as PanelStateMap,
   }),
   getters: {
@@ -51,7 +48,7 @@ export const useApp = defineStore("app", {
     /**
      * @return Whether the right details panel is open.
      */
-    isDetailsPanelOpen(): boolean {
+    isDetailsPanelOpen(): DetailsOpenState {
       return this.isOpen[PanelType.detailsPanel];
     },
     /**
@@ -65,24 +62,6 @@ export const useApp = defineStore("app", {
      */
     isErrorDisplayOpen(): boolean {
       return this.isOpen[PanelType.errorDisplay];
-    },
-    /**
-     * @return Whether the artifact body is open.
-     */
-    isArtifactBodyOpen(): boolean {
-      return this.isOpen[PanelType.artifactBody];
-    },
-    /**
-     * @return Whether the trace link creator is open.
-     */
-    isTraceLinkCreatorOpen(): boolean {
-      return this.isOpen[PanelType.traceLinkCreator];
-    },
-    /**
-     * @return Whether the trace link creator is open.
-     */
-    isTraceLinkGeneratorOpen(): GeneratorOpenState {
-      return this.isOpen[PanelType.traceLinkGenerator];
     },
     /**
      * @return Whether trace link drawing is enabled.
@@ -153,28 +132,11 @@ export const useApp = defineStore("app", {
       this.togglePanel(PanelType.errorDisplay);
     },
     /**
-     * Toggles whether the artifact body modal is open.
+     * Opens the details panel.
+     * @param state - The type of content to open.
      */
-    toggleArtifactBody(): void {
-      this.togglePanel(PanelType.artifactBody);
-    },
-    /**
-     * Toggles whether the trace link creator is open.
-     */
-    toggleTraceLinkCreator(): void {
-      this.togglePanel(PanelType.traceLinkCreator);
-    },
-    /**
-     * Opens the trace link generator.
-     */
-    openTraceLinkGenerator(state: GeneratorOpenState): void {
-      this.isOpen[PanelType.traceLinkGenerator] = state;
-    },
-    /**
-     * Toggles whether the trace link generator is open.
-     */
-    closeTraceLinkGenerator(): void {
-      this.closePanel(PanelType.traceLinkGenerator);
+    openDetailsPanel(state: DetailsOpenState): void {
+      this.isOpen[PanelType.detailsPanel] = state;
     },
     /**
      * Enables the draw link mode.
@@ -202,12 +164,14 @@ export const useApp = defineStore("app", {
       if (isNewArtifact) selectionStore.clearSelections();
 
       this.isOpen[PanelType.artifactCreator] = type || true;
+      this.openDetailsPanel("saveArtifact");
     },
     /**
      * Closes the artifact creator.
      */
     closeArtifactCreator(): void {
       this.closePanel(PanelType.artifactCreator);
+      this.closeSidePanels();
     },
     /**
      * Enqueues a new update to be loaded when the user is ready.

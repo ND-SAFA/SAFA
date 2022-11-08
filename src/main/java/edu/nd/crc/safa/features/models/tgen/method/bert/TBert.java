@@ -211,7 +211,7 @@ public abstract class TBert implements ITraceLinkGeneration {
         //TODO: Use scheduled tasks instead of constant pinging.
         String outputFile = CloudStorage.getJobOutputPath(jobId);
         try {
-            while (!CloudStorage.exists(outputFile)) {
+            while (!CloudStorage.hasAccess(outputFile)) {
                 Thread.sleep(1000 * Defaults.WAIT_SECONDS);
             }
             Blob blob = CloudStorage.getBlob(outputFile);

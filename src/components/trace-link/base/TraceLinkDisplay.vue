@@ -107,8 +107,12 @@ import {
   handleDeclineLink,
   handleUnreviewLink,
 } from "@/api";
-import { FlexBox, Typography, AttributeChip } from "@/components/common";
-import { GenericArtifactBodyDisplay } from "@/components";
+import {
+  FlexBox,
+  Typography,
+  AttributeChip,
+  GenericArtifactBodyDisplay,
+} from "@/components/common";
 
 /**
  * Displays a trace link.

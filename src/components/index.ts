@@ -7,3 +7,4 @@ export * from "./artifact";
 export * from "./navigation";
 export * from "./jobs";
 export * from "./models";
+export * from "./delta";

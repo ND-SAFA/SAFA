@@ -82,6 +82,7 @@ export const useSelection = defineStore("selection", {
       this.selectedGroupIds = [];
       this.selectedArtifactId = "";
       this.selectedTraceLinkId = "";
+      appStore.closeSidePanels();
     },
     /**
      * Sets the viewport to the given artifact and its subtree.

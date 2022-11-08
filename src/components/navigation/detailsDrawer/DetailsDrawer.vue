@@ -102,7 +102,6 @@ export default Vue.extend({
      * Toggles whether the details panel is open.
      */
     handleClose(): void {
-      appStore.closeSidePanels();
       selectionStore.clearSelections();
     },
   },

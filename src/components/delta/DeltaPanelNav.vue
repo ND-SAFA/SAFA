@@ -1,61 +1,67 @@
 <template>
-  <v-container class="mt-2">
-    <typography el="h1" variant="title" value="Delta View" />
-    <v-divider class="mb-2" />
-
+  <div class="mt-4">
     <v-btn
-      v-if="!isDeltaViewEnabled"
+      v-if="!isSelectorVisible"
       block
       large
-      :disabled="!isProjectDefined"
       color="primary"
       @click="handleChange"
     >
       <v-icon class="pr-2">mdi-source-branch</v-icon>
       Compare Versions
     </v-btn>
-    <v-btn
-      v-else
-      block
-      large
-      outlined
-      :disabled="!isProjectDefined"
-      @click="handleChange"
-    >
+    <v-btn v-else block large outlined @click="handleChange">
       <v-icon class="pr-2">mdi-close</v-icon>
       Hide Delta View
     </v-btn>
 
-    <delta-versions-modal
-      v-if="isProjectDefined"
-      :is-open="isModalOpen"
-      :project="project"
-      @close="isModalOpen = false"
-      @submit="handleSubmit"
-    />
-  </v-container>
+    <v-select
+      v-if="isSelectorVisible"
+      filled
+      v-model="version"
+      :items="versions"
+      :loading="isLoading"
+      item-value="versionId"
+      label="Delta Version"
+      class="mt-4"
+    >
+      <template v-slot:selection>
+        {{ getVersionName(version) }}
+      </template>
+      <template v-slot:item="{ item }">
+        {{ getVersionName(item) }}
+      </template>
+    </v-select>
+  </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
+import { VersionModel } from "@/types";
+import { versionToString } from "@/util";
 import { deltaStore, projectStore } from "@/hooks";
-import { handleReloadProject } from "@/api";
-import { Typography } from "@/components/common";
-import DeltaVersionsModal from "./DeltaVersionsModal.vue";
+import {
+  getProjectVersions,
+  handleReloadProject,
+  handleSetProjectDelta,
+} from "@/api";
 
 /**
  * Displays the delta panel navigation.
  */
 export default Vue.extend({
   name: "DeltaPanelNav",
-  components: {
-    DeltaVersionsModal,
-    Typography,
+  components: {},
+  data() {
+    return {
+      isLoading: false,
+      isSelectorVisible: false,
+      versions: [] as VersionModel[],
+    };
   },
-  data: () => ({
-    isModalOpen: false,
-    errorMessage: undefined as string | undefined,
-  }),
+  mounted() {
+    this.loadVersions();
+  },
   computed: {
     /**
      * @return The current project.
@@ -64,28 +70,59 @@ export default Vue.extend({
       return projectStore.project;
     },
     /**
-     * @return Whether the current project is defined
-     */
-    isProjectDefined(): boolean {
-      return this.project.projectId !== "";
-    },
-    /**
      * @return Whether delta view is enabled.
      */
-    isDeltaViewEnabled(): boolean {
+    inDeltaView(): boolean {
       return deltaStore.inDeltaView;
+    },
+    /**
+     * Tracks the delta version and loads new versions.
+     */
+    version: {
+      get(): VersionModel | undefined {
+        return deltaStore.afterVersion;
+      },
+      set(newVersionId: string): void {
+        const newVersion = this.versions.find(
+          ({ versionId }) => versionId === newVersionId
+        );
+
+        if (!newVersion || !this.project.projectVersion) return;
+
+        this.isLoading = true;
+
+        handleSetProjectDelta(this.project.projectVersion, newVersion, () => {
+          this.isLoading = false;
+        });
+      },
     },
   },
   methods: {
     /**
+     * Returns a version's name.
+     * @param version - The version to name.
+     * @return The version's name.
+     */
+    getVersionName(version: VersionModel): string {
+      return versionToString(version);
+    },
+    /**
+     * Loads the versions of the current project.
+     */
+    async loadVersions(): Promise<void> {
+      const { projectId } = this.project;
+      this.versions = projectId ? await getProjectVersions(projectId) : [];
+    },
+    /**
      * Changes whether delta view is enabled.
      */
     handleChange(): void {
-      if (!this.isDeltaViewEnabled) {
-        this.isModalOpen = true;
-      } else {
+      if (this.isSelectorVisible) {
         deltaStore.setIsDeltaViewEnabled(false);
         handleReloadProject();
+        this.isSelectorVisible = false;
+      } else {
+        this.isSelectorVisible = true;
       }
     },
     /**
@@ -93,16 +130,6 @@ export default Vue.extend({
      */
     handleSubmit(): void {
       deltaStore.setIsDeltaViewEnabled(true);
-    },
-  },
-  watch: {
-    /**
-     * Resets errors when the project changes.
-     */
-    project(): void {
-      if (!this.isProjectDefined) return;
-
-      this.errorMessage = undefined;
     },
   },
 });

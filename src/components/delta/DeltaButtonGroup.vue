@@ -26,7 +26,7 @@ import ArtifactDeltaButton from "./ArtifactDeltaButton.vue";
 /**
  * Displays a group of delta buttons.
  *
- * @emits `click` - On delta button click.
+ * @emits `click` (String) - On delta button click.
  */
 export default Vue.extend({
   name: "DeltaButtonGroup",

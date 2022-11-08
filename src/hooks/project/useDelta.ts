@@ -113,6 +113,7 @@ export const useDelta = defineStore("delta", {
       await subtreeStore.restoreHiddenNodesAfter(async () =>
         layoutStore.setArtifactTreeLayout()
       );
+      this.setIsDeltaViewEnabled(true);
     },
     /**
      * Returns the delta states of all of the given artifacts.

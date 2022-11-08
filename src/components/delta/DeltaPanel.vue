@@ -1,20 +1,24 @@
 <template>
-  <v-container v-if="isOpen"> </v-container>
+  <div v-if="isOpen">
+    <delta-panel-nav />
+    <artifact-deltas />
+    <trace-deltas />
+  </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import { appStore } from "@/hooks";
+import DeltaPanelNav from "./DeltaPanelNav.vue";
+import ArtifactDeltas from "./ArtifactDeltas.vue";
+import TraceDeltas from "./TraceDeltas.vue";
 
 /**
  * Displays project version delta information.
  */
 export default Vue.extend({
   name: "DeltaPanel",
-  components: {},
-  data() {
-    return {};
-  },
+  components: { DeltaPanelNav, ArtifactDeltas, TraceDeltas },
   computed: {
     /**
      * @return Whether this panel is open.
@@ -23,8 +27,5 @@ export default Vue.extend({
       return appStore.isDetailsPanelOpen === "delta";
     },
   },
-  methods: {},
 });
 </script>
-
-<style scoped lang="scss"></style>

@@ -17,19 +17,12 @@
         @click="handleRemovedSelect"
       />
     </v-list>
-
-    <trace-link-approval-modal
-      :is-open="isTraceModalOpen"
-      :link="selectedDeltaLink"
-      @close="isTraceModalOpen = false"
-    />
   </v-container>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { TraceLinkModel } from "@/types";
-import { deltaStore } from "@/hooks";
+import { deltaStore, selectionStore } from "@/hooks";
 import { Typography } from "@/components/common";
 import DeltaButtonGroup from "./DeltaButtonGroup.vue";
 
@@ -43,8 +36,6 @@ export default Vue.extend({
   components: { DeltaButtonGroup, Typography },
   data() {
     return {
-      isTraceModalOpen: false,
-      selectedDeltaLink: undefined as TraceLinkModel | undefined,
       openPanels: [0, 1],
     };
   },
@@ -74,16 +65,14 @@ export default Vue.extend({
      * @param id - The trace to select.
      */
     handleAddedSelect(id: string): void {
-      this.selectedDeltaLink = this.addedTraces[id];
-      this.isTraceModalOpen = true;
+      selectionStore.selectTraceLink(this.addedTraces[id]);
     },
     /**
      * Selects a removed trace.
      * @param id - The trace to select.
      */
     handleRemovedSelect(id: string): void {
-      this.selectedDeltaLink = this.removedTraces[id];
-      this.isTraceModalOpen = true;
+      selectionStore.selectTraceLink(this.removedTraces[id]);
     },
   },
   watch: {

@@ -47,6 +47,7 @@ public class CloudStorage {
 
     /**
      * Deletes file in SAFA bucket.
+     * TODO: Throw error if not access to file
      *
      * @param filePath Path of the file to delete.
      */

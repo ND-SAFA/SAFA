@@ -1,0 +1,83 @@
+<template>
+  <div>
+    <flex-box align="center" justify="space-between">
+      <v-tooltip bottom>
+        <template v-slot:activator="{ on, attrs }">
+          <typography
+            ellipsis
+            v-on="on"
+            v-bind="attrs"
+            variant="subtitle"
+            el="h1"
+            :value="selectedArtifactName"
+            data-cy="text-selected-name"
+          />
+        </template>
+        {{ selectedArtifactName }}
+      </v-tooltip>
+      <attribute-chip
+        artifact-type
+        :value="selectedArtifactType"
+        data-cy="text-selected-type"
+      />
+    </flex-box>
+    <v-divider />
+    <typography
+      defaultExpanded
+      y="2"
+      variant="expandable"
+      :value="selectedArtifactBody"
+      data-cy="text-selected-body"
+    />
+  </div>
+</template>
+
+<script lang="ts">
+import Vue from "vue";
+import { selectionStore } from "@/hooks";
+import { Typography, FlexBox, AttributeChip } from "@/components/common";
+
+/**
+ * Displays the selected node's title and option buttons.
+ */
+export default Vue.extend({
+  name: "ArtifactTitle",
+  components: {
+    AttributeChip,
+    FlexBox,
+    Typography,
+  },
+  computed: {
+    /**
+     * @return The selected artifact.
+     */
+    selectedArtifact() {
+      return selectionStore.selectedArtifact;
+    },
+    /**
+     * @return The selected artifact's name.
+     */
+    selectedArtifactName(): string {
+      return this.selectedArtifact?.name || "";
+    },
+    /**
+     * @return The selected artifact's type.
+     */
+    selectedArtifactType(): string {
+      return this.selectedArtifact?.type || "";
+    },
+    /**
+     * @return The selected artifact's body.
+     */
+    selectedArtifactBody(): string {
+      return this.selectedArtifact?.body.trim() || "";
+    },
+  },
+});
+</script>
+
+<style scoped>
+.artifact-title {
+  width: 230px;
+}
+</style>

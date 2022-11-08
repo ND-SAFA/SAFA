@@ -6,6 +6,12 @@
         display-title
         display-divider
       />
+      <v-card-actions>
+        <v-btn text @click="handleViewTarget">
+          <v-icon class="mr-1">mdi-application-array-outline</v-icon>
+          View Artifact
+        </v-btn>
+      </v-card-actions>
     </v-card>
     <flex-box justify="center" y="2">
       <v-icon large style="transform: rotate(270deg)">
@@ -24,6 +30,12 @@
         display-title
         display-divider
       />
+      <v-card-actions>
+        <v-btn text @click="handleViewSource">
+          <v-icon class="mr-1">mdi-application-array-outline</v-icon>
+          View Artifact
+        </v-btn>
+      </v-card-actions>
     </v-card>
   </div>
 </template>
@@ -70,6 +82,20 @@ export default Vue.extend({
       return this.traceLink?.traceType === TraceType.GENERATED
         ? String(this.traceLink.score)
         : "";
+    },
+  },
+  methods: {
+    /**
+     * Views the target artifact.
+     */
+    handleViewTarget(): void {
+      selectionStore.selectArtifact(this.traceLink?.targetId || "");
+    },
+    /**
+     * Views the source artifact.
+     */
+    handleViewSource(): void {
+      selectionStore.selectArtifact(this.traceLink?.sourceId || "");
     },
   },
 });

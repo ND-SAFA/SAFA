@@ -21,6 +21,7 @@ import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
+import edu.nd.crc.safa.utilities.CloudStorage;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -69,6 +70,8 @@ public class JobController extends BaseController {
     @DeleteMapping(AppRoutes.Jobs.Meta.DELETE_JOB)
     public void deleteJob(@PathVariable UUID jobId) throws SafaError {
         this.jobService.deleteJob(jobId);
+        String jobOutputFile = CloudStorage.getJobOutputPath(jobId.toString());
+        CloudStorage.deleteFile(jobOutputFile);
         this.serviceProvider.getNotificationService().broadcastChange(
             EntityChangeBuilder
                 .create(jobId)

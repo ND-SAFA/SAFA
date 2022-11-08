@@ -1,6 +1,6 @@
 import { EventObject } from "cytoscape";
 import { ArtifactModel } from "@/types";
-import { layoutStore, selectionStore } from "@/hooks";
+import { appStore, layoutStore, selectionStore } from "@/hooks";
 import { disableDrawMode } from "@/cytoscape";
 import { DefaultCytoEvents } from "@/cytoscape/events/cyto-events";
 import { CytoCore, CytoEvent, CytoEventHandlers } from "@/types/cytoscape/core";
@@ -18,6 +18,7 @@ export const ArtifactTreeCytoEvents: CytoEventHandlers = {
     action(cy: CytoCore, event: EventObject) {
       if (event.target === cy) {
         selectionStore.clearSelections();
+        appStore.closeSidePanels();
         disableDrawMode();
       }
     },

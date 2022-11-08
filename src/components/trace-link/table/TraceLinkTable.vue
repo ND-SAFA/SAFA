@@ -77,7 +77,7 @@
 
       <template v-slot:expanded-item="{ headers, item }">
         <td :colspan="headers.length" class="pb-2">
-          <trace-link-display :link="item" hide-actions :show-only="showOnly" />
+          <trace-link-display :link="item" :show-only="showOnly" />
         </td>
       </template>
     </v-data-table>
@@ -95,10 +95,9 @@ import {
   TableGroupHeader,
   Typography,
 } from "@/components/common";
-import { TraceLinkDisplay } from "../base";
+import { TraceLinkDisplay, TraceLinkApproval } from "../base";
 import traceLinkTableHeaders from "./traceLinkTableHeaders";
 import TraceLinkTableHeader from "./TraceLinkTableHeader.vue";
-import TraceLinkApproval from "./TraceLinkApproval.vue";
 
 /**
  * Displays a table of trace links.

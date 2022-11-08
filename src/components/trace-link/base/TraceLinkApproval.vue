@@ -1,34 +1,43 @@
 <template>
-  <flex-box align="center" justify="center">
-    <v-btn
-      v-if="showUnreviewed"
-      text
-      :loading="isUnreviewLoading"
-      @click="handleUnreview"
-    >
-      <v-icon class="mr-1">mdi-checkbox-blank-circle-outline</v-icon>
-      Un-Review
-    </v-btn>
-    <v-btn
-      v-if="showApproved"
-      text
-      :loading="isApproveLoading"
-      color="primary"
-      @click="handleApprove"
-    >
-      <v-icon class="mr-1">mdi-check-circle-outline</v-icon>
-      Approve
-    </v-btn>
-    <v-btn
-      v-if="showDeclined"
-      text
-      :loading="isDeclineLoading"
-      color="error"
-      @click="handleDecline"
-    >
-      <v-icon class="mr-1">mdi-close-circle-outline</v-icon>
-      Decline
-    </v-btn>
+  <flex-box justify="space-between">
+    <flex-box align="center" justify="center">
+      <v-btn
+        v-if="showUnreviewed"
+        text
+        :loading="isUnreviewLoading"
+        @click="handleUnreview"
+      >
+        <v-icon class="mr-1">mdi-checkbox-blank-circle-outline</v-icon>
+        Un-Review
+      </v-btn>
+      <v-btn
+        v-if="showApproved"
+        text
+        :loading="isApproveLoading"
+        color="primary"
+        @click="handleApprove"
+      >
+        <v-icon class="mr-1">mdi-check-circle-outline</v-icon>
+        Approve
+      </v-btn>
+      <v-btn
+        v-if="showDeclined"
+        text
+        :loading="isDeclineLoading"
+        color="error"
+        @click="handleDecline"
+      >
+        <v-icon class="mr-1">mdi-close-circle-outline</v-icon>
+        Decline
+      </v-btn>
+    </flex-box>
+    <flex-box v-if="showDelete">
+      <v-divider vertical />
+      <v-btn text color="error" @click="handleDelete">
+        <v-icon class="mr-1">mdi-delete</v-icon>
+        Delete
+      </v-btn>
+    </flex-box>
   </flex-box>
 </template>
 
@@ -36,6 +45,7 @@
 import Vue, { PropType } from "vue";
 import { TraceLinkModel } from "@/types";
 import { linkStatus } from "@/util";
+import { logStore, projectStore, sessionStore } from "@/hooks";
 import {
   handleApproveLink,
   handleDeclineLink,
@@ -49,6 +59,7 @@ import { FlexBox } from "@/components/common";
  * @emits-1 `link:approve` - On Link Approval.
  * @emits-2 `link:decline` - On Link Decline.
  * @emits-2 `link:unreview` - On Link Un-review.
+ * @emits-2 `link:delete` - On Link Delete.
  */
 export default Vue.extend({
   name: "TraceLinkApproval",
@@ -60,19 +71,22 @@ export default Vue.extend({
       type: Object as PropType<TraceLinkModel>,
       required: true,
     },
+    showDelete: Boolean,
   },
   data() {
     return {
-      isSourceExpanded: false,
-      isTargetExpanded: false,
-      confirmDelete: false,
       isApproveLoading: false,
       isDeclineLoading: false,
       isUnreviewLoading: false,
-      isDeleteLoading: false,
     };
   },
   computed: {
+    /**
+     * @return Whether the current user is an editor of the current project.
+     */
+    isEditor(): boolean {
+      return sessionStore.isEditor(projectStore.project);
+    },
     /**
      * @return Whether this link can be approved.
      */
@@ -122,6 +136,22 @@ export default Vue.extend({
         onSuccess: () => this.$emit("link:unreview", this.link),
         onComplete: () => (this.isDeclineLoading = false),
       });
+    },
+    /**
+     * Deletes the given link.
+     */
+    handleDelete() {
+      logStore.confirm(
+        "Delete Trace Link",
+        "Are you sure you want to delete this trace link?",
+        async (confirmed) => {
+          if (!confirmed) return;
+
+          await handleUnreviewLink(this.link, {
+            onSuccess: () => this.$emit("link:delete", this.link),
+          });
+        }
+      );
     },
   },
 });

@@ -81,6 +81,7 @@ export const useSelection = defineStore("selection", {
       this.selectedSubtreeIds = [];
       this.selectedGroupIds = [];
       this.selectedArtifactId = "";
+      this.selectedTraceLinkId = "";
     },
     /**
      * Sets the viewport to the given artifact and its subtree.

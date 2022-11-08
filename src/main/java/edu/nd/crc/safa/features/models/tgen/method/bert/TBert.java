@@ -209,7 +209,7 @@ public abstract class TBert implements ITraceLinkGeneration {
 
     private <T extends AbstractTGenResponse> T getOutput(String jobId, Class<T> responseClass) {
         //TODO: Use scheduled tasks instead of constant pinging.
-        String outputFile = "prediction/output/" + jobId + "/output.json";
+        String outputFile = CloudStorage.getJobOutputPath(jobId);
         try {
             while (!CloudStorage.exists(outputFile)) {
                 Thread.sleep(1000 * Defaults.WAIT_SECONDS);
@@ -237,10 +237,6 @@ public abstract class TBert implements ITraceLinkGeneration {
         } catch (Exception e) {
             e.printStackTrace();
             throw new SafaError("An error occurred while training the model", e);
-        } finally {
-            if (CloudStorage.exists(outputFile)) {
-                CloudStorage.getBlob(outputFile).delete();
-            }
         }
     }
 

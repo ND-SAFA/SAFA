@@ -43,6 +43,12 @@ public class CloudStorage {
         return response;
     }
 
+    public static void deleteFile(String filePath) {
+        if (CloudStorage.exists(filePath)) {
+            CloudStorage.getBlob(filePath).delete();
+        }
+    }
+
     public static Blob getBlob(String objectName) {
         Storage storage = getStorage();
         BlobId blobId = getBlobId(objectName);
@@ -64,6 +70,10 @@ public class CloudStorage {
             return false;
         }
         return blob.exists();
+    }
+
+    public static String getJobOutputPath(String jobId) {
+        return "prediction/output/" + jobId + "/output.json";
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)

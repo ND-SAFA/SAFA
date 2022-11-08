@@ -186,7 +186,7 @@ export default Vue.extend({
      * @param traceLink - The trace link to select.
      */
     handleLinkRightClick(traceLink: TraceLinkModel): void {
-      selectionStore.selectTraceLink(traceLink.traceLinkId);
+      selectionStore.selectTraceLink(traceLink);
     },
   },
 });

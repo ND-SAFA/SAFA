@@ -114,12 +114,6 @@ export const useApp = defineStore("app", {
       this.togglePanel(PanelType.appPanel);
     },
     /**
-     * Toggles whether the details panel is open.
-     */
-    toggleDetailsPanel(): void {
-      this.togglePanel(PanelType.detailsPanel);
-    },
-    /**
      * Closes the side panels.
      */
     closeSidePanels(): void {

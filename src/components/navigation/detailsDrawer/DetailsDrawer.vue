@@ -14,7 +14,7 @@
         <generic-icon-button
           icon-id="mdi-close"
           tooltip="Close panel"
-          @click="toggleOpen"
+          @click="handleClose"
         />
       </flex-box>
       <v-divider />
@@ -32,7 +32,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { DetailsOpenState } from "@/types";
-import { appStore } from "@/hooks";
+import { appStore, selectionStore } from "@/hooks";
 import { GenericIconButton, Typography, FlexBox } from "@/components/common";
 import { DeltaPanel } from "@/components/delta";
 import { DocumentPanel } from "@/components/document";
@@ -101,8 +101,9 @@ export default Vue.extend({
     /**
      * Toggles whether the details panel is open.
      */
-    toggleOpen(): void {
-      appStore.toggleDetailsPanel();
+    handleClose(): void {
+      appStore.closeSidePanels();
+      selectionStore.clearSelections();
     },
   },
 });

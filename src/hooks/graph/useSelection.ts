@@ -136,10 +136,11 @@ export const useSelection = defineStore("selection", {
     /**
      * Sets the given trace links as selected.
      *
-     * @param traceLinkId - The trace link to select.
+     * @param traceLink - The trace link to select.
      */
-    selectTraceLink(traceLinkId: string): void {
-      this.selectedTraceLinkId = traceLinkId;
+    selectTraceLink(traceLink: TraceLinkModel): void {
+      this.selectedTraceLinkId = traceLink.traceLinkId;
+      this.selectedSubtreeIds = [traceLink.sourceId, traceLink.targetId];
       appStore.openDetailsPanel("displayTrace");
     },
     /**

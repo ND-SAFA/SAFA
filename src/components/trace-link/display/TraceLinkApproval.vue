@@ -32,7 +32,7 @@
       </v-btn>
     </flex-box>
     <flex-box v-if="showDelete">
-      <v-divider vertical />
+      <v-divider vertical v-if="showApproved || showDeclined" />
       <v-btn text color="error" @click="handleDelete">
         <v-icon class="mr-1">mdi-delete</v-icon>
         Delete
@@ -45,10 +45,11 @@
 import Vue, { PropType } from "vue";
 import { TraceLinkModel } from "@/types";
 import { linkStatus } from "@/util";
-import { logStore, projectStore, sessionStore } from "@/hooks";
+import { projectStore, sessionStore } from "@/hooks";
 import {
   handleApproveLink,
   handleDeclineLink,
+  handleDeleteLink,
   handleUnreviewLink,
 } from "@/api";
 import { FlexBox } from "@/components/common";
@@ -141,17 +142,9 @@ export default Vue.extend({
      * Deletes the given link.
      */
     handleDelete() {
-      logStore.confirm(
-        "Delete Trace Link",
-        "Are you sure you want to delete this trace link?",
-        async (confirmed) => {
-          if (!confirmed) return;
-
-          await handleUnreviewLink(this.link, {
-            onSuccess: () => this.$emit("link:delete", this.link),
-          });
-        }
-      );
+      handleDeleteLink(this.link, {
+        onSuccess: () => this.$emit("link:delete", this.link),
+      });
     },
   },
 });

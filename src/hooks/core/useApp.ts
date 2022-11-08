@@ -118,6 +118,7 @@ export const useApp = defineStore("app", {
      */
     closeSidePanels(): void {
       this.closePanel(PanelType.detailsPanel);
+      this.closePanel(PanelType.artifactCreator);
     },
     /**
      * Closes the side panels.
@@ -159,13 +160,6 @@ export const useApp = defineStore("app", {
 
       this.isOpen[PanelType.artifactCreator] = type || true;
       this.openDetailsPanel("saveArtifact");
-    },
-    /**
-     * Closes the artifact creator.
-     */
-    closeArtifactCreator(): void {
-      this.closePanel(PanelType.artifactCreator);
-      this.closeSidePanels();
     },
     /**
      * Enqueues a new update to be loaded when the user is ready.

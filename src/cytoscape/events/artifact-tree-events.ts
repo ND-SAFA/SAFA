@@ -1,5 +1,5 @@
 import { EventObject } from "cytoscape";
-import { ArtifactModel } from "@/types";
+import { ArtifactModel, DetailsOpenState } from "@/types";
 import { appStore, layoutStore, selectionStore } from "@/hooks";
 import { disableDrawMode } from "@/cytoscape";
 import { DefaultCytoEvents } from "@/cytoscape/events/cyto-events";
@@ -17,9 +17,17 @@ export const ArtifactTreeCytoEvents: CytoEventHandlers = {
     events: [CytoEvent.TAP],
     action(cy: CytoCore, event: EventObject) {
       if (event.target === cy) {
-        selectionStore.clearSelections();
-        appStore.closeSidePanels();
         disableDrawMode();
+
+        // Don't close the side panels if an object is being edited.
+        if (
+          (
+            ["document", "saveArtifact", "saveTrace"] as DetailsOpenState[]
+          ).includes(appStore.isDetailsPanelOpen)
+        )
+          return;
+
+        selectionStore.clearSelections();
       }
     },
   },

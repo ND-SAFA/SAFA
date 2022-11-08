@@ -7,7 +7,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { appStore } from "@/hooks";
-import { ArtifactBody } from "../base";
+import { ArtifactBody } from "../display";
 
 /**
  * Displays artifact content.

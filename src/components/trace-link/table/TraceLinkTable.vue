@@ -95,7 +95,7 @@ import {
   TableGroupHeader,
   Typography,
 } from "@/components/common";
-import { TraceLinkDisplay, TraceLinkApproval } from "../base";
+import { TraceLinkDisplay, TraceLinkApproval } from "../display";
 import traceLinkTableHeaders from "./traceLinkTableHeaders";
 import TraceLinkTableHeader from "./TraceLinkTableHeader.vue";
 

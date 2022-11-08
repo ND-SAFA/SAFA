@@ -8,7 +8,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { appStore } from "@/hooks";
-import { TraceLinkButtons, TraceLinkContent } from "../base";
+import { TraceLinkButtons, TraceLinkContent } from "../display";
 
 /**
  * Displays trace link information.

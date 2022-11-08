@@ -9,12 +9,10 @@
 
 <script lang="ts">
 import Vue from "vue";
-import {
-  ArtifactTitle,
-  ArtifactDocuments,
-  ArtifactErrors,
-  ArtifactTraces,
-} from "./content";
+import ArtifactTitle from "./ArtifactTitle.vue";
+import ArtifactDocuments from "./ArtifactDocuments.vue";
+import ArtifactErrors from "./ArtifactErrors.vue";
+import ArtifactTraces from "./ArtifactTraces.vue";
 
 /**
  * Displays artifact information.

@@ -8,7 +8,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { appStore } from "@/hooks";
-import { ArtifactButtons, ArtifactContent } from "../base";
+import { ArtifactButtons, ArtifactContent } from "../display";
 
 /**
  * Displays artifact information.

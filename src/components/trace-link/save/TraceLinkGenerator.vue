@@ -25,7 +25,7 @@ import Vue from "vue";
 import { ArtifactLevelModel, ModelType, GenerationModel } from "@/types";
 import { handleGenerateLinks } from "@/api";
 import { Typography, CustomModelInput } from "@/components/common";
-import { TraceMatrixCreator } from "../base";
+import { TraceMatrixCreator } from "../save";
 
 /**
  * Displays inputs for generating trace links.

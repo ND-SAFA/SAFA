@@ -42,8 +42,6 @@
         <v-icon>mdi-plus</v-icon>
         Add View
       </v-btn>
-
-      <document-modal :is-open="isOpen" @close="handleCloseMenu" />
     </template>
   </v-select>
 </template>
@@ -52,6 +50,7 @@
 import Vue from "vue";
 import { DocumentModel } from "@/types";
 import {
+  appStore,
   documentSaveStore,
   documentStore,
   projectStore,
@@ -59,14 +58,10 @@ import {
 } from "@/hooks";
 import { handleSwitchDocuments } from "@/api";
 import { GenericIconButton } from "@/components/common";
-import DocumentModal from "./DocumentModal.vue";
 
 export default Vue.extend({
   name: "DocumentSelector",
-  components: { DocumentModal, GenericIconButton },
-  data: () => ({
-    isOpen: false,
-  }),
+  components: { GenericIconButton },
   computed: {
     /**
      * @return The current documents.
@@ -104,21 +99,22 @@ export default Vue.extend({
      */
     handleCloseMenu() {
       (this.$refs.documentSelector as HTMLElement).blur();
-      this.isOpen = false;
     },
     /**
      * Opens the create document modal.
      */
     handleCreateOpen() {
       documentSaveStore.baseDocument = undefined;
-      this.isOpen = true;
+      this.handleCloseMenu();
+      appStore.openDetailsPanel("document");
     },
     /**
      * Opens the edit document modal.
      */
     handleEditOpen(document: DocumentModel) {
       documentSaveStore.baseDocument = document;
-      this.isOpen = true;
+      this.handleCloseMenu();
+      appStore.openDetailsPanel("document");
     },
   },
 });

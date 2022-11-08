@@ -44,7 +44,7 @@ import {
 import {
   TraceLinkPanel,
   SaveTraceLinkPanel,
-} from "@/components/trace-link/panels";
+} from "@/components/traceLink/panels";
 
 /**
  * Renders content in a right side panel.

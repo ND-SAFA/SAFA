@@ -23,7 +23,7 @@ import Vue, { PropType } from "vue";
 import { ArtifactLevelModel, GenerationModel } from "@/types";
 import { handleTrainModel } from "@/api";
 import { Typography } from "@/components/common";
-import { TraceMatrixCreator } from "@/components/trace-link";
+import { TraceMatrixCreator } from "@/components/traceLink";
 
 /**
  * A step for training a model with artifacts and trace links from the current project.

@@ -20,7 +20,7 @@
 import Vue from "vue";
 import { tracePredictionTabOptions } from "@/util";
 import { TabList, Typography } from "@/components/common";
-import { TraceLinkTable, TraceLinkGenerator } from "@/components/trace-link";
+import { TraceLinkTable, TraceLinkGenerator } from "@/components/traceLink";
 import ModelTable from "./ModelTable.vue";
 
 /**

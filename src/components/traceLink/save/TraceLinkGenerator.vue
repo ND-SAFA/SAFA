@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container style="max-width: 50em">
     <typography el="p" b="4" :value="modalDescription" />
 
     <custom-model-input v-model="model" />

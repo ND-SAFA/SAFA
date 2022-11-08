@@ -31,7 +31,7 @@ import { projectStore } from "@/hooks";
 import { GenericIconButton } from "@/components/common/generic";
 
 /**
- * A input for projects.
+ * An input for projects.
  *
  * @emits-1 `input` (string[] | string | undefined) - On value change.
  */

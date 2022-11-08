@@ -65,17 +65,6 @@ export default Vue.extend({
       this.replaceAllArtifacts = false;
     },
   },
-  computed: {
-    /**
-     * @return Whether the uploaded files are valid.
-     */
-    isUploadValid(): boolean {
-      return (
-        this.selectedFiles.length > 0 &&
-        !!this.selectedFiles.find(({ name }) => name === "tim.json")
-      );
-    },
-  },
   methods: {
     /**
      * Closes the modal and clears data.

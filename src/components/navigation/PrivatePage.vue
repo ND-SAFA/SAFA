@@ -8,7 +8,7 @@
 import Vue from "vue";
 
 /**
- * Displays a page with top and side bars.
+ * Displays a page with top and sidebars.
  */
 export default Vue.extend({
   name: "PrivatePage",

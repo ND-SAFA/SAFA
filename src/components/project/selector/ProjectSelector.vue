@@ -63,7 +63,7 @@ export default Vue.extend({
   props: {
     /**
      * Whether this component is currently in view. If within
-     * a stepper then this is true when the this component is within the current step.
+     * a stepper then this is true when this component is on the current step.
      */
     isOpen: {
       type: Boolean,

@@ -82,7 +82,7 @@ export default Vue.extend({
   },
   methods: {
     /**
-     * Selects an artifact..
+     * Selects an artifact.
      */
     handleArtifactSelect(
       name: string,

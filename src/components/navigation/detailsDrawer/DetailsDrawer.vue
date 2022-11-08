@@ -6,7 +6,7 @@
     hide-overlay
     :value="drawerOpen"
     height="100%"
-    width="400"
+    :width="width"
   >
     <v-container>
       <flex-box justify="space-between" align="center">
@@ -76,6 +76,9 @@ export default Vue.extend({
     drawerOpen(): boolean {
       return !!this.openState;
     },
+    /**
+     * @return The title of the panel.
+     */
     title(): string {
       switch (appStore.isDetailsPanelOpen) {
         case "delta":
@@ -94,6 +97,16 @@ export default Vue.extend({
           return "Create Trace Link";
         default:
           return "";
+      }
+    },
+    /**
+     * @return The width of the panel.
+     */
+    width(): string {
+      if (appStore.isDetailsPanelOpen === "displayArtifactBody") {
+        return "600";
+      } else {
+        return "400";
       }
     },
   },

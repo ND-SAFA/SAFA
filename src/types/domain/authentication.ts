@@ -77,17 +77,3 @@ export interface PasswordChangeModel {
    */
   newPassword: string;
 }
-
-/**
- * Defines the decoded object of an authorization JWT token
- */
-export interface AuthToken {
-  /**
-   * The identifier (email) of the subscriber.
-   */
-  sub: string;
-  /**
-   * Expiration date in number of seconds since epoch.
-   */
-  exp: number;
-}

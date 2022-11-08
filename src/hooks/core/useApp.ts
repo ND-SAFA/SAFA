@@ -132,6 +132,7 @@ export const useApp = defineStore("app", {
      */
     openDetailsPanel(state: DetailsOpenState): void {
       this.isOpen[PanelType.detailsPanel] = state;
+      this.isOpen[PanelType.appPanel] = false;
     },
     /**
      * Enables the draw link mode.

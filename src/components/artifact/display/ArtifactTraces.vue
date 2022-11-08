@@ -1,5 +1,5 @@
 <template>
-  <div v-if="parents.length + children.length > 0" class="mb-2">
+  <div v-if="parents.length + children.length > 0" class="my-2">
     <flex-box>
       <v-icon color="primary" style="transform: rotate(-45deg)">
         mdi-ray-start-arrow

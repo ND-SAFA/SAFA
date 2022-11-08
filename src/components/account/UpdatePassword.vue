@@ -55,7 +55,7 @@ export default Vue.extend({
   },
   methods: {
     /**
-     * Handles an password edit.
+     * Handles a password edit.
      */
     handleEditPassword(): void {
       this.passwordError = false;

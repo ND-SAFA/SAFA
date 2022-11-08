@@ -120,7 +120,7 @@ export default Vue.extend({
       return this.column.dataType === ColumnDataType.RELATION;
     },
     /**
-     * @return Whether the data type is a select.
+     * @return Whether the data type is select.
      */
     isSelect(): boolean {
       return this.column.dataType === ColumnDataType.SELECT;

@@ -100,7 +100,6 @@ export function linkStatus(traceLink?: TraceLinkModel) {
 
   return {
     canBeModified,
-    canBeDeleted: () => !canBeModified(),
     canBeApproved: () =>
       canBeModified() && traceLink?.approvalStatus !== ApprovalType.APPROVED,
     canBeDeclined: () =>

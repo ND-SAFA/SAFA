@@ -18,7 +18,7 @@ import { appStore, selectionStore } from "@/hooks";
 import { Typography } from "@/components/common";
 
 /**
- * Displays the selected node's body..
+ * Displays the selected node's body.
  */
 export default Vue.extend({
   name: "ArtifactBody",

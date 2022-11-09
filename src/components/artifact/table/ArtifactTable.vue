@@ -47,6 +47,12 @@
         </td>
       </template>
 
+      <template v-slot:[`item.deltaState`]="{ item }">
+        <td class="v-data-table__divider">
+          <artifact-table-delta-chip :artifact="item" />
+        </td>
+      </template>
+
       <template v-slot:[`item.type`]="{ item }">
         <td class="v-data-table__divider">
           <attribute-chip :value="item.type" artifact-type />
@@ -96,6 +102,7 @@ import ArtifactTableHeader from "./ArtifactTableHeader.vue";
 import ArtifactTableCell from "./ArtifactTableCell.vue";
 import ArtifactTableRowName from "./ArtifactTableRowName.vue";
 import ArtifactTableRowActions from "./ArtifactTableRowActions.vue";
+import ArtifactTableDeltaChip from "./ArtifactTableDeltaChip.vue";
 
 /**
  * Represents a table of artifacts.
@@ -110,6 +117,7 @@ export default Vue.extend({
     ArtifactTableCell,
     ArtifactTableRowName,
     TableGroupHeader,
+    ArtifactTableDeltaChip,
   },
   data() {
     return {
@@ -160,6 +168,16 @@ export default Vue.extend({
           filterable: true,
           divider: true,
         },
+        ...(deltaStore.inDeltaView
+          ? [
+              {
+                text: "Delta State",
+                value: "deltaState",
+                width: "200px",
+                groupable: false,
+              },
+            ]
+          : []),
         ...documentStore.tableColumns.map((col) => ({
           text: col.name,
           value: col.id,

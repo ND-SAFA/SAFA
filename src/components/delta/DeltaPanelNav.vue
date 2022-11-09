@@ -111,7 +111,12 @@ export default Vue.extend({
      */
     async loadVersions(): Promise<void> {
       const { projectId } = this.project;
-      this.versions = projectId ? await getProjectVersions(projectId) : [];
+      this.versions = projectId
+        ? (await getProjectVersions(projectId)).filter(
+            ({ versionId }) =>
+              versionId !== this.project.projectVersion?.versionId
+          )
+        : [];
     },
     /**
      * Changes whether delta view is enabled.

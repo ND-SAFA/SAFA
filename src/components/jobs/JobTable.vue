@@ -15,7 +15,7 @@
     <template v-slot:[`item.currentProgress`]="{ item }">
       <v-row v-if="isCancelled(item.status)" no-gutters>
         <v-col cols="4">
-          <typography secondary value="Upload Cancelled" />
+          <typography secondary value="Cancelled" />
         </v-col>
         <v-col cols="4">
           <typography secondary :value="getUpdatedText(item.lastUpdatedAt)" />
@@ -185,13 +185,13 @@ export default Vue.extend({
      * @returns The display name for when this job was updated.
      */
     getUpdatedText(timestamp: string) {
-      return `Last Update: ${timestampToDisplay(timestamp)}`;
+      return `Updated: ${timestampToDisplay(timestamp)}`;
     },
     /**
      * @returns The display name for when this job was completed.
      */
     getCompletedText(timestamp: string) {
-      return `Upload Completed: ${timestampToDisplay(timestamp)}`;
+      return `Completed: ${timestampToDisplay(timestamp)}`;
     },
     /**
      * @returns The display name for a job status.

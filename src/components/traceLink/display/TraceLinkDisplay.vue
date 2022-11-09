@@ -28,30 +28,14 @@
       variant="expandable"
       :value="showOnly === 'source' ? sourceArtifact.body : targetArtifact.body"
     />
-
-    <flex-box
-      full-width
-      align="center"
-      :justify="score ? 'space-between' : 'end'"
-    >
-      <flex-box align="center" v-if="!!score">
-        <typography value="Confidence Score:" r="2" />
-        <attribute-chip style="width: 200px" confidence-score :value="score" />
-      </flex-box>
-    </flex-box>
   </div>
 </template>
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { ArtifactModel, TraceLinkModel, TraceType } from "@/types";
+import { ArtifactModel, TraceLinkModel } from "@/types";
 import { artifactStore } from "@/hooks";
-import {
-  FlexBox,
-  Typography,
-  AttributeChip,
-  GenericArtifactBodyDisplay,
-} from "@/components/common";
+import { Typography, GenericArtifactBodyDisplay } from "@/components/common";
 
 /**
  * Displays a trace link.
@@ -60,9 +44,7 @@ export default Vue.extend({
   name: "TraceLinkDisplay",
   components: {
     Typography,
-    FlexBox,
     GenericArtifactBodyDisplay,
-    AttributeChip,
   },
   props: {
     link: {
@@ -89,14 +71,6 @@ export default Vue.extend({
      */
     targetArtifact(): ArtifactModel | undefined {
       return artifactStore.getArtifactById(this.link.targetId);
-    },
-    /**
-     * @return The score of generated links.
-     */
-    score(): string {
-      return this.link.traceType === TraceType.GENERATED
-        ? String(this.link.score)
-        : "";
     },
   },
 });

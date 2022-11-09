@@ -4,6 +4,7 @@
     right
     clipped
     hide-overlay
+    disable-resize-watcher
     :value="drawerOpen"
     height="100%"
     :width="width"
@@ -74,7 +75,7 @@ export default Vue.extend({
      * @return Whether the details panel is open.
      */
     drawerOpen(): boolean {
-      return !!this.openState;
+      return typeof this.openState === "string";
     },
     /**
      * @return The title of the panel.
@@ -84,7 +85,7 @@ export default Vue.extend({
         case "delta":
           return "Version Delta";
         case "document":
-          return "View";
+          return "Save View";
         case "displayArtifact":
           return "Artifact";
         case "displayArtifactBody":

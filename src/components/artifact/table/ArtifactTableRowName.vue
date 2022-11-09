@@ -1,6 +1,5 @@
 <template>
   <flex-box align="center">
-    <artifact-table-delta-chip :artifact="artifact" />
     <v-icon
       v-if="getHasWarnings(artifact)"
       color="secondary"
@@ -21,7 +20,6 @@ import Vue, { PropType } from "vue";
 import { ArtifactModel } from "@/types";
 import { warningStore } from "@/hooks";
 import { Typography, FlexBox } from "@/components/common";
-import ArtifactTableDeltaChip from "./ArtifactTableDeltaChip.vue";
 
 /**
  * Displays the name of a row of artifacts.
@@ -31,7 +29,6 @@ export default Vue.extend({
   components: {
     FlexBox,
     Typography,
-    ArtifactTableDeltaChip,
   },
   props: {
     artifact: Object as PropType<ArtifactModel>,

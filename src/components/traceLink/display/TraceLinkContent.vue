@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-card outlined class="pa-2">
+    <panel-card>
       <generic-artifact-body-display
         :artifact="targetArtifact"
         display-title
@@ -12,7 +12,7 @@
           View Artifact
         </v-btn>
       </v-card-actions>
-    </v-card>
+    </panel-card>
     <flex-box justify="center" y="2">
       <v-icon large style="transform: rotate(270deg)">
         mdi-ray-start-arrow
@@ -24,7 +24,7 @@
         :value="score"
       />
     </flex-box>
-    <v-card outlined class="pa-2">
+    <panel-card>
       <generic-artifact-body-display
         :artifact="sourceArtifact"
         display-title
@@ -36,7 +36,7 @@
           View Artifact
         </v-btn>
       </v-card-actions>
-    </v-card>
+    </panel-card>
   </div>
 </template>
 
@@ -48,6 +48,7 @@ import {
   GenericArtifactBodyDisplay,
   FlexBox,
   AttributeChip,
+  PanelCard,
 } from "@/components/common";
 
 /**
@@ -55,7 +56,7 @@ import {
  */
 export default Vue.extend({
   name: "TraceLinkContent",
-  components: { FlexBox, GenericArtifactBodyDisplay, AttributeChip },
+  components: { PanelCard, FlexBox, GenericArtifactBodyDisplay, AttributeChip },
   computed: {
     /**
      * @return The selected trace link.

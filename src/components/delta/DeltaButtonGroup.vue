@@ -2,7 +2,6 @@
   <toggle-list :value="itemFields.length > 0" :title="title">
     <artifact-delta-button
       v-for="{ name, id } in itemFields"
-      class="mr-1 mt-1"
       :key="name"
       :name="name"
       :deltaType="deltaType"

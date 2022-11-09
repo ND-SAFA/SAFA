@@ -1,5 +1,5 @@
 <template>
-  <v-container v-if="isDeltaMode">
+  <panel-card v-if="isDeltaMode">
     <typography el="h2" variant="subtitle" value="Artifacts" />
     <v-divider />
 
@@ -29,14 +29,14 @@
       :delta-type="selectedDeltaArtifact.deltaType"
       @close="handleCloseModal"
     />
-  </v-container>
+  </panel-card>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import { DeltaType, DeltaArtifact, ChangedArtifact } from "@/types";
 import { deltaStore } from "@/hooks";
-import { Typography } from "@/components/common";
+import { Typography, PanelCard } from "@/components/common";
 import ArtifactDeltaDiff from "./ArtifactDeltaDiff.vue";
 import DeltaButtonGroup from "./DeltaButtonGroup.vue";
 
@@ -47,7 +47,7 @@ import DeltaButtonGroup from "./DeltaButtonGroup.vue";
  */
 export default Vue.extend({
   name: "ArtifactDeltas",
-  components: { ArtifactDeltaDiff, DeltaButtonGroup, Typography },
+  components: { PanelCard, ArtifactDeltaDiff, DeltaButtonGroup, Typography },
   data() {
     return {
       selectedDeltaArtifact: undefined as ChangedArtifact | undefined,

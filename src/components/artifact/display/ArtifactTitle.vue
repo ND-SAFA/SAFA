@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <panel-card>
     <flex-box align="center" justify="space-between">
       <v-tooltip bottom>
         <template v-slot:activator="{ on, attrs }">
@@ -29,13 +29,18 @@
       :value="selectedArtifactBody"
       data-cy="text-selected-body"
     />
-  </div>
+  </panel-card>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import { selectionStore } from "@/hooks";
-import { Typography, FlexBox, AttributeChip } from "@/components/common";
+import {
+  Typography,
+  FlexBox,
+  AttributeChip,
+  PanelCard,
+} from "@/components/common";
 
 /**
  * Displays the selected node's title and option buttons.
@@ -43,6 +48,7 @@ import { Typography, FlexBox, AttributeChip } from "@/components/common";
 export default Vue.extend({
   name: "ArtifactTitle",
   components: {
+    PanelCard,
     AttributeChip,
     FlexBox,
     Typography,

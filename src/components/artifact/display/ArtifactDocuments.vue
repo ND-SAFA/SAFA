@@ -1,5 +1,5 @@
 <template>
-  <div v-if="documents.length > 0" class="mt-4">
+  <panel-card v-if="doDisplay">
     <typography el="h2" variant="subtitle" value="Views" />
     <v-divider />
 
@@ -13,7 +13,7 @@
         />
       </template>
     </v-list>
-  </div>
+  </panel-card>
 </template>
 
 <script lang="ts">
@@ -22,14 +22,14 @@ import { DocumentModel } from "@/types";
 import { documentTypeOptions } from "@/util";
 import { documentStore, selectionStore } from "@/hooks";
 import { handleSwitchDocuments } from "@/api";
-import { Typography, GenericListItem } from "@/components/common";
+import { Typography, GenericListItem, PanelCard } from "@/components/common";
 
 /**
  * Displays the selected node's documents.
  */
 export default Vue.extend({
   name: "ArtifactDocuments",
-  components: { Typography, GenericListItem },
+  components: { PanelCard, Typography, GenericListItem },
   computed: {
     /**
      * @return The selected artifact.
@@ -46,6 +46,12 @@ export default Vue.extend({
       return documentStore.projectDocuments.filter(({ documentId }) =>
         this.selectedArtifact?.documentIds.includes(documentId)
       );
+    },
+    /**
+     * @return Whether to display this section.
+     */
+    doDisplay(): boolean {
+      return this.documents.length > 0;
     },
   },
   methods: {

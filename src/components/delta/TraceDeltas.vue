@@ -1,5 +1,5 @@
 <template>
-  <v-container v-if="isDeltaMode">
+  <panel-card v-if="isDeltaMode">
     <typography el="h2" variant="subtitle" value="Trace Links" />
     <v-divider />
 
@@ -17,13 +17,13 @@
         @click="handleRemovedSelect"
       />
     </v-list>
-  </v-container>
+  </panel-card>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import { deltaStore, selectionStore } from "@/hooks";
-import { Typography } from "@/components/common";
+import { Typography, PanelCard } from "@/components/common";
 import DeltaButtonGroup from "./DeltaButtonGroup.vue";
 
 /**
@@ -33,7 +33,7 @@ import DeltaButtonGroup from "./DeltaButtonGroup.vue";
  */
 export default Vue.extend({
   name: "TraceDeltas",
-  components: { DeltaButtonGroup, Typography },
+  components: { PanelCard, DeltaButtonGroup, Typography },
   data() {
     return {
       openPanels: [0, 1],

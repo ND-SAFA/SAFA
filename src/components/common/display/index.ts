@@ -7,3 +7,4 @@ export { default as AttributeChip } from "./AttributeChip.vue";
 export { default as FileFormatAlert } from "./FileFormatAlert.vue";
 export { default as TabList } from "./TabList.vue";
 export { default as UnderConstructionAlert } from "./UnderConstructionAlert.vue";
+export { default as PanelCard } from "./PanelCard.vue";

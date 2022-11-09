@@ -1,10 +1,10 @@
 <template>
-  <div v-if="parents.length + children.length > 0" class="my-2">
-    <flex-box>
+  <panel-card v-if="doDisplay">
+    <flex-box justify="space-between">
+      <typography el="h2" l="1" variant="subtitle" value="Trace Links" />
       <v-icon color="primary" style="transform: rotate(-45deg)">
         mdi-ray-start-arrow
       </v-icon>
-      <typography el="h2" l="1" variant="subtitle" value="Trace Links" />
     </flex-box>
 
     <v-divider />
@@ -61,7 +61,7 @@
         </v-list>
       </toggle-list>
     </v-list>
-  </div>
+  </panel-card>
 </template>
 
 <script lang="ts">
@@ -79,6 +79,7 @@ import {
   FlexBox,
   ToggleList,
   GenericIconButton,
+  PanelCard,
 } from "@/components/common";
 
 /**
@@ -87,6 +88,7 @@ import {
 export default Vue.extend({
   name: "ArtifactTraces",
   components: {
+    PanelCard,
     GenericIconButton,
     FlexBox,
     Typography,
@@ -127,6 +129,12 @@ export default Vue.extend({
 
           return { title: artifact?.name || "", subtitle: artifact?.type };
         });
+    },
+    /**
+     * @return Whether to display this section.
+     */
+    doDisplay(): boolean {
+      return this.parents.length + this.children.length > 0;
     },
     /**
      * Determines the width of trace link buttons.

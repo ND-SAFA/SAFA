@@ -1,6 +1,12 @@
 <template>
-  <v-btn outlined :color="titleColor" @click="$emit('click', name)">
-    <span class="text-ellipsis" style="max-width: 180px; color: inherit">
+  <v-btn
+    outlined
+    block
+    :color="titleColor"
+    @click="$emit('click', name)"
+    class="my-1"
+  >
+    <span class="text-ellipsis" style="max-width: 300px; color: inherit">
       {{ name }}
     </span>
   </v-btn>

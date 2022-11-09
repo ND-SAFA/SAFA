@@ -55,7 +55,7 @@ export default Vue.extend({
   data() {
     return {
       isLoading: false,
-      isSelectorVisible: false,
+      isSelectorVisible: deltaStore.inDeltaView,
       versions: [] as VersionModel[],
     };
   },

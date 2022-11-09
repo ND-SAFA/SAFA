@@ -35,7 +35,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { DeltaType, DeltaArtifact, ChangedArtifact } from "@/types";
-import { deltaStore } from "@/hooks";
+import { deltaStore, selectionStore } from "@/hooks";
 import { Typography, PanelCard } from "@/components/common";
 import ArtifactDeltaDiff from "./ArtifactDeltaDiff.vue";
 import DeltaButtonGroup from "./DeltaButtonGroup.vue";
@@ -96,33 +96,36 @@ export default Vue.extend({
      * @param id - The artifact to select.
      */
     handleAddedSelect(id: string): void {
-      this.handleArtifactSelect(
-        this.addedArtifacts[id].name,
-        this.addedArtifacts[id],
-        "added"
-      );
+      selectionStore.selectArtifact(id);
+      // this.handleArtifactSelect(
+      //   this.addedArtifacts[id].name,
+      //   this.addedArtifacts[id],
+      //   "added"
+      // );
     },
     /**
      * Selects a modified artifact.
      * @param id - The artifact to select.
      */
     handleModifiedSelect(id: string): void {
-      this.handleArtifactSelect(
-        this.modifiedArtifacts[id].after.name,
-        this.modifiedArtifacts[id],
-        "modified"
-      );
+      selectionStore.selectArtifact(id);
+      // this.handleArtifactSelect(
+      //   this.modifiedArtifacts[id].after.name,
+      //   this.modifiedArtifacts[id],
+      //   "modified"
+      // );
     },
     /**
      * Selects a removed artifact.
      * @param id - The artifact to select.
      */
     handleRemovedSelect(id: string): void {
-      this.handleArtifactSelect(
-        this.removedArtifacts[id].name,
-        this.removedArtifacts[id],
-        "removed"
-      );
+      selectionStore.selectArtifact(id);
+      // this.handleArtifactSelect(
+      //   this.removedArtifacts[id].name,
+      //   this.removedArtifacts[id],
+      //   "removed"
+      // );
     },
     /**
      * Closes the delta modal.

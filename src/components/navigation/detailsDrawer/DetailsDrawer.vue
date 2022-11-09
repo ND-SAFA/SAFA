@@ -10,7 +10,7 @@
   >
     <v-container>
       <flex-box justify="space-between" align="center">
-        <typography color="grey" el="h2" variant="subtitle" :value="title" />
+        <typography color="primary" el="h2" variant="subtitle" :value="title" />
         <generic-icon-button
           icon-id="mdi-close"
           tooltip="Close panel"

@@ -1,49 +1,40 @@
 <template>
-  <v-container style="max-width: 50em">
-    <flex-box justify="space-between">
-      <panel-card class="full-width mr-2">
-        <typography el="h2" variant="subtitle" value="Project Data" />
-        <v-divider class="mb-2" />
-        <typography el="p" :value="subtitle" />
-        <typography el="h2" variant="subtitle" value="Description" />
-        <v-divider class="mb-2" />
-        <typography ep="p" :value="description" />
-      </panel-card>
+  <div>
+    <v-container>
+      <flex-box b="2">
+        <v-btn text @click="handleDownload">
+          <v-icon class="mr-1">mdi-download</v-icon>
+          Download Files
+        </v-btn>
+        <br />
+        <v-btn text @click="handleEdit">
+          <v-icon class="mr-1">mdi-pencil</v-icon>
+          Edit Project
+        </v-btn>
+        <v-divider vertical />
+        <v-btn text color="error" @click="handleDelete">
+          <v-icon class="mr-1">mdi-delete</v-icon>
+          Delete Project
+        </v-btn>
+      </flex-box>
 
-      <div>
-        <v-card outlined>
-          <v-container>
-            <v-btn text @click="handleDownload">
-              <v-icon class="mr-1">mdi-download</v-icon>
-              Download Files
-            </v-btn>
-            <br />
-            <v-btn text @click="handleEdit">
-              <v-icon class="mr-1">mdi-pencil</v-icon>
-              Edit Project
-            </v-btn>
-            <v-divider />
-            <v-btn text color="error" @click="handleDelete">
-              <v-icon class="mr-1">mdi-delete</v-icon>
-              Delete Project
-            </v-btn>
-          </v-container>
-        </v-card>
-      </div>
+      <project-display />
+    </v-container>
 
-      <project-identifier-modal
-        :is-open="isEditOpen"
-        :is-loading="isLoading"
-        @close="isEditOpen = false"
-        @save="handleSave"
-      />
-      <confirm-project-delete
-        :is-open="isDeleteOpen"
-        @confirm="handleConfirmDeleteProject"
-        @cancel="isDeleteOpen = false"
-      />
-    </flex-box>
-  </v-container>
+    <settings-members />
+
+    <project-identifier-modal
+      :is-open="isEditOpen"
+      :is-loading="isLoading"
+      @close="isEditOpen = false"
+      @save="handleSave"
+    />
+    <confirm-project-delete
+      :is-open="isDeleteOpen"
+      @confirm="handleConfirmDeleteProject"
+      @cancel="isDeleteOpen = false"
+    />
+  </div>
 </template>
 
 <script lang="ts">
@@ -54,11 +45,13 @@ import {
   handleDownloadProjectCSV,
   handleDeleteProject,
 } from "@/api";
-import { Typography, FlexBox, PanelCard } from "@/components/common";
+import { FlexBox } from "@/components/common";
 import {
   ProjectIdentifierModal,
   ConfirmProjectDelete,
+  ProjectDisplay,
 } from "@/components/project/base";
+import { SettingsMembers } from "./members";
 
 /**
  * Represents the section describing the project name and descriptions
@@ -67,11 +60,11 @@ import {
 export default Vue.extend({
   name: "SettingsOverview",
   components: {
-    PanelCard,
+    ProjectDisplay,
     FlexBox,
-    Typography,
     ProjectIdentifierModal,
     ConfirmProjectDelete,
+    SettingsMembers,
   },
   data() {
     return {
@@ -87,19 +80,6 @@ export default Vue.extend({
      */
     project() {
       return projectStore.project;
-    },
-    /**
-     * @return The subtitle for this project.
-     */
-    subtitle(): string {
-      const { artifacts, traces } = this.project;
-      return `${artifacts.length} Artifacts | ${traces.length} Trace Links`;
-    },
-    /**
-     * @return The description for this project.
-     */
-    description(): string {
-      return this.project.description || "No Description.";
     },
   },
   methods: {

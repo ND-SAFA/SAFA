@@ -1,5 +1,7 @@
 <template>
   <v-container>
+    <typography el="h2" variant="subtitle" value="Project Members" />
+    <v-divider class="mb-2" />
     <generic-selector
       is-open
       :headers="headers"
@@ -40,7 +42,7 @@ import Vue from "vue";
 import { MembershipModel, ProjectModel, ProjectRole } from "@/types";
 import { logStore, projectStore, sessionStore } from "@/hooks";
 import { handleDeleteMember, handleGetMembers } from "@/api";
-import { GenericSelector } from "@/components/common";
+import { GenericSelector, Typography } from "@/components/common";
 import SettingsMemberInformationModal from "./SettingsMemberInformationModal.vue";
 
 /**
@@ -48,7 +50,7 @@ import SettingsMemberInformationModal from "./SettingsMemberInformationModal.vue
  */
 export default Vue.extend({
   name: "SettingsMembers",
-  components: { GenericSelector, SettingsMemberInformationModal },
+  components: { GenericSelector, SettingsMemberInformationModal, Typography },
   data() {
     return {
       memberToEdit: undefined as MembershipModel | undefined,

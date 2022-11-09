@@ -1,13 +1,12 @@
 <template>
   <div>
-    <typography el="h1" variant="title" :value="project.name" />
+    <typography el="h1" variant="title" value="Project Settings" />
     <v-divider class="mb-2" />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { projectStore } from "@/hooks";
 import { Typography } from "@/components/common";
 
 /**
@@ -18,14 +17,6 @@ export default Vue.extend({
   name: "SettingsHeader",
   components: {
     Typography,
-  },
-  computed: {
-    /**
-     * @return The current project.
-     */
-    project() {
-      return projectStore.project;
-    },
   },
 });
 </script>

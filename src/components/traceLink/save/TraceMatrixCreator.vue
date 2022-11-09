@@ -24,11 +24,16 @@
               style="width: 50%"
             />
           </flex-box>
-          <typography
-            secondary
-            align="center"
-            :value="getMatrixDetails(matrix)"
-          />
+          <flex-box justify="center">
+            <attribute-chip
+              v-for="(detail, idx) in getMatrixDetails(matrix)"
+              :key="detail"
+              :value="detail"
+              :icon="
+                idx < 2 ? 'mdi-alpha-a-box-outline' : 'mdi-ray-start-arrow'
+              "
+            />
+          </flex-box>
         </flex-box>
         <generic-icon-button
           icon-id="mdi-close"
@@ -57,6 +62,7 @@ import {
   FlexBox,
   GenericIconButton,
   Typography,
+  AttributeChip,
 } from "@/components/common";
 
 /**
@@ -71,6 +77,7 @@ export default Vue.extend({
     Typography,
     ArtifactTypeInput,
     FlexBox,
+    AttributeChip,
   },
   props: {
     value: {
@@ -85,10 +92,10 @@ export default Vue.extend({
   },
   methods: {
     /**
-     * Gets the details information on a matrix of artifacts.
+     * Returns displayable characteristics on a matrix of artifacts.
      * @param matrix - The matrix to get details for.
      */
-    getMatrixDetails(matrix: ArtifactLevelModel): string {
+    getMatrixDetails(matrix: ArtifactLevelModel): string[] {
       const sources = artifactStore.getArtifactsByType[matrix.source] || [];
       const targets = artifactStore.getArtifactsByType[matrix.target] || [];
       const manual = traceStore.getTraceLinksByArtifactSets(sources, targets, [
@@ -100,10 +107,12 @@ export default Vue.extend({
         ["approved"]
       );
 
-      return (
-        `Source Artifacts: ${sources.length} | Target Artifacts: ${targets.length} | ` +
-        `Manual Links: ${manual.length} | Approved Links: ${approved.length}`
-      );
+      return [
+        `Source Artifacts: ${sources.length}`,
+        `Target Artifacts: ${targets.length}`,
+        `Manual Links: ${manual.length}`,
+        `Approved Links: ${approved.length}`,
+      ];
     },
     /**
      * Creates a new trace matrix.

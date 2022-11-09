@@ -6,12 +6,9 @@
         <settings-overview />
       </v-tab-item>
       <v-tab-item key="2">
-        <settings-members />
-      </v-tab-item>
-      <v-tab-item key="3">
         <upload-new-version :is-open="tab === 2" />
       </v-tab-item>
-      <v-tab-item key="4">
+      <v-tab-item key="3">
         <type-options />
       </v-tab-item>
     </tab-list>
@@ -25,7 +22,6 @@ import { TabList } from "@/components/common";
 import { UploadNewVersion } from "@/components/project/selector";
 import SettingsHeader from "./SettingsHeader.vue";
 import SettingsOverview from "./SettingsOverview.vue";
-import { SettingsMembers } from "./members";
 import TypeOptions from "./TypeOptions.vue";
 
 /**
@@ -38,7 +34,6 @@ export default Vue.extend({
     UploadNewVersion,
     TabList,
     SettingsOverview,
-    SettingsMembers,
     SettingsHeader,
   },
   props: {},

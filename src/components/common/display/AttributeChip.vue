@@ -13,7 +13,7 @@
         style="max-width: 200px"
         class="mr-1"
         :outlined="outlined"
-        :color="color"
+        :color="displayColor"
         :data-cy="dataCy"
       >
         <v-icon v-if="iconId" small>{{ iconId }}</v-icon>
@@ -28,7 +28,12 @@
     <span>{{ text }}</span>
   </v-tooltip>
   <flex-box v-else align="center">
-    <v-progress-linear :value="progress" :color="color" height="20" rounded />
+    <v-progress-linear
+      :value="progress"
+      :color="displayColor"
+      height="20"
+      rounded
+    />
     <typography l="2" :value="progress + '%'" style="width: 50px" />
   </flex-box>
 </template>
@@ -59,6 +64,7 @@ export default Vue.extend({
     artifactType: Boolean,
     confidenceScore: Boolean,
     dataCy: String,
+    color: String,
   },
   computed: {
     /**
@@ -94,8 +100,10 @@ export default Vue.extend({
     /**
      * @return The color to display for this chip.
      */
-    color(): string {
-      if (this.confidenceScore) {
+    displayColor(): string {
+      if (this.color) {
+        return this.color;
+      } else if (this.confidenceScore) {
         return getScoreColor(this.value || "");
       } else if (this.artifactType) {
         return "";

@@ -8,7 +8,7 @@ from api.responses.base_response import BaseResponse
 from jobs.abstract_job import AbstractJob
 from jobs.job_status import Status
 from test.base_trace_test import BaseTraceTest
-from test.config.paths import TEST_OUTPUT_DIR
+from test.paths.paths import TEST_OUTPUT_DIR
 from tracer.dataset.creators.supported_dataset_creator import SupportedDatasetCreator
 from tracer.dataset.dataset_role import DatasetRole
 from tracer.models.model_generator import ModelGenerator

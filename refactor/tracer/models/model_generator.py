@@ -5,7 +5,7 @@ from transformers.modeling_utils import PreTrainedModel
 from transformers.models.auto.tokenization_auto import AutoTokenizer
 from transformers.tokenization_utils import PreTrainedTokenizer
 
-from config.constants import MAX_SEQ_LENGTH_DEFAULT
+from constants.constants import MAX_SEQ_LENGTH_DEFAULT
 from tracer.models.base_models.supported_base_model import SupportedBaseModel
 from tracer.models.model_properties import ArchitectureType, ModelSize
 

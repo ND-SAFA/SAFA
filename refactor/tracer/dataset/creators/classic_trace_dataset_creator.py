@@ -1,6 +1,6 @@
 from typing import Dict, List, Set, Tuple
 
-from config.constants import USE_LINKED_TARGETS_ONLY_DEFAULT
+from constants.constants import USE_LINKED_TARGETS_ONLY_DEFAULT
 from tracer.dataset.creators.abstract_trace_dataset_creator import AbstractTraceDatasetCreator
 from tracer.dataset.data_objects.artifact import Artifact
 from tracer.dataset.data_objects.trace_link import TraceLink

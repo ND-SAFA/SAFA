@@ -1,8 +1,9 @@
 import os
 
 from jobs.delete_model_job import DeleteModelJob
+from jobs.job_args import JobArgs
 from test.base_job_test import BaseJobTest
-from test.config.paths import TEST_OUTPUT_DIR
+from test.paths.paths import TEST_OUTPUT_DIR
 
 
 class TestDeleteModelJob(BaseJobTest):
@@ -29,4 +30,5 @@ class TestDeleteModelJob(BaseJobTest):
         self.assertFalse(os.path.exists(self.MODEL_DIR))
 
     def _get_job(self):
-        return DeleteModelJob(model_path=self.MODEL_DIR, output_dir=TEST_OUTPUT_DIR)
+        job_args = JobArgs(model_path=self.MODEL_DIR, output_dir=TEST_OUTPUT_DIR)
+        return DeleteModelJob(job_args)

@@ -1,6 +1,6 @@
 from typing import List
 
-from config.constants import MIN_LENGTH_DEFAULT
+from constants.constants import MIN_LENGTH_DEFAULT
 from tracer.pre_processing.abstract_pre_processing_step import AbstractPreProcessingStep, Order
 
 

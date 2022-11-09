@@ -10,7 +10,9 @@ from transformers.trainer import Trainer
 from transformers.trainer_pt_utils import get_tpu_sampler, is_torch_tpu_available
 
 from api.responses.prediction_response import PredictionResponse
-from common.override import overrides
+from config.override import overrides
+from tracer.dataset.dataset_map import DatasetMap
+from tracer.dataset.dataset_role import DatasetRole
 from tracer.dataset.trace_dataset import TraceDataset
 from tracer.metrics.supported_trace_metric import get_metric_name, get_metric_path
 from tracer.models.model_generator import ModelGenerator
@@ -34,17 +36,16 @@ class TraceTrainer(Trainer):
         tokenizer = self.model_generator.get_tokenizer()
         super().__init__(model=model, args=args, tokenizer=tokenizer, callbacks=args.callbacks, **kwargs)
 
-    def perform_training(self, train_dataset: TraceDataset, eval_dataset: TraceDataset = None,
-                         checkpoint: str = None) -> Dict:
+    def perform_training(self, dataset_map: DatasetMap, checkpoint: str = None) -> Dict:
         """
         Performs the model training.
-        :param train_dataset: The dataset used to adjust model weights.
-        :param eval_dataset: The dataset used to determine the best model (TODO).
+        :param dataset_map: The map containing dataset for each of the roles used in a model training.
         :param checkpoint: path to checkpoint.
         :return: a dictionary containing the results
         """
-        self.train_dataset = self.extract_dataset(train_dataset)
-        self.eval_dataset = self.extract_dataset(eval_dataset) if eval_dataset else None
+        self.train_dataset = dataset_map[DatasetRole.TRAIN].to_trainer_dataset(self.model_generator)
+        if DatasetRole.EVAL in dataset_map:
+            self.eval_dataset = dataset_map[DatasetRole.EVAL].to_trainer_dataset(self.model_generator)
         output = self.train(resume_from_checkpoint=checkpoint)
         return TraceTrainer.output_to_dict(output)
 
@@ -55,20 +56,11 @@ class TraceTrainer(Trainer):
         :return: A dictionary containing the results.
         """
         self.eval_dataset = eval_dataset.to_trainer_dataset(self.model_generator)
-        output = self.predict(self.eval_dataset)
+        output = self.predict(self.eval_dataset)  # append with .to_trainer_dataset ??
         predictions = TraceTrainer.get_similarity_scores(output.predictions)
         results = self._eval(predictions, output.label_ids, self.args.metrics) if self.args.metrics else None
         output_dict = TraceTrainer.output_to_dict(output, metrics=results, predictions=predictions)
         return PredictionResponse.from_output(output_dict, eval_dataset.get_source_target_pairs())
-
-    def extract_dataset(self, trace_dataset: TraceDataset):
-        """
-        Extracts the dataset or list of data to be passed into the dataloader for train or eval.
-        Note, this class is overriden in trainers who expect a different data format.
-        :param trace_dataset: The trace dataset whose traces are extracted.
-        :return:
-        """
-        return trace_dataset.to_trainer_dataset(self.model_generator)
 
     @staticmethod
     def output_to_dict(output: NamedTuple, **kwargs) -> Dict:
@@ -92,10 +84,9 @@ class TraceTrainer(Trainer):
         results = {}
         for metric_path in metric_paths:
             metric = load_metric(metric_path, keep_in_memory=True)
-            print(metric)
             metric_result = metric.compute(predictions=preds, references=label_ids)
             metric_name = get_metric_name(metric)
-            if metric_name in metric_result:
+            if isinstance(metric_result, dict) and metric_name in metric_result:
                 results.update(metric_result)
             else:
                 results[metric_name] = metric_result

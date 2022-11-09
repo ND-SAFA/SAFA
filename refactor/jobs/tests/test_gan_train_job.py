@@ -1,3 +1,4 @@
+import os
 from unittest import mock
 from unittest.mock import patch
 
@@ -6,6 +7,7 @@ from jobs.gan_train_job import GanTrainJob
 from jobs.job_args import JobArgs
 from jobs.tests.test_train_job import TestTrainJob
 from test.base_job_test import BaseJobTest
+from test.paths.paths import TEST_DATA_DIR
 from tracer.dataset.creators.supported_dataset_creator import SupportedDatasetCreator
 from tracer.dataset.dataset_role import DatasetRole
 from tracer.train.trace_trainer import TraceTrainer
@@ -17,6 +19,7 @@ class TestGanTrainJob(BaseJobTest):
     TODO: Add test that includes a pre-training dataset
     TODO: Reduce the run time of the test to < 10 seconds
     """
+    PRETRAIN_DIR = os.path.join(TEST_DATA_DIR, "pre_train")
     EXAMPLE_TRAINING_OUTPUT = {
         "stats": [{
             "epoch": 1,
@@ -45,5 +48,8 @@ class TestGanTrainJob(BaseJobTest):
         job_args.trace_args_params = {
             "num_train_epochs": 1
         }
+        job_args.datasets_map[DatasetRole.PRE_TRAIN] = (SupportedDatasetCreator.MLM_PRETRAIN, {
+            "orig_data_path": self.PRETRAIN_DIR
+        })
         job = GanTrainJob(job_args)
         return job

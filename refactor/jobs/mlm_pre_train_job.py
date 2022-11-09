@@ -3,7 +3,7 @@ from typing import Dict, List
 
 from transformers import DataCollatorForLanguageModeling
 
-from config.constants import BLOCK_SIZE_DEFAULT, MLM_PROBABILITY_DEFAULT, TRAINING_DATA_DIR_DEFAULT
+from constants.constants import BLOCK_SIZE_DEFAULT, MLM_PROBABILITY_DEFAULT, TRAINING_DATA_DIR_DEFAULT
 from jobs.abstract_trace_job import AbstractTraceJob
 from jobs.job_args import JobArgs
 from server.storage.safa_storage import SafaStorage
@@ -53,7 +53,7 @@ class MLMPreTrainJob(AbstractTraceJob):
         )
         tokenizer.save_vocabulary(self.output_dir)
         trainer = self.get_trainer(data_collator=data_collator)
-        result = trainer.perform_training(self.train_dataset)
+        result = trainer.perform_training(self.dataset_map)
         trainer.save_model(trainer.args.output_dir)
 
         os.remove(self.train_dataset.training_file_path)

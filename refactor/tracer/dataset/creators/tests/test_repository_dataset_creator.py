@@ -1,8 +1,8 @@
 import os
 
 from test.base_trace_test import BaseTraceTest
-from test.config.paths import TEST_DATA_DIR
-from tracer.dataset.creators.repository_dataset_creator import RepositoryKeys, RepositoryDatasetCreator
+from test.paths.paths import TEST_DATA_DIR
+from tracer.dataset.creators.repository_dataset_creator import RepositoryDatasetCreator, RepositoryKeys
 
 
 class TestRepositoryDatasetCreator(BaseTraceTest):

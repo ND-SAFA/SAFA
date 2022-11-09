@@ -1,13 +1,16 @@
 import datetime
 import time
 from collections import namedtuple
+from typing import Dict
 
 import numpy as np
 import torch
 import torch.nn.functional as F
 from transformers import AutoModel, get_constant_schedule_with_warmup
 
-from common.override import overrides
+from tracer.dataset.dataset_map import DatasetMap
+from tracer.dataset.dataset_role import DatasetRole
+from tracer.dataset.pre_train_dataset import PreTrainDataset
 from tracer.dataset.trace_dataset import TraceDataset
 from tracer.models.base_models.descriminator import Discriminator
 from tracer.models.base_models.generator import Generator
@@ -26,6 +29,19 @@ class GanTrainer(TraceTrainer):
     def __init__(self, args: GanArgs, model_generator: ModelGenerator, **kwargs):
         super().__init__(args, model_generator, **kwargs)
         self.transformer = None
+
+    def perform_training(self, dataset_map: DatasetMap, checkpoint: str = None) -> Dict:
+        """
+        Performs the model training.
+        :param dataset_map: The map containing dataset for each of the roles used in a model training.
+        :param checkpoint: path to checkpoint.
+        :return: a dictionary containing the results
+        """
+        self.train_dataset = self.to_gan_dataset(dataset_map.train_dataset, dataset_map.pre_train_dataset)
+        if DatasetRole.EVAL in dataset_map:
+            self.eval_dataset = self.to_gan_dataset(dataset_map.eval_dataset)
+        output = self.train(resume_from_checkpoint=checkpoint)
+        return TraceTrainer.output_to_dict(output)
 
     def train(self, resume_from_checkpoint: str = None):
         device = GanTrainer.get_device()
@@ -315,16 +331,18 @@ class GanTrainer(TraceTrainer):
                 transformer = torch.nn.DataParallel(transformer)
         return generator, discriminator, transformer
 
-    @overrides(TraceTrainer)
-    def extract_dataset(self, trace_dataset: TraceDataset):
+    def to_gan_dataset(self, trace_dataset: TraceDataset, pre_train_dataset: PreTrainDataset = None):
         """
         Extracts tensors from trace dataset containing different masks for architecture.
         :param trace_dataset: The dataset whose traces are converted to tensors.
+        :param pre_train_dataset: The dataset whose text is used to create the distribution of words used
+        by the generator
         :return: Dataloader containing tensors representing traces.
         """
         gan_dataset_converter = GanDatasetConverter(self.args,
                                                     trace_dataset,
-                                                    self.tokenizer)
+                                                    self.tokenizer,
+                                                    pre_train_dataset=pre_train_dataset)
         return gan_dataset_converter.build()
 
     @staticmethod
@@ -342,7 +360,6 @@ class GanTrainer(TraceTrainer):
         """
         Returns the available device for running transformer.
         :return: GPU if available, CPU otherwise.
-        :rtype:
         """
         if torch.cuda.is_available():
             device = torch.device("cuda")

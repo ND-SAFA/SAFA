@@ -5,6 +5,7 @@ from jobs.abstract_job import AbstractJob
 from jobs.job_args import JobArgs
 from server.storage.safa_storage import SafaStorage
 from tracer.dataset.creators.supported_dataset_creator import SupportedDatasetCreator
+from tracer.dataset.dataset_map import DatasetMap
 from tracer.dataset.dataset_role import DatasetRole
 from tracer.dataset.trace_dataset import TraceDataset
 from tracer.pre_processing.pre_processing_option import PreProcessingOption
@@ -29,6 +30,7 @@ class AbstractTraceJob(AbstractJob, ABC):
         self.train_args = TraceArgs(job_args.output_dir,
                                     **(job_args.trace_args_params if job_args.trace_args_params else {}))
         self._trainer = None
+        self.dataset_map = self._make_datasets(job_args.datasets_map, dataset_pre_processing_options)
 
     @staticmethod
     def _make_dataset(datasets_map: Dict[DatasetRole, Tuple[SupportedDatasetCreator, Dict]],
@@ -48,6 +50,19 @@ class AbstractTraceJob(AbstractJob, ABC):
             dataset_creator = dataset_creator_class.value(pre_processing_params=pre_processing_params,
                                                           **dataset_creator_params)
             return dataset_creator.create()
+
+    @staticmethod
+    def _make_datasets(datasets_map: Dict[DatasetRole, Tuple[SupportedDatasetCreator, Dict]],
+                       dataset_pre_processing_options: Dict[DatasetRole, Tuple[List[PreProcessingOption], Dict]]
+                       ):
+        role2dataset: DatasetMap = DatasetMap()
+        for dataset_role, dataset_creator_reqs in datasets_map.items():
+            dataset_creator_class, dataset_creator_params = dataset_creator_reqs
+            pre_processing_params = dataset_pre_processing_options.get(dataset_role)
+            dataset_creator = dataset_creator_class.value(pre_processing_params=pre_processing_params,
+                                                          **dataset_creator_params)
+            role2dataset[dataset_role] = dataset_creator.create()
+        return role2dataset
 
     def get_trainer(self, **kwargs) -> TraceTrainer:
         """

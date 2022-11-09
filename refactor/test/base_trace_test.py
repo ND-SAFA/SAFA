@@ -32,15 +32,15 @@ class BaseTraceTest(BaseTest):
     NEG_LINKS = set(ALL_TEST_LINKS).difference(set(POS_LINKS))
 
     _EXAMPLE_METRIC_RESULTS = {'test_loss': 0.6929082870483398}
-    _EXAMPLE_PREDICTIONS = np.array([[0.50035876, 0.49964124],
-                                     [0.50035876, 0.49964124],
-                                     [0.50035876, 0.49964124],
-                                     [0.50035876, 0.49964124],
-                                     [0.50035876, 0.49964124],
-                                     [0.50035876, 0.49964124],
-                                     [0.50035876, 0.49964124],
-                                     [0.50035876, 0.49964124],
-                                     [0.50035876, 0.49964124]])
+    _EXAMPLE_PREDICTIONS = np.array([0.6,
+                                     0.4,
+                                     0.3,
+                                     0.8,
+                                     0.1,
+                                     0.01,
+                                     0.2,
+                                     0.4,
+                                     0.4])
     _EXAMPLE_LABEL_IDS = np.array([1, 0, 0, 1, 0, 0, 0, 1, 0])
     EXAMPLE_PREDICTION_OUTPUT = PredictionOutput(predictions=_EXAMPLE_PREDICTIONS,
                                                  label_ids=_EXAMPLE_LABEL_IDS,

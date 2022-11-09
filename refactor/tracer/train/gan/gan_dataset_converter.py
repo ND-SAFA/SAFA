@@ -10,7 +10,8 @@ from tracer.dataset.pre_train_dataset import PreTrainDataset
 from tracer.dataset.trace_dataset import TraceDataset
 from tracer.train.trace_args import TraceArgs
 
-BINARY_LABEL_LIST = [0, 1]
+UNLABELED_CLASS = 2
+BINARY_LABEL_LIST = [0, 1, UNLABELED_CLASS]
 LabeledExample = Tuple[str, str, int]
 UnlabeledExample = Tuple[str, None]
 Example = Union[LabeledExample, UnlabeledExample]
@@ -82,17 +83,17 @@ class GanDatasetConverter:
         label_mask_array = []
         input_mask_array = []
         for (text, label_mask) in examples:
-            if label_mask is None:  # no label use single text encoding
+            if label_mask is None or not label_mask:  # no label use single text encoding
                 encoded_sent = self.tokenizer.encode(text[0], add_special_tokens=True,
                                                      max_length=self.trace_args.max_seq_length,
                                                      padding="max_length", truncation=True)
             else:  # if label use sequence encoding
-                combined = text[0] + " [SEP] " + text[1]
                 encoded_sent = self.tokenizer.encode(text[0], text[1], add_special_tokens=True,
                                                      max_length=self.trace_args.max_seq_length,
                                                      padding="max_length", truncation=True)
+            label = UNLABELED_CLASS if text[-1] not in label_map else label_map[text[-1]]
             input_ids.append(encoded_sent)
-            label_id_array.append(label_map[text[-1]])
+            label_id_array.append(label)
             label_mask_array.append(label_mask)
 
         for sent in input_ids:

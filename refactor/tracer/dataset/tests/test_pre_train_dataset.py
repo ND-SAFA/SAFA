@@ -1,11 +1,12 @@
 from unittest import mock
 from unittest.mock import patch
 
+from transformers import LineByLineTextDataset
+
 from test.base_test import BaseTest
-from test.config.paths import TEST_VOCAB_FILE
+from test.paths.paths import TEST_VOCAB_FILE
 from tracer.dataset.pre_train_dataset import PreTrainDataset
 from tracer.models.model_generator import ModelGenerator
-from transformers import LineByLineTextDataset
 
 
 class TestPreTrainDataset(BaseTest):

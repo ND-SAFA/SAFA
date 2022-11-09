@@ -1,6 +1,6 @@
 import datasets
 
-from config.constants import K_METRIC_DEFAULT
+from constants.constants import K_METRIC_DEFAULT
 from tracer.metrics.abstract_trace_metric import AbstractTraceMetric
 
 _DESCRIPTION = """

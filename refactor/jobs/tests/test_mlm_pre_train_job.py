@@ -7,7 +7,7 @@ from transformers import AutoModelForMaskedLM
 from jobs.job_args import JobArgs
 from jobs.mlm_pre_train_job import MLMPreTrainJob
 from test.base_job_test import BaseJobTest
-from test.config.paths import TEST_DATA_DIR, TEST_OUTPUT_DIR
+from test.paths.paths import TEST_DATA_DIR, TEST_OUTPUT_DIR
 from tracer.dataset.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
 from tracer.dataset.dataset_role import DatasetRole
 from tracer.models.base_models.supported_base_model import SupportedBaseModel
@@ -37,11 +37,10 @@ class TestMLMPreTrainJob(BaseJobTest):
 
     def _get_job(self):
         params = self.get_test_params(include_pre_processing=True, include_base_model=False)
-        params["base_model"] = SupportedBaseModel.AUTO_MODEL
-        params["datasets_map"] = {
+        datasets_map = {
             DatasetRole.PRE_TRAIN: MLMPreTrainDatasetCreator(self.PRETRAIN_DIR)
         }
-        job_args = JobArgs(**params)
+        job_args = JobArgs(**params, base_model=SupportedBaseModel.AUTO_MODEL, datasets_map=datasets_map)
         return MLMPreTrainJob(job_args,
                               orig_data_path=self.PRETRAIN_DIR,
                               training_data_dir=TEST_OUTPUT_DIR)

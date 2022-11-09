@@ -7,6 +7,7 @@ from torch.utils.data.sampler import RandomSampler
 
 from test.base_trace_test import BaseTraceTest
 from tracer.dataset.creators.classic_trace_dataset_creator import ClassicTraceDatasetCreator
+from tracer.dataset.dataset_map import DatasetMap
 from tracer.models.base_models.supported_base_model import SupportedBaseModel
 from tracer.models.model_generator import ModelGenerator
 from tracer.train.trace_args import TraceArgs
@@ -23,7 +24,8 @@ class TestTraceTrainer(BaseTraceTest):
         test_trace_trainer = self.get_test_trace_trainer(metrics=self.TEST_METRIC_NAMES)
         test_trace_trainer.model_generator.get_tokenizer().padding = True
         train_dataset, eval_dataset = self.get_dataset().split(self.VALIDATION_PERCENTAGE)
-        output = test_trace_trainer.perform_training(train_dataset, eval_dataset)
+        dataset_map = DatasetMap(train_dataset=train_dataset, eval_dataset=eval_dataset)
+        output = test_trace_trainer.perform_training(dataset_map)
         self.assertIn("training_loss", output)
 
     @patch.object(TraceTrainer, "_eval")
@@ -48,9 +50,9 @@ class TestTraceTrainer(BaseTraceTest):
 
     def test_eval(self):
         output = deepcopy(self.EXAMPLE_PREDICTION_OUTPUT)
-        TraceTrainer._eval(output.predictions, output.label_ids, self.TEST_METRIC_NAMES)
+        result = TraceTrainer._eval(output.predictions, output.label_ids, self.TEST_METRIC_NAMES)
         for metric in self.TEST_METRIC_NAMES:
-            self.assertIn(metric, output.metrics)
+            self.assertIn(metric, result)
 
     @patch("torch.distributed.get_rank")
     @patch("torch.distributed.get_world_size")

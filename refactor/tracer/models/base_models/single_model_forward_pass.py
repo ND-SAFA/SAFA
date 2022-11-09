@@ -5,7 +5,7 @@ from torch.nn import CrossEntropyLoss
 from transformers.modeling_utils import PreTrainedModel
 from transformers.models.electra.modeling_electra import ElectraClassificationHead
 
-from config.constants import LOGITS, LOSS
+from constants.constants import LOGITS, LOSS
 
 """
 Attention Mask
@@ -25,9 +25,9 @@ Segment token indices to indicate first and second portions of the inputs. Indic
 Labels
 ----------------------------------------------
 Labels for computing the masked language modeling loss. 
-Indices should be in [-100, 0, ..., config.vocab_size] (see input_ids docstring) 
+Indices should be in [-100, 0, ..., constants.vocab_size] (see input_ids docstring) 
 Tokens with indices set to -100 are ignored (masked), the loss is only computed for the tokens with labels 
-in [0, ..., config.vocab_size] next_sentence_label (torch.LongTensor of shape (batch_size,), optional): 
+in [0, ..., constants.vocab_size] next_sentence_label (torch.LongTensor of shape (batch_size,), optional): 
 Labels for computing the next sequence prediction (classification) loss. Input should be a sequence pair 
 (see input_ids docstring) Indices should be in [0, 1]:
 

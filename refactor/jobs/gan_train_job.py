@@ -8,17 +8,17 @@ class GanTrainJob(TrainJob):
     """
     Job to train a GAN-BERT for trace prediction.
     """
-    
+
     def __init__(self, job_args: JobArgs):
         job_args.base_model = SupportedBaseModel.AUTO_MODEL
         super().__init__(job_args)
 
-    def get_trainer(self, **kwargs) -> GanTrainer:
+    def get_trainer(self) -> GanTrainer:
         """
         Gets the trace trainer for the job
         :param kwargs: any additional parameters for the trainer
         :return: the trainer
         """
         if self._trainer is None:
-            self._trainer = GanTrainer(args=self.train_args, model_generator=self.get_model_generator(), **kwargs)
+            self._trainer = GanTrainer(args=self.train_args, model_generator=self.get_model_generator())
         return self._trainer

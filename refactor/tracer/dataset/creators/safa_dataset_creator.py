@@ -1,14 +1,14 @@
 import json
 import os
-from typing import Callable, Dict, List, Set, Tuple
+from typing import Dict, List, Set, Tuple
 
-from config.constants import USE_LINKED_TARGETS_ONLY_DEFAULT
-from tracer.dataset.data_objects.artifact import Artifact
+import pandas as pd
+
+from constants.constants import USE_LINKED_TARGETS_ONLY_DEFAULT
 from tracer.dataset.creators.abstract_trace_dataset_creator import AbstractTraceDatasetCreator
-from tracer.dataset.data_objects.trace_link import TraceLink
+from tracer.dataset.data_objects.artifact import Artifact
 from tracer.dataset.trace_dataset import TraceDataset
 from tracer.pre_processing.pre_processing_option import PreProcessingOption
-import pandas as pd
 
 
 class SafaKeys:
@@ -37,7 +37,8 @@ class SafaKeys:
                                HWR2SR_FILE: (
                                    HARDWARE_REQUIREMENTS_FILE, SYSTEM_REQUIREMENTS_FILE)}
 
-    def __init__(self, artifact_id_key: str = ARTIFACT_ID, artifact_token_key: str = ARTIFACT_TOKEN, source_id_key: str = SOURCE_ID,
+    def __init__(self, artifact_id_key: str = ARTIFACT_ID, artifact_token_key: str = ARTIFACT_TOKEN,
+                 source_id_key: str = SOURCE_ID,
                  target_id_key: str = TARGET_ID, artifacts_key: str = ARTIFACTS, traces_key: str = TRACES,
                  trace_files_2_artifacts: Dict[str, Tuple[str, str]] = None):
         self.artifact_id_key = artifact_id_key

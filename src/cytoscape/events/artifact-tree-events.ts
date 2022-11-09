@@ -33,6 +33,7 @@ export const ArtifactTreeCytoEvents: CytoEventHandlers = {
   },
   select: {
     events: [CytoEvent.TAP],
+    selector: "node",
     // action(cy: CytoCore, event: EventObject) {
     //   const currentTimeStamp = event.timeStamp;
     //   const artifact = event.target.data() as ArtifactModel;

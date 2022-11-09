@@ -5,6 +5,7 @@
     :color="titleColor"
     @click="$emit('click', name)"
     class="my-1"
+    style="background-color: white"
   >
     <span class="text-ellipsis" style="max-width: 300px; color: inherit">
       {{ name }}

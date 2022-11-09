@@ -1,5 +1,9 @@
 <template>
   <v-container style="max-width: 40em">
+    <typography
+      el="p"
+      value="Select files to upload to the current project version."
+    />
     <project-files-input
       v-model="selectedFiles"
       data-cy="input-files-version"
@@ -21,7 +25,7 @@ import Vue from "vue";
 import { IdentifierModel, VersionModel } from "@/types";
 import { logStore, projectStore } from "@/hooks";
 import { handleUploadProjectVersion } from "@/api";
-import { GenericSwitch } from "@/components/common";
+import { GenericSwitch, Typography } from "@/components/common";
 import { ProjectFilesInput } from "../base";
 
 /**
@@ -30,6 +34,7 @@ import { ProjectFilesInput } from "../base";
 export default Vue.extend({
   name: "UploadNewVersion",
   components: {
+    Typography,
     GenericSwitch,
     ProjectFilesInput,
   },

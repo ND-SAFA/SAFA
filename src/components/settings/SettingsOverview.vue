@@ -1,14 +1,14 @@
 <template>
-  <v-container>
+  <v-container style="max-width: 50em">
     <flex-box justify="space-between">
-      <div>
+      <panel-card class="full-width mr-2">
         <typography el="h2" variant="subtitle" value="Project Data" />
         <v-divider class="mb-2" />
         <typography el="p" :value="subtitle" />
         <typography el="h2" variant="subtitle" value="Description" />
         <v-divider class="mb-2" />
-        <typography ep="p" :value="project.description" />
-      </div>
+        <typography ep="p" :value="description" />
+      </panel-card>
 
       <div>
         <v-card outlined>
@@ -22,7 +22,7 @@
               <v-icon class="mr-1">mdi-pencil</v-icon>
               Edit Project
             </v-btn>
-            <br />
+            <v-divider />
             <v-btn text color="error" @click="handleDelete">
               <v-icon class="mr-1">mdi-delete</v-icon>
               Delete Project
@@ -54,7 +54,7 @@ import {
   handleDownloadProjectCSV,
   handleDeleteProject,
 } from "@/api";
-import { Typography, FlexBox } from "@/components/common";
+import { Typography, FlexBox, PanelCard } from "@/components/common";
 import {
   ProjectIdentifierModal,
   ConfirmProjectDelete,
@@ -67,6 +67,7 @@ import {
 export default Vue.extend({
   name: "SettingsOverview",
   components: {
+    PanelCard,
     FlexBox,
     Typography,
     ProjectIdentifierModal,
@@ -93,6 +94,12 @@ export default Vue.extend({
     subtitle(): string {
       const { artifacts, traces } = this.project;
       return `${artifacts.length} Artifacts | ${traces.length} Trace Links`;
+    },
+    /**
+     * @return The description for this project.
+     */
+    description(): string {
+      return this.project.description || "No Description.";
     },
   },
   methods: {

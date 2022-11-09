@@ -9,8 +9,10 @@
         </v-btn>
       </flex-box>
       <v-divider />
-      <update-password />
-      <delete-account />
+      <v-container>
+        <update-password />
+        <delete-account />
+      </v-container>
     </v-container>
   </div>
 </template>

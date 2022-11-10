@@ -1,6 +1,8 @@
 package features.models.crud;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.UUID;
 
@@ -8,16 +10,16 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.models.entities.Model;
 import edu.nd.crc.safa.features.models.entities.ModelAppEntity;
 import edu.nd.crc.safa.features.models.tgen.entities.BaseGenerationModels;
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import common.ApplicationBaseTest;
+import org.json.JSONObject;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.ResultMatcher;
 import requests.SafaRequest;
 
 public class TestModelEditing extends ApplicationBaseTest {
@@ -25,65 +27,76 @@ public class TestModelEditing extends ApplicationBaseTest {
     @Autowired
     private ObjectMapper jacksonObjectMapper;
 
-    /**
-     * Test for
-     * {@link edu.nd.crc.safa.features.models.controllers.ModelController#editModelById(UUID, UUID, ModelAppEntity)}
-     * 
-     * @throws Exception On error
-     */
-    @Test
-    public void testModelEdit() throws Exception {
-        // Test values
-        String testNameBefore = "testNameBefore";
-        String testNameAfter = "testNameAfter";
-        BaseGenerationModels baseModelBefore = BaseGenerationModels.NLBert;
-        BaseGenerationModels baseModelAfter = BaseGenerationModels.VSM;
+    private Project project;
+    private ModelAppEntity model;
 
-        // Create project and model
+    @BeforeEach
+    public void setup() {
         ProjectVersion pv = creationService.createProjectWithNewVersion("projectName");
-        Project project = pv.getProject();
+        project = pv.getProject();
 
-        ModelAppEntity model = new ModelAppEntity();
-        model.setName(testNameBefore);
-        model.setBaseModel(baseModelBefore);
+        model = new ModelAppEntity();
+        model.setName("testName");
+        model.setBaseModel(BaseGenerationModels.NLBert);
         model = serviceProvider.getModelService().createOrUpdateModel(project, model);
-        UUID uuidBefore = model.getId();
+    }
 
-        // Update all fields in model entity
+    @Test
+    public void verifyNameIsEditable() throws Exception {
         ModelAppEntity editedModel = new ModelAppEntity();
-        editedModel.setName(testNameAfter);
-        editedModel.setBaseModel(baseModelAfter);
+        editedModel.setName("newName");
+
+        JSONObject response = SafaRequest
+                .withRoute(AppRoutes.Models.MODEL_BY_ID)
+                .withProject(project)
+                .withModelId(model.getId())
+                .putWithJsonObject(editedModel, status().is2xxSuccessful());
+
+        ModelAppEntity returnedModel = jacksonObjectMapper.readValue(response.toString(), ModelAppEntity.class);
+        assertThat(returnedModel.getName()).isEqualTo(editedModel.getName());
+
+        Model updatedModelInDb = serviceProvider.getModelService().getModelById(model.getId());
+        assertThat(updatedModelInDb).isNotNull();
+        assertThat(updatedModelInDb.getName()).isEqualTo(editedModel.getName());
+    }
+
+    @Test
+    public void verifyIdIsNotEditable() throws Exception {
+        ModelAppEntity editedModel = new ModelAppEntity();
         editedModel.setId(UUID.randomUUID());
 
-        // Create matcher to assert that the request is successful and returns the updated model
-        // with only the allowed fields updated
-        ResultMatcher matcher = (MvcResult result) -> {
-            HttpStatus status = HttpStatus.resolve(result.getResponse().getStatus());
-            assertThat(status).isNotNull();
-            assertThat(status.is2xxSuccessful()).isTrue();
-
-            String body = result.getResponse().getContentAsString();
-            assertThat(result.getResponse().getContentType()).isEqualTo("application/json");
-            assertThat(body).isNotEmpty();
-
-            ModelAppEntity returnedModel = jacksonObjectMapper.readValue(body, ModelAppEntity.class);
-            assertThat(returnedModel.getName()).isEqualTo(testNameAfter);
-            assertThat(returnedModel.getBaseModel()).isEqualTo(baseModelBefore);
-            assertThat(returnedModel.getId()).isEqualTo(uuidBefore);
-        };
-
-        // Send request
         SafaRequest
                 .withRoute(AppRoutes.Models.MODEL_BY_ID)
                 .withProject(project)
                 .withModelId(model.getId())
-                .putWithJsonObject(editedModel, matcher);
+                .putWithJsonObject(editedModel, status().is4xxClientError());
 
-        // Check that DB is updated
-        Model updatedModelInDb = serviceProvider.getModelService().getModelById(uuidBefore);
+        Model updatedModelInDb = serviceProvider.getModelService().getModelById(model.getId());
         assertThat(updatedModelInDb).isNotNull();
-        assertThat(updatedModelInDb.getName()).isEqualTo(testNameAfter);
-        assertThat(updatedModelInDb.getBaseModel()).isEqualTo(baseModelBefore);
-        assertThat(updatedModelInDb.getId()).isEqualTo(uuidBefore);
+        assertThat(updatedModelInDb.getId()).isEqualTo(model.getId());
+
+        try {
+            serviceProvider.getModelService().getModelById(editedModel.getId());
+            fail("getModelById should have thrown an exception");
+        } catch (SafaError ignored) {
+
+        }
+    }
+
+    @Test
+    public void verifyBaseModelIsNotEditable() throws Exception {
+        ModelAppEntity editedModel = new ModelAppEntity();
+        editedModel.setBaseModel(BaseGenerationModels.VSM);
+
+        SafaRequest
+                .withRoute(AppRoutes.Models.MODEL_BY_ID)
+                .withProject(project)
+                .withModelId(model.getId())
+                .putWithJsonObject(editedModel, status().is4xxClientError());
+
+        Model updatedModelInDb = serviceProvider.getModelService().getModelById(model.getId());
+        assertThat(updatedModelInDb).isNotNull();
+        assertThat(updatedModelInDb.getBaseModel()).isEqualTo(model.getBaseModel());
+
     }
 }

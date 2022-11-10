@@ -1,6 +1,9 @@
 <template>
   <panel-card class="full-width mr-2">
-    <typography el="h2" variant="subtitle" :value="project.name" />
+    <flex-box align="center">
+      <typography el="h2" variant="subtitle" :value="project.name" />
+      <typography x="2" variant="caption" :value="version" />
+    </flex-box>
     <v-divider class="mb-2" />
     <flex-box justify="space-between">
       <typography y="4" ep="p" :value="description" />
@@ -32,6 +35,7 @@
 
 <script lang="ts">
 import Vue from "vue";
+import { versionToString } from "@/util";
 import { projectStore, typeOptionsStore } from "@/hooks";
 import {
   PanelCard,
@@ -46,16 +50,18 @@ import {
 export default Vue.extend({
   name: "ProjectDisplay",
   components: { FlexBox, PanelCard, AttributeChip, Typography },
-  props: {},
-  data() {
-    return {};
-  },
   computed: {
     /**
      * @return The current project.
      */
     project() {
       return projectStore.project;
+    },
+    /**
+     * @return The version for this project.
+     */
+    version(): string {
+      return `Version ${versionToString(this.project.projectVersion)}`;
     },
     /**
      * @return The artifact count for this project.
@@ -82,8 +88,5 @@ export default Vue.extend({
       return typeOptionsStore.artifactTypes;
     },
   },
-  methods: {},
 });
 </script>
-
-<style scoped lang="scss"></style>

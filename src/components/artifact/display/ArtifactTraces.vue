@@ -17,21 +17,26 @@
       >
         <v-list dense style="max-height: 300px" class="overflow-y-auto">
           <template v-for="parent in parents">
-            <generic-list-item
-              :key="parent.title"
-              :item="parent"
+            <v-list-item
+              :key="parent.id"
               data-cy="list-selected-parent-item"
-              @click="handleArtifactClick(parent.title)"
+              @click="handleArtifactClick(parent.name)"
             >
+              <v-list-item-title>
+                <generic-artifact-body-display
+                  display-title
+                  :artifact="parent"
+                />
+              </v-list-item-title>
               <v-list-item-action @click.stop="">
                 <generic-icon-button
                   icon-id="mdi-ray-start-end"
                   tooltip="View Trace Link"
                   data-cy="button-selected-parent-link"
-                  @click="handleTraceLinkClick(parent.title)"
+                  @click="handleTraceLinkClick(parent.name)"
                 />
               </v-list-item-action>
-            </generic-list-item>
+            </v-list-item>
           </template>
         </v-list>
       </toggle-list>
@@ -42,21 +47,26 @@
       >
         <v-list dense style="max-height: 300px" class="overflow-y-auto">
           <template v-for="child in children">
-            <generic-list-item
-              :key="child.title"
-              :item="child"
+            <v-list-item
+              :key="child.name"
               data-cy="list-selected-child-item"
-              @click="handleArtifactClick(child.title)"
+              @click="handleArtifactClick(child.name)"
             >
+              <v-list-item-title>
+                <generic-artifact-body-display
+                  display-title
+                  :artifact="child"
+                />
+              </v-list-item-title>
               <v-list-item-action @click.stop="">
                 <generic-icon-button
                   icon-id="mdi-ray-start-end"
                   tooltip="View Trace Link"
                   data-cy="button-selected-child-link"
-                  @click="handleTraceLinkClick(child.title)"
+                  @click="handleTraceLinkClick(child.name)"
                 />
               </v-list-item-action>
-            </generic-list-item>
+            </v-list-item>
           </template>
         </v-list>
       </toggle-list>
@@ -66,7 +76,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { ListItem } from "@/types";
+import { ArtifactModel, ListItem } from "@/types";
 import {
   artifactStore,
   selectionStore,
@@ -81,6 +91,7 @@ import {
   GenericIconButton,
   PanelCard,
 } from "@/components/common";
+import GenericArtifactBodyDisplay from "@/components/common/generic/GenericArtifactBodyDisplay.vue";
 
 /**
  * Displays the selected node's parents and children.
@@ -88,6 +99,7 @@ import {
 export default Vue.extend({
   name: "ArtifactTraces",
   components: {
+    GenericArtifactBodyDisplay,
     PanelCard,
     GenericIconButton,
     FlexBox,
@@ -105,30 +117,22 @@ export default Vue.extend({
     /**
      * @return The selected artifact's parents.
      */
-    parents(): ListItem[] {
+    parents(): ArtifactModel[] {
       if (!this.selectedArtifact) return [];
 
       return subtreeStore
         .getParents(this.selectedArtifact.id)
-        .map((artifactId) => {
-          const artifact = artifactStore.getArtifactById(artifactId);
-
-          return { title: artifact?.name || "", subtitle: artifact?.type };
-        });
+        .map((id) => artifactStore.getArtifactById(id)) as ArtifactModel[];
     },
     /**
      * @return The selected artifact's children.
      */
-    children(): ListItem[] {
+    children(): ArtifactModel[] {
       if (!this.selectedArtifact) return [];
 
       return subtreeStore
         .getChildren(this.selectedArtifact.id)
-        .map((artifactId) => {
-          const artifact = artifactStore.getArtifactById(artifactId);
-
-          return { title: artifact?.name || "", subtitle: artifact?.type };
-        });
+        .map((id) => artifactStore.getArtifactById(id)) as ArtifactModel[];
     },
     /**
      * @return Whether to display this section.

@@ -1,22 +1,23 @@
 <template>
   <v-container style="max-width: 40em">
-    <typography
-      el="p"
-      value="Select files to upload to the current project version."
-    />
-    <project-files-input
-      v-model="selectedFiles"
-      data-cy="input-files-version"
-      class="mx-2"
-    />
-    <generic-switch
-      v-model="replaceAllArtifacts"
-      label="Replace all artifacts"
-      class="ml-4"
-    />
-    <v-btn block color="primary" @click="handleSubmit">
-      Upload Project Files
-    </v-btn>
+    <v-card outlined class="pa-2">
+      <typography
+        el="p"
+        value="Select files to upload to the current project version."
+      />
+      <project-files-input
+        v-model="selectedFiles"
+        data-cy="input-files-version"
+      />
+      <generic-switch
+        v-model="replaceAllArtifacts"
+        label="Replace all artifacts"
+        class="ml-4"
+      />
+      <v-btn block color="primary" @click="handleSubmit">
+        Upload Project Files
+      </v-btn>
+    </v-card>
   </v-container>
 </template>
 

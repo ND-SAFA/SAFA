@@ -1,22 +1,21 @@
 <template>
   <v-container style="max-width: 50em">
-    <typography el="p" b="4" :value="modalDescription" />
-
-    <custom-model-input v-model="model" />
-
-    <trace-matrix-creator v-model="matrices" />
-
-    <v-btn
-      block
-      :disabled="!isValid"
-      :loading="isLoading"
-      color="primary"
-      data-cy="button-trace-generate"
-      class="mt-2"
-      @click="handleSubmit"
-    >
-      Generate Trace Links
-    </v-btn>
+    <v-card outlined class="pa-2">
+      <typography el="p" b="4" :value="modalDescription" />
+      <custom-model-input v-model="model" />
+      <trace-matrix-creator v-model="matrices" />
+      <v-btn
+        block
+        :disabled="!isValid"
+        :loading="isLoading"
+        color="primary"
+        data-cy="button-trace-generate"
+        class="mt-2"
+        @click="handleSubmit"
+      >
+        Generate Trace Links
+      </v-btn>
+    </v-card>
   </v-container>
 </template>
 

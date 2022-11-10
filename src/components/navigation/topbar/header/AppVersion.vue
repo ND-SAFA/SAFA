@@ -19,14 +19,13 @@
       :items="versions"
       item-value="versionId"
       style="width: 100px"
+      @input="handleLoadVersion"
     >
       <template v-slot:selection>
         {{ getVersionName(version) }}
       </template>
       <template v-slot:item="{ item }">
-        <span @click="handleLoadVersion(item)">
-          {{ getVersionName(item) }}
-        </span>
+        {{ getVersionName(item) }}
       </template>
       <template v-slot:append-item>
         <v-btn text color="primary" @click="openCreateVersion = true">
@@ -114,8 +113,8 @@ export default Vue.extend({
     /**
      * Loads the versions of the current project.
      */
-    async handleLoadVersion(version: VersionModel): Promise<void> {
-      await handleLoadVersion(version.versionId);
+    async handleLoadVersion(versionId: string): Promise<void> {
+      await handleLoadVersion(versionId);
     },
     /**
      * Adds the new version the version list and loads that version.

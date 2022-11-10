@@ -1,8 +1,11 @@
 <template>
-  <v-container>
-    <typography el="h1" variant="title" value="Trace Prediction" />
-    <v-divider class="mb-2" />
-    <project-display />
+  <sidebar-grid>
+    <template v-slot:header>
+      <trace-prediction-header />
+    </template>
+    <template v-slot:sidebar>
+      <project-display />
+    </template>
     <tab-list v-model="tab" :tabs="tabs">
       <v-tab-item key="1">
         <model-table />
@@ -14,16 +17,17 @@
         <trace-link-table />
       </v-tab-item>
     </tab-list>
-  </v-container>
+  </sidebar-grid>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import { tracePredictionTabOptions } from "@/util";
-import { TabList, Typography } from "@/components/common";
+import { TabList, SidebarGrid } from "@/components/common";
 import { TraceLinkTable, TraceLinkGenerator } from "@/components/traceLink";
 import { ProjectDisplay } from "@/components/project/";
 import ModelTable from "./ModelTable.vue";
+import TracePredictionHeader from "./TracePredictionHeader.vue";
 
 /**
  * Tabs for predicting and approving trace links.
@@ -31,23 +35,19 @@ import ModelTable from "./ModelTable.vue";
 export default Vue.extend({
   name: "TracePredictionTabs",
   components: {
+    SidebarGrid,
+    TracePredictionHeader,
     ProjectDisplay,
     TraceLinkGenerator,
     ModelTable,
     TraceLinkTable,
     TabList,
-    Typography,
   },
-  props: {},
   data() {
     return {
       tab: 0,
       tabs: tracePredictionTabOptions(),
     };
   },
-  computed: {},
-  methods: {},
 });
 </script>
-
-<style scoped lang="scss"></style>

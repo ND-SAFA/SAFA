@@ -1,7 +1,5 @@
 <template>
-  <v-container>
-    <typography variant="subtitle" el="h2" value="Model Training" />
-    <v-divider class="mb-2" />
+  <div>
     <model-training :model="model" />
     <!--    <tab-list v-model="tab" :tabs="tabs">-->
     <!--      <v-tab-item key="1">-->
@@ -11,7 +9,7 @@
     <!--        <under-construction-alert />-->
     <!--      </v-tab-item>-->
     <!--    </tab-list>-->
-  </v-container>
+  </div>
 </template>
 
 <script lang="ts">

@@ -1,7 +1,6 @@
 <template>
-  <private-page>
+  <private-page full-window>
     <template v-slot:page>
-      <back-button text="Back To Tree View" to-project />
       <settings-tabs />
     </template>
   </private-page>
@@ -9,7 +8,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { PrivatePage, SettingsTabs, BackButton } from "@/components";
+import { PrivatePage, SettingsTabs } from "@/components";
 
 /**
  * Displays project settings.
@@ -17,10 +16,8 @@ import { PrivatePage, SettingsTabs, BackButton } from "@/components";
 export default Vue.extend({
   name: "ProjectSettingsView",
   components: {
-    BackButton,
     PrivatePage,
     SettingsTabs,
   },
-  computed: {},
 });
 </script>

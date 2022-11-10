@@ -1,28 +1,19 @@
 <template>
-  <div>
-    <v-container>
-      <flex-box b="2">
-        <v-btn text @click="handleDownload">
-          <v-icon class="mr-1">mdi-download</v-icon>
-          Download Files
-        </v-btn>
-        <br />
-        <v-btn text @click="handleEdit">
-          <v-icon class="mr-1">mdi-pencil</v-icon>
-          Edit Project
-        </v-btn>
-        <v-divider vertical />
-        <v-btn text color="error" @click="handleDelete">
-          <v-icon class="mr-1">mdi-delete</v-icon>
-          Delete Project
-        </v-btn>
-      </flex-box>
-
-      <project-display />
-    </v-container>
-
-    <settings-members />
-
+  <flex-box b="2">
+    <v-btn text @click="handleDownload">
+      <v-icon class="mr-1">mdi-download</v-icon>
+      Download
+    </v-btn>
+    <br />
+    <v-btn text @click="handleEdit">
+      <v-icon class="mr-1">mdi-pencil</v-icon>
+      Edit
+    </v-btn>
+    <v-divider vertical />
+    <v-btn text color="error" @click="handleDelete">
+      <v-icon class="mr-1">mdi-delete</v-icon>
+      Delete
+    </v-btn>
     <project-identifier-modal
       :is-open="isEditOpen"
       :is-loading="isLoading"
@@ -34,7 +25,7 @@
       @confirm="handleConfirmDeleteProject"
       @cancel="isDeleteOpen = false"
     />
-  </div>
+  </flex-box>
 </template>
 
 <script lang="ts">
@@ -46,25 +37,18 @@ import {
   handleDeleteProject,
 } from "@/api";
 import { FlexBox } from "@/components/common";
-import {
-  ProjectIdentifierModal,
-  ConfirmProjectDelete,
-  ProjectDisplay,
-} from "@/components/project/base";
-import { SettingsMembers } from "./members";
+import ProjectIdentifierModal from "./ProjectIdentifierModal.vue";
+import ConfirmProjectDelete from "./ConfirmProjectDelete.vue";
 
 /**
- * Represents the section describing the project name and descriptions
- * within the settings.
+ * Displays buttons for interacting with projects.
  */
 export default Vue.extend({
-  name: "SettingsOverview",
+  name: "ProjectButtons",
   components: {
-    ProjectDisplay,
     FlexBox,
     ProjectIdentifierModal,
     ConfirmProjectDelete,
-    SettingsMembers,
   },
   data() {
     return {

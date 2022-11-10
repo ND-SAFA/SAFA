@@ -1,39 +1,53 @@
 <template>
   <panel-card class="full-width mr-2">
     <v-card-title>
-      <flex-box full-width justify="space-between" align="center">
-        <flex-box align="center">
-          <typography el="h2" variant="subtitle" :value="project.name" />
-          <typography x="2" variant="caption" :value="version" />
-        </flex-box>
-        <flex-box>
-          <attribute-chip
-            :value="artifacts"
-            icon="mdi-alpha-a-box-outline"
-            color="primary"
-          />
-          <attribute-chip
-            :value="traceLinks"
-            icon="mdi-ray-start-arrow"
-            color="primary"
-          />
-        </flex-box>
-      </flex-box>
+      <typography el="h2" variant="subtitle" :value="project.name" />
     </v-card-title>
+    <v-card-subtitle>
+      <typography variant="caption" :value="version" />
+    </v-card-subtitle>
     <v-card-text>
-      <v-row dense>
-        <v-col cols="6">
-          <typography y="4" ep="p" :value="description" />
-        </v-col>
-        <v-col cols="6">
-          <flex-box t="2" justify="end" class="flex-wrap">
-            <div v-for="type in artifactTypes" :key="type" class="mb-1">
+      <typography ep="p" :value="description" />
+    </v-card-text>
+    <v-card-actions>
+      <div>
+        <flex-box b="4" class="flex-wrap">
+          <div class="mb-2">
+            <attribute-chip
+              :value="artifacts"
+              icon="mdi-alpha-a-box-outline"
+              color="primary"
+            />
+          </div>
+          <div class="mb-2">
+            <attribute-chip
+              :value="traceLinks"
+              icon="mdi-ray-start-arrow"
+              color="primary"
+            />
+          </div>
+        </flex-box>
+        <!--        <flex-box class="flex-wrap">-->
+        <!--          <div v-for="type in artifactTypes" :key="type" class="mb-1">-->
+        <!--            <attribute-chip artifact-type :value="type" />-->
+        <!--          </div>-->
+        <!--        </flex-box>-->
+        <flex-box
+          v-for="direction in typeDirections"
+          :key="direction[0]"
+          y="2"
+          align="center"
+        >
+          <attribute-chip artifact-type :value="direction[0]" />
+          <v-icon>mdi-arrow-right</v-icon>
+          <flex-box class="flex-wrap">
+            <div v-for="type in direction[1]" :key="type" class="mb-1">
               <attribute-chip artifact-type :value="type" />
             </div>
           </flex-box>
-        </v-col>
-      </v-row>
-    </v-card-text>
+        </flex-box>
+      </div>
+    </v-card-actions>
   </panel-card>
 </template>
 
@@ -90,6 +104,14 @@ export default Vue.extend({
      */
     artifactTypes(): string[] {
       return typeOptionsStore.artifactTypes;
+    },
+    /**
+     * @return The artifact type directions for this project.
+     */
+    typeDirections(): [string, string[]][] {
+      return Object.entries(typeOptionsStore.artifactTypeDirections).filter(
+        ([, targets]) => targets.length > 0
+      );
     },
   },
 });

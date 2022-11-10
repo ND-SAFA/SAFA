@@ -1,9 +1,15 @@
 <template>
-  <v-container>
-    <settings-header />
+  <sidebar-grid>
+    <template v-slot:header>
+      <settings-header />
+    </template>
+    <template v-slot:sidebar>
+      <project-buttons />
+      <project-display />
+    </template>
     <tab-list v-model="tab" :tabs="tabs">
       <v-tab-item key="1">
-        <settings-overview />
+        <settings-members />
       </v-tab-item>
       <v-tab-item key="2">
         <upload-new-version :is-open="tab === 2" />
@@ -12,17 +18,21 @@
         <type-options />
       </v-tab-item>
     </tab-list>
-  </v-container>
+  </sidebar-grid>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import { settingsTabOptions } from "@/util";
-import { TabList } from "@/components/common";
-import { UploadNewVersion } from "@/components/project/selector";
+import { TabList, SidebarGrid } from "@/components/common";
+import {
+  UploadNewVersion,
+  ProjectButtons,
+  ProjectDisplay,
+} from "@/components/project";
 import SettingsHeader from "./SettingsHeader.vue";
-import SettingsOverview from "./SettingsOverview.vue";
 import TypeOptions from "./TypeOptions.vue";
+import { SettingsMembers } from "./members";
 
 /**
  * Tabs for changing project settings.
@@ -30,22 +40,20 @@ import TypeOptions from "./TypeOptions.vue";
 export default Vue.extend({
   name: "TracePredictionTabs",
   components: {
+    SidebarGrid,
+    ProjectDisplay,
+    ProjectButtons,
     TypeOptions,
     UploadNewVersion,
     TabList,
-    SettingsOverview,
+    SettingsMembers,
     SettingsHeader,
   },
-  props: {},
   data() {
     return {
       tab: 0,
       tabs: settingsTabOptions(),
     };
   },
-  computed: {},
-  methods: {},
 });
 </script>
-
-<style scoped lang="scss"></style>

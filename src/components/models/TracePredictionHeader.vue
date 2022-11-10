@@ -1,7 +1,7 @@
 <template>
   <div>
     <back-button text="Back To Tree View" to-project />
-    <typography t="2" el="h1" variant="title" value="Project Settings" />
+    <typography t="2" el="h1" variant="title" value="Trace Prediction" />
     <v-divider class="mb-2" />
   </div>
 </template>
@@ -11,14 +11,13 @@ import Vue from "vue";
 import { Typography, BackButton } from "@/components/common";
 
 /**
- * Represents the section describing the project name and descriptions
- * within the settings.
+ * Displays the header of the trace prediction page.
  */
 export default Vue.extend({
-  name: "SettingsHeader",
+  name: "TracePredictionHeader",
   components: {
-    Typography,
     BackButton,
+    Typography,
   },
 });
 </script>

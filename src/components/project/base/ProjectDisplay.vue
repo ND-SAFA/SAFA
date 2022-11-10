@@ -1,14 +1,12 @@
 <template>
   <panel-card class="full-width mr-2">
-    <flex-box align="center">
-      <typography el="h2" variant="subtitle" :value="project.name" />
-      <typography x="2" variant="caption" :value="version" />
-    </flex-box>
-    <v-divider class="mb-2" />
-    <flex-box justify="space-between">
-      <typography y="4" ep="p" :value="description" />
-      <div>
-        <flex-box justify="end">
+    <v-card-title>
+      <flex-box full-width justify="space-between" align="center">
+        <flex-box align="center">
+          <typography el="h2" variant="subtitle" :value="project.name" />
+          <typography x="2" variant="caption" :value="version" />
+        </flex-box>
+        <flex-box>
           <attribute-chip
             :value="artifacts"
             icon="mdi-alpha-a-box-outline"
@@ -20,16 +18,22 @@
             color="primary"
           />
         </flex-box>
-        <flex-box t="2" justify="end">
-          <attribute-chip
-            v-for="type in artifactTypes"
-            :key="type"
-            artifact-type
-            :value="type"
-          />
-        </flex-box>
-      </div>
-    </flex-box>
+      </flex-box>
+    </v-card-title>
+    <v-card-text>
+      <v-row dense>
+        <v-col cols="6">
+          <typography y="4" ep="p" :value="description" />
+        </v-col>
+        <v-col cols="6">
+          <flex-box t="2" justify="end" class="flex-wrap">
+            <div v-for="type in artifactTypes" :key="type" class="mb-1">
+              <attribute-chip artifact-type :value="type" />
+            </div>
+          </flex-box>
+        </v-col>
+      </v-row>
+    </v-card-text>
   </panel-card>
 </template>
 

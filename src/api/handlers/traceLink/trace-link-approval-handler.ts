@@ -201,7 +201,7 @@ export async function handleDeleteLink(
     async (confirmed) => {
       if (!confirmed) return;
 
-      await handleUnreviewLink(link, {
+      await handleDeclineLink(link, {
         onSuccess,
         onError,
         onComplete,

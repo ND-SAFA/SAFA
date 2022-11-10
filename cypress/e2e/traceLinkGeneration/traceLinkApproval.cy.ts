@@ -119,7 +119,7 @@ describe("Trace Link Approval", () => {
 
   describe("I can sort trace links by name, type, and approval status", () => {
     it("Can sort by name", () => {
-      // Let make sure all review catigories are selected
+      // Let make sure all review categories are selected
       cy.clickButton(DataCy.traceLinkTableApprovalTypeButton).type(
         "{backspace}{downArrow}{enter}{downArrow}{enter}{downArrow}{enter}{esc}"
       );
@@ -129,7 +129,7 @@ describe("Trace Link Approval", () => {
       cy.clickButton(DataCy.traceLinkTableSortByInput).type(
         "{enter}{downArrow}{enter}{esc}"
       );
-      // Should have D9 first and D5 second in order of name (desending)
+      // Should have D9 first and D5 second in order of name (descending)
       cy.withinTableRows(DataCy.traceLinkTable, (tr) => {
         tr.contains("D9").should("have.length", 1);
         tr.contains("D9")
@@ -150,7 +150,7 @@ describe("Trace Link Approval", () => {
       cy.clickButton(DataCy.traceLinkTableSortByInput).type(
         "{backspace}{downArrow}{downArrow}{enter}{esc}"
       );
-      // Should have D9 first and D5 second in order of type (desending)
+      // Should have D9 first and D5 second in order of type (descending)
       cy.withinTableRows(DataCy.traceLinkTable, (tr) => {
         tr.contains("D5")
           .should("have.length", 1)

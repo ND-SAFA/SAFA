@@ -260,6 +260,8 @@ export enum DataCy {
   traceLinkTableGenerateTraceLinkDeclineButton = "button-trace-link-generate-decline",
   traceLinkTableGenerateTraceLinkUnapproveButton = "button-trace-link-generate-unapproved",
   traceLinkTableApprovalTypeButton = "button-trace-link-generate-approval-type",
+  traceLinkTableSortByInput = "artifact-table-sort-by",
+  traceLinkTableGroupByInput = "artifact-table-group-by",
 }
 
 export enum DataIds {

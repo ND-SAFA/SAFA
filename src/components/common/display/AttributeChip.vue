@@ -15,6 +15,7 @@
         :outlined="outlined"
         :color="displayColor"
         :data-cy="dataCy"
+        :style="artifactType ? 'background-color: white !important' : ''"
       >
         <v-icon v-if="iconId" small>{{ iconId }}</v-icon>
         <typography

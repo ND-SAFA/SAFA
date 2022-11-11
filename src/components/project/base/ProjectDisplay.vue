@@ -27,11 +27,6 @@
             />
           </div>
         </flex-box>
-        <!--        <flex-box class="flex-wrap">-->
-        <!--          <div v-for="type in artifactTypes" :key="type" class="mb-1">-->
-        <!--            <attribute-chip artifact-type :value="type" />-->
-        <!--          </div>-->
-        <!--        </flex-box>-->
         <flex-box
           v-for="direction in typeDirections"
           :key="direction[0]"
@@ -39,7 +34,7 @@
           align="center"
         >
           <attribute-chip artifact-type :value="direction[0]" />
-          <v-icon>mdi-arrow-right</v-icon>
+          <v-icon class="mx-1">mdi-ray-start-arrow</v-icon>
           <flex-box class="flex-wrap">
             <div v-for="type in direction[1]" :key="type" class="mb-1">
               <attribute-chip artifact-type :value="type" />

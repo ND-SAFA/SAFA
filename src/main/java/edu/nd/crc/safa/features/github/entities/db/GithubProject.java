@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.features.github.entities.db;
 
+import java.util.Date;
 import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -8,6 +9,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 
 import edu.nd.crc.safa.features.projects.entities.db.Project;
@@ -61,4 +64,16 @@ public class GithubProject {
      */
     @Column(name = "last_commit_sha", length = 64)
     private String lastCommitSha;
+
+    /**
+     * Timestamp of the last update
+     */
+    @Column(name = "last_update", nullable = false)
+    private Date lastUpdate = new Date();
+
+    @PreUpdate
+    @PrePersist
+    public void updateTimeStamps() {
+        this.lastUpdate = new Date();
+    }
 }

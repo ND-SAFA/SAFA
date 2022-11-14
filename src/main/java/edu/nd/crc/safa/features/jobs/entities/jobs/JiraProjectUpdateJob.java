@@ -7,6 +7,9 @@ import edu.nd.crc.safa.features.jira.entities.app.JiraIssuesResponseDTO;
 import edu.nd.crc.safa.features.jira.services.JiraConnectionService;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 
+/**
+ * Job to update an already imported JIRA project
+ */
 public class JiraProjectUpdateJob extends CreateProjectViaJiraJob {
     JiraConnectionService jiraConnectionService;
 

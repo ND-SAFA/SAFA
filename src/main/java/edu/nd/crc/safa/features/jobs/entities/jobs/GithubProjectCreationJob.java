@@ -113,8 +113,13 @@ public class GithubProjectCreationJob extends CommitJob {
             projectDescription = projectName;
         }
 
-        project.setName(projectName);
-        project.setDescription(projectDescription);
+        // if not already set
+        if (!StringUtils.hasLength(project.getName())) {
+            project.setName(projectName);
+        }
+        if (!StringUtils.hasLength(project.getDescription())) {
+            project.setDescription(projectDescription);
+        }
         this.serviceProvider.getProjectRepository().save(project);
 
         // Step - Update job name

@@ -91,6 +91,13 @@ Cypress.Commands.add("loadNewProject", () => {
   cy.logout();
 });
 
+Cypress.Commands.add("loadNewGeneratedProject", () => {
+  cy.visit("/create")
+    .login(validUser.email, validUser.password)
+    .location("pathname", { timeout: 5000 })
+    .should("equal", "/create");
+});
+
 Cypress.Commands.add("createProjectSettings", () => {
   cy.visit("/create")
     .login(validUser.email, validUser.password)

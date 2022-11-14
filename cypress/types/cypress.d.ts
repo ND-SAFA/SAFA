@@ -466,5 +466,16 @@ declare namespace Cypress {
      * Goes into the Project Settings
      */
     createProjectSettings(): Chainable<void>;
+
+    /**
+     * Navigates to the Approve Generated Trace Links page.
+     *
+     */
+    openApproveGeneratedTraceLinks(): Chainable<void>;
+    /**
+     * Loads in a new project with generated trace links.
+     *
+     */
+    loadNewGeneratedProject(): Chainable<void>;
   }
 }

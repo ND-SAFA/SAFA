@@ -61,7 +61,6 @@ import {
   ArtifactTypeInput,
   FlexBox,
   GenericIconButton,
-  Typography,
   AttributeChip,
 } from "@/components/common";
 
@@ -74,7 +73,6 @@ export default Vue.extend({
   name: "TraceMatrixCreator",
   components: {
     GenericIconButton,
-    Typography,
     ArtifactTypeInput,
     FlexBox,
     AttributeChip,

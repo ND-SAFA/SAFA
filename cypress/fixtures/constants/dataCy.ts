@@ -44,13 +44,15 @@ export enum DataCy {
 
   // Authentication
 
-  accountDropdown = "account-dropdown",
+  isLoggedIn = "is-logged-in",
   emailInput = "input-email",
   passwordInput = "input-password",
   loginButton = "button-login",
+  logoutButton = "button-logout",
 
   // Account Editing
 
+  accountPage = "page-account",
   passwordCurrentInput = "input-current-password",
   passwordNewInput = "input-new-password",
   passwordChangeButton = "button-update-password",
@@ -103,7 +105,6 @@ export enum DataCy {
 
   // Project Selection
 
-  selectionModal = "modal-project-select",
   selectionProjectList = "table-project",
   selectionVersionList = "table-version",
   selectionSearch = "input-selector-search",

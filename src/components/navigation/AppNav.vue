@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div :data-cy="isLoggedIn ? 'is-logged-in' : ''">
     <app-nav-bar v-if="isLoggedIn" />
     <app-nav-drawer v-if="isLoggedIn" />
     <details-drawer v-if="isLoggedIn" />

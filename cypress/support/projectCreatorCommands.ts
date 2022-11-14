@@ -107,7 +107,5 @@ Cypress.Commands.add("createProjectSettings", () => {
   cy.createBulkProject()
     .getCy(DataCy.jobStatus, "first", 20000)
     .should("contain.text", "Completed");
-  cy.clickButtonWithName("View Project")
-    .clickButton(DataCy.navProjectButton)
-    .clickButtonWithName("Project Settings");
+  cy.clickButtonWithName("View Project").clickButtonWithName("Settings");
 });

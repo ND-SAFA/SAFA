@@ -3,12 +3,12 @@ import "cypress-wait-until";
 
 describe("Project Members Display", () => {
   before(() => {
+    cy.viewport(1024, 768);
     cy.dbResetJobs().dbResetProjects().createProjectSettings();
   });
 
   beforeEach(() => {
-    cy.loadCurrentProject();
-    cy.openProjectSettings();
+    cy.loadCurrentProject().openProjectSettings();
     cy.projectAddNewMember("test2@test.com", "Admin");
     cy.waitUntil(function () {
       return cy.getCy(DataCy.snackbarSuccess).should("be.visible");

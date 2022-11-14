@@ -16,7 +16,6 @@
 import Vue, { PropType } from "vue";
 import { GenerationModel } from "@/types";
 import { modelEditorTabOptions } from "@/util";
-import { Typography } from "@/components/common";
 import ModelTraining from "./ModelTraining.vue";
 
 /**
@@ -24,7 +23,7 @@ import ModelTraining from "./ModelTraining.vue";
  */
 export default Vue.extend({
   name: "ModelEditor",
-  components: { Typography, ModelTraining },
+  components: { ModelTraining },
   props: {
     model: {
       type: Object as PropType<GenerationModel>,

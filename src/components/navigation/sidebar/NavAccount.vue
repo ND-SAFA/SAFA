@@ -23,7 +23,7 @@
       <v-list-item-icon>
         <v-icon color="primary">mdi-account-circle</v-icon>
       </v-list-item-icon>
-      <v-list-item-title>
+      <v-list-item-title data-cy="page-account">
         <typography bold value="My Account" />
       </v-list-item-title>
     </v-list-item>

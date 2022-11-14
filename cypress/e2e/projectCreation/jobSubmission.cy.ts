@@ -14,9 +14,7 @@ describe("Job Submission", () => {
 
   describe("I can view projects being imported", () => {
     it("Shows a list of imported projects", () => {
-      cy.clickButton(DataCy.navProjectButton).clickButtonWithName(
-        "Project Uploads"
-      );
+      cy.clickButtonWithName("Project Uploads");
 
       cy.withinTableRows(DataCy.jobTable, (tr) => {
         tr.should("have.length.above", 1);

@@ -3,7 +3,7 @@
     <v-container>
       <flex-box justify="space-between">
         <typography el="h1" variant="title" value="My Account" />
-        <v-btn text color="error" @click="handleLogout">
+        <v-btn text color="error" @click="handleLogout" data-cy="button-logout">
           <v-icon>mdi-logout-variant</v-icon>
           Log Out
         </v-btn>

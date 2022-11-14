@@ -2,12 +2,12 @@ import { DataCy } from "../../fixtures";
 
 describe("Project Members CRUD", () => {
   before(() => {
+    cy.viewport(1024, 768);
     cy.dbResetJobs().dbResetProjects().createProjectSettings();
   });
 
   beforeEach(() => {
-    cy.loadCurrentProject();
-    cy.openProjectSettings();
+    cy.loadCurrentProject().openProjectSettings();
   });
 
   describe("As an owner, I can add a new member to a project", () => {

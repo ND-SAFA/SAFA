@@ -6,9 +6,8 @@ from torch.utils.data.distributed import DistributedSampler
 from torch.utils.data.sampler import RandomSampler
 
 from test.base_trace_test import BaseTraceTest
-from tracer.dataset.creators.classic_trace_dataset_creator import ClassicTraceDatasetCreator
+from test.paths.paths import TEST_OUTPUT_DIR
 from tracer.dataset.dataset_role import DatasetRole
-from tracer.dataset.trainer_datasets_container import TrainerDatasetsContainer
 from tracer.models.base_models.supported_base_model import SupportedBaseModel
 from tracer.models.model_generator import ModelGenerator
 from tracer.train.trace_args import TraceArgs
@@ -86,5 +85,5 @@ class TestTraceTrainer(BaseTraceTest):
         model_generator = ModelGenerator(SupportedBaseModel.PL_BERT, "path")
         model_generator.get_model = mock.MagicMock(return_value=self.get_test_model())
         model_generator.get_tokenizer = mock.MagicMock(return_value=self.get_test_tokenizer())
-        return TraceTrainer(TraceArgs(output_dir="output", trainer_dataset_container=trainer_dataset_container, **kwargs),
+        return TraceTrainer(TraceArgs(output_dir=TEST_OUTPUT_DIR, trainer_dataset_container=trainer_dataset_container, **kwargs),
                             model_generator)

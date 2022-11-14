@@ -1,6 +1,6 @@
 from test.base_trace_test import BaseTraceTest
 
 
-class TestTraceDataset(BaseTraceTest):
+class TestGanDatasetConverter(BaseTraceTest):
     # TODO
     pass

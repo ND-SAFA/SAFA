@@ -162,6 +162,7 @@ public class GithubCredentialsController extends BaseController {
             githubAccessCredentials.setRefreshToken(refreshTokenDTO.getRefreshToken());
             githubAccessCredentials.setAccessTokenExpiration(refreshTokenDTO.getAccessTokenExpiration());
             githubAccessCredentials.setRefreshTokenExpiration(refreshTokenDTO.getRefreshTokenExpiration());
+            githubAccessCredentials.updateExpirationDates();
             githubAccessCredentialsRepository.save(githubAccessCredentials);
 
             output.setResult(new GithubResponseDTO<>(null, GithubResponseMessage.UPDATED));

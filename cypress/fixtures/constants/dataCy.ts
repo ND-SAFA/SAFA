@@ -254,6 +254,15 @@ export enum DataCy {
   artifactTableDeleteArtifactRowButton = "button-artifact-delete-icon",
   artifactTableArtifactPanelBody = "text-selected-body",
   artifactTableArtifactDeleteIAcceptButton = "button-confirm-modal",
+
+  // Trace Link Generation
+  traceLinkTable = "table-trace-link",
+  traceLinkTableGenerateTraceLinkApproveButton = "button-trace-link-generate-approve",
+  traceLinkTableGenerateTraceLinkDeclineButton = "button-trace-link-generate-decline",
+  traceLinkTableGenerateTraceLinkUnapproveButton = "button-trace-link-generate-unapproved",
+  traceLinkTableApprovalTypeButton = "button-trace-link-generate-approval-type",
+  traceLinkTableSortByInput = "artifact-table-sort-by",
+  traceLinkTableGroupByInput = "artifact-table-group-by",
 }
 
 export enum DataIds {

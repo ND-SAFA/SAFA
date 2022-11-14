@@ -26,6 +26,7 @@
       <save-artifact-panel />
       <trace-link-panel />
       <save-trace-link-panel />
+      <generate-trace-link-panel />
     </v-container>
   </v-navigation-drawer>
 </template>
@@ -45,6 +46,7 @@ import {
 import {
   TraceLinkPanel,
   SaveTraceLinkPanel,
+  GenerateTraceLinkPanel,
 } from "@/components/traceLink/panels";
 
 /**
@@ -63,6 +65,7 @@ export default Vue.extend({
     Typography,
     FlexBox,
     GenericIconButton,
+    GenerateTraceLinkPanel,
   },
   computed: {
     /**
@@ -96,6 +99,8 @@ export default Vue.extend({
           return "Trace Link";
         case "saveTrace":
           return "Create Trace Link";
+        case "generateTrace":
+          return "Generate Trace Links";
         default:
           return "";
       }
@@ -106,6 +111,8 @@ export default Vue.extend({
     width(): string {
       if (appStore.isDetailsPanelOpen === "displayArtifactBody") {
         return "600";
+      } else if (appStore.isDetailsPanelOpen === "generateTrace") {
+        return "800";
       } else {
         return "400";
       }

@@ -6,6 +6,7 @@
         text
         :loading="isUnreviewLoading"
         @click="handleUnreview"
+        data-cy="button-trace-link-generate-unapproved"
       >
         <v-icon class="mr-1">mdi-checkbox-blank-circle-outline</v-icon>
         Un-Review
@@ -16,6 +17,7 @@
         :loading="isApproveLoading"
         color="primary"
         @click="handleApprove"
+        data-cy="button-trace-link-generate-approve"
       >
         <v-icon class="mr-1">mdi-check-circle-outline</v-icon>
         Approve
@@ -26,6 +28,7 @@
         :loading="isDeclineLoading"
         color="error"
         @click="handleDecline"
+        data-cy="button-trace-link-generate-decline"
       >
         <v-icon class="mr-1">mdi-close-circle-outline</v-icon>
         Decline
@@ -33,7 +36,12 @@
     </flex-box>
     <flex-box v-if="showDelete">
       <v-divider vertical v-if="showApproved || showDeclined" />
-      <v-btn text color="error" @click="handleDelete">
+      <v-btn
+        text
+        color="error"
+        @click="handleDelete"
+        data-cy="button-trace-link-generate-delete"
+      >
         <v-icon class="mr-1">mdi-delete</v-icon>
         Delete
       </v-btn>

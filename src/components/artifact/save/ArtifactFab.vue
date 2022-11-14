@@ -26,6 +26,14 @@
       </v-btn>
     </template>
     <generic-icon-button
+      fab
+      small
+      icon-id="mdi-link-variant-plus"
+      tooltip="Generate Trace Links"
+      data-cy="button-fab-generate-trace"
+      @click="handleGenerateTraceLink"
+    />
+    <generic-icon-button
       v-if="isVisible"
       fab
       small
@@ -118,6 +126,14 @@ export default Vue.extend({
         } else {
           enableDrawMode();
         }
+      });
+    },
+    /**
+     * Opens the generate trace link modal.
+     */
+    handleGenerateTraceLink(): void {
+      projectStore.ifProjectDefined(() => {
+        appStore.openDetailsPanel("generateTrace");
       });
     },
   },

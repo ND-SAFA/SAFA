@@ -11,7 +11,11 @@
         <model-table />
       </v-tab-item>
       <v-tab-item key="2">
-        <trace-link-generator :is-open="tab === 1" />
+        <v-container style="max-width: 50em">
+          <v-card outlined class="pa-2">
+            <trace-link-generator :is-open="tab === 1" />
+          </v-card>
+        </v-container>
       </v-tab-item>
       <v-tab-item key="3">
         <trace-link-table />

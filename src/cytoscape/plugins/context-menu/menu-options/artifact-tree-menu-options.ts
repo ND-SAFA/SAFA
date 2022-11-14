@@ -52,10 +52,24 @@ export const artifactTreeMenuItems: MenuItem[] = [
     content: "Draw Link",
     tooltipText: "Draw a new trace link between artifacts",
     coreAsWell: true,
-    hasTrailingDivider: true,
     onClickFunction(): void {
       projectStore.ifProjectDefined(() => {
         enableDrawMode();
+      });
+    },
+    isVisible(): boolean {
+      return sessionStore.isEditor(projectStore.project);
+    },
+  },
+  {
+    id: "generate-link",
+    content: "Generate Links",
+    tooltipText: "Generate new trace links between artifact levels",
+    coreAsWell: true,
+    hasTrailingDivider: true,
+    onClickFunction(): void {
+      projectStore.ifProjectDefined(() => {
+        appStore.openDetailsPanel("generateTrace");
       });
     },
     isVisible(): boolean {
@@ -83,6 +97,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
     tooltipText: "View this artifact's body text",
     selector: "node",
     coreAsWell: false,
+    hasTrailingDivider: true,
     onClickFunction(event: EventObject): void {
       handleOnClick(event, (artifact: ArtifactModel) => {
         selectionStore.selectArtifact(artifact.id);
@@ -99,7 +114,6 @@ export const artifactTreeMenuItems: MenuItem[] = [
     tooltipText: "Edit this artifact",
     selector: "node",
     coreAsWell: false,
-    hasTrailingDivider: true,
     onClickFunction(event: EventObject): void {
       handleOnClick(event, async (artifact: ArtifactModel) => {
         selectionStore.selectArtifact(artifact.id);

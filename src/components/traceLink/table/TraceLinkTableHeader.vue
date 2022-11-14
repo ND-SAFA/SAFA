@@ -19,6 +19,7 @@
         item-text="name"
         item-value="id"
         class="mb-1"
+        data-cy="button-trace-link-generate-approval-type"
       />
     </template>
     <template v-slot:bottom>

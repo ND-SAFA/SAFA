@@ -395,9 +395,8 @@ declare namespace Cypress {
     /**
      * Selects an artifact on the graph.
      * @param name - The artifact name to select.
-     * @param selectType - The type of artifact lookup to use. Default to the nav bar.
      */
-    selectArtifact(name: string, selectType?: "nav" | "panel"): Chainable<void>;
+    selectArtifact(name: string): Chainable<void>;
 
     // Project Documents
 

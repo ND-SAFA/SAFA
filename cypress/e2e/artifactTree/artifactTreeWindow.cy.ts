@@ -32,8 +32,7 @@ describe("Artifact Tree Window", () => {
   describe("I can see the graph interactions load on page change", () => {
     it("Loads the graph and is responsive", () => {
       // Visit another page.
-      cy.clickButton(DataCy.navProjectButton)
-        .clickButtonWithName("Create Project")
+      cy.clickButtonWithName("Create Project")
         .location("pathname", { timeout: 5000 })
         .should("equal", "/create");
 
@@ -57,8 +56,8 @@ describe("Artifact Tree Window", () => {
   describe("I can see the graph interactions load on artifact view change", () => {
     it("Loads the graph and is responsive", () => {
       // Toggle back and forth to the artifact table.
-      cy.clickButton(DataCy.navToggleView)
-        .clickButton(DataCy.navToggleView)
+      cy.clickButtonWithName("table")
+        .clickButtonWithName("tree")
         .getCy(DataCy.appLoading)
         .should("not.be.visible");
 

@@ -7,9 +7,7 @@ Cypress.Commands.add("openProjectSelector", () => {
 });
 
 Cypress.Commands.add("openUploadFiles", () => {
-  cy.clickButton(DataCy.navVersionButton).clickButtonWithName(
-    "Upload Flat Files"
-  );
+  cy.clickButtonWithName("Settings").switchTab("Data Upload");
 });
 
 Cypress.Commands.add("projectSelectorContinue", () => {

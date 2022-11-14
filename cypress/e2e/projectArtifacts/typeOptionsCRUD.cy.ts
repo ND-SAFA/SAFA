@@ -19,14 +19,14 @@ describe("Type Options CRUD", () => {
       cy.getNodes(true).should("be.visible");
       cy.getCy(DataCy.selectedPanelType).should("contain", type);
 
-      cy.clickButton(DataCy.navToggleRightPanel);
+      cy.clickButtonWithName("Settings").switchTab("Artifact Settings");
       cy.getCy(DataCy.artifactSearchTypeList).should("contain", type);
     });
   });
 
   describe("I can change the icon of an artifact type", () => {
     it("Changes the icon of a type", () => {
-      cy.clickButton(DataCy.navToggleRightPanel).switchTab("Types");
+      cy.clickButtonWithName("Settings").switchTab("Artifact Settings");
 
       cy.getCy(DataCy.typeOptionsList)
         .first()

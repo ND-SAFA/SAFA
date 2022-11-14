@@ -1,7 +1,7 @@
 import { DataCy } from "../fixtures";
 
 Cypress.Commands.add("switchToTableView", () => {
-  cy.clickButton(DataCy.navToggleView);
+  cy.clickButtonWithName("table");
 });
 
 Cypress.Commands.add("artifactTableFirstElementLookUp", () => {

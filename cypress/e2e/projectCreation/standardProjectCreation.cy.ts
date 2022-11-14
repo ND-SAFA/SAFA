@@ -10,9 +10,10 @@ describe("Manual Project Creation", () => {
   beforeEach(() => {
     cy.dbResetJobs();
 
-    cy.visit("/create").login(validUser.email, validUser.password);
-
-    cy.location("pathname", { timeout: 5000 }).should("equal", "/create");
+    cy.visit("/create")
+      .login(validUser.email, validUser.password)
+      .location("pathname", { timeout: 5000 })
+      .should("equal", "/create");
   });
 
   describe("Project Artifact Uploading", () => {

@@ -43,15 +43,9 @@ Cypress.Commands.add("centerGraph", () => {
   cy.clickButton(DataCy.navGraphCenterButton).wait(200);
 });
 
-Cypress.Commands.add("selectArtifact", (name, selectType = "nav") => {
-  if (selectType === "nav") {
-    cy.inputText(DataCy.artifactSearchNavInput, name).clickButton(
-      DataCy.artifactSearchItem,
-      "first"
-    );
-  } else {
-    cy.clickButton(DataCy.navToggleRightPanel)
-      .inputText(DataCy.artifactSearchSideInput, "F21")
-      .clickButton(DataCy.artifactSearchItem, "first");
-  }
+Cypress.Commands.add("selectArtifact", (name) => {
+  cy.inputText(DataCy.artifactSearchNavInput, name).clickButton(
+    DataCy.artifactSearchItem,
+    "first"
+  );
 });

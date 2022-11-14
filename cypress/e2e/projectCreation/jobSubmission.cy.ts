@@ -5,9 +5,10 @@ describe("Job Submission", () => {
   beforeEach(() => {
     cy.dbResetJobs().dbResetProjects();
 
-    cy.visit("/create").login(validUser.email, validUser.password);
-
-    cy.location("pathname", { timeout: 2000 }).should("equal", "/create");
+    cy.visit("/create")
+      .login(validUser.email, validUser.password)
+      .location("pathname", { timeout: 2000 })
+      .should("equal", "/create");
 
     cy.createBulkProject();
   });

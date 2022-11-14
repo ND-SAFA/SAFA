@@ -462,12 +462,6 @@ declare namespace Cypress {
     projectAddNewMember(name: string, projectRole: string): Chainable<void>;
 
     /**
-     * Logs into the create project page, uploads a project, and waits for it to complete.
-     * Goes into the Project Settings
-     */
-    createProjectSettings(): Chainable<void>;
-
-    /**
      * Navigates to the Approve Generated Trace Links page.
      *
      */

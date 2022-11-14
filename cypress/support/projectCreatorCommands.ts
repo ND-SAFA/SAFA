@@ -97,15 +97,3 @@ Cypress.Commands.add("loadNewGeneratedProject", () => {
     .location("pathname", { timeout: 5000 })
     .should("equal", "/create");
 });
-
-Cypress.Commands.add("createProjectSettings", () => {
-  cy.visit("/create")
-    .login(validUser.email, validUser.password)
-    .location("pathname", { timeout: 5000 })
-    .should("equal", "/create");
-
-  cy.createBulkProject()
-    .getCy(DataCy.jobStatus, "first", 20000)
-    .should("contain.text", "Completed");
-  cy.clickButtonWithName("View Project").clickButtonWithName("Settings");
-});

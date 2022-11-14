@@ -2,11 +2,11 @@ import { DataCy } from "../../fixtures";
 
 describe("Project Members CRUD", () => {
   before(() => {
-    cy.viewport(1024, 768);
-    cy.dbResetJobs().dbResetProjects().createProjectSettings();
+    cy.dbResetJobs().dbResetProjects().loadNewProject();
   });
 
   beforeEach(() => {
+    cy.viewport(1024, 768);
     cy.loadCurrentProject().openProjectSettings();
   });
 

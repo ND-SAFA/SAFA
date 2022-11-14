@@ -27,6 +27,8 @@ Cypress.Commands.add("waitForProjectLoad", (waitForNodes = true) => {
 Cypress.Commands.add("loadCurrentProject", (waitForNodes = true) => {
   cy.visit("/login")
     .login(validUser.email, validUser.password)
+    .location("pathname", { timeout: 10000 })
+    .should("equal", "/")
     .openProjectSelector()
     .projectSelectorContinue()
     .projectSelectorContinue()

@@ -4,11 +4,12 @@ from unittest.mock import patch
 
 from transformers import AutoModelForMaskedLM
 
+from config.override import overrides
 from jobs.job_args import JobArgs
 from jobs.mlm_pre_train_job import MLMPreTrainJob
 from test.base_job_test import BaseJobTest
 from test.paths.paths import TEST_DATA_DIR, TEST_OUTPUT_DIR
-from tracer.dataset.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
+from tracer.dataset.creators.supported_dataset_creator import SupportedDatasetCreator
 from tracer.dataset.dataset_role import DatasetRole
 from tracer.models.base_models.supported_base_model import SupportedBaseModel
 from tracer.models.model_generator import ModelGenerator
@@ -32,15 +33,17 @@ class TestMLMPreTrainJob(BaseJobTest):
         job.run()
         self.assert_output_on_success(self._load_job_output(job))
 
+    @staticmethod
+    @overrides(BaseJobTest)
+    def create_dataset_map(dataset_role: DatasetRole, include_links=True):
+        return {DatasetRole.TRAIN: (SupportedDatasetCreator.MLM_PRETRAIN, {"orig_data_path": TestMLMPreTrainJob.PRETRAIN_DIR,
+                                                                           "training_data_dir":
+                                                                               os.path.join(TEST_OUTPUT_DIR, "pre_train")})}
+
     def _assert_success(self, output_dict: dict):
         self.assert_training_output_matches_expected(output_dict)
 
     def _get_job(self):
-        params = self.get_test_params(include_pre_processing=True, include_base_model=False)
-        datasets_map = {
-            DatasetRole.PRE_TRAIN: MLMPreTrainDatasetCreator(self.PRETRAIN_DIR)
-        }
-        job_args = JobArgs(**params, base_model=SupportedBaseModel.AUTO_MODEL, datasets_map=datasets_map)
-        return MLMPreTrainJob(job_args,
-                              orig_data_path=self.PRETRAIN_DIR,
-                              training_data_dir=TEST_OUTPUT_DIR)
+        params = self.get_test_params_for_trace(include_pre_processing=True, include_base_model=False)
+        job_args = JobArgs(**params, base_model=SupportedBaseModel.AUTO_MODEL)
+        return MLMPreTrainJob(job_args)

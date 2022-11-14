@@ -1,10 +1,17 @@
+from copy import deepcopy
+from typing import Dict, Tuple
+
 import numpy as np
 from transformers.trainer_utils import PredictionOutput
 
 from api.responses.prediction_response import PredictionResponse
+from constants.constants import VALIDATION_PERCENTAGE_DEFAULT
 from test.base_test import BaseTest
+from tracer.dataset.creators.supported_dataset_creator import SupportedDatasetCreator
 from tracer.dataset.data_objects.artifact import Artifact
 from tracer.dataset.data_objects.trace_link import TraceLink
+from tracer.dataset.dataset_role import DatasetRole
+from tracer.dataset.trainer_datasets_container import TrainerDatasetsContainer
 
 
 class BaseTraceTest(BaseTest):
@@ -56,6 +63,33 @@ class BaseTraceTest(BaseTest):
     _KEY_ERROR_MESSAGE = "{} not in {}"
     _VAL_ERROR_MESSAGE = "{} with value {} does not equal expected value of {} {}"
     _LEN_ERROR = "Length of {} does not match expected"
+
+    _DATASET_PARAMS = {"source_layers": SOURCE_LAYERS,
+                       "target_layers": TARGET_LAYERS,
+                       "true_links": POS_LINKS}
+    DATASET_ARGS_PARAMS = {
+        "validation_percentage": VALIDATION_PERCENTAGE_DEFAULT
+    }
+
+    TRACE_ARGS_PARAMS = {
+        "num_train_epochs": 1,
+        "metrics": ["accuracy", "map_at_k"]
+    }
+
+    @staticmethod
+    def create_dataset_map(dataset_role: DatasetRole, include_links=True):
+        dataset_params = deepcopy(BaseTraceTest._DATASET_PARAMS)
+        if not include_links:
+            dataset_params.pop("true_links")
+        return {dataset_role: (SupportedDatasetCreator.CLASSIC_TRACE, dataset_params)}
+
+    @staticmethod
+    def create_trainer_dataset_container(dataset_map: Dict[DatasetRole, Tuple], include_pre_processing=False, **dataset_args):
+        kwargs = {**BaseTraceTest.DATASET_ARGS_PARAMS, **dataset_args}
+        pre_processing_params = {dataset_role: BaseTraceTest.PRE_PROCESSING_PARAMS for dataset_role in dataset_map.keys()} \
+            if include_pre_processing else None
+        return TrainerDatasetsContainer(dataset_map, pre_processing_params,
+                                        **kwargs)
 
     def assert_prediction_output_matches_expected(self, output: dict, threshold: int = 0.05):
         if PredictionResponse.PREDICTIONS not in output:

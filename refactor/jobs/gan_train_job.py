@@ -13,12 +13,11 @@ class GanTrainJob(TrainJob):
         job_args.base_model = SupportedBaseModel.AUTO_MODEL
         super().__init__(job_args)
 
-    def get_trainer(self) -> GanTrainer:
+    def get_trainer(self, **kwargs) -> GanTrainer:
         """
         Gets the trace trainer for the job
-        :param kwargs: any additional parameters for the trainer
         :return: the trainer
         """
         if self._trainer is None:
-            self._trainer = GanTrainer(args=self.train_args, model_generator=self.get_model_generator())
+            self._trainer = GanTrainer(args=self.trace_args, model_generator=self.get_model_generator(), **kwargs)
         return self._trainer

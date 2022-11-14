@@ -9,6 +9,6 @@ class TrainJob(AbstractTraceJob):
         :return: results of the training including as loss and time
         """
         trainer = self.get_trainer()
-        result = trainer.perform_training(self.dataset_map)
+        result = trainer.perform_training()
         trainer.save_model(self.output_dir)
         return result

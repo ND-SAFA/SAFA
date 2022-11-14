@@ -1,12 +1,8 @@
-from dataclasses import dataclass
-from typing import Dict, List, Tuple
+from dataclasses import dataclass, field
 
-from constants.constants import ADD_MOUNT_DIRECTORY_TO_OUTPUT_DEFAULT, SAVE_OUTPUT_DEFAULT, \
-    VALIDATION_PERCENTAGE_DEFAULT
-from tracer.dataset.creators.supported_dataset_creator import SupportedDatasetCreator
-from tracer.dataset.dataset_role import DatasetRole
+from constants.constants import ADD_MOUNT_DIRECTORY_TO_OUTPUT_DEFAULT, SAVE_OUTPUT_DEFAULT
 from tracer.models.base_models.supported_base_model import SupportedBaseModel
-from tracer.pre_processing.pre_processing_option import PreProcessingOption
+from tracer.train.trace_args import TraceArgs
 
 
 @dataclass
@@ -24,22 +20,9 @@ class JobArgs:
     """
     base_model: SupportedBaseModel = None
     """
-    Dictionary mapping dataset role (e.g. train/eval) to the desired dataset creator and its params
+    Initialized post-init to contain all arguments for tracing jobs
     """
-    datasets_map: Dict[DatasetRole, Tuple[SupportedDatasetCreator, Dict]] = None
-    """
-    Dictionary mapping dataset role to the desired pre-processing steps and related params
-    """
-    dataset_pre_processing_options: Dict[DatasetRole, Tuple[List[PreProcessingOption], Dict]] = None
-    """
-    Additional parameters for the trace args
-    """
-    trace_args_params: Dict = None
-    validation_percentage: float = VALIDATION_PERCENTAGE_DEFAULT
-    """
-    If True, splits the training dataset for eval
-    """
-    split_train_dataset: bool = False
+    trace_args: TraceArgs = None
     """
     If True, adds mount directory to output path
     """

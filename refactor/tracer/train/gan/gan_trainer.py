@@ -1,14 +1,14 @@
 import datetime
 import time
 from collections import namedtuple
-from typing import Dict
+from typing import Dict, Optional, Union, Any, List
 
 import numpy as np
 import torch
 import torch.nn.functional as F
 from transformers import AutoModel, get_constant_schedule_with_warmup
 
-from tracer.dataset.dataset_map import DatasetMap
+from config.override import overrides
 from tracer.dataset.dataset_role import DatasetRole
 from tracer.dataset.pre_train_dataset import PreTrainDataset
 from tracer.dataset.trace_dataset import TraceDataset
@@ -16,7 +16,7 @@ from tracer.models.base_models.descriminator import Discriminator
 from tracer.models.base_models.generator import Generator
 from tracer.models.model_generator import ModelGenerator
 from tracer.train.gan.gan_dataset_converter import GanDatasetConverter
-from tracer.train.gan_args import GanArgs
+from tracer.train.trace_args import TraceArgs
 from tracer.train.trace_trainer import TraceTrainer
 
 
@@ -26,24 +26,25 @@ class GanTrainer(TraceTrainer):
     Github: https://github.com/crux82/ganbert-pytorch/blob/main/GANBERT_pytorch.ipynb
     """
 
-    def __init__(self, args: GanArgs, model_generator: ModelGenerator, **kwargs):
+    def __init__(self, args: TraceArgs, model_generator: ModelGenerator, **kwargs):
         super().__init__(args, model_generator, **kwargs)
         self.transformer = None
 
-    def perform_training(self, dataset_map: DatasetMap, checkpoint: str = None) -> Dict:
+    def perform_training(self, checkpoint: str = None) -> Dict:
         """
         Performs the model training.
-        :param dataset_map: The map containing dataset for each of the roles used in a model training.
         :param checkpoint: path to checkpoint.
         :return: a dictionary containing the results
         """
-        self.train_dataset = self.to_gan_dataset(dataset_map.train_dataset, dataset_map.pre_train_dataset)
-        if DatasetRole.EVAL in dataset_map:
-            self.eval_dataset = self.to_gan_dataset(dataset_map.eval_dataset)
+        self.train_dataset = self.to_gan_dataset(self.dataset_container.train_dataset, self.dataset_container.pre_train_dataset)
+        if DatasetRole.EVAL in self.dataset_container:
+            self.eval_dataset = self.to_gan_dataset(self.dataset_container.eval_dataset)
         output = self.train(resume_from_checkpoint=checkpoint)
         return TraceTrainer.output_to_dict(output)
 
-    def train(self, resume_from_checkpoint: str = None):
+    @overrides(TraceTrainer)
+    def train(self, resume_from_checkpoint: Optional[Union[str, bool]] = None, trial: Union["optuna.Trial", Dict[str, Any]] = None,
+              ignore_keys_for_eval: Optional[List[str]] = None, **kwargs):
         device = GanTrainer.get_device()
         generator, discriminator, transformer = self.create_models()
 
@@ -341,9 +342,8 @@ class GanTrainer(TraceTrainer):
         """
         gan_dataset_converter = GanDatasetConverter(self.args,
                                                     trace_dataset,
-                                                    self.tokenizer,
                                                     pre_train_dataset=pre_train_dataset)
-        return gan_dataset_converter.build()
+        return gan_dataset_converter.to_gan_dataset(self.model_generator)
 
     @staticmethod
     def format_time(elapsed: float):

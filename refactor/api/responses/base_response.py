@@ -7,6 +7,7 @@ class BaseResponse:
     EXCEPTION = "exception"
     STATUS = "status"
     MODEL_PATH = "modelPath"
+    TRACEBACK = "traceback"
     _properties = {JOB_ID: Schema(type=TYPE_STRING, format=FORMAT_UUID),
                    STATUS: Schema(type=TYPE_INTEGER),
                    MODEL_PATH: Schema(type=TYPE_STRING),
@@ -26,5 +27,3 @@ class BaseResponse:
             if key in BaseResponse._properties:
                 properties[key] = BaseResponse._properties[key]
         return properties
-
-

@@ -28,12 +28,13 @@ class NpEncoder(json.JSONEncoder):
 class AbstractJob:
     OUTPUT_FILENAME = "output.json"
 
-    def __init__(self, job_args: JobArgs):
+    def __init__(self, job_args: JobArgs, **kwargs):
         """
         The base job class
         :param job_args: The arguments to the job.
         """
         super().__init__()
+        self.job_args = job_args
         self.status = Status.NOT_STARTED
         self.result = {}
         self.id = uuid.uuid4()
@@ -65,6 +66,7 @@ class AbstractJob:
             self.status = Status.SUCCESS
         except Exception as e:
             print(traceback.format_exc())
+            self.result[BaseResponse.TRACEBACK] = traceback.format_exc()
             self.result[BaseResponse.EXCEPTION] = str(e)
             self.status = Status.FAILURE
 

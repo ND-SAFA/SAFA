@@ -1,4 +1,4 @@
-from typing import List, Tuple, Union
+from typing import List, Tuple, Union, Dict
 
 import math
 import numpy as np
@@ -8,6 +8,7 @@ from torch.utils.data.dataset import TensorDataset
 
 from tracer.dataset.pre_train_dataset import PreTrainDataset
 from tracer.dataset.trace_dataset import TraceDataset
+from tracer.models.model_generator import ModelGenerator
 from tracer.train.trace_args import TraceArgs
 
 UNLABELED_CLASS = 2
@@ -18,25 +19,20 @@ Example = Union[LabeledExample, UnlabeledExample]
 
 
 class GanDatasetConverter:
-    """
-    Responsible for creating a dataset that the GAN will understand from a csv file containing two columns
-    (text, label) where text contains the concatenated source and target artifacts. The label is either 0 or 1
-    representing traced or not traced.
-    """
 
-    def __init__(self,
-                 trace_args: TraceArgs,
-                 train_dataset: TraceDataset,
-                 tokenizer,
-                 pre_train_dataset: PreTrainDataset = None,
+    def __init__(self, trace_args: TraceArgs, train_dataset: TraceDataset, pre_train_dataset: PreTrainDataset = None,
                  label_list: List = None):
+        """
+        Responsible for creating a dataset that the GAN will understand from a csv file containing two columns
+        (text, label) where text contains the concatenated source and target artifacts. The label is either 0 or 1
+        representing traced or not traced.
+        """
         self.trace_args = trace_args
-        self.tokenizer = tokenizer
         self.labeled_examples = self.create_labeled_examples(train_dataset)
         self.unlabeled_examples = self.create_unlabeled_exampled(pre_train_dataset) if pre_train_dataset else None
         self.label_list = label_list if label_list else BINARY_LABEL_LIST
 
-    def build(self) -> DataLoader:
+    def to_gan_dataset(self, model_generator: ModelGenerator) -> DataLoader:
         """
         Creates dataloader containing labeled and unlabeled examples for gan.
         :return:
@@ -67,7 +63,7 @@ class GanDatasetConverter:
             self.trace_args.apply_balance)
 
         # Generate input examples to the Transformer
-        input_ids, label_id_array, label_mask_array, input_mask_array = self.tokenize_examples(examples, label_map)
+        input_ids, label_id_array, label_mask_array, input_mask_array = self.tokenize_examples(examples, label_map, model_generator)
         tensor_dataset = self.to_tensor_dataset(input_ids, label_id_array, label_mask_array, input_mask_array)
 
         # Building the DataLoader
@@ -77,22 +73,18 @@ class GanDatasetConverter:
             sampler=sampler(tensor_dataset),
             batch_size=self.trace_args.train_batch_size)  # Trains with this batch size.
 
-    def tokenize_examples(self, examples, label_map):
+    def tokenize_examples(self, examples, label_map, model_generator: ModelGenerator):
         input_ids = []
         label_id_array = []
         label_mask_array = []
         input_mask_array = []
         for (text, label_mask) in examples:
             if label_mask is None or not label_mask:  # no label use single text encoding
-                encoded_sent = self.tokenizer.encode(text[0], add_special_tokens=True,
-                                                     max_length=self.trace_args.max_seq_length,
-                                                     padding="max_length", truncation=True)
+                encoded_sent = model_generator.get_feature(text=text[0], add_special_tokens=True)
             else:  # if label use sequence encoding
-                encoded_sent = self.tokenizer.encode(text[0], text[1], add_special_tokens=True,
-                                                     max_length=self.trace_args.max_seq_length,
-                                                     padding="max_length", truncation=True)
+                encoded_sent = model_generator.get_feature(text=text[0], text_pair=text[1], add_special_tokens=True)
             label = UNLABELED_CLASS if text[-1] not in label_map else label_map[text[-1]]
-            input_ids.append(encoded_sent)
+            input_ids.append(encoded_sent['input_ids'])
             label_id_array.append(label)
             label_mask_array.append(label_mask)
 

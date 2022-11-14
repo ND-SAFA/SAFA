@@ -99,6 +99,6 @@ class ModelGenerator:
         :return: feature name, value mappings
         """
         tokenizer = self.get_tokenizer()
-        return tokenizer(truncation="longest_first", return_attention_mask=True,
+        return tokenizer(truncation=True, return_attention_mask=True,
                          max_length=self._max_seq_length,
                          padding="max_length", return_token_type_ids=return_token_type_ids, **kwargs)

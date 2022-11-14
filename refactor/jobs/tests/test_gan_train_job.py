@@ -8,6 +8,7 @@ from jobs.job_args import JobArgs
 from jobs.tests.test_train_job import TestTrainJob
 from test.base_job_test import BaseJobTest
 from test.paths.paths import TEST_DATA_DIR
+from tracer.dataset.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
 from tracer.dataset.creators.supported_dataset_creator import SupportedDatasetCreator
 from tracer.dataset.dataset_role import DatasetRole
 from tracer.train.trace_trainer import TraceTrainer
@@ -48,8 +49,6 @@ class TestGanTrainJob(BaseJobTest):
         job_args.trace_args_params = {
             "num_train_epochs": 1
         }
-        job_args.datasets_map[DatasetRole.PRE_TRAIN] = (SupportedDatasetCreator.MLM_PRETRAIN, {
-            "orig_data_path": self.PRETRAIN_DIR
-        })
-        job = GanTrainJob(job_args)
-        return job
+        job_args.trace_args.trainer_dataset_container[DatasetRole.PRE_TRAIN] = MLMPreTrainDatasetCreator(
+            orig_data_path=self.PRETRAIN_DIR).create()
+        return GanTrainJob(job_args)

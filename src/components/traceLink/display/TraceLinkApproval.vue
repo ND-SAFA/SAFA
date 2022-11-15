@@ -6,7 +6,7 @@
         text
         :loading="isUnreviewLoading"
         @click="handleUnreview"
-        data-cy="button-trace-link-generate-unapproved"
+        data-cy="button-trace-unreview"
       >
         <v-icon class="mr-1">mdi-checkbox-blank-circle-outline</v-icon>
         Un-Review
@@ -17,7 +17,7 @@
         :loading="isApproveLoading"
         color="primary"
         @click="handleApprove"
-        data-cy="button-trace-link-generate-approve"
+        data-cy="button-trace-approve"
       >
         <v-icon class="mr-1">mdi-check-circle-outline</v-icon>
         Approve
@@ -28,7 +28,7 @@
         :loading="isDeclineLoading"
         color="error"
         @click="handleDecline"
-        data-cy="button-trace-link-generate-decline"
+        data-cy="button-trace-decline"
       >
         <v-icon class="mr-1">mdi-close-circle-outline</v-icon>
         Decline
@@ -40,7 +40,7 @@
         text
         color="error"
         @click="handleDelete"
-        data-cy="button-trace-link-generate-delete"
+        data-cy="button-trace-delete"
       >
         <v-icon class="mr-1">mdi-delete</v-icon>
         Delete

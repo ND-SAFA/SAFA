@@ -3,7 +3,12 @@
     <panel-card v-if="parents.length > 0">
       <typography el="h2" l="1" variant="subtitle" value="Parent Artifacts" />
       <v-divider />
-      <v-list dense style="max-height: 300px" class="overflow-y-auto">
+      <v-list
+        dense
+        style="max-height: 300px"
+        class="overflow-y-auto"
+        data-cy="list-selected-parents"
+      >
         <template v-for="parent in parents">
           <v-list-item
             :key="parent.id"
@@ -28,7 +33,12 @@
     <panel-card v-if="children.length > 0">
       <typography el="h2" l="1" variant="subtitle" value="Child Artifacts" />
       <v-divider />
-      <v-list dense style="max-height: 300px" class="overflow-y-auto">
+      <v-list
+        dense
+        style="max-height: 300px"
+        class="overflow-y-auto"
+        data-cy="list-selected-children"
+      >
         <template v-for="child in children">
           <v-list-item
             :key="child.name"

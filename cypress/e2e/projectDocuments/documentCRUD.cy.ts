@@ -45,8 +45,6 @@ describe("Document CRUD", () => {
 
       cy.getCy(DataCy.snackbarSuccess)
         .should("be.visible")
-        .getCy(DataCy.documentModal)
-        .should("not.be.visible")
         .waitForProjectLoad();
       cy.getNodes().should("have.length", 2);
     });
@@ -58,8 +56,6 @@ describe("Document CRUD", () => {
 
       cy.getCy(DataCy.snackbarSuccess)
         .should("be.visible")
-        .getCy(DataCy.documentModal)
-        .should("not.be.visible")
         .waitForProjectLoad();
       cy.getNodes().should("have.length", 5);
     });
@@ -74,8 +70,6 @@ describe("Document CRUD", () => {
 
       cy.getCy(DataCy.snackbarSuccess)
         .should("be.visible")
-        .getCy(DataCy.documentModal)
-        .should("not.be.visible")
         .waitForProjectLoad();
       cy.getNodes().should("have.length", 3);
     });
@@ -104,8 +98,6 @@ describe("Document CRUD", () => {
 
       cy.getCy(DataCy.snackbarSuccess)
         .should("be.visible")
-        .getCy(DataCy.documentModal)
-        .should("not.be.visible")
         .waitForProjectLoad();
       cy.getNodes().should("have.length", 1);
 
@@ -117,8 +109,6 @@ describe("Document CRUD", () => {
 
       cy.getCy(DataCy.snackbarSuccess)
         .should("be.visible")
-        .getCy(DataCy.documentModal)
-        .should("not.be.visible")
         .waitForProjectLoad();
       cy.getNodes().should("have.length", 3);
     });
@@ -137,17 +127,11 @@ describe("Document CRUD", () => {
       cy.getNodes().should("have.length", 1);
 
       cy.openDocumentEditor(name)
-        .getCy(DataCy.documentModal)
-        .within(() => {
-          cy.clickButton(DataCy.documentDeleteButton).clickButton(
-            DataCy.documentDeleteButton
-          );
-        });
+        .clickButton(DataCy.documentDeleteButton)
+        .clickButton(DataCy.confirmModalButton);
 
       cy.getCy(DataCy.snackbarSuccess)
         .should("be.visible")
-        .getCy(DataCy.documentModal)
-        .should("not.be.visible")
         .waitForProjectLoad();
       cy.getNodes().should("have.length.above", 1);
     });
@@ -161,16 +145,12 @@ describe("Document CRUD", () => {
 
       cy.getCy(DataCy.snackbarSuccess)
         .should("be.visible")
-        .getCy(DataCy.documentModal)
-        .should("not.be.visible")
         .waitForProjectLoad();
       cy.getNodes().should("have.length", 1);
 
       cy.openDocumentSelector().clickButtonWithName("Default");
 
-      cy.getCy(DataCy.documentModal)
-        .should("not.be.visible")
-        .waitForProjectLoad();
+      cy.waitForProjectLoad();
       cy.getNodes().should("have.length.above", 1);
     });
   });

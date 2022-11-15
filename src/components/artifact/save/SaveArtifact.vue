@@ -126,7 +126,7 @@ export default Vue.extend({
      * Closes the artifact creator.
      */
     handleClose(): void {
-      appStore.closeSidePanels();
+      appStore.openDetailsPanel("displayArtifact");
     },
   },
 });

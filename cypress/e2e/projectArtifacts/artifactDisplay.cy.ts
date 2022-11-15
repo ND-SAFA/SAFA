@@ -56,7 +56,7 @@ describe("Artifact Display", () => {
 
       // Affirm created artifact is selected.
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
-      cy.getCy(DataCy.selectedPanelParents).should("be.visible").click();
+      cy.getCy(DataCy.selectedPanelParents).should("be.visible");
 
       // Affirm parents are shown, and click first parent's link.
       cy.getCy(DataCy.selectedPanelParentItem)
@@ -68,9 +68,7 @@ describe("Artifact Display", () => {
         });
 
       // Affirm link is visible and close.
-      cy.getCy(DataCy.traceApproveModal)
-        .should("be.visible")
-        .closeModal(DataCy.traceApproveModal);
+      cy.getCy(DataCy.traceSourceButton).should("be.visible").click();
 
       // Affirm viewing parent artifact.
       cy.getCy(DataCy.selectedPanelParentItem)
@@ -97,15 +95,13 @@ describe("Artifact Display", () => {
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
       cy.getCy(DataCy.selectedPanelParents)
         .should("be.visible")
-        .click()
         .getCy(DataCy.selectedPanelParentItem)
         .first()
         .click();
 
       // Affirm children are shown, and click first child's link.
-      cy.getCy(DataCy.selectedPanelChildren)
-        .should("be.visible")
-        .getCy(DataCy.selectedPanelChildItem)
+      cy.getCy(DataCy.selectedPanelChildren).should("be.visible");
+      cy.getCy(DataCy.selectedPanelChildItem)
         .should("have.length", 1)
         .first()
         .should("contain", child)
@@ -114,9 +110,7 @@ describe("Artifact Display", () => {
         });
 
       // Affirm link is visible and close.
-      cy.getCy(DataCy.traceApproveModal)
-        .should("be.visible")
-        .closeModal(DataCy.traceApproveModal);
+      cy.getCy(DataCy.traceTargetButton).should("be.visible").click();
 
       // Affirm viewing created child artifact.
       cy.getCy(DataCy.selectedPanelChildItem)

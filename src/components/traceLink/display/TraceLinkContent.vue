@@ -7,7 +7,7 @@
         display-divider
       />
       <v-card-actions>
-        <v-btn text @click="handleViewTarget">
+        <v-btn text data-cy="button-trace-target" @click="handleViewTarget">
           <v-icon class="mr-1">mdi-application-array-outline</v-icon>
           View Artifact
         </v-btn>
@@ -31,7 +31,7 @@
         display-divider
       />
       <v-card-actions>
-        <v-btn text @click="handleViewSource">
+        <v-btn text data-cy="button-trace-source" @click="handleViewSource">
           <v-icon class="mr-1">mdi-application-array-outline</v-icon>
           View Artifact
         </v-btn>

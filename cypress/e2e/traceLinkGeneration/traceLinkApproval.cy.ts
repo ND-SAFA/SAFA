@@ -6,16 +6,17 @@ describe("Trace Link Approval", () => {
   });
 
   beforeEach(() => {
+    cy.viewport(1024, 768);
     cy.loadCurrentProject().openApproveGeneratedTraceLinks();
   });
 
   describe("I can approve an un-reviewed or declined trace link", () => {
-    it("Can decline a trace link and check that it is declined", () => {
-      cy.clickButton(DataCy.traceLinkTableGenerateTraceLinkDeclineButton);
+    it("Can approve a trace link and check that it is approved", () => {
+      cy.clickButton(DataCy.traceApproveButton);
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
-      // To verify that it is declined, we will check for that trace link
+      // To verify that it is approved, we will check for that trace link
       cy.clickButton(DataCy.traceLinkTableApprovalTypeButton).type(
-        "{backspace}{downArrow}{downArrow}{enter}{esc}"
+        "{backspace}{downArrow}{enter}{esc}"
       );
       cy.withinTableRows(DataCy.traceLinkTable, (tr) => {
         // Has length 3 for heading, group, and trace link itself
@@ -24,27 +25,14 @@ describe("Trace Link Approval", () => {
       });
     });
 
-    it("Can approve an un-reviewed trace link and check that it is approved", () => {
-      cy.clickButton(DataCy.traceLinkTableGenerateTraceLinkApproveButton);
-      cy.getCy(DataCy.snackbarSuccess).should("be.visible");
-      // To verify that it is approved, we will check for that trace link
-      cy.clickButton(DataCy.traceLinkTableApprovalTypeButton).type(
-        "{backspace}{downArrow}{enter}{esc}"
-      );
-      cy.withinTableRows(DataCy.traceLinkTable, (tr) => {
-        tr.should("have.length", 3);
-        tr.contains("D2").should("have.length", 1);
-      });
-    });
-
     it("Can approve a declined trace link and check that it is approved", () => {
       cy.clickButton(DataCy.traceLinkTableApprovalTypeButton).type(
         "{backspace}{downArrow}{downArrow}{enter}{esc}"
       );
-      cy.clickButton(DataCy.traceLinkTableGenerateTraceLinkApproveButton);
+      cy.clickButton(DataCy.traceApproveButton);
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
       cy.clickButton(DataCy.traceLinkTableApprovalTypeButton).type(
-        "{backspace}{downArrow}{downArrow}{enter}{esc}"
+        "{backspace}{downArrow}{enter}{esc}"
       );
       cy.withinTableRows(DataCy.traceLinkTable, (tr) => {
         tr.should("have.length", 4);
@@ -54,8 +42,8 @@ describe("Trace Link Approval", () => {
   });
 
   describe("I can decline an un-reviewed or approved trace link", () => {
-    it("Can decline an un-reviewed trace link and check that it is declined", () => {
-      cy.clickButton(DataCy.traceLinkTableGenerateTraceLinkDeclineButton);
+    it("Can decline a trace link and check that it is declined", () => {
+      cy.clickButton(DataCy.traceDeclineButton);
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
       cy.clickButton(DataCy.traceLinkTableApprovalTypeButton).type(
         "{backspace}{downArrow}{downArrow}{enter}{esc}"
@@ -70,7 +58,7 @@ describe("Trace Link Approval", () => {
       cy.clickButton(DataCy.traceLinkTableApprovalTypeButton).type(
         "{backspace}{downArrow}{enter}{esc}"
       );
-      cy.clickButton(DataCy.traceLinkTableGenerateTraceLinkDeclineButton);
+      cy.clickButton(DataCy.traceDeclineButton);
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
       cy.clickButton(DataCy.traceLinkTableApprovalTypeButton).type(
         "{backspace}{downArrow}{enter}{esc}"
@@ -82,17 +70,15 @@ describe("Trace Link Approval", () => {
     });
   });
 
-  /* These will be skipped for now
-  //TODO: Figure out how to test for trace links on the actual graph
-  describe("I cannot see declined trace links on the graph", () => {});
-  describe("I can see un-reviewed trace links as dotted lines", () => {});
-  */
+  // describe("I cannot see declined trace links on the graph", () => {});
+  // describe("I can see un-reviewed trace links as dotted lines", () => {});
+
   describe("I can un-review an approved or declined trace link", () => {
     it("Can un-review an approved trace link", () => {
       cy.clickButton(DataCy.traceLinkTableApprovalTypeButton).type(
         "{backspace}{downArrow}{enter}{esc}"
       );
-      cy.clickButton(DataCy.traceLinkTableGenerateTraceLinkUnapproveButton);
+      cy.clickButton(DataCy.traceUnreviewButton);
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
       cy.clickButton(DataCy.traceLinkTableApprovalTypeButton).type(
         "{backspace}{downArrow}{downArrow}{enter}{esc}"
@@ -106,7 +92,7 @@ describe("Trace Link Approval", () => {
       cy.clickButton(DataCy.traceLinkTableApprovalTypeButton).type(
         "{backspace}{downArrow}{downArrow}{enter}{esc}"
       );
-      cy.clickButton(DataCy.traceLinkTableGenerateTraceLinkUnapproveButton);
+      cy.clickButton(DataCy.traceUnreviewButton);
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
       cy.clickButton(DataCy.traceLinkTableApprovalTypeButton).type(
         "{backspace}{downArrow}{enter}{esc}"

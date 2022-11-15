@@ -36,7 +36,7 @@ describe("Project Members CRUD", () => {
   describe("As an owner, I can remove a member from a project", () => {
     it("Can remove a member from a project", () => {
       cy.clickButton(DataCy.projectSettingsDeleteUserButton);
-      cy.clickButton(DataCy.projectSettingsIAcceptButton);
+      cy.clickButton(DataCy.confirmModalButton);
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
     });
   });

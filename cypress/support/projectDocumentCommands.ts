@@ -74,7 +74,5 @@ Cypress.Commands.add("createDocument", (props) => {
 });
 
 Cypress.Commands.add("saveDocument", () => {
-  cy.getCy(DataCy.documentModal).within(() => {
-    cy.clickButton(DataCy.documentSaveButton, undefined, true);
-  });
+  cy.clickButton(DataCy.documentSaveButton);
 });

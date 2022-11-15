@@ -13,23 +13,21 @@ describe("Artifact CRUD", () => {
     it("Cannot create an artifact without a name, type, or body", () => {
       cy.createNewArtifact({ name: "" });
 
-      cy.getCy(DataCy.artifactSaveModal).within(() => {
-        cy.getCy(DataCy.artifactSaveSubmitButton).should("be.disabled");
+      cy.getCy(DataCy.artifactSaveSubmitButton).should("be.disabled");
 
-        cy.inputText(DataCy.artifactSaveNameInput, `New ${Math.random()}`);
-        cy.getCy(DataCy.artifactSaveBodyInput).clear();
+      cy.inputText(DataCy.artifactSaveNameInput, `New ${Math.random()}`);
+      cy.getCy(DataCy.artifactSaveBodyInput).clear();
 
-        cy.getCy(DataCy.artifactSaveSubmitButton).should("be.disabled");
+      cy.getCy(DataCy.artifactSaveSubmitButton).should("be.disabled");
 
-        cy.inputText(DataCy.artifactSaveBodyInput, "New Artifact");
-        cy.getCy(DataCy.artifactSaveTypeInput).clear();
+      cy.inputText(DataCy.artifactSaveBodyInput, "New Artifact");
+      cy.getCy(DataCy.artifactSaveTypeInput).clear();
 
-        cy.getCy(DataCy.artifactSaveSubmitButton).should("be.disabled");
+      cy.getCy(DataCy.artifactSaveSubmitButton).should("be.disabled");
 
-        cy.inputText(DataCy.artifactSaveTypeInput, "Designs{downArrow}{enter}");
+      cy.inputText(DataCy.artifactSaveTypeInput, "Designs{downArrow}{enter}");
 
-        cy.getCy(DataCy.artifactSaveSubmitButton).should("be.enabled");
-      });
+      cy.getCy(DataCy.artifactSaveSubmitButton).should("be.enabled");
     });
 
     it("Cannot create a new artifact with the same name", () => {
@@ -39,10 +37,8 @@ describe("Artifact CRUD", () => {
 
       cy.createNewArtifact({ name });
 
-      cy.getCy(DataCy.artifactSaveModal).within(() => {
-        cy.contains("This name is already used, please select another.");
-        cy.getCy(DataCy.artifactSaveSubmitButton).should("be.disabled");
-      });
+      cy.contains("This name is already used, please select another.");
+      cy.getCy(DataCy.artifactSaveSubmitButton).should("be.disabled");
     });
 
     it("Creates a simple new artifact", () => {
@@ -83,7 +79,7 @@ describe("Artifact CRUD", () => {
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
       cy.getCy(DataCy.selectedPanelName).should("be.visible");
 
-      cy.getCy(DataCy.selectedPanelParents).should("be.visible").click();
+      cy.getCy(DataCy.selectedPanelParents).should("be.visible");
       cy.getCy(DataCy.selectedPanelParentItem)
         .should("be.visible")
         .should("have.length", 1);
@@ -113,14 +109,10 @@ describe("Artifact CRUD", () => {
 
       cy.getCy(DataCy.selectedPanelEditButton).click();
 
-      cy.getCy(DataCy.artifactSaveModal).within(() => {
-        cy.getCy(DataCy.artifactSaveNameInput)
-          .should("have.value", name)
-          .clear();
+      cy.getCy(DataCy.artifactSaveNameInput).should("have.value", name).clear();
 
-        cy.inputText(DataCy.artifactSaveNameInput, editedName);
-        cy.clickButton(DataCy.artifactSaveSubmitButton);
-      });
+      cy.inputText(DataCy.artifactSaveNameInput, editedName);
+      cy.clickButton(DataCy.artifactSaveSubmitButton);
 
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
       cy.getNodes(true).should("be.visible");

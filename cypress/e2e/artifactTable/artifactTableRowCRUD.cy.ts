@@ -65,7 +65,7 @@ describe("Artifact Table Row CRUD", () => {
         .contains("Test Artifact")
         .should("exist");
       cy.getCy(DataCy.artifactTableDeleteArtifactRowButton).last().click();
-      cy.clickButton(DataCy.artifactTableArtifactDeleteIAcceptButton);
+      cy.clickButton(DataCy.confirmModalButton);
       cy.getCy(DataCy.artifactTableArtifact)
         .last()
         .contains("Test Artifact")

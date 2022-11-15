@@ -2,6 +2,7 @@ import { DataCy, simpleProjectFiles, testProject } from "../../fixtures";
 
 describe("Project Selection", () => {
   beforeEach(() => {
+    cy.viewport(1024, 768);
     cy.dbResetProjects().loadNewProject().openProjectSelector();
   });
 
@@ -176,11 +177,9 @@ describe("Project Selection", () => {
           .projectSelectorContinue()
           .openUploadFiles();
 
-        cy.getCy(DataCy.versionUploadModal).within(() => {
-          cy.clickButton(DataCy.stepperContinueButton)
-            .uploadFiles(DataCy.versionUploadFilesInput, ...simpleProjectFiles)
-            .clickButton(DataCy.stepperContinueButton);
-        });
+        cy.clickButton(DataCy.stepperContinueButton)
+          .uploadFiles(DataCy.versionUploadFilesInput, ...simpleProjectFiles)
+          .clickButton(DataCy.stepperContinueButton);
 
         cy.getCy(DataCy.snackbarSuccess).should("be.visible");
       });

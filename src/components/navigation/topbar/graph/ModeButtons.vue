@@ -1,14 +1,32 @@
 <template>
   <v-btn-toggle tile group multiple dense :value="value">
-    <v-btn value="tree" text color="accent" @click="handleTreeView">
+    <v-btn
+      value="tree"
+      text
+      color="accent"
+      data-cy="button-nav-tree"
+      @click="handleTreeView"
+    >
       <v-icon left color="accent">mdi-family-tree</v-icon>
       Tree
     </v-btn>
-    <v-btn value="table" text color="accent" @click="handleTableView">
+    <v-btn
+      value="table"
+      text
+      color="accent"
+      data-cy="button-nav-table"
+      @click="handleTableView"
+    >
       <v-icon left color="accent">mdi-table-multiple</v-icon>
       Table
     </v-btn>
-    <v-btn value="delta" text color="accent" @click="handleDeltaView">
+    <v-btn
+      value="delta"
+      text
+      color="accent"
+      data-cy="button-nav-delta"
+      @click="handleDeltaView"
+    >
       <v-icon left color="accent">mdi-compare</v-icon>
       Delta
     </v-btn>

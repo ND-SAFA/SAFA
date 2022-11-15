@@ -177,9 +177,10 @@ describe("Project Selection", () => {
           .projectSelectorContinue()
           .openUploadFiles();
 
-        cy.clickButton(DataCy.stepperContinueButton)
-          .uploadFiles(DataCy.versionUploadFilesInput, ...simpleProjectFiles)
-          .clickButton(DataCy.stepperContinueButton);
+        cy.uploadFiles(
+          DataCy.versionUploadFilesInput,
+          ...simpleProjectFiles
+        ).clickButton(DataCy.versionUploadFilesButton);
 
         cy.getCy(DataCy.snackbarSuccess).should("be.visible");
       });

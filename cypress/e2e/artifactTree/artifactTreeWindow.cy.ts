@@ -55,8 +55,8 @@ describe("Artifact Tree Window", () => {
   describe("I can see the graph interactions load on artifact view change", () => {
     it("Loads the graph and is responsive", () => {
       // Toggle back and forth to the artifact table.
-      cy.clickButtonWithName("table")
-        .clickButtonWithName("tree")
+      cy.clickButton(DataCy.navTableButton)
+        .clickButton(DataCy.navTreeButton)
         .getCy(DataCy.appLoading)
         .should("not.be.visible");
 

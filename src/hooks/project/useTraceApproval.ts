@@ -51,6 +51,21 @@ export const useTraceApproval = defineStore("traceApproval", {
       this.$patch(generated);
     },
     /**
+     * Updates the status of a flat link.
+     *
+     * @param traceLink - The link to update.
+     * @param status - The status to update to.
+     */
+    updateLinkStatus(traceLink: TraceLinkModel, status: ApprovalType): void {
+      const flatLink = this.traceLinks.find(
+        ({ traceLinkId }) => traceLinkId === traceLink.traceLinkId
+      );
+
+      if (!flatLink) return;
+
+      flatLink.approvalStatus = status;
+    },
+    /**
      * Selects all links that meet the filter predicate.
      *
      * @param filter - The filter to run on all links.
@@ -93,6 +108,7 @@ export const useTraceApproval = defineStore("traceApproval", {
       this.deselectLinks(
         ({ traceLinkId }) => traceLinkId !== traceLink.traceLinkId
       );
+      this.updateLinkStatus(traceLink, ApprovalType.APPROVED);
     },
     /**
      * Updates the stored links with a new declined status.
@@ -107,6 +123,7 @@ export const useTraceApproval = defineStore("traceApproval", {
       this.deselectLinks(
         ({ traceLinkId }) => traceLinkId !== traceLink.traceLinkId
       );
+      this.updateLinkStatus(traceLink, ApprovalType.DECLINED);
     },
     /**
      * Updates the stored links with a new un-reviewed status.
@@ -123,6 +140,7 @@ export const useTraceApproval = defineStore("traceApproval", {
       this.deselectLinks(
         ({ traceLinkId }) => traceLinkId !== traceLink.traceLinkId
       );
+      this.updateLinkStatus(traceLink, ApprovalType.UNREVIEWED);
     },
   },
 });

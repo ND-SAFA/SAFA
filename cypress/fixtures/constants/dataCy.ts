@@ -11,6 +11,10 @@ export enum DataCy {
   navGraphCenterButton = "button-nav-graph-center",
   navGraphFilterButton = "button-nav-graph-filter",
   navGraphFilterOption = "button-checkmark-menu-item",
+  navTreeButton = "button-nav-tree",
+  navTableButton = "button-nav-table",
+  navDeltaButton = "button-nav-delta",
+  sidebarCloseButton = "button-sidebar-close",
 
   // Steppers
 
@@ -121,6 +125,7 @@ export enum DataCy {
   versionDeleteConfirmButton = "button-version-delete",
 
   versionUploadFilesInput = "input-files-version",
+  versionUploadFilesButton = "button-upload-files",
 
   // Artifact View
 

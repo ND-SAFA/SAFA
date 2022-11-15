@@ -12,8 +12,9 @@
         large
         icon-id="mdi-menu-open"
         tooltip="Close sidebar"
-        @click="sidebarOpen = false"
         color="primary"
+        data-cy="button-sidebar-close"
+        @click="sidebarOpen = false"
       />
     </flex-box>
     <flex-box justify="center" full-width v-else t="2">
@@ -23,6 +24,7 @@
         tooltip="Open sidebar"
         @click="sidebarOpen = true"
         color="primary"
+        data-cy="button-sidebar-open"
         icon-style="transform: rotate(180deg)"
       />
     </flex-box>

@@ -14,7 +14,12 @@
         label="Replace all artifacts"
         class="ml-4"
       />
-      <v-btn block color="primary" @click="handleSubmit">
+      <v-btn
+        block
+        color="primary"
+        data-cy="button-upload-files"
+        @click="handleSubmit"
+      >
         Upload Project Files
       </v-btn>
     </v-card>
@@ -23,7 +28,6 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { IdentifierModel, VersionModel } from "@/types";
 import { logStore, projectStore } from "@/hooks";
 import { handleUploadProjectVersion } from "@/api";
 import { GenericSwitch, Typography } from "@/components/common";
@@ -47,8 +51,6 @@ export default Vue.extend({
   },
   data() {
     return {
-      selectedProject: undefined as IdentifierModel | undefined,
-      selectedVersion: undefined as VersionModel | undefined,
       selectedFiles: [] as File[],
       isLoading: false,
       setAsNewVersion: true,
@@ -60,13 +62,8 @@ export default Vue.extend({
      * Sets the current project and version when opened.
      */
     isOpen(open: boolean) {
-      const currentProject = projectStore.project;
-      const currentVersion = currentProject.projectVersion;
+      if (!open) return;
 
-      if (!open || !currentProject.projectId) return;
-
-      this.selectedProject = currentProject;
-      this.selectedVersion = currentVersion;
       this.selectedFiles = [];
       this.replaceAllArtifacts = false;
     },
@@ -76,26 +73,17 @@ export default Vue.extend({
      * Closes the modal and clears data.
      */
     handleReset() {
-      this.selectedProject = undefined;
-      this.selectedVersion = undefined;
       this.selectedFiles = [];
     },
     /**
      * Attempts to upload a new project version.
      */
     handleSubmit() {
-      if (this.selectedProject === undefined) {
-        return logStore.onWarning("No project is selected.");
-      }
-      if (this.selectedVersion === undefined) {
-        return logStore.onWarning("No project version is selected.");
-      }
-
       this.isLoading = true;
 
       handleUploadProjectVersion(
-        this.selectedProject.projectId,
-        this.selectedVersion.versionId,
+        projectStore.projectId,
+        projectStore.versionId,
         this.selectedFiles,
         this.setAsNewVersion,
         this.replaceAllArtifacts

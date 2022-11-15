@@ -8,9 +8,10 @@ import {
 
 describe("Bulk Project Creation", () => {
   beforeEach(() => {
-    cy.dbResetJobs();
-    cy.dbResetProjects();
+    cy.dbResetJobs().dbResetProjects();
+  });
 
+  beforeEach(() => {
     cy.visit("/login")
       .login(validUser.email, validUser.password)
       .location("pathname", { timeout: 2000 })

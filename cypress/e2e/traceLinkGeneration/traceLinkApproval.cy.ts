@@ -105,7 +105,7 @@ describe("Trace Link Approval", () => {
       it("Can un-review a declined trace link", () => {
         cy.clickButton(DataCy.traceDeclineButton);
         cy.clickButton(DataCy.traceLinkTableApprovalTypeButton).type(
-          "{backspace}{downArrow}{enter}{esc}"
+          "{backspace}{downArrow}{downArrow}{enter}{esc}"
         );
         cy.clickButton(DataCy.traceUnreviewButton);
 

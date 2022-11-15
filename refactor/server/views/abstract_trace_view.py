@@ -1,12 +1,15 @@
 import json
 from typing import Dict, Type, TypeVar, Union
 
+from django.http import JsonResponse
 from django.http.request import HttpRequest
 from drf_yasg.openapi import Schema, TYPE_OBJECT
 from rest_framework import permissions, status
 from rest_framework.views import APIView
 
 from api.responses.base_response import BaseResponse
+from jobs.abstract_job import AbstractJob
+from jobs.job_factory import JobFactory
 from server.serializers.base_serializer import BaseSerializer
 
 AppEntity = TypeVar("AppEntity")
@@ -15,24 +18,30 @@ AppEntity = TypeVar("AppEntity")
 class AbstractTraceView(APIView):
     permission_classes = (permissions.AllowAny,)
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-    @staticmethod
-    def run_job(request: HttpRequest, job_type: JobType, job: AbstractJob = None,
-                run_async: bool = True) -> JsonResponse:
+    def __init__(self, serializer: Type[BaseSerializer], job: Type[AbstractJob], **kwargs, ):
         """
-        Runs the specified job using params from a given request
-        :param request: request from client
-        :param job_type: job type to run
-        :param run_async: if True, runs the job asynchronously
+        :param serializer_class: The serializer used to validate request and create job.
+        :param job_class: The class of the job to run.
+        :param kwargs: Custom view arguments
+        """
+        super().__init__(**kwargs)
+        self.serializer = serializer
+        self.job = job
+
+    def run_job(self, request: HttpRequest, job: AbstractJob = None, run_async: bool = True) -> JsonResponse:
+        """
+        Serializes request, create job, and runs it.
+        :param request: request from client.
+
+        :param run_async: If True, runs the job asynchronously
         :param job: the job to run (if none is provided, one will be created from the request)
         :return: the job name
         """
         if not job:
-            job = BaseTraceJobView._create_job_from_request(request, job_type)
+            job_factory = AbstractTraceView.read_request(request, self.serializer)
+            job = job_factory.build(self.job)
         if isinstance(job, AbstractJob):
-            job.start()
+            job.run()
             if run_async:
                 response_dict = {BaseResponse.JOB_ID: str(job.id)}
             else:
@@ -40,7 +49,16 @@ class AbstractTraceView(APIView):
                 response_dict = job.result
         else:
             response_dict = job
-        return BaseTraceJobView.dict_to_response(response_dict)
+        return AbstractTraceView.dict_to_response(response_dict)
+
+    @staticmethod
+    def dict_to_response(dict_: Dict) -> JsonResponse:
+        """
+        Converts a dictionary to a JsonResponse
+        :param dict_: a dictionary
+        :return: the json response
+        """
+        return JsonResponse(dict_)
 
     @staticmethod
     def get_responses(response_keys: Union[str, list]) -> Dict:
@@ -54,7 +72,7 @@ class AbstractTraceView(APIView):
                                        properties=BaseResponse.get_properties(response_keys))}
 
     @staticmethod
-    def read_request(request: HttpRequest, serializer_class: Type[BaseSerializer[AppEntity]]) -> AppEntity:
+    def read_request(request: HttpRequest, serializer_class: Type[BaseSerializer]) -> JobFactory:
         """
         Converts a HttpRequest to a dictionary
         :param request: the HttpRequest

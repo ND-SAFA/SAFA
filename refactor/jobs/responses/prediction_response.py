@@ -1,7 +1,7 @@
 from copy import deepcopy
 from typing import List
 
-from jobs.responses import BaseResponse
+from jobs.responses.base_response import BaseResponse
 
 
 class PredictionResponse(BaseResponse):

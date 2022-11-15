@@ -1,7 +1,7 @@
 from abc import ABC
-from typing import Dict, Optional, Tuple, List
+from typing import Dict, List, Optional, Tuple
 
-from config.constants import SAVE_OUTPUT_DEFAULT, ADD_MOUNT_DIRECTORY_TO_OUTPUT_DEFAULT, VALIDATION_PERCENTAGE_DEFAULT
+from config.constants import ADD_MOUNT_DIRECTORY_TO_OUTPUT_DEFAULT, SAVE_OUTPUT_DEFAULT, VALIDATION_PERCENTAGE_DEFAULT
 from jobs.abstract_job import AbstractJob
 from server.storage.safa_storage import SafaStorage
 from tracer.dataset.creators.supported_dataset_creator import SupportedDatasetCreator
@@ -60,8 +60,9 @@ class AbstractTraceJob(AbstractJob, ABC):
         if dataset_creator_reqs:
             dataset_creator_class, dataset_creator_params = dataset_creator_reqs
             pre_processing_params = dataset_pre_processing_options.get(dataset_role)
-            dataset_creator = dataset_creator_class.value(pre_processing_params=pre_processing_params, **dataset_creator_params)
-            return dataset_creator.create()
+            dataset_creator = dataset_creator_class.value(pre_processing_params=pre_processing_params,
+                                                          **dataset_creator_params)
+            return dataset_creator.serialize_data()
 
     def get_trainer(self, **kwargs) -> TraceTrainer:
         """

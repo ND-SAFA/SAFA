@@ -1,8 +1,9 @@
-from typing import Dict, Generic, Type, TypeVar
+from enum import Enum
+from typing import Any, Dict, Generic, Type, TypeVar
 from unittest import TestCase
 
+from jobs.job_factory import JobFactory
 from server.serializers.base_serializer import BaseSerializer
-from tracer.models.base_models.supported_base_model import SupportedBaseModel
 from tracer.pre_processing.separate_joined_words_step import SeparateJoinedWordsStep
 
 AppEntity = TypeVar('AppEntity')
@@ -56,6 +57,7 @@ class BaseSerializerTest(Generic[AppEntity]):
                                             partial=True)
         is_valid = update_serializer.is_valid()
         updated_model_identifier = update_serializer.save()
+        print(updated_model_identifier.kwargs)
 
         test_case.assertTrue(is_valid)
         test_case.assertEqual(0, len(update_serializer.errors))
@@ -81,7 +83,7 @@ class BaseSerializerTest(Generic[AppEntity]):
             test_case.assertIn(expected_phrase, errors[key][0].title().lower())
 
     @staticmethod
-    def assert_contains_camel_case_properties(test_case: TestCase, instance, camel_case_properties: Dict):
+    def assert_contains_camel_case_properties(test_case: TestCase, instance: JobFactory, camel_case_properties: Dict):
         """
         Verifies that instance contains properties (in camel case) with expected values.
         :param test_case: The test used to assert the validity of the properties.
@@ -91,10 +93,17 @@ class BaseSerializerTest(Generic[AppEntity]):
         """
         for key, new_value in camel_case_properties.items():
             object_key = BaseSerializerTest.to_snake_case(key)
-            object_value = getattr(instance, object_key)
-            if isinstance(object_value, SupportedBaseModel):
-                object_value = str(object_value).split(".")[-1]
+            object_value = instance.kwargs[object_key]
+            object_value = BaseSerializerTest.to_repr(object_value)
             test_case.assertEqual(new_value, object_value)
+
+    @staticmethod
+    def to_repr(object_value: Any):
+        if isinstance(object_value, Enum):
+            return object_value.name
+        if isinstance(object_value, list):
+            return list(map(BaseSerializerTest.to_repr, object_value))
+        return object_value
 
     @staticmethod
     def to_snake_case(word: str):

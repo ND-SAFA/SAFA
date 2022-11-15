@@ -1,28 +1,36 @@
-from typing import Dict, List, Tuple
+from typing import Type
 
 from jobs.abstract_job import AbstractJob
-from tracer.models.base_models.supported_base_model import SupportedBaseModel
 
 
 class JobFactory:
-    def __init__(self, base_model: SupportedBaseModel, model_path: str, output_dir: str, load_from_storage: bool,
-                 source_layers: List[Dict[str, str]] = None, target_layers: List[Dict[str, str]] = None,
-                 settings: Dict[str, str] = None, links: List[Tuple[str, str]] = None):
+    def __init__(self, **kwargs):
         """
         Storage of job arguments and creator of jobs.
         """
-        self.base_model = base_model
-        self.model_path = model_path
-        self.output_dir = output_dir
-        self.load_from_storage = load_from_storage
-        self.source_layers = source_layers
-        self.target_layers = target_layers
-        self.links = links
-        self.settings = settings
+        self.kwargs = kwargs
+        self.replace_map = {
+            "load_from_storage": "add_mount_directory_to_output"
+        }
 
-    def build(self, add_mount_directory_to_output: bool = True) -> AbstractJob:
+    def build(self, job_class: Type[AbstractJob]) -> AbstractJob:
         """
         Creates job using job argument and any additional parameters.
         :return: Job
         """
-        raise NotImplementedError()
+        kwargs = {}
+        for property_name, property_value in vars(job_class):
+            native_name = property_name
+            if property_name in self.replace_map:
+                native_name = self.replace_map[property_name]
+            kwargs[property_name] = self.kwargs[native_name]
+        return job_class(**kwargs)
+
+    def __getattr__(self, attribute_name):
+        if attribute_name in self.__dict__:
+            return super().__getattribute__(attribute_name)
+        elif attribute_name in self.kwargs:
+            return self.kwargs[attribute_name]
+        else:
+            error = "%s does not contain field: %s" % (self.__class__.__name__, attribute_name)
+            raise AttributeError(error)

@@ -26,7 +26,7 @@ class BaseSerializer(serializers.Serializer):
         :return: AppEntity with updated values
         """
         for property_name, property_value in validated_data.items():
-            setattr(instance, property_name, property_value)
+            instance.kwargs[property_name] = property_value
         return instance
 
     def save(self, **kwargs) -> JobFactory:

@@ -1,17 +1,18 @@
+import json
 import os
 import traceback
 import uuid
 from abc import abstractmethod
 from typing import Dict
 
+import numpy as np
+
 from api.responses.base_response import BaseResponse
-from config.constants import SAVE_OUTPUT_DEFAULT, ADD_MOUNT_DIRECTORY_TO_OUTPUT_DEFAULT
+from config.constants import ADD_MOUNT_DIRECTORY_TO_OUTPUT_DEFAULT, SAVE_OUTPUT_DEFAULT
 from jobs.job_status import Status
 from server.storage.safa_storage import SafaStorage
 from tracer.models.base_models.supported_base_model import SupportedBaseModel
 from tracer.models.model_generator import ModelGenerator
-import json
-import numpy as np
 
 
 class NpEncoder(json.JSONEncoder):
@@ -76,6 +77,7 @@ class AbstractJob:
         json_output = self._get_output_as_json()
         if self.save_job_output:
             self._save(json_output)
+        return json_output
 
     def _get_output_as_json(self) -> str:
         """

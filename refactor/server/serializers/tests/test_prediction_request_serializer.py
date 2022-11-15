@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from server.serializers.prediction_request_serializer import PredictionRequest, PredictionRequestSerializer
+from server.serializers.prediction_request_serializer import PredictionRequestSerializer
 from server.serializers.tests.base_serializer_test import BaseSerializerTest
 
 
@@ -20,7 +20,7 @@ class TestPredictionRequestSerializer(TestCase):
             "num_train_epochs": 1
         }
     }
-    serializer_test = BaseSerializerTest[PredictionRequest](PredictionRequestSerializer)
+    serializer_test = BaseSerializerTest(PredictionRequestSerializer)
 
     def test_serialization(self):
         prediction_request = self.serializer_test.serialize_data(self, self.serializer_test_data)

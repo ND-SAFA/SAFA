@@ -9,7 +9,7 @@ from rest_framework.views import APIView
 
 from jobs.abstract_job import AbstractJob
 from jobs.job_factory import JobFactory
-from jobs.responses import BaseResponse
+from jobs.responses.base_response import BaseResponse
 from server.serializers.base_serializer import BaseSerializer
 
 AppEntity = TypeVar("AppEntity")

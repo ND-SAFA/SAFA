@@ -5,7 +5,7 @@ import numpy as np
 from transformers.trainer_utils import PredictionOutput
 
 from config.constants import VALIDATION_PERCENTAGE_DEFAULT
-from jobs.responses import PredictionResponse
+from jobs.responses.prediction_response import PredictionResponse
 from test.base_test import BaseTest
 from tracer.datasets.creators.supported_dataset_creator import SupportedDatasetCreator
 from tracer.datasets.data_objects.artifact import Artifact

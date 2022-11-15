@@ -7,7 +7,7 @@ from unittest.mock import patch
 
 from jobs.abstract_job import AbstractJob
 from jobs.job_status import Status
-from jobs.responses import BaseResponse
+from jobs.responses.base_response import BaseResponse
 from test.base_trace_test import BaseTraceTest
 from test.paths.paths import TEST_OUTPUT_DIR
 from tracer.datasets.dataset_role import DatasetRole

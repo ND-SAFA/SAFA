@@ -1,7 +1,7 @@
 from typing import Dict
 
 from jobs.abstract_job import AbstractJob
-from jobs.responses import BaseResponse
+from jobs.responses.base_response import BaseResponse
 
 
 class CreateModelJob(AbstractJob):

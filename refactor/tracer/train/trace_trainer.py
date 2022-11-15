@@ -11,7 +11,7 @@ from transformers.trainer import Trainer
 from transformers.trainer_pt_utils import get_tpu_sampler, is_torch_tpu_available
 
 from config.override import overrides
-from jobs.responses import PredictionResponse
+from jobs.responses.prediction_response import PredictionResponse
 from tracer.datasets.dataset_role import DatasetRole
 from tracer.metrics.supported_trace_metric import get_metric_name, get_metric_path
 from tracer.models.model_generator import ModelGenerator

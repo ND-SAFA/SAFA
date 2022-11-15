@@ -9,7 +9,7 @@ import numpy as np
 
 from jobs.job_args import JobArgs
 from jobs.job_status import Status
-from jobs.responses import BaseResponse
+from jobs.responses.base_response import BaseResponse
 from server.storage.safa_storage import SafaStorage
 from tracer.models.model_generator import ModelGenerator
 

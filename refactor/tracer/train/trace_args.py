@@ -2,9 +2,9 @@ from typing import List
 
 from transformers.training_args import TrainingArguments
 
-from constants.constants import EVALUATION_STRATEGY_DEFAULT, LOAD_BEST_MODEL_AT_END_DEFAULT, \
-    METRIC_FOR_BEST_MODEL_DEFAULT, N_EPOCHS_DEFAULT, SAVE_STRATEGY_DEFAULT, SAVE_TOTAL_LIMIT_DEFAULT, MAX_SEQ_LENGTH_DEFAULT
-from tracer.dataset.trainer_datasets_container import TrainerDatasetsContainer
+from config.constants import EVALUATION_STRATEGY_DEFAULT, LOAD_BEST_MODEL_AT_END_DEFAULT, MAX_SEQ_LENGTH_DEFAULT, \
+    METRIC_FOR_BEST_MODEL_DEFAULT, N_EPOCHS_DEFAULT, SAVE_STRATEGY_DEFAULT, SAVE_TOTAL_LIMIT_DEFAULT
+from tracer.datasets.trainer_datasets_container import TrainerDatasetsContainer
 
 
 class TraceArgs(TrainingArguments):
@@ -43,7 +43,7 @@ class TraceArgs(TrainingArguments):
         """
         Arguments for Learning Model
         :param output_dir: dir to save trainer output to
-        :param dataset_container: The map containing dataset for each of the roles used in a model training.
+        :param dataset_container: The map containing datasets for each of the roles used in a model training.
         :param kwargs: optional arguments for Trainer as identified at link below + other class attributes (i.e. resample_rate)
         https://huggingface.co/docs/transformers/v4.21.0/en/main_classes/trainer#transformers.TrainingArguments
         """

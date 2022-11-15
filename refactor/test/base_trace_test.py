@@ -4,14 +4,14 @@ from typing import Dict, Tuple
 import numpy as np
 from transformers.trainer_utils import PredictionOutput
 
-from api.responses.prediction_response import PredictionResponse
-from constants.constants import VALIDATION_PERCENTAGE_DEFAULT
+from config.constants import VALIDATION_PERCENTAGE_DEFAULT
+from jobs.responses import PredictionResponse
 from test.base_test import BaseTest
-from tracer.dataset.creators.supported_dataset_creator import SupportedDatasetCreator
-from tracer.dataset.data_objects.artifact import Artifact
-from tracer.dataset.data_objects.trace_link import TraceLink
-from tracer.dataset.dataset_role import DatasetRole
-from tracer.dataset.trainer_datasets_container import TrainerDatasetsContainer
+from tracer.datasets.creators.supported_dataset_creator import SupportedDatasetCreator
+from tracer.datasets.data_objects.artifact import Artifact
+from tracer.datasets.data_objects.trace_link import TraceLink
+from tracer.datasets.dataset_role import DatasetRole
+from tracer.datasets.trainer_datasets_container import TrainerDatasetsContainer
 
 
 class BaseTraceTest(BaseTest):
@@ -84,9 +84,11 @@ class BaseTraceTest(BaseTest):
         return {dataset_role: (SupportedDatasetCreator.CLASSIC_TRACE, dataset_params)}
 
     @staticmethod
-    def create_trainer_dataset_container(dataset_map: Dict[DatasetRole, Tuple], include_pre_processing=False, **dataset_args):
+    def create_trainer_dataset_container(dataset_map: Dict[DatasetRole, Tuple], include_pre_processing=False,
+                                         **dataset_args):
         kwargs = {**BaseTraceTest.DATASET_ARGS_PARAMS, **dataset_args}
-        pre_processing_params = {dataset_role: BaseTraceTest.PRE_PROCESSING_PARAMS for dataset_role in dataset_map.keys()} \
+        pre_processing_params = {dataset_role: BaseTraceTest.PRE_PROCESSING_PARAMS for dataset_role in
+                                 dataset_map.keys()} \
             if include_pre_processing else None
         return TrainerDatasetsContainer(dataset_map, pre_processing_params,
                                         **kwargs)

@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from constants.constants import SAVE_OUTPUT_DEFAULT
+from config.constants import SAVE_OUTPUT_DEFAULT
 from tracer.models.base_models.supported_base_model import SupportedBaseModel
 from tracer.train.trace_args import TraceArgs
 

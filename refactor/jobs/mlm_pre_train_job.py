@@ -1,7 +1,8 @@
 import os
+
 from transformers import DataCollatorForLanguageModeling
 
-from constants.constants import MLM_PROBABILITY_DEFAULT
+from config.constants import MLM_PROBABILITY_DEFAULT
 from jobs.abstract_trace_job import AbstractTraceJob
 from jobs.job_args import JobArgs
 

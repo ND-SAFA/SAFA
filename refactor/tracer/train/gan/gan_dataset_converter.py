@@ -1,4 +1,4 @@
-from typing import List, Tuple, Union, Dict
+from typing import List, Tuple, Union
 
 import math
 import numpy as np
@@ -6,8 +6,8 @@ import torch
 from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
 from torch.utils.data.dataset import TensorDataset
 
-from tracer.dataset.pre_train_dataset import PreTrainDataset
-from tracer.dataset.trace_dataset import TraceDataset
+from tracer.datasets.pre_train_dataset import PreTrainDataset
+from tracer.datasets.trace_dataset import TraceDataset
 from tracer.models.model_generator import ModelGenerator
 from tracer.train.trace_args import TraceArgs
 
@@ -23,7 +23,7 @@ class GanDatasetConverter:
     def __init__(self, trace_args: TraceArgs, train_dataset: TraceDataset, pre_train_dataset: PreTrainDataset = None,
                  label_list: List = None):
         """
-        Responsible for creating a dataset that the GAN will understand from a csv file containing two columns
+        Responsible for creating a datasets that the GAN will understand from a csv file containing two columns
         (text, label) where text contains the concatenated source and target artifacts. The label is either 0 or 1
         representing traced or not traced.
         """
@@ -42,7 +42,7 @@ class GanDatasetConverter:
         for (i, label) in enumerate(self.label_list):
             label_map[label] = i
 
-        # 1. The labeled (train) dataset is assigned with a mask set to True
+        # 1. The labeled (train) datasets is assigned with a mask set to True
         input_examples = self.labeled_examples
         label_masks = np.ones(len(self.labeled_examples), dtype=bool)
 
@@ -63,7 +63,8 @@ class GanDatasetConverter:
             self.trace_args.apply_balance)
 
         # Generate input examples to the Transformer
-        input_ids, label_id_array, label_mask_array, input_mask_array = self.tokenize_examples(examples, label_map, model_generator)
+        input_ids, label_id_array, label_mask_array, input_mask_array = self.tokenize_examples(examples, label_map,
+                                                                                               model_generator)
         tensor_dataset = self.to_tensor_dataset(input_ids, label_id_array, label_mask_array, input_mask_array)
 
         # Building the DataLoader
@@ -157,8 +158,8 @@ class GanDatasetConverter:
     @staticmethod
     def create_labeled_examples(trace_dataset: TraceDataset) -> List[LabeledExample]:
         """
-        Creates a set of labeled examples from trace links in dataset.
-        :param trace_dataset: The dataset whose trace links are converted to labeled examples.
+        Creates a set of labeled examples from trace links in datasets.
+        :param trace_dataset: The datasets whose trace links are converted to labeled examples.
         :return: List of labeled example representing trace links.
         """
         labeled_examples: List[LabeledExample] = []
@@ -170,8 +171,8 @@ class GanDatasetConverter:
     @staticmethod
     def create_unlabeled_exampled(pre_training_dataset: PreTrainDataset) -> List[UnlabeledExample]:
         """
-        Reads dataset and creates sets of unlabeled examples per line in file.
-        :param pre_training_dataset: The dataset containing pre-training file.
+        Reads datasets and creates sets of unlabeled examples per line in file.
+        :param pre_training_dataset: The datasets containing pre-training file.
         :return: List of unlabeled examples.
         """
         pre_training_file = GanDatasetConverter.read_file(pre_training_dataset.training_file_path)

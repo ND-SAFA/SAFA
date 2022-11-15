@@ -7,8 +7,8 @@ from jobs.job_args import JobArgs
 from jobs.train_job import TrainJob
 from test.base_job_test import BaseJobTest
 from test.paths.paths import TEST_DATA_DIR
-from tracer.dataset.creators.supported_dataset_creator import SupportedDatasetCreator
-from tracer.dataset.dataset_role import DatasetRole
+from tracer.datasets.creators.supported_dataset_creator import SupportedDatasetCreator
+from tracer.datasets.dataset_role import DatasetRole
 from tracer.train.trace_trainer import TraceTrainer
 
 

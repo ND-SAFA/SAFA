@@ -5,7 +5,7 @@ from torch.nn import CrossEntropyLoss
 from transformers.modeling_utils import PreTrainedModel
 from transformers.models.electra.modeling_electra import ElectraClassificationHead
 
-from constants.constants import LOGITS, LOSS
+from config.constants import LOGITS, LOSS
 
 """
 Attention Mask

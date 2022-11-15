@@ -2,13 +2,13 @@ import re
 from dataclasses import dataclass, field
 from typing import Dict, List, Tuple, Type
 
-from constants.constants import SAVE_OUTPUT_DEFAULT
+from config.constants import SAVE_OUTPUT_DEFAULT
 from jobs.abstract_job import AbstractJob
 from jobs.abstract_trace_job import AbstractTraceJob
 from jobs.job_args import JobArgs
-from tracer.dataset.creators.supported_dataset_creator import SupportedDatasetCreator
-from tracer.dataset.dataset_role import DatasetRole
-from tracer.dataset.trainer_datasets_container import TrainerDatasetsContainer
+from tracer.datasets.creators.supported_dataset_creator import SupportedDatasetCreator
+from tracer.datasets.dataset_role import DatasetRole
+from tracer.datasets.trainer_datasets_container import TrainerDatasetsContainer
 from tracer.models.base_models.supported_base_model import SupportedBaseModel
 from tracer.pre_processing.pre_processing_option import PreProcessingOption
 from tracer.train.trace_args import TraceArgs
@@ -29,16 +29,16 @@ class JobFactory:
     """
     base_model: SupportedBaseModel = None
     """
-    Dictionary mapping dataset role (e.g. train/eval) to the desired dataset creator and its params
+    Dictionary mapping datasets role (e.g. train/eval) to the desired datasets creator and its params
     """
     datasets_map: Dict[DatasetRole, Tuple[SupportedDatasetCreator, Dict]] = field(default_factory=dict)
     """
-    Dictionary mapping dataset role to the desired pre-processing steps and related params
+    Dictionary mapping datasets role to the desired pre-processing steps and related params
     """
     dataset_pre_processing_options: Dict[DatasetRole, Tuple[List[PreProcessingOption], Dict]] = field(
         default_factory=dict)
     """
-    Any additional parameters for making dataset including test/train split info
+    Any additional parameters for making datasets including test/train split info
     """
     additional_dataset_params: Dict = field(default_factory=dict)
     """
@@ -92,7 +92,7 @@ class JobFactory:
 
     def _create_trace_args(self) -> None:
         """
-        Creates the trace args from the given dataset and trace args params
+        Creates the trace args from the given datasets and trace args params
         :return: None
         """
         trainer_dataset_creator = TrainerDatasetsContainer(datasets_map=self.datasets_map,

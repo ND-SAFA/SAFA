@@ -9,8 +9,8 @@ from jobs.job_args import JobArgs
 from jobs.mlm_pre_train_job import MLMPreTrainJob
 from test.base_job_test import BaseJobTest
 from test.paths.paths import TEST_DATA_DIR, TEST_OUTPUT_DIR
-from tracer.dataset.creators.supported_dataset_creator import SupportedDatasetCreator
-from tracer.dataset.dataset_role import DatasetRole
+from tracer.datasets.creators.supported_dataset_creator import SupportedDatasetCreator
+from tracer.datasets.dataset_role import DatasetRole
 from tracer.models.base_models.supported_base_model import SupportedBaseModel
 from tracer.models.model_generator import ModelGenerator
 

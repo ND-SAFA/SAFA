@@ -2,8 +2,8 @@ from django.http import HttpRequest
 from django.views.decorators.csrf import csrf_exempt
 from drf_yasg.utils import swagger_auto_schema
 
-from api.responses.base_response import BaseResponse
 from jobs.predict_job import PredictJob
+from jobs.responses import BaseResponse
 from server.serializers.prediction_request_serializer import PredictionRequestSerializer
 from server.views.abstract_trace_view import AbstractTraceView
 

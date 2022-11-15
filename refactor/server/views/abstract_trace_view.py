@@ -7,9 +7,9 @@ from drf_yasg.openapi import Schema, TYPE_OBJECT
 from rest_framework import permissions, status
 from rest_framework.views import APIView
 
-from api.responses.base_response import BaseResponse
 from jobs.abstract_job import AbstractJob
 from jobs.job_factory import JobFactory
+from jobs.responses import BaseResponse
 from server.serializers.base_serializer import BaseSerializer
 
 AppEntity = TypeVar("AppEntity")

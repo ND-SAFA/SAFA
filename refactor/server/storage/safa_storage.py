@@ -1,6 +1,6 @@
 import os
 
-from constants.constants import IS_TEST, MNT_DIR
+from config.constants import IS_TEST, MNT_DIR
 
 
 class SafaStorage:

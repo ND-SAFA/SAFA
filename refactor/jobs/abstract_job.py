@@ -7,9 +7,9 @@ from typing import Dict
 
 import numpy as np
 
-from api.responses.base_response import BaseResponse
 from jobs.job_args import JobArgs
 from jobs.job_status import Status
+from jobs.responses import BaseResponse
 from server.storage.safa_storage import SafaStorage
 from tracer.models.model_generator import ModelGenerator
 

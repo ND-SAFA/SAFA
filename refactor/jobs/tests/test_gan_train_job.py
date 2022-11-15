@@ -8,16 +8,16 @@ from jobs.job_args import JobArgs
 from jobs.tests.test_train_job import TestTrainJob
 from test.base_job_test import BaseJobTest
 from test.paths.paths import TEST_DATA_DIR
-from tracer.dataset.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
-from tracer.dataset.creators.supported_dataset_creator import SupportedDatasetCreator
-from tracer.dataset.dataset_role import DatasetRole
+from tracer.datasets.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
+from tracer.datasets.creators.supported_dataset_creator import SupportedDatasetCreator
+from tracer.datasets.dataset_role import DatasetRole
 from tracer.train.trace_trainer import TraceTrainer
 
 
 class TestGanTrainJob(BaseJobTest):
     """
     Tests that GAN is able to train and test.
-    TODO: Add test that includes a pre-training dataset
+    TODO: Add test that includes a pre-training datasets
     TODO: Reduce the run time of the test to < 10 seconds
     """
     PRETRAIN_DIR = os.path.join(TEST_DATA_DIR, "pre_train")

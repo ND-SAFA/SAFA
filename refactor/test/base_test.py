@@ -6,7 +6,7 @@ from django.test import TestCase
 from transformers.models.bert.configuration_bert import BertConfig
 from transformers.models.bert.tokenization_bert import BertTokenizer
 
-from constants.constants import DELETE_TEST_OUTPUT
+from config.constants import DELETE_TEST_OUTPUT
 from server.storage.safa_storage import SafaStorage
 from test.paths.paths import TEST_OUTPUT_DIR, TEST_VOCAB_FILE
 from tracer.models.base_models.pl_bert import PLBert

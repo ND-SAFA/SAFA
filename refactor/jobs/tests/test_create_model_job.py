@@ -1,6 +1,6 @@
-from api.responses.base_response import BaseResponse
 from jobs.create_model_job import CreateModelJob
 from jobs.job_args import JobArgs
+from jobs.responses import BaseResponse
 from test.base_job_test import BaseJobTest
 
 

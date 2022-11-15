@@ -1,7 +1,7 @@
 from jobs.job_args import JobArgs
 from jobs.predict_job import PredictJob
 from test.base_job_test import BaseJobTest
-from tracer.dataset.dataset_role import DatasetRole
+from tracer.datasets.dataset_role import DatasetRole
 
 
 class TestPredictJob(BaseJobTest):

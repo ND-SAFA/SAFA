@@ -1,7 +1,7 @@
 import datetime
 import time
 from collections import namedtuple
-from typing import Dict, Optional, Union, Any, List
+from typing import Any, Dict, List, Optional, Union
 
 import numpy as np
 import torch
@@ -9,9 +9,9 @@ import torch.nn.functional as F
 from transformers import AutoModel, get_constant_schedule_with_warmup
 
 from config.override import overrides
-from tracer.dataset.dataset_role import DatasetRole
-from tracer.dataset.pre_train_dataset import PreTrainDataset
-from tracer.dataset.trace_dataset import TraceDataset
+from tracer.datasets.dataset_role import DatasetRole
+from tracer.datasets.pre_train_dataset import PreTrainDataset
+from tracer.datasets.trace_dataset import TraceDataset
 from tracer.models.base_models.descriminator import Discriminator
 from tracer.models.base_models.generator import Generator
 from tracer.models.model_generator import ModelGenerator
@@ -36,14 +36,16 @@ class GanTrainer(TraceTrainer):
         :param checkpoint: path to checkpoint.
         :return: a dictionary containing the results
         """
-        self.train_dataset = self.to_gan_dataset(self.dataset_container.train_dataset, self.dataset_container.pre_train_dataset)
+        self.train_dataset = self.to_gan_dataset(self.dataset_container.train_dataset,
+                                                 self.dataset_container.pre_train_dataset)
         if DatasetRole.EVAL in self.dataset_container:
             self.eval_dataset = self.to_gan_dataset(self.dataset_container.eval_dataset)
         output = self.train(resume_from_checkpoint=checkpoint)
         return TraceTrainer.output_to_dict(output)
 
     @overrides(TraceTrainer)
-    def train(self, resume_from_checkpoint: Optional[Union[str, bool]] = None, trial: Union["optuna.Trial", Dict[str, Any]] = None,
+    def train(self, resume_from_checkpoint: Optional[Union[str, bool]] = None,
+              trial: Union["optuna.Trial", Dict[str, Any]] = None,
               ignore_keys_for_eval: Optional[List[str]] = None, **kwargs):
         device = GanTrainer.get_device()
         generator, discriminator, transformer = self.create_models()
@@ -95,7 +97,7 @@ class GanTrainer(TraceTrainer):
             generator.train()
             discriminator.train()
 
-            # For each batch of training dataset...
+            # For each batch of training datasets...
             for step, batch in enumerate(self.train_dataset):
 
                 # Progress update every print_each_n_step batches.
@@ -114,25 +116,25 @@ class GanTrainer(TraceTrainer):
 
                 real_batch_size = b_input_ids.shape[0]
 
-                # Encode real dataset in the Transformer
+                # Encode real datasets in the Transformer
                 model_outputs = transformer(b_input_ids, attention_mask=b_input_mask)
                 real_embeddings = model_outputs[-1]
 
-                # Generate fake dataset that should have the same distribution of the ones
+                # Generate fake datasets that should have the same distribution of the ones
                 # encoded by the transformer.
                 # First noisy input are used in input to the Generator
                 noise = torch.zeros(real_batch_size, self.args.noise_size, device=device).uniform_(0, 1)
-                # Generate Fake dataset
+                # Generate Fake datasets
                 gen_embeddings = generator(noise)
 
-                # Generate the output of the Discriminator for real and fake dataset.
+                # Generate the output of the Discriminator for real and fake datasets.
                 # First, we put together the output of the transformer and the generator
                 dis_input = torch.cat([real_embeddings, gen_embeddings], dim=0)
                 # Then, we select the output of the disciminator
                 features, logits, probs = discriminator(dis_input)
 
                 # Finally, we separate the discriminator's output for the real and fake
-                # dataset
+                # datasets
                 features_list = torch.split(features, real_batch_size)
                 dis_real_features = features_list[0]
                 dis_fake_features = features_list[1]
@@ -159,8 +161,8 @@ class GanTrainer(TraceTrainer):
                 # Disciminator's LOSS estimation
                 logits = dis_real_logits[:, 0:-1]
                 log_probs = F.log_softmax(logits, dim=-1)
-                # The discriminator provides an output for labeled and unlabeled real dataset
-                # so the loss evaluated for unlabeled dataset is ignored (masked)
+                # The discriminator provides an output for labeled and unlabeled real datasets
+                # so the loss evaluated for unlabeled datasets is ignored (masked)
                 label2one_hot = torch.nn.functional.one_hot(b_labels, len(self.train_dataset))
                 per_example_loss = -torch.sum(label2one_hot * log_probs, dim=-1)
                 per_example_loss = torch.masked_select(per_example_loss, b_label_mask.to(device))
@@ -251,7 +253,7 @@ class GanTrainer(TraceTrainer):
 
             if self.eval_dataset is None:
                 continue
-            # Evaluate dataset for one epoch
+            # Evaluate datasets for one epoch
             for batch in self.eval_dataset:
                 # Unpack this training batch from our dataloader.
                 b_input_ids = batch[0].to(device)
@@ -334,9 +336,9 @@ class GanTrainer(TraceTrainer):
 
     def to_gan_dataset(self, trace_dataset: TraceDataset, pre_train_dataset: PreTrainDataset = None):
         """
-        Extracts tensors from trace dataset containing different masks for architecture.
-        :param trace_dataset: The dataset whose traces are converted to tensors.
-        :param pre_train_dataset: The dataset whose text is used to create the distribution of words used
+        Extracts tensors from trace datasets containing different masks for architecture.
+        :param trace_dataset: The datasets whose traces are converted to tensors.
+        :param pre_train_dataset: The datasets whose text is used to create the distribution of words used
         by the generator
         :return: Dataloader containing tensors representing traces.
         """

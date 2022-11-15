@@ -6,6 +6,7 @@ describe("Type Options CRUD", () => {
   });
 
   beforeEach(() => {
+    cy.viewport(1024, 768);
     cy.loadCurrentProject();
   });
 
@@ -20,7 +21,7 @@ describe("Type Options CRUD", () => {
       cy.getCy(DataCy.selectedPanelType).should("contain", type);
 
       cy.clickButtonWithName("Settings").switchTab("Artifact Settings");
-      cy.getCy(DataCy.artifactSearchTypeList).should("contain", type);
+      cy.getCy(DataCy.typeOptionsList).should("contain", type);
     });
   });
 

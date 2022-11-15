@@ -88,6 +88,8 @@ export function handleDeleteDocument({
     async (confirmed) => {
       if (!confirmed) return;
 
+      appStore.onLoadStart();
+
       await deleteDocument(document)
         .then(async () => {
           await documentStore.removeDocument(document);
@@ -98,7 +100,8 @@ export function handleDeleteDocument({
           logStore.onError(`Unable to delete document: ${name}`);
           logStore.onDevError(e);
           onError?.(e);
-        });
+        })
+        .finally(() => appStore.onLoadEnd());
     }
   );
 }

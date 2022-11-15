@@ -352,6 +352,19 @@ declare namespace Cypress {
     loadCurrentProject(waitForNodes?: boolean): Chainable<void>;
 
     /**
+     * Centers the graph.
+     */
+    centerGraph(): Chainable<void>;
+
+    /**
+     * Selects an artifact on the graph.
+     * @param name - The artifact name to select.
+     */
+    selectArtifact(name: string): Chainable<void>;
+
+    // Artifact Table
+
+    /**
      * Switches to table view.
      */
     switchToTableView(): Chainable<void>;
@@ -367,36 +380,6 @@ declare namespace Cypress {
      * @param sortType - The type of sort to use.
      */
     artifactTableChangeSort(sortType: string): Chainable<void>;
-
-    /**
-     * Adds a new artifact to the table view.
-     *
-     * @param name - The name of the artifact to add.
-     * @param type - The type of the artifact to add.
-     * @param docType - The document type of the artifact to add.
-     * @param parentArtifact - The parent type of the artifact to add.
-     * @param body - The body of the artifact to add.
-     * @param summary - The summary of the artifact to add.
-     */
-    addTableArtifact(
-      name: string,
-      type: string,
-      docType: string,
-      parentArtifact: string,
-      body: string,
-      summary: string
-    ): Chainable<void>;
-
-    /**
-     * Centers the graph.
-     */
-    centerGraph(): Chainable<void>;
-
-    /**
-     * Selects an artifact on the graph.
-     * @param name - The artifact name to select.
-     */
-    selectArtifact(name: string): Chainable<void>;
 
     // Project Documents
 

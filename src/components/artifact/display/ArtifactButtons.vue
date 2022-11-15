@@ -1,15 +1,20 @@
 <template>
   <flex-box t="2">
-    <v-btn text @click="handleViewBody">
+    <v-btn text data-cy="button-artifact-body" @click="handleViewBody">
       <v-icon class="mr-1">mdi-application-array-outline</v-icon>
       View Body
     </v-btn>
-    <v-btn text @click="handleEditArtifact">
+    <v-btn text data-cy="button-artifact-edit" @click="handleEditArtifact">
       <v-icon class="mr-1">mdi-pencil</v-icon>
       Edit
     </v-btn>
     <v-divider vertical />
-    <v-btn text color="error" @click="handleDeleteArtifact">
+    <v-btn
+      text
+      color="error"
+      data-cy="button-artifact-delete"
+      @click="handleDeleteArtifact"
+    >
       <v-icon class="mr-1">mdi-delete</v-icon>
       Delete
     </v-btn>

@@ -15,6 +15,7 @@
         <generic-icon-button
           icon-id="mdi-close"
           tooltip="Close panel"
+          data-cy="button-close-details"
           @click="handleClose"
         />
       </flex-box>

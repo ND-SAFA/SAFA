@@ -35,6 +35,10 @@ describe("Artifact CRUD", () => {
 
       cy.createNewArtifact({ name }).saveArtifact();
 
+      cy.getCy(DataCy.snackbarSuccess)
+        .should("be.visible")
+        .clickButton(DataCy.selectedPanelCloseButton);
+
       cy.createNewArtifact({ name });
 
       cy.contains("This name is already used, please select another.");

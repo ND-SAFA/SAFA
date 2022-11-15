@@ -39,32 +39,19 @@ Cypress.Commands.add(
       ).clickButtonWithName(type);
     }
     if (includeTypes) {
-      cy.inputText(DataCy.documentIncludeTypesInput, includeTypes)
-        .getCy(DataCy.documentIncludeTypesInput)
-        .within(() => {
-          cy.clickButton(DataCy.documentSaveTypesButton, undefined, true);
-        });
+      cy.inputText(DataCy.documentIncludeTypesInput, `${includeTypes}{esc}`);
     }
     if (artifacts) {
-      cy.inputText(DataCy.documentArtifactsInput, artifacts)
-        .getCy(DataCy.documentArtifactsInput)
-        .within(() => {
-          cy.clickButton(DataCy.documentSaveArtifactsButton, undefined, true);
-        });
+      cy.inputText(DataCy.documentArtifactsInput, `${artifacts}{esc}`);
     }
     if (includeChildTypes) {
-      cy.inputText(DataCy.documentChildTypesInput, includeChildTypes)
-        .getCy(DataCy.documentChildTypesInput)
-        .within(() => {
-          cy.clickButton(DataCy.documentSaveTypesButton, undefined, true);
-        });
+      cy.inputText(DataCy.documentChildTypesInput, `${includeChildTypes}{esc}`);
     }
     if (childArtifacts) {
-      cy.inputText(DataCy.documentChildArtifactsInput, childArtifacts)
-        .getCy(DataCy.documentChildArtifactsInput)
-        .within(() => {
-          cy.clickButton(DataCy.documentSaveArtifactsButton, undefined, true);
-        });
+      cy.inputText(
+        DataCy.documentChildArtifactsInput,
+        `${childArtifacts}{esc}`
+      );
     }
   }
 );

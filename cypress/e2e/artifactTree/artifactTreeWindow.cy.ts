@@ -40,8 +40,7 @@ describe("Artifact Tree Window", () => {
       cy.go("back")
         .location("pathname", { timeout: 5000 })
         .should("equal", "/project")
-        .getCy(DataCy.appLoading)
-        .should("not.be.visible");
+        .waitForProjectLoad(true);
 
       // Assert that right clicking works to know that the graph is responsive.
       cy.centerGraph()

@@ -13,7 +13,6 @@ class TestPredictionRequestSerializer(TestCase):
         "baseModel": "NL_BERT",
         "modelPath": "~/desktop/safa/datasets",
         "outputDir": "hello",
-        "loadFromStorage": True,
         "sourceLayers": [{"S1": "hello"}],
         "targetLayers": [{"T1": "world"}],
         "settings": {
@@ -30,9 +29,9 @@ class TestPredictionRequestSerializer(TestCase):
         self.serializer_test.serialize_deserialize_data(self, self.serializer_test_data)
 
     def test_update(self):
-        new_properties = {"loadFromStorage": False}
+        new_properties = {"outputDir": "hello world"}
         self.serializer_test.serialize_update_data(self, self.serializer_test_data, new_properties)
 
     def test_invalid_update(self):
-        invalid_properties = {"loadFromStorage": 12}
+        invalid_properties = {"outputDir": 12}
         self.serializer_test.test_invalid_update(self, self.serializer_test_data, invalid_properties)

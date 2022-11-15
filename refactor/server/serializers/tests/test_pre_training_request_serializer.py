@@ -13,7 +13,6 @@ class TestPreTrainingRequestSerializer(TestCase):
         "baseModel": "NL_BERT",
         "modelPath": "~/desktop/safa/datasets",
         "outputDir": "hello",
-        "loadFromStorage": True,
         "saveJobOutput": False,
         "trainingDataDir": "~/desktop/pretraining",
         "preProcessingOptions": ["SEPARATE_JOINED_WORDS"],

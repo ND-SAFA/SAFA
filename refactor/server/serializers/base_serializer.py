@@ -25,8 +25,7 @@ class BaseSerializer(serializers.Serializer):
         :param validated_data: The values to update the entity with
         :return: AppEntity with updated values
         """
-        for property_name, property_value in validated_data.items():
-            instance.kwargs[property_name] = property_value
+        instance.set_args(**validated_data)
         return instance
 
     def save(self, **kwargs) -> JobFactory:

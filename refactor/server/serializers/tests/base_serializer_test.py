@@ -41,7 +41,7 @@ class BaseSerializerTest(Generic[AppEntity]):
         entity_created = self.serialize_data(test_case, data)
         deserialized_data = self.serializer(entity_created).data
         for key, value in deserialized_data.items():
-            test_case.assertTrue(key in data.keys())
+            test_case.assertIn(key, data.keys())
             test_case.assertEqual(data[key], value)
 
     def serialize_update_data(self, test_case: TestCase, data: Dict, new_properties: Dict):
@@ -57,7 +57,6 @@ class BaseSerializerTest(Generic[AppEntity]):
                                             partial=True)
         is_valid = update_serializer.is_valid()
         updated_model_identifier = update_serializer.save()
-        print(updated_model_identifier.kwargs)
 
         test_case.assertTrue(is_valid)
         test_case.assertEqual(0, len(update_serializer.errors))
@@ -93,7 +92,7 @@ class BaseSerializerTest(Generic[AppEntity]):
         """
         for key, new_value in camel_case_properties.items():
             object_key = BaseSerializerTest.to_snake_case(key)
-            object_value = instance.kwargs[object_key]
+            object_value = getattr(instance, object_key)
             object_value = BaseSerializerTest.to_repr(object_value)
             test_case.assertEqual(new_value, object_value)
 

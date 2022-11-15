@@ -38,8 +38,7 @@ class AbstractJob:
         self.status = Status.NOT_STARTED
         self.result = {}
         self.id = uuid.uuid4()
-        self.output_dir = SafaStorage.add_mount_directory(
-            job_args.output_dir) if job_args.add_mount_directory_to_output else job_args.output_dir
+        self.output_dir = job_args.output_dir
         self.job_output_filepath = self._get_output_filepath(self.output_dir, self.id)
         self.save_job_output = job_args.save_job_output
         self.base_model = job_args.base_model

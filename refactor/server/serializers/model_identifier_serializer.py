@@ -10,8 +10,6 @@ class ModelIdentifierSerializer(BaseSerializer):
     modelPath = serializers.CharField(max_length=200, help_text="Path to model state.", source="model_path")
     outputDir = serializers.CharField(max_length=200, help_text="Path to store logs and run information.",
                                       source="output_dir")
-    loadFromStorage = serializers.BooleanField(help_text="Whether the model path is in cloud storage.",
-                                               source="load_from_storage")
     saveJobOutput = serializers.BooleanField(required=False,
                                              help_text="If True, saves the output to the output dir.",
                                              source="save_job_output")

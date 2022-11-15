@@ -13,7 +13,7 @@ class TestModelIdentifierSerializer(TestCase):
         "baseModel": "NL_BERT",
         "modelPath": "~/desktop/safa/datasets",
         "outputDir": "hello",
-        "loadFromStorage": True
+        "saveJobOutput": True
     }
     serializer_test = BaseSerializerTest(ModelIdentifierSerializer)
 

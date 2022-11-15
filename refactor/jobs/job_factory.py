@@ -1,31 +1,17 @@
+import re
 from dataclasses import dataclass, field
-from typing import Dict, Tuple, List, Type
+from typing import Dict, List, Tuple, Type
 
-from constants.constants import ADD_MOUNT_DIRECTORY_TO_OUTPUT_DEFAULT, SAVE_OUTPUT_DEFAULT
+from constants.constants import SAVE_OUTPUT_DEFAULT
 from jobs.abstract_job import AbstractJob
 from jobs.abstract_trace_job import AbstractTraceJob
 from jobs.job_args import JobArgs
 from tracer.dataset.creators.supported_dataset_creator import SupportedDatasetCreator
-from tracer.dataset.trainer_datasets_container import TrainerDatasetsContainer
 from tracer.dataset.dataset_role import DatasetRole
+from tracer.dataset.trainer_datasets_container import TrainerDatasetsContainer
 from tracer.models.base_models.supported_base_model import SupportedBaseModel
 from tracer.pre_processing.pre_processing_option import PreProcessingOption
 from tracer.train.trace_args import TraceArgs
-
-import re
-
-
-def assert_job_factory_attr_names():
-    """
-    Ensures the job factory has attributes with names matching those in job args
-    :return: None
-    """
-    for attr in dir(JobArgs):
-        if not hasattr(JobFactory, attr):
-            raise NameError("Expected attr named %s in JobFactory to match attr in job args" % attr)
-
-
-assert_job_factory_attr_names()
 
 
 @dataclass
@@ -33,11 +19,11 @@ class JobFactory:
     """
     Where model and logs will be saved to.
     """
-    output_dir: str
+    output_dir: str = None
     """
     Path to the model weights (e.g. loading pretrained model).
     """
-    model_path: str
+    model_path: str = None
     """
     The model used to load the architecture.
     """
@@ -49,15 +35,12 @@ class JobFactory:
     """
     Dictionary mapping dataset role to the desired pre-processing steps and related params
     """
-    dataset_pre_processing_options: Dict[DatasetRole, Tuple[List[PreProcessingOption], Dict]] = field(default_factory=dict)
+    dataset_pre_processing_options: Dict[DatasetRole, Tuple[List[PreProcessingOption], Dict]] = field(
+        default_factory=dict)
     """
     Any additional parameters for making dataset including test/train split info
     """
     additional_dataset_params: Dict = field(default_factory=dict)
-    """
-    If True, adds mount directory to output path
-    """
-    add_mount_directory_to_output: bool = ADD_MOUNT_DIRECTORY_TO_OUTPUT_DEFAULT
     """
     If True, saves the output to the output_dir
     """
@@ -69,20 +52,20 @@ class JobFactory:
     """
     args used for TraceTrainer, initialized from traceArgsParams
     """
-    trace_args: TraceArgs = field(init=False)
+    trace_args: TraceArgs = field(init=False, default=None)
     """
     any additional args needed for the job
     """
-    additional_job_params: Dict = field(init=False)
+    additional_job_params: Dict = field(init=False, default=None)
 
     def __init__(self, **kwargs):
         """
         Responsible for creating jobs
         :param kwargs: all necessary parameters
         """
-        self.__set_args(**kwargs)
+        self.set_args(**kwargs)
 
-    def __set_args(self, **kwargs) -> None:
+    def set_args(self, **kwargs) -> None:
         """
         Sets class args
         :param kwargs: optional arguments for Trainer
@@ -136,3 +119,23 @@ class JobFactory:
         :return: the string as snake case
         """
         return "_".join([s.lower() for s in re.split("([A-Z][^A-Z]*)", camel_case_str) if s])
+
+
+def print_fields(p_class):
+    print(list(filter(lambda f: f[0] != '_', p_class.__dict__.keys())))
+
+
+def assert_job_factory_attr_names():
+    """
+    Ensures the job factory has attributes with names matching those in job args
+    :return: None
+    """
+    print_fields(JobFactory)
+    print_fields(JobArgs)
+
+    for attr in dir(JobArgs):
+        if not hasattr(JobFactory, attr):
+            raise NameError("Expected attr named %s in JobFactory to match attr in job args" % attr)
+
+
+assert_job_factory_attr_names()

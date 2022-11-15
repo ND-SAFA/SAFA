@@ -13,7 +13,6 @@ class TestTrainingRequestSerializer(TestCase):
         "baseModel": "NL_BERT",
         "modelPath": "~/desktop/safa/datasets",
         "outputDir": "hello",
-        "loadFromStorage": True,
         "sourceLayers": [{"S1": "hello"}],
         "targetLayers": [{"T1": "world"}],
         "links": [["S1", "T1"]],

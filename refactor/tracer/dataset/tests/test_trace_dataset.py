@@ -16,7 +16,8 @@ def fake_method(text, text_pair=None, return_token_type_ids=None, add_special_to
 
 class TestTraceDataset(BaseTraceTest):
     VAlIDATION_PERCENTAGE = 0.3
-    EXPECTED_VAL_SIZE_NEG_LINKS = round((len(BaseTraceTest.ALL_TEST_LINKS) - len(BaseTraceTest.POS_LINKS)) * VAlIDATION_PERCENTAGE)
+    EXPECTED_VAL_SIZE_NEG_LINKS = round(
+        (len(BaseTraceTest.ALL_TEST_LINKS) - len(BaseTraceTest.POS_LINKS)) * VAlIDATION_PERCENTAGE)
     EXPECTED_VAL_SIZE_POS_LINKS = round(len(BaseTraceTest.POS_LINKS) * VAlIDATION_PERCENTAGE)
     TEST_FEATURE = {"irrelevant_key1": "k",
                     "input_ids": "a",
@@ -34,7 +35,8 @@ class TestTraceDataset(BaseTraceTest):
     @patch.object(ModelGenerator, "get_tokenizer")
     def test_to_trainer_dataset(self, get_tokenizer_mock: mock.MagicMock):
         get_tokenizer_mock.return_value = self.get_test_tokenizer()
-        train_dataset, test_dataset = self.get_trace_dataset().train_test_split(self.VAlIDATION_PERCENTAGE, resample_rate=1)
+        train_dataset, test_dataset = self.get_trace_dataset().train_test_split(self.VAlIDATION_PERCENTAGE,
+                                                                                resample_rate=1)
         model_generator = ModelGenerator(**self.MODEL_GENERATOR_PARAMS)
         trainer_dataset = train_dataset.to_trainer_dataset(model_generator)
         self.assertTrue(isinstance(trainer_dataset[0], dict))
@@ -104,7 +106,8 @@ class TestTraceDataset(BaseTraceTest):
         self.assertIn(DataKey.LABEL_KEY, feature_entry_siamese)
 
         feature_entry_single = trace_dataset._get_feature_entry(test_link, ArchitectureType.SINGLE, fake_method)
-        self.assertIn(FEATURE_VALUE.format(test_link.source.token, test_link.target.token), feature_entry_single.values())
+        self.assertIn(FEATURE_VALUE.format(test_link.source.token, test_link.target.token),
+                      feature_entry_single.values())
         self.assertIn(DataKey.LABEL_KEY, feature_entry_single)
 
     def test_extract_feature_info(self):

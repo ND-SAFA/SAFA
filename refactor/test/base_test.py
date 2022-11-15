@@ -1,14 +1,14 @@
 import os
 import shutil
-from copy import deepcopy
 
 import mock
 from django.test import TestCase
 from transformers.models.bert.configuration_bert import BertConfig
 from transformers.models.bert.tokenization_bert import BertTokenizer
-from config.constants import DELETE_TEST_OUTPUT
+
+from constants.constants import DELETE_TEST_OUTPUT
 from server.storage.safa_storage import SafaStorage
-from test.config.paths import TEST_OUTPUT_DIR, TEST_VOCAB_FILE
+from test.paths.paths import TEST_OUTPUT_DIR, TEST_VOCAB_FILE
 from tracer.models.base_models.pl_bert import PLBert
 from tracer.models.base_models.supported_base_model import SupportedBaseModel
 from tracer.pre_processing.pre_processing_option import PreProcessingOption
@@ -55,14 +55,19 @@ class BaseTest(TestCase):
             initializer_range=0.02,
         )
 
+    def assert_lists_have_the_same_vals(self, list1, list2):
+        diff1 = set(list1).difference(list2)
+        diff2 = set(list2).difference(list1)
+        self.assertEquals(len(diff1), 0)
+        self.assertEquals(len(diff2), 0)
+
     @staticmethod
     def get_test_tokenizer():
         tokenizer = BertTokenizer(vocab_file=TEST_VOCAB_FILE)
         tokenizer._convert_token_to_id = mock.MagicMock(return_value=24)
         return tokenizer
 
-    def assert_lists_have_the_same_vals(self, list1, list2):
-        diff1 = set(list1).difference(list2)
-        diff2 = set(list2).difference(list1)
-        self.assertEquals(len(diff1), 0)
-        self.assertEquals(len(diff2), 0)
+    @staticmethod
+    def read_file(file_path: str):
+        with open(file_path) as file:
+            return file.read()

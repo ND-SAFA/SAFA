@@ -1,7 +1,8 @@
-from tracer.dataset.abstract_dataset import AbstractDataset
-from tracer.models.model_generator import ModelGenerator
 from torch.utils.data import Dataset
 from transformers import LineByLineTextDataset
+
+from tracer.dataset.abstract_dataset import AbstractDataset
+from tracer.models.model_generator import ModelGenerator
 
 
 class PreTrainDataset(AbstractDataset):

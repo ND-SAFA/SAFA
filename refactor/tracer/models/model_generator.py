@@ -5,7 +5,7 @@ from transformers.modeling_utils import PreTrainedModel
 from transformers.models.auto.tokenization_auto import AutoTokenizer
 from transformers.tokenization_utils import PreTrainedTokenizer
 
-from config.constants import MAX_SEQ_LENGTH_DEFAULT
+from constants.constants import MAX_SEQ_LENGTH_DEFAULT
 from tracer.models.base_models.supported_base_model import SupportedBaseModel
 from tracer.models.model_properties import ArchitectureType, ModelSize
 
@@ -99,6 +99,6 @@ class ModelGenerator:
         :return: feature name, value mappings
         """
         tokenizer = self.get_tokenizer()
-        return tokenizer(truncation="longest_first", return_attention_mask=True,
+        return tokenizer(truncation=True, return_attention_mask=True,
                          max_length=self._max_seq_length,
                          padding="max_length", return_token_type_ids=return_token_type_ids, **kwargs)

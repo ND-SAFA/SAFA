@@ -8,10 +8,9 @@ from typing import Dict
 import numpy as np
 
 from api.responses.base_response import BaseResponse
-from config.constants import ADD_MOUNT_DIRECTORY_TO_OUTPUT_DEFAULT, SAVE_OUTPUT_DEFAULT
+from jobs.job_args import JobArgs
 from jobs.job_status import Status
 from server.storage.safa_storage import SafaStorage
-from tracer.models.base_models.supported_base_model import SupportedBaseModel
 from tracer.models.model_generator import ModelGenerator
 
 
@@ -29,26 +28,22 @@ class NpEncoder(json.JSONEncoder):
 class AbstractJob:
     OUTPUT_FILENAME = "output.json"
 
-    def __init__(self, output_dir: str, model_path: str, base_model: SupportedBaseModel = None,
-                 add_mount_directory_to_output: bool = ADD_MOUNT_DIRECTORY_TO_OUTPUT_DEFAULT,
-                 save_job_output: bool = SAVE_OUTPUT_DEFAULT):
+    def __init__(self, job_args: JobArgs, **kwargs):
         """
         The base job class
-        :param output_dir: where the model will be saved to
-        :param base_model: supported base model name
-        :param model_path: where the pretrained model will be loaded from
-        :param add_mount_directory_to_output: if True, adds mount directory to output path
-        :param save_job_output: if True, saves the output to the output_dir
+        :param job_args: The arguments to the job.
         """
         super().__init__()
+        self.job_args = job_args
         self.status = Status.NOT_STARTED
         self.result = {}
         self.id = uuid.uuid4()
-        self.output_dir = SafaStorage.add_mount_directory(output_dir) if add_mount_directory_to_output else output_dir
+        self.output_dir = SafaStorage.add_mount_directory(
+            job_args.output_dir) if job_args.add_mount_directory_to_output else job_args.output_dir
         self.job_output_filepath = self._get_output_filepath(self.output_dir, self.id)
-        self.save_job_output = save_job_output
-        self.base_model = base_model
-        self.model_path = model_path
+        self.save_job_output = job_args.save_job_output
+        self.base_model = job_args.base_model
+        self.model_path = job_args.model_path
         self.__model_generator = None
 
     def get_model_generator(self) -> ModelGenerator:
@@ -71,6 +66,7 @@ class AbstractJob:
             self.status = Status.SUCCESS
         except Exception as e:
             print(traceback.format_exc())
+            self.result[BaseResponse.TRACEBACK] = traceback.format_exc()
             self.result[BaseResponse.EXCEPTION] = str(e)
             self.status = Status.FAILURE
 

@@ -3,7 +3,7 @@ from collections import OrderedDict
 from copy import deepcopy
 from typing import Callable, Dict, List, Sized, Tuple
 
-from config.constants import RESAMPLE_RATE_DEFAULT
+from constants.constants import RESAMPLE_RATE_DEFAULT
 from tracer.dataset.abstract_dataset import AbstractDataset
 from tracer.dataset.data_key import DataKey
 from tracer.dataset.data_objects.trace_link import TraceLink
@@ -18,7 +18,7 @@ class TraceDataset(AbstractDataset):
 
     def __init__(self, links: Dict[int, TraceLink], pos_link_ids: List[int] = None, neg_link_ids: List[int] = None):
         """
-        Represents the common format for all datasets used by the huggingface trainer.
+        Represents the config format for all datasets used by the huggingface trainer.
         :param links: The candidate links.
         :param pos_link_ids: The set of trace link ids representing positive links.
         :param neg_link_ids: The set of trace link ids representing negative links.
@@ -46,8 +46,9 @@ class TraceDataset(AbstractDataset):
         :param model_generator: The model generator determining architecture and feature function for trace links.
         :return: A dataset used by the HF trainer.
         """
-        feature_entries = {link.id: self._get_feature_entry(link, model_generator.arch_type, model_generator.get_feature)
-                           for link in self.links.values()}
+        feature_entries = {
+            link.id: self._get_feature_entry(link, model_generator.arch_type, model_generator.get_feature)
+            for link in self.links.values()}
         return [feature_entries[link_id] for link_id in self.pos_link_ids + self.neg_link_ids]
 
     def get_source_target_pairs(self) -> List[Tuple]:
@@ -55,7 +56,8 @@ class TraceDataset(AbstractDataset):
         Gets the list of source target pairs in the order corresponding to the trainer dataset
         :return: list of tuples containing source id and target id
         """
-        return [(self.links[link_id].source.id, self.links[link_id].target.id) for link_id in self.pos_link_ids + self.neg_link_ids]
+        return [(self.links[link_id].source.id, self.links[link_id].target.id) for link_id in
+                self.pos_link_ids + self.neg_link_ids]
 
     def train_test_split(self, percent_test: float, resample_rate: int = RESAMPLE_RATE_DEFAULT):
         """
@@ -150,8 +152,9 @@ class TraceDataset(AbstractDataset):
         :return: feature name, value mappings
         """
         if arch_type == ArchitectureType.SIAMESE:
-            entry = {**self._extract_feature_info(link.source.get_feature(feature_func), DataKey.SOURCE_PRE + DataKey.SEP),
-                     **self._extract_feature_info(link.target.get_feature(feature_func), DataKey.TARGET_PRE + DataKey.SEP)}
+            entry = {
+                **self._extract_feature_info(link.source.get_feature(feature_func), DataKey.SOURCE_PRE + DataKey.SEP),
+                **self._extract_feature_info(link.target.get_feature(feature_func), DataKey.TARGET_PRE + DataKey.SEP)}
         else:
             entry = self._extract_feature_info(link.get_feature(feature_func))
         entry[DataKey.LABEL_KEY] = int(link.is_true_link)

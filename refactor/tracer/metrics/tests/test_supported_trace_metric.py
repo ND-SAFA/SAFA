@@ -9,7 +9,7 @@ class TestSupportedTraceMetric(BaseTest):
     TEST_LIST_METRICS = ["accuracy"]
 
     def test_get_metric_path(self):
-        path = get_metric_path("map_at_k")
+        path = get_metric_path("MAP_AT_K")
         self.assertIn("metrics/map_at_k_metric.py", path)
 
     @patch("datasets.list_metrics")

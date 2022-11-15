@@ -1,9 +1,9 @@
 import os
 import uuid
 from os.path import dirname
-from typing import List, Dict, Tuple
+from typing import Dict, List, Tuple
 
-from config.constants import BLOCK_SIZE_DEFAULT
+from constants.constants import BLOCK_SIZE_DEFAULT
 from tracer.dataset.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tracer.dataset.pre_train_dataset import PreTrainDataset
 from tracer.pre_processing.pre_processing_option import PreProcessingOption

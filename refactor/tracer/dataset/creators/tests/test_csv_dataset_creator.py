@@ -1,7 +1,7 @@
 import os
 
 from test.base_trace_test import BaseTraceTest
-from test.config.paths import TEST_DATA_DIR
+from test.paths.paths import TEST_DATA_DIR
 from tracer.dataset.creators.csv_dataset_creator import CSVDatasetCreator
 
 

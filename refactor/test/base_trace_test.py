@@ -1,9 +1,17 @@
+from copy import deepcopy
+from typing import Dict, Tuple
+
+import numpy as np
+from transformers.trainer_utils import PredictionOutput
+
 from api.responses.prediction_response import PredictionResponse
+from constants.constants import VALIDATION_PERCENTAGE_DEFAULT
 from test.base_test import BaseTest
+from tracer.dataset.creators.supported_dataset_creator import SupportedDatasetCreator
 from tracer.dataset.data_objects.artifact import Artifact
 from tracer.dataset.data_objects.trace_link import TraceLink
-from transformers.trainer_utils import PredictionOutput
-import numpy as np
+from tracer.dataset.dataset_role import DatasetRole
+from tracer.dataset.trainer_datasets_container import TrainerDatasetsContainer
 
 
 class BaseTraceTest(BaseTest):
@@ -31,22 +39,23 @@ class BaseTraceTest(BaseTest):
     NEG_LINKS = set(ALL_TEST_LINKS).difference(set(POS_LINKS))
 
     _EXAMPLE_METRIC_RESULTS = {'test_loss': 0.6929082870483398}
-    _EXAMPLE_PREDICTIONS = np.array([[0.50035876, 0.49964124],
-                                     [0.50035876, 0.49964124],
-                                     [0.50035876, 0.49964124],
-                                     [0.50035876, 0.49964124],
-                                     [0.50035876, 0.49964124],
-                                     [0.50035876, 0.49964124],
-                                     [0.50035876, 0.49964124],
-                                     [0.50035876, 0.49964124],
-                                     [0.50035876, 0.49964124]])
+    _EXAMPLE_PREDICTIONS = np.array([0.6,
+                                     0.4,
+                                     0.3,
+                                     0.8,
+                                     0.1,
+                                     0.01,
+                                     0.2,
+                                     0.4,
+                                     0.4])
     _EXAMPLE_LABEL_IDS = np.array([1, 0, 0, 1, 0, 0, 0, 1, 0])
     EXAMPLE_PREDICTION_OUTPUT = PredictionOutput(predictions=_EXAMPLE_PREDICTIONS,
                                                  label_ids=_EXAMPLE_LABEL_IDS,
                                                  metrics=_EXAMPLE_METRIC_RESULTS)
     EXAMPLE_TRAINING_OUTPUT = {'global_step': 3, 'training_loss': 0.6927204132080078,
                                'metrics': {'train_runtime': 0.1516, 'train_samples_per_second': 79.13,
-                                           'train_steps_per_second': 19.782, 'train_loss': 0.6927204132080078, 'epoch': 3.0},
+                                           'train_steps_per_second': 19.782, 'train_loss': 0.6927204132080078,
+                                           'epoch': 3.0},
                                'status': 0}
     _EXAMPLE_PREDICTION_LINKS = {'source': 0, 'target': 1, 'score': 0.5}
     _EXAMPLE_PREDICTION_METRICS = {'test_loss': 0.6948729753494263, 'test_runtime': 0.0749,
@@ -54,6 +63,33 @@ class BaseTraceTest(BaseTest):
     _KEY_ERROR_MESSAGE = "{} not in {}"
     _VAL_ERROR_MESSAGE = "{} with value {} does not equal expected value of {} {}"
     _LEN_ERROR = "Length of {} does not match expected"
+
+    _DATASET_PARAMS = {"source_layers": SOURCE_LAYERS,
+                       "target_layers": TARGET_LAYERS,
+                       "true_links": POS_LINKS}
+    DATASET_ARGS_PARAMS = {
+        "validation_percentage": VALIDATION_PERCENTAGE_DEFAULT
+    }
+
+    TRACE_ARGS_PARAMS = {
+        "num_train_epochs": 1,
+        "metrics": ["accuracy", "map_at_k"]
+    }
+
+    @staticmethod
+    def create_dataset_map(dataset_role: DatasetRole, include_links=True):
+        dataset_params = deepcopy(BaseTraceTest._DATASET_PARAMS)
+        if not include_links:
+            dataset_params.pop("true_links")
+        return {dataset_role: (SupportedDatasetCreator.CLASSIC_TRACE, dataset_params)}
+
+    @staticmethod
+    def create_trainer_dataset_container(dataset_map: Dict[DatasetRole, Tuple], include_pre_processing=False, **dataset_args):
+        kwargs = {**BaseTraceTest.DATASET_ARGS_PARAMS, **dataset_args}
+        pre_processing_params = {dataset_role: BaseTraceTest.PRE_PROCESSING_PARAMS for dataset_role in dataset_map.keys()} \
+            if include_pre_processing else None
+        return TrainerDatasetsContainer(dataset_map, pre_processing_params,
+                                        **kwargs)
 
     def assert_prediction_output_matches_expected(self, output: dict, threshold: int = 0.05):
         if PredictionResponse.PREDICTIONS not in output:
@@ -71,7 +107,8 @@ class BaseTraceTest(BaseTest):
                 if key == "score":
                     expected_val = self._EXAMPLE_PREDICTION_LINKS["score"]
                     if abs(val - expected_val) >= threshold:
-                        self.fail(self._VAL_ERROR_MESSAGE.format(key, val, expected_val, PredictionResponse.PREDICTIONS))
+                        self.fail(
+                            self._VAL_ERROR_MESSAGE.format(key, val, expected_val, PredictionResponse.PREDICTIONS))
                 else:
                     link[val] = link_dict[key]
             predicted_links.add(tuple(link))

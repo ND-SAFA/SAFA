@@ -3,7 +3,7 @@ from django.views.decorators.csrf import csrf_exempt
 from drf_yasg.utils import swagger_auto_schema
 
 from jobs.mlm_pre_train_job import MLMPreTrainJob
-from jobs.responses.base_response import BaseResponse
+from jobs.results.job_result import JobResult
 from server.serializers.pre_training_request_serializer import PreTrainingRequestSerializer
 from server.views.abstract_trace_view import AbstractTraceView
 
@@ -13,7 +13,7 @@ class PreTrainView(AbstractTraceView):
     Provides endpoint for creating a new model.
     """
 
-    responses = AbstractTraceView.get_responses([BaseResponse.MODEL_PATH, BaseResponse.STATUS, BaseResponse.EXCEPTION])
+    responses = AbstractTraceView.get_responses([JobResult.MODEL_PATH, JobResult.STATUS, JobResult.EXCEPTION])
     serializer = PreTrainingRequestSerializer
 
     def __init__(self, **kwargs):

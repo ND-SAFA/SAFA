@@ -6,8 +6,8 @@ from unittest import mock
 from unittest.mock import patch
 
 from jobs.abstract_job import AbstractJob
-from jobs.job_status import Status
-from jobs.responses.base_response import BaseResponse
+from jobs.results.job_status import JobStatus
+from jobs.results.job_result import JobResult
 from test.base_trace_test import BaseTraceTest
 from test.paths.paths import TEST_OUTPUT_DIR
 from tracer.datasets.dataset_role import DatasetRole
@@ -85,20 +85,20 @@ class BaseJobTest(BaseTraceTest, ABC):
             return json.load(out_file)
 
     def assert_output_on_success(self, output_dict: dict):
-        self.assertIn(BaseResponse.STATUS, output_dict)
-        if output_dict[BaseResponse.STATUS] == Status.FAILURE:
-            failure_msg = output_dict[BaseResponse.EXCEPTION] if BaseResponse.EXCEPTION in output_dict \
+        self.assertIn(JobResult.STATUS, output_dict)
+        if output_dict[JobResult.STATUS] == JobStatus.FAILURE:
+            failure_msg = output_dict[JobResult.EXCEPTION] if JobResult.EXCEPTION in output_dict \
                 else "Status is FAILURE but should be SUCCESS"
-            if BaseResponse.TRACEBACK in output_dict:
-                failure_msg += "\n " + output_dict[BaseResponse.TRACEBACK]
+            if JobResult.TRACEBACK in output_dict:
+                failure_msg += "\n " + output_dict[JobResult.TRACEBACK]
             self.fail(failure_msg)
-        self.assertEquals(output_dict[BaseResponse.STATUS], Status.SUCCESS)
+        self.assertEquals(output_dict[JobResult.STATUS], JobStatus.SUCCESS)
         self._assert_success(output_dict)
 
     def assert_output_on_failure(self, output_dict: dict):
-        self.assertIn(BaseResponse.EXCEPTION, output_dict)
-        self.assertIn(BaseResponse.STATUS, output_dict)
-        self.assertEquals(output_dict[BaseResponse.STATUS], Status.FAILURE)
+        self.assertIn(JobResult.EXCEPTION, output_dict)
+        self.assertIn(JobResult.STATUS, output_dict)
+        self.assertEquals(output_dict[JobResult.STATUS], JobStatus.FAILURE)
 
     @abstractmethod
     def _assert_success(self, output_dict: dict):

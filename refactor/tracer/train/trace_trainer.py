@@ -11,7 +11,6 @@ from transformers.trainer import Trainer
 from transformers.trainer_pt_utils import get_tpu_sampler, is_torch_tpu_available
 
 from config.override import overrides
-from jobs.responses.prediction_response import PredictionResponse
 from tracer.datasets.dataset_role import DatasetRole
 from tracer.metrics.supported_trace_metric import get_metric_name, get_metric_path
 from tracer.models.model_generator import ModelGenerator
@@ -58,9 +57,9 @@ class TraceTrainer(Trainer):
         predictions = TraceTrainer.get_similarity_scores(output.predictions)
         results = self._eval(predictions, output.label_ids, output.metrics,
                              self.args.metrics) if self.args.metrics else None
-        output_dict = TraceTrainer.output_to_dict(output, metrics=results, predictions=predictions)
-        return PredictionResponse.from_output(output_dict,
-                                              self.dataset_container.eval_dataset.get_source_target_pairs())
+        output_dict = TraceTrainer.output_to_dict(output, metrics=results, predictions=predictions,
+                                                  source_target_pairs=self.dataset_container.eval_dataset.get_source_target_pairs())
+        return output_dict
 
     @staticmethod
     def output_to_dict(output: NamedTuple, **kwargs) -> Dict:
@@ -69,8 +68,10 @@ class TraceTrainer(Trainer):
         :param output: output from training or prediction
         :return: the output represented as a dictionary
         """
-        return {field: kwargs[field] if (field in kwargs and kwargs[field]) else getattr(output, field) for field in
-                output._fields}
+        base_output = {field: kwargs[field] if (field in kwargs and kwargs[field]) else getattr(output, field) for field in
+                       output._fields}
+        additional_attrs = {field: kwargs[field] for field in kwargs.keys() if field not in base_output}
+        return {**base_output, **additional_attrs}
 
     @staticmethod
     def _eval(preds: Union[np.ndarray, Tuple[np.ndarray]], label_ids: np.ndarray, output_metrics: Dict,

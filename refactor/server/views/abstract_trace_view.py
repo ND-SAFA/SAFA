@@ -9,7 +9,7 @@ from rest_framework.views import APIView
 
 from jobs.abstract_job import AbstractJob
 from jobs.job_factory import JobFactory
-from jobs.responses.base_response import BaseResponse
+from jobs.results.job_result import JobResult
 from server.serializers.base_serializer import BaseSerializer
 
 AppEntity = TypeVar("AppEntity")
@@ -40,15 +40,12 @@ class AbstractTraceView(APIView):
         if not job:
             job_factory = AbstractTraceView.read_request(request, self.serializer)
             job = job_factory.build(self.job)
-        if isinstance(job, AbstractJob):
-            job.run()
-            if run_async:
-                response_dict = {BaseResponse.JOB_ID: str(job.id)}
-            else:
-                job.join()
-                response_dict = job.result
+        job.run()
+        if run_async:
+            response_dict = {JobResult.JOB_ID: str(job.id)}
         else:
-            response_dict = job
+            job.join()
+            response_dict = job.result.as_dict()
         return AbstractTraceView.dict_to_response(response_dict)
 
     @staticmethod
@@ -69,7 +66,7 @@ class AbstractTraceView(APIView):
         """
         return {
             status.HTTP_200_OK: Schema(type=TYPE_OBJECT,
-                                       properties=BaseResponse.get_properties(response_keys))}
+                                       properties=JobResult.get_properties(response_keys))}
 
     @staticmethod
     def read_request(request: HttpRequest, serializer_class: Type[BaseSerializer]) -> JobFactory:

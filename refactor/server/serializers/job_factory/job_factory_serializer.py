@@ -5,9 +5,9 @@ from rest_framework import serializers
 from jobs.job_factory import JobFactory
 
 
-class BaseSerializer(serializers.Serializer):
+class JobFactorySerializer(serializers.Serializer):
     """
-    Provides generic
+    Provides generic serialization and deserialization of JobFactory
     """
 
     def create(self, validated_data: Dict) -> JobFactory:

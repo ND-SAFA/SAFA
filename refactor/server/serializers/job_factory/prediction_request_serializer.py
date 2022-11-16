@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from server.serializers.model_identifier_serializer import ModelIdentifierSerializer
+from server.serializers.job_factory.model_identifier_serializer import ModelIdentifierSerializer
 
 
 class PredictionRequestSerializer(ModelIdentifierSerializer):

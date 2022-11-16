@@ -5,24 +5,24 @@ from tracer.datasets.creators.abstract_trace_dataset_creator import AbstractTrac
 from tracer.datasets.data_objects.artifact import Artifact
 from tracer.datasets.data_objects.trace_link import TraceLink
 from tracer.datasets.trace_dataset import TraceDataset
-from tracer.pre_processing.pre_processing_option import PreProcessingOption
+from tracer.pre_processing.steps.abstract_pre_processing_step import AbstractPreProcessingStep
 
 
 class ClassicTraceDatasetCreator(AbstractTraceDatasetCreator):
 
     def __init__(self, source_layers: List[Dict[str, str]], target_layers: List[Dict[str, str]],
                  true_links: List[Tuple[str, str]] = None,
-                 pre_processing_params: Tuple[List[PreProcessingOption], Dict] = None,
+                 pre_processing_steps: List[AbstractPreProcessingStep] = None,
                  use_linked_targets_only: bool = USE_LINKED_TARGETS_ONLY_DEFAULT):
         """
         Constructs datasets in classic trace format
         :param source_layers: a list of source artifacts across all layers
         :param target_layers: a list of target artifacts across all layers
         :param true_links: list of tuples containing linked source and target ids
-        :param pre_processing_params: tuple containing the desired pre-processing steps and related params
+        :param pre_processing_steps: tuple containing the desired pre-processing steps and related params
         :param use_linked_targets_only: if True, uses only the targets that make up at least one true link
         """
-        super().__init__(pre_processing_params, use_linked_targets_only)
+        super().__init__(pre_processing_steps, use_linked_targets_only)
         self.source_layers = source_layers
         self.target_layers = target_layers
         self.true_links = true_links

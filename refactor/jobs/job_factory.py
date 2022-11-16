@@ -6,11 +6,11 @@ from config.constants import SAVE_OUTPUT_DEFAULT
 from jobs.abstract_job import AbstractJob
 from jobs.abstract_trace_job import AbstractTraceJob
 from jobs.job_args import JobArgs
-from tracer.datasets.creators.supported_dataset_creator import SupportedDatasetCreator
+from tracer.datasets.abstract_dataset import AbstractDataset
 from tracer.datasets.dataset_role import DatasetRole
 from tracer.datasets.trainer_datasets_container import TrainerDatasetsContainer
 from tracer.models.base_models.supported_base_model import SupportedBaseModel
-from tracer.pre_processing.pre_processing_option import PreProcessingOption
+from tracer.pre_processing.pre_processing_steps import PreProcessingSteps
 from tracer.train.trace_args import TraceArgs
 
 
@@ -31,11 +31,11 @@ class JobFactory:
     """
     Dictionary mapping datasets role (e.g. train/eval) to the desired datasets creator and its params
     """
-    datasets_map: Dict[DatasetRole, Tuple[SupportedDatasetCreator, Dict]] = field(default_factory=dict)
+    datasets_map: Dict[DatasetRole, AbstractDataset] = field(default_factory=dict)
     """
     Dictionary mapping datasets role to the desired pre-processing steps and related params
     """
-    dataset_pre_processing_options: Dict[DatasetRole, Tuple[List[PreProcessingOption], Dict]] = field(
+    dataset_pre_processing_options: Dict[DatasetRole, Tuple[List[PreProcessingSteps], Dict]] = field(
         default_factory=dict)
     """
     Any additional parameters for making datasets including test/train split info
@@ -121,17 +121,11 @@ class JobFactory:
         return "_".join([s.lower() for s in re.split("([A-Z][^A-Z]*)", camel_case_str) if s])
 
 
-def print_fields(p_class):
-    print(list(filter(lambda f: f[0] != '_', p_class.__dict__.keys())))
-
-
 def assert_job_factory_attr_names():
     """
     Ensures the job factory has attributes with names matching those in job args
     :return: None
     """
-    print_fields(JobFactory)
-    print_fields(JobArgs)
 
     for attr in dir(JobArgs):
         if not hasattr(JobFactory, attr):

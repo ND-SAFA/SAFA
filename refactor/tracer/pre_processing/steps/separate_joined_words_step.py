@@ -1,6 +1,6 @@
-from typing import Callable, List, Iterable
+from typing import Callable, Iterable, List
 
-from tracer.pre_processing.abstract_pre_processing_step import AbstractPreProcessingStep, Order
+from tracer.pre_processing.steps.abstract_pre_processing_step import AbstractPreProcessingStep, Order
 
 
 class SeparateJoinedWordsStep(AbstractPreProcessingStep):
@@ -58,5 +58,6 @@ class SeparateJoinedWordsStep(AbstractPreProcessingStep):
         separated_word_list = word_list
         for deliminator in self.deliminators:
             separated_word_list = self._perform_on_word_list(separated_word_list,
-                                                             lambda word: self._separate_deliminated_word(word, deliminator))
+                                                             lambda word: self._separate_deliminated_word(word,
+                                                                                                          deliminator))
         return self._perform_on_word_list(separated_word_list, self._separate_camel_case_word)

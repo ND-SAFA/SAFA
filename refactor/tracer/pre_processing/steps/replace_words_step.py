@@ -1,6 +1,6 @@
 from typing import Dict
 
-from tracer.pre_processing.abstract_pre_processing_step import AbstractPreProcessingBeforeStep, Order
+from tracer.pre_processing.steps.abstract_pre_processing_step import AbstractPreProcessingBeforeStep, Order
 
 
 class ReplaceWordsStep(AbstractPreProcessingBeforeStep):

@@ -1,34 +1,30 @@
-from typing import Dict, List, Tuple, Union, Type
+from typing import Dict, List, Tuple, Type, Union
 
-from tracer.pre_processing.abstract_pre_processing_step import AbstractPreProcessingStep
-from tracer.pre_processing.pre_processing_option import PreProcessingOption
+from tracer.pre_processing.steps.abstract_pre_processing_step import AbstractPreProcessingStep
 
 
 class PreProcessor:
 
-    def __init__(self, selected_options: List[PreProcessingOption] = None, **kwargs):
+    def __init__(self, steps: List[AbstractPreProcessingStep]):
         """
         Handles Pre-Processing
-        :param selected_options: the selected pre-process options to run
+        :param steps: the selected pre-process options to run
         """
-        selected_options = selected_options if selected_options else []
-        self.ordered_before_steps, self.ordered_regular_steps = self._get_ordered_steps(selected_options, **kwargs)
+        self.steps = steps if steps else []
+        self.ordered_before_steps, self.ordered_regular_steps = self._get_ordered_steps(steps)
 
     @staticmethod
-    def _get_ordered_steps(selected_options: List[PreProcessingOption], **kwargs) \
+    def _get_ordered_steps(steps: List[AbstractPreProcessingStep]) \
             -> Tuple[List[AbstractPreProcessingStep], List[AbstractPreProcessingStep]]:
         """
         Gets the steps in the order they should be run
-        :param selected_options: the selected pre-process options to run
+        :param steps: the selected pre-process options to run
         :return: the ordered list of steps to run before and the ordered list of steps to run after words are split into word list
         """
         before_steps = []
         regular_steps = []
-        for option in selected_options:
-            step_class = option.value
-            step_params = PreProcessor._get_step_params(step_class, **kwargs)
-            step = step_class(**step_params)
-            if step.run_before:
+        for step in steps:
+            if step._run_before:
                 before_steps.append(step)
             else:
                 regular_steps.append(step)

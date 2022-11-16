@@ -11,16 +11,16 @@ from server.storage.safa_storage import SafaStorage
 from test.paths.paths import TEST_OUTPUT_DIR, TEST_VOCAB_FILE
 from tracer.models.base_models.pl_bert import PLBert
 from tracer.models.base_models.supported_base_model import SupportedBaseModel
-from tracer.pre_processing.pre_processing_option import PreProcessingOption
+from tracer.pre_processing.pre_processing_steps import PreProcessingSteps
 
 
 class BaseTest(TestCase):
     MODEL_GENERATOR_PARAMS = {"base_model": SupportedBaseModel.PL_BERT,
                               "model_path": "model"}
-    PRE_PROCESSING_PARAMS = ([PreProcessingOption.REPLACE_WORDS,
-                              PreProcessingOption.REMOVE_UNWANTED_CHARS,
-                              PreProcessingOption.SEPARATE_JOINED_WORDS,
-                              PreProcessingOption.FILTER_MIN_LENGTH],
+    PRE_PROCESSING_PARAMS = ([PreProcessingSteps.REPLACE_WORDS,
+                              PreProcessingSteps.REMOVE_UNWANTED_CHARS,
+                              PreProcessingSteps.SEPARATE_JOINED_WORDS,
+                              PreProcessingSteps.FILTER_MIN_LENGTH],
                              {"word_replace_mappings": {"This": "Esta", "one": "uno"}})
 
     def setup(self):

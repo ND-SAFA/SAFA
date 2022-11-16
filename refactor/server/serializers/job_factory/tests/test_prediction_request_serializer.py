@@ -1,10 +1,10 @@
 from django.test import TestCase
 
+from server.serializers.job_factory.prediction_request_serializer import PredictionRequestSerializer
 from server.serializers.tests.base_serializer_test import BaseSerializerTest
-from server.serializers.training_request_serializer import TrainingRequestSerializer
 
 
-class TestTrainingRequestSerializer(TestCase):
+class TestPredictionRequestSerializer(TestCase):
     """
     Test that the PredictionRequestSerializer is able to create PredictionRequest from JSON and export PredictionRequest
     as JSON
@@ -15,26 +15,23 @@ class TestTrainingRequestSerializer(TestCase):
         "outputDir": "hello",
         "sourceLayers": [{"S1": "hello"}],
         "targetLayers": [{"T1": "world"}],
-        "links": [["S1", "T1"]],
         "settings": {
             "num_train_epochs": 1
         }
     }
-
-    serializer_test = BaseSerializerTest(TrainingRequestSerializer)
+    serializer_test = BaseSerializerTest(PredictionRequestSerializer)
 
     def test_serialization(self):
-        training_request = self.serializer_test.serialize_data(self, self.serializer_test_data)
-        BaseSerializerTest.assert_contains_camel_case_properties(self, training_request, self.serializer_test_data)
+        prediction_request = self.serializer_test.serialize_data(self, self.serializer_test_data)
+        BaseSerializerTest.assert_contains_camel_case_properties(self, prediction_request, self.serializer_test_data)
 
     def test_deserialization(self):
         self.serializer_test.serialize_deserialize_data(self, self.serializer_test_data)
 
     def test_update(self):
-        new_properties = {"links": [["T1", "S1"]]}
+        new_properties = {"outputDir": "hello world"}
         self.serializer_test.serialize_update_data(self, self.serializer_test_data, new_properties)
 
     def test_invalid_update(self):
-        invalid_properties = {"links": "test"}
-        self.serializer_test.test_invalid_update(self, self.serializer_test_data, invalid_properties,
-                                                 expected_phrase="list")
+        invalid_properties = {"outputDir": 12}
+        self.serializer_test.test_invalid_update(self, self.serializer_test_data, invalid_properties)

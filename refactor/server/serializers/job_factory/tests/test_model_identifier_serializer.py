@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from server.serializers.model_identifier_serializer import ModelIdentifierSerializer
+from server.serializers.job_factory.model_identifier_serializer import ModelIdentifierSerializer
 from server.serializers.tests.base_serializer_test import BaseSerializerTest
 
 

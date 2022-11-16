@@ -2,7 +2,7 @@ import random
 from copy import copy
 from typing import List
 
-from tracer.pre_processing.abstract_pre_processing_step import AbstractPreProcessingStep, Order
+from tracer.pre_processing.steps.abstract_pre_processing_step import AbstractPreProcessingStep, Order
 
 
 class ShuffleWordsStep(AbstractPreProcessingStep):

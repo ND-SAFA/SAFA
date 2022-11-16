@@ -2,16 +2,17 @@ from enum import Enum
 from typing import Any, Dict, Generic, Type, TypeVar
 from unittest import TestCase
 
+from rest_framework.serializers import Serializer
+
 from jobs.job_factory import JobFactory
-from server.serializers.base_serializer import BaseSerializer
-from tracer.pre_processing.separate_joined_words_step import SeparateJoinedWordsStep
+from tracer.pre_processing.steps.separate_joined_words_step import SeparateJoinedWordsStep
 
 AppEntity = TypeVar('AppEntity')
 
 
 class BaseSerializerTest(Generic[AppEntity]):
 
-    def __init__(self, serializer: Type[BaseSerializer[AppEntity]]):
+    def __init__(self, serializer: Type[Serializer[AppEntity]]):
         """
         Provides default tests for testing serialization, deserialization, and update methods of rest_framework Serializer.
         """
@@ -44,13 +45,16 @@ class BaseSerializerTest(Generic[AppEntity]):
             test_case.assertIn(key, data.keys())
             test_case.assertEqual(data[key], value)
 
-    def serialize_update_data(self, test_case: TestCase, data: Dict, new_properties: Dict):
+    def serialize_update_data(self, test_case: TestCase, data: Dict, new_properties: Dict,
+                              expected_properties: Dict = None):
         """
         Test that PredictionRequest can be updated with new load_from_storage property.
         :param test_case: The test used to make assertions.
         :param data: The map of values to serialize into entity.
         :param new_properties: The map of values to update entity with (camel case converted to snake case).
         """
+        if expected_properties is None:
+            expected_properties = new_properties
         entity_created = self.serialize_data(test_case, data)
         update_serializer = self.serializer(entity_created,
                                             data=new_properties,
@@ -60,7 +64,7 @@ class BaseSerializerTest(Generic[AppEntity]):
 
         test_case.assertTrue(is_valid)
         test_case.assertEqual(0, len(update_serializer.errors))
-        self.assert_contains_camel_case_properties(test_case, updated_model_identifier, new_properties)
+        self.assert_contains_camel_case_properties(test_case, updated_model_identifier, expected_properties)
 
     def test_invalid_update(self, test_case: TestCase, data: Dict, invalid_properties: Dict,
                             expected_phrase: str = "valid"):
@@ -92,7 +96,10 @@ class BaseSerializerTest(Generic[AppEntity]):
         """
         for key, new_value in camel_case_properties.items():
             object_key = BaseSerializerTest.to_snake_case(key)
-            object_value = getattr(instance, object_key)
+            if isinstance(instance, Dict):
+                object_value = instance[object_key]
+            else:
+                object_value = getattr(instance, object_key)
             object_value = BaseSerializerTest.to_repr(object_value)
             test_case.assertEqual(new_value, object_value)
 

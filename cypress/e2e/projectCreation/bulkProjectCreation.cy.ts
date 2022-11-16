@@ -7,7 +7,7 @@ import {
 } from "../../fixtures";
 
 describe("Bulk Project Creation", () => {
-  beforeEach(() => {
+  before(() => {
     cy.dbResetJobs().dbResetProjects();
   });
 

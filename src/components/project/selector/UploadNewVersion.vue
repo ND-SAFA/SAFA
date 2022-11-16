@@ -28,7 +28,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { logStore, projectStore } from "@/hooks";
+import { projectStore } from "@/hooks";
 import { handleUploadProjectVersion } from "@/api";
 import { GenericSwitch, Typography } from "@/components/common";
 import { ProjectFilesInput } from "../base";

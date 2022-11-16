@@ -63,7 +63,7 @@
 import Vue, { PropType } from "vue";
 import { DataTableHeader } from "vuetify";
 import { FlexBox } from "@/components/common";
-import CommitButtons from "@/components/navigation/header/CommitButtons.vue";
+import { CommitButtons } from "@/components/navigation";
 /**
  * Renders the header for a table.
  *

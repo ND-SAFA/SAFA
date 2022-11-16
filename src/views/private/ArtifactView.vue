@@ -4,9 +4,6 @@
       <artifact-table />
       <artifact-tree />
       <artifact-fab />
-
-      <artifact-creator-modal />
-      <trace-link-creator-modal />
     </template>
   </private-page>
 </template>
@@ -17,9 +14,7 @@ import {
   ArtifactTree,
   ArtifactTable,
   PrivatePage,
-  ArtifactCreatorModal,
   ArtifactFab,
-  TraceLinkCreatorModal,
 } from "@/components";
 
 /**
@@ -28,12 +23,10 @@ import {
 export default Vue.extend({
   name: "ArtifactView",
   components: {
-    TraceLinkCreatorModal,
     ArtifactFab,
     ArtifactTable,
     PrivatePage,
     ArtifactTree,
-    ArtifactCreatorModal,
   },
 });
 </script>

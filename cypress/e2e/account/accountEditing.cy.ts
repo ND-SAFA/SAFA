@@ -49,7 +49,7 @@ describe("Account Editing", () => {
           editUser.invalidPassword
         );
         cy.getCy(DataCy.accountDeleteButton).click();
-        cy.getCy(DataCy.popUpAcceptButton).click();
+        cy.getCy(DataCy.confirmModalButton).click();
         cy.location("pathname", { timeout: 5000 }).should(
           "not.equal",
           "/login"
@@ -59,7 +59,7 @@ describe("Account Editing", () => {
       it.skip("Successfully deletes my account", () => {
         cy.inputText(DataCy.accountDeletePasswordInput, editUser.password);
         cy.getCy(DataCy.accountDeleteButton).click();
-        cy.getCy(DataCy.popUpAcceptButton).click();
+        cy.getCy(DataCy.confirmModalButton).click();
         cy.location("pathname", { timeout: 5000 }).should("equal", "/login");
       });
     });

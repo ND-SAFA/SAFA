@@ -8,3 +8,4 @@ export * from "./artifact-tree-view";
 export * from "./tim-tree";
 export * from "./table";
 export * from "./models";
+export * from "./settings";

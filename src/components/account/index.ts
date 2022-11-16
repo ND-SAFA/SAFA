@@ -1,2 +1,1 @@
-export { default as DeleteAccount } from "./DeleteAccount.vue";
-export { default as UpdatePassword } from "./UpdatePassword.vue";
+export { default as MyAccount } from "./MyAccount.vue";

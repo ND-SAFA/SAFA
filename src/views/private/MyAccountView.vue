@@ -1,27 +1,14 @@
 <template>
   <private-page>
     <template v-slot:page>
-      <back-button />
-      <v-container>
-        <typography el="h1" variant="title" value="My Account" />
-        <v-divider />
-        <update-password />
-        <v-divider class="mt-4" />
-        <delete-account />
-      </v-container>
+      <my-account />
     </template>
   </private-page>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import {
-  PrivatePage,
-  Typography,
-  BackButton,
-  DeleteAccount,
-  UpdatePassword,
-} from "@/components";
+import { PrivatePage, MyAccount } from "@/components";
 
 /**
  * Displays the account page.
@@ -29,11 +16,8 @@ import {
 export default Vue.extend({
   name: "MyAccountView",
   components: {
-    BackButton,
-    Typography,
+    MyAccount,
     PrivatePage,
-    DeleteAccount,
-    UpdatePassword,
   },
 });
 </script>

@@ -1,9 +1,9 @@
 <template>
   <div>
-    <span class="mt-1">
+    <div class="mt-1">
       <typography bold color="primary" :value="entry.label" />
-      <typography secondary value="Icon" />
-    </span>
+      <typography secondary value="Icon:" />
+    </div>
     <v-btn-toggle v-model="entry.iconIndex" class="my-1" borderless>
       <v-btn
         :disabled="!allowEditing"

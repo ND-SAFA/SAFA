@@ -10,7 +10,7 @@ describe("Trace Link CRUD", () => {
   });
 
   describe("I can create a new trace link", () => {
-    it("Creates a new trace link from the modal", () => {
+    it("Creates a new trace link", () => {
       cy.createNewTraceLink("D3", "F5").saveTraceLink();
 
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
@@ -21,20 +21,20 @@ describe("Trace Link CRUD", () => {
 
   describe("I can delete a trace link", () => {
     it("Deletes a trace link", () => {
-      cy.createNewArtifact({ parent: "{downArrow}{enter}" }).saveArtifact();
+      cy.createNewArtifact({
+        parent: "{downArrow}{enter}",
+      }).saveArtifact();
 
-      cy.getCy(DataCy.selectedPanelParents).should("be.visible").click();
+      cy.getCy(DataCy.selectedPanelParents).should("be.visible");
       cy.getCy(DataCy.selectedPanelParentItem)
         .first()
         .within(() => {
           cy.clickButton(DataCy.selectedPanelParentLinkButton);
         });
 
-      cy.getCy(DataCy.traceApproveModal).within(() => {
-        cy.clickButton(DataCy.traceDeleteButton).clickButton(
-          DataCy.traceDeleteButton
-        );
-      });
+      cy.clickButton(DataCy.traceDeleteButton).clickButton(
+        DataCy.confirmModalButton
+      );
 
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
       cy.getCy(DataCy.selectedPanelParents).should("not.exist");
@@ -68,13 +68,11 @@ describe("Trace Link CRUD", () => {
           .should("be.disabled");
 
         // Delete the first link direction
-        cy.getCy(DataCy.traceSaveModal).within(() => {
-          cy.clickButton(DataCy.traceSaveDirectionsPanel);
+        cy.clickButton(DataCy.traceSaveDirectionsPanel);
 
-          cy.getCy(DataCy.traceSaveDirectionsChip).each((el) => {
-            cy.wrap(el).within(() => {
-              cy.get("button").click();
-            });
+        cy.getCy(DataCy.traceSaveDirectionsChip).each((el) => {
+          cy.wrap(el).within(() => {
+            cy.get("button").click();
           });
         });
 

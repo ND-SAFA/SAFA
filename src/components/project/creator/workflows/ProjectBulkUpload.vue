@@ -9,7 +9,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { ProjectFilesUploader } from "@/components/project/shared";
+import { ProjectFilesUploader } from "@/components/project/base";
 
 /**
  * Allows for creating a project with a bulk upload.

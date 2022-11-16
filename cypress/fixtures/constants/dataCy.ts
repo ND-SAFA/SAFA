@@ -8,15 +8,13 @@ export enum DataCy {
 
   // Navigation
 
-  navProjectButton = "button-nav-project",
-  navVersionButton = "button-nav-version",
-  navLinksButton = "button-nav-links",
   navGraphCenterButton = "button-nav-graph-center",
-  navToggleLeftPanel = "button-left-panel-toggle",
-  navToggleRightPanel = "button-right-panel-toggle",
   navGraphFilterButton = "button-nav-graph-filter",
   navGraphFilterOption = "button-checkmark-menu-item",
-  navToggleView = "button-view-toggle",
+  navTreeButton = "button-nav-tree",
+  navTableButton = "button-nav-table",
+  navDeltaButton = "button-nav-delta",
+  sidebarCloseButton = "button-sidebar-close",
 
   // Steppers
 
@@ -44,19 +42,20 @@ export enum DataCy {
 
   // Authentication
 
-  accountDropdown = "account-dropdown",
+  isLoggedIn = "is-logged-in",
   emailInput = "input-email",
   passwordInput = "input-password",
   loginButton = "button-login",
+  logoutButton = "button-logout",
 
   // Account Editing
 
+  accountPage = "page-account",
   passwordCurrentInput = "input-current-password",
   passwordNewInput = "input-new-password",
   passwordChangeButton = "button-update-password",
   accountDeletePasswordInput = "input-delete-password",
   accountDeleteButton = "button-delete-my-account",
-  popUpAcceptButton = "button-confirm-modal",
 
   // Snackbar
 
@@ -103,7 +102,6 @@ export enum DataCy {
 
   // Project Selection
 
-  selectionModal = "modal-project-select",
   selectionProjectList = "table-project",
   selectionVersionList = "table-version",
   selectionSearch = "input-selector-search",
@@ -126,8 +124,8 @@ export enum DataCy {
   versionDeleteModal = "modal-version-delete",
   versionDeleteConfirmButton = "button-version-delete",
 
-  versionUploadModal = "modal-version-upload",
   versionUploadFilesInput = "input-files-version",
+  versionUploadFilesButton = "button-upload-files",
 
   // Artifact View
 
@@ -136,21 +134,20 @@ export enum DataCy {
   artifactFabCreateTrace = "button-fab-create-trace",
   artifactFabDrawTrace = "button-fab-draw-trace",
 
-  artifactSaveModal = "modal-artifact-save",
   artifactSaveNameInput = "input-artifact-name",
   artifactSaveTypeInput = "input-artifact-type",
   artifactSaveBodyInput = "input-artifact-body",
   artifactSaveParentInput = "input-artifact-parent",
   artifactSaveSubmitButton = "button-artifact-save",
 
-  traceSaveModal = "modal-trace-save",
   traceSaveSourceInput = "button-trace-save-source",
   traceSaveTargetInput = "button-trace-save-target",
   traceSaveDirectionsPanel = "panel-trace-directions",
   traceSaveDirectionsChip = "chip-type-direction",
   traceSaveSubmitButton = "button-trace-save",
 
-  traceApproveModal = "modal-trace-approve",
+  traceTargetButton = "button-trace-target",
+  traceSourceButton = "button-trace-source",
   traceUnreviewButton = "button-trace-unreview",
   traceApproveButton = "button-trace-approve",
   traceDeclineButton = "button-trace-decline",
@@ -158,12 +155,13 @@ export enum DataCy {
 
   // Selection Panel
 
+  selectedPanelCloseButton = "button-close-details",
   selectedPanelName = "text-selected-name",
   selectedPanelType = "text-selected-type",
   selectedPanelBody = "text-selected-body",
-  selectedPanelBodyButton = "button-selected-body",
-  selectedPanelEditButton = "button-selected-edit",
-  selectedPanelDeleteButton = "button-selected-delete",
+  selectedPanelBodyButton = "button-artifact-body",
+  selectedPanelEditButton = "button-artifact-edit",
+  selectedPanelDeleteButton = "button-artifact-delete",
 
   selectedPanelParents = "list-selected-parents",
   selectedPanelParentItem = "list-selected-parent-item",
@@ -184,9 +182,7 @@ export enum DataCy {
   // Artifact Search
 
   artifactSearchNavInput = "input-artifact-search-nav",
-  artifactSearchSideInput = "input-artifact-search-side",
   artifactSearchCount = "text-artifact-search-count",
-  artifactSearchTypeList = "list-artifact-search-type",
   artifactSearchItem = "text-artifact-search-item",
 
   // Type Options
@@ -201,7 +197,6 @@ export enum DataCy {
   projectSettingsAddToProject = "button-add-user-to-project",
   projectSettingsEditUserButton = "button-selector-edit",
   projectSettingsDeleteUserButton = "button-selector-delete",
-  projectSettingsIAcceptButton = "button-confirm-modal",
   projectSettingsSearchUser = "input-selector-search",
   projectSettingsTable = "generic-selector-table",
 
@@ -211,7 +206,6 @@ export enum DataCy {
   documentCreateButton = "button-document-select-create",
   documentItemButton = "button-document-select-item",
   documentEditButton = "button-document-select-edit",
-  documentModal = "modal-document-save",
   documentNameInput = "input-document-name",
   documentTypeInput = "input-document-type",
   documentIncludeTypesInput = "input-document-include-types",
@@ -225,6 +219,7 @@ export enum DataCy {
   documentSaveButton = "button-document-save",
 
   // Artifact Table
+
   artifactTable = "view-artifact-table",
   artifactTableRow = "table-row-artifact",
   artifactTableSortBy = "artifact-table-sort-by",
@@ -239,27 +234,12 @@ export enum DataCy {
   artifactTableArtifact = "artifact-table-artifact",
   artifactTableArtifactWarning = "artifact-table-artifact-warning",
   artifactTableArtifactWarningLabel = "artifact-table-panel-warnings-title",
-
-  // Artifact Table - Create New Artifact
-  artifactTableAddContentButton = "button-fab-toggle",
-  artifactTableAddArtifactButton = "button-fab-create-artifact",
-  artifactTableCreateArtifactNameInput = "input-artifact-name",
-  artifactTableCreateArtifactTypeInput = "input-artifact-type",
-  artifactTableCreateArtifactDocumentTypeInput = "input-artifact-document",
-  artifactTableCreateArtifactParentArtifactInput = "input-artifact-parent",
-  artifactTableCreateArtifactBodyInput = "input-artifact-body",
-  artifactTableCreateArtifactSummaryInput = "input-artifact-summary",
-  artifactTableCreateArtifactSaveButton = "button-artifact-save",
   artifactTableEditArtifactRowButton = "button-artifact-edit-icon",
   artifactTableDeleteArtifactRowButton = "button-artifact-delete-icon",
-  artifactTableArtifactPanelBody = "text-selected-body",
-  artifactTableArtifactDeleteIAcceptButton = "button-confirm-modal",
 
   // Trace Link Generation
+
   traceLinkTable = "table-trace-link",
-  traceLinkTableGenerateTraceLinkApproveButton = "button-trace-link-generate-approve",
-  traceLinkTableGenerateTraceLinkDeclineButton = "button-trace-link-generate-decline",
-  traceLinkTableGenerateTraceLinkUnapproveButton = "button-trace-link-generate-unapproved",
   traceLinkTableApprovalTypeButton = "button-trace-link-generate-approval-type",
   traceLinkTableSortByInput = "artifact-table-sort-by",
   traceLinkTableGroupByInput = "artifact-table-group-by",

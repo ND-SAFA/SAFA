@@ -1,21 +1,33 @@
 <template>
-  <div style="max-width: 300px">
-    <typography variant="subtitle" el="h2" value="Danger Zone" y="2" />
+  <v-card outlined class="pa-2" style="width: 30em">
+    <typography
+      variant="subtitle"
+      el="h2"
+      value="Delete Account"
+      color="error"
+    />
+    <v-divider class="mb-2" />
+    <typography
+      el="p"
+      value="Type in your current password to delete your account."
+    />
     <password-field
       label="Password"
       v-model="deletePassword"
       data-cy="input-delete-password"
     />
-    <v-btn
-      outlined
-      color="error"
-      :disabled="!deletePassword"
-      @click="handleDeleteAccount"
-      data-cy="button-delete-my-account"
-    >
-      Delete my account
-    </v-btn>
-  </div>
+    <v-card-actions>
+      <v-btn
+        outlined
+        color="error"
+        :disabled="!deletePassword"
+        @click="handleDeleteAccount"
+        data-cy="button-delete-my-account"
+      >
+        Delete my account
+      </v-btn>
+    </v-card-actions>
+  </v-card>
 </template>
 
 <script lang="ts">

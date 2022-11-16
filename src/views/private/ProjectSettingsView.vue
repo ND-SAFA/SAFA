@@ -1,24 +1,14 @@
 <template>
-  <private-page>
+  <private-page full-window>
     <template v-slot:page>
-      <back-button text="Back To Tree View" to-project />
-      <v-container>
-        <settings-general-section :project="project" />
-        <settings-member-section :project="project" />
-      </v-container>
+      <settings-tabs />
     </template>
   </private-page>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { projectStore } from "@/hooks";
-import {
-  PrivatePage,
-  SettingsGeneralSection,
-  SettingsMemberSection,
-  BackButton,
-} from "@/components";
+import { PrivatePage, SettingsTabs } from "@/components";
 
 /**
  * Displays project settings.
@@ -26,18 +16,8 @@ import {
 export default Vue.extend({
   name: "ProjectSettingsView",
   components: {
-    BackButton,
     PrivatePage,
-    SettingsGeneralSection,
-    SettingsMemberSection,
-  },
-  computed: {
-    /**
-     * @return The current project.
-     */
-    project() {
-      return projectStore.project;
-    },
+    SettingsTabs,
   },
 });
 </script>

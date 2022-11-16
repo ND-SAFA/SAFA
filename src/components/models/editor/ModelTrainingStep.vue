@@ -1,6 +1,6 @@
 <template>
   <v-timeline-item small :color="stepColor">
-    <v-card outlined class="pa-2">
+    <v-alert outlined border="left" :color="stepColor">
       <flex-box justify="space-between" align="center">
         <div>
           <typography el="div" bold :value="stepName" />
@@ -47,7 +47,7 @@
           </v-chip>
         </flex-box>
       </flex-box>
-    </v-card>
+    </v-alert>
   </v-timeline-item>
 </template>
 

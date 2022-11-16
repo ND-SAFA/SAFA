@@ -143,7 +143,7 @@ export default Vue.extend({
     },
     /**
      * @param dataType - The data type to check.
-     * @return Whether the data type is a select.
+     * @return Whether the data type is select.
      */
     isSelect(dataType: ColumnDataType): boolean {
       return dataType === ColumnDataType.SELECT;

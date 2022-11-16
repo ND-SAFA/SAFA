@@ -7,14 +7,14 @@ export enum Routes {
   FORGOT_PASSWORD = "/forgot",
   RESET_PASSWORD = "/reset",
   HOME = "/",
-  ARTIFACT = "/project",
-  PROJECT_SETTINGS = "/project/settings",
-  PROJECT_MODELS = "/project/models",
-  TRACE_LINK = "/project/links",
-  ERROR = "/error",
   PROJECT_CREATOR = "/create",
+  MY_PROJECTS = "/open",
+  ARTIFACT = "/project",
+  PROJECT_SETTINGS = "/settings",
+  TRACE_LINK = "/links",
   UPLOAD_STATUS = "/uploads",
   ACCOUNT = "/account",
+  ERROR = "/error",
 }
 
 /**
@@ -33,7 +33,6 @@ export const routesWithRequiredProject: string[] = [
   Routes.PROJECT_SETTINGS,
   Routes.ARTIFACT,
   Routes.TRACE_LINK,
-  Routes.PROJECT_MODELS,
 ];
 
 export const routesPublic: string[] = [

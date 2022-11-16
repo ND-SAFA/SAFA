@@ -184,6 +184,33 @@ export async function handleUnreviewLink(
 }
 
 /**
+ * Deletes a trace link after confirmation.
+ *
+ * @param link - The trace link to delete.
+ * @param onSuccess - Called if the action is successful.
+ * @param onError - Called if the action fails.
+ * @param onComplete - Called after the action.
+ */
+export async function handleDeleteLink(
+  link: TraceLinkModel,
+  { onSuccess, onError, onComplete }: IOHandlerCallback
+): Promise<void> {
+  logStore.confirm(
+    "Delete Trace Link",
+    `Are you sure you want to delete "${link.sourceName} -> ${link.targetName}"?`,
+    async (confirmed) => {
+      if (!confirmed) return;
+
+      await handleDeclineLink(link, {
+        onSuccess,
+        onError,
+        onComplete,
+      });
+    }
+  );
+}
+
+/**
  * Processes link API functions, setting the app state to loading in between.
  *
  * @param link - The trace link to process.

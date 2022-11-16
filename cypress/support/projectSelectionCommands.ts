@@ -1,19 +1,17 @@
 import { DataCy } from "../fixtures";
 
 Cypress.Commands.add("openProjectSelector", () => {
-  cy.clickButton(DataCy.navProjectButton).clickButtonWithName("Open Project");
+  cy.visit("/open")
+    .location("pathname", { timeout: 2000 })
+    .should("equal", "/open");
 });
 
 Cypress.Commands.add("openUploadFiles", () => {
-  cy.clickButton(DataCy.navVersionButton).clickButtonWithName(
-    "Upload Flat Files"
-  );
+  cy.clickButtonWithName("Settings").switchTab("Data Upload");
 });
 
 Cypress.Commands.add("projectSelectorContinue", () => {
-  cy.getCy(DataCy.selectionModal).within(() => {
-    cy.clickButton(DataCy.stepperContinueButton);
-  });
+  cy.clickButton(DataCy.stepperContinueButton);
 });
 
 Cypress.Commands.add("createNewVersion", (type) => {
@@ -23,10 +21,8 @@ Cypress.Commands.add("createNewVersion", (type) => {
     revision: DataCy.versionCreateRevisionButton,
   };
 
-  cy.getCy(DataCy.selectionModal).within(() => {
-    cy.getCy(DataCy.selectionVersionList).within(() => {
-      cy.clickButton(DataCy.selectorAddButton);
-    });
+  cy.getCy(DataCy.selectionVersionList).within(() => {
+    cy.clickButton(DataCy.selectorAddButton);
   });
 
   cy.getCy(DataCy.versionCreateModal).within(() => {

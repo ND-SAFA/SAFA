@@ -5,18 +5,17 @@ describe("Job Submission", () => {
   beforeEach(() => {
     cy.dbResetJobs().dbResetProjects();
 
-    cy.visit("/create").login(validUser.email, validUser.password);
-
-    cy.location("pathname", { timeout: 2000 }).should("equal", "/create");
+    cy.visit("/create")
+      .login(validUser.email, validUser.password)
+      .location("pathname", { timeout: 2000 })
+      .should("equal", "/create");
 
     cy.createBulkProject();
   });
 
   describe("I can view projects being imported", () => {
     it("Shows a list of imported projects", () => {
-      cy.clickButton(DataCy.navProjectButton).clickButtonWithName(
-        "Project Uploads"
-      );
+      cy.clickButtonWithName("Project Uploads");
 
       cy.withinTableRows(DataCy.jobTable, (tr) => {
         tr.should("have.length.above", 1);

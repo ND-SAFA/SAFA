@@ -1,6 +1,11 @@
 <template>
-  <div style="max-width: 300px">
-    <typography variant="subtitle" el="h2" value="Password" y="2" />
+  <v-card outlined class="pa-2 mb-2" style="width: 30em">
+    <typography variant="subtitle" el="h2" value="Update Password" />
+    <v-divider class="mb-2" />
+    <typography
+      el="p"
+      value="Type in your current password and the new password you would like to set."
+    />
     <password-field
       label="Current Password"
       v-model="oldPassword"
@@ -12,15 +17,17 @@
       v-model="newPassword"
       data-cy="input-new-password"
     />
-    <v-btn
-      :disabled="!oldPassword || !newPassword"
-      outlined
-      @click="handleEditPassword"
-      data-cy="button-update-password"
-    >
-      Update Password
-    </v-btn>
-  </div>
+    <v-card-actions>
+      <v-btn
+        :disabled="!oldPassword || !newPassword"
+        outlined
+        @click="handleEditPassword"
+        data-cy="button-update-password"
+      >
+        Update Password
+      </v-btn>
+    </v-card-actions>
+  </v-card>
 </template>
 
 <script lang="ts">
@@ -54,7 +61,7 @@ export default Vue.extend({
   },
   methods: {
     /**
-     * Handles an password edit.
+     * Handles a password edit.
      */
     handleEditPassword(): void {
       this.passwordError = false;

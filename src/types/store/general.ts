@@ -14,14 +14,11 @@ export type ArtifactTypeIcons = Record<string, string>;
  * Enumerates types of panels.
  */
 export enum PanelType {
-  left,
-  right,
-  artifactCreator,
-  errorDisplay,
-  artifactBody,
-  traceLinkCreator,
-  traceLinkDraw,
-  traceLinkGenerator,
+  appPanel = "appPanel",
+  detailsPanel = "detailsPanel",
+  artifactCreator = "artifactCreator",
+  errorDisplay = "errorDisplay",
+  traceLinkDraw = "traceLinkDraw",
 }
 
 /**
@@ -34,22 +31,28 @@ export type CreatorOpenState =
   | DocumentType;
 
 /**
- * Represents the open state of the trace link generator.
+ * Represents the type of details panel states.
  */
-export type GeneratorOpenState = boolean | "generate" | "train";
+export type DetailsOpenState =
+  | boolean
+  | "delta"
+  | "document"
+  | "displayArtifact"
+  | "displayArtifactBody"
+  | "saveArtifact"
+  | "displayTrace"
+  | "saveTrace"
+  | "generateTrace";
 
 /**
  * Represents the states of all openable panels.
  */
 export interface PanelStateMap {
-  [PanelType.left]: boolean;
-  [PanelType.right]: boolean;
+  [PanelType.appPanel]: boolean;
+  [PanelType.detailsPanel]: DetailsOpenState;
   [PanelType.artifactCreator]: CreatorOpenState;
   [PanelType.errorDisplay]: boolean;
-  [PanelType.artifactBody]: boolean;
-  [PanelType.traceLinkCreator]: boolean;
   [PanelType.traceLinkDraw]: boolean;
-  [PanelType.traceLinkGenerator]: GeneratorOpenState;
 }
 
 /**

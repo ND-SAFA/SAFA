@@ -32,8 +32,7 @@ describe("Artifact Tree Window", () => {
   describe("I can see the graph interactions load on page change", () => {
     it("Loads the graph and is responsive", () => {
       // Visit another page.
-      cy.clickButton(DataCy.navProjectButton)
-        .clickButtonWithName("Create Project")
+      cy.clickButtonWithName("Create Project")
         .location("pathname", { timeout: 5000 })
         .should("equal", "/create");
 
@@ -41,8 +40,7 @@ describe("Artifact Tree Window", () => {
       cy.go("back")
         .location("pathname", { timeout: 5000 })
         .should("equal", "/project")
-        .getCy(DataCy.appLoading)
-        .should("not.be.visible");
+        .waitForProjectLoad(true);
 
       // Assert that right clicking works to know that the graph is responsive.
       cy.centerGraph()
@@ -57,8 +55,8 @@ describe("Artifact Tree Window", () => {
   describe("I can see the graph interactions load on artifact view change", () => {
     it("Loads the graph and is responsive", () => {
       // Toggle back and forth to the artifact table.
-      cy.clickButton(DataCy.navToggleView)
-        .clickButton(DataCy.navToggleView)
+      cy.clickButton(DataCy.navTableButton)
+        .clickButton(DataCy.navTreeButton)
         .getCy(DataCy.appLoading)
         .should("not.be.visible");
 

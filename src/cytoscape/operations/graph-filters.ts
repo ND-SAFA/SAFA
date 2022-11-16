@@ -1,28 +1,4 @@
-import { SingularElementArgument } from "cytoscape";
 import { ArtifactModel } from "@/types";
-
-/**
- * Returns whether the element is either:
- * 1. A node included in the given artifact ids.
- * 2. A link between two of the given artifact ids.
- *
- * @param artifactsIds - The artifacts to check within.
- * @param element - The element to check.
- * @return Whether the element is related.
- */
-export function isRelatedToArtifacts(
-  artifactsIds: string[],
-  element: SingularElementArgument
-): boolean {
-  if (element.isEdge()) {
-    return (
-      artifactsIds.includes(element.data().sourceId) &&
-      artifactsIds.includes(element.data().targetId)
-    );
-  } else {
-    return artifactsIds.includes(element.data().id);
-  }
-}
 
 /**
  * Returns whether the artifact is in the given subtree, or the subtree is empty.

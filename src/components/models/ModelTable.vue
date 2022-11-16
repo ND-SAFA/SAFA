@@ -1,37 +1,44 @@
 <template>
-  <generic-selector
-    is-open
-    show-expand
-    :has-select="false"
-    :has-edit="false"
-    :headers="headers"
-    :items="items"
-    item-key="id"
-    class="model-table mt-5"
-    @item:add="handleAdd"
-    @item:edit="handleEdit"
-    @item:delete="handleDelete"
-    @refresh="handleRefresh"
-  >
-    <template v-slot:addItemDialogue>
-      <model-creator-modal :is-open="isSaveOpen" @close="handleClose" />
-      <model-share-modal
-        :model="currentItem"
-        :is-open="isShareOpen"
-        @close="handleClose"
-      />
-    </template>
-    <template v-slot:expanded-item="{ item }">
-      <ModelEditor :model="item" />
-    </template>
-    <template v-slot:[`item.actions`]="{ item }">
-      <generic-icon-button
-        icon-id="mdi-share-variant"
-        tooltip="Share Model"
-        @click="handleShare(item)"
-      />
-    </template>
-  </generic-selector>
+  <v-container>
+    <typography
+      el="p"
+      b="4"
+      value="Create a new model below, or expand one of the models to view past training and add new steps."
+    />
+    <generic-selector
+      is-open
+      show-expand
+      :has-select="false"
+      :has-edit="false"
+      :headers="headers"
+      :items="items"
+      item-key="id"
+      class="model-table mt-5"
+      @item:add="handleAdd"
+      @item:edit="handleEdit"
+      @item:delete="handleDelete"
+      @refresh="handleRefresh"
+    >
+      <template v-slot:addItemDialogue>
+        <model-creator-modal :is-open="isSaveOpen" @close="handleClose" />
+        <model-share-modal
+          :model="currentItem"
+          :is-open="isShareOpen"
+          @close="handleClose"
+        />
+      </template>
+      <template v-slot:expanded-item="{ item }">
+        <ModelEditor :model="item" />
+      </template>
+      <template v-slot:[`item.actions`]="{ item }">
+        <generic-icon-button
+          icon-id="mdi-share-variant"
+          tooltip="Share Model"
+          @click="handleShare(item)"
+        />
+      </template>
+    </generic-selector>
+  </v-container>
 </template>
 
 <script lang="ts">
@@ -39,7 +46,11 @@ import Vue from "vue";
 import { GenerationModel } from "@/types";
 import { modelSaveStore, projectStore } from "@/hooks";
 import { handleDeleteModel, handleLoadModels } from "@/api";
-import { GenericSelector, GenericIconButton } from "@/components/common";
+import {
+  GenericSelector,
+  GenericIconButton,
+  Typography,
+} from "@/components/common";
 import ModelShareModal from "./ModelShareModal.vue";
 import ModelCreatorModal from "./ModelCreatorModal.vue";
 import { ModelEditor } from "./editor";
@@ -55,6 +66,7 @@ export default Vue.extend({
     GenericIconButton,
     ModelEditor,
     GenericSelector,
+    Typography,
   },
   data() {
     return {

@@ -2,12 +2,12 @@ import { DataCy } from "../../fixtures";
 
 describe("Project Members CRUD", () => {
   before(() => {
-    cy.dbResetJobs().dbResetProjects().createProjectSettings();
+    cy.dbResetJobs().dbResetProjects().loadNewProject();
   });
 
   beforeEach(() => {
-    cy.loadCurrentProject();
-    cy.openProjectSettings();
+    cy.viewport(1024, 768);
+    cy.loadCurrentProject().openProjectSettings();
   });
 
   describe("As an owner, I can add a new member to a project", () => {
@@ -36,7 +36,7 @@ describe("Project Members CRUD", () => {
   describe("As an owner, I can remove a member from a project", () => {
     it("Can remove a member from a project", () => {
       cy.clickButton(DataCy.projectSettingsDeleteUserButton);
-      cy.clickButton(DataCy.projectSettingsIAcceptButton);
+      cy.clickButton(DataCy.confirmModalButton);
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
     });
   });

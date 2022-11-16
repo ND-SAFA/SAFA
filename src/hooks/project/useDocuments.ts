@@ -235,13 +235,6 @@ export const useDocuments = defineStore("documents", {
       await this.switchDocuments(remainingDocuments[0] || this.baseDocument);
     },
     /**
-     * Toggles whether the current document is in table view.
-     */
-    toggleTableView(): void {
-      this.isTableView = !this.isTableView;
-    },
-
-    /**
      * Returns whether the given document name already exists.
      *
      * @param name - The name to search for.

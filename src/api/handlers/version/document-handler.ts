@@ -82,17 +82,28 @@ export function handleDeleteDocument({
   const document = documentSaveStore.editedDocument;
   const { name } = document;
 
-  deleteDocument(document)
-    .then(async () => {
-      await documentStore.removeDocument(document);
-      logStore.onSuccess(`Document has been deleted: ${name}`);
-      onSuccess?.();
-    })
-    .catch((e) => {
-      logStore.onError(`Unable to delete document: ${name}`);
-      logStore.onDevError(e);
-      onError?.(e);
-    });
+  logStore.confirm(
+    "Delete Document",
+    `Are you sure you want to delete the document "${name}"?`,
+    async (confirmed) => {
+      if (!confirmed) return;
+
+      appStore.onLoadStart();
+
+      await deleteDocument(document)
+        .then(async () => {
+          await documentStore.removeDocument(document);
+          logStore.onSuccess(`Document has been deleted: ${name}`);
+          onSuccess?.();
+        })
+        .catch((e) => {
+          logStore.onError(`Unable to delete document: ${name}`);
+          logStore.onDevError(e);
+          onError?.(e);
+        })
+        .finally(() => appStore.onLoadEnd());
+    }
+  );
 }
 
 /**

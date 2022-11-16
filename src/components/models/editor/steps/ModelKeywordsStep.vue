@@ -1,5 +1,6 @@
 <template>
   <v-container v-if="!generated" style="max-width: 40em">
+    <under-construction-alert />
     <typography
       el="p"
       value="Enter keywords for the domain that this model should be trained on. Press enter to save a keyword."
@@ -14,21 +15,21 @@
     />
     <v-combobox filled multiple chips deletable-chips label="Documents" />
     <v-combobox filled multiple chips deletable-chips label="Repositories" />
-    <v-btn block color="primary"> Start Model Pre-Training </v-btn>
+    <v-btn disabled block color="primary"> Start Model Pre-Training </v-btn>
   </v-container>
 </template>
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { GenerationModel } from "@/types";
-import { Typography } from "@/components/common";
+import { Typography, UnderConstructionAlert } from "@/components/common";
 
 /**
  * A step for pre-training a model with keywords and documents.
  */
 export default Vue.extend({
   name: "ModelKeywordsStep",
-  components: { Typography },
+  components: { Typography, UnderConstructionAlert },
   props: {
     model: {
       type: Object as PropType<GenerationModel>,

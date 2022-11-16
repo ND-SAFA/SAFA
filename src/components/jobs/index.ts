@@ -1,1 +1,1 @@
-export { default as JobTable } from "./JobTable.vue";
+export { default as JobDisplay } from "./JobDisplay.vue";

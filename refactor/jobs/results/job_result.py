@@ -33,9 +33,6 @@ class JobResult:
     SCORE = "score"
     SOURCE_TARGET_PAIRS = "source_target_pairs"
 
-    _MINIMIZE = "minimize"
-    _MAXIMIZE = "minimize"
-    _comparison_metric = ("_loss", _MINIMIZE)
     _properties = {JOB_ID: Schema(type=TYPE_STRING, format=FORMAT_UUID),
                    STATUS: Schema(type=TYPE_INTEGER),
                    MODEL_PATH: Schema(type=TYPE_STRING),
@@ -70,17 +67,6 @@ class JobResult:
         :return: True if the key is in the results dictionary else False
         """
         return key in self.__result
-
-    def set_comparison_metric(self, metric: Union[str, SupportedTraceMetric], maximize: bool = True) -> None:
-        """
-        Sets the metric to compare to results (note: metrics must be set inside of result)
-        :param metric: the metric to use for comparison
-        :param maximize: if True, the metric results are best when value is maximized, otherwise better results mean minimized val
-        :return: None
-        """
-        if isinstance(metric, SupportedTraceMetric):
-            metric = SupportedTraceMetric.name.lower()
-        self._comparison_metric = (metric, JobResult._MAXIMIZE if maximize else JobResult._MINIMIZE)
 
     def set_job_status(self, status: JobStatus) -> None:
         """
@@ -124,6 +110,22 @@ class JobResult:
         """
         return self.__result
 
+    def is_better_than(self, other: "JobResult", comparison_metric: Union[str, SupportedTraceMetric] = '',
+                       should_maximize: bool = True) -> bool:
+        """
+        Evaluates whether this result is better than the other result
+        :param other: the other result
+        :param comparison_metric: metric to use for comparison (defaults to status)
+        :param should_maximize: if True, a better result means maximizing the provided metric, else aims to minimize it
+        :return: True if this result is better than the other result else False
+        """
+        if isinstance(comparison_metric, SupportedTraceMetric):
+            comparison_metric = comparison_metric.name
+        self_val, other_val = self.__get_comparison_vals(other, comparison_metric.lower())
+        if should_maximize:
+            return self_val >= other_val
+        return self_val <= other_val
+
     @staticmethod
     def from_dict(results_dict: Dict) -> "JobResult":
         """
@@ -148,49 +150,23 @@ class JobResult:
                 properties[key] = JobResult._properties[key]
         return properties
 
-    def __can_compare_with_metric(self, other: "JobResult") -> bool:
+    def __can_compare_with_metric(self, other: "JobResult", comparison_metric_name: str) -> bool:
         """
          Returns True if can use comparison metric to compare the two results
          :param other: other result
          :return: True if can use comparison metric to compare the two results else false
          """
         if JobResult.METRICS in self and JobResult.METRICS in other:
-            compare_metric_name, max_or_min = self._comparison_metric
-            if compare_metric_name in self[JobResult.METRICS] and compare_metric_name in other[JobResult.METRICS]:
+            if comparison_metric_name in self[JobResult.METRICS] and comparison_metric_name in other[JobResult.METRICS]:
                 return True
-            for metric_name in self[JobResult.METRICS].keys():
-                if compare_metric_name in metric_name and metric_name in other[JobResult.METRICS]:
-                    self.set_comparison_metric(metric_name, max_or_min == self._MAXIMIZE)
-                    return True
         return False
 
-    def __get_comparison_vals(self, other: "JobResult") -> Tuple:
+    def __get_comparison_vals(self, other: "JobResult", comparison_metric_name: str) -> Tuple:
         """
         Gets the values to use for comparison
         :param other: the other result
         :return: the values to use for comparison
         """
-        compare_metric_name, _ = self._comparison_metric
-        if self.__can_compare_with_metric(other):
-            return self[JobResult.METRICS][compare_metric_name], other[JobResult.METRICS][compare_metric_name]
+        if self.__can_compare_with_metric(other, comparison_metric_name):
+            return self[JobResult.METRICS][comparison_metric_name], other[JobResult.METRICS][comparison_metric_name]
         return self.get_job_status(), other.get_job_status
-
-    def is_better_than(self, other) -> bool:
-        """
-        Evaluates whether this result is better than the other result
-        :param other: the other result
-        :return: True if this result is better than the other result else False
-        """
-        should_maximize = self._comparison_metric[1] == self._MAXIMIZE if self.__can_compare_with_metric(other) \
-            else True
-        if should_maximize:
-            return self >= other
-        return self <= other
-
-    def __eq__(self, other):
-        self_val, other_val = self.__can_compare_with_metric(other)
-        return self_val == other_val
-
-    def __gt__(self, other):
-        self_val, other_val = self.__can_compare_with_metric(other)
-        return self_val > other_val

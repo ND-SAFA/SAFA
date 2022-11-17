@@ -28,7 +28,7 @@ BLOCK_SIZE_DEFAULT = 128
 TRAINING_DATA_DIR_DEFAULT = "jobs/pretrain/mlm"
 USE_LINKED_TARGETS_ONLY_DEFAULT = False
 
-# -------------- PreProcessing --------------
+# -------------- PRE-PROCESSING --------------
 MIN_LENGTH_DEFAULT = 1
 
 # -------------- METRICS --------------
@@ -37,6 +37,9 @@ K_METRIC_DEFAULT = 10  # TODO
 # -------------- MODELS --------------
 LOGITS = "logits"
 LOSS = "loss"
+
+# -------------- EXPERIMENT --------------
+USE_BEST_FROM_PREVIOUS = "useBestFromPrevious"
 
 # -------------- TEST/DEV --------------
 IS_TEST = os.getenv("DEPLOYMENT", "development").lower() == "test"

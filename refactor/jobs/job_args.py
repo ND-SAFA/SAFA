@@ -27,3 +27,6 @@ class JobArgs:
     If True, saves the output to the output_dir
     """
     save_job_output: bool = SAVE_OUTPUT_DEFAULT
+
+    def as_kwargs(self):
+        return {attr_name: getattr(self, attr_name) for attr_name in dir(self) if not attr_name.startswith("__")}

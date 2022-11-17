@@ -38,9 +38,6 @@ K_METRIC_DEFAULT = 10  # TODO
 LOGITS = "logits"
 LOSS = "loss"
 
-# -------------- EXPERIMENT --------------
-USE_BEST_FROM_PREVIOUS = "useBestFromPrevious"
-
 # -------------- TEST/DEV --------------
 IS_TEST = os.getenv("DEPLOYMENT", "development").lower() == "test"
 DELETE_TEST_OUTPUT = os.getenv("DELETE_TEST_OUTPUT", "true").capitalize() == "True"

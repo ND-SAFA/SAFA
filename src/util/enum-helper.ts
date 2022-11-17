@@ -232,9 +232,9 @@ export function tracePredictionTabOptions(): SelectOption[] {
  */
 export function settingsTabOptions(): SelectOption[] {
   return [
-    // createEnumOption(SettingsTabTypes.overview, "Overview"),
     createEnumOption(SettingsTabTypes.members, "Members"),
     createEnumOption(SettingsTabTypes.upload, "Data Upload"),
+    createEnumOption(SettingsTabTypes.integrations, "Data Integrations"),
     createEnumOption(SettingsTabTypes.artifacts, "Artifact Settings"),
   ];
 }

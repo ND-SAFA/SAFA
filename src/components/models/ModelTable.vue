@@ -9,7 +9,6 @@
       is-open
       show-expand
       :has-select="false"
-      :has-edit="false"
       :headers="headers"
       :items="items"
       item-key="id"

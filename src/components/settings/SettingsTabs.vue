@@ -15,6 +15,9 @@
         <upload-new-version :is-open="tab === 2" />
       </v-tab-item>
       <v-tab-item key="3">
+        <project-installations-table />
+      </v-tab-item>
+      <v-tab-item key="4">
         <type-options />
       </v-tab-item>
     </tab-list>
@@ -30,6 +33,7 @@ import {
   ProjectButtons,
   ProjectDisplay,
 } from "@/components/project";
+import { ProjectInstallationsTable } from "@/components/integrations";
 import SettingsHeader from "./SettingsHeader.vue";
 import TypeOptions from "./TypeOptions.vue";
 import { SettingsMembers } from "./members";
@@ -40,6 +44,7 @@ import { SettingsMembers } from "./members";
 export default Vue.extend({
   name: "TracePredictionTabs",
   components: {
+    ProjectInstallationsTable,
     SidebarGrid,
     ProjectDisplay,
     ProjectButtons,

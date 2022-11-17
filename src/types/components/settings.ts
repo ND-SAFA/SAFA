@@ -1,6 +1,6 @@
 export enum SettingsTabTypes {
-  overview = "overview",
   members = "members",
   upload = "upload",
+  integrations = "integrations",
   artifacts = "artifacts",
 }

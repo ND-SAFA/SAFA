@@ -10,6 +10,7 @@
           hide-details
         />
         <gen-method-input
+          v-if="!isUpdate"
           only-trainable
           v-model="editedModel.baseModel"
           style="max-width: 200px"

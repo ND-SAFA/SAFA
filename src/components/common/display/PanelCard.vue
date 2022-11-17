@@ -1,5 +1,5 @@
 <template>
-  <v-card outlined class="pa-2 mb-4 primary lighten-4">
+  <v-card outlined class="pa-2 mb-4 primary lighten-4 overflow-hidden">
     <slot />
   </v-card>
 </template>

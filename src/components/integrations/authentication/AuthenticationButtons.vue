@@ -1,30 +1,28 @@
 <template>
-  <v-container>
-    <flex-box justify="center" align="center">
-      <v-btn
-        large
-        color="primary"
-        :disabled="isDisabled"
-        :loading="isLoading"
-        @click="handleClick"
-      >
-        <v-icon class="mr-1">mdi-transit-connection-variant</v-icon>
-        <span v-if="!hasCredentials">{{ disconnectedTitle }}</span>
-        <span v-else>{{ connectedTitle }}</span>
-      </v-btn>
-      <v-btn
-        v-if="hasCredentials"
-        large
-        color="error"
-        outlined
-        class="ml-2"
-        @click="$emit('delete')"
-      >
-        <v-icon class="mr-1">mdi-delete</v-icon>
-        Disconnect
-      </v-btn>
-    </flex-box>
-  </v-container>
+  <flex-box justify="center" align="center" y="2">
+    <v-btn
+      large
+      color="primary"
+      :disabled="isDisabled"
+      :loading="isLoading"
+      @click="handleClick"
+    >
+      <v-icon class="mr-1">mdi-transit-connection-variant</v-icon>
+      <span v-if="!hasCredentials">{{ disconnectedTitle }}</span>
+      <span v-else>{{ connectedTitle }}</span>
+    </v-btn>
+    <v-btn
+      v-if="hasCredentials"
+      large
+      color="error"
+      outlined
+      class="ml-2"
+      @click="$emit('delete')"
+    >
+      <v-icon class="mr-1">mdi-delete</v-icon>
+      Disconnect
+    </v-btn>
+  </flex-box>
 </template>
 
 <script lang="ts">
@@ -32,13 +30,13 @@ import Vue from "vue";
 import { FlexBox } from "@/components/common/display";
 
 /**
- * Displays an authentication stepper step.
+ * Displays buttons for authenticating an integration.
  *
  * @emits `click` - On button click.
  * @emits `delete` - On disconnect
  */
 export default Vue.extend({
-  name: "GenericStepperAuthentication",
+  name: "AuthenticationButtons",
   components: { FlexBox },
   props: {
     hasCredentials: {

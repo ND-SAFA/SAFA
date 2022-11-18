@@ -3,7 +3,7 @@ import {
   IOHandlerCallback,
   ProjectModel,
 } from "@/types";
-import { appStore, logStore, projectStore } from "@/hooks";
+import { appStore, integrationsStore, logStore, projectStore } from "@/hooks";
 import { navigateTo, Routes } from "@/router";
 import {
   createGitHubProject,
@@ -86,19 +86,23 @@ export function handleBulkImportProject(
 /**
  * Imports a Jira project, sets related app state, and moves to the upload page.
  *
- * @param projectId - The Jira project id to import.
  * @param onSuccess - Called if the action is successful.
  * @param onError - Called if the action fails.
  */
-export function handleImportJiraProject(
-  projectId: string,
-  { onSuccess, onError }: IOHandlerCallback
-): void {
+export function handleImportJiraProject({
+  onSuccess,
+  onError,
+}: IOHandlerCallback): void {
+  const projectId = integrationsStore.jiraProject?.id;
+
+  if (!projectId) return;
+
   appStore.onLoadStart();
 
   createJiraProject(projectId)
     .then(async (job) => {
       await handleJobSubmission(job);
+      integrationsStore.jiraProject = undefined;
       logStore.onSuccess(`Jira project has been created: ${projectId}`);
       await navigateTo(Routes.UPLOAD_STATUS);
       onSuccess?.();
@@ -114,19 +118,23 @@ export function handleImportJiraProject(
 /**
  * Imports a GitHub project, sets related app state, and moves to the upload page.
  *
- * @param repositoryName - The GitHub repository name to import.
  * @param onSuccess - Called if the action is successful.
  * @param onError - Called if the action fails.
  */
-export function handleImportGitHubProject(
-  repositoryName: string,
-  { onSuccess, onError }: IOHandlerCallback
-): void {
+export function handleImportGitHubProject({
+  onSuccess,
+  onError,
+}: IOHandlerCallback): void {
+  const repositoryName = integrationsStore.gitHubProject?.name;
+
+  if (!repositoryName) return;
+
   appStore.onLoadStart();
 
   createGitHubProject(repositoryName)
     .then(async (job) => {
       await handleJobSubmission(job);
+      integrationsStore.gitHubProject = undefined;
       logStore.onSuccess(`GitHub project has been created: ${repositoryName}`);
       await navigateTo(Routes.UPLOAD_STATUS);
       onSuccess?.();

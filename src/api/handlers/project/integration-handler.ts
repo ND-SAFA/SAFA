@@ -1,10 +1,11 @@
 import {
   GitHubProjectModel,
+  InstallationModel,
   IOHandlerCallback,
   JiraProjectModel,
-  URLParameter,
 } from "@/types";
-import { logStore } from "@/hooks";
+import { integrationsStore, logStore, projectStore } from "@/hooks";
+import { getParam, QueryParams } from "@/router";
 import {
   getGitHubCredentials,
   getGitHubProjects,
@@ -14,21 +15,108 @@ import {
   refreshJiraCredentials,
   saveGitHubCredentials,
   saveJiraCredentials,
+  getProjectInstallations,
+  createGitHubProjectSync,
+  createJiraProjectSync,
+  handleJobSubmission,
 } from "@/api";
+
+/**
+ * Handles loading installations affiliated with the current project.
+ *
+ * @param onComplete - Called once the action is complete.
+ * @param onSuccess - Called if the action is successful.
+ * @param onError - Called if the action fails.
+ */
+export function handleLoadInstallations({
+  onSuccess,
+  onError,
+  onComplete,
+}: IOHandlerCallback): void {
+  getProjectInstallations(projectStore.projectId)
+    .then((installations) => {
+      projectStore.installations = installations;
+      onSuccess?.();
+    })
+    .catch(onError)
+    .finally(onComplete);
+}
+
+/**
+ * Syncs the current project with the selected installation's data.
+ *
+ * @param installation - The installation to sync data with.
+ * @param onComplete - Called once the action is complete.
+ * @param onSuccess - Called if the action is successful.
+ * @param onError - Called if the action fails.
+ */
+export async function handleSyncInstallation(
+  installation: Omit<InstallationModel, "lastUpdate">,
+  { onSuccess, onError, onComplete }: IOHandlerCallback
+): Promise<void> {
+  try {
+    if (installation.type === "GITHUB") {
+      const job = await createGitHubProjectSync(
+        projectStore.versionId,
+        installation.installationId
+      );
+
+      await handleJobSubmission(job);
+    } else if (installation.type === "JIRA") {
+      const job = await createJiraProjectSync(
+        projectStore.versionId,
+        installation.installationId
+      );
+
+      await handleJobSubmission(job);
+    } else {
+      throw new Error("Unknown installation type");
+    }
+
+    logStore.onSuccess(
+      `Integration data is being synced: ${installation.installationId}. 
+       You'll receive a notification once data has completed syncing.`
+    );
+    onSuccess?.();
+  } catch (e) {
+    logStore.onError(`Unable to sync integration data: ${e}`);
+    onError?.(e as Error);
+  } finally {
+    onComplete?.();
+  }
+}
 
 /**
  * Handles Jira authentication when the app loads.
  *
- * @param accessCode -The Jira access code, if one exists.
- * @param onSuccess - Called if the action is successful, with the Jira authorization token.
+ * @param onComplete - Called when the action completes.
+ * @param onSuccess - Called if the action is successful.
  * @param onError - Called if the action fails.
  */
-export function handleAuthorizeJira(
-  accessCode: URLParameter,
-  { onSuccess, onError }: IOHandlerCallback
-): void {
+export function handleAuthorizeJira({
+  onSuccess,
+  onError,
+  onComplete,
+}: IOHandlerCallback): void {
+  const accessCode =
+    getParam(QueryParams.TAB) === "jira"
+      ? getParam(QueryParams.JIRA_TOKEN)
+      : "";
+
+  const handleSuccess = () => {
+    integrationsStore.validJiraCredentials = true;
+    onSuccess?.();
+  };
+  const handleError = (e: Error) => {
+    integrationsStore.validJiraCredentials = false;
+    onError?.(e);
+  };
+
   if (accessCode) {
-    saveJiraCredentials(String(accessCode)).then(onSuccess).catch(onError);
+    saveJiraCredentials(String(accessCode))
+      .then(handleSuccess)
+      .catch(handleError)
+      .finally(onComplete);
   } else {
     getJiraCredentials()
       .then(async (valid) => {
@@ -36,8 +124,9 @@ export function handleAuthorizeJira(
           await refreshJiraCredentials();
         }
       })
-      .then(onSuccess)
-      .catch(onError);
+      .then(handleSuccess)
+      .catch(handleError)
+      .finally(onComplete);
   }
 }
 
@@ -62,16 +151,34 @@ export function handleLoadJiraProjects({
 /**
  * Handles GitHub authentication when the app loads.
  *
- * @param accessCode -The GitHub access code, if one exists.
+ * @param onComplete - Called when the action completes.
  * @param onSuccess - Called if the action is successful, with the GitHub authorization token.
  * @param onError - Called if the action fails.
  */
-export function handleAuthorizeGitHub(
-  accessCode: URLParameter,
-  { onSuccess, onError }: IOHandlerCallback
-): void {
+export function handleAuthorizeGitHub({
+  onSuccess,
+  onError,
+  onComplete,
+}: IOHandlerCallback): void {
+  const accessCode =
+    getParam(QueryParams.TAB) === "github"
+      ? getParam(QueryParams.GITHUB_TOKEN)
+      : "";
+
+  const handleSuccess = () => {
+    integrationsStore.validGitHubCredentials = true;
+    onSuccess?.();
+  };
+  const handleError = (e: Error) => {
+    integrationsStore.validGitHubCredentials = false;
+    onError?.(e);
+  };
+
   if (accessCode) {
-    saveGitHubCredentials(String(accessCode)).then(onSuccess).catch(onError);
+    saveGitHubCredentials(String(accessCode))
+      .then(handleSuccess)
+      .catch(handleError)
+      .finally(onComplete);
   } else {
     getGitHubCredentials()
       .then(async (valid) => {
@@ -79,8 +186,9 @@ export function handleAuthorizeGitHub(
           await refreshGitHubCredentials();
         }
       })
-      .then(onSuccess)
-      .catch(onError);
+      .then(handleSuccess)
+      .catch(handleError)
+      .finally(onComplete);
   }
 }
 

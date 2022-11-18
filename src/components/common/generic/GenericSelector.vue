@@ -17,11 +17,6 @@
     data-cy="generic-selector-table"
   >
     <slot />
-    <template v-for="{ id } in headers" v-slot:[`item.${id}`]="{ item }">
-      <div :key="id">
-        <slot :name="`item.${id}`" :item="item" />
-      </div>
-    </template>
     <template v-slot:top>
       <slot name="deleteItemDialogue" />
       <slot name="editItemDialogue" />

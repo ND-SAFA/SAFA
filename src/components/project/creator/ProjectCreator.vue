@@ -15,10 +15,7 @@
         <project-bulk-upload />
       </v-tab-item>
       <v-tab-item key="3">
-        <jira-creator-stepper />
-      </v-tab-item>
-      <v-tab-item key="4">
-        <git-hub-creator-stepper />
+        <integrations-stepper type="create" />
       </v-tab-item>
     </tab-list>
   </v-container>
@@ -29,12 +26,8 @@ import Vue from "vue";
 import { creatorTabOptions } from "@/util";
 import { getParam, QueryParams, updateParam } from "@/router";
 import { TabList, Typography } from "@/components/common";
-import {
-  ProjectCreatorStepper,
-  JiraCreatorStepper,
-  GitHubCreatorStepper,
-  ProjectBulkUpload,
-} from "./workflows";
+import { IntegrationsStepper } from "@/components/integrations";
+import { ProjectCreatorStepper, ProjectBulkUpload } from "./workflows";
 
 /**
  * Allows for creating a project.
@@ -42,11 +35,10 @@ import {
 export default Vue.extend({
   name: "ProjectCreator",
   components: {
+    IntegrationsStepper,
     TabList,
-    GitHubCreatorStepper,
     ProjectCreatorStepper,
     ProjectBulkUpload,
-    JiraCreatorStepper,
     Typography,
   },
   data() {

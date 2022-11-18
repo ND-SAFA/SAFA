@@ -2,7 +2,7 @@
   <generic-stepper-list-step
     empty-message="There are no projects."
     :item-count="projects.length"
-    :loading="loading"
+    :loading="projectsLoading"
     title="Jira Projects"
   >
     <template slot="items">
@@ -25,37 +25,64 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import Vue from "vue";
 import { JiraProjectModel } from "@/types";
+import { integrationsStore } from "@/hooks";
+import { handleLoadJiraProjects } from "@/api";
 import { GenericStepperListStep } from "@/components";
 
 /**
  * Allows for selecting a jira project.
- *
- * @emits `select` (JiraProject) - On project selection.
  */
 export default Vue.extend({
   name: "JiraProjectSelector",
   components: {
     GenericStepperListStep,
   },
-  props: {
-    projects: {
-      type: Array as PropType<JiraProjectModel[]>,
-      required: true,
+  data() {
+    return {
+      projects: [] as JiraProjectModel[],
+      projectsLoading: false,
+    };
+  },
+  mounted() {
+    if (!integrationsStore.validJiraCredentials) return;
+
+    this.loadProjects();
+  },
+  computed: {
+    /**
+     * @return Whether there are current valid credentials.
+     */
+    hasCredentials(): boolean {
+      return integrationsStore.validJiraCredentials;
     },
-    loading: {
-      type: Boolean,
-      required: false,
+  },
+  watch: {
+    /**
+     * Loads projects when credentials are valid.
+     */
+    hasCredentials(valid: boolean): void {
+      if (!valid) return;
+
+      this.loadProjects();
     },
   },
   methods: {
     /**
-     * Handles a click to select a project.
-     * @param project - The project to select.
+     * Loads a user's Jira projects for a selected site.
      */
-    handleProjectSelect(project: JiraProjectModel) {
-      this.$emit("select", project);
+    async loadProjects() {
+      integrationsStore.jiraProject = undefined;
+      this.projectsLoading = true;
+
+      handleLoadJiraProjects({
+        onSuccess: (projects) => {
+          this.projects = projects;
+          this.projectsLoading = false;
+        },
+        onError: () => (this.projectsLoading = false),
+      });
     },
     /**
      * Returns a project's subtitle.
@@ -64,6 +91,13 @@ export default Vue.extend({
      */
     getProjectSubtitle(project: JiraProjectModel): string {
       return project.key;
+    },
+    /**
+     * Handles a click to select a project.
+     * @param project - The project to select.
+     */
+    handleProjectSelect(project: JiraProjectModel | undefined) {
+      integrationsStore.selectJiraProject(project);
     },
   },
 });

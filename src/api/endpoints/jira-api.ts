@@ -143,16 +143,3 @@ export async function createJiraProjectSync(
     )
   ).payload;
 }
-
-/**
- * TODO
- *
- * Gets the stored Jira project information for a specific project.
- *
- * @param projectId - The project to get Jira credentials for.
- */
-// export async function getJiraProject(
-//   projectId: string
-// ): Promise<{ id: string }> {
-//   return { id: "" };
-// }

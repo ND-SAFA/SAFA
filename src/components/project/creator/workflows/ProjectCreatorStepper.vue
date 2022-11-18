@@ -79,9 +79,12 @@ import {
 } from "@/api";
 import { GenericStepper } from "@/components/common";
 import { ProjectIdentifierInput } from "@/components/project/base";
-import { ArtifactTypeCreator, TraceFileCreator } from "../panels";
-import { GenericUploader } from "../validation-panels";
-import { TimTree } from "../tim-tree-view";
+import {
+  GenericUploader,
+  ArtifactTypeCreator,
+  TraceFileCreator,
+} from "../panels";
+import { TimTree } from "../timTree";
 
 const PROJECT_IDENTIFIER_STEP_NAME = "Name Project";
 

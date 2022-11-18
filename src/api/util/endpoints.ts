@@ -34,6 +34,8 @@ export enum Endpoint {
   deleteProjectMember = "projects/members/:projectMemberId",
 
   // Integrations
+  getInstallations = "projects/installations/by-project/:projectId",
+
   jiraCreateCredentials = "accounts/jira/credentials/:accessCode",
   jiraEditCredentials = "accounts/jira/credentials",
   jiraValidateCredentials = "accounts/jira/credentials/validate",

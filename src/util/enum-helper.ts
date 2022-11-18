@@ -195,8 +195,7 @@ export function creatorTabOptions(): SelectOption[] {
   return [
     createEnumOption(CreatorTabTypes.standard, "Standard Upload"),
     createEnumOption(CreatorTabTypes.bulk, "Bulk Upload"),
-    createEnumOption(CreatorTabTypes.jira, "Jira Upload"),
-    createEnumOption(CreatorTabTypes.github, "GitHub Upload"),
+    createEnumOption(CreatorTabTypes.import, "Integrations Import"),
   ];
 }
 
@@ -232,9 +231,9 @@ export function tracePredictionTabOptions(): SelectOption[] {
  */
 export function settingsTabOptions(): SelectOption[] {
   return [
-    // createEnumOption(SettingsTabTypes.overview, "Overview"),
     createEnumOption(SettingsTabTypes.members, "Members"),
     createEnumOption(SettingsTabTypes.upload, "Data Upload"),
+    createEnumOption(SettingsTabTypes.integrations, "Data Integrations"),
     createEnumOption(SettingsTabTypes.artifacts, "Artifact Settings"),
   ];
 }

@@ -123,16 +123,3 @@ export async function createGitHubProjectSync(
     )
   ).payload;
 }
-
-/**
- * TODO
- *
- * Gets the stored GitHub project information for a specific project.
- *
- * @param projectId - The project to get GitHub credentials for.
- */
-// export async function getGitHubProject(
-//   projectId: string
-// ): Promise<{ repositoryName: string }> {
-//   return { repositoryName: "" };
-// }

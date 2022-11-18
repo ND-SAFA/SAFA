@@ -115,7 +115,10 @@ export function handleAuthorizeJira({
   if (accessCode) {
     saveJiraCredentials(String(accessCode))
       .then(handleSuccess)
-      .catch(handleError)
+      .catch((e) => {
+        logStore.onError("Unable to read Jira access code.");
+        handleError(e);
+      })
       .finally(onComplete);
   } else {
     getJiraCredentials()
@@ -177,7 +180,10 @@ export function handleAuthorizeGitHub({
   if (accessCode) {
     saveGitHubCredentials(String(accessCode))
       .then(handleSuccess)
-      .catch(handleError)
+      .catch((e) => {
+        logStore.onError("Unable to read GitHub access code.");
+        handleError(e);
+      })
       .finally(onComplete);
   } else {
     getGitHubCredentials()

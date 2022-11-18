@@ -45,6 +45,11 @@ export default Vue.extend({
       projectsLoading: false,
     };
   },
+  mounted() {
+    if (!integrationsStore.validJiraCredentials) return;
+
+    this.loadProjects();
+  },
   computed: {
     /**
      * @return Whether there are current valid credentials.

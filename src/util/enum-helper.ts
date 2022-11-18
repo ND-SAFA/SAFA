@@ -195,8 +195,7 @@ export function creatorTabOptions(): SelectOption[] {
   return [
     createEnumOption(CreatorTabTypes.standard, "Standard Upload"),
     createEnumOption(CreatorTabTypes.bulk, "Bulk Upload"),
-    createEnumOption(CreatorTabTypes.jira, "Jira Upload"),
-    createEnumOption(CreatorTabTypes.github, "GitHub Upload"),
+    createEnumOption(CreatorTabTypes.import, "Integrations Import"),
   ];
 }
 

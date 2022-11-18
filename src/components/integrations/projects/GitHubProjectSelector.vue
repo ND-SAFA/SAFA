@@ -49,6 +49,11 @@ export default Vue.extend({
       repositoriesLoading: false,
     };
   },
+  mounted() {
+    if (!integrationsStore.validGitHubCredentials) return;
+
+    this.loadProjects();
+  },
   computed: {
     /**
      * @return Whether there are current valid credentials.

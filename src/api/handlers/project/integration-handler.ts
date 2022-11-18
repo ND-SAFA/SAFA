@@ -51,7 +51,7 @@ export function handleLoadInstallations({
  * @param onError - Called if the action fails.
  */
 export async function handleSyncInstallation(
-  installation: InstallationModel,
+  installation: Omit<InstallationModel, "lastUpdate">,
   { onSuccess, onError, onComplete }: IOHandlerCallback
 ): Promise<void> {
   try {

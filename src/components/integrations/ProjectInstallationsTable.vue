@@ -13,11 +13,38 @@
           {{ getDateDisplay(item.lastUpdate) }}
         </span>
       </template>
+
       <template v-slot:[`item.actions`]="{ item }">
         <v-btn text color="primary" @click="handleSync(item)">
           <v-icon class="mr-1">mdi-cached</v-icon>
           Re-Sync Data
         </v-btn>
+      </template>
+
+      <template v-slot:[`footer.prepend`]>
+        <div class="py-3">
+          <generic-icon-button
+            fab
+            color="primary"
+            icon-id="mdi-plus"
+            tooltip="Import New Project"
+            data-cy="button-integration-add"
+            @click="modalOpen = true"
+          />
+          <generic-modal
+            :is-open="modalOpen"
+            title="Import Data"
+            :actions-height="0"
+            @close="modalOpen = false"
+          >
+            <template v-slot:body>
+              <integrations-stepper
+                type="connect"
+                @submit="modalOpen = false"
+              />
+            </template>
+          </generic-modal>
+        </div>
       </template>
     </v-data-table>
   </v-container>
@@ -29,19 +56,30 @@ import { InstallationModel } from "@/types";
 import { timestampToDisplay } from "@/util";
 import { projectStore } from "@/hooks";
 import { handleSyncInstallation } from "@/api";
-import { Typography } from "@/components/common";
+import {
+  Typography,
+  GenericIconButton,
+  GenericModal,
+} from "@/components/common";
+import IntegrationsStepper from "./IntegrationsStepper.vue";
 
 /**
  * Renders a table of all active installations for the current project.
  */
 export default Vue.extend({
   name: "ProjectInstallationsTable",
-  components: { Typography },
+  components: {
+    IntegrationsStepper,
+    GenericModal,
+    Typography,
+    GenericIconButton,
+  },
   data() {
     return {
+      modalOpen: false,
       isLoading: false,
       headers: [
-        { text: "Installation Type", value: "type" },
+        { text: "Integration Type", value: "type" },
         { text: "Project ID", value: "installationId" },
         { text: "Last Synced", value: "lastUpdate" },
         { text: "Actions", value: "actions", sortable: false },
@@ -61,7 +99,6 @@ export default Vue.extend({
      * @returns The display name for when this installation was last synced.
      */
     getDateDisplay(timestamp: string) {
-      console.log(timestamp, timestampToDisplay(timestamp));
       return timestampToDisplay(timestamp);
     },
     /**

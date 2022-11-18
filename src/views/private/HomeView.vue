@@ -39,13 +39,9 @@
                   <v-icon>mdi-folder-arrow-up-outline</v-icon>
                   Bulk Upload Project
                 </v-btn>
-                <v-btn text @click="handleOpenGitHub">
+                <v-btn text @click="handleOpenImport">
                   <v-icon>mdi-transit-connection-variant</v-icon>
-                  Import GitHub Project
-                </v-btn>
-                <v-btn text @click="handleOpenJira">
-                  <v-icon>mdi-transit-connection-variant</v-icon>
-                  Import Jira Project
+                  Import Jira/GitHub Project
                 </v-btn>
               </div>
             </v-card-text>
@@ -112,14 +108,9 @@ export default Vue.extend({
         [QueryParams.TAB]: CreatorTabTypes.bulk,
       });
     },
-    handleOpenGitHub() {
+    handleOpenImport() {
       navigateTo(Routes.PROJECT_CREATOR, {
-        [QueryParams.TAB]: CreatorTabTypes.github,
-      });
-    },
-    handleOpenJira() {
-      navigateTo(Routes.PROJECT_CREATOR, {
-        [QueryParams.TAB]: CreatorTabTypes.jira,
+        [QueryParams.TAB]: CreatorTabTypes.import,
       });
     },
   },

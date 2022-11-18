@@ -10,7 +10,7 @@
         <jira-authentication />
       </v-stepper-content>
       <v-stepper-content step="2">
-        <jira-project-selector @select="handleProjectSelect($event)" />
+        <jira-project-selector />
       </v-stepper-content>
     </template>
   </generic-stepper>
@@ -39,7 +39,6 @@ export default Vue.extend({
   },
   data() {
     return {
-      selectedProject: undefined as JiraProjectModel | undefined,
       steps: [
         ["Connect to Jira", false],
         ["Select Project", false],
@@ -53,6 +52,12 @@ export default Vue.extend({
      */
     hasCredentials(): boolean {
       return integrationsStore.validJiraCredentials;
+    },
+    /**
+     * @return The current selected Jira project.
+     */
+    selectedProject(): JiraProjectModel | undefined {
+      return integrationsStore.jiraProject;
     },
   },
   watch: {
@@ -68,6 +73,12 @@ export default Vue.extend({
         this.setStepIsValid(0, false);
       }
     },
+    /**
+     * Updates the selection step when a project is selected.
+     */
+    selectedProject(project: JiraProjectModel | undefined): void {
+      this.setStepIsValid(1, !!project);
+    },
   },
   methods: {
     /**
@@ -79,32 +90,10 @@ export default Vue.extend({
       Vue.set(this.steps, stepIndex, [this.steps[stepIndex][0], isValid]);
     },
     /**
-     * Clears stepper data.
-     */
-    clearData(): void {
-      this.selectedProject = undefined;
-    },
-    /**
-     * Selects a Jira project to import.
-     */
-    handleProjectSelect(project: JiraProjectModel) {
-      if (this.selectedProject?.id !== project.id) {
-        this.selectedProject = project;
-        this.setStepIsValid(1, true);
-      } else {
-        this.selectedProject = undefined;
-        this.setStepIsValid(1, false);
-      }
-    },
-    /**
      * Attempts to import a Jira project.
      */
     handleSaveProject(): void {
-      if (!this.selectedProject) return;
-
-      handleImportJiraProject(this.selectedProject.id, {
-        onSuccess: () => this.clearData(),
-      });
+      handleImportJiraProject({});
     },
   },
 });

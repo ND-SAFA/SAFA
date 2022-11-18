@@ -10,7 +10,7 @@
         <git-hub-authentication />
       </v-stepper-content>
       <v-stepper-content step="2">
-        <git-hub-project-selector @select="handleProjectSelect($event)" />
+        <git-hub-project-selector />
       </v-stepper-content>
     </template>
   </generic-stepper>
@@ -39,7 +39,6 @@ export default Vue.extend({
   },
   data() {
     return {
-      selectedRepository: undefined as GitHubProjectModel | undefined,
       steps: [
         ["Connect to GitHub", false],
         ["Select Repository", false],
@@ -53,6 +52,12 @@ export default Vue.extend({
      */
     hasCredentials(): boolean {
       return integrationsStore.validGitHubCredentials;
+    },
+    /**
+     * @return The current selected GitHub project.
+     */
+    selectedProject(): GitHubProjectModel | undefined {
+      return integrationsStore.gitHubProject;
     },
   },
   watch: {
@@ -68,6 +73,12 @@ export default Vue.extend({
         this.setStepIsValid(0, false);
       }
     },
+    /**
+     * Updates the selection step when a project is selected.
+     */
+    selectedProject(project: GitHubProjectModel | undefined): void {
+      this.setStepIsValid(1, !!project);
+    },
   },
   methods: {
     /**
@@ -79,32 +90,10 @@ export default Vue.extend({
       Vue.set(this.steps, stepIndex, [this.steps[stepIndex][0], isValid]);
     },
     /**
-     * Clears stepper data.
-     */
-    clearData(): void {
-      this.selectedRepository = undefined;
-    },
-    /**
-     * Selects a GitHub project to import.
-     */
-    handleProjectSelect(project: GitHubProjectModel) {
-      if (this.selectedRepository?.id !== project.id) {
-        this.selectedRepository = project;
-        this.setStepIsValid(1, true);
-      } else {
-        this.selectedRepository = undefined;
-        this.setStepIsValid(1, false);
-      }
-    },
-    /**
      * Attempts to import a GitHub project.
      */
     handleSaveProject(): void {
-      if (!this.selectedRepository) return;
-
-      handleImportGitHubProject(this.selectedRepository.name, {
-        onSuccess: () => this.clearData(),
-      });
+      handleImportGitHubProject({});
     },
   },
 });

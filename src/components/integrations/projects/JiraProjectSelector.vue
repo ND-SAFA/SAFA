@@ -33,8 +33,6 @@ import { GenericStepperListStep } from "@/components";
 
 /**
  * Allows for selecting a jira project.
- *
- * @emits `select` (JiraProject) - On project selection.
  */
 export default Vue.extend({
   name: "JiraProjectSelector",
@@ -45,7 +43,6 @@ export default Vue.extend({
     return {
       projects: [] as JiraProjectModel[],
       projectsLoading: false,
-      selectedProject: undefined as JiraProjectModel | undefined,
     };
   },
   computed: {
@@ -71,7 +68,7 @@ export default Vue.extend({
      * Loads a user's Jira projects for a selected site.
      */
     async loadProjects() {
-      this.selectedProject = undefined;
+      integrationsStore.jiraProject = undefined;
       this.projectsLoading = true;
 
       handleLoadJiraProjects({
@@ -94,9 +91,8 @@ export default Vue.extend({
      * Handles a click to select a project.
      * @param project - The project to select.
      */
-    handleProjectSelect(project: JiraProjectModel) {
-      this.selectedProject = project;
-      this.$emit("select", project);
+    handleProjectSelect(project: JiraProjectModel | undefined) {
+      integrationsStore.selectJiraProject(project);
     },
   },
 });

@@ -37,8 +37,6 @@ import { GenericStepperListStep } from "@/components/common";
 
 /**
  * Allows for selecting a GitHub repository.
- *
- * @emits `select` (GitHubRepository) - On repository selection.
  */
 export default Vue.extend({
   name: "GitHubProjectSelector",
@@ -49,7 +47,6 @@ export default Vue.extend({
     return {
       repositories: [] as GitHubProjectModel[],
       repositoriesLoading: false,
-      selectedRepository: undefined as GitHubProjectModel | undefined,
     };
   },
   computed: {
@@ -75,7 +72,7 @@ export default Vue.extend({
      * Loads a user's GitHub projects for a selected organization.
      */
     async loadProjects() {
-      this.selectedRepository = undefined;
+      integrationsStore.gitHubProject = undefined;
       this.repositoriesLoading = true;
 
       handleLoadGitHubProjects({
@@ -111,9 +108,8 @@ export default Vue.extend({
      * SHandles a click to select a repository.
      * @param repository - The repository to select.
      */
-    handleRepositorySelect(repository: GitHubProjectModel) {
-      this.selectedRepository = repository;
-      this.$emit("select", repository);
+    handleRepositorySelect(repository: GitHubProjectModel | undefined) {
+      integrationsStore.selectGitHubProject(repository);
     },
   },
 });

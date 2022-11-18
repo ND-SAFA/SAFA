@@ -1,5 +1,5 @@
 <template>
-  <flex-box justify="center" align="center" b="2">
+  <flex-box justify="center" align="center" y="2">
     <v-btn
       large
       color="primary"

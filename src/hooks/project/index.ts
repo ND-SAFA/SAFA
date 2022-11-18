@@ -9,3 +9,4 @@ export { default as subtreeStore } from "./useSubtree";
 export { default as projectStore } from "./useProject";
 export { default as deltaStore } from "./useDelta";
 export { default as approvalStore } from "./useTraceApproval";
+export { default as integrationsStore } from "./useIntegrations";

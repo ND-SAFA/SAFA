@@ -8,11 +8,16 @@
           Log Out
         </v-btn>
       </flex-box>
-      <v-divider />
-      <v-container>
-        <update-password />
-        <delete-account />
-      </v-container>
+      <v-divider class="mb-4" />
+      <v-row>
+        <v-col cols="6">
+          <update-password />
+          <delete-account />
+        </v-col>
+        <v-col cols="6">
+          <integrations-accounts />
+        </v-col>
+      </v-row>
     </v-container>
   </div>
 </template>
@@ -21,6 +26,7 @@
 import Vue from "vue";
 import { handleLogout } from "@/api";
 import { Typography, FlexBox } from "@/components/common";
+import IntegrationsAccounts from "./IntegrationsAccounts.vue";
 import DeleteAccount from "./DeleteAccount.vue";
 import UpdatePassword from "./UpdatePassword.vue";
 
@@ -30,6 +36,7 @@ import UpdatePassword from "./UpdatePassword.vue";
 export default Vue.extend({
   name: "MyAccount",
   components: {
+    IntegrationsAccounts,
     FlexBox,
     Typography,
     DeleteAccount,

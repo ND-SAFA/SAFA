@@ -3,23 +3,14 @@
     v-model="currentStep"
     :steps="steps"
     submitText="Create Project"
-    @submit="handleSaveProject()"
+    @submit="handleSaveProject"
   >
     <template v-slot:items>
       <v-stepper-content step="1">
-        <jira-authentication
-          :has-credentials="validCredentials"
-          :is-loading="isLoading"
-          @delete="handleDeleteCredentials"
-        />
+        <jira-authentication />
       </v-stepper-content>
-
       <v-stepper-content step="2">
-        <jira-project-selector
-          :loading="projectsLoading"
-          :projects="projects"
-          @select="handleProjectSelect($event)"
-        />
+        <jira-project-selector @select="handleProjectSelect($event)" />
       </v-stepper-content>
     </template>
   </generic-stepper>
@@ -28,17 +19,13 @@
 <script lang="ts">
 import Vue from "vue";
 import { JiraProjectModel, StepState } from "@/types";
-import { getParam, QueryParams } from "@/router";
-import { deleteJiraCredentials, handleImportJiraProject } from "@/api";
+import { integrationsStore } from "@/hooks";
+import { handleImportJiraProject } from "@/api";
 import { GenericStepper } from "@/components/common";
 import {
   JiraAuthentication,
   JiraProjectSelector,
-} from "@/components/project/creator/steps";
-import {
-  handleAuthorizeJira,
-  handleLoadJiraProjects,
-} from "@/api/handlers/project/integration-handler";
+} from "@/components/integrations";
 
 /**
  * Allows for creating a project from Jira.
@@ -52,14 +39,7 @@ export default Vue.extend({
   },
   data() {
     return {
-      accessCode: getParam(QueryParams.JIRA_TOKEN),
-      isLoading: true,
-      validCredentials: false,
-
-      projects: [] as JiraProjectModel[],
-      projectsLoading: false,
       selectedProject: undefined as JiraProjectModel | undefined,
-
       steps: [
         ["Connect to Jira", false],
         ["Select Project", false],
@@ -67,23 +47,27 @@ export default Vue.extend({
       currentStep: 1,
     };
   },
-  /**
-   * If a jira access code is found in the query, loads the Jira authorization token and sites for the user.
-   */
-  mounted() {
-    handleAuthorizeJira(this.accessCode, {
-      onSuccess: () => {
-        this.isLoading = false;
-        this.validCredentials = true;
+  computed: {
+    /**
+     * @return Whether there are current valid credentials.
+     */
+    hasCredentials(): boolean {
+      return integrationsStore.validJiraCredentials;
+    },
+  },
+  watch: {
+    /**
+     * Updates the current step when credentials are loaded.
+     */
+    hasCredentials(valid: boolean): void {
+      if (valid) {
         this.currentStep = 2;
         this.setStepIsValid(0, true);
-        this.loadProjects();
-      },
-      onError: () => {
-        this.isLoading = false;
-        this.validCredentials = false;
-      },
-    });
+      } else {
+        this.currentStep = 1;
+        this.setStepIsValid(0, false);
+      }
+    },
   },
   methods: {
     /**
@@ -98,29 +82,7 @@ export default Vue.extend({
      * Clears stepper data.
      */
     clearData(): void {
-      this.validCredentials = false;
-      this.projects = [];
-    },
-    /**
-     * Clears the saved credentials
-     */
-    async handleDeleteCredentials(): Promise<void> {
-      await deleteJiraCredentials();
-      this.validCredentials = false;
-      this.currentStep = 1;
-    },
-    /**
-     * Loads a user's Jira projects for a selected site.
-     */
-    async loadProjects() {
-      this.projectsLoading = true;
-      handleLoadJiraProjects({
-        onSuccess: (projects) => {
-          this.projects = projects;
-          this.projectsLoading = false;
-        },
-        onError: () => (this.projectsLoading = false),
-      });
+      this.selectedProject = undefined;
     },
     /**
      * Selects a Jira project to import.

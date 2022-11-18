@@ -2,7 +2,7 @@
   <generic-stepper-list-step
     title="GitHub Repositories"
     :item-count="repositories.length"
-    :loading="loading"
+    :loading="repositoriesLoading"
     empty-message="There are no repositories."
   >
     <template slot="items">
@@ -29,8 +29,10 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import Vue from "vue";
 import { GitHubProjectModel } from "@/types";
+import { integrationsStore } from "@/hooks";
+import { handleLoadGitHubProjects } from "@/api";
 import { GenericStepperListStep } from "@/components/common";
 
 /**
@@ -39,27 +41,50 @@ import { GenericStepperListStep } from "@/components/common";
  * @emits `select` (GitHubRepository) - On repository selection.
  */
 export default Vue.extend({
-  name: "GitHubRepositorySelector",
+  name: "GitHubProjectSelector",
   components: {
     GenericStepperListStep,
   },
-  props: {
-    repositories: {
-      type: Array as PropType<GitHubProjectModel[]>,
-      required: true,
+  data() {
+    return {
+      repositories: [] as GitHubProjectModel[],
+      repositoriesLoading: false,
+      selectedRepository: undefined as GitHubProjectModel | undefined,
+    };
+  },
+  computed: {
+    /**
+     * @return Whether there are current valid credentials.
+     */
+    hasCredentials(): boolean {
+      return integrationsStore.validGitHubCredentials;
     },
-    loading: {
-      type: Boolean,
-      required: false,
+  },
+  watch: {
+    /**
+     * Loads projects when credentials are valid.
+     */
+    hasCredentials(valid: boolean): void {
+      if (!valid) return;
+
+      this.loadProjects();
     },
   },
   methods: {
     /**
-     * SHandles a click to select a repository.
-     * @param repository - The repository to select.
+     * Loads a user's GitHub projects for a selected organization.
      */
-    handleRepositorySelect(repository: GitHubProjectModel) {
-      this.$emit("select", repository);
+    async loadProjects() {
+      this.selectedRepository = undefined;
+      this.repositoriesLoading = true;
+
+      handleLoadGitHubProjects({
+        onSuccess: (repositories) => {
+          this.repositories = repositories;
+          this.repositoriesLoading = false;
+        },
+        onError: () => (this.repositoriesLoading = false),
+      });
     },
     /**
      * Returns a repository's subtitle.
@@ -81,6 +106,14 @@ export default Vue.extend({
       const updated = new Date(repository.created_at);
 
       return `Created on ${updated.getMonth()}/${updated.getDate()}/${updated.getFullYear()}`;
+    },
+    /**
+     * SHandles a click to select a repository.
+     * @param repository - The repository to select.
+     */
+    handleRepositorySelect(repository: GitHubProjectModel) {
+      this.selectedRepository = repository;
+      this.$emit("select", repository);
     },
   },
 });

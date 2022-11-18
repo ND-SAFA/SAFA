@@ -3,9 +3,9 @@ import {
   InstallationModel,
   IOHandlerCallback,
   JiraProjectModel,
-  URLParameter,
 } from "@/types";
-import { logStore, projectStore } from "@/hooks";
+import { integrationsStore, logStore, projectStore } from "@/hooks";
+import { getParam, QueryParams } from "@/router";
 import {
   getGitHubCredentials,
   getGitHubProjects,
@@ -89,16 +89,34 @@ export async function handleSyncInstallation(
 /**
  * Handles Jira authentication when the app loads.
  *
- * @param accessCode -The Jira access code, if one exists.
+ * @param onComplete - Called when the action completes.
  * @param onSuccess - Called if the action is successful.
  * @param onError - Called if the action fails.
  */
-export function handleAuthorizeJira(
-  accessCode: URLParameter,
-  { onSuccess, onError }: IOHandlerCallback
-): void {
+export function handleAuthorizeJira({
+  onSuccess,
+  onError,
+  onComplete,
+}: IOHandlerCallback): void {
+  const accessCode =
+    getParam(QueryParams.TAB) === "jira"
+      ? getParam(QueryParams.JIRA_TOKEN)
+      : "";
+
+  const handleSuccess = () => {
+    integrationsStore.validJiraCredentials = true;
+    onSuccess?.();
+  };
+  const handleError = (e: Error) => {
+    integrationsStore.validJiraCredentials = false;
+    onError?.(e);
+  };
+
   if (accessCode) {
-    saveJiraCredentials(String(accessCode)).then(onSuccess).catch(onError);
+    saveJiraCredentials(String(accessCode))
+      .then(handleSuccess)
+      .catch(handleError)
+      .finally(onComplete);
   } else {
     getJiraCredentials()
       .then(async (valid) => {
@@ -106,8 +124,9 @@ export function handleAuthorizeJira(
           await refreshJiraCredentials();
         }
       })
-      .then(onSuccess)
-      .catch(onError);
+      .then(handleSuccess)
+      .catch(handleError)
+      .finally(onComplete);
   }
 }
 
@@ -132,16 +151,34 @@ export function handleLoadJiraProjects({
 /**
  * Handles GitHub authentication when the app loads.
  *
- * @param accessCode -The GitHub access code, if one exists.
+ * @param onComplete - Called when the action completes.
  * @param onSuccess - Called if the action is successful, with the GitHub authorization token.
  * @param onError - Called if the action fails.
  */
-export function handleAuthorizeGitHub(
-  accessCode: URLParameter,
-  { onSuccess, onError }: IOHandlerCallback
-): void {
+export function handleAuthorizeGitHub({
+  onSuccess,
+  onError,
+  onComplete,
+}: IOHandlerCallback): void {
+  const accessCode =
+    getParam(QueryParams.TAB) === "github"
+      ? getParam(QueryParams.GITHUB_TOKEN)
+      : "";
+
+  const handleSuccess = () => {
+    integrationsStore.validGitHubCredentials = true;
+    onSuccess?.();
+  };
+  const handleError = (e: Error) => {
+    integrationsStore.validGitHubCredentials = false;
+    onError?.(e);
+  };
+
   if (accessCode) {
-    saveGitHubCredentials(String(accessCode)).then(onSuccess).catch(onError);
+    saveGitHubCredentials(String(accessCode))
+      .then(handleSuccess)
+      .catch(handleError)
+      .finally(onComplete);
   } else {
     getGitHubCredentials()
       .then(async (valid) => {
@@ -149,8 +186,9 @@ export function handleAuthorizeGitHub(
           await refreshGitHubCredentials();
         }
       })
-      .then(onSuccess)
-      .catch(onError);
+      .then(handleSuccess)
+      .catch(handleError)
+      .finally(onComplete);
   }
 }
 

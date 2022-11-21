@@ -6,7 +6,7 @@ from jobs.job_factory import JobFactory
 from server.serializers.dataset.dataset_creator_serializer import DatasetCreatorSerializer
 from server.serializers.serializer_utility import SerializerUtility
 from server.serializers.tests.base_serializer_test import BaseSerializerTest
-from tracer.util.reflection_util import ParamScope, ReflectionUtil
+from util import ParamScope, ReflectionUtil
 
 
 class JobFactorySerializer(serializers.Serializer):

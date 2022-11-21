@@ -3,7 +3,7 @@ from django.test import TestCase
 from jobs.job_factory import JobFactory
 from server.serializers.job_factory.training_request_serializer import TrainingRequestSerializer
 from server.serializers.tests.base_serializer_test import BaseSerializerTest
-from tracer.util.reflection_util import ReflectionUtil
+from util import ReflectionUtil
 
 
 class TestTrainingRequestSerializer(TestCase):

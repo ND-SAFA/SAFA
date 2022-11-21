@@ -3,7 +3,7 @@ from typing import Dict
 from unittest import TestCase
 
 from server.serializers.dataset.dataset_creator_serializer import ParamScope
-from tracer.util.reflection_util import ReflectionUtil
+from util import ReflectionUtil
 
 
 class TestClassOne:

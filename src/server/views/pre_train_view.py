@@ -4,7 +4,7 @@ from drf_yasg.utils import swagger_auto_schema
 
 from jobs.mlm_pre_train_job import MLMPreTrainJob
 from jobs.results.job_result import JobResult
-from server.serializers.pre_training_request_serializer import PreTrainingRequestSerializer
+from server.serializers.job_factory.pre_training_request_serializer import PreTrainingRequestSerializer
 from server.views.abstract_trace_view import AbstractTraceView
 
 

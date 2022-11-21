@@ -1,6 +1,6 @@
 import re
 from dataclasses import dataclass, field
-from typing import Dict, List, Tuple, Type, Callable
+from typing import Callable, Dict, Type
 
 from config.constants import SAVE_OUTPUT_DEFAULT
 from jobs.abstract_job import AbstractJob
@@ -9,6 +9,7 @@ from jobs.job_args import JobArgs
 from tracer.datasets.trainer_datasets_container import TrainerDatasetsContainer
 from tracer.models.base_models.supported_base_model import SupportedBaseModel
 from tracer.train.trace_args import TraceArgs
+from util.reflection_util import ReflectionUtil
 
 
 @dataclass
@@ -55,6 +56,7 @@ class JobFactory:
         Responsible for creating jobs
         :param kwargs: all necessary parameters
         """
+        self.trace_args_params = {}  # TODO: Fix default factory using field
         self.set_args(**kwargs)
 
     def set_args(self, **kwargs) -> None:
@@ -77,7 +79,7 @@ class JobFactory:
         :param job_class: the class of job to build
         :return: Job
         """
-        if isinstance(job_class, AbstractTraceJob):
+        if ReflectionUtil.is_instance_or_subclass(job_class, AbstractTraceJob):
             self._create_trace_args()
         job_args = JobArgs(**self._get_job_args_params())
         return job_class(job_args, **self.additional_job_params)
@@ -89,7 +91,10 @@ class JobFactory:
         """
         if self.trainer_dataset_container is None:
             raise ValueError("TrainerDatasetCreator is not instantiated in JobFactory.")
-        self.trace_args = TraceArgs(trainer_dataset_creator=self.trainer_dataset_container, **self.trace_args_params)
+        trace_args_params = self.trace_args_params if self.trace_args_params else {}
+        self.trace_args = TraceArgs(trainer_dataset_container=self.trainer_dataset_container,
+                                    output_dir=self.output_dir,
+                                    **trace_args_params)
 
     def _get_job_args_params(self) -> Dict[str, any]:
         """

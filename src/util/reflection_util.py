@@ -11,6 +11,16 @@ class ParamScope(Enum):
 class ReflectionUtil:
 
     @staticmethod
+    def is_instance_or_subclass(target_class, source_class):
+        """
+        Returns whether target is instance of sub-class of source class.
+        :param target_class: The class being tested for containment
+        :param source_class: The containment class.
+        :return: Boolean representing if target is contained within source.
+        """
+        return isinstance(target_class, source_class) or issubclass(target_class, source_class)
+
+    @staticmethod
     def copy_fields(source: Dict, include: List[str] = None, exclude: List[str] = None):
         if include:
             return {field: source[field] for field in include}

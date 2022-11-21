@@ -9,7 +9,7 @@ from tracer.datasets.creators.abstract_dataset_creator import AbstractDatasetCre
 from tracer.datasets.creators.abstract_trace_dataset_creator import AbstractTraceDatasetCreator
 from tracer.datasets.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
 from tracer.datasets.creators.supported_dataset_creator import SupportedDatasetCreator
-from util import ParamScope, ReflectionUtil
+from util.reflection_util import ReflectionUtil
 
 SupportedDatasets = Union[AbstractTraceDatasetCreator, MLMPreTrainDatasetCreator]
 

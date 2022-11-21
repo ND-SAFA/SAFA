@@ -10,7 +10,7 @@ from rest_framework.views import APIView
 from jobs.abstract_job import AbstractJob
 from jobs.job_factory import JobFactory
 from jobs.results.job_result import JobResult
-from server.serializers.base_serializer import BaseSerializer
+from server.serializers.job_factory.job_factory_serializer import JobFactorySerializer
 
 AppEntity = TypeVar("AppEntity")
 

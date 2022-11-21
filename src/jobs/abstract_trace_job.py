@@ -2,7 +2,6 @@ from abc import ABC
 
 from jobs.abstract_job import AbstractJob
 from jobs.job_args import JobArgs
-from server.storage.safa_storage import SafaStorage
 from tracer.train.trace_trainer import TraceTrainer
 
 
@@ -12,7 +11,7 @@ class AbstractTraceJob(AbstractJob, ABC):
         """
         The base job class for tracing jobs
         """
-        job_args.model_path = SafaStorage.add_mount_directory(job_args.model_path)
+        job_args.model_path = job_args.model_path
         super().__init__(job_args)
         self.trace_args = job_args.trace_args
         self._trainer = None

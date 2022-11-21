@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Any, Dict, Generic, Type, TypeVar
+from typing import Any, Dict, Generic, Type, TypeVar, Union
 from unittest import TestCase, skip
 
 from rest_framework.serializers import Serializer

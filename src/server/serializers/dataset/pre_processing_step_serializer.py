@@ -6,7 +6,7 @@ from rest_framework import serializers
 from server.serializers.serializer_utility import SerializerUtility
 from tracer.pre_processing.pre_processing_steps import PreProcessingSteps
 from tracer.pre_processing.steps.abstract_pre_processing_step import AbstractPreProcessingStep
-from util import ParamScope, ReflectionUtil
+from util.reflection_util import ParamScope, ReflectionUtil
 
 
 class PreProcessingStepSerializer(serializers.Serializer):

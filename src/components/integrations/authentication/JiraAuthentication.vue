@@ -1,11 +1,11 @@
 <template>
-  <authentication-buttons
-    connected-title="Connected to Jira"
-    disconnected-title="Connect to Jira"
+  <authentication-list-item
+    title="Jira"
     :is-loading="isLoading"
     :has-credentials="hasCredentials"
-    @click="handleAuthentication"
-    @delete="handleDeleteCredentials"
+    @click="handleClick"
+    @connect="handleAuthentication"
+    @disconnect="handleDeleteCredentials"
   />
 </template>
 
@@ -17,7 +17,7 @@ import {
   deleteJiraCredentials,
   handleAuthorizeJira,
 } from "@/api";
-import AuthenticationButtons from "./AuthenticationButtons.vue";
+import AuthenticationListItem from "./AuthenticationListItem.vue";
 
 /**
  * Prompts the user to authenticate their Jira account.
@@ -25,7 +25,7 @@ import AuthenticationButtons from "./AuthenticationButtons.vue";
 export default Vue.extend({
   name: "JiraAuthentication",
   components: {
-    AuthenticationButtons,
+    AuthenticationListItem,
   },
   data() {
     return {
@@ -64,6 +64,12 @@ export default Vue.extend({
     async handleDeleteCredentials(): Promise<void> {
       await deleteJiraCredentials();
       integrationsStore.validJiraCredentials = false;
+    },
+    /**
+     * Selects this integration source.
+     */
+    handleClick(): void {
+      this.$emit("click");
     },
   },
 });

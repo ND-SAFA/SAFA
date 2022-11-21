@@ -62,13 +62,15 @@ export async function saveJiraCredentials(accessCode: string): Promise<void> {
  */
 export async function getJiraCredentials(): Promise<boolean> {
   return (
-    await authHttpClient<{ payload: boolean }>(
-      Endpoint.jiraValidateCredentials,
-      {
-        method: "GET",
-      }
-    )
-  ).payload;
+    (
+      await authHttpClient<{ payload: boolean | null }>(
+        Endpoint.jiraValidateCredentials,
+        {
+          method: "GET",
+        }
+      )
+    ).payload === true
+  );
 }
 
 /**
@@ -76,10 +78,17 @@ export async function getJiraCredentials(): Promise<boolean> {
  *
  * @return Whether the credentials are valid.
  */
-export async function refreshJiraCredentials(): Promise<void> {
-  await authHttpClient(Endpoint.jiraEditCredentials, {
-    method: "PUT",
-  });
+export async function refreshJiraCredentials(): Promise<boolean> {
+  return (
+    (
+      await authHttpClient<{ payload: boolean | null }>(
+        Endpoint.jiraEditCredentials,
+        {
+          method: "PUT",
+        }
+      )
+    ).payload === true
+  );
 }
 
 /**
@@ -98,13 +107,15 @@ export async function deleteJiraCredentials(): Promise<void> {
  */
 export async function getJiraProjects(): Promise<JiraProjectModel[]> {
   return (
-    await authHttpClient<{ payload: JiraProjectModel[] }>(
-      Endpoint.jiraGetProjects,
-      {
-        method: "GET",
-      }
-    )
-  ).payload;
+    (
+      await authHttpClient<{ payload: JiraProjectModel[] }>(
+        Endpoint.jiraGetProjects,
+        {
+          method: "GET",
+        }
+      )
+    ).payload || []
+  );
 }
 
 /**

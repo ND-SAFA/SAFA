@@ -1,11 +1,11 @@
 <template>
-  <authentication-buttons
-    connected-title="Connected to GitHub"
-    disconnected-title="Connect to GitHub"
+  <authentication-list-item
+    title="GitHub"
     :is-loading="isLoading"
     :has-credentials="hasCredentials"
-    @click="handleAuthentication"
-    @delete="handleDeleteCredentials"
+    @click="handleClick"
+    @connect="handleAuthentication"
+    @discnnect="handleDeleteCredentials"
   />
 </template>
 
@@ -17,7 +17,7 @@ import {
   deleteGitHubCredentials,
   handleAuthorizeGitHub,
 } from "@/api";
-import AuthenticationButtons from "./AuthenticationButtons.vue";
+import AuthenticationListItem from "./AuthenticationListItem.vue";
 
 /**
  * Prompts the user to authenticate their GitHub account.
@@ -25,7 +25,7 @@ import AuthenticationButtons from "./AuthenticationButtons.vue";
 export default Vue.extend({
   name: "GitHubAuthentication",
   components: {
-    AuthenticationButtons,
+    AuthenticationListItem,
   },
   data() {
     return {
@@ -63,6 +63,12 @@ export default Vue.extend({
     async handleDeleteCredentials(): Promise<void> {
       await deleteGitHubCredentials();
       integrationsStore.validGitHubCredentials = false;
+    },
+    /**
+     * Selects this integration source.
+     */
+    handleClick(): void {
+      this.$emit("click");
     },
   },
 });

@@ -39,13 +39,15 @@ export async function saveGitHubCredentials(accessCode: string): Promise<void> {
  */
 export async function getGitHubCredentials(): Promise<boolean> {
   return (
-    await authHttpClient<{ payload: boolean }>(
-      Endpoint.githubValidateCredentials,
-      {
-        method: "GET",
-      }
-    )
-  ).payload;
+    (
+      await authHttpClient<{ payload: boolean | null }>(
+        Endpoint.githubValidateCredentials,
+        {
+          method: "GET",
+        }
+      )
+    ).payload === true
+  );
 }
 
 /**
@@ -53,10 +55,17 @@ export async function getGitHubCredentials(): Promise<boolean> {
  *
  * @return Whether the credentials are valid.
  */
-export async function refreshGitHubCredentials(): Promise<void> {
-  await authHttpClient(Endpoint.githubEditCredentials, {
-    method: "PUT",
-  });
+export async function refreshGitHubCredentials(): Promise<boolean> {
+  return (
+    (
+      await authHttpClient<{ payload: boolean | null }>(
+        Endpoint.githubEditCredentials,
+        {
+          method: "PUT",
+        }
+      )
+    ).payload === true
+  );
 }
 
 /**
@@ -75,13 +84,15 @@ export async function deleteGitHubCredentials(): Promise<void> {
  */
 export async function getGitHubProjects(): Promise<GitHubProjectModel[]> {
   return (
-    await authHttpClient<{ payload: GitHubProjectModel[] }>(
-      Endpoint.githubGetProjects,
-      {
-        method: "GET",
-      }
-    )
-  ).payload;
+    (
+      await authHttpClient<{ payload: GitHubProjectModel[] }>(
+        Endpoint.githubGetProjects,
+        {
+          method: "GET",
+        }
+      )
+    ).payload || []
+  );
 }
 
 /**

@@ -1,19 +1,12 @@
 <template>
-  <panel-card>
-    <typography el="h2" variant="subtitle" value="Linked Integrations" />
-    <v-divider class="mb-2" />
-    <jira-authentication />
-    <git-hub-authentication />
-  </panel-card>
+  <v-card outlined class="pa-2">
+    <authentication-selector />
+  </v-card>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { PanelCard, Typography } from "@/components/common/";
-import {
-  JiraAuthentication,
-  GitHubAuthentication,
-} from "@/components/integrations";
+import { AuthenticationSelector } from "@/components/integrations";
 
 /**
  * IntegrationsAccounts.
@@ -21,10 +14,7 @@ import {
 export default Vue.extend({
   name: "IntegrationsAccounts",
   components: {
-    JiraAuthentication,
-    GitHubAuthentication,
-    Typography,
-    PanelCard,
+    AuthenticationSelector,
   },
 });
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <v-card outlined class="pa-2" style="width: 30em">
+  <v-card outlined class="pa-4" style="width: 30em">
     <typography
       variant="subtitle"
       el="h2"

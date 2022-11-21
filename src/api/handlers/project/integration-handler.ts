@@ -123,8 +123,12 @@ export function handleAuthorizeJira({
   } else {
     getJiraCredentials()
       .then(async (valid) => {
-        if (!valid) {
-          await refreshJiraCredentials();
+        if (valid) return;
+
+        const refreshValid = await refreshJiraCredentials();
+
+        if (!refreshValid) {
+          throw new Error("Invalid refresh");
         }
       })
       .then(handleSuccess)
@@ -188,8 +192,12 @@ export function handleAuthorizeGitHub({
   } else {
     getGitHubCredentials()
       .then(async (valid) => {
-        if (!valid) {
-          await refreshGitHubCredentials();
+        if (valid) return;
+
+        const refreshValid = await refreshGitHubCredentials();
+
+        if (!refreshValid) {
+          throw new Error("Invalid refresh");
         }
       })
       .then(handleSuccess)

@@ -1,2 +1,1 @@
-export { default as JiraAuthentication } from "./JiraAuthentication.vue";
-export { default as GitHubAuthentication } from "./GitHubAuthentication.vue";
+export { default as AuthenticationSelector } from "./AuthenticationSelector.vue";

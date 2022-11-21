@@ -7,16 +7,7 @@
   >
     <template v-slot:items>
       <v-stepper-content step="1">
-        <v-container style="max-width: 30em">
-          <v-select
-            filled
-            label="Data Source"
-            v-model="source"
-            :items="sourceTypes"
-          />
-          <jira-authentication v-if="source === 'Jira'" />
-          <git-hub-authentication v-if="source === 'GitHub'" />
-        </v-container>
+        <authentication-selector v-model="source" />
       </v-stepper-content>
       <v-stepper-content step="2">
         <jira-project-selector v-if="source === 'Jira'" />
@@ -36,7 +27,7 @@ import {
   handleSyncInstallation,
 } from "@/api";
 import { GenericStepper } from "@/components/common";
-import { GitHubAuthentication, JiraAuthentication } from "./authentication";
+import { AuthenticationSelector } from "./authentication";
 import { JiraProjectSelector, GitHubProjectSelector } from "./projects";
 
 /**
@@ -47,10 +38,9 @@ import { JiraProjectSelector, GitHubProjectSelector } from "./projects";
 export default Vue.extend({
   name: "IntegrationsStepper",
   components: {
+    AuthenticationSelector,
     GitHubProjectSelector,
-    GitHubAuthentication,
     JiraProjectSelector,
-    JiraAuthentication,
     GenericStepper,
   },
   props: {
@@ -62,7 +52,6 @@ export default Vue.extend({
   data() {
     return {
       source: undefined as "Jira" | "GitHub" | undefined,
-      sourceTypes: ["Jira", "GitHub"],
       steps: [
         ["Connect to Source", false],
         ["Select Project", false],

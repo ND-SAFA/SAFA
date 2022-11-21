@@ -2,6 +2,7 @@ from django.test import TestCase
 
 from server.serializers.dataset.pre_processing_step_serializer import PreProcessingStepSerializer
 from server.serializers.tests.base_serializer_test import BaseSerializerTest
+from tracer.pre_processing.steps.abstract_pre_processing_step import AbstractPreProcessingStep
 
 
 class TestPreProcessingStepSerializer(TestCase):
@@ -32,5 +33,7 @@ class TestPreProcessingStepSerializer(TestCase):
 
     def test_serialization_with_no_params(self):
         test_data = {"step": "REMOVE_WHITE_SPACE"}
-        entity = self.serializer_test.serialize_data(self, test_data)
-        BaseSerializerTest.assert_contains_camel_case_properties(self, entity, self.test_data["params"])
+        entity: AbstractPreProcessingStep = self.serializer_test.serialize_data(self, test_data)
+        self.assertIsNotNone(entity)
+        cleaned_word = entity.run([" target "])[0]
+        self.assertEqual("target", cleaned_word)

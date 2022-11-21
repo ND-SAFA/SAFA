@@ -1,16 +1,13 @@
 import re
 from dataclasses import dataclass, field
-from typing import Dict, List, Tuple, Type
+from typing import Dict, Type
 
 from config.constants import SAVE_OUTPUT_DEFAULT
 from jobs.abstract_job import AbstractJob
 from jobs.abstract_trace_job import AbstractTraceJob
 from jobs.job_args import JobArgs
-from tracer.datasets.abstract_dataset import AbstractDataset
-from tracer.datasets.dataset_role import DatasetRole
 from tracer.datasets.trainer_datasets_container import TrainerDatasetsContainer
 from tracer.models.base_models.supported_base_model import SupportedBaseModel
-from tracer.pre_processing.pre_processing_steps import PreProcessingSteps
 from tracer.train.trace_args import TraceArgs
 
 
@@ -29,14 +26,9 @@ class JobFactory:
     """
     base_model: SupportedBaseModel = None
     """
-    Dictionary mapping datasets role (e.g. train/eval) to the desired datasets creator and its params
+    Container for datasets used for any training, prediction, or evaluation.
     """
-    datasets_map: Dict[DatasetRole, AbstractDataset] = field(default_factory=dict)
-    """
-    Dictionary mapping datasets role to the desired pre-processing steps and related params
-    """
-    dataset_pre_processing_options: Dict[DatasetRole, Tuple[List[PreProcessingSteps], Dict]] = field(
-        default_factory=dict)
+    trainer_dataset_container: TrainerDatasetsContainer = None
     """
     Any additional parameters for making datasets including test/train split info
     """
@@ -95,10 +87,9 @@ class JobFactory:
         Creates the trace args from the given datasets and trace args params
         :return: None
         """
-        trainer_dataset_creator = TrainerDatasetsContainer(datasets_map=self.datasets_map,
-                                                           dataset_pre_processing_options=self.dataset_pre_processing_options,
-                                                           **self.additional_dataset_params)
-        self.trace_args = TraceArgs(trainer_dataset_creator=trainer_dataset_creator, **self.trace_args_params)
+        if self.trainer_dataset_container is None:
+            raise ValueError("TrainerDatasetCreator is not instantiated in JobFactory.")
+        self.trace_args = TraceArgs(trainer_dataset_creator=self.trainer_dataset_container, **self.trace_args_params)
 
     def _get_job_args_params(self) -> Dict[str, any]:
         """

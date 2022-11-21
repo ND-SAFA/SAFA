@@ -1,10 +1,11 @@
 from enum import Enum
-from typing import Any, Dict, Generic, Type, TypeVar
+from typing import Any, Dict, Generic, Type, TypeVar, Union
 from unittest import TestCase
 
 from rest_framework.serializers import Serializer
 
 from jobs.job_factory import JobFactory
+from tracer.models.base_models.supported_base_model import SupportedBaseModel
 from tracer.pre_processing.steps.separate_joined_words_step import SeparateJoinedWordsStep
 
 AppEntity = TypeVar('AppEntity')
@@ -41,9 +42,12 @@ class BaseSerializerTest(Generic[AppEntity]):
         """
         entity_created = self.serialize_data(test_case, data)
         deserialized_data = self.serializer(entity_created).data
-        for key, value in deserialized_data.items():
-            test_case.assertIn(key, data.keys())
-            test_case.assertEqual(data[key], value)
+        for key, expected_value in data.items():
+            test_case.assertIn(key, deserialized_data)
+            value = deserialized_data[key]
+            if isinstance(value, SupportedBaseModel):
+                value = value.name
+            test_case.assertEqual(expected_value, value)
 
     def serialize_update_data(self, test_case: TestCase, data: Dict, new_properties: Dict,
                               expected_properties: Dict = None):
@@ -86,7 +90,8 @@ class BaseSerializerTest(Generic[AppEntity]):
             test_case.assertIn(expected_phrase, errors[key][0].title().lower())
 
     @staticmethod
-    def assert_contains_camel_case_properties(test_case: TestCase, instance: JobFactory, camel_case_properties: Dict):
+    def assert_contains_camel_case_properties(test_case: TestCase, instance: Union[JobFactory, Dict],
+                                              camel_case_properties: Dict):
         """
         Verifies that instance contains properties (in camel case) with expected values.
         :param test_case: The test used to assert the validity of the properties.
@@ -110,6 +115,12 @@ class BaseSerializerTest(Generic[AppEntity]):
         if isinstance(object_value, list):
             return list(map(BaseSerializerTest.to_repr, object_value))
         return object_value
+
+    @staticmethod
+    def to_camel_case(word: str):
+        words = word.lower().split("_")
+        words = words[:1] + [w.title() for w in words[1:]]
+        return "".join(words)
 
     @staticmethod
     def to_snake_case(word: str):

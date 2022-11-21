@@ -1,13 +1,23 @@
+from typing import Dict
+
 from rest_framework import serializers
 
+from jobs.job_factory import JobFactory
+from server.serializers.dataset.dataset_creator_serializer import DatasetCreatorSerializer
 from server.serializers.job_factory.model_identifier_serializer import ModelIdentifierSerializer
+from server.serializers.serializer_utility import SerializerUtility
+from tracer.datasets.trainer_datasets_container import TrainerDatasetsContainer
 
 
 class PredictionRequestSerializer(ModelIdentifierSerializer):
-    sourceLayers = serializers.ListField(child=serializers.DictField(help_text="Map of artifact ids to body."),
-                                         help_text="List of source artifact mappings.",
-                                         source="source_layers")
-    targetLayers = serializers.ListField(child=serializers.DictField(help_text="Map of artifact ids to body."),
-                                         help_text="List of target artifact mappings.",
-                                         source="target_layers")
-    settings = serializers.DictField(help_text="Custom training arguments.")
+    data = DatasetCreatorSerializer(help_text="The instructions for creating training/prediction dataset.",
+                                    required=True)
+    settings = serializers.DictField(help_text="Custom training arguments.", required=False)
+
+    def create(self, validated_data: Dict) -> JobFactory:
+        kwargs: Dict = SerializerUtility.create_children_serializers(validated_data, self.fields.fields)
+        dataset = kwargs.pop("data")
+        kwargs.update(kwargs.pop("settings"))  # put settings in main kwargs
+        trainer_datasets_container = TrainerDatasetsContainer(train=dataset)
+        kwargs["trainer_dataset_container"] = trainer_datasets_container
+        return JobFactory(**kwargs)

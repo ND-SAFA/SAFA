@@ -11,8 +11,13 @@ class ParamScope(Enum):
 class ReflectionUtil:
 
     @staticmethod
-    def copy_fields(source: Dict, fields: List[str]):
-        return {field: source[field] for field in fields}
+    def copy_fields(source: Dict, include: List[str] = None, exclude: List[str] = None):
+        if include:
+            return {field: source[field] for field in include}
+        elif exclude:
+            return {field: source[field] for field in source.keys() if field not in exclude}
+        else:
+            raise ValueError("Specify fields to include or exclude.")
 
     @staticmethod
     def get_field_scope(field_name: str, class_name: str = None) -> ParamScope:
@@ -37,7 +42,7 @@ class ReflectionUtil:
         return ParamScope.LOCAL
 
     @staticmethod
-    def get_fields(instance: Any, scope: ParamScope) -> Dict:
+    def get_fields(instance: Any, scope: ParamScope, ignore: List[str] = None) -> Dict:
         """
         Returns the fields of the instance within the scope given.
         :param instance: The instance whose fields are returned.
@@ -46,11 +51,12 @@ class ReflectionUtil:
         """
         params = {}
         for param_id in vars(instance):
-            param_name = param_id
-            param_scope = ReflectionUtil.get_field_scope(param_name, class_name=instance.__class__.__name__)
+            if ignore and param_id in ignore:
+                continue
+            param_scope = ReflectionUtil.get_field_scope(param_id, class_name=instance.__class__.__name__)
             if param_scope.value <= scope.value:
                 param_value = getattr(instance, param_id)
-                params[param_name] = param_value
+                params[param_id] = param_value
         return params
 
     @staticmethod

@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from server.serializers.dataset.dataset_container_serializer import TrainerDatasetsContainerSerializer
+from server.serializers.dataset.trainer_dataset_container_serializer import TrainerDatasetsContainerSerializer
 from server.serializers.tests.base_serializer_test import BaseSerializerTest
 from tracer.datasets.trainer_datasets_container import TrainerDatasetsContainer
 

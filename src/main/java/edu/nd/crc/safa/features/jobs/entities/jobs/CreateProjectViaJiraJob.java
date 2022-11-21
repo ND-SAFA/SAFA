@@ -24,6 +24,7 @@ import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
 
 import lombok.Setter;
+import org.springframework.util.StringUtils;
 
 /**
  * Responsible for providing step implementations for:
@@ -106,19 +107,29 @@ public class CreateProjectViaJiraJob extends CommitJob {
         String projectName = this.jiraProjectResponse.getName();
         String projectDescription = this.jiraProjectResponse.getDescription();
         Project project = this.jiraIdentifier.getProjectVersion().getProject();
-        project.setName(projectName);
-        project.setDescription(projectDescription);
+
+        // if not already set
+        if (!StringUtils.hasLength(project.getName())) {
+            project.setName(projectName);
+        }
+        if (!StringUtils.hasLength(project.getDescription())) {
+            project.setDescription(projectDescription);
+        }
         this.serviceProvider.getProjectRepository().save(project);
 
         // Step - Update job name
         this.serviceProvider.getJobService().setJobName(this.getJobDbEntity(), createJobName(projectName));
 
         // Step - Map JIRA project to SAFA project
-        this.jiraProject = this.serviceProvider
-            .getJiraConnectionService()
-            .createJiraProjectMapping(
-                project,
-                this.jiraIdentifier.getJiraProjectId());
+        this.jiraProject = this.getJiraProjectMapping(
+            project,
+            this.jiraIdentifier.getJiraProjectId());
+    }
+
+    protected JiraProject getJiraProjectMapping(Project project, Long jiraProjectId)  {
+        JiraProject jiraProject = new JiraProject(project, jiraProjectId);
+
+        return this.serviceProvider.getJiraProjectRepository().save(jiraProject);
     }
 
     @IJobStep(value = "Importing Issues and Links", position = 4)

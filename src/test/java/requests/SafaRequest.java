@@ -11,9 +11,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
-import javax.servlet.http.Cookie;
 
 import edu.nd.crc.safa.utilities.JsonFileUtilities;
+
+import javax.servlet.http.Cookie;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.http.MediaType;
@@ -103,8 +104,8 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
         return postWithResponseParser(body, ResponseParser::jsonCreator, resultMatcher);
     }
 
-    public void putWithJsonObject(Object body, ResultMatcher resultMatcher) throws Exception {
-        sendAuthenticatedRequest(
+    public JSONObject putWithJsonObject(Object body, ResultMatcher resultMatcher) throws Exception {
+        return sendAuthenticatedRequest(
             put(this.buildEndpoint())
                 .content(stringify(body))
                 .contentType(MediaType.APPLICATION_JSON),

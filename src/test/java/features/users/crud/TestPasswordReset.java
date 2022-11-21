@@ -8,6 +8,7 @@ import java.util.Optional;
 import common.ApplicationBaseTest;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.email.EmailService;
+import edu.nd.crc.safa.features.users.entities.app.PasswordForgottenRequest;
 import edu.nd.crc.safa.features.users.entities.app.ResetPasswordRequestDTO;
 import edu.nd.crc.safa.features.users.entities.app.UserIdentifierDTO;
 import edu.nd.crc.safa.features.users.entities.db.PasswordResetToken;
@@ -107,7 +108,7 @@ public class TestPasswordReset extends ApplicationBaseTest {
     private SafaUser issueForgetPasswordCall() throws Exception {
         SafaUser storedUser = Objects.requireNonNull(
             serviceProvider.getSafaUserRepository().findByEmail(testEmail).orElse(null));
-        UserIdentifierDTO userIdentifierDTO = new UserIdentifierDTO(storedUser);
+        PasswordForgottenRequest userIdentifierDTO = new PasswordForgottenRequest(storedUser.getEmail());
         SafaRequest
             .withRoute(AppRoutes.Accounts.FORGOT_PASSWORD)
             .putWithJsonObject(userIdentifierDTO, status().is2xxSuccessful());

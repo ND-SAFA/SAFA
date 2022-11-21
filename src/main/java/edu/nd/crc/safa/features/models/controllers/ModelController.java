@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -113,6 +114,73 @@ public class ModelController extends BaseController {
                     .create(mp.getProject())
                     .withModelDelete(modelId)
             ));
+    }
+
+    /**
+     * Edits information about a model within a given project. Currently only edits to the
+     * model name are supported. Edits to fields other than the model name will simply be
+     * ignored.
+     *
+     * @param projectId The ID of the project the model to edit exists under
+     * @param modelId The ID of the model to edit
+     * @param modelAppEntity The model object with all the data to update
+     * @return The newly updated model
+     * @throws SafaError When an attempt is made to update a field that is not allowed to change
+     */
+    @PutMapping(AppRoutes.Models.MODEL_BY_ID)
+    public ModelAppEntity editModelById(@PathVariable UUID projectId,
+                              @PathVariable UUID modelId,
+                              @RequestBody ModelAppEntity modelAppEntity) throws SafaError {
+
+        Project project = this.resourceBuilder.fetchProject(projectId).withViewProject();
+
+        // Get model object as it currently is in the database
+        Model model = this.serviceProvider.getModelService().getModelById(modelId);
+        ModelAppEntity currentModelEntity = new ModelAppEntity(model);
+
+        // Make updates
+        updateCurrentModelObject(currentModelEntity, modelAppEntity);
+
+        // Save results to database and return
+        return this.serviceProvider.getModelService().createOrUpdateModel(project, currentModelEntity);
+
+    }
+
+    /**
+     * Modifies {@code currentModel} to contain updated fields from {@code updatedModel} while also checking that
+     * no fields were updated that aren't allowed to be.
+     *
+     * @param currentModel The current version of the model as it exists in the database.
+     * @param updatedModel The new version of the model with the user's edits.
+     * @throws SafaError When an attempt is made to update a disallowed field.
+     */
+    private void updateCurrentModelObject(ModelAppEntity currentModel, ModelAppEntity updatedModel) throws SafaError {
+        checkNoUpdate(currentModel.getId(), updatedModel.getId(), "id");
+        checkNoUpdate(currentModel.getBaseModel(), updatedModel.getBaseModel(), "baseModel");
+
+        // If we make it here, no disallowed fields were updated, so we can update the fields that are allowed
+        if (updatedModel.getName() != null) {
+            currentModel.setName(updatedModel.getName());
+        }
+    }
+
+    /**
+     * Checks that a field was not updated between {@code oldValue} and {@code newValue}.
+     * A field is considered to not be updated if the old value and new value are equal, or
+     * if the new value is not set at all. If the field is updated, an exception is thrown.
+     * Otherwise, this function does nothing.
+     *
+     * @param oldValue The old value of the field.
+     * @param newValue The new value of the field.
+     * @param fieldName The name of the field we are checking (used for informational purposes in the exception).
+     * @param <T> The type of the field.
+     * @throws SafaError If the field was in fact updated.
+     */
+    private <T> void checkNoUpdate(T oldValue, T newValue, String fieldName) throws SafaError {
+        if (newValue != null && !newValue.equals(oldValue)) {
+            throw new SafaError("Attempt to edit disallowed field: " + fieldName
+                    + " - '" + oldValue + "' -> '" + newValue + "'");
+        }
     }
 
     /**

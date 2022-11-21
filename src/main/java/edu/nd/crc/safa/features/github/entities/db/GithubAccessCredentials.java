@@ -59,14 +59,14 @@ public class GithubAccessCredentials {
     private SafaUser user;
 
     /**
-     * In how many minutes the access token will expire
+     * In how many seconds the access token will expire
      */
     @Transient
     private Integer accessTokenExpiration;
 
 
     /**
-     * In how many minutes the refresh token will expire
+     * In how many seconds the refresh token will expire
      * i.e. in how many minutes the credentials are useless
      *      and should be deleted
      */
@@ -100,22 +100,14 @@ public class GithubAccessCredentials {
     }
 
     @PrePersist
-    private void onCreate() {
-        this.updateExpirationDates();
-    }
-
     @PreUpdate
-    private void onUpdate() {
-        this.updateExpirationDates();
-    }
-
-    private void updateExpirationDates() {
+    public void updateExpirationDates() {
         if (this.refreshTokenExpiration != null) {
-            this.refreshTokenExpirationDate = LocalDateTime.now().plusMinutes(this.refreshTokenExpiration);
+            this.refreshTokenExpirationDate = LocalDateTime.now().plusSeconds(this.refreshTokenExpiration);
         }
 
         if (this.accessTokenExpiration != null) {
-            this.accessTokenExpirationDate = LocalDateTime.now().plusMinutes(this.accessTokenExpiration);
+            this.accessTokenExpirationDate = LocalDateTime.now().plusSeconds(this.accessTokenExpiration);
         }
     }
 

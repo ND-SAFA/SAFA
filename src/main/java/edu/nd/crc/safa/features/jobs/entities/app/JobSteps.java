@@ -7,7 +7,9 @@ import edu.nd.crc.safa.features.jobs.entities.jobs.CreateProjectViaJsonJob;
 import edu.nd.crc.safa.features.jobs.entities.jobs.FlatFileProjectCreationJob;
 import edu.nd.crc.safa.features.jobs.entities.jobs.GenerateLinksJob;
 import edu.nd.crc.safa.features.jobs.entities.jobs.GithubProjectCreationJob;
+import edu.nd.crc.safa.features.jobs.entities.jobs.GithubProjectImportJob;
 import edu.nd.crc.safa.features.jobs.entities.jobs.GithubProjectUpdateJob;
+import edu.nd.crc.safa.features.jobs.entities.jobs.JiraProjectImportJob;
 import edu.nd.crc.safa.features.jobs.entities.jobs.JiraProjectUpdateJob;
 import edu.nd.crc.safa.features.jobs.entities.jobs.TrainModelJob;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
@@ -42,6 +44,10 @@ public class JobSteps {
                 return AbstractJob.getJobSteps(JiraProjectUpdateJob.class);
             case PROJECT_UPDATE_VIA_GITHUB:
                 return AbstractJob.getJobSteps(GithubProjectUpdateJob.class);
+            case IMPORT_VIA_JIRA:
+                return AbstractJob.getJobSteps(JiraProjectImportJob.class);
+            case IMPORT_VIA_GITHUB:
+                return AbstractJob.getJobSteps(GithubProjectImportJob.class);
             case GENERATE_LINKS:
                 return AbstractJob.getJobSteps(GenerateLinksJob.class);
             case TRAIN_MODEL:

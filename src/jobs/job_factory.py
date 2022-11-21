@@ -2,7 +2,7 @@ import re
 from dataclasses import dataclass, field
 from typing import Callable, Dict, Type
 
-from config.constants import SAVE_OUTPUT_DEFAULT
+from config.constants import SAVE_OUTPUT_DEFAULT, SAVE_DATASET_SPLITS_DEFAULT
 from jobs.abstract_job import AbstractJob
 from jobs.abstract_trace_job import AbstractTraceJob
 from jobs.job_args import JobArgs
@@ -50,6 +50,10 @@ class JobFactory:
     any additional args needed for the job
     """
     additional_job_params: Dict = field(init=False, default=None)
+    """
+    If True, saves the dataset splits to output_dir
+    """
+    save_dataset_splits: bool = SAVE_DATASET_SPLITS_DEFAULT
 
     def __init__(self, **kwargs):
         """

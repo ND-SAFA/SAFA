@@ -1,6 +1,6 @@
 import re
 from dataclasses import dataclass, field
-from typing import Dict, List, Tuple, Type
+from typing import Dict, List, Tuple, Type, Callable
 
 from config.constants import SAVE_OUTPUT_DEFAULT
 from jobs.abstract_job import AbstractJob
@@ -133,9 +133,9 @@ def assert_job_factory_attr_names():
     print_fields(JobFactory)
     print_fields(JobArgs)
 
-    for attr in dir(JobArgs):
-        if not hasattr(JobFactory, attr):
-            raise NameError("Expected attr named %s in JobFactory to match attr in job args" % attr)
+    for attr_name, attr_value in vars(JobArgs).items():
+        if not isinstance(attr_value, Callable) and not hasattr(JobFactory, attr_name):
+            raise NameError("Expected attr named %s in JobFactory to match attr in job args" % attr_name)
 
 
 assert_job_factory_attr_names()

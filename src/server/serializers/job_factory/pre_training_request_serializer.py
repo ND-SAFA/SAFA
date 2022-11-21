@@ -12,9 +12,3 @@ class PreTrainingRequestSerializer(ModelIdentifierSerializer):
     preProcessingOptions = serializers.ListField(
         source='pre_processing_options',
         child=EnumField(choices=PreProcessingSteps, required=False, help_text="Custom pre-processing options."))
-    blockSize = serializers.IntegerField(required=False, source="block_size",
-                                         help_text="The length of a pre-training block.")
-    traceArgsParams = serializers.DictField(required=False, source="trace_args_params",
-                                            help_text="Custom training arguments.")
-    mlmProbability = serializers.FloatField(required=False, source="mlm_probability",
-                                            help_text="The probability a word in a block will be masked")

@@ -17,6 +17,8 @@ class TrainerDatasetsContainerSerializer(serializers.Serializer):
                                    required=False)
     eval = DatasetCreatorSerializer(help_text="The instructions for creating testing dataset.",
                                     required=False)
+    params = serializers.DictField(help_text="Initialization params for Trainer Dataset Container",
+                                   required=True)
 
     def create(self, validated_data: Dict):
         """
@@ -24,7 +26,9 @@ class TrainerDatasetsContainerSerializer(serializers.Serializer):
         :param validated_data: The validated request data defining datasets.
         :return: TrainerDatasetsContainer with dataset creators.
         """
-        kwargs = SerializerUtility.create_children_serializers(validated_data)
+        kwargs = SerializerUtility.create_children_serializers(validated_data, self.fields.fields)
+        if "params" in validated_data:
+            kwargs.update(validated_data["params"])
         return TrainerDatasetsContainer(**kwargs)
 
     def update(self, instance, validated_data):

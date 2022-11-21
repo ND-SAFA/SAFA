@@ -1,4 +1,4 @@
-from typing import Dict, List, Tuple
+from typing import List
 
 import pandas as pd
 
@@ -6,7 +6,7 @@ from tracer.datasets.creators.abstract_trace_dataset_creator import AbstractTrac
 from tracer.datasets.data_objects.artifact import Artifact
 from tracer.datasets.data_objects.trace_link import TraceLink
 from tracer.datasets.trace_dataset import TraceDataset
-from tracer.pre_processing.pre_processing_option import PreProcessingOption
+from tracer.pre_processing.steps.abstract_pre_processing_step import AbstractPreProcessingStep
 
 
 class CSVKey:
@@ -22,13 +22,13 @@ class CSVKey:
 
 class CSVDatasetCreator(AbstractTraceDatasetCreator):
 
-    def __init__(self, data_file_path: str, pre_processing_params: Tuple[List[PreProcessingOption], Dict] = None):
+    def __init__(self, data_file_path: str, pre_processing_steps: List[AbstractPreProcessingStep] = None):
         """
         Constructs datasets in CSV format
         :param data_file_path: path to csv
-        :param pre_processing_params: tuple containing the desired pre-processing steps and related params
+        :param pre_processing_steps: tuple containing the desired pre-processing steps and related params
         """
-        super().__init__(pre_processing_params, use_linked_targets_only=False)
+        super().__init__(pre_processing_steps, use_linked_targets_only=False)
         self.data_file_path = data_file_path
 
     def create(self) -> TraceDataset:

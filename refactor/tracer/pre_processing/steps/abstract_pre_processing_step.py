@@ -20,8 +20,8 @@ class AbstractPreProcessingStep(ABC):
         :param order: the order the step should be run in
         :param run_before: if True, the step will be run before splitting the content into a word list
         """
-        self.order = order
-        self.run_before = run_before
+        self._order = order
+        self._run_before = run_before
 
     @abstractmethod
     def run(self, word_list: List[str]) -> List[str]:
@@ -33,10 +33,10 @@ class AbstractPreProcessingStep(ABC):
         pass
 
     def __eq__(self, other):
-        return self.order.value == other.order.value
+        return self._order.value == other._order.value
 
     def __lt__(self, other):
-        return self.order.value < other.order.value
+        return self._order.value < other._order.value
 
 
 class AbstractPreProcessingBeforeStep(AbstractPreProcessingStep, ABC):

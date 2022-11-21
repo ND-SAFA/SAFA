@@ -4,7 +4,7 @@ from config.constants import USE_LINKED_TARGETS_ONLY_DEFAULT
 from tracer.datasets.creators.abstract_trace_dataset_creator import AbstractTraceDatasetCreator
 from tracer.datasets.creators.safa_dataset_creator import SafaDatasetCreator, SafaKeys
 from tracer.datasets.trace_dataset import TraceDataset
-from tracer.pre_processing.pre_processing_option import PreProcessingOption
+from tracer.pre_processing.pre_processing_steps import PreProcessingSteps
 
 
 class RepositoryKeys(SafaKeys):
@@ -32,19 +32,19 @@ class RepositoryKeys(SafaKeys):
 class RepositoryDatasetCreator(AbstractTraceDatasetCreator):
     KEYS = RepositoryKeys()
 
-    def __init__(self, repo_paths: List[str], pre_processing_params: Tuple[List[PreProcessingOption], Dict] = None,
+    def __init__(self, repo_paths: List[str], pre_processing_steps: Tuple[List[PreProcessingSteps], Dict] = None,
                  data_keys: SafaKeys = KEYS, use_linked_targets_only: bool = USE_LINKED_TARGETS_ONLY_DEFAULT):
         """
         Responsible for creating a datasets from a repository
         :param repo_paths: list of paths to all repositories
-        :param pre_processing_params: tuple containing the desired pre-processing steps and related params
+        :param pre_processing_steps: tuple containing the desired pre-processing steps and related params
         :param data_keys: keys to use to access data
         :param use_linked_targets_only: if True, uses only the targets that make up at least one true link
         """
-        super().__init__(pre_processing_params, use_linked_targets_only)
+        super().__init__(pre_processing_steps, use_linked_targets_only)
         self.repo_paths = repo_paths
         self.keys = data_keys
-        self.pre_processing_params = pre_processing_params
+        self.pre_processing_params = pre_processing_steps
 
     def create(self) -> TraceDataset:
         """
@@ -54,7 +54,7 @@ class RepositoryDatasetCreator(AbstractTraceDatasetCreator):
         dataset = None
         for repo_path in self.repo_paths:
             repo_dataset = SafaDatasetCreator(repo_path, self.pre_processing_params, self.keys,
-                                              self.use_linked_targets_only).create()
+                                              self._use_linked_targets_only).create()
 
             dataset = dataset + repo_dataset if dataset else repo_dataset
         return dataset

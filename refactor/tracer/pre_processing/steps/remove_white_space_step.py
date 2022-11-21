@@ -1,6 +1,6 @@
 from typing import List
 
-from tracer.pre_processing.abstract_pre_processing_step import AbstractPreProcessingStep
+from tracer.pre_processing.steps.abstract_pre_processing_step import AbstractPreProcessingStep
 
 
 class RemoveWhiteSpaceStep(AbstractPreProcessingStep):

@@ -1,6 +1,7 @@
 from django.test import TestCase
 
-from server.serializers.prediction_request_serializer import PredictionRequestSerializer
+from jobs.job_factory import JobFactory
+from server.serializers.job_factory.prediction_request_serializer import PredictionRequestSerializer
 from server.serializers.tests.base_serializer_test import BaseSerializerTest
 
 
@@ -12,9 +13,16 @@ class TestPredictionRequestSerializer(TestCase):
     serializer_test_data = {
         "baseModel": "NL_BERT",
         "modelPath": "~/desktop/safa/datasets",
+        "trainerDatasetContainer": {
+            "train": {
+                "creator": "CLASSIC_TRACE",
+                "params": {
+                    "sourceLayers": [{"S1": "hello"}],
+                    "targetLayers": [{"T1": "world"}]
+                }
+            }
+        },
         "outputDir": "hello",
-        "sourceLayers": [{"S1": "hello"}],
-        "targetLayers": [{"T1": "world"}],
         "settings": {
             "num_train_epochs": 1
         }
@@ -22,7 +30,9 @@ class TestPredictionRequestSerializer(TestCase):
     serializer_test = BaseSerializerTest(PredictionRequestSerializer)
 
     def test_serialization(self):
-        prediction_request = self.serializer_test.serialize_data(self, self.serializer_test_data)
+        prediction_request: JobFactory = self.serializer_test.serialize_data(self, self.serializer_test_data)
+        self.assertIsNotNone(prediction_request.trainer_dataset_container)
+        self.assertIsNotNone(prediction_request.trainer_dataset_container.eval_dataset)
         BaseSerializerTest.assert_contains_camel_case_properties(self, prediction_request, self.serializer_test_data)
 
     def test_deserialization(self):

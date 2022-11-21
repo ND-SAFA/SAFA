@@ -18,7 +18,7 @@ AppEntity = TypeVar("AppEntity")
 class AbstractTraceView(APIView):
     permission_classes = (permissions.AllowAny,)
 
-    def __init__(self, serializer: Type[BaseSerializer], job: Type[AbstractJob], **kwargs, ):
+    def __init__(self, serializer: Type[JobFactorySerializer], job: Type[AbstractJob], **kwargs, ):
         """
         :param serializer_class: The serializer used to validate request and create job.
         :param job_class: The class of the job to run.
@@ -69,7 +69,7 @@ class AbstractTraceView(APIView):
                                        properties=JobResult.get_properties(response_keys))}
 
     @staticmethod
-    def read_request(request: HttpRequest, serializer_class: Type[BaseSerializer]) -> JobFactory:
+    def read_request(request: HttpRequest, serializer_class: Type[JobFactorySerializer]) -> JobFactory:
         """
         Converts a HttpRequest to a dictionary
         :param request: the HttpRequest

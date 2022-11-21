@@ -1,8 +1,8 @@
 from rest_enumfield import EnumField
 from rest_framework import serializers
 
-from server.serializers.model_identifier_serializer import ModelIdentifierSerializer
-from tracer.pre_processing.pre_processing_option import PreProcessingOption
+from server.serializers.job_factory.model_identifier_serializer import ModelIdentifierSerializer
+from tracer.pre_processing.pre_processing_steps import PreProcessingSteps
 
 
 class PreTrainingRequestSerializer(ModelIdentifierSerializer):
@@ -11,9 +11,7 @@ class PreTrainingRequestSerializer(ModelIdentifierSerializer):
                                             help_text="Path to directory containing pre-training documents.")
     preProcessingOptions = serializers.ListField(
         source='pre_processing_options',
-        child=EnumField(choices=PreProcessingOption, required=False, help_text="Custom pre-processing options."))
-    preProcessingParams = serializers.DictField(required=False, source="pre_processing_params",
-                                                help_text="TODO")
+        child=EnumField(choices=PreProcessingSteps, required=False, help_text="Custom pre-processing options."))
     blockSize = serializers.IntegerField(required=False, source="block_size",
                                          help_text="The length of a pre-training block.")
     traceArgsParams = serializers.DictField(required=False, source="trace_args_params",

@@ -5,20 +5,20 @@ from tracer.datasets.creators.abstract_dataset_creator import AbstractDatasetCre
 from tracer.datasets.data_objects.artifact import Artifact
 from tracer.datasets.data_objects.trace_link import TraceLink
 from tracer.datasets.trace_dataset import TraceDataset
-from tracer.pre_processing.pre_processing_option import PreProcessingOption
+from tracer.pre_processing.steps.abstract_pre_processing_step import AbstractPreProcessingStep
 
 
 class AbstractTraceDatasetCreator(AbstractDatasetCreator, ABC):
 
-    def __init__(self, pre_processing_params: Tuple[List[PreProcessingOption], Dict], use_linked_targets_only: bool):
+    def __init__(self, pre_processing_steps: List[AbstractPreProcessingStep], use_linked_targets_only: bool):
         """
         Responsible for creating datasets in format for defined models.
-        :param pre_processing_params: tuple containing the desired pre-processing steps and related params
+        :param pre_processing_steps: tuple containing the desired pre-processing steps and related params
         :use_linked_targets_only: if True, uses only the targets that make up at least one true link
         """
-        super().__init__(pre_processing_params)
+        super().__init__(pre_processing_steps)
         self._linked_targets = set()
-        self.use_linked_targets_only = use_linked_targets_only
+        self._use_linked_targets_only = use_linked_targets_only
 
     @abstractmethod
     def create(self) -> TraceDataset:
@@ -37,7 +37,7 @@ class AbstractTraceDatasetCreator(AbstractDatasetCreator, ABC):
         :param pos_link_ids: The list of all positive link ids in project.
         :return: Map between trace link ids and trace links for given source and target artifacts.
         """
-        if self.use_linked_targets_only:
+        if self._use_linked_targets_only:
             target_artifacts = self._filter_unlinked_targets(target_artifacts)
 
         links = {}

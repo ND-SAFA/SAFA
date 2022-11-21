@@ -1,6 +1,6 @@
 from jobs.create_model_job import CreateModelJob
 from jobs.job_args import JobArgs
-from jobs.responses.base_response import BaseResponse
+from jobs.results.job_result import JobResult
 from test.base_job_test import BaseJobTest
 
 
@@ -18,5 +18,5 @@ class TestCreateModelJob(BaseJobTest):
         return CreateModelJob(job_args)
 
     def _assert_success(self, output_dict: dict):
-        self.assertIn(BaseResponse.MODEL_PATH, output_dict)
-        self.assertEqual(output_dict[BaseResponse.MODEL_PATH], self.TEST_PARAMS["output_dir"])
+        self.assertIn(JobResult.MODEL_PATH, output_dict)
+        self.assertEqual(output_dict[JobResult.MODEL_PATH], self.TEST_PARAMS["output_dir"])

@@ -28,7 +28,7 @@ BLOCK_SIZE_DEFAULT = 128
 TRAINING_DATA_DIR_DEFAULT = "jobs/pretrain/mlm"
 USE_LINKED_TARGETS_ONLY_DEFAULT = False
 
-# -------------- PreProcessing --------------
+# -------------- PRE-PROCESSING --------------
 MIN_LENGTH_DEFAULT = 1
 
 # -------------- METRICS --------------

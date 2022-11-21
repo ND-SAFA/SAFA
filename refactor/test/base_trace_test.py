@@ -5,7 +5,7 @@ import numpy as np
 from transformers.trainer_utils import PredictionOutput
 
 from config.constants import VALIDATION_PERCENTAGE_DEFAULT
-from jobs.responses.prediction_response import PredictionResponse
+from jobs.results.job_result import JobResult
 from test.base_test import BaseTest
 from tracer.datasets.creators.supported_dataset_creator import SupportedDatasetCreator
 from tracer.datasets.data_objects.artifact import Artifact
@@ -94,33 +94,33 @@ class BaseTraceTest(BaseTest):
                                         **kwargs)
 
     def assert_prediction_output_matches_expected(self, output: dict, threshold: int = 0.05):
-        if PredictionResponse.PREDICTIONS not in output:
-            self.fail(self._KEY_ERROR_MESSAGE.format(PredictionResponse.PREDICTIONS, output))
-        predictions = output[PredictionResponse.PREDICTIONS]
+        if JobResult.PREDICTIONS not in output:
+            self.fail(self._KEY_ERROR_MESSAGE.format(JobResult.PREDICTIONS, output))
+        predictions = output[JobResult.PREDICTIONS]
         if len(predictions) != len(self.ALL_TEST_LINKS):
-            self.fail(self._LEN_ERROR.format(PredictionResponse.PREDICTIONS))
+            self.fail(self._LEN_ERROR.format(JobResult.PREDICTIONS))
         expected_links = {link for link in self.ALL_TEST_LINKS}
         predicted_links = set()
-        for link_dict in output[PredictionResponse.PREDICTIONS]:
+        for link_dict in output[JobResult.PREDICTIONS]:
             link = [None, None]
             for key, val in self._EXAMPLE_PREDICTION_LINKS.items():
                 if key not in link_dict:
-                    self.fail(self._KEY_ERROR_MESSAGE.format(key, PredictionResponse.PREDICTIONS))
+                    self.fail(self._KEY_ERROR_MESSAGE.format(key, JobResult.PREDICTIONS))
                 if key == "score":
                     expected_val = self._EXAMPLE_PREDICTION_LINKS["score"]
                     if abs(val - expected_val) >= threshold:
                         self.fail(
-                            self._VAL_ERROR_MESSAGE.format(key, val, expected_val, PredictionResponse.PREDICTIONS))
+                            self._VAL_ERROR_MESSAGE.format(key, val, expected_val, JobResult.PREDICTIONS))
                 else:
                     link[val] = link_dict[key]
             predicted_links.add(tuple(link))
         self.assert_lists_have_the_same_vals(expected_links, predicted_links)
-        if PredictionResponse.METRICS not in output:
-            self.fail(self._KEY_ERROR_MESSAGE.format(PredictionResponse.METRICS, output))
+        if JobResult.METRICS not in output:
+            self.fail(self._KEY_ERROR_MESSAGE.format(JobResult.METRICS, output))
         for metric in self._EXAMPLE_PREDICTION_METRICS.keys():
-            if metric not in output[PredictionResponse.METRICS]:
+            if metric not in output[JobResult.METRICS]:
                 self.fail(
-                    self._KEY_ERROR_MESSAGE.format(PredictionResponse.METRICS, output[PredictionResponse.METRICS]))
+                    self._KEY_ERROR_MESSAGE.format(JobResult.METRICS, output[JobResult.METRICS]))
 
     def assert_training_output_matches_expected(self, output_dict: dict):
         for key, value in self.EXAMPLE_TRAINING_OUTPUT.items():

@@ -5,6 +5,7 @@ import mock
 from torch.utils.data.distributed import DistributedSampler
 from torch.utils.data.sampler import RandomSampler
 
+from jobs.predict_job import PredictJob
 from test.base_trace_test import BaseTraceTest
 from test.paths.paths import TEST_OUTPUT_DIR
 from tracer.datasets.dataset_role import DatasetRole
@@ -30,7 +31,8 @@ class TestTraceTrainer(BaseTraceTest):
     def test_perform_prediction(self, eval_mock: mock.MagicMock):
         test_trace_trainer = self.get_test_trace_trainer()
         output = test_trace_trainer.perform_prediction()
-        self.assert_prediction_output_matches_expected(output)
+        output = PredictJob._result_from_prediction_output(output)
+        self.assert_prediction_output_matches_expected(output.as_dict())
         self.assertFalse(eval_mock.called)
 
     def test_perform_prediction_with_metrics(self):

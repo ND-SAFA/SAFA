@@ -3,8 +3,8 @@ from django.views.decorators.csrf import csrf_exempt
 from drf_yasg.utils import swagger_auto_schema
 
 from jobs.predict_job import PredictJob
-from jobs.responses.base_response import BaseResponse
-from server.serializers.job_factory.prediction_request_serializer import PredictionRequestSerializer
+from jobs.results.job_result import JobResult
+from server.serializers.prediction_request_serializer import PredictionRequestSerializer
 from server.views.abstract_trace_view import AbstractTraceView
 
 
@@ -13,7 +13,7 @@ class PredictView(AbstractTraceView):
     Provides endpoint for creating a new model.
     """
 
-    responses = AbstractTraceView.get_responses([BaseResponse.MODEL_PATH, BaseResponse.STATUS, BaseResponse.EXCEPTION])
+    responses = AbstractTraceView.get_responses([JobResult.MODEL_PATH, JobResult.STATUS, JobResult.EXCEPTION])
     serializer = PredictionRequestSerializer
 
     def __init__(self, **kwargs):

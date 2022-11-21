@@ -1,31 +1,17 @@
-import json
 import os
+import threading
 import traceback
 import uuid
 from abc import abstractmethod
-from typing import Dict
-
-import numpy as np
 
 from jobs.job_args import JobArgs
-from jobs.job_status import Status
-from jobs.responses.base_response import BaseResponse
+from jobs.results.job_status import JobStatus
+from jobs.results.job_result import JobResult
 from server.storage.safa_storage import SafaStorage
 from tracer.models.model_generator import ModelGenerator
 
 
-class NpEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, np.integer):
-            return int(obj)
-        if isinstance(obj, np.floating):
-            return float(obj)
-        if isinstance(obj, np.ndarray):
-            return obj.tolist()
-        return super(NpEncoder, self).default(obj)
-
-
-class AbstractJob:
+class AbstractJob(threading.Thread):
     OUTPUT_FILENAME = "output.json"
 
     def __init__(self, job_args: JobArgs, **kwargs):
@@ -35,8 +21,7 @@ class AbstractJob:
         """
         super().__init__()
         self.job_args = job_args
-        self.status = Status.NOT_STARTED
-        self.result = {}
+        self.result = JobResult()
         self.id = uuid.uuid4()
         self.output_dir = job_args.output_dir
         self.job_output_filepath = self._get_output_filepath(self.output_dir, self.id)
@@ -58,33 +43,22 @@ class AbstractJob:
         """
         Runs the job and saves the output
         """
-        self.status = Status.IN_PROGRESS
+        self.result.set_job_status(JobStatus.IN_PROGRESS)
         try:
-            output = self._run()
-            self.result.update(output)
-            self.status = Status.SUCCESS
+            run_result = self._run()
+            self.result = run_result.update(self.result)
+            self.result.set_job_status(JobStatus.SUCCESS)
         except Exception as e:
             print(traceback.format_exc())
-            self.result[BaseResponse.TRACEBACK] = traceback.format_exc()
-            self.result[BaseResponse.EXCEPTION] = str(e)
-            self.status = Status.FAILURE
-
-        json_output = self._get_output_as_json()
+            self.result[JobResult.TRACEBACK] = traceback.format_exc()
+            self.result[JobResult.EXCEPTION] = str(e)
+            self.result.set_job_status(JobStatus.FAILURE)
+        json_output = self.result.to_json()
         if self.save_job_output:
             self._save(json_output)
-        return json_output
-
-    def _get_output_as_json(self) -> str:
-        """
-        Returns the job output as json
-        :return: the output as json
-        """
-        output = self.result
-        output[BaseResponse.STATUS] = self.status.value
-        return json.dumps(output, indent=4, cls=NpEncoder)
 
     @abstractmethod
-    def _run(self) -> Dict:
+    def _run(self) -> JobResult:
         """
         Runs job specific logic
         :return: output of job as a dictionary

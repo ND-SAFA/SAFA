@@ -1,3 +1,7 @@
+from copy import deepcopy
+from typing import Dict, List, NamedTuple, Tuple, Union
+
+import numpy as np
 from datasets import load_metric
 from scipy.special import softmax
 from torch.utils.data import DataLoader
@@ -6,19 +10,17 @@ from torch.utils.data.sampler import RandomSampler
 from transformers.trainer import Trainer
 from transformers.trainer_pt_utils import get_tpu_sampler, is_torch_tpu_available
 
-from typing import Dict, List, NamedTuple, Tuple, Union
-
-import numpy as np
-from api.responses.prediction_response import PredictionResponse
+from config.override import overrides
+from jobs.responses.prediction_response import PredictionResponse
+from tracer.datasets.dataset_role import DatasetRole
+from tracer.metrics.supported_trace_metric import get_metric_name, get_metric_path
 from tracer.models.model_generator import ModelGenerator
 from tracer.train.trace_args import TraceArgs
-from tracer.dataset.trace_dataset import TraceDataset
-from tracer.metrics.supported_trace_metric import get_metric_path, get_metric_name
 
 
 class TraceTrainer(Trainer):
     """
-    Responsible for using given model for training and prediction using given dataset.
+    Responsible for using given model for training and prediction using given datasets.
     """
 
     def __init__(self, args: TraceArgs, model_generator: ModelGenerator, **kwargs):
@@ -27,37 +29,38 @@ class TraceTrainer(Trainer):
         :param args: the learning model arguments
         """
         self.args = args
+        self.dataset_container = args.trainer_dataset_container
         self.model_generator = model_generator
         self.model_generator.set_max_seq_length(self.args.max_seq_length)
         model = self.model_generator.get_model()
         tokenizer = self.model_generator.get_tokenizer()
         super().__init__(model=model, args=args, tokenizer=tokenizer, callbacks=args.callbacks, **kwargs)
 
-    def perform_training(self, train_dataset: TraceDataset, eval_dataset: TraceDataset = None, checkpoint: str = None) -> Dict:
+    def perform_training(self, checkpoint: str = None) -> Dict:
         """
         Performs the model training.
-        :param train_dataset: The dataset used to adjust model weights.
-        :param eval_dataset: The dataset used to determine the best model (TODO).
         :param checkpoint: path to checkpoint.
         :return: a dictionary containing the results
         """
-        self.train_dataset = train_dataset.to_trainer_dataset(self.model_generator)
-        self.eval_dataset = eval_dataset.to_trainer_dataset(self.model_generator) if eval_dataset else eval_dataset
+        self.train_dataset = self.dataset_container.train_dataset.to_trainer_dataset(self.model_generator)
+        if DatasetRole.VAL in self.dataset_container:
+            self.eval_dataset = self.dataset_container.val_dataset.to_trainer_dataset(self.model_generator)
         output = self.train(resume_from_checkpoint=checkpoint)
         return TraceTrainer.output_to_dict(output)
 
-    def perform_prediction(self, eval_dataset: TraceDataset) -> Dict:
+    def perform_prediction(self) -> Dict:
         """
         Performs the prediction and (optionally) evaluation for the model
-        :param eval_dataset: The dataset being predicted and/or evaluated.
         :return: A dictionary containing the results.
         """
-        self.eval_dataset = eval_dataset.to_trainer_dataset(self.model_generator)
+        self.eval_dataset = self.dataset_container.eval_dataset.to_trainer_dataset(self.model_generator)
         output = self.predict(self.eval_dataset)
         predictions = TraceTrainer.get_similarity_scores(output.predictions)
-        results = self._eval(predictions, output.label_ids, self.args.metrics) if self.args.metrics else None
+        results = self._eval(predictions, output.label_ids, output.metrics,
+                             self.args.metrics) if self.args.metrics else None
         output_dict = TraceTrainer.output_to_dict(output, metrics=results, predictions=predictions)
-        return PredictionResponse.from_output(output_dict, eval_dataset.get_source_target_pairs())
+        return PredictionResponse.from_output(output_dict,
+                                              self.dataset_container.eval_dataset.get_source_target_pairs())
 
     @staticmethod
     def output_to_dict(output: NamedTuple, **kwargs) -> Dict:
@@ -66,10 +69,12 @@ class TraceTrainer(Trainer):
         :param output: output from training or prediction
         :return: the output represented as a dictionary
         """
-        return {field: kwargs[field] if (field in kwargs and kwargs[field]) else getattr(output, field) for field in output._fields}
+        return {field: kwargs[field] if (field in kwargs and kwargs[field]) else getattr(output, field) for field in
+                output._fields}
 
     @staticmethod
-    def _eval(preds: Union[np.ndarray, Tuple[np.ndarray]], label_ids: np.ndarray, metric_names: List) -> Dict:
+    def _eval(preds: Union[np.ndarray, Tuple[np.ndarray]], label_ids: np.ndarray, output_metrics: Dict,
+              metric_names: List) -> Dict:
         """
         Performs the evaluation of the model (use this instead of Trainer.evaluation to utilize predefined metrics from models)
         :param output: the output from predictions
@@ -77,13 +82,12 @@ class TraceTrainer(Trainer):
         :return: a dictionary of metric_name to result
         """
         metric_paths = [get_metric_path(name) for name in metric_names]
-        results = {}
+        results = deepcopy(output_metrics)
         for metric_path in metric_paths:
             metric = load_metric(metric_path, keep_in_memory=True)
-            print(metric)
             metric_result = metric.compute(predictions=preds, references=label_ids)
             metric_name = get_metric_name(metric)
-            if metric_name in metric_result:
+            if isinstance(metric_result, dict) and metric_name in metric_result:
                 results.update(metric_result)
             else:
                 results[metric_name] = metric_result
@@ -102,8 +106,7 @@ class TraceTrainer(Trainer):
             similarity_scores.append(softmax(prediction)[1])
         return similarity_scores
 
-    ################## FUNCTIONS BELOW ARE OVERRIDDEN FROM TRANSFORMERS ##################
-
+    @overrides(Trainer)
     def get_train_dataloader(self) -> DataLoader:
         """
         Gets the dataloader for training

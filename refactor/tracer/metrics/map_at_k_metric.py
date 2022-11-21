@@ -6,7 +6,7 @@ from tracer.metrics.abstract_trace_metric import AbstractTraceMetric
 
 _DESCRIPTION = """
 Mean Average Precision@K metric measures the average precision over k for recommendations shown for 
-different links and averages them over all queries in the dataset.
+different links and averages them over all queries in the datasets.
 """
 
 _KWARGS_DESCRIPTION = """
@@ -24,19 +24,20 @@ _CITATION = """
 
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
 class MapAtKMetric(AbstractTraceMetric):
+    name = "map_at_k"
 
     # TODO
-    def _compute(self, predictions, labels, k=K_METRIC_DEFAULT, **kwargs) -> float:
+    def _compute(self, predictions, references, k=K_METRIC_DEFAULT, **kwargs) -> float:
         """
         computes the Mean Average Precision@K or the average precision over k for recommendations shown for different links
-         and averages them over all queries in the dataset.
+         and averages them over all queries in the datasets.
         :param predictions: predicted labels
         :param labels: ground truth labels.
         :param k: considers only the subset of recommendations from rank 1 through k
         :param kwargs: any other necessary params
         :return: Mean Average Precision@K score.
         """
-        return average_precision_score(labels, predictions)
+        return average_precision_score(references, predictions)
 
     def _info(self) -> datasets.MetricInfo:
         """

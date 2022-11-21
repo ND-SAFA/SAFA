@@ -1,5 +1,5 @@
 from test.base_test import BaseTest
-from tracer.pre_processing.replace_words_step import ReplaceWordsStep
+from tracer.pre_processing.steps.replace_words_step import ReplaceWordsStep
 
 
 class TestReplaceWordsStep(BaseTest):

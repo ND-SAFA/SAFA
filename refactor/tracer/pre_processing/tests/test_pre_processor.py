@@ -1,18 +1,18 @@
 from copy import deepcopy
 
 from test.base_test import BaseTest
-from tracer.pre_processing.pre_processing_option import PreProcessingOption
+from tracer.pre_processing.pre_processing_steps import PreProcessingSteps
 from tracer.pre_processing.pre_processor import PreProcessor
-from tracer.pre_processing.replace_words_step import ReplaceWordsStep
+from tracer.pre_processing.steps.replace_words_step import ReplaceWordsStep
 
 
 class TestPreProcessor(BaseTest):
     TEST_OPTIONS, TEST_PARAMS = BaseTest.PRE_PROCESSING_PARAMS
     TEST_ARTIFACT_CONTENTS = ["This is 1.0 of 2.0 testCases!", "This i$ the other_one"]
     EXPECTED_CONTENTS = ["Esta is 10 of 20 test Cases", "Esta the other uno"]
-    BEFORE_STEP = PreProcessingOption.REPLACE_WORDS
-    FIRST_STEP = PreProcessingOption.SEPARATE_JOINED_WORDS
-    LAST_STEP = PreProcessingOption.FILTER_MIN_LENGTH
+    BEFORE_STEP = PreProcessingSteps.REPLACE_WORDS
+    FIRST_STEP = PreProcessingSteps.SEPARATE_JOINED_WORDS
+    LAST_STEP = PreProcessingSteps.FILTER_MIN_LENGTH
 
     def test_get_ordered_steps(self):
         before_steps, regular_steps = PreProcessor._get_ordered_steps(self.TEST_OPTIONS, **self.TEST_PARAMS)
@@ -26,8 +26,8 @@ class TestPreProcessor(BaseTest):
         self.assertIsInstance(regular_steps[len(regular_steps) - 1], self.LAST_STEP.value)
 
     def test_order_steps(self):
-        steps = [PreProcessingOption.SHUFFLE_WORDS.value(), PreProcessingOption.SEPARATE_JOINED_WORDS.value(),
-                 PreProcessingOption.REMOVE_UNWANTED_CHARS.value()]
+        steps = [PreProcessingSteps.SHUFFLE_WORDS.value(), PreProcessingSteps.SEPARATE_JOINED_WORDS.value(),
+                 PreProcessingSteps.REMOVE_UNWANTED_CHARS.value()]
         expected_order = [1, 2, 0]
         ordered_steps = PreProcessor._order_steps(steps)
         for i, step in enumerate(ordered_steps):
@@ -36,7 +36,8 @@ class TestPreProcessor(BaseTest):
 
     def test_get_step_params(self):
         key, val = deepcopy(self.TEST_PARAMS).popitem()
-        step_params = PreProcessor._get_step_params(ReplaceWordsStep, word_replace_mappings=self.TEST_PARAMS["word_replace_mappings"])
+        step_params = PreProcessor._get_step_params(ReplaceWordsStep,
+                                                    word_replace_mappings=self.TEST_PARAMS["word_replace_mappings"])
         self.assertIn(key, step_params)
         self.assertEqual(step_params[key], val)
 

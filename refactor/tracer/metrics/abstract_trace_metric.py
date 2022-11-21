@@ -1,9 +1,14 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 
 import datasets
+from datasets import MetricInfo
 
 
 class AbstractTraceMetric(datasets.Metric, ABC):
+
+    @abstractmethod
+    def _info(self) -> MetricInfo:
+        pass
 
     def get_features(self) -> datasets.Features:
         """

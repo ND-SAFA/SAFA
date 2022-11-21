@@ -2,12 +2,12 @@ import inspect
 from enum import Enum
 from typing import Type
 
-from datasets import list_metrics, Metric
+from datasets import Metric, list_metrics
 
-from tracer.metrics.mrr_metric import MRRMetric
-from tracer.metrics.precision_at_k_metric import PrecisionAtKMetric
 from tracer.metrics.abstract_trace_metric import AbstractTraceMetric
 from tracer.metrics.map_at_k_metric import MapAtKMetric
+from tracer.metrics.mrr_metric import MRRMetric
+from tracer.metrics.precision_at_k_metric import PrecisionAtKMetric
 
 metric_suffix = "Metric"
 
@@ -41,7 +41,7 @@ def get_metric_name(metric_class: Metric) -> str:
     :param metric_class: the class of the metric
     :return: the name
     """
-    name = metric_class.__class__.__name__
+    name = metric_class.name
     return name.split(metric_suffix)[0].lower()
 
 

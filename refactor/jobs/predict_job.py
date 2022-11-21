@@ -10,4 +10,4 @@ class PredictJob(AbstractTraceJob):
         Performs predictions and (optionally) evaluation of model
         :return: results of the prediction including prediction values and associated ids
         """
-        return self.get_trainer().perform_prediction(self.eval_dataset)
+        return self.get_trainer().perform_prediction()

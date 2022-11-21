@@ -1,97 +1,45 @@
-import json
+import os
+from unittest import mock
+from unittest.mock import patch
 
-import mock
-import numpy as np
-from mock import patch
-
-from api.responses import BaseResponse
-from jobs.job_status import Status
-from jobs.trace_args_builder import TraceArgsBuilder
+from config.override import overrides
+from jobs.job_args import JobArgs
 from jobs.train_job import TrainJob
-from models.model_generator import ModelGenerator
-from test.base_test import BaseTest
-from test.config.paths import TEST_OUTPUT_DIR
-from train.trace_trainer import TraceTrainer
+from test.base_job_test import BaseJobTest
+from test.paths.paths import TEST_DATA_DIR
+from tracer.datasets.creators.supported_dataset_creator import SupportedDatasetCreator
+from tracer.datasets.dataset_role import DatasetRole
+from tracer.train.trace_trainer import TraceTrainer
 
 
-class TestTrainJob(BaseTest):
-    TEST_OUTPUT = {'global_step': 3, 'training_loss': 0.6927204132080078,
-                   'metrics': {'train_runtime': 0.1516, 'train_samples_per_second': 79.13,
-                               'train_steps_per_second': 19.782, 'train_loss': 0.6927204132080078, 'epoch': 3.0},
-                   'status': 0}
+class TestTrainJob(BaseJobTest):
+    CSV_DATA_DIR = os.path.join(TEST_DATA_DIR, "csv")
+    CSV_DATA_FILE = os.path.join(CSV_DATA_DIR, "test_csv_data.csv")
 
     @patch.object(TraceTrainer, "save_model")
-    @patch.object(ModelGenerator, '_ModelGenerator__load_model')
-    @patch.object(ModelGenerator, 'get_tokenizer')
-    def test_run_full(self, get_tokenizer_mock: mock.MagicMock, load_model_mock: mock.MagicMock,
-                      save_model_mock: mock.MagicMock):
-        load_model_mock.return_value = self.get_test_model()
-        get_tokenizer_mock.return_value = self.get_test_tokenizer()
-        test_train_job = self.get_test_train_job()
-        test_train_job.run()
-        output_file_path = self.get_expected_output_path(test_train_job.id) + "/" + TrainJob.OUTPUT_FILENAME
-        with open(output_file_path, "r") as outfile:
-            lines = outfile.readlines()
-        json_str = "".join(lines)
-        self.output_test_success(json_str)
+    def test_run_success(self, save_model_mock: mock.MagicMock):
+        self._test_run_success()
 
-    @patch("trace.train.trace_trainer.TraceTrainer.perform_training")
-    @patch.object(ModelGenerator, "get_model")
-    @patch.object(ModelGenerator, "get_tokenizer")
-    @patch.object(TrainJob, "_save")
-    def test_run_success(self, save_mock: mock.MagicMock, get_tokenizer_mock: mock.MagicMock,
-                         get_model_mock: mock.MagicMock, perform_training_mock: mock.MagicMock):
-        get_model_mock.return_value = self.get_test_model()
-        get_tokenizer_mock.return_value = self.get_test_tokenizer()
-        save_mock.side_effect = self.output_test_success
-        perform_training_mock.return_value = self.TEST_OUTPUT
-        test_train_job = self.get_test_train_job()
-        test_train_job.run()
-        self.assertTrue(perform_training_mock.called)
+    def test_run_failure(self):
+        self._test_run_failure()
 
-    @patch("trace.train.trace_trainer.TraceTrainer.perform_training")
-    @patch.object(ModelGenerator, "get_model")
-    @patch.object(ModelGenerator, "get_tokenizer")
-    @patch.object(TrainJob, "_save")
-    def test_run_failure(self, save_mock: mock.MagicMock, get_tokenizer_mock: mock.MagicMock,
-                         get_model_mock: mock.MagicMock, perform_training_mock: mock.MagicMock):
-        save_mock.side_effect = self.output_test_failure
-        perform_training_mock.return_value = ValueError()
-        get_model_mock.return_value = self.get_test_model()
-        get_tokenizer_mock.return_value = self.get_test_tokenizer()
-        test_train_job = self.get_test_train_job()
-        test_train_job.run()
-        self.assertTrue(perform_training_mock.called)
+    def test_split_train_dataset(self):
+        job = self._get_job()
+        self.assertTrue(job.trace_args.trainer_dataset_container.eval_dataset is not None)
 
-    @patch.object(ModelGenerator, "get_tokenizer")
-    @patch.object(ModelGenerator, "get_model")
-    def get_test_train_job(self, get_model_mock: mock.MagicMock, get_tokenizer_mock: mock.MagicMock):
-        get_model_mock.return_value = self.get_test_model()
-        get_tokenizer_mock.return_value = self.get_test_tokenizer()
-        arg_builder = TraceArgsBuilder(**self.get_test_params())
-        return TrainJob(arg_builder)
+    @staticmethod
+    @overrides(BaseJobTest)
+    def create_dataset_map(dataset_role: DatasetRole, include_links=True):
+        train_dataset = BaseJobTest.create_dataset_map(DatasetRole.TRAIN)
+        test_dataset = {DatasetRole.EVAL: (SupportedDatasetCreator.CSV, {"data_file_path": TestTrainJob.CSV_DATA_FILE})}
+        return {**train_dataset, **test_dataset}
 
-    def output_test_success(self, output: str):
-        output_dict = json.loads(output)
-        for key, value in self.TEST_OUTPUT.items():
-            self.assertIn(key, output_dict)
-            expected_value = value.tolist() if isinstance(value, np.ndarray) else value
-            if isinstance(expected_value, list):
-                for i, ele in enumerate(output_dict[key]):
-                    if isinstance(ele, list):
-                        if isinstance(ele[0], float):
-                            for j, x in enumerate(ele):
-                                self.assertLessEqual(abs(x - expected_value[i][j]), 0.05)
-                            continue
-                    self.assertEquals(ele, expected_value[i])
-        self.assertIn(BaseResponse.STATUS, output_dict)
-        self.assertEquals(output_dict[BaseResponse.STATUS], Status.SUCCESS)
+    def _assert_success(self, output_dict: dict):
+        self.assert_training_output_matches_expected(output_dict)
 
-    def output_test_failure(self, output):
-        output_dict = json.loads(output)
-        self.assertIn(BaseResponse.EXCEPTION, output_dict)
-        self.assertIn(BaseResponse.STATUS, output_dict)
-        self.assertEquals(output_dict[BaseResponse.STATUS], Status.FAILURE)
-
-    def get_expected_output_path(self, train_job_id):
-        return TEST_OUTPUT_DIR + "/" + str(train_job_id)
+    def _get_job(self) -> TrainJob:
+        test_params = self.get_test_params_for_trace(dataset_role=DatasetRole.TRAIN, include_links=True, split_train_dataset=True)
+        job_args = JobArgs(**test_params)
+        job = TrainJob(job_args)
+        self.assertEquals(job.trace_args.num_train_epochs, 1)
+        return job

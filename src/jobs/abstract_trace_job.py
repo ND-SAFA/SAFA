@@ -1,21 +1,29 @@
 from abc import ABC
 
-from jobs.abstract_args_builder import AbstractArgsBuilder
 from jobs.abstract_job import AbstractJob
-from train.trace_trainer import TraceTrainer
+from jobs.job_args import JobArgs
+from server.storage.safa_storage import SafaStorage
+from tracer.train.trace_trainer import TraceTrainer
 
 
 class AbstractTraceJob(AbstractJob, ABC):
 
-    def __init__(self, args_builder: AbstractArgsBuilder):
+    def __init__(self, job_args: JobArgs):
         """
-        Base job for task using a model (i.e. training, prediction, evaluation...)
-        :param args_builder: arguments used for configuring the model
+        The base job class for tracing jobs
         """
-        super().__init__(args_builder)
-        self.__trainer = None
+        job_args.model_path = SafaStorage.add_mount_directory(job_args.model_path)
+        super().__init__(job_args)
+        self.trace_args = job_args.trace_args
+        self._trainer = None
 
     def get_trainer(self, **kwargs) -> TraceTrainer:
-        if self.__trainer is None:
-            self.__trainer = TraceTrainer(args=self.args, **kwargs)
-        return self.__trainer
+        """
+        Gets the trace trainer for the job
+        :param kwargs: any additional parameters for the trainer
+        :return: the trainer
+        """
+        if self._trainer is None:
+            self._trainer = TraceTrainer(args=self.job_args.trace_args, model_generator=self.get_model_generator(),
+                                         **kwargs)
+        return self._trainer

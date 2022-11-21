@@ -68,11 +68,9 @@ export async function handleApproveLink(
   link: TraceLinkModel,
   { onSuccess, onError, onComplete }: IOHandlerCallback
 ): Promise<void> {
-  const currentStatus = link.approvalStatus;
-
   linkAPIHandler(link, updateApprovedLink, {
-    onSuccess: () => {
-      traceStore.addOrUpdateTraceLinks([link]);
+    onSuccess: (updatedLinks) => {
+      traceStore.addOrUpdateTraceLinks(updatedLinks);
       approvalStore.approveLink(link);
       logStore.onSuccess(
         `Link has been approved: ${link.sourceName} -> ${link.targetName}`
@@ -80,7 +78,6 @@ export async function handleApproveLink(
       onSuccess?.();
     },
     onError: (e) => {
-      link.approvalStatus = currentStatus;
       logStore.onError(
         `Unable to approve link: ${link.sourceName} -> ${link.targetName}`
       );
@@ -102,11 +99,9 @@ export async function handleDeclineLink(
   link: TraceLinkModel,
   { onSuccess, onError, onComplete }: IOHandlerCallback
 ): Promise<void> {
-  const currentStatus = link.approvalStatus;
-
   linkAPIHandler(link, updateDeclinedLink, {
-    onSuccess: () => {
-      traceStore.deleteTraceLinks([link]);
+    onSuccess: (updatedLinks) => {
+      traceStore.deleteTraceLinks(updatedLinks);
       approvalStore.declineLink(link);
       logStore.onSuccess(
         `Link has been removed: ${link.sourceName} -> ${link.targetName}`
@@ -114,7 +109,6 @@ export async function handleDeclineLink(
       onSuccess?.();
     },
     onError: (e) => {
-      link.approvalStatus = currentStatus;
       logStore.onError(
         `Unable to decline link: ${link.sourceName} -> ${link.targetName}`
       );
@@ -170,18 +164,16 @@ export async function handleUnreviewLink(
   link: TraceLinkModel,
   { onSuccess, onError, onComplete }: IOHandlerCallback
 ): Promise<void> {
-  const currentStatus = link.approvalStatus;
-
   linkAPIHandler(link, updateUnreviewedLink, {
-    onSuccess: () => {
+    onSuccess: (updatedLinks) => {
       approvalStore.resetLink(link);
+      traceStore.addOrUpdateTraceLinks(updatedLinks);
       logStore.onSuccess(
         `Link has been reset: ${link.sourceName} -> ${link.targetName}`
       );
       onSuccess?.();
     },
     onError: (e) => {
-      link.approvalStatus = currentStatus;
       logStore.onError(
         `Unable to reset link: ${link.sourceName} -> ${link.targetName}`
       );
@@ -189,6 +181,33 @@ export async function handleUnreviewLink(
     },
     onComplete,
   });
+}
+
+/**
+ * Deletes a trace link after confirmation.
+ *
+ * @param link - The trace link to delete.
+ * @param onSuccess - Called if the action is successful.
+ * @param onError - Called if the action fails.
+ * @param onComplete - Called after the action.
+ */
+export async function handleDeleteLink(
+  link: TraceLinkModel,
+  { onSuccess, onError, onComplete }: IOHandlerCallback
+): Promise<void> {
+  logStore.confirm(
+    "Delete Trace Link",
+    `Are you sure you want to delete "${link.sourceName} -> ${link.targetName}"?`,
+    async (confirmed) => {
+      if (!confirmed) return;
+
+      await handleDeclineLink(link, {
+        onSuccess,
+        onError,
+        onComplete,
+      });
+    }
+  );
 }
 
 /**
@@ -203,11 +222,11 @@ export async function handleUnreviewLink(
 function linkAPIHandler(
   link: TraceLinkModel,
   linkAPI: (traceLink: TraceLinkModel) => Promise<TraceLinkModel[]>,
-  { onSuccess, onError, onComplete }: IOHandlerCallback
+  { onSuccess, onError, onComplete }: IOHandlerCallback<TraceLinkModel[]>
 ): void {
   appStore.onLoadStart();
   linkAPI(link)
-    .then(() => onSuccess?.())
+    .then((updatedLinks) => onSuccess?.(updatedLinks))
     .catch((e) => onError?.(e))
     .finally(() => {
       appStore.onLoadEnd();

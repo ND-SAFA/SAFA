@@ -1,5 +1,5 @@
 import { ArtifactModel, IOHandlerCallback } from "@/types";
-import { artifactStore, logStore, projectStore } from "@/hooks";
+import { artifactStore, logStore, projectStore, traceStore } from "@/hooks";
 import {
   createArtifact,
   deleteArtifact,
@@ -97,9 +97,15 @@ export function handleDeleteArtifact(
     async (isConfirmed: boolean) => {
       if (!isConfirmed) return;
 
-      deleteArtifact(artifact)
+      const relatedTraces = traceStore.allTraces.filter(
+        ({ sourceId, targetId }) =>
+          sourceId === artifact.id || targetId === artifact.id
+      );
+
+      deleteArtifact(artifact, relatedTraces)
         .then(() => {
           artifactStore.deleteArtifacts([artifact]);
+          traceStore.deleteTraceLinks(relatedTraces);
           logStore.onSuccess(`Deleted artifact: ${artifact.name}`);
           onSuccess?.();
         })

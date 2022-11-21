@@ -1,4 +1,4 @@
-import { DataCy, validUser } from "../../fixtures";
+import { DataCy } from "../../fixtures";
 
 describe("Artifact Table Display", () => {
   before(() => {

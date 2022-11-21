@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 
 import {
   CreatorOpenState,
-  GeneratorOpenState,
+  DetailsOpenState,
   PanelStateMap,
   PanelType,
 } from "@/types";
@@ -31,28 +31,25 @@ export const useApp = defineStore("app", {
      * The open state for each type of panel.
      */
     isOpen: {
-      [PanelType.left]: false,
-      [PanelType.right]: false,
+      [PanelType.appPanel]: true,
+      [PanelType.detailsPanel]: false,
       [PanelType.artifactCreator]: false,
       [PanelType.errorDisplay]: false,
-      [PanelType.artifactBody]: false,
-      [PanelType.traceLinkCreator]: false,
       [PanelType.traceLinkDraw]: false,
-      [PanelType.traceLinkGenerator]: false,
     } as PanelStateMap,
   }),
   getters: {
     /**
-     * @return Whether the left panel is open.
+     * @return Whether the left app panel is open.
      */
-    isLeftPanelOpen(): boolean {
-      return this.isOpen[PanelType.left];
+    isAppPanelOpen(): boolean {
+      return this.isOpen[PanelType.appPanel];
     },
     /**
-     * @return Whether the right panel is open.
+     * @return Whether the right details panel is open.
      */
-    isRightPanelOpen(): boolean {
-      return this.isOpen[PanelType.right];
+    isDetailsPanelOpen(): DetailsOpenState {
+      return this.isOpen[PanelType.detailsPanel];
     },
     /**
      * @return Whether the artifact creator is open.
@@ -65,24 +62,6 @@ export const useApp = defineStore("app", {
      */
     isErrorDisplayOpen(): boolean {
       return this.isOpen[PanelType.errorDisplay];
-    },
-    /**
-     * @return Whether the artifact body is open.
-     */
-    isArtifactBodyOpen(): boolean {
-      return this.isOpen[PanelType.artifactBody];
-    },
-    /**
-     * @return Whether the trace link creator is open.
-     */
-    isTraceLinkCreatorOpen(): boolean {
-      return this.isOpen[PanelType.traceLinkCreator];
-    },
-    /**
-     * @return Whether the trace link creator is open.
-     */
-    isTraceLinkGeneratorOpen(): GeneratorOpenState {
-      return this.isOpen[PanelType.traceLinkGenerator];
     },
     /**
      * @return Whether trace link drawing is enabled.
@@ -131,21 +110,15 @@ export const useApp = defineStore("app", {
     /**
      * Toggles whether the right panel is open.
      */
-    toggleRightPanel(): void {
-      this.togglePanel(PanelType.right);
-    },
-    /**
-     * Toggles whether the left panel is open.
-     */
-    toggleLeftPanel(): void {
-      this.togglePanel(PanelType.left);
+    toggleAppPanel(): void {
+      this.togglePanel(PanelType.appPanel);
     },
     /**
      * Closes the side panels.
      */
     closeSidePanels(): void {
-      this.closePanel(PanelType.left);
-      this.closePanel(PanelType.right);
+      this.closePanel(PanelType.detailsPanel);
+      this.closePanel(PanelType.artifactCreator);
     },
     /**
      * Closes the side panels.
@@ -154,28 +127,12 @@ export const useApp = defineStore("app", {
       this.togglePanel(PanelType.errorDisplay);
     },
     /**
-     * Toggles whether the artifact body modal is open.
+     * Opens the details panel.
+     * @param state - The type of content to open.
      */
-    toggleArtifactBody(): void {
-      this.togglePanel(PanelType.artifactBody);
-    },
-    /**
-     * Toggles whether the trace link creator is open.
-     */
-    toggleTraceLinkCreator(): void {
-      this.togglePanel(PanelType.traceLinkCreator);
-    },
-    /**
-     * Opens the trace link generator.
-     */
-    openTraceLinkGenerator(state: GeneratorOpenState): void {
-      this.isOpen[PanelType.traceLinkGenerator] = state;
-    },
-    /**
-     * Toggles whether the trace link generator is open.
-     */
-    closeTraceLinkGenerator(): void {
-      this.closePanel(PanelType.traceLinkGenerator);
+    openDetailsPanel(state: DetailsOpenState): void {
+      this.isOpen[PanelType.detailsPanel] = state;
+      this.isOpen[PanelType.appPanel] = false;
     },
     /**
      * Enables the draw link mode.
@@ -203,12 +160,7 @@ export const useApp = defineStore("app", {
       if (isNewArtifact) selectionStore.clearSelections();
 
       this.isOpen[PanelType.artifactCreator] = type || true;
-    },
-    /**
-     * Closes the artifact creator.
-     */
-    closeArtifactCreator(): void {
-      this.closePanel(PanelType.artifactCreator);
+      this.openDetailsPanel("saveArtifact");
     },
     /**
      * Enqueues a new update to be loaded when the user is ready.

@@ -2,7 +2,7 @@ import Vue from "vue";
 import VueRouter, { NavigationGuardNext, Route, RouteConfig } from "vue-router";
 import { routerChecks } from "@/router/checks";
 import {
-  ApproveLinksView,
+  TracePredictionView,
   ArtifactView,
   CreateAccountView,
   ErrorPageView,
@@ -14,7 +14,7 @@ import {
   UploadStatusView,
   HomeView,
   MyAccountView,
-  ProjectModelsView,
+  ProjectSelectorView,
 } from "@/views";
 import { Routes } from "./routes";
 
@@ -50,34 +50,34 @@ const routes: Array<RouteConfig> = [
     component: HomeView,
   },
   {
+    path: Routes.PROJECT_CREATOR,
+    name: "Create Project",
+    component: ProjectCreatorView,
+  },
+  {
+    path: Routes.MY_PROJECTS,
+    name: "My Projects",
+    component: ProjectSelectorView,
+  },
+  {
     path: Routes.ACCOUNT,
     name: "My Account",
     component: MyAccountView,
   },
   {
     path: Routes.ARTIFACT,
-    name: "Project",
+    name: "Artifact View",
     component: ArtifactView,
   },
   {
     path: Routes.TRACE_LINK,
-    name: "Trace Links",
-    component: ApproveLinksView,
-  },
-  {
-    path: Routes.PROJECT_CREATOR,
-    name: "Project Creator",
-    component: ProjectCreatorView,
+    name: "Trace Prediction",
+    component: TracePredictionView,
   },
   {
     path: Routes.PROJECT_SETTINGS,
     name: "Project Settings",
     component: ProjectSettingsView,
-  },
-  {
-    path: Routes.PROJECT_MODELS,
-    name: "Project Models",
-    component: ProjectModelsView,
   },
   {
     path: Routes.ERROR,

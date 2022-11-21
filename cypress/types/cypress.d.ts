@@ -352,6 +352,19 @@ declare namespace Cypress {
     loadCurrentProject(waitForNodes?: boolean): Chainable<void>;
 
     /**
+     * Centers the graph.
+     */
+    centerGraph(): Chainable<void>;
+
+    /**
+     * Selects an artifact on the graph.
+     * @param name - The artifact name to select.
+     */
+    selectArtifact(name: string): Chainable<void>;
+
+    // Artifact Table
+
+    /**
      * Switches to table view.
      */
     switchToTableView(): Chainable<void>;
@@ -367,37 +380,6 @@ declare namespace Cypress {
      * @param sortType - The type of sort to use.
      */
     artifactTableChangeSort(sortType: string): Chainable<void>;
-
-    /**
-     * Adds a new artifact to the table view.
-     *
-     * @param name - The name of the artifact to add.
-     * @param type - The type of the artifact to add.
-     * @param docType - The document type of the artifact to add.
-     * @param parentArtifact - The parent type of the artifact to add.
-     * @param body - The body of the artifact to add.
-     * @param summary - The summary of the artifact to add.
-     */
-    addTableArtifact(
-      name: string,
-      type: string,
-      docType: string,
-      parentArtifact: string,
-      body: string,
-      summary: string
-    ): Chainable<void>;
-
-    /**
-     * Centers the graph.
-     */
-    centerGraph(): Chainable<void>;
-
-    /**
-     * Selects an artifact on the graph.
-     * @param name - The artifact name to select.
-     * @param selectType - The type of artifact lookup to use. Default to the nav bar.
-     */
-    selectArtifact(name: string, selectType?: "nav" | "panel"): Chainable<void>;
 
     // Project Documents
 
@@ -441,5 +423,35 @@ declare namespace Cypress {
      * The document modal must be open.
      */
     saveDocument(): Chainable<void>;
+
+    /**
+     * Uploads file containing trace links.
+     * @param file - Contains trace links.
+     */
+    uploadingTraceLinks(file: string): Chainable<void>;
+
+    /**
+     * Opens the project settings modal.
+     */
+    openProjectSettings(): Chainable<void>;
+
+    /**
+     * Adds New member into a project
+     * Must be in project settings.
+     * @param name - Input email of new member.
+     * @param projectRole - Input project role such as "owner", "Editor", "Viewer", "Admin"
+     */
+    projectAddNewMember(name: string, projectRole: string): Chainable<void>;
+
+    /**
+     * Navigates to the Approve Generated Trace Links page.
+     *
+     */
+    openApproveGeneratedTraceLinks(): Chainable<void>;
+    /**
+     * Loads in a new project with generated trace links.
+     *
+     */
+    loadNewGeneratedProject(): Chainable<void>;
   }
 }

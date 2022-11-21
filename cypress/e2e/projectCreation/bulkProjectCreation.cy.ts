@@ -7,13 +7,19 @@ import {
 } from "../../fixtures";
 
 describe("Bulk Project Creation", () => {
+  before(() => {
+    cy.dbResetJobs().dbResetProjects();
+  });
+
   beforeEach(() => {
-    cy.dbResetJobs();
-    cy.dbResetProjects();
+    cy.visit("/login")
+      .login(validUser.email, validUser.password)
+      .location("pathname", { timeout: 2000 })
+      .should("equal", "/");
 
-    cy.visit("/create?tab=bulk").login(validUser.email, validUser.password);
-
-    cy.location("pathname", { timeout: 2000 }).should("equal", "/create");
+    cy.visit("/create?tab=bulk")
+      .location("pathname", { timeout: 2000 })
+      .should("equal", "/create");
   });
 
   describe("I cannot create a project without a name", () => {
@@ -39,11 +45,7 @@ describe("Bulk Project Creation", () => {
     });
 
     it("Can create an empty project in the project selector", () => {
-      cy.openProjectSelector()
-        .getCy(DataCy.selectionModal)
-        .within(() => {
-          cy.clickButton(DataCy.selectorAddButton);
-        });
+      cy.openProjectSelector().clickButton(DataCy.selectorAddButton);
 
       cy.getCy(DataCy.projectEditModal).within(() => {
         cy.setProjectIdentifier("modal").clickButton(

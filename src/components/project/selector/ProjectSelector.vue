@@ -43,8 +43,7 @@ import {
   handleSaveProject,
 } from "@/api";
 import { GenericSelector } from "@/components/common";
-import { ProjectIdentifierModal } from "@/components/project/shared";
-import ConfirmProjectDelete from "./ConfirmProjectDelete.vue";
+import { ConfirmProjectDelete, ProjectIdentifierModal } from "../base";
 
 /**
  * Displays list of project available to current user and allows them to
@@ -64,7 +63,7 @@ export default Vue.extend({
   props: {
     /**
      * Whether this component is currently in view. If within
-     * a stepper then this is true when the this component is within the current step.
+     * a stepper then this is true when this component is on the current step.
      */
     isOpen: {
       type: Boolean,

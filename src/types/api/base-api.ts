@@ -10,14 +10,6 @@ export interface APIOptions {
 type APIMethods = "GET" | "POST" | "PUT" | "DELETE";
 
 /**
- * Defines a response from the API.
- */
-export interface APIResponse<T> {
-  status: number;
-  body: T;
-}
-
-/**
  * Defines a error response from the API.
  */
 export interface APIError {

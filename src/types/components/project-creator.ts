@@ -61,9 +61,8 @@ export type ArtifactUploader = IGenericUploader<
   ArtifactFile
 >;
 
-export enum CreatorTypes {
+export enum CreatorTabTypes {
   standard = "standard",
   bulk = "bulk",
-  jira = "jira",
-  github = "github",
+  import = "import",
 }

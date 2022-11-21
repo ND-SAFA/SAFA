@@ -5,15 +5,13 @@ Cypress.Commands.add("fillArtifactModal", ({ name, type, body, parent }) => {
   if (type === undefined) type = "Designs{downArrow}{enter}";
   if (body === undefined) body = "New Artifact";
 
-  cy.getCy(DataCy.artifactSaveModal).within(() => {
-    cy.inputText(DataCy.artifactSaveNameInput, name)
-      .inputText(DataCy.artifactSaveBodyInput, body)
-      .inputText(DataCy.artifactSaveTypeInput, type);
+  cy.inputText(DataCy.artifactSaveNameInput, name)
+    .inputText(DataCy.artifactSaveBodyInput, body)
+    .inputText(DataCy.artifactSaveTypeInput, type);
 
-    if (parent) {
-      cy.inputText(DataCy.artifactSaveParentInput, parent);
-    }
-  });
+  if (parent) {
+    cy.inputText(DataCy.artifactSaveParentInput, parent);
+  }
 });
 
 Cypress.Commands.add("createNewArtifact", (props) => {
@@ -23,18 +21,14 @@ Cypress.Commands.add("createNewArtifact", (props) => {
 });
 
 Cypress.Commands.add("saveArtifact", () => {
-  cy.getCy(DataCy.artifactSaveModal).within(() => {
-    cy.clickButton(DataCy.artifactSaveSubmitButton);
-  });
+  cy.clickButton(DataCy.artifactSaveSubmitButton);
 });
 
 Cypress.Commands.add("fillTraceLinkModal", (source = "", target = "") => {
-  cy.getCy(DataCy.traceSaveModal).within(() => {
-    cy.inputText(
-      DataCy.traceSaveSourceInput,
-      `${source}{downArrow}{enter}`
-    ).inputText(DataCy.traceSaveTargetInput, `${target}{downArrow}{enter}`);
-  });
+  cy.inputText(
+    DataCy.traceSaveSourceInput,
+    `${source}{downArrow}{enter}`
+  ).inputText(DataCy.traceSaveTargetInput, `${target}{downArrow}{enter}`);
 });
 
 Cypress.Commands.add("createNewTraceLink", (source = "", target = "") => {
@@ -44,7 +38,5 @@ Cypress.Commands.add("createNewTraceLink", (source = "", target = "") => {
 });
 
 Cypress.Commands.add("saveTraceLink", () => {
-  cy.getCy(DataCy.traceSaveModal).within(() => {
-    cy.clickButton(DataCy.traceSaveSubmitButton);
-  });
+  cy.clickButton(DataCy.traceSaveSubmitButton);
 });

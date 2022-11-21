@@ -1,4 +1,4 @@
-import { DataCy, validUser } from "../../fixtures";
+import { DataCy } from "../../fixtures";
 import "cypress-wait-until";
 
 describe("Artifact Table Row CRUD", () => {
@@ -13,63 +13,72 @@ describe("Artifact Table Row CRUD", () => {
 
   describe("I can add a row to the artifact table", () => {
     it("Adds an artifact to the table", () => {
-      cy.clickButton(DataCy.artifactTableAddContentButton);
-      cy.clickButton(DataCy.artifactTableAddArtifactButton);
-      cy.addTableArtifact(
-        "Test Artifact",
-        "Test Type",
-        "default",
-        "default",
-        "Test Body",
-        "Test Summary"
-      );
-      cy.waitUntil(function () {
-        return cy
-          .getCy(DataCy.artifactTableCreateArtifactSaveButton)
-          .should("not.be.visible");
-      });
-      cy.getCy(DataCy.artifactTableArtifact)
-        .last()
-        .contains("Test Artifact")
-        .should("exist");
+      const name = "Test Artifact";
+
+      cy.createNewArtifact({
+        name,
+      }).saveArtifact();
+
+      cy.getCy(DataCy.snackbarSuccess).should("be.visible");
+
+      cy.getCy(DataCy.artifactTableArtifact).contains(name).should("exist");
     });
   });
 
   describe("I can edit a row of the artifact table", () => {
-    it("Edits the test artifact in the table", () => {
+    it("Edits an artifact in the table", () => {
+      const name = `Test Artifact Edit`;
+      const newBody = "(Edited Body Content)";
+
+      cy.createNewArtifact({
+        name,
+      }).saveArtifact();
+
+      cy.getCy(DataCy.snackbarSuccess).should("be.visible");
+
       cy.getCy(DataCy.artifactTableArtifact)
-        .last()
-        .contains("Test Artifact")
-        .should("exist");
-      cy.getCy(DataCy.artifactTableEditArtifactRowButton).last().click();
-      cy.inputText(
-        DataCy.artifactTableCreateArtifactBodyInput,
-        " (Edited Body Content)"
-      );
-      cy.clickButton(DataCy.artifactTableCreateArtifactSaveButton);
-      cy.waitUntil(function () {
-        return cy
-          .getCy(DataCy.artifactTableCreateArtifactSaveButton)
-          .should("not.be.visible");
-      });
-      cy.getCy(DataCy.artifactTableArtifactPanelBody)
-        .contains("Test Body (Edited Body Content")
-        .should("exist");
+        .contains(name)
+        .click()
+        .parent()
+        .parent()
+        .parent()
+        .within(() => {
+          cy.getCy(DataCy.artifactTableEditArtifactRowButton).click();
+        });
+
+      cy.inputText(DataCy.artifactSaveBodyInput, newBody).saveArtifact();
+
+      cy.getCy(DataCy.snackbarSuccess).should("be.visible");
+
+      cy.getCy(DataCy.selectedPanelBody).contains(newBody).should("exist");
     });
   });
 
   describe("I can delete a row of the artifact table", () => {
     it("Deletes the test artifact in the table", () => {
+      const name = `Test Artifact Delete`;
+
+      cy.createNewArtifact({
+        name,
+      }).saveArtifact();
+
+      cy.getCy(DataCy.snackbarSuccess).should("be.visible");
+
       cy.getCy(DataCy.artifactTableArtifact)
-        .last()
-        .contains("Test Artifact")
-        .should("exist");
-      cy.getCy(DataCy.artifactTableDeleteArtifactRowButton).last().click();
-      cy.clickButton(DataCy.artifactTableArtifactDeleteIAcceptButton);
-      cy.getCy(DataCy.artifactTableArtifact)
-        .last()
-        .contains("Test Artifact")
-        .should("not.exist");
+        .contains(name)
+        .click()
+        .parent()
+        .parent()
+        .parent()
+        .within(() => {
+          cy.getCy(DataCy.artifactTableDeleteArtifactRowButton).click();
+        });
+
+      cy.clickButton(DataCy.confirmModalButton);
+
+      cy.getCy(DataCy.snackbarSuccess).should("be.visible");
+
+      cy.getCy(DataCy.artifactTableArtifact).contains(name).should("not.exist");
     });
   });
 

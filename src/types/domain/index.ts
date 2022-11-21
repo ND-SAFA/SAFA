@@ -9,3 +9,5 @@ export * from "./project";
 export * from "./links";
 export * from "./delta";
 export * from "./model";
+export * from "./attribute";
+export * from "./installations";

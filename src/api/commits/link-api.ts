@@ -66,7 +66,10 @@ export async function createModelTraining(
 export async function updateApprovedLink(
   traceLink: TraceLinkModel
 ): Promise<TraceLinkModel[]> {
-  traceLink.approvalStatus = ApprovalType.APPROVED;
+  traceLink = {
+    ...traceLink,
+    approvalStatus: ApprovalType.APPROVED,
+  };
 
   return CommitBuilder.withCurrentVersion()
     .withModifiedTraceLink(traceLink)
@@ -83,12 +86,15 @@ export async function updateApprovedLink(
 export async function updateDeclinedLink(
   traceLink: TraceLinkModel
 ): Promise<TraceLinkModel[]> {
-  traceLink.approvalStatus = ApprovalType.DECLINED;
+  traceLink = {
+    ...traceLink,
+    approvalStatus: ApprovalType.DECLINED,
+  };
 
   return CommitBuilder.withCurrentVersion()
     .withModifiedTraceLink(traceLink)
     .save()
-    .then(async ({ traces }) => traces.removed);
+    .then(async ({ traces }) => traces.modified);
 }
 
 /**
@@ -100,12 +106,15 @@ export async function updateDeclinedLink(
 export async function updateDeclinedLinks(
   traceLinks: TraceLinkModel[]
 ): Promise<TraceLinkModel[]> {
-  traceLinks.map((link) => (link.approvalStatus = ApprovalType.DECLINED));
+  traceLinks = traceLinks.map((link) => ({
+    ...link,
+    approvalStatus: ApprovalType.DECLINED,
+  }));
 
   return CommitBuilder.withCurrentVersion()
     .withModifiedTraceLinks(traceLinks)
     .save()
-    .then(async ({ traces }) => traces.removed);
+    .then(async ({ traces }) => traces.modified);
 }
 
 /**
@@ -117,7 +126,10 @@ export async function updateDeclinedLinks(
 export async function updateUnreviewedLink(
   traceLink: TraceLinkModel
 ): Promise<TraceLinkModel[]> {
-  traceLink.approvalStatus = ApprovalType.UNREVIEWED;
+  traceLink = {
+    ...traceLink,
+    approvalStatus: ApprovalType.UNREVIEWED,
+  };
 
   return CommitBuilder.withCurrentVersion()
     .withModifiedTraceLink(traceLink)
@@ -134,7 +146,10 @@ export async function updateUnreviewedLink(
 export async function createLink(
   traceLink: TraceLinkModel
 ): Promise<TraceLinkModel[]> {
-  traceLink.approvalStatus = ApprovalType.APPROVED;
+  traceLink = {
+    ...traceLink,
+    approvalStatus: ApprovalType.APPROVED,
+  };
 
   return CommitBuilder.withCurrentVersion()
     .withNewTraceLink(traceLink)

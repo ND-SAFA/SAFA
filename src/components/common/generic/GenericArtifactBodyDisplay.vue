@@ -1,11 +1,11 @@
 <template>
   <v-list-item-content style="max-width: 500px">
     <v-list-item-title v-if="!!displayTitle">
-      <flex-box align="center">
-        <typography r="2" :value="artifact.name" />
-        <typography variant="caption" :value="artifactType" />
+      <flex-box align="center" justify="space-between">
+        <typography :value="artifact.name" />
+        <attribute-chip artifact-type :value="artifactType" />
       </flex-box>
-      <v-divider v-if="!!displayDivider" />
+      <v-divider class="mt-1" v-if="!!displayDivider" />
     </v-list-item-title>
     <v-list-item-subtitle>
       <typography
@@ -23,13 +23,14 @@ import Vue, { PropType } from "vue";
 import { ArtifactModel } from "@/types";
 import { typeOptionsStore } from "@/hooks";
 import { Typography, FlexBox } from "@/components/common/display";
+import AttributeChip from "@/components/common/display/AttributeChip.vue";
 
 /**
  * Displays the body of an artifact that can be expanded.
  */
 export default Vue.extend({
   name: "GenericArtifactBodyDisplay",
-  components: { FlexBox, Typography },
+  components: { AttributeChip, FlexBox, Typography },
   props: {
     artifact: {
       type: Object as PropType<ArtifactModel>,

@@ -4,7 +4,6 @@
     :timeout="timeout"
     :color="messageColor"
     bottom
-    left
     outlined
   >
     <flex-box

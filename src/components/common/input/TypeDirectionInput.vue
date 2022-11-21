@@ -2,7 +2,7 @@
   <div>
     <span class="mt-1">
       <typography bold color="primary" :value="entry.label" />
-      <typography secondary value="Traces To" />
+      <typography secondary value="Traces To:" />
     </span>
     <v-chip-group column>
       <v-chip

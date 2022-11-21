@@ -1,11 +1,6 @@
 import { defineStore } from "pinia";
 
-import {
-  ArtifactModel,
-  FilterAction,
-  PanelType,
-  TraceLinkModel,
-} from "@/types";
+import { ArtifactModel, FilterAction, TraceLinkModel } from "@/types";
 import {
   artifactTreeCyPromise,
   cyCenterOnArtifacts,
@@ -86,7 +81,8 @@ export const useSelection = defineStore("selection", {
       this.selectedSubtreeIds = [];
       this.selectedGroupIds = [];
       this.selectedArtifactId = "";
-      appStore.closePanel(PanelType.left);
+      this.selectedTraceLinkId = "";
+      appStore.closeSidePanels();
     },
     /**
      * Sets the viewport to the given artifact and its subtree.
@@ -136,9 +132,18 @@ export const useSelection = defineStore("selection", {
      */
     selectArtifact(artifactId: string): void {
       this.selectedArtifactId = artifactId;
-
-      appStore.openPanel(PanelType.left);
       this.centerOnArtifacts([artifactId]);
+      appStore.openDetailsPanel("displayArtifact");
+    },
+    /**
+     * Sets the given trace links as selected.
+     *
+     * @param traceLink - The trace link to select.
+     */
+    selectTraceLink(traceLink: TraceLinkModel): void {
+      this.selectedTraceLinkId = traceLink.traceLinkId;
+      this.selectedSubtreeIds = [traceLink.sourceId, traceLink.targetId];
+      appStore.openDetailsPanel("displayTrace");
     },
     /**
      * Sets the given artifact as selected if it is not already,

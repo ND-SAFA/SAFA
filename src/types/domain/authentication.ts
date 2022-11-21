@@ -48,10 +48,6 @@ export interface UserResetModel {
    * The user's email.
    */
   email: string;
-  /**
-   * Leave this blank.
-   */
-  userId: string;
 }
 
 /**
@@ -80,18 +76,4 @@ export interface PasswordChangeModel {
    * The new password to set.
    */
   newPassword: string;
-}
-
-/**
- * Defines the decoded object of an authorization JWT token
- */
-export interface AuthToken {
-  /**
-   * The identifier (email) of the subscriber.
-   */
-  sub: string;
-  /**
-   * Expiration date in number of seconds since epoch.
-   */
-  exp: number;
 }

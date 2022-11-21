@@ -3,8 +3,9 @@ import {
   IdentifierModel,
   MembershipModel,
   ProjectModel,
-  TrainedModel,
+  GenerationModel,
   VersionModel,
+  InstallationModel,
 } from "@/types";
 import { createProject, removeMatches } from "@/util";
 import { pinia } from "@/plugins";
@@ -29,6 +30,10 @@ export const useProject = defineStore("project", {
      * The currently loaded project.
      */
     project: createProject(),
+    /**
+     * The 3rd party installations linked to the current project.
+     */
+    installations: [] as InstallationModel[],
   }),
   getters: {
     /**
@@ -74,7 +79,7 @@ export const useProject = defineStore("project", {
     /**
      * @return The current project's models.
      */
-    models(): TrainedModel[] {
+    models(): GenerationModel[] {
       return this.project.models;
     },
     /**

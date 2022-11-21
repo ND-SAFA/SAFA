@@ -28,7 +28,7 @@ describe("Authentication", () => {
       it("logs in successfully with validUser credentials", () => {
         cy.login(validUser.email, validUser.password);
 
-        cy.getCy(DataCy.accountDropdown).should("exist");
+        cy.getCy(DataCy.isLoggedIn).should("exist");
       });
 
       it("fails to log in with invalidUser credentials", () => {
@@ -37,7 +37,7 @@ describe("Authentication", () => {
           invalidUser.password
         );
 
-        cy.getCy(DataCy.accountDropdown).should("not.exist");
+        cy.getCy(DataCy.isLoggedIn).should("not.exist");
       });
 
       it("wont let you log in without both an email and password", () => {

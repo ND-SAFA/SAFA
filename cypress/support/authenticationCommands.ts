@@ -7,7 +7,12 @@ Cypress.Commands.add("login", (email, password) => {
 });
 
 Cypress.Commands.add("logout", () => {
-  cy.getCy(DataCy.accountDropdown).click().clickButton("button-logout");
+  cy.wait(1000)
+    .getCy(DataCy.accountPage)
+    .click()
+    .location("pathname", { timeout: 2000 })
+    .should("equal", "/account")
+    .clickButton(DataCy.logoutButton);
 });
 
 Cypress.Commands.add("createNewAccount", (email, password) => {

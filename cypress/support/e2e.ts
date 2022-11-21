@@ -7,3 +7,5 @@ import "./artifactViewCommands";
 import "./artifactTreeCommands";
 import "./artifactTableCommands";
 import "./projectDocumentCommands";
+import "./projectSettingCommands";
+import "./traceLinkGenerationCommands";

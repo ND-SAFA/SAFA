@@ -2,13 +2,17 @@ import {
   ApprovalType,
   ArtifactDeltaState,
   ColumnDataType,
+  CreatorTabTypes,
   DocumentType,
   FTANodeType,
   ModelShareType,
+  ModelTabTypes,
   ModelType,
   ProjectRole,
   SafetyCaseType,
   SelectOption,
+  SettingsTabTypes,
+  TracePredictionTabTypes,
 } from "@/types";
 import { enumToDisplay } from "@/util/string-helper";
 
@@ -179,5 +183,57 @@ export function modelShareOptions(): SelectOption[] {
   return [
     createEnumOption(ModelShareType.CLONE, "Clone the model"),
     createEnumOption(ModelShareType.REUSE, "Reuse the same model"),
+  ];
+}
+
+/**
+ * Returns display names for project creator tabs.
+ *
+ * @return The select option names and ids.
+ */
+export function creatorTabOptions(): SelectOption[] {
+  return [
+    createEnumOption(CreatorTabTypes.standard, "Standard Upload"),
+    createEnumOption(CreatorTabTypes.bulk, "Bulk Upload"),
+    createEnumOption(CreatorTabTypes.import, "Integrations Import"),
+  ];
+}
+
+/**
+ * Returns display names for model editor tabs.
+ *
+ * @return The select option names and ids.
+ */
+export function modelEditorTabOptions(): SelectOption[] {
+  return [
+    createEnumOption(ModelTabTypes.training, "Training"),
+    createEnumOption(ModelTabTypes.evaluation, "Evaluation"),
+  ];
+}
+
+/**
+ * Returns display names for trace prediction tabs.
+ *
+ * @return The select option names and ids.
+ */
+export function tracePredictionTabOptions(): SelectOption[] {
+  return [
+    createEnumOption(TracePredictionTabTypes.models, "Models"),
+    createEnumOption(TracePredictionTabTypes.generation, "Trace Generation"),
+    createEnumOption(TracePredictionTabTypes.approval, "Trace Approval"),
+  ];
+}
+
+/**
+ * Returns display names for project settings tabs.
+ *
+ * @return The select option names and ids.
+ */
+export function settingsTabOptions(): SelectOption[] {
+  return [
+    createEnumOption(SettingsTabTypes.members, "Members"),
+    createEnumOption(SettingsTabTypes.upload, "Data Upload"),
+    createEnumOption(SettingsTabTypes.integrations, "Data Integrations"),
+    createEnumOption(SettingsTabTypes.artifacts, "Artifact Settings"),
   ];
 }

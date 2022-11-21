@@ -1,78 +1,153 @@
 import {
-  GitHubCredentialsModel,
-  GitHubRepositoryModel,
-  InternalGitHubCredentialsModel,
-  InternalJiraCredentialsModel,
+  GitHubProjectModel,
+  InstallationModel,
   IOHandlerCallback,
-  JiraAccessTokenModel,
   JiraProjectModel,
-  LocalStorageKeys,
-  URLParameter,
 } from "@/types";
-import { logStore } from "@/hooks";
+import { integrationsStore, logStore, projectStore } from "@/hooks";
+import { getParam, QueryParams } from "@/router";
 import {
-  getGitHubRefreshToken,
-  getGitHubRepositories,
-  getGitHubToken,
+  getGitHubCredentials,
+  getGitHubProjects,
+  getJiraCredentials,
   getJiraProjects,
-  getJiraRefreshToken,
-  getJiraToken,
+  refreshGitHubCredentials,
+  refreshJiraCredentials,
   saveGitHubCredentials,
   saveJiraCredentials,
+  getProjectInstallations,
+  createGitHubProjectSync,
+  createJiraProjectSync,
+  handleJobSubmission,
 } from "@/api";
+
+/**
+ * Handles loading installations affiliated with the current project.
+ *
+ * @param onComplete - Called once the action is complete.
+ * @param onSuccess - Called if the action is successful.
+ * @param onError - Called if the action fails.
+ */
+export function handleLoadInstallations({
+  onSuccess,
+  onError,
+  onComplete,
+}: IOHandlerCallback): void {
+  getProjectInstallations(projectStore.projectId)
+    .then((installations) => {
+      projectStore.installations = installations;
+      onSuccess?.();
+    })
+    .catch(onError)
+    .finally(onComplete);
+}
+
+/**
+ * Syncs the current project with the selected installation's data.
+ *
+ * @param installation - The installation to sync data with.
+ * @param onComplete - Called once the action is complete.
+ * @param onSuccess - Called if the action is successful.
+ * @param onError - Called if the action fails.
+ */
+export async function handleSyncInstallation(
+  installation: Omit<InstallationModel, "lastUpdate">,
+  { onSuccess, onError, onComplete }: IOHandlerCallback
+): Promise<void> {
+  try {
+    if (installation.type === "GITHUB") {
+      const job = await createGitHubProjectSync(
+        projectStore.versionId,
+        installation.installationId
+      );
+
+      await handleJobSubmission(job);
+    } else if (installation.type === "JIRA") {
+      const job = await createJiraProjectSync(
+        projectStore.versionId,
+        installation.installationId
+      );
+
+      await handleJobSubmission(job);
+    } else {
+      throw new Error("Unknown installation type");
+    }
+
+    logStore.onSuccess(
+      `Integration data is being synced: ${installation.installationId}. 
+       You'll receive a notification once data has completed syncing.`
+    );
+    onSuccess?.();
+  } catch (e) {
+    logStore.onError(`Unable to sync integration data: ${e}`);
+    onError?.(e as Error);
+  } finally {
+    onComplete?.();
+  }
+}
 
 /**
  * Handles Jira authentication when the app loads.
  *
- * @param accessCode -The Jira access code, if one exists.
- * @param onSuccess - Called if the action is successful, with the Jira authorization token.
+ * @param onComplete - Called when the action completes.
+ * @param onSuccess - Called if the action is successful.
  * @param onError - Called if the action fails.
  */
-export function handleAuthorizeJira(
-  accessCode: URLParameter,
-  { onSuccess, onError }: IOHandlerCallback<InternalJiraCredentialsModel>
-): void {
-  const handleSuccess = (token: JiraAccessTokenModel) => {
-    localStorage.setItem(
-      LocalStorageKeys.JIRA_REFRESH_TOKEN,
-      token.refresh_token
-    );
+export function handleAuthorizeJira({
+  onSuccess,
+  onError,
+  onComplete,
+}: IOHandlerCallback): void {
+  const accessCode =
+    getParam(QueryParams.TAB) === "jira"
+      ? getParam(QueryParams.JIRA_TOKEN)
+      : "";
 
-    onSuccess?.({
-      bearerAccessToken: token.access_token,
-      refreshToken: token.refresh_token,
-      cloudId: localStorage.getItem(LocalStorageKeys.JIRA_CLOUD_ID) || "",
-      clientId: process.env.VUE_APP_JIRA_CLIENT_ID || "",
-      clientSecret: process.env.VUE_APP_JIRA_CLIENT_SECRET || "",
-    });
+  const handleSuccess = () => {
+    integrationsStore.validJiraCredentials = true;
+    onSuccess?.();
+  };
+  const handleError = (e: Error) => {
+    integrationsStore.validJiraCredentials = false;
+    onError?.(e);
   };
 
   if (accessCode) {
-    getJiraToken(String(accessCode)).then(handleSuccess).catch(onError);
+    saveJiraCredentials(String(accessCode))
+      .then(handleSuccess)
+      .catch((e) => {
+        logStore.onError("Unable to read Jira access code.");
+        handleError(e);
+      })
+      .finally(onComplete);
   } else {
-    const refreshToken =
-      localStorage.getItem(LocalStorageKeys.JIRA_REFRESH_TOKEN) || "";
+    getJiraCredentials()
+      .then(async (valid) => {
+        if (valid) return;
 
-    getJiraRefreshToken(refreshToken).then(handleSuccess).catch(onError);
+        const refreshValid = await refreshJiraCredentials();
+
+        if (!refreshValid) {
+          throw new Error("Invalid refresh");
+        }
+      })
+      .then(handleSuccess)
+      .catch(handleError)
+      .finally(onComplete);
   }
 }
 
 /**
  * Loads Jira projects and sets the currently selected cloud id.
  *
- * @param credentials - The access and refresh token received from authorizing Jira.
  * @param onSuccess - Called if the action is successful, with the jira project list.
  * @param onError - Called if the action fails.
  */
-export function handleLoadJiraProjects(
-  credentials: InternalJiraCredentialsModel,
-  { onSuccess, onError }: IOHandlerCallback<JiraProjectModel[]>
-): void {
-  localStorage.setItem(LocalStorageKeys.JIRA_CLOUD_ID, credentials.cloudId);
-
-  saveJiraCredentials(credentials).catch(onError);
-
-  getJiraProjects(credentials.bearerAccessToken, credentials.cloudId)
+export function handleLoadJiraProjects({
+  onSuccess,
+  onError,
+}: IOHandlerCallback<JiraProjectModel[]>): void {
+  getJiraProjects()
     .then(onSuccess)
     .catch((e) => {
       onError?.(e);
@@ -83,38 +158,51 @@ export function handleLoadJiraProjects(
 /**
  * Handles GitHub authentication when the app loads.
  *
- * @param accessCode -The GitHub access code, if one exists.
+ * @param onComplete - Called when the action completes.
  * @param onSuccess - Called if the action is successful, with the GitHub authorization token.
  * @param onError - Called if the action fails.
  */
-export function handleAuthorizeGitHub(
-  accessCode: URLParameter,
-  { onSuccess, onError }: IOHandlerCallback<InternalGitHubCredentialsModel>
-): void {
-  const handleSuccess = (token: GitHubCredentialsModel) => {
-    localStorage.setItem(
-      LocalStorageKeys.GIT_HUB_REFRESH_TOKEN,
-      token.refreshToken
-    );
+export function handleAuthorizeGitHub({
+  onSuccess,
+  onError,
+  onComplete,
+}: IOHandlerCallback): void {
+  const accessCode =
+    getParam(QueryParams.TAB) === "github"
+      ? getParam(QueryParams.GITHUB_TOKEN)
+      : "";
 
-    onSuccess?.({
-      ...token,
-      installationId:
-        localStorage.getItem(LocalStorageKeys.GIT_HUB_INSTALLATION_ID) || "",
-      clientId: process.env.VUE_APP_GITHUB_CLIENT_ID || "",
-      clientSecret: process.env.VUE_APP_GITHUB_CLIENT_SECRET || "",
-      accessTokenExpiration: Date.now() + 28800000, // 8 hours in ms.
-      refreshTokenExpiration: Date.now() + 7776000000, // 90 days in ms.
-    });
+  const handleSuccess = () => {
+    integrationsStore.validGitHubCredentials = true;
+    onSuccess?.();
+  };
+  const handleError = (e: Error) => {
+    integrationsStore.validGitHubCredentials = false;
+    onError?.(e);
   };
 
   if (accessCode) {
-    getGitHubToken(String(accessCode)).then(handleSuccess).catch(onError);
+    saveGitHubCredentials(String(accessCode))
+      .then(handleSuccess)
+      .catch((e) => {
+        logStore.onError("Unable to read GitHub access code.");
+        handleError(e);
+      })
+      .finally(onComplete);
   } else {
-    const refreshToken =
-      localStorage.getItem(LocalStorageKeys.GIT_HUB_REFRESH_TOKEN) || "";
+    getGitHubCredentials()
+      .then(async (valid) => {
+        if (valid) return;
 
-    getGitHubRefreshToken(refreshToken).then(handleSuccess).catch(onError);
+        const refreshValid = await refreshGitHubCredentials();
+
+        if (!refreshValid) {
+          throw new Error("Invalid refresh");
+        }
+      })
+      .then(handleSuccess)
+      .catch(handleError)
+      .finally(onComplete);
   }
 }
 
@@ -125,18 +213,11 @@ export function handleAuthorizeGitHub(
  * @param onSuccess - Called if the action is successful, with the jira project list.
  * @param onError - Called if the action fails.
  */
-export function handleLoadGitHubProjects(
-  credentials: InternalGitHubCredentialsModel,
-  { onSuccess, onError }: IOHandlerCallback<GitHubRepositoryModel[]>
-): void {
-  localStorage.setItem(
-    LocalStorageKeys.GIT_HUB_INSTALLATION_ID,
-    credentials.installationId
-  );
-
-  saveGitHubCredentials(credentials).catch(onError);
-
-  getGitHubRepositories(credentials.accessToken, credentials.installationId)
+export function handleLoadGitHubProjects({
+  onSuccess,
+  onError,
+}: IOHandlerCallback<GitHubProjectModel[]>): void {
+  getGitHubProjects()
     .then(onSuccess)
     .catch((e) => {
       onError?.(e);

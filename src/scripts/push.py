@@ -4,11 +4,6 @@ import sys
 
 from transformers import AutoModel
 
-from tracer.models.base_models.supported_base_model import SupportedBaseModel
-from tracer.models.model_generator import ModelGenerator
-from tracer.train.trace_args import TraceArgs
-from tracer.train.trace_trainer import TraceTrainer
-
 parser = argparse.ArgumentParser(description='Runs regular bert model.')
 parser.add_argument('model')
 parser.add_argument('export')
@@ -21,6 +16,10 @@ args.root = os.path.expanduser(args.root)
 os.environ["DJANGO_SETTINGS_MODULE"] = "server.settings"
 assert os.path.exists(args.root), args.root
 sys.path.append(args.root)
+from tracer.models.base_models.supported_base_model import SupportedBaseModel
+from tracer.models.model_generator import ModelGenerator
+from tracer.train.trace_args import TraceArgs
+from tracer.train.trace_trainer import TraceTrainer
 
 if __name__ == "__main__":
     local_model_generator = ModelGenerator(SupportedBaseModel.NL_BERT, args.model)

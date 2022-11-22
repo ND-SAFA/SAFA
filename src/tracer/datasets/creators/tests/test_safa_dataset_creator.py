@@ -2,14 +2,15 @@ import os
 
 from test.base_trace_test import BaseTraceTest
 from test.paths.paths import TEST_DATA_DIR
-from tracer.datasets.creators.safa_dataset_creator import SafaDatasetCreator, SafaKeys
+from tracer.datasets.creators.safa_dataset_creator import SafaDatasetCreator
+from tracer.datasets.formats.safa_format import SafaFormat
 
 
 class TestSafaDatasetCreator(BaseTraceTest):
     TRACE_FILES_2_ARTIFACTS = {"Layer1Source2Target.json": ("Layer1Source.json", "Layer1Target.json"),
                                "Layer2Source2Target.json": ("Layer2Source.json", "Layer2Target.json"),
                                }
-    KEYS = SafaKeys(trace_files_2_artifacts=TRACE_FILES_2_ARTIFACTS)
+    KEYS = SafaFormat(trace_files_2_artifacts=TRACE_FILES_2_ARTIFACTS)
     SAFA_DATA_DIR = os.path.join(TEST_DATA_DIR, "safa")
 
     def test_create(self):

@@ -26,7 +26,9 @@
 
 <script lang="ts">
 import Vue from "vue";
+import { SelectOption } from "@/types";
 import { settingsTabOptions } from "@/util";
+import { projectStore, sessionStore } from "@/hooks";
 import { TabList, SidebarGrid } from "@/components/common";
 import {
   UploadNewVersion,
@@ -57,8 +59,17 @@ export default Vue.extend({
   data() {
     return {
       tab: 0,
-      tabs: settingsTabOptions(),
     };
+  },
+  computed: {
+    /**
+     * @return The tabs to display.
+     */
+    tabs(): SelectOption[] {
+      return sessionStore.isEditor(projectStore.project)
+        ? settingsTabOptions()
+        : [settingsTabOptions()[0]];
+    },
   },
 });
 </script>

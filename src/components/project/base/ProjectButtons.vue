@@ -1,5 +1,5 @@
 <template>
-  <flex-box b="2">
+  <flex-box b="2" v-if="doDisplay">
     <v-btn text @click="handleDownload">
       <v-icon class="mr-1">mdi-download</v-icon>
       Download
@@ -30,7 +30,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { identifierSaveStore, projectStore } from "@/hooks";
+import { identifierSaveStore, projectStore, sessionStore } from "@/hooks";
 import {
   handleSaveProject,
   handleDownloadProjectCSV,
@@ -59,6 +59,12 @@ export default Vue.extend({
     };
   },
   computed: {
+    /**
+     * @return Whether to display these buttons.
+     */
+    doDisplay(): boolean {
+      return sessionStore.isEditor(projectStore.project);
+    },
     /**
      * @return The current project.
      */

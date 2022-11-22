@@ -1,5 +1,5 @@
 <template>
-  <flex-box t="2">
+  <flex-box t="2" v-if="doDisplay">
     <v-btn text data-cy="button-artifact-body" @click="handleViewBody">
       <v-icon class="mr-1">mdi-application-array-outline</v-icon>
       View Body
@@ -24,7 +24,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { ArtifactModel } from "@/types";
-import { appStore, selectionStore } from "@/hooks";
+import { appStore, projectStore, selectionStore, sessionStore } from "@/hooks";
 import { handleDeleteArtifact } from "@/api";
 import { FlexBox } from "@/components/common";
 
@@ -35,6 +35,12 @@ export default Vue.extend({
   name: "ArtifactButtons",
   components: { FlexBox },
   computed: {
+    /**
+     * @return Whether to display these actions.
+     */
+    doDisplay(): boolean {
+      return sessionStore.isEditor(projectStore.project);
+    },
     /**
      * @return The selected artifact.
      */

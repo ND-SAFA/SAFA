@@ -1,5 +1,5 @@
 <template>
-  <flex-box justify="space-between">
+  <flex-box justify="space-between" v-if="doDisplay">
     <flex-box align="center" justify="center">
       <v-btn
         v-if="showUnreviewed"
@@ -91,9 +91,9 @@ export default Vue.extend({
   },
   computed: {
     /**
-     * @return Whether the current user is an editor of the current project.
+     * @return Whether to display these buttons.
      */
-    isEditor(): boolean {
+    doDisplay(): boolean {
       return sessionStore.isEditor(projectStore.project);
     },
     /**

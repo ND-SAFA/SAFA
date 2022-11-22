@@ -4,35 +4,20 @@
       Add Model Training
     </v-btn>
     <v-card v-else outlined class="pa-2">
-      <v-container style="max-width: 40em">
-        <v-select
-          filled
-          hide-details
-          label="Training Type"
-          :items="trainingOptions"
-          v-model="trainingType"
-        />
-      </v-container>
-      <model-document-step
-        v-if="trainingType === 'documents'"
-        :model="model"
-        @submit="handleSubmit"
-      />
-      <model-repository-step
-        v-if="trainingType === 'repositories'"
-        :model="model"
-        @submit="handleSubmit"
-      />
-      <model-keywords-step
-        v-if="trainingType === 'keywords'"
-        :model="model"
-        @submit="handleSubmit"
-      />
-      <model-project-step
-        v-if="trainingType === 'project'"
-        :model="model"
-        @submit="handleSubmit"
-      />
+      <tab-list v-model="tab" :tabs="tabs">
+        <v-tab-item key="1">
+          <model-document-step :model="model" @submit="handleSubmit" />
+        </v-tab-item>
+        <v-tab-item key="2">
+          <model-repository-step :model="model" @submit="handleSubmit" />
+        </v-tab-item>
+        <v-tab-item key="3">
+          <model-keywords-step :model="model" @submit="handleSubmit" />
+        </v-tab-item>
+        <v-tab-item key="4">
+          <model-project-step :model="model" @submit="handleSubmit" />
+        </v-tab-item>
+      </tab-list>
     </v-card>
   </v-timeline-item>
 </template>
@@ -40,6 +25,8 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { GenerationModel } from "@/types";
+import { trainingTabOptions } from "@/util";
+import TabList from "@/components/common/display/TabList.vue";
 import {
   ModelProjectStep,
   ModelDocumentStep,
@@ -53,6 +40,7 @@ import {
 export default Vue.extend({
   name: "ModelTrainingCreator",
   components: {
+    TabList,
     ModelKeywordsStep,
     ModelRepositoryStep,
     ModelDocumentStep,
@@ -67,8 +55,8 @@ export default Vue.extend({
   data() {
     return {
       addOpen: false,
-      trainingOptions: ["documents", "repositories", "keywords", "project"],
-      trainingType: "project",
+      tab: 3,
+      tabs: trainingTabOptions(),
     };
   },
   methods: {
@@ -81,5 +69,3 @@ export default Vue.extend({
   },
 });
 </script>
-
-<style scoped lang="scss"></style>

@@ -237,3 +237,17 @@ export function settingsTabOptions(): SelectOption[] {
     createEnumOption(SettingsTabTypes.artifacts, "Artifact Settings"),
   ];
 }
+
+/**
+ * Returns display names for model training tabs.
+ *
+ * @return The select option names and ids.
+ */
+export function trainingTabOptions(): SelectOption[] {
+  return [
+    createEnumOption("documents", "Documents"),
+    createEnumOption("repositories", "Repositories"),
+    createEnumOption("keywords", "Keywords"),
+    createEnumOption("project", "Project Data"),
+  ];
+}

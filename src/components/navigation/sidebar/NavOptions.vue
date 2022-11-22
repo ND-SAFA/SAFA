@@ -19,7 +19,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { NavOption } from "@/types";
-import { appStore, projectStore } from "@/hooks";
+import { appStore, projectStore, sessionStore } from "@/hooks";
 import { QueryParams, Routes } from "@/router";
 import { Typography } from "@/components/common";
 
@@ -86,7 +86,9 @@ export default Vue.extend({
         {
           label: "Trace Prediction",
           icon: "mdi-link-box",
-          disabled: this.hideProjectOptions,
+          disabled:
+            this.hideProjectOptions ||
+            !sessionStore.isEditor(projectStore.project),
           path: { path: Routes.TRACE_LINK, query },
         },
         {

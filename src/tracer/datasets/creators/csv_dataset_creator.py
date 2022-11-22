@@ -5,19 +5,9 @@ import pandas as pd
 from tracer.datasets.creators.abstract_trace_dataset_creator import AbstractTraceDatasetCreator
 from tracer.datasets.data_objects.artifact import Artifact
 from tracer.datasets.data_objects.trace_link import TraceLink
+from tracer.datasets.formats.csv_format import CSVFormat
 from tracer.datasets.trace_dataset import TraceDataset
 from tracer.pre_processing.steps.abstract_pre_processing_step import AbstractPreProcessingStep
-
-
-class CSVKey:
-    ID_PARAM = "ID"
-    SOURCE_ID_PARAM = "source_id"
-    TARGET_ID_PARAM = "target_id"
-    CONTENT_PARAM = "Content"
-    SOURCE_PARAM = "Source"
-    TARGET_PARAM = "Target"
-    TEXT_PARAM = "text"
-    LABEL_PARAM = "label"
 
 
 class CSVDatasetCreator(AbstractTraceDatasetCreator):
@@ -37,14 +27,22 @@ class CSVDatasetCreator(AbstractTraceDatasetCreator):
         :return: the datasets
         """
         data_df = self._read_data_file(self.data_file_path)
+        return self.create_from_dataframe(data_df)
+
+    def create_from_dataframe(self, data_df: pd.DataFrame) -> TraceDataset:
+        """
+        Creates a trace dataset from a dataframe in the csv format
+        :param data_df: the dataframe
+        :return: TraceDataset
+        """
         links = {}
         pos_link_ids, neg_link_ids = [], []
         for i, row in data_df.iterrows():
-            source_tokens, target_tokens = self._process_tokens(tokens=[row[CSVKey.SOURCE_PARAM],
-                                                                        row[CSVKey.TARGET_PARAM]])
-            link = self._create_trace_link(source_id=row[CSVKey.SOURCE_ID_PARAM], source_token=source_tokens,
-                                           target_id=row[CSVKey.TARGET_ID_PARAM], target_token=target_tokens,
-                                           label=row[CSVKey.LABEL_PARAM])
+            source_tokens, target_tokens = self._process_tokens(tokens=[row[CSVFormat.SOURCE],
+                                                                        row[CSVFormat.TARGET]])
+            link = self._create_trace_link(source_id=row[CSVFormat.SOURCE_ID], source_token=source_tokens,
+                                           target_id=row[CSVFormat.TARGET_ID], target_token=target_tokens,
+                                           label=row[CSVFormat.LABEL])
             links[link.id] = link
             self._add_to_link_ids(link, pos_link_ids, neg_link_ids)
 

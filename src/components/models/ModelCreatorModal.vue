@@ -85,9 +85,8 @@ export default Vue.extend({
      * Saves the current model.
      */
     handleSave() {
-      handleSaveModel({
-        onSuccess: () => this.handleClose(),
-      });
+      handleSaveModel({});
+      this.handleClose();
     },
   },
   watch: {

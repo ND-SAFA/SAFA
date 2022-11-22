@@ -1,7 +1,5 @@
 <template>
   <v-autocomplete
-    chips
-    deletable-chips
     hide-details
     ref="artifactInput"
     :filled="filled"
@@ -30,7 +28,13 @@
       </v-list-item>
     </template>
     <template v-slot:selection="{ item, index }">
-      <v-chip v-if="index < 3" outlined close @click:close="handleDelete(item)">
+      <v-chip
+        v-if="index < 3"
+        outlined
+        close
+        style="background-color: white !important"
+        @click:close="handleDelete(item)"
+      >
         <typography :value="item.name" />
       </v-chip>
       <typography
@@ -52,7 +56,7 @@ import {
   GenericArtifactBodyDisplay,
   GenericIconButton,
 } from "@/components/common/generic";
-import { Typography } from "@/components/common/display";
+import { Typography, AttributeChip } from "@/components/common/display";
 
 /**
  * An input for artifacts.
@@ -65,6 +69,7 @@ export default Vue.extend({
   components: {
     GenericIconButton,
     Typography,
+    AttributeChip,
     GenericArtifactBodyDisplay,
   },
   props: {

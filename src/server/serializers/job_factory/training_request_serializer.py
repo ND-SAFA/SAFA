@@ -7,4 +7,4 @@ from server.serializers.job_factory.prediction_request_serializer import Predict
 class TrainingRequestSerializer(PredictionRequestSerializer):
 
     def create(self, validated_data: Dict) -> JobFactory:
-        super().create(validated_data, "train")
+        return super().create(validated_data, "train")

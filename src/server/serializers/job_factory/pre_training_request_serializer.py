@@ -11,6 +11,9 @@ from tracer.datasets.trainer_datasets_container import TrainerDatasetsContainer
 
 
 class PreTrainingRequestSerializer(ModelIdentifierSerializer):
+    """
+    Serializer for pre-training a model.
+    """
     trainingDataDir = serializers.CharField(max_length=200,
                                             source="training_data_dir",
                                             help_text="Path to directory containing pre-training documents.")

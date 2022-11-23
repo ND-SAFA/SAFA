@@ -3,10 +3,8 @@ from typing import Dict
 from rest_framework import serializers
 
 from jobs.job_factory import JobFactory
-from server.serializers.dataset.dataset_creator_serializer import DatasetCreatorSerializer
+from server.serializers.job_factory.job_factory_converter import JobFactoryConverter
 from server.serializers.serializer_utility import SerializerUtility
-from server.serializers.tests.base_serializer_test import BaseSerializerTest
-from util.reflection_util import ParamScope, ReflectionUtil
 
 
 class JobFactorySerializer(serializers.Serializer):
@@ -21,7 +19,7 @@ class JobFactorySerializer(serializers.Serializer):
         :return: The validated data.
         """
         data = super().validate(attrs)
-        SerializerUtility.has_unknown_fields(self, self.initial_data, self.fields.fields)
+        SerializerUtility.assert_no_unknown_fields(self, self.initial_data, self.fields.fields)
         return data
 
     def create(self, validated_data: Dict) -> JobFactory:
@@ -44,22 +42,10 @@ class JobFactorySerializer(serializers.Serializer):
         """
         return super().save(**kwargs)
 
-    def to_representation(self, instance: JobFactory):
-        data = {
-            "settings": instance.additional_job_params
-        }
-        ignore_vars = ["additional_job_params"]
-        fields = ReflectionUtil.get_fields(instance, ParamScope.LOCAL, ignore=ignore_vars)
-        fields = {BaseSerializerTest.to_camel_case(k): v for k, v in fields.items()}
-        data.update(fields)
-        dataset_container = instance.trainer_dataset_container
-        dataset = None
-        if dataset_container.train_dataset:
-            dataset = dataset_container.train_dataset
-        if dataset_container.eval_dataset:
-            dataset = dataset_container.eval_dataset
-        if dataset is None:
-            raise ValueError("Dataset not defined.")
-        dataset_representation = DatasetCreatorSerializer().to_representation(dataset)
-        data["data"] = dataset_representation
-        return data
+    def to_representation(self, instance: JobFactory) -> Dict:
+        """
+        Exports job factory into API format.
+        :param instance: The job factory to convert.
+        :return: JSON data representing job factory.
+        """
+        return JobFactoryConverter.job_factory_representation(instance)

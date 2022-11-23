@@ -9,6 +9,9 @@ from server.serializers.serializer_utility import SerializerUtility
 
 
 class PredictionRequestSerializer(ModelIdentifierSerializer):
+    """
+    Serializer for a model prediction request.
+    """
     data = DatasetCreatorSerializer(help_text="The instructions for creating training/prediction dataset.",
                                     required=True)
     settings = serializers.DictField(help_text="Custom training arguments.", required=False)

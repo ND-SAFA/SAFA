@@ -14,6 +14,8 @@ class AbstractTraceJob(AbstractJob, ABC):
         job_args.model_path = job_args.model_path
         super().__init__(job_args)
         self.trace_args = job_args.trace_args
+        if job_args.save_dataset_splits:
+            self.trace_args.trainer_dataset_container.save_dataset_splits(job_args.output_dir)
         self._trainer = None
 
     def get_trainer(self, **kwargs) -> TraceTrainer:

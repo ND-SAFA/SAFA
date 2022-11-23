@@ -2,11 +2,12 @@ from unittest import mock
 from unittest.mock import patch
 
 from test.base_trace_test import BaseTraceTest
+from tracer.datasets.creators.csv_dataset_creator import CSVDatasetCreator
 from tracer.datasets.data_key import DataKey
 from tracer.datasets.trace_dataset import TraceDataset
 from tracer.models.model_generator import ModelGenerator
 from tracer.models.model_properties import ArchitectureType
-
+import pandas as pd
 FEATURE_VALUE = "({}, {})"
 
 
@@ -41,6 +42,15 @@ class TestTraceDataset(BaseTraceTest):
         trainer_dataset = train_dataset.to_trainer_dataset(model_generator)
         self.assertTrue(isinstance(trainer_dataset[0], dict))
         self.assertEquals(self.get_expected_train_dataset_size(resample_rate=1), len(trainer_dataset))
+
+    def test_to_dataframe(self):
+        trace_dataset = self.get_trace_dataset()
+        df = trace_dataset.to_dataframe()
+        self.assertTrue(isinstance(df, pd.DataFrame))
+        new_trace_dataset = CSVDatasetCreator("path").create_from_dataframe(data_df=df)
+        self.assert_lists_have_the_same_vals(new_trace_dataset.links.keys(), trace_dataset.links.keys())
+        self.assert_lists_have_the_same_vals(new_trace_dataset.pos_link_ids, trace_dataset.pos_link_ids)
+        self.assert_lists_have_the_same_vals(new_trace_dataset.neg_link_ids, trace_dataset.neg_link_ids)
 
     def test_get_source_target_pairs(self):
         trace_dataset = self.get_trace_dataset()
@@ -135,6 +145,9 @@ class TestTraceDataset(BaseTraceTest):
         links = self.get_links(self.ALL_TEST_LINKS)
         pos_links_ids = self.get_link_ids(self.POS_LINKS)
         neg_link_ids = self.get_link_ids(self.NEG_LINKS)
+        for link in links.values():
+            if link.id in pos_links_ids:
+                link.is_true_link = True
         return TraceDataset(links, pos_links_ids, neg_link_ids)
 
     def get_expected_train_dataset_size(self, resample_rate=RESAMPLE_RATE, validation_percentage=VAlIDATION_PERCENTAGE):

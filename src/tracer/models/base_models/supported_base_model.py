@@ -1,6 +1,6 @@
 from enum import Enum
 
-from transformers import AutoModel, AutoModelForMaskedLM
+from transformers import AutoModelForMaskedLM, AutoModelForSequenceClassification
 
 from tracer.models.base_models.bert_trace_siamese import BertTraceSiamese
 from tracer.models.base_models.electra_trace_single import ElectraTraceSingle
@@ -14,4 +14,4 @@ class SupportedBaseModel(Enum):
     BERT_TRACE_SIAMESE = BertTraceSiamese
     ELECTRA_TRACE_SINGLE = ElectraTraceSingle
     BERT_FOR_MASKED_LM = AutoModelForMaskedLM
-    AUTO_MODEL = AutoModel
+    AUTO_MODEL = AutoModelForSequenceClassification

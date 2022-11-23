@@ -4,7 +4,7 @@ from drf_yasg.utils import swagger_auto_schema
 
 from jobs.create_model_job import CreateModelJob
 from jobs.results.job_result import JobResult
-from server.serializers.model_identifier_serializer import ModelIdentifierSerializer
+from server.serializers.job_factory.model_identifier_serializer import ModelIdentifierSerializer
 from server.views.abstract_trace_view import AbstractTraceView
 
 

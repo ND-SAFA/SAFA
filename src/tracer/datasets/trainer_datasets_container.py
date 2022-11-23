@@ -35,6 +35,16 @@ class TrainerDatasetsContainer:
             self.train_dataset, self.val_dataset = self.train_dataset.train_test_split(validation_percentage,
                                                                                        resample_rate)
 
+    def save_dataset_splits(self, output_dir: str) -> None:
+        """
+        Saves all dataset splits to the output dir
+        :param output_dir: directory to save to
+        :return: None
+        """
+        for dataset_role in DatasetRole:
+            if dataset_role in self:
+                self[dataset_role].save(output_dir, dataset_role.name.lower())
+
     def __getitem__(self, dataset_role: DatasetRole) -> AbstractDataset:
         """
         Returns the datasets corresponding to role.

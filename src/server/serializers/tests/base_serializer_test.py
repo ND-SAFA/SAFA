@@ -1,6 +1,6 @@
 from enum import Enum
 from typing import Any, Dict, Generic, Type, TypeVar, Union
-from unittest import TestCase, skip
+from unittest import TestCase
 
 from rest_framework.serializers import Serializer
 
@@ -20,7 +20,6 @@ class BaseSerializerTest(Generic[AppEntity]):
         """
         self.serializer = serializer
 
-    @skip("Skipping until Alberto fixes")
     def serialize_data(self, test_case: TestCase, data: Dict, is_valid_value=True) -> AppEntity:
         """
         Serializes the test data into entity and performs validation checks.

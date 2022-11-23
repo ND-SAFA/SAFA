@@ -19,7 +19,7 @@ class JobFactorySerializer(serializers.Serializer):
         :return: The validated data.
         """
         data = super().validate(attrs)
-        SerializerUtility.assert_no_unknown_fields(self, self.initial_data, self.fields.fields)
+        SerializerUtility.assert_no_unknown_fields(self.initial_data, self.fields.fields)
         return data
 
     def create(self, validated_data: Dict) -> JobFactory:

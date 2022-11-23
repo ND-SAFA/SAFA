@@ -2,7 +2,7 @@ from django.test import TestCase
 
 from server.serializers.job_factory.pre_training_request_serializer import PreTrainingRequestSerializer
 from server.serializers.tests.base_serializer_test import BaseSerializerTest
-from util import ReflectionUtil
+from util.reflection_util import ReflectionUtil
 
 
 class TestPreTrainingRequestSerializer(TestCase):

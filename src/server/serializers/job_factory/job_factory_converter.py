@@ -21,18 +21,19 @@ class JobFactoryConverter:
         :param instance: The job factory to convert.
         :return: The JSON representation.
         """
+        data = {
+            "settings": instance.additional_job_params,
+        }
         # 1. Get fields to serialize
         ignore_vars = ignore_vars if ignore_vars else ["additional_job_params"]
         fields = ReflectionUtil.get_fields(instance, ParamScope.LOCAL, ignore=ignore_vars)
         fields = {SerializerUtility.to_camel_case(k): v for k, v in fields.items()}
         # 2. Extract dataset used in request
-        dataset = JobFactoryConverter.__get_dataset(instance.trainer_dataset_container)
-        dataset_representation = JobFactoryConverter.abstract_dataset_creator_representation(dataset)
+        if instance.trainer_dataset_container:
+            dataset = JobFactoryConverter.__get_dataset(instance.trainer_dataset_container)
+            dataset_representation = JobFactoryConverter.abstract_dataset_creator_representation(dataset)
+            data["data"] = dataset_representation
         # 3. Create payload with settings, data, and fields
-        data = {
-            "settings": instance.additional_job_params,
-            "data": dataset_representation
-        }
         data.update(fields)
         return data
 

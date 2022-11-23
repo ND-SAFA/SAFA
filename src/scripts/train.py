@@ -12,8 +12,9 @@ parser = argparse.ArgumentParser(
     description='Pre-trains a bert model on a directory of documents.')
 parser.add_argument('data')  # positional argument
 parser.add_argument('output')
-parser.add_argument('-model', help="The model to pre-train", default="roberta-base-uncased")
+parser.add_argument('-model', help="The model to pre-train", default="roberta-base")
 parser.add_argument('-root', default='~/projects/safa/tgen/src')
+parser.add_argument('-epochs', default=10)
 
 args = parser.parse_args()
 
@@ -57,7 +58,11 @@ if __name__ == "__main__":
             },
             "preProcessingSteps": []
         },
-        "settings": {}
+        "settings": {
+            "trace_args_params": {
+                "num_train_epochs": args.epochs
+            }
+        }
     }
     pre_training_serializer = TrainingRequestSerializer(data=job_definition)
     assert pre_training_serializer.is_valid(), pre_training_serializer.errors

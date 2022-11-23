@@ -2,12 +2,13 @@ import os
 
 from test.base_trace_test import BaseTraceTest
 from test.paths.paths import TEST_DATA_DIR
-from tracer.datasets.creators.repository_dataset_creator import RepositoryDatasetCreator, RepositoryKeys
+from tracer.datasets.creators.repository_dataset_creator import RepositoryDatasetCreator
+from tracer.datasets.formats.repository_format import RepositoryFormat
 
 
 class TestRepositoryDatasetCreator(BaseTraceTest):
     TRACE_FILES_2_ARTIFACTS = {"commit2issue.csv": ("commit.csv", "issue.csv")}
-    KEYS = RepositoryKeys(trace_files_2_artifacts=TRACE_FILES_2_ARTIFACTS)
+    KEYS = RepositoryFormat(trace_files_2_artifacts=TRACE_FILES_2_ARTIFACTS)
     REPO_DIR = os.path.join(TEST_DATA_DIR, "repo")
     REPO_DIRNAMES = ["one", "two"]
 

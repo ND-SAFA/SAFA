@@ -22,3 +22,13 @@ class PreTrainDataset(AbstractDataset):
                                      file_path=self.training_file_path,
                                      block_size=self.block_size,
                                      **self.kwargs)
+
+    def save(self, output_dir: str, filename: str) -> str:
+        """
+        Saves the dataset to the output dir
+        :param output_dir: directory to save to
+        :param filename: name of tthe file (no ext)
+        :return: location the file was saved to
+        """
+        # TODO
+        pass

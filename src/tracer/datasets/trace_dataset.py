@@ -1,3 +1,4 @@
+import os
 import random
 from collections import OrderedDict
 from copy import deepcopy
@@ -7,8 +8,10 @@ from config.constants import RESAMPLE_RATE_DEFAULT
 from tracer.datasets.abstract_dataset import AbstractDataset
 from tracer.datasets.data_key import DataKey
 from tracer.datasets.data_objects.trace_link import TraceLink
+from tracer.datasets.formats.csv_format import CSVFormat
 from tracer.models.model_generator import ModelGenerator
 from tracer.models.model_properties import ArchitectureType
+import pandas as pd
 
 SEED = 420
 random.seed(SEED)
@@ -50,6 +53,30 @@ class TraceDataset(AbstractDataset):
             link.id: self._get_feature_entry(link, model_generator.arch_type, model_generator.get_feature)
             for link in self.links.values()}
         return [feature_entries[link_id] for link_id in self.pos_link_ids + self.neg_link_ids]
+
+    def to_dataframe(self) -> pd.DataFrame:
+        """
+        Converts trace links in datasets to dataframe format.
+        :return: the dataset in a dataframe
+        """
+        link_ids_to_rows = {}
+        for link in self.links.values():
+            link_ids_to_rows[link.id] = [link.source.id, link.source.token, link.target.id, link.target.token, int(link.is_true_link)]
+        data = [link_ids_to_rows[link_id] for link_id in self.pos_link_ids + self.neg_link_ids]
+        return pd.DataFrame(data,
+                            columns=[CSVFormat.SOURCE_ID, CSVFormat.SOURCE, CSVFormat.TARGET_ID, CSVFormat.TARGET, CSVFormat.LABEL])
+
+    def save(self, output_dir: str, filename: str) -> str:
+        """
+        Saves the dataset to the output dir
+        :param output_dir: directory to save to
+        :param filename: name of tthe file (no ext)
+        :return: location the file was saved to
+        """
+        output_path = os.path.join(output_dir, filename + ".csv")
+        df = self.to_dataframe()
+        df.to_csv(output_path)
+        return output_path
 
     def get_source_target_pairs(self) -> List[Tuple]:
         """

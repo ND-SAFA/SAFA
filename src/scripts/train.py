@@ -43,14 +43,11 @@ application = get_wsgi_application()
 # Script Initialization
 #
 
-model = args.model
-data_path = args.data
-output_path = args.output
 
 if __name__ == "__main__":
     job_definition = {
         "baseModel": SupportedBaseModel.AUTO_MODEL,
-        "modelPath": "roberta-base",
+        "modelPath": args.model,
         "outputDir": args.output,
         "saveJobOutput": True,
         "data": {

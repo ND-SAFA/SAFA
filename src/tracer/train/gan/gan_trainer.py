@@ -36,10 +36,10 @@ class GanTrainer(TraceTrainer):
         :param checkpoint: path to checkpoint.
         :return: a dictionary containing the results
         """
-        self.train_dataset = self.to_gan_dataset(self.dataset_container.train_dataset,
-                                                 self.dataset_container.pre_train_dataset)
+        self.train_dataset = self.to_gan_dataset(self.dataset_container[DatasetRole.TRAIN],
+                                                 self.dataset_container[DatasetRole.PRE_TRAIN])
         if DatasetRole.EVAL in self.dataset_container:
-            self.eval_dataset = self.to_gan_dataset(self.dataset_container.eval_dataset)
+            self.eval_dataset = self.to_gan_dataset(self.dataset_container[DatasetRole.EVAL])
         output = self.train(resume_from_checkpoint=checkpoint)
         return TraceTrainer.output_to_dict(output)
 

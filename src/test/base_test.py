@@ -1,5 +1,6 @@
 import os
 import shutil
+from typing import List
 
 import mock
 from django.test import TestCase
@@ -12,16 +13,17 @@ from test.paths.paths import TEST_OUTPUT_DIR, TEST_VOCAB_FILE
 from tracer.models.base_models.pl_bert import PLBert
 from tracer.models.base_models.supported_base_model import SupportedBaseModel
 from tracer.pre_processing.pre_processing_steps import PreProcessingSteps
+from tracer.pre_processing.steps.abstract_pre_processing_step import AbstractPreProcessingStep
 
 
 class BaseTest(TestCase):
     MODEL_GENERATOR_PARAMS = {"base_model": SupportedBaseModel.PL_BERT,
                               "model_path": "model"}
-    PRE_PROCESSING_PARAMS = ([PreProcessingSteps.REPLACE_WORDS,
-                              PreProcessingSteps.REMOVE_UNWANTED_CHARS,
-                              PreProcessingSteps.SEPARATE_JOINED_WORDS,
-                              PreProcessingSteps.FILTER_MIN_LENGTH],
-                             {"word_replace_mappings": {"This": "Esta", "one": "uno"}})
+    PRE_PROCESSING_STEPS: List[AbstractPreProcessingStep] = [
+        PreProcessingSteps.REPLACE_WORDS.value(word_replace_mappings={"This": "Esta", "one": "uno"}),
+        PreProcessingSteps.REMOVE_UNWANTED_CHARS.value(),
+        PreProcessingSteps.SEPARATE_JOINED_WORDS.value(),
+        PreProcessingSteps.FILTER_MIN_LENGTH.value()]
 
     def setup(self):
         if not os.path.isdir(TEST_OUTPUT_DIR):

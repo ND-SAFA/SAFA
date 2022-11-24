@@ -1,7 +1,7 @@
 import os
 from unittest import mock
 from unittest.mock import patch
-import unittest
+
 from transformers import AutoModelForMaskedLM
 
 from config.override import overrides
@@ -35,10 +35,11 @@ class TestMLMPreTrainJob(BaseJobTest):
 
     @staticmethod
     @overrides(BaseJobTest)
-    def create_dataset_map(dataset_role: DatasetRole, include_links=True):
-        return {DatasetRole.TRAIN: (SupportedDatasetCreator.MLM_PRETRAIN, {"orig_data_path": TestMLMPreTrainJob.PRETRAIN_DIR,
-                                                                           "training_data_dir":
-                                                                               os.path.join(TEST_OUTPUT_DIR, "pre_train")})}
+    def create_dataset(dataset_role: DatasetRole, include_links=True):
+        return {DatasetRole.TRAIN: (
+        SupportedDatasetCreator.MLM_PRETRAIN, {"orig_data_path": TestMLMPreTrainJob.PRETRAIN_DIR,
+                                               "training_data_dir":
+                                                   os.path.join(TEST_OUTPUT_DIR, "pre_train")})}
 
     def _assert_success(self, output_dict: dict):
         self.assert_training_output_matches_expected(output_dict)

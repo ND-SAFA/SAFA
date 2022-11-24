@@ -32,7 +32,7 @@ class TestPredictionRequestSerializer(TestCase):
     def test_serialization(self):
         prediction_request: JobFactory = self.serializer_test.serialize_data(self, self.serializer_test_data)
         self.assertIsNotNone(prediction_request.trainer_dataset_container)
-        self.assertIsNotNone(prediction_request.trainer_dataset_container.eval_dataset)
+        self.assertIsNotNone(prediction_request.trainer_dataset_container.__eval_dataset)
         BaseSerializerTest.assert_contains_camel_case_properties(self, prediction_request, self.serializer_test_data)
 
     def test_deserialization(self):

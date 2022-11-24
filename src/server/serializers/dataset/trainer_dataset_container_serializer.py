@@ -18,7 +18,7 @@ class TrainerDatasetsContainerSerializer(serializers.Serializer):
     eval = DatasetCreatorSerializer(help_text="The instructions for creating testing dataset.",
                                     required=False)
     params = serializers.DictField(help_text="Initialization params for Trainer Dataset Container",
-                                   required=True)
+                                   required=False)
 
     def create(self, validated_data: Dict):
         """

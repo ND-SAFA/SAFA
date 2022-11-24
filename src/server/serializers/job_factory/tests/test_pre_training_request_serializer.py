@@ -15,11 +15,19 @@ class TestPreTrainingRequestSerializer(TestCase):
         "modelPath": "~/desktop/safa/datasets",
         "outputDir": "hello",
         "saveJobOutput": False,
-        "trainingDataDir": "~/desktop/pretraining",
-        "preProcessingOptions": ["SEPARATE_JOINED_WORDS"],
-        "preProcessingParams": {"deliminators": ["*"]},
-        "blockSize": 120,
-        "mlmProbability": .5,
+        "trainingDataDir": "src/test/data/pre_train",
+        "preProcessingSteps": [
+            {
+                "step": "SEPARATE_JOINED_WORDS",
+                "params": {
+                    "deliminators": ["*"]
+                }
+            }
+        ],
+        "params": {
+            "blockSize": 120,
+            "mlmProbability": .5,
+        }
     }
 
     serializer_test = BaseSerializerTest(PreTrainingRequestSerializer)
@@ -46,10 +54,14 @@ class TestPreTrainingRequestSerializer(TestCase):
         self.serializer_test.serialize_deserialize_data(self, self.serializer_test_data)
 
     def test_update(self):
-        new_properties = {"preProcessingOptions": ["REMOVE_UNWANTED_CHARS", "SEPARATE_JOINED_WORDS"]}
-        self.serializer_test.serialize_update_data(self, self.serializer_test_data, new_properties)
+        new_properties = {"preProcessingSteps": [{"step": "REMOVE_UNWANTED_CHARS"}, {"step": "SEPARATE_JOINED_WORDS"}]}
+
+        def run_update():
+            self.serializer_test.serialize_update_data(self, self.serializer_test_data, new_properties)
+
+        self.assertRaises(NotImplementedError, run_update)
 
     def test_invalid_update(self):
-        invalid_properties = {"preProcessingParams": []}
+        invalid_properties = {"params": []}
         self.serializer_test.test_invalid_update(self, self.serializer_test_data, invalid_properties,
                                                  expected_phrase="list")

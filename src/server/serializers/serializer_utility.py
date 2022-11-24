@@ -3,6 +3,7 @@ from typing import Dict, OrderedDict
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
+from tracer.datasets.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tracer.datasets.trainer_datasets_container import TrainerDatasetsContainer
 from tracer.pre_processing.steps.separate_joined_words_step import SeparateJoinedWordsStep
 
@@ -13,8 +14,8 @@ class SerializerUtility:
     """
 
     @staticmethod
-    def create_trainer_dataset_container(kwargs: Dict, container_param: str, dataset_param: str = "data",
-                                         export_param: str = "trainer_dataset_container"):
+    def wrap_with_trainer_dataset_container(kwargs: Dict, container_param: str, dataset_param: str = "data",
+                                            export_param: str = "trainer_dataset_container"):
         """
         Reads dataset from kwargs and wraps it in a trainer dataset container.
         :param kwargs: The kwargs to extract dataset from.
@@ -23,8 +24,8 @@ class SerializerUtility:
         :param export_param: The name of the parameter to export trainer dataset container to in kwargs.
         :return: None
         """
-        dataset = kwargs.pop(dataset_param).create()
-        container_kwargs = {container_param: dataset}
+        dataset_creator: AbstractDatasetCreator = kwargs.pop(dataset_param)
+        container_kwargs = {container_param: dataset_creator}
         trainer_datasets_container = TrainerDatasetsContainer(**container_kwargs)
         kwargs[export_param] = trainer_datasets_container
 

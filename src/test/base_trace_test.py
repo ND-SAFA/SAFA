@@ -1,5 +1,5 @@
 from copy import deepcopy
-from typing import Dict, Tuple
+from typing import Dict
 
 import numpy as np
 from transformers.trainer_utils import PredictionOutput
@@ -7,6 +7,7 @@ from transformers.trainer_utils import PredictionOutput
 from config.constants import VALIDATION_PERCENTAGE_DEFAULT
 from jobs.results.job_result import JobResult
 from test.base_test import BaseTest
+from tracer.datasets.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tracer.datasets.creators.supported_dataset_creator import SupportedDatasetCreator
 from tracer.datasets.data_objects.artifact import Artifact
 from tracer.datasets.data_objects.trace_link import TraceLink
@@ -77,21 +78,19 @@ class BaseTraceTest(BaseTest):
     }
 
     @staticmethod
-    def create_dataset_map(dataset_role: DatasetRole, include_links=True):
+    def create_dataset(dataset_role: DatasetRole, include_links=True, include_pre_processing=False) -> Dict[
+        DatasetRole, AbstractDatasetCreator]:
         dataset_params = deepcopy(BaseTraceTest._DATASET_PARAMS)
         if not include_links:
             dataset_params.pop("true_links")
-        return {dataset_role: (SupportedDatasetCreator.CLASSIC_TRACE, dataset_params)}
+        dataset_params["pre_processing_steps"] = BaseTest.PRE_PROCESSING_STEPS if include_pre_processing else None
+        abstract_dataset = SupportedDatasetCreator.CLASSIC_TRACE.value(**dataset_params)
+        return {dataset_role: abstract_dataset}
 
     @staticmethod
-    def create_trainer_dataset_container(dataset_map: Dict[DatasetRole, Tuple], include_pre_processing=False,
-                                         **dataset_args):
+    def create_trainer_dataset_container(dataset_map: Dict[DatasetRole, AbstractDatasetCreator], **dataset_args):
         kwargs = {**BaseTraceTest.DATASET_ARGS_PARAMS, **dataset_args}
-        pre_processing_params = {dataset_role: BaseTraceTest.PRE_PROCESSING_PARAMS for dataset_role in
-                                 dataset_map.keys()} \
-            if include_pre_processing else None
-        return TrainerDatasetsContainer(dataset_map, pre_processing_params,
-                                        **kwargs)
+        return TrainerDatasetsContainer.create_from_map(dataset_map, **kwargs)
 
     def assert_prediction_output_matches_expected(self, output: dict, threshold: int = 0.05):
         if JobResult.PREDICTIONS not in output:

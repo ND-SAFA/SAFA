@@ -21,6 +21,7 @@ class PreTrainingRequestSerializer(ModelIdentifierSerializer):
                                                      many=True,
                                                      source="pre_processing_steps",
                                                      required=False)
+    params = serializers.DictField(help_text="Arguments for passed into hugging face trainer.")
 
     def create(self, validated_data: Dict) -> JobFactory:
         kwargs = SerializerUtility.create_children_serializers(validated_data, self.fields.fields)
@@ -28,7 +29,7 @@ class PreTrainingRequestSerializer(ModelIdentifierSerializer):
         pre_processing_steps = kwargs.pop("pre_processing_steps", None)
         training_data_dir = kwargs.pop("training_data_dir")
 
-        training_dataset = MLMPreTrainDatasetCreator(orig_data_path=training_data_dir,
-                                                     pre_processing_steps=pre_processing_steps).create()
-        trainer_datasets_container = TrainerDatasetsContainer(train=training_dataset)
+        training_dataset_creator = MLMPreTrainDatasetCreator(orig_data_path=training_data_dir,
+                                                             pre_processing_steps=pre_processing_steps)
+        trainer_datasets_container = TrainerDatasetsContainer(train=training_dataset_creator)
         return JobFactory(**kwargs, trainer_dataset_container=trainer_datasets_container)

@@ -80,7 +80,7 @@ class ReflectionUtil:
         for enum_key in enum:
             if isinstance(instance, enum_key.value):
                 return enum_key.name
-        raise ValueError("Could not convert " + str(type(instance)) + " into SupportedDatasetCreator.")
+        raise ValueError("Could not convert " + str(type(instance)) + " into" + enum + ".")
 
     @staticmethod
     def set_attributes(instance: Any, params: Dict):

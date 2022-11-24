@@ -3,7 +3,8 @@ from django.test import TestCase
 from jobs.job_factory import JobFactory
 from server.serializers.job_factory.training_request_serializer import TrainingRequestSerializer
 from server.serializers.tests.base_serializer_test import BaseSerializerTest
-from util import ReflectionUtil
+from tracer.datasets.dataset_role import DatasetRole
+from util.reflection_util import ReflectionUtil
 
 
 class TestTrainingRequestSerializer(TestCase):
@@ -34,7 +35,7 @@ class TestTrainingRequestSerializer(TestCase):
         job_factory: JobFactory = self.serializer_test.serialize_data(self, self.serializer_test_data)
         dataset_container = job_factory.trainer_dataset_container
         self.assertIsNotNone(dataset_container)
-        self.assertIsNotNone(dataset_container.train_dataset)
+        self.assertIsNotNone(dataset_container[DatasetRole.TRAIN])
         # Verify that general properties have been set
         expected_properties = ReflectionUtil.copy_fields(self.serializer_test_data, exclude=["data", "settings"])
         BaseSerializerTest.assert_contains_camel_case_properties(self, job_factory, expected_properties)

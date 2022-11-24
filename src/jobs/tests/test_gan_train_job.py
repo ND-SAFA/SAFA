@@ -34,12 +34,12 @@ class TestGanTrainJob(BaseJobTest):
         self._test_run_success()
 
     @staticmethod
-    def create_dataset_map(dataset_role: DatasetRole, include_links=True):
-        train_dataset = BaseJobTest.create_dataset_map(DatasetRole.TRAIN)
-        test_dataset = {DatasetRole.EVAL: (SupportedDatasetCreator.CSV, {
-            "data_file_path": TestTrainJob.CSV_DATA_FILE
-        })}
-        return {**train_dataset, **test_dataset}
+    def create_dataset(dataset_role: DatasetRole, include_links=True, include_pre_processing=False):
+        train_dataset = BaseJobTest.create_dataset(DatasetRole.TRAIN, include_links=include_links,
+                                                   include_pre_processing=include_pre_processing)
+        test_dataset = SupportedDatasetCreator.CSV.value(data_file_path=TestTrainJob.CSV_DATA_FILE)
+        test_dataset_map = {DatasetRole.EVAL: test_dataset}
+        return {**train_dataset, **test_dataset_map}
 
     def _assert_success(self, output_dict: dict):
         self.assert_training_output_matches_expected(output_dict)
@@ -51,5 +51,5 @@ class TestGanTrainJob(BaseJobTest):
             "num_train_epochs": 1
         }
         job_args.trace_args.trainer_dataset_container[DatasetRole.PRE_TRAIN] = MLMPreTrainDatasetCreator(
-            orig_data_path=self.PRETRAIN_DIR, training_data_dir=TEST_OUTPUT_DIR).create()
+            orig_data_path=self.PRETRAIN_DIR, training_data_dir=TEST_OUTPUT_DIR)
         return GanTrainJob(job_args)

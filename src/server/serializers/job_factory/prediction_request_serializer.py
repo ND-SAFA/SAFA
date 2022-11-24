@@ -18,6 +18,6 @@ class PredictionRequestSerializer(ModelIdentifierSerializer):
 
     def create(self, validated_data: Dict, dataset_param_key="eval") -> JobFactory:
         kwargs: Dict = SerializerUtility.create_children_serializers(validated_data, self.fields.fields)
-        SerializerUtility.create_trainer_dataset_container(kwargs, dataset_param_key)
+        SerializerUtility.wrap_with_trainer_dataset_container(kwargs, dataset_param_key)
         kwargs.update(kwargs.pop("settings"))  # put settings in main kwargs
         return JobFactory(**kwargs)

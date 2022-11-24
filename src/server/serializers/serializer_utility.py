@@ -3,15 +3,48 @@ from typing import Dict, OrderedDict
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
+from tracer.datasets.trainer_datasets_container import TrainerDatasetsContainer
+from tracer.pre_processing.steps.separate_joined_words_step import SeparateJoinedWordsStep
+
 
 class SerializerUtility:
+    """
+    Helper class for generalizing serializer logic and job factory construction.
+    """
+
+    @staticmethod
+    def create_trainer_dataset_container(kwargs: Dict, container_param: str, dataset_param: str = "data",
+                                         export_param: str = "trainer_dataset_container"):
+        """
+        Reads dataset from kwargs and wraps it in a trainer dataset container.
+        :param kwargs: The kwargs to extract dataset from.
+        :param container_param: The name of parameter in the dataset container to store dataset under.
+        :param dataset_param: The name of the parameter in kwargs containing dataset.
+        :param export_param: The name of the parameter to export trainer dataset container to in kwargs.
+        :return: None
+        """
+        dataset = kwargs.pop(dataset_param).create()
+        container_kwargs = {container_param: dataset}
+        trainer_datasets_container = TrainerDatasetsContainer(**container_kwargs)
+        kwargs[export_param] = trainer_datasets_container
+
     @staticmethod
     def update_error():
+        """
+        Throws a not implemented error with a consistent message.
+        :return: None
+        """
         raise NotImplementedError("Update has not implemented for serializers. Please create new serialier.")
 
     @staticmethod
-    def has_unknown_fields(instance: serializers.Serializer, initial_data: Dict, fields: OrderedDict):
-        if hasattr(instance, 'initial_data'):
+    def assert_no_unknown_fields(initial_data: Dict, fields: OrderedDict):
+        """
+        Asserts that all fields in initial data have a corresponding field.
+        :param initial_data: The data used to initialize a serializer.
+        :param fields: The fields of the serializer.
+        :return: None
+        """
+        if initial_data:
             unknown_keys = set(initial_data.keys()) - set(fields.keys())
             if unknown_keys:
                 raise ValidationError("Got unknown fields: {}".format(unknown_keys))
@@ -36,3 +69,18 @@ class SerializerUtility:
             else:
                 kwargs[field_name] = validated_data[field_name]
         return kwargs
+
+    @staticmethod
+    def to_camel_case(word: str):
+        words = word.lower().split("_")
+        words = words[:1] + [w.title() for w in words[1:]]
+        return "".join(words)
+
+    @staticmethod
+    def to_snake_case(word: str):
+        """
+        Wrapper for performing snake case conversion to single word.
+        :param word: The string to convert.
+        :return: word in snake_case.
+        """
+        return "_".join(list(map(lambda w: w.lower(), SeparateJoinedWordsStep._separate_camel_case_word(word))))

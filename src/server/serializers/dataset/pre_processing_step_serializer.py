@@ -3,10 +3,10 @@ from typing import Dict, Type
 from rest_enumfield import EnumField
 from rest_framework import serializers
 
+from server.serializers.job_factory.job_factory_converter import JobFactoryConverter
 from server.serializers.serializer_utility import SerializerUtility
 from tracer.pre_processing.pre_processing_steps import PreProcessingSteps
 from tracer.pre_processing.steps.abstract_pre_processing_step import AbstractPreProcessingStep
-from util.reflection_util import ParamScope, ReflectionUtil
 
 
 class PreProcessingStepSerializer(serializers.Serializer):
@@ -23,7 +23,4 @@ class PreProcessingStepSerializer(serializers.Serializer):
         return SerializerUtility.update_error()
 
     def to_representation(self, instance: AbstractPreProcessingStep):
-        return {
-            "step": ReflectionUtil.get_enum_key(PreProcessingSteps, instance),
-            "params": ReflectionUtil.get_fields(instance, ParamScope.LOCAL)
-        }
+        return JobFactoryConverter.abstract_pre_processing_step_representation(instance)

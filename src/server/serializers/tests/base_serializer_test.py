@@ -4,11 +4,12 @@ from unittest import TestCase, skip
 
 from rest_framework.serializers import Serializer
 
-from jobs.job_factory import JobFactory
+from server.serializers.serializer_utility import SerializerUtility
 from tracer.models.base_models.supported_base_model import SupportedBaseModel
-from tracer.pre_processing.steps.separate_joined_words_step import SeparateJoinedWordsStep
 
 AppEntity = TypeVar('AppEntity')
+
+from jobs.job_factory import JobFactory
 
 
 class BaseSerializerTest(Generic[AppEntity]):
@@ -101,7 +102,7 @@ class BaseSerializerTest(Generic[AppEntity]):
         :return: None, error thrown if there is missing properties or the values are not as expected.
         """
         for key, new_value in camel_case_properties.items():
-            object_key = BaseSerializerTest.to_snake_case(key)
+            object_key = SerializerUtility.to_snake_case(key)
             if isinstance(instance, Dict):
                 object_value = instance[object_key]
             else:
@@ -116,18 +117,3 @@ class BaseSerializerTest(Generic[AppEntity]):
         if isinstance(object_value, list):
             return list(map(BaseSerializerTest.to_repr, object_value))
         return object_value
-
-    @staticmethod
-    def to_camel_case(word: str):
-        words = word.lower().split("_")
-        words = words[:1] + [w.title() for w in words[1:]]
-        return "".join(words)
-
-    @staticmethod
-    def to_snake_case(word: str):
-        """
-        Wrapper for performing snake case conversion to single word.
-        :param word: The string to convert.
-        :return: word in snake_case.
-        """
-        return "_".join(list(map(lambda w: w.lower(), SeparateJoinedWordsStep._separate_camel_case_word(word))))

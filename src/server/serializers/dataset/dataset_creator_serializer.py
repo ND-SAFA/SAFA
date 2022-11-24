@@ -4,12 +4,12 @@ from rest_enumfield import EnumField
 from rest_framework import serializers
 
 from server.serializers.dataset.pre_processing_step_serializer import PreProcessingStepSerializer
+from server.serializers.job_factory.job_factory_converter import JobFactoryConverter
 from server.serializers.serializer_utility import SerializerUtility
 from tracer.datasets.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tracer.datasets.creators.abstract_trace_dataset_creator import AbstractTraceDatasetCreator
 from tracer.datasets.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
 from tracer.datasets.creators.supported_dataset_creator import SupportedDatasetCreator
-from util.reflection_util import ReflectionUtil
 
 SupportedDatasets = Union[AbstractTraceDatasetCreator, MLMPreTrainDatasetCreator]
 
@@ -41,16 +41,4 @@ class DatasetCreatorSerializer(serializers.Serializer):
         SerializerUtility.update_error()
 
     def to_representation(self, instance: AbstractDatasetCreator):
-        """
-        Exports dataset creator to its API format.
-        :param instance: The dataset creator to deserialize.
-        :return: Dictionary containing API json.
-        """
-        steps = instance._pre_processor.steps
-        step_serializer = PreProcessingStepSerializer(steps, many=True)
-        steps_representation = step_serializer.to_representation(steps)
-        return {
-            "creator": ReflectionUtil.get_enum_key(SupportedDatasetCreator, instance),
-            "params": ReflectionUtil.get_fields(instance, ParamScope.LOCAL),
-            "preProcessingSteps": steps_representation
-        }
+        return JobFactoryConverter.abstract_dataset_creator_representation(instance)

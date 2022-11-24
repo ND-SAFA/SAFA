@@ -2,55 +2,40 @@ import argparse
 import os
 import sys
 
-os.environ["DJANGO_SETTINGS_MODULE"] = "server.settings"
+from dotenv import load_dotenv
 
-#
-# Argument Parsing
-#
-parser = argparse.ArgumentParser(
-    prog='PreTrainer',
-    description='Pre-trains a bert model on a directory of documents.')
-parser.add_argument('data')  # positional argument
-parser.add_argument('output')
-parser.add_argument('-model', help="The model to pre-train", default="roberta-base-uncased")
-parser.add_argument('-root', default='~/projects/safa/tgen/src')
+load_dotenv()
 
-args = parser.parse_args()
-
-#
-# Path Expansion
-#
-path_vars = ["root", "data", "output"]
-for path_var in path_vars:
-    path_value = getattr(args, path_var)
-    path_value = os.path.expanduser(path_value)
-    setattr(args, path_var, path_value)
-    assert os.path.exists(path_value), path_value
-
-sys.path.append(args.root)
-
-#
-# IMPORTS
-#
-from tracer.models.base_models.supported_base_model import SupportedBaseModel
-from jobs.job_factory import JobFactory
-from django.core.wsgi import get_wsgi_application
-from jobs.predict_job import PredictJob
-from server.serializers.job_factory.prediction_request_serializer import PredictionRequestSerializer
-
-application = get_wsgi_application()
-#
-# Script Initialization
-#
-
-model = args.model
-data_path = args.data
-output_path = args.output
+ROOT_PATH = os.path.expanduser(os.environ["ROOT_PATH"])
+assert os.path.exists(ROOT_PATH), ROOT_PATH
+sys.path.append(ROOT_PATH)
 
 if __name__ == "__main__":
+    #
+    # IMPORTS
+    #
+    from tracer.models.base_models.supported_base_model import SupportedBaseModel
+    from jobs.predict_job import PredictJob
+    from server.serializers.job_factory.prediction_request_serializer import PredictionRequestSerializer
+    from scripts.base_script import BaseScript
+
+    #
+    # Argument Parsing
+    #
+    parser = argparse.ArgumentParser(
+        prog='PreTrainer',
+        description='Pre-trains a bert model on a directory of documents.')
+    parser.add_argument('data')  # positional argument
+    parser.add_argument('output')
+    parser.add_argument('-model', help="The model to pre-train", default="roberta-base")
+    args = parser.parse_args()
+
+    #
+    # Create Job Data
+    #
     job_definition = {
         "baseModel": SupportedBaseModel.AUTO_MODEL,
-        "modelPath": "roberta-base",
+        "modelPath": args.model,
         "outputDir": args.output,
         "saveJobOutput": True,
         "data": {
@@ -66,8 +51,5 @@ if __name__ == "__main__":
             }
         }
     }
-    pre_training_serializer = PredictionRequestSerializer(data=job_definition)
-    assert pre_training_serializer.is_valid(), pre_training_serializer.errors
-    job_factory: JobFactory = pre_training_serializer.save()
-    pre_training_job = job_factory.build(PredictJob)
-    pre_training_job.run()
+    base_script = BaseScript(args, PredictionRequestSerializer, PredictJob)
+    base_script.run(job_definition)

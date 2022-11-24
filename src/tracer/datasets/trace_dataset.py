@@ -1,12 +1,15 @@
 import os
 import random
+import uuid
 from collections import OrderedDict
 from copy import deepcopy
-from typing import Callable, Dict, List, Sized, Tuple
+from typing import Callable, Dict, List, Sized, Tuple, Iterable
 
 from config.constants import RESAMPLE_RATE_DEFAULT
 from tracer.datasets.abstract_dataset import AbstractDataset
+from tracer.datasets.data_augmenter import DataAugmenter
 from tracer.datasets.data_key import DataKey
+from tracer.datasets.data_objects.artifact import Artifact
 from tracer.datasets.data_objects.trace_link import TraceLink
 from tracer.datasets.formats.csv_format import CSVFormat
 from tracer.models.model_generator import ModelGenerator
@@ -18,6 +21,7 @@ random.seed(SEED)
 
 
 class TraceDataset(AbstractDataset):
+    AUG_ID = str(uuid.uuid4())[:8]
 
     def __init__(self, links: Dict[int, TraceLink], pos_link_ids: List[int] = None, neg_link_ids: List[int] = None):
         """
@@ -66,6 +70,22 @@ class TraceDataset(AbstractDataset):
         return pd.DataFrame(data,
                             columns=[CSVFormat.SOURCE_ID, CSVFormat.SOURCE, CSVFormat.TARGET_ID, CSVFormat.TARGET, CSVFormat.LABEL])
 
+    def augment_pos_links(self, replacement_percentage: float) -> None:
+        """
+        Augments the positive links to balance the data by randomly replacing words in the artifact bodies
+        :param replacement_percentage: the rate at which to replace words
+        :return: None
+        """
+        pos_links = [self.links[link_id] for link_id in self.pos_link_ids]
+        data_entries = [DataAugmenter.WORD_SEP.join([link.source.token, self.AUG_ID, link.target.token]) for link in pos_links]
+        augmented_data = DataAugmenter(replacement_percentage).run(data_entries, n_expected=len(self.neg_link_ids))
+        for entry, reference_index in augmented_data:
+            aug_source_tokens, aug_target_tokens = entry.split(DataAugmenter.WORD_SEP + self.AUG_ID + DataAugmenter.WORD_SEP)
+            orig_link = pos_links[reference_index]
+            aug_source_id, aug_target_id = ("%s_%s" % (link_id, self.AUG_ID) for link_id in [orig_link.source.id, orig_link.target.id])
+            self.add_link(source_id=aug_source_id, target_id=aug_target_id,
+                          source_tokens=aug_source_tokens, target_tokens=aug_target_tokens, is_true_link=True)
+
     def save(self, output_dir: str, filename: str) -> str:
         """
         Saves the dataset to the output dir
@@ -86,16 +106,18 @@ class TraceDataset(AbstractDataset):
         return [(self.links[link_id].source.id, self.links[link_id].target.id) for link_id in
                 self.pos_link_ids + self.neg_link_ids]
 
-    def train_test_split(self, percent_test: float, resample_rate: int = RESAMPLE_RATE_DEFAULT):
+    def train_test_split(self, percent_test: float, resample_rate: int = 0, replacement_percentage: float = 0) \
+            -> Tuple["TraceDataset", "TraceDataset"]:
         """
         Gets the train and test datasets splits
         :param percent_test: the percent of data used for testing
         :param resample_rate: the rate at which to resample the positive links
+        :param replacement_percentage: if performing Augmentation, the replacement rate will be used to determine the # of word replacements
         :return: the train and test datasets
         """
         train, test = self.split(percent_test)
-        train = self._prepare_train_split(train, resample_rate)
-        test = self._prepare_test_split(test)
+        train.prepare_for_training(resample_rate, replacement_percentage)
+        test.prepare_for_testing()
         return train, test
 
     def resize_pos_links(self, new_length: int, include_duplicates: bool = False) -> None:
@@ -132,6 +154,26 @@ class TraceDataset(AbstractDataset):
         """
         self.neg_link_ids = self._resample_data(self.neg_link_ids, resample_rate)
 
+    def add_link(self, source_id: str, target_id: str, source_tokens: str, target_tokens: str, is_true_link: bool) -> int:
+        """
+        Adds a link to the dataset
+        :param source_id: the id of the source artifact
+        :param target_id: the id of the target artifact
+        :param source_tokens: the content of the source artifact
+        :param target_tokens: the content of the target artifact
+        :param is_true_link: True if the artifacts are positively linked else False
+        :return: the new link id
+        """
+        source = Artifact(source_id, source_tokens)
+        target = Artifact(target_id, target_tokens)
+        new_link = TraceLink(source, target, is_true_link=is_true_link)
+        self.links[new_link.id] = new_link
+        if is_true_link:
+            self.pos_link_ids.append(new_link.id)
+        else:
+            self.neg_link_ids.append(new_link.id)
+        return new_link.id
+
     @staticmethod
     def _resize_data(data: List, new_length: int, include_duplicates: bool = False) -> List:
         """
@@ -141,6 +183,8 @@ class TraceDataset(AbstractDataset):
         :param include_duplicates: if True, uses sampling
         :return: a list with the datasets of the new_length
         """
+        if new_length == len(data):
+            return data
         include_duplicates = True if new_length > len(
             data) else include_duplicates  # must include duplicates to make a bigger datasets
         reduction_func = random.choices if include_duplicates else random.sample
@@ -231,25 +275,26 @@ class TraceDataset(AbstractDataset):
         """
         return len(data) - round(len(data) * percent_split)
 
-    def _prepare_train_split(self, train_split: "TraceDataset", resample_rate: int) -> "TraceDataset":
+    def prepare_for_training(self, resample_rate: int, replacement_percentage: float) -> None:
         """
         Resamples positive links and resizes negative links to create 50-50 ratio.
-        :param train_split: The split to prepare.
         :param resample_rate: The number of copies of each positive link.
+        :param replacement_percentage: The rate at which to replace words for data augmentation
         :return: Prepared trace datasets
         """
-        if len(train_split.pos_link_ids) > 0:
-            train_split.resample_pos_links(resample_rate)
-            train_split.resize_neg_links(len(train_split.pos_link_ids), include_duplicates=True)
-        return train_split
+        if len(self.pos_link_ids) > 0:
+            if replacement_percentage > 0:
+                self.augment_pos_links(replacement_percentage)
+            if resample_rate > 0:
+                self.resample_pos_links(resample_rate)
+            self.resize_neg_links(len(self.pos_link_ids), include_duplicates=True)
 
-    def _prepare_test_split(self, test_split: "TraceDataset") -> "TraceDataset":
+    def prepare_for_testing(self) -> None:
         """
         Does nothing. TODO: Add resizing behavior.
-        :param test_split: The split to prepare.
-        :return: Prepared trace datasets.
+        :return: None
         """
-        return test_split
+        return
 
     def __len__(self):
         return len(self.pos_link_ids) + len(self.neg_link_ids)

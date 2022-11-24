@@ -9,15 +9,17 @@ class TestDataAugmenter(BaseTest):
 
     def test_run(self):
         da = self.get_data_augmenter()
-        data_entries = ["The city planning is missing in this depressing city", "the cars always break",
-                        "I hate South Bend alot", "South Bend is frigid"]
-        result = da.run(data_entries, 7)
-        self.assertEquals(len(result), 7)
+        data_entries = ["0The city planning is missing in this depressing city", "1the cars always break",
+                        "2I hate South Bend alot", "3South Bend is frigid"]
+        result = list(da.run(data_entries, 7))
+        self.assertEquals(len(result), 7-len(data_entries))
+        for augmented_data, i in result:
+            self.assertEquals(int(data_entries[i][0]), i)
 
     def test_get_number_to_sample(self):
-        self.assertEquals(2, DataAugmenter._get_number_to_sample(5, 10, 12))
-        self.assertEquals(0, DataAugmenter._get_number_to_sample(5, 10, 10))
-        self.assertEquals(5, DataAugmenter._get_number_to_sample(5, 10, 17))
+        self.assertEquals(2, DataAugmenter._get_number_to_sample(5, 5, 12))
+        self.assertEquals(0, DataAugmenter._get_number_to_sample(5, 5, 10))
+        self.assertEquals(5, DataAugmenter._get_number_to_sample(5, 5, 17))
 
     def test_generate_new_content(self):
         orig_content = "The city planning is missing in this depressing city and the cars always break"

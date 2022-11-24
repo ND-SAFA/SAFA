@@ -1,7 +1,7 @@
 import random
 from copy import copy
 from dataclasses import dataclass
-from typing import List, Set, Optional
+from typing import List, Set, Optional, Tuple, Iterable
 
 import nltk
 from nltk.stem import WordNetLemmatizer
@@ -26,30 +26,34 @@ class DataAugmenter:
     POS2EXCLUDE = {wn.NOUN}
     STOPWORDS = set(stopwords.words('english'))
     NEW_LINE = "\n"
+    WORD_SEP = " "
     lemmatizer = WordNetLemmatizer()
 
-    def __init__(self, replacement_rate: float):
+    def __init__(self, replacement_percentage: float):
         """
         Handles data augmentation to obtain a larger dataset
-        :param replacement_rate: the rate at which to replace words
+        :param replacement_percentage: the rate at which to replace words
         """
-        self.replacement_rate = replacement_rate
+        self.replacement_rate = replacement_percentage
 
-    def run(self, data_entries: List[str], n_expected: int) -> List[str]:
+    def run(self, data_entries: List[str], n_expected: int) -> Iterable[Tuple[str, int]]:
         """
         Runs the data augmentation to obtain a larger dataset
         :param data_entries: a list of data content
         :param n_expected: the number of data entries desired
-        :return: the augmented data
+        :return: list of tuples containing the augmented data and the orig indices for the entry
         """
         n_orig = len(data_entries)
-        n_sample = self._get_number_to_sample(n_orig, n_orig, n_expected)
-        augmented_data = copy(data_entries)
+        n_sample = self._get_number_to_sample(n_orig, 0, n_expected)
+        augmented_data = []
+        index_reference = []
         while n_sample > 0:
-            for entry in random.sample(data_entries, k=n_sample):
+            for i in random.sample([i for i in range(n_orig)], k=n_sample):
+                entry = data_entries[i]
                 augmented_data.append(self._generate_new_content(entry, self.replacement_rate))
+                index_reference.append(i)
             n_sample = self._get_number_to_sample(n_orig, len(augmented_data), n_expected)
-        return augmented_data
+        return zip(augmented_data, index_reference)
 
     @staticmethod
     def _generate_new_content(orig_content: str, replacement_rate: float) -> str:
@@ -67,18 +71,18 @@ class DataAugmenter:
         for i, wr in enumerate(word_reps):
             word = wr.replacements.pop() if i in indices2replace else wr.word
             new_content.append(word)
-        return " ".join(new_content)
+        return DataAugmenter.WORD_SEP.join(new_content)
 
     @staticmethod
-    def _get_number_to_sample(n_orig: int, n_total: int, n_expected: int) -> int:
+    def _get_number_to_sample(n_orig: int, n_new: int, n_expected: int) -> int:
         """
         Gets the number of data entries to select for word replacements
         :param n_orig: the number of orig data entries
-        :param n_total: the current total of orig data entries
+        :param n_new: the current total of orig data entries
         :param n_expected: the number of desired data entries
         :return: the number of data entries to select
         """
-        return min(n_expected - n_total, n_orig)
+        return min(n_expected - (n_new + n_orig), n_orig)
 
     @staticmethod
     def _get_synonyms(orig_word: str, pos: str) -> Set[str]:

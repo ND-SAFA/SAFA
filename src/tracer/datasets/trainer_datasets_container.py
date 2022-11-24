@@ -1,6 +1,6 @@
 from typing import Optional
 
-from config.constants import RESAMPLE_RATE_DEFAULT, VALIDATION_PERCENTAGE_DEFAULT
+from config.constants import RESAMPLE_RATE_DEFAULT, VALIDATION_PERCENTAGE_DEFAULT, REPLACEMENT_PERCENTAGE_DEFAULT
 from tracer.datasets.abstract_dataset import AbstractDataset
 from tracer.datasets.dataset_role import DatasetRole
 from tracer.datasets.pre_train_dataset import PreTrainDataset
@@ -9,13 +9,11 @@ from tracer.datasets.trace_dataset import TraceDataset
 
 class TrainerDatasetsContainer:
 
-    def __init__(self,
-                 pre_train: PreTrainDataset = None,
-                 train: AbstractDataset = None,
-                 val: AbstractDataset = None,
-                 eval: TraceDataset = None,
+    def __init__(self, pre_train: PreTrainDataset = None, train: AbstractDataset = None,
+                 val: AbstractDataset = None, eval: TraceDataset = None,
                  validation_percentage: float = VALIDATION_PERCENTAGE_DEFAULT, split_train_dataset: bool = False,
-                 resample_rate: int = RESAMPLE_RATE_DEFAULT
+                 resample_rate: int = RESAMPLE_RATE_DEFAULT,
+                 do_augmentation: bool = False, replacement_percentage: float = REPLACEMENT_PERCENTAGE_DEFAULT
                  ):
         """
         Container to hold all the datasets used in the TraceTrainer
@@ -26,14 +24,17 @@ class TrainerDatasetsContainer:
         :param validation_percentage: percentage of the data to use for validation datasets
         :param split_train_dataset: if True, splits the training datasets into a train, val datasets
         :param resample_rate: the rate at which to resample positive examples in the train datasets
+        :param do_augmentation: if True, performs data augmentation on the positive examples
+        :param replacement_percentage: if augmenting, the rate at which to replace words in positive examples in the train datasets
         """
         self.pre_train_dataset: Optional[PreTrainDataset] = pre_train
         self.train_dataset: Optional[AbstractDataset] = train
         self.val_dataset: Optional[AbstractDataset] = val
         self.eval_dataset: Optional[TraceDataset] = eval
-        if isinstance(self.train_dataset, TraceDataset) and split_train_dataset:
-            self.train_dataset, self.val_dataset = self.train_dataset.train_test_split(validation_percentage,
-                                                                                       resample_rate)
+        if isinstance(self.train_dataset, TraceDataset):
+            if split_train_dataset:
+                self.train_dataset, self.val_dataset = self.train_dataset.split(validation_percentage)
+            self.train_dataset.prepare_for_training(resample_rate, replacement_percentage if do_augmentation else 0)
 
     def save_dataset_splits(self, output_dir: str) -> None:
         """

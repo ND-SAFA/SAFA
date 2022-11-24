@@ -8,7 +8,14 @@ from tracer.datasets.trace_dataset import TraceDataset
 from tracer.models.model_generator import ModelGenerator
 from tracer.models.model_properties import ArchitectureType
 import pandas as pd
+
 FEATURE_VALUE = "({}, {})"
+
+
+def fake_synonyms(replacement_word: str, orig_word: str, pos: str):
+    if "s_" in orig_word:
+        return {replacement_word}
+    return set()
 
 
 def fake_method(text, text_pair=None, return_token_type_ids=None, add_special_tokens=None):
@@ -51,6 +58,25 @@ class TestTraceDataset(BaseTraceTest):
         self.assert_lists_have_the_same_vals(new_trace_dataset.links.keys(), trace_dataset.links.keys())
         self.assert_lists_have_the_same_vals(new_trace_dataset.pos_link_ids, trace_dataset.pos_link_ids)
         self.assert_lists_have_the_same_vals(new_trace_dataset.neg_link_ids, trace_dataset.neg_link_ids)
+
+    @patch("tracer.datasets.data_augmenter.DataAugmenter._get_word_pos")
+    @patch("tracer.datasets.data_augmenter.DataAugmenter._get_synonyms")
+    def test_augment_pos_links(self, get_synonym_mock, get_word_pos_mock):
+        replacement_word = "augmented_source_token"
+        get_synonym_mock.side_effect = lambda orig_word, pos: fake_synonyms(replacement_word, orig_word, pos)
+        get_word_pos_mock.return_value = "j"
+        trace_dataset = self.get_trace_dataset()
+        trace_dataset.augment_pos_links(replacement_percentage=0.15)
+        n_augmented_links = 0
+        self.assertEquals(len(trace_dataset.pos_link_ids), len(trace_dataset.neg_link_ids))
+        for link_id, link in trace_dataset.links.items():
+            if trace_dataset.AUG_ID in link.target.id:
+                self.assertIn(link_id, trace_dataset.pos_link_ids)
+                self.assertEquals(link.source.token, replacement_word)
+                self.assertIn("token", link.target.token)
+                self.assertIn(trace_dataset.AUG_ID, link.source.id)
+                n_augmented_links += 1
+        self.assertEquals(len(self.NEG_LINKS) - len(self.POS_LINKS), n_augmented_links)
 
     def test_get_source_target_pairs(self):
         trace_dataset = self.get_trace_dataset()
@@ -104,6 +130,25 @@ class TestTraceDataset(BaseTraceTest):
         for split in [split1, split2]:
             link_ids = split.pos_link_ids + split.neg_link_ids
             self.assert_lists_have_the_same_vals(split.links.keys(), link_ids)
+
+    def test_prepare_for_training(self):
+        n_pos_links = len(self.POS_LINKS)
+
+        trace_dataset_aug = self.get_trace_dataset()
+        trace_dataset_aug.prepare_for_training(0, .15)
+        aug_links = {link_id for link_id in trace_dataset_aug.pos_link_ids if
+                     trace_dataset_aug.AUG_ID in trace_dataset_aug.links[link_id].source.id}
+        self.assertEquals(len(aug_links), len(self.NEG_LINKS) - n_pos_links)
+        self.assertEquals(len(set(trace_dataset_aug.pos_link_ids)), n_pos_links+len(aug_links))
+        self.assertEquals(len(trace_dataset_aug.pos_link_ids), len(trace_dataset_aug.neg_link_ids))
+
+        trace_dataset_resample = self.get_trace_dataset()
+        trace_dataset_resample.prepare_for_training(3, 0)
+        aug_links = {link_id for link_id in trace_dataset_resample.pos_link_ids if
+                     trace_dataset_resample.AUG_ID in trace_dataset_resample.links[link_id].source.id}
+        self.assertEquals(len(aug_links), 0)
+        self.assertEquals(len(trace_dataset_resample.pos_link_ids), 3 * n_pos_links)
+        self.assertEquals(len(trace_dataset_resample.pos_link_ids), len(trace_dataset_resample.neg_link_ids))
 
     def test_get_feature_entry(self):
         trace_dataset = self.get_trace_dataset()

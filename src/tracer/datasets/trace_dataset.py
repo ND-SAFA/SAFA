@@ -3,11 +3,11 @@ import random
 import uuid
 from collections import OrderedDict
 from copy import deepcopy
-from typing import Callable, Dict, List, Sized, Tuple, Iterable
+from typing import Callable, Dict, List, Sized, Tuple
 
-from config.constants import RESAMPLE_RATE_DEFAULT
 from tracer.datasets.abstract_dataset import AbstractDataset
-from tracer.datasets.data_augmenter import DataAugmenter
+from tracer.datasets.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
+from tracer.datasets.processing.augmentation.data_augmenter import DataAugmenter
 from tracer.datasets.data_key import DataKey
 from tracer.datasets.data_objects.artifact import Artifact
 from tracer.datasets.data_objects.trace_link import TraceLink
@@ -21,7 +21,6 @@ random.seed(SEED)
 
 
 class TraceDataset(AbstractDataset):
-    AUG_ID = str(uuid.uuid4())[:8]
 
     def __init__(self, links: Dict[int, TraceLink], pos_link_ids: List[int] = None, neg_link_ids: List[int] = None):
         """
@@ -70,21 +69,41 @@ class TraceDataset(AbstractDataset):
         return pd.DataFrame(data,
                             columns=[CSVFormat.SOURCE_ID, CSVFormat.SOURCE, CSVFormat.TARGET_ID, CSVFormat.TARGET, CSVFormat.LABEL])
 
-    def augment_pos_links(self, replacement_percentage: float) -> None:
+    def augment_pos_links(self, augmentation_steps: List[AbstractDataAugmentationStep]) -> None:
         """
-        Augments the positive links to balance the data by randomly replacing words in the artifact bodies
-        :param replacement_percentage: the rate at which to replace words
+        Augments the positive links to balance the data using the given augmentation steps
+        :param augmentation_steps: the augmentation steps to run
         :return: None
         """
+        processor = DataAugmenter(augmentation_steps)
         pos_links = [self.links[link_id] for link_id in self.pos_link_ids]
-        data_entries = [DataAugmenter.WORD_SEP.join([link.source.token, self.AUG_ID, link.target.token]) for link in pos_links]
-        augmented_data = DataAugmenter(replacement_percentage).run(data_entries, n_expected=len(self.neg_link_ids))
-        for entry, reference_index in augmented_data:
-            aug_source_tokens, aug_target_tokens = entry.split(DataAugmenter.WORD_SEP + self.AUG_ID + DataAugmenter.WORD_SEP)
-            orig_link = pos_links[reference_index]
-            aug_source_id, aug_target_id = ("%s_%s" % (link_id, self.AUG_ID) for link_id in [orig_link.source.id, orig_link.target.id])
-            self.add_link(source_id=aug_source_id, target_id=aug_target_id,
-                          source_tokens=aug_source_tokens, target_tokens=aug_target_tokens, is_true_link=True)
+        data_entries = [(link.source.token, link.target.token) for link in pos_links]
+        augmentation_results = processor.run(data_entries, n_total_expected=len(self.neg_link_ids))
+        for aug_id, results in augmentation_results.items():
+            for entry, reference_index in results:
+                orig_link = pos_links[reference_index]
+                aug_source_id, aug_target_id = ("%s_%s" % (link_id, aug_id) for link_id in [orig_link.source.id, orig_link.target.id])
+                aug_source_tokens, aug_target_tokens = entry
+                self.add_link(source_id=aug_source_id, target_id=aug_target_id,
+                              source_tokens=aug_source_tokens, target_tokens=aug_target_tokens, is_true_link=True)
+
+    def prepare_for_training(self, augmentation_steps: List[AbstractDataAugmentationStep] = None) -> None:
+        """
+        Resamples positive links and resizes negative links to create 50-50 ratio.
+        :param augmentation_steps: steps to run to augment the training data
+        :return: Prepared trace datasets
+        """
+        if len(self.pos_link_ids) > 0:
+            if augmentation_steps:
+                self.augment_pos_links(augmentation_steps)
+            self.resize_neg_links(len(self.pos_link_ids), include_duplicates=True)
+
+    def prepare_for_testing(self) -> None:
+        """
+        Does nothing. TODO: Add resizing behavior.
+        :return: None
+        """
+        return
 
     def save(self, output_dir: str, filename: str) -> str:
         """
@@ -105,20 +124,6 @@ class TraceDataset(AbstractDataset):
         """
         return [(self.links[link_id].source.id, self.links[link_id].target.id) for link_id in
                 self.pos_link_ids + self.neg_link_ids]
-
-    def train_test_split(self, percent_test: float, resample_rate: int = 0, replacement_percentage: float = 0) \
-            -> Tuple["TraceDataset", "TraceDataset"]:
-        """
-        Gets the train and test datasets splits
-        :param percent_test: the percent of data used for testing
-        :param resample_rate: the rate at which to resample the positive links
-        :param replacement_percentage: if performing Augmentation, the replacement rate will be used to determine the # of word replacements
-        :return: the train and test datasets
-        """
-        train, test = self.split(percent_test)
-        train.prepare_for_training(resample_rate, replacement_percentage)
-        test.prepare_for_testing()
-        return train, test
 
     def resize_pos_links(self, new_length: int, include_duplicates: bool = False) -> None:
         """
@@ -214,8 +219,8 @@ class TraceDataset(AbstractDataset):
         }
         return TraceDataset(slice_links, slice_pos_link_ids, slice_neg_link_ids)
 
-    def _get_feature_entry(self, link: TraceLink, arch_type: ArchitectureType, feature_func: Callable) -> Dict[
-        str, any]:
+    def _get_feature_entry(self, link: TraceLink, arch_type: ArchitectureType, feature_func: Callable) \
+            -> Dict[str, any]:
         """
         Gets a representational dictionary of the feature to be used in the datasets
         :param link: link to extract features from
@@ -274,27 +279,6 @@ class TraceDataset(AbstractDataset):
         :return: the size of the datasets split
         """
         return len(data) - round(len(data) * percent_split)
-
-    def prepare_for_training(self, resample_rate: int, replacement_percentage: float) -> None:
-        """
-        Resamples positive links and resizes negative links to create 50-50 ratio.
-        :param resample_rate: The number of copies of each positive link.
-        :param replacement_percentage: The rate at which to replace words for data augmentation
-        :return: Prepared trace datasets
-        """
-        if len(self.pos_link_ids) > 0:
-            if replacement_percentage > 0:
-                self.augment_pos_links(replacement_percentage)
-            if resample_rate > 0:
-                self.resample_pos_links(resample_rate)
-            self.resize_neg_links(len(self.pos_link_ids), include_duplicates=True)
-
-    def prepare_for_testing(self) -> None:
-        """
-        Does nothing. TODO: Add resizing behavior.
-        :return: None
-        """
-        return
 
     def __len__(self):
         return len(self.pos_link_ids) + len(self.neg_link_ids)

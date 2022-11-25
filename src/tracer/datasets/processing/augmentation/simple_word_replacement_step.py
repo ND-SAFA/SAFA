@@ -10,6 +10,8 @@ from nltk.corpus import wordnet as wn
 from nltk.corpus import stopwords
 import math
 
+from tracer.datasets.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
+
 Synset = nltk.corpus.reader.wordnet.Synset
 
 
@@ -22,67 +24,36 @@ class WordRepresentation:
     is_end_of_sentence: bool = False
 
 
-class DataAugmenter:
+class SimpleWordReplacementStep(AbstractDataAugmentationStep):
     POS2EXCLUDE = {wn.NOUN}
     STOPWORDS = set(stopwords.words('english'))
     NEW_LINE = "\n"
     WORD_SEP = " "
     lemmatizer = WordNetLemmatizer()
 
-    def __init__(self, replacement_percentage: float):
+    def __init__(self, percent_to_weight: float, replacement_percentage: float):
         """
         Handles data augmentation to obtain a larger dataset
         :param replacement_percentage: the rate at which to replace words
         """
         self.replacement_rate = replacement_percentage
+        super().__init__(percent_to_weight)
 
-    def run(self, data_entries: List[str], n_expected: int) -> Iterable[Tuple[str, int]]:
-        """
-        Runs the data augmentation to obtain a larger dataset
-        :param data_entries: a list of data content
-        :param n_expected: the number of data entries desired
-        :return: list of tuples containing the augmented data and the orig indices for the entry
-        """
-        n_orig = len(data_entries)
-        n_sample = self._get_number_to_sample(n_orig, 0, n_expected)
-        augmented_data = []
-        index_reference = []
-        while n_sample > 0:
-            for i in random.sample([i for i in range(n_orig)], k=n_sample):
-                entry = data_entries[i]
-                augmented_data.append(self._generate_new_content(entry, self.replacement_rate))
-                index_reference.append(i)
-            n_sample = self._get_number_to_sample(n_orig, len(augmented_data), n_expected)
-        return zip(augmented_data, index_reference)
-
-    @staticmethod
-    def _generate_new_content(orig_content: str, replacement_rate: float) -> str:
+    def _generate_new_content(self, orig_content: str) -> str:
         """
         Generates new content by replacing words in the original content
         :param orig_content: the original content
-        :param replacement_rate: the rate at which to replace words
         :return: the new content
         """
-        word_reps = DataAugmenter._to_word_representations(orig_content)
-        indices2sample = [i for i in range(len(word_reps)) if DataAugmenter._should_replace(word_reps[i])]
-        n_replacements = min(math.ceil(len(word_reps) * replacement_rate), len(indices2sample))
+        word_reps = SimpleWordReplacementStep._to_word_representations(orig_content)
+        indices2sample = [i for i in range(len(word_reps)) if SimpleWordReplacementStep._should_replace(word_reps[i])]
+        n_replacements = min(math.ceil(len(word_reps) * self.replacement_rate), len(indices2sample))
         indices2replace = set(random.sample(indices2sample, k=n_replacements))
         new_content = []
         for i, wr in enumerate(word_reps):
             word = wr.replacements.pop() if i in indices2replace else wr.word
             new_content.append(word)
-        return DataAugmenter.WORD_SEP.join(new_content)
-
-    @staticmethod
-    def _get_number_to_sample(n_orig: int, n_new: int, n_expected: int) -> int:
-        """
-        Gets the number of data entries to select for word replacements
-        :param n_orig: the number of orig data entries
-        :param n_new: the current total of orig data entries
-        :param n_expected: the number of desired data entries
-        :return: the number of data entries to select
-        """
-        return min(n_expected - (n_new + n_orig), n_orig)
+        return SimpleWordReplacementStep.reconstruct_content(new_content)
 
     @staticmethod
     def _get_synonyms(orig_word: str, pos: str) -> Set[str]:
@@ -92,7 +63,7 @@ class DataAugmenter:
         :param pos: the part of speech
         :return: a set of synonyms
         """
-        synsets = wn.synsets(DataAugmenter.lemmatizer.lemmatize(orig_word), pos=pos) if pos else []
+        synsets = wn.synsets(SimpleWordReplacementStep.lemmatizer.lemmatize(orig_word), pos=pos) if pos else []
         return {name for syn in synsets for name in syn.lemma_names() if name.lower() != orig_word.lower()}
 
     @staticmethod
@@ -107,10 +78,10 @@ class DataAugmenter:
             sentence_word_reps = []
             word_tag_pairs = pos_tag(word_tokenize(sentence))
             for word, tag in word_tag_pairs:
-                pos = DataAugmenter._get_word_pos(tag)
-                replacements = DataAugmenter._get_synonyms(word, pos)
+                pos = SimpleWordReplacementStep._get_word_pos(tag)
+                replacements = SimpleWordReplacementStep._get_synonyms(word, pos)
                 sentence_word_reps.append(WordRepresentation(word=word, pos=pos, replacements=replacements,
-                                                             is_stop_word=word in DataAugmenter.STOPWORDS))
+                                                             is_stop_word=word in SimpleWordReplacementStep.STOPWORDS))
             last_word = sentence_word_reps.pop()
             last_word.is_end_of_sentence = True
             sentence_word_reps.append(last_word)
@@ -141,4 +112,5 @@ class DataAugmenter:
         :param word_rep: the word representation
         :return: True if the word should be replaced else False
         """
-        return not word_rep.is_stop_word and word_rep.pos not in DataAugmenter.POS2EXCLUDE and len(word_rep.replacements) >= 1
+        return not word_rep.is_stop_word and word_rep.pos not in SimpleWordReplacementStep.POS2EXCLUDE and len(
+            word_rep.replacements) >= 1

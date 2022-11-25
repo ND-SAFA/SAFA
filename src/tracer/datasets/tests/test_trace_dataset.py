@@ -4,6 +4,7 @@ from unittest.mock import patch
 from test.base_trace_test import BaseTraceTest
 from tracer.datasets.creators.csv_dataset_creator import CSVDatasetCreator
 from tracer.datasets.data_key import DataKey
+from tracer.datasets.processing.augmentation.simple_word_replacement_step import SimpleWordReplacementStep
 from tracer.datasets.trace_dataset import TraceDataset
 from tracer.models.model_generator import ModelGenerator
 from tracer.models.model_properties import ArchitectureType
@@ -34,17 +35,11 @@ class TestTraceDataset(BaseTraceTest):
     FEATURE_KEYS = DataKey.get_feature_entry_keys()
     RESAMPLE_RATE = 3
 
-    def test_train_test_dataset(self):
-        trace_dataset = self.get_trace_dataset()
-        train, test = trace_dataset.train_test_split(self.VAlIDATION_PERCENTAGE, self.RESAMPLE_RATE)
-        self.assertEquals(self.get_expected_train_dataset_size(), len(train.pos_link_ids) + len(train.neg_link_ids))
-        self.assertEquals(self.EXPECTED_VAL_SIZE_POS_LINKS + self.EXPECTED_VAL_SIZE_NEG_LINKS, len(test))
-
     @patch.object(ModelGenerator, "get_tokenizer")
     def test_to_trainer_dataset(self, get_tokenizer_mock: mock.MagicMock):
         get_tokenizer_mock.return_value = self.get_test_tokenizer()
-        train_dataset, test_dataset = self.get_trace_dataset().train_test_split(self.VAlIDATION_PERCENTAGE,
-                                                                                resample_rate=1)
+        train_dataset, test_dataset = self.get_trace_dataset().split(self.VAlIDATION_PERCENTAGE)
+        train_dataset.prepare_for_training()
         model_generator = ModelGenerator(**self.MODEL_GENERATOR_PARAMS)
         trainer_dataset = train_dataset.to_trainer_dataset(model_generator)
         self.assertTrue(isinstance(trainer_dataset[0], dict))
@@ -59,22 +54,22 @@ class TestTraceDataset(BaseTraceTest):
         self.assert_lists_have_the_same_vals(new_trace_dataset.pos_link_ids, trace_dataset.pos_link_ids)
         self.assert_lists_have_the_same_vals(new_trace_dataset.neg_link_ids, trace_dataset.neg_link_ids)
 
-    @patch("tracer.datasets.data_augmenter.DataAugmenter._get_word_pos")
-    @patch("tracer.datasets.data_augmenter.DataAugmenter._get_synonyms")
+    @patch.object(SimpleWordReplacementStep, "_get_word_pos")
+    @patch.object(SimpleWordReplacementStep, "_get_synonyms")
     def test_augment_pos_links(self, get_synonym_mock, get_word_pos_mock):
         replacement_word = "augmented_source_token"
         get_synonym_mock.side_effect = lambda orig_word, pos: fake_synonyms(replacement_word, orig_word, pos)
         get_word_pos_mock.return_value = "j"
         trace_dataset = self.get_trace_dataset()
-        trace_dataset.augment_pos_links(replacement_percentage=0.15)
+        trace_dataset.augment_pos_links([SimpleWordReplacementStep(1, 0.15)])
         n_augmented_links = 0
         self.assertEquals(len(trace_dataset.pos_link_ids), len(trace_dataset.neg_link_ids))
         for link_id, link in trace_dataset.links.items():
-            if trace_dataset.AUG_ID in link.target.id:
+            if SimpleWordReplacementStep.get_aug_id() in link.target.id:
                 self.assertIn(link_id, trace_dataset.pos_link_ids)
                 self.assertEquals(link.source.token, replacement_word)
                 self.assertIn("token", link.target.token)
-                self.assertIn(trace_dataset.AUG_ID, link.source.id)
+                self.assertIn(SimpleWordReplacementStep.get_aug_id(), link.source.id)
                 n_augmented_links += 1
         self.assertEquals(len(self.NEG_LINKS) - len(self.POS_LINKS), n_augmented_links)
 
@@ -135,20 +130,21 @@ class TestTraceDataset(BaseTraceTest):
         n_pos_links = len(self.POS_LINKS)
 
         trace_dataset_aug = self.get_trace_dataset()
-        trace_dataset_aug.prepare_for_training(0, .15)
+        trace_dataset_aug.prepare_for_training([SimpleWordReplacementStep(1, 0.15)])
         aug_links = {link_id for link_id in trace_dataset_aug.pos_link_ids if
-                     trace_dataset_aug.AUG_ID in trace_dataset_aug.links[link_id].source.id}
+                     SimpleWordReplacementStep.get_aug_id() in trace_dataset_aug.links[link_id].source.id}
         self.assertEquals(len(aug_links), len(self.NEG_LINKS) - n_pos_links)
         self.assertEquals(len(set(trace_dataset_aug.pos_link_ids)), n_pos_links+len(aug_links))
         self.assertEquals(len(trace_dataset_aug.pos_link_ids), len(trace_dataset_aug.neg_link_ids))
 
-        trace_dataset_resample = self.get_trace_dataset()
-        trace_dataset_resample.prepare_for_training(3, 0)
-        aug_links = {link_id for link_id in trace_dataset_resample.pos_link_ids if
-                     trace_dataset_resample.AUG_ID in trace_dataset_resample.links[link_id].source.id}
-        self.assertEquals(len(aug_links), 0)
-        self.assertEquals(len(trace_dataset_resample.pos_link_ids), 3 * n_pos_links)
-        self.assertEquals(len(trace_dataset_resample.pos_link_ids), len(trace_dataset_resample.neg_link_ids))
+        #TODO test on resample
+        # trace_dataset_resample = self.get_trace_dataset()
+        # trace_dataset_resample.prepare_for_training([SimpleWordReplacementStep(1, 0.15)])
+        # aug_links = {link_id for link_id in trace_dataset_resample.pos_link_ids if
+        #              SimpleWordReplacementStep.get_aug_id() in trace_dataset_resample.links[link_id].source.id}
+        # self.assertEquals(len(aug_links), 0)
+        # self.assertEquals(len(trace_dataset_resample.pos_link_ids), 3 * n_pos_links)
+        # self.assertEquals(len(trace_dataset_resample.pos_link_ids), len(trace_dataset_resample.neg_link_ids))
 
     def test_get_feature_entry(self):
         trace_dataset = self.get_trace_dataset()

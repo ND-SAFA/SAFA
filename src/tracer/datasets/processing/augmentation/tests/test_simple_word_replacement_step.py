@@ -72,7 +72,7 @@ class TestSimpleWordReplacementStep(BaseTest):
 
     def word_replacement_test(self, orig_content, indices2sample, replacement_rate):
         step = self.get_word_replacement_step(replacement_rate)
-        new_content = step._generate_new_content(orig_content)
+        new_content = step._augment(orig_content)
         orig_words = orig_content.split()
         n_replacements = 0
         for i, word in enumerate(new_content.split()):

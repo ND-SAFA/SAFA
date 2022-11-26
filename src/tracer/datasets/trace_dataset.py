@@ -1,6 +1,5 @@
 import os
 import random
-import uuid
 from collections import OrderedDict
 from copy import deepcopy
 from typing import Callable, Dict, List, Sized, Tuple
@@ -12,6 +11,7 @@ from tracer.datasets.data_key import DataKey
 from tracer.datasets.data_objects.artifact import Artifact
 from tracer.datasets.data_objects.trace_link import TraceLink
 from tracer.datasets.formats.csv_format import CSVFormat
+from tracer.datasets.processing.augmentation.source_target_swap_step import SourceTargetSwapStep
 from tracer.models.model_generator import ModelGenerator
 from tracer.models.model_properties import ArchitectureType
 import pandas as pd
@@ -69,96 +69,6 @@ class TraceDataset(AbstractDataset):
         return pd.DataFrame(data,
                             columns=[CSVFormat.SOURCE_ID, CSVFormat.SOURCE, CSVFormat.TARGET_ID, CSVFormat.TARGET, CSVFormat.LABEL])
 
-    def augment_pos_links(self, augmentation_steps: List[AbstractDataAugmentationStep]) -> None:
-        """
-        Augments the positive links to balance the data using the given augmentation steps
-        :param augmentation_steps: the augmentation steps to run
-        :return: None
-        """
-        processor = DataAugmenter(augmentation_steps)
-        pos_links = [self.links[link_id] for link_id in self.pos_link_ids]
-        data_entries = [(link.source.token, link.target.token) for link in pos_links]
-        augmentation_results = processor.run(data_entries, n_total_expected=len(self.neg_link_ids))
-        for aug_id, results in augmentation_results.items():
-            for entry, reference_index in results:
-                orig_link = pos_links[reference_index]
-                aug_source_id, aug_target_id = ("%s_%s" % (link_id, aug_id) for link_id in [orig_link.source.id, orig_link.target.id])
-                aug_source_tokens, aug_target_tokens = entry
-                self.add_link(source_id=aug_source_id, target_id=aug_target_id,
-                              source_tokens=aug_source_tokens, target_tokens=aug_target_tokens, is_true_link=True)
-
-    def prepare_for_training(self, augmentation_steps: List[AbstractDataAugmentationStep] = None) -> None:
-        """
-        Resamples positive links and resizes negative links to create 50-50 ratio.
-        :param augmentation_steps: steps to run to augment the training data
-        :return: Prepared trace datasets
-        """
-        if len(self.pos_link_ids) > 0:
-            if augmentation_steps:
-                self.augment_pos_links(augmentation_steps)
-            self.resize_neg_links(len(self.pos_link_ids), include_duplicates=True)
-
-    def prepare_for_testing(self) -> None:
-        """
-        Does nothing. TODO: Add resizing behavior.
-        :return: None
-        """
-        return
-
-    def save(self, output_dir: str, filename: str) -> str:
-        """
-        Saves the dataset to the output dir
-        :param output_dir: directory to save to
-        :param filename: name of tthe file (no ext)
-        :return: location the file was saved to
-        """
-        output_path = os.path.join(output_dir, filename + ".csv")
-        df = self.to_dataframe()
-        df.to_csv(output_path)
-        return output_path
-
-    def get_source_target_pairs(self) -> List[Tuple]:
-        """
-        Gets the list of source target pairs in the order corresponding to the trainer datasets
-        :return: list of tuples containing source id and target id
-        """
-        return [(self.links[link_id].source.id, self.links[link_id].target.id) for link_id in
-                self.pos_link_ids + self.neg_link_ids]
-
-    def resize_pos_links(self, new_length: int, include_duplicates: bool = False) -> None:
-        """
-        Extends or shrinks pos trace links to given size.
-        :param new_length: The new size of the links.
-        :param include_duplicates: Whether to include duplicate links if extending.
-        :return:  None (links are automatically set in current instance).
-        """
-        self.pos_link_ids = self._resize_data(self.pos_link_ids, new_length, include_duplicates=include_duplicates)
-
-    def resize_neg_links(self, new_length: int, include_duplicates: bool = False) -> None:
-        """
-        Extends or shrinks neg trace links to given size.
-        :param new_length: The new size of the links.
-        :param include_duplicates: Whether to include duplicate links if extending.
-        :return:  None (links are automatically set in current instance).
-        """
-        self.neg_link_ids = self._resize_data(self.neg_link_ids, new_length, include_duplicates=include_duplicates)
-
-    def resample_pos_links(self, resample_rate: int) -> None:
-        """
-        Copies pos links as many times defined by resample rate.
-        :param resample_rate: How many copies of each link to make.
-        :return:  None (links are automatically set in current instance).
-        """
-        self.pos_link_ids = self._resample_data(self.pos_link_ids, resample_rate)
-
-    def resample_neg_links(self, resample_rate: int) -> None:
-        """
-        Copies neg links as many times defined by resample rate.
-        :param resample_rate: How many copies of each link to make.
-        :return:  None (links are automatically set in current instance).
-        """
-        self.neg_link_ids = self._resample_data(self.neg_link_ids, resample_rate)
-
     def add_link(self, source_id: str, target_id: str, source_tokens: str, target_tokens: str, is_true_link: bool) -> int:
         """
         Adds a link to the dataset
@@ -179,6 +89,104 @@ class TraceDataset(AbstractDataset):
             self.neg_link_ids.append(new_link.id)
         return new_link.id
 
+    def augment_pos_links(self, augmentation_steps: List[AbstractDataAugmentationStep]) -> None:
+        """
+        Augments the positive links to balance the data using the given augmentation steps
+        :param augmentation_steps: the augmentation steps to run
+        :return: None
+        """
+        augmenter = DataAugmenter(augmentation_steps)
+        pos_links_for_swp, data_entries_for_swap = self._get_data_entries_for_augmentation()
+        augmentation_results_from_swap = augmenter.run(data_entries_for_swap, n_total_expected=len(data_entries_for_swap),
+                                                       exclude_all_but_step_type=SourceTargetSwapStep)
+        if augmentation_results_from_swap:
+            self._create_links_from_augmentation(augmentation_results_from_swap, pos_links_for_swp)
+
+        pos_links, data_entries = self._get_data_entries_for_augmentation()
+        augmentation_results = augmenter.run(data_entries, n_total_expected=len(self.neg_link_ids),
+                                             include_all_but_step_type=SourceTargetSwapStep)
+        self._create_links_from_augmentation(augmentation_results, pos_links)
+
+    def get_source_target_pairs(self) -> List[Tuple]:
+        """
+        Gets the list of source target pairs in the order corresponding to the trainer datasets
+        :return: list of tuples containing source id and target id
+        """
+        return [(self.links[link_id].source.id, self.links[link_id].target.id) for link_id in
+                self.pos_link_ids + self.neg_link_ids]
+
+    def prepare_for_training(self, augmentation_steps: List[AbstractDataAugmentationStep] = None) -> None:
+        """
+        Resamples positive links and resizes negative links to create 50-50 ratio.
+        :param augmentation_steps: steps to run to augment the training data
+        :return: Prepared trace datasets
+        """
+        if len(self.pos_link_ids) > 0:
+            if augmentation_steps:
+                self.augment_pos_links(augmentation_steps)
+            self.resize_neg_links(len(self.pos_link_ids), include_duplicates=True)
+
+    def prepare_for_testing(self) -> None:
+        """
+        Does nothing. TODO: Add resizing behavior.
+        :return: None
+        """
+        return
+
+    def resize_pos_links(self, new_length: int, include_duplicates: bool = False) -> None:
+        """
+        Extends or shrinks pos trace links to given size.
+        :param new_length: The new size of the links.
+        :param include_duplicates: Whether to include duplicate links if extending.
+        :return:  None (links are automatically set in current instance).
+        """
+        self.pos_link_ids = self._resize_data(self.pos_link_ids, new_length, include_duplicates=include_duplicates)
+
+    def resize_neg_links(self, new_length: int, include_duplicates: bool = False) -> None:
+        """
+        Extends or shrinks neg trace links to given size.
+        :param new_length: The new size of the links.
+        :param include_duplicates: Whether to include duplicate links if extending.
+        :return:  None (links are automatically set in current instance).
+        """
+        self.neg_link_ids = self._resize_data(self.neg_link_ids, new_length, include_duplicates=include_duplicates)
+
+    def save(self, output_dir: str, filename: str) -> str:
+        """
+        Saves the dataset to the output dir
+        :param output_dir: directory to save to
+        :param filename: name of tthe file (no ext)
+        :return: location the file was saved to
+        """
+        output_path = os.path.join(output_dir, filename + ".csv")
+        df = self.to_dataframe()
+        df.to_csv(output_path)
+        return output_path
+
+    def _get_data_entries_for_augmentation(self) -> Tuple[List[TraceLink], List[Tuple[str, str]]]:
+        """
+        Gets the data entries (link source, target, token pairs) for the augmentation
+        :return: all links being used for augmentation and the data entries
+        """
+        pos_links = [self.links[link_id] for link_id in self.pos_link_ids]
+        return pos_links, [(link.source.token, link.target.token) for link in pos_links]
+
+    def _create_links_from_augmentation(self, augmentation_results: Dict[str, AbstractDataAugmentationStep.AUGMENTATION_RESULT],
+                                        orig_links: List[TraceLink]) -> None:
+        """
+        Creates new trace links from the results of an augmentation step
+        :param augmentation_results: the augmentation step id mapped to its results
+        :param orig_links: a list of all the original links (pre-augmentation) that the step was run on
+        :return: None
+        """
+        for aug_id, result in augmentation_results.items():
+            for entry, reference_index in result:
+                orig_link = orig_links[reference_index]
+                aug_source_id, aug_target_id = ("%s_%s" % (link_id, aug_id) for link_id in [orig_link.source.id, orig_link.target.id])
+                aug_source_tokens, aug_target_tokens = entry
+                self.add_link(source_id=aug_source_id, target_id=aug_target_id,
+                              source_tokens=aug_source_tokens, target_tokens=aug_target_tokens, is_true_link=True)
+
     @staticmethod
     def _resize_data(data: List, new_length: int, include_duplicates: bool = False) -> List:
         """
@@ -194,16 +202,6 @@ class TraceDataset(AbstractDataset):
             data) else include_duplicates  # must include duplicates to make a bigger datasets
         reduction_func = random.choices if include_duplicates else random.sample
         return reduction_func(data, k=new_length)
-
-    @staticmethod
-    def _resample_data(data: List[dict], resample_rate: int) -> List[dict]:
-        """
-        Adds multiple copies of each datasets entry at the given resample rate
-        :param data: a list of datasets entries
-        :param resample_rate: the number of copies to make of each entry
-        :return: the resampled datasets
-        """
-        return [entry for i in range(resample_rate) for entry in data]
 
     def _create_new_dataset_from_slice(self, percent_split: float, slice_num: int) -> "TraceDataset":
         """

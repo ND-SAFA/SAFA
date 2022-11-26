@@ -10,6 +10,7 @@ from nltk.corpus import wordnet as wn
 from nltk.corpus import stopwords
 import math
 
+from config.override import overrides
 from tracer.datasets.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
 
 Synset = nltk.corpus.reader.wordnet.Synset
@@ -33,13 +34,25 @@ class SimpleWordReplacementStep(AbstractDataAugmentationStep):
 
     def __init__(self, percent_to_weight: float, replacement_percentage: float):
         """
-        Handles data augmentation to obtain a larger dataset
+        Handles word replacement to augment the data and obtain a larger dataset
+        :param percent_to_weight: the percentage of the data that the augmentation step will augment
         :param replacement_percentage: the rate at which to replace words
         """
         self.replacement_rate = replacement_percentage
         super().__init__(percent_to_weight)
 
-    def _generate_new_content(self, orig_content: str) -> str:
+    def _augment(self, data_entry: Tuple[str, str]) -> Tuple[str]:
+        """
+        Augments the source and target tokens through word replacement
+        :param data_entry: the original content of the source and target
+        :return: the new content of the source and target
+        """
+        augmented_content = []
+        for orig_content in data_entry:
+            augmented_content.append(self._augment_content(orig_content))
+        return tuple(augmented_content)
+
+    def _augment_content(self, orig_content: str) -> str:
         """
         Generates new content by replacing words in the original content
         :param orig_content: the original content

@@ -1,4 +1,5 @@
-from typing import List, Dict, Iterable, Tuple
+from copy import deepcopy
+from typing import List, Dict, Iterable, Tuple, Type
 
 from config.override import overrides
 from tracer.datasets.processing.abstract_data_processor import AbstractDataProcessor
@@ -6,24 +7,69 @@ from tracer.datasets.processing.augmentation.abstract_data_augmentation_step imp
 
 
 class DataAugmenter(AbstractDataProcessor):
-    RUN_RESULTS = Dict[str, Iterable[Tuple[Tuple[str, str], int]]]
+    ordered_steps: List[AbstractDataAugmentationStep]
 
     @overrides(AbstractDataProcessor)
-    def run(self, data_entries: List[Tuple[str, str]], n_total_expected: int) -> RUN_RESULTS:
+    def run(self, data_entries: List[Tuple[str, str]], n_total_expected: int,
+            exclude_all_but_step_type: Type[AbstractDataAugmentationStep] = None,
+            include_all_but_step_type: Type[AbstractDataAugmentationStep] = None) \
+            -> Dict[str, AbstractDataAugmentationStep.AUGMENTATION_RESULT]:
         """
         Runs all given steps with the given run_arg
         :param data_entries: the arguments to use when running
         :param n_total_expected: total number of expected data entries at the end
-        :return: the results from the steps
+        :param exclude_all_but_step_type: if provided, will ONLY run step of given type
+        :param include_all_but_step_type: if provided, will run all steps BUT the given type
+        :return: the augmentation step id mapped to its results
         """
+        steps2run = self._get_steps_to_run(exclude_all_but_step_type, include_all_but_step_type)
         augmentation_results = {}
-        for step in self.ordered_steps:
-            content_list = [step.WORD_SEP.join([source, step.get_aug_id(), target]) for source, target in data_entries]
+        for step in steps2run:
             n_expected_for_step = self._get_n_expected_for_step(step, n_total_expected)
-            augmented_content, index_references = step.run(content_list, n_expected_for_step)
-            augmented_data = [content.split(step.WORD_SEP + step.get_aug_id() + step.WORD_SEP) for content in augmented_content]
-            augmentation_results[step.get_aug_id()] = zip(augmented_data, index_references)
+            augmentation_result = step.run(data_entries, n_expected_for_step)
+            augmentation_results[step.get_aug_id()] = augmentation_result
         return augmentation_results
+
+    def _get_steps_to_run(self, exclude_all_but_step_type: Type[AbstractDataAugmentationStep] = None,
+                          include_all_but_step_type: Type[AbstractDataAugmentationStep] = None) -> List[AbstractDataAugmentationStep]:
+        """
+        Gets the steps that should be run
+        :param exclude_all_but_step_type: if provided, will ONLY run step of given type
+        :param include_all_but_step_type: if provided, will run all steps BUT the given type
+        :return: the steps to run
+        """
+        if include_all_but_step_type:
+            steps2run = self._filter_step_type(self.ordered_steps, include_all_but_step_type)
+        elif exclude_all_but_step_type:
+            step = self._get_step_of_type(self.ordered_steps, exclude_all_but_step_type)
+            steps2run = [step] if step else []
+        else:
+            steps2run = self.ordered_steps
+        return steps2run
+
+    @staticmethod
+    def _filter_step_type(steps: List[AbstractDataAugmentationStep], step_type: Type[AbstractDataAugmentationStep]) \
+            -> List[AbstractDataAugmentationStep]:
+        """
+        Filters out the given step type from the list of steps
+        :param steps: a list of all steps
+        :param step_type: the step type to filter
+        :return: the filtered list of steps
+        """
+        return [step for step in steps if not isinstance(step, step_type)]
+
+    @staticmethod
+    def _get_step_of_type(steps: List[AbstractDataAugmentationStep], step_type: Type[AbstractDataAugmentationStep]) \
+            -> AbstractDataAugmentationStep:
+        """
+        Gets a step matching the given type
+        :param steps: a list of all steps
+        :param step_type: the step type to get
+        :return: the step matching the given type
+        """
+        for step in steps:
+            if isinstance(step, step_type):
+                return step
 
     @staticmethod
     def _get_n_expected_for_step(step: AbstractDataAugmentationStep, n_total_expected: int) -> int:

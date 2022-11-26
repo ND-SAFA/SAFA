@@ -25,7 +25,7 @@ class AbstractDataProcessingStep(ABC):
         self.order = order
 
     @abstractmethod
-    def run(self, data_entries: List[str], **kwargs) -> Iterable:
+    def run(self, data_entries: List, **kwargs) -> List:
         """
         Runs the pre-processing step on a given word_list
         :param data_entries: the list of words to process

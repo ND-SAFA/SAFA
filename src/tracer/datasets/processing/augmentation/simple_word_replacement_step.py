@@ -10,6 +10,7 @@ from nltk.corpus import wordnet as wn
 from nltk.corpus import stopwords
 import math
 
+from config.constants import REPLACEMENT_PERCENTAGE_DEFAULT
 from config.override import overrides
 from tracer.datasets.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
 
@@ -32,7 +33,7 @@ class SimpleWordReplacementStep(AbstractDataAugmentationStep):
     WORD_SEP = " "
     lemmatizer = WordNetLemmatizer()
 
-    def __init__(self, percent_to_weight: float, replacement_percentage: float):
+    def __init__(self, percent_to_weight: float, replacement_percentage: float = REPLACEMENT_PERCENTAGE_DEFAULT):
         """
         Handles word replacement to augment the data and obtain a larger dataset
         :param percent_to_weight: the percentage of the data that the augmentation step will augment

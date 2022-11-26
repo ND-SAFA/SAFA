@@ -6,7 +6,7 @@ from jobs.abstract_job import AbstractJob
 from jobs.gan_train_job import GanTrainJob
 from jobs.job_args import JobArgs
 from jobs.tests.test_train_job import TestTrainJob
-from test.base_job_test import BaseJobTest
+from jobs.tests.base_job_test import BaseJobTest
 from test.paths.paths import TEST_DATA_DIR, TEST_OUTPUT_DIR
 from tracer.datasets.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
 from tracer.datasets.creators.supported_dataset_creator import SupportedDatasetCreator

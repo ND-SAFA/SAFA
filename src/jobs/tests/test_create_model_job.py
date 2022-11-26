@@ -1,7 +1,7 @@
 from jobs.create_model_job import CreateModelJob
 from jobs.job_args import JobArgs
 from jobs.results.job_result import JobResult
-from test.base_job_test import BaseJobTest
+from jobs.tests.base_job_test import BaseJobTest
 
 
 class TestCreateModelJob(BaseJobTest):

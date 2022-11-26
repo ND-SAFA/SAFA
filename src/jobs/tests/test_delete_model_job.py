@@ -2,7 +2,7 @@ import os
 
 from jobs.delete_model_job import DeleteModelJob
 from jobs.job_args import JobArgs
-from test.base_job_test import BaseJobTest
+from jobs.tests.base_job_test import BaseJobTest
 from test.paths.paths import TEST_OUTPUT_DIR
 
 

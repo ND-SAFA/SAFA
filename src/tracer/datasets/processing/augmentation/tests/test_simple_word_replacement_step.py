@@ -10,19 +10,19 @@ class TestSimpleWordReplacementStep(BaseTest):
 
     def test_run(self):
         step = self.get_word_replacement_step()
-        data_entries = ["0The city planning is missing in this depressing city", "1the cars always break",
-                        "2I hate South Bend alot", "3South Bend is frigid"]
-        result = list(step.run(data_entries, 7))
-        self.assertEquals(len(result), 7 - len(data_entries))
+        data_entries = [("0", "The city planning is missing in this depressing city"), ("1", "the cars always break"),
+                        ("2", "I hate South Bend alot"), ("3", "South Bend is frigid")]
+        result = list(step.run(data_entries, 3))
+        self.assertEquals(len(result), 3)
         for augmented_data, i in result:
             self.assertEquals(int(data_entries[i][0]), i)
 
     def test_get_number_to_sample(self):
-        self.assertEquals(2, SimpleWordReplacementStep._get_number_to_sample(5, 5, 12))
-        self.assertEquals(0, SimpleWordReplacementStep._get_number_to_sample(5, 5, 10))
+        self.assertEquals(2, SimpleWordReplacementStep._get_number_to_sample(5, 5, 7))
+        self.assertEquals(0, SimpleWordReplacementStep._get_number_to_sample(5, 5, 5))
         self.assertEquals(5, SimpleWordReplacementStep._get_number_to_sample(5, 5, 17))
 
-    def test_generate_new_content(self):
+    def test_augment_content(self):
         orig_content = "The city planning is missing in this depressing city and the cars always break"
         indices2sample = [4, 7, 12, 13]
 
@@ -72,7 +72,7 @@ class TestSimpleWordReplacementStep(BaseTest):
 
     def word_replacement_test(self, orig_content, indices2sample, replacement_rate):
         step = self.get_word_replacement_step(replacement_rate)
-        new_content = step._augment(orig_content)
+        new_content = step._augment_content(orig_content)
         orig_words = orig_content.split()
         n_replacements = 0
         for i, word in enumerate(new_content.split()):

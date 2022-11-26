@@ -97,7 +97,7 @@ class TraceDataset(AbstractDataset):
         """
         augmenter = DataAugmenter(augmentation_steps)
         pos_links_for_swp, data_entries_for_swap = self._get_data_entries_for_augmentation()
-        augmentation_results_from_swap = augmenter.run(data_entries_for_swap, n_total_expected=len(data_entries_for_swap),
+        augmentation_results_from_swap = augmenter.run(data_entries_for_swap, n_total_expected=2*len(data_entries_for_swap),
                                                        exclude_all_but_step_type=SourceTargetSwapStep)
         if augmentation_results_from_swap:
             self._create_links_from_augmentation(augmentation_results_from_swap, pos_links_for_swp)

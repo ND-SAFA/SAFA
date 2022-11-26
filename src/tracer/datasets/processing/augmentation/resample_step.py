@@ -17,18 +17,18 @@ class ResampleStep(AbstractDataAugmentationStep):
         super().__init__(percent_to_weight)
 
     @overrides(AbstractDataAugmentationStep)
-    def run(self, data_entries: List, n_expected: int = None) -> AbstractDataAugmentationStep.AUGMENTATION_RESULT:
+    def run(self, data_entries: List, n_needed: int = None) -> AbstractDataAugmentationStep.AUGMENTATION_RESULT:
         """
         Runs the resample step to obtain a larger dataset
         :param data_entries: a list of tokens as source, target pairs
-        :param n_expected: the number of data entries desired
+        :param n_needed: the number of new data entries needed
         :return: list of containing the augmented data and the orig indices for the entry
         """
-        if n_expected:
-            self.resample_rate = max(round(n_expected / len(data_entries)), 1)
+        if n_needed:
+            self.resample_rate = max(round(n_needed / len(data_entries)), 1)
         augmented_data = []
         index_references = []
-        for i, data_entry in data_entries:
+        for i, data_entry in enumerate(data_entries):
             resampled_data = self._augment(data_entry)
             augmented_data.extend(resampled_data)
             index_references.extend([i for j in range(len(resampled_data))])

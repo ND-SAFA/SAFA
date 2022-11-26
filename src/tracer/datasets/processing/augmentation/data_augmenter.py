@@ -22,10 +22,11 @@ class DataAugmenter(AbstractDataProcessor):
         :param include_all_but_step_type: if provided, will run all steps BUT the given type
         :return: the augmentation step id mapped to its results
         """
+        n_needed = n_total_expected - len(data_entries)
         steps2run = self._get_steps_to_run(exclude_all_but_step_type, include_all_but_step_type)
         augmentation_results = {}
         for step in steps2run:
-            n_expected_for_step = self._get_n_expected_for_step(step, n_total_expected)
+            n_expected_for_step = self._get_n_expected_for_step(step, n_needed)
             augmentation_result = step.run(data_entries, n_expected_for_step)
             augmentation_results[step.get_aug_id()] = augmentation_result
         return augmentation_results

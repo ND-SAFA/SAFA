@@ -1,6 +1,6 @@
 from jobs.job_args import JobArgs
 from jobs.predict_job import PredictJob
-from test.base_job_test import BaseJobTest
+from jobs.tests.base_job_test import BaseJobTest
 from tracer.datasets.dataset_role import DatasetRole
 
 

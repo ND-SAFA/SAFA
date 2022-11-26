@@ -102,17 +102,6 @@ class TestTraceDataset(BaseTraceTest):
             self.assertEquals(new_length, len(link_ids))
             self.assertEquals(new_length, len(set(link_ids)))  # no duplicates
 
-    def test_resample_links(self):
-        trace_dataset = self.get_trace_dataset()
-        expected_pos_links = self.RESAMPLE_RATE * len(trace_dataset.pos_link_ids)
-        expected_neg_links = self.RESAMPLE_RATE * len(trace_dataset.neg_link_ids)
-
-        trace_dataset.resample_pos_links(self.RESAMPLE_RATE)
-        trace_dataset.resample_neg_links(self.RESAMPLE_RATE)
-
-        self.assertEquals(expected_pos_links, len(trace_dataset.pos_link_ids))
-        self.assertEquals(expected_neg_links, len(trace_dataset.neg_link_ids))
-
     def test_split(self):
         trace_dataset = self.get_trace_dataset()
         split1, split2 = trace_dataset.split(self.VAlIDATION_PERCENTAGE)

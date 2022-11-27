@@ -28,7 +28,7 @@ class DataAugmenter(AbstractDataProcessor):
         for step in steps2run:
             n_expected_for_step = self._get_n_expected_for_step(step, n_needed)
             augmentation_result = step.run(data_entries, n_expected_for_step)
-            augmentation_results[step.get_aug_id()] = augmentation_result
+            augmentation_results[step.get_id()] = augmentation_result
         return augmentation_results
 
     def _get_steps_to_run(self, exclude_all_but_step_type: Type[AbstractDataAugmentationStep] = None,

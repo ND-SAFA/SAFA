@@ -96,16 +96,14 @@ class TraceDataset(AbstractDataset):
         :return: None
         """
         augmenter = DataAugmenter(augmentation_steps)
-        pos_links_for_swp, data_entries_for_swap = self._get_data_entries_for_augmentation()
-        augmentation_results_from_swap = augmenter.run(data_entries_for_swap, n_total_expected=2*len(data_entries_for_swap),
-                                                       exclude_all_but_step_type=SourceTargetSwapStep)
-        if augmentation_results_from_swap:
-            self._create_links_from_augmentation(augmentation_results_from_swap, pos_links_for_swp)
-
-        pos_links, data_entries = self._get_data_entries_for_augmentation()
-        augmentation_results = augmenter.run(data_entries, n_total_expected=len(self.neg_link_ids),
-                                             include_all_but_step_type=SourceTargetSwapStep)
-        self._create_links_from_augmentation(augmentation_results, pos_links)
+        augmentation_runs = [lambda data: augmenter.run(data, n_total_expected=2 * len(data),
+                                                        exclude_all_but_step_type=SourceTargetSwapStep),
+                             lambda data: augmenter.run(data, n_total_expected=len(self.neg_link_ids),
+                                                        include_all_but_step_type=SourceTargetSwapStep)]
+        for run in augmentation_runs:
+            pos_links, data_entries = self._get_data_entries_for_augmentation()
+            augmentation_results = run(data_entries)
+            self._create_links_from_augmentation(augmentation_results, pos_links)
 
     def get_source_target_pairs(self) -> List[Tuple]:
         """
@@ -179,13 +177,37 @@ class TraceDataset(AbstractDataset):
         :param orig_links: a list of all the original links (pre-augmentation) that the step was run on
         :return: None
         """
-        for aug_id, result in augmentation_results.items():
+        for step_id, result in augmentation_results.items():
+            id_ = AbstractDataAugmentationStep.extract_unique_id_from_step_id(step_id)
+            i = 0
             for entry, reference_index in result:
-                orig_link = orig_links[reference_index]
-                aug_source_id, aug_target_id = ("%s_%s" % (link_id, aug_id) for link_id in [orig_link.source.id, orig_link.target.id])
+                i += 1
+                aug_source_id, aug_target_id = self._get_augmented_artifact_ids(augmented_tokens=entry,
+                                                                                orig_link=orig_links[reference_index],
+                                                                                aug_step_id=id_, entry_num=i)
                 aug_source_tokens, aug_target_tokens = entry
                 self.add_link(source_id=aug_source_id, target_id=aug_target_id,
                               source_tokens=aug_source_tokens, target_tokens=aug_target_tokens, is_true_link=True)
+
+    def _get_augmented_artifact_ids(self, augmented_tokens: Tuple[str, str], orig_link: TraceLink, aug_step_id: str, entry_num: int) \
+            -> Tuple[str, str]:
+        """
+        Gets the augmented artifact ids for the new augmented source and target artifact
+        :param augmented_tokens: the augmented tokens for source and target
+        :param orig_link: the original link (pre-augmentation)
+        :param aug_step_id: the unique id of the augmentation step
+        :param entry_num: the number for the augmented data entry
+        :return: the augmented source and target ids
+        """
+        aug_source_tokens, aug_target_tokens = augmented_tokens
+        aug_source_id, aug_target_id = ("%s%s" % (link_id, aug_step_id) for link_id in [orig_link.source.id, orig_link.target.id])
+
+        new_id = TraceLink.generate_link_id(aug_source_id, aug_target_id)
+        if new_id in self.links:
+            if self.links[new_id].source.token != aug_source_tokens or self.links[new_id].target.token != aug_target_tokens:
+                aug_source_id += str(entry_num)
+                aug_target_id += str(entry_num)
+        return aug_source_id, aug_target_id
 
     @staticmethod
     def _resize_data(data: List, new_length: int, include_duplicates: bool = False) -> List:

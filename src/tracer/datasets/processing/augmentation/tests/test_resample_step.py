@@ -17,13 +17,8 @@ class TestResampleStep(BaseTest):
         self.resample_test(augmented_data, data_entries, self.RESAMPLE_RATE)
 
         n_expected = 9
-        resample_rate = round(n_expected/len(data_entries))
         augmented_data_n_expected = list(step.run(data_entries, n_needed=n_expected))
-        self.assertEquals(len(augmented_data_n_expected), resample_rate*len(data_entries))
-        self.resample_test(augmented_data_n_expected, data_entries, resample_rate)
-
-        augmented_data_n_expected_small = list(step.run(data_entries, n_needed=1))
-        self.assertEquals(len(augmented_data_n_expected_small), len(data_entries))
+        self.assertEquals(len(augmented_data_n_expected), n_expected)
 
     def test_augment(self):
         step = self.get_resample_step()

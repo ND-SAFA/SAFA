@@ -66,6 +66,10 @@ export interface AttributePositionModel {
  */
 export interface AttributeLayoutModel {
   /**
+   * The ID of this attribute layout.
+   */
+  id: string;
+  /**
    * The list of artifact types to display this attribute layout on.
    * If empty, this attribute will be displayed for all.
    */

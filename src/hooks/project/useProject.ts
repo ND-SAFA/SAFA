@@ -182,6 +182,7 @@ export const useProject = defineStore("project", {
         ],
         layouts: [
           {
+            id: "default",
             artifactTypes: [],
             positions: [
               { x: 0, y: 0, width: 1, height: 1, key: "str" },

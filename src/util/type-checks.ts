@@ -29,7 +29,7 @@ export function isModifiedArtifact(
  * @return Whether this item is an artifact.
  */
 export function isArtifact(artifact: DeltaArtifact): artifact is ArtifactModel {
-  const requiredFields = ["id", "summary", "body", "type"];
+  const requiredFields = ["id", "body", "type"];
   return containsFields(artifact, requiredFields);
 }
 

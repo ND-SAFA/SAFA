@@ -1,26 +1,41 @@
 <template>
-  <div>
-    <typography t="4" el="h1" variant="subtitle" value="Identifier" />
-    <v-divider class="mb-4" />
-    <v-text-field
-      filled
+  <div class="mt-4">
+    <v-row dense>
+      <v-col cols="6">
+        <v-text-field
+          filled
+          v-if="!store.isFTA"
+          v-model="store.editedArtifact.name"
+          label="Artifact Name"
+          hint="Please select an identifier for the artifact"
+          :error-messages="nameErrors"
+          :loading="nameCheckIsLoading"
+          data-cy="input-artifact-name"
+      /></v-col>
+      <v-col cols="6">
+        <artifact-type-input
+          persistent-hint
+          v-if="!store.isFTA && !store.isSafetyCase && !store.isFMEA"
+          v-model="store.editedArtifact.type"
+          label="Artifact Type"
+          hint="Required"
+          data-cy="input-artifact-type"
+      /></v-col>
+    </v-row>
+
+    <v-textarea
       v-if="!store.isFTA"
-      v-model="store.editedArtifact.name"
-      label="Artifact Name"
-      hint="Please select an identifier for the artifact"
-      :error-messages="nameErrors"
-      :loading="nameCheckIsLoading"
-      data-cy="input-artifact-name"
-    />
-    <artifact-type-input
+      filled
       persistent-hint
-      v-if="!store.isFTA && !store.isSafetyCase && !store.isFMEA"
-      v-model="store.editedArtifact.type"
-      label="Artifact Type"
+      label="Artifact Body"
+      v-model="store.editedArtifact.body"
+      rows="3"
       hint="Required"
-      data-cy="input-artifact-type"
+      data-cy="input-artifact-body"
     />
+
     <v-select
+      v-if="displayDocumentType"
       filled
       label="Document Type"
       v-model="store.editedArtifact.documentType"
@@ -59,30 +74,7 @@
       data-cy="input-artifact-parent"
     />
 
-    <div v-if="!store.isFTA">
-      <typography el="h1" variant="subtitle" value="Description" />
-      <v-divider class="mb-4" />
-      <v-textarea
-        filled
-        persistent-hint
-        v-if="!store.isFTA"
-        label="Artifact Body"
-        v-model="store.editedArtifact.body"
-        rows="3"
-        hint="Required"
-        data-cy="input-artifact-body"
-      />
-      <v-textarea
-        filled
-        v-if="!store.isFTA"
-        label="Artifact Summary"
-        v-model="store.editedArtifact.summary"
-        rows="3"
-        hint="A brief summary of the artifact content"
-        data-cy="input-artifact-summary"
-      />
-    </div>
-    <custom-field-input v-if="store.isFMEA" v-model="store.editedArtifact" />
+    <attribute-list-input :model="store.editedArtifact.attributes || {}" />
   </div>
 </template>
 
@@ -92,12 +84,8 @@ import { SelectOption } from "@/types";
 import { documentTypeMap, logicTypeOptions, safetyCaseOptions } from "@/util";
 import { artifactSaveStore, documentStore, projectStore } from "@/hooks";
 import { getDoesArtifactExist } from "@/api";
-import {
-  ArtifactInput,
-  ArtifactTypeInput,
-  CustomFieldInput,
-  Typography,
-} from "@/components/common";
+import { ArtifactInput, ArtifactTypeInput } from "@/components/common";
+import AttributeListInput from "@/components/common/input/AttributeListInput.vue";
 
 /**
  * Inputs for artifact creation and editing.
@@ -105,10 +93,9 @@ import {
 export default Vue.extend({
   name: "SaveArtifactInputs",
   components: {
+    AttributeListInput,
     ArtifactTypeInput,
-    CustomFieldInput,
     ArtifactInput,
-    Typography,
   },
   data() {
     return {
@@ -125,6 +112,12 @@ export default Vue.extend({
      */
     documentTypes(): SelectOption[] {
       return documentTypeMap()[documentStore.currentType];
+    },
+    /**
+     * @return Whether to display the document type input.
+     */
+    displayDocumentType(): boolean {
+      return this.documentTypes.length > 1;
     },
     /**
      * @return The document types allowed on the current document.

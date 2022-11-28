@@ -1,4 +1,5 @@
-import { DocumentType } from "@/types/domain/document";
+import { CustomAttributeCollection } from "./attribute";
+import { DocumentType } from "./document";
 
 /**
  * Enumerates the types of FTA nodes.
@@ -77,33 +78,13 @@ export interface ArtifactModel {
    * Represents a collection of custom attributes on an artifact.
    */
   customFields?: Record<string, string>;
+  /**
+   * Represents a collection of custom attributes on an artifact.
+   */
+  attributes?: CustomAttributeCollection;
 }
 
 /**
  * Defines an artifact with its custom fields flattened into the artifact data.
  */
 export type FlatArtifact = ArtifactModel & Record<string, string>;
-
-/**
- * Defines an artifact warning.
- */
-export interface WarningModel {
-  /**
-   * The artifact rule name.
-   */
-  ruleName: string;
-  /**
-   * The artifact rule message.
-   */
-  ruleMessage: string;
-}
-
-/**
- * A collection of warnings for all artifacts.
- */
-export type ProjectWarnings = Record<string, WarningModel[]>;
-
-/**
- * Returns an artifact matching the given query, if one exists.
- */
-export type ArtifactQueryFunction = (q: string) => ArtifactModel | undefined;

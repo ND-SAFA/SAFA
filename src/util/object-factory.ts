@@ -96,6 +96,7 @@ export function createProject(project?: Partial<ProjectModel>): ProjectModel {
     warnings: project?.warnings || {},
     layout: project?.layout || {},
     models: project?.models || [],
+    attributes: project?.attributes || [],
   };
 }
 

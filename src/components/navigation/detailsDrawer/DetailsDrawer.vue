@@ -110,7 +110,11 @@ export default Vue.extend({
      * @return The width of the panel.
      */
     width(): string {
-      if (appStore.isDetailsPanelOpen === "displayArtifactBody") {
+      if (
+        appStore.isDetailsPanelOpen === "displayArtifactBody" ||
+        appStore.isDetailsPanelOpen === "displayArtifact" ||
+        appStore.isDetailsPanelOpen === "saveArtifact"
+      ) {
         return "600";
       } else if (appStore.isDetailsPanelOpen === "generateTrace") {
         return "800";

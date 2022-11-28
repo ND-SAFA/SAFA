@@ -56,7 +56,7 @@ import {
   GenericArtifactBodyDisplay,
   GenericIconButton,
 } from "@/components/common/generic";
-import { Typography, AttributeChip } from "@/components/common/display";
+import { Typography } from "@/components/common/display";
 
 /**
  * An input for artifacts.
@@ -69,7 +69,6 @@ export default Vue.extend({
   components: {
     GenericIconButton,
     Typography,
-    AttributeChip,
     GenericArtifactBodyDisplay,
   },
   props: {

@@ -1,6 +1,5 @@
 import {
   ArtifactModel,
-  ArtifactQueryFunction,
   InternalTraceType,
   SubtreeItem,
   SubtreeLinkModel,
@@ -22,7 +21,7 @@ export function getMatchingChildren(
   parentIds: string[],
   includedChildTypes: string[],
   getSubtree: (id: string) => string[],
-  getArtifact: ArtifactQueryFunction
+  getArtifact: (id: string) => ArtifactModel | undefined
 ): string[] {
   if (includedChildTypes.length === 0) return [];
 

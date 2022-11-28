@@ -44,6 +44,7 @@
     "vue-cli-plugin-pinia": "^0.1.4",
     "vue-code-diff": "^1.2.0",
     "vue-cytoscape": "^1.0.8",
+    "vue-grid-layout": "^2.4.0",
     "vue-router": "^3.2.0",
     "vuetify": "^2.4.0",
     "webstomp-client": "^1.2.6"

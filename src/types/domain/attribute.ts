@@ -13,7 +13,14 @@ export interface CustomAttributeModel {
   /**
    * The type of data represented by this attribute.
    */
-  type: "string" | "number" | "select" | "multiselect";
+  type:
+    | "string"
+    | "select"
+    | "multiselect"
+    | "date"
+    | "int"
+    | "float"
+    | "boolean";
   /**
    * The list of artifact types to display this attribute on.
    * If empty, this attribute will be displayed for all.
@@ -31,4 +38,21 @@ export interface CustomAttributeModel {
    * The max-value for a number field.
    */
   max?: number;
+  /**
+   * Defines where in the layout to display this attribute.
+   */
+  layout: {
+    x: number;
+    y: number;
+    h: number;
+    w: number;
+  };
 }
+
+/**
+ * Represents a collection of custom attributes, keyed by their `key` value.
+ */
+export type CustomAttributeCollection = Record<
+  string,
+  string | string[] | number | boolean | undefined
+>;

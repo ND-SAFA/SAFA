@@ -21,13 +21,20 @@
         data-cy="text-selected-type"
       />
     </flex-box>
+
     <v-divider />
+
+    <typography variant="caption" value="Body" />
     <typography
       defaultExpanded
-      y="2"
       variant="expandable"
       :value="selectedArtifactBody"
       data-cy="text-selected-body"
+    />
+
+    <attribute-list-display
+      class="mt-4"
+      :model="selectedArtifact.attributes || {}"
     />
   </panel-card>
 </template>
@@ -40,14 +47,16 @@ import {
   FlexBox,
   AttributeChip,
   PanelCard,
+  AttributeListDisplay,
 } from "@/components/common";
 
 /**
  * Displays the selected node's title and option buttons.
  */
 export default Vue.extend({
-  name: "ArtifactTitle",
+  name: "ArtifactFields",
   components: {
+    AttributeListDisplay,
     PanelCard,
     AttributeChip,
     FlexBox,

@@ -7,6 +7,7 @@ import {
   TraceLinkModel,
   GenerationModel,
   WarningModel,
+  CustomAttributeModel,
 } from "@/types";
 
 /**
@@ -90,7 +91,6 @@ export interface ProjectModel extends IdentifierModel {
    * The different documents for this project.
    */
   documents: DocumentModel[];
-
   /**
    * The artifact types present in the project.
    */
@@ -107,6 +107,10 @@ export interface ProjectModel extends IdentifierModel {
    * List of trained project models.
    */
   models: GenerationModel[];
+  /**
+   * List of custom artifact attributes.
+   */
+  attributes?: CustomAttributeModel[];
 }
 
 export type VersionType = "major" | "minor" | "revision";

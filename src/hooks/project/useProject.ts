@@ -146,6 +146,52 @@ export const useProject = defineStore("project", {
      * Initializes the current project.
      */
     initializeProject(project: ProjectModel): void {
+      // TODO: remove testing code.
+      project.attributes = [
+        {
+          key: "str",
+          label: "Custom String",
+          type: "string",
+          artifactTypes: [],
+          layout: { x: 0, y: 0, w: 1, h: 1 },
+        },
+        {
+          key: "int",
+          label: "Custom Int",
+          type: "int",
+          artifactTypes: [],
+          layout: { x: 1, y: 0, w: 1, h: 1 },
+        },
+        {
+          key: "sel",
+          label: "Custom Select",
+          type: "select",
+          artifactTypes: [],
+          layout: { x: 0, y: 1, w: 2, h: 1 },
+        },
+        {
+          key: "date",
+          label: "Custom Date",
+          type: "date",
+          artifactTypes: [],
+          layout: { x: 0, y: 2, w: 1, h: 1 },
+        },
+        {
+          key: "float",
+          label: "Custom Float",
+          type: "float",
+          artifactTypes: [],
+          layout: { x: 1, y: 2, w: 1, h: 1 },
+        },
+        {
+          key: "bool",
+          label: "Custom Boolean",
+          type: "boolean",
+          artifactTypes: [],
+          layout: { x: 0, y: 3, w: 1, h: 1 },
+        },
+      ];
+
       this.project = project;
 
       selectionStore.clearSelections();

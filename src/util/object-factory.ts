@@ -90,13 +90,13 @@ export function createProject(project?: Partial<ProjectModel>): ProjectModel {
     ...createProjectIdentifier(project),
     artifacts: project?.artifacts || [],
     traces: project?.traces || [],
-    projectVersion: project?.projectVersion || undefined,
+    projectVersion: project?.projectVersion,
     artifactTypes: project?.artifactTypes || [],
     documents: project?.documents || [],
     warnings: project?.warnings || {},
     layout: project?.layout || {},
     models: project?.models || [],
-    attributes: project?.attributes || [],
+    attributes: project?.attributes,
   };
 }
 

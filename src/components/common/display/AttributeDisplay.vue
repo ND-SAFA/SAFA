@@ -7,7 +7,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { CustomAttributeCollection, CustomAttributeModel } from "@/types";
+import { CustomAttributeCollection, AttributeModel } from "@/types";
 import { timestampToDisplay } from "@/util";
 import Typography from "./Typography.vue";
 
@@ -23,7 +23,7 @@ export default Vue.extend({
       required: true,
     },
     attribute: {
-      type: Object as PropType<CustomAttributeModel>,
+      type: Object as PropType<AttributeModel>,
       required: true,
     },
   },

@@ -96,7 +96,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { CustomAttributeCollection, CustomAttributeModel } from "@/types";
+import { CustomAttributeCollection, AttributeModel } from "@/types";
 
 /**
  * An input for a generic attribute.
@@ -105,7 +105,7 @@ export default Vue.extend({
   name: "AttributeInput",
   props: {
     model: Object as PropType<CustomAttributeCollection>,
-    attribute: Object as PropType<CustomAttributeModel>,
+    attribute: Object as PropType<AttributeModel>,
   },
   data() {
     return {

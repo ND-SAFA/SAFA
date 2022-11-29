@@ -8,8 +8,7 @@ from transformers.models.bert.configuration_bert import BertConfig
 from transformers.models.bert.tokenization_bert import BertTokenizer
 
 from config.constants import DELETE_TEST_OUTPUT
-from server.storage.safa_storage import SafaStorage
-from test.paths.paths import TEST_OUTPUT_DIR, TEST_VOCAB_FILE
+from test.paths.paths import TEST_DATA_DIR, TEST_OUTPUT_DIR, TEST_VOCAB_FILE
 from tracer.models.base_models.pl_bert import PLBert
 from tracer.models.base_models.supported_base_model import SupportedBaseModel
 from tracer.pre_processing.pre_processing_steps import PreProcessingSteps
@@ -25,13 +24,17 @@ class BaseTest(TestCase):
         PreProcessingSteps.SEPARATE_JOINED_WORDS.value(),
         PreProcessingSteps.FILTER_MIN_LENGTH.value()]
 
-    def setup(self):
-        if not os.path.isdir(TEST_OUTPUT_DIR):
-            SafaStorage.create_dir(TEST_OUTPUT_DIR)
+    def setUp(self):
+        os.makedirs(TEST_OUTPUT_DIR, exist_ok=True)
 
     def tearDown(self):
         if DELETE_TEST_OUTPUT and os.path.exists(TEST_OUTPUT_DIR):
             shutil.rmtree(TEST_OUTPUT_DIR)
+            for file in os.listdir(TEST_DATA_DIR):
+                file_path = os.path.join(TEST_DATA_DIR, file)
+                if os.path.isfile(file):
+                    print(file_path)
+                    os.remove(file_path)
 
     @staticmethod
     def get_test_model():

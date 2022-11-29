@@ -1,8 +1,8 @@
 from enum import Enum
 from typing import Dict
-from unittest import TestCase
 
 from server.serializers.dataset.dataset_creator_serializer import ParamScope
+from test.base_test import BaseTest
 from util import ReflectionUtil
 
 
@@ -25,7 +25,7 @@ class TestEnum(Enum):
     TWO = TestClassTwo
 
 
-class TestReflectionUtil(TestCase):
+class TestReflectionUtil(BaseTest):
 
     def test_get_param_scope(self):
         self.__assert_scope("hello", ParamScope.LOCAL)

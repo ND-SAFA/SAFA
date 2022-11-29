@@ -1,12 +1,11 @@
-from django.test import TestCase
-
 from server.serializers.dataset.trainer_dataset_container_serializer import TrainerDatasetsContainerSerializer
 from server.serializers.tests.base_serializer_test import BaseSerializerTest
+from test.base_test import BaseTest
 from tracer.datasets.dataset_role import DatasetRole
 from tracer.datasets.trainer_datasets_container import TrainerDatasetsContainer
 
 
-class TestPreProcessingStepSerializer(TestCase):
+class TestPreProcessingStepSerializer(BaseTest):
     test_data = {
         "preTrain": {
             "creator": "MLM_PRETRAIN",

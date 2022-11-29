@@ -1,5 +1,5 @@
 from copy import deepcopy
-from typing import Dict
+from typing import Dict, List
 
 import numpy as np
 from transformers.trainer_utils import PredictionOutput
@@ -13,6 +13,7 @@ from tracer.datasets.data_objects.artifact import Artifact
 from tracer.datasets.data_objects.trace_link import TraceLink
 from tracer.datasets.dataset_role import DatasetRole
 from tracer.datasets.trainer_datasets_container import TrainerDatasetsContainer
+from tracer.pre_processing.steps.abstract_pre_processing_step import AbstractPreProcessingStep
 
 
 class BaseTraceTest(BaseTest):
@@ -78,13 +79,23 @@ class BaseTraceTest(BaseTest):
     }
 
     @staticmethod
-    def create_dataset(dataset_role: DatasetRole, include_links=True, include_pre_processing=False) -> Dict[
-        DatasetRole, AbstractDatasetCreator]:
-        dataset_params = deepcopy(BaseTraceTest._DATASET_PARAMS)
+    def create_dataset(dataset_role: DatasetRole,
+                       dataset_creator_class: SupportedDatasetCreator = SupportedDatasetCreator.CLASSIC_TRACE,
+                       dataset_creator_params: Dict = None,
+                       include_links=True,
+                       include_pre_processing: bool = False,
+                       pre_processing_steps: List[AbstractPreProcessingStep] = None,
+                       **kwargs
+                       ) -> Dict[DatasetRole, AbstractDatasetCreator]:
+        if not dataset_creator_params:
+            dataset_creator_params = deepcopy(BaseTraceTest._DATASET_PARAMS)
         if not include_links:
-            dataset_params.pop("true_links")
-        dataset_params["pre_processing_steps"] = BaseTest.PRE_PROCESSING_STEPS if include_pre_processing else None
-        abstract_dataset = SupportedDatasetCreator.CLASSIC_TRACE.value(**dataset_params)
+            dataset_creator_params.pop("true_links")
+        if not pre_processing_steps:
+            pre_processing_steps = BaseTest.PRE_PROCESSING_STEPS
+        if include_pre_processing:
+            dataset_creator_params["pre_processing_steps"] = BaseTest.PRE_PROCESSING_STEPS
+        abstract_dataset = dataset_creator_class.value(**dataset_creator_params, **kwargs)
         return {dataset_role: abstract_dataset}
 
     @staticmethod

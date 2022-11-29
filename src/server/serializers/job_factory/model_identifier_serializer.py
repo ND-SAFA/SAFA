@@ -17,3 +17,5 @@ class ModelIdentifierSerializer(JobFactorySerializer):
     saveJobOutput = serializers.BooleanField(default=SAVE_OUTPUT_DEFAULT,
                                              help_text="If True, saves the output to the output dir.",
                                              source="save_job_output")
+
+    params = serializers.DictField(help_text="Additional arguments to HuggingFace trainer.", required=False)

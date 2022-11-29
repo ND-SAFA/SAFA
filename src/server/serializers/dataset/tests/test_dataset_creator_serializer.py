@@ -1,10 +1,9 @@
-from django.test import TestCase
-
 from server.serializers.dataset.dataset_creator_serializer import DatasetCreatorSerializer
 from server.serializers.tests.base_serializer_test import BaseSerializerTest
+from test.base_test import BaseTest
 
 
-class TestDatasetCreatorSerializer(TestCase):
+class TestDatasetCreatorSerializer(BaseTest):
     test_data = {
         "creator": "CSV",
         "params": {
@@ -32,7 +31,7 @@ class TestDatasetCreatorSerializer(TestCase):
     def test_update_throws_error(self):
         new_properties = {"creator": "SAFA"}
         try:
-            self.serializer_test.serialize_update_data(self, self.test_data, new_properties)
+            self.serializer_test.test_no_update(self, self.test_data, new_properties)
             self.fail("Update should not be possible")
         except NotImplementedError as e:
             pass

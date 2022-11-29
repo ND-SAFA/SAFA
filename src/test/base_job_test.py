@@ -52,10 +52,10 @@ class BaseJobTest(BaseTraceTest, ABC):
                                   include_base_model=True,
                                   split_train_dataset=False):
         test_args = BaseJobTest.get_test_params(as_api=as_api, include_base_model=include_base_model)
-        trainer_dataset_container = self.create_trainer_dataset_container(
-            self.create_dataset(dataset_role, include_links=include_links,
-                                include_pre_processing=include_pre_processing),
-            split_train_dataset=split_train_dataset)
+        role2dataset = self.create_dataset(dataset_role, include_links=include_links,
+                                           include_pre_processing=include_pre_processing)
+        trainer_dataset_container = self.create_trainer_dataset_container(role2dataset,
+                                                                          split_train_dataset=split_train_dataset)
         output_dir = os.path.join(test_args["output_dir"], "trace")
         test_args["trace_args"] = TraceArgs(output_dir=output_dir, trainer_dataset_container=trainer_dataset_container,
                                             **BaseJobTest.TRACE_ARGS_PARAMS)

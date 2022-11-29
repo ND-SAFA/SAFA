@@ -17,6 +17,18 @@ class JobFactoryConverter:
     """
 
     @staticmethod
+    def create_job_factory(serialized_data: Dict) -> JobFactory:
+        # TODO: Should not need to call this whenever you want to create a job factory.
+        """
+        Creates job factory from serialized data.
+        :param serialized_data: Validated and processed data from subclass of ModelIdentifierSerializer.
+        :return: JobFactory
+        :rtype:
+        """
+        params = serialized_data.pop("params")
+        return JobFactory(**serialized_data, **params)
+
+    @staticmethod
     def job_factory_representation(instance: JobFactory, ignore_vars=None) -> Dict:
         """
         Converts JobFactory into JSON representation
@@ -24,7 +36,7 @@ class JobFactoryConverter:
         :return: The JSON representation.
         """
         data = {
-            "settings": instance.additional_job_params,
+            "params": instance.additional_job_params,
         }
         # 1. Get fields to serialize
         ignore_vars = ignore_vars if ignore_vars else ["additional_job_params"]

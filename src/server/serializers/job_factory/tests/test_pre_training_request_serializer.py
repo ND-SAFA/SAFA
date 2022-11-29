@@ -1,11 +1,10 @@
-from django.test import TestCase
-
 from server.serializers.job_factory.pre_training_request_serializer import PreTrainingRequestSerializer
 from server.serializers.tests.base_serializer_test import BaseSerializerTest
+from test.base_test import BaseTest
 from util.reflection_util import ReflectionUtil
 
 
-class TestPreTrainingRequestSerializer(TestCase):
+class TestPreTrainingRequestSerializer(BaseTest):
     """
     Test that the PredictionRequestSerializer is able to create PredictionRequest from JSON and export PredictionRequest
     as JSON
@@ -57,7 +56,7 @@ class TestPreTrainingRequestSerializer(TestCase):
         new_properties = {"preProcessingSteps": [{"step": "REMOVE_UNWANTED_CHARS"}, {"step": "SEPARATE_JOINED_WORDS"}]}
 
         def run_update():
-            self.serializer_test.serialize_update_data(self, self.serializer_test_data, new_properties)
+            self.serializer_test.test_no_update(self, self.serializer_test_data, new_properties)
 
         self.assertRaises(NotImplementedError, run_update)
 

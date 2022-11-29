@@ -22,22 +22,22 @@ class TraceArgs(TrainingArguments):
     metrics: List[str] = None
 
     # GAN
-    n_hidden_layers_g = 1
-    n_hidden_layers_d = 1
-    noise_size = 100  # size of the generator's input noisy vectors
-    out_dropout_rate = 0.9  # dropout to be applied to discriminator's input vectors
-    apply_scheduler = False
-    epsilon = 1e-8
-    print_each_n_step = 100
-    learning_rate_discriminator = 5e-5
-    learning_rate_generator = 5e-5
-    warmup_proportion = 0.1
-    apply_balance = True  # Replicate labeled data to balance poorly represented datasets,
-    shuffle = True
+    n_hidden_layers_g: int = 1
+    n_hidden_layers_d: int = 1
+    noise_size: int = 100  # size of the generator's input noisy vectors
+    out_dropout_rate: float = 0.9  # dropout to be applied to discriminator's input vectors
+    apply_scheduler: bool = False
+    epsilon: float = 1e-8
+    print_each_n_step: int = 100
+    learning_rate_discriminator: float = 5e-5
+    learning_rate_generator: float = 5e-5
+    warmup_proportion: float = 0.1
+    apply_balance: bool = True  # Replicate labeled data to balance poorly represented datasets,
+    shuffle: bool = True
 
     # Misc
     callbacks: List = None
-    multi_gpu = True
+    multi_gpu: bool = True
 
     def __init__(self, output_dir: str, trainer_dataset_container: TrainerDatasetsContainer, **kwargs):
         """

@@ -29,7 +29,7 @@ class JobFactorySerializer(serializers.Serializer):
         :return: Instance of AppEntity with validated data as kwargs
         """
         kwargs = SerializerUtility.create_children_serializers(validated_data, self.fields.fields)
-        return JobFactory(**kwargs)
+        return JobFactoryConverter.create_job_factory(kwargs)
 
     def update(self, instance: JobFactory, validated_data: Dict):
         SerializerUtility.update_error()

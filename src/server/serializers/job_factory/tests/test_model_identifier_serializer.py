@@ -1,10 +1,9 @@
-from django.test import TestCase
-
 from server.serializers.job_factory.model_identifier_serializer import ModelIdentifierSerializer
 from server.serializers.tests.base_serializer_test import BaseSerializerTest
+from test.base_test import BaseTest
 
 
-class TestModelIdentifierSerializer(TestCase):
+class TestModelIdentifierSerializer(BaseTest):
     """
     Test that the ModelIdentifierSerializers is able to create ModelIdentifier from JSON and export ModelIdentifiers
     as JSON
@@ -28,6 +27,6 @@ class TestModelIdentifierSerializer(TestCase):
         new_properties = {"baseModel": "PL_BERT"}
 
         def run_update():
-            self.serializer_test.serialize_update_data(self, self.serializer_test_data, new_properties)
+            self.serializer_test.test_no_update(self, self.serializer_test_data, new_properties)
 
         self.assertRaises(NotImplementedError, run_update)

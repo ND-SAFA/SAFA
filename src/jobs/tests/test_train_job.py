@@ -27,15 +27,16 @@ class TestTrainJob(BaseJobTest):
 
     def test_split_train_dataset(self):
         job = self._get_job()
-        self.assertTrue(job.trace_args.trainer_dataset_container.__eval_dataset is not None)
+        self.assertTrue(job.trace_args.trainer_dataset_container[DatasetRole.EVAL] is not None)
 
     @staticmethod
     @overrides(BaseJobTest)
-    def create_dataset(dataset_role: DatasetRole, include_links=True) -> Dict[DatasetRole, AbstractDataset]:
-        train_dataset = BaseJobTest.create_dataset(DatasetRole.TRAIN, include_links=include_links)
+    def create_dataset(dataset_role: DatasetRole, include_links=True, include_pre_processing: bool = False) -> Dict[
+        DatasetRole, AbstractDataset]:
+        train_dataset = BaseJobTest.create_dataset(DatasetRole.TRAIN, include_links=include_links,
+                                                   include_pre_processing=include_pre_processing)
         test_dataset = SupportedDatasetCreator.CSV.value(data_file_path=TestTrainJob.CSV_DATA_FILE)
-        test_dataset_map = {DatasetRole.EVAL: test_dataset}
-        return {**train_dataset, **test_dataset_map}
+        return {**train_dataset, DatasetRole.EVAL: test_dataset}
 
     def _assert_success(self, output_dict: dict):
         self.assert_training_output_matches_expected(output_dict)

@@ -8,6 +8,7 @@ from config.override import overrides
 from jobs.job_args import JobArgs
 from jobs.mlm_pre_train_job import MLMPreTrainJob
 from test.base_job_test import BaseJobTest
+from test.base_trace_test import BaseTraceTest
 from test.paths.paths import TEST_DATA_DIR, TEST_OUTPUT_DIR
 from tracer.datasets.creators.supported_dataset_creator import SupportedDatasetCreator
 from tracer.datasets.dataset_role import DatasetRole
@@ -33,13 +34,17 @@ class TestMLMPreTrainJob(BaseJobTest):
         job.run()
         self.assert_output_on_success(self._load_job_output(job))
 
-    @staticmethod
-    @overrides(BaseJobTest)
-    def create_dataset(dataset_role: DatasetRole, include_links=True):
-        return {DatasetRole.TRAIN: (
-        SupportedDatasetCreator.MLM_PRETRAIN, {"orig_data_path": TestMLMPreTrainJob.PRETRAIN_DIR,
-                                               "training_data_dir":
-                                                   os.path.join(TEST_OUTPUT_DIR, "pre_train")})}
+    @overrides(BaseTraceTest)
+    def create_dataset(self, dataset_role: DatasetRole, include_links=True, include_pre_processing=False):
+        dataset_creator_params = {
+            "orig_data_path": TestMLMPreTrainJob.PRETRAIN_DIR,
+            "training_data_dir": os.path.join(TEST_OUTPUT_DIR, "pre_train")
+        }
+        return BaseTraceTest.create_dataset(dataset_role,
+                                            dataset_creator_class=SupportedDatasetCreator.MLM_PRETRAIN,
+                                            dataset_creator_params=dataset_creator_params,
+                                            include_pre_processing=include_pre_processing,
+                                            include_links=include_links)
 
     def _assert_success(self, output_dict: dict):
         self.assert_training_output_matches_expected(output_dict)

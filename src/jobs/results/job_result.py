@@ -6,6 +6,7 @@ from drf_yasg.openapi import FORMAT_UUID, Schema, TYPE_INTEGER, TYPE_STRING
 
 from jobs.results.job_status import JobStatus
 from tracer.metrics.supported_trace_metric import SupportedTraceMetric
+from util.uncased_dict import UncasedDict
 
 
 class NpEncoder(json.JSONEncoder):
@@ -17,56 +18,6 @@ class NpEncoder(json.JSONEncoder):
         if isinstance(obj, np.ndarray):
             return obj.tolist()
         return super(NpEncoder, self).default(obj)
-
-
-class FormattedDict:
-    @staticmethod
-    def _process_key(key: str) -> str:
-        """
-        Ensures the key is always in the correct case, etc.
-        :param key: the key to process
-        :return: the processed key
-        """
-        return key.lower()
-
-    @staticmethod
-    def _process_value(value: Any):
-        """
-        Ensures the value is always in the correct format
-        :param value: the value to process
-        :return: the processed value
-        """
-        if isinstance(value, dict):
-            processed_value = FormattedDict()
-            for key, val in value.items():
-                processed_value[key] = val
-            return processed_value
-        return value
-
-    def __getitem__(self, key: str) -> Any:
-        """
-        Returns value matching the given key in the results dictionary
-        :param key: the key to the results dictionary
-        :return: the value from the results dictionary
-        """
-        return self[self._process_key(key)]
-
-    def __setitem__(self, key: str, value: Any) -> None:
-        """
-        Sets the key to be mapped to the given value in the results dictionary
-        :param key: the key to the results dictionary
-        :param value: the value to be mapped to the key in the results dictionary
-        :return: None
-        """
-        setattr(self, self._process_key(key), self._process_value(value))
-
-    def __contains__(self, key: str) -> bool:
-        """
-        Returns True if the key is in the results dictionary
-        :param key: the key to the results dictionary
-        :return: True if the key is in the results dictionary else False
-        """
-        return self._process_key(key) in self
 
 
 class JobResult:
@@ -90,10 +41,7 @@ class JobResult:
                    EXCEPTION: Schema(type=TYPE_STRING)}
 
     def __init__(self, result_dict: Dict = None):
-        self.__result = FormattedDict()
-        if result_dict:
-            for key, val in result_dict.items():
-                self[key] = val
+        self.__result = UncasedDict(result_dict)
 
     def set_job_status(self, status: JobStatus) -> None:
         """
@@ -172,7 +120,7 @@ class JobResult:
         """
         if isinstance(comparison_metric, SupportedTraceMetric):
             comparison_metric = comparison_metric.name
-        self_val, other_val = self._get_comparison_vals(other, comparison_metric.lower())
+        self_val, other_val = self._get_comparison_vals(other, comparison_metric)
         if should_maximize:
             return self_val >= other_val
         return self_val <= other_val
@@ -185,7 +133,6 @@ class JobResult:
          """
         if not comparison_metric_name:
             return False
-        comparison_metric_name = self._process_key(comparison_metric_name)
         if JobResult.METRICS in self and JobResult.METRICS in other:
             if comparison_metric_name in self[JobResult.METRICS] and comparison_metric_name in other[JobResult.METRICS]:
                 return True
@@ -230,7 +177,16 @@ class JobResult:
         return key in self.__result
 
     def __eq__(self, other: "JobResult") -> bool:
+        """
+        Returns True if the result dictionaries for both job results are the same
+        :param other: a different job result
+        :return: True if the result dictionaries for both job results are the same else False
+        """
         return self.__result == other.__result
 
-    def __repr__(self):
+    def __repr__(self) -> dict:
+        """
+        Returns the results dictionary as a representation of the class
+        :return: the results dict
+        """
         return self.__result

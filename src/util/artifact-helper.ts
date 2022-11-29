@@ -30,6 +30,6 @@ export function filterArtifacts(
 export function flattenArtifact(artifact: ArtifactModel): FlatArtifact {
   return {
     ...artifact,
-    ...(artifact.customFields || {}),
+    ...(artifact.attributes || {}),
   } as FlatArtifact;
 }

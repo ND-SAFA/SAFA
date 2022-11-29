@@ -2,8 +2,6 @@ import {
   ArtifactModel,
   ArtifactTypeIcons,
   ArtifactTypeModel,
-  ColumnDataType,
-  ColumnModel,
   Commit,
   ConfirmationType,
   ConfirmDialogueMessage,
@@ -135,7 +133,6 @@ export function createArtifact(
     documentIds: artifact?.documentIds || [],
     safetyCaseType: artifact?.safetyCaseType || SafetyCaseType.GOAL,
     logicType: artifact?.logicType || FTANodeType.AND,
-    customFields: artifact?.customFields || {},
   };
 }
 
@@ -183,18 +180,6 @@ export function createArtifactOfType(
   }
 
   return createArtifact(artifact);
-}
-
-/**
- * @return An column initialized to the given props.
- */
-export function createColumn(column?: Partial<ColumnModel>): ColumnModel {
-  return {
-    id: column?.id || "",
-    name: column?.name || "",
-    dataType: column?.dataType || ColumnDataType.FREE_TEXT,
-    required: column?.required || false,
-  };
 }
 
 /**

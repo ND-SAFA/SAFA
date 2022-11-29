@@ -84,8 +84,11 @@ import { SelectOption } from "@/types";
 import { documentTypeMap, logicTypeOptions, safetyCaseOptions } from "@/util";
 import { artifactSaveStore, documentStore, projectStore } from "@/hooks";
 import { getDoesArtifactExist } from "@/api";
-import { ArtifactInput, ArtifactTypeInput } from "@/components/common";
-import AttributeListInput from "@/components/common/input/AttributeListInput.vue";
+import {
+  ArtifactInput,
+  ArtifactTypeInput,
+  AttributeListInput,
+} from "@/components/common";
 
 /**
  * Inputs for artifact creation and editing.

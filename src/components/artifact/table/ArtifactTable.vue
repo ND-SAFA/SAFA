@@ -20,6 +20,7 @@
       :item-class="getItemBackground"
       :items-per-page="50"
       data-cy="view-artifact-table"
+      class="mt-4"
       @click:row="handleView($event)"
     >
       <template v-slot:top>
@@ -60,11 +61,11 @@
       </template>
 
       <template
-        v-for="column in columns"
-        v-slot:[`item.${column.id}`]="{ item }"
+        v-for="attribute in attributes"
+        v-slot:[`item.${attribute.key}`]="{ item }"
       >
-        <td :key="column.id" class="v-data-table__divider">
-          <artifact-table-cell :column="column" :item="item" />
+        <td :key="attribute.key" class="v-data-table__divider">
+          <attribute-display :attribute="attribute" :model="item.attributes" />
         </td>
       </template>
 
@@ -85,21 +86,27 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { ArtifactModel, ArtifactDeltaState, FlatArtifact } from "@/types";
+import {
+  ArtifactModel,
+  ArtifactDeltaState,
+  FlatArtifact,
+  AttributeModel,
+} from "@/types";
 import {
   appStore,
   artifactStore,
   documentStore,
   deltaStore,
   selectionStore,
+  projectStore,
 } from "@/hooks";
 import {
   Typography,
   AttributeChip,
   TableGroupHeader,
+  AttributeDisplay,
 } from "@/components/common";
 import ArtifactTableHeader from "./ArtifactTableHeader.vue";
-import ArtifactTableCell from "./ArtifactTableCell.vue";
 import ArtifactTableRowName from "./ArtifactTableRowName.vue";
 import ArtifactTableRowActions from "./ArtifactTableRowActions.vue";
 import ArtifactTableDeltaChip from "./ArtifactTableDeltaChip.vue";
@@ -110,11 +117,11 @@ import ArtifactTableDeltaChip from "./ArtifactTableDeltaChip.vue";
 export default Vue.extend({
   name: "ArtifactTable",
   components: {
+    AttributeDisplay,
     ArtifactTableRowActions,
     AttributeChip,
     Typography,
     ArtifactTableHeader,
-    ArtifactTableCell,
     ArtifactTableRowName,
     TableGroupHeader,
     ArtifactTableDeltaChip,
@@ -178,9 +185,9 @@ export default Vue.extend({
               },
             ]
           : []),
-        ...documentStore.tableColumns.map((col) => ({
-          text: col.name,
-          value: col.id,
+        ...projectStore.attributes.map(({ key, label }) => ({
+          text: label,
+          value: key,
           width: "300px",
           divider: true,
         })),
@@ -199,8 +206,8 @@ export default Vue.extend({
     /**
      * @return The artifact table's columns.
      */
-    columns() {
-      return documentStore.tableColumns;
+    attributes(): AttributeModel[] {
+      return projectStore.attributes;
     },
     /**
      * @return The artifact table's items.

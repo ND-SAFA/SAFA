@@ -2,7 +2,6 @@ import { defineStore } from "pinia";
 
 import {
   LayoutPositionsModel,
-  ColumnModel,
   DocumentModel,
   DocumentType,
   ProjectModel,
@@ -82,12 +81,6 @@ export const useDocuments = defineStore("documents", {
      */
     isTableDocument(): boolean {
       return this.isTableView || this.isEditableTableDocument;
-    },
-    /**
-     * @returns The column definitions for a table document.
-     */
-    tableColumns(): ColumnModel[] {
-      return (this.isTableDocument && this.currentDocument.columns) || [];
     },
   },
   actions: {
@@ -242,15 +235,6 @@ export const useDocuments = defineStore("documents", {
      */
     doesDocumentExist(name: string): boolean {
       return !!this.projectDocuments.find((document) => document.name === name);
-    },
-    /**
-     * Returns whether the given column name already exists.
-     *
-     * @param name - The name to search for.
-     * @return Whether the name exists.
-     */
-    doesColumnExist(name: string): boolean {
-      return !!this.tableColumns.find((column) => column.name === name);
     },
   },
 });

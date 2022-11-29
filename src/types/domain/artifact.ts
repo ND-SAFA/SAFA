@@ -77,10 +77,6 @@ export interface ArtifactModel {
   /**
    * Represents a collection of custom attributes on an artifact.
    */
-  customFields?: Record<string, string>;
-  /**
-   * Represents a collection of custom attributes on an artifact.
-   */
   attributes?: CustomAttributeCollection;
 }
 

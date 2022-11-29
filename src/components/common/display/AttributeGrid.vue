@@ -48,6 +48,7 @@ export default Vue.extend({
     currentLayout(): AttributeLayoutModel {
       return (
         projectStore.project.attributes?.layouts[0] || {
+          id: "default",
           artifactTypes: [],
           positions: [],
         }

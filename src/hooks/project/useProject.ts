@@ -6,6 +6,7 @@ import {
   GenerationModel,
   VersionModel,
   InstallationModel,
+  AttributeModel,
 } from "@/types";
 import { createProject, removeMatches } from "@/util";
 import { pinia } from "@/plugins";
@@ -81,6 +82,12 @@ export const useProject = defineStore("project", {
      */
     models(): GenerationModel[] {
       return this.project.models;
+    },
+    /**
+     * @return The current project's models.
+     */
+    attributes(): AttributeModel[] {
+      return this.project.attributes?.items || [];
     },
     /**
      * @return A list of indexes for deletable projects.

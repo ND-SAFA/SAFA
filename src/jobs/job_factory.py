@@ -39,6 +39,10 @@ class JobFactory:
     """
     save_job_output: bool = SAVE_OUTPUT_DEFAULT
     """
+    Sets the random seed for a job
+    """
+    random_seed: int = None
+    """
     Additional parameters for the trace args
     """
     trace_args_params: Dict = field(default_factory=dict)

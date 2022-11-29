@@ -31,6 +31,10 @@ class JobArgs:
     If True, saves the dataset splits to output_dir
     """
     save_dataset_splits: bool = SAVE_DATASET_SPLITS_DEFAULT
+    """
+    Sets the random seed for a job
+    """
+    random_seed: int = None
 
     def as_kwargs(self):
         return {attr_name: getattr(self, attr_name) for attr_name in dir(self) if not attr_name.startswith("__")}

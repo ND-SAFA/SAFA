@@ -78,6 +78,14 @@ class TestJobResult(BaseTest):
         self.assertEquals(val1, JobStatus.SUCCESS)
         self.assertEquals(val2, JobStatus.UNKNOWN)
 
+    def test_unknown_value(self):
+        result = self.get_job_result()
+        try:
+            result["unknown"] = 2
+            self.fail("Exception not raised for unknown value")
+        except ValueError:
+            pass
+
     def get_job_result(self, results_dict=None, precision_at_k=0.8):
         if results_dict is None:
             results_dict = {JobResult.METRICS: {SupportedTraceMetric.PRECISION_AT_K.name: precision_at_k}}

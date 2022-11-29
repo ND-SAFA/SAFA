@@ -164,7 +164,7 @@ class JobResult:
         :return: None
         """
         if not hasattr(self, key.upper()):
-            raise Exception("Unknown key. Please match expected response name.")
+            raise ValueError("Unknown key. Please match expected response name.")
 
         self.__result[key] = value
 

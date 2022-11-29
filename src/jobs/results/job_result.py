@@ -1,3 +1,4 @@
+from copy import deepcopy
 from typing import Union, Dict, Any, Tuple
 from drf_yasg.openapi import Schema, FORMAT_UUID, TYPE_STRING, TYPE_INTEGER
 import json
@@ -16,6 +17,58 @@ class NpEncoder(json.JSONEncoder):
         if isinstance(obj, np.ndarray):
             return obj.tolist()
         return super(NpEncoder, self).default(obj)
+
+
+class FormattedDict:
+    @staticmethod
+    def _process_key(key: str) -> str:
+        """
+        Ensures the key is always in the correct case, etc.
+        :param key: the key to process
+        :return: the processed key
+        """
+        return key.lower()
+
+    @staticmethod
+    def _process_value(value: Any):
+        """
+        Ensures the value is always in the correct format
+        :param value: the value to process
+        :return: the processed value
+        """
+        print(value)
+        print(isinstance(value, dict))
+        if isinstance(value, dict):
+            processed_value = FormattedDict()
+            for key, val in value.items():
+                processed_value[key] = val
+            return processed_value
+        return value
+
+    def __getitem__(self, key: str) -> Any:
+        """
+        Returns value matching the given key in the results dictionary
+        :param key: the key to the results dictionary
+        :return: the value from the results dictionary
+        """
+        return self[self._process_key(key)]
+
+    def __setitem__(self, key: str, value: Any) -> None:
+        """
+        Sets the key to be mapped to the given value in the results dictionary
+        :param key: the key to the results dictionary
+        :param value: the value to be mapped to the key in the results dictionary
+        :return: None
+        """
+        self[self._process_key(key)] = self._process_value(value)
+
+    def __contains__(self, key: str) -> bool:
+        """
+        Returns True if the key is in the results dictionary
+        :param key: the key to the results dictionary
+        :return: True if the key is in the results dictionary else False
+        """
+        return self._process_key(key) in self
 
 
 class JobResult:
@@ -39,34 +92,10 @@ class JobResult:
                    EXCEPTION: Schema(type=TYPE_STRING)}
 
     def __init__(self, result_dict: Dict = None):
-        self.__result = result_dict if result_dict else {}
-
-    def __getitem__(self, key: str) -> Any:
-        """
-        Returns value matching the given key in the results dictionary
-        :param key: the key to the results dictionary
-        :return: the value from the results dictionary
-        """
-        return self.__result[key]
-
-    def __setitem__(self, key: str, value: Any) -> None:
-        """
-        Sets the key to be mapped to the given value in the results dictionary
-        :param key: the key to the results dictionary
-        :param value: the value to be mapped to the key in the results dictionary
-        :return: None
-        """
-        if not hasattr(self, key.upper()):
-            raise Exception("Unknown key. Please match expected response name.")
-        self.__result[key] = value
-
-    def __contains__(self, key: str) -> bool:
-        """
-        Returns True if the key is in the results dictionary
-        :param key: the key to the results dictionary
-        :return: True if the key is in the results dictionary else False
-        """
-        return key in self.__result
+        self.__result = FormattedDict()
+        if result_dict:
+            for key, val in result_dict.items():
+                self[key] = val
 
     def set_job_status(self, status: JobStatus) -> None:
         """
@@ -110,22 +139,6 @@ class JobResult:
         """
         return self.__result
 
-    def is_better_than(self, other: "JobResult", comparison_metric: Union[str, SupportedTraceMetric] = '',
-                       should_maximize: bool = True) -> bool:
-        """
-        Evaluates whether this result is better than the other result
-        :param other: the other result
-        :param comparison_metric: metric to use for comparison (defaults to status)
-        :param should_maximize: if True, a better result means maximizing the provided metric, else aims to minimize it
-        :return: True if this result is better than the other result else False
-        """
-        if isinstance(comparison_metric, SupportedTraceMetric):
-            comparison_metric = comparison_metric.name
-        self_val, other_val = self.__get_comparison_vals(other, comparison_metric.lower())
-        if should_maximize:
-            return self_val >= other_val
-        return self_val <= other_val
-
     @staticmethod
     def from_dict(results_dict: Dict) -> "JobResult":
         """
@@ -150,23 +163,76 @@ class JobResult:
                 properties[key] = JobResult._properties[key]
         return properties
 
-    def __can_compare_with_metric(self, other: "JobResult", comparison_metric_name: str) -> bool:
+    def is_better_than(self, other: "JobResult", comparison_metric: Union[str, SupportedTraceMetric] = None,
+                       should_maximize: bool = True) -> bool:
+        """
+        Evaluates whether this result is better than the other result
+        :param other: the other result
+        :param comparison_metric: metric to use for comparison (defaults to status)
+        :param should_maximize: if True, a better result means maximizing the provided metric, else aims to minimize it
+        :return: True if this result is better than the other result else False
+        """
+        if isinstance(comparison_metric, SupportedTraceMetric):
+            comparison_metric = comparison_metric.name
+        self_val, other_val = self._get_comparison_vals(other, comparison_metric.lower())
+        if should_maximize:
+            return self_val >= other_val
+        return self_val <= other_val
+
+    def _can_compare_with_metric(self, other: "JobResult", comparison_metric_name: str) -> bool:
         """
          Returns True if can use comparison metric to compare the two results
          :param other: other result
          :return: True if can use comparison metric to compare the two results else false
          """
+        if not comparison_metric_name:
+            return False
+        comparison_metric_name = self._process_key(comparison_metric_name)
         if JobResult.METRICS in self and JobResult.METRICS in other:
             if comparison_metric_name in self[JobResult.METRICS] and comparison_metric_name in other[JobResult.METRICS]:
                 return True
         return False
 
-    def __get_comparison_vals(self, other: "JobResult", comparison_metric_name: str) -> Tuple:
+    def _get_comparison_vals(self, other: "JobResult", comparison_metric_name: str) -> Tuple:
         """
         Gets the values to use for comparison
         :param other: the other result
         :return: the values to use for comparison
         """
-        if self.__can_compare_with_metric(other, comparison_metric_name):
+        if self._can_compare_with_metric(other, comparison_metric_name):
             return self[JobResult.METRICS][comparison_metric_name], other[JobResult.METRICS][comparison_metric_name]
-        return self.get_job_status(), other.get_job_status
+        return self.get_job_status(), other.get_job_status()
+
+    def __getitem__(self, key: str) -> Any:
+        """
+        Returns value matching the given key in the results dictionary
+        :param key: the key to the results dictionary
+        :return: the value from the results dictionary
+        """
+        return self.__result[key]
+
+    def __setitem__(self, key: str, value: Any) -> None:
+        """
+        Sets the key to be mapped to the given value in the results dictionary
+        :param key: the key to the results dictionary
+        :param value: the value to be mapped to the key in the results dictionary
+        :return: None
+        """
+        if not hasattr(self, key.upper()):
+            raise Exception("Unknown key. Please match expected response name.")
+
+        self.__result[key] = value
+
+    def __contains__(self, key: str) -> bool:
+        """
+        Returns True if the key is in the results dictionary
+        :param key: the key to the results dictionary
+        :return: True if the key is in the results dictionary else False
+        """
+        return key in self.__result
+
+    def __eq__(self, other: "JobResult") -> bool:
+        return self.__result == other.__result
+
+    def __repr__(self):
+        return self.__result

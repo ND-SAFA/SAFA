@@ -52,7 +52,7 @@ export default Vue.extend({
       } else if (this.attribute.type === "date") {
         return timestampToDisplay(value);
       } else if (this.attribute.type === "boolean") {
-        return this.model[this.attribute.key] ? "True" : "False";
+        return this.model[this.attribute.key] ? "Yes" : "No";
       } else {
         return value;
       }

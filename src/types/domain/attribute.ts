@@ -1,4 +1,18 @@
 /**
+ * Enumerates the type of attribute properties.
+ */
+export type AttributeType =
+  | "text" // String
+  | "paragraph" // String
+  | "select" // String
+  | "multiselect" // String Array
+  | "relation" // String Array
+  | "date" // ISO Date String
+  | "int" // Integer
+  | "float" // Float
+  | "boolean"; // Boolean
+
+/**
  * Defines a custom attribute being tracked for a project.
  */
 export interface AttributeModel {
@@ -13,14 +27,7 @@ export interface AttributeModel {
   /**
    * The type of data represented by this attribute.
    */
-  type:
-    | "string"
-    | "select"
-    | "multiselect"
-    | "date"
-    | "int"
-    | "float"
-    | "boolean";
+  type: AttributeType;
   /**
    * Any pre-set options for this custom field to choose from.
    */
@@ -97,9 +104,16 @@ export interface ProjectAttributesModel {
 }
 
 /**
+ * Represents all possible data types of an attribute.
+ */
+export type AttributeDataType =
+  | string
+  | string[]
+  | number
+  | boolean
+  | undefined;
+
+/**
  * Represents a collection of custom attributes, keyed by their `key` value.
  */
-export type CustomAttributeCollection = Record<
-  string,
-  string | string[] | number | boolean | undefined
->;
+export type CustomAttributeCollection = Record<string, AttributeDataType>;

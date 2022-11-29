@@ -159,17 +159,30 @@ export const useProject = defineStore("project", {
           {
             key: "str",
             label: "Custom String",
-            type: "string",
+            type: "text",
+            min: 4,
+            max: 4,
           },
           {
             key: "int",
             label: "Custom Int",
             type: "int",
+            min: 0,
+            max: 5,
           },
           {
             key: "sel",
             label: "Custom Select",
             type: "select",
+            options: ["A", "B", "C"],
+          },
+          {
+            key: "multi",
+            label: "Custom Multiselect",
+            type: "multiselect",
+            options: ["A", "B", "C"],
+            min: 1,
+            max: 2,
           },
           {
             key: "date",
@@ -186,6 +199,16 @@ export const useProject = defineStore("project", {
             label: "Custom Boolean",
             type: "boolean",
           },
+          {
+            key: "rel",
+            label: "Custom Relation",
+            type: "relation",
+          },
+          {
+            key: "par",
+            label: "Custom Paragraph",
+            type: "paragraph",
+          },
         ],
         layouts: [
           {
@@ -193,11 +216,19 @@ export const useProject = defineStore("project", {
             artifactTypes: [],
             positions: [
               { x: 0, y: 0, width: 1, height: 1, key: "str" },
-              { x: 1, y: 0, width: 1, height: 1, key: "int" },
-              { x: 0, y: 1, width: 2, height: 1, key: "sel" },
-              { x: 0, y: 2, width: 1, height: 1, key: "date" },
+              { x: 1, y: 0, width: 1, height: 1, key: "bool" },
+
+              { x: 0, y: 1, width: 1, height: 1, key: "date" },
+
+              { x: 0, y: 2, width: 1, height: 1, key: "int" },
               { x: 1, y: 2, width: 1, height: 1, key: "float" },
-              { x: 0, y: 3, width: 1, height: 1, key: "bool" },
+
+              { x: 0, y: 3, width: 1, height: 1, key: "sel" },
+              { x: 1, y: 3, width: 1, height: 1, key: "rel" },
+
+              { x: 0, y: 4, width: 2, height: 1, key: "multi" },
+
+              { x: 0, y: 5, width: 2, height: 1, key: "par" },
             ],
           },
         ],

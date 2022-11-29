@@ -3,7 +3,7 @@
     :layout="layout"
     :is-draggable="editable"
     :is-resizable="editable"
-    :margin="[0, 0]"
+    :margin="[0, 20]"
     :col-num="2"
     :row-height="80"
     :vertical-compact="false"

@@ -1,19 +1,33 @@
 <template>
   <v-text-field
-    v-if="attribute.type === 'string'"
+    v-if="attribute.type === 'text'"
     filled
     :label="attribute.label"
-    v-model="model[attribute.key]"
     class="mr-2"
+    :rules="[lengthRules]"
+    :value="model[attribute.key]"
+    @input="handleInput"
+  />
+
+  <v-textarea
+    v-else-if="attribute.type === 'paragraph'"
+    filled
+    :label="attribute.label"
+    class="mr-2"
+    rows="3"
+    :rules="[lengthRules]"
+    :value="model[attribute.key]"
+    @input="handleInput"
   />
 
   <v-select
     v-else-if="attribute.type === 'select'"
     filled
     :label="attribute.label"
-    v-model="model[attribute.key]"
     :items="attribute.options"
     class="mr-2"
+    :value="model[attribute.key]"
+    @input="handleInput"
   />
 
   <v-autocomplete
@@ -23,9 +37,21 @@
     chips
     deletable-chips
     :label="attribute.label"
-    v-model="model[attribute.key]"
     :items="attribute.options"
     class="mr-2"
+    :rules="[lengthRules]"
+    :value="model[attribute.key]"
+    @input="handleInput"
+  />
+
+  <artifact-input
+    v-else-if="attribute.type === 'relation'"
+    multiple
+    :label="attribute.label"
+    class="mr-2 mb-2"
+    :rules="[lengthRules]"
+    :value="model[attribute.key]"
+    @input="handleInput"
   />
 
   <v-menu
@@ -51,7 +77,8 @@
       ></v-text-field>
     </template>
     <v-date-picker
-      v-model="model[attribute.key]"
+      :value="model[attribute.key]"
+      @input="handleInput"
       no-title
       scrollable
       color="primary"
@@ -73,8 +100,10 @@
     type="number"
     filled
     :label="attribute.label"
-    v-model="model[attribute.key]"
     class="mr-2"
+    :rules="[intRules, numRules]"
+    :value="model[attribute.key]"
+    @input="handleInput"
   />
 
   <v-text-field
@@ -82,35 +111,112 @@
     type="number"
     filled
     :label="attribute.label"
-    v-model="model[attribute.key]"
     class="mr-2"
+    :rules="[numRules]"
+    :value="model[attribute.key]"
+    @input="handleInput"
   />
 
   <v-checkbox
     v-else-if="attribute.type === 'boolean'"
     :label="attribute.label"
-    v-model="model[attribute.key]"
     class="pl-4 mr-2"
+    :value="model[attribute.key]"
+    @change="handleInput"
   />
 </template>
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { CustomAttributeCollection, AttributeModel } from "@/types";
+import {
+  CustomAttributeCollection,
+  AttributeModel,
+  AttributeDataType,
+} from "@/types";
+import ArtifactInput from "./ArtifactInput.vue";
 
 /**
  * An input for a generic attribute.
  */
 export default Vue.extend({
   name: "AttributeInput",
+  components: { ArtifactInput },
   props: {
-    model: Object as PropType<CustomAttributeCollection>,
-    attribute: Object as PropType<AttributeModel>,
+    model: {
+      type: Object as PropType<CustomAttributeCollection>,
+      required: true,
+    },
+    attribute: {
+      type: Object as PropType<AttributeModel>,
+      required: true,
+    },
   },
   data() {
     return {
       menu: false,
     };
+  },
+  computed: {
+    /**
+     * Creates an error when an integer has a float value.
+     */
+    intRules(): (value: string | undefined) => string | true {
+      return (value) =>
+        value?.includes(".") ? "Must be a valid integer." : true;
+    },
+    /**
+     * Creates an error when a number is not within bounds.
+     */
+    numRules(): (value: string | undefined) => string | true {
+      return (value) => {
+        const { min, max } = this.attribute;
+
+        if (!value) {
+          return true;
+        } else if (max !== undefined && parseFloat(value) > max) {
+          return `Value is greater than ${max}.`;
+        } else if (min !== undefined && parseFloat(value) < min) {
+          return `Value is less than ${min}.`;
+        } else {
+          return true;
+        }
+      };
+    },
+    /**
+     * Creates an error when length is not within bounds.
+     */
+    lengthRules(): (value: string | string[] | undefined) => string | true {
+      return (value) => {
+        const { min, max } = this.attribute;
+        const unit = Array.isArray(value) ? "items" : "characters";
+
+        if (!value) {
+          return true;
+        } else if (max !== undefined && value.length > max) {
+          return `Value has greater than ${max} ${unit}.`;
+        } else if (min !== undefined && value.length < min) {
+          return `Value has less than ${min} ${unit}.`;
+        } else {
+          return true;
+        }
+      };
+    },
+  },
+  methods: {
+    /**
+     * Handles input changes to make adjustments to the stored data types.
+     *
+     * @param value - The updated value of this attribute.
+     */
+    handleInput(value: AttributeDataType): void {
+      if (this.attribute.type === "int") {
+        this.model[this.attribute.key] = parseInt(String(value));
+      } else if (this.attribute.type === "float") {
+        this.model[this.attribute.key] = parseFloat(String(value));
+      } else {
+        this.model[this.attribute.key] = value;
+      }
+    },
   },
 });
 </script>

@@ -25,11 +25,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { GridLayout, GridItem, GridItemData } from "vue-grid-layout";
-import {
-  AttributeLayoutModel,
-  AttributeModel,
-  AttributePositionModel,
-} from "@/types";
+import { AttributeModel, AttributePositionModel } from "@/types";
 import { projectStore } from "@/hooks";
 
 /**
@@ -45,14 +41,8 @@ export default Vue.extend({
     /**
      * @return The current layout to render.
      */
-    currentLayout(): AttributeLayoutModel {
-      return (
-        projectStore.project.attributes?.layouts[0] || {
-          id: "default",
-          artifactTypes: [],
-          positions: [],
-        }
-      );
+    currentLayout(): AttributePositionModel[] {
+      return projectStore.project.attributes?.defaultLayout || [];
     },
     /**
      * @return All custom attributes in this project.
@@ -64,7 +54,7 @@ export default Vue.extend({
      * @return The layout of custom attributes.
      */
     layout(): GridItemData[] {
-      return this.currentLayout.positions.map((pos) => ({
+      return this.currentLayout.map((pos) => ({
         i: pos.key,
         x: pos.x,
         y: pos.y,
@@ -79,7 +69,7 @@ export default Vue.extend({
       attr: AttributeModel | undefined;
       pos: AttributePositionModel;
     }[] {
-      return this.currentLayout.positions.map((pos) => ({
+      return this.currentLayout.map((pos) => ({
         pos,
         attr: this.attributes.find(({ key }) => pos.key === key),
       }));

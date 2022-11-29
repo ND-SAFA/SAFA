@@ -96,9 +96,11 @@ export interface ProjectAttributesModel {
    */
   items: AttributeModel[];
   /**
-   * A list of custom attribute layouts.
-   * This list should always contain at least one item with empty artifact types,
-   * used as the default layout.
+   * The default attribute layout to use.
+   */
+  defaultLayout: AttributePositionModel[];
+  /**
+   * A list of custom attribute layouts for specific artifact types.
    */
   layouts: AttributeLayoutModel[];
 }

@@ -1,8 +1,8 @@
-from copy import deepcopy
-from typing import Union, Dict, Any, Tuple
-from drf_yasg.openapi import Schema, FORMAT_UUID, TYPE_STRING, TYPE_INTEGER
 import json
+from typing import Any, Dict, Tuple, Union
+
 import numpy as np
+from drf_yasg.openapi import FORMAT_UUID, Schema, TYPE_INTEGER, TYPE_STRING
 
 from jobs.results.job_status import JobStatus
 from tracer.metrics.supported_trace_metric import SupportedTraceMetric
@@ -36,8 +36,6 @@ class FormattedDict:
         :param value: the value to process
         :return: the processed value
         """
-        print(value)
-        print(isinstance(value, dict))
         if isinstance(value, dict):
             processed_value = FormattedDict()
             for key, val in value.items():
@@ -60,7 +58,7 @@ class FormattedDict:
         :param value: the value to be mapped to the key in the results dictionary
         :return: None
         """
-        self[self._process_key(key)] = self._process_value(value)
+        setattr(self, self._process_key(key), self._process_value(value))
 
     def __contains__(self, key: str) -> bool:
         """

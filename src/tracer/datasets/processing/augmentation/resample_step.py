@@ -31,23 +31,6 @@ class ResampleStep(AbstractDataAugmentationStep):
         else:
             self.resample_rate = 1
         return super().run(data_entries, n_needed)
-        #     n_per_entry = n_needed / len(data_entries)
-        #     if 0 < n_per_entry < 1:
-        #         n_sample = round(n_per_entry * len(data_entries))
-        #         data_entries = random.sample(data_entries, k=n_sample)
-        #     self.resample_rate = math.ceil(n_per_entry)
-        #
-        # augmented_data = []
-        # index_references = []
-        # for i, data_entry in enumerate(data_entries):
-        #     resampled_data = self._augment(data_entry)
-        #     augmented_data.extend(resampled_data)
-        #     index_references.extend([i for j in range(len(resampled_data))])
-        #
-        # if len(augmented_data) > n_needed:
-        #     sample_indices = random.sample([i for i in range(len(augmented_data))], n_needed)
-        #     return zip([augmented_data[i] for i in sample_indices],  [index_references[i] for i in sample_indices])
-        # return zip(augmented_data, index_references)
 
     def _augment(self, data_entry: Tuple[str, str]) -> List[Tuple[str, str]]:
         """

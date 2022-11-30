@@ -1,13 +1,12 @@
 import os
 from unittest import mock
 from unittest.mock import patch
-
 from transformers import AutoModelForMaskedLM
 
 from config.override import overrides
 from jobs.job_args import JobArgs
 from jobs.mlm_pre_train_job import MLMPreTrainJob
-from test.base_job_test import BaseJobTest
+from jobs.tests.base_job_test import BaseJobTest
 from test.base_trace_test import BaseTraceTest
 from test.paths.paths import TEST_DATA_DIR, TEST_OUTPUT_DIR
 from tracer.datasets.creators.supported_dataset_creator import SupportedDatasetCreator

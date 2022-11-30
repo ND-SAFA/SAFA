@@ -1,21 +1,21 @@
-from typing import Dict, Optional, Union
+from typing import List, Optional, Union, Dict
 
-from config.constants import RESAMPLE_RATE_DEFAULT, VALIDATION_PERCENTAGE_DEFAULT
+from config.constants import VALIDATION_PERCENTAGE_DEFAULT
 from tracer.datasets.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tracer.datasets.dataset_role import DatasetRole
 from tracer.datasets.pre_train_dataset import PreTrainDataset
+from tracer.datasets.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
 from tracer.datasets.trace_dataset import TraceDataset
 
 
 class TrainerDatasetsContainer:
-
     def __init__(self,
                  pre_train: AbstractDatasetCreator = None,
                  train: AbstractDatasetCreator = None,
                  val: AbstractDatasetCreator = None,
                  eval: AbstractDatasetCreator = None,
                  validation_percentage: float = VALIDATION_PERCENTAGE_DEFAULT, split_train_dataset: bool = False,
-                 resample_rate: int = RESAMPLE_RATE_DEFAULT
+                 augmentation_steps: List[AbstractDataAugmentationStep] = None
                  ):
         """
         Container to hold all the datasets used in the TraceTrainer
@@ -25,7 +25,7 @@ class TrainerDatasetsContainer:
         :param eval: The training dataset creator.
         :param validation_percentage: percentage of the data to use for validation datasets
         :param split_train_dataset: if True, splits the training datasets into a train, val datasets
-        :param resample_rate: the rate at which to resample positive examples in the train datasets
+        :param augmentation_steps: steps to run to augment the training data
         """
         self.__pre_train_creator = pre_train
         self.__train_creator = train
@@ -35,13 +35,11 @@ class TrainerDatasetsContainer:
         self.__train_dataset: Optional[TraceDataset] = self.__optional_create(train)
         self.__val_dataset: Optional[TraceDataset] = self.__optional_create(val)
         self.__eval_dataset: Optional[TraceDataset] = self.__optional_create(eval)
-        self.split(split_train_dataset, validation_percentage, resample_rate)
 
-    def split(self, split_train_dataset: bool, validation_percentage: float = VALIDATION_PERCENTAGE_DEFAULT,
-              resample_rate: int = RESAMPLE_RATE_DEFAULT):
-        if isinstance(self.__train_dataset, TraceDataset) and split_train_dataset:
-            self.__train_dataset, self.__val_dataset = self.__train_dataset.train_test_split(validation_percentage,
-                                                                                             resample_rate)
+        if isinstance(self.__train_dataset, TraceDataset):
+            if split_train_dataset:
+                self.train_dataset, self.val_dataset = self.__train_dataset.split(validation_percentage)
+            self.train_dataset.prepare_for_training(augmentation_steps)
 
     def get_creator(self, dataset_role: DatasetRole):
         if dataset_role == DatasetRole.PRE_TRAIN:
@@ -52,7 +50,7 @@ class TrainerDatasetsContainer:
             return self.__val_creator
         if dataset_role == DatasetRole.EVAL:
             return self.__eval_creator
-        raise Exception("Unrecognized role:" + dataset_role)
+        raise Exception("Unrecognized role:" + dataset_role.name)
 
     @staticmethod
     def create_from_map(dataset_map: Dict[DatasetRole, AbstractDatasetCreator], **kwargs):
@@ -97,8 +95,7 @@ class TrainerDatasetsContainer:
             raise Exception("Not datasets found corresponding with:" + str(dataset_role))
 
     @staticmethod
-    def __optional_create(dataset_creator: Optional[AbstractDatasetCreator]) -> Optional[
-        Union[TraceDataset, PreTrainDataset]]:
+    def __optional_create(dataset_creator: Optional[AbstractDatasetCreator]) -> Optional[Union[TraceDataset, PreTrainDataset]]:
         """
         Creates dataset set if not None, otherwise None is returned.
         :param dataset_creator: The optional dataset creator to use.

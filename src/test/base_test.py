@@ -1,5 +1,6 @@
 import os
 import shutil
+from typing import List
 
 import mock
 from django.test import TestCase
@@ -7,29 +8,33 @@ from transformers.models.bert.configuration_bert import BertConfig
 from transformers.models.bert.tokenization_bert import BertTokenizer
 
 from config.constants import DELETE_TEST_OUTPUT
-from server.storage.safa_storage import SafaStorage
-from test.paths.paths import TEST_OUTPUT_DIR, TEST_VOCAB_FILE
+from test.paths.paths import TEST_DATA_DIR, TEST_OUTPUT_DIR, TEST_VOCAB_FILE
 from tracer.models.base_models.pl_bert import PLBert
 from tracer.models.base_models.supported_base_model import SupportedBaseModel
 from tracer.pre_processing.pre_processing_steps import PreProcessingSteps
+from tracer.pre_processing.steps.abstract_pre_processing_step import AbstractPreProcessingStep
 
 
 class BaseTest(TestCase):
     MODEL_GENERATOR_PARAMS = {"base_model": SupportedBaseModel.PL_BERT,
                               "model_path": "model"}
-    PRE_PROCESSING_PARAMS = ([PreProcessingSteps.REPLACE_WORDS,
-                              PreProcessingSteps.REMOVE_UNWANTED_CHARS,
-                              PreProcessingSteps.SEPARATE_JOINED_WORDS,
-                              PreProcessingSteps.FILTER_MIN_LENGTH],
-                             {"word_replace_mappings": {"This": "Esta", "one": "uno"}})
+    PRE_PROCESSING_STEPS: List[AbstractPreProcessingStep] = [
+        PreProcessingSteps.REPLACE_WORDS.value(word_replace_mappings={"This": "Esta", "one": "uno"}),
+        PreProcessingSteps.REMOVE_UNWANTED_CHARS.value(),
+        PreProcessingSteps.SEPARATE_JOINED_WORDS.value(),
+        PreProcessingSteps.FILTER_MIN_LENGTH.value()]
 
-    def setup(self):
-        if not os.path.isdir(TEST_OUTPUT_DIR):
-            SafaStorage.create_dir(TEST_OUTPUT_DIR)
+    def setUp(self):
+        os.makedirs(TEST_OUTPUT_DIR, exist_ok=True)
 
     def tearDown(self):
         if DELETE_TEST_OUTPUT and os.path.exists(TEST_OUTPUT_DIR):
             shutil.rmtree(TEST_OUTPUT_DIR)
+            for file in os.listdir(TEST_DATA_DIR):
+                file_path = os.path.join(TEST_DATA_DIR, file)
+                if os.path.isfile(file):
+                    print(file_path)
+                    os.remove(file_path)
 
     @staticmethod
     def get_test_model():

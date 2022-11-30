@@ -16,7 +16,8 @@ class TestClassicTraceDatasetCreator(BaseTraceTest):
         pos_link_ids = dataset_creator._get_pos_link_ids(self.POS_LINKS)
         links = dataset_creator._generate_all_links(self.SOURCE_LAYERS, self.TARGET_LAYERS,
                                                     pos_link_ids)
-        self.assert_lists_have_the_same_vals([(link.source.id, link.target.id) for link in links.values()], self.ALL_TEST_LINKS)
+        self.assert_lists_have_the_same_vals([(link.source.id, link.target.id) for link in links.values()],
+                                             self.ALL_TEST_LINKS)
 
     def test_make_artifacts(self):
         dataset_creator = self.get_classic_trace_dataset_creator()
@@ -47,5 +48,5 @@ class TestClassicTraceDatasetCreator(BaseTraceTest):
 
     def get_classic_trace_dataset_creator(self, use_linked_targets_only: bool = False):
         return ClassicTraceDatasetCreator(source_layers=self.SOURCE_LAYERS, target_layers=self.TARGET_LAYERS,
-                                          true_links=self.POS_LINKS, pre_processing_steps=self.PRE_PROCESSING_PARAMS,
+                                          true_links=self.POS_LINKS, pre_processing_steps=self.PRE_PROCESSING_STEPS,
                                           use_linked_targets_only=use_linked_targets_only)

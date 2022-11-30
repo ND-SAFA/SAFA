@@ -1,4 +1,4 @@
-from typing import Dict, List, Tuple, Type, Union
+from typing import List, Tuple, Union
 
 from tracer.pre_processing.steps.abstract_pre_processing_step import AbstractPreProcessingStep
 
@@ -29,19 +29,6 @@ class PreProcessor:
             else:
                 regular_steps.append(step)
         return PreProcessor._order_steps(before_steps), PreProcessor._order_steps(regular_steps)
-
-    @staticmethod
-    def _get_step_params(step_class: Type[AbstractPreProcessingStep], **kwargs) -> Dict[str, any]:
-        """
-        Creates a dictionary of the parameters used to initialize a pre-processing step
-        :param step_class: the class of the pre-processing step
-        :return: a dictionary of the parameters used to initialize a pre-processing step
-        """
-        step_params = {}
-        for name, value in kwargs.items():
-            if hasattr(step_class, name):
-                step_params[name] = value
-        return step_params
 
     @staticmethod
     def _order_steps(steps: List[AbstractPreProcessingStep]) -> List[AbstractPreProcessingStep]:

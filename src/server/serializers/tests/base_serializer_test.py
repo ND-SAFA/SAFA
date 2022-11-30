@@ -1,6 +1,6 @@
 from enum import Enum
 from typing import Any, Dict, Generic, Type, TypeVar, Union
-from unittest import TestCase, skip
+from unittest import TestCase
 
 from rest_framework.serializers import Serializer
 
@@ -20,7 +20,6 @@ class BaseSerializerTest(Generic[AppEntity]):
         """
         self.serializer = serializer
 
-    @skip("Skipping until Alberto fixes")
     def serialize_data(self, test_case: TestCase, data: Dict, is_valid_value=True) -> AppEntity:
         """
         Serializes the test data into entity and performs validation checks.
@@ -44,15 +43,18 @@ class BaseSerializerTest(Generic[AppEntity]):
         """
         entity_created = self.serialize_data(test_case, data)
         deserialized_data = self.serializer(entity_created).data
-        for key, expected_value in data.items():
+        for key, value_expected in data.items():
             test_case.assertIn(key, deserialized_data)
             value = deserialized_data[key]
             if isinstance(value, SupportedBaseModel):
                 value = value.name
-            test_case.assertEqual(expected_value, value)
+            if isinstance(value, dict):
+                test_case.assertEqual(value, value | value_expected)
+            else:
+                test_case.assertEqual(value_expected, value)
 
-    def serialize_update_data(self, test_case: TestCase, data: Dict, new_properties: Dict,
-                              expected_properties: Dict = None):
+    def test_no_update(self, test_case: TestCase, data: Dict, new_properties: Dict,
+                       expected_properties: Dict = None):
         """
         Test that PredictionRequest can be updated with new load_from_storage property.
         :param test_case: The test used to make assertions.
@@ -104,6 +106,7 @@ class BaseSerializerTest(Generic[AppEntity]):
         for key, new_value in camel_case_properties.items():
             object_key = SerializerUtility.to_snake_case(key)
             if isinstance(instance, Dict):
+                assert object_key in instance, "Did not find {%s} in {%s}" % (object_key, repr(instance))
                 object_value = instance[object_key]
             else:
                 object_value = getattr(instance, object_key)

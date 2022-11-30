@@ -2,6 +2,7 @@ import os
 
 from test.base_trace_test import BaseTraceTest
 from test.paths.paths import TEST_OUTPUT_DIR
+from tracer.datasets.dataset_role import DatasetRole
 from tracer.datasets.trace_dataset import TraceDataset
 from tracer.datasets.trainer_datasets_container import TrainerDatasetsContainer
 
@@ -22,4 +23,7 @@ class TestTrainerDatasetsContainer(BaseTraceTest):
         return TraceDataset(links, pos_links_ids, neg_link_ids)
 
     def get_trainer_datasets_container(self):
-        return TrainerDatasetsContainer(train=self.get_trace_dataset(), split_train_dataset=True)
+        trainer_datasets_container = TrainerDatasetsContainer(split_train_dataset=True)
+        trainer_datasets_container[DatasetRole.TRAIN] = self.get_trace_dataset()
+        trainer_datasets_container.split(split_train_dataset=True)
+        return trainer_datasets_container

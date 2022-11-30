@@ -1,11 +1,11 @@
-from django.test import TestCase
-
 from server.serializers.dataset.trainer_dataset_container_serializer import TrainerDatasetsContainerSerializer
 from server.serializers.tests.base_serializer_test import BaseSerializerTest
+from test.base_test import BaseTest
+from tracer.datasets.dataset_role import DatasetRole
 from tracer.datasets.trainer_datasets_container import TrainerDatasetsContainer
 
 
-class TestPreProcessingStepSerializer(TestCase):
+class TestPreProcessingStepSerializer(BaseTest):
     test_data = {
         "preTrain": {
             "creator": "MLM_PRETRAIN",
@@ -38,7 +38,7 @@ class TestPreProcessingStepSerializer(TestCase):
 
     def test_serialization(self):
         entity: TrainerDatasetsContainer = self.serializer_test.serialize_data(self, self.test_data)
-        self.assertIsNotNone(entity.pre_train_dataset)
-        self.assertIsNotNone(entity.train_dataset)
-        self.assertIsNone(entity.eval_dataset)
-        self.assertIsNone(entity.val_dataset)
+        self.assertIsNotNone(entity[DatasetRole.PRE_TRAIN])
+        self.assertIsNotNone(entity[DatasetRole.TRAIN])
+        self.assertIsNone(entity[DatasetRole.EVAL])
+        self.assertIsNone(entity[DatasetRole.VAL])

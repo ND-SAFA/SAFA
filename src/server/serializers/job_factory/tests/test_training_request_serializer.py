@@ -1,12 +1,12 @@
-from django.test import TestCase
-
 from jobs.job_factory import JobFactory
 from server.serializers.job_factory.training_request_serializer import TrainingRequestSerializer
 from server.serializers.tests.base_serializer_test import BaseSerializerTest
-from util import ReflectionUtil
+from test.base_test import BaseTest
+from tracer.datasets.dataset_role import DatasetRole
+from util.reflection_util import ReflectionUtil
 
 
-class TestTrainingRequestSerializer(TestCase):
+class TestTrainingRequestSerializer(BaseTest):
     """
     Test that the PredictionRequestSerializer is able to create PredictionRequest from JSON and export PredictionRequest
     as JSON
@@ -23,7 +23,7 @@ class TestTrainingRequestSerializer(TestCase):
                 "true_links": [["S1", "T1"]]
             }
         },
-        "settings": {
+        "params": {
             "num_train_epochs": 1
         }
     }
@@ -34,13 +34,14 @@ class TestTrainingRequestSerializer(TestCase):
         job_factory: JobFactory = self.serializer_test.serialize_data(self, self.serializer_test_data)
         dataset_container = job_factory.trainer_dataset_container
         self.assertIsNotNone(dataset_container)
-        self.assertIsNotNone(dataset_container.train_dataset)
+        self.assertIsNotNone(dataset_container[DatasetRole.TRAIN])
         # Verify that general properties have been set
-        expected_properties = ReflectionUtil.copy_fields(self.serializer_test_data, exclude=["data", "settings"])
+        expected_properties = ReflectionUtil.copy_fields(self.serializer_test_data,
+                                                         exclude=["data", "settings", "params"])
         BaseSerializerTest.assert_contains_camel_case_properties(self, job_factory, expected_properties)
 
         # Verify that settings have been set
-        expected_settings_properties = self.serializer_test_data["settings"]
+        expected_settings_properties = self.serializer_test_data["params"]
         BaseSerializerTest.assert_contains_camel_case_properties(self, job_factory.additional_job_params,
                                                                  expected_settings_properties)
 
@@ -49,10 +50,11 @@ class TestTrainingRequestSerializer(TestCase):
         self.serializer_test.serialize_deserialize_data(self, self.serializer_test_data)
 
     def test_update(self):
-        new_properties = {"true_": [["T1", "S1"]]}
-        self.serializer_test.serialize_update_data(self, self.serializer_test_data, new_properties)
+        new_properties = {"outputDir": "hello"}
 
-    def test_invalid_update(self):
-        invalid_properties = {"links": "test"}
-        self.serializer_test.test_invalid_update(self, self.serializer_test_data, invalid_properties,
-                                                 expected_phrase="list")
+        def update_runner():
+            self.serializer_test.test_no_update(self,
+                                                self.serializer_test_data,
+                                                new_properties)
+
+        self.assertRaises(NotImplementedError, update_runner)

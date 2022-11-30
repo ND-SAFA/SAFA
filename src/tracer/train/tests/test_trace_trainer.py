@@ -74,18 +74,20 @@ class TestTraceTrainer(BaseTraceTest):
         self.assertIsInstance(data_loader.sampler, RandomSampler)
 
     def set_train_dataset(self, test_trace_trainer):
-        test_trace_trainer.train_dataset = self.get_dataset_contianer().train_dataset
+        train_dataset = self.get_dataset_container()[DatasetRole.TRAIN]
+        test_trace_trainer.train_dataset = train_dataset
 
-    def get_dataset_contianer(self):
-        dataset_map_train = self.create_dataset_map(DatasetRole.TRAIN, include_links=True)
-        dataset_map_eval = self.create_dataset_map(DatasetRole.EVAL, include_links=False)
-        return self.create_trainer_dataset_container({**dataset_map_train, **dataset_map_eval},
+    def get_dataset_container(self):
+        train_dataset_map = self.create_dataset(DatasetRole.TRAIN, include_links=True)
+        eval_dataset_map = self.create_dataset(DatasetRole.EVAL, include_links=False)
+        return self.create_trainer_dataset_container({**train_dataset_map, **eval_dataset_map},
                                                      split_train_dataset=True)
 
     def get_test_trace_trainer(self, **kwargs):
-        trainer_dataset_container = self.get_dataset_contianer()
+        trainer_dataset_container = self.get_dataset_container()
         model_generator = ModelGenerator(SupportedBaseModel.PL_BERT, "path")
         model_generator.get_model = mock.MagicMock(return_value=self.get_test_model())
         model_generator.get_tokenizer = mock.MagicMock(return_value=self.get_test_tokenizer())
-        return TraceTrainer(TraceArgs(output_dir=TEST_OUTPUT_DIR, trainer_dataset_container=trainer_dataset_container, **kwargs),
-                            model_generator)
+        return TraceTrainer(
+            TraceArgs(output_dir=TEST_OUTPUT_DIR, trainer_dataset_container=trainer_dataset_container, **kwargs),
+            model_generator)

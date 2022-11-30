@@ -1,4 +1,4 @@
-source_id,Source,target_id,Target,label
+source_id,source,target_id,target,label
 s1,s_token1,t1,t_token1,1
 s1,s_token1,t2,t_token2,0
 s1,s_token1,t3,t_token3,0

@@ -1,4 +1,5 @@
 import os
+import random
 import threading
 import traceback
 import uuid
@@ -21,6 +22,8 @@ class AbstractJob(threading.Thread):
         """
         super().__init__()
         self.job_args = job_args
+        if job_args.random_seed:
+            random.seed(job_args.random_seed)
         self.result = JobResult()
         self.id = uuid.uuid4()
         self.output_dir = job_args.output_dir

@@ -41,9 +41,9 @@ class TraceTrainer(Trainer):
         :param checkpoint: path to checkpoint.
         :return: a dictionary containing the results
         """
-        self.train_dataset = self.dataset_container.train_dataset.to_trainer_dataset(self.model_generator)
+        self.train_dataset = self.dataset_container[DatasetRole.TRAIN].to_trainer_dataset(self.model_generator)
         if DatasetRole.VAL in self.dataset_container:
-            self.eval_dataset = self.dataset_container.val_dataset.to_trainer_dataset(self.model_generator)
+            self.eval_dataset = self.dataset_container[DatasetRole.VAL].to_trainer_dataset(self.model_generator)
         output = self.train(resume_from_checkpoint=checkpoint)
         return TraceTrainer.output_to_dict(output)
 
@@ -52,13 +52,14 @@ class TraceTrainer(Trainer):
         Performs the prediction and (optionally) evaluation for the model
         :return: A dictionary containing the results.
         """
-        self.eval_dataset = self.dataset_container.eval_dataset.to_trainer_dataset(self.model_generator)
+        self.eval_dataset = self.dataset_container[DatasetRole.EVAL].to_trainer_dataset(self.model_generator)
         output = self.predict(self.eval_dataset)
         predictions = TraceTrainer.get_similarity_scores(output.predictions)
         results = self._eval(predictions, output.label_ids, output.metrics,
                              self.args.metrics) if self.args.metrics else None
         output_dict = TraceTrainer.output_to_dict(output, metrics=results, predictions=predictions,
-                                                  source_target_pairs=self.dataset_container.eval_dataset.get_source_target_pairs())
+                                                  source_target_pairs=self.dataset_container[
+                                                      DatasetRole.EVAL].get_source_target_pairs())
         return output_dict
 
     @staticmethod
@@ -68,7 +69,8 @@ class TraceTrainer(Trainer):
         :param output: output from training or prediction
         :return: the output represented as a dictionary
         """
-        base_output = {field: kwargs[field] if (field in kwargs and kwargs[field]) else getattr(output, field) for field in
+        base_output = {field: kwargs[field] if (field in kwargs and kwargs[field]) else getattr(output, field) for field
+                       in
                        output._fields}
         additional_attrs = {field: kwargs[field] for field in kwargs.keys() if field not in base_output}
         return {**base_output, **additional_attrs}

@@ -1,11 +1,10 @@
-from django.test import TestCase
-
 from server.serializers.dataset.pre_processing_step_serializer import PreProcessingStepSerializer
 from server.serializers.tests.base_serializer_test import BaseSerializerTest
+from test.base_test import BaseTest
 from tracer.pre_processing.steps.abstract_pre_processing_step import AbstractPreProcessingStep
 
 
-class TestPreProcessingStepSerializer(TestCase):
+class TestPreProcessingStepSerializer(BaseTest):
     test_data = {
         "step": "FILTER_MIN_LENGTH",
         "params": {
@@ -25,11 +24,11 @@ class TestPreProcessingStepSerializer(TestCase):
     def test_update(self):
         new_properties = {"params": {"min_length": 20}}
         expected_properties = new_properties["params"]
-        self.serializer_test.serialize_update_data(self, self.test_data, new_properties, expected_properties)
 
-    def test_invalid_update(self):
-        invalid_properties = {"step": "test"}
-        self.serializer_test.test_invalid_update(self, self.test_data, invalid_properties)
+        def run_update():
+            self.serializer_test.test_no_update(self, self.test_data, new_properties, expected_properties)
+
+        self.assertRaises(NotImplementedError, run_update)
 
     def test_serialization_with_no_params(self):
         test_data = {"step": "REMOVE_WHITE_SPACE"}

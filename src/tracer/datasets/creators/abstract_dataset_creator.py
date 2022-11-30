@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import List, Union
 
-from tracer.datasets.abstract_dataset import AbstractDataset
+from tracer.datasets.pre_train_dataset import PreTrainDataset
+from tracer.datasets.trace_dataset import TraceDataset
 from tracer.pre_processing.pre_processor import PreProcessor
 from tracer.pre_processing.steps.abstract_pre_processing_step import AbstractPreProcessingStep
 
@@ -16,7 +17,7 @@ class AbstractDatasetCreator(ABC):
         self._pre_processor = self._make_pre_processor(pre_processing_steps)
 
     @abstractmethod
-    def create(self) -> AbstractDataset:
+    def create(self) -> Union[TraceDataset, PreTrainDataset]:
         """
         Creates the datasets
         :return: the datasets

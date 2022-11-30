@@ -36,4 +36,4 @@ class TestSafaDatasetCreator(BaseTraceTest):
         self.assert_lists_have_the_same_vals(pos_link_ids, self.get_link_ids(self.POS_LINKS))
 
     def get_safa_dataset_creator(self):
-        return SafaDatasetCreator(self.SAFA_DATA_DIR, self.PRE_PROCESSING_PARAMS, data_keys=self.KEYS)
+        return SafaDatasetCreator(self.SAFA_DATA_DIR, self.PRE_PROCESSING_STEPS, data_keys=self.KEYS)

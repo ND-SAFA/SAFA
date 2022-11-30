@@ -1,11 +1,10 @@
-from django.test import TestCase
-
 from server.serializers.job_factory.pre_training_request_serializer import PreTrainingRequestSerializer
 from server.serializers.tests.base_serializer_test import BaseSerializerTest
-from util import ReflectionUtil
+from test.base_test import BaseTest
+from util.reflection_util import ReflectionUtil
 
 
-class TestPreTrainingRequestSerializer(TestCase):
+class TestPreTrainingRequestSerializer(BaseTest):
     """
     Test that the PredictionRequestSerializer is able to create PredictionRequest from JSON and export PredictionRequest
     as JSON
@@ -15,11 +14,19 @@ class TestPreTrainingRequestSerializer(TestCase):
         "modelPath": "~/desktop/safa/datasets",
         "outputDir": "hello",
         "saveJobOutput": False,
-        "trainingDataDir": "~/desktop/pretraining",
-        "preProcessingOptions": ["SEPARATE_JOINED_WORDS"],
-        "preProcessingParams": {"deliminators": ["*"]},
-        "blockSize": 120,
-        "mlmProbability": .5,
+        "trainingDataDir": "src/test/data/pre_train",
+        "preProcessingSteps": [
+            {
+                "step": "SEPARATE_JOINED_WORDS",
+                "params": {
+                    "deliminators": ["*"]
+                }
+            }
+        ],
+        "params": {
+            "blockSize": 120,
+            "mlmProbability": .5,
+        }
     }
 
     serializer_test = BaseSerializerTest(PreTrainingRequestSerializer)
@@ -46,10 +53,14 @@ class TestPreTrainingRequestSerializer(TestCase):
         self.serializer_test.serialize_deserialize_data(self, self.serializer_test_data)
 
     def test_update(self):
-        new_properties = {"preProcessingOptions": ["REMOVE_UNWANTED_CHARS", "SEPARATE_JOINED_WORDS"]}
-        self.serializer_test.serialize_update_data(self, self.serializer_test_data, new_properties)
+        new_properties = {"preProcessingSteps": [{"step": "REMOVE_UNWANTED_CHARS"}, {"step": "SEPARATE_JOINED_WORDS"}]}
+
+        def run_update():
+            self.serializer_test.test_no_update(self, self.serializer_test_data, new_properties)
+
+        self.assertRaises(NotImplementedError, run_update)
 
     def test_invalid_update(self):
-        invalid_properties = {"preProcessingParams": []}
+        invalid_properties = {"params": []}
         self.serializer_test.test_invalid_update(self, self.serializer_test_data, invalid_properties,
                                                  expected_phrase="list")

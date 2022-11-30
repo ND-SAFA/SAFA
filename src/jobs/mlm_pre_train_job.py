@@ -6,6 +6,7 @@ from config.constants import MLM_PROBABILITY_DEFAULT
 from jobs.job_args import JobArgs
 from jobs.results.job_result import JobResult
 from jobs.train_job import TrainJob
+from tracer.datasets.dataset_role import DatasetRole
 from tracer.datasets.pre_train_dataset import PreTrainDataset
 
 
@@ -28,6 +29,6 @@ class MLMPreTrainJob(TrainJob):
 
         job_result = super()._run(data_collator=data_collator)
 
-        train_dataset: PreTrainDataset = self.trace_args.trainer_dataset_container.train_dataset
+        train_dataset: PreTrainDataset = self.trace_args.trainer_dataset_container[DatasetRole.TRAIN]
         os.remove(train_dataset.training_file_path)
         return job_result

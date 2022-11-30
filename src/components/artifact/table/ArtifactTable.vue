@@ -98,7 +98,7 @@ import {
   documentStore,
   deltaStore,
   selectionStore,
-  projectStore,
+  attributesStore,
 } from "@/hooks";
 import {
   Typography,
@@ -185,7 +185,7 @@ export default Vue.extend({
               },
             ]
           : []),
-        ...projectStore.attributes.map(({ key, label }) => ({
+        ...attributesStore.attributes.map(({ key, label }) => ({
           text: label,
           value: key,
           width: "300px",
@@ -207,7 +207,7 @@ export default Vue.extend({
      * @return The artifact table's columns.
      */
     attributes(): AttributeModel[] {
-      return projectStore.attributes;
+      return attributesStore.attributes;
     },
     /**
      * @return The artifact table's items.

@@ -39,7 +39,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { MembershipModel, ProjectModel, ProjectRole } from "@/types";
-import { logStore, projectStore, sessionStore } from "@/hooks";
+import { logStore, membersStore, projectStore, sessionStore } from "@/hooks";
 import { handleDeleteMember, handleGetMembers } from "@/api";
 import { GenericSelector, Typography } from "@/components/common";
 import SettingsMemberInformationModal from "./SettingsMemberInformationModal.vue";
@@ -80,7 +80,7 @@ export default Vue.extend({
      * @return All project members.
      */
     members(): MembershipModel[] {
-      return this.project.members;
+      return membersStore.members;
     },
   },
   methods: {

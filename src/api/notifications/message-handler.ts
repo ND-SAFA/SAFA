@@ -12,6 +12,7 @@ import {
   artifactStore,
   documentStore,
   jobStore,
+  membersStore,
   projectStore,
   sessionStore,
   traceStore,
@@ -81,7 +82,7 @@ async function handleDeleteChange(change: ChangeModel) {
       return handleClearProject();
     case EntityType.MEMBERS:
       // (entityIds = projectMembershipsIds)
-      projectStore.deleteMembers(change.entityIds);
+      membersStore.deleteMembers(change.entityIds);
       break;
     case EntityType.VERSION:
       // (entityIds = project version id)
@@ -142,7 +143,7 @@ async function handleUpdateChange(change: ChangeModel, project: ProjectModel) {
       });
       break;
     case EntityType.MEMBERS:
-      projectStore.updateMembers(project.members);
+      membersStore.updateMembers(project.members);
       break;
     case EntityType.VERSION:
       return handleLoadVersion(versionId);

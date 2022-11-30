@@ -7,7 +7,8 @@ import {
   TraceLinkModel,
   GenerationModel,
   WarningModel,
-  ProjectAttributesModel,
+  AttributeModel,
+  AttributeLayoutModel,
 } from "@/types";
 
 /**
@@ -29,7 +30,7 @@ export interface IdentifierModel {
   description: string;
 
   /**
-   * List of members and roles in project.
+   * List of members and their roles in the project.
    */
   members: MembershipModel[];
 
@@ -112,9 +113,13 @@ export interface ProjectModel extends IdentifierModel {
   models: GenerationModel[];
 
   /**
-   * Custom artifact attributes information.
+   * A list of custom attributes used on this project.
    */
-  attributes?: ProjectAttributesModel;
+  attributes?: AttributeModel[];
+  /**
+   * Layouts for displaying this project's custom attributes.
+   */
+  attributeLayouts?: AttributeLayoutModel[];
 }
 
 export type VersionType = "major" | "minor" | "revision";

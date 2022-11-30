@@ -88,24 +88,6 @@ export interface AttributeLayoutModel {
 }
 
 /**
- * Defines all attributes on a project.
- */
-export interface ProjectAttributesModel {
-  /**
-   * A list of custom artifact attributes.
-   */
-  items: AttributeModel[];
-  /**
-   * The default attribute layout to use.
-   */
-  defaultLayout: AttributePositionModel[];
-  /**
-   * A list of custom attribute layouts for specific artifact types.
-   */
-  layouts: AttributeLayoutModel[];
-}
-
-/**
  * Represents all possible data types of an attribute.
  */
 export type AttributeDataType =

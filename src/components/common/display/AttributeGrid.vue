@@ -26,7 +26,7 @@
 import Vue from "vue";
 import { GridLayout, GridItem, GridItemData } from "vue-grid-layout";
 import { AttributeModel, AttributePositionModel } from "@/types";
-import { projectStore } from "@/hooks";
+import { attributesStore } from "@/hooks";
 
 /**
  * Renders a grid of attributes.
@@ -42,13 +42,7 @@ export default Vue.extend({
      * @return The current layout to render.
      */
     currentLayout(): AttributePositionModel[] {
-      return projectStore.project.attributes?.defaultLayout || [];
-    },
-    /**
-     * @return All custom attributes in this project.
-     */
-    attributes(): AttributeModel[] {
-      return projectStore.project.attributes?.items || [];
+      return attributesStore.defaultLayout;
     },
     /**
      * @return The layout of custom attributes.
@@ -71,7 +65,7 @@ export default Vue.extend({
     }[] {
       return this.currentLayout.map((pos) => ({
         pos,
-        attr: this.attributes.find(({ key }) => pos.key === key),
+        attr: attributesStore.attributes.find(({ key }) => pos.key === key),
       }));
     },
   },

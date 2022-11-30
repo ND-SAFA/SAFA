@@ -1,5 +1,5 @@
 import { IOHandlerCallback, MembershipModel, ProjectRole } from "@/types";
-import { logStore, projectStore } from "@/hooks";
+import { logStore, membersStore, projectStore } from "@/hooks";
 import {
   deleteProjectMember,
   getProjectMembers,
@@ -9,13 +9,15 @@ import {
 /**
  * Returns the current project's members.
  */
-export function handleGetMembers(): Promise<MembershipModel[]> {
-  return getProjectMembers(projectStore.projectId).catch((e) => {
-    logStore.onError(`Unable to get members`);
-    logStore.onDevError(e.message);
-
-    return [];
-  });
+export function handleGetMembers(): Promise<void> {
+  return getProjectMembers(projectStore.projectId)
+    .then((members) => {
+      membersStore.updateMembers(members);
+    })
+    .catch((e) => {
+      logStore.onError(`Unable to get members`);
+      logStore.onDevError(e.message);
+    });
 }
 
 /**
@@ -35,15 +37,7 @@ export function handleInviteMember(
 ): void {
   saveProjectMember(projectId, memberEmail, projectRole)
     .then((member) => {
-      projectStore.updateProject({
-        members: [
-          ...projectStore.project.members.filter(
-            ({ projectMembershipId }) =>
-              member.projectMembershipId !== projectMembershipId
-          ),
-          member,
-        ],
-      });
+      membersStore.updateMembers([...membersStore.members, member]);
       logStore.onSuccess(`Member saved on the project: ${memberEmail}`);
       onSuccess?.();
     })
@@ -68,12 +62,7 @@ export function handleDeleteMember(member: MembershipModel): void {
 
       deleteProjectMember(member)
         .then(() => {
-          projectStore.updateProject({
-            members: projectStore.project.members.filter(
-              ({ projectMembershipId }) =>
-                member.projectMembershipId !== projectMembershipId
-            ),
-          });
+          membersStore.deleteMembers([member.projectMembershipId]);
           logStore.onSuccess(`Deleted a member: ${member.email}`);
         })
         .catch((e) => {

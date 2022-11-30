@@ -10,6 +10,7 @@ import {
 import {
   appStore,
   artifactStore,
+  attributesStore,
   documentStore,
   jobStore,
   membersStore,
@@ -55,7 +56,7 @@ export async function handleEntityChangeMessage(
       if (!isCurrentUser || notifyUserEntities.includes(change.entity)) {
         if (change.action === ActionType.DELETE) {
           await handleDeleteChange(change);
-        } else {
+        } else if (change.action === ActionType.UPDATE) {
           await handleUpdateChange(change, project);
         }
       }
@@ -123,6 +124,14 @@ async function handleDeleteChange(change: ChangeModel) {
         ),
       });
       break;
+    case EntityType.ATTRIBUTES:
+      // (entityIds = attribute keys)
+      attributesStore.deleteAttributes(change.entityIds);
+      break;
+    case EntityType.ATTRIBUTE_LAYOUTS:
+      // (entityIds = attribute layout ids)
+      attributesStore.deleteAttributeLayouts(change.entityIds);
+      break;
   }
 }
 
@@ -168,6 +177,12 @@ async function handleUpdateChange(change: ChangeModel, project: ProjectModel) {
       break;
     case EntityType.MODELS:
       projectStore.updateProject({ models: project.models });
+      break;
+    case EntityType.ATTRIBUTES:
+      attributesStore.updateAttributes(project.attributes || []);
+      break;
+    case EntityType.ATTRIBUTE_LAYOUTS:
+      attributesStore.updateAttributeLayouts(project.attributeLayouts || []);
       break;
   }
 }

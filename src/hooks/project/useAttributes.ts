@@ -6,6 +6,8 @@ import {
   AttributePositionModel,
   ProjectModel,
 } from "@/types";
+import { removeMatches } from "@/util";
+import { projectStore } from "@/hooks";
 import { pinia } from "@/plugins";
 
 /**
@@ -120,6 +122,66 @@ export const useAttributes = defineStore("attributes", {
           ],
         },
       ];
+    },
+
+    /**
+     * Updates the stored custom attributes.
+     *
+     * @param updatedAttributes - The updated attributes.
+     */
+    updateAttributes(updatedAttributes: AttributeModel[]): void {
+      const ids = updatedAttributes.map(({ key }) => key);
+
+      this.attributes = [
+        ...removeMatches(this.attributes, "key", ids),
+        ...updatedAttributes,
+      ];
+
+      projectStore.project.attributes = this.attributes;
+    },
+    /**
+     * Deletes from the stored custom attributes.
+     *
+     * @param deletedAttributes - The keys of attributes to delete.
+     */
+    deleteAttributes(deletedAttributes: string[]): void {
+      this.attributes = removeMatches(
+        this.attributes,
+        "key",
+        deletedAttributes
+      );
+
+      projectStore.project.attributes = this.attributes;
+    },
+
+    /**
+     * Updates the stored custom attribute layouts.
+     *
+     * @param updatedLayouts - The updated layouts.
+     */
+    updateAttributeLayouts(updatedLayouts: AttributeLayoutModel[]): void {
+      const ids = updatedLayouts.map(({ id }) => id);
+
+      this.attributeLayouts = [
+        ...removeMatches(this.attributeLayouts, "id", ids),
+        ...updatedLayouts,
+      ];
+
+      projectStore.project.attributeLayouts = this.attributeLayouts;
+    },
+    /**
+     * Deletes from the stored custom attribute layouts.
+     *
+     * @param deletedLayouts - The ids of layouts to delete.
+     */
+    deleteAttributeLayouts(deletedLayouts: string[]): void {
+      this.attributeLayouts = removeMatches(
+        this.attributeLayouts,
+        "id",
+        deletedLayouts
+      );
+
+      projectStore.project.attributeLayouts = this.attributeLayouts;
     },
   },
 });

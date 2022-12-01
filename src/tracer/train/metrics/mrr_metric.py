@@ -1,6 +1,6 @@
 import datasets
 
-from tracer.metrics.abstract_trace_metric import AbstractTraceMetric
+from tracer.train.metrics.abstract_trace_metric import AbstractTraceMetric
 
 _DESCRIPTION = """
 Mean Reciprocal Rank metric measures how far down the ranking the first relevant link is

@@ -4,10 +4,10 @@ from typing import Type
 
 from datasets import Metric, list_metrics
 
-from tracer.metrics.abstract_trace_metric import AbstractTraceMetric
-from tracer.metrics.map_at_k_metric import MapAtKMetric
-from tracer.metrics.mrr_metric import MRRMetric
-from tracer.metrics.precision_at_k_metric import PrecisionAtKMetric
+from tracer.train.metrics.abstract_trace_metric import AbstractTraceMetric
+from tracer.train.metrics.map_at_k_metric import MapAtKMetric
+from tracer.train.metrics.mrr_metric import MRRMetric
+from tracer.train.metrics.precision_at_k_metric import PrecisionAtKMetric
 
 metric_suffix = "Metric"
 

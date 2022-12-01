@@ -1,7 +1,7 @@
 import datasets
 
 from config.constants import K_METRIC_DEFAULT
-from tracer.metrics.abstract_trace_metric import AbstractTraceMetric
+from tracer.train.metrics.abstract_trace_metric import AbstractTraceMetric
 
 _DESCRIPTION = """
 Precision@K metric measures the percentage of links that were correctly predicted

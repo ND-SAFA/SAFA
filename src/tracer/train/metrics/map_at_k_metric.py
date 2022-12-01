@@ -2,7 +2,7 @@ import datasets
 from sklearn.metrics import average_precision_score
 
 from config.constants import K_METRIC_DEFAULT
-from tracer.metrics.abstract_trace_metric import AbstractTraceMetric
+from tracer.train.metrics.abstract_trace_metric import AbstractTraceMetric
 
 _DESCRIPTION = """
 Mean Average Precision@K metric measures the average precision over k for recommendations shown for 

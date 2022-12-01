@@ -6,10 +6,10 @@ from rest_framework import serializers
 from server.serializers.dataset.pre_processing_step_serializer import PreProcessingStepSerializer
 from server.serializers.job_factory.job_factory_converter import JobFactoryConverter
 from server.serializers.serializer_utility import SerializerUtility
-from tracer.datasets.creators.abstract_dataset_creator import AbstractDatasetCreator
-from tracer.datasets.creators.abstract_trace_dataset_creator import AbstractTraceDatasetCreator
-from tracer.datasets.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
-from tracer.datasets.creators.supported_dataset_creator import SupportedDatasetCreator
+from data.creators.abstract_dataset_creator import AbstractDatasetCreator
+from data.creators.abstract_trace_dataset_creator import AbstractTraceDatasetCreator
+from data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
+from data.creators.supported_dataset_creator import SupportedDatasetCreator
 
 SupportedDatasets = Union[AbstractTraceDatasetCreator, MLMPreTrainDatasetCreator]
 

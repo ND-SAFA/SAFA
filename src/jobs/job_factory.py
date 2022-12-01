@@ -6,9 +6,9 @@ from config.constants import SAVE_OUTPUT_DEFAULT, SAVE_DATASET_SPLITS_DEFAULT
 from jobs.abstract_job import AbstractJob
 from jobs.abstract_trace_job import AbstractTraceJob
 from jobs.job_args import JobArgs
-from tracer.datasets.trainer_datasets_container import TrainerDatasetsContainer
-from tracer.models.base_models.supported_base_model import SupportedBaseModel
-from tracer.train.trace_args import TraceArgs
+from data.trainer_datasets_container import TrainerDatasetsContainer
+from models.base_models.supported_base_model import SupportedBaseModel
+from train.trace_args import TraceArgs
 from util.reflection_util import ReflectionUtil
 
 
@@ -27,11 +27,11 @@ class JobFactory:
     """
     base_model: SupportedBaseModel = None
     """
-    Container for datasets used for any training, prediction, or evaluation.
+    Container for data used for any training, prediction, or evaluation.
     """
     trainer_dataset_container: TrainerDatasetsContainer = None
     """
-    Any additional parameters for making datasets including test/train split info
+    Any additional parameters for making data including test/train split info
     """
     additional_dataset_params: Dict = field(default_factory=dict)
     """
@@ -94,7 +94,7 @@ class JobFactory:
 
     def _create_trace_args(self) -> None:
         """
-        Creates the trace args from the given datasets and trace args params
+        Creates the trace args from the given data and trace args params
         :return: None
         """
         if self.trainer_dataset_container is None:

@@ -3,7 +3,7 @@ from jobs.create_datasets_job import CreateDatasetsJob
 from jobs.job_args import JobArgs
 from jobs.results.job_result import JobResult
 from jobs.tests.base_job_test import BaseJobTest
-from tracer.datasets.dataset_role import DatasetRole
+from data.dataset_role import DatasetRole
 
 
 class TestCreateDatasetsJob(BaseJobTest):

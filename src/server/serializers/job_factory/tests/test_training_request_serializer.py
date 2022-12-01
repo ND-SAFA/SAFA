@@ -2,7 +2,7 @@ from jobs.job_factory import JobFactory
 from server.serializers.job_factory.training_request_serializer import TrainingRequestSerializer
 from server.serializers.tests.base_serializer_test import BaseSerializerTest
 from test.base_test import BaseTest
-from tracer.datasets.dataset_role import DatasetRole
+from data.dataset_role import DatasetRole
 from util.reflection_util import ReflectionUtil
 import unittest
 
@@ -15,7 +15,7 @@ class TestTrainingRequestSerializer(BaseTest):
     """
     serializer_test_data = {
         "baseModel": "NL_BERT",
-        "modelPath": "~/desktop/safa/datasets",
+        "modelPath": "~/desktop/safa/data",
         "outputDir": "hello",
         "data": {
             "creator": "CLASSIC_TRACE",

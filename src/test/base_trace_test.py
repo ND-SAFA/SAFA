@@ -7,14 +7,14 @@ from transformers.trainer_utils import PredictionOutput
 from config.constants import VALIDATION_PERCENTAGE_DEFAULT
 from jobs.results.job_result import JobResult
 from test.base_test import BaseTest
-from tracer.datasets.creators.abstract_dataset_creator import AbstractDatasetCreator
-from tracer.datasets.creators.split_dataset_creator import SplitDatasetCreator
-from tracer.datasets.creators.supported_dataset_creator import SupportedDatasetCreator
-from tracer.datasets.data_objects.artifact import Artifact
-from tracer.datasets.data_objects.trace_link import TraceLink
-from tracer.datasets.dataset_role import DatasetRole
-from tracer.datasets.trainer_datasets_container import TrainerDatasetsContainer
-from tracer.datasets.processing.abstract_data_processing_step import AbstractDataProcessingStep
+from data.creators.abstract_dataset_creator import AbstractDatasetCreator
+from data.creators.split_dataset_creator import SplitDatasetCreator
+from data.creators.supported_dataset_creator import SupportedDatasetCreator
+from data.data_objects.artifact import Artifact
+from data.data_objects.trace_link import TraceLink
+from data.dataset_role import DatasetRole
+from data.trainer_datasets_container import TrainerDatasetsContainer
+from data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 
 
 class BaseTraceTest(BaseTest):

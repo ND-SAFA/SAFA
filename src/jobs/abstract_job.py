@@ -9,7 +9,7 @@ from jobs.job_args import JobArgs
 from jobs.results.job_status import JobStatus
 from jobs.results.job_result import JobResult
 from server.storage.safa_storage import SafaStorage
-from tracer.models.model_generator import ModelGenerator
+from models.model_generator import ModelGenerator
 
 
 class AbstractJob(threading.Thread):

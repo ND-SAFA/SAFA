@@ -12,7 +12,7 @@ class TestPreTrainingRequestSerializer(BaseTest):
     """
     serializer_test_data = {
         "baseModel": "NL_BERT",
-        "modelPath": "~/desktop/safa/datasets",
+        "modelPath": "~/desktop/safa/data",
         "outputDir": "hello",
         "saveJobOutput": False,
         "trainingDataDir": "src/test/data/pre_train",

@@ -3,7 +3,7 @@ from rest_framework import serializers
 
 from config.constants import SAVE_OUTPUT_DEFAULT
 from server.serializers.job_factory.job_factory_serializer import JobFactorySerializer
-from tracer.models.base_models.supported_base_model import SupportedBaseModel
+from models.base_models.supported_base_model import SupportedBaseModel
 
 
 class ModelIdentifierSerializer(JobFactorySerializer):

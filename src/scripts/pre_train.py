@@ -15,7 +15,7 @@ if __name__ == "__main__":
     # IMPORTS
     #
     from scripts.base_script import BaseScript
-    from tracer.models.base_models.supported_base_model import SupportedBaseModel
+    from models.base_models.supported_base_model import SupportedBaseModel
     from jobs.mlm_pre_train_job import MLMPreTrainJob
     from server.serializers.job_factory.pre_training_request_serializer import PreTrainingRequestSerializer
 

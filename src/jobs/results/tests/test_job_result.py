@@ -3,7 +3,7 @@ from jobs.results.job_status import JobStatus
 from test.base_test import BaseTest
 import json
 
-from tracer.train.metrics.supported_trace_metric import SupportedTraceMetric
+from train.metrics.supported_trace_metric import SupportedTraceMetric
 
 
 class TestJobResult(BaseTest):

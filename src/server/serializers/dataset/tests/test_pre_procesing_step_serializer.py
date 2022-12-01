@@ -1,7 +1,7 @@
 from server.serializers.dataset.pre_processing_step_serializer import PreProcessingStepSerializer
 from server.serializers.tests.base_serializer_test import BaseSerializerTest
 from test.base_test import BaseTest
-from tracer.datasets.processing.abstract_data_processing_step import AbstractDataProcessingStep
+from data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 
 
 class TestPreProcessingStepSerializer(BaseTest):

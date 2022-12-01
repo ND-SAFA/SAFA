@@ -5,8 +5,8 @@ from rest_framework import serializers
 
 from server.serializers.job_factory.job_factory_converter import JobFactoryConverter
 from server.serializers.serializer_utility import SerializerUtility
-from tracer.datasets.processing.cleaning.data_cleaning_steps import DataCleaningSteps
-from tracer.datasets.processing.abstract_data_processing_step import AbstractDataProcessingStep
+from data.processing.cleaning.data_cleaning_steps import DataCleaningSteps
+from data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 
 
 class PreProcessingStepSerializer(serializers.Serializer):

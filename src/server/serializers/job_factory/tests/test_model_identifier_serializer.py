@@ -11,7 +11,7 @@ class TestModelIdentifierSerializer(BaseTest):
     """
     serializer_test_data = {
         "baseModel": "NL_BERT",
-        "modelPath": "~/desktop/safa/datasets",
+        "modelPath": "~/desktop/safa/data",
         "outputDir": "hello",
         "saveJobOutput": True
     }

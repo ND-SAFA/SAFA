@@ -2,7 +2,7 @@ import itertools
 from dataclasses import dataclass, field
 from typing import List, Dict, Type, Tuple, Union, Any
 from jobs.abstract_job import AbstractJob
-from tracer.train.metrics.supported_trace_metric import SupportedTraceMetric
+from train.metrics.supported_trace_metric import SupportedTraceMetric
 
 
 @dataclass

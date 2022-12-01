@@ -9,10 +9,10 @@ from transformers.models.bert.tokenization_bert import BertTokenizer
 
 from config.constants import DELETE_TEST_OUTPUT
 from test.paths.paths import TEST_DATA_DIR, TEST_OUTPUT_DIR, TEST_VOCAB_FILE
-from tracer.models.base_models.pl_bert import PLBert
-from tracer.models.base_models.supported_base_model import SupportedBaseModel
-from tracer.datasets.processing.cleaning.data_cleaning_steps import DataCleaningSteps
-from tracer.datasets.processing.abstract_data_processing_step import AbstractDataProcessingStep
+from models.base_models.pl_bert import PLBert
+from models.base_models.supported_base_model import SupportedBaseModel
+from data.processing.cleaning.data_cleaning_steps import DataCleaningSteps
+from data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 
 
 class BaseTest(TestCase):

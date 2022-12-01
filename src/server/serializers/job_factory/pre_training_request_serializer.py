@@ -7,9 +7,9 @@ from server.serializers.dataset.pre_processing_step_serializer import PreProcess
 from server.serializers.job_factory.job_factory_converter import JobFactoryConverter
 from server.serializers.job_factory.model_identifier_serializer import ModelIdentifierSerializer
 from server.serializers.serializer_utility import SerializerUtility
-from tracer.datasets.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
-from tracer.datasets.dataset_role import DatasetRole
-from tracer.datasets.trainer_datasets_container import TrainerDatasetsContainer
+from data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
+from data.dataset_role import DatasetRole
+from data.trainer_datasets_container import TrainerDatasetsContainer
 
 
 class PreTrainingRequestSerializer(ModelIdentifierSerializer):

@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 
 from config.constants import SAVE_OUTPUT_DEFAULT, SAVE_DATASET_SPLITS_DEFAULT
-from tracer.models.base_models.supported_base_model import SupportedBaseModel
-from tracer.train.trace_args import TraceArgs
+from models.base_models.supported_base_model import SupportedBaseModel
+from train.trace_args import TraceArgs
 
 
 @dataclass

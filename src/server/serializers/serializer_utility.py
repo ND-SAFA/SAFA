@@ -3,9 +3,9 @@ from typing import Dict, OrderedDict
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from tracer.datasets.creators.abstract_dataset_creator import AbstractDatasetCreator
-from tracer.datasets.trainer_datasets_container import TrainerDatasetsContainer
-from tracer.datasets.processing.cleaning.separate_joined_words_step import SeparateJoinedWordsStep
+from data.creators.abstract_dataset_creator import AbstractDatasetCreator
+from data.trainer_datasets_container import TrainerDatasetsContainer
+from data.processing.cleaning.separate_joined_words_step import SeparateJoinedWordsStep
 
 
 class SerializerUtility:

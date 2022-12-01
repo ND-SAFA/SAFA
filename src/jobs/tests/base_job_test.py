@@ -10,9 +10,9 @@ from jobs.results.job_result import JobResult
 from jobs.results.job_status import JobStatus
 from test.base_trace_test import BaseTraceTest
 from test.paths.paths import TEST_OUTPUT_DIR
-from tracer.datasets.dataset_role import DatasetRole
-from tracer.models.model_generator import ModelGenerator
-from tracer.train.trace_args import TraceArgs
+from data.dataset_role import DatasetRole
+from models.model_generator import ModelGenerator
+from train.trace_args import TraceArgs
 
 
 class BaseJobTest(BaseTraceTest, ABC):

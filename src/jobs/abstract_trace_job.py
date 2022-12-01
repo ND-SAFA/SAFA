@@ -2,7 +2,7 @@ from abc import ABC
 
 from jobs.abstract_job import AbstractJob
 from jobs.job_args import JobArgs
-from tracer.train.trace_trainer import TraceTrainer
+from train.trace_trainer import TraceTrainer
 
 
 class AbstractTraceJob(AbstractJob, ABC):

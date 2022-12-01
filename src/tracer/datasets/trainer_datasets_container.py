@@ -1,7 +1,5 @@
 from collections import OrderedDict
 from typing import List, Optional, Union, Dict
-
-from config.constants import VALIDATION_PERCENTAGE_DEFAULT
 from tracer.datasets.abstract_dataset import AbstractDataset
 from tracer.datasets.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tracer.datasets.creators.split_dataset_creator import SplitDatasetCreator
@@ -30,7 +28,7 @@ class TrainerDatasetsContainer:
         self.__dataset_creators = {DatasetRole.PRE_TRAIN: pre_train_dataset_creator, DatasetRole.TRAIN: train_dataset_creator,
                                    DatasetRole.VAL: val_dataset_creator, DatasetRole.EVAL: eval_dataset_creator}
         self.__datasets = self._create_datasets_from_creators(self.__dataset_creators)
-        self._prepare_datasets()
+        self._prepare_datasets(augmentation_steps)
 
     def get_creator(self, dataset_role: DatasetRole) -> AbstractDatasetCreator:
         """
@@ -40,15 +38,18 @@ class TrainerDatasetsContainer:
         """
         return self.__dataset_creators[dataset_role]
 
-    def save_dataset_splits(self, output_dir: str) -> None:
+    def save_dataset_splits(self, output_dir: str) -> List[str]:
         """
         Saves all dataset splits to the output dir
         :param output_dir: directory to save to
-        :return: None
+        :return: the list of files that were saved
         """
+        output_paths = []
         for dataset_role in DatasetRole:
             if dataset_role in self:
-                self[dataset_role].save(output_dir, dataset_role.name.lower())
+                output_path = self[dataset_role].save(output_dir, dataset_role.name.lower())
+                output_paths.append(output_path)
+        return output_paths
 
     @staticmethod
     def create_from_map(dataset_creators_map: Dict[DatasetRole, AbstractDatasetCreator], **kwargs):
@@ -66,7 +67,7 @@ class TrainerDatasetsContainer:
             **kwargs)
         return trainer_datasets_container
 
-    def _prepare_datasets(self, augmentation_steps: List[AbstractDataAugmentationStep] = None) -> None:
+    def _prepare_datasets(self, augmentation_steps: List[AbstractDataAugmentationStep]) -> None:
         """
         Performs any necessary additional steps necessary to prepare each dataset
         :param augmentation_steps: steps to augment the training dataset

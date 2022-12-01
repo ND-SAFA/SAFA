@@ -10,6 +10,8 @@ from tracer.datasets.trace_dataset import TraceDataset
 
 
 class TrainerDatasetsContainer:
+    DATASET_TYPE = Union[PreTrainDataset, TraceDataset, AbstractDataset]
+
     def __init__(self,
                  pre_train_dataset_creator: AbstractDatasetCreator = None,
                  train_dataset_creator: AbstractDatasetCreator = None,
@@ -52,19 +54,17 @@ class TrainerDatasetsContainer:
         return output_paths
 
     @staticmethod
-    def create_from_map(dataset_creators_map: Dict[DatasetRole, AbstractDatasetCreator], **kwargs):
+    def create_from_map(dataset_creators_map: Dict[DatasetRole, AbstractDatasetCreator]):
         """
         Creates instance containing dataset for each mapped role.
         :param dataset_creators_map: The map of roles to datasets to set in instance.
-        :param kwargs: Additional initialization parameters to instance.
         :return: TrainerDatasetsContainer with initialized datasets.
         """
         trainer_datasets_container = TrainerDatasetsContainer(
             pre_train_dataset_creator=dataset_creators_map.get(DatasetRole.PRE_TRAIN, None),
             train_dataset_creator=dataset_creators_map.get(DatasetRole.TRAIN, None),
             val_dataset_creator=dataset_creators_map.get(DatasetRole.VAL, None),
-            eval_dataset_creator=dataset_creators_map.get(DatasetRole.EVAL, None),
-            **kwargs)
+            eval_dataset_creator=dataset_creators_map.get(DatasetRole.EVAL, None))
         return trainer_datasets_container
 
     def _prepare_datasets(self, augmentation_steps: List[AbstractDataAugmentationStep]) -> None:
@@ -74,10 +74,10 @@ class TrainerDatasetsContainer:
         :return: None
         """
         train_dataset = self[DatasetRole.TRAIN]
-        if isinstance(train_dataset, TraceDataset):
+        if isinstance(self[DatasetRole.TRAIN], TraceDataset):
             dataset_splits_map = self._create_dataset_splits(train_dataset, self.__dataset_creators)
-            dataset_splits_map[DatasetRole.TRAIN].prepare_for_training(augmentation_steps)
             self.__datasets.update(dataset_splits_map)
+            self[DatasetRole.TRAIN].prepare_for_training(augmentation_steps)
 
     @staticmethod
     def _create_dataset_splits(train_dataset: TraceDataset, dataset_creators_map: Dict[DatasetRole, AbstractDatasetCreator]) \
@@ -103,7 +103,7 @@ class TrainerDatasetsContainer:
 
     @staticmethod
     def _create_datasets_from_creators(dataset_creators_map: Dict[DatasetRole, AbstractDatasetCreator]) \
-            -> Dict[DatasetRole, AbstractDataset]:
+            -> Dict[DatasetRole, DATASET_TYPE]:
         """
         Creates the datasets from their corresponding creators
         :return: a dictionary mapping dataset role to the corresponding dataset
@@ -130,7 +130,7 @@ class TrainerDatasetsContainer:
         if not isinstance(index_value, DatasetRole):
             raise Exception("Expected index to be datasets role:" + index_value)
 
-    def __getitem__(self, dataset_role: DatasetRole) -> Optional[AbstractDataset]:
+    def __getitem__(self, dataset_role: DatasetRole) -> Optional[DATASET_TYPE]:
         """
         Returns the datasets corresponding to role.
         :param dataset_role: The role of the datasets returned.
@@ -139,7 +139,7 @@ class TrainerDatasetsContainer:
         self.__assert_index(dataset_role)
         return self.__datasets[dataset_role]
 
-    def __setitem__(self, dataset_role: DatasetRole, dataset: AbstractDataset):
+    def __setitem__(self, dataset_role: DatasetRole, dataset: DATASET_TYPE):
         """
         Sets given datasets for given attribute corresponding to role
         :param dataset_role: The role defining attribute to set

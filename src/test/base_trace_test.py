@@ -8,6 +8,7 @@ from config.constants import VALIDATION_PERCENTAGE_DEFAULT
 from jobs.results.job_result import JobResult
 from test.base_test import BaseTest
 from tracer.datasets.creators.abstract_dataset_creator import AbstractDatasetCreator
+from tracer.datasets.creators.split_dataset_creator import SplitDatasetCreator
 from tracer.datasets.creators.supported_dataset_creator import SupportedDatasetCreator
 from tracer.datasets.data_objects.artifact import Artifact
 from tracer.datasets.data_objects.trace_link import TraceLink
@@ -99,9 +100,10 @@ class BaseTraceTest(BaseTest):
         return {dataset_role: abstract_dataset}
 
     @staticmethod
-    def create_trainer_dataset_container(dataset_map: Dict[DatasetRole, AbstractDatasetCreator], **dataset_args):
-        kwargs = {**BaseTraceTest.DATASET_ARGS_PARAMS, **dataset_args}
-        return TrainerDatasetsContainer.create_from_map(dataset_map, **kwargs)
+    def create_trainer_dataset_container(dataset_map: Dict[DatasetRole, AbstractDatasetCreator], split_train_dataset=True):
+        if split_train_dataset:
+            dataset_map[DatasetRole.VAL] = SplitDatasetCreator(split_percentage=VALIDATION_PERCENTAGE_DEFAULT)
+        return TrainerDatasetsContainer.create_from_map(dataset_map)
 
     def assert_prediction_output_matches_expected(self, output: dict, threshold: int = 0.05):
         if JobResult.PREDICTIONS not in output:

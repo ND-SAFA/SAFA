@@ -14,7 +14,7 @@ class PredictionRequestSerializer(ModelIdentifierSerializer):
     data = DatasetCreatorSerializer(help_text="The instructions for creating training/prediction dataset.",
                                     required=True)
 
-    def create(self, validated_data: Dict, dataset_param_key="eval") -> JobFactory:
+    def create(self, validated_data: Dict, dataset_param_key="eval_dataset_creator") -> JobFactory:
         representation: Dict = SerializerUtility.create_children_serializers(validated_data, self.fields.fields)
         SerializerUtility.wrap_property_with_trainer_dataset_container(representation, dataset_param_key)
         return JobFactoryConverter.create_job_factory(representation)

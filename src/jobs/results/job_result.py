@@ -29,6 +29,7 @@ class JobResult:
     PREDICTIONS = "predictions"
     ARTIFACT_IDS = "ids"
     METRICS = "metrics"
+    SAVED_DATASET_PATHS = "savedDatasetPaths"
     IDS = "ids"
     SOURCE = "source"
     TARGET = "target"

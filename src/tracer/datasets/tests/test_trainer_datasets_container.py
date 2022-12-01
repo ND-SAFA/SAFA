@@ -25,7 +25,7 @@ class TestTrainerDatasetsContainer(BaseTraceTest):
         datasets_container = self.get_trainer_datasets_container(
             pre_train_dataset_creator=MLMPreTrainDatasetCreator("orig_data_path"),
             eval_dataset_creator=self.EVAL_DATASET_CREATOR)
-        datasets_container._prepare_datasets()
+        datasets_container._prepare_datasets([])
         self.assert_final_datasets_are_as_expected(datasets_container)
 
     @patch.object(MLMPreTrainDatasetCreator, "create")

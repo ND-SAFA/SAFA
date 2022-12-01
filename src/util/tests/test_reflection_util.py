@@ -1,9 +1,8 @@
 from enum import Enum
 from typing import Dict
 
-from server.serializers.dataset.dataset_creator_serializer import ParamScope
 from test.base_test import BaseTest
-from util import ReflectionUtil
+from util.reflection_util import ParamScope, ReflectionUtil
 
 
 class TestClassOne:

@@ -10,4 +10,4 @@ class TrainingRequestSerializer(PredictionRequestSerializer):
     """
 
     def create(self, validated_data: Dict) -> JobFactory:
-        return super().create(validated_data, "train")
+        return super().create(validated_data, "train_dataset_creator")

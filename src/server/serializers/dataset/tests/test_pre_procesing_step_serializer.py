@@ -1,7 +1,7 @@
 from server.serializers.dataset.pre_processing_step_serializer import PreProcessingStepSerializer
 from server.serializers.tests.base_serializer_test import BaseSerializerTest
 from test.base_test import BaseTest
-from tracer.pre_processing.steps.abstract_pre_processing_step import AbstractPreProcessingStep
+from tracer.datasets.processing.abstract_data_processing_step import AbstractDataProcessingStep
 
 
 class TestPreProcessingStepSerializer(BaseTest):
@@ -32,7 +32,7 @@ class TestPreProcessingStepSerializer(BaseTest):
 
     def test_serialization_with_no_params(self):
         test_data = {"step": "REMOVE_WHITE_SPACE"}
-        entity: AbstractPreProcessingStep = self.serializer_test.serialize_data(self, test_data)
+        entity: AbstractDataProcessingStep = self.serializer_test.serialize_data(self, test_data)
         self.assertIsNotNone(entity)
         cleaned_word = entity.run([" target "])[0]
         self.assertEqual("target", cleaned_word)

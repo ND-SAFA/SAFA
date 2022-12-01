@@ -1,5 +1,5 @@
 from test.base_test import BaseTest
-from tracer.pre_processing.steps.remove_unwanted_chars_step import RemoveUnwantedCharsStep
+from tracer.datasets.processing.cleaning.remove_unwanted_chars_step import RemoveUnwantedCharsStep
 
 
 class TestRemoveUnwantedCharStep(BaseTest):

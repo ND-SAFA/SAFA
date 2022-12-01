@@ -30,11 +30,4 @@ class AbstractDataProcessor:
         :param content_list: a list of artifact body strings
         :return: the results
         """
-        processed = []
-        word_lists = [AbstractDataProcessingStep.get_word_list(content) for content in content_list]
-        for word_list in word_lists:
-            processed_word_list = word_list
-            for step in self.ordered_steps:
-                processed_word_list = step.run(processed_word_list)
-            processed.append(processed_word_list)
-        return [AbstractDataProcessingStep.reconstruct_content(word_list) for word_list in processed]
+        pass

@@ -11,18 +11,18 @@ from config.constants import DELETE_TEST_OUTPUT
 from test.paths.paths import TEST_DATA_DIR, TEST_OUTPUT_DIR, TEST_VOCAB_FILE
 from tracer.models.base_models.pl_bert import PLBert
 from tracer.models.base_models.supported_base_model import SupportedBaseModel
-from tracer.pre_processing.pre_processing_steps import PreProcessingSteps
-from tracer.pre_processing.steps.abstract_pre_processing_step import AbstractPreProcessingStep
+from tracer.datasets.processing.cleaning.data_cleaning_steps import DataCleaningSteps
+from tracer.datasets.processing.abstract_data_processing_step import AbstractDataProcessingStep
 
 
 class BaseTest(TestCase):
     MODEL_GENERATOR_PARAMS = {"base_model": SupportedBaseModel.PL_BERT,
                               "model_path": "model"}
-    PRE_PROCESSING_STEPS: List[AbstractPreProcessingStep] = [
-        PreProcessingSteps.REPLACE_WORDS.value(word_replace_mappings={"This": "Esta", "one": "uno"}),
-        PreProcessingSteps.REMOVE_UNWANTED_CHARS.value(),
-        PreProcessingSteps.SEPARATE_JOINED_WORDS.value(),
-        PreProcessingSteps.FILTER_MIN_LENGTH.value()]
+    DATA_CLEANING_STEPS: List[AbstractDataProcessingStep] = [
+        DataCleaningSteps.REPLACE_WORDS.value(word_replace_mappings={"This": "Esta", "one": "uno"}),
+        DataCleaningSteps.REMOVE_UNWANTED_CHARS.value(),
+        DataCleaningSteps.SEPARATE_JOINED_WORDS.value(),
+        DataCleaningSteps.FILTER_MIN_LENGTH.value()]
 
     def setUp(self):
         os.makedirs(TEST_OUTPUT_DIR, exist_ok=True)

@@ -1,5 +1,5 @@
 from test.base_test import BaseTest
-from tracer.pre_processing.steps.separate_joined_words_step import SeparateJoinedWordsStep
+from tracer.datasets.processing.cleaning.separate_joined_words_step import SeparateJoinedWordsStep
 
 
 class TestSeparateJoinedWordsStep(BaseTest):

@@ -7,18 +7,18 @@ from tracer.datasets.data_objects.artifact import Artifact
 from tracer.datasets.data_objects.trace_link import TraceLink
 from tracer.datasets.formats.csv_format import CSVFormat
 from tracer.datasets.trace_dataset import TraceDataset
-from tracer.pre_processing.steps.abstract_pre_processing_step import AbstractPreProcessingStep
+from tracer.datasets.processing.abstract_data_processing_step import AbstractDataProcessingStep
 
 
 class CSVDatasetCreator(AbstractTraceDatasetCreator):
 
-    def __init__(self, data_file_path: str, pre_processing_steps: List[AbstractPreProcessingStep] = None):
+    def __init__(self, data_file_path: str, data_cleaning_steps: List[AbstractDataProcessingStep] = None):
         """
         Constructs datasets in CSV format
         :param data_file_path: path to csv
-        :param pre_processing_steps: tuple containing the desired pre-processing steps and related params
+        :param data_cleaning_steps: tuple containing the desired pre-processing steps and related params
         """
-        super().__init__(pre_processing_steps, use_linked_targets_only=False)
+        super().__init__(data_cleaning_steps, use_linked_targets_only=False)
         self.data_file_path = data_file_path
 
     def create(self) -> TraceDataset:

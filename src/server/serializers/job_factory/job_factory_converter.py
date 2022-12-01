@@ -5,9 +5,9 @@ from server.serializers.serializer_utility import SerializerUtility
 from tracer.datasets.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tracer.datasets.creators.supported_dataset_creator import SupportedDatasetCreator
 from tracer.datasets.dataset_role import DatasetRole
+from tracer.datasets.processing.cleaning.data_cleaning_steps import DataCleaningSteps
 from tracer.datasets.trainer_datasets_container import TrainerDatasetsContainer
-from tracer.pre_processing.pre_processing_steps import PreProcessingSteps
-from tracer.pre_processing.steps.abstract_pre_processing_step import AbstractPreProcessingStep
+from tracer.datasets.processing.abstract_data_processing_step import AbstractDataProcessingStep
 from util.reflection_util import ParamScope, ReflectionUtil
 
 
@@ -66,8 +66,8 @@ class JobFactoryConverter:
         :param instance: The dataset creator to deserialize.
         :return: Dictionary containing API json.
         """
-        steps = instance._pre_processor.steps
-        steps_representation = [JobFactoryConverter.abstract_pre_processing_step_representation(step) for step in steps]
+        steps = instance._data_cleaner.steps
+        steps_representation = [JobFactoryConverter.abstract_data_cleaning_step_representation(step) for step in steps]
         return {
             "creator": ReflectionUtil.get_enum_key(SupportedDatasetCreator, instance),
             "params": ReflectionUtil.get_fields(instance, ParamScope.LOCAL),
@@ -75,13 +75,13 @@ class JobFactoryConverter:
         }
 
     @staticmethod
-    def abstract_pre_processing_step_representation(instance: AbstractPreProcessingStep):
+    def abstract_data_cleaning_step_representation(instance: AbstractDataProcessingStep):
         """
         Converts AbstractPreProcessingStep into JSON data.
         :param instance: The pre-processing step to convert.
         :return: Dictionary representing JSON representation.
         """
         return {
-            "step": ReflectionUtil.get_enum_key(PreProcessingSteps, instance),
+            "step": ReflectionUtil.get_enum_key(DataCleaningSteps, instance),
             "params": ReflectionUtil.get_fields(instance, ParamScope.LOCAL)
         }

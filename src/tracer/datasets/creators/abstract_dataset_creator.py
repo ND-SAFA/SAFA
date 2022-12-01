@@ -3,18 +3,18 @@ from typing import List, Union
 
 from tracer.datasets.pre_train_dataset import PreTrainDataset
 from tracer.datasets.trace_dataset import TraceDataset
-from tracer.pre_processing.pre_processor import PreProcessor
-from tracer.pre_processing.steps.abstract_pre_processing_step import AbstractPreProcessingStep
+from tracer.datasets.processing.cleaning.data_cleaner import DataCleaner
+from tracer.datasets.processing.abstract_data_processing_step import AbstractDataProcessingStep
 
 
 class AbstractDatasetCreator(ABC):
 
-    def __init__(self, pre_processing_steps: List[AbstractPreProcessingStep]):
+    def __init__(self, data_cleaning_steps: List[AbstractDataProcessingStep]):
         """
         Responsible for creating datasets in format for defined models.
-        :param pre_processing_steps: List of pre-processing steps for dataset.
+        :param data_cleaning_steps: List of pre-processing steps for dataset.
         """
-        self._pre_processor = self._make_pre_processor(pre_processing_steps)
+        self._data_cleaner = self._make_data_cleaner(data_cleaning_steps)
 
     @abstractmethod
     def create(self) -> Union[TraceDataset, PreTrainDataset]:
@@ -25,15 +25,15 @@ class AbstractDatasetCreator(ABC):
         pass
 
     @staticmethod
-    def _make_pre_processor(pre_processing_steps: List[AbstractPreProcessingStep] = None) -> PreProcessor:
+    def _make_data_cleaner(data_cleaning_steps: List[AbstractDataProcessingStep] = None) -> DataCleaner:
         """
         Handles making the pre_processor
-        :param pre_processing_steps: tuple containing the desired pre-processing steps and related params
+        :param data_cleaning_steps: tuple containing the desired pre-processing steps and related params
         :return: the pre_processor
         """
-        if pre_processing_steps:
-            return PreProcessor(pre_processing_steps)
-        return PreProcessor([])
+        if data_cleaning_steps:
+            return DataCleaner(data_cleaning_steps)
+        return DataCleaner([])
 
     def _process_tokens(self, tokens: Union[List[str], str]) -> Union[List[str], str]:
         """
@@ -44,7 +44,7 @@ class AbstractDatasetCreator(ABC):
         if not isinstance(tokens, list):
             tokens = [tokens]
 
-        tokens = self._pre_processor.run(tokens=tokens)
+        tokens = self._data_cleaner.run(tokens=tokens)
 
         if len(tokens) == 1:
             tokens = tokens.pop()

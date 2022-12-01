@@ -1,5 +1,5 @@
 from test.base_test import BaseTest
-from tracer.pre_processing.steps.filter_min_length_step import FilterMinLengthStep
+from tracer.datasets.processing.cleaning.filter_min_length_step import FilterMinLengthStep
 
 
 class TestFilterMinLengthStep(BaseTest):

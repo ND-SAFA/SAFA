@@ -21,18 +21,18 @@ class PreTrainingRequestSerializer(ModelIdentifierSerializer):
                                             help_text="Path to directory containing pre-training documents.")
     preProcessingSteps = PreProcessingStepSerializer(help_text="The steps performed on dataset before model access.",
                                                      many=True,
-                                                     source="pre_processing_steps",
+                                                     source="data_cleaning_steps",
                                                      required=False)
     params = serializers.DictField(help_text="Arguments for passed into hugging face trainer.")
 
     def create(self, validated_data: Dict) -> JobFactory:
         kwargs = SerializerUtility.create_children_serializers(validated_data, self.fields.fields)
 
-        pre_processing_steps = kwargs.pop("pre_processing_steps", None)
+        pre_processing_steps = kwargs.pop("data_cleaning_steps", None)
         training_data_dir = kwargs.pop("training_data_dir")
 
         training_dataset_creator = MLMPreTrainDatasetCreator(orig_data_path=training_data_dir,
-                                                             pre_processing_steps=pre_processing_steps)
+                                                             data_cleaning_steps=pre_processing_steps)
         trainer_datasets_container = TrainerDatasetsContainer(train_dataset_creator=training_dataset_creator)
         return JobFactory(**kwargs, trainer_dataset_container=trainer_datasets_container)
 
@@ -44,8 +44,8 @@ class PreTrainingRequestSerializer(ModelIdentifierSerializer):
                 representation[field_name] = job_factory_representation[field_name]
         pre_train_dataset_creator: MLMPreTrainDatasetCreator = instance.trainer_dataset_container.get_creator(
             DatasetRole.TRAIN)
-        representation["preProcessingSteps"] = [JobFactoryConverter.abstract_pre_processing_step_representation(step)
-                                                for step in pre_train_dataset_creator._pre_processor.steps]
+        representation["preProcessingSteps"] = [JobFactoryConverter.abstract_data_cleaning_step_representation(step)
+                                                for step in pre_train_dataset_creator._data_cleaner.steps]
         representation["trainingDataDir"] = pre_train_dataset_creator.orig_data_path
 
         return representation

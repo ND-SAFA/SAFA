@@ -15,7 +15,7 @@ class TestTrainerDatasetsContainer(BaseTraceTest):
     TRAIN_DATASET_CREATOR = ClassicTraceDatasetCreator(source_layers=BaseTraceTest.SOURCE_LAYERS,
                                                        target_layers=BaseTraceTest.TARGET_LAYERS,
                                                        true_links=BaseTraceTest.POS_LINKS,
-                                                       pre_processing_steps=BaseTraceTest.PRE_PROCESSING_STEPS,
+                                                       data_cleaning_steps=BaseTraceTest.DATA_CLEANING_STEPS,
                                                        use_linked_targets_only=False)
     VAL_DATASET_CREATOR = SplitDatasetCreator(split_percentage=0.3)
     EVAL_DATASET_CREATOR = SplitDatasetCreator(split_percentage=0.2)

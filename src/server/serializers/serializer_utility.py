@@ -5,7 +5,7 @@ from rest_framework.exceptions import ValidationError
 
 from tracer.datasets.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tracer.datasets.trainer_datasets_container import TrainerDatasetsContainer
-from tracer.pre_processing.steps.separate_joined_words_step import SeparateJoinedWordsStep
+from tracer.datasets.processing.cleaning.separate_joined_words_step import SeparateJoinedWordsStep
 
 
 class SerializerUtility:

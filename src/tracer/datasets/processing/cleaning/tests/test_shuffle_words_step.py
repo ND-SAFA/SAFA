@@ -1,5 +1,5 @@
 from test.base_test import BaseTest
-from tracer.pre_processing.steps.shuffle_words_step import ShuffleWordsStep
+from tracer.datasets.processing.cleaning.shuffle_words_step import ShuffleWordsStep
 
 
 class TestShuffleWordsStep(BaseTest):

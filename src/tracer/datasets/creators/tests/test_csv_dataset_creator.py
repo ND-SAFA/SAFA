@@ -18,4 +18,4 @@ class TestCSVDatasetCreator(BaseTraceTest):
 
     def get_csv_dataset_creator(self):
         data_file_path = os.path.join(self.CSV_DATA_DIR, self.TEST_DATA_FILE)
-        return CSVDatasetCreator(data_file_path, pre_processing_steps=self.PRE_PROCESSING_STEPS)
+        return CSVDatasetCreator(data_file_path, data_cleaning_steps=self.DATA_CLEANING_STEPS)

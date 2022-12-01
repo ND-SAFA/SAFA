@@ -1,5 +1,5 @@
 from test.base_test import BaseTest
-from tracer.pre_processing.steps.remove_white_space_step import RemoveWhiteSpaceStep
+from tracer.datasets.processing.cleaning.remove_white_space_step import RemoveWhiteSpaceStep
 
 
 class TestRemoveWhitespaceStep(BaseTest):

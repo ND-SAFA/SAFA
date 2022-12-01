@@ -22,7 +22,7 @@ class ManualReplaceWordsStep(AbstractDataProcessingStep):
         :param word_list: the list of words to separate
         :return: the processed word list with word replacements
         """
-        new_word_list = deepcopy(word_list)
+        new_word_list = []
         for word in word_list:
             replacement = self.word_replace_mappings[word] if word in self.word_replace_mappings else word
             new_word_list.append(replacement)

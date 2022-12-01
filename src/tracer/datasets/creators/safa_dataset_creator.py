@@ -9,7 +9,7 @@ from tracer.datasets.creators.abstract_trace_dataset_creator import AbstractTrac
 from tracer.datasets.data_objects.artifact import Artifact
 from tracer.datasets.formats.safa_format import SafaFormat
 from tracer.datasets.trace_dataset import TraceDataset
-from tracer.pre_processing.steps.abstract_pre_processing_step import AbstractPreProcessingStep
+from tracer.datasets.processing.abstract_data_processing_step import AbstractDataProcessingStep
 
 
 class SafaDatasetCreator(AbstractTraceDatasetCreator):
@@ -17,16 +17,16 @@ class SafaDatasetCreator(AbstractTraceDatasetCreator):
     CSV_EXT = ".csv"
     KEYS = SafaFormat()
 
-    def __init__(self, project_path: str, pre_processing_steps: List[AbstractPreProcessingStep] = None,
+    def __init__(self, project_path: str, data_cleaning_steps: List[AbstractDataProcessingStep] = None,
                  data_keys: SafaFormat = KEYS, use_linked_targets_only: bool = USE_LINKED_TARGETS_ONLY_DEFAULT):
         """
         Creates a datasets from the SAFA datasets format.
         :param project_path: the path to the project
-        :param pre_processing_steps: tuple containing the desired pre-processing steps and related params
+        :param data_cleaning_steps: tuple containing the desired pre-processing steps and related params
         :param data_keys: keys to use to access data
         :param use_linked_targets_only: if True, uses only the targets that make up at least one true link
         """
-        super().__init__(pre_processing_steps, use_linked_targets_only)
+        super().__init__(data_cleaning_steps, use_linked_targets_only)
         self.project_path = project_path
         self.keys = data_keys
 

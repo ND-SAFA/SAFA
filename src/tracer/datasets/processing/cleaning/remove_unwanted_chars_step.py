@@ -1,6 +1,7 @@
 from typing import List
 
 from tracer.datasets.processing.abstract_data_processing_step import AbstractDataProcessingStep, ProcessingOrder
+from tracer.datasets.processing.cleaning.separate_joined_words_step import SeparateJoinedWordsStep
 
 
 class RemoveUnwantedCharsStep(AbstractDataProcessingStep):
@@ -19,7 +20,7 @@ class RemoveUnwantedCharsStep(AbstractDataProcessingStep):
         :param char: the char
         :return: True if char should be kept, else False
         """
-        return char.isdigit() or char.isalpha()
+        return char.isdigit() or char.isalpha() or char in SeparateJoinedWordsStep.DELIMINATORS
 
     @staticmethod
     def _remove_unwanted_chars_from_word(word: str) -> str:

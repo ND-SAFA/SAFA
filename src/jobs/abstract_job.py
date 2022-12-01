@@ -76,8 +76,10 @@ class AbstractJob(threading.Thread):
         :param job_id: the id of the job
         :return: the filepath
         """
-        filename = "job_%s_%s" % (str(job_id), AbstractJob.OUTPUT_FILENAME)
-        return os.path.join(output_dir, filename)
+        output_path = os.path.join(output_dir, str(job_id))
+        if not os.path.exists(output_path):
+            os.makedirs(output_path)
+        return os.path.join(output_path, AbstractJob.OUTPUT_FILENAME)
 
     def _save(self, output: str) -> bool:
         """

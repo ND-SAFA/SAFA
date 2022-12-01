@@ -1,7 +1,10 @@
+from collections import OrderedDict
 from typing import List, Optional, Union, Dict
 
 from config.constants import VALIDATION_PERCENTAGE_DEFAULT
+from tracer.datasets.abstract_dataset import AbstractDataset
 from tracer.datasets.creators.abstract_dataset_creator import AbstractDatasetCreator
+from tracer.datasets.creators.split_dataset_creator import SplitDatasetCreator
 from tracer.datasets.dataset_role import DatasetRole
 from tracer.datasets.pre_train_dataset import PreTrainDataset
 from tracer.datasets.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
@@ -10,60 +13,32 @@ from tracer.datasets.trace_dataset import TraceDataset
 
 class TrainerDatasetsContainer:
     def __init__(self,
-                 pre_train: AbstractDatasetCreator = None,
-                 train: AbstractDatasetCreator = None,
-                 val: AbstractDatasetCreator = None,
-                 eval: AbstractDatasetCreator = None,
-                 validation_percentage: float = VALIDATION_PERCENTAGE_DEFAULT, split_train_dataset: bool = False,
+                 pre_train_dataset_creator: AbstractDatasetCreator = None,
+                 train_dataset_creator: AbstractDatasetCreator = None,
+                 val_dataset_creator: AbstractDatasetCreator = None,
+                 eval_dataset_creator: AbstractDatasetCreator = None,
                  augmentation_steps: List[AbstractDataAugmentationStep] = None
                  ):
         """
         Container to hold all the datasets used in the TraceTrainer
-        :param pre_train: The pre-training dataset creator.
-        :param train: The training dataset creator.
-        :param val: the validation dataset creator.
-        :param eval: The training dataset creator.
-        :param validation_percentage: percentage of the data to use for validation datasets
-        :param split_train_dataset: if True, splits the training datasets into a train, val datasets
+        :param pre_train_dataset_creator: The pre-training dataset creator.
+        :param train_dataset_creator: The training dataset creator.
+        :param val_dataset_creator: the validation dataset creator.
+        :param eval_dataset_creator: The training dataset creator.datasets
         :param augmentation_steps: steps to run to augment the training data
         """
-        self.__pre_train_creator = pre_train
-        self.__train_creator = train
-        self.__val_creator = val
-        self.__eval_creator = eval
-        self.__pre_train_dataset: Optional[PreTrainDataset] = self.__optional_create(pre_train)
-        self.__train_dataset: Optional[TraceDataset] = self.__optional_create(train)
-        self.__val_dataset: Optional[TraceDataset] = self.__optional_create(val)
-        self.__eval_dataset: Optional[TraceDataset] = self.__optional_create(eval)
+        self.__dataset_creators = {DatasetRole.PRE_TRAIN: pre_train_dataset_creator, DatasetRole.TRAIN: train_dataset_creator,
+                                   DatasetRole.VAL: val_dataset_creator, DatasetRole.EVAL: eval_dataset_creator}
+        self.__datasets = self._create_datasets_from_creators(self.__dataset_creators)
+        self._prepare_datasets()
 
-        if isinstance(self.__train_dataset, TraceDataset):
-            if split_train_dataset:
-                self.train_dataset, self.val_dataset = self.__train_dataset.split(validation_percentage)
-            self.train_dataset.prepare_for_training(augmentation_steps)
-
-    def get_creator(self, dataset_role: DatasetRole):
-        if dataset_role == DatasetRole.PRE_TRAIN:
-            return self.__pre_train_creator
-        if dataset_role == DatasetRole.TRAIN:
-            return self.__train_creator
-        if dataset_role == DatasetRole.VAL:
-            return self.__val_creator
-        if dataset_role == DatasetRole.EVAL:
-            return self.__eval_creator
-        raise Exception("Unrecognized role:" + dataset_role.name)
-
-    @staticmethod
-    def create_from_map(dataset_map: Dict[DatasetRole, AbstractDatasetCreator], **kwargs):
+    def get_creator(self, dataset_role: DatasetRole) -> AbstractDatasetCreator:
         """
-        Creates instance containing dataset for each mapped role.
-        :param dataset_map: The map of roles to datasets to set in instance.
-        :param kwargs: Additional initialization parameters to instance.
-        :return: TrainerDatasetsContainer with initialized datasets.
+        Gets the dataset creator for the given role
+        :param dataset_role: the dataset role
+        :return: the dataset creator for the given role
         """
-        trainer_datasets_container = TrainerDatasetsContainer(**kwargs)
-        for dataset_role, dataset_creator in dataset_map.items():
-            trainer_datasets_container[dataset_role] = dataset_creator.create()
-        return trainer_datasets_container
+        return self.__dataset_creators[dataset_role]
 
     def save_dataset_splits(self, output_dir: str) -> None:
         """
@@ -75,24 +50,65 @@ class TrainerDatasetsContainer:
             if dataset_role in self:
                 self[dataset_role].save(output_dir, dataset_role.name.lower())
 
-    def __getitem__(self, dataset_role: DatasetRole) -> Optional[Union[TraceDataset, PreTrainDataset]]:
+    @staticmethod
+    def create_from_map(dataset_creators_map: Dict[DatasetRole, AbstractDatasetCreator], **kwargs):
         """
-        Returns the datasets corresponding to role.
-        :param dataset_role: The role of the datasets returned.
-        :return: PreTrainDataset if pretrain role otherwise TraceDataset
+        Creates instance containing dataset for each mapped role.
+        :param dataset_creators_map: The map of roles to datasets to set in instance.
+        :param kwargs: Additional initialization parameters to instance.
+        :return: TrainerDatasetsContainer with initialized datasets.
         """
+        trainer_datasets_container = TrainerDatasetsContainer(
+            pre_train_dataset_creator=dataset_creators_map.get(DatasetRole.PRE_TRAIN, None),
+            train_dataset_creator=dataset_creators_map.get(DatasetRole.TRAIN, None),
+            val_dataset_creator=dataset_creators_map.get(DatasetRole.VAL, None),
+            eval_dataset_creator=dataset_creators_map.get(DatasetRole.EVAL, None),
+            **kwargs)
+        return trainer_datasets_container
 
-        self.__assert_index(dataset_role)
-        if dataset_role == DatasetRole.TRAIN:
-            return self.__train_dataset
-        elif dataset_role == DatasetRole.PRE_TRAIN:
-            return self.__pre_train_dataset
-        elif dataset_role == DatasetRole.EVAL:
-            return self.__eval_dataset
-        elif dataset_role == DatasetRole.VAL:
-            return self.__val_dataset
-        else:
-            raise Exception("Not datasets found corresponding with:" + str(dataset_role))
+    def _prepare_datasets(self, augmentation_steps: List[AbstractDataAugmentationStep] = None) -> None:
+        """
+        Performs any necessary additional steps necessary to prepare each dataset
+        :param augmentation_steps: steps to augment the training dataset
+        :return: None
+        """
+        train_dataset = self[DatasetRole.TRAIN]
+        if isinstance(train_dataset, TraceDataset):
+            dataset_splits_map = self._create_dataset_splits(train_dataset, self.__dataset_creators)
+            dataset_splits_map[DatasetRole.TRAIN].prepare_for_training(augmentation_steps)
+            self.__datasets.update(dataset_splits_map)
+
+    @staticmethod
+    def _create_dataset_splits(train_dataset: TraceDataset, dataset_creators_map: Dict[DatasetRole, AbstractDatasetCreator]) \
+            -> Dict[DatasetRole, TraceDataset]:
+        """
+        Splits the train dataset into desired splits and creates a dictionary mapping dataset role to split for all split datasets
+        :param train_dataset: the train dataset
+        :param dataset_creators_map: a map of dataset role to all dataset creators
+        :return: a dictionary mapping dataset role to split for all split datasets
+        """
+        dataset_percent_splits = OrderedDict({dataset_role: dataset_creator.split_percentage
+                                              for dataset_role, dataset_creator in dataset_creators_map.items()
+                                              if isinstance(dataset_creator, SplitDatasetCreator)})
+        dataset_splits_map = {}
+        if len(dataset_percent_splits) < 1:
+            return dataset_splits_map
+        splits = train_dataset.split_multiple(list(dataset_percent_splits.values()))
+        train_dataset, split_datasets = splits[0], splits[1:]
+        dataset_splits_map[DatasetRole.TRAIN] = train_dataset
+        for i, dataset_role in enumerate(dataset_percent_splits.keys()):
+            dataset_splits_map[dataset_role] = split_datasets[i]
+        return dataset_splits_map
+
+    @staticmethod
+    def _create_datasets_from_creators(dataset_creators_map: Dict[DatasetRole, AbstractDatasetCreator]) \
+            -> Dict[DatasetRole, AbstractDataset]:
+        """
+        Creates the datasets from their corresponding creators
+        :return: a dictionary mapping dataset role to the corresponding dataset
+        """
+        return {dataset_role: TrainerDatasetsContainer.__optional_create(dataset_creator)
+                for dataset_role, dataset_creator in dataset_creators_map.items()}
 
     @staticmethod
     def __optional_create(dataset_creator: Optional[AbstractDatasetCreator]) -> Optional[Union[TraceDataset, PreTrainDataset]]:
@@ -101,34 +117,7 @@ class TrainerDatasetsContainer:
         :param dataset_creator: The optional dataset creator to use.
         :return: None or Dataset
         """
-        return None if dataset_creator is None else dataset_creator.create()
-
-    def __setitem__(self, dataset_role: DatasetRole, dataset: Union[TraceDataset, PreTrainDataset]):
-        """
-        Sets given datasets for given attribute corresponding to role
-        :param dataset_role: The role defining attribute to set
-        :param dataset: The datasets to set
-        :return: None
-        """
-        self.__assert_index(dataset_role)
-        if dataset_role == DatasetRole.TRAIN:
-            self.__train_dataset = dataset
-        elif dataset_role == DatasetRole.PRE_TRAIN:
-            self.__pre_train_dataset = dataset
-        elif dataset_role == DatasetRole.EVAL:
-            self.__eval_dataset = dataset
-        elif dataset_role == DatasetRole.VAL:
-            self.__val_dataset = dataset
-        else:
-            raise Exception("Not datasets found corresponding with:" + str(dataset_role))
-
-    def __contains__(self, dataset_role: DatasetRole):
-        """
-        Returns whether datasets exist for given role.
-        :param dataset_role: The role to check a datasets for.
-        :return: Boolean representing whether datasets exist for role
-        """
-        return self[dataset_role] is not None
+        return dataset_creator.create() if dataset_creator else None
 
     @staticmethod
     def __assert_index(index_value):
@@ -139,6 +128,33 @@ class TrainerDatasetsContainer:
         """
         if not isinstance(index_value, DatasetRole):
             raise Exception("Expected index to be datasets role:" + index_value)
+
+    def __getitem__(self, dataset_role: DatasetRole) -> Optional[AbstractDataset]:
+        """
+        Returns the datasets corresponding to role.
+        :param dataset_role: The role of the datasets returned.
+        :return: PreTrainDataset if pretrain role otherwise TraceDataset
+        """
+        self.__assert_index(dataset_role)
+        return self.__datasets[dataset_role]
+
+    def __setitem__(self, dataset_role: DatasetRole, dataset: AbstractDataset):
+        """
+        Sets given datasets for given attribute corresponding to role
+        :param dataset_role: The role defining attribute to set
+        :param dataset: The datasets to set
+        :return: None
+        """
+        self.__assert_index(dataset_role)
+        self.__datasets[dataset_role] = dataset
+
+    def __contains__(self, dataset_role: DatasetRole):
+        """
+        Returns whether datasets exist for given role.
+        :param dataset_role: The role to check a datasets for.
+        :return: Boolean representing whether datasets exist for role
+        """
+        return self[dataset_role] is not None
 
     def __repr__(self):
         """

@@ -2,7 +2,7 @@ import os
 import random
 from collections import OrderedDict
 from copy import deepcopy
-from typing import Callable, Dict, List, Sized, Tuple
+from typing import Callable, Dict, List, Sized, Tuple, Union
 
 from tracer.datasets.abstract_dataset import AbstractDataset
 from tracer.datasets.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
@@ -15,9 +15,6 @@ from tracer.datasets.processing.augmentation.source_target_swap_step import Sour
 from tracer.models.model_generator import ModelGenerator
 from tracer.models.model_properties import ArchitectureType
 import pandas as pd
-
-SEED = 420
-random.seed(SEED)
 
 
 class TraceDataset(AbstractDataset):
@@ -35,16 +32,6 @@ class TraceDataset(AbstractDataset):
 
         self._shuffle_link_ids(self.pos_link_ids)
         self._shuffle_link_ids(self.neg_link_ids)
-
-    def split(self, percent_split: float) -> Tuple["TraceDataset", "TraceDataset"]:
-        """
-        Splits trace datasets into two, with latter containing percentage of links specified.
-        :param percent_split: The percent of links to include in second trace datasets.
-        :return: Tuple of two trace datasets.
-        """
-        first_slice = self._create_new_dataset_from_slice(percent_split, slice_num=1)
-        second_slice = self._create_new_dataset_from_slice(percent_split, slice_num=2)
-        return first_slice, second_slice
 
     def to_trainer_dataset(self, model_generator: ModelGenerator) -> List[Dict]:
         """
@@ -113,6 +100,25 @@ class TraceDataset(AbstractDataset):
         return [(self.links[link_id].source.id, self.links[link_id].target.id) for link_id in
                 self.pos_link_ids + self.neg_link_ids]
 
+    def split(self, percent_split: float) -> Tuple["TraceDataset", "TraceDataset"]:
+        """
+        Splits trace datasets into two, with latter containing percentage of links specified.
+        :param percent_split: The percent of links to include trace datasets.
+        :return: Tuple of two trace datasets.
+        """
+        first_slice = self._create_new_dataset_from_slice(percent_split, slice_num=1)
+        second_slice = self._create_new_dataset_from_slice(percent_split, slice_num=2)
+        return first_slice, second_slice
+
+    def split_multiple(self, percent_splits: List[float]) -> Tuple["TraceDataset"]:
+        """
+         Splits trace datasets into multiple datasets, with each part containing the corresponding percentage of links specified.
+         :param percent_splits: The percent of links to include trace datasets for each split.
+         :return: Tuple of trace datasets for each split specified
+         """
+        percent_splits = [1 - sum(percent_splits)] + percent_splits
+        return self._split_multiple_helper(percent_splits, splits=[self])
+
     def prepare_for_training(self, augmentation_steps: List[AbstractDataAugmentationStep] = None) -> None:
         """
         Resamples positive links and resizes negative links to create 50-50 ratio.
@@ -160,6 +166,22 @@ class TraceDataset(AbstractDataset):
         df = self.to_dataframe()
         df.to_csv(output_path)
         return output_path
+
+    def _split_multiple_helper(self, percent_splits: List, splits: List) -> Tuple["TraceDataset"]:
+        """
+        Recursive method to split a dataset into multiple parts fir all percentages provided
+        :param percent_splits: a list of all split percentages (should sum to 1)
+        :param splits: list of already split datasets (the last element should be the portion remaining to split)
+        :return: Tuple of trace datasets for each split specified
+        """
+        if len(percent_splits) <= 1:
+            return tuple(splits)
+        dataset_to_split = splits.pop()
+        total_percent_to_split = 1 - percent_splits.pop(0)
+        slices = dataset_to_split.split(total_percent_to_split)
+        splits.extend(slices)
+        updated_percent_splits = [percent_split / total_percent_to_split for percent_split in percent_splits]
+        return self._split_multiple_helper(updated_percent_splits, splits)
 
     def _get_data_entries_for_augmentation(self) -> Tuple[List[TraceLink], List[Tuple[str, str]]]:
         """

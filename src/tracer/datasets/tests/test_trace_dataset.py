@@ -6,6 +6,8 @@ from unittest.mock import patch
 from test.base_trace_test import BaseTraceTest
 from tracer.datasets.creators.csv_dataset_creator import CSVDatasetCreator
 from tracer.datasets.data_key import DataKey
+from tracer.datasets.data_objects.artifact import Artifact
+from tracer.datasets.data_objects.trace_link import TraceLink
 from tracer.datasets.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
 from tracer.datasets.processing.augmentation.resample_step import ResampleStep
 from tracer.datasets.processing.augmentation.simple_word_replacement_step import SimpleWordReplacementStep
@@ -108,9 +110,48 @@ class TestTraceDataset(BaseTraceTest):
             if expected != actual:
                 self.fail("Expected number of links (%d) does not match actual (%d) for %s" % (expected, actual, str(type(steps[i]))))
 
+    def test_add_link(self):
+        trace_dataset = self.get_trace_dataset()
+        source_tokens, target_tokens = "s_token", "t_token"
+
+        true_source_id, true_target_id = "source_id1", "target_id1"
+        trace_dataset.add_link(true_source_id, true_target_id, source_tokens, target_tokens, is_true_link=True)
+        true_link_id = TraceLink.generate_link_id(true_source_id, true_target_id)
+        self.assertIn(true_link_id, trace_dataset.links)
+        self.assertNotIn(true_link_id, trace_dataset.neg_link_ids)
+        self.assertIn(true_link_id, trace_dataset.pos_link_ids)
+        self.assertEquals(trace_dataset.links[true_link_id].source.token, source_tokens)
+        self.assertEquals(trace_dataset.links[true_link_id].target.token, target_tokens)
+
+        false_source_id, false_target_id = "source_id2", "target_id2"
+        trace_dataset.add_link(false_source_id, false_target_id, source_tokens, target_tokens, is_true_link=False)
+        false_link_id = TraceLink.generate_link_id(false_source_id, false_target_id)
+        self.assertIn(false_link_id, trace_dataset.links)
+        self.assertIn(false_link_id, trace_dataset.neg_link_ids)
+        self.assertNotIn(false_link_id, trace_dataset.pos_link_ids)
+
     def test_get_augmented_artifact_ids(self):
-        # TODO
-        pass
+        trace_dataset = self.get_trace_dataset()
+        augmented_tokens = ("s_token_aug", "t_token_aug")
+        aug_step_id = "9349jsf"
+        entry_num = 1
+        orig_link = list(trace_dataset.links.values()).pop()
+
+        aug_source_id, aug_target_id = trace_dataset._get_augmented_artifact_ids(augmented_tokens, orig_link, aug_step_id, entry_num)
+        self.assertEquals(aug_source_id, orig_link.source.id + aug_step_id)
+        self.assertEquals(aug_target_id, orig_link.target.id + aug_step_id)
+
+        # link id already exists but is same as augmented
+        trace_dataset.add_link(aug_source_id, aug_target_id, *augmented_tokens, is_true_link=True)
+        aug_source_id, aug_target_id = trace_dataset._get_augmented_artifact_ids(augmented_tokens, orig_link, aug_step_id, entry_num)
+        self.assertEquals(aug_source_id, orig_link.source.id + aug_step_id)
+        self.assertEquals(aug_target_id, orig_link.target.id + aug_step_id)
+
+        # link id already exists but is NOT the same as augmented
+        trace_dataset.add_link(aug_source_id, aug_target_id, "s_token", "t_token", is_true_link=True)
+        aug_source_id, aug_target_id = trace_dataset._get_augmented_artifact_ids(augmented_tokens, orig_link, aug_step_id, entry_num)
+        self.assertEquals(aug_source_id, orig_link.source.id + aug_step_id + str(entry_num))
+        self.assertEquals(aug_target_id, orig_link.target.id + aug_step_id + str(entry_num))
 
     def test_get_data_entries_for_augmentation(self):
         trace_dataset = self.get_trace_dataset()
@@ -184,6 +225,27 @@ class TestTraceDataset(BaseTraceTest):
         for split in [split1, split2]:
             link_ids = split.pos_link_ids + split.neg_link_ids
             self.assert_lists_have_the_same_vals(split.links.keys(), link_ids)
+
+    def test_split_multiple(self):
+        trace_dataset = self.get_trace_dataset()
+        n_orig_links = len(trace_dataset)
+        percent_splits = [0.3, 0.2]
+        splits = trace_dataset.split_multiple(percent_splits)
+        length_of_splits = [len(split) for split in splits]
+        split_link_ids = [set(split.links.keys()) for split in splits]
+        self.assertEquals(sum(length_of_splits), n_orig_links)
+        for i, len_split in enumerate(length_of_splits):
+            if i == 0:
+                self.assertLessEqual(abs(len_split - round(n_orig_links * (1-sum(percent_splits)))), 1)
+                continue
+            self.assertLessEqual(abs(len_split - round(n_orig_links*percent_splits[i-1])), 1)
+        for i, split in enumerate(splits):
+            link_ids = split_link_ids[i]
+            for j, other_link_ids in enumerate(split_link_ids):
+                if i == j:
+                    continue
+                intersection = other_link_ids.intersection(link_ids)
+                self.assertEquals(len(intersection), 0)
 
     def test_prepare_for_training(self):
         n_pos_links = len(self.POS_LINKS)

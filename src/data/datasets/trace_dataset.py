@@ -8,8 +8,8 @@ from data.abstract_dataset import AbstractDataset
 from data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
 from data.processing.augmentation.data_augmenter import DataAugmenter
 from data.data_key import DataKey
-from data.data_objects.artifact import Artifact
-from data.data_objects.trace_link import TraceLink
+from data.tree.artifact import Artifact
+from data.tree.trace_link import TraceLink
 from data.formats.csv_format import CSVFormat
 from data.processing.augmentation.source_target_swap_step import SourceTargetSwapStep
 from models.model_generator import ModelGenerator

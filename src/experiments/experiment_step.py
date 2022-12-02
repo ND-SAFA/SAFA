@@ -3,7 +3,7 @@ from typing import List, Tuple, Union
 from experiments.experiment_variables import ExperimentVariables
 from jobs.abstract_job import AbstractJob
 from jobs.job_factory import JobFactory
-from tracer.metrics.supported_trace_metric import SupportedTraceMetric
+from train.metrics.supported_trace_metric import SupportedTraceMetric
 
 
 class ExperimentStep:

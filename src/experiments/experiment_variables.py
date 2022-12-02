@@ -1,9 +1,8 @@
 import itertools
 from dataclasses import dataclass, field
-from typing import List, Dict, Type, Optional, Tuple, Union, Any
+from typing import List, Dict, Type, Tuple, Union, Any
 from jobs.abstract_job import AbstractJob
-from jobs.job_factory import JobFactory
-from tracer.metrics.supported_trace_metric import SupportedTraceMetric
+from train.metrics.supported_trace_metric import SupportedTraceMetric
 
 
 @dataclass

@@ -5,16 +5,16 @@ import numpy as np
 from transformers.trainer_utils import PredictionOutput
 
 from config.constants import VALIDATION_PERCENTAGE_DEFAULT
-from jobs.results.job_result import JobResult
+from jobs.components.job_result import JobResult
 from test.base_test import BaseTest
-from tracer.datasets.creators.abstract_dataset_creator import AbstractDatasetCreator
-from tracer.datasets.creators.split_dataset_creator import SplitDatasetCreator
-from tracer.datasets.creators.supported_dataset_creator import SupportedDatasetCreator
-from tracer.datasets.data_objects.artifact import Artifact
-from tracer.datasets.data_objects.trace_link import TraceLink
-from tracer.datasets.dataset_role import DatasetRole
-from tracer.datasets.trainer_datasets_container import TrainerDatasetsContainer
-from tracer.pre_processing.steps.abstract_pre_processing_step import AbstractPreProcessingStep
+from data.creators.abstract_dataset_creator import AbstractDatasetCreator
+from data.creators.split_dataset_creator import SplitDatasetCreator
+from data.creators.supported_dataset_creator import SupportedDatasetCreator
+from data.tree.artifact import Artifact
+from data.tree.trace_link import TraceLink
+from data.datasets.dataset_role import DatasetRole
+from data.datasets.trainer_datasets_container import TrainerDatasetsContainer
+from data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 
 
 class BaseTraceTest(BaseTest):
@@ -85,7 +85,7 @@ class BaseTraceTest(BaseTest):
                        dataset_creator_params: Dict = None,
                        include_links=True,
                        include_pre_processing: bool = False,
-                       pre_processing_steps: List[AbstractPreProcessingStep] = None,
+                       pre_processing_steps: List[AbstractDataProcessingStep] = None,
                        **kwargs
                        ) -> Dict[DatasetRole, AbstractDatasetCreator]:
         if not dataset_creator_params:
@@ -93,9 +93,9 @@ class BaseTraceTest(BaseTest):
         if not include_links:
             dataset_creator_params.pop("true_links")
         if not pre_processing_steps:
-            pre_processing_steps = BaseTest.PRE_PROCESSING_STEPS
+            pre_processing_steps = BaseTest.DATA_CLEANING_STEPS
         if include_pre_processing:
-            dataset_creator_params["pre_processing_steps"] = BaseTest.PRE_PROCESSING_STEPS
+            dataset_creator_params["data_cleaning_steps"] = BaseTest.DATA_CLEANING_STEPS
         abstract_dataset = dataset_creator_class.value(**dataset_creator_params, **kwargs)
         return {dataset_role: abstract_dataset}
 

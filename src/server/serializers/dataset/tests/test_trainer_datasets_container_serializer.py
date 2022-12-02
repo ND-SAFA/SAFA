@@ -1,8 +1,8 @@
 from server.serializers.dataset.trainer_dataset_container_serializer import TrainerDatasetsContainerSerializer
 from server.serializers.tests.base_serializer_test import BaseSerializerTest
 from test.base_test import BaseTest
-from tracer.datasets.dataset_role import DatasetRole
-from tracer.datasets.trainer_datasets_container import TrainerDatasetsContainer
+from data.datasets.dataset_role import DatasetRole
+from data.datasets.trainer_datasets_container import TrainerDatasetsContainer
 import unittest
 
 
@@ -12,7 +12,7 @@ class TestPreProcessingStepSerializer(BaseTest):
         "preTrain": {
             "creator": "MLM_PRETRAIN",
             "params": {
-                "orig_data_path": "/mnt/datasets/automotive"
+                "orig_data_path": "/mnt/data/automotive"
             },
             "preProcessingSteps": [
                 {
@@ -26,7 +26,7 @@ class TestPreProcessingStepSerializer(BaseTest):
         "train": {
             "creator": "SAFA",
             "params": {
-                "project_path": "/mnt/datasets/LHP"
+                "project_path": "/mnt/data/LHP"
             },
             "preProcessingSteps": [
                 {

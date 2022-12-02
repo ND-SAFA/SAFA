@@ -4,7 +4,7 @@ from rest_framework import serializers
 
 from server.serializers.dataset.dataset_creator_serializer import DatasetCreatorSerializer
 from server.serializers.serializer_utility import SerializerUtility
-from tracer.datasets.trainer_datasets_container import TrainerDatasetsContainer
+from data.datasets.trainer_datasets_container import TrainerDatasetsContainer
 
 
 class TrainerDatasetsContainerSerializer(serializers.Serializer):
@@ -23,7 +23,7 @@ class TrainerDatasetsContainerSerializer(serializers.Serializer):
     def create(self, validated_data: Dict):
         """
         Creates TrainerDatasetContainer for each defined dataset.
-        :param validated_data: The validated request data defining datasets.
+        :param validated_data: The validated request data defining data.
         :return: TrainerDatasetsContainer with dataset creators.
         """
         kwargs = SerializerUtility.create_children_serializers(validated_data, self.fields.fields)

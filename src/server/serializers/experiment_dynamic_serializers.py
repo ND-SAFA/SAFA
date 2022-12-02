@@ -6,7 +6,7 @@ from django.core.wsgi import get_wsgi_application
 from rest_framework import serializers
 
 from server.serializers.serializer_utility import SerializerUtility
-from tracer.train.trace_args import TraceArgs
+from train.trace_args import TraceArgs
 from util.reflection_util import ParamScope, ReflectionUtil
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'server.settings')

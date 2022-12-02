@@ -4,7 +4,7 @@ from drf_yasg.utils import swagger_auto_schema
 
 from jobs.predict_job import PredictJob
 from server.serializers.job_factory.prediction_request_serializer import PredictionRequestSerializer
-from jobs.results.job_result import JobResult
+from jobs.components.job_result import JobResult
 from server.views.abstract_trace_view import AbstractTraceView
 
 

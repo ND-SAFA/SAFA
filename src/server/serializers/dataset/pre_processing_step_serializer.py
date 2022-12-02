@@ -5,22 +5,22 @@ from rest_framework import serializers
 
 from server.serializers.job_factory.job_factory_converter import JobFactoryConverter
 from server.serializers.serializer_utility import SerializerUtility
-from tracer.pre_processing.pre_processing_steps import PreProcessingSteps
-from tracer.pre_processing.steps.abstract_pre_processing_step import AbstractPreProcessingStep
+from data.processing.cleaning.data_cleaning_steps import DataCleaningSteps
+from data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 
 
 class PreProcessingStepSerializer(serializers.Serializer):
-    step = EnumField(choices=PreProcessingSteps,
+    step = EnumField(choices=DataCleaningSteps,
                      help_text="The pre-processing step to perform.")
     params = serializers.DictField(help_text="The arguments used to construct step.", required=False)
 
-    def create(self, validated_data: Dict) -> AbstractPreProcessingStep:
-        step_class: Type[AbstractPreProcessingStep] = validated_data["step"].value
+    def create(self, validated_data: Dict) -> AbstractDataProcessingStep:
+        step_class: Type[AbstractDataProcessingStep] = validated_data["step"].value
         params = validated_data["params"] if "params" in validated_data else {}
         return step_class(**params)
 
-    def update(self, instance, validated_data: Dict) -> AbstractPreProcessingStep:
+    def update(self, instance, validated_data: Dict) -> AbstractDataProcessingStep:
         return SerializerUtility.update_error()
 
-    def to_representation(self, instance: AbstractPreProcessingStep):
-        return JobFactoryConverter.abstract_pre_processing_step_representation(instance)
+    def to_representation(self, instance: AbstractDataProcessingStep):
+        return JobFactoryConverter.abstract_data_cleaning_step_representation(instance)

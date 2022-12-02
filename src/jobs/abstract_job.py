@@ -1,15 +1,16 @@
 import os
 import random
+import transformers
 import threading
 import traceback
 import uuid
 from abc import abstractmethod
 
-from jobs.job_args import JobArgs
-from jobs.results.job_status import JobStatus
-from jobs.results.job_result import JobResult
+from jobs.components.job_args import JobArgs
+from jobs.components.job_status import JobStatus
+from jobs.components.job_result import JobResult
 from server.storage.safa_storage import SafaStorage
-from tracer.models.model_generator import ModelGenerator
+from models.model_generator import ModelGenerator
 
 
 class AbstractJob(threading.Thread):
@@ -22,8 +23,8 @@ class AbstractJob(threading.Thread):
         """
         super().__init__()
         self.job_args = job_args
-        if job_args.random_seed:
-            random.seed(job_args.random_seed)
+        if self.job_args.random_seed:
+            self.set_random_seed(self.job_args.random_seed)
         self.result = JobResult()
         self.id = uuid.uuid4()
         self.output_dir = job_args.output_dir
@@ -59,6 +60,16 @@ class AbstractJob(threading.Thread):
         json_output = self.result.to_json()
         if self.save_job_output:
             self._save(json_output)
+
+    @staticmethod
+    def set_random_seed(random_seed: int) -> None:
+        """
+        Sets the random seed used for training
+        :param random_seed: the random seed to use
+        :return: None
+        """
+        random.seed(random_seed)
+        transformers.enable_full_determinism(random_seed)
 
     @abstractmethod
     def _run(self) -> JobResult:

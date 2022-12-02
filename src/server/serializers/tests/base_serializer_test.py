@@ -5,7 +5,7 @@ from unittest import TestCase
 from rest_framework.serializers import Serializer
 
 from server.serializers.serializer_utility import SerializerUtility
-from tracer.models.base_models.supported_base_model import SupportedBaseModel
+from models.base_models.supported_base_model import SupportedBaseModel
 
 AppEntity = TypeVar('AppEntity')
 

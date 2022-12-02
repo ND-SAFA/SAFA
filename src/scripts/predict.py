@@ -14,7 +14,7 @@ if __name__ == "__main__":
     #
     # IMPORTS
     #
-    from tracer.models.base_models.supported_base_model import SupportedBaseModel
+    from models.base_models.supported_base_model import SupportedBaseModel
     from jobs.predict_job import PredictJob
     from server.serializers.job_factory.prediction_request_serializer import PredictionRequestSerializer
     from scripts.base_script import BaseScript

@@ -1,7 +1,5 @@
-from typing import Dict
-
 from jobs.abstract_job import AbstractJob
-from jobs.results.job_result import JobResult
+from jobs.components.job_result import JobResult
 
 
 class CreateModelJob(AbstractJob):

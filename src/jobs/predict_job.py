@@ -1,7 +1,7 @@
 from typing import Dict
 
 from jobs.abstract_trace_job import AbstractTraceJob
-from jobs.results.job_result import JobResult
+from jobs.components.job_result import JobResult
 
 
 class PredictJob(AbstractTraceJob):

@@ -3,9 +3,9 @@ from typing import Dict, OrderedDict
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from tracer.datasets.creators.abstract_dataset_creator import AbstractDatasetCreator
-from tracer.datasets.trainer_datasets_container import TrainerDatasetsContainer
-from tracer.pre_processing.steps.separate_joined_words_step import SeparateJoinedWordsStep
+from data.creators.abstract_dataset_creator import AbstractDatasetCreator
+from data.datasets.trainer_datasets_container import TrainerDatasetsContainer
+from data.processing.cleaning.separate_joined_words_step import SeparateJoinedWordsStep
 
 
 class SerializerUtility:
@@ -84,4 +84,4 @@ class SerializerUtility:
         :param word: The string to convert.
         :return: word in snake_case.
         """
-        return "_".join(list(map(lambda w: w.lower(), SeparateJoinedWordsStep._separate_camel_case_word(word))))
+        return "_".join(list(map(lambda w: w.lower(), SeparateJoinedWordsStep.separate_camel_case_word(word))))

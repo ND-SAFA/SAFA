@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import List, Union
 
-from data.pre_train_dataset import PreTrainDataset
-from data.trace_dataset import TraceDataset
+from data.datasets.pre_train_dataset import PreTrainDataset
+from data.datasets.trace_dataset import TraceDataset
 from data.processing.cleaning.data_cleaner import DataCleaner
 from data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 

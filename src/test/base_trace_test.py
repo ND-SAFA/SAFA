@@ -5,15 +5,15 @@ import numpy as np
 from transformers.trainer_utils import PredictionOutput
 
 from config.constants import VALIDATION_PERCENTAGE_DEFAULT
-from jobs.results.job_result import JobResult
+from jobs.components.job_result import JobResult
 from test.base_test import BaseTest
 from data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from data.creators.split_dataset_creator import SplitDatasetCreator
 from data.creators.supported_dataset_creator import SupportedDatasetCreator
-from data.data_objects.artifact import Artifact
-from data.data_objects.trace_link import TraceLink
-from data.dataset_role import DatasetRole
-from data.trainer_datasets_container import TrainerDatasetsContainer
+from data.tree.artifact import Artifact
+from data.tree.trace_link import TraceLink
+from data.datasets.dataset_role import DatasetRole
+from data.datasets.trainer_datasets_container import TrainerDatasetsContainer
 from data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 
 

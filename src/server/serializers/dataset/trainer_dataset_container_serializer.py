@@ -4,7 +4,7 @@ from rest_framework import serializers
 
 from server.serializers.dataset.dataset_creator_serializer import DatasetCreatorSerializer
 from server.serializers.serializer_utility import SerializerUtility
-from data.trainer_datasets_container import TrainerDatasetsContainer
+from data.datasets.trainer_datasets_container import TrainerDatasetsContainer
 
 
 class TrainerDatasetsContainerSerializer(serializers.Serializer):

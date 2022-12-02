@@ -2,9 +2,9 @@ from abc import ABC, abstractmethod
 from typing import Dict, List, Set, Tuple
 
 from data.creators.abstract_dataset_creator import AbstractDatasetCreator
-from data.data_objects.artifact import Artifact
-from data.data_objects.trace_link import TraceLink
-from data.trace_dataset import TraceDataset
+from data.tree.artifact import Artifact
+from data.tree.trace_link import TraceLink
+from data.datasets.trace_dataset import TraceDataset
 from data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 
 

@@ -3,7 +3,7 @@ from django.views.decorators.csrf import csrf_exempt
 from drf_yasg.utils import swagger_auto_schema
 
 from jobs.delete_model_job import DeleteModelJob
-from jobs.results.job_result import JobResult
+from jobs.components.job_result import JobResult
 from server.serializers.job_factory.model_identifier_serializer import ModelIdentifierSerializer
 from server.views.abstract_trace_view import AbstractTraceView
 

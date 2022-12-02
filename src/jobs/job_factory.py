@@ -2,11 +2,11 @@ import re
 from dataclasses import dataclass, field
 from typing import Callable, Dict, Type
 
-from config.constants import SAVE_OUTPUT_DEFAULT, SAVE_DATASET_SPLITS_DEFAULT
+from config.constants import SAVE_OUTPUT_DEFAULT
 from jobs.abstract_job import AbstractJob
 from jobs.abstract_trace_job import AbstractTraceJob
-from jobs.job_args import JobArgs
-from data.trainer_datasets_container import TrainerDatasetsContainer
+from jobs.components.job_args import JobArgs
+from data.datasets.trainer_datasets_container import TrainerDatasetsContainer
 from models.base_models.supported_base_model import SupportedBaseModel
 from train.trace_args import TraceArgs
 from util.reflection_util import ReflectionUtil

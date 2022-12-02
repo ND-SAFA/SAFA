@@ -4,13 +4,13 @@ from unittest import mock
 from unittest.mock import patch
 
 from config.override import overrides
-from jobs.job_args import JobArgs
+from jobs.components.job_args import JobArgs
 from jobs.train_job import TrainJob
 from jobs.tests.base_job_test import BaseJobTest
 from test.paths.paths import TEST_DATA_DIR
-from data.abstract_dataset import AbstractDataset
+from data.datasets.abstract_dataset import AbstractDataset
 from data.creators.supported_dataset_creator import SupportedDatasetCreator
-from data.dataset_role import DatasetRole
+from data.datasets.dataset_role import DatasetRole
 from train.trace_trainer import TraceTrainer
 
 

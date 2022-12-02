@@ -8,8 +8,8 @@ from server.serializers.job_factory.job_factory_converter import JobFactoryConve
 from server.serializers.job_factory.model_identifier_serializer import ModelIdentifierSerializer
 from server.serializers.serializer_utility import SerializerUtility
 from data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
-from data.dataset_role import DatasetRole
-from data.trainer_datasets_container import TrainerDatasetsContainer
+from data.datasets.dataset_role import DatasetRole
+from data.datasets.trainer_datasets_container import TrainerDatasetsContainer
 
 
 class PreTrainingRequestSerializer(ModelIdentifierSerializer):

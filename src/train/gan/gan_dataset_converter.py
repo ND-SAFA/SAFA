@@ -6,8 +6,8 @@ import torch
 from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
 from torch.utils.data.dataset import TensorDataset
 
-from data.pre_train_dataset import PreTrainDataset
-from data.trace_dataset import TraceDataset
+from data.datasets.pre_train_dataset import PreTrainDataset
+from data.datasets.trace_dataset import TraceDataset
 from models.model_generator import ModelGenerator
 from train.trace_args import TraceArgs
 

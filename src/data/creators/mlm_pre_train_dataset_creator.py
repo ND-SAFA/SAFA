@@ -5,7 +5,7 @@ from typing import List
 
 from config.constants import BLOCK_SIZE_DEFAULT
 from data.creators.abstract_dataset_creator import AbstractDatasetCreator
-from data.pre_train_dataset import PreTrainDataset
+from data.datasets.pre_train_dataset import PreTrainDataset
 from data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 
 

@@ -8,7 +8,7 @@ from torch.utils.data.sampler import RandomSampler
 from jobs.predict_job import PredictJob
 from test.base_trace_test import BaseTraceTest
 from test.paths.paths import TEST_OUTPUT_DIR
-from data.dataset_role import DatasetRole
+from data.datasets.dataset_role import DatasetRole
 from models.base_models.supported_base_model import SupportedBaseModel
 from models.model_generator import ModelGenerator
 from train.trace_args import TraceArgs

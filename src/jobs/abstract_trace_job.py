@@ -1,7 +1,7 @@
 from abc import ABC
 
 from jobs.abstract_job import AbstractJob
-from jobs.job_args import JobArgs
+from jobs.components.job_args import JobArgs
 from train.trace_trainer import TraceTrainer
 
 

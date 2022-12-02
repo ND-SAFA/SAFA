@@ -5,13 +5,13 @@ from unittest.mock import patch
 
 from test.base_trace_test import BaseTraceTest
 from data.creators.csv_dataset_creator import CSVDatasetCreator
-from data.data_key import DataKey
-from data.data_objects.trace_link import TraceLink
+from data.datasets.data_key import DataKey
+from data.tree.trace_link import TraceLink
 from data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
 from data.processing.augmentation.resample_step import ResampleStep
 from data.processing.augmentation.simple_word_replacement_step import SimpleWordReplacementStep
 from data.processing.augmentation.source_target_swap_step import SourceTargetSwapStep
-from data.trace_dataset import TraceDataset
+from data.datasets.trace_dataset import TraceDataset
 from models.model_generator import ModelGenerator
 from models.model_properties import ArchitectureType
 import pandas as pd

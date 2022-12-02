@@ -1,7 +1,7 @@
-from jobs.job_args import JobArgs
+from jobs.components.job_args import JobArgs
 from jobs.predict_job import PredictJob
 from jobs.tests.base_job_test import BaseJobTest
-from data.dataset_role import DatasetRole
+from data.datasets.dataset_role import DatasetRole
 
 
 class TestPredictJob(BaseJobTest):

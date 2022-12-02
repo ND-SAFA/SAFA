@@ -4,9 +4,9 @@ from jobs.job_factory import JobFactory
 from server.serializers.serializer_utility import SerializerUtility
 from data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from data.creators.supported_dataset_creator import SupportedDatasetCreator
-from data.dataset_role import DatasetRole
+from data.datasets.dataset_role import DatasetRole
 from data.processing.cleaning.data_cleaning_steps import DataCleaningSteps
-from data.trainer_datasets_container import TrainerDatasetsContainer
+from data.datasets.trainer_datasets_container import TrainerDatasetsContainer
 from data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 from util.reflection_util import ParamScope, ReflectionUtil
 

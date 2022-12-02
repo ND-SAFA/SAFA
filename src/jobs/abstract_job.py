@@ -5,9 +5,9 @@ import traceback
 import uuid
 from abc import abstractmethod
 
-from jobs.job_args import JobArgs
-from jobs.results.job_status import JobStatus
-from jobs.results.job_result import JobResult
+from jobs.components.job_args import JobArgs
+from jobs.components.job_status import JobStatus
+from jobs.components.job_result import JobResult
 from server.storage.safa_storage import SafaStorage
 from models.model_generator import ModelGenerator
 

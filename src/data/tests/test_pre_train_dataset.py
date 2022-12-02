@@ -5,7 +5,7 @@ from transformers import LineByLineTextDataset
 
 from test.base_test import BaseTest
 from test.paths.paths import TEST_VOCAB_FILE
-from data.pre_train_dataset import PreTrainDataset
+from data.datasets.pre_train_dataset import PreTrainDataset
 from models.model_generator import ModelGenerator
 
 

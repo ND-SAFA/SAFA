@@ -2,7 +2,7 @@ from jobs.job_factory import JobFactory
 from server.serializers.job_factory.training_request_serializer import TrainingRequestSerializer
 from server.serializers.tests.base_serializer_test import BaseSerializerTest
 from test.base_test import BaseTest
-from data.dataset_role import DatasetRole
+from data.datasets.dataset_role import DatasetRole
 from util.reflection_util import ReflectionUtil
 import unittest
 

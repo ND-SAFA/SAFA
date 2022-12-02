@@ -5,7 +5,7 @@ from data.creators.abstract_trace_dataset_creator import AbstractTraceDatasetCre
 from data.creators.safa_dataset_creator import SafaDatasetCreator
 from data.formats.repository_format import RepositoryFormat
 from data.formats.safa_format import SafaFormat
-from data.trace_dataset import TraceDataset
+from data.datasets.trace_dataset import TraceDataset
 from data.processing.cleaning.data_cleaning_steps import DataCleaningSteps
 
 

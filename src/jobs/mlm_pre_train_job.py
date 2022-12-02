@@ -3,11 +3,11 @@ import os
 from transformers import DataCollatorForLanguageModeling
 
 from config.constants import MLM_PROBABILITY_DEFAULT
-from jobs.job_args import JobArgs
-from jobs.results.job_result import JobResult
+from jobs.components.job_args import JobArgs
+from jobs.components.job_result import JobResult
 from jobs.train_job import TrainJob
-from data.dataset_role import DatasetRole
-from data.pre_train_dataset import PreTrainDataset
+from data.datasets.dataset_role import DatasetRole
+from data.datasets.pre_train_dataset import PreTrainDataset
 
 
 class MLMPreTrainJob(TrainJob):

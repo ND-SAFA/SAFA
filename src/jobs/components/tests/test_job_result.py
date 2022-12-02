@@ -1,5 +1,5 @@
-from jobs.results.job_result import JobResult
-from jobs.results.job_status import JobStatus
+from jobs.components.job_result import JobResult
+from jobs.components.job_status import JobStatus
 from test.base_test import BaseTest
 import json
 

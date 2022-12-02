@@ -6,9 +6,9 @@ from test.paths.paths import TEST_OUTPUT_DIR
 from data.creators.classic_trace_dataset_creator import ClassicTraceDatasetCreator
 from data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
 from data.creators.split_dataset_creator import SplitDatasetCreator
-from data.dataset_role import DatasetRole
-from data.trace_dataset import TraceDataset
-from data.trainer_datasets_container import TrainerDatasetsContainer
+from data.datasets.dataset_role import DatasetRole
+from data.datasets.trace_dataset import TraceDataset
+from data.datasets.trainer_datasets_container import TrainerDatasetsContainer
 
 
 class TestTrainerDatasetsContainer(BaseTraceTest):

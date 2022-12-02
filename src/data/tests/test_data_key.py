@@ -1,5 +1,5 @@
 from test.base_test import BaseTest
-from data.data_key import DataKey
+from data.datasets.data_key import DataKey
 
 
 class TestDataKey(BaseTest):

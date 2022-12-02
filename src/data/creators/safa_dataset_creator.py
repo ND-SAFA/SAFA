@@ -6,9 +6,9 @@ import pandas as pd
 
 from config.constants import USE_LINKED_TARGETS_ONLY_DEFAULT
 from data.creators.abstract_trace_dataset_creator import AbstractTraceDatasetCreator
-from data.data_objects.artifact import Artifact
+from data.tree.artifact import Artifact
 from data.formats.safa_format import SafaFormat
-from data.trace_dataset import TraceDataset
+from data.datasets.trace_dataset import TraceDataset
 from data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 
 

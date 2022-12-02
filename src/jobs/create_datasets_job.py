@@ -1,6 +1,6 @@
 from jobs.abstract_trace_job import AbstractTraceJob
-from jobs.job_args import JobArgs
-from jobs.results.job_result import JobResult
+from jobs.components.job_args import JobArgs
+from jobs.components.job_result import JobResult
 
 
 class CreateDatasetsJob(AbstractTraceJob):

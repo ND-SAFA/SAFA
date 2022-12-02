@@ -4,10 +4,10 @@ from collections import OrderedDict
 from copy import deepcopy
 from typing import Callable, Dict, List, Sized, Tuple
 
-from data.abstract_dataset import AbstractDataset
+from data.datasets.abstract_dataset import AbstractDataset
 from data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
 from data.processing.augmentation.data_augmenter import DataAugmenter
-from data.data_key import DataKey
+from data.datasets.data_key import DataKey
 from data.tree.artifact import Artifact
 from data.tree.trace_link import TraceLink
 from data.formats.csv_format import CSVFormat

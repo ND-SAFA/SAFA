@@ -1,8 +1,8 @@
 from server.serializers.dataset.trainer_dataset_container_serializer import TrainerDatasetsContainerSerializer
 from server.serializers.tests.base_serializer_test import BaseSerializerTest
 from test.base_test import BaseTest
-from data.dataset_role import DatasetRole
-from data.trainer_datasets_container import TrainerDatasetsContainer
+from data.datasets.dataset_role import DatasetRole
+from data.datasets.trainer_datasets_container import TrainerDatasetsContainer
 import unittest
 
 

@@ -1,7 +1,7 @@
 from torch.utils.data import Dataset
 from transformers import LineByLineTextDataset
 
-from data.abstract_dataset import AbstractDataset
+from data.datasets.abstract_dataset import AbstractDataset
 from models.model_generator import ModelGenerator
 
 

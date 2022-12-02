@@ -6,11 +6,11 @@ from unittest import mock
 from unittest.mock import patch
 
 from jobs.abstract_job import AbstractJob
-from jobs.results.job_result import JobResult
-from jobs.results.job_status import JobStatus
+from jobs.components.job_result import JobResult
+from jobs.components.job_status import JobStatus
 from test.base_trace_test import BaseTraceTest
 from test.paths.paths import TEST_OUTPUT_DIR
-from data.dataset_role import DatasetRole
+from data.datasets.dataset_role import DatasetRole
 from models.model_generator import ModelGenerator
 from train.trace_args import TraceArgs
 

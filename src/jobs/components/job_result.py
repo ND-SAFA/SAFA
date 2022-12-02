@@ -4,7 +4,7 @@ from typing import Any, Dict, Tuple, Union
 import numpy as np
 from drf_yasg.openapi import FORMAT_UUID, Schema, TYPE_INTEGER, TYPE_STRING
 
-from jobs.results.job_status import JobStatus
+from jobs.components.job_status import JobStatus
 from train.metrics.supported_trace_metric import SupportedTraceMetric
 from util.uncased_dict import UncasedDict
 

@@ -1,12 +1,12 @@
 from collections import OrderedDict
 from typing import List, Optional, Union, Dict
-from data.abstract_dataset import AbstractDataset
+from data.datasets.abstract_dataset import AbstractDataset
 from data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from data.creators.split_dataset_creator import SplitDatasetCreator
-from data.dataset_role import DatasetRole
-from data.pre_train_dataset import PreTrainDataset
+from data.datasets.dataset_role import DatasetRole
+from data.datasets.pre_train_dataset import PreTrainDataset
 from data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
-from data.trace_dataset import TraceDataset
+from data.datasets.trace_dataset import TraceDataset
 
 
 class TrainerDatasetsContainer:

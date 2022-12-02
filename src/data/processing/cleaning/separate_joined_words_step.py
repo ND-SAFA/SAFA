@@ -15,7 +15,7 @@ class SeparateJoinedWordsStep(AbstractDataProcessingStep):
         super().__init__(self.ORDER)
 
     @staticmethod
-    def _separate_camel_case_word(word: str) -> List[str]:
+    def separate_camel_case_word(word: str) -> List[str]:
         """
         Splits a camelCase word
         :param word: the word to split
@@ -60,4 +60,4 @@ class SeparateJoinedWordsStep(AbstractDataProcessingStep):
             separated_word_list = self._perform_on_word_list(separated_word_list,
                                                              lambda word: self._separate_deliminated_word(word,
                                                                                                           deliminator))
-        return self._perform_on_word_list(separated_word_list, self._separate_camel_case_word)
+        return self._perform_on_word_list(separated_word_list, self.separate_camel_case_word)

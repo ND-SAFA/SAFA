@@ -8,10 +8,10 @@ class TestSeparateJoinedWordsStep(BaseTest):
     def test_separate_camel_case_word(self):
         test_camel_case = "camelCase2"
         expected_result = ["camel", "Case2"]
-        result = SeparateJoinedWordsStep._separate_camel_case_word(test_camel_case)
+        result = SeparateJoinedWordsStep.separate_camel_case_word(test_camel_case)
         self.assertListEqual(result, expected_result)
         test_regular_word = "Regular"
-        result = SeparateJoinedWordsStep._separate_camel_case_word(test_regular_word)
+        result = SeparateJoinedWordsStep.separate_camel_case_word(test_regular_word)
         self.assertListEqual(result, [test_regular_word])
 
     def test_separate_deliminated_word(self):

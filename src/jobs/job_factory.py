@@ -54,10 +54,6 @@ class JobFactory:
     any additional args needed for the job
     """
     additional_job_params: Dict = field(init=False, default=None)
-    """
-    If True, saves the dataset splits to output_dir
-    """
-    save_dataset_splits: bool = SAVE_DATASET_SPLITS_DEFAULT
 
     def __init__(self, **kwargs):
         """

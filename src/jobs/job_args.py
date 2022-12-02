@@ -28,10 +28,6 @@ class JobArgs:
     """
     save_job_output: bool = SAVE_OUTPUT_DEFAULT
     """
-    If True, saves the dataset splits to output_dir
-    """
-    save_dataset_splits: bool = SAVE_DATASET_SPLITS_DEFAULT
-    """
     Sets the random seed for a job
     """
     random_seed: int = None

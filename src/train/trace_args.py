@@ -1,18 +1,22 @@
+from dataclasses import dataclass
 from typing import List
 
 from transformers.training_args import TrainingArguments
 
 from config.constants import EVALUATION_STRATEGY_DEFAULT, LOAD_BEST_MODEL_AT_END_DEFAULT, MAX_SEQ_LENGTH_DEFAULT, \
     METRIC_FOR_BEST_MODEL_DEFAULT, N_EPOCHS_DEFAULT, SAVE_STRATEGY_DEFAULT, SAVE_TOTAL_LIMIT_DEFAULT, SAVE_DATASET_SPLITS_DEFAULT
-from data.trainer_datasets_container import TrainerDatasetsContainer
+from data.datasets.trainer_datasets_container import TrainerDatasetsContainer
 
 
 class TraceArgs(TrainingArguments):
+    # required
+    output_dir: str
+    trainer_dataset_container: TrainerDatasetsContainer = None
+
     # Tokenizer
     max_seq_length: int = MAX_SEQ_LENGTH_DEFAULT
 
     # Trainer
-    trainer_dataset_container: TrainerDatasetsContainer
     num_train_epochs: int = N_EPOCHS_DEFAULT
     evaluation_strategy: str = EVALUATION_STRATEGY_DEFAULT
     save_strategy: str = SAVE_STRATEGY_DEFAULT
@@ -40,7 +44,7 @@ class TraceArgs(TrainingArguments):
     multi_gpu: bool = True
     save_dataset_splits: bool = SAVE_DATASET_SPLITS_DEFAULT
 
-    def __init__(self, output_dir: str, trainer_dataset_container: TrainerDatasetsContainer, **kwargs):
+    def __init__(self, output_dir: str, **kwargs):
         """
         Arguments for Learning Model
         :param output_dir: dir to save trainer output to
@@ -48,7 +52,6 @@ class TraceArgs(TrainingArguments):
         :param kwargs: optional arguments for Trainer as identified at link below + other class attributes (i.e. resample_rate)
         https://huggingface.co/docs/transformers/v4.21.0/en/main_classes/trainer#transformers.TrainingArguments
         """
-        self.trainer_dataset_container = trainer_dataset_container
         self.__set_args(**kwargs)
         super().__init__(log_level="info", log_level_replica="info", output_dir=output_dir,
                          num_train_epochs=self.num_train_epochs)

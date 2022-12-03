@@ -13,7 +13,7 @@ from data.tree.trace_link import TraceLink
 from data.formats.csv_format import CSVFormat
 from data.processing.augmentation.source_target_swap_step import SourceTargetSwapStep
 from models.model_generator import ModelGenerator
-from models.model_properties import ArchitectureType
+from models.model_properties import ModelArchitectureType
 import pandas as pd
 
 
@@ -261,7 +261,7 @@ class TraceDataset(AbstractDataset):
         }
         return TraceDataset(slice_links, slice_pos_link_ids, slice_neg_link_ids)
 
-    def _get_feature_entry(self, link: TraceLink, arch_type: ArchitectureType, feature_func: Callable) \
+    def _get_feature_entry(self, link: TraceLink, arch_type: ModelArchitectureType, feature_func: Callable) \
             -> Dict[str, any]:
         """
         Gets a representational dictionary of the feature to be used in the data
@@ -269,7 +269,7 @@ class TraceDataset(AbstractDataset):
         :param arch_type: The model architecture determining features.
         :return: feature name, value mappings
         """
-        if arch_type == ArchitectureType.SIAMESE:
+        if arch_type == ModelArchitectureType.SIAMESE:
             entry = {
                 **self._extract_feature_info(link.source.get_feature(feature_func), DataKey.SOURCE_PRE + DataKey.SEP),
                 **self._extract_feature_info(link.target.get_feature(feature_func), DataKey.TARGET_PRE + DataKey.SEP)}

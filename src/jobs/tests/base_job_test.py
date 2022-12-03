@@ -38,10 +38,8 @@ class BaseJobTest(BaseTraceTest, ABC):
         self.assert_output_on_failure(self._load_job_output(job))
 
     @staticmethod
-    def get_test_params(as_api=False, include_base_model=True):
+    def get_test_params(as_api=False):
         test_args = deepcopy(BaseJobTest._JOB_PARAMS_BASE)
-        if not include_base_model:
-            test_args.pop("base_model")
         # Step - Replaces casing to snake case
         if as_api:
             test_args = BaseJobTest.parse_kwargs(test_args)
@@ -51,7 +49,7 @@ class BaseJobTest(BaseTraceTest, ABC):
                                   include_pre_processing=False,
                                   include_base_model=True,
                                   split_train_dataset=False):
-        test_args = BaseJobTest.get_test_params(as_api=as_api, include_base_model=include_base_model)
+        test_args = BaseJobTest.get_test_params(as_api=as_api)
         role2dataset = self.create_dataset(dataset_role, include_links=include_links,
                                            include_pre_processing=include_pre_processing)
         trainer_dataset_container = self.create_trainer_dataset_container(role2dataset,

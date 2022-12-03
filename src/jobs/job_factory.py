@@ -8,6 +8,7 @@ from jobs.abstract_trace_job import AbstractTraceJob
 from jobs.components.job_args import JobArgs
 from data.datasets.trainer_datasets_container import TrainerDatasetsContainer
 from models.base_models.supported_base_model import SupportedBaseModel
+from models.model_properties import ModelArchitectureType
 from train.trace_args import TraceArgs
 from util.reflection_util import ReflectionUtil
 
@@ -25,7 +26,7 @@ class JobFactory:
     """
     The model used to load the architecture.
     """
-    base_model: SupportedBaseModel = None
+    model_architecture: ModelArchitectureType = None
     """
     Container for data used for any training, prediction, or evaluation.
     """

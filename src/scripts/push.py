@@ -22,7 +22,7 @@ from train.trace_args import TraceArgs
 from train.trace_trainer import TraceTrainer
 
 if __name__ == "__main__":
-    local_model_generator = ModelGenerator(SupportedBaseModel.NL_BERT, args.model)
+    local_model_generator = ModelGenerator(args.model)
     local_model_generator.auto_class = AutoModel
     output_dir = os.path.join(args.root, "output", args.export)
     local_trace_args = TraceArgs(None, None)

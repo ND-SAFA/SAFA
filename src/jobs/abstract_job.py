@@ -30,7 +30,6 @@ class AbstractJob(threading.Thread):
         self.output_dir = job_args.output_dir
         self.job_output_filepath = self._get_output_filepath(self.output_dir, self.id)
         self.save_job_output = job_args.save_job_output
-        self.base_model = job_args.base_model
         self.model_path = job_args.model_path
         self.__model_generator = None
 
@@ -40,7 +39,7 @@ class AbstractJob(threading.Thread):
         :return: the model generator
         """
         if self.__model_generator is None:
-            self.__model_generator = ModelGenerator(base_model=self.base_model, model_path=self.model_path)
+            self.__model_generator = ModelGenerator(model_path=self.model_path)
         return self.__model_generator
 
     def run(self) -> None:

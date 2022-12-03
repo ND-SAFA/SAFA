@@ -2,12 +2,13 @@ from typing import Dict, Optional
 
 from transformers import AutoConfig
 from transformers.modeling_utils import PreTrainedModel
+from transformers.models.auto import AutoModel
 from transformers.models.auto.tokenization_auto import AutoTokenizer
 from transformers.tokenization_utils import PreTrainedTokenizer
 
 from config.constants import MAX_SEQ_LENGTH_DEFAULT
 from models.base_models.supported_base_model import SupportedBaseModel
-from models.model_properties import ArchitectureType, ModelSize
+from models.model_properties import ModelArchitectureType, ModelSize, ModelTask
 
 
 class ModelGenerator:
@@ -16,7 +17,9 @@ class ModelGenerator:
     """
     _max_seq_length: int = MAX_SEQ_LENGTH_DEFAULT
 
-    def __init__(self, base_model: SupportedBaseModel, model_path: str, model_size: ModelSize = ModelSize.BASE):
+    def __init__(self, model_path: str, model_task: ModelTask = ModelTask.SEQUENCE_CLASSIFICATION,
+                 model_size: ModelSize = ModelSize.BASE,
+                 model_architecture: ModelArchitectureType = ModelArchitectureType.SINGLE):
         """
         Handles loading model and related functions
         :param model_path: the path to the saved model
@@ -25,36 +28,9 @@ class ModelGenerator:
         self.__tokenizer: Optional[AutoTokenizer] = None
         self.__model: Optional[PreTrainedModel] = None
         self.model_path = model_path
-        self.base_model = base_model
-        self.model_name = base_model.name
-        self.base_model_class = self.base_model.value
-        self.arch_type = self._get_model_architecture_type(self.model_name)
+        self.model_task = model_task
+        self.arch_type = model_architecture
         self.model_size = model_size
-
-    @staticmethod
-    def get_supported_base_model(model_name: str) -> SupportedBaseModel:
-        """
-        Gets the supported base model
-        :param model_name: the name of the model
-        :return: the SupportedBaseModel
-        """
-        try:
-            return SupportedBaseModel[model_name.upper()]
-        except KeyError:
-            raise NameError("Model name %s unknown" % model_name)
-
-    @staticmethod
-    def _get_model_architecture_type(model_name: str) -> ArchitectureType:
-        """
-        Gets the architecture type of model
-        :param model_name: the name of the model
-        :return: the ArchitectureType of model
-        """
-        arch_type = model_name.split("_")[-1]
-        try:
-            return ArchitectureType[arch_type.upper()]
-        except KeyError:
-            return ArchitectureType.SINGLE
 
     def __load_model(self) -> PreTrainedModel:
         """
@@ -63,7 +39,7 @@ class ModelGenerator:
         """
         config = AutoConfig.from_pretrained(self.model_path)
         config.num_labels = 2
-        return self.base_model_class.from_pretrained(self.model_path, config=config)
+        return self.model_task.value.from_pretrained(self.model_path, config=config)
 
     def get_model(self) -> PreTrainedModel:
         """

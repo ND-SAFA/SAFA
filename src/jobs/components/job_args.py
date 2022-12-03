@@ -2,6 +2,7 @@ from dataclasses import dataclass
 
 from config.constants import SAVE_OUTPUT_DEFAULT, SAVE_DATASET_SPLITS_DEFAULT
 from models.base_models.supported_base_model import SupportedBaseModel
+from models.model_properties import ModelArchitectureType
 from train.trace_args import TraceArgs
 
 
@@ -18,7 +19,7 @@ class JobArgs:
     """
     The model used to load the architecture.
     """
-    base_model: SupportedBaseModel = None
+    model_architecture: ModelArchitectureType = None
     """
     Initialized post-init to contain all arguments for tracing jobs
     """

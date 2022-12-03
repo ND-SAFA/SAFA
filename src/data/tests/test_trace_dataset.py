@@ -13,7 +13,7 @@ from data.processing.augmentation.simple_word_replacement_step import SimpleWord
 from data.processing.augmentation.source_target_swap_step import SourceTargetSwapStep
 from data.datasets.trace_dataset import TraceDataset
 from models.model_generator import ModelGenerator
-from models.model_properties import ArchitectureType
+from models.model_properties import ModelArchitectureType
 import pandas as pd
 
 FEATURE_VALUE = "({}, {})"
@@ -263,12 +263,12 @@ class TestTraceDataset(BaseTraceTest):
         source, target = self.POS_LINKS[0]
         test_link = self.get_test_link(source, target)
 
-        feature_entry_siamese = trace_dataset._get_feature_entry(test_link, ArchitectureType.SIAMESE, fake_method)
+        feature_entry_siamese = trace_dataset._get_feature_entry(test_link, ModelArchitectureType.SIAMESE, fake_method)
         self.assertIn(test_link.source.token, feature_entry_siamese.values())
         self.assertIn(test_link.target.token, feature_entry_siamese.values())
         self.assertIn(DataKey.LABEL_KEY, feature_entry_siamese)
 
-        feature_entry_single = trace_dataset._get_feature_entry(test_link, ArchitectureType.SINGLE, fake_method)
+        feature_entry_single = trace_dataset._get_feature_entry(test_link, ModelArchitectureType.SINGLE, fake_method)
         self.assertIn(FEATURE_VALUE.format(test_link.source.token, test_link.target.token),
                       feature_entry_single.values())
         self.assertIn(DataKey.LABEL_KEY, feature_entry_single)

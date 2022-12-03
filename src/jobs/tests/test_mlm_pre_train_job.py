@@ -50,5 +50,5 @@ class TestMLMPreTrainJob(BaseJobTest):
 
     def _get_job(self):
         params = self.get_test_params_for_trace(include_pre_processing=True, include_base_model=False)
-        job_args = JobArgs(**params, base_model=SupportedBaseModel.AUTO_MODEL)
+        job_args = JobArgs(**params)
         return MLMPreTrainJob(job_args)

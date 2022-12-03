@@ -85,7 +85,7 @@ class TestTraceTrainer(BaseTraceTest):
 
     def get_test_trace_trainer(self, **kwargs):
         trainer_dataset_container = self.get_dataset_container()
-        model_generator = ModelGenerator(SupportedBaseModel.PL_BERT, "path")
+        model_generator = ModelGenerator("path")
         model_generator.get_model = mock.MagicMock(return_value=self.get_test_model())
         model_generator.get_tokenizer = mock.MagicMock(return_value=self.get_test_tokenizer())
         return TraceTrainer(

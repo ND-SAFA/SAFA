@@ -7,7 +7,7 @@ from test.base_test import BaseTest
 from models.base_models.bert_trace_siamese import BertTraceSiamese
 from models.base_models.supported_base_model import SupportedBaseModel
 from models.model_generator import ModelGenerator
-from models.model_properties import ArchitectureType
+from models.model_properties import ModelArchitectureType
 
 
 class TestTokenizer:
@@ -15,28 +15,6 @@ class TestTokenizer:
 
 
 class TestModelGenerator(BaseTest):
-    TEST_BASE_MODEL = {
-        "base_model_name": SupportedBaseModel.BERT_TRACE_SIAMESE.name.lower(),
-        "arch_type": ArchitectureType.SIAMESE,
-        "supported_base_model": SupportedBaseModel.BERT_TRACE_SIAMESE,
-        "base_model_class": BertTraceSiamese
-
-    }
-
-    def test_get_supported_base_model(self):
-        supported_base_model = ModelGenerator.get_supported_base_model(self.TEST_BASE_MODEL["base_model_name"])
-        self.assertEqual(supported_base_model, self.TEST_BASE_MODEL["supported_base_model"])
-
-    def test_get_supported_base_model_with_unknown_model(self):
-        self.assertRaises(NameError, lambda: ModelGenerator.get_supported_base_model("bert"))
-
-    def test_get_model_architecture_type(self):
-        arch_type = ModelGenerator._get_model_architecture_type(self.TEST_BASE_MODEL["base_model_name"])
-        self.assertEqual(arch_type, self.TEST_BASE_MODEL["arch_type"])
-
-    def test_get_model_architecture_type_with_unknown_type(self):
-        arch_type = ModelGenerator._get_model_architecture_type("bert")
-        self.assertEqual(arch_type, ArchitectureType.SINGLE)
 
     @patch.object(ModelGenerator, '_ModelGenerator__load_model')
     def test_get_model(self, load_model_mock: mock.MagicMock):
@@ -78,7 +56,7 @@ class TestModelGenerator(BaseTest):
         self.assertEquals(test_generator._max_seq_length, 5)
 
     def get_test_model_generator(self):
-        return ModelGenerator(self.TEST_BASE_MODEL["supported_base_model"], "path")
+        return ModelGenerator("path")
 
     @patch.object(ModelGenerator, 'get_tokenizer')
     def test_get_feature_with_return_token_type_ids(self, get_tokenizer_mock: mock.MagicMock):

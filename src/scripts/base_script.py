@@ -1,6 +1,7 @@
 import os
 from typing import Dict, List, Type
 
+import tensorflow as tf
 from django.core.wsgi import get_wsgi_application
 from dotenv import load_dotenv
 from rest_framework import serializers
@@ -31,6 +32,7 @@ class BaseScript:
         self.path_vars = path_vars if path_vars else ["data", "output"]
         self.application = get_wsgi_application()
         self.assert_path_vars_exists()
+        print("# of gpus: ", tf.config.list_physical_devices('GPU'))
 
     def assert_path_vars_exists(self):
         """

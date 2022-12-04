@@ -1,13 +1,13 @@
 from abc import abstractmethod
 from typing import Any
 
-from models.model_generator import ModelGenerator
+from models.model_manager import ModelManager
 
 
 class AbstractDataset:
 
     @abstractmethod
-    def to_trainer_dataset(self, model_generator: ModelGenerator) -> Any:
+    def to_trainer_dataset(self, model_generator: ModelManager) -> Any:
         """
         Converts data to that used by Huggingface (HF) trainer.
         :param model_generator: The model generator determining architecture and feature function for trace links.

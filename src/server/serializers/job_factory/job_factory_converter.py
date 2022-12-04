@@ -6,7 +6,7 @@ from data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from data.creators.supported_dataset_creator import SupportedDatasetCreator
 from data.datasets.dataset_role import DatasetRole
 from data.processing.cleaning.data_cleaning_steps import DataCleaningSteps
-from data.datasets.trainer_datasets_container import TrainerDatasetsContainer
+from data.datasets.trainer_datasets_manager import TrainerDatasetsManager
 from data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 from util.reflection_util import ParamScope, ReflectionUtil
 
@@ -52,7 +52,7 @@ class JobFactoryConverter:
         return data
 
     @staticmethod
-    def __get_dataset_creator(dataset_container: TrainerDatasetsContainer) -> AbstractDatasetCreator:
+    def __get_dataset_creator(dataset_container: TrainerDatasetsManager) -> AbstractDatasetCreator:
         if DatasetRole.TRAIN in dataset_container:
             return dataset_container.get_creator(DatasetRole.TRAIN)
         if DatasetRole.EVAL in dataset_container:

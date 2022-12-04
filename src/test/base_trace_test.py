@@ -13,7 +13,7 @@ from data.creators.supported_dataset_creator import SupportedDatasetCreator
 from data.tree.artifact import Artifact
 from data.tree.trace_link import TraceLink
 from data.datasets.dataset_role import DatasetRole
-from data.datasets.trainer_datasets_container import TrainerDatasetsContainer
+from data.datasets.trainer_datasets_manager import TrainerDatasetsManager
 from data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 
 
@@ -103,7 +103,7 @@ class BaseTraceTest(BaseTest):
     def create_trainer_dataset_container(dataset_map: Dict[DatasetRole, AbstractDatasetCreator], split_train_dataset=True):
         if split_train_dataset:
             dataset_map[DatasetRole.VAL] = SplitDatasetCreator(split_percentage=VALIDATION_PERCENTAGE_DEFAULT)
-        return TrainerDatasetsContainer.create_from_map(dataset_map)
+        return TrainerDatasetsManager.create_from_map(dataset_map)
 
     def assert_prediction_output_matches_expected(self, output: dict, threshold: int = 0.05):
         if JobResult.PREDICTIONS not in output:

@@ -12,7 +12,7 @@ from data.processing.augmentation.resample_step import ResampleStep
 from data.processing.augmentation.simple_word_replacement_step import SimpleWordReplacementStep
 from data.processing.augmentation.source_target_swap_step import SourceTargetSwapStep
 from data.datasets.trace_dataset import TraceDataset
-from models.model_generator import ModelGenerator
+from models.model_manager import ModelManager
 from models.model_properties import ModelArchitectureType
 import pandas as pd
 
@@ -41,12 +41,12 @@ class TestTraceDataset(BaseTraceTest):
     FEATURE_KEYS = DataKey.get_feature_entry_keys()
     RESAMPLE_RATE = 3
 
-    @patch.object(ModelGenerator, "get_tokenizer")
+    @patch.object(ModelManager, "get_tokenizer")
     def test_to_trainer_dataset(self, get_tokenizer_mock: mock.MagicMock):
         get_tokenizer_mock.return_value = self.get_test_tokenizer()
         train_dataset, test_dataset = self.get_trace_dataset().split(self.VAlIDATION_PERCENTAGE)
         train_dataset.prepare_for_training()
-        model_generator = ModelGenerator(**self.MODEL_GENERATOR_PARAMS)
+        model_generator = ModelManager(**self.MODEL_GENERATOR_PARAMS)
         trainer_dataset = train_dataset.to_trainer_dataset(model_generator)
         self.assertTrue(isinstance(trainer_dataset[0], dict))
         self.assertEquals(self.get_expected_train_dataset_size(resample_rate=1), len(trainer_dataset))

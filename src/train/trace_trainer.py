@@ -12,9 +12,10 @@ from transformers.trainer_pt_utils import get_tpu_sampler, is_torch_tpu_availabl
 
 from config.override import overrides
 from data.datasets.dataset_role import DatasetRole
+from data.datasets.trainer_datasets_manager import TrainerDatasetsManager
 from train.metrics.supported_trace_metric import get_metric_name, get_metric_path
-from models.model_generator import ModelGenerator
-from train.trace_args import TraceArgs
+from models.model_manager import ModelManager
+from train.trainer_args import TrainerArgs
 
 
 class TraceTrainer(Trainer):
@@ -22,17 +23,17 @@ class TraceTrainer(Trainer):
     Responsible for using given model for training and prediction using given data.
     """
 
-    def __init__(self, args: TraceArgs, model_generator: ModelGenerator, **kwargs):
+    def __init__(self, args: TrainerArgs, model_manager: ModelManager, trainer_dataset_manager: TrainerDatasetsManager=None, **kwargs):
         """
         Handles the training and evaluation of learning models
         :param args: the learning model arguments
         """
         self.args = args
         self.dataset_container = args.trainer_dataset_container
-        self.model_generator = model_generator
-        self.model_generator.set_max_seq_length(self.args.max_seq_length)
-        model = self.model_generator.get_model()
-        tokenizer = self.model_generator.get_tokenizer()
+        self.model_manager = model_manager
+        self.model_manager.set_max_seq_length(self.args.max_seq_length)
+        model = self.model_manager.get_model()
+        tokenizer = self.model_manager.get_tokenizer()
         super().__init__(model=model, args=args, tokenizer=tokenizer, callbacks=args.callbacks, **kwargs)
 
     def perform_training(self, checkpoint: str = None) -> Dict:
@@ -41,9 +42,9 @@ class TraceTrainer(Trainer):
         :param checkpoint: path to checkpoint.
         :return: a dictionary containing the results
         """
-        self.train_dataset = self.dataset_container[DatasetRole.TRAIN].to_trainer_dataset(self.model_generator)
+        self.train_dataset = self.dataset_container[DatasetRole.TRAIN].to_trainer_dataset(self.model_manager)
         if DatasetRole.VAL in self.dataset_container:
-            self.eval_dataset = self.dataset_container[DatasetRole.VAL].to_trainer_dataset(self.model_generator)
+            self.eval_dataset = self.dataset_container[DatasetRole.VAL].to_trainer_dataset(self.model_manager)
         output = self.train(resume_from_checkpoint=checkpoint)
         return TraceTrainer.output_to_dict(output)
 
@@ -52,7 +53,7 @@ class TraceTrainer(Trainer):
         Performs the prediction and (optionally) evaluation for the model
         :return: A dictionary containing the results.
         """
-        self.eval_dataset = self.dataset_container[DatasetRole.EVAL].to_trainer_dataset(self.model_generator)
+        self.eval_dataset = self.dataset_container[DatasetRole.EVAL].to_trainer_dataset(self.model_manager)
         output = self.predict(self.eval_dataset)
         predictions = TraceTrainer.get_similarity_scores(output.predictions)
         results = self._eval(predictions, output.label_ids, output.metrics,

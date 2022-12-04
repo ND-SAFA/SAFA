@@ -21,7 +21,7 @@ class MLMPreTrainJob(TrainJob):
         self.mlm_probability = mlm_probability
 
     def _run(self) -> JobResult:
-        tokenizer = self.get_model_generator().get_tokenizer()
+        tokenizer = self.get_model_manager().get_tokenizer()
         data_collator = DataCollatorForLanguageModeling(
             tokenizer=tokenizer, mlm=True, mlm_probability=self.mlm_probability
         )
@@ -29,6 +29,6 @@ class MLMPreTrainJob(TrainJob):
 
         job_result = super()._run(data_collator=data_collator)
 
-        train_dataset: PreTrainDataset = self.trace_args.trainer_dataset_container[DatasetRole.TRAIN]
+        train_dataset: PreTrainDataset = self.trainer_args.trainer_dataset_container[DatasetRole.TRAIN]
         os.remove(train_dataset.training_file_path)
         return job_result

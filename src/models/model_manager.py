@@ -11,7 +11,7 @@ from models.base_models.supported_base_model import SupportedBaseModel
 from models.model_properties import ModelArchitectureType, ModelSize, ModelTask
 
 
-class ModelGenerator:
+class ModelManager:
     """
     Represents a learning model
     """

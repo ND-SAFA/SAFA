@@ -12,7 +12,7 @@ from data.tree.artifact import Artifact
 from data.tree.trace_link import TraceLink
 from data.formats.csv_format import CSVFormat
 from data.processing.augmentation.source_target_swap_step import SourceTargetSwapStep
-from models.model_generator import ModelGenerator
+from models.model_manager import ModelManager
 from models.model_properties import ModelArchitectureType
 import pandas as pd
 
@@ -33,7 +33,7 @@ class TraceDataset(AbstractDataset):
         self._shuffle_link_ids(self.pos_link_ids)
         self._shuffle_link_ids(self.neg_link_ids)
 
-    def to_trainer_dataset(self, model_generator: ModelGenerator) -> List[Dict]:
+    def to_trainer_dataset(self, model_generator: ModelManager) -> List[Dict]:
         """
         Converts trace links in data to feature entries used by Huggingface (HF) trainer.
         :param model_generator: The model generator determining architecture and feature function for trace links.

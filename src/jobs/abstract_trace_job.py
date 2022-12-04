@@ -13,10 +13,16 @@ class AbstractTraceJob(AbstractJob, ABC):
         """
         job_args.model_path = job_args.model_path
         super().__init__(job_args)
-        self.trace_args = job_args.trace_args
-        self.saved_dataset_paths = self.trace_args.trainer_dataset_container.save_dataset_splits(job_args.output_dir) \
-            if self.trace_args.save_dataset_splits else []
+        self.trainer_args = job_args.trainer_args
+        self.saved_dataset_paths = self.trainer_args.trainer_dataset_container.save_dataset_splits(job_args.output_dir) \
+            if self.trainer_args.save_dataset_splits else []
         self._trainer = None
+
+    def _create_trace_args(self):
+        pass
+
+    def _create_dataset_container(self):
+        pass
 
     def get_trainer(self, **kwargs) -> TraceTrainer:
         """
@@ -25,6 +31,6 @@ class AbstractTraceJob(AbstractJob, ABC):
         :return: the trainer
         """
         if self._trainer is None:
-            self._trainer = TraceTrainer(args=self.job_args.trace_args, model_generator=self.get_model_generator(),
+            self._trainer = TraceTrainer(args=self.job_args.trainer_args, model_manager=self.get_model_manager(),
                                          **kwargs)
         return self._trainer

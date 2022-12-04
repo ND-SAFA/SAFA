@@ -6,7 +6,7 @@ from django.core.wsgi import get_wsgi_application
 from rest_framework import serializers
 
 from server.serializers.serializer_utility import SerializerUtility
-from train.trace_args import TraceArgs
+from train.trainer_args import TrainerArgs
 from util.reflection_util import ParamScope, ReflectionUtil
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'server.settings')
@@ -63,7 +63,7 @@ if __name__ == "__main__":
     payload = {
         "max_seq_length": 255
     }
-    serializer = DynamicSerializer(TraceArgs, data=payload)
+    serializer = DynamicSerializer(TrainerArgs, data=payload)
     assert serializer.is_valid(), json.dumps(serializer.errors, indent=4)
     instance = serializer.save()
     print(instance)

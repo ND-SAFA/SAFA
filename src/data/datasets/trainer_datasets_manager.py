@@ -9,7 +9,7 @@ from data.processing.augmentation.abstract_data_augmentation_step import Abstrac
 from data.datasets.trace_dataset import TraceDataset
 
 
-class TrainerDatasetsContainer:
+class TrainerDatasetsManager:
     DATASET_TYPE = Union[PreTrainDataset, TraceDataset, AbstractDataset]
 
     def __init__(self,
@@ -58,9 +58,9 @@ class TrainerDatasetsContainer:
         """
         Creates instance containing dataset for each mapped role.
         :param dataset_creators_map: The map of roles to data to set in instance.
-        :return: TrainerDatasetsContainer with initialized data.
+        :return: TrainerDatasetsManager with initialized data.
         """
-        trainer_datasets_container = TrainerDatasetsContainer(
+        trainer_datasets_container = TrainerDatasetsManager(
             pre_train_dataset_creator=dataset_creators_map.get(DatasetRole.PRE_TRAIN, None),
             train_dataset_creator=dataset_creators_map.get(DatasetRole.TRAIN, None),
             val_dataset_creator=dataset_creators_map.get(DatasetRole.VAL, None),
@@ -108,7 +108,7 @@ class TrainerDatasetsContainer:
         Creates the data from their corresponding creators
         :return: a dictionary mapping dataset role to the corresponding dataset
         """
-        return {dataset_role: TrainerDatasetsContainer.__optional_create(dataset_creator)
+        return {dataset_role: TrainerDatasetsManager.__optional_create(dataset_creator)
                 for dataset_role, dataset_creator in dataset_creators_map.items()}
 
     @staticmethod

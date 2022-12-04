@@ -12,7 +12,7 @@ from test.paths.paths import TEST_DATA_DIR, TEST_OUTPUT_DIR
 from data.creators.supported_dataset_creator import SupportedDatasetCreator
 from data.datasets.dataset_role import DatasetRole
 from models.base_models.supported_base_model import SupportedBaseModel
-from models.model_generator import ModelGenerator
+from models.model_manager import ModelManager
 
 
 class TestMLMPreTrainJob(BaseJobTest):
@@ -24,8 +24,8 @@ class TestMLMPreTrainJob(BaseJobTest):
     def test_run_failure(self):
         self._test_run_failure()
 
-    @patch.object(ModelGenerator, '_ModelGenerator__load_model')
-    @patch.object(ModelGenerator, 'get_tokenizer')
+    @patch.object(ModelManager, '_ModelManager__load_model')
+    @patch.object(ModelManager, 'get_tokenizer')
     def _test_run_success(self, get_tokenizer_mock: mock.MagicMock, load_model_mock: mock.MagicMock):
         load_model_mock.return_value = AutoModelForMaskedLM.from_pretrained("bert-base-uncased")
         get_tokenizer_mock.return_value = self.get_test_tokenizer()

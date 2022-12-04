@@ -10,8 +10,8 @@ from test.base_trace_test import BaseTraceTest
 from test.paths.paths import TEST_OUTPUT_DIR
 from data.datasets.dataset_role import DatasetRole
 from models.base_models.supported_base_model import SupportedBaseModel
-from models.model_generator import ModelGenerator
-from train.trace_args import TraceArgs
+from models.model_manager import ModelManager
+from train.trainer_args import TrainerArgs
 from train.trace_trainer import TraceTrainer
 
 
@@ -23,7 +23,7 @@ class TestTraceTrainer(BaseTraceTest):
 
     def test_perform_training(self):
         test_trace_trainer = self.get_test_trace_trainer(metrics=self.TEST_METRIC_NAMES)
-        test_trace_trainer.model_generator.get_tokenizer().padding = True
+        test_trace_trainer.model_manager.get_tokenizer().padding = True
         output = test_trace_trainer.perform_training()
         self.assertIn("training_loss", output)
 
@@ -85,9 +85,9 @@ class TestTraceTrainer(BaseTraceTest):
 
     def get_test_trace_trainer(self, **kwargs):
         trainer_dataset_container = self.get_dataset_container()
-        model_generator = ModelGenerator("path")
+        model_generator = ModelManager("path")
         model_generator.get_model = mock.MagicMock(return_value=self.get_test_model())
         model_generator.get_tokenizer = mock.MagicMock(return_value=self.get_test_tokenizer())
         return TraceTrainer(
-            TraceArgs(output_dir=TEST_OUTPUT_DIR, trainer_dataset_container=trainer_dataset_container, **kwargs),
+            TrainerArgs(output_dir=TEST_OUTPUT_DIR, trainer_dataset_container=trainer_dataset_container, **kwargs),
             model_generator)

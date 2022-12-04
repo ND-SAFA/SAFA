@@ -6,10 +6,10 @@ from config.constants import SAVE_OUTPUT_DEFAULT
 from jobs.abstract_job import AbstractJob
 from jobs.abstract_trace_job import AbstractTraceJob
 from jobs.components.job_args import JobArgs
-from data.datasets.trainer_datasets_container import TrainerDatasetsContainer
+from data.datasets.trainer_datasets_manager import TrainerDatasetsManager
 from models.base_models.supported_base_model import SupportedBaseModel
 from models.model_properties import ModelArchitectureType
-from train.trace_args import TraceArgs
+from train.trainer_args import TrainerArgs
 from util.reflection_util import ReflectionUtil
 
 
@@ -30,7 +30,7 @@ class JobFactory:
     """
     Container for data used for any training, prediction, or evaluation.
     """
-    trainer_dataset_container: TrainerDatasetsContainer = None
+    trainer_dataset_container: TrainerDatasetsManager = None
     """
     Any additional parameters for making data including test/train split info
     """
@@ -50,7 +50,7 @@ class JobFactory:
     """
     args used for TraceTrainer, initialized from traceArgsParams
     """
-    trace_args: TraceArgs = field(init=False, default=None)
+    trainer_args: TrainerArgs = field(init=False, default=None)
     """
     any additional args needed for the job
     """
@@ -97,9 +97,9 @@ class JobFactory:
         if self.trainer_dataset_container is None:
             raise ValueError("TrainerDatasetCreator is not instantiated in JobFactory.")
         trace_args_params = self.trace_args_params if self.trace_args_params else {}
-        self.trace_args = TraceArgs(trainer_dataset_container=self.trainer_dataset_container,
-                                    output_dir=self.output_dir,
-                                    **trace_args_params)
+        self.trace_args = TrainerArgs(trainer_dataset_container=self.trainer_dataset_container,
+                                      output_dir=self.output_dir,
+                                      **trace_args_params)
 
     def _get_job_args_params(self) -> Dict[str, any]:
         """

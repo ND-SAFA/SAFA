@@ -10,7 +10,7 @@ from jobs.components.job_args import JobArgs
 from jobs.components.job_status import JobStatus
 from jobs.components.job_result import JobResult
 from server.storage.safa_storage import SafaStorage
-from models.model_generator import ModelGenerator
+from models.model_manager import ModelManager
 
 
 class AbstractJob(threading.Thread):
@@ -31,16 +31,16 @@ class AbstractJob(threading.Thread):
         self.job_output_filepath = self._get_output_filepath(self.output_dir, self.id)
         self.save_job_output = job_args.save_job_output
         self.model_path = job_args.model_path
-        self.__model_generator = None
+        self.__model_manager = None
 
-    def get_model_generator(self) -> ModelGenerator:
+    def get_model_manager(self) -> ModelManager:
         """
         Gets the model generator for the job given a base model and model path
         :return: the model generator
         """
-        if self.__model_generator is None:
-            self.__model_generator = ModelGenerator(model_path=self.model_path)
-        return self.__model_generator
+        if self.__model_manager is None:
+            self.__model_manager = ModelManager(model_path=self.model_path)
+        return self.__model_manager
 
     def run(self) -> None:
         """

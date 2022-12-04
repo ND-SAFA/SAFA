@@ -1,9 +1,8 @@
 from dataclasses import dataclass
 
-from config.constants import SAVE_OUTPUT_DEFAULT, SAVE_DATASET_SPLITS_DEFAULT
-from models.base_models.supported_base_model import SupportedBaseModel
+from config.constants import SAVE_OUTPUT_DEFAULT
 from models.model_properties import ModelArchitectureType
-from train.trace_args import TraceArgs
+from train.trainer_args import TrainerArgs
 
 
 @dataclass
@@ -23,7 +22,7 @@ class JobArgs:
     """
     Initialized post-init to contain all arguments for tracing jobs
     """
-    trace_args: TraceArgs = None
+    trainer_args: TrainerArgs = None
     """
     If True, saves the output to the output_dir
     """

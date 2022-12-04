@@ -2,7 +2,7 @@ from server.serializers.dataset.trainer_dataset_container_serializer import Trai
 from server.serializers.tests.base_serializer_test import BaseSerializerTest
 from test.base_test import BaseTest
 from data.datasets.dataset_role import DatasetRole
-from data.datasets.trainer_datasets_container import TrainerDatasetsContainer
+from data.datasets.trainer_datasets_manager import TrainerDatasetsManager
 import unittest
 
 
@@ -39,7 +39,7 @@ class TestPreProcessingStepSerializer(BaseTest):
     serializer_test = BaseSerializerTest(TrainerDatasetsContainerSerializer)
 
     def test_serialization(self):
-        entity: TrainerDatasetsContainer = self.serializer_test.serialize_data(self, self.test_data)
+        entity: TrainerDatasetsManager = self.serializer_test.serialize_data(self, self.test_data)
         self.assertIsNotNone(entity[DatasetRole.PRE_TRAIN])
         self.assertIsNotNone(entity[DatasetRole.TRAIN])
         self.assertIsNone(entity[DatasetRole.EVAL])

@@ -9,7 +9,7 @@ from server.serializers.job_factory.model_identifier_serializer import ModelIden
 from server.serializers.serializer_utility import SerializerUtility
 from data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
 from data.datasets.dataset_role import DatasetRole
-from data.datasets.trainer_datasets_container import TrainerDatasetsContainer
+from data.datasets.trainer_datasets_manager import TrainerDatasetsManager
 
 
 class PreTrainingRequestSerializer(ModelIdentifierSerializer):
@@ -33,7 +33,7 @@ class PreTrainingRequestSerializer(ModelIdentifierSerializer):
 
         training_dataset_creator = MLMPreTrainDatasetCreator(orig_data_path=training_data_dir,
                                                              data_cleaning_steps=pre_processing_steps)
-        trainer_datasets_container = TrainerDatasetsContainer(train_dataset_creator=training_dataset_creator)
+        trainer_datasets_container = TrainerDatasetsManager(train_dataset_creator=training_dataset_creator)
         return JobFactory(**kwargs, trainer_dataset_container=trainer_datasets_container)
 
     def to_representation(self, instance: JobFactory) -> Dict:

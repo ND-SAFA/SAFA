@@ -24,5 +24,5 @@ class TestCreateDatasetsJob(BaseJobTest):
         test_params = self.get_test_params_for_trace(dataset_role=DatasetRole.TRAIN, include_links=True)
         job_args = JobArgs(**test_params)
         if not include_dataset:
-            job_args.trace_args.trainer_dataset_container[DatasetRole.TRAIN] = None
+            job_args.trainer_args.trainer_dataset_container[DatasetRole.TRAIN] = None
         return CreateDatasetsJob(job_args)

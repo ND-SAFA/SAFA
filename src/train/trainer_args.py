@@ -5,13 +5,13 @@ from transformers.training_args import TrainingArguments
 
 from config.constants import EVALUATION_STRATEGY_DEFAULT, LOAD_BEST_MODEL_AT_END_DEFAULT, MAX_SEQ_LENGTH_DEFAULT, \
     METRIC_FOR_BEST_MODEL_DEFAULT, N_EPOCHS_DEFAULT, SAVE_STRATEGY_DEFAULT, SAVE_TOTAL_LIMIT_DEFAULT, SAVE_DATASET_SPLITS_DEFAULT
-from data.datasets.trainer_datasets_container import TrainerDatasetsContainer
+from data.datasets.trainer_datasets_manager import TrainerDatasetsManager
 
 
-class TraceArgs(TrainingArguments):
+class TrainerArgs(TrainingArguments):
     # required
     output_dir: str
-    trainer_dataset_container: TrainerDatasetsContainer = None
+    trainer_dataset_container: TrainerDatasetsManager = None
 
     # Tokenizer
     max_seq_length: int = MAX_SEQ_LENGTH_DEFAULT

@@ -8,7 +8,7 @@ from data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreato
 from data.creators.split_dataset_creator import SplitDatasetCreator
 from data.datasets.dataset_role import DatasetRole
 from data.datasets.trace_dataset import TraceDataset
-from data.datasets.trainer_datasets_container import TrainerDatasetsContainer
+from data.datasets.trainer_datasets_manager import TrainerDatasetsManager
 
 
 class TestTrainerDatasetsContainer(BaseTraceTest):
@@ -22,7 +22,7 @@ class TestTrainerDatasetsContainer(BaseTraceTest):
 
     @patch.object(MLMPreTrainDatasetCreator, "create")
     def test_prepare_datasets(self, create_mock):
-        datasets_container = self.get_trainer_datasets_container(
+        datasets_container = self.get_trainer_datasets_manager(
             pre_train_dataset_creator=MLMPreTrainDatasetCreator("orig_data_path"),
             eval_dataset_creator=self.EVAL_DATASET_CREATOR)
         datasets_container._prepare_datasets([])
@@ -38,7 +38,7 @@ class TestTrainerDatasetsContainer(BaseTraceTest):
         }
         expected_dataset_split_roles = [DatasetRole.TRAIN, DatasetRole.VAL, DatasetRole.EVAL]
         train_dataset = self.TRAIN_DATASET_CREATOR.create()
-        splits = TrainerDatasetsContainer._create_dataset_splits(train_dataset, dataset_creators_map)
+        splits = TrainerDatasetsManager._create_dataset_splits(train_dataset, dataset_creators_map)
 
         for dataset_role in expected_dataset_split_roles:
             self.assertIn(dataset_role, splits)
@@ -46,13 +46,13 @@ class TestTrainerDatasetsContainer(BaseTraceTest):
         self.assertNotIn(DatasetRole.PRE_TRAIN, splits)
 
     def test_get_creator(self):
-        datasets_container = self.get_trainer_datasets_container()
+        datasets_container = self.get_trainer_datasets_manager()
         self.assertIsInstance(datasets_container.get_creator(DatasetRole.TRAIN), ClassicTraceDatasetCreator)
 
     def test_save_dataset_splits(self):
         if not os.path.exists(TEST_OUTPUT_DIR):
             os.makedirs(TEST_OUTPUT_DIR)
-        datasets_container = self.get_trainer_datasets_container()
+        datasets_container = self.get_trainer_datasets_manager()
         datasets_container.save_dataset_splits(TEST_OUTPUT_DIR)
         self.assert_lists_have_the_same_vals(["train.csv", "val.csv"], os.listdir(TEST_OUTPUT_DIR))
 
@@ -62,7 +62,7 @@ class TestTrainerDatasetsContainer(BaseTraceTest):
                                 DatasetRole.TRAIN: self.TRAIN_DATASET_CREATOR,
                                 DatasetRole.VAL: self.VAL_DATASET_CREATOR,
                                 DatasetRole.EVAL: None}
-        datasets_container = self.get_trainer_datasets_container()
+        datasets_container = self.get_trainer_datasets_manager()
         datasets_map = datasets_container._create_datasets_from_creators(dataset_creators_map)
         self.assertTrue(datasets_map[DatasetRole.PRE_TRAIN] is not None)
         self.assertIsInstance(datasets_map[DatasetRole.TRAIN], TraceDataset)
@@ -72,22 +72,22 @@ class TestTrainerDatasetsContainer(BaseTraceTest):
                                 DatasetRole.TRAIN: self.TRAIN_DATASET_CREATOR,
                                 DatasetRole.VAL: self.VAL_DATASET_CREATOR,
                                 DatasetRole.EVAL: self.EVAL_DATASET_CREATOR}
-        datasets_container = TrainerDatasetsContainer.create_from_map(dataset_creators_map)
+        datasets_container = TrainerDatasetsManager.create_from_map(dataset_creators_map)
         self.assert_final_datasets_are_as_expected(datasets_container)
 
     def test_get_set_bad_index(self):
-        datasets_container = self.get_trainer_datasets_container()
+        datasets_container = self.get_trainer_datasets_manager()
         try:
             datasets_container["eval"] = None
             self.fail("Did not raise Exception on bad index")
         except Exception:
             pass
 
-    def get_trainer_datasets_container(self, pre_train_dataset_creator=None, eval_dataset_creator=None):
+    def get_trainer_datasets_manager(self, pre_train_dataset_creator=None, eval_dataset_creator=None):
         train_dataset_creator = self.TRAIN_DATASET_CREATOR
 
         val_dataset_creator = self.VAL_DATASET_CREATOR
-        trainer_datasets_container = TrainerDatasetsContainer(
+        trainer_datasets_container = TrainerDatasetsManager(
             pre_train_dataset_creator = pre_train_dataset_creator,
             train_dataset_creator=train_dataset_creator,
             val_dataset_creator=val_dataset_creator,

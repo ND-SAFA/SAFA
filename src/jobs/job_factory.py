@@ -47,6 +47,10 @@ class JobFactory:
     """
     random_seed: int = None
     """
+    Path to hub to save model to.
+    """
+    hub_path: str = None
+    """
     Additional parameters for the trace args
     """
     trace_args_params: Dict = field(default_factory=dict)

@@ -1,6 +1,7 @@
 import argparse
 import os
 import sys
+import uuid
 
 from dotenv import load_dotenv
 
@@ -33,8 +34,14 @@ if __name__ == "__main__":
     #
     job_definition = {
         "modelPath": args.model,
-        "outputDir": args.export,
+        "outputDir": args.model + "/" + str(uuid.uuid4()),
         "saveJobOutput": False,
+        "params": {
+            "hub_path": args.export,
+            "trace_args_params": {
+                "push_to_hub": True,
+            }
+        }
     }
     base_script = BaseScript(ModelIdentifierSerializer, PushModelJob)
     base_script.run(job_definition, path_vars=["modelPath"])

@@ -9,6 +9,8 @@ class PushModelJob(AbstractTraceJob):
         Creates a new model
         :return: the model path
         """
+        hub_path = self.job_args.hub_path
+        assert hub_path is not None, "Expected hub_path to be defined."
         trainer = self.get_trainer()
-        trainer.push_to_hub(self.output_dir)
+        trainer.push_to_hub(hub_path)
         return JobResult.from_dict({JobResult.MODEL_PATH: self.output_dir})

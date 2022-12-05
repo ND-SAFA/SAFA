@@ -35,6 +35,10 @@ class JobArgs:
     Sets the random seed for a job
     """
     random_seed: int = None
+    """
+    Path to hub to save model to.
+    """
+    hub_path: str = None
 
     def as_kwargs(self):
         return {attr_name: getattr(self, attr_name) for attr_name in dir(self) if not attr_name.startswith("__")}

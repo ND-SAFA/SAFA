@@ -1,10 +1,12 @@
 <template>
   <div>
-    <v-tabs v-model="model">
-      <v-tab v-for="{ name } in tabs" :key="name">
-        <typography :value="name" />
-      </v-tab>
-    </v-tabs>
+    <v-lazy>
+      <v-tabs v-model="model">
+        <v-tab v-for="{ name } in tabs" :key="name">
+          <typography :value="name" />
+        </v-tab>
+      </v-tabs>
+    </v-lazy>
     <v-tabs-items v-model="model" class="mt-1">
       <slot />
     </v-tabs-items>

@@ -1,7 +1,6 @@
 import argparse
 import os
 import sys
-import uuid
 
 from dotenv import load_dotenv
 
@@ -26,6 +25,7 @@ if __name__ == "__main__":
         prog='PreTrainer',
         description='Pre-trains a bert model on a directory of documents.')
     parser.add_argument('model')  # positional argument
+    parser.add_argument('repo')
     parser.add_argument('export', help="The model to evaluate.")
     args = parser.parse_args()
 
@@ -34,7 +34,7 @@ if __name__ == "__main__":
     #
     job_definition = {
         "modelPath": args.model,
-        "outputDir": args.model + "/" + str(uuid.uuid4()),
+        "outputDir": os.path.join(args.repo, args.export),
         "saveJobOutput": False,
         "params": {
             "hub_path": args.export

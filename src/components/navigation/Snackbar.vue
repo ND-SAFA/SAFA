@@ -4,20 +4,19 @@
     :timeout="timeout"
     :color="messageColor"
     bottom
-    outlined
   >
     <flex-box
       align="center"
       justify="space-between"
       :data-cy="`snackbar-${messageType}`"
     >
-      <v-icon class="inherit-color"> {{ messageIcon }} </v-icon>
-      <typography align="center" x="2" :value="snackbarMessage" />
+      <v-icon class="white--text"> {{ messageIcon }} </v-icon>
+      <typography color="white" align="center" x="2" :value="snackbarMessage" />
       <flex-box align="center">
         <v-btn
           text
           v-if="hasErrors"
-          :color="messageColor"
+          color="white"
           @click="handleSeeError"
           class="ma-0"
         >
@@ -25,13 +24,13 @@
         </v-btn>
         <generic-icon-button
           v-if="showAction"
-          :color="messageColor"
+          color="white"
           icon-id="mdi-download"
           tooltip="Update"
           @click="handleAction"
         />
         <generic-icon-button
-          :color="messageColor"
+          color="white"
           icon-id="mdi-close"
           tooltip="Close"
           data-cy="button-snackbar-close"
@@ -49,10 +48,12 @@ import Vue from "vue";
 import { MessageType, SnackbarMessage } from "@/types";
 import { ThemeColors } from "@/util";
 import { appStore, logStore } from "@/hooks";
-import { ServerErrorModal } from "@/components/common/modals";
-import GenericIconButton from "@/components/common/generic/GenericIconButton.vue";
-import Typography from "./Typography.vue";
-import FlexBox from "./FlexBox.vue";
+import {
+  ServerErrorModal,
+  GenericIconButton,
+  Typography,
+  FlexBox,
+} from "@/components/common";
 
 /**
  * Displays snackbar messages.

@@ -14,7 +14,7 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { SelectOption } from "@/types";
-import Typography from "./Typography.vue";
+import Typography from "../Typography.vue";
 
 /**
  * Renders content across multiple tabs.

@@ -62,8 +62,8 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { DataTableHeader } from "vuetify";
-import { FlexBox } from "@/components/common";
-import { CommitButtons } from "@/components/navigation";
+import { FlexBox } from "@/components/common/layout";
+import { CommitButtons } from "@/components/common/button";
 /**
  * Renders the header for a table.
  *

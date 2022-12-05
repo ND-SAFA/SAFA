@@ -49,14 +49,13 @@ export default Vue.extend({
     };
   },
   watch: {
+    /**
+     * Reset the state when opened.
+     */
     isOpen(open: boolean) {
       if (!open) return;
 
-      this.isLoading = false;
-      this.isValid = false;
-      this.method = undefined;
-      this.model = undefined;
-      this.matrices = [{ source: "", target: "" }];
+      this.reset();
     },
     /**
      * Validates that all matrices are valid on change.
@@ -95,6 +94,16 @@ export default Vue.extend({
   },
   methods: {
     /**
+     * Resets this component's data.
+     */
+    reset(): void {
+      this.isLoading = false;
+      this.isValid = false;
+      this.method = undefined;
+      this.model = undefined;
+      this.matrices = [{ source: "", target: "" }];
+    },
+    /**
      * Attempts to generate the selected trace links.
      */
     handleSubmit(): void {
@@ -103,7 +112,7 @@ export default Vue.extend({
       this.isLoading = true;
       handleGenerateLinks(undefined, this.model, this.matrices, {
         onComplete: () => {
-          this.isLoading = false;
+          this.reset();
           this.$emit("submit");
         },
       });

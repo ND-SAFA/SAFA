@@ -45,7 +45,7 @@ import Vue from "vue";
 import { ArtifactModel, TraceLinkModel, TraceType } from "@/types";
 import { artifactStore, selectionStore } from "@/hooks";
 import {
-  GenericArtifactBodyDisplay,
+  ArtifactBodyDisplay,
   FlexBox,
   AttributeChip,
   PanelCard,
@@ -56,7 +56,12 @@ import {
  */
 export default Vue.extend({
   name: "TraceLinkContent",
-  components: { PanelCard, FlexBox, GenericArtifactBodyDisplay, AttributeChip },
+  components: {
+    PanelCard,
+    FlexBox,
+    GenericArtifactBodyDisplay: ArtifactBodyDisplay,
+    AttributeChip,
+  },
   computed: {
     /**
      * @return The selected trace link.

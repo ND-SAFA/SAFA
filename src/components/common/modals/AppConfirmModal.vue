@@ -25,7 +25,7 @@
 import Vue, { PropType } from "vue";
 import { ConfirmationType, ConfirmDialogueMessage } from "@/types";
 import { logStore } from "@/hooks";
-import Typography from "@/components/common/display/Typography.vue";
+import { Typography } from "@/components/common/display";
 import GenericModal from "./GenericModal.vue";
 
 /**

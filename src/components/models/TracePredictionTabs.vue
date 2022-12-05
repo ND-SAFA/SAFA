@@ -29,8 +29,8 @@ import Vue from "vue";
 import { tracePredictionTabOptions } from "@/util";
 import { TabList, SidebarGrid } from "@/components/common";
 import { TraceLinkTable, TraceLinkGenerator } from "@/components/traceLink";
-import { ProjectDisplay } from "@/components/project/";
-import ModelTable from "./ModelTable.vue";
+import { ProjectDisplay } from "@/components/project";
+import { ModelTable } from "./table";
 import TracePredictionHeader from "./TracePredictionHeader.vue";
 
 /**

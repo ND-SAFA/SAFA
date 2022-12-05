@@ -38,8 +38,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { identifierSaveStore } from "@/hooks";
-import { GenericModal } from "@/components/common";
-import Typography from "@/components/common/display/Typography.vue";
+import { GenericModal, Typography } from "@/components/common";
 
 /**
  * A modal for confirming project deletion.

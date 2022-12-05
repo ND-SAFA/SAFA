@@ -36,7 +36,7 @@ import { appStore } from "@/hooks";
 import { Routes } from "@/router";
 import { handleLogout } from "@/api";
 import { FlexBox, Typography } from "@/components/common";
-import Notifications from "@/components/navigation/sidebar/Notifications.vue";
+import Notifications from "./Notifications.vue";
 
 /**
  * Renders the navigation drawer.

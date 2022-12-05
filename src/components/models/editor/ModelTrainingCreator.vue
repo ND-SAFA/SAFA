@@ -26,7 +26,7 @@
 import Vue, { PropType } from "vue";
 import { GenerationModel } from "@/types";
 import { trainingTabOptions } from "@/util";
-import TabList from "@/components/common/display/TabList.vue";
+import { TabList } from "@/components/common";
 import {
   ModelProjectStep,
   ModelDocumentStep,

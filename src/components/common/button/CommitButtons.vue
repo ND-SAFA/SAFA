@@ -20,7 +20,8 @@ import Vue from "vue";
 import { ButtonDefinition, ButtonType } from "@/types";
 import { commitStore } from "@/hooks";
 import { redoCommit, undoCommit } from "@/api";
-import { GenericIconButton, FlexBox } from "@/components/common";
+import { FlexBox } from "@/components/common/layout";
+import GenericIconButton from "./GenericIconButton.vue";
 
 export default Vue.extend({
   name: "CommitButtons",

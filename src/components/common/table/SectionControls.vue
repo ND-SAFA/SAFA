@@ -19,7 +19,8 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { GenericIconButton, FlexBox } from "@/components/common";
+import { GenericIconButton } from "@/components/common/button";
+import { FlexBox } from "@/components/common/layout";
 
 /**
  * Displays section controls.

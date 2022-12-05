@@ -9,7 +9,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import Typography from "./Typography.vue";
+import Typography from "../Typography.vue";
 
 /**
  * An alert for components that are still under construction.

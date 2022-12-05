@@ -14,9 +14,8 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { FlexBox } from "@/components/common";
+import { FlexBox, CommitButtons } from "@/components/common";
 import { DocumentSelector } from "@/components/document";
-import CommitButtons from "./CommitButtons.vue";
 import GraphButtons from "./GraphButtons.vue";
 import ModeButtons from "./ModeButtons.vue";
 

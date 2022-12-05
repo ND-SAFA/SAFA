@@ -54,12 +54,9 @@ import Vue, { PropType } from "vue";
 import { DataTableGroup } from "@/types";
 import { camelcaseToDisplay } from "@/util";
 import { artifactStore } from "@/hooks";
-import {
-  FlexBox,
-  AttributeChip,
-  Typography,
-  GenericIconButton,
-} from "@/components/common";
+import { GenericIconButton } from "@/components/common/button";
+import { FlexBox } from "@/components/common/layout";
+import { AttributeChip, Typography } from "@/components/common/display";
 import SectionControls from "./SectionControls.vue";
 
 /**

@@ -7,7 +7,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import Typography from "./Typography.vue";
+import Typography from "../Typography.vue";
 
 /**
  * An alert that details the required format of upload files.

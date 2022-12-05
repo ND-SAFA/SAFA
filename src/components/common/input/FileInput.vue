@@ -24,7 +24,7 @@ import Vue, { PropType } from "vue";
  * @emits-2 `input` (File[] | File | null) - On file change.
  */
 export default Vue.extend({
-  name: "GenericFileSelector",
+  name: "FileInput",
   props: {
     value: Array as PropType<File[] | File | null>,
     multiple: {

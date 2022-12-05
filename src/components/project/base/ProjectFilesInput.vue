@@ -1,7 +1,7 @@
 <template>
   <div>
     <file-format-alert />
-    <generic-file-selector
+    <file-input
       v-model="selectedFiles"
       :data-cy="dataCy"
       :errors="errors"
@@ -50,7 +50,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { ArtifactLevelModel, TimModel } from "@/types";
-import { GenericFileSelector, FileFormatAlert } from "@/components/common";
+import { FileInput, FileFormatAlert } from "@/components/common";
 
 /**
  * An input for project files.
@@ -61,7 +61,7 @@ export default Vue.extend({
   name: "ProjectFilesInput",
   components: {
     FileFormatAlert,
-    GenericFileSelector,
+    FileInput,
   },
   props: {
     dataCy: String,

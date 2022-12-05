@@ -28,7 +28,7 @@
 import Vue, { PropType } from "vue";
 import { IdentifierModel } from "@/types";
 import { projectStore } from "@/hooks";
-import { GenericIconButton } from "@/components/common/generic";
+import { GenericIconButton } from "@/components/common/button";
 
 /**
  * An input for projects.

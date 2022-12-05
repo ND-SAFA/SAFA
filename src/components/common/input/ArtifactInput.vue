@@ -24,7 +24,7 @@
     <template v-slot:item="{ item, on, attrs }">
       <v-list-item v-on="on" v-bind="attrs" dense>
         <v-checkbox :value="isSelected(item)" />
-        <generic-artifact-body-display display-title :artifact="item" />
+        <artifact-body-display display-title :artifact="item" />
       </v-list-item>
     </template>
     <template v-slot:selection="{ item, index }">
@@ -52,11 +52,8 @@ import Vue, { PropType } from "vue";
 import { ArtifactModel } from "@/types";
 import { filterArtifacts } from "@/util";
 import { artifactStore } from "@/hooks";
-import {
-  GenericArtifactBodyDisplay,
-  GenericIconButton,
-} from "@/components/common/generic";
-import { Typography } from "@/components/common/display";
+import { GenericIconButton } from "@/components/common/button";
+import { Typography, ArtifactBodyDisplay } from "@/components/common/display";
 
 /**
  * An input for artifacts.
@@ -69,7 +66,7 @@ export default Vue.extend({
   components: {
     GenericIconButton,
     Typography,
-    GenericArtifactBodyDisplay,
+    ArtifactBodyDisplay,
   },
   props: {
     value: {

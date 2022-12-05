@@ -29,8 +29,7 @@ import { IdentifierModel, ModelShareType, GenerationModel } from "@/types";
 import { modelShareOptions } from "@/util";
 import { projectStore } from "@/hooks";
 import { handleShareModel } from "@/api";
-import { FlexBox, GenericModal } from "@/components/common";
-import ProjectInput from "@/components/common/input/ProjectInput.vue";
+import { FlexBox, GenericModal, ProjectInput } from "@/components/common";
 
 /**
  * A modal for sharing models.

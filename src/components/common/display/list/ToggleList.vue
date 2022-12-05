@@ -13,7 +13,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import Typography from "./Typography.vue";
+import Typography from "../Typography.vue";
 
 /**
  * Displays a toggleable list.

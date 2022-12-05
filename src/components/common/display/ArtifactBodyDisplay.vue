@@ -22,8 +22,9 @@
 import Vue, { PropType } from "vue";
 import { ArtifactModel } from "@/types";
 import { typeOptionsStore } from "@/hooks";
-import { Typography, FlexBox } from "@/components/common/display";
-import AttributeChip from "@/components/common/display/AttributeChip.vue";
+import { FlexBox } from "@/components/common/layout";
+import { AttributeChip } from "./attribute";
+import Typography from "./Typography.vue";
 
 /**
  * Displays the body of an artifact that can be expanded.

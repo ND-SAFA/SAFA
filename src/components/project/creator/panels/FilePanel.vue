@@ -12,7 +12,7 @@
     <v-expansion-panel-content>
       <slot name="before-rows" />
 
-      <generic-file-selector
+      <file-input
         v-if="showFileUploader"
         :multiple="false"
         data-cy="input-files-panel"
@@ -88,7 +88,7 @@ import Vue, { PropType } from "vue";
 import { logStore } from "@/hooks";
 import {
   GenericSwitch,
-  GenericFileSelector,
+  FileInput,
   Typography,
   FlexBox,
 } from "@/components/common";
@@ -109,7 +109,7 @@ export default Vue.extend({
     FlexBox,
     Typography,
     GenericSwitch,
-    GenericFileSelector,
+    FileInput,
   },
   props: {
     fileRequired: {

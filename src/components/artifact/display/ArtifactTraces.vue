@@ -76,7 +76,7 @@ import {
   Typography,
   GenericIconButton,
   PanelCard,
-  GenericArtifactBodyDisplay,
+  ArtifactBodyDisplay,
 } from "@/components/common";
 
 /**
@@ -85,7 +85,7 @@ import {
 export default Vue.extend({
   name: "ArtifactTraces",
   components: {
-    GenericArtifactBodyDisplay,
+    GenericArtifactBodyDisplay: ArtifactBodyDisplay,
     PanelCard,
     GenericIconButton,
     Typography,

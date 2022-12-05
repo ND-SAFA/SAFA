@@ -12,7 +12,7 @@
 import Vue, { PropType } from "vue";
 import { CustomAttributeCollection, AttributeModel } from "@/types";
 import { timestampToDisplay } from "@/util";
-import Typography from "./Typography.vue";
+import Typography from "../Typography.vue";
 import AttributeChip from "./AttributeChip.vue";
 
 /**

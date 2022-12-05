@@ -24,7 +24,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import Typography from "@/components/common/display/Typography.vue";
+import { Typography } from "@/components/common/display";
 
 /**
  * Presents a list in a stepper workflow for item selection.

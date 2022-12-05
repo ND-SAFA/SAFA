@@ -8,3 +8,5 @@ export { default as CustomModelInput } from "./CustomModelInput.vue";
 export { default as ProjectInput } from "./ProjectInput.vue";
 export { default as AttributeInput } from "./AttributeInput.vue";
 export { default as AttributeListInput } from "./AttributeListInput.vue";
+export { default as FileInput } from "./FileInput.vue";
+export { default as GenericSwitch } from "./GenericSwitch.vue";

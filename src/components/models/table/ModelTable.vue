@@ -50,9 +50,9 @@ import {
   GenericIconButton,
   Typography,
 } from "@/components/common";
+import { ModelEditor } from "../editor";
 import ModelShareModal from "./ModelShareModal.vue";
 import ModelCreatorModal from "./ModelCreatorModal.vue";
-import { ModelEditor } from "./editor";
 
 /**
  * Renders a table of project models.

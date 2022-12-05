@@ -35,7 +35,7 @@
 import Vue, { PropType } from "vue";
 import { ArtifactModel, TraceLinkModel } from "@/types";
 import { artifactStore } from "@/hooks";
-import { Typography, GenericArtifactBodyDisplay } from "@/components/common";
+import { Typography, ArtifactBodyDisplay } from "@/components/common";
 
 /**
  * Displays a trace link.
@@ -44,7 +44,7 @@ export default Vue.extend({
   name: "TraceLinkDisplay",
   components: {
     Typography,
-    GenericArtifactBodyDisplay,
+    GenericArtifactBodyDisplay: ArtifactBodyDisplay,
   },
   props: {
     link: {

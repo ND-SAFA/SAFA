@@ -49,8 +49,8 @@ import {
   uppercaseToDisplay,
 } from "@/util";
 import { typeOptionsStore } from "@/hooks";
-import FlexBox from "@/components/common/display/FlexBox.vue";
-import Typography from "./Typography.vue";
+import { FlexBox } from "@/components/common/layout";
+import Typography from "../Typography.vue";
 
 /**
  * Displays a generic chip that can render specific attributes.

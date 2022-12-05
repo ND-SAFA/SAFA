@@ -11,10 +11,11 @@
 <script lang="ts">
 import Vue from "vue";
 import { logStore, sessionStore } from "@/hooks";
-import { AppConfirmModal, Snackbar } from "@/components/common";
+import { AppConfirmModal } from "@/components/common";
 import { AppNavDrawer } from "./sidebar";
 import { AppNavBar } from "./topbar";
 import { DetailsDrawer } from "./detailsDrawer";
+import Snackbar from "./Snackbar.vue";
 
 /**
  * Renders all app navigation bars.

@@ -37,10 +37,7 @@ if __name__ == "__main__":
         "outputDir": args.model + "/" + str(uuid.uuid4()),
         "saveJobOutput": False,
         "params": {
-            "hub_path": args.export,
-            "trace_args_params": {
-                "push_to_hub": True,
-            }
+            "hub_path": args.export
         }
     }
     base_script = BaseScript(ModelIdentifierSerializer, PushModelJob)

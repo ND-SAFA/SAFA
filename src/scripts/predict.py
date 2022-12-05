@@ -14,7 +14,6 @@ if __name__ == "__main__":
     #
     # IMPORTS
     #
-    from models.base_models.supported_base_model import SupportedBaseModel
     from jobs.predict_job import PredictJob
     from server.serializers.job_factory.prediction_request_serializer import PredictionRequestSerializer
     from scripts.base_script import BaseScript
@@ -34,22 +33,20 @@ if __name__ == "__main__":
     # Create Job Data
     #
     job_definition = {
-        "baseModel": SupportedBaseModel.AUTO_MODEL,
         "modelPath": args.model,
         "outputDir": args.output,
         "saveJobOutput": True,
         "data": {
-            "creator": "CSV",
+            "creator": "SAFA",
             "params": {
-                "data_file_path": args.data
+                "project_path": args.data
             },
-            "preProcessingSteps": []
         },
-        "settings": {
+        "params": {
             "trace_args_params": {
                 "metrics": ["map_at_k"]
             }
         }
     }
-    base_script = BaseScript(args, PredictionRequestSerializer, PredictJob)
-    base_script.run(job_definition)
+    base_script = BaseScript(PredictionRequestSerializer, PredictJob)
+    base_script.run(job_definition, path_vars=[["data", "params", "project_path"]])

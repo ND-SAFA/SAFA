@@ -46,7 +46,7 @@ if __name__ == "__main__":
         },
         "params": {
             "trace_args_params": {
-                "num_train_epochs": args.epochs
+                "num_train_epochs": int(args.epochs)
             }
         }
     }

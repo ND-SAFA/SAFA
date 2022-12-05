@@ -2,28 +2,40 @@ import argparse
 import os
 import sys
 
-from transformers import AutoModel
+from dotenv import load_dotenv
 
-parser = argparse.ArgumentParser(description='Runs regular bert model.')
-parser.add_argument('model')
-parser.add_argument('export')
-parser.add_argument('-commit', default="FEATURE: Pushing model from tgen.")
-parser.add_argument('-root', default='~/tgen/src')
-args = parser.parse_args()
+from jobs.push_model_job import PushModelJob
+from server.serializers.job_factory.model_identifier_serializer import ModelIdentifierSerializer
 
-args.root = os.path.expanduser(args.root)
+load_dotenv()
 
-os.environ["DJANGO_SETTINGS_MODULE"] = "server.settings"
-assert os.path.exists(args.root), args.root
-sys.path.append(args.root)
-from models.model_generator import ModelGenerator
-from train.trace_args import TraceArgs
-from train.trace_trainer import TraceTrainer
+ROOT_PATH = os.path.expanduser(os.environ["ROOT_PATH"])
+assert os.path.exists(ROOT_PATH), ROOT_PATH
+sys.path.append(ROOT_PATH)
 
 if __name__ == "__main__":
-    local_model_generator = ModelGenerator(args.model)
-    local_model_generator.auto_class = AutoModel
-    output_dir = os.path.join(args.root, "output", args.export)
-    local_trace_args = TraceArgs(None, None)
-    trace_trainer = TraceTrainer(local_trace_args, model_generator=local_model_generator)
-    trace_trainer.push_to_hub(args.commit)
+    #
+    # IMPORTS
+    #
+    from scripts.base_script import BaseScript
+
+    #
+    # Argument Parsing
+    #
+    parser = argparse.ArgumentParser(
+        prog='PreTrainer',
+        description='Pre-trains a bert model on a directory of documents.')
+    parser.add_argument('model')  # positional argument
+    parser.add_argument('export', help="The model to evaluate.")
+    args = parser.parse_args()
+
+    #
+    # Create Job Data
+    #
+    job_definition = {
+        "modelPath": args.model,
+        "outputDir": args.export,
+        "saveJobOutput": False,
+    }
+    base_script = BaseScript(ModelIdentifierSerializer, PushModelJob)
+    base_script.run(job_definition, path_vars=["modelPath"])

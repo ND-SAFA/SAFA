@@ -4,8 +4,6 @@ import sys
 
 from dotenv import load_dotenv
 
-from models.model_properties import ModelTask
-
 load_dotenv()
 
 ROOT_PATH = os.path.expanduser(os.environ["ROOT_PATH"])
@@ -19,6 +17,7 @@ if __name__ == "__main__":
     from scripts.base_script import BaseScript
     from jobs.mlm_pre_train_job import MLMPreTrainJob
     from server.serializers.job_factory.pre_training_request_serializer import PreTrainingRequestSerializer
+    from models.model_properties import ModelTask
 
     #
     # Argument Parsing

@@ -25,13 +25,14 @@ if __name__ == "__main__":
         prog='PreTrainer',
         description='Pre-trains a bert model on a directory of documents.')
     parser.add_argument('data')  # positional argument
-    parser.add_argument('output')
-    parser.add_argument('-model', help="The model to pre-train", default="roberta-base")
+    parser.add_argument('model', help="The model to evaluate.")
+    parser.add_argument('-output', default=None)
     args = parser.parse_args()
 
     #
     # Create Job Data
     #
+    output = args.output if args.output else args.model
     job_definition = {
         "modelPath": args.model,
         "outputDir": args.output,

@@ -26,8 +26,8 @@ if __name__ == "__main__":
         description='Pre-trains a bert model on a directory of documents.')
     parser.add_argument('data')  # positional argument
     parser.add_argument('output')
-    parser.add_argument('-model', help="The model to pre-train", default="roberta-base")
-    parser.add_argument('-epochs', default=10)
+    parser.add_argument('-model', help="The model to fine-tune.", default="roberta-base")
+    parser.add_argument('-epochs', default=20)
 
     args = parser.parse_args()
 

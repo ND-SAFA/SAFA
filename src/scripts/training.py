@@ -50,5 +50,6 @@ if __name__ == "__main__":
             }
         }
     }
+    os.makedirs(job_definition["outputDir"], exist_ok=True)
     base_script = BaseScript(TrainingRequestSerializer, TrainJob)
     base_script.run(job_definition, path_vars=[["data", "params", "project_path"], "outputDir"])

@@ -45,7 +45,7 @@ if __name__ == "__main__":
         },
         "params": {
             "trace_args_params": {
-                "metrics": ["map_at_k"]
+                "metrics": ["map_at_k", "threshold"]
             }
         }
     }

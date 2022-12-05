@@ -5,6 +5,7 @@ from typing import Type
 from datasets import Metric, list_metrics
 
 from train.metrics.abstract_trace_metric import AbstractTraceMetric
+from train.metrics.calculate_threshold import CalculateThreshold
 from train.metrics.map_at_k_metric import MapAtKMetric
 from train.metrics.mrr_metric import MRRMetric
 from train.metrics.precision_at_k_metric import PrecisionAtKMetric
@@ -16,6 +17,7 @@ class SupportedTraceMetric(Enum):
     MAP_AT_K = MapAtKMetric
     PRECISION_AT_K = PrecisionAtKMetric
     MRR = MRRMetric
+    THRESHOLD = CalculateThreshold
 
 
 def get_metric_path(metric_name: str) -> str:

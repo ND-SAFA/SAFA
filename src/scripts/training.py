@@ -15,7 +15,6 @@ if __name__ == "__main__":
     # IMPORTS
     #
     from scripts.base_script import BaseScript
-    from models.base_models.supported_base_model import SupportedBaseModel
     from jobs.train_job import TrainJob
     from server.serializers.job_factory.training_request_serializer import TrainingRequestSerializer
 
@@ -36,22 +35,20 @@ if __name__ == "__main__":
     # Create Job Data
     #
     job_definition = {
-        "baseModel": SupportedBaseModel.AUTO_MODEL,
         "modelPath": args.model,
         "outputDir": args.output,
         "saveJobOutput": True,
         "data": {
-            "creator": "CSV",
+            "creator": "SAFA",
             "params": {
-                "data_file_path": args.data
+                "project_path": args.data
             },
-            "preProcessingSteps": []
         },
-        "settings": {
+        "params": {
             "trace_args_params": {
                 "num_train_epochs": args.epochs
             }
         }
     }
-    base_script = BaseScript(args, TrainingRequestSerializer, TrainJob)
-    base_script.run(job_definition)
+    base_script = BaseScript(TrainingRequestSerializer, TrainJob)
+    base_script.run(job_definition, path_vars=[["data", "params", "project_path"], "outputDir"])

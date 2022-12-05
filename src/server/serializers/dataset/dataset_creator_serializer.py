@@ -3,13 +3,13 @@ from typing import Dict, Type, Union
 from rest_enumfield import EnumField
 from rest_framework import serializers
 
-from server.serializers.dataset.pre_processing_step_serializer import PreProcessingStepSerializer
-from server.serializers.job_factory.job_factory_converter import JobFactoryConverter
-from server.serializers.serializer_utility import SerializerUtility
 from data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from data.creators.abstract_trace_dataset_creator import AbstractTraceDatasetCreator
 from data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
 from data.creators.supported_dataset_creator import SupportedDatasetCreator
+from server.serializers.dataset.pre_processing_step_serializer import PreProcessingStepSerializer
+from server.serializers.job_factory.job_factory_converter import JobFactoryConverter
+from server.serializers.serializer_utility import SerializerUtility
 
 SupportedDatasets = Union[AbstractTraceDatasetCreator, MLMPreTrainDatasetCreator]
 
@@ -35,7 +35,7 @@ class DatasetCreatorSerializer(serializers.Serializer):
         pre_processing_steps = kwargs.get("data_cleaning_steps", None)
         params = kwargs.get("params", {})
         creator_class: Type[SupportedDatasets] = kwargs["creator"].value
-        return creator_class(pre_processing_steps=pre_processing_steps, **params)
+        return creator_class(data_cleaning_steps=pre_processing_steps, **params)
 
     def update(self, instance, validated_data):
         SerializerUtility.update_error()

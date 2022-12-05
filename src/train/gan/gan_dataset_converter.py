@@ -1,6 +1,6 @@
+import math
 from typing import List, Tuple, Union
 
-import math
 import numpy as np
 import torch
 from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
@@ -10,6 +10,7 @@ from data.datasets.pre_train_dataset import PreTrainDataset
 from data.datasets.trace_dataset import TraceDataset
 from models.model_generator import ModelGenerator
 from train.trace_args import TraceArgs
+from util.file_util import FileUtil
 
 UNLABELED_CLASS = 2
 BINARY_LABEL_LIST = [0, 1, UNLABELED_CLASS]
@@ -175,19 +176,9 @@ class GanDatasetConverter:
         :param pre_training_dataset: The data containing pre-training file.
         :return: List of unlabeled examples.
         """
-        pre_training_file = GanDatasetConverter.read_file(pre_training_dataset.training_file_path)
+        pre_training_file = FileUtil.read_file(pre_training_dataset.training_file_path)
         labeled_examples: List[UnlabeledExample] = []
 
         for line in pre_training_file.split("\n"):  # TODO : remove assumption that file must be separated by newlines
             labeled_examples.append((line, None))
         return labeled_examples
-
-    @staticmethod
-    def read_file(file_path: str) -> str:
-        """
-        Reads file at given path if exists.
-        :param file_path: Path of the file to read.
-        :return: The content of the file.
-        """
-        with open(file_path) as file:
-            return file.read()

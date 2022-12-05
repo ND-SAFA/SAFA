@@ -1,5 +1,5 @@
 import os
-from typing import Dict, List, Type
+from typing import Any, Dict, List, Type
 
 import tensorflow as tf
 from django.core.wsgi import get_wsgi_application
@@ -38,7 +38,7 @@ class BaseScript:
         :return: None
         """
         if path_vars is None:
-            path_vars = ["data"]
+            path_vars = []
         self.assert_path_vars_exists(data, path_vars)
         serializer = self.serializer(data=data)
         assert serializer.is_valid(), serializer.errors
@@ -53,8 +53,29 @@ class BaseScript:
         :return: None
         """
         for path_var in path_vars:
-            if path_var in args:
+            if isinstance(path_var, list):
+                path_value = BaseScript.get_path(path_var, args)
+                path_value = os.path.expanduser(path_value)
+                assert os.path.exists(path_value), path_value
+                BaseScript.set_path(path_var, args, path_value)
+            elif path_var in args:
                 path_value = args[path_var]
                 path_value = os.path.expanduser(path_value)
-                args[path_var] = path_value
                 assert os.path.exists(path_value), path_value
+                args[path_var] = path_value
+
+    @staticmethod
+    def get_path(path: List[str], obj: dict):
+        if len(path) == 0:
+            return obj
+        current_path = path[0]
+        next_paths = path[1:]
+        assert current_path in obj, "Expected %s to exist in %s." % (current_path, obj)
+        return BaseScript.get_path(next_paths, obj[current_path])
+
+    @staticmethod
+    def set_path(path: List[str], obj: dict, value: Any):
+        if len(path) == 1:
+            obj[path[0]] = value
+            return
+        return BaseScript.set_path(path[1:], obj[path[0]], value)

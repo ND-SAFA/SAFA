@@ -6,19 +6,18 @@ import pandas as pd
 
 from config.constants import USE_LINKED_TARGETS_ONLY_DEFAULT
 from data.creators.abstract_trace_dataset_creator import AbstractTraceDatasetCreator
-from data.tree.artifact import Artifact
-from data.formats.safa_format import SafaFormat
 from data.datasets.trace_dataset import TraceDataset
+from data.formats.safa_format import SafaFormat
 from data.processing.abstract_data_processing_step import AbstractDataProcessingStep
+from data.tree.artifact import Artifact
 
 
 class SafaDatasetCreator(AbstractTraceDatasetCreator):
     JSON_EXT = ".json"
     CSV_EXT = ".csv"
-    KEYS = SafaFormat()
 
     def __init__(self, project_path: str, data_cleaning_steps: List[AbstractDataProcessingStep] = None,
-                 data_keys: SafaFormat = KEYS, use_linked_targets_only: bool = USE_LINKED_TARGETS_ONLY_DEFAULT):
+                 use_linked_targets_only: bool = USE_LINKED_TARGETS_ONLY_DEFAULT):
         """
         Creates a data from the SAFA data format.
         :param project_path: the path to the project
@@ -28,7 +27,7 @@ class SafaDatasetCreator(AbstractTraceDatasetCreator):
         """
         super().__init__(data_cleaning_steps, use_linked_targets_only)
         self.project_path = project_path
-        self.keys = data_keys
+        self.keys = SafaFormat(project_path)
 
     def create(self) -> TraceDataset:
         """

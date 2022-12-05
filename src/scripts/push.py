@@ -4,9 +4,6 @@ import sys
 
 from dotenv import load_dotenv
 
-from jobs.push_model_job import PushModelJob
-from server.serializers.job_factory.model_identifier_serializer import ModelIdentifierSerializer
-
 load_dotenv()
 
 ROOT_PATH = os.path.expanduser(os.environ["ROOT_PATH"])
@@ -18,6 +15,8 @@ if __name__ == "__main__":
     # IMPORTS
     #
     from scripts.base_script import BaseScript
+    from jobs.push_model_job import PushModelJob
+    from server.serializers.job_factory.model_identifier_serializer import ModelIdentifierSerializer
 
     #
     # Argument Parsing

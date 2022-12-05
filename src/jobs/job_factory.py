@@ -97,8 +97,6 @@ class JobFactory:
         Creates the trace args from the given data and trace args params
         :return: None
         """
-        if self.trainer_dataset_container is None:
-            raise ValueError("TrainerDatasetCreator is not instantiated in JobFactory.")
         trace_args_params = self.trace_args_params if self.trace_args_params else {}
         self.trace_args = TraceArgs(trainer_dataset_container=self.trainer_dataset_container,
                                     output_dir=self.output_dir,

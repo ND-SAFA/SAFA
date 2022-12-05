@@ -41,4 +41,4 @@ if __name__ == "__main__":
         }
     }
     base_script = BaseScript(ModelIdentifierSerializer, PushModelJob)
-    base_script.run(job_definition, path_vars=["modelPath", "outputDir"])
+    base_script.run(job_definition, path_vars=["modelPath"])

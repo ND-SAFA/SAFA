@@ -1,3 +1,5 @@
+import shutil
+
 from jobs.abstract_trace_job import AbstractTraceJob
 from jobs.components.job_result import JobResult
 
@@ -13,4 +15,5 @@ class PushModelJob(AbstractTraceJob):
         assert hub_path is not None, "Expected hub_path to be defined."
         trainer = self.get_trainer()
         trainer.push_to_hub(hub_path)
+        shutil.rmtree(self.output_dir)
         return JobResult.from_dict({JobResult.MODEL_PATH: self.output_dir})

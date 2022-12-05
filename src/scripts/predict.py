@@ -35,7 +35,7 @@ if __name__ == "__main__":
     output = args.output if args.output else args.model
     job_definition = {
         "modelPath": args.model,
-        "outputDir": args.output,
+        "outputDir": output,
         "saveJobOutput": True,
         "data": {
             "creator": "SAFA",

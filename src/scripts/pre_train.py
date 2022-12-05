@@ -4,6 +4,8 @@ import sys
 
 from dotenv import load_dotenv
 
+from models.model_properties import ModelTask
+
 load_dotenv()
 
 ROOT_PATH = os.path.expanduser(os.environ["ROOT_PATH"])
@@ -15,7 +17,6 @@ if __name__ == "__main__":
     # IMPORTS
     #
     from scripts.base_script import BaseScript
-    from models.base_models.supported_base_model import SupportedBaseModel
     from jobs.mlm_pre_train_job import MLMPreTrainJob
     from server.serializers.job_factory.pre_training_request_serializer import PreTrainingRequestSerializer
 
@@ -33,7 +34,7 @@ if __name__ == "__main__":
     # Job Data Creation
     #
     job_definition = {
-        "baseModel": SupportedBaseModel.BERT_FOR_MASKED_LM,
+        "modelTask": ModelTask.MASKED_LEARNING,
         "modelPath": "roberta-base",
         "trainingDataDir": args.data,
         "outputDir": args.output,
@@ -42,5 +43,5 @@ if __name__ == "__main__":
     #
     # Run Job
     #
-    base_script = BaseScript(args, PreTrainingRequestSerializer, MLMPreTrainJob)
-    base_script.run(job_definition)
+    base_script = BaseScript(PreTrainingRequestSerializer, MLMPreTrainJob)
+    base_script.run(job_definition, path_vars=["trainingDataDir"])

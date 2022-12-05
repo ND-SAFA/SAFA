@@ -16,7 +16,6 @@ args.root = os.path.expanduser(args.root)
 os.environ["DJANGO_SETTINGS_MODULE"] = "server.settings"
 assert os.path.exists(args.root), args.root
 sys.path.append(args.root)
-from models.base_models.supported_base_model import SupportedBaseModel
 from models.model_generator import ModelGenerator
 from train.trace_args import TraceArgs
 from train.trace_trainer import TraceTrainer

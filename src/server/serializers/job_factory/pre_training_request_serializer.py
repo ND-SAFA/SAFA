@@ -2,14 +2,14 @@ from typing import Dict
 
 from rest_framework import serializers
 
+from data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
+from data.datasets.dataset_role import DatasetRole
+from data.datasets.trainer_datasets_container import TrainerDatasetsContainer
 from jobs.job_factory import JobFactory
 from server.serializers.dataset.pre_processing_step_serializer import PreProcessingStepSerializer
 from server.serializers.job_factory.job_factory_converter import JobFactoryConverter
 from server.serializers.job_factory.model_identifier_serializer import ModelIdentifierSerializer
 from server.serializers.serializer_utility import SerializerUtility
-from data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
-from data.datasets.dataset_role import DatasetRole
-from data.datasets.trainer_datasets_container import TrainerDatasetsContainer
 
 
 class PreTrainingRequestSerializer(ModelIdentifierSerializer):
@@ -23,7 +23,7 @@ class PreTrainingRequestSerializer(ModelIdentifierSerializer):
                                                      many=True,
                                                      source="data_cleaning_steps",
                                                      required=False)
-    params = serializers.DictField(help_text="Arguments for passed into hugging face trainer.")
+    params = serializers.DictField(help_text="Arguments for passed into hugging face trainer.", required=False)
 
     def create(self, validated_data: Dict) -> JobFactory:
         kwargs = SerializerUtility.create_children_serializers(validated_data, self.fields.fields)

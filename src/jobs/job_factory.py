@@ -3,12 +3,11 @@ from dataclasses import dataclass, field
 from typing import Callable, Dict, Type
 
 from config.constants import SAVE_OUTPUT_DEFAULT
+from data.datasets.trainer_datasets_container import TrainerDatasetsContainer
 from jobs.abstract_job import AbstractJob
 from jobs.abstract_trace_job import AbstractTraceJob
 from jobs.components.job_args import JobArgs
-from data.datasets.trainer_datasets_container import TrainerDatasetsContainer
-from models.base_models.supported_base_model import SupportedBaseModel
-from models.model_properties import ModelArchitectureType
+from models.model_properties import ModelArchitectureType, ModelTask
 from train.trace_args import TraceArgs
 from util.reflection_util import ReflectionUtil
 
@@ -27,6 +26,10 @@ class JobFactory:
     The model used to load the architecture.
     """
     model_architecture: ModelArchitectureType = None
+    """
+    Defines the task architecture.
+    """
+    model_task: ModelTask = None
     """
     Container for data used for any training, prediction, or evaluation.
     """

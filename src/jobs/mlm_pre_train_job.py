@@ -3,16 +3,16 @@ import os
 from transformers import DataCollatorForLanguageModeling
 
 from config.constants import MLM_PROBABILITY_DEFAULT
+from data.datasets.dataset_role import DatasetRole
+from data.datasets.pre_train_dataset import PreTrainDataset
 from jobs.components.job_args import JobArgs
 from jobs.components.job_result import JobResult
 from jobs.train_job import TrainJob
-from data.datasets.dataset_role import DatasetRole
-from data.datasets.pre_train_dataset import PreTrainDataset
 
 
 class MLMPreTrainJob(TrainJob):
 
-    def __init__(self, job_args: JobArgs, mlm_probability: float = MLM_PROBABILITY_DEFAULT):
+    def __init__(self, job_args: JobArgs, mlm_probability: float = MLM_PROBABILITY_DEFAULT, **kwargs):
         """
         The base job class for tracing jobs
         :param mlm_probability: the probability for the masking a word in the learning model

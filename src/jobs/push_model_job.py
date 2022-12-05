@@ -12,6 +12,7 @@ class PushModelJob(AbstractTraceJob):
         :return: the model path
         """
         hub_path = self.job_args.hub_path
+        shutil.rmtree(self.output_dir)
         assert hub_path is not None, "Expected hub_path to be defined."
         trainer = self.get_trainer()
         trainer.push_to_hub(hub_path)

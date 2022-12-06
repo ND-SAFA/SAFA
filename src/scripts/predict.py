@@ -50,4 +50,4 @@ if __name__ == "__main__":
         }
     }
     base_script = BaseScript(PredictionRequestSerializer, PredictJob)
-    base_script.run(job_definition, path_vars=[["data", "params", "project_path"]])
+    base_script.run(job_definition, path_vars=[["data", "params", "project_path"], "modelPath"])

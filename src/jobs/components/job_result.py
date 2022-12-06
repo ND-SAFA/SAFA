@@ -72,12 +72,13 @@ class JobResult:
         self.__result.update(other_result)
         return self
 
-    def to_json(self) -> str:
+    def to_json(self, key: str = None) -> str:
         """
         Returns the job output as json
         :return: the output as json
         """
-        return json.dumps(self.__result, indent=4, cls=NpEncoder)
+        obj = self.__result[key] if key else self.__result
+        return json.dumps(obj, indent=4, cls=NpEncoder)
 
     def as_dict(self) -> dict:
         """

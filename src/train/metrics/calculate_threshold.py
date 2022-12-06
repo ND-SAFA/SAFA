@@ -27,7 +27,7 @@ class CalculateThreshold(AbstractTraceMetric):
     UPPER_RECALL_THRESHOLD = .95
 
     # TODO
-    def _perform_compute(self, predictions, labels, k=K_METRIC_DEFAULT, **kwargs) -> float:
+    def _compute(self, predictions, references, k=K_METRIC_DEFAULT, **kwargs) -> float:
         """
         computes the Mean Average Precision@K or the average precision over k for recommendations shown for different links
          and averages them over all queries in the dataset.
@@ -37,7 +37,7 @@ class CalculateThreshold(AbstractTraceMetric):
         :param kwargs: any other necessary params
         :return: Mean Average Precision@K score.
         """
-        precisions, recalls, thresholds = precision_recall_curve(labels, predictions)
+        precisions, recalls, thresholds = precision_recall_curve(references, predictions)
 
         max_precision = 0
         threshold = None
@@ -46,7 +46,7 @@ class CalculateThreshold(AbstractTraceMetric):
             p = precisions[index]
             r = recalls[index]
             if r >= self.UPPER_RECALL_THRESHOLD and p > max_precision:
-                print("(T, P, R)", "(%s, %s, %s)" % (t, p, r))
+                print("(Threshold, Precision, Recall)", "(%s, %s, %s)" % (t, p, r))
                 threshold = t
 
         if threshold is None:

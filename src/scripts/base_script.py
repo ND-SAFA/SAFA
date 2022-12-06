@@ -45,6 +45,7 @@ class BaseScript:
         job_factory: JobFactory = serializer.save()
         job = job_factory.build(self.job)
         job.run()
+        print(job.result.to_json("metrics"))
 
     @staticmethod
     def assert_path_vars_exists(args: Dict, path_vars: List[str]):

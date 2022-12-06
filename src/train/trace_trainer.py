@@ -42,7 +42,6 @@ class TraceTrainer(Trainer):
         :return: a dictionary containing the results
         """
         self.train_dataset = self.dataset_container[DatasetRole.TRAIN].to_trainer_dataset(self.model_generator)
-        print("# of examples:", len(self.train_dataset))
         if DatasetRole.VAL in self.dataset_container:
             self.eval_dataset = self.dataset_container[DatasetRole.VAL].to_trainer_dataset(self.model_generator)
         output = self.train(resume_from_checkpoint=checkpoint)

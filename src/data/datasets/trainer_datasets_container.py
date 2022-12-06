@@ -32,7 +32,6 @@ class TrainerDatasetsContainer:
                                    DatasetRole.TRAIN: train_dataset_creator,
                                    DatasetRole.VAL: val_dataset_creator, DatasetRole.EVAL: eval_dataset_creator}
         self.__datasets = self._create_datasets_from_creators(self.__dataset_creators)
-        print("Original length:", len(self[DatasetRole.TRAIN]))
         self._prepare_datasets(augmentation_steps)
 
     def get_creator(self, dataset_role: DatasetRole) -> AbstractDatasetCreator:

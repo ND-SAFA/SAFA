@@ -45,4 +45,4 @@ if __name__ == "__main__":
     os.makedirs(output_dir)
     base_script = BaseScript(ModelIdentifierSerializer, PushModelJob)
     base_script.run(job_definition, path_vars=["modelPath", output_dir])
-    shutil.rmtree(output_dir)
+    shutil.rmtree(args.repo)

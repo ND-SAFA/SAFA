@@ -35,7 +35,29 @@ class PrecisionAtKMetric(AbstractTraceMetric):
         :return: Precision@K score.
         """
         predicted_labels = [1 if p >= k else 0 for p in predictions]
+        print(self.count_errors(references, predicted_labels))
         return precision_score(references, predicted_labels)
+
+    @staticmethod
+    def count_errors(y_true, y_pred):
+        errors = {
+            "tp": 0,
+            "tn": 0,
+            "fn": 0,
+            "fp": 0,
+        }
+        for label, pred in zip(y_true, y_pred):
+            if label == pred:
+                if label == 1:
+                    errors["tp"] += 1
+                else:
+                    errors["tn"] += 1
+            else:
+                if label == 1:
+                    errors["fn"] += 1
+                else:
+                    errors["fp"] += 1
+        return errors
 
     def _info(self) -> datasets.MetricInfo:
         """

@@ -21,7 +21,7 @@ class ModelGenerator:
         Handles loading model and related functions
         :param model_path: the path to the saved model
         """
-
+        print("Model Path:", model_path)
         self.__tokenizer: Optional[AutoTokenizer] = None
         self.__model: Optional[PreTrainedModel] = None
         self.model_path = model_path
@@ -80,7 +80,7 @@ class ModelGenerator:
         :return: the Tokenizer
         """
         if self.__tokenizer is None:
-            self.__tokenizer = AutoTokenizer.from_pretrained(self.model_path)
+            self.__tokenizer = AutoTokenizer.from_pretrained(self.model_path, force_download=True)
         return self.__tokenizer
 
     def set_max_seq_length(self, max_seq_length: int) -> None:

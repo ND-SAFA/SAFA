@@ -16,6 +16,10 @@ export interface GenerationModel {
    * The base model that is being extended.
    */
   baseModel: ModelType;
+  /**
+   * The logged steps of training on this model.
+   */
+  steps?: TrainingStepModel[];
 }
 
 /**

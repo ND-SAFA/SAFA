@@ -1,4 +1,9 @@
 import { ArtifactModel, ProjectModel, TraceLinkModel } from "@/types";
+import {
+  ENABLED_FEATURES,
+  EXAMPLE_ATTRIBUTE_LAYOUTS,
+  EXAMPLE_ATTRIBUTES,
+} from "@/util";
 import { Endpoint, fillEndpoint, authHttpClient } from "@/api/util";
 
 /**
@@ -10,10 +15,17 @@ import { Endpoint, fillEndpoint, authHttpClient } from "@/api/util";
 export async function getProjectVersion(
   versionId: string
 ): Promise<ProjectModel> {
-  return authHttpClient<ProjectModel>(
+  const project = await authHttpClient<ProjectModel>(
     fillEndpoint(Endpoint.projectVersion, { versionId }),
     { method: "GET" }
   );
+
+  if (ENABLED_FEATURES.EXAMPLE_ATTRIBUTES) {
+    project.attributes = EXAMPLE_ATTRIBUTES;
+    project.attributeLayouts = EXAMPLE_ATTRIBUTE_LAYOUTS;
+  }
+
+  return project;
 }
 
 /**

@@ -21,64 +21,10 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { GenerationModel, TrainingStepModel } from "@/types";
+import { ENABLED_FEATURES, EXAMPLE_TRAINING_STEPS } from "@/util";
 import { Typography } from "@/components/common";
 import ModelTrainingStep from "./ModelTrainingStep.vue";
 import ModelTrainingCreator from "./ModelTrainingCreator.vue";
-
-// const exampleSteps = [
-//   {
-//     type: "document",
-//     updatedAt: new Date(Date.now()).toISOString(),
-//     status: "Completed",
-//     keywords: [],
-//     documents: [
-//       {
-//         name: "BOSCH Automotive Handbook.pdf",
-//         url: "https://path-to-gcp-bucket-file",
-//       },
-//     ],
-//     repositories: [],
-//     projects: [],
-//   },
-//   {
-//     type: "repository",
-//     updatedAt: new Date(Date.now()).toISOString(),
-//     status: "Completed",
-//     keywords: [],
-//     documents: [],
-//     repositories: [
-//       {
-//         name: "organization/my-project",
-//         url: "https://path-to-git-hub-repo",
-//       },
-//     ],
-//     projects: [],
-//   },
-//   {
-//     type: "project",
-//     updatedAt: new Date(Date.now()).toISOString(),
-//     status: "In Progress",
-//     keywords: [],
-//     documents: [],
-//     repositories: [],
-//     projects: [
-//       {
-//         id: "123",
-//         name: "My Project",
-//         levels: [
-//           {
-//             source: "Designs",
-//             target: "Designs",
-//           },
-//           {
-//             source: "Designs",
-//             target: "Requirements",
-//           },
-//         ],
-//       },
-//     ],
-//   },
-// ] as TrainingStepModel[];
 
 /**
  * Displays logs of the model's training process,
@@ -98,8 +44,13 @@ export default Vue.extend({
     },
   },
   computed: {
+    /**
+     * @return The logged steps of model training.
+     */
     steps(): TrainingStepModel[] {
-      return [];
+      return ENABLED_FEATURES.EXAMPLE_TRAINING_STEPS
+        ? EXAMPLE_TRAINING_STEPS
+        : this.model.steps || [];
     },
   },
 });

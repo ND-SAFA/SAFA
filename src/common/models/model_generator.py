@@ -63,7 +63,7 @@ class ModelGenerator:
         """
         config = AutoConfig.from_pretrained(self.model_path)
         config.num_labels = 2
-        return self.base_model_class.from_pretrained(self.model_path, config=config)
+        return self.base_model_class.from_pretrained(self.model_path, config=config, force_download=True)
 
     def get_model(self) -> PreTrainedModel:
         """

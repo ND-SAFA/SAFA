@@ -1,5 +1,6 @@
 import argparse
 import os
+import shutil
 import sys
 
 from dotenv import load_dotenv
@@ -25,20 +26,23 @@ if __name__ == "__main__":
         prog='PreTrainer',
         description='Pre-trains a bert model on a directory of documents.')
     parser.add_argument('model')  # positional argument
-    parser.add_argument('repo')
+    parser.add_argument('repo', default="~/repos")
     parser.add_argument('export', help="The model to evaluate.")
     args = parser.parse_args()
 
     #
     # Create Job Data
     #
+    output_dir = os.path.join(args.repo, args.export)
     job_definition = {
         "modelPath": args.model,
-        "outputDir": os.path.join(args.repo, args.export),
+        "outputDir": output_dir,
         "saveJobOutput": False,
         "params": {
             "hub_path": args.export
         }
     }
+    os.makedirs(output_dir)
     base_script = BaseScript(ModelIdentifierSerializer, PushModelJob)
-    base_script.run(job_definition, path_vars=["modelPath"])
+    base_script.run(job_definition, path_vars=["modelPath", output_dir])
+    shutil.rmtree(output_dir)

@@ -35,9 +35,6 @@ class PrecisionAtKMetric(AbstractTraceMetric):
         :return: Precision@K score.
         """
         predicted_labels = [1 if p >= k else 0 for p in predictions]
-        print(predictions)
-        print(predicted_labels)
-        print(references)
         return precision_score(references, predicted_labels)
 
     def _info(self) -> datasets.MetricInfo:

@@ -9,7 +9,3 @@ class AugmentationStep(Enum):
     SIMPLE_WORD_REPLACEMENT = SimpleWordReplacementStep
     RESAMPLE = ResampleStep
     SOURCE_TARGET_SWAP = SourceTargetSwapStep
-
-    def get_step_attributes(self):
-        for step_class in AugmentationStep:
-            step_attributes = dir(step_class)

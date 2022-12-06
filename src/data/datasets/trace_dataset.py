@@ -134,6 +134,8 @@ class TraceDataset(AbstractDataset):
             if augmentation_steps:
                 self.augment_pos_links(augmentation_steps)
             self.resize_neg_links(len(self.pos_link_ids), include_duplicates=True)
+            print("# Pos:", len(self.pos_link_ids))
+            print("# Neg:", len(self.neg_link_ids))
 
     def prepare_for_testing(self) -> None:
         """

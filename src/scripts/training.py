@@ -44,6 +44,14 @@ if __name__ == "__main__":
                 "project_path": args.data
             },
         },
+        "augmentationSteps": [
+            {
+                "creator": "RESAMPLE",
+                "params": {
+                    "resample_rate": 1
+                }
+            }
+        ],
         "params": {
             "trace_args_params": {
                 "num_train_epochs": int(args.epochs)

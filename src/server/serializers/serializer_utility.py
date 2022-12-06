@@ -14,8 +14,8 @@ class SerializerUtility:
     """
 
     @staticmethod
-    def wrap_property_with_trainer_dataset_container(kwargs: Dict, container_param: str, dataset_param: str = "data",
-                                                     export_param: str = "trainer_dataset_container"):
+    def serialize_trainer_dataset_container(kwargs: Dict, container_param: str, dataset_param: str = "data",
+                                            export_param: str = "trainer_dataset_container", **addition_kwargs):
         """
         Reads dataset from kwargs and wraps it in a trainer dataset container.
         :param kwargs: The kwargs to extract dataset from.
@@ -26,7 +26,7 @@ class SerializerUtility:
         """
         dataset_creator: AbstractDatasetCreator = kwargs.pop(dataset_param)
         container_kwargs = {container_param: dataset_creator}
-        trainer_datasets_container = TrainerDatasetsContainer(**container_kwargs)
+        trainer_datasets_container = TrainerDatasetsContainer(**container_kwargs, **addition_kwargs)
         kwargs[export_param] = trainer_datasets_container
 
     @staticmethod

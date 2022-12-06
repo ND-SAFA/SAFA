@@ -2,7 +2,7 @@
   <div>
     <v-row class="my-1" v-if="!showOnly">
       <v-col cols="6">
-        <generic-artifact-body-display
+        <artifact-body-display
           :artifact="sourceArtifact"
           display-title
           display-divider
@@ -12,7 +12,7 @@
       <v-divider vertical inset />
 
       <v-col cols="6">
-        <generic-artifact-body-display
+        <artifact-body-display
           :artifact="targetArtifact"
           display-title
           display-divider
@@ -44,7 +44,7 @@ export default Vue.extend({
   name: "TraceLinkDisplay",
   components: {
     Typography,
-    GenericArtifactBodyDisplay: ArtifactBodyDisplay,
+    ArtifactBodyDisplay,
   },
   props: {
     link: {

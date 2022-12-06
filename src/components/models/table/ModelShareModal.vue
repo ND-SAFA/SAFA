@@ -1,5 +1,5 @@
 <template>
-  <generic-modal :is-open="!!isOpen" title="Share Model" @close="handleClose">
+  <modal :is-open="!!isOpen" title="Share Model" @close="handleClose">
     <template v-slot:body>
       <flex-box column t="4">
         <project-input v-model="projectId" exclude-current-project />
@@ -20,7 +20,7 @@
         Share
       </v-btn>
     </template>
-  </generic-modal>
+  </modal>
 </template>
 
 <script lang="ts">
@@ -33,7 +33,7 @@ import {
 import { modelShareOptions } from "@/util";
 import { projectStore } from "@/hooks";
 import { handleShareModel } from "@/api";
-import { FlexBox, GenericModal, ProjectInput } from "@/components/common";
+import { FlexBox, Modal, ProjectInput } from "@/components/common";
 
 /**
  * A modal for sharing models.
@@ -44,7 +44,7 @@ export default Vue.extend({
   name: "ModelShareModal",
   components: {
     ProjectInput,
-    GenericModal,
+    Modal,
     FlexBox,
   },
   props: {

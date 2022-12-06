@@ -8,7 +8,7 @@
   >
     <flex-box v-if="sidebarOpen" full-width justify="center" t="3" b="3">
       <safa-icon variant="primary" style="width: 180px" />
-      <generic-icon-button
+      <icon-button
         large
         icon-id="mdi-menu-open"
         tooltip="Close sidebar"
@@ -18,7 +18,7 @@
       />
     </flex-box>
     <flex-box justify="center" full-width v-else t="2">
-      <generic-icon-button
+      <icon-button
         large
         icon-id="mdi-menu-open"
         tooltip="Open sidebar"
@@ -37,7 +37,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { appStore } from "@/hooks";
-import { FlexBox, GenericIconButton, SafaIcon } from "@/components/common";
+import { FlexBox, IconButton, SafaIcon } from "@/components/common";
 import NavOptions from "./NavOptions.vue";
 import NavAccount from "./NavAccount.vue";
 
@@ -50,7 +50,7 @@ export default Vue.extend({
     NavOptions,
     NavAccount,
     FlexBox,
-    GenericIconButton,
+    IconButton,
     SafaIcon,
   },
   computed: {

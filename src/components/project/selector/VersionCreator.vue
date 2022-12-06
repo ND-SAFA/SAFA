@@ -1,5 +1,5 @@
 <template>
-  <generic-modal
+  <modal
     :title="`Current Version: ${version}`"
     size="xs"
     :is-open="isOpen"
@@ -48,7 +48,7 @@
         </v-row>
       </v-container>
     </template>
-  </generic-modal>
+  </modal>
 </template>
 
 <script lang="ts">
@@ -56,7 +56,7 @@ import Vue, { PropType } from "vue";
 import { IdentifierSchema, VersionSchema, VersionType } from "@/types";
 import { versionToString } from "@/util";
 import { getCurrentVersion, handleCreateVersion } from "@/api";
-import { GenericModal } from "@/components/common";
+import { Modal } from "@/components/common";
 
 /**
  * A modal for creating new versions.
@@ -67,7 +67,7 @@ import { GenericModal } from "@/components/common";
 export default Vue.extend({
   name: "VersionCreator",
   components: {
-    GenericModal,
+    Modal,
   },
   props: {
     isOpen: {

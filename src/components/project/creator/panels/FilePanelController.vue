@@ -15,10 +15,7 @@
     </template>
 
     <template v-slot:before-rows v-if="isTracePanel">
-      <generic-switch
-        v-model="isGeneratedToggle"
-        label="Generate Trace Links"
-      />
+      <switch-input v-model="isGeneratedToggle" label="Generate Trace Links" />
       <gen-method-input v-if="isGeneratedToggle" v-model="method" />
     </template>
   </file-panel>
@@ -28,12 +25,12 @@
 import Vue, { PropType } from "vue";
 import {
   ArtifactMap,
-  IGenericFilePanel,
+  ParseFilePanel,
   ModelType,
   ValidFileTypes,
 } from "@/types";
 import { isTracePanel } from "@/util";
-import { GenericSwitch, GenMethodInput, Typography } from "@/components/common";
+import { SwitchInput, GenMethodInput, Typography } from "@/components/common";
 import FilePanel from "./FilePanel.vue";
 
 /**
@@ -46,7 +43,7 @@ export default Vue.extend({
   name: "FilePanelController",
   components: {
     GenMethodInput,
-    GenericSwitch,
+    SwitchInput,
     FilePanel,
     Typography,
   },
@@ -56,7 +53,7 @@ export default Vue.extend({
       required: true,
     },
     panel: {
-      type: Object as PropType<IGenericFilePanel<ArtifactMap, ValidFileTypes>>,
+      type: Object as PropType<ParseFilePanel<ArtifactMap, ValidFileTypes>>,
       required: true,
     },
   },

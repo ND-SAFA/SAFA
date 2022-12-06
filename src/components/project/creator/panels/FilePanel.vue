@@ -20,7 +20,7 @@
       />
 
       <flex-box justify="space-between" align="center">
-        <generic-switch
+        <switch-input
           v-if="showFileUploader"
           v-model="ignoreErrors"
           label="Ignore Errors"
@@ -87,7 +87,7 @@
 import Vue, { PropType } from "vue";
 import { logStore } from "@/hooks";
 import {
-  GenericSwitch,
+  SwitchInput,
   FileInput,
   Typography,
   FlexBox,
@@ -108,7 +108,7 @@ export default Vue.extend({
   components: {
     FlexBox,
     Typography,
-    GenericSwitch,
+    SwitchInput,
     FileInput,
   },
   props: {

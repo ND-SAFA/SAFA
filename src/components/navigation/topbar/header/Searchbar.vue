@@ -34,7 +34,7 @@
         </flex-box>
       </template>
       <template v-slot:item="{ item }">
-        <generic-artifact-body-display
+        <artifact-body-display
           display-title
           :artifact="item"
           data-cy="text-artifact-search-item"
@@ -59,7 +59,7 @@ export default Vue.extend({
   components: {
     FlexBox,
     Typography,
-    GenericArtifactBodyDisplay: ArtifactBodyDisplay,
+    ArtifactBodyDisplay,
   },
   data() {
     return {

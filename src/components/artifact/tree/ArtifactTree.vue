@@ -1,5 +1,5 @@
 <template>
-  <generic-cytoscape-controller
+  <cytoscape-controller
     id="cytoscape-artifact"
     :cyto-core-graph="cytoCoreGraph"
     :class="className"
@@ -13,7 +13,7 @@
         :hidden="isArtifactHidden(artifact.id)"
         :faded="isArtifactFaded(artifact.id)"
       />
-      <generic-graph-link
+      <graph-link
         v-for="traceLink in traceLinks"
         :key="traceLink.traceLinkId"
         :trace-definition="traceLink"
@@ -21,14 +21,14 @@
         @click:right="handleLinkRightClick"
         graph="artifact"
       />
-      <generic-graph-link
+      <graph-link
         v-for="traceLink in subtreeLinks"
         :key="traceLink.traceLinkId"
         :trace-definition="traceLink"
         graph="artifact"
       />
     </template>
-  </generic-cytoscape-controller>
+  </cytoscape-controller>
 </template>
 
 <script lang="ts">
@@ -47,18 +47,15 @@ import {
 } from "@/hooks";
 import { Routes } from "@/router";
 import { artifactTreeGraph, cyResetTree } from "@/cytoscape";
-import {
-  GenericGraphLink,
-  GenericCytoscapeController,
-} from "@/components/common";
+import { GraphLink, CytoscapeController } from "@/components/common";
 import ArtifactNode from "./ArtifactNode.vue";
 
 export default Vue.extend({
   name: "ArtifactTree",
   components: {
     ArtifactNode,
-    GenericGraphLink,
-    GenericCytoscapeController,
+    GraphLink,
+    CytoscapeController,
   },
   data() {
     return {

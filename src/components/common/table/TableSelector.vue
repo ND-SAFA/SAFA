@@ -32,7 +32,7 @@
           prepend-inner-icon="mdi-magnify"
           data-cy="input-selector-search"
         />
-        <generic-icon-button
+        <icon-button
           tooltip="Refresh"
           icon-id="mdi-refresh"
           data-cy="button-selector-reload"
@@ -43,14 +43,14 @@
     <template v-slot:[`item.actions`]="{ item }">
       <flex-box>
         <slot name="item.actions" :item="item" />
-        <generic-icon-button
+        <icon-button
           v-if="hasEdit"
           icon-id="mdi-pencil"
           tooltip="Edit"
           data-cy="button-selector-edit"
           @click="$emit('item:edit', item)"
         />
-        <generic-icon-button
+        <icon-button
           v-if="isDeleteEnabled(item)"
           icon-id="mdi-delete"
           tooltip="Delete"
@@ -61,7 +61,7 @@
     </template>
     <template v-slot:[`footer.prepend`]>
       <div class="py-3">
-        <generic-icon-button
+        <icon-button
           v-if="!minimal && hasAdd"
           fab
           color="primary"
@@ -84,7 +84,7 @@
 import Vue, { PropType } from "vue";
 import { DataTableHeader } from "vuetify";
 import { FlexBox } from "@/components/common/layout";
-import { GenericIconButton } from "@/components/common/button";
+import { IconButton } from "@/components/common/button";
 
 /**
  * Displays a generic selector.
@@ -96,8 +96,8 @@ import { GenericIconButton } from "@/components/common/button";
  * @emits-5 `item:add` - On add item.
  */
 export default Vue.extend({
-  name: "GenericSelector",
-  components: { FlexBox, GenericIconButton },
+  name: "TableSelector",
+  components: { FlexBox, IconButton },
   props: {
     headers: {
       type: Array as PropType<DataTableHeader[]>,

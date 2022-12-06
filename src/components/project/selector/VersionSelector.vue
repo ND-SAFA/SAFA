@@ -1,5 +1,5 @@
 <template>
-  <generic-selector
+  <table-selector
     v-if="this.isOpen"
     item-key="versionId"
     no-data-text="Project contains no versions"
@@ -34,7 +34,7 @@
         @confirm="handleConfirmDeleteVersion"
       />
     </template>
-  </generic-selector>
+  </table-selector>
 </template>
 
 <script lang="ts">
@@ -42,7 +42,7 @@ import Vue, { PropType } from "vue";
 import { IdentifierSchema, VersionSchema, DataItem } from "@/types";
 import { projectStore, sessionStore } from "@/hooks";
 import { getProjectVersions, handleDeleteVersion } from "@/api";
-import { GenericSelector } from "@/components/common";
+import { TableSelector } from "@/components/common";
 import { ConfirmVersionDelete } from "../base";
 import VersionCreator from "./VersionCreator.vue";
 
@@ -56,7 +56,11 @@ import VersionCreator from "./VersionCreator.vue";
  */
 export default Vue.extend({
   name: "VersionSelector",
-  components: { GenericSelector, VersionCreator, ConfirmVersionDelete },
+  components: {
+    TableSelector,
+    VersionCreator,
+    ConfirmVersionDelete,
+  },
   props: {
     /**
      * Whether this component is currently in view. If within

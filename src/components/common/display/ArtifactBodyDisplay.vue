@@ -30,7 +30,7 @@ import Typography from "./Typography.vue";
  * Displays the body of an artifact that can be expanded.
  */
 export default Vue.extend({
-  name: "GenericArtifactBodyDisplay",
+  name: "ArtifactBodyDisplay",
   components: { AttributeChip, FlexBox, Typography },
   props: {
     artifact: {

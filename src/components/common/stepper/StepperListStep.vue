@@ -30,7 +30,7 @@ import { Typography } from "@/components/common/display";
  * Presents a list in a stepper workflow for item selection.
  */
 export default Vue.extend({
-  name: "GenericStepperListStep",
+  name: "StepperListStep",
   components: { Typography },
   props: {
     title: {

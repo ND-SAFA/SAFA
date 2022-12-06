@@ -1,7 +1,7 @@
 <template>
   <flex-box>
     <template v-for="definition in changeButtons">
-      <generic-icon-button
+      <icon-button
         v-if="definition.handler"
         :key="definition.label"
         :color="color"
@@ -21,13 +21,13 @@ import { ButtonDefinition, ButtonType } from "@/types";
 import { commitStore } from "@/hooks";
 import { redoCommit, undoCommit } from "@/api";
 import { FlexBox } from "@/components/common/layout";
-import GenericIconButton from "./GenericIconButton.vue";
+import IconButton from "./IconButton.vue";
 
 export default Vue.extend({
   name: "CommitButtons",
   components: {
     FlexBox,
-    GenericIconButton,
+    IconButton,
   },
   props: {
     color: {

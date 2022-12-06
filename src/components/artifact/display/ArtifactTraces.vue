@@ -16,10 +16,10 @@
             @click="handleArtifactClick(parent.name)"
           >
             <v-list-item-title>
-              <generic-artifact-body-display display-title :artifact="parent" />
+              <artifact-body-display display-title :artifact="parent" />
             </v-list-item-title>
             <v-list-item-action @click.stop="">
-              <generic-icon-button
+              <icon-button
                 icon-id="mdi-ray-start-end"
                 tooltip="View Trace Link"
                 data-cy="button-selected-parent-link"
@@ -46,10 +46,10 @@
             @click="handleArtifactClick(child.name)"
           >
             <v-list-item-title>
-              <generic-artifact-body-display display-title :artifact="child" />
+              <artifact-body-display display-title :artifact="child" />
             </v-list-item-title>
             <v-list-item-action @click.stop="">
-              <generic-icon-button
+              <icon-button
                 icon-id="mdi-ray-start-end"
                 tooltip="View Trace Link"
                 data-cy="button-selected-child-link"
@@ -74,7 +74,7 @@ import {
 } from "@/hooks";
 import {
   Typography,
-  GenericIconButton,
+  IconButton,
   PanelCard,
   ArtifactBodyDisplay,
 } from "@/components/common";
@@ -85,9 +85,9 @@ import {
 export default Vue.extend({
   name: "ArtifactTraces",
   components: {
-    GenericArtifactBodyDisplay: ArtifactBodyDisplay,
+    ArtifactBodyDisplay,
     PanelCard,
-    GenericIconButton,
+    IconButton,
     Typography,
   },
   computed: {

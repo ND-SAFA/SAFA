@@ -20,7 +20,7 @@ import { deltaStore } from "@/hooks";
  * @emits `click:right` - On right click.
  */
 export default Vue.extend({
-  name: "TraceLink",
+  name: "GraphLink",
   props: {
     traceDefinition: {
       type: Object as PropType<TraceLinkSchema>,

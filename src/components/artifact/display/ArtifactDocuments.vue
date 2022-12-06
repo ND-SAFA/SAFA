@@ -6,7 +6,7 @@
     <v-list>
       <template v-for="(doc, idx) in documents">
         <v-divider :key="doc.documentId + '-div'" v-if="idx !== 0" />
-        <generic-list-item
+        <list-item
           :key="doc.documentId"
           :item="{ title: doc.name, subtitle: documentTypeName(doc.type) }"
           @click="handleSwitchDocument(doc)"
@@ -22,14 +22,14 @@ import { DocumentSchema } from "@/types";
 import { documentTypeOptions } from "@/util";
 import { documentStore, selectionStore } from "@/hooks";
 import { handleSwitchDocuments } from "@/api";
-import { Typography, GenericListItem, PanelCard } from "@/components/common";
+import { Typography, ListItem, PanelCard } from "@/components/common";
 
 /**
  * Displays the selected node's documents.
  */
 export default Vue.extend({
   name: "ArtifactDocuments",
-  components: { PanelCard, Typography, GenericListItem },
+  components: { PanelCard, Typography, ListItem },
   computed: {
     /**
      * @return The selected artifact.

@@ -1,5 +1,5 @@
 <template>
-  <generic-selector
+  <table-selector
     :headers="headers"
     :items="projects"
     :is-open="isOpen"
@@ -30,7 +30,7 @@
         @cancel="handleCancelDeleteProject"
       />
     </template>
-  </generic-selector>
+  </table-selector>
 </template>
 
 <script lang="ts">
@@ -42,7 +42,7 @@ import {
   handleGetProjects,
   handleSaveProject,
 } from "@/api";
-import { GenericSelector } from "@/components/common";
+import { TableSelector } from "@/components/common";
 import { ConfirmProjectDelete, ProjectIdentifierModal } from "../base";
 
 /**
@@ -56,7 +56,7 @@ import { ConfirmProjectDelete, ProjectIdentifierModal } from "../base";
 export default Vue.extend({
   name: "ProjectSelector",
   components: {
-    GenericSelector,
+    TableSelector,
     ProjectIdentifierModal,
     ConfirmProjectDelete,
   },

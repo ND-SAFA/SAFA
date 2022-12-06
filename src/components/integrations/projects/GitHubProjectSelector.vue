@@ -1,5 +1,5 @@
 <template>
-  <generic-stepper-list-step
+  <stepper-list-step
     title="GitHub Repositories"
     :item-count="repositories.length"
     :loading="repositoriesLoading"
@@ -25,7 +25,7 @@
         </v-list-item>
       </template>
     </template>
-  </generic-stepper-list-step>
+  </stepper-list-step>
 </template>
 
 <script lang="ts">
@@ -33,7 +33,7 @@ import Vue from "vue";
 import { GitHubProjectSchema } from "@/types";
 import { integrationsStore } from "@/hooks";
 import { handleLoadGitHubProjects } from "@/api";
-import { GenericStepperListStep } from "@/components/common";
+import { StepperListStep } from "@/components/common";
 
 /**
  * Allows for selecting a GitHub repository.
@@ -41,7 +41,7 @@ import { GenericStepperListStep } from "@/components/common";
 export default Vue.extend({
   name: "GitHubProjectSelector",
   components: {
-    GenericStepperListStep,
+    StepperListStep,
   },
   data() {
     return {

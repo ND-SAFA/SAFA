@@ -13,7 +13,7 @@
     @keydown.enter="$emit('enter')"
   >
     <template v-slot:append>
-      <generic-icon-button
+      <icon-button
         small
         icon-id="mdi-content-save-outline"
         tooltip="Save Artifacts"
@@ -52,7 +52,7 @@ import Vue, { PropType } from "vue";
 import { ArtifactSchema } from "@/types";
 import { filterArtifacts } from "@/util";
 import { artifactStore } from "@/hooks";
-import { GenericIconButton } from "@/components/common/button";
+import { IconButton } from "@/components/common/button";
 import { Typography, ArtifactBodyDisplay } from "@/components/common/display";
 
 /**
@@ -64,7 +64,7 @@ import { Typography, ArtifactBodyDisplay } from "@/components/common/display";
 export default Vue.extend({
   name: "ArtifactInput",
   components: {
-    GenericIconButton,
+    IconButton,
     Typography,
     ArtifactBodyDisplay,
   },

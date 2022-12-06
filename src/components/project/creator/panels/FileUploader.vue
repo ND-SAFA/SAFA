@@ -38,8 +38,8 @@
 import Vue, { PropType } from "vue";
 import {
   ArtifactMap,
-  IGenericFilePanel,
-  IGenericUploader,
+  ParseFilePanel,
+  FileUploader,
   ValidFileTypes,
   ProjectFile,
   ValidPayloads,
@@ -57,7 +57,7 @@ import ValidatedPanels from "./ValidatedPanels.vue";
  * @emits-3 `change` - On change.
  */
 export default Vue.extend({
-  name: "GenericUploader",
+  name: "FileUploader",
   components: {
     FileFormatAlert,
     ValidatedPanels,
@@ -74,7 +74,7 @@ export default Vue.extend({
     },
     uploader: {
       type: Object as PropType<
-        IGenericUploader<ArtifactMap, ValidPayloads, ValidFileTypes>
+        FileUploader<ArtifactMap, ValidPayloads, ValidFileTypes>
       >,
       required: true,
     },
@@ -125,7 +125,7 @@ export default Vue.extend({
      */
     handleChange(
       i: number,
-      panel: IGenericFilePanel<ArtifactMap, ValidFileTypes>
+      panel: ParseFilePanel<ArtifactMap, ValidFileTypes>
     ): void {
       this.$emit(
         "change",

@@ -1,5 +1,5 @@
 <template>
-  <generic-modal
+  <modal
     size="xs"
     :isOpen="isMessageDefined"
     :title="title"
@@ -18,7 +18,7 @@
         I accept
       </v-btn>
     </template>
-  </generic-modal>
+  </modal>
 </template>
 
 <script lang="ts">
@@ -26,14 +26,14 @@ import Vue, { PropType } from "vue";
 import { ConfirmationType, ConfirmDialogueMessage } from "@/types";
 import { logStore } from "@/hooks";
 import { Typography } from "@/components/common/display";
-import GenericModal from "./GenericModal.vue";
+import Modal from "./Modal.vue";
 
 /**
  * Displays a modal for confirming sensitive actions.
  */
 export default Vue.extend({
   name: "AppConfirmModal",
-  components: { Typography, GenericModal },
+  components: { Typography, Modal },
   props: {
     message: {
       type: Object as PropType<ConfirmDialogueMessage>,

@@ -5,7 +5,7 @@
       b="4"
       value="Create a new model below, or expand one of the models to view past training and add new steps."
     />
-    <generic-selector
+    <table-selector
       is-open
       show-expand
       :has-select="false"
@@ -30,13 +30,13 @@
         <ModelEditor :model="item" />
       </template>
       <template v-slot:[`item.actions`]="{ item }">
-        <generic-icon-button
+        <icon-button
           icon-id="mdi-share-variant"
           tooltip="Share Model"
           @click="handleShare(item)"
         />
       </template>
-    </generic-selector>
+    </table-selector>
   </v-container>
 </template>
 
@@ -45,11 +45,7 @@ import Vue from "vue";
 import { GenerationModelSchema } from "@/types";
 import { modelSaveStore, projectStore } from "@/hooks";
 import { handleDeleteModel, handleLoadModels } from "@/api";
-import {
-  GenericSelector,
-  GenericIconButton,
-  Typography,
-} from "@/components/common";
+import { TableSelector, IconButton, Typography } from "@/components/common";
 import { ModelEditor } from "../editor";
 import ModelShareModal from "./ModelShareModal.vue";
 import ModelCreatorModal from "./ModelCreatorModal.vue";
@@ -62,9 +58,9 @@ export default Vue.extend({
   components: {
     ModelShareModal,
     ModelCreatorModal,
-    GenericIconButton,
+    IconButton,
     ModelEditor,
-    GenericSelector,
+    TableSelector,
     Typography,
   },
   data() {

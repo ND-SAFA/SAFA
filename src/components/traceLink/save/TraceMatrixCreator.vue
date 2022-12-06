@@ -35,7 +35,7 @@
             />
           </flex-box>
         </flex-box>
-        <generic-icon-button
+        <icon-button
           icon-id="mdi-close"
           color="error"
           tooltip="Remove trace matrix"
@@ -60,7 +60,7 @@ import { artifactStore, traceStore } from "@/hooks";
 import {
   ArtifactTypeInput,
   FlexBox,
-  GenericIconButton,
+  IconButton,
   AttributeChip,
 } from "@/components/common";
 
@@ -72,7 +72,7 @@ import {
 export default Vue.extend({
   name: "TraceMatrixCreator",
   components: {
-    GenericIconButton,
+    IconButton,
     ArtifactTypeInput,
     FlexBox,
     AttributeChip,

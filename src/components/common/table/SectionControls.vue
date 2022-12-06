@@ -1,13 +1,13 @@
 <template>
   <flex-box>
-    <generic-icon-button
+    <icon-button
       small
       color="error"
       tooltip="Collapse All"
       icon-id="mdi-arrow-collapse-all"
       @click="$emit('close:all')"
     />
-    <generic-icon-button
+    <icon-button
       small
       color="primary"
       tooltip="Expand All"
@@ -19,7 +19,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { GenericIconButton } from "@/components/common/button";
+import { IconButton } from "@/components/common/button";
 import { FlexBox } from "@/components/common/layout";
 
 /**
@@ -30,6 +30,6 @@ import { FlexBox } from "@/components/common/layout";
  */
 export default Vue.extend({
   name: "SectionControls",
-  components: { FlexBox, GenericIconButton },
+  components: { FlexBox, IconButton },
 });
 </script>

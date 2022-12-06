@@ -22,14 +22,14 @@
         >
           See Errors
         </v-btn>
-        <generic-icon-button
+        <icon-button
           v-if="showAction"
           color="white"
           icon-id="mdi-download"
           tooltip="Update"
           @click="handleAction"
         />
-        <generic-icon-button
+        <icon-button
           color="white"
           icon-id="mdi-close"
           tooltip="Close"
@@ -50,7 +50,7 @@ import { ThemeColors } from "@/util";
 import { appStore, logStore } from "@/hooks";
 import {
   ServerErrorModal,
-  GenericIconButton,
+  IconButton,
   Typography,
   FlexBox,
 } from "@/components/common";
@@ -61,7 +61,7 @@ import {
 export default Vue.extend({
   name: "Snackbar",
   components: {
-    GenericIconButton,
+    IconButton,
     FlexBox,
     Typography,
     ServerErrorModal,

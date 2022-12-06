@@ -7,7 +7,7 @@
     />
     <v-divider inset vertical class="accent mx-1 faded mb-2" />
     <template v-for="definition in viewButtons">
-      <generic-icon-button
+      <icon-button
         v-if="definition.handler"
         :key="definition.label"
         color="accent"
@@ -27,13 +27,13 @@ import { ButtonDefinition, ButtonType } from "@/types";
 import { artifactStore, documentStore, selectionStore } from "@/hooks";
 import { handleRegenerateLayout } from "@/api";
 import { cyZoomIn, cyZoomOut } from "@/cytoscape";
-import { GenericIconButton, CheckmarkMenu, FlexBox } from "@/components/common";
+import { IconButton, CheckmarkMenu, FlexBox } from "@/components/common";
 
 export default Vue.extend({
   name: "GraphButtons",
   components: {
     FlexBox,
-    GenericIconButton,
+    IconButton,
     CheckmarkMenu,
   },
   data() {

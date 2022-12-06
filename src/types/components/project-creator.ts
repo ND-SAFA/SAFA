@@ -4,7 +4,7 @@ import { ArtifactFile, ProjectFile, TraceFile } from "@/types/components";
 /**
  * Defines a panel for parsing files.
  */
-export interface IGenericFilePanel<Environment, F extends ProjectFile> {
+export interface ParseFilePanel<Environment, F extends ProjectFile> {
   title: string;
   projectFile: F;
   entityNames: string[];
@@ -16,9 +16,9 @@ export interface IGenericFilePanel<Environment, F extends ProjectFile> {
 /**
  * Defines a set of panels for uploading multiple types of files.
  */
-export interface IGenericUploader<Environment, T, F extends ProjectFile> {
-  panels: IGenericFilePanel<Environment, F>[];
-  createNewPanel(payload: T): IGenericFilePanel<Environment, F>;
+export interface FileUploader<Environment, T, F extends ProjectFile> {
+  panels: ParseFilePanel<Environment, F>[];
+  createNewPanel(payload: T): ParseFilePanel<Environment, F>;
 }
 
 /**
@@ -40,30 +40,22 @@ export type ArtifactMap = Record<string, ArtifactSchema>;
 /**
  * Defines a panel for parsing trace link files.
  */
-export type TracePanel = IGenericFilePanel<ArtifactMap, TraceFile>;
+export type TracePanel = ParseFilePanel<ArtifactMap, TraceFile>;
 
 /**
  * Defines a set of panels for parsing trace link files.
  */
-export type TraceUploader = IGenericUploader<
-  ArtifactMap,
-  LinkSchema,
-  TraceFile
->;
+export type TraceUploader = FileUploader<ArtifactMap, LinkSchema, TraceFile>;
 
 /**
  * Defines a panel for parsing artifact files.
  */
-export type ArtifactPanel = IGenericFilePanel<ArtifactMap, ArtifactFile>;
+export type ArtifactPanel = ParseFilePanel<ArtifactMap, ArtifactFile>;
 
 /**
  * Defines a set of panels for parsing artifact files.
  */
-export type ArtifactUploader = IGenericUploader<
-  ArtifactMap,
-  string,
-  ArtifactFile
->;
+export type ArtifactUploader = FileUploader<ArtifactMap, string, ArtifactFile>;
 
 export enum CreatorTabTypes {
   standard = "standard",

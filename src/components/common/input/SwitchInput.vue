@@ -6,12 +6,12 @@
 import Vue from "vue";
 
 /**
- * Displays a generic switch.
+ * Displays a generic switch input.
  *
  * @emits `input` (boolean) - On input change.
  */
 export default Vue.extend({
-  name: "GenericSwitch",
+  name: "SwitchInput",
   props: {
     label: {
       type: String,

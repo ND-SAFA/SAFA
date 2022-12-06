@@ -23,7 +23,7 @@
 
       <template v-slot:[`footer.prepend`]>
         <div class="py-3">
-          <generic-icon-button
+          <icon-button
             fab
             color="primary"
             icon-id="mdi-plus"
@@ -31,7 +31,7 @@
             data-cy="button-integration-add"
             @click="modalOpen = true"
           />
-          <generic-modal
+          <modal
             :is-open="modalOpen"
             title="Import Data"
             :actions-height="0"
@@ -43,7 +43,7 @@
                 @submit="modalOpen = false"
               />
             </template>
-          </generic-modal>
+          </modal>
         </div>
       </template>
     </v-data-table>
@@ -56,11 +56,7 @@ import { InstallationSchema } from "@/types";
 import { timestampToDisplay } from "@/util";
 import { projectStore } from "@/hooks";
 import { handleSyncInstallation } from "@/api";
-import {
-  Typography,
-  GenericIconButton,
-  GenericModal,
-} from "@/components/common";
+import { Typography, IconButton, Modal } from "@/components/common";
 import IntegrationsStepper from "./IntegrationsStepper.vue";
 
 /**
@@ -70,9 +66,9 @@ export default Vue.extend({
   name: "ProjectInstallationsTable",
   components: {
     IntegrationsStepper,
-    GenericModal,
+    Modal,
     Typography,
-    GenericIconButton,
+    IconButton,
   },
   data() {
     return {

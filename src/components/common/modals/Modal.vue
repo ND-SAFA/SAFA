@@ -7,7 +7,21 @@
   >
     <v-card :class="`modal-${size}`" :data-cy="dataCy">
       <v-card-title class="primary">
-        <generic-modal-title :title="title" @close="$emit('close')" />
+        <flex-box
+          full-width
+          justify="space-between"
+          align="center"
+          data-cy="modal-title"
+        >
+          <typography :value="title" color="white" />
+          <icon-button
+            tooltip="Close"
+            icon-id="mdi-close"
+            color="white"
+            data-cy="button-close"
+            @click="$emit('close')"
+          />
+        </flex-box>
       </v-card-title>
 
       <v-card-text>
@@ -32,7 +46,9 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { ModalSize } from "@/types";
-import GenericModalTitle from "./GenericModalTitle.vue";
+import { Typography } from "@/components/common/display";
+import { IconButton } from "@/components/common/button";
+import { FlexBox } from "@/components/common/layout";
 
 /**
  * Displays a generic modal.
@@ -40,9 +56,11 @@ import GenericModalTitle from "./GenericModalTitle.vue";
  * @emits `close` - On close.
  */
 export default Vue.extend({
-  name: "generic-modal",
+  name: "Modal",
   components: {
-    GenericModalTitle,
+    FlexBox,
+    Typography,
+    IconButton,
   },
   props: {
     title: {

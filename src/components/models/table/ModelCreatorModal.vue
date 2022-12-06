@@ -1,5 +1,5 @@
 <template>
-  <generic-modal :is-open="!!isOpen" :title="modalTitle" @close="handleClose">
+  <modal :is-open="!!isOpen" :title="modalTitle" @close="handleClose">
     <template v-slot:body>
       <flex-box t="4">
         <v-text-field
@@ -23,7 +23,7 @@
         Save
       </v-btn>
     </template>
-  </generic-modal>
+  </modal>
 </template>
 
 <script lang="ts">
@@ -31,7 +31,7 @@ import Vue from "vue";
 import { GenerationModelSchema } from "@/types";
 import { modelSaveStore } from "@/hooks";
 import { handleSaveModel } from "@/api";
-import { GenericModal, GenMethodInput, FlexBox } from "@/components/common";
+import { Modal, GenMethodInput, FlexBox } from "@/components/common";
 
 /**
  * A modal for creating and editing models.
@@ -41,7 +41,7 @@ import { GenericModal, GenMethodInput, FlexBox } from "@/components/common";
 export default Vue.extend({
   name: "ModelCreatorModal",
   components: {
-    GenericModal,
+    Modal,
     GenMethodInput,
     FlexBox,
   },

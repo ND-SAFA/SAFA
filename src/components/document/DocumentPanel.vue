@@ -29,7 +29,7 @@
       v-model="store.editedDocument.artifactIds"
       data-cy="input-document-artifacts"
     />
-    <generic-switch
+    <switch-input
       class="ml-1"
       label="Include artifact children"
       v-model="store.includeChildren"
@@ -86,7 +86,7 @@ import {
   FlexBox,
   ArtifactInput,
   ArtifactTypeInput,
-  GenericSwitch,
+  SwitchInput,
 } from "@/components/common";
 
 /**
@@ -96,7 +96,7 @@ export default Vue.extend({
   name: "DocumentPanel",
   components: {
     FlexBox,
-    GenericSwitch,
+    SwitchInput,
     ArtifactTypeInput,
     ArtifactInput,
   },

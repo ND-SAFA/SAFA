@@ -1,10 +1,5 @@
 <template>
-  <generic-stepper
-    minimal
-    v-model="currentStep"
-    :steps="steps"
-    @submit="handleSubmit"
-  >
+  <stepper minimal v-model="currentStep" :steps="steps" @submit="handleSubmit">
     <template v-slot:items>
       <v-stepper-content :step="projectStep">
         <project-selector
@@ -25,7 +20,7 @@
         />
       </v-stepper-content>
     </template>
-  </generic-stepper>
+  </stepper>
 </template>
 
 <script lang="ts">
@@ -40,7 +35,7 @@ import {
 import { versionToString } from "@/util";
 import { logStore } from "@/hooks";
 import { handleLoadVersion } from "@/api";
-import { GenericStepper } from "@/components/common";
+import { Stepper } from "@/components/common";
 import VersionSelector from "./VersionSelector.vue";
 import ProjectSelector from "./ProjectSelector.vue";
 
@@ -53,7 +48,7 @@ const SELECT_VERSION_DEFAULT_NAME = "Select a Version";
 export default Vue.extend({
   name: "ProjectVersionList",
   components: {
-    GenericStepper,
+    Stepper,
     ProjectSelector,
     VersionSelector,
   },

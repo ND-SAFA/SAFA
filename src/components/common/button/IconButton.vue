@@ -30,7 +30,7 @@ import Vue from "vue";
  * @emits `click` - On button click.
  */
 export default Vue.extend({
-  name: "GenericIconButton",
+  name: "IconButton",
   props: {
     dataCy: String,
     tooltip: {

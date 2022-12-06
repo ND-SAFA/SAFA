@@ -1,7 +1,7 @@
 <template>
   <div>
     <panel-card>
-      <generic-artifact-body-display
+      <artifact-body-display
         :artifact="targetArtifact"
         display-title
         display-divider
@@ -25,7 +25,7 @@
       />
     </flex-box>
     <panel-card>
-      <generic-artifact-body-display
+      <artifact-body-display
         :artifact="sourceArtifact"
         display-title
         display-divider
@@ -59,7 +59,7 @@ export default Vue.extend({
   components: {
     PanelCard,
     FlexBox,
-    GenericArtifactBodyDisplay: ArtifactBodyDisplay,
+    ArtifactBodyDisplay,
     AttributeChip,
   },
   computed: {

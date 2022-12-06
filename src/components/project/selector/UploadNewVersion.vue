@@ -9,7 +9,7 @@
         v-model="selectedFiles"
         data-cy="input-files-version"
       />
-      <generic-switch
+      <switch-input
         v-model="replaceAllArtifacts"
         label="Replace all artifacts"
         class="ml-4"
@@ -30,7 +30,7 @@
 import Vue from "vue";
 import { projectStore } from "@/hooks";
 import { handleUploadProjectVersion } from "@/api";
-import { GenericSwitch, Typography } from "@/components/common";
+import { SwitchInput, Typography } from "@/components/common";
 import { ProjectFilesInput } from "../base";
 
 /**
@@ -40,7 +40,7 @@ export default Vue.extend({
   name: "UploadNewVersion",
   components: {
     Typography,
-    GenericSwitch,
+    SwitchInput,
     ProjectFilesInput,
   },
   props: {

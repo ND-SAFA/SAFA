@@ -3,7 +3,7 @@ import {
   ArtifactData,
   DeltaArtifact,
   EntityModification,
-  IGenericFilePanel,
+  ParseFilePanel,
   ProjectFile,
   TraceFile,
   TracePanel,
@@ -86,7 +86,7 @@ export function isTraceFile(file: ProjectFile): file is TraceFile {
  * @return Whether this panel is a trace panel.
  */
 export function isTracePanel(
-  panel: IGenericFilePanel<Record<string, unknown>, ProjectFile>
+  panel: ParseFilePanel<Record<string, unknown>, ProjectFile>
 ): panel is TracePanel {
   return isTraceFile(panel.projectFile);
 }

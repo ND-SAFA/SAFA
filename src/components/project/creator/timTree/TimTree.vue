@@ -3,7 +3,7 @@
     <flex-box justify="end">
       <v-btn text @click="handleResetGraph"> Reset Graph </v-btn>
     </flex-box>
-    <generic-cytoscape-controller
+    <cytoscape-controller
       id="cytoscape-tim"
       :cyto-core-graph="cytoCoreGraph"
       :class="className"
@@ -14,7 +14,7 @@
           :artifact-panel="artifactPanel"
           :key="artifactPanel.title"
         />
-        <generic-graph-link
+        <graph-link
           v-for="tracePanel in tracePanels"
           :key="getTraceId(tracePanel)"
           :trace-definition="tracePanel.projectFile"
@@ -22,7 +22,7 @@
           graph="tim"
         />
       </template>
-    </generic-cytoscape-controller>
+    </cytoscape-controller>
   </v-container>
 </template>
 
@@ -32,11 +32,7 @@ import { TracePanel, CytoCoreGraph, ArtifactPanel } from "@/types";
 import { getTraceId } from "@/util";
 import { appStore, layoutStore } from "@/hooks";
 import { timGraph, cyResetTim } from "@/cytoscape";
-import {
-  GenericGraphLink,
-  GenericCytoscapeController,
-  FlexBox,
-} from "@/components/common";
+import { GraphLink, CytoscapeController, FlexBox } from "@/components/common";
 import ArtifactTypeNode from "./ArtifactTypeNode.vue";
 
 /**
@@ -48,8 +44,8 @@ export default Vue.extend({
   components: {
     FlexBox,
     ArtifactTypeNode,
-    GenericCytoscapeController,
-    GenericGraphLink,
+    CytoscapeController,
+    GraphLink,
   },
   props: {
     tracePanels: {

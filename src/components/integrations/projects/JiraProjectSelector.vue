@@ -1,5 +1,5 @@
 <template>
-  <generic-stepper-list-step
+  <stepper-list-step
     empty-message="There are no projects."
     :item-count="projects.length"
     :loading="projectsLoading"
@@ -21,7 +21,7 @@
         </v-list-item>
       </template>
     </template>
-  </generic-stepper-list-step>
+  </stepper-list-step>
 </template>
 
 <script lang="ts">
@@ -29,7 +29,7 @@ import Vue from "vue";
 import { JiraProjectSchema } from "@/types";
 import { integrationsStore } from "@/hooks";
 import { handleLoadJiraProjects } from "@/api";
-import { GenericStepperListStep } from "@/components";
+import { StepperListStep } from "@/components";
 
 /**
  * Allows for selecting a jira project.
@@ -37,7 +37,7 @@ import { GenericStepperListStep } from "@/components";
 export default Vue.extend({
   name: "JiraProjectSelector",
   components: {
-    GenericStepperListStep,
+    StepperListStep,
   },
   data() {
     return {

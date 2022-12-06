@@ -33,7 +33,7 @@ import Typography from "../Typography.vue";
  * @emits `click` - On click.
  */
 export default Vue.extend({
-  name: "GenericListItem",
+  name: "ListItem",
   components: { Typography },
   props: {
     item: Object as PropType<ListItem>,

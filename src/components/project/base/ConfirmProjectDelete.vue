@@ -1,5 +1,5 @@
 <template>
-  <generic-modal
+  <modal
     size="md"
     :is-open="isOpen"
     title="Delete Project"
@@ -32,13 +32,13 @@
         Delete
       </v-btn>
     </template>
-  </generic-modal>
+  </modal>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import { identifierSaveStore } from "@/hooks";
-import { GenericModal, Typography } from "@/components/common";
+import { Modal, Typography } from "@/components/common";
 
 /**
  * A modal for confirming project deletion.
@@ -48,7 +48,7 @@ import { GenericModal, Typography } from "@/components/common";
  */
 export default Vue.extend({
   name: "ConfirmProjectDelete",
-  components: { Typography, GenericModal },
+  components: { Typography, Modal },
   props: {
     isOpen: {
       type: Boolean,

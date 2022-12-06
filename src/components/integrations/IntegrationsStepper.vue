@@ -1,5 +1,5 @@
 <template>
-  <generic-stepper
+  <stepper
     :minimal="type === 'connect'"
     v-model="currentStep"
     :steps="steps"
@@ -14,7 +14,7 @@
         <git-hub-project-selector v-if="source === 'GitHub'" />
       </v-stepper-content>
     </template>
-  </generic-stepper>
+  </stepper>
 </template>
 
 <script lang="ts">
@@ -26,7 +26,7 @@ import {
   handleImportJiraProject,
   handleSyncInstallation,
 } from "@/api";
-import { GenericStepper } from "@/components/common";
+import { Stepper } from "@/components/common";
 import { AuthenticationSelector } from "./authentication";
 import { JiraProjectSelector, GitHubProjectSelector } from "./projects";
 
@@ -41,7 +41,7 @@ export default Vue.extend({
     AuthenticationSelector,
     GitHubProjectSelector,
     JiraProjectSelector,
-    GenericStepper,
+    Stepper,
   },
   props: {
     type: {

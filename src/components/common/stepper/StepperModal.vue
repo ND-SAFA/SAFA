@@ -1,5 +1,5 @@
 <template>
-  <generic-modal
+  <modal
     :title="title"
     :is-open="isOpen"
     :is-loading="isLoading"
@@ -9,7 +9,7 @@
     @close="$emit('close')"
   >
     <template v-slot:body>
-      <generic-stepper
+      <stepper
         minimal
         v-model="currentStep"
         :steps="steps"
@@ -18,16 +18,16 @@
         <template v-slot:items>
           <slot name="items" />
         </template>
-      </generic-stepper>
+      </stepper>
     </template>
-  </generic-modal>
+  </modal>
 </template>
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { ModalSize } from "@/types";
-import GenericModal from "../modals/GenericModal.vue";
-import GenericStepper from "./GenericStepper.vue";
+import { Modal } from "@/components/common/modals";
+import Stepper from "./Stepper.vue";
 
 /**
  * Displays a generic stepper modal.
@@ -38,10 +38,10 @@ import GenericStepper from "./GenericStepper.vue";
  * @emits-4 `submit` - On submit.
  */
 export default Vue.extend({
-  name: "GenericStepperModal",
+  name: "StepperModal",
   components: {
-    GenericModal,
-    GenericStepper,
+    Modal,
+    Stepper,
   },
   props: {
     dataCy: String,

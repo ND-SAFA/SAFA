@@ -65,7 +65,7 @@ import { Typography } from "@/components/common/display";
  * @emits-2 `submit` - On submit.
  */
 export default Vue.extend({
-  name: "GenericStepper",
+  name: "Stepper",
   components: { Typography },
   props: {
     value: {

@@ -19,7 +19,7 @@ import { logStore } from "@/hooks";
  * Abstracts setting up a cytoscape instance and corresponding plugins.
  */
 export default Vue.extend({
-  name: "GenericCytoscapeController",
+  name: "CytoscapeController",
   props: {
     cytoCoreGraph: {
       type: Object as PropType<CytoCoreGraph>,

@@ -18,7 +18,7 @@
         </v-container>
       </v-tab-item>
       <v-tab-item key="3">
-        <trace-link-table />
+        <trace-approval-table />
       </v-tab-item>
     </tab-list>
   </sidebar-grid>
@@ -28,9 +28,10 @@
 import Vue from "vue";
 import { tracePredictionTabOptions } from "@/util";
 import { TabList, SidebarGrid } from "@/components/common";
-import { TraceLinkTable, TraceLinkGenerator } from "@/components/traceLink";
+import { TraceLinkGenerator } from "@/components/traceLink";
 import { ProjectDisplay } from "@/components/project";
-import { ModelTable } from "./table";
+import { ModelTable } from "./training";
+import { TraceApprovalTable } from "./approval";
 import TracePredictionHeader from "./TracePredictionHeader.vue";
 
 /**
@@ -44,7 +45,7 @@ export default Vue.extend({
     ProjectDisplay,
     TraceLinkGenerator,
     ModelTable,
-    TraceLinkTable,
+    TraceApprovalTable,
     TabList,
   },
   data() {

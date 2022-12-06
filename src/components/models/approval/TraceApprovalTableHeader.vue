@@ -47,7 +47,7 @@ import { TableHeader } from "@/components/common";
  * @emits-3 `update:approvalTypes` (String) on approval type update.
  */
 export default Vue.extend({
-  name: "TraceLinkTableHeader",
+  name: "TraceApprovalTableHeader",
   components: {
     TableHeader,
   },

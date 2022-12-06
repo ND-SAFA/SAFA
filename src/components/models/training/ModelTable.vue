@@ -46,7 +46,7 @@ import { GenerationModelSchema } from "@/types";
 import { modelSaveStore, projectStore } from "@/hooks";
 import { handleDeleteModel, handleLoadModels } from "@/api";
 import { TableSelector, IconButton, Typography } from "@/components/common";
-import { ModelEditor } from "../editor";
+import { ModelEditor } from "./editor";
 import ModelShareModal from "./ModelShareModal.vue";
 import ModelCreatorModal from "./ModelCreatorModal.vue";
 

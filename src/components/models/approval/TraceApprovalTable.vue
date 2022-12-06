@@ -26,7 +26,7 @@
       data-cy="table-trace-link"
     >
       <template v-slot:top>
-        <trace-link-table-header
+        <trace-approval-table-header
           :headers="headers"
           :group-by.sync="groupBy"
           :sort-by.sync="sortBy"
@@ -96,17 +96,17 @@ import {
   TableGroupHeader,
   Typography,
 } from "@/components/common";
-import { TraceLinkDisplay, TraceLinkApproval } from "../display";
-import traceLinkTableHeaders from "./traceLinkTableHeaders";
-import TraceLinkTableHeader from "./TraceLinkTableHeader.vue";
+import { TraceLinkDisplay, TraceLinkApproval } from "@/components/traceLink";
+import traceApprovalTableHeaders from "./traceApprovalTableHeaders";
+import TraceApprovalTableHeader from "./TraceApprovalTableHeader.vue";
 
 /**
  * Displays a table of trace links.
  */
 export default Vue.extend({
-  name: "TraceLinkTable",
+  name: "TraceApprovalTable",
   components: {
-    TraceLinkTableHeader,
+    TraceApprovalTableHeader,
     TraceLinkApproval,
     TableGroupHeader,
     AttributeChip,
@@ -120,7 +120,7 @@ export default Vue.extend({
       groupBy: "targetName" as keyof FlatTraceLink | undefined,
       sortDesc: true,
       groupDesc: false,
-      headers: traceLinkTableHeaders,
+      headers: traceApprovalTableHeaders,
       approvalTypes: [ApprovalType.UNREVIEWED],
     };
   },

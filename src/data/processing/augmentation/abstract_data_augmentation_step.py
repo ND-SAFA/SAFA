@@ -1,7 +1,7 @@
 import random
 import uuid
 from abc import ABC, abstractmethod
-from typing import List, Iterable, Tuple, Any
+from typing import Any, Iterable, List, Tuple
 
 from config.override import overrides
 from data.processing.abstract_data_processing_step import AbstractDataProcessingStep, ProcessingOrder
@@ -45,7 +45,7 @@ class AbstractDataAugmentationStep(AbstractDataProcessingStep, ABC):
         :param step_id: the step id
         :return: the unique id
         """
-        return step_id.removeprefix(AbstractDataAugmentationStep.COMMON_ID)
+        return AbstractDataAugmentationStep.__remove_prefix(step_id, AbstractDataAugmentationStep.COMMON_ID)
 
     @classmethod
     def get_id(cls) -> str:
@@ -56,7 +56,8 @@ class AbstractDataAugmentationStep(AbstractDataProcessingStep, ABC):
         return AbstractDataAugmentationStep.COMMON_ID + cls._unique_step_id()
 
     @staticmethod
-    def _add_augmented_data(augmented_data: Any, index_reference: int, augmented_data_entries: List, index_references: List) -> None:
+    def _add_augmented_data(augmented_data: Any, index_reference: int, augmented_data_entries: List,
+                            index_references: List) -> None:
         """
         Adds the augmented data to the appropriate lists
         :param augmented_data: the augmented data
@@ -95,3 +96,16 @@ class AbstractDataAugmentationStep(AbstractDataProcessingStep, ABC):
         :return: the id
         """
         return str(hash(cls.__name__))[:8]
+
+    @staticmethod
+    def __remove_prefix(text, prefix):
+        """
+        Removes prefix from text if it contains it.
+        This is a patch for versions of python < 3.9.
+        :param text: The text to remove the prefix from.
+        :param prefix: The prefix to remove if exists.
+        :return: Text without prefix.
+        """
+        if text.startswith(prefix):
+            return text[len(prefix):]
+        return text  # or whatever

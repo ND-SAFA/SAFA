@@ -12,8 +12,8 @@ from transformers.trainer_pt_utils import get_tpu_sampler, is_torch_tpu_availabl
 
 from config.override import overrides
 from data.datasets.dataset_role import DatasetRole
-from train.metrics.supported_trace_metric import get_metric_name, get_metric_path
 from models.model_generator import ModelGenerator
+from train.metrics.supported_trace_metric import get_metric_name, get_metric_path
 from train.trace_args import TraceArgs
 
 
@@ -42,6 +42,7 @@ class TraceTrainer(Trainer):
         :return: a dictionary containing the results
         """
         self.train_dataset = self.dataset_container[DatasetRole.TRAIN].to_trainer_dataset(self.model_generator)
+        print("# of examples:", len(self.train_dataset))
         if DatasetRole.VAL in self.dataset_container:
             self.eval_dataset = self.dataset_container[DatasetRole.VAL].to_trainer_dataset(self.model_generator)
         output = self.train(resume_from_checkpoint=checkpoint)

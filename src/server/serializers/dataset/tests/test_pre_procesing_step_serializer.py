@@ -1,4 +1,4 @@
-from server.serializers.dataset.pre_processing_step_serializer import PreProcessingStepSerializer
+from server.serializers.dataset.pre_processing_step_serializer import DataCleaningStepSerializer
 from server.serializers.tests.base_serializer_test import BaseSerializerTest
 from test.base_test import BaseTest
 from data.processing.abstract_data_processing_step import AbstractDataProcessingStep
@@ -12,7 +12,7 @@ class TestPreProcessingStepSerializer(BaseTest):
         }
     }
 
-    serializer_test = BaseSerializerTest(PreProcessingStepSerializer)
+    serializer_test = BaseSerializerTest(DataCleaningStepSerializer)
 
     def test_serialization(self):
         entity = self.serializer_test.serialize_data(self, self.test_data)

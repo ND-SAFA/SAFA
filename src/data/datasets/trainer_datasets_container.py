@@ -1,12 +1,13 @@
 from collections import OrderedDict
-from typing import List, Optional, Union, Dict
-from data.datasets.abstract_dataset import AbstractDataset
+from typing import Dict, List, Optional, Union
+
 from data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from data.creators.split_dataset_creator import SplitDatasetCreator
+from data.datasets.abstract_dataset import AbstractDataset
 from data.datasets.dataset_role import DatasetRole
 from data.datasets.pre_train_dataset import PreTrainDataset
-from data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
 from data.datasets.trace_dataset import TraceDataset
+from data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
 
 
 class TrainerDatasetsContainer:
@@ -27,9 +28,11 @@ class TrainerDatasetsContainer:
         :param eval_dataset_creator: The training dataset creator.data
         :param augmentation_steps: steps to run to augment the training data
         """
-        self.__dataset_creators = {DatasetRole.PRE_TRAIN: pre_train_dataset_creator, DatasetRole.TRAIN: train_dataset_creator,
+        self.__dataset_creators = {DatasetRole.PRE_TRAIN: pre_train_dataset_creator,
+                                   DatasetRole.TRAIN: train_dataset_creator,
                                    DatasetRole.VAL: val_dataset_creator, DatasetRole.EVAL: eval_dataset_creator}
         self.__datasets = self._create_datasets_from_creators(self.__dataset_creators)
+        print("Original length:", len(self[DatasetRole.TRAIN]))
         self._prepare_datasets(augmentation_steps)
 
     def get_creator(self, dataset_role: DatasetRole) -> AbstractDatasetCreator:
@@ -80,7 +83,8 @@ class TrainerDatasetsContainer:
             self[DatasetRole.TRAIN].prepare_for_training(augmentation_steps)
 
     @staticmethod
-    def _create_dataset_splits(train_dataset: TraceDataset, dataset_creators_map: Dict[DatasetRole, AbstractDatasetCreator]) \
+    def _create_dataset_splits(train_dataset: TraceDataset,
+                               dataset_creators_map: Dict[DatasetRole, AbstractDatasetCreator]) \
             -> Dict[DatasetRole, TraceDataset]:
         """
         Splits the train dataset into desired splits and creates a dictionary mapping dataset role to split for all split data
@@ -112,7 +116,8 @@ class TrainerDatasetsContainer:
                 for dataset_role, dataset_creator in dataset_creators_map.items()}
 
     @staticmethod
-    def __optional_create(dataset_creator: Optional[AbstractDatasetCreator]) -> Optional[Union[TraceDataset, PreTrainDataset]]:
+    def __optional_create(dataset_creator: Optional[AbstractDatasetCreator]) -> Optional[
+        Union[TraceDataset, PreTrainDataset]]:
         """
         Creates dataset set if not None, otherwise None is returned.
         :param dataset_creator: The optional dataset creator to use.

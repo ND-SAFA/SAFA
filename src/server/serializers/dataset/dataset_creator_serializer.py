@@ -7,7 +7,7 @@ from data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from data.creators.abstract_trace_dataset_creator import AbstractTraceDatasetCreator
 from data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
 from data.creators.supported_dataset_creator import SupportedDatasetCreator
-from server.serializers.dataset.pre_processing_step_serializer import PreProcessingStepSerializer
+from server.serializers.dataset.pre_processing_step_serializer import DataCleaningStepSerializer
 from server.serializers.job_factory.job_factory_converter import JobFactoryConverter
 from server.serializers.serializer_utility import SerializerUtility
 
@@ -20,10 +20,10 @@ class DatasetCreatorSerializer(serializers.Serializer):
     params = serializers.DictField(help_text="The arguments used to construct dataset.",
                                    required=False)
 
-    preProcessingSteps = PreProcessingStepSerializer(help_text="The steps performed on dataset before model access.",
-                                                     many=True,
-                                                     source="data_cleaning_steps",
-                                                     required=False)
+    dataCleaningSteps = DataCleaningStepSerializer(help_text="The steps performed on dataset before model access.",
+                                                   many=True,
+                                                   source="data_cleaning_steps",
+                                                   required=False)
 
     def create(self, validated_data: Dict) -> SupportedDatasets:
         """

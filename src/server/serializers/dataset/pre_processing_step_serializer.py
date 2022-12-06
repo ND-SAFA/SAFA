@@ -3,13 +3,13 @@ from typing import Dict, Type
 from rest_enumfield import EnumField
 from rest_framework import serializers
 
+from data.processing.abstract_data_processing_step import AbstractDataProcessingStep
+from data.processing.cleaning.data_cleaning_steps import DataCleaningSteps
 from server.serializers.job_factory.job_factory_converter import JobFactoryConverter
 from server.serializers.serializer_utility import SerializerUtility
-from data.processing.cleaning.data_cleaning_steps import DataCleaningSteps
-from data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 
 
-class PreProcessingStepSerializer(serializers.Serializer):
+class DataCleaningStepSerializer(serializers.Serializer):
     step = EnumField(choices=DataCleaningSteps,
                      help_text="The pre-processing step to perform.")
     params = serializers.DictField(help_text="The arguments used to construct step.", required=False)

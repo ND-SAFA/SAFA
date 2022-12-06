@@ -1,5 +1,6 @@
 <template>
   <table-header
+    show-commit-buttons
     :headers="headers"
     :group-by.sync="currentGroup"
     :sort-by.sync="currentSort"

@@ -12,7 +12,7 @@
         append-icon="mdi-magnify"
       />
       <flex-box align="center">
-        <commit-buttons color="primary" class="mt-2" />
+        <commit-buttons v-if="showCommitButtons" color="primary" class="mt-2" />
         <slot name="bottom" />
       </flex-box>
     </div>
@@ -84,6 +84,7 @@ export default Vue.extend({
     groupDesc: Boolean,
     sortBy: Array as PropType<string[]>,
     sortDesc: Boolean,
+    showCommitButtons: Boolean,
   },
   computed: {
     options() {

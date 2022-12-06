@@ -237,3 +237,15 @@ export function trainingTabOptions(): SelectOption[] {
     createEnumOption("project", "Project Data"),
   ];
 }
+
+/**
+ * Returns display names for table view tabs.
+ *
+ * @return The select option names and ids.
+ */
+export function tableViewTabOptions(): SelectOption[] {
+  return [
+    createEnumOption("artifacts", "Artifacts"),
+    createEnumOption("traceLinks", "Trace Links"),
+  ];
+}

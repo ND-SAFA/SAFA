@@ -25,9 +25,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         prog='PreTrainer',
         description='Pre-trains a bert model on a directory of documents.')
-    parser.add_argument('model')  # positional argument
-    parser.add_argument('repo', default="~/repos")
-    parser.add_argument('export', help="The model to evaluate.")
+    parser.add_argument('model', help="The path of the model to push.")
+    parser.add_argument('export', help="The name of the repository to push to.")
+    parser.add_argument('-repo', default="~/repos", help="The path to clone repository to.")
     args = parser.parse_args()
 
     #

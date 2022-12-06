@@ -2,8 +2,8 @@
 
 import {
   IOHandlerCallback,
-  PasswordChangeModel,
-  UserPasswordModel,
+  PasswordChangeSchema,
+  UserPasswordSchema,
 } from "@/types";
 import { sessionStore, logStore } from "@/hooks";
 import { getParam, getParams, navigateTo, QueryParams, Routes } from "@/router";
@@ -23,7 +23,7 @@ import {
  * @param user - The user to log in.
  * @throws If login is unsuccessful.
  */
-export async function handleLogin(user: UserPasswordModel): Promise<void> {
+export async function handleLogin(user: UserPasswordSchema): Promise<void> {
   const session = await createLoginSession(user);
   const goToPath = getParam(QueryParams.LOGIN_PATH);
   const query = { ...getParams() };
@@ -94,7 +94,7 @@ export async function handleAuthentication(): Promise<void> {
  * @param onError - Called if the action fails.
  */
 export function handleChangePassword(
-  password: PasswordChangeModel,
+  password: PasswordChangeSchema,
   { onSuccess, onError }: IOHandlerCallback
 ): void {
   savePassword(password)

@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-import { IdentifierModel, ProjectRole, SessionModel } from "@/types";
+import { IdentifierSchema, ProjectRole, SessionSchema } from "@/types";
 import { createSession, createUser } from "@/util";
 import { pinia } from "@/plugins";
 
@@ -33,7 +33,7 @@ export const useSession = defineStore("session", {
     /**
      * Updates the current session.
      */
-    updateSession(session: Partial<SessionModel>) {
+    updateSession(session: Partial<SessionSchema>) {
       this.session = { ...this.session, ...session };
     },
     /**
@@ -46,7 +46,7 @@ export const useSession = defineStore("session", {
     /**
      * @return Whether the current user owns this project.
      */
-    isOwner(project: IdentifierModel): boolean {
+    isOwner(project: IdentifierSchema): boolean {
       const member = project.members.find(
         (member) => member.email === this.userEmail
       );
@@ -56,7 +56,7 @@ export const useSession = defineStore("session", {
     /**
      * @return Whether the current user can administrate this project.
      */
-    isAdmin(project: IdentifierModel): boolean {
+    isAdmin(project: IdentifierSchema): boolean {
       const member = project.members.find(
         (member) => member.email === this.userEmail
       );
@@ -68,7 +68,7 @@ export const useSession = defineStore("session", {
     /**
      * @return Whether the current user can edit this project.
      */
-    isEditor(project: IdentifierModel): boolean {
+    isEditor(project: IdentifierSchema): boolean {
       const member = project.members.find(
         (member) => member.email === this.userEmail
       );

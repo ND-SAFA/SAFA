@@ -1,4 +1,4 @@
-import { ArtifactModel, FlatArtifact } from "@/types";
+import { ArtifactSchema, FlatArtifact } from "@/types";
 
 /**
  * Decides whether to filter an artifact out of view.
@@ -8,7 +8,7 @@ import { ArtifactModel, FlatArtifact } from "@/types";
  * @return If true, the artifact should be kept.
  */
 export function filterArtifacts(
-  artifact: ArtifactModel,
+  artifact: ArtifactSchema,
   queryText: string
 ): boolean {
   const lowercaseQuery = queryText.toLowerCase();
@@ -27,7 +27,7 @@ export function filterArtifacts(
  * @param artifact -The artifact to flatten.
  * @return The flattened artifact.
  */
-export function flattenArtifact(artifact: ArtifactModel): FlatArtifact {
+export function flattenArtifact(artifact: ArtifactSchema): FlatArtifact {
   return {
     ...artifact,
     ...(artifact.attributes || {}),

@@ -21,7 +21,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { GenerationModel } from "@/types";
+import { GenerationModelSchema } from "@/types";
 import { Typography, UnderConstructionAlert } from "@/components/common";
 
 /**
@@ -32,7 +32,7 @@ export default Vue.extend({
   components: { Typography, UnderConstructionAlert },
   props: {
     model: {
-      type: Object as PropType<GenerationModel>,
+      type: Object as PropType<GenerationModelSchema>,
       required: true,
     },
     generated: Boolean,

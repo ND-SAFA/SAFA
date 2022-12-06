@@ -1,7 +1,7 @@
 /**
  * Enumerates the types of artifact deltas.
  */
-import { ArtifactModel, TraceLinkModel } from "@/types";
+import { ArtifactSchema, TraceLinkSchema } from "@/types";
 
 /**
  * Enumerates the types of delta state.
@@ -78,17 +78,17 @@ export interface ProjectDelta {
   /**
    * Mapping of artifact names and their corresponding changes.
    */
-  artifacts: EntityDelta<ArtifactModel>;
+  artifacts: EntityDelta<ArtifactSchema>;
   /**
    * Mapping of trace ids and their corresponding changes.
    */
-  traces: EntityDelta<TraceLinkModel>;
+  traces: EntityDelta<TraceLinkSchema>;
 }
 
 /**
  * Represents an artifact delta.
  */
-export type DeltaArtifact = ArtifactModel | EntityModification<ArtifactModel>;
+export type DeltaArtifact = ArtifactSchema | EntityModification<ArtifactSchema>;
 
 /**
  * Represents a changed artifact.

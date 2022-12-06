@@ -51,7 +51,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { TraceLinkModel } from "@/types";
+import { TraceLinkSchema } from "@/types";
 import { linkStatus } from "@/util";
 import { projectStore, sessionStore } from "@/hooks";
 import {
@@ -77,7 +77,7 @@ export default Vue.extend({
   },
   props: {
     link: {
-      type: Object as PropType<TraceLinkModel>,
+      type: Object as PropType<TraceLinkSchema>,
       required: true,
     },
     showDelete: Boolean,

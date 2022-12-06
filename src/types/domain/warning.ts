@@ -1,7 +1,7 @@
 /**
  * Defines an artifact warning.
  */
-export interface WarningModel {
+export interface WarningSchema {
   /**
    * The artifact rule name.
    */
@@ -13,6 +13,6 @@ export interface WarningModel {
 }
 
 /**
- * A collection of warnings for all artifacts.
+ * A collection of warnings keyed by artifact id.
  */
-export type ProjectWarnings = Record<string, WarningModel[]>;
+export type WarningCollectionSchema = Record<string, WarningSchema[]>;

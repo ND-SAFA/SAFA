@@ -1,4 +1,4 @@
-import { IOHandlerCallback, MembershipModel, ProjectRole } from "@/types";
+import { IOHandlerCallback, MembershipSchema, ProjectRole } from "@/types";
 import { logStore, membersStore, projectStore } from "@/hooks";
 import {
   deleteProjectMember,
@@ -53,7 +53,7 @@ export function handleInviteMember(
  *
  * @param member - The member to delete.
  */
-export function handleDeleteMember(member: MembershipModel): void {
+export function handleDeleteMember(member: MembershipSchema): void {
   logStore.confirm(
     "Remove User from Project",
     `Are you sure you want to remove ${member.email} from project?`,

@@ -29,7 +29,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { ArtifactModel, CreatorOpenState } from "@/types";
+import { ArtifactSchema, CreatorOpenState } from "@/types";
 import { appStore, artifactSaveStore, selectionStore } from "@/hooks";
 import { handleDeleteArtifact, handleSaveArtifact } from "@/api";
 import { FlexBox } from "@/components/common";
@@ -56,7 +56,7 @@ export default Vue.extend({
     /**
      * @return The base artifact being edited.
      */
-    baseArtifact(): ArtifactModel | undefined {
+    baseArtifact(): ArtifactSchema | undefined {
       return selectionStore.selectedArtifact;
     },
     /**

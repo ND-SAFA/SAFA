@@ -17,7 +17,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { ArtifactModel } from "@/types";
+import { ArtifactSchema } from "@/types";
 import { appStore, selectionStore } from "@/hooks";
 import { handleDeleteArtifact } from "@/api";
 import { FlexBox, GenericIconButton } from "@/components/common";
@@ -32,14 +32,14 @@ export default Vue.extend({
     GenericIconButton,
   },
   props: {
-    artifact: Object as PropType<ArtifactModel>,
+    artifact: Object as PropType<ArtifactSchema>,
   },
   methods: {
     /**
      * Opens the edit artifact window.
      * @param artifact - The artifact to edit.
      */
-    handleEdit(artifact: ArtifactModel) {
+    handleEdit(artifact: ArtifactSchema) {
       selectionStore.selectArtifact(artifact.id);
       appStore.openArtifactCreatorTo({
         isNewArtifact: false,
@@ -49,7 +49,7 @@ export default Vue.extend({
      * Opens the delete artifact window.
      * @param artifact - The artifact to delete.
      */
-    handleDelete(artifact: ArtifactModel) {
+    handleDelete(artifact: ArtifactSchema) {
       handleDeleteArtifact(artifact, {});
     },
   },

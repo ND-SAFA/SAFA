@@ -33,7 +33,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { ArtifactModel, TraceLinkModel } from "@/types";
+import { ArtifactSchema, TraceLinkSchema } from "@/types";
 import { artifactStore } from "@/hooks";
 import { Typography, ArtifactBodyDisplay } from "@/components/common";
 
@@ -48,7 +48,7 @@ export default Vue.extend({
   },
   props: {
     link: {
-      type: Object as PropType<TraceLinkModel>,
+      type: Object as PropType<TraceLinkSchema>,
       required: true,
     },
     showOnly: String as PropType<"source" | "target">,
@@ -63,13 +63,13 @@ export default Vue.extend({
     /**
      * @return The artifact this link comes from.
      */
-    sourceArtifact(): ArtifactModel | undefined {
+    sourceArtifact(): ArtifactSchema | undefined {
       return artifactStore.getArtifactById(this.link.sourceId);
     },
     /**
      * @return The artifact this link goes towards.
      */
-    targetArtifact(): ArtifactModel | undefined {
+    targetArtifact(): ArtifactSchema | undefined {
       return artifactStore.getArtifactById(this.link.targetId);
     },
   },

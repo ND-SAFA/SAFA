@@ -25,7 +25,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { GridLayout, GridItem, GridItemData } from "vue-grid-layout";
-import { AttributeModel, AttributePositionModel } from "@/types";
+import { AttributeSchema, AttributePositionSchema } from "@/types";
 import { attributesStore } from "@/hooks";
 
 /**
@@ -41,7 +41,7 @@ export default Vue.extend({
     /**
      * @return The current layout to render.
      */
-    currentLayout(): AttributePositionModel[] {
+    currentLayout(): AttributePositionSchema[] {
       return attributesStore.defaultLayout;
     },
     /**
@@ -60,8 +60,8 @@ export default Vue.extend({
      * @return All attributes and their positions in the active layout.
      */
     attributeLayout(): {
-      attr: AttributeModel | undefined;
-      pos: AttributePositionModel;
+      attr: AttributeSchema | undefined;
+      pos: AttributePositionSchema;
     }[] {
       return this.currentLayout.map((pos) => ({
         pos,

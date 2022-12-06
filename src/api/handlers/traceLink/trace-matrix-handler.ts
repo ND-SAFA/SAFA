@@ -1,4 +1,4 @@
-import { LabelledTraceDirectionModel } from "@/types";
+import { LabelledTraceDirectionSchema } from "@/types";
 import { typeOptionsStore, projectStore } from "@/hooks";
 import { deleteTraceMatrix, getTraceMatrices } from "@/api";
 
@@ -37,7 +37,7 @@ export async function handleRemoveTraceType(
  * @param removedType - The type direction to remove.
  */
 export async function handleRemoveDirection(
-  labeledType: LabelledTraceDirectionModel,
+  labeledType: LabelledTraceDirectionSchema,
   removedType: string
 ): Promise<void> {
   labeledType.allowedTypes = labeledType.allowedTypes.filter(

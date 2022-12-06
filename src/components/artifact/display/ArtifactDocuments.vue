@@ -18,7 +18,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { DocumentModel } from "@/types";
+import { DocumentSchema } from "@/types";
 import { documentTypeOptions } from "@/util";
 import { documentStore, selectionStore } from "@/hooks";
 import { handleSwitchDocuments } from "@/api";
@@ -40,7 +40,7 @@ export default Vue.extend({
     /**
      * @return The selected artifact's documents.
      */
-    documents(): DocumentModel[] {
+    documents(): DocumentSchema[] {
       if (!this.selectedArtifact) return [];
 
       return documentStore.projectDocuments.filter(({ documentId }) =>
@@ -59,7 +59,7 @@ export default Vue.extend({
      * Switches to another document.
      * @param document - The document to switch to.
      */
-    handleSwitchDocument(document: DocumentModel): void {
+    handleSwitchDocument(document: DocumentSchema): void {
       handleSwitchDocuments(document);
     },
     /**

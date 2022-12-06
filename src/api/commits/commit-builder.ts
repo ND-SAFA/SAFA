@@ -1,4 +1,9 @@
-import { ArtifactModel, Commit, VersionModel, TraceLinkModel } from "@/types";
+import {
+  ArtifactSchema,
+  Commit,
+  VersionSchema,
+  TraceLinkSchema,
+} from "@/types";
 import { createCommit } from "@/util";
 import { projectStore } from "@/hooks";
 import { saveCommit } from "@/api";
@@ -16,7 +21,7 @@ export class CommitBuilder {
    * Creates a commit builder.
    * @param version - The project version to commit to.
    */
-  constructor(version: VersionModel) {
+  constructor(version: VersionSchema) {
     this.commit = createCommit(version);
   }
 
@@ -33,7 +38,7 @@ export class CommitBuilder {
    *
    * @param artifact - The artifact to create.
    */
-  withNewArtifact(artifact: ArtifactModel): this {
+  withNewArtifact(artifact: ArtifactSchema): this {
     this.commit.artifacts.added.push(artifact);
     return this;
   }
@@ -43,7 +48,7 @@ export class CommitBuilder {
    *
    * @param artifact - The artifact to modify.
    */
-  withModifiedArtifact(artifact: ArtifactModel): this {
+  withModifiedArtifact(artifact: ArtifactSchema): this {
     this.commit.artifacts.modified.push(artifact);
     return this;
   }
@@ -53,7 +58,7 @@ export class CommitBuilder {
    *
    * @param artifact - The artifact to remove.
    */
-  withRemovedArtifact(artifact: ArtifactModel): this {
+  withRemovedArtifact(artifact: ArtifactSchema): this {
     this.commit.artifacts.removed.push(artifact);
     return this;
   }
@@ -63,7 +68,7 @@ export class CommitBuilder {
    *
    * @param traceLink - The link to add.
    */
-  withNewTraceLink(traceLink: TraceLinkModel): this {
+  withNewTraceLink(traceLink: TraceLinkSchema): this {
     this.commit.traces.added.push(traceLink);
     return this;
   }
@@ -73,7 +78,7 @@ export class CommitBuilder {
    *
    * @param traceLinks - The links to add.
    */
-  withNewTraceLinks(traceLinks: TraceLinkModel[]): this {
+  withNewTraceLinks(traceLinks: TraceLinkSchema[]): this {
     this.commit.traces.added.push(...traceLinks);
     return this;
   }
@@ -83,7 +88,7 @@ export class CommitBuilder {
    *
    * @param traceLink - The link to modify.
    */
-  withModifiedTraceLink(traceLink: TraceLinkModel): this {
+  withModifiedTraceLink(traceLink: TraceLinkSchema): this {
     this.commit.traces.modified.push(traceLink);
     return this;
   }
@@ -93,7 +98,7 @@ export class CommitBuilder {
    *
    * @param traceLinks - The links to modify.
    */
-  withModifiedTraceLinks(traceLinks: TraceLinkModel[]): this {
+  withModifiedTraceLinks(traceLinks: TraceLinkSchema[]): this {
     this.commit.traces.modified.push(...traceLinks);
     return this;
   }

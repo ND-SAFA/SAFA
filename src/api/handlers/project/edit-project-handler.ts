@@ -1,4 +1,4 @@
-import { IOHandlerCallback, ProjectModel, IdentifierModel } from "@/types";
+import { IOHandlerCallback, ProjectSchema, IdentifierSchema } from "@/types";
 import { identifierSaveStore, logStore, projectStore } from "@/hooks";
 import {
   deleteProject,
@@ -18,7 +18,7 @@ export function handleSaveProject({
   onSuccess,
   onError,
   onComplete,
-}: IOHandlerCallback<ProjectModel>): void {
+}: IOHandlerCallback<ProjectSchema>): void {
   const identifier = identifierSaveStore.editedIdentifier;
 
   saveProject(identifier)
@@ -46,7 +46,7 @@ export function handleDeleteProject({
   onSuccess,
   onError,
   onComplete,
-}: IOHandlerCallback<IdentifierModel>): void {
+}: IOHandlerCallback<IdentifierSchema>): void {
   const project = identifierSaveStore.baseIdentifier;
 
   if (!project) return;

@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-import { IdentifierModel } from "@/types";
+import { IdentifierSchema } from "@/types";
 import { createProjectIdentifier } from "@/util";
 import { pinia } from "@/plugins";
 
@@ -12,7 +12,7 @@ export const useSaveIdentifier = defineStore("saveIdentifier", {
     /**
      * A base identifier being edited.
      */
-    baseIdentifier: undefined as IdentifierModel | undefined,
+    baseIdentifier: undefined as IdentifierSchema | undefined,
     /**
      * The identifier being created or edited.
      */

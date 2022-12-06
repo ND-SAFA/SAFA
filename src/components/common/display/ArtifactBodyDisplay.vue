@@ -20,7 +20,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { ArtifactModel } from "@/types";
+import { ArtifactSchema } from "@/types";
 import { typeOptionsStore } from "@/hooks";
 import { FlexBox } from "@/components/common/layout";
 import { AttributeChip } from "./attribute";
@@ -34,7 +34,7 @@ export default Vue.extend({
   components: { AttributeChip, FlexBox, Typography },
   props: {
     artifact: {
-      type: Object as PropType<ArtifactModel>,
+      type: Object as PropType<ArtifactSchema>,
       required: true,
     },
     displayTitle: Boolean,

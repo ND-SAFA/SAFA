@@ -1,7 +1,7 @@
 /**
  * Represents a member in a given project
  */
-export interface MembershipModel {
+export interface MembershipSchema {
   projectMembershipId: string;
   email: string;
   role: ProjectRole;
@@ -21,7 +21,7 @@ export enum ProjectRole {
 /**
  * Represents a request for adding a member to a project.
  */
-export interface MemberRequestModel {
+export interface MemberRequestSchema {
   memberEmail: string;
   projectRole: ProjectRole;
 }

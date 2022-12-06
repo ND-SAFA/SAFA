@@ -2,8 +2,8 @@ import { defineStore } from "pinia";
 
 import {
   ArtifactUploader,
-  CreateProjectByJsonModel,
-  MembershipModel,
+  CreateProjectByJsonSchema,
+  MembershipSchema,
   ProjectRole,
   TraceUploader,
 } from "@/types";
@@ -38,7 +38,7 @@ export const useSaveProject = defineStore("saveProject", {
     getCreationRequest(
       artifactUploader: ArtifactUploader,
       traceUploader: TraceUploader
-    ): CreateProjectByJsonModel {
+    ): CreateProjectByJsonSchema {
       const artifacts = artifactUploader.panels
         .map(({ projectFile }) => projectFile.artifacts || [])
         .reduce((acc, cur) => [...acc, ...cur], []);
@@ -56,7 +56,7 @@ export const useSaveProject = defineStore("saveProject", {
           ],
           method: projectFile.method,
         }));
-      const user: MembershipModel = {
+      const user: MembershipSchema = {
         projectMembershipId: "",
         email: sessionStore.userEmail,
         role: ProjectRole.OWNER,

@@ -34,7 +34,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { IdentifierModel } from "@/types";
+import { IdentifierSchema } from "@/types";
 import { identifierSaveStore } from "@/hooks";
 import { handleBulkImportProject } from "@/api";
 import { GenericSwitch } from "@/components/common";
@@ -74,7 +74,7 @@ export default Vue.extend({
     /**
      * @return  The identifier being updated.
      */
-    identifier(): IdentifierModel {
+    identifier(): IdentifierSchema {
       return identifierSaveStore.editedIdentifier;
     },
     /**

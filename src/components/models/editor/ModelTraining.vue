@@ -20,7 +20,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { GenerationModel, TrainingStepModel } from "@/types";
+import { GenerationModelSchema, TrainingStepSchema } from "@/types";
 import { ENABLED_FEATURES, EXAMPLE_TRAINING_STEPS } from "@/util";
 import { Typography } from "@/components/common";
 import ModelTrainingStep from "./ModelTrainingStep.vue";
@@ -39,7 +39,7 @@ export default Vue.extend({
   },
   props: {
     model: {
-      type: Object as PropType<GenerationModel>,
+      type: Object as PropType<GenerationModelSchema>,
       required: true,
     },
   },
@@ -47,7 +47,7 @@ export default Vue.extend({
     /**
      * @return The logged steps of model training.
      */
-    steps(): TrainingStepModel[] {
+    steps(): TrainingStepSchema[] {
       return ENABLED_FEATURES.EXAMPLE_TRAINING_STEPS
         ? EXAMPLE_TRAINING_STEPS
         : this.model.steps || [];

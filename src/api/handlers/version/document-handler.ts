@@ -1,4 +1,4 @@
-import { DocumentType, IOHandlerCallback, DocumentModel } from "@/types";
+import { DocumentType, IOHandlerCallback, DocumentSchema } from "@/types";
 import { createDocument, preserveObjectKeys } from "@/util";
 import {
   logStore,
@@ -54,7 +54,7 @@ export async function handleCreateDocument(
  * @param document - The document to edit.
  */
 export async function handleUpdateDocument(
-  document: DocumentModel
+  document: DocumentSchema
 ): Promise<void> {
   const versionId = projectStore.versionIdWithLog;
   const updatedDocument = await saveDocument(versionId, document);
@@ -171,7 +171,7 @@ export function handleSaveDocument({
  * @param document - The current document.
  */
 export async function handleSwitchDocuments(
-  document: DocumentModel
+  document: DocumentSchema
 ): Promise<void> {
   documentStore.switchDocuments(document);
 

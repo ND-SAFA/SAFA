@@ -1,7 +1,7 @@
 import {
-  CreateProjectByJsonModel,
+  CreateProjectByJsonSchema,
   IOHandlerCallback,
-  ProjectModel,
+  ProjectSchema,
 } from "@/types";
 import { appStore, integrationsStore, logStore, projectStore } from "@/hooks";
 import { navigateTo, Routes } from "@/router";
@@ -23,7 +23,7 @@ import {
  * @param onError - Called if the action fails.
  */
 export function handleImportProject(
-  projectCreationRequest: CreateProjectByJsonModel,
+  projectCreationRequest: CreateProjectByJsonSchema,
   { onSuccess, onError }: IOHandlerCallback
 ): void {
   const name = projectCreationRequest.project.name;
@@ -55,7 +55,7 @@ export function handleImportProject(
  */
 export function handleBulkImportProject(
   project: Pick<
-    ProjectModel,
+    ProjectSchema,
     "projectId" | "name" | "description" | "projectVersion"
   >,
   files: File[],

@@ -29,7 +29,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { LinkModel, TraceFile } from "@/types";
+import { LinkSchema, TraceFile } from "@/types";
 import { logStore } from "@/hooks";
 import { FlexBox } from "@/components/common";
 
@@ -82,7 +82,7 @@ export default Vue.extend({
         sourceId: this.source,
         targetName: this.target,
         targetId: this.target,
-      } as LinkModel);
+      } as LinkSchema);
     },
   },
   watch: {

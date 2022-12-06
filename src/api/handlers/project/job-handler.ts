@@ -1,5 +1,5 @@
 import { Frame } from "webstomp-client";
-import { ChangeMessageModel, IOHandlerCallback, JobModel } from "@/types";
+import { ChangeMessageSchema, IOHandlerCallback, JobSchema } from "@/types";
 import { appStore, jobStore } from "@/hooks";
 import {
   connect,
@@ -33,7 +33,7 @@ export async function connectAndSubscribeToJob(jobId: string): Promise<void> {
  * @param frame - The websocket frame including job update message.
  */
 export function updateJobFromWebsocketMessage(frame: Frame): void {
-  const job: JobModel | ChangeMessageModel = JSON.parse(frame.body);
+  const job: JobSchema | ChangeMessageSchema = JSON.parse(frame.body);
 
   if (!("jobType" in job)) return;
 
@@ -44,7 +44,7 @@ export function updateJobFromWebsocketMessage(frame: Frame): void {
  * Subscribes to job updates via websocket messages, updates the
  * store, and selects the job.
  */
-export async function handleJobSubmission(job: JobModel): Promise<void> {
+export async function handleJobSubmission(job: JobSchema): Promise<void> {
   await connectAndSubscribeToJob(job.id);
   jobStore.updateJob(job);
   jobStore.selectedJob = job;
@@ -58,7 +58,7 @@ export async function handleJobSubmission(job: JobModel): Promise<void> {
  * @param onError - Called if the action fails.
  */
 export function handleDeleteJob(
-  job: JobModel,
+  job: JobSchema,
   { onSuccess, onError }: IOHandlerCallback
 ): void {
   deleteJobById(job.id)

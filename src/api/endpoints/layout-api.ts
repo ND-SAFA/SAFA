@@ -1,4 +1,4 @@
-import { GeneratedLayoutsModel, LayoutRegenerationModel } from "@/types";
+import { GeneratedLayoutsSchema, LayoutRegenerationSchema } from "@/types";
 import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
 
 /**
@@ -11,12 +11,12 @@ import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
 export async function createLayout(
   versionId: string,
   documentId: string
-): Promise<GeneratedLayoutsModel> {
-  const body: LayoutRegenerationModel = documentId
+): Promise<GeneratedLayoutsSchema> {
+  const body: LayoutRegenerationSchema = documentId
     ? { defaultDocument: false, documentIds: [documentId] }
     : { defaultDocument: true, documentIds: [] };
 
-  return authHttpClient<GeneratedLayoutsModel>(
+  return authHttpClient<GeneratedLayoutsSchema>(
     fillEndpoint(Endpoint.refreshLayout, { versionId }),
     {
       method: "POST",

@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-import { GenerationModel } from "@/types";
+import { GenerationModelSchema } from "@/types";
 import { createModel } from "@/util";
 import { pinia } from "@/plugins";
 
@@ -12,7 +12,7 @@ export const useSaveModel = defineStore("saveModel", {
     /**
      * A base model being edited.
      */
-    baseModel: undefined as GenerationModel | undefined,
+    baseModel: undefined as GenerationModelSchema | undefined,
     /**
      * The model being created or edited.
      */

@@ -19,7 +19,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { ArtifactLevelModel, ModelType, GenerationModel } from "@/types";
+import { ArtifactLevelSchema, ModelType, GenerationModelSchema } from "@/types";
 import { handleGenerateLinks } from "@/api";
 import { Typography, CustomModelInput } from "@/components/common";
 import { TraceMatrixCreator } from "../save";
@@ -44,8 +44,8 @@ export default Vue.extend({
       isLoading: false,
       isValid: false,
       method: undefined as ModelType | undefined,
-      model: undefined as GenerationModel | undefined,
-      matrices: [{ source: "", target: "" }] as ArtifactLevelModel[],
+      model: undefined as GenerationModelSchema | undefined,
+      matrices: [{ source: "", target: "" }] as ArtifactLevelSchema[],
     };
   },
   watch: {

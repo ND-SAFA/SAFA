@@ -49,7 +49,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { ArtifactModel } from "@/types";
+import { ArtifactSchema } from "@/types";
 import { filterArtifacts } from "@/util";
 import { artifactStore } from "@/hooks";
 import { GenericIconButton } from "@/components/common/button";
@@ -103,7 +103,7 @@ export default Vue.extend({
      * @param item - The artifact to check.
      * @return Whether it is selected.
      */
-    isSelected(item: ArtifactModel): boolean {
+    isSelected(item: ArtifactSchema): boolean {
       if (typeof this.model === "string") {
         return item.id === this.model;
       } else if (Array.isArray(this.model)) {
@@ -117,7 +117,7 @@ export default Vue.extend({
      *
      * @param item - The artifact to remove.
      */
-    handleDelete(item: ArtifactModel): void {
+    handleDelete(item: ArtifactSchema): void {
       if (typeof this.model === "string") {
         this.model = "";
       } else if (Array.isArray(this.model)) {
@@ -135,7 +135,7 @@ export default Vue.extend({
     /**
      * @return The artifacts to select from.
      */
-    artifacts(): ArtifactModel[] {
+    artifacts(): ArtifactSchema[] {
       return this.onlyDocumentArtifacts
         ? artifactStore.currentArtifacts
         : artifactStore.allArtifacts;

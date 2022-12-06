@@ -42,7 +42,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { GenerationModel } from "@/types";
+import { GenerationModelSchema } from "@/types";
 import { modelSaveStore, projectStore } from "@/hooks";
 import { handleDeleteModel, handleLoadModels } from "@/api";
 import {
@@ -76,14 +76,14 @@ export default Vue.extend({
         { text: "Base Model", value: "baseModel" },
         { text: "Actions", value: "actions", sortable: false },
       ],
-      currentItem: undefined as GenerationModel | undefined,
+      currentItem: undefined as GenerationModelSchema | undefined,
     };
   },
   computed: {
     /**
      * @return All project models.
      */
-    items(): GenerationModel[] {
+    items(): GenerationModelSchema[] {
       return projectStore.models;
     },
   },
@@ -108,7 +108,7 @@ export default Vue.extend({
      * Opens the modal to edit a model.
      * @param model - The model to edit.
      */
-    handleEdit(model: GenerationModel) {
+    handleEdit(model: GenerationModelSchema) {
       modelSaveStore.baseModel = model;
       this.currentItem = model;
       this.isSaveOpen = true;
@@ -117,7 +117,7 @@ export default Vue.extend({
      * Opens the modal to share a model.
      * @param model - The model to share.
      */
-    handleShare(model: GenerationModel) {
+    handleShare(model: GenerationModelSchema) {
       this.currentItem = model;
       this.isShareOpen = true;
     },
@@ -125,7 +125,7 @@ export default Vue.extend({
      * Opens the modal to delete a model.
      * @param model - The model to delete.
      */
-    handleDelete(model: GenerationModel) {
+    handleDelete(model: GenerationModelSchema) {
       handleDeleteModel(model);
     },
     /**

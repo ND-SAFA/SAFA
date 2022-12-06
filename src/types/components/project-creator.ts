@@ -1,4 +1,4 @@
-import { ArtifactModel, LinkModel } from "@/types/domain";
+import { ArtifactSchema, LinkSchema } from "@/types/domain";
 import { ArtifactFile, ProjectFile, TraceFile } from "@/types/components";
 
 /**
@@ -30,12 +30,12 @@ export type ValidFileTypes = ArtifactFile | TraceFile;
  * Defines the types of parsed objects used in upload verification as
  * either an artifact id or a trace link.
  */
-export type ValidPayloads = string | LinkModel;
+export type ValidPayloads = string | LinkSchema;
 
 /**
  * Defines a collection of parsed artifacts.
  */
-export type ArtifactMap = Record<string, ArtifactModel>;
+export type ArtifactMap = Record<string, ArtifactSchema>;
 
 /**
  * Defines a panel for parsing trace link files.
@@ -45,7 +45,11 @@ export type TracePanel = IGenericFilePanel<ArtifactMap, TraceFile>;
 /**
  * Defines a set of panels for parsing trace link files.
  */
-export type TraceUploader = IGenericUploader<ArtifactMap, LinkModel, TraceFile>;
+export type TraceUploader = IGenericUploader<
+  ArtifactMap,
+  LinkSchema,
+  TraceFile
+>;
 
 /**
  * Defines a panel for parsing artifact files.

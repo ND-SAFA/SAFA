@@ -35,7 +35,7 @@ export enum ModelType {
 /**
  * Defines a link.
  */
-export interface LinkModel {
+export interface LinkSchema {
   /**
    * The source node ID.
    */
@@ -57,7 +57,7 @@ export interface LinkModel {
 /**
  * Defines a trace link.
  */
-export interface TraceLinkModel extends LinkModel {
+export interface TraceLinkSchema extends LinkSchema {
   /**
    * The trace link ID.
    */
@@ -79,7 +79,7 @@ export interface TraceLinkModel extends LinkModel {
 /**
  * Represents a trace link merged with other properties.
  */
-export interface FlatTraceLink extends TraceLinkModel {
+export interface FlatTraceLink extends TraceLinkSchema {
   /**
    * The type of source artifact.
    */
@@ -102,7 +102,7 @@ export interface FlatTraceLink extends TraceLinkModel {
  * Link used when hiding subtrees to summarize the links of the children
  * of some root node.
  */
-export interface SubtreeLinkModel extends TraceLinkModel {
+export interface SubtreeLinkSchema extends TraceLinkSchema {
   type: InternalTraceType.SUBTREE;
   /**
    * The id of the artifact.
@@ -113,7 +113,7 @@ export interface SubtreeLinkModel extends TraceLinkModel {
 /**
  * The direction of trace links allowed by an artifact type.
  */
-export interface TraceDirectionModel {
+export interface TraceDirectionSchema {
   /**
    * The name of source the artifact type.
    */
@@ -127,7 +127,7 @@ export interface TraceDirectionModel {
 /**
  * The direction of trace links allowed by an artifact type, with a label.
  */
-export interface LabelledTraceDirectionModel extends TraceDirectionModel {
+export interface LabelledTraceDirectionSchema extends TraceDirectionSchema {
   /**
    * The label to present an artifact direction.
    */
@@ -145,7 +145,7 @@ export interface LabelledTraceDirectionModel extends TraceDirectionModel {
 /**
  * Represents links generated for a project.
  */
-export interface GeneratedLinksModel {
+export interface GeneratedLinksSchema {
   /**
    * All generated links.
    */

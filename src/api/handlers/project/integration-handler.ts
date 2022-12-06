@@ -1,8 +1,8 @@
 import {
-  GitHubProjectModel,
-  InstallationModel,
+  GitHubProjectSchema,
+  InstallationSchema,
   IOHandlerCallback,
-  JiraProjectModel,
+  JiraProjectSchema,
 } from "@/types";
 import { integrationsStore, logStore, projectStore } from "@/hooks";
 import { getParam, QueryParams } from "@/router";
@@ -51,7 +51,7 @@ export function handleLoadInstallations({
  * @param onError - Called if the action fails.
  */
 export async function handleSyncInstallation(
-  installation: Omit<InstallationModel, "lastUpdate">,
+  installation: Omit<InstallationSchema, "lastUpdate">,
   { onSuccess, onError, onComplete }: IOHandlerCallback
 ): Promise<void> {
   try {
@@ -146,7 +146,7 @@ export function handleAuthorizeJira({
 export function handleLoadJiraProjects({
   onSuccess,
   onError,
-}: IOHandlerCallback<JiraProjectModel[]>): void {
+}: IOHandlerCallback<JiraProjectSchema[]>): void {
   getJiraProjects()
     .then(onSuccess)
     .catch((e) => {
@@ -216,7 +216,7 @@ export function handleAuthorizeGitHub({
 export function handleLoadGitHubProjects({
   onSuccess,
   onError,
-}: IOHandlerCallback<GitHubProjectModel[]>): void {
+}: IOHandlerCallback<GitHubProjectSchema[]>): void {
   getGitHubProjects()
     .then(onSuccess)
     .catch((e) => {

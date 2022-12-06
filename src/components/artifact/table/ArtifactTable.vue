@@ -87,10 +87,10 @@
 <script lang="ts">
 import Vue from "vue";
 import {
-  ArtifactModel,
+  ArtifactSchema,
   ArtifactDeltaState,
   FlatArtifact,
-  AttributeModel,
+  AttributeSchema,
 } from "@/types";
 import {
   appStore,
@@ -134,7 +134,7 @@ export default Vue.extend({
       sortDesc: false,
       groupDesc: false,
       selectedDeltaTypes: [] as ArtifactDeltaState[],
-      expanded: [] as ArtifactModel[],
+      expanded: [] as ArtifactSchema[],
     };
   },
   computed: {
@@ -206,7 +206,7 @@ export default Vue.extend({
     /**
      * @return The artifact table's columns.
      */
-    attributes(): AttributeModel[] {
+    attributes(): AttributeSchema[] {
       return attributesStore.attributes;
     },
     /**
@@ -227,7 +227,7 @@ export default Vue.extend({
      * Opens the view artifact side panel.
      * @param artifact - The artifact to view.
      */
-    handleView(artifact: ArtifactModel) {
+    handleView(artifact: ArtifactSchema) {
       if (selectionStore.selectedArtifactId === artifact.id) {
         selectionStore.clearSelections();
         this.expanded = [];
@@ -241,7 +241,7 @@ export default Vue.extend({
      * @param item - The artifact to display.
      * @return The class name to add to the artifact.
      */
-    getItemBackground(item: ArtifactModel): string {
+    getItemBackground(item: ArtifactSchema): string {
       if (selectionStore.selectedArtifactId === item.id) {
         return "artifact-row-selected";
       }

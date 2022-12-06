@@ -1,10 +1,10 @@
 import { defineStore } from "pinia";
 
 import {
-  LayoutPositionsModel,
-  DocumentModel,
+  LayoutPositionsSchema,
+  DocumentSchema,
   DocumentType,
-  ProjectModel,
+  ProjectSchema,
 } from "@/types";
 import { createDocument, isTableDocument, removeMatches } from "@/util";
 import { pinia } from "@/plugins";
@@ -43,7 +43,7 @@ export const useDocuments = defineStore("documents", {
     /**
      * @return All custom documents & the base document.
      */
-    projectDocuments(): DocumentModel[] {
+    projectDocuments(): DocumentSchema[] {
       return [...this.allDocuments, this.baseDocument];
     },
     /**
@@ -87,7 +87,7 @@ export const useDocuments = defineStore("documents", {
     /**
      * Initializes the current artifacts and traces visible in the current document.
      */
-    initializeProject(project: ProjectModel): void {
+    initializeProject(project: ProjectSchema): void {
       const {
         artifacts,
         traces,
@@ -125,7 +125,7 @@ export const useDocuments = defineStore("documents", {
      */
     updateDocumentLayout(
       documentId: string,
-      layout: LayoutPositionsModel
+      layout: LayoutPositionsSchema
     ): void {
       const document = this.allDocuments.find(
         (document) => documentId === document.documentId
@@ -143,7 +143,7 @@ export const useDocuments = defineStore("documents", {
      * Updates the base document's layout, and reruns the layout if on the base document.
      * @param layout - The new layout to set.
      */
-    updateBaseLayout(layout: LayoutPositionsModel): void {
+    updateBaseLayout(layout: LayoutPositionsSchema): void {
       projectStore.updateProject({ layout });
 
       this.baseDocument.layout = layout;
@@ -157,7 +157,7 @@ export const useDocuments = defineStore("documents", {
      *
      * @param updatedDocuments - The updated documents.
      */
-    async updateDocuments(updatedDocuments: DocumentModel[]): Promise<void> {
+    async updateDocuments(updatedDocuments: DocumentSchema[]): Promise<void> {
       const updatedIds = updatedDocuments.map((d) => d.documentId);
       const currentDocument = updatedDocuments.find(
         ({ documentId }) => documentId === this.currentId
@@ -177,7 +177,7 @@ export const useDocuments = defineStore("documents", {
      *
      * @param document - The document to switch to.
      */
-    async switchDocuments(document: DocumentModel): Promise<void> {
+    async switchDocuments(document: DocumentSchema): Promise<void> {
       const currentArtifactIds = document.artifactIds;
 
       this.currentDocument = document;
@@ -190,7 +190,7 @@ export const useDocuments = defineStore("documents", {
      *
      * @param document - The document to add.
      */
-    async addDocument(document: DocumentModel): Promise<void> {
+    async addDocument(document: DocumentSchema): Promise<void> {
       this.allDocuments = [...this.allDocuments, document];
 
       await this.switchDocuments(document);
@@ -213,7 +213,7 @@ export const useDocuments = defineStore("documents", {
      *
      * @param document - The document, or document id, to delete.
      */
-    async removeDocument(document: string | DocumentModel): Promise<void> {
+    async removeDocument(document: string | DocumentSchema): Promise<void> {
       const deleteDocumentId =
         typeof document === "string" ? document : document.documentId;
 

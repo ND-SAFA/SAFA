@@ -8,7 +8,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { CustomAttributeCollection } from "@/types";
+import { AttributeCollectionSchema } from "@/types";
 import { AttributeGrid } from "@/components/common/display";
 import AttributeInput from "./AttributeInput.vue";
 
@@ -19,7 +19,7 @@ export default Vue.extend({
   name: "AttributeListInput",
   components: { AttributeGrid, AttributeInput },
   props: {
-    model: Object as PropType<CustomAttributeCollection>,
+    model: Object as PropType<AttributeCollectionSchema>,
   },
 });
 </script>

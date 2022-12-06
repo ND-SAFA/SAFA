@@ -25,7 +25,11 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { IdentifierModel, ModelShareType, GenerationModel } from "@/types";
+import {
+  IdentifierSchema,
+  ModelShareType,
+  GenerationModelSchema,
+} from "@/types";
 import { modelShareOptions } from "@/util";
 import { projectStore } from "@/hooks";
 import { handleShareModel } from "@/api";
@@ -45,7 +49,7 @@ export default Vue.extend({
   },
   props: {
     isOpen: Boolean,
-    model: Object as PropType<GenerationModel | undefined>,
+    model: Object as PropType<GenerationModelSchema | undefined>,
   },
   data() {
     return {
@@ -58,7 +62,7 @@ export default Vue.extend({
     /**
      * @return All unloaded projects for the current user.
      */
-    projects(): IdentifierModel[] {
+    projects(): IdentifierSchema[] {
       return projectStore.unloadedProjects;
     },
     /**

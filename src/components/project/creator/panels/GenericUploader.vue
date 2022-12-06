@@ -43,7 +43,7 @@ import {
   ValidFileTypes,
   ProjectFile,
   ValidPayloads,
-  LinkModel,
+  LinkSchema,
 } from "@/types";
 import { FileFormatAlert } from "@/components/common";
 import FilePanelController from "./FilePanelController.vue";
@@ -163,7 +163,7 @@ export default Vue.extend({
      * Emits changes when a panel is added.
      * @param payload - The added panel artifact name or trace link.
      */
-    handleAddFile(payload: string | LinkModel): void {
+    handleAddFile(payload: string | LinkSchema): void {
       const newPanel = this.uploader.createNewPanel(payload);
       this.$emit("change", this.panels.concat([newPanel]));
       this.openPanelIndexes.push(this.panels.length - 1);

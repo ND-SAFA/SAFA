@@ -117,7 +117,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { JobModel, JobStatus } from "@/types";
+import { JobSchema, JobStatus } from "@/types";
 import { enumToDisplay, getJobStatusColor, timestampToDisplay } from "@/util";
 import { appStore, jobStore, logStore } from "@/hooks";
 import { handleDeleteJob, handleLoadVersion, handleReloadJobs } from "@/api";
@@ -152,13 +152,13 @@ export default Vue.extend({
     /**
      * return The current jobs.
      */
-    jobs(): JobModel[] {
+    jobs(): JobSchema[] {
       return jobStore.jobs;
     },
     /**
      * return The current selected job index.
      */
-    expanded(): JobModel[] {
+    expanded(): JobSchema[] {
       return jobStore.selectedJob ? [jobStore.selectedJob] : [];
     },
   },
@@ -215,20 +215,20 @@ export default Vue.extend({
      * Opens the view job expansion panel.
      * @param job - The job to view.
      */
-    handleView(job: JobModel): void {
+    handleView(job: JobSchema): void {
       jobStore.selectedJob = job;
     },
     /**
      * Attempts to delete a job.
      * @param job - The job to delete.
      */
-    handleDeleteJob(job: JobModel): void {
+    handleDeleteJob(job: JobSchema): void {
       handleDeleteJob(job, {});
     },
     /**
      * Navigates user to the completed project.
      */
-    async handleViewProject(job: JobModel): Promise<void> {
+    async handleViewProject(job: JobSchema): Promise<void> {
       if (job.completedEntityId) {
         await handleLoadVersion(job.completedEntityId);
       } else {

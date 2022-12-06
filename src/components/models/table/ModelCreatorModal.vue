@@ -28,7 +28,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { GenerationModel } from "@/types";
+import { GenerationModelSchema } from "@/types";
 import { modelSaveStore } from "@/hooks";
 import { handleSaveModel } from "@/api";
 import { GenericModal, GenMethodInput, FlexBox } from "@/components/common";
@@ -58,7 +58,7 @@ export default Vue.extend({
     /**
      * @return The model being edited.
      */
-    editedModel(): GenerationModel {
+    editedModel(): GenerationModelSchema {
       return modelSaveStore.editedModel;
     },
     /**

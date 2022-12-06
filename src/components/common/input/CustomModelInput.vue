@@ -20,7 +20,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { GenerationModel } from "@/types";
+import { GenerationModelSchema } from "@/types";
 import { projectStore } from "@/hooks";
 import { Typography } from "@/components/common/display";
 
@@ -35,7 +35,7 @@ export default Vue.extend({
     Typography,
   },
   props: {
-    value: Object as PropType<GenerationModel | undefined>,
+    value: Object as PropType<GenerationModelSchema | undefined>,
   },
   data() {
     return {
@@ -46,7 +46,7 @@ export default Vue.extend({
     /**
      * @return The trace generation model types.
      */
-    modelOptions(): GenerationModel[] {
+    modelOptions(): GenerationModelSchema[] {
       return projectStore.models;
     },
   },
@@ -54,7 +54,7 @@ export default Vue.extend({
     /**
      * Updates the model if the value changes.
      */
-    value(currentValue: GenerationModel) {
+    value(currentValue: GenerationModelSchema) {
       this.model = currentValue?.id;
     },
     /**

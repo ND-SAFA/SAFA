@@ -1,10 +1,10 @@
 import { defineStore } from "pinia";
 import {
-  IdentifierModel,
-  ProjectModel,
-  GenerationModel,
-  VersionModel,
-  InstallationModel,
+  IdentifierSchema,
+  ProjectSchema,
+  GenerationModelSchema,
+  VersionSchema,
+  InstallationSchema,
 } from "@/types";
 import { createProject } from "@/util";
 import { pinia } from "@/plugins";
@@ -26,7 +26,7 @@ export const useProject = defineStore("project", {
     /**
      * All projects available to the current user.
      */
-    allProjects: [] as IdentifierModel[],
+    allProjects: [] as IdentifierSchema[],
     /**
      * The currently loaded project.
      */
@@ -34,7 +34,7 @@ export const useProject = defineStore("project", {
     /**
      * The 3rd party installations linked to the current project.
      */
-    installations: [] as InstallationModel[],
+    installations: [] as InstallationSchema[],
   }),
   getters: {
     /**
@@ -46,7 +46,7 @@ export const useProject = defineStore("project", {
     /**
      * @return The current version.
      */
-    version(): VersionModel | undefined {
+    version(): VersionSchema | undefined {
       return this.project.projectVersion;
     },
     /**
@@ -80,7 +80,7 @@ export const useProject = defineStore("project", {
     /**
      * @return The current project's models.
      */
-    models(): GenerationModel[] {
+    models(): GenerationModelSchema[] {
       return this.project.models;
     },
     /**
@@ -96,7 +96,7 @@ export const useProject = defineStore("project", {
     /**
      * @return All projects that arent currently loaded.
      */
-    unloadedProjects(): IdentifierModel[] {
+    unloadedProjects(): IdentifierSchema[] {
       return this.allProjects.filter(
         ({ projectId }) => projectId !== this.projectId
       );
@@ -108,7 +108,7 @@ export const useProject = defineStore("project", {
      *
      * @param project - The new project fields.
      */
-    updateProject(project: Partial<ProjectModel>): void {
+    updateProject(project: Partial<ProjectSchema>): void {
       this.project = {
         ...this.project,
         ...project,
@@ -117,7 +117,7 @@ export const useProject = defineStore("project", {
     /**
      * Initializes the current project.
      */
-    initializeProject(project: ProjectModel): void {
+    initializeProject(project: ProjectSchema): void {
       this.project = project;
 
       selectionStore.clearSelections();
@@ -145,7 +145,7 @@ export const useProject = defineStore("project", {
      *
      * @param project - The project to add.
      */
-    addProject(project: IdentifierModel): void {
+    addProject(project: IdentifierSchema): void {
       this.allProjects = [
         project,
         ...this.allProjects.filter(

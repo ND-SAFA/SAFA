@@ -1,5 +1,5 @@
-import { LayoutPositionsModel } from "@/types";
-import { IdentifierModel } from "@/types/domain/project";
+import { LayoutPositionsSchema } from "@/types";
+import { IdentifierSchema } from "@/types/domain/project";
 
 /**
  * Enumerates the type of documents supported by SAFA.
@@ -15,7 +15,7 @@ export enum DocumentType {
 /**
  * Defines a specific document.
  */
-export interface DocumentModel {
+export interface DocumentSchema {
   /**
    * The id of this document.
    */
@@ -23,7 +23,7 @@ export interface DocumentModel {
   /**
    * The project associated with this document.
    */
-  project: IdentifierModel;
+  project: IdentifierSchema;
   /**
    * The name of the document.
    */
@@ -43,5 +43,5 @@ export interface DocumentModel {
   /**
    * Map of document ids to their artifact positions.
    */
-  layout: LayoutPositionsModel;
+  layout: LayoutPositionsSchema;
 }

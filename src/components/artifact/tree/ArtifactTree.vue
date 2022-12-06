@@ -34,7 +34,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { Route } from "vue-router";
-import { TraceLinkModel, ArtifactModel, CytoCoreGraph } from "@/types";
+import { TraceLinkSchema, ArtifactSchema, CytoCoreGraph } from "@/types";
 import {
   appStore,
   artifactStore,
@@ -93,13 +93,13 @@ export default Vue.extend({
     /**
      * @return All visible artifacts.
      */
-    artifacts(): ArtifactModel[] {
+    artifacts(): ArtifactSchema[] {
       return artifactStore.currentArtifacts;
     },
     /**
      * @return All visible trace links.
      */
-    traceLinks(): TraceLinkModel[] {
+    traceLinks(): TraceLinkSchema[] {
       return deltaStore.inDeltaView
         ? traceStore.currentTraces
         : traceStore.visibleTraces;
@@ -175,7 +175,7 @@ export default Vue.extend({
      * @param link - The trace link to check.
      * @return Whether to fade.
      */
-    isTraceLinkFaded(link: TraceLinkModel): boolean {
+    isTraceLinkFaded(link: TraceLinkSchema): boolean {
       return (
         !this.artifactsInView.includes(link.targetId) ||
         !this.artifactsInView.includes(link.sourceId)
@@ -185,7 +185,7 @@ export default Vue.extend({
      * Selects a clicked trace link and opens the link modal.
      * @param traceLink - The trace link to select.
      */
-    handleLinkRightClick(traceLink: TraceLinkModel): void {
+    handleLinkRightClick(traceLink: TraceLinkSchema): void {
       selectionStore.selectTraceLink(traceLink);
     },
   },

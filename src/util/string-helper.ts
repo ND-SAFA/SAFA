@@ -1,4 +1,4 @@
-import { VersionModel } from "@/types";
+import { VersionSchema } from "@/types";
 
 /**
  * Returns given string with newlines inserted after maxWordCount
@@ -115,7 +115,7 @@ export function timestampToDisplay(timestamp: string): string {
  *
  * @return The stringified version number.
  */
-export function versionToString(currentVersion?: VersionModel): string {
+export function versionToString(currentVersion?: VersionSchema): string {
   if (currentVersion === undefined) {
     return "X.X.X";
   }

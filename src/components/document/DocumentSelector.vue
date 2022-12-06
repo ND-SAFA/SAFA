@@ -48,7 +48,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { DocumentModel } from "@/types";
+import { DocumentSchema } from "@/types";
 import {
   appStore,
   documentSaveStore,
@@ -111,7 +111,7 @@ export default Vue.extend({
     /**
      * Opens the edit document modal.
      */
-    handleEditOpen(document: DocumentModel) {
+    handleEditOpen(document: DocumentSchema) {
       documentSaveStore.baseDocument = document;
       this.handleCloseMenu();
       appStore.openDetailsPanel("document");

@@ -1,14 +1,14 @@
 import {
-  ArtifactModel,
-  GeneratedMatrixModel,
-  ProjectModel,
-  TraceLinkModel,
+  ArtifactSchema,
+  GeneratedMatrixSchema,
+  ProjectSchema,
+  TraceLinkSchema,
 } from "@/types/domain";
 
 /**
  * Defines the response from checking if an artifact exists.
  */
-export interface NameValidationModel {
+export interface NameValidationSchema {
   /**
    * Whether the artifact exists.
    */
@@ -18,7 +18,7 @@ export interface NameValidationModel {
 /**
  * The response from parsing a file.
  */
-export interface ParseFileModel {
+export interface ParseFileSchema {
   /**
    * Any parsing errors encountered.
    */
@@ -28,33 +28,33 @@ export interface ParseFileModel {
 /**
  * The response from parsing an artifact file.
  */
-export interface ParseArtifactFileModel extends ParseFileModel {
+export interface ParseArtifactFileSchema extends ParseFileSchema {
   /**
    * The artifacts parsed.
    */
-  entities: ArtifactModel[];
+  entities: ArtifactSchema[];
 }
 
 /**
  * The response from parsing a trace file.
  */
-export interface ParseTraceFileModel extends ParseFileModel {
+export interface ParseTraceFileSchema extends ParseFileSchema {
   /**
    * The traces parsed.
    */
-  entities: TraceLinkModel[];
+  entities: TraceLinkSchema[];
 }
 
 /**
  * The request payload for creating a project via JSON.
  */
-export interface CreateProjectByJsonModel {
+export interface CreateProjectByJsonSchema {
   /**
    * The project entities to commit.
    */
-  project: ProjectModel;
+  project: ProjectSchema;
   /**
    * The trace generation request to perform and commit.
    */
-  requests: GeneratedMatrixModel[];
+  requests: GeneratedMatrixSchema[];
 }

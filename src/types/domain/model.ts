@@ -1,9 +1,9 @@
-import { GeneratedMatrixModel, ModelType, VersionModel } from "@/types";
+import { GeneratedMatrixSchema, ModelType, VersionSchema } from "@/types";
 
 /**
  * Represents a model trained to generate trace links.
  */
-export interface GenerationModel {
+export interface GenerationModelSchema {
   /**
    * The model's id.
    */
@@ -19,7 +19,7 @@ export interface GenerationModel {
   /**
    * The logged steps of training on this model.
    */
-  steps?: TrainingStepModel[];
+  steps?: TrainingStepSchema[];
 }
 
 /**
@@ -33,7 +33,7 @@ export enum ModelShareType {
 /**
  * Describes a matrix of artifacts.
  */
-export interface ArtifactLevelModel {
+export interface ArtifactLevelSchema {
   /**
    * The source artifact type.
    */
@@ -47,21 +47,21 @@ export interface ArtifactLevelModel {
 /**
  * Represents a matrix to generate or train links on.
  */
-export interface TrainOrGenerateLinksModel {
+export interface TrainOrGenerateLinksSchema {
   /**
    * The version to commit the entities to.
    */
-  projectVersion?: VersionModel;
+  projectVersion?: VersionSchema;
   /**
    * The sets of matrices to generate or train on.
    */
-  requests: GeneratedMatrixModel[];
+  requests: GeneratedMatrixSchema[];
 }
 
 /**
  * Represents a step of model training.
  */
-export interface TrainingStepModel {
+export interface TrainingStepSchema {
   /**
    * The type of training being done.
    *
@@ -125,6 +125,6 @@ export interface TrainingStepModel {
     /**
      * The trace matrices being used for training.
      */
-    levels: ArtifactLevelModel[];
+    levels: ArtifactLevelSchema[];
   }[];
 }

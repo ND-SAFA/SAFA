@@ -15,7 +15,7 @@ export type AttributeType =
 /**
  * Defines a custom attribute being tracked for a project.
  */
-export interface AttributeModel {
+export interface AttributeSchema {
   /**
    * The key to this attribute within an artifact's `customFields` object.
    */
@@ -45,7 +45,7 @@ export interface AttributeModel {
 /**
  * A list of the attributes to lay out and their positions.
  */
-export interface AttributePositionModel {
+export interface AttributePositionSchema {
   /**
    * The attribute key for this item.
    */
@@ -71,7 +71,7 @@ export interface AttributePositionModel {
 /**
  * Defines a layout of custom attributes for some set of artifact types.
  */
-export interface AttributeLayoutModel {
+export interface AttributeLayoutSchema {
   /**
    * The ID of this attribute layout.
    */
@@ -84,7 +84,7 @@ export interface AttributeLayoutModel {
   /**
    * A list of the attributes to lay out and their positions.
    */
-  positions: AttributePositionModel[];
+  positions: AttributePositionSchema[];
 }
 
 /**
@@ -100,4 +100,4 @@ export type AttributeDataType =
 /**
  * Represents a collection of custom attributes, keyed by their `key` value.
  */
-export type CustomAttributeCollection = Record<string, AttributeDataType>;
+export type AttributeCollectionSchema = Record<string, AttributeDataType>;

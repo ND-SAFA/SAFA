@@ -12,7 +12,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { GenerationModel } from "@/types";
+import { GenerationModelSchema } from "@/types";
 import {
   Typography,
   FileInput,
@@ -31,7 +31,7 @@ export default Vue.extend({
   },
   props: {
     model: {
-      type: Object as PropType<GenerationModel>,
+      type: Object as PropType<GenerationModelSchema>,
       required: true,
     },
   },

@@ -53,7 +53,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { IdentifierModel, VersionModel, VersionType } from "@/types";
+import { IdentifierSchema, VersionSchema, VersionType } from "@/types";
 import { versionToString } from "@/util";
 import { getCurrentVersion, handleCreateVersion } from "@/api";
 import { GenericModal } from "@/components/common";
@@ -75,14 +75,14 @@ export default Vue.extend({
       required: true,
     },
     project: {
-      type: Object as PropType<IdentifierModel>,
+      type: Object as PropType<IdentifierSchema>,
       required: false,
     },
   },
   data() {
     return {
       isLoading: false,
-      currentVersion: undefined as VersionModel | undefined,
+      currentVersion: undefined as VersionSchema | undefined,
     };
   },
   computed: {

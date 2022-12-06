@@ -26,7 +26,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { JiraProjectModel } from "@/types";
+import { JiraProjectSchema } from "@/types";
 import { integrationsStore } from "@/hooks";
 import { handleLoadJiraProjects } from "@/api";
 import { GenericStepperListStep } from "@/components";
@@ -41,7 +41,7 @@ export default Vue.extend({
   },
   data() {
     return {
-      projects: [] as JiraProjectModel[],
+      projects: [] as JiraProjectSchema[],
       projectsLoading: false,
     };
   },
@@ -89,14 +89,14 @@ export default Vue.extend({
      * @param project - The project to extract from.
      * @return The subtitle.
      */
-    getProjectSubtitle(project: JiraProjectModel): string {
+    getProjectSubtitle(project: JiraProjectSchema): string {
       return project.key;
     },
     /**
      * Handles a click to select a project.
      * @param project - The project to select.
      */
-    handleProjectSelect(project: JiraProjectModel | undefined) {
+    handleProjectSelect(project: JiraProjectSchema | undefined) {
       integrationsStore.selectJiraProject(project);
     },
   },

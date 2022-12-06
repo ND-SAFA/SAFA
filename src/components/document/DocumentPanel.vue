@@ -78,7 +78,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { DocumentModel } from "@/types";
+import { DocumentSchema } from "@/types";
 import { documentTypeOptions } from "@/util";
 import { appStore, documentSaveStore } from "@/hooks";
 import { handleDeleteDocument, handleSaveDocument } from "@/api";
@@ -147,7 +147,7 @@ export default Vue.extend({
     /**
      * @return The base document being edited.
      */
-    baseDocument(): DocumentModel | undefined {
+    baseDocument(): DocumentSchema | undefined {
       return documentSaveStore.baseDocument;
     },
   },

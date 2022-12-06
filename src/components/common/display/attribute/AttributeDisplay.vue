@@ -10,7 +10,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { CustomAttributeCollection, AttributeModel } from "@/types";
+import { AttributeCollectionSchema, AttributeSchema } from "@/types";
 import { timestampToDisplay } from "@/util";
 import Typography from "../Typography.vue";
 import AttributeChip from "./AttributeChip.vue";
@@ -23,11 +23,11 @@ export default Vue.extend({
   components: { Typography, AttributeChip },
   props: {
     model: {
-      type: Object as PropType<CustomAttributeCollection>,
+      type: Object as PropType<AttributeCollectionSchema>,
       required: true,
     },
     attribute: {
-      type: Object as PropType<AttributeModel>,
+      type: Object as PropType<AttributeSchema>,
       required: true,
     },
     hideTitle: Boolean,

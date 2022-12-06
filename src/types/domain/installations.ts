@@ -1,7 +1,7 @@
 /**
  * Defines a 3rd party data installation to a project.
  */
-export interface InstallationModel {
+export interface InstallationSchema {
   /**
    * The id of the installed data source.
    */

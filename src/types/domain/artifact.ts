@@ -1,4 +1,4 @@
-import { CustomAttributeCollection } from "./attribute";
+import { AttributeCollectionSchema } from "./attribute";
 import { DocumentType } from "./document";
 
 /**
@@ -33,7 +33,7 @@ export const allowedSafetyCaseTypes: Record<SafetyCaseType, SafetyCaseType[]> =
 /**
  * Defines an artifact of a project.
  */
-export interface ArtifactModel {
+export interface ArtifactSchema {
   /**
    * A unique UUID identifying an artifact across versions.
    */
@@ -77,10 +77,10 @@ export interface ArtifactModel {
   /**
    * Represents a collection of custom attributes on an artifact.
    */
-  attributes?: CustomAttributeCollection;
+  attributes?: AttributeCollectionSchema;
 }
 
 /**
  * Defines an artifact with its custom fields flattened into the artifact data.
  */
-export type FlatArtifact = ArtifactModel & Record<string, string>;
+export type FlatArtifact = ArtifactSchema & Record<string, string>;

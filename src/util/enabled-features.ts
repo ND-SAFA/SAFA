@@ -1,7 +1,7 @@
 import {
-  AttributeLayoutModel,
-  AttributeModel,
-  TrainingStepModel,
+  AttributeLayoutSchema,
+  AttributeSchema,
+  TrainingStepSchema,
 } from "@/types";
 
 /**
@@ -60,7 +60,7 @@ export const EXAMPLE_TRAINING_STEPS = [
       },
     ],
   },
-] as TrainingStepModel[];
+] as TrainingStepSchema[];
 
 /**
  * Example attributes for artifacts.
@@ -119,7 +119,7 @@ export const EXAMPLE_ATTRIBUTES = [
     label: "Custom Paragraph",
     type: "paragraph",
   },
-] as AttributeModel[];
+] as AttributeSchema[];
 
 /**
  * Example attribute layouts for artifacts.
@@ -145,7 +145,7 @@ export const EXAMPLE_ATTRIBUTE_LAYOUTS = [
       { x: 0, y: 5, width: 2, height: 1, key: "par" },
     ],
   },
-] as AttributeLayoutModel[];
+] as AttributeLayoutSchema[];
 
 /**
  * A mapping of whether certain test features are enabled.

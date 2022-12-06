@@ -10,7 +10,7 @@ import Vue, { PropType } from "vue";
 import {
   ArtifactDeltaState,
   TraceCytoCoreElement,
-  TraceLinkModel,
+  TraceLinkSchema,
 } from "@/types";
 import { deltaStore } from "@/hooks";
 
@@ -23,7 +23,7 @@ export default Vue.extend({
   name: "TraceLink",
   props: {
     traceDefinition: {
-      type: Object as PropType<TraceLinkModel>,
+      type: Object as PropType<TraceLinkSchema>,
       required: true,
     },
     graph: {

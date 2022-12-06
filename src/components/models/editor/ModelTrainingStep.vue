@@ -53,7 +53,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { TrainingStepModel } from "@/types";
+import { TrainingStepSchema } from "@/types";
 import { Typography, FlexBox } from "@/components/common";
 
 /**
@@ -67,7 +67,7 @@ export default Vue.extend({
   },
   props: {
     step: {
-      type: Object as PropType<TrainingStepModel>,
+      type: Object as PropType<TrainingStepSchema>,
       required: true,
     },
   },

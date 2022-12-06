@@ -17,7 +17,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { ArtifactModel } from "@/types";
+import { ArtifactSchema } from "@/types";
 import { warningStore } from "@/hooks";
 import { Typography, FlexBox } from "@/components/common";
 
@@ -31,7 +31,7 @@ export default Vue.extend({
     Typography,
   },
   props: {
-    artifact: Object as PropType<ArtifactModel>,
+    artifact: Object as PropType<ArtifactSchema>,
   },
   methods: {
     /**
@@ -39,7 +39,7 @@ export default Vue.extend({
      * @param item - The artifact to search for
      * @return Whether the artifact has warnings.
      */
-    getHasWarnings(item: ArtifactModel): boolean {
+    getHasWarnings(item: ArtifactSchema): boolean {
       return warningStore.artifactWarnings[item.id]?.length > 0;
     },
   },

@@ -41,8 +41,8 @@ import {
   OptionalProjectIdentifier,
   OptionalProjectVersion,
   StepState,
-  IdentifierModel,
-  VersionModel,
+  IdentifierSchema,
+  VersionSchema,
 } from "@/types";
 import { versionToString } from "@/util";
 import { projectStore } from "@/hooks";
@@ -126,7 +126,7 @@ export default Vue.extend({
      * @param project - The project to select
      * @param goToNextStep - If true, the step will be incremented.
      */
-    selectProject(project: IdentifierModel, goToNextStep = false) {
+    selectProject(project: IdentifierSchema, goToNextStep = false) {
       this.selectedProject = project;
 
       Vue.set(this.steps, 0, [project.name, true]);
@@ -144,7 +144,7 @@ export default Vue.extend({
      * Selects a version.
      * @param version - The version to select.
      */
-    selectVersion(version: VersionModel) {
+    selectVersion(version: VersionSchema) {
       this.selectedVersion = version;
       Vue.set(this.steps, 1, [versionToString(version), true]);
     },

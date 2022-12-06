@@ -46,7 +46,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { VersionModel } from "@/types";
+import { VersionSchema } from "@/types";
 import { versionToString } from "@/util";
 import { projectStore } from "@/hooks";
 import { getProjectVersions, handleLoadVersion } from "@/api";
@@ -61,7 +61,7 @@ export default Vue.extend({
   components: { FlexBox, Typography, VersionCreator },
   data() {
     return {
-      versions: [] as VersionModel[],
+      versions: [] as VersionSchema[],
       openCreateVersion: false,
     };
   },
@@ -107,7 +107,7 @@ export default Vue.extend({
      * @param version - The version to name.
      * @return The version's name.
      */
-    getVersionName(version: VersionModel): string {
+    getVersionName(version: VersionSchema): string {
       return versionToString(version);
     },
     /**
@@ -120,7 +120,7 @@ export default Vue.extend({
      * Adds the new version the version list and loads that version.
      * @param version - The new version.
      */
-    async handleVersionCreated(version: VersionModel): Promise<void> {
+    async handleVersionCreated(version: VersionSchema): Promise<void> {
       this.versions = [version, ...this.versions];
       this.openCreateVersion = false;
       await handleLoadVersion(version.versionId);

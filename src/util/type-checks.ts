@@ -1,5 +1,5 @@
 import {
-  ArtifactModel,
+  ArtifactSchema,
   ArtifactData,
   DeltaArtifact,
   EntityModification,
@@ -17,7 +17,7 @@ import {
  */
 export function isModifiedArtifact(
   artifact: DeltaArtifact
-): artifact is EntityModification<ArtifactModel> {
+): artifact is EntityModification<ArtifactSchema> {
   const requiredFields = ["before", "after"];
   return containsFields(artifact, requiredFields);
 }
@@ -28,7 +28,9 @@ export function isModifiedArtifact(
  * @param artifact - The artifact to check.
  * @return Whether this item is an artifact.
  */
-export function isArtifact(artifact: DeltaArtifact): artifact is ArtifactModel {
+export function isArtifact(
+  artifact: DeltaArtifact
+): artifact is ArtifactSchema {
   const requiredFields = ["id", "body", "type"];
   return containsFields(artifact, requiredFields);
 }

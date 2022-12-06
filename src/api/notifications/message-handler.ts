@@ -1,11 +1,11 @@
 import { Frame } from "webstomp-client";
 import {
   ActionType,
-  ChangeMessageModel,
-  ChangeModel,
+  ChangeMessageSchema,
+  ChangeSchema,
   EntityType,
   notifyUserEntities,
-  ProjectModel,
+  ProjectSchema,
 } from "@/types";
 import {
   appStore,
@@ -38,7 +38,7 @@ export async function handleEntityChangeMessage(
   versionId: string,
   frame: Frame
 ): Promise<void> {
-  const message: ChangeMessageModel = JSON.parse(frame.body);
+  const message: ChangeMessageSchema = JSON.parse(frame.body);
   const project = await getChanges(versionId, message);
   //TODO: current user check is disabled. Evaluate a better way of filtering updates by the current user.
   const isCurrentUser = message.user === sessionStore.userEmail && false;
@@ -74,7 +74,7 @@ export async function handleEntityChangeMessage(
  *
  * @param change - The deletion change.
  */
-async function handleDeleteChange(change: ChangeModel) {
+async function handleDeleteChange(change: ChangeSchema) {
   switch (change.entity) {
     case EntityType.PROJECT:
       // (entityIds.length should be 1 and equal to projectId)
@@ -141,7 +141,10 @@ async function handleDeleteChange(change: ChangeModel) {
  * @param change - The update change.
  * @param project - The updated project.
  */
-async function handleUpdateChange(change: ChangeModel, project: ProjectModel) {
+async function handleUpdateChange(
+  change: ChangeSchema,
+  project: ProjectSchema
+) {
   const versionId = projectStore.versionId;
 
   switch (change.entity) {

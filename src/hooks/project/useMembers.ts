@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-import { MembershipModel, ProjectModel } from "@/types";
+import { MembershipSchema, ProjectSchema } from "@/types";
 import { removeMatches } from "@/util";
 import { pinia } from "@/plugins";
 import projectStore from "./useProject";
@@ -13,14 +13,14 @@ export const useMembers = defineStore("members", {
     /**
      * List of members and their roles in the project.
      */
-    members: [] as MembershipModel[],
+    members: [] as MembershipSchema[],
   }),
   getters: {},
   actions: {
     /**
      * Initializes the current project.
      */
-    initializeProject(project: ProjectModel): void {
+    initializeProject(project: ProjectSchema): void {
       this.members = project.members;
     },
     /**
@@ -28,7 +28,7 @@ export const useMembers = defineStore("members", {
      *
      * @param updatedMembers - The updated members.
      */
-    updateMembers(updatedMembers: MembershipModel[]): void {
+    updateMembers(updatedMembers: MembershipSchema[]): void {
       const ids = updatedMembers.map((member) => member.projectMembershipId);
 
       this.members = [

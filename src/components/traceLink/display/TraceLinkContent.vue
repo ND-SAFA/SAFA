@@ -42,7 +42,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { ArtifactModel, TraceLinkModel, TraceType } from "@/types";
+import { ArtifactSchema, TraceLinkSchema, TraceType } from "@/types";
 import { artifactStore, selectionStore } from "@/hooks";
 import {
   ArtifactBodyDisplay,
@@ -66,19 +66,19 @@ export default Vue.extend({
     /**
      * @return The selected trace link.
      */
-    traceLink(): TraceLinkModel | undefined {
+    traceLink(): TraceLinkSchema | undefined {
       return selectionStore.selectedTraceLink;
     },
     /**
      * @return The artifact this link comes from.
      */
-    sourceArtifact(): ArtifactModel | undefined {
+    sourceArtifact(): ArtifactSchema | undefined {
       return artifactStore.getArtifactById(this.traceLink?.sourceId || "");
     },
     /**
      * @return The artifact this link goes towards.
      */
-    targetArtifact(): ArtifactModel | undefined {
+    targetArtifact(): ArtifactSchema | undefined {
       return artifactStore.getArtifactById(this.traceLink?.targetId || "");
     },
     /**

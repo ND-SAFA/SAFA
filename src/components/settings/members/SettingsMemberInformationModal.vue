@@ -41,7 +41,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { MembershipModel, ProjectRole } from "@/types";
+import { MembershipSchema, ProjectRole } from "@/types";
 import { projectRoleOptions } from "@/util";
 import { projectStore } from "@/hooks";
 import { handleInviteMember } from "@/api";
@@ -59,7 +59,7 @@ export default Vue.extend({
       required: true,
     },
     member: {
-      type: Object as PropType<MembershipModel>,
+      type: Object as PropType<MembershipSchema>,
       required: false,
     },
     clearOnClose: {
@@ -157,7 +157,7 @@ export default Vue.extend({
      * Updates member fields when the member changes.
      * @param newMember - The new member.
      */
-    member(newMember: MembershipModel | undefined): void {
+    member(newMember: MembershipSchema | undefined): void {
       if (!newMember) return;
 
       this.userRole = newMember.role;

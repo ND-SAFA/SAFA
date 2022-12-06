@@ -26,7 +26,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { IdentifierModel } from "@/types";
+import { IdentifierSchema } from "@/types";
 import { projectStore } from "@/hooks";
 import { GenericIconButton } from "@/components/common/button";
 
@@ -63,7 +63,7 @@ export default Vue.extend({
     /**
      * @return All projects for the current user.
      */
-    projects(): IdentifierModel[] {
+    projects(): IdentifierSchema[] {
       return this.excludeCurrentProject
         ? projectStore.unloadedProjects
         : projectStore.allProjects;

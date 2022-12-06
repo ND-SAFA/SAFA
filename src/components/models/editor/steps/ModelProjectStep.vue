@@ -20,7 +20,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { ArtifactLevelModel, GenerationModel } from "@/types";
+import { ArtifactLevelSchema, GenerationModelSchema } from "@/types";
 import { handleTrainModel } from "@/api";
 import { Typography } from "@/components/common";
 import { TraceMatrixCreator } from "@/components/traceLink";
@@ -35,14 +35,14 @@ export default Vue.extend({
   components: { Typography, TraceMatrixCreator },
   props: {
     model: {
-      type: Object as PropType<GenerationModel>,
+      type: Object as PropType<GenerationModelSchema>,
       required: true,
     },
   },
   data() {
     return {
       isLoading: false,
-      matrices: [{ source: "", target: "" }] as ArtifactLevelModel[],
+      matrices: [{ source: "", target: "" }] as ArtifactLevelSchema[],
     };
   },
   computed: {

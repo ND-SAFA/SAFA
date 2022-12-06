@@ -35,7 +35,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { DataItem, IdentifierModel } from "@/types";
+import { DataItem, IdentifierSchema } from "@/types";
 import { identifierSaveStore, projectStore, sessionStore } from "@/hooks";
 import {
   handleDeleteProject,
@@ -76,7 +76,7 @@ export default Vue.extend({
   },
   data() {
     return {
-      selected: undefined as IdentifierModel | undefined,
+      selected: undefined as IdentifierSchema | undefined,
       headers: this.minimal
         ? [{ text: "Name", value: "name", sortable: true, isSelectable: true }]
         : [
@@ -102,7 +102,7 @@ export default Vue.extend({
     /**
      * @return All projects for the current user.
      */
-    projects(): IdentifierModel[] {
+    projects(): IdentifierSchema[] {
       return projectStore.allProjects;
     },
     /**
@@ -135,7 +135,10 @@ export default Vue.extend({
      * @param item - The selected project.
      * @param goToNextStep - If true with a valid project, the next step will be navigated to.
      */
-    handleSelectProject(item: DataItem<IdentifierModel>, goToNextStep = false) {
+    handleSelectProject(
+      item: DataItem<IdentifierSchema>,
+      goToNextStep = false
+    ) {
       if (item.value) {
         this.$emit("selected", item.item, goToNextStep);
       } else {
@@ -159,7 +162,7 @@ export default Vue.extend({
      * Opens the edit project modal.
      * @param item - The project to edit.
      */
-    handleEditProject(item: IdentifierModel) {
+    handleEditProject(item: IdentifierSchema) {
       identifierSaveStore.baseIdentifier = item;
       this.isSaveOpen = true;
     },
@@ -167,7 +170,7 @@ export default Vue.extend({
      * Opens the delete project modal.
      * @param item - The project to delete.
      */
-    handleDeleteProject(item: IdentifierModel) {
+    handleDeleteProject(item: IdentifierSchema) {
       identifierSaveStore.baseIdentifier = item;
       this.isDeleteOpen = true;
     },

@@ -38,7 +38,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { MembershipModel, ProjectModel, ProjectRole } from "@/types";
+import { MembershipSchema, ProjectSchema, ProjectRole } from "@/types";
 import { logStore, membersStore, projectStore, sessionStore } from "@/hooks";
 import { handleDeleteMember, handleGetMembers } from "@/api";
 import { GenericSelector, Typography } from "@/components/common";
@@ -52,7 +52,7 @@ export default Vue.extend({
   components: { GenericSelector, SettingsMemberInformationModal, Typography },
   data() {
     return {
-      memberToEdit: undefined as MembershipModel | undefined,
+      memberToEdit: undefined as MembershipSchema | undefined,
       isLoading: false,
       isNewOpen: false,
       isEditOpen: false,
@@ -67,7 +67,7 @@ export default Vue.extend({
     /**
      * @return The current project.
      */
-    project(): ProjectModel {
+    project(): ProjectSchema {
       return projectStore.project;
     },
     /**
@@ -79,7 +79,7 @@ export default Vue.extend({
     /**
      * @return All project members.
      */
-    members(): MembershipModel[] {
+    members(): MembershipSchema[] {
       return membersStore.members;
     },
   },
@@ -103,7 +103,7 @@ export default Vue.extend({
      * Opens the edit member modal.
      * @param member - The member to edit.
      */
-    handleEditMember(member: MembershipModel): void {
+    handleEditMember(member: MembershipSchema): void {
       this.memberToEdit = member;
       this.isEditOpen = true;
     },
@@ -111,7 +111,7 @@ export default Vue.extend({
      * Opens the delete member modal.
      * @param member - The member to delete.
      */
-    handleDeleteMember(member: MembershipModel): void {
+    handleDeleteMember(member: MembershipSchema): void {
       if (
         member.role === ProjectRole.OWNER &&
         this.members.filter(({ role }) => role === ProjectRole.OWNER).length ===

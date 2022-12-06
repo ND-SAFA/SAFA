@@ -1,4 +1,4 @@
-import { ProjectModel } from "@/types";
+import { ProjectSchema } from "@/types";
 import { createProject } from "@/util";
 import { documentStore, subtreeStore, projectStore } from "@/hooks";
 import { QueryParams, removeParams, updateParam } from "@/router";
@@ -26,7 +26,7 @@ export async function handleClearProject(): Promise<void> {
  *
  * @param project - Project created containing entities.
  */
-export async function handleSetProject(project: ProjectModel): Promise<void> {
+export async function handleSetProject(project: ProjectSchema): Promise<void> {
   const projectId = project.projectId;
   const versionId = project.projectVersion?.versionId || "";
 
@@ -56,7 +56,7 @@ export async function handleReloadProject(): Promise<void> {
  *
  * @param project The project possibly containing a currentDocumentId.
  */
-async function setCurrentDocument(project: ProjectModel): Promise<void> {
+async function setCurrentDocument(project: ProjectSchema): Promise<void> {
   if (!project.currentDocumentId) return;
 
   const document = project.documents.find(

@@ -52,7 +52,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { InstallationModel } from "@/types";
+import { InstallationSchema } from "@/types";
 import { timestampToDisplay } from "@/util";
 import { projectStore } from "@/hooks";
 import { handleSyncInstallation } from "@/api";
@@ -90,7 +90,7 @@ export default Vue.extend({
     /**
      * @return All project installations.
      */
-    installations(): InstallationModel[] {
+    installations(): InstallationSchema[] {
       return projectStore.installations;
     },
   },
@@ -105,7 +105,7 @@ export default Vue.extend({
      * Syncs the current project with the selected installation's data.
      * @param installation - THe installation to sync.
      */
-    handleSync(installation: InstallationModel): void {
+    handleSync(installation: InstallationSchema): void {
       this.isLoading = true;
 
       handleSyncInstallation(installation, {

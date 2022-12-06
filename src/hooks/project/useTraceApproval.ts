@@ -3,8 +3,8 @@ import { defineStore } from "pinia";
 import {
   ApprovalType,
   FlatTraceLink,
-  GeneratedLinksModel,
-  TraceLinkModel,
+  GeneratedLinksSchema,
+  TraceLinkSchema,
 } from "@/types";
 import { pinia } from "@/plugins";
 
@@ -46,7 +46,7 @@ export const useTraceApproval = defineStore("traceApproval", {
      *
      * @param generated - The generated links and their states.
      */
-    initializeTraces(generated: GeneratedLinksModel) {
+    initializeTraces(generated: GeneratedLinksSchema) {
       this.selectedLinks = [];
       this.$patch(generated);
     },
@@ -56,7 +56,7 @@ export const useTraceApproval = defineStore("traceApproval", {
      * @param traceLink - The link to update.
      * @param status - The status to update to.
      */
-    updateLinkStatus(traceLink: TraceLinkModel, status: ApprovalType): void {
+    updateLinkStatus(traceLink: TraceLinkSchema, status: ApprovalType): void {
       const flatLink = this.traceLinks.find(
         ({ traceLinkId }) => traceLinkId === traceLink.traceLinkId
       );
@@ -100,7 +100,7 @@ export const useTraceApproval = defineStore("traceApproval", {
      *
      * @param traceLink - The link to approve.
      */
-    approveLink(traceLink: TraceLinkModel): void {
+    approveLink(traceLink: TraceLinkSchema): void {
       this.declinedIds = this.declinedIds.filter(
         (declinedId) => declinedId != traceLink.traceLinkId
       );
@@ -115,7 +115,7 @@ export const useTraceApproval = defineStore("traceApproval", {
      *
      * @param traceLink - The link to decline.
      */
-    declineLink(traceLink: TraceLinkModel): void {
+    declineLink(traceLink: TraceLinkSchema): void {
       this.approvedIds = this.approvedIds.filter(
         (approvedId) => approvedId != traceLink.traceLinkId
       );
@@ -130,7 +130,7 @@ export const useTraceApproval = defineStore("traceApproval", {
      *
      * @param traceLink - The link to reset.
      */
-    resetLink(traceLink: TraceLinkModel): void {
+    resetLink(traceLink: TraceLinkSchema): void {
       this.approvedIds = this.approvedIds.filter(
         (approvedId) => approvedId != traceLink.traceLinkId
       );

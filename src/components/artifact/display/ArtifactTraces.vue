@@ -65,7 +65,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { ArtifactModel } from "@/types";
+import { ArtifactSchema } from "@/types";
 import {
   artifactStore,
   selectionStore,
@@ -100,22 +100,22 @@ export default Vue.extend({
     /**
      * @return The selected artifact's parents.
      */
-    parents(): ArtifactModel[] {
+    parents(): ArtifactSchema[] {
       if (!this.selectedArtifact) return [];
 
       return subtreeStore
         .getParents(this.selectedArtifact.id)
-        .map((id) => artifactStore.getArtifactById(id)) as ArtifactModel[];
+        .map((id) => artifactStore.getArtifactById(id)) as ArtifactSchema[];
     },
     /**
      * @return The selected artifact's children.
      */
-    children(): ArtifactModel[] {
+    children(): ArtifactSchema[] {
       if (!this.selectedArtifact) return [];
 
       return subtreeStore
         .getChildren(this.selectedArtifact.id)
-        .map((id) => artifactStore.getArtifactById(id)) as ArtifactModel[];
+        .map((id) => artifactStore.getArtifactById(id)) as ArtifactSchema[];
     },
     /**
      * @return Whether to display this section.

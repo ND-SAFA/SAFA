@@ -14,7 +14,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { GenerationModel } from "@/types";
+import { GenerationModelSchema } from "@/types";
 import { modelEditorTabOptions } from "@/util";
 import ModelTraining from "./ModelTraining.vue";
 
@@ -26,7 +26,7 @@ export default Vue.extend({
   components: { ModelTraining },
   props: {
     model: {
-      type: Object as PropType<GenerationModel>,
+      type: Object as PropType<GenerationModelSchema>,
       required: true,
     },
   },

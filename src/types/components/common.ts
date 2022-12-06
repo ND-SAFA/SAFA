@@ -1,11 +1,11 @@
-import { IdentifierModel, VersionModel } from "@/types";
+import { IdentifierSchema, VersionSchema } from "@/types";
 
 /**
  * An optional project identifier.
  */
-export type OptionalProjectIdentifier = IdentifierModel | undefined;
+export type OptionalProjectIdentifier = IdentifierSchema | undefined;
 
 /**
  * An optional project version.
  */
-export type OptionalProjectVersion = VersionModel | undefined;
+export type OptionalProjectVersion = VersionSchema | undefined;

@@ -1,6 +1,11 @@
 import { defineStore } from "pinia";
 
-import { ArtifactModel, Commit, CommitHistory, TraceLinkModel } from "@/types";
+import {
+  ArtifactSchema,
+  Commit,
+  CommitHistory,
+  TraceLinkSchema,
+} from "@/types";
 import { createCommit } from "@/util";
 import { pinia } from "@/plugins";
 import traceStore from "./useTraces";
@@ -52,7 +57,7 @@ export const useCommits = defineStore("commits", {
           removed: commit.artifacts.added,
           modified: commit.artifacts.modified
             .map(({ id }) => artifactStore.getArtifactById(id))
-            .filter((artifact) => !!artifact) as ArtifactModel[],
+            .filter((artifact) => !!artifact) as ArtifactSchema[],
         },
         traces: {
           added: commit.traces.removed,
@@ -61,7 +66,7 @@ export const useCommits = defineStore("commits", {
             .map((link) =>
               traceStore.getTraceLinkByArtifacts(link.sourceId, link.targetId)
             )
-            .filter((link) => !!link) as TraceLinkModel[],
+            .filter((link) => !!link) as TraceLinkSchema[],
         },
       };
     },

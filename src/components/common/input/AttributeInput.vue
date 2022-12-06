@@ -129,8 +129,8 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import {
-  CustomAttributeCollection,
-  AttributeModel,
+  AttributeCollectionSchema,
+  AttributeSchema,
   AttributeDataType,
 } from "@/types";
 import ArtifactInput from "./ArtifactInput.vue";
@@ -143,11 +143,11 @@ export default Vue.extend({
   components: { ArtifactInput },
   props: {
     model: {
-      type: Object as PropType<CustomAttributeCollection>,
+      type: Object as PropType<AttributeCollectionSchema>,
       required: true,
     },
     attribute: {
-      type: Object as PropType<AttributeModel>,
+      type: Object as PropType<AttributeSchema>,
       required: true,
     },
   },

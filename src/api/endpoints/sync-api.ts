@@ -1,4 +1,4 @@
-import { ChangeMessageModel, ProjectModel } from "@/types";
+import { ChangeMessageSchema, ProjectSchema } from "@/types";
 import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
 
 /**
@@ -10,9 +10,9 @@ import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
  */
 export async function getChanges(
   versionId: string,
-  message: ChangeMessageModel
-): Promise<ProjectModel> {
-  return authHttpClient<ProjectModel>(
+  message: ChangeMessageSchema
+): Promise<ProjectSchema> {
+  return authHttpClient<ProjectSchema>(
     fillEndpoint(Endpoint.sync, { versionId }),
     {
       method: "POST",

@@ -39,7 +39,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { IdentifierModel } from "@/types";
+import { IdentifierSchema } from "@/types";
 import { identifierSaveStore } from "@/hooks";
 import { GenericModal } from "@/components/common";
 import ProjectFilesUploader from "./ProjectFilesUploader.vue";
@@ -73,7 +73,7 @@ export default Vue.extend({
     /**
      * @return  The identifier being updated.
      */
-    identifier(): IdentifierModel {
+    identifier(): IdentifierSchema {
       return identifierSaveStore.editedIdentifier;
     },
     /**

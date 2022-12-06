@@ -1,10 +1,10 @@
 import { defineStore } from "pinia";
 
 import {
-  AttributeLayoutModel,
-  AttributeModel,
-  AttributePositionModel,
-  ProjectModel,
+  AttributeLayoutSchema,
+  AttributeSchema,
+  AttributePositionSchema,
+  ProjectSchema,
 } from "@/types";
 import { removeMatches } from "@/util";
 import { projectStore } from "@/hooks";
@@ -18,11 +18,11 @@ export const useAttributes = defineStore("attributes", {
     /**
      * A list of custom attributes used on this project.
      */
-    attributes: [] as AttributeModel[],
+    attributes: [] as AttributeSchema[],
     /**
      * Layouts for displaying this project's custom attributes.
      */
-    attributeLayouts: [] as AttributeLayoutModel[],
+    attributeLayouts: [] as AttributeLayoutSchema[],
   }),
   getters: {
     /**
@@ -30,7 +30,7 @@ export const useAttributes = defineStore("attributes", {
      *
      * @return The default layout for artifact attributes.
      */
-    defaultLayout(): AttributePositionModel[] {
+    defaultLayout(): AttributePositionSchema[] {
       const layout = this.attributeLayouts.find(
         ({ artifactTypes }) => artifactTypes.length === 0
       );
@@ -42,7 +42,7 @@ export const useAttributes = defineStore("attributes", {
     /**
      * Initializes the current project.
      */
-    initializeProject(project: ProjectModel): void {
+    initializeProject(project: ProjectSchema): void {
       this.attributes = project.attributes || [];
       this.attributeLayouts = project.attributeLayouts || [];
     },
@@ -52,7 +52,7 @@ export const useAttributes = defineStore("attributes", {
      *
      * @param updatedAttributes - The updated attributes.
      */
-    updateAttributes(updatedAttributes: AttributeModel[]): void {
+    updateAttributes(updatedAttributes: AttributeSchema[]): void {
       const ids = updatedAttributes.map(({ key }) => key);
 
       this.attributes = [
@@ -82,7 +82,7 @@ export const useAttributes = defineStore("attributes", {
      *
      * @param updatedLayouts - The updated layouts.
      */
-    updateAttributeLayouts(updatedLayouts: AttributeLayoutModel[]): void {
+    updateAttributeLayouts(updatedLayouts: AttributeLayoutSchema[]): void {
       const ids = updatedLayouts.map(({ id }) => id);
 
       this.attributeLayouts = [

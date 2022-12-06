@@ -9,6 +9,7 @@ from train.metrics.calculate_threshold import CalculateThreshold
 from train.metrics.map_at_k_metric import MapAtKMetric
 from train.metrics.mrr_metric import MRRMetric
 from train.metrics.precision_at_k_metric import PrecisionAtKMetric
+from train.metrics.recall_at_k_metric import RecallAtKMetric
 
 metric_suffix = "Metric"
 
@@ -16,6 +17,7 @@ metric_suffix = "Metric"
 class SupportedTraceMetric(Enum):
     MAP_AT_K = MapAtKMetric
     PRECISION_AT_K = PrecisionAtKMetric
+    RECALL_AT_K = RecallAtKMetric
     MRR = MRRMetric
     THRESHOLD = CalculateThreshold
 

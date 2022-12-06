@@ -1,11 +1,11 @@
 import datasets
-from sklearn.metrics import precision_score
+from sklearn.metrics import recall_score
 
 from config.constants import K_METRIC_DEFAULT
 from train.metrics.abstract_trace_metric import AbstractTraceMetric
 
 _DESCRIPTION = """
-Precision@K metric measures the percentage of predicted links that were correct.
+Recall@K metric measures the percentage of true links that were correctly predicted.
 """
 
 _KWARGS_DESCRIPTION = """
@@ -14,7 +14,7 @@ Args:
     references (`list` of `int`): Ground truth labels.
     k (int): The level of the threshold to consider a similar score a true label.
 Returns:
-    precision_at_k (`float` or `int`): Precision@K score. 
+    recall_at_k (`float` or `int`): Recall@K score. 
 """
 
 _CITATION = """
@@ -22,23 +22,20 @@ _CITATION = """
 
 
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
-class PrecisionAtKMetric(AbstractTraceMetric):
+class RecallAtKMetric(AbstractTraceMetric):
 
     # TODO
     def _compute(self, predictions, references, k=K_METRIC_DEFAULT, **kwargs) -> float:
         """
-        Computes the Precision@K or the percentage of links that were correctly predicted
+        Recall@K metric measures the percentage of true links that were correctly predicted.
         :param predictions: predicted labels
         :param labels: ground truth labels.
         :param k: considers only the subset of recommendations from rank 1 through k
         :param kwargs: any other necessary params
-        :return: Precision@K score.
+        :return: Recall@K score.
         """
         predicted_labels = [1 if p >= k else 0 for p in predictions]
-        print(predictions)
-        print(predicted_labels)
-        print(references)
-        return precision_score(references, predicted_labels)
+        return recall_score(references, predicted_labels)
 
     def _info(self) -> datasets.MetricInfo:
         """

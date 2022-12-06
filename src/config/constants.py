@@ -1,5 +1,6 @@
 import os
 from os.path import abspath, dirname
+
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -28,7 +29,7 @@ REPLACEMENT_PERCENTAGE_DEFAULT = 0.15
 MIN_LENGTH_DEFAULT = 1
 
 # -------------- METRICS --------------
-K_METRIC_DEFAULT = 10  # TODO
+K_METRIC_DEFAULT = .5  # TODO
 
 # -------------- MODELS --------------
 LOGITS = "logits"

@@ -89,6 +89,8 @@ class TraceTrainer(Trainer):
         for metric_path in metric_paths:
             metric = load_metric(metric_path, keep_in_memory=True)
             metric_result = metric.compute(predictions=preds, references=label_ids)
+            if isinstance(metric_result, float):
+                metric_result = round(metric_result, 2)
             metric_name = get_metric_name(metric)
             if isinstance(metric_result, dict) and metric_name in metric_result:
                 results.update(metric_result)

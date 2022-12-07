@@ -47,19 +47,19 @@ class TraceTrainer(Trainer):
         output = self.train(resume_from_checkpoint=checkpoint)
         return TraceTrainer.output_to_dict(output)
 
-    def perform_prediction(self) -> Dict:
+    def perform_prediction(self, eval_dataset_role: DatasetRole = DatasetRole.EVAL) -> Dict:
         """
         Performs the prediction and (optionally) evaluation for the model
         :return: A dictionary containing the results.
         """
-        self.eval_dataset = self.dataset_container[DatasetRole.EVAL].to_trainer_dataset(self.model_generator)
+        self.eval_dataset = self.dataset_container[eval_dataset_role].to_trainer_dataset(self.model_generator)
         output = self.predict(self.eval_dataset)
         predictions = TraceTrainer.get_similarity_scores(output.predictions)
         results = self._eval(predictions, output.label_ids, output.metrics,
                              self.args.metrics) if self.args.metrics else None
         output_dict = TraceTrainer.output_to_dict(output, metrics=results, predictions=predictions,
                                                   source_target_pairs=self.dataset_container[
-                                                      DatasetRole.EVAL].get_source_target_pairs())
+                                                      eval_dataset_role].get_source_target_pairs())
         return output_dict
 
     @staticmethod
@@ -76,7 +76,7 @@ class TraceTrainer(Trainer):
         return {**base_output, **additional_attrs}
 
     @staticmethod
-    def _eval(preds: Union[np.ndarray, Tuple[np.ndarray]], label_ids: np.ndarray, output_metrics: Dict,
+    def _eval(preds: List[float], label_ids: np.ndarray, output_metrics: Dict,
               metric_names: List) -> Dict:
         """
         Performs the evaluation of the model (use this instead of Trainer.evaluation to utilize predefined metrics from models)

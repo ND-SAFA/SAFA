@@ -6,20 +6,22 @@ from datasets import Metric, list_metrics
 
 from train.metrics.abstract_trace_metric import AbstractTraceMetric
 from train.metrics.calculate_threshold import CalculateThreshold
-from train.metrics.map_at_k_metric import MapAtKMetric
+from train.metrics.confusion_matrix_at_threshold_metric import ConfusionMatrixAtThresholdMetric
+from train.metrics.map_metric import MapMetric
 from train.metrics.mrr_metric import MRRMetric
-from train.metrics.precision_at_k_metric import PrecisionAtKMetric
-from train.metrics.recall_at_k_metric import RecallAtKMetric
+from train.metrics.precision_at_threshold_metric import PrecisionAtThresholdMetric
+from train.metrics.recall_at_threshold_metric import RecallAtThresholdMetric
 
 metric_suffix = "Metric"
 
 
 class SupportedTraceMetric(Enum):
-    MAP_AT_K = MapAtKMetric
-    PRECISION_AT_K = PrecisionAtKMetric
-    RECALL_AT_K = RecallAtKMetric
-    MRR = MRRMetric
+    MAP = MapMetric
+    PRECISION = PrecisionAtThresholdMetric
+    RECALL = RecallAtThresholdMetric
     THRESHOLD = CalculateThreshold
+    CONFUSION_MATRIX = ConfusionMatrixAtThresholdMetric
+    MRR = MRRMetric
 
 
 def get_metric_path(metric_name: str) -> str:

@@ -11,10 +11,10 @@ class PredictionRequestSerializer(ModelIdentifierSerializer):
     """
     Serializer for a model prediction request.
     """
-    data = DatasetCreatorSerializer(help_text="The instructions for creating training/prediction dataset.",
+    data = DatasetCreatorSerializer(help_text="Creator for training dataset.",
                                     required=True)
 
     def create(self, validated_data: Dict) -> JobFactory:
         representation: Dict = SerializerUtility.create_children_serializers(validated_data, self.fields.fields)
-        SerializerUtility.serialize_trainer_dataset_container(representation, "eval_dataset_creator")
+        SerializerUtility.serialize_trainer_dataset_container(representation, [("data", "eval_dataset_creator")])
         return JobFactoryConverter.create_job_factory(representation)

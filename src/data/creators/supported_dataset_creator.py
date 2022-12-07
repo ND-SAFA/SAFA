@@ -4,6 +4,7 @@ from data.creators.classic_trace_dataset_creator import ClassicTraceDatasetCreat
 from data.creators.csv_dataset_creator import CSVDatasetCreator
 from data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
 from data.creators.safa_dataset_creator import SafaDatasetCreator
+from data.creators.split_dataset_creator import SplitDatasetCreator
 
 
 class SupportedDatasetCreator(Enum):
@@ -11,3 +12,4 @@ class SupportedDatasetCreator(Enum):
     SAFA = SafaDatasetCreator
     CLASSIC_TRACE = ClassicTraceDatasetCreator
     MLM_PRETRAIN = MLMPreTrainDatasetCreator
+    SPLIT = SplitDatasetCreator

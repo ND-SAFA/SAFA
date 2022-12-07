@@ -1,14 +1,14 @@
 import os
 from unittest.mock import patch
 
-from test.base_trace_test import BaseTraceTest
-from test.paths.paths import TEST_OUTPUT_DIR
 from data.creators.classic_trace_dataset_creator import ClassicTraceDatasetCreator
 from data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
 from data.creators.split_dataset_creator import SplitDatasetCreator
 from data.datasets.dataset_role import DatasetRole
 from data.datasets.trace_dataset import TraceDataset
 from data.datasets.trainer_datasets_container import TrainerDatasetsContainer
+from test.base_trace_test import BaseTraceTest
+from test.paths.paths import TEST_OUTPUT_DIR
 
 
 class TestTrainerDatasetsContainer(BaseTraceTest):
@@ -17,8 +17,8 @@ class TestTrainerDatasetsContainer(BaseTraceTest):
                                                        true_links=BaseTraceTest.POS_LINKS,
                                                        data_cleaning_steps=BaseTraceTest.DATA_CLEANING_STEPS,
                                                        use_linked_targets_only=False)
-    VAL_DATASET_CREATOR = SplitDatasetCreator(split_percentage=0.3)
-    EVAL_DATASET_CREATOR = SplitDatasetCreator(split_percentage=0.2)
+    VAL_DATASET_CREATOR = SplitDatasetCreator(val_percentage=0.3)
+    EVAL_DATASET_CREATOR = SplitDatasetCreator(val_percentage=0.2)
 
     @patch.object(MLMPreTrainDatasetCreator, "create")
     def test_prepare_datasets(self, create_mock):
@@ -88,7 +88,7 @@ class TestTrainerDatasetsContainer(BaseTraceTest):
 
         val_dataset_creator = self.VAL_DATASET_CREATOR
         trainer_datasets_container = TrainerDatasetsContainer(
-            pre_train_dataset_creator = pre_train_dataset_creator,
+            pre_train_dataset_creator=pre_train_dataset_creator,
             train_dataset_creator=train_dataset_creator,
             val_dataset_creator=val_dataset_creator,
             eval_dataset_creator=eval_dataset_creator)

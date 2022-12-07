@@ -1,4 +1,4 @@
-from typing import Dict, OrderedDict
+from typing import Dict, List, OrderedDict, Tuple
 
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
@@ -14,18 +14,19 @@ class SerializerUtility:
     """
 
     @staticmethod
-    def serialize_trainer_dataset_container(kwargs: Dict, container_param: str, dataset_param: str = "data",
+    def serialize_trainer_dataset_container(kwargs: Dict, dataset_params: List[Tuple[str, str]],
                                             export_param: str = "trainer_dataset_container", **addition_kwargs):
         """
         Reads dataset from kwargs and wraps it in a trainer dataset container.
         :param kwargs: The kwargs to extract dataset from.
-        :param container_param: The name of parameter in the dataset container to store dataset under.
-        :param dataset_param: The name of the parameter in kwargs containing dataset.
+        :param dataset_params: List of parameter conversions from validated data to trainer dataset container.
         :param export_param: The name of the parameter to export trainer dataset container to in kwargs.
         :return: None
         """
-        dataset_creator: AbstractDatasetCreator = kwargs.pop(dataset_param)
-        container_kwargs = {container_param: dataset_creator}
+        container_kwargs = {}
+        for dataset_param, container_param in dataset_params:
+            dataset_creator: AbstractDatasetCreator = kwargs.pop(dataset_param)
+            container_kwargs[container_param] = dataset_creator
         trainer_datasets_container = TrainerDatasetsContainer(**container_kwargs, **addition_kwargs)
         kwargs[export_param] = trainer_datasets_container
 

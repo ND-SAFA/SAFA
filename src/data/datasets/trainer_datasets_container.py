@@ -25,7 +25,7 @@ class TrainerDatasetsContainer:
         :param pre_train_dataset_creator: The pre-training dataset creator.
         :param train_dataset_creator: The training dataset creator.
         :param val_dataset_creator: the validation dataset creator.
-        :param eval_dataset_creator: The training dataset creator.data
+        :param eval_dataset_creator: The training dataset creator.
         :param augmentation_steps: steps to run to augment the training data
         """
         self.__dataset_creators = {DatasetRole.PRE_TRAIN: pre_train_dataset_creator,
@@ -91,7 +91,7 @@ class TrainerDatasetsContainer:
         :param dataset_creators_map: a map of dataset role to all dataset creators
         :return: a dictionary mapping dataset role to split for all split data
         """
-        dataset_percent_splits = OrderedDict({dataset_role: dataset_creator.split_percentage
+        dataset_percent_splits = OrderedDict({dataset_role: dataset_creator.val_percentage
                                               for dataset_role, dataset_creator in dataset_creators_map.items()
                                               if isinstance(dataset_creator, SplitDatasetCreator)})
         dataset_splits_map = {}

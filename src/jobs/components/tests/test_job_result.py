@@ -1,8 +1,8 @@
+import json
+
 from jobs.components.job_result import JobResult
 from jobs.components.job_status import JobStatus
 from test.base_test import BaseTest
-import json
-
 from train.metrics.supported_trace_metric import SupportedTraceMetric
 
 
@@ -20,7 +20,7 @@ class TestJobResult(BaseTest):
         result1.update(result2)
         result1.update({JobResult.PREDICTIONS: [{"source": "s1", "target": "t2", "score": 0.9}]})
         self.assertIn(JobResult.METRICS.upper(), result1)
-        self.assertIn(SupportedTraceMetric.PRECISION_AT_K.name.lower(), result1[JobResult.METRICS])
+        self.assertIn(SupportedTraceMetric.PRECISION.name.lower(), result1[JobResult.METRICS])
         self.assertIn(JobResult.STATUS, result1)
         self.assertEquals(result1[JobResult.STATUS], 1)
         self.assertIn(JobResult.PREDICTIONS, result1)
@@ -36,6 +36,7 @@ class TestJobResult(BaseTest):
         result_dict = result1.as_dict()
         result2 = JobResult.from_dict(result_dict)
         self.assertEquals(result1, result2)
+
     def test_get_properties(self):
         response_keys = [JobResult.MODEL_PATH, JobResult.STATUS, "doesnt exist"]
         properties = JobResult.get_properties(response_keys)
@@ -51,8 +52,10 @@ class TestJobResult(BaseTest):
     def test_is_better_than(self):
         result1 = self.get_job_result(precision_at_k=0.8)
         result2 = self.get_job_result(precision_at_k=0.3)
-        self.assertTrue(result1.is_better_than(result2, SupportedTraceMetric.PRECISION_AT_K, should_maximize=True))
-        self.assertFalse(result1.is_better_than(result2, SupportedTraceMetric.PRECISION_AT_K, should_maximize=False))
+        self.assertTrue(
+            result1.is_better_than(result2, SupportedTraceMetric.PRECISION, should_maximize=True))
+        self.assertFalse(
+            result1.is_better_than(result2, SupportedTraceMetric.PRECISION, should_maximize=False))
         self.assertFalse(result2.is_better_than(result1, "precision_at_k", should_maximize=True))
 
         result3 = self.get_job_result({JobResult.STATUS: 1})
@@ -62,14 +65,14 @@ class TestJobResult(BaseTest):
     def test_can_compare_with_metric(self):
         result1 = self.get_job_result(precision_at_k=0.8)
         result2 = self.get_job_result(precision_at_k=0.3)
-        self.assertTrue(result1._can_compare_with_metric(result2, SupportedTraceMetric.PRECISION_AT_K.name))
+        self.assertTrue(result1._can_compare_with_metric(result2, SupportedTraceMetric.PRECISION.name))
         self.assertFalse(result1._can_compare_with_metric(result2, None))
         self.assertFalse(result1._can_compare_with_metric(result2, "precision"))
 
     def test_get_comparison_vals(self):
         result1 = self.get_job_result(precision_at_k=0.8)
         result2 = self.get_job_result(precision_at_k=0.3)
-        metric1, metric2 = result1._get_comparison_vals(result2, SupportedTraceMetric.PRECISION_AT_K.name)
+        metric1, metric2 = result1._get_comparison_vals(result2, SupportedTraceMetric.PRECISION.name)
         self.assertEquals(metric1, 0.8)
         self.assertEquals(metric2, 0.3)
 
@@ -88,7 +91,5 @@ class TestJobResult(BaseTest):
 
     def get_job_result(self, results_dict=None, precision_at_k=0.8):
         if results_dict is None:
-            results_dict = {JobResult.METRICS: {SupportedTraceMetric.PRECISION_AT_K.name: precision_at_k}}
+            results_dict = {JobResult.METRICS: {SupportedTraceMetric.PRECISION.name: precision_at_k}}
         return JobResult(results_dict)
-
-

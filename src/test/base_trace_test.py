@@ -5,16 +5,16 @@ import numpy as np
 from transformers.trainer_utils import PredictionOutput
 
 from config.constants import VALIDATION_PERCENTAGE_DEFAULT
-from jobs.components.job_result import JobResult
-from test.base_test import BaseTest
 from data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from data.creators.split_dataset_creator import SplitDatasetCreator
 from data.creators.supported_dataset_creator import SupportedDatasetCreator
-from data.tree.artifact import Artifact
-from data.tree.trace_link import TraceLink
 from data.datasets.dataset_role import DatasetRole
 from data.datasets.trainer_datasets_container import TrainerDatasetsContainer
 from data.processing.abstract_data_processing_step import AbstractDataProcessingStep
+from data.tree.artifact import Artifact
+from data.tree.trace_link import TraceLink
+from jobs.components.job_result import JobResult
+from test.base_test import BaseTest
 
 
 class BaseTraceTest(BaseTest):
@@ -100,9 +100,10 @@ class BaseTraceTest(BaseTest):
         return {dataset_role: abstract_dataset}
 
     @staticmethod
-    def create_trainer_dataset_container(dataset_map: Dict[DatasetRole, AbstractDatasetCreator], split_train_dataset=True):
+    def create_trainer_dataset_container(dataset_map: Dict[DatasetRole, AbstractDatasetCreator],
+                                         split_train_dataset=True):
         if split_train_dataset:
-            dataset_map[DatasetRole.VAL] = SplitDatasetCreator(split_percentage=VALIDATION_PERCENTAGE_DEFAULT)
+            dataset_map[DatasetRole.VAL] = SplitDatasetCreator(val_percentage=VALIDATION_PERCENTAGE_DEFAULT)
         return TrainerDatasetsContainer.create_from_map(dataset_map)
 
     def assert_prediction_output_matches_expected(self, output: dict, threshold: int = 0.05):

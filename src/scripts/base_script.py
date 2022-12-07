@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from rest_framework import serializers
 
 from jobs.abstract_job import AbstractJob
+from jobs.components.job_result import JobResult
 from jobs.job_factory import JobFactory
 
 load_dotenv()
@@ -45,7 +46,7 @@ class BaseScript:
         job_factory: JobFactory = serializer.save()
         job = job_factory.build(self.job)
         job.run()
-        print(job.result.to_json("metrics"))
+        print(job.result.to_json(JobResult.VAL_METRICS))
 
     @staticmethod
     def assert_path_vars_exists(args: Dict, path_vars: List[str]):

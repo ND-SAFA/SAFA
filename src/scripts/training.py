@@ -44,6 +44,12 @@ if __name__ == "__main__":
                 "project_path": args.data
             },
         },
+        "val_data": {
+            "creator": "SPLIT",
+            "params": {
+                "val_percentage": .20
+            }
+        },
         "augmentationSteps": [
             {
                 "creator": "RESAMPLE",
@@ -54,7 +60,8 @@ if __name__ == "__main__":
         ],
         "params": {
             "trace_args_params": {
-                "num_train_epochs": int(args.epochs)
+                "num_train_epochs": int(args.epochs),
+                "metrics": ["map", "threshold", "precision", "recall", "confusion_matrix"]
             }
         }
     }

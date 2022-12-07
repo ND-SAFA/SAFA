@@ -1,20 +1,21 @@
 import datasets
-from sklearn.metrics import recall_score
+from sklearn.metrics import average_precision_score
 
 from config.constants import K_METRIC_DEFAULT
 from train.metrics.abstract_trace_metric import AbstractTraceMetric
 
 _DESCRIPTION = """
-Recall@K metric measures the percentage of true links that were correctly predicted.
+Mean Average Precision@K metric measures the average precision over k for recommendations shown for 
+different links and averages them over all queries in the data.
 """
 
 _KWARGS_DESCRIPTION = """
 Args:
-    predictions (`list` of `int`): Predicted labels.
+    predictions (`list` of `float`): Predicted labels.
     references (`list` of `int`): Ground truth labels.
-    k (int): The level of the threshold to consider a similar score a true label.
+    k (int): considers only the subset of recommendations from rank 1 through k
 Returns:
-    recall_at_k (`float` or `int`): Recall@K score. 
+    map_at_k (`float` or `int`): Mean Average Precision@K score. 
 """
 
 _CITATION = """
@@ -22,20 +23,21 @@ _CITATION = """
 
 
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
-class RecallAtKMetric(AbstractTraceMetric):
+class MapMetric(AbstractTraceMetric):
+    name = "map_at_k"
 
     # TODO
     def _compute(self, predictions, references, k=K_METRIC_DEFAULT, **kwargs) -> float:
         """
-        Recall@K metric measures the percentage of true links that were correctly predicted.
+        computes the Mean Average Precision@K or the average precision over k for recommendations shown for different links
+         and averages them over all queries in the data.
         :param predictions: predicted labels
         :param labels: ground truth labels.
         :param k: considers only the subset of recommendations from rank 1 through k
         :param kwargs: any other necessary params
-        :return: Recall@K score.
+        :return: Mean Average Precision@K score.
         """
-        predicted_labels = [1 if p >= k else 0 for p in predictions]
-        return recall_score(references, predicted_labels)
+        return average_precision_score(references, predictions)
 
     def _info(self) -> datasets.MetricInfo:
         """

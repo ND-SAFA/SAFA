@@ -48,5 +48,5 @@ class TestClassicTraceDatasetCreator(BaseTraceTest):
 
     def get_classic_trace_dataset_creator(self, use_linked_targets_only: bool = False):
         return ClassicTraceDatasetCreator(source_layers=self.SOURCE_LAYERS, target_layers=self.TARGET_LAYERS,
-                                          true_links=self.POS_LINKS, data_cleaning_steps=self.DATA_CLEANING_STEPS,
+                                          true_links=self.POS_LINKS, data_cleaner=self.DATA_CLEANING_STEPS,
                                           use_linked_targets_only=use_linked_targets_only)

@@ -4,7 +4,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from data.creators.abstract_dataset_creator import AbstractDatasetCreator
-from data.datasets.trainer_datasets_manager import TrainerDatasetsManager
+from data.datasets.trainer_dataset_manager import TrainerDatasetManager
 from data.processing.cleaning.separate_joined_words_step import SeparateJoinedWordsStep
 
 
@@ -26,7 +26,7 @@ class SerializerUtility:
         """
         dataset_creator: AbstractDatasetCreator = kwargs.pop(dataset_param)
         container_kwargs = {container_param: dataset_creator}
-        trainer_datasets_container = TrainerDatasetsManager(**container_kwargs)
+        trainer_datasets_container = TrainerDatasetManager(**container_kwargs)
         kwargs[export_param] = trainer_datasets_container
 
     @staticmethod

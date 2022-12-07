@@ -6,7 +6,7 @@ from config.constants import SAVE_OUTPUT_DEFAULT
 from jobs.abstract_job import AbstractJob
 from jobs.abstract_trace_job import AbstractTraceJob
 from jobs.components.job_args import JobArgs
-from data.datasets.trainer_datasets_manager import TrainerDatasetsManager
+from data.datasets.trainer_dataset_manager import TrainerDatasetManager
 from models.base_models.supported_base_model import SupportedBaseModel
 from models.model_properties import ModelArchitectureType
 from train.trainer_args import TrainerArgs
@@ -30,7 +30,7 @@ class JobFactory:
     """
     Container for data used for any training, prediction, or evaluation.
     """
-    trainer_dataset_container: TrainerDatasetsManager = None
+    trainer_dataset_container: TrainerDatasetManager = None
     """
     Any additional parameters for making data including test/train split info
     """

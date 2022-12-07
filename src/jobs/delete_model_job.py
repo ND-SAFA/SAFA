@@ -11,6 +11,6 @@ class DeleteModelJob(AbstractJob):
         Deletes a new model directory
         :return: Empty Dict
         """
-        if os.path.exists(self.model_path):
-            shutil.rmtree(self.model_path)
+        if os.path.exists(self.model_manager.model_path):
+            shutil.rmtree(self.model_manager.model_path)
         return JobResult()

@@ -4,7 +4,7 @@ from rest_framework import serializers
 
 from server.serializers.dataset.dataset_creator_serializer import DatasetCreatorSerializer
 from server.serializers.serializer_utility import SerializerUtility
-from data.datasets.trainer_datasets_manager import TrainerDatasetsManager
+from data.datasets.trainer_dataset_manager import TrainerDatasetManager
 
 
 class TrainerDatasetsContainerSerializer(serializers.Serializer):
@@ -24,12 +24,12 @@ class TrainerDatasetsContainerSerializer(serializers.Serializer):
         """
         Creates TrainerDatasetContainer for each defined dataset.
         :param validated_data: The validated request data defining data.
-        :return: TrainerDatasetsManager with dataset creators.
+        :return: TrainerDatasetManager with dataset creators.
         """
         kwargs = SerializerUtility.create_children_serializers(validated_data, self.fields.fields)
         if "params" in validated_data:
             kwargs.update(validated_data["params"])
-        return TrainerDatasetsManager(**kwargs)
+        return TrainerDatasetManager(**kwargs)
 
     def update(self, instance, validated_data):
         SerializerUtility.update_error()

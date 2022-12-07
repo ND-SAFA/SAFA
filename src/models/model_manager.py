@@ -2,12 +2,10 @@ from typing import Dict, Optional
 
 from transformers import AutoConfig
 from transformers.modeling_utils import PreTrainedModel
-from transformers.models.auto import AutoModel
 from transformers.models.auto.tokenization_auto import AutoTokenizer
 from transformers.tokenization_utils import PreTrainedTokenizer
 
 from config.constants import MAX_SEQ_LENGTH_DEFAULT
-from models.base_models.supported_base_model import SupportedBaseModel
 from models.model_properties import ModelArchitectureType, ModelSize, ModelTask
 
 

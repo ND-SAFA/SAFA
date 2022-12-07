@@ -4,17 +4,16 @@ from typing import List, Union
 from data.datasets.pre_train_dataset import PreTrainDataset
 from data.datasets.trace_dataset import TraceDataset
 from data.processing.cleaning.data_cleaner import DataCleaner
-from data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 
 
 class AbstractDatasetCreator(ABC):
 
-    def __init__(self, data_cleaning_steps: List[AbstractDataProcessingStep]):
+    def __init__(self, data_cleaner: DataCleaner = None):
         """
         Responsible for creating data in format for defined models.
-        :param data_cleaning_steps: List of pre-processing steps for dataset.
+        :param data_cleaner: the data cleaner to use on the data
         """
-        self._data_cleaner = self._make_data_cleaner(data_cleaning_steps)
+        self.data_cleaner = data_cleaner
 
     @abstractmethod
     def create(self) -> Union[TraceDataset, PreTrainDataset]:
@@ -23,17 +22,6 @@ class AbstractDatasetCreator(ABC):
         :return: the data
         """
         pass
-
-    @staticmethod
-    def _make_data_cleaner(data_cleaning_steps: List[AbstractDataProcessingStep] = None) -> DataCleaner:
-        """
-        Handles making the pre_processor
-        :param data_cleaning_steps: tuple containing the desired pre-processing steps and related params
-        :return: the pre_processor
-        """
-        if data_cleaning_steps:
-            return DataCleaner(data_cleaning_steps)
-        return DataCleaner([])
 
     def _process_tokens(self, tokens: Union[List[str], str]) -> Union[List[str], str]:
         """
@@ -44,7 +32,7 @@ class AbstractDatasetCreator(ABC):
         if not isinstance(tokens, list):
             tokens = [tokens]
 
-        tokens = self._data_cleaner.run(tokens=tokens)
+        tokens = self.data_cleaner.run(tokens=tokens) if self.data_cleaner else tokens
 
         if len(tokens) == 1:
             tokens = tokens.pop()

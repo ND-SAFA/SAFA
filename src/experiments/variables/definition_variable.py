@@ -4,7 +4,7 @@ from experiments.variables.variable import Variable
 from util.uncased_dict import UncasedDict
 
 
-class DefinitionVariable(Variable, UncasedDict):
+class DefinitionVariable(UncasedDict, Variable):
 
     def __init__(self, value: Dict[str, Variable]):
         Variable.__init__(self, value=value)

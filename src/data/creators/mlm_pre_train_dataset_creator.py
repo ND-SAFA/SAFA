@@ -6,7 +6,7 @@ from typing import List
 from config.constants import BLOCK_SIZE_DEFAULT
 from data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from data.datasets.pre_train_dataset import PreTrainDataset
-from data.processing.abstract_data_processing_step import AbstractDataProcessingStep
+from data.processing.cleaning.data_cleaner import DataCleaner
 
 
 class MLMPreTrainDatasetCreator(AbstractDatasetCreator):
@@ -14,16 +14,16 @@ class MLMPreTrainDatasetCreator(AbstractDatasetCreator):
     OUTPUT_FILE_EXT = ".txt"
 
     def __init__(self, orig_data_path: str, training_data_dir: str = None,
-                 data_cleaning_steps: List[AbstractDataProcessingStep] = None,
+                 data_cleaner: DataCleaner = None,
                  block_size: int = BLOCK_SIZE_DEFAULT):
         """
         The masked learning model pretraining data creator
         :param orig_data_path: path to the original pretraining data
         :param training_data_dir: path to the directory to save the training data file (defaults to same as orig_data_path)
-        :param data_cleaning_steps: tuple containing the desired pre-processing steps and related params
+        :param data_cleaner: the data cleaner to use on the data
         :param block_size: the block size for the LineByLineDataset
         """
-        super().__init__(data_cleaning_steps)
+        super().__init__(data_cleaner)
         self.orig_data_path = orig_data_path
         self.block_size = block_size
         self.id = str(uuid.uuid4())

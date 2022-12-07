@@ -16,13 +16,14 @@ from models.model_manager import ModelManager
 class AbstractJob(threading.Thread):
     OUTPUT_FILENAME = "output.json"
 
-    def __init__(self, job_args: JobArgs, **kwargs):
+    def __init__(self, job_args: JobArgs, model_manager: ModelManager = None, **kwargs):
         """
         The base job class
         :param job_args: The arguments to the job.
         """
         super().__init__()
         self.job_args = job_args
+        self.model_manager = model_manager
         if self.job_args.random_seed:
             self.set_random_seed(self.job_args.random_seed)
         self.result = JobResult()
@@ -30,17 +31,6 @@ class AbstractJob(threading.Thread):
         self.output_dir = job_args.output_dir
         self.job_output_filepath = self._get_output_filepath(self.output_dir, self.id)
         self.save_job_output = job_args.save_job_output
-        self.model_path = job_args.model_path
-        self.__model_manager = None
-
-    def get_model_manager(self) -> ModelManager:
-        """
-        Gets the model generator for the job given a base model and model path
-        :return: the model generator
-        """
-        if self.__model_manager is None:
-            self.__model_manager = ModelManager(model_path=self.model_path)
-        return self.__model_manager
 
     def run(self) -> None:
         """

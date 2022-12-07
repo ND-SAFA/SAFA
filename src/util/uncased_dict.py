@@ -32,7 +32,7 @@ class UncasedDict(dict):
         :param value: the value to process
         :return: the processed value
         """
-        if isinstance(value, dict):
+        if isinstance(value, dict) and not isinstance(value, UncasedDict):
             processed_value = UncasedDict()
             for key, val in value.items():
                 processed_value[key] = val

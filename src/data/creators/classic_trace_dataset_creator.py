@@ -2,27 +2,27 @@ from typing import Dict, List, Set, Tuple
 
 from config.constants import USE_LINKED_TARGETS_ONLY_DEFAULT
 from data.creators.abstract_trace_dataset_creator import AbstractTraceDatasetCreator
+from data.processing.cleaning.data_cleaner import DataCleaner
 from data.tree.artifact import Artifact
 from data.tree.trace_link import TraceLink
 from data.datasets.trace_dataset import TraceDataset
-from data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 
 
 class ClassicTraceDatasetCreator(AbstractTraceDatasetCreator):
 
     def __init__(self, source_layers: List[Dict[str, str]], target_layers: List[Dict[str, str]],
                  true_links: List[Tuple[str, str]] = None,
-                 data_cleaning_steps: List[AbstractDataProcessingStep] = None,
+                 data_cleaner: DataCleaner = None,
                  use_linked_targets_only: bool = USE_LINKED_TARGETS_ONLY_DEFAULT):
         """
         Constructs data in classic trace format
         :param source_layers: a list of source artifacts across all layers
         :param target_layers: a list of target artifacts across all layers
         :param true_links: list of tuples containing linked source and target ids
-        :param data_cleaning_steps: tuple containing the desired pre-processing steps and related params
+        :param data_cleaner: the data cleaner to use on the data
         :param use_linked_targets_only: if True, uses only the targets that make up at least one true link
         """
-        super().__init__(data_cleaning_steps, use_linked_targets_only)
+        super().__init__(data_cleaner, use_linked_targets_only)
         self.source_layers = source_layers
         self.target_layers = target_layers
         self.true_links = true_links

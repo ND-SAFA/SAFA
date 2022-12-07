@@ -21,4 +21,4 @@ class TestRepositoryDatasetCreator(BaseTraceTest):
 
     def get_repo_dataset_creator(self):
         return RepositoryDatasetCreator([os.path.join(self.REPO_DIR, dirname) for dirname in self.REPO_DIRNAMES],
-                                        data_cleaning_steps=self.DATA_CLEANING_STEPS, data_keys=self.KEYS)
+                                        data_cleaner=self.DATA_CLEANING_STEPS, data_keys=self.KEYS)

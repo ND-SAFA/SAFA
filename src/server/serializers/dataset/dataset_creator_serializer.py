@@ -22,7 +22,7 @@ class DatasetCreatorSerializer(serializers.Serializer):
 
     preProcessingSteps = PreProcessingStepSerializer(help_text="The steps performed on dataset before model access.",
                                                      many=True,
-                                                     source="data_cleaning_steps",
+                                                     source="data_cleaner",
                                                      required=False)
 
     def create(self, validated_data: Dict) -> SupportedDatasets:
@@ -32,7 +32,7 @@ class DatasetCreatorSerializer(serializers.Serializer):
         :return: AbstractDatasetCreator containing TraceDataset or PreTrainDataset
         """
         kwargs = SerializerUtility.create_children_serializers(validated_data, self.fields.fields)
-        pre_processing_steps = kwargs.get("data_cleaning_steps", None)
+        pre_processing_steps = kwargs.get("data_cleaner", None)
         params = kwargs.get("params", {})
         creator_class: Type[SupportedDatasets] = kwargs["creator"].value
         return creator_class(pre_processing_steps=pre_processing_steps, **params)

@@ -12,21 +12,13 @@ class JobArgs:
     """
     output_dir: str = None
     """
-    Path to the model weights (e.g. loading pretrained model).
-    """
-    model_path: str = None
-    """
-    The model used to load the architecture.
-    """
-    model_architecture: ModelArchitectureType = None
-    """
-    Initialized post-init to contain all arguments for tracing jobs
-    """
-    trainer_args: TrainerArgs = None
-    """
     If True, saves the output to the output_dir
     """
     save_job_output: bool = SAVE_OUTPUT_DEFAULT
+    """
+   If True, saves the dataset splits to the output_dir
+   """
+    save_dataset_splits: bool = False
     """
     Sets the random seed for a job
     """

@@ -12,7 +12,7 @@ from transformers.trainer_pt_utils import get_tpu_sampler, is_torch_tpu_availabl
 
 from config.override import overrides
 from data.datasets.dataset_role import DatasetRole
-from data.datasets.trainer_datasets_manager import TrainerDatasetsManager
+from data.datasets.trainer_dataset_manager import TrainerDatasetManager
 from train.metrics.supported_trace_metric import get_metric_name, get_metric_path
 from models.model_manager import ModelManager
 from train.trainer_args import TrainerArgs
@@ -23,18 +23,19 @@ class TraceTrainer(Trainer):
     Responsible for using given model for training and prediction using given data.
     """
 
-    def __init__(self, args: TrainerArgs, model_manager: ModelManager, trainer_dataset_manager: TrainerDatasetsManager=None, **kwargs):
+    def __init__(self, trainer_args: TrainerArgs, model_manager: ModelManager, trainer_dataset_manager: TrainerDatasetManager,
+                 **kwargs):
         """
         Handles the training and evaluation of learning models
         :param args: the learning model arguments
         """
-        self.args = args
-        self.dataset_container = args.trainer_dataset_container
+        self.args = trainer_args
+        self.dataset_container = trainer_dataset_manager
         self.model_manager = model_manager
         self.model_manager.set_max_seq_length(self.args.max_seq_length)
         model = self.model_manager.get_model()
         tokenizer = self.model_manager.get_tokenizer()
-        super().__init__(model=model, args=args, tokenizer=tokenizer, callbacks=args.callbacks, **kwargs)
+        super().__init__(model=model, args=trainer_args, tokenizer=tokenizer, callbacks=trainer_args.callbacks, **kwargs)
 
     def perform_training(self, checkpoint: str = None) -> Dict:
         """

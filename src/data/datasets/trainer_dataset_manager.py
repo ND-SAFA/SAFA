@@ -5,11 +5,11 @@ from data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from data.creators.split_dataset_creator import SplitDatasetCreator
 from data.datasets.dataset_role import DatasetRole
 from data.datasets.pre_train_dataset import PreTrainDataset
-from data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
 from data.datasets.trace_dataset import TraceDataset
+from data.processing.augmentation.data_augmenter import DataAugmenter
 
 
-class TrainerDatasetsManager:
+class TrainerDatasetManager:
     DATASET_TYPE = Union[PreTrainDataset, TraceDataset, AbstractDataset]
 
     def __init__(self,
@@ -17,7 +17,7 @@ class TrainerDatasetsManager:
                  train_dataset_creator: AbstractDatasetCreator = None,
                  val_dataset_creator: AbstractDatasetCreator = None,
                  eval_dataset_creator: AbstractDatasetCreator = None,
-                 augmentation_steps: List[AbstractDataAugmentationStep] = None
+                 augmenter: DataAugmenter = None
                  ):
         """
         Container to hold all the data used in the TraceTrainer
@@ -25,12 +25,12 @@ class TrainerDatasetsManager:
         :param train_dataset_creator: The training dataset creator.
         :param val_dataset_creator: the validation dataset creator.
         :param eval_dataset_creator: The training dataset creator.data
-        :param augmentation_steps: steps to run to augment the training data
+        :param augmenter: augmenter to use for augmenting datasets
         """
         self.__dataset_creators = {DatasetRole.PRE_TRAIN: pre_train_dataset_creator, DatasetRole.TRAIN: train_dataset_creator,
                                    DatasetRole.VAL: val_dataset_creator, DatasetRole.EVAL: eval_dataset_creator}
         self.__datasets = self._create_datasets_from_creators(self.__dataset_creators)
-        self._prepare_datasets(augmentation_steps)
+        self._prepare_datasets(augmenter)
 
     def get_creator(self, dataset_role: DatasetRole) -> AbstractDatasetCreator:
         """
@@ -58,26 +58,26 @@ class TrainerDatasetsManager:
         """
         Creates instance containing dataset for each mapped role.
         :param dataset_creators_map: The map of roles to data to set in instance.
-        :return: TrainerDatasetsManager with initialized data.
+        :return: TrainerDatasetManager with initialized data.
         """
-        trainer_datasets_container = TrainerDatasetsManager(
+        trainer_datasets_container = TrainerDatasetManager(
             pre_train_dataset_creator=dataset_creators_map.get(DatasetRole.PRE_TRAIN, None),
             train_dataset_creator=dataset_creators_map.get(DatasetRole.TRAIN, None),
             val_dataset_creator=dataset_creators_map.get(DatasetRole.VAL, None),
             eval_dataset_creator=dataset_creators_map.get(DatasetRole.EVAL, None))
         return trainer_datasets_container
 
-    def _prepare_datasets(self, augmentation_steps: List[AbstractDataAugmentationStep]) -> None:
+    def _prepare_datasets(self, augmenter: DataAugmenter) -> None:
         """
         Performs any necessary additional steps necessary to prepare each dataset
-        :param augmentation_steps: steps to augment the training dataset
+        :param augmenter: augmenter to use for augmenting datasets
         :return: None
         """
         train_dataset = self[DatasetRole.TRAIN]
         if isinstance(self[DatasetRole.TRAIN], TraceDataset):
             dataset_splits_map = self._create_dataset_splits(train_dataset, self.__dataset_creators)
             self.__datasets.update(dataset_splits_map)
-            self[DatasetRole.TRAIN].prepare_for_training(augmentation_steps)
+            self[DatasetRole.TRAIN].prepare_for_training(augmenter)
 
     @staticmethod
     def _create_dataset_splits(train_dataset: TraceDataset, dataset_creators_map: Dict[DatasetRole, AbstractDatasetCreator]) \
@@ -108,7 +108,7 @@ class TrainerDatasetsManager:
         Creates the data from their corresponding creators
         :return: a dictionary mapping dataset role to the corresponding dataset
         """
-        return {dataset_role: TrainerDatasetsManager.__optional_create(dataset_creator)
+        return {dataset_role: TrainerDatasetManager.__optional_create(dataset_creator)
                 for dataset_role, dataset_creator in dataset_creators_map.items()}
 
     @staticmethod

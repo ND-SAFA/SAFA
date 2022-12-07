@@ -6,7 +6,7 @@ from data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from data.creators.supported_dataset_creator import SupportedDatasetCreator
 from data.datasets.dataset_role import DatasetRole
 from data.processing.cleaning.data_cleaning_steps import DataCleaningSteps
-from data.datasets.trainer_datasets_manager import TrainerDatasetsManager
+from data.datasets.trainer_dataset_manager import TrainerDatasetManager
 from data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 from util.reflection_util import ParamScope, ReflectionUtil
 
@@ -52,7 +52,7 @@ class JobFactoryConverter:
         return data
 
     @staticmethod
-    def __get_dataset_creator(dataset_container: TrainerDatasetsManager) -> AbstractDatasetCreator:
+    def __get_dataset_creator(dataset_container: TrainerDatasetManager) -> AbstractDatasetCreator:
         if DatasetRole.TRAIN in dataset_container:
             return dataset_container.get_creator(DatasetRole.TRAIN)
         if DatasetRole.EVAL in dataset_container:
@@ -66,7 +66,7 @@ class JobFactoryConverter:
         :param instance: The dataset creator to deserialize.
         :return: Dictionary containing API json.
         """
-        steps = instance._data_cleaner.steps
+        steps = instance.data_cleaner.steps
         steps_representation = [JobFactoryConverter.abstract_data_cleaning_step_representation(step) for step in steps]
         return {
             "creator": ReflectionUtil.get_enum_key(SupportedDatasetCreator, instance),

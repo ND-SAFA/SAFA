@@ -28,13 +28,24 @@ if __name__ == "__main__":
     parser.add_argument('output')
     parser.add_argument('-model', help="The model to fine-tune.", default="roberta-base")
     parser.add_argument('-epochs', default=20, type=int)
-    parser.add_argument('-split', default=0.2, type=float)
+    parser.add_argument('-val', default=None)
 
     args = parser.parse_args()
 
     #
     # Create Job Data
     #
+    validation_dataset_definition = {
+        "creator": "SPLIT",
+        "params": {
+            "val_percentage": float(args.val)
+        }
+    } if args.val else {
+        "creator": "SAFA",
+        "params": {
+            "project_path": args.val
+        }
+    }
     job_definition = {
         "modelPath": args.model,
         "outputDir": args.output,
@@ -45,12 +56,7 @@ if __name__ == "__main__":
                 "project_path": args.data
             },
         },
-        "val_data": {
-            "creator": "SPLIT",
-            "params": {
-                "val_percentage": args.split
-            }
-        },
+        "val_data": validation_dataset_definition,
         "augmentationSteps": [
             {
                 "creator": "RESAMPLE",

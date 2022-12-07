@@ -28,7 +28,7 @@ if __name__ == "__main__":
     parser.add_argument('output')
     parser.add_argument('-model', help="The model to fine-tune.", default="roberta-base")
     parser.add_argument('-epochs', default=20, type=int)
-    parser.add_argument('-val', default=None)
+    parser.add_argument('-val', default=None, type=float)
     parser.add_argument('-val_path', default=None)
 
     args = parser.parse_args()
@@ -40,7 +40,7 @@ if __name__ == "__main__":
         validation_dataset_definition = {
             "creator": "SAFA",
             "params": {
-                "project_path": args.val
+                "project_path": args.val_path
             }
         }
     elif args.val:

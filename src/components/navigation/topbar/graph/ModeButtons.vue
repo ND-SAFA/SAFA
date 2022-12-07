@@ -1,6 +1,7 @@
 <template>
   <v-btn-toggle tile group multiple dense :value="value">
     <v-btn
+      :disabled="isTreeDisabled"
       value="tree"
       text
       color="accent"
@@ -57,6 +58,12 @@ export default Vue.extend({
     inDeltaView(): boolean {
       return deltaStore.inDeltaView;
     },
+    /**
+     * @return Whether the tree view is disabled.
+     */
+    isTreeDisabled(): boolean {
+      return documentStore.isEditableTableDocument;
+    },
   },
   methods: {
     /**
@@ -65,7 +72,7 @@ export default Vue.extend({
     updateValue(): void {
       const selected: string[] = [];
 
-      selected.push(documentStore.isTableView ? "table" : "tree");
+      selected.push(documentStore.isTableDocument ? "table" : "tree");
 
       if (this.inDeltaView) {
         selected.push("delta");
@@ -100,6 +107,12 @@ export default Vue.extend({
      * Updates the value when delta view changes.
      */
     inDeltaView(): void {
+      this.updateValue();
+    },
+    /**
+     * Updates the value when the document type changes.
+     */
+    isTreeDisabled(): void {
       this.updateValue();
     },
   },

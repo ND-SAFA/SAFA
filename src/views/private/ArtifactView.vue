@@ -58,7 +58,7 @@ export default Vue.extend({
      * @return Whether table view is enabled.
      */
     isTableView(): boolean {
-      return documentStore.isTableView;
+      return documentStore.isTableDocument;
     },
   },
 });

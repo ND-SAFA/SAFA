@@ -12,6 +12,29 @@
         <v-col cols="6">
           <panel-card>
             <v-card-title>
+              <v-icon large :color="iconColor"> mdi-view-list </v-icon>
+              <typography
+                el="h2"
+                l="2"
+                variant="subtitle"
+                value="Load Existing Project"
+              />
+            </v-card-title>
+            <v-card-subtitle>
+              <v-divider class="mb-2" />
+              <typography
+                variant="small"
+                value="Select an existing project and version to load."
+              />
+            </v-card-subtitle>
+            <v-card-text>
+              <project-version-list />
+            </v-card-text>
+          </panel-card>
+        </v-col>
+        <v-col cols="6">
+          <panel-card>
+            <v-card-title>
               <v-icon large :color="iconColor">
                 mdi-folder-plus-outline
               </v-icon>
@@ -44,29 +67,6 @@
                   Import Jira/GitHub Project
                 </v-btn>
               </div>
-            </v-card-text>
-          </panel-card>
-        </v-col>
-        <v-col cols="6">
-          <panel-card>
-            <v-card-title>
-              <v-icon large :color="iconColor"> mdi-view-list </v-icon>
-              <typography
-                el="h2"
-                l="2"
-                variant="subtitle"
-                value="Load Existing Project"
-              />
-            </v-card-title>
-            <v-card-subtitle>
-              <v-divider class="mb-2" />
-              <typography
-                variant="small"
-                value="Select an existing project and version to load."
-              />
-            </v-card-subtitle>
-            <v-card-text>
-              <project-version-list />
             </v-card-text>
           </panel-card>
         </v-col>

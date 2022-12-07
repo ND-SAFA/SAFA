@@ -15,6 +15,7 @@
           <delete-account />
         </v-col>
         <v-col cols="6">
+          <external-links />
           <integrations-accounts />
         </v-col>
       </v-row>
@@ -26,6 +27,7 @@
 import Vue from "vue";
 import { handleLogout } from "@/api";
 import { Typography, FlexBox } from "@/components/common";
+import ExternalLinks from "./ExternalLinks.vue";
 import IntegrationsAccounts from "./IntegrationsAccounts.vue";
 import DeleteAccount from "./DeleteAccount.vue";
 import UpdatePassword from "./UpdatePassword.vue";
@@ -36,6 +38,7 @@ import UpdatePassword from "./UpdatePassword.vue";
 export default Vue.extend({
   name: "MyAccount",
   components: {
+    ExternalLinks,
     IntegrationsAccounts,
     FlexBox,
     Typography,

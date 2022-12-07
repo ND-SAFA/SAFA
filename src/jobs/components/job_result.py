@@ -1,5 +1,5 @@
 import json
-from typing import Any, Dict, Tuple, Union
+from typing import Any, Dict, List, Tuple, Union
 
 import numpy as np
 from drf_yasg.openapi import FORMAT_UUID, Schema, TYPE_INTEGER, TYPE_STRING
@@ -73,12 +73,12 @@ class JobResult:
         self.__result.update(other_result)
         return self
 
-    def to_json(self, key: str = None) -> str:
+    def to_json(self, keys: List[str] = None) -> str:
         """
         Returns the job output as json
         :return: the output as json
         """
-        obj = self.__result[key] if key else self.__result
+        obj = {key: self.__result[key] for key in keys if key in self.__result} if keys else self.__result
         return json.dumps(obj, indent=4, cls=NpEncoder)
 
     def as_dict(self) -> dict:

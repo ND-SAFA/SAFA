@@ -27,7 +27,8 @@ if __name__ == "__main__":
     parser.add_argument('data')  # positional argument
     parser.add_argument('output')
     parser.add_argument('-model', help="The model to fine-tune.", default="roberta-base")
-    parser.add_argument('-epochs', default=20)
+    parser.add_argument('-epochs', default=20, type=int)
+    parser.add_argument('-split', default=0.2, type=float)
 
     args = parser.parse_args()
 
@@ -47,7 +48,7 @@ if __name__ == "__main__":
         "val_data": {
             "creator": "SPLIT",
             "params": {
-                "val_percentage": .20
+                "val_percentage": args.split
             }
         },
         "augmentationSteps": [
@@ -60,7 +61,7 @@ if __name__ == "__main__":
         ],
         "params": {
             "trace_args_params": {
-                "num_train_epochs": int(args.epochs),
+                "num_train_epochs": args.epochs,
                 "metrics": ["map", "threshold", "precision", "recall", "confusion_matrix"]
             }
         }

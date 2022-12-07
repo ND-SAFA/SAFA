@@ -46,7 +46,6 @@ class CalculateThreshold(AbstractTraceMetric):
             p = precisions[index]
             r = recalls[index]
             if r >= self.UPPER_RECALL_THRESHOLD and p > max_precision:
-                print("(Threshold, Precision, Recall)", "(%s, %s, %s)" % (t, p, r))
                 threshold = t
 
         if threshold is None:

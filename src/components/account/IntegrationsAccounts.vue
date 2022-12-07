@@ -1,12 +1,13 @@
 <template>
-  <v-card outlined class="pa-2">
+  <panel-card>
     <authentication-selector />
-  </v-card>
+  </panel-card>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import { AuthenticationSelector } from "@/components/integrations";
+import { PanelCard } from "@/components/common";
 
 /**
  * IntegrationsAccounts.
@@ -14,6 +15,7 @@ import { AuthenticationSelector } from "@/components/integrations";
 export default Vue.extend({
   name: "IntegrationsAccounts",
   components: {
+    PanelCard,
     AuthenticationSelector,
   },
 });

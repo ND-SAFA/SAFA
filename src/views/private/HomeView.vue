@@ -10,7 +10,7 @@
       />
       <v-row>
         <v-col cols="6">
-          <v-card outlined>
+          <panel-card>
             <v-card-title>
               <v-icon large :color="iconColor">
                 mdi-folder-plus-outline
@@ -45,10 +45,10 @@
                 </v-btn>
               </div>
             </v-card-text>
-          </v-card>
+          </panel-card>
         </v-col>
         <v-col cols="6">
-          <v-card outlined>
+          <panel-card>
             <v-card-title>
               <v-icon large :color="iconColor"> mdi-view-list </v-icon>
               <typography
@@ -68,7 +68,7 @@
             <v-card-text>
               <project-version-list />
             </v-card-text>
-          </v-card>
+          </panel-card>
         </v-col>
       </v-row>
     </template>
@@ -80,7 +80,12 @@ import Vue from "vue";
 import { CreatorTabTypes } from "@/types";
 import { ThemeColors } from "@/util";
 import { navigateTo, QueryParams, Routes } from "@/router";
-import { PrivatePage, ProjectVersionList, Typography } from "@/components";
+import {
+  PrivatePage,
+  ProjectVersionList,
+  Typography,
+  PanelCard,
+} from "@/components";
 
 /**
  * Displays the home page.
@@ -88,6 +93,7 @@ import { PrivatePage, ProjectVersionList, Typography } from "@/components";
 export default Vue.extend({
   name: "HomeView",
   components: {
+    PanelCard,
     PrivatePage,
     ProjectVersionList,
     Typography,

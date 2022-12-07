@@ -1,7 +1,10 @@
 <template>
   <v-data-table
+    show-select
+    single-select
     show-group-by
     fixed-header
+    v-model="selected"
     :headers="headers"
     :items="items"
     :search="searchText"
@@ -9,7 +12,6 @@
     :group-by.sync="groupBy"
     :group-desc.sync="groupDesc"
     :sort-desc.sync="sortDesc"
-    :item-class="getItemBackground"
     :items-per-page="50"
     data-cy="view-artifact-table"
     class="mt-4"
@@ -71,12 +73,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import {
-  ArtifactSchema,
-  ArtifactDeltaState,
-  FlatArtifact,
-  AttributeSchema,
-} from "@/types";
+import { ArtifactDeltaState, FlatArtifact, AttributeSchema } from "@/types";
 import {
   artifactStore,
   deltaStore,
@@ -115,6 +112,7 @@ export default Vue.extend({
       sortDesc: false,
       groupDesc: false,
       selectedDeltaTypes: [] as ArtifactDeltaState[],
+      selected: [] as FlatArtifact[],
     };
   },
   computed: {
@@ -193,22 +191,16 @@ export default Vue.extend({
   methods: {
     /**
      * Opens the view artifact side panel.
-     * @param artifact - The artifact to view.
+     * @param item - The artifact to view.
      */
-    handleView(artifact: ArtifactSchema) {
-      selectionStore.toggleSelectArtifact(artifact.id);
-    },
-    /**
-     * Returns the background class name of an artifact row.
-     * @param item - The artifact to display.
-     * @return The class name to add to the artifact.
-     */
-    getItemBackground(item: ArtifactSchema): string {
+    handleView(item: FlatArtifact) {
       if (selectionStore.selectedArtifactId === item.id) {
-        return "artifact-row-selected";
+        selectionStore.clearSelections();
+        this.selected = [];
+      } else {
+        selectionStore.selectArtifact(item.id);
+        this.selected = [item];
       }
-
-      return "";
     },
   },
 });

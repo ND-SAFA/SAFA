@@ -29,7 +29,10 @@ export function filterArtifacts(
  */
 export function flattenArtifact(artifact: ArtifactSchema): FlatArtifact {
   return {
-    ...artifact,
+    id: artifact.id,
+    name: artifact.name,
+    type: artifact.type,
+    body: artifact.body,
     ...(artifact.attributes || {}),
-  } as FlatArtifact;
+  };
 }

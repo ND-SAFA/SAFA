@@ -1,6 +1,6 @@
 <template>
   <v-container style="max-width: 40em">
-    <v-card outlined class="pa-2">
+    <panel-card>
       <typography
         el="p"
         value="Select files to upload to the current project version."
@@ -22,7 +22,7 @@
       >
         Upload Project Files
       </v-btn>
-    </v-card>
+    </panel-card>
   </v-container>
 </template>
 
@@ -30,7 +30,7 @@
 import Vue from "vue";
 import { projectStore } from "@/hooks";
 import { handleUploadProjectVersion } from "@/api";
-import { SwitchInput, Typography } from "@/components/common";
+import { SwitchInput, Typography, PanelCard } from "@/components/common";
 import { ProjectFilesInput } from "../base";
 
 /**
@@ -39,6 +39,7 @@ import { ProjectFilesInput } from "../base";
 export default Vue.extend({
   name: "UploadNewVersion",
   components: {
+    PanelCard,
     Typography,
     SwitchInput,
     ProjectFilesInput,

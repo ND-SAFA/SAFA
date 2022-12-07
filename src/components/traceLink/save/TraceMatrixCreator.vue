@@ -36,7 +36,7 @@
           </flex-box>
         </flex-box>
         <icon-button
-          icon-id="mdi-close"
+          icon-id="mdi-delete-outline"
           color="error"
           tooltip="Remove trace matrix"
           @click="handleRemoveMatrix(idx)"

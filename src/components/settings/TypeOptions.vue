@@ -4,7 +4,7 @@
       <typography el="h2" variant="subtitle" value="Type Options" />
       <v-divider class="mb-2" />
 
-      <v-list expand class="primary lighten-4">
+      <v-list expand>
         <toggle-list
           v-for="entry in typeDirections"
           :key="entry.type"

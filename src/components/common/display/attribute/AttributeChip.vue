@@ -11,7 +11,7 @@
         v-bind="attrs"
         small
         style="max-width: 200px"
-        class="mr-1"
+        class="mr-1 primary-border"
         :outlined="outlined"
         :color="displayColor"
         :data-cy="dataCy"

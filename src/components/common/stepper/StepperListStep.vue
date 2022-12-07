@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <div>
     <typography el="h1" variant="subtitle" :value="title" />
     <v-divider />
     <v-progress-circular
@@ -19,7 +19,7 @@
         <slot name="items" />
       </v-list-item-group>
     </v-list>
-  </v-container>
+  </div>
 </template>
 
 <script lang="ts">

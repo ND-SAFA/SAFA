@@ -1,7 +1,9 @@
 <template>
   <v-data-table
+    show-select
+    single-select
     show-group-by
-    multi-sort
+    v-model="selected"
     :headers="headers"
     :items="items"
     :search="searchText"
@@ -42,7 +44,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { DataTableHeader } from "vuetify";
-import { ArtifactSchema } from "@/types";
+import { FlatArtifact } from "@/types";
 import { appStore, artifactStore, selectionStore, subtreeStore } from "@/hooks";
 import {
   AttributeChip,
@@ -67,6 +69,7 @@ export default Vue.extend({
       groupBy: "type",
       sortDesc: false,
       groupDesc: false,
+      selected: [] as FlatArtifact[],
     };
   },
   computed: {
@@ -79,8 +82,7 @@ export default Vue.extend({
     /**
      * @return All rows to render.
      */
-    items(): (Pick<ArtifactSchema, "id" | "name" | "type"> &
-      Record<string, string>)[] {
+    items(): FlatArtifact[] {
       return artifactStore.currentArtifacts.map(({ id, name, type }) => {
         return {
           id,
@@ -133,10 +135,16 @@ export default Vue.extend({
   methods: {
     /**
      * Handles viewing an artifact.
-     * @param artifact - The artifact to view.
+     * @param item - The artifact to view.
      */
-    handleView(artifact: Pick<ArtifactSchema, "id" | "name" | "type">) {
-      selectionStore.toggleSelectArtifact(artifact.id);
+    handleView(item: FlatArtifact) {
+      if (selectionStore.selectedArtifactId === item.id) {
+        selectionStore.clearSelections();
+        this.selected = [];
+      } else {
+        selectionStore.selectArtifact(item.id);
+        this.selected = [item];
+      }
     },
   },
 });

@@ -83,4 +83,5 @@ export interface ArtifactSchema {
 /**
  * Defines an artifact with its custom fields flattened into the artifact data.
  */
-export type FlatArtifact = ArtifactSchema & Record<string, string>;
+export type FlatArtifact = Pick<ArtifactSchema, "id" | "name" | "type"> &
+  Record<string, string>;

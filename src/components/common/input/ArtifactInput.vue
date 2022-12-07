@@ -32,6 +32,8 @@
         v-if="index < 3"
         outlined
         close
+        small
+        class="primary-border"
         style="background-color: white !important"
         @click:close="handleDelete(item)"
       >

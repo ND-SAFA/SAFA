@@ -1,5 +1,5 @@
 <template>
-  <generic-modal
+  <modal
     :title="`Artifact Changes: ${name}`"
     :is-open="isOpen"
     :actions-height="0"
@@ -34,20 +34,20 @@
         />
       </div>
     </template>
-  </generic-modal>
+  </modal>
 </template>
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import CodeDiff from "vue-code-diff";
 import {
-  ArtifactModel,
+  ArtifactSchema,
   DeltaArtifact,
   DeltaType,
   EntityModification,
 } from "@/types";
 import { isArtifact, isModifiedArtifact, splitIntoLines } from "@/util";
-import { GenericModal } from "@/components/common";
+import { Modal } from "@/components/common";
 
 /**
  * Displays artifact delta code diffs.
@@ -56,7 +56,7 @@ import { GenericModal } from "@/components/common";
  */
 export default Vue.extend({
   name: "ArtifactDeltaDiff",
-  components: { GenericModal, CodeDiff },
+  components: { Modal, CodeDiff },
   props: {
     isOpen: {
       type: Boolean,
@@ -93,7 +93,7 @@ export default Vue.extend({
     /**
      * Returns the current modified artifact.
      */
-    modification(): EntityModification<ArtifactModel> | undefined {
+    modification(): EntityModification<ArtifactSchema> | undefined {
       return isModifiedArtifact(this.inputArtifact)
         ? this.inputArtifact
         : undefined;

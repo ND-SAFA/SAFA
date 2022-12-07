@@ -1,11 +1,10 @@
 import {
-  ArtifactModel,
-  ArtifactQueryFunction,
+  ArtifactSchema,
   InternalTraceType,
   SubtreeItem,
-  SubtreeLinkModel,
+  SubtreeLinkSchema,
   SubtreeMap,
-  TraceLinkModel,
+  TraceLinkSchema,
 } from "@/types";
 
 /**
@@ -22,7 +21,7 @@ export function getMatchingChildren(
   parentIds: string[],
   includedChildTypes: string[],
   getSubtree: (id: string) => string[],
-  getArtifact: ArtifactQueryFunction
+  getArtifact: (id: string) => ArtifactSchema | undefined
 ): string[] {
   if (includedChildTypes.length === 0) return [];
 
@@ -53,12 +52,12 @@ export function getMatchingChildren(
  * @return Created phantom links.
  */
 export function createPhantomLinks(
-  traces: TraceLinkModel[],
+  traces: TraceLinkSchema[],
   phantomLinkIds: string[],
   nodesInSubtree: string[],
   rootId: string,
   childId: string
-): (isIncoming: boolean) => SubtreeLinkModel[] {
+): (isIncoming: boolean) => SubtreeLinkSchema[] {
   return (isIncoming) =>
     traces
       .filter((link) => {
@@ -74,7 +73,7 @@ export function createPhantomLinks(
         );
       })
       .map((link) => {
-        const base: SubtreeLinkModel = {
+        const base: SubtreeLinkSchema = {
           ...link,
           traceLinkId: `${link.traceLinkId}-phantom`,
           type: InternalTraceType.SUBTREE,
@@ -95,8 +94,8 @@ export function createPhantomLinks(
  * @return The computed subtree map.
  */
 export function createSubtreeMap(
-  artifacts: ArtifactModel[],
-  traces: TraceLinkModel[]
+  artifacts: ArtifactSchema[],
+  traces: TraceLinkSchema[]
 ): SubtreeMap {
   const computedSubtrees = {};
   const traversedIds: string[] = [];
@@ -125,8 +124,8 @@ export function createSubtreeMap(
  * @return The child ids in the subtree.
  */
 function getSubtree(
-  artifacts: ArtifactModel[],
-  traces: TraceLinkModel[],
+  artifacts: ArtifactSchema[],
+  traces: TraceLinkSchema[],
   artifactId: string,
   subtreeMapCache: SubtreeMap,
   traversedIds: string[]
@@ -178,8 +177,8 @@ function getSubtree(
  * @return The computed child artifact ids.
  */
 function getChildren(
-  artifacts: ArtifactModel[],
-  traces: TraceLinkModel[],
+  artifacts: ArtifactSchema[],
+  traces: TraceLinkSchema[],
   artifactId: string
 ): string[] {
   return traces
@@ -199,8 +198,8 @@ function getChildren(
  * @return The root node.
  */
 export async function getRootNode(
-  artifacts: ArtifactModel[],
-  traces: TraceLinkModel[],
+  artifacts: ArtifactSchema[],
+  traces: TraceLinkSchema[],
   currentArtifactId?: string,
   traversedNodes: string[] = []
 ): Promise<string | undefined> {
@@ -241,8 +240,8 @@ export async function getRootNode(
  * @return The found node.
  */
 function getMostConnectedNode(
-  artifacts: ArtifactModel[],
-  traces: TraceLinkModel[]
+  artifacts: ArtifactSchema[],
+  traces: TraceLinkSchema[]
 ): string {
   let max = -1;
   let maxId = "";

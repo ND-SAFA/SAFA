@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-import { GitHubProjectModel, JiraProjectModel } from "@/types";
+import { GitHubProjectSchema, JiraProjectSchema } from "@/types";
 import { pinia } from "@/plugins";
 
 /**
@@ -15,7 +15,7 @@ export const useIntegrations = defineStore("integrations", {
     /**
      * A selected Jira project to import.
      */
-    jiraProject: undefined as JiraProjectModel | undefined,
+    jiraProject: undefined as JiraProjectSchema | undefined,
     /**
      * Whether this user is connected to GitHub.
      */
@@ -23,7 +23,7 @@ export const useIntegrations = defineStore("integrations", {
     /**
      * A selected GitHub project to import.
      */
-    gitHubProject: undefined as GitHubProjectModel | undefined,
+    gitHubProject: undefined as GitHubProjectSchema | undefined,
   }),
   getters: {},
   actions: {
@@ -32,7 +32,7 @@ export const useIntegrations = defineStore("integrations", {
      *
      * @param project - The project to select.
      */
-    selectJiraProject(project: JiraProjectModel | undefined): void {
+    selectJiraProject(project: JiraProjectSchema | undefined): void {
       if (!this.jiraProject || this.jiraProject?.id !== project?.id) {
         this.jiraProject = project;
       } else {
@@ -44,7 +44,7 @@ export const useIntegrations = defineStore("integrations", {
      *
      * @param project - The project to select.
      */
-    selectGitHubProject(project: GitHubProjectModel | undefined): void {
+    selectGitHubProject(project: GitHubProjectSchema | undefined): void {
       if (!this.gitHubProject || this.gitHubProject?.id !== project?.id) {
         this.gitHubProject = project;
       } else {

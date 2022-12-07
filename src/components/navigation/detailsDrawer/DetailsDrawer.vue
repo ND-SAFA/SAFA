@@ -12,7 +12,7 @@
     <v-container>
       <flex-box justify="space-between" align="center">
         <typography color="primary" el="h2" variant="subtitle" :value="title" />
-        <generic-icon-button
+        <icon-button
           icon-id="mdi-close"
           tooltip="Close panel"
           data-cy="button-close-details"
@@ -36,7 +36,7 @@
 import Vue from "vue";
 import { DetailsOpenState } from "@/types";
 import { appStore, selectionStore } from "@/hooks";
-import { GenericIconButton, Typography, FlexBox } from "@/components/common";
+import { IconButton, Typography, FlexBox } from "@/components/common";
 import { DeltaPanel } from "@/components/delta";
 import { DocumentPanel } from "@/components/document";
 import {
@@ -65,7 +65,7 @@ export default Vue.extend({
     DeltaPanel,
     Typography,
     FlexBox,
-    GenericIconButton,
+    IconButton,
     GenerateTraceLinkPanel,
   },
   computed: {
@@ -110,7 +110,11 @@ export default Vue.extend({
      * @return The width of the panel.
      */
     width(): string {
-      if (appStore.isDetailsPanelOpen === "displayArtifactBody") {
+      if (
+        appStore.isDetailsPanelOpen === "displayArtifactBody" ||
+        appStore.isDetailsPanelOpen === "displayArtifact" ||
+        appStore.isDetailsPanelOpen === "saveArtifact"
+      ) {
         return "600";
       } else if (appStore.isDetailsPanelOpen === "generateTrace") {
         return "800";

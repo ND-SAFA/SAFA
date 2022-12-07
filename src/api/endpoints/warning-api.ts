@@ -1,4 +1,4 @@
-import { ProjectWarnings } from "@/types";
+import { WarningCollectionSchema } from "@/types";
 import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
 
 /**
@@ -9,8 +9,8 @@ import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
  */
 export async function getWarningsInProjectVersion(
   versionId: string
-): Promise<ProjectWarnings> {
-  return authHttpClient<ProjectWarnings>(
+): Promise<WarningCollectionSchema> {
+  return authHttpClient<WarningCollectionSchema>(
     fillEndpoint(Endpoint.getWarningsInProjectVersion, {
       versionId,
     }),

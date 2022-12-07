@@ -5,7 +5,7 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import {
-  ArtifactModel,
+  ArtifactSchema,
   ArtifactCytoCoreElement,
   ArtifactDeltaState,
 } from "@/types";
@@ -20,7 +20,7 @@ export default Vue.extend({
   name: "ArtifactNode",
   props: {
     artifactDefinition: {
-      type: Object as PropType<ArtifactModel>,
+      type: Object as PropType<ArtifactSchema>,
       required: true,
     },
     hidden: Boolean,

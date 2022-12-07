@@ -1,4 +1,4 @@
-import { DocumentModel } from "@/types";
+import { DocumentSchema } from "@/types";
 import { appStore, warningStore, sessionStore, documentStore } from "@/hooks";
 import {
   navigateTo,
@@ -23,7 +23,7 @@ import {
  */
 export async function handleLoadVersion(
   versionId: string,
-  document?: DocumentModel,
+  document?: DocumentSchema,
   doNavigate = true
 ): Promise<void> {
   appStore.onLoadStart();

@@ -2,7 +2,7 @@
   <div>
     <v-row class="my-1" v-if="!showOnly">
       <v-col cols="6">
-        <generic-artifact-body-display
+        <artifact-body-display
           :artifact="sourceArtifact"
           display-title
           display-divider
@@ -12,7 +12,7 @@
       <v-divider vertical inset />
 
       <v-col cols="6">
-        <generic-artifact-body-display
+        <artifact-body-display
           :artifact="targetArtifact"
           display-title
           display-divider
@@ -33,9 +33,9 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { ArtifactModel, TraceLinkModel } from "@/types";
+import { ArtifactSchema, TraceLinkSchema } from "@/types";
 import { artifactStore } from "@/hooks";
-import { Typography, GenericArtifactBodyDisplay } from "@/components/common";
+import { Typography, ArtifactBodyDisplay } from "@/components/common";
 
 /**
  * Displays a trace link.
@@ -44,11 +44,11 @@ export default Vue.extend({
   name: "TraceLinkDisplay",
   components: {
     Typography,
-    GenericArtifactBodyDisplay,
+    ArtifactBodyDisplay,
   },
   props: {
     link: {
-      type: Object as PropType<TraceLinkModel>,
+      type: Object as PropType<TraceLinkSchema>,
       required: true,
     },
     showOnly: String as PropType<"source" | "target">,
@@ -63,13 +63,13 @@ export default Vue.extend({
     /**
      * @return The artifact this link comes from.
      */
-    sourceArtifact(): ArtifactModel | undefined {
+    sourceArtifact(): ArtifactSchema | undefined {
       return artifactStore.getArtifactById(this.link.sourceId);
     },
     /**
      * @return The artifact this link goes towards.
      */
-    targetArtifact(): ArtifactModel | undefined {
+    targetArtifact(): ArtifactSchema | undefined {
       return artifactStore.getArtifactById(this.link.targetId);
     },
   },

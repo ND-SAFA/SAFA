@@ -1,7 +1,7 @@
 /**
  * Identifies a job being performed.
  */
-export interface JobModel {
+export interface JobSchema {
   /**
    * The UUID of the job.
    */

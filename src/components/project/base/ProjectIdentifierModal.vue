@@ -1,5 +1,5 @@
 <template>
-  <generic-modal
+  <modal
     :is-open="isOpen"
     :title="modelTitle"
     size="m"
@@ -34,14 +34,14 @@
         Save
       </v-btn>
     </template>
-  </generic-modal>
+  </modal>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { IdentifierModel } from "@/types";
+import { IdentifierSchema } from "@/types";
 import { identifierSaveStore } from "@/hooks";
-import { GenericModal } from "@/components/common";
+import { Modal } from "@/components/common";
 import ProjectFilesUploader from "./ProjectFilesUploader.vue";
 import ProjectIdentifierInput from "./ProjectIdentifierInput.vue";
 
@@ -54,7 +54,7 @@ import ProjectIdentifierInput from "./ProjectIdentifierInput.vue";
 export default Vue.extend({
   name: "ProjectIdentifierModal",
   components: {
-    GenericModal,
+    Modal,
     ProjectFilesUploader,
     ProjectIdentifierInput,
   },
@@ -73,7 +73,7 @@ export default Vue.extend({
     /**
      * @return  The identifier being updated.
      */
-    identifier(): IdentifierModel {
+    identifier(): IdentifierSchema {
       return identifierSaveStore.editedIdentifier;
     },
     /**

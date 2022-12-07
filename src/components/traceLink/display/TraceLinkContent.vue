@@ -1,7 +1,7 @@
 <template>
   <div>
     <panel-card>
-      <generic-artifact-body-display
+      <artifact-body-display
         :artifact="targetArtifact"
         display-title
         display-divider
@@ -25,7 +25,7 @@
       />
     </flex-box>
     <panel-card>
-      <generic-artifact-body-display
+      <artifact-body-display
         :artifact="sourceArtifact"
         display-title
         display-divider
@@ -42,10 +42,10 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { ArtifactModel, TraceLinkModel, TraceType } from "@/types";
+import { ArtifactSchema, TraceLinkSchema, TraceType } from "@/types";
 import { artifactStore, selectionStore } from "@/hooks";
 import {
-  GenericArtifactBodyDisplay,
+  ArtifactBodyDisplay,
   FlexBox,
   AttributeChip,
   PanelCard,
@@ -56,24 +56,29 @@ import {
  */
 export default Vue.extend({
   name: "TraceLinkContent",
-  components: { PanelCard, FlexBox, GenericArtifactBodyDisplay, AttributeChip },
+  components: {
+    PanelCard,
+    FlexBox,
+    ArtifactBodyDisplay,
+    AttributeChip,
+  },
   computed: {
     /**
      * @return The selected trace link.
      */
-    traceLink(): TraceLinkModel | undefined {
+    traceLink(): TraceLinkSchema | undefined {
       return selectionStore.selectedTraceLink;
     },
     /**
      * @return The artifact this link comes from.
      */
-    sourceArtifact(): ArtifactModel | undefined {
+    sourceArtifact(): ArtifactSchema | undefined {
       return artifactStore.getArtifactById(this.traceLink?.sourceId || "");
     },
     /**
      * @return The artifact this link goes towards.
      */
-    targetArtifact(): ArtifactModel | undefined {
+    targetArtifact(): ArtifactSchema | undefined {
       return artifactStore.getArtifactById(this.traceLink?.targetId || "");
     },
     /**

@@ -35,8 +35,8 @@
             />
           </flex-box>
         </flex-box>
-        <generic-icon-button
-          icon-id="mdi-close"
+        <icon-button
+          icon-id="mdi-delete-outline"
           color="error"
           tooltip="Remove trace matrix"
           @click="handleRemoveMatrix(idx)"
@@ -55,12 +55,12 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { ArtifactLevelModel } from "@/types";
+import { ArtifactLevelSchema } from "@/types";
 import { artifactStore, traceStore } from "@/hooks";
 import {
   ArtifactTypeInput,
   FlexBox,
-  GenericIconButton,
+  IconButton,
   AttributeChip,
 } from "@/components/common";
 
@@ -72,14 +72,14 @@ import {
 export default Vue.extend({
   name: "TraceMatrixCreator",
   components: {
-    GenericIconButton,
+    IconButton,
     ArtifactTypeInput,
     FlexBox,
     AttributeChip,
   },
   props: {
     value: {
-      type: Array as PropType<ArtifactLevelModel[]>,
+      type: Array as PropType<ArtifactLevelSchema[]>,
       required: true,
     },
   },
@@ -93,7 +93,7 @@ export default Vue.extend({
      * Returns displayable characteristics on a matrix of artifacts.
      * @param matrix - The matrix to get details for.
      */
-    getMatrixDetails(matrix: ArtifactLevelModel): string[] {
+    getMatrixDetails(matrix: ArtifactLevelSchema): string[] {
       const sources = artifactStore.getArtifactsByType[matrix.source] || [];
       const targets = artifactStore.getArtifactsByType[matrix.target] || [];
       const manual = traceStore.getTraceLinksByArtifactSets(sources, targets, [
@@ -130,13 +130,13 @@ export default Vue.extend({
     /**
      * Updates the model if the value changes.
      */
-    value(currentValue: ArtifactLevelModel[]) {
+    value(currentValue: ArtifactLevelSchema[]) {
       this.model = currentValue;
     },
     /**
      * Emits changes to the model.
      */
-    model(currentValue: ArtifactLevelModel[]) {
+    model(currentValue: ArtifactLevelSchema[]) {
       this.$emit("input", currentValue);
     },
   },

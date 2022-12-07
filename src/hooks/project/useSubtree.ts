@@ -1,11 +1,11 @@
 import { defineStore } from "pinia";
 
 import {
-  ArtifactModel,
-  ProjectModel,
-  SubtreeLinkModel,
+  ArtifactSchema,
+  ProjectSchema,
+  SubtreeLinkSchema,
   SubtreeMap,
-  TraceLinkModel,
+  TraceLinkSchema,
 } from "@/types";
 import {
   createPhantomLinks,
@@ -29,7 +29,7 @@ export const useSubtree = defineStore("subtrees", {
     /**
      * List of phantom links used when hiding subtrees.
      */
-    subtreeLinks: [] as SubtreeLinkModel[],
+    subtreeLinks: [] as SubtreeLinkSchema[],
     /**
      * List of artifact ids currently hidden within subtrees.
      */
@@ -75,8 +75,8 @@ export const useSubtree = defineStore("subtrees", {
      * @param traces - The traces to create the subtree for.
      */
     updateSubtreeMap(
-      artifacts: ArtifactModel[] = artifactStore.allArtifacts,
-      traces: TraceLinkModel[] = traceStore.allTraces
+      artifacts: ArtifactSchema[] = artifactStore.allArtifacts,
+      traces: TraceLinkSchema[] = traceStore.allTraces
     ): void {
       this.subtreeMap = createSubtreeMap(artifacts, traces);
     },
@@ -91,7 +91,7 @@ export const useSubtree = defineStore("subtrees", {
     /**
      * Updates the subtree map.
      */
-    initializeProject(project: ProjectModel): void {
+    initializeProject(project: ProjectSchema): void {
       this.updateSubtreeMap(project.artifacts, project.traces);
     },
     /**
@@ -106,7 +106,7 @@ export const useSubtree = defineStore("subtrees", {
       nodesInSubtree: string[],
       rootId: string,
       childId: string
-    ): SubtreeLinkModel[] {
+    ): SubtreeLinkSchema[] {
       const traces = traceStore.currentTraces;
       const subtreeLinkIds = this.subtreeLinks.map(
         ({ traceLinkId }) => traceLinkId

@@ -1,43 +1,60 @@
 <template>
-  <v-btn
-    :icon="definition.type !== 'text'"
-    :text="definition.type === 'text'"
-    small
-    color="accent"
-    @click="definition.handler"
-    class="mr-2"
-    :disabled="isDisabled"
-    :data-cy="definition.dataCy"
-  >
-    <v-icon v-if="definition.type === 'icon'">
-      {{ definition.icon }}
-    </v-icon>
-    <label v-else>{{ definition.label }}</label>
-  </v-btn>
+  <v-tooltip bottom z-index="10000">
+    <template v-slot:activator="{ on, attrs }">
+      <v-btn
+        v-on="on"
+        v-bind="attrs"
+        :color="color"
+        :icon="!fab"
+        :fab="fab"
+        :class="disabled ? 'disable-events' : ''"
+        :small="small"
+        :large="large"
+        :hidden="isHidden"
+        :data-cy="dataCy"
+        @click="$emit('click')"
+      >
+        <v-icon :style="iconStyle">{{ iconId }}</v-icon>
+      </v-btn>
+    </template>
+    <span>{{ tooltip }}</span>
+  </v-tooltip>
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
-import { IconDefinition } from "@/types";
+import Vue from "vue";
 
 /**
- * Renders an icon button.
+ * A generic icon button.
+ *
+ * @emits `click` - On button click.
  */
 export default Vue.extend({
   name: "IconButton",
   props: {
-    definition: {
-      type: Object as PropType<IconDefinition>,
+    dataCy: String,
+    tooltip: {
+      type: String,
       required: true,
     },
+    iconId: {
+      type: String,
+      required: true,
+    },
+    color: String,
+    iconStyle: String,
+    fab: Boolean,
+    small: Boolean,
+    large: Boolean,
+    isDisabled: Boolean,
+    isHidden: Boolean,
   },
   computed: {
     /**
-     * @return Whether the button should be disabled.
+     * @return Whether the button is disabled.
      */
-    isDisabled() {
-      const def: IconDefinition = this.definition;
-      return def.isDisabled === undefined ? false : def.isDisabled;
+    disabled(): boolean {
+      return this.isDisabled === undefined ? false : this.isDisabled;
     },
   },
 });

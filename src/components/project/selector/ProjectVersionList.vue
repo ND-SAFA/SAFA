@@ -1,10 +1,5 @@
 <template>
-  <generic-stepper
-    minimal
-    v-model="currentStep"
-    :steps="steps"
-    @submit="handleSubmit"
-  >
+  <stepper minimal v-model="currentStep" :steps="steps" @submit="handleSubmit">
     <template v-slot:items>
       <v-stepper-content :step="projectStep">
         <project-selector
@@ -25,7 +20,7 @@
         />
       </v-stepper-content>
     </template>
-  </generic-stepper>
+  </stepper>
 </template>
 
 <script lang="ts">
@@ -34,13 +29,13 @@ import {
   OptionalProjectIdentifier,
   OptionalProjectVersion,
   StepState,
-  IdentifierModel,
-  VersionModel,
+  IdentifierSchema,
+  VersionSchema,
 } from "@/types";
 import { versionToString } from "@/util";
 import { logStore } from "@/hooks";
 import { handleLoadVersion } from "@/api";
-import { GenericStepper } from "@/components/common";
+import { Stepper } from "@/components/common";
 import VersionSelector from "./VersionSelector.vue";
 import ProjectSelector from "./ProjectSelector.vue";
 
@@ -53,7 +48,7 @@ const SELECT_VERSION_DEFAULT_NAME = "Select a Version";
 export default Vue.extend({
   name: "ProjectVersionList",
   components: {
-    GenericStepper,
+    Stepper,
     ProjectSelector,
     VersionSelector,
   },
@@ -86,7 +81,7 @@ export default Vue.extend({
      * @param project - The project to select
      * @param goToNextStep - If true, the step will be incremented.
      */
-    selectProject(project: IdentifierModel, goToNextStep = false) {
+    selectProject(project: IdentifierSchema, goToNextStep = false) {
       if (this.currentStep !== 1) return;
 
       this.selectedProject = project;
@@ -106,7 +101,7 @@ export default Vue.extend({
      * Selects a version.
      * @param version - The version to select.
      */
-    selectVersion(version: VersionModel) {
+    selectVersion(version: VersionSchema) {
       this.selectedVersion = version;
       Vue.set(this.steps, 1, [versionToString(version), true]);
     },

@@ -1,4 +1,4 @@
-import { ArtifactTypeModel, LabelledTraceDirectionModel } from "@/types";
+import { ArtifactTypeSchema, LabelledTraceDirectionSchema } from "@/types";
 import { projectStore, typeOptionsStore } from "@/hooks";
 import { saveArtifactType } from "@/api/endpoints";
 
@@ -8,7 +8,7 @@ import { saveArtifactType } from "@/api/endpoints";
  * @param artifactType - The artifact type to add or edit.
  */
 export async function handleSaveArtifactType(
-  artifactType: ArtifactTypeModel
+  artifactType: ArtifactTypeSchema
 ): Promise<void> {
   const updatedArtifactType = await saveArtifactType(
     projectStore.projectId,
@@ -24,7 +24,7 @@ export async function handleSaveArtifactType(
  * @param labeledType - The artifact type to add or edit.
  */
 export async function handleSaveArtifactTypeIcon(
-  labeledType: LabelledTraceDirectionModel
+  labeledType: LabelledTraceDirectionSchema
 ): Promise<void> {
   const type = typeOptionsStore.allArtifactTypes.find(
     ({ name }) => name === labeledType.type

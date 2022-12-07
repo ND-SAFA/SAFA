@@ -29,7 +29,7 @@
       v-model="store.editedDocument.artifactIds"
       data-cy="input-document-artifacts"
     />
-    <generic-switch
+    <switch-input
       class="ml-1"
       label="Include artifact children"
       v-model="store.includeChildren"
@@ -78,7 +78,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { DocumentModel } from "@/types";
+import { DocumentSchema } from "@/types";
 import { documentTypeOptions } from "@/util";
 import { appStore, documentSaveStore } from "@/hooks";
 import { handleDeleteDocument, handleSaveDocument } from "@/api";
@@ -86,7 +86,7 @@ import {
   FlexBox,
   ArtifactInput,
   ArtifactTypeInput,
-  GenericSwitch,
+  SwitchInput,
 } from "@/components/common";
 
 /**
@@ -96,7 +96,7 @@ export default Vue.extend({
   name: "DocumentPanel",
   components: {
     FlexBox,
-    GenericSwitch,
+    SwitchInput,
     ArtifactTypeInput,
     ArtifactInput,
   },
@@ -147,7 +147,7 @@ export default Vue.extend({
     /**
      * @return The base document being edited.
      */
-    baseDocument(): DocumentModel | undefined {
+    baseDocument(): DocumentSchema | undefined {
       return documentSaveStore.baseDocument;
     },
   },

@@ -1,9 +1,13 @@
-import { ArtifactLevelModel, ModelType, GenerationModel } from "@/types/domain";
+import {
+  ArtifactLevelSchema,
+  ModelType,
+  GenerationModelSchema,
+} from "@/types/domain";
 
 /**
  * Defines a resource file.
  */
-export interface ResourceModel {
+export interface ResourceSchema {
   /**
    * The file path.
    */
@@ -13,12 +17,14 @@ export interface ResourceModel {
 /**
  * Defines a trace matrix file.
  */
-export interface TraceMatrixModel extends ResourceModel, ArtifactLevelModel {}
+export interface TraceMatrixSchema
+  extends ResourceSchema,
+    ArtifactLevelSchema {}
 
 /**
  * Defines a trace matrix generation request.
  */
-export interface GeneratedMatrixModel {
+export interface GeneratedMatrixSchema {
   /**
    * The default model to use to generate links.
    */
@@ -26,23 +32,23 @@ export interface GeneratedMatrixModel {
   /**
    * The custom model used to generate links.
    */
-  model?: GenerationModel;
+  model?: GenerationModelSchema;
   /**
    * The artifact levels to trace with method.
    */
-  artifactLevels: ArtifactLevelModel[];
+  artifactLevels: ArtifactLevelSchema[];
 }
 
 /**
  * A collection of resources.
  */
-export interface FileModel {
-  [key: string]: ResourceModel;
+export interface FileSchema {
+  [key: string]: ResourceSchema;
 }
 
 /**
  * A collection of tim files.
  */
-export interface TimFileModel {
-  [key: string]: FileModel | TraceMatrixModel;
+export interface TimFileSchema {
+  [key: string]: FileSchema | TraceMatrixSchema;
 }

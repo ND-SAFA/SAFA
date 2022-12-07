@@ -4,7 +4,7 @@
       <typography el="h2" variant="subtitle" value="Type Options" />
       <v-divider class="mb-2" />
 
-      <v-list expand class="primary lighten-4">
+      <v-list expand>
         <toggle-list
           v-for="entry in typeDirections"
           :key="entry.type"
@@ -28,7 +28,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { LabelledTraceDirectionModel } from "@/types";
+import { LabelledTraceDirectionSchema } from "@/types";
 import { typeOptionsStore } from "@/hooks";
 import {
   Typography,
@@ -55,7 +55,7 @@ export default Vue.extend({
     /**
      * @return The current project's artifact types.
      */
-    typeDirections(): LabelledTraceDirectionModel[] {
+    typeDirections(): LabelledTraceDirectionSchema[] {
       return typeOptionsStore.typeDirections();
     },
   },

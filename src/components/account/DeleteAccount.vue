@@ -1,5 +1,5 @@
 <template>
-  <v-card outlined class="pa-4" style="width: 30em">
+  <panel-card style="width: 30em" color="error">
     <typography
       variant="subtitle"
       el="h2"
@@ -27,13 +27,13 @@
         Delete my account
       </v-btn>
     </v-card-actions>
-  </v-card>
+  </panel-card>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import { handleDeleteAccount } from "@/api";
-import { PasswordField, Typography } from "@/components";
+import { PasswordField, Typography, PanelCard } from "@/components/common";
 
 /**
  * Displays account deletion.
@@ -41,6 +41,7 @@ import { PasswordField, Typography } from "@/components";
 export default Vue.extend({
   name: "DeleteAccount",
   components: {
+    PanelCard,
     Typography,
     PasswordField,
   },

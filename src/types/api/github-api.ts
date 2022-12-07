@@ -1,7 +1,7 @@
 /**
  * Defines a GitHub repository.
  */
-export interface GitHubProjectModel {
+export interface GitHubProjectSchema {
   /**
    * The project's id.
    */

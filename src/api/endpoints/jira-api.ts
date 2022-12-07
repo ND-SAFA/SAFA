@@ -1,4 +1,4 @@
-import { JiraProjectModel, JobModel } from "@/types";
+import { JiraProjectSchema, JobSchema } from "@/types";
 import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
 
 /**
@@ -105,10 +105,10 @@ export async function deleteJiraCredentials(): Promise<void> {
  *
  * @return The user's projects.
  */
-export async function getJiraProjects(): Promise<JiraProjectModel[]> {
+export async function getJiraProjects(): Promise<JiraProjectSchema[]> {
   return (
     (
-      await authHttpClient<{ payload: JiraProjectModel[] }>(
+      await authHttpClient<{ payload: JiraProjectSchema[] }>(
         Endpoint.jiraGetProjects,
         {
           method: "GET",
@@ -124,9 +124,9 @@ export async function getJiraProjects(): Promise<JiraProjectModel[]> {
  * @param id - The Jira project id to import.
  * @return The created import job.
  */
-export async function createJiraProject(id: string): Promise<JobModel> {
+export async function createJiraProject(id: string): Promise<JobSchema> {
   return (
-    await authHttpClient<{ payload: JobModel }>(
+    await authHttpClient<{ payload: JobSchema }>(
       fillEndpoint(Endpoint.jiraCreateProject, { id }),
       {
         method: "POST",
@@ -144,9 +144,9 @@ export async function createJiraProject(id: string): Promise<JobModel> {
 export async function createJiraProjectSync(
   versionId: string,
   id: string
-): Promise<JobModel> {
+): Promise<JobSchema> {
   return (
-    await authHttpClient<{ payload: JobModel }>(
+    await authHttpClient<{ payload: JobSchema }>(
       fillEndpoint(Endpoint.jiraSyncProject, { versionId, id }),
       {
         method: "PUT",

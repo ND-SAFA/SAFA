@@ -1,4 +1,4 @@
-import { ArtifactModel, DocumentModel } from "@/types";
+import { ArtifactSchema, DocumentSchema } from "@/types";
 import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
 
 /**
@@ -10,9 +10,9 @@ import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
  */
 export async function saveDocument(
   versionId: string,
-  document: DocumentModel
-): Promise<DocumentModel> {
-  return authHttpClient<DocumentModel>(
+  document: DocumentSchema
+): Promise<DocumentSchema> {
+  return authHttpClient<DocumentSchema>(
     fillEndpoint(Endpoint.createOrUpdateDocument, {
       versionId,
     }),
@@ -31,8 +31,8 @@ export async function saveDocument(
  */
 export async function getDocuments(
   versionId: string
-): Promise<DocumentModel[]> {
-  return authHttpClient<DocumentModel[]>(
+): Promise<DocumentSchema[]> {
+  return authHttpClient<DocumentSchema[]>(
     fillEndpoint(Endpoint.getProjectDocuments, {
       versionId,
     }),
@@ -48,7 +48,7 @@ export async function getDocuments(
  *
  * @param document - The document to be deleted.
  */
-export async function deleteDocument(document: DocumentModel): Promise<void> {
+export async function deleteDocument(document: DocumentSchema): Promise<void> {
   await authHttpClient<void>(
     fillEndpoint(Endpoint.deleteDocument, {
       documentId: document.documentId,
@@ -70,9 +70,9 @@ export async function deleteDocument(document: DocumentModel): Promise<void> {
 export async function saveDocumentArtifacts(
   versionId: string,
   documentId: string,
-  artifacts: ArtifactModel[]
-): Promise<ArtifactModel[]> {
-  return authHttpClient<ArtifactModel[]>(
+  artifacts: ArtifactSchema[]
+): Promise<ArtifactSchema[]> {
+  return authHttpClient<ArtifactSchema[]>(
     fillEndpoint(Endpoint.addArtifactsToDocument, {
       versionId,
       documentId,

@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <typography el="h2" variant="subtitle" value="Project Members" />
-    <generic-selector
+    <table-selector
       is-open
       :headers="headers"
       :items="members"
@@ -32,16 +32,16 @@
           @confirm="handleConfirmEdit"
         />
       </template>
-    </generic-selector>
+    </table-selector>
   </v-container>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { MembershipModel, ProjectModel, ProjectRole } from "@/types";
-import { logStore, projectStore, sessionStore } from "@/hooks";
+import { MembershipSchema, ProjectSchema, ProjectRole } from "@/types";
+import { logStore, membersStore, projectStore, sessionStore } from "@/hooks";
 import { handleDeleteMember, handleGetMembers } from "@/api";
-import { GenericSelector, Typography } from "@/components/common";
+import { TableSelector, Typography } from "@/components/common";
 import SettingsMemberInformationModal from "./SettingsMemberInformationModal.vue";
 
 /**
@@ -49,10 +49,10 @@ import SettingsMemberInformationModal from "./SettingsMemberInformationModal.vue
  */
 export default Vue.extend({
   name: "SettingsMembers",
-  components: { GenericSelector, SettingsMemberInformationModal, Typography },
+  components: { TableSelector, SettingsMemberInformationModal, Typography },
   data() {
     return {
-      memberToEdit: undefined as MembershipModel | undefined,
+      memberToEdit: undefined as MembershipSchema | undefined,
       isLoading: false,
       isNewOpen: false,
       isEditOpen: false,
@@ -67,7 +67,7 @@ export default Vue.extend({
     /**
      * @return The current project.
      */
-    project(): ProjectModel {
+    project(): ProjectSchema {
       return projectStore.project;
     },
     /**
@@ -79,8 +79,8 @@ export default Vue.extend({
     /**
      * @return All project members.
      */
-    members(): MembershipModel[] {
-      return this.project.members;
+    members(): MembershipSchema[] {
+      return membersStore.members;
     },
   },
   methods: {
@@ -103,7 +103,7 @@ export default Vue.extend({
      * Opens the edit member modal.
      * @param member - The member to edit.
      */
-    handleEditMember(member: MembershipModel): void {
+    handleEditMember(member: MembershipSchema): void {
       this.memberToEdit = member;
       this.isEditOpen = true;
     },
@@ -111,7 +111,7 @@ export default Vue.extend({
      * Opens the delete member modal.
      * @param member - The member to delete.
      */
-    handleDeleteMember(member: MembershipModel): void {
+    handleDeleteMember(member: MembershipSchema): void {
       if (
         member.role === ProjectRole.OWNER &&
         this.members.filter(({ role }) => role === ProjectRole.OWNER).length ===

@@ -1,11 +1,11 @@
 import {
   ApprovalType,
-  ArtifactLevelModel,
+  ArtifactLevelSchema,
   FlatTraceLink,
-  GeneratedMatrixModel,
+  GeneratedMatrixSchema,
   IOHandlerCallback,
   ModelType,
-  GenerationModel,
+  GenerationModelSchema,
 } from "@/types";
 import {
   approvalStore,
@@ -83,8 +83,8 @@ export async function handleGetGeneratedLinks({
  */
 export async function handleGenerateLinks(
   method: ModelType | undefined,
-  model: GenerationModel | undefined,
-  artifactLevels: ArtifactLevelModel[],
+  model: GenerationModelSchema | undefined,
+  artifactLevels: ArtifactLevelSchema[],
   { onSuccess, onError, onComplete }: IOHandlerCallback
 ): Promise<void> {
   const matricesName = artifactLevels
@@ -121,8 +121,8 @@ export async function handleGenerateLinks(
  * @param onComplete - Called after the action.
  */
 export async function handleTrainModel(
-  model: GenerationModel,
-  artifactLevels: ArtifactLevelModel[],
+  model: GenerationModelSchema,
+  artifactLevels: ArtifactLevelSchema[],
   { onSuccess, onError, onComplete }: IOHandlerCallback
 ): Promise<void> {
   const matricesName = artifactLevels
@@ -155,10 +155,10 @@ export async function handleTrainModel(
  * @param model - If a custom model is used,
  */
 function createGeneratedMatrix(
-  artifactLevels: ArtifactLevelModel[],
+  artifactLevels: ArtifactLevelSchema[],
   method?: ModelType,
-  model?: GenerationModel
-): GeneratedMatrixModel {
+  model?: GenerationModelSchema
+): GeneratedMatrixSchema {
   return {
     method: model?.baseModel || method || ModelType.NLBert,
     model,

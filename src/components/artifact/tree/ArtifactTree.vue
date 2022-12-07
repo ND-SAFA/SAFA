@@ -1,5 +1,5 @@
 <template>
-  <generic-cytoscape-controller
+  <cytoscape-controller
     id="cytoscape-artifact"
     :cyto-core-graph="cytoCoreGraph"
     :class="className"
@@ -13,7 +13,7 @@
         :hidden="isArtifactHidden(artifact.id)"
         :faded="isArtifactFaded(artifact.id)"
       />
-      <generic-graph-link
+      <graph-link
         v-for="traceLink in traceLinks"
         :key="traceLink.traceLinkId"
         :trace-definition="traceLink"
@@ -21,20 +21,20 @@
         @click:right="handleLinkRightClick"
         graph="artifact"
       />
-      <generic-graph-link
+      <graph-link
         v-for="traceLink in subtreeLinks"
         :key="traceLink.traceLinkId"
         :trace-definition="traceLink"
         graph="artifact"
       />
     </template>
-  </generic-cytoscape-controller>
+  </cytoscape-controller>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import { Route } from "vue-router";
-import { TraceLinkModel, ArtifactModel, CytoCoreGraph } from "@/types";
+import { TraceLinkSchema, ArtifactSchema, CytoCoreGraph } from "@/types";
 import {
   appStore,
   artifactStore,
@@ -47,18 +47,15 @@ import {
 } from "@/hooks";
 import { Routes } from "@/router";
 import { artifactTreeGraph, cyResetTree } from "@/cytoscape";
-import {
-  GenericGraphLink,
-  GenericCytoscapeController,
-} from "@/components/common";
+import { GraphLink, CytoscapeController } from "@/components/common";
 import ArtifactNode from "./ArtifactNode.vue";
 
 export default Vue.extend({
   name: "ArtifactTree",
   components: {
     ArtifactNode,
-    GenericGraphLink,
-    GenericCytoscapeController,
+    GraphLink,
+    CytoscapeController,
   },
   data() {
     return {
@@ -93,13 +90,13 @@ export default Vue.extend({
     /**
      * @return All visible artifacts.
      */
-    artifacts(): ArtifactModel[] {
+    artifacts(): ArtifactSchema[] {
       return artifactStore.currentArtifacts;
     },
     /**
      * @return All visible trace links.
      */
-    traceLinks(): TraceLinkModel[] {
+    traceLinks(): TraceLinkSchema[] {
       return deltaStore.inDeltaView
         ? traceStore.currentTraces
         : traceStore.visibleTraces;
@@ -175,7 +172,7 @@ export default Vue.extend({
      * @param link - The trace link to check.
      * @return Whether to fade.
      */
-    isTraceLinkFaded(link: TraceLinkModel): boolean {
+    isTraceLinkFaded(link: TraceLinkSchema): boolean {
       return (
         !this.artifactsInView.includes(link.targetId) ||
         !this.artifactsInView.includes(link.sourceId)
@@ -185,7 +182,7 @@ export default Vue.extend({
      * Selects a clicked trace link and opens the link modal.
      * @param traceLink - The trace link to select.
      */
-    handleLinkRightClick(traceLink: TraceLinkModel): void {
+    handleLinkRightClick(traceLink: TraceLinkSchema): void {
       selectionStore.selectTraceLink(traceLink);
     },
   },

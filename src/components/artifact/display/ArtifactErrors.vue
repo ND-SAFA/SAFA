@@ -27,7 +27,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { WarningModel } from "@/types";
+import { WarningSchema } from "@/types";
 import { warningStore, selectionStore } from "@/hooks";
 import {
   Typography,
@@ -52,7 +52,7 @@ export default Vue.extend({
     /**
      * @return The selected artifact's warnings.
      */
-    selectedArtifactWarnings(): WarningModel[] {
+    selectedArtifactWarnings(): WarningSchema[] {
       const id = this.selectedArtifact?.id || "";
 
       return warningStore.artifactWarnings[id] || [];

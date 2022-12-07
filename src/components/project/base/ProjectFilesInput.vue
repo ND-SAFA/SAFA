@@ -1,7 +1,7 @@
 <template>
   <div>
     <file-format-alert />
-    <generic-file-selector
+    <file-input
       v-model="selectedFiles"
       :data-cy="dataCy"
       :errors="errors"
@@ -49,8 +49,8 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { ArtifactLevelModel, TimModel } from "@/types";
-import { GenericFileSelector, FileFormatAlert } from "@/components/common";
+import { ArtifactLevelSchema, TimSchema } from "@/types";
+import { FileInput, FileFormatAlert } from "@/components/common";
 
 /**
  * An input for project files.
@@ -61,7 +61,7 @@ export default Vue.extend({
   name: "ProjectFilesInput",
   components: {
     FileFormatAlert,
-    GenericFileSelector,
+    FileInput,
   },
   props: {
     dataCy: String,
@@ -69,9 +69,9 @@ export default Vue.extend({
   data() {
     return {
       selectedFiles: [] as File[],
-      tim: undefined as TimModel | undefined,
+      tim: undefined as TimSchema | undefined,
       artifactTypes: [] as string[],
-      traceMatrices: [] as ArtifactLevelModel[],
+      traceMatrices: [] as ArtifactLevelSchema[],
     };
   },
   computed: {
@@ -86,7 +86,7 @@ export default Vue.extend({
     /**
      * @return Generated trace matrices based on file names.
      */
-    matrixOptions(): ArtifactLevelModel[] {
+    matrixOptions(): ArtifactLevelSchema[] {
       return this.artifactTypes
         .map((source) =>
           this.artifactTypes.map((target) => ({ source, target }))
@@ -141,7 +141,7 @@ export default Vue.extend({
             },
           }))
           .reduce((acc, cur) => ({ ...acc, ...cur }), {}),
-      } as TimModel;
+      } as TimSchema;
 
       this.selectedFiles = [
         ...this.selectedFiles.filter(({ name }) => name !== "tim.json"),

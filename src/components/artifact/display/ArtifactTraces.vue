@@ -16,10 +16,10 @@
             @click="handleArtifactClick(parent.name)"
           >
             <v-list-item-title>
-              <generic-artifact-body-display display-title :artifact="parent" />
+              <artifact-body-display display-title :artifact="parent" />
             </v-list-item-title>
             <v-list-item-action @click.stop="">
-              <generic-icon-button
+              <icon-button
                 icon-id="mdi-ray-start-end"
                 tooltip="View Trace Link"
                 data-cy="button-selected-parent-link"
@@ -46,10 +46,10 @@
             @click="handleArtifactClick(child.name)"
           >
             <v-list-item-title>
-              <generic-artifact-body-display display-title :artifact="child" />
+              <artifact-body-display display-title :artifact="child" />
             </v-list-item-title>
             <v-list-item-action @click.stop="">
-              <generic-icon-button
+              <icon-button
                 icon-id="mdi-ray-start-end"
                 tooltip="View Trace Link"
                 data-cy="button-selected-child-link"
@@ -65,7 +65,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { ArtifactModel } from "@/types";
+import { ArtifactSchema } from "@/types";
 import {
   artifactStore,
   selectionStore,
@@ -74,9 +74,9 @@ import {
 } from "@/hooks";
 import {
   Typography,
-  GenericIconButton,
+  IconButton,
   PanelCard,
-  GenericArtifactBodyDisplay,
+  ArtifactBodyDisplay,
 } from "@/components/common";
 
 /**
@@ -85,9 +85,9 @@ import {
 export default Vue.extend({
   name: "ArtifactTraces",
   components: {
-    GenericArtifactBodyDisplay,
+    ArtifactBodyDisplay,
     PanelCard,
-    GenericIconButton,
+    IconButton,
     Typography,
   },
   computed: {
@@ -100,22 +100,22 @@ export default Vue.extend({
     /**
      * @return The selected artifact's parents.
      */
-    parents(): ArtifactModel[] {
+    parents(): ArtifactSchema[] {
       if (!this.selectedArtifact) return [];
 
       return subtreeStore
         .getParents(this.selectedArtifact.id)
-        .map((id) => artifactStore.getArtifactById(id)) as ArtifactModel[];
+        .map((id) => artifactStore.getArtifactById(id)) as ArtifactSchema[];
     },
     /**
      * @return The selected artifact's children.
      */
-    children(): ArtifactModel[] {
+    children(): ArtifactSchema[] {
       if (!this.selectedArtifact) return [];
 
       return subtreeStore
         .getChildren(this.selectedArtifact.id)
-        .map((id) => artifactStore.getArtifactById(id)) as ArtifactModel[];
+        .map((id) => artifactStore.getArtifactById(id)) as ArtifactSchema[];
     },
     /**
      * @return Whether to display this section.

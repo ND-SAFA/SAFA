@@ -1,4 +1,4 @@
-import { GitHubProjectModel, JobModel } from "@/types";
+import { GitHubProjectSchema, JobSchema } from "@/types";
 import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
 
 /**
@@ -82,10 +82,10 @@ export async function deleteGitHubCredentials(): Promise<void> {
  *
  * @return The GitHub repositories for this user.
  */
-export async function getGitHubProjects(): Promise<GitHubProjectModel[]> {
+export async function getGitHubProjects(): Promise<GitHubProjectSchema[]> {
   return (
     (
-      await authHttpClient<{ payload: GitHubProjectModel[] }>(
+      await authHttpClient<{ payload: GitHubProjectSchema[] }>(
         Endpoint.githubGetProjects,
         {
           method: "GET",
@@ -103,9 +103,9 @@ export async function getGitHubProjects(): Promise<GitHubProjectModel[]> {
  */
 export async function createGitHubProject(
   repositoryName: string
-): Promise<JobModel> {
+): Promise<JobSchema> {
   return (
-    await authHttpClient<{ payload: JobModel }>(
+    await authHttpClient<{ payload: JobSchema }>(
       fillEndpoint(Endpoint.githubCreateProject, { repositoryName }),
       {
         method: "POST",
@@ -124,9 +124,9 @@ export async function createGitHubProject(
 export async function createGitHubProjectSync(
   versionId: string,
   repositoryName: string
-): Promise<JobModel> {
+): Promise<JobSchema> {
   return (
-    await authHttpClient<{ payload: JobModel }>(
+    await authHttpClient<{ payload: JobSchema }>(
       fillEndpoint(Endpoint.githubSyncProject, { versionId, repositoryName }),
       {
         method: "PUT",

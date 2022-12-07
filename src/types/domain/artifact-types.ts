@@ -1,7 +1,7 @@
 /**
- * Defines an type of artifact in a project.
+ * Defines a type of artifact in a project.
  */
-export interface ArtifactTypeModel {
+export interface ArtifactTypeSchema {
   /**
    * The UUID for specific artifact type.
    */

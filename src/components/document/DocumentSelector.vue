@@ -20,7 +20,7 @@
           {{ item.name }}
         </v-col>
         <v-col class="flex-grow-0" @click.stop="handleEditOpen(item)">
-          <generic-icon-button
+          <icon-button
             v-if="canEdit(item.name)"
             icon-id="mdi-dots-horizontal"
             :tooltip="`Edit ${item.name}`"
@@ -48,7 +48,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { DocumentModel } from "@/types";
+import { DocumentSchema } from "@/types";
 import {
   appStore,
   documentSaveStore,
@@ -57,11 +57,11 @@ import {
   sessionStore,
 } from "@/hooks";
 import { handleSwitchDocuments } from "@/api";
-import { GenericIconButton } from "@/components/common";
+import { IconButton } from "@/components/common";
 
 export default Vue.extend({
   name: "DocumentSelector",
-  components: { GenericIconButton },
+  components: { IconButton },
   computed: {
     /**
      * @return The current documents.
@@ -111,7 +111,7 @@ export default Vue.extend({
     /**
      * Opens the edit document modal.
      */
-    handleEditOpen(document: DocumentModel) {
+    handleEditOpen(document: DocumentSchema) {
       documentSaveStore.baseDocument = document;
       this.handleCloseMenu();
       appStore.openDetailsPanel("document");

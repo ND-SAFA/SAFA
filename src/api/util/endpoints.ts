@@ -77,6 +77,12 @@ export enum Endpoint {
   createNewMinorVersion = "projects/:projectId/versions/minor",
   createNewRevisionVersion = "projects/:projectId/versions/revision",
 
+  // Attributes
+  createAttribute = "projects/:projectId/attributes",
+  editAttribute = "projects/:projectId/attributes/:key",
+  createAttributeLayout = "projects/:projectId/attribute-layouts",
+  editAttributeLayout = "projects/:projectId/attribute-layouts/:id",
+
   // Layout
   refreshLayout = "projects/versions/:versionId/layout",
 

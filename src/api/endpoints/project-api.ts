@@ -1,11 +1,11 @@
 import {
-  CreateProjectByJsonModel,
-  IdentifierModel,
-  JobModel,
-  MemberRequestModel,
-  MembershipModel,
+  CreateProjectByJsonSchema,
+  IdentifierSchema,
+  JobSchema,
+  MemberRequestSchema,
+  MembershipSchema,
   ProjectDelta,
-  ProjectModel,
+  ProjectSchema,
   ProjectRole,
 } from "@/types";
 import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
@@ -17,18 +17,18 @@ import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
  * @return The saved project.
  */
 export async function saveProject(
-  project: Pick<ProjectModel, "projectId" | "name" | "description">
-): Promise<ProjectModel> {
-  return authHttpClient<ProjectModel>(Endpoint.project, {
+  project: Pick<ProjectSchema, "projectId" | "name" | "description">
+): Promise<ProjectSchema> {
+  return authHttpClient<ProjectSchema>(Endpoint.project, {
     method: "POST",
     body: JSON.stringify(project),
   });
 }
 
 export async function createProjectCreationJob(
-  payload: CreateProjectByJsonModel
-): Promise<JobModel> {
-  return authHttpClient<JobModel>(Endpoint.createProjectJob, {
+  payload: CreateProjectByJsonSchema
+): Promise<JobSchema> {
+  return authHttpClient<JobSchema>(Endpoint.createProjectJob, {
     method: "POST",
     body: JSON.stringify(payload),
   });
@@ -39,8 +39,8 @@ export async function createProjectCreationJob(
  *
  * @return All project identifiers.
  */
-export async function getProjects(): Promise<IdentifierModel[]> {
-  return authHttpClient<IdentifierModel[]>(Endpoint.project, {
+export async function getProjects(): Promise<IdentifierSchema[]> {
+  return authHttpClient<IdentifierSchema[]>(Endpoint.project, {
     method: "GET",
   });
 }
@@ -86,8 +86,8 @@ export async function getProjectDelta(
  */
 export async function getProjectMembers(
   projectId: string
-): Promise<MembershipModel[]> {
-  return authHttpClient<MembershipModel[]>(
+): Promise<MembershipSchema[]> {
+  return authHttpClient<MembershipSchema[]>(
     fillEndpoint(Endpoint.getProjectMembers, {
       projectId,
     }),
@@ -108,8 +108,8 @@ export async function saveProjectMember(
   projectId: string,
   memberEmail: string,
   projectRole: ProjectRole
-): Promise<MembershipModel> {
-  return authHttpClient<MembershipModel>(
+): Promise<MembershipSchema> {
+  return authHttpClient<MembershipSchema>(
     fillEndpoint(Endpoint.getProjectMembers, {
       projectId,
     }),
@@ -118,7 +118,7 @@ export async function saveProjectMember(
       body: JSON.stringify({
         memberEmail,
         projectRole,
-      } as MemberRequestModel),
+      } as MemberRequestSchema),
     }
   );
 }
@@ -131,8 +131,8 @@ export async function saveProjectMember(
  */
 export async function deleteProjectMember({
   projectMembershipId,
-}: MembershipModel): Promise<MembershipModel[]> {
-  return authHttpClient<MembershipModel[]>(
+}: MembershipSchema): Promise<MembershipSchema[]> {
+  return authHttpClient<MembershipSchema[]>(
     fillEndpoint(Endpoint.deleteProjectMember, {
       projectMemberId: projectMembershipId,
     }),

@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-import { JobModel } from "@/types";
+import { JobSchema } from "@/types";
 import { pinia } from "@/plugins";
 
 /**
@@ -11,11 +11,11 @@ export const useJobs = defineStore("jobs", {
     /**
      * The list of user jobs.
      */
-    jobs: [] as JobModel[],
+    jobs: [] as JobSchema[],
     /**
      * The index of the selected job.
      */
-    selectedJob: undefined as JobModel | undefined,
+    selectedJob: undefined as JobSchema | undefined,
   }),
   getters: {},
   actions: {
@@ -25,7 +25,7 @@ export const useJobs = defineStore("jobs", {
      *
      * @param job - The job to update.
      */
-    updateJob(job: JobModel): void {
+    updateJob(job: JobSchema): void {
       this.jobs = [job, ...this.jobs.filter(({ id }) => id !== job.id)];
     },
     /**
@@ -34,7 +34,7 @@ export const useJobs = defineStore("jobs", {
      * @param jobId - The job id to get.
      * @returns The job with given id.
      */
-    getJob(jobId: string): JobModel | undefined {
+    getJob(jobId: string): JobSchema | undefined {
       return this.jobs.find(({ id }) => id === jobId);
     },
     /**
@@ -42,7 +42,7 @@ export const useJobs = defineStore("jobs", {
      *
      * @param job - The job, or id, to delete.
      */
-    deleteJob(job: JobModel | string): void {
+    deleteJob(job: JobSchema | string): void {
       const deleteId = typeof job === "string" ? job : job.id;
       const jobs = this.jobs.filter(({ id }) => id !== deleteId);
 

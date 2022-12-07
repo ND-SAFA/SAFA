@@ -13,7 +13,7 @@
     @keydown.enter="$emit('enter')"
   >
     <template v-slot:append>
-      <generic-icon-button
+      <icon-button
         small
         icon-id="mdi-content-save-outline"
         tooltip="Save Projects"
@@ -26,9 +26,9 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { IdentifierModel } from "@/types";
+import { IdentifierSchema } from "@/types";
 import { projectStore } from "@/hooks";
-import { GenericIconButton } from "@/components/common/generic";
+import { IconButton } from "@/components/common/button";
 
 /**
  * An input for projects.
@@ -38,7 +38,7 @@ import { GenericIconButton } from "@/components/common/generic";
 export default Vue.extend({
   name: "ProjectInput",
   components: {
-    GenericIconButton,
+    IconButton,
   },
   props: {
     value: {
@@ -63,7 +63,7 @@ export default Vue.extend({
     /**
      * @return All projects for the current user.
      */
-    projects(): IdentifierModel[] {
+    projects(): IdentifierSchema[] {
       return this.excludeCurrentProject
         ? projectStore.unloadedProjects
         : projectStore.allProjects;

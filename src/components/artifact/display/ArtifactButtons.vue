@@ -23,7 +23,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { ArtifactModel } from "@/types";
+import { ArtifactSchema } from "@/types";
 import { appStore, projectStore, selectionStore, sessionStore } from "@/hooks";
 import { handleDeleteArtifact } from "@/api";
 import { FlexBox } from "@/components/common";
@@ -44,7 +44,7 @@ export default Vue.extend({
     /**
      * @return The selected artifact.
      */
-    artifact(): ArtifactModel | undefined {
+    artifact(): ArtifactSchema | undefined {
       return selectionStore.selectedArtifact;
     },
   },

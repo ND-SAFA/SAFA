@@ -1,5 +1,5 @@
 <template>
-  <generic-modal
+  <modal
     size="xxs"
     :is-open="deleteDialogue"
     :title="title"
@@ -18,14 +18,14 @@
         Delete
       </v-btn>
     </template>
-  </generic-modal>
+  </modal>
 </template>
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { VersionModel } from "@/types";
+import { VersionSchema } from "@/types";
 import { versionToString } from "@/util";
-import { GenericModal } from "@/components/common";
+import { Modal } from "@/components/common";
 
 /**
  * A modal for confirming version deletion.
@@ -35,14 +35,14 @@ import { GenericModal } from "@/components/common";
  */
 export default Vue.extend({
   name: "ConfirmVersionDelete",
-  components: { GenericModal },
+  components: { Modal },
   props: {
     deleteDialogue: {
       type: Boolean,
       required: true,
     },
     version: {
-      type: Object as PropType<VersionModel>,
+      type: Object as PropType<VersionSchema>,
       required: false,
     },
   },
@@ -69,7 +69,7 @@ export default Vue.extend({
     /**
      * Updates the title when the version changes.
      */
-    version(version: VersionModel) {
+    version(version: VersionSchema) {
       this.title = `Delete version: ${versionToString(version)}`;
     },
   },

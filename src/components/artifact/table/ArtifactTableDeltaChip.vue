@@ -6,10 +6,10 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { ArtifactModel, ArtifactDeltaState } from "@/types";
+import { ArtifactSchema, ArtifactDeltaState } from "@/types";
 import { capitalize, getBackgroundColor } from "@/util";
 import { deltaStore } from "@/hooks";
-import Typography from "@/components/common/display/Typography.vue";
+import { Typography } from "@/components/common";
 
 /**
  * Renders a chip for the delta state of this artifact.
@@ -18,7 +18,7 @@ export default Vue.extend({
   name: "ArtifactTableDeltaChip",
   components: { Typography },
   props: {
-    artifact: Object as PropType<ArtifactModel>,
+    artifact: Object as PropType<ArtifactSchema>,
   },
   computed: {
     /**

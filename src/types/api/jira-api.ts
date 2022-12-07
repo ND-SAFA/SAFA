@@ -1,7 +1,7 @@
 /**
  * Represents a jira project.
  */
-export interface JiraProjectModel {
+export interface JiraProjectSchema {
   /**
    * The project's unique id.
    */

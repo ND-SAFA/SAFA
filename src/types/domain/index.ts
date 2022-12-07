@@ -1,5 +1,6 @@
 export * from "./authentication";
 export * from "./artifact";
+export * from "./warning";
 export * from "./artifact-types";
 export * from "./files";
 export * from "./document";

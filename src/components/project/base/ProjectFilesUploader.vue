@@ -7,7 +7,7 @@
       :data-cy-description="dataCyDescription"
     />
     <v-container style="max-width: 40em">
-      <generic-switch
+      <switch-input
         class="mt-0"
         v-model="emptyFiles"
         label="Create an empty project"
@@ -34,10 +34,10 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { IdentifierModel } from "@/types";
+import { IdentifierSchema } from "@/types";
 import { identifierSaveStore } from "@/hooks";
 import { handleBulkImportProject } from "@/api";
-import { GenericSwitch } from "@/components/common";
+import { SwitchInput } from "@/components/common";
 import ProjectFilesInput from "./ProjectFilesInput.vue";
 import ProjectIdentifierInput from "./ProjectIdentifierInput.vue";
 
@@ -50,7 +50,7 @@ export default Vue.extend({
   name: "ProjectFilesUploader",
   components: {
     ProjectFilesInput,
-    GenericSwitch,
+    SwitchInput,
     ProjectIdentifierInput,
   },
   props: {
@@ -74,7 +74,7 @@ export default Vue.extend({
     /**
      * @return  The identifier being updated.
      */
-    identifier(): IdentifierModel {
+    identifier(): IdentifierSchema {
       return identifierSaveStore.editedIdentifier;
     },
     /**

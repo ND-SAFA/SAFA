@@ -37,7 +37,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { VersionModel } from "@/types";
+import { VersionSchema } from "@/types";
 import { versionToString } from "@/util";
 import { deltaStore, projectStore } from "@/hooks";
 import {
@@ -56,7 +56,7 @@ export default Vue.extend({
     return {
       isLoading: false,
       isSelectorVisible: deltaStore.inDeltaView,
-      versions: [] as VersionModel[],
+      versions: [] as VersionSchema[],
     };
   },
   mounted() {
@@ -79,7 +79,7 @@ export default Vue.extend({
      * Tracks the delta version and loads new versions.
      */
     version: {
-      get(): VersionModel | undefined {
+      get(): VersionSchema | undefined {
         return deltaStore.afterVersion;
       },
       set(newVersionId: string): void {
@@ -103,7 +103,7 @@ export default Vue.extend({
      * @param version - The version to name.
      * @return The version's name.
      */
-    getVersionName(version: VersionModel): string {
+    getVersionName(version: VersionSchema): string {
       return versionToString(version);
     },
     /**

@@ -13,10 +13,10 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import {
-  ArtifactModel,
+  ArtifactSchema,
   DeltaType,
   EntityModification,
-  TraceLinkModel,
+  TraceLinkSchema,
 } from "@/types";
 import { capitalize } from "@/util";
 import { ToggleList } from "@/components/common";
@@ -39,7 +39,7 @@ export default Vue.extend({
       type: Object as PropType<
         Record<
           string,
-          ArtifactModel | EntityModification<ArtifactModel> | TraceLinkModel
+          ArtifactSchema | EntityModification<ArtifactSchema> | TraceLinkSchema
         >
       >,
       required: true,
@@ -78,7 +78,7 @@ export default Vue.extend({
       const items = Object.values(this.items);
 
       if (this.isTraces) {
-        return (items as TraceLinkModel[]).map(
+        return (items as TraceLinkSchema[]).map(
           ({ traceLinkId, sourceName, targetName }) => ({
             id: traceLinkId,
             name: `${sourceName} > ${targetName}`,
@@ -86,10 +86,10 @@ export default Vue.extend({
         );
       } else {
         return this.deltaType === "modified"
-          ? (items as EntityModification<ArtifactModel>[]).map(
+          ? (items as EntityModification<ArtifactSchema>[]).map(
               ({ after: { id, name } }) => ({ id, name })
             )
-          : (items as ArtifactModel[]).map(({ id, name }) => ({ id, name }));
+          : (items as ArtifactSchema[]).map(({ id, name }) => ({ id, name }));
       }
     },
   },

@@ -1,10 +1,10 @@
 import {
-  SessionModel,
-  PasswordResetModel,
-  UserPasswordModel,
-  UserResetModel,
-  PasswordChangeModel,
-  UserModel,
+  SessionSchema,
+  PasswordResetSchema,
+  UserPasswordSchema,
+  UserResetSchema,
+  PasswordChangeSchema,
+  UserSchema,
 } from "@/types";
 import { baseURL, Endpoint, fillEndpoint, authHttpClient } from "@/api";
 
@@ -35,9 +35,9 @@ async function sessionFetch<T>(...args: Parameters<typeof fetch>): Promise<T> {
  * @throws If the account cannot be created.
  */
 export async function createUser(
-  user: UserPasswordModel
-): Promise<SessionModel> {
-  return sessionFetch<SessionModel>(fillEndpoint(Endpoint.createAccount), {
+  user: UserPasswordSchema
+): Promise<SessionSchema> {
+  return sessionFetch<SessionSchema>(fillEndpoint(Endpoint.createAccount), {
     method: "POST",
     body: JSON.stringify(user),
     headers: {
@@ -54,9 +54,9 @@ export async function createUser(
  * @throws If no session exists.
  */
 export async function createLoginSession(
-  user: UserPasswordModel
-): Promise<SessionModel> {
-  return sessionFetch<SessionModel>(fillEndpoint(Endpoint.login), {
+  user: UserPasswordSchema
+): Promise<SessionSchema> {
+  return sessionFetch<SessionSchema>(fillEndpoint(Endpoint.login), {
     method: "POST",
     body: JSON.stringify(user),
   });
@@ -68,8 +68,8 @@ export async function createLoginSession(
  * @return The current user.
  * @throws If no user exists.
  */
-export async function getCurrentUser(): Promise<UserModel> {
-  return authHttpClient<UserModel>(fillEndpoint(Endpoint.getAccount), {
+export async function getCurrentUser(): Promise<UserSchema> {
+  return authHttpClient<UserSchema>(fillEndpoint(Endpoint.getAccount), {
     method: "GET",
   });
 }
@@ -79,7 +79,9 @@ export async function getCurrentUser(): Promise<UserModel> {
  *
  * @param user - The user to reset.
  */
-export async function createPasswordReset(user: UserResetModel): Promise<void> {
+export async function createPasswordReset(
+  user: UserResetSchema
+): Promise<void> {
   await authHttpClient(fillEndpoint(Endpoint.forgotPassword), {
     method: "PUT",
     body: JSON.stringify(user),
@@ -93,7 +95,7 @@ export async function createPasswordReset(user: UserResetModel): Promise<void> {
  * @throws The password change request was unsuccessful.
  */
 export async function updatePassword(
-  password: PasswordResetModel
+  password: PasswordResetSchema
 ): Promise<void> {
   await sessionFetch(fillEndpoint(Endpoint.resetPassword), {
     method: "PUT",
@@ -108,7 +110,7 @@ export async function updatePassword(
  * @throws The password change request was unsuccessful.
  */
 export async function savePassword(
-  password: PasswordChangeModel
+  password: PasswordChangeSchema
 ): Promise<void> {
   await authHttpClient(fillEndpoint(Endpoint.updatePassword), {
     method: "PUT",

@@ -1,5 +1,5 @@
 <template>
-  <generic-stepper-list-step
+  <stepper-list-step
     title="Integration Sources"
     :item-count="2"
     empty-message=""
@@ -9,15 +9,12 @@
       <jira-authentication @click="$emit('input', 'Jira')" />
       <git-hub-authentication @click="$emit('input', 'GitHub')" />
     </template>
-  </generic-stepper-list-step>
+  </stepper-list-step>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import {
-  GenericStepperListStep,
-  UnderConstructionAlert,
-} from "@/components/common";
+import { StepperListStep, UnderConstructionAlert } from "@/components/common";
 import JiraAuthentication from "./JiraAuthentication.vue";
 import GitHubAuthentication from "./GitHubAuthentication.vue";
 
@@ -31,7 +28,7 @@ export default Vue.extend({
   components: {
     GitHubAuthentication,
     JiraAuthentication,
-    GenericStepperListStep,
+    StepperListStep,
     UnderConstructionAlert,
   },
 });

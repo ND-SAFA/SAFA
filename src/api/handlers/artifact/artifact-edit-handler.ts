@@ -1,4 +1,4 @@
-import { ArtifactModel, IOHandlerCallback } from "@/types";
+import { ArtifactSchema, IOHandlerCallback } from "@/types";
 import { artifactStore, logStore, projectStore, traceStore } from "@/hooks";
 import {
   createArtifact,
@@ -19,9 +19,9 @@ import {
  * @param onComplete - Called after the action.
  */
 export async function handleSaveArtifact(
-  artifact: ArtifactModel,
+  artifact: ArtifactSchema,
   isUpdate: boolean,
-  parentArtifact: ArtifactModel | undefined,
+  parentArtifact: ArtifactSchema | undefined,
   { onSuccess, onError, onComplete }: IOHandlerCallback
 ): Promise<void> {
   try {
@@ -63,7 +63,7 @@ export async function handleSaveArtifact(
  * @param cb - Callbacks for this action.
  */
 export function handleDuplicateArtifact(
-  artifact: ArtifactModel,
+  artifact: ArtifactSchema,
   cb: IOHandlerCallback
 ): Promise<void> {
   return handleSaveArtifact(
@@ -88,7 +88,7 @@ export function handleDuplicateArtifact(
  * @param onComplete - Called after the action.
  */
 export function handleDeleteArtifact(
-  artifact: ArtifactModel,
+  artifact: ArtifactSchema,
   { onSuccess, onError, onComplete }: IOHandlerCallback
 ): void {
   logStore.confirm(

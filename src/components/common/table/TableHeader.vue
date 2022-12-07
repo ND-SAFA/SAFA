@@ -12,7 +12,7 @@
         append-icon="mdi-magnify"
       />
       <flex-box align="center">
-        <commit-buttons color="primary" class="mt-2" />
+        <commit-buttons v-if="showCommitButtons" color="primary" class="mt-2" />
         <slot name="bottom" />
       </flex-box>
     </div>
@@ -62,8 +62,8 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { DataTableHeader } from "vuetify";
-import { FlexBox } from "@/components/common";
-import { CommitButtons } from "@/components/navigation";
+import { FlexBox } from "@/components/common/layout";
+import { CommitButtons } from "@/components/common/button";
 /**
  * Renders the header for a table.
  *
@@ -84,6 +84,7 @@ export default Vue.extend({
     groupDesc: Boolean,
     sortBy: Array as PropType<string[]>,
     sortDesc: Boolean,
+    showCommitButtons: Boolean,
   },
   computed: {
     options() {

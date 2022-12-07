@@ -1,6 +1,6 @@
 <template>
   <div class="mt-4">
-    <artifact-title />
+    <artifact-fields />
     <artifact-traces />
     <artifact-documents />
     <artifact-errors />
@@ -9,7 +9,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import ArtifactTitle from "./ArtifactTitle.vue";
+import ArtifactFields from "./ArtifactFields.vue";
 import ArtifactDocuments from "./ArtifactDocuments.vue";
 import ArtifactErrors from "./ArtifactErrors.vue";
 import ArtifactTraces from "./ArtifactTraces.vue";
@@ -20,7 +20,7 @@ import ArtifactTraces from "./ArtifactTraces.vue";
 export default Vue.extend({
   name: "ArtifactContent",
   components: {
-    ArtifactTitle,
+    ArtifactFields,
     ArtifactDocuments,
     ArtifactErrors,
     ArtifactTraces,

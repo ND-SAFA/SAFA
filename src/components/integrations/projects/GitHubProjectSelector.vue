@@ -1,5 +1,5 @@
 <template>
-  <generic-stepper-list-step
+  <stepper-list-step
     title="GitHub Repositories"
     :item-count="repositories.length"
     :loading="repositoriesLoading"
@@ -25,15 +25,15 @@
         </v-list-item>
       </template>
     </template>
-  </generic-stepper-list-step>
+  </stepper-list-step>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { GitHubProjectModel } from "@/types";
+import { GitHubProjectSchema } from "@/types";
 import { integrationsStore } from "@/hooks";
 import { handleLoadGitHubProjects } from "@/api";
-import { GenericStepperListStep } from "@/components/common";
+import { StepperListStep } from "@/components/common";
 
 /**
  * Allows for selecting a GitHub repository.
@@ -41,11 +41,11 @@ import { GenericStepperListStep } from "@/components/common";
 export default Vue.extend({
   name: "GitHubProjectSelector",
   components: {
-    GenericStepperListStep,
+    StepperListStep,
   },
   data() {
     return {
-      repositories: [] as GitHubProjectModel[],
+      repositories: [] as GitHubProjectSchema[],
       repositoriesLoading: false,
     };
   },
@@ -93,7 +93,7 @@ export default Vue.extend({
      * @param repository - The repository to extract from.
      * @return The subtitle.
      */
-    getRepositorySubtitle(repository: GitHubProjectModel): string {
+    getRepositorySubtitle(repository: GitHubProjectSchema): string {
       const { name, size } = repository;
       const subtitle = `${name} | ${size} File`;
 
@@ -104,7 +104,7 @@ export default Vue.extend({
      * @param repository - The repository to extract from.
      * @return The last updated time.
      */
-    getRepositoryTime(repository: GitHubProjectModel): string {
+    getRepositoryTime(repository: GitHubProjectSchema): string {
       const updated = new Date(repository.created_at);
 
       return `Created on ${updated.getMonth()}/${updated.getDate()}/${updated.getFullYear()}`;
@@ -113,7 +113,7 @@ export default Vue.extend({
      * SHandles a click to select a repository.
      * @param repository - The repository to select.
      */
-    handleRepositorySelect(repository: GitHubProjectModel | undefined) {
+    handleRepositorySelect(repository: GitHubProjectSchema | undefined) {
       integrationsStore.selectGitHubProject(repository);
     },
   },

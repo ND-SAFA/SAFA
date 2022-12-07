@@ -1,7 +1,6 @@
 import {
   ApprovalType,
   ArtifactDeltaState,
-  ColumnDataType,
   CreatorTabTypes,
   DocumentType,
   FTANodeType,
@@ -98,20 +97,7 @@ export function logicTypeOptions(): SelectOption[] {
 }
 
 /**
- * Returns display names for each column type.
- *
- * @return The select option names and ids.
- */
-export function columnTypeOptions(): SelectOption[] {
-  return [
-    createEnumOption(ColumnDataType.FREE_TEXT, "Text"),
-    createEnumOption(ColumnDataType.RELATION),
-    createEnumOption(ColumnDataType.SELECT),
-  ];
-}
-
-/**
- * Returns display names for each column type.
+ * Returns display names for each delta type.
  *
  * @return The select option names and ids.
  */
@@ -249,5 +235,17 @@ export function trainingTabOptions(): SelectOption[] {
     createEnumOption("repositories", "Repositories"),
     createEnumOption("keywords", "Keywords"),
     createEnumOption("project", "Project Data"),
+  ];
+}
+
+/**
+ * Returns display names for table view tabs.
+ *
+ * @return The select option names and ids.
+ */
+export function tableViewTabOptions(): SelectOption[] {
+  return [
+    createEnumOption("artifacts", "Artifacts"),
+    createEnumOption("traceLinks", "Trace Links"),
   ];
 }

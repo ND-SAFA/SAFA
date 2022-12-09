@@ -86,6 +86,13 @@ class AutoEncoder:
                 loss = self.encoder_decoder_model(input_ids=input_ids, decoder_input_ids=labels, labels=labels).loss
                 loss.backward()
 
+            test_sentences = source_sentences[:3]
+            test_token_ids = self.tokenize(test_sentences)
+            generated_tokens = self.encoder_decoder_model.generate(test_token_ids)
+            generated_sentences = self.model_tokenizer.batch_decode(generated_tokens, skip_special_tokens=True)
+            print("Source:", "\n".join(test_sentences))
+            print("Generated:", "\n".join(generated_sentences))
+
     def encode(self, sentences):
         token_ids = self.tokenize(sentences)
         return self.decoder_model.bert(token_ids)[0]

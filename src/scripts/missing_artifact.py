@@ -7,7 +7,7 @@ from typing import List
 import torch
 from dotenv import load_dotenv
 from tqdm import tqdm
-from transformers import BertGenerationDecoder, BertGenerationEncoder, BertTokenizer, EncoderDecoderModel
+from transformers import BertTokenizer, EncoderDecoderModel
 
 load_dotenv()
 
@@ -27,7 +27,7 @@ class AutoEncoder:
     BERT Encoder-Decoder for sequence-to-sequence tasks.
     """
 
-    def __init__(self, base_model="bert-large-uncased", tensor_type="pt"):
+    def __init__(self, base_model="bert-base-uncased", tensor_type="pt"):
         """
         Creates autoencoder using given base bert model and tensor types.
         :param base_model: The base bert model to use for encoder and decoders.
@@ -35,23 +35,14 @@ class AutoEncoder:
         """
         self.base_model = base_model
         self.tensor_type = tensor_type
-        self.encoder_model = BertGenerationEncoder.from_pretrained(base_model,
-                                                                   bos_token_id=BOS_TOKEN_ID,
-                                                                   eos_token_id=EOS_TOKEN_ID)
-        self.decoder_model = BertGenerationDecoder.from_pretrained(base_model,
-                                                                   add_cross_attention=True,
-                                                                   is_decoder=True,
-                                                                   bos_token_id=BOS_TOKEN_ID,
-                                                                   eos_token_id=EOS_TOKEN_ID
-                                                                   )
-        self.encoder_decoder_model = EncoderDecoderModel(encoder=self.encoder_model, decoder=self.decoder_model)
-        self.model_tokenizer = BertTokenizer.from_pretrained(base_model)
+        self.model = EncoderDecoderModel.from_encoder_decoder_pretrained(base_model, base_model)
+        self.tokenizer = BertTokenizer.from_pretrained(base_model)
         self.tokenizer_kwargs = {"add_special_tokens": False,
                                  "return_tensors": self.tensor_type,
                                  "padding": True,
                                  "truncation": True}
-        self.encoder_decoder_model.config.decoder_start_token_id = self.model_tokenizer.cls_token_id
-        self.encoder_model.config.pad_token_id = self.model_tokenizer.pad_token_id
+        self.model.config.decoder_start_token_id = self.tokenizer.cls_token_id
+        self.model.config.pad_token_id = self.tokenizer.pad_token_id
 
     def tokenize(self, corpus: List[str]):
         """
@@ -59,7 +50,7 @@ class AutoEncoder:
         :param corpus: List of sentences to tokenize.
         :return: TokenIds.
         """
-        return self.model_tokenizer.batch_encode_plus(corpus, **self.tokenizer_kwargs).input_ids
+        return self.tokenizer.batch_encode_plus(corpus, **self.tokenizer_kwargs).input_ids
 
     def train(self, source_sentences: List[str], target_sentences: List[str] = None, n_epochs=1, batch_size=4) -> None:
         """
@@ -75,7 +66,7 @@ class AutoEncoder:
 
         n_sentences = len(source_sentences)
         n_batches = math.ceil(n_sentences / batch_size)
-        for epoch in tqdm(range(n_epochs)):
+        for epoch in range(n_epochs):
             for batch_index in tqdm(range(n_batches)):
                 start_index = batch_size * batch_index
                 end_index = start_index + batch_size
@@ -85,19 +76,24 @@ class AutoEncoder:
                 batch_labels = target_sentences[start_index: end_index]
                 input_ids = self.tokenize(batch_sentences)
                 labels = self.tokenize(batch_labels)
-                loss = self.encoder_decoder_model(input_ids=input_ids, decoder_input_ids=labels, labels=labels).loss
+                loss = self.model(input_ids=input_ids, decoder_input_ids=labels, labels=labels).loss
                 loss.backward()
+            self.predict(source_sentences[0])
 
-            test_sentences = source_sentences[:3]
-            test_token_ids = self.tokenize(test_sentences)
-            generated_tokens = self.encoder_decoder_model.generate(test_token_ids)
-            generated_sentences = self.model_tokenizer.batch_decode(generated_tokens, skip_special_tokens=True)
-            print("Source:", "\n".join(test_sentences))
-            print("Generated:", "\n".join(generated_sentences))
+    def test_autoencoder(self, test_sentences):
+
+        test_token_ids = self.tokenize(test_sentences)
+        generated_tokens = self.model.generate(test_token_ids)
+        generated_sentences = self.tokenizer.batch_decode(generated_tokens, skip_special_tokens=True)
+        print("-" * 15, "Eval", "-" * 15)
+        print("Source")
+        print("\n".join(test_sentences))
+        print("Generated")
+        print("\n".join(generated_sentences))
 
     def encode(self, sentences):
         token_ids = self.tokenize(sentences)
-        return self.decoder_model.bert(token_ids)[0]
+        return self.model.encoder.base_model(token_ids)[0]
 
     def decode(self, vector):
         """
@@ -105,7 +101,7 @@ class AutoEncoder:
         :param vector: The vector to decode into sentence.
         :return: String representing decoded vector
         """
-        predict_output = self.decoder_model.lm_head(vector).data
+        predict_output = self.model.bert(vector).data
         n_sentences, seq_len, vocab_size = predict_output.shape
         output_sentences = []
         for sentence_index in range(n_sentences):
@@ -115,7 +111,7 @@ class AutoEncoder:
                 token_id = torch.argmax(word_distribution).item()
                 sentence_tokens.append(token_id)
             output_sentences.append(sentence_tokens)
-        return self.model_tokenizer.batch_decode(output_sentences, skip_special_tokens=True)
+        return self.tokenizer.batch_decode(output_sentences, skip_special_tokens=True)
 
     def corpus_vector(self, sentences: List[str]):
         """
@@ -131,6 +127,37 @@ class AutoEncoder:
             aggregate_embedding = aggregate_embedding + embeddings[sentence_index]
         embeddings = torch.reshape(aggregate_embedding, (1, n_words, n_dim))
         return embeddings
+
+    def predict(self, sentence: str):
+        # create ids of encoded input vectors
+        input_ids = self.tokenizer(sentence, return_tensors="pt").input_ids
+        decoder_input_ids = self.tokenizer(self.tokenizer.cls_token,
+                                           add_special_tokens=False,
+                                           return_tensors="pt").input_ids
+        decoder_start_token = decoder_input_ids[0, 0].item()
+
+        assert decoder_start_token == self.model.config.decoder_start_token_id, "`decoder_input_ids` should correspond to `model.config.decoder_start_token_id`"
+
+        # pass input_ids to encoder and to decoder and pass BOS token to decoder to retrieve first logit
+        outputs = self.model(input_ids, decoder_input_ids=decoder_input_ids, return_dict=True)
+        encoded_sequence = (outputs.encoder_last_hidden_state,)
+        lm_logits = outputs.logits
+
+        running = True
+        i = 0
+        while running and not i > 100:
+            next_decoder_input_ids = torch.argmax(lm_logits[:, -1:], axis=-1)
+            next_index = next_decoder_input_ids.item()
+            if next_index == 0:
+                break
+            decoder_input_ids = torch.cat([decoder_input_ids, next_decoder_input_ids], axis=-1)
+            lm_logits = self.model(None,
+                                   encoder_outputs=encoded_sequence,
+                                   decoder_input_ids=decoder_input_ids,
+                                   return_dict=True).logits
+            i += 1
+        autoencoded_sentence = self.tokenizer.decode(decoder_input_ids[0], skip_special_tokens=True)
+        print(autoencoded_sentence)
 
 
 def read_project_artifacts(project_path: str) -> List[str]:
@@ -170,7 +197,4 @@ if __name__ == "__main__":
 
     # 2. Train Model
     autoencoder = AutoEncoder()
-    autoencoder.train(source_project_artifacts, n_epochs=args.e)
-    source_vector = autoencoder.corpus_vector(source_project_artifacts)
-    source_decode = autoencoder.decode(source_vector)
-    print(source_decode)
+    autoencoder.train(source_project_artifacts)

@@ -2,6 +2,7 @@ import os.path
 from typing import List
 
 import torch
+from tqdm import tqdm
 from transformers import BertGenerationDecoder, BertGenerationEncoder, BertTokenizer, EncoderDecoderModel
 
 from data.creators.safa_dataset_creator import SafaDatasetCreator
@@ -67,7 +68,7 @@ class AutoEncoder:
 
         input_ids = self.tokenize(source_sentences)
         labels = self.tokenize(target_sentences)
-        for epoch in range(n_epochs):
+        for epoch in tqdm(range(n_epochs)):
             loss = self.encoder_decoder_model(input_ids=input_ids, decoder_input_ids=labels, labels=labels).loss
             loss.backward()
 

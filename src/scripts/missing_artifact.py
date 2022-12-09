@@ -50,6 +50,8 @@ class AutoEncoder:
                                  "return_tensors": self.tensor_type,
                                  "padding": True,
                                  "truncation": True}
+        self.encoder_decoder_model.config.decoder_start_token_id = self.model_tokenizer.cls_token_id
+        self.encoder_model.config.pad_token_id = self.model_tokenizer.pad_token_id
 
     def tokenize(self, corpus: List[str]):
         """

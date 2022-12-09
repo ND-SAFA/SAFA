@@ -1,4 +1,5 @@
 import argparse
+import math
 import os
 import sys
 from typing import List
@@ -56,23 +57,34 @@ class AutoEncoder:
         :param corpus: List of sentences to tokenize.
         :return: TokenIds.
         """
-        return self.model_tokenizer(corpus, **self.tokenizer_kwargs).input_ids
+        return self.model_tokenizer.batch_encode_plus(corpus, **self.tokenizer_kwargs).input_ids
 
-    def train(self, source_sentences: List[str], target_sentences: List[str] = None, n_epochs=1) -> None:
+    def train(self, source_sentences: List[str], target_sentences: List[str] = None, n_epochs=1, batch_size=4) -> None:
         """
         Trains model to predict target sentences from sources.
         :param source_sentences: List of source sentences.
         :param target_sentences: List of target sentences.
         :param n_epochs: Number epochs to train for.
+        :param batch_size: Size of the batches.
         """
         if target_sentences is None:
             target_sentences = source_sentences
+        assert len(source_sentences) == len(target_sentences), "Expected source length to match target length."
 
-        input_ids = self.tokenize(source_sentences)
-        labels = self.tokenize(target_sentences)
+        n_sentences = len(source_sentences)
+        n_batches = math.ceil(n_sentences / batch_size)
         for epoch in tqdm(range(n_epochs)):
-            loss = self.encoder_decoder_model(input_ids=input_ids, decoder_input_ids=labels, labels=labels).loss
-            loss.backward()
+            for batch_index in tqdm(range(n_batches)):
+                start_index = batch_size * batch_index
+                end_index = start_index + batch_size
+                if end_index > n_sentences - 1:
+                    end_index = n_sentences - 1
+                batch_sentences = source_sentences[start_index: end_index]
+                batch_labels = target_sentences[start_index: end_index]
+                input_ids = self.tokenize(batch_sentences)
+                labels = self.tokenize(batch_labels)
+                loss = self.encoder_decoder_model(input_ids=input_ids, decoder_input_ids=labels, labels=labels).loss
+                loss.backward()
 
     def encode(self, sentences):
         token_ids = self.tokenize(sentences)
@@ -138,21 +150,18 @@ if __name__ == "__main__":
         prog='AutoEncoder for Project',
         description='AutoEncodes project.')
     parser.add_argument('project')
+    parser.add_argument('-e', default=1, type=int)
     args = parser.parse_args()
     project_path = os.path.expanduser(args.project)
 
     # 1. Read Project
     project_artifacts = read_project_artifacts(project_path)[:]
     source_project_artifacts: List[str] = project_artifacts
-    target_project_artifacts: List[str] = project_artifacts[:-1]
-    missing_artifact = project_artifacts[-1]
     print("Source:", len(source_project_artifacts))
-    print("Target:", len(target_project_artifacts))
-    print("Missing artifact:", missing_artifact)
 
     # 2. Train Model
     autoencoder = AutoEncoder()
-    autoencoder.train(source_project_artifacts)
+    autoencoder.train(source_project_artifacts, n_epochs=args.e)
     source_vector = autoencoder.corpus_vector(source_project_artifacts)
     source_decode = autoencoder.decode(source_vector)
     print(source_decode)

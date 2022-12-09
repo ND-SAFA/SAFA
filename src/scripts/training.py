@@ -28,8 +28,8 @@ if __name__ == "__main__":
     parser.add_argument('output')
     parser.add_argument('-model', help="The model to fine-tune.", default="roberta-base")
     parser.add_argument('-epochs', default=20, type=int)
-    parser.add_argument('-val', default=None, type=float)
     parser.add_argument('-val_path', default=None)
+    parser.add_argument('-val', default=None, type=float)
 
     args = parser.parse_args()
 
@@ -80,4 +80,5 @@ if __name__ == "__main__":
     }
     os.makedirs(job_definition["outputDir"], exist_ok=True)
     base_script = BaseScript(TrainingRequestSerializer, TrainJob)
-    base_script.run(job_definition, path_vars=[["data", "params", "project_path"], "outputDir"])
+    base_script.run(job_definition,
+                    path_vars=[["data", "params", "project_path"], "outputDir", ["val_data", "params", "project_path"]])

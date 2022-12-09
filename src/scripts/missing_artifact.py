@@ -198,4 +198,4 @@ if __name__ == "__main__":
 
     # 2. Train Model
     autoencoder = AutoEncoder()
-    autoencoder.train(source_project_artifacts)
+    autoencoder.train(source_project_artifacts, n_epochs=args.e)

@@ -157,7 +157,8 @@ class AutoEncoder:
                                    return_dict=True).logits
             i += 1
         autoencoded_sentence = self.tokenizer.decode(decoder_input_ids[0], skip_special_tokens=True)
-        print(autoencoded_sentence)
+        print("Original", sentence)
+        print("Generated:", autoencoded_sentence)
 
 
 def read_project_artifacts(project_path: str) -> List[str]:

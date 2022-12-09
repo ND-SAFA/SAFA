@@ -1,22 +1,24 @@
-import os.path
+import argparse
+import os
+import sys
 from typing import List
 
 import torch
+from dotenv import load_dotenv
 from tqdm import tqdm
 from transformers import BertGenerationDecoder, BertGenerationEncoder, BertTokenizer, EncoderDecoderModel
+
+load_dotenv()
+
+ROOT_PATH = os.path.expanduser(os.environ["ROOT_PATH"])
+assert os.path.exists(ROOT_PATH), ROOT_PATH
+sys.path.append(ROOT_PATH)
 
 from data.creators.safa_dataset_creator import SafaDatasetCreator
 from data.datasets.trace_dataset import TraceDataset
 
 BOS_TOKEN_ID = 101
 EOS_TOKEN_ID = 102
-
-CONCATENATION = {
-    "sum": torch.sum,
-    "avg": torch.avg_pool1d
-}
-
-PROJECT_PATH = os.path.expanduser(os.path.join("~", "desktop", "safa", "datasets", "mip", "task_1", "answer"))
 
 
 class AutoEncoder:
@@ -131,9 +133,16 @@ def read_project_artifacts(project_path: str) -> List[str]:
 
 
 if __name__ == "__main__":
-    concatenation = "sum"
-    project_artifacts = read_project_artifacts(PROJECT_PATH)[:]
+    # A. Read arguments
+    parser = argparse.ArgumentParser(
+        prog='AutoEncoder for Project',
+        description='AutoEncodes project.')
+    parser.add_argument('project')
+    args = parser.parse_args()
+    project_path = os.path.expanduser(args.project)
 
+    # 1. Read Project
+    project_artifacts = read_project_artifacts(project_path)[:]
     source_project_artifacts: List[str] = project_artifacts
     target_project_artifacts: List[str] = project_artifacts[:-1]
     missing_artifact = project_artifacts[-1]
@@ -141,7 +150,7 @@ if __name__ == "__main__":
     print("Target:", len(target_project_artifacts))
     print("Missing artifact:", missing_artifact)
 
-    # Train Model
+    # 2. Train Model
     autoencoder = AutoEncoder()
     autoencoder.train(source_project_artifacts)
     source_vector = autoencoder.corpus_vector(source_project_artifacts)

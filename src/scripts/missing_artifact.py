@@ -20,6 +20,7 @@ from data.datasets.trace_dataset import TraceDataset
 
 BOS_TOKEN_ID = 101
 EOS_TOKEN_ID = 102
+MAX_SEQUENCE_LENGTH = 50
 
 
 class AutoEncoder:
@@ -77,6 +78,7 @@ class AutoEncoder:
                 input_ids = self.tokenize(batch_sentences)
                 labels = self.tokenize(batch_labels)
                 loss = self.model(input_ids=input_ids, decoder_input_ids=labels, labels=labels).loss
+                print("Loss:", loss.item(), end="\n\r")
                 loss.backward()
             self.predict(source_sentences[0])
 
@@ -145,7 +147,7 @@ class AutoEncoder:
 
         running = True
         i = 0
-        while running and not i > 100:
+        while running and not i > MAX_SEQUENCE_LENGTH:
             next_decoder_input_ids = torch.argmax(lm_logits[:, -1:], axis=-1)
             next_index = next_decoder_input_ids.item()
             if next_index == 0:

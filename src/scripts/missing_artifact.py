@@ -1,0 +1,148 @@
+import os.path
+from typing import List
+
+import torch
+from transformers import BertGenerationDecoder, BertGenerationEncoder, BertTokenizer, EncoderDecoderModel
+
+from data.creators.safa_dataset_creator import SafaDatasetCreator
+from data.datasets.trace_dataset import TraceDataset
+
+BOS_TOKEN_ID = 101
+EOS_TOKEN_ID = 102
+
+CONCATENATION = {
+    "sum": torch.sum,
+    "avg": torch.avg_pool1d
+}
+
+PROJECT_PATH = os.path.expanduser(os.path.join("~", "desktop", "safa", "datasets", "mip", "task_1", "answer"))
+
+
+class AutoEncoder:
+    """
+    BERT Encoder-Decoder for sequence-to-sequence tasks.
+    """
+
+    def __init__(self, base_model="bert-large-uncased", tensor_type="pt"):
+        """
+        Creates autoencoder using given base bert model and tensor types.
+        :param base_model: The base bert model to use for encoder and decoders.
+        :param tensor_type: "pt" or "tf"
+        """
+        self.base_model = base_model
+        self.tensor_type = tensor_type
+        self.encoder_model = BertGenerationEncoder.from_pretrained(base_model,
+                                                                   bos_token_id=BOS_TOKEN_ID,
+                                                                   eos_token_id=EOS_TOKEN_ID)
+        self.decoder_model = BertGenerationDecoder.from_pretrained(base_model,
+                                                                   add_cross_attention=True,
+                                                                   is_decoder=True,
+                                                                   bos_token_id=BOS_TOKEN_ID,
+                                                                   eos_token_id=EOS_TOKEN_ID
+                                                                   )
+        self.encoder_decoder_model = EncoderDecoderModel(encoder=self.encoder_model, decoder=self.decoder_model)
+        self.model_tokenizer = BertTokenizer.from_pretrained(base_model)
+        self.tokenizer_kwargs = {"add_special_tokens": False,
+                                 "return_tensors": self.tensor_type,
+                                 "padding": True,
+                                 "truncation": True}
+
+    def tokenize(self, corpus: List[str]):
+        """
+        Tokenizes corpus with set tokenizer kwargs.
+        :param corpus: List of sentences to tokenize.
+        :return: TokenIds.
+        """
+        return self.model_tokenizer(corpus, **self.tokenizer_kwargs).input_ids
+
+    def train(self, source_sentences: List[str], target_sentences: List[str] = None, n_epochs=1) -> None:
+        """
+        Trains model to predict target sentences from sources.
+        :param source_sentences: List of source sentences.
+        :param target_sentences: List of target sentences.
+        :param n_epochs: Number epochs to train for.
+        """
+        if target_sentences is None:
+            target_sentences = source_sentences
+
+        input_ids = self.tokenize(source_sentences)
+        labels = self.tokenize(target_sentences)
+        for epoch in range(n_epochs):
+            loss = self.encoder_decoder_model(input_ids=input_ids, decoder_input_ids=labels, labels=labels).loss
+            loss.backward()
+
+    def encode(self, sentences):
+        token_ids = self.tokenize(sentences)
+        return self.decoder_model.bert(token_ids)[0]
+
+    def decode(self, vector):
+        """
+        Decodes a vector into a sentence.
+        :param vector: The vector to decode into sentence.
+        :return: String representing decoded vector
+        """
+        predict_output = self.decoder_model.lm_head(vector).data
+        n_sentences, seq_len, vocab_size = predict_output.shape
+        output_sentences = []
+        for sentence_index in range(n_sentences):
+            sentence_tokens = []
+            for word_index in range(seq_len):
+                word_distribution = predict_output[sentence_index, word_index]
+                token_id = torch.argmax(word_distribution).item()
+                sentence_tokens.append(token_id)
+            output_sentences.append(sentence_tokens)
+        return self.model_tokenizer.batch_decode(output_sentences, skip_special_tokens=True)
+
+    def corpus_vector(self, sentences: List[str]):
+        """
+        Calculates a representative vector for given corpus by concatenating embeddings of sentences in corpus.
+        :param sentences: List of sentences.
+        # TODO : Add different concatenations
+        :return: Single vector representing corpus.
+        """
+        embeddings = self.encode(sentences)
+        n_sentences, n_words, n_dim = embeddings.shape
+        aggregate_embedding = torch.zeros((n_words, n_dim))
+        for sentence_index in range(n_sentences):
+            aggregate_embedding = aggregate_embedding + embeddings[sentence_index]
+        embeddings = torch.reshape(aggregate_embedding, (1, n_words, n_dim))
+        return embeddings
+
+
+def read_project_artifacts(project_path: str) -> List[str]:
+    safa_dataset_creator = SafaDatasetCreator(project_path)
+    trace_dataset: TraceDataset = safa_dataset_creator.create()
+    id2artifact = {}
+
+    def add_artifact(artifact):
+        artifact_id = artifact.id
+        artifact_body = artifact.token
+        if artifact_id not in id2artifact:
+            id2artifact[artifact_id] = artifact_body
+
+    for link_id, link in trace_dataset.links.items():
+        target = link.target
+        source = link.source
+
+        add_artifact(target)
+        add_artifact(source)
+    return list(id2artifact.values())
+
+
+if __name__ == "__main__":
+    concatenation = "sum"
+    project_artifacts = read_project_artifacts(PROJECT_PATH)[:]
+
+    source_project_artifacts: List[str] = project_artifacts
+    target_project_artifacts: List[str] = project_artifacts[:-1]
+    missing_artifact = project_artifacts[-1]
+    print("Source:", len(source_project_artifacts))
+    print("Target:", len(target_project_artifacts))
+    print("Missing artifact:", missing_artifact)
+
+    # Train Model
+    autoencoder = AutoEncoder()
+    autoencoder.train(source_project_artifacts)
+    source_vector = autoencoder.corpus_vector(source_project_artifacts)
+    source_decode = autoencoder.decode(source_vector)
+    print(source_decode)

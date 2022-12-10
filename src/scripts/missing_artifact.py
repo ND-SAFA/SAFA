@@ -66,7 +66,7 @@ class AutoEncoder:
             per_device_eval_batch_size=batch_size,
             fp16=torch.cuda.is_available(),
             output_dir=output_path,
-            logging_steps=2,
+            logging_steps=100,
             eval_steps=100,
             save_total_limit=1,
             **kwargs

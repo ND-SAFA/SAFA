@@ -1,13 +1,14 @@
 import argparse
-import math
 import os
 import sys
 from typing import List
 
 import torch
+from datasets import Dataset
 from dotenv import load_dotenv
-from tqdm import tqdm
-from transformers import BertTokenizer, EncoderDecoderModel
+from sklearn.model_selection import train_test_split
+from transformers import BertTokenizer, DataCollatorForSeq2Seq, EncoderDecoderModel, Seq2SeqTrainer, \
+    Seq2SeqTrainingArguments
 
 load_dotenv()
 
@@ -21,6 +22,7 @@ from data.datasets.trace_dataset import TraceDataset
 BOS_TOKEN_ID = 101
 EOS_TOKEN_ID = 102
 MAX_SEQUENCE_LENGTH = 50
+MAX_INPUT_LENGTH = 126
 
 
 class AutoEncoder:
@@ -44,6 +46,31 @@ class AutoEncoder:
                                  "truncation": True}
         self.model.config.decoder_start_token_id = self.tokenizer.cls_token_id
         self.model.config.pad_token_id = self.tokenizer.pad_token_id
+        self.model.config.eos_token_id = self.tokenizer.sep_token_id
+        self.model.config.vocab_size = self.model.config.encoder.vocab_size
+        self.use_default_search()
+
+    def use_default_search(self):
+        self.model.config.max_length = 142
+        self.model.config.min_length = 56
+        self.model.config.no_repeat_ngram_size = 3
+        self.model.config.early_stopping = True
+        self.model.config.length_penalty = 2.0
+        self.model.config.num_beams = 4
+
+    def create_training_args(self, batch_size, output_path: str, **kwargs) -> Seq2SeqTrainingArguments:
+        return Seq2SeqTrainingArguments(
+            predict_with_generate=True,
+            evaluation_strategy="steps",
+            per_device_train_batch_size=batch_size,
+            per_device_eval_batch_size=batch_size,
+            fp16=torch.cuda.is_available(),
+            output_dir=output_path,
+            logging_steps=2,
+            save_steps=10,
+            eval_steps=10,
+            **kwargs
+        )
 
     def tokenize(self, corpus: List[str]):
         """
@@ -51,9 +78,43 @@ class AutoEncoder:
         :param corpus: List of sentences to tokenize.
         :return: TokenIds.
         """
-        return self.tokenizer.batch_encode_plus(corpus, **self.tokenizer_kwargs).input_ids
+        return self.tokenizer.batch_encode_plus(corpus, **self.tokenizer_kwargs)
 
-    def train(self, source_sentences: List[str], target_sentences: List[str] = None, n_epochs=1, batch_size=4) -> None:
+    def compute_metrics(self, predictions):
+        labels_ids = predictions.label_ids
+        predicted_ids = predictions.predictions
+
+        predicted_sentence = self.tokenizer.batch_decode(predicted_ids, skip_special_tokens=True)
+        label_sentence = self.tokenizer.batch_decode(labels_ids, skip_special_tokens=True)
+
+        for source, generated in zip(label_sentence, predicted_sentence):
+            print("Source:", source)
+            print("Generated:", generated)
+            print()
+
+        return {
+            "sources": label_sentence,
+            "targets": predicted_sentence
+        }
+
+    def create_dataset(self, sentences: List[str]):
+        def pre_process(examples):
+            model_inputs = self.tokenizer(examples["source"], max_length=MAX_INPUT_LENGTH, truncation=True)
+            labels = self.tokenizer(examples["target"], max_length=MAX_INPUT_LENGTH, truncation=True)
+            model_inputs["labels"] = labels["input_ids"]
+            return model_inputs
+
+        def create(s: List[str]):
+            dataset = Dataset.from_dict({
+                "source": s,
+                "target": s
+            })
+            return dataset.map(pre_process, batched=True)
+
+        return create(sentences)
+
+    def train(self, output_path: str, source_sentences: List[str], target_sentences: List[str] = None, n_epochs=1,
+              batch_size=4, val_size=.2) -> None:
         """
         Trains model to predict target sentences from sources.
         :param source_sentences: List of source sentences.
@@ -61,26 +122,21 @@ class AutoEncoder:
         :param n_epochs: Number epochs to train for.
         :param batch_size: Size of the batches.
         """
-        if target_sentences is None:
-            target_sentences = source_sentences
-        assert len(source_sentences) == len(target_sentences), "Expected source length to match target length."
-
-        n_sentences = len(source_sentences)
-        n_batches = math.ceil(n_sentences / batch_size)
-        for epoch in range(n_epochs):
-            for batch_index in tqdm(range(n_batches)):
-                start_index = batch_size * batch_index
-                end_index = start_index + batch_size
-                if end_index > n_sentences - 1:
-                    end_index = n_sentences - 1
-                batch_sentences = source_sentences[start_index: end_index]
-                batch_labels = target_sentences[start_index: end_index]
-                input_ids = self.tokenize(batch_sentences)
-                labels = self.tokenize(batch_labels)
-                loss = self.model(input_ids=input_ids, decoder_input_ids=labels, labels=labels).loss
-                print("Loss:", loss.item(), end="\n\r")
-                loss.backward()
-            self.predict(source_sentences[0])
+        train_sentences, validation_sentences = train_test_split(source_sentences, test_size=val_size)
+        train_data = self.create_dataset(train_sentences)
+        val_data = self.create_dataset(validation_sentences)
+        training_args = self.create_training_args(batch_size, output_path, num_train_epochs=n_epochs)
+        data_collator = DataCollatorForSeq2Seq(self.tokenizer, self.model)
+        trainer = Seq2SeqTrainer(
+            model=self.model,
+            args=training_args,
+            train_dataset=train_data,
+            eval_dataset=val_data,
+            compute_metrics=self.compute_metrics,
+            data_collator=data_collator
+        )
+        trainer.train()
+        trainer.save_model()
 
     def test_autoencoder(self, test_sentences):
 
@@ -189,15 +245,16 @@ if __name__ == "__main__":
         prog='AutoEncoder for Project',
         description='AutoEncodes project.')
     parser.add_argument('project')
+    parser.add_argument('export')
     parser.add_argument('-e', default=1, type=int)
     args = parser.parse_args()
     project_path = os.path.expanduser(args.project)
 
     # 1. Read Project
-    project_artifacts = read_project_artifacts(project_path)[:]
+    project_artifacts = read_project_artifacts(project_path)
     source_project_artifacts: List[str] = project_artifacts
     print("Source:", len(source_project_artifacts))
 
     # 2. Train Model
     autoencoder = AutoEncoder()
-    autoencoder.train(source_project_artifacts, n_epochs=args.e)
+    autoencoder.train(args.export, source_project_artifacts, n_epochs=args.e)

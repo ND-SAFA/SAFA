@@ -61,14 +61,14 @@ class AutoEncoder:
     def create_training_args(self, batch_size, output_path: str, **kwargs) -> Seq2SeqTrainingArguments:
         return Seq2SeqTrainingArguments(
             predict_with_generate=True,
-            evaluation_strategy="steps",
+            evaluation_strategy="epoch",
             per_device_train_batch_size=batch_size,
             per_device_eval_batch_size=batch_size,
             fp16=torch.cuda.is_available(),
             output_dir=output_path,
             logging_steps=2,
-            save_steps=10,
-            eval_steps=10,
+            eval_steps=100,
+            save_total_limit=1,
             **kwargs
         )
 

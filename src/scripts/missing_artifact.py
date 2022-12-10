@@ -93,8 +93,7 @@ class AutoEncoder:
             print()
 
         return {
-            "sources": label_sentence,
-            "targets": predicted_sentence
+            "result": 42  # dummy metric for now
         }
 
     def create_dataset(self, sentences: List[str]):

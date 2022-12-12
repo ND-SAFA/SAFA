@@ -15,6 +15,7 @@ Synset = nltk.corpus.reader.wordnet.Synset
 nltk.download('stopwords')
 nltk.download('wordnet')
 nltk.download('omw-1.4')
+nltk.download('punkt')
 
 
 @dataclass

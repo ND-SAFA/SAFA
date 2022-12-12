@@ -8,7 +8,7 @@ import java.util.Random;
 import edu.nd.crc.safa.features.artifacts.entities.FTAType;
 import edu.nd.crc.safa.features.artifacts.entities.SafetyCaseType;
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
-import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
+import edu.nd.crc.safa.features.artifacts.entities.db.versions.ArtifactVersion;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;

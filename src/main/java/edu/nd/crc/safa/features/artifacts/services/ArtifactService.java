@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
+import edu.nd.crc.safa.features.artifacts.entities.db.versions.ArtifactVersion;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
 import edu.nd.crc.safa.features.common.IAppEntityService;
 import edu.nd.crc.safa.features.projects.entities.db.Project;

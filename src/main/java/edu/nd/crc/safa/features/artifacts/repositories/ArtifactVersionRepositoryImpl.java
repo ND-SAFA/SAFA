@@ -9,9 +9,9 @@ import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
-import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.features.artifacts.entities.db.FTAArtifact;
 import edu.nd.crc.safa.features.artifacts.entities.db.SafetyCaseArtifact;
+import edu.nd.crc.safa.features.artifacts.entities.db.versions.ArtifactVersion;
 import edu.nd.crc.safa.features.commits.repositories.GenericVersionRepository;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.documents.entities.db.Document;

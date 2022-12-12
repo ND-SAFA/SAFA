@@ -7,14 +7,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import builders.DbEntityBuilder;
-
+import edu.nd.crc.safa.features.artifacts.entities.db.versions.ArtifactVersion;
 import edu.nd.crc.safa.features.rules.entities.app.RuleAppEntity;
 import edu.nd.crc.safa.features.rules.entities.app.RuleCondition;
 import edu.nd.crc.safa.features.rules.entities.app.RuleRelation;
-import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
-import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.features.rules.parser.RuleName;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
+
+import builders.DbEntityBuilder;
 
 /**
  * Defines a rule test consisting of creating a rule constraining

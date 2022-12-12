@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.artifacts.entities.db;
+package edu.nd.crc.safa.features.artifacts.entities.db.versions;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -16,6 +16,7 @@ import javax.persistence.UniqueConstraint;
 
 import edu.nd.crc.safa.config.AppConstraints;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
+import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.common.IVersionEntity;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
@@ -70,14 +71,10 @@ public class ArtifactVersion implements Serializable, IVersionEntity<ArtifactApp
         nullable = false,
         columnDefinition = "mediumtext")
     String content;
-    @Lob
-    @Column(columnDefinition = "mediumtext")
-    String customFields;
 
     public ArtifactVersion() {
         this.summary = "";
         this.content = "";
-        this.customFields = "{}";
     }
 
     public ArtifactVersion(ProjectVersion projectVersion,
@@ -91,7 +88,6 @@ public class ArtifactVersion implements Serializable, IVersionEntity<ArtifactApp
         this.projectVersion = projectVersion;
         this.summary = summary;
         this.content = content;
-        this.customFields = customFields;
     }
 
     public ArtifactVersion(ProjectVersion projectVersion,
@@ -128,25 +124,25 @@ public class ArtifactVersion implements Serializable, IVersionEntity<ArtifactApp
         return this.artifact.getType().getName();
     }
 
+    // TODO add custom fields to hasSameContent
+
     public boolean hasSameContent(IVersionEntity entityVersion) {
         if (entityVersion instanceof ArtifactVersion) {
             ArtifactVersion artifactVersion = (ArtifactVersion) entityVersion;
             return hasSameContent(artifactVersion.getName(),
                 artifactVersion.getSummary(),
-                artifactVersion.getContent(),
-                artifactVersion.getCustomFields());
+                artifactVersion.getContent());
         }
         return false;
     }
 
     public boolean hasSameContent(ArtifactAppEntity a) {
-        return hasSameContent(a.getName(), a.getSummary(), a.getBody(), a.getCustomFields().toString());
+        return hasSameContent(a.getName(), a.getSummary(), a.getBody());
     }
 
-    private boolean hasSameContent(String name, String summary, String content, String customFields) {
+    private boolean hasSameContent(String name, String summary, String content) {
         return this.getName().equals(name)
             && this.summary.equals(summary)
-            && this.content.equals(content)
-            && this.customFields.equals(customFields);
+            && this.content.equals(content);
     }
 }

@@ -10,7 +10,7 @@ import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.entities.FTAType;
 import edu.nd.crc.safa.features.artifacts.entities.SafetyCaseType;
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
-import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
+import edu.nd.crc.safa.features.artifacts.entities.db.versions.ArtifactVersion;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;

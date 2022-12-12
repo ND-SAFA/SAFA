@@ -1,18 +1,20 @@
+import math
 import random
 from dataclasses import dataclass
-from typing import List, Set, Optional, Tuple
+from typing import List, Optional, Set, Tuple
 
 import nltk
-from nltk.stem import WordNetLemmatizer
 from nltk import pos_tag, word_tokenize
-from nltk.corpus import wordnet as wn
-from nltk.corpus import stopwords
-import math
+from nltk.corpus import stopwords, wordnet as wn
+from nltk.stem import WordNetLemmatizer
 
 from config.constants import REPLACEMENT_PERCENTAGE_DEFAULT
 from data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
 
 Synset = nltk.corpus.reader.wordnet.Synset
+nltk.download('stopwords')
+nltk.download('wordnet')
+nltk.download('omw-1.4')
 
 
 @dataclass

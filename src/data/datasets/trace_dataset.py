@@ -90,11 +90,14 @@ class TraceDataset(AbstractDataset):
         augmenter = DataAugmenter(augmentation_steps)
         augmentation_runs = [lambda data: augmenter.run(data, n_total_expected=2 * len(data),
                                                         exclude_all_but_step_type=SourceTargetSwapStep),
-                             lambda data: augmenter.run(data, n_total_expected=len(self.neg_link_ids),
+                             lambda data: augmenter.run(data, n_total_expected=len(self.neg_link_ids) * 2,
                                                         include_all_but_step_type=SourceTargetSwapStep)]
+        print("Orig negative:", len(self.neg_link_ids))
         for run in augmentation_runs:
             pos_links, data_entries = self._get_data_entries_for_augmentation()
             augmentation_results = run(data_entries)
+            print("Orig:", len(data_entries))
+            print("Aug:", augmentation_results)
             self._create_links_from_augmentation(augmentation_results, pos_links)
 
     def get_source_target_pairs(self) -> List[Tuple]:
@@ -133,6 +136,7 @@ class TraceDataset(AbstractDataset):
         if len(self.pos_link_ids) > 0:
             if augmentation_steps:
                 self.augment_pos_links(augmentation_steps)
+            print("Orig neg:", len(self.neg_link_ids))
             self.resize_neg_links(len(self.pos_link_ids), include_duplicates=True)
             print("# Pos:", len(self.pos_link_ids))
             print("# Neg:", len(self.neg_link_ids))

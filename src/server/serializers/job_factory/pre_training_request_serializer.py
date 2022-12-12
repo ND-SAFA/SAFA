@@ -28,13 +28,14 @@ class PreTrainingRequestSerializer(ModelIdentifierSerializer):
     def create(self, validated_data: Dict) -> JobFactory:
         kwargs = SerializerUtility.create_children_serializers(validated_data, self.fields.fields)
 
-        pre_processing_steps = kwargs.pop("data_cleaning_steps", None)
+        pre_processing_steps = kwargs.pop("augmentation_steps", None)
         training_data_dir = kwargs.pop("training_data_dir")
 
         training_dataset_creator = MLMPreTrainDatasetCreator(orig_data_path=training_data_dir,
                                                              data_cleaning_steps=pre_processing_steps)
         trainer_datasets_container = TrainerDatasetsContainer(train_dataset_creator=training_dataset_creator)
-        return JobFactory(**kwargs, trainer_dataset_container=trainer_datasets_container)
+        params = validated_data.pop("params", {})
+        return JobFactory(**kwargs, **params, trainer_dataset_container=trainer_datasets_container)
 
     def to_representation(self, instance: JobFactory) -> Dict:
         representation = {}

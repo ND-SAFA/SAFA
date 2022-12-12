@@ -72,6 +72,15 @@ if __name__ == "__main__":
                 "params": {
                     "resample_rate": 1
                 }
+            },
+            {
+                "creator": "RESAMPLE",
+                "params": {
+                    "resample_rate": 1
+                }
+            },
+            {
+                "creator": "SIMPLE_WORD_REPLACEMENT"
             }
         ],
         # ],

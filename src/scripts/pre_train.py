@@ -49,4 +49,4 @@ if __name__ == "__main__":
     # Run Job
     #
     base_script = BaseScript(PreTrainingRequestSerializer, MLMPreTrainJob)
-    base_script.run(job_definition, path_vars=["trainingDataDir"])
+    base_script.run(job_definition, path_vars=["trainingDataDir", "outputDir"])

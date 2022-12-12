@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <panel-card>
     <typography el="h2" variant="subtitle" value="Project Integrations" />
     <v-data-table
       :headers="headers"
@@ -47,7 +47,7 @@
         </div>
       </template>
     </v-data-table>
-  </v-container>
+  </panel-card>
 </template>
 
 <script lang="ts">
@@ -56,7 +56,7 @@ import { InstallationSchema } from "@/types";
 import { timestampToDisplay } from "@/util";
 import { projectStore } from "@/hooks";
 import { handleSyncInstallation } from "@/api";
-import { Typography, IconButton, Modal } from "@/components/common";
+import { Typography, IconButton, Modal, PanelCard } from "@/components/common";
 import IntegrationsStepper from "./IntegrationsStepper.vue";
 
 /**
@@ -65,6 +65,7 @@ import IntegrationsStepper from "./IntegrationsStepper.vue";
 export default Vue.extend({
   name: "ProjectInstallationsTable",
   components: {
+    PanelCard,
     IntegrationsStepper,
     Modal,
     Typography,

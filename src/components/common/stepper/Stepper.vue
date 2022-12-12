@@ -1,57 +1,57 @@
 <template>
-  <v-container>
-    <v-card :outlined="!minimal" :style="minimal ? 'box-shadow: none' : ''">
-      <v-row>
-        <v-stepper
-          v-model="currentStep"
-          class="full-width"
-          :alt-labels="!minimal"
-          :elevation="minimal ? 0 : 1"
-        >
-          <v-stepper-header :style="minimal ? 'box-shadow: none' : ''">
-            <template v-for="(stepName, stepIndex) in stepNames">
-              <v-stepper-step
-                :complete="currentStep > stepIndex + 1"
-                :step="stepIndex + 1"
-                :key="stepIndex"
-                :editable="steps[stepIndex][1]"
-              >
-                <typography :value="stepName" class="width-max" el="div" />
-              </v-stepper-step>
-              <v-divider
-                :key="`${stepName}-divider`"
-                v-if="stepIndex < stepNames.length - 1"
-              />
-            </template>
-          </v-stepper-header>
+  <v-card
+    :outlined="!minimal"
+    :style="minimal ? 'box-shadow: none' : ''"
+    class="primary-border"
+  >
+    <v-stepper
+      v-model="currentStep"
+      class="full-width"
+      :alt-labels="!minimal"
+      :elevation="minimal ? 0 : 1"
+    >
+      <v-stepper-header :style="minimal ? 'box-shadow: none' : ''">
+        <template v-for="(stepName, stepIndex) in stepNames">
+          <v-stepper-step
+            :complete="currentStep > stepIndex + 1"
+            :step="stepIndex + 1"
+            :key="stepIndex"
+            :editable="steps[stepIndex][1]"
+          >
+            <typography :value="stepName" class="width-max" el="div" />
+          </v-stepper-step>
+          <v-divider
+            :key="`${stepName}-divider`"
+            v-if="stepIndex < stepNames.length - 1"
+          />
+        </template>
+      </v-stepper-header>
 
-          <v-stepper-items>
-            <slot name="items" />
-            <v-container v-if="!hideContinue">
-              <v-btn
-                color="primary"
-                :outlined="currentStep !== numberOfSteps"
-                :disabled="!isStepDone"
-                @click="onStepForward"
-                data-cy="button-stepper-continue"
-              >
-                {{ currentStep === numberOfSteps ? submitText : "Continue" }}
-              </v-btn>
-              <v-btn
-                text
-                @click="onStepBack"
-                :disabled="currentStep === 1"
-                color="primary"
-                data-cy="button-stepper-back"
-              >
-                Go Back
-              </v-btn>
-            </v-container>
-          </v-stepper-items>
-        </v-stepper>
-      </v-row>
-    </v-card>
-  </v-container>
+      <v-stepper-items>
+        <slot name="items" />
+        <v-container v-if="!hideContinue">
+          <v-btn
+            color="primary"
+            :outlined="currentStep !== numberOfSteps"
+            :disabled="!isStepDone"
+            @click="onStepForward"
+            data-cy="button-stepper-continue"
+          >
+            {{ currentStep === numberOfSteps ? submitText : "Continue" }}
+          </v-btn>
+          <v-btn
+            text
+            @click="onStepBack"
+            :disabled="currentStep === 1"
+            color="primary"
+            data-cy="button-stepper-back"
+          >
+            Go Back
+          </v-btn>
+        </v-container>
+      </v-stepper-items>
+    </v-stepper>
+  </v-card>
 </template>
 
 <script lang="ts">

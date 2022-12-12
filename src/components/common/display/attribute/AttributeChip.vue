@@ -17,12 +17,15 @@
         :data-cy="dataCy"
         :style="artifactType ? 'background-color: white !important' : ''"
       >
-        <v-icon v-if="iconId" small>{{ iconId }}</v-icon>
+        <v-icon v-if="iconId" small :color="artifactType ? 'primary' : ''">
+          {{ iconId }}
+        </v-icon>
         <typography
           ellipsis
           inherit-color
           :l="iconId ? '1' : '0'"
           :value="text"
+          :color="artifactType ? 'primary' : ''"
         />
       </v-chip>
     </template>

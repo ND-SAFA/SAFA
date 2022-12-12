@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <panel-card>
     <typography
       el="p"
       b="4"
@@ -82,7 +82,7 @@
         </td>
       </template>
     </v-data-table>
-  </v-container>
+  </panel-card>
 </template>
 
 <script lang="ts">
@@ -95,6 +95,7 @@ import {
   AttributeChip,
   TableGroupHeader,
   Typography,
+  PanelCard,
 } from "@/components/common";
 import { TraceLinkDisplay, TraceLinkApproval } from "@/components/traceLink";
 import traceApprovalTableHeaders from "./traceApprovalTableHeaders";
@@ -106,6 +107,7 @@ import TraceApprovalTableHeader from "./TraceApprovalTableHeader.vue";
 export default Vue.extend({
   name: "TraceApprovalTable",
   components: {
+    PanelCard,
     TraceApprovalTableHeader,
     TraceLinkApproval,
     TableGroupHeader,

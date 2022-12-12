@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <panel-card>
     <typography
       el="p"
       b="4"
@@ -37,7 +37,7 @@
         />
       </template>
     </table-selector>
-  </v-container>
+  </panel-card>
 </template>
 
 <script lang="ts">
@@ -45,7 +45,12 @@ import Vue from "vue";
 import { GenerationModelSchema } from "@/types";
 import { modelSaveStore, projectStore } from "@/hooks";
 import { handleDeleteModel, handleLoadModels } from "@/api";
-import { TableSelector, IconButton, Typography } from "@/components/common";
+import {
+  TableSelector,
+  IconButton,
+  Typography,
+  PanelCard,
+} from "@/components/common";
 import { ModelEditor } from "./editor";
 import ModelShareModal from "./ModelShareModal.vue";
 import ModelCreatorModal from "./ModelCreatorModal.vue";
@@ -56,6 +61,7 @@ import ModelCreatorModal from "./ModelCreatorModal.vue";
 export default Vue.extend({
   name: "ModelTable",
   components: {
+    PanelCard,
     ModelShareModal,
     ModelCreatorModal,
     IconButton,

@@ -9,7 +9,7 @@
     height="100%"
     :width="width"
   >
-    <v-container>
+    <v-container class="full-height primary lighten-5">
       <flex-box justify="space-between" align="center">
         <typography color="primary" el="h2" variant="subtitle" :value="title" />
         <icon-button

@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <panel-card>
     <typography el="h2" variant="subtitle" value="Project Members" />
     <table-selector
       is-open
@@ -33,7 +33,7 @@
         />
       </template>
     </table-selector>
-  </v-container>
+  </panel-card>
 </template>
 
 <script lang="ts">
@@ -41,7 +41,7 @@ import Vue from "vue";
 import { MembershipSchema, ProjectSchema, ProjectRole } from "@/types";
 import { logStore, membersStore, projectStore, sessionStore } from "@/hooks";
 import { handleDeleteMember, handleGetMembers } from "@/api";
-import { TableSelector, Typography } from "@/components/common";
+import { TableSelector, Typography, PanelCard } from "@/components/common";
 import SettingsMemberInformationModal from "./SettingsMemberInformationModal.vue";
 
 /**
@@ -49,7 +49,12 @@ import SettingsMemberInformationModal from "./SettingsMemberInformationModal.vue
  */
 export default Vue.extend({
   name: "SettingsMembers",
-  components: { TableSelector, SettingsMemberInformationModal, Typography },
+  components: {
+    PanelCard,
+    TableSelector,
+    SettingsMemberInformationModal,
+    Typography,
+  },
   data() {
     return {
       memberToEdit: undefined as MembershipSchema | undefined,

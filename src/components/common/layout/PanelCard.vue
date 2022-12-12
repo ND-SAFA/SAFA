@@ -1,7 +1,9 @@
 <template>
-  <v-card outlined :class="className">
-    <slot />
-  </v-card>
+  <div class="pb-4 primary lighten-5">
+    <v-card outlined :class="className">
+      <slot />
+    </v-card>
+  </div>
 </template>
 
 <script lang="ts">
@@ -23,7 +25,7 @@ export default Vue.extend({
      * This card's class names.
      */
     className(): string {
-      return `pa-4 mb-4 overflow-hidden ${this.color}-border`;
+      return `pa-4 overflow-hidden ${this.color}-border`;
     },
   },
 });

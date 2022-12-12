@@ -11,11 +11,9 @@
         <model-table />
       </v-tab-item>
       <v-tab-item key="2">
-        <v-container style="max-width: 50em">
-          <panel-card>
-            <trace-link-generator :is-open="tab === 1" />
-          </panel-card>
-        </v-container>
+        <panel-card>
+          <trace-link-generator :is-open="tab === 1" />
+        </panel-card>
       </v-tab-item>
       <v-tab-item key="3">
         <trace-approval-table />

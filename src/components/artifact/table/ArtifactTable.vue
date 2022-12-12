@@ -1,74 +1,77 @@
 <template>
-  <v-data-table
-    show-select
-    single-select
-    show-group-by
-    fixed-header
-    v-model="selected"
-    :headers="headers"
-    :items="items"
-    :search="searchText"
-    :sort-by.sync="sortBy"
-    :group-by.sync="groupBy"
-    :group-desc.sync="groupDesc"
-    :sort-desc.sync="sortDesc"
-    :items-per-page="50"
-    data-cy="view-artifact-table"
-    class="mt-4"
-    @click:row="handleView($event)"
-  >
-    <template v-slot:top>
-      <artifact-table-header
-        :headers="headers"
-        :group-by.sync="groupBy"
-        :sort-by.sync="sortBy"
-        :group-desc.sync="groupDesc"
-        :sort-desc.sync="sortDesc"
-        :search-text.sync="searchText"
-        @filter="selectedDeltaTypes = $event"
-      />
-    </template>
-
-    <template v-slot:[`group.header`]="data">
-      <table-group-header :data="data" />
-    </template>
-
-    <template v-slot:[`item.name`]="{ item }">
-      <td class="v-data-table__divider">
-        <artifact-table-row-name
-          :artifact="item"
-          data-cy="table-row-artifact"
-        />
-      </td>
-    </template>
-
-    <template v-slot:[`item.deltaState`]="{ item }">
-      <td class="v-data-table__divider">
-        <artifact-table-delta-chip :artifact="item" />
-      </td>
-    </template>
-
-    <template v-slot:[`item.type`]="{ item }">
-      <td class="v-data-table__divider">
-        <attribute-chip :value="item.type" artifact-type />
-      </td>
-    </template>
-
-    <template
-      v-for="attribute in attributes"
-      v-slot:[`item.${attribute.key}`]="{ item }"
+  <panel-card>
+    <v-data-table
+      show-select
+      single-select
+      show-group-by
+      fixed-header
+      height="60vh"
+      v-model="selected"
+      :headers="headers"
+      :items="items"
+      :search="searchText"
+      :sort-by.sync="sortBy"
+      :group-by.sync="groupBy"
+      :group-desc.sync="groupDesc"
+      :sort-desc.sync="sortDesc"
+      :items-per-page="50"
+      data-cy="view-artifact-table"
+      class="mt-4"
+      @click:row="handleView($event)"
     >
-      <td :key="attribute.key" class="v-data-table__divider">
-        <attribute-display :attribute="attribute" :model="item.attributes" />
-      </td>
-    </template>
+      <template v-slot:top>
+        <artifact-table-header
+          :headers="headers"
+          :group-by.sync="groupBy"
+          :sort-by.sync="sortBy"
+          :group-desc.sync="groupDesc"
+          :sort-desc.sync="sortDesc"
+          :search-text.sync="searchText"
+          @filter="selectedDeltaTypes = $event"
+        />
+      </template>
 
-    <template v-slot:[`item.actions`]="{ item }">
-      <td @click.stop="">
-        <artifact-table-row-actions :artifact="item" />
-      </td>
-    </template>
-  </v-data-table>
+      <template v-slot:[`group.header`]="data">
+        <table-group-header :data="data" />
+      </template>
+
+      <template v-slot:[`item.name`]="{ item }">
+        <td class="v-data-table__divider">
+          <artifact-table-row-name
+            :artifact="item"
+            data-cy="table-row-artifact"
+          />
+        </td>
+      </template>
+
+      <template v-slot:[`item.deltaState`]="{ item }">
+        <td class="v-data-table__divider">
+          <artifact-table-delta-chip :artifact="item" />
+        </td>
+      </template>
+
+      <template v-slot:[`item.type`]="{ item }">
+        <td class="v-data-table__divider">
+          <attribute-chip :value="item.type" artifact-type />
+        </td>
+      </template>
+
+      <template
+        v-for="attribute in attributes"
+        v-slot:[`item.${attribute.key}`]="{ item }"
+      >
+        <td :key="attribute.key" class="v-data-table__divider">
+          <attribute-display :attribute="attribute" :model="item.attributes" />
+        </td>
+      </template>
+
+      <template v-slot:[`item.actions`]="{ item }">
+        <td @click.stop="">
+          <artifact-table-row-actions :artifact="item" />
+        </td>
+      </template>
+    </v-data-table>
+  </panel-card>
 </template>
 
 <script lang="ts">
@@ -84,6 +87,7 @@ import {
   AttributeChip,
   TableGroupHeader,
   AttributeDisplay,
+  PanelCard,
 } from "@/components/common";
 import ArtifactTableHeader from "./ArtifactTableHeader.vue";
 import ArtifactTableRowName from "./ArtifactTableRowName.vue";
@@ -96,6 +100,7 @@ import ArtifactTableDeltaChip from "./ArtifactTableDeltaChip.vue";
 export default Vue.extend({
   name: "ArtifactTable",
   components: {
+    PanelCard,
     AttributeDisplay,
     ArtifactTableRowActions,
     AttributeChip,

@@ -1,44 +1,59 @@
 <template>
-  <v-data-table
-    show-select
-    single-select
-    show-group-by
-    v-model="selected"
-    :headers="headers"
-    :items="items"
-    :search="searchText"
-    :loading="isLoading"
-    :sort-by.sync="sortBy"
-    :group-by.sync="groupBy"
-    :group-desc.sync="groupDesc"
-    :sort-desc.sync="sortDesc"
-    item-key="name"
-    :items-per-page="50"
-    @click:row="handleView($event)"
-    data-cy="table-trace-matrix"
-    class="mt-4"
-  >
-    <template v-slot:top>
-      <table-header
-        :headers="headers"
-        :search-text.sync="searchText"
-        :group-by.sync="groupBy"
-        :sort-by.sync="sortBy"
-        :sort-desc.sync="sortDesc"
-        :group-desc.sync="groupDesc"
-      />
-    </template>
+  <panel-card>
+    <v-data-table
+      show-select
+      single-select
+      show-group-by
+      fixed-header
+      height="60vh"
+      v-model="selected"
+      :headers="headers"
+      :items="items"
+      :search="searchText"
+      :loading="isLoading"
+      :sort-by.sync="sortBy"
+      :group-by.sync="groupBy"
+      :group-desc.sync="groupDesc"
+      :sort-desc.sync="sortDesc"
+      item-key="name"
+      :items-per-page="50"
+      @click:row="handleView($event)"
+      data-cy="table-trace-matrix"
+      class="mt-4"
+    >
+      <template v-slot:top>
+        <table-header
+          :headers="headers"
+          :search-text.sync="searchText"
+          :group-by.sync="groupBy"
+          :sort-by.sync="sortBy"
+          :sort-desc.sync="sortDesc"
+          :group-desc.sync="groupDesc"
+        />
+      </template>
 
-    <template v-slot:[`group.header`]="data">
-      <table-group-header :data="data" />
-    </template>
+      <template v-slot:[`group.header`]="data">
+        <table-group-header :data="data" />
+      </template>
 
-    <template v-slot:[`item.type`]="{ item }">
-      <td class="v-data-table__divider">
-        <attribute-chip :value="item.type" artifact-type />
-      </td>
-    </template>
-  </v-data-table>
+      <template v-slot:[`item.type`]="{ item }">
+        <td class="v-data-table__divider">
+          <attribute-chip :value="item.type" artifact-type />
+        </td>
+      </template>
+
+      <template v-for="id in artifactColumns" v-slot:[`item.${id}`]="{ item }">
+        <v-chip :key="id" v-if="item[id] === 'Parent'" color="primary">
+          <v-icon style="transform: rotate(-90deg)">mdi-ray-start-arrow</v-icon>
+          Parent
+        </v-chip>
+        <v-chip :key="id" v-else-if="item[id] === 'Child'" color="secondary">
+          <v-icon style="transform: rotate(90deg)">mdi-ray-start-arrow</v-icon>
+          Child
+        </v-chip>
+      </template>
+    </v-data-table>
+  </panel-card>
 </template>
 
 <script lang="ts">
@@ -50,6 +65,7 @@ import {
   AttributeChip,
   TableGroupHeader,
   TableHeader,
+  PanelCard,
 } from "@/components/common";
 
 /**
@@ -58,6 +74,7 @@ import {
 export default Vue.extend({
   name: "TraceMatrixTable",
   components: {
+    PanelCard,
     TableHeader,
     TableGroupHeader,
     AttributeChip,
@@ -98,6 +115,12 @@ export default Vue.extend({
             .reduce((acc, cur) => ({ ...acc, ...cur }), {}),
         };
       });
+    },
+    /**
+     * @return The ids of artifact columns.
+     */
+    artifactColumns(): string[] {
+      return artifactStore.currentArtifacts.map(({ id }) => id);
     },
     /**
      * @return All columns to render.

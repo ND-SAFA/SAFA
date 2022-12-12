@@ -1,118 +1,124 @@
 <template>
-  <v-data-table
-    single-expand
-    show-expand
-    :headers="headers"
-    :items="jobs"
-    :expanded="expanded"
-    :loading="isLoading"
-    data-cy="job-table"
-    @click:row="handleView($event)"
-  >
-    <template v-slot:[`item.name`]="{ item }">
-      <typography bold :value="item.name" />
-    </template>
-    <template v-slot:[`item.currentProgress`]="{ item }">
-      <v-row v-if="isCancelled(item.status)" no-gutters>
-        <v-col cols="4">
-          <typography secondary value="Cancelled" />
-        </v-col>
-        <v-col cols="4">
-          <typography secondary :value="getUpdatedText(item.lastUpdatedAt)" />
-        </v-col>
-      </v-row>
-      <typography
-        v-else-if="isCompleted(item.status)"
-        secondary
-        :value="getCompletedText(item.completedAt)"
-      />
-      <v-row v-else no-gutters>
-        <v-col cols="4">
-          <typography
-            secondary
-            :value="`Upload Progress: ${item.currentProgress}%`"
-          />
-        </v-col>
-        <v-col cols="4">
-          <typography secondary :value="getUpdatedText(item.lastUpdatedAt)" />
-        </v-col>
-      </v-row>
-    </template>
-    <template v-slot:[`item.status`]="{ item }">
-      <v-chip
-        outlined
-        :color="getStatusColor(item.status)"
-        data-cy="job-status"
-      >
-        <v-progress-circular
-          v-if="isInProgress(item.status)"
-          :color="getStatusColor(item.status)"
-          indeterminate
-          size="16"
-          class="mx-1"
+  <panel-card>
+    <v-data-table
+      single-expand
+      show-expand
+      :headers="headers"
+      :items="jobs"
+      :expanded="expanded"
+      :loading="isLoading"
+      data-cy="job-table"
+      @click:row="handleView($event)"
+    >
+      <template v-slot:[`item.name`]="{ item }">
+        <typography bold :value="item.name" />
+      </template>
+      <template v-slot:[`item.currentProgress`]="{ item }">
+        <v-row v-if="isCancelled(item.status)" no-gutters>
+          <v-col cols="4">
+            <typography secondary value="Cancelled" />
+          </v-col>
+          <v-col cols="4">
+            <typography secondary :value="getUpdatedText(item.lastUpdatedAt)" />
+          </v-col>
+        </v-row>
+        <typography
+          v-else-if="isCompleted(item.status)"
+          secondary
+          :value="getCompletedText(item.completedAt)"
         />
-        <v-icon
-          v-if="isCompleted(item.status)"
+        <v-row v-else no-gutters>
+          <v-col cols="4">
+            <typography
+              secondary
+              :value="`Upload Progress: ${item.currentProgress}%`"
+            />
+          </v-col>
+          <v-col cols="4">
+            <typography secondary :value="getUpdatedText(item.lastUpdatedAt)" />
+          </v-col>
+        </v-row>
+      </template>
+      <template v-slot:[`item.status`]="{ item }">
+        <v-chip
+          outlined
           :color="getStatusColor(item.status)"
+          data-cy="job-status"
         >
-          mdi-check-circle-outline
-        </v-icon>
-        <v-icon
-          v-if="isCancelled(item.status)"
-          :color="getStatusColor(item.status)"
-        >
-          mdi-close-circle-outline
-        </v-icon>
-        <span class="ml-1">
-          {{ formatStatus(item.status) }}
-        </span>
-      </v-chip>
-    </template>
-    <template v-slot:expanded-item="{ headers, item }">
-      <td :colspan="headers.length">
-        <v-container>
-          <v-stepper alt-labels class="elevation-0" v-model="item.currentStep">
-            <v-stepper-header>
-              <template v-for="(step, stepIndex) in item.steps">
-                <v-stepper-step :key="stepIndex" :step="stepIndex">
-                  <typography
-                    class="upload-step"
-                    align="center"
-                    el="p"
-                    :value="item.steps[stepIndex]"
+          <v-progress-circular
+            v-if="isInProgress(item.status)"
+            :color="getStatusColor(item.status)"
+            indeterminate
+            size="16"
+            class="mx-1"
+          />
+          <v-icon
+            v-if="isCompleted(item.status)"
+            :color="getStatusColor(item.status)"
+          >
+            mdi-check-circle-outline
+          </v-icon>
+          <v-icon
+            v-if="isCancelled(item.status)"
+            :color="getStatusColor(item.status)"
+          >
+            mdi-close-circle-outline
+          </v-icon>
+          <span class="ml-1">
+            {{ formatStatus(item.status) }}
+          </span>
+        </v-chip>
+      </template>
+      <template v-slot:expanded-item="{ headers, item }">
+        <td :colspan="headers.length">
+          <v-container>
+            <v-stepper
+              alt-labels
+              class="elevation-0"
+              v-model="item.currentStep"
+            >
+              <v-stepper-header>
+                <template v-for="(step, stepIndex) in item.steps">
+                  <v-stepper-step :key="stepIndex" :step="stepIndex">
+                    <typography
+                      class="upload-step"
+                      align="center"
+                      el="p"
+                      :value="item.steps[stepIndex]"
+                    />
+                  </v-stepper-step>
+                  <v-divider
+                    :key="step"
+                    v-if="stepIndex < item.steps.length - 1"
                   />
-                </v-stepper-step>
-                <v-divider
-                  :key="step"
-                  v-if="stepIndex < item.steps.length - 1"
-                />
-              </template>
-            </v-stepper-header>
-          </v-stepper>
+                </template>
+              </v-stepper-header>
+            </v-stepper>
 
-          <flex-box full-width justify="end">
-            <v-btn
-              outlined
-              color="error"
-              class="mr-1"
-              data-cy="button-delete-job"
-              @click="handleDeleteJob(item)"
-            >
-              Delete Upload
-            </v-btn>
-            <v-btn
-              color="primary"
-              :disabled="!isCompleted(item.status)"
-              data-cy="button-open-job"
-              @click="handleViewProject(item)"
-            >
-              View Project
-            </v-btn>
-          </flex-box>
-        </v-container>
-      </td>
-    </template>
-  </v-data-table>
+            <flex-box full-width justify="end">
+              <v-btn
+                outlined
+                color="error"
+                class="mr-1"
+                data-cy="button-delete-job"
+                @click="handleDeleteJob(item)"
+              >
+                Delete Upload
+              </v-btn>
+              <v-btn
+                color="primary"
+                :disabled="!isCompleted(item.status)"
+                data-cy="button-open-job"
+                @click="handleViewProject(item)"
+              >
+                View Project
+              </v-btn>
+            </flex-box>
+          </v-container>
+        </td>
+      </template>
+    </v-data-table>
+  </panel-card>
 </template>
 
 <script lang="ts">
@@ -121,14 +127,14 @@ import { JobSchema, JobStatus } from "@/types";
 import { enumToDisplay, getJobStatusColor, timestampToDisplay } from "@/util";
 import { appStore, jobStore, logStore } from "@/hooks";
 import { handleDeleteJob, handleLoadVersion, handleReloadJobs } from "@/api";
-import { Typography, FlexBox } from "@/components/common";
+import { Typography, FlexBox, PanelCard } from "@/components/common";
 
 /**
  * Renders a list of jobs.
  */
 export default Vue.extend({
   name: "JobTable",
-  components: { Typography, FlexBox },
+  components: { PanelCard, Typography, FlexBox },
   props: {},
   data() {
     return {

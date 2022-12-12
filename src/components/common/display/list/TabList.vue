@@ -1,8 +1,8 @@
 <template>
   <div>
     <v-lazy>
-      <v-tabs v-model="model">
-        <v-tab v-for="{ name } in tabs" :key="name">
+      <v-tabs v-model="model" class="width-fit">
+        <v-tab v-for="{ name } in tabs" :key="name" class="primary lighten-5">
           <typography :value="name" />
         </v-tab>
       </v-tabs>

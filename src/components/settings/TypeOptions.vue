@@ -1,29 +1,27 @@
 <template>
-  <v-container style="max-width: 50em">
-    <panel-card>
-      <typography el="h2" variant="subtitle" value="Type Options" />
-      <v-divider class="mb-2" />
+  <panel-card>
+    <typography el="h2" variant="subtitle" value="Type Options" />
+    <v-divider class="mb-2" />
 
-      <v-list expand>
-        <toggle-list
-          v-for="entry in typeDirections"
-          :key="entry.type"
-          :icon="entry.icon"
-          data-cy="list-type-options"
-        >
-          <template v-slot:activator>
-            <typography :value="entry.label" ellipsis />
-          </template>
-          <v-card outlined class="my-2">
-            <v-container>
-              <type-direction-input :entry="entry" />
-              <type-icon-input :entry="entry" />
-            </v-container>
-          </v-card>
-        </toggle-list>
-      </v-list>
-    </panel-card>
-  </v-container>
+    <v-list expand>
+      <toggle-list
+        v-for="entry in typeDirections"
+        :key="entry.type"
+        :icon="entry.icon"
+        data-cy="list-type-options"
+      >
+        <template v-slot:activator>
+          <typography :value="entry.label" ellipsis />
+        </template>
+        <v-card outlined class="my-2">
+          <v-container>
+            <type-direction-input :entry="entry" />
+            <type-icon-input :entry="entry" />
+          </v-container>
+        </v-card>
+      </toggle-list>
+    </v-list>
+  </panel-card>
 </template>
 
 <script lang="ts">

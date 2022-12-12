@@ -28,6 +28,7 @@ if __name__ == "__main__":
     parser.add_argument('data')
     parser.add_argument('output')
     parser.add_argument('-model', default='robert-base')
+    parser.add_argument('-epochs', default=5, type=int)
     args = parser.parse_args()
     #
     # Job Data Creation
@@ -37,7 +38,12 @@ if __name__ == "__main__":
         "modelPath": "roberta-base",
         "trainingDataDir": args.data,
         "outputDir": args.output,
-        "saveJobOutput": True
+        "saveJobOutput": True,
+        "params": {
+            "trace_args_params": {
+                "num_train_epochs": args.epochs
+            }
+        }
     }
     #
     # Run Job

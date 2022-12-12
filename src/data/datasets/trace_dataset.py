@@ -90,7 +90,7 @@ class TraceDataset(AbstractDataset):
         augmenter = DataAugmenter(augmentation_steps)
         augmentation_runs = [lambda data: augmenter.run(data, n_total_expected=2 * len(data),
                                                         exclude_all_but_step_type=SourceTargetSwapStep),
-                             lambda data: augmenter.run(data, n_total_expected=len(self.neg_link_ids) * 2,
+                             lambda data: augmenter.run(data, n_total_expected=len(self.neg_link_ids) * 3,
                                                         include_all_but_step_type=SourceTargetSwapStep)]
         print("Orig negative:", len(self.neg_link_ids))
         for run in augmentation_runs:

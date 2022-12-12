@@ -68,16 +68,7 @@ if __name__ == "__main__":
                 "creator": "SOURCE_TARGET_SWAP",
             },
             {
-                "creator": "RESAMPLE",
-                "params": {
-                    "resample_rate": 1
-                }
-            },
-            {
-                "creator": "RESAMPLE",
-                "params": {
-                    "resample_rate": 1
-                }
+                "creator": "RESAMPLE"
             },
             {
                 "creator": "SIMPLE_WORD_REPLACEMENT"

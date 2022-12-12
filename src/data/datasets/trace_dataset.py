@@ -90,14 +90,11 @@ class TraceDataset(AbstractDataset):
         augmenter = DataAugmenter(augmentation_steps)
         augmentation_runs = [lambda data: augmenter.run(data, n_total_expected=2 * len(data),
                                                         exclude_all_but_step_type=SourceTargetSwapStep),
-                             lambda data: augmenter.run(data, n_total_expected=len(self.neg_link_ids) * 3,
+                             lambda data: augmenter.run(data, n_total_expected=len(self.neg_link_ids),
                                                         include_all_but_step_type=SourceTargetSwapStep)]
-        print("Orig negative:", len(self.neg_link_ids))
         for run in augmentation_runs:
             pos_links, data_entries = self._get_data_entries_for_augmentation()
             augmentation_results = run(data_entries)
-            print("Orig:", len(data_entries))
-            print("Aug:", augmentation_results)
             self._create_links_from_augmentation(augmentation_results, pos_links)
 
     def get_source_target_pairs(self) -> List[Tuple]:
@@ -136,10 +133,7 @@ class TraceDataset(AbstractDataset):
         if len(self.pos_link_ids) > 0:
             if augmentation_steps:
                 self.augment_pos_links(augmentation_steps)
-            print("Orig neg:", len(self.neg_link_ids))
             self.resize_neg_links(len(self.pos_link_ids), include_duplicates=True)
-            print("# Pos:", len(self.pos_link_ids))
-            print("# Neg:", len(self.neg_link_ids))
 
     def prepare_for_testing(self) -> None:
         """
@@ -222,6 +216,7 @@ class TraceDataset(AbstractDataset):
                 aug_source_tokens, aug_target_tokens = entry
                 self.add_link(source_id=aug_source_id, target_id=aug_target_id,
                               source_tokens=aug_source_tokens, target_tokens=aug_target_tokens, is_true_link=True)
+            print(step_id, ":", i)
 
     def _get_augmented_artifact_ids(self, augmented_tokens: Tuple[str, str], orig_link: TraceLink, aug_step_id: str,
                                     entry_num: int) \

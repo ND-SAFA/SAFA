@@ -2,9 +2,9 @@ from django.http import HttpRequest
 from django.views.decorators.csrf import csrf_exempt
 from drf_yasg.utils import swagger_auto_schema
 
-from jobs.mlm_pre_train_job import MLMPreTrainJob
 from jobs.components.job_result import JobResult
-from server.serializers.job_factory.pre_training_request_serializer import PreTrainingRequestSerializer
+from jobs.mlm_pre_train_job import MLMPreTrainJob
+from server.serializers.job_factory.training_request_serializer import TrainingRequestSerializer
 from server.views.abstract_trace_view import AbstractTraceView
 
 
@@ -14,7 +14,7 @@ class PreTrainView(AbstractTraceView):
     """
 
     responses = AbstractTraceView.get_responses([JobResult.MODEL_PATH, JobResult.STATUS, JobResult.EXCEPTION])
-    serializer = PreTrainingRequestSerializer
+    serializer = TrainingRequestSerializer
 
     def __init__(self, **kwargs):
         super().__init__(self.serializer, MLMPreTrainJob, **kwargs)

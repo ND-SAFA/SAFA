@@ -29,7 +29,7 @@ class BaseScript:
         self.serializer = serializer
         self.job = job
         self.application = get_wsgi_application()
-        print("# of gpus: ", tf.config.list_physical_devices('GPU'))
+        print("GPUS : ", tf.config.list_physical_devices('GPU'))
 
     def run(self, data: Dict, path_vars=None):
         """

@@ -25,8 +25,9 @@ class SerializerUtility:
         """
         container_kwargs = {}
         for dataset_param, container_param in dataset_params:
-            dataset_creator: AbstractDatasetCreator = kwargs.pop(dataset_param)
-            container_kwargs[container_param] = dataset_creator
+            if dataset_param in kwargs:
+                dataset_creator: AbstractDatasetCreator = kwargs.pop(dataset_param)
+                container_kwargs[container_param] = dataset_creator
         trainer_datasets_container = TrainerDatasetsContainer(**container_kwargs, **addition_kwargs)
         kwargs[export_param] = trainer_datasets_container
 

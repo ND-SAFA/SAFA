@@ -1,7 +1,7 @@
 import random
 import uuid
 from abc import ABC, abstractmethod
-from typing import List, Iterable, Tuple, Any
+from typing import Any, Iterable, List, Tuple
 
 from config.override import overrides
 from data.processing.abstract_data_processing_step import AbstractDataProcessingStep, ProcessingOrder
@@ -56,7 +56,8 @@ class AbstractDataAugmentationStep(AbstractDataProcessingStep, ABC):
         return AbstractDataAugmentationStep.COMMON_ID + cls._unique_step_id()
 
     @staticmethod
-    def _add_augmented_data(augmented_data: Any, index_reference: int, augmented_data_entries: List, index_references: List) -> None:
+    def _add_augmented_data(augmented_data: Any, index_reference: int, augmented_data_entries: List,
+                            index_references: List) -> None:
         """
         Adds the augmented data to the appropriate lists
         :param augmented_data: the augmented data

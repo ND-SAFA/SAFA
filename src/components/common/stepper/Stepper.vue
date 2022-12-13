@@ -2,11 +2,11 @@
   <v-card
     :outlined="!minimal"
     :style="minimal ? 'box-shadow: none' : ''"
-    class="primary-border"
+    :class="minimal ? '' : 'primary-border'"
   >
     <v-stepper
       v-model="currentStep"
-      class="full-width"
+      class="full-width transparent-bg"
       :alt-labels="!minimal"
       :elevation="minimal ? 0 : 1"
     >

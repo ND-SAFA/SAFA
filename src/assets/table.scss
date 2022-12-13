@@ -1,11 +1,9 @@
-$color-selected: #EEEEEE;
-
 .artifact-view,
 .trace-link-table,
 .model-table,
 .job-table {
   .artifact-row-selected {
-    background-color: $color-selected;
+    background-color: var(--v-selected-base);
   }
 
   .v-data-table__expanded__content {

@@ -11,6 +11,7 @@
       <v-divider class="mb-4" />
       <v-row>
         <v-col cols="6">
+          <theme-controller />
           <update-password />
           <delete-account />
         </v-col>
@@ -31,6 +32,7 @@ import ExternalLinks from "./ExternalLinks.vue";
 import IntegrationsAccounts from "./IntegrationsAccounts.vue";
 import DeleteAccount from "./DeleteAccount.vue";
 import UpdatePassword from "./UpdatePassword.vue";
+import ThemeController from "./ThemeController.vue";
 
 /**
  * Displays information on the current user.
@@ -38,6 +40,7 @@ import UpdatePassword from "./UpdatePassword.vue";
 export default Vue.extend({
   name: "MyAccount",
   components: {
+    ThemeController,
     ExternalLinks,
     IntegrationsAccounts,
     FlexBox,

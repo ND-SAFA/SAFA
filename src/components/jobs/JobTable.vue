@@ -75,6 +75,7 @@
             <v-stepper
               alt-labels
               class="elevation-0"
+              style="background-color: transparent"
               v-model="item.currentStep"
             >
               <v-stepper-header>

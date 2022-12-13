@@ -74,3 +74,7 @@ export enum ConfirmationType {
  * General type for representing an empty callback
  */
 export type EmptyLambda = () => void;
+
+export enum LocalStorageKeys {
+  darkMode = "dark",
+}

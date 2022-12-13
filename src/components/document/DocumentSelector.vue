@@ -10,7 +10,7 @@
     hide-details
     dark
     style="max-width: 200px"
-    class="mx-1"
+    class="mx-1 nav-input"
     item-text="name"
     data-cy="button-document-select-open"
   >

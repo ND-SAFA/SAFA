@@ -1,7 +1,10 @@
 <template>
-  <v-alert dense border="left" color="primary">
-    <typography color="white" value="The format of files can be found here:" />
-    <v-btn text link color="white" @click="handleOpenWiki">SAFA WIKI</v-btn>
+  <v-alert outlined dense border="left" color="primary">
+    <typography
+      color="primary"
+      value="The format of files can be found here:"
+    />
+    <v-btn text link color="primary" @click="handleOpenWiki">SAFA WIKI</v-btn>
   </v-alert>
 </template>
 

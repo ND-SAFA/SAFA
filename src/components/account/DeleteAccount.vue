@@ -1,5 +1,5 @@
 <template>
-  <panel-card style="width: 30em" color="error">
+  <panel-card color="error">
     <typography
       variant="subtitle"
       el="h2"

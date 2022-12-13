@@ -13,7 +13,7 @@
       :search-input.sync="queryText"
       item-text="name"
       item-value="id"
-      class="mx-1 mt-1 primary lighten-1"
+      class="mx-1 mt-1 primary lighten-1 nav-input"
       :filter="filterArtifacts"
       data-cy="input-artifact-search-nav"
     >

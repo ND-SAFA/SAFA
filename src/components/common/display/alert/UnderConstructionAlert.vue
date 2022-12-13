@@ -1,7 +1,6 @@
 <template>
-  <v-alert border="left" color="warning" class="mt-2">
+  <v-alert outlined border="left" color="warning" class="mt-2">
     <typography
-      color="white"
       value="This content is still under construction. Check back soon!"
     />
   </v-alert>

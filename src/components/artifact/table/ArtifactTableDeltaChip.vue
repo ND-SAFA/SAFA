@@ -43,7 +43,7 @@ export default Vue.extend({
      * @return The color to display for this chip.
      */
     color(): string {
-      return getBackgroundColor(this.deltaState);
+      return getBackgroundColor(this.deltaState, this.$vuetify.theme.dark);
     },
   },
 });

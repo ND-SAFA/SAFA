@@ -15,7 +15,12 @@ export enum ThemeColors {
   grey = "#DDDDDD",
   darkGrey = "#969696", // Borders
 
-  background = "#F0F5FF",
+  textLight = "#36405A",
+  textDark = "#FFF",
+  backgroundLight = "#F0F5FF",
+  backgroundDark = "#333",
+  selectedLight = "#EEE",
+  selectedDark = "#EEE",
 
   added = "#00AD69", // Text
   addedLight = "#6CD8A9", // Backgrounds
@@ -37,10 +42,12 @@ export enum ThemeColors {
 /**
  * Returns the background color for the given state.
  * @param state - The state to get the color for.
+ * @param dark - Whether the app is in dark mode.
  * @return The color.
  */
 export function getBackgroundColor(
-  state?: ArtifactDeltaState | ApprovalType | string
+  state: ArtifactDeltaState | ApprovalType | string,
+  dark: boolean
 ): string {
   switch (state) {
     case ApprovalType.APPROVED:
@@ -56,7 +63,7 @@ export function getBackgroundColor(
     case ArtifactDeltaState.REMOVED:
       return ThemeColors.removedLight;
     default:
-      return ThemeColors.lightGrey;
+      return dark ? ThemeColors.backgroundDark : ThemeColors.backgroundLight;
   }
 }
 
@@ -74,7 +81,7 @@ export function getBorderColor(state?: ArtifactDeltaState | string): string {
     case ArtifactDeltaState.REMOVED:
       return ThemeColors.removedDark;
     default:
-      return ThemeColors.darkGrey;
+      return ThemeColors.modifiedLight;
   }
 }
 

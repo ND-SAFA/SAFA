@@ -66,6 +66,11 @@ export interface ArtifactData extends CytoCoreElementData {
    * Any warnings in child elements.
    */
   childWarnings?: WarningSchema[];
+
+  /**
+   * Whether the app is running in dark mode.
+   */
+  dark: boolean;
 }
 
 /**

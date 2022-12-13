@@ -1,5 +1,5 @@
 import { ArtifactData, SvgStyle } from "@/types";
-import { ThemeColors } from "@/util";
+import { getBackgroundColor, getBorderColor, ThemeColors } from "@/util";
 import { ARTIFACT_BORDER_WIDTH, ARTIFACT_CHILDREN_HEIGHT } from "@/cytoscape";
 import { svgIcon, svgText } from "./svg-text";
 import { svgStoplight } from "./node-stoplight";
@@ -24,6 +24,12 @@ export function svgFooter(
   const warningCount = getWarnings(data);
   const hasWarnings = warningCount > 0;
   const hasChildren = (data.hiddenChildren || 0) > 0;
+  const backgroundColor = hasWarnings
+    ? ThemeColors.warningLight
+    : getBackgroundColor(data.artifactDeltaState, data.dark);
+  const borderColor = hasWarnings
+    ? ThemeColors.warningDark
+    : getBorderColor(data.artifactDeltaState);
 
   if (!hasChildren && !hasWarnings && data.childDeltaStates?.length === 0) {
     return "";
@@ -36,7 +42,7 @@ export function svgFooter(
       rx="8" 
       width="${outerStyle.width}" 
       height="${ARTIFACT_CHILDREN_HEIGHT}"
-      fill="${hasWarnings ? ThemeColors.warningDark : ThemeColors.darkGrey}"
+      fill="${borderColor}"
       class="artifact-border"
     />
     <rect
@@ -45,7 +51,7 @@ export function svgFooter(
       rx="7" 
       width="${outerStyle.width - ARTIFACT_BORDER_WIDTH * 2}" 
       height="${ARTIFACT_CHILDREN_HEIGHT - ARTIFACT_BORDER_WIDTH * 2}"
-      fill="${hasWarnings ? ThemeColors.warningLight : ThemeColors.lightGrey}"
+      fill="${backgroundColor}"
       class="artifact-svg"
     />
     ${svgChildren(data.hiddenChildren || 0, hasWarnings, textY)}

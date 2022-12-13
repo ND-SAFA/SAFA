@@ -47,7 +47,7 @@ function svgGoal(data: ArtifactData): string {
     svgRect(
       outer,
       getBorderColor(data.artifactDeltaState),
-      getBackgroundColor(data.artifactDeltaState)
+      getBackgroundColor(data.artifactDeltaState, data.dark)
     )
   );
 }
@@ -74,7 +74,7 @@ function svgSolution(data: ArtifactData): string {
     svgCircle(
       radius,
       getBorderColor(data.artifactDeltaState),
-      getBackgroundColor(data.artifactDeltaState)
+      getBackgroundColor(data.artifactDeltaState, data.dark)
     )
   );
 }
@@ -103,7 +103,7 @@ function svgStrategy(data: ArtifactData): string {
       { width: outerWidth, height: outerHeight },
       xOffset,
       getBorderColor(data.artifactDeltaState),
-      getBackgroundColor(data.artifactDeltaState)
+      getBackgroundColor(data.artifactDeltaState, data.dark)
     )
   );
 }

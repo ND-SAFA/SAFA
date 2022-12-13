@@ -30,11 +30,9 @@
     <template v-slot:selection="{ item, index }">
       <v-chip
         v-if="index < 3"
-        outlined
         close
         small
-        class="primary-border"
-        style="background-color: white !important"
+        class="primary-border neutral-bg"
         @click:close="handleDelete(item)"
       >
         <typography :value="item.name" />

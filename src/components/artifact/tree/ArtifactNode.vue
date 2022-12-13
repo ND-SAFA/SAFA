@@ -77,6 +77,7 @@ export default Vue.extend({
           childDeltaStates: hiddenChildDeltaStates,
           safetyCaseType,
           logicType,
+          dark: this.$vuetify.theme.dark,
         },
       };
     },

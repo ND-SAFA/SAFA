@@ -117,7 +117,8 @@ export default Vue.extend({
       let classNames = ` text-${this.align}`;
 
       if (this.classes) classNames += ` ${this.classes}`;
-      if (this.color) classNames += ` ${this.color}--text`;
+      if (this.color && !this.$vuetify.theme.dark)
+        classNames += ` ${this.color}--text`;
       if (this.inheritColor) classNames += ` inherit-color`;
       if (this.error) classNames += ` error--text`;
       if (this.ellipsis) classNames += ` text-ellipsis`;

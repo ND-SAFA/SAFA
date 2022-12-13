@@ -1,5 +1,5 @@
 <template>
-  <panel-card class="mb-2" style="width: 30em">
+  <panel-card>
     <typography variant="subtitle" el="h2" value="Update Password" />
     <v-divider class="mb-2" />
     <typography

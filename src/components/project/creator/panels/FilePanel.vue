@@ -1,5 +1,5 @@
 <template>
-  <v-expansion-panel data-cy="panel-files">
+  <v-expansion-panel data-cy="panel-files" class="primary-border">
     <v-expansion-panel-header>
       <flex-box align="center">
         <v-progress-circular indeterminate v-if="isLoading" class="mr-2" />

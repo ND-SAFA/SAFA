@@ -2,7 +2,7 @@
   <div>
     <v-card
       outlined
-      class="my-2 pa-2"
+      class="my-2 pa-2 primary-border"
       v-for="(matrix, idx) in model"
       :key="idx"
     >

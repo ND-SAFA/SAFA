@@ -11,11 +11,10 @@
         v-bind="attrs"
         small
         style="max-width: 200px"
-        class="mr-1 primary-border"
+        class="mr-1 primary-border neutral-bg"
         :outlined="outlined"
         :color="displayColor"
         :data-cy="dataCy"
-        :style="artifactType ? 'background-color: white !important' : ''"
       >
         <v-icon v-if="iconId" small :color="artifactType ? 'primary' : ''">
           {{ iconId }}
@@ -25,7 +24,6 @@
           inherit-color
           :l="iconId ? '1' : '0'"
           :value="text"
-          :color="artifactType ? 'primary' : ''"
         />
       </v-chip>
     </template>
@@ -112,14 +110,14 @@ export default Vue.extend({
       } else if (this.artifactType) {
         return "";
       } else {
-        return getBackgroundColor(this.value || "");
+        return getBackgroundColor(this.value || "", this.$vuetify.theme.dark);
       }
     },
     /**
      * @return Whether the chip is outlined.
      */
     outlined(): boolean {
-      return this.enumerated || this.confidenceScore || this.artifactType;
+      return this.enumerated || this.confidenceScore;
     },
     /**
      * @return Thee current progress %.

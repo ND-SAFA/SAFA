@@ -5,15 +5,21 @@ $color-warning: #F5B53F;
 $color-added: #6CD8A9;
 $color-removed: #E27171;
 $color-modified: #8DA5D3;
-$color-selected: #EEEEEE;
-$color-border: #969696;
-$color-text: #969696;
+
 $color-text-light: #FFD592;
 
 .primary-border {
-  border-color: $color-modified !important;
+  border: 1px solid var(--v-modifiedLight-base) !important;
 }
 
 .error-border {
-  border-color: $color-removed !important;
+  border-color: var(--v-removedLight-base) !important;
+}
+
+.transparent-bg {
+  background-color: transparent !important;
+}
+
+.neutral-bg {
+  background-color: var(--v-neutral-base) !important;
 }

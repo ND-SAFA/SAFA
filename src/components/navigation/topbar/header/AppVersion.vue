@@ -19,6 +19,7 @@
       :items="versions"
       item-value="versionId"
       style="width: 100px"
+      class="nav-input"
       @input="handleLoadVersion"
     >
       <template v-slot:selection>

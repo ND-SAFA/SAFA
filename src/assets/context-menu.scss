@@ -1,5 +1,3 @@
-$color-border: #969696;
-$color-selected: #EEEEEE;
 $graph-border-radius: 8px;
 
 .cy-context-menus-cxt-menu {
@@ -10,28 +8,24 @@ $graph-border-radius: 8px;
   margin: 0;
   width: fit-content;
   border-radius: $graph-border-radius;
-  border: 1px solid $color-border;
-  background-color: #f8f8f8;
+  border: 1px solid var(--v-modifiedLight-base);
+  background-color: var(--v-background-base);
   height: fit-content;
 
   > button:hover {
     color: black;
-    background-color: $color-selected;
-  }
-
-  > .cy-context-menus-divider {
-    border-bottom: 1px solid lighten($color-border, 30);
+    background-color: var(--v-selected-base);
   }
 
   > .cy-context-menus-cxt-menuitem {
     display: block;
-    background-color: #f8f8f8;
+    background-color: var(--v-background-base);
     width: 100%;
     padding: 3px 20px;
     font-size: 12px;
     white-space: nowrap;
     text-align: left;
-    color: black;
+    color: var(--v-text-base);
     border-radius: $graph-border-radius;
   }
 

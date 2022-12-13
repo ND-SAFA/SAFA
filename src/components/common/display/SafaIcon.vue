@@ -1,6 +1,14 @@
 <template>
   <img
-    :src="pathToLogo"
+    v-if="!this.$vuetify.theme.dark"
+    src="@/assets/SAFA-primary.svg"
+    alt="SAFA"
+    class="full-width"
+    @click="$emit('click')"
+  />
+  <img
+    v-else
+    src="@/assets/SAFA-secondary.svg"
     alt="SAFA"
     class="full-width"
     @click="$emit('click')"
@@ -15,12 +23,5 @@ import Vue from "vue";
  */
 export default Vue.extend({
   name: "SafaIcon",
-  data() {
-    return {
-      pathToLogo: this.$vuetify.theme.dark
-        ? require("@/assets/SAFA-secondary.svg")
-        : require("@/assets/SAFA-primary.svg"),
-    };
-  },
 });
 </script>

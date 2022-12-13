@@ -13,7 +13,7 @@
         </v-btn>
       </v-card-actions>
     </panel-card>
-    <flex-box justify="center" y="2">
+    <flex-box justify="center" b="4">
       <v-icon large style="transform: rotate(270deg)">
         mdi-ray-start-arrow
       </v-icon>

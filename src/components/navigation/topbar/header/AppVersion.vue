@@ -3,7 +3,7 @@
     <typography
       el="h1"
       variant="subtitle"
-      color="accent"
+      color="white"
       style="white-space: nowrap"
       :value="projectName"
       x="4"

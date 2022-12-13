@@ -1,11 +1,11 @@
 .nav-input {
   fieldset, i {
-    color: fade-out($color-text-light, 0.5) !important;
+    color: fade-out($color-accent, 0.5) !important;
   }
 
   &:hover {
     fieldset, div, label, i {
-      color: $color-text-light !important;
+      color: $color-accent !important;
     }
   }
 }

@@ -20,7 +20,7 @@
         </v-badge>
       </v-btn>
     </template>
-    <div class="white pa-2">
+    <div class="neutral-bg pa-2">
       <typography
         v-if="notifications.length === 0"
         secondary

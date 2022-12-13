@@ -34,7 +34,7 @@ export default new Vuetify({
       },
       dark: {
         primary: {
-          base: ThemeColors.primary,
+          base: ThemeColors.primaryDark,
           lighten5: ThemeColors.backgroundDark,
         },
         secondary: ThemeColors.secondary,

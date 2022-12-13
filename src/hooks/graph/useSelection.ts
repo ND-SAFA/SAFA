@@ -132,7 +132,9 @@ export const useSelection = defineStore("selection", {
      */
     selectArtifact(artifactId: string): void {
       this.selectedArtifactId = artifactId;
+      this.selectedTraceLinkId = "";
       this.centerOnArtifacts([artifactId]);
+      this.selectedSubtreeIds = [];
       appStore.openDetailsPanel("displayArtifact");
     },
     /**
@@ -141,8 +143,10 @@ export const useSelection = defineStore("selection", {
      * @param traceLink - The trace link to select.
      */
     selectTraceLink(traceLink: TraceLinkSchema): void {
+      this.selectedArtifactId = "";
       this.selectedTraceLinkId = traceLink.traceLinkId;
       this.selectedSubtreeIds = [traceLink.sourceId, traceLink.targetId];
+      this.centerOnArtifacts([traceLink.sourceId, traceLink.targetId]);
       appStore.openDetailsPanel("displayTrace");
     },
     /**

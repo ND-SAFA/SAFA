@@ -26,7 +26,7 @@ import Vue from "vue";
 import { ButtonDefinition, ButtonType } from "@/types";
 import { artifactStore, documentStore, selectionStore } from "@/hooks";
 import { handleRegenerateLayout } from "@/api";
-import { cyZoomIn, cyZoomOut } from "@/cytoscape";
+import { cyCenterNodes, cyZoomIn, cyZoomOut } from "@/cytoscape";
 import { IconButton, CheckmarkMenu, FlexBox } from "@/components/common";
 
 export default Vue.extend({
@@ -73,12 +73,7 @@ export default Vue.extend({
         },
         {
           type: ButtonType.ICON,
-          handler: () => {
-            selectionStore.filterGraph({
-              type: "subtree",
-              artifactsInSubtree: [],
-            });
-          },
+          handler: () => cyCenterNodes(true),
           label: "Center Graph",
           icon: "mdi-graphql",
           dataCy: "button-nav-graph-center",

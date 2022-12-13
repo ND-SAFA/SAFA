@@ -58,7 +58,7 @@ export default Vue.extend({
         warningStore.getArtifactWarnings(hiddenChildren);
       const hiddenChildDeltaStates =
         deltaStore.getArtifactDeltaStates(hiddenChildren);
-      const opacity = this.hidden ? 0 : this.faded ? 0.1 : 1;
+      const opacity = this.hidden ? 0 : this.faded ? 0.3 : 1;
 
       return {
         data: {

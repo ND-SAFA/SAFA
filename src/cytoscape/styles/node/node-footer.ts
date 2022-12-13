@@ -24,9 +24,10 @@ export function svgFooter(
   const warningCount = getWarnings(data);
   const hasWarnings = warningCount > 0;
   const hasChildren = (data.hiddenChildren || 0) > 0;
-  const backgroundColor = hasWarnings
-    ? ThemeColors.warningLight
-    : getBackgroundColor(data.artifactDeltaState, data.dark);
+  const backgroundColor =
+    hasWarnings && !data.dark
+      ? ThemeColors.warningLight
+      : getBackgroundColor(data.artifactDeltaState, data.dark);
   const borderColor = hasWarnings
     ? ThemeColors.warningDark
     : getBorderColor(data.artifactDeltaState);

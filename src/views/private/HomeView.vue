@@ -12,7 +12,7 @@
         <v-col cols="6">
           <panel-card>
             <v-card-title>
-              <v-icon large :color="iconColor"> mdi-view-list </v-icon>
+              <v-icon large color="primary"> mdi-view-list </v-icon>
               <typography
                 el="h2"
                 l="2"
@@ -35,9 +35,7 @@
         <v-col cols="6">
           <panel-card>
             <v-card-title>
-              <v-icon large :color="iconColor">
-                mdi-folder-plus-outline
-              </v-icon>
+              <v-icon large color="primary"> mdi-folder-plus-outline </v-icon>
               <typography
                 el="h2"
                 l="2"
@@ -78,7 +76,6 @@
 <script lang="ts">
 import Vue from "vue";
 import { CreatorTabTypes } from "@/types";
-import { ThemeColors } from "@/util";
 import { navigateTo, QueryParams, Routes } from "@/router";
 import {
   PrivatePage,
@@ -97,11 +94,6 @@ export default Vue.extend({
     PrivatePage,
     ProjectVersionList,
     Typography,
-  },
-  data() {
-    return {
-      iconColor: ThemeColors.primary,
-    };
   },
   methods: {
     handleOpenStandard() {

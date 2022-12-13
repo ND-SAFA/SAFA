@@ -7,12 +7,12 @@
     class="elevation-1"
   >
     <flex-box v-if="sidebarOpen" full-width justify="center" t="3" b="3">
-      <safa-icon variant="primary" style="width: 180px" />
+      <safa-icon style="width: 180px" />
       <icon-button
         large
         icon-id="mdi-menu-open"
         tooltip="Close sidebar"
-        color="primary"
+        :color="$vuetify.theme.dark ? 'secondary' : 'primary'"
         data-cy="button-sidebar-close"
         @click="sidebarOpen = false"
       />

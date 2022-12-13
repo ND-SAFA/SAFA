@@ -1,5 +1,5 @@
 <template>
-  <v-app-bar app clipped-right color="primary">
+  <v-app-bar app clipped-right :color="$vuetify.theme.dark ? '' : 'primary'">
     <header-bar />
     <template v-slot:extension v-if="graphVisible">
       <graph-bar />

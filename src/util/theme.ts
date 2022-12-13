@@ -5,6 +5,7 @@ import { ApprovalType, ArtifactDeltaState, JobStatus } from "@/types";
  */
 export enum ThemeColors {
   primary = "#5975B8",
+  primaryDark = "#729FCF",
   secondary = "#F5B53F",
   accent = "#FFD592",
   error = "#E11F26",

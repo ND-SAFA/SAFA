@@ -76,6 +76,7 @@
 
 <script lang="ts">
 import Vue from "vue";
+import { DataTableHeader } from "vuetify";
 import { ArtifactDeltaState, FlatArtifact, AttributeSchema } from "@/types";
 import {
   artifactStore,
@@ -130,8 +131,12 @@ export default Vue.extend({
     /**
      * @return The artifact table's headers.
      */
-    headers() {
+    headers(): Partial<DataTableHeader>[] {
       return [
+        {
+          value: "data-table-select",
+          groupable: false,
+        },
         {
           text: "Name",
           value: "name",
@@ -168,10 +173,6 @@ export default Vue.extend({
           width: "150px",
           groupable: false,
         },
-        {
-          value: "data-table-expand",
-          groupable: false,
-        },
       ];
     },
     /**
@@ -200,11 +201,21 @@ export default Vue.extend({
      */
     handleView(item: FlatArtifact) {
       if (selectionStore.selectedArtifactId === item.id) {
-        selectionStore.clearSelections();
         this.selected = [];
       } else {
-        selectionStore.selectArtifact(item.id);
         this.selected = [item];
+      }
+    },
+  },
+  watch: {
+    /**
+     * Updates the selection store when the selected artifact changes.
+     */
+    selected(items: FlatArtifact[]) {
+      if (items.length === 0) {
+        selectionStore.clearSelections();
+      } else {
+        selectionStore.selectArtifact(items[0].id);
       }
     },
   },

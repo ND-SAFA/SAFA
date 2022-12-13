@@ -81,17 +81,16 @@ class TraceDataset(AbstractDataset):
             self.neg_link_ids.append(new_link.id)
         return new_link.id
 
-    def augment_pos_links(self, augmentation_steps: List[AbstractDataAugmentationStep]) -> None:
+    def augment_pos_links(self, data_augmenter: DataAugmenter) -> None:
         """
         Augments the positive links to balance the data using the given augmentation steps
-        :param augmentation_steps: the augmentation steps to run
+        :param data_augmenter: The augmenter responsible for generating new positive samples.
         :return: None
         """
-        augmenter = DataAugmenter(augmentation_steps)
-        augmentation_runs = [lambda data: augmenter.run(data, n_total_expected=2 * len(data),
-                                                        exclude_all_but_step_type=SourceTargetSwapStep),
-                             lambda data: augmenter.run(data, n_total_expected=len(self.neg_link_ids),
-                                                        include_all_but_step_type=SourceTargetSwapStep)]
+        augmentation_runs = [lambda data: data_augmenter.run(data, n_total_expected=2 * len(data),
+                                                             exclude_all_but_step_type=SourceTargetSwapStep),
+                             lambda data: data_augmenter.run(data, n_total_expected=len(self.neg_link_ids),
+                                                             include_all_but_step_type=SourceTargetSwapStep)]
         for run in augmentation_runs:
             pos_links, data_entries = self._get_data_entries_for_augmentation()
             augmentation_results = run(data_entries)
@@ -124,15 +123,17 @@ class TraceDataset(AbstractDataset):
         percent_splits = [1 - sum(percent_splits)] + percent_splits
         return self._split_multiple_helper(percent_splits, splits=[self])
 
-    def prepare_for_training(self, augmentation_steps: List[AbstractDataAugmentationStep] = None) -> None:
+    def prepare_for_training(self, data_augmenter: DataAugmenter = None) -> None:
         """
         Resamples positive links and resizes negative links to create 50-50 ratio.
-        :param augmentation_steps: steps to run to augment the training data
+        :param data_augmenter: The augmenter responsible for generating new positive samples.
         :return: Prepared trace data
         """
+        print("# Pos:", len(self.pos_link_ids))
+        print("# Neg:", len(self.neg_link_ids))
         if len(self.pos_link_ids) > 0:
-            if augmentation_steps:
-                self.augment_pos_links(augmentation_steps)
+            if data_augmenter:
+                self.augment_pos_links(data_augmenter)
             self.resize_neg_links(len(self.pos_link_ids), include_duplicates=True)
 
     def prepare_for_testing(self) -> None:

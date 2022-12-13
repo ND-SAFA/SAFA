@@ -7,7 +7,7 @@ from data.datasets.abstract_dataset import AbstractDataset
 from data.datasets.dataset_role import DatasetRole
 from data.datasets.pre_train_dataset import PreTrainDataset
 from data.datasets.trace_dataset import TraceDataset
-from data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
+from data.processing.augmentation.data_augmenter import DataAugmenter
 
 
 class TrainerDatasetsContainer:
@@ -18,7 +18,7 @@ class TrainerDatasetsContainer:
                  train_dataset_creator: AbstractDatasetCreator = None,
                  val_dataset_creator: AbstractDatasetCreator = None,
                  eval_dataset_creator: AbstractDatasetCreator = None,
-                 augmentation_steps: List[AbstractDataAugmentationStep] = None
+                 data_augmenter: DataAugmenter = None
                  ):
         """
         Container to hold all the data used in the TraceTrainer
@@ -26,13 +26,13 @@ class TrainerDatasetsContainer:
         :param train_dataset_creator: The training dataset creator.
         :param val_dataset_creator: the validation dataset creator.
         :param eval_dataset_creator: The training dataset creator.
-        :param augmentation_steps: steps to run to augment the training data
+        :param data_augmenter: The augmenter responsible for generating new positive links.
         """
         self.__dataset_creators = {DatasetRole.PRE_TRAIN: pre_train_dataset_creator,
                                    DatasetRole.TRAIN: train_dataset_creator,
                                    DatasetRole.VAL: val_dataset_creator, DatasetRole.EVAL: eval_dataset_creator}
         self.__datasets = self._create_datasets_from_creators(self.__dataset_creators)
-        self._prepare_datasets(augmentation_steps)
+        self._prepare_datasets(data_augmenter)
 
     def get_creator(self, dataset_role: DatasetRole) -> AbstractDatasetCreator:
         """
@@ -69,17 +69,17 @@ class TrainerDatasetsContainer:
             eval_dataset_creator=dataset_creators_map.get(DatasetRole.EVAL, None))
         return trainer_datasets_container
 
-    def _prepare_datasets(self, augmentation_steps: List[AbstractDataAugmentationStep]) -> None:
+    def _prepare_datasets(self, data_augmenter: DataAugmenter) -> None:
         """
         Performs any necessary additional steps necessary to prepare each dataset
-        :param augmentation_steps: steps to augment the training dataset
+        :param data_augmenter: The augmenter responsible for generating new positive samples.
         :return: None
         """
         train_dataset = self[DatasetRole.TRAIN]
         if isinstance(self[DatasetRole.TRAIN], TraceDataset):
             dataset_splits_map = self._create_dataset_splits(train_dataset, self.__dataset_creators)
             self.__datasets.update(dataset_splits_map)
-            self[DatasetRole.TRAIN].prepare_for_training(augmentation_steps)
+            self[DatasetRole.TRAIN].prepare_for_training(data_augmenter)
 
     @staticmethod
     def _create_dataset_splits(train_dataset: TraceDataset,

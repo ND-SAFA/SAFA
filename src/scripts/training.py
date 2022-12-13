@@ -63,17 +63,22 @@ if __name__ == "__main__":
             },
         },
         "val_data": validation_dataset_definition,
-        "augmentationSteps": [
-            {
-                "creator": "SOURCE_TARGET_SWAP",
-            },
-            {
-                "creator": "RESAMPLE"
-            },
-            {
-                "creator": "SIMPLE_WORD_REPLACEMENT"
+        "augmentation": {
+            "steps": [
+                {
+                    "creator": "SOURCE_TARGET_SWAP",
+                },
+                {
+                    "creator": "SIMPLE_WORD_REPLACEMENT"
+                },
+                {
+                    "creator": "RESAMPLE"
+                }
+            ],
+            "params": {
+                "run_all": True
             }
-        ],
+        },
         # ],
         "params": {
             "trace_args_params": {

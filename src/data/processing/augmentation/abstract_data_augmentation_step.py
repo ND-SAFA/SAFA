@@ -27,12 +27,14 @@ class AbstractDataAugmentationStep(AbstractDataProcessingStep, ABC):
         :param n_needed: the number of new data entries needed
         :return: list of containing the augmented data and the orig indices for the entry
         """
+        if n_needed == -1:
+            n_needed = len(data_entries)
         n_orig = len(data_entries)
         n_sample = self._get_number_to_sample(n_orig, 0, n_needed)
         augmented_data_entries = []
         index_references = []
         while n_sample > 0:
-            for i in random.sample([i for i in range(n_orig)], k=n_sample):
+            for i in random.sample([i for i in range(n_orig)], k=n_sample):  # without replacement
                 augmented_data = self._augment(data_entries[i])
                 self._add_augmented_data(augmented_data, i, augmented_data_entries, index_references)
             n_sample = self._get_number_to_sample(n_orig, len(augmented_data_entries), n_needed)

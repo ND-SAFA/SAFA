@@ -137,5 +137,7 @@ export async function deleteAccount(password: string): Promise<void> {
 export async function deleteSession(): Promise<void> {
   await authHttpClient(fillEndpoint(Endpoint.logout), {
     method: "GET",
+  }).catch(() => {
+    // TODO: this should not be failing.
   });
 }

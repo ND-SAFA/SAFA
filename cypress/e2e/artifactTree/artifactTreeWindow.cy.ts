@@ -77,7 +77,7 @@ describe("Artifact Tree Window", () => {
         .filter(":visible")
         .each((el) => cy.wrap(el).click());
 
-      cy.centerGraph().getNodes().should("have.css", "opacity", "0.1");
+      cy.centerGraph().getNodes().should("have.css", "opacity", "0.3");
     });
   });
 });

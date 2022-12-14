@@ -1,5 +1,5 @@
 <template>
-  <v-list-group :prepend-icon="icon" :value="value">
+  <v-list-group :prepend-icon="icon" :value="value" @click="$emit('click')">
     <template v-slot:activator>
       <v-list-item-title>
         <typography v-if="title" :value="title" data-cy="generic-list-item" />
@@ -18,6 +18,8 @@ import Typography from "../Typography.vue";
 
 /**
  * Displays a toggleable list.
+ *
+ * @emits-1 `click` - On activator click.
  */
 export default Vue.extend({
   name: "ToggleList",

@@ -2,8 +2,8 @@
   <div>
     <v-lazy>
       <flex-box class="width-fit" align="center">
-        <v-tabs v-model="model">
-          <v-tab v-for="{ name } in tabs" :key="name" :class="className">
+        <v-tabs v-model="model" class="transparent-bg">
+          <v-tab v-for="{ name } in tabs" :key="name" class="transparent-bg">
             <typography :value="name" />
           </v-tab>
         </v-tabs>

@@ -148,7 +148,7 @@ public class GithubController extends BaseController {
         GithubAccessCredentials githubAccessCredentials = githubAccessCredentialsRepository.findByUser(principal)
             .orElseThrow(() -> new SafaError("No GitHub credentials found"));
 
-        GithubResponseDTO<Void> responseDTO = githubControllerUtils.checkCredentials(githubAccessCredentials);
+        GithubResponseDTO<Boolean> responseDTO = githubControllerUtils.checkCredentials(githubAccessCredentials);
 
         if (!responseDTO.getMessage().equals(GithubResponseMessage.OK)) {
             throw new SafaError("Invalid GitHub credentials: " + responseDTO.getMessage());

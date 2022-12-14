@@ -117,8 +117,8 @@ public class GithubCredentialsController extends BaseController {
     }
 
     @GetMapping(AppRoutes.Github.Credentials.VALID)
-    public DeferredResult<GithubResponseDTO<Void>> validCredentials() {
-        DeferredResult<GithubResponseDTO<Void>> output = executorDelegate.createOutput(5000L);
+    public DeferredResult<GithubResponseDTO<Boolean>> validCredentials() {
+        DeferredResult<GithubResponseDTO<Boolean>> output = executorDelegate.createOutput(5000L);
 
         executorDelegate.submit(output, () -> {
             SafaUser principal = safaUserService.getCurrentUser();
@@ -146,7 +146,7 @@ public class GithubCredentialsController extends BaseController {
             GithubAccessCredentials githubAccessCredentials = githubAccessCredentialsRepository.findByUser(principal)
                 .orElseThrow(() -> new SafaError("No GitHub credentials found"));
 
-            GithubResponseDTO<Void> responseDTO = githubControllerUtils.checkCredentials(githubAccessCredentials);
+            GithubResponseDTO<Boolean> responseDTO = githubControllerUtils.checkCredentials(githubAccessCredentials);
 
             if (GithubResponseMessage.EXPIRED.equals(responseDTO.getMessage())) {
                 log.error("Trying to refresh expired credentials");

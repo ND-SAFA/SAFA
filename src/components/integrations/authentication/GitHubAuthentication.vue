@@ -5,7 +5,7 @@
     :has-credentials="hasCredentials"
     @click="handleClick"
     @connect="handleAuthentication"
-    @discnnect="handleDeleteCredentials"
+    @disconnect="handleDeleteCredentials"
   />
 </template>
 

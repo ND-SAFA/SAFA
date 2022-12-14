@@ -8,8 +8,9 @@
     :value="drawerOpen"
     height="100%"
     :width="width"
+    class="primary lighten-5"
   >
-    <v-container class="full-height primary lighten-5">
+    <v-container class="full-height">
       <flex-box justify="space-between" align="center">
         <typography color="primary" el="h2" variant="subtitle" :value="title" />
         <icon-button

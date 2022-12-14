@@ -6,6 +6,7 @@ import edu.nd.crc.safa.features.jobs.entities.app.AbstractJob;
 import edu.nd.crc.safa.features.jobs.entities.app.JobType;
 import edu.nd.crc.safa.features.jobs.entities.jobs.GithubProjectCreationJob;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 /**
@@ -18,18 +19,20 @@ public class CreateProjectViaGithubBuilder extends AbstractJobBuilder<GithubIden
      */
     GithubIdentifier githubIdentifier;
 
-    public CreateProjectViaGithubBuilder(
-        ServiceProvider serviceProvider,
-        GithubIdentifier githubIdentifier) {
-        super(serviceProvider);
+    SafaUser user;
+
+    public CreateProjectViaGithubBuilder(ServiceProvider serviceProvider, GithubIdentifier githubIdentifier,
+                                         SafaUser user) {
+        super(serviceProvider, user);
         this.githubIdentifier = githubIdentifier;
+        this.user = user;
     }
 
     @Override
     protected GithubIdentifier constructIdentifier() {
         Project project = new Project("", "");
 
-        this.serviceProvider.getProjectService().saveProjectWithCurrentUserAsOwner(project);
+        this.serviceProvider.getProjectService().saveProjectWithUserAsOwner(project, this.user);
         ProjectVersion projectVersion = this.serviceProvider.getVersionService().createInitialProjectVersion(project);
         this.githubIdentifier.setProjectVersion(projectVersion);
         return this.githubIdentifier;

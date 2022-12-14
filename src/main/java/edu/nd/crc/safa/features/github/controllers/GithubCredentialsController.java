@@ -66,8 +66,8 @@ public class GithubCredentialsController extends BaseController {
         @NotNull @NotEmpty @PathVariable("accessCode") String accessCode) {
         DeferredResult<GithubResponseDTO<Void>> output = executorDelegate.createOutput(5000L);
 
+        SafaUser principal = safaUserService.getCurrentUser();
         executorDelegate.submit(output, () -> {
-            SafaUser principal = safaUserService.getCurrentUser();
             GithubAccessCredentialsDTO dto = githubConnectionService.useAccessCode(accessCode);
 
             if (dto.isError()) {
@@ -99,8 +99,8 @@ public class GithubCredentialsController extends BaseController {
     public DeferredResult<GithubResponseDTO<Void>> deleteCredentials() {
         DeferredResult<GithubResponseDTO<Void>> output = executorDelegate.createOutput(5000L);
 
+        SafaUser principal = safaUserService.getCurrentUser();
         executorDelegate.submit(output, () -> {
-            SafaUser principal = safaUserService.getCurrentUser();
             Optional<GithubAccessCredentials> credentials = githubAccessCredentialsRepository
                 .findByUser(principal);
 
@@ -120,13 +120,13 @@ public class GithubCredentialsController extends BaseController {
     public DeferredResult<GithubResponseDTO<Boolean>> validCredentials() {
         DeferredResult<GithubResponseDTO<Boolean>> output = executorDelegate.createOutput(5000L);
 
+        SafaUser principal = safaUserService.getCurrentUser();
         executorDelegate.submit(output, () -> {
-            SafaUser principal = safaUserService.getCurrentUser();
             Optional<GithubAccessCredentials> credentials = githubAccessCredentialsRepository
                 .findByUser(principal);
 
             if (credentials.isEmpty()) {
-                output.setResult(new GithubResponseDTO<>(null, GithubResponseMessage.MISSING));
+                output.setResult(new GithubResponseDTO<>(false, GithubResponseMessage.MISSING));
                 return;
             }
 
@@ -141,8 +141,8 @@ public class GithubCredentialsController extends BaseController {
     public DeferredResult<GithubResponseDTO<Void>> refreshCredentials() {
         DeferredResult<GithubResponseDTO<Void>> output = executorDelegate.createOutput(5000L);
 
+        SafaUser principal = safaUserService.getCurrentUser();
         executorDelegate.submit(output, () -> {
-            SafaUser principal = safaUserService.getCurrentUser();
             GithubAccessCredentials githubAccessCredentials = githubAccessCredentialsRepository.findByUser(principal)
                 .orElseThrow(() -> new SafaError("No GitHub credentials found"));
 

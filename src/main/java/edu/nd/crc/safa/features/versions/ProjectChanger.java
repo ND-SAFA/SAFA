@@ -12,6 +12,7 @@ import edu.nd.crc.safa.features.layout.entities.app.LayoutManager;
 import edu.nd.crc.safa.features.projects.entities.db.ProjectEntity;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.entities.db.TraceLinkVersion;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import lombok.AllArgsConstructor;
@@ -39,9 +40,20 @@ public class ProjectChanger {
      * @return {@link ProjectCommit} Commit containing persisted entities and any errors.
      */
     public ProjectCommit commit(ProjectCommit projectCommit) {
+        return commitAsUser(projectCommit, serviceProvider.getSafaUserService().getCurrentUser());
+    }
+
+    /**
+     * Performs modifications specified in project commit and updates the layout accordingly.
+     *
+     * @param projectCommit Commit containing addition, modifications, and deletions of entities.
+     * @param user          The user performing the commit
+     * @return {@link ProjectCommit} Commit containing persisted entities and any errors.
+     */
+    public ProjectCommit commitAsUser(ProjectCommit projectCommit, SafaUser user) {
         ProjectCommit committedChanges = serviceProvider
             .getCommitService()
-            .performCommit(projectCommit);
+            .performCommit(projectCommit, user);
         LayoutManager layoutManager = new LayoutManager(serviceProvider, projectVersion);
         layoutManager.generateLayoutUpdates(committedChanges);
         return committedChanges;

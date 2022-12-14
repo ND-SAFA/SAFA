@@ -9,7 +9,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 
 /**
@@ -42,13 +41,24 @@ public class ThreadConfiguration {
     }
 
     /**
-     * Forces the security context to be copied to child threads (e.g. jobs).
-     * Specifically, this allows jobs to have access to the credentials of the
-     * user who submitted the job.
+     * I am leaving this method so that there is documentation about why this behavior was removed
+     * in case anyone tries to add it back. MODE_INHERITABLETHREADLOCAL should NOT be used in a pooled
+     * environment (see <a href="https://github.com/spring-projects/spring-security/issues/6856">this github issue</a>).
+     * <br /><br />
+     * To summarize: thread pools reuse threads (that's the whole point), but the security context is only copied
+     * to the thread when it is first spawned. This means that subsequent jobs using that thread will use the old
+     * context, which is likely to have been created for a different user. This creates instances where one user may
+     * have access to parts of another user's account, if the request made for that object happened to be handled
+     * from within the thread pool.
+     * <br /><br />
+     * Instead, the user's information needs to be retrieved in the thread that was originally handling the request
+     * and then passed to the thread doing the background task.
      */
     @PostConstruct
     public void setSecurityContextMode() {
         // Only call this method once, otherwise the strategy will reset to default
-        SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
+
+        // DO NOT UNCOMMENT THIS LINE - SEE ABOVE COMMENT FOR EXPLANATION
+        //SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
     }
 }

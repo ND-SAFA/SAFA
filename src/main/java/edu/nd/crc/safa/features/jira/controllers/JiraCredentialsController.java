@@ -31,7 +31,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.context.request.async.DeferredResult;
 
 
@@ -62,8 +61,8 @@ public class JiraCredentialsController extends BaseController {
         @NotNull @NotEmpty @PathVariable("accessCode") String accessCode) {
         DeferredResult<JiraResponseDTO<Void>> output = executorDelegate.createOutput(5000L);
 
+        SafaUser principal = safaUserService.getCurrentUser();
         executorDelegate.submit(output, () -> {
-            SafaUser principal = safaUserService.getCurrentUser();
             JiraAccessCredentialsDTO data = jiraConnectionService.useAccessCode(accessCode);
             JiraAccessCredentials credentials = data.toEntity();
             JiraAccessCredentials previousCredentials =
@@ -86,8 +85,8 @@ public class JiraCredentialsController extends BaseController {
     public DeferredResult<JiraResponseDTO<Void>> createCredentials() {
         DeferredResult<JiraResponseDTO<Void>> output = executorDelegate.createOutput(5000L);
 
+        SafaUser principal = safaUserService.getCurrentUser();
         executorDelegate.submit(output, () -> {
-            SafaUser principal = safaUserService.getCurrentUser();
             Optional<JiraAccessCredentials> credentialsOptional = accessCredentialsRepository
                 .findByUser(principal);
 
@@ -118,8 +117,8 @@ public class JiraCredentialsController extends BaseController {
     public DeferredResult<JiraResponseDTO<Boolean>> validateJIRACredentials() {
         DeferredResult<JiraResponseDTO<Boolean>> output = executorDelegate.createOutput(5000L);
 
+        SafaUser principal = safaUserService.getCurrentUser();
         executorDelegate.submit(output, () -> {
-            SafaUser principal = safaUserService.getCurrentUser();
             Optional<JiraAccessCredentials> credentialsOptional = accessCredentialsRepository
                 .findByUser(principal);
 
@@ -146,8 +145,8 @@ public class JiraCredentialsController extends BaseController {
     public DeferredResult<JiraResponseDTO<Void>> deleteCredentials() {
         DeferredResult<JiraResponseDTO<Void>> output = executorDelegate.createOutput(5000L);
 
+        SafaUser principal = safaUserService.getCurrentUser();
         executorDelegate.submit(output, () -> {
-            SafaUser principal = safaUserService.getCurrentUser();
             Optional<JiraAccessCredentials> credentialsOptional = accessCredentialsRepository
                 .findByUser(principal);
 

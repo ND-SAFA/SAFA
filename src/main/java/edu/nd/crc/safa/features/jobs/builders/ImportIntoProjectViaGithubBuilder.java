@@ -4,6 +4,7 @@ import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.github.entities.api.GithubIdentifier;
 import edu.nd.crc.safa.features.jobs.entities.app.AbstractJob;
 import edu.nd.crc.safa.features.jobs.entities.jobs.GithubProjectImportJob;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
 /**
  * Creates a job responsible for importing a GitHub repository into an existing project
@@ -11,8 +12,9 @@ import edu.nd.crc.safa.features.jobs.entities.jobs.GithubProjectImportJob;
 public class ImportIntoProjectViaGithubBuilder extends CreateProjectViaGithubBuilder {
 
     public ImportIntoProjectViaGithubBuilder(ServiceProvider serviceProvider,
-                                             GithubIdentifier githubIdentifier) {
-        super(serviceProvider, githubIdentifier);
+                                             GithubIdentifier githubIdentifier,
+                                             SafaUser user) {
+        super(serviceProvider, githubIdentifier, user);
 
         if (githubIdentifier.getProjectVersion() == null) {
             throw new IllegalArgumentException(

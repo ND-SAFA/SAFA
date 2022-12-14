@@ -1,6 +1,7 @@
 import {
   ApprovalType,
   ArtifactDeltaState,
+  AttributeType,
   CreatorTabTypes,
   DocumentType,
   FTANodeType,
@@ -251,5 +252,24 @@ export function tableViewTabOptions(): SelectOption[] {
   return [
     createEnumOption("artifacts", "Artifacts"),
     createEnumOption("traceLinks", "Trace Links"),
+  ];
+}
+
+/**
+ * Returns display names for attribute types.
+ *
+ * @return The select option names and ids.
+ */
+export function attributeTypeOptions(): SelectOption[] {
+  return [
+    createEnumOption(AttributeType.text, "Text"),
+    createEnumOption(AttributeType.paragraph, "Paragraph"),
+    createEnumOption(AttributeType.select, "Select"),
+    createEnumOption(AttributeType.multiselect, "Multiselect"),
+    createEnumOption(AttributeType.relation, "Relation"),
+    createEnumOption(AttributeType.date, "Date"),
+    createEnumOption(AttributeType.int, "Integer"),
+    createEnumOption(AttributeType.float, "Number"),
+    createEnumOption(AttributeType.boolean, "Yes/No"),
   ];
 }

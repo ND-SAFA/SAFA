@@ -153,5 +153,5 @@ export const EXAMPLE_ATTRIBUTE_LAYOUTS = [
  */
 export const ENABLED_FEATURES = {
   EXAMPLE_TRAINING_STEPS: false,
-  EXAMPLE_ATTRIBUTES: false,
+  EXAMPLE_ATTRIBUTES: true,
 };

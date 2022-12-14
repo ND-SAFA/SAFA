@@ -8,6 +8,7 @@
     </template>
     <v-divider class="faded" />
     <slot />
+    <v-divider class="faded" />
   </v-list-group>
 </template>
 

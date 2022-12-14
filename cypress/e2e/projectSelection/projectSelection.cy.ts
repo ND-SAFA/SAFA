@@ -1,9 +1,16 @@
 import { DataCy, simpleProjectFiles, testProject } from "../../fixtures";
+import { validUser } from "../../fixtures/data/user.json";
 
 describe("Project Selection", () => {
   beforeEach(() => {
     cy.viewport(1024, 768);
-    cy.dbResetProjects().loadNewProject().openProjectSelector();
+    cy.dbResetProjects().loadNewProject();
+
+    cy.visit("/open")
+      .login(validUser.email, validUser.password)
+      .location("pathname", { timeout: 5000 })
+      .should("equal", "/open")
+      .openProjectSelector();
   });
 
   describe("Project List", () => {

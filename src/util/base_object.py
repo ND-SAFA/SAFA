@@ -1,11 +1,11 @@
 from abc import ABC, abstractmethod
 from copy import copy
 from dataclasses import dataclass
-from typing import Any, Type, get_type_hints, List, _SpecialGenericAlias, Union, Dict, Callable, Set
+from typing import Any, Type, get_type_hints, List, _SpecialGenericAlias, Union, Dict, Callable, Set, Optional, _UnionGenericAlias, \
+    _Final
 from experiments.variables.variable import Variable
 
 from experiments.variables.definition_variable import DefinitionVariable
-from util.uncased_dict import UncasedDict
 import inspect
 
 
@@ -19,10 +19,8 @@ class ParamSpecs:
 
 class BaseObject(ABC):
 
-    # TODO nested type checking
-
     @classmethod
-    def initialize_from_definition(cls, definition: DefinitionVariable = None):
+    def initialize_from_definition(cls, definition: DefinitionVariable):
         """
         Initializes the object from a dictionary
         :param definition: a dictionary of the necessary params to initialize
@@ -138,11 +136,16 @@ class BaseObject(ABC):
         :param expected_type: expected type or typing generic
         :return: True if value is the expected type else False
         """
-        if isinstance(expected_type, _SpecialGenericAlias):
-            expected_type = expected_type.__origin__
-        if not isinstance(val, expected_type):
-            return False
-        return True
+        if isinstance(expected_type, _UnionGenericAlias):
+            is_instance = False
+            for child_type in expected_type.__args__:
+                if child_type is not None:
+                    is_instance = is_instance or BaseObject._is_instance(val, child_type)
+            return is_instance
+        else:
+            if isinstance(expected_type, _SpecialGenericAlias):
+                expected_type = expected_type.__origin__
+            return isinstance(val, expected_type)
 
     @staticmethod
     def _get_param_specs(method: Callable) -> ParamSpecs:
@@ -160,7 +163,8 @@ class BaseObject(ABC):
         param_types = {param: type_hints[param] if param in type_hints else None for param in param_names}
 
         expected_param_names.reverse()
-        required_params = {param for i, param in enumerate(expected_param_names) if i >= len(full_specs.defaults)}
+        required_params = {param for i, param in enumerate(expected_param_names)
+                           if full_specs.defaults and i >= len(full_specs.defaults)}
 
         return ParamSpecs(param_names=param_names, param_types=param_types,
                           required_params=required_params, has_kwargs=full_specs.varkw is not None)

@@ -13,9 +13,11 @@
       :key="attr.key"
       :x="pos.x"
       :y="pos.y"
-      :w="pos.width"
-      :h="pos.height"
-      :i="pos.key"
+      :w="pos.w"
+      :h="pos.h"
+      :i="pos.i"
+      @moved="(...args) => handleMoveEvent(pos, ...args)"
+      @resized="(...args) => handleResizeEvent(pos, ...args)"
     >
       <slot name="item" :attribute="attr" />
     </grid-item>
@@ -27,6 +29,7 @@ import Vue from "vue";
 import { GridLayout, GridItem, GridItemData } from "vue-grid-layout";
 import { AttributeSchema, AttributePositionSchema } from "@/types";
 import { attributesStore } from "@/hooks";
+import { handleUpdateAttributeLayout } from "@/api/handlers/project/attribute-handler";
 
 /**
  * Renders a grid of attributes.
@@ -37,6 +40,14 @@ export default Vue.extend({
   props: {
     editable: Boolean,
   },
+  data() {
+    return {
+      layout: [] as GridItemData[],
+    };
+  },
+  mounted() {
+    this.resetLayout();
+  },
   computed: {
     /**
      * @return The current layout to render.
@@ -45,10 +56,24 @@ export default Vue.extend({
       return attributesStore.defaultLayout;
     },
     /**
-     * @return The layout of custom attributes.
+     * @return All attributes and their positions in the active layout.
      */
-    layout(): GridItemData[] {
-      return this.currentLayout.map((pos) => ({
+    attributeLayout(): {
+      attr: AttributeSchema | undefined;
+      pos: GridItemData;
+    }[] {
+      return this.layout.map((pos) => ({
+        pos,
+        attr: attributesStore.attributes.find(({ key }) => pos.i === key),
+      }));
+    },
+  },
+  methods: {
+    /**
+     * Resets the layout to match the store.
+     */
+    resetLayout(): void {
+      this.layout = this.currentLayout.map((pos) => ({
         i: pos.key,
         x: pos.x,
         y: pos.y,
@@ -57,16 +82,34 @@ export default Vue.extend({
       }));
     },
     /**
-     * @return All attributes and their positions in the active layout.
+     * Called when an attribute is moved.
      */
-    attributeLayout(): {
-      attr: AttributeSchema | undefined;
-      pos: AttributePositionSchema;
-    }[] {
-      return this.currentLayout.map((pos) => ({
-        pos,
-        attr: attributesStore.attributes.find(({ key }) => pos.key === key),
-      }));
+    handleMoveEvent(
+      position: AttributePositionSchema,
+      i: string,
+      x: number,
+      y: number
+    ) {
+      handleUpdateAttributeLayout(position, { x, y });
+    },
+    /**
+     * Called when an attribute is resized.
+     */
+    handleResizeEvent(
+      position: AttributePositionSchema,
+      i: string,
+      height: number,
+      width: number
+    ) {
+      handleUpdateAttributeLayout(position, { height, width });
+    },
+  },
+  watch: {
+    /**
+     * Resets the layout when the stored layout changes.
+     */
+    currentLayout() {
+      this.resetLayout();
     },
   },
 });

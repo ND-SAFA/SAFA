@@ -127,6 +127,7 @@ export const EXAMPLE_ATTRIBUTES = [
 export const EXAMPLE_ATTRIBUTE_LAYOUTS = [
   {
     id: "default",
+    name: "Default",
     artifactTypes: [],
     positions: [
       { x: 0, y: 0, width: 1, height: 1, key: "str" },

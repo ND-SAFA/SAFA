@@ -20,6 +20,9 @@
       <v-tab-item key="4">
         <type-options />
       </v-tab-item>
+      <v-tab-item key="5">
+        <attribute-settings />
+      </v-tab-item>
     </tab-list>
   </sidebar-grid>
 </template>
@@ -36,6 +39,7 @@ import {
   ProjectDisplay,
 } from "@/components/project";
 import { ProjectInstallationsTable } from "@/components/integrations";
+import { AttributeSettings } from "@/components/attributes";
 import SettingsHeader from "./SettingsHeader.vue";
 import TypeOptions from "./TypeOptions.vue";
 import { SettingsMembers } from "./members";
@@ -46,6 +50,7 @@ import { SettingsMembers } from "./members";
 export default Vue.extend({
   name: "TracePredictionTabs",
   components: {
+    AttributeSettings,
     ProjectInstallationsTable,
     SidebarGrid,
     ProjectDisplay,

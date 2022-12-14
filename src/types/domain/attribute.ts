@@ -77,6 +77,10 @@ export interface AttributeLayoutSchema {
    */
   id: string;
   /**
+   * The name of this attribute layout.
+   */
+  name: string;
+  /**
    * The list of artifact types to display this attribute layout on.
    * If empty, this attribute will be displayed for all.
    */

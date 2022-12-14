@@ -1,11 +1,14 @@
 <template>
   <div>
     <v-lazy>
-      <v-tabs v-model="model" class="width-fit">
-        <v-tab v-for="{ name } in tabs" :key="name" class="primary lighten-5">
-          <typography :value="name" />
-        </v-tab>
-      </v-tabs>
+      <flex-box class="width-fit" align="center">
+        <v-tabs v-model="model">
+          <v-tab v-for="{ name } in tabs" :key="name" :class="className">
+            <typography :value="name" />
+          </v-tab>
+        </v-tabs>
+        <slot name="tabs" />
+      </flex-box>
     </v-lazy>
     <v-tabs-items v-model="model" class="mt-1">
       <slot />
@@ -16,6 +19,7 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { SelectOption } from "@/types";
+import FlexBox from "@/components/common/layout/FlexBox.vue";
 import Typography from "../Typography.vue";
 
 /**
@@ -26,18 +30,30 @@ import Typography from "../Typography.vue";
  */
 export default Vue.extend({
   name: "TabList",
-  components: { Typography },
+  components: { FlexBox, Typography },
   props: {
     value: Number,
     tabs: {
       type: Array as PropType<SelectOption[]>,
       required: true,
     },
+    background: {
+      type: String as PropType<"outer" | "inner">,
+      default: "outer",
+    },
   },
   data() {
     return {
       model: this.value,
     };
+  },
+  computed: {
+    /**
+     * @return The class name for the tab header.
+     */
+    className(): string {
+      return this.background === "inner" ? "neutral-bg" : "primary lighten-5";
+    },
   },
   watch: {
     /**

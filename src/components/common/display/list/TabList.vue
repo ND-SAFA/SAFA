@@ -37,23 +37,11 @@ export default Vue.extend({
       type: Array as PropType<SelectOption[]>,
       required: true,
     },
-    background: {
-      type: String as PropType<"outer" | "inner">,
-      default: "outer",
-    },
   },
   data() {
     return {
       model: this.value,
     };
-  },
-  computed: {
-    /**
-     * @return The class name for the tab header.
-     */
-    className(): string {
-      return this.background === "inner" ? "neutral-bg" : "primary lighten-5";
-    },
   },
   watch: {
     /**

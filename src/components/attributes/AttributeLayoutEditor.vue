@@ -1,5 +1,5 @@
 <template>
-  <tab-list v-model="tab" :tabs="tabs" background="inner">
+  <tab-list v-model="tab" :tabs="tabs">
     <template v-slot:tabs>
       <v-btn text color="primary" @click="handleAddLayout">
         <v-icon>mdi-plus</v-icon>
@@ -7,13 +7,7 @@
       </v-btn>
     </template>
     <v-tab-item v-for="(tab, idx) in tabs" :key="idx + 1">
-      <attribute-grid editable>
-        <template v-slot:item="{ attribute }">
-          <v-card outlined class="pa-2 mx-2">
-            {{ attribute.label }}
-          </v-card>
-        </template>
-      </attribute-grid>
+      <save-attribute-layout :layout="layouts[idx]" />
     </v-tab-item>
   </tab-list>
 </template>
@@ -22,14 +16,18 @@
 import Vue from "vue";
 import { AttributeLayoutSchema, SelectOption } from "@/types";
 import { attributesStore } from "@/hooks";
-import { AttributeGrid, TabList } from "@/components/common";
+import { TabList } from "@/components/common";
+import SaveAttributeLayout from "./SaveAttributeLayout.vue";
 
 /**
  * Allows for editing attribute layouts.
  */
 export default Vue.extend({
   name: "AttributeLayoutEditor",
-  components: { TabList, AttributeGrid },
+  components: {
+    SaveAttributeLayout,
+    TabList,
+  },
   data() {
     return {
       tab: 0,

@@ -74,7 +74,7 @@
       data-cy="input-artifact-parent"
     />
 
-    <attribute-list-input :model="store.editedArtifact.attributes || {}" />
+    <attribute-list-input :artifact="store.editedArtifact" />
   </div>
 </template>
 

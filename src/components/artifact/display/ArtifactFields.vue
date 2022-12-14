@@ -32,10 +32,7 @@
       data-cy="text-selected-body"
     />
 
-    <attribute-list-display
-      class="mt-4"
-      :model="selectedArtifact.attributes || {}"
-    />
+    <attribute-list-display class="mt-4" :artifact="selectedArtifact" />
   </panel-card>
 </template>
 

@@ -106,6 +106,19 @@ export const useAttributes = defineStore("attributes", {
 
       projectStore.project.attributeLayouts = this.attributeLayouts;
     },
+    /**
+     * Returns the layout based on an artifact type.
+     *
+     * @param type - The type to find.
+     * @return The attribute layout.
+     */
+    getLayoutByType(type: string): AttributeLayoutSchema {
+      return (
+        this.attributeLayouts.find(({ artifactTypes }) =>
+          artifactTypes.includes(type)
+        ) || this.attributeLayouts[0]
+      );
+    },
   },
 });
 

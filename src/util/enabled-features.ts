@@ -146,6 +146,15 @@ export const EXAMPLE_ATTRIBUTE_LAYOUTS = [
       { x: 0, y: 5, width: 2, height: 1, key: "par" },
     ],
   },
+  {
+    id: "new",
+    name: "New",
+    artifactTypes: ["design"],
+    positions: [
+      { x: 0, y: 0, width: 1, height: 1, key: "str" },
+      { x: 1, y: 0, width: 1, height: 1, key: "bool" },
+    ],
+  },
 ] as AttributeLayoutSchema[];
 
 /**

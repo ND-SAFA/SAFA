@@ -1,6 +1,6 @@
 <template>
   <grid-layout
-    :layout="layout"
+    :layout="gridLayout"
     :is-draggable="editable"
     :is-resizable="editable"
     :margin="[0, 20]"
@@ -25,9 +25,13 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import Vue, { PropType } from "vue";
 import { GridLayout, GridItem, GridItemData } from "vue-grid-layout";
-import { AttributeSchema, AttributePositionSchema } from "@/types";
+import {
+  AttributeSchema,
+  AttributePositionSchema,
+  AttributeLayoutSchema,
+} from "@/types";
 import { attributesStore } from "@/hooks";
 import { handleUpdateAttributeLayout } from "@/api/handlers/project/attribute-handler";
 
@@ -39,10 +43,14 @@ export default Vue.extend({
   components: { GridLayout, GridItem },
   props: {
     editable: Boolean,
+    layout: {
+      type: Object as PropType<AttributeLayoutSchema>,
+      required: true,
+    },
   },
   data() {
     return {
-      layout: [] as GridItemData[],
+      gridLayout: [] as GridItemData[],
     };
   },
   mounted() {
@@ -50,19 +58,13 @@ export default Vue.extend({
   },
   computed: {
     /**
-     * @return The current layout to render.
-     */
-    currentLayout(): AttributePositionSchema[] {
-      return attributesStore.defaultLayout;
-    },
-    /**
      * @return All attributes and their positions in the active layout.
      */
     attributeLayout(): {
       attr: AttributeSchema | undefined;
       pos: GridItemData;
     }[] {
-      return this.layout.map((pos) => ({
+      return this.gridLayout.map((pos) => ({
         pos,
         attr: attributesStore.attributes.find(({ key }) => pos.i === key),
       }));
@@ -73,7 +75,7 @@ export default Vue.extend({
      * Resets the layout to match the store.
      */
     resetLayout(): void {
-      this.layout = this.currentLayout.map((pos) => ({
+      this.gridLayout = this.layout.positions.map((pos) => ({
         i: pos.key,
         x: pos.x,
         y: pos.y,
@@ -108,7 +110,7 @@ export default Vue.extend({
     /**
      * Resets the layout when the stored layout changes.
      */
-    currentLayout() {
+    layout() {
       this.resetLayout();
     },
   },

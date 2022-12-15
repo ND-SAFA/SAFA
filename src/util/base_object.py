@@ -1,12 +1,12 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 from copy import copy
 from dataclasses import dataclass
-from typing import Any, Type, get_type_hints, List, _SpecialGenericAlias, Union, Dict, Callable, Set, Optional, _UnionGenericAlias, \
-    _Final
+from typing import Any, Type, get_type_hints, _SpecialGenericAlias, Union, Dict, Callable, Set, Optional, _UnionGenericAlias, \
+    _Final, _GenericAlias, _CallableGenericAlias, _CallableType, get_origin, get_args, List, Tuple
 from experiments.variables.variable import Variable
 
 from experiments.variables.definition_variable import DefinitionVariable
-import inspect
+from inspect import isfunction, getfullargspec
 
 
 @dataclass
@@ -18,6 +18,9 @@ class ParamSpecs:
 
 
 class BaseObject(ABC):
+
+    # TODO add None with optional case
+    # TODO clean up _is_instance
 
     @classmethod
     def initialize_from_definition(cls, definition: DefinitionVariable):
@@ -129,7 +132,7 @@ class BaseObject(ABC):
         return set(param_dict.keys()).difference(param_specs.param_names)
 
     @staticmethod
-    def _is_instance(val: Any, expected_type: Union[Type, _SpecialGenericAlias]) -> bool:
+    def _is_instance(val: Any, expected_type: Union[Type, _GenericAlias]) -> bool:
         """
         Determines that the value is of the correct type
         :param val: the value
@@ -138,13 +141,38 @@ class BaseObject(ABC):
         """
         if isinstance(expected_type, _UnionGenericAlias):
             is_instance = False
-            for child_type in expected_type.__args__:
-                if child_type is not None:
-                    is_instance = is_instance or BaseObject._is_instance(val, child_type)
+            for child_type in get_args(expected_type):
+                is_instance = is_instance or BaseObject._is_instance(val, child_type)
             return is_instance
+        elif isinstance(expected_type, _CallableType):
+            return isfunction(val)
         else:
-            if isinstance(expected_type, _SpecialGenericAlias):
-                expected_type = expected_type.__origin__
+            if isinstance(expected_type, _GenericAlias):
+                args = get_args(expected_type)
+                if len(args) > 0:
+                    val = val
+                    is_instance = BaseObject._is_instance(val, get_origin(expected_type))
+                    if isinstance(val, dict):
+                        key_type = args[0]
+                        val_type = key_type if len(args) < 2 else args[1]
+                        return BaseObject._is_instance(list(val.keys()).pop(), key_type) \
+                               and BaseObject._is_instance(list(val.values()).pop(), val_type)
+                    elif isinstance(val, tuple):
+                        for i, child_arg in enumerate(args):
+                            try:
+                                _val = val[i]
+                            except KeyError as e:
+                                return False
+                            is_instance = is_instance and BaseObject._is_instance(_val, child_arg)
+                        return is_instance
+                    for child_type in args:
+                        try:
+                            val = val[0]
+                        except KeyError as e:
+                            return False
+                        is_instance = is_instance and BaseObject._is_instance(val, child_type)
+                    return is_instance
+                expected_type = get_origin(expected_type)
             return isinstance(val, expected_type)
 
     @staticmethod
@@ -154,7 +182,7 @@ class BaseObject(ABC):
         :param method: the method to create param specs for
         :return: the param specs
         """
-        full_specs = inspect.getfullargspec(method)
+        full_specs = getfullargspec(method)
         expected_param_names = full_specs.args
         expected_param_names.remove("self")
 

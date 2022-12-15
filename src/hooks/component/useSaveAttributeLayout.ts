@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-import { AttributeLayoutSchema } from "@/types";
+import { AttributeLayoutSchema, AttributeSchema } from "@/types";
 import { createAttributeLayout } from "@/util";
 import { pinia } from "@/plugins";
 
@@ -43,10 +43,36 @@ export const useSaveAttributeLayout = (id: string) =>
     actions: {
       /**
        * Resets the state of the attribute layout to the selected artifact.
+       * @param baseLayout - The layout to reset data to.
        */
       resetLayout(baseLayout: AttributeLayoutSchema): void {
         this.baseLayout = baseLayout;
         this.editedLayout = createAttributeLayout(this.baseLayout);
+      },
+      /**
+       * Adds an attribute to the bottom of the edited layout.
+       * @param key - The attribute key to add to the layout.
+       */
+      addAttribute(key: string): void {
+        const y =
+          Math.max(...this.editedLayout.positions.map(({ y }) => y)) + 1;
+
+        this.editedLayout.positions.push({
+          key,
+          y,
+          x: 0,
+          width: 1,
+          height: 1,
+        });
+      },
+      /**
+       * Removes an attribute from the layout.
+       * @param attribute - The attribute to add to the layout.
+       */
+      deleteAttribute(attribute: AttributeSchema): void {
+        this.editedLayout.positions = this.editedLayout.positions.filter(
+          ({ key }) => key !== attribute.key
+        );
       },
     },
   });

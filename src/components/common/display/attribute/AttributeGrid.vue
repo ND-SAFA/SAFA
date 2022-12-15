@@ -10,7 +10,7 @@
   >
     <grid-item
       v-for="{ attr, pos } of attributeLayout"
-      :key="attr.key"
+      :key="pos.i"
       :x="pos.x"
       :y="pos.y"
       :w="pos.w"
@@ -33,7 +33,6 @@ import {
   AttributeLayoutSchema,
 } from "@/types";
 import { attributesStore } from "@/hooks";
-import { handleUpdateAttributeLayout } from "@/api/handlers/project/attribute-handler";
 
 /**
  * Renders a grid of attributes.
@@ -75,13 +74,30 @@ export default Vue.extend({
      * Resets the layout to match the store.
      */
     resetLayout(): void {
-      this.gridLayout = this.layout.positions.map((pos) => ({
-        i: pos.key,
-        x: pos.x,
-        y: pos.y,
-        w: pos.width,
-        h: pos.height,
-      }));
+      let maxY = 0;
+      const gridLayout = this.layout.positions.map((pos) => {
+        maxY = Math.max(pos.y, maxY);
+
+        return {
+          i: pos.key,
+          x: pos.x,
+          y: pos.y,
+          w: pos.width,
+          h: pos.height,
+        };
+      });
+
+      if (this.editable) {
+        gridLayout.push({
+          i: "ADD-NEW-ATTRIBUTE",
+          x: 0,
+          y: maxY + 1,
+          w: 2,
+          h: 1,
+        });
+      }
+
+      this.gridLayout = gridLayout;
     },
     /**
      * Called when an attribute is moved.
@@ -92,7 +108,8 @@ export default Vue.extend({
       x: number,
       y: number
     ) {
-      handleUpdateAttributeLayout(position, { x, y });
+      position.x = x;
+      position.y = y;
     },
     /**
      * Called when an attribute is resized.
@@ -103,14 +120,15 @@ export default Vue.extend({
       height: number,
       width: number
     ) {
-      handleUpdateAttributeLayout(position, { height, width });
+      position.height = height;
+      position.width = width;
     },
   },
   watch: {
     /**
      * Resets the layout when the stored layout changes.
      */
-    layout() {
+    "layout.positions"() {
       this.resetLayout();
     },
   },

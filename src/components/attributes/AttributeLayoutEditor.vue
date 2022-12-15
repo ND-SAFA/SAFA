@@ -6,8 +6,9 @@
         Add Layout
       </v-btn>
     </template>
-    <v-tab-item v-for="(tab, idx) in tabs" :key="idx + 1">
+    <v-tab-item v-for="(_, idx) in tabs" :key="idx + 1">
       <save-attribute-layout
+        v-if="idx === tab"
         :layout="layouts[idx]"
         @save="handleSaveLayout(idx)"
       />

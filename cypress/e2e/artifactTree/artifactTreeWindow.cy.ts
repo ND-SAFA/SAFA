@@ -11,7 +11,6 @@ describe("Artifact Tree Window", () => {
 
   describe("I can re-center the graph", () => {
     it("Makes all nodes centered and visible", () => {
-      cy.getNodes().should("not.have.length", 19);
       cy.centerGraph();
       cy.getNodes().should("have.length", 19);
     });

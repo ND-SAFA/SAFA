@@ -23,7 +23,9 @@
       <v-col cols="6">
         <artifact-type-input
           multiple
+          persistent-hint
           v-model="store.editedLayout.artifactTypes"
+          hint="This layout only appears on these types."
       /></v-col>
     </v-row>
     <panel-card>
@@ -71,6 +73,7 @@
 import Vue, { PropType } from "vue";
 import { AttributeLayoutSchema, AttributeSchema } from "@/types";
 import { attributeLayoutSaveStore, attributesStore } from "@/hooks";
+import { handleDeleteAttributeLayout, handleSaveAttributeLayout } from "@/api";
 import {
   AttributeGrid,
   ArtifactTypeInput,
@@ -79,10 +82,6 @@ import {
   Typography,
   IconButton,
 } from "@/components/common";
-import {
-  handleDeleteAttributeLayout,
-  handleSaveAttributeLayout,
-} from "@/api/handlers/project/attribute-handler";
 
 /**
  * Allows for editing attribute layouts.
@@ -128,14 +127,15 @@ export default Vue.extend({
      * Saves an attribute layout.
      */
     handleSave() {
-      handleSaveAttributeLayout(this.store.editedLayout);
-      this.$emit("save");
+      handleSaveAttributeLayout(this.store.editedLayout, this.store.isUpdate, {
+        onSuccess: () => this.$emit("save"),
+      });
     },
     /**
      * Deletes an attribute layout.
      */
     handleDeleteLayout() {
-      handleDeleteAttributeLayout(this.store.editedLayout);
+      handleDeleteAttributeLayout(this.store.editedLayout, {});
     },
     /**
      * Deletes an attribute from the layout.

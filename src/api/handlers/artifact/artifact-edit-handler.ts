@@ -49,7 +49,7 @@ export async function handleSaveArtifact(
     onSuccess?.();
   } catch (e) {
     logStore.onDevError(String(e));
-    logStore.onError(`Unable to create artifact: ${artifact.name}`);
+    logStore.onError(`Unable to save artifact: ${artifact.name}`);
     onError?.(e as Error);
   } finally {
     onComplete?.();

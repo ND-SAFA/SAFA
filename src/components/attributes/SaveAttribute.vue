@@ -51,11 +51,8 @@ import Vue, { PropType } from "vue";
 import { AttributeSchema } from "@/types";
 import { attributeTypeOptions } from "@/util";
 import { attributeSaveStore } from "@/hooks";
+import { handleDeleteAttribute, handleSaveAttribute } from "@/api";
 import { FlexBox } from "@/components/common";
-import {
-  handleDeleteAttribute,
-  handleSaveAttribute,
-} from "@/api/handlers/project/attribute-handler";
 
 /**
  * Allows for creating and editing attributes.
@@ -82,14 +79,15 @@ export default Vue.extend({
      * Saves an attribute.
      */
     handleSave() {
-      handleSaveAttribute(this.store.editedAttribute);
-      this.$emit("save");
+      handleSaveAttribute(this.store.editedAttribute, this.store.isUpdate, {
+        onSuccess: () => this.$emit("save"),
+      });
     },
     /**
      * Deletes an attribute.
      */
     handleDelete() {
-      handleDeleteAttribute(this.store.editedAttribute);
+      handleDeleteAttribute(this.store.editedAttribute, {});
     },
   },
   watch: {

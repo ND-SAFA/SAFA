@@ -52,9 +52,15 @@ import { AttributeSchema } from "@/types";
 import { attributeTypeOptions } from "@/util";
 import { attributeSaveStore } from "@/hooks";
 import { FlexBox } from "@/components/common";
+import {
+  handleDeleteAttribute,
+  handleSaveAttribute,
+} from "@/api/handlers/project/attribute-handler";
 
 /**
  * Allows for creating and editing attributes.
+ *
+ * @emits-1 `save` - On attribute save.
  */
 export default Vue.extend({
   name: "SaveAttribute",
@@ -76,13 +82,14 @@ export default Vue.extend({
      * Saves an attribute.
      */
     handleSave() {
-      //TODO
+      handleSaveAttribute(this.store.editedAttribute);
+      this.$emit("save");
     },
     /**
      * Deletes an attribute.
      */
     handleDelete() {
-      //TODO
+      handleDeleteAttribute(this.store.editedAttribute);
     },
   },
   watch: {

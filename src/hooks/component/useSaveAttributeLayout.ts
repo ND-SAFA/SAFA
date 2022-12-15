@@ -55,7 +55,9 @@ export const useSaveAttributeLayout = (id: string) =>
        */
       addAttribute(key: string): void {
         const y =
-          Math.max(...this.editedLayout.positions.map(({ y }) => y)) + 1;
+          this.editedLayout.positions.length === 0
+            ? 0
+            : Math.max(0, ...this.editedLayout.positions.map(({ y }) => y)) + 1;
 
         this.editedLayout.positions.push({
           key,

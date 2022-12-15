@@ -79,9 +79,15 @@ import {
   Typography,
   IconButton,
 } from "@/components/common";
+import {
+  handleDeleteAttributeLayout,
+  handleSaveAttributeLayout,
+} from "@/api/handlers/project/attribute-handler";
 
 /**
  * Allows for editing attribute layouts.
+ *
+ * @emits-1 `save` - On attribute layout save.
  */
 export default Vue.extend({
   name: "SaveAttributeLayout",
@@ -122,13 +128,14 @@ export default Vue.extend({
      * Saves an attribute layout.
      */
     handleSave() {
-      //TODO
+      handleSaveAttributeLayout(this.store.editedLayout);
+      this.$emit("save");
     },
     /**
      * Deletes an attribute layout.
      */
     handleDeleteLayout() {
-      //TODO
+      handleDeleteAttributeLayout(this.store.editedLayout);
     },
     /**
      * Deletes an attribute from the layout.

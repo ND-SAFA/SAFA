@@ -18,7 +18,7 @@
         Cancel
       </v-btn>
     </flex-box>
-    <save-attribute v-if="createOpen" />
+    <save-attribute v-if="createOpen" @save="createOpen = false" />
     <v-divider v-if="createOpen" />
     <v-list expand>
       <toggle-list

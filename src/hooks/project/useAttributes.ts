@@ -119,6 +119,54 @@ export const useAttributes = defineStore("attributes", {
         ) || this.attributeLayouts[0]
       );
     },
+    /**
+     * Adds or updates an attribute.
+     * @param attribute - The attribute to add.
+     */
+    updateAttribute(attribute: AttributeSchema): void {
+      const existingIndex = this.attributes.findIndex(
+        ({ key }) => key === attribute.key
+      );
+
+      if (existingIndex === -1) {
+        this.attributes.push(attribute);
+      } else {
+        this.attributes.splice(existingIndex, 1, attribute);
+      }
+    },
+    /**
+     * Deletes an attribute.
+     * @param attribute - The attribute to delete.
+     */
+    deleteAttribute(attribute: AttributeSchema): void {
+      this.attributes = this.attributes.filter(
+        ({ key }) => key !== attribute.key
+      );
+    },
+    /**
+     * Adds or updates an attribute layout.
+     * @param layout - The attribute layout to add.
+     */
+    updateLayout(layout: AttributeLayoutSchema): void {
+      const existingIndex = this.attributeLayouts.findIndex(
+        ({ id }) => id === layout.id
+      );
+
+      if (existingIndex === -1) {
+        this.attributeLayouts.push(layout);
+      } else {
+        this.attributeLayouts.splice(existingIndex, 1, layout);
+      }
+    },
+    /**
+     * Deletes an attribute layout.
+     * @param layout - The attribute layout to delete.
+     */
+    deleteLayout(layout: AttributeLayoutSchema): void {
+      this.attributeLayouts = this.attributeLayouts.filter(
+        ({ id }) => id !== layout.id
+      );
+    },
   },
 });
 

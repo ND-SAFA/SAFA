@@ -16,8 +16,8 @@
       :w="pos.w"
       :h="pos.h"
       :i="pos.i"
-      @moved="(...args) => handleMoveEvent(pos, ...args)"
-      @resized="(...args) => handleResizeEvent(pos, ...args)"
+      @moved="handleMoveEvent"
+      @resized="handleResizeEvent"
     >
       <slot name="item" :attribute="attr" />
     </grid-item>
@@ -27,11 +27,7 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { GridLayout, GridItem, GridItemData } from "vue-grid-layout";
-import {
-  AttributeSchema,
-  AttributePositionSchema,
-  AttributeLayoutSchema,
-} from "@/types";
+import { AttributeSchema, AttributeLayoutSchema } from "@/types";
 import { attributesStore } from "@/hooks";
 
 /**
@@ -91,7 +87,7 @@ export default Vue.extend({
         gridLayout.push({
           i: "ADD-NEW-ATTRIBUTE",
           x: 0,
-          y: maxY + 1,
+          y: gridLayout.length === 0 ? 0 : maxY + 1,
           w: 2,
           h: 1,
         });
@@ -102,24 +98,22 @@ export default Vue.extend({
     /**
      * Called when an attribute is moved.
      */
-    handleMoveEvent(
-      position: AttributePositionSchema,
-      i: string,
-      x: number,
-      y: number
-    ) {
+    handleMoveEvent(i: string, x: number, y: number) {
+      const position = this.layout.positions.find(({ key }) => key === i);
+
+      if (!position) return;
+
       position.x = x;
       position.y = y;
     },
     /**
      * Called when an attribute is resized.
      */
-    handleResizeEvent(
-      position: AttributePositionSchema,
-      i: string,
-      height: number,
-      width: number
-    ) {
+    handleResizeEvent(i: string, height: number, width: number) {
+      const position = this.layout.positions.find(({ key }) => key === i);
+
+      if (!position) return;
+
       position.height = height;
       position.width = width;
     },

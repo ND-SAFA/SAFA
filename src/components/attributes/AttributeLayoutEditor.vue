@@ -7,7 +7,10 @@
       </v-btn>
     </template>
     <v-tab-item v-for="(tab, idx) in tabs" :key="idx + 1">
-      <save-attribute-layout :layout="layouts[idx]" />
+      <save-attribute-layout
+        :layout="layouts[idx]"
+        @save="handleSaveLayout(idx)"
+      />
     </v-tab-item>
   </tab-list>
 </template>
@@ -61,9 +64,17 @@ export default Vue.extend({
     /**
      * Adds a new attribute layout.
      */
-    handleAddLayout() {
+    handleAddLayout(): void {
       this.createOpen = true;
       this.tab = attributesStore.attributeLayouts.length;
+    },
+    /**
+     * Closes the layout creator on save.
+     * @param idx - The index of the saved layout.
+     */
+    handleSaveLayout(idx: number): void {
+      this.createOpen = false;
+      this.tab = idx;
     },
   },
 });

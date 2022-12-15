@@ -1,7 +1,7 @@
 <template>
   <tab-list v-model="tab" :tabs="tabs">
     <template v-slot:tabs>
-      <v-btn text color="primary" @click="handleAddLayout">
+      <v-btn v-if="!createOpen" text color="primary" @click="handleAddLayout">
         <v-icon>mdi-plus</v-icon>
         Add Layout
       </v-btn>
@@ -31,6 +31,7 @@ export default Vue.extend({
   data() {
     return {
       tab: 0,
+      createOpen: false,
     };
   },
   computed: {
@@ -44,10 +45,16 @@ export default Vue.extend({
      * @return The tabs for each layout.
      */
     tabs(): SelectOption[] {
-      return attributesStore.attributeLayouts.map(({ id, name }) => ({
+      const tabs = attributesStore.attributeLayouts.map(({ id, name }) => ({
         id,
         name,
       }));
+
+      if (this.createOpen) {
+        tabs.push({ id: "new", name: "New Layout" });
+      }
+
+      return tabs;
     },
   },
   methods: {
@@ -55,7 +62,8 @@ export default Vue.extend({
      * Adds a new attribute layout.
      */
     handleAddLayout() {
-      //TODO
+      this.createOpen = true;
+      this.tab = attributesStore.attributeLayouts.length;
     },
   },
 });

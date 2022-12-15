@@ -21,6 +21,7 @@ import {
   VersionSchema,
   AttributeSchema,
   AttributeType,
+  AttributeLayoutSchema,
 } from "@/types";
 import { defaultTypeIcon } from "@/util/icons";
 
@@ -266,5 +267,19 @@ export function createAttribute(
     options: attribute?.options,
     min: attribute?.min,
     max: attribute?.max,
+  };
+}
+
+/**
+ * @return An attribute layout initialized to the given props.
+ */
+export function createAttributeLayout(
+  layout?: Partial<AttributeLayoutSchema>
+): AttributeLayoutSchema {
+  return {
+    id: layout?.id || "",
+    name: layout?.name || "",
+    artifactTypes: layout?.artifactTypes || [],
+    positions: layout?.positions || [],
   };
 }

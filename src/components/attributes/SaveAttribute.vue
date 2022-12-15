@@ -2,36 +2,43 @@
   <v-container>
     <v-text-field
       filled
-      :disabled="isUpdate"
+      :disabled="store.isUpdate"
       label="Key"
-      v-model="editedAttribute.key"
+      v-model="store.editedAttribute.key"
+      hint="The unique key that this attribute is saved under."
     />
-    <v-text-field filled label="Label" v-model="editedAttribute.label" />
+    <v-text-field
+      filled
+      label="Label"
+      v-model="store.editedAttribute.label"
+      hint="The label that is displayed for this attribute."
+    />
     <v-select
       filled
-      :disabled="isUpdate"
-      label="Type"
-      v-model="editedAttribute.type"
+      :disabled="store.isUpdate"
+      label="Attribute Type"
+      v-model="store.editedAttribute.type"
       item-text="name"
       item-value="id"
       :items="typeOptions"
     />
     <v-combobox
-      v-if="editedAttribute.type.includes('select')"
+      v-if="store.editedAttribute.type.includes('select')"
       filled
       chips
       deletable-chips
       multiple
       label="Options"
-      v-model="editedAttribute.options"
+      v-model="store.editedAttribute.options"
+      hint="Type in an option and press enter to save."
     />
     <flex-box justify="space-between">
-      <v-btn v-if="isUpdate" text color="error" @click="handleDelete">
+      <v-btn v-if="store.isUpdate" text color="error" @click="handleDelete">
         <v-icon class="mr-1">mdi-delete</v-icon>
         Delete
       </v-btn>
       <v-spacer />
-      <v-btn color="primary" @click="handleSave">
+      <v-btn :disabled="!store.canSave" color="primary" @click="handleSave">
         <v-icon class="mr-1">mdi-content-save</v-icon>
         Save
       </v-btn>
@@ -63,26 +70,6 @@ export default Vue.extend({
   },
   mounted() {
     this.store.resetAttribute(this.attribute);
-  },
-  computed: {
-    /**
-     * @return  The attribute being edited.
-     */
-    editedAttribute(): AttributeSchema {
-      return this.store.editedAttribute;
-    },
-    /**
-     * @return  Whether the attribute can be saved.
-     */
-    canSave(): boolean {
-      return this.store.canSave;
-    },
-    /**
-     * @return Whether an existing attribute is being updated.
-     */
-    isUpdate(): boolean {
-      return this.store.isUpdate;
-    },
   },
   methods: {
     /**

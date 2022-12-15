@@ -42,11 +42,8 @@ export const useSaveAttribute = (id: string) =>
       /**
        * Resets the state of the attribute to the selected artifact.
        */
-      resetAttribute(baseAttribute?: AttributeSchema): void {
-        if (baseAttribute) {
-          this.baseAttribute = baseAttribute;
-        }
-
+      resetAttribute(baseAttribute: AttributeSchema): void {
+        this.baseAttribute = baseAttribute;
         this.editedAttribute = createAttribute(this.baseAttribute);
       },
     },

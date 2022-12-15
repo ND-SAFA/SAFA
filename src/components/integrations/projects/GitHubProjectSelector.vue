@@ -94,10 +94,7 @@ export default Vue.extend({
      * @return The subtitle.
      */
     getRepositorySubtitle(repository: GitHubProjectSchema): string {
-      const { name, size } = repository;
-      const subtitle = `${name} | ${size} File`;
-
-      return size === 1 ? subtitle : `${subtitle}s`;
+      return repository.name;
     },
     /**
      * Returns a repository's last updated time.

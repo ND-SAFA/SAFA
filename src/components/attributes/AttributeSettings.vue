@@ -1,6 +1,6 @@
 <template>
   <panel-card>
-    <v-row>
+    <v-row style="min-height: 60vh">
       <v-col cols="4">
         <attribute-editor />
       </v-col>

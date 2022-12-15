@@ -1,5 +1,5 @@
 <template>
-  <div class="pb-4 primary lighten-5">
+  <div class="mb-4">
     <v-card outlined :class="className">
       <slot />
     </v-card>

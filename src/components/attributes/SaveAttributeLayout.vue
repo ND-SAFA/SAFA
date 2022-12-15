@@ -1,8 +1,8 @@
 <template>
   <div>
-    <flex-box v-if="store.isCustom" justify="space-between" b="4">
+    <flex-box justify="space-between" b="4">
       <v-btn
-        v-if="store.isUpdate"
+        v-if="store.isCustom && store.isUpdate"
         text
         color="error"
         @click="handleDeleteLayout"

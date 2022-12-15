@@ -280,6 +280,6 @@ export function createAttributeLayout(
     id: layout?.id || "",
     name: layout?.name || "",
     artifactTypes: layout?.artifactTypes || [],
-    positions: layout?.positions || [],
+    positions: layout?.positions?.map((pos) => ({ ...pos })) || [],
   };
 }

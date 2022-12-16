@@ -39,7 +39,7 @@ public class TestGithubImport extends AbstractGithubTest {
         // We should have as many artifacts as the number of files produced by the mock service
         Assertions.assertEquals(
             serviceMock.getRepositoryFiles(credentials, repositoryName, "sha")
-                .filterOutFolders().getTree().size(),
+                .filesOnly().getTree().size(),
             serviceProvider.getArtifactRepository()
                 .findByProject(githubProject.getProject()).size()
         );
@@ -71,7 +71,7 @@ public class TestGithubImport extends AbstractGithubTest {
             .findByProjectAndRepositoryName(project, repositoryName).isPresent());
 
         int importedArtifactsCount = serviceMock.getRepositoryFiles(credentials, repositoryName, "sha")
-            .filterOutFolders().getTree().size();
+            .filesOnly().getTree().size();
 
         // We should have the correct number of artifacts and links
         List<Artifact> artifacts = serviceProvider.getArtifactRepository()

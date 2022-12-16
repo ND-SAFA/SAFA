@@ -27,10 +27,10 @@ public class GithubRepositoryFiletreeResponseDTO {
 
     private List<GithubRepositoryFileDTO> tree = new ArrayList<>();
 
-    public GithubRepositoryFiletreeResponseDTO filterOutFolders() {
+    public GithubRepositoryFiletreeResponseDTO filesOnly() {
         List<GithubRepositoryFileDTO> tree = this.tree
                 .stream()
-                .filter(file -> !GithubRepositoryFileType.FOLDER.equals(file.getType()))
+                .filter(file -> GithubRepositoryFileType.FILE.equals(file.getType()))
                 .collect(Collectors.toList());
 
         return new GithubRepositoryFiletreeResponseDTO(this.sha, tree);

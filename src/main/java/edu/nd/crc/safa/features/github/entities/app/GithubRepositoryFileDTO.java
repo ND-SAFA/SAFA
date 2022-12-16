@@ -29,7 +29,10 @@ public class GithubRepositoryFileDTO {
         FILE,
 
         @JsonProperty("tree")
-        FOLDER;
+        FOLDER,
+
+        @JsonProperty("commit")
+        SUBMODULE;
     }
 
 }

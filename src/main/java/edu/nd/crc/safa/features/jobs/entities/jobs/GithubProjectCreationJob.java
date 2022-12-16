@@ -160,7 +160,7 @@ public class GithubProjectCreationJob extends CommitJob {
                 this.githubIdentifier.getRepositoryName(),
                 this.commitSha);
 
-        for (GithubRepositoryFileDTO file : filetreeResponseDTO.filterOutFolders().getTree()) {
+        for (GithubRepositoryFileDTO file : filetreeResponseDTO.filesOnly().getTree()) {
             GithubFileBlobDTO blobDTO = this.serviceProvider.getGithubConnectionService()
                 .getBlobInformation(this.credentials, file.getBlobApiUrl());
             String name = file.getPath();

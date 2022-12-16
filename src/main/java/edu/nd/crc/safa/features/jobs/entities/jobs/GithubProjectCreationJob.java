@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.features.jobs.entities.jobs;
 
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -146,7 +147,6 @@ public class GithubProjectCreationJob extends CommitJob {
         this.commitSha = connectionService.getRepositoryBranch(this.credentials, repositoryName,
             this.githubRepositoryDTO.getDefaultBranch()).getLastCommitSha();
         this.projectCommit.addArtifacts(ModificationType.ADDED, getArtifacts());
-        System.out.println("HERE I AM " + projectCommit.getArtifacts().getSize());
         this.githubProject.setLastCommitSha(this.commitSha);
         this.serviceProvider.getGithubProjectRepository().save(githubProject);
     }
@@ -169,7 +169,7 @@ public class GithubProjectCreationJob extends CommitJob {
             String body = "";
 
             if (blobDTO != null && StringUtils.hasLength(blobDTO.getContent())) {
-                body = blobDTO.getContent();
+                body = base64Decode(blobDTO.getContent());
             }
 
             ArtifactAppEntity artifact = new ArtifactAppEntity(
@@ -186,5 +186,23 @@ public class GithubProjectCreationJob extends CommitJob {
         }
 
         return artifacts;
+    }
+
+    /**
+     * Decodes GitHub's base64 encoded file bodies. Each line in the original file
+     * is base64 encoded in GitHub's storage, with newlines separating them.
+     *
+     * @param encodedBody The encoded file body
+     * @return The decoded file body
+     */
+    private String base64Decode(String encodedBody) {
+        StringBuilder output = new StringBuilder();
+
+        for (String line : encodedBody.split("\n")) {
+            byte[] decodedBytes = Base64.getDecoder().decode(line);
+            output.append(new String(decodedBytes));
+        }
+
+        return output.toString();
     }
 }

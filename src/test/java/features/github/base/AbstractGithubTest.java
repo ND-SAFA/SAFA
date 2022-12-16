@@ -5,9 +5,8 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import common.ApplicationBaseTest;
 import edu.nd.crc.safa.features.github.entities.app.GithubCommitDiffResponseDTO;
+import edu.nd.crc.safa.features.github.entities.app.GithubFileBlobDTO;
 import edu.nd.crc.safa.features.github.entities.app.GithubRepositoryBranchDTO;
 import edu.nd.crc.safa.features.github.entities.app.GithubRepositoryDTO;
 import edu.nd.crc.safa.features.github.entities.app.GithubRepositoryFiletreeResponseDTO;
@@ -16,6 +15,9 @@ import edu.nd.crc.safa.features.github.entities.db.GithubAccessCredentials;
 import edu.nd.crc.safa.features.github.repositories.GithubAccessCredentialsRepository;
 import edu.nd.crc.safa.features.github.services.GithubConnectionService;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import common.ApplicationBaseTest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mockito;
@@ -32,6 +34,11 @@ public abstract class AbstractGithubTest extends ApplicationBaseTest {
     private static final String MASTER_BRANCH_RESPONSE_FILE = "mock/github/master_branch_response.json";
     private static final String FILETREE_RESPONSE_FILE = "mock/github/filetree_response.json";
     private static final String DIFF_RESPONSE_FILE = "mock/github/diff_response.json";
+
+    public static final String ENCODED_FILE_CONTENT = "VGhpcyBpcyBzb21lIHRlc3QgY29udGVudCB0aGF0IHdpbGwgYmUgcGFyc2VkIGZyb20gYmFzZTY0\n" +
+        "IGludG8gYSByYXcgc3RyaW5n";
+
+    public static final String DECODED_FILE_CONTENT = "This is some test content that will be parsed from base64 into a raw string";
 
     protected String repositoryName = "home_assistant_ro";
     protected String githubLogin = "safaGithub";
@@ -94,6 +101,11 @@ public abstract class AbstractGithubTest extends ApplicationBaseTest {
         )).thenReturn(
             this.readResourceFile(DIFF_RESPONSE_FILE, GithubCommitDiffResponseDTO.class)
         );
+
+        GithubFileBlobDTO file = new GithubFileBlobDTO();
+        file.setContent(ENCODED_FILE_CONTENT);
+        Mockito.when(serviceMock.getBlobInformation(Mockito.any(), Mockito.any()))
+                .thenReturn(file);
 
         credentials.setAccessTokenExpirationDate(LocalDateTime.MAX);
         credentials.setRefreshTokenExpirationDate(LocalDateTime.MAX);

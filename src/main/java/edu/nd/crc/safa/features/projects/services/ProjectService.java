@@ -51,6 +51,16 @@ public class ProjectService {
      */
     public List<ProjectIdAppEntity> getProjectsForCurrentUser() {
         SafaUser user = this.safaUserService.getCurrentUser();
+        return getProjectsForUser(user);
+    }
+
+    /**
+     * Returns list of projects owned or shared with current user.
+     *
+     * @param user The user to get projects for
+     * @return List of projects where given user has access to.
+     */
+    public List<ProjectIdAppEntity> getProjectsForUser(SafaUser user) {
         return this.projectMembershipRepository
             .findByMember(user)
             .stream()
@@ -71,8 +81,19 @@ public class ProjectService {
      * @param project The project to set user as owner
      */
     public void saveProjectWithCurrentUserAsOwner(Project project) {
+        SafaUser user = this.safaUserService.getCurrentUser();
+        saveProjectWithUserAsOwner(project, user);
+    }
+
+    /**
+     * Sets authorized user as project owner and saves project.
+     *
+     * @param project The project to set user as owner
+     * @param user The user to set as owner
+     */
+    public void saveProjectWithUserAsOwner(Project project, SafaUser user) {
         this.projectRepository.save(project);
-        this.setCurrentUserAsOwner(project);
+        this.setUserAsOwner(project, user);
     }
 
     /**
@@ -82,6 +103,16 @@ public class ProjectService {
      */
     public void setCurrentUserAsOwner(Project project) {
         SafaUser user = this.safaUserService.getCurrentUser();
+        setUserAsOwner(project, user);
+    }
+
+    /**
+     * The authorized user to be an owner to given project.
+     *
+     * @param project The project the current user will be owner in.
+     * @param user The user to set as owner
+     */
+    public void setUserAsOwner(Project project, SafaUser user) {
         ProjectMembership projectMembership = new ProjectMembership(project, user, ProjectRole.OWNER);
         this.projectMembershipRepository.save(projectMembership);
     }

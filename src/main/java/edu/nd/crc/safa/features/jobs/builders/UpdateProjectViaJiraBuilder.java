@@ -4,6 +4,7 @@ import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.jira.entities.api.JiraIdentifier;
 import edu.nd.crc.safa.features.jobs.entities.app.AbstractJob;
 import edu.nd.crc.safa.features.jobs.entities.jobs.JiraProjectUpdateJob;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
 /**
  * Builds job for pulling issues from JIRA and updating project.
@@ -11,8 +12,9 @@ import edu.nd.crc.safa.features.jobs.entities.jobs.JiraProjectUpdateJob;
 public class UpdateProjectViaJiraBuilder extends CreateProjectViaJiraBuilder {
 
     public UpdateProjectViaJiraBuilder(ServiceProvider serviceProvider,
-                                       JiraIdentifier jiraIdentifier) {
-        super(serviceProvider, jiraIdentifier);
+                                       JiraIdentifier jiraIdentifier,
+                                       SafaUser user) {
+        super(serviceProvider, jiraIdentifier, user);
         if (jiraIdentifier.getProjectVersion() == null) {
             throw new IllegalArgumentException("Expected non-null project version when updating project.");
         }

@@ -7,6 +7,8 @@ import edu.nd.crc.safa.features.jobs.entities.app.AbstractJob;
 import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
 import edu.nd.crc.safa.features.jobs.entities.app.JobType;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
+import edu.nd.crc.safa.features.jobs.services.JobService;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
 import lombok.AllArgsConstructor;
 
@@ -27,9 +29,15 @@ public abstract class AbstractJobBuilder<I> {
      */
     JobDbEntity jobDbEntity;
 
-    protected AbstractJobBuilder(ServiceProvider serviceProvider) {
-        this.serviceProvider = serviceProvider;
+    SafaUser user;
 
+    protected AbstractJobBuilder(ServiceProvider serviceProvider) {
+        this(serviceProvider, null);
+    }
+
+    protected AbstractJobBuilder(ServiceProvider serviceProvider, SafaUser user) {
+        this.serviceProvider = serviceProvider;
+        this.user = user;
     }
 
     public JobAppEntity perform() throws Exception {
@@ -37,9 +45,13 @@ public abstract class AbstractJobBuilder<I> {
         this.identifier = this.constructIdentifier();
 
         // Step 2 - Create database entity
-        this.jobDbEntity = this.serviceProvider
-            .getJobService()
-            .createNewJob(this.getJobType(), this.getJobName());
+        JobService jobService = this.serviceProvider.getJobService();
+
+        if (this.user == null) {
+            this.jobDbEntity = jobService.createNewJob(this.getJobType(), this.getJobName());
+        } else {
+            this.jobDbEntity = jobService.createNewJobForUser(this.getJobType(), this.getJobName(), this.user);
+        }
 
         // Step 3 - Construct job definition
         AbstractJob abstractJob = this.constructJobForWork();

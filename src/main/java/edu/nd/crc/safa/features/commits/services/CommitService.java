@@ -21,6 +21,7 @@ import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.traces.repositories.TraceLinkVersionRepository;
 import edu.nd.crc.safa.features.traces.services.TraceService;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import lombok.AllArgsConstructor;
@@ -42,10 +43,11 @@ public class CommitService {
      * Saves entities in commit to specified project version.
      *
      * @param projectCommit The commit containing changes to artifacts and traces.
+     * @param user          The user performing the commit
      * @return ProjectCommit with updated entities.
      * @throws SafaError Throws error if any change fails to commit.
      */
-    public ProjectCommit performCommit(ProjectCommit projectCommit) throws SafaError {
+    public ProjectCommit performCommit(ProjectCommit projectCommit, SafaUser user) throws SafaError {
         ProjectVersion projectVersion = projectCommit.getCommitVersion();
         boolean failOnError = projectCommit.isFailOnError();
         List<CommitError> errors;
@@ -87,7 +89,7 @@ public class CommitService {
             builder.withUpdateLayout();
         }
 
-        this.notificationService.broadcastChange(builder);
+        this.notificationService.broadcastChangeToUser(builder, user);
 
         return new ProjectCommit(projectVersion, artifactChanges, traceChanges, errors, failOnError);
     }

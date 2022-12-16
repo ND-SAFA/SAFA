@@ -54,8 +54,8 @@ public class JiraInstallationsController extends BaseController {
     public DeferredResult<JiraResponseDTO<List<JiraInstallationDTO>>> retrieveAvailableInstallations() {
         DeferredResult<JiraResponseDTO<List<JiraInstallationDTO>>> output = executorDelegate.createOutput(5000L);
 
+        SafaUser principal = safaUserService.getCurrentUser();
         executorDelegate.submit(output, () -> {
-            SafaUser principal = safaUserService.getCurrentUser();
             Optional<JiraAccessCredentials> credentials = accessCredentialsRepository
                 .findByUser(principal);
 
@@ -76,13 +76,13 @@ public class JiraInstallationsController extends BaseController {
         @PathVariable("cloudId") String cloudId) {
         DeferredResult<JiraResponseDTO<Void>> output = executorDelegate.createOutput(5000L);
 
+        SafaUser principal = safaUserService.getCurrentUser();
         executorDelegate.submit(output, () -> {
             if (!StringUtils.hasText(cloudId)) {
                 output.setResult(new JiraResponseDTO<>(null, JiraResponseMessage.ERROR));
                 return;
             }
 
-            SafaUser principal = safaUserService.getCurrentUser();
             Optional<JiraAccessCredentials> credentialsOptional = accessCredentialsRepository
                 .findByUser(principal);
 

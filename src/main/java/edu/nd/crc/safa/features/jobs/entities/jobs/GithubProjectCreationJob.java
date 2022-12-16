@@ -25,7 +25,6 @@ import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.services.ProjectService;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
-import edu.nd.crc.safa.features.users.services.SafaUserService;
 
 import org.springframework.util.StringUtils;
 
@@ -80,10 +79,9 @@ public class GithubProjectCreationJob extends CommitJob {
 
     @IJobStep(value = "Authenticating User Credentials", position = 1)
     public void authenticateUserCredentials() {
-        SafaUserService safaUserService = this.serviceProvider.getSafaUserService();
         GithubAccessCredentialsRepository accessCredentialsRepository = this.serviceProvider
             .getGithubAccessCredentialsRepository();
-        SafaUser principal = safaUserService.getCurrentUser();
+        SafaUser principal = this.getJobDbEntity().getUser();
 
         this.credentials = accessCredentialsRepository.findByUser(principal).orElseThrow(() ->
             new SafaError("No GitHub credentials found for user " + principal.getEmail()));
@@ -130,8 +128,7 @@ public class GithubProjectCreationJob extends CommitJob {
     }
 
     protected GithubProject getGithubProjectMapping(Project project) {
-        SafaUserService safaUserService = this.serviceProvider.getSafaUserService();
-        SafaUser principal = safaUserService.getCurrentUser();
+        SafaUser principal = this.getJobDbEntity().getUser();
         GithubProject githubProject = new GithubProject();
 
         githubProject.setProject(project);

@@ -70,18 +70,18 @@ public class JobService {
 
     /**
      * Creates new job with:
-     * - current authenticated user as creator
+     * - given authenticated user as creator
      * - status as In Progress
      * - current progress equals 0
      *
      * @param jobType The type of job being performed.
      * @param name    The name of the job.
+     * @param user    The user to create the job for
      * @return The saved job db entity.
      */
-    public JobDbEntity createNewJob(JobType jobType, String name) {
-        SafaUser currentUser = this.safaUserService.getCurrentUser();
+    public JobDbEntity createNewJobForUser(JobType jobType, String name, SafaUser user) {
         JobDbEntity jobDbEntity = new JobDbEntity(
-            currentUser,
+            user,
             name,
             jobType,
             JobStatus.IN_PROGRESS,
@@ -93,6 +93,21 @@ public class JobService {
         );
         this.jobDbRepository.save(jobDbEntity);
         return jobDbEntity;
+    }
+
+    /**
+     * Creates new job with:
+     * - current authenticated user as creator
+     * - status as In Progress
+     * - current progress equals 0
+     *
+     * @param jobType The type of job being performed.
+     * @param name    The name of the job.
+     * @return The saved job db entity.
+     */
+    public JobDbEntity createNewJob(JobType jobType, String name) {
+        SafaUser currentUser = this.safaUserService.getCurrentUser();
+        return createNewJobForUser(jobType, name, currentUser);
     }
 
     /**

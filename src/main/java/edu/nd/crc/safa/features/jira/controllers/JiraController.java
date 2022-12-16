@@ -59,8 +59,8 @@ public class JiraController extends BaseController {
         DeferredResult<JiraResponseDTO<List<JiraProjectResponseDTO>>> output =
             executorDelegate.createOutput(5000L);
 
+        SafaUser principal = safaUserService.getCurrentUser();
         executorDelegate.submit(output, () -> {
-            SafaUser principal = safaUserService.getCurrentUser();
             Optional<JiraAccessCredentials> credentialsOptional = accessCredentialsRepository
                 .findByUser(principal);
 
@@ -98,7 +98,8 @@ public class JiraController extends BaseController {
         // version created in job
         CreateProjectViaJiraBuilder createProjectViaJira = new CreateProjectViaJiraBuilder(
             serviceProvider,
-            new JiraIdentifier(null, jiraProjectId, jiraAccessCredentials.getCloudId()));
+            new JiraIdentifier(null, jiraProjectId, jiraAccessCredentials.getCloudId()),
+            principal);
 
         return new JiraResponseDTO<>(createProjectViaJira.perform(), JiraResponseMessage.OK);
     }
@@ -126,7 +127,8 @@ public class JiraController extends BaseController {
             jiraAccessCredentials.getCloudId());
         UpdateProjectViaJiraBuilder updateProjectViaJira = new UpdateProjectViaJiraBuilder(
             this.serviceProvider,
-            jiraIdentifier
+            jiraIdentifier,
+            principal
         );
 
         return new JiraResponseDTO<>(updateProjectViaJira.perform(), JiraResponseMessage.OK);
@@ -156,7 +158,8 @@ public class JiraController extends BaseController {
             jiraAccessCredentials.getCloudId());
         ImportIntoProjectViaJiraBuilder updateProjectViaJira = new ImportIntoProjectViaJiraBuilder(
             this.serviceProvider,
-            jiraIdentifier
+            jiraIdentifier,
+            principal
         );
 
         return new JiraResponseDTO<>(updateProjectViaJira.perform(), JiraResponseMessage.OK);

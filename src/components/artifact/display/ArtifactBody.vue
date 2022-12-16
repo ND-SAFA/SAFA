@@ -1,9 +1,8 @@
 <template>
   <div>
-    <v-btn class="my-2" text @click="handleViewArtifact">
-      <v-icon class="mr-1">mdi-application-array-outline</v-icon>
+    <text-button text y="2" variant="artifact" @click="handleViewArtifact">
       View Artifact
-    </v-btn>
+    </text-button>
     <typography
       :variant="isCodeDisplay ? 'code' : 'body'"
       el="p"
@@ -15,7 +14,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { appStore, selectionStore } from "@/hooks";
-import { Typography } from "@/components/common";
+import { Typography, TextButton } from "@/components/common";
 
 /**
  * Displays the selected node's body.
@@ -23,6 +22,7 @@ import { Typography } from "@/components/common";
 export default Vue.extend({
   name: "ArtifactBody",
   components: {
+    TextButton,
     Typography,
   },
   computed: {

@@ -1,16 +1,17 @@
 /**
  * Enumerates the type of attribute properties.
  */
-export type AttributeType =
-  | "text" // String
-  | "paragraph" // String
-  | "select" // String
-  | "multiselect" // String Array
-  | "relation" // String Array
-  | "date" // ISO Date String
-  | "int" // Integer
-  | "float" // Float
-  | "boolean"; // Boolean
+export enum AttributeType {
+  text = "text", // String
+  paragraph = "paragraph", // String
+  select = "select", // String
+  multiselect = "multiselect", // String Array
+  relation = "relation", // String Array
+  date = "date", // ISO Date String
+  int = "int", // Integer
+  float = "float", // Float
+  boolean = "boolean", // Boolean
+}
 
 /**
  * Defines a custom attribute being tracked for a project.
@@ -76,6 +77,10 @@ export interface AttributeLayoutSchema {
    * The ID of this attribute layout.
    */
   id: string;
+  /**
+   * The name of this attribute layout.
+   */
+  name: string;
   /**
    * The list of artifact types to display this attribute layout on.
    * If empty, this attribute will be displayed for all.

@@ -1,14 +1,18 @@
 <template>
-  <attribute-grid>
+  <attribute-grid :layout="layout">
     <template v-slot:item="{ attribute }">
-      <attribute-display :model="model" :attribute="attribute" />
+      <attribute-display
+        :model="artifact.attributes || {}"
+        :attribute="attribute"
+      />
     </template>
   </attribute-grid>
 </template>
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { AttributeCollectionSchema } from "@/types";
+import { ArtifactSchema, AttributeLayoutSchema } from "@/types";
+import { attributesStore } from "@/hooks";
 import AttributeGrid from "./AttributeGrid.vue";
 import AttributeDisplay from "./AttributeDisplay.vue";
 
@@ -19,7 +23,18 @@ export default Vue.extend({
   name: "AttributeListDisplay",
   components: { AttributeDisplay, AttributeGrid },
   props: {
-    model: Object as PropType<AttributeCollectionSchema>,
+    artifact: {
+      type: Object as PropType<ArtifactSchema>,
+      required: true,
+    },
+  },
+  computed: {
+    /**
+     * @return The layout for this artifact.
+     */
+    layout(): AttributeLayoutSchema {
+      return attributesStore.getLayoutByType(this.artifact.type);
+    },
   },
 });
 </script>

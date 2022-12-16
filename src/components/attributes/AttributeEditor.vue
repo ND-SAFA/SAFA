@@ -1,0 +1,82 @@
+<template>
+  <v-navigation-drawer absolute permanent width="33%">
+    <flex-box
+      t="6"
+      full-width
+      justify="space-between"
+      align="center"
+      class="px-4"
+    >
+      <typography
+        variant="subtitle"
+        :value="createOpen ? 'New Attribute' : 'Attributes'"
+      />
+      <v-spacer />
+      <text-button
+        v-if="!createOpen"
+        text
+        variant="add"
+        @click="createOpen = true"
+      >
+        Add Attribute
+      </text-button>
+      <text-button v-else text variant="cancel" @click="createOpen = false">
+        Cancel
+      </text-button>
+    </flex-box>
+    <save-attribute v-if="createOpen" @save="createOpen = false" />
+    <v-divider v-if="createOpen" />
+    <v-list expand>
+      <toggle-list
+        v-for="attribute in attributes"
+        :key="attribute.key"
+        :title="attribute.label"
+      >
+        <save-attribute :attribute="attribute" />
+      </toggle-list>
+    </v-list>
+    <flex-box v-if="attributes.length === 0" justify="center">
+      <typography
+        variant="caption"
+        value="You have not yet created any custom attributes."
+      />
+    </flex-box>
+  </v-navigation-drawer>
+</template>
+
+<script lang="ts">
+import Vue from "vue";
+import { AttributeSchema } from "@/types";
+import { attributeTypeOptions } from "@/util";
+import { attributesStore } from "@/hooks";
+import {
+  ToggleList,
+  FlexBox,
+  TextButton,
+  Typography,
+} from "@/components/common";
+import SaveAttribute from "./SaveAttribute.vue";
+
+/**
+ * Renders the list of project attributes and allows for editing them.
+ */
+export default Vue.extend({
+  name: "AttributeEditor",
+  components: { TextButton, Typography, FlexBox, SaveAttribute, ToggleList },
+  data() {
+    return {
+      typeOptions: attributeTypeOptions(),
+      createOpen: false,
+    };
+  },
+  computed: {
+    /**
+     * @return The list of custom attributes.
+     */
+    attributes(): AttributeSchema[] {
+      return attributesStore.attributes;
+    },
+  },
+  methods: {},
+});
+</script>

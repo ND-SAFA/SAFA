@@ -1,23 +1,30 @@
 <template>
   <flex-box t="2" v-if="doDisplay">
-    <v-btn text data-cy="button-artifact-body" @click="handleViewBody">
-      <v-icon class="mr-1">mdi-application-array-outline</v-icon>
-      View Body
-    </v-btn>
-    <v-btn text data-cy="button-artifact-edit" @click="handleEditArtifact">
-      <v-icon class="mr-1">mdi-pencil</v-icon>
-      Edit
-    </v-btn>
-    <v-divider vertical />
-    <v-btn
+    <text-button
       text
-      color="error"
+      variant="artifact"
+      data-cy="button-artifact-body"
+      @click="handleViewBody"
+    >
+      View Body
+    </text-button>
+    <text-button
+      text
+      variant="edit"
+      data-cy="button-artifact-edit"
+      @click="handleEditArtifact"
+    >
+      Edit
+    </text-button>
+    <v-divider vertical />
+    <text-button
+      text
+      variant="delete"
       data-cy="button-artifact-delete"
       @click="handleDeleteArtifact"
     >
-      <v-icon class="mr-1">mdi-delete</v-icon>
       Delete
-    </v-btn>
+    </text-button>
   </flex-box>
 </template>
 
@@ -26,14 +33,14 @@ import Vue from "vue";
 import { ArtifactSchema } from "@/types";
 import { appStore, projectStore, selectionStore, sessionStore } from "@/hooks";
 import { handleDeleteArtifact } from "@/api";
-import { FlexBox } from "@/components/common";
+import { FlexBox, TextButton } from "@/components/common";
 
 /**
  * Displays artifact buttons.
  */
 export default Vue.extend({
   name: "ArtifactButtons",
-  components: { FlexBox },
+  components: { TextButton, FlexBox },
   computed: {
     /**
      * @return Whether to display these actions.

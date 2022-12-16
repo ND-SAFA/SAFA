@@ -1,5 +1,6 @@
 <template>
   <div>
+    <typography el="h2" variant="subtitle" value="Generate Trace Links" />
     <typography el="p" b="4" :value="modalDescription" />
     <custom-model-input v-model="model" />
     <trace-matrix-creator v-model="matrices" />

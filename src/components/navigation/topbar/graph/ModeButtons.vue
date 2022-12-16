@@ -1,48 +1,50 @@
 <template>
   <v-btn-toggle tile group multiple dense :value="value">
-    <v-btn
+    <text-button
       :disabled="isTreeDisabled"
       value="tree"
       text
       color="accent"
       data-cy="button-nav-tree"
+      icon-id="mdi-family-tree"
       @click="handleTreeView"
     >
-      <v-icon left color="accent">mdi-family-tree</v-icon>
       Tree
-    </v-btn>
-    <v-btn
+    </text-button>
+    <text-button
       value="table"
       text
       color="accent"
       data-cy="button-nav-table"
+      icon-id="mdi-table-multiple"
       @click="handleTableView"
     >
-      <v-icon left color="accent">mdi-table-multiple</v-icon>
       Table
-    </v-btn>
-    <v-btn
+    </text-button>
+    <text-button
       value="delta"
       text
       color="accent"
       data-cy="button-nav-delta"
+      icon-id="mdi-compare"
       @click="handleDeltaView"
     >
-      <v-icon left color="accent">mdi-compare</v-icon>
       Delta
-    </v-btn>
+    </text-button>
   </v-btn-toggle>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import { appStore, deltaStore, documentStore } from "@/hooks";
+import { TextButton } from "@/components/common";
 
 /**
  * Buttons for changing the mode of the artifact view.
  */
 export default Vue.extend({
   name: "ModeButtons",
+  components: { TextButton },
   data() {
     return {
       value: [] as string[],

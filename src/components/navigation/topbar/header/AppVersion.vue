@@ -29,10 +29,9 @@
         {{ getVersionName(item) }}
       </template>
       <template v-slot:append-item>
-        <v-btn text color="primary" @click="openCreateVersion = true">
-          <v-icon>mdi-plus</v-icon>
+        <text-button text variant="add" @click="openCreateVersion = true">
           Add Version
-        </v-btn>
+        </text-button>
       </template>
     </v-select>
 
@@ -51,7 +50,7 @@ import { VersionSchema } from "@/types";
 import { versionToString } from "@/util";
 import { projectStore } from "@/hooks";
 import { getProjectVersions, handleLoadVersion } from "@/api";
-import { Typography, FlexBox } from "@/components/common";
+import { Typography, FlexBox, TextButton } from "@/components/common";
 import { VersionCreator } from "@/components/project/selector";
 
 /**
@@ -59,7 +58,7 @@ import { VersionCreator } from "@/components/project/selector";
  */
 export default Vue.extend({
   name: "AppVersion",
-  components: { FlexBox, Typography, VersionCreator },
+  components: { TextButton, FlexBox, Typography, VersionCreator },
   data() {
     return {
       versions: [] as VersionSchema[],

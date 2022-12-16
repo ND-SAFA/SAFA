@@ -7,10 +7,14 @@
         display-divider
       />
       <v-card-actions>
-        <v-btn text data-cy="button-trace-target" @click="handleViewTarget">
-          <v-icon class="mr-1">mdi-application-array-outline</v-icon>
+        <text-button
+          text
+          data-cy="button-trace-target"
+          variant="artifact"
+          @click="handleViewTarget"
+        >
           View Artifact
-        </v-btn>
+        </text-button>
       </v-card-actions>
     </panel-card>
     <flex-box justify="center" b="4">
@@ -49,6 +53,7 @@ import {
   FlexBox,
   AttributeChip,
   PanelCard,
+  TextButton,
 } from "@/components/common";
 
 /**
@@ -57,6 +62,7 @@ import {
 export default Vue.extend({
   name: "TraceLinkContent",
   components: {
+    TextButton,
     PanelCard,
     FlexBox,
     ArtifactBodyDisplay,

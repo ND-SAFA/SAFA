@@ -19,3 +19,7 @@
   max-height: 40vh;
   overflow-y: scroll;
 }
+
+.v-tabs-bar, .v-window {
+  background-color: transparent !important;
+}

@@ -19,6 +19,9 @@ import {
   GenerationModelSchema,
   UserSchema,
   VersionSchema,
+  AttributeSchema,
+  AttributeType,
+  AttributeLayoutSchema,
 } from "@/types";
 import { defaultTypeIcon } from "@/util/icons";
 
@@ -248,5 +251,35 @@ export function createModel(
     id: model?.id || "",
     name: model?.name || "",
     baseModel: model?.baseModel || ModelType.NLBert,
+  };
+}
+
+/**
+ * @return An attribute initialized to the given props.
+ */
+export function createAttribute(
+  attribute?: Partial<AttributeSchema>
+): AttributeSchema {
+  return {
+    key: attribute?.key || "",
+    label: attribute?.label || "",
+    type: attribute?.type || AttributeType.text,
+    options: attribute?.options,
+    min: attribute?.min,
+    max: attribute?.max,
+  };
+}
+
+/**
+ * @return An attribute layout initialized to the given props.
+ */
+export function createAttributeLayout(
+  layout?: Partial<AttributeLayoutSchema>
+): AttributeLayoutSchema {
+  return {
+    id: layout?.id || "",
+    name: layout?.name || "",
+    artifactTypes: layout?.artifactTypes || [],
+    positions: layout?.positions?.map((pos) => ({ ...pos })) || [],
   };
 }

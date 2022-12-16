@@ -12,6 +12,7 @@
   <v-textarea
     v-else-if="attribute.type === 'paragraph'"
     filled
+    no-resize
     :label="attribute.label"
     class="mr-2"
     rows="3"

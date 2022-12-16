@@ -3,4 +3,5 @@ export enum SettingsTabTypes {
   upload = "upload",
   integrations = "integrations",
   artifacts = "artifacts",
+  attributes = "attributes",
 }

@@ -1,7 +1,6 @@
 <template>
   <panel-card>
-    <typography el="h2" variant="subtitle" value="Type Options" />
-    <v-divider class="mb-2" />
+    <typography el="h2" variant="subtitle" value="Artifact Types" />
 
     <v-list expand>
       <toggle-list
@@ -13,12 +12,10 @@
         <template v-slot:activator>
           <typography :value="entry.label" ellipsis />
         </template>
-        <v-card outlined class="my-2">
-          <v-container>
-            <type-direction-input :entry="entry" />
-            <type-icon-input :entry="entry" />
-          </v-container>
-        </v-card>
+        <v-container>
+          <type-direction-input :entry="entry" />
+          <type-icon-input :entry="entry" />
+        </v-container>
       </toggle-list>
     </v-list>
   </panel-card>

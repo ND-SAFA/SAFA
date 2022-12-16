@@ -121,12 +121,20 @@ export const EXAMPLE_ATTRIBUTES = [
   },
 ] as AttributeSchema[];
 
+export const EXAMPLE_EMPTY_LAYOUT = {
+  id: "default",
+  name: "Default",
+  artifactTypes: [],
+  positions: [],
+} as AttributeLayoutSchema;
+
 /**
  * Example attribute layouts for artifacts.
  */
 export const EXAMPLE_ATTRIBUTE_LAYOUTS = [
   {
     id: "default",
+    name: "Default",
     artifactTypes: [],
     positions: [
       { x: 0, y: 0, width: 1, height: 1, key: "str" },
@@ -145,6 +153,15 @@ export const EXAMPLE_ATTRIBUTE_LAYOUTS = [
       { x: 0, y: 5, width: 2, height: 1, key: "par" },
     ],
   },
+  {
+    id: "new",
+    name: "New",
+    artifactTypes: ["design"],
+    positions: [
+      { x: 0, y: 0, width: 1, height: 1, key: "str" },
+      { x: 1, y: 0, width: 1, height: 1, key: "bool" },
+    ],
+  },
 ] as AttributeLayoutSchema[];
 
 /**
@@ -152,5 +169,7 @@ export const EXAMPLE_ATTRIBUTE_LAYOUTS = [
  */
 export const ENABLED_FEATURES = {
   EXAMPLE_TRAINING_STEPS: false,
+
+  ATTRIBUTES: true,
   EXAMPLE_ATTRIBUTES: false,
 };

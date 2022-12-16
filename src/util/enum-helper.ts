@@ -1,6 +1,7 @@
 import {
   ApprovalType,
   ArtifactDeltaState,
+  AttributeType,
   CreatorTabTypes,
   DocumentType,
   FTANodeType,
@@ -14,6 +15,7 @@ import {
   TracePredictionTabTypes,
 } from "@/types";
 import { enumToDisplay } from "@/util/string-helper";
+import { ENABLED_FEATURES } from "@/util/enabled-features";
 
 /**
  * Converts an enum value into a selectable option with a title case name.
@@ -220,7 +222,10 @@ export function settingsTabOptions(): SelectOption[] {
     createEnumOption(SettingsTabTypes.members, "Members"),
     createEnumOption(SettingsTabTypes.upload, "Data Upload"),
     createEnumOption(SettingsTabTypes.integrations, "Data Integrations"),
-    createEnumOption(SettingsTabTypes.artifacts, "Artifact Settings"),
+    createEnumOption(SettingsTabTypes.artifacts, "Artifact Types"),
+    ...(ENABLED_FEATURES.ATTRIBUTES
+      ? [createEnumOption(SettingsTabTypes.attributes, "Custom Attributes")]
+      : []),
   ];
 }
 
@@ -247,5 +252,24 @@ export function tableViewTabOptions(): SelectOption[] {
   return [
     createEnumOption("artifacts", "Artifacts"),
     createEnumOption("traceLinks", "Trace Links"),
+  ];
+}
+
+/**
+ * Returns display names for attribute types.
+ *
+ * @return The select option names and ids.
+ */
+export function attributeTypeOptions(): SelectOption[] {
+  return [
+    createEnumOption(AttributeType.text, "Text"),
+    createEnumOption(AttributeType.paragraph, "Paragraph"),
+    createEnumOption(AttributeType.select, "Select"),
+    createEnumOption(AttributeType.multiselect, "Multiselect"),
+    createEnumOption(AttributeType.relation, "Relation"),
+    createEnumOption(AttributeType.date, "Date"),
+    createEnumOption(AttributeType.int, "Integer"),
+    createEnumOption(AttributeType.float, "Number"),
+    createEnumOption(AttributeType.boolean, "Yes/No"),
   ];
 }

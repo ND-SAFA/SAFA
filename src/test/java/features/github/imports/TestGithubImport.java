@@ -39,7 +39,7 @@ public class TestGithubImport extends AbstractGithubTest {
         // We should have as many artifacts as the number of files produced by the mock service
         Assertions.assertEquals(
             serviceMock.getRepositoryFiles(credentials, repositoryName, "sha")
-                .filterOutFolders().getTree().size(),
+                .filesOnly().getTree().size(),
             serviceProvider.getArtifactRepository()
                 .findByProject(githubProject.getProject()).size()
         );
@@ -71,7 +71,7 @@ public class TestGithubImport extends AbstractGithubTest {
             .findByProjectAndRepositoryName(project, repositoryName).isPresent());
 
         int importedArtifactsCount = serviceMock.getRepositoryFiles(credentials, repositoryName, "sha")
-            .filterOutFolders().getTree().size();
+            .filesOnly().getTree().size();
 
         // We should have the correct number of artifacts and links
         List<Artifact> artifacts = serviceProvider.getArtifactRepository()
@@ -81,6 +81,7 @@ public class TestGithubImport extends AbstractGithubTest {
             artifacts.size());
 
         // Since some artifacts existed beforehand, we'll just check that *some* artifact has the right body
+        // And while we're at it, we'll check the artifact type
         boolean correctBodyFound = false;
         for (Artifact artifact : artifacts) {
             Optional<ArtifactVersion> artifactVersion
@@ -88,6 +89,7 @@ public class TestGithubImport extends AbstractGithubTest {
 
             if (artifactVersion.isPresent() && artifactVersion.get().getContent().equals(AbstractGithubTest.DECODED_FILE_CONTENT)) {
                 correctBodyFound = true;
+                Assertions.assertEquals("GitHub File", artifact.getType().getName());
             }
         }
         Assertions.assertTrue(correctBodyFound);

@@ -12,17 +12,12 @@ import edu.nd.crc.safa.features.github.entities.app.GithubRepositoryDTO;
 import edu.nd.crc.safa.features.github.entities.app.GithubRepositoryFiletreeResponseDTO;
 import edu.nd.crc.safa.features.github.entities.app.GithubSelfResponseDTO;
 import edu.nd.crc.safa.features.github.entities.db.GithubAccessCredentials;
-import edu.nd.crc.safa.features.github.repositories.GithubAccessCredentialsRepository;
-import edu.nd.crc.safa.features.github.repositories.GithubProjectRepository;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.utilities.WebApiUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -180,7 +175,7 @@ public class GithubConnectionServiceImpl implements GithubConnectionService {
                     .retrieve()
                     .bodyToMono(GithubRepositoryFiletreeResponseDTO.class)
             )
-            .map(GithubRepositoryFiletreeResponseDTO::filterOutFolders)
+            .map(GithubRepositoryFiletreeResponseDTO::filesOnly)
             .orElseThrow(() -> new SafaError("Error while trying to retrieve file tree for " + repositoryName));
     }
 

@@ -103,7 +103,7 @@ export const CytoscapeStyle: (Stylesheet | CytoStyleSheet)[] = [
   {
     selector: `${ARTIFACT_NODE_SELECTOR}[?dark]`,
     style: {
-      "background-color": "black",
+      "background-color": ThemeColors.black,
     },
   },
   {

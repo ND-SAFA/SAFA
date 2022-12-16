@@ -10,6 +10,7 @@
     :has-delete-for-indexes="deletableProjects"
     :has-delete="false"
     data-cy="table-project"
+    class="project-table"
     @item:edit="handleEditProject"
     @item:select="handleSelectProject"
     @item:delete="handleDeleteProject"
@@ -35,7 +36,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { DataItem, IdentifierSchema } from "@/types";
+import { IdentifierSchema } from "@/types";
 import { identifierSaveStore, projectStore, sessionStore } from "@/hooks";
 import {
   handleDeleteProject,
@@ -133,14 +134,10 @@ export default Vue.extend({
     /**
      * Emits changes to the selected item.
      * @param item - The selected project.
-     * @param goToNextStep - If true with a valid project, the next step will be navigated to.
      */
-    handleSelectProject(
-      item: DataItem<IdentifierSchema>,
-      goToNextStep = false
-    ) {
-      if (item.value) {
-        this.$emit("selected", item.item, goToNextStep);
+    handleSelectProject(item: IdentifierSchema | undefined) {
+      if (item) {
+        this.$emit("selected", item, true);
       } else {
         this.$emit("unselected");
       }

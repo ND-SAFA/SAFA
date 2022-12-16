@@ -13,6 +13,7 @@
     :has-delete="showEdit"
     :can-delete-last-item="false"
     data-cy="table-version"
+    class="version-table"
     @item:select="handleSelectVersion"
     @item:delete="handleDeleteVersion"
     @item:add="handleAddItem"
@@ -39,7 +40,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { IdentifierSchema, VersionSchema, DataItem } from "@/types";
+import { IdentifierSchema, VersionSchema } from "@/types";
 import { projectStore, sessionStore } from "@/hooks";
 import { getProjectVersions, handleDeleteVersion } from "@/api";
 import { TableSelector } from "@/components/common";
@@ -168,9 +169,9 @@ export default Vue.extend({
     /**
      * Emits selected versions.
      */
-    handleSelectVersion(item: DataItem<VersionSchema>) {
-      if (item.value) {
-        this.$emit("selected", item.item);
+    handleSelectVersion(item: VersionSchema) {
+      if (item) {
+        this.$emit("selected", item);
       } else {
         this.$emit("unselected");
       }

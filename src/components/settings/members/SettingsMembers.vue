@@ -7,7 +7,6 @@
       :items="members"
       :has-delete="isAdmin"
       :has-edit="isAdmin"
-      :has-select="false"
       :is-loading="isLoading"
       item-key="email"
       class="mt-5"

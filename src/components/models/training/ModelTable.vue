@@ -9,7 +9,6 @@
     <table-selector
       is-open
       show-expand
-      :has-select="false"
       :headers="headers"
       :items="items"
       item-key="id"

@@ -104,6 +104,7 @@ export default Vue.extend({
     selectVersion(version: VersionSchema) {
       this.selectedVersion = version;
       Vue.set(this.steps, 1, [versionToString(version), true]);
+      this.handleSubmit();
     },
     /**
      * Deselects a version.

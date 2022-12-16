@@ -11,7 +11,7 @@
       :is-loading="isLoading"
       size="l"
       data-cy="project-version-stepper"
-      @submit="handleLoadProject"
+      @submit="handleSubmit"
     >
       <template v-slot:items>
         <v-stepper-content step="1">
@@ -147,6 +147,7 @@ export default Vue.extend({
     selectVersion(version: VersionSchema) {
       this.selectedVersion = version;
       Vue.set(this.steps, 1, [versionToString(version), true]);
+      this.handleSubmit();
     },
     /**
      * Deselects a version.
@@ -158,7 +159,7 @@ export default Vue.extend({
     /**
      * Loads the selected project.
      */
-    async handleLoadProject(): Promise<void> {
+    async handleSubmit(): Promise<void> {
       if (!this.selectedProject || !this.selectedVersion) return;
 
       this.isLoading = true;

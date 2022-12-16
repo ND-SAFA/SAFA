@@ -1,7 +1,9 @@
 .artifact-view,
 .trace-link-table,
 .model-table,
-.job-table {
+.job-table,
+.project-table,
+.version-table {
   .artifact-row-selected {
     background-color: var(--v-selected-base);
   }

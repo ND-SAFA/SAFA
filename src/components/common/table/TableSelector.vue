@@ -13,7 +13,8 @@
     :search="search"
     :no-data-text="noDataText"
     :show-expand="showExpand"
-    @item-selected="$emit('item:select', $event, true)"
+    @item-selected="$emit('item:select', $event)"
+    @click:row="handleClick"
     data-cy="generic-selector-table"
   >
     <slot />
@@ -41,23 +42,25 @@
       </flex-box>
     </template>
     <template v-slot:[`item.actions`]="{ item }">
-      <flex-box>
-        <slot name="item.actions" :item="item" />
-        <icon-button
-          v-if="hasEdit"
-          icon-id="mdi-pencil"
-          tooltip="Edit"
-          data-cy="button-selector-edit"
-          @click="$emit('item:edit', item)"
-        />
-        <icon-button
-          v-if="isDeleteEnabled(item)"
-          icon-id="mdi-delete"
-          tooltip="Delete"
-          data-cy="button-selector-delete"
-          @click="$emit('item:delete', item)"
-        />
-      </flex-box>
+      <td @click.stop="">
+        <flex-box>
+          <slot name="item.actions" :item="item" />
+          <icon-button
+            v-if="hasEdit"
+            icon-id="mdi-pencil"
+            tooltip="Edit"
+            data-cy="button-selector-edit"
+            @click="$emit('item:edit', item)"
+          />
+          <icon-button
+            v-if="isDeleteEnabled(item)"
+            icon-id="mdi-delete"
+            tooltip="Delete"
+            data-cy="button-selector-delete"
+            @click="$emit('item:delete', item)"
+          />
+        </flex-box>
+      </td>
     </template>
     <template v-slot:[`footer.prepend`]>
       <div class="py-3">
@@ -90,7 +93,7 @@ import { IconButton } from "@/components/common/button";
  * Displays a generic selector.
  *
  * @emits-1 `refresh` - On refresh.
- * @emits-2 `item:select` (item: Record<string, unknown>) - On select item.
+ * @emits-2 `item:select` (item: Record<string, unknown> | undefined) - On select item.
  * @emits-3 `item:edit` (item: Record<string, unknown>) - On edit item.
  * @emits-4 `item:delete` (item: Record<string, unknown>) - On delete item.
  * @emits-5 `item:add` - On add item.
@@ -148,7 +151,7 @@ export default Vue.extend({
     hasSelect: {
       type: Boolean,
       required: false,
-      default: true,
+      default: false,
     },
     isOpen: {
       type: Boolean,
@@ -192,24 +195,27 @@ export default Vue.extend({
         (this.canDeleteLastItem || isNotLastItem)
       );
     },
-  },
-  /**
-   * If no item is selected, the first item will be selected on mount.
-   */
-  mounted() {
-    if (this.selected.length === 0 && this.items.length > 0) {
-      this.selected = [this.items[0]];
-      this.$emit("item:select", { item: this.items[0], value: true });
-    }
+    /**
+     * Selects the clicked item.
+     * @param item - The item to select.
+     */
+    handleClick(item: Record<string, unknown>): void {
+      if (this.selected[0] !== item) {
+        this.selected = [item];
+        this.$emit("item:select", item);
+      } else {
+        this.selected = [];
+        this.$emit("item:select");
+      }
+    },
   },
   watch: {
     /**
-     * Select the first item when new items are loaded.
+     * Resets selected when new items are loaded.
      */
     items(newItems: Record<string, unknown>[]) {
-      this.selected = [this.items[0]];
+      this.selected = [];
       this.previousItems = newItems;
-      this.$emit("item:select", { item: this.items[0], value: true });
     },
     /**
      * Clears data when the selector opens.

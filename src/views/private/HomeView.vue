@@ -28,7 +28,7 @@
               />
             </v-card-subtitle>
             <v-card-text>
-              <project-version-list />
+              <mini-project-version-stepper />
             </v-card-text>
           </panel-card>
         </v-col>
@@ -79,7 +79,7 @@ import { CreatorTabTypes } from "@/types";
 import { navigateTo, QueryParams, Routes } from "@/router";
 import {
   PrivatePage,
-  ProjectVersionList,
+  MiniProjectVersionStepper,
   Typography,
   PanelCard,
 } from "@/components";
@@ -92,7 +92,7 @@ export default Vue.extend({
   components: {
     PanelCard,
     PrivatePage,
-    ProjectVersionList,
+    MiniProjectVersionStepper,
     Typography,
   },
   methods: {

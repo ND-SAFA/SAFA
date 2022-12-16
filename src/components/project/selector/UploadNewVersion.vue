@@ -1,5 +1,6 @@
 <template>
   <panel-card>
+    <typography el="h2" variant="subtitle" value="Data File Upload" />
     <typography
       el="p"
       value="Select files to upload to the current project version."

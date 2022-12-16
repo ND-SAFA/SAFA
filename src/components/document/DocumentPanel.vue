@@ -52,26 +52,24 @@
 
     <v-divider class="my-4" />
     <flex-box justify="space-between">
-      <v-btn
+      <text-button
         text
         v-if="isUpdate"
-        color="error"
-        @click="handleDelete"
+        variant="delete"
         data-cy="button-document-delete"
+        @click="handleDelete"
       >
-        <v-icon class="mr-1">mdi-delete</v-icon>
         Delete
-      </v-btn>
+      </text-button>
       <v-spacer />
-      <v-btn
-        color="primary"
+      <text-button
         :disabled="!canSave"
+        variant="save"
         data-cy="button-document-save"
         @click="handleSubmit"
       >
-        <v-icon class="mr-1">mdi-content-save</v-icon>
         Save
-      </v-btn>
+      </text-button>
     </flex-box>
   </div>
 </template>
@@ -87,6 +85,7 @@ import {
   ArtifactInput,
   ArtifactTypeInput,
   SwitchInput,
+  TextButton,
 } from "@/components/common";
 
 /**
@@ -95,6 +94,7 @@ import {
 export default Vue.extend({
   name: "DocumentPanel",
   components: {
+    TextButton,
     FlexBox,
     SwitchInput,
     ArtifactTypeInput,

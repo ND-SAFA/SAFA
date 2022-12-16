@@ -1,26 +1,35 @@
 <template>
-  <tab-list v-model="tab" :tabs="tabs">
-    <template v-slot:tabs>
-      <v-btn v-if="!createOpen" text color="primary" @click="handleAddLayout">
-        <v-icon>mdi-plus</v-icon>
-        Add Layout
-      </v-btn>
-    </template>
-    <v-tab-item v-for="(_, idx) in tabs" :key="idx + 1">
-      <save-attribute-layout
-        v-if="idx === tab"
-        :layout="layouts[idx]"
-        @save="handleSaveLayout(idx)"
-      />
-    </v-tab-item>
-  </tab-list>
+  <div>
+    <tab-list v-model="tab" :tabs="tabs">
+      <template v-slot:before>
+        <typography r="4" el="h2" variant="subtitle" value="Layouts" />
+      </template>
+      <template v-slot:after>
+        <text-button
+          v-if="!createOpen"
+          text
+          variant="add"
+          @click="handleAddLayout"
+        >
+          Add Layout
+        </text-button>
+      </template>
+      <v-tab-item v-for="(_, idx) in tabs" :key="idx + 1">
+        <save-attribute-layout
+          v-if="idx === tab"
+          :layout="layouts[idx]"
+          @save="handleSaveLayout(idx)"
+        />
+      </v-tab-item>
+    </tab-list>
+  </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import { AttributeLayoutSchema, SelectOption } from "@/types";
 import { attributesStore } from "@/hooks";
-import { TabList } from "@/components/common";
+import { TabList, TextButton, Typography } from "@/components/common";
 import SaveAttributeLayout from "./SaveAttributeLayout.vue";
 
 /**
@@ -29,8 +38,10 @@ import SaveAttributeLayout from "./SaveAttributeLayout.vue";
 export default Vue.extend({
   name: "AttributeLayoutEditor",
   components: {
+    TextButton,
     SaveAttributeLayout,
     TabList,
+    Typography,
   },
   data() {
     return {

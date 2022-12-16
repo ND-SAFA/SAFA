@@ -7,16 +7,22 @@
       align="center"
       class="px-4"
     >
-      <typography v-if="createOpen" variant="subtitle" value="New Attribute" />
+      <typography
+        variant="subtitle"
+        :value="createOpen ? 'New Attribute' : 'Attributes'"
+      />
       <v-spacer />
-      <v-btn v-if="!createOpen" text color="primary" @click="createOpen = true">
-        <v-icon>mdi-plus</v-icon>
+      <text-button
+        v-if="!createOpen"
+        text
+        variant="add"
+        @click="createOpen = true"
+      >
         Add Attribute
-      </v-btn>
-      <v-btn v-else text @click="createOpen = false">
-        <v-icon>mdi-close</v-icon>
+      </text-button>
+      <text-button v-else text variant="cancel" @click="createOpen = false">
         Cancel
-      </v-btn>
+      </text-button>
     </flex-box>
     <save-attribute v-if="createOpen" @save="createOpen = false" />
     <v-divider v-if="createOpen" />
@@ -37,8 +43,12 @@ import Vue from "vue";
 import { AttributeSchema } from "@/types";
 import { attributeTypeOptions } from "@/util";
 import { attributesStore } from "@/hooks";
-import { ToggleList, FlexBox } from "@/components/common";
-import Typography from "@/components/common/display/Typography.vue";
+import {
+  ToggleList,
+  FlexBox,
+  TextButton,
+  Typography,
+} from "@/components/common";
 import SaveAttribute from "./SaveAttribute.vue";
 
 /**
@@ -46,7 +56,7 @@ import SaveAttribute from "./SaveAttribute.vue";
  */
 export default Vue.extend({
   name: "AttributeEditor",
-  components: { Typography, FlexBox, SaveAttribute, ToggleList },
+  components: { TextButton, Typography, FlexBox, SaveAttribute, ToggleList },
   data() {
     return {
       typeOptions: attributeTypeOptions(),

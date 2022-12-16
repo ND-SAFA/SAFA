@@ -1,7 +1,6 @@
 <template>
   <panel-card>
-    <typography el="h2" variant="subtitle" value="Type Options" />
-    <v-divider class="mb-2" />
+    <typography el="h2" variant="subtitle" value="Artifact Types" />
 
     <v-list expand>
       <toggle-list

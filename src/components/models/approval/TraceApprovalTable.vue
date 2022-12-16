@@ -1,5 +1,6 @@
 <template>
   <panel-card>
+    <typography el="h2" variant="subtitle" value="Approve Generated Links" />
     <typography
       el="p"
       b="4"

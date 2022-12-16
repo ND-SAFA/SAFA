@@ -45,10 +45,9 @@
     </v-card>
 
     <flex-box justify="center">
-      <v-btn text color="primary" @click="handleCreateMatrix">
-        <v-icon>mdi-plus</v-icon>
+      <text-button text variant="add" @click="handleCreateMatrix">
         Add New Matrix
-      </v-btn>
+      </text-button>
     </flex-box>
   </div>
 </template>
@@ -62,6 +61,7 @@ import {
   FlexBox,
   IconButton,
   AttributeChip,
+  TextButton,
 } from "@/components/common";
 
 /**
@@ -72,6 +72,7 @@ import {
 export default Vue.extend({
   name: "TraceMatrixCreator",
   components: {
+    TextButton,
     IconButton,
     ArtifactTypeInput,
     FlexBox,

@@ -1,19 +1,27 @@
 <template>
-  <v-btn v-if="hasUpdate" text small color="accent" @click="handleClick">
-    <v-icon class="mr-1">mdi-cloud-sync-outline</v-icon>
+  <text-button
+    v-if="hasUpdate"
+    text
+    small
+    color="accent"
+    icon-id="mdi-cloud-sync-outline"
+    @click="handleClick"
+  >
     Load Project Updates
-  </v-btn>
+  </text-button>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import { appStore } from "@/hooks";
+import { TextButton } from "@/components/common";
 
 /**
  * Renders a button to update the current project.
  */
 export default Vue.extend({
   name: "UpdateButton",
+  components: { TextButton },
   computed: {
     /**
      * @return Whether the app has an update.

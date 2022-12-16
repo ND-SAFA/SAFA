@@ -1,6 +1,6 @@
 <template>
   <panel-card>
-    <typography el="h2" variant="subtitle" value="Project Integrations" />
+    <typography el="h2" variant="subtitle" value="Data Integrations" />
     <v-data-table
       :headers="headers"
       :items="installations"
@@ -15,10 +15,14 @@
       </template>
 
       <template v-slot:[`item.actions`]="{ item }">
-        <v-btn text color="primary" @click="handleSync(item)">
-          <v-icon class="mr-1">mdi-cached</v-icon>
+        <text-button
+          text
+          color="primary"
+          icon-id="mdi-cached"
+          @click="handleSync(item)"
+        >
           Re-Sync Data
-        </v-btn>
+        </text-button>
       </template>
 
       <template v-slot:[`footer.prepend`]>
@@ -56,7 +60,13 @@ import { InstallationSchema } from "@/types";
 import { timestampToDisplay } from "@/util";
 import { projectStore } from "@/hooks";
 import { handleSyncInstallation } from "@/api";
-import { Typography, IconButton, Modal, PanelCard } from "@/components/common";
+import {
+  Typography,
+  IconButton,
+  Modal,
+  PanelCard,
+  TextButton,
+} from "@/components/common";
 import IntegrationsStepper from "./IntegrationsStepper.vue";
 
 /**
@@ -65,6 +75,7 @@ import IntegrationsStepper from "./IntegrationsStepper.vue";
 export default Vue.extend({
   name: "ProjectInstallationsTable",
   components: {
+    TextButton,
     PanelCard,
     IntegrationsStepper,
     Modal,

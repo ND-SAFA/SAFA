@@ -11,7 +11,7 @@
         v-bind="attrs"
         small
         style="max-width: 200px"
-        class="mr-1 primary-border neutral-bg"
+        :class="chipBlassName"
         :outlined="outlined"
         :color="displayColor"
         :data-cy="dataCy"
@@ -107,17 +107,23 @@ export default Vue.extend({
         return this.color;
       } else if (this.confidenceScore) {
         return getScoreColor(this.value || "");
-      } else if (this.artifactType) {
-        return "";
-      } else {
+      } else if (this.enumerated) {
         return getBackgroundColor(this.value || "", this.$vuetify.theme.dark);
+      } else {
+        return "";
       }
     },
     /**
      * @return Whether the chip is outlined.
      */
     outlined(): boolean {
-      return this.enumerated || this.confidenceScore;
+      return this.enumerated;
+    },
+    /**
+     * @return Whether chip's class name
+     */
+    chipBlassName(): string {
+      return this.enumerated ? "mr-1 " : "mr-1 primary-border neutral-bg";
     },
     /**
      * @return Thee current progress %.

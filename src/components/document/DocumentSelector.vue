@@ -31,17 +31,16 @@
     </template>
 
     <template v-slot:append-item>
-      <v-btn
+      <text-button
         v-if="canEdit()"
         text
         block
-        color="primary"
+        variant="add"
         data-cy="button-document-select-create"
         @click="handleCreateOpen"
       >
-        <v-icon>mdi-plus</v-icon>
         Add View
-      </v-btn>
+      </text-button>
     </template>
   </v-select>
 </template>
@@ -57,11 +56,11 @@ import {
   sessionStore,
 } from "@/hooks";
 import { handleSwitchDocuments } from "@/api";
-import { IconButton } from "@/components/common";
+import { IconButton, TextButton } from "@/components/common";
 
 export default Vue.extend({
   name: "DocumentSelector",
-  components: { IconButton },
+  components: { TextButton, IconButton },
   computed: {
     /**
      * @return The current documents.

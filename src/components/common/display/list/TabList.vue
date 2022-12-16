@@ -2,12 +2,13 @@
   <div>
     <v-lazy>
       <flex-box class="width-fit" align="center">
+        <slot name="before" />
         <v-tabs v-model="model" class="transparent-bg">
           <v-tab v-for="{ name } in tabs" :key="name" class="transparent-bg">
             <typography :value="name" />
           </v-tab>
         </v-tabs>
-        <slot name="tabs" />
+        <slot name="after" />
       </flex-box>
     </v-lazy>
     <v-tabs-items v-model="model" class="mt-1">

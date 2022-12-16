@@ -33,15 +33,22 @@
       hint="Type in an option and press enter to save."
     />
     <flex-box justify="space-between">
-      <v-btn v-if="store.isUpdate" text color="error" @click="handleDelete">
-        <v-icon class="mr-1">mdi-delete</v-icon>
+      <text-button
+        v-if="store.isUpdate"
+        text
+        variant="delete"
+        @click="handleDelete"
+      >
         Delete
-      </v-btn>
+      </text-button>
       <v-spacer />
-      <v-btn :disabled="!store.canSave" color="primary" @click="handleSave">
-        <v-icon class="mr-1">mdi-content-save</v-icon>
+      <text-button
+        :disabled="!store.canSave"
+        variant="save"
+        @click="handleSave"
+      >
         Save
-      </v-btn>
+      </text-button>
     </flex-box>
   </v-container>
 </template>
@@ -52,7 +59,7 @@ import { AttributeSchema } from "@/types";
 import { attributeTypeOptions } from "@/util";
 import { attributeSaveStore } from "@/hooks";
 import { handleDeleteAttribute, handleSaveAttribute } from "@/api";
-import { FlexBox } from "@/components/common";
+import { FlexBox, TextButton } from "@/components/common";
 
 /**
  * Allows for creating and editing attributes.
@@ -61,7 +68,7 @@ import { FlexBox } from "@/components/common";
  */
 export default Vue.extend({
   name: "SaveAttribute",
-  components: { FlexBox },
+  components: { TextButton, FlexBox },
   props: {
     attribute: Object as PropType<AttributeSchema>,
   },

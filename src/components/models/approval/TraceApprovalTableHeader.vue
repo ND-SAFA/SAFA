@@ -24,10 +24,14 @@
       />
     </template>
     <template v-slot:bottom>
-      <v-btn text color="error" @click="handleClear">
-        <v-icon class="mr-1">mdi-close-circle-multiple-outline</v-icon>
+      <text-button
+        text
+        color="error"
+        icon-id="mdi-close-circle-multiple-outline"
+        @click="handleClear"
+      >
         Clear Unreviewed
-      </v-btn>
+      </text-button>
     </template>
   </table-header>
 </template>
@@ -37,7 +41,7 @@ import Vue, { PropType } from "vue";
 import { DataTableHeader } from "vuetify";
 import { approvalTypeOptions } from "@/util";
 import { handleDeclineAll } from "@/api";
-import { TableHeader } from "@/components/common";
+import { TableHeader, TextButton } from "@/components/common";
 
 /**
  * Displays the header for the trace links table.
@@ -50,6 +54,7 @@ import { TableHeader } from "@/components/common";
 export default Vue.extend({
   name: "TraceApprovalTableHeader",
   components: {
+    TextButton,
     TableHeader,
   },
   props: {

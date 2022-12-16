@@ -1,21 +1,5 @@
 <template>
   <div>
-    <flex-box justify="space-between" b="4">
-      <v-btn
-        v-if="store.isCustom && store.isUpdate"
-        text
-        color="error"
-        @click="handleDeleteLayout"
-      >
-        <v-icon class="mr-1">mdi-delete</v-icon>
-        Delete
-      </v-btn>
-      <v-spacer />
-      <v-btn :disabled="!store.canSave" color="primary" @click="handleSave">
-        <v-icon class="mr-1">mdi-content-save</v-icon>
-        Save
-      </v-btn>
-    </flex-box>
     <v-row dense v-if="store.isCustom">
       <v-col cols="6">
         <v-text-field filled label="Name" v-model="store.editedLayout.name"
@@ -25,15 +9,20 @@
           multiple
           persistent-hint
           v-model="store.editedLayout.artifactTypes"
-          hint="This layout only appears on these types."
+          hint="The layout will only appear on these artifact types."
       /></v-col>
     </v-row>
+
     <panel-card>
       <attribute-grid editable :layout="store.editedLayout">
         <template v-slot:item="{ attribute }">
-          <v-card outlined class="pa-2 mx-2">
+          <v-card outlined class="pa-3 mx-2">
             <flex-box v-if="!!attribute" align="center" justify="space-between">
-              <typography :value="attribute.label" />
+              <div>
+                <typography :value="attribute.label" />
+                <br />
+                <typography variant="caption" :value="attribute.key" />
+              </div>
               <icon-button
                 icon-id="mdi-delete"
                 tooltip="Remove from layout"
@@ -52,20 +41,38 @@
                 item-text="label"
                 v-model="addedAttribute"
               />
-              <v-btn
+              <text-button
                 :disabled="!addedAttribute"
                 text
-                color="primary"
+                variant="add"
                 @click="handleAddAttribute"
               >
-                <v-icon class="mr-1">mdi-plus</v-icon>
                 Include Attribute
-              </v-btn>
+              </text-button>
             </flex-box>
           </v-card>
         </template>
       </attribute-grid>
     </panel-card>
+
+    <flex-box justify="space-between" b="4">
+      <text-button
+        v-if="store.isCustom && store.isUpdate"
+        text
+        variant="delete"
+        @click="handleDeleteLayout"
+      >
+        Delete
+      </text-button>
+      <v-spacer />
+      <text-button
+        :disabled="!store.canSave"
+        variant="save"
+        @click="handleSave"
+      >
+        Save
+      </text-button>
+    </flex-box>
   </div>
 </template>
 
@@ -81,6 +88,7 @@ import {
   PanelCard,
   Typography,
   IconButton,
+  TextButton,
 } from "@/components/common";
 
 /**
@@ -91,6 +99,7 @@ import {
 export default Vue.extend({
   name: "SaveAttributeLayout",
   components: {
+    TextButton,
     IconButton,
     Typography,
     PanelCard,

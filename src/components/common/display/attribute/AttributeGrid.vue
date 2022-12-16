@@ -16,6 +16,8 @@
       :w="pos.w"
       :h="pos.h"
       :i="pos.i"
+      :is-draggable="!!editable && !!attr"
+      :is-resizable="!!editable && !!attr"
       @moved="handleMoveEvent"
       @resized="handleResizeEvent"
     >

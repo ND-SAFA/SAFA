@@ -1,19 +1,25 @@
 <template>
   <div class="mt-4">
-    <v-btn
+    <text-button
       v-if="!isSelectorVisible"
       block
       large
       color="primary"
+      icon-id="mdi-source-branch"
       @click="handleChange"
     >
-      <v-icon class="pr-2">mdi-source-branch</v-icon>
       Compare Versions
-    </v-btn>
-    <v-btn v-else block large outlined @click="handleChange">
-      <v-icon class="pr-2">mdi-close</v-icon>
+    </text-button>
+    <text-button
+      v-else
+      block
+      large
+      outlined
+      variant="cancel"
+      @click="handleChange"
+    >
       Hide Delta View
-    </v-btn>
+    </text-button>
 
     <v-select
       v-if="isSelectorVisible"
@@ -45,13 +51,14 @@ import {
   handleReloadProject,
   handleSetProjectDelta,
 } from "@/api";
+import { TextButton } from "@/components/common";
 
 /**
  * Displays the delta panel navigation.
  */
 export default Vue.extend({
   name: "DeltaPanelNav",
-  components: {},
+  components: { TextButton },
   data() {
     return {
       isLoading: false,

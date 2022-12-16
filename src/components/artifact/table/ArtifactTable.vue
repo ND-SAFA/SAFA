@@ -1,7 +1,6 @@
 <template>
   <panel-card>
     <v-data-table
-      show-select
       single-select
       show-group-by
       fixed-header
@@ -133,10 +132,6 @@ export default Vue.extend({
      */
     headers(): Partial<DataTableHeader>[] {
       return [
-        {
-          value: "data-table-select",
-          groupable: false,
-        },
         {
           text: "Name",
           value: "name",

@@ -13,12 +13,12 @@ Cypress.Commands.add("openUploadFiles", () => {
 Cypress.Commands.add("projectSelectorContinue", (select) => {
   if (select === "project") {
     cy.withinTableRows(DataCy.selectionProjectList, (tr) => {
-      tr.should("not.contain", "Loading");
+      tr.should("not.contain", "Loading").should("not.contain", "No");
       tr.last().click();
     });
   } else if (select === "version") {
     cy.withinTableRows(DataCy.selectionVersionList, (tr) => {
-      tr.should("not.contain", "Loading");
+      tr.should("not.contain", "Loading").should("not.contain", "No");
       tr.last().click();
     });
   } else {

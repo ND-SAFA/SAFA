@@ -2,7 +2,9 @@ package edu.nd.crc.safa.features.github.entities.app;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 
 /**
  * Transfer object describing metadata for a GitHub repository file
@@ -24,15 +26,19 @@ public class GithubRepositoryFileDTO {
     @JsonProperty("url")
     private String blobApiUrl;
 
+    @AllArgsConstructor
+    @Getter
     public enum GithubRepositoryFileType {
         @JsonProperty("blob")
-        FILE,
+        FILE("GitHub File"),
 
         @JsonProperty("tree")
-        FOLDER,
+        FOLDER("GitHub Folder"),
 
         @JsonProperty("commit")
-        SUBMODULE;
+        SUBMODULE("GitHub Submodule");
+
+        private final String artifactTypeName;
     }
 
 }

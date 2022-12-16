@@ -164,7 +164,7 @@ public class GithubProjectCreationJob extends CommitJob {
             GithubFileBlobDTO blobDTO = this.serviceProvider.getGithubConnectionService()
                 .getBlobInformation(this.credentials, file.getBlobApiUrl());
             String name = file.getPath();
-            String type = file.getType().name();
+            String type = file.getType().getArtifactTypeName();
             String summary = file.getSha();
             String body = "";
 

@@ -2,12 +2,17 @@ package features.github.imports;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import features.github.base.AbstractGithubTest;
+import java.util.List;
+import java.util.Optional;
 
 import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
+import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.features.github.entities.db.GithubProject;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
+
+import features.github.base.AbstractGithubTest;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -69,10 +74,23 @@ public class TestGithubImport extends AbstractGithubTest {
             .filterOutFolders().getTree().size();
 
         // We should have the correct number of artifacts and links
+        List<Artifact> artifacts = serviceProvider.getArtifactRepository()
+            .findByProject(project);
         Assertions.assertEquals(
             importedArtifactsCount + initialArtifactCount,
-            serviceProvider.getArtifactRepository()
-                .findByProject(project).size());
+            artifacts.size());
+
+        // Since some artifacts existed beforehand, we'll just check that *some* artifact has the right body
+        boolean correctBodyFound = false;
+        for (Artifact artifact : artifacts) {
+            Optional<ArtifactVersion> artifactVersion
+                = serviceProvider.getArtifactVersionRepository().findByProjectVersionAndArtifact(projectVersion, artifact);
+
+            if (artifactVersion.isPresent() && artifactVersion.get().getContent().equals(AbstractGithubTest.DECODED_FILE_CONTENT)) {
+                correctBodyFound = true;
+            }
+        }
+        Assertions.assertTrue(correctBodyFound);
 
         Assertions.assertEquals(0,
             serviceProvider.getTraceLinkRepository().count());

@@ -10,8 +10,20 @@ Cypress.Commands.add("openUploadFiles", () => {
   cy.clickButtonWithName("Settings").switchTab("Data Upload");
 });
 
-Cypress.Commands.add("projectSelectorContinue", () => {
-  cy.clickButton(DataCy.stepperContinueButton);
+Cypress.Commands.add("projectSelectorContinue", (select) => {
+  if (select === "project") {
+    cy.withinTableRows(DataCy.selectionProjectList, (tr) => {
+      tr.should("not.contain", "Loading");
+      tr.last().click();
+    });
+  } else if (select === "version") {
+    cy.withinTableRows(DataCy.selectionVersionList, (tr) => {
+      tr.should("not.contain", "Loading");
+      tr.last().click();
+    });
+  } else {
+    cy.clickButton(DataCy.stepperContinueButton);
+  }
 });
 
 Cypress.Commands.add("createNewVersion", (type) => {

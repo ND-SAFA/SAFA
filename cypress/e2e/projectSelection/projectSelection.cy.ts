@@ -9,8 +9,7 @@ describe("Project Selection", () => {
     cy.visit("/open")
       .login(validUser.email, validUser.password)
       .location("pathname", { timeout: 5000 })
-      .should("equal", "/open")
-      .openProjectSelector();
+      .should("equal", "/open");
   });
 
   describe("Project List", () => {
@@ -51,17 +50,13 @@ describe("Project Selection", () => {
     describe("I can select a project to see its versions", () => {
       it("Selects a project and continues to the version step", () => {
         cy.withinTableRows(DataCy.selectionProjectList, (tr) => {
-          tr.get(".v-simple-checkbox").first().click().click();
+          tr.last().click();
         });
 
         cy.getCy(DataCy.stepperBackButton).should("not.be.disabled");
       });
 
       it("Cannot continue without a project selected", () => {
-        cy.withinTableRows(DataCy.selectionProjectList, (tr) => {
-          tr.get(".v-simple-checkbox").first().click();
-        });
-
         cy.getCy(DataCy.stepperContinueButton).should("be.disabled");
       });
     });
@@ -105,7 +100,7 @@ describe("Project Selection", () => {
   describe("Project Version List", () => {
     describe("I can reload my list of project versions", () => {
       it("Displays project versions", () => {
-        cy.projectSelectorContinue();
+        cy.projectSelectorContinue("project");
 
         cy.withinTableRows(DataCy.selectionVersionList, (tr) =>
           tr.should("have.length.above", 1)
@@ -113,7 +108,7 @@ describe("Project Selection", () => {
       });
 
       it("Reloads project versions", () => {
-        cy.projectSelectorContinue();
+        cy.projectSelectorContinue("project");
 
         cy.clickButton(DataCy.selectionReload, "last");
 
@@ -125,17 +120,17 @@ describe("Project Selection", () => {
 
     describe("I can select and load a version of the project", () => {
       it("Selects and loads a project and version", () => {
-        cy.projectSelectorContinue().projectSelectorContinue();
+        cy.projectSelectorContinue("project").projectSelectorContinue(
+          "version"
+        );
 
         cy.getCy(DataCy.appLoading).should("be.visible");
+        cy.waitForProjectLoad(true);
+        cy.getNodes().should("exist");
       });
 
       it("Cannot continue if a version is not selected", () => {
-        cy.projectSelectorContinue();
-
-        cy.withinTableRows(DataCy.selectionVersionList, (tr) => {
-          tr.get(".v-simple-checkbox").first().click();
-        });
+        cy.projectSelectorContinue("project");
 
         cy.getCy(DataCy.stepperContinueButton).should("be.disabled");
       });
@@ -145,19 +140,19 @@ describe("Project Selection", () => {
   describe("Project Version CRUD", () => {
     describe("I can create a new major, minor, or revision version", () => {
       it("Can create a new major version", () => {
-        cy.projectSelectorContinue().createNewVersion("major");
+        cy.projectSelectorContinue("project").createNewVersion("major");
 
         cy.getCy(DataCy.snackbarSuccess).should("be.visible");
       });
 
       it("Can create a new minor version", () => {
-        cy.projectSelectorContinue().createNewVersion("minor");
+        cy.projectSelectorContinue("project").createNewVersion("minor");
 
         cy.getCy(DataCy.snackbarSuccess).should("be.visible");
       });
 
       it("Can create a new revision version", () => {
-        cy.projectSelectorContinue().createNewVersion("revision");
+        cy.projectSelectorContinue("project").createNewVersion("revision");
 
         cy.getCy(DataCy.snackbarSuccess).should("be.visible");
       });
@@ -165,7 +160,7 @@ describe("Project Selection", () => {
 
     describe("I can delete a project version", () => {
       it("Deletes a version", () => {
-        cy.projectSelectorContinue().createNewVersion("revision");
+        cy.projectSelectorContinue("project").createNewVersion("revision");
 
         cy.getCy(DataCy.selectionVersionList).within(() => {
           cy.clickButton(DataCy.selectorDeleteButton);
@@ -180,8 +175,8 @@ describe("Project Selection", () => {
 
     describe("I can upload new flat files to a project version", () => {
       it("Uploads files to the current version", () => {
-        cy.projectSelectorContinue()
-          .projectSelectorContinue()
+        cy.projectSelectorContinue("project")
+          .projectSelectorContinue("version")
           .openUploadFiles();
 
         cy.uploadFiles(
@@ -192,7 +187,5 @@ describe("Project Selection", () => {
         cy.getCy(DataCy.snackbarSuccess).should("be.visible");
       });
     });
-
-    // describe("[WIP] I can upload flat files to the current document");
   });
 });

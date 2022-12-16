@@ -3,6 +3,7 @@ import {
   ENABLED_FEATURES,
   EXAMPLE_ATTRIBUTE_LAYOUTS,
   EXAMPLE_ATTRIBUTES,
+  EXAMPLE_EMPTY_LAYOUT,
 } from "@/util";
 import { Endpoint, fillEndpoint, authHttpClient } from "@/api/util";
 
@@ -23,6 +24,8 @@ export async function getProjectVersion(
   if (ENABLED_FEATURES.EXAMPLE_ATTRIBUTES) {
     project.attributes = EXAMPLE_ATTRIBUTES;
     project.attributeLayouts = EXAMPLE_ATTRIBUTE_LAYOUTS;
+  } else {
+    project.attributeLayouts = [EXAMPLE_EMPTY_LAYOUT];
   }
 
   return project;

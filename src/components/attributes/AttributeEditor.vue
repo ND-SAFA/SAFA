@@ -35,6 +35,12 @@
         <save-attribute :attribute="attribute" />
       </toggle-list>
     </v-list>
+    <flex-box v-if="attributes.length === 0" justify="center">
+      <typography
+        variant="caption"
+        value="You have not yet created any custom attributes."
+      />
+    </flex-box>
   </v-navigation-drawer>
 </template>
 

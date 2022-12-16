@@ -13,7 +13,7 @@ export async function createAttribute(
   projectId: string,
   attribute: AttributeSchema
 ): Promise<AttributeSchema> {
-  if (ENABLED_FEATURES.EXAMPLE_ATTRIBUTES) {
+  if (ENABLED_FEATURES.ATTRIBUTES) {
     return attribute;
   }
   return authHttpClient<AttributeSchema>(
@@ -38,7 +38,7 @@ export async function editAttribute(
   projectId: string,
   attribute: AttributeSchema
 ): Promise<AttributeSchema> {
-  if (ENABLED_FEATURES.EXAMPLE_ATTRIBUTES) {
+  if (ENABLED_FEATURES.ATTRIBUTES) {
     return attribute;
   }
   return authHttpClient<AttributeSchema>(
@@ -63,7 +63,7 @@ export async function deleteAttribute(
   projectId: string,
   attribute: AttributeSchema
 ): Promise<void> {
-  if (ENABLED_FEATURES.EXAMPLE_ATTRIBUTES) {
+  if (ENABLED_FEATURES.ATTRIBUTES) {
     return;
   }
   return authHttpClient<void>(
@@ -88,7 +88,7 @@ export async function createAttributeLayout(
   projectId: string,
   layout: AttributeLayoutSchema
 ): Promise<AttributeLayoutSchema> {
-  if (ENABLED_FEATURES.EXAMPLE_ATTRIBUTES) {
+  if (ENABLED_FEATURES.ATTRIBUTES) {
     return layout;
   }
   return authHttpClient<AttributeLayoutSchema>(
@@ -113,7 +113,7 @@ export async function editAttributeLayout(
   projectId: string,
   layout: AttributeLayoutSchema
 ): Promise<AttributeLayoutSchema> {
-  if (ENABLED_FEATURES.EXAMPLE_ATTRIBUTES) {
+  if (ENABLED_FEATURES.ATTRIBUTES) {
     return layout;
   }
   return authHttpClient<AttributeLayoutSchema>(
@@ -138,7 +138,7 @@ export async function deleteAttributeLayout(
   projectId: string,
   layout: AttributeLayoutSchema
 ): Promise<void> {
-  if (ENABLED_FEATURES.EXAMPLE_ATTRIBUTES) {
+  if (ENABLED_FEATURES.ATTRIBUTES) {
     return;
   }
   return authHttpClient<void>(

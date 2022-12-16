@@ -121,6 +121,13 @@ export const EXAMPLE_ATTRIBUTES = [
   },
 ] as AttributeSchema[];
 
+export const EXAMPLE_EMPTY_LAYOUT = {
+  id: "default",
+  name: "Default",
+  artifactTypes: [],
+  positions: [],
+} as AttributeLayoutSchema;
+
 /**
  * Example attribute layouts for artifacts.
  */
@@ -162,5 +169,7 @@ export const EXAMPLE_ATTRIBUTE_LAYOUTS = [
  */
 export const ENABLED_FEATURES = {
   EXAMPLE_TRAINING_STEPS: false,
-  EXAMPLE_ATTRIBUTES: true,
+
+  ATTRIBUTES: true,
+  EXAMPLE_ATTRIBUTES: false,
 };

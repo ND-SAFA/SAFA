@@ -18,7 +18,7 @@
       :items-per-page="50"
       @click:row="handleView($event)"
       data-cy="table-trace-matrix"
-      class="mt-4"
+      class="mt-4 trace-matrix-table"
     >
       <template v-slot:top>
         <table-header

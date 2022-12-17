@@ -27,5 +27,5 @@ export default Vue.extend({
 </script>
 
 <style lang="scss">
-@import "./assets/main.scss";
+@import "assets/style/main";
 </style>

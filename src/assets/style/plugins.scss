@@ -1,0 +1,8 @@
+// Fixes code-diff's broken styling
+code.hljs {
+  min-height: 26px;
+}
+
+.vue-grid-item.vue-grid-placeholder {
+  background-color: var(--v-modifiedLight-base);
+}

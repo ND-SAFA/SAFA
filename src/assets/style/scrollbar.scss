@@ -1,0 +1,22 @@
+*::-webkit-scrollbar {
+  background: var(--v-neutral-base);
+  width: 12px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--v-neutral-base);        /* color of the tracking area */
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: var(--v-primary-base);    /* color of the scroll thumb */
+  border-radius: 20px;       /* roundness of the scroll thumb */
+  border: 3px solid var(--v-neutral-base);  /* creates padding around scroll thumb */
+
+  &:hover {
+    background-color: var(--v-primary-base);
+  }
+}
+
+* {
+  scrollbar-color: var(--v-primary-base) var(--v-neutral-base);   /* scroll thumb and track */
+}

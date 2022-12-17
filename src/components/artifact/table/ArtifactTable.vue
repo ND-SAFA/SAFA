@@ -15,7 +15,7 @@
       :sort-desc.sync="sortDesc"
       :items-per-page="50"
       data-cy="view-artifact-table"
-      class="mt-4"
+      class="mt-4 artifact-table"
       @click:row="handleView($event)"
     >
       <template v-slot:top>

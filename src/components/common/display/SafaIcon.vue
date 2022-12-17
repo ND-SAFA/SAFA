@@ -1,14 +1,14 @@
 <template>
   <img
     v-if="!this.$vuetify.theme.dark"
-    src="@/assets/SAFA-primary.svg"
+    src="@/assets/images/SAFA-primary.svg"
     alt="SAFA"
     class="full-width"
     @click="$emit('click')"
   />
   <img
     v-else
-    src="@/assets/SAFA-secondary.svg"
+    src="@/assets/images/SAFA-secondary.svg"
     alt="SAFA"
     class="full-width"
     @click="$emit('click')"

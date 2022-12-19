@@ -50,16 +50,21 @@ export async function handleLogin(user: UserPasswordSchema): Promise<void> {
 }
 
 /**
- * Logs a user out.
+ * Logs a user out to the login screen.
+ *
+ * @param sendLogoutRequest - Whether to send the API request to log out.
  */
-export async function handleLogout(): Promise<void> {
+export async function handleLogout(sendLogoutRequest = false): Promise<void> {
   document.cookie = "";
 
   await handleClearProject();
   await navigateTo(Routes.LOGIN_ACCOUNT);
   sessionStore.clearSession();
   logStore.notifications = [];
-  await deleteSession();
+
+  if (sendLogoutRequest) {
+    await deleteSession();
+  }
   // datadogRum.startSessionReplayRecording();
 }
 
@@ -122,7 +127,7 @@ export function handleDeleteAccount(password: string): void {
     async (isConfirmed) => {
       if (!isConfirmed) return;
 
-      deleteAccount(password).then(handleLogout);
+      deleteAccount(password).then(() => handleLogout());
     }
   );
 }

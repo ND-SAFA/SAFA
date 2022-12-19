@@ -59,7 +59,7 @@ export default Vue.extend({
      * Logs the current user out.
      */
     handleLogout(): void {
-      handleLogout();
+      handleLogout(true);
     },
   },
 });

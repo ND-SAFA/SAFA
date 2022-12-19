@@ -20,6 +20,12 @@
       <v-tab-item key="4">
         <type-options />
       </v-tab-item>
+      <v-tab-item key="5">
+        <v-card>
+          <under-construction-alert />
+        </v-card>
+        <attribute-settings />
+      </v-tab-item>
     </tab-list>
   </sidebar-grid>
 </template>
@@ -29,13 +35,18 @@ import Vue from "vue";
 import { SelectOption } from "@/types";
 import { settingsTabOptions } from "@/util";
 import { projectStore, sessionStore } from "@/hooks";
-import { TabList, SidebarGrid } from "@/components/common";
+import {
+  TabList,
+  SidebarGrid,
+  UnderConstructionAlert,
+} from "@/components/common";
 import {
   UploadNewVersion,
   ProjectButtons,
   ProjectDisplay,
 } from "@/components/project";
 import { ProjectInstallationsTable } from "@/components/integrations";
+import { AttributeSettings } from "@/components/attributes";
 import SettingsHeader from "./SettingsHeader.vue";
 import TypeOptions from "./TypeOptions.vue";
 import { SettingsMembers } from "./members";
@@ -46,6 +57,8 @@ import { SettingsMembers } from "./members";
 export default Vue.extend({
   name: "TracePredictionTabs",
   components: {
+    UnderConstructionAlert,
+    AttributeSettings,
     ProjectInstallationsTable,
     SidebarGrid,
     ProjectDisplay,

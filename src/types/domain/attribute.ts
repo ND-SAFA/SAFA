@@ -1,7 +1,22 @@
 /**
+ * Enumerates the type of attribute properties.
+ */
+export enum AttributeType {
+  text = "text", // String
+  paragraph = "paragraph", // String
+  select = "select", // String
+  multiselect = "multiselect", // String Array
+  relation = "relation", // String Array
+  date = "date", // ISO Date String
+  int = "int", // Integer
+  float = "float", // Float
+  boolean = "boolean", // Boolean
+}
+
+/**
  * Defines a custom attribute being tracked for a project.
  */
-export interface CustomAttributeModel {
+export interface AttributeSchema {
   /**
    * The key to this attribute within an artifact's `customFields` object.
    */
@@ -13,12 +28,7 @@ export interface CustomAttributeModel {
   /**
    * The type of data represented by this attribute.
    */
-  type: "string" | "number" | "select" | "multiselect";
-  /**
-   * The list of artifact types to display this attribute on.
-   * If empty, this attribute will be displayed for all.
-   */
-  artifactTypes: string[];
+  type: AttributeType;
   /**
    * Any pre-set options for this custom field to choose from.
    */
@@ -32,3 +42,67 @@ export interface CustomAttributeModel {
    */
   max?: number;
 }
+
+/**
+ * A list of the attributes to lay out and their positions.
+ */
+export interface AttributePositionSchema {
+  /**
+   * The attribute key for this item.
+   */
+  key: string;
+  /**
+   * The x position in the layout.
+   */
+  x: number;
+  /**
+   * The y position in the layout.
+   */
+  y: number;
+  /**
+   * The height in the layout.
+   */
+  height: number;
+  /**
+   * The width in the layout.
+   */
+  width: number;
+}
+
+/**
+ * Defines a layout of custom attributes for some set of artifact types.
+ */
+export interface AttributeLayoutSchema {
+  /**
+   * The ID of this attribute layout.
+   */
+  id: string;
+  /**
+   * The name of this attribute layout.
+   */
+  name: string;
+  /**
+   * The list of artifact types to display this attribute layout on.
+   * If empty, this attribute will be displayed for all.
+   */
+  artifactTypes: string[];
+  /**
+   * A list of the attributes to lay out and their positions.
+   */
+  positions: AttributePositionSchema[];
+}
+
+/**
+ * Represents all possible data types of an attribute.
+ */
+export type AttributeDataType =
+  | string
+  | string[]
+  | number
+  | boolean
+  | undefined;
+
+/**
+ * Represents a collection of custom attributes, keyed by their `key` value.
+ */
+export type AttributeCollectionSchema = Record<string, AttributeDataType>;

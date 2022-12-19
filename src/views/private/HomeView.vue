@@ -10,11 +10,32 @@
       />
       <v-row>
         <v-col cols="6">
-          <v-card outlined>
+          <panel-card>
             <v-card-title>
-              <v-icon large :color="iconColor">
-                mdi-folder-plus-outline
-              </v-icon>
+              <v-icon large color="primary"> mdi-view-list </v-icon>
+              <typography
+                el="h2"
+                l="2"
+                variant="subtitle"
+                value="Load Existing Project"
+              />
+            </v-card-title>
+            <v-card-subtitle>
+              <v-divider class="mb-2" />
+              <typography
+                variant="small"
+                value="Select an existing project and version to load."
+              />
+            </v-card-subtitle>
+            <v-card-text>
+              <mini-project-version-stepper />
+            </v-card-text>
+          </panel-card>
+        </v-col>
+        <v-col cols="6">
+          <panel-card>
+            <v-card-title>
+              <v-icon large color="primary"> mdi-folder-plus-outline </v-icon>
               <typography
                 el="h2"
                 l="2"
@@ -45,30 +66,7 @@
                 </v-btn>
               </div>
             </v-card-text>
-          </v-card>
-        </v-col>
-        <v-col cols="6">
-          <v-card outlined>
-            <v-card-title>
-              <v-icon large :color="iconColor"> mdi-view-list </v-icon>
-              <typography
-                el="h2"
-                l="2"
-                variant="subtitle"
-                value="Load Existing Project"
-              />
-            </v-card-title>
-            <v-card-subtitle>
-              <v-divider class="mb-2" />
-              <typography
-                variant="small"
-                value="Select an existing project and version to load."
-              />
-            </v-card-subtitle>
-            <v-card-text>
-              <project-version-list />
-            </v-card-text>
-          </v-card>
+          </panel-card>
         </v-col>
       </v-row>
     </template>
@@ -78,9 +76,13 @@
 <script lang="ts">
 import Vue from "vue";
 import { CreatorTabTypes } from "@/types";
-import { ThemeColors } from "@/util";
 import { navigateTo, QueryParams, Routes } from "@/router";
-import { PrivatePage, ProjectVersionList, Typography } from "@/components";
+import {
+  PrivatePage,
+  MiniProjectVersionStepper,
+  Typography,
+  PanelCard,
+} from "@/components";
 
 /**
  * Displays the home page.
@@ -88,14 +90,10 @@ import { PrivatePage, ProjectVersionList, Typography } from "@/components";
 export default Vue.extend({
   name: "HomeView",
   components: {
+    PanelCard,
     PrivatePage,
-    ProjectVersionList,
+    MiniProjectVersionStepper,
     Typography,
-  },
-  data() {
-    return {
-      iconColor: ThemeColors.primary,
-    };
   },
   methods: {
     handleOpenStandard() {

@@ -1,5 +1,5 @@
 <template>
-  <v-card outlined class="pa-4 mb-2" style="width: 30em">
+  <panel-card>
     <typography variant="subtitle" el="h2" value="Update Password" />
     <v-divider class="mb-2" />
     <typography
@@ -27,13 +27,13 @@
         Update Password
       </v-btn>
     </v-card-actions>
-  </v-card>
+  </panel-card>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import { handleChangePassword } from "@/api";
-import { PasswordField, Typography } from "@/components";
+import { PasswordField, Typography, PanelCard } from "@/components/common";
 
 /**
  * Allows for password updating.
@@ -41,6 +41,7 @@ import { PasswordField, Typography } from "@/components";
 export default Vue.extend({
   name: "MyAccountView",
   components: {
+    PanelCard,
     Typography,
     PasswordField,
   },

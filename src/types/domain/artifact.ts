@@ -1,4 +1,5 @@
-import { DocumentType } from "@/types/domain/document";
+import { AttributeCollectionSchema } from "./attribute";
+import { DocumentType } from "./document";
 
 /**
  * Enumerates the types of FTA nodes.
@@ -32,7 +33,7 @@ export const allowedSafetyCaseTypes: Record<SafetyCaseType, SafetyCaseType[]> =
 /**
  * Defines an artifact of a project.
  */
-export interface ArtifactModel {
+export interface ArtifactSchema {
   /**
    * A unique UUID identifying an artifact across versions.
    */
@@ -76,34 +77,11 @@ export interface ArtifactModel {
   /**
    * Represents a collection of custom attributes on an artifact.
    */
-  customFields?: Record<string, string>;
+  attributes?: AttributeCollectionSchema;
 }
 
 /**
  * Defines an artifact with its custom fields flattened into the artifact data.
  */
-export type FlatArtifact = ArtifactModel & Record<string, string>;
-
-/**
- * Defines an artifact warning.
- */
-export interface WarningModel {
-  /**
-   * The artifact rule name.
-   */
-  ruleName: string;
-  /**
-   * The artifact rule message.
-   */
-  ruleMessage: string;
-}
-
-/**
- * A collection of warnings for all artifacts.
- */
-export type ProjectWarnings = Record<string, WarningModel[]>;
-
-/**
- * Returns an artifact matching the given query, if one exists.
- */
-export type ArtifactQueryFunction = (q: string) => ArtifactModel | undefined;
+export type FlatArtifact = Pick<ArtifactSchema, "id" | "name" | "type"> &
+  Record<string, string>;

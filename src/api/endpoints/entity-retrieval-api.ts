@@ -1,4 +1,10 @@
-import { ArtifactModel, ProjectModel, TraceLinkModel } from "@/types";
+import { ArtifactSchema, ProjectSchema, TraceLinkSchema } from "@/types";
+import {
+  ENABLED_FEATURES,
+  EXAMPLE_ATTRIBUTE_LAYOUTS,
+  EXAMPLE_ATTRIBUTES,
+  EXAMPLE_EMPTY_LAYOUT,
+} from "@/util";
 import { Endpoint, fillEndpoint, authHttpClient } from "@/api/util";
 
 /**
@@ -9,11 +15,20 @@ import { Endpoint, fillEndpoint, authHttpClient } from "@/api/util";
  */
 export async function getProjectVersion(
   versionId: string
-): Promise<ProjectModel> {
-  return authHttpClient<ProjectModel>(
+): Promise<ProjectSchema> {
+  const project = await authHttpClient<ProjectSchema>(
     fillEndpoint(Endpoint.projectVersion, { versionId }),
     { method: "GET" }
   );
+
+  if (ENABLED_FEATURES.EXAMPLE_ATTRIBUTES) {
+    project.attributes = EXAMPLE_ATTRIBUTES;
+    project.attributeLayouts = EXAMPLE_ATTRIBUTE_LAYOUTS;
+  } else {
+    project.attributeLayouts = [EXAMPLE_EMPTY_LAYOUT];
+  }
+
+  return project;
 }
 
 /**
@@ -24,8 +39,8 @@ export async function getProjectVersion(
  */
 export async function getArtifactsInVersion(
   versionId: string
-): Promise<ArtifactModel[]> {
-  return authHttpClient<ArtifactModel[]>(
+): Promise<ArtifactSchema[]> {
+  return authHttpClient<ArtifactSchema[]>(
     fillEndpoint(Endpoint.getArtifactsInVersion, { versionId }),
     { method: "GET" }
   );
@@ -39,8 +54,8 @@ export async function getArtifactsInVersion(
  */
 export async function getTracesInVersion(
   versionId: string
-): Promise<TraceLinkModel[]> {
-  return authHttpClient<TraceLinkModel[]>(
+): Promise<TraceLinkSchema[]> {
+  return authHttpClient<TraceLinkSchema[]>(
     fillEndpoint(Endpoint.getTracesInVersion, { versionId }),
     { method: "GET" }
   );

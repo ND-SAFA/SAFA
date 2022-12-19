@@ -1,36 +1,35 @@
 <template>
-  <v-container style="max-width: 40em">
-    <v-card outlined class="pa-2">
-      <typography
-        el="p"
-        value="Select files to upload to the current project version."
-      />
-      <project-files-input
-        v-model="selectedFiles"
-        data-cy="input-files-version"
-      />
-      <generic-switch
-        v-model="replaceAllArtifacts"
-        label="Replace all artifacts"
-        class="ml-4"
-      />
-      <v-btn
-        block
-        color="primary"
-        data-cy="button-upload-files"
-        @click="handleSubmit"
-      >
-        Upload Project Files
-      </v-btn>
-    </v-card>
-  </v-container>
+  <panel-card>
+    <typography el="h2" variant="subtitle" value="Data File Upload" />
+    <typography
+      el="p"
+      value="Select files to upload to the current project version."
+    />
+    <project-files-input
+      v-model="selectedFiles"
+      data-cy="input-files-version"
+    />
+    <switch-input
+      v-model="replaceAllArtifacts"
+      label="Replace all artifacts"
+      class="ml-4"
+    />
+    <v-btn
+      block
+      color="primary"
+      data-cy="button-upload-files"
+      @click="handleSubmit"
+    >
+      Upload Project Files
+    </v-btn>
+  </panel-card>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import { projectStore } from "@/hooks";
 import { handleUploadProjectVersion } from "@/api";
-import { GenericSwitch, Typography } from "@/components/common";
+import { SwitchInput, Typography, PanelCard } from "@/components/common";
 import { ProjectFilesInput } from "../base";
 
 /**
@@ -39,8 +38,9 @@ import { ProjectFilesInput } from "../base";
 export default Vue.extend({
   name: "UploadNewVersion",
   components: {
+    PanelCard,
     Typography,
-    GenericSwitch,
+    SwitchInput,
     ProjectFilesInput,
   },
   props: {

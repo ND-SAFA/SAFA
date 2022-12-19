@@ -13,7 +13,7 @@
       :search-input.sync="queryText"
       item-text="name"
       item-value="id"
-      class="mx-1 mt-1 primary lighten-1"
+      class="mx-1 mt-1 nav-input"
       :filter="filterArtifacts"
       data-cy="input-artifact-search-nav"
     >
@@ -34,7 +34,7 @@
         </flex-box>
       </template>
       <template v-slot:item="{ item }">
-        <generic-artifact-body-display
+        <artifact-body-display
           display-title
           :artifact="item"
           data-cy="text-artifact-search-item"
@@ -49,11 +49,7 @@ import Vue from "vue";
 import { ArtifactSearchItem } from "@/types";
 import { filterArtifacts, objectToArray } from "@/util";
 import { typeOptionsStore, artifactStore, selectionStore } from "@/hooks";
-import {
-  GenericArtifactBodyDisplay,
-  Typography,
-  FlexBox,
-} from "@/components/common";
+import { ArtifactBodyDisplay, Typography, FlexBox } from "@/components/common";
 
 /**
  * Artifact search bar.
@@ -63,7 +59,7 @@ export default Vue.extend({
   components: {
     FlexBox,
     Typography,
-    GenericArtifactBodyDisplay,
+    ArtifactBodyDisplay,
   },
   data() {
     return {

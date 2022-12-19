@@ -58,8 +58,7 @@
 import Vue from "vue";
 import { navigateTo, Routes } from "@/router";
 import { handleLogin } from "@/api";
-import Typography from "@/components/common/display/Typography.vue";
-import { CardPage, PasswordField } from "@/components";
+import { CardPage, PasswordField, Typography } from "@/components";
 
 /**
  * Displays the login page.

@@ -1,18 +1,20 @@
 import {
-  ArtifactModel,
-  ArtifactTypeModel,
-  DocumentModel,
-  LayoutPositionsModel,
-  MembershipModel,
-  TraceLinkModel,
-  GenerationModel,
-  WarningModel,
+  ArtifactSchema,
+  ArtifactTypeSchema,
+  DocumentSchema,
+  LayoutPositionsSchema,
+  MembershipSchema,
+  TraceLinkSchema,
+  GenerationModelSchema,
+  WarningSchema,
+  AttributeSchema,
+  AttributeLayoutSchema,
 } from "@/types";
 
 /**
  * Defines a project.
  */
-export interface IdentifierModel {
+export interface IdentifierSchema {
   /**
    * The ID of the project.
    */
@@ -28,9 +30,9 @@ export interface IdentifierModel {
   description: string;
 
   /**
-   * List of members and roles in project.
+   * List of members and their roles in the project.
    */
-  members: MembershipModel[];
+  members: MembershipSchema[];
 
   /**
    * The primary owner of this project.
@@ -41,7 +43,7 @@ export interface IdentifierModel {
 /**
  * Defines the version of a project.
  */
-export interface VersionModel {
+export interface VersionSchema {
   /**
    * The project version id.
    */
@@ -49,7 +51,7 @@ export interface VersionModel {
   /**
    * The project.
    */
-  project?: IdentifierModel;
+  project?: IdentifierSchema;
   /**
    * The major version number.
    */
@@ -67,20 +69,24 @@ export interface VersionModel {
 /**
  * Defines a versioned and parsed project.
  */
-export interface ProjectModel extends IdentifierModel {
+export interface ProjectSchema extends IdentifierSchema {
   /**
    * The project's version.
    */
-  projectVersion?: VersionModel;
+  projectVersion?: VersionSchema;
 
   /**
    * The project's artifacts.
    */
-  artifacts: ArtifactModel[];
+  artifacts: ArtifactSchema[];
   /**
    * The project's traces.
    */
-  traces: TraceLinkModel[];
+  traces: TraceLinkSchema[];
+  /**
+   * The artifact types present in the project.
+   */
+  artifactTypes: ArtifactTypeSchema[];
 
   /**
    * The current document id.
@@ -89,24 +95,31 @@ export interface ProjectModel extends IdentifierModel {
   /**
    * The different documents for this project.
    */
-  documents: DocumentModel[];
+  documents: DocumentSchema[];
 
-  /**
-   * The artifact types present in the project.
-   */
-  artifactTypes: ArtifactTypeModel[];
   /**
    * A collection of warnings on project artifacts.
    */
-  warnings: Record<string, WarningModel[]>;
+  warnings: Record<string, WarningSchema[]>;
+
   /**
    * Map of artifact ids to their position in the default graph.
    */
-  layout: LayoutPositionsModel;
+  layout: LayoutPositionsSchema;
+
   /**
    * List of trained project models.
    */
-  models: GenerationModel[];
+  models: GenerationModelSchema[];
+
+  /**
+   * A list of custom attributes used on this project.
+   */
+  attributes?: AttributeSchema[];
+  /**
+   * Layouts for displaying this project's custom attributes.
+   */
+  attributeLayouts?: AttributeLayoutSchema[];
 }
 
 export type VersionType = "major" | "minor" | "revision";

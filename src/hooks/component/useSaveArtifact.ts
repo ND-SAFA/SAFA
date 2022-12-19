@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-import { ArtifactModel, DocumentType } from "@/types";
+import { ArtifactSchema, DocumentType } from "@/types";
 import { createArtifact, createArtifactOfType } from "@/util";
 import { pinia } from "@/plugins";
 import selectionStore from "../graph/useSelection";
@@ -59,7 +59,7 @@ export const useSaveArtifact = defineStore("saveArtifact", {
     /**
      * @return The parent artifact of a logic node.
      */
-    parentArtifact(): ArtifactModel | undefined {
+    parentArtifact(): ArtifactSchema | undefined {
       return this.parentId
         ? artifactStore.getArtifactById(this.parentId)
         : undefined;
@@ -108,7 +108,7 @@ export const useSaveArtifact = defineStore("saveArtifact", {
     /**
      * @return The savable artifact data based on the edited artifact's fields.
      */
-    finalizedArtifact(): ArtifactModel {
+    finalizedArtifact(): ArtifactSchema {
       const { documentId } = documentStore.currentDocument;
       const { logicType, safetyCaseType } = this.editedArtifact;
 

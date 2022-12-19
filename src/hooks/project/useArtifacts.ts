@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-import { ArtifactModel, DocumentArtifacts, FlatArtifact } from "@/types";
+import { ArtifactSchema, DocumentArtifacts, FlatArtifact } from "@/types";
 import {
   standardizeValueArray,
   flattenArtifact,
@@ -21,8 +21,8 @@ import selectionStore from "@/hooks/graph/useSelection";
  */
 export const useArtifacts = defineStore("artifacts", {
   state: () => ({
-    allArtifacts: [] as ArtifactModel[],
-    currentArtifacts: [] as ArtifactModel[],
+    allArtifacts: [] as ArtifactSchema[],
+    currentArtifacts: [] as ArtifactSchema[],
   }),
   getters: {
     /**
@@ -34,7 +34,7 @@ export const useArtifacts = defineStore("artifacts", {
     /**
      * @return A collection of current artifact lists, keyed by their type.
      */
-    getArtifactsByType(): Record<string, ArtifactModel[]> {
+    getArtifactsByType(): Record<string, ArtifactSchema[]> {
       return collectByField(this.currentArtifacts, "type");
     },
   },
@@ -58,7 +58,7 @@ export const useArtifacts = defineStore("artifacts", {
      *
      * @param newArtifacts - The new artifacts to add.
      */
-    addOrUpdateArtifacts(newArtifacts: ArtifactModel[]): void {
+    addOrUpdateArtifacts(newArtifacts: ArtifactSchema[]): void {
       const newIds = newArtifacts.map(({ id }) => id);
       const updatedArtifacts = [
         ...removeMatches(this.allArtifacts, "id", newIds),
@@ -81,7 +81,7 @@ export const useArtifacts = defineStore("artifacts", {
      *
      * @param artifact - The newly created artifact.
      */
-    addCreatedArtifact(artifact: ArtifactModel): void {
+    addCreatedArtifact(artifact: ArtifactSchema): void {
       layoutStore.setArtifactToSavedPosition(artifact.id);
       this.addOrUpdateArtifacts([artifact]);
       selectionStore.selectArtifact(artifact.id);
@@ -92,7 +92,7 @@ export const useArtifacts = defineStore("artifacts", {
      *
      * @param deletedArtifacts - The artifacts, or ids, to delete.
      */
-    deleteArtifacts(deletedArtifacts: ArtifactModel[] | string[]): void {
+    deleteArtifacts(deletedArtifacts: ArtifactSchema[] | string[]): void {
       if (deletedArtifacts.length === 0) return;
 
       const ids = standardizeValueArray(deletedArtifacts, "id");
@@ -115,7 +115,7 @@ export const useArtifacts = defineStore("artifacts", {
      * @param name - The name to find.
      * @return The matching artifact, if one exists.
      */
-    getArtifactByName(name: string): ArtifactModel | undefined {
+    getArtifactByName(name: string): ArtifactSchema | undefined {
       return this.allArtifacts.find((artifact) => artifact.name === name);
     },
     /**
@@ -124,7 +124,7 @@ export const useArtifacts = defineStore("artifacts", {
      * @param id - The id to find.
      * @return The matching artifact, if one exists.
      */
-    getArtifactById(id: string): ArtifactModel | undefined {
+    getArtifactById(id: string): ArtifactSchema | undefined {
       return this.allArtifacts.find((artifact) => artifact.id === id);
     },
   },

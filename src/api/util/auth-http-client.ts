@@ -55,6 +55,7 @@ export default async function authHttpClient<T>(
   const data = JSON.parse(content);
 
   if (!res.ok) {
+    logStore.onDevError(data.error);
     throw Error(data.error);
   } else {
     return data;

@@ -1,5 +1,5 @@
 <template>
-  <generic-stepper
+  <stepper
     v-model="currentStep"
     :steps="steps"
     submitText="Create Project"
@@ -16,7 +16,7 @@
       </v-stepper-content>
 
       <v-stepper-content step="2">
-        <generic-uploader
+        <file-uploader
           :artifact-map="artifactMap"
           :uploader="artifactUploader"
           item-name="artifact"
@@ -32,11 +32,11 @@
               @submit="onAddFile"
             />
           </template>
-        </generic-uploader>
+        </file-uploader>
       </v-stepper-content>
 
       <v-stepper-content step="3">
-        <generic-uploader
+        <file-uploader
           :artifact-map="artifactMap"
           :default-valid-state="true"
           :uploader="traceUploader"
@@ -54,7 +54,7 @@
               @submit="onAddFile"
             />
           </template>
-        </generic-uploader>
+        </file-uploader>
       </v-stepper-content>
 
       <v-stepper-content step="4">
@@ -65,7 +65,7 @@
         />
       </v-stepper-content>
     </template>
-  </generic-stepper>
+  </stepper>
 </template>
 
 <script lang="ts">
@@ -77,13 +77,9 @@ import {
   createTraceUploader,
   handleImportProject,
 } from "@/api";
-import { GenericStepper } from "@/components/common";
+import { Stepper } from "@/components/common";
 import { ProjectIdentifierInput } from "@/components/project/base";
-import {
-  GenericUploader,
-  ArtifactTypeCreator,
-  TraceFileCreator,
-} from "../panels";
+import { FileUploader, ArtifactTypeCreator, TraceFileCreator } from "../panels";
 import { TimTree } from "../timTree";
 
 const PROJECT_IDENTIFIER_STEP_NAME = "Name Project";
@@ -92,8 +88,8 @@ export default Vue.extend({
   name: "ProjectCreatorStepper",
   components: {
     ProjectIdentifierInput,
-    GenericStepper,
-    GenericUploader,
+    Stepper,
+    FileUploader,
     ArtifactTypeCreator,
     TraceFileCreator,
     TimTree,

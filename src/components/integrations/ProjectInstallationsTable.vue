@@ -1,6 +1,6 @@
 <template>
-  <v-container>
-    <typography el="h2" variant="subtitle" value="Project Integrations" />
+  <panel-card>
+    <typography el="h2" variant="subtitle" value="Data Integrations" />
     <v-data-table
       :headers="headers"
       :items="installations"
@@ -15,15 +15,19 @@
       </template>
 
       <template v-slot:[`item.actions`]="{ item }">
-        <v-btn text color="primary" @click="handleSync(item)">
-          <v-icon class="mr-1">mdi-cached</v-icon>
+        <text-button
+          text
+          color="primary"
+          icon-id="mdi-cached"
+          @click="handleSync(item)"
+        >
           Re-Sync Data
-        </v-btn>
+        </text-button>
       </template>
 
       <template v-slot:[`footer.prepend`]>
         <div class="py-3">
-          <generic-icon-button
+          <icon-button
             fab
             color="primary"
             icon-id="mdi-plus"
@@ -31,7 +35,7 @@
             data-cy="button-integration-add"
             @click="modalOpen = true"
           />
-          <generic-modal
+          <modal
             :is-open="modalOpen"
             title="Import Data"
             :actions-height="0"
@@ -43,23 +47,25 @@
                 @submit="modalOpen = false"
               />
             </template>
-          </generic-modal>
+          </modal>
         </div>
       </template>
     </v-data-table>
-  </v-container>
+  </panel-card>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { InstallationModel } from "@/types";
+import { InstallationSchema } from "@/types";
 import { timestampToDisplay } from "@/util";
 import { projectStore } from "@/hooks";
 import { handleSyncInstallation } from "@/api";
 import {
   Typography,
-  GenericIconButton,
-  GenericModal,
+  IconButton,
+  Modal,
+  PanelCard,
+  TextButton,
 } from "@/components/common";
 import IntegrationsStepper from "./IntegrationsStepper.vue";
 
@@ -69,10 +75,12 @@ import IntegrationsStepper from "./IntegrationsStepper.vue";
 export default Vue.extend({
   name: "ProjectInstallationsTable",
   components: {
+    TextButton,
+    PanelCard,
     IntegrationsStepper,
-    GenericModal,
+    Modal,
     Typography,
-    GenericIconButton,
+    IconButton,
   },
   data() {
     return {
@@ -90,7 +98,7 @@ export default Vue.extend({
     /**
      * @return All project installations.
      */
-    installations(): InstallationModel[] {
+    installations(): InstallationSchema[] {
       return projectStore.installations;
     },
   },
@@ -105,7 +113,7 @@ export default Vue.extend({
      * Syncs the current project with the selected installation's data.
      * @param installation - THe installation to sync.
      */
-    handleSync(installation: InstallationModel): void {
+    handleSync(installation: InstallationSchema): void {
       this.isLoading = true;
 
       handleSyncInstallation(installation, {

@@ -1,4 +1,4 @@
-import { ArtifactModel } from "@/types";
+import { ArtifactSchema } from "@/types";
 
 /**
  * Returns whether the artifact is in the given subtree, or the subtree is empty.
@@ -9,7 +9,7 @@ import { ArtifactModel } from "@/types";
  */
 export function isInSubtree(
   subtreeIds: string[],
-  artifact: ArtifactModel
+  artifact: ArtifactSchema
 ): boolean {
   return subtreeIds.length === 0 || subtreeIds.includes(artifact.id);
 }
@@ -23,7 +23,7 @@ export function isInSubtree(
  */
 export function doesNotContainType(
   ignoreTypes: string[] | undefined,
-  artifact: ArtifactModel
+  artifact: ArtifactSchema
 ): boolean {
   return ignoreTypes === undefined || !ignoreTypes.includes(artifact.type);
 }

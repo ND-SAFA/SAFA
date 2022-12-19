@@ -59,11 +59,13 @@ describe("Artifact CRUD", () => {
       const name = `New ${Math.random()}`;
 
       // Opens the right click window.
-      cy.get("canvas")
-        .first()
-        .then(($el) =>
-          cy.wrap($el).rightclick($el.width() / 4, $el.height() / 4)
-        );
+      // cy.get("canvas")
+      //   .first()
+      //   .then(($el) =>
+      //     cy.wrap($el).rightclick($el.width() / 2, $el.height() / 2)
+      //   );
+
+      cy.centerGraph().getNodes().first().rightclick();
 
       // Click the add artifact button.
       cy.get(DataIds.rightClickAddArtifact)

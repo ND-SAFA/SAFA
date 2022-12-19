@@ -15,26 +15,25 @@
       />
     </v-list-item-title>
     <v-list-item-action style="min-width: unset">
-      <v-btn
+      <text-button
         v-if="!hasCredentials"
         color="primary"
         outlined
+        icon-id="mdi-transit-connection-variant"
         @click="handleConnect"
       >
-        <v-icon class="mr-1">mdi-transit-connection-variant</v-icon>
         Connect
-      </v-btn>
-      <v-btn v-else color="error" outlined @click="handleDisconnect">
-        <v-icon class="mr-1">mdi-delete</v-icon>
+      </text-button>
+      <text-button v-else outlined variant="delete" @click="handleDisconnect">
         Disconnect
-      </v-btn>
+      </text-button>
     </v-list-item-action>
   </v-list-item>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { Typography } from "@/components/common";
+import { Typography, TextButton } from "@/components/common";
 
 /**
  * Displays a list item & buttons for authenticating an integration.
@@ -45,7 +44,7 @@ import { Typography } from "@/components/common";
  */
 export default Vue.extend({
   name: "AuthenticationListItem",
-  components: { Typography },
+  components: { TextButton, Typography },
   props: {
     hasCredentials: {
       type: Boolean,

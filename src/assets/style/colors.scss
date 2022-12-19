@@ -1,0 +1,17 @@
+$color-accent: #FFD592;
+
+.primary-border {
+  border: 1px solid var(--v-modifiedLight-base) !important;
+}
+
+.error-border {
+  border-color: var(--v-removedLight-base) !important;
+}
+
+.transparent-bg {
+  background-color: transparent !important;
+}
+
+.neutral-bg {
+  background-color: var(--v-neutral-base) !important;
+}

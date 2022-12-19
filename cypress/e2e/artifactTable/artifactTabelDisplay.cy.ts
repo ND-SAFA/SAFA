@@ -10,11 +10,13 @@ describe("Artifact Table Display", () => {
     cy.switchToTableView();
   });
 
-  describe("I can sort artifacts by their attributes", () => {
-    it("Sorts artifacts by name", () => {
+  describe("I can view artifacts in a table", () => {
+    it("Shows the first artifact in the table", () => {
       cy.artifactTableFirstElementLookUp().should("exist").contains("D1");
     });
+  });
 
+  describe("I can sort artifacts by their attributes", () => {
     it("Sorts artifacts by type", () => {
       cy.clickButton(DataCy.artifactTableSortBy).type(
         "{enter}{downArrow}{enter}"
@@ -29,7 +31,6 @@ describe("Artifact Table Display", () => {
   });
 
   describe("I can group artifacts by their attributes", () => {
-    //TODO: Add tests for grouping artifacts by their attributes
     it("Groups artifacts by name", () => {
       cy.clickButton(DataCy.artifactTableSortBy).type(
         "{backspace}{backspace}{backspace}{backspace}{esc}"
@@ -39,19 +40,6 @@ describe("Artifact Table Display", () => {
       cy.getCy(DataCy.artifactTableGroupByTableHeader)
         .should("exist")
         .contains("Name:");
-    });
-
-    it("Groups artifacts by type", () => {
-      cy.clickButton(DataCy.artifactTableSortBy).type(
-        "{backspace}{backspace}{backspace}{backspace}{esc}"
-      );
-      cy.clickButton(DataCy.artifactTableGroupBy).type(
-        "{downArrow}{downArrow}{enter}"
-      );
-
-      cy.getCy(DataCy.artifactTableGroupByTableHeader)
-        .should("exist")
-        .contains("Type:");
     });
   });
 

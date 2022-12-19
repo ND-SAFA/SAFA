@@ -1,26 +1,27 @@
 import {
-  ArtifactModel,
+  ArtifactSchema,
   ArtifactTypeIcons,
-  ArtifactTypeModel,
-  ColumnDataType,
-  ColumnModel,
+  ArtifactTypeSchema,
   Commit,
   ConfirmationType,
   ConfirmDialogueMessage,
-  DocumentModel,
+  DocumentSchema,
   DocumentType,
   FTANodeType,
-  IdentifierModel,
+  IdentifierSchema,
   MessageType,
   ModelType,
   ProjectDelta,
-  ProjectModel,
+  ProjectSchema,
   SafetyCaseType,
-  SessionModel,
+  SessionSchema,
   SnackbarMessage,
-  GenerationModel,
-  UserModel,
-  VersionModel,
+  GenerationModelSchema,
+  UserSchema,
+  VersionSchema,
+  AttributeSchema,
+  AttributeType,
+  AttributeLayoutSchema,
 } from "@/types";
 import { defaultTypeIcon } from "@/util/icons";
 
@@ -50,7 +51,7 @@ export function createConfirmDialogueMessage(): ConfirmDialogueMessage {
 /**
  * @return An empty user.
  */
-export function createUser(): UserModel {
+export function createUser(): UserSchema {
   return {
     userId: "",
     email: "",
@@ -60,7 +61,7 @@ export function createUser(): UserModel {
 /**
  * @return An empty session.
  */
-export function createSession(): SessionModel {
+export function createSession(): SessionSchema {
   return {
     token: "",
     versionId: "",
@@ -71,8 +72,8 @@ export function createSession(): SessionModel {
  * @return An empty project identifier.
  */
 export function createProjectIdentifier(
-  identifier?: Partial<IdentifierModel>
-): IdentifierModel {
+  identifier?: Partial<IdentifierSchema>
+): IdentifierSchema {
   return {
     name: identifier?.name || "",
     projectId: identifier?.projectId || "",
@@ -85,17 +86,19 @@ export function createProjectIdentifier(
 /**
  * @return An empty project.
  */
-export function createProject(project?: Partial<ProjectModel>): ProjectModel {
+export function createProject(project?: Partial<ProjectSchema>): ProjectSchema {
   return {
     ...createProjectIdentifier(project),
     artifacts: project?.artifacts || [],
     traces: project?.traces || [],
-    projectVersion: project?.projectVersion || undefined,
+    projectVersion: project?.projectVersion,
     artifactTypes: project?.artifactTypes || [],
     documents: project?.documents || [],
     warnings: project?.warnings || {},
     layout: project?.layout || {},
     models: project?.models || [],
+    attributes: project?.attributes || [],
+    attributeLayouts: project?.attributeLayouts || [],
   };
 }
 
@@ -121,8 +124,8 @@ export function createProjectDelta(): ProjectDelta {
  * @return An artifact initialized to the given props.
  */
 export function createArtifact(
-  artifact?: Partial<ArtifactModel>
-): ArtifactModel {
+  artifact?: Partial<ArtifactSchema>
+): ArtifactSchema {
   return {
     id: artifact?.id || "",
     baseEntityId: artifact?.baseEntityId || "",
@@ -134,7 +137,6 @@ export function createArtifact(
     documentIds: artifact?.documentIds || [],
     safetyCaseType: artifact?.safetyCaseType || SafetyCaseType.GOAL,
     logicType: artifact?.logicType || FTANodeType.AND,
-    customFields: artifact?.customFields || {},
   };
 }
 
@@ -149,9 +151,9 @@ export function createArtifact(
  * @return An artifact initialized to the given props.
  */
 export function createArtifactOfType(
-  artifact: Partial<ArtifactModel> | undefined,
+  artifact: Partial<ArtifactSchema> | undefined,
   type?: true | string
-): ArtifactModel {
+): ArtifactSchema {
   if (typeof type === "string") {
     const isFTA = type in FTANodeType;
     const isSC = type in SafetyCaseType;
@@ -185,21 +187,9 @@ export function createArtifactOfType(
 }
 
 /**
- * @return An column initialized to the given props.
- */
-export function createColumn(column?: Partial<ColumnModel>): ColumnModel {
-  return {
-    id: column?.id || "",
-    name: column?.name || "",
-    dataType: column?.dataType || ColumnDataType.FREE_TEXT,
-    required: column?.required || false,
-  };
-}
-
-/**
  * @returns An empty commit.
  */
-export function createCommit(version: VersionModel): Commit {
+export function createCommit(version: VersionSchema): Commit {
   return {
     commitVersion: version,
     artifacts: {
@@ -219,7 +209,7 @@ export function createCommit(version: VersionModel): Commit {
  * @returns A record mapping the lowercase artifact type name to the corresponding default icon.
  */
 export function createDefaultTypeIcons(
-  artifactTypes: ArtifactTypeModel[] = []
+  artifactTypes: ArtifactTypeSchema[] = []
 ): ArtifactTypeIcons {
   return artifactTypes
     .map((t) => ({ [t.name]: t.icon.replace("mdi-help", defaultTypeIcon) }))
@@ -232,8 +222,8 @@ export function createDefaultTypeIcons(
  * @return An document initialized to the given props.
  */
 export function createDocument(
-  document?: Partial<DocumentModel>
-): DocumentModel {
+  document?: Partial<DocumentSchema>
+): DocumentSchema {
   return {
     documentId: document?.documentId || "",
     project: document?.project || {
@@ -254,10 +244,42 @@ export function createDocument(
 /**
  * @return A model initialized to the given props.
  */
-export function createModel(model?: Partial<GenerationModel>): GenerationModel {
+export function createModel(
+  model?: Partial<GenerationModelSchema>
+): GenerationModelSchema {
   return {
     id: model?.id || "",
     name: model?.name || "",
     baseModel: model?.baseModel || ModelType.NLBert,
+  };
+}
+
+/**
+ * @return An attribute initialized to the given props.
+ */
+export function createAttribute(
+  attribute?: Partial<AttributeSchema>
+): AttributeSchema {
+  return {
+    key: attribute?.key || "",
+    label: attribute?.label || "",
+    type: attribute?.type || AttributeType.text,
+    options: attribute?.options,
+    min: attribute?.min,
+    max: attribute?.max,
+  };
+}
+
+/**
+ * @return An attribute layout initialized to the given props.
+ */
+export function createAttributeLayout(
+  layout?: Partial<AttributeLayoutSchema>
+): AttributeLayoutSchema {
+  return {
+    id: layout?.id || "",
+    name: layout?.name || "",
+    artifactTypes: layout?.artifactTypes || [],
+    positions: layout?.positions?.map((pos) => ({ ...pos })) || [],
   };
 }

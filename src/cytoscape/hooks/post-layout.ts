@@ -137,6 +137,6 @@ export const DefaultPostLayoutHooks: LayoutHook[] = [
  * Post layout hooks for the TIM tree.
  */
 export const TIMPostLayoutHooks: LayoutHook[] = [
-  (): void => cyCenterNodes(timTreeCyPromise),
+  (): void => cyCenterNodes(false, timTreeCyPromise),
   applyCytoEvents,
 ];

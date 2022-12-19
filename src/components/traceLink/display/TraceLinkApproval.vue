@@ -1,57 +1,56 @@
 <template>
   <flex-box justify="space-between" v-if="doDisplay">
     <flex-box align="center" justify="center">
-      <v-btn
+      <text-button
         v-if="showUnreviewed"
         text
         :loading="isUnreviewLoading"
-        @click="handleUnreview"
         data-cy="button-trace-unreview"
+        icon-id="mdi-checkbox-blank-circle-outline"
+        @click="handleUnreview"
       >
-        <v-icon class="mr-1">mdi-checkbox-blank-circle-outline</v-icon>
         Un-Review
-      </v-btn>
-      <v-btn
+      </text-button>
+      <text-button
         v-if="showApproved"
         text
         :loading="isApproveLoading"
         color="primary"
-        @click="handleApprove"
         data-cy="button-trace-approve"
+        icon-id="mdi-check-circle-outline"
+        @click="handleApprove"
       >
-        <v-icon class="mr-1">mdi-check-circle-outline</v-icon>
         Approve
-      </v-btn>
-      <v-btn
+      </text-button>
+      <text-button
         v-if="showDeclined"
         text
         :loading="isDeclineLoading"
         color="error"
-        @click="handleDecline"
         data-cy="button-trace-decline"
+        icon-id="mdi-close-circle-outline"
+        @click="handleDecline"
       >
-        <v-icon class="mr-1">mdi-close-circle-outline</v-icon>
         Decline
-      </v-btn>
+      </text-button>
     </flex-box>
     <flex-box v-if="showDelete">
       <v-divider vertical v-if="showApproved || showDeclined" />
-      <v-btn
+      <text-button
         text
-        color="error"
-        @click="handleDelete"
+        variant="delete"
         data-cy="button-trace-delete"
+        @click="handleDelete"
       >
-        <v-icon class="mr-1">mdi-delete</v-icon>
         Delete
-      </v-btn>
+      </text-button>
     </flex-box>
   </flex-box>
 </template>
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { TraceLinkModel } from "@/types";
+import { TraceLinkSchema } from "@/types";
 import { linkStatus } from "@/util";
 import { projectStore, sessionStore } from "@/hooks";
 import {
@@ -60,7 +59,7 @@ import {
   handleDeleteLink,
   handleUnreviewLink,
 } from "@/api";
-import { FlexBox } from "@/components/common";
+import { FlexBox, TextButton } from "@/components/common";
 
 /**
  * Displays trace link approval buttons.
@@ -73,11 +72,12 @@ import { FlexBox } from "@/components/common";
 export default Vue.extend({
   name: "TraceLinkApproval",
   components: {
+    TextButton,
     FlexBox,
   },
   props: {
     link: {
-      type: Object as PropType<TraceLinkModel>,
+      type: Object as PropType<TraceLinkSchema>,
       required: true,
     },
     showDelete: Boolean,

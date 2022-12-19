@@ -15,7 +15,7 @@
     @submit="$emit('blur')"
   >
     <template v-slot:append>
-      <generic-icon-button
+      <icon-button
         small
         icon-id="mdi-content-save-outline"
         tooltip="Save Types"
@@ -32,8 +32,8 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { typeOptionsStore } from "@/hooks";
-import { GenericIconButton } from "@/components/common/generic";
-import AttributeChip from "@/components/common/display/AttributeChip.vue";
+import { IconButton } from "@/components/common/button";
+import { AttributeChip } from "@/components/common/display";
 
 /**
  * An input for selecting artifact types.
@@ -43,7 +43,7 @@ import AttributeChip from "@/components/common/display/AttributeChip.vue";
  */
 export default Vue.extend({
   name: "ArtifactTypeInput",
-  components: { AttributeChip, GenericIconButton },
+  components: { AttributeChip, IconButton },
   props: {
     value: {
       type: [Array, String] as PropType<string[] | string | null>,

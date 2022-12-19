@@ -45,7 +45,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { ArtifactModel, LabelledTraceDirectionModel } from "@/types";
+import { ArtifactSchema, LabelledTraceDirectionSchema } from "@/types";
 import { appStore, artifactStore, traceStore, typeOptionsStore } from "@/hooks";
 import { handleCreateLink } from "@/api";
 import {
@@ -78,13 +78,13 @@ export default Vue.extend({
     /**
      * @return The source artifact.
      */
-    sourceArtifact(): ArtifactModel | undefined {
+    sourceArtifact(): ArtifactSchema | undefined {
       return artifactStore.getArtifactById(this.sourceArtifactId);
     },
     /**
      * @return The source artifact.
      */
-    targetArtifact(): ArtifactModel | undefined {
+    targetArtifact(): ArtifactSchema | undefined {
       return artifactStore.getArtifactById(this.targetArtifactId);
     },
     /**
@@ -115,7 +115,7 @@ export default Vue.extend({
     /**
      * @return The current project's artifact types.
      */
-    typeDirections(): LabelledTraceDirectionModel[] {
+    typeDirections(): LabelledTraceDirectionSchema[] {
       return typeOptionsStore.typeDirections();
     },
   },

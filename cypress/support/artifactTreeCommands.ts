@@ -30,8 +30,8 @@ Cypress.Commands.add("loadCurrentProject", (waitForNodes = true) => {
     .location("pathname", { timeout: 10000 })
     .should("equal", "/")
     .openProjectSelector()
-    .projectSelectorContinue()
-    .projectSelectorContinue()
+    .projectSelectorContinue("project")
+    .projectSelectorContinue("version")
     .location("pathname", { timeout: 10000 })
     .should("equal", "/project");
 

@@ -1,5 +1,5 @@
 <template>
-  <v-container v-if="isLoggedIn" :class="fullWindow ? 'full-window-page' : ''">
+  <v-container v-if="isLoggedIn" :class="className">
     <slot name="page" />
   </v-container>
   <v-container v-else class="my-8">
@@ -27,6 +27,14 @@ export default Vue.extend({
      */
     isLoggedIn() {
       return sessionStore.doesSessionExist;
+    },
+    /**
+     * @return The page's class name.
+     */
+    className(): string {
+      return this.fullWindow
+        ? "full-window-page primary lighten-5"
+        : "primary lighten-5";
     },
   },
 });

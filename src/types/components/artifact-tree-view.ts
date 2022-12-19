@@ -1,12 +1,12 @@
 import {
   ArtifactDeltaState,
-  WarningModel,
+  WarningSchema,
   CytoCoreElementData,
   CytoCoreElementDefinition,
   FTANodeType,
-  PositionModel,
+  PositionSchema,
   SafetyCaseType,
-  TraceLinkModel,
+  TraceLinkSchema,
 } from "@/types";
 
 /**
@@ -24,7 +24,7 @@ export interface ArtifactData extends CytoCoreElementData {
   /**
    * Any warnings generated from the artifact.
    */
-  warnings?: WarningModel[];
+  warnings?: WarningSchema[];
   /**
    * The name of the artifact.
    */
@@ -65,7 +65,12 @@ export interface ArtifactData extends CytoCoreElementData {
   /**
    * Any warnings in child elements.
    */
-  childWarnings?: WarningModel[];
+  childWarnings?: WarningSchema[];
+
+  /**
+   * Whether the app is running in dark mode.
+   */
+  dark: boolean;
 }
 
 /**
@@ -79,7 +84,7 @@ export interface ArtifactCytoCoreElement extends CytoCoreElementDefinition {
   /**
    * The artifact's position in the graph
    */
-  position?: PositionModel;
+  position?: PositionSchema;
   /**
    * The element's cytoscape classes
    */
@@ -89,7 +94,7 @@ export interface ArtifactCytoCoreElement extends CytoCoreElementDefinition {
 /**
  * Defines a trace link's data in cytoscape.
  */
-export interface TraceData extends CytoCoreElementData, TraceLinkModel {
+export interface TraceData extends CytoCoreElementData, TraceLinkSchema {
   /**
    * The cytoscape element id to point from.
    */

@@ -1,4 +1,4 @@
-import { VersionModel } from "@/types";
+import { VersionSchema } from "@/types";
 import { Endpoint, fillEndpoint, authHttpClient } from "@/api";
 
 /**
@@ -9,8 +9,8 @@ import { Endpoint, fillEndpoint, authHttpClient } from "@/api";
  */
 export async function getProjectVersions(
   projectId: string
-): Promise<VersionModel[]> {
-  return authHttpClient<VersionModel[]>(
+): Promise<VersionSchema[]> {
+  return authHttpClient<VersionSchema[]>(
     fillEndpoint(Endpoint.getProjectVersions, { projectId }),
     { method: "GET" }
   );
@@ -24,8 +24,8 @@ export async function getProjectVersions(
  */
 export async function getCurrentVersion(
   projectId: string
-): Promise<VersionModel> {
-  return authHttpClient<VersionModel>(
+): Promise<VersionSchema> {
+  return authHttpClient<VersionSchema>(
     fillEndpoint(Endpoint.getCurrentVersion, { projectId }),
     { method: "GET" }
   );
@@ -39,8 +39,8 @@ export async function getCurrentVersion(
  */
 export async function createMajorVersion(
   projectId: string
-): Promise<VersionModel> {
-  return authHttpClient<VersionModel>(
+): Promise<VersionSchema> {
+  return authHttpClient<VersionSchema>(
     fillEndpoint(Endpoint.createNewMajorVersion, { projectId }),
     { method: "POST" }
   );
@@ -54,8 +54,8 @@ export async function createMajorVersion(
  */
 export async function createMinorVersion(
   projectId: string
-): Promise<VersionModel> {
-  return authHttpClient<VersionModel>(
+): Promise<VersionSchema> {
+  return authHttpClient<VersionSchema>(
     fillEndpoint(Endpoint.createNewMinorVersion, { projectId }),
     { method: "POST" }
   );
@@ -69,8 +69,8 @@ export async function createMinorVersion(
  */
 export async function createRevisionVersion(
   projectId: string
-): Promise<VersionModel> {
-  return authHttpClient<VersionModel>(
+): Promise<VersionSchema> {
+  return authHttpClient<VersionSchema>(
     fillEndpoint(Endpoint.createNewRevisionVersion, { projectId }),
     {
       method: "POST",

@@ -1,4 +1,4 @@
-import { TraceLinkModel, ArtifactModel, ModelType } from "@/types";
+import { TraceLinkSchema, ArtifactSchema, ModelType } from "@/types";
 
 /**
  * Defines a project file.
@@ -26,7 +26,7 @@ export interface ArtifactFile extends ProjectFile {
   /**
    * A list of artifacts from the file.
    */
-  artifacts: ArtifactModel[];
+  artifacts: ArtifactSchema[];
 }
 
 /**
@@ -48,7 +48,7 @@ export interface TraceFile extends ProjectFile {
   /**
    * A list of traces from the file.
    */
-  traces: TraceLinkModel[];
+  traces: TraceLinkSchema[];
   /**
    * The generation model to use.
    */

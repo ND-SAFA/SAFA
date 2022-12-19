@@ -1,19 +1,13 @@
 <template>
   <flex-box b="2" v-if="doDisplay">
-    <v-btn text @click="handleDownload">
-      <v-icon class="mr-1">mdi-download</v-icon>
+    <text-button text icon-id="mdi-download" @click="handleDownload">
       Download
-    </v-btn>
-    <br />
-    <v-btn text @click="handleEdit">
-      <v-icon class="mr-1">mdi-pencil</v-icon>
-      Edit
-    </v-btn>
+    </text-button>
+    <text-button text variant="edit" @click="handleEdit"> Edit </text-button>
     <v-divider vertical />
-    <v-btn text color="error" @click="handleDelete">
-      <v-icon class="mr-1">mdi-delete</v-icon>
+    <text-button text variant="delete" @click="handleDelete">
       Delete
-    </v-btn>
+    </text-button>
     <project-identifier-modal
       :is-open="isEditOpen"
       :is-loading="isLoading"
@@ -36,7 +30,7 @@ import {
   handleDownloadProjectCSV,
   handleDeleteProject,
 } from "@/api";
-import { FlexBox } from "@/components/common";
+import { FlexBox, TextButton } from "@/components/common";
 import ProjectIdentifierModal from "./ProjectIdentifierModal.vue";
 import ConfirmProjectDelete from "./ConfirmProjectDelete.vue";
 
@@ -46,6 +40,7 @@ import ConfirmProjectDelete from "./ConfirmProjectDelete.vue";
 export default Vue.extend({
   name: "ProjectButtons",
   components: {
+    TextButton,
     FlexBox,
     ProjectIdentifierModal,
     ConfirmProjectDelete,

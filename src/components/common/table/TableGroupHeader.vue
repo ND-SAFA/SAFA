@@ -2,7 +2,7 @@
   <td :colspan="data.headers.length">
     <flex-box y="2" x="2" align="center" justify="space-between">
       <flex-box align="center">
-        <generic-icon-button
+        <icon-button
           small
           :icon-id="data.isOpen ? 'mdi-chevron-up' : 'mdi-chevron-down'"
           :tooltip="data.isOpen ? 'Hide Group' : 'Show Group'"
@@ -31,7 +31,7 @@
           @open:all="$emit('open:all', data)"
           @close:all="$emit('close:all', data)"
         />
-        <generic-icon-button
+        <icon-button
           small
           icon-id="mdi-close"
           tooltip="Remove Grouping"
@@ -54,12 +54,9 @@ import Vue, { PropType } from "vue";
 import { DataTableGroup } from "@/types";
 import { camelcaseToDisplay } from "@/util";
 import { artifactStore } from "@/hooks";
-import {
-  FlexBox,
-  AttributeChip,
-  Typography,
-  GenericIconButton,
-} from "@/components/common";
+import { IconButton } from "@/components/common/button";
+import { FlexBox } from "@/components/common/layout";
+import { AttributeChip, Typography } from "@/components/common/display";
 import SectionControls from "./SectionControls.vue";
 
 /**
@@ -72,7 +69,7 @@ export default Vue.extend({
   name: "TableGroupHeader",
   components: {
     AttributeChip,
-    GenericIconButton,
+    IconButton,
     Typography,
     FlexBox,
     SectionControls,

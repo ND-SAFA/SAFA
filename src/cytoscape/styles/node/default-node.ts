@@ -24,7 +24,7 @@ export function svgDefault(data: ArtifactData): string {
     svgRect(
       outer,
       getBorderColor(data.artifactDeltaState),
-      getBackgroundColor(data.artifactDeltaState),
+      getBackgroundColor(data.artifactDeltaState, data.dark),
       8
     )
   );

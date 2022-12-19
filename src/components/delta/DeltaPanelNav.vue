@@ -1,19 +1,25 @@
 <template>
   <div class="mt-4">
-    <v-btn
+    <text-button
       v-if="!isSelectorVisible"
       block
       large
       color="primary"
+      icon-id="mdi-source-branch"
       @click="handleChange"
     >
-      <v-icon class="pr-2">mdi-source-branch</v-icon>
       Compare Versions
-    </v-btn>
-    <v-btn v-else block large outlined @click="handleChange">
-      <v-icon class="pr-2">mdi-close</v-icon>
+    </text-button>
+    <text-button
+      v-else
+      block
+      large
+      outlined
+      variant="cancel"
+      @click="handleChange"
+    >
       Hide Delta View
-    </v-btn>
+    </text-button>
 
     <v-select
       v-if="isSelectorVisible"
@@ -37,7 +43,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { VersionModel } from "@/types";
+import { VersionSchema } from "@/types";
 import { versionToString } from "@/util";
 import { deltaStore, projectStore } from "@/hooks";
 import {
@@ -45,18 +51,19 @@ import {
   handleReloadProject,
   handleSetProjectDelta,
 } from "@/api";
+import { TextButton } from "@/components/common";
 
 /**
  * Displays the delta panel navigation.
  */
 export default Vue.extend({
   name: "DeltaPanelNav",
-  components: {},
+  components: { TextButton },
   data() {
     return {
       isLoading: false,
       isSelectorVisible: deltaStore.inDeltaView,
-      versions: [] as VersionModel[],
+      versions: [] as VersionSchema[],
     };
   },
   mounted() {
@@ -79,7 +86,7 @@ export default Vue.extend({
      * Tracks the delta version and loads new versions.
      */
     version: {
-      get(): VersionModel | undefined {
+      get(): VersionSchema | undefined {
         return deltaStore.afterVersion;
       },
       set(newVersionId: string): void {
@@ -103,7 +110,7 @@ export default Vue.extend({
      * @param version - The version to name.
      * @return The version's name.
      */
-    getVersionName(version: VersionModel): string {
+    getVersionName(version: VersionSchema): string {
       return versionToString(version);
     },
     /**

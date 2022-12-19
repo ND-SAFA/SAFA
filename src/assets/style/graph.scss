@@ -1,0 +1,50 @@
+$graph-border-width: 1px;
+$graph-border-radius: 8px;
+
+.cy-container,
+#cytoscape-div,
+#cytoscape-artifact {
+  height: 100% !important;
+  max-height: 100vh !important;
+}
+
+.artifact-view {
+  opacity: 0;
+
+  &.visible {
+    transition: opacity 0.2s ease-in-out;
+    transition-delay: 0.2s;
+    opacity: 100;
+  }
+
+  &.disabled {
+    display: none;
+  }
+}
+
+.artifact-svg-wrapper {
+  &:hover > .artifact-svg {
+    fill: var(--v-neutral-base);
+    filter: drop-shadow(0px 2px 2px rgb(0 0 0 / 0.3));
+  }
+
+  &.artifact-svg-delta-NO_CHANGE:hover > .artifact-border {
+    fill: var(--v-primary-base);
+  }
+
+  &.artifact-svg-delta-NO_CHANGE:hover > .artifact-svg-div {
+    stroke: var(--v-primary-base);
+  }
+}
+
+.no-icon-rotate {
+  cursor: pointer !important;
+  transform: none !important;
+}
+
+.artifact-text.text-body-1 {
+  display: block;
+  text-align: center;
+  font-weight: 800 !important;
+  font-size: 1.2rem !important;
+}

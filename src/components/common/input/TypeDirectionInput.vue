@@ -23,7 +23,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { LabelledTraceDirectionModel } from "@/types";
+import { LabelledTraceDirectionSchema } from "@/types";
 import { projectStore, sessionStore, typeOptionsStore } from "@/hooks";
 import { handleRemoveDirection } from "@/api";
 import { Typography } from "@/components/common/display";
@@ -35,7 +35,7 @@ export default Vue.extend({
   name: "TypeDirectionInput",
   components: { Typography },
   props: {
-    entry: Object as PropType<LabelledTraceDirectionModel>,
+    entry: Object as PropType<LabelledTraceDirectionSchema>,
   },
   computed: {
     /**
@@ -60,7 +60,7 @@ export default Vue.extend({
      * @param removedType - The type to remove.
      */
     handleDeleteDirection(
-      entry: LabelledTraceDirectionModel,
+      entry: LabelledTraceDirectionSchema,
       removedType: string
     ) {
       handleRemoveDirection(entry, removedType);

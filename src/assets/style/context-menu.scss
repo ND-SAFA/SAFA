@@ -1,0 +1,36 @@
+$graph-border-radius: 8px;
+
+.cy-context-menus-cxt-menu {
+  display: none;
+  z-index: 1000;
+  position: absolute;
+  padding: 0;
+  margin: 0;
+  width: fit-content;
+  border-radius: $graph-border-radius;
+  border: 1px solid var(--v-modifiedLight-base);
+  background-color: var(--v-background-base);
+  height: fit-content;
+
+  > button:hover {
+    color: black;
+    background-color: var(--v-selected-base);
+  }
+
+  > .cy-context-menus-cxt-menuitem {
+    display: block;
+    background-color: var(--v-background-base);
+    width: 100%;
+    padding: 3px 20px;
+    font-size: 12px;
+    white-space: nowrap;
+    text-align: left;
+    color: var(--v-text-base);
+    border-radius: $graph-border-radius;
+  }
+
+  .cy-context-menus-submenu-indicator {
+    position: relative;
+    left: 10px;
+  }
+}

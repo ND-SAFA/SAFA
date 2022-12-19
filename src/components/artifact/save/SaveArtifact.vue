@@ -1,38 +1,36 @@
 <template>
-  <div>
+  <div class="pb-4">
     <save-artifact-inputs />
     <v-divider class="my-4" />
     <flex-box justify="space-between">
-      <v-btn
-        text
+      <text-button
         v-if="isUpdate"
-        color="error"
-        @click="handleDelete"
+        text
+        variant="delete"
         data-cy="button-artifact-delete"
+        @click="handleDelete"
       >
-        <v-icon class="mr-1">mdi-delete</v-icon>
         Delete
-      </v-btn>
+      </text-button>
       <v-spacer />
-      <v-btn
-        color="primary"
+      <text-button
         :disabled="!canSave"
+        variant="save"
         data-cy="button-artifact-save"
         @click="handleSubmit"
       >
-        <v-icon class="mr-1">mdi-content-save</v-icon>
         Save
-      </v-btn>
+      </text-button>
     </flex-box>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { ArtifactModel, CreatorOpenState } from "@/types";
+import { ArtifactSchema, CreatorOpenState } from "@/types";
 import { appStore, artifactSaveStore, selectionStore } from "@/hooks";
 import { handleDeleteArtifact, handleSaveArtifact } from "@/api";
-import { FlexBox } from "@/components/common";
+import { FlexBox, TextButton } from "@/components/common";
 import SaveArtifactInputs from "./SaveArtifactInputs.vue";
 
 /**
@@ -41,6 +39,7 @@ import SaveArtifactInputs from "./SaveArtifactInputs.vue";
 export default Vue.extend({
   name: "SaveArtifact",
   components: {
+    TextButton,
     FlexBox,
     SaveArtifactInputs,
   },
@@ -56,7 +55,7 @@ export default Vue.extend({
     /**
      * @return The base artifact being edited.
      */
-    baseArtifact(): ArtifactModel | undefined {
+    baseArtifact(): ArtifactSchema | undefined {
       return selectionStore.selectedArtifact;
     },
     /**

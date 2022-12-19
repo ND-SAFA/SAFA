@@ -1,18 +1,19 @@
 <template>
-  <flex-box column>
-    <attribute-input
-      v-for="attribute of attributes"
-      :key="attribute.key"
-      :model="model"
-      :attribute="attribute"
-    />
-  </flex-box>
+  <attribute-grid :layout="layout">
+    <template v-slot:item="{ attribute }">
+      <attribute-input
+        :model="artifact.attributes || {}"
+        :attribute="attribute"
+      />
+    </template>
+  </attribute-grid>
 </template>
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { CustomAttributeModel } from "@/types";
-import { FlexBox } from "@/components/common/display";
+import { ArtifactSchema, AttributeLayoutSchema } from "@/types";
+import { attributesStore } from "@/hooks";
+import { AttributeGrid } from "@/components/common/display";
 import AttributeInput from "./AttributeInput.vue";
 
 /**
@@ -20,10 +21,20 @@ import AttributeInput from "./AttributeInput.vue";
  */
 export default Vue.extend({
   name: "AttributeListInput",
-  components: { FlexBox, AttributeInput },
+  components: { AttributeGrid, AttributeInput },
   props: {
-    model: Object,
-    attributes: Array as PropType<CustomAttributeModel[]>,
+    artifact: {
+      type: Object as PropType<ArtifactSchema>,
+      required: true,
+    },
+  },
+  computed: {
+    /**
+     * @return The layout for this artifact.
+     */
+    layout(): AttributeLayoutSchema {
+      return attributesStore.getLayoutByType(this.artifact.type);
+    },
   },
 });
 </script>

@@ -2,8 +2,8 @@
 
 import {
   IOHandlerCallback,
-  PasswordChangeModel,
-  UserPasswordModel,
+  PasswordChangeSchema,
+  UserPasswordSchema,
 } from "@/types";
 import { sessionStore, logStore } from "@/hooks";
 import { getParam, getParams, navigateTo, QueryParams, Routes } from "@/router";
@@ -15,6 +15,7 @@ import {
   handleLoadLastProject,
   handleGetProjects,
   getCurrentUser,
+  deleteSession,
 } from "@/api";
 
 /**
@@ -23,7 +24,7 @@ import {
  * @param user - The user to log in.
  * @throws If login is unsuccessful.
  */
-export async function handleLogin(user: UserPasswordModel): Promise<void> {
+export async function handleLogin(user: UserPasswordSchema): Promise<void> {
   const session = await createLoginSession(user);
   const goToPath = getParam(QueryParams.LOGIN_PATH);
   const query = { ...getParams() };
@@ -49,16 +50,21 @@ export async function handleLogin(user: UserPasswordModel): Promise<void> {
 }
 
 /**
- * Logs a user out.
+ * Logs a user out to the login screen.
+ *
+ * @param sendLogoutRequest - Whether to send the API request to log out.
  */
-export async function handleLogout(): Promise<void> {
+export async function handleLogout(sendLogoutRequest = false): Promise<void> {
   document.cookie = "";
 
   await handleClearProject();
   await navigateTo(Routes.LOGIN_ACCOUNT);
   sessionStore.clearSession();
   logStore.notifications = [];
-  // await deleteSession();
+
+  if (sendLogoutRequest) {
+    await deleteSession();
+  }
   // datadogRum.startSessionReplayRecording();
 }
 
@@ -94,7 +100,7 @@ export async function handleAuthentication(): Promise<void> {
  * @param onError - Called if the action fails.
  */
 export function handleChangePassword(
-  password: PasswordChangeModel,
+  password: PasswordChangeSchema,
   { onSuccess, onError }: IOHandlerCallback
 ): void {
   savePassword(password)
@@ -121,7 +127,7 @@ export function handleDeleteAccount(password: string): void {
     async (isConfirmed) => {
       if (!isConfirmed) return;
 
-      deleteAccount(password).then(handleLogout);
+      deleteAccount(password).then(() => handleLogout());
     }
   );
 }

@@ -1,47 +1,8 @@
 /**
- * Container for the project entity to update
- * along with the initiator.
- */
-export interface ProjectMessageModel {
-  type: ProjectMessageType;
-  user: string;
-}
-
-/**
- * Enumerates the type of notification messages that signal
- * that a project meta entity should be updated.
- */
-export enum ProjectMessageType {
-  MEMBERS = "MEMBERS",
-  DOCUMENTS = "DOCUMENTS",
-  META = "META",
-}
-
-/**
- * Container for the versioned entity to update
- * along with the initiator.
- */
-export interface VersionMessageModel {
-  type: VersionMessageType;
-  user: string;
-}
-
-/**
- * Enumerates the types of notifications messages that trigger
- * updates of the versioned entities
- */
-export enum VersionMessageType {
-  VERSION = "VERSION",
-  ARTIFACTS = "ARTIFACTS",
-  TRACES = "TRACES",
-  WARNINGS = "WARNINGS",
-}
-
-/**
  * Notifies client of a series of changes to the project.
  *
  */
-export interface ChangeMessageModel {
+export interface ChangeMessageSchema {
   /**
    * The user initiating the change.
    */
@@ -51,7 +12,7 @@ export interface ChangeMessageModel {
    * Each change depicts what entity was affected, how it was affected
    * (UPDATED / DELETED), and the affected entity ids).
    */
-  changes: ChangeModel[];
+  changes: ChangeSchema[];
   /**
    * Includes whether the default document layout should be updated.
    * This is true if any artifacts or trace links where changed.
@@ -62,7 +23,7 @@ export interface ChangeMessageModel {
 /**
  * Represents list of changed entities.
  */
-export interface ChangeModel {
+export interface ChangeSchema {
   entity: EntityType;
   action: ActionType;
   entityIds: string[];
@@ -83,6 +44,8 @@ export enum EntityType {
   JOBS = "JOBS",
   LAYOUT = "LAYOUT",
   MODELS = "MODELS",
+  ATTRIBUTES = "ATTRIBUTES",
+  ATTRIBUTE_LAYOUTS = "ATTRIBUTE_LAYOUTS",
 }
 
 /**

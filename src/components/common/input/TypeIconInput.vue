@@ -20,7 +20,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { LabelledTraceDirectionModel } from "@/types";
+import { LabelledTraceDirectionSchema } from "@/types";
 import { allTypeIcons } from "@/util";
 import { projectStore, sessionStore } from "@/hooks";
 import { handleSaveArtifactTypeIcon } from "@/api";
@@ -33,7 +33,7 @@ export default Vue.extend({
   name: "TypeIconInput",
   components: { Typography },
   props: {
-    entry: Object as PropType<LabelledTraceDirectionModel>,
+    entry: Object as PropType<LabelledTraceDirectionSchema>,
   },
   data() {
     return { icons: allTypeIcons };
@@ -52,7 +52,7 @@ export default Vue.extend({
      * @param entry - The type to update.
      * @param icon - The icon to set.
      */
-    handleIconChange(entry: LabelledTraceDirectionModel, icon: string) {
+    handleIconChange(entry: LabelledTraceDirectionSchema, icon: string) {
       handleSaveArtifactTypeIcon({ ...entry, icon });
     },
   },

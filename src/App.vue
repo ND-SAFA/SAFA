@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-main>
+    <v-main class="primary lighten-5">
       <transition name="fade" mode="out-in">
         <keep-alive>
           <router-view />
@@ -27,5 +27,5 @@ export default Vue.extend({
 </script>
 
 <style lang="scss">
-@import "./assets/main.scss";
+@import "assets/style/main";
 </style>

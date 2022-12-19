@@ -2,11 +2,11 @@ import { defineStore } from "pinia";
 
 import {
   ArtifactDeltaState,
-  ArtifactModel,
+  ArtifactSchema,
   EntityModification,
   ProjectDelta,
-  TraceLinkModel,
-  VersionModel,
+  TraceLinkSchema,
+  VersionSchema,
 } from "@/types";
 import { createProjectDelta } from "@/util";
 import { disableDrawMode } from "@/cytoscape";
@@ -29,7 +29,7 @@ export const useDelta = defineStore("delta", {
     /**
      * The version that artifact deltas have been made to.
      */
-    afterVersion: undefined as VersionModel | undefined,
+    afterVersion: undefined as VersionSchema | undefined,
     /**
      * A collection of all added artifacts.
      */
@@ -39,31 +39,31 @@ export const useDelta = defineStore("delta", {
     /**
      * @return A collection of all added artifacts.
      */
-    addedArtifacts(): Record<string, ArtifactModel> {
+    addedArtifacts(): Record<string, ArtifactSchema> {
       return this.projectDelta.artifacts.added;
     },
     /**
      * @return A collection of all removed artifacts.
      */
-    removedArtifacts(): Record<string, ArtifactModel> {
+    removedArtifacts(): Record<string, ArtifactSchema> {
       return this.projectDelta.artifacts.removed;
     },
     /**
      * @return A collection of all modified artifacts.
      */
-    modifiedArtifacts(): Record<string, EntityModification<ArtifactModel>> {
+    modifiedArtifacts(): Record<string, EntityModification<ArtifactSchema>> {
       return this.projectDelta.artifacts.modified;
     },
     /**
      * @return A collection of all added traces.
      */
-    addedTraces(): Record<string, TraceLinkModel> {
+    addedTraces(): Record<string, TraceLinkSchema> {
       return this.projectDelta.traces.added;
     },
     /**
      * @return A collection of all removed traces.
      */
-    removedTraces(): Record<string, TraceLinkModel> {
+    removedTraces(): Record<string, TraceLinkSchema> {
       return this.projectDelta.traces.removed;
     },
   },

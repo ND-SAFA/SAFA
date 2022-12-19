@@ -17,8 +17,7 @@ describe("Trace Link Approval", () => {
         .should("equal", "/create");
 
       cy.createBulkProject()
-        .getCy(DataCy.jobStatus, "first", 20000)
-        .should("contain.text", "Completed")
+        .waitForJobLoad()
         .clickButton(DataCy.jobOpenButton)
         .openApproveGeneratedTraceLinks()
         .clickButton(DataCy.sidebarCloseButton);

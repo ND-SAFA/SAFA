@@ -1,9 +1,9 @@
 import {
-  ArtifactModel,
+  ArtifactSchema,
   ArtifactData,
   DeltaArtifact,
   EntityModification,
-  IGenericFilePanel,
+  ParseFilePanel,
   ProjectFile,
   TraceFile,
   TracePanel,
@@ -17,7 +17,7 @@ import {
  */
 export function isModifiedArtifact(
   artifact: DeltaArtifact
-): artifact is EntityModification<ArtifactModel> {
+): artifact is EntityModification<ArtifactSchema> {
   const requiredFields = ["before", "after"];
   return containsFields(artifact, requiredFields);
 }
@@ -28,8 +28,10 @@ export function isModifiedArtifact(
  * @param artifact - The artifact to check.
  * @return Whether this item is an artifact.
  */
-export function isArtifact(artifact: DeltaArtifact): artifact is ArtifactModel {
-  const requiredFields = ["id", "summary", "body", "type"];
+export function isArtifact(
+  artifact: DeltaArtifact
+): artifact is ArtifactSchema {
+  const requiredFields = ["id", "body", "type"];
   return containsFields(artifact, requiredFields);
 }
 
@@ -84,7 +86,7 @@ export function isTraceFile(file: ProjectFile): file is TraceFile {
  * @return Whether this panel is a trace panel.
  */
 export function isTracePanel(
-  panel: IGenericFilePanel<Record<string, unknown>, ProjectFile>
+  panel: ParseFilePanel<Record<string, unknown>, ProjectFile>
 ): panel is TracePanel {
   return isTraceFile(panel.projectFile);
 }

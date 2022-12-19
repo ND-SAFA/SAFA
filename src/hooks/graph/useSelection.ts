@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-import { ArtifactModel, FilterAction, TraceLinkModel } from "@/types";
+import { ArtifactSchema, FilterAction, TraceLinkSchema } from "@/types";
 import {
   artifactTreeCyPromise,
   cyCenterOnArtifacts,
@@ -63,13 +63,13 @@ export const useSelection = defineStore("selection", {
     /**
      * @return The currently selected artifact.
      */
-    selectedArtifact(): ArtifactModel | undefined {
+    selectedArtifact(): ArtifactSchema | undefined {
       return artifactStore.getArtifactById(this.selectedArtifactId);
     },
     /**
      * @return The currently selected artifact.
      */
-    selectedTraceLink(): TraceLinkModel | undefined {
+    selectedTraceLink(): TraceLinkSchema | undefined {
       return traceStore.getTraceLinkById(this.selectedTraceLinkId);
     },
   },
@@ -132,7 +132,9 @@ export const useSelection = defineStore("selection", {
      */
     selectArtifact(artifactId: string): void {
       this.selectedArtifactId = artifactId;
+      this.selectedTraceLinkId = "";
       this.centerOnArtifacts([artifactId]);
+      this.selectedSubtreeIds = [];
       appStore.openDetailsPanel("displayArtifact");
     },
     /**
@@ -140,9 +142,11 @@ export const useSelection = defineStore("selection", {
      *
      * @param traceLink - The trace link to select.
      */
-    selectTraceLink(traceLink: TraceLinkModel): void {
+    selectTraceLink(traceLink: TraceLinkSchema): void {
+      this.selectedArtifactId = "";
       this.selectedTraceLinkId = traceLink.traceLinkId;
       this.selectedSubtreeIds = [traceLink.sourceId, traceLink.targetId];
+      this.centerOnArtifacts([traceLink.sourceId, traceLink.targetId]);
       appStore.openDetailsPanel("displayTrace");
     },
     /**

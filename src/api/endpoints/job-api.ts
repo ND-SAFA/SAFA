@@ -1,4 +1,4 @@
-import { JobModel } from "@/types";
+import { JobSchema } from "@/types";
 import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
 
 /**
@@ -11,8 +11,8 @@ import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
 export async function createFlatFileUploadJob(
   versionId: string,
   formData: FormData
-): Promise<JobModel> {
-  return authHttpClient<JobModel>(
+): Promise<JobSchema> {
+  return authHttpClient<JobSchema>(
     fillEndpoint(Endpoint.updateProjectThroughFlatFiles, { versionId }),
     {
       method: "POST",
@@ -27,8 +27,8 @@ export async function createFlatFileUploadJob(
  *
  * @return Uses list.
  */
-export async function getUserJobs(): Promise<JobModel[]> {
-  return authHttpClient<JobModel[]>(fillEndpoint(Endpoint.getUserJobs, {}), {
+export async function getUserJobs(): Promise<JobSchema[]> {
+  return authHttpClient<JobSchema[]>(fillEndpoint(Endpoint.getUserJobs, {}), {
     method: "GET",
   });
 }

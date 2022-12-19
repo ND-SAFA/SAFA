@@ -1,11 +1,11 @@
 import {
   ArtifactMap,
-  ArtifactModel,
-  LinkModel,
+  ArtifactSchema,
+  LinkSchema,
   ModelType,
-  ParseTraceFileModel,
+  ParseTraceFileSchema,
   TraceFile,
-  TraceLinkModel,
+  TraceLinkSchema,
   TracePanel,
   TraceUploader,
 } from "@/types";
@@ -28,7 +28,7 @@ export function createTraceUploader(): TraceUploader {
  *
  * @param traceLink - The like to create the panel for.
  */
-function createNewPanel(traceLink: LinkModel): TracePanel {
+function createNewPanel(traceLink: LinkSchema): TracePanel {
   return {
     title: `${traceLink.sourceName} X ${traceLink.targetName}`,
     entityNames: [],
@@ -50,7 +50,7 @@ function createNewPanel(traceLink: LinkModel): TracePanel {
  *
  * @param traceLink - The trace link in this file.
  */
-function createTraceFile(traceLink: LinkModel): TraceFile {
+function createTraceFile(traceLink: LinkSchema): TraceFile {
   return {
     sourceId: traceLink.sourceId,
     targetId: traceLink.targetId,
@@ -103,9 +103,9 @@ function createParsedArtifactFile(
   file: File
 ): Promise<void> {
   return parseTraceFile(file)
-    .then((res: ParseTraceFileModel) => {
+    .then((res: ParseTraceFileSchema) => {
       const { entities, errors } = res;
-      const validTraces: TraceLinkModel[] = [];
+      const validTraces: TraceLinkSchema[] = [];
 
       entities.forEach((link) => {
         const error = getTraceError(panel.projectFile, artifactMap, link);
@@ -139,8 +139,8 @@ function createParsedArtifactFile(
  */
 function getTraceError(
   traceFile: TraceFile,
-  artifactMap: Record<string, ArtifactModel>,
-  traceLink: LinkModel
+  artifactMap: Record<string, ArtifactSchema>,
+  traceLink: LinkSchema
 ): string | undefined {
   const { sourceName, targetName } = traceLink;
 

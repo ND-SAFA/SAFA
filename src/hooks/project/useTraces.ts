@@ -3,9 +3,9 @@ import { defineStore } from "pinia";
 import {
   ApprovalType,
   ArtifactData,
-  ArtifactModel,
+  ArtifactSchema,
   DocumentTraces,
-  TraceLinkModel,
+  TraceLinkSchema,
   TraceType,
 } from "@/types";
 import { matchTrace, removeMatches, standardizeValueArray } from "@/util";
@@ -24,17 +24,17 @@ export const useTraces = defineStore("traces", {
     /**
      * All trace links in the project.
      */
-    allTraces: [] as TraceLinkModel[],
+    allTraces: [] as TraceLinkSchema[],
     /**
      * The visible trace links.
      */
-    currentTraces: [] as TraceLinkModel[],
+    currentTraces: [] as TraceLinkSchema[],
   }),
   getters: {
     /**
      * @return All visible trace links.
      */
-    visibleTraces(): TraceLinkModel[] {
+    visibleTraces(): TraceLinkSchema[] {
       return this.currentTraces.filter(
         (t) => t.approvalStatus != ApprovalType.DECLINED
       );
@@ -63,7 +63,7 @@ export const useTraces = defineStore("traces", {
      *
      * @param newTraces - The trace links to add.
      */
-    addOrUpdateTraceLinks(newTraces: TraceLinkModel[]): void {
+    addOrUpdateTraceLinks(newTraces: TraceLinkSchema[]): void {
       const newIds = newTraces.map(({ traceLinkId }) => traceLinkId);
       const updatedTraces = [
         ...removeMatches(this.allTraces, "traceLinkId", newIds),
@@ -84,7 +84,7 @@ export const useTraces = defineStore("traces", {
      * @param deletedTraces - The trace links, or ids, to remove.
      */
     async deleteTraceLinks(
-      deletedTraces: TraceLinkModel[] | string[]
+      deletedTraces: TraceLinkSchema[] | string[]
     ): Promise<void> {
       if (deletedTraces.length === 0) return;
 
@@ -105,7 +105,7 @@ export const useTraces = defineStore("traces", {
      * @param id - The trace link id.
      * @return The trace link, if one exists.
      */
-    getTraceLinkById(id: string): TraceLinkModel | undefined {
+    getTraceLinkById(id: string): TraceLinkSchema | undefined {
       return this.allTraces.find(({ traceLinkId }) => traceLinkId === id);
     },
     /**
@@ -120,7 +120,7 @@ export const useTraces = defineStore("traces", {
       sourceId: string,
       targetId: string,
       ignoreDirection = false
-    ): TraceLinkModel | undefined {
+    ): TraceLinkSchema | undefined {
       return this.allTraces.find(
         matchTrace(sourceId, targetId, ignoreDirection)
       );
@@ -134,10 +134,10 @@ export const useTraces = defineStore("traces", {
      * @return All trace links from source to target artifacts.
      */
     getTraceLinksByArtifactSets(
-      sources: ArtifactModel[],
-      targets: ArtifactModel[],
+      sources: ArtifactSchema[],
+      targets: ArtifactSchema[],
       filters: ("manual" | "approved")[] = []
-    ): TraceLinkModel[] {
+    ): TraceLinkSchema[] {
       const linksBetweenSets = this.allTraces.filter(
         ({ sourceId, targetId }) =>
           !!sources.find(({ id }) => id === sourceId) &&
@@ -180,8 +180,8 @@ export const useTraces = defineStore("traces", {
      * @return Whether a link can be created, or a reason why it cant.
      */
     isLinkAllowed(
-      source: ArtifactModel | ArtifactData,
-      target: ArtifactModel | ArtifactData
+      source: ArtifactSchema | ArtifactData,
+      target: ArtifactSchema | ArtifactData
     ): string | boolean {
       if (source.id === target.id) {
         return "An artifact cannot link to itself.";

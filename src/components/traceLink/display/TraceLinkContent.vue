@@ -1,19 +1,23 @@
 <template>
   <div>
     <panel-card>
-      <generic-artifact-body-display
+      <artifact-body-display
         :artifact="targetArtifact"
         display-title
         display-divider
       />
       <v-card-actions>
-        <v-btn text data-cy="button-trace-target" @click="handleViewTarget">
-          <v-icon class="mr-1">mdi-application-array-outline</v-icon>
+        <text-button
+          text
+          data-cy="button-trace-target"
+          variant="artifact"
+          @click="handleViewTarget"
+        >
           View Artifact
-        </v-btn>
+        </text-button>
       </v-card-actions>
     </panel-card>
-    <flex-box justify="center" y="2">
+    <flex-box justify="center" b="4">
       <v-icon large style="transform: rotate(270deg)">
         mdi-ray-start-arrow
       </v-icon>
@@ -25,7 +29,7 @@
       />
     </flex-box>
     <panel-card>
-      <generic-artifact-body-display
+      <artifact-body-display
         :artifact="sourceArtifact"
         display-title
         display-divider
@@ -42,13 +46,14 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { ArtifactModel, TraceLinkModel, TraceType } from "@/types";
+import { ArtifactSchema, TraceLinkSchema, TraceType } from "@/types";
 import { artifactStore, selectionStore } from "@/hooks";
 import {
-  GenericArtifactBodyDisplay,
+  ArtifactBodyDisplay,
   FlexBox,
   AttributeChip,
   PanelCard,
+  TextButton,
 } from "@/components/common";
 
 /**
@@ -56,24 +61,30 @@ import {
  */
 export default Vue.extend({
   name: "TraceLinkContent",
-  components: { PanelCard, FlexBox, GenericArtifactBodyDisplay, AttributeChip },
+  components: {
+    TextButton,
+    PanelCard,
+    FlexBox,
+    ArtifactBodyDisplay,
+    AttributeChip,
+  },
   computed: {
     /**
      * @return The selected trace link.
      */
-    traceLink(): TraceLinkModel | undefined {
+    traceLink(): TraceLinkSchema | undefined {
       return selectionStore.selectedTraceLink;
     },
     /**
      * @return The artifact this link comes from.
      */
-    sourceArtifact(): ArtifactModel | undefined {
+    sourceArtifact(): ArtifactSchema | undefined {
       return artifactStore.getArtifactById(this.traceLink?.sourceId || "");
     },
     /**
      * @return The artifact this link goes towards.
      */
-    targetArtifact(): ArtifactModel | undefined {
+    targetArtifact(): ArtifactSchema | undefined {
       return artifactStore.getArtifactById(this.traceLink?.targetId || "");
     },
     /**

@@ -16,7 +16,7 @@ export const ARTIFACT_BORDER_WIDTH = 3;
 /**
  * Graph specific values.
  */
-export const CENTER_GRAPH_PADDING = 10;
+export const CENTER_GRAPH_PADDING = 40;
 export const DEFAULT_ARTIFACT_TREE_ZOOM = 0.75;
 
 /**

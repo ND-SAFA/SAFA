@@ -1,7 +1,7 @@
 /**
  * Defines a user model.
  */
-export interface UserModel {
+export interface UserSchema {
   /**
    * The user's id.
    */
@@ -15,7 +15,7 @@ export interface UserModel {
 /**
  * Defines a user & password model.
  */
-export interface UserPasswordModel {
+export interface UserPasswordSchema {
   /**
    * The user's email.
    */
@@ -29,7 +29,7 @@ export interface UserPasswordModel {
 /**
  * Defines a session model.
  */
-export interface SessionModel {
+export interface SessionSchema {
   /**
    * The JWT token authorizing current user.
    */
@@ -43,7 +43,7 @@ export interface SessionModel {
 /**
  * Defines a user model for password reset.
  */
-export interface UserResetModel {
+export interface UserResetSchema {
   /**
    * The user's email.
    */
@@ -53,7 +53,7 @@ export interface UserResetModel {
 /**
  * Defines a user model for password reset.
  */
-export interface PasswordResetModel {
+export interface PasswordResetSchema {
   /**
    * The token generated and included by email as a query param to securely change a user's password.
    */
@@ -67,7 +67,7 @@ export interface PasswordResetModel {
 /**
  * Defines a user model for password change.
  */
-export interface PasswordChangeModel {
+export interface PasswordChangeSchema {
   /**
    * The current password to change.
    */

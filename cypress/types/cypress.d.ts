@@ -237,6 +237,11 @@ declare namespace Cypress {
     openUploadFiles(): Chainable<void>;
 
     /**
+     * Waits for the most recent job to complete.
+     */
+    waitForJobLoad(): Chainable<void>;
+
+    /**
      * Logs into the create project page, uploads a project, and waits for it to complete.
      */
     loadNewProject(): Chainable<void>;
@@ -252,8 +257,10 @@ declare namespace Cypress {
      * Must have the project selector open.
      * On the project step: Selects the current project, continuing to the version step.
      * On the version step: Selects the current version, continuing to the project page.
+     *
+     * @param select - If set, the first project or version will be selected before continuing.
      */
-    projectSelectorContinue(): Chainable<void>;
+    projectSelectorContinue(select?: "project" | "version"): Chainable<void>;
 
     /**
      * Must have the project selector open to the version step.

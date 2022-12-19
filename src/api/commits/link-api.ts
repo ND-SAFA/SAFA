@@ -1,8 +1,8 @@
 import {
   ApprovalType,
-  JobModel,
-  TraceLinkModel,
-  TrainOrGenerateLinksModel,
+  JobSchema,
+  TraceLinkSchema,
+  TrainOrGenerateLinksSchema,
 } from "@/types";
 import { CommitBuilder } from "@/api";
 import { authHttpClient, Endpoint, fillEndpoint } from "@/api/util";
@@ -15,8 +15,8 @@ import { authHttpClient, Endpoint, fillEndpoint } from "@/api/util";
  */
 export async function getGeneratedLinks(
   versionId: string
-): Promise<TraceLinkModel[]> {
-  return authHttpClient<TraceLinkModel[]>(
+): Promise<TraceLinkSchema[]> {
+  return authHttpClient<TraceLinkSchema[]>(
     fillEndpoint(Endpoint.getGeneratedLinks, { versionId }),
     { method: "GET" }
   );
@@ -29,9 +29,9 @@ export async function getGeneratedLinks(
  * @return The created job.
  */
 export async function createGeneratedLinks(
-  config: TrainOrGenerateLinksModel
-): Promise<JobModel> {
-  return authHttpClient<JobModel>(fillEndpoint(Endpoint.generateLinksJob), {
+  config: TrainOrGenerateLinksSchema
+): Promise<JobSchema> {
+  return authHttpClient<JobSchema>(fillEndpoint(Endpoint.generateLinksJob), {
     method: "POST",
     body: JSON.stringify(config),
   });
@@ -46,9 +46,9 @@ export async function createGeneratedLinks(
  */
 export async function createModelTraining(
   projectId: string,
-  config: TrainOrGenerateLinksModel
-): Promise<JobModel> {
-  return authHttpClient<JobModel>(
+  config: TrainOrGenerateLinksSchema
+): Promise<JobSchema> {
+  return authHttpClient<JobSchema>(
     fillEndpoint(Endpoint.trainModelJob, { projectId }),
     {
       method: "POST",
@@ -64,8 +64,8 @@ export async function createModelTraining(
  * @return The modified trace links.
  */
 export async function updateApprovedLink(
-  traceLink: TraceLinkModel
-): Promise<TraceLinkModel[]> {
+  traceLink: TraceLinkSchema
+): Promise<TraceLinkSchema[]> {
   traceLink = {
     ...traceLink,
     approvalStatus: ApprovalType.APPROVED,
@@ -84,8 +84,8 @@ export async function updateApprovedLink(
  * @return The removed trace links.
  */
 export async function updateDeclinedLink(
-  traceLink: TraceLinkModel
-): Promise<TraceLinkModel[]> {
+  traceLink: TraceLinkSchema
+): Promise<TraceLinkSchema[]> {
   traceLink = {
     ...traceLink,
     approvalStatus: ApprovalType.DECLINED,
@@ -104,8 +104,8 @@ export async function updateDeclinedLink(
  * @return The removed trace links.
  */
 export async function updateDeclinedLinks(
-  traceLinks: TraceLinkModel[]
-): Promise<TraceLinkModel[]> {
+  traceLinks: TraceLinkSchema[]
+): Promise<TraceLinkSchema[]> {
   traceLinks = traceLinks.map((link) => ({
     ...link,
     approvalStatus: ApprovalType.DECLINED,
@@ -124,8 +124,8 @@ export async function updateDeclinedLinks(
  * @return The removed trace links.
  */
 export async function updateUnreviewedLink(
-  traceLink: TraceLinkModel
-): Promise<TraceLinkModel[]> {
+  traceLink: TraceLinkSchema
+): Promise<TraceLinkSchema[]> {
   traceLink = {
     ...traceLink,
     approvalStatus: ApprovalType.UNREVIEWED,
@@ -144,8 +144,8 @@ export async function updateUnreviewedLink(
  * @return The created trace links.
  */
 export async function createLink(
-  traceLink: TraceLinkModel
-): Promise<TraceLinkModel[]> {
+  traceLink: TraceLinkSchema
+): Promise<TraceLinkSchema[]> {
   traceLink = {
     ...traceLink,
     approvalStatus: ApprovalType.APPROVED,
@@ -164,8 +164,8 @@ export async function createLink(
  * @return The created trace links.
  */
 export async function saveGeneratedLinks(
-  traceLinks: TraceLinkModel[]
-): Promise<TraceLinkModel[]> {
+  traceLinks: TraceLinkSchema[]
+): Promise<TraceLinkSchema[]> {
   return CommitBuilder.withCurrentVersion()
     .hideErrors()
     .withNewTraceLinks(traceLinks)

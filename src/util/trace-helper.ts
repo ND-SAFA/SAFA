@@ -2,10 +2,10 @@ import {
   allowedSafetyCaseTypes,
   ApprovalType,
   ArtifactData,
-  ArtifactModel,
+  ArtifactSchema,
   ArtifactTypeDirections,
-  LinkModel,
-  TraceLinkModel,
+  LinkSchema,
+  TraceLinkSchema,
   TraceType,
 } from "@/types";
 
@@ -26,7 +26,7 @@ export function getTraceId(source: string, target: string): string {
  * @param traceLink - The trace link.
  * @return The standardized ID of the source joined to the target.
  */
-export function extractTraceId(traceLink: LinkModel): string {
+export function extractTraceId(traceLink: LinkSchema): string {
   return `${traceLink.sourceName}-${traceLink.targetName}`;
 }
 
@@ -43,7 +43,7 @@ export function matchTrace(
   targetId: string,
   ignoreDirection = false
 ) {
-  return (trace: TraceLinkModel): boolean =>
+  return (trace: TraceLinkSchema): boolean =>
     ignoreDirection
       ? (trace.sourceId === sourceId && trace.targetId === targetId) ||
         (trace.targetId === sourceId && trace.sourceId === targetId)
@@ -59,8 +59,8 @@ export function matchTrace(
  * @return Whether the link is allowed.
  */
 export function isLinkAllowedByType(
-  source: ArtifactModel | ArtifactData,
-  target: ArtifactModel | ArtifactData,
+  source: ArtifactSchema | ArtifactData,
+  target: ArtifactSchema | ArtifactData,
   artifactTypeDirections: ArtifactTypeDirections
 ): boolean {
   const sourceType =
@@ -95,7 +95,7 @@ export function isLinkAllowedByType(
  * @return Status callbacks.
  */
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export function linkStatus(traceLink?: TraceLinkModel) {
+export function linkStatus(traceLink?: TraceLinkSchema) {
   const canBeModified = () => traceLink?.traceType === TraceType.GENERATED;
 
   return {

@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-import { ProjectWarnings } from "@/types";
+import { WarningCollectionSchema } from "@/types";
 import { pinia } from "@/plugins";
 
 /**
@@ -12,7 +12,7 @@ export const useWarnings = defineStore("warnings", {
     /**
      * A collection of warnings keyed by the associated artifact.
      */
-    artifactWarnings: {} as ProjectWarnings,
+    artifactWarnings: {} as WarningCollectionSchema,
   }),
   getters: {},
   actions: {

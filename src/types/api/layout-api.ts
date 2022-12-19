@@ -1,9 +1,9 @@
-import { LayoutPositionsModel } from "@/types";
+import { LayoutPositionsSchema } from "@/types";
 
 /**
  * Represents the configuration to refresh document layouts.
  */
-export interface LayoutRegenerationModel {
+export interface LayoutRegenerationSchema {
   /**
    * If true, the default document will be regenerated.
    */
@@ -17,13 +17,13 @@ export interface LayoutRegenerationModel {
 /**
  * Represents regenerated layouts.
  */
-export interface GeneratedLayoutsModel {
+export interface GeneratedLayoutsSchema {
   /**
    * Returns the layout for the default document.
    */
-  defaultDocumentLayout: LayoutPositionsModel;
+  defaultDocumentLayout: LayoutPositionsSchema;
   /**
    * Returns the layout for each document regenerated, keyed by document id.
    */
-  documentLayoutMap: Record<string, LayoutPositionsModel>;
+  documentLayoutMap: Record<string, LayoutPositionsSchema>;
 }

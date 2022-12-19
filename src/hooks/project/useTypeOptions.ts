@@ -2,13 +2,13 @@ import { defineStore } from "pinia";
 
 import {
   ArtifactData,
-  ArtifactModel,
+  ArtifactSchema,
   ArtifactTypeDirections,
-  ArtifactTypeModel,
-  LabelledTraceDirectionModel,
-  ProjectModel,
+  ArtifactTypeSchema,
+  LabelledTraceDirectionSchema,
+  ProjectSchema,
   SafetyCaseType,
-  TraceDirectionModel,
+  TraceDirectionSchema,
 } from "@/types";
 import {
   allTypeIcons,
@@ -34,7 +34,7 @@ export const useTypeOptions = defineStore("typeOptions", {
     /**
      * A list of all artifact types.
      */
-    allArtifactTypes: [] as ArtifactTypeModel[],
+    allArtifactTypes: [] as ArtifactTypeSchema[],
     /**
      * A mapping of the icons for each artifact type.
      */
@@ -58,7 +58,7 @@ export const useTypeOptions = defineStore("typeOptions", {
      *
      * @param project - The project to load.
      */
-    initializeProject(project: ProjectModel): void {
+    initializeProject(project: ProjectSchema): void {
       this.artifactTypeDirections = {};
       this.initializeTypeIcons(project.artifactTypes);
     },
@@ -67,7 +67,7 @@ export const useTypeOptions = defineStore("typeOptions", {
      *
      * @param allArtifactTypes - The artifact types to set.
      */
-    initializeTypeIcons(allArtifactTypes: ArtifactTypeModel[]): void {
+    initializeTypeIcons(allArtifactTypes: ArtifactTypeSchema[]): void {
       this.$patch({
         artifactTypeIcons: createDefaultTypeIcons(allArtifactTypes),
         allArtifactTypes,
@@ -79,7 +79,7 @@ export const useTypeOptions = defineStore("typeOptions", {
      * @param type - The type to update.
      * @param allowedTypes - The allowed types to set.
      */
-    updateLinkDirections({ type, allowedTypes }: TraceDirectionModel): void {
+    updateLinkDirections({ type, allowedTypes }: TraceDirectionSchema): void {
       this.artifactTypeDirections = {
         ...this.artifactTypeDirections,
         [type]: allowedTypes,
@@ -91,7 +91,7 @@ export const useTypeOptions = defineStore("typeOptions", {
      * @param type - The type to update.
      * @param icon - The icon to set.
      */
-    updateArtifactIcon({ type, icon }: LabelledTraceDirectionModel): void {
+    updateArtifactIcon({ type, icon }: LabelledTraceDirectionSchema): void {
       this.artifactTypeIcons = {
         ...this.artifactTypeIcons,
         [type]: icon,
@@ -102,7 +102,7 @@ export const useTypeOptions = defineStore("typeOptions", {
      *
      * @param artifactTypes - The artifact types to add.
      */
-    addOrUpdateArtifactTypes(artifactTypes: ArtifactTypeModel[]): void {
+    addOrUpdateArtifactTypes(artifactTypes: ArtifactTypeSchema[]): void {
       const ids = artifactTypes.map(({ typeId }) => typeId);
       const allArtifactTypes = [
         ...removeMatches(this.allArtifactTypes, "typeId", ids),
@@ -117,7 +117,7 @@ export const useTypeOptions = defineStore("typeOptions", {
      *
      * @param newArtifacts - The artifact to add types from.
      */
-    addTypesFromArtifacts(newArtifacts: ArtifactModel[]): void {
+    addTypesFromArtifacts(newArtifacts: ArtifactSchema[]): void {
       newArtifacts.forEach(({ type }) => {
         if (this.artifactTypeDirections[type]) return;
 
@@ -169,8 +169,8 @@ export const useTypeOptions = defineStore("typeOptions", {
      * @return Whether the link is allowed.
      */
     isLinkAllowedByType(
-      source: ArtifactModel | ArtifactData,
-      target: ArtifactModel | ArtifactData
+      source: ArtifactSchema | ArtifactData,
+      target: ArtifactSchema | ArtifactData
     ): boolean {
       return isLinkAllowedByType(source, target, this.artifactTypeDirections);
     },
@@ -198,7 +198,7 @@ export const useTypeOptions = defineStore("typeOptions", {
     /**
      * Generates labeled artifact type directions.
      */
-    typeDirections(): LabelledTraceDirectionModel[] {
+    typeDirections(): LabelledTraceDirectionSchema[] {
       return Object.entries(this.artifactTypeDirections).map(
         ([type, allowedTypes]) => {
           const icon = this.getArtifactTypeIcon(type);

@@ -1,8 +1,8 @@
 import {
-  ArtifactModel,
+  ArtifactSchema,
   ArtifactData,
   ApprovalType,
-  TraceLinkModel,
+  TraceLinkSchema,
   TraceType,
   IOHandlerCallback,
 } from "@/types";
@@ -22,15 +22,15 @@ import {
  * @param target - The artifact to link to.
  */
 export async function handleCreateLink(
-  source: ArtifactModel | ArtifactData,
-  target: ArtifactModel | ArtifactData
+  source: ArtifactSchema | ArtifactData,
+  target: ArtifactSchema | ArtifactData
 ): Promise<void> {
   const sourceName =
     "artifactName" in source ? source.artifactName : source.name;
   const targetName =
     "artifactName" in target ? target.artifactName : target.name;
 
-  const traceLink: TraceLinkModel = {
+  const traceLink: TraceLinkSchema = {
     traceLinkId: "",
     sourceId: source.id,
     sourceName,
@@ -65,7 +65,7 @@ export async function handleCreateLink(
  * @param onComplete - Called after the action.
  */
 export async function handleApproveLink(
-  link: TraceLinkModel,
+  link: TraceLinkSchema,
   { onSuccess, onError, onComplete }: IOHandlerCallback
 ): Promise<void> {
   linkAPIHandler(link, updateApprovedLink, {
@@ -96,7 +96,7 @@ export async function handleApproveLink(
  * @param onComplete - Called after the action.
  */
 export async function handleDeclineLink(
-  link: TraceLinkModel,
+  link: TraceLinkSchema,
   { onSuccess, onError, onComplete }: IOHandlerCallback
 ): Promise<void> {
   linkAPIHandler(link, updateDeclinedLink, {
@@ -161,7 +161,7 @@ export async function handleDeclineAll(): Promise<void> {
  * @param onComplete - Called after the action.
  */
 export async function handleUnreviewLink(
-  link: TraceLinkModel,
+  link: TraceLinkSchema,
   { onSuccess, onError, onComplete }: IOHandlerCallback
 ): Promise<void> {
   linkAPIHandler(link, updateUnreviewedLink, {
@@ -192,7 +192,7 @@ export async function handleUnreviewLink(
  * @param onComplete - Called after the action.
  */
 export async function handleDeleteLink(
-  link: TraceLinkModel,
+  link: TraceLinkSchema,
   { onSuccess, onError, onComplete }: IOHandlerCallback
 ): Promise<void> {
   logStore.confirm(
@@ -220,9 +220,9 @@ export async function handleDeleteLink(
  * @param onComplete - Called after the action.
  */
 function linkAPIHandler(
-  link: TraceLinkModel,
-  linkAPI: (traceLink: TraceLinkModel) => Promise<TraceLinkModel[]>,
-  { onSuccess, onError, onComplete }: IOHandlerCallback<TraceLinkModel[]>
+  link: TraceLinkSchema,
+  linkAPI: (traceLink: TraceLinkSchema) => Promise<TraceLinkSchema[]>,
+  { onSuccess, onError, onComplete }: IOHandlerCallback<TraceLinkSchema[]>
 ): void {
   appStore.onLoadStart();
   linkAPI(link)

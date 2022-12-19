@@ -1,5 +1,5 @@
 <template>
-  <generic-selector
+  <table-selector
     v-if="this.isOpen"
     item-key="versionId"
     no-data-text="Project contains no versions"
@@ -13,6 +13,7 @@
     :has-delete="showEdit"
     :can-delete-last-item="false"
     data-cy="table-version"
+    class="version-table"
     @item:select="handleSelectVersion"
     @item:delete="handleDeleteVersion"
     @item:add="handleAddItem"
@@ -26,24 +27,15 @@
         @create="handleVersionCreated"
       />
     </template>
-    <template v-slot:deleteItemDialogue>
-      <confirm-version-delete
-        :version="versionToDelete"
-        :delete-dialogue="deleteVersionDialogue"
-        @cancel="handleCancelDeleteVersion"
-        @confirm="handleConfirmDeleteVersion"
-      />
-    </template>
-  </generic-selector>
+  </table-selector>
 </template>
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { IdentifierModel, VersionModel, DataItem } from "@/types";
+import { IdentifierSchema, VersionSchema } from "@/types";
 import { projectStore, sessionStore } from "@/hooks";
 import { getProjectVersions, handleDeleteVersion } from "@/api";
-import { GenericSelector } from "@/components/common";
-import { ConfirmVersionDelete } from "../base";
+import { TableSelector } from "@/components/common";
 import VersionCreator from "./VersionCreator.vue";
 
 /**
@@ -56,7 +48,10 @@ import VersionCreator from "./VersionCreator.vue";
  */
 export default Vue.extend({
   name: "VersionSelector",
-  components: { GenericSelector, VersionCreator, ConfirmVersionDelete },
+  components: {
+    TableSelector,
+    VersionCreator,
+  },
   props: {
     /**
      * Whether this component is currently in view. If within
@@ -70,7 +65,7 @@ export default Vue.extend({
      * The currently selected project whose versions we are displaying.
      */
     project: {
-      type: Object as PropType<IdentifierModel>,
+      type: Object as PropType<IdentifierSchema>,
       required: false,
     },
     hideCurrentVersion: {
@@ -111,9 +106,7 @@ export default Vue.extend({
             ...baseHeaders,
             { text: "Actions", value: "actions", sortable: false },
           ],
-      versions: [] as VersionModel[],
-      versionToDelete: undefined as VersionModel | undefined,
-      deleteVersionDialogue: false,
+      versions: [] as VersionSchema[],
       addVersionDialogue: false,
       isLoading: false,
     };
@@ -130,7 +123,7 @@ export default Vue.extend({
     /**
      * @return The displayed versions.
      */
-    displayedVersions(): VersionModel[] {
+    displayedVersions(): VersionSchema[] {
       return this.hideCurrentVersion
         ? this.versions.filter(
             ({ versionId }) => versionId !== projectStore.versionId
@@ -154,7 +147,7 @@ export default Vue.extend({
       this.isLoading = true;
 
       getProjectVersions(this.project.projectId)
-        .then((versions: VersionModel[]) => {
+        .then((versions: VersionSchema[]) => {
           this.versions = versions;
         })
         .finally(() => {
@@ -164,9 +157,9 @@ export default Vue.extend({
     /**
      * Emits selected versions.
      */
-    handleSelectVersion(item: DataItem<VersionModel>) {
-      if (item.value) {
-        this.$emit("selected", item.item);
+    handleSelectVersion(item: VersionSchema) {
+      if (item) {
+        this.$emit("selected", item);
       } else {
         this.$emit("unselected");
       }
@@ -187,41 +180,21 @@ export default Vue.extend({
      * Adds the new version the version list, and emits the new version to select.
      * @param version - The new version.
      */
-    handleVersionCreated(version: VersionModel) {
+    handleVersionCreated(version: VersionSchema) {
       this.versions = [version, ...this.versions];
       this.addVersionDialogue = false;
-      this.$emit("selected", version);
-    },
-    /**
-     * Opens the version deletion modal.
-     * @param version - The version to delete.
-     */
-    handleDeleteVersion(version: VersionModel) {
-      this.versionToDelete = version;
-      this.deleteVersionDialogue = true;
-    },
-    /**
-     * Closes the version deletion modal.
-     */
-    handleCancelDeleteVersion() {
-      this.deleteVersionDialogue = false;
     },
     /**
      * Attempts to delete the version.
      * @param version - The version to delete.
      */
-    handleConfirmDeleteVersion(version: VersionModel) {
-      this.deleteVersionDialogue = false;
-      this.isLoading = true;
-
-      handleDeleteVersion(version.versionId, {
+    handleDeleteVersion(version: VersionSchema) {
+      handleDeleteVersion(version, {
         onSuccess: () => {
-          this.isLoading = false;
           this.versions = this.versions.filter(
             (v) => v.versionId != version.versionId
           );
         },
-        onError: () => (this.isLoading = false),
       });
     },
   },

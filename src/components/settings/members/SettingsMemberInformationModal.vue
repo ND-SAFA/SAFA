@@ -1,5 +1,5 @@
 <template>
-  <generic-modal :is-open="isOpen" :title="modelTitle" @close="handleCancel">
+  <modal :is-open="isOpen" :title="modelTitle" @close="handleCancel">
     <template v-slot:body>
       <flex-box align="center" t="4">
         <v-text-field
@@ -36,30 +36,30 @@
         {{ buttonLabel }}
       </v-btn>
     </template>
-  </generic-modal>
+  </modal>
 </template>
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { MembershipModel, ProjectRole } from "@/types";
+import { MembershipSchema, ProjectRole } from "@/types";
 import { projectRoleOptions } from "@/util";
 import { projectStore } from "@/hooks";
 import { handleInviteMember } from "@/api";
-import { GenericModal, FlexBox, ProjectInput } from "@/components/common";
+import { Modal, FlexBox, ProjectInput } from "@/components/common";
 
 /**
  * The modal for sharing a project with a user.
  */
 export default Vue.extend({
   name: "SettingsMemberInformation",
-  components: { ProjectInput, FlexBox, GenericModal },
+  components: { ProjectInput, FlexBox, Modal },
   props: {
     isOpen: {
       type: Boolean,
       required: true,
     },
     member: {
-      type: Object as PropType<MembershipModel>,
+      type: Object as PropType<MembershipSchema>,
       required: false,
     },
     clearOnClose: {
@@ -157,7 +157,7 @@ export default Vue.extend({
      * Updates member fields when the member changes.
      * @param newMember - The new member.
      */
-    member(newMember: MembershipModel | undefined): void {
+    member(newMember: MembershipSchema | undefined): void {
       if (!newMember) return;
 
       this.userRole = newMember.role;

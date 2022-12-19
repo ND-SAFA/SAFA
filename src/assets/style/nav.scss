@@ -1,0 +1,25 @@
+.nav-input {
+  fieldset, i {
+    color: fade-out($color-accent, 0.5) !important;
+  }
+
+  &:hover {
+    fieldset, div, label, i {
+      color: $color-accent !important;
+    }
+  }
+}
+
+.nav-selected {
+  color: var(--v-primary-base) !important;
+}
+
+.nav-notifications {
+  min-width: 300px;
+  max-height: 40vh;
+  overflow-y: scroll;
+}
+
+.v-tabs-bar, .v-window {
+  background-color: transparent !important;
+}

@@ -13,7 +13,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { TraceLinkModel } from "@/types";
+import { TraceLinkSchema } from "@/types";
 import { appStore, selectionStore } from "@/hooks";
 import { FlexBox } from "@/components/common";
 import { TraceLinkApproval } from "./index";
@@ -28,7 +28,7 @@ export default Vue.extend({
     /**
      * @return The selected trace link.
      */
-    traceLink(): TraceLinkModel | undefined {
+    traceLink(): TraceLinkSchema | undefined {
       return selectionStore.selectedTraceLink;
     },
   },

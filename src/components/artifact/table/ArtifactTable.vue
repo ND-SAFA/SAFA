@@ -1,14 +1,11 @@
 <template>
-  <v-container
-    v-if="isTableView"
-    style="height: 100%"
-    :class="isVisible ? 'artifact-view visible' : 'artifact-view'"
-  >
+  <panel-card>
     <v-data-table
+      single-select
       show-group-by
-      show-expand
-      single-expand
       fixed-header
+      height="60vh"
+      v-model="selected"
       :headers="headers"
       :items="items"
       :search="searchText"
@@ -16,10 +13,9 @@
       :group-by.sync="groupBy"
       :group-desc.sync="groupDesc"
       :sort-desc.sync="sortDesc"
-      :expanded="expanded"
-      :item-class="getItemBackground"
       :items-per-page="50"
       data-cy="view-artifact-table"
+      class="mt-4 artifact-table"
       @click:row="handleView($event)"
     >
       <template v-slot:top>
@@ -60,11 +56,11 @@
       </template>
 
       <template
-        v-for="column in columns"
-        v-slot:[`item.${column.id}`]="{ item }"
+        v-for="attribute in attributes"
+        v-slot:[`item.${attribute.key}`]="{ item }"
       >
-        <td :key="column.id" class="v-data-table__divider">
-          <artifact-table-cell :column="column" :item="item" />
+        <td :key="attribute.key" class="v-data-table__divider">
+          <attribute-display :attribute="attribute" :model="item.attributes" />
         </td>
       </template>
 
@@ -73,33 +69,27 @@
           <artifact-table-row-actions :artifact="item" />
         </td>
       </template>
-
-      <template v-slot:expanded-item="{ headers, item }">
-        <td :colspan="headers.length">
-          <typography el="p" y="2" :value="item.body" />
-        </td>
-      </template>
     </v-data-table>
-  </v-container>
+  </panel-card>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { ArtifactModel, ArtifactDeltaState, FlatArtifact } from "@/types";
+import { DataTableHeader } from "vuetify";
+import { ArtifactDeltaState, FlatArtifact, AttributeSchema } from "@/types";
 import {
-  appStore,
   artifactStore,
-  documentStore,
   deltaStore,
   selectionStore,
+  attributesStore,
 } from "@/hooks";
 import {
-  Typography,
   AttributeChip,
   TableGroupHeader,
+  AttributeDisplay,
+  PanelCard,
 } from "@/components/common";
 import ArtifactTableHeader from "./ArtifactTableHeader.vue";
-import ArtifactTableCell from "./ArtifactTableCell.vue";
 import ArtifactTableRowName from "./ArtifactTableRowName.vue";
 import ArtifactTableRowActions from "./ArtifactTableRowActions.vue";
 import ArtifactTableDeltaChip from "./ArtifactTableDeltaChip.vue";
@@ -110,11 +100,11 @@ import ArtifactTableDeltaChip from "./ArtifactTableDeltaChip.vue";
 export default Vue.extend({
   name: "ArtifactTable",
   components: {
+    PanelCard,
+    AttributeDisplay,
     ArtifactTableRowActions,
     AttributeChip,
-    Typography,
     ArtifactTableHeader,
-    ArtifactTableCell,
     ArtifactTableRowName,
     TableGroupHeader,
     ArtifactTableDeltaChip,
@@ -127,16 +117,10 @@ export default Vue.extend({
       sortDesc: false,
       groupDesc: false,
       selectedDeltaTypes: [] as ArtifactDeltaState[],
-      expanded: [] as ArtifactModel[],
+      selected: [] as FlatArtifact[],
     };
   },
   computed: {
-    /**
-     * @return Whether to render the artifact table.
-     */
-    isVisible(): boolean {
-      return !appStore.isLoading && documentStore.isTableDocument;
-    },
     /**
      * @return Whether delta view is enabled.
      */
@@ -144,15 +128,9 @@ export default Vue.extend({
       return deltaStore.inDeltaView;
     },
     /**
-     * @return Whether table view is enabled.
-     */
-    isTableView(): boolean {
-      return documentStore.isTableDocument;
-    },
-    /**
      * @return The artifact table's headers.
      */
-    headers() {
+    headers(): Partial<DataTableHeader>[] {
       return [
         {
           text: "Name",
@@ -178,9 +156,9 @@ export default Vue.extend({
               },
             ]
           : []),
-        ...documentStore.tableColumns.map((col) => ({
-          text: col.name,
-          value: col.id,
+        ...attributesStore.attributes.map(({ key, label }) => ({
+          text: label,
+          value: key,
           width: "300px",
           divider: true,
         })),
@@ -190,17 +168,13 @@ export default Vue.extend({
           width: "150px",
           groupable: false,
         },
-        {
-          value: "data-table-expand",
-          groupable: false,
-        },
       ];
     },
     /**
      * @return The artifact table's columns.
      */
-    columns() {
-      return documentStore.tableColumns;
+    attributes(): AttributeSchema[] {
+      return attributesStore.attributes;
     },
     /**
      * @return The artifact table's items.
@@ -218,28 +192,26 @@ export default Vue.extend({
   methods: {
     /**
      * Opens the view artifact side panel.
-     * @param artifact - The artifact to view.
+     * @param item - The artifact to view.
      */
-    handleView(artifact: ArtifactModel) {
-      if (selectionStore.selectedArtifactId === artifact.id) {
-        selectionStore.clearSelections();
-        this.expanded = [];
+    handleView(item: FlatArtifact) {
+      if (selectionStore.selectedArtifactId === item.id) {
+        this.selected = [];
       } else {
-        selectionStore.selectArtifact(artifact.id);
-        this.expanded = [artifact];
+        this.selected = [item];
       }
     },
+  },
+  watch: {
     /**
-     * Returns the background class name of an artifact row.
-     * @param item - The artifact to display.
-     * @return The class name to add to the artifact.
+     * Updates the selection store when the selected artifact changes.
      */
-    getItemBackground(item: ArtifactModel): string {
-      if (selectionStore.selectedArtifactId === item.id) {
-        return "artifact-row-selected";
+    selected(items: FlatArtifact[]) {
+      if (items.length === 0) {
+        selectionStore.clearSelections();
+      } else {
+        selectionStore.selectArtifact(items[0].id);
       }
-
-      return "";
     },
   },
 });

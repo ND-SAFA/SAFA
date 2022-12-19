@@ -69,13 +69,30 @@ export function cyZoomOut(cyPromise: CyPromise = artifactTreeCyPromise): void {
 /**
  * Centers the viewport on all graph nodes.
  *
+ * @param animate - Whether to animate the centering.
  * @param cyPromise - The cy instance.
  */
 export function cyCenterNodes(
+  animate = false,
   cyPromise: CyPromise = artifactTreeCyPromise
 ): void {
   cyPromise.then((cy) => {
-    cy.center(cy.nodes());
+    const nodes = cy.nodes();
+
+    if (animate) {
+      if (cy.animated()) {
+        cy.stop(false, false);
+      }
+
+      cy.animate({
+        fit: { eles: nodes, padding: CENTER_GRAPH_PADDING },
+        duration: ANIMATION_DURATION,
+      });
+    } else if (nodes.length > 10) {
+      cy.fit(nodes, CENTER_GRAPH_PADDING);
+    } else {
+      cy.center(nodes);
+    }
   });
 }
 
@@ -146,20 +163,12 @@ export function cyCenterOnArtifacts(
         ? cy.nodes()
         : cy.nodes().filter((n) => artifactIds.includes(n.data().id));
 
-    if (collection.length > 1) {
-      cy.animate({
-        fit: { eles: collection, padding: CENTER_GRAPH_PADDING },
-        duration: ANIMATION_DURATION,
-        complete: () => setCenteredArtifacts(undefined),
-      });
-    } else {
-      cy.animate({
-        zoom: DEFAULT_ARTIFACT_TREE_ZOOM,
-        center: { eles: collection },
-        duration: ANIMATION_DURATION,
-        complete: () => setCenteredArtifacts(undefined),
-      });
-    }
+    cy.animate({
+      zoom: DEFAULT_ARTIFACT_TREE_ZOOM,
+      center: { eles: collection },
+      duration: ANIMATION_DURATION,
+      complete: () => setCenteredArtifacts(undefined),
+    });
   });
 }
 
@@ -223,7 +232,7 @@ export function cyResetTree(
   if (selectedId) {
     selectionStore.selectArtifact(selectedId);
   } else {
-    cyCenterNodes(cyPromise);
+    cyCenterNodes(false, cyPromise);
   }
 }
 

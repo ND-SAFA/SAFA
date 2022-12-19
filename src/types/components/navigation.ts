@@ -1,10 +1,10 @@
-import { ArtifactModel } from "@/types";
+import { ArtifactSchema } from "@/types";
 
 /**
  * Represents an item in an artifact search list.
  */
 export type ArtifactSearchItem =
-  | ArtifactModel
+  | ArtifactSchema
   | { header: string }
   | { divider: boolean };
 

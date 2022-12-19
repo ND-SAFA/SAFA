@@ -1,4 +1,4 @@
-import { InstallationModel } from "@/types";
+import { InstallationSchema } from "@/types";
 import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
 
 /**
@@ -9,8 +9,8 @@ import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
  */
 export async function getProjectInstallations(
   projectId: string
-): Promise<InstallationModel[]> {
-  return authHttpClient<InstallationModel[]>(
+): Promise<InstallationSchema[]> {
+  return authHttpClient<InstallationSchema[]>(
     fillEndpoint(Endpoint.getInstallations, { projectId }),
     {
       method: "GET",

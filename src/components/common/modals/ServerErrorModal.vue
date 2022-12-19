@@ -1,5 +1,5 @@
 <template>
-  <generic-modal
+  <modal
     title="Server Errors"
     :isOpen="isOpen"
     :actionsHeight="0"
@@ -17,13 +17,13 @@
         </v-list-item>
       </v-list>
     </template>
-  </generic-modal>
+  </modal>
 </template>
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { appStore } from "@/hooks";
-import GenericModal from "./GenericModal.vue";
+import Modal from "./Modal.vue";
 
 /**
  * Renders server errors.
@@ -31,7 +31,7 @@ import GenericModal from "./GenericModal.vue";
 export default Vue.extend({
   name: "ServerErrorModal",
   components: {
-    GenericModal,
+    Modal,
   },
   data() {
     return {

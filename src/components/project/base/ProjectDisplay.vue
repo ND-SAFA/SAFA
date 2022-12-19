@@ -11,7 +11,7 @@
     </v-card-text>
     <v-card-actions>
       <div>
-        <flex-box b="4" class="flex-wrap">
+        <flex-box wrap b="4">
           <div class="mb-2">
             <attribute-chip
               :value="artifacts"
@@ -28,14 +28,15 @@
           </div>
         </flex-box>
         <flex-box
+          wrap
           v-for="direction in typeDirections"
           :key="direction[0]"
           y="2"
           align="center"
         >
           <attribute-chip artifact-type :value="direction[0]" />
-          <v-icon class="mx-1">mdi-ray-start-arrow</v-icon>
-          <flex-box class="flex-wrap">
+          <flex-box wrap>
+            <v-icon class="mx-1">mdi-ray-start-arrow</v-icon>
             <div v-for="type in direction[1]" :key="type" class="mb-1">
               <attribute-chip artifact-type :value="type" />
             </div>

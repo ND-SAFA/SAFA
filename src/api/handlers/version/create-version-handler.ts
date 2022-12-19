@@ -1,4 +1,4 @@
-import { IOHandlerCallback, VersionModel, VersionType } from "@/types";
+import { IOHandlerCallback, VersionSchema, VersionType } from "@/types";
 import { versionToString } from "@/util";
 import { logStore } from "@/hooks";
 import {
@@ -20,7 +20,7 @@ import {
 export async function handleCreateVersion(
   projectId: string,
   versionType: VersionType,
-  { onSuccess, onError, onComplete }: IOHandlerCallback<VersionModel>
+  { onSuccess, onError, onComplete }: IOHandlerCallback<VersionSchema>
 ): Promise<void> {
   const createVersion = () => {
     if (versionType === "major") {

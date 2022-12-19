@@ -16,15 +16,15 @@ describe("Artifact Subtree", () => {
       // Selected node is visible.
       cy.getNodes(true)
         .should("be.visible")
-        .should("not.have.css", "opacity", "0.1");
+        .should("not.have.css", "opacity", "0.3");
 
       // Subtree nodes are visible.
-      cy.getNode("F9").should("not.have.css", "opacity", "0.1");
-      cy.getNode("F15").should("not.have.css", "opacity", "0.1");
-      cy.getNode("F17").should("not.have.css", "opacity", "0.1");
+      cy.getNode("F9").should("not.have.css", "opacity", "0.3");
+      cy.getNode("F15").should("not.have.css", "opacity", "0.3");
+      cy.getNode("F17").should("not.have.css", "opacity", "0.3");
 
       // Unrelated node is faded.
-      cy.getNode("D5").should("have.css", "opacity", "0.1");
+      cy.getNode("D5").should("have.css", "opacity", "0.3");
     });
   });
 

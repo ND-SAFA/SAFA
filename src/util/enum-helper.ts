@@ -1,7 +1,7 @@
 import {
   ApprovalType,
   ArtifactDeltaState,
-  ColumnDataType,
+  AttributeType,
   CreatorTabTypes,
   DocumentType,
   FTANodeType,
@@ -15,6 +15,7 @@ import {
   TracePredictionTabTypes,
 } from "@/types";
 import { enumToDisplay } from "@/util/string-helper";
+import { ENABLED_FEATURES } from "@/util/enabled-features";
 
 /**
  * Converts an enum value into a selectable option with a title case name.
@@ -98,20 +99,7 @@ export function logicTypeOptions(): SelectOption[] {
 }
 
 /**
- * Returns display names for each column type.
- *
- * @return The select option names and ids.
- */
-export function columnTypeOptions(): SelectOption[] {
-  return [
-    createEnumOption(ColumnDataType.FREE_TEXT, "Text"),
-    createEnumOption(ColumnDataType.RELATION),
-    createEnumOption(ColumnDataType.SELECT),
-  ];
-}
-
-/**
- * Returns display names for each column type.
+ * Returns display names for each delta type.
  *
  * @return The select option names and ids.
  */
@@ -234,7 +222,10 @@ export function settingsTabOptions(): SelectOption[] {
     createEnumOption(SettingsTabTypes.members, "Members"),
     createEnumOption(SettingsTabTypes.upload, "Data Upload"),
     createEnumOption(SettingsTabTypes.integrations, "Data Integrations"),
-    createEnumOption(SettingsTabTypes.artifacts, "Artifact Settings"),
+    createEnumOption(SettingsTabTypes.artifacts, "Artifact Types"),
+    ...(ENABLED_FEATURES.ATTRIBUTES
+      ? [createEnumOption(SettingsTabTypes.attributes, "Custom Attributes")]
+      : []),
   ];
 }
 
@@ -249,5 +240,36 @@ export function trainingTabOptions(): SelectOption[] {
     createEnumOption("repositories", "Repositories"),
     createEnumOption("keywords", "Keywords"),
     createEnumOption("project", "Project Data"),
+  ];
+}
+
+/**
+ * Returns display names for table view tabs.
+ *
+ * @return The select option names and ids.
+ */
+export function tableViewTabOptions(): SelectOption[] {
+  return [
+    createEnumOption("artifacts", "Artifacts"),
+    createEnumOption("traceLinks", "Trace Links"),
+  ];
+}
+
+/**
+ * Returns display names for attribute types.
+ *
+ * @return The select option names and ids.
+ */
+export function attributeTypeOptions(): SelectOption[] {
+  return [
+    createEnumOption(AttributeType.text, "Text"),
+    createEnumOption(AttributeType.paragraph, "Paragraph"),
+    createEnumOption(AttributeType.select, "Select"),
+    createEnumOption(AttributeType.multiselect, "Multiselect"),
+    createEnumOption(AttributeType.relation, "Relation"),
+    createEnumOption(AttributeType.date, "Date"),
+    createEnumOption(AttributeType.int, "Integer"),
+    createEnumOption(AttributeType.float, "Number"),
+    createEnumOption(AttributeType.boolean, "Yes/No"),
   ];
 }

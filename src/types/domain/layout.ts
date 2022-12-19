@@ -2,7 +2,7 @@
  * The position of a node within a graph.
  * A node’s position refers to the centre point of its body.
  */
-export interface PositionModel {
+export interface PositionSchema {
   /**
    * # of pixes right from the top-left  corner.
    */
@@ -16,4 +16,4 @@ export interface PositionModel {
 /**
  * Maps artifact ids to their coordinates on the graph.
  */
-export type LayoutPositionsModel = Record<string, PositionModel>;
+export type LayoutPositionsSchema = Record<string, PositionSchema>;

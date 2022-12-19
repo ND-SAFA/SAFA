@@ -1,5 +1,5 @@
 <template>
-  <generic-selector
+  <table-selector
     :headers="headers"
     :items="projects"
     :is-open="isOpen"
@@ -10,6 +10,7 @@
     :has-delete-for-indexes="deletableProjects"
     :has-delete="false"
     data-cy="table-project"
+    class="project-table"
     @item:edit="handleEditProject"
     @item:select="handleSelectProject"
     @item:delete="handleDeleteProject"
@@ -30,19 +31,19 @@
         @cancel="handleCancelDeleteProject"
       />
     </template>
-  </generic-selector>
+  </table-selector>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { DataItem, IdentifierModel } from "@/types";
+import { IdentifierSchema } from "@/types";
 import { identifierSaveStore, projectStore, sessionStore } from "@/hooks";
 import {
   handleDeleteProject,
   handleGetProjects,
   handleSaveProject,
 } from "@/api";
-import { GenericSelector } from "@/components/common";
+import { TableSelector } from "@/components/common";
 import { ConfirmProjectDelete, ProjectIdentifierModal } from "../base";
 
 /**
@@ -56,7 +57,7 @@ import { ConfirmProjectDelete, ProjectIdentifierModal } from "../base";
 export default Vue.extend({
   name: "ProjectSelector",
   components: {
-    GenericSelector,
+    TableSelector,
     ProjectIdentifierModal,
     ConfirmProjectDelete,
   },
@@ -76,7 +77,7 @@ export default Vue.extend({
   },
   data() {
     return {
-      selected: undefined as IdentifierModel | undefined,
+      selected: undefined as IdentifierSchema | undefined,
       headers: this.minimal
         ? [{ text: "Name", value: "name", sortable: true, isSelectable: true }]
         : [
@@ -102,7 +103,7 @@ export default Vue.extend({
     /**
      * @return All projects for the current user.
      */
-    projects(): IdentifierModel[] {
+    projects(): IdentifierSchema[] {
       return projectStore.allProjects;
     },
     /**
@@ -133,11 +134,10 @@ export default Vue.extend({
     /**
      * Emits changes to the selected item.
      * @param item - The selected project.
-     * @param goToNextStep - If true with a valid project, the next step will be navigated to.
      */
-    handleSelectProject(item: DataItem<IdentifierModel>, goToNextStep = false) {
-      if (item.value) {
-        this.$emit("selected", item.item, goToNextStep);
+    handleSelectProject(item: IdentifierSchema | undefined) {
+      if (item) {
+        this.$emit("selected", item, true);
       } else {
         this.$emit("unselected");
       }
@@ -159,7 +159,7 @@ export default Vue.extend({
      * Opens the edit project modal.
      * @param item - The project to edit.
      */
-    handleEditProject(item: IdentifierModel) {
+    handleEditProject(item: IdentifierSchema) {
       identifierSaveStore.baseIdentifier = item;
       this.isSaveOpen = true;
     },
@@ -167,7 +167,7 @@ export default Vue.extend({
      * Opens the delete project modal.
      * @param item - The project to delete.
      */
-    handleDeleteProject(item: IdentifierModel) {
+    handleDeleteProject(item: IdentifierSchema) {
       identifierSaveStore.baseIdentifier = item;
       this.isDeleteOpen = true;
     },

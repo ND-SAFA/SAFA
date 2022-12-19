@@ -10,7 +10,7 @@
     hide-details
     dark
     style="max-width: 200px"
-    class="mx-1"
+    class="mx-1 nav-input"
     item-text="name"
     data-cy="button-document-select-open"
   >
@@ -20,7 +20,7 @@
           {{ item.name }}
         </v-col>
         <v-col class="flex-grow-0" @click.stop="handleEditOpen(item)">
-          <generic-icon-button
+          <icon-button
             v-if="canEdit(item.name)"
             icon-id="mdi-dots-horizontal"
             :tooltip="`Edit ${item.name}`"
@@ -31,24 +31,23 @@
     </template>
 
     <template v-slot:append-item>
-      <v-btn
+      <text-button
         v-if="canEdit()"
         text
         block
-        color="primary"
+        variant="add"
         data-cy="button-document-select-create"
         @click="handleCreateOpen"
       >
-        <v-icon>mdi-plus</v-icon>
         Add View
-      </v-btn>
+      </text-button>
     </template>
   </v-select>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { DocumentModel } from "@/types";
+import { DocumentSchema } from "@/types";
 import {
   appStore,
   documentSaveStore,
@@ -57,11 +56,11 @@ import {
   sessionStore,
 } from "@/hooks";
 import { handleSwitchDocuments } from "@/api";
-import { GenericIconButton } from "@/components/common";
+import { IconButton, TextButton } from "@/components/common";
 
 export default Vue.extend({
   name: "DocumentSelector",
-  components: { GenericIconButton },
+  components: { TextButton, IconButton },
   computed: {
     /**
      * @return The current documents.
@@ -111,7 +110,7 @@ export default Vue.extend({
     /**
      * Opens the edit document modal.
      */
-    handleEditOpen(document: DocumentModel) {
+    handleEditOpen(document: DocumentSchema) {
       documentSaveStore.baseDocument = document;
       this.handleCloseMenu();
       appStore.openDetailsPanel("document");

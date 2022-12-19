@@ -1,5 +1,5 @@
 <template>
-  <v-expansion-panel data-cy="panel-files">
+  <v-expansion-panel data-cy="panel-files" class="primary-border">
     <v-expansion-panel-header>
       <flex-box align="center">
         <v-progress-circular indeterminate v-if="isLoading" class="mr-2" />
@@ -12,7 +12,7 @@
     <v-expansion-panel-content>
       <slot name="before-rows" />
 
-      <generic-file-selector
+      <file-input
         v-if="showFileUploader"
         :multiple="false"
         data-cy="input-files-panel"
@@ -20,7 +20,7 @@
       />
 
       <flex-box justify="space-between" align="center">
-        <generic-switch
+        <switch-input
           v-if="showFileUploader"
           v-model="ignoreErrors"
           label="Ignore Errors"
@@ -87,8 +87,8 @@
 import Vue, { PropType } from "vue";
 import { logStore } from "@/hooks";
 import {
-  GenericSwitch,
-  GenericFileSelector,
+  SwitchInput,
+  FileInput,
   Typography,
   FlexBox,
 } from "@/components/common";
@@ -108,8 +108,8 @@ export default Vue.extend({
   components: {
     FlexBox,
     Typography,
-    GenericSwitch,
-    GenericFileSelector,
+    SwitchInput,
+    FileInput,
   },
   props: {
     fileRequired: {

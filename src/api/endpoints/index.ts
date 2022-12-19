@@ -15,3 +15,4 @@ export * from "./sync-api";
 export * from "./model-api";
 export * from "./files-api";
 export * from "./installations-api";
+export * from "./attribute-api";

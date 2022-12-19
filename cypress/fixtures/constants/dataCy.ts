@@ -121,9 +121,6 @@ export enum DataCy {
   versionCreateMinorButton = "button-create-minor-version",
   versionCreateRevisionButton = "button-create-revision-version",
 
-  versionDeleteModal = "modal-version-delete",
-  versionDeleteConfirmButton = "button-version-delete",
-
   versionUploadFilesInput = "input-files-version",
   versionUploadFilesButton = "button-upload-files",
 

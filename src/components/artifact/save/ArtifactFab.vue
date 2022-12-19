@@ -25,7 +25,7 @@
         <v-icon v-else>mdi-plus</v-icon>
       </v-btn>
     </template>
-    <generic-icon-button
+    <icon-button
       fab
       small
       icon-id="mdi-link-variant-plus"
@@ -33,7 +33,7 @@
       data-cy="button-fab-generate-trace"
       @click="handleGenerateTraceLink"
     />
-    <generic-icon-button
+    <icon-button
       v-if="isVisible"
       fab
       small
@@ -43,7 +43,7 @@
       data-cy="button-fab-draw-trace"
       @click="handleDrawTraceLink"
     />
-    <generic-icon-button
+    <icon-button
       fab
       small
       icon-id="mdi-ray-start-end"
@@ -51,7 +51,7 @@
       data-cy="button-fab-create-trace"
       @click="handleAddTraceLink"
     />
-    <generic-icon-button
+    <icon-button
       fab
       small
       icon-id="mdi-folder-plus-outline"
@@ -66,7 +66,7 @@
 import Vue from "vue";
 import { appStore, documentStore, projectStore, sessionStore } from "@/hooks";
 import { disableDrawMode, enableDrawMode } from "@/cytoscape";
-import { GenericIconButton } from "@/components/common";
+import { IconButton } from "@/components/common";
 
 /**
  * Displays the artifact tree action buttons.
@@ -74,7 +74,7 @@ import { GenericIconButton } from "@/components/common";
 export default Vue.extend({
   name: "ArtifactFab",
   components: {
-    GenericIconButton,
+    IconButton,
   },
   data() {
     return { fab: false };

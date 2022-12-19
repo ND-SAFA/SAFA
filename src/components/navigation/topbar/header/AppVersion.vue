@@ -3,7 +3,7 @@
     <typography
       el="h1"
       variant="subtitle"
-      color="accent"
+      color="white"
       style="white-space: nowrap"
       :value="projectName"
       x="4"
@@ -19,6 +19,7 @@
       :items="versions"
       item-value="versionId"
       style="width: 100px"
+      class="nav-input"
       @input="handleLoadVersion"
     >
       <template v-slot:selection>
@@ -28,10 +29,9 @@
         {{ getVersionName(item) }}
       </template>
       <template v-slot:append-item>
-        <v-btn text color="primary" @click="openCreateVersion = true">
-          <v-icon>mdi-plus</v-icon>
+        <text-button text variant="add" @click="openCreateVersion = true">
           Add Version
-        </v-btn>
+        </text-button>
       </template>
     </v-select>
 
@@ -46,11 +46,11 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { VersionModel } from "@/types";
+import { VersionSchema } from "@/types";
 import { versionToString } from "@/util";
 import { projectStore } from "@/hooks";
 import { getProjectVersions, handleLoadVersion } from "@/api";
-import { Typography, FlexBox } from "@/components/common";
+import { Typography, FlexBox, TextButton } from "@/components/common";
 import { VersionCreator } from "@/components/project/selector";
 
 /**
@@ -58,10 +58,10 @@ import { VersionCreator } from "@/components/project/selector";
  */
 export default Vue.extend({
   name: "AppVersion",
-  components: { FlexBox, Typography, VersionCreator },
+  components: { TextButton, FlexBox, Typography, VersionCreator },
   data() {
     return {
-      versions: [] as VersionModel[],
+      versions: [] as VersionSchema[],
       openCreateVersion: false,
     };
   },
@@ -107,7 +107,7 @@ export default Vue.extend({
      * @param version - The version to name.
      * @return The version's name.
      */
-    getVersionName(version: VersionModel): string {
+    getVersionName(version: VersionSchema): string {
       return versionToString(version);
     },
     /**
@@ -120,7 +120,7 @@ export default Vue.extend({
      * Adds the new version the version list and loads that version.
      * @param version - The new version.
      */
-    async handleVersionCreated(version: VersionModel): Promise<void> {
+    async handleVersionCreated(version: VersionSchema): Promise<void> {
       this.versions = [version, ...this.versions];
       this.openCreateVersion = false;
       await handleLoadVersion(version.versionId);

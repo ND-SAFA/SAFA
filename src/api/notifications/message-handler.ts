@@ -1,17 +1,19 @@
 import { Frame } from "webstomp-client";
 import {
   ActionType,
-  ChangeMessageModel,
-  ChangeModel,
+  ChangeMessageSchema,
+  ChangeSchema,
   EntityType,
   notifyUserEntities,
-  ProjectModel,
+  ProjectSchema,
 } from "@/types";
 import {
   appStore,
   artifactStore,
+  attributesStore,
   documentStore,
   jobStore,
+  membersStore,
   projectStore,
   sessionStore,
   traceStore,
@@ -36,7 +38,7 @@ export async function handleEntityChangeMessage(
   versionId: string,
   frame: Frame
 ): Promise<void> {
-  const message: ChangeMessageModel = JSON.parse(frame.body);
+  const message: ChangeMessageSchema = JSON.parse(frame.body);
   const project = await getChanges(versionId, message);
   //TODO: current user check is disabled. Evaluate a better way of filtering updates by the current user.
   const isCurrentUser = message.user === sessionStore.userEmail && false;
@@ -54,7 +56,7 @@ export async function handleEntityChangeMessage(
       if (!isCurrentUser || notifyUserEntities.includes(change.entity)) {
         if (change.action === ActionType.DELETE) {
           await handleDeleteChange(change);
-        } else {
+        } else if (change.action === ActionType.UPDATE) {
           await handleUpdateChange(change, project);
         }
       }
@@ -72,7 +74,7 @@ export async function handleEntityChangeMessage(
  *
  * @param change - The deletion change.
  */
-async function handleDeleteChange(change: ChangeModel) {
+async function handleDeleteChange(change: ChangeSchema) {
   switch (change.entity) {
     case EntityType.PROJECT:
       // (entityIds.length should be 1 and equal to projectId)
@@ -81,7 +83,7 @@ async function handleDeleteChange(change: ChangeModel) {
       return handleClearProject();
     case EntityType.MEMBERS:
       // (entityIds = projectMembershipsIds)
-      projectStore.deleteMembers(change.entityIds);
+      membersStore.deleteMembers(change.entityIds);
       break;
     case EntityType.VERSION:
       // (entityIds = project version id)
@@ -122,6 +124,14 @@ async function handleDeleteChange(change: ChangeModel) {
         ),
       });
       break;
+    case EntityType.ATTRIBUTES:
+      // (entityIds = attribute keys)
+      attributesStore.deleteAttributes(change.entityIds);
+      break;
+    case EntityType.ATTRIBUTE_LAYOUTS:
+      // (entityIds = attribute layout ids)
+      attributesStore.deleteAttributeLayouts(change.entityIds);
+      break;
   }
 }
 
@@ -131,7 +141,10 @@ async function handleDeleteChange(change: ChangeModel) {
  * @param change - The update change.
  * @param project - The updated project.
  */
-async function handleUpdateChange(change: ChangeModel, project: ProjectModel) {
+async function handleUpdateChange(
+  change: ChangeSchema,
+  project: ProjectSchema
+) {
   const versionId = projectStore.versionId;
 
   switch (change.entity) {
@@ -142,7 +155,7 @@ async function handleUpdateChange(change: ChangeModel, project: ProjectModel) {
       });
       break;
     case EntityType.MEMBERS:
-      projectStore.updateMembers(project.members);
+      membersStore.updateMembers(project.members);
       break;
     case EntityType.VERSION:
       return handleLoadVersion(versionId);
@@ -167,6 +180,12 @@ async function handleUpdateChange(change: ChangeModel, project: ProjectModel) {
       break;
     case EntityType.MODELS:
       projectStore.updateProject({ models: project.models });
+      break;
+    case EntityType.ATTRIBUTES:
+      attributesStore.updateAttributes(project.attributes || []);
+      break;
+    case EntityType.ATTRIBUTE_LAYOUTS:
+      attributesStore.updateAttributeLayouts(project.attributeLayouts || []);
       break;
   }
 }

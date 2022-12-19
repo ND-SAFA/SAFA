@@ -1,5 +1,5 @@
 import { EventObject } from "cytoscape";
-import { ArtifactModel, ArtifactData, MenuItem } from "@/types";
+import { ArtifactSchema, ArtifactData, MenuItem } from "@/types";
 import {
   appStore,
   artifactStore,
@@ -83,7 +83,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
     selector: "node",
     coreAsWell: false,
     onClickFunction(event: EventObject): void {
-      handleOnClick(event, (artifact: ArtifactModel) => {
+      handleOnClick(event, (artifact: ArtifactSchema) => {
         selectionStore.selectArtifact(artifact.id);
       });
     },
@@ -99,7 +99,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
     coreAsWell: false,
     hasTrailingDivider: true,
     onClickFunction(event: EventObject): void {
-      handleOnClick(event, (artifact: ArtifactModel) => {
+      handleOnClick(event, (artifact: ArtifactSchema) => {
         selectionStore.selectArtifact(artifact.id);
         appStore.openDetailsPanel("displayArtifactBody");
       });
@@ -115,7 +115,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
     selector: "node",
     coreAsWell: false,
     onClickFunction(event: EventObject): void {
-      handleOnClick(event, async (artifact: ArtifactModel) => {
+      handleOnClick(event, async (artifact: ArtifactSchema) => {
         selectionStore.selectArtifact(artifact.id);
         appStore.openArtifactCreatorTo({});
       });
@@ -134,7 +134,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
     selector: "node",
     coreAsWell: false,
     onClickFunction(event: EventObject): void {
-      handleOnClick(event, async (artifact: ArtifactModel) => {
+      handleOnClick(event, async (artifact: ArtifactSchema) => {
         handleDeleteArtifact(artifact, {});
       });
     },
@@ -153,7 +153,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
     coreAsWell: false,
     hasTrailingDivider: true,
     onClickFunction(event: EventObject): void {
-      handleOnClick(event, async (artifact: ArtifactModel) => {
+      handleOnClick(event, async (artifact: ArtifactSchema) => {
         await handleDuplicateArtifact(artifact, {});
       });
     },
@@ -215,7 +215,7 @@ function hasSubtree(artifactData: ArtifactData | undefined): boolean {
   return false;
 }
 
-type ArtifactHandler = (a: ArtifactModel) => void | Promise<void>;
+type ArtifactHandler = (a: ArtifactSchema) => void | Promise<void>;
 
 /**
  * Handles an artifact on click event.

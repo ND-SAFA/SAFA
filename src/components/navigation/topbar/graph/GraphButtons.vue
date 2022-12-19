@@ -7,7 +7,7 @@
     />
     <v-divider inset vertical class="accent mx-1 faded mb-2" />
     <template v-for="definition in viewButtons">
-      <generic-icon-button
+      <icon-button
         v-if="definition.handler"
         :key="definition.label"
         color="accent"
@@ -26,14 +26,14 @@ import Vue from "vue";
 import { ButtonDefinition, ButtonType } from "@/types";
 import { artifactStore, documentStore, selectionStore } from "@/hooks";
 import { handleRegenerateLayout } from "@/api";
-import { cyZoomIn, cyZoomOut } from "@/cytoscape";
-import { GenericIconButton, CheckmarkMenu, FlexBox } from "@/components/common";
+import { cyCenterNodes, cyZoomIn, cyZoomOut } from "@/cytoscape";
+import { IconButton, CheckmarkMenu, FlexBox } from "@/components/common";
 
 export default Vue.extend({
   name: "GraphButtons",
   components: {
     FlexBox,
-    GenericIconButton,
+    IconButton,
     CheckmarkMenu,
   },
   data() {
@@ -73,12 +73,7 @@ export default Vue.extend({
         },
         {
           type: ButtonType.ICON,
-          handler: () => {
-            selectionStore.filterGraph({
-              type: "subtree",
-              artifactsInSubtree: [],
-            });
-          },
+          handler: () => cyCenterNodes(true),
           label: "Center Graph",
           icon: "mdi-graphql",
           dataCy: "button-nav-graph-center",

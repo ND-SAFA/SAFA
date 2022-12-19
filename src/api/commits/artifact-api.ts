@@ -1,8 +1,8 @@
 import {
   ApprovalType,
-  ArtifactModel,
-  NameValidationModel,
-  TraceLinkModel,
+  ArtifactSchema,
+  NameValidationSchema,
+  TraceLinkSchema,
 } from "@/types";
 import { Endpoint, fillEndpoint, authHttpClient, CommitBuilder } from "@/api";
 
@@ -17,7 +17,7 @@ export async function getDoesArtifactExist(
   versionId: string,
   artifactName: string
 ): Promise<boolean> {
-  const res = await authHttpClient<NameValidationModel>(
+  const res = await authHttpClient<NameValidationSchema>(
     fillEndpoint(Endpoint.isArtifactNameTaken, { versionId }),
     { method: "POST", body: JSON.stringify({ artifactName }) }
   );
@@ -33,9 +33,9 @@ export async function getDoesArtifactExist(
  * @return The deleted artifact.
  */
 export async function deleteArtifact(
-  artifact: ArtifactModel,
-  traceLinks: TraceLinkModel[]
-): Promise<ArtifactModel> {
+  artifact: ArtifactSchema,
+  traceLinks: TraceLinkSchema[]
+): Promise<ArtifactSchema> {
   traceLinks = traceLinks.map((link) => ({
     ...link,
     approvalStatus: ApprovalType.DECLINED,
@@ -57,8 +57,8 @@ export async function deleteArtifact(
  */
 export async function createArtifact(
   versionId: string,
-  artifact: ArtifactModel
-): Promise<ArtifactModel[]> {
+  artifact: ArtifactSchema
+): Promise<ArtifactSchema[]> {
   return CommitBuilder.withCurrentVersion()
     .withNewArtifact(artifact)
     .save()
@@ -74,8 +74,8 @@ export async function createArtifact(
  */
 export async function updateArtifact(
   versionId: string,
-  artifact: ArtifactModel
-): Promise<ArtifactModel[]> {
+  artifact: ArtifactSchema
+): Promise<ArtifactSchema[]> {
   return CommitBuilder.withCurrentVersion()
     .withModifiedArtifact(artifact)
     .save()

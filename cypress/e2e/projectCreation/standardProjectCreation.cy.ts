@@ -276,6 +276,7 @@ describe("Standard Project Creation", () => {
 
       // Step - Check for creation success message
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
+      cy.waitForJobLoad();
     });
   });
 });

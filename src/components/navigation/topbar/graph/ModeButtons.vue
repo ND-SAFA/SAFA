@@ -1,47 +1,50 @@
 <template>
   <v-btn-toggle tile group multiple dense :value="value">
-    <v-btn
+    <text-button
+      :disabled="isTreeDisabled"
       value="tree"
       text
       color="accent"
       data-cy="button-nav-tree"
+      icon-id="mdi-family-tree"
       @click="handleTreeView"
     >
-      <v-icon left color="accent">mdi-family-tree</v-icon>
       Tree
-    </v-btn>
-    <v-btn
+    </text-button>
+    <text-button
       value="table"
       text
       color="accent"
       data-cy="button-nav-table"
+      icon-id="mdi-table-multiple"
       @click="handleTableView"
     >
-      <v-icon left color="accent">mdi-table-multiple</v-icon>
       Table
-    </v-btn>
-    <v-btn
+    </text-button>
+    <text-button
       value="delta"
       text
       color="accent"
       data-cy="button-nav-delta"
+      icon-id="mdi-compare"
       @click="handleDeltaView"
     >
-      <v-icon left color="accent">mdi-compare</v-icon>
       Delta
-    </v-btn>
+    </text-button>
   </v-btn-toggle>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import { appStore, deltaStore, documentStore } from "@/hooks";
+import { TextButton } from "@/components/common";
 
 /**
  * Buttons for changing the mode of the artifact view.
  */
 export default Vue.extend({
   name: "ModeButtons",
+  components: { TextButton },
   data() {
     return {
       value: [] as string[],
@@ -57,6 +60,12 @@ export default Vue.extend({
     inDeltaView(): boolean {
       return deltaStore.inDeltaView;
     },
+    /**
+     * @return Whether the tree view is disabled.
+     */
+    isTreeDisabled(): boolean {
+      return documentStore.isEditableTableDocument;
+    },
   },
   methods: {
     /**
@@ -65,7 +74,7 @@ export default Vue.extend({
     updateValue(): void {
       const selected: string[] = [];
 
-      selected.push(documentStore.isTableView ? "table" : "tree");
+      selected.push(documentStore.isTableDocument ? "table" : "tree");
 
       if (this.inDeltaView) {
         selected.push("delta");
@@ -100,6 +109,12 @@ export default Vue.extend({
      * Updates the value when delta view changes.
      */
     inDeltaView(): void {
+      this.updateValue();
+    },
+    /**
+     * Updates the value when the document type changes.
+     */
+    isTreeDisabled(): void {
       this.updateValue();
     },
   },

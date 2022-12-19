@@ -1,5 +1,5 @@
 import { EventObject } from "cytoscape";
-import { ArtifactModel, DetailsOpenState } from "@/types";
+import { ArtifactSchema, DetailsOpenState } from "@/types";
 import { appStore, layoutStore, selectionStore } from "@/hooks";
 import { disableDrawMode } from "@/cytoscape";
 import { DefaultCytoEvents } from "@/cytoscape/events/cyto-events";
@@ -48,7 +48,7 @@ export const ArtifactTreeCytoEvents: CytoEventHandlers = {
     //   previousTapStamp = currentTimeStamp;
     // },
     action(cy: CytoCore, event: EventObject) {
-      const artifact = event.target.data() as ArtifactModel;
+      const artifact = event.target.data() as ArtifactSchema;
 
       if (!artifact.id) return;
 
@@ -58,7 +58,7 @@ export const ArtifactTreeCytoEvents: CytoEventHandlers = {
   selectAll: {
     events: [CytoEvent.BOX_SELECT],
     action(cy: CytoCore, event: EventObject) {
-      const artifact = event.target.data() as ArtifactModel;
+      const artifact = event.target.data() as ArtifactSchema;
 
       selectionStore.addToSelectedGroup(artifact.id);
     },
@@ -66,7 +66,7 @@ export const ArtifactTreeCytoEvents: CytoEventHandlers = {
   setInitialPosition: {
     events: [CytoEvent.ADD],
     action(cy: CytoCore, event: EventObject) {
-      const artifact = event.target.data() as ArtifactModel;
+      const artifact = event.target.data() as ArtifactSchema;
 
       cy.nodes()
         .filter((n) => n.data().id === artifact.id)

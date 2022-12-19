@@ -6,7 +6,7 @@
     <v-list>
       <template v-for="(doc, idx) in documents">
         <v-divider :key="doc.documentId + '-div'" v-if="idx !== 0" />
-        <generic-list-item
+        <list-item
           :key="doc.documentId"
           :item="{ title: doc.name, subtitle: documentTypeName(doc.type) }"
           @click="handleSwitchDocument(doc)"
@@ -18,18 +18,18 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { DocumentModel } from "@/types";
+import { DocumentSchema } from "@/types";
 import { documentTypeOptions } from "@/util";
 import { documentStore, selectionStore } from "@/hooks";
 import { handleSwitchDocuments } from "@/api";
-import { Typography, GenericListItem, PanelCard } from "@/components/common";
+import { Typography, ListItem, PanelCard } from "@/components/common";
 
 /**
  * Displays the selected node's documents.
  */
 export default Vue.extend({
   name: "ArtifactDocuments",
-  components: { PanelCard, Typography, GenericListItem },
+  components: { PanelCard, Typography, ListItem },
   computed: {
     /**
      * @return The selected artifact.
@@ -40,7 +40,7 @@ export default Vue.extend({
     /**
      * @return The selected artifact's documents.
      */
-    documents(): DocumentModel[] {
+    documents(): DocumentSchema[] {
       if (!this.selectedArtifact) return [];
 
       return documentStore.projectDocuments.filter(({ documentId }) =>
@@ -59,7 +59,7 @@ export default Vue.extend({
      * Switches to another document.
      * @param document - The document to switch to.
      */
-    handleSwitchDocument(document: DocumentModel): void {
+    handleSwitchDocument(document: DocumentSchema): void {
       handleSwitchDocuments(document);
     },
     /**

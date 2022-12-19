@@ -1,4 +1,4 @@
-import { ArtifactModel, VersionModel, TraceLinkModel } from "@/types";
+import { ArtifactSchema, VersionSchema, TraceLinkSchema } from "@/types";
 
 /**
  * Represents a single commit containing one or more changes to
@@ -8,15 +8,15 @@ export interface Commit {
   /**
    * The version this commit is being made on.
    */
-  commitVersion: VersionModel;
+  commitVersion: VersionSchema;
   /**
    * The changes occurring to the project artifacts.
    */
-  artifacts: EntityCommit<ArtifactModel>;
+  artifacts: EntityCommit<ArtifactSchema>;
   /**
    * The changes occurring to project traces.
    */
-  traces: EntityCommit<TraceLinkModel>;
+  traces: EntityCommit<TraceLinkSchema>;
   /**
    * If false, errors will be silent.
    */

@@ -78,15 +78,20 @@ Cypress.Commands.add("createReqToHazardFiles", (createTraces, next) => {
   }
 });
 
+Cypress.Commands.add("waitForJobLoad", () => {
+  cy.getCy(DataCy.jobStatus, "first", 20000).should(
+    "contain.text",
+    "Completed"
+  );
+});
+
 Cypress.Commands.add("loadNewProject", () => {
   cy.visit("/create")
     .login(validUser.email, validUser.password)
     .location("pathname", { timeout: 5000 })
     .should("equal", "/create");
 
-  cy.createBulkProject()
-    .getCy(DataCy.jobStatus, "first", 20000)
-    .should("contain.text", "Completed");
+  cy.createBulkProject().waitForJobLoad();
 
   cy.logout();
 });

@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -13,6 +15,7 @@ import javax.persistence.UniqueConstraint;
 
 import edu.nd.crc.safa.config.AppConstraints;
 import edu.nd.crc.safa.features.common.IBaseEntity;
+import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.types.ArtifactType;
 
@@ -61,15 +64,20 @@ public class Artifact implements Serializable, IBaseEntity, IArtifact {
     @Column(name = "name")
     String name;
 
-    public Artifact() {
+    @Column(name = "document_type")
+    @Enumerated(EnumType.STRING)
+    DocumentType documentType;
 
+    public Artifact() {
+        this.documentType = DocumentType.ARTIFACT_TREE;
     }
 
-    public Artifact(Project project, ArtifactType type, String name) {
+    public Artifact(Project project, ArtifactType type, String name, DocumentType documentType) {
         this();
         this.project = project;
         this.type = type;
         this.name = name;
+        this.documentType = documentType;
     }
 
     @Override

@@ -50,7 +50,7 @@ public class ArtifactSchemaField {
     private ArtifactFieldType type;
 
     @Column(nullable = false)
-    private String key;
+    private String keyname;
 
     @Column(nullable = false)
     private String label;

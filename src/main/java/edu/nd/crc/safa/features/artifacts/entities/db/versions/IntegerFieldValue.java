@@ -32,7 +32,7 @@ public class IntegerFieldValue {
     @Column
     private UUID id;
 
-    @Column(nullable = false)
+    @Column(name = "field_value", nullable = false)
     private int value;
 
     @OneToOne

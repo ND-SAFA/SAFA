@@ -33,7 +33,7 @@ public class SelectionFieldOption {
     @Column
     private UUID id;
 
-    @Column(nullable = false)
+    @Column(name = "option_value", nullable = false)
     private String value;
 
     @ManyToOne

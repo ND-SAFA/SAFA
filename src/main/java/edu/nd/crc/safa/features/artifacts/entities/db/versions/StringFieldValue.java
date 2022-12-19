@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
@@ -32,7 +33,8 @@ public class StringFieldValue {
     @Column
     private UUID id;
 
-    @Column(nullable = false)
+    @Lob
+    @Column(name = "field_value", nullable = false)
     private String value;
 
     @OneToOne

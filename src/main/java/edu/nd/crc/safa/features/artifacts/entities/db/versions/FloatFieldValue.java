@@ -32,7 +32,7 @@ public class FloatFieldValue {
     @Column
     private UUID id;
 
-    @Column(nullable = false)
+    @Column(name = "field_value", nullable = false)
     private float value;
 
     @OneToOne

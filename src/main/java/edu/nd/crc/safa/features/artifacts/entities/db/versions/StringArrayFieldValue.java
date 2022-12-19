@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -32,7 +33,8 @@ public class StringArrayFieldValue {
     @Column
     private UUID id;
 
-    @Column(nullable = false)
+    @Lob
+    @Column(name = "field_value", nullable = false)
     private String value;
 
     @ManyToOne

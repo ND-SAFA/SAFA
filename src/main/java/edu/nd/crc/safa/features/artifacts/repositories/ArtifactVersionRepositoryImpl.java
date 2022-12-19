@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.features.artifacts.repositories;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -26,7 +27,6 @@ import edu.nd.crc.safa.features.traces.repositories.TraceLinkVersionRepository;
 import edu.nd.crc.safa.features.types.ArtifactType;
 import edu.nd.crc.safa.features.versions.VersionCalculator;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
-import edu.nd.crc.safa.utilities.JsonFileUtilities;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -88,7 +88,8 @@ public class ArtifactVersionRepositoryImpl
             artifact,
             artifactAppEntity.getSummary(),
             artifactAppEntity.getBody(),
-            JsonFileUtilities.toJson(artifactAppEntity.getCustomFields()).toString());
+            ""); // TODO custom fields
+            //JsonFileUtilities.toJson(artifactAppEntity.getCustomFields()).toString());
     }
 
     @Override
@@ -140,7 +141,8 @@ public class ArtifactVersionRepositoryImpl
         ProjectVersion projectVersion = artifactVersion.getProjectVersion();
         TypeReference<Map<String, String>> typeReference = new TypeReference<Map<String, String>>() {
         };
-        Map<String, String> customFields = JsonFileUtilities.parse(artifactVersion.getCustomFields(), typeReference);
+        Map<String, String> customFields = new HashMap<>(); // TODO custom fields
+        //JsonFileUtilities.parse(artifactVersion.getCustomFields(), typeReference);
 
         ArtifactAppEntity artifactAppEntity =
             new ArtifactAppEntity(artifactVersion.getArtifact().getArtifactId(),

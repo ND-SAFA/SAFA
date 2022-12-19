@@ -1,6 +1,3 @@
-ALTER TABLE artifact
-DROP COLUMN document_type;
-
 ALTER TABLE artifact_body
 DROP COLUMN custom_fields;
 
@@ -19,7 +16,7 @@ CREATE TABLE artifact_schema_field
 CREATE TABLE selection_field_option
 (
     id               VARCHAR(255) NOT NULL,
-    value            VARCHAR(255) NOT NULL,
+    option_value     VARCHAR(255) NOT NULL,
     schema_field_id  VARCHAR(255) NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (schema_field_id) REFERENCES artifact_schema_field (id) ON DELETE CASCADE
@@ -58,7 +55,7 @@ CREATE TABLE artifact_field_version
 CREATE TABLE string_field_value
 (
     id                   VARCHAR(255) NOT NULL,
-    value                MEDIUMTEXT   NOT NULL,
+    field_value          MEDIUMTEXT   NOT NULL,
     field_version_id     VARCHAR(255) NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (field_version_id) REFERENCES artifact_field_version (id) ON DELETE CASCADE
@@ -67,7 +64,7 @@ CREATE TABLE string_field_value
 CREATE TABLE string_array_field_value
 (
     id                   VARCHAR(255) NOT NULL,
-    value                MEDIUMTEXT   NOT NULL,
+    field_value          MEDIUMTEXT   NOT NULL,
     field_version_id     VARCHAR(255) NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (field_version_id) REFERENCES artifact_field_version (id) ON DELETE CASCADE
@@ -76,7 +73,7 @@ CREATE TABLE string_array_field_value
 CREATE TABLE integer_field_value
 (
     id                   VARCHAR(255) NOT NULL,
-    value                INT          NOT NULL,
+    field_value          INT          NOT NULL,
     field_version_id     VARCHAR(255) NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (field_version_id) REFERENCES artifact_field_version (id) ON DELETE CASCADE
@@ -85,7 +82,7 @@ CREATE TABLE integer_field_value
 CREATE TABLE float_field_value
 (
     id                   VARCHAR(255) NOT NULL,
-    value                FLOAT        NOT NULL,
+    field_value          FLOAT        NOT NULL,
     field_version_id     VARCHAR(255) NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (field_version_id) REFERENCES artifact_field_version (id) ON DELETE CASCADE
@@ -94,7 +91,7 @@ CREATE TABLE float_field_value
 CREATE TABLE boolean_field_value
 (
     id                   VARCHAR(255) NOT NULL,
-    value                BOOLEAN      NOT NULL,
+    field_value          BOOLEAN      NOT NULL,
     field_version_id     VARCHAR(255) NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (field_version_id) REFERENCES artifact_field_version (id) ON DELETE CASCADE

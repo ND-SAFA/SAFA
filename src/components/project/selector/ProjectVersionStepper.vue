@@ -128,6 +128,7 @@ export default Vue.extend({
      */
     selectProject(project: IdentifierSchema, goToNextStep = false) {
       this.selectedProject = project;
+      this.unselectVersion();
 
       Vue.set(this.steps, 0, [project.name, true]);
 

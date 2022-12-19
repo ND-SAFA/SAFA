@@ -1,4 +1,10 @@
-import { IOHandlerCallback, ProjectSchema, IdentifierSchema } from "@/types";
+import {
+  IOHandlerCallback,
+  ProjectSchema,
+  IdentifierSchema,
+  VersionSchema,
+} from "@/types";
+import { versionToString } from "@/util";
 import { identifierSaveStore, logStore, projectStore } from "@/hooks";
 import {
   deleteProject,
@@ -76,22 +82,32 @@ export function handleDeleteProject({
 /**
  * Deletes a version, updates app state, and logs the status.
  *
- * @param versionId - The version to delete.
+ * @param version - The version to delete.
  * @param onSuccess - Called if the action is successful.
  * @param onError - Called if the action fails.
  */
 export function handleDeleteVersion(
-  versionId: string,
+  version: VersionSchema,
   { onSuccess, onError }: IOHandlerCallback
 ): void {
-  deleteProjectVersion(versionId)
-    .then(async () => {
-      logStore.onSuccess(`Version has successfully been deleted.`);
-      onSuccess?.();
-    })
-    .catch((e) => {
-      logStore.onError(`Unable to delete version.`);
-      logStore.onDevError(e.message);
-      onError?.(e);
-    });
+  const name = versionToString(version);
+
+  logStore.confirm(
+    `Delete Version`,
+    `Are you sure you would like to delete "${name}"?`,
+    async (isConfirmed: boolean) => {
+      if (!isConfirmed) return;
+
+      deleteProjectVersion(version.versionId)
+        .then(async () => {
+          logStore.onSuccess(`Successfully deleted version: ${name}`);
+          onSuccess?.();
+        })
+        .catch((e) => {
+          logStore.onError(`Unable to delete version: ${name}`);
+          logStore.onDevError(e.message);
+          onError?.(e);
+        });
+    }
+  );
 }

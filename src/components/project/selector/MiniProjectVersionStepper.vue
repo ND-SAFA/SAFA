@@ -85,6 +85,7 @@ export default Vue.extend({
       if (this.currentStep !== 1) return;
 
       this.selectedProject = project;
+      this.unselectVersion();
 
       Vue.set(this.steps, 0, [project.name, true]);
 

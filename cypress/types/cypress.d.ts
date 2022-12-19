@@ -237,6 +237,11 @@ declare namespace Cypress {
     openUploadFiles(): Chainable<void>;
 
     /**
+     * Waits for the most recent job to complete.
+     */
+    waitForJobLoad(): Chainable<void>;
+
+    /**
      * Logs into the create project page, uploads a project, and waits for it to complete.
      */
     loadNewProject(): Chainable<void>;

@@ -27,14 +27,6 @@
         @create="handleVersionCreated"
       />
     </template>
-    <template v-slot:deleteItemDialogue>
-      <confirm-version-delete
-        :version="versionToDelete"
-        :delete-dialogue="deleteVersionDialogue"
-        @cancel="handleCancelDeleteVersion"
-        @confirm="handleConfirmDeleteVersion"
-      />
-    </template>
   </table-selector>
 </template>
 
@@ -44,7 +36,6 @@ import { IdentifierSchema, VersionSchema } from "@/types";
 import { projectStore, sessionStore } from "@/hooks";
 import { getProjectVersions, handleDeleteVersion } from "@/api";
 import { TableSelector } from "@/components/common";
-import { ConfirmVersionDelete } from "../base";
 import VersionCreator from "./VersionCreator.vue";
 
 /**
@@ -60,7 +51,6 @@ export default Vue.extend({
   components: {
     TableSelector,
     VersionCreator,
-    ConfirmVersionDelete,
   },
   props: {
     /**
@@ -117,8 +107,6 @@ export default Vue.extend({
             { text: "Actions", value: "actions", sortable: false },
           ],
       versions: [] as VersionSchema[],
-      versionToDelete: undefined as VersionSchema | undefined,
-      deleteVersionDialogue: false,
       addVersionDialogue: false,
       isLoading: false,
     };
@@ -195,38 +183,18 @@ export default Vue.extend({
     handleVersionCreated(version: VersionSchema) {
       this.versions = [version, ...this.versions];
       this.addVersionDialogue = false;
-      this.$emit("selected", version);
-    },
-    /**
-     * Opens the version deletion modal.
-     * @param version - The version to delete.
-     */
-    handleDeleteVersion(version: VersionSchema) {
-      this.versionToDelete = version;
-      this.deleteVersionDialogue = true;
-    },
-    /**
-     * Closes the version deletion modal.
-     */
-    handleCancelDeleteVersion() {
-      this.deleteVersionDialogue = false;
     },
     /**
      * Attempts to delete the version.
      * @param version - The version to delete.
      */
-    handleConfirmDeleteVersion(version: VersionSchema) {
-      this.deleteVersionDialogue = false;
-      this.isLoading = true;
-
-      handleDeleteVersion(version.versionId, {
+    handleDeleteVersion(version: VersionSchema) {
+      handleDeleteVersion(version, {
         onSuccess: () => {
-          this.isLoading = false;
           this.versions = this.versions.filter(
             (v) => v.versionId != version.versionId
           );
         },
-        onError: () => (this.isLoading = false),
       });
     },
   },

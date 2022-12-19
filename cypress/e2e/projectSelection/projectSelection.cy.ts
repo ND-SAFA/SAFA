@@ -4,7 +4,8 @@ import { validUser } from "../../fixtures/data/user.json";
 describe("Project Selection", () => {
   beforeEach(() => {
     cy.viewport(1024, 768);
-    cy.dbResetProjects().loadNewProject();
+    cy.dbResetProjects();
+    cy.loadNewProject();
 
     cy.visit("/open")
       .login(validUser.email, validUser.password)
@@ -126,7 +127,6 @@ describe("Project Selection", () => {
 
         cy.getCy(DataCy.appLoading).should("be.visible");
         cy.waitForProjectLoad(true);
-        cy.getNodes().should("exist");
       });
 
       it("Cannot continue if a version is not selected", () => {
@@ -165,9 +165,8 @@ describe("Project Selection", () => {
         cy.getCy(DataCy.selectionVersionList).within(() => {
           cy.clickButton(DataCy.selectorDeleteButton);
         });
-        cy.getCy(DataCy.versionDeleteModal).within(() => {
-          cy.clickButton(DataCy.versionDeleteConfirmButton);
-        });
+
+        cy.clickButton(DataCy.confirmModalButton);
 
         cy.getCy(DataCy.snackbarSuccess).should("be.visible");
       });

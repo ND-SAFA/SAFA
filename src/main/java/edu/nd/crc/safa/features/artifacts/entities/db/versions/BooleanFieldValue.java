@@ -10,6 +10,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import edu.nd.crc.safa.features.common.ServiceProvider;
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -25,7 +27,7 @@ import org.hibernate.annotations.Type;
 @Setter
 @ToString
 @RequiredArgsConstructor
-public class BooleanFieldValue {
+public class BooleanFieldValue implements IFieldValue {
     @Id
     @GeneratedValue
     @Type(type = "uuid-char")
@@ -55,5 +57,20 @@ public class BooleanFieldValue {
     @Override
     public int hashCode() {
         return getClass().hashCode();
+    }
+
+    @Override
+    public void setValueFromString(String strValue) {
+        setValue(Boolean.parseBoolean(strValue));
+    }
+
+    @Override
+    public String getValueAsString() {
+        return Boolean.toString(isValue());
+    }
+
+    @Override
+    public void save(ServiceProvider serviceProvider) {
+        serviceProvider.getBooleanFieldValueRepository().save(this);
     }
 }

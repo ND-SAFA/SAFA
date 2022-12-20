@@ -3,8 +3,18 @@ package edu.nd.crc.safa.features.common;
 import edu.nd.crc.safa.authentication.TokenService;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactTypeRepository;
+import edu.nd.crc.safa.features.artifacts.repositories.schema.ArtifactSchemaFieldRepository;
+import edu.nd.crc.safa.features.artifacts.repositories.schema.FloatFieldInfoRepository;
+import edu.nd.crc.safa.features.artifacts.repositories.schema.IntegerFieldInfoRepository;
+import edu.nd.crc.safa.features.artifacts.repositories.schema.SelectionFieldOptionRepository;
+import edu.nd.crc.safa.features.artifacts.repositories.versions.ArtifactFieldVersionRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.versions.ArtifactVersionRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.versions.ArtifactVersionRepositoryImpl;
+import edu.nd.crc.safa.features.artifacts.repositories.versions.BooleanFieldValueRepository;
+import edu.nd.crc.safa.features.artifacts.repositories.versions.FloatFieldValueRepository;
+import edu.nd.crc.safa.features.artifacts.repositories.versions.IntegerFieldValueRepository;
+import edu.nd.crc.safa.features.artifacts.repositories.versions.StringArrayFieldValueRepository;
+import edu.nd.crc.safa.features.artifacts.repositories.versions.StringFieldValueRepository;
 import edu.nd.crc.safa.features.artifacts.services.ArtifactService;
 import edu.nd.crc.safa.features.commits.services.CommitService;
 import edu.nd.crc.safa.features.delta.services.DeltaService;
@@ -93,6 +103,17 @@ public class ServiceProvider {
     private final ArtifactVersionRepository artifactVersionRepository;
     private final ArtifactService artifactService;
     private final ArtifactVersionRepositoryImpl artifactVersionRepositoryImpl;
+    private final ArtifactSchemaFieldRepository artifactSchemaFieldRepository;
+    private final SelectionFieldOptionRepository selectionFieldOptionRepository;
+    private final IntegerFieldInfoRepository integerFieldInfoRepository;
+    private final FloatFieldInfoRepository floatFieldInfoRepository;
+
+    private final FloatFieldValueRepository floatFieldValueRepository;
+    private final IntegerFieldValueRepository integerFieldValueRepository;
+    private final BooleanFieldValueRepository booleanFieldValueRepository;
+    private final StringFieldValueRepository stringFieldValueRepository;
+    private final StringArrayFieldValueRepository stringArrayFieldValueRepository;
+    private final ArtifactFieldVersionRepository artifactFieldVersionRepository;
     //Traces
     private final TraceLinkVersionRepository traceLinkVersionRepository;
     private final TraceService traceService;

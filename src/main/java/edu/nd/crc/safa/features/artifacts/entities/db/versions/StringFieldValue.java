@@ -11,6 +11,8 @@ import javax.persistence.Lob;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import edu.nd.crc.safa.features.common.ServiceProvider;
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -26,7 +28,7 @@ import org.hibernate.annotations.Type;
 @Setter
 @ToString
 @RequiredArgsConstructor
-public class StringFieldValue {
+public class StringFieldValue implements IFieldValue {
     @Id
     @GeneratedValue
     @Type(type = "uuid-char")
@@ -57,5 +59,20 @@ public class StringFieldValue {
     @Override
     public int hashCode() {
         return getClass().hashCode();
+    }
+
+    @Override
+    public void setValueFromString(String strValue) {
+        setValue(strValue);
+    }
+
+    @Override
+    public String getValueAsString() {
+        return getValue();
+    }
+
+    @Override
+    public void save(ServiceProvider serviceProvider) {
+        serviceProvider.getStringFieldValueRepository().save(this);
     }
 }

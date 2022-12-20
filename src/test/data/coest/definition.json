@@ -1,0 +1,39 @@
+{
+  "artifacts": {
+    "Requirements": {
+      "parser": "XML",
+      "file": "source.xml",
+      "cols": "CCHIT-artifacts",
+      "params": {
+        "xpath": "/artifacts/artifact"
+      }
+    },
+    "Regulatory Codes": {
+      "parser": "XML",
+      "file": "target.xml",
+      "cols": "CCHIT-artifacts",
+      "params": {
+        "xpath": "/artifacts/artifact"
+      }
+    }
+  },
+  "traces": {
+    "requirements2regulatorycodes.csv": {
+      "source": "Requirements",
+      "target": "Regulatory Codes",
+      "file": "answer.txt",
+      "parser": "CSV",
+      "cols": "CCHIT-traces"
+    }
+  },
+  "conversions": {
+    "CCHIT-artifacts": {
+      "art_id": "id",
+      "art_title": "content"
+    },
+    "CCHIT-traces": {
+      "source": "source",
+      "target": "target"
+    }
+  }
+}

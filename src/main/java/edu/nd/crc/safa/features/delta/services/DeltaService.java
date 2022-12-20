@@ -1,7 +1,7 @@
 package edu.nd.crc.safa.features.delta.services;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
+import edu.nd.crc.safa.features.artifacts.repositories.versions.ArtifactVersionRepository;
 import edu.nd.crc.safa.features.delta.entities.app.EntityDelta;
 import edu.nd.crc.safa.features.delta.entities.app.ProjectDelta;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;

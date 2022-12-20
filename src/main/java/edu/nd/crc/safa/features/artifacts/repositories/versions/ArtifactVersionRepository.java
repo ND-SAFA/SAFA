@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.artifacts.repositories;
+package edu.nd.crc.safa.features.artifacts.repositories.versions;
 
 import java.util.List;
 import java.util.Optional;

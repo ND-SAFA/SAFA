@@ -6,7 +6,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.db.versions.ArtifactVersion;
-import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
+import edu.nd.crc.safa.features.artifacts.repositories.versions.ArtifactVersionRepository;
 import edu.nd.crc.safa.features.rules.parser.RuleName;
 import edu.nd.crc.safa.features.traces.entities.db.ApprovalStatus;
 import edu.nd.crc.safa.features.traces.entities.db.TraceLink;

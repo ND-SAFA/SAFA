@@ -1,7 +1,7 @@
 package features.artifacts.properties;
 
 
-import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
+import edu.nd.crc.safa.features.artifacts.repositories.versions.ArtifactVersionRepository;
 
 import common.ApplicationBaseTest;
 import org.junit.jupiter.api.Test;

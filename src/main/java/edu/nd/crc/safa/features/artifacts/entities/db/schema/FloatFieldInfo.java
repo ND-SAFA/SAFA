@@ -7,7 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import lombok.Getter;
@@ -39,7 +39,7 @@ public class FloatFieldInfo {
     @Column(nullable = false)
     private float max;
 
-    @ManyToOne
+    @OneToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "schema_field_id", nullable = false)
     private ArtifactSchemaField schemaField;

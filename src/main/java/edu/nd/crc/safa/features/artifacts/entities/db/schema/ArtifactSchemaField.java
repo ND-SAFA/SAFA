@@ -58,7 +58,7 @@ public class ArtifactSchemaField {
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "artifact_type_id", nullable = false)
-    private ArtifactType artifact;
+    private ArtifactType artifactType;
 
     @Override
     public boolean equals(Object o) {
@@ -76,4 +76,5 @@ public class ArtifactSchemaField {
     public int hashCode() {
         return getClass().hashCode();
     }
+
 }

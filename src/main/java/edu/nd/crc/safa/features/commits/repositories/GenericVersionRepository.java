@@ -9,7 +9,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.config.AppConstraints;
-import edu.nd.crc.safa.features.artifacts.repositories.IVersionRepository;
+import edu.nd.crc.safa.features.artifacts.repositories.versions.IVersionRepository;
 import edu.nd.crc.safa.features.commits.entities.db.VersionEntityAction;
 import edu.nd.crc.safa.features.common.IBaseEntity;
 import edu.nd.crc.safa.features.common.IVersionEntity;

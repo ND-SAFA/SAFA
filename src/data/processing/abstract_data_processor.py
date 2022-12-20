@@ -1,10 +1,11 @@
 from abc import abstractmethod
-from typing import List, Any
+from typing import Any, List
 
 from data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 
 
-class AbstractDataProcessor:
+class \
+        AbstractDataProcessor:
 
     def __init__(self, steps: List[AbstractDataProcessingStep]):
         """

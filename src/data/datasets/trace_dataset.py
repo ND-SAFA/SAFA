@@ -4,17 +4,18 @@ from collections import OrderedDict
 from copy import deepcopy
 from typing import Callable, Dict, List, Sized, Tuple
 
+import pandas as pd
+
 from data.datasets.abstract_dataset import AbstractDataset
+from data.datasets.data_key import DataKey
+from data.formats.csv_format import CSVFormat
 from data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
 from data.processing.augmentation.data_augmenter import DataAugmenter
-from data.datasets.data_key import DataKey
+from data.processing.augmentation.source_target_swap_step import SourceTargetSwapStep
 from data.tree.artifact import Artifact
 from data.tree.trace_link import TraceLink
-from data.formats.csv_format import CSVFormat
-from data.processing.augmentation.source_target_swap_step import SourceTargetSwapStep
 from models.model_manager import ModelManager
 from models.model_properties import ModelArchitectureType
-import pandas as pd
 
 
 class TraceDataset(AbstractDataset):
@@ -51,12 +52,15 @@ class TraceDataset(AbstractDataset):
         """
         link_ids_to_rows = {}
         for link in self.links.values():
-            link_ids_to_rows[link.id] = [link.source.id, link.source.token, link.target.id, link.target.token, int(link.is_true_link)]
+            link_ids_to_rows[link.id] = [link.source.id, link.source.token, link.target.id, link.target.token,
+                                         int(link.is_true_link)]
         data = [link_ids_to_rows[link_id] for link_id in self.pos_link_ids + self.neg_link_ids]
         return pd.DataFrame(data,
-                            columns=[CSVFormat.SOURCE_ID, CSVFormat.SOURCE, CSVFormat.TARGET_ID, CSVFormat.TARGET, CSVFormat.LABEL])
+                            columns=[CSVFormat.SOURCE_ID, CSVFormat.SOURCE, CSVFormat.TARGET_ID, CSVFormat.TARGET,
+                                     CSVFormat.LABEL])
 
-    def add_link(self, source_id: str, target_id: str, source_tokens: str, target_tokens: str, is_true_link: bool) -> int:
+    def add_link(self, source_id: str, target_id: str, source_tokens: str, target_tokens: str,
+                 is_true_link: bool) -> int:
         """
         Adds a link to the dataset
         :param source_id: the id of the source artifact
@@ -190,7 +194,8 @@ class TraceDataset(AbstractDataset):
         pos_links = [self.links[link_id] for link_id in self.pos_link_ids]
         return pos_links, [(link.source.token, link.target.token) for link in pos_links]
 
-    def _create_links_from_augmentation(self, augmentation_results: Dict[str, AbstractDataAugmentationStep.AUGMENTATION_RESULT],
+    def _create_links_from_augmentation(self, augmentation_results: Dict[
+        str, AbstractDataAugmentationStep.AUGMENTATION_RESULT],
                                         orig_links: List[TraceLink]) -> None:
         """
         Creates new trace links from the results of an augmentation step
@@ -210,7 +215,8 @@ class TraceDataset(AbstractDataset):
                 self.add_link(source_id=aug_source_id, target_id=aug_target_id,
                               source_tokens=aug_source_tokens, target_tokens=aug_target_tokens, is_true_link=True)
 
-    def _get_augmented_artifact_ids(self, augmented_tokens: Tuple[str, str], orig_link: TraceLink, aug_step_id: str, entry_num: int) \
+    def _get_augmented_artifact_ids(self, augmented_tokens: Tuple[str, str], orig_link: TraceLink, aug_step_id: str,
+                                    entry_num: int) \
             -> Tuple[str, str]:
         """
         Gets the augmented artifact ids for the new augmented source and target artifact
@@ -221,11 +227,13 @@ class TraceDataset(AbstractDataset):
         :return: the augmented source and target ids
         """
         aug_source_tokens, aug_target_tokens = augmented_tokens
-        aug_source_id, aug_target_id = ("%s%s" % (link_id, aug_step_id) for link_id in [orig_link.source.id, orig_link.target.id])
+        aug_source_id, aug_target_id = ("%s%s" % (link_id, aug_step_id) for link_id in
+                                        [orig_link.source.id, orig_link.target.id])
 
         new_id = TraceLink.generate_link_id(aug_source_id, aug_target_id)
         if new_id in self.links:
-            if self.links[new_id].source.token != aug_source_tokens or self.links[new_id].target.token != aug_target_tokens:
+            if self.links[new_id].source.token != aug_source_tokens or self.links[
+                new_id].target.token != aug_target_tokens:
                 aug_source_id += str(entry_num)
                 aug_target_id += str(entry_num)
         return aug_source_id, aug_target_id

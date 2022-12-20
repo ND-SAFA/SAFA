@@ -1,4 +1,4 @@
-from typing import List, Dict, Tuple, Type
+from typing import Dict, List, Tuple, Type
 
 from config.override import overrides
 from data.processing.abstract_data_processor import AbstractDataProcessor
@@ -31,7 +31,8 @@ class DataAugmenter(AbstractDataProcessor):
         return augmentation_results
 
     def _get_steps_to_run(self, exclude_all_but_step_type: Type[AbstractDataAugmentationStep] = None,
-                          include_all_but_step_type: Type[AbstractDataAugmentationStep] = None) -> List[AbstractDataAugmentationStep]:
+                          include_all_but_step_type: Type[AbstractDataAugmentationStep] = None) -> List[
+        AbstractDataAugmentationStep]:
         """
         Gets the steps that should be run
         :param exclude_all_but_step_type: if provided, will ONLY run step of given type

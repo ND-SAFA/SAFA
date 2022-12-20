@@ -16,7 +16,7 @@ class FilterMinLengthStep(AbstractDataProcessingStep):
         super().__init__(self.ORDER)
         self.min_length = min_length
 
-    def run(self, word_list: List[str],  **kwargs) -> List[str]:
+    def run(self, word_list: List[str], **kwargs) -> List[str]:
         """
         Removes all words smaller than the min_length in a given word_list
         :param word_list: the list of words to process

@@ -1,122 +1,107 @@
-from enum import Enum
-from typing import Any, Dict, Generic, Type, TypeVar, Union
+from typing import Dict, List, TypeVar
 from unittest import TestCase
 
-from rest_framework.serializers import Serializer
-
-from server.serializers.serializer_utility import SerializerUtility
-from models.base_models.supported_base_model import SupportedBaseModel
+from experiments.variables.definition_variable import DefinitionVariable
+from experiments.variables.multi_variable import MultiVariable
+from experiments.variables.variable import Variable
+from server.serializers.experiment_serializer import ExperimentSerializer
 
 AppEntity = TypeVar('AppEntity')
 
-from jobs.job_factory import JobFactory
 
+class ExperimentSerializerTest(TestCase):
+    input_data = {
+        "experiment": {
+            "model_path": {
+                "*": ["robert-base-uncased", "~/desktop/safa"]
+            },
+            "output_path": "~/desktop",
+            "augmentation": {
+                "steps": [
+                    {
+                        "creator": "SAFA"
+                    }
+                ]
+            }
+        }
+    }
 
-class BaseSerializerTest(Generic[AppEntity]):
+    def test_single_variable(self):
+        # A. Gather expected data
+        variable_name = "output_path"
+        variable_class = Variable
+        expected_values = self.input_data["experiment"][variable_name]
 
-    def __init__(self, serializer: Type[Serializer[AppEntity]]):
-        """
-        Provides default tests for testing serialization, deserialization, and update methods of rest_framework Serializer.
-        """
-        self.serializer = serializer
+        # 1. De-serialize data
+        experiment_variables = self.deserialize([variable_name])
 
-    def serialize_data(self, test_case: TestCase, data: Dict, is_valid_value=True) -> AppEntity:
-        """
-        Serializes the test data into entity and performs validation checks.
-        :param test_case: The test case used to assert the validity of serializer.
-        :param data: The dictionary used to create object from serializer.
-        :param is_valid_value: The expected state of the serializer's is_valid flag.
-        :return: Entity created and serializers used
-        """
-        serializer = self.serializer(data=data)
-        is_valid = serializer.is_valid()
-        test_case.assertEqual(is_valid_value, is_valid, msg=serializer.errors)
-        if is_valid_value:
-            test_case.assertEqual(0, len(serializer.errors))
-        return serializer.save()
+        # 2. Verify that resulting class is variable and value are as expected
+        self.assertIn(variable_name, experiment_variables)
+        parsed_variable: variable_class = experiment_variables[variable_name]
+        self.assertTrue(isinstance(parsed_variable, variable_class))
+        self.assertEqual(parsed_variable.value, expected_values)
 
-    def serialize_deserialize_data(self, test_case: TestCase, data: Dict):
-        """
-        Test that given a Entity, the serializer is able to convert it back to json properly.
-        :param test_case: The test used to make assertions.
-        :param data: The map of values to serialize into entity.
-        """
-        entity_created = self.serialize_data(test_case, data)
-        deserialized_data = self.serializer(entity_created).data
-        for key, value_expected in data.items():
-            test_case.assertIn(key, deserialized_data)
-            value = deserialized_data[key]
-            if isinstance(value, SupportedBaseModel):
-                value = value.name
-            if isinstance(value, dict):
-                test_case.assertEqual(value, value | value_expected)
-            else:
-                test_case.assertEqual(value_expected, value)
+    def test_multi_variable(self):
+        # A. Gather expected data
+        variable_name = "model_path"
+        variable_class = MultiVariable
+        expected_values = self.input_data["experiment"][variable_name][MultiVariable.SYMBOL]
 
-    def test_no_update(self, test_case: TestCase, data: Dict, new_properties: Dict,
-                       expected_properties: Dict = None):
-        """
-        Test that PredictionRequest can be updated with new load_from_storage property.
-        :param test_case: The test used to make assertions.
-        :param data: The map of values to serialize into entity.
-        :param new_properties: The map of values to update entity with (camel case converted to snake case).
-        """
-        if expected_properties is None:
-            expected_properties = new_properties
-        entity_created = self.serialize_data(test_case, data)
-        update_serializer = self.serializer(entity_created,
-                                            data=new_properties,
-                                            partial=True)
-        is_valid = update_serializer.is_valid()
-        updated_model_identifier = update_serializer.save()
+        # 1. De-serialize data
+        model_path_variable = self.deserialize([variable_name])
 
-        test_case.assertTrue(is_valid)
-        test_case.assertEqual(0, len(update_serializer.errors))
-        self.assert_contains_camel_case_properties(test_case, updated_model_identifier, expected_properties)
+        # Check values
+        processed_values = model_path_variable[variable_name]
+        self.assertIsInstance(processed_values, variable_class)
+        self.assertEqual(expected_values, processed_values)
 
-    def test_invalid_update(self, test_case: TestCase, data: Dict, invalid_properties: Dict,
-                            expected_phrase: str = "valid"):
-        """
-        Serializes data and performs update with invalid properties asserting that error is caught.
-        :param test_case: The test used to make assertions.
-        :param data: The map of values to serialize into entity.
-        :param invalid_properties: The map of property names to invalid values to cause errors.
-        :param expected_phrase: The phrased expected to be in error message.
-        """
-        entity_created = self.serialize_data(test_case, data)
-        update_serializer = self.serializer(entity_created, data=invalid_properties, partial=True)
+    def test_definition_variable(self):
+        # A. Gather expected data
+        definition_key = "augmentation"
+        expected_class = DefinitionVariable
+        expected_values = self.input_data["experiment"][definition_key]
 
-        is_valid = update_serializer.is_valid()
-        errors = update_serializer.errors
-        test_case.assertFalse(is_valid)
-        for key, value in invalid_properties.items():
-            test_case.assertIn(key, errors)
-            test_case.assertIn(expected_phrase, errors[key][0].title().lower())
+        # 1. De-serialize data
+        experiment_parsed = self.deserialize([definition_key])
 
-    @staticmethod
-    def assert_contains_camel_case_properties(test_case: TestCase, instance: Union[JobFactory, Dict],
-                                              camel_case_properties: Dict):
-        """
-        Verifies that instance contains properties (in camel case) with expected values.
-        :param test_case: The test used to assert the validity of the properties.
-        :param instance: The object whose properties are verified.
-        :param camel_case_properties: Dictionary of property names (in camel case) and expected values.
-        :return: None, error thrown if there is missing properties or the values are not as expected.
-        """
-        for key, new_value in camel_case_properties.items():
-            object_key = SerializerUtility.to_snake_case(key)
-            if isinstance(instance, Dict):
-                assert object_key in instance, "Did not find {%s} in {%s}" % (object_key, repr(instance))
-                object_value = instance[object_key]
-            else:
-                object_value = getattr(instance, object_key)
-            object_value = BaseSerializerTest.to_repr(object_value)
-            test_case.assertEqual(new_value, object_value)
+        # Check values
+        self.assertIn(definition_key, experiment_parsed)
 
-    @staticmethod
-    def to_repr(object_value: Any):
-        if isinstance(object_value, Enum):
-            return object_value.name
-        if isinstance(object_value, list):
-            return list(map(BaseSerializerTest.to_repr, object_value))
-        return object_value
+        # Extract definition variable
+        definition_variable: expected_class = experiment_parsed[definition_key]
+        self.assertTrue(isinstance(definition_variable, expected_class))
+
+        # Check values
+        definition_value: Dict = definition_variable.value
+        self.assertIn("steps", definition_value)
+        definition_steps = definition_value["steps"]
+        self.assertIsInstance(definition_steps, Variable)
+
+        for definition_step, expected_step in zip(definition_steps.value, expected_values["steps"]):
+            self.assertIsInstance(definition_step, DefinitionVariable)
+            for expected_key, expected_value in expected_step.items():
+                self.assertIn(expected_key, definition_step)
+                step_creator = definition_step[expected_key]
+                self.assertIsInstance(step_creator, Variable)
+                self.assertEqual(step_creator.value, expected_value)
+
+    def deserialize(self, variable_names: List[str], is_valid: bool = True):
+        """
+        Creates experiment variables using subset of data in variable names.
+        :param variable_names: The key names to include in experiment data.
+        :param is_valid: Whether to expected serializer to be in a valid state.
+        :return: Mapping between keys and variables.
+        """
+        variable_data = self.get_experiment_subset(variable_names)
+        experiment_serializer = ExperimentSerializer(data=variable_data)
+        self.assertEqual(experiment_serializer.is_valid(), is_valid)
+        return experiment_serializer.save()
+
+    def get_experiment_subset(self, fields: List[str]):
+        """
+        Returns experiment data with only given fields.
+        :param fields: The fields to include in subset.
+        :return: Dictionary containing experiment definitions of only those in defined fields.
+        """
+        field_dict = {field: self.input_data["experiment"][field] for field in fields}
+        return {"experiment": field_dict}

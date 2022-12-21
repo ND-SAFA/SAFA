@@ -5,6 +5,8 @@ import pandas as pd
 class DataFrameUtil:
     @staticmethod
     def convert_df(df, column_translation, drop_na=True):
+        if column_translation is None:
+            column_translation = {col: col for col in df.columns}
         entities = []
         for i, entity_row in df.iterrows():
             entity_dict = {}

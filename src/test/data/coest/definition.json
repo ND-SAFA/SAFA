@@ -22,18 +22,13 @@
       "source": "Requirements",
       "target": "Regulatory Codes",
       "file": "answer.txt",
-      "parser": "CSV",
-      "cols": "CCHIT-traces"
+      "parser": "CSV"
     }
   },
   "conversions": {
     "CCHIT-artifacts": {
       "art_id": "id",
       "art_title": "content"
-    },
-    "CCHIT-traces": {
-      "source": "source",
-      "target": "target"
     }
   }
 }

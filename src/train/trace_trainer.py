@@ -44,9 +44,8 @@ class TraceTrainer(Trainer):
         self.train_dataset = self.dataset_container[DatasetRole.TRAIN].to_trainer_dataset(self.model_generator)
         if DatasetRole.VAL in self.dataset_container:
             self.eval_dataset = self.dataset_container[DatasetRole.VAL].to_trainer_dataset(self.model_generator)
-        return {}
-        # output = self.train(resume_from_checkpoint=checkpoint)
-        # return TraceTrainer.output_to_dict(output)
+        output = self.train(resume_from_checkpoint=checkpoint)
+        return TraceTrainer.output_to_dict(output)
 
     def perform_prediction(self, eval_dataset_role: DatasetRole = DatasetRole.EVAL) -> Dict:
         """

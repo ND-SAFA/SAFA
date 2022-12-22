@@ -42,6 +42,4 @@ class ExperimentSerializer(serializers.Serializer):
                 value_definition = self.create(value)
                 return DefinitionVariable(value_definition)
         else:
-            if isinstance(value, list):
-                value = [self.create_variable(v) for v in value]
             return Variable(value)

@@ -3,6 +3,7 @@ package features.artifacts.base;
 import java.util.UUID;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
+import edu.nd.crc.safa.features.artifacts.entities.ArtifactFieldType;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.common.IAppEntityService;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
@@ -27,6 +28,8 @@ public abstract class AbstractArtifactCrudTest extends AbstractCrudTest<Artifact
 
     @Override
     protected UUID createEntity() throws Exception {
+        dbEntityBuilder.newCustomAttribute(projectName, ArtifactFieldType.TEXT, "key", "key");
+
         ProjectCommit commit = commitService
             .commit(CommitBuilder
                 .withVersion(projectVersion)

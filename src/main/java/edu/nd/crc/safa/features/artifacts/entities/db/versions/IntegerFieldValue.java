@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.features.artifacts.entities.db.versions;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -10,7 +11,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.artifacts.repositories.versions.IntegerFieldValueRepository;
+import edu.nd.crc.safa.features.artifacts.services.ArtifactSystemServiceProvider;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -70,7 +72,10 @@ public class IntegerFieldValue implements IFieldValue {
     }
 
     @Override
-    public void save(ServiceProvider serviceProvider) {
-        serviceProvider.getIntegerFieldValueRepository().save(this);
+    public void save(ArtifactSystemServiceProvider serviceProvider) {
+        IntegerFieldValueRepository repo = serviceProvider.getIntegerFieldValueRepository();
+        Optional<IntegerFieldValue> existing = repo.getByFieldVersion(this.fieldVersion);
+        existing.ifPresent(value -> this.id = value.getId());
+        repo.save(this);
     }
 }

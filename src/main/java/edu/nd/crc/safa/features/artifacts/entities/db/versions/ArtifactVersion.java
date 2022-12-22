@@ -1,6 +1,8 @@
 package edu.nd.crc.safa.features.artifacts.entities.db.versions;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,6 +14,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
 import edu.nd.crc.safa.config.AppConstraints;
@@ -72,30 +75,33 @@ public class ArtifactVersion implements Serializable, IVersionEntity<ArtifactApp
         columnDefinition = "mediumtext")
     String content;
 
+    @Transient
+    private Map<String, String> customAttributeValues;
+
     public ArtifactVersion() {
         this.summary = "";
         this.content = "";
+        this.customAttributeValues = new HashMap<>();
     }
 
     public ArtifactVersion(ProjectVersion projectVersion,
                            ModificationType modificationType,
                            Artifact artifact,
                            String summary,
-                           String content,
-                           String customFields) {
+                           String content) {
         this.artifact = artifact;
         this.modificationType = modificationType;
         this.projectVersion = projectVersion;
         this.summary = summary;
         this.content = content;
+        this.customAttributeValues = new HashMap<>();
     }
 
     public ArtifactVersion(ProjectVersion projectVersion,
                            Artifact artifact,
                            String summary,
-                           String content,
-                           String customFields) {
-        this(projectVersion, ModificationType.ADDED, artifact, summary, content, customFields);
+                           String content) {
+        this(projectVersion, ModificationType.ADDED, artifact, summary, content);
     }
 
     @Override
@@ -124,25 +130,29 @@ public class ArtifactVersion implements Serializable, IVersionEntity<ArtifactApp
         return this.artifact.getType().getName();
     }
 
-    // TODO add custom fields to hasSameContent
+    public void addCustomAttributeValue(String keyname, String value) {
+        customAttributeValues.put(keyname, value);
+    }
 
     public boolean hasSameContent(IVersionEntity entityVersion) {
         if (entityVersion instanceof ArtifactVersion) {
             ArtifactVersion artifactVersion = (ArtifactVersion) entityVersion;
             return hasSameContent(artifactVersion.getName(),
                 artifactVersion.getSummary(),
-                artifactVersion.getContent());
+                artifactVersion.getContent(),
+                artifactVersion.getCustomAttributeValues());
         }
         return false;
     }
 
     public boolean hasSameContent(ArtifactAppEntity a) {
-        return hasSameContent(a.getName(), a.getSummary(), a.getBody());
+        return hasSameContent(a.getName(), a.getSummary(), a.getBody(), a.getAttributes());
     }
 
-    private boolean hasSameContent(String name, String summary, String content) {
+    private boolean hasSameContent(String name, String summary, String content, Map<String, String> attributes) {
         return this.getName().equals(name)
             && this.summary.equals(summary)
-            && this.content.equals(content);
+            && this.content.equals(content)
+            && this.customAttributeValues.equals(attributes);
     }
 }

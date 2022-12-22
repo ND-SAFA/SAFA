@@ -106,7 +106,7 @@ public class JsonBuilder extends AbstractBuilder {
         artifact.put("summary", "");
         artifact.put("documentIds", new ArrayList<>());
         artifact.put(Constants.DOCUMENT_TYPE, DocumentType.ARTIFACT_TREE.toString());
-        artifact.put("customFields", customFields);
+        artifact.put("attributes", customFields);
         project.getJSONArray(Constants.ARTIFACTS).put(artifact);
         return this;
     }

@@ -1,7 +1,6 @@
 package edu.nd.crc.safa.features.artifacts.repositories.versions;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -17,6 +16,7 @@ import edu.nd.crc.safa.features.artifacts.repositories.ArtifactRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.FTAArtifactRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.SafetyCaseArtifactRepository;
+import edu.nd.crc.safa.features.artifacts.services.ArtifactFieldValueUtils;
 import edu.nd.crc.safa.features.commits.repositories.GenericVersionRepository;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
@@ -66,11 +66,19 @@ public class ArtifactVersionRepositoryImpl
     @Autowired
     TraceLinkVersionRepository traceLinkVersionRepository;
 
+    @Autowired
+    ArtifactFieldValueUtils artifactFieldValueUtils;
+
     VersionCalculator versionCalculator = new VersionCalculator();
 
     @Override
     public ArtifactVersion save(ArtifactVersion artifactVersion) {
-        return this.artifactVersionRepository.save(artifactVersion);
+        ArtifactVersion version = this.artifactVersionRepository.save(artifactVersion);
+
+        artifactFieldValueUtils.saveAllAttributeValues(artifactVersion,
+            artifactVersion.getCustomAttributeValues());
+
+        return version;
     }
 
     @Override
@@ -84,16 +92,19 @@ public class ArtifactVersionRepositoryImpl
                 ModificationType.REMOVED,
                 artifact,
                 "",
-                "",
                 "");
         }
-        return new ArtifactVersion(projectVersion,
+        ArtifactVersion artifactVersion = new ArtifactVersion(projectVersion,
             modificationType,
             artifact,
             artifactAppEntity.getSummary(),
-            artifactAppEntity.getBody(),
-            ""); // TODO custom fields
-            //JsonFileUtilities.toJson(artifactAppEntity.getCustomFields()).toString());
+            artifactAppEntity.getBody());
+
+        for (Map.Entry<String, String> entry : artifactAppEntity.getAttributes().entrySet()) {
+            artifactVersion.addCustomAttributeValue(entry.getKey(), entry.getValue());
+        }
+
+        return artifactVersion;
     }
 
     @Override
@@ -145,8 +156,8 @@ public class ArtifactVersionRepositoryImpl
         ProjectVersion projectVersion = artifactVersion.getProjectVersion();
         TypeReference<Map<String, String>> typeReference = new TypeReference<Map<String, String>>() {
         };
-        Map<String, String> customFields = new HashMap<>(); // TODO custom fields
-        //JsonFileUtilities.parse(artifactVersion.getCustomFields(), typeReference);
+        Map<String, String> customFields =
+            artifactFieldValueUtils.getCustomAttributeValuesForArtifact(artifactVersion);
 
         ArtifactAppEntity artifactAppEntity =
             new ArtifactAppEntity(artifactVersion.getArtifact().getArtifactId(),

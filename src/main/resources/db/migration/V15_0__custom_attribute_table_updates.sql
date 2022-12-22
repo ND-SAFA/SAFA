@@ -58,6 +58,7 @@ CREATE TABLE string_field_value
     field_value          MEDIUMTEXT   NOT NULL,
     field_version_id     VARCHAR(255) NOT NULL,
     PRIMARY KEY (id),
+    CONSTRAINT UNIQUE_STRING_FIELD_VALUE_PER_FIELD UNIQUE (field_version_id),
     FOREIGN KEY (field_version_id) REFERENCES artifact_field_version (id) ON DELETE CASCADE
 );
 
@@ -76,6 +77,7 @@ CREATE TABLE integer_field_value
     field_value          INT          NOT NULL,
     field_version_id     VARCHAR(255) NOT NULL,
     PRIMARY KEY (id),
+    CONSTRAINT UNIQUE_INTEGER_FIELD_VALUE_PER_FIELD UNIQUE (field_version_id),
     FOREIGN KEY (field_version_id) REFERENCES artifact_field_version (id) ON DELETE CASCADE
 );
 
@@ -85,6 +87,7 @@ CREATE TABLE float_field_value
     field_value          FLOAT        NOT NULL,
     field_version_id     VARCHAR(255) NOT NULL,
     PRIMARY KEY (id),
+    CONSTRAINT UNIQUE_FLOAT_FIELD_VALUE_PER_FIELD UNIQUE (field_version_id),
     FOREIGN KEY (field_version_id) REFERENCES artifact_field_version (id) ON DELETE CASCADE
 );
 
@@ -94,5 +97,6 @@ CREATE TABLE boolean_field_value
     field_value          BOOLEAN      NOT NULL,
     field_version_id     VARCHAR(255) NOT NULL,
     PRIMARY KEY (id),
+    CONSTRAINT UNIQUE_BOOLEAN_FIELD_VALUE_PER_FIELD UNIQUE (field_version_id),
     FOREIGN KEY (field_version_id) REFERENCES artifact_field_version (id) ON DELETE CASCADE
 );

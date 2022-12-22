@@ -44,6 +44,12 @@ public class FloatFieldInfo {
     @JoinColumn(name = "schema_field_id", nullable = false)
     private CustomAttribute schemaField;
 
+    public FloatFieldInfo(CustomAttribute field, float min, float max) {
+        this.schemaField = field;
+        this.min = min;
+        this.max = max;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

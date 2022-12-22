@@ -11,7 +11,7 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.artifacts.services.ArtifactSystemServiceProvider;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -72,7 +72,7 @@ public class StringArrayFieldValue implements IFieldValue {
     }
 
     @Override
-    public void save(ServiceProvider serviceProvider) {
+    public void save(ArtifactSystemServiceProvider serviceProvider) {
         serviceProvider.getStringArrayFieldValueRepository().save(this);
     }
 }

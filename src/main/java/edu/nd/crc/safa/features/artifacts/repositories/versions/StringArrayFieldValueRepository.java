@@ -10,4 +10,6 @@ import org.springframework.data.repository.CrudRepository;
 
 public interface StringArrayFieldValueRepository extends CrudRepository<StringArrayFieldValue, UUID> {
     List<StringArrayFieldValue> getByFieldVersion(ArtifactFieldVersion fieldVersion);
+
+    void deleteByFieldVersion(ArtifactFieldVersion fieldVersion);
 }

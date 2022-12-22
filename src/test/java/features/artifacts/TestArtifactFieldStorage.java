@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactFieldType;
@@ -16,9 +17,9 @@ import edu.nd.crc.safa.features.artifacts.entities.db.schema.CustomAttribute;
 import edu.nd.crc.safa.features.artifacts.entities.db.schema.FloatFieldInfo;
 import edu.nd.crc.safa.features.artifacts.entities.db.schema.IntegerFieldInfo;
 import edu.nd.crc.safa.features.artifacts.entities.db.schema.SelectionFieldOption;
-import edu.nd.crc.safa.features.artifacts.entities.db.versions.ArtifactFieldValueUtils;
 import edu.nd.crc.safa.features.artifacts.entities.db.versions.ArtifactFieldVersion;
 import edu.nd.crc.safa.features.artifacts.entities.db.versions.ArtifactVersion;
+import edu.nd.crc.safa.features.artifacts.services.ArtifactFieldValueUtils;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 
@@ -26,21 +27,26 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import common.ApplicationBaseTest;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class TestArtifactFieldStorage extends ApplicationBaseTest {
 
+    @Autowired
+    ArtifactFieldValueUtils artifactFieldValueUtils;
+
     private final Map<ArtifactFieldType, FieldSchemaInfo> fields = Map.of(
-        ArtifactFieldType.TEXT, new FieldSchemaInfo("Text goes here", "textField", "Text Value"),
-        ArtifactFieldType.PARAGRAPH, new FieldSchemaInfo("Longer text goes here", "paragraphField", "Paragraph Value"),
-        ArtifactFieldType.SELECT, new FieldSchemaInfo("A selection goes here", "selectField", "str1"),
-        ArtifactFieldType.MULTISELECT, new FieldSchemaInfo("A multiselection goes here", "multiselectField", "[\"str2\",\"str3\"]"),
-        ArtifactFieldType.RELATION, new FieldSchemaInfo("A relation goes here", "relationField", "[\"val1\",\"val2\"]"),
-        ArtifactFieldType.DATE, new FieldSchemaInfo("A date goes here", "dateField", "Date value"),
-        ArtifactFieldType.INT, new FieldSchemaInfo("An int goes here", "intField", "10"),
-        ArtifactFieldType.FLOAT, new FieldSchemaInfo("A float goes here", "floatField", "123.2"),
-        ArtifactFieldType.BOOLEAN, new FieldSchemaInfo("A bool goes here", "booleanField", "true")
+        ArtifactFieldType.TEXT, new FieldSchemaInfo("Text goes here", "textField", "Text Value", "Second text value"),
+        ArtifactFieldType.PARAGRAPH, new FieldSchemaInfo("Longer text goes here", "paragraphField", "Paragraph Value", "Second paragraph value"),
+        ArtifactFieldType.SELECT, new FieldSchemaInfo("A selection goes here", "selectField", "str1", "str2"),
+        ArtifactFieldType.MULTISELECT, new FieldSchemaInfo("A multiselection goes here", "multiselectField", "[\"str2\",\"str3\"]", "[\"str1\",\"str2\"]"),
+        ArtifactFieldType.RELATION, new FieldSchemaInfo("A relation goes here", "relationField", "[\"val1\",\"val2\"]", "[\"val2\",\"val3\"]"),
+        ArtifactFieldType.DATE, new FieldSchemaInfo("A date goes here", "dateField", "Date value", "Second date value"),
+        ArtifactFieldType.INT, new FieldSchemaInfo("An int goes here", "intField", "10", "11"),
+        ArtifactFieldType.FLOAT, new FieldSchemaInfo("A float goes here", "floatField", "123.2", "321.1"),
+        ArtifactFieldType.BOOLEAN, new FieldSchemaInfo("A bool goes here", "booleanField", "true", "false")
     );
 
     private final float floatMax = 100.5f;
@@ -54,56 +60,48 @@ public class TestArtifactFieldStorage extends ApplicationBaseTest {
 
     @BeforeEach
     public void setup() throws IOException {
-        dbEntityBuilder.createEmptyData();
-        project = dbEntityBuilder.newProjectWithReturn(projectName);
-        dbEntityBuilder.newVersionWithReturn(projectName);
-
         String typeName = "ArtifactTypeName";
-        dbEntityBuilder.newTypeAndReturn(projectName, typeName);
         String artifactName = "ArtifactName";
-        dbEntityBuilder.newArtifactWithReturn(projectName, typeName, artifactName);
         String artifactSummary = "This is a summary";
         String artifactContent = "This is the full content of the artifact";
+
+        dbEntityBuilder.createEmptyData();
+        project = dbEntityBuilder.newProjectWithReturn(projectName);
+
+        dbEntityBuilder.newVersion(projectName)
+            .newType(projectName, typeName)
+            .newArtifact(projectName, typeName, artifactName);
+
         artifactVersion = dbEntityBuilder.newArtifactBodyWithReturn(projectName, 0,
             ModificationType.ADDED, artifactName, artifactSummary, artifactContent);
 
         for (ArtifactFieldType fieldType : fields.keySet()) {
             FieldSchemaInfo schemaInfo = fields.get(fieldType);
 
-            CustomAttribute field = new CustomAttribute();
-            setupSchemaField(field, fieldType, schemaInfo);
+            CustomAttribute field = setupSchemaField(fieldType, schemaInfo);
 
-            ArtifactFieldValueUtils.saveArtifactValue(serviceProvider, field, artifactVersion, schemaInfo.value);
+            artifactFieldValueUtils.saveAttributeValue(field, artifactVersion, schemaInfo.value);
         }
     }
 
-    private void setupSchemaField(CustomAttribute field, ArtifactFieldType fieldType, FieldSchemaInfo schemaInfo) {
-        field.setProject(project);
-        field.setType(fieldType);
-        field.setLabel(schemaInfo.displayName);
-        field.setKeyname(schemaInfo.keyName);
-        serviceProvider.getCustomAttributeRepository().save(field);
+    private CustomAttribute setupSchemaField(ArtifactFieldType fieldType, FieldSchemaInfo schemaInfo) {
+        CustomAttribute field = dbEntityBuilder.newCustomAttributeWithReturn(projectName, fieldType,
+            schemaInfo.displayName, schemaInfo.keyName);
 
         if (fieldType.getExtraInfoType() == ArtifactFieldExtraInfoType.FLOAT_BOUNDS) {
-            FloatFieldInfo floatFieldInfo = new FloatFieldInfo();
-            floatFieldInfo.setSchemaField(field);
-            floatFieldInfo.setMax(floatMax);
-            floatFieldInfo.setMin(floatMin);
+            FloatFieldInfo floatFieldInfo = new FloatFieldInfo(field, floatMin, floatMax);
             serviceProvider.getFloatFieldInfoRepository().save(floatFieldInfo);
         } else if (fieldType.getExtraInfoType() == ArtifactFieldExtraInfoType.INT_BOUNDS) {
-            IntegerFieldInfo intFieldInfo = new IntegerFieldInfo();
-            intFieldInfo.setSchemaField(field);
-            intFieldInfo.setMax(intMax);
-            intFieldInfo.setMin(intMin);
+            IntegerFieldInfo intFieldInfo = new IntegerFieldInfo(field, intMin, intMax);
             serviceProvider.getIntegerFieldInfoRepository().save(intFieldInfo);
         } else if (fieldType.getExtraInfoType() == ArtifactFieldExtraInfoType.OPTIONS) {
             for (String selection : selections) {
-                SelectionFieldOption option = new SelectionFieldOption();
-                option.setSchemaField(field);
-                option.setValue(selection);
+                SelectionFieldOption option = new SelectionFieldOption(field, selection);
                 serviceProvider.getSelectionFieldOptionRepository().save(option);
             }
         }
+
+        return field;
     }
 
     @Test
@@ -139,38 +137,69 @@ public class TestArtifactFieldStorage extends ApplicationBaseTest {
         List<ArtifactFieldVersion> fieldVersions = serviceProvider.getArtifactFieldVersionRepository().findByArtifactVersion(artifactVersion);
         assertEquals(fields.size(), fieldVersions.size());
 
+        assertAttributeValues(fieldVersions, FieldSchemaInfo::getValue);
+    }
+
+    private void updateAttributes() {
+        for (ArtifactFieldType fieldType : fields.keySet()) {
+            FieldSchemaInfo schemaInfo = fields.get(fieldType);
+
+            Optional<CustomAttribute> fieldOpt =
+                artifactFieldValueUtils.getServiceProvider().getCustomAttributeRepository()
+                    .findByProjectAndKeyname(project, schemaInfo.keyName);
+
+            assertTrue(fieldOpt.isPresent());
+
+            artifactFieldValueUtils.saveAttributeValue(fieldOpt.get(), artifactVersion, schemaInfo.altValue);
+        }
+    }
+
+    private void assertAttributeValues(List<ArtifactFieldVersion> fieldVersions, Function<FieldSchemaInfo, String> expectedValueFunc) throws JsonProcessingException {
         for (ArtifactFieldVersion fieldVersion : fieldVersions) {
             FieldSchemaInfo schemaInfo = fields.get(fieldVersion.getSchemaField().getType());
+            String expectedValue = expectedValueFunc.apply(schemaInfo);
 
             switch (fieldVersion.getValueType()) {
                 case STRING:
                     String stringValue = fieldVersion.getStringValue();
-                    assertEquals(schemaInfo.value, stringValue);
+                    assertEquals(expectedValue, stringValue);
                     break;
                 case INTEGER:
                     int intValue = fieldVersion.getIntegerValue();
-                    assertEquals(Integer.parseInt(schemaInfo.value), intValue);
+                    assertEquals(Integer.parseInt(expectedValue), intValue);
                     break;
                 case BOOLEAN:
                     boolean boolValue = fieldVersion.getBooleanValue();
-                    assertEquals(Boolean.parseBoolean(schemaInfo.value), boolValue);
+                    assertEquals(Boolean.parseBoolean(expectedValue), boolValue);
                     break;
                 case FLOAT:
                     float floatValue = fieldVersion.getFloatValue();
-                    assertEquals(Float.parseFloat(schemaInfo.value), floatValue);
+                    assertEquals(Float.parseFloat(expectedValue), floatValue);
                     break;
                 case STRING_ARRAY:
                     List<String> stringArrayValue = fieldVersion.getStringArrayValue();
-                    assertEquals(Arrays.asList(new ObjectMapper().readValue(schemaInfo.value, String[].class)), stringArrayValue);
+                    assertEquals(Arrays.asList(new ObjectMapper().readValue(expectedValue, String[].class)), stringArrayValue);
                     break;
             }
         }
     }
 
+    @Test
+    public void testFieldValueUpdate() throws JsonProcessingException {
+        updateAttributes();
+
+        List<ArtifactFieldVersion> fieldVersions = serviceProvider.getArtifactFieldVersionRepository().findByArtifactVersion(artifactVersion);
+        assertEquals(fields.size(), fieldVersions.size());
+
+        assertAttributeValues(fieldVersions, FieldSchemaInfo::getAltValue);
+    }
+
     @AllArgsConstructor
+    @Data
     private static class FieldSchemaInfo {
         public String displayName;
         public String keyName;
         public String value;
+        public String altValue;
     }
 }

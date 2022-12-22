@@ -1,6 +1,6 @@
 package edu.nd.crc.safa.features.artifacts.entities.db.versions;
 
-import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.artifacts.services.ArtifactSystemServiceProvider;
 
 public interface IFieldValue {
     void setFieldVersion(ArtifactFieldVersion fieldVersion);
@@ -9,5 +9,5 @@ public interface IFieldValue {
 
     String getValueAsString();
 
-    void save(ServiceProvider serviceProvider);
+    void save(ArtifactSystemServiceProvider serviceProvider);
 }

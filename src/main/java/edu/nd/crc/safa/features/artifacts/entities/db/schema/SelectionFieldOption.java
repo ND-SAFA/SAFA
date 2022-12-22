@@ -41,6 +41,11 @@ public class SelectionFieldOption {
     @JoinColumn(name = "schema_field_id", nullable = false)
     private CustomAttribute schemaField;
 
+    public SelectionFieldOption(CustomAttribute field, String value) {
+        this.schemaField = field;
+        this.value = value;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

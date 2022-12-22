@@ -44,6 +44,12 @@ public class IntegerFieldInfo {
     @JoinColumn(name = "schema_field_id", nullable = false)
     private CustomAttribute schemaField;
 
+    public IntegerFieldInfo(CustomAttribute field, int min, int max) {
+        this.schemaField = field;
+        this.min = min;
+        this.max = max;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

@@ -3,18 +3,19 @@ from collections import Counter
 from unittest import mock
 from unittest.mock import patch
 
-from test.base_trace_test import BaseTraceTest
+import pandas as pd
+
 from data.creators.csv_dataset_creator import CSVDatasetCreator
 from data.datasets.data_key import DataKey
-from data.tree.trace_link import TraceLink
+from data.datasets.trace_dataset import TraceDataset
 from data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
 from data.processing.augmentation.resample_step import ResampleStep
 from data.processing.augmentation.simple_word_replacement_step import SimpleWordReplacementStep
 from data.processing.augmentation.source_target_swap_step import SourceTargetSwapStep
-from data.datasets.trace_dataset import TraceDataset
+from data.tree.trace_link import TraceLink
 from models.model_generator import ModelGenerator
 from models.model_properties import ModelArchitectureType
-import pandas as pd
+from test.base_trace_test import BaseTraceTest
 
 FEATURE_VALUE = "({}, {})"
 
@@ -107,7 +108,8 @@ class TestTraceDataset(BaseTraceTest):
         for i, expected in enumerate(n_expected):
             actual = n_augmented_links[i]
             if expected != actual:
-                self.fail("Expected number of links (%d) does not match actual (%d) for %s" % (expected, actual, str(type(steps[i]))))
+                self.fail("Expected number of links (%d) does not match actual (%d) for %s" % (
+                expected, actual, str(type(steps[i]))))
 
     def test_add_link(self):
         trace_dataset = self.get_trace_dataset()
@@ -136,19 +138,22 @@ class TestTraceDataset(BaseTraceTest):
         entry_num = 1
         orig_link = list(trace_dataset.links.values()).pop()
 
-        aug_source_id, aug_target_id = trace_dataset._get_augmented_artifact_ids(augmented_tokens, orig_link, aug_step_id, entry_num)
+        aug_source_id, aug_target_id = trace_dataset._get_augmented_artifact_ids(augmented_tokens, orig_link,
+                                                                                 aug_step_id, entry_num)
         self.assertEquals(aug_source_id, orig_link.source.id + aug_step_id)
         self.assertEquals(aug_target_id, orig_link.target.id + aug_step_id)
 
         # link id already exists but is same as augmented
         trace_dataset.add_link(aug_source_id, aug_target_id, *augmented_tokens, is_true_link=True)
-        aug_source_id, aug_target_id = trace_dataset._get_augmented_artifact_ids(augmented_tokens, orig_link, aug_step_id, entry_num)
+        aug_source_id, aug_target_id = trace_dataset._get_augmented_artifact_ids(augmented_tokens, orig_link,
+                                                                                 aug_step_id, entry_num)
         self.assertEquals(aug_source_id, orig_link.source.id + aug_step_id)
         self.assertEquals(aug_target_id, orig_link.target.id + aug_step_id)
 
         # link id already exists but is NOT the same as augmented
         trace_dataset.add_link(aug_source_id, aug_target_id, "s_token", "t_token", is_true_link=True)
-        aug_source_id, aug_target_id = trace_dataset._get_augmented_artifact_ids(augmented_tokens, orig_link, aug_step_id, entry_num)
+        aug_source_id, aug_target_id = trace_dataset._get_augmented_artifact_ids(augmented_tokens, orig_link,
+                                                                                 aug_step_id, entry_num)
         self.assertEquals(aug_source_id, orig_link.source.id + aug_step_id + str(entry_num))
         self.assertEquals(aug_target_id, orig_link.target.id + aug_step_id + str(entry_num))
 
@@ -166,8 +171,9 @@ class TestTraceDataset(BaseTraceTest):
         orig_links = list(self.get_links(self.POS_LINKS).values())
         base_result = [(link.source.token, link.target.token) for link in orig_links]
         results = [[(id_ + pair[0], id_ + pair[1]) for pair in base_result] for id_ in ids]
-        augmentation_results = {AbstractDataAugmentationStep.COMMON_ID + id_: zip(results[i], [j for j in range(len(orig_links))])
-                                for i, id_ in enumerate(ids)}
+        augmentation_results = {
+            AbstractDataAugmentationStep.COMMON_ID + id_: zip(results[i], [j for j in range(len(orig_links))])
+            for i, id_ in enumerate(ids)}
         trace_dataset = self.get_trace_dataset()
         trace_dataset._create_links_from_augmentation(augmentation_results, orig_links)
         self.assertEquals(len(trace_dataset.pos_link_ids), 3 * len(orig_links))
@@ -235,9 +241,9 @@ class TestTraceDataset(BaseTraceTest):
         self.assertEquals(sum(length_of_splits), n_orig_links)
         for i, len_split in enumerate(length_of_splits):
             if i == 0:
-                self.assertLessEqual(abs(len_split - round(n_orig_links * (1-sum(percent_splits)))), 1)
+                self.assertLessEqual(abs(len_split - round(n_orig_links * (1 - sum(percent_splits)))), 1)
                 continue
-            self.assertLessEqual(abs(len_split - round(n_orig_links*percent_splits[i-1])), 1)
+            self.assertLessEqual(abs(len_split - round(n_orig_links * percent_splits[i - 1])), 1)
         for i, split in enumerate(splits):
             link_ids = split_link_ids[i]
             for j, other_link_ids in enumerate(split_link_ids):
@@ -297,11 +303,10 @@ class TestTraceDataset(BaseTraceTest):
     def get_trace_dataset(self):
         links = self.get_links(self.ALL_TEST_LINKS)
         pos_links_ids = self.get_link_ids(self.POS_LINKS)
-        neg_link_ids = self.get_link_ids(self.NEG_LINKS)
         for link in links.values():
             if link.id in pos_links_ids:
                 link.is_true_link = True
-        return TraceDataset(links, pos_links_ids, neg_link_ids)
+        return TraceDataset(links)
 
     def get_expected_train_dataset_size(self, resample_rate=RESAMPLE_RATE, validation_percentage=VAlIDATION_PERCENTAGE):
         num_train_pos_links = round(len(self.POS_LINKS) * (1 - validation_percentage))

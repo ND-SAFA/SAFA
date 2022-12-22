@@ -8,24 +8,25 @@ class SafaFormat:
     TIM_FILE = "tim.json"
     DATAFILES_KEY = "datafiles"
     ARTIFACT_ID = "id"
-    ARTIFACT_TOKEN = "content"
+    SAFA_CVS_ARTIFACT_TOKEN = "content"
+    SAFA_JSON_ARTIFACT_TOKEN = "body"
     SOURCE_ID = "source"
     TARGET_ID = "target"
     ARTIFACTS = "artifacts"
     TRACES = "traces"
+    SUPPORTED_EXTENSIONS = [".json", ".csv"]
 
-    def __init__(self, project_path: str,
-                 artifact_id_key: str = ARTIFACT_ID, artifact_token_key: str = ARTIFACT_TOKEN,
+    def __init__(self, project_path: str, artifact_token_key: str = SAFA_CVS_ARTIFACT_TOKEN,
                  source_id_key: str = SOURCE_ID,
-                 target_id_key: str = TARGET_ID, artifacts_key: str = ARTIFACTS, traces_key: str = TRACES):
+                 target_id_key: str = TARGET_ID, artifacts_key: str = ARTIFACTS, traces_key: str = TRACES,
+                 trace_files_2_artifacts=None):
         self.project_path = project_path
-        self.artifact_id_key = artifact_id_key
         self.artifact_token_key = artifact_token_key
         self.source_id_key = source_id_key
         self.target_id_key = target_id_key
         self.artifacts_key = artifacts_key
         self.traces_key = traces_key
-        self.trace_files_2_artifacts = self.read_project_definition()
+        self.trace_files_2_artifacts = self.read_project_definition() if not trace_files_2_artifacts else trace_files_2_artifacts
 
     def read_project_definition(self):
         tim_file_path = os.path.join(self.project_path, self.TIM_FILE)
@@ -52,3 +53,19 @@ class SafaFormat:
         for artifact_name, artifact_definition in data_files.items():
             name2artifact[artifact_name] = artifact_definition["File"]
         return name2artifact
+
+    def get_artifact_token(self, data_file_name: str):
+        supported_formats = [(self.SAFA_CVS_ARTIFACT_TOKEN, ".csv"), (self.SAFA_JSON_ARTIFACT_TOKEN, ".json")]
+        for token, identifier in supported_formats:
+            if identifier in data_file_name:
+                return token
+        supported_format_names = list(map(lambda f: f[1], supported_formats))
+        raise Exception(data_file_name, "does not have a supported file type: ", supported_format_names)
+
+    def get_artifact_id(self, data_file_name: str):
+        supported_ids = [(".json", "name"), (".csv", "id")]
+        for extension, key in supported_ids:
+            if extension in data_file_name:
+                return key
+        supported_format_names = [ext for ext, key in supported_ids]
+        raise Exception(data_file_name, "does not have a supported file type: ", supported_format_names)

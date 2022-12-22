@@ -3,11 +3,11 @@ from typing import List
 import pandas as pd
 
 from data.creators.abstract_trace_dataset_creator import AbstractTraceDatasetCreator
+from data.datasets.trace_dataset import TraceDataset
+from data.formats.csv_format import CSVFormat
+from data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 from data.tree.artifact import Artifact
 from data.tree.trace_link import TraceLink
-from data.formats.csv_format import CSVFormat
-from data.datasets.trace_dataset import TraceDataset
-from data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 
 
 class CSVDatasetCreator(AbstractTraceDatasetCreator):
@@ -46,7 +46,7 @@ class CSVDatasetCreator(AbstractTraceDatasetCreator):
             links[link.id] = link
             self._add_to_link_ids(link, pos_link_ids, neg_link_ids)
 
-        return TraceDataset(links=links, pos_link_ids=pos_link_ids, neg_link_ids=neg_link_ids)
+        return TraceDataset(links=links)
 
     @staticmethod
     def _add_to_link_ids(link: TraceLink, pos_link_ids: List[int], neg_link_ids: List[int]) -> None:

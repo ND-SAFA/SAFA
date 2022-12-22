@@ -20,16 +20,19 @@ from models.model_properties import ModelArchitectureType
 
 class TraceDataset(AbstractDataset):
 
-    def __init__(self, links: Dict[int, TraceLink], pos_link_ids: List[int] = None, neg_link_ids: List[int] = None):
+    def __init__(self, links: Dict[int, TraceLink]):
         """
         Represents the config format for all data used by the huggingface trainer.
         :param links: The candidate links.
-        :param pos_link_ids: The set of trace link ids representing positive links.
-        :param neg_link_ids: The set of trace link ids representing negative links.
         """
         self.links = OrderedDict(links)
-        self.pos_link_ids = pos_link_ids if pos_link_ids else list()
-        self.neg_link_ids = neg_link_ids if neg_link_ids else list()
+        self.pos_link_ids = []
+        self.neg_link_ids = []
+        for link in links.values():
+            if link.is_true_link:
+                self.pos_link_ids.append(link.id)
+            else:
+                self.neg_link_ids.append(link.id)
 
         self._shuffle_link_ids(self.pos_link_ids)
         self._shuffle_link_ids(self.neg_link_ids)
@@ -270,7 +273,7 @@ class TraceDataset(AbstractDataset):
         slice_links = {
             link_id: self.links[link_id] for link_id in slice_pos_link_ids + slice_neg_link_ids
         }
-        return TraceDataset(slice_links, slice_pos_link_ids, slice_neg_link_ids)
+        return TraceDataset(slice_links)
 
     def _get_feature_entry(self, link: TraceLink, arch_type: ModelArchitectureType, feature_func: Callable) \
             -> Dict[str, any]:
@@ -339,6 +342,4 @@ class TraceDataset(AbstractDataset):
     def __add__(self, other: "TraceDataset"):
         combined_links = deepcopy(self.links)
         combined_links.update(other.links)
-        combined_pos_link_ids = set(self.pos_link_ids).union(set(other.pos_link_ids))
-        combined_neg_link_ids = set(self.neg_link_ids).union(set(other.neg_link_ids))
-        return TraceDataset(combined_links, list(combined_pos_link_ids), list(combined_neg_link_ids))
+        return TraceDataset(combined_links)

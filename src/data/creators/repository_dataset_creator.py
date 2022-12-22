@@ -3,9 +3,9 @@ from typing import Dict, List, Tuple
 from config.constants import USE_LINKED_TARGETS_ONLY_DEFAULT
 from data.creators.abstract_trace_dataset_creator import AbstractTraceDatasetCreator
 from data.creators.safa_dataset_creator import SafaDatasetCreator
+from data.datasets.trace_dataset import TraceDataset
 from data.formats.repository_format import RepositoryFormat
 from data.formats.safa_format import SafaFormat
-from data.datasets.trace_dataset import TraceDataset
 from data.processing.cleaning.data_cleaning_steps import DataCleaningSteps
 
 
@@ -33,8 +33,9 @@ class RepositoryDatasetCreator(AbstractTraceDatasetCreator):
         """
         dataset = None
         for repo_path in self.repo_paths:
-            repo_dataset = SafaDatasetCreator(repo_path, self.data_cleaning_steps, self.keys,
-                                              self._use_linked_targets_only).create()
+            repo_dataset = SafaDatasetCreator(project_path=repo_path,
+                                              data_cleaning_steps=self.data_cleaning_steps,
+                                              use_linked_targets_only=self._use_linked_targets_only).create()
 
             dataset = dataset + repo_dataset if dataset else repo_dataset
         return dataset

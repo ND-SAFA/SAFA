@@ -85,6 +85,7 @@ torch==1.11.0
 tqdm==4.64.0
 transformers==4.20.1
 typing_extensions==4.3.0
+typeguard==2.13.3
 uritemplate==4.1.1
 urllib3==1.26.12
 Werkzeug==2.2.2

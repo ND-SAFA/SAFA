@@ -1,4 +1,4 @@
-from typing import Callable, List
+from typing import Callable, List, Optional
 
 from test.base_test import BaseTest
 from util.base_object import BaseObject
@@ -39,6 +39,11 @@ class TestIsInstance(BaseTest):
         a: Callable[[str], str] = lambda s: s
         self.negative_test(a, List[str])
         self.positive_test(a, Callable)
+
+    def test_optionals(self):
+        a: Optional[str] = None
+        self.negative_test(a, str)
+        self.positive_test(a, Optional[str])
 
     @staticmethod
     def positive_test(value, expected_type):

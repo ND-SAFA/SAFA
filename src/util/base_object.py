@@ -1,33 +1,21 @@
 from abc import ABC
-from copy import copy
-from dataclasses import dataclass
-from typing import Any, Type, get_type_hints, _SpecialGenericAlias, Union, Dict, Callable, Set, Optional, _UnionGenericAlias, \
-    _Final, _GenericAlias, _CallableGenericAlias, _CallableType, get_origin, get_args, List, Tuple
-from experiments.variables.variable import Variable
+from typing import Any, Type, Union
+
+from typeguard import check_type
 
 from experiments.variables.definition_variable import DefinitionVariable
-from inspect import isfunction, getfullargspec
-
-
-@dataclass
-class ParamSpecs:
-    param_names: Set[str]
-    param_types: Dict[str, Union[Type, _SpecialGenericAlias]]
-    has_kwargs: bool
-    required_params: Set[str]
+from experiments.variables.variable import Variable
+from util.param_specs import ParamSpecs
 
 
 class BaseObject(ABC):
-
-    # TODO add None with optional case
-    # TODO clean up _is_instance
 
     @classmethod
     def initialize_from_definition(cls, definition: DefinitionVariable):
         """
         Initializes the object from a dictionary
         :param definition: a dictionary of the necessary params to initialize
-        :return: the initialize object
+        :return: the initialized object
         """
         param_specs = ParamSpecs.create_from_method(cls.__init__)
         param_specs.assert_definition(definition)
@@ -42,7 +30,8 @@ class BaseObject(ABC):
         return cls(**params)
 
     @classmethod
-    def _get_value_of_variable(cls, variable: Union[Variable, Any], expected_type: Union[Type, _SpecialGenericAlias] = None) -> Any:
+    def _get_value_of_variable(cls, variable: Union[Variable, Any],
+                               expected_type: Union[Type] = None) -> Any:
         """
         Gets the value of a given variable
         :param variable: the variable, can be any variable class or the actual value desired
@@ -75,7 +64,7 @@ class BaseObject(ABC):
             raise TypeError("Unable to initialize %s for %s" % (expected_class, cls.__name__))
 
     @classmethod
-    def _assert_type(cls, val: Any, expected_type: Union[Type, _SpecialGenericAlias], param_name: str):
+    def _assert_type(cls, val: Any, expected_type: Union[Type], param_name: str):
         """
         Asserts that the value is of the expected type for the variable with the given name
         :param val: the value
@@ -83,3 +72,8 @@ class BaseObject(ABC):
         :param param_name: the name of the parameter being tested
         :return: None (raises an exception if not the expected type)
         """
+        try:
+            check_type(param_name, val, expected_type)
+        except TypeError:
+            raise TypeError(
+                "%s expected type %s for %s but received %s" % (cls.__name__, expected_type, param_name, type(val)))

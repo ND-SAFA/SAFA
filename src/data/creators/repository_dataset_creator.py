@@ -1,11 +1,11 @@
-from typing import Dict, List, Tuple
+from typing import List
 
 from config.constants import USE_LINKED_TARGETS_ONLY_DEFAULT
 from data.creators.abstract_trace_dataset_creator import AbstractTraceDatasetCreator
 from data.creators.safa_dataset_creator import SafaDatasetCreator
+from data.datasets.trace_dataset import TraceDataset
 from data.formats.repository_format import RepositoryFormat
 from data.formats.safa_format import SafaFormat
-from data.datasets.trace_dataset import TraceDataset
 from data.processing.cleaning.data_cleaner import DataCleaner
 
 

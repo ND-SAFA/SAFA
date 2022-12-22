@@ -1,8 +1,6 @@
 from dataclasses import dataclass
 
 from config.constants import SAVE_OUTPUT_DEFAULT
-from models.model_properties import ModelArchitectureType
-from train.trainer_args import TrainerArgs
 
 
 @dataclass
@@ -16,8 +14,8 @@ class JobArgs:
     """
     save_job_output: bool = SAVE_OUTPUT_DEFAULT
     """
-   If True, saves the dataset splits to the output_dir
-   """
+    If True, saves the dataset splits to the output_dir
+    """
     save_dataset_splits: bool = False
     """
     Sets the random seed for a job

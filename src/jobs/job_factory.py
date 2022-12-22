@@ -3,11 +3,10 @@ from dataclasses import dataclass, field
 from typing import Callable, Dict, Type
 
 from config.constants import SAVE_OUTPUT_DEFAULT
+from data.datasets.trainer_dataset_manager import TrainerDatasetManager
 from jobs.abstract_job import AbstractJob
 from jobs.abstract_trace_job import AbstractTraceJob
 from jobs.components.job_args import JobArgs
-from data.datasets.trainer_dataset_manager import TrainerDatasetManager
-from models.base_models.supported_base_model import SupportedBaseModel
 from models.model_properties import ModelArchitectureType
 from train.trainer_args import TrainerArgs
 from util.reflection_util import ReflectionUtil
@@ -55,6 +54,10 @@ class JobFactory:
     any additional args needed for the job
     """
     additional_job_params: Dict = field(init=False, default=None)
+    """
+    If True, saves the dataset splits to the output_dir
+    """
+    save_dataset_splits: bool = False
 
     def __init__(self, **kwargs):
         """

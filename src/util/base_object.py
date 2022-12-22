@@ -29,9 +29,8 @@ class BaseObject(ABC):
         :param definition: a dictionary of the necessary params to initialize
         :return: the initialize object
         """
-        param_specs = cls._get_param_specs(cls.__init__)
-        cls._assert_no_missing_params(definition, param_specs)
-        cls._assert_no_unexpected_params(definition, param_specs)
+        param_specs = ParamSpecs.create_from_method(cls.__init__)
+        param_specs.assert_definition(definition)
 
         params = {}
         for param_name, variable in definition.items():
@@ -84,115 +83,3 @@ class BaseObject(ABC):
         :param param_name: the name of the parameter being tested
         :return: None (raises an exception if not the expected type)
         """
-        if not cls._is_instance(val, expected_type):
-            raise TypeError("%s expected type %s for %s but received %s" % (cls.__name__, expected_type, param_name, type(val)))
-
-    @classmethod
-    def _assert_no_missing_params(cls, definition: Dict, param_specs: ParamSpecs) -> None:
-        """
-        Asserts that there are no missing params for the method represented by the given param specs
-        :param definition: the dictionary of parameter name to value mappings to check
-        :param param_specs: the parameter specs for the method
-        :return: None (raises an exception if there are missing params)
-        """
-        missing_params = cls._get_any_missing_required_params(definition, param_specs)
-        if len(missing_params) >= 1:
-            raise TypeError("%s is missing required arguments: %s" % (cls.__name__, missing_params))
-
-    @classmethod
-    def _assert_no_unexpected_params(cls, definition: Dict, param_specs: ParamSpecs) -> None:
-        """
-        Asserts that there are no unexpected params for the method represented by the given param specs
-        :param definition: the dictionary of parameter name to value mappings to check
-        :param param_specs: the parameter specs for the method
-        :return: None (raises an exception if there are unexpected params)
-        """
-        extra_params = cls._get_any_additional_params(definition, param_specs)
-        if len(extra_params) >= 1 and not param_specs.has_kwargs:
-            raise TypeError("%s received unexpected arguments: %s" % (cls.__name__, extra_params))
-
-    @staticmethod
-    def _get_any_missing_required_params(param_dict: Dict, param_specs: ParamSpecs) -> Set[str]:
-        """
-        Gets any missing params for the given param specs that are not supplied in the parameter dictionary
-        :param param_dict: the dictionary of parameter name to value mappings to check
-        :param param_specs: the parameter specs for the method to check if all required params have been supplied
-        :return: a set of any missing required parameters
-        """
-        return set(param_specs.required_params).difference(set(param_dict.keys()))
-
-    @staticmethod
-    def _get_any_additional_params(param_dict: Dict, param_specs: ParamSpecs) -> Set[str]:
-        """
-        Gets any additional params for the given param specs that are supplied in the parameter dictionary
-        :param param_dict: the dictionary of parameter name to value mappings to check
-        :param param_specs: the parameter specs for the method to get any additional parameters for
-        :return: a set of any additional parameters
-        """
-        return set(param_dict.keys()).difference(param_specs.param_names)
-
-    @staticmethod
-    def _is_instance(val: Any, expected_type: Union[Type, _GenericAlias]) -> bool:
-        """
-        Determines that the value is of the correct type
-        :param val: the value
-        :param expected_type: expected type or typing generic
-        :return: True if value is the expected type else False
-        """
-        if isinstance(expected_type, _UnionGenericAlias):
-            is_instance = False
-            for child_type in get_args(expected_type):
-                is_instance = is_instance or BaseObject._is_instance(val, child_type)
-            return is_instance
-        elif isinstance(expected_type, _CallableType):
-            return isfunction(val)
-        else:
-            if isinstance(expected_type, _GenericAlias):
-                args = get_args(expected_type)
-                if len(args) > 0:
-                    val = val
-                    is_instance = BaseObject._is_instance(val, get_origin(expected_type))
-                    if isinstance(val, dict):
-                        key_type = args[0]
-                        val_type = key_type if len(args) < 2 else args[1]
-                        return BaseObject._is_instance(list(val.keys()).pop(), key_type) \
-                               and BaseObject._is_instance(list(val.values()).pop(), val_type)
-                    elif isinstance(val, tuple):
-                        for i, child_arg in enumerate(args):
-                            try:
-                                _val = val[i]
-                            except KeyError as e:
-                                return False
-                            is_instance = is_instance and BaseObject._is_instance(_val, child_arg)
-                        return is_instance
-                    for child_type in args:
-                        try:
-                            val = val[0]
-                        except KeyError as e:
-                            return False
-                        is_instance = is_instance and BaseObject._is_instance(val, child_type)
-                    return is_instance
-                expected_type = get_origin(expected_type)
-            return isinstance(val, expected_type)
-
-    @staticmethod
-    def _get_param_specs(method: Callable) -> ParamSpecs:
-        """
-        Returns the param specs for the given method
-        :param method: the method to create param specs for
-        :return: the param specs
-        """
-        full_specs = getfullargspec(method)
-        expected_param_names = full_specs.args
-        expected_param_names.remove("self")
-
-        param_names = set(copy(expected_param_names))
-        type_hints = get_type_hints(method)
-        param_types = {param: type_hints[param] if param in type_hints else None for param in param_names}
-
-        expected_param_names.reverse()
-        required_params = {param for i, param in enumerate(expected_param_names)
-                           if full_specs.defaults and i >= len(full_specs.defaults)}
-
-        return ParamSpecs(param_names=param_names, param_types=param_types,
-                          required_params=required_params, has_kwargs=full_specs.varkw is not None)

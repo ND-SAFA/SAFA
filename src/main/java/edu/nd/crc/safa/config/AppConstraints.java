@@ -20,7 +20,7 @@ public class AppConstraints {
     public static final String UNIQUE_ARTIFACT_NAME_PER_PROJECT = "UNIQUE_ARTIFACT_NAME_PER_PROJECT";
     public static final String UNIQUE_ARTIFACT_TYPE_PER_PROJECT = "UNIQUE_ARTIFACT_TYPE_PER_PROJECT";
     public static final String UNIQUE_ARTIFACT_BODY_PER_VERSION = "UNIQUE_ARTIFACT_BODY_PER_VERSION";
-    public static final String UNIQUE_KEYNAME_PER_ARTIFACT_TYPE = "UNIQUE_KEYNAME_PER_ARTIFACT_TYPE";
+    public static final String UNIQUE_KEYNAME_PER_PROJECT = "UNIQUE_KEYNAME_PER_PROJECT";
 
     // Traces
     public static final String SINGLE_TRACE_BETWEEN_SOURCE_AND_TARGET = "SINGLE_TRACE_BETWEEN_SOURCE_AND_TARGET";
@@ -52,7 +52,7 @@ public class AppConstraints {
         AppConstraints.UNIQUE_ARTIFACT_NAME_PER_PROJECT,
         AppConstraints.UNIQUE_ARTIFACT_TYPE_PER_PROJECT,
         AppConstraints.UNIQUE_ARTIFACT_BODY_PER_VERSION,
-        AppConstraints.UNIQUE_KEYNAME_PER_ARTIFACT_TYPE,
+        AppConstraints.UNIQUE_KEYNAME_PER_PROJECT,
         AppConstraints.SINGLE_TRACE_BETWEEN_SOURCE_AND_TARGET,
         AppConstraints.SINGLE_TRACE_VERSION_PER_PROJECT_VERSION,
         AppConstraints.UNIQUE_TRACE_MATRIX_PER_PROJECT,
@@ -107,7 +107,7 @@ public class AppConstraints {
                 return createNullError(cause);
             case AppConstraints.UNIQUE_MODEL_PROJECT_RECORD:
                 return "Model is already associated with project, second record of this was attempted.";
-            case AppConstraints.UNIQUE_KEYNAME_PER_ARTIFACT_TYPE:
+            case AppConstraints.UNIQUE_KEYNAME_PER_PROJECT:
                 return "Key already exists within this artifact type.";
             default:
                 throw new SafaError("Database constraint was violated. %s", cause);

@@ -15,7 +15,7 @@ import javax.persistence.UniqueConstraint;
 
 import edu.nd.crc.safa.config.AppConstraints;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactFieldType;
-import edu.nd.crc.safa.features.types.ArtifactType;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -27,17 +27,17 @@ import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
 
 @Entity
-@Table(name = "artifact_schema_field",
+@Table(name = "custom_attribute",
     uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"keyname", "artifact_type_id"},
-            name = AppConstraints.UNIQUE_KEYNAME_PER_ARTIFACT_TYPE)
+        @UniqueConstraint(columnNames = {"keyname", "project_id"},
+            name = AppConstraints.UNIQUE_KEYNAME_PER_PROJECT)
     }
 )
 @Getter
 @Setter
 @ToString
 @RequiredArgsConstructor
-public class ArtifactSchemaField {
+public class CustomAttribute {
 
     @Id
     @GeneratedValue
@@ -57,8 +57,8 @@ public class ArtifactSchemaField {
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "artifact_type_id", nullable = false)
-    private ArtifactType artifactType;
+    @JoinColumn(name = "project_id", nullable = false)
+    private Project project;
 
     @Override
     public boolean equals(Object o) {
@@ -68,7 +68,7 @@ public class ArtifactSchemaField {
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) {
             return false;
         }
-        ArtifactSchemaField that = (ArtifactSchemaField) o;
+        CustomAttribute that = (CustomAttribute) o;
         return id != null && Objects.equals(id, that.id);
     }
 

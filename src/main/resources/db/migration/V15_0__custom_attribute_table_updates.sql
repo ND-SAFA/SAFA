@@ -1,16 +1,16 @@
 ALTER TABLE artifact_body
 DROP COLUMN custom_fields;
 
-CREATE TABLE artifact_schema_field
+CREATE TABLE custom_attribute
 (
     id                VARCHAR(255) NOT NULL,
     type              INT          NOT NULL,
     keyname           VARCHAR(255) NOT NULL,
     label             VARCHAR(255) NOT NULL,
-    artifact_type_id  VARCHAR(255) NOT NULL,
+    project_id        VARCHAR(255) NOT NULL,
     PRIMARY KEY (id),
-    CONSTRAINT UNIQUE_KEYNAME_PER_ARTIFACT_TYPE UNIQUE (keyname, artifact_type_id),
-    FOREIGN KEY (artifact_type_id) REFERENCES artifact_type (type_id) ON DELETE CASCADE
+    CONSTRAINT UNIQUE_KEYNAME_PER_PROJECT UNIQUE (keyname, project_id),
+    FOREIGN KEY (project_id) REFERENCES project (project_id) ON DELETE CASCADE
 );
 
 CREATE TABLE selection_field_option
@@ -19,7 +19,7 @@ CREATE TABLE selection_field_option
     option_value     VARCHAR(255) NOT NULL,
     schema_field_id  VARCHAR(255) NOT NULL,
     PRIMARY KEY (id),
-    FOREIGN KEY (schema_field_id) REFERENCES artifact_schema_field (id) ON DELETE CASCADE
+    FOREIGN KEY (schema_field_id) REFERENCES custom_attribute (id) ON DELETE CASCADE
 );
 
 CREATE TABLE float_field
@@ -29,7 +29,7 @@ CREATE TABLE float_field
     max              FLOAT        NOT NULL,
     schema_field_id  VARCHAR(255) NOT NULL,
     PRIMARY KEY (id),
-    FOREIGN KEY (schema_field_id) REFERENCES artifact_schema_field (id) ON DELETE CASCADE
+    FOREIGN KEY (schema_field_id) REFERENCES custom_attribute (id) ON DELETE CASCADE
 );
 
 CREATE TABLE integer_field
@@ -39,7 +39,7 @@ CREATE TABLE integer_field
     max              INT          NOT NULL,
     schema_field_id  VARCHAR(255) NOT NULL,
     PRIMARY KEY (id),
-    FOREIGN KEY (schema_field_id) REFERENCES artifact_schema_field (id) ON DELETE CASCADE
+    FOREIGN KEY (schema_field_id) REFERENCES custom_attribute (id) ON DELETE CASCADE
 );
 
 CREATE TABLE artifact_field_version
@@ -49,7 +49,7 @@ CREATE TABLE artifact_field_version
     field_id             VARCHAR(255) NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (artifact_version_id) REFERENCES artifact_body (entity_version_id) ON DELETE CASCADE,
-    FOREIGN KEY (field_id) REFERENCES artifact_schema_field (id) ON DELETE CASCADE
+    FOREIGN KEY (field_id) REFERENCES custom_attribute (id) ON DELETE CASCADE
 );
 
 CREATE TABLE string_field_value

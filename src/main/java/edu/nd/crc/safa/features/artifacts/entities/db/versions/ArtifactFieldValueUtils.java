@@ -3,7 +3,7 @@ package edu.nd.crc.safa.features.artifacts.entities.db.versions;
 import java.util.Optional;
 
 import edu.nd.crc.safa.features.artifacts.entities.db.schema.ArtifactFieldStorageType;
-import edu.nd.crc.safa.features.artifacts.entities.db.schema.ArtifactSchemaField;
+import edu.nd.crc.safa.features.artifacts.entities.db.schema.CustomAttribute;
 import edu.nd.crc.safa.features.artifacts.repositories.versions.ArtifactFieldVersionRepository;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
@@ -25,7 +25,7 @@ public class ArtifactFieldValueUtils {
      * @param artifactVersion The version of the artifact we are setting a value within.
      * @param value The value to set.
      */
-    public static void saveArtifactValue(ServiceProvider serviceProvider, ArtifactSchemaField field,
+    public static void saveArtifactValue(ServiceProvider serviceProvider, CustomAttribute field,
                                          ArtifactVersion artifactVersion, String value) {
 
         ArtifactFieldVersion fieldVersion = getFieldVersion(serviceProvider, field, artifactVersion);
@@ -49,7 +49,7 @@ public class ArtifactFieldValueUtils {
      * @param artifactVersion The artifact version we want to access a field for.
      * @return The field version if it existed previously, or a new one.
      */
-    private static ArtifactFieldVersion getFieldVersion(ServiceProvider serviceProvider, ArtifactSchemaField field,
+    private static ArtifactFieldVersion getFieldVersion(ServiceProvider serviceProvider, CustomAttribute field,
                                                         ArtifactVersion artifactVersion) {
 
         ArtifactFieldVersionRepository repo = serviceProvider.getArtifactFieldVersionRepository();

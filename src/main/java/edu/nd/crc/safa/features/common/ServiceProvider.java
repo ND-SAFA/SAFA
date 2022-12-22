@@ -3,7 +3,7 @@ package edu.nd.crc.safa.features.common;
 import edu.nd.crc.safa.authentication.TokenService;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactTypeRepository;
-import edu.nd.crc.safa.features.artifacts.repositories.schema.ArtifactSchemaFieldRepository;
+import edu.nd.crc.safa.features.artifacts.repositories.schema.CustomAttributeRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.schema.FloatFieldInfoRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.schema.IntegerFieldInfoRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.schema.SelectionFieldOptionRepository;
@@ -103,7 +103,7 @@ public class ServiceProvider {
     private final ArtifactVersionRepository artifactVersionRepository;
     private final ArtifactService artifactService;
     private final ArtifactVersionRepositoryImpl artifactVersionRepositoryImpl;
-    private final ArtifactSchemaFieldRepository artifactSchemaFieldRepository;
+    private final CustomAttributeRepository customAttributeRepository;
     private final SelectionFieldOptionRepository selectionFieldOptionRepository;
     private final IntegerFieldInfoRepository integerFieldInfoRepository;
     private final FloatFieldInfoRepository floatFieldInfoRepository;

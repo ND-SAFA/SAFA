@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactFieldType;
 import edu.nd.crc.safa.features.artifacts.entities.db.schema.ArtifactFieldExtraInfoType;
-import edu.nd.crc.safa.features.artifacts.entities.db.schema.ArtifactSchemaField;
+import edu.nd.crc.safa.features.artifacts.entities.db.schema.CustomAttribute;
 import edu.nd.crc.safa.features.artifacts.entities.db.schema.FloatFieldInfo;
 import edu.nd.crc.safa.features.artifacts.entities.db.schema.IntegerFieldInfo;
 import edu.nd.crc.safa.features.artifacts.entities.db.schema.SelectionFieldOption;
@@ -21,7 +21,6 @@ import edu.nd.crc.safa.features.artifacts.entities.db.versions.ArtifactFieldVers
 import edu.nd.crc.safa.features.artifacts.entities.db.versions.ArtifactVersion;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
-import edu.nd.crc.safa.features.types.ArtifactType;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,8 +30,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class TestArtifactFieldStorage extends ApplicationBaseTest {
-
-    private final String typeName = "ArtifactTypeName";
 
     private final Map<ArtifactFieldType, FieldSchemaInfo> fields = Map.of(
         ArtifactFieldType.TEXT, new FieldSchemaInfo("Text goes here", "textField", "Text Value"),
@@ -61,7 +58,8 @@ public class TestArtifactFieldStorage extends ApplicationBaseTest {
         project = dbEntityBuilder.newProjectWithReturn(projectName);
         dbEntityBuilder.newVersionWithReturn(projectName);
 
-        ArtifactType artifactType = dbEntityBuilder.newTypeAndReturn(projectName, typeName);
+        String typeName = "ArtifactTypeName";
+        dbEntityBuilder.newTypeAndReturn(projectName, typeName);
         String artifactName = "ArtifactName";
         dbEntityBuilder.newArtifactWithReturn(projectName, typeName, artifactName);
         String artifactSummary = "This is a summary";
@@ -72,19 +70,19 @@ public class TestArtifactFieldStorage extends ApplicationBaseTest {
         for (ArtifactFieldType fieldType : fields.keySet()) {
             FieldSchemaInfo schemaInfo = fields.get(fieldType);
 
-            ArtifactSchemaField field = new ArtifactSchemaField();
-            setupSchemaField(field, artifactType, fieldType, schemaInfo);
+            CustomAttribute field = new CustomAttribute();
+            setupSchemaField(field, fieldType, schemaInfo);
 
             ArtifactFieldValueUtils.saveArtifactValue(serviceProvider, field, artifactVersion, schemaInfo.value);
         }
     }
 
-    private void setupSchemaField(ArtifactSchemaField field, ArtifactType artifactType, ArtifactFieldType fieldType, FieldSchemaInfo schemaInfo) {
-        field.setArtifactType(artifactType);
+    private void setupSchemaField(CustomAttribute field, ArtifactFieldType fieldType, FieldSchemaInfo schemaInfo) {
+        field.setProject(project);
         field.setType(fieldType);
         field.setLabel(schemaInfo.displayName);
         field.setKeyname(schemaInfo.keyName);
-        serviceProvider.getArtifactSchemaFieldRepository().save(field);
+        serviceProvider.getCustomAttributeRepository().save(field);
 
         if (fieldType.getExtraInfoType() == ArtifactFieldExtraInfoType.FLOAT_BOUNDS) {
             FloatFieldInfo floatFieldInfo = new FloatFieldInfo();
@@ -110,14 +108,10 @@ public class TestArtifactFieldStorage extends ApplicationBaseTest {
 
     @Test
     public void testSchemaCreation() {
-        Optional<ArtifactType> artifactTypeOptional = artifactTypeRepository.findByProjectAndNameIgnoreCase(project, typeName);
-        assertTrue(artifactTypeOptional.isPresent());
-
-        ArtifactType artifactType = artifactTypeOptional.get();
-        List<ArtifactSchemaField> artifactFields = serviceProvider.getArtifactSchemaFieldRepository().findByArtifactType(artifactType);
+        List<CustomAttribute> artifactFields = serviceProvider.getCustomAttributeRepository().findByProject(project);
         assertEquals(fields.size(), artifactFields.size());
 
-        for (ArtifactSchemaField field : artifactFields) {
+        for (CustomAttribute field : artifactFields) {
             FieldSchemaInfo schemaInfo = fields.get(field.getType());
             assertEquals(schemaInfo.displayName, field.getLabel());
             assertEquals(schemaInfo.keyName, field.getKeyname());

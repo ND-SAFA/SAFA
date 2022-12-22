@@ -42,7 +42,7 @@ public class FloatFieldInfo {
     @OneToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "schema_field_id", nullable = false)
-    private ArtifactSchemaField schemaField;
+    private CustomAttribute schemaField;
 
     @Override
     public boolean equals(Object o) {

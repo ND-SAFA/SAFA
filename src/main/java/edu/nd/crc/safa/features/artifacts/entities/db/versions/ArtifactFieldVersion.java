@@ -16,7 +16,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import edu.nd.crc.safa.features.artifacts.entities.db.schema.ArtifactFieldStorageType;
-import edu.nd.crc.safa.features.artifacts.entities.db.schema.ArtifactSchemaField;
+import edu.nd.crc.safa.features.artifacts.entities.db.schema.CustomAttribute;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -49,7 +49,7 @@ public class ArtifactFieldVersion {
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "field_id", nullable = false)
-    private ArtifactSchemaField schemaField;
+    private CustomAttribute schemaField;
 
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)

@@ -52,7 +52,7 @@ class ParamSpecs:
         """
         extra_params = self.get_any_additional_params(definition)
         if len(extra_params) >= 1 and not self.has_kwargs:
-            raise TypeError("%s received unexpected arguments: %s" % (self.__name__, extra_params))
+            raise TypeError("%s received unexpected arguments: %s" % (self.__class__, extra_params))
 
     def get_any_missing_required_params(self, param_dict: Dict) -> Set[str]:
         """

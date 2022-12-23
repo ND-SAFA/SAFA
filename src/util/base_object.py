@@ -42,13 +42,14 @@ class BaseObject(ABC):
         """
         val = variable
         if isinstance(variable, TypedDefinitionVariable):
-            expected_type = cls._get_expected_class_by_type(expected_type, variable.object_type)
+            expected_type = expected_type._get_expected_class_by_type(expected_type, variable.object_type)
 
         if isinstance(variable, MultiVariable):
             expected_inner_types = get_args(expected_type)
             val = []
             for i, inner_var in enumerate(variable):
-                expected_inner_type = expected_inner_types[i] if i < len(expected_inner_types) else expected_inner_types[0]
+                expected_inner_type = expected_inner_types[i] if i < len(expected_inner_types) else \
+                    expected_inner_types[0]
                 val.append(cls._get_value_of_variable(inner_var, expected_inner_type))
         elif isinstance(variable, DefinitionVariable):
             val = cls._make_child_object(variable, expected_type) if expected_type else None
@@ -67,7 +68,7 @@ class BaseObject(ABC):
         if isinstance(expected_class, BaseObject):
             return expected_class.initialize_from_definition(definition)
 
-        params = {param_name: cls._get_value_of_variable(variable)
+        params = {param_name: cls._get_value_of_variable(variable, expected_class)
                   for param_name, variable in definition.items()}
         try:
             return expected_class(**params)
@@ -83,7 +84,8 @@ class BaseObject(ABC):
         :param child_class_name: the name of the child class
         :return: the expected type
         """
-        raise TypeError("Cannot create %s because %s has not defined a creation method." % (child_class_name, cls.__name__))
+        raise TypeError(
+            "Cannot create %s because %s has not defined a creation method." % (child_class_name, cls.__name__))
 
     @classmethod
     def _assert_type(cls, val: Any, expected_type: Union[Type], param_name: str):

@@ -12,10 +12,6 @@ from util.param_specs import ParamSpecs
 
 class BaseObject(ABC):
 
-    # TODO currently cannot handle a list of definition variables (see below):
-    #     DataCleaner.initialize_from_definition(
-    #         DefinitionVariable({"steps": Variable([DefinitionVariable({"type": Variable("REMOVE_UNWANTED_CHARS")})])}))
-
     @classmethod
     def initialize_from_definition(cls, definition: DefinitionVariable):
         """

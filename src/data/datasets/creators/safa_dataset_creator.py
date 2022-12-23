@@ -1,17 +1,15 @@
-from typing import List
-
 from config.constants import USE_LINKED_TARGETS_ONLY_DEFAULT
 from data.datasets.creators.abstract_trace_dataset_creator import AbstractTraceDatasetCreator
 from data.datasets.creators.readers.project.tim_definition_reader import TimProjectReader
 from data.datasets.trace_dataset import TraceDataset
-from data.processing.abstract_data_processing_step import AbstractDataProcessingStep
+from data.processing.cleaning.data_cleaner import DataCleaner
 
 
 class SafaDatasetCreator(AbstractTraceDatasetCreator):
     JSON_EXT = ".json"
     CSV_EXT = ".csv"
 
-    def __init__(self, project_path: str, data_cleaning_steps: List[AbstractDataProcessingStep] = None,
+    def __init__(self, project_path: str, data_cleaner: DataCleaner = None,
                  use_linked_targets_only: bool = USE_LINKED_TARGETS_ONLY_DEFAULT):
         """
         Creates a data from the SAFA data format.
@@ -20,7 +18,7 @@ class SafaDatasetCreator(AbstractTraceDatasetCreator):
         :param data_keys: keys to use to access data
         :param use_linked_targets_only: if True, uses only the targets that make up at least one true link
         """
-        super().__init__(data_cleaning_steps, use_linked_targets_only)
+        super().__init__(data_cleaner, use_linked_targets_only)
         self.project_path = project_path
 
     def create(self) -> TraceDataset:

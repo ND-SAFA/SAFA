@@ -1,9 +1,10 @@
 import os
 
-from test.base_trace_test import BaseTraceTest
-from test.paths.paths import TEST_DATA_DIR
 from data.datasets.creators.repository_dataset_creator import RepositoryDatasetCreator
 from data.datasets.formats.repository_format import RepositoryFormat
+from data.processing.cleaning.data_cleaner import DataCleaner
+from test.base_trace_test import BaseTraceTest
+from test.paths.paths import TEST_DATA_DIR
 
 
 class TestRepositoryDatasetCreator(BaseTraceTest):
@@ -20,5 +21,6 @@ class TestRepositoryDatasetCreator(BaseTraceTest):
         self.assert_lists_have_the_same_vals(dataset.neg_link_ids, self.get_link_ids(self.NEG_LINKS))
 
     def get_repo_dataset_creator(self):
+        data_cleaner = DataCleaner(self.DATA_CLEANING_STEPS)
         return RepositoryDatasetCreator([os.path.join(self.REPO_DIR, dirname) for dirname in self.REPO_DIRNAMES],
-                                        data_cleaner=self.DATA_CLEANING_STEPS, data_keys=self.KEYS)
+                                        data_cleaner=data_cleaner, data_keys=self.KEYS)

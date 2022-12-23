@@ -3,20 +3,20 @@ from typing import List, Set, Tuple
 
 from data.datasets.creators.abstract_dataset_creator import AbstractDatasetCreator
 from data.datasets.trace_dataset import TraceDataset
-from data.processing.abstract_data_processing_step import AbstractDataProcessingStep
+from data.processing.cleaning.data_cleaner import DataCleaner
 from data.tree.artifact import Artifact
 from data.tree.trace_link import TraceLink
 
 
 class AbstractTraceDatasetCreator(AbstractDatasetCreator, ABC):
 
-    def __init__(self, data_cleaning_steps: List[AbstractDataProcessingStep], use_linked_targets_only: bool):
+    def __init__(self, data_cleaner: DataCleaner, use_linked_targets_only: bool):
         """
         Responsible for creating data in format for defined models.
-        :param data_cleaning_steps: tuple containing the desired pre-processing steps and related params
+        :param data_cleaner: Processes the artifact tokens.
         :use_linked_targets_only: if True, uses only the targets that make up at least one true link
         """
-        super().__init__(data_cleaning_steps)
+        super().__init__(data_cleaner)
         self._linked_targets = set()
         self._use_linked_targets_only = use_linked_targets_only
 

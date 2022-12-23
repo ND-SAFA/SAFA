@@ -1,8 +1,9 @@
 import os
 
+from data.datasets.creators.csv_dataset_creator import CSVDatasetCreator
+from data.processing.cleaning.data_cleaner import DataCleaner
 from test.base_trace_test import BaseTraceTest
 from test.paths.paths import TEST_DATA_DIR
-from data.datasets.creators.csv_dataset_creator import CSVDatasetCreator
 
 
 class TestCSVDatasetCreator(BaseTraceTest):
@@ -18,4 +19,5 @@ class TestCSVDatasetCreator(BaseTraceTest):
 
     def get_csv_dataset_creator(self):
         data_file_path = os.path.join(self.CSV_DATA_DIR, self.TEST_DATA_FILE)
-        return CSVDatasetCreator(data_file_path, data_cleaner=self.DATA_CLEANING_STEPS)
+        data_cleaner = DataCleaner(self.DATA_CLEANING_STEPS)
+        return CSVDatasetCreator(data_file_path, data_cleaner=data_cleaner)

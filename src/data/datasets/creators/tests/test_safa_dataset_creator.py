@@ -1,6 +1,7 @@
 import os
 
 from data.datasets.creators.safa_dataset_creator import SafaDatasetCreator
+from data.processing.cleaning.data_cleaner import DataCleaner
 from test.base_trace_test import BaseTraceTest
 from test.paths.paths import TEST_DATA_DIR
 
@@ -19,4 +20,5 @@ class TestSafaDatasetCreator(BaseTraceTest):
         self.assert_lists_have_the_same_vals(dataset.neg_link_ids, self.get_link_ids(self.NEG_LINKS))
 
     def get_safa_dataset_creator(self):
-        return SafaDatasetCreator(self.SAFA_DATA_DIR, self.DATA_CLEANING_STEPS)
+        data_cleaner = DataCleaner(self.DATA_CLEANING_STEPS)
+        return SafaDatasetCreator(self.SAFA_DATA_DIR, data_cleaner=data_cleaner)

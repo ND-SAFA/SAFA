@@ -1,7 +1,7 @@
 from typing import Dict
 
+from data.creators.readers.project.iproject_reader import IProjectParser
 from data.formats.safa_format import SafaFormat
-from data.readers.project.iproject_reader import IProjectParser
 from util.json_util import JSONUtil
 
 

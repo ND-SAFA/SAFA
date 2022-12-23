@@ -1,12 +1,11 @@
 import os
 from abc import ABC, abstractmethod
 from enum import Enum
-from typing import Callable, Dict, Generic, Optional, Type, TypeVar
+from typing import Callable, Dict, Generic, List, Optional, Type, TypeVar
 
 import pandas as pd
 
-from data.formats.safa_format import SafaFormat
-from data.readers.project.structure_keys import StructureKeys
+from data.creators.readers.project.structure_keys import StructureKeys
 from util.dataframe_util import DataFrameUtil
 from util.file_util import FileUtil
 from util.json_util import JSONUtil
@@ -21,25 +20,26 @@ class Wrapper:
         return self.f(*args, **kwargs)
 
 
-def read_folder(folder_path: str, exclude=None):
-    """
-    Creates artifact for each file in folder path.
-    :param folder_path: Path to folder containing artifact files.
-    :param exclude: The files to exclude in folder path.
-    :return: DataFrame containing artifact ids and tokens.
-    """
-    if exclude is None:
-        exclude = [".DS_Store"]
-    items = list(filter(lambda f: f not in exclude, os.listdir(folder_path)))
+def read_files_as_artifacts(files: List[str]):
     entries = []
-    for item in items:
-        file_path = os.path.join(folder_path, item)
+    for file in files:
         entry = {
-            SafaFormat.ARTIFACT_ID: item,
-            SafaFormat.SAFA_CVS_ARTIFACT_TOKEN: FileUtil.read_file(file_path)
+            StructureKeys.Artifact.ID: file,
+            StructureKeys.Artifact.BODY: FileUtil.read_file(file)
         }
         entries.append(entry)
     return pd.DataFrame(entries)
+
+
+def read_folder(path: str, exclude=None):
+    """
+    Creates artifact for each file in folder path.
+    :param path: Path to folder containing artifact files.
+    :param exclude: The files to exclude in folder path.
+    :return: DataFrame containing artifact ids and tokens.
+    """
+    files_in_path = FileUtil.get_file_list(path, exclude=exclude)
+    return read_files_as_artifacts(files_in_path)
 
 
 def read_json(data_path: str, entity_name: str = None):
@@ -85,7 +85,6 @@ class EntityReader(ABC, Generic[EntityType]):
         """
         required_properties = [StructureKeys.PATH]
         JSONUtil.require_properties(definition, required_properties)
-
         self.definition: Dict = definition
         self.path = os.path.join(base_path, self.get_property(StructureKeys.PATH))
         self.conversions: Dict[str, Dict] = conversions if conversions else None
@@ -107,8 +106,8 @@ class EntityReader(ABC, Generic[EntityType]):
         return DataFrameUtil.convert_columns(source_entities_df, column_conversion)
 
     def read_source_entities(self):
-        parser_params = self.get_property(StructureKeys.PARAMS) if StructureKeys.PARAMS in self.definition else {}
-        parser = EntityReader.get_entity_parser(self.path)
+        parser_params = self.get_property(StructureKeys.PARAMS, {})
+        parser = self.get_entity_parser()
         return parser(self.path, **parser_params)
 
     def read_column_conversion(self) -> Optional[Dict]:
@@ -119,15 +118,17 @@ class EntityReader(ABC, Generic[EntityType]):
         return None
 
     def get_property(self, property_name: str, default_value=None):
-        if property_name not in self.definition and not default_value:
+        if property_name not in self.definition and default_value is None:
             raise ValueError(self.definition, "does not contain property: ", property_name)
         return self.definition.get(property_name, default_value)
 
-    @staticmethod
-    def get_entity_parser(entity_path) -> Type[Callable]:
-        if os.path.isdir(entity_path):
+    def get_entity_parser(self) -> Type[Callable]:
+        if StructureKeys.PARSER in self.definition:
+            parser_key = self.get_property(StructureKeys.PARSER).upper()
+            return EntityFormats[parser_key].value
+        if os.path.isdir(self.path):
             return EntityFormats.FOLDER.value
-        data_file_name = os.path.basename(entity_path)
+        data_file_name = os.path.basename(self.path)
         for f, extensions in EntityFileTypes:
             for extension in extensions:
                 if extension in data_file_name:

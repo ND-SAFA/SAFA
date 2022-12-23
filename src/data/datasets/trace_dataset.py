@@ -56,7 +56,7 @@ class TraceDataset(AbstractDataset):
         """
         link_ids_to_rows = {}
         for link in self.links.values():
-            link_ids_to_rows[link.id] = [link.source.id, link.source.token, link.target.id, link.target.token,
+            link_ids_to_rows[link.id] = [link.source_body.id, link.source_body.token, link.target.id, link.target.token,
                                          int(link.is_true_link)]
         data = [link_ids_to_rows[link_id] for link_id in self.pos_link_ids + self.neg_link_ids]
         return pd.DataFrame(data,

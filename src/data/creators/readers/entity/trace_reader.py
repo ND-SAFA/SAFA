@@ -1,8 +1,8 @@
 from typing import Dict, List, TypedDict
 
+from data.creators.readers.entity.artifact_reader import ArtifactReader
+from data.creators.readers.entity.entity_reader import EntityReader
 from data.formats.safa_format import SafaFormat
-from data.readers.artifact_reader import ArtifactReader
-from data.readers.entity_reader import EntityReader
 from data.tree.artifact import Artifact
 from data.tree.trace_link import TraceLink
 from util.json_util import JSONUtil

@@ -1,4 +1,5 @@
 import json
+import os
 from typing import Dict
 
 
@@ -22,3 +23,16 @@ class FileUtil:
         """
         with open(file_path) as file:
             return json.load(file)
+
+    @staticmethod
+    def get_file_list(data_path: str, exclude=None):
+        if exclude is None:
+            exclude = [".DS_Store"]
+        if os.path.isfile(data_path):
+            files = [data_path]
+        elif os.path.isdir(data_path):
+            files = list(filter(lambda f: f not in exclude, os.listdir(data_path)))
+            files = list(map(lambda f: os.path.join(data_path, f), files))
+        else:
+            raise Exception("Unable to read pretraining data file path " + data_path)
+        return files

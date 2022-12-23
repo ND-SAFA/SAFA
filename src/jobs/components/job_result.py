@@ -6,6 +6,7 @@ from drf_yasg.openapi import FORMAT_UUID, Schema, TYPE_INTEGER, TYPE_STRING
 
 from jobs.components.job_status import JobStatus
 from train.metrics.supported_trace_metric import SupportedTraceMetric
+from util.base_object import BaseObject
 from util.uncased_dict import UncasedDict
 
 
@@ -20,7 +21,7 @@ class NpEncoder(json.JSONEncoder):
         return super(NpEncoder, self).default(obj)
 
 
-class JobResult:
+class JobResult(BaseObject):
     JOB_ID = "jobID"
     EXCEPTION = "exception"
     STATUS = "status"

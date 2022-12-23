@@ -9,17 +9,19 @@ from abc import abstractmethod
 from jobs.components.job_args import JobArgs
 from jobs.components.job_status import JobStatus
 from jobs.components.job_result import JobResult
-from server.storage.safa_storage import SafaStorage
 from models.model_manager import ModelManager
+from server.storage.safa_storage import SafaStorage
+from util.base_object import BaseObject
 
 
-class AbstractJob(threading.Thread):
+class AbstractJob(threading.Thread, BaseObject):
     OUTPUT_FILENAME = "output.json"
 
-    def __init__(self, job_args: JobArgs, model_manager: ModelManager = None, **kwargs):
+    def __init__(self, job_args: JobArgs, model_manager: ModelManager = None):
         """
         The base job class
         :param job_args: The arguments to the job.
+        :param model_manager: the model manager
         """
         super().__init__()
         self.job_args = job_args

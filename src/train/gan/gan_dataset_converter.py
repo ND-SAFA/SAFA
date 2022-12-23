@@ -10,6 +10,7 @@ from data.datasets.pre_train_dataset import PreTrainDataset
 from data.datasets.trace_dataset import TraceDataset
 from models.model_manager import ModelManager
 from train.trainer_args import TrainerArgs
+from util.base_object import BaseObject
 
 UNLABELED_CLASS = 2
 BINARY_LABEL_LIST = [0, 1, UNLABELED_CLASS]
@@ -18,7 +19,7 @@ UnlabeledExample = Tuple[str, None]
 Example = Union[LabeledExample, UnlabeledExample]
 
 
-class GanDatasetConverter:
+class GanDatasetConverter(BaseObject):
 
     def __init__(self, trainer_args: TrainerArgs, train_dataset: TraceDataset, pre_train_dataset: PreTrainDataset = None,
                  label_list: List = None):

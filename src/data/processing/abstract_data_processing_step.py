@@ -5,6 +5,8 @@ from typing import List, Tuple, Iterable, Any
 
 import math
 
+from util.base_object import BaseObject
+
 
 class ProcessingOrder(enum.Enum):
     BEFORE_WORD_SPLIT = -1
@@ -15,7 +17,7 @@ class ProcessingOrder(enum.Enum):
 
 
 @total_ordering
-class AbstractDataProcessingStep(ABC):
+class AbstractDataProcessingStep(BaseObject, ABC):
     WORD_SEP = " "
 
     def __init__(self, order: ProcessingOrder = ProcessingOrder.ANY):

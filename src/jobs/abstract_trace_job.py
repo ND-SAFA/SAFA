@@ -3,6 +3,7 @@ from abc import ABC
 from data.datasets.trainer_dataset_manager import TrainerDatasetManager
 from jobs.abstract_job import AbstractJob
 from jobs.components.job_args import JobArgs
+from jobs.create_datasets_job import CreateDatasetsJob
 from models.model_manager import ModelManager
 from train.trace_trainer import TraceTrainer
 from train.trainer_args import TrainerArgs
@@ -22,8 +23,8 @@ class AbstractTraceJob(AbstractJob, ABC):
         super().__init__(job_args=job_args, model_manager=model_manager)
         self.trainer_args = trainer_args
         self.trainer_dataset_manager = trainer_dataset_manager
-        self.saved_dataset_paths = self.trainer_dataset_manager.save_dataset_splits(job_args.output_dir) \
-            if job_args.save_dataset_splits else []
+        if job_args.save_dataset_splits:
+            CreateDatasetsJob(job_args, trainer_dataset_manager).run()
         self._trainer = None
 
     def get_trainer(self, **kwargs) -> TraceTrainer:

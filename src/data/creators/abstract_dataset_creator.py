@@ -4,9 +4,10 @@ from typing import List, Union
 from data.datasets.pre_train_dataset import PreTrainDataset
 from data.datasets.trace_dataset import TraceDataset
 from data.processing.cleaning.data_cleaner import DataCleaner
+from util.base_object import BaseObject
 
 
-class AbstractDatasetCreator(ABC):
+class AbstractDatasetCreator(BaseObject, ABC):
 
     def __init__(self, data_cleaner: DataCleaner = None):
         """

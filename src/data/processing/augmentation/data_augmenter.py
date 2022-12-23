@@ -8,7 +8,7 @@ from util.base_object import BaseObject
 from util.enum_utils import get_enum_from_name
 
 
-class DataAugmenter(AbstractDataProcessor, BaseObject):
+class DataAugmenter(AbstractDataProcessor):
     ordered_steps: List[AbstractDataAugmentationStep]
 
     @overrides(AbstractDataProcessor)

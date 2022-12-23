@@ -1,10 +1,11 @@
 from dataclasses import dataclass
 
 from config.constants import SAVE_OUTPUT_DEFAULT
+from util.base_object import BaseObject
 
 
 @dataclass
-class JobArgs:
+class JobArgs(BaseObject):
     """
     Where model and logs will be saved to.
     """

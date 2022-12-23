@@ -2,9 +2,10 @@ from abc import abstractmethod
 from typing import Any
 
 from models.model_manager import ModelManager
+from util.base_object import BaseObject
 
 
-class AbstractDataset:
+class AbstractDataset(BaseObject):
 
     @abstractmethod
     def to_trainer_dataset(self, model_generator: ModelManager) -> Any:

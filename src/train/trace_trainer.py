@@ -16,9 +16,10 @@ from data.datasets.trainer_dataset_manager import TrainerDatasetManager
 from train.metrics.supported_trace_metric import get_metric_name, get_metric_path
 from models.model_manager import ModelManager
 from train.trainer_args import TrainerArgs
+from util.base_object import BaseObject
 
 
-class TraceTrainer(Trainer):
+class TraceTrainer(Trainer, BaseObject):
     """
     Responsible for using given model for training and prediction using given data.
     """

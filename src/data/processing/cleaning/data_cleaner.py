@@ -4,15 +4,11 @@ from config.override import overrides
 from data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 from data.processing.abstract_data_processor import AbstractDataProcessor
 from data.processing.cleaning.supported_data_cleaning_step import SupportedDataCleaningStep
-from experiments.variables.definition_variable import DefinitionVariable
-from experiments.variables.multi_variable import MultiVariable
-from experiments.variables.typed_definition_variable import TypedDefinitionVariable
-from experiments.variables.variable import Variable
 from util.base_object import BaseObject
 from util.enum_utils import get_enum_from_name
 
 
-class DataCleaner(AbstractDataProcessor, BaseObject):
+class DataCleaner(AbstractDataProcessor):
 
     def run(self, tokens: List[str], **kwargs) -> List[str]:
         """

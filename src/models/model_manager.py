@@ -7,9 +7,10 @@ from transformers.tokenization_utils import PreTrainedTokenizer
 
 from config.constants import MAX_SEQ_LENGTH_DEFAULT
 from models.model_properties import ModelArchitectureType, ModelSize, ModelTask
+from util.base_object import BaseObject
 
 
-class ModelManager:
+class ModelManager(BaseObject):
     """
     Represents a learning model
     """

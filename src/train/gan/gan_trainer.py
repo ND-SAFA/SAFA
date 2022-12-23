@@ -14,9 +14,9 @@ from data.datasets.pre_train_dataset import PreTrainDataset
 from data.datasets.trace_dataset import TraceDataset
 from models.base_models.descriminator import Discriminator
 from models.base_models.generator import Generator
-from models.model_generator import ModelGenerator
+from models.model_manager import ModelManager
 from train.gan.gan_dataset_converter import GanDatasetConverter
-from train.trace_args import TraceArgs
+from train.trainer_args import TrainerArgs
 from train.trace_trainer import TraceTrainer
 
 
@@ -26,8 +26,8 @@ class GanTrainer(TraceTrainer):
     Github: https://github.com/crux82/ganbert-pytorch/blob/main/GANBERT_pytorch.ipynb
     """
 
-    def __init__(self, args: TraceArgs, model_generator: ModelGenerator, **kwargs):
-        super().__init__(args, model_generator, **kwargs)
+    def __init__(self, args: TrainerArgs, model_manager: ModelManager, **kwargs):
+        super().__init__(args, model_manager, **kwargs)
         self.transformer = None
 
     def perform_training(self, checkpoint: str = None) -> Dict:
@@ -310,7 +310,7 @@ class GanTrainer(TraceTrainer):
         return output
 
     def create_models(self):
-        transformer = AutoModel.from_pretrained("bert-base-uncased")  # self.model_generator.get_model()
+        transformer = AutoModel.from_pretrained("bert-base-uncased")  # self.model_manager.get_model()
         hidden_size = int(transformer.config.hidden_size)
         # Define the number and width of hidden layers
         hidden_levels_g = [hidden_size for i in range(0, self.args.n_hidden_layers_g)]
@@ -345,7 +345,7 @@ class GanTrainer(TraceTrainer):
         gan_dataset_converter = GanDatasetConverter(self.args,
                                                     trace_dataset,
                                                     pre_train_dataset=pre_train_dataset)
-        return gan_dataset_converter.to_gan_dataset(self.model_generator)
+        return gan_dataset_converter.to_gan_dataset(self.model_manager)
 
     @staticmethod
     def format_time(elapsed: float):

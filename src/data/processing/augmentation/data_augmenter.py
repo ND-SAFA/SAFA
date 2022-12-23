@@ -1,22 +1,15 @@
-from typing import Dict, List, Tuple, Type
+from typing import Dict, List, Tuple, Type, Any
 
 from config.override import overrides
-from data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 from data.processing.abstract_data_processor import AbstractDataProcessor
 from data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
+from data.processing.augmentation.supported_data_augmentation_step import SupportedAugmentationStep
+from util.base_object import BaseObject
+from util.enum_utils import get_enum_from_name
 
 
 class DataAugmenter(AbstractDataProcessor):
     ordered_steps: List[AbstractDataAugmentationStep]
-
-    def __init__(self, steps: List[AbstractDataProcessingStep], run_all: bool = False):
-        """
-        Constructs augmenter with given steps and ability to activate no augmentation limit.
-        :param steps: The steps to run for augmentation.
-        :param run_all: Whether to run every step on all positive links.
-        """
-        super().__init__(steps)
-        self.run_all = run_all
 
     @overrides(AbstractDataProcessor)
     def run(self, data_entries: List[Tuple[str, str]], n_total_expected: int,
@@ -35,17 +28,13 @@ class DataAugmenter(AbstractDataProcessor):
         steps2run = self._get_steps_to_run(exclude_all_but_step_type, include_all_but_step_type)
         augmentation_results = {}
         for step in steps2run:
-            if self.run_all:
-                n_expected_for_step = -1
-            else:
-                n_expected_for_step = self._get_n_expected_for_step(step, n_needed)
+            n_expected_for_step = self._get_n_expected_for_step(step, n_needed)
             augmentation_result = step.run(data_entries, n_expected_for_step)
             augmentation_results[step.get_id()] = augmentation_result
         return augmentation_results
 
     def _get_steps_to_run(self, exclude_all_but_step_type: Type[AbstractDataAugmentationStep] = None,
-                          include_all_but_step_type: Type[AbstractDataAugmentationStep] = None) -> List[
-        AbstractDataAugmentationStep]:
+                          include_all_but_step_type: Type[AbstractDataAugmentationStep] = None) -> List[AbstractDataAugmentationStep]:
         """
         Gets the steps that should be run
         :param exclude_all_but_step_type: if provided, will ONLY run step of given type
@@ -94,3 +83,14 @@ class DataAugmenter(AbstractDataProcessor):
         :return: the n_expected for the given step
         """
         return round(step.percent_to_weight * n_total_expected)
+
+    @classmethod
+    @overrides(BaseObject)
+    def _get_expected_class_by_type(cls, abstract_class: Type, child_class_name: str) -> Any:
+        """
+        Returns the correct expected class when given the abstract parent class type and name of child class
+        :param abstract_class: the abstract parent class type
+        :param child_class_name: the name of the child class
+        :return: the expected type
+        """
+        return get_enum_from_name(SupportedAugmentationStep, child_class_name).value

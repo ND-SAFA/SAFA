@@ -5,16 +5,16 @@ import numpy as np
 from transformers.trainer_utils import PredictionOutput
 
 from config.constants import VALIDATION_PERCENTAGE_DEFAULT
-from data.creators.abstract_dataset_creator import AbstractDatasetCreator
-from data.creators.split_dataset_creator import SplitDatasetCreator
-from data.creators.supported_dataset_creator import SupportedDatasetCreator
-from data.datasets.dataset_role import DatasetRole
-from data.datasets.trainer_datasets_container import TrainerDatasetsContainer
-from data.processing.abstract_data_processing_step import AbstractDataProcessingStep
-from data.tree.artifact import Artifact
-from data.tree.trace_link import TraceLink
 from jobs.components.job_result import JobResult
 from test.base_test import BaseTest
+from data.datasets.creators.abstract_dataset_creator import AbstractDatasetCreator
+from data.datasets.creators.split_dataset_creator import SplitDatasetCreator
+from data.datasets.creators.supported_dataset_creator import SupportedDatasetCreator
+from data.tree.artifact import Artifact
+from data.tree.trace_link import TraceLink
+from data.datasets.dataset_role import DatasetRole
+from data.datasets.trainer_dataset_manager import TrainerDatasetManager
+from data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 
 
 class BaseTraceTest(BaseTest):
@@ -95,16 +95,15 @@ class BaseTraceTest(BaseTest):
         if not pre_processing_steps:
             pre_processing_steps = BaseTest.DATA_CLEANING_STEPS
         if include_pre_processing:
-            dataset_creator_params["data_cleaning_steps"] = BaseTest.DATA_CLEANING_STEPS
+            dataset_creator_params["data_cleaner"] = BaseTest.DATA_CLEANING_STEPS
         abstract_dataset = dataset_creator_class.value(**dataset_creator_params, **kwargs)
         return {dataset_role: abstract_dataset}
 
     @staticmethod
-    def create_trainer_dataset_container(dataset_map: Dict[DatasetRole, AbstractDatasetCreator],
-                                         split_train_dataset=True):
+    def create_trainer_dataset_container(dataset_map: Dict[DatasetRole, AbstractDatasetCreator], split_train_dataset=True):
         if split_train_dataset:
-            dataset_map[DatasetRole.VAL] = SplitDatasetCreator(val_percentage=VALIDATION_PERCENTAGE_DEFAULT)
-        return TrainerDatasetsContainer.create_from_map(dataset_map)
+            dataset_map[DatasetRole.VAL] = SplitDatasetCreator(split_percentage=VALIDATION_PERCENTAGE_DEFAULT)
+        return TrainerDatasetManager.create_from_map(dataset_map)
 
     def assert_prediction_output_matches_expected(self, output: dict, threshold: int = 0.05):
         if JobResult.PREDICTIONS not in output:

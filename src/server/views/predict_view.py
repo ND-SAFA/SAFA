@@ -2,9 +2,9 @@ from django.http import HttpRequest
 from django.views.decorators.csrf import csrf_exempt
 from drf_yasg.utils import swagger_auto_schema
 
-from jobs.predict_job import PredictJob
-from server.serializers.job_factory.prediction_request_serializer import PredictionRequestSerializer
 from jobs.components.job_result import JobResult
+from jobs.predict_job import PredictJob
+from server.serializers.experiment_serializer import ExperimentSerializer
 from server.views.abstract_trace_view import AbstractTraceView
 
 
@@ -14,7 +14,7 @@ class PredictView(AbstractTraceView):
     """
 
     responses = AbstractTraceView.get_responses([JobResult.MODEL_PATH, JobResult.STATUS, JobResult.EXCEPTION])
-    serializer = PredictionRequestSerializer
+    serializer = ExperimentSerializer
 
     def __init__(self, **kwargs):
         super().__init__(self.serializer, PredictJob, **kwargs)

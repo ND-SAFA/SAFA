@@ -1,4 +1,4 @@
-from typing import Tuple, List
+from typing import List, Tuple
 
 from config.constants import RESAMPLE_RATE_DEFAULT
 from config.override import overrides
@@ -40,7 +40,8 @@ class ResampleStep(AbstractDataAugmentationStep):
 
     @staticmethod
     @overrides(AbstractDataAugmentationStep)
-    def _add_augmented_data(augmented_data: List, index_reference: int, augmented_data_entries: List, index_references: List) -> None:
+    def _add_augmented_data(augmented_data: List, index_reference: int, augmented_data_entries: List,
+                            index_references: List) -> None:
         """
         Adds the augmented data to the appropriate lists
         :param augmented_data: the augmented data

@@ -1,44 +1,27 @@
 from dataclasses import dataclass
 
 from config.constants import SAVE_OUTPUT_DEFAULT
-from models.model_properties import ModelArchitectureType, ModelTask
-from train.trace_args import TraceArgs
+from util.base_object import BaseObject
 
 
 @dataclass
-class JobArgs:
+class JobArgs(BaseObject):
     """
     Where model and logs will be saved to.
     """
     output_dir: str = None
     """
-    Path to the model weights (e.g. loading pretrained model).
-    """
-    model_path: str = None
-    """
-    The model used to load the architecture.
-    """
-    model_architecture: ModelArchitectureType = None
-    """
-    Defines the task architecture.
-    """
-    model_task: ModelTask = None
-    """
-    Initialized post-init to contain all arguments for tracing jobs
-    """
-    trace_args: TraceArgs = None
-    """
     If True, saves the output to the output_dir
     """
     save_job_output: bool = SAVE_OUTPUT_DEFAULT
     """
+    If True, saves the dataset splits to the output_dir
+    """
+    save_dataset_splits: bool = False
+    """
     Sets the random seed for a job
     """
     random_seed: int = None
-    """
-    Path to hub to save model to.
-    """
-    hub_path: str = None
 
     def as_kwargs(self):
         return {attr_name: getattr(self, attr_name) for attr_name in dir(self) if not attr_name.startswith("__")}

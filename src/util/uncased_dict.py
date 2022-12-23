@@ -2,11 +2,19 @@ from typing import Any, Dict
 
 
 class UncasedDict(dict):
-    def __init__(self, dict_: Dict = None):
+    def __init__(self, dict_: Dict[Any, Any] = None):
         super().__init__()
         if dict_:
-            for key, val in dict_.items():
-                self[key] = val
+            self.__initialize_as_dict(dict_)
+
+    def __initialize_as_dict(self, dict_: Dict[Any, Any]) -> None:
+        """
+        Moves the input dictionary into its own internal dictionary representation
+        :param dict_: input dictionary to set internal attributes
+        :return: None
+        """
+        for key, val in dict_.items():
+            self[key] = val
 
     @staticmethod
     def _process_key(key: str) -> str:
@@ -24,7 +32,7 @@ class UncasedDict(dict):
         :param value: the value to process
         :return: the processed value
         """
-        if isinstance(value, dict):
+        if isinstance(value, dict) and not isinstance(value, UncasedDict):
             processed_value = UncasedDict()
             for key, val in value.items():
                 processed_value[key] = val

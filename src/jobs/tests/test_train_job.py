@@ -9,7 +9,7 @@ from jobs.train_job import TrainJob
 from jobs.tests.base_job_test import BaseJobTest
 from test.paths.paths import TEST_DATA_DIR
 from data.datasets.abstract_dataset import AbstractDataset
-from data.creators.supported_dataset_creator import SupportedDatasetCreator
+from data.datasets.creators.supported_dataset_creator import SupportedDatasetCreator
 from data.datasets.dataset_role import DatasetRole
 from train.trace_trainer import TraceTrainer
 
@@ -27,7 +27,7 @@ class TestTrainJob(BaseJobTest):
 
     def test_split_train_dataset(self):
         job = self._get_job()
-        self.assertTrue(job.trace_args.trainer_dataset_container[DatasetRole.EVAL] is not None)
+        self.assertTrue(job.trainer_args.trainer_dataset_container[DatasetRole.EVAL] is not None)
 
     @staticmethod
     @overrides(BaseJobTest)
@@ -46,5 +46,5 @@ class TestTrainJob(BaseJobTest):
                                                      split_train_dataset=True)
         job_args = JobArgs(**test_params)
         job = TrainJob(job_args)
-        self.assertEquals(job.trace_args.num_train_epochs, 1)
+        self.assertEquals(job.trainer_args.num_train_epochs, 1)
         return job

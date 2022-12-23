@@ -1,29 +1,31 @@
 import os
 import random
+import transformers
 import threading
 import traceback
 import uuid
 from abc import abstractmethod
 
-import transformers
-
 from jobs.components.job_args import JobArgs
-from jobs.components.job_result import JobResult
 from jobs.components.job_status import JobStatus
-from models.model_generator import ModelGenerator
+from jobs.components.job_result import JobResult
+from models.model_manager import ModelManager
 from server.storage.safa_storage import SafaStorage
+from util.base_object import BaseObject
 
 
-class AbstractJob(threading.Thread):
+class AbstractJob(threading.Thread, BaseObject):
     OUTPUT_FILENAME = "output.json"
 
-    def __init__(self, job_args: JobArgs, **kwargs):
+    def __init__(self, job_args: JobArgs, model_manager: ModelManager = None):
         """
         The base job class
         :param job_args: The arguments to the job.
+        :param model_manager: the model manager
         """
         super().__init__()
         self.job_args = job_args
+        self.model_manager = model_manager
         if self.job_args.random_seed:
             self.set_random_seed(self.job_args.random_seed)
         self.result = JobResult()
@@ -31,18 +33,6 @@ class AbstractJob(threading.Thread):
         self.output_dir = job_args.output_dir
         self.job_output_filepath = self._get_output_filepath(self.output_dir, self.id)
         self.save_job_output = job_args.save_job_output
-        self.model_path = job_args.model_path
-        self.model_task = job_args.model_task
-        self.__model_generator = None
-
-    def get_model_generator(self) -> ModelGenerator:
-        """
-        Gets the model generator for the job given a base model and model path
-        :return: the model generator
-        """
-        if self.__model_generator is None:
-            self.__model_generator = ModelGenerator(model_path=self.model_path, model_task=self.model_task)
-        return self.__model_generator
 
     def run(self) -> None:
         """

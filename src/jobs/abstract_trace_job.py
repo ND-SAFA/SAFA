@@ -1,23 +1,30 @@
 from abc import ABC
 
+from data.datasets.trainer_dataset_manager import TrainerDatasetManager
 from jobs.abstract_job import AbstractJob
 from jobs.components.job_args import JobArgs
+from jobs.create_datasets_job import CreateDatasetsJob
+from models.model_manager import ModelManager
 from train.trace_trainer import TraceTrainer
+from train.trainer_args import TrainerArgs
 
 
 class AbstractTraceJob(AbstractJob, ABC):
 
-    def __init__(self, job_args: JobArgs):
+    def __init__(self, job_args: JobArgs, model_manager: ModelManager,
+                 trainer_dataset_manager: TrainerDatasetManager, trainer_args: TrainerArgs):
         """
         The base job class for tracing jobs
+        :param job_args: the arguments for the job
+        :param model_manager: the manages the model necessary for the job
+        :param trainer_dataset_manager: manages all datasets for the trainer
+        :param trainer_args: other arguments needed for the trainer
         """
-        job_args.model_path = job_args.model_path
-        super().__init__(job_args)
-        self.trace_args = job_args.trace_args
-        if self.trace_args.trainer_dataset_container:
-            self.saved_dataset_paths = self.trace_args.trainer_dataset_container.save_dataset_splits(
-                job_args.output_dir) \
-                if self.trace_args.save_dataset_splits else []
+        super().__init__(job_args=job_args, model_manager=model_manager)
+        self.trainer_args = trainer_args
+        self.trainer_dataset_manager = trainer_dataset_manager
+        if job_args.save_dataset_splits:
+            CreateDatasetsJob(job_args, trainer_dataset_manager).run()
         self._trainer = None
 
     def get_trainer(self, **kwargs) -> TraceTrainer:
@@ -27,6 +34,6 @@ class AbstractTraceJob(AbstractJob, ABC):
         :return: the trainer
         """
         if self._trainer is None:
-            self._trainer = TraceTrainer(args=self.job_args.trace_args, model_generator=self.get_model_generator(),
-                                         **kwargs)
+            self._trainer = TraceTrainer(trainer_args=self.trainer_args, trainer_dataset_manager=self.trainer_dataset_manager,
+                                         model_manager=self.model_manager, **kwargs)
         return self._trainer

@@ -1,6 +1,6 @@
-import math
 from typing import List, Tuple, Union
 
+import math
 import numpy as np
 import torch
 from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
@@ -8,9 +8,9 @@ from torch.utils.data.dataset import TensorDataset
 
 from data.datasets.pre_train_dataset import PreTrainDataset
 from data.datasets.trace_dataset import TraceDataset
-from models.model_generator import ModelGenerator
-from train.trace_args import TraceArgs
-from util.file_util import FileUtil
+from models.model_manager import ModelManager
+from train.trainer_args import TrainerArgs
+from util.base_object import BaseObject
 
 UNLABELED_CLASS = 2
 BINARY_LABEL_LIST = [0, 1, UNLABELED_CLASS]
@@ -19,21 +19,21 @@ UnlabeledExample = Tuple[str, None]
 Example = Union[LabeledExample, UnlabeledExample]
 
 
-class GanDatasetConverter:
+class GanDatasetConverter(BaseObject):
 
-    def __init__(self, trace_args: TraceArgs, train_dataset: TraceDataset, pre_train_dataset: PreTrainDataset = None,
+    def __init__(self, trainer_args: TrainerArgs, train_dataset: TraceDataset, pre_train_dataset: PreTrainDataset = None,
                  label_list: List = None):
         """
         Responsible for creating a data that the GAN will understand from a csv file containing two columns
         (text, label) where text contains the concatenated source and target artifacts. The label is either 0 or 1
         representing traced or not traced.
         """
-        self.trace_args = trace_args
+        self.trace_args = trainer_args
         self.labeled_examples = self.create_labeled_examples(train_dataset)
         self.unlabeled_examples = self.create_unlabeled_exampled(pre_train_dataset) if pre_train_dataset else None
         self.label_list = label_list if label_list else BINARY_LABEL_LIST
 
-    def to_gan_dataset(self, model_generator: ModelGenerator) -> DataLoader:
+    def to_gan_dataset(self, model_generator: ModelManager) -> DataLoader:
         """
         Creates dataloader containing labeled and unlabeled examples for gan.
         :return:
@@ -75,7 +75,7 @@ class GanDatasetConverter:
             sampler=sampler(tensor_dataset),
             batch_size=self.trace_args.train_batch_size)  # Trains with this batch size.
 
-    def tokenize_examples(self, examples, label_map, model_generator: ModelGenerator):
+    def tokenize_examples(self, examples, label_map, model_generator: ModelManager):
         input_ids = []
         label_id_array = []
         label_mask_array = []
@@ -166,7 +166,7 @@ class GanDatasetConverter:
         labeled_examples: List[LabeledExample] = []
         for trace_id, trace in trace_dataset.links.items():
             trace_label = 1 if trace.is_true_link else 0
-            labeled_examples.append((trace.source_body.token, trace.target.token, trace_label))
+            labeled_examples.append((trace.source.token, trace.target.token, trace_label))
         return labeled_examples
 
     @staticmethod
@@ -176,9 +176,19 @@ class GanDatasetConverter:
         :param pre_training_dataset: The data containing pre-training file.
         :return: List of unlabeled examples.
         """
-        pre_training_file = FileUtil.read_file(pre_training_dataset.training_file_path)
+        pre_training_file = GanDatasetConverter.read_file(pre_training_dataset.training_file_path)
         labeled_examples: List[UnlabeledExample] = []
 
         for line in pre_training_file.split("\n"):  # TODO : remove assumption that file must be separated by newlines
             labeled_examples.append((line, None))
         return labeled_examples
+
+    @staticmethod
+    def read_file(file_path: str) -> str:
+        """
+        Reads file at given path if exists.
+        :param file_path: Path of the file to read.
+        :return: The content of the file.
+        """
+        with open(file_path) as file:
+            return file.read()

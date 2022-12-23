@@ -8,8 +8,8 @@ from jobs.components.job_args import JobArgs
 from jobs.tests.test_train_job import TestTrainJob
 from jobs.tests.base_job_test import BaseJobTest
 from test.paths.paths import TEST_DATA_DIR, TEST_OUTPUT_DIR
-from data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
-from data.creators.supported_dataset_creator import SupportedDatasetCreator
+from data.datasets.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
+from data.datasets.creators.supported_dataset_creator import SupportedDatasetCreator
 from data.datasets.dataset_role import DatasetRole
 from train.trace_trainer import TraceTrainer
 

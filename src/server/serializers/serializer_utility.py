@@ -3,9 +3,8 @@ from typing import Dict, List, OrderedDict, Tuple
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from data.creators.abstract_dataset_creator import AbstractDatasetCreator
-from data.datasets.trainer_datasets_container import TrainerDatasetsContainer
-from data.processing.augmentation.data_augmenter import DataAugmenter
+from data.datasets.creators.abstract_dataset_creator import AbstractDatasetCreator
+from data.datasets.trainer_dataset_manager import TrainerDatasetManager
 from data.processing.cleaning.separate_joined_words_step import SeparateJoinedWordsStep
 
 
@@ -28,14 +27,9 @@ class SerializerUtility:
         :param data_augmenter: The augmenter responsible for generating new positive samples.
         :return: None
         """
-        container_kwargs = {}
-        for dataset_param, container_param in dataset_params:
-            if dataset_param in kwargs:
-                dataset_creator: AbstractDatasetCreator = kwargs.pop(dataset_param)
-                container_kwargs[container_param] = dataset_creator
-        trainer_datasets_container = TrainerDatasetsContainer(data_augmenter=data_augmenter,
-                                                              **container_kwargs,
-                                                              **addition_kwargs)
+        dataset_creator: AbstractDatasetCreator = kwargs.pop(dataset_param)
+        container_kwargs = {container_param: dataset_creator}
+        trainer_datasets_container = TrainerDatasetManager(**container_kwargs)
         kwargs[export_param] = trainer_datasets_container
 
     @staticmethod

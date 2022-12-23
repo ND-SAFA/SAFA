@@ -11,16 +11,16 @@ from jobs.components.job_status import JobStatus
 from test.base_trace_test import BaseTraceTest
 from test.paths.paths import TEST_OUTPUT_DIR
 from data.datasets.dataset_role import DatasetRole
-from models.model_generator import ModelGenerator
-from train.trace_args import TraceArgs
+from models.model_manager import ModelManager
+from train.trainer_args import TrainerArgs
 
 
 class BaseJobTest(BaseTraceTest, ABC):
     _JOB_PARAMS_BASE = {**BaseTraceTest.MODEL_GENERATOR_PARAMS,
                         "output_dir": TEST_OUTPUT_DIR}
 
-    @patch.object(ModelGenerator, '_ModelGenerator__load_model')
-    @patch.object(ModelGenerator, 'get_tokenizer')
+    @patch.object(ModelManager, '_ModelManager__load_model')
+    @patch.object(ModelManager, 'get_tokenizer')
     def _test_run_success(self, get_tokenizer_mock: mock.MagicMock, load_model_mock: mock.MagicMock):
         load_model_mock.return_value = self.get_test_model()
         get_tokenizer_mock.return_value = self.get_test_tokenizer()
@@ -28,8 +28,8 @@ class BaseJobTest(BaseTraceTest, ABC):
         job.run()
         self.assert_output_on_success(self._load_job_output(job))
 
-    @patch.object(ModelGenerator, "get_model")
-    @patch.object(ModelGenerator, "get_tokenizer")
+    @patch.object(ModelManager, "get_model")
+    @patch.object(ModelManager, "get_tokenizer")
     def _test_run_failure(self, get_tokenizer_mock: mock.MagicMock, get_model_mock: mock.MagicMock):
         get_tokenizer_mock.return_value = self.get_test_tokenizer()
         get_model_mock.return_value = ValueError()
@@ -55,8 +55,8 @@ class BaseJobTest(BaseTraceTest, ABC):
         trainer_dataset_container = self.create_trainer_dataset_container(role2dataset,
                                                                           split_train_dataset=split_train_dataset)
         output_dir = os.path.join(test_args["output_dir"], "trace")
-        test_args["trace_args"] = TraceArgs(output_dir=output_dir, trainer_dataset_container=trainer_dataset_container,
-                                            **BaseJobTest.TRACE_ARGS_PARAMS)
+        test_args["trainer_args"] = TrainerArgs(output_dir=output_dir, trainer_dataset_container=trainer_dataset_container,
+                                              **BaseJobTest.TRACE_ARGS_PARAMS)
         return test_args
 
     @staticmethod
@@ -70,8 +70,8 @@ class BaseJobTest(BaseTraceTest, ABC):
         parsed_kwargs["baseModel"] = parsed_kwargs["baseModel"].name
         return parsed_kwargs
 
-    @patch.object(ModelGenerator, "get_tokenizer")
-    @patch.object(ModelGenerator, "get_model")
+    @patch.object(ModelManager, "get_tokenizer")
+    @patch.object(ModelManager, "get_model")
     def get_job(self, get_model_mock: mock.MagicMock, get_tokenizer_mock: mock.MagicMock):
         get_model_mock.return_value = self.get_test_model()
         get_tokenizer_mock.return_value = self.get_test_tokenizer()

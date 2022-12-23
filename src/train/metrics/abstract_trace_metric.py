@@ -3,8 +3,10 @@ from abc import ABC, abstractmethod
 import datasets
 from datasets import MetricInfo
 
+from util.base_object import BaseObject
 
-class AbstractTraceMetric(datasets.Metric, ABC):
+
+class AbstractTraceMetric(datasets.Metric, BaseObject, ABC):
 
     @abstractmethod
     def _info(self) -> MetricInfo:

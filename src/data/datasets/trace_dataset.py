@@ -8,13 +8,13 @@ import pandas as pd
 
 from data.datasets.abstract_dataset import AbstractDataset
 from data.datasets.data_key import DataKey
-from data.formats.csv_format import CSVFormat
+from data.datasets.formats.csv_format import CSVFormat
 from data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
 from data.processing.augmentation.data_augmenter import DataAugmenter
 from data.processing.augmentation.source_target_swap_step import SourceTargetSwapStep
 from data.tree.artifact import Artifact
 from data.tree.trace_link import TraceLink
-from models.model_generator import ModelGenerator
+from models.model_manager import ModelManager
 from models.model_properties import ModelArchitectureType
 
 
@@ -37,7 +37,7 @@ class TraceDataset(AbstractDataset):
         self._shuffle_link_ids(self.pos_link_ids)
         self._shuffle_link_ids(self.neg_link_ids)
 
-    def to_trainer_dataset(self, model_generator: ModelGenerator) -> List[Dict]:
+    def to_trainer_dataset(self, model_generator: ModelManager) -> List[Dict]:
         """
         Converts trace links in data to feature entries used by Huggingface (HF) trainer.
         :param model_generator: The model generator determining architecture and feature function for trace links.
@@ -56,7 +56,7 @@ class TraceDataset(AbstractDataset):
         """
         link_ids_to_rows = {}
         for link in self.links.values():
-            link_ids_to_rows[link.id] = [link.source_body.id, link.source_body.token, link.target.id, link.target.token,
+            link_ids_to_rows[link.id] = [link.source.id, link.source.token, link.target.id, link.target.token,
                                          int(link.is_true_link)]
         data = [link_ids_to_rows[link_id] for link_id in self.pos_link_ids + self.neg_link_ids]
         return pd.DataFrame(data,
@@ -84,16 +84,16 @@ class TraceDataset(AbstractDataset):
             self.neg_link_ids.append(new_link.id)
         return new_link.id
 
-    def augment_pos_links(self, data_augmenter: DataAugmenter) -> None:
+    def augment_pos_links(self, augmenter: DataAugmenter) -> None:
         """
         Augments the positive links to balance the data using the given augmentation steps
-        :param data_augmenter: The augmenter responsible for generating new positive samples.
+        :param augmenter: the augmentation to use for augmentation
         :return: None
         """
-        augmentation_runs = [lambda data: data_augmenter.run(data, n_total_expected=2 * len(data),
-                                                             exclude_all_but_step_type=SourceTargetSwapStep),
-                             lambda data: data_augmenter.run(data, n_total_expected=len(self.neg_link_ids),
-                                                             include_all_but_step_type=SourceTargetSwapStep)]
+        augmentation_runs = [lambda data: augmenter.run(data, n_total_expected=2 * len(data),
+                                                        exclude_all_but_step_type=SourceTargetSwapStep),
+                             lambda data: augmenter.run(data, n_total_expected=len(self.neg_link_ids),
+                                                        include_all_but_step_type=SourceTargetSwapStep)]
         for run in augmentation_runs:
             pos_links, data_entries = self._get_data_entries_for_augmentation()
             augmentation_results = run(data_entries)
@@ -126,17 +126,17 @@ class TraceDataset(AbstractDataset):
         percent_splits = [1 - sum(percent_splits)] + percent_splits
         return self._split_multiple_helper(percent_splits, splits=[self])
 
-    def prepare_for_training(self, data_augmenter: DataAugmenter = None) -> None:
+    def prepare_for_training(self, augmenter: DataAugmenter = None) -> None:
         """
         Resamples positive links and resizes negative links to create 50-50 ratio.
-        :param data_augmenter: The augmenter responsible for generating new positive samples.
+        :param augmenter: the augmenter to use for augmentation
         :return: Prepared trace data
         """
         print("# Pos:", len(self.pos_link_ids))
         print("# Neg:", len(self.neg_link_ids))
         if len(self.pos_link_ids) > 0:
-            if data_augmenter:
-                self.augment_pos_links(data_augmenter)
+            if augmenter:
+                self.augment_pos_links(augmenter)
             self.resize_neg_links(len(self.pos_link_ids), include_duplicates=True)
 
     def prepare_for_testing(self) -> None:

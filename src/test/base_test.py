@@ -4,13 +4,13 @@ from typing import List
 
 import mock
 from django.test import TestCase
+from models.base_models.pl_bert import PLBert
 from transformers.models.bert.configuration_bert import BertConfig
 from transformers.models.bert.tokenization_bert import BertTokenizer
 
 from config.constants import DELETE_TEST_OUTPUT
 from data.processing.abstract_data_processing_step import AbstractDataProcessingStep
-from data.processing.cleaning.data_cleaning_steps import DataCleaningSteps
-from models.base_models.pl_bert import PLBert
+from data.processing.cleaning.supported_data_cleaning_step import SupportedDataCleaningStep
 from test.paths.paths import TEST_DATA_DIR, TEST_OUTPUT_DIR, TEST_VOCAB_FILE
 
 
@@ -18,10 +18,10 @@ class BaseTest(TestCase):
     MODEL_GENERATOR_PARAMS = {
         "model_path": "model"}
     DATA_CLEANING_STEPS: List[AbstractDataProcessingStep] = [
-        DataCleaningSteps.REPLACE_WORDS.value(word_replace_mappings={"This": "Esta", "one": "uno"}),
-        DataCleaningSteps.REMOVE_UNWANTED_CHARS.value(),
-        DataCleaningSteps.SEPARATE_JOINED_WORDS.value(),
-        DataCleaningSteps.FILTER_MIN_LENGTH.value()]
+        SupportedDataCleaningStep.REPLACE_WORDS.value(word_replace_mappings={"This": "Esta", "one": "uno"}),
+        SupportedDataCleaningStep.REMOVE_UNWANTED_CHARS.value(),
+        SupportedDataCleaningStep.SEPARATE_JOINED_WORDS.value(),
+        SupportedDataCleaningStep.FILTER_MIN_LENGTH.value()]
 
     def setUp(self):
         os.makedirs(TEST_OUTPUT_DIR, exist_ok=True)
@@ -70,4 +70,8 @@ class BaseTest(TestCase):
         tokenizer = BertTokenizer(vocab_file=TEST_VOCAB_FILE)
         tokenizer._convert_token_to_id = mock.MagicMock(return_value=24)
         return tokenizer
-   
+
+    @staticmethod
+    def read_file(file_path: str):
+        with open(file_path) as file:
+            return file.read()

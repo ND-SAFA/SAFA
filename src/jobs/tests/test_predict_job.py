@@ -1,10 +1,27 @@
+from data.datasets.dataset_role import DatasetRole
 from jobs.components.job_args import JobArgs
 from jobs.predict_job import PredictJob
 from jobs.tests.base_job_test import BaseJobTest
-from data.datasets.dataset_role import DatasetRole
 
 
 class TestPredictJob(BaseJobTest):
+    definition = {
+        "job_args": {
+            "output_dir": TEST_OUTPUT_DIR
+        },
+        "model_manager": {
+            "model_path": "roberta-base"
+        },
+        "trainer_dataset_manager": {
+            "eval_dataset_creator": {
+                "objectType": "Safa",
+                "project_path": os.path.join(TEST_DATA_DIR, "safa")
+            }
+        },
+        "trainer_args": {
+            "output_dir": TEST_OUTPUT_DIR
+        }
+    }
 
     def test_run_success(self):
         self._test_run_success()

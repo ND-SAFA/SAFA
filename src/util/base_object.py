@@ -8,6 +8,7 @@ from experiments.variables.multi_variable import MultiVariable
 from experiments.variables.typed_definition_variable import TypedDefinitionVariable
 from experiments.variables.variable import Variable
 from util.param_specs import ParamSpecs
+from util.reflection_util import ReflectionUtil
 
 
 class BaseObject(ABC):
@@ -42,6 +43,7 @@ class BaseObject(ABC):
         """
         val = variable
         if isinstance(variable, TypedDefinitionVariable):
+            assert ReflectionUtil.is_instance_or_subclass(expected_type, BaseObject)
             expected_type = expected_type._get_expected_class_by_type(expected_type, variable.object_type)
 
         if isinstance(variable, MultiVariable):

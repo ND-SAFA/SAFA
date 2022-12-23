@@ -16,7 +16,7 @@ class TestDefinitionCreator(BaseTest):
                 "model_path": "roberta-base"
             },
             "trainer_dataset_manager": {
-                "train_dataset_creator": {
+                "eval_dataset_creator": {
                     "objectType": "Safa",
                     "project_path": os.path.join(TEST_DATA_DIR, "safa")
                 }

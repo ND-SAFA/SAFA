@@ -1,14 +1,17 @@
 import os
 from unittest.mock import patch
 
-from data.creators.classic_trace_dataset_creator import ClassicTraceDatasetCreator
-from data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
-from data.creators.split_dataset_creator import SplitDatasetCreator
+from data.datasets.creators.classic_trace_dataset_creator import ClassicTraceDatasetCreator
+from data.datasets.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
+from data.datasets.creators.split_dataset_creator import SplitDatasetCreator
 from data.datasets.dataset_role import DatasetRole
 from data.datasets.trace_dataset import TraceDataset
-from data.datasets.trainer_datasets_container import TrainerDatasetsContainer
 from test.base_trace_test import BaseTraceTest
 from test.paths.paths import TEST_OUTPUT_DIR
+
+
+class TrainerDatasetsContainer:
+    pass
 
 
 class TestTrainerDatasetsContainer(BaseTraceTest):

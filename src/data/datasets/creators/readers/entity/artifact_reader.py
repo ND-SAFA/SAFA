@@ -1,7 +1,7 @@
 from typing import Dict
 
-from data.creators.readers.entity.entity_reader import EntityReader, EntityType
-from data.formats.safa_format import SafaFormat
+from data.datasets.creators.readers.entity.entity_reader import EntityReader, EntityType
+from data.datasets.formats.safa_format import SafaFormat
 from data.tree.artifact import Artifact
 
 

@@ -1,4 +1,4 @@
-from data.creators.tests.test_mlm_pre_train_dataset_creator import TestMLMPreTrainDatasetCreator
+from data.datasets.creators.tests.test_mlm_pre_train_dataset_creator import TestMLMPreTrainDatasetCreator
 from test.base_test import BaseTest
 from util.file_util import FileUtil
 

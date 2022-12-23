@@ -1,5 +1,5 @@
-from data.creators.readers.entity.pre_train_reader import PreTrainReader
-from data.creators.tests.test_mlm_pre_train_dataset_creator import TestMLMPreTrainDatasetCreator
+from data.datasets.creators.readers.entity.pre_train_reader import PreTrainReader
+from data.datasets.creators.tests.test_mlm_pre_train_dataset_creator import TestMLMPreTrainDatasetCreator
 from test.base_test import BaseTest
 
 

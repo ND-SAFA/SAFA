@@ -1,6 +1,6 @@
 import os
 
-from data.creators.coest_dataset_creator import CoestDatasetCreator
+from data.datasets.creators.coest_dataset_creator import CoestDatasetCreator
 from test.base_test import BaseTest
 from test.paths.paths import TEST_DATA_DIR
 

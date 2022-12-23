@@ -4,7 +4,6 @@ from typing import List
 
 import mock
 from django.test import TestCase
-from models.base_models.pl_bert import PLBert
 from transformers.models.bert.configuration_bert import BertConfig
 from transformers.models.bert.tokenization_bert import BertTokenizer
 
@@ -15,7 +14,7 @@ from test.paths.paths import TEST_DATA_DIR, TEST_OUTPUT_DIR, TEST_VOCAB_FILE
 
 
 class BaseTest(TestCase):
-    MODEL_GENERATOR_PARAMS = {
+    MODEL_MANAGER_PARAMS = {
         "model_path": "model"}
     DATA_CLEANING_STEPS: List[AbstractDataProcessingStep] = [
         SupportedDataCleaningStep.REPLACE_WORDS.value(word_replace_mappings={"This": "Esta", "one": "uno"}),

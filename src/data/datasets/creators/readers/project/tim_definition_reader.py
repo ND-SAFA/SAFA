@@ -1,8 +1,8 @@
 from typing import Dict
 
-from data.creators.readers.project.iproject_reader import IProjectParser
-from data.creators.readers.project.structure_keys import StructureKeys
-from data.formats.safa_format import SafaFormat
+from data.datasets.creators.readers.project.iproject_reader import IProjectParser
+from data.datasets.creators.readers.project.structure_keys import StructureKeys
+from data.datasets.formats.safa_format import SafaFormat
 from util.file_util import FileUtil
 from util.json_util import JSONUtil
 

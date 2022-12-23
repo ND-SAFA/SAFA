@@ -5,18 +5,18 @@ from copy import deepcopy
 from unittest import mock
 from unittest.mock import patch
 
+from data.datasets.dataset_role import DatasetRole
 from jobs.abstract_job import AbstractJob
 from jobs.components.job_result import JobResult
 from jobs.components.job_status import JobStatus
+from models.model_manager import ModelManager
 from test.base_trace_test import BaseTraceTest
 from test.paths.paths import TEST_OUTPUT_DIR
-from data.datasets.dataset_role import DatasetRole
-from models.model_manager import ModelManager
 from train.trainer_args import TrainerArgs
 
 
 class BaseJobTest(BaseTraceTest, ABC):
-    _JOB_PARAMS_BASE = {**BaseTraceTest.MODEL_GENERATOR_PARAMS,
+    _JOB_PARAMS_BASE = {**BaseTraceTest.MODEL_MANAGER_PARAMS,
                         "output_dir": TEST_OUTPUT_DIR}
 
     @patch.object(ModelManager, '_ModelManager__load_model')
@@ -55,8 +55,9 @@ class BaseJobTest(BaseTraceTest, ABC):
         trainer_dataset_container = self.create_trainer_dataset_container(role2dataset,
                                                                           split_train_dataset=split_train_dataset)
         output_dir = os.path.join(test_args["output_dir"], "trace")
-        test_args["trainer_args"] = TrainerArgs(output_dir=output_dir, trainer_dataset_container=trainer_dataset_container,
-                                              **BaseJobTest.TRACE_ARGS_PARAMS)
+        test_args["trainer_args"] = TrainerArgs(output_dir=output_dir,
+                                                trainer_dataset_container=trainer_dataset_container,
+                                                **BaseJobTest.TRACE_ARGS_PARAMS)
         return test_args
 
     @staticmethod

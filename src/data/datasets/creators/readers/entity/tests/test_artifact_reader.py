@@ -1,8 +1,8 @@
 import os
 from typing import Dict, List
 
-from data.creators.readers.entity.artifact_reader import ArtifactReader
-from data.creators.readers.project.structure_keys import StructureKeys
+from data.datasets.creators.readers.entity.artifact_reader import ArtifactReader
+from data.datasets.creators.readers.project.structure_keys import StructureKeys
 from data.tree.artifact import Artifact
 from test.base_test import BaseTest
 from test.paths.paths import TEST_DATA_DIR

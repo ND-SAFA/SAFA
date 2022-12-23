@@ -1,6 +1,6 @@
 import os
 
-from data.creators.safa_dataset_creator import SafaDatasetCreator
+from data.datasets.creators.safa_dataset_creator import SafaDatasetCreator
 from test.base_trace_test import BaseTraceTest
 from test.paths.paths import TEST_DATA_DIR
 

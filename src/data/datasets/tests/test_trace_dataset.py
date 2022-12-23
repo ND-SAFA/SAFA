@@ -3,9 +3,6 @@ from collections import Counter
 from unittest import mock
 from unittest.mock import patch
 
-import pandas as pd
-
-from data.creators.csv_dataset_creator import CSVDatasetCreator
 from data.datasets.data_key import DataKey
 from data.datasets.trace_dataset import TraceDataset
 from data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
@@ -13,7 +10,7 @@ from data.processing.augmentation.resample_step import ResampleStep
 from data.processing.augmentation.simple_word_replacement_step import SimpleWordReplacementStep
 from data.processing.augmentation.source_target_swap_step import SourceTargetSwapStep
 from data.tree.trace_link import TraceLink
-from models.model_generator import ModelGenerator
+from models.model_manager import ModelManager
 from models.model_properties import ModelArchitectureType
 from test.base_trace_test import BaseTraceTest
 
@@ -42,24 +39,15 @@ class TestTraceDataset(BaseTraceTest):
     FEATURE_KEYS = DataKey.get_feature_entry_keys()
     RESAMPLE_RATE = 3
 
-    @patch.object(ModelGenerator, "get_tokenizer")
+    @patch.object(ModelManager, "get_tokenizer")
     def test_to_trainer_dataset(self, get_tokenizer_mock: mock.MagicMock):
         get_tokenizer_mock.return_value = self.get_test_tokenizer()
         train_dataset, test_dataset = self.get_trace_dataset().split(self.VAlIDATION_PERCENTAGE)
         train_dataset.prepare_for_training()
-        model_generator = ModelGenerator(**self.MODEL_GENERATOR_PARAMS)
+        model_generator = ModelManager(**self.MODEL_MANAGER_PARAMS)
         trainer_dataset = train_dataset.to_trainer_dataset(model_generator)
         self.assertTrue(isinstance(trainer_dataset[0], dict))
         self.assertEquals(self.get_expected_train_dataset_size(resample_rate=1), len(trainer_dataset))
-
-    def test_to_dataframe(self):
-        trace_dataset = self.get_trace_dataset()
-        df = trace_dataset.to_dataframe()
-        self.assertTrue(isinstance(df, pd.DataFrame))
-        new_trace_dataset = CSVDatasetCreator("path").create_from_dataframe(data_df=df)
-        self.assert_lists_have_the_same_vals(new_trace_dataset.links.keys(), trace_dataset.links.keys())
-        self.assert_lists_have_the_same_vals(new_trace_dataset.pos_link_ids, trace_dataset.pos_link_ids)
-        self.assert_lists_have_the_same_vals(new_trace_dataset.neg_link_ids, trace_dataset.neg_link_ids)
 
     @patch.object(SimpleWordReplacementStep, "_get_word_pos")
     @patch.object(SimpleWordReplacementStep, "_get_synonyms")

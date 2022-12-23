@@ -1,6 +1,6 @@
 import os
 
-from data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
+from data.datasets.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
 from data.datasets.pre_train_dataset import PreTrainDataset
 from test.base_test import BaseTest
 from test.paths.paths import TEST_DATA_DIR, TEST_OUTPUT_DIR

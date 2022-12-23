@@ -3,8 +3,8 @@ from typing import Dict
 
 import pandas as pd
 
-from data.creators.readers.entity.entity_reader import EntityReader, EntityType
-from data.creators.readers.project.structure_keys import StructureKeys
+from data.datasets.creators.readers.entity.entity_reader import EntityReader, EntityType
+from data.datasets.creators.readers.project.structure_keys import StructureKeys
 from data.tree.artifact import Artifact
 from data.tree.trace_link import TraceLink
 

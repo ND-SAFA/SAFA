@@ -1,10 +1,8 @@
-from typing import Dict, List, OrderedDict, Tuple
+from typing import Dict, OrderedDict
 
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from data.datasets.creators.abstract_dataset_creator import AbstractDatasetCreator
-from data.datasets.trainer_dataset_manager import TrainerDatasetManager
 from data.processing.cleaning.separate_joined_words_step import SeparateJoinedWordsStep
 
 
@@ -12,25 +10,6 @@ class SerializerUtility:
     """
     Helper class for generalizing serializer logic and job factory construction.
     """
-
-    @staticmethod
-    def serialize_trainer_dataset_container(kwargs: Dict,
-                                            dataset_params: List[Tuple[str, str]],
-                                            export_param: str = "trainer_dataset_container",
-                                            data_augmenter: DataAugmenter = None,
-                                            **addition_kwargs):
-        """
-        Reads dataset from kwargs and wraps it in a trainer dataset container.
-        :param kwargs: The kwargs to extract dataset from.
-        :param dataset_params: List of parameter conversions from validated data to trainer dataset container.
-        :param export_param: The name of the parameter to export trainer dataset container to in kwargs.
-        :param data_augmenter: The augmenter responsible for generating new positive samples.
-        :return: None
-        """
-        dataset_creator: AbstractDatasetCreator = kwargs.pop(dataset_param)
-        container_kwargs = {container_param: dataset_creator}
-        trainer_datasets_container = TrainerDatasetManager(**container_kwargs)
-        kwargs[export_param] = trainer_datasets_container
 
     @staticmethod
     def update_error():

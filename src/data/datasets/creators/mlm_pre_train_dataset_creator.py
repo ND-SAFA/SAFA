@@ -4,8 +4,8 @@ from os.path import dirname
 from typing import List
 
 from config.constants import BLOCK_SIZE_DEFAULT
-from data.creators.abstract_dataset_creator import AbstractDatasetCreator
-from data.creators.readers.entity.pre_train_reader import PreTrainReader
+from data.datasets.creators.abstract_dataset_creator import AbstractDatasetCreator
+from data.datasets.creators.readers.entity.pre_train_reader import PreTrainReader
 from data.datasets.pre_train_dataset import PreTrainDataset
 from data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 

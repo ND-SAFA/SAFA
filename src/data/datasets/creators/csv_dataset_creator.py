@@ -1,7 +1,7 @@
 from typing import Dict, List
 
-from data.creators.abstract_trace_dataset_creator import AbstractTraceDatasetCreator
-from data.creators.readers.entity.csv_project_reader import CSVProjectReader
+from data.datasets.creators.abstract_trace_dataset_creator import AbstractTraceDatasetCreator
+from data.datasets.creators.readers.entity.csv_project_reader import CSVProjectReader
 from data.datasets.trace_dataset import TraceDataset
 from data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 from data.tree.trace_link import TraceLink

@@ -2,9 +2,9 @@ import os
 from abc import ABC, abstractmethod
 from typing import Dict
 
-from data.creators.readers.entity.artifact_reader import ArtifactReader
-from data.creators.readers.entity.trace_reader import TraceDefinition
-from data.creators.readers.project.structure_keys import StructureKeys
+from data.datasets.creators.readers.entity.artifact_reader import ArtifactReader
+from data.datasets.creators.readers.entity.trace_reader import TraceDefinition
+from data.datasets.creators.readers.project.structure_keys import StructureKeys
 from data.datasets.trace_dataset import TraceDataset
 from data.tree.trace_link import TraceLink
 from util.file_util import FileUtil

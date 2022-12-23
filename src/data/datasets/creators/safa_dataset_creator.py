@@ -1,8 +1,8 @@
 from typing import List
 
 from config.constants import USE_LINKED_TARGETS_ONLY_DEFAULT
-from data.creators.abstract_trace_dataset_creator import AbstractTraceDatasetCreator
-from data.creators.readers.project.tim_definition_reader import TimProjectReader
+from data.datasets.creators.abstract_trace_dataset_creator import AbstractTraceDatasetCreator
+from data.datasets.creators.readers.project.tim_definition_reader import TimProjectReader
 from data.datasets.trace_dataset import TraceDataset
 from data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 

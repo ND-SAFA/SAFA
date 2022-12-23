@@ -5,7 +5,7 @@ from typing import Callable, Dict, Generic, List, Optional, Type, TypeVar
 
 import pandas as pd
 
-from data.creators.readers.project.structure_keys import StructureKeys
+from data.datasets.creators.readers.project.structure_keys import StructureKeys
 from util.dataframe_util import DataFrameUtil
 from util.file_util import FileUtil
 from util.json_util import JSONUtil

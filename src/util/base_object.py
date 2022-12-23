@@ -1,11 +1,11 @@
 from abc import ABC
-from typing import Any, Type, Union
+from typing import Any, Type, Union, get_args
 
 from typeguard import check_type
 
 from experiments.variables.definition_variable import DefinitionVariable
 from experiments.variables.multi_variable import MultiVariable
-from experiments.variables.typed_variable import TypedVariable
+from experiments.variables.typed_definition_variable import TypedDefinitionVariable
 from experiments.variables.variable import Variable
 from util.param_specs import ParamSpecs
 
@@ -45,7 +45,16 @@ class BaseObject(ABC):
         :return: the value
         """
         val = variable
-        if isinstance(variable, DefinitionVariable):
+        if isinstance(variable, TypedDefinitionVariable):
+            expected_type = cls._get_expected_class_by_type(expected_type, variable.object_type)
+
+        if isinstance(variable, MultiVariable):
+            expected_inner_types = get_args(expected_type)
+            val = []
+            for i, inner_var in enumerate(variable):
+                expected_inner_type = expected_inner_types[i] if i < len(expected_inner_types) else expected_inner_types[0]
+                val.append(cls._get_value_of_variable(inner_var, expected_inner_type))
+        elif isinstance(variable, DefinitionVariable):
             val = cls._make_child_object(variable, expected_type) if expected_type else None
         elif isinstance(variable, Variable):
             val = variable.value
@@ -59,12 +68,6 @@ class BaseObject(ABC):
         :param definition: contains attributes necessary to construct the child
         :return: the child object
         """
-        if expected_class.__name__.startswith("Abstract"):
-            if TypedVariable.OBJECT_TYPE_KEY not in definition:
-                raise TypeError("Cannot create abstract class. Please specify type to create %s", expected_class)
-            expected_class = cls._get_expected_class_for_abstract(expected_class,
-                                                                  cls._get_value_of_variable(definition[TypedVariable.OBJECT_TYPE_KEY]))
-
         if isinstance(expected_class, BaseObject):
             return expected_class.initialize_from_definition(definition)
 
@@ -76,7 +79,7 @@ class BaseObject(ABC):
             raise TypeError("Unable to initialize %s for %s" % (expected_class, cls.__name__))
 
     @classmethod
-    def _get_expected_class_for_abstract(cls, abstract_class: Type, child_class_name: str) -> Any:
+    def _get_expected_class_by_type(cls, abstract_class: Type, child_class_name: str) -> Any:
         """
         *Must be implemented in calling class*
         Returns the correct expected class when given the abstract parent class type and name of child class
@@ -84,7 +87,7 @@ class BaseObject(ABC):
         :param child_class_name: the name of the child class
         :return: the expected type
         """
-        raise TypeError("Cannot create %s because %s has not defined a creation method.")
+        raise TypeError("Cannot create %s because %s has not defined a creation method." % (child_class_name, cls.__name__))
 
     @classmethod
     def _assert_type(cls, val: Any, expected_type: Union[Type], param_name: str):

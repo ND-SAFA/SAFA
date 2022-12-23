@@ -7,9 +7,9 @@ from transformers.trainer_utils import PredictionOutput
 from config.constants import VALIDATION_PERCENTAGE_DEFAULT
 from jobs.components.job_result import JobResult
 from test.base_test import BaseTest
-from data.creators.abstract_dataset_creator import AbstractDatasetCreator
-from data.creators.split_dataset_creator import SplitDatasetCreator
-from data.creators.supported_dataset_creator import SupportedDatasetCreator
+from data.datasets.creators.abstract_dataset_creator import AbstractDatasetCreator
+from data.datasets.creators.split_dataset_creator import SplitDatasetCreator
+from data.datasets.creators.supported_dataset_creator import SupportedDatasetCreator
 from data.tree.artifact import Artifact
 from data.tree.trace_link import TraceLink
 from data.datasets.dataset_role import DatasetRole

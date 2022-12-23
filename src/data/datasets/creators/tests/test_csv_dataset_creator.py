@@ -2,7 +2,7 @@ import os
 
 from test.base_trace_test import BaseTraceTest
 from test.paths.paths import TEST_DATA_DIR
-from data.creators.csv_dataset_creator import CSVDatasetCreator
+from data.datasets.creators.csv_dataset_creator import CSVDatasetCreator
 
 
 class TestCSVDatasetCreator(BaseTraceTest):

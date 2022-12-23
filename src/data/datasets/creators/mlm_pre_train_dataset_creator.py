@@ -4,7 +4,7 @@ from os.path import dirname
 from typing import List
 
 from config.constants import BLOCK_SIZE_DEFAULT
-from data.creators.abstract_dataset_creator import AbstractDatasetCreator
+from data.datasets.creators.abstract_dataset_creator import AbstractDatasetCreator
 from data.datasets.pre_train_dataset import PreTrainDataset
 from data.processing.cleaning.data_cleaner import DataCleaner
 

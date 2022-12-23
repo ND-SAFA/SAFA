@@ -1,5 +1,5 @@
 from test.base_trace_test import BaseTraceTest
-from data.creators.classic_trace_dataset_creator import ClassicTraceDatasetCreator
+from data.datasets.creators.classic_trace_dataset_creator import ClassicTraceDatasetCreator
 
 
 class TestClassicTraceDatasetCreator(BaseTraceTest):

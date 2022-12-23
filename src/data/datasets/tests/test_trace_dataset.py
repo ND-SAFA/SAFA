@@ -4,7 +4,7 @@ from unittest import mock
 from unittest.mock import patch
 
 from test.base_trace_test import BaseTraceTest
-from data.creators.csv_dataset_creator import CSVDatasetCreator
+from data.datasets.creators.csv_dataset_creator import CSVDatasetCreator
 from data.datasets.data_key import DataKey
 from data.tree.trace_link import TraceLink
 from data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep

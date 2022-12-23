@@ -2,8 +2,8 @@ import os
 
 from test.base_trace_test import BaseTraceTest
 from test.paths.paths import TEST_DATA_DIR
-from data.creators.safa_dataset_creator import SafaDatasetCreator
-from data.formats.safa_format import SafaFormat
+from data.datasets.creators.safa_dataset_creator import SafaDatasetCreator
+from data.datasets.formats.safa_format import SafaFormat
 
 
 class TestSafaDatasetCreator(BaseTraceTest):

@@ -9,7 +9,7 @@ from jobs.train_job import TrainJob
 from jobs.tests.base_job_test import BaseJobTest
 from test.paths.paths import TEST_DATA_DIR
 from data.datasets.abstract_dataset import AbstractDataset
-from data.creators.supported_dataset_creator import SupportedDatasetCreator
+from data.datasets.creators.supported_dataset_creator import SupportedDatasetCreator
 from data.datasets.dataset_role import DatasetRole
 from train.trace_trainer import TraceTrainer
 

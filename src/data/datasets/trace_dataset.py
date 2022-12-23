@@ -8,7 +8,7 @@ import pandas as pd
 
 from data.datasets.abstract_dataset import AbstractDataset
 from data.datasets.data_key import DataKey
-from data.formats.csv_format import CSVFormat
+from data.datasets.formats.csv_format import CSVFormat
 from data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
 from data.processing.augmentation.data_augmenter import DataAugmenter
 from data.processing.augmentation.source_target_swap_step import SourceTargetSwapStep

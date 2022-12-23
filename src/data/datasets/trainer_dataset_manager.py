@@ -2,15 +2,14 @@ from collections import OrderedDict
 from typing import Dict, List, Optional, Union, Type, Any
 
 from config.override import overrides
-from data.creators.abstract_dataset_creator import AbstractDatasetCreator
-from data.creators.split_dataset_creator import SplitDatasetCreator
-from data.creators.supported_dataset_creator import SupportedDatasetCreator
+from data.datasets.creators.abstract_dataset_creator import AbstractDatasetCreator
+from data.datasets.creators.split_dataset_creator import SplitDatasetCreator
+from data.datasets.creators.supported_dataset_creator import SupportedDatasetCreator
 from data.datasets.abstract_dataset import AbstractDataset
 from data.datasets.dataset_role import DatasetRole
 from data.datasets.pre_train_dataset import PreTrainDataset
 from data.datasets.trace_dataset import TraceDataset
 from data.processing.augmentation.data_augmenter import DataAugmenter
-from experiments.variables.definition_variable import DefinitionVariable
 from util.base_object import BaseObject
 from util.enum_utils import get_enum_from_name
 

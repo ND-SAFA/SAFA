@@ -5,9 +5,9 @@ from typing import List, Set
 import pandas as pd
 
 from config.constants import USE_LINKED_TARGETS_ONLY_DEFAULT
-from data.creators.abstract_trace_dataset_creator import AbstractTraceDatasetCreator
+from data.datasets.creators.abstract_trace_dataset_creator import AbstractTraceDatasetCreator
 from data.datasets.trace_dataset import TraceDataset
-from data.formats.safa_format import SafaFormat
+from data.datasets.formats.safa_format import SafaFormat
 from data.processing.cleaning.data_cleaner import DataCleaner
 from data.tree.artifact import Artifact
 

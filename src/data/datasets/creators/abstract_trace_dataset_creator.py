@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Dict, List, Set, Tuple
 
-from data.creators.abstract_dataset_creator import AbstractDatasetCreator
+from data.datasets.creators.abstract_dataset_creator import AbstractDatasetCreator
 from data.datasets.trace_dataset import TraceDataset
 from data.processing.cleaning.data_cleaner import DataCleaner
 from data.tree.artifact import Artifact

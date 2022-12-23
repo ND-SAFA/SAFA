@@ -2,9 +2,9 @@ from typing import List
 
 import pandas as pd
 
-from data.creators.abstract_trace_dataset_creator import AbstractTraceDatasetCreator
+from data.datasets.creators.abstract_trace_dataset_creator import AbstractTraceDatasetCreator
 from data.datasets.trace_dataset import TraceDataset
-from data.formats.csv_format import CSVFormat
+from data.datasets.formats.csv_format import CSVFormat
 from data.processing.cleaning.data_cleaner import DataCleaner
 from data.tree.artifact import Artifact
 from data.tree.trace_link import TraceLink

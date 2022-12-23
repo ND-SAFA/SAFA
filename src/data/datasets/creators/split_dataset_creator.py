@@ -1,7 +1,7 @@
 from typing import Union
 
 from config.constants import VALIDATION_PERCENTAGE_DEFAULT
-from data.creators.abstract_dataset_creator import AbstractDatasetCreator
+from data.datasets.creators.abstract_dataset_creator import AbstractDatasetCreator
 from data.datasets.pre_train_dataset import PreTrainDataset
 from data.datasets.trace_dataset import TraceDataset
 

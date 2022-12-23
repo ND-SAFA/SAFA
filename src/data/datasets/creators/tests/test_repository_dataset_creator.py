@@ -2,8 +2,8 @@ import os
 
 from test.base_trace_test import BaseTraceTest
 from test.paths.paths import TEST_DATA_DIR
-from data.creators.repository_dataset_creator import RepositoryDatasetCreator
-from data.formats.repository_format import RepositoryFormat
+from data.datasets.creators.repository_dataset_creator import RepositoryDatasetCreator
+from data.datasets.formats.repository_format import RepositoryFormat
 
 
 class TestRepositoryDatasetCreator(BaseTraceTest):

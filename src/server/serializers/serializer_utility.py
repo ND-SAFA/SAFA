@@ -3,7 +3,7 @@ from typing import Dict, OrderedDict
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from data.creators.abstract_dataset_creator import AbstractDatasetCreator
+from data.datasets.creators.abstract_dataset_creator import AbstractDatasetCreator
 from data.datasets.trainer_dataset_manager import TrainerDatasetManager
 from data.processing.cleaning.separate_joined_words_step import SeparateJoinedWordsStep
 

@@ -1,6 +1,6 @@
 from typing import Dict, Tuple
 
-from data.formats.safa_format import SafaFormat
+from data.datasets.formats.safa_format import SafaFormat
 
 
 class RepositoryFormat(SafaFormat):

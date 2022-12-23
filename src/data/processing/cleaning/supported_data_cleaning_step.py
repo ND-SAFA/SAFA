@@ -8,14 +8,10 @@ from data.processing.cleaning.separate_joined_words_step import SeparateJoinedWo
 from data.processing.cleaning.shuffle_words_step import ShuffleWordsStep
 
 
-class DataCleaningSteps(Enum):
+class SupportedDataCleaningStep(Enum):
     FILTER_MIN_LENGTH = FilterMinLengthStep
     SHUFFLE_WORDS = ShuffleWordsStep
     REMOVE_UNWANTED_CHARS = RemoveUnwantedCharsStep
     SEPARATE_JOINED_WORDS = SeparateJoinedWordsStep
     REPLACE_WORDS = ManualReplaceWordsStep
     REMOVE_WHITE_SPACE = RemoveWhiteSpaceStep
-
-    def get_step_attributes(self):
-        for step_class in DataCleaningSteps:
-            step_attributes = dir(step_class)

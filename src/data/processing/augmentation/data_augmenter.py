@@ -1,11 +1,13 @@
-from typing import Dict, List, Tuple, Type
+from typing import Dict, List, Tuple, Type, Any
 
 from config.override import overrides
 from data.processing.abstract_data_processor import AbstractDataProcessor
 from data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
+from data.processing.augmentation.supported_data_augmentation_step import SupportedAugmentationStep
+from util.base_object import BaseObject
 
 
-class DataAugmenter(AbstractDataProcessor):
+class DataAugmenter(AbstractDataProcessor, BaseObject):
     ordered_steps: List[AbstractDataAugmentationStep]
 
     @overrides(AbstractDataProcessor)
@@ -31,8 +33,7 @@ class DataAugmenter(AbstractDataProcessor):
         return augmentation_results
 
     def _get_steps_to_run(self, exclude_all_but_step_type: Type[AbstractDataAugmentationStep] = None,
-                          include_all_but_step_type: Type[AbstractDataAugmentationStep] = None) -> List[
-        AbstractDataAugmentationStep]:
+                          include_all_but_step_type: Type[AbstractDataAugmentationStep] = None) -> List[AbstractDataAugmentationStep]:
         """
         Gets the steps that should be run
         :param exclude_all_but_step_type: if provided, will ONLY run step of given type
@@ -81,3 +82,14 @@ class DataAugmenter(AbstractDataProcessor):
         :return: the n_expected for the given step
         """
         return round(step.percent_to_weight * n_total_expected)
+
+    @classmethod
+    @overrides(BaseObject)
+    def _get_expected_class_for_abstract(cls, abstract_class: Type, child_class_name: str) -> Any:
+        """
+        Returns the correct expected class when given the abstract parent class type and name of child class
+        :param abstract_class: the abstract parent class type
+        :param child_class_name: the name of the child class
+        :return: the expected type
+        """
+        return SupportedAugmentationStep[child_class_name.upper()]

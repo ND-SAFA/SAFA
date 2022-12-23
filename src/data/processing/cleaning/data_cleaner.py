@@ -1,10 +1,15 @@
-from typing import List
+from typing import List, Type, Any
 
+from config.override import overrides
 from data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 from data.processing.abstract_data_processor import AbstractDataProcessor
+from data.processing.cleaning.supported_data_cleaning_step import SupportedDataCleaningStep
+from experiments.variables.definition_variable import DefinitionVariable
+from experiments.variables.variable import Variable
+from util.base_object import BaseObject
 
 
-class DataCleaner(AbstractDataProcessor):
+class DataCleaner(AbstractDataProcessor, BaseObject):
 
     def run(self, tokens: List[str], **kwargs) -> List[str]:
         """
@@ -20,3 +25,14 @@ class DataCleaner(AbstractDataProcessor):
                 processed_word_list = step.run(processed_word_list)
             processed.append(processed_word_list)
         return [AbstractDataProcessingStep.reconstruct_content(word_list) for word_list in processed]
+
+    @classmethod
+    @overrides(BaseObject)
+    def _get_expected_class_for_abstract(cls, abstract_class: Type, child_class_name: str) -> Any:
+        """
+        Returns the correct expected class when given the abstract parent class type and name of child class
+        :param abstract_class: the abstract parent class type
+        :param child_class_name: the name of the child class
+        :return: the expected type
+        """
+        return SupportedDataCleaningStep[child_class_name.upper()]

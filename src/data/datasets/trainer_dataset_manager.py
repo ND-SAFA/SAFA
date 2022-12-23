@@ -1,16 +1,20 @@
 from collections import OrderedDict
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Union, Type, Any
 
+from config.override import overrides
 from data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from data.creators.split_dataset_creator import SplitDatasetCreator
+from data.creators.supported_dataset_creator import SupportedDatasetCreator
 from data.datasets.abstract_dataset import AbstractDataset
 from data.datasets.dataset_role import DatasetRole
 from data.datasets.pre_train_dataset import PreTrainDataset
 from data.datasets.trace_dataset import TraceDataset
 from data.processing.augmentation.data_augmenter import DataAugmenter
+from experiments.variables.definition_variable import DefinitionVariable
+from util.base_object import BaseObject
 
 
-class TrainerDatasetManager:
+class TrainerDatasetManager(BaseObject):
     DATASET_TYPE = Union[PreTrainDataset, TraceDataset, AbstractDataset]
 
     def __init__(self,
@@ -69,17 +73,28 @@ class TrainerDatasetManager:
             eval_dataset_creator=dataset_creators_map.get(DatasetRole.EVAL, None))
         return trainer_datasets_container
 
-    def _prepare_datasets(self, augmenter: DataAugmenter) -> None:
+    @classmethod
+    @overrides(BaseObject)
+    def _get_expected_class_for_abstract(cls, abstract_class: Type, child_class_name: str) -> Any:
+        """
+        Returns the correct expected class when given the abstract parent class type and name of child class
+        :param abstract_class: the abstract parent class type
+        :param child_class_name: the name of the child class
+        :return: the expected type
+        """
+        return SupportedDatasetCreator[child_class_name.upper()]
+
+    def _prepare_datasets(self, data_augmenter: DataAugmenter) -> None:
         """
         Performs any necessary additional steps necessary to prepare each dataset
-        :param augmenter: augmenter to use for augmenting datasets
+        :param data_augmenter: The augmenter responsible for generating new positive samples.
         :return: None
         """
         train_dataset = self[DatasetRole.TRAIN]
         if isinstance(self[DatasetRole.TRAIN], TraceDataset):
             dataset_splits_map = self._create_dataset_splits(train_dataset, self.__dataset_creators)
             self.__datasets.update(dataset_splits_map)
-            self[DatasetRole.TRAIN].prepare_for_training(augmenter)
+            self[DatasetRole.TRAIN].prepare_for_training(data_augmenter)
 
     @staticmethod
     def _create_dataset_splits(train_dataset: TraceDataset,

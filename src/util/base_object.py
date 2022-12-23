@@ -10,6 +10,10 @@ from util.param_specs import ParamSpecs
 
 class BaseObject(ABC):
 
+    # TODO currently cannot handle a list of definition variables (see below):
+    #     DataCleaner.initialize_from_definition(
+    #         DefinitionVariable({"steps": Variable([DefinitionVariable({"type": Variable("REMOVE_UNWANTED_CHARS")})])}))
+
     @classmethod
     def initialize_from_definition(cls, definition: DefinitionVariable):
         """
@@ -53,6 +57,12 @@ class BaseObject(ABC):
         :param definition: contains attributes necessary to construct the child
         :return: the child object
         """
+        if expected_class.__name__.startswith("Abstract"):
+            if DefinitionVariable.TYPE not in definition:
+                raise TypeError("Cannot create abstract class. Please specify type to create %s", expected_class)
+            expected_class = cls._get_expected_class_for_abstract(expected_class,
+                                                                  cls._get_value_of_variable(definition[DefinitionVariable.TYPE]))
+
         if isinstance(expected_class, BaseObject):
             return expected_class.initialize_from_definition(definition)
 
@@ -62,6 +72,17 @@ class BaseObject(ABC):
             return expected_class(**params)
         except Exception as e:
             raise TypeError("Unable to initialize %s for %s" % (expected_class, cls.__name__))
+
+    @classmethod
+    def _get_expected_class_for_abstract(cls, abstract_class: Type, child_class_name: str) -> Any:
+        """
+        *Must be implemented in calling class*
+        Returns the correct expected class when given the abstract parent class type and name of child class
+        :param abstract_class: the abstract parent class type
+        :param child_class_name: the name of the child class
+        :return: the expected type
+        """
+        raise TypeError("Cannot create %s because %s has not defined a creation method.")
 
     @classmethod
     def _assert_type(cls, val: Any, expected_type: Union[Type], param_name: str):

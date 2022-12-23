@@ -1,11 +1,12 @@
 import os
+from abc import ABC, abstractmethod
 from enum import Enum
-from typing import Callable, Dict, Type
+from typing import Callable, Dict, Generic, Optional, Type, TypeVar
 
 import pandas as pd
 
-from data.creators.parsers.definitions.structure_keys import StructureKeys
 from data.formats.safa_format import SafaFormat
+from data.readers.project.structure_keys import StructureKeys
 from util.dataframe_util import DataFrameUtil
 from util.file_util import FileUtil
 from util.json_util import JSONUtil
@@ -61,43 +62,73 @@ class EntityFormats(Enum):
     JSON = Wrapper(read_json)
 
 
-EntityFormatFileTypes = [
+EntityFileTypes = [
     (EntityFormats.XML, [".xml"]),
     (EntityFormats.CSV, [".csv", ".txt"]),
     (EntityFormats.JSON, [".json"])
 ]
 
-
-class SupportedEntityTypes(Enum):
-    ARTIFACT = "artifact"
-    TRACE = "trace"
+EntityType = TypeVar("EntityType")
 
 
-class EntityParser:
+class EntityReader(ABC, Generic[EntityType]):
+    """
+    Responsible for converting data into entities.
+    """
 
-    def __init__(self, project_path: str, definition: Dict, conversions=None):
-        required_properties = [StructureKeys.FILE]
+    def __init__(self, base_path: str, definition: Dict, conversions: Dict = None):
+        """
+        Creates reader
+        :param base_path: The base path to find data.
+        :param definition: Defines how to parse the data.
+        :param conversions: The conversions to the data to standardize it.
+        """
+        required_properties = [StructureKeys.PATH]
         JSONUtil.require_properties(definition, required_properties)
 
         self.definition: Dict = definition
-        file_path = os.path.join(project_path, definition[StructureKeys.FILE])
-        parser = self.get_entity_parser(file_path)
-        parser_params = definition[StructureKeys.PARAMS] if StructureKeys.PARAMS in definition else {}
-        self.entity_df = parser(file_path, **parser_params)
-        self.conversions = conversions if conversions else None
+        self.path = os.path.join(base_path, self.get_property(StructureKeys.PATH))
+        self.conversions: Dict[str, Dict] = conversions if conversions else None
+        self.entity_type = None
 
     def get_entities(self):
-        column_conversion = None
+        if self.entity_type is None:
+            entity_df = self.read_entities()
+            self.entity_type = self.create(entity_df)
+        return self.entity_type
+
+    @abstractmethod
+    def create(self, entity_df) -> EntityType:
+        pass
+
+    def read_entities(self) -> pd.DataFrame:
+        source_entities_df = self.read_source_entities()
+        column_conversion = self.read_column_conversion()
+        return DataFrameUtil.convert_columns(source_entities_df, column_conversion)
+
+    def read_source_entities(self):
+        parser_params = self.get_property(StructureKeys.PARAMS) if StructureKeys.PARAMS in self.definition else {}
+        parser = EntityReader.get_entity_parser(self.path)
+        return parser(self.path, **parser_params)
+
+    def read_column_conversion(self) -> Optional[Dict]:
         if StructureKeys.COLS in self.definition:
-            column_conversion = self.conversions[self.definition[StructureKeys.COLS]]
-        return DataFrameUtil.convert_df(self.entity_df, column_conversion)
+            conversion_id = self.get_property(StructureKeys.COLS)
+            assert self.conversions is not None, "Could not find conversion %s because none defined." % conversion_id
+            return self.conversions[conversion_id]
+        return None
+
+    def get_property(self, property_name: str, default_value=None):
+        if property_name not in self.definition and not default_value:
+            raise ValueError(self.definition, "does not contain property: ", property_name)
+        return self.definition.get(property_name, default_value)
 
     @staticmethod
     def get_entity_parser(entity_path) -> Type[Callable]:
         if os.path.isdir(entity_path):
             return EntityFormats.FOLDER.value
         data_file_name = os.path.basename(entity_path)
-        for f, extensions in EntityFormatFileTypes:
+        for f, extensions in EntityFileTypes:
             for extension in extensions:
                 if extension in data_file_name:
                     return f.value

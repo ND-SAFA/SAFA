@@ -4,7 +4,7 @@ import pandas as pd
 
 class DataFrameUtil:
     @staticmethod
-    def convert_df(df, column_translation, drop_na=True):
+    def convert_columns(df, column_translation, drop_na=True):
         if column_translation is None or len(column_translation) == 0:
             column_translation = {col: col for col in df.columns}
         entities = []

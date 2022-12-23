@@ -14,6 +14,7 @@ class SafaFormat:
     TARGET_ID = "target"
     ARTIFACTS = "artifacts"
     TRACES = "traces"
+    FILE = "file"
     SUPPORTED_EXTENSIONS = [".json", ".csv"]
 
     def __init__(self, project_path: str, artifact_token_key: str = SAFA_CVS_ARTIFACT_TOKEN,

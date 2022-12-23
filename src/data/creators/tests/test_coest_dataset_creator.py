@@ -8,7 +8,7 @@ from test.paths.paths import TEST_DATA_DIR
 class TestCoestDatasetCreator(BaseTest):
     project_path = os.path.join(TEST_DATA_DIR, "coest")
 
-    def test_positive_links(self):
+    def test_create(self):
         dataset_creator = CoestDatasetCreator(self.project_path)
         dataset = dataset_creator.create()
 

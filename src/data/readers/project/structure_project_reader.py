@@ -1,11 +1,11 @@
 from typing import Dict
 
-from data.creators.parsers.definitions.idefinition_parser import IDefinitionParser
 from data.formats.safa_format import SafaFormat
+from data.readers.project.iproject_reader import IProjectParser
 from util.json_util import JSONUtil
 
 
-class StructureDefinitionParser(IDefinitionParser):
+class StructureProjectReader(IProjectParser):
 
     def get_trace_definitions(self) -> Dict[str, Dict]:
         JSONUtil.require_properties(self.definition, [SafaFormat.TRACES])

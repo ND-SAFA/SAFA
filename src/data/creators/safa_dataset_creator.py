@@ -2,9 +2,9 @@ from typing import List
 
 from config.constants import USE_LINKED_TARGETS_ONLY_DEFAULT
 from data.creators.abstract_trace_dataset_creator import AbstractTraceDatasetCreator
-from data.creators.parsers.definitions.tim_definition_parser import TimDefinitionParser
 from data.datasets.trace_dataset import TraceDataset
 from data.processing.abstract_data_processing_step import AbstractDataProcessingStep
+from data.readers.project.tim_definition_reader import TimProjectReader
 
 
 class SafaDatasetCreator(AbstractTraceDatasetCreator):
@@ -28,4 +28,4 @@ class SafaDatasetCreator(AbstractTraceDatasetCreator):
         Creates the data
         :return: the data
         """
-        return TimDefinitionParser(self.project_path).create()
+        return TimProjectReader(self.project_path).create()

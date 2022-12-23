@@ -4,21 +4,19 @@ from typing import List
 
 import mock
 from django.test import TestCase
+from models.base_models.pl_bert import PLBert
 from transformers.models.bert.configuration_bert import BertConfig
 from transformers.models.bert.tokenization_bert import BertTokenizer
 
 from config.constants import DELETE_TEST_OUTPUT
-from models.model_properties import ModelArchitectureType
-from test.paths.paths import TEST_DATA_DIR, TEST_OUTPUT_DIR, TEST_VOCAB_FILE
-from models.base_models.pl_bert import PLBert
-from models.base_models.supported_base_model import SupportedBaseModel
-from data.processing.cleaning.supported_data_cleaning_step import SupportedDataCleaningStep
 from data.processing.abstract_data_processing_step import AbstractDataProcessingStep
+from data.processing.cleaning.supported_data_cleaning_step import SupportedDataCleaningStep
+from test.paths.paths import TEST_DATA_DIR, TEST_OUTPUT_DIR, TEST_VOCAB_FILE
 
 
 class BaseTest(TestCase):
     MODEL_GENERATOR_PARAMS = {
-                              "model_path": "model"}
+        "model_path": "model"}
     DATA_CLEANING_STEPS: List[AbstractDataProcessingStep] = [
         SupportedDataCleaningStep.REPLACE_WORDS.value(word_replace_mappings={"This": "Esta", "one": "uno"}),
         SupportedDataCleaningStep.REMOVE_UNWANTED_CHARS.value(),

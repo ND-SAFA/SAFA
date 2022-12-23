@@ -4,6 +4,8 @@ from typing import Any, Type, Union
 from typeguard import check_type
 
 from experiments.variables.definition_variable import DefinitionVariable
+from experiments.variables.multi_variable import MultiVariable
+from experiments.variables.typed_variable import TypedVariable
 from experiments.variables.variable import Variable
 from util.param_specs import ParamSpecs
 
@@ -58,10 +60,10 @@ class BaseObject(ABC):
         :return: the child object
         """
         if expected_class.__name__.startswith("Abstract"):
-            if DefinitionVariable.TYPE not in definition:
+            if TypedVariable.OBJECT_TYPE_KEY not in definition:
                 raise TypeError("Cannot create abstract class. Please specify type to create %s", expected_class)
             expected_class = cls._get_expected_class_for_abstract(expected_class,
-                                                                  cls._get_value_of_variable(definition[DefinitionVariable.TYPE]))
+                                                                  cls._get_value_of_variable(definition[TypedVariable.OBJECT_TYPE_KEY]))
 
         if isinstance(expected_class, BaseObject):
             return expected_class.initialize_from_definition(definition)

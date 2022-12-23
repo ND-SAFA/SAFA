@@ -2,7 +2,7 @@ from typing import Dict, List, TypeVar
 from unittest import TestCase
 
 from experiments.variables.definition_variable import DefinitionVariable
-from experiments.variables.multi_variable import MultiVariable
+from experiments.variables.experimental_variable import ExperimentalVariable
 from experiments.variables.variable import Variable
 from server.serializers.experiment_serializer import ExperimentSerializer
 
@@ -44,8 +44,8 @@ class ExperimentSerializerTest(TestCase):
     def test_multi_variable(self):
         # A. Gather expected data
         variable_name = "model_path"
-        variable_class = MultiVariable
-        expected_values = self.input_data["experiment"][variable_name][MultiVariable.SYMBOL]
+        variable_class = ExperimentalVariable
+        expected_values = self.input_data["experiment"][variable_name][ExperimentalVariable.SYMBOL]
 
         # 1. De-serialize data
         model_path_variable = self.deserialize([variable_name])

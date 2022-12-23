@@ -3,7 +3,7 @@ from typing import Dict
 from rest_framework import serializers
 
 from experiments.variables.definition_variable import DefinitionVariable
-from experiments.variables.multi_variable import MultiVariable
+from experiments.variables.experimental_variable import ExperimentalVariable
 from experiments.variables.variable import Variable
 from server.serializers.serializer_utility import SerializerUtility
 
@@ -35,9 +35,9 @@ class ExperimentSerializer(serializers.Serializer):
         :return: Variable encapsulating value.
         """
         if isinstance(value, dict):
-            if value.get(MultiVariable.SYMBOL, None):
-                values = value[MultiVariable.SYMBOL]
-                return MultiVariable(values)
+            if value.get(ExperimentalVariable.SYMBOL, None):
+                values = value[ExperimentalVariable.SYMBOL]
+                return ExperimentalVariable(values)
             else:
                 value_definition = self.create(value)
                 return DefinitionVariable(value_definition)

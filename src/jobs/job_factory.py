@@ -134,6 +134,3 @@ def assert_job_factory_attr_names():
     for attr_name, attr_value in vars(JobArgs).items():
         if not isinstance(attr_value, Callable) and not hasattr(JobFactory, attr_name):
             raise NameError("Expected attr named %s in JobFactory to match attr in job args" % attr_name)
-
-
-assert_job_factory_attr_names()

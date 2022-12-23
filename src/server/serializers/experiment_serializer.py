@@ -4,13 +4,14 @@ from rest_framework import serializers
 
 from experiments.variables.definition_variable import DefinitionVariable
 from experiments.variables.experimental_variable import ExperimentalVariable
+from experiments.variables.typed_definition_variable import TypedDefinitionVariable
 from experiments.variables.variable import Variable
 from server.serializers.serializer_utility import SerializerUtility
 
 
 class ExperimentSerializer(serializers.Serializer):
     KEY = "definition"
-    experiment = serializers.DictField(required=True)
+    definition = serializers.DictField(required=True)
 
     def update(self, instance, validated_data):
         SerializerUtility.update_error()
@@ -39,8 +40,9 @@ class ExperimentSerializer(serializers.Serializer):
             if value.get(ExperimentalVariable.SYMBOL, None):
                 values = value[ExperimentalVariable.SYMBOL]
                 return ExperimentalVariable(values)
+            elif value.get(TypedDefinitionVariable.OBJECT_TYPE_KEY, None):
+                return TypedDefinitionVariable(value)
             else:
-
                 value_definition = self.create(value)
                 return DefinitionVariable(value_definition)
         else:

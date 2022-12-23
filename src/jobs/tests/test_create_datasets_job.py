@@ -1,9 +1,9 @@
+from data.datasets.dataset_role import DatasetRole
 from jobs.abstract_job import AbstractJob
-from jobs.create_datasets_job import CreateDatasetsJob
 from jobs.components.job_args import JobArgs
 from jobs.components.job_result import JobResult
+from jobs.create_datasets_job import CreateDatasetsJob
 from jobs.tests.base_job_test import BaseJobTest
-from data.datasets.dataset_role import DatasetRole
 
 
 class TestCreateDatasetsJob(BaseJobTest):

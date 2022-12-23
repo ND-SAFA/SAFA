@@ -4,7 +4,7 @@ from typing import List
 
 import mock
 from django.test import TestCase
-from models.base_models.pl_bert import PLBert
+from transformers import AutoModelForSequenceClassification
 from transformers.models.bert.configuration_bert import BertConfig
 from transformers.models.bert.tokenization_bert import BertTokenizer
 
@@ -37,7 +37,7 @@ class BaseTest(TestCase):
 
     @staticmethod
     def get_test_model():
-        return PLBert(BaseTest.get_test_config())
+        return AutoModelForSequenceClassification.from_pretrained("robert-base")
 
     @staticmethod
     def get_test_config():

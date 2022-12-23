@@ -12,6 +12,9 @@ class ArtifactReader(EntityReader):
     def create(self, artifact_df) -> EntityType:
         artifacts = []
         for _, artifact_row in artifact_df.iterrows():
-            artifacts.append(Artifact(artifact_row[SafaFormat.ARTIFACT_ID],
+            artifact_id = artifact_row[SafaFormat.ARTIFACT_ID]
+            if isinstance(artifact_id, float):
+                artifact_id = str(int(artifact_id))
+            artifacts.append(Artifact(artifact_id,
                                       artifact_row[SafaFormat.SAFA_CVS_ARTIFACT_TOKEN]))
         return artifacts

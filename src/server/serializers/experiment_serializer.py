@@ -9,6 +9,7 @@ from server.serializers.serializer_utility import SerializerUtility
 
 
 class ExperimentSerializer(serializers.Serializer):
+    KEY = "definition"
     experiment = serializers.DictField(required=True)
 
     def update(self, instance, validated_data):
@@ -22,8 +23,8 @@ class ExperimentSerializer(serializers.Serializer):
         :return: Mapping between keys and variables.
         """
         result: Dict[str, Variable] = {}
-        if "experiment" in validated_data:
-            validated_data = validated_data["experiment"]
+        if self.KEY in validated_data:
+            validated_data = validated_data[self.KEY]
         for key, value in validated_data.items():
             result[key] = self.create_variable(value)
         return result
@@ -39,6 +40,7 @@ class ExperimentSerializer(serializers.Serializer):
                 values = value[ExperimentalVariable.SYMBOL]
                 return ExperimentalVariable(values)
             else:
+
                 value_definition = self.create(value)
                 return DefinitionVariable(value_definition)
         else:

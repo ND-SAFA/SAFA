@@ -55,7 +55,7 @@ class TestBaseObject(BaseTest):
 
     def test_nested_specs(self):
         nested_params = {
-            "experiment": {
+            "definition": {
                 "a": self.class_params
             }
         }

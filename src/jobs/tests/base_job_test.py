@@ -52,11 +52,9 @@ class BaseJobTest(BaseTraceTest, ABC):
         test_args = BaseJobTest.get_test_params(as_api=as_api)
         role2dataset = self.create_dataset(dataset_role, include_links=include_links,
                                            include_pre_processing=include_pre_processing)
-        trainer_dataset_container = self.create_trainer_dataset_container(role2dataset,
-                                                                          split_train_dataset=split_train_dataset)
+
         output_dir = os.path.join(test_args["output_dir"], "trace")
         test_args["trainer_args"] = TrainerArgs(output_dir=output_dir,
-                                                trainer_dataset_container=trainer_dataset_container,
                                                 **BaseJobTest.TRACE_ARGS_PARAMS)
         return test_args
 

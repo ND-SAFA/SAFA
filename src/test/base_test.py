@@ -36,7 +36,7 @@ class BaseTest(TestCase):
 
     @staticmethod
     def get_test_model():
-        return AutoModelForSequenceClassification.from_pretrained("robert-base")
+        return AutoModelForSequenceClassification.from_pretrained("bert-base-uncased")
 
     @staticmethod
     def get_test_config():

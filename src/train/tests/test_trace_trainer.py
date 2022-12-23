@@ -5,21 +5,20 @@ import mock
 from torch.utils.data.distributed import DistributedSampler
 from torch.utils.data.sampler import RandomSampler
 
+from data.datasets.dataset_role import DatasetRole
 from jobs.predict_job import PredictJob
+from models.model_manager import ModelManager
 from test.base_trace_test import BaseTraceTest
 from test.paths.paths import TEST_OUTPUT_DIR
-from data.datasets.dataset_role import DatasetRole
-from models.base_models.supported_base_model import SupportedBaseModel
-from models.model_manager import ModelManager
-from train.trainer_args import TrainerArgs
 from train.trace_trainer import TraceTrainer
+from train.trainer_args import TrainerArgs
 
 
 class TestTraceTrainer(BaseTraceTest):
     VALIDATION_PERCENTAGE = 0.3
     EXPECTED_VALIDATION_SIZE = 3
     EXPECTED_PREDICTION_SIZE = len(BaseTraceTest.TARGET_LAYERS) * len(BaseTraceTest.SOURCE_LAYERS)
-    TEST_METRIC_NAMES = ["accuracy", "map_at_k"]
+    TEST_METRIC_NAMES = ["accuracy", "map"]
 
     def test_perform_training(self):
         test_trace_trainer = self.get_test_trace_trainer(metrics=self.TEST_METRIC_NAMES)
@@ -80,14 +79,15 @@ class TestTraceTrainer(BaseTraceTest):
     def get_dataset_container(self):
         train_dataset_map = self.create_dataset(DatasetRole.TRAIN, include_links=True)
         eval_dataset_map = self.create_dataset(DatasetRole.EVAL, include_links=False)
-        return self.create_trainer_dataset_container({**train_dataset_map, **eval_dataset_map},
-                                                     split_train_dataset=True)
+        return self.create_trainer_dataset_manager({**train_dataset_map, **eval_dataset_map},
+                                                   split_train_dataset=True)
 
     def get_test_trace_trainer(self, **kwargs):
-        trainer_dataset_container = self.get_dataset_container()
-        model_generator = ModelManager("path")
-        model_generator.get_model = mock.MagicMock(return_value=self.get_test_model())
-        model_generator.get_tokenizer = mock.MagicMock(return_value=self.get_test_tokenizer())
+        trainer_dataset_manager = self.get_dataset_container()
+        model_manager = ModelManager("path")
+        model_manager.get_model = mock.MagicMock(return_value=self.get_test_model())
+        model_manager.get_tokenizer = mock.MagicMock(return_value=self.get_test_tokenizer())
         return TraceTrainer(
-            TrainerArgs(output_dir=TEST_OUTPUT_DIR, trainer_dataset_container=trainer_dataset_container, **kwargs),
-            model_generator)
+            TrainerArgs(output_dir=TEST_OUTPUT_DIR, **kwargs),
+            trainer_dataset_manager=trainer_dataset_manager,
+            model_manager=model_manager)

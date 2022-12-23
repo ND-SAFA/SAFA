@@ -100,10 +100,10 @@ class BaseTraceTest(BaseTest):
         return {dataset_role: abstract_dataset}
 
     @staticmethod
-    def create_trainer_dataset_container(dataset_map: Dict[DatasetRole, AbstractDatasetCreator],
-                                         split_train_dataset=True):
+    def create_trainer_dataset_manager(dataset_map: Dict[DatasetRole, AbstractDatasetCreator],
+                                       split_train_dataset=True) -> TrainerDatasetManager:
         if split_train_dataset:
-            dataset_map[DatasetRole.VAL] = SplitDatasetCreator(split_percentage=VALIDATION_PERCENTAGE_DEFAULT)
+            dataset_map[DatasetRole.VAL] = SplitDatasetCreator(val_percentage=VALIDATION_PERCENTAGE_DEFAULT)
         return TrainerDatasetManager.create_from_map(dataset_map)
 
     def assert_prediction_output_matches_expected(self, output: dict, threshold: int = 0.05):

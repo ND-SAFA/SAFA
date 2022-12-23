@@ -3,11 +3,8 @@ from mock import patch
 from transformers.modeling_utils import PreTrainedModel
 from transformers.models.auto.tokenization_auto import AutoTokenizer
 
-from test.base_test import BaseTest
-from models.base_models.bert_trace_siamese import BertTraceSiamese
-from models.base_models.supported_base_model import SupportedBaseModel
 from models.model_manager import ModelManager
-from models.model_properties import ModelArchitectureType
+from test.base_test import BaseTest
 
 
 class TestTokenizer:

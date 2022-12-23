@@ -132,8 +132,6 @@ class TraceDataset(AbstractDataset):
         :param augmenter: the augmenter to use for augmentation
         :return: Prepared trace data
         """
-        print("# Pos:", len(self.pos_link_ids))
-        print("# Neg:", len(self.neg_link_ids))
         if len(self.pos_link_ids) > 0:
             if augmenter:
                 self.augment_pos_links(augmenter)

@@ -26,19 +26,20 @@ if __name__ == "__main__":
         description='Pre-trains a bert model on a directory of documents.')
     parser.add_argument('data')  # positional argument
     parser.add_argument('output')
+    parser.add_argument('-creator', default="SAFA", help="The dataset creator to use.")
     parser.add_argument('-model', help="The model to fine-tune.", default="roberta-base")
     parser.add_argument('-epochs', default=20, type=int)
     parser.add_argument('-val_path', default=None)
     parser.add_argument('-val', default=None, type=float)
 
     args = parser.parse_args()
-
+    
     #
     # Create Job Data
     #
     if args.val_path:
         validation_dataset_definition = {
-            "creator": "SAFA",
+            "creator": args.creator,
             "params": {
                 "project_path": args.val_path
             }
@@ -57,7 +58,7 @@ if __name__ == "__main__":
         "outputDir": args.output,
         "saveJobOutput": True,
         "data": {
-            "creator": "SAFA",
+            "creator": args.creator,
             "params": {
                 "project_path": args.data
             },

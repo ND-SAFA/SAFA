@@ -1,0 +1,15 @@
+{
+  "DataFiles": {
+    "Commit": {
+      "File": "commit.csv"
+    },
+    "Issue": {
+      "File": "issue.csv"
+    }
+  },
+  "commit2issue": {
+    "Source": "Commit",
+    "Target": "Issue",
+    "File": "commit2issue.csv"
+  }
+}

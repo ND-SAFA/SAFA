@@ -1,4 +1,4 @@
-from typing import Dict, Any
+from typing import Any, Dict
 
 
 class UncasedDict(dict):
@@ -55,3 +55,13 @@ class UncasedDict(dict):
         :return: True if the key is in the results dictionary else False
         """
         return super().__contains__(self._process_key(key))
+
+    def rename_property(self, prop: str, new_prop: str):
+        converted_dict = self.copy()
+        for key, value in self.items():
+            if isinstance(value, UncasedDict):
+                value = value.rename_property(prop, new_prop)
+            if key == prop:
+                key = new_prop
+            converted_dict[key] = value
+        return converted_dict

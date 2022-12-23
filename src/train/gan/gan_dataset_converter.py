@@ -166,7 +166,7 @@ class GanDatasetConverter:
         labeled_examples: List[LabeledExample] = []
         for trace_id, trace in trace_dataset.links.items():
             trace_label = 1 if trace.is_true_link else 0
-            labeled_examples.append((trace.source.token, trace.target.token, trace_label))
+            labeled_examples.append((trace.source_body.token, trace.target.token, trace_label))
         return labeled_examples
 
     @staticmethod

@@ -1,11 +1,11 @@
 from abc import ABC, abstractmethod
-from typing import Dict, List, Set, Tuple
+from typing import List, Set, Tuple
 
 from data.creators.abstract_dataset_creator import AbstractDatasetCreator
-from data.tree.artifact import Artifact
-from data.tree.trace_link import TraceLink
 from data.datasets.trace_dataset import TraceDataset
 from data.processing.abstract_data_processing_step import AbstractDataProcessingStep
+from data.tree.artifact import Artifact
+from data.tree.trace_link import TraceLink
 
 
 class AbstractTraceDatasetCreator(AbstractDatasetCreator, ABC):
@@ -27,26 +27,6 @@ class AbstractTraceDatasetCreator(AbstractDatasetCreator, ABC):
         :return: the data
         """
         pass
-
-    def _create_links_for_layer(self, source_artifacts: List[Artifact], target_artifacts: List[Artifact],
-                                pos_link_ids: Set[int]) -> Dict[int, TraceLink]:
-        """
-        Creates map between trace link id to trace link.
-        :param source_artifacts: The source artifacts to extract links for.
-        :param target_artifacts: The target artifacts to extract links for.
-        :param pos_link_ids: The list of all positive link ids in project.
-        :return: Map between trace link ids and trace links for given source and target artifacts.
-        """
-        if self._use_linked_targets_only:
-            target_artifacts = self._filter_unlinked_targets(target_artifacts)
-
-        links = {}
-        for source in source_artifacts:
-            for target in target_artifacts:
-                link = TraceLink(source, target)
-                link.is_true_link = link.id in pos_link_ids
-                links[link.id] = link
-        return links
 
     def _get_pos_link_ids(self, true_links: List[Tuple[str, str]]) -> Set[int]:
         """

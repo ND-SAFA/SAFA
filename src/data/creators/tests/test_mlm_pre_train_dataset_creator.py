@@ -18,7 +18,7 @@ class TestMLMPreTrainDatasetCreator(BaseTest):
     EXPECTED_OUTPUT_FILE1 = " ".join(FILE1_LINES)
     EXPECTED_OUTPUT_FILE2 = " ".join(FILE2_LINES)
 
-    def test_pre_train_file_aggregation(self):
+    def test_create(self):
         """
         Tests that creating a pre-training data results in the aggregation of files in pre-training directory.
         """
@@ -26,36 +26,8 @@ class TestMLMPreTrainDatasetCreator(BaseTest):
         dataset = dataset_creator.create()
         self.assertTrue(isinstance(dataset, PreTrainDataset), "create results in PreTrainDataset")
         training_content = FileUtil.read_file(dataset.training_file_path).split("\n")
-        for expected_line in self.FILE1_LINES + self.FILE2_LINES:
-            self.assertIn(expected_line, training_content)
-
-    def test_get_file_list(self):
-        """
-        Tests that pre-training data creator is able to retrieve relevant files in pre-training directory.
-        """
-        files_dir = MLMPreTrainDatasetCreator._get_file_list(self.PRETRAIN_DIR)
-        self.assert_lists_have_the_same_vals(self.FILENAMES, files_dir)
-        files_single = MLMPreTrainDatasetCreator._get_file_list(self.DATAFILE)
-        self.assert_lists_have_the_same_vals([self.FILENAMES[0]], files_single)
-
-    def test_read_data_files(self):
-        """
-        Tests that reading data files correctly aggregates file contents.
-        :return:
-        :rtype:
-        """
-        dataset_creator = self.get_mlm_pre_train_dataset_creator()
-        training_files = [os.path.join(self.PRETRAIN_DIR, filename) for filename in self.FILENAMES]
-        training_examples = dataset_creator._read_data_files(training_files)
-        result = " ".join(training_examples)
-        expected = " ".join([self.EXPECTED_OUTPUT_FILE1, self.EXPECTED_OUTPUT_FILE2])
-        self.assertEqual(expected, result)
-
-    def test_read_data_file(self):
-        dataset_creator = self.get_mlm_pre_train_dataset_creator()
-        training_examples = dataset_creator._read_data_file(self.DATAFILE)
-        result = " ".join(training_examples)
-        self.assertEqual(self.EXPECTED_OUTPUT_FILE1, result)
+        expected_lines = self.FILE1_LINES + self.FILE2_LINES
+        self.assert_lists_have_the_same_vals(training_content, expected_lines)
 
     def test_write_training_examples(self):
         dataset_creator = self.get_mlm_pre_train_dataset_creator()

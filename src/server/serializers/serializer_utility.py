@@ -69,7 +69,7 @@ class SerializerUtility:
         """
         kwargs = {}
         for field in fields.values():
-            field_name = field.source
+            field_name = field.source_body
             if field_name not in validated_data:
                 continue
             is_serializer = isinstance(field, serializers.Serializer)

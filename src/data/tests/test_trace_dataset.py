@@ -3,18 +3,19 @@ from collections import Counter
 from unittest import mock
 from unittest.mock import patch
 
-from test.base_trace_test import BaseTraceTest
+import pandas as pd
+
 from data.creators.csv_dataset_creator import CSVDatasetCreator
 from data.datasets.data_key import DataKey
-from data.tree.trace_link import TraceLink
+from data.datasets.trace_dataset import TraceDataset
 from data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
 from data.processing.augmentation.resample_step import ResampleStep
 from data.processing.augmentation.simple_word_replacement_step import SimpleWordReplacementStep
 from data.processing.augmentation.source_target_swap_step import SourceTargetSwapStep
-from data.datasets.trace_dataset import TraceDataset
+from data.tree.trace_link import TraceLink
 from models.model_generator import ModelGenerator
 from models.model_properties import ModelArchitectureType
-import pandas as pd
+from test.base_trace_test import BaseTraceTest
 
 FEATURE_VALUE = "({}, {})"
 
@@ -85,14 +86,14 @@ class TestTraceDataset(BaseTraceTest):
             for i, step_id in enumerate(step_ids):
                 if step_id in link.target.id:
                     self.assertIn(link_id, trace_dataset.pos_link_ids)
-                    self.assertIn(step_id, link.source.id)
+                    self.assertIn(step_id, link.source_body.id)
                     n_augmented_links[i] += 1
                     if isinstance(steps[i], SimpleWordReplacementStep):
-                        if replacement_word not in link.source.token and replacement_word not in link.target.token:
+                        if replacement_word not in link.source_body.token and replacement_word not in link.target.token:
                             self.fail("Did not properly perform simple word replacement")
                         self.assertIn("token", link.target.token)
                     elif isinstance(steps[i], SourceTargetSwapStep):
-                        self.assertIn("t_", link.source.token)
+                        self.assertIn("t_", link.source_body.token)
                         if "s_" not in link.target.token:
                             if replacement_word not in link.target.token:
                                 self.fail("Did not properly perform source target swap")
@@ -107,7 +108,8 @@ class TestTraceDataset(BaseTraceTest):
         for i, expected in enumerate(n_expected):
             actual = n_augmented_links[i]
             if expected != actual:
-                self.fail("Expected number of links (%d) does not match actual (%d) for %s" % (expected, actual, str(type(steps[i]))))
+                self.fail("Expected number of links (%d) does not match actual (%d) for %s" % (
+                    expected, actual, str(type(steps[i]))))
 
     def test_add_link(self):
         trace_dataset = self.get_trace_dataset()
@@ -119,7 +121,7 @@ class TestTraceDataset(BaseTraceTest):
         self.assertIn(true_link_id, trace_dataset.links)
         self.assertNotIn(true_link_id, trace_dataset.neg_link_ids)
         self.assertIn(true_link_id, trace_dataset.pos_link_ids)
-        self.assertEquals(trace_dataset.links[true_link_id].source.token, source_tokens)
+        self.assertEquals(trace_dataset.links[true_link_id].source_body.token, source_tokens)
         self.assertEquals(trace_dataset.links[true_link_id].target.token, target_tokens)
 
         false_source_id, false_target_id = "source_id2", "target_id2"
@@ -136,20 +138,23 @@ class TestTraceDataset(BaseTraceTest):
         entry_num = 1
         orig_link = list(trace_dataset.links.values()).pop()
 
-        aug_source_id, aug_target_id = trace_dataset._get_augmented_artifact_ids(augmented_tokens, orig_link, aug_step_id, entry_num)
-        self.assertEquals(aug_source_id, orig_link.source.id + aug_step_id)
+        aug_source_id, aug_target_id = trace_dataset._get_augmented_artifact_ids(augmented_tokens, orig_link,
+                                                                                 aug_step_id, entry_num)
+        self.assertEquals(aug_source_id, orig_link.source_body.id + aug_step_id)
         self.assertEquals(aug_target_id, orig_link.target.id + aug_step_id)
 
         # link id already exists but is same as augmented
         trace_dataset.add_link(aug_source_id, aug_target_id, *augmented_tokens, is_true_link=True)
-        aug_source_id, aug_target_id = trace_dataset._get_augmented_artifact_ids(augmented_tokens, orig_link, aug_step_id, entry_num)
-        self.assertEquals(aug_source_id, orig_link.source.id + aug_step_id)
+        aug_source_id, aug_target_id = trace_dataset._get_augmented_artifact_ids(augmented_tokens, orig_link,
+                                                                                 aug_step_id, entry_num)
+        self.assertEquals(aug_source_id, orig_link.source_body.id + aug_step_id)
         self.assertEquals(aug_target_id, orig_link.target.id + aug_step_id)
 
         # link id already exists but is NOT the same as augmented
         trace_dataset.add_link(aug_source_id, aug_target_id, "s_token", "t_token", is_true_link=True)
-        aug_source_id, aug_target_id = trace_dataset._get_augmented_artifact_ids(augmented_tokens, orig_link, aug_step_id, entry_num)
-        self.assertEquals(aug_source_id, orig_link.source.id + aug_step_id + str(entry_num))
+        aug_source_id, aug_target_id = trace_dataset._get_augmented_artifact_ids(augmented_tokens, orig_link,
+                                                                                 aug_step_id, entry_num)
+        self.assertEquals(aug_source_id, orig_link.source_body.id + aug_step_id + str(entry_num))
         self.assertEquals(aug_target_id, orig_link.target.id + aug_step_id + str(entry_num))
 
     def test_get_data_entries_for_augmentation(self):
@@ -164,19 +169,20 @@ class TestTraceDataset(BaseTraceTest):
     def test_create_links_from_augmentation(self):
         ids = ['id1', 'id2']
         orig_links = list(self.get_links(self.POS_LINKS).values())
-        base_result = [(link.source.token, link.target.token) for link in orig_links]
+        base_result = [(link.source_body.token, link.target.token) for link in orig_links]
         results = [[(id_ + pair[0], id_ + pair[1]) for pair in base_result] for id_ in ids]
-        augmentation_results = {AbstractDataAugmentationStep.COMMON_ID + id_: zip(results[i], [j for j in range(len(orig_links))])
-                                for i, id_ in enumerate(ids)}
+        augmentation_results = {
+            AbstractDataAugmentationStep.COMMON_ID + id_: zip(results[i], [j for j in range(len(orig_links))])
+            for i, id_ in enumerate(ids)}
         trace_dataset = self.get_trace_dataset()
         trace_dataset._create_links_from_augmentation(augmentation_results, orig_links)
         self.assertEquals(len(trace_dataset.pos_link_ids), 3 * len(orig_links))
         n_augmented_links = [0 for i in range(len(ids))]
         for link in trace_dataset.links.values():
             for i, id_ in enumerate(ids):
-                if id_ in link.source.id:
+                if id_ in link.source_body.id:
                     self.assertIn(id_, link.target.id)
-                    self.assertIn(id_, link.source.token)
+                    self.assertIn(id_, link.source_body.token)
                     self.assertIn(id_, link.target.token)
                     self.assertIn(link.id, trace_dataset.pos_link_ids)
                     n_augmented_links[i] += 1
@@ -235,9 +241,9 @@ class TestTraceDataset(BaseTraceTest):
         self.assertEquals(sum(length_of_splits), n_orig_links)
         for i, len_split in enumerate(length_of_splits):
             if i == 0:
-                self.assertLessEqual(abs(len_split - round(n_orig_links * (1-sum(percent_splits)))), 1)
+                self.assertLessEqual(abs(len_split - round(n_orig_links * (1 - sum(percent_splits)))), 1)
                 continue
-            self.assertLessEqual(abs(len_split - round(n_orig_links*percent_splits[i-1])), 1)
+            self.assertLessEqual(abs(len_split - round(n_orig_links * percent_splits[i - 1])), 1)
         for i, split in enumerate(splits):
             link_ids = split_link_ids[i]
             for j, other_link_ids in enumerate(split_link_ids):
@@ -253,7 +259,7 @@ class TestTraceDataset(BaseTraceTest):
         trace_dataset_aug.prepare_for_training([SimpleWordReplacementStep(1, 0.15)])
         aug_links = {link_id for link_id in trace_dataset_aug.pos_link_ids if
                      AbstractDataAugmentationStep.extract_unique_id_from_step_id(SimpleWordReplacementStep.get_id())
-                     in trace_dataset_aug.links[link_id].source.id}
+                     in trace_dataset_aug.links[link_id].source_body.id}
         self.assertEquals(len(aug_links), len(self.NEG_LINKS) - n_pos_links)
         self.assertEquals(len(set(trace_dataset_aug.pos_link_ids)), n_pos_links + len(aug_links))
         self.assertEquals(len(trace_dataset_aug.pos_link_ids), len(trace_dataset_aug.neg_link_ids))
@@ -264,12 +270,12 @@ class TestTraceDataset(BaseTraceTest):
         test_link = self.get_test_link(source, target)
 
         feature_entry_siamese = trace_dataset._get_feature_entry(test_link, ModelArchitectureType.SIAMESE, fake_method)
-        self.assertIn(test_link.source.token, feature_entry_siamese.values())
+        self.assertIn(test_link.source_body.token, feature_entry_siamese.values())
         self.assertIn(test_link.target.token, feature_entry_siamese.values())
         self.assertIn(DataKey.LABEL_KEY, feature_entry_siamese)
 
         feature_entry_single = trace_dataset._get_feature_entry(test_link, ModelArchitectureType.SINGLE, fake_method)
-        self.assertIn(FEATURE_VALUE.format(test_link.source.token, test_link.target.token),
+        self.assertIn(FEATURE_VALUE.format(test_link.source_body.token, test_link.target.token),
                       feature_entry_single.values())
         self.assertIn(DataKey.LABEL_KEY, feature_entry_single)
 
@@ -297,11 +303,10 @@ class TestTraceDataset(BaseTraceTest):
     def get_trace_dataset(self):
         links = self.get_links(self.ALL_TEST_LINKS)
         pos_links_ids = self.get_link_ids(self.POS_LINKS)
-        neg_link_ids = self.get_link_ids(self.NEG_LINKS)
         for link in links.values():
             if link.id in pos_links_ids:
                 link.is_true_link = True
-        return TraceDataset(links, pos_links_ids, neg_link_ids)
+        return TraceDataset(links)
 
     def get_expected_train_dataset_size(self, resample_rate=RESAMPLE_RATE, validation_percentage=VAlIDATION_PERCENTAGE):
         num_train_pos_links = round(len(self.POS_LINKS) * (1 - validation_percentage))

@@ -6,19 +6,16 @@ from data.datasets.creators.mlm_pre_train_dataset_creator import MLMPreTrainData
 from data.datasets.creators.split_dataset_creator import SplitDatasetCreator
 from data.datasets.dataset_role import DatasetRole
 from data.datasets.trace_dataset import TraceDataset
+from data.datasets.trainer_dataset_manager import TrainerDatasetManager
 from test.base_trace_test import BaseTraceTest
 from test.paths.paths import TEST_OUTPUT_DIR
-
-
-class TrainerDatasetsContainer:
-    pass
 
 
 class TestTrainerDatasetsContainer(BaseTraceTest):
     TRAIN_DATASET_CREATOR = ClassicTraceDatasetCreator(source_layers=BaseTraceTest.SOURCE_LAYERS,
                                                        target_layers=BaseTraceTest.TARGET_LAYERS,
                                                        true_links=BaseTraceTest.POS_LINKS,
-                                                       data_cleaning_steps=BaseTraceTest.DATA_CLEANING_STEPS,
+                                                       data_cleaner=BaseTraceTest.DATA_CLEANER,
                                                        use_linked_targets_only=False)
     VAL_DATASET_CREATOR = SplitDatasetCreator(val_percentage=0.3)
     EVAL_DATASET_CREATOR = SplitDatasetCreator(val_percentage=0.2)
@@ -41,7 +38,7 @@ class TestTrainerDatasetsContainer(BaseTraceTest):
         }
         expected_dataset_split_roles = [DatasetRole.TRAIN, DatasetRole.VAL, DatasetRole.EVAL]
         train_dataset = self.TRAIN_DATASET_CREATOR.create()
-        splits = TrainerDatasetsContainer._create_dataset_splits(train_dataset, dataset_creators_map)
+        splits = TrainerDatasetManager._create_dataset_splits(train_dataset, dataset_creators_map)
 
         for dataset_role in expected_dataset_split_roles:
             self.assertIn(dataset_role, splits)
@@ -75,13 +72,13 @@ class TestTrainerDatasetsContainer(BaseTraceTest):
                                 DatasetRole.TRAIN: self.TRAIN_DATASET_CREATOR,
                                 DatasetRole.VAL: self.VAL_DATASET_CREATOR,
                                 DatasetRole.EVAL: self.EVAL_DATASET_CREATOR}
-        datasets_container = TrainerDatasetsContainer.create_from_map(dataset_creators_map)
+        datasets_container = TrainerDatasetManager.create_from_map(dataset_creators_map)
         self.assert_final_datasets_are_as_expected(datasets_container)
 
     def test_get_set_bad_index(self):
         datasets_container = self.get_trainer_datasets_container()
         try:
-            datasets_container["eval"] = None
+            datasets_container[DatasetRole.EVAL] = None
             self.fail("Did not raise Exception on bad index")
         except Exception:
             pass
@@ -90,7 +87,7 @@ class TestTrainerDatasetsContainer(BaseTraceTest):
         train_dataset_creator = self.TRAIN_DATASET_CREATOR
 
         val_dataset_creator = self.VAL_DATASET_CREATOR
-        trainer_datasets_container = TrainerDatasetsContainer(
+        trainer_datasets_container = TrainerDatasetManager(
             pre_train_dataset_creator=pre_train_dataset_creator,
             train_dataset_creator=train_dataset_creator,
             val_dataset_creator=val_dataset_creator,

@@ -42,4 +42,4 @@ class TestMLMPreTrainDatasetCreator(BaseTest):
     def get_mlm_pre_train_dataset_creator(self):
         return MLMPreTrainDatasetCreator(self.PRETRAIN_DIR,
                                          TEST_OUTPUT_DIR,
-                                         data_cleaning_steps=self.DATA_CLEANING_STEPS)
+                                         data_cleaner=self.DATA_CLEANER)

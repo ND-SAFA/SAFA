@@ -1,5 +1,4 @@
 from data.datasets.creators.classic_trace_dataset_creator import ClassicTraceDatasetCreator
-from data.processing.cleaning.data_cleaner import DataCleaner
 from test.base_trace_test import BaseTraceTest
 
 
@@ -48,7 +47,6 @@ class TestClassicTraceDatasetCreator(BaseTraceTest):
             self.assertIn(link.target.id, self.LINKED_TARGETS)
 
     def get_classic_trace_dataset_creator(self, use_linked_targets_only: bool = False):
-        data_cleaner = DataCleaner(self.DATA_CLEANING_STEPS)
         return ClassicTraceDatasetCreator(source_layers=self.SOURCE_LAYERS, target_layers=self.TARGET_LAYERS,
-                                          true_links=self.POS_LINKS, data_cleaner=data_cleaner,
+                                          true_links=self.POS_LINKS, data_cleaner=self.DATA_CLEANER,
                                           use_linked_targets_only=use_linked_targets_only)

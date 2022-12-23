@@ -1,9 +1,9 @@
 from typing import Type
 
-from test.base_test import BaseTest
-from data.processing.cleaning.supported_data_cleaning_step import SupportedDataCleaningStep
-from data.processing.cleaning.data_cleaner import DataCleaner
 from data.processing.abstract_data_processing_step import AbstractDataProcessingStep
+from data.processing.cleaning.data_cleaner import DataCleaner
+from data.processing.cleaning.supported_data_cleaning_step import SupportedDataCleaningStep
+from test.base_test import BaseTest
 
 
 class TestDataCleaner(BaseTest):
@@ -14,7 +14,8 @@ class TestDataCleaner(BaseTest):
     LAST_STEP: Type[AbstractDataProcessingStep] = SupportedDataCleaningStep.FILTER_MIN_LENGTH.value
 
     def test_order_steps(self):
-        steps = [SupportedDataCleaningStep.SHUFFLE_WORDS.value(), SupportedDataCleaningStep.SEPARATE_JOINED_WORDS.value(),
+        steps = [SupportedDataCleaningStep.SHUFFLE_WORDS.value(),
+                 SupportedDataCleaningStep.SEPARATE_JOINED_WORDS.value(),
                  SupportedDataCleaningStep.REMOVE_UNWANTED_CHARS.value()]
         expected_order = [1, 2, 0]
         ordered_steps = DataCleaner._order_steps(steps)
@@ -28,4 +29,4 @@ class TestDataCleaner(BaseTest):
         self.assertListEqual(processed_content, self.EXPECTED_CONTENTS)
 
     def get_data_cleaner(self):
-        return DataCleaner(self.DATA_CLEANING_STEPS)
+        return self.DATA_CLEANER

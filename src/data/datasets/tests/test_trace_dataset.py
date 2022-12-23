@@ -6,6 +6,7 @@ from unittest.mock import patch
 from data.datasets.data_key import DataKey
 from data.datasets.trace_dataset import TraceDataset
 from data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
+from data.processing.augmentation.data_augmenter import DataAugmenter
 from data.processing.augmentation.resample_step import ResampleStep
 from data.processing.augmentation.simple_word_replacement_step import SimpleWordReplacementStep
 from data.processing.augmentation.source_target_swap_step import SourceTargetSwapStep
@@ -65,7 +66,8 @@ class TestTraceDataset(BaseTraceTest):
         n_expected = [(len(trace_dataset.neg_link_ids) - (2 * len(trace_dataset.pos_link_ids))) * .5,
                       len(trace_dataset.pos_link_ids)]
         n_expected.append(n_expected[0])
-        trace_dataset.augment_pos_links(steps)
+        data_augmenter = DataAugmenter(steps)
+        trace_dataset.augment_pos_links(data_augmenter)
         self.assertEquals(len(trace_dataset.pos_link_ids), len(trace_dataset.neg_link_ids))
 
         n_augmented_links = [0 for i in range(len(step_ids))]
@@ -74,14 +76,14 @@ class TestTraceDataset(BaseTraceTest):
             for i, step_id in enumerate(step_ids):
                 if step_id in link.target.id:
                     self.assertIn(link_id, trace_dataset.pos_link_ids)
-                    self.assertIn(step_id, link.source_body.id)
+                    self.assertIn(step_id, link.source.id)
                     n_augmented_links[i] += 1
                     if isinstance(steps[i], SimpleWordReplacementStep):
-                        if replacement_word not in link.source_body.token and replacement_word not in link.target.token:
+                        if replacement_word not in link.source.token and replacement_word not in link.target.token:
                             self.fail("Did not properly perform simple word replacement")
                         self.assertIn("token", link.target.token)
                     elif isinstance(steps[i], SourceTargetSwapStep):
-                        self.assertIn("t_", link.source_body.token)
+                        self.assertIn("t_", link.source.token)
                         if "s_" not in link.target.token:
                             if replacement_word not in link.target.token:
                                 self.fail("Did not properly perform source target swap")
@@ -109,7 +111,7 @@ class TestTraceDataset(BaseTraceTest):
         self.assertIn(true_link_id, trace_dataset.links)
         self.assertNotIn(true_link_id, trace_dataset.neg_link_ids)
         self.assertIn(true_link_id, trace_dataset.pos_link_ids)
-        self.assertEquals(trace_dataset.links[true_link_id].source_body.token, source_tokens)
+        self.assertEquals(trace_dataset.links[true_link_id].source.token, source_tokens)
         self.assertEquals(trace_dataset.links[true_link_id].target.token, target_tokens)
 
         false_source_id, false_target_id = "source_id2", "target_id2"
@@ -128,21 +130,21 @@ class TestTraceDataset(BaseTraceTest):
 
         aug_source_id, aug_target_id = trace_dataset._get_augmented_artifact_ids(augmented_tokens, orig_link,
                                                                                  aug_step_id, entry_num)
-        self.assertEquals(aug_source_id, orig_link.source_body.id + aug_step_id)
+        self.assertEquals(aug_source_id, orig_link.source.id + aug_step_id)
         self.assertEquals(aug_target_id, orig_link.target.id + aug_step_id)
 
         # link id already exists but is same as augmented
         trace_dataset.add_link(aug_source_id, aug_target_id, *augmented_tokens, is_true_link=True)
         aug_source_id, aug_target_id = trace_dataset._get_augmented_artifact_ids(augmented_tokens, orig_link,
                                                                                  aug_step_id, entry_num)
-        self.assertEquals(aug_source_id, orig_link.source_body.id + aug_step_id)
+        self.assertEquals(aug_source_id, orig_link.source.id + aug_step_id)
         self.assertEquals(aug_target_id, orig_link.target.id + aug_step_id)
 
         # link id already exists but is NOT the same as augmented
         trace_dataset.add_link(aug_source_id, aug_target_id, "s_token", "t_token", is_true_link=True)
         aug_source_id, aug_target_id = trace_dataset._get_augmented_artifact_ids(augmented_tokens, orig_link,
                                                                                  aug_step_id, entry_num)
-        self.assertEquals(aug_source_id, orig_link.source_body.id + aug_step_id + str(entry_num))
+        self.assertEquals(aug_source_id, orig_link.source.id + aug_step_id + str(entry_num))
         self.assertEquals(aug_target_id, orig_link.target.id + aug_step_id + str(entry_num))
 
     def test_get_data_entries_for_augmentation(self):
@@ -157,7 +159,7 @@ class TestTraceDataset(BaseTraceTest):
     def test_create_links_from_augmentation(self):
         ids = ['id1', 'id2']
         orig_links = list(self.get_links(self.POS_LINKS).values())
-        base_result = [(link.source_body.token, link.target.token) for link in orig_links]
+        base_result = [(link.source.token, link.target.token) for link in orig_links]
         results = [[(id_ + pair[0], id_ + pair[1]) for pair in base_result] for id_ in ids]
         augmentation_results = {
             AbstractDataAugmentationStep.COMMON_ID + id_: zip(results[i], [j for j in range(len(orig_links))])
@@ -168,9 +170,9 @@ class TestTraceDataset(BaseTraceTest):
         n_augmented_links = [0 for i in range(len(ids))]
         for link in trace_dataset.links.values():
             for i, id_ in enumerate(ids):
-                if id_ in link.source_body.id:
+                if id_ in link.source.id:
                     self.assertIn(id_, link.target.id)
-                    self.assertIn(id_, link.source_body.token)
+                    self.assertIn(id_, link.source.token)
                     self.assertIn(id_, link.target.token)
                     self.assertIn(link.id, trace_dataset.pos_link_ids)
                     n_augmented_links[i] += 1
@@ -244,10 +246,11 @@ class TestTraceDataset(BaseTraceTest):
         n_pos_links = len(self.POS_LINKS)
 
         trace_dataset_aug = self.get_trace_dataset()
-        trace_dataset_aug.prepare_for_training([SimpleWordReplacementStep(1, 0.15)])
+        data_augmenter = DataAugmenter([SimpleWordReplacementStep(1, 0.15)])
+        trace_dataset_aug.prepare_for_training(data_augmenter)
         aug_links = {link_id for link_id in trace_dataset_aug.pos_link_ids if
                      AbstractDataAugmentationStep.extract_unique_id_from_step_id(SimpleWordReplacementStep.get_id())
-                     in trace_dataset_aug.links[link_id].source_body.id}
+                     in trace_dataset_aug.links[link_id].source.id}
         self.assertEquals(len(aug_links), len(self.NEG_LINKS) - n_pos_links)
         self.assertEquals(len(set(trace_dataset_aug.pos_link_ids)), n_pos_links + len(aug_links))
         self.assertEquals(len(trace_dataset_aug.pos_link_ids), len(trace_dataset_aug.neg_link_ids))
@@ -258,12 +261,12 @@ class TestTraceDataset(BaseTraceTest):
         test_link = self.get_test_link(source, target)
 
         feature_entry_siamese = trace_dataset._get_feature_entry(test_link, ModelArchitectureType.SIAMESE, fake_method)
-        self.assertIn(test_link.source_body.token, feature_entry_siamese.values())
+        self.assertIn(test_link.source.token, feature_entry_siamese.values())
         self.assertIn(test_link.target.token, feature_entry_siamese.values())
         self.assertIn(DataKey.LABEL_KEY, feature_entry_siamese)
 
         feature_entry_single = trace_dataset._get_feature_entry(test_link, ModelArchitectureType.SINGLE, fake_method)
-        self.assertIn(FEATURE_VALUE.format(test_link.source_body.token, test_link.target.token),
+        self.assertIn(FEATURE_VALUE.format(test_link.source.token, test_link.target.token),
                       feature_entry_single.values())
         self.assertIn(DataKey.LABEL_KEY, feature_entry_single)
 

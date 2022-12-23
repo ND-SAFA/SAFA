@@ -1,7 +1,10 @@
+import os
+
 from data.datasets.dataset_role import DatasetRole
 from jobs.components.job_args import JobArgs
 from jobs.predict_job import PredictJob
 from jobs.tests.base_job_test import BaseJobTest
+from test.paths.paths import TEST_DATA_DIR, TEST_OUTPUT_DIR
 
 
 class TestPredictJob(BaseJobTest):

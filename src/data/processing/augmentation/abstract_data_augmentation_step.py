@@ -11,7 +11,7 @@ class AbstractDataAugmentationStep(AbstractDataProcessingStep, ABC):
     COMMON_ID = str(uuid.uuid4())[:8]
     AUGMENTATION_RESULT = Iterable[Tuple[Tuple[str], int]]
 
-    def __init__(self, percent_to_weight: float, order: ProcessingOrder = ProcessingOrder.ANY):
+    def __init__(self, percent_to_weight: float = 1, order: ProcessingOrder = ProcessingOrder.ANY):
         """
         :param percent_to_weight: the percentage of the data that the augmentation step will augment
         :param order: the order the step should be run in

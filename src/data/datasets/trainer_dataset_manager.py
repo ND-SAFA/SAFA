@@ -12,6 +12,7 @@ from data.datasets.trace_dataset import TraceDataset
 from data.processing.augmentation.data_augmenter import DataAugmenter
 from experiments.variables.definition_variable import DefinitionVariable
 from util.base_object import BaseObject
+from util.enum_utils import get_enum_from_name
 
 
 class TrainerDatasetManager(BaseObject):
@@ -82,7 +83,7 @@ class TrainerDatasetManager(BaseObject):
         :param child_class_name: the name of the child class
         :return: the expected type
         """
-        return SupportedDatasetCreator[child_class_name.upper()].value
+        return get_enum_from_name(SupportedDatasetCreator, child_class_name).value
 
     def _prepare_datasets(self, data_augmenter: DataAugmenter) -> None:
         """
@@ -130,8 +131,7 @@ class TrainerDatasetManager(BaseObject):
                 for dataset_role, dataset_creator in dataset_creators_map.items()}
 
     @staticmethod
-    def __optional_create(dataset_creator: Optional[AbstractDatasetCreator]) -> Optional[
-        Union[TraceDataset, PreTrainDataset]]:
+    def __optional_create(dataset_creator: Optional[AbstractDatasetCreator]) -> Optional[Union[TraceDataset, PreTrainDataset]]:
         """
         Creates dataset set if not None, otherwise None is returned.
         :param dataset_creator: The optional dataset creator to use.

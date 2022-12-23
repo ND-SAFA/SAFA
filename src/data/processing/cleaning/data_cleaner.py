@@ -9,6 +9,7 @@ from experiments.variables.multi_variable import MultiVariable
 from experiments.variables.typed_definition_variable import TypedDefinitionVariable
 from experiments.variables.variable import Variable
 from util.base_object import BaseObject
+from util.enum_utils import get_enum_from_name
 
 
 class DataCleaner(AbstractDataProcessor, BaseObject):
@@ -37,4 +38,4 @@ class DataCleaner(AbstractDataProcessor, BaseObject):
         :param child_class_name: the name of the child class
         :return: the expected type
         """
-        return SupportedDataCleaningStep[child_class_name.upper()].value
+        return get_enum_from_name(SupportedDataCleaningStep, child_class_name).value

@@ -5,6 +5,7 @@ from data.processing.abstract_data_processor import AbstractDataProcessor
 from data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
 from data.processing.augmentation.supported_data_augmentation_step import SupportedAugmentationStep
 from util.base_object import BaseObject
+from util.enum_utils import get_enum_from_name
 
 
 class DataAugmenter(AbstractDataProcessor, BaseObject):
@@ -92,4 +93,4 @@ class DataAugmenter(AbstractDataProcessor, BaseObject):
         :param child_class_name: the name of the child class
         :return: the expected type
         """
-        return SupportedAugmentationStep[child_class_name.upper()].value
+        return get_enum_from_name(SupportedAugmentationStep, child_class_name).value

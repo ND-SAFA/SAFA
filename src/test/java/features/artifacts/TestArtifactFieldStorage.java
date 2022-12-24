@@ -19,7 +19,7 @@ import edu.nd.crc.safa.features.artifacts.entities.db.schema.IntegerFieldInfo;
 import edu.nd.crc.safa.features.artifacts.entities.db.schema.SelectionFieldOption;
 import edu.nd.crc.safa.features.artifacts.entities.db.versions.ArtifactFieldVersion;
 import edu.nd.crc.safa.features.artifacts.entities.db.versions.ArtifactVersion;
-import edu.nd.crc.safa.features.artifacts.services.ArtifactFieldValueUtils;
+import edu.nd.crc.safa.features.artifacts.services.ArtifactFieldValueService;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 
@@ -35,7 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class TestArtifactFieldStorage extends ApplicationBaseTest {
 
     @Autowired
-    ArtifactFieldValueUtils artifactFieldValueUtils;
+    ArtifactFieldValueService artifactFieldValueService;
 
     private final Map<ArtifactFieldType, FieldSchemaInfo> fields = Map.of(
         ArtifactFieldType.TEXT, new FieldSchemaInfo("Text goes here", "textField", "Text Value", "Second text value"),
@@ -80,7 +80,7 @@ public class TestArtifactFieldStorage extends ApplicationBaseTest {
 
             CustomAttribute field = setupSchemaField(fieldType, schemaInfo);
 
-            artifactFieldValueUtils.saveAttributeValue(field, artifactVersion, schemaInfo.value);
+            artifactFieldValueService.saveAttributeValue(field, artifactVersion, schemaInfo.value);
         }
     }
 
@@ -145,12 +145,12 @@ public class TestArtifactFieldStorage extends ApplicationBaseTest {
             FieldSchemaInfo schemaInfo = fields.get(fieldType);
 
             Optional<CustomAttribute> fieldOpt =
-                artifactFieldValueUtils.getServiceProvider().getCustomAttributeRepository()
+                artifactFieldValueService.getServiceProvider().getCustomAttributeRepository()
                     .findByProjectAndKeyname(project, schemaInfo.keyName);
 
             assertTrue(fieldOpt.isPresent());
 
-            artifactFieldValueUtils.saveAttributeValue(fieldOpt.get(), artifactVersion, schemaInfo.altValue);
+            artifactFieldValueService.saveAttributeValue(fieldOpt.get(), artifactVersion, schemaInfo.altValue);
         }
     }
 

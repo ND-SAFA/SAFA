@@ -16,7 +16,7 @@ import edu.nd.crc.safa.features.artifacts.repositories.ArtifactRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.FTAArtifactRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.SafetyCaseArtifactRepository;
-import edu.nd.crc.safa.features.artifacts.services.ArtifactFieldValueUtils;
+import edu.nd.crc.safa.features.artifacts.services.ArtifactFieldValueService;
 import edu.nd.crc.safa.features.commits.repositories.GenericVersionRepository;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
@@ -67,7 +67,7 @@ public class ArtifactVersionRepositoryImpl
     TraceLinkVersionRepository traceLinkVersionRepository;
 
     @Autowired
-    ArtifactFieldValueUtils artifactFieldValueUtils;
+    ArtifactFieldValueService artifactFieldValueService;
 
     VersionCalculator versionCalculator = new VersionCalculator();
 
@@ -75,7 +75,7 @@ public class ArtifactVersionRepositoryImpl
     public ArtifactVersion save(ArtifactVersion artifactVersion) {
         ArtifactVersion version = this.artifactVersionRepository.save(artifactVersion);
 
-        artifactFieldValueUtils.saveAllAttributeValues(artifactVersion,
+        artifactFieldValueService.saveAllAttributeValues(artifactVersion,
             artifactVersion.getCustomAttributeValues());
 
         return version;
@@ -157,7 +157,7 @@ public class ArtifactVersionRepositoryImpl
         TypeReference<Map<String, String>> typeReference = new TypeReference<Map<String, String>>() {
         };
         Map<String, String> customFields =
-            artifactFieldValueUtils.getCustomAttributeValuesForArtifact(artifactVersion);
+            artifactFieldValueService.getCustomAttributeValuesForArtifact(artifactVersion);
 
         ArtifactAppEntity artifactAppEntity =
             new ArtifactAppEntity(artifactVersion.getArtifact().getArtifactId(),

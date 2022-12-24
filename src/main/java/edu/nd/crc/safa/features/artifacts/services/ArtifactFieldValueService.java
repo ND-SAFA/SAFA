@@ -17,23 +17,21 @@ import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 /**
  * Contains util functions for interacting with artifact fields.
  */
-@Component
-@Data
-public class ArtifactFieldValueUtils {
+@Service
+public class ArtifactFieldValueService {
 
     private final ArtifactSystemServiceProvider serviceProvider;
 
     private final Logger logger = LoggerFactory.getLogger(ArtifactVersionRepositoryImpl.class);
 
-    public ArtifactFieldValueUtils(ArtifactSystemServiceProvider serviceProvider) {
+    public ArtifactFieldValueService(ArtifactSystemServiceProvider serviceProvider) {
         this.serviceProvider = serviceProvider;
     }
 

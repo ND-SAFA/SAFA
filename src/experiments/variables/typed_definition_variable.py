@@ -5,7 +5,7 @@ from experiments.variables.variable import Variable
 
 
 class TypedDefinitionVariable(DefinitionVariable):
-    OBJECT_TYPE_KEY = "objectType"
+    OBJECT_TYPE_KEY = "object_type"
 
     def __init__(self, value: Dict[str, Any]):
         """

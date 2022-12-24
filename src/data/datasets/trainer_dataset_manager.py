@@ -1,11 +1,13 @@
 from collections import OrderedDict
 from typing import Dict, List, Optional, Union, Type, Any
 
+from prometheus_client.decorator import getfullargspec
+
 from config.override import overrides
+from data.datasets.abstract_dataset import AbstractDataset
 from data.datasets.creators.abstract_dataset_creator import AbstractDatasetCreator
 from data.datasets.creators.split_dataset_creator import SplitDatasetCreator
 from data.datasets.creators.supported_dataset_creator import SupportedDatasetCreator
-from data.datasets.abstract_dataset import AbstractDataset
 from data.datasets.dataset_role import DatasetRole
 from data.datasets.pre_train_dataset import PreTrainDataset
 from data.datasets.trace_dataset import TraceDataset
@@ -35,8 +37,8 @@ class TrainerDatasetManager(BaseObject):
         self.__dataset_creators = {DatasetRole.PRE_TRAIN: pre_train_dataset_creator,
                                    DatasetRole.TRAIN: train_dataset_creator,
                                    DatasetRole.VAL: val_dataset_creator, DatasetRole.EVAL: eval_dataset_creator}
-        self.__datasets = self._create_datasets_from_creators(self.__dataset_creators)
-        self._prepare_datasets(augmenter)
+        self.__datasets = None
+        self.augmenter = augmenter
 
     def get_creator(self, dataset_role: DatasetRole) -> AbstractDatasetCreator:
         """
@@ -84,6 +86,16 @@ class TrainerDatasetManager(BaseObject):
         """
         return get_enum_from_name(SupportedDatasetCreator, child_class_name).value
 
+    def get_datasets(self) -> Dict[DatasetRole: AbstractDataset]:
+        """
+        Gets the dictionary mapping dataset role to the dataset
+        :return: the dictionary of datasets
+        """
+        if self.__datasets is None:
+            self.__datasets = self._create_datasets_from_creators(self.__dataset_creators)
+            self._prepare_datasets(self.augmenter)
+        return self.__datasets
+
     def _prepare_datasets(self, data_augmenter: DataAugmenter) -> None:
         """
         Performs any necessary additional steps necessary to prepare each dataset
@@ -93,7 +105,7 @@ class TrainerDatasetManager(BaseObject):
         train_dataset = self[DatasetRole.TRAIN]
         if isinstance(self[DatasetRole.TRAIN], TraceDataset):
             dataset_splits_map = self._create_dataset_splits(train_dataset, self.__dataset_creators)
-            self.__datasets.update(dataset_splits_map)
+            self.get_datasets().update(dataset_splits_map)
             self[DatasetRole.TRAIN].prepare_for_training(data_augmenter)
 
     @staticmethod
@@ -155,7 +167,7 @@ class TrainerDatasetManager(BaseObject):
         :return: PreTrainDataset if pretrain role otherwise TraceDataset
         """
         self.__assert_index(dataset_role)
-        return self.__datasets[dataset_role]
+        return self.get_datasets()[dataset_role]
 
     def __setitem__(self, dataset_role: DatasetRole, dataset: DATASET_TYPE):
         """
@@ -165,7 +177,7 @@ class TrainerDatasetManager(BaseObject):
         :return: None
         """
         self.__assert_index(dataset_role)
-        self.__datasets[dataset_role] = dataset
+        self.get_datasets()[dataset_role] = dataset
 
     def __contains__(self, dataset_role: DatasetRole):
         """
@@ -175,9 +187,21 @@ class TrainerDatasetManager(BaseObject):
         """
         return self[dataset_role] is not None
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """
         Returns string representation of role to type of mapped dataset.
         :return: String representation of trainer data container.
         """
-        return str({role.name: type(self[role]) for role in DatasetRole})
+        return str({role.name: type(self.get_creator(role)) for role in DatasetRole})
+
+    def __getattr__(self, item: str) -> Any:
+        """
+        Gets attribute of class or init
+        :param item: the name of the attribute
+        :return: the attribute value
+        """
+        dataset_creators_name = "dataset_creator"
+        if dataset_creators_name in item:
+            dataset_role = item.split(dataset_creators_name)[0]
+            return self.get_creator(DatasetRole[dataset_role.upper()])
+        return super().__getattribute__(item)

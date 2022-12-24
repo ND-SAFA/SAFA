@@ -8,10 +8,7 @@ from transformers.models.bert.configuration_bert import BertConfig
 from transformers.models.bert.tokenization_bert import BertTokenizer
 
 from config.constants import DELETE_TEST_OUTPUT
-from models.model_properties import ModelArchitectureType
 from test.paths.paths import TEST_DATA_DIR, TEST_OUTPUT_DIR, TEST_VOCAB_FILE
-from models.base_models.pl_bert import PLBert
-from models.base_models.supported_base_model import SupportedBaseModel
 from data.processing.cleaning.supported_data_cleaning_step import SupportedDataCleaningStep
 from data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 
@@ -39,7 +36,7 @@ class BaseTest(TestCase):
 
     @staticmethod
     def get_test_model():
-        return PLBert(BaseTest.get_test_config())
+        return None #PLBert(BaseTest.get_test_config())
 
     @staticmethod
     def get_test_config():

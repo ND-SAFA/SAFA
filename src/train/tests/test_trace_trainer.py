@@ -62,14 +62,14 @@ class TestTraceTrainer(BaseTraceTest):
         get_rank_mock.return_value = 3
         test_trace_trainer = self.get_test_trace_trainer()
         self.set_train_dataset(test_trace_trainer)
-        test_trace_trainer.args.local_rank = 2
+        test_trace_trainer.trainer_args.local_rank = 2
         data_loader = test_trace_trainer.get_train_dataloader()
         self.assertIsInstance(data_loader.sampler, DistributedSampler)
 
     def test_get_train_dataloader_local_rank_neg_one(self):
         test_trace_trainer = self.get_test_trace_trainer()
         self.set_train_dataset(test_trace_trainer)
-        test_trace_trainer.args.local_rank = -1
+        test_trace_trainer.trainer_args.local_rank = -1
         data_loader = test_trace_trainer.get_train_dataloader()
         self.assertIsInstance(data_loader.sampler, RandomSampler)
 

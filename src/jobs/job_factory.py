@@ -43,15 +43,15 @@ class JobFactory:
     """
     random_seed: int = None
     """
-    Additional parameters for the trace args
+    Additional parameters for the trace trainer_args
     """
     trace_args_params: Dict = field(default_factory=dict)
     """
-    args used for TraceTrainer, initialized from traceArgsParams
+    trainer_args used for TraceTrainer, initialized from traceArgsParams
     """
     trainer_args: TrainerArgs = field(init=False, default=None)
     """
-    any additional args needed for the job
+    any additional trainer_args needed for the job
     """
     additional_job_params: Dict = field(init=False, default=None)
     """
@@ -69,7 +69,7 @@ class JobFactory:
 
     def set_args(self, **kwargs) -> None:
         """
-        Sets class args
+        Sets class trainer_args
         :param kwargs: optional arguments for Trainer
         :return: None
         """
@@ -94,7 +94,7 @@ class JobFactory:
 
     def _create_trace_args(self) -> None:
         """
-        Creates the trace args from the given data and trace args params
+        Creates the trace trainer_args from the given data and trace trainer_args params
         :return: None
         """
         if self.trainer_dataset_container is None:
@@ -127,13 +127,10 @@ class JobFactory:
 
 def assert_job_factory_attr_names():
     """
-    Ensures the job factory has attributes with names matching those in job args
+    Ensures the job factory has attributes with names matching those in job trainer_args
     :return: None
     """
 
     for attr_name, attr_value in vars(JobArgs).items():
         if not isinstance(attr_value, Callable) and not hasattr(JobFactory, attr_name):
-            raise NameError("Expected attr named %s in JobFactory to match attr in job args" % attr_name)
-
-
-assert_job_factory_attr_names()
+            raise NameError("Expected attr named %s in JobFactory to match attr in job trainer_args" % attr_name)

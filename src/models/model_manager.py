@@ -11,9 +11,6 @@ from util.base_object import BaseObject
 
 
 class ModelManager(BaseObject):
-    """
-    Represents a learning model
-    """
     _max_seq_length: int = MAX_SEQ_LENGTH_DEFAULT
 
     def __init__(self, model_path: str, model_task: ModelTask = ModelTask.SEQUENCE_CLASSIFICATION,

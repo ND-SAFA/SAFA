@@ -1,6 +1,6 @@
+import math
 from typing import List, Tuple, Union
 
-import math
 import numpy as np
 import torch
 from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
@@ -19,6 +19,8 @@ UnlabeledExample = Tuple[str, None]
 Example = Union[LabeledExample, UnlabeledExample]
 
 
+# TODO add documentation
+
 class GanDatasetConverter(BaseObject):
 
     def __init__(self, trainer_args: TrainerArgs, train_dataset: TraceDataset, pre_train_dataset: PreTrainDataset = None,
@@ -28,7 +30,9 @@ class GanDatasetConverter(BaseObject):
         (text, label) where text contains the concatenated source and target artifacts. The label is either 0 or 1
         representing traced or not traced.
         """
-        self.trace_args = trainer_args
+        self.trainer_args = trainer_args
+        self.train_dataset = train_dataset
+        self.pre_train_dataset = pre_train_dataset
         self.labeled_examples = self.create_labeled_examples(train_dataset)
         self.unlabeled_examples = self.create_unlabeled_exampled(pre_train_dataset) if pre_train_dataset else None
         self.label_list = label_list if label_list else BINARY_LABEL_LIST
@@ -36,8 +40,7 @@ class GanDatasetConverter(BaseObject):
     def to_gan_dataset(self, model_generator: ModelManager) -> DataLoader:
         """
         Creates dataloader containing labeled and unlabeled examples for gan.
-        :return:
-        :rtype:
+        :return: data loader
         """
         label_map = {}
         for (i, label) in enumerate(self.label_list):
@@ -61,7 +64,7 @@ class GanDatasetConverter(BaseObject):
             input_examples,
             label_mask_rate,
             label_masks,
-            self.trace_args.apply_balance)
+            self.trainer_args.apply_balance)
 
         # Generate input examples to the Transformer
         input_ids, label_id_array, label_mask_array, input_mask_array = self.tokenize_examples(examples, label_map,
@@ -69,11 +72,11 @@ class GanDatasetConverter(BaseObject):
         tensor_dataset = self.to_tensor_dataset(input_ids, label_id_array, label_mask_array, input_mask_array)
 
         # Building the DataLoader
-        sampler = RandomSampler if self.trace_args.shuffle else SequentialSampler
+        sampler = RandomSampler if self.trainer_args.shuffle else SequentialSampler
         return DataLoader(
             tensor_dataset,  # The training samples.
             sampler=sampler(tensor_dataset),
-            batch_size=self.trace_args.train_batch_size)  # Trains with this batch size.
+            batch_size=self.trainer_args.train_batch_size)  # Trains with this batch size.
 
     def tokenize_examples(self, examples, label_map, model_generator: ModelManager):
         input_ids = []

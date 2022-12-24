@@ -6,8 +6,8 @@ import pandas as pd
 
 from config.constants import USE_LINKED_TARGETS_ONLY_DEFAULT
 from data.datasets.creators.abstract_trace_dataset_creator import AbstractTraceDatasetCreator
-from data.datasets.trace_dataset import TraceDataset
 from data.datasets.formats.safa_format import SafaFormat
+from data.datasets.trace_dataset import TraceDataset
 from data.processing.cleaning.data_cleaner import DataCleaner
 from data.tree.artifact import Artifact
 
@@ -23,24 +23,24 @@ class SafaDatasetCreator(AbstractTraceDatasetCreator):
         Creates a data from the SAFA data format.
         :param project_path: the path to the project
         :param data_cleaner: the data cleaner to use on the data
-        :param data_keys: keys to use to access data
+        :param data_keys: data_keys to use to access data
         :param use_linked_targets_only: if True, uses only the targets that make up at least one true link
         """
         super().__init__(data_cleaner, use_linked_targets_only)
         self.project_path = project_path
-        self.keys = data_keys
+        self.data_keys = data_keys
 
     def create(self) -> TraceDataset:
         """
         Creates the data
         :return: the data
         """
-        return self._create_dataset_from_files(self.keys)
+        return self._create_dataset_from_files(self.data_keys)
 
     def _create_dataset_from_files(self, keys: SafaFormat) -> TraceDataset:
         """
         Creates data params from data files
-        :param keys: keys used to access data in dataframe
+        :param keys: data_keys used to access data in dataframe
         :return: the links, pos_link-ids, and neg_link_ids
         """
         links = {}
@@ -60,13 +60,13 @@ class SafaDatasetCreator(AbstractTraceDatasetCreator):
         :param data_file_name: The name of the artifact file to read.
         :return: List of artifacts in file.
         """
-        artifacts_file = self._read_data_file(self.project_path, data_file_name, self.keys.artifacts_key)
+        artifacts_file = self._read_data_file(self.project_path, data_file_name, self.data_keys.artifacts_key)
 
         artifacts = []
         for i, row in artifacts_file.iterrows():
-            artifact_tokens = self._process_tokens(row[self.keys.artifact_token_key])
+            artifact_tokens = self._process_tokens(row[self.data_keys.artifact_token_key])
             if artifact_tokens:
-                artifacts.append(Artifact(row[self.keys.artifact_id_key], artifact_tokens))
+                artifacts.append(Artifact(row[self.data_keys.artifact_id_key], artifact_tokens))
 
         return artifacts
 
@@ -75,8 +75,8 @@ class SafaDatasetCreator(AbstractTraceDatasetCreator):
         Extracts positive trace links from trace files in project.
         :return: Trace link ids of positive links.
         """
-        links_df = self._read_data_file(self.project_path, data_file_name, self.keys.traces_key)
-        return self._get_pos_link_ids([(link[self.keys.source_id_key], link[self.keys.target_id_key])
+        links_df = self._read_data_file(self.project_path, data_file_name, self.data_keys.traces_key)
+        return self._get_pos_link_ids([(link[self.data_keys.source_id_key], link[self.data_keys.target_id_key])
                                        for _, link in links_df.iterrows()])
 
     @staticmethod

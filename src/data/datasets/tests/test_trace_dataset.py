@@ -56,7 +56,7 @@ class TestTraceDataset(BaseTraceTest):
         df = trace_dataset.to_dataframe()
         self.assertTrue(isinstance(df, pd.DataFrame))
         new_trace_dataset = CSVDatasetCreator("path").create_from_dataframe(data_df=df)
-        self.assert_lists_have_the_same_vals(new_trace_dataset.links.keys(), trace_dataset.links.keys())
+        self.assert_lists_have_the_same_vals(new_trace_dataset.links.data_keys(), trace_dataset.links.data_keys())
         self.assert_lists_have_the_same_vals(new_trace_dataset.pos_link_ids, trace_dataset.pos_link_ids)
         self.assert_lists_have_the_same_vals(new_trace_dataset.neg_link_ids, trace_dataset.neg_link_ids)
 
@@ -218,12 +218,12 @@ class TestTraceDataset(BaseTraceTest):
         expected_val_link_size = (self.EXPECTED_VAL_SIZE_POS_LINKS + self.EXPECTED_VAL_SIZE_NEG_LINKS)
         self.assertEquals(len(split1), len(self.ALL_TEST_LINKS) - expected_val_link_size)
         self.assertEquals(len(split2), expected_val_link_size)
-        intersection = set(split1.links.keys()).intersection(set(split2.links.keys()))
+        intersection = set(split1.links.data_keys()).intersection(set(split2.links.data_keys()))
         self.assertEquals(len(intersection), 0)
 
         for split in [split1, split2]:
             link_ids = split.pos_link_ids + split.neg_link_ids
-            self.assert_lists_have_the_same_vals(split.links.keys(), link_ids)
+            self.assert_lists_have_the_same_vals(split.links.data_keys(), link_ids)
 
     def test_split_multiple(self):
         trace_dataset = self.get_trace_dataset()
@@ -231,7 +231,7 @@ class TestTraceDataset(BaseTraceTest):
         percent_splits = [0.3, 0.2]
         splits = trace_dataset.split_multiple(percent_splits)
         length_of_splits = [len(split) for split in splits]
-        split_link_ids = [set(split.links.keys()) for split in splits]
+        split_link_ids = [set(split.links.data_keys()) for split in splits]
         self.assertEquals(sum(length_of_splits), n_orig_links)
         for i, len_split in enumerate(length_of_splits):
             if i == 0:

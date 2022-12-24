@@ -3,6 +3,10 @@ from typing import Dict, Any
 
 class UncasedDict(dict):
     def __init__(self, dict_: Dict[Any, Any] = None):
+        """
+        Represents a dictionary whose keys are uncased
+        :param dict_: the dictionary to represent
+        """
         super().__init__()
         if dict_:
             self.__initialize_as_dict(dict_)
@@ -63,3 +67,4 @@ class UncasedDict(dict):
         :return: True if the key is in the results dictionary else False
         """
         return super().__contains__(self._process_key(key))
+

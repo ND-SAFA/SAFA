@@ -21,12 +21,12 @@ from train.trace_trainer import TraceTrainer
 
 
 class GanTrainer(TraceTrainer):
-    """
-    Generative Adviserial Network for training bert models.
-    Github: https://github.com/crux82/ganbert-pytorch/blob/main/GANBERT_pytorch.ipynb
-    """
 
     def __init__(self, args: TrainerArgs, model_manager: ModelManager, **kwargs):
+        """
+        Generative Adviserial Network for training bert models.
+        Github: https://github.com/crux82/ganbert-pytorch/blob/main/GANBERT_pytorch.ipynb
+        """
         super().__init__(args, model_manager, **kwargs)
         self.transformer = None
 
@@ -36,10 +36,10 @@ class GanTrainer(TraceTrainer):
         :param checkpoint: path to checkpoint.
         :return: a dictionary containing the results
         """
-        self.train_dataset = self.to_gan_dataset(self.dataset_container[DatasetRole.TRAIN],
-                                                 self.dataset_container[DatasetRole.PRE_TRAIN])
-        if DatasetRole.EVAL in self.dataset_container:
-            self.eval_dataset = self.to_gan_dataset(self.dataset_container[DatasetRole.EVAL])
+        self.train_dataset = self.to_gan_dataset(self.trainer_dataset_manager[DatasetRole.TRAIN],
+                                                 self.trainer_dataset_manager[DatasetRole.PRE_TRAIN])
+        if DatasetRole.EVAL in self.trainer_dataset_manager:
+            self.eval_dataset = self.to_gan_dataset(self.trainer_dataset_manager[DatasetRole.EVAL])
         output = self.train(resume_from_checkpoint=checkpoint)
         return TraceTrainer.output_to_dict(output)
 
@@ -61,14 +61,14 @@ class GanTrainer(TraceTrainer):
         g_vars = [v for v in generator.parameters()]
 
         # optimizer
-        dis_optimizer = torch.optim.AdamW(d_vars, lr=self.args.learning_rate_discriminator)
-        gen_optimizer = torch.optim.AdamW(g_vars, lr=self.args.learning_rate_generator)
+        dis_optimizer = torch.optim.AdamW(d_vars, lr=self.trainer_args.learning_rate_discriminator)
+        gen_optimizer = torch.optim.AdamW(g_vars, lr=self.trainer_args.learning_rate_generator)
 
         # scheduler
-        if self.args.apply_scheduler:
+        if self.trainer_args.apply_scheduler:
             num_train_examples = len(self.train_dataset)
-            num_train_steps = int(num_train_examples / self.args.train_batch_size * self.args.num_train_epochs)
-            num_warmup_steps = int(num_train_steps * self.args.warmup_proportion)
+            num_train_steps = int(num_train_examples / self.trainer_args.train_batch_size * self.trainer_args.num_train_epochs)
+            num_warmup_steps = int(num_train_steps * self.trainer_args.warmup_proportion)
 
             scheduler_d = get_constant_schedule_with_warmup(dis_optimizer,
                                                             num_warmup_steps=num_warmup_steps)
@@ -76,13 +76,13 @@ class GanTrainer(TraceTrainer):
                                                             num_warmup_steps=num_warmup_steps)
 
         # For each epoch...
-        for epoch_i in range(0, self.args.num_train_epochs):
+        for epoch_i in range(0, self.trainer_args.num_train_epochs):
             # ========================================
             #               Training
             # ========================================
             # Perform one full pass over the training set.
             print("")
-            print('======== Epoch {:} / {:} ========'.format(epoch_i + 1, self.args.num_train_epochs))
+            print('======== Epoch {:} / {:} ========'.format(epoch_i + 1, self.trainer_args.num_train_epochs))
             print('Training...')
 
             # Measure how long the training epoch takes.
@@ -101,7 +101,7 @@ class GanTrainer(TraceTrainer):
             for step, batch in enumerate(self.train_dataset):
 
                 # Progress update every print_each_n_step batches.
-                if step % self.args.print_each_n_step == 0 and not step == 0:
+                if step % self.trainer_args.print_each_n_step == 0 and not step == 0:
                     # Calculate elapsed time in minutes.
                     elapsed = self.format_time(time.time() - t0)
 
@@ -123,7 +123,7 @@ class GanTrainer(TraceTrainer):
                 # Generate fake data that should have the same distribution of the ones
                 # encoded by the transformer.
                 # First noisy input are used in input to the Generator
-                noise = torch.zeros(real_batch_size, self.args.noise_size, device=device).uniform_(0, 1)
+                noise = torch.zeros(real_batch_size, self.trainer_args.noise_size, device=device).uniform_(0, 1)
                 # Generate Fake data
                 gen_embeddings = generator(noise)
 
@@ -151,7 +151,7 @@ class GanTrainer(TraceTrainer):
                 #  LOSS evaluation
                 # ---------------------------------
                 # Generator's LOSS estimation
-                g_loss_d = -1 * torch.mean(torch.log(1 - dis_fake_probs[:, -1] + self.args.epsilon))
+                g_loss_d = -1 * torch.mean(torch.log(1 - dis_fake_probs[:, -1] + self.trainer_args.epsilon))
                 g_feat_reg = torch.mean(
                     torch.pow(
                         torch.mean(dis_real_features, dim=0) - torch.mean(dis_fake_features, dim=0),
@@ -176,9 +176,9 @@ class GanTrainer(TraceTrainer):
                     dis_loss_supervised = torch.div(torch.sum(per_example_loss.to(device)), labeled_example_count)
 
                 dis_loss_unsupervised_real = -1 * torch.mean(
-                    torch.log(1 - dis_real_probs[:, -1] + self.args.epsilon))
+                    torch.log(1 - dis_real_probs[:, -1] + self.trainer_args.epsilon))
                 dis_loss_unsupervised_fake = -1 * torch.mean(
-                    torch.log(dis_fake_probs[:, -1] + self.args.epsilon))
+                    torch.log(dis_fake_probs[:, -1] + self.trainer_args.epsilon))
                 d_loss = dis_loss_supervised + dis_loss_unsupervised_real + dis_loss_unsupervised_fake
 
                 # ---------------------------------
@@ -207,7 +207,7 @@ class GanTrainer(TraceTrainer):
                 tr_d_loss += d_loss.item()
 
                 # Update the learning rate with the scheduler
-                if self.args.apply_scheduler:
+                if self.trainer_args.apply_scheduler:
                     scheduler_d.step()
                     scheduler_g.step()
 
@@ -313,24 +313,24 @@ class GanTrainer(TraceTrainer):
         transformer = AutoModel.from_pretrained("bert-base-uncased")  # self.model_manager.get_model()
         hidden_size = int(transformer.config.hidden_size)
         # Define the number and width of hidden layers
-        hidden_levels_g = [hidden_size for i in range(0, self.args.n_hidden_layers_g)]
-        hidden_levels_d = [hidden_size for i in range(0, self.args.n_hidden_layers_d)]
+        hidden_levels_g = [hidden_size for i in range(0, self.trainer_args.n_hidden_layers_g)]
+        hidden_levels_d = [hidden_size for i in range(0, self.trainer_args.n_hidden_layers_d)]
 
         # -------------------------------------------------
         #   Instantiate the Generator and Discriminator
         # -------------------------------------------------
-        generator = Generator(noise_size=self.args.noise_size, output_size=hidden_size, hidden_sizes=hidden_levels_g,
-                              dropout_rate=self.args.out_dropout_rate)
+        generator = Generator(noise_size=self.trainer_args.noise_size, output_size=hidden_size, hidden_sizes=hidden_levels_g,
+                              dropout_rate=self.trainer_args.out_dropout_rate)
         discriminator = Discriminator(input_size=hidden_size, hidden_sizes=hidden_levels_d,
                                       num_labels=len(self.train_dataset),
-                                      dropout_rate=self.args.out_dropout_rate)
+                                      dropout_rate=self.trainer_args.out_dropout_rate)
 
         # Put everything in the GPU if available
         if torch.cuda.is_available():
             generator.cuda()
             discriminator.cuda()
             transformer.cuda()
-            if self.args.multi_gpu:
+            if self.trainer_args.multi_gpu:
                 transformer = torch.nn.DataParallel(transformer)
         return generator, discriminator, transformer
 
@@ -342,7 +342,7 @@ class GanTrainer(TraceTrainer):
         by the generator
         :return: Dataloader containing tensors representing traces.
         """
-        gan_dataset_converter = GanDatasetConverter(self.args,
+        gan_dataset_converter = GanDatasetConverter(self.trainer_args,
                                                     trace_dataset,
                                                     pre_train_dataset=pre_train_dataset)
         return gan_dataset_converter.to_gan_dataset(self.model_manager)

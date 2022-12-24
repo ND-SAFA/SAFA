@@ -25,7 +25,7 @@ class TestSafaDatasetCreator(BaseTraceTest):
         sources = []
         for source_file, target_file in self.TRACE_FILES_2_ARTIFACTS.values():
             sources += dataset_creator._create_artifacts_from_file(source_file)
-        self.assert_lists_have_the_same_vals(list(self.SOURCE_LAYERS[0].keys()) + list(self.SOURCE_LAYERS[1].keys()),
+        self.assert_lists_have_the_same_vals(list(self.SOURCE_LAYERS[0].data_keys()) + list(self.SOURCE_LAYERS[1].data_keys()),
                                              [artifact.id for artifact in sources])
 
     def test_get_pos_link_ids_from_file(self):

@@ -20,9 +20,10 @@ from test.base_test import BaseTest
 class BaseTraceTest(BaseTest):
     SOURCE_LAYERS = [{"s1": "s_token1",
                       "s2": "s_token2",
-                      "s3": "s_token3"}, {"s4": "s_token4",
-                                          "s5": "s_token5",
-                                          "s6": "s_token6"}]
+                      "s3": "s_token3"},
+                     {"s4": "s_token4",
+                      "s5": "s_token5",
+                      "s6": "s_token6"}]
 
     TARGET_LAYERS = [{"t1": "t_token1",
                       "t2": "t_token2",

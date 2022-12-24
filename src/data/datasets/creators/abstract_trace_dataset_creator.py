@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import List, Set, Tuple
+from typing import Dict, List, Set, Tuple
 
 from data.datasets.creators.abstract_dataset_creator import AbstractDatasetCreator
 from data.datasets.trace_dataset import TraceDataset

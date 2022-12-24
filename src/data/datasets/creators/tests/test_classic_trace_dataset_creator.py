@@ -22,7 +22,7 @@ class TestClassicTraceDatasetCreator(BaseTraceTest):
     def test_make_artifacts(self):
         dataset_creator = self.get_classic_trace_dataset_creator()
         artifacts = dataset_creator._make_artifacts(self.SOURCE_LAYERS[0])
-        self.assert_lists_have_the_same_vals(self.SOURCE_LAYERS[0].data_keys(), [artifact.id for artifact in artifacts])
+        self.assert_lists_have_the_same_vals(self.SOURCE_LAYERS[0].keys(), [artifact.id for artifact in artifacts])
 
     def test_get_pos_link_ids(self):
         dataset_creator = self.get_classic_trace_dataset_creator()

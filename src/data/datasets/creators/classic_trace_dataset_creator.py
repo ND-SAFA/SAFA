@@ -76,7 +76,7 @@ class ClassicTraceDatasetCreator(AbstractTraceDatasetCreator):
         :param pos_link_ids: The list of all positive link ids in project.
         :return: Map between trace link ids and trace links for given source and target artifacts.
         """
-        if self._use_linked_targets_only:
+        if self.use_linked_targets_only:
             target_artifacts = self._filter_unlinked_targets(target_artifacts)
 
         links = {}

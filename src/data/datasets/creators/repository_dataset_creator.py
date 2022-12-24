@@ -34,7 +34,7 @@ class RepositoryDatasetCreator(AbstractTraceDatasetCreator):
         for repo_path in self.repo_paths:
             repo_dataset = SafaDatasetCreator(project_path=repo_path,
                                               data_cleaner=self.data_cleaner,
-                                              use_linked_targets_only=self._use_linked_targets_only).create()
+                                              use_linked_targets_only=self.use_linked_targets_only).create()
 
             dataset = dataset + repo_dataset if dataset else repo_dataset
         return dataset

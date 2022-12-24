@@ -51,7 +51,7 @@ class TestBaseObject(BaseTest):
             def create():
                 test_class = TestClass.initialize_from_definition(definition_variable)
 
-            self.assertRaises(TypeError, create)
+            self.assertRaises(TypeError, create, "Failed: " + param_name)
 
     def test_nested_specs(self):
         nested_params = {

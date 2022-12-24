@@ -1,33 +1,23 @@
 from typing import List
 
 from experiments.experiment_step import ExperimentStep
-from experiments.experiment_variables import ExperimentVariables
+from util.base_object import BaseObject
 
 
-class Experiment:
+class Experiment(BaseObject):
 
-    def __init__(self, jobs_vars: List[ExperimentVariables]):
+    def __init__(self, steps: List[ExperimentStep]):
         """
         Represents an experiment run
-        :param jobs_vars: list of all variables to explore
+        :param steps: list of all experiment steps to run
         """
-        self.steps = self._make_steps(jobs_vars)
-
-    @staticmethod
-    def _make_steps(jobs_vars: List[ExperimentVariables]) -> List[ExperimentStep]:
-        """
-        Constructs the experiment steps for each set of job variables
-        :param jobs_vars: a list of job variables
-        :return: a list of experiment steps
-        """
-        return [ExperimentStep(job_vars) for job_vars in jobs_vars]
+        self.steps = steps
 
     def run(self):
         """
         Runs all steps in the experiment
         :return: None
         """
-        best_job_args_from_prior = {}
+        best_job_from_prior_step = None
         for step in self.steps:
-            best_job = step.run(**best_job_args_from_prior)
-            best_job_args_from_prior = best_job.job_args.as_kwargs()
+            best_job_from_prior_step = step.run(best_job_from_prior_step)

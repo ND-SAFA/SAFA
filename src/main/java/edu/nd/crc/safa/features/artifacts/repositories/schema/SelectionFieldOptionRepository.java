@@ -10,4 +10,6 @@ import org.springframework.data.repository.CrudRepository;
 
 public interface SelectionFieldOptionRepository extends CrudRepository<SelectionFieldOption, UUID> {
     List<SelectionFieldOption> findBySchemaField(CustomAttribute schemaField);
+
+    void deleteBySchemaField(CustomAttribute attribute);
 }

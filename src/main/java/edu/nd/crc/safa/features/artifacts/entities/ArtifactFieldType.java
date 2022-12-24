@@ -3,6 +3,12 @@ package edu.nd.crc.safa.features.artifacts.entities;
 import edu.nd.crc.safa.features.artifacts.entities.db.schema.ArtifactFieldExtraInfoType;
 import edu.nd.crc.safa.features.artifacts.entities.db.schema.ArtifactFieldStorageType;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@Getter
+@AllArgsConstructor
 public enum ArtifactFieldType {
     TEXT(ArtifactFieldStorageType.STRING, ArtifactFieldExtraInfoType.NONE),
     PARAGRAPH(ArtifactFieldStorageType.STRING, ArtifactFieldExtraInfoType.NONE),
@@ -17,16 +23,8 @@ public enum ArtifactFieldType {
     private final ArtifactFieldStorageType storageType;
     private final ArtifactFieldExtraInfoType extraInfoType;
 
-    ArtifactFieldType(ArtifactFieldStorageType storageType, ArtifactFieldExtraInfoType extraInfoType) {
-        this.storageType = storageType;
-        this.extraInfoType = extraInfoType;
-    }
-
-    public ArtifactFieldStorageType getStorageType() {
-        return storageType;
-    }
-
-    public ArtifactFieldExtraInfoType getExtraInfoType() {
-        return extraInfoType;
+    @JsonValue
+    public String getJsonName() {
+        return name().toLowerCase();
     }
 }

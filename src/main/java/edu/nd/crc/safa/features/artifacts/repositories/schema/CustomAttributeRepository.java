@@ -14,4 +14,8 @@ public interface CustomAttributeRepository extends CrudRepository<CustomAttribut
     Optional<CustomAttribute> findByProjectAndKeyname(Project project, String keyname);
 
     List<CustomAttribute> findByProject(Project project);
+
+    boolean existsByProjectAndKeyname(Project project, String keyname);
+
+    void deleteByProjectAndKeyname(Project project, String key);
 }

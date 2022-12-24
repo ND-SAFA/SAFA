@@ -15,8 +15,8 @@ import edu.nd.crc.safa.features.notifications.entities.Change;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
-import common.EntityConstants;
 import common.ApplicationBaseTest;
+import common.EntityConstants;
 import org.junit.jupiter.api.Test;
 import requests.RouteBuilder;
 import requests.SafaRequest;
@@ -63,7 +63,7 @@ class TestDeleteArtifactFromDocument extends ApplicationBaseTest {
         assertThat(documentArtifactList).isEmpty();
 
         // VP - Verify that 2 changes are detected (document + artifacts).
-        EntityChangeMessage message = notificationService.getNextMessage(defaultUser);
+        EntityChangeMessage message = notificationService.getNextMessage(defaultUser); //TODO: fails on rare occasions
         assertThat(message.getChanges()).hasSize(2);
 
         // VP - Verify that change is for a deleted member

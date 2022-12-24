@@ -38,7 +38,7 @@ public class StringFieldValue implements IFieldValue {
     private UUID id;
 
     @Lob
-    @Column(name = "field_value", nullable = false)
+    @Column(name = "field_value", nullable = false, columnDefinition = "mediumtext")
     private String value;
 
     @OneToOne

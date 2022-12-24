@@ -1,11 +1,11 @@
 from collections import OrderedDict
-from typing import Dict, List, Optional, Union, Type, Any
+from typing import Any, Dict, List, Optional, Type, Union
 
 from config.override import overrides
+from data.datasets.abstract_dataset import AbstractDataset
 from data.datasets.creators.abstract_dataset_creator import AbstractDatasetCreator
 from data.datasets.creators.split_dataset_creator import SplitDatasetCreator
 from data.datasets.creators.supported_dataset_creator import SupportedDatasetCreator
-from data.datasets.abstract_dataset import AbstractDataset
 from data.datasets.dataset_role import DatasetRole
 from data.datasets.pre_train_dataset import PreTrainDataset
 from data.datasets.trace_dataset import TraceDataset
@@ -66,12 +66,11 @@ class TrainerDatasetManager(BaseObject):
         :param dataset_creators_map: The map of roles to data to set in instance.
         :return: TrainerDatasetManager with initialized data.
         """
-        trainer_datasets_container = TrainerDatasetManager(
+        return TrainerDatasetManager(
             pre_train_dataset_creator=dataset_creators_map.get(DatasetRole.PRE_TRAIN, None),
             train_dataset_creator=dataset_creators_map.get(DatasetRole.TRAIN, None),
             val_dataset_creator=dataset_creators_map.get(DatasetRole.VAL, None),
             eval_dataset_creator=dataset_creators_map.get(DatasetRole.EVAL, None))
-        return trainer_datasets_container
 
     @classmethod
     @overrides(BaseObject)

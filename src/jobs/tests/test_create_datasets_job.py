@@ -21,7 +21,7 @@ class TestCreateDatasetsJob(BaseJobTest):
         self.assert_output_on_failure(self._load_job_output(job))
 
     def _get_job(self, include_dataset=True) -> AbstractJob:
-        test_params = self.get_test_params_for_trace(dataset_role=DatasetRole.TRAIN, include_links=True)
+        test_params = self.get_job_args(dataset_role=DatasetRole.TRAIN, include_links=True)
         job_args = JobArgs(**test_params)
         if not include_dataset:
             job_args.trainer_args.trainer_dataset_container[DatasetRole.TRAIN] = None

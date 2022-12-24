@@ -5,8 +5,8 @@ from copy import deepcopy
 from unittest import mock
 from unittest.mock import patch
 
-from data.datasets.dataset_role import DatasetRole
 from jobs.abstract_job import AbstractJob
+from jobs.components.job_args import JobArgs
 from jobs.components.job_result import JobResult
 from jobs.components.job_status import JobStatus
 from models.model_manager import ModelManager
@@ -16,8 +16,7 @@ from train.trainer_args import TrainerArgs
 
 
 class BaseJobTest(BaseTraceTest, ABC):
-    _JOB_PARAMS_BASE = {**BaseTraceTest.MODEL_MANAGER_PARAMS,
-                        "output_dir": TEST_OUTPUT_DIR}
+    _JOB_PARAMS_BASE = {"output_dir": TEST_OUTPUT_DIR}
 
     @patch.object(ModelManager, '_ModelManager__load_model')
     @patch.object(ModelManager, 'get_tokenizer')
@@ -38,25 +37,22 @@ class BaseJobTest(BaseTraceTest, ABC):
         self.assert_output_on_failure(self._load_job_output(job))
 
     @staticmethod
-    def get_test_params(as_api=False):
-        test_args = deepcopy(BaseJobTest._JOB_PARAMS_BASE)
+    def get_job_params(as_api=False):
+        job_params = deepcopy(BaseJobTest._JOB_PARAMS_BASE)
         # Step - Replaces casing to snake case
         if as_api:
-            test_args = BaseJobTest.parse_kwargs(test_args)
-        return test_args
+            job_params = BaseJobTest.parse_kwargs(job_params)
+        return job_params
 
-    def get_test_params_for_trace(self, dataset_role=DatasetRole.TRAIN, include_links=True, as_api=False,
-                                  include_pre_processing=False,
-                                  include_base_model=True,
-                                  split_train_dataset=False):
-        test_args = BaseJobTest.get_test_params(as_api=as_api)
-        role2dataset = self.create_dataset(dataset_role, include_links=include_links,
-                                           include_pre_processing=include_pre_processing)
+    def get_job_args(self, as_api=False) -> JobArgs:
+        test_args = BaseJobTest.get_job_params(as_api=as_api)
+        return JobArgs(**test_args)
 
+    def get_trainer_args(self, as_api=False):
+        test_args = BaseJobTest.get_job_params(as_api=as_api)
         output_dir = os.path.join(test_args["output_dir"], "trace")
-        test_args["trainer_args"] = TrainerArgs(output_dir=output_dir,
-                                                **BaseJobTest.TRACE_ARGS_PARAMS)
-        return test_args
+        return TrainerArgs(output_dir=output_dir,
+                           **BaseJobTest.TRACE_ARGS_PARAMS)
 
     @staticmethod
     def parse_kwargs(test_args):

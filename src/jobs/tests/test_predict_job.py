@@ -33,7 +33,7 @@ class TestPredictJob(BaseJobTest):
         self._test_run_failure()
 
     def _get_job(self):
-        test_params = self.get_test_params_for_trace(dataset_role=DatasetRole.EVAL, include_links=False)
+        test_params = self.get_job_args(dataset_role=DatasetRole.EVAL, include_links=False)
         job_args = JobArgs(**test_params)
         return PredictJob(job_args)
 

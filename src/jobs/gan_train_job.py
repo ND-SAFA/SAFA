@@ -1,6 +1,4 @@
-from jobs.components.job_args import JobArgs
 from jobs.train_job import TrainJob
-from models.base_models.supported_base_model import SupportedBaseModel
 from train.gan.gan_trainer import GanTrainer
 
 

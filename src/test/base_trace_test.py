@@ -79,6 +79,21 @@ class BaseTraceTest(BaseTest):
         "metrics": ["accuracy", "map_at_k"]
     }
 
+    dataset_creator_definition = {
+        "objectType": "CLASSIC",
+        "source_layers": SOURCE_LAYERS,
+        "target_layers": TARGET_LAYERS,
+        "true_links": POS_LINKS
+    }
+
+    dataset_manager_definition = {
+        "train_dataset_creator": dataset_creator_definition
+    }
+
+    model_manager_definition = {
+        "model_path": "bert-base-uncased"
+    }
+
     @staticmethod
     def create_dataset(dataset_role: DatasetRole,
                        dataset_creator_class: SupportedDatasetCreator = SupportedDatasetCreator.CLASSIC_TRACE,

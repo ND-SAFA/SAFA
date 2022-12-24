@@ -1,17 +1,14 @@
 import os
 from unittest import mock
 from unittest.mock import patch
+
 from transformers import AutoModelForMaskedLM
 
-from config.override import overrides
 from jobs.components.job_args import JobArgs
 from jobs.mlm_pre_train_job import MLMPreTrainJob
 from jobs.tests.base_job_test import BaseJobTest
-from test.base_trace_test import BaseTraceTest
-from test.paths.paths import TEST_DATA_DIR, TEST_OUTPUT_DIR
-from data.datasets.creators.supported_dataset_creator import SupportedDatasetCreator
-from data.datasets.dataset_role import DatasetRole
 from models.model_manager import ModelManager
+from test.paths.paths import TEST_DATA_DIR
 
 
 class TestMLMPreTrainJob(BaseJobTest):
@@ -32,22 +29,10 @@ class TestMLMPreTrainJob(BaseJobTest):
         job.run()
         self.assert_output_on_success(self._load_job_output(job))
 
-    @overrides(BaseTraceTest)
-    def create_dataset(self, dataset_role: DatasetRole, include_links=True, include_pre_processing=False):
-        dataset_creator_params = {
-            "orig_data_path": TestMLMPreTrainJob.PRETRAIN_DIR,
-            "training_data_dir": os.path.join(TEST_OUTPUT_DIR, "pre_train")
-        }
-        return BaseTraceTest.create_dataset(dataset_role,
-                                            dataset_creator_class=SupportedDatasetCreator.MLM_PRETRAIN,
-                                            dataset_creator_params=dataset_creator_params,
-                                            include_pre_processing=include_pre_processing,
-                                            include_links=include_links)
-
     def _assert_success(self, output_dict: dict):
         self.assert_training_output_matches_expected(output_dict)
 
     def _get_job(self):
-        params = self.get_test_params_for_trace(include_pre_processing=True, include_base_model=False)
+        params = self.get_job_args(include_pre_processing=True, include_base_model=False)
         job_args = JobArgs(**params)
         return MLMPreTrainJob(job_args)

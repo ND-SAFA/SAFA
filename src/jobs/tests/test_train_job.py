@@ -4,14 +4,17 @@ from unittest import mock
 from unittest.mock import patch
 
 from config.override import overrides
-from jobs.components.job_args import JobArgs
-from jobs.train_job import TrainJob
-from jobs.tests.base_job_test import BaseJobTest
-from test.paths.paths import TEST_DATA_DIR
 from data.datasets.abstract_dataset import AbstractDataset
 from data.datasets.creators.supported_dataset_creator import SupportedDatasetCreator
 from data.datasets.dataset_role import DatasetRole
+from data.datasets.trainer_dataset_manager import TrainerDatasetManager
+from jobs.components.job_args import JobArgs
+from jobs.tests.base_job_test import BaseJobTest
+from jobs.train_job import TrainJob
+from models.model_manager import ModelManager
+from test.paths.paths import TEST_DATA_DIR
 from train.trace_trainer import TraceTrainer
+from train.trainer_args import TrainerArgs
 
 
 class TestTrainJob(BaseJobTest):
@@ -27,24 +30,28 @@ class TestTrainJob(BaseJobTest):
 
     def test_split_train_dataset(self):
         job = self._get_job()
-        self.assertTrue(job.trainer_args.trainer_dataset_container[DatasetRole.EVAL] is not None)
+        self.assertTrue(job.trainer_dataset_manager[DatasetRole.EVAL] is not None)
 
     @staticmethod
     @overrides(BaseJobTest)
-    def create_dataset(dataset_role: DatasetRole, include_links=True, include_pre_processing: bool = False) -> Dict[
+    def create_dataset(include_links=True, include_pre_processing: bool = False) -> Dict[
         DatasetRole, AbstractDataset]:
         train_dataset = BaseJobTest.create_dataset(DatasetRole.TRAIN, include_links=include_links,
                                                    include_pre_processing=include_pre_processing)
         test_dataset = SupportedDatasetCreator.CSV.value(data_file_path=TestTrainJob.CSV_DATA_FILE)
-        return {**train_dataset, DatasetRole.EVAL: test_dataset}
+        return TrainerDatasetManager.create_from_map({**train_dataset, DatasetRole.EVAL: test_dataset})
 
     def _assert_success(self, output_dict: dict):
         self.assert_training_output_matches_expected(output_dict)
 
     def _get_job(self) -> TrainJob:
-        test_params = self.get_test_params_for_trace(dataset_role=DatasetRole.TRAIN, include_links=True,
-                                                     split_train_dataset=True)
-        job_args = JobArgs(**test_params)
-        job = TrainJob(job_args)
+        job_args: JobArgs = self.get_job_args()
+        trainer_args: TrainerArgs = self.get_trainer_args()
+        trainer_dataset_manager: TrainerDatasetManager = self.create_dataset()
+        model_manager: ModelManager = self.get_test_model()
+        job = TrainJob(job_args,
+                       trainer_dataset_manager=trainer_dataset_manager,
+                       trainer_args=trainer_args,
+                       model_manager=model_manager)
         self.assertEquals(job.trainer_args.num_train_epochs, 1)
         return job

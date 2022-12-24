@@ -23,7 +23,7 @@ class RepositoryDatasetCreator(AbstractTraceDatasetCreator):
         """
         super().__init__(data_cleaner, use_linked_targets_only)
         self.repo_paths = repo_paths
-        self.keys = data_keys
+        self.data_keys = data_keys
 
     def create(self) -> TraceDataset:
         """

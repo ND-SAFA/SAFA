@@ -1,5 +1,6 @@
 from abc import ABC
 
+from config.override import overrides
 from data.datasets.trainer_dataset_manager import TrainerDatasetManager
 from jobs.abstract_job import AbstractJob
 from jobs.components.job_args import JobArgs
@@ -23,9 +24,16 @@ class AbstractTraceJob(AbstractJob, ABC):
         super().__init__(job_args=job_args, model_manager=model_manager)
         self.trainer_args = trainer_args
         self.trainer_dataset_manager = trainer_dataset_manager
-        if job_args.save_dataset_splits:
-            CreateDatasetsJob(job_args, trainer_dataset_manager).run()
         self._trainer = None
+
+    @overrides(AbstractJob)
+    def run(self) -> None:
+        """
+        Runs the job and saves the output
+        """
+        if self.job_args.save_dataset_splits:
+            CreateDatasetsJob(self.job_args, self.trainer_dataset_manager).run()
+        super().run()
 
     def get_trainer(self, **kwargs) -> TraceTrainer:
         """

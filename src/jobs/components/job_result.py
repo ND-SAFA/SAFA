@@ -44,6 +44,10 @@ class JobResult(BaseObject):
                    EXCEPTION: Schema(type=TYPE_STRING)}
 
     def __init__(self, result_dict: Dict = None):
+        """
+        Represents the results of a job
+        :param result_dict:
+        """
         self.__result = UncasedDict(result_dict)
 
     def set_job_status(self, status: JobStatus) -> None:
@@ -65,7 +69,7 @@ class JobResult(BaseObject):
 
     def update(self, other_result: Union["JobResult", Dict]) -> "JobResult":
         """
-        Merges both results into current result (replacing current value with value from other_result for overlapping keys)
+        Merges both results into current result (replacing current value with value from other_result for overlapping data_keys)
         :param other_result: the other result
         :return: None
         """
@@ -102,8 +106,8 @@ class JobResult(BaseObject):
     def get_properties(response_keys: Union[str, list]) -> Dict:
         """
         Gets properties used to generate response documentation
-        :param response_keys: either a single response key or a list of response keys to get properties for
-        :return a dictionary of the response keys mapped to appropriate schema
+        :param response_keys: either a single response key or a list of response data_keys to get properties for
+        :return a dictionary of the response data_keys mapped to appropriate schema
         """
         if not isinstance(response_keys, list):
             response_keys = [response_keys]
@@ -188,9 +192,9 @@ class JobResult(BaseObject):
         """
         return self.__result == other.__result
 
-    def __repr__(self) -> dict:
+    def __repr__(self) -> str:
         """
-        Returns the results dictionary as a representation of the class
-        :return: the results dict
+        Returns a representation of the class as a string
+        :return: the results dict as a string
         """
-        return self.__result
+        return repr(self.__result)

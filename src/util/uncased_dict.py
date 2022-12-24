@@ -3,6 +3,10 @@ from typing import Any, Dict
 
 class UncasedDict(dict):
     def __init__(self, dict_: Dict[Any, Any] = None):
+        """
+        Represents a dictionary whose keys are uncased
+        :param dict_: the dictionary to represent
+        """
         super().__init__()
         if dict_:
             self.__initialize_as_dict(dict_)
@@ -64,12 +68,3 @@ class UncasedDict(dict):
         """
         return super().__contains__(self._process_key(key))
 
-    def rename_property(self, prop: str, new_prop: str):
-        converted_dict = self.copy()
-        for key, value in self.items():
-            if isinstance(value, UncasedDict):
-                value = value.rename_property(prop, new_prop)
-            if key == prop:
-                key = new_prop
-            converted_dict[key] = value
-        return converted_dict

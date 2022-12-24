@@ -1,7 +1,5 @@
 from jobs.abstract_job import AbstractJob
-from jobs.components.job_args import JobArgs
 from jobs.components.job_result import JobResult
-from models.model_manager import ModelManager
 
 
 class CreateModelJob(AbstractJob):

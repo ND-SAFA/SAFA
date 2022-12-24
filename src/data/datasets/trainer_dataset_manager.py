@@ -12,6 +12,7 @@ from data.datasets.dataset_role import DatasetRole
 from data.datasets.pre_train_dataset import PreTrainDataset
 from data.datasets.trace_dataset import TraceDataset
 from data.processing.augmentation.data_augmenter import DataAugmenter
+from experiments.variables.undetermined_variable import UndeterminedVariable
 from util.base_object import BaseObject
 from util.enum_utils import get_enum_from_name
 
@@ -34,9 +35,9 @@ class TrainerDatasetManager(BaseObject):
         :param eval_dataset_creator: The training dataset creator.data
         :param augmenter: augmenter to use for augmenting datasets
         """
-        self.__dataset_creators = {DatasetRole.PRE_TRAIN: pre_train_dataset_creator,
-                                   DatasetRole.TRAIN: train_dataset_creator,
-                                   DatasetRole.VAL: val_dataset_creator, DatasetRole.EVAL: eval_dataset_creator}
+        self._dataset_creators = {DatasetRole.PRE_TRAIN: pre_train_dataset_creator,
+                                  DatasetRole.TRAIN: train_dataset_creator,
+                                  DatasetRole.VAL: val_dataset_creator, DatasetRole.EVAL: eval_dataset_creator}
         self.__datasets = None
         self.augmenter = augmenter
 
@@ -46,7 +47,7 @@ class TrainerDatasetManager(BaseObject):
         :param dataset_role: the dataset role
         :return: the dataset creator for the given role
         """
-        return self.__dataset_creators[dataset_role]
+        return self._dataset_creators[dataset_role]
 
     def save_dataset_splits(self, output_dir: str) -> List[str]:
         """
@@ -75,6 +76,30 @@ class TrainerDatasetManager(BaseObject):
             eval_dataset_creator=dataset_creators_map.get(DatasetRole.EVAL, None))
         return trainer_datasets_container
 
+    @overrides(BaseObject)
+    def use_values_from_object_for_undetermined(self, obj: "TrainerDatasetManager") -> None:
+        """
+        Fills in any undetermined values in self by using values from the given object
+        :param obj: the object to use to fill in values
+        :return: None
+        """
+        for dataset_role, dataset_creator in self._dataset_creators.items():
+            if isinstance(dataset_creator, UndeterminedVariable):
+                self._dataset_creators[dataset_role] = obj.get_creator(dataset_role)
+            elif isinstance(dataset_creator, BaseObject):
+                self._dataset_creators[dataset_role].use_values_from_object_for_undetermined(obj.get_creator(dataset_role))
+        super().use_values_from_object_for_undetermined(obj)
+
+    def get_datasets(self) -> Dict[DatasetRole, AbstractDataset]:
+        """
+        Gets the dictionary mapping dataset role to the dataset
+        :return: the dictionary of datasets
+        """
+        if self.__datasets is None:
+            self.__datasets = self._create_datasets_from_creators(self._dataset_creators)
+            self._prepare_datasets(self.augmenter)
+        return self.__datasets
+
     @classmethod
     @overrides(BaseObject)
     def _get_expected_class_by_type(cls, abstract_class: Type, child_class_name: str) -> Any:
@@ -86,16 +111,6 @@ class TrainerDatasetManager(BaseObject):
         """
         return get_enum_from_name(SupportedDatasetCreator, child_class_name).value
 
-    def get_datasets(self) -> Dict[DatasetRole: AbstractDataset]:
-        """
-        Gets the dictionary mapping dataset role to the dataset
-        :return: the dictionary of datasets
-        """
-        if self.__datasets is None:
-            self.__datasets = self._create_datasets_from_creators(self.__dataset_creators)
-            self._prepare_datasets(self.augmenter)
-        return self.__datasets
-
     def _prepare_datasets(self, data_augmenter: DataAugmenter) -> None:
         """
         Performs any necessary additional steps necessary to prepare each dataset
@@ -104,7 +119,7 @@ class TrainerDatasetManager(BaseObject):
         """
         train_dataset = self[DatasetRole.TRAIN]
         if isinstance(self[DatasetRole.TRAIN], TraceDataset):
-            dataset_splits_map = self._create_dataset_splits(train_dataset, self.__dataset_creators)
+            dataset_splits_map = self._create_dataset_splits(train_dataset, self._dataset_creators)
             self.get_datasets().update(dataset_splits_map)
             self[DatasetRole.TRAIN].prepare_for_training(data_augmenter)
 
@@ -193,15 +208,3 @@ class TrainerDatasetManager(BaseObject):
         :return: String representation of trainer data container.
         """
         return str({role.name: type(self.get_creator(role)) for role in DatasetRole})
-
-    def __getattr__(self, item: str) -> Any:
-        """
-        Gets attribute of class or init
-        :param item: the name of the attribute
-        :return: the attribute value
-        """
-        dataset_creators_name = "dataset_creator"
-        if dataset_creators_name in item:
-            dataset_role = item.split(dataset_creators_name)[0]
-            return self.get_creator(DatasetRole[dataset_role.upper()])
-        return super().__getattribute__(item)

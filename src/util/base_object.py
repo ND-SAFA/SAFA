@@ -15,12 +15,28 @@ from util.param_specs import ParamSpecs
 
 class BaseObject(ABC):
 
+    def use_values_from_object_for_undetermined(self, obj: "BaseObject") -> None:
+        """
+        Fills in any undetermined values in self by using values from the given object
+        :param obj: the object to use to fill in values
+        :return: None
+        """
+        if not isinstance(obj, self.__class__):
+            raise Exception("Object must be of the same type %s" % self.__class__)
+        for attr_name, attr_value in vars(self).items():
+            if isinstance(attr_value, UndeterminedVariable):
+                value_to_use = getattr(obj, attr_name)
+                setattr(self, attr_name, value_to_use)
+            elif isinstance(attr_value, BaseObject):
+                obj_to_use = getattr(obj, attr_name)
+                attr_value.use_values_from_object_for_undetermined(obj_to_use)
+
     @classmethod
     def initialize_from_definition(cls, definition: DefinitionVariable):
         """
-        Initializes the object from a dictionary
+        Initializes the obj from a dictionary
         :param definition: a dictionary of the necessary params to initialize
-        :return: the initialized object
+        :return: the initialized obj
         """
         param_specs = ParamSpecs.create_from_method(cls.__init__)
         param_specs.assert_definition(definition)
@@ -33,7 +49,7 @@ class BaseObject(ABC):
             if isinstance(param_value, ExperimentalVariable):
                 experiment_params_list = []
                 for experiment_val in param_value:
-                    experiment_params_list.extend(cls._set_params_values(deepcopy(params_list), param_name, experiment_val))
+                    experiment_params_list.extend(cls._set_params_values(params_list, param_name, experiment_val))
                 params_list = experiment_params_list
             else:
                 params_list = cls._set_params_values(params_list, param_name, param_value)
@@ -50,11 +66,14 @@ class BaseObject(ABC):
         :param expected_type: the expected type of the param value
         :return: the list of params dictionaries with the new param added
         """
+        params_list_out = []
         if expected_type:
             cls._assert_type(param_value, expected_type, param_name)
         for params in params_list:
-            params[param_name] = cls._get_value_of_variable(param_value)
-        return params_list
+            params_out = deepcopy(params)
+            params_out[param_name] = deepcopy(cls._get_value_of_variable(param_value))
+            params_list_out.append(params_out)
+        return params_list_out
 
     @classmethod
     def _get_value_of_variable(cls, variable: Union[Variable, Any], expected_type: Union[Type] = None) -> Any:
@@ -91,9 +110,9 @@ class BaseObject(ABC):
     def _make_child_object(cls, definition: DefinitionVariable, expected_class: Type) -> Any:
         """
         Handles making children objects
-        :param expected_class: the expected_class for the child object
+        :param expected_class: the expected_class for the child obj
         :param definition: contains attributes necessary to construct the child
-        :return: the child object
+        :return: the child obj
         """
         if issubclass(expected_class, BaseObject):
             return expected_class.initialize_from_definition(definition)

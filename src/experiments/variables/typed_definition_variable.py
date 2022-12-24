@@ -10,10 +10,10 @@ class TypedDefinitionVariable(DefinitionVariable):
     def __init__(self, value: Dict[str, Any]):
         """
         A variable used to instantiate objects of the given type
-        :param value: a definition of the object and its type defined using OBJECT_TYPE_KEY
+        :param value: a definition of the obj and its type defined using OBJECT_TYPE_KEY
         """
         if TypedDefinitionVariable.OBJECT_TYPE_KEY not in value:
-            raise KeyError("Please specify object type using the key %s" % TypedDefinitionVariable.OBJECT_TYPE_KEY)
+            raise KeyError("Please specify obj type using the key %s" % TypedDefinitionVariable.OBJECT_TYPE_KEY)
         object_type = value.pop(TypedDefinitionVariable.OBJECT_TYPE_KEY)
         self.object_type = object_type.value if isinstance(object_type, Variable) else object_type
         super().__init__(value)

@@ -93,6 +93,6 @@ class TestObjectBuilder:
     @staticmethod
     def get_definition(class_type):
         if class_type in TestObjectBuilder.SUPPORTED_OBJECTS:
-            return TestObjectBuilder.SUPPORTED_OBJECTS[class_type]
+            return deepcopy(TestObjectBuilder.SUPPORTED_OBJECTS[class_type])
 
         raise ValueError("Unable to find definition for:" + class_type)

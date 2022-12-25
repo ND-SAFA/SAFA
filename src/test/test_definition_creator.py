@@ -1,5 +1,5 @@
 import os
-from typing import get_args, get_origin, get_type_hints
+from copy import deepcopy
 
 from data.datasets.dataset_role import DatasetRole
 from data.datasets.trainer_dataset_manager import TrainerDatasetManager
@@ -9,8 +9,6 @@ from test.base_test import BaseTest
 from test.definition_creator import DefinitionCreator
 from test.paths.paths import TEST_DATA_DIR, TEST_OUTPUT_DIR
 from test.test_object_builder import TestObjectBuilder
-from util.base_object import BaseObject
-from util.reflection_util import ReflectionUtil
 
 
 class TestDefinitionCreator(BaseTest):
@@ -35,34 +33,19 @@ class TestDefinitionCreator(BaseTest):
         "trainer_args": TRAINER_ARGS_DEFINITION
     }
 
-    def test_typing(self):
-        hints = get_type_hints(TrainerDatasetManager.__init__)
-        args = get_args(hints["train_dataset_creator"])
-        origin = get_origin(args[0])
-        arg = args[0]
-        arg_type = type(arg)
-        arg_class = arg.__class__
-
-        results = {}
-        values = [arg, arg_type, arg_class]
-        for index, value in enumerate(values):
-            results[index] = ReflectionUtil.is_instance_or_subclass(value, BaseObject)
-
-        print("Done.")
-
     def test_trainer_creation(self):
         definition = {
-            "train_dataset_creator": self.DATASET_CREATOR_DEFINITION
+            "train_dataset_creator": deepcopy(self.DATASET_CREATOR_DEFINITION)
         }
         trainer_dataset_manager = TestObjectBuilder.create(TrainerDatasetManager, override=True, **definition)
         self.verify_trainer_dataset_manager(trainer_dataset_manager)
 
     def test_trainer_dataset_manager(self):
-        definition = self.DEFINITION.copy()
+        definition = deepcopy(self.DEFINITION)
         predict_job: PredictJob = DefinitionCreator.create(PredictJob, definition)
 
         # Verify trainer dataset manager
-        self.verify_trainer_dataset_manager(predict_job.trainer_dataset_manager)
+        self.verify_trainer_dataset_manager(predict_job.trainer_dataset_manager, DatasetRole.EVAL)
 
         # Verify trainer args
         definition.pop("trainer_dataset_manager")

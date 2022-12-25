@@ -17,7 +17,7 @@ class MLMPreTrainJob(TrainJob):
 
     def __init__(self, job_args: JobArgs, model_manager: ModelManager,
                  trainer_dataset_manager: TrainerDatasetManager, trainer_args: TrainerArgs,
-                 mlm_probability: float):
+                 mlm_probability: float = 0.15):
         """
         The base job class for tracing jobs
         :param job_args: the arguments for the job

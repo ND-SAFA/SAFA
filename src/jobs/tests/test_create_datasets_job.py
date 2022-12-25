@@ -1,9 +1,10 @@
-from data.datasets.dataset_role import DatasetRole
+from data.datasets.trainer_dataset_manager import TrainerDatasetManager
 from jobs.abstract_job import AbstractJob
 from jobs.components.job_args import JobArgs
 from jobs.components.job_result import JobResult
 from jobs.create_datasets_job import CreateDatasetsJob
 from jobs.tests.base_job_test import BaseJobTest
+from test.test_object_creator import TestObjectCreator
 
 
 class TestCreateDatasetsJob(BaseJobTest):
@@ -21,8 +22,11 @@ class TestCreateDatasetsJob(BaseJobTest):
         self.assert_output_on_failure(self._load_job_output(job))
 
     def _get_job(self, include_dataset=True) -> AbstractJob:
-        test_params = self.get_job_args(dataset_role=DatasetRole.TRAIN, include_links=True)
-        job_args = JobArgs(**test_params)
+        job_args = TestObjectCreator.create(JobArgs)
         if not include_dataset:
-            job_args.trainer_args.trainer_dataset_container[DatasetRole.TRAIN] = None
-        return CreateDatasetsJob(job_args)
+            trainer_dataset_manager = TestObjectCreator.create(TrainerDatasetManager, **{}, override=True)
+
+        else:
+            trainer_dataset_manager = TestObjectCreator.create(TrainerDatasetManager)
+
+        return CreateDatasetsJob(job_args=job_args, trainer_dataset_manager=trainer_dataset_manager)

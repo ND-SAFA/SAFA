@@ -9,35 +9,35 @@ class TestAssertions:
     _VAL_ERROR_MESSAGE = "{} with value {} does not equal expected value of {} {}"
     _LEN_ERROR = "Length of {} does not match expected"
 
-    def assert_prediction_output_matches_expected(self, test_case: TestCase, output: dict, threshold: int = 0.05):
+    @classmethod
+    def assert_prediction_output_matches_expected(cls, test_case: TestCase, output: dict, threshold: int = 0.05):
         if JobResult.PREDICTIONS not in output:
-            test_case.fail(self._KEY_ERROR_MESSAGE.format(JobResult.PREDICTIONS, output))
+            test_case.fail(cls._KEY_ERROR_MESSAGE.format(JobResult.PREDICTIONS, output))
         predictions = output[JobResult.PREDICTIONS]
         all_links = TestDataManager.get_all_links()
-        if len(predictions) != len(all_links):
-            test_case.fail(self._LEN_ERROR.format(JobResult.PREDICTIONS))
+        test_case.assertEquals(len(predictions), len(all_links), cls._LEN_ERROR.format(JobResult.PREDICTIONS))
         expected_links = {link for link in all_links}
         predicted_links = set()
         for link_dict in output[JobResult.PREDICTIONS]:
             link = [None, None]
             for key, val in TestDataManager.EXAMPLE_PREDICTION_LINKS.items():
                 if key not in link_dict:
-                    test_case.fail(self._KEY_ERROR_MESSAGE.format(key, JobResult.PREDICTIONS))
+                    test_case.fail(cls._KEY_ERROR_MESSAGE.format(key, JobResult.PREDICTIONS))
                 if key == "score":
                     expected_val = TestDataManager.EXAMPLE_PREDICTION_LINKS["score"]
                     if abs(val - expected_val) >= threshold:
                         test_case.fail(
-                            self._VAL_ERROR_MESSAGE.format(key, val, expected_val, JobResult.PREDICTIONS))
+                            cls._VAL_ERROR_MESSAGE.format(key, val, expected_val, JobResult.PREDICTIONS))
                 else:
                     link[val] = link_dict[key]
             predicted_links.add(tuple(link))
-        self.assert_lists_have_the_same_vals(test_case, expected_links, predicted_links)
+        cls.assert_lists_have_the_same_vals(test_case, expected_links, predicted_links)
         if JobResult.METRICS not in output:
-            test_case.fail(self._KEY_ERROR_MESSAGE.format(JobResult.METRICS, output))
+            test_case.fail(cls._KEY_ERROR_MESSAGE.format(JobResult.METRICS, output))
         for metric in TestDataManager.EXAMPLE_PREDICTION_METRICS.keys():
             if metric not in output[JobResult.METRICS]:
                 test_case.fail(
-                    self._KEY_ERROR_MESSAGE.format(JobResult.METRICS, output[JobResult.METRICS]))
+                    cls._KEY_ERROR_MESSAGE.format(JobResult.METRICS, output[JobResult.METRICS]))
 
     @staticmethod
     def assert_training_output_matches_expected(test_case: TestCase, output_dict: dict):

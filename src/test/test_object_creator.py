@@ -1,5 +1,5 @@
 from copy import deepcopy
-from typing import Dict, List
+from typing import Dict, List, Type, TypeVar
 
 from config.constants import VALIDATION_PERCENTAGE_DEFAULT
 from data.datasets.creators.abstract_dataset_creator import AbstractDatasetCreator
@@ -18,8 +18,10 @@ from test.paths.paths import TEST_OUTPUT_DIR
 from test.test_data_manager import TestDataManager
 from train.trainer_args import TrainerArgs
 
+ObjectType = TypeVar("ObjectType")
 
-class TestObjectBuilder:
+
+class TestObjectCreator:
     DATASET_ARGS_PARAMS = {
         "validation_percentage": VALIDATION_PERCENTAGE_DEFAULT
     }
@@ -82,17 +84,19 @@ class TestObjectBuilder:
         return {dataset_role: abstract_dataset}
 
     @staticmethod
-    def create(class_type, override=False, **kwargs, ):
+    def create(class_type: Type[ObjectType], override=False, **kwargs) -> ObjectType:
+        kwargs = deepcopy(kwargs)
         if override:
             args = kwargs
         else:
-            args = TestObjectBuilder.get_definition(class_type)
+            args = TestObjectCreator.get_definition(class_type)
+            args = deepcopy(args)
             args.update(kwargs)
         return DefinitionCreator.create(class_type, args)
 
     @staticmethod
     def get_definition(class_type):
-        if class_type in TestObjectBuilder.SUPPORTED_OBJECTS:
-            return deepcopy(TestObjectBuilder.SUPPORTED_OBJECTS[class_type])
+        if class_type in TestObjectCreator.SUPPORTED_OBJECTS:
+            return deepcopy(TestObjectCreator.SUPPORTED_OBJECTS[class_type])
 
         raise ValueError("Unable to find definition for:" + class_type)

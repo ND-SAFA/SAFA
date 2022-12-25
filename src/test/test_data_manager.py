@@ -47,26 +47,14 @@ class TestDataManager:
                                   'test_samples_per_second': 240.328, 'test_steps_per_second': 40.055}
 
     @staticmethod
-    def get_sources():
-        return TestDataManager.get_artifacts(TestDataManager.Keys.SOURCE)
-
-    @staticmethod
-    def get_target():
-        return TestDataManager.get_artifacts(TestDataManager.Keys.TARGET)
-
-    @staticmethod
-    def get_artifacts(param: str):
-        artifacts = TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS, param])
-        return {id_: token for artifacts in artifacts for id_, token in artifacts.items()}
-
-    @staticmethod
     def get_all_links() -> List[Tuple[str, str]]:
-        sources = TestDataManager.get_sources()
-        targets = TestDataManager.get_target()
+        sources = TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS, TestDataManager.Keys.SOURCE])
+        targets = TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS, TestDataManager.Keys.TARGET])
         links = []
-        for source_id, source_body in sources.items():
-            for target_id, target_body in targets.items():
-                links.append((source_id, target_id))
+        for source_dict, target_dict in zip(sources, targets):
+            for source_id, source_body in source_dict.items():
+                for target_id, target_body in target_dict.items():
+                    links.append((source_id, target_id))
         return links
 
     @staticmethod

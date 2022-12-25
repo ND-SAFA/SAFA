@@ -3,7 +3,9 @@ import os
 from jobs.components.job_args import JobArgs
 from jobs.delete_model_job import DeleteModelJob
 from jobs.tests.base_job_test import BaseJobTest
+from models.model_manager import ModelManager
 from test.paths.paths import TEST_OUTPUT_DIR
+from test.test_object_creator import TestObjectCreator
 
 
 class TestDeleteModelJob(BaseJobTest):
@@ -31,4 +33,7 @@ class TestDeleteModelJob(BaseJobTest):
 
     def _get_job(self):
         job_args = JobArgs(output_dir=TEST_OUTPUT_DIR)
-        return DeleteModelJob(job_args)
+        model_manager = TestObjectCreator.create(ModelManager, **{
+            "model_path": self.MODEL_DIR
+        })
+        return DeleteModelJob(job_args=job_args, model_manager=model_manager)

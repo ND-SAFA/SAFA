@@ -13,7 +13,7 @@ from models.model_manager import ModelManager
 from models.model_properties import ModelTask
 from test.paths.paths import TEST_DATA_DIR
 from test.test_assertions import TestAssertions
-from test.test_object_builder import TestObjectBuilder
+from test.test_object_creator import TestObjectCreator
 from train.trainer_args import TrainerArgs
 
 
@@ -39,14 +39,14 @@ class TestMLMPreTrainJob(BaseJobTest):
         TestAssertions.assert_training_output_matches_expected(self, output_dict)
 
     def _get_job(self):
-        job_args = TestObjectBuilder.create(JobArgs)
-        model_manager = TestObjectBuilder.create(ModelManager, model_task=ModelTask.MASKED_LEARNING)
-        trainer_dataset_manager = TestObjectBuilder.create(TrainerDatasetManager, **{
+        job_args = TestObjectCreator.create(JobArgs)
+        model_manager = TestObjectCreator.create(ModelManager, model_task=ModelTask.MASKED_LEARNING)
+        trainer_dataset_manager = TestObjectCreator.create(TrainerDatasetManager, **{
             "train_dataset_creator": {
                 TypedDefinitionVariable.OBJECT_TYPE_KEY: "MLM_PRETRAIN",
                 "orig_data_path": self.PRETRAIN_DIR
             }
         })
-        trainer_args = TestObjectBuilder.create(TrainerArgs)
+        trainer_args = TestObjectCreator.create(TrainerArgs)
         return MLMPreTrainJob(job_args=job_args, model_manager=model_manager,
                               trainer_dataset_manager=trainer_dataset_manager, trainer_args=trainer_args)

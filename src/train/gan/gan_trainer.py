@@ -12,12 +12,10 @@ from config.override import overrides
 from data.datasets.dataset_role import DatasetRole
 from data.datasets.pre_train_dataset import PreTrainDataset
 from data.datasets.trace_dataset import TraceDataset
-from models.base_models.descriminator import Discriminator
-from models.base_models.generator import Generator
 from models.model_manager import ModelManager
 from train.gan.gan_dataset_converter import GanDatasetConverter
-from train.trainer_args import TrainerArgs
 from train.trace_trainer import TraceTrainer
+from train.trainer_args import TrainerArgs
 
 
 class GanTrainer(TraceTrainer):
@@ -67,7 +65,8 @@ class GanTrainer(TraceTrainer):
         # scheduler
         if self.trainer_args.apply_scheduler:
             num_train_examples = len(self.train_dataset)
-            num_train_steps = int(num_train_examples / self.trainer_args.train_batch_size * self.trainer_args.num_train_epochs)
+            num_train_steps = int(
+                num_train_examples / self.trainer_args.train_batch_size * self.trainer_args.num_train_epochs)
             num_warmup_steps = int(num_train_steps * self.trainer_args.warmup_proportion)
 
             scheduler_d = get_constant_schedule_with_warmup(dis_optimizer,
@@ -319,7 +318,8 @@ class GanTrainer(TraceTrainer):
         # -------------------------------------------------
         #   Instantiate the Generator and Discriminator
         # -------------------------------------------------
-        generator = Generator(noise_size=self.trainer_args.noise_size, output_size=hidden_size, hidden_sizes=hidden_levels_g,
+        generator = Generator(noise_size=self.trainer_args.noise_size, output_size=hidden_size,
+                              hidden_sizes=hidden_levels_g,
                               dropout_rate=self.trainer_args.out_dropout_rate)
         discriminator = Discriminator(input_size=hidden_size, hidden_sizes=hidden_levels_d,
                                       num_labels=len(self.train_dataset),

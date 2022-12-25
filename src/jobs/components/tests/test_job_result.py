@@ -67,7 +67,7 @@ class TestJobResult(BaseTest):
         result2 = self.get_job_result(precision_at_k=0.3)
         self.assertTrue(result1._can_compare_with_metric(result2, SupportedTraceMetric.PRECISION.name))
         self.assertFalse(result1._can_compare_with_metric(result2, None))
-        self.assertFalse(result1._can_compare_with_metric(result2, "precision"))
+        self.assertFalse(result1._can_compare_with_metric(result2, "precision_at_k"))
 
     def test_get_comparison_vals(self):
         result1 = self.get_job_result(precision_at_k=0.8)

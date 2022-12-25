@@ -10,6 +10,7 @@ from experiments.variables.multi_variable import MultiVariable
 from experiments.variables.typed_definition_variable import TypedDefinitionVariable
 from experiments.variables.undetermined_variable import UndeterminedVariable
 from experiments.variables.variable import Variable
+from util.enum_utils import get_enum_from_name
 from util.param_specs import ParamSpecs
 from util.reflection_util import ReflectionUtil
 
@@ -135,14 +136,22 @@ class BaseObject(ABC):
     @classmethod
     def _get_expected_class_by_type(cls, abstract_class: Type, child_class_name: str) -> Any:
         """
-        *Must be implemented in calling class*
         Returns the correct expected class when given the abstract parent class type and name of child class
         :param abstract_class: the abstract parent class type
         :param child_class_name: the name of the child class
         :return: the expected type
         """
-        raise TypeError(
-            "Cannot create %s because %s has not defined a creation method." % (child_class_name, cls.__name__))
+        return get_enum_from_name(cls._get_child_enum_class(abstract_class, child_class_name), child_class_name).value
+
+    @classmethod
+    def _get_child_enum_class(cls, abstract_class: Type, child_class_name: str) -> Type:
+        """
+        Returns the correct enum class mapping name to class given the abstract parent class type and name of child class
+        :param abstract_class: the abstract parent class type
+        :param child_class_name: the name of the child class
+        :return: the enum class mapping name to class
+        """
+        raise TypeError("Cannot create %s because %s has not defined the enum class to use." % (child_class_name, cls.__name__))
 
     @classmethod
     def _assert_type(cls, val: Any, expected_type: Union[Type], param_name: str):

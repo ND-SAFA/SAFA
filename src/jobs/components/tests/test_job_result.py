@@ -56,7 +56,7 @@ class TestJobResult(BaseTest):
             result1.is_better_than(result2, SupportedTraceMetric.PRECISION, should_maximize=True))
         self.assertFalse(
             result1.is_better_than(result2, SupportedTraceMetric.PRECISION, should_maximize=False))
-        self.assertFalse(result2.is_better_than(result1, "precision_at_k", should_maximize=True))
+        self.assertFalse(result2.is_better_than(result1, SupportedTraceMetric.PRECISION, should_maximize=True))
 
         result3 = self.get_job_result({JobResult.STATUS: 1})
         result4 = self.get_job_result({})

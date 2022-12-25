@@ -24,7 +24,8 @@ class TraceTrainer(Trainer, BaseObject):
     Responsible for using given model for training and prediction using given data.
     """
 
-    def __init__(self, trainer_args: TrainerArgs, model_manager: ModelManager, trainer_dataset_manager: TrainerDatasetManager,
+    def __init__(self, trainer_args: TrainerArgs, model_manager: ModelManager,
+                 trainer_dataset_manager: TrainerDatasetManager,
                  **kwargs):
         """
         Handles the training and evaluation of learning models
@@ -36,7 +37,8 @@ class TraceTrainer(Trainer, BaseObject):
         self.model_manager.set_max_seq_length(self.trainer_args.max_seq_length)
         model = self.model_manager.get_model()
         tokenizer = self.model_manager.get_tokenizer()
-        super().__init__(model=model, args=trainer_args, tokenizer=tokenizer, callbacks=trainer_args.callbacks, **kwargs)
+        super().__init__(model=model, args=trainer_args, tokenizer=tokenizer, callbacks=trainer_args.callbacks,
+                         **kwargs)
 
     def perform_training(self, checkpoint: str = None) -> Dict:
         """
@@ -50,12 +52,12 @@ class TraceTrainer(Trainer, BaseObject):
         output = self.train(resume_from_checkpoint=checkpoint)
         return TraceTrainer.output_to_dict(output)
 
-    def perform_prediction(self) -> Dict:
+    def perform_prediction(self, dataset_role: DatasetRole = DatasetRole.EVAL) -> Dict:
         """
         Performs the prediction and (optionally) evaluation for the model
         :return: A dictionary containing the results.
         """
-        self.eval_dataset = self.trainer_dataset_manager[DatasetRole.EVAL].to_trainer_dataset(self.model_manager)
+        self.eval_dataset = self.trainer_dataset_manager[dataset_role].to_trainer_dataset(self.model_manager)
         output = self.predict(self.eval_dataset)
         predictions = TraceTrainer.get_similarity_scores(output.predictions)
         results = self._eval(predictions, output.label_ids, output.metrics,

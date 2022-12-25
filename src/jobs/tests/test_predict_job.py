@@ -1,6 +1,7 @@
 import os
 
 from data.datasets.dataset_role import DatasetRole
+from experiments.variables.typed_definition_variable import TypedDefinitionVariable
 from jobs.components.job_args import JobArgs
 from jobs.predict_job import PredictJob
 from jobs.tests.base_job_test import BaseJobTest
@@ -17,7 +18,7 @@ class TestPredictJob(BaseJobTest):
         },
         "trainer_dataset_manager": {
             "eval_dataset_creator": {
-                "objectType": "Safa",
+                TypedDefinitionVariable.OBJECT_TYPE_KEY: "Safa",
                 "project_path": os.path.join(TEST_DATA_DIR, "safa")
             }
         },

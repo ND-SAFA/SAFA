@@ -34,5 +34,6 @@ class TestMLMPreTrainJob(BaseJobTest):
 
     def _get_job(self):
         params = self.get_job_args(include_pre_processing=True, include_base_model=False)
+        trainer_args = self.get_trainer_args()
         job_args = JobArgs(**params)
         return MLMPreTrainJob(job_args)

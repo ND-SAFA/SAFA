@@ -77,8 +77,8 @@ class TestTraceTrainer(BaseTraceTest):
         test_trace_trainer.train_dataset = train_dataset
 
     def get_dataset_container(self):
-        train_dataset_map = self.create_dataset(DatasetRole.TRAIN, include_links=True)
-        eval_dataset_map = self.create_dataset(DatasetRole.EVAL, include_links=False)
+        train_dataset_map = self.create_dataset_map(DatasetRole.TRAIN, include_links=True)
+        eval_dataset_map = self.create_dataset_map(DatasetRole.EVAL, include_links=False)
         return self.create_trainer_dataset_manager({**train_dataset_map, **eval_dataset_map},
                                                    split_train_dataset=True)
 

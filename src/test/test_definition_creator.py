@@ -1,43 +1,68 @@
 import os
+from typing import get_args, get_origin, get_type_hints
 
 from data.datasets.dataset_role import DatasetRole
+from data.datasets.trainer_dataset_manager import TrainerDatasetManager
+from experiments.variables.typed_definition_variable import TypedDefinitionVariable
 from jobs.predict_job import PredictJob
 from test.base_test import BaseTest
 from test.definition_creator import DefinitionCreator
 from test.paths.paths import TEST_DATA_DIR, TEST_OUTPUT_DIR
+from test.test_object_builder import TestObjectBuilder
+from util.base_object import BaseObject
+from util.reflection_util import ReflectionUtil
 
 
 class TestDefinitionCreator(BaseTest):
-    DEFINITION = {
-        "job_args": {
-            "output_dir": TEST_OUTPUT_DIR
-        },
-        "model_manager": {
-            "model_path": "roberta-base"
-        },
-        "trainer_dataset_manager": {
-            "eval_dataset_creator": {
-                "objectType": "STRUCTURE",
-                "project_path": os.path.join(TEST_DATA_DIR, "coest")
-            }
-        },
-        "trainer_args": {
-            "output_dir": TEST_OUTPUT_DIR
-        }
+    JOB_ARGS_DEFINITION = {
+        "output_dir": TEST_OUTPUT_DIR
     }
+    MODEL_MANAGER_DEFINITION = {
+        "model_path": "roberta-base"
+    }
+    DATASET_CREATOR_DEFINITION = {
+        TypedDefinitionVariable.OBJECT_TYPE_KEY: "STRUCTURE",
+        "project_path": os.path.join(TEST_DATA_DIR, "coest")
+    }
+    DATASET_MANAGER_DEFINITION = {
+        "eval_dataset_creator": DATASET_CREATOR_DEFINITION
+    }
+    TRAINER_ARGS_DEFINITION = {"output_dir": TEST_OUTPUT_DIR}
+    DEFINITION = {
+        "job_args": JOB_ARGS_DEFINITION,
+        "model_manager": MODEL_MANAGER_DEFINITION,
+        "trainer_dataset_manager": DATASET_MANAGER_DEFINITION,
+        "trainer_args": TRAINER_ARGS_DEFINITION
+    }
+
+    def test_typing(self):
+        hints = get_type_hints(TrainerDatasetManager.__init__)
+        args = get_args(hints["train_dataset_creator"])
+        origin = get_origin(args[0])
+        arg = args[0]
+        arg_type = type(arg)
+        arg_class = arg.__class__
+
+        results = {}
+        values = [arg, arg_type, arg_class]
+        for index, value in enumerate(values):
+            results[index] = ReflectionUtil.is_instance_or_subclass(value, BaseObject)
+
+        print("Done.")
+
+    def test_trainer_creation(self):
+        definition = {
+            "train_dataset_creator": self.DATASET_CREATOR_DEFINITION
+        }
+        trainer_dataset_manager = TestObjectBuilder.create(TrainerDatasetManager, override=True, **definition)
+        self.verify_trainer_dataset_manager(trainer_dataset_manager)
 
     def test_trainer_dataset_manager(self):
         definition = self.DEFINITION.copy()
         predict_job: PredictJob = DefinitionCreator.create(PredictJob, definition)
 
         # Verify trainer dataset manager
-        for dataset_role in [DatasetRole.VAL, DatasetRole.TRAIN]:
-            self.assertIsNone(predict_job.trainer_dataset_manager[dataset_role])
-        eval_dataset = predict_job.trainer_dataset_manager[DatasetRole.EVAL]
-
-        self.assertEquals(len(eval_dataset.pos_link_ids), 4)
-        self.assertEquals(len(eval_dataset.neg_link_ids), 4)
-        self.assertEquals(len(eval_dataset.links), 8)
+        self.verify_trainer_dataset_manager(predict_job.trainer_dataset_manager)
 
         # Verify trainer args
         definition.pop("trainer_dataset_manager")
@@ -45,3 +70,15 @@ class TestDefinitionCreator(BaseTest):
             parent_object = getattr(predict_job, parent_key)
             for child_key, child_value in parent_value.items():
                 self.assertEquals(getattr(parent_object, child_key), child_value)
+
+    def verify_trainer_dataset_manager(self, trainer_dataset_manager: TrainerDatasetManager,
+                                       target_role: DatasetRole = DatasetRole.TRAIN):
+        roles = [e for e in DatasetRole]
+        roles.remove(target_role)
+        for dataset_role in roles:
+            self.assertIsNone(trainer_dataset_manager[dataset_role])
+        dataset = trainer_dataset_manager[target_role]
+
+        self.assertEquals(len(dataset.pos_link_ids), 4)
+        self.assertEquals(len(dataset.neg_link_ids), 4)
+        self.assertEquals(len(dataset.links), 8)

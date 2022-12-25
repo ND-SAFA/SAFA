@@ -1,6 +1,6 @@
 from abc import ABC
 from copy import deepcopy
-from typing import Any, Type, Union, get_args, List, Dict
+from typing import Any, Dict, List, Type, Union, _UnionGenericAlias, get_args
 
 from typeguard import check_type
 
@@ -58,7 +58,45 @@ class BaseObject(ABC):
         return instances.pop() if len(instances) == 1 else ExperimentalVariable([Variable(i) for i in instances])
 
     @classmethod
-    def _set_params_values(cls, params_list: List[Dict], param_name: str, param_value: Any, expected_type: Type = None) -> List[Dict]:
+    def get_generic(cls, expected_type):
+        if isinstance(expected_type, _UnionGenericAlias):
+            args = get_args(expected_type)
+            return args[0]
+
+    @classmethod
+    def _get_value_of_variable(cls, variable: Union[Variable, Any], expected_type: Union[Type] = None) -> Any:
+        """
+        Gets the value of a given variable
+        :param variable: the variable, can be any variable class or the actual value desired
+        :param expected_type: the expected type for the value
+        :return: the value
+        """
+        if isinstance(variable, UndeterminedVariable):
+            val = variable
+        elif isinstance(variable, MultiVariable):
+            expected_inner_types = get_args(expected_type)
+            expected_inner_type = expected_inner_types[0] if len(expected_inner_types) >= 1 else expected_type
+            val = []
+            for i, inner_var in enumerate(variable):
+                expected_inner_type = expected_inner_types[i] if i < len(expected_inner_types) else expected_inner_type
+                inner_val = cls._get_value_of_variable(inner_var, expected_inner_type)
+                val.append(inner_val)
+            if isinstance(variable, ExperimentalVariable):
+                val = ExperimentalVariable(val)
+        elif isinstance(variable, TypedDefinitionVariable):
+            expected_class = cls._get_expected_class_by_type(expected_type, variable.object_type)
+            val = cls._make_child_object(DefinitionVariable(variable), expected_class)
+        elif isinstance(variable, DefinitionVariable) or isinstance(variable, TypedDefinitionVariable):
+            val = cls._make_child_object(variable, expected_type) if expected_type else None
+        elif isinstance(variable, Variable):
+            val = variable.value
+        else:
+            val = variable
+        return val
+
+    @classmethod
+    def _set_params_values(cls, params_list: List[Dict], param_name: str, param_value: Any,
+                           expected_type: Type = None) -> List[Dict]:
         """
         Adds the param_name, param_value pair to each params dictionary in the params list
         :param params_list: list of params dictionary
@@ -77,38 +115,6 @@ class BaseObject(ABC):
         return params_list_out
 
     @classmethod
-    def _get_value_of_variable(cls, variable: Union[Variable, Any], expected_type: Union[Type] = None) -> Any:
-        """
-        Gets the value of a given variable
-        :param variable: the variable, can be any variable class or the actual value desired
-        :param expected_type: the expected type for the value
-        :return: the value
-        """
-        if isinstance(variable, TypedDefinitionVariable):
-            assert ReflectionUtil.is_instance_or_subclass(expected_type, BaseObject)
-            expected_type = expected_type._get_expected_class_by_type(expected_type, variable.object_type)
-
-        if isinstance(variable, UndeterminedVariable):
-            val = variable
-        elif isinstance(variable, MultiVariable):
-            expected_inner_types = get_args(expected_type)
-            expected_inner_type = expected_inner_types[0] if len(expected_inner_types) >= 1 else expected_type
-            val = []
-            for i, inner_var in enumerate(variable):
-                expected_inner_type = expected_inner_types[i] if i < len(expected_inner_types) else expected_inner_type
-                inner_val = cls._get_value_of_variable(inner_var, expected_inner_type)
-                val.append(inner_val)
-            if isinstance(variable, ExperimentalVariable):
-                val = ExperimentalVariable(val)
-        elif isinstance(variable, DefinitionVariable):
-            val = cls._make_child_object(variable, expected_type) if expected_type else None
-        elif isinstance(variable, Variable):
-            val = variable.value
-        else:
-            val = variable
-        return val
-
-    @classmethod
     def _make_child_object(cls, definition: DefinitionVariable, expected_class: Type) -> Any:
         """
         Handles making children objects
@@ -116,7 +122,7 @@ class BaseObject(ABC):
         :param definition: contains attributes necessary to construct the child
         :return: the child obj
         """
-        if issubclass(expected_class, BaseObject):
+        if ReflectionUtil.is_instance_or_subclass(expected_class, BaseObject):
             return expected_class.initialize_from_definition(definition)
 
         params = {param_name: cls._get_value_of_variable(variable, expected_class)

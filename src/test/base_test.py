@@ -14,8 +14,7 @@ from test.paths.paths import TEST_DATA_DIR, TEST_OUTPUT_DIR, TEST_VOCAB_FILE
 
 
 class BaseTest(TestCase):
-    MODEL_MANAGER_PARAMS = {
-        "model_path": "model"}
+    MODEL_MANAGER_PARAMS = {"model_path": "model"}
     DATA_CLEANER = DataCleaner([
         SupportedDataCleaningStep.REPLACE_WORDS.value(word_replace_mappings={"This": "Esta", "one": "uno"}),
         SupportedDataCleaningStep.REMOVE_UNWANTED_CHARS.value(),
@@ -57,12 +56,6 @@ class BaseTest(TestCase):
             is_decoder=False,
             initializer_range=0.02,
         )
-
-    def assert_lists_have_the_same_vals(self, list1, list2):
-        diff1 = set(list1).difference(list2)
-        diff2 = set(list2).difference(list1)
-        self.assertEquals(len(diff1), 0)
-        self.assertEquals(len(diff2), 0)
 
     @staticmethod
     def get_test_tokenizer():

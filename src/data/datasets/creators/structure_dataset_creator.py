@@ -13,9 +13,15 @@ class StructureDatasetCreator(AbstractTraceDatasetCreator):
         """
         Creates a dataset from the coest.org website.
         :param project_path: Path to the project folder containing definition file.
+        :param data_cleaner: The cleaner responsible for processing artifact tokens.
+        :param use_linked_targets_only: if True, uses only the targets that make up at least one true link
         """
         super().__init__(data_cleaner, use_linked_targets_only)
         self.project_path = project_path
 
     def create(self) -> TraceDataset:
+        """
+        Creates the coest dataset using the structured project reader
+        :return: the dataset
+        """
         return StructureProjectReader(self.project_path).create()

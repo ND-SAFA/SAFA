@@ -14,8 +14,7 @@ class SafaDatasetCreator(AbstractTraceDatasetCreator):
         """
         Creates a data from the SAFA data format.
         :param project_path: the path to the project
-        :param data_cleaning_steps: tuple containing the desired pre-processing steps and related params
-        :param data_keys: keys to use to access data
+        :param data_cleaner: the cleaner responsible for processing artifact tokens.
         :param use_linked_targets_only: if True, uses only the targets that make up at least one true link
         """
         super().__init__(data_cleaner, use_linked_targets_only)

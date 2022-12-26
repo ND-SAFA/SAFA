@@ -1,6 +1,6 @@
 from typing import List, Any
 
-from experiments.variables.variable import Variable
+from util.variables.variable import Variable
 
 
 class MultiVariable(Variable, list):

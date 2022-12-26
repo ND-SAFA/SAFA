@@ -166,7 +166,7 @@ class TraceDataset(AbstractDataset):
         """
         Saves the dataset to the output dir
         :param output_dir: directory to save to
-        :param filename: name of tthe file (no ext)
+        :param filename: name of the file (no ext)
         :return: location the file was saved to
         """
         output_path = os.path.join(output_dir, filename + ".csv")
@@ -237,8 +237,7 @@ class TraceDataset(AbstractDataset):
 
         new_id = TraceLink.generate_link_id(aug_source_id, aug_target_id)
         if new_id in self.links:
-            if self.links[new_id].source.token != aug_source_tokens or self.links[
-                new_id].target.token != aug_target_tokens:
+            if self.links[new_id].source.token != aug_source_tokens or self.links[new_id].target.token != aug_target_tokens:
                 aug_source_id += str(entry_num)
                 aug_target_id += str(entry_num)
         return aug_source_id, aug_target_id
@@ -334,10 +333,19 @@ class TraceDataset(AbstractDataset):
         """
         return len(data) - round(len(data) * percent_split)
 
-    def __len__(self):
+    def __len__(self) -> int:
+        """
+        Returns the length of the dataset
+        :return: the length of the dataset
+        """
         return len(self.pos_link_ids) + len(self.neg_link_ids)
 
-    def __add__(self, other: "TraceDataset"):
+    def __add__(self, other: "TraceDataset") -> "TraceDataset":
+        """
+        Combines two datasets
+        :param other: the other dataset
+        :return: the combined dataset
+        """
         combined_links = deepcopy(self.links)
         combined_links.update(other.links)
         return TraceDataset(combined_links)

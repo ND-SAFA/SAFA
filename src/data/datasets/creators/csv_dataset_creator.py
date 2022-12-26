@@ -20,8 +20,8 @@ class CSVDatasetCreator(AbstractTraceDatasetCreator):
 
     def create(self) -> TraceDataset:
         """
-        Creates the data
-        :return: the data
+        Creates the data from the csv
+        :return: the dataset
         """
         project_reader = CSVEntityReader(self.data_file_path)
         trace_links: Dict[int, TraceLink] = project_reader.get_entities()

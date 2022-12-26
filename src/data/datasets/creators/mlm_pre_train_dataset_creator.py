@@ -21,7 +21,7 @@ class MLMPreTrainDatasetCreator(AbstractDatasetCreator):
         The masked learning model pretraining data creator
         :param orig_data_path: path to the original pretraining data
         :param training_data_dir: path to the directory to save the training data file (defaults to same as orig_data_path)
-        :param data_cleaning_steps: tuple containing the desired pre-processing steps and related params
+        :param data_cleaner: the cleaner responsible for processing artifact tokens.
         :param block_size: the block size for the LineByLineDataset
         """
         super().__init__(data_cleaner)

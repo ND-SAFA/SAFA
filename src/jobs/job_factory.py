@@ -1,6 +1,6 @@
 from typing import Type, Union
 
-from experiments.variables.definition_variable import DefinitionVariable
+from util.variables.definition_variable import DefinitionVariable
 from jobs.abstract_job import AbstractJob
 
 

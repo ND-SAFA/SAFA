@@ -21,7 +21,7 @@ class AbstractDataset(BaseObject):
         """
         Saves the dataset to the output dir
         :param output_dir: directory to save to
-        :param filename: name of tthe file (no ext)
+        :param filename: name of the file (no ext)
         :return: location the file was saved to
         """
         pass

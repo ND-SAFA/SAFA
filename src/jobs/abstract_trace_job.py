@@ -1,7 +1,7 @@
 from abc import ABC
 
 from config.override import overrides
-from data.datasets.trainer_dataset_manager import TrainerDatasetManager
+from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
 from jobs.abstract_job import AbstractJob
 from jobs.components.job_args import JobArgs
 from jobs.create_datasets_job import CreateDatasetsJob

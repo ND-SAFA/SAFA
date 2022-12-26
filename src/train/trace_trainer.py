@@ -12,7 +12,7 @@ from transformers.trainer_pt_utils import get_tpu_sampler, is_torch_tpu_availabl
 
 from config.override import overrides
 from data.datasets.dataset_role import DatasetRole
-from data.datasets.trainer_dataset_manager import TrainerDatasetManager
+from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
 from models.model_manager import ModelManager
 from train.metrics.supported_trace_metric import get_metric_name, get_metric_path
 from train.trainer_args import TrainerArgs

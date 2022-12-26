@@ -11,6 +11,9 @@ from util.uncased_dict import UncasedDict
 
 
 class NpEncoder(json.JSONEncoder):
+    """
+    Handles Numpy conversion to json
+    """
     def default(self, obj):
         if isinstance(obj, np.integer):
             return int(obj)

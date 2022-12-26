@@ -5,7 +5,7 @@ from unittest.mock import patch
 from config.constants import VALIDATION_PERCENTAGE_DEFAULT
 from data.datasets.dataset_role import DatasetRole
 from data.datasets.trainer_dataset_manager import TrainerDatasetManager
-from experiments.variables.typed_definition_variable import TypedDefinitionVariable
+from util.variables.typed_definition_variable import TypedDefinitionVariable
 from jobs.components.job_args import JobArgs
 from jobs.tests.base_job_test import BaseJobTest
 from jobs.train_job import TrainJob

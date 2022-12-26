@@ -65,9 +65,7 @@ class ClassicTraceDatasetCreator(AbstractTraceDatasetCreator):
             artifacts.append(Artifact(artifact_id, processed_artifact_token))
         return artifacts
 
-    def _create_links_for_layer(self,
-                                source_artifacts: List[Artifact],
-                                target_artifacts: List[Artifact],
+    def _create_links_for_layer(self, source_artifacts: List[Artifact], target_artifacts: List[Artifact],
                                 pos_link_ids: Set[int]) -> Dict[int, TraceLink]:
         """
         Creates map between trace link id to trace link.

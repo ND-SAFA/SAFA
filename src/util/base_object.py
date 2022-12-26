@@ -4,12 +4,13 @@ from typing import Any, Dict, List, Type, Union, _UnionGenericAlias, get_args
 
 from typeguard import check_type
 
-from experiments.variables.definition_variable import DefinitionVariable
-from experiments.variables.experimental_variable import ExperimentalVariable
-from experiments.variables.multi_variable import MultiVariable
-from experiments.variables.typed_definition_variable import TypedDefinitionVariable
-from experiments.variables.undetermined_variable import UndeterminedVariable
-from experiments.variables.variable import Variable
+from util.variables.definition_variable import DefinitionVariable
+from util.variables.experimental_variable import ExperimentalVariable
+from util.variables.multi_variable import MultiVariable
+from util.variables.typed_definition_variable import TypedDefinitionVariable
+from util.variables.undetermined_variable import UndeterminedVariable
+from util.variables.variable import Variable
+from util.enum_utils import get_enum_from_name
 from util.param_specs import ParamSpecs
 from util.reflection_util import ReflectionUtil
 
@@ -22,10 +23,11 @@ class BaseObject(ABC):
         :param obj: the object to use to fill in values
         :return: None
         """
-        if not isinstance(obj, self.__class__):
-            raise Exception("Object must be of the same type %s" % self.__class__)
         for attr_name, attr_value in vars(self).items():
             if isinstance(attr_value, UndeterminedVariable):
+                if not hasattr(obj, attr_name):
+                    raise TypeError("Cannot set undetermined variable because %s does not contain %s"
+                                    % (obj.__class__.__name__, attr_name))
                 value_to_use = getattr(obj, attr_name)
                 setattr(self, attr_name, value_to_use)
             elif isinstance(attr_value, BaseObject):
@@ -135,14 +137,22 @@ class BaseObject(ABC):
     @classmethod
     def _get_expected_class_by_type(cls, abstract_class: Type, child_class_name: str) -> Any:
         """
-        *Must be implemented in calling class*
         Returns the correct expected class when given the abstract parent class type and name of child class
         :param abstract_class: the abstract parent class type
         :param child_class_name: the name of the child class
         :return: the expected type
         """
-        raise TypeError(
-            "Cannot create %s because %s has not defined a creation method." % (child_class_name, cls.__name__))
+        return get_enum_from_name(cls._get_child_enum_class(abstract_class, child_class_name), child_class_name).value
+
+    @classmethod
+    def _get_child_enum_class(cls, abstract_class: Type, child_class_name: str) -> Type:
+        """
+        Returns the correct enum class mapping name to class given the abstract parent class type and name of child class
+        :param abstract_class: the abstract parent class type
+        :param child_class_name: the name of the child class
+        :return: the enum class mapping name to class
+        """
+        raise TypeError("Cannot create %s because %s has not defined the enum class to use." % (child_class_name, cls.__name__))
 
     @classmethod
     def _assert_type(cls, val: Any, expected_type: Union[Type], param_name: str):

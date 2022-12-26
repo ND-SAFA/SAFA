@@ -1,7 +1,5 @@
 from collections import OrderedDict
-from typing import Any, Dict, List, Optional, Type, Union
-
-from prometheus_client.decorator import getfullargspec
+from typing import Dict, List, Optional, Type, Union
 
 from config.override import overrides
 from data.datasets.abstract_dataset import AbstractDataset
@@ -12,9 +10,8 @@ from data.datasets.dataset_role import DatasetRole
 from data.datasets.pre_train_dataset import PreTrainDataset
 from data.datasets.trace_dataset import TraceDataset
 from data.processing.augmentation.data_augmenter import DataAugmenter
-from experiments.variables.undetermined_variable import UndeterminedVariable
+from util.variables.undetermined_variable import UndeterminedVariable
 from util.base_object import BaseObject
-from util.enum_utils import get_enum_from_name
 
 
 class TrainerDatasetManager(BaseObject):
@@ -101,14 +98,14 @@ class TrainerDatasetManager(BaseObject):
 
     @classmethod
     @overrides(BaseObject)
-    def _get_expected_class_by_type(cls, abstract_class: Type, child_class_name: str) -> Any:
+    def _get_child_enum_class(cls, abstract_class: Type, child_class_name: str) -> Type:
         """
-        Returns the correct expected class when given the abstract parent class type and name of child class
+        Returns the correct enum class mapping name to class given the abstract parent class type and name of child class
         :param abstract_class: the abstract parent class type
         :param child_class_name: the name of the child class
-        :return: the expected type
+        :return: the enum class mapping name to class
         """
-        return get_enum_from_name(SupportedDatasetCreator, child_class_name).value
+        return SupportedDatasetCreator
 
     def _prepare_datasets(self, data_augmenter: DataAugmenter) -> None:
         """
@@ -156,8 +153,7 @@ class TrainerDatasetManager(BaseObject):
                 for dataset_role, dataset_creator in dataset_creators_map.items()}
 
     @staticmethod
-    def __optional_create(dataset_creator: Optional[AbstractDatasetCreator]) -> Optional[
-        Union[TraceDataset, PreTrainDataset]]:
+    def __optional_create(dataset_creator: Optional[AbstractDatasetCreator]) -> Optional[Union[TraceDataset, PreTrainDataset]]:
         """
         Creates dataset set if not None, otherwise None is returned.
         :param dataset_creator: The optional dataset creator to use.

@@ -3,7 +3,8 @@ from unittest.mock import patch
 
 from transformers import AutoModelForMaskedLM
 
-from data.datasets.trainer_dataset_manager import TrainerDatasetManager
+from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
+from util.variables.typed_definition_variable import TypedDefinitionVariable
 from jobs.components.job_args import JobArgs
 from jobs.mlm_pre_train_job import MLMPreTrainJob
 from jobs.tests.base_job_test import BaseJobTest

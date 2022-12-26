@@ -1,14 +1,18 @@
 import os
 import random
-import transformers
 import threading
 import traceback
 import uuid
 from abc import abstractmethod
+from copy import deepcopy
+from inspect import getfullargspec
+from typing import Dict
+
+import transformers
 
 from jobs.components.job_args import JobArgs
-from jobs.components.job_status import JobStatus
 from jobs.components.job_result import JobResult
+from jobs.components.job_status import JobStatus
 from models.model_manager import ModelManager
 from server.storage.safa_storage import SafaStorage
 from util.base_object import BaseObject
@@ -94,3 +98,14 @@ class AbstractJob(threading.Thread, BaseObject):
         except Exception:
             print(traceback.format_exc())  # to save in logs
             return False
+
+    def __deepcopy__(self, memodict: Dict ={}) -> "AbstractJob":
+        """
+        Overrides deepcopy because there is a weird issue with coping threads
+        :param memodict: param from orig deepcopy
+        :return: the copy of the job
+        """
+        param_names = getfullargspec(self.__init__).args
+        params = {name: deepcopy(getattr(self, name)) for name in param_names if name != "self"}
+        cpyobj = type(self)(**params)  # shallow copy of whole object
+        return cpyobj

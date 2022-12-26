@@ -1,7 +1,7 @@
 from typing import List
 
-from experiments.variables.definition_variable import DefinitionVariable
-from experiments.variables.variable import Variable
+from util.variables.definition_variable import DefinitionVariable
+from util.variables.variable import Variable
 from server.serializers.experiment_serializer import ExperimentSerializer
 from test.base_test import BaseTest
 from util.base_object import BaseObject

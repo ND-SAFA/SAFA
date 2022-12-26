@@ -7,9 +7,9 @@ from data.datasets.creators.classic_trace_dataset_creator import ClassicTraceDat
 from data.datasets.creators.split_dataset_creator import SplitDatasetCreator
 from data.datasets.creators.supported_dataset_creator import SupportedDatasetCreator
 from data.datasets.dataset_role import DatasetRole
-from data.datasets.trainer_dataset_manager import TrainerDatasetManager
+from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
 from data.processing.abstract_data_processing_step import AbstractDataProcessingStep
-from experiments.variables.typed_definition_variable import TypedDefinitionVariable
+from util.variables.typed_definition_variable import TypedDefinitionVariable
 from jobs.components.job_args import JobArgs
 from models.model_manager import ModelManager
 from test.base_test import BaseTest

@@ -1,4 +1,4 @@
-from experiments.variables.variable import Variable
+from util.variables.variable import Variable
 
 
 class UndeterminedVariable(Variable):

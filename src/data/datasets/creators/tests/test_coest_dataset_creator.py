@@ -6,7 +6,7 @@ from test.paths.paths import TEST_DATA_DIR
 
 
 class TestStructureDatasetCreator(BaseTest):
-    project_path = os.path.join(TEST_DATA_DIR, "coest")
+    project_path = os.path.join(TEST_DATA_DIR, "structure")
 
     def test_create(self):
         dataset_creator = StructureDatasetCreator(self.project_path)

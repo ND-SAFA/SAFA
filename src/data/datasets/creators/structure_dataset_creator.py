@@ -11,7 +11,7 @@ class StructureDatasetCreator(AbstractTraceDatasetCreator):
                  data_cleaner: DataCleaner = None,
                  use_linked_targets_only: bool = USE_LINKED_TARGETS_ONLY_DEFAULT):
         """
-        Creates a dataset from the coest.org website.
+        Creates a dataset from the structure.org website.
         :param project_path: Path to the project folder containing definition file.
         :param data_cleaner: The cleaner responsible for processing artifact tokens.
         :param use_linked_targets_only: if True, uses only the targets that make up at least one true link
@@ -21,7 +21,7 @@ class StructureDatasetCreator(AbstractTraceDatasetCreator):
 
     def create(self) -> TraceDataset:
         """
-        Creates the coest dataset using the structured project reader
+        Creates the structure dataset using the structured project reader
         :return: the dataset
         """
         return StructureProjectReader(self.project_path).create()

@@ -3,12 +3,12 @@ from copy import deepcopy
 
 from data.datasets.dataset_role import DatasetRole
 from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
-from util.variables.typed_definition_variable import TypedDefinitionVariable
 from jobs.predict_job import PredictJob
 from test.base_test import BaseTest
 from test.definition_creator import DefinitionCreator
 from test.paths.paths import TEST_DATA_DIR, TEST_OUTPUT_DIR
 from test.test_object_creator import TestObjectCreator
+from util.variables.typed_definition_variable import TypedDefinitionVariable
 
 
 class TestDefinitionCreator(BaseTest):
@@ -20,7 +20,7 @@ class TestDefinitionCreator(BaseTest):
     }
     DATASET_CREATOR_DEFINITION = {
         TypedDefinitionVariable.OBJECT_TYPE_KEY: "STRUCTURE",
-        "project_path": os.path.join(TEST_DATA_DIR, "coest")
+        "project_path": os.path.join(TEST_DATA_DIR, "structure")
     }
     DATASET_MANAGER_DEFINITION = {
         "eval_dataset_creator": DATASET_CREATOR_DEFINITION

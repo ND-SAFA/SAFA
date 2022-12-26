@@ -4,12 +4,12 @@ from typing import Dict, List, Type, TypeVar
 from config.constants import VALIDATION_PERCENTAGE_DEFAULT
 from data.datasets.creators.abstract_dataset_creator import AbstractDatasetCreator
 from data.datasets.creators.classic_trace_dataset_creator import ClassicTraceDatasetCreator
+from data.datasets.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
 from data.datasets.creators.split_dataset_creator import SplitDatasetCreator
 from data.datasets.creators.supported_dataset_creator import SupportedDatasetCreator
 from data.datasets.dataset_role import DatasetRole
 from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
 from data.processing.abstract_data_processing_step import AbstractDataProcessingStep
-from util.variables.typed_definition_variable import TypedDefinitionVariable
 from jobs.components.job_args import JobArgs
 from models.model_manager import ModelManager
 from test.base_test import BaseTest
@@ -18,6 +18,7 @@ from test.definition_creator import DefinitionCreator
 from test.paths.paths import PRETRAIN_DIR, TEST_OUTPUT_DIR
 from test.test_data_manager import TestDataManager
 from train.trainer_args import TrainerArgs
+from util.variables.typed_definition_variable import TypedDefinitionVariable
 
 ObjectType = TypeVar("ObjectType")
 
@@ -61,7 +62,8 @@ class TestObjectCreator:
         JobArgs: job_args_definition,
         ClassicTraceDatasetCreator: dataset_creator_definition,
         TrainerDatasetManager: trainer_dataset_manager_definition,
-        ModelManager: model_manager_definition
+        ModelManager: model_manager_definition,
+        MLMPreTrainDatasetCreator: pretrain_dataset_definition
     }
 
     @staticmethod

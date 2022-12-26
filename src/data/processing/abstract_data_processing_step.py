@@ -1,9 +1,8 @@
 import enum
+import math
 from abc import ABC, abstractmethod
 from functools import total_ordering
-from typing import List, Tuple, Iterable, Any
-
-import math
+from typing import List
 
 from util.base_object import BaseObject
 
@@ -53,8 +52,18 @@ class AbstractDataProcessingStep(BaseObject, ABC):
         """
         return AbstractDataProcessingStep.WORD_SEP.join(word_list)
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
+        """
+        Compares the order of the steps
+        :param other: the other step to compare
+        :return: True if both steps can occur in interchangeable order
+        """
         return self.order.value == other.order.value
 
-    def __lt__(self, other):
+    def __lt__(self, other) -> bool:
+        """
+        Compares the order of the steps
+        :param other: the other step to compare
+        :return: True if the current step should occur before the other
+        """
         return self.order.value < other.order.value

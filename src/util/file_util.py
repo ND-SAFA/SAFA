@@ -1,6 +1,6 @@
 import json
 import os
-from typing import Dict
+from typing import Dict, List
 
 
 class FileUtil:
@@ -25,7 +25,13 @@ class FileUtil:
             return json.load(file)
 
     @staticmethod
-    def get_file_list(data_path: str, exclude=None):
+    def get_file_list(data_path: str, exclude: List[str] = None) -> List[str]:
+        """
+        Gets list of files in the data path
+        :param data_path: the path to the data
+        :param exclude: list of strings to exclude
+        :return: a list of files
+        """
         if exclude is None:
             exclude = [".DS_Store"]
         if os.path.isfile(data_path):

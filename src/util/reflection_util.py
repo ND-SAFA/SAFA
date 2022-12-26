@@ -11,7 +11,7 @@ class ParamScope(Enum):
 class ReflectionUtil:
 
     @staticmethod
-    def is_instance_or_subclass(target_class, source_class):
+    def is_instance_or_subclass(target_class, source_class) -> bool:
         """
         Returns whether target is instance of sub-class of source class.
         :param target_class: The class being tested for containment
@@ -21,7 +21,14 @@ class ReflectionUtil:
         return isinstance(target_class, source_class) or issubclass(target_class, source_class)
 
     @staticmethod
-    def copy_fields(source: Dict, include: List[str] = None, exclude: List[str] = None):
+    def copy_fields(source: Dict, include: List[str] = None, exclude: List[str] = None) -> Dict[str, Any]:
+        """
+        Creates a copy of the source fields
+        :param source: the source fields
+        :param include: copies only those in include list if given
+        :param exclude: copies all but those in exclude list if given
+        :return: a copy of the fields
+        """
         if include:
             return {field: source[field] for field in include}
         elif exclude:
@@ -55,6 +62,7 @@ class ReflectionUtil:
     def get_fields(instance: Any, scope: ParamScope, ignore: List[str] = None) -> Dict:
         """
         Returns the fields of the instance within the scope given.
+        :param ignore: will ignore any fields in this list
         :param instance: The instance whose fields are returned.
         :param scope: The scope of the fields to return.
         :return: Dictionary whose keys are field names and values are field values.
@@ -70,7 +78,7 @@ class ReflectionUtil:
         return params
 
     @staticmethod
-    def get_enum_key(enum: Type[Enum], instance):
+    def get_enum_key(enum: Type[Enum], instance) -> str:
         """
         Returns the key in enum whose value is the class of instance.
         :param enum: Enum containing classes are values.
@@ -80,10 +88,10 @@ class ReflectionUtil:
         for enum_key in enum:
             if isinstance(instance, enum_key.value):
                 return enum_key.name
-        raise ValueError("Could not convert " + str(type(instance)) + " into" + enum + ".")
+        raise ValueError("Could not convert " + str(type(instance)) + " into" + str(enum) + ".")
 
     @staticmethod
-    def set_attributes(instance: Any, params: Dict):
+    def set_attributes(instance: Any, params: Dict) -> Any:
         """
         Sets the instance variables matching param keys to param values.
         :param instance: The object whose properties will be updated.

@@ -2,10 +2,10 @@ from typing import Dict
 
 from rest_framework import serializers
 
-from experiments.variables.definition_variable import DefinitionVariable
-from experiments.variables.experimental_variable import ExperimentalVariable
-from experiments.variables.typed_definition_variable import TypedDefinitionVariable
-from experiments.variables.variable import Variable
+from util.variables.definition_variable import DefinitionVariable
+from util.variables.experimental_variable import ExperimentalVariable
+from util.variables.typed_definition_variable import TypedDefinitionVariable
+from util.variables.variable import Variable
 from server.serializers.serializer_utility import SerializerUtility
 
 

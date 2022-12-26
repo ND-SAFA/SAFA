@@ -17,7 +17,7 @@ class RepositoryDatasetCreator(AbstractTraceDatasetCreator):
         """
         Responsible for creating a data from a repository
         :param repo_paths: list of paths to all repositories
-        :param data_cleaning_steps: tuple containing the desired pre-processing steps and related params
+        :param data_cleaner: The cleaner responsible for processing artifact tokens.
         :param data_keys: keys to use to access data
         :param use_linked_targets_only: if True, uses only the targets that make up at least one true link
         """

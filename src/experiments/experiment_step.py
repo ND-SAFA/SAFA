@@ -1,8 +1,8 @@
 from typing import List, Union, Type
 
 from config.override import overrides
-from experiments.variables.definition_variable import DefinitionVariable
-from experiments.variables.experimental_variable import ExperimentalVariable
+from util.variables.definition_variable import DefinitionVariable
+from util.variables.experimental_variable import ExperimentalVariable
 from jobs.abstract_job import AbstractJob
 from jobs.supported_job_type import SupportedJobType
 from train.metrics.supported_trace_metric import SupportedTraceMetric

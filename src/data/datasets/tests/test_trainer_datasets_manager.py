@@ -6,7 +6,7 @@ from data.datasets.creators.mlm_pre_train_dataset_creator import MLMPreTrainData
 from data.datasets.creators.split_dataset_creator import SplitDatasetCreator
 from data.datasets.dataset_role import DatasetRole
 from data.datasets.trace_dataset import TraceDataset
-from data.datasets.trainer_dataset_manager import TrainerDatasetManager
+from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
 from test.base_trace_test import BaseTraceTest
 from test.paths.paths import TEST_OUTPUT_DIR
 

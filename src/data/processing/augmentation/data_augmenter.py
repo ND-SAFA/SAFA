@@ -1,11 +1,10 @@
-from typing import Dict, List, Tuple, Type, Any
+from typing import Dict, List, Tuple, Type
 
 from config.override import overrides
 from data.processing.abstract_data_processor import AbstractDataProcessor
 from data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
 from data.processing.augmentation.supported_data_augmentation_step import SupportedAugmentationStep
 from util.base_object import BaseObject
-from util.enum_utils import get_enum_from_name
 
 
 class DataAugmenter(AbstractDataProcessor):

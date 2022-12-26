@@ -1,9 +1,9 @@
 from typing import Dict, List, TypeVar
 from unittest import TestCase
 
-from experiments.variables.definition_variable import DefinitionVariable
-from experiments.variables.experimental_variable import ExperimentalVariable
-from experiments.variables.variable import Variable
+from util.variables.definition_variable import DefinitionVariable
+from util.variables.experimental_variable import ExperimentalVariable
+from util.variables.variable import Variable
 from server.serializers.experiment_serializer import ExperimentSerializer
 
 AppEntity = TypeVar('AppEntity')

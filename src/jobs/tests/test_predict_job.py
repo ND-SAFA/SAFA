@@ -1,7 +1,7 @@
 import os
 
 from data.datasets.dataset_role import DatasetRole
-from experiments.variables.typed_definition_variable import TypedDefinitionVariable
+from util.variables.typed_definition_variable import TypedDefinitionVariable
 from jobs.components.job_args import JobArgs
 from jobs.predict_job import PredictJob
 from jobs.tests.base_job_test import BaseJobTest

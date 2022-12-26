@@ -2,8 +2,8 @@ import os
 from copy import deepcopy
 
 from data.datasets.dataset_role import DatasetRole
-from data.datasets.trainer_dataset_manager import TrainerDatasetManager
-from experiments.variables.typed_definition_variable import TypedDefinitionVariable
+from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
+from util.variables.typed_definition_variable import TypedDefinitionVariable
 from jobs.predict_job import PredictJob
 from test.base_test import BaseTest
 from test.definition_creator import DefinitionCreator

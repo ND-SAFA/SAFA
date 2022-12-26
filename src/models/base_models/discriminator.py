@@ -1,3 +1,5 @@
+from typing import List
+
 from torch import nn
 
 
@@ -7,7 +9,14 @@ class Discriminator(nn.Module):
     https://github.com/crux82/ganbert
     """
 
-    def __init__(self, input_size=512, hidden_sizes=[512], num_labels=2, dropout_rate=0.1):
+    def __init__(self, input_size: int = 512, hidden_sizes: List[int] = [512], num_labels: int = 2, dropout_rate: float = 0.1):
+        """
+        Discriminator for GAN
+        :param input_size: the size of the input layer
+        :param hidden_sizes: list of sizes for all hidden layers
+        :param num_labels: the number of labels (defaults to binary 0 or 1)
+        :param dropout_rate: the rate at which to apply dropout
+        """
         super(Discriminator, self).__init__()
         self.input_dropout = nn.Dropout(p=dropout_rate)
         layers = []
@@ -22,6 +31,11 @@ class Discriminator(nn.Module):
         self.softmax = nn.Softmax(dim=-1)
 
     def forward(self, input_rep):
+        """
+        Performed on forward pass
+        :param input_rep: the input representation
+        :return: the features, logits and probabilities
+        """
         input_rep = self.input_dropout(input_rep)
         features = self.layers(input_rep)
         logits = self.logit(features)

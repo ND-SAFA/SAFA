@@ -1,11 +1,11 @@
 import random
 
-from experiments.variables.definition_variable import DefinitionVariable
-from experiments.variables.experimental_variable import ExperimentalVariable
-from experiments.variables.multi_variable import MultiVariable
-from experiments.variables.typed_definition_variable import TypedDefinitionVariable
-from experiments.variables.undetermined_variable import UndeterminedVariable
-from experiments.variables.variable import Variable
+from util.variables.definition_variable import DefinitionVariable
+from util.variables.experimental_variable import ExperimentalVariable
+from util.variables.multi_variable import MultiVariable
+from util.variables.typed_definition_variable import TypedDefinitionVariable
+from util.variables.undetermined_variable import UndeterminedVariable
+from util.variables.variable import Variable
 from jobs.components.job_result import JobResult
 from jobs.supported_job_type import SupportedJobType
 from test.base_test import BaseTest

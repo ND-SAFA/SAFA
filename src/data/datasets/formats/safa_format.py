@@ -21,6 +21,15 @@ class SafaFormat:
                  source_id_key: str = SOURCE_ID,
                  target_id_key: str = TARGET_ID, artifacts_key: str = ARTIFACTS, traces_key: str = TRACES,
                  trace_files_2_artifacts=None):
+        """
+        Represents the format for safa/tim
+        :param artifact_token_key: the key to access artifact token
+        :param source_id_key: the key to access source id
+        :param target_id_key: the key to access target id
+        :param artifacts_key: the key to access the artifacts
+        :param traces_key: the key to access the trace links
+        :param trace_files_2_artifacts: the files mapping artifacts to links
+        """
         self.project_path = project_path
         self.artifact_token_key = artifact_token_key
         self.source_id_key = source_id_key
@@ -29,7 +38,11 @@ class SafaFormat:
         self.traces_key = traces_key
         self.trace_files_2_artifacts = self.read_project_definition() if not trace_files_2_artifacts else trace_files_2_artifacts
 
-    def read_project_definition(self):
+    def read_project_definition(self) -> Dict[str, Tuple[str, str]]:
+        """
+        Reads the project definitions from the tim file
+        :return: a dictionary mapping trace link to artifact pair
+        """
         tim_file_path = os.path.join(self.project_path, self.TIM_FILE)
         project_definition = FileUtil.read_json_file(tim_file_path)
         name2artifact = self.read_data_files(project_definition.pop("DataFiles"))
@@ -55,15 +68,27 @@ class SafaFormat:
             name2artifact[artifact_name] = artifact_definition["File"]
         return name2artifact
 
-    def get_artifact_token(self, data_file_name: str):
-        supported_formats = [(self.SAFA_CVS_ARTIFACT_TOKEN, ".csv"), (self.SAFA_JSON_ARTIFACT_TOKEN, ".json")]
+    @staticmethod
+    def get_artifact_token(data_file_name: str) -> str:
+        """
+        Gets the artifact token
+        :param data_file_name: the name of the file containing the artifact
+        :return: the token
+        """
+        supported_formats = [(SafaFormat.SAFA_CVS_ARTIFACT_TOKEN, ".csv"), (SafaFormat.SAFA_JSON_ARTIFACT_TOKEN, ".json")]
         for token, identifier in supported_formats:
             if identifier in data_file_name:
                 return token
         supported_format_names = list(map(lambda f: f[1], supported_formats))
         raise Exception(data_file_name, "does not have a supported file type: ", supported_format_names)
 
-    def get_artifact_id(self, data_file_name: str):
+    @staticmethod
+    def get_artifact_id(data_file_name: str) -> str:
+        """
+        Gets the artifact id
+        :param data_file_name: the name of the file containing the artifact
+        :return: the token
+        """
         supported_ids = [(".json", "name"), (".csv", "id")]
         for extension, key in supported_ids:
             if extension in data_file_name:

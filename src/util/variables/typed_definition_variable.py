@@ -1,7 +1,7 @@
 from typing import Dict, Any
 
-from experiments.variables.definition_variable import DefinitionVariable
-from experiments.variables.variable import Variable
+from util.variables.definition_variable import DefinitionVariable
+from util.variables.variable import Variable
 
 
 class TypedDefinitionVariable(DefinitionVariable):
@@ -19,6 +19,10 @@ class TypedDefinitionVariable(DefinitionVariable):
         super().__init__(value)
 
     def __repr__(self) -> str:
+        """
+        Returns a string representation of the variable
+        :return: the string representation
+        """
         CLOSE_BRACKET = "}"
         repr_ = super().__repr__()
         parts = [part for part in repr_.split(CLOSE_BRACKET) if len(part) > 0]

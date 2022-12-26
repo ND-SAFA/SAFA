@@ -4,12 +4,12 @@ from typing import Any, Dict, List, Type, Union, _UnionGenericAlias, get_args
 
 from typeguard import check_type
 
-from experiments.variables.definition_variable import DefinitionVariable
-from experiments.variables.experimental_variable import ExperimentalVariable
-from experiments.variables.multi_variable import MultiVariable
-from experiments.variables.typed_definition_variable import TypedDefinitionVariable
-from experiments.variables.undetermined_variable import UndeterminedVariable
-from experiments.variables.variable import Variable
+from util.variables.definition_variable import DefinitionVariable
+from util.variables.experimental_variable import ExperimentalVariable
+from util.variables.multi_variable import MultiVariable
+from util.variables.typed_definition_variable import TypedDefinitionVariable
+from util.variables.undetermined_variable import UndeterminedVariable
+from util.variables.variable import Variable
 from util.enum_utils import get_enum_from_name
 from util.param_specs import ParamSpecs
 from util.reflection_util import ReflectionUtil

@@ -1,18 +1,18 @@
-from copy import deepcopy, copy
 import os
 import random
-from inspect import getfullargspec
-from typing import Dict
-
-import transformers
 import threading
 import traceback
 import uuid
 from abc import abstractmethod
+from copy import deepcopy
+from inspect import getfullargspec
+from typing import Dict
+
+import transformers
 
 from jobs.components.job_args import JobArgs
-from jobs.components.job_status import JobStatus
 from jobs.components.job_result import JobResult
+from jobs.components.job_status import JobStatus
 from models.model_manager import ModelManager
 from server.storage.safa_storage import SafaStorage
 from util.base_object import BaseObject

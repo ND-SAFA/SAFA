@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Dict, Any
 
 from config.constants import SAVE_OUTPUT_DEFAULT
 from util.base_object import BaseObject
@@ -23,5 +24,9 @@ class JobArgs(BaseObject):
     """
     random_seed: int = None
 
-    def as_kwargs(self):
+    def as_kwargs(self) -> Dict[str, Any]:
+        """
+        Gets the job args as kwargs
+        :return: the job args as kwargs
+        """
         return {attr_name: getattr(self, attr_name) for attr_name in dir(self) if not attr_name.startswith("__")}

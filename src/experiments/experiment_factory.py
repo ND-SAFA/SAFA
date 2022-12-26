@@ -1,5 +1,5 @@
 from experiments.experiment import Experiment
-from experiments.variables.definition_variable import DefinitionVariable
+from util.variables.definition_variable import DefinitionVariable
 
 
 class ExperimentFactory:
@@ -20,4 +20,3 @@ class ExperimentFactory:
         :return: the Experiment
         """
         return Experiment.initialize_from_definition(self.experiment_definition)
-

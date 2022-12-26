@@ -3,6 +3,7 @@ from typing import Dict, List, Type, TypeVar
 
 from config.constants import VALIDATION_PERCENTAGE_DEFAULT
 from data.datasets.creators.abstract_dataset_creator import AbstractDatasetCreator
+from data.datasets.creators.classic_trace_dataset_creator import ClassicTraceDatasetCreator
 from data.datasets.creators.split_dataset_creator import SplitDatasetCreator
 from data.datasets.creators.supported_dataset_creator import SupportedDatasetCreator
 from data.datasets.dataset_role import DatasetRole
@@ -34,7 +35,6 @@ class TestObjectCreator:
     job_args_definition = {"output_dir": TEST_OUTPUT_DIR}
 
     dataset_creator_definition = {
-        TypedDefinitionVariable.OBJECT_TYPE_KEY: "CLASSIC_TRACE",
         "source_layers": TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS, TestDataManager.Keys.SOURCE]),
         "target_layers": TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS, TestDataManager.Keys.TARGET]),
         "true_links": TestDataManager.get_path(TestDataManager.Keys.TRACES)
@@ -46,7 +46,10 @@ class TestObjectCreator:
     }
 
     trainer_dataset_manager_definition = {
-        "train_dataset_creator": dataset_creator_definition
+        "train_dataset_creator": {
+            TypedDefinitionVariable.OBJECT_TYPE_KEY: "CLASSIC_TRACE",
+            **dataset_creator_definition
+        }
     }
 
     model_manager_definition = {
@@ -56,7 +59,7 @@ class TestObjectCreator:
     SUPPORTED_OBJECTS = {
         TrainerArgs: trainer_args_definition,
         JobArgs: job_args_definition,
-        AbstractDatasetCreator: dataset_creator_definition,
+        ClassicTraceDatasetCreator: dataset_creator_definition,
         TrainerDatasetManager: trainer_dataset_manager_definition,
         ModelManager: model_manager_definition
     }

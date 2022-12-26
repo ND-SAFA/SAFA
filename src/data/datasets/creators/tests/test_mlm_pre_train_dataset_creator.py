@@ -4,6 +4,7 @@ from data.datasets.creators.mlm_pre_train_dataset_creator import MLMPreTrainData
 from data.datasets.pre_train_dataset import PreTrainDataset
 from test.base_test import BaseTest
 from test.paths.paths import TEST_DATA_DIR, TEST_OUTPUT_DIR
+from test.test_assertions import TestAssertions
 from util.file_util import FileUtil
 
 
@@ -27,7 +28,7 @@ class TestMLMPreTrainDatasetCreator(BaseTest):
         self.assertTrue(isinstance(dataset, PreTrainDataset), "create results in PreTrainDataset")
         training_content = FileUtil.read_file(dataset.training_file_path).split("\n")
         expected_lines = self.FILE1_LINES + self.FILE2_LINES
-        self.assert_lists_have_the_same_vals(training_content, expected_lines)
+        TestAssertions.assert_lists_have_the_same_vals(self, training_content, expected_lines)
 
     def test_write_training_examples(self):
         dataset_creator = self.get_mlm_pre_train_dataset_creator()

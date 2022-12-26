@@ -3,6 +3,9 @@ from typing import List, Tuple, Union
 import numpy as np
 from transformers.trainer_utils import PredictionOutput
 
+from data.tree.artifact import Artifact
+from data.tree.trace_link import TraceLink
+
 
 class TestDataManager:
     class Keys:
@@ -68,6 +71,10 @@ class TestDataManager:
         return set(all_links).difference(set(pos_links))
 
     @staticmethod
+    def get_linked_targets():
+        return [link[1] for link in TestDataManager.get_positive_links()]
+
+    @staticmethod
     def get_path(paths: Union[List[str], str], data=None):
         """
         Returns the data at given JSON path.
@@ -84,3 +91,49 @@ class TestDataManager:
         else:
             export_data = TestDataManager.DATA[paths[0]]
         return TestDataManager.get_path(paths[1:], export_data)
+
+    @staticmethod
+    def get_positive_link_ids() -> List[int]:
+        positive_links = TestDataManager.get_positive_links()
+        return TestDataManager._get_link_ids(positive_links)
+
+    @staticmethod
+    def get_all_link_ids() -> List[int]:
+        all_links = TestDataManager.get_all_links()
+        return TestDataManager._get_link_ids(all_links)
+
+    @staticmethod
+    def get_negative_link_ids() -> List[int]:
+        negative_links = TestDataManager.get_negative_links()
+        return TestDataManager._get_link_ids(negative_links)
+
+    @staticmethod
+    def _get_link_ids(links_list):
+        return list(TestDataManager._create_link_map(links_list).keys())
+
+    @staticmethod
+    def _create_link_map(link_list):
+        links = {}
+        for source, target in link_list:
+            link = TestDataManager._create_test_link(source, target)
+            links[link.id] = link
+        return links
+
+    @staticmethod
+    def _create_test_link(source: str, target: str):
+        s = Artifact(source, TestDataManager._get_artifact_body(source))
+        t = Artifact(target, TestDataManager._get_artifact_body(target))
+        return TraceLink(s, t)
+
+    @staticmethod
+    def _create_test_artifact(artifacts_dict):
+        return [Artifact(id_, token) for id_, token in artifacts_dict.items()]
+
+    @staticmethod
+    def _get_artifact_body(artifact_id: str):
+        for artifact_type_key in [TestDataManager.Keys.SOURCE, TestDataManager.Keys.TARGET]:
+            artifact_levels = TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS, artifact_type_key])
+            for artifact_level in artifact_levels:
+                if artifact_id in artifact_level:
+                    return artifact_level[artifact_id]
+        raise ValueError("Could not find artifact with id:" + artifact_id)

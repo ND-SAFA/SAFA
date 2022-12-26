@@ -17,7 +17,7 @@ class CSVSourceData:
     label: str = "label"
 
 
-class CSVProjectReader(EntityReader):
+class CSVEntityReader(EntityReader):
     def __init__(self, data_path: str):
         base_path, file_path = os.path.split(data_path)
         super().__init__(base_path, {

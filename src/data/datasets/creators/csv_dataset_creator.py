@@ -1,7 +1,7 @@
 from typing import Dict
 
 from data.datasets.creators.abstract_trace_dataset_creator import AbstractTraceDatasetCreator
-from data.datasets.creators.readers.entity.csv_project_reader import CSVProjectReader
+from data.datasets.creators.readers.entity.csv_project_reader import CSVEntityReader
 from data.datasets.trace_dataset import TraceDataset
 from data.processing.cleaning.data_cleaner import DataCleaner
 from data.tree.trace_link import TraceLink
@@ -23,6 +23,6 @@ class CSVDatasetCreator(AbstractTraceDatasetCreator):
         Creates the data
         :return: the data
         """
-        project_reader = CSVProjectReader(self.data_file_path)
+        project_reader = CSVEntityReader(self.data_file_path)
         trace_links: Dict[int, TraceLink] = project_reader.get_entities()
         return TraceDataset(links=trace_links)

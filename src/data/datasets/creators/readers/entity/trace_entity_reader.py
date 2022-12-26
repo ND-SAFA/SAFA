@@ -14,7 +14,7 @@ class TraceData(TypedDict):
     target: str
 
 
-class TraceDefinition(EntityReader):
+class TraceEntityReader(EntityReader):
 
     def __init__(self, base_path: str, trace_definition: Dict,
                  type2artifacts: Dict[str, ArtifactReader], **kwargs):

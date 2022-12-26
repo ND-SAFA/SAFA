@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from typing import Dict
 
 from data.datasets.creators.readers.entity.artifact_reader import ArtifactReader
-from data.datasets.creators.readers.entity.trace_reader import TraceDefinition
+from data.datasets.creators.readers.entity.trace_entity_reader import TraceEntityReader
 from data.datasets.creators.readers.project.structure_keys import StructureKeys
 from data.datasets.trace_dataset import TraceDataset
 from data.tree.trace_link import TraceLink
@@ -12,7 +12,9 @@ from util.uncased_dict import UncasedDict
 
 
 class IProjectParser(ABC):
-    def __init__(self, project_path: str, conversions={}):
+    def __init__(self, project_path: str, conversions=None):
+        if conversions is None:
+            conversions = {}
         self.project_path = project_path
         self.definition = self.read_definition()
         self.conversions = self.definition.get(StructureKeys.CONVERSIONS, conversions)
@@ -37,8 +39,8 @@ class IProjectParser(ABC):
     def create_trace_links(self, name2artifacts: Dict[str, ArtifactReader]) -> Dict[int, TraceLink]:
         trace_links: Dict[int, TraceLink] = {}
         for trace_matrix_name, trace_definition_json in self.get_trace_definitions().items():
-            trace_definition = TraceDefinition(self.project_path, trace_definition_json, name2artifacts,
-                                               conversions=self.conversions)
+            trace_definition = TraceEntityReader(self.project_path, trace_definition_json, name2artifacts,
+                                                 conversions=self.conversions)
             trace_links.update(trace_definition.get_entities())
         return trace_links
 

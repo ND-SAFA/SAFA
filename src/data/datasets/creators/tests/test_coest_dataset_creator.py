@@ -1,6 +1,6 @@
 import os
 
-from data.datasets.creators.coest_dataset_creator import StructureDatasetCreator
+from data.datasets.creators.structure_dataset_creator import StructureDatasetCreator
 from test.base_test import BaseTest
 from test.paths.paths import TEST_DATA_DIR
 

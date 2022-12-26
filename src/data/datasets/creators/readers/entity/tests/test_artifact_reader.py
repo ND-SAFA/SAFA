@@ -9,7 +9,7 @@ from test.paths.paths import TEST_DATA_DIR
 
 
 class TestArtifactReader(BaseTest):
-    PROJECT = "coest"
+    PROJECT = "structure"
     ARTIFACT_FILE = "source.xml"
 
     ARTIFACT_MAPPINGS = {

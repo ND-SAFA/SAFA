@@ -1,5 +1,9 @@
+from copy import deepcopy, copy
 import os
 import random
+from inspect import getfullargspec
+from typing import Dict
+
 import transformers
 import threading
 import traceback
@@ -94,3 +98,14 @@ class AbstractJob(threading.Thread, BaseObject):
         except Exception:
             print(traceback.format_exc())  # to save in logs
             return False
+
+    def __deepcopy__(self, memodict: Dict ={}) -> "AbstractJob":
+        """
+        Overrides deepcopy because there is a weird issue with coping threads
+        :param memodict: param from orig deepcopy
+        :return: the copy of the job
+        """
+        param_names = getfullargspec(self.__init__).args
+        params = {name: deepcopy(getattr(self, name)) for name in param_names if name != "self"}
+        cpyobj = type(self)(**params)  # shallow copy of whole object
+        return cpyobj

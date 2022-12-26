@@ -15,5 +15,5 @@ class TrainJob(AbstractTraceJob):
         trainer.save_model(self.output_dir)
         if DatasetRole.EVAL in self.trainer_dataset_manager:
             val_metrics = trainer.perform_prediction()
-            training_output[JobResult.VAL_METRICS] = val_metrics[JobResult.METRICS]
+            training_output[JobResult.METRICS].update(val_metrics[JobResult.METRICS])  # TODO do these overlap??
         return JobResult.from_dict(training_output)

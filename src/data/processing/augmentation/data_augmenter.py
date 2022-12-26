@@ -86,11 +86,11 @@ class DataAugmenter(AbstractDataProcessor):
 
     @classmethod
     @overrides(BaseObject)
-    def _get_expected_class_by_type(cls, abstract_class: Type, child_class_name: str) -> Any:
+    def _get_child_enum_class(cls, abstract_class: Type, child_class_name: str) -> Type:
         """
-        Returns the correct expected class when given the abstract parent class type and name of child class
+        Returns the correct enum class mapping name to class given the abstract parent class type and name of child class
         :param abstract_class: the abstract parent class type
         :param child_class_name: the name of the child class
-        :return: the expected type
+        :return: the enum class mapping name to class
         """
-        return get_enum_from_name(SupportedAugmentationStep, child_class_name).value
+        return SupportedAugmentationStep

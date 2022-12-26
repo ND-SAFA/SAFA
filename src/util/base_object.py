@@ -23,10 +23,11 @@ class BaseObject(ABC):
         :param obj: the object to use to fill in values
         :return: None
         """
-        if not isinstance(obj, self.__class__):
-            raise Exception("Object must be of the same type %s" % self.__class__)
         for attr_name, attr_value in vars(self).items():
             if isinstance(attr_value, UndeterminedVariable):
+                if not hasattr(obj, attr_name):
+                    raise TypeError("Cannot set undetermined variable because %s does not contain %s"
+                                    % (obj.__class__.__name__, attr_name))
                 value_to_use = getattr(obj, attr_name)
                 setattr(self, attr_name, value_to_use)
             elif isinstance(attr_value, BaseObject):

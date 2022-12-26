@@ -14,6 +14,8 @@ from data.tree.trace_link import TraceLink
 from models.model_manager import ModelManager
 from models.model_properties import ModelArchitectureType
 from test.base_trace_test import BaseTraceTest
+from test.test_assertions import TestAssertions
+from test.test_data_manager import TestDataManager
 
 FEATURE_VALUE = "({}, {})"
 
@@ -30,15 +32,20 @@ def fake_method(text, text_pair=None, return_token_type_ids=None, add_special_to
 
 class TestTraceDataset(BaseTraceTest):
     VAlIDATION_PERCENTAGE = 0.3
-    EXPECTED_VAL_SIZE_NEG_LINKS = round(
-        (len(BaseTraceTest.ALL_TEST_LINKS) - len(BaseTraceTest.POS_LINKS)) * VAlIDATION_PERCENTAGE)
-    EXPECTED_VAL_SIZE_POS_LINKS = round(len(BaseTraceTest.POS_LINKS) * VAlIDATION_PERCENTAGE)
+    N_LINKS = len(TestDataManager.get_all_links())
+    N_POSITIVE = len(TestDataManager.get_positive_links())
+    N_NEGATIVE = len(TestDataManager.get_negative_links())
+    EXPECTED_VAL_SIZE_NEG_LINKS = round((N_LINKS - N_POSITIVE) * VAlIDATION_PERCENTAGE)
+    EXPECTED_VAL_SIZE_POS_LINKS = round(N_POSITIVE * VAlIDATION_PERCENTAGE)
     TEST_FEATURE = {"irrelevant_key1": "k",
                     "input_ids": "a",
                     "token_type_ids": "l",
                     "attention_mask": 4}
     FEATURE_KEYS = DataKey.get_feature_entry_keys()
     RESAMPLE_RATE = 3
+    positive_links = TestDataManager._create_link_map(TestDataManager.get_positive_links())
+    all_links = TestDataManager._create_link_map(TestDataManager.get_all_links())
+    negative_links = TestDataManager._create_link_map(TestDataManager.get_negative_links())
 
     @patch.object(ModelManager, "get_tokenizer")
     def test_to_trainer_dataset(self, get_tokenizer_mock: mock.MagicMock):
@@ -150,15 +157,17 @@ class TestTraceDataset(BaseTraceTest):
     def test_get_data_entries_for_augmentation(self):
         trace_dataset = self.get_trace_dataset()
         pos_links, data_entries = trace_dataset._get_data_entries_for_augmentation()
-        self.assert_lists_have_the_same_vals([link.id for link in pos_links],
-                                             [link.id for link in self.get_links(self.POS_LINKS).values()])
-        self.assertEquals(len(data_entries), len(self.POS_LINKS))
-        for link in self.POS_LINKS:
-            self.assertIn((self.ALL_TEST_SOURCES[link[0]], self.ALL_TEST_TARGETS[link[1]]), data_entries)
+        TestAssertions.assert_lists_have_the_same_vals(self, [link.id for link in pos_links],
+                                                       [link.id for link in self.positive_links.values()])
+        self.assertEquals(len(data_entries), self.N_POSITIVE)
+        for link_id, link in self.positive_links.items():
+            source_body = TestDataManager._get_artifact_body(link.source.id)
+            target_body = TestDataManager._get_artifact_body(link.target.id)
+            self.assertIn((source_body, target_body), data_entries)
 
     def test_create_links_from_augmentation(self):
         ids = ['id1', 'id2']
-        orig_links = list(self.get_links(self.POS_LINKS).values())
+        orig_links = list(self.positive_links.values())
         base_result = [(link.source.token, link.target.token) for link in orig_links]
         results = [[(id_ + pair[0], id_ + pair[1]) for pair in base_result] for id_ in ids]
         augmentation_results = {
@@ -183,7 +192,8 @@ class TestTraceDataset(BaseTraceTest):
         trace_dataset = self.get_trace_dataset()
 
         source_target_pairs = trace_dataset.get_source_target_pairs()
-        self.assert_lists_have_the_same_vals(source_target_pairs, self.ALL_TEST_LINKS)
+        expected_pairs = TestDataManager.get_all_links()
+        TestAssertions.assert_lists_have_the_same_vals(self, source_target_pairs, expected_pairs)
 
     def test_resize_links_duplicates(self):
         new_length = 5
@@ -212,14 +222,14 @@ class TestTraceDataset(BaseTraceTest):
         trace_dataset = self.get_trace_dataset()
         split1, split2 = trace_dataset.split(self.VAlIDATION_PERCENTAGE)
         expected_val_link_size = (self.EXPECTED_VAL_SIZE_POS_LINKS + self.EXPECTED_VAL_SIZE_NEG_LINKS)
-        self.assertEquals(len(split1), len(self.ALL_TEST_LINKS) - expected_val_link_size)
+        self.assertEquals(len(split1), len(self.all_links) - expected_val_link_size)
         self.assertEquals(len(split2), expected_val_link_size)
         intersection = set(split1.links.keys()).intersection(set(split2.links.keys()))
         self.assertEquals(len(intersection), 0)
 
         for split in [split1, split2]:
             link_ids = split.pos_link_ids + split.neg_link_ids
-            self.assert_lists_have_the_same_vals(split.links.keys(), link_ids)
+            TestAssertions.assert_lists_have_the_same_vals(self, split.links.keys(), link_ids)
 
     def test_split_multiple(self):
         trace_dataset = self.get_trace_dataset()
@@ -243,7 +253,6 @@ class TestTraceDataset(BaseTraceTest):
                 self.assertEquals(len(intersection), 0)
 
     def test_prepare_for_training(self):
-        n_pos_links = len(self.POS_LINKS)
 
         trace_dataset_aug = self.get_trace_dataset()
         data_augmenter = DataAugmenter([SimpleWordReplacementStep(1, 0.15)])
@@ -251,14 +260,14 @@ class TestTraceDataset(BaseTraceTest):
         aug_links = {link_id for link_id in trace_dataset_aug.pos_link_ids if
                      AbstractDataAugmentationStep.extract_unique_id_from_step_id(SimpleWordReplacementStep.get_id())
                      in trace_dataset_aug.links[link_id].source.id}
-        self.assertEquals(len(aug_links), len(self.NEG_LINKS) - n_pos_links)
-        self.assertEquals(len(set(trace_dataset_aug.pos_link_ids)), n_pos_links + len(aug_links))
+        self.assertEquals(len(aug_links), self.N_NEGATIVE - self.N_POSITIVE)
+        self.assertEquals(len(set(trace_dataset_aug.pos_link_ids)), self.N_POSITIVE + len(aug_links))
         self.assertEquals(len(trace_dataset_aug.pos_link_ids), len(trace_dataset_aug.neg_link_ids))
 
     def test_get_feature_entry(self):
         trace_dataset = self.get_trace_dataset()
-        source, target = self.POS_LINKS[0]
-        test_link = self.get_test_link(source, target)
+        source, target = TestDataManager.get_positive_links()[0]
+        test_link = TestDataManager._create_test_link(source, target)
 
         feature_entry_siamese = trace_dataset._get_feature_entry(test_link, ModelArchitectureType.SIAMESE, fake_method)
         self.assertIn(test_link.source.token, feature_entry_siamese.values())
@@ -272,7 +281,7 @@ class TestTraceDataset(BaseTraceTest):
 
     def test_extract_feature_info(self):
         feature_info = TraceDataset._extract_feature_info(self.TEST_FEATURE)
-        self.assert_lists_have_the_same_vals(feature_info.keys(), self.FEATURE_KEYS)
+        TestAssertions.assert_lists_have_the_same_vals(self, feature_info.keys(), self.FEATURE_KEYS)
 
         prefix = "s_"
         feature_info_prefix = TraceDataset._extract_feature_info(self.TEST_FEATURE, prefix)
@@ -280,25 +289,26 @@ class TestTraceDataset(BaseTraceTest):
             self.assertTrue(feature_name.startswith(prefix))
 
     def test_get_data_split(self):
-        split1 = TraceDataset._get_data_split(self.POS_LINKS, self.VAlIDATION_PERCENTAGE, for_second_split=False)
-        split2 = TraceDataset._get_data_split(self.POS_LINKS, self.VAlIDATION_PERCENTAGE, for_second_split=True)
-        self.assertEquals(len(split1), len(self.POS_LINKS) - self.EXPECTED_VAL_SIZE_POS_LINKS)
+        positive_links = list(self.positive_links.values())
+        split1 = TraceDataset._get_data_split(positive_links, self.VAlIDATION_PERCENTAGE, for_second_split=False)
+        split2 = TraceDataset._get_data_split(positive_links, self.VAlIDATION_PERCENTAGE, for_second_split=True)
+        self.assertEquals(len(split1), self.N_POSITIVE - self.EXPECTED_VAL_SIZE_POS_LINKS)
         self.assertEquals(len(split2), self.EXPECTED_VAL_SIZE_POS_LINKS)
         intersection = set(split1).intersection(set(split2))
         self.assertEquals(len(intersection), 0)
 
     def test_get_first_split_size(self):
-        size = TraceDataset._get_first_split_size(self.POS_LINKS, self.VAlIDATION_PERCENTAGE)
-        self.assertEquals(size, len(self.POS_LINKS) - self.EXPECTED_VAL_SIZE_POS_LINKS)
+        size = TraceDataset._get_first_split_size(TestDataManager.get_positive_links(), self.VAlIDATION_PERCENTAGE)
+        self.assertEquals(size, self.N_POSITIVE - self.EXPECTED_VAL_SIZE_POS_LINKS)
 
     def get_trace_dataset(self):
-        links = self.get_links(self.ALL_TEST_LINKS)
-        pos_links_ids = self.get_link_ids(self.POS_LINKS)
+        links = TestDataManager._create_link_map(TestDataManager.get_all_links())
+        pos_links_ids = TestDataManager.get_positive_link_ids()
         for link in links.values():
             if link.id in pos_links_ids:
                 link.is_true_link = True
         return TraceDataset(links)
 
     def get_expected_train_dataset_size(self, resample_rate=RESAMPLE_RATE, validation_percentage=VAlIDATION_PERCENTAGE):
-        num_train_pos_links = round(len(self.POS_LINKS) * (1 - validation_percentage))
+        num_train_pos_links = round(self.N_POSITIVE * (1 - validation_percentage))
         return resample_rate * num_train_pos_links * 2  # equal number pos and neg links

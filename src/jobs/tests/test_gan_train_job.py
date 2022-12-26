@@ -1,15 +1,18 @@
 import os
-from unittest import mock, skip
+from unittest import mock
 from unittest.mock import patch
 
-from data.datasets.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
-from data.datasets.dataset_role import DatasetRole
+from data.datasets.trainer_dataset_manager import TrainerDatasetManager
 from jobs.abstract_job import AbstractJob
 from jobs.components.job_args import JobArgs
 from jobs.gan_train_job import GanTrainJob
 from jobs.tests.base_job_test import BaseJobTest
-from test.paths.paths import TEST_DATA_DIR, TEST_OUTPUT_DIR
+from models.model_manager import ModelManager
+from test.paths.paths import TEST_DATA_DIR
+from test.test_assertions import TestAssertions
+from test.test_object_creator import TestObjectCreator
 from train.trace_trainer import TraceTrainer
+from train.trainer_args import TrainerArgs
 
 
 class TestGanTrainJob(BaseJobTest):
@@ -26,24 +29,23 @@ class TestGanTrainJob(BaseJobTest):
         }]
     }
 
-    @skip("Throws Exception at line 120 in gan_trainer.train")
     @patch.object(TraceTrainer, "save_model")
     def test_run_success(self, save_model_mock: mock.MagicMock):
         self._test_run_success()
 
     def _assert_success(self, output_dict: dict):
-        self.assert_training_output_matches_expected(output_dict)
+        TestAssertions.assert_training_output_matches_expected(self, output_dict)
 
     def _get_job(self) -> AbstractJob:
-        pre_train_dataset = MLMPreTrainDatasetCreator(
-            orig_data_path=self.PRETRAIN_DIR, training_data_dir=TEST_OUTPUT_DIR)
-        trainer_dataset_manager = self.create_trainer_dataset_manager({
-            DatasetRole.PRE_TRAIN: pre_train_dataset
+        trainer_dataset_manager = TestObjectCreator.create(TrainerDatasetManager, override=True, **{
+            "pre_train_dataset_creator": TestObjectCreator.pretrain_dataset_definition,
+            "train_dataset_creator": TestObjectCreator.dataset_creator_definition,
         })
-        test_params = self.get_job_args(dataset_role=DatasetRole.PRE_TRAIN, include_links=True)
-        job_args = JobArgs(**test_params)
-        job_args.trace_args_params = {
+        job_args = TestObjectCreator.create(JobArgs)
+        model_manager = TestObjectCreator.create(ModelManager)
+        trainer_args = TestObjectCreator.create(TrainerArgs, **{
             "num_train_epochs": 1
-        }
+        })
 
-        return GanTrainJob(job_args, trainer_dataset_manager=trainer_dataset_manager)
+        return GanTrainJob(job_args, trainer_dataset_manager=trainer_dataset_manager, model_manager=model_manager,
+                           trainer_args=trainer_args)

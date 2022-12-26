@@ -12,6 +12,9 @@ from config.override import overrides
 from data.datasets.dataset_role import DatasetRole
 from data.datasets.pre_train_dataset import PreTrainDataset
 from data.datasets.trace_dataset import TraceDataset
+from data.datasets.trainer_dataset_manager import TrainerDatasetManager
+from models.gan.discriminator import Discriminator
+from models.gan.generator import Generator
 from models.model_manager import ModelManager
 from train.gan.gan_dataset_converter import GanDatasetConverter
 from train.trace_trainer import TraceTrainer
@@ -20,12 +23,13 @@ from train.trainer_args import TrainerArgs
 
 class GanTrainer(TraceTrainer):
 
-    def __init__(self, args: TrainerArgs, model_manager: ModelManager, **kwargs):
+    def __init__(self, args: TrainerArgs, model_manager: ModelManager, trainer_dataset_manager: TrainerDatasetManager,
+                 **kwargs):
         """
         Generative Adviserial Network for training bert models.
         Github: https://github.com/crux82/ganbert-pytorch/blob/main/GANBERT_pytorch.ipynb
         """
-        super().__init__(args, model_manager, **kwargs)
+        super().__init__(args, model_manager, trainer_dataset_manager, **kwargs)
         self.transformer = None
 
     def perform_training(self, checkpoint: str = None) -> Dict:

@@ -22,8 +22,8 @@ class AbstractTraceJob(AbstractJob, ABC):
         :param trainer_args: other arguments needed for the trainer
         """
         super().__init__(job_args=job_args, model_manager=model_manager)
-        self.trainer_args = trainer_args
         self.trainer_dataset_manager = trainer_dataset_manager
+        self.trainer_args = trainer_args
         self._trainer = None
 
     @overrides(AbstractJob)
@@ -42,6 +42,7 @@ class AbstractTraceJob(AbstractJob, ABC):
         :return: the trainer
         """
         if self._trainer is None:
-            self._trainer = TraceTrainer(trainer_args=self.trainer_args, trainer_dataset_manager=self.trainer_dataset_manager,
+            self._trainer = TraceTrainer(trainer_args=self.trainer_args,
+                                         trainer_dataset_manager=self.trainer_dataset_manager,
                                          model_manager=self.model_manager, **kwargs)
         return self._trainer

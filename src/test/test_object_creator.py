@@ -14,7 +14,7 @@ from models.model_manager import ModelManager
 from test.base_test import BaseTest
 from test.base_trace_test import BaseTraceTest
 from test.definition_creator import DefinitionCreator
-from test.paths.paths import TEST_OUTPUT_DIR
+from test.paths.paths import PRETRAIN_DIR, TEST_OUTPUT_DIR
 from test.test_data_manager import TestDataManager
 from train.trainer_args import TrainerArgs
 
@@ -38,6 +38,11 @@ class TestObjectCreator:
         "source_layers": TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS, TestDataManager.Keys.SOURCE]),
         "target_layers": TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS, TestDataManager.Keys.TARGET]),
         "true_links": TestDataManager.get_path(TestDataManager.Keys.TRACES)
+    }
+
+    pretrain_dataset_definition = {
+        TypedDefinitionVariable.OBJECT_TYPE_KEY: "MLM_PRETRAIN",
+        "orig_data_path": PRETRAIN_DIR
     }
 
     trainer_dataset_manager_definition = {

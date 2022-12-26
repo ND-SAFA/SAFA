@@ -1,24 +1,20 @@
-import os
 from unittest import mock
 from unittest.mock import patch
 
 from transformers import AutoModelForMaskedLM
 
 from data.datasets.trainer_dataset_manager import TrainerDatasetManager
-from experiments.variables.typed_definition_variable import TypedDefinitionVariable
 from jobs.components.job_args import JobArgs
 from jobs.mlm_pre_train_job import MLMPreTrainJob
 from jobs.tests.base_job_test import BaseJobTest
 from models.model_manager import ModelManager
 from models.model_properties import ModelTask
-from test.paths.paths import TEST_DATA_DIR
 from test.test_assertions import TestAssertions
 from test.test_object_creator import TestObjectCreator
 from train.trainer_args import TrainerArgs
 
 
 class TestMLMPreTrainJob(BaseJobTest):
-    PRETRAIN_DIR = os.path.join(TEST_DATA_DIR, "pre_train")
 
     def test_run_success(self):
         self._test_run_success()
@@ -42,10 +38,7 @@ class TestMLMPreTrainJob(BaseJobTest):
         job_args = TestObjectCreator.create(JobArgs)
         model_manager = TestObjectCreator.create(ModelManager, model_task=ModelTask.MASKED_LEARNING)
         trainer_dataset_manager = TestObjectCreator.create(TrainerDatasetManager, **{
-            "train_dataset_creator": {
-                TypedDefinitionVariable.OBJECT_TYPE_KEY: "MLM_PRETRAIN",
-                "orig_data_path": self.PRETRAIN_DIR
-            }
+            "train_dataset_creator": TestObjectCreator.pretrain_dataset_definition
         })
         trainer_args = TestObjectCreator.create(TrainerArgs)
         return MLMPreTrainJob(job_args=job_args, model_manager=model_manager,

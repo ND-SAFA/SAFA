@@ -13,5 +13,6 @@ class GanTrainJob(TrainJob):
         :return: the trainer
         """
         if self._trainer is None:
-            self._trainer = GanTrainer(args=self.trainer_args, model_manager=self.model_manager, **kwargs)
+            self._trainer = GanTrainer(args=self.trainer_args, model_manager=self.model_manager,
+                                       trainer_dataset_manager=self.trainer_dataset_manager, **kwargs)
         return self._trainer

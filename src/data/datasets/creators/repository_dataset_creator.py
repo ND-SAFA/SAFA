@@ -2,7 +2,7 @@ from typing import List
 
 from config.constants import USE_LINKED_TARGETS_ONLY_DEFAULT
 from data.datasets.creators.abstract_trace_dataset_creator import AbstractTraceDatasetCreator
-from data.datasets.creators.safa_dataset_creator import SafaDatasetCreator
+from data.datasets.creators.readers.project.repository_project_reader import RepositoryProjectReader
 from data.datasets.formats.repository_format import RepositoryFormat
 from data.datasets.formats.safa_format import SafaFormat
 from data.datasets.trace_dataset import TraceDataset
@@ -10,7 +10,7 @@ from data.processing.cleaning.data_cleaner import DataCleaner
 
 
 class RepositoryDatasetCreator(AbstractTraceDatasetCreator):
-    KEYS = RepositoryFormat()
+    KEYS = RepositoryFormat
 
     def __init__(self, repo_paths: List[str], data_cleaner: DataCleaner = None,
                  data_keys: SafaFormat = KEYS, use_linked_targets_only: bool = USE_LINKED_TARGETS_ONLY_DEFAULT):
@@ -32,9 +32,7 @@ class RepositoryDatasetCreator(AbstractTraceDatasetCreator):
         """
         dataset = None
         for repo_path in self.repo_paths:
-            repo_dataset = SafaDatasetCreator(project_path=repo_path,
-                                              data_cleaner=self.data_cleaner,
-                                              use_linked_targets_only=self.use_linked_targets_only).create()
-
+            repository_project_reader = RepositoryProjectReader(repo_path)
+            repo_dataset = repository_project_reader.create()
             dataset = dataset + repo_dataset if dataset else repo_dataset
         return dataset

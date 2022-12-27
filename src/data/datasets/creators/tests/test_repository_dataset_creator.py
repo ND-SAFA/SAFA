@@ -10,7 +10,7 @@ from test.test_data_manager import TestDataManager
 
 class TestRepositoryDatasetCreator(BaseTraceTest):
     TRACE_FILES_2_ARTIFACTS = {"commit2issue.csv": ("commit.csv", "issue.csv")}
-    KEYS = RepositoryFormat(trace_files_2_artifacts=TRACE_FILES_2_ARTIFACTS)
+    KEYS = RepositoryFormat
     REPO_DIR = os.path.join(TEST_DATA_DIR, "repo")
     REPO_DIRNAMES = ["one", "two"]
 

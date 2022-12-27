@@ -29,6 +29,8 @@ class AbstractJob(threading.Thread, BaseObject):
         """
         super().__init__()
         self.job_args = job_args
+        if model_manager.model_output_path:
+            model_manager.model_output_path = job_args.output_dir
         self.model_manager = model_manager
         if self.job_args.random_seed:
             self.set_random_seed(self.job_args.random_seed)

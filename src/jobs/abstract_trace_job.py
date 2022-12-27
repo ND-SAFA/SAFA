@@ -21,8 +21,6 @@ class AbstractTraceJob(AbstractJob, ABC):
         :param trainer_dataset_manager: manages all datasets for the trainer
         :param trainer_args: other arguments needed for the trainer
         """
-        if model_manager.model_output_path is None:
-            model_manager.model_output_path = trainer_args.output_dir
         super().__init__(job_args=job_args, model_manager=model_manager)
         self.trainer_dataset_manager = trainer_dataset_manager
         self.trainer_args = trainer_args

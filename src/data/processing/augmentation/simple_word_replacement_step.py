@@ -12,7 +12,6 @@ from config.constants import REPLACEMENT_PERCENTAGE_DEFAULT
 from data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
 
 Synset = nltk.corpus.reader.wordnet.Synset
-# TODO this should only have to happen once?? Move somewhere
 nltk.download('stopwords')
 nltk.download('wordnet')
 nltk.download('omw-1.4')

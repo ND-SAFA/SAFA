@@ -34,8 +34,7 @@ class AbstractJob(threading.Thread, BaseObject):
             self.set_random_seed(self.job_args.random_seed)
         self.result = JobResult()
         self.id = uuid.uuid4()
-        self.output_dir = job_args.output_dir
-        self.job_output_filepath = self._get_output_filepath(self.output_dir, self.id)
+        self.job_output_filepath = self._get_output_filepath(self.job_args.output_dir, self.id)
         self.save_job_output = job_args.save_job_output
 
     def run(self) -> None:

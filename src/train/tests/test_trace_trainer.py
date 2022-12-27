@@ -6,19 +6,25 @@ from torch.utils.data.distributed import DistributedSampler
 from torch.utils.data.sampler import RandomSampler
 
 from data.datasets.dataset_role import DatasetRole
+from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
 from jobs.predict_job import PredictJob
 from models.model_manager import ModelManager
 from test.base_trace_test import BaseTraceTest
-from test.paths.paths import TEST_OUTPUT_DIR
 from test.test_assertions import TestAssertions
+from test.test_data_manager import TestDataManager
+from test.test_object_creator import TestObjectCreator
 from train.trace_trainer import TraceTrainer
 from train.trainer_args import TrainerArgs
+from util.variables.typed_definition_variable import TypedDefinitionVariable
 
 
 class TestTraceTrainer(BaseTraceTest):
     VALIDATION_PERCENTAGE = 0.3
     EXPECTED_VALIDATION_SIZE = 3
-    EXPECTED_PREDICTION_SIZE = len(BaseTraceTest.TARGET_LAYERS) * len(BaseTraceTest.SOURCE_LAYERS)
+    TARGET_LAYERS = TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS, TestDataManager.Keys.TARGET])
+    SOURCE_LAYERS = TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS, TestDataManager.Keys.SOURCE])
+
+    EXPECTED_PREDICTION_SIZE = len(TARGET_LAYERS) * len(SOURCE_LAYERS)
     TEST_METRIC_NAMES = ["accuracy", "map"]
 
     def test_perform_training(self):
@@ -29,7 +35,8 @@ class TestTraceTrainer(BaseTraceTest):
 
     @patch.object(TraceTrainer, "_eval")
     def test_perform_prediction(self, eval_mock: mock.MagicMock):
-        test_trace_trainer = self.get_test_trace_trainer()
+        eval_mock.return_value = TestDataManager.EXAMPLE_PREDICTION_OUTPUT
+        test_trace_trainer = self.get_test_trace_trainer(metrics=self.TEST_METRIC_NAMES)
         output = test_trace_trainer.perform_prediction()
         output = PredictJob._result_from_prediction_output(output)
         TestAssertions.assert_prediction_output_matches_expected(self, output.as_dict())
@@ -42,14 +49,14 @@ class TestTraceTrainer(BaseTraceTest):
             self.assertIn(metric, output["metrics"])
 
     def test_output_to_dict(self):
-        output_dict = TraceTrainer.output_to_dict(self.EXAMPLE_PREDICTION_OUTPUT)
+        output_dict = TraceTrainer.output_to_dict(TestDataManager.EXAMPLE_PREDICTION_OUTPUT)
         self.assertIsInstance(output_dict, dict)
         self.assertIn("predictions", output_dict)
         self.assertIn("label_ids", output_dict)
         self.assertIn("metrics", output_dict)
 
     def test_eval(self):
-        output = deepcopy(self.EXAMPLE_PREDICTION_OUTPUT)
+        output = deepcopy(TestDataManager.EXAMPLE_PREDICTION_OUTPUT)
         result = TraceTrainer._eval(output.predictions, output.label_ids, output.metrics, self.TEST_METRIC_NAMES)
         for metric in self.TEST_METRIC_NAMES:
             self.assertIn(metric, result)
@@ -77,18 +84,26 @@ class TestTraceTrainer(BaseTraceTest):
         train_dataset = self.get_dataset_container()[DatasetRole.TRAIN]
         test_trace_trainer.train_dataset = train_dataset
 
-    def get_dataset_container(self):
-        train_dataset_map = self.create_dataset_map(DatasetRole.TRAIN, include_links=True)
-        eval_dataset_map = self.create_dataset_map(DatasetRole.EVAL, include_links=False)
-        return self.create_trainer_dataset_manager({**train_dataset_map, **eval_dataset_map},
-                                                   split_train_dataset=True)
-
     def get_test_trace_trainer(self, **kwargs):
         trainer_dataset_manager = self.get_dataset_container()
-        model_manager = ModelManager("path")
+        model_manager = TestObjectCreator.create(ModelManager)
         model_manager.get_model = mock.MagicMock(return_value=self.get_test_model())
         model_manager.get_tokenizer = mock.MagicMock(return_value=self.get_test_tokenizer())
+        trainer_args = TestObjectCreator.create(TrainerArgs, **kwargs)
         return TraceTrainer(
-            TrainerArgs(output_dir=TEST_OUTPUT_DIR, **kwargs),
+            trainer_args=trainer_args,
             trainer_dataset_manager=trainer_dataset_manager,
-            model_manager=model_manager)
+            model_manager=model_manager, **kwargs)
+
+    @staticmethod
+    def get_dataset_container():
+        return TestObjectCreator.create(TrainerDatasetManager, **{
+            "eval_dataset_creator": {
+                TypedDefinitionVariable.OBJECT_TYPE_KEY: "CLASSIC_TRACE",
+                **TestObjectCreator.dataset_creator_definition
+            },
+            "val_dataset_creator": {
+                TypedDefinitionVariable.OBJECT_TYPE_KEY: "SPLIT",
+                "val_percentage": .3
+            }
+        })

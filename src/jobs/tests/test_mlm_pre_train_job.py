@@ -1,10 +1,4 @@
-from unittest import mock
-from unittest.mock import patch
-
-from transformers import AutoModelForMaskedLM
-
 from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
-from util.variables.typed_definition_variable import TypedDefinitionVariable
 from jobs.components.job_args import JobArgs
 from jobs.mlm_pre_train_job import MLMPreTrainJob
 from jobs.tests.base_job_test import BaseJobTest
@@ -23,11 +17,7 @@ class TestMLMPreTrainJob(BaseJobTest):
     def test_run_failure(self):
         self._test_run_failure()
 
-    @patch.object(ModelManager, '_ModelManager__load_model')
-    @patch.object(ModelManager, 'get_tokenizer')
-    def _test_run_success(self, get_tokenizer_mock: mock.MagicMock, load_model_mock: mock.MagicMock):
-        load_model_mock.return_value = AutoModelForMaskedLM.from_pretrained("bert-base-uncased")
-        get_tokenizer_mock.return_value = self.get_test_tokenizer()
+    def _test_run_success(self):
         job = self.get_job()
         job.run()
         self.assert_output_on_success(self._load_job_output(job))
@@ -37,10 +27,13 @@ class TestMLMPreTrainJob(BaseJobTest):
 
     def _get_job(self):
         job_args = TestObjectCreator.create(JobArgs)
-        model_manager = TestObjectCreator.create(ModelManager, model_task=ModelTask.MASKED_LEARNING)
+        model_manager = TestObjectCreator.create(ModelManager, **{
+            "model_task": ModelTask.MASKED_LEARNING,
+            "model_path": "bert-base-uncased"
+        })
         trainer_dataset_manager = TestObjectCreator.create(TrainerDatasetManager, **{
             "train_dataset_creator": TestObjectCreator.pretrain_dataset_definition
-        })
+        }, override=True)
         trainer_args = TestObjectCreator.create(TrainerArgs)
         return MLMPreTrainJob(job_args=job_args, model_manager=model_manager,
                               trainer_dataset_manager=trainer_dataset_manager, trainer_args=trainer_args)

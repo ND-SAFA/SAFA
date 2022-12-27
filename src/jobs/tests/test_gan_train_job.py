@@ -2,7 +2,7 @@ import os
 from unittest import mock, skip
 from unittest.mock import patch
 
-from data.datasets.trainer_dataset_manager import TrainerDatasetManager
+from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
 from jobs.abstract_job import AbstractJob
 from jobs.components.job_args import JobArgs
 from jobs.gan_train_job import GanTrainJob

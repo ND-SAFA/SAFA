@@ -1,7 +1,4 @@
-import os
-
-from data.datasets.dataset_role import DatasetRole
-from util.variables.typed_definition_variable import TypedDefinitionVariable
+from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
 from jobs.components.job_args import JobArgs
 from jobs.predict_job import PredictJob
 from jobs.tests.base_job_test import BaseJobTest
@@ -9,6 +6,7 @@ from models.model_manager import ModelManager
 from test.test_assertions import TestAssertions
 from test.test_object_creator import TestObjectCreator
 from train.trainer_args import TrainerArgs
+from util.variables.typed_definition_variable import TypedDefinitionVariable
 
 
 class TestPredictJob(BaseJobTest):
@@ -23,7 +21,10 @@ class TestPredictJob(BaseJobTest):
         job_args: JobArgs = TestObjectCreator.create(JobArgs)
         model_manager: ModelManager = TestObjectCreator.create(ModelManager)
         trainer_dataset_manager: TrainerDatasetManager = TestObjectCreator.create(TrainerDatasetManager, **{
-            "eval_dataset_creator": TestObjectCreator.dataset_creator_definition
+            "eval_dataset_creator": {
+                TypedDefinitionVariable.OBJECT_TYPE_KEY: "CLASSIC_TRACE",
+                **TestObjectCreator.dataset_creator_definition
+            }
         }, override=True)
         trainer_args: TrainerArgs = TestObjectCreator.create(TrainerArgs)
         return PredictJob(job_args=job_args, model_manager=model_manager,

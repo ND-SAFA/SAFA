@@ -37,7 +37,7 @@ class TestAssertions:
         for metric in TestDataManager.EXAMPLE_PREDICTION_METRICS.keys():
             if metric not in output[JobResult.METRICS]:
                 test_case.fail(
-                    cls._KEY_ERROR_MESSAGE.format(JobResult.METRICS, output[JobResult.METRICS]))
+                    cls._KEY_ERROR_MESSAGE.format(metric, output[JobResult.METRICS]))
 
     @staticmethod
     def assert_training_output_matches_expected(test_case: TestCase, output_dict: dict):

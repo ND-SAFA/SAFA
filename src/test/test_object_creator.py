@@ -54,7 +54,8 @@ class TestObjectCreator:
     }
 
     model_manager_definition = {
-        "model_path": "bert-base-uncased"
+        "model_path": "bert-base-uncased",
+        "model_output_path": TEST_OUTPUT_DIR
     }
 
     SUPPORTED_OBJECTS = {

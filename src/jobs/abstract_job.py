@@ -29,7 +29,7 @@ class AbstractJob(threading.Thread, BaseObject):
         """
         super().__init__()
         self.job_args = job_args
-        if model_manager.model_output_path:
+        if model_manager and model_manager.model_output_path:
             model_manager.model_output_path = job_args.output_dir
         self.model_manager = model_manager
         if self.job_args.random_seed:
@@ -100,7 +100,7 @@ class AbstractJob(threading.Thread, BaseObject):
             print(traceback.format_exc())  # to save in logs
             return False
 
-    def __deepcopy__(self, memodict: Dict ={}) -> "AbstractJob":
+    def __deepcopy__(self, memodict: Dict = {}) -> "AbstractJob":
         """
         Overrides deepcopy because there is a weird issue with coping threads
         :param memodict: param from orig deepcopy

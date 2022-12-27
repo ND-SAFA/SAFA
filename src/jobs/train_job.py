@@ -14,7 +14,7 @@ class TrainJob(AbstractTraceJob):
         """
         trainer = self.get_trainer(**kwargs)
         training_output = trainer.perform_training()
-        trainer.save_model(self.output_dir)
+        trainer.save_model(self.model_manager.model_output_path)
         if DatasetRole.EVAL in self.trainer_dataset_manager:
             val_metrics = trainer.perform_prediction()
             training_output[JobResult.METRICS].update(val_metrics[JobResult.METRICS])

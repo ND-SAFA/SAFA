@@ -29,13 +29,14 @@ class AbstractJob(threading.Thread, BaseObject):
         """
         super().__init__()
         self.job_args = job_args
+        if model_manager.model_output_path:
+            model_manager.model_output_path = job_args.output_dir
         self.model_manager = model_manager
         if self.job_args.random_seed:
             self.set_random_seed(self.job_args.random_seed)
         self.result = JobResult()
         self.id = uuid.uuid4()
-        self.output_dir = job_args.output_dir
-        self.job_output_filepath = self._get_output_filepath(self.output_dir, self.id)
+        self.job_output_filepath = self._get_output_filepath(self.job_args.output_dir, self.id)
         self.save_job_output = job_args.save_job_output
 
     def run(self) -> None:

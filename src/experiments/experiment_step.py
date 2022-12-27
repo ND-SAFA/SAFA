@@ -30,7 +30,7 @@ class ExperimentStep(BaseObject):
         """
         if prior_best_job:
             if hasattr(prior_best_job, "model_manager"):
-                prior_best_job.model_manager.model_path = prior_best_job.output_dir  # TODO is this right?
+                prior_best_job.model_manager.model_path = prior_best_job.model_manager.model_output_path
             self._run_on_all_jobs(self.jobs, "use_values_from_object_for_undetermined", obj=prior_best_job)
         self._run_on_all_jobs(self.jobs, "start")
         self._run_on_all_jobs(self.jobs, "join")

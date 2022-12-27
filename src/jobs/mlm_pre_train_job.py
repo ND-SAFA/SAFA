@@ -39,7 +39,7 @@ class MLMPreTrainJob(TrainJob):
         data_collator = DataCollatorForLanguageModeling(
             tokenizer=tokenizer, mlm=True, mlm_probability=self.mlm_probability
         )
-        tokenizer.save_vocabulary(self.output_dir)
+        tokenizer.save_vocabulary(self.job_args.output_dir)
 
         job_result = super()._run(data_collator=data_collator)
 

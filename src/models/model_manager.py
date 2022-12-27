@@ -13,7 +13,7 @@ from util.base_object import BaseObject
 class ModelManager(BaseObject):
     _max_seq_length: int = MAX_SEQ_LENGTH_DEFAULT
 
-    def __init__(self, model_path: str, model_task: ModelTask = ModelTask.SEQUENCE_CLASSIFICATION,
+    def __init__(self, model_path: str, model_output_path: str = None, model_task: ModelTask = ModelTask.SEQUENCE_CLASSIFICATION,
                  model_size: ModelSize = ModelSize.BASE,
                  model_architecture: ModelArchitectureType = ModelArchitectureType.SINGLE):
         """
@@ -24,6 +24,7 @@ class ModelManager(BaseObject):
         self.__tokenizer: Optional[AutoTokenizer] = None
         self.__model: Optional[PreTrainedModel] = None
         self.model_path = model_path
+        self.model_output_path = model_output_path
         self.model_task = model_task
         self.arch_type = model_architecture
         self.model_size = model_size

@@ -33,14 +33,11 @@ class TestTraceTrainer(BaseTraceTest):
         output = test_trace_trainer.perform_training()
         self.assertIn("training_loss", output)
 
-    @patch.object(TraceTrainer, "_eval")
-    def test_perform_prediction(self, eval_mock: mock.MagicMock):
-        eval_mock.return_value = TestDataManager.EXAMPLE_PREDICTION_OUTPUT
+    def test_perform_prediction(self):
         test_trace_trainer = self.get_test_trace_trainer(metrics=self.TEST_METRIC_NAMES)
         output = test_trace_trainer.perform_prediction()
         output = PredictJob._result_from_prediction_output(output)
         TestAssertions.assert_prediction_output_matches_expected(self, output.as_dict())
-        self.assertFalse(eval_mock.called)
 
     def test_perform_prediction_with_metrics(self):
         test_trace_trainer = self.get_test_trace_trainer(metrics=self.TEST_METRIC_NAMES)
@@ -93,7 +90,7 @@ class TestTraceTrainer(BaseTraceTest):
         return TraceTrainer(
             trainer_args=trainer_args,
             trainer_dataset_manager=trainer_dataset_manager,
-            model_manager=model_manager, **kwargs)
+            model_manager=model_manager)
 
     @staticmethod
     def get_dataset_container():

@@ -34,17 +34,17 @@ public class FloatFieldInfo {
     private UUID id;
 
     @Column(nullable = false)
-    private float min;
+    private double min;
 
     @Column(nullable = false)
-    private float max;
+    private double max;
 
     @OneToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "schema_field_id", nullable = false)
     private CustomAttribute schemaField;
 
-    public FloatFieldInfo(CustomAttribute field, float min, float max) {
+    public FloatFieldInfo(CustomAttribute field, double min, double max) {
         this.schemaField = field;
         this.min = min;
         this.max = max;

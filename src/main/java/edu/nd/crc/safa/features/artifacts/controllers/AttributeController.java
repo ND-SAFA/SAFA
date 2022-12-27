@@ -3,14 +3,12 @@ package edu.nd.crc.safa.features.artifacts.controllers;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 
 import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.artifacts.entities.AttributeSchemaAppEntity;
 import edu.nd.crc.safa.features.artifacts.entities.db.schema.CustomAttribute;
-import edu.nd.crc.safa.features.artifacts.services.ArtifactSystemServiceProvider;
 import edu.nd.crc.safa.features.artifacts.services.AttributeService;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
@@ -34,14 +32,11 @@ public class AttributeController extends BaseController  {
 
     private final AttributeService attributeService;
 
-    private final ArtifactSystemServiceProvider serviceProvider;
-
     @Autowired
     public AttributeController(ResourceBuilder resourceBuilder, ServiceProvider serviceProvider,
-                               AttributeService attributeService, ArtifactSystemServiceProvider assp) {
+                               AttributeService attributeService) {
         super(resourceBuilder, serviceProvider);
         this.attributeService = attributeService;
-        this.serviceProvider = assp;
     }
 
     /**
@@ -54,11 +49,7 @@ public class AttributeController extends BaseController  {
     @GetMapping(AppRoutes.Attribute.ROOT)
     public List<AttributeSchemaAppEntity> getProjectAttributes(@PathVariable UUID projectId) throws SafaError {
         Project project = this.resourceBuilder.fetchProject(projectId).withViewProject();
-        return serviceProvider.getCustomAttributeRepository()
-            .findByProject(project)
-            .stream()
-            .map(attributeService::appEntityFromCustomAttribute)
-            .collect(Collectors.toList());
+        return attributeService.getAttributeEntitiesForProject(project);
     }
 
     /**
@@ -66,11 +57,12 @@ public class AttributeController extends BaseController  {
      *
      * @param projectId The ID of the project.
      * @param appEntity The front-end representation of the new attribute.
+     * @return The created attribute.
      * @throws SafaError If something goes wrong while saving the data.
      */
     @PostMapping(AppRoutes.Attribute.ROOT)
-    public void createNewProjectAttribute(@PathVariable UUID projectId,
-                                          @RequestBody AttributeSchemaAppEntity appEntity) throws SafaError {
+    public AttributeSchemaAppEntity createNewProjectAttribute(@PathVariable UUID projectId,
+                            @RequestBody AttributeSchemaAppEntity appEntity) throws SafaError {
 
         Project project = this.resourceBuilder.fetchProject(projectId).withEditProject();
 
@@ -79,6 +71,8 @@ public class AttributeController extends BaseController  {
         }
 
         attributeService.saveEntity(appEntity, project, true);
+
+        return getProjectAttribute(projectId, appEntity.getKey());
     }
 
     /**
@@ -99,8 +93,7 @@ public class AttributeController extends BaseController  {
             throw new SafaError("Attribute key cannot be blank");
         }
 
-        Optional<CustomAttribute> attr =
-            serviceProvider.getCustomAttributeRepository().findByProjectAndKeyname(project, key);
+        Optional<CustomAttribute> attr = attributeService.getByProjectAndKeyname(project, key);
 
         if (attr.isEmpty()) {
             throw new SafaError(String.format("No attribute named %s in project.", key));
@@ -115,12 +108,12 @@ public class AttributeController extends BaseController  {
      * @param projectId The ID of the project.
      * @param key The key name of the attribute to edit.
      * @param appEntity The new attribute definition.
+     * @return The updated attribute
      * @throws SafaError If there is a problem updating the attribute.
      */
     @PutMapping(AppRoutes.Attribute.BY_KEY)
-    public void updateProjectAttribute(@PathVariable UUID projectId,
-                                       @PathVariable String key,
-                                       @RequestBody AttributeSchemaAppEntity appEntity) throws SafaError {
+    public AttributeSchemaAppEntity updateProjectAttribute(@PathVariable UUID projectId, @PathVariable String key,
+                            @RequestBody AttributeSchemaAppEntity appEntity) throws SafaError {
 
         Project project = this.resourceBuilder.fetchProject(projectId).withEditProject();
 
@@ -133,6 +126,8 @@ public class AttributeController extends BaseController  {
         }
 
         attributeService.saveEntity(appEntity, project, false);
+
+        return getProjectAttribute(projectId, key);
     }
 
     /**
@@ -152,7 +147,7 @@ public class AttributeController extends BaseController  {
             throw new SafaError("Attribute key cannot be blank");
         }
 
-        serviceProvider.getCustomAttributeRepository().deleteByProjectAndKeyname(project, key);
+        attributeService.deleteByProjectAndKeyname(project, key);
     }
 
 }

@@ -6,7 +6,9 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
+import edu.nd.crc.safa.features.artifacts.entities.AttributeSchemaAppEntity;
 import edu.nd.crc.safa.features.artifacts.services.ArtifactService;
+import edu.nd.crc.safa.features.artifacts.services.AttributeService;
 import edu.nd.crc.safa.features.common.ProjectEntities;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
 import edu.nd.crc.safa.features.documents.services.CurrentDocumentService;
@@ -30,6 +32,7 @@ import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 /**
@@ -57,6 +60,7 @@ public class ProjectRetrievalService {
     private final WarningService warningService;
     private final CommitErrorRetrievalService commitErrorRetrievalService;
     private final ModelService modelService;
+    private final AttributeService attributeService;
 
     /**
      * Creates a project application entity containing the entities (e.g. traces, artifacts) from
@@ -92,6 +96,9 @@ public class ProjectRetrievalService {
 
         List<ModelAppEntity> models = this.modelService.getUserModels();
 
+        List<AttributeSchemaAppEntity> attributes = this.attributeService
+            .getAttributeEntitiesForProject(projectVersion.getProject(), Sort.by("label"));
+
         return new ProjectAppEntity(projectVersion,
             entities.getArtifacts(),
             entities.getTraces(),
@@ -102,7 +109,8 @@ public class ProjectRetrievalService {
             warnings,
             errors,
             layout,
-            models);
+            models,
+            attributes);
     }
 
     /**

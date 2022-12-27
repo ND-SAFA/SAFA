@@ -7,6 +7,7 @@ import java.util.UUID;
 import edu.nd.crc.safa.features.artifacts.entities.db.schema.CustomAttribute;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.CrudRepository;
 
 public interface CustomAttributeRepository extends CrudRepository<CustomAttribute, UUID>  {
@@ -14,6 +15,8 @@ public interface CustomAttributeRepository extends CrudRepository<CustomAttribut
     Optional<CustomAttribute> findByProjectAndKeyname(Project project, String keyname);
 
     List<CustomAttribute> findByProject(Project project);
+
+    List<CustomAttribute> findByProject(Project project, Sort sort);
 
     boolean existsByProjectAndKeyname(Project project, String keyname);
 

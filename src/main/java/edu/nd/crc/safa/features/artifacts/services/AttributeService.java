@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.features.artifacts.services;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -17,6 +18,7 @@ import edu.nd.crc.safa.features.artifacts.repositories.schema.SelectionFieldOpti
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 /**
@@ -172,8 +174,13 @@ public class AttributeService {
             throw new IllegalArgumentException("The given custom attribute does not have options associated with it.");
         }
 
-        return appEntity.getOptions()
-            .stream()
+        List<String> options = appEntity.getOptions();
+
+        if (options == null) {
+            options = new ArrayList<>();
+        }
+
+        return options.stream()
             .map(option -> new SelectionFieldOption(parentAttribute, option))
             .collect(Collectors.toList());
     }
@@ -194,7 +201,18 @@ public class AttributeService {
                 "The given custom attribute does not have float info associated with it.");
         }
 
-        return new FloatFieldInfo(parentAttribute, appEntity.getMin().floatValue(), appEntity.getMax().floatValue());
+        Number min = appEntity.getMin();
+        Number max = appEntity.getMax();
+
+        if (min == null) {
+            min = -Float.MAX_VALUE;
+        }
+
+        if (max == null) {
+            max = Float.MAX_VALUE;
+        }
+
+        return new FloatFieldInfo(parentAttribute, min.doubleValue(), max.doubleValue());
     }
 
     /**
@@ -213,7 +231,18 @@ public class AttributeService {
                 "The given custom attribute does not have int info associated with it.");
         }
 
-        return new IntegerFieldInfo(parentAttribute, appEntity.getMin().intValue(), appEntity.getMax().intValue());
+        Number min = appEntity.getMin();
+        Number max = appEntity.getMax();
+
+        if (min == null) {
+            min = Integer.MIN_VALUE;
+        }
+
+        if (max == null) {
+            max = Integer.MAX_VALUE;
+        }
+
+        return new IntegerFieldInfo(parentAttribute, min.intValue(), max.intValue());
     }
 
     /**
@@ -368,5 +397,74 @@ public class AttributeService {
                 .orElse(null));
 
         intFieldRepo.save(intInfo);
+    }
+
+    /**
+     * Returns all custom attributes in a given project.
+     *
+     * @param project The project to search.
+     * @return All attributes in the given project.
+     */
+    public List<CustomAttribute> getAttributesForProject(Project project) {
+        return serviceProvider.getCustomAttributeRepository().findByProject(project);
+    }
+
+    /**
+     * Returns all custom attributes in a given project sorted by the given sort.
+     *
+     * @param project The project to search.
+     * @param sort The sort order to use.
+     * @return All attributes in the given project.
+     */
+    public List<CustomAttribute> getAttributesForProject(Project project, Sort sort) {
+        return serviceProvider.getCustomAttributeRepository().findByProject(project, sort);
+    }
+
+    /**
+     * Returns all custom attributes in a given project as front-end entities.
+     *
+     * @param project The project to search.
+     * @return All attributes in the given project.
+     */
+    public List<AttributeSchemaAppEntity> getAttributeEntitiesForProject(Project project) {
+        return this.getAttributesForProject(project)
+            .stream()
+            .map(this::appEntityFromCustomAttribute)
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * Returns all custom attributes in a given project as front-end entities sorted by the given sort.
+     *
+     * @param project The project to search.
+     * @param sort The sort order to use.
+     * @return All attributes in the given project.
+     */
+    public List<AttributeSchemaAppEntity> getAttributeEntitiesForProject(Project project, Sort sort) {
+        return this.getAttributesForProject(project, sort)
+            .stream()
+            .map(this::appEntityFromCustomAttribute)
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * Finds an attribute with a given key within the given project.
+     *
+     * @param project The project to search.
+     * @param keyname The key for the attribute to find.
+     * @return The attribute, if it exists.
+     */
+    public Optional<CustomAttribute> getByProjectAndKeyname(Project project, String keyname) {
+        return serviceProvider.getCustomAttributeRepository().findByProjectAndKeyname(project, keyname);
+    }
+
+    /**
+     * Delete an attribute from the given project.
+     *
+     * @param project The project to delete from.
+     * @param keyname The key of the attribute to delete.
+     */
+    public void deleteByProjectAndKeyname(Project project, String keyname) {
+        serviceProvider.getCustomAttributeRepository().deleteByProjectAndKeyname(project, keyname);
     }
 }

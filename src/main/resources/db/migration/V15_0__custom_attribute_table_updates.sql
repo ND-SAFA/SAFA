@@ -25,8 +25,8 @@ CREATE TABLE selection_field_option
 CREATE TABLE float_field
 (
     id               VARCHAR(255) NOT NULL,
-    min              FLOAT        NOT NULL,
-    max              FLOAT        NOT NULL,
+    min              DOUBLE       NOT NULL,
+    max              DOUBLE       NOT NULL,
     schema_field_id  VARCHAR(255) NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (schema_field_id) REFERENCES custom_attribute (id) ON DELETE CASCADE
@@ -84,7 +84,7 @@ CREATE TABLE integer_field_value
 CREATE TABLE float_field_value
 (
     id                   VARCHAR(255) NOT NULL,
-    field_value          FLOAT        NOT NULL,
+    field_value          DOUBLE       NOT NULL,
     field_version_id     VARCHAR(255) NOT NULL,
     PRIMARY KEY (id),
     CONSTRAINT UNIQUE_FLOAT_FIELD_VALUE_PER_FIELD UNIQUE (field_version_id),

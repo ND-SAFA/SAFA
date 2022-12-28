@@ -21,5 +21,5 @@ class TestRepositoryProjectReader(BaseTest):
 
         # VP 2. Verify trace files
         definition.pop(SafaKeys.DATAFILES_KEY)
-        trace_definitions = definition.items()
+        trace_definitions = definition
         TestAssertions.assert_file_definitions_have_files(self, trace_definitions, self.TRACE_FILES)

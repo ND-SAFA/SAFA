@@ -168,6 +168,7 @@ class BaseObject(ABC):
             return
         try:
             check_type(param_name, val, expected_type)
-        except TypeError:
+        except TypeError as te:
+            print(te)
             raise TypeError(
                 "%s expected type %s for %s but received %s" % (cls.__name__, expected_type, param_name, type(val)))

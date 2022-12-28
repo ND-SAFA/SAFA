@@ -138,4 +138,4 @@ class EntityReader(ABC, Generic[EntityType]):
                     return f.value
 
         supported_file_types = [f.name.lower() for f in EntityFormats]
-        raise Exception(data_file_name, "does not have supported file type: ", supported_file_types)
+        raise ValueError(data_file_name, "does not have supported file type: ", supported_file_types)

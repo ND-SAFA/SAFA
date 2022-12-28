@@ -22,7 +22,6 @@ class AbstractDatasetCreator(BaseObject, ABC):
         Creates the data
         :return: the data
         """
-        pass
 
     def _process_tokens(self, tokens: Union[List[str], str]) -> Union[List[str], str]:
         """

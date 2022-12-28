@@ -1,14 +1,15 @@
 import random
 
+from jobs.components.job_result import JobResult
+from jobs.supported_job_type import SupportedJobType
+from test.base_test import BaseTest
+from test.paths.paths import TEST_OUTPUT_DIR
 from util.variables.definition_variable import DefinitionVariable
 from util.variables.experimental_variable import ExperimentalVariable
 from util.variables.multi_variable import MultiVariable
 from util.variables.typed_definition_variable import TypedDefinitionVariable
 from util.variables.undetermined_variable import UndeterminedVariable
 from util.variables.variable import Variable
-from jobs.components.job_result import JobResult
-from jobs.supported_job_type import SupportedJobType
-from test.base_test import BaseTest
 
 
 class BaseExperimentTest(BaseTest):
@@ -18,7 +19,7 @@ class BaseExperimentTest(BaseTest):
             DefinitionVariable({"jobs": MultiVariable([TypedDefinitionVariable({
                 TypedDefinitionVariable.OBJECT_TYPE_KEY: SupportedJobType.TRAIN.name,
                 "job_args": DefinitionVariable({
-                    "output_dir": Variable("TEST_OUTPUT_DIR"),
+                    "output_dir": Variable(TEST_OUTPUT_DIR),
                 }),
                 "model_manager": DefinitionVariable({
                     "model_path": ExperimentalVariable([Variable("roberta-base"), Variable("bert-base")]),

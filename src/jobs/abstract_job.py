@@ -73,7 +73,6 @@ class AbstractJob(threading.Thread, BaseObject):
         Runs job specific logic
         :return: output of job as a dictionary
         """
-        pass
 
     @staticmethod
     def _get_output_filepath(output_dir: str, job_id: uuid) -> str:

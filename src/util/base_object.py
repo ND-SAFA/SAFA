@@ -4,15 +4,15 @@ from typing import Any, Dict, List, Type, Union, _UnionGenericAlias, get_args
 
 from typeguard import check_type
 
+from util.enum_utils import get_enum_from_name
+from util.param_specs import ParamSpecs
+from util.reflection_util import ReflectionUtil
 from util.variables.definition_variable import DefinitionVariable
 from util.variables.experimental_variable import ExperimentalVariable
 from util.variables.multi_variable import MultiVariable
 from util.variables.typed_definition_variable import TypedDefinitionVariable
 from util.variables.undetermined_variable import UndeterminedVariable
 from util.variables.variable import Variable
-from util.enum_utils import get_enum_from_name
-from util.param_specs import ParamSpecs
-from util.reflection_util import ReflectionUtil
 
 
 class BaseObject(ABC):
@@ -55,7 +55,7 @@ class BaseObject(ABC):
                     experiment_params_list.extend(cls._set_params_values(params_list, param_name, experiment_val))
                 params_list = experiment_params_list
             else:
-                params_list = cls._set_params_values(params_list, param_name, param_value)
+                params_list = cls._set_params_values(params_list, param_name, param_value, expected_type)
         instances = [cls(**params) for params in params_list]
         return instances.pop() if len(instances) == 1 else ExperimentalVariable([Variable(i) for i in instances])
 
@@ -152,7 +152,8 @@ class BaseObject(ABC):
         :param child_class_name: the name of the child class
         :return: the enum class mapping name to class
         """
-        raise TypeError("Cannot create %s because %s has not defined the enum class to use." % (child_class_name, cls.__name__))
+        raise TypeError(
+            "Cannot create %s because %s has not defined the enum class to use." % (child_class_name, cls.__name__))
 
     @classmethod
     def _assert_type(cls, val: Any, expected_type: Union[Type], param_name: str):

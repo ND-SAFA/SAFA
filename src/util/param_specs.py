@@ -10,6 +10,7 @@ class ParamSpecs:
     param_types: Dict[str, Union[Type, _SpecialGenericAlias]]
     has_kwargs: bool
     required_params: Set[str]
+    name: str
 
     @staticmethod
     def create_from_method(method: Callable) -> "ParamSpecs":
@@ -28,9 +29,9 @@ class ParamSpecs:
 
         expected_param_names.reverse()
         required_params = {param for i, param in enumerate(expected_param_names)
-                           if full_specs.defaults and i >= len(full_specs.defaults)}
+                           if not full_specs.defaults or i >= len(full_specs.defaults)}
 
-        return ParamSpecs(param_names=param_names, param_types=param_types,
+        return ParamSpecs(name=str(method), param_names=param_names, param_types=param_types,
                           required_params=required_params, has_kwargs=full_specs.varkw is not None)
 
     def assert_definition(self, definition: Dict) -> None:
@@ -41,7 +42,7 @@ class ParamSpecs:
         """
         missing_params = self.get_any_missing_required_params(definition)
         if len(missing_params) >= 1:
-            raise TypeError("%s is missing required arguments: %s" % (self.__name__, missing_params))
+            raise TypeError("%s is missing required arguments: %s" % (self.name, missing_params))
         self.assert_no_unexpected_params(definition)
 
     def assert_no_unexpected_params(self, definition: Dict) -> None:
@@ -52,7 +53,7 @@ class ParamSpecs:
         """
         extra_params = self.get_any_additional_params(definition)
         if len(extra_params) >= 1 and not self.has_kwargs:
-            raise TypeError("%s received unexpected arguments: %s" % (self.__class__, extra_params))
+            raise TypeError("%s received unexpected arguments: %s" % (self.name, extra_params))
 
     def get_any_missing_required_params(self, param_dict: Dict) -> Set[str]:
         """

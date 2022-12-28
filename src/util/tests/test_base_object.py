@@ -1,10 +1,16 @@
-from typing import List
+from typing import Dict, List, Optional
 
-from util.variables.definition_variable import DefinitionVariable
-from util.variables.variable import Variable
 from server.serializers.experiment_serializer import ExperimentSerializer
 from test.base_test import BaseTest
+from test.test_object_creator import TestObjectCreator
 from util.base_object import BaseObject
+from util.variables.definition_variable import DefinitionVariable
+from util.variables.variable import Variable
+
+
+class TestWithOptional(BaseObject):
+    def __init__(self, a: Optional[float] = None):
+        self.a = a
 
 
 class TestClass(BaseObject):
@@ -35,11 +41,6 @@ class TestBaseObject(BaseTest):
         test_class = TestClass.initialize_from_definition(definition_variable)
         self.assert_has_params(test_class, self.class_params)
 
-    def assert_has_params(self, instance, params):
-        for param_name, param_value in params.items():
-            class_value = getattr(instance, param_name)
-            self.assertEqual(param_value, class_value)
-
     def test_get_param_spects_invalid(self):
         invalid_param_tests = [("a", 42), ("b", "wrongtype",), ("c", [42]), ("d", "single")]
         for param_name, invalid_value in invalid_param_tests:
@@ -65,3 +66,39 @@ class TestBaseObject(BaseTest):
         print(definition_variable)
         outer_class = TestOuterClass.initialize_from_definition(definition_variable)
         self.assert_has_params(outer_class.a, self.class_params)
+
+    def test_optional_valid(self):
+        valid_values = [None, 4.2]
+        for value in valid_values:
+            definition: Dict = {
+                "a": value
+            }
+            object = TestObjectCreator.create(TestWithOptional, override=True, **definition)
+            self.assert_has_params(object, definition)
+
+    def test_optional_invalid(self):
+        definition: Dict = {
+            "a": "invalid-value"
+        }
+
+        def create():
+            object = TestObjectCreator.create(TestWithOptional, override=True, **definition)
+
+        self.assertRaises(TypeError, create)
+
+    def test_invalid_child_object(self):
+        definition = {
+            "a": {
+                "a": 4.2
+            }
+        }
+
+        def create():
+            TestObjectCreator.create(TestOuterClass, override=True, **definition)
+
+        self.assertRaises(TypeError, create)
+
+    def assert_has_params(self, instance, params):
+        for param_name, param_value in params.items():
+            class_value = getattr(instance, param_name)
+            self.assertEqual(param_value, class_value)

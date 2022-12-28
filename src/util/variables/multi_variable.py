@@ -23,3 +23,12 @@ class MultiVariable(Variable, list):
         for var in self.value:
             values.append(var.value)
         return values
+
+    @staticmethod
+    def from_list(orig_list: List) -> "MultiVariable":
+        """
+        Constructs a multi variable from a list of objects
+        :param orig_list: the original list
+        :return: the multivariable constructed from the original list
+        """
+        return MultiVariable([Variable(i) for i in orig_list])

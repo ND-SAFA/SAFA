@@ -1,6 +1,7 @@
 from abc import ABC
 from copy import deepcopy
-from typing import Any, Dict, List, Type, Union, _UnionGenericAlias, get_args
+from dataclasses import dataclass, field
+from typing import Any, Dict, List, Type, Union, _UnionGenericAlias, get_args, Generic
 
 from typeguard import check_type
 
@@ -13,6 +14,29 @@ from util.variables.multi_variable import MultiVariable
 from util.variables.typed_definition_variable import TypedDefinitionVariable
 from util.variables.undetermined_variable import UndeterminedVariable
 from util.variables.variable import Variable
+
+
+@dataclass
+class ObjectMeta:
+    init_params: Dict = field(init=False, default_factory=dict)
+    experimental_vars: Dict = field(init=False, default_factory=dict)
+    instance: Any = field(init=False)
+
+    def add_param(self, param_name: str, param_val: Any, is_experimental: bool = False,
+                  children_experimental_vars: Dict = None) -> None:
+        """
+        Adds a param to the object meta
+        :param param_name: the name of the parameter
+        :param param_val: the value of the parameter
+        :param is_experimental: True if the parameter is an experimental variable
+        :param children_experimental_vars: a dictionary mapping param name to values for all children experiment vars
+        :return: None
+        """
+        self.init_params[param_name] = param_val
+        if children_experimental_vars:
+            self.experimental_vars.update(children_experimental_vars)
+        if is_experimental:
+            self.experimental_vars[param_name] = param_val
 
 
 class BaseObject(ABC):
@@ -44,26 +68,26 @@ class BaseObject(ABC):
         param_specs = ParamSpecs.create_from_method(cls.__init__)
         param_specs.assert_definition(definition)
 
-        params_list = [{}]
+        obj_meta_list = [ObjectMeta()]
 
         for param_name, variable in definition.items():
             expected_type = param_specs.param_types[param_name] if param_name in param_specs.param_types else None
             param_value = cls._get_value_of_variable(variable, expected_type)
             if isinstance(param_value, ExperimentalVariable):
                 experiment_params_list = []
-                for experiment_val in param_value:
-                    experiment_params_list.extend(cls._set_params_values(params_list, param_name, experiment_val))
-                params_list = experiment_params_list
+                for i, experiment_val in enumerate(param_value):
+                    children_experimental_vars = param_value.experimental_param_names_to_vals[
+                        i] if param_value.experimental_param_names_to_vals else {}
+                    experiment_params_list.extend(
+                        cls._add_param_values(obj_meta_list, param_name, experiment_val, is_experimental=True,
+                                              children_experimental_vars=children_experimental_vars))
+                obj_meta_list = experiment_params_list
             else:
-                params_list = cls._set_params_values(params_list, param_name, param_value, expected_type)
-        instances = [cls(**params) for params in params_list]
-        return instances.pop() if len(instances) == 1 else ExperimentalVariable([Variable(i) for i in instances])
-
-    @classmethod
-    def get_generic(cls, expected_type):
-        if isinstance(expected_type, _UnionGenericAlias):
-            args = get_args(expected_type)
-            return args[0]
+                obj_meta_list = cls._add_param_values(obj_meta_list, param_name, param_value)
+        instances = [cls(**obj_meta.init_params) for obj_meta in obj_meta_list]
+        experimental_vars = [obj_meta.experimental_vars for obj_meta in obj_meta_list]
+        return instances.pop() if len(instances) == 1 else ExperimentalVariable(instances,
+                                                                                experimental_param_name_to_val=experimental_vars)
 
     @classmethod
     def _get_value_of_variable(cls, variable: Union[Variable, Any], expected_type: Union[Type] = None) -> Any:
@@ -88,33 +112,13 @@ class BaseObject(ABC):
         elif isinstance(variable, TypedDefinitionVariable):
             expected_class = cls._get_expected_class_by_type(expected_type, variable.object_type)
             val = cls._make_child_object(DefinitionVariable(variable), expected_class)
-        elif isinstance(variable, DefinitionVariable) or isinstance(variable, TypedDefinitionVariable):
+        elif isinstance(variable, DefinitionVariable):
             val = cls._make_child_object(variable, expected_type) if expected_type else None
         elif isinstance(variable, Variable):
             val = variable.value
         else:
             val = variable
         return val
-
-    @classmethod
-    def _set_params_values(cls, params_list: List[Dict], param_name: str, param_value: Any,
-                           expected_type: Type = None) -> List[Dict]:
-        """
-        Adds the param_name, param_value pair to each params dictionary in the params list
-        :param params_list: list of params dictionary
-        :param param_name: the name of the new param to add
-        :param param_value: the value of the new param to add
-        :param expected_type: the expected type of the param value
-        :return: the list of params dictionaries with the new param added
-        """
-        params_list_out = []
-        if expected_type:
-            cls._assert_type(param_value, expected_type, param_name)
-        for params in params_list:
-            params_out = deepcopy(params)
-            params_out[param_name] = deepcopy(cls._get_value_of_variable(param_value))
-            params_list_out.append(params_out)
-        return params_list_out
 
     @classmethod
     def _make_child_object(cls, definition: DefinitionVariable, expected_class: Type) -> Any:
@@ -133,6 +137,30 @@ class BaseObject(ABC):
             return expected_class(**params)
         except Exception as e:
             raise TypeError("Unable to initialize %s for %s" % (expected_class, cls.__name__))
+
+    @classmethod
+    def _add_param_values(cls, obj_meta_list: List[ObjectMeta], param_name: str, param_value: Any,
+                          expected_type: Type = None, is_experimental: bool = False,
+                          children_experimental_vars: Dict = None) -> List[ObjectMeta]:
+        """
+        Adds the param_name, param_value pair to each params dictionary in the params list
+        :param obj_meta_list: list of params dictionary
+        :param param_name: the name of the new param to add
+        :param param_value: the value of the new param to add
+        :param expected_type: the expected type of the param value
+        :param is_experimental: True if the new param is an experimental variable
+        :param children_experimental_vars: a dictionary mapping param name to values for all children experiment vars
+        :return: the list of params dictionaries with the new param added
+        """
+        obj_meta_list_out = []
+        if expected_type:
+            cls._assert_type(param_value, expected_type, param_name)
+        for obj_meta in obj_meta_list:
+            meta_out = deepcopy(obj_meta)
+            meta_out.add_param(param_name, deepcopy(cls._get_value_of_variable(param_value)), is_experimental=is_experimental,
+                               children_experimental_vars=children_experimental_vars)
+            obj_meta_list_out.append(meta_out)
+        return obj_meta_list_out
 
     @classmethod
     def _get_expected_class_by_type(cls, abstract_class: Type, child_class_name: str) -> Any:
@@ -172,3 +200,14 @@ class BaseObject(ABC):
             print(te)
             raise TypeError(
                 "%s expected type %s for %s but received %s" % (cls.__name__, expected_type, param_name, type(val)))
+
+    @classmethod
+    def _get_generic(cls, expected_type: Type) -> Generic:
+        """
+        Gets the generic type from expected type
+        :param expected_type: the expected type
+        :return: the generic type
+        """
+        if isinstance(expected_type, _UnionGenericAlias):
+            args = get_args(expected_type)
+            return args[0]

@@ -3,8 +3,8 @@ import os
 from transformers import DataCollatorForLanguageModeling
 
 from data.datasets.dataset_role import DatasetRole
-from data.datasets.pre_train_dataset import PreTrainDataset
 from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
+from data.datasets.pre_train_dataset import PreTrainDataset
 from jobs.components.job_args import JobArgs
 from jobs.components.job_result import JobResult
 from jobs.train_job import TrainJob

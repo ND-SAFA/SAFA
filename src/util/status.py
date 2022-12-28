@@ -1,7 +1,7 @@
 from enum import IntEnum
 
 
-class JobStatus(IntEnum):
+class Status(IntEnum):
     SUCCESS = 0
     NOT_STARTED = 1
     IN_PROGRESS = 2

@@ -18,7 +18,10 @@ class ReflectionUtil:
         :param source_class: The containment class.
         :return: Boolean representing if target is contained within source.
         """
-        return isinstance(target_class, source_class) or issubclass(target_class, source_class)
+        try:
+            return isinstance(target_class, source_class) or issubclass(target_class, source_class)
+        except Exception:
+            return False
 
     @staticmethod
     def copy_fields(source: Dict, include: List[str] = None, exclude: List[str] = None) -> Dict[str, Any]:

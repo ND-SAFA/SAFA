@@ -10,7 +10,10 @@ from data.datasets.creators.supported_dataset_creator import SupportedDatasetCre
 from data.datasets.dataset_role import DatasetRole
 from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
 from data.processing.abstract_data_processing_step import AbstractDataProcessingStep
+from experiments.experiment import Experiment
+from experiments.experiment_step import ExperimentStep
 from jobs.components.job_args import JobArgs
+from jobs.supported_job_type import SupportedJobType
 from models.model_manager import ModelManager
 from test.base_test import BaseTest
 from test.base_trace_test import BaseTraceTest
@@ -47,10 +50,8 @@ class TestObjectCreator:
     }
 
     trainer_dataset_manager_definition = {
-        "train_dataset_creator": {
-            TypedDefinitionVariable.OBJECT_TYPE_KEY: "CLASSIC_TRACE",
-            **dataset_creator_definition
-        }
+        "train_dataset_creator": {TypedDefinitionVariable.OBJECT_TYPE_KEY: "CLASSIC_TRACE",
+                                  **dataset_creator_definition}
     }
 
     model_manager_definition = {
@@ -58,13 +59,44 @@ class TestObjectCreator:
         "model_output_path": TEST_OUTPUT_DIR
     }
 
+    experiment_train_job_definition = {
+        TypedDefinitionVariable.OBJECT_TYPE_KEY: SupportedJobType.TRAIN.name,
+        "model_manager": model_manager_definition,
+        "trainer_dataset_manager": {
+            "train_dataset_creator": {
+                "object_type": "Safa",
+                "project_path": {"*": ["path1", "path2"]}}
+        },
+        "trainer_args": {
+            "output_dir": TEST_OUTPUT_DIR,
+            "num_train_epochs": {"*": [100, 200]}
+        }
+    }
+
+    experiment_predict_job_definition = {
+        TypedDefinitionVariable.OBJECT_TYPE_KEY: SupportedJobType.PREDICT.name,
+        "model_manager": model_manager_definition,
+        "trainer_args": trainer_args_definition,
+        "trainer_dataset_manager": {
+            "eval_dataset_creator": {TypedDefinitionVariable.OBJECT_TYPE_KEY: "CLASSIC_TRACE",
+                                     **dataset_creator_definition}
+        }
+    }
+
+    experiment_train_step_definition = {"jobs": [experiment_train_job_definition], "comparison_metric": "accuracy"}
+    experiment_predict_step_definition = {"jobs": [experiment_predict_job_definition], "comparison_metric": "accuracy"}
+    experiment_definition = {"steps": [experiment_train_step_definition, experiment_predict_step_definition],
+                             "output_dir": TEST_OUTPUT_DIR}
+
     SUPPORTED_OBJECTS = {
         TrainerArgs: trainer_args_definition,
         JobArgs: job_args_definition,
         ClassicTraceDatasetCreator: dataset_creator_definition,
         TrainerDatasetManager: trainer_dataset_manager_definition,
         ModelManager: model_manager_definition,
-        MLMPreTrainDatasetCreator: pretrain_dataset_definition
+        MLMPreTrainDatasetCreator: pretrain_dataset_definition,
+        ExperimentStep: experiment_train_step_definition,
+        Experiment: experiment_definition
     }
 
     @staticmethod

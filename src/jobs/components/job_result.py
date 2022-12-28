@@ -1,27 +1,12 @@
-import json
 from typing import Any, Dict, List, Tuple, Union
 
-import numpy as np
 from drf_yasg.openapi import FORMAT_UUID, Schema, TYPE_INTEGER, TYPE_STRING
 
-from jobs.components.job_status import JobStatus
 from train.metrics.supported_trace_metric import SupportedTraceMetric
 from util.base_object import BaseObject
+from util.json_util import JSONUtil
+from util.status import Status
 from util.uncased_dict import UncasedDict
-
-
-class NpEncoder(json.JSONEncoder):
-    """
-    Handles Numpy conversion to json
-    """
-    def default(self, obj):
-        if isinstance(obj, np.integer):
-            return int(obj)
-        if isinstance(obj, np.floating):
-            return float(obj)
-        if isinstance(obj, np.ndarray):
-            return obj.tolist()
-        return super(NpEncoder, self).default(obj)
 
 
 class JobResult(BaseObject):
@@ -53,7 +38,7 @@ class JobResult(BaseObject):
         """
         self.__result = UncasedDict(result_dict)
 
-    def set_job_status(self, status: JobStatus) -> None:
+    def set_job_status(self, status: Status) -> None:
         """
         Sets the status of the job in teh results
         :param status: the job status
@@ -61,14 +46,14 @@ class JobResult(BaseObject):
         """
         self[JobResult.STATUS] = status
 
-    def get_job_status(self) -> JobStatus:
+    def get_job_status(self) -> Status:
         """
         Gets the job status from results
         :return: the job status
         """
         if JobResult.STATUS in self:
             return self[JobResult.STATUS]
-        return JobStatus.UNKNOWN
+        return Status.UNKNOWN
 
     def update(self, other_result: Union["JobResult", Dict]) -> "JobResult":
         """
@@ -87,7 +72,7 @@ class JobResult(BaseObject):
         :return: the output as json
         """
         obj = {key: self.__result[key] for key in keys if key in self.__result} if keys else self.__result
-        return json.dumps(obj, indent=4, cls=NpEncoder)
+        return JSONUtil.dict_to_json(obj)
 
     def as_dict(self) -> dict:
         """

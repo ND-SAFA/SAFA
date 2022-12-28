@@ -13,8 +13,8 @@ from data.datasets.dataset_role import DatasetRole
 from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
 from data.datasets.pre_train_dataset import PreTrainDataset
 from data.datasets.trace_dataset import TraceDataset
-from models.base_models.discriminator import Discriminator
-from models.base_models.generator import Generator
+from models.gan.discriminator import Discriminator
+from models.gan.generator import Generator
 from models.model_manager import ModelManager
 from train.gan.gan_dataset_converter import GanDatasetConverter
 from train.trace_trainer import TraceTrainer

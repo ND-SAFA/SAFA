@@ -4,6 +4,16 @@ from typing import Dict, List
 
 
 class FileUtil:
+
+    @staticmethod
+    def make_dir_safe(output_path: str) -> None:
+        """
+        Makes a directory, by first checking if the directory exists
+        :return: None
+        """
+        if not os.path.exists(output_path):
+            os.makedirs(output_path)
+
     @staticmethod
     def read_file(file_path: str):
         """

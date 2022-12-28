@@ -1,3 +1,5 @@
+from typing import Dict, Any
+
 from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
 from jobs.abstract_job import AbstractJob
 from jobs.components.job_args import JobArgs
@@ -9,9 +11,11 @@ class CreateDatasetsJob(AbstractJob):
     def __init__(self, job_args: JobArgs, trainer_dataset_manager: TrainerDatasetManager):
         """
         Responsible for creating and saving new data
+        :param job_args: the arguments for the job
+        :param trainer_dataset_manager: manages all datasets for the trainer
         """
         job_args.save_dataset_splits = True
-        super().__init__(job_args)
+        super().__init__(job_args=job_args)
         self.trainer_dataset_manager = trainer_dataset_manager
 
     def _run(self, **kwargs) -> JobResult:

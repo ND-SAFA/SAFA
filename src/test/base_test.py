@@ -30,7 +30,6 @@ class BaseTest(TestCase):
             for file in os.listdir(TEST_DATA_DIR):
                 file_path = os.path.join(TEST_DATA_DIR, file)
                 if os.path.isfile(file):
-                    print(file_path)
                     os.remove(file_path)
 
     @staticmethod

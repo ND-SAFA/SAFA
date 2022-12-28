@@ -1,7 +1,7 @@
 import json
 
 from jobs.components.job_result import JobResult
-from jobs.components.job_status import JobStatus
+from util.status import Status
 from test.base_test import BaseTest
 from train.metrics.supported_trace_metric import SupportedTraceMetric
 
@@ -10,9 +10,9 @@ class TestJobResult(BaseTest):
 
     def test_set_get_job_status(self):
         result = self.get_job_result()
-        self.assertEquals(result.get_job_status(), JobStatus.UNKNOWN)
-        result.set_job_status(JobStatus.SUCCESS)
-        self.assertEquals(result.get_job_status(), JobStatus.SUCCESS)
+        self.assertEquals(result.get_job_status(), Status.UNKNOWN)
+        result.set_job_status(Status.SUCCESS)
+        self.assertEquals(result.get_job_status(), Status.SUCCESS)
 
     def test_update(self):
         result1 = self.get_job_result()
@@ -76,10 +76,10 @@ class TestJobResult(BaseTest):
         self.assertEquals(metric1, 0.8)
         self.assertEquals(metric2, 0.3)
 
-        result1.set_job_status(JobStatus.SUCCESS)
+        result1.set_job_status(Status.SUCCESS)
         val1, val2 = result1._get_comparison_vals(result2, "unknown")
-        self.assertEquals(val1, JobStatus.SUCCESS)
-        self.assertEquals(val2, JobStatus.UNKNOWN)
+        self.assertEquals(val1, Status.SUCCESS)
+        self.assertEquals(val2, Status.UNKNOWN)
 
     def test_unknown_value(self):
         result = self.get_job_result()

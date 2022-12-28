@@ -1,15 +1,22 @@
-from typing import List, Union, Type
+import os
+from copy import deepcopy
+from typing import List, Union, Type, Dict, Optional
 
 from config.override import overrides
-from util.variables.definition_variable import DefinitionVariable
-from util.variables.experimental_variable import ExperimentalVariable
 from jobs.abstract_job import AbstractJob
 from jobs.supported_job_type import SupportedJobType
+from server.storage.safa_storage import SafaStorage
 from train.metrics.supported_trace_metric import SupportedTraceMetric
 from util.base_object import BaseObject
+from util.file_util import FileUtil
+from util.json_util import JSONUtil
+from util.status import Status
+from util.variables.experimental_variable import ExperimentalVariable
 
 
 class ExperimentStep(BaseObject):
+    OUTPUT_FILENAME = "output.json"
+
     def __init__(self, jobs: Union[List[AbstractJob], ExperimentalVariable],
                  comparison_metric: Union[str, SupportedTraceMetric] = None, should_maximize_metric: bool = True):
         """
@@ -18,23 +25,90 @@ class ExperimentStep(BaseObject):
         :param comparison_metric: the metric to use to determine the best job
         :param should_maximize_metric: True if should maximize the comparison metric to find best job
         """
-        self.jobs = jobs.get_values_of_all_variables() if isinstance(jobs, ExperimentalVariable) else jobs
+        if isinstance(jobs, list) and isinstance(jobs[0], ExperimentalVariable):
+            jobs = jobs.pop()  # TODO fix this
+        if not isinstance(jobs, ExperimentalVariable):
+            jobs = ExperimentalVariable(jobs)
+        self.jobs = jobs.get_values_of_all_variables()
+        self.job_to_experimental_var = self._get_job_to_experimental_var(jobs)
+        self.status = Status.NOT_STARTED
+        self.best_job = None
         self.comparison_metric = comparison_metric
         self.should_maximize_metric = should_maximize_metric
 
-    def run(self, prior_best_job: AbstractJob = None) -> AbstractJob:
+    def run(self, jobs_for_undetermined_vars: List[AbstractJob] = None) -> List[AbstractJob]:
         """
         Runs all step jobs
-        :param prior_best_job: the best job from a prior step
-        :return: the best job from this step
+        :param jobs_for_undetermined_vars: the best job from a prior step
+        :return: the best job from this step if comparison metric is provided, else all the jobs
         """
-        if prior_best_job:
-            if hasattr(prior_best_job, "model_manager"):
-                prior_best_job.model_manager.model_path = prior_best_job.model_manager.model_output_path
-            self._run_on_all_jobs(self.jobs, "use_values_from_object_for_undetermined", obj=prior_best_job)
+        self.status = Status.IN_PROGRESS
+        if jobs_for_undetermined_vars:
+            self.jobs = self._update_jobs_undetermined_vars(self.jobs, jobs_for_undetermined_vars)
         self._run_on_all_jobs(self.jobs, "start")
         self._run_on_all_jobs(self.jobs, "join")
-        return self._get_best_job(self.jobs, self.comparison_metric, self.should_maximize_metric)
+        if self.comparison_metric:
+            self.best_job = self._get_best_job(self.jobs, self.comparison_metric, self.should_maximize_metric)
+            return [self.best_job]
+        self.status = Status.SUCCESS
+        return self.jobs
+
+    def save_results(self, output_dir: str) -> None:
+        """
+        Saves the results of the step
+        :param output_dir: the directory to output results to
+        :return: None
+        """
+        FileUtil.make_dir_safe(output_dir)
+        json_output = JSONUtil.dict_to_json(self.get_results())
+        output_filepath = os.path.join(output_dir, ExperimentStep.OUTPUT_FILENAME)
+        SafaStorage.save_to_file(json_output, output_filepath)
+        for job in self.jobs:
+            job.save(output_dir)
+
+    def get_results(self) -> Dict[str, str]:
+        """
+        Gets the results of the step
+        :return: a dictionary containing the results
+        """
+        results = {}
+        for var_name, var_value in vars(self).items():
+            if var_name.startswith("_") or callable(var_value):
+                continue
+            results[var_name] = str(var_value)
+        return results
+
+    @staticmethod
+    def _get_job_to_experimental_var(experimental_jobs: ExperimentalVariable) -> Optional[Dict[str, Dict]]:
+        """
+        Gets a mapping of job id to the experimental variables associated with that job
+        :param experimental_jobs: an experimental variable containing all jobs and their experimental variables
+        :return: a dictionary mapping job id to the experimental variables associated with that job
+        """
+        if not experimental_jobs.experimental_param_names_to_vals:
+            return None
+        job_to_experimental_var = {}
+        for i, job in enumerate(experimental_jobs.get_values_of_all_variables()):
+            job_to_experimental_var[str(job.id)] = {param_name: param_val for param_name, param_val in
+                                                    experimental_jobs.experimental_param_names_to_vals[i].items()
+                                                    if not isinstance(param_val, BaseObject)}
+        return job_to_experimental_var
+
+    def _update_jobs_undetermined_vars(self, jobs2update: List[AbstractJob], jobs2use: List[AbstractJob]) -> List[AbstractJob]:
+        """
+        Updates all the jobs2update's undetermined vals with those from the jobs2use
+        :param jobs2update: the list of jobs to update undetermined vals for
+        :param jobs2use: the list of jobs to use for updating undetermined vals
+        :return: the list of updated jobs
+        """
+        final_jobs = []
+        for job in jobs2use:
+            jobs2update = deepcopy(jobs2update)
+            if hasattr(job, "model_manager"):
+                job.model_manager.model_path = job.model_manager.model_output_path
+            self._run_on_all_jobs(jobs2update, "use_values_from_object_for_undetermined", obj=job)
+            final_jobs.extend(jobs2update)
+        return final_jobs
 
     @staticmethod
     def _run_on_all_jobs(jobs: List[AbstractJob], method_name: str, **method_params) -> List:
@@ -48,7 +122,7 @@ class ExperimentStep(BaseObject):
         return list(map(lambda job: getattr(job, method_name)(**method_params), jobs))
 
     @staticmethod
-    def _get_best_job(jobs: List[AbstractJob], comparison_metric: Union[str, SupportedTraceMetric] = None,
+    def _get_best_job(jobs: List[AbstractJob], comparison_metric: Union[str, SupportedTraceMetric],
                       should_maximize: bool = True) -> AbstractJob:
         """
         Returns the job with the best results as determined by the comparison info
@@ -58,10 +132,9 @@ class ExperimentStep(BaseObject):
         :return: the best job
         """
         best_job = jobs[0]
-        if comparison_metric:
-            for job in jobs:
-                if job.result.is_better_than(best_job.result, comparison_metric, should_maximize):
-                    best_job = job
+        for job in jobs:
+            if job.result.is_better_than(best_job.result, comparison_metric, should_maximize):
+                best_job = job
         return best_job
 
     @classmethod
@@ -74,16 +147,3 @@ class ExperimentStep(BaseObject):
         :return: the enum class mapping name to class
         """
         return SupportedJobType
-
-    @classmethod
-    @overrides(BaseObject)
-    def initialize_from_definition(cls, definition: DefinitionVariable):
-        """
-        Initializes the obj from a dictionary
-        :param definition: a dictionary of the necessary params to initialize
-        :return: the initialized obj
-        """
-        instance = super().initialize_from_definition(definition)
-        if isinstance(instance.jobs, list) and isinstance(instance.jobs[0], ExperimentalVariable):
-            instance.jobs = instance.jobs.pop().get_values_of_all_variables()  # TODO why is this happening
-        return instance

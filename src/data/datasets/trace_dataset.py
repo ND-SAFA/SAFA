@@ -218,7 +218,6 @@ class TraceDataset(AbstractDataset):
                 aug_source_tokens, aug_target_tokens = entry
                 self.add_link(source_id=aug_source_id, target_id=aug_target_id,
                               source_tokens=aug_source_tokens, target_tokens=aug_target_tokens, is_true_link=True)
-            print(step_id, ":", i)
 
     def _get_augmented_artifact_ids(self, augmented_tokens: Tuple[str, str], orig_link: TraceLink, aug_step_id: str,
                                     entry_num: int) \

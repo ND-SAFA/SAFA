@@ -34,4 +34,4 @@ class PushModelJob(AbstractTraceJob):
         trainer = self.get_trainer()
         trainer.push_to_hub(hub_path)
         shutil.rmtree(self.job_args.output_dir)
-        return JobResult.from_dict({JobResult.MODEL_PATH: self.output_dir})
+        return JobResult.from_dict({JobResult.MODEL_PATH: self.job_args.output_dir})

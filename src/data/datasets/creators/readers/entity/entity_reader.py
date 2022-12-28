@@ -16,7 +16,6 @@ class Wrapper:
         self.f = f
 
     def __call__(self, *args, **kwargs):
-        print(self.f)
         return self.f(*args, **kwargs)
 
 

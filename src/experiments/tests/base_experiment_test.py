@@ -19,7 +19,6 @@ class BaseExperimentTest(BaseTest):
             DefinitionVariable({"jobs": MultiVariable([TypedDefinitionVariable({
                 TypedDefinitionVariable.OBJECT_TYPE_KEY: SupportedJobType.TRAIN.name,
                 "job_args": DefinitionVariable({
-                    "output_dir": Variable(TEST_OUTPUT_DIR),
                 }),
                 "model_manager": DefinitionVariable({
                     "model_path": ExperimentalVariable([Variable("roberta-base"), Variable("bert-base")]),
@@ -41,7 +40,6 @@ class BaseExperimentTest(BaseTest):
             DefinitionVariable({"jobs": MultiVariable([TypedDefinitionVariable({
                 TypedDefinitionVariable.OBJECT_TYPE_KEY: SupportedJobType.PREDICT.name,
                 "job_args": DefinitionVariable({
-                    "output_dir": Variable("TEST_OUTPUT_DIR"),
                 }),
                 "model_manager": DefinitionVariable({
                     "model_path": UndeterminedVariable(),
@@ -62,6 +60,10 @@ class BaseExperimentTest(BaseTest):
         "output_dir": TEST_OUTPUT_DIR,
 
     })
+
+    def setUp(self):
+        super(BaseExperimentTest, self).setUp()
+        self.accuracies = []
 
     def job_fake_run(self):
         accuracy = random.randint(1, 100) / 100

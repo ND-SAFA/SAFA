@@ -1,5 +1,7 @@
+from typing import Dict, List
 from unittest import TestCase
 
+from data.datasets.keys.structure_keys import StructureKeys
 from jobs.components.job_result import JobResult
 from test.test_data_manager import TestDataManager
 
@@ -50,3 +52,10 @@ class TestAssertions:
         diff2 = set(list2).difference(list1)
         test_case.assertEquals(len(diff1), 0)
         test_case.assertEquals(len(diff2), 0)
+
+    @staticmethod
+    def assert_file_definitions_have_files(test_case: TestCase,
+                                           artifact_definitions: Dict,
+                                           expected_artifact_files: List[str]):
+        artifact_files = [artifact_def[StructureKeys.PATH] for artifact_def in artifact_definitions.values()]
+        TestAssertions.assert_lists_have_the_same_vals(test_case, artifact_files, expected_artifact_files)

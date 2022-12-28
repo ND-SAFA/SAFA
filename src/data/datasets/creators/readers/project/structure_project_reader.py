@@ -1,19 +1,19 @@
 from typing import Dict
 
-from data.datasets.creators.readers.project.iproject_reader import IProjectParser
-from data.datasets.formats.safa_format import SafaFormat
+from data.datasets.creators.readers.project.iproject_reader import AbstractTraceProjectReader
+from data.datasets.keys.safa_format import SafaKeys
 from util.json_util import JSONUtil
 
 
-class StructureProjectReader(IProjectParser):
+class StructureProjectReader(AbstractTraceProjectReader):
 
     def get_trace_definitions(self) -> Dict[str, Dict]:
-        JSONUtil.require_properties(self.definition, [SafaFormat.TRACES])
-        return self.definition[SafaFormat.TRACES]
+        JSONUtil.require_properties(self.definition, [SafaKeys.TRACES])
+        return self.definition[SafaKeys.TRACES]
 
     def get_artifact_definitions(self) -> Dict[str, Dict]:
-        JSONUtil.require_properties(self.definition, [SafaFormat.ARTIFACTS])
-        return self.definition[SafaFormat.ARTIFACTS]
+        JSONUtil.require_properties(self.definition, [SafaKeys.ARTIFACTS])
+        return self.definition[SafaKeys.ARTIFACTS]
 
-    def get_definition_file_name(self) -> str:
+    def _get_definition_file_name(self) -> str:
         return "definition.json"

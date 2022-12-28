@@ -8,7 +8,7 @@ import pandas as pd
 
 from data.datasets.abstract_dataset import AbstractDataset
 from data.datasets.data_key import DataKey
-from data.datasets.formats.csv_format import CSVFormat
+from data.datasets.keys.csv_format import CSVKeys
 from data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
 from data.processing.augmentation.data_augmenter import DataAugmenter
 from data.processing.augmentation.source_target_swap_step import SourceTargetSwapStep
@@ -60,8 +60,8 @@ class TraceDataset(AbstractDataset):
                                          int(link.is_true_link)]
         data = [link_ids_to_rows[link_id] for link_id in self.pos_link_ids + self.neg_link_ids]
         return pd.DataFrame(data,
-                            columns=[CSVFormat.SOURCE_ID, CSVFormat.SOURCE, CSVFormat.TARGET_ID, CSVFormat.TARGET,
-                                     CSVFormat.LABEL])
+                            columns=[CSVKeys.SOURCE_ID, CSVKeys.SOURCE, CSVKeys.TARGET_ID, CSVKeys.TARGET,
+                                     CSVKeys.LABEL])
 
     def add_link(self, source_id: str, target_id: str, source_tokens: str, target_tokens: str,
                  is_true_link: bool) -> int:
@@ -237,7 +237,8 @@ class TraceDataset(AbstractDataset):
 
         new_id = TraceLink.generate_link_id(aug_source_id, aug_target_id)
         if new_id in self.links:
-            if self.links[new_id].source.token != aug_source_tokens or self.links[new_id].target.token != aug_target_tokens:
+            if self.links[new_id].source.token != aug_source_tokens or self.links[
+                new_id].target.token != aug_target_tokens:
                 aug_source_id += str(entry_num)
                 aug_target_id += str(entry_num)
         return aug_source_id, aug_target_id

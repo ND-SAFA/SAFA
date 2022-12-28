@@ -1,9 +1,9 @@
 from typing import Dict, Tuple
 
-from data.datasets.formats.safa_format import SafaFormat
+from data.datasets.keys.safa_format import SafaKeys
 
 
-class RepositoryFormat(SafaFormat):
+class RepositoryKeys(SafaKeys):
     ISSUE_FILE_NAME = "issue.csv"
     PULL_FILE_NAME = "pull.csv"
     COMMIT_FILE_NAME = "commit.csv"
@@ -31,4 +31,4 @@ class RepositoryFormat(SafaFormat):
         """
         super().__init__(artifact_id_key, source_id_key, target_id_key, artifacts_key, traces_key,
                          trace_files_2_artifacts=trace_files_2_artifacts if trace_files_2_artifacts else
-                         RepositoryFormat.TRACE_FILE_2_ARTIFACTS)
+                         RepositoryKeys.TRACE_FILE_2_ARTIFACTS)

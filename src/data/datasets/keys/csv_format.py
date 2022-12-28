@@ -1,4 +1,7 @@
-class CSVFormat:
+class CSVKeys:
+    """
+    Keys used in the CSV project format.
+    """
     ID = "ID"
     SOURCE_ID = "source_id"
     TARGET_ID = "target_id"

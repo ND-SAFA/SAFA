@@ -4,7 +4,7 @@ from typing import List
 import pandas as pd
 
 from data.datasets.creators.readers.entity.entity_reader import EntityReader, EntityType
-from data.datasets.creators.readers.project.structure_keys import StructureKeys
+from data.datasets.keys.structure_keys import StructureKeys
 
 
 class PreTrainReader(EntityReader[List[str]]):

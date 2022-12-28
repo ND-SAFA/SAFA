@@ -2,7 +2,7 @@ from typing import Dict, List, TypedDict
 
 from data.datasets.creators.readers.entity.artifact_reader import ArtifactReader
 from data.datasets.creators.readers.entity.entity_reader import EntityReader
-from data.datasets.formats.safa_format import SafaFormat
+from data.datasets.keys.safa_format import SafaKeys
 from data.tree.artifact import Artifact
 from data.tree.trace_link import TraceLink
 from util.json_util import JSONUtil
@@ -18,14 +18,14 @@ class TraceEntityReader(EntityReader):
 
     def __init__(self, base_path: str, trace_definition: Dict,
                  type2artifacts: Dict[str, ArtifactReader], **kwargs):
-        JSONUtil.require_properties(trace_definition, [SafaFormat.SOURCE_ID, SafaFormat.TARGET_ID])
+        JSONUtil.require_properties(trace_definition, [SafaKeys.SOURCE_ID, SafaKeys.TARGET_ID])
         super().__init__(base_path, trace_definition, **kwargs)
         self.type2artifacts: Dict[str, ArtifactReader] = UncasedDict(type2artifacts)
-        self.target_type = self.definition[SafaFormat.TARGET_ID]
+        self.target_type = self.definition[SafaKeys.TARGET_ID]
         self.source_artifacts: List[Artifact] = self.type2artifacts[
-            self.definition[SafaFormat.SOURCE_ID]].get_entities()
+            self.definition[SafaKeys.SOURCE_ID]].get_entities()
         self.target_artifacts: List[Artifact] = self.type2artifacts[
-            self.definition[SafaFormat.TARGET_ID]].get_entities()
+            self.definition[SafaKeys.TARGET_ID]].get_entities()
 
     def create(self, traces_df) -> Dict[int, TraceLink]:
         positive_link_ids = []
@@ -43,8 +43,8 @@ class TraceEntityReader(EntityReader):
     def create_trace_link(source_artifact, target_artifact, traces_df):
         source_id = source_artifact.id
         target_id = target_artifact.id
-        trace_query = traces_df[(traces_df[SafaFormat.SOURCE_ID] == source_id) &
-                                (traces_df[SafaFormat.TARGET_ID] == target_id)]
+        trace_query = traces_df[(traces_df[SafaKeys.SOURCE_ID] == source_id) &
+                                (traces_df[SafaKeys.TARGET_ID] == target_id)]
         is_positive = len(trace_query) >= 1
         trace_link = TraceLink(source_artifact, target_artifact, is_true_link=is_positive)
         return trace_link

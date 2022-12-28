@@ -1,4 +1,8 @@
 class StructureKeys:
+    """
+    Keys used in the STRUCTURE project format.
+    """
+
     class Trace:
         SOURCE = "source"
         TARGET = "target"

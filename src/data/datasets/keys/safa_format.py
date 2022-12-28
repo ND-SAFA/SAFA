@@ -1,4 +1,7 @@
-class SafaFormat:
+class SafaKeys:
+    """
+    Keys used in the SAFA project format.
+    """
     TIM_FILE = "tim.json"
     DATAFILES_KEY = "datafiles"
     ARTIFACT_ID = "id"

@@ -5,7 +5,7 @@ from typing import Callable, Dict, Generic, List, Optional, Type, TypeVar
 
 import pandas as pd
 
-from data.datasets.creators.readers.project.structure_keys import StructureKeys
+from data.datasets.keys.structure_keys import StructureKeys
 from util.dataframe_util import DataFrameUtil
 from util.file_util import FileUtil
 from util.json_util import JSONUtil
@@ -98,7 +98,11 @@ class EntityReader(ABC, Generic[EntityType]):
 
     @abstractmethod
     def create(self, entity_df) -> EntityType:
-        pass
+        """
+        Creates the entities.
+        :param entity_df: DataFrame containing many instances of entities.
+        :return: The final entity type.
+        """
 
     def read_entities(self) -> pd.DataFrame:
         source_entities_df = self.read_source_entities()

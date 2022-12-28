@@ -83,10 +83,8 @@ class TestBaseObject(BaseTest):
             "a": "invalid-value"
         }
 
-        def create():
-            object = TestObjectCreator.create(TestWithOptional, override=True, **definition)
-
-        self.assertRaises(TypeError, create)
+        with self.assertRaises(TypeError) as e:
+            TestObjectCreator.create(TestWithOptional, override=True, **definition)
 
     def test_invalid_child_object(self):
         definition = {

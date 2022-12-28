@@ -1,7 +1,7 @@
 from abc import ABC
 from copy import deepcopy
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Type, Union, _UnionGenericAlias, get_args, Generic
+from typing import Any, Dict, Generic, List, Type, Union, _UnionGenericAlias, get_args
 
 from typeguard import check_type
 
@@ -83,7 +83,7 @@ class BaseObject(ABC):
                                               children_experimental_vars=children_experimental_vars))
                 obj_meta_list = experiment_params_list
             else:
-                obj_meta_list = cls._add_param_values(obj_meta_list, param_name, param_value)
+                obj_meta_list = cls._add_param_values(obj_meta_list, param_name, param_value, expected_type)
         instances = [cls(**obj_meta.init_params) for obj_meta in obj_meta_list]
         experimental_vars = [obj_meta.experimental_vars for obj_meta in obj_meta_list]
         return instances.pop() if len(instances) == 1 else ExperimentalVariable(instances,
@@ -157,7 +157,8 @@ class BaseObject(ABC):
             cls._assert_type(param_value, expected_type, param_name)
         for obj_meta in obj_meta_list:
             meta_out = deepcopy(obj_meta)
-            meta_out.add_param(param_name, deepcopy(cls._get_value_of_variable(param_value)), is_experimental=is_experimental,
+            meta_out.add_param(param_name, deepcopy(cls._get_value_of_variable(param_value)),
+                               is_experimental=is_experimental,
                                children_experimental_vars=children_experimental_vars)
             obj_meta_list_out.append(meta_out)
         return obj_meta_list_out

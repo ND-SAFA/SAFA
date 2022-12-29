@@ -6,12 +6,15 @@ from data.datasets.dataset_role import DatasetRole
 from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
 from experiments.experiment_step import ExperimentStep
 from experiments.tests.base_experiment_test import BaseExperimentTest
+from jobs.components.job_args import JobArgs
 from jobs.components.job_result import JobResult
+from jobs.delete_model_job import DeleteModelJob
 from jobs.predict_job import PredictJob
 from jobs.train_job import TrainJob
 from test.paths.paths import TEST_OUTPUT_DIR
 from test.test_object_creator import TestObjectCreator
 from util.status import Status
+from variables.undetermined_variable import UndeterminedVariable
 
 
 class TestExperimentStep(BaseExperimentTest):
@@ -39,22 +42,55 @@ class TestExperimentStep(BaseExperimentTest):
     def test_run_with_best_prior(self, predict_job_run_mock: mock.MagicMock):
         predict_job_run_mock.side_effect = self.job_fake_run
         train_experiment_step = self.get_experiment_step()
-        predict_experiment_step = self.get_experiment_step(override=True, **{
-            "jobs": [{
-                **TestObjectCreator.experiment_predict_job_definition,
-                "model_manager": {
-                    "model_path": "?"
-                }
-            }]
-        })
+        predict_experiment_step = self.get_experiment_step(train=False)
         best_job_from_prior = train_experiment_step.jobs.pop()
         best_job = predict_experiment_step.run([best_job_from_prior]).pop()
         expected_model_path = best_job_from_prior.model_manager.model_path
         self.assertEquals(best_job.model_manager.model_path, expected_model_path)
         self.assertEqual(predict_job_run_mock.call_count, 1)
 
-    def get_experiment_step(self, **kwargs):
+    def test_update_jobs_undetermined_vars(self):
+        train_step = self.get_experiment_step()
+        predict_step = self.get_experiment_step(train=False)
+        predict_step.jobs[0].trainer_args.num_train_epochs = UndeterminedVariable()
+        final_jobs = predict_step._update_jobs_undetermined_vars(predict_step.jobs, train_step.jobs)
+        self.assertEquals(len(final_jobs), len(train_step.jobs))
+        for job in final_jobs:
+            self.assertTrue(not isinstance(job.trainer_args.num_train_epochs, UndeterminedVariable))
+            self.assertTrue(not isinstance(job.model_manager.model_path, UndeterminedVariable))
+
+    def test_run_on_all_jobs(self):
+        jobs = self.get_test_jobs()
+        results = ExperimentStep._run_on_all_jobs(jobs, "get_output_filepath")
+        self.assertEquals(len(results), 2)
+        self.assertNotEquals(results[0], results[1])
+
+    def test_get_best_job(self):
+        job1, job2 = self.get_test_jobs()
+        job1.result[JobResult.METRICS] = {"accuracy": 0.5}
+
+        job2.result[JobResult.METRICS] = {"accuracy": 0.8}
+        best_job = ExperimentStep._get_best_job([job1, job2], comparison_metric="accuracy")
+        self.assertEquals(best_job.id, job2.id)
+
+    def get_experiment_step(self, train=True):
+        kwargs = {}
+        if not train:
+            kwargs = {"override": True, **{
+                "jobs": [{
+                    **TestObjectCreator.experiment_predict_job_definition,
+                    "model_manager": {
+                        "model_path": "?"
+                    }
+                }]
+            }}
         return TestObjectCreator.create(ExperimentStep, **kwargs)
+
+    @staticmethod
+    def get_test_jobs():
+        job1 = DeleteModelJob(job_args=JobArgs(output_dir=TEST_OUTPUT_DIR))
+        job2 = DeleteModelJob(job_args=JobArgs(output_dir=TEST_OUTPUT_DIR))
+        return [job1, job2]
 
     @staticmethod
     def get_job_by_id(step, job_id):

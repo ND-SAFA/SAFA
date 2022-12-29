@@ -1,26 +1,15 @@
-import json
 from typing import Any, Dict, List, Tuple, Union
 
-import numpy as np
 from drf_yasg.openapi import FORMAT_UUID, Schema, TYPE_INTEGER, TYPE_STRING
 
-from jobs.components.job_status import JobStatus
 from train.metrics.supported_trace_metric import SupportedTraceMetric
+from util.base_object import BaseObject
+from util.json_util import JSONUtil
+from util.status import Status
 from util.uncased_dict import UncasedDict
 
 
-class NpEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, np.integer):
-            return int(obj)
-        if isinstance(obj, np.floating):
-            return float(obj)
-        if isinstance(obj, np.ndarray):
-            return obj.tolist()
-        return super(NpEncoder, self).default(obj)
-
-
-class JobResult:
+class JobResult(BaseObject):
     JOB_ID = "jobID"
     EXCEPTION = "exception"
     STATUS = "status"
@@ -43,9 +32,13 @@ class JobResult:
                    EXCEPTION: Schema(type=TYPE_STRING)}
 
     def __init__(self, result_dict: Dict = None):
+        """
+        Represents the results of a job
+        :param result_dict:
+        """
         self.__result = UncasedDict(result_dict)
 
-    def set_job_status(self, status: JobStatus) -> None:
+    def set_job_status(self, status: Status) -> None:
         """
         Sets the status of the job in teh results
         :param status: the job status
@@ -53,18 +46,18 @@ class JobResult:
         """
         self[JobResult.STATUS] = status
 
-    def get_job_status(self) -> JobStatus:
+    def get_job_status(self) -> Status:
         """
         Gets the job status from results
         :return: the job status
         """
         if JobResult.STATUS in self:
             return self[JobResult.STATUS]
-        return JobStatus.UNKNOWN
+        return Status.UNKNOWN
 
     def update(self, other_result: Union["JobResult", Dict]) -> "JobResult":
         """
-        Merges both results into current result (replacing current value with value from other_result for overlapping keys)
+        Merges both results into current result (replacing current value with value from other_result for overlapping data_keys)
         :param other_result: the other result
         :return: None
         """
@@ -79,7 +72,7 @@ class JobResult:
         :return: the output as json
         """
         obj = {key: self.__result[key] for key in keys if key in self.__result} if keys else self.__result
-        return json.dumps(obj, indent=4, cls=NpEncoder)
+        return JSONUtil.dict_to_json(obj)
 
     def as_dict(self) -> dict:
         """
@@ -101,8 +94,8 @@ class JobResult:
     def get_properties(response_keys: Union[str, list]) -> Dict:
         """
         Gets properties used to generate response documentation
-        :param response_keys: either a single response key or a list of response keys to get properties for
-        :return a dictionary of the response keys mapped to appropriate schema
+        :param response_keys: either a single response key or a list of response data_keys to get properties for
+        :return a dictionary of the response data_keys mapped to appropriate schema
         """
         if not isinstance(response_keys, list):
             response_keys = [response_keys]
@@ -187,9 +180,9 @@ class JobResult:
         """
         return self.__result == other.__result
 
-    def __repr__(self) -> dict:
+    def __repr__(self) -> str:
         """
-        Returns the results dictionary as a representation of the class
-        :return: the results dict
+        Returns a representation of the class as a string
+        :return: the results dict as a string
         """
-        return self.__result
+        return repr(self.__result)

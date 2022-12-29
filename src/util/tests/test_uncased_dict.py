@@ -1,4 +1,5 @@
-from test.base_test import BaseTest
+from testres.base_test import BaseTest
+
 from util.uncased_dict import UncasedDict
 
 

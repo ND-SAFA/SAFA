@@ -1,5 +1,5 @@
-from test.base_test import BaseTest
 from data.processing.cleaning.filter_min_length_step import FilterMinLengthStep
+from testres.base_test import BaseTest
 
 
 class TestFilterMinLengthStep(BaseTest):

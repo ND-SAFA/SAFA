@@ -1,4 +1,4 @@
-from test.base_test import BaseTest
+from testres.base_test import BaseTest
 from data.processing.cleaning.separate_joined_words_step import SeparateJoinedWordsStep
 
 

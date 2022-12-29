@@ -1,7 +1,9 @@
 from typing import Callable, Dict
 
+from util.base_object import BaseObject
 
-class Artifact:
+
+class Artifact(BaseObject):
     """
     Data structure representing artifact in project.
     """

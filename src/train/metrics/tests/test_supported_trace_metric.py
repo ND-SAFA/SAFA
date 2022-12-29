@@ -1,7 +1,7 @@
 import mock
 from mock import patch
 
-from test.base_test import BaseTest
+from testres.base_test import BaseTest
 from train.metrics.supported_trace_metric import get_metric_path
 
 
@@ -9,7 +9,7 @@ class TestSupportedTraceMetric(BaseTest):
     TEST_LIST_METRICS = ["accuracy"]
 
     def test_get_metric_path(self):
-        path = get_metric_path("MAP_AT_K")
+        path = get_metric_path("MAP")
         self.assertIn("metrics/map_metric.py", path)
 
     @patch("datasets.list_metrics")

@@ -1,5 +1,5 @@
-from test.base_test import BaseTest
 from data.processing.cleaning.remove_unwanted_chars_step import RemoveUnwantedCharsStep
+from testres.base_test import BaseTest
 
 
 class TestRemoveUnwantedCharStep(BaseTest):

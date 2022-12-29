@@ -1,6 +1,6 @@
 import math
 
-from test.base_test import BaseTest
+from testres.base_test import BaseTest
 from data.processing.augmentation.simple_word_replacement_step import SimpleWordReplacementStep, \
     WordRepresentation
 from nltk.corpus import wordnet as wn

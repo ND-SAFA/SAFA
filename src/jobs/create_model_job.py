@@ -9,9 +9,8 @@ class CreateModelJob(AbstractJob):
         Creates a new model
         :return: the model path
         """
-        model_generator = self.get_model_generator()
-        model = model_generator.get_model()
-        model.save_pretrained(self.output_dir)
-        tokenizer = model_generator.get_tokenizer()
-        tokenizer.save_pretrained(self.output_dir)
-        return JobResult.from_dict({JobResult.MODEL_PATH: self.output_dir})
+        model = self.model_manager.get_model()
+        model.save_pretrained(self.model_manager.model_output_path)
+        tokenizer = self.model_manager.get_tokenizer()
+        tokenizer.save_pretrained(self.model_manager.model_output_path)
+        return JobResult.from_dict({JobResult.MODEL_PATH: self.model_manager.model_output_path})

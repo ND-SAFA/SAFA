@@ -11,7 +11,7 @@ class AbstractDataAugmentationStep(AbstractDataProcessingStep, ABC):
     COMMON_ID = str(uuid.uuid4())[:8]
     AUGMENTATION_RESULT = Iterable[Tuple[Tuple[str], int]]
 
-    def __init__(self, percent_to_weight: float, order: ProcessingOrder = ProcessingOrder.ANY):
+    def __init__(self, percent_to_weight: float = 1, order: ProcessingOrder = ProcessingOrder.ANY):
         """
         :param percent_to_weight: the percentage of the data that the augmentation step will augment
         :param order: the order the step should be run in
@@ -27,12 +27,14 @@ class AbstractDataAugmentationStep(AbstractDataProcessingStep, ABC):
         :param n_needed: the number of new data entries needed
         :return: list of containing the augmented data and the orig indices for the entry
         """
+        if n_needed == -1:
+            n_needed = len(data_entries)
         n_orig = len(data_entries)
         n_sample = self._get_number_to_sample(n_orig, 0, n_needed)
         augmented_data_entries = []
         index_references = []
         while n_sample > 0:
-            for i in random.sample([i for i in range(n_orig)], k=n_sample):
+            for i in random.sample([i for i in range(n_orig)], k=n_sample):  # without replacement
                 augmented_data = self._augment(data_entries[i])
                 self._add_augmented_data(augmented_data, i, augmented_data_entries, index_references)
             n_sample = self._get_number_to_sample(n_orig, len(augmented_data_entries), n_needed)

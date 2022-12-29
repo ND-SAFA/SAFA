@@ -1,3 +1,5 @@
+from typing import Dict, Any
+
 from data.datasets.dataset_role import DatasetRole
 from jobs.abstract_trace_job import AbstractTraceJob
 from jobs.components.job_result import JobResult
@@ -12,7 +14,8 @@ class TrainJob(AbstractTraceJob):
         """
         trainer = self.get_trainer(**kwargs)
         training_output = trainer.perform_training()
-        trainer.save_model(self.output_dir)
-        val_metrics = trainer.perform_prediction(DatasetRole.VAL)
-        training_output[JobResult.VAL_METRICS] = val_metrics[JobResult.METRICS]
+        trainer.save_model(self.model_manager.model_output_path)
+        if DatasetRole.EVAL in self.trainer_dataset_manager:
+            val_metrics = trainer.perform_prediction()
+            training_output[JobResult.METRICS].update(val_metrics[JobResult.METRICS])
         return JobResult.from_dict(training_output)

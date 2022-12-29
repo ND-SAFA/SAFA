@@ -1,11 +1,13 @@
-from jobs.create_model_job import CreateModelJob
 from jobs.components.job_args import JobArgs
 from jobs.components.job_result import JobResult
+from jobs.create_model_job import CreateModelJob
 from jobs.tests.base_job_test import BaseJobTest
+from models.model_manager import ModelManager
+from testres.paths.paths import TEST_OUTPUT_DIR
+from util.object_creator import ObjectCreator
 
 
 class TestCreateModelJob(BaseJobTest):
-    TEST_PARAMS = BaseJobTest.get_test_params()
 
     def test_run_success(self):
         self._test_run_success()
@@ -14,9 +16,10 @@ class TestCreateModelJob(BaseJobTest):
         self._test_run_failure()
 
     def _get_job(self):
-        job_args = JobArgs(**self.TEST_PARAMS)
-        return CreateModelJob(job_args)
+        job_args = ObjectCreator.create(JobArgs)
+        model_manager: ModelManager = ObjectCreator.create(ModelManager)
+        return CreateModelJob(job_args=job_args, model_manager=model_manager)
 
     def _assert_success(self, output_dict: dict):
         self.assertIn(JobResult.MODEL_PATH, output_dict)
-        self.assertEqual(output_dict[JobResult.MODEL_PATH], self.TEST_PARAMS["output_dir"])
+        self.assertEqual(output_dict[JobResult.MODEL_PATH], TEST_OUTPUT_DIR)

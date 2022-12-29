@@ -1,0 +1,52 @@
+{
+  "steps": [
+    {
+      "jobs": [
+        {
+          "object_type": "TRAIN",
+          "job_args": {
+            "random_seed": {
+              "*": [
+                42,
+                165,
+                315,
+                249
+              ]
+            }
+          },
+          "model_manager": {
+            "model_path": "bert-base-uncased"
+          },
+          "trainer_args": {
+            "output_dir": "~/Projects/SAFA/tgen/test/output",
+            "num_train_epochs": {
+              "*": [
+                5,
+                10,
+                15,
+                20,
+                25,
+                30,
+                35,
+                40,
+                45,
+                50
+              ]
+            }
+          },
+          "trainer_dataset_manager": {
+            "train_dataset_creator": {
+              "object_type": "STRUCTURE",
+              "project_path": "~/Projects/SAFA/tgen/src/test/data/structure"
+            },
+            "val_dataset_creator": {
+              "object_type": "SPLIT",
+              "val_percentage": 0.2
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "output_dir": "~/Projects/SAFA/tgen/test/output"
+}

@@ -5,35 +5,39 @@ import mock
 from torch.utils.data.distributed import DistributedSampler
 from torch.utils.data.sampler import RandomSampler
 
-from jobs.predict_job import PredictJob
-from test.base_trace_test import BaseTraceTest
-from test.paths.paths import TEST_OUTPUT_DIR
 from data.datasets.dataset_role import DatasetRole
-from models.base_models.supported_base_model import SupportedBaseModel
-from models.model_generator import ModelGenerator
-from train.trace_args import TraceArgs
+from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
+from jobs.predict_job import PredictJob
+from models.model_manager import ModelManager
+from testres.base_trace_test import BaseTraceTest
+from testres.test_assertions import TestAssertions
+from testres.test_data_manager import TestDataManager
 from train.trace_trainer import TraceTrainer
+from train.trainer_args import TrainerArgs
+from util.object_creator import ObjectCreator
+from variables.typed_definition_variable import TypedDefinitionVariable
 
 
 class TestTraceTrainer(BaseTraceTest):
     VALIDATION_PERCENTAGE = 0.3
     EXPECTED_VALIDATION_SIZE = 3
-    EXPECTED_PREDICTION_SIZE = len(BaseTraceTest.TARGET_LAYERS) * len(BaseTraceTest.SOURCE_LAYERS)
-    TEST_METRIC_NAMES = ["accuracy", "map_at_k"]
+    TARGET_LAYERS = TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS, TestDataManager.Keys.TARGET])
+    SOURCE_LAYERS = TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS, TestDataManager.Keys.SOURCE])
+
+    EXPECTED_PREDICTION_SIZE = len(TARGET_LAYERS) * len(SOURCE_LAYERS)
+    TEST_METRIC_NAMES = ["accuracy", "map"]
 
     def test_perform_training(self):
         test_trace_trainer = self.get_test_trace_trainer(metrics=self.TEST_METRIC_NAMES)
-        test_trace_trainer.model_generator.get_tokenizer().padding = True
+        test_trace_trainer.model_manager.get_tokenizer().padding = True
         output = test_trace_trainer.perform_training()
         self.assertIn("training_loss", output)
 
-    @patch.object(TraceTrainer, "_eval")
-    def test_perform_prediction(self, eval_mock: mock.MagicMock):
-        test_trace_trainer = self.get_test_trace_trainer()
+    def test_perform_prediction(self):
+        test_trace_trainer = self.get_test_trace_trainer(metrics=self.TEST_METRIC_NAMES)
         output = test_trace_trainer.perform_prediction()
         output = PredictJob._result_from_prediction_output(output)
-        self.assert_prediction_output_matches_expected(output.as_dict())
-        self.assertFalse(eval_mock.called)
+        TestAssertions.assert_prediction_output_matches_expected(self, output.as_dict())
 
     def test_perform_prediction_with_metrics(self):
         test_trace_trainer = self.get_test_trace_trainer(metrics=self.TEST_METRIC_NAMES)
@@ -42,14 +46,14 @@ class TestTraceTrainer(BaseTraceTest):
             self.assertIn(metric, output["metrics"])
 
     def test_output_to_dict(self):
-        output_dict = TraceTrainer.output_to_dict(self.EXAMPLE_PREDICTION_OUTPUT)
+        output_dict = TraceTrainer.output_to_dict(TestDataManager.EXAMPLE_PREDICTION_OUTPUT)
         self.assertIsInstance(output_dict, dict)
         self.assertIn("predictions", output_dict)
         self.assertIn("label_ids", output_dict)
         self.assertIn("metrics", output_dict)
 
     def test_eval(self):
-        output = deepcopy(self.EXAMPLE_PREDICTION_OUTPUT)
+        output = deepcopy(TestDataManager.EXAMPLE_PREDICTION_OUTPUT)
         result = TraceTrainer._eval(output.predictions, output.label_ids, output.metrics, self.TEST_METRIC_NAMES)
         for metric in self.TEST_METRIC_NAMES:
             self.assertIn(metric, result)
@@ -62,14 +66,14 @@ class TestTraceTrainer(BaseTraceTest):
         get_rank_mock.return_value = 3
         test_trace_trainer = self.get_test_trace_trainer()
         self.set_train_dataset(test_trace_trainer)
-        test_trace_trainer.args.local_rank = 2
+        test_trace_trainer.trainer_args.local_rank = 2
         data_loader = test_trace_trainer.get_train_dataloader()
         self.assertIsInstance(data_loader.sampler, DistributedSampler)
 
     def test_get_train_dataloader_local_rank_neg_one(self):
         test_trace_trainer = self.get_test_trace_trainer()
         self.set_train_dataset(test_trace_trainer)
-        test_trace_trainer.args.local_rank = -1
+        test_trace_trainer.trainer_args.local_rank = -1
         data_loader = test_trace_trainer.get_train_dataloader()
         self.assertIsInstance(data_loader.sampler, RandomSampler)
 
@@ -77,17 +81,26 @@ class TestTraceTrainer(BaseTraceTest):
         train_dataset = self.get_dataset_container()[DatasetRole.TRAIN]
         test_trace_trainer.train_dataset = train_dataset
 
-    def get_dataset_container(self):
-        train_dataset_map = self.create_dataset(DatasetRole.TRAIN, include_links=True)
-        eval_dataset_map = self.create_dataset(DatasetRole.EVAL, include_links=False)
-        return self.create_trainer_dataset_container({**train_dataset_map, **eval_dataset_map},
-                                                     split_train_dataset=True)
-
     def get_test_trace_trainer(self, **kwargs):
-        trainer_dataset_container = self.get_dataset_container()
-        model_generator = ModelGenerator("path")
-        model_generator.get_model = mock.MagicMock(return_value=self.get_test_model())
-        model_generator.get_tokenizer = mock.MagicMock(return_value=self.get_test_tokenizer())
+        trainer_dataset_manager = self.get_dataset_container()
+        model_manager = ObjectCreator.create(ModelManager)
+        model_manager.get_model = mock.MagicMock(return_value=self.get_test_model())
+        model_manager.get_tokenizer = mock.MagicMock(return_value=self.get_test_tokenizer())
+        trainer_args = ObjectCreator.create(TrainerArgs, **kwargs)
         return TraceTrainer(
-            TraceArgs(output_dir=TEST_OUTPUT_DIR, trainer_dataset_container=trainer_dataset_container, **kwargs),
-            model_generator)
+            trainer_args=trainer_args,
+            trainer_dataset_manager=trainer_dataset_manager,
+            model_manager=model_manager)
+
+    @staticmethod
+    def get_dataset_container():
+        return ObjectCreator.create(TrainerDatasetManager, **{
+            "eval_dataset_creator": {
+                TypedDefinitionVariable.OBJECT_TYPE_KEY: "CLASSIC_TRACE",
+                **ObjectCreator.dataset_creator_definition
+            },
+            "val_dataset_creator": {
+                TypedDefinitionVariable.OBJECT_TYPE_KEY: "SPLIT",
+                "val_percentage": .3
+            }
+        })

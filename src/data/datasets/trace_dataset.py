@@ -8,33 +8,36 @@ import pandas as pd
 
 from data.datasets.abstract_dataset import AbstractDataset
 from data.datasets.data_key import DataKey
-from data.formats.csv_format import CSVFormat
+from data.datasets.keys.csv_format import CSVKeys
 from data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
 from data.processing.augmentation.data_augmenter import DataAugmenter
 from data.processing.augmentation.source_target_swap_step import SourceTargetSwapStep
 from data.tree.artifact import Artifact
 from data.tree.trace_link import TraceLink
-from models.model_generator import ModelGenerator
+from models.model_manager import ModelManager
 from models.model_properties import ModelArchitectureType
 
 
 class TraceDataset(AbstractDataset):
 
-    def __init__(self, links: Dict[int, TraceLink], pos_link_ids: List[int] = None, neg_link_ids: List[int] = None):
+    def __init__(self, links: Dict[int, TraceLink]):
         """
         Represents the config format for all data used by the huggingface trainer.
         :param links: The candidate links.
-        :param pos_link_ids: The set of trace link ids representing positive links.
-        :param neg_link_ids: The set of trace link ids representing negative links.
         """
         self.links = OrderedDict(links)
-        self.pos_link_ids = pos_link_ids if pos_link_ids else list()
-        self.neg_link_ids = neg_link_ids if neg_link_ids else list()
+        self.pos_link_ids = []
+        self.neg_link_ids = []
+        for link in links.values():
+            if link.is_true_link:
+                self.pos_link_ids.append(link.id)
+            else:
+                self.neg_link_ids.append(link.id)
 
         self._shuffle_link_ids(self.pos_link_ids)
         self._shuffle_link_ids(self.neg_link_ids)
 
-    def to_trainer_dataset(self, model_generator: ModelGenerator) -> List[Dict]:
+    def to_trainer_dataset(self, model_generator: ModelManager) -> List[Dict]:
         """
         Converts trace links in data to feature entries used by Huggingface (HF) trainer.
         :param model_generator: The model generator determining architecture and feature function for trace links.
@@ -57,8 +60,8 @@ class TraceDataset(AbstractDataset):
                                          int(link.is_true_link)]
         data = [link_ids_to_rows[link_id] for link_id in self.pos_link_ids + self.neg_link_ids]
         return pd.DataFrame(data,
-                            columns=[CSVFormat.SOURCE_ID, CSVFormat.SOURCE, CSVFormat.TARGET_ID, CSVFormat.TARGET,
-                                     CSVFormat.LABEL])
+                            columns=[CSVKeys.SOURCE_ID, CSVKeys.SOURCE, CSVKeys.TARGET_ID, CSVKeys.TARGET,
+                                     CSVKeys.LABEL])
 
     def add_link(self, source_id: str, target_id: str, source_tokens: str, target_tokens: str,
                  is_true_link: bool) -> int:
@@ -81,13 +84,12 @@ class TraceDataset(AbstractDataset):
             self.neg_link_ids.append(new_link.id)
         return new_link.id
 
-    def augment_pos_links(self, augmentation_steps: List[AbstractDataAugmentationStep]) -> None:
+    def augment_pos_links(self, augmenter: DataAugmenter) -> None:
         """
         Augments the positive links to balance the data using the given augmentation steps
-        :param augmentation_steps: the augmentation steps to run
+        :param augmenter: the augmentation to use for augmentation
         :return: None
         """
-        augmenter = DataAugmenter(augmentation_steps)
         augmentation_runs = [lambda data: augmenter.run(data, n_total_expected=2 * len(data),
                                                         exclude_all_but_step_type=SourceTargetSwapStep),
                              lambda data: augmenter.run(data, n_total_expected=len(self.neg_link_ids),
@@ -124,18 +126,16 @@ class TraceDataset(AbstractDataset):
         percent_splits = [1 - sum(percent_splits)] + percent_splits
         return self._split_multiple_helper(percent_splits, splits=[self])
 
-    def prepare_for_training(self, augmentation_steps: List[AbstractDataAugmentationStep] = None) -> None:
+    def prepare_for_training(self, augmenter: DataAugmenter = None) -> None:
         """
         Resamples positive links and resizes negative links to create 50-50 ratio.
-        :param augmentation_steps: steps to run to augment the training data
+        :param augmenter: the augmenter to use for augmentation
         :return: Prepared trace data
         """
         if len(self.pos_link_ids) > 0:
-            if augmentation_steps:
-                self.augment_pos_links(augmentation_steps)
+            if augmenter:
+                self.augment_pos_links(augmenter)
             self.resize_neg_links(len(self.pos_link_ids), include_duplicates=True)
-            print("# Pos:", len(self.pos_link_ids))
-            print("# Neg:", len(self.neg_link_ids))
 
     def prepare_for_testing(self) -> None:
         """
@@ -166,7 +166,7 @@ class TraceDataset(AbstractDataset):
         """
         Saves the dataset to the output dir
         :param output_dir: directory to save to
-        :param filename: name of tthe file (no ext)
+        :param filename: name of the file (no ext)
         :return: location the file was saved to
         """
         output_path = os.path.join(output_dir, filename + ".csv")
@@ -270,7 +270,7 @@ class TraceDataset(AbstractDataset):
         slice_links = {
             link_id: self.links[link_id] for link_id in slice_pos_link_ids + slice_neg_link_ids
         }
-        return TraceDataset(slice_links, slice_pos_link_ids, slice_neg_link_ids)
+        return TraceDataset(slice_links)
 
     def _get_feature_entry(self, link: TraceLink, arch_type: ModelArchitectureType, feature_func: Callable) \
             -> Dict[str, any]:
@@ -333,12 +333,19 @@ class TraceDataset(AbstractDataset):
         """
         return len(data) - round(len(data) * percent_split)
 
-    def __len__(self):
+    def __len__(self) -> int:
+        """
+        Returns the length of the dataset
+        :return: the length of the dataset
+        """
         return len(self.pos_link_ids) + len(self.neg_link_ids)
 
-    def __add__(self, other: "TraceDataset"):
+    def __add__(self, other: "TraceDataset") -> "TraceDataset":
+        """
+        Combines two datasets
+        :param other: the other dataset
+        :return: the combined dataset
+        """
         combined_links = deepcopy(self.links)
         combined_links.update(other.links)
-        combined_pos_link_ids = set(self.pos_link_ids).union(set(other.pos_link_ids))
-        combined_neg_link_ids = set(self.neg_link_ids).union(set(other.neg_link_ids))
-        return TraceDataset(combined_links, list(combined_pos_link_ids), list(combined_neg_link_ids))
+        return TraceDataset(combined_links)

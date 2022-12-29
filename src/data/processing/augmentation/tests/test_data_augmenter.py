@@ -1,8 +1,9 @@
-from test.base_test import BaseTest
 from data.processing.augmentation.data_augmenter import DataAugmenter
 from data.processing.augmentation.resample_step import ResampleStep
 from data.processing.augmentation.simple_word_replacement_step import SimpleWordReplacementStep
 from data.processing.augmentation.source_target_swap_step import SourceTargetSwapStep
+from testres.base_test import BaseTest
+from testres.test_assertions import TestAssertions
 
 
 class TestDataAugmenter(BaseTest):
@@ -22,17 +23,19 @@ class TestDataAugmenter(BaseTest):
     def test_get_steps_to_run(self):
         augmenter = self.get_data_augmenter()
         steps2run = augmenter._get_steps_to_run(exclude_all_but_step_type=SourceTargetSwapStep)
-        self.assert_lists_have_the_same_vals(self.get_aug_ids(steps2run), [self.STEPS[0].get_id()])
+        TestAssertions.assert_lists_have_the_same_vals(self, self.get_aug_ids(steps2run), [self.STEPS[0].get_id()])
 
         steps2run = augmenter._get_steps_to_run(include_all_but_step_type=SourceTargetSwapStep)
-        self.assert_lists_have_the_same_vals(self.get_aug_ids(steps2run), self.get_aug_ids(self.STEPS[1:]))
+        TestAssertions.assert_lists_have_the_same_vals(self, self.get_aug_ids(steps2run),
+                                                       self.get_aug_ids(self.STEPS[1:]))
 
         steps2run = augmenter._get_steps_to_run()
-        self.assert_lists_have_the_same_vals(self.get_aug_ids(steps2run), self.get_aug_ids(self.STEPS))
+        TestAssertions.assert_lists_have_the_same_vals(self, self.get_aug_ids(steps2run), self.get_aug_ids(self.STEPS))
 
     def test_filter_step_type(self):
         filtered_steps = DataAugmenter._filter_step_type(steps=self.STEPS, step_type=SourceTargetSwapStep)
-        self.assert_lists_have_the_same_vals(self.get_aug_ids(filtered_steps), self.get_aug_ids(self.STEPS[1:]))
+        TestAssertions.assert_lists_have_the_same_vals(self, self.get_aug_ids(filtered_steps),
+                                                       self.get_aug_ids(self.STEPS[1:]))
 
     def test_get_step_type(self):
         step_of_type = DataAugmenter._get_step_of_type(steps=self.STEPS, step_type=SourceTargetSwapStep)

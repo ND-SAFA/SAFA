@@ -29,7 +29,7 @@ class BaseScript:
         self.serializer = serializer
         self.job = job
         self.application = get_wsgi_application()
-        print("# of gpus: ", tf.config.list_physical_devices('GPU'))
+        print("GPUS : ", tf.config.list_physical_devices('GPU'))
 
     def run(self, data: Dict, path_vars=None):
         """
@@ -46,7 +46,7 @@ class BaseScript:
         job_factory: JobFactory = serializer.save()
         job = job_factory.build(self.job)
         job.run()
-        print(job.result.to_json([JobResult.VAL_METRICS, JobResult.METRICS]))
+        print(job.result.dict_to_json([JobResult.METRICS]))
 
     @staticmethod
     def assert_path_vars_exists(args: Dict, path_vars: List[str]):

@@ -1,10 +1,8 @@
-from typing import Dict, List, OrderedDict, Tuple
+from typing import Dict, OrderedDict
 
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from data.creators.abstract_dataset_creator import AbstractDatasetCreator
-from data.datasets.trainer_datasets_container import TrainerDatasetsContainer
 from data.processing.cleaning.separate_joined_words_step import SeparateJoinedWordsStep
 
 
@@ -12,23 +10,6 @@ class SerializerUtility:
     """
     Helper class for generalizing serializer logic and job factory construction.
     """
-
-    @staticmethod
-    def serialize_trainer_dataset_container(kwargs: Dict, dataset_params: List[Tuple[str, str]],
-                                            export_param: str = "trainer_dataset_container", **addition_kwargs):
-        """
-        Reads dataset from kwargs and wraps it in a trainer dataset container.
-        :param kwargs: The kwargs to extract dataset from.
-        :param dataset_params: List of parameter conversions from validated data to trainer dataset container.
-        :param export_param: The name of the parameter to export trainer dataset container to in kwargs.
-        :return: None
-        """
-        container_kwargs = {}
-        for dataset_param, container_param in dataset_params:
-            dataset_creator: AbstractDatasetCreator = kwargs.pop(dataset_param)
-            container_kwargs[container_param] = dataset_creator
-        trainer_datasets_container = TrainerDatasetsContainer(**container_kwargs, **addition_kwargs)
-        kwargs[export_param] = trainer_datasets_container
 
     @staticmethod
     def update_error():
@@ -61,7 +42,7 @@ class SerializerUtility:
         """
         kwargs = {}
         for field in fields.values():
-            field_name = field.source
+            field_name = field.source_body
             if field_name not in validated_data:
                 continue
             is_serializer = isinstance(field, serializers.Serializer)

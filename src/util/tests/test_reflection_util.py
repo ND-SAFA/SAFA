@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import Dict
 
-from test.base_test import BaseTest
+from testres.base_test import BaseTest
 from util.reflection_util import ParamScope, ReflectionUtil
 
 

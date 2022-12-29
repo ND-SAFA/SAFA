@@ -12,28 +12,33 @@ from transformers.trainer_pt_utils import get_tpu_sampler, is_torch_tpu_availabl
 
 from config.override import overrides
 from data.datasets.dataset_role import DatasetRole
-from models.model_generator import ModelGenerator
+from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
+from models.model_manager import ModelManager
 from train.metrics.supported_trace_metric import get_metric_name, get_metric_path
-from train.trace_args import TraceArgs
+from train.trainer_args import TrainerArgs
+from util.base_object import BaseObject
 
 
-class TraceTrainer(Trainer):
+class TraceTrainer(Trainer, BaseObject):
     """
     Responsible for using given model for training and prediction using given data.
     """
 
-    def __init__(self, args: TraceArgs, model_generator: ModelGenerator, **kwargs):
+    def __init__(self, trainer_args: TrainerArgs, model_manager: ModelManager,
+                 trainer_dataset_manager: TrainerDatasetManager,
+                 **kwargs):
         """
         Handles the training and evaluation of learning models
         :param args: the learning model arguments
         """
-        self.args = args
-        self.dataset_container = args.trainer_dataset_container
-        self.model_generator = model_generator
-        self.model_generator.set_max_seq_length(self.args.max_seq_length)
-        model = self.model_generator.get_model()
-        tokenizer = self.model_generator.get_tokenizer()
-        super().__init__(model=model, args=args, tokenizer=tokenizer, callbacks=args.callbacks, **kwargs)
+        self.trainer_args = trainer_args
+        self.trainer_dataset_manager = trainer_dataset_manager
+        self.model_manager = model_manager
+        self.model_manager.set_max_seq_length(self.trainer_args.max_seq_length)
+        model = self.model_manager.get_model()
+        tokenizer = self.model_manager.get_tokenizer()
+        super().__init__(model=model, args=trainer_args, tokenizer=tokenizer, callbacks=trainer_args.callbacks,
+                         **kwargs)
 
     def perform_training(self, checkpoint: str = None) -> Dict:
         """
@@ -41,25 +46,25 @@ class TraceTrainer(Trainer):
         :param checkpoint: path to checkpoint.
         :return: a dictionary containing the results
         """
-        self.train_dataset = self.dataset_container[DatasetRole.TRAIN].to_trainer_dataset(self.model_generator)
-        if DatasetRole.VAL in self.dataset_container:
-            self.eval_dataset = self.dataset_container[DatasetRole.VAL].to_trainer_dataset(self.model_generator)
+        self.train_dataset = self.trainer_dataset_manager[DatasetRole.TRAIN].to_trainer_dataset(self.model_manager)
+        if DatasetRole.VAL in self.trainer_dataset_manager:
+            self.eval_dataset = self.trainer_dataset_manager[DatasetRole.VAL].to_trainer_dataset(self.model_manager)
         output = self.train(resume_from_checkpoint=checkpoint)
         return TraceTrainer.output_to_dict(output)
 
-    def perform_prediction(self, eval_dataset_role: DatasetRole = DatasetRole.EVAL) -> Dict:
+    def perform_prediction(self, dataset_role: DatasetRole = DatasetRole.EVAL) -> Dict:
         """
         Performs the prediction and (optionally) evaluation for the model
         :return: A dictionary containing the results.
         """
-        self.eval_dataset = self.dataset_container[eval_dataset_role].to_trainer_dataset(self.model_generator)
+        self.eval_dataset = self.trainer_dataset_manager[dataset_role].to_trainer_dataset(self.model_manager)
         output = self.predict(self.eval_dataset)
         predictions = TraceTrainer.get_similarity_scores(output.predictions)
         results = self._eval(predictions, output.label_ids, output.metrics,
-                             self.args.metrics) if self.args.metrics else None
+                             self.trainer_args.metrics) if self.trainer_args.metrics else None
         output_dict = TraceTrainer.output_to_dict(output, metrics=results, predictions=predictions,
-                                                  source_target_pairs=self.dataset_container[
-                                                      eval_dataset_role].get_source_target_pairs())
+                                                  source_target_pairs=self.trainer_dataset_manager[
+                                                      DatasetRole.EVAL].get_source_target_pairs())
         return output_dict
 
     @staticmethod
@@ -76,7 +81,7 @@ class TraceTrainer(Trainer):
         return {**base_output, **additional_attrs}
 
     @staticmethod
-    def _eval(preds: List[float], label_ids: np.ndarray, output_metrics: Dict,
+    def _eval(preds: Union[np.ndarray, Tuple[np.ndarray]], label_ids: np.ndarray, output_metrics: Dict,
               metric_names: List) -> Dict:
         """
         Performs the evaluation of the model (use this instead of Trainer.evaluation to utilize predefined metrics from models)
@@ -89,8 +94,6 @@ class TraceTrainer(Trainer):
         for metric_path in metric_paths:
             metric = load_metric(metric_path, keep_in_memory=True)
             metric_result = metric.compute(predictions=preds, references=label_ids)
-            if isinstance(metric_result, float):
-                metric_result = round(metric_result, 2)
             metric_name = get_metric_name(metric)
             if isinstance(metric_result, dict) and metric_name in metric_result:
                 results.update(metric_result)
@@ -118,19 +121,19 @@ class TraceTrainer(Trainer):
         :return: the DataLoader
         """
         if is_torch_tpu_available():
-            train_sampler = get_tpu_sampler(self.train_dataset, self.args.train_batch_size)
+            train_sampler = get_tpu_sampler(self.train_dataset, self.trainer_args.train_batch_size)
         else:
             train_sampler = (
                 RandomSampler(self.train_dataset)
-                if self.args.local_rank == -1
+                if self.trainer_args.local_rank == -1
                 else DistributedSampler(self.train_dataset)
             )
 
         data_loader = DataLoader(
             self.train_dataset,
-            batch_size=self.args.train_batch_size,
+            batch_size=self.trainer_args.train_batch_size,
             sampler=train_sampler,
             collate_fn=self.data_collator,
-            drop_last=self.args.dataloader_drop_last,
+            drop_last=self.trainer_args.dataloader_drop_last,
         )
         return data_loader

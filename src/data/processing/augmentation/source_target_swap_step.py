@@ -5,11 +5,11 @@ from data.processing.augmentation.abstract_data_augmentation_step import Abstrac
 
 class SourceTargetSwapStep(AbstractDataAugmentationStep):
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         """
         Handles swapping the source and target pairs to augment the data
         """
-        super().__init__(percent_to_weight=1)
+        super().__init__(**kwargs)
 
     def _augment(self, data_entry: Tuple[str, str]) -> Tuple[str]:
         """

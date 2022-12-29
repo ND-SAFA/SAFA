@@ -1,22 +1,26 @@
 import os
-from typing import Dict
 from unittest import mock
 from unittest.mock import patch
 
-from config.override import overrides
-from jobs.components.job_args import JobArgs
-from jobs.train_job import TrainJob
-from jobs.tests.base_job_test import BaseJobTest
-from test.paths.paths import TEST_DATA_DIR
-from data.datasets.abstract_dataset import AbstractDataset
-from data.creators.supported_dataset_creator import SupportedDatasetCreator
+from config.constants import VALIDATION_PERCENTAGE_DEFAULT
 from data.datasets.dataset_role import DatasetRole
+from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
+from jobs.components.job_args import JobArgs
+from jobs.tests.base_job_test import BaseJobTest
+from jobs.train_job import TrainJob
+from models.model_manager import ModelManager
+from testres.paths.paths import TEST_DATA_DIR
+from testres.test_assertions import TestAssertions
 from train.trace_trainer import TraceTrainer
+from train.trainer_args import TrainerArgs
+from util.object_creator import ObjectCreator
+from variables.typed_definition_variable import TypedDefinitionVariable
 
 
 class TestTrainJob(BaseJobTest):
     CSV_DATA_DIR = os.path.join(TEST_DATA_DIR, "csv")
     CSV_DATA_FILE = os.path.join(CSV_DATA_DIR, "test_csv_data.csv")
+    EXPECTED_SPLIT_ROLE: DatasetRole = DatasetRole.EVAL
 
     @patch.object(TraceTrainer, "save_model")
     def test_run_success(self, save_model_mock: mock.MagicMock):
@@ -27,24 +31,25 @@ class TestTrainJob(BaseJobTest):
 
     def test_split_train_dataset(self):
         job = self._get_job()
-        self.assertTrue(job.trace_args.trainer_dataset_container[DatasetRole.EVAL] is not None)
-
-    @staticmethod
-    @overrides(BaseJobTest)
-    def create_dataset(dataset_role: DatasetRole, include_links=True, include_pre_processing: bool = False) -> Dict[
-        DatasetRole, AbstractDataset]:
-        train_dataset = BaseJobTest.create_dataset(DatasetRole.TRAIN, include_links=include_links,
-                                                   include_pre_processing=include_pre_processing)
-        test_dataset = SupportedDatasetCreator.CSV.value(data_file_path=TestTrainJob.CSV_DATA_FILE)
-        return {**train_dataset, DatasetRole.EVAL: test_dataset}
+        self.assertTrue(job.trainer_dataset_manager[self.EXPECTED_SPLIT_ROLE] is not None)
 
     def _assert_success(self, output_dict: dict):
-        self.assert_training_output_matches_expected(output_dict)
+        TestAssertions.assert_training_output_matches_expected(self, output_dict)
 
     def _get_job(self) -> TrainJob:
-        test_params = self.get_test_params_for_trace(dataset_role=DatasetRole.TRAIN, include_links=True,
-                                                     split_train_dataset=True)
-        job_args = JobArgs(**test_params)
-        job = TrainJob(job_args)
-        self.assertEquals(job.trace_args.num_train_epochs, 1)
+        job_args: JobArgs = ObjectCreator.create(JobArgs)
+        trainer_args: TrainerArgs = ObjectCreator.create(TrainerArgs)
+        dataset_param = "_".join([self.EXPECTED_SPLIT_ROLE.value, "dataset", "creator"])
+        trainer_dataset_manager: TrainerDatasetManager = ObjectCreator.create(TrainerDatasetManager, **{
+            dataset_param: {
+                TypedDefinitionVariable.OBJECT_TYPE_KEY: "SPLIT",
+                "val_percentage": VALIDATION_PERCENTAGE_DEFAULT
+            }
+        })
+        model_manager: ModelManager = ObjectCreator.create(ModelManager)
+        job = TrainJob(job_args,
+                       trainer_dataset_manager=trainer_dataset_manager,
+                       trainer_args=trainer_args,
+                       model_manager=model_manager)
+        self.assertEquals(job.trainer_args.num_train_epochs, 1)
         return job

@@ -2,9 +2,10 @@ from collections.abc import Callable
 from typing import Dict
 
 from data.tree.artifact import Artifact
+from util.base_object import BaseObject
 
 
-class TraceLink:
+class TraceLink(BaseObject):
     """
     Data structure representing link between source and target artifact.
     """

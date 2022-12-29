@@ -1,8 +1,10 @@
-from typing import List, Dict, Tuple, Type
+from typing import Dict, List, Tuple, Type
 
 from config.override import overrides
 from data.processing.abstract_data_processor import AbstractDataProcessor
 from data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
+from data.processing.augmentation.supported_data_augmentation_step import SupportedAugmentationStep
+from util.base_object import BaseObject
 
 
 class DataAugmenter(AbstractDataProcessor):
@@ -80,3 +82,14 @@ class DataAugmenter(AbstractDataProcessor):
         :return: the n_expected for the given step
         """
         return round(step.percent_to_weight * n_total_expected)
+
+    @classmethod
+    @overrides(BaseObject)
+    def _get_child_enum_class(cls, abstract_class: Type, child_class_name: str) -> Type:
+        """
+        Returns the correct enum class mapping name to class given the abstract parent class type and name of child class
+        :param abstract_class: the abstract parent class type
+        :param child_class_name: the name of the child class
+        :return: the enum class mapping name to class
+        """
+        return SupportedAugmentationStep

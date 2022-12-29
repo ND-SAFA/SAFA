@@ -1,12 +1,40 @@
-from typing import Dict, Any
+from typing import Any, Dict
 
 
 class UncasedDict(dict):
-    def __init__(self, dict_: Dict = None):
+    def __init__(self, dict_: Dict[Any, Any] = None):
+        """
+        Represents a dictionary whose keys are uncased
+        :param dict_: the dictionary to represent
+        """
         super().__init__()
         if dict_:
-            for key, val in dict_.items():
-                self[key] = val
+            self.__initialize_as_dict(dict_)
+
+    def rename_property(self, prop: str, new_prop: str) -> Dict[str, Any]:
+        """
+        Renames the given property to a new name
+        :param prop: the original property name
+        :param new_prop: new property name
+        :return: the updated dictionary
+        """
+        converted_dict = self.copy()
+        for key, value in self.items():
+            if isinstance(value, UncasedDict):
+                value = value.rename_property(prop, new_prop)
+            if key == prop:
+                key = new_prop
+            converted_dict[key] = value
+        return converted_dict
+
+    def __initialize_as_dict(self, dict_: Dict[Any, Any]) -> None:
+        """
+        Moves the input dictionary into its own internal dictionary representation
+        :param dict_: input dictionary to set internal attributes
+        :return: None
+        """
+        for key, val in dict_.items():
+            self[key] = val
 
     @staticmethod
     def _process_key(key: str) -> str:
@@ -24,7 +52,7 @@ class UncasedDict(dict):
         :param value: the value to process
         :return: the processed value
         """
-        if isinstance(value, dict):
+        if isinstance(value, dict) and not isinstance(value, UncasedDict):
             processed_value = UncasedDict()
             for key, val in value.items():
                 processed_value[key] = val

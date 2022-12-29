@@ -47,9 +47,9 @@ class TraceTrainer(Trainer, BaseObject):
         :return: a dictionary containing the results
         """
         self.train_dataset = self.trainer_dataset_manager[DatasetRole.TRAIN].to_trainer_dataset(self.model_manager)
-        if DatasetRole.VAL in self.trainer_dataset_manager:
-            self.eval_dataset = self.trainer_dataset_manager[DatasetRole.VAL].to_trainer_dataset(self.model_manager)
         output = self.train(resume_from_checkpoint=checkpoint)
+        if DatasetRole.VAL in self.trainer_dataset_manager:
+            return self.perform_prediction(DatasetRole.VAL)
         return TraceTrainer.output_to_dict(output)
 
     def perform_prediction(self, dataset_role: DatasetRole = DatasetRole.EVAL) -> Dict:

@@ -10,6 +10,18 @@ ROOT_PATH = os.path.expanduser(os.environ["ROOT_PATH"])
 assert os.path.exists(ROOT_PATH), ROOT_PATH
 sys.path.append(ROOT_PATH)
 
+
+def expand_paths(value):
+    if isinstance(value, list):
+        return [expand_paths(v) for v in value]
+    if isinstance(value, dict):
+        return {k: expand_paths(v) for k, v in value.items()}
+    if isinstance(value, str):
+        if "~" in value:
+            return os.path.expanduser(value)
+    return value
+
+
 if __name__ == "__main__":
     #
     # IMPORTS
@@ -31,6 +43,7 @@ if __name__ == "__main__":
     # Job Data Creation
     #
     job_definition = FileUtil.read_json_file(file_path)
+    job_definition = expand_paths(job_definition)
     #
     # Run Job
     #

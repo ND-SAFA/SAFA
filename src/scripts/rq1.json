@@ -18,7 +18,7 @@
             "model_path": "bert-base-uncased"
           },
           "trainer_args": {
-            "output_dir": "/Users/albertorodriguez/Projects/SAFA/tgen/test/output",
+            "output_dir": "~/Projects/SAFA/tgen/test/output",
             "num_train_epochs": {
               "*": [
                 5,
@@ -37,7 +37,7 @@
           "trainer_dataset_manager": {
             "train_dataset_creator": {
               "object_type": "STRUCTURE",
-              "project_path": "/Users/albertorodriguez/Projects/SAFA/tgen/src/test/data/structure"
+              "project_path": "~/Projects/SAFA/tgen/src/test/data/structure"
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",
@@ -48,5 +48,5 @@
       ]
     }
   ],
-  "output_dir": "/Users/albertorodriguez/Projects/SAFA/tgen/test/output"
+  "output_dir": "~/Projects/SAFA/tgen/test/output"
 }

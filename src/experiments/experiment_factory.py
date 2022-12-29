@@ -9,9 +9,6 @@ class ExperimentFactory:
          Responsible for creating experiments
          :param experiment_definition: all necessary parameters for creating the experiment (may be json or definition var)
          """
-        if not isinstance(experiment_definition, DefinitionVariable):
-            # TODO @alberto please add serializing to this
-            pass
         self.experiment_definition = experiment_definition
 
     def build(self) -> Experiment:

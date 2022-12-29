@@ -1,4 +1,5 @@
 import os
+import uuid
 from typing import List
 
 from experiments.experiment_step import ExperimentStep
@@ -15,6 +16,7 @@ class Experiment(BaseObject):
         Represents an experiment run
         :param steps: list of all experiment steps to run
         """
+        self.id = uuid.uuid4()
         self.steps = steps
         self.output_dir = output_dir
         FileUtil.make_dir_safe(output_dir)
@@ -35,4 +37,4 @@ class Experiment(BaseObject):
         :param step_num: the number of the step
         :return: the output path
         """
-        return os.path.join(self.output_dir, self._STEP_DIR_NAME.format(step_num))
+        return os.path.join(self.output_dir, str(self.id), self._STEP_DIR_NAME.format(step_num))

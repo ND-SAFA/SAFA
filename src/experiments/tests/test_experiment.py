@@ -1,3 +1,4 @@
+import os
 from unittest import mock
 from unittest.mock import patch
 
@@ -19,7 +20,9 @@ class TestExperiment(BaseExperimentTest):
         experiment.run()
         self.assertEqual(train_job_run_mock.call_count, 8)
         self.assertEqual(predict_job_run_mock.call_count, 1)
+        result_dirs = os.listdir(os.path.join(experiment.output_dir, str(experiment.id)))
+        self.assertEquals(len(result_dirs), len(experiment.steps))
 
     def get_experiment(self):
-        #return TestObjectCreator.create(Experiment)
+        # return TestObjectCreator.create(Experiment)
         return Experiment.initialize_from_definition(self.EXPERIMENT_DEFINITION)

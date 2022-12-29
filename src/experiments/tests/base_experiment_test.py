@@ -1,3 +1,4 @@
+import os
 import random
 
 from jobs.components.job_result import JobResult
@@ -10,7 +11,10 @@ from util.variables.multi_variable import MultiVariable
 from util.variables.typed_definition_variable import TypedDefinitionVariable
 from util.variables.undetermined_variable import UndeterminedVariable
 from util.variables.variable import Variable
-
+from jobs.components.job_result import JobResult
+from jobs.supported_job_type import SupportedJobType
+from test.base_test import BaseTest
+import json
 
 class BaseExperimentTest(BaseTest):
     accuracies = []
@@ -64,6 +68,13 @@ class BaseExperimentTest(BaseTest):
     def setUp(self):
         super(BaseExperimentTest, self).setUp()
         self.accuracies = []
+
+    @staticmethod
+    def _load_step_output(step):
+        output_file_path = os.path.join(TEST_OUTPUT_DIR, step.OUTPUT_FILENAME)
+        with open(output_file_path) as out_file:
+            output = json.load(out_file)
+        return output
 
     def job_fake_run(self):
         accuracy = random.randint(1, 100) / 100

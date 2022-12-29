@@ -2,6 +2,7 @@ import argparse
 import os
 import sys
 
+import torch
 from django.core.wsgi import get_wsgi_application
 from dotenv import load_dotenv
 
@@ -45,6 +46,11 @@ if __name__ == "__main__":
     #
     job_definition = FileUtil.read_json_file(file_path)
     job_definition = expand_paths(job_definition)
+    #
+    # Logs
+    #
+    print("GPUS : ", torch.cuda.device_count())
+
     #
     # Run Job
     #

@@ -17,7 +17,7 @@ from variables.experimental_variable import ExperimentalVariable
 
 class ExperimentStep(BaseObject):
     OUTPUT_FILENAME = "output.json"
-    MAX_JOBS = 2
+    MAX_JOBS = 1
 
     def __init__(self, jobs: Union[List[AbstractJob], ExperimentalVariable, List[ExperimentalVariable]],
                  comparison_metric: Union[str, SupportedTraceMetric] = None, should_maximize_metric: bool = True):

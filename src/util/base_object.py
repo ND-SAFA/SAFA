@@ -139,6 +139,7 @@ class BaseObject(ABC):
                 return params
             return expected_class(**params)
         except Exception as e:
+            print(e)
             raise TypeError("Unable to initialize %s for %s" % (expected_class, cls.__name__))
 
     @classmethod

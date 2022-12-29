@@ -313,7 +313,7 @@ class GanTrainer(TraceTrainer):
         return output
 
     def create_models(self):
-        transformer = AutoModel.from_pretrained("bert-base-uncased")  # self.model_manager.get_model()
+        transformer = AutoModel.from_pretrained(self.model_manager.model_path)
         hidden_size = int(transformer.config.hidden_size)
         # Define the number and width of hidden layers
         hidden_levels_g = [hidden_size for i in range(0, self.trainer_args.n_hidden_layers_g)]

@@ -1,7 +1,7 @@
 from abc import ABC
 from copy import deepcopy
 from dataclasses import dataclass, field
-from typing import Any, Dict, Generic, List, Type, Union, _UnionGenericAlias, get_args
+from typing import Any, Dict, List, Type, Union, get_args
 
 from typeguard import check_type
 
@@ -205,14 +205,3 @@ class BaseObject(ABC):
             print(te)
             raise TypeError(
                 "%s expected type %s for %s but received %s" % (cls.__name__, expected_type, param_name, type(val)))
-
-    @classmethod
-    def _get_generic(cls, expected_type: Type) -> Generic:
-        """
-        Gets the generic type from expected type
-        :param expected_type: the expected type
-        :return: the generic type
-        """
-        if isinstance(expected_type, _UnionGenericAlias):
-            args = get_args(expected_type)
-            return args[0]

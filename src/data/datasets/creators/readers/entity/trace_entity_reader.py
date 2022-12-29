@@ -1,4 +1,6 @@
-from typing import Dict, List, TypedDict
+from typing import Dict, List
+
+from typing_extensions import TypedDict
 
 from data.datasets.creators.readers.entity.artifact_reader import ArtifactReader
 from data.datasets.creators.readers.entity.entity_reader import EntityReader

@@ -80,7 +80,6 @@ class AbstractJob(threading.Thread, BaseObject):
         Runs job specific logic
         :return: output of job as a dictionary
         """
-        pass
 
     def save(self, output_dir: str) -> bool:
         """

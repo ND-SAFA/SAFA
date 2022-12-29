@@ -14,8 +14,7 @@ class AbstractDataset(BaseObject):
         :param model_generator: The model generator determining architecture and feature function for trace links.
         :return: A data used by the HF trainer.
         """
-        pass
-
+        
     @abstractmethod
     def save(self, output_dir: str, filename: str) -> str:
         """
@@ -24,4 +23,3 @@ class AbstractDataset(BaseObject):
         :param filename: name of the file (no ext)
         :return: location the file was saved to
         """
-        pass

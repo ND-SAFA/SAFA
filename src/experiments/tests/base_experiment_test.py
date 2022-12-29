@@ -1,6 +1,9 @@
 import os
 import random
 
+from jobs.components.job_result import JobResult
+from jobs.supported_job_type import SupportedJobType
+from test.base_test import BaseTest
 from test.paths.paths import TEST_OUTPUT_DIR
 from util.variables.definition_variable import DefinitionVariable
 from util.variables.experimental_variable import ExperimentalVariable

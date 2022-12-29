@@ -4,8 +4,6 @@ import sys
 
 from dotenv import load_dotenv
 
-from server.serializers.job_factory.training_request_serializer import TrainingRequestSerializer
-
 load_dotenv()
 
 ROOT_PATH = os.path.expanduser(os.environ["ROOT_PATH"])

@@ -1,10 +1,12 @@
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 
+from jobs.abstract_job import AbstractJob
 from server.serializers.experiment_serializer import ExperimentSerializer
 from test.base_test import BaseTest
 from test.test_object_creator import TestObjectCreator
 from util.base_object import BaseObject
 from util.variables.definition_variable import DefinitionVariable
+from util.variables.experimental_variable import ExperimentalVariable
 from util.variables.variable import Variable
 
 
@@ -81,10 +83,8 @@ class TestBaseObject(BaseTest):
             "a": "invalid-value"
         }
 
-        def create():
-            object = TestObjectCreator.create(TestWithOptional, override=True, **definition)
-
-        self.assertRaises(TypeError, create)
+        with self.assertRaises(TypeError) as e:
+            TestObjectCreator.create(TestWithOptional, override=True, **definition)
 
     def test_invalid_child_object(self):
         definition = {
@@ -97,6 +97,11 @@ class TestBaseObject(BaseTest):
             TestObjectCreator.create(TestOuterClass, override=True, **definition)
 
         self.assertRaises(TypeError, create)
+
+    def test_optional_lists(self):
+        value = ExperimentalVariable([Variable("a"), Variable("b")])
+        target_type = Union[List[AbstractJob], ExperimentalVariable]
+        BaseObject._assert_type(value, target_type, "test_param")
 
     def assert_has_params(self, instance, params):
         for param_name, param_value in params.items():

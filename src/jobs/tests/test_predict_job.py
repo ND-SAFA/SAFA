@@ -5,7 +5,7 @@ from jobs.tests.base_job_test import BaseJobTest
 from models.model_manager import ModelManager
 from test.test_assertions import TestAssertions
 from train.trainer_args import TrainerArgs
-from util.object_creator import TestObjectCreator
+from util.object_creator import ObjectCreator
 from variables.typed_definition_variable import TypedDefinitionVariable
 
 
@@ -18,15 +18,15 @@ class TestPredictJob(BaseJobTest):
         self._test_run_failure()
 
     def _get_job(self):
-        job_args: JobArgs = TestObjectCreator.create(JobArgs)
-        model_manager: ModelManager = TestObjectCreator.create(ModelManager)
-        trainer_dataset_manager: TrainerDatasetManager = TestObjectCreator.create(TrainerDatasetManager, **{
+        job_args: JobArgs = ObjectCreator.create(JobArgs)
+        model_manager: ModelManager = ObjectCreator.create(ModelManager)
+        trainer_dataset_manager: TrainerDatasetManager = ObjectCreator.create(TrainerDatasetManager, **{
             "eval_dataset_creator": {
                 TypedDefinitionVariable.OBJECT_TYPE_KEY: "CLASSIC_TRACE",
-                **TestObjectCreator.dataset_creator_definition
+                **ObjectCreator.dataset_creator_definition
             }
         }, override=True)
-        trainer_args: TrainerArgs = TestObjectCreator.create(TrainerArgs)
+        trainer_args: TrainerArgs = ObjectCreator.create(TrainerArgs)
         return PredictJob(job_args=job_args, model_manager=model_manager,
                           trainer_dataset_manager=trainer_dataset_manager, trainer_args=trainer_args)
 

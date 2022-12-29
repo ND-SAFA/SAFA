@@ -1,4 +1,5 @@
 from test.base_test import BaseTest
+
 from util.uncased_dict import UncasedDict
 
 
@@ -19,10 +20,10 @@ class TestUncasedDict(BaseTest):
 
     def test_basic_functionality(self):
         uncased_dict = self.get_uncased_dict()
-        self.assertIn("test", uncased_dict)
-        self.assertEquals(uncased_dict["test"], 1)
-        uncased_dict["test"] = 2
-        self.assertEquals(uncased_dict["test"], 2)
+        self.assertIn("testres", uncased_dict)
+        self.assertEquals(uncased_dict["testres"], 1)
+        uncased_dict["testres"] = 2
+        self.assertEquals(uncased_dict["testres"], 2)
 
     def get_uncased_dict(self):
         return UncasedDict({"TEST": 1})

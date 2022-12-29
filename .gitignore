@@ -11,7 +11,7 @@ cache
 /**/.DS_Store
 
 # Transformers
-src/test/output/runs/**
+src/testres/output/runs/**
 /**/output.json
 /**/output
 

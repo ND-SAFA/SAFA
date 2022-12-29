@@ -6,7 +6,7 @@ from models.model_manager import ModelManager
 from models.model_properties import ModelTask
 from test.test_assertions import TestAssertions
 from train.trainer_args import TrainerArgs
-from util.object_creator import TestObjectCreator
+from util.object_creator import ObjectCreator
 
 
 class TestMLMPreTrainJob(BaseJobTest):
@@ -26,14 +26,14 @@ class TestMLMPreTrainJob(BaseJobTest):
         TestAssertions.assert_training_output_matches_expected(self, output_dict)
 
     def _get_job(self):
-        job_args = TestObjectCreator.create(JobArgs)
-        model_manager = TestObjectCreator.create(ModelManager, **{
+        job_args = ObjectCreator.create(JobArgs)
+        model_manager = ObjectCreator.create(ModelManager, **{
             "model_task": ModelTask.MASKED_LEARNING,
             "model_path": "bert-base-uncased"
         })
-        trainer_dataset_manager = TestObjectCreator.create(TrainerDatasetManager, **{
-            "train_dataset_creator": TestObjectCreator.pretrain_dataset_definition
+        trainer_dataset_manager = ObjectCreator.create(TrainerDatasetManager, **{
+            "train_dataset_creator": ObjectCreator.pretrain_dataset_definition
         }, override=True)
-        trainer_args = TestObjectCreator.create(TrainerArgs)
+        trainer_args = ObjectCreator.create(TrainerArgs)
         return MLMPreTrainJob(job_args=job_args, model_manager=model_manager,
                               trainer_dataset_manager=trainer_dataset_manager, trainer_args=trainer_args)

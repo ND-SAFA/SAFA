@@ -28,7 +28,7 @@ if __name__ == "__main__":
     # IMPORTS
     #
     from experiments.experiment import Experiment
-    from util.object_creator import TestObjectCreator
+    from util.object_creator import ObjectCreator
     from util.file_util import FileUtil
 
     #
@@ -49,5 +49,5 @@ if __name__ == "__main__":
     # Run Job
     #
     application = get_wsgi_application()
-    experiment = TestObjectCreator.create(Experiment, override=True, **job_definition)
+    experiment = ObjectCreator.create(Experiment, override=True, **job_definition)
     experiment.run()

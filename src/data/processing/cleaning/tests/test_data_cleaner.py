@@ -1,14 +1,15 @@
 from typing import Type
 
+from test.base_test import BaseTest
+
 from data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 from data.processing.cleaning.data_cleaner import DataCleaner
 from data.processing.cleaning.supported_data_cleaning_step import SupportedDataCleaningStep
-from test.base_test import BaseTest
 
 
 class TestDataCleaner(BaseTest):
     TEST_ARTIFACT_CONTENTS = ["This is 1.0 of 2.0 testCases!", "This i$ the other_one"]
-    EXPECTED_CONTENTS = ["Esta is 10 of 20 test Cases", "Esta the other uno"]
+    EXPECTED_CONTENTS = ["Esta is 10 of 20 testres Cases", "Esta the other uno"]
     BEFORE_STEP: Type[AbstractDataProcessingStep] = SupportedDataCleaningStep.REPLACE_WORDS.value
     FIRST_STEP: Type[AbstractDataProcessingStep] = SupportedDataCleaningStep.SEPARATE_JOINED_WORDS.value
     LAST_STEP: Type[AbstractDataProcessingStep] = SupportedDataCleaningStep.FILTER_MIN_LENGTH.value

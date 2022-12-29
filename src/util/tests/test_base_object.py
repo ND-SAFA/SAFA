@@ -4,7 +4,7 @@ from jobs.abstract_job import AbstractJob
 from server.serializers.experiment_serializer import ExperimentSerializer
 from test.base_test import BaseTest
 from util.base_object import BaseObject
-from util.object_creator import TestObjectCreator
+from util.object_creator import ObjectCreator
 from variables.definition_variable import DefinitionVariable
 from variables.experimental_variable import ExperimentalVariable
 from variables.variable import Variable
@@ -75,7 +75,7 @@ class TestBaseObject(BaseTest):
             definition: Dict = {
                 "a": value
             }
-            object = TestObjectCreator.create(TestWithOptional, override=True, **definition)
+            object = ObjectCreator.create(TestWithOptional, override=True, **definition)
             self.assert_has_params(object, definition)
 
     def test_optional_invalid(self):
@@ -84,7 +84,7 @@ class TestBaseObject(BaseTest):
         }
 
         with self.assertRaises(TypeError) as e:
-            TestObjectCreator.create(TestWithOptional, override=True, **definition)
+            ObjectCreator.create(TestWithOptional, override=True, **definition)
 
     def test_invalid_child_object(self):
         definition = {
@@ -94,7 +94,7 @@ class TestBaseObject(BaseTest):
         }
 
         def create():
-            TestObjectCreator.create(TestOuterClass, override=True, **definition)
+            ObjectCreator.create(TestOuterClass, override=True, **definition)
 
         self.assertRaises(TypeError, create)
 

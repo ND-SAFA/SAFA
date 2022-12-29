@@ -2,25 +2,26 @@ import os
 from unittest import mock
 from unittest.mock import patch
 
+from test.paths.paths import TEST_DATA_DIR
+from test.test_assertions import TestAssertions
+
 from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
 from jobs.abstract_job import AbstractJob
 from jobs.components.job_args import JobArgs
 from jobs.gan_train_job import GanTrainJob
 from jobs.tests.base_job_test import BaseJobTest
 from models.model_manager import ModelManager
-from test.paths.paths import TEST_DATA_DIR
-from test.test_assertions import TestAssertions
 from train.trace_trainer import TraceTrainer
 from train.trainer_args import TrainerArgs
-from util.object_creator import TestObjectCreator
+from util.object_creator import ObjectCreator
 from variables.typed_definition_variable import TypedDefinitionVariable
 
 
 class TestGanTrainJob(BaseJobTest):
     """
-    Tests that GAN is able to train and test.
-    TODO: Add test that includes a pre-training data
-    TODO: Reduce the run time of the test to < 10 seconds
+    Tests that GAN is able to train and testres.
+    TODO: Add testres that includes a pre-training data
+    TODO: Reduce the run time of the testres to < 10 seconds
     """
     PRETRAIN_DIR = os.path.join(TEST_DATA_DIR, "pre_train")
     EXAMPLE_TRAINING_OUTPUT = {
@@ -38,16 +39,16 @@ class TestGanTrainJob(BaseJobTest):
         TestAssertions.assert_training_output_matches_expected(self, output_dict, self.EXAMPLE_TRAINING_OUTPUT)
 
     def _get_job(self) -> AbstractJob:
-        trainer_dataset_manager = TestObjectCreator.create(TrainerDatasetManager, override=True, **{
-            "pre_train_dataset_creator": TestObjectCreator.pretrain_dataset_definition,
+        trainer_dataset_manager = ObjectCreator.create(TrainerDatasetManager, override=True, **{
+            "pre_train_dataset_creator": ObjectCreator.pretrain_dataset_definition,
             "train_dataset_creator": {
                 TypedDefinitionVariable.OBJECT_TYPE_KEY: "CLASSIC_TRACE",
-                **TestObjectCreator.dataset_creator_definition
+                **ObjectCreator.dataset_creator_definition
             },
         })
-        job_args = TestObjectCreator.create(JobArgs)
-        model_manager = TestObjectCreator.create(ModelManager)
-        trainer_args = TestObjectCreator.create(TrainerArgs, **{
+        job_args = ObjectCreator.create(JobArgs)
+        model_manager = ObjectCreator.create(ModelManager)
+        trainer_args = ObjectCreator.create(TrainerArgs, **{
             "num_train_epochs": 1
         })
 

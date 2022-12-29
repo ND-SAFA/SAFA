@@ -13,7 +13,7 @@ from jobs.delete_model_job import DeleteModelJob
 from jobs.predict_job import PredictJob
 from jobs.train_job import TrainJob
 from test.paths.paths import TEST_OUTPUT_DIR
-from util.object_creator import TestObjectCreator
+from util.object_creator import ObjectCreator
 from util.status import Status
 from variables.undetermined_variable import UndeterminedVariable
 
@@ -86,13 +86,13 @@ class TestExperimentStep(BaseExperimentTest):
         if not train:
             kwargs = {"override": True, **{
                 "jobs": [{
-                    **TestObjectCreator.experiment_predict_job_definition,
+                    **ObjectCreator.experiment_predict_job_definition,
                     "model_manager": {
                         "model_path": "?"
                     }
                 }]
             }}
-        return TestObjectCreator.create(ExperimentStep, **kwargs)
+        return ObjectCreator.create(ExperimentStep, **kwargs)
 
     @staticmethod
     def get_test_jobs():

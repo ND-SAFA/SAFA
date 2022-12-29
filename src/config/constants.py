@@ -36,7 +36,7 @@ LOGITS = "logits"
 LOSS = "loss"
 
 # -------------- TEST/DEV --------------
-IS_TEST = os.getenv("DEPLOYMENT", "development").lower() == "test"
+IS_TEST = os.getenv("DEPLOYMENT", "development").lower() == "testres"
 DELETE_TEST_OUTPUT = os.getenv("DELETE_TEST_OUTPUT", "true").capitalize() == "True"
 MNT_DIR = os.environ.get('MNT_DIR', "")
 

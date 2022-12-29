@@ -7,7 +7,7 @@ from jobs.predict_job import PredictJob
 from test.base_test import BaseTest
 from test.paths.paths import TEST_DATA_DIR, TEST_OUTPUT_DIR
 from util.definition_creator import DefinitionCreator
-from util.object_creator import TestObjectCreator
+from util.object_creator import ObjectCreator
 from variables.typed_definition_variable import TypedDefinitionVariable
 
 
@@ -37,7 +37,7 @@ class TestDefinitionCreator(BaseTest):
         definition = {
             "train_dataset_creator": deepcopy(self.DATASET_CREATOR_DEFINITION)
         }
-        trainer_dataset_manager = TestObjectCreator.create(TrainerDatasetManager, override=True, **definition)
+        trainer_dataset_manager = ObjectCreator.create(TrainerDatasetManager, override=True, **definition)
         self.verify_trainer_dataset_manager(trainer_dataset_manager)
 
     def test_trainer_dataset_manager(self):

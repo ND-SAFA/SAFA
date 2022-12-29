@@ -4,7 +4,7 @@ from jobs.create_model_job import CreateModelJob
 from jobs.tests.base_job_test import BaseJobTest
 from models.model_manager import ModelManager
 from test.paths.paths import TEST_OUTPUT_DIR
-from util.object_creator import TestObjectCreator
+from util.object_creator import ObjectCreator
 
 
 class TestCreateModelJob(BaseJobTest):
@@ -16,8 +16,8 @@ class TestCreateModelJob(BaseJobTest):
         self._test_run_failure()
 
     def _get_job(self):
-        job_args = TestObjectCreator.create(JobArgs)
-        model_manager: ModelManager = TestObjectCreator.create(ModelManager)
+        job_args = ObjectCreator.create(JobArgs)
+        model_manager: ModelManager = ObjectCreator.create(ModelManager)
         return CreateModelJob(job_args=job_args, model_manager=model_manager)
 
     def _assert_success(self, output_dict: dict):

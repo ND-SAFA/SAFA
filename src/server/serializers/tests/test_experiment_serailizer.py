@@ -1,7 +1,7 @@
 from experiments.experiment_step import ExperimentStep
 from test.base_test import BaseTest
 from util.definition_creator import DefinitionCreator
-from util.object_creator import TestObjectCreator
+from util.object_creator import ObjectCreator
 from variables.definition_variable import DefinitionVariable
 from variables.multi_variable import MultiVariable
 
@@ -21,5 +21,5 @@ class TestExperimentSerializer(BaseTest):
             self.assertIsInstance(job, DefinitionVariable)
 
     def test_playground(self):
-        step = TestObjectCreator.create(ExperimentStep)
+        step = ObjectCreator.create(ExperimentStep)
         print(step)

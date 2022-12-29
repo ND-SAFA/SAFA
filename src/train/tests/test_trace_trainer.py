@@ -14,7 +14,7 @@ from test.test_assertions import TestAssertions
 from test.test_data_manager import TestDataManager
 from train.trace_trainer import TraceTrainer
 from train.trainer_args import TrainerArgs
-from util.object_creator import TestObjectCreator
+from util.object_creator import ObjectCreator
 from variables.typed_definition_variable import TypedDefinitionVariable
 
 
@@ -83,10 +83,10 @@ class TestTraceTrainer(BaseTraceTest):
 
     def get_test_trace_trainer(self, **kwargs):
         trainer_dataset_manager = self.get_dataset_container()
-        model_manager = TestObjectCreator.create(ModelManager)
+        model_manager = ObjectCreator.create(ModelManager)
         model_manager.get_model = mock.MagicMock(return_value=self.get_test_model())
         model_manager.get_tokenizer = mock.MagicMock(return_value=self.get_test_tokenizer())
-        trainer_args = TestObjectCreator.create(TrainerArgs, **kwargs)
+        trainer_args = ObjectCreator.create(TrainerArgs, **kwargs)
         return TraceTrainer(
             trainer_args=trainer_args,
             trainer_dataset_manager=trainer_dataset_manager,
@@ -94,10 +94,10 @@ class TestTraceTrainer(BaseTraceTest):
 
     @staticmethod
     def get_dataset_container():
-        return TestObjectCreator.create(TrainerDatasetManager, **{
+        return ObjectCreator.create(TrainerDatasetManager, **{
             "eval_dataset_creator": {
                 TypedDefinitionVariable.OBJECT_TYPE_KEY: "CLASSIC_TRACE",
-                **TestObjectCreator.dataset_creator_definition
+                **ObjectCreator.dataset_creator_definition
             },
             "val_dataset_creator": {
                 TypedDefinitionVariable.OBJECT_TYPE_KEY: "SPLIT",

@@ -10,7 +10,7 @@ from data.datasets.trace_dataset import TraceDataset
 from test.base_trace_test import BaseTraceTest
 from test.paths.paths import TEST_OUTPUT_DIR
 from test.test_assertions import TestAssertions
-from util.object_creator import TestObjectCreator
+from util.object_creator import ObjectCreator
 from variables.typed_definition_variable import TypedDefinitionVariable
 
 
@@ -79,7 +79,7 @@ class TestTrainerDatasetsManager(BaseTraceTest):
 
     def create_dataset_manager(self, keys: List[DatasetRole]):
         dataset_creators = {
-            DatasetRole.PRE_TRAIN: ("pre_train_dataset_creator", TestObjectCreator.pretrain_dataset_definition),
+            DatasetRole.PRE_TRAIN: ("pre_train_dataset_creator", ObjectCreator.pretrain_dataset_definition),
             DatasetRole.EVAL: ("eval_dataset_creator", self.eval_dataset_creator_definition),
             DatasetRole.VAL: ("val_dataset_creator", self.val_dataset_creator_definition)
         }
@@ -87,7 +87,7 @@ class TestTrainerDatasetsManager(BaseTraceTest):
         for key in keys:
             arg_name, definition = dataset_creators[key]
             args[arg_name] = definition
-        return TestObjectCreator.create(TrainerDatasetManager, **args)
+        return ObjectCreator.create(TrainerDatasetManager, **args)
 
     def assert_final_datasets_are_as_expected(self, datasets_container):
         expected_dataset_split_roles = [DatasetRole.TRAIN, DatasetRole.VAL, DatasetRole.EVAL]

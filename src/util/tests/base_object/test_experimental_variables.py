@@ -1,6 +1,6 @@
 from models.model_manager import ModelManager
 from test.base_test import BaseTest
-from util.object_creator import TestObjectCreator
+from util.object_creator import ObjectCreator
 from variables.experimental_variable import ExperimentalVariable
 from variables.variable import Variable
 
@@ -11,5 +11,5 @@ class TestExperimentalVariables(BaseTest):
         DEFINITION = {
             "model_path": ExperimentalVariable([Variable("roberta-base"), Variable("bert-base")]),
         }
-        result = TestObjectCreator.create(ModelManager, **DEFINITION)
+        result = ObjectCreator.create(ModelManager, **DEFINITION)
         print(result)

@@ -10,7 +10,7 @@ from experiments.experiment_step import ExperimentStep
 from jobs.components.job_args import JobArgs
 from jobs.supported_job_type import SupportedJobType
 from models.model_manager import ModelManager
-from test.paths.paths import PRETRAIN_DIR, TEST_OUTPUT_DIR
+from test.paths.paths import TEST_OUTPUT_DIR
 from test.test_data_manager import TestDataManager
 from train.trainer_args import TrainerArgs
 from util.definition_creator import DefinitionCreator
@@ -19,7 +19,7 @@ from variables.typed_definition_variable import TypedDefinitionVariable
 ObjectType = TypeVar("ObjectType")
 
 
-class TestObjectCreator:
+class ObjectCreator:
     DATASET_ARGS_PARAMS = {
         "validation_percentage": VALIDATION_PERCENTAGE_DEFAULT
     }
@@ -103,14 +103,14 @@ class TestObjectCreator:
         if override:
             args = kwargs
         else:
-            args = TestObjectCreator.get_definition(class_type)
+            args = ObjectCreator.get_definition(class_type)
             args = deepcopy(args)
             args.update(kwargs)
         return DefinitionCreator.create(class_type, args)
 
     @staticmethod
     def get_definition(class_type):
-        if class_type in TestObjectCreator.SUPPORTED_OBJECTS:
-            return deepcopy(TestObjectCreator.SUPPORTED_OBJECTS[class_type])
+        if class_type in ObjectCreator.SUPPORTED_OBJECTS:
+            return deepcopy(ObjectCreator.SUPPORTED_OBJECTS[class_type])
 
         raise ValueError("Unable to find definition for:" + class_type)

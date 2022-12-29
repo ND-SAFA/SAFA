@@ -13,7 +13,7 @@ from test.paths.paths import TEST_DATA_DIR
 from test.test_assertions import TestAssertions
 from train.trace_trainer import TraceTrainer
 from train.trainer_args import TrainerArgs
-from util.object_creator import TestObjectCreator
+from util.object_creator import ObjectCreator
 from variables.typed_definition_variable import TypedDefinitionVariable
 
 
@@ -37,16 +37,16 @@ class TestTrainJob(BaseJobTest):
         TestAssertions.assert_training_output_matches_expected(self, output_dict)
 
     def _get_job(self) -> TrainJob:
-        job_args: JobArgs = TestObjectCreator.create(JobArgs)
-        trainer_args: TrainerArgs = TestObjectCreator.create(TrainerArgs)
+        job_args: JobArgs = ObjectCreator.create(JobArgs)
+        trainer_args: TrainerArgs = ObjectCreator.create(TrainerArgs)
         dataset_param = "_".join([self.EXPECTED_SPLIT_ROLE.value, "dataset", "creator"])
-        trainer_dataset_manager: TrainerDatasetManager = TestObjectCreator.create(TrainerDatasetManager, **{
+        trainer_dataset_manager: TrainerDatasetManager = ObjectCreator.create(TrainerDatasetManager, **{
             dataset_param: {
                 TypedDefinitionVariable.OBJECT_TYPE_KEY: "SPLIT",
                 "val_percentage": VALIDATION_PERCENTAGE_DEFAULT
             }
         })
-        model_manager: ModelManager = TestObjectCreator.create(ModelManager)
+        model_manager: ModelManager = ObjectCreator.create(ModelManager)
         job = TrainJob(job_args,
                        trainer_dataset_manager=trainer_dataset_manager,
                        trainer_args=trainer_args,

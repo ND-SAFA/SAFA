@@ -1,3 +1,4 @@
+import math
 import os
 from copy import deepcopy
 from typing import Dict, List, Optional, Type, Union
@@ -16,6 +17,7 @@ from variables.experimental_variable import ExperimentalVariable
 
 class ExperimentStep(BaseObject):
     OUTPUT_FILENAME = "output.json"
+    MAX_JOBS = 2
 
     def __init__(self, jobs: Union[List[AbstractJob], ExperimentalVariable, List[ExperimentalVariable]],
                  comparison_metric: Union[str, SupportedTraceMetric] = None, should_maximize_metric: bool = True):
@@ -45,8 +47,10 @@ class ExperimentStep(BaseObject):
         self.status = Status.IN_PROGRESS
         if jobs_for_undetermined_vars:
             self.jobs = self._update_jobs_undetermined_vars(self.jobs, jobs_for_undetermined_vars)
-        self._run_on_all_jobs(self.jobs, "start")
-        self._run_on_all_jobs(self.jobs, "join")
+        job_runs = self._divide_jobs_into_runs()
+        for jobs in job_runs:
+            self._run_on_jobs(jobs, "start")
+            self._run_on_jobs(jobs, "join")
         self.status = Status.SUCCESS
         if self.comparison_metric:
             self.best_job = self._get_best_job(self.jobs, self.comparison_metric, self.should_maximize_metric)
@@ -77,6 +81,19 @@ class ExperimentStep(BaseObject):
                 continue
             results[var_name] = var_value
         return results
+
+    def _divide_jobs_into_runs(self) -> List[List[AbstractJob]]:
+        """
+        Divides the jobs up into runs of size MAX JOBS
+        :return: a list of runs containing at most MAX JOBS per run
+        """
+        job_runs = [[] for i in range(math.ceil(len(self.jobs) / self.MAX_JOBS))]
+        run_index = 0
+        for job_index, job in enumerate(self.jobs):
+            job_runs[run_index].append(job)
+            if (job_index + 1) % self.MAX_JOBS == 0:
+                run_index += 1
+        return job_runs
 
     @staticmethod
     def _get_job_to_experimental_var(experimental_jobs: ExperimentalVariable) -> Optional[Dict[str, Dict]]:
@@ -110,12 +127,12 @@ class ExperimentStep(BaseObject):
             jobs2update = deepcopy(jobs2update)
             if hasattr(job, "model_manager"):
                 job.model_manager.model_path = job.model_manager.model_output_path
-            self._run_on_all_jobs(jobs2update, "use_values_from_object_for_undetermined", obj=job)
+            self._run_on_jobs(jobs2update, "use_values_from_object_for_undetermined", obj=job)
             final_jobs.extend(jobs2update)
         return final_jobs
 
     @staticmethod
-    def _run_on_all_jobs(jobs: List[AbstractJob], method_name: str, **method_params) -> List:
+    def _run_on_jobs(jobs: List[AbstractJob], method_name: str, **method_params) -> List:
         """
         Runs a method on all jobs in the list
         :param jobs: the list of jobs to run the method on

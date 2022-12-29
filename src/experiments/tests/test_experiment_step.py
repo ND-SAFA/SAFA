@@ -1,3 +1,4 @@
+import math
 import os
 from unittest import mock
 from unittest.mock import patch
@@ -49,6 +50,13 @@ class TestExperimentStep(BaseExperimentTest):
         self.assertEquals(best_job.model_manager.model_path, expected_model_path)
         self.assertEqual(predict_job_run_mock.call_count, 1)
 
+    def test_divide_jobs_into_runs(self):
+        train_step = self.get_experiment_step()
+        runs = train_step._divide_jobs_into_runs()
+        self.assertEquals(len(runs), math.ceil(len(train_step.jobs)/train_step.MAX_JOBS))
+        for run_ in runs:
+            self.assertLessEqual(len(run_), train_step.MAX_JOBS)
+
     def test_update_jobs_undetermined_vars(self):
         train_step = self.get_experiment_step()
         predict_step = self.get_experiment_step(train=False)
@@ -61,7 +69,7 @@ class TestExperimentStep(BaseExperimentTest):
 
     def test_run_on_all_jobs(self):
         jobs = self.get_test_jobs()
-        results = ExperimentStep._run_on_all_jobs(jobs, "get_output_filepath")
+        results = ExperimentStep._run_on_jobs(jobs, "get_output_filepath")
         self.assertEquals(len(results), 2)
         self.assertNotEquals(results[0], results[1])
 

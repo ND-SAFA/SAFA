@@ -1,3 +1,5 @@
+from typing import Dict
+
 from server.serializers.experiment_serializer import ExperimentSerializer
 
 
@@ -7,8 +9,12 @@ class DefinitionCreator:
     def create(definition_class, definition, **kwargs):
         data = definition
         data.update(kwargs)
+        definition_variable = DefinitionCreator.create_definition_variable(data)
+        return definition_class.initialize_from_definition(definition_variable)
+
+    @staticmethod
+    def create_definition_variable(data: Dict):
         definition = {ExperimentSerializer.KEY: data}
         experiment_serializer = ExperimentSerializer(data=definition)
         assert experiment_serializer.is_valid(), experiment_serializer.errors
-        definition_variable = experiment_serializer.save()
-        return definition_class.initialize_from_definition(definition_variable)
+        return experiment_serializer.save()

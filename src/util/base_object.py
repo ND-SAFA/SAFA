@@ -134,6 +134,9 @@ class BaseObject(ABC):
         params = {param_name: cls._get_value_of_variable(variable, expected_class)
                   for param_name, variable in definition.items()}
         try:
+            if expected_class in [Dict[str, str], Dict[str, float], Dict[str, int]]:
+                # TODO: Add flag to indicate when data should be created as a dictionary of data
+                return params
             return expected_class(**params)
         except Exception as e:
             raise TypeError("Unable to initialize %s for %s" % (expected_class, cls.__name__))

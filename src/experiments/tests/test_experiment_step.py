@@ -17,7 +17,7 @@ class TestExperimentStep(BaseExperimentTest):
         experiment_step = self.get_experiment_step()
         best_job = experiment_step.run().pop()
         self.assertEquals(max(self.accuracies), best_job.result[JobResult.METRICS]["accuracy"])
-        self.assertEqual(train_job_run_mock.call_count, 8)
+        self.assertEqual(train_job_run_mock.call_count, 4)
 
     @patch.object(PredictJob, "_run")
     def test_run_with_best_prior(self, predict_job_run_mock: mock.MagicMock):
@@ -32,9 +32,7 @@ class TestExperimentStep(BaseExperimentTest):
     def get_experiment_step(self, train_job=True):
         if train_job:
             step = TestObjectCreator.create(ExperimentStep)
-            step_definition = self.EXPERIMENT_DEFINITION["steps"][0]
         else:
-            step = TestObjectCreator.create(ExperimentStep, override=True, **TestObjectCreator.experiment_predict_step_definition)
-            step_definition = self.EXPERIMENT_DEFINITION["steps"][1]
-        step = ExperimentStep.initialize_from_definition(step_definition)
+            step = TestObjectCreator.create(ExperimentStep, override=True,
+                                            **TestObjectCreator.experiment_predict_step_definition)
         return step

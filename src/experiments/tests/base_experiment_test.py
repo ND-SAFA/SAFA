@@ -16,25 +16,26 @@ class BaseExperimentTest(BaseTest):
     accuracies = []
     EXPERIMENT_DEFINITION = DefinitionVariable({
         "steps": MultiVariable([
-            DefinitionVariable({"jobs": MultiVariable([TypedDefinitionVariable({
-                TypedDefinitionVariable.OBJECT_TYPE_KEY: SupportedJobType.TRAIN.name,
-                "job_args": DefinitionVariable({
-                }),
-                "model_manager": DefinitionVariable({
-                    "model_path": ExperimentalVariable([Variable("roberta-base"), Variable("bert-base")]),
-                }),
-                "trainer_dataset_manager": DefinitionVariable({
-                    "train_dataset_creator":
-                        TypedDefinitionVariable({
-                            "object_type": "Safa",
-                            "project_path": ExperimentalVariable([Variable("safa1"), Variable("safa2")])
-                        })
-                }),
-                "trainer_args": DefinitionVariable({
-                    "output_dir": Variable(TEST_OUTPUT_DIR),
-                    "num_train_epochs": ExperimentalVariable([Variable(100), Variable(200)])
-                })
-            })]),
+            DefinitionVariable({
+                "jobs": MultiVariable([TypedDefinitionVariable({
+                    TypedDefinitionVariable.OBJECT_TYPE_KEY: SupportedJobType.TRAIN.name,
+                    "job_args": DefinitionVariable({
+                    }),
+                    "model_manager": DefinitionVariable({
+                        "model_path": ExperimentalVariable([Variable("roberta-base"), Variable("bert-base")]),
+                    }),
+                    "trainer_dataset_manager": DefinitionVariable({
+                        "train_dataset_creator":
+                            TypedDefinitionVariable({
+                                "object_type": "Safa",
+                                "project_path": ExperimentalVariable([Variable("safa1"), Variable("safa2")])
+                            })
+                    }),
+                    "trainer_args": DefinitionVariable({
+                        "output_dir": Variable(TEST_OUTPUT_DIR),
+                        "num_train_epochs": ExperimentalVariable([Variable(100), Variable(200)])
+                    })
+                })]),
                 "comparison_metric": "accuracy"
             }),
             DefinitionVariable({"jobs": MultiVariable([TypedDefinitionVariable({

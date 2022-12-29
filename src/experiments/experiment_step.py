@@ -1,6 +1,6 @@
 import os
 from copy import deepcopy
-from typing import List, Union, Type, Dict, Optional
+from typing import Dict, List, Optional, Type, Union
 
 from config.override import overrides
 from jobs.abstract_job import AbstractJob
@@ -17,7 +17,7 @@ from util.variables.experimental_variable import ExperimentalVariable
 class ExperimentStep(BaseObject):
     OUTPUT_FILENAME = "output.json"
 
-    def __init__(self, jobs: Union[List[AbstractJob], ExperimentalVariable],
+    def __init__(self, jobs: Union[List[AbstractJob], ExperimentalVariable, List[ExperimentalVariable]],
                  comparison_metric: Union[str, SupportedTraceMetric] = None, should_maximize_metric: bool = True):
         """
         Represents an experiment step
@@ -94,7 +94,8 @@ class ExperimentStep(BaseObject):
                                                     if not isinstance(param_val, BaseObject)}
         return job_to_experimental_var
 
-    def _update_jobs_undetermined_vars(self, jobs2update: List[AbstractJob], jobs2use: List[AbstractJob]) -> List[AbstractJob]:
+    def _update_jobs_undetermined_vars(self, jobs2update: List[AbstractJob], jobs2use: List[AbstractJob]) -> List[
+        AbstractJob]:
         """
         Updates all the jobs2update's undetermined vals with those from the jobs2use
         :param jobs2update: the list of jobs to update undetermined vals for

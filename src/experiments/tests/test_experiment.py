@@ -5,7 +5,6 @@ from experiments.experiment import Experiment
 from experiments.tests.base_experiment_test import BaseExperimentTest
 from jobs.predict_job import PredictJob
 from jobs.train_job import TrainJob
-from test.test_object_creator import TestObjectCreator
 
 
 class TestExperiment(BaseExperimentTest):
@@ -21,5 +20,4 @@ class TestExperiment(BaseExperimentTest):
         self.assertEqual(predict_job_run_mock.call_count, 1)
 
     def get_experiment(self):
-        #return TestObjectCreator.create(Experiment)
         return Experiment.initialize_from_definition(self.EXPERIMENT_DEFINITION)

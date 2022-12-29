@@ -62,9 +62,10 @@ class TestObjectCreator:
     experiment_train_job_definition = {
         TypedDefinitionVariable.OBJECT_TYPE_KEY: SupportedJobType.TRAIN.name,
         "model_manager": model_manager_definition,
+        "job_args": {},
         "trainer_dataset_manager": {
             "train_dataset_creator": {
-                "object_type": "Safa",
+                TypedDefinitionVariable.OBJECT_TYPE_KEY: "Safa",
                 "project_path": {"*": ["path1", "path2"]}}
         },
         "trainer_args": {
@@ -76,11 +77,15 @@ class TestObjectCreator:
     experiment_predict_job_definition = {
         TypedDefinitionVariable.OBJECT_TYPE_KEY: SupportedJobType.PREDICT.name,
         "model_manager": model_manager_definition,
-        "trainer_args": trainer_args_definition,
+        "job_args": {},
         "trainer_dataset_manager": {
-            "eval_dataset_creator": {TypedDefinitionVariable.OBJECT_TYPE_KEY: "CLASSIC_TRACE",
-                                     **dataset_creator_definition}
-        }
+            "eval_dataset_creator": {
+                TypedDefinitionVariable.OBJECT_TYPE_KEY: "CLASSIC_TRACE",
+                **dataset_creator_definition
+            }
+        },
+        "trainer_args": trainer_args_definition,
+
     }
 
     experiment_train_step_definition = {"jobs": [experiment_train_job_definition], "comparison_metric": "accuracy"}

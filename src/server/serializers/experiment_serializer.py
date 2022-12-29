@@ -2,11 +2,12 @@ from typing import Dict
 
 from rest_framework import serializers
 
+from server.serializers.serializer_utility import SerializerUtility
 from util.variables.definition_variable import DefinitionVariable
 from util.variables.experimental_variable import ExperimentalVariable
+from util.variables.multi_variable import MultiVariable
 from util.variables.typed_definition_variable import TypedDefinitionVariable
 from util.variables.variable import Variable
-from server.serializers.serializer_utility import SerializerUtility
 
 
 class ExperimentSerializer(serializers.Serializer):
@@ -37,13 +38,16 @@ class ExperimentSerializer(serializers.Serializer):
         :return: Variable encapsulating value.
         """
         if isinstance(value, dict):
+            value_definition = self.create(value)
             if value.get(ExperimentalVariable.SYMBOL, None):
                 values = value[ExperimentalVariable.SYMBOL]
                 return ExperimentalVariable(values)
             elif value.get(TypedDefinitionVariable.OBJECT_TYPE_KEY, None):
-                return TypedDefinitionVariable(value)
+                return TypedDefinitionVariable(value_definition)
             else:
-                value_definition = self.create(value)
                 return DefinitionVariable(value_definition)
+        if isinstance(value, list) and len(value) > 0 and isinstance(value[0], Dict):
+            values = [self.create_variable(v) for v in value]
+            return MultiVariable(values)
         else:
             return Variable(value)

@@ -99,7 +99,6 @@ scipy==1.9.1
 seaborn==0.12.1
 sentencepiece==0.1.97
 six==1.16.0
-sklearn==0.0
 sqlparse==0.4.2
 stack-data==0.6.0
 tensorboard==2.10.1

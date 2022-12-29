@@ -1,13 +1,13 @@
 from copy import copy
 from dataclasses import dataclass
 from inspect import getfullargspec
-from typing import Callable, Dict, Set, Type, Union, _SpecialGenericAlias, get_type_hints
+from typing import Callable, Dict, Set, Type, Union, get_type_hints
 
 
 @dataclass
 class ParamSpecs:
     param_names: Set[str]
-    param_types: Dict[str, Union[Type, _SpecialGenericAlias]]
+    param_types: Dict[str, Union[Type]]
     has_kwargs: bool
     required_params: Set[str]
     name: str

@@ -18,6 +18,7 @@ from variables.experimental_variable import ExperimentalVariable
 class ExperimentStep(BaseObject):
     OUTPUT_FILENAME = "output.json"
     MAX_JOBS = 1
+    RUN_ASYNC = False
 
     def __init__(self, jobs: Union[List[AbstractJob], ExperimentalVariable, List[ExperimentalVariable]],
                  comparison_metric: Union[str, SupportedTraceMetric] = None, should_maximize_metric: bool = True):
@@ -49,8 +50,13 @@ class ExperimentStep(BaseObject):
             self.jobs = self._update_jobs_undetermined_vars(self.jobs, jobs_for_undetermined_vars)
         job_runs = self._divide_jobs_into_runs()
         for jobs in job_runs:
-            self._run_on_jobs(jobs, "start")
-            self._run_on_jobs(jobs, "join")
+            if self.RUN_ASYNC:
+                self._run_on_jobs(jobs, "start")
+                self._run_on_jobs(jobs, "join")
+            else:
+                for job in jobs:
+                    job.run()
+
         self.status = Status.SUCCESS
         if self.comparison_metric:
             self.best_job = self._get_best_job(self.jobs, self.comparison_metric, self.should_maximize_metric)

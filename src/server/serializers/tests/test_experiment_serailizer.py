@@ -1,7 +1,7 @@
 from experiments.experiment_step import ExperimentStep
 from test.base_test import BaseTest
-from test.definition_creator import DefinitionCreator
-from test.test_object_creator import TestObjectCreator
+from util.definition_creator import DefinitionCreator
+from util.object_creator import TestObjectCreator
 from variables.definition_variable import DefinitionVariable
 from variables.multi_variable import MultiVariable
 

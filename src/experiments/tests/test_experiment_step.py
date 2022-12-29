@@ -13,7 +13,7 @@ from jobs.delete_model_job import DeleteModelJob
 from jobs.predict_job import PredictJob
 from jobs.train_job import TrainJob
 from test.paths.paths import TEST_OUTPUT_DIR
-from test.test_object_creator import TestObjectCreator
+from util.object_creator import TestObjectCreator
 from util.status import Status
 from variables.undetermined_variable import UndeterminedVariable
 
@@ -53,7 +53,7 @@ class TestExperimentStep(BaseExperimentTest):
     def test_divide_jobs_into_runs(self):
         train_step = self.get_experiment_step()
         runs = train_step._divide_jobs_into_runs()
-        self.assertEquals(len(runs), math.ceil(len(train_step.jobs)/train_step.MAX_JOBS))
+        self.assertEquals(len(runs), math.ceil(len(train_step.jobs) / train_step.MAX_JOBS))
         for run_ in runs:
             self.assertLessEqual(len(run_), train_step.MAX_JOBS)
 

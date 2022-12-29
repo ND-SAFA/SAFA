@@ -10,7 +10,7 @@ from data.datasets.trace_dataset import TraceDataset
 from test.base_trace_test import BaseTraceTest
 from test.paths.paths import TEST_OUTPUT_DIR
 from test.test_assertions import TestAssertions
-from test.test_object_creator import TestObjectCreator
+from util.object_creator import TestObjectCreator
 from variables.typed_definition_variable import TypedDefinitionVariable
 
 

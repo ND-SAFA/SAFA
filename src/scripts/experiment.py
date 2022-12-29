@@ -2,6 +2,7 @@ import argparse
 import os
 import sys
 
+from django.core.wsgi import get_wsgi_application
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -27,7 +28,7 @@ if __name__ == "__main__":
     # IMPORTS
     #
     from experiments.experiment import Experiment
-    from test.test_object_creator import TestObjectCreator
+    from util.object_creator import TestObjectCreator
     from util.file_util import FileUtil
 
     #
@@ -47,5 +48,6 @@ if __name__ == "__main__":
     #
     # Run Job
     #
+    application = get_wsgi_application()
     experiment = TestObjectCreator.create(Experiment, override=True, **job_definition)
     experiment.run()

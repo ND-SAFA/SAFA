@@ -2,7 +2,7 @@ from data.datasets.creators.classic_trace_dataset_creator import ClassicTraceDat
 from test.base_trace_test import BaseTraceTest
 from test.test_assertions import TestAssertions
 from test.test_data_manager import TestDataManager
-from test.test_object_creator import TestObjectCreator
+from util.object_creator import TestObjectCreator
 
 
 class TestClassicTraceDatasetCreator(BaseTraceTest):

@@ -3,8 +3,8 @@ from typing import Dict, List, Optional, Union
 from jobs.abstract_job import AbstractJob
 from server.serializers.experiment_serializer import ExperimentSerializer
 from test.base_test import BaseTest
-from test.test_object_creator import TestObjectCreator
 from util.base_object import BaseObject
+from util.object_creator import TestObjectCreator
 from variables.definition_variable import DefinitionVariable
 from variables.experimental_variable import ExperimentalVariable
 from variables.variable import Variable

@@ -10,9 +10,9 @@ from jobs.tests.base_job_test import BaseJobTest
 from models.model_manager import ModelManager
 from test.paths.paths import TEST_DATA_DIR
 from test.test_assertions import TestAssertions
-from test.test_object_creator import TestObjectCreator
 from train.trace_trainer import TraceTrainer
 from train.trainer_args import TrainerArgs
+from util.object_creator import TestObjectCreator
 from variables.typed_definition_variable import TypedDefinitionVariable
 
 

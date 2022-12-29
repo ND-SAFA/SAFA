@@ -4,7 +4,7 @@ from jobs.components.job_args import JobArgs
 from jobs.components.job_result import JobResult
 from jobs.create_datasets_job import CreateDatasetsJob
 from jobs.tests.base_job_test import BaseJobTest
-from test.test_object_creator import TestObjectCreator
+from util.object_creator import TestObjectCreator
 
 
 class TestCreateDatasetsJob(BaseJobTest):

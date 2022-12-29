@@ -4,8 +4,8 @@ from jobs.predict_job import PredictJob
 from jobs.tests.base_job_test import BaseJobTest
 from models.model_manager import ModelManager
 from test.test_assertions import TestAssertions
-from test.test_object_creator import TestObjectCreator
 from train.trainer_args import TrainerArgs
+from util.object_creator import TestObjectCreator
 from variables.typed_definition_variable import TypedDefinitionVariable
 
 

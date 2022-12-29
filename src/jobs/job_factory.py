@@ -6,14 +6,11 @@ from variables.definition_variable import DefinitionVariable
 
 class JobFactory:
 
-    def __init__(self, job_definition: Union[str, DefinitionVariable]):
+    def __init__(self, job_definition: DefinitionVariable):
         """
         Responsible for creating jobs
         :param job_definition: all necessary parameters for creating the job (may be json or definition var)
         """
-        if not isinstance(job_definition, DefinitionVariable):
-            # TODO @alberto please add serializing to this
-            pass
         self.job_definition = job_definition
 
     def build(self, job_class: Type[AbstractJob]) -> AbstractJob:

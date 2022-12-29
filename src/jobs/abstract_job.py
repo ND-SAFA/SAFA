@@ -70,6 +70,8 @@ class AbstractJob(threading.Thread, BaseObject):
         :param output_dir: the directory to the output
         :return: the filepath
         """
+        if output_dir is None:
+            output_dir = self.job_args.output_dir
         output_path = os.path.join(output_dir, str(self.id))
         FileUtil.make_dir_safe(output_path)
         return os.path.join(output_path, AbstractJob.OUTPUT_FILENAME)

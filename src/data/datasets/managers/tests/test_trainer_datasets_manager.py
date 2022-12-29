@@ -14,7 +14,7 @@ from test.test_object_creator import TestObjectCreator
 from variables.typed_definition_variable import TypedDefinitionVariable
 
 
-class TestTrainerDatasetsContainer(BaseTraceTest):
+class TestTrainerDatasetsManager(BaseTraceTest):
     val_dataset_creator_definition = {
         TypedDefinitionVariable.OBJECT_TYPE_KEY: "SPLIT",
         "val_percentage": 0.3
@@ -70,7 +70,7 @@ class TestTrainerDatasetsContainer(BaseTraceTest):
 
     def test_get_set_bad_index(self):
         dataset_container_manager = self.create_dataset_manager(
-            [DatasetRole.PRE_TRAIN, DatasetRole.VAL, DatasetRole.EVAL])
+            [DatasetRole.VAL, DatasetRole.EVAL])
         try:
             dataset_container_manager[DatasetRole.EVAL] = None
             self.fail("Did not raise Exception on bad index")

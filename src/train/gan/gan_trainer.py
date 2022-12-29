@@ -230,7 +230,7 @@ class GanTrainer(TraceTrainer):
             #     TEST ON THE EVALUATION DATASET
             # ========================================
             # After the completion of each training epoch, measure our performance on
-            # our testres set.
+            # our test set.
             print("")
             print("Running Test...")
 
@@ -271,7 +271,7 @@ class GanTrainer(TraceTrainer):
                     _, logits, probs = discriminator(real_embeddings)
                     ###log_probs = F.log_softmax(probs[:,1:], dim=-1)
                     filtered_logits = logits[:, 0:-1]
-                    # Accumulate the testres loss.
+                    # Accumulate the test loss.
                     total_test_loss += nll_loss(filtered_logits, b_labels)
 
                 # Accumulate the predictions and the input labels

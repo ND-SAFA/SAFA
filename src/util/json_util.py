@@ -2,6 +2,9 @@ from typing import Dict, List
 import json
 import numpy as np
 
+from util.base_object import BaseObject
+
+
 class NpEncoder(json.JSONEncoder):
     """
     Handles Numpy conversion to json
@@ -14,6 +17,8 @@ class NpEncoder(json.JSONEncoder):
             return float(obj)
         if isinstance(obj, np.ndarray):
             return obj.tolist()
+        if isinstance(obj, BaseObject):
+            return str(obj)
         return super(NpEncoder, self).default(obj)
 
 

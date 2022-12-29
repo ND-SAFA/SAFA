@@ -47,10 +47,10 @@ class ExperimentStep(BaseObject):
             self.jobs = self._update_jobs_undetermined_vars(self.jobs, jobs_for_undetermined_vars)
         self._run_on_all_jobs(self.jobs, "start")
         self._run_on_all_jobs(self.jobs, "join")
+        self.status = Status.SUCCESS
         if self.comparison_metric:
             self.best_job = self._get_best_job(self.jobs, self.comparison_metric, self.should_maximize_metric)
             return [self.best_job]
-        self.status = Status.SUCCESS
         return self.jobs
 
     def save_results(self, output_dir: str) -> None:
@@ -75,7 +75,7 @@ class ExperimentStep(BaseObject):
         for var_name, var_value in vars(self).items():
             if var_name.startswith("_") or callable(var_value):
                 continue
-            results[var_name] = str(var_value)
+            results[var_name] = var_value
         return results
 
     @staticmethod
@@ -89,9 +89,11 @@ class ExperimentStep(BaseObject):
             return None
         job_to_experimental_var = {}
         for i, job in enumerate(experimental_jobs.get_values_of_all_variables()):
-            job_to_experimental_var[str(job.id)] = {param_name: param_val for param_name, param_val in
+            job_to_experimental_var[str(job.id)] = {param_name: param_val.__class__.__name__ if isinstance(param_val, BaseObject)
+                                                    else str(param_val)
+                                                    for param_name, param_val in
                                                     experimental_jobs.experimental_param_names_to_vals[i].items()
-                                                    if not isinstance(param_val, BaseObject)}
+                                                    }
         return job_to_experimental_var
 
     def _update_jobs_undetermined_vars(self, jobs2update: List[AbstractJob], jobs2use: List[AbstractJob]) -> List[

@@ -42,8 +42,9 @@ class TestAssertions:
                     cls._KEY_ERROR_MESSAGE.format(metric, output[JobResult.METRICS]))
 
     @staticmethod
-    def assert_training_output_matches_expected(test_case: TestCase, output_dict: dict):
-        for key, value in TestDataManager.EXAMPLE_TRAINING_OUTPUT.items():
+    def assert_training_output_matches_expected(test_case: TestCase, output_dict: dict, expected_output=None):
+        expected_output = expected_output if expected_output else TestDataManager.EXAMPLE_TRAINING_OUTPUT
+        for key, value in expected_output.items():
             test_case.assertIn(key, output_dict)
 
     @staticmethod

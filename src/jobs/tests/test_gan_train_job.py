@@ -1,5 +1,5 @@
 import os
-from unittest import mock, skip
+from unittest import mock
 from unittest.mock import patch
 
 from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
@@ -13,6 +13,7 @@ from test.test_assertions import TestAssertions
 from test.test_object_creator import TestObjectCreator
 from train.trace_trainer import TraceTrainer
 from train.trainer_args import TrainerArgs
+from variables.typed_definition_variable import TypedDefinitionVariable
 
 
 class TestGanTrainJob(BaseJobTest):
@@ -29,18 +30,20 @@ class TestGanTrainJob(BaseJobTest):
         }]
     }
 
-    @skip
     @patch.object(TraceTrainer, "save_model")
     def test_run_success(self, save_model_mock: mock.MagicMock):
         self._test_run_success()
 
     def _assert_success(self, output_dict: dict):
-        TestAssertions.assert_training_output_matches_expected(self, output_dict)
+        TestAssertions.assert_training_output_matches_expected(self, output_dict, self.EXAMPLE_TRAINING_OUTPUT)
 
     def _get_job(self) -> AbstractJob:
         trainer_dataset_manager = TestObjectCreator.create(TrainerDatasetManager, override=True, **{
             "pre_train_dataset_creator": TestObjectCreator.pretrain_dataset_definition,
-            "train_dataset_creator": TestObjectCreator.dataset_creator_definition,
+            "train_dataset_creator": {
+                TypedDefinitionVariable.OBJECT_TYPE_KEY: "CLASSIC_TRACE",
+                **TestObjectCreator.dataset_creator_definition
+            },
         })
         job_args = TestObjectCreator.create(JobArgs)
         model_manager = TestObjectCreator.create(ModelManager)

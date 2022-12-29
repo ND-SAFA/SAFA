@@ -64,7 +64,7 @@ class TraceTrainer(Trainer, BaseObject):
                              self.trainer_args.metrics) if self.trainer_args.metrics else None
         output_dict = TraceTrainer.output_to_dict(output, metrics=results, predictions=predictions,
                                                   source_target_pairs=self.trainer_dataset_manager[
-                                                      DatasetRole.EVAL].get_source_target_pairs())
+                                                      dataset_role].get_source_target_pairs())
         return output_dict
 
     @staticmethod

@@ -39,6 +39,7 @@ if __name__ == "__main__":
         prog='Experiment',
         description='Runs experiment definitions')
     parser.add_argument('file')
+    parser.add_argument('--health', default=None, type=bool)
     args = parser.parse_args()
     file_path = os.path.expanduser(args.file)
     #
@@ -56,4 +57,5 @@ if __name__ == "__main__":
     #
     application = get_wsgi_application()
     experiment = ObjectCreator.create(Experiment, override=True, **job_definition)
-    experiment.run()
+    if not args.health():
+        experiment.run()

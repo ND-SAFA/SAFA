@@ -1,7 +1,7 @@
 from typing import Dict
 
-from util.variables.variable import Variable
 from util.uncased_dict import UncasedDict
+from variables.variable import Variable
 
 
 class DefinitionVariable(UncasedDict, Variable):

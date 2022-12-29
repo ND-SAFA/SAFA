@@ -2,8 +2,8 @@ from experiments.experiment_step import ExperimentStep
 from test.base_test import BaseTest
 from test.definition_creator import DefinitionCreator
 from test.test_object_creator import TestObjectCreator
-from util.variables.definition_variable import DefinitionVariable
-from util.variables.multi_variable import MultiVariable
+from variables.definition_variable import DefinitionVariable
+from variables.multi_variable import MultiVariable
 
 
 class TestExperimentSerializer(BaseTest):

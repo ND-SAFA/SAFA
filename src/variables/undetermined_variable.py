@@ -1,7 +1,8 @@
-from util.variables.variable import Variable
+from variables.variable import Variable
 
 
 class UndeterminedVariable(Variable):
+    SYMBOL = "?"
 
     def __init__(self):
         """

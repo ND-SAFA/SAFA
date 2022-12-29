@@ -1,7 +1,7 @@
-from typing import List, Dict, Any
+from typing import Any, Dict, List
 
-from util.variables.multi_variable import MultiVariable
-from util.variables.variable import Variable
+from variables.multi_variable import MultiVariable
+from variables.variable import Variable
 
 
 class ExperimentalVariable(MultiVariable):

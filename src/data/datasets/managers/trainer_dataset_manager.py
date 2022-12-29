@@ -10,8 +10,8 @@ from data.datasets.dataset_role import DatasetRole
 from data.datasets.pre_train_dataset import PreTrainDataset
 from data.datasets.trace_dataset import TraceDataset
 from data.processing.augmentation.data_augmenter import DataAugmenter
-from util.variables.undetermined_variable import UndeterminedVariable
 from util.base_object import BaseObject
+from variables.undetermined_variable import UndeterminedVariable
 
 
 class TrainerDatasetManager(BaseObject):
@@ -83,7 +83,8 @@ class TrainerDatasetManager(BaseObject):
             if isinstance(dataset_creator, UndeterminedVariable):
                 self._dataset_creators[dataset_role] = obj.get_creator(dataset_role)
             elif isinstance(dataset_creator, BaseObject):
-                self._dataset_creators[dataset_role].use_values_from_object_for_undetermined(obj.get_creator(dataset_role))
+                self._dataset_creators[dataset_role].use_values_from_object_for_undetermined(
+                    obj.get_creator(dataset_role))
         super().use_values_from_object_for_undetermined(obj)
 
     def get_datasets(self) -> Dict[DatasetRole, AbstractDataset]:
@@ -153,7 +154,8 @@ class TrainerDatasetManager(BaseObject):
                 for dataset_role, dataset_creator in dataset_creators_map.items()}
 
     @staticmethod
-    def __optional_create(dataset_creator: Optional[AbstractDatasetCreator]) -> Optional[Union[TraceDataset, PreTrainDataset]]:
+    def __optional_create(dataset_creator: Optional[AbstractDatasetCreator]) -> Optional[
+        Union[TraceDataset, PreTrainDataset]]:
         """
         Creates dataset set if not None, otherwise None is returned.
         :param dataset_creator: The optional dataset creator to use.

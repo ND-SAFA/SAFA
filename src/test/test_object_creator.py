@@ -1,27 +1,20 @@
 from copy import deepcopy
-from typing import Dict, List, Type, TypeVar
+from typing import Type, TypeVar
 
 from config.constants import VALIDATION_PERCENTAGE_DEFAULT
-from data.datasets.creators.abstract_dataset_creator import AbstractDatasetCreator
 from data.datasets.creators.classic_trace_dataset_creator import ClassicTraceDatasetCreator
 from data.datasets.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
-from data.datasets.creators.split_dataset_creator import SplitDatasetCreator
-from data.datasets.creators.supported_dataset_creator import SupportedDatasetCreator
-from data.datasets.dataset_role import DatasetRole
 from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
-from data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 from experiments.experiment import Experiment
 from experiments.experiment_step import ExperimentStep
 from jobs.components.job_args import JobArgs
 from jobs.supported_job_type import SupportedJobType
 from models.model_manager import ModelManager
-from test.base_test import BaseTest
-from test.base_trace_test import BaseTraceTest
 from test.definition_creator import DefinitionCreator
 from test.paths.paths import PRETRAIN_DIR, TEST_OUTPUT_DIR
 from test.test_data_manager import TestDataManager
 from train.trainer_args import TrainerArgs
-from util.variables.typed_definition_variable import TypedDefinitionVariable
+from variables.typed_definition_variable import TypedDefinitionVariable
 
 ObjectType = TypeVar("ObjectType")
 
@@ -103,33 +96,6 @@ class TestObjectCreator:
         ExperimentStep: experiment_train_step_definition,
         Experiment: experiment_definition
     }
-
-    @staticmethod
-    def create_trainer_dataset_manager(dataset_map: Dict[DatasetRole, AbstractDatasetCreator],
-                                       split_train_dataset=True) -> TrainerDatasetManager:
-        if split_train_dataset:
-            dataset_map[DatasetRole.VAL] = SplitDatasetCreator(val_percentage=VALIDATION_PERCENTAGE_DEFAULT)
-        return TrainerDatasetManager.create_from_map(dataset_map)
-
-    @staticmethod
-    def create_dataset_map(dataset_role: DatasetRole,
-                           dataset_creator_class: SupportedDatasetCreator = SupportedDatasetCreator.CLASSIC_TRACE,
-                           dataset_creator_params: Dict = None,
-                           include_links=True,
-                           include_pre_processing: bool = False,
-                           pre_processing_steps: List[AbstractDataProcessingStep] = None,
-                           **kwargs
-                           ) -> Dict[DatasetRole, AbstractDatasetCreator]:
-        if not dataset_creator_params:
-            dataset_creator_params = deepcopy(BaseTraceTest._DATASET_PARAMS)
-        if not include_links:
-            dataset_creator_params.pop("true_links")
-        if not pre_processing_steps:
-            dataset_creator_params["data_cleaner"] = BaseTest.DATA_CLEANER
-        if include_pre_processing:
-            dataset_creator_params["data_cleaner"] = BaseTest.DATA_CLEANER
-        abstract_dataset = dataset_creator_class.value(**dataset_creator_params, **kwargs)
-        return {dataset_role: abstract_dataset}
 
     @staticmethod
     def create(class_type: Type[ObjectType], override=False, **kwargs) -> ObjectType:

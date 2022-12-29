@@ -11,7 +11,7 @@ from test.base_trace_test import BaseTraceTest
 from test.paths.paths import TEST_OUTPUT_DIR
 from test.test_assertions import TestAssertions
 from test.test_object_creator import TestObjectCreator
-from util.variables.typed_definition_variable import TypedDefinitionVariable
+from variables.typed_definition_variable import TypedDefinitionVariable
 
 
 class TestTrainerDatasetsContainer(BaseTraceTest):

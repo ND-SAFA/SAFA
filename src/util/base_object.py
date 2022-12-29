@@ -8,12 +8,12 @@ from typeguard import check_type
 from util.enum_utils import get_enum_from_name
 from util.param_specs import ParamSpecs
 from util.reflection_util import ReflectionUtil
-from util.variables.definition_variable import DefinitionVariable
-from util.variables.experimental_variable import ExperimentalVariable
-from util.variables.multi_variable import MultiVariable
-from util.variables.typed_definition_variable import TypedDefinitionVariable
-from util.variables.undetermined_variable import UndeterminedVariable
-from util.variables.variable import Variable
+from variables.definition_variable import DefinitionVariable
+from variables.experimental_variable import ExperimentalVariable
+from variables.multi_variable import MultiVariable
+from variables.typed_definition_variable import TypedDefinitionVariable
+from variables.undetermined_variable import UndeterminedVariable
+from variables.variable import Variable
 
 
 @dataclass

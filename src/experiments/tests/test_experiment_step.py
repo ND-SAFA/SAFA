@@ -38,20 +38,23 @@ class TestExperimentStep(BaseExperimentTest):
     @patch.object(PredictJob, "_run")
     def test_run_with_best_prior(self, predict_job_run_mock: mock.MagicMock):
         predict_job_run_mock.side_effect = self.job_fake_run
-        train_experiment_step = self.get_experiment_step(train_job=True)
-        predict_experiment_step = self.get_experiment_step(train_job=False)
+        train_experiment_step = self.get_experiment_step()
+        predict_experiment_step = self.get_experiment_step(override=True, **{
+            "jobs": [{
+                **TestObjectCreator.experiment_predict_job_definition,
+                "model_manager": {
+                    "model_path": "?"
+                }
+            }]
+        })
         best_job_from_prior = train_experiment_step.jobs.pop()
         best_job = predict_experiment_step.run([best_job_from_prior]).pop()
-        self.assertEquals(best_job.model_manager.model_path, best_job_from_prior.model_manager.model_path)
+        expected_model_path = best_job_from_prior.model_manager.model_path
+        self.assertEquals(best_job.model_manager.model_path, expected_model_path)
         self.assertEqual(predict_job_run_mock.call_count, 1)
 
-    def get_experiment_step(self, train_job=True):
-        if train_job:
-            step = TestObjectCreator.create(ExperimentStep)
-        else:
-            step = TestObjectCreator.create(ExperimentStep, override=True,
-                                            **TestObjectCreator.experiment_predict_step_definition)
-        return step
+    def get_experiment_step(self, **kwargs):
+        return TestObjectCreator.create(ExperimentStep, **kwargs)
 
     @staticmethod
     def get_job_by_id(step, job_id):

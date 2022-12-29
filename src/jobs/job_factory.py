@@ -1,7 +1,7 @@
 from typing import Type, Union
 
-from util.variables.definition_variable import DefinitionVariable
 from jobs.abstract_job import AbstractJob
+from variables.definition_variable import DefinitionVariable
 
 
 class JobFactory:

@@ -3,11 +3,12 @@ from typing import Dict
 from rest_framework import serializers
 
 from server.serializers.serializer_utility import SerializerUtility
-from util.variables.definition_variable import DefinitionVariable
-from util.variables.experimental_variable import ExperimentalVariable
-from util.variables.multi_variable import MultiVariable
-from util.variables.typed_definition_variable import TypedDefinitionVariable
-from util.variables.variable import Variable
+from variables.definition_variable import DefinitionVariable
+from variables.experimental_variable import ExperimentalVariable
+from variables.multi_variable import MultiVariable
+from variables.typed_definition_variable import TypedDefinitionVariable
+from variables.undetermined_variable import UndeterminedVariable
+from variables.variable import Variable
 
 
 class ExperimentSerializer(serializers.Serializer):
@@ -50,4 +51,6 @@ class ExperimentSerializer(serializers.Serializer):
             values = [self.create_variable(v) for v in value]
             return MultiVariable(values)
         else:
+            if isinstance(value, str) and value.strip() == UndeterminedVariable.SYMBOL:
+                return UndeterminedVariable()
             return Variable(value)

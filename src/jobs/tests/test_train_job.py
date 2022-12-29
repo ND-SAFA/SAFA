@@ -14,7 +14,7 @@ from test.test_assertions import TestAssertions
 from test.test_object_creator import TestObjectCreator
 from train.trace_trainer import TraceTrainer
 from train.trainer_args import TrainerArgs
-from util.variables.typed_definition_variable import TypedDefinitionVariable
+from variables.typed_definition_variable import TypedDefinitionVariable
 
 
 class TestTrainJob(BaseJobTest):

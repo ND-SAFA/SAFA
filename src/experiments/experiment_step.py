@@ -11,7 +11,7 @@ from util.base_object import BaseObject
 from util.file_util import FileUtil
 from util.json_util import JSONUtil
 from util.status import Status
-from util.variables.experimental_variable import ExperimentalVariable
+from variables.experimental_variable import ExperimentalVariable
 
 
 class ExperimentStep(BaseObject):
@@ -89,11 +89,12 @@ class ExperimentStep(BaseObject):
             return None
         job_to_experimental_var = {}
         for i, job in enumerate(experimental_jobs.get_values_of_all_variables()):
-            job_to_experimental_var[str(job.id)] = {param_name: param_val.__class__.__name__ if isinstance(param_val, BaseObject)
-                                                    else str(param_val)
-                                                    for param_name, param_val in
-                                                    experimental_jobs.experimental_param_names_to_vals[i].items()
-                                                    }
+            job_to_experimental_var[str(job.id)] = {
+                param_name: param_val.__class__.__name__ if isinstance(param_val, BaseObject)
+                else str(param_val)
+                for param_name, param_val in
+                experimental_jobs.experimental_param_names_to_vals[i].items()
+            }
         return job_to_experimental_var
 
     def _update_jobs_undetermined_vars(self, jobs2update: List[AbstractJob], jobs2use: List[AbstractJob]) -> List[

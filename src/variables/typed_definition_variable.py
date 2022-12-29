@@ -1,7 +1,7 @@
-from typing import Dict, Any
+from typing import Any, Dict
 
-from util.variables.definition_variable import DefinitionVariable
-from util.variables.variable import Variable
+from variables.definition_variable import DefinitionVariable
+from variables.variable import Variable
 
 
 class TypedDefinitionVariable(DefinitionVariable):

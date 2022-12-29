@@ -1,8 +1,8 @@
 from models.model_manager import ModelManager
 from test.base_test import BaseTest
 from test.test_object_creator import TestObjectCreator
-from util.variables.experimental_variable import ExperimentalVariable
-from util.variables.variable import Variable
+from variables.experimental_variable import ExperimentalVariable
+from variables.variable import Variable
 
 
 class TestExperimentalVariables(BaseTest):

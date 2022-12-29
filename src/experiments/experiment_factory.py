@@ -1,5 +1,5 @@
 from experiments.experiment import Experiment
-from util.variables.definition_variable import DefinitionVariable
+from variables import DefinitionVariable
 
 
 class ExperimentFactory:

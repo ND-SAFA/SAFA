@@ -8,7 +8,7 @@ from test.base_test import BaseTest
 from test.definition_creator import DefinitionCreator
 from test.paths.paths import TEST_DATA_DIR, TEST_OUTPUT_DIR
 from test.test_object_creator import TestObjectCreator
-from util.variables.typed_definition_variable import TypedDefinitionVariable
+from variables.typed_definition_variable import TypedDefinitionVariable
 
 
 class TestDefinitionCreator(BaseTest):

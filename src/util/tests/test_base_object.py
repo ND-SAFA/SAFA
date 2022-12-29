@@ -5,9 +5,9 @@ from server.serializers.experiment_serializer import ExperimentSerializer
 from test.base_test import BaseTest
 from test.test_object_creator import TestObjectCreator
 from util.base_object import BaseObject
-from util.variables.definition_variable import DefinitionVariable
-from util.variables.experimental_variable import ExperimentalVariable
-from util.variables.variable import Variable
+from variables.definition_variable import DefinitionVariable
+from variables.experimental_variable import ExperimentalVariable
+from variables.variable import Variable
 
 
 class TestWithOptional(BaseObject):

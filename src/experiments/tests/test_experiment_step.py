@@ -15,7 +15,7 @@ from util.status import Status
 
 
 class TestExperimentStep(BaseExperimentTest):
-    EXPERIMENT_VARS = ["model_manager.model_path", "trainer_dataset_manager.train_dataset_creator.project_path",
+    EXPERIMENT_VARS = ["trainer_dataset_manager.train_dataset_creator.project_path",
                        "trainer_args.num_train_epochs"]
 
     @patch.object(TrainJob, "_run")
@@ -74,5 +74,5 @@ class TestExperimentStep(BaseExperimentTest):
                         continue
                     attr = getattr(attr, attr_name)
                     self.assertIn(attr_name, job_experiment_vars.keys())
-                    if i == len(path_attrs)-1:
+                    if i == len(path_attrs) - 1:
                         self.assertEquals(str(attr), job_experiment_vars[attr_name])

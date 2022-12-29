@@ -1,4 +1,4 @@
-from test.base_test import BaseTest
+from testres.base_test import BaseTest
 from data.processing.cleaning.remove_white_space_step import RemoveWhiteSpaceStep
 
 

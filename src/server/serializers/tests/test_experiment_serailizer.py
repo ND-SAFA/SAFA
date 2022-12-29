@@ -1,5 +1,5 @@
 from experiments.experiment_step import ExperimentStep
-from test.base_test import BaseTest
+from testres.base_test import BaseTest
 from util.definition_creator import DefinitionCreator
 from util.object_creator import ObjectCreator
 from variables.definition_variable import DefinitionVariable

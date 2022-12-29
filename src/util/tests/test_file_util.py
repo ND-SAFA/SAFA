@@ -1,8 +1,8 @@
 import os
 
 from data.datasets.creators.tests.test_mlm_pre_train_dataset_creator import TestMLMPreTrainDatasetCreator
-from test.base_test import BaseTest
-from test.test_assertions import TestAssertions
+from testres.base_test import BaseTest
+from testres.test_assertions import TestAssertions
 from util.file_util import FileUtil
 
 

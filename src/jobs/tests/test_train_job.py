@@ -9,8 +9,8 @@ from jobs.components.job_args import JobArgs
 from jobs.tests.base_job_test import BaseJobTest
 from jobs.train_job import TrainJob
 from models.model_manager import ModelManager
-from test.paths.paths import TEST_DATA_DIR
-from test.test_assertions import TestAssertions
+from testres.paths.paths import TEST_DATA_DIR
+from testres.test_assertions import TestAssertions
 from train.trace_trainer import TraceTrainer
 from train.trainer_args import TrainerArgs
 from util.object_creator import ObjectCreator

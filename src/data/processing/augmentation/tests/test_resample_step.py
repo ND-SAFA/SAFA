@@ -1,9 +1,8 @@
-from test.base_test import BaseTest
+from testres.base_test import BaseTest
 from data.processing.augmentation.resample_step import ResampleStep
 
 
 class TestResampleStep(BaseTest):
-
     RESAMPLE_RATE = 3
 
     def test_run(self):
@@ -13,7 +12,7 @@ class TestResampleStep(BaseTest):
         step = self.get_resample_step()
 
         augmented_data = list(step.run(data_entries))
-        self.assertEquals(len(augmented_data), self.RESAMPLE_RATE*len(data_entries))
+        self.assertEquals(len(augmented_data), self.RESAMPLE_RATE * len(data_entries))
         self.resample_test(augmented_data, data_entries, self.RESAMPLE_RATE)
 
         n_expected = 9

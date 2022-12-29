@@ -12,7 +12,7 @@ from jobs.components.job_result import JobResult
 from jobs.delete_model_job import DeleteModelJob
 from jobs.predict_job import PredictJob
 from jobs.train_job import TrainJob
-from test.paths.paths import TEST_OUTPUT_DIR
+from testres.paths.paths import TEST_OUTPUT_DIR
 from util.object_creator import ObjectCreator
 from util.status import Status
 from variables.undetermined_variable import UndeterminedVariable

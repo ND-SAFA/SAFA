@@ -4,8 +4,8 @@ from typing import Dict, List
 from data.datasets.creators.readers.entity.artifact_reader import ArtifactReader
 from data.datasets.keys.structure_keys import StructureKeys
 from data.tree.artifact import Artifact
-from test.base_test import BaseTest
-from test.paths.paths import TEST_DATA_DIR
+from testres.base_test import BaseTest
+from testres.paths.paths import TEST_DATA_DIR
 
 
 class TestArtifactReader(BaseTest):

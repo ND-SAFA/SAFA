@@ -4,7 +4,7 @@ from transformers.modeling_utils import PreTrainedModel
 from transformers.models.auto.tokenization_auto import AutoTokenizer
 
 from models.model_manager import ModelManager
-from test.base_test import BaseTest
+from testres.base_test import BaseTest
 
 
 class TestTokenizer:

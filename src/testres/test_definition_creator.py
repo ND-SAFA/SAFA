@@ -4,8 +4,8 @@ from copy import deepcopy
 from data.datasets.dataset_role import DatasetRole
 from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
 from jobs.predict_job import PredictJob
-from test.base_test import BaseTest
-from test.paths.paths import TEST_DATA_DIR, TEST_OUTPUT_DIR
+from testres.base_test import BaseTest
+from testres.paths.paths import TEST_DATA_DIR, TEST_OUTPUT_DIR
 from util.definition_creator import DefinitionCreator
 from util.object_creator import ObjectCreator
 from variables.typed_definition_variable import TypedDefinitionVariable

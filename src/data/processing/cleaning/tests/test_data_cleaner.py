@@ -1,6 +1,6 @@
 from typing import Type
 
-from test.base_test import BaseTest
+from testres.base_test import BaseTest
 
 from data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 from data.processing.cleaning.data_cleaner import DataCleaner

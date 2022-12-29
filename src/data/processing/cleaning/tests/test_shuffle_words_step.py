@@ -1,6 +1,6 @@
 import random
 
-from test.base_test import BaseTest
+from testres.base_test import BaseTest
 
 from data.processing.cleaning.shuffle_words_step import ShuffleWordsStep
 

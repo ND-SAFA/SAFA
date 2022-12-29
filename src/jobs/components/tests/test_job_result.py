@@ -2,7 +2,7 @@ import json
 
 from jobs.components.job_result import JobResult
 from util.status import Status
-from test.base_test import BaseTest
+from testres.base_test import BaseTest
 from train.metrics.supported_trace_metric import SupportedTraceMetric
 
 

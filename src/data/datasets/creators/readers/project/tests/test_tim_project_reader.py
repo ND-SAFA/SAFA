@@ -1,9 +1,9 @@
 import os
 
 from data.datasets.creators.readers.project.tim_project_reader import TimProjectReader
-from test.base_test import BaseTest
-from test.paths.paths import TEST_DATA_DIR
-from test.test_assertions import TestAssertions
+from testres.base_test import BaseTest
+from testres.paths.paths import TEST_DATA_DIR
+from testres.test_assertions import TestAssertions
 
 
 class TestTimProjectReader(BaseTest):

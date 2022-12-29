@@ -1,6 +1,6 @@
 import os
 
-from test.paths.paths import TEST_OUTPUT_DIR
+from testres.paths.paths import TEST_OUTPUT_DIR
 
 from jobs.components.job_args import JobArgs
 from jobs.delete_model_job import DeleteModelJob

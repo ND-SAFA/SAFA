@@ -3,7 +3,7 @@ from jobs.components.job_args import JobArgs
 from jobs.predict_job import PredictJob
 from jobs.tests.base_job_test import BaseJobTest
 from models.model_manager import ModelManager
-from test.test_assertions import TestAssertions
+from testres.test_assertions import TestAssertions
 from train.trainer_args import TrainerArgs
 from util.object_creator import ObjectCreator
 from variables.typed_definition_variable import TypedDefinitionVariable

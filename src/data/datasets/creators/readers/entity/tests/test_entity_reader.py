@@ -4,9 +4,9 @@ from data.datasets.creators.readers.entity.artifact_reader import ArtifactReader
 from data.datasets.creators.readers.entity.pre_train_reader import PreTrainReader
 from data.datasets.creators.tests.test_mlm_pre_train_dataset_creator import TestMLMPreTrainDatasetCreator
 from data.datasets.keys.structure_keys import StructureKeys
-from test.base_test import BaseTest
-from test.paths.paths import TEST_DATA_DIR
-from test.test_assertions import TestAssertions
+from testres.base_test import BaseTest
+from testres.paths.paths import TEST_DATA_DIR
+from testres.test_assertions import TestAssertions
 
 
 class TestPreTrainReader(BaseTest):

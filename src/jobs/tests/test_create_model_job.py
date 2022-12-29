@@ -3,7 +3,7 @@ from jobs.components.job_result import JobResult
 from jobs.create_model_job import CreateModelJob
 from jobs.tests.base_job_test import BaseJobTest
 from models.model_manager import ModelManager
-from test.paths.paths import TEST_OUTPUT_DIR
+from testres.paths.paths import TEST_OUTPUT_DIR
 from util.object_creator import ObjectCreator
 
 

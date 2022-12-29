@@ -2,8 +2,8 @@ from data.processing.augmentation.data_augmenter import DataAugmenter
 from data.processing.augmentation.resample_step import ResampleStep
 from data.processing.augmentation.simple_word_replacement_step import SimpleWordReplacementStep
 from data.processing.augmentation.source_target_swap_step import SourceTargetSwapStep
-from test.base_test import BaseTest
-from test.test_assertions import TestAssertions
+from testres.base_test import BaseTest
+from testres.test_assertions import TestAssertions
 
 
 class TestDataAugmenter(BaseTest):

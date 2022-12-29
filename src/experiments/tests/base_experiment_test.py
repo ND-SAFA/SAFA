@@ -4,8 +4,8 @@ import random
 
 from jobs.components.job_result import JobResult
 from jobs.supported_job_type import SupportedJobType
-from test.base_test import BaseTest
-from test.paths.paths import TEST_OUTPUT_DIR
+from testres.base_test import BaseTest
+from testres.paths.paths import TEST_OUTPUT_DIR
 from variables.definition_variable import DefinitionVariable
 from variables.experimental_variable import ExperimentalVariable
 from variables.multi_variable import MultiVariable

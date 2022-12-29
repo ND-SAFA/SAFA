@@ -1,5 +1,5 @@
 from models.model_manager import ModelManager
-from test.base_test import BaseTest
+from testres.base_test import BaseTest
 from util.object_creator import ObjectCreator
 from variables.experimental_variable import ExperimentalVariable
 from variables.variable import Variable

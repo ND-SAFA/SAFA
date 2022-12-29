@@ -7,9 +7,9 @@ from data.datasets.creators.mlm_pre_train_dataset_creator import MLMPreTrainData
 from data.datasets.dataset_role import DatasetRole
 from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
 from data.datasets.trace_dataset import TraceDataset
-from test.base_trace_test import BaseTraceTest
-from test.paths.paths import TEST_OUTPUT_DIR
-from test.test_assertions import TestAssertions
+from testres.base_trace_test import BaseTraceTest
+from testres.paths.paths import TEST_OUTPUT_DIR
+from testres.test_assertions import TestAssertions
 from util.object_creator import ObjectCreator
 from variables.typed_definition_variable import TypedDefinitionVariable
 

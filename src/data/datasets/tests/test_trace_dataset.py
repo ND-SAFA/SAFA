@@ -13,9 +13,9 @@ from data.processing.augmentation.source_target_swap_step import SourceTargetSwa
 from data.tree.trace_link import TraceLink
 from models.model_manager import ModelManager
 from models.model_properties import ModelArchitectureType
-from test.base_trace_test import BaseTraceTest
-from test.test_assertions import TestAssertions
-from test.test_data_manager import TestDataManager
+from testres.base_trace_test import BaseTraceTest
+from testres.test_assertions import TestAssertions
+from testres.test_data_manager import TestDataManager
 
 FEATURE_VALUE = "({}, {})"
 

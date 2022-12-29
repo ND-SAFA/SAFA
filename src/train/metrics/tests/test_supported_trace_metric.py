@@ -1,7 +1,7 @@
 import mock
 from mock import patch
 
-from test.base_test import BaseTest
+from testres.base_test import BaseTest
 from train.metrics.supported_trace_metric import get_metric_path
 
 

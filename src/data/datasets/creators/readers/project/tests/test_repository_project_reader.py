@@ -2,9 +2,9 @@ import os
 
 from data.datasets.creators.readers.project.repository_project_reader import RepositoryProjectReader
 from data.datasets.keys.safa_format import SafaKeys
-from test.base_test import BaseTest
-from test.paths.paths import TEST_DATA_DIR
-from test.test_assertions import TestAssertions
+from testres.base_test import BaseTest
+from testres.paths.paths import TEST_DATA_DIR
+from testres.test_assertions import TestAssertions
 
 
 class TestRepositoryProjectReader(BaseTest):

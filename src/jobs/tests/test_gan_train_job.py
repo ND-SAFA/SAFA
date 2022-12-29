@@ -2,8 +2,8 @@ import os
 from unittest import mock
 from unittest.mock import patch
 
-from test.paths.paths import TEST_DATA_DIR
-from test.test_assertions import TestAssertions
+from testres.paths.paths import TEST_DATA_DIR
+from testres.test_assertions import TestAssertions
 
 from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
 from jobs.abstract_job import AbstractJob

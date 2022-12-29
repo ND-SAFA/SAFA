@@ -2,7 +2,7 @@ from typing import Dict, List, Optional, Union
 
 from jobs.abstract_job import AbstractJob
 from server.serializers.experiment_serializer import ExperimentSerializer
-from test.base_test import BaseTest
+from testres.base_test import BaseTest
 from util.base_object import BaseObject
 from util.object_creator import ObjectCreator
 from variables.definition_variable import DefinitionVariable

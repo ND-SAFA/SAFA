@@ -10,7 +10,7 @@ from transformers.models.bert.tokenization_bert import BertTokenizer
 from config.constants import DELETE_TEST_OUTPUT
 from data.processing.cleaning.data_cleaner import DataCleaner
 from data.processing.cleaning.supported_data_cleaning_step import SupportedDataCleaningStep
-from test.paths.paths import TEST_DATA_DIR, TEST_OUTPUT_DIR, TEST_VOCAB_FILE
+from testres.paths.paths import TEST_DATA_DIR, TEST_OUTPUT_DIR, TEST_VOCAB_FILE
 
 
 class BaseTest(TestCase):

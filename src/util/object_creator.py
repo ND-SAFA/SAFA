@@ -10,8 +10,8 @@ from experiments.experiment_step import ExperimentStep
 from jobs.components.job_args import JobArgs
 from jobs.supported_job_type import SupportedJobType
 from models.model_manager import ModelManager
-from test.paths.paths import TEST_OUTPUT_DIR
-from test.test_data_manager import TestDataManager
+from testres.paths.paths import TEST_OUTPUT_DIR
+from testres.test_data_manager import TestDataManager
 from train.trainer_args import TrainerArgs
 from util.definition_creator import DefinitionCreator
 from variables.typed_definition_variable import TypedDefinitionVariable

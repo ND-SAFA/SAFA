@@ -1,5 +1,5 @@
 from data.datasets.creators.split_dataset_creator import SplitDatasetCreator
-from test.base_test import BaseTest
+from testres.base_test import BaseTest
 
 
 class TestSplitDatasetCreator(BaseTest):

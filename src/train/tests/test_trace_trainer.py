@@ -9,9 +9,9 @@ from data.datasets.dataset_role import DatasetRole
 from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
 from jobs.predict_job import PredictJob
 from models.model_manager import ModelManager
-from test.base_trace_test import BaseTraceTest
-from test.test_assertions import TestAssertions
-from test.test_data_manager import TestDataManager
+from testres.base_trace_test import BaseTraceTest
+from testres.test_assertions import TestAssertions
+from testres.test_data_manager import TestDataManager
 from train.trace_trainer import TraceTrainer
 from train.trainer_args import TrainerArgs
 from util.object_creator import ObjectCreator

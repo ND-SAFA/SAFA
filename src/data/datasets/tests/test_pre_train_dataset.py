@@ -5,8 +5,8 @@ from transformers import LineByLineTextDataset
 
 from data.datasets.pre_train_dataset import PreTrainDataset
 from models.model_manager import ModelManager
-from test.base_test import BaseTest
-from test.paths.paths import TEST_VOCAB_FILE
+from testres.base_test import BaseTest
+from testres.paths.paths import TEST_VOCAB_FILE
 
 
 class TestPreTrainDataset(BaseTest):

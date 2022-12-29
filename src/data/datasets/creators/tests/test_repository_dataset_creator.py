@@ -2,10 +2,10 @@ import os
 
 from data.datasets.creators.repository_dataset_creator import RepositoryDatasetCreator
 from data.datasets.keys.safa_format import SafaKeys
-from test.base_trace_test import BaseTraceTest
-from test.paths.paths import TEST_DATA_DIR
-from test.test_assertions import TestAssertions
-from test.test_data_manager import TestDataManager
+from testres.base_trace_test import BaseTraceTest
+from testres.paths.paths import TEST_DATA_DIR
+from testres.test_assertions import TestAssertions
+from testres.test_data_manager import TestDataManager
 
 
 class TestRepositoryDatasetCreator(BaseTraceTest):

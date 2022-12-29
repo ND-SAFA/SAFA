@@ -4,7 +4,7 @@ from jobs.mlm_pre_train_job import MLMPreTrainJob
 from jobs.tests.base_job_test import BaseJobTest
 from models.model_manager import ModelManager
 from models.model_properties import ModelTask
-from test.test_assertions import TestAssertions
+from testres.test_assertions import TestAssertions
 from train.trainer_args import TrainerArgs
 from util.object_creator import ObjectCreator
 

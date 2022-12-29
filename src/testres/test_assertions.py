@@ -3,7 +3,7 @@ from unittest import TestCase
 
 from data.datasets.keys.structure_keys import StructureKeys
 from jobs.components.job_result import JobResult
-from test.test_data_manager import TestDataManager
+from testres.test_data_manager import TestDataManager
 
 
 class TestAssertions:

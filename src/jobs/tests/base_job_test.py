@@ -7,7 +7,7 @@ from jobs.abstract_job import AbstractJob
 from jobs.components.job_result import JobResult
 from util.status import Status
 from models.model_manager import ModelManager
-from test.base_trace_test import BaseTraceTest
+from testres.base_trace_test import BaseTraceTest
 
 
 class BaseJobTest(BaseTraceTest, ABC):

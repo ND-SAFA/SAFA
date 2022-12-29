@@ -1,8 +1,8 @@
 import os
 
 from data.datasets.creators.structure_dataset_creator import StructureDatasetCreator
-from test.base_test import BaseTest
-from test.paths.paths import TEST_DATA_DIR
+from testres.base_test import BaseTest
+from testres.paths.paths import TEST_DATA_DIR
 
 
 class TestStructureDatasetCreator(BaseTest):

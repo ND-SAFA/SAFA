@@ -1,9 +1,10 @@
 from abc import ABC
 from copy import deepcopy
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Type, Union, get_args
+from typing import Any, Dict, List, Type, Union
 
 from typeguard import check_type
+from typing_extensions import get_args
 
 from util.enum_utils import get_enum_from_name
 from util.param_specs import ParamSpecs

@@ -15,7 +15,7 @@ sys.path.append(ROOT_PATH)
 if __name__ == "__main__":
     job_definition = {
         "job_args": {
-            "random_seed": "165"
+            "random_seed": 165
         },
         "model_manager": {
             "model_path": "bert-base-uncased"

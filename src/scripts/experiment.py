@@ -1,8 +1,10 @@
 import argparse
 import os
+import random
 import sys
 
 import torch
+import transformers
 from django.core.wsgi import get_wsgi_application
 from dotenv import load_dotenv
 
@@ -54,5 +56,7 @@ if __name__ == "__main__":
     # Run Job
     #
     application = get_wsgi_application()
+    transformers.set_seed(42)
+    random.seed(42)
     experiment = ObjectCreator.create(Experiment, override=True, **job_definition)
     experiment.run()

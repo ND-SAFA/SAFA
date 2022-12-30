@@ -8,6 +8,8 @@ from copy import deepcopy
 from inspect import getfullargspec
 from typing import Dict
 
+import transformers
+
 from jobs.components.job_args import JobArgs
 from jobs.components.job_result import JobResult
 from models.model_manager import ModelManager
@@ -60,7 +62,7 @@ class AbstractJob(threading.Thread, BaseObject):
         :return: None
         """
         random.seed(random_seed)
-        # transformers.enable_full_determinism(random_seed)
+        transformers.enable_full_determinism(random_seed)
 
     def get_output_filepath(self, output_dir: str = None) -> str:
         """

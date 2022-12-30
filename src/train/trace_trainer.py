@@ -1,7 +1,9 @@
+import os
 from copy import deepcopy
 from typing import Dict, List, NamedTuple, Tuple, Union
 
 import numpy as np
+import torch
 from datasets import load_metric
 from scipy.special import softmax
 from torch.utils.data import DataLoader
@@ -17,6 +19,9 @@ from models.model_manager import ModelManager
 from train.metrics.supported_trace_metric import get_metric_name, get_metric_path
 from train.trainer_args import TrainerArgs
 from util.base_object import BaseObject
+
+os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":16:8"
+torch.use_deterministic_algorithms(True)
 
 
 class TraceTrainer(Trainer, BaseObject):

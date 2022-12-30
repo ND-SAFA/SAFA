@@ -18,8 +18,8 @@ from variables.experimental_variable import ExperimentalVariable
 
 class ExperimentStep(BaseObject):
     OUTPUT_FILENAME = "output.json"
-    MAX_JOBS = 1
-    RUN_ASYNC = False
+    MAX_JOBS = 2
+    RUN_ASYNC = True
 
     def __init__(self, jobs: Union[List[AbstractJob], ExperimentalVariable, List[ExperimentalVariable]],
                  comparison_metric: Union[str, SupportedTraceMetric] = None, should_maximize_metric: bool = True):
@@ -57,9 +57,7 @@ class ExperimentStep(BaseObject):
                 self._run_on_jobs(jobs, "join")
         else:
             for job in self.jobs:
-                print("Starting:", job)
                 job.run()
-                print("Ending:", job)
 
         self.status = Status.SUCCESS
         if self.comparison_metric:

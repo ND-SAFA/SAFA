@@ -28,7 +28,8 @@
             },
             "metrics": [
               "map"
-            ]
+            ],
+            "_n_gpu": 1
           },
           "trainer_dataset_manager": {
             "train_dataset_creator": {

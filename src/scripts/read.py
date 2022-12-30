@@ -5,7 +5,7 @@ import pandas as pd
 
 from util.file_util import FileUtil
 
-IGNORE = ["job_args"]
+IGNORE = ["job_args", "trainer_args"]
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -40,4 +40,4 @@ if __name__ == "__main__":
                 entries.append(entry)
 
     entries_df = pd.DataFrame(entries)
-    print(entries_df)
+    entries_df.to_csv(os.path.join(base_path, "results.csv"), index=False)

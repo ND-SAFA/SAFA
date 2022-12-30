@@ -141,6 +141,7 @@ class TrainerDatasetManager(BaseObject):
         dataset_splits_map[DatasetRole.TRAIN] = train_dataset
         for i, dataset_role in enumerate(dataset_percent_splits.keys()):
             dataset_splits_map[dataset_role] = split_datasets[i]
+        print("Datasets are split...")
         return dataset_splits_map
 
     @staticmethod

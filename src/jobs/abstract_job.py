@@ -63,6 +63,7 @@ class AbstractJob(threading.Thread, BaseObject):
         """
         random.seed(random_seed)
         set_seed(random_seed)
+        print("Setting random seed!")
 
     def get_output_filepath(self, output_dir: str = None) -> str:
         """

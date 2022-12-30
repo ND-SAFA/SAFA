@@ -21,7 +21,7 @@ class ExperimentStep(BaseObject):
     MAX_JOBS = 1
     RUN_ASYNC = False
 
-    def __init__(self, jobs: Union[List[AbstractJob], ExperimentalVariable, List[ExperimentalVariable]],
+    def __init__(self, jobs: Union[List[AbstractJob], ExperimentalVariable],
                  comparison_metric: Union[str, SupportedTraceMetric] = None, should_maximize_metric: bool = True):
         """
         Represents an experiment step
@@ -29,8 +29,6 @@ class ExperimentStep(BaseObject):
         :param comparison_metric: the metric to use to determine the best job
         :param should_maximize_metric: True if should maximize the comparison metric to find best job
         """
-        if isinstance(jobs, list) and isinstance(jobs[0], ExperimentalVariable):
-            jobs = jobs.pop()  # TODO fix this
         if not isinstance(jobs, ExperimentalVariable):
             jobs = ExperimentalVariable(jobs)
         jobs, experimental_vars = jobs.get_values_of_all_variables(), jobs.experimental_param_names_to_vals

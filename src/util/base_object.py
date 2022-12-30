@@ -74,15 +74,19 @@ class BaseObject(ABC):
         for param_name, variable in definition.items():
             expected_type = param_specs.param_types[param_name] if param_name in param_specs.param_types else None
             param_value = cls._get_value_of_variable(variable, expected_type)
+
             if isinstance(param_value, ExperimentalVariable):
-                experiment_params_list = []
-                for i, experiment_val in enumerate(param_value):
-                    children_experimental_vars = param_value.experimental_param_names_to_vals[
-                        i] if param_value.experimental_param_names_to_vals else {}
-                    experiment_params_list.extend(
-                        cls._add_param_values(obj_meta_list, param_name, experiment_val, is_experimental=True,
-                                              children_experimental_vars=children_experimental_vars))
-                obj_meta_list = experiment_params_list
+                if cls._is_type(param_value, expected_type, param_name):
+                    obj_meta_list[0].init_params[param_name] = param_value
+                else:
+                    experiment_params_list = []
+                    for i, experiment_val in enumerate(param_value):
+                        children_experimental_vars = param_value.experimental_param_names_to_vals[
+                            i] if param_value.experimental_param_names_to_vals else {}
+                        experiment_params_list.extend(
+                            cls._add_param_values(obj_meta_list, param_name, experiment_val, is_experimental=True,
+                                                  children_experimental_vars=children_experimental_vars))
+                    obj_meta_list = experiment_params_list
             else:
                 obj_meta_list = cls._add_param_values(obj_meta_list, param_name, param_value, expected_type)
         instances = [cls(**obj_meta.init_params) for obj_meta in obj_meta_list]
@@ -108,7 +112,9 @@ class BaseObject(ABC):
                 expected_inner_type = expected_inner_types[i] if i < len(expected_inner_types) else expected_inner_type
                 inner_val = cls._get_value_of_variable(inner_var, expected_inner_type)
                 val.append(inner_val)
-            if isinstance(variable, ExperimentalVariable):
+            if len(val) == 1 and isinstance(val[0], ExperimentalVariable):
+                val = val.pop()
+            elif isinstance(variable, ExperimentalVariable):
                 val = ExperimentalVariable(val)
         elif isinstance(variable, TypedDefinitionVariable):
             expected_class = cls._get_expected_class_by_type(expected_type, variable.object_type)
@@ -198,11 +204,22 @@ class BaseObject(ABC):
         :param param_name: the name of the parameter being tested
         :return: None (raises an exception if not the expected type)
         """
-        if isinstance(val, UndeterminedVariable):
-            return
-        try:
-            check_type(param_name, val, expected_type)
-        except TypeError as te:
-            print(te)
+        if not cls._is_type(val, expected_type, param_name):
             raise TypeError(
                 "%s expected type %s for %s but received %s" % (cls.__name__, expected_type, param_name, type(val)))
+
+    @classmethod
+    def _is_type(cls, val: Any, expected_type: Union[Type], param_name: str) -> bool:
+        """
+        Checks if the value is of the expected type for the variable with the given name
+        :param val: the value
+        :param expected_type: expected type or typing generic
+        :param param_name: the name of the parameter being tested
+        :return: True if the type of val matches expected_type, False otherwise
+        """
+        try:
+            if not isinstance(val, UndeterminedVariable):
+                check_type(param_name, val, expected_type)
+        except TypeError:
+            return False
+        return True

@@ -1,7 +1,7 @@
 import math
 import os
 from copy import deepcopy
-from typing import Dict, List, Optional, Type, Union, Any
+from typing import Any, Dict, List, Type, Union
 
 from config.override import overrides
 from jobs.abstract_job import AbstractJob
@@ -49,14 +49,17 @@ class ExperimentStep(BaseObject):
         self.status = Status.IN_PROGRESS
         if jobs_for_undetermined_vars:
             self.jobs = self._update_jobs_undetermined_vars(self.jobs, jobs_for_undetermined_vars)
-        job_runs = self._divide_jobs_into_runs()
-        for jobs in job_runs:
-            if self.RUN_ASYNC:
+
+        if self.RUN_ASYNC:
+            job_runs = self._divide_jobs_into_runs()
+            for jobs in job_runs:
                 self._run_on_jobs(jobs, "start")
                 self._run_on_jobs(jobs, "join")
-            else:
-                for job in jobs:
-                    job.run()
+        else:
+            for job in self.jobs:
+                print("Starting:", job)
+                job.run()
+                print("Ending:", job)
 
         self.status = Status.SUCCESS
         if self.comparison_metric:
@@ -103,7 +106,8 @@ class ExperimentStep(BaseObject):
         return job_runs
 
     @staticmethod
-    def _update_jobs_with_experimental_vars(jobs: List[AbstractJob], experimental_vars: List[Dict[str, Any]]) -> List[AbstractJob]:
+    def _update_jobs_with_experimental_vars(jobs: List[AbstractJob], experimental_vars: List[Dict[str, Any]]) -> List[
+        AbstractJob]:
         """
         Updates the jobs to contain the experimental vars associated with that job
         :param jobs: the jobs to update
@@ -114,7 +118,8 @@ class ExperimentStep(BaseObject):
             job.result[JobResult.EXPERIMENTAL_VARS] = experimental_vars[i]
         return jobs
 
-    def _update_jobs_undetermined_vars(self, jobs2update: List[AbstractJob], jobs2use: List[AbstractJob]) -> List[AbstractJob]:
+    def _update_jobs_undetermined_vars(self, jobs2update: List[AbstractJob], jobs2use: List[AbstractJob]) -> List[
+        AbstractJob]:
         """
         Updates all the jobs2update's undetermined vals with those from the jobs2use
         :param jobs2update: the list of jobs to update undetermined vals for

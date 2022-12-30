@@ -1,13 +1,21 @@
 import argparse
 import os
+import sys
 
 import pandas as pd
+from dotenv import load_dotenv
 
-from util.file_util import FileUtil
+load_dotenv()
+
+ROOT_PATH = os.path.expanduser(os.environ["ROOT_PATH"])
+assert os.path.exists(ROOT_PATH), ROOT_PATH
+sys.path.append(ROOT_PATH)
 
 IGNORE = ["job_args", "trainer_args"]
 
 if __name__ == "__main__":
+    from util.file_util import FileUtil
+
     parser = argparse.ArgumentParser(
         prog='Results reader',
         description='Reads experiment results.')
@@ -41,3 +49,4 @@ if __name__ == "__main__":
 
     entries_df = pd.DataFrame(entries)
     entries_df.to_csv(os.path.join(base_path, "results.csv"), index=False)
+    print(entries_df)

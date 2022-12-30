@@ -8,10 +8,12 @@ load_dotenv()
 ROOT_PATH = os.path.expanduser(os.environ["ROOT_PATH"])
 assert os.path.exists(ROOT_PATH), ROOT_PATH
 sys.path.append(ROOT_PATH)
-from jobs.train_job import TrainJob
-from util.object_creator import ObjectCreator
 
 if __name__ == "__main__":
+    from jobs.train_job import TrainJob
+    from util.object_creator import ObjectCreator
+    from scripts.experiment import expand_paths
+
     job_definition = {
         "job_args": {
             "random_seed": 165
@@ -38,6 +40,7 @@ if __name__ == "__main__":
             }
         }
     }
+    job_definition = expand_paths(job_definition)
 
     train_job = ObjectCreator.create(TrainJob, override=True, **job_definition)
     train_job.run()

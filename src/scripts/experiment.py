@@ -53,6 +53,9 @@ if __name__ == "__main__":
     #
     # Run Job
     #
+    os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":16:8:"
+    torch.use_deterministic_algorithms(True)
+
     application = get_wsgi_application()
     experiment = ObjectCreator.create(Experiment, override=True, **job_definition)
     experiment.run()

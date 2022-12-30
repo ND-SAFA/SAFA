@@ -40,5 +40,5 @@ if __name__ == "__main__":
         }
     }
 
-    train_job = ObjectCreator.create(TrainJob, job_definition)
+    train_job = ObjectCreator.create(TrainJob, override=True, **job_definition)
     train_job.run()

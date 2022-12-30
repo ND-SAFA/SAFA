@@ -8,8 +8,6 @@ from copy import deepcopy
 from inspect import getfullargspec
 from typing import Dict
 
-from transformers import set_seed
-
 from jobs.components.job_args import JobArgs
 from jobs.components.job_result import JobResult
 from models.model_manager import ModelManager
@@ -62,7 +60,7 @@ class AbstractJob(threading.Thread, BaseObject):
         :return: None
         """
         random.seed(random_seed)
-        set_seed(random_seed)
+        # set_seed(random_seed)
 
     def get_output_filepath(self, output_dir: str = None) -> str:
         """

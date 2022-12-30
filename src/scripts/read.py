@@ -12,7 +12,7 @@ ROOT_PATH = os.path.expanduser(os.environ["ROOT_PATH"])
 assert os.path.exists(ROOT_PATH), ROOT_PATH
 sys.path.append(ROOT_PATH)
 
-IGNORE = ["job_args", "trainer_args"]
+IGNORE = ["job_args", "trainer_args", "model_manager", "val_dataset_creator", "trainer_dataset_manager"]
 
 
 def get_path(entry_dict: Dict, paths: List[str]):

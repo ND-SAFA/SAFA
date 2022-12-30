@@ -1,7 +1,7 @@
 import math
 import os
 from copy import deepcopy
-from typing import Any, Dict, List, Type, Union
+from typing import Any, Callable, Dict, List, Type, Union
 
 from config.override import overrides
 from jobs.abstract_job import AbstractJob
@@ -40,9 +40,13 @@ class ExperimentStep(BaseObject):
         self.comparison_metric = comparison_metric
         self.should_maximize_metric = should_maximize_metric
 
-    def run(self, jobs_for_undetermined_vars: List[AbstractJob] = None) -> List[AbstractJob]:
+    def run(self, jobs_for_undetermined_vars: List[AbstractJob] = None, job_callback: Callable[[], None] = None) -> \
+            List[
+                AbstractJob]:
         """
         Runs all step jobs
+        :param job_callback:
+        :type job_callback:
         :param jobs_for_undetermined_vars: the best job from a prior step
         :return: the best job from this step if comparison metric is provided, else all the jobs
         """
@@ -58,6 +62,8 @@ class ExperimentStep(BaseObject):
         else:
             for job in self.jobs:
                 job.run()
+                if job_callback:
+                    job_callback()
 
         self.status = Status.SUCCESS
         if self.comparison_metric:

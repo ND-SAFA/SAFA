@@ -11,7 +11,6 @@ class TrainJob(AbstractTraceJob):
         :return: results of the training including as loss and time
         """
         trainer = self.get_trainer(**kwargs)
-        print("Got trainer...")
         training_output = trainer.perform_training()
         trainer.save_model(self.model_manager.model_output_path)
         if DatasetRole.EVAL in self.trainer_dataset_manager:

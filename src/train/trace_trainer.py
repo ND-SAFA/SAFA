@@ -47,7 +47,6 @@ class TraceTrainer(Trainer, BaseObject):
         :return: a dictionary containing the results
         """
         self.train_dataset = self.trainer_dataset_manager[DatasetRole.TRAIN].to_trainer_dataset(self.model_manager)
-        print("Got dataset...starting!")
         train_output = self.train(resume_from_checkpoint=checkpoint)
         train_json = TraceTrainer.output_to_dict(train_output)
         if DatasetRole.VAL in self.trainer_dataset_manager:

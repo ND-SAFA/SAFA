@@ -25,6 +25,7 @@ class JobResult(BaseObject):
     SCORE = "score"
     SOURCE_TARGET_PAIRS = "source_target_pairs"
     VAL_METRICS = "val_metrics"
+    EXPERIMENTAL_VARS = "experimental_vars"
 
     _properties = {JOB_ID: Schema(type=TYPE_STRING, format=FORMAT_UUID),
                    STATUS: Schema(type=TYPE_INTEGER),

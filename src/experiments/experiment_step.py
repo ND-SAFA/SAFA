@@ -5,6 +5,7 @@ from typing import Dict, List, Optional, Type, Union
 
 from config.override import overrides
 from jobs.abstract_job import AbstractJob
+from jobs.components.job_result import JobResult
 from jobs.supported_job_type import SupportedJobType
 from server.storage.safa_storage import SafaStorage
 from train.metrics.supported_trace_metric import SupportedTraceMetric
@@ -33,7 +34,9 @@ class ExperimentStep(BaseObject):
         if not isinstance(jobs, ExperimentalVariable):
             jobs = ExperimentalVariable(jobs)
         self.jobs = jobs.get_values_of_all_variables()
-        self.job_to_experimental_var = self._get_job_to_experimental_var(jobs)
+        if jobs.experimental_param_names_to_vals:
+            for i, job in enumerate(self.jobs):
+                job.result[JobResult.EXPERIMENTAL_VARS] = jobs.experimental_param_names_to_vals[i]
         self.status = Status.NOT_STARTED
         self.best_job = None
         self.comparison_metric = comparison_metric
@@ -130,9 +133,6 @@ class ExperimentStep(BaseObject):
         final_jobs = []
         for job in jobs2use:
             jobs2update_tmp = deepcopy(jobs2update)
-            if self.job_to_experimental_var:
-                for orig_job, new_job in zip(jobs2update, jobs2update_tmp):
-                    self.job_to_experimental_var[new_job.id] = self.job_to_experimental_var.pop(orig_job.id)
             jobs2update = jobs2update_tmp
             if hasattr(job, "model_manager"):
                 job.model_manager.model_path = job.model_manager.model_output_path

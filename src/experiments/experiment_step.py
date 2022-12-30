@@ -1,10 +1,11 @@
 import math
 import os
 from copy import deepcopy
-from typing import Dict, List, Optional, Type, Union
+from typing import Dict, List, Optional, Type, Union, Any
 
 from config.override import overrides
 from jobs.abstract_job import AbstractJob
+from jobs.components.job_result import JobResult
 from jobs.supported_job_type import SupportedJobType
 from server.storage.safa_storage import SafaStorage
 from train.metrics.supported_trace_metric import SupportedTraceMetric
@@ -32,8 +33,8 @@ class ExperimentStep(BaseObject):
             jobs = jobs.pop()  # TODO fix this
         if not isinstance(jobs, ExperimentalVariable):
             jobs = ExperimentalVariable(jobs)
-        self.jobs = jobs.get_values_of_all_variables()
-        self.job_to_experimental_var = self._get_job_to_experimental_var(jobs)
+        jobs, experimental_vars = jobs.get_values_of_all_variables(), jobs.experimental_param_names_to_vals
+        self.jobs = self._update_jobs_with_experimental_vars(jobs, experimental_vars) if experimental_vars else jobs
         self.status = Status.NOT_STARTED
         self.best_job = None
         self.comparison_metric = comparison_metric
@@ -102,23 +103,16 @@ class ExperimentStep(BaseObject):
         return job_runs
 
     @staticmethod
-    def _get_job_to_experimental_var(experimental_jobs: ExperimentalVariable) -> Optional[Dict[str, Dict]]:
+    def _update_jobs_with_experimental_vars(jobs: List[AbstractJob], experimental_vars: List[Dict[str, Any]]) -> List[AbstractJob]:
         """
-        Gets a mapping of job id to the experimental variables associated with that job
-        :param experimental_jobs: an experimental variable containing all jobs and their experimental variables
-        :return: a dictionary mapping job id to the experimental variables associated with that job
+        Updates the jobs to contain the experimental vars associated with that job
+        :param jobs: the jobs to update
+        :param experimental_vars: the list of experimental vars associated with each job
+        :return: the update jobs
         """
-        if not experimental_jobs.experimental_param_names_to_vals:
-            return None
-        job_to_experimental_var = {}
-        for i, job in enumerate(experimental_jobs.get_values_of_all_variables()):
-            job_to_experimental_var[str(job.id)] = {
-                param_name: param_val.__class__.__name__ if isinstance(param_val, BaseObject)
-                else str(param_val)
-                for param_name, param_val in
-                experimental_jobs.experimental_param_names_to_vals[i].items()
-            }
-        return job_to_experimental_var
+        for i, job in enumerate(jobs):
+            job.result[JobResult.EXPERIMENTAL_VARS] = experimental_vars[i]
+        return jobs
 
     def _update_jobs_undetermined_vars(self, jobs2update: List[AbstractJob], jobs2use: List[AbstractJob]) -> List[AbstractJob]:
         """
@@ -130,9 +124,6 @@ class ExperimentStep(BaseObject):
         final_jobs = []
         for job in jobs2use:
             jobs2update_tmp = deepcopy(jobs2update)
-            if self.job_to_experimental_var:
-                for orig_job, new_job in zip(jobs2update, jobs2update_tmp):
-                    self.job_to_experimental_var[new_job.id] = self.job_to_experimental_var.pop(orig_job.id)
             jobs2update = jobs2update_tmp
             if hasattr(job, "model_manager"):
                 job.model_manager.model_path = job.model_manager.model_output_path

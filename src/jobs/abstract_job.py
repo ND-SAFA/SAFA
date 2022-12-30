@@ -107,6 +107,7 @@ class AbstractJob(threading.Thread, BaseObject):
         param_names = getfullargspec(self.__init__).args
         params = {name: deepcopy(getattr(self, name, None)) for name in param_names if name != "self"}
         cpyobj = type(self)(**params)  # shallow copy of whole object
+        cpyobj.result = deepcopy(self.result)
         return cpyobj
 
     def __str__(self) -> str:

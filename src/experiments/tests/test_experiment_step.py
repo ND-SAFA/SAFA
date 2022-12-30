@@ -32,7 +32,7 @@ class TestExperimentStep(BaseExperimentTest):
         result_dirs = os.listdir(os.path.join(TEST_OUTPUT_DIR))
         for job_id in output["jobs"]:
             self.assertIn(job_id, result_dirs)
-        self.assert_experimental_vars(output, experiment_step)
+        self.assert_experimental_vars(experiment_step)
         self.assertEquals(output["status"], Status.SUCCESS.value)
         best_job = self.get_job_by_id(experiment_step, output["best_job"])
         self.assertTrue(best_job is not None)
@@ -109,11 +109,13 @@ class TestExperimentStep(BaseExperimentTest):
                 break
         return found_job
 
-    def assert_experimental_vars(self, output, experiment_step):
-        for job_id, job_experiment_vars in output["job_to_experimental_var"].items():
+    def assert_experimental_vars(self, experiment_step):
+        for job in experiment_step.jobs:
+            self.assertIn(JobResult.EXPERIMENTAL_VARS, job.result)
+            job_experiment_vars = job.result[JobResult.EXPERIMENTAL_VARS]
             for experiment_var_path in self.EXPERIMENT_VARS:
                 path_attrs = experiment_var_path.split(".")
-                attr = self.get_job_by_id(experiment_step, job_id)
+                attr = job
                 for i, attr_name in enumerate(path_attrs):
                     if not hasattr(attr, attr_name):
                         if isinstance(attr, TrainerDatasetManager):
@@ -122,4 +124,4 @@ class TestExperimentStep(BaseExperimentTest):
                     attr = getattr(attr, attr_name)
                     self.assertIn(attr_name, job_experiment_vars.keys())
                     if i == len(path_attrs) - 1:
-                        self.assertEquals(str(attr), job_experiment_vars[attr_name])
+                        self.assertEquals(attr, job_experiment_vars[attr_name])

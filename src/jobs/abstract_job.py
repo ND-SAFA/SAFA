@@ -1,5 +1,6 @@
 import os
 import random
+import threading
 import traceback
 import uuid
 from abc import abstractmethod
@@ -18,7 +19,7 @@ from util.file_util import FileUtil
 from util.status import Status
 
 
-class AbstractJob(BaseObject):
+class AbstractJob(threading.Thread, BaseObject):
     OUTPUT_FILENAME = "output.json"
 
     def __init__(self, job_args: JobArgs, model_manager: ModelManager = None):

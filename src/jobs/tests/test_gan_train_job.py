@@ -1,5 +1,5 @@
 import os
-from unittest import mock
+from unittest import mock, skip
 from unittest.mock import patch
 
 from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
@@ -30,6 +30,7 @@ class TestGanTrainJob(BaseJobTest):
         }]
     }
 
+    @skip
     @patch.object(TraceTrainer, "save_model")
     def test_run_success(self, save_model_mock: mock.MagicMock):
         self._test_run_success()

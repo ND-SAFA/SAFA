@@ -1,7 +1,7 @@
 import math
 import os
 from copy import deepcopy
-from typing import Dict, List, Optional, Type, Union
+from typing import Dict, List, Optional, Type, Union, Any
 
 from config.override import overrides
 from jobs.abstract_job import AbstractJob
@@ -33,10 +33,8 @@ class ExperimentStep(BaseObject):
             jobs = jobs.pop()  # TODO fix this
         if not isinstance(jobs, ExperimentalVariable):
             jobs = ExperimentalVariable(jobs)
-        self.jobs = jobs.get_values_of_all_variables()
-        if jobs.experimental_param_names_to_vals:
-            for i, job in enumerate(self.jobs):
-                job.result[JobResult.EXPERIMENTAL_VARS] = jobs.experimental_param_names_to_vals[i]
+        jobs, experimental_vars = jobs.get_values_of_all_variables(), jobs.experimental_param_names_to_vals
+        self.jobs = self._update_jobs_with_experimental_vars(jobs, experimental_vars) if experimental_vars else jobs
         self.status = Status.NOT_STARTED
         self.best_job = None
         self.comparison_metric = comparison_metric
@@ -105,23 +103,16 @@ class ExperimentStep(BaseObject):
         return job_runs
 
     @staticmethod
-    def _get_job_to_experimental_var(experimental_jobs: ExperimentalVariable) -> Optional[Dict[str, Dict]]:
+    def _update_jobs_with_experimental_vars(jobs: List[AbstractJob], experimental_vars: List[Dict[str, Any]]) -> List[AbstractJob]:
         """
-        Gets a mapping of job id to the experimental variables associated with that job
-        :param experimental_jobs: an experimental variable containing all jobs and their experimental variables
-        :return: a dictionary mapping job id to the experimental variables associated with that job
+        Updates the jobs to contain the experimental vars associated with that job
+        :param jobs: the jobs to update
+        :param experimental_vars: the list of experimental vars associated with each job
+        :return: the update jobs
         """
-        if not experimental_jobs.experimental_param_names_to_vals:
-            return None
-        job_to_experimental_var = {}
-        for i, job in enumerate(experimental_jobs.get_values_of_all_variables()):
-            job_to_experimental_var[str(job.id)] = {
-                param_name: param_val.__class__.__name__ if isinstance(param_val, BaseObject)
-                else str(param_val)
-                for param_name, param_val in
-                experimental_jobs.experimental_param_names_to_vals[i].items()
-            }
-        return job_to_experimental_var
+        for i, job in enumerate(jobs):
+            job.result[JobResult.EXPERIMENTAL_VARS] = experimental_vars[i]
+        return jobs
 
     def _update_jobs_undetermined_vars(self, jobs2update: List[AbstractJob], jobs2use: List[AbstractJob]) -> List[AbstractJob]:
         """

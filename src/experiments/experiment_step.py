@@ -120,8 +120,7 @@ class ExperimentStep(BaseObject):
             }
         return job_to_experimental_var
 
-    def _update_jobs_undetermined_vars(self, jobs2update: List[AbstractJob], jobs2use: List[AbstractJob]) -> List[
-        AbstractJob]:
+    def _update_jobs_undetermined_vars(self, jobs2update: List[AbstractJob], jobs2use: List[AbstractJob]) -> List[AbstractJob]:
         """
         Updates all the jobs2update's undetermined vals with those from the jobs2use
         :param jobs2update: the list of jobs to update undetermined vals for
@@ -130,7 +129,11 @@ class ExperimentStep(BaseObject):
         """
         final_jobs = []
         for job in jobs2use:
-            jobs2update = deepcopy(jobs2update)
+            jobs2update_tmp = deepcopy(jobs2update)
+            if self.job_to_experimental_var:
+                for orig_job, new_job in zip(jobs2update, jobs2update_tmp):
+                    self.job_to_experimental_var[new_job.id] = self.job_to_experimental_var.pop(orig_job.id)
+            jobs2update = jobs2update_tmp
             if hasattr(job, "model_manager"):
                 job.model_manager.model_path = job.model_manager.model_output_path
             self._run_on_jobs(jobs2update, "use_values_from_object_for_undetermined", obj=job)

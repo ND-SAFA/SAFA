@@ -7,7 +7,7 @@ from data.processing.augmentation.abstract_data_augmentation_step import Abstrac
 
 class ResampleStep(AbstractDataAugmentationStep):
 
-    def __init__(self, percent_to_weight: float, resample_rate: int = RESAMPLE_RATE_DEFAULT):
+    def __init__(self, percent_to_weight: float = 1, resample_rate: int = RESAMPLE_RATE_DEFAULT):
         """
         Handles word replacement to augment the data and obtain a larger dataset
         :param percent_to_weight: the percentage of the data that the augmentation step will augment

@@ -45,30 +45,30 @@ if __name__ == "__main__":
         experiment_path = os.path.join(base_path, experiment_file)
         steps = list(filter(lambda f: f[0] != ".", os.listdir(experiment_path)))
         for step_index, step in enumerate(steps):
-            step_path = os.path.join(experiment_path, step)
-            step_output_path = os.path.join(step_path, "output.json")
-            step_output = FileUtil.read_json_file(step_output_path)
+            try:
+                step_path = os.path.join(experiment_path, step)
+                step_output_path = os.path.join(step_path, "output.json")
+                step_output = FileUtil.read_json_file(step_output_path)
 
-            for job_id in step_output["jobs"]:
-                print(experiment_file, step_index, job_id)
-                entry = {}
-                job_output_path = os.path.join(step_path, job_id, "output.json")
-                job_output = FileUtil.read_json_file(job_output_path)
-
-
-                def add_entries(paths: List[str], filter: Callable[[str], bool]):
-                    subset_dict = get_path(job_output, paths)
-                    subset_properties = filter_entries(subset_dict, filter)
-                    entry.update(subset_properties)
+                for job_id in step_output["jobs"]:
+                    print(experiment_file, step_index, job_id)
+                    entry = {}
+                    job_output_path = os.path.join(step_path, job_id, "output.json")
+                    job_output = FileUtil.read_json_file(job_output_path)
 
 
-                try:
+                    def add_entries(paths: List[str], filter: Callable[[str], bool]):
+                        subset_dict = get_path(job_output, paths)
+                        subset_properties = filter_entries(subset_dict, filter)
+                        entry.update(subset_properties)
+
+
                     add_entries(["experimental_vars"], lambda var: var not in IGNORE)
                     add_entries(["val_output", "metrics"], lambda s: "test_" not in s)
                     entries.append(entry)
-                except Exception as e:
-                    print(e)
-                    print("Failed: E(%s) J(%s) S(%s)" % (experiment_file, job_id, step))
+            except Exception as e:
+                print(e)
+                print("Failed: E(%s) J(%s) S(%s)" % (experiment_file, job_id, step))
 
     entries_df = pd.DataFrame(entries)
     entries_df.to_csv(os.path.join(base_path, "results.csv"), index=False)

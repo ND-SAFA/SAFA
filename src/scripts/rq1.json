@@ -8,16 +8,10 @@
             "random_seed": 36
           },
           "model_manager": {
-            "model_path": {
-              "*": [
-                "bert-base-uncased",
-                "microsoft/codebert-base",
-                "thearod5/automotive-base"
-              ]
-            }
+            "model_path": "bert-base-uncased"
           },
           "trainer_args": {
-            "output_dir": "[OUTPUT_PATH]/lhp/rq1",
+            "output_dir": "[OUTPUT_PATH]/lhp/augmentation",
             "train_epochs_range": [
               10,
               40,
@@ -42,11 +36,18 @@
                   0.8
                 ]
               }
+            },
+            "augmenter": {
+              "steps": [
+                {
+                  "object_type": "SIMPLE_WORD_REPLACEMENT"
+                }
+              ]
             }
           }
         }
       ]
     }
   ],
-  "output_dir": "[OUTPUT_PATH]/lhp/rq1"
+  "output_dir": "[OUTPUT_PATH]/lhp/augmentation"
 }

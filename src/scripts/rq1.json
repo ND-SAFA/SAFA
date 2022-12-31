@@ -7,7 +7,9 @@
           "job_args": {
             "random_seed": {
               "*": [
-                165,
+                36,
+                534,
+                25,
                 242
               ]
             }
@@ -15,31 +17,38 @@
           "model_manager": {
             "model_path": {
               "*": [
-                "bert-base-uncased"
+                "bert-base-uncased",
+                "microsoft/codebert-base",
+                "thearod5/automotive-base"
               ]
             }
           },
           "trainer_args": {
-            "output_dir": "~/projects/safa/tgen/test/output",
-            "num_train_epochs": {
-              "*": [
-                10
-              ]
-            },
+            "output_dir": "[OUTPUT_PATH]/lhp/rq1",
+            "train_epoch_range": [
+              10,
+              50,
+              10
+            ],
             "per_device_train_batch_size": 4,
             "metrics": [
               "map"
-            ],
-            "_n_gpu": 1
+            ]
           },
           "trainer_dataset_manager": {
             "train_dataset_creator": {
-              "object_type": "STRUCTURE",
-              "project_path": "[DATA_PATH]/structure"
+              "object_type": "SAFA",
+              "project_path": "[DATA_PATH]/lhp"
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",
-              "val_percentage": 0.8
+              "val_percentage": {
+                "*": [
+                  0.2,
+                  0.5,
+                  0.8
+                ]
+              }
             },
             "augmenter": {
               "*": [
@@ -52,6 +61,13 @@
                       "object_type": "SOURCE_TARGET_SWAP"
                     }
                   ]
+                },
+                {
+                  "steps": [
+                    {
+                      "object_type": "SIMPLE_WORD_REPLACEMENT"
+                    }
+                  ]
                 }
               ]
             }
@@ -60,5 +76,5 @@
       ]
     }
   ],
-  "output_dir": "~/projects/safa/tgen/test/output"
+  "output_dir": "[OUTPUT_PATH]/lhp/rq1"
 }

@@ -12,7 +12,7 @@ ROOT_PATH = os.path.expanduser(os.environ["ROOT_PATH"])
 assert os.path.exists(ROOT_PATH), ROOT_PATH
 sys.path.append(ROOT_PATH)
 
-ENV_REPLACEMENT_VARIABLES = ["DATA_PATH", "ROOT_PATH"]
+ENV_REPLACEMENT_VARIABLES = ["DATA_PATH", "ROOT_PATH", "OUTPUT_PATH"]
 
 
 def get_env_replacements():

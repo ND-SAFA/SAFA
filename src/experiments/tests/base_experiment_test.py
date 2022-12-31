@@ -69,8 +69,9 @@ class BaseExperimentTest(BaseTest):
         self.accuracies = []
 
     @staticmethod
-    def _load_step_output(step):
-        output_file_path = os.path.join(TEST_OUTPUT_DIR, step.OUTPUT_FILENAME)
+    def _load_step_output(step=None, output_file_path=None):
+        if not output_file_path:
+            output_file_path = os.path.join(TEST_OUTPUT_DIR, step.OUTPUT_FILENAME)
         with open(output_file_path) as out_file:
             output = json.load(out_file)
         return output

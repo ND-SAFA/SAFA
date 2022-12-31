@@ -98,9 +98,10 @@ class SimpleWordReplacementStep(AbstractDataAugmentationStep):
                 replacements = SimpleWordReplacementStep._get_synonyms(word, pos)
                 sentence_word_reps.append(WordRepresentation(word=word, pos=pos, replacements=replacements,
                                                              is_stop_word=word in SimpleWordReplacementStep.STOPWORDS))
-            last_word = sentence_word_reps.pop()
-            last_word.is_end_of_sentence = True
-            sentence_word_reps.append(last_word)
+            if len(sentence_word_reps) > 0:
+                last_word = sentence_word_reps.pop()
+                last_word.is_end_of_sentence = True
+                sentence_word_reps.append(last_word)
             word_representations.extend(sentence_word_reps)
         return word_representations
 

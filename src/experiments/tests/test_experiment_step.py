@@ -26,7 +26,7 @@ class TestExperimentStep(BaseExperimentTest):
     def test_run(self, train_job_run_mock: mock.MagicMock):
         train_job_run_mock.side_effect = self.job_fake_run
         experiment_step = self.get_experiment_step()
-        experiment_step.run()
+        experiment_step.run(TEST_OUTPUT_DIR)
         experiment_step.save_results(TEST_OUTPUT_DIR)
         output = self._load_step_output(experiment_step)
         result_dirs = os.listdir(os.path.join(TEST_OUTPUT_DIR))
@@ -45,7 +45,7 @@ class TestExperimentStep(BaseExperimentTest):
         train_experiment_step = self.get_experiment_step()
         predict_experiment_step = self.get_experiment_step(train=False)
         best_job_from_prior = train_experiment_step.jobs.pop()
-        best_job = predict_experiment_step.run([best_job_from_prior]).pop()
+        best_job = predict_experiment_step.run(TEST_OUTPUT_DIR, [best_job_from_prior]).pop()
         expected_model_path = best_job_from_prior.model_manager.model_path
         self.assertEquals(best_job.model_manager.model_path, expected_model_path)
         self.assertEqual(predict_job_run_mock.call_count, 1)

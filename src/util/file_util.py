@@ -6,13 +6,16 @@ from typing import Dict, List, Union
 class FileUtil:
 
     @staticmethod
-    def make_dir_safe(output_path: str) -> None:
+    def make_dir_safe(output_path: str, *additional_path_parts) -> str:
         """
         Makes a directory, by first checking if the directory exists
-        :return: None
+        :return: the output path
         """
+        if additional_path_parts:
+            output_path = os.path.join(output_path, *additional_path_parts)
         if not os.path.exists(output_path):
             os.makedirs(output_path)
+        return output_path
 
     @staticmethod
     def read_file(file_path: str):

@@ -1,3 +1,4 @@
+import traceback
 from abc import ABC
 from copy import deepcopy
 from dataclasses import dataclass, field
@@ -109,7 +110,6 @@ class BaseObject(ABC):
             expected_inner_type = expected_inner_types[0] if len(expected_inner_types) >= 1 else expected_type
             val = []
             for i, inner_var in enumerate(variable):
-                expected_inner_type = expected_inner_types[i] if i < len(expected_inner_types) else expected_inner_type
                 inner_val = cls._get_value_of_variable(inner_var, expected_inner_type)
                 val.append(inner_val)
             if len(val) == 1 and isinstance(val[0], ExperimentalVariable):
@@ -119,6 +119,8 @@ class BaseObject(ABC):
         elif isinstance(variable, TypedDefinitionVariable):
             expected_class = cls._get_expected_class_by_type(expected_type, variable.object_type)
             val = cls._make_child_object(DefinitionVariable(variable), expected_class)
+        elif isinstance(variable, ExperimentalVariable):
+            val = variable
         elif isinstance(variable, DefinitionVariable):
             val = cls._make_child_object(variable, expected_type) if expected_type else None
         elif isinstance(variable, Variable):
@@ -146,7 +148,7 @@ class BaseObject(ABC):
                 return params
             return expected_class(**params)
         except Exception as e:
-            print(e)
+            print(traceback.format_exc())
             raise TypeError("Unable to initialize %s for %s" % (expected_class, cls.__name__))
 
     @classmethod

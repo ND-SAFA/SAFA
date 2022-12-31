@@ -20,7 +20,7 @@
             }
           },
           "trainer_args": {
-            "output_dir": "~/tgen/test/output",
+            "output_dir": "~/projects/safa/tgen/test/output",
             "num_train_epochs": {
               "*": [
                 10
@@ -40,11 +40,25 @@
             "val_dataset_creator": {
               "object_type": "SPLIT",
               "val_percentage": 0.8
+            },
+            "augmenter": {
+              "*": [
+                {
+                  "steps": []
+                },
+                {
+                  "steps": [
+                    {
+                      "object_type": "SOURCE_TARGET_SWAP"
+                    }
+                  ]
+                }
+              ]
             }
           }
         }
       ]
     }
   ],
-  "output_dir": "~/tgen/test/output"
+  "output_dir": "~/projects/safa/tgen/test/output"
 }

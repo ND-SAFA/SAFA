@@ -15,7 +15,9 @@ class TrainerArgs(TrainingArguments, BaseObject):
     max_seq_length: int = MAX_SEQ_LENGTH_DEFAULT
 
     # Trainer
+    train_epochs_range: List = None
     num_train_epochs: int = N_EPOCHS_DEFAULT
+    checkpoint_path: str = None
     evaluation_strategy: str = EVALUATION_STRATEGY_DEFAULT
     save_strategy: str = SAVE_STRATEGY_DEFAULT
     save_total_limit: int = SAVE_TOTAL_LIMIT_DEFAULT

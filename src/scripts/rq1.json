@@ -41,6 +41,9 @@
               "steps": [
                 {
                   "object_type": "SIMPLE_WORD_REPLACEMENT"
+                },
+                {
+                  "object_type": "SOURCE_TARGET_SWAP"
                 }
               ]
             }

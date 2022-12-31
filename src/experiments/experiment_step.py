@@ -7,6 +7,7 @@ from config.override import overrides
 from jobs.abstract_job import AbstractJob
 from jobs.components.job_result import JobResult
 from jobs.supported_job_type import SupportedJobType
+from jobs.train_job import TrainJob
 from server.storage.safa_storage import SafaStorage
 from train.metrics.supported_trace_metric import SupportedTraceMetric
 from util.base_object import BaseObject
@@ -37,14 +38,14 @@ class ExperimentStep(BaseObject):
         self.best_job = None
         self.comparison_metric = comparison_metric
         self.should_maximize_metric = should_maximize_metric
+        if not self.RUN_ASYNC:
+            self.MAX_JOBS = 1
 
-    def run(self, jobs_for_undetermined_vars: List[AbstractJob] = None, job_callback: Callable[[], None] = None) -> \
-            List[
-                AbstractJob]:
+    def run(self, output_dir: str, jobs_for_undetermined_vars: List[AbstractJob] = None) -> \
+            List[AbstractJob]:
         """
         Runs all step jobs
-        :param job_callback:
-        :type job_callback:
+        :param output_dir: the directory to save to
         :param jobs_for_undetermined_vars: the best job from a prior step
         :return: the best job from this step if comparison metric is provided, else all the jobs
         """
@@ -52,22 +53,23 @@ class ExperimentStep(BaseObject):
         if jobs_for_undetermined_vars:
             self.jobs = self._update_jobs_undetermined_vars(self.jobs, jobs_for_undetermined_vars)
 
-        if self.RUN_ASYNC:
-            job_runs = self._divide_jobs_into_runs()
-            for jobs in job_runs:
-                self._run_on_jobs(jobs, "start")
-                self._run_on_jobs(jobs, "join")
-        else:
-            for job in self.jobs:
-                job.run()
-                if job_callback:
-                    job_callback()
+        use_multi_epoch_step = isinstance(self.jobs[0], TrainJob) and self.jobs[0].trainer_args.train_epochs_range is not None
+        job_runs = self._divide_jobs_into_runs()
+        for jobs in job_runs:
+            if use_multi_epoch_step:
+                from experiments.multi_epoch_experiment_step import MultiEpochExperimentStep
+                for job in jobs:
+                    best_job = MultiEpochExperimentStep([job], self.comparison_metric, self.should_maximize_metric).run(output_dir)
+                    job.result = best_job.pop().result
+            else:
+                self._run_jobs(jobs, output_dir)
 
         self.status = Status.SUCCESS
+
         if self.comparison_metric:
             self.best_job = self._get_best_job(self.jobs, self.comparison_metric, self.should_maximize_metric)
-            return [self.best_job]
-        return self.jobs
+        self.save_results(output_dir)
+        return [self.best_job] if self.best_job else self.jobs
 
     def save_results(self, output_dir: str) -> None:
         """
@@ -79,8 +81,6 @@ class ExperimentStep(BaseObject):
         json_output = JSONUtil.dict_to_json(self.get_results())
         output_filepath = os.path.join(output_dir, ExperimentStep.OUTPUT_FILENAME)
         SafaStorage.save_to_file(json_output, output_filepath)
-        for job in self.jobs:
-            job.save(output_dir)
 
     def get_results(self) -> Dict[str, str]:
         """
@@ -93,6 +93,17 @@ class ExperimentStep(BaseObject):
                 continue
             results[var_name] = var_value
         return results
+
+    def _run_jobs(self, jobs: List[AbstractJob], output_dir: str) -> None:
+        """
+        Runs the jobs and saves the output once they finish
+        :param jobs: a list of jobs to run
+        :param output_dir: the directory to save results to
+        :return: None
+        """
+        self._run_on_jobs(jobs, "start")
+        self._run_on_jobs(jobs, "join")
+        self._run_on_jobs(jobs, "save", output_dir=output_dir)
 
     def _divide_jobs_into_runs(self) -> List[List[AbstractJob]]:
         """
@@ -108,8 +119,7 @@ class ExperimentStep(BaseObject):
         return job_runs
 
     @staticmethod
-    def _update_jobs_with_experimental_vars(jobs: List[AbstractJob], experimental_vars: List[Dict[str, Any]]) -> List[
-        AbstractJob]:
+    def _update_jobs_with_experimental_vars(jobs: List[AbstractJob], experimental_vars: List[Dict[str, Any]]) -> List[AbstractJob]:
         """
         Updates the jobs to contain the experimental vars associated with that job
         :param jobs: the jobs to update
@@ -120,8 +130,7 @@ class ExperimentStep(BaseObject):
             job.result[JobResult.EXPERIMENTAL_VARS] = experimental_vars[i]
         return jobs
 
-    def _update_jobs_undetermined_vars(self, jobs2update: List[AbstractJob], jobs2use: List[AbstractJob]) -> List[
-        AbstractJob]:
+    def _update_jobs_undetermined_vars(self, jobs2update: List[AbstractJob], jobs2use: List[AbstractJob]) -> List[AbstractJob]:
         """
         Updates all the jobs2update's undetermined vals with those from the jobs2use
         :param jobs2update: the list of jobs to update undetermined vals for

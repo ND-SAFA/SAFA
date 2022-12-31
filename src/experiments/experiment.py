@@ -1,8 +1,9 @@
 import os
 import uuid
-from typing import List
+from typing import List, Callable
 
 from experiments.experiment_step import ExperimentStep
+from jobs.abstract_job import AbstractJob
 from util.base_object import BaseObject
 from util.file_util import FileUtil
 
@@ -20,18 +21,26 @@ class Experiment(BaseObject):
         self.output_dir = output_dir
         FileUtil.make_dir_safe(output_dir)
 
-    def run(self):
+    def run(self, output_path_function: Callable = None):
         """
         Runs all steps in the experiment
         :return: None
         """
         jobs_for_undetermined_vals = None
+        output_path_function = self._get_step_output_path if output_path_function is None else output_path_function
         for i, step in enumerate(self.steps):
-            def save():
-                step.save_results(self._get_step_output_path(i))
+            step_output_path = output_path_function(step_num=i)
+            jobs_for_undetermined_vals = step.run(step_output_path, jobs_for_undetermined_vals)
 
-            jobs_for_undetermined_vals = step.run(jobs_for_undetermined_vals, job_callback=save)
-            save()
+    def get_all_jobs(self) -> List[AbstractJob]:
+        """
+        Returns a list of all jobs across all steps
+        :return: a list of all jobs across all steps
+        """
+        jobs = []
+        for step in self.steps:
+            jobs.extend(step.jobs)
+        return jobs
 
     def _get_step_output_path(self, step_num: int) -> str:
         """

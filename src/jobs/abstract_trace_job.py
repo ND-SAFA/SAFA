@@ -51,5 +51,4 @@ class AbstractTraceJob(AbstractJob, ABC):
 
     def cleanup(self):
         super().cleanup()
-        self.trainer_dataset_manager = None
         self._trainer = None

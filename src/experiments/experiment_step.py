@@ -1,7 +1,7 @@
 import math
 import os
 from copy import deepcopy
-from typing import Any, Callable, Dict, List, Type, Union
+from typing import Any, Dict, List, Type, Union
 
 from config.override import overrides
 from jobs.abstract_job import AbstractJob
@@ -53,14 +53,17 @@ class ExperimentStep(BaseObject):
         if jobs_for_undetermined_vars:
             self.jobs = self._update_jobs_undetermined_vars(self.jobs, jobs_for_undetermined_vars)
 
-        use_multi_epoch_step = isinstance(self.jobs[0], TrainJob) and self.jobs[0].trainer_args.train_epochs_range is not None
+        use_multi_epoch_step = isinstance(self.jobs[0], TrainJob) and self.jobs[
+            0].trainer_args.train_epochs_range is not None
         job_runs = self._divide_jobs_into_runs()
         for jobs in job_runs:
             if use_multi_epoch_step:
                 from experiments.multi_epoch_experiment_step import MultiEpochExperimentStep
                 for job in jobs:
-                    best_job = MultiEpochExperimentStep([job], self.comparison_metric, self.should_maximize_metric).run(output_dir)
-                    job.result = best_job.pop().result
+                    best_job = MultiEpochExperimentStep([job], self.comparison_metric, self.should_maximize_metric).run(
+                        output_dir)
+                    if len(best_job) > 0:
+                        job.result = best_job.pop().result
             else:
                 self._run_jobs(jobs, output_dir)
 
@@ -119,7 +122,8 @@ class ExperimentStep(BaseObject):
         return job_runs
 
     @staticmethod
-    def _update_jobs_with_experimental_vars(jobs: List[AbstractJob], experimental_vars: List[Dict[str, Any]]) -> List[AbstractJob]:
+    def _update_jobs_with_experimental_vars(jobs: List[AbstractJob], experimental_vars: List[Dict[str, Any]]) -> List[
+        AbstractJob]:
         """
         Updates the jobs to contain the experimental vars associated with that job
         :param jobs: the jobs to update
@@ -130,7 +134,8 @@ class ExperimentStep(BaseObject):
             job.result[JobResult.EXPERIMENTAL_VARS] = experimental_vars[i]
         return jobs
 
-    def _update_jobs_undetermined_vars(self, jobs2update: List[AbstractJob], jobs2use: List[AbstractJob]) -> List[AbstractJob]:
+    def _update_jobs_undetermined_vars(self, jobs2update: List[AbstractJob], jobs2use: List[AbstractJob]) -> List[
+        AbstractJob]:
         """
         Updates all the jobs2update's undetermined vals with those from the jobs2use
         :param jobs2update: the list of jobs to update undetermined vals for

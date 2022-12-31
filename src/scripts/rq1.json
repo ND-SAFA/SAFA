@@ -35,7 +35,7 @@
           "trainer_dataset_manager": {
             "train_dataset_creator": {
               "object_type": "STRUCTURE",
-              "project_path": "~/projects/safa/tgen/src/testres/data/structure"
+              "project_path": "[DATA_PATH]/structure"
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",

@@ -1,6 +1,6 @@
 import json
 import os
-from typing import Dict, List
+from typing import Dict, List, Union
 
 
 class FileUtil:
@@ -55,3 +55,23 @@ class FileUtil:
         else:
             raise Exception("Unable to read pretraining data file path " + data_path)
         return files
+
+    @staticmethod
+    def expand_paths_in_dictionary(value: Union[List, Dict, str], replacements: Dict[str, str] = None):
+        """
+        For every string found in value, if its a path its expanded and
+        :param value: List, Dict, or String containing one or more values.
+        :param replacements: Dictionary from source to target string replacements in paths.
+        :return: Same type as value, but with its content processed.
+        """
+        if isinstance(value, list):
+            return [FileUtil.expand_paths_in_dictionary(v, replacements=replacements) for v in value]
+        if isinstance(value, dict):
+            return {k: FileUtil.expand_paths_in_dictionary(v, replacements=replacements) for k, v in value.items()}
+        if isinstance(value, str):
+            if "~" in value:
+                return os.path.expanduser(value)
+            if replacements:
+                for k, v in replacements.items():
+                    value = value.replace(k, v)
+        return value

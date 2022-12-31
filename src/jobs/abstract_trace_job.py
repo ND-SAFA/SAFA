@@ -49,6 +49,10 @@ class AbstractTraceJob(AbstractJob, ABC):
                                          model_manager=self.model_manager, **kwargs)
         return self._trainer
 
-    def cleanup(self):
+    def cleanup(self) -> None:
+        """
+        Removes trainer from memory.
+        :return: None
+        """
         super().cleanup()
         self._trainer = None

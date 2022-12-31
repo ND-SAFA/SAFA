@@ -48,7 +48,11 @@ class ModelManager(BaseObject):
             self.__model = self.__load_model()
         return self.__model
 
-    def clear_model(self):
+    def clear_model(self) -> None:
+        """
+        Removes reference to model.
+        :return: None
+        """
         self.__model = None
 
     def get_tokenizer(self) -> PreTrainedTokenizer:

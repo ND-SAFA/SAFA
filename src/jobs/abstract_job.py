@@ -55,8 +55,12 @@ class AbstractJob(threading.Thread, BaseObject):
             self.save(self.job_args.output_dir)
         self.cleanup()
 
-    def cleanup(self):
-        self.model_manager.get_model()
+    def cleanup(self) -> None:
+        """
+        Removes the model from memory of the model manager.
+        :return: None
+        """
+        self.model_manager.clear_model()
 
     @staticmethod
     def set_random_seed(random_seed: int) -> None:

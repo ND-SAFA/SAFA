@@ -53,6 +53,10 @@ class AbstractJob(threading.Thread, BaseObject):
             self.result.set_job_status(Status.FAILURE)
         if self.save_job_output and self.job_args.output_dir:
             self.save(self.job_args.output_dir)
+        self.cleanup()
+
+    def cleanup(self):
+        self.model_manager.get_model()
 
     @staticmethod
     def set_random_seed(random_seed: int) -> None:

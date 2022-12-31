@@ -48,3 +48,8 @@ class AbstractTraceJob(AbstractJob, ABC):
                                          trainer_dataset_manager=self.trainer_dataset_manager,
                                          model_manager=self.model_manager, **kwargs)
         return self._trainer
+
+    def cleanup(self):
+        super().cleanup()
+        self.trainer_dataset_manager = None
+        self._trainer = None

@@ -36,13 +36,6 @@
             "val_dataset_creator": {
               "object_type": "SPLIT",
               "val_percentage": 0.2
-            },
-            "augmenter": {
-              "steps": [
-                {
-                  "object_type": "SOURCE_TARGET_SWAP"
-                }
-              ]
             }
           }
         }

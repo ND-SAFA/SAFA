@@ -40,9 +40,10 @@ class TraceTrainer(Trainer, BaseObject):
         self.trainer_dataset_manager = trainer_dataset_manager
         self.model_manager = model_manager
         self.model_manager.set_max_seq_length(self.trainer_args.max_seq_length)
-        model = self.model_manager.get_model()
+        model_init = lambda: self.model_manager.get_model()
         tokenizer = self.model_manager.get_tokenizer()
-        super().__init__(model=model, args=trainer_args, tokenizer=tokenizer, callbacks=trainer_args.callbacks,
+        super().__init__(model_init=model_init, args=trainer_args, tokenizer=tokenizer,
+                         callbacks=trainer_args.callbacks,
                          **kwargs)
 
     def perform_training(self, checkpoint: str = None) -> Dict:

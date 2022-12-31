@@ -18,6 +18,7 @@ class JobResult(BaseObject):
     PREDICTIONS = "predictions"
     ARTIFACT_IDS = "ids"
     METRICS = "metrics"
+    TOTAL_EPOCHS = "total_epochs"  # distinguishes from epochs which does not describe global training loop
     SAVED_DATASET_PATHS = "savedDatasetPaths"
     IDS = "ids"
     SOURCE = "source"

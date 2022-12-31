@@ -25,6 +25,7 @@ class TrainerArgs(TrainingArguments, BaseObject):
     metric_for_best_model_default: str = METRIC_FOR_BEST_MODEL_DEFAULT
     metrics: List[str] = None
     place_model_on_device: bool = False
+    total_training_epochs = None
 
     # GAN
     n_hidden_layers_g: int = 1

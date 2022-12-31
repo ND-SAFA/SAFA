@@ -46,6 +46,7 @@ class MultiEpochExperimentStep(ExperimentStep):
             epoch_job = deepcopy(orig_job)
             epoch_job.id = str(uuid.uuid4())
             epoch_job.trainer_args.num_train_epochs = epoch
+            epoch_job.trainer_args.total_training_epochs = epoch_total
             epoch_job.model_manager.model_output_path = MultiEpochExperimentStep._get_epoch_output_path(
                 orig_job.model_manager.model_output_path, epoch_total)
             epoch_job.trainer_args.checkpoint_path = MultiEpochExperimentStep._get_epoch_output_path(

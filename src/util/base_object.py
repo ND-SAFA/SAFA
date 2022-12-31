@@ -2,7 +2,7 @@ import traceback
 from abc import ABC
 from copy import deepcopy
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Type, Union
+from typing import Any, Dict, List, Type, Union, _UnionGenericAlias
 
 from typeguard import check_type
 from typing_extensions import get_args
@@ -146,6 +146,8 @@ class BaseObject(ABC):
             if expected_class in [Dict[str, str], Dict[str, float], Dict[str, int]]:
                 # TODO: Add flag to indicate when data should be created as a dictionary of data
                 return params
+            if isinstance(expected_class, _UnionGenericAlias):
+                expected_class = get_args(expected_class)[0]
             return expected_class(**params)
         except Exception as e:
             print(traceback.format_exc())

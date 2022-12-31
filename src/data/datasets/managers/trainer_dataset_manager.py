@@ -10,6 +10,7 @@ from data.datasets.dataset_role import DatasetRole
 from data.datasets.pre_train_dataset import PreTrainDataset
 from data.datasets.trace_dataset import TraceDataset
 from data.processing.augmentation.data_augmenter import DataAugmenter
+from data.processing.augmentation.supported_data_augmentation_step import SupportedAugmentationStep
 from util.base_object import BaseObject
 from variables.undetermined_variable import UndeterminedVariable
 
@@ -106,6 +107,8 @@ class TrainerDatasetManager(BaseObject):
         :param child_class_name: the name of the child class
         :return: the enum class mapping name to class
         """
+        if abstract_class == DataAugmenter:
+            return SupportedAugmentationStep
         return SupportedDatasetCreator
 
     def _prepare_datasets(self, data_augmenter: DataAugmenter) -> None:

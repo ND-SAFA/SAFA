@@ -57,8 +57,9 @@ class TraceTrainer(Trainer, BaseObject):
         self._move_model_to_device(self.model, self.args.device)
         self.train_dataset = self.trainer_dataset_manager[DatasetRole.TRAIN].to_trainer_dataset(self.model_manager)
         output = self.train(resume_from_checkpoint=checkpoint)
-        output[JobResult.TOTAL_EPOCHS] = self.trainer_args.total_training_epochs
-        return TraceTrainer.output_to_dict(output)
+        output_dict = TraceTrainer.output_to_dict(output)
+        output_dict[JobResult.TOTAL_EPOCHS] = self.trainer_args.total_training_epochs
+        return output_dict
 
     def perform_prediction(self, dataset_role: DatasetRole = DatasetRole.EVAL) -> Dict:
         """

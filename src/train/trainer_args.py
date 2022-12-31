@@ -24,6 +24,7 @@ class TrainerArgs(TrainingArguments, BaseObject):
     load_best_model_at_end: bool = LOAD_BEST_MODEL_AT_END_DEFAULT
     metric_for_best_model_default: str = METRIC_FOR_BEST_MODEL_DEFAULT
     metrics: List[str] = None
+    place_model_on_device: bool = False
 
     # GAN
     n_hidden_layers_g: int = 1

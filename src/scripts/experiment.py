@@ -12,16 +12,17 @@ ROOT_PATH = os.path.expanduser(os.environ["ROOT_PATH"])
 assert os.path.exists(ROOT_PATH), ROOT_PATH
 sys.path.append(ROOT_PATH)
 
+ENV_REPLACEMENT_VARIABLES = ["DATA_PATH", "ROOT_PATH"]
 
-def expand_paths(value):
-    if isinstance(value, list):
-        return [expand_paths(v) for v in value]
-    if isinstance(value, dict):
-        return {k: expand_paths(v) for k, v in value.items()}
-    if isinstance(value, str):
-        if "~" in value:
-            return os.path.expanduser(value)
-    return value
+
+def get_env_replacements():
+    replacements = {}
+    for replacement_path in ENV_REPLACEMENT_VARIABLES:
+        path_value = os.environ.get(replacement_path, None)
+        if path_value:
+            path_key = "[%s]" % replacement_path
+            replacements[path_key] = os.path.expanduser(path_value)
+    return replacements
 
 
 if __name__ == "__main__":
@@ -44,8 +45,9 @@ if __name__ == "__main__":
     #
     # Job Data Creation
     #
+    env_replacements = get_env_replacements()
     job_definition = FileUtil.read_json_file(file_path)
-    job_definition = expand_paths(job_definition)
+    job_definition = FileUtil.expand_paths_in_dictionary(job_definition, env_replacements)
     #
     # Logs
     #

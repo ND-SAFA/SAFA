@@ -25,6 +25,7 @@
           },
           "trainer_args": {
             "output_dir": "[OUTPUT_PATH]/lhp/rq1",
+            "place_model_on_device": false,
             "train_epochs_range": [
               10,
               50,

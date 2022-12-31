@@ -65,7 +65,8 @@ class ExperimentStep(BaseObject):
                     if len(best_job) > 0:
                         job.result = best_job.pop().result
             else:
-                self._run_jobs(jobs, output_dir)
+                self._run_on_jobs(jobs, "run")
+                self._run_on_jobs(jobs, "save", output_dir=output_dir)
 
         self.status = Status.SUCCESS
 

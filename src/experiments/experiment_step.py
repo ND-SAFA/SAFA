@@ -60,8 +60,10 @@ class ExperimentStep(BaseObject):
             if use_multi_epoch_step:
                 from experiments.multi_epoch_experiment_step import MultiEpochExperimentStep
                 for job in jobs:
-                    MultiEpochExperimentStep([job], self.comparison_metric, self.should_maximize_metric).run(
+                    best_job = MultiEpochExperimentStep([job], self.comparison_metric, self.should_maximize_metric).run(
                         output_dir)
+                    if len(best_job) > 0:
+                        job.result = best_job.pop().result
             else:
                 self._run_on_jobs(jobs, "run")
                 self._run_on_jobs(jobs, "save", output_dir=output_dir)

@@ -55,8 +55,6 @@ class TraceTrainer(Trainer, BaseObject):
         self.model = self.model_manager.get_model()
         self._move_model_to_device(self.model, self.args.device)
         self.train_dataset = self.trainer_dataset_manager[DatasetRole.TRAIN].to_trainer_dataset(self.model_manager)
-        if DatasetRole.VAL in self.trainer_dataset_manager:
-            self.eval_dataset = self.trainer_dataset_manager[DatasetRole.VAL].to_trainer_dataset(self.model_manager)
         output = self.train(resume_from_checkpoint=checkpoint)
         return TraceTrainer.output_to_dict(output)
 

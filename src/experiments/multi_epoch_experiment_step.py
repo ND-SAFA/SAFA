@@ -1,4 +1,5 @@
 import os
+import uuid
 from copy import deepcopy
 from typing import List
 
@@ -23,7 +24,8 @@ class MultiEpochExperimentStep(ExperimentStep):
         orig_job.trainer_args.train_epochs_range = None
         steps = self._construct_epoch_steps(epochs, orig_job)
         experiment = Experiment(steps, output_dir)
-        experiment.run(lambda step_num: self._get_epoch_output_path(orig_job.model_manager.model_output_path, epochs[step_num]))
+        experiment.run(
+            lambda step_num: self._get_epoch_output_path(orig_job.model_manager.model_output_path, epochs[step_num]))
         jobs = experiment.get_all_jobs()
         best_job = [self._get_best_job(jobs, self.comparison_metric, self.should_maximize_metric)] \
             if self.comparison_metric else self.jobs
@@ -42,6 +44,7 @@ class MultiEpochExperimentStep(ExperimentStep):
             prev_epoch = epochs[i - 1] if (i - 1) >= 0 else None
             epoch = epoch_total - prev_epoch if prev_epoch else epoch_total
             epoch_job = deepcopy(orig_job)
+            epoch_job.id = str(uuid.uuid4())
             epoch_job.trainer_args.num_train_epochs = epoch
             epoch_job.model_manager.model_output_path = MultiEpochExperimentStep._get_epoch_output_path(
                 orig_job.model_manager.model_output_path, epoch_total)

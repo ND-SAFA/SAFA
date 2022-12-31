@@ -11,9 +11,9 @@ class TrainJob(AbstractTraceJob):
         :return: results of the training including as loss and time
         """
         trainer = self.get_trainer(**kwargs)
-        training_output = trainer.perform_training()
+        training_output = trainer.perform_training()  # will switch dataset in val to eval if present.
         trainer.save_model(self.model_manager.model_output_path)
-        if DatasetRole.EVAL in self.trainer_dataset_manager:
-            val_metrics = trainer.perform_prediction()
+        if DatasetRole.VAL in self.trainer_dataset_manager:
+            val_metrics = trainer.perform_prediction(DatasetRole.VAL)
             training_output[JobResult.METRICS].update(val_metrics[JobResult.METRICS])
         return JobResult.from_dict(training_output)

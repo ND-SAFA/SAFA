@@ -6,6 +6,8 @@ from typing import Callable, Dict, List
 import pandas as pd
 from dotenv import load_dotenv
 
+from util.file_util import FileUtil
+
 load_dotenv()
 
 ROOT_PATH = os.path.expanduser(os.environ["ROOT_PATH"])
@@ -29,47 +31,58 @@ def filter_entries(entry_dict: Dict, filter: Callable[[str], bool] = lambda s: s
     return {k: v for k, v in entry_dict.items() if filter(k)}
 
 
-if __name__ == "__main__":
-    from util.file_util import FileUtil
+def ls_filter(path: str, f: Callable[[str], bool] = None, ignore: List[str] = None):
+    if f is None:
+        f = lambda s: s
+    if ignore is None:
+        ignore = []
+    return list(filter(lambda p: f(p) and f not in ignore, os.listdir(path)))
 
+
+def ls_jobs(path: str):
+    return ls_filter(path, f=lambda p: len(p.split("-")) == 5)
+
+
+def get_dict_path(data: Dict, instructions: List[str]):
+    if len(instructions) == 0:
+        return data
+    return get_dict_path(data[instructions[0]], instructions[1:])
+
+
+def extract_info(data: Dict, copy_paths: List[List[str]]):
+    result = {}
+    for path in copy_paths:
+        value = get_dict_path(data, path)
+        if isinstance(value, dict):
+            filter_values = {k: v for k, v in value.items() if k not in IGNORE}
+            result = {**result, **filter_values}
+        else:
+            result = {**result, path[-1]: value}
+
+    return result
+
+
+instructions = [["metrics", "map"], ["metrics", "epoch"], ["experimental_vars"]]
+IGNORE = ["job_args", "trainer_dataset_manager", "trainer_args"]
+if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         prog='Results reader',
         description='Reads experiment results.')
     parser.add_argument("path")
     args = parser.parse_args()
-    base_path = os.path.expanduser(args.path)
-    experiment_files = list(filter(lambda f: len(f.split("-")) >= 3, os.listdir(base_path)))
+    BASE_PATH = os.path.expanduser(args.path)
+    TRAINER_PATH = os.path.join(BASE_PATH, "trainer")
+    EPOCH_RUNS = ls_filter(TRAINER_PATH, ignore=[".DS_Store", "runs"])
 
     entries = []
-    for experiment_file in experiment_files:
-        experiment_path = os.path.join(base_path, experiment_file)
-        steps = list(filter(lambda f: f[0] != ".", os.listdir(experiment_path)))
-        for step_index, step in enumerate(steps):
-            try:
-                step_path = os.path.join(experiment_path, step)
-                step_output_path = os.path.join(step_path, "output.json")
-                step_output = FileUtil.read_json_file(step_output_path)
-
-                for job_id in step_output["jobs"]:
-                    print(experiment_file, step_index, job_id)
-                    entry = {}
-                    job_output_path = os.path.join(step_path, job_id, "output.json")
-                    job_output = FileUtil.read_json_file(job_output_path)
-
-
-                    def add_entries(paths: List[str], filter: Callable[[str], bool]):
-                        subset_dict = get_path(job_output, paths)
-                        subset_properties = filter_entries(subset_dict, filter)
-                        entry.update(subset_properties)
-
-
-                    add_entries(["experimental_vars"], lambda var: var not in IGNORE)
-                    add_entries(["val_output", "metrics"], lambda s: "test_" not in s)
-                    entries.append(entry)
-            except Exception as e:
-                print(e)
-                print("Failed: E(%s) J(%s) S(%s)" % (experiment_file, job_id, step))
-
+    for epoch in EPOCH_RUNS:
+        epoch_path = os.path.join(TRAINER_PATH, epoch)
+        jobs = ls_jobs(epoch_path)
+        for job_id in jobs:
+            job_output_path = os.path.join(epoch_path, job_id, "output.json")
+            job_output = FileUtil.read_json_file(job_output_path)
+            entry = extract_info(job_output, instructions)
+            entries.append(entry)
     entries_df = pd.DataFrame(entries)
-    entries_df.to_csv(os.path.join(base_path, "results.csv"), index=False)
-    print(entries_df)
+    output_path = os.path.join(BASE_PATH, "result.csv")
+    entries_df.to_csv(output_path, index=False)

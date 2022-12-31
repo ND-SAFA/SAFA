@@ -8,6 +8,7 @@ from copy import deepcopy
 from inspect import getfullargspec
 from typing import Dict
 
+import torch
 from transformers import set_seed
 
 from jobs.components.job_args import JobArgs
@@ -61,6 +62,7 @@ class AbstractJob(threading.Thread, BaseObject):
         :return: None
         """
         self.model_manager.clear_model()
+        torch.cuda.empty_cache()
 
     @staticmethod
     def set_random_seed(random_seed: int) -> None:

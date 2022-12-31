@@ -41,7 +41,7 @@ class ExperimentSerializer(serializers.Serializer):
         if isinstance(value, dict):
             value_definition = self.create(value)
             if value.get(ExperimentalVariable.SYMBOL, None):
-                values = value[ExperimentalVariable.SYMBOL]
+                values = [self.create_variable(v) for v in value[ExperimentalVariable.SYMBOL]]
                 return ExperimentalVariable(values)
             elif value.get(TypedDefinitionVariable.OBJECT_TYPE_KEY, None):
                 return TypedDefinitionVariable(value_definition)

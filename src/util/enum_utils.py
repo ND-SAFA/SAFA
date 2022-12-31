@@ -17,4 +17,7 @@ def get_enum_from_name(enum_class: Type, enum_name: str) -> Enum:
             name_removed_sep = "".join(e.name.split(SEP_SYM))
             if name_removed_sep == enum_name:
                 return e
-    return enum_class[enum_name]
+    try:
+        return enum_class[enum_name]
+    except:
+        raise ValueError("%s does not have value: %s" % (enum_class, enum_name))

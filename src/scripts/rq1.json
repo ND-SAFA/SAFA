@@ -25,7 +25,7 @@
           },
           "trainer_args": {
             "output_dir": "[OUTPUT_PATH]/lhp/rq1",
-            "train_epoch_range": [
+            "train_epochs_range": [
               10,
               50,
               10
@@ -38,7 +38,7 @@
           "trainer_dataset_manager": {
             "train_dataset_creator": {
               "object_type": "SAFA",
-              "project_path": "[DATA_PATH]/lhp"
+              "project_path": "[DATA_PATH]/safa"
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",

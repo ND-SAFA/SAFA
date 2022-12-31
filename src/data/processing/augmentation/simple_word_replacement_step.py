@@ -35,7 +35,7 @@ class SimpleWordReplacementStep(AbstractDataAugmentationStep):
     WORD_SEP = " "
     lemmatizer = WordNetLemmatizer()
 
-    def __init__(self, percent_to_weight: float, replacement_percentage: float = REPLACEMENT_PERCENTAGE_DEFAULT):
+    def __init__(self, percent_to_weight: float = 1, replacement_percentage: float = REPLACEMENT_PERCENTAGE_DEFAULT):
         """
         Handles word replacement to augment the data and obtain a larger dataset
         :param percent_to_weight: the percentage of the data that the augmentation step will augment

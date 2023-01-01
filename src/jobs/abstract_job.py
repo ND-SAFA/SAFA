@@ -61,7 +61,8 @@ class AbstractJob(threading.Thread, BaseObject):
         Removes the model from memory of the model manager.
         :return: None
         """
-        self.model_manager.clear_model()
+        if self.model_manager:
+            self.model_manager.clear_model()
         torch.cuda.empty_cache()
 
     @staticmethod

@@ -137,6 +137,7 @@ class BaseObject(ABC):
         :param definition: contains attributes necessary to construct the child
         :return: the child obj
         """
+        expected_class = ReflectionUtil.get_target_class_from_type(expected_class)
         if ReflectionUtil.is_instance_or_subclass(expected_class, BaseObject):
             return expected_class.initialize_from_definition(definition)
 
@@ -146,8 +147,6 @@ class BaseObject(ABC):
             if expected_class in [Dict[str, str], Dict[str, float], Dict[str, int]]:
                 # TODO: Add flag to indicate when data should be created as a dictionary of data
                 return params
-            if isinstance(expected_class, _UnionGenericAlias):
-                expected_class = get_args(expected_class)[0]
             return expected_class(**params)
         except Exception as e:
             print(traceback.format_exc())

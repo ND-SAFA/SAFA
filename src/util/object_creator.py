@@ -5,6 +5,7 @@ from config.constants import VALIDATION_PERCENTAGE_DEFAULT
 from data.datasets.creators.classic_trace_dataset_creator import ClassicTraceDatasetCreator
 from data.datasets.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
 from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
+from data.processing.augmentation.data_augmenter import DataAugmenter
 from experiments.experiment import Experiment
 from experiments.experiment_step import ExperimentStep
 from jobs.components.job_args import JobArgs
@@ -23,6 +24,10 @@ class ObjectCreator:
     DATASET_ARGS_PARAMS = {
         "validation_percentage": VALIDATION_PERCENTAGE_DEFAULT
     }
+
+    augmenter_definition = {"steps":
+                          {"*": [[], [{"object_type": "SOURCE_TARGET_SWAP"}]]}
+                      }
 
     trainer_args_definition = {
         "output_dir": TEST_OUTPUT_DIR,
@@ -91,6 +96,7 @@ class ObjectCreator:
         JobArgs: job_args_definition,
         ClassicTraceDatasetCreator: dataset_creator_definition,
         TrainerDatasetManager: trainer_dataset_manager_definition,
+        DataAugmenter: augmenter_definition,
         ModelManager: model_manager_definition,
         MLMPreTrainDatasetCreator: pretrain_dataset_definition,
         ExperimentStep: experiment_train_step_definition,

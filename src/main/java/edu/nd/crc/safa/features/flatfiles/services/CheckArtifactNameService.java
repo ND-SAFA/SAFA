@@ -4,9 +4,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
-import edu.nd.crc.safa.features.artifacts.entities.db.versions.ArtifactVersion;
+import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactRepository;
-import edu.nd.crc.safa.features.artifacts.repositories.versions.ArtifactVersionRepository;
+import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.flatfiles.controllers.entities.ArtifactNameCheck;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;

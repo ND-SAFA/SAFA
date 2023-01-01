@@ -11,7 +11,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.artifacts.entities.AttributeSchemaAppEntity;
+import edu.nd.crc.safa.features.attributes.entities.CustomAttributeAppEntity;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
 import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
@@ -54,7 +54,7 @@ public class ProjectAppEntity implements IAppEntity {
     ProjectParsingErrors errors;
     Map<UUID, LayoutPosition> layout;
     List<ModelAppEntity> models;
-    List<AttributeSchemaAppEntity> attributes;
+    List<CustomAttributeAppEntity> attributes;
 
     public ProjectAppEntity() {
         this.name = "";
@@ -82,7 +82,7 @@ public class ProjectAppEntity implements IAppEntity {
                             ProjectParsingErrors errors,
                             Map<UUID, LayoutPosition> layout,
                             List<ModelAppEntity> models,
-                            List<AttributeSchemaAppEntity> attributes) {
+                            List<CustomAttributeAppEntity> attributes) {
         this();
         Project project = projectVersion.getProject();
         this.projectId = project.getProjectId();

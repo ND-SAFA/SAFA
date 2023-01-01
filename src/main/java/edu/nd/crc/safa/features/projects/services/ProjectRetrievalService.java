@@ -6,9 +6,9 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.artifacts.entities.AttributeSchemaAppEntity;
 import edu.nd.crc.safa.features.artifacts.services.ArtifactService;
-import edu.nd.crc.safa.features.artifacts.services.AttributeService;
+import edu.nd.crc.safa.features.attributes.entities.CustomAttributeAppEntity;
+import edu.nd.crc.safa.features.attributes.services.AttributeService;
 import edu.nd.crc.safa.features.common.ProjectEntities;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
 import edu.nd.crc.safa.features.documents.services.CurrentDocumentService;
@@ -96,7 +96,7 @@ public class ProjectRetrievalService {
 
         List<ModelAppEntity> models = this.modelService.getUserModels();
 
-        List<AttributeSchemaAppEntity> attributes = this.attributeService
+        List<CustomAttributeAppEntity> attributes = this.attributeService
             .getAttributeEntitiesForProject(projectVersion.getProject(), Sort.by("label"));
 
         return new ProjectAppEntity(projectVersion,

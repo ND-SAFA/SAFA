@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.artifacts.entities.db.versions.ArtifactVersion;
+import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 
 import common.DefaultProjectConstants;

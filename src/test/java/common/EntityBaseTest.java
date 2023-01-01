@@ -4,7 +4,7 @@ import edu.nd.crc.safa.features.artifacts.repositories.ArtifactRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.FTAArtifactRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.SafetyCaseArtifactRepository;
-import edu.nd.crc.safa.features.artifacts.repositories.versions.ArtifactVersionRepository;
+import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.documents.repositories.DocumentArtifactRepository;
 import edu.nd.crc.safa.features.documents.repositories.DocumentRepository;

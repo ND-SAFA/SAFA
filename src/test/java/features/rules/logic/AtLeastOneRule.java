@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import edu.nd.crc.safa.features.artifacts.entities.db.versions.ArtifactVersion;
+import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.features.rules.entities.app.RuleAppEntity;
 import edu.nd.crc.safa.features.rules.entities.app.RuleCondition;
 import edu.nd.crc.safa.features.rules.entities.app.RuleRelation;

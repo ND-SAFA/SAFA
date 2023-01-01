@@ -7,17 +7,17 @@ import java.util.List;
 import java.util.Map;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.artifacts.entities.ArtifactFieldType;
 import edu.nd.crc.safa.features.artifacts.entities.FTAType;
 import edu.nd.crc.safa.features.artifacts.entities.SafetyCaseType;
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
-import edu.nd.crc.safa.features.artifacts.entities.db.schema.CustomAttribute;
-import edu.nd.crc.safa.features.artifacts.entities.db.versions.ArtifactVersion;
+import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactTypeRepository;
-import edu.nd.crc.safa.features.artifacts.repositories.schema.CustomAttributeRepository;
-import edu.nd.crc.safa.features.artifacts.repositories.versions.ArtifactVersionRepository;
-import edu.nd.crc.safa.features.artifacts.repositories.versions.ArtifactVersionRepositoryImpl;
+import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
+import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepositoryImpl;
+import edu.nd.crc.safa.features.attributes.entities.CustomAttributeType;
+import edu.nd.crc.safa.features.attributes.entities.db.definitions.CustomAttribute;
+import edu.nd.crc.safa.features.attributes.repositories.definitions.CustomAttributeRepository;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
@@ -215,12 +215,12 @@ public class DbEntityBuilder extends AbstractBuilder {
         return this.artifactTypes.get(projectName).containsKey(typeName);
     }
 
-    public DbEntityBuilder newCustomAttribute(String projectName, ArtifactFieldType type, String label, String key) {
+    public DbEntityBuilder newCustomAttribute(String projectName, CustomAttributeType type, String label, String key) {
         newCustomAttributeWithReturn(projectName, type, label, key);
         return this;
     }
 
-    public CustomAttribute newCustomAttributeWithReturn(String projectName, ArtifactFieldType type, String label, String key) {
+    public CustomAttribute newCustomAttributeWithReturn(String projectName, CustomAttributeType type, String label, String key) {
         Project project = getProject(projectName);
         CustomAttribute field = new CustomAttribute();
         field.setProject(project);

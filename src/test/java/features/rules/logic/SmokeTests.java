@@ -10,7 +10,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
-import edu.nd.crc.safa.features.artifacts.entities.db.versions.ArtifactVersion;
+import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.features.rules.parser.ArtifactRelationship;
 import edu.nd.crc.safa.features.rules.parser.Condition;
 import edu.nd.crc.safa.features.rules.parser.DefaultTreeRules;

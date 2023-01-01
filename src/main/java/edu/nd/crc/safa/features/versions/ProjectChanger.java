@@ -3,7 +3,7 @@ package edu.nd.crc.safa.features.versions;
 import java.util.List;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.artifacts.entities.db.versions.ArtifactVersion;
+import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.common.ProjectEntities;
 import edu.nd.crc.safa.features.common.ServiceProvider;

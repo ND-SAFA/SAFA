@@ -28,12 +28,30 @@ export default Vue.extend({
       required: true,
     },
   },
+  mounted() {
+    this.initializeArtifact();
+  },
   computed: {
     /**
      * @return The layout for this artifact.
      */
     layout(): AttributeLayoutSchema {
       return attributesStore.getLayoutByType(this.artifact.type);
+    },
+  },
+  methods: {
+    /**
+     * Initializes the artifact's custom attributes.
+     */
+    initializeArtifact(): void {
+      if (this.artifact.attributes) return;
+
+      this.artifact.attributes = {};
+    },
+  },
+  watch: {
+    artifact() {
+      this.initializeArtifact();
     },
   },
 });

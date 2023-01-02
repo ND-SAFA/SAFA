@@ -17,7 +17,7 @@
           "model_manager": {
             "model_path": {
               "*": [
-                "robert-base",
+                "roberta-base",
                 "microsoft/codebert-base",
                 "thearod5/sebert-task-cls"
               ]

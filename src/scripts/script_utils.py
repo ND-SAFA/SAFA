@@ -57,16 +57,20 @@ def get_dict_path(data: Dict, instructions: List[str]):
     return get_dict_path(data[current_key], next_keys)
 
 
-def extract_info(data: Dict, copy_paths: List[List[str]], ignore=None):
+def extract_info(data: Dict, copy_paths: List[List[str]], ignore=None, log=False):
     if ignore is None:
         ignore = []
     result = {}
     for path in copy_paths:
-        value = get_dict_path(data, path)
-        if isinstance(value, dict):
-            filter_values = {k: v for k, v in value.items() if k not in ignore}
-            result = {**result, **filter_values}
-        else:
-            result = {**result, path[-1]: value}
+        try:
+            value = get_dict_path(data, path)
+            if isinstance(value, dict):
+                filter_values = {k: v for k, v in value.items() if k not in ignore}
+                result = {**result, **filter_values}
+            else:
+                result = {**result, path[-1]: value}
+        except Exception as e:
+            if log:
+                print(e)
 
     return result

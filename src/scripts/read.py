@@ -17,7 +17,7 @@ if __name__ == "__main__":
     #
     # Imports
     #
-    from scripts.script_utils import extract_info, get_dict_path, ls_filter, ls_jobs, read_job_definition
+    from scripts.script_utils import extract_info, ls_jobs, read_job_definition
     from util.file_util import FileUtil
 
     #
@@ -30,20 +30,16 @@ if __name__ == "__main__":
     args = parser.parse_args()
     job_definition = read_job_definition(args.experiment)
 
-    TRAINER_PATH = get_dict_path(job_definition, ["steps", 0, "jobs", 0, "trainer_args", "output_dir"])
-    BASE_PATH = os.path.dirname(TRAINER_PATH)
-    EPOCH_RUNS = ls_filter(TRAINER_PATH, ignore=[".DS_Store", "runs"])
+    OUTPUT_DIR = job_definition["output_dir"]
 
     entries = []
-    for epoch in EPOCH_RUNS:
-        epoch_path = os.path.join(TRAINER_PATH, epoch)
-        jobs = ls_jobs(epoch_path)
-        for job_id in jobs:
-            job_output_path = os.path.join(epoch_path, job_id, "output.json")
-            job_output = FileUtil.read_json_file(job_output_path)
-            entry = extract_info(job_output, COPY_PATHS, IGNORE)
-            entries.append(entry)
+    for job_id in ls_jobs(OUTPUT_DIR):
+        job_output_path = os.path.join(OUTPUT_DIR, job_id, "output.json")
+        job_output = FileUtil.read_json_file(job_output_path)
+        entry = extract_info(job_output, COPY_PATHS, IGNORE)
+        entries.append(entry)
+
     entries_df = pd.DataFrame(entries)
-    output_path = os.path.join(BASE_PATH, "result.csv")
+    output_path = os.path.join(OUTPUT_DIR, "result.csv")
     entries_df.to_csv(output_path, index=False)
     print(entries_df)

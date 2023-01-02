@@ -12,6 +12,7 @@ class ExperimentalVariable(MultiVariable):
         """
         A list of Variables to use in experiments
         :param values: a list of variables for experimenting
+        :param experimental_param_name_to_val: Dictionary of experimental vars per value.
         """
         if len(values) > 0 and not isinstance(values[0], Variable):
             values = MultiVariable.from_list(values).value
@@ -21,5 +22,11 @@ class ExperimentalVariable(MultiVariable):
             self.experimental_param_names_to_vals = experimental_param_name_to_val
         super().__init__(values)
 
-    def __extract_experimental_params(self, values: List[Any]):
-        return list(map(lambda j: j.result[JobResult.EXPERIMENTAL_VARS], values))
+    @staticmethod
+    def __extract_experimental_params(jobs: List[Any]) -> List[Dict]:
+        """
+        Extract experimental params for each job.
+        :param jobs: The jobs whose experimental vars are returned.
+        :return: ExperimentalVars per job.
+        """
+        return list(map(lambda j: j.result[JobResult.EXPERIMENTAL_VARS], jobs))

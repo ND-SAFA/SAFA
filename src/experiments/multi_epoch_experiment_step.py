@@ -24,7 +24,8 @@ class MultiEpochExperimentStep(ExperimentStep):
         self.jobs = self._construct_epoch_jobs(epochs, orig_job)
         return super().run(output_dir, jobs_for_undetermined_vars)
 
-    def _construct_epoch_steps(self, epochs: List[int], orig_job: TrainJob) -> List[ExperimentStep]:
+    @staticmethod
+    def _construct_epoch_jobs(epochs: List[int], orig_job: TrainJob) -> List[AbstractJob]:
         """
         Constructs the jobs for each epoch
         :param epochs: the list of all epochs
@@ -40,17 +41,12 @@ class MultiEpochExperimentStep(ExperimentStep):
             epoch_job.trainer_args.num_train_epochs = epoch
             epoch_job.result[JobResult.EXPERIMENTAL_VARS]["num_train_epochs"] = epoch_total
             epoch_job.trainer_args.total_training_epochs = epoch_total
-            epoch_job.model_manager.model_output_path = MultiEpochExperimentStep._get_epoch_output_path(
-                orig_job.model_manager.model_output_path, epoch_total)
-            epoch_job.trainer_args.checkpoint_path = MultiEpochExperimentStep._get_epoch_output_path(
-                orig_job.model_manager.model_output_path, prev_epoch) if prev_epoch else None
-            jobs.append(epoch_job)
-        return jobs
 
             # Set model paths
             model_checkpoint_path = os.path.join(orig_job.model_manager.model_output_path, str(orig_job.id))
             epoch_job.model_manager.model_path = model_checkpoint_path if i > 0 else orig_job.model_manager.model_path
             epoch_job.trainer_args.checkpoint_path = model_checkpoint_path if i > 0 else None
             epoch_job.model_manager.model_output_path = model_checkpoint_path
+
             jobs.append(epoch_job)
-        return [ExperimentStep(jobs, self.comparison_metric, self.should_maximize_metric)]
+        return jobs

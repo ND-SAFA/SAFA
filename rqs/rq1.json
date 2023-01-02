@@ -24,7 +24,7 @@
             }
           },
           "trainer_args": {
-            "output_dir": "[OUTPUT_PATH]/lhp/augmentation",
+            "output_dir": "[OUTPUT_PATH]/lhp/rq1/models",
             "train_epochs_range": [
               10,
               40,
@@ -71,5 +71,5 @@
       ]
     }
   ],
-  "output_dir": "[OUTPUT_PATH]/lhp/augmentation"
+  "output_dir": "[OUTPUT_PATH]/lhp/rq1/jobs"
 }

@@ -7,7 +7,9 @@ import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.services.ArtifactService;
+import edu.nd.crc.safa.features.attributes.entities.AttributeLayoutAppEntity;
 import edu.nd.crc.safa.features.attributes.entities.CustomAttributeAppEntity;
+import edu.nd.crc.safa.features.attributes.services.AttributeLayoutService;
 import edu.nd.crc.safa.features.attributes.services.AttributeService;
 import edu.nd.crc.safa.features.common.ProjectEntities;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
@@ -61,6 +63,7 @@ public class ProjectRetrievalService {
     private final CommitErrorRetrievalService commitErrorRetrievalService;
     private final ModelService modelService;
     private final AttributeService attributeService;
+    private final AttributeLayoutService attributeLayoutService;
 
     /**
      * Creates a project application entity containing the entities (e.g. traces, artifacts) from
@@ -99,6 +102,8 @@ public class ProjectRetrievalService {
         List<CustomAttributeAppEntity> attributes = this.attributeService
             .getAttributeEntitiesForProject(projectVersion.getProject(), Sort.by("label"));
 
+        List<AttributeLayoutAppEntity> attributeLayouts = this.attributeLayoutService.getAppEntities(projectVersion);
+
         return new ProjectAppEntity(projectVersion,
             entities.getArtifacts(),
             entities.getTraces(),
@@ -110,7 +115,8 @@ public class ProjectRetrievalService {
             errors,
             layout,
             models,
-            attributes);
+            attributes,
+            attributeLayouts);
     }
 
     /**

@@ -25,8 +25,7 @@ public class TestFMEACrud extends AbstractArtifactCrudTest {
 
     @Override
     protected void modifyArtifact(ArtifactAppEntity artifact) {
-        /*Map<String, String> customFields = artifact.getCustomFields();
-        customFields.put("key", "newValue");*/
-        // TODO custom fields
+        Map<String, String> customFields = artifact.getAttributes();
+        customFields.put("key", "newValue");
     }
 }

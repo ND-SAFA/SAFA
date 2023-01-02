@@ -29,7 +29,6 @@ import edu.nd.crc.safa.features.versions.VersionCalculator;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -121,8 +120,10 @@ public class ArtifactVersionRepositoryImpl
 
     @Override
     public Optional<ArtifactVersion> findExistingVersionEntity(ArtifactVersion artifactVersion) {
-        return this.artifactVersionRepository
-            .findByProjectVersionAndArtifactName(artifactVersion.getProjectVersion(), artifactVersion.getName());
+        Optional<ArtifactVersion> version = this.artifactVersionRepository
+                .findByProjectVersionAndArtifactName(artifactVersion.getProjectVersion(), artifactVersion.getName());
+        version.ifPresent(this::attachCustomAttributesToArtifactVersion);
+        return version;
     }
 
     @Override
@@ -132,12 +133,16 @@ public class ArtifactVersionRepositoryImpl
 
     @Override
     public List<ArtifactVersion> retrieveVersionEntitiesByProject(Project project) {
-        return artifactVersionRepository.findByProjectVersionProject(project);
+        List<ArtifactVersion> versions = artifactVersionRepository.findByProjectVersionProject(project);
+        versions.forEach(this::attachCustomAttributesToArtifactVersion);
+        return versions;
     }
 
     @Override
     public List<ArtifactVersion> retrieveVersionEntitiesByBaseEntity(Artifact artifact) {
-        return artifactVersionRepository.findByArtifact(artifact);
+        List<ArtifactVersion> versions = artifactVersionRepository.findByArtifact(artifact);
+        versions.forEach(this::attachCustomAttributesToArtifactVersion);
+        return versions;
     }
 
     @Override
@@ -149,11 +154,7 @@ public class ArtifactVersionRepositoryImpl
     public ArtifactAppEntity retrieveAppEntityFromVersionEntity(ArtifactVersion artifactVersion) {
         // Step 1 - Create base entity information
 
-        ProjectVersion projectVersion = artifactVersion.getProjectVersion();
-        TypeReference<Map<String, String>> typeReference = new TypeReference<Map<String, String>>() {
-        };
-        Map<String, String> customFields =
-            attributeValueService.getCustomAttributeValuesForArtifact(artifactVersion);
+        attachCustomAttributesToArtifactVersion(artifactVersion);
 
         ArtifactAppEntity artifactAppEntity =
             new ArtifactAppEntity(artifactVersion.getArtifact().getArtifactId(),
@@ -162,7 +163,7 @@ public class ArtifactVersionRepositoryImpl
                 artifactVersion.getSummary(),
                 artifactVersion.getContent(),
                 artifactVersion.getArtifact().getDocumentType(),
-                customFields);
+                artifactVersion.getCustomAttributeValues());
 
         // Step 2 - Attach document links
         attachDocumentLinks(artifactVersion, artifactAppEntity);
@@ -187,6 +188,12 @@ public class ArtifactVersionRepositoryImpl
         }
 
         artifactAppEntity.setDocumentIds(documentIds);
+    }
+
+    private void attachCustomAttributesToArtifactVersion(ArtifactVersion artifactVersion) {
+        Map<String, String> customFields =
+                attributeValueService.getCustomAttributeValuesForArtifact(artifactVersion);
+        customFields.forEach(artifactVersion::addCustomAttributeValue);
     }
 
     private void attachDocumentNodeInformation(ArtifactAppEntity artifactAppEntity, Artifact artifact) {

@@ -1,6 +1,8 @@
 {
   "steps": [
     {
+      "comparison_metric": "map",
+      "should_maximize_metric": true,
       "jobs": [
         {
           "object_type": "TRAIN",

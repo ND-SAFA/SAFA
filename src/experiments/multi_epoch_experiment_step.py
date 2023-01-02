@@ -29,15 +29,14 @@ class MultiEpochExperimentStep(ExperimentStep):
             if self.comparison_metric else self.jobs
         return best_job
 
-    @staticmethod
-    def _construct_epoch_steps(epochs: List[int], orig_job: TrainJob) -> List[ExperimentStep]:
+    def _construct_epoch_steps(self, epochs: List[int], orig_job: TrainJob) -> List[ExperimentStep]:
         """
         Constructs the steps for each epoch
         :param epochs: the list of all epochs
         :param orig_job: the original train job
         :return: the list of steps for each epoch
         """
-        steps = []
+        jobs = []
         for i, epoch_total in enumerate(epochs):
             prev_epoch = epochs[i - 1] if (i - 1) >= 0 else None
             epoch = epoch_total - prev_epoch if prev_epoch else epoch_total
@@ -48,7 +47,8 @@ class MultiEpochExperimentStep(ExperimentStep):
 
             # Set model paths
             model_checkpoint_path = os.path.join(orig_job.model_manager.model_output_path, str(orig_job.id))
+            epoch_job.model_manager.model_path = model_checkpoint_path if i > 0 else orig_job.model_manager.model_path
             epoch_job.trainer_args.checkpoint_path = model_checkpoint_path if i > 0 else None
             epoch_job.model_manager.model_output_path = model_checkpoint_path
-            steps.append(ExperimentStep([epoch_job]))
-        return steps
+            jobs.append(epoch_job)
+        return [ExperimentStep(jobs, self.comparison_metric, self.should_maximize_metric)]

@@ -48,8 +48,7 @@ class MultiEpochExperimentStep(ExperimentStep):
 
             # Set model paths
             model_checkpoint_path = os.path.join(orig_job.model_manager.model_output_path, str(orig_job.id))
-            epoch_job.model_manager.model_path = model_checkpoint_path if i > 0 else orig_job.model_manager.model_path
+            epoch_job.trainer_args.checkpoint_path = model_checkpoint_path if i > 0 else None
             epoch_job.model_manager.model_output_path = model_checkpoint_path
-            epoch_job.trainer_args.checkpoint_path = model_checkpoint_path
             steps.append(ExperimentStep([epoch_job]))
         return steps

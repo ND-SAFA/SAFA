@@ -53,6 +53,6 @@ public enum CustomAttributeStorageType {
     private static String toJsonString(List<StringArrayAttributeValue> stringArrayAttributeValues) {
         return stringArrayAttributeValues.stream()
             .map(StringArrayAttributeValue::getValueAsString)
-            .collect(Collectors.joining(",", "[", "]'"));
+            .collect(Collectors.joining(",", "[", "]"));
     }
 }

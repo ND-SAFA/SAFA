@@ -49,7 +49,7 @@ public class StringArrayAttributeValue implements IAttributeValue {
 
     @Override
     public String getValueAsString() {
-        return getValue();
+        return "\"" + getValue() + "\"";
     }
 
     @Override

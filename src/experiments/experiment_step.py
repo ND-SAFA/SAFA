@@ -53,8 +53,7 @@ class ExperimentStep(BaseObject):
         if jobs_for_undetermined_vars:
             self.jobs = self._update_jobs_undetermined_vars(self.jobs, jobs_for_undetermined_vars)
 
-        use_multi_epoch_step = isinstance(self.jobs[0], TrainJob) and self.jobs[
-            0].trainer_args.train_epochs_range is not None
+        use_multi_epoch_step = isinstance(self.jobs[0], TrainJob) and self.jobs[0].trainer_args.train_epochs_range is not None
         job_runs = self._divide_jobs_into_runs()
 
         for jobs in job_runs:
@@ -131,8 +130,7 @@ class ExperimentStep(BaseObject):
         return job_runs
 
     @staticmethod
-    def _update_jobs_with_experimental_vars(jobs: List[AbstractJob], experimental_vars: List[Dict[str, Any]]) -> List[
-        AbstractJob]:
+    def _update_jobs_with_experimental_vars(jobs: List[AbstractJob], experimental_vars: List[Dict[str, Any]]) -> List[AbstractJob]:
         """
         Updates the jobs to contain the experimental vars associated with that job
         :param jobs: the jobs to update
@@ -140,11 +138,13 @@ class ExperimentStep(BaseObject):
         :return: the update jobs
         """
         for i, job in enumerate(jobs):
-            job.result[JobResult.EXPERIMENTAL_VARS] = experimental_vars[i] if experimental_vars else {}
+            if not job.result[JobResult.EXPERIMENTAL_VARS]:
+                job.result[JobResult.EXPERIMENTAL_VARS] = {}
+            if experimental_vars:
+                job.result[JobResult.EXPERIMENTAL_VARS].update(experimental_vars[i])
         return jobs
 
-    def _update_jobs_undetermined_vars(self, jobs2update: List[AbstractJob], jobs2use: List[AbstractJob]) -> List[
-        AbstractJob]:
+    def _update_jobs_undetermined_vars(self, jobs2update: List[AbstractJob], jobs2use: List[AbstractJob]) -> List[AbstractJob]:
         """
         Updates all the jobs2update's undetermined vals with those from the jobs2use
         :param jobs2update: the list of jobs to update undetermined vals for

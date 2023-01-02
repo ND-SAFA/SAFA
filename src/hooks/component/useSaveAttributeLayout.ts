@@ -3,7 +3,7 @@ import { defineStore } from "pinia";
 import { AttributeLayoutSchema, AttributeSchema } from "@/types";
 import { createAttributeLayout } from "@/util";
 import { pinia } from "@/plugins";
-import projectStore from "../project/useProject";
+import attributesStore from "../project/useAttributes";
 
 /**
  * The save attribute store assists in creating and editing attribute layouts.
@@ -40,7 +40,7 @@ export const useSaveAttributeLayout = (id: string) =>
       typeErrors(): string[] {
         const { artifactTypes } = this.editedLayout;
 
-        for (const layout of projectStore.project.attributeLayouts || []) {
+        for (const layout of attributesStore.attributeLayouts || []) {
           if (artifactTypes.length === 0 && layout.artifactTypes.length === 0) {
             return [`A default layout already exists: ${layout.name}.`];
           }

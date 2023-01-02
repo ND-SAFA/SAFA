@@ -2,8 +2,8 @@
   <v-list-group :prepend-icon="icon" :value="value" @click="$emit('click')">
     <template v-slot:activator>
       <v-list-item-title>
-        <typography v-if="title" :value="title" data-cy="generic-list-item" />
         <slot name="activator" />
+        <typography v-if="title" :value="title" data-cy="generic-list-item" />
       </v-list-item-title>
     </template>
     <v-divider class="faded" />

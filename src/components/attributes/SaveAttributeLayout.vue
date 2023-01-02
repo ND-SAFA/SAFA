@@ -17,8 +17,8 @@
     <panel-card>
       <attribute-grid editable :layout="store.editedLayout">
         <template v-slot:item="{ attribute }">
-          <v-card outlined class="pa-3 mx-2">
-            <flex-box v-if="!!attribute" align="center" justify="space-between">
+          <v-card v-if="!!attribute" outlined class="pa-3 mx-2">
+            <flex-box align="center" justify="space-between">
               <div>
                 <typography :value="attribute.label" />
                 <br />
@@ -30,26 +30,6 @@
                 color="error"
                 @click="handleDeleteAttribute(attribute)"
               />
-            </flex-box>
-            <flex-box v-else justify="space-between" align="center">
-              <v-select
-                filled
-                label="Attribute"
-                hide-details
-                class="mr-2"
-                :items="unusedAttributes"
-                item-value="key"
-                item-text="label"
-                v-model="addedAttribute"
-              />
-              <text-button
-                :disabled="!addedAttribute"
-                text
-                variant="add"
-                @click="handleAddAttribute"
-              >
-                Include Attribute
-              </text-button>
             </flex-box>
           </v-card>
         </template>

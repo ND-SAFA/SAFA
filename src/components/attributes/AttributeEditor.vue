@@ -3,6 +3,7 @@
     <flex-box
       t="6"
       full-width
+      wrap
       justify="space-between"
       align="center"
       class="px-4"
@@ -32,6 +33,17 @@
         :key="attribute.key"
         :title="attribute.label"
       >
+        <template v-slot:activator>
+          <span @click.stop="">
+            <icon-button
+              class="ml-auto"
+              icon-id="mdi-plus"
+              tooltip="Add to layout"
+              :is-disabled="isAttributeInLayout(attribute)"
+              @click="handleAddToLayout(attribute)"
+            />
+          </span>
+        </template>
         <save-attribute :attribute="attribute" />
       </toggle-list>
     </v-list>
@@ -48,12 +60,13 @@
 import Vue from "vue";
 import { AttributeSchema } from "@/types";
 import { attributeTypeOptions } from "@/util";
-import { attributesStore } from "@/hooks";
+import { attributeLayoutSaveStore, attributesStore } from "@/hooks";
 import {
-  ToggleList,
   FlexBox,
   TextButton,
+  ToggleList,
   Typography,
+  IconButton,
 } from "@/components/common";
 import SaveAttribute from "./SaveAttribute.vue";
 
@@ -62,7 +75,14 @@ import SaveAttribute from "./SaveAttribute.vue";
  */
 export default Vue.extend({
   name: "AttributeEditor",
-  components: { TextButton, Typography, FlexBox, SaveAttribute, ToggleList },
+  components: {
+    IconButton,
+    TextButton,
+    Typography,
+    FlexBox,
+    SaveAttribute,
+    ToggleList,
+  },
   data() {
     return {
       typeOptions: attributeTypeOptions(),
@@ -76,7 +96,29 @@ export default Vue.extend({
     attributes(): AttributeSchema[] {
       return attributesStore.attributes;
     },
+    /**
+     * @return The store for the current layout being edited.
+     */
+    layoutStore() {
+      return attributeLayoutSaveStore(attributesStore.selectedLayoutId);
+    },
   },
-  methods: {},
+  methods: {
+    /**
+     * @return Whether this attribute is in the current layout.
+     */
+    isAttributeInLayout(attribute: AttributeSchema): boolean {
+      return !!this.layoutStore.editedLayout.positions.find(
+        ({ key }) => key === attribute.key
+      );
+    },
+    /**
+     * Adds an attribute to the current layout.
+     * @param attribute - The attribute to add.
+     */
+    handleAddToLayout(attribute: AttributeSchema): void {
+      this.layoutStore.addAttribute(attribute.key);
+    },
+  },
 });
 </script>

@@ -107,8 +107,6 @@ class TrainerDatasetManager(BaseObject):
         :param child_class_name: the name of the child class
         :return: the enum class mapping name to class
         """
-        if abstract_class == DataAugmenter:
-            return SupportedAugmentationStep
         return SupportedDatasetCreator
 
     def _prepare_datasets(self, data_augmenter: DataAugmenter) -> None:

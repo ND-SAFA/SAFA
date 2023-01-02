@@ -33,7 +33,7 @@ class ExperimentStep(BaseObject):
         if not isinstance(jobs, ExperimentalVariable):
             jobs = ExperimentalVariable(jobs)
         jobs, experimental_vars = jobs.get_values_of_all_variables(), jobs.experimental_param_names_to_vals
-        self.jobs = self._update_jobs_with_experimental_vars(jobs, experimental_vars) if experimental_vars else jobs
+        self.jobs = self._update_jobs_with_experimental_vars(jobs, experimental_vars)
         self.status = Status.NOT_STARTED
         self.best_job = None
         self.comparison_metric = comparison_metric
@@ -142,7 +142,7 @@ class ExperimentStep(BaseObject):
         :return: the update jobs
         """
         for i, job in enumerate(jobs):
-            job.result[JobResult.EXPERIMENTAL_VARS] = experimental_vars[i]
+            job.result[JobResult.EXPERIMENTAL_VARS] = experimental_vars[i] if experimental_vars else {}
         return jobs
 
     def _update_jobs_undetermined_vars(self, jobs2update: List[AbstractJob], jobs2use: List[AbstractJob]) -> List[

@@ -5,6 +5,7 @@ from typing import List
 
 from experiments.experiment_step import ExperimentStep
 from jobs.abstract_job import AbstractJob
+from jobs.components.job_result import JobResult
 from jobs.train_job import TrainJob
 
 
@@ -17,24 +18,18 @@ class MultiEpochExperimentStep(ExperimentStep):
         :param jobs_for_undetermined_vars: job used to fill in any undetermined vars
         :return: the best job
         """
-        from experiments.experiment import Experiment
         orig_job: TrainJob = self.jobs.pop()
         epochs = [i for i in range(*orig_job.trainer_args.train_epochs_range)]
         orig_job.trainer_args.train_epochs_range = None
-        steps = self._construct_epoch_steps(epochs, orig_job)
-        experiment = Experiment(steps, output_dir)
-        experiment.run()
-        jobs = experiment.get_all_jobs()
-        best_job = [self._get_best_job(jobs, self.comparison_metric, self.should_maximize_metric)] \
-            if self.comparison_metric else self.jobs
-        return best_job
+        self.jobs = self._construct_epoch_jobs(epochs, orig_job)
+        return super().run(output_dir, jobs_for_undetermined_vars)
 
     def _construct_epoch_steps(self, epochs: List[int], orig_job: TrainJob) -> List[ExperimentStep]:
         """
-        Constructs the steps for each epoch
+        Constructs the jobs for each epoch
         :param epochs: the list of all epochs
         :param orig_job: the original train job
-        :return: the list of steps for each epoch
+        :return: the list of jobs for each epoch
         """
         jobs = []
         for i, epoch_total in enumerate(epochs):
@@ -43,7 +38,14 @@ class MultiEpochExperimentStep(ExperimentStep):
             epoch_job = deepcopy(orig_job)
             epoch_job.id = str(uuid.uuid4())
             epoch_job.trainer_args.num_train_epochs = epoch
+            epoch_job.result[JobResult.EXPERIMENTAL_VARS]["num_train_epochs"] = epoch_total
             epoch_job.trainer_args.total_training_epochs = epoch_total
+            epoch_job.model_manager.model_output_path = MultiEpochExperimentStep._get_epoch_output_path(
+                orig_job.model_manager.model_output_path, epoch_total)
+            epoch_job.trainer_args.checkpoint_path = MultiEpochExperimentStep._get_epoch_output_path(
+                orig_job.model_manager.model_output_path, prev_epoch) if prev_epoch else None
+            jobs.append(epoch_job)
+        return jobs
 
             # Set model paths
             model_checkpoint_path = os.path.join(orig_job.model_manager.model_output_path, str(orig_job.id))

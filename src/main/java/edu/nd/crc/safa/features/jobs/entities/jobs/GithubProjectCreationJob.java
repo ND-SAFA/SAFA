@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.features.jobs.entities.jobs;
 
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -25,7 +26,6 @@ import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.services.ProjectService;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
-import edu.nd.crc.safa.features.users.services.SafaUserService;
 
 import org.springframework.util.StringUtils;
 
@@ -80,10 +80,9 @@ public class GithubProjectCreationJob extends CommitJob {
 
     @IJobStep(value = "Authenticating User Credentials", position = 1)
     public void authenticateUserCredentials() {
-        SafaUserService safaUserService = this.serviceProvider.getSafaUserService();
         GithubAccessCredentialsRepository accessCredentialsRepository = this.serviceProvider
             .getGithubAccessCredentialsRepository();
-        SafaUser principal = safaUserService.getCurrentUser();
+        SafaUser principal = this.getJobDbEntity().getUser();
 
         this.credentials = accessCredentialsRepository.findByUser(principal).orElseThrow(() ->
             new SafaError("No GitHub credentials found for user " + principal.getEmail()));
@@ -113,8 +112,13 @@ public class GithubProjectCreationJob extends CommitJob {
             projectDescription = projectName;
         }
 
-        project.setName(projectName);
-        project.setDescription(projectDescription);
+        // if not already set
+        if (!StringUtils.hasLength(project.getName())) {
+            project.setName(projectName);
+        }
+        if (!StringUtils.hasLength(project.getDescription())) {
+            project.setDescription(projectDescription);
+        }
         this.serviceProvider.getProjectRepository().save(project);
 
         // Step - Update job name
@@ -125,8 +129,7 @@ public class GithubProjectCreationJob extends CommitJob {
     }
 
     protected GithubProject getGithubProjectMapping(Project project) {
-        SafaUserService safaUserService = this.serviceProvider.getSafaUserService();
-        SafaUser principal = safaUserService.getCurrentUser();
+        SafaUser principal = this.getJobDbEntity().getUser();
         GithubProject githubProject = new GithubProject();
 
         githubProject.setProject(project);
@@ -144,7 +147,6 @@ public class GithubProjectCreationJob extends CommitJob {
         this.commitSha = connectionService.getRepositoryBranch(this.credentials, repositoryName,
             this.githubRepositoryDTO.getDefaultBranch()).getLastCommitSha();
         this.projectCommit.addArtifacts(ModificationType.ADDED, getArtifacts());
-        System.out.println("HERE I AM " + projectCommit.getArtifacts().getSize());
         this.githubProject.setLastCommitSha(this.commitSha);
         this.serviceProvider.getGithubProjectRepository().save(githubProject);
     }
@@ -158,16 +160,16 @@ public class GithubProjectCreationJob extends CommitJob {
                 this.githubIdentifier.getRepositoryName(),
                 this.commitSha);
 
-        for (GithubRepositoryFileDTO file : filetreeResponseDTO.filterOutFolders().getTree()) {
+        for (GithubRepositoryFileDTO file : filetreeResponseDTO.filesOnly().getTree()) {
             GithubFileBlobDTO blobDTO = this.serviceProvider.getGithubConnectionService()
                 .getBlobInformation(this.credentials, file.getBlobApiUrl());
             String name = file.getPath();
-            String type = file.getType().name();
+            String type = file.getType().getArtifactTypeName();
             String summary = file.getSha();
             String body = "";
 
             if (blobDTO != null && StringUtils.hasLength(blobDTO.getContent())) {
-                body = blobDTO.getContent();
+                body = base64Decode(blobDTO.getContent());
             }
 
             ArtifactAppEntity artifact = new ArtifactAppEntity(
@@ -184,5 +186,23 @@ public class GithubProjectCreationJob extends CommitJob {
         }
 
         return artifacts;
+    }
+
+    /**
+     * Decodes GitHub's base64 encoded file bodies. Each line in the original file
+     * is base64 encoded in GitHub's storage, with newlines separating them.
+     *
+     * @param encodedBody The encoded file body
+     * @return The decoded file body
+     */
+    private String base64Decode(String encodedBody) {
+        StringBuilder output = new StringBuilder();
+
+        for (String line : encodedBody.split("\n")) {
+            byte[] decodedBytes = Base64.getDecoder().decode(line);
+            output.append(new String(decodedBytes));
+        }
+
+        return output.toString();
     }
 }

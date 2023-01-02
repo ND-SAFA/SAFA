@@ -9,6 +9,8 @@ import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.repositories.SafaUserRepository;
 
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,6 +25,8 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class SafaUserService {
 
+    private final Logger logger = LoggerFactory.getLogger(SafaUserService.class);
+
     private final PasswordEncoder passwordEncoder;
     private final SafaUserRepository safaUserRepository;
 
@@ -30,6 +34,11 @@ public class SafaUserService {
      * @return the current {@link SafaUser} logged in
      */
     public SafaUser getCurrentUser() {
+        if (!Thread.currentThread().getName().startsWith("https-jsse-nio-3000-exec")) {
+            logger.warn("Attempt to get user information from a thread that does not appear to be a spring thread ("
+                + Thread.currentThread().getName() + "). This is dangerous and should not be done.");
+        }
+
         SecurityContext securityContext = SecurityContextHolder.getContext();
         Authentication authentication = securityContext.getAuthentication();
 

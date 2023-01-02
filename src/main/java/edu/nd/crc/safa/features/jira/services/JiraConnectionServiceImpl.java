@@ -15,10 +15,8 @@ import edu.nd.crc.safa.features.jira.entities.app.JiraIssuesResponseDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraProjectPermissionDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraProjectResponseDTO;
 import edu.nd.crc.safa.features.jira.entities.db.JiraAccessCredentials;
-import edu.nd.crc.safa.features.jira.entities.db.JiraProject;
 import edu.nd.crc.safa.features.jira.repositories.JiraProjectRepository;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
-import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.utilities.WebApiUtils;
 
 import lombok.AllArgsConstructor;
@@ -258,12 +256,6 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
                 .retrieve()
                 .bodyToMono(JiraIssuesResponseDTO.class)
         ).orElseThrow(() -> new SafaError("Error while trying to refresh JIRA credentials"));
-    }
-
-    @Override
-    public JiraProject createJiraProjectMapping(Project project, Long jiraProjectId) {
-        JiraProject jiraProject = new JiraProject(project, jiraProjectId);
-        return jiraProjectRepository.save(jiraProject);
     }
 
     @Getter

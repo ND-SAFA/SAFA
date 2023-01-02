@@ -142,6 +142,13 @@ public class AppRoutes {
                 + "/versions/{versionId}/artifacts/validate";
         }
 
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        public static class Installations {
+            public static final String BY_PROJECT = Projects.ROOT + "/installations/by-project/{id}";
+            public static final String GITHUB_BY_IMPORTED =
+                Projects.ROOT + "/installations/by-github-repositories/{ids}";
+            public static final String JIRA_BY_IMPORTED = Projects.ROOT + "/installations/by-jira-projects/{ids}";
+        }
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -185,6 +192,7 @@ public class AppRoutes {
             public static final String BY_ID = Import.ROOT + "/jira/{id}";
             public static final String UPDATE = Versions.BY_ID + "/import/jira/{id}";
             public static final String RETRIEVE_JIRA_PROJECTS = Projects.ROOT + "/jira";
+            public static final String IMPORT_INTO_EXISTING = Versions.BY_ID + "/import/jira/{id}";
         }
     }
 

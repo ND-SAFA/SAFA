@@ -2,12 +2,17 @@ package features.github.imports;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import features.github.base.AbstractGithubTest;
+import java.util.List;
+import java.util.Optional;
 
 import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
+import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.features.github.entities.db.GithubProject;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
+
+import features.github.base.AbstractGithubTest;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -34,7 +39,7 @@ public class TestGithubImport extends AbstractGithubTest {
         // We should have as many artifacts as the number of files produced by the mock service
         Assertions.assertEquals(
             serviceMock.getRepositoryFiles(credentials, repositoryName, "sha")
-                .filterOutFolders().getTree().size(),
+                .filesOnly().getTree().size(),
             serviceProvider.getArtifactRepository()
                 .findByProject(githubProject.getProject()).size()
         );
@@ -66,13 +71,28 @@ public class TestGithubImport extends AbstractGithubTest {
             .findByProjectAndRepositoryName(project, repositoryName).isPresent());
 
         int importedArtifactsCount = serviceMock.getRepositoryFiles(credentials, repositoryName, "sha")
-            .filterOutFolders().getTree().size();
+            .filesOnly().getTree().size();
 
         // We should have the correct number of artifacts and links
+        List<Artifact> artifacts = serviceProvider.getArtifactRepository()
+            .findByProject(project);
         Assertions.assertEquals(
             importedArtifactsCount + initialArtifactCount,
-            serviceProvider.getArtifactRepository()
-                .findByProject(project).size());
+            artifacts.size());
+
+        // Since some artifacts existed beforehand, we'll just check that *some* artifact has the right body
+        // And while we're at it, we'll check the artifact type
+        boolean correctBodyFound = false;
+        for (Artifact artifact : artifacts) {
+            Optional<ArtifactVersion> artifactVersion
+                = serviceProvider.getArtifactVersionRepository().findByProjectVersionAndArtifact(projectVersion, artifact);
+
+            if (artifactVersion.isPresent() && artifactVersion.get().getContent().equals(AbstractGithubTest.DECODED_FILE_CONTENT)) {
+                correctBodyFound = true;
+                Assertions.assertEquals("GitHub File", artifact.getType().getName());
+            }
+        }
+        Assertions.assertTrue(correctBodyFound);
 
         Assertions.assertEquals(0,
             serviceProvider.getTraceLinkRepository().count());

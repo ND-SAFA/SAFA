@@ -5,6 +5,7 @@ import java.util.UUID;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.repositories.ProjectRepository;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.services.PermissionService;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.features.versions.repositories.ProjectVersionRepository;
@@ -62,8 +63,18 @@ public class ResourceBuilder {
         return this.project;
     }
 
+    public Project withOwnProjectAs(SafaUser user) throws SafaError {
+        this.permissionService.requireOwnerPermission(project, user);
+        return this.project;
+    }
+
     public Project withViewProject() throws SafaError {
         this.permissionService.requireViewPermission(project);
+        return this.project;
+    }
+
+    public Project withViewProjectAs(SafaUser user) throws SafaError {
+        this.permissionService.requireViewPermission(project, user);
         return this.project;
     }
 
@@ -72,13 +83,28 @@ public class ResourceBuilder {
         return this.project;
     }
 
+    public Project withEditProjectAs(SafaUser user) {
+        this.permissionService.requireEditPermission(project, user);
+        return this.project;
+    }
+
     public ProjectVersion withViewVersion() {
         this.permissionService.requireViewPermission(projectVersion.getProject());
         return projectVersion;
     }
 
+    public ProjectVersion withViewVersionAs(SafaUser user) {
+        this.permissionService.requireViewPermission(projectVersion.getProject(), user);
+        return projectVersion;
+    }
+
     public ProjectVersion withEditVersion() {
         this.permissionService.requireEditPermission(projectVersion.getProject());
+        return projectVersion;
+    }
+
+    public ProjectVersion withEditVersionAs(SafaUser user) {
+        this.permissionService.requireEditPermission(projectVersion.getProject(), user);
         return projectVersion;
     }
 }

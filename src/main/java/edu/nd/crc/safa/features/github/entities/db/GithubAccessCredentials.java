@@ -100,16 +100,8 @@ public class GithubAccessCredentials {
     }
 
     @PrePersist
-    private void onCreate() {
-        this.updateExpirationDates();
-    }
-
     @PreUpdate
-    private void onUpdate() {
-        this.updateExpirationDates();
-    }
-
-    private void updateExpirationDates() {
+    public void updateExpirationDates() {
         if (this.refreshTokenExpiration != null) {
             this.refreshTokenExpirationDate = LocalDateTime.now().plusSeconds(this.refreshTokenExpiration);
         }

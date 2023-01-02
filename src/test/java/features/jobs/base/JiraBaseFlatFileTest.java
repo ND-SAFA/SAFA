@@ -2,6 +2,7 @@ package features.jobs.base;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import javax.validation.constraints.NotNull;
@@ -13,10 +14,10 @@ import edu.nd.crc.safa.features.jobs.entities.app.JobSteps;
 import edu.nd.crc.safa.features.jobs.entities.app.JobType;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.utilities.JsonFileUtilities;
-
 import features.flatfiles.base.BaseFlatFileTest;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import services.MappingTestService;
 
@@ -30,7 +31,7 @@ public abstract class JiraBaseFlatFileTest extends BaseFlatFileTest {
     protected int N_STEPS = 4;
     protected String cloudId = UUID.randomUUID().toString();
     protected Long jiraProjectId = (long) 1;
-
+    protected String[] originalJraProjectCreationSteps;
 
     @BeforeEach
     public void setJiraAuthorization() {
@@ -42,11 +43,17 @@ public abstract class JiraBaseFlatFileTest extends BaseFlatFileTest {
         credentials.setCloudId(cloudId);
         serviceProvider.getJiraAccessCredentialsRepository().save(credentials);
 
+        originalJraProjectCreationSteps = Arrays.stream(JobSteps.jiraProjectCreationSteps).toArray(String[]::new);
         // Step - Override steps to skip authentication and project retrieval
         JobSteps.jiraProjectCreationSteps = new String[]{
             JobSteps.jiraProjectCreationSteps[2],
             JobSteps.jiraProjectCreationSteps[3]
         };
+    }
+
+    @AfterEach
+    public void restoreSteps() {
+        JobSteps.jiraProjectCreationSteps = originalJraProjectCreationSteps;
     }
 
     @NotNull

@@ -11,8 +11,12 @@
             "model_path": "bert-base-uncased"
           },
           "trainer_args": {
-            "output_dir": "[OUTPUT_PATH]/lhp/rq1/trainer",
-            "num_train_epochs": 1,
+            "output_dir": "[OUTPUT_PATH]/lhp/models",
+            "train_epochs_range": [
+              1,
+              3,
+              1
+            ],
             "per_device_train_batch_size": 2,
             "metrics": [
               "map"
@@ -20,24 +24,17 @@
           },
           "trainer_dataset_manager": {
             "train_dataset_creator": {
-              "object_type": "STRUCTURE",
-              "project_path": "[DATA_PATH]/structure"
+              "object_type": "SAFA",
+              "project_path": "~/desktop/safa/datasets/lhp/answer"
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",
-              "val_percentage": 0.5
-            },
-            "augmenter": {
-              "steps": [
-                {
-                  "object_type": "SIMPLE_WORD_REPLACEMENT"
-                }
-              ]
+              "val_percentage": 0.8
             }
           }
         }
       ]
     }
   ],
-  "output_dir": "[OUTPUT_PATH]/lhp/rq1/output"
+  "output_dir": "[OUTPUT_PATH]/lhp/jobs"
 }

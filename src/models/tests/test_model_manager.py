@@ -1,8 +1,8 @@
 import mock
 from mock import patch
 from transformers.modeling_utils import PreTrainedModel
+from transformers.models.auto import AutoModelForSequenceClassification
 from transformers.models.auto.tokenization_auto import AutoTokenizer
-
 from models.model_manager import ModelManager
 from testres.base_test import BaseTest
 
@@ -12,6 +12,23 @@ class TestTokenizer:
 
 
 class TestModelManager(BaseTest):
+
+    def test_get_encoder_layers(self):
+        model = AutoModelForSequenceClassification.from_pretrained("bert-base-uncased")
+        manager = self.get_model_manager()
+        layers = manager.get_encoder_layers(model)
+        self.assertEquals(len(layers), 12)
+
+    def test_freeze_layers(self):
+        layers2freeze = [-2, 0]
+        model = AutoModelForSequenceClassification.from_pretrained("bert-base-uncased")
+        manager = self.get_model_manager()
+        manager._freeze_layers(model, layers2freeze)
+        layers = manager.get_encoder_layers(model)
+        for layer_no in layers2freeze:
+            layer = layers[layer_no]
+            for param in layer:
+                self.assertFalse(param.requires_grad)
 
     @patch.object(ModelManager, '_ModelManager__load_model')
     def test_get_model(self, load_model_mock: mock.MagicMock):

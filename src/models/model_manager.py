@@ -1,9 +1,10 @@
-from typing import Dict, Optional
+from typing import Dict, Optional, List
 
 from transformers import AutoConfig
 from transformers.modeling_utils import PreTrainedModel
 from transformers.models.auto.tokenization_auto import AutoTokenizer
 from transformers.tokenization_utils import PreTrainedTokenizer
+from torch.nn.parameter import Parameter
 
 from config.constants import MAX_SEQ_LENGTH_DEFAULT
 from models.model_properties import ModelArchitectureType, ModelSize, ModelTask
@@ -12,11 +13,13 @@ from util.base_object import BaseObject
 
 class ModelManager(BaseObject):
     _max_seq_length: int = MAX_SEQ_LENGTH_DEFAULT
+    LAYER = List[Parameter]
 
     def __init__(self, model_path: str, model_output_path: str = None,
                  model_task: ModelTask = ModelTask.SEQUENCE_CLASSIFICATION,
                  model_size: ModelSize = ModelSize.BASE,
-                 model_architecture: ModelArchitectureType = ModelArchitectureType.SINGLE):
+                 model_architecture: ModelArchitectureType = ModelArchitectureType.SINGLE,
+                 layers_to_freeze: List[int] = None):
         """
         Handles loading model and related functions
         :param model_path: the path to the saved model
@@ -29,6 +32,7 @@ class ModelManager(BaseObject):
         self.model_task = model_task
         self.arch_type = model_architecture
         self.model_size = model_size
+        self.layers_to_freeze = layers_to_freeze
 
     def __load_model(self) -> PreTrainedModel:
         """
@@ -37,7 +41,10 @@ class ModelManager(BaseObject):
         """
         config = AutoConfig.from_pretrained(self.model_path)
         config.num_labels = 2
-        return self.model_task.value.from_pretrained(self.model_path, config=config)
+        model = self.model_task.value.from_pretrained(self.model_path, config=config)
+        if self.layers_to_freeze:
+            self._freeze_layers(model, self.layers_to_freeze)
+        return model
 
     def get_model(self) -> PreTrainedModel:
         """
@@ -83,3 +90,31 @@ class ModelManager(BaseObject):
         return tokenizer(truncation=True, return_attention_mask=True,
                          max_length=self._max_seq_length,
                          padding="max_length", return_token_type_ids=return_token_type_ids, **kwargs)
+
+    @staticmethod
+    def get_encoder_layers(model: PreTrainedModel) -> List[LAYER]:
+        """
+        Returns a list of layers represented by a list of their parameters
+        :return: a list of layers represented by a list of their parameters
+        """
+        layers = {}
+        for name, param in model.named_parameters():
+            descr = name.split(".")
+            if "layer" in descr:
+                layer_no = int(descr[descr.index("layer") + 1])
+                if layer_no not in layers:
+                    layers[layer_no] = []
+                layers[layer_no].append(param)
+        return [layers[i] for i in range(len(layers))]
+
+    def _freeze_layers(self, model: PreTrainedModel, layers_to_freeze: List[int]) -> None:
+        """
+        Freezes the layer corresponding with the given numbers.
+        :param layers_to_freeze: Number of the layers to freeze. If negative number given, layer will be that many from end
+        :return: None
+        """
+        layers = self.get_encoder_layers(model)
+        for layer_no in layers_to_freeze:
+            layer = layers[layer_no]
+            for param in layer:
+                param.requires_grad = False

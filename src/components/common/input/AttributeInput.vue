@@ -170,13 +170,13 @@ export default Vue.extend({
      */
     numRules(): (value: string | undefined) => string | true {
       return (value) => {
-        const { min, max } = this.attribute;
+        const { min = null, max = null } = this.attribute;
 
         if (!value) {
           return true;
-        } else if (max !== undefined && parseFloat(value) > max) {
+        } else if (max !== null && parseFloat(value) > max) {
           return `Value is greater than ${max}.`;
-        } else if (min !== undefined && parseFloat(value) < min) {
+        } else if (min !== null && parseFloat(value) < min) {
           return `Value is less than ${min}.`;
         } else {
           return true;
@@ -188,14 +188,14 @@ export default Vue.extend({
      */
     lengthRules(): (value: string | string[] | undefined) => string | true {
       return (value) => {
-        const { min, max } = this.attribute;
+        const { min = null, max = null } = this.attribute;
         const unit = Array.isArray(value) ? "items" : "characters";
 
         if (!value) {
           return true;
-        } else if (max !== undefined && value.length > max) {
+        } else if (max !== null && value.length > max) {
           return `Value has greater than ${max} ${unit}.`;
-        } else if (min !== undefined && value.length < min) {
+        } else if (min !== null && value.length < min) {
           return `Value has less than ${min} ${unit}.`;
         } else {
           return true;

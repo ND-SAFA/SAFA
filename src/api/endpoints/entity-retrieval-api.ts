@@ -1,10 +1,4 @@
 import { ArtifactSchema, ProjectSchema, TraceLinkSchema } from "@/types";
-import {
-  ENABLED_FEATURES,
-  EXAMPLE_ATTRIBUTE_LAYOUTS,
-  EXAMPLE_ATTRIBUTES,
-  EXAMPLE_EMPTY_LAYOUT,
-} from "@/util";
 import { Endpoint, fillEndpoint, authHttpClient } from "@/api/util";
 
 /**
@@ -16,19 +10,10 @@ import { Endpoint, fillEndpoint, authHttpClient } from "@/api/util";
 export async function getProjectVersion(
   versionId: string
 ): Promise<ProjectSchema> {
-  const project = await authHttpClient<ProjectSchema>(
+  return authHttpClient<ProjectSchema>(
     fillEndpoint(Endpoint.projectVersion, { versionId }),
     { method: "GET" }
   );
-
-  if (ENABLED_FEATURES.EXAMPLE_ATTRIBUTES) {
-    project.attributes = EXAMPLE_ATTRIBUTES;
-    project.attributeLayouts = EXAMPLE_ATTRIBUTE_LAYOUTS;
-  } else {
-    project.attributeLayouts = [EXAMPLE_EMPTY_LAYOUT];
-  }
-
-  return project;
 }
 
 /**

@@ -1,5 +1,4 @@
 import { AttributeLayoutSchema, AttributeSchema } from "@/types";
-import { ENABLED_FEATURES } from "@/util";
 import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
 
 /**
@@ -13,9 +12,6 @@ export async function createAttribute(
   projectId: string,
   attribute: AttributeSchema
 ): Promise<AttributeSchema> {
-  if (ENABLED_FEATURES.ATTRIBUTES) {
-    return attribute;
-  }
   return authHttpClient<AttributeSchema>(
     fillEndpoint(Endpoint.createAttribute, {
       projectId,
@@ -38,9 +34,6 @@ export async function editAttribute(
   projectId: string,
   attribute: AttributeSchema
 ): Promise<AttributeSchema> {
-  if (ENABLED_FEATURES.ATTRIBUTES) {
-    return attribute;
-  }
   return authHttpClient<AttributeSchema>(
     fillEndpoint(Endpoint.editAttribute, {
       projectId,
@@ -63,9 +56,6 @@ export async function deleteAttribute(
   projectId: string,
   attribute: AttributeSchema
 ): Promise<void> {
-  if (ENABLED_FEATURES.ATTRIBUTES) {
-    return;
-  }
   return authHttpClient<void>(
     fillEndpoint(Endpoint.editAttribute, {
       projectId,
@@ -88,9 +78,6 @@ export async function createAttributeLayout(
   projectId: string,
   layout: AttributeLayoutSchema
 ): Promise<AttributeLayoutSchema> {
-  if (ENABLED_FEATURES.ATTRIBUTES) {
-    return layout;
-  }
   return authHttpClient<AttributeLayoutSchema>(
     fillEndpoint(Endpoint.createAttributeLayout, {
       projectId,
@@ -113,9 +100,6 @@ export async function editAttributeLayout(
   projectId: string,
   layout: AttributeLayoutSchema
 ): Promise<AttributeLayoutSchema> {
-  if (ENABLED_FEATURES.ATTRIBUTES) {
-    return layout;
-  }
   return authHttpClient<AttributeLayoutSchema>(
     fillEndpoint(Endpoint.editAttribute, {
       projectId,
@@ -138,9 +122,6 @@ export async function deleteAttributeLayout(
   projectId: string,
   layout: AttributeLayoutSchema
 ): Promise<void> {
-  if (ENABLED_FEATURES.ATTRIBUTES) {
-    return;
-  }
   return authHttpClient<void>(
     fillEndpoint(Endpoint.editAttribute, {
       projectId,

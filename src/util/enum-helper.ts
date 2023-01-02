@@ -223,9 +223,7 @@ export function settingsTabOptions(): SelectOption[] {
     createEnumOption(SettingsTabTypes.upload, "Data Upload"),
     createEnumOption(SettingsTabTypes.integrations, "Data Integrations"),
     createEnumOption(SettingsTabTypes.artifacts, "Artifact Types"),
-    ...(ENABLED_FEATURES.ATTRIBUTES
-      ? [createEnumOption(SettingsTabTypes.attributes, "Custom Attributes")]
-      : []),
+    createEnumOption(SettingsTabTypes.attributes, "Custom Attributes"),
   ];
 }
 

@@ -65,7 +65,7 @@ class ExperimentStep(BaseObject):
                                                                            self.should_maximize_metric)
                     self.best_job = multi_epoch_experiment_step.run(output_dir)
             else:
-                for job in self.jobs:
+                for job in jobs:
                     job.run()
                     if isinstance(job, AbstractTraceJob) and self.comparison_metric is not None:
                         self.best_job = self.optional_save(self.best_job, job)

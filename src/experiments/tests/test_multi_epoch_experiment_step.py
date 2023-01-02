@@ -8,6 +8,7 @@ from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
 from experiments.experiment_step import ExperimentStep
 from experiments.multi_epoch_experiment_step import MultiEpochExperimentStep
 from experiments.tests.base_experiment_test import BaseExperimentTest
+from jobs.abstract_job import AbstractJob
 from jobs.components.job_args import JobArgs
 from jobs.components.job_result import JobResult
 from jobs.delete_model_job import DeleteModelJob
@@ -34,17 +35,14 @@ class TestMultiEpochExperimentStep(BaseExperimentTest):
         experiment_step.run(TEST_OUTPUT_DIR)
 
         output_dirs = os.listdir(TEST_OUTPUT_DIR)
-        for epoch in range(*TestMultiEpochExperimentStep.EPOCH_ARGS):
-            self.assertIn(str(epoch), output_dirs)
-
-            epoch_files = os.listdir(os.path.join(TEST_OUTPUT_DIR, str(epoch)))
-            self.assertIn('output.json', epoch_files)
-            epoch_files.remove('output.json')
-
-            self.assertEquals(1, len(epoch_files))
-            job_id = epoch_files.pop()
-            job_files = os.listdir(os.path.join(TEST_OUTPUT_DIR, str(epoch), job_id))
-            self.assertIn('output.json', job_files)
+        output_dirs.remove('output.json')
+        epochs = set()
+        for job_id in output_dirs:
+            output_file = os.path.join(TEST_OUTPUT_DIR, job_id, AbstractJob.OUTPUT_FILENAME)
+            epochs.add(self._load_step_output(output_file_path=output_file)[JobResult.EXPERIMENTAL_VARS]["num_train_epochs"])
+        self.assertEquals(len(epochs), len(self.EPOCH_ARGS))
+        for epoch in range(*self.EPOCH_ARGS):
+            self.assertIn(epoch, epochs)
 
     def get_experiment_step(self):
         kwargs = {"override": True, **{

@@ -6,7 +6,6 @@ from typing import List
 from experiments.experiment_step import ExperimentStep
 from jobs.abstract_job import AbstractJob
 from jobs.train_job import TrainJob
-from util.file_util import FileUtil
 
 
 class MultiEpochExperimentStep(ExperimentStep):
@@ -24,8 +23,7 @@ class MultiEpochExperimentStep(ExperimentStep):
         orig_job.trainer_args.train_epochs_range = None
         steps = self._construct_epoch_steps(epochs, orig_job)
         experiment = Experiment(steps, output_dir)
-        experiment.run(
-            lambda step_num: self._get_epoch_output_path(orig_job.model_manager.model_output_path, epochs[step_num]))
+        experiment.run()
         jobs = experiment.get_all_jobs()
         best_job = [self._get_best_job(jobs, self.comparison_metric, self.should_maximize_metric)] \
             if self.comparison_metric else self.jobs
@@ -47,23 +45,11 @@ class MultiEpochExperimentStep(ExperimentStep):
             epoch_job.id = str(uuid.uuid4())
             epoch_job.trainer_args.num_train_epochs = epoch
             epoch_job.trainer_args.total_training_epochs = epoch_total
-            epoch_job.model_manager.model_output_path = MultiEpochExperimentStep._get_epoch_output_path(
-                orig_job.model_manager.model_output_path, epoch_total)
-            epoch_job.trainer_args.checkpoint_path = MultiEpochExperimentStep._get_epoch_output_path(
-                orig_job.model_manager.model_output_path, prev_epoch) if prev_epoch else None
+
+            # Set model paths
+            model_checkpoint_path = os.path.join(orig_job.model_manager.model_output_path, str(orig_job.id))
+            epoch_job.model_manager.model_path = model_checkpoint_path if i > 0 else orig_job.model_manager.model_path
+            epoch_job.model_manager.model_output_path = model_checkpoint_path
+            epoch_job.trainer_args.checkpoint_path = model_checkpoint_path
             steps.append(ExperimentStep([epoch_job]))
         return steps
-
-    @staticmethod
-    def _get_epoch_output_path(output_path: str, epoch_num: int, make: bool = False) -> str:
-        """
-        Gets the path to the epoch's output
-        :param output_path: the base output path
-        :param epoch_num: the number of the epoch
-        :param make: if True, makes the directory
-        :return: the path to the output
-        """
-        path = os.path.join(output_path, str(epoch_num))
-        if make:
-            FileUtil.make_dir_safe(path)
-        return path

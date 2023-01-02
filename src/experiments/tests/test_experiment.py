@@ -37,5 +37,4 @@ class TestExperiment(BaseExperimentTest):
         definition = deepcopy(self.EXPERIMENT_DEFINITION)
         if not use_metric:
             definition["steps"][0].pop("comparison_metric")
-        # return TestObjectCreator.create(Experiment)
         return Experiment.initialize_from_definition(definition)

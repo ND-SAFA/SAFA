@@ -7,7 +7,6 @@ from experiments.experiment_step import ExperimentStep
 from jobs.abstract_job import AbstractJob
 from jobs.components.job_result import JobResult
 from jobs.train_job import TrainJob
-from util.file_util import FileUtil
 
 
 class MultiEpochExperimentStep(ExperimentStep):
@@ -42,23 +41,12 @@ class MultiEpochExperimentStep(ExperimentStep):
             epoch_job.trainer_args.num_train_epochs = epoch
             epoch_job.result[JobResult.EXPERIMENTAL_VARS]["num_train_epochs"] = epoch_total
             epoch_job.trainer_args.total_training_epochs = epoch_total
-            epoch_job.model_manager.model_output_path = MultiEpochExperimentStep._get_epoch_output_path(
-                orig_job.model_manager.model_output_path, epoch_total)
-            epoch_job.trainer_args.checkpoint_path = MultiEpochExperimentStep._get_epoch_output_path(
-                orig_job.model_manager.model_output_path, prev_epoch) if prev_epoch else None
+
+            # Set model paths
+            model_checkpoint_path = os.path.join(orig_job.model_manager.model_output_path, str(orig_job.id))
+            epoch_job.model_manager.model_path = orig_job.model_manager.model_path if prev_epoch is None else model_checkpoint_path
+            epoch_job.trainer_args.checkpoint_path = None if prev_epoch is None else model_checkpoint_path
+            epoch_job.model_manager.model_output_path = model_checkpoint_path
+
             jobs.append(epoch_job)
         return jobs
-
-    @staticmethod
-    def _get_epoch_output_path(output_path: str, epoch_num: int, make: bool = False) -> str:
-        """
-        Gets the path to the epoch's output
-        :param output_path: the base output path
-        :param epoch_num: the number of the epoch
-        :param make: if True, makes the directory
-        :return: the path to the output
-        """
-        path = os.path.join(output_path, str(epoch_num))
-        if make:
-            FileUtil.make_dir_safe(path)
-        return path

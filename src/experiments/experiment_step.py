@@ -5,10 +5,10 @@ from typing import Any, Dict, List, Type, Union
 
 from config.override import overrides
 from jobs.abstract_job import AbstractJob
+from jobs.abstract_trace_job import AbstractTraceJob
 from jobs.components.job_result import JobResult
 from jobs.supported_job_type import SupportedJobType
 from jobs.train_job import TrainJob
-from server.storage.safa_storage import SafaStorage
 from train.metrics.supported_trace_metric import SupportedTraceMetric
 from util.base_object import BaseObject
 from util.file_util import FileUtil
@@ -56,24 +56,43 @@ class ExperimentStep(BaseObject):
         use_multi_epoch_step = isinstance(self.jobs[0], TrainJob) and self.jobs[
             0].trainer_args.train_epochs_range is not None
         job_runs = self._divide_jobs_into_runs()
+
         for jobs in job_runs:
             if use_multi_epoch_step:
                 from experiments.multi_epoch_experiment_step import MultiEpochExperimentStep
                 for job in jobs:
-                    best_job = MultiEpochExperimentStep([job], self.comparison_metric, self.should_maximize_metric).run(
-                        output_dir)
-                    if len(best_job) > 0:
-                        job.result = best_job.pop().result
+                    multi_epoch_experiment_step = MultiEpochExperimentStep([job], self.comparison_metric,
+                                                                           self.should_maximize_metric)
+                    self.best_job = multi_epoch_experiment_step.run(output_dir)
             else:
-                self._run_on_jobs(jobs, "run")
+                for job in self.jobs:
+                    job.run()
+                    if isinstance(job, AbstractTraceJob) and self.comparison_metric is not None:
+                        self.best_job = self.optional_save(self.best_job, job)
                 self._run_on_jobs(jobs, "save", output_dir=output_dir)
 
         self.status = Status.SUCCESS
-
-        if self.comparison_metric:
-            self.best_job = self._get_best_job(self.jobs, self.comparison_metric, self.should_maximize_metric)
         self.save_results(output_dir)
         return [self.best_job] if self.best_job else self.jobs
+
+    def optional_save(self, best_job: AbstractTraceJob, job: AbstractTraceJob, best_model_name: str = "best"):
+        """
+        Checks job against best model and if better will override best model path.
+        :param best_job: The best job.
+        :param job: The current job to check against best job.
+        :param best_model_name: The name of the directory within model output path to store model in.
+        :return: The best job.
+        """
+
+        def save_best():
+            best_model_path = os.path.join(job.model_manager.model_output_path, best_model_name)
+            job.get_trainer().save_model(best_model_path)
+
+        if best_job is None or job.result.is_better_than(best_job.result, self.comparison_metric,
+                                                         self.should_maximize_metric):
+            save_best()
+            return job
+        return best_job
 
     def save_results(self, output_dir: str) -> None:
         """
@@ -84,7 +103,7 @@ class ExperimentStep(BaseObject):
         FileUtil.make_dir_safe(output_dir)
         json_output = JSONUtil.dict_to_json(self.get_results())
         output_filepath = os.path.join(output_dir, ExperimentStep.OUTPUT_FILENAME)
-        SafaStorage.save_to_file(json_output, output_filepath)
+        FileUtil.save_to_file(json_output, output_filepath)
 
     def get_results(self) -> Dict[str, str]:
         """
@@ -97,17 +116,6 @@ class ExperimentStep(BaseObject):
                 continue
             results[var_name] = var_value
         return results
-
-    def _run_jobs(self, jobs: List[AbstractJob], output_dir: str) -> None:
-        """
-        Runs the jobs and saves the output once they finish
-        :param jobs: a list of jobs to run
-        :param output_dir: the directory to save results to
-        :return: None
-        """
-        self._run_on_jobs(jobs, "start")
-        self._run_on_jobs(jobs, "join")
-        self._run_on_jobs(jobs, "save", output_dir=output_dir)
 
     def _divide_jobs_into_runs(self) -> List[List[AbstractJob]]:
         """

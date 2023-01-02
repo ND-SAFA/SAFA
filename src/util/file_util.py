@@ -2,6 +2,8 @@ import json
 import os
 from typing import Dict, List, Union
 
+from util.json_util import JSONUtil
+
 
 class FileUtil:
 
@@ -75,3 +77,25 @@ class FileUtil:
                 for k, v in replacements.items():
                     value = value.replace(k, v)
         return value
+
+    @staticmethod
+    def save_to_file(content: Union[str, Dict], output_file_path: str):
+        """
+        Soon to be mock function for saving files to storage but using the filesystem instead.
+        :param content: The content of the file to create.
+        :param output_file_path: The path to save the file to.
+        """
+        if isinstance(content, dict):
+            content = JSONUtil.dict_to_json(content)
+        with FileUtil.safe_open_w(output_file_path) as file:
+            file.write(content)
+
+    @staticmethod
+    def safe_open_w(path):
+        FileUtil.create_dir(path)
+        return open(path, 'w')
+
+    @staticmethod
+    def create_dir(dir_path: str):
+        if not os.path.exists(os.path.dirname(dir_path)):
+            os.makedirs(os.path.dirname(dir_path))

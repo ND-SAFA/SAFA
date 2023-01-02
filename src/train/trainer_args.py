@@ -26,9 +26,6 @@ class TrainerArgs(TrainingArguments, BaseObject):
     metrics: List[str] = None
     place_model_on_device: bool = False
     total_training_epochs = None
-    save_best: bool = True
-    comparison_metric: str = "map"
-    should_maximize_metric: bool = True
 
     # GAN
     n_hidden_layers_g: int = 1

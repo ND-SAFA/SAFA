@@ -14,7 +14,6 @@ from transformers import set_seed
 from jobs.components.job_args import JobArgs
 from jobs.components.job_result import JobResult
 from models.model_manager import ModelManager
-from server.storage.safa_storage import SafaStorage
 from util.base_object import BaseObject
 from util.file_util import FileUtil
 from util.status import Status
@@ -103,7 +102,7 @@ class AbstractJob(threading.Thread, BaseObject):
         try:
             json_output = self.result.to_json()
             job_output_filepath = self.get_output_filepath(output_dir)
-            SafaStorage.save_to_file(json_output, job_output_filepath)
+            FileUtil.save_to_file(json_output, job_output_filepath)
             return True
         except Exception:
             print(traceback.format_exc())  # to save in logs

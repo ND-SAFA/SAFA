@@ -8,7 +8,6 @@ from jobs.abstract_job import AbstractJob
 from jobs.components.job_result import JobResult
 from jobs.supported_job_type import SupportedJobType
 from jobs.train_job import TrainJob
-from server.storage.safa_storage import SafaStorage
 from train.metrics.supported_trace_metric import SupportedTraceMetric
 from util.base_object import BaseObject
 from util.file_util import FileUtil
@@ -84,7 +83,7 @@ class ExperimentStep(BaseObject):
         FileUtil.make_dir_safe(output_dir)
         json_output = JSONUtil.dict_to_json(self.get_results())
         output_filepath = os.path.join(output_dir, ExperimentStep.OUTPUT_FILENAME)
-        SafaStorage.save_to_file(json_output, output_filepath)
+        FileUtil.save_to_file(json_output, output_filepath)
 
     def get_results(self) -> Dict[str, str]:
         """

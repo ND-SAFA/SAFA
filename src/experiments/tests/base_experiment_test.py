@@ -24,7 +24,7 @@ class BaseExperimentTest(BaseTest):
                     "job_args": DefinitionVariable({
                     }),
                     "model_manager": DefinitionVariable({
-                        "model_path": ExperimentalVariable([Variable("roberta-base"), Variable("bert-base")]),
+                        "model_path": ExperimentalVariable([Variable("roberta-base"), Variable("bert-base-uncased")]),
                     }),
                     "trainer_dataset_manager": DefinitionVariable({
                         "train_dataset_creator":

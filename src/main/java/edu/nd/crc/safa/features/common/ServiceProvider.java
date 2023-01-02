@@ -10,12 +10,14 @@ import edu.nd.crc.safa.features.attributes.repositories.definitions.CustomAttrib
 import edu.nd.crc.safa.features.attributes.repositories.definitions.FloatAttributeInfoRepository;
 import edu.nd.crc.safa.features.attributes.repositories.definitions.IntegerAttributeInfoRepository;
 import edu.nd.crc.safa.features.attributes.repositories.definitions.SelectionAttributeOptionRepository;
+import edu.nd.crc.safa.features.attributes.repositories.layouts.AttributeLayoutRepository;
 import edu.nd.crc.safa.features.attributes.repositories.values.ArtifactAttributeVersionRepository;
 import edu.nd.crc.safa.features.attributes.repositories.values.BooleanAttributeValueRepository;
 import edu.nd.crc.safa.features.attributes.repositories.values.FloatAttributeValueRepository;
 import edu.nd.crc.safa.features.attributes.repositories.values.IntegerAttributeValueRepository;
 import edu.nd.crc.safa.features.attributes.repositories.values.StringArrayAttributeValueRepository;
 import edu.nd.crc.safa.features.attributes.repositories.values.StringAttributeValueRepository;
+import edu.nd.crc.safa.features.attributes.services.AttributeLayoutService;
 import edu.nd.crc.safa.features.commits.services.CommitService;
 import edu.nd.crc.safa.features.delta.services.DeltaService;
 import edu.nd.crc.safa.features.documents.repositories.DocumentArtifactRepository;
@@ -103,17 +105,25 @@ public class ServiceProvider {
     private final ArtifactVersionRepository artifactVersionRepository;
     private final ArtifactService artifactService;
     private final ArtifactVersionRepositoryImpl artifactVersionRepositoryImpl;
+
+    // Attribute Definitions
     private final CustomAttributeRepository customAttributeRepository;
     private final SelectionAttributeOptionRepository selectionAttributeOptionRepository;
     private final IntegerAttributeInfoRepository integerAttributeInfoRepository;
     private final FloatAttributeInfoRepository floatAttributeInfoRepository;
 
+    // Attribute Values
     private final FloatAttributeValueRepository floatAttributeValueRepository;
     private final IntegerAttributeValueRepository integerAttributeValueRepository;
     private final BooleanAttributeValueRepository booleanAttributeValueRepository;
     private final StringAttributeValueRepository stringAttributeValueRepository;
     private final StringArrayAttributeValueRepository stringArrayAttributeValueRepository;
     private final ArtifactAttributeVersionRepository artifactAttributeVersionRepository;
+
+    // Attribute Layouts
+    private final AttributeLayoutRepository attributeLayoutRepository;
+    private final AttributeLayoutService attributeLayoutService;
+
     //Traces
     private final TraceLinkVersionRepository traceLinkVersionRepository;
     private final TraceService traceService;

@@ -42,4 +42,9 @@ public class ArtifactTypeToLayoutMapping {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "artifact_type_id", nullable = false)
     private ArtifactType artifactType;
+
+    public ArtifactTypeToLayoutMapping(AttributeLayout layout, ArtifactType type) {
+        this.layout = layout;
+        this.artifactType = type;
+    }
 }

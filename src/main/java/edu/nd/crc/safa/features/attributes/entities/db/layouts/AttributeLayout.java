@@ -11,6 +11,7 @@ import javax.persistence.Table;
 
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -25,6 +26,7 @@ import org.hibernate.annotations.Type;
 @Setter
 @ToString
 @RequiredArgsConstructor
+@AllArgsConstructor
 public class AttributeLayout {
 
     @Id

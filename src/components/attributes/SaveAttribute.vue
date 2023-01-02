@@ -32,6 +32,22 @@
       v-model="store.editedAttribute.options"
       hint="Type in an option and press enter to save."
     />
+    <div v-if="showBounds">
+      <v-text-field
+        filled
+        label="Minimum"
+        type="number"
+        v-model="store.editedAttribute.min"
+        :hint="minBoundHint"
+      />
+      <v-text-field
+        filled
+        label="Maximum"
+        type="number"
+        v-model="store.editedAttribute.max"
+        :hint="maxBoundHint"
+      />
+    </div>
     <flex-box justify="space-between">
       <text-button
         v-if="store.isUpdate"
@@ -55,7 +71,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { AttributeSchema } from "@/types";
+import { AttributeSchema, AttributeType } from "@/types";
 import { attributeTypeOptions } from "@/util";
 import { attributeSaveStore } from "@/hooks";
 import { handleDeleteAttribute, handleSaveAttribute } from "@/api";
@@ -80,6 +96,36 @@ export default Vue.extend({
   },
   mounted() {
     this.store.resetAttribute(this.attribute);
+  },
+  computed: {
+    /**
+     * @return Whether this attribute value has bounds.
+     */
+    showBounds(): boolean {
+      return ![AttributeType.date, AttributeType.boolean].includes(
+        this.attribute?.type || ""
+      );
+    },
+    /**
+     * @return The hint for the min bound.
+     */
+    minBoundHint(): string {
+      return [AttributeType.int, AttributeType.float].includes(
+        this.attribute?.type || ""
+      )
+        ? "The minimum value of this number."
+        : "The minimum length of this value.";
+    },
+    /**
+     * @return The hint for the max bound.
+     */
+    maxBoundHint(): string {
+      return [AttributeType.int, AttributeType.float].includes(
+        this.attribute?.type || ""
+      )
+        ? "The maximum value of this number."
+        : "The maximum length of this value.";
+    },
   },
   methods: {
     /**

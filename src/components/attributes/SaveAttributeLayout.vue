@@ -10,6 +10,7 @@
           persistent-hint
           v-model="store.editedLayout.artifactTypes"
           hint="The layout will only appear on these artifact types."
+          :error-messages="store.typeErrors"
       /></v-col>
     </v-row>
 

@@ -9,6 +9,7 @@
     :hint="hint"
     :hide-details="hideDetails"
     :persistent-hint="persistentHint"
+    :error-messages="errorMessages"
     item-text="label"
     item-value="type"
     @blur="$emit('blur')"
@@ -60,6 +61,7 @@ export default Vue.extend({
     hint: String,
     persistentHint: Boolean,
     hideDetails: Boolean,
+    errorMessages: Array,
   },
   data() {
     return {

@@ -42,7 +42,7 @@ def ls_filter(path: str, f: Callable[[str], bool] = None, ignore: List[str] = No
         f = lambda s: s
     if ignore is None:
         ignore = []
-    return list(filter(lambda p: f(p) and f not in ignore, os.listdir(path)))
+    return list(filter(lambda p: f(p) and p not in ignore, os.listdir(path)))
 
 
 def ls_jobs(path: str):

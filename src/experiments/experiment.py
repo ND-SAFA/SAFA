@@ -9,7 +9,7 @@ from util.file_util import FileUtil
 
 
 class Experiment(BaseObject):
-    _STEP_DIR_NAME = "step_{}"
+    _STEP_DIR_NAME = "step_%s"
 
     def __init__(self, steps: List[ExperimentStep], output_dir: str):
         """
@@ -28,7 +28,8 @@ class Experiment(BaseObject):
         """
         jobs_for_undetermined_vals = None
         for i, step in enumerate(self.steps):
-            jobs_for_undetermined_vals = step.run(self.output_dir, jobs_for_undetermined_vals)
+            step_output_dir = os.path.join(self.output_dir, str(self.id), self._STEP_DIR_NAME % i)
+            jobs_for_undetermined_vals = step.run(step_output_dir, jobs_for_undetermined_vals)
 
     def get_all_jobs(self) -> List[AbstractJob]:
         """

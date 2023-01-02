@@ -17,7 +17,7 @@ if __name__ == "__main__":
     #
     # Imports
     #
-    from scripts.script_utils import extract_info, ls_jobs, read_job_definition
+    from scripts.script_utils import extract_info, ls_filter, ls_jobs, read_job_definition
     from util.file_util import FileUtil
 
     #
@@ -33,11 +33,15 @@ if __name__ == "__main__":
     OUTPUT_DIR = job_definition["output_dir"]
 
     entries = []
-    for job_id in ls_jobs(OUTPUT_DIR):
-        job_output_path = os.path.join(OUTPUT_DIR, job_id, "output.json")
-        job_output = FileUtil.read_json_file(job_output_path)
-        entry = extract_info(job_output, COPY_PATHS, IGNORE)
-        entries.append(entry)
+    for experiment_id in ls_jobs(OUTPUT_DIR):
+        experiment_path = os.path.join(OUTPUT_DIR, experiment_id)
+        for step in ls_filter(experiment_path, ignore=IGNORE):
+            step_path = os.path.join(experiment_path, step)
+            for job_id in ls_jobs(step_path):
+                job_output_path = os.path.join(step_path, job_id, "output.json")
+                job_output = FileUtil.read_json_file(job_output_path)
+                entry = extract_info(job_output, COPY_PATHS, IGNORE)
+                entries.append(entry)
 
     entries_df = pd.DataFrame(entries)
     output_path = os.path.join(OUTPUT_DIR, "result.csv")

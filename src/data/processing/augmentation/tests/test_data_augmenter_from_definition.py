@@ -25,16 +25,8 @@ class TestDataAugmenterFromDefinition(BaseTest):
         self.assertEquals(len(data_augmenter.steps), 1)
 
     def test_experiment(self):
-        definition = {
-            "augmenter": {
-                "*": [
-                    {"steps": []},
-                    {"steps": [{"object_type": "SOURCE_TARGET_SWAP"}]}
-                ]
-            }
-        }
-        data_augmenters: ExperimentalVariable = ObjectCreator.create(TrainerDatasetManager, override=True, **definition)
-        n_a = len(data_augmenters[0].value.augmenter.steps)
-        n_b = len(data_augmenters[1].value.augmenter.steps)
+        data_augmenters: ExperimentalVariable = ObjectCreator.create(DataAugmenter)
+        n_a = len(data_augmenters[0].value.steps)
+        n_b = len(data_augmenters[1].value.steps)
         self.assertEquals(n_a, 0)
         self.assertEquals(n_b, 1)

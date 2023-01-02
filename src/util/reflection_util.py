@@ -1,6 +1,6 @@
+import typing
 from enum import Enum
-from typing import Any, Dict, List, Type
-
+from typing import Any, Dict, List, Type, Union
 
 class ParamScope(Enum):
     LOCAL = 0
@@ -11,7 +11,18 @@ class ParamScope(Enum):
 class ReflectionUtil:
 
     @staticmethod
-    def is_instance_or_subclass(target_class, source_class) -> bool:
+    def get_target_class_from_type(target_class: Type) -> Type:
+        """
+        Gets the target class from the given type (i.e. if Union[someclass] will return someclass
+        :param target_class: the type
+        :return: the target class
+        """
+        if typing.get_origin(target_class) is typing.Union:
+            return typing.get_args(target_class)[0]
+        return target_class
+
+    @staticmethod
+    def is_instance_or_subclass(target_class: Type, source_class: Type) -> bool:
         """
         Returns whether target is instance of sub-class of source class.
         :param target_class: The class being tested for containment

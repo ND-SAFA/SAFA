@@ -1,6 +1,5 @@
 package edu.nd.crc.safa.features.attributes.entities.db.values;
 
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import javax.persistence.Column;
@@ -18,7 +17,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.Hibernate;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
@@ -43,23 +41,6 @@ public class BooleanAttributeValue implements IAttributeValue {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "attribute_version_id", nullable = false)
     private ArtifactAttributeVersion attributeVersion;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) {
-            return false;
-        }
-        BooleanAttributeValue that = (BooleanAttributeValue) o;
-        return id != null && Objects.equals(id, that.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
-    }
 
     @Override
     public void setValueFromString(String strValue) {

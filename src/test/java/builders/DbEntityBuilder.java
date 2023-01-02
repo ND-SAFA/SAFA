@@ -67,7 +67,10 @@ public class DbEntityBuilder extends AbstractBuilder {
     private final ProjectMembershipRepository projectMembershipRepository;
     private final ArtifactVersionRepositoryImpl artifactVersionRepositoryImpl;
     private final ProjectService projectService;
-    private final CustomAttributeRepository customAttributeRepository;
+
+    @Autowired
+    private CustomAttributeRepository customAttributeRepository;
+
     Map<String, Project> projects;
     Map<String, Map<Integer, ProjectVersion>> versions;
     Map<String, Map<String, Document>> documents;
@@ -91,7 +94,6 @@ public class DbEntityBuilder extends AbstractBuilder {
         this.traceLinkVersionRepository = serviceProvider.getTraceLinkVersionRepository();
         this.projectMembershipRepository = serviceProvider.getProjectMembershipRepository();
         this.artifactVersionRepositoryImpl = serviceProvider.getArtifactVersionRepositoryImpl();
-        this.customAttributeRepository = serviceProvider.getCustomAttributeRepository();
         DbEntityBuilder.instance = this;
     }
 

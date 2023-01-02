@@ -88,10 +88,8 @@ class ExperimentStep(BaseObject):
             best_model_path = os.path.join(job.model_manager.model_output_path, best_model_name)
             job.get_trainer().save_model(best_model_path)
 
-        if best_job is None:
-            save_best()
-            return job
-        if job.result.is_better_than(best_job.result, self.comparison_metric, self.should_maximize_metric):
+        if best_job is None or job.result.is_better_than(best_job.result, self.comparison_metric,
+                                                         self.should_maximize_metric):
             save_best()
             return job
         return best_job

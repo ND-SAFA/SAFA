@@ -1,20 +1,15 @@
 import os
 from copy import deepcopy
-from typing import Dict, List, NamedTuple, Tuple, Union
+from typing import Dict, List, NamedTuple
 
 import numpy as np
 import torch
 from datasets import load_metric
-from scipy.special import softmax
-from torch.utils.data import DataLoader
-from torch.utils.data.distributed import DistributedSampler
-from torch.utils.data.sampler import RandomSampler
 from transformers.trainer import Trainer
-from transformers.trainer_pt_utils import get_tpu_sampler, is_torch_tpu_available
 
-from config.override import overrides
 from data.datasets.dataset_role import DatasetRole
 from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
+from data.datasets.trace_matrix import TraceMatrix
 from jobs.components.job_result import JobResult
 from models.model_manager import ModelManager
 from train.metrics.supported_trace_metric import get_metric_name, get_metric_path
@@ -67,12 +62,12 @@ class TraceTrainer(Trainer, BaseObject):
         """
         self.eval_dataset = self.trainer_dataset_manager[dataset_role].to_trainer_dataset(self.model_manager)
         output = self.predict(self.eval_dataset)
-        predictions = TraceTrainer.get_similarity_scores(output.predictions)
-        results = self._eval(predictions, output.label_ids, output.metrics,
+        source_target_pairs = self.trainer_dataset_manager[dataset_role].get_source_target_pairs()
+        trace_matrix = TraceMatrix(source_target_pairs, output)
+        results = self._eval(trace_matrix, output.label_ids, output.metrics,
                              self.trainer_args.metrics) if self.trainer_args.metrics else None
-        output_dict = TraceTrainer.output_to_dict(output, metrics=results, predictions=predictions,
-                                                  source_target_pairs=self.trainer_dataset_manager[
-                                                      dataset_role].get_source_target_pairs())
+        output_dict = TraceTrainer.output_to_dict(output, metrics=results, predictions=trace_matrix.scores,
+                                                  source_target_pairs=source_target_pairs)
         return output_dict
 
     @staticmethod
@@ -88,7 +83,7 @@ class TraceTrainer(Trainer, BaseObject):
         return {**base_output, **additional_attrs}
 
     @staticmethod
-    def _eval(preds: Union[np.ndarray, Tuple[np.ndarray]], label_ids: np.ndarray, output_metrics: Dict,
+    def _eval(trace_matrix: TraceMatrix, label_ids: np.ndarray, output_metrics: Dict,
               metric_names: List) -> Dict:
         """
         Performs the evaluation of the model (use this instead of Trainer.evaluation to utilize predefined metrics from models)
@@ -100,47 +95,11 @@ class TraceTrainer(Trainer, BaseObject):
         results = deepcopy(output_metrics)
         for metric_path in metric_paths:
             metric = load_metric(metric_path, keep_in_memory=True)
-            metric_result = metric.compute(predictions=preds, references=label_ids)
+            metric_result = metric.compute(predictions=trace_matrix.scores, references=label_ids,
+                                           trace_matrix=trace_matrix)
             metric_name = get_metric_name(metric)
             if isinstance(metric_result, dict) and metric_name in metric_result:
                 results.update(metric_result)
             else:
                 results[metric_name] = metric_result
         return results
-
-    @staticmethod
-    def get_similarity_scores(predictions: Union[np.ndarray, Tuple[np.ndarray]]) -> List[float]:
-        """
-        Transforms predictions into similarity scores.
-        :param predictions: The model predictions.
-        :return: List of similarity scores associated with predictions.
-        """
-        similarity_scores = []
-        for pred_i in range(predictions.shape[0]):
-            prediction = predictions[pred_i]
-            similarity_scores.append(softmax(prediction)[1])
-        return similarity_scores
-
-    @overrides(Trainer)
-    def get_train_dataloader(self) -> DataLoader:
-        """
-        Gets the dataloader for training
-        :return: the DataLoader
-        """
-        if is_torch_tpu_available():
-            train_sampler = get_tpu_sampler(self.train_dataset, self.trainer_args.train_batch_size)
-        else:
-            train_sampler = (
-                RandomSampler(self.train_dataset)
-                if self.trainer_args.local_rank == -1
-                else DistributedSampler(self.train_dataset)
-            )
-
-        data_loader = DataLoader(
-            self.train_dataset,
-            batch_size=self.trainer_args.train_batch_size,
-            sampler=train_sampler,
-            collate_fn=self.data_collator,
-            drop_last=self.trainer_args.dataloader_drop_last,
-        )
-        return data_loader

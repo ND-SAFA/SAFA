@@ -15,7 +15,13 @@
             }
           },
           "model_manager": {
-            "model_path": "roberta-base",
+            "model_path": {
+              "*": [
+                "roberta-base",
+                "thearod5/automotive",
+                "thearod5/sebert-task-cls"
+              ]
+            },
             "layers_to_freeze": {
               "*": [
                 null,
@@ -30,34 +36,20 @@
                   0,
                   1,
                   2
-                ],
-                [
-                  0,
-                  1,
-                  2,
-                  3
-                ],
-                [
-                  0,
-                  1,
-                  2,
-                  3,
-                  4
                 ]
               ]
             }
           },
           "trainer_args": {
-            "output_dir": "[OUTPUT_PATH]/lhp/rq1/models",
+            "output_dir": "[OUTPUT_PATH]/lhp/rq3/models",
             "train_epochs_range": [
               1,
-              21,
+              25,
               3
             ],
             "per_device_train_batch_size": 2,
             "metrics": [
-              "map",
-              "f"
+              "map"
             ]
           },
           "trainer_dataset_manager": {
@@ -65,8 +57,8 @@
               "object_type": "SAFA",
               "project_path": {
                 "*": [
-                  "[DATA_PATH]/lhp/heating",
                   "[DATA_PATH]/lhp/cooling",
+                  "[DATA_PATH]/lhp/heating",
                   "[DATA_PATH]/lhp/vehiclemodes"
                 ]
               }
@@ -84,7 +76,12 @@
             "augmenter": {
               "steps": [
                 {
-                  "object_type": "RESAMPLE"
+                  "object_type": "SIMPLE_WORD_REPLACEMENT",
+                  "percent_to_weight": 0.5
+                },
+                {
+                  "object_type": "SOURCE_TARGET_SWAP",
+                  "percent_to_weight": 0.5
                 }
               ]
             }
@@ -93,5 +90,5 @@
       ]
     }
   ],
-  "output_dir": "[OUTPUT_PATH]/lhp/rq1/jobs"
+  "output_dir": "[OUTPUT_PATH]/rq3/jobs"
 }

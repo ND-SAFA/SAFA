@@ -2,6 +2,7 @@ import datasets
 from sklearn.metrics import average_precision_score
 
 from config.constants import K_METRIC_DEFAULT
+from data.datasets.trace_matrix import TraceMatrix
 from train.metrics.abstract_trace_metric import AbstractTraceMetric
 
 _DESCRIPTION = """
@@ -27,7 +28,7 @@ class MapMetric(AbstractTraceMetric):
     name = "map"
 
     # TODO
-    def _compute(self, predictions, references, k=K_METRIC_DEFAULT, **kwargs) -> float:
+    def _compute(self, predictions, references, trace_matrix: TraceMatrix, k=K_METRIC_DEFAULT, **kwargs) -> float:
         """
         computes the Mean Average Precision@K or the average precision over k for recommendations shown for different links
          and averages them over all queries in the data.
@@ -37,7 +38,7 @@ class MapMetric(AbstractTraceMetric):
         :param kwargs: any other necessary params
         :return: Mean Average Precision@K score.
         """
-        return average_precision_score(references, predictions)
+        return trace_matrix.calculate_query_metric(average_precision_score)
 
     def _info(self) -> datasets.MetricInfo:
         """

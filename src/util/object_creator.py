@@ -26,13 +26,13 @@ class ObjectCreator:
     }
 
     augmenter_definition = {"steps":
-                          {"*": [[], [{"object_type": "SOURCE_TARGET_SWAP"}]]}
-                      }
+                                {"*": [[], [{"object_type": "SOURCE_TARGET_SWAP"}]]}
+                            }
 
     trainer_args_definition = {
         "output_dir": TEST_OUTPUT_DIR,
         "num_train_epochs": 1,
-        "metrics": ["accuracy", "map"]
+        "metrics": ["f", "map"]
     }
     job_args_definition = {"output_dir": TEST_OUTPUT_DIR}
 

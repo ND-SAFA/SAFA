@@ -141,5 +141,13 @@ export default Vue.extend({
       this.addedAttribute = "";
     },
   },
+  watch: {
+    /**
+     * Updates the store when the layout changes.
+     */
+    layout(): void {
+      this.store = attributeLayoutSaveStore(this.layout?.id || "");
+    },
+  },
 });
 </script>

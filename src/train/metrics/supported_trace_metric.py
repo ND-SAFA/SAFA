@@ -7,6 +7,7 @@ from datasets import Metric, list_metrics
 from train.metrics.abstract_trace_metric import AbstractTraceMetric
 from train.metrics.calculate_threshold import CalculateThreshold
 from train.metrics.confusion_matrix_at_threshold_metric import ConfusionMatrixAtThresholdMetric
+from train.metrics.f1_metric import FMetric
 from train.metrics.map_metric import MapMetric
 from train.metrics.mrr_metric import MRRMetric
 from train.metrics.precision_at_threshold_metric import PrecisionAtThresholdMetric
@@ -22,6 +23,7 @@ class SupportedTraceMetric(Enum):
     THRESHOLD = CalculateThreshold
     CONFUSION_MATRIX = ConfusionMatrixAtThresholdMetric
     MRR = MRRMetric
+    F = FMetric
 
 
 def get_metric_path(metric_name: str) -> str:

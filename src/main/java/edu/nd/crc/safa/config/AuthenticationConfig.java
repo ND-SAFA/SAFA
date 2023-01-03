@@ -88,6 +88,7 @@ public class AuthenticationConfig extends WebSecurityConfigurerAdapter {
                 .logout()
                 .logoutUrl(AppRoutes.Accounts.LOGOUT)
                 .deleteCookies(SecurityConstants.JWT_COOKIE_NAME)
+                .logoutSuccessHandler((a,b,c) -> { })
             .and()
                 .authorizeRequests()
                 // Close authentication settings

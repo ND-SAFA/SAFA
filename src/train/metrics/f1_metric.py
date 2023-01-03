@@ -28,17 +28,18 @@ _CITATION = """
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
 class FMetric(AbstractTraceMetric):
     name = "f1"
+    F1_KEY = "f1"
+    F2_KEY = "f2"
 
     # TODO
     def _compute(self, predictions, references, trace_matrix: TraceMatrix, k=K_METRIC_DEFAULT, **kwargs) -> Dict:
         """
-        computes the Mean Average Precision@K or the average precision over k for recommendations shown for different links
-         and averages them over all queries in the data.
+        Computes the max f1 and f2 scores for all thresholds for given predictions.
         :param predictions: predicted labels
         :param labels: ground truth labels.
         :param k: considers only the subset of recommendations from rank 1 through k
         :param kwargs: any other necessary params
-        :return: Mean Average Precision@K score.
+        :return: Dictionary containing f1 and f2 scores.
         """
         precision, recall, thresholds = precision_recall_curve(references, predictions)
         max_f1 = 0
@@ -50,12 +51,26 @@ class FMetric(AbstractTraceMetric):
                 max_f1 = f1
             if f2 >= max_f2:
                 max_f2 = f2
-        return {"f1": max_f1, "f2": max_f2}
+        return {self.F1_KEY: max_f1, self.F2_KEY: max_f2}
 
-    def f1_score(self, precision, recall):
+    @staticmethod
+    def f1_score(precision, recall):
+        """
+        Returns the f1 score from precision and recall.
+        :param precision: The precision score.
+        :param recall: The recall score
+        :return: The harmonic mean between precision and recall.
+        """
         return 2 * (precision * recall) / (precision + recall) if precision + recall > 0 else 0
 
-    def f2_score(self, precision, recall):
+    @staticmethod
+    def f2_score(precision, recall):
+        """
+        Returns the F2 score from precision and recall.
+        :param precision: The precision score.
+        :param recall: The recall score
+        :return: The harmonic mean between precision and recall with greater weight to recall.
+        """
         return 5 * precision * recall / (4 * precision + recall) if precision + recall > 0 else 0
 
     def _info(self) -> datasets.MetricInfo:

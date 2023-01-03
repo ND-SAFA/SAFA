@@ -74,7 +74,6 @@ class TraceTrainer(Trainer, BaseObject):
                              self.trainer_args.metrics) if self.trainer_args.metrics else None
         output_dict = TraceTrainer.output_to_dict(output, metrics=results, predictions=trace_matrix.scores,
                                                   source_target_pairs=source_target_pairs)
-        print(output_dict)
         return output_dict
 
     @staticmethod

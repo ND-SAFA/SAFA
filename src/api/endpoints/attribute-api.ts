@@ -101,7 +101,7 @@ export async function editAttributeLayout(
   layout: AttributeLayoutSchema
 ): Promise<AttributeLayoutSchema> {
   return authHttpClient<AttributeLayoutSchema>(
-    fillEndpoint(Endpoint.editAttribute, {
+    fillEndpoint(Endpoint.editAttributeLayout, {
       projectId,
       id: layout.id,
     }),

@@ -5,7 +5,6 @@ import {
   AttributeSchema,
   AttributePositionSchema,
   ProjectSchema,
-  AttributeType,
 } from "@/types";
 import { removeMatches } from "@/util";
 import { projectStore } from "@/hooks";

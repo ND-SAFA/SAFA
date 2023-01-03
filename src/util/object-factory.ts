@@ -137,6 +137,7 @@ export function createArtifact(
     documentIds: artifact?.documentIds || [],
     safetyCaseType: artifact?.safetyCaseType || SafetyCaseType.GOAL,
     logicType: artifact?.logicType || FTANodeType.AND,
+    attributes: artifact?.attributes || {},
   };
 }
 

@@ -24,6 +24,7 @@ export async function handleSaveArtifact(
   parentArtifact: ArtifactSchema | undefined,
   { onSuccess, onError, onComplete }: IOHandlerCallback
 ): Promise<void> {
+  console.log(artifact);
   try {
     const versionId = projectStore.versionIdWithLog;
 

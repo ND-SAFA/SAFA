@@ -9,7 +9,6 @@ from inspect import getfullargspec
 from typing import Dict
 
 import torch
-from numba import cuda
 from transformers import set_seed
 
 from jobs.components.job_args import JobArgs
@@ -64,9 +63,6 @@ class AbstractJob(threading.Thread, BaseObject):
         if self.model_manager:
             self.model_manager.clear_model()
         torch.cuda.empty_cache()
-        device = cuda.get_current_device()
-        device.reset()
-        print("_" * 14, "CLEANUP")
 
     @staticmethod
     def set_random_seed(random_seed: int) -> None:

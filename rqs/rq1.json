@@ -54,7 +54,7 @@
               21,
               3
             ],
-            "per_device_train_batch_size": 2,
+            "per_device_train_batch_size": 4,
             "metrics": [
               "map",
               "f"

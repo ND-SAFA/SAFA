@@ -146,7 +146,7 @@ export default Vue.extend({
      * Updates the store when the layout changes.
      */
     layout(): void {
-      this.store = attributeLayoutSaveStore(this.layout?.id || "");
+      this.store.resetLayout(this.layout);
     },
   },
 });

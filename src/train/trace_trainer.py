@@ -5,13 +5,8 @@ from typing import Dict, List, NamedTuple
 import numpy as np
 import torch
 from datasets import load_metric
-from torch.utils.data import DataLoader
-from torch.utils.data.distributed import DistributedSampler
-from torch.utils.data.sampler import RandomSampler
 from transformers.trainer import Trainer
-from transformers.trainer_pt_utils import get_tpu_sampler, is_torch_tpu_available
 
-from config.override import overrides
 from data.datasets.dataset_role import DatasetRole
 from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
 from data.datasets.trace_matrix import TraceMatrix
@@ -110,27 +105,3 @@ class TraceTrainer(Trainer, BaseObject):
             else:
                 results[metric_name] = metric_result
         return results
-
-    @overrides(Trainer)
-    def get_train_dataloader(self) -> DataLoader:
-        """
-        Gets the dataloader for training
-        :return: the DataLoader
-        """
-        if is_torch_tpu_available():
-            train_sampler = get_tpu_sampler(self.train_dataset, self.trainer_args.train_batch_size)
-        else:
-            train_sampler = (
-                RandomSampler(self.train_dataset)
-                if self.trainer_args.local_rank == -1
-                else DistributedSampler(self.train_dataset)
-            )
-
-        data_loader = DataLoader(
-            self.train_dataset,
-            batch_size=self.trainer_args.train_batch_size,
-            sampler=train_sampler,
-            collate_fn=self.data_collator,
-            drop_last=self.trainer_args.dataloader_drop_last,
-        )
-        return data_loader

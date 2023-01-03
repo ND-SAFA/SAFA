@@ -123,7 +123,7 @@ export async function deleteAttributeLayout(
   layout: AttributeLayoutSchema
 ): Promise<void> {
   return authHttpClient<void>(
-    fillEndpoint(Endpoint.editAttribute, {
+    fillEndpoint(Endpoint.editAttributeLayout, {
       projectId,
       id: layout.id,
     }),

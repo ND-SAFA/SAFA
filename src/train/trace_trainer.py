@@ -58,7 +58,6 @@ class TraceTrainer(Trainer, BaseObject):
         self.train_dataset = self.trainer_dataset_manager[DatasetRole.TRAIN].to_trainer_dataset(self.model_manager)
         output = self.train(resume_from_checkpoint=checkpoint)
         output_dict = TraceTrainer.output_to_dict(output)
-        output_dict[JobResult.TOTAL_EPOCHS] = self.trainer_args.total_training_epochs
         return output_dict
 
     def perform_prediction(self, dataset_role: DatasetRole = DatasetRole.EVAL) -> Dict:
@@ -84,8 +83,7 @@ class TraceTrainer(Trainer, BaseObject):
         :return: the output represented as a dictionary
         """
         base_output = {field: kwargs[field] if (field in kwargs and kwargs[field]) else getattr(output, field) for field
-                       in
-                       output._fields}
+                       in output._fields}
         additional_attrs = {field: kwargs[field] for field in kwargs.keys() if field not in base_output}
         return {**base_output, **additional_attrs}
 

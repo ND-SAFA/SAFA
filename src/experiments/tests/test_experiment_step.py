@@ -7,12 +7,14 @@ from data.datasets.dataset_role import DatasetRole
 from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
 from experiments.experiment_step import ExperimentStep
 from experiments.tests.base_experiment_test import BaseExperimentTest
+from jobs.abstract_trace_job import AbstractTraceJob
 from jobs.components.job_args import JobArgs
 from jobs.components.job_result import JobResult
-from jobs.delete_model_job import DeleteModelJob
 from jobs.predict_job import PredictJob
 from jobs.train_job import TrainJob
+from models.model_manager import ModelManager
 from testres.paths.paths import TEST_OUTPUT_DIR
+from train.trainer_args import TrainerArgs
 from util.object_creator import ObjectCreator
 from util.status import Status
 from variables.undetermined_variable import UndeterminedVariable
@@ -73,12 +75,14 @@ class TestExperimentStep(BaseExperimentTest):
         self.assertEquals(len(results), 2)
         self.assertNotEquals(results[0], results[1])
 
-    def test_get_best_job(self):
+    @patch.object(AbstractTraceJob, "get_trainer")
+    def test_get_best_job(self, get_trainer_mock):
         job1, job2 = self.get_test_jobs()
+        step = self.get_experiment_step()
         job1.result[JobResult.METRICS] = {"accuracy": 0.5}
 
         job2.result[JobResult.METRICS] = {"accuracy": 0.8}
-        best_job = ExperimentStep._get_best_job([job1, job2], comparison_metric="accuracy")
+        best_job = step._get_best_job([job1, job2])
         self.assertEquals(best_job.id, job2.id)
 
     def get_experiment_step(self, train=True):
@@ -96,8 +100,10 @@ class TestExperimentStep(BaseExperimentTest):
 
     @staticmethod
     def get_test_jobs():
-        job1 = DeleteModelJob(job_args=JobArgs(output_dir=TEST_OUTPUT_DIR))
-        job2 = DeleteModelJob(job_args=JobArgs(output_dir=TEST_OUTPUT_DIR))
+        job1 = TrainJob(JobArgs(output_dir=TEST_OUTPUT_DIR), ModelManager(TEST_OUTPUT_DIR), None,
+                        TrainerArgs(output_dir=TEST_OUTPUT_DIR))
+        job2 = TrainJob(JobArgs(output_dir=TEST_OUTPUT_DIR),  ModelManager(TEST_OUTPUT_DIR), None,
+                        TrainerArgs(output_dir=TEST_OUTPUT_DIR))
         return [job1, job2]
 
     @staticmethod

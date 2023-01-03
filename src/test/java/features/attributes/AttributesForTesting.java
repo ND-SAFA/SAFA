@@ -8,6 +8,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
+import edu.nd.crc.safa.features.attributes.entities.CustomAttributeAppEntity;
 import edu.nd.crc.safa.features.attributes.entities.CustomAttributeExtraInfoType;
 import edu.nd.crc.safa.features.attributes.entities.CustomAttributeType;
 import edu.nd.crc.safa.features.attributes.entities.db.definitions.CustomAttribute;
@@ -46,6 +47,12 @@ public class AttributesForTesting {
     public final int intMin = 1;
     public final List<String> selections = List.of("str1", "str2", "str3");
 
+    public final float altFloatMax = 4.20f;
+    public final float altFloatMin = 13.37f;
+    public final int altIntMax = 7;
+    public final int altIntMin = 6;
+    public final List<String> altSelections = List.of("str4", "str5", "str6");
+
     public CustomAttribute setupAttribute(DbEntityBuilder dbEntityBuilder, String projectName,
                                           AttributeSystemServiceProvider serviceProvider, CustomAttributeType attributeType) {
 
@@ -68,6 +75,42 @@ public class AttributesForTesting {
         }
 
         return attribute;
+    }
+
+    public CustomAttributeAppEntity setupAttributeAppEntity(CustomAttributeType type) {
+        AttributeInfo schemaInfo = attributes.get(type);
+
+        CustomAttributeAppEntity appEntity = new CustomAttributeAppEntity(schemaInfo.keyName, schemaInfo.displayName, type);
+
+        if (type.getExtraInfoType() == CustomAttributeExtraInfoType.FLOAT_BOUNDS) {
+            appEntity.setMin(floatMin);
+            appEntity.setMax(floatMax);
+        } else if (type.getExtraInfoType() == CustomAttributeExtraInfoType.INT_BOUNDS) {
+            appEntity.setMin(intMin);
+            appEntity.setMax(intMax);
+        } else if (type.getExtraInfoType() == CustomAttributeExtraInfoType.OPTIONS) {
+            appEntity.setOptions(selections);
+        }
+
+        return appEntity;
+    }
+
+    public CustomAttributeAppEntity setupAltAttributeAppEntity(CustomAttributeType type) {
+        AttributeInfo schemaInfo = attributes.get(type);
+
+        CustomAttributeAppEntity appEntity = new CustomAttributeAppEntity(schemaInfo.keyName, schemaInfo.displayName + "-alt", type);
+
+        if (type.getExtraInfoType() == CustomAttributeExtraInfoType.FLOAT_BOUNDS) {
+            appEntity.setMin(altFloatMin);
+            appEntity.setMax(altFloatMax);
+        } else if (type.getExtraInfoType() == CustomAttributeExtraInfoType.INT_BOUNDS) {
+            appEntity.setMin(altIntMin);
+            appEntity.setMax(altIntMax);
+        } else if (type.getExtraInfoType() == CustomAttributeExtraInfoType.OPTIONS) {
+            appEntity.setOptions(altSelections);
+        }
+
+        return appEntity;
     }
 
     public void setupAttributeValueInitial(CustomAttribute attribute, ArtifactVersion artifactVersion, AttributeValueService attributeValueService) {

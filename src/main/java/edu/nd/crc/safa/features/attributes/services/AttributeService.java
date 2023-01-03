@@ -29,8 +29,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class AttributeService {
 
-    //TODO tests
-
     private final AttributeSystemServiceProvider serviceProvider;
 
     public AttributeService(AttributeSystemServiceProvider serviceProvider) {

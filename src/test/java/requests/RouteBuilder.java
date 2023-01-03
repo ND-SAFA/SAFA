@@ -122,6 +122,11 @@ public class RouteBuilder<T extends RouteBuilder<T>> {
         return (T) this;
     }
 
+    public T withKey(String key) {
+        this.path = this.path.replace("{key}", key);
+        return (T) this;
+    }
+
     public String buildEndpoint() {
         if (this.path.contains("{")) {
             throw new SafaError("Path is not fully configured: %s", this.path);

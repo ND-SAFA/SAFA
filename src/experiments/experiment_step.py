@@ -1,7 +1,7 @@
 import math
 import os
 from copy import deepcopy
-from typing import Any, Dict, List, Type, Union
+from typing import Any, Dict, List, Type, Union, Optional
 
 from config.override import overrides
 from jobs.abstract_job import AbstractJob
@@ -58,39 +58,41 @@ class ExperimentStep(BaseObject):
 
         for jobs in job_runs:
             if use_multi_epoch_step:
-                from experiments.multi_epoch_experiment_step import MultiEpochExperimentStep
-                for job in jobs:
-                    multi_epoch_experiment_step = MultiEpochExperimentStep([job], self.comparison_metric,
-                                                                           self.should_maximize_metric)
-                    self.best_job = multi_epoch_experiment_step.run(output_dir)
+                self.best_job = self._run_multi_epoch_step(jobs, output_dir)
             else:
-                for job in jobs:
-                    job.run()
-                    if isinstance(job, AbstractTraceJob) and self.comparison_metric is not None:
-                        self.best_job = self.optional_save(self.best_job, job)
-                self._run_on_jobs(jobs, "save", output_dir=output_dir)
+                self.best_job = self._run_jobs(jobs, output_dir)
 
         self.status = Status.SUCCESS
         self.save_results(output_dir)
         return [self.best_job] if self.best_job else self.jobs
 
-    def optional_save(self, best_job: AbstractTraceJob, job: AbstractTraceJob, best_model_name: str = "best"):
+    def _run_multi_epoch_step(self, jobs: List[AbstractJob], output_dir: str):
         """
-        Checks job against best model and if better will override best model path.
-        :param best_job: The best job.
-        :param job: The current job to check against best job.
-        :param best_model_name: The name of the directory within model output path to store model in.
-        :return: The best job.
+        Runs the a multi epoch step for a given epoch range inside the jobs' trainer args
+        :param jobs: a list of jobs to run
+        :param output_dir: path to produce output to
+        :return: the best job
         """
+        from experiments.multi_epoch_experiment_step import MultiEpochExperimentStep
+        best_job = None
+        for job in jobs:
+            multi_epoch_experiment_step = MultiEpochExperimentStep([job], self.comparison_metric,
+                                                                   self.should_maximize_metric)
+            best_epoch_job = multi_epoch_experiment_step.run(output_dir)
+            best_job = self._get_best_job(best_epoch_job, self.best_job)
+        return best_job
 
-        def save_best():
-            best_model_path = os.path.join(job.model_manager.model_output_path, best_model_name)
-            job.get_trainer().save_model(best_model_path)
-
-        if best_job is None or job.result.is_better_than(best_job.result, self.comparison_metric,
-                                                         self.should_maximize_metric):
-            save_best()
-            return job
+    def _run_jobs(self, jobs: List[AbstractJob], output_dir: str) -> AbstractJob:
+        """
+        Runs the jobs and returns the current best job from all runs
+        :param jobs: a list of jobs to run
+        :param output_dir: path to produce output to
+        :return: the best job
+        """
+        self._run_on_jobs(jobs, "start")
+        self._run_on_jobs(jobs, "join")
+        best_job = self._get_best_job(jobs, self.best_job)
+        self._run_on_jobs(jobs, "save", output_dir=output_dir)
         return best_job
 
     def save_results(self, output_dir: str) -> None:
@@ -116,6 +118,25 @@ class ExperimentStep(BaseObject):
             results[var_name] = var_value
         return results
 
+    def _conditional_save(self, best_job: AbstractTraceJob, job: AbstractTraceJob, best_model_name: str = "best"):
+        """
+        Checks job against best model and if better will override best model path.
+        :param best_job: The best job.
+        :param job: The current job to check against best job.
+        :param best_model_name: The name of the directory within model output path to store model in.
+        :return: The best job.
+        """
+
+        def save_best():
+            best_model_path = os.path.join(job.model_manager.model_output_path, best_model_name)
+            job.get_trainer().save_model(best_model_path)
+
+        if best_job is None or job.result.is_better_than(best_job.result, self.comparison_metric,
+                                                         self.should_maximize_metric):
+            save_best()
+            return job
+        return best_job
+
     def _divide_jobs_into_runs(self) -> List[List[AbstractJob]]:
         """
         Divides the jobs up into runs of size MAX JOBS
@@ -128,6 +149,21 @@ class ExperimentStep(BaseObject):
             if (job_index + 1) % self.MAX_JOBS == 0:
                 run_index += 1
         return job_runs
+
+    def _get_best_job(self, jobs: List[AbstractJob], best_job: AbstractJob = None) -> Optional[AbstractJob]:
+        """
+        Returns the job with the best results as determined by the comparison info
+        :param jobs: the list of all jobs
+        :param best_job: the current best job
+        :return: the best job
+        """
+        if self.comparison_metric is None:
+            return None
+        best_job = best_job if best_job else jobs[0]
+        for job in jobs:
+            if isinstance(job, AbstractTraceJob):
+                best_job = self._conditional_save(best_job, job)
+        return best_job
 
     @staticmethod
     def _update_jobs_with_experimental_vars(jobs: List[AbstractJob], experimental_vars: List[Dict[str, Any]]) -> List[AbstractJob]:
@@ -171,22 +207,6 @@ class ExperimentStep(BaseObject):
         :return: list of results
         """
         return list(map(lambda job: getattr(job, method_name)(**method_params), jobs))
-
-    @staticmethod
-    def _get_best_job(jobs: List[AbstractJob], comparison_metric: Union[str, SupportedTraceMetric],
-                      should_maximize: bool = True) -> AbstractJob:
-        """
-        Returns the job with the best results as determined by the comparison info
-        :param jobs: the list of all jobs
-        :param comparison_metric: the metric to use to determine the best job
-        :param should_maximize: True if should maximize the comparison metric to find best job
-        :return: the best job
-        """
-        best_job = jobs[0]
-        for job in jobs:
-            if job.result.is_better_than(best_job.result, comparison_metric, should_maximize):
-                best_job = job
-        return best_job
 
     @classmethod
     @overrides(BaseObject)

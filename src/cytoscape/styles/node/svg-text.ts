@@ -7,29 +7,35 @@ import { sanitizeText } from "./node-helper";
  * @param text - The text to render.
  * @param style - The style to draw with.
  * @param dataCy - The data cy selector to append.
- * @param spanStyle - Any style to add to the span.
+ * @param textStyle - Any style to add to the text node.
  *
  * @return stringified SVG for the node.
  */
 export function svgText(
   text: string,
-  style: { width: string | number } & Omit<SvgStyle, "width">,
+  style: { width: string | number; code?: boolean } & Omit<SvgStyle, "width">,
   dataCy: string,
-  spanStyle = ""
+  textStyle = ""
 ): string {
+  const textNode = style.code
+    ? `<pre
+        class="text-body-1 ${style.class || ""}" 
+        data-cy="tree-node-${dataCy}"
+        style="${textStyle}"
+      >${sanitizeText(text)}</pre>`
+    : `<span
+        class="text-body-1 ${style.class || ""}" 
+        data-cy="tree-node-${dataCy}"
+        style="${textStyle}"
+      >${sanitizeText(text)}</span>`;
+
   return `
     <foreignObject 
       x="${style.x}" y="${style.y}" 
       width="${style.width}" 
       height="${style.height}"
     >
-      <span
-        class="text-body-1 ${style.class || ""}" 
-        data-cy="tree-node-${dataCy}"
-        style="${spanStyle}"
-      >
-        ${sanitizeText(text)}
-      </span>
+      ${textNode}
     </foreignObject>
   `;
 }

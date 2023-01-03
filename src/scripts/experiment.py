@@ -12,6 +12,7 @@ ROOT_PATH = os.path.expanduser(os.environ["ROOT_PATH"])
 assert os.path.exists(ROOT_PATH), ROOT_PATH
 sys.path.append(ROOT_PATH)
 
+RQ_PATH = os.path.expanduser(os.environ["RQ_PATH"])
 if __name__ == "__main__":
     #
     # IMPORTS
@@ -28,7 +29,7 @@ if __name__ == "__main__":
         description='Runs experiment definitions')
     parser.add_argument('file')
     args = parser.parse_args()
-    file_path = os.path.expanduser(args.file)
+    file_path = os.path.join(RQ_PATH, args.file)
     job_definition = read_job_definition(file_path)
     #
     # Logs

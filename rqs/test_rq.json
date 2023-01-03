@@ -20,22 +20,15 @@
               "*": [
                 null,
                 [
+                  0,
                   1,
-                  2,
-                  3,
-                  4,
-                  5,
-                  6,
-                  7,
-                  8,
-                  9,
-                  10
+                  2
                 ]
               ]
             }
           },
           "trainer_args": {
-            "output_dir": "[OUTPUT_PATH]/lhp/models",
+            "output_dir": "[OUTPUT_PATH]/test/models",
             "num_train_epochs": 2,
             "per_device_train_batch_size": 2,
             "metrics": [
@@ -45,7 +38,7 @@
           "trainer_dataset_manager": {
             "train_dataset_creator": {
               "object_type": "SAFA",
-              "project_path": "~/desktop/safa/datasets/lhp/cooling"
+              "project_path": "[DATA_PATH]/lhp/cooling"
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",
@@ -56,5 +49,5 @@
       ]
     }
   ],
-  "output_dir": "[OUTPUT_PATH]/lhp/jobs"
+  "output_dir": "[OUTPUT_PATH]/test/jobs"
 }

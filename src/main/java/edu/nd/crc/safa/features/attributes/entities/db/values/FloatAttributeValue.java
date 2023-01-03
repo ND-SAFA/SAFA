@@ -13,6 +13,8 @@ import javax.persistence.Table;
 import edu.nd.crc.safa.features.attributes.repositories.values.FloatAttributeValueRepository;
 import edu.nd.crc.safa.features.attributes.services.AttributeSystemServiceProvider;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.FloatNode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -43,13 +45,13 @@ public class FloatAttributeValue implements IAttributeValue {
     private ArtifactAttributeVersion attributeVersion;
 
     @Override
-    public void setValueFromString(String strValue) {
-        setValue(Float.parseFloat(strValue));
+    public void setValueFromJsonNode(JsonNode jsonValue) {
+        setValue(jsonValue.floatValue());
     }
 
     @Override
-    public String getValueAsString() {
-        return Float.toString(getValue());
+    public JsonNode getValueAsJsonNode() {
+        return FloatNode.valueOf(getValue());
     }
 
     @Override

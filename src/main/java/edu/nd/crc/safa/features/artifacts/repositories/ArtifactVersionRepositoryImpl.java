@@ -29,6 +29,7 @@ import edu.nd.crc.safa.features.versions.VersionCalculator;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -95,7 +96,7 @@ public class ArtifactVersionRepositoryImpl
             artifactAppEntity.getSummary(),
             artifactAppEntity.getBody());
 
-        for (Map.Entry<String, String> entry : artifactAppEntity.getAttributes().entrySet()) {
+        for (Map.Entry<String, JsonNode> entry : artifactAppEntity.getAttributes().entrySet()) {
             artifactVersion.addCustomAttributeValue(entry.getKey(), entry.getValue());
         }
 
@@ -191,7 +192,7 @@ public class ArtifactVersionRepositoryImpl
     }
 
     private void attachCustomAttributesToArtifactVersion(ArtifactVersion artifactVersion) {
-        Map<String, String> customFields =
+        Map<String, JsonNode> customFields =
                 attributeValueService.getCustomAttributeValuesForArtifact(artifactVersion);
         customFields.forEach(artifactVersion::addCustomAttributeValue);
     }

@@ -11,6 +11,7 @@ import javax.validation.constraints.NotNull;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.projects.entities.app.IAppEntity;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
 
 /**
@@ -49,7 +50,7 @@ public class ArtifactAppEntity implements IAppEntity {
     /**
      * Mapping of columns ids to column values for this artifact.
      */
-    Map<String, String> attributes = new HashMap<>();
+    Map<String, JsonNode> attributes = new HashMap<>();
     /**
      * The type of document this artifact is displayed in.
      */
@@ -79,7 +80,7 @@ public class ArtifactAppEntity implements IAppEntity {
                              String summary,
                              String body,
                              DocumentType documentType,
-                             Map<String, String> attributes) {
+                             Map<String, JsonNode> attributes) {
         this();
         this.id = artifactId;
         this.type = type;

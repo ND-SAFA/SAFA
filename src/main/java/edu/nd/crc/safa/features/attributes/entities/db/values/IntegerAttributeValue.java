@@ -13,6 +13,8 @@ import javax.persistence.Table;
 import edu.nd.crc.safa.features.attributes.repositories.values.IntegerAttributeValueRepository;
 import edu.nd.crc.safa.features.attributes.services.AttributeSystemServiceProvider;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.IntNode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -43,13 +45,13 @@ public class IntegerAttributeValue implements IAttributeValue {
     private ArtifactAttributeVersion attributeVersion;
 
     @Override
-    public void setValueFromString(String strValue) {
-        setValue(Integer.parseInt(strValue));
+    public void setValueFromJsonNode(JsonNode jsonValue) {
+        setValue(jsonValue.intValue());
     }
 
     @Override
-    public String getValueAsString() {
-        return Integer.toString(getValue());
+    public JsonNode getValueAsJsonNode() {
+        return IntNode.valueOf(getValue());
     }
 
     @Override

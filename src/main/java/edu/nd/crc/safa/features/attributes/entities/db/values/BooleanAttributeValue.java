@@ -13,6 +13,8 @@ import javax.persistence.Table;
 import edu.nd.crc.safa.features.attributes.repositories.values.BooleanAttributeValueRepository;
 import edu.nd.crc.safa.features.attributes.services.AttributeSystemServiceProvider;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.BooleanNode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -43,13 +45,13 @@ public class BooleanAttributeValue implements IAttributeValue {
     private ArtifactAttributeVersion attributeVersion;
 
     @Override
-    public void setValueFromString(String strValue) {
-        setValue(Boolean.parseBoolean(strValue));
+    public void setValueFromJsonNode(JsonNode jsonValue) {
+        setValue(jsonValue.booleanValue());
     }
 
     @Override
-    public String getValueAsString() {
-        return Boolean.toString(isValue());
+    public JsonNode getValueAsJsonNode() {
+        return BooleanNode.valueOf(isValue());
     }
 
     @Override

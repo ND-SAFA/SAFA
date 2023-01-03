@@ -23,6 +23,7 @@ import edu.nd.crc.safa.features.common.IVersionEntity;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -75,7 +76,7 @@ public class ArtifactVersion implements Serializable, IVersionEntity<ArtifactApp
     String content;
 
     @Transient
-    private Map<String, String> customAttributeValues;
+    private Map<String, JsonNode> customAttributeValues;
 
     public ArtifactVersion() {
         this.summary = "";
@@ -129,7 +130,7 @@ public class ArtifactVersion implements Serializable, IVersionEntity<ArtifactApp
         return this.artifact.getType().getName();
     }
 
-    public void addCustomAttributeValue(String keyname, String value) {
+    public void addCustomAttributeValue(String keyname, JsonNode value) {
         customAttributeValues.put(keyname, value);
     }
 
@@ -148,7 +149,7 @@ public class ArtifactVersion implements Serializable, IVersionEntity<ArtifactApp
         return hasSameContent(a.getName(), a.getSummary(), a.getBody(), a.getAttributes());
     }
 
-    private boolean hasSameContent(String name, String summary, String content, Map<String, String> attributes) {
+    private boolean hasSameContent(String name, String summary, String content, Map<String, JsonNode> attributes) {
         return this.getName().equals(name)
             && this.summary.equals(summary)
             && this.content.equals(content)

@@ -14,6 +14,9 @@ import edu.nd.crc.safa.features.attributes.entities.db.values.StringArrayAttribu
 import edu.nd.crc.safa.features.attributes.entities.db.values.StringAttributeValue;
 import edu.nd.crc.safa.features.attributes.services.AttributeSystemServiceProvider;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -28,31 +31,34 @@ public enum CustomAttributeStorageType {
     STRING(StringAttributeValue::new, false,
         (serviceProvider, artifactAttributeVersion) ->
             serviceProvider.getStringAttributeValueRepository().getByAttributeVersion(artifactAttributeVersion)
-                .map(StringAttributeValue::getValueAsString).orElse(null)),
+                .map(StringAttributeValue::getValueAsJsonNode).orElse(null)),
     STRING_ARRAY(StringArrayAttributeValue::new, true,
         (serviceProvider, artifactAttributeVersion) ->
-            toJsonString(serviceProvider.getStringArrayAttributeValueRepository()
+            toJsonArray(serviceProvider.getStringArrayAttributeValueRepository()
                     .getByAttributeVersion(artifactAttributeVersion))),
     INTEGER(IntegerAttributeValue::new, false,
         (serviceProvider, artifactAttributeVersion) ->
             serviceProvider.getIntegerAttributeValueRepository().getByAttributeVersion(artifactAttributeVersion)
-                .map(IntegerAttributeValue::getValueAsString).orElse(null)),
+                .map(IntegerAttributeValue::getValueAsJsonNode).orElse(null)),
     FLOAT(FloatAttributeValue::new, false,
         (serviceProvider, artifactAttributeVersion) ->
             serviceProvider.getFloatAttributeValueRepository().getByAttributeVersion(artifactAttributeVersion)
-                .map(FloatAttributeValue::getValueAsString).orElse(null)),
+                .map(FloatAttributeValue::getValueAsJsonNode).orElse(null)),
     BOOLEAN(BooleanAttributeValue::new, false,
         (serviceProvider, artifactAttributeVersion) ->
             serviceProvider.getBooleanAttributeValueRepository().getByAttributeVersion(artifactAttributeVersion)
-                .map(BooleanAttributeValue::getValueAsString).orElse(null));
+                .map(BooleanAttributeValue::getValueAsJsonNode).orElse(null));
 
     final Supplier<IAttributeValue> attributeValueConstructor;
     final boolean isArrayType;
-    final BiFunction<AttributeSystemServiceProvider, ArtifactAttributeVersion, String> stringValueRetriever;
+    final BiFunction<AttributeSystemServiceProvider, ArtifactAttributeVersion, JsonNode> jsonValueRetriever;
 
-    private static String toJsonString(List<StringArrayAttributeValue> stringArrayAttributeValues) {
-        return stringArrayAttributeValues.stream()
-            .map(StringArrayAttributeValue::getValueAsString)
-            .collect(Collectors.joining(",", "[", "]"));
+    private static JsonNode toJsonArray(List<StringArrayAttributeValue> stringArrayAttributeValues) {
+        List<JsonNode> childNodes = stringArrayAttributeValues
+                .stream()
+                .map(StringArrayAttributeValue::getValueAsJsonNode)
+                .collect(Collectors.toList());
+
+        return new ArrayNode(JsonNodeFactory.instance, childNodes);
     }
 }

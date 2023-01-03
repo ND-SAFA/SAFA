@@ -1,6 +1,8 @@
 package edu.nd.crc.safa.features.attributes.services;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -14,8 +16,7 @@ import edu.nd.crc.safa.features.attributes.entities.db.values.IAttributeValue;
 import edu.nd.crc.safa.features.attributes.repositories.values.ArtifactAttributeVersionRepository;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -41,18 +42,18 @@ public class AttributeValueService {
      * @param artifactVersion The artifact version we're looking at.
      * @return A map from attribute keynames to values.
      */
-    public Map<String, String> getCustomAttributeValuesForArtifact(ArtifactVersion artifactVersion) {
+    public Map<String, JsonNode> getCustomAttributeValuesForArtifact(ArtifactVersion artifactVersion) {
 
         List<ArtifactAttributeVersion> attributeVersions =
             serviceProvider.getArtifactAttributeVersionRepository().findByArtifactVersion(artifactVersion);
 
-        Map<String, String> out = new HashMap<>();
+        Map<String, JsonNode> out = new HashMap<>();
 
         for (ArtifactAttributeVersion attributeVersion : attributeVersions) {
-            String fieldValue = attributeVersion.getValueType().getStringValueRetriever()
+            JsonNode jsonValue = attributeVersion.getValueType().getJsonValueRetriever()
                 .apply(serviceProvider, attributeVersion);
 
-            out.put(attributeVersion.getAttribute().getKeyname(), fieldValue);
+            out.put(attributeVersion.getAttribute().getKeyname(), jsonValue);
         }
 
         return out;
@@ -67,14 +68,14 @@ public class AttributeValueService {
      * @param value The value to set.
      */
     @Transactional
-    public void saveAttributeValue(CustomAttribute attribute, ArtifactVersion artifactVersion, String value) {
+    public void saveAttributeValue(CustomAttribute attribute, ArtifactVersion artifactVersion, JsonNode value) {
 
         ArtifactAttributeVersion attributeVersion = getAttributeVersion(attribute, artifactVersion);
 
         CustomAttributeStorageType storageType = attribute.getType().getStorageType();
         if (storageType.isArrayType()) {
             clearArrayTypeValues(attributeVersion);
-            for (String innerValue : unpackStringArray(value)) {
+            for (JsonNode innerValue : unpackJsonArray(value)) {
                 saveArtifactValueInner(storageType, innerValue, attributeVersion);
             }
         } else {
@@ -109,11 +110,11 @@ public class AttributeValueService {
      * @param attributeValues The values to set.
      */
     @Transactional
-    public void saveAllAttributeValues(ArtifactVersion artifactVersion, Map<String, String> attributeValues) {
+    public void saveAllAttributeValues(ArtifactVersion artifactVersion, Map<String, JsonNode> attributeValues) {
 
-        for (Map.Entry<String, String> entry : attributeValues.entrySet()) {
+        for (Map.Entry<String, JsonNode> entry : attributeValues.entrySet()) {
             String key = entry.getKey();
-            String value = entry.getValue();
+            JsonNode value = entry.getValue();
 
             Optional<CustomAttribute> attribute =
                 serviceProvider.getCustomAttributeRepository()
@@ -159,16 +160,15 @@ public class AttributeValueService {
      * @return The parsed array.
      * @throws SafaError When the string is not formatted correctly.
      */
-    private String[] unpackStringArray(String value) {
-        String[] values;
+    private JsonNode[] unpackJsonArray(JsonNode value) {
+        assert value.isArray();
 
-        try {
-            values = new ObjectMapper().readValue(value, String[].class);
-        } catch (JsonProcessingException e) {
-            throw new SafaError("Failed to unpack string array", e);
+        List<JsonNode> nodes = new ArrayList<>();
+        for (Iterator<JsonNode> it = value.elements(); it.hasNext(); ) {
+            nodes.add(it.next());
         }
 
-        return values;
+        return nodes.toArray(new JsonNode[0]);
     }
 
     /**
@@ -177,12 +177,12 @@ public class AttributeValueService {
      * @param value The value to set.
      * @param attributeVersion The artifact attribute version we set a value in.
      */
-    private void saveArtifactValueInner(CustomAttributeStorageType storageType, String value,
+    private void saveArtifactValueInner(CustomAttributeStorageType storageType, JsonNode value,
                                         ArtifactAttributeVersion attributeVersion) {
 
         IAttributeValue attributeValueObj = storageType.getAttributeValueConstructor().get();
         attributeValueObj.setAttributeVersion(attributeVersion);
-        attributeValueObj.setValueFromString(value);
+        attributeValueObj.setValueFromJsonNode(value);
         attributeValueObj.save(serviceProvider);
     }
 }

@@ -2,12 +2,14 @@ package edu.nd.crc.safa.features.attributes.entities.db.values;
 
 import edu.nd.crc.safa.features.attributes.services.AttributeSystemServiceProvider;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 public interface IAttributeValue {
     void setAttributeVersion(ArtifactAttributeVersion attributeVersion);
 
-    void setValueFromString(String strValue);
+    void setValueFromJsonNode(JsonNode jsonNode);
 
-    String getValueAsString();
+    JsonNode getValueAsJsonNode();
 
     void save(AttributeSystemServiceProvider serviceProvider);
 }

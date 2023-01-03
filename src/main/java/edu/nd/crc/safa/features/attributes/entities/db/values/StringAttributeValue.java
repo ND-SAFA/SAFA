@@ -14,6 +14,8 @@ import javax.persistence.Table;
 import edu.nd.crc.safa.features.attributes.repositories.values.StringAttributeValueRepository;
 import edu.nd.crc.safa.features.attributes.services.AttributeSystemServiceProvider;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -45,13 +47,13 @@ public class StringAttributeValue implements IAttributeValue {
     private ArtifactAttributeVersion attributeVersion;
 
     @Override
-    public void setValueFromString(String strValue) {
-        setValue(strValue);
+    public void setValueFromJsonNode(JsonNode jsonValue) {
+        setValue(jsonValue.textValue());
     }
 
     @Override
-    public String getValueAsString() {
-        return getValue();
+    public JsonNode getValueAsJsonNode() {
+        return TextNode.valueOf(getValue());
     }
 
     @Override

@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 //TODO send notifications
-//TODO tests
 
 @RestController
 public class AttributeController extends BaseController  {

@@ -265,10 +265,18 @@ class TraceDataset(AbstractDataset):
         :param slice_num: Whether to return first or second slice.
         :return:
         """
-        slice_pos_link_ids = TraceDataset._get_data_split(self.pos_link_ids, percent_split, slice_num == 2)
-        slice_neg_link_ids = TraceDataset._get_data_split(self.neg_link_ids, percent_split, slice_num == 2)
+        queries = {}
+        for link in self.links.values():
+            source_id = link.source.id
+            if source_id in queries:
+                queries[source_id].append(link)
+            else:
+                queries[source_id] = [link]
+        source_names = list(queries.keys())
+        split_size = TraceDataset._get_first_split_size(source_names, percent_split)
+        split_source = source_names[:split_size] if slice_num == 1 else source_names[:split_size]
         slice_links = {
-            link_id: self.links[link_id] for link_id in slice_pos_link_ids + slice_neg_link_ids
+            trace_link.id: trace_link for source_name in split_source for trace_link in queries[source_name]
         }
         return TraceDataset(slice_links)
 

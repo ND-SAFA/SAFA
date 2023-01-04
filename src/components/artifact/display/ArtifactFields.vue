@@ -9,15 +9,15 @@
             v-bind="attrs"
             variant="subtitle"
             el="h1"
-            :value="selectedArtifactName"
+            :value="name"
             data-cy="text-selected-name"
           />
         </template>
-        {{ selectedArtifactName }}
+        {{ name }}
       </v-tooltip>
       <attribute-chip
         artifact-type
-        :value="selectedArtifactType"
+        :value="type"
         data-cy="text-selected-type"
       />
     </flex-box>
@@ -26,18 +26,19 @@
 
     <typography variant="caption" value="Body" />
     <typography
-      defaultExpanded
-      variant="expandable"
-      :value="selectedArtifactBody"
+      default-expanded
+      :variant="variant"
+      :value="body"
       data-cy="text-selected-body"
     />
 
-    <attribute-list-display class="mt-4" :artifact="selectedArtifact" />
+    <attribute-list-display class="mt-4" :artifact="artifact" />
   </panel-card>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
+import { ReservedArtifactType, TextType } from "@/types";
 import { selectionStore } from "@/hooks";
 import {
   Typography,
@@ -63,33 +64,33 @@ export default Vue.extend({
     /**
      * @return The selected artifact.
      */
-    selectedArtifact() {
+    artifact() {
       return selectionStore.selectedArtifact;
     },
     /**
      * @return The selected artifact's name.
      */
-    selectedArtifactName(): string {
-      return this.selectedArtifact?.name || "";
+    name(): string {
+      return this.artifact?.name || "";
     },
     /**
      * @return The selected artifact's type.
      */
-    selectedArtifactType(): string {
-      return this.selectedArtifact?.type || "";
+    type(): string {
+      return this.artifact?.type || "";
+    },
+    /**
+     * @return The selected artifact's body text variant.
+     */
+    variant(): TextType {
+      return this.type === ReservedArtifactType.github ? "code" : "expandable";
     },
     /**
      * @return The selected artifact's body.
      */
-    selectedArtifactBody(): string {
-      return this.selectedArtifact?.body.trim() || "";
+    body(): string {
+      return this.artifact?.body.trim() || "";
     },
   },
 });
 </script>
-
-<style scoped>
-.artifact-title {
-  width: 230px;
-}
-</style>

@@ -1,4 +1,9 @@
-import { ArtifactData, SvgNodeStyle, SvgStyle } from "@/types";
+import {
+  ArtifactData,
+  ReservedArtifactType,
+  SvgNodeStyle,
+  SvgStyle,
+} from "@/types";
 import { capitalize, getBorderColor } from "@/util";
 import { ARTIFACT_CHILDREN_HEIGHT } from "@/cytoscape";
 import { svgText } from "@/cytoscape/styles/node/svg-text";
@@ -51,7 +56,7 @@ export function svgNode(
           color,
         })}
         ${svgTitle(data.artifactName, y + 10, "name")}
-        ${svgBody(data.body, truncateLength, {
+        ${svgBody(data, truncateLength, {
           x,
           y: y + 35,
           width: bodyWidth || width,
@@ -108,27 +113,29 @@ export function svgDiv(style: Omit<SvgStyle, "height">): string {
 /**
  * Creates the SVG for representing an node's body.
  *
- * @param body - The body to render.
+ * @param data - The artifact to render.
  * @param truncateLength - The maximum characters of text to render.
  * @param style - The style to draw with.
  *
  * @return stringified SVG for the node.
  */
 function svgBody(
-  body: string,
+  data: ArtifactData,
   truncateLength: number,
   style: SvgStyle
 ): string {
+  const code = data.artifactType === ReservedArtifactType.github;
+
   return svgText(
-    getBody(body, truncateLength),
-    style,
+    getBody(data.body, truncateLength),
+    { ...style, code },
     "body",
     `
       display: block;
       width: ${style.width}px;
       height: ${style.height}px;
       line-height: 1rem;
-      text-align: center;
+      text-align: ${code ? "left" : "center"};
     `
   );
 }

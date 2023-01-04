@@ -1,5 +1,5 @@
 <template>
-  <attribute-grid :layout="layout">
+  <attribute-grid v-if="doDisplay" :layout="layout">
     <template v-slot:item="{ attribute }">
       <attribute-display
         :model="artifact.attributes || {}"
@@ -34,6 +34,12 @@ export default Vue.extend({
      */
     layout(): AttributeLayoutSchema {
       return attributesStore.getLayoutByType(this.artifact.type);
+    },
+    /**
+     * @return Whether the attribute list should be displayed.
+     */
+    doDisplay(): boolean {
+      return this.layout.positions.length > 0;
     },
   },
 });

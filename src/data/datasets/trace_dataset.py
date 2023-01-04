@@ -273,6 +273,8 @@ class TraceDataset(AbstractDataset):
             else:
                 queries[source_id] = [link]
         source_names = list(queries.keys())
+        random.shuffle(source_names)
+        random.shuffle(source_names)
         split_size = TraceDataset._get_first_split_size(source_names, percent_split)
         split_source = source_names[:split_size] if slice_num == 1 else source_names[:split_size]
         slice_links = {

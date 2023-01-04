@@ -19,6 +19,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.springframework.data.domain.Sort;
 
 /**
  * Contains details about how values for custom artifact attributes are actually
@@ -28,31 +29,22 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum CustomAttributeStorageType {
 
-    STRING(StringAttributeValue::new, false,
-        (serviceProvider, artifactAttributeVersion) ->
-            serviceProvider.getStringAttributeValueRepository().getByAttributeVersion(artifactAttributeVersion)
-                .map(StringAttributeValue::getValueAsJsonNode).orElse(null)),
-    STRING_ARRAY(StringArrayAttributeValue::new, true,
-        (serviceProvider, artifactAttributeVersion) ->
-            toJsonArray(serviceProvider.getStringArrayAttributeValueRepository()
-                    .getByAttributeVersion(artifactAttributeVersion))),
-    INTEGER(IntegerAttributeValue::new, false,
-        (serviceProvider, artifactAttributeVersion) ->
-            serviceProvider.getIntegerAttributeValueRepository().getByAttributeVersion(artifactAttributeVersion)
-                .map(IntegerAttributeValue::getValueAsJsonNode).orElse(null)),
-    FLOAT(FloatAttributeValue::new, false,
-        (serviceProvider, artifactAttributeVersion) ->
-            serviceProvider.getFloatAttributeValueRepository().getByAttributeVersion(artifactAttributeVersion)
-                .map(FloatAttributeValue::getValueAsJsonNode).orElse(null)),
-    BOOLEAN(BooleanAttributeValue::new, false,
-        (serviceProvider, artifactAttributeVersion) ->
-            serviceProvider.getBooleanAttributeValueRepository().getByAttributeVersion(artifactAttributeVersion)
-                .map(BooleanAttributeValue::getValueAsJsonNode).orElse(null));
+    STRING(StringAttributeValue::new, false, CustomAttributeStorageType::stringJsonValueRetriever),
+    STRING_ARRAY(StringArrayAttributeValue::new, true, CustomAttributeStorageType::stringArrayJsonValueRetriever),
+    INTEGER(IntegerAttributeValue::new, false, CustomAttributeStorageType::integerJsonValueRetriever),
+    FLOAT(FloatAttributeValue::new, false, CustomAttributeStorageType::floatJsonValueRetriever),
+    BOOLEAN(BooleanAttributeValue::new, false, CustomAttributeStorageType::boolJsonValueRetriever);
 
     final Supplier<IAttributeValue> attributeValueConstructor;
     final boolean isArrayType;
     final BiFunction<AttributeSystemServiceProvider, ArtifactAttributeVersion, JsonNode> jsonValueRetriever;
 
+    /**
+     * Converts a list of string attribute values to a json array node.
+     *
+     * @param stringArrayAttributeValues String array attribute values to put into a json array.
+     * @return A json array node containing the given values.
+     */
     private static JsonNode toJsonArray(List<StringArrayAttributeValue> stringArrayAttributeValues) {
         List<JsonNode> childNodes = stringArrayAttributeValues
                 .stream()
@@ -60,5 +52,80 @@ public enum CustomAttributeStorageType {
                 .collect(Collectors.toList());
 
         return new ArrayNode(JsonNodeFactory.instance, childNodes);
+    }
+
+    /**
+     * Retrieves a string attribute value as a json node.
+     *
+     * @param serviceProvider The service provider (gives access to repos).
+     * @param attributeVersion The attribute version to fetch.
+     * @return A json node with the string value inside of it.
+     */
+    private static JsonNode stringJsonValueRetriever(AttributeSystemServiceProvider serviceProvider,
+                                                     ArtifactAttributeVersion attributeVersion) {
+        return serviceProvider.getStringAttributeValueRepository()
+                .getByAttributeVersion(attributeVersion)
+                .map(StringAttributeValue::getValueAsJsonNode)
+                .orElse(null);
+    }
+
+    /**
+     * Retrieves a string array attribute value as a json node.
+     *
+     * @param serviceProvider The service provider (gives access to repos).
+     * @param attributeVersion The attribute version to fetch.
+     * @return A json node with the string array value inside of it.
+     */
+    private static JsonNode stringArrayJsonValueRetriever(AttributeSystemServiceProvider serviceProvider,
+                                                          ArtifactAttributeVersion attributeVersion) {
+        List<StringArrayAttributeValue> stringArrayAttributeValues =
+                serviceProvider.getStringArrayAttributeValueRepository()
+                        .getByAttributeVersion(attributeVersion, Sort.by("value"));
+        return toJsonArray(stringArrayAttributeValues);
+    }
+
+    /**
+     * Retrieves an integer attribute value as a json node.
+     *
+     * @param serviceProvider The service provider (gives access to repos).
+     * @param attributeVersion The attribute version to fetch.
+     * @return A json node with the integer value inside of it.
+     */
+    private static JsonNode integerJsonValueRetriever(AttributeSystemServiceProvider serviceProvider,
+                                                      ArtifactAttributeVersion attributeVersion) {
+        return serviceProvider.getIntegerAttributeValueRepository()
+                .getByAttributeVersion(attributeVersion)
+                .map(IntegerAttributeValue::getValueAsJsonNode)
+                .orElse(null);
+    }
+
+    /**
+     * Retrieves a float attribute value as a json node.
+     *
+     * @param serviceProvider The service provider (gives access to repos).
+     * @param attributeVersion The attribute version to fetch.
+     * @return A json node with the float value inside of it.
+     */
+    private static JsonNode floatJsonValueRetriever(AttributeSystemServiceProvider serviceProvider,
+                                                    ArtifactAttributeVersion attributeVersion) {
+        return serviceProvider.getFloatAttributeValueRepository()
+                .getByAttributeVersion(attributeVersion)
+                .map(FloatAttributeValue::getValueAsJsonNode)
+                .orElse(null);
+    }
+
+    /**
+     * Retrieves a boolean attribute value as a json node.
+     *
+     * @param serviceProvider The service provider (gives access to repos).
+     * @param attributeVersion The attribute version to fetch.
+     * @return A json node with the boolean value inside of it.
+     */
+    private static JsonNode boolJsonValueRetriever(AttributeSystemServiceProvider serviceProvider,
+                                                   ArtifactAttributeVersion attributeVersion) {
+        return serviceProvider.getBooleanAttributeValueRepository()
+                .getByAttributeVersion(attributeVersion)
+                .map(BooleanAttributeValue::getValueAsJsonNode)
+                .orElse(null);
     }
 }

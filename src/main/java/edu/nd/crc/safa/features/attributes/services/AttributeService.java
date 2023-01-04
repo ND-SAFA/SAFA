@@ -74,10 +74,33 @@ public class AttributeService {
      * @throws IllegalArgumentException If this attribute is not supposed to have selection options.
      */
     public List<SelectionAttributeOption> getOptionsForAttribute(CustomAttribute attribute) {
+        return getOptionsForAttributeSorted(attribute, Sort.unsorted());
+    }
+
+    /**
+     * Retrieves selection options for a custom attribute sorted by display label.
+     *
+     * @param attribute The attribute to get options for.
+     * @return The options, if they are found.
+     * @throws IllegalArgumentException If this attribute is not supposed to have selection options.
+     */
+    public List<SelectionAttributeOption> getOptionsForAttributeSorted(CustomAttribute attribute) {
+        return getOptionsForAttributeSorted(attribute, Sort.by("value"));
+    }
+
+    /**
+     * Retrieves selection options for a custom attribute sorted by the given sort.
+     *
+     * @param attribute The attribute to get options for.
+     * @param sort The sort to use for the retrieved data.
+     * @return The options, if they are found.
+     * @throws IllegalArgumentException If this attribute is not supposed to have selection options.
+     */
+    public List<SelectionAttributeOption> getOptionsForAttributeSorted(CustomAttribute attribute, Sort sort) {
         if (attribute.getType().getExtraInfoType() != CustomAttributeExtraInfoType.OPTIONS) {
             throw new IllegalArgumentException("The given custom attribute does not have options associated with it.");
         }
-        return serviceProvider.getSelectionAttributeOptionRepository().findByAttribute(attribute);
+        return serviceProvider.getSelectionAttributeOptionRepository().findByAttribute(attribute, sort);
     }
 
     /**
@@ -88,7 +111,7 @@ public class AttributeService {
      * @throws IllegalArgumentException If this attribute is not supposed to have selection options.
      */
     public List<String> getStringOptionsForAttribute(CustomAttribute attribute) {
-        return getOptionsForAttribute(attribute)
+        return getOptionsForAttributeSorted(attribute)
             .stream()
             .map(SelectionAttributeOption::getValue)
             .collect(Collectors.toList());

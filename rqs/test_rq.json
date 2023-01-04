@@ -28,7 +28,7 @@
           "trainer_dataset_manager": {
             "train_dataset_creator": {
               "object_type": "SAFA",
-              "project_path": "[DATA_PATH]/lhp/experiment/cooling"
+              "project_path": "[DATA_PATH]/lhp/cooling"
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",

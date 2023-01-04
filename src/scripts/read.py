@@ -12,7 +12,7 @@ assert os.path.exists(ROOT_PATH), ROOT_PATH
 sys.path.append(ROOT_PATH)
 
 IGNORE = ["job_args", "trainer_args", "model_manager", "val_dataset_creator", "trainer_dataset_manager"]
-COPY_PATHS = [["metrics", "map"], ["experimental_vars"]]
+COPY_PATHS = [["metrics", "map"], ["metrics", "f1"], ["metrics", "f2"], ["experimental_vars"]]
 if __name__ == "__main__":
     #
     # Imports

@@ -59,8 +59,36 @@ export const useAttributes = defineStore("attributes", {
         [
           // {
           //   key: "1",
-          //   label: "Test",
-          //   type: AttributeType.date,
+          //   label: "Paragraph",
+          //   type: AttributeType.paragraph,
+          // },
+          // {
+          //   key: "2",
+          //   label: "Relation",
+          //   type: AttributeType.relation,
+          // },
+          // {
+          //   key: "3",
+          //   label: "Boolean",
+          //   type: AttributeType.boolean,
+          // },
+          // {
+          //   key: "4",
+          //   label: "Multiselect",
+          //   type: AttributeType.multiselect,
+          //   options: [
+          //     "One option",
+          //     "Another option",
+          //     "And another option",
+          //     "And one more",
+          //   ],
+          // },
+          // {
+          //   key: "5",
+          //   label: "Number",
+          //   type: AttributeType.float,
+          //   max: 5,
+          //   min: 1,
           // },
         ];
       this.attributeLayouts =
@@ -77,6 +105,34 @@ export const useAttributes = defineStore("attributes", {
           //       width: 1,
           //       height: 1,
           //       key: "1",
+          //     },
+          //     {
+          //       x: 0,
+          //       y: 1,
+          //       width: 1,
+          //       height: 1,
+          //       key: "3",
+          //     },
+          //     {
+          //       x: 1,
+          //       y: 1,
+          //       width: 1,
+          //       height: 1,
+          //       key: "2",
+          //     },
+          //     {
+          //       x: 0,
+          //       y: 2,
+          //       width: 1,
+          //       height: 1,
+          //       key: "4",
+          //     },
+          //     {
+          //       x: 0,
+          //       y: 3,
+          //       width: 1,
+          //       height: 1,
+          //       key: "5",
           //     },
           //   ],
           // },

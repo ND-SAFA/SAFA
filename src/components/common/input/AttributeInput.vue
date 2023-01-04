@@ -12,7 +12,6 @@
   <v-textarea
     v-else-if="attribute.type === 'paragraph'"
     filled
-    no-resize
     :label="attribute.label"
     class="mr-2"
     rows="3"
@@ -122,7 +121,7 @@
     v-else-if="attribute.type === 'boolean'"
     :label="attribute.label"
     class="pl-4 mr-2"
-    :value="model[attribute.key]"
+    :input-value="model[attribute.key]"
     @change="handleInput"
   />
 </template>

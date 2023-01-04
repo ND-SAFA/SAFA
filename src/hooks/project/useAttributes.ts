@@ -2,8 +2,9 @@ import { defineStore } from "pinia";
 
 import {
   AttributeLayoutSchema,
-  AttributeSchema,
   AttributePositionSchema,
+  AttributeSchema,
+  AttributeType,
   ProjectSchema,
 } from "@/types";
 import { removeMatches } from "@/util";
@@ -53,8 +54,33 @@ export const useAttributes = defineStore("attributes", {
      * Initializes the current project.
      */
     initializeProject(project: ProjectSchema): void {
-      this.attributes = project.attributes || [];
-      this.attributeLayouts = project.attributeLayouts || [];
+      this.attributes =
+        project.attributes ||
+        [
+          // {
+          //   key: "1",
+          //   label: "Test",
+          //   type: AttributeType.date,
+          // },
+        ];
+      this.attributeLayouts =
+        project.attributeLayouts ||
+        [
+          // {
+          //   id: "2",
+          //   name: "Default",
+          //   artifactTypes: [],
+          //   positions: [
+          //     {
+          //       x: 0,
+          //       y: 0,
+          //       width: 1,
+          //       height: 1,
+          //       key: "1",
+          //     },
+          //   ],
+          // },
+        ];
     },
 
     /**

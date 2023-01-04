@@ -12,6 +12,7 @@
 import Vue, { PropType } from "vue";
 import { AttributeCollectionSchema, AttributeSchema } from "@/types";
 import { timestampToDisplay } from "@/util";
+import { artifactStore } from "@/hooks";
 import Typography from "../Typography.vue";
 import AttributeChip from "./AttributeChip.vue";
 
@@ -38,8 +39,11 @@ export default Vue.extend({
      */
     arrayValue(): string[] {
       const value = this.model[this.attribute.key];
+      const array = Array.isArray(value) ? value : [];
 
-      return Array.isArray(value) ? value : [];
+      return this.attribute.type === "relation"
+        ? array.map((id) => artifactStore.getArtifactById(id)?.name || id)
+        : array;
     },
     /**
      * @return The attribute's display value.
@@ -50,7 +54,7 @@ export default Vue.extend({
       if (this.model[this.attribute.key] === undefined) {
         return "";
       } else if (this.attribute.type === "date") {
-        return timestampToDisplay(value);
+        return timestampToDisplay(value).split(" at ")[0];
       } else if (this.attribute.type === "boolean") {
         return this.model[this.attribute.key] ? "Yes" : "No";
       } else {

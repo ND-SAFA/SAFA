@@ -32,7 +32,12 @@
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",
-              "val_percentage": 0.8
+              "val_percentage": {
+                "*": [
+                  0.2,
+                  0.8
+                ]
+              }
             }
           }
         }

@@ -30,14 +30,10 @@ class TraceEntityReader(EntityReader):
             self.definition[SafaKeys.TARGET_ID]].get_entities()
 
     def create(self, traces_df) -> Dict[int, TraceLink]:
-        positive_link_ids = []
-        negative_link_ids = []
         trace_links: Dict[int, TraceLink] = {}
         for source_artifact in self.source_artifacts:
             for target_artifact in self.target_artifacts:
                 trace_link = self.create_trace_link(source_artifact, target_artifact, traces_df)
-                link_id_container = positive_link_ids if trace_link.is_true_link else negative_link_ids
-                link_id_container.append(trace_link.id)
                 trace_links[trace_link.id] = trace_link
         return trace_links
 

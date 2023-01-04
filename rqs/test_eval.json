@@ -1,0 +1,42 @@
+{
+  "steps": [
+    {
+      "comparison_metric": "map",
+      "should_maximize_metric": true,
+      "jobs": [
+        {
+          "object_type": "TRAIN",
+          "job_args": {
+            "random_seed": 36
+          },
+          "model_manager": {
+            "model_path": "roberta-base"
+          },
+          "trainer_args": {
+            "output_dir": "[OUTPUT_PATH]/test/models",
+            "train_epochs_range": [
+              1,
+              6,
+              1
+            ],
+            "per_device_train_batch_size": 2,
+            "metrics": [
+              "map"
+            ]
+          },
+          "trainer_dataset_manager": {
+            "train_dataset_creator": {
+              "object_type": "SAFA",
+              "project_path": "~/desktop/safa/datasets/lhp/experiment/cooling"
+            },
+            "val_dataset_creator": {
+              "object_type": "SPLIT",
+              "val_percentage": 0.2
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "output_dir": "[OUTPUT_PATH]/test/jobs"
+}

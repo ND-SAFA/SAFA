@@ -1,11 +1,17 @@
-from typing import Callable, List, Tuple, Union
+from typing import Callable, Dict, List, Tuple, Union
 
 import numpy as np
+import pandas as pd
 from scipy.special import softmax
 from transformers.trainer_utils import PredictionOutput
 
+ArtifactQuery = Dict[str, List[float]]
+ProjectQueries = Dict[str, ArtifactQuery]
 
-class TraceMatrix:
+
+class TraceMatrixManager:
+    PRED_KEY = "preds"
+    LABEL_KEY = "labels"
     """
     Contains trace and similarity matrices for computing query-based metrics.
     """
@@ -18,9 +24,7 @@ class TraceMatrix:
         """
         self.source_target_pairs = source_target_pairs
         self.scores = self.get_similarity_scores(output.predictions)
-        similarity_matrix, trace_matrix = self.create_trace_matrix(source_target_pairs, self.scores, output.label_ids)
-        self.similarity_matrix = similarity_matrix
-        self.trace_matrix = trace_matrix
+        self.queries = self.create_trace_matrix(source_target_pairs, self.scores, output.label_ids)
 
     def calculate_query_metric(self, metric: Callable[[List[float], List[int]], float]):
         """
@@ -28,20 +32,19 @@ class TraceMatrix:
         :param metric: The metric to compute for each query in matrix.
         :return: Average metric value.
         """
-        source_matrix = self.similarity_matrix
-        trace_matrix = self.trace_matrix
-        n_sources = source_matrix.shape[0]
         metric_values = []
-        for source_index in range(n_sources):
-            query_predictions = source_matrix[source_index, :]
-            query_labels = trace_matrix[source_index, :]
+        for source, query in self.queries.items():
+            query_predictions = query[self.PRED_KEY]
+            query_labels = query[self.LABEL_KEY]
             query_map = metric(query_labels, query_predictions)
-            metric_values.append(query_map)
+            print(pd.Series(query_labels).value_counts())
+            print(query_map)
+            if not np.isnan(query_map):
+                metric_values.append(query_map)
         return sum(metric_values) / len(metric_values)
 
     @staticmethod
-    def create_trace_matrix(artifact_pairs: List[Tuple[str, str]], scores: List[float], labels: List[int]) -> Tuple[
-        np.array, np.array]:
+    def create_trace_matrix(artifact_pairs: List[Tuple[str, str]], scores: List[float], labels: List[int]) -> Dict:
         """
         Creates similarity and trace matrices from scores and labels.
         :param artifact_pairs: The pairs of artifact corresponding to scores.
@@ -49,30 +52,18 @@ class TraceMatrix:
         :param labels: The labels representing if the artifact pair is traced or not.
         :return: SimilarityMatrix, TraceMatrix
         """
-        source_artifacts = []
-        target_artifacts = []
-        queries = {}
-        for (source, target), score, label in zip(artifact_pairs, scores, labels):
-            if source not in source_artifacts:
-                source_artifacts.append(source)
-            if target not in target_artifacts:
-                target_artifacts.append(target)
+        queries: ProjectQueries = {}
+        for (source, target), pred, label in zip(artifact_pairs, scores, labels):
             if source in queries:
                 assert target not in queries[source]
-                queries[source][target] = [score, label]
+                queries[source][TraceMatrixManager.PRED_KEY].append(pred)
+                queries[source][TraceMatrixManager.LABEL_KEY].append(label)
             else:
-                queries[source] = {target: [score, label]}
-        similarity_matrix = np.zeros((len(source_artifacts), len(target_artifacts)))
-        trace_matrix = np.zeros((len(source_artifacts), len(target_artifacts)))
-
-        for source, targets in queries.items():
-            source_index = source_artifacts.index(source)
-            for target, payload in targets.items():
-                score, label = payload
-                target_index = target_artifacts.index(target)
-                similarity_matrix[source_index][target_index] = score
-                trace_matrix[source_index][target_index] = label
-        return similarity_matrix, trace_matrix
+                queries[source] = {
+                    TraceMatrixManager.PRED_KEY: [pred],
+                    TraceMatrixManager.LABEL_KEY: [label]
+                }
+        return queries
 
     @staticmethod
     def get_similarity_scores(predictions: Union[np.ndarray, Tuple[np.ndarray]]) -> List[float]:

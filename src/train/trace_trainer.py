@@ -9,7 +9,7 @@ from transformers.trainer import Trainer
 
 from data.datasets.dataset_role import DatasetRole
 from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
-from data.datasets.trace_matrix import TraceMatrix
+from data.datasets.trace_matrix import TraceMatrixManager
 from models.model_manager import ModelManager
 from train.metrics.supported_trace_metric import get_metric_name, get_metric_path
 from train.trainer_args import TrainerArgs
@@ -62,7 +62,7 @@ class TraceTrainer(Trainer, BaseObject):
         self.eval_dataset = self.trainer_dataset_manager[dataset_role].to_trainer_dataset(self.model_manager)
         output = self.predict(self.eval_dataset)
         source_target_pairs = self.trainer_dataset_manager[dataset_role].get_source_target_pairs()
-        trace_matrix = TraceMatrix(source_target_pairs, output)
+        trace_matrix = TraceMatrixManager(source_target_pairs, output)
         results = self._eval(trace_matrix, output.label_ids, output.metrics,
                              self.trainer_args.metrics) if self.trainer_args.metrics else None
         output_dict = TraceTrainer.output_to_dict(output, metrics=results, predictions=trace_matrix.scores,
@@ -82,7 +82,7 @@ class TraceTrainer(Trainer, BaseObject):
         return {**base_output, **additional_attrs}
 
     @staticmethod
-    def _eval(trace_matrix: TraceMatrix, label_ids: np.ndarray, output_metrics: Dict,
+    def _eval(trace_matrix: TraceMatrixManager, label_ids: np.ndarray, output_metrics: Dict,
               metric_names: List) -> Dict:
         """
         Performs the evaluation of the model (use this instead of Trainer.evaluation to utilize predefined metrics from models)

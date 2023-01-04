@@ -54,7 +54,7 @@ class TestTraceTrainer(BaseTraceTest):
 
     def test_eval(self):
         output = deepcopy(TestDataManager.EXAMPLE_PREDICTION_OUTPUT)
-        result = TraceTrainer._eval(output.predictions, output.label_ids, output.metrics, self.TEST_METRIC_NAMES)
+        result = TraceTrainer._eval(output.PREDICTIONS, output.label_ids, output.metrics, self.TEST_METRIC_NAMES)
         for metric in self.TEST_METRIC_NAMES:
             self.assertIn(metric, result)
 

@@ -14,11 +14,7 @@
           },
           "trainer_args": {
             "output_dir": "[OUTPUT_PATH]/test/models",
-            "train_epochs_range": [
-              1,
-              6,
-              1
-            ],
+            "num_train_epochs": 3,
             "per_device_train_batch_size": 4,
             "metrics": [
               "map",

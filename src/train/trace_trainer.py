@@ -10,7 +10,6 @@ from transformers.trainer import Trainer
 from data.datasets.dataset_role import DatasetRole
 from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
 from data.datasets.trace_matrix import TraceMatrix
-from jobs.components.job_result import JobResult
 from models.model_manager import ModelManager
 from train.metrics.supported_trace_metric import get_metric_name, get_metric_path
 from train.trainer_args import TrainerArgs
@@ -52,6 +51,7 @@ class TraceTrainer(Trainer, BaseObject):
         self._move_model_to_device(self.model, self.args.device)
         self.train_dataset = self.trainer_dataset_manager[DatasetRole.TRAIN].to_trainer_dataset(self.model_manager)
         output = self.train(resume_from_checkpoint=checkpoint)
+        self.save_model()
         output_dict = TraceTrainer.output_to_dict(output)
         return output_dict
 

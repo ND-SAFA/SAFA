@@ -1,7 +1,6 @@
 from typing import Callable, Dict, List, Tuple, Union
 
 import numpy as np
-import pandas as pd
 from scipy.special import softmax
 from transformers.trainer_utils import PredictionOutput
 
@@ -37,7 +36,9 @@ class TraceMatrixManager:
             query_predictions = query[self.PRED_KEY]
             query_labels = query[self.LABEL_KEY]
             query_map = metric(query_labels, query_predictions)
-            print(pd.Series(query_labels).value_counts())
+            print("-" * 15)
+            print(query_labels)
+            print(query_predictions)
             print(query_map)
             if not np.isnan(query_map):
                 metric_values.append(query_map)

@@ -14,6 +14,8 @@ sys.path.append(ROOT_PATH)
 IGNORE = ["job_args", "trainer_args", "model_manager", "val_dataset_creator", "trainer_dataset_manager",
           "train_dataset"]
 COPY_PATHS = [["metrics", "map"], ["metrics", "f1"], ["metrics", "f2"], ["experimental_vars"]]
+RQ_PATH = os.path.expanduser(os.environ["RQ_PATH"])
+
 if __name__ == "__main__":
     #
     # Imports
@@ -29,7 +31,8 @@ if __name__ == "__main__":
         description='Reads experiment results.')
     parser.add_argument("experiment")
     args = parser.parse_args()
-    job_definition = read_job_definition(args.experiment)
+    file_path = os.path.join(RQ_PATH, args.experiment)
+    job_definition = read_job_definition(file_path)
 
     OUTPUT_DIR = job_definition["output_dir"]
 

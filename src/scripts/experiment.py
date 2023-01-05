@@ -1,5 +1,6 @@
 import argparse
 import os
+import shutil
 import sys
 
 import torch
@@ -31,6 +32,10 @@ if __name__ == "__main__":
     args = parser.parse_args()
     file_path = os.path.join(RQ_PATH, args.file)
     job_definition = read_job_definition(file_path)
+    #
+    #
+    #
+    shutil.rmtree(os.path.dirname(job_definition["output_dir"]))
     #
     # Logs
     #

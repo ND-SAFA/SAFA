@@ -1,8 +1,9 @@
 <template>
   <grid-layout
+    v-if="editable"
     :layout="gridLayout"
-    :is-draggable="editable"
-    :is-resizable="editable"
+    :is-draggable="true"
+    :is-resizable="false"
     :margin="[0, 20]"
     :col-num="2"
     :row-height="80"
@@ -16,14 +17,29 @@
       :w="pos.w"
       :h="pos.h"
       :i="pos.i"
-      :is-draggable="!!editable && !!attr"
-      :is-resizable="!!editable && !!attr"
+      :is-draggable="!!attr"
+      :is-resizable="false"
       @moved="handleMoveEvent"
       @resized="handleResizeEvent"
     >
       <slot name="item" :attribute="attr" />
     </grid-item>
   </grid-layout>
+  <div v-else>
+    <flex-box
+      full-width
+      justify="space-between"
+      v-for="(attrs, y) of staticLayout"
+      :key="y"
+    >
+      <div v-if="attrs[0]" :style="attrs[1] ? 'width: 50%' : 'width: 100%'">
+        <slot name="item" :attribute="attrs[0]" />
+      </div>
+      <div v-if="attrs[1]" style="width: 50%">
+        <slot name="item" :attribute="attrs[1]" />
+      </div>
+    </flex-box>
+  </div>
 </template>
 
 <script lang="ts">
@@ -31,13 +47,14 @@ import Vue, { PropType } from "vue";
 import { GridLayout, GridItem, GridItemData } from "vue-grid-layout";
 import { AttributeSchema, AttributeLayoutSchema } from "@/types";
 import { attributesStore } from "@/hooks";
+import { FlexBox } from "@/components/common/layout";
 
 /**
  * Renders a grid of attributes.
  */
 export default Vue.extend({
   name: "AttributeGrid",
-  components: { GridLayout, GridItem },
+  components: { FlexBox, GridLayout, GridItem },
   props: {
     editable: Boolean,
     layout: {
@@ -48,6 +65,7 @@ export default Vue.extend({
   data() {
     return {
       gridLayout: [] as GridItemData[],
+      staticLayout: [] as (AttributeSchema | undefined)[][],
     };
   },
   mounted() {
@@ -70,11 +88,26 @@ export default Vue.extend({
   methods: {
     /**
      * Resets the layout to match the store.
+     *
+     * Creates 2 layout objects:
+     * - `gridLayout` represents the layout data needed for editing the arrangement.
+     * - `staticLayout` represents the ordered attributes to display when not editing.
+     *    This second layout is necessary to get around the variable height limitations of the grid library.
      */
     resetLayout(): void {
       let maxY = 0;
-      const gridLayout = this.layout.positions.map((pos) => {
+      const attributesByY: Record<number, string[]> = {};
+
+      this.gridLayout = this.layout.positions.map((pos) => {
         maxY = Math.max(pos.y, maxY);
+
+        if (!attributesByY[pos.y]) attributesByY[pos.y] = [];
+
+        if (pos.x === 0) {
+          attributesByY[pos.y] = [pos.key, attributesByY[pos.y][1]];
+        } else {
+          attributesByY[pos.y] = [attributesByY[pos.y][0], pos.key];
+        }
 
         return {
           i: pos.key,
@@ -85,17 +118,12 @@ export default Vue.extend({
         };
       });
 
-      if (this.editable) {
-        gridLayout.push({
-          i: "ADD-NEW-ATTRIBUTE",
-          x: 0,
-          y: gridLayout.length === 0 ? 0 : maxY + 1,
-          w: 2,
-          h: 1,
-        });
-      }
-
-      this.gridLayout = gridLayout;
+      this.staticLayout = Array.from(Array(maxY + 1)).map(
+        (_, idx) =>
+          attributesByY[idx].map((key) =>
+            attributesStore.attributes.find((attr) => attr.key === key)
+          ) || []
+      );
     },
     /**
      * Called when an attribute is moved.

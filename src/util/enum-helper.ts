@@ -15,7 +15,6 @@ import {
   TracePredictionTabTypes,
 } from "@/types";
 import { enumToDisplay } from "@/util/string-helper";
-import { ENABLED_FEATURES } from "@/util/enabled-features";
 
 /**
  * Converts an enum value into a selectable option with a title case name.
@@ -223,9 +222,7 @@ export function settingsTabOptions(): SelectOption[] {
     createEnumOption(SettingsTabTypes.upload, "Data Upload"),
     createEnumOption(SettingsTabTypes.integrations, "Data Integrations"),
     createEnumOption(SettingsTabTypes.artifacts, "Artifact Types"),
-    ...(ENABLED_FEATURES.ATTRIBUTES
-      ? [createEnumOption(SettingsTabTypes.attributes, "Custom Attributes")]
-      : []),
+    createEnumOption(SettingsTabTypes.attributes, "Custom Attributes"),
   ];
 }
 

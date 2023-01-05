@@ -2,8 +2,8 @@ import { defineStore } from "pinia";
 
 import {
   AttributeLayoutSchema,
-  AttributeSchema,
   AttributePositionSchema,
+  AttributeSchema,
   ProjectSchema,
 } from "@/types";
 import { removeMatches } from "@/util";
@@ -23,6 +23,10 @@ export const useAttributes = defineStore("attributes", {
      * Layouts for displaying this project's custom attributes.
      */
     attributeLayouts: [] as AttributeLayoutSchema[],
+    /**
+     * The index of the current layout selected for editing.
+     */
+    selectedLayout: 0,
   }),
   getters: {
     /**
@@ -36,6 +40,12 @@ export const useAttributes = defineStore("attributes", {
       );
 
       return layout?.positions || [];
+    },
+    /**
+     * @return The id of the selected layout.
+     */
+    selectedLayoutId(): string {
+      return this.attributeLayouts[this.selectedLayout]?.id || "";
     },
   },
   actions: {

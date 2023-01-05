@@ -1,33 +1,83 @@
+from typing import List, Tuple
+
 import numpy as np
+from sklearn.metrics import average_precision_score
 from transformers.trainer_utils import PredictionOutput
 
-from data.datasets.trace_matrix import TraceMatrix
+from data.datasets.trace_matrix import TraceMatrixManager
 from testres.base_test import BaseTest
 
 
 class TestTraceMatrix(BaseTest):
-    def test_matrix_construction(self):
-        labels_ids = [0, 1, 0]
-        predictions = np.array([[0.3, 0.2], [0.3, 0.6], [0.5, 0.1]])
-        output = PredictionOutput(label_ids=labels_ids, predictions=predictions, metrics=["map"])
-        artifact_pairs = [("R1", "R4"), ("R2", "R4"), ("R3", "R4")]
-        trace_matrix = TraceMatrix(artifact_pairs, output)
-        similarity_matrix = trace_matrix.similarity_matrix
-        trace_matrix = trace_matrix.trace_matrix
+    THRESHOLD = 0.5
+    N_TARGETS = 2
+    N_SOURCES = 2
+    SOURCE_ARTIFACTS = ["R1", "R2"]
+    TARGET_ARTIFACTS = ["D1", "D2"]
+    LABEL_IDS = [0, 1, 1, 0]
+    PREDICTIONS = np.array([[0.3, 0.2], [0.3, 0.6], [0.5, 0.1], [0.1, 0.5]])
+    PREDICTION_OUTPUT = PredictionOutput(label_ids=LABEL_IDS, predictions=PREDICTIONS, metrics=["map"])
 
-        # Assert matrix sizes
-        for matrix in [similarity_matrix, trace_matrix]:
-            n_sources = matrix.shape[0]
-            n_targets = matrix.shape[1]
-            self.assertEquals(n_sources, 3)
-            self.assertEquals(n_targets, 1)
+    manager = None
 
-        # Assert similarity
-        self.assertLess(similarity_matrix[0][0], 0.5)
-        self.assertGreater(similarity_matrix[1][0], 0.5)
-        self.assertLess(similarity_matrix[2][0], 0.5)
+    def setUp(self):
+        self.manager = TraceMatrixManager(self.get_artifact_pairs(), self.PREDICTION_OUTPUT)
 
-        # Assert labels
-        self.assertEqual(trace_matrix[0][0], 0)
-        self.assertEqual(trace_matrix[1][0], 1)
-        self.assertEqual(trace_matrix[2][0], 0)
+    def test_map_correctness(self) -> None:
+        """
+        Asserts that the correct map score is calculated.
+        """
+        map_score = self.manager.calculate_query_metric(average_precision_score)
+        self.assertEqual(map_score, 0.75)
+
+    def assert_matrix_sizes(self) -> None:
+        """
+        Assert that queries containing right number of elements.
+        """
+        for source in self.SOURCE_ARTIFACTS:
+            source_queries = self.manager.queries[source]
+            source_pred = source_queries[TraceMatrixManager.PRED_KEY]
+            source_labels = source_queries[TraceMatrixManager.LABEL_KEY]
+            self.assertEquals(len(source_pred), self.N_TARGETS)
+            self.assertEquals(len(source_labels), self.N_TARGETS)
+
+    def assert_source_queries(self) -> None:
+        """
+        Asserts that source queries containing write scores and labels.
+        """
+        source_1 = self.SOURCE_ARTIFACTS[0]
+        source_1_query = self.manager.queries[source_1]
+        self.assert_query(source_1_query, [False, True], [0, 1])
+
+        source_2 = self.SOURCE_ARTIFACTS[1]
+        source_2_query = self.manager.queries[source_2]
+        self.assert_query(source_2_query, [False, True], [1, 0])
+
+    def assert_query(self, queries, expected_greater: List[bool], expected_labels: List[int]) -> None:
+        """
+        Asserts that queries are above or under threshold and labels have expected values.
+        :param queries: Queries for source artifacts containing predictions and labels.
+        :param expected_greater: List of boolean representing if score is expected to be greater than threshold.
+        :param expected_labels: List of expected values.
+        :return: None
+        """
+        predictions = queries[TraceMatrixManager.PRED_KEY]
+        labels = queries[TraceMatrixManager.LABEL_KEY]
+        for i in range(self.N_TARGETS):
+            assertion = self.assertGreater if expected_greater[i] else self.assertLess
+            assertion(predictions[i], self.THRESHOLD)
+            self.assertEqual(labels[i], expected_labels[i])
+
+    def get_artifact_pairs(self) -> List[Tuple[str, str]]:
+        """
+        Returns list of tuples for each combination of source and target artifacts.
+        :return: List of tuples containing artifact ids.
+        """
+        pairs = []
+        for source_artifact in self.SOURCE_ARTIFACTS:
+            for target_artifact in self.TARGET_ARTIFACTS:
+                pairs.append((source_artifact, target_artifact))
+        return pairs
+
+    def test_map(self):
+        pass

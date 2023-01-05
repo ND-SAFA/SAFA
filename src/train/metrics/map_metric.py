@@ -1,8 +1,10 @@
+from typing import Dict
+
 import datasets
 from sklearn.metrics import average_precision_score
 
 from config.constants import K_METRIC_DEFAULT
-from data.datasets.trace_matrix import TraceMatrix
+from data.datasets.trace_matrix import TraceMatrixManager
 from train.metrics.abstract_trace_metric import AbstractTraceMetric
 
 _DESCRIPTION = """
@@ -26,9 +28,12 @@ _CITATION = """
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
 class MapMetric(AbstractTraceMetric):
     name = "map"
+    MAP_KEY = "map"
+    AP_KEY = "ap"
 
     # TODO
-    def _compute(self, predictions, references, trace_matrix: TraceMatrix, k=K_METRIC_DEFAULT, **kwargs) -> float:
+    def _compute(self, predictions, references, trace_matrix: TraceMatrixManager, k=K_METRIC_DEFAULT,
+                 **kwargs) -> Dict:
         """
         computes the Mean Average Precision@K or the average precision over k for recommendations shown for different links
          and averages them over all queries in the data.
@@ -38,7 +43,12 @@ class MapMetric(AbstractTraceMetric):
         :param kwargs: any other necessary params
         :return: Mean Average Precision@K score.
         """
-        return trace_matrix.calculate_query_metric(average_precision_score)
+        map = trace_matrix.calculate_query_metric(average_precision_score)
+        ap = average_precision_score(references, predictions)
+        return {
+            self.MAP_KEY: map,
+            self.AP_KEY: ap
+        }
 
     def _info(self) -> datasets.MetricInfo:
         """

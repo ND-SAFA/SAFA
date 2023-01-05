@@ -9,8 +9,7 @@ from transformers.trainer import Trainer
 
 from data.datasets.dataset_role import DatasetRole
 from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
-from data.datasets.trace_matrix import TraceMatrix
-from jobs.components.job_result import JobResult
+from data.datasets.trace_matrix import TraceMatrixManager
 from models.model_manager import ModelManager
 from train.metrics.supported_trace_metric import get_metric_name, get_metric_path
 from train.trainer_args import TrainerArgs
@@ -63,7 +62,7 @@ class TraceTrainer(Trainer, BaseObject):
         self.eval_dataset = self.trainer_dataset_manager[dataset_role].to_trainer_dataset(self.model_manager)
         output = self.predict(self.eval_dataset)
         source_target_pairs = self.trainer_dataset_manager[dataset_role].get_source_target_pairs()
-        trace_matrix = TraceMatrix(source_target_pairs, output)
+        trace_matrix = TraceMatrixManager(source_target_pairs, output)
         results = self._eval(trace_matrix, output.label_ids, output.metrics,
                              self.trainer_args.metrics) if self.trainer_args.metrics else None
         output_dict = TraceTrainer.output_to_dict(output, metrics=results, predictions=trace_matrix.scores,
@@ -83,7 +82,7 @@ class TraceTrainer(Trainer, BaseObject):
         return {**base_output, **additional_attrs}
 
     @staticmethod
-    def _eval(trace_matrix: TraceMatrix, label_ids: np.ndarray, output_metrics: Dict,
+    def _eval(trace_matrix: TraceMatrixManager, label_ids: np.ndarray, output_metrics: Dict,
               metric_names: List) -> Dict:
         """
         Performs the evaluation of the model (use this instead of Trainer.evaluation to utilize predefined metrics from models)
@@ -93,10 +92,13 @@ class TraceTrainer(Trainer, BaseObject):
         """
         metric_paths = [get_metric_path(name) for name in metric_names]
         results = deepcopy(output_metrics)
+        trace_matrix_metrics = ["map"]
         for metric_path in metric_paths:
             metric = load_metric(metric_path, keep_in_memory=True)
-            metric_result = metric.compute(predictions=trace_matrix.scores, references=label_ids,
-                                           trace_matrix=trace_matrix)
+            args = {"predictions": trace_matrix.scores, "references": label_ids}
+            if metric.name in trace_matrix_metrics:
+                args["trace_matrix"] = trace_matrix
+            metric_result = metric.compute(**args)
             metric_name = get_metric_name(metric)
             if isinstance(metric_result, dict) and metric_name in metric_result:
                 results.update(metric_result)

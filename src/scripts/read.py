@@ -13,7 +13,7 @@ sys.path.append(ROOT_PATH)
 
 IGNORE = ["job_args", "trainer_args", "model_manager", "val_dataset_creator", "trainer_dataset_manager",
           "train_dataset"]
-COPY_PATHS = [["metrics", "map"], ["metrics", "f1"], ["metrics", "f2"], ["experimental_vars"]]
+COPY_PATHS = [["metrics", "map"], ["metrics", "ap"], ["metrics", "f1"], ["metrics", "f2"], ["experimental_vars"]]
 RQ_PATH = os.path.expanduser(os.environ["RQ_PATH"])
 
 if __name__ == "__main__":

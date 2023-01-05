@@ -1,4 +1,3 @@
-from collections import OrderedDict
 from typing import Dict, List, Optional, Type, Union
 
 from config.override import overrides
@@ -8,9 +7,9 @@ from data.datasets.creators.split_dataset_creator import SplitDatasetCreator
 from data.datasets.creators.supported_dataset_creator import SupportedDatasetCreator
 from data.datasets.dataset_role import DatasetRole
 from data.datasets.pre_train_dataset import PreTrainDataset
+from data.datasets.splitting.trace_dataset_splitter import TraceDatasetSplitter
 from data.datasets.trace_dataset import TraceDataset
 from data.processing.augmentation.data_augmenter import DataAugmenter
-from data.processing.augmentation.supported_data_augmentation_step import SupportedAugmentationStep
 from util.base_object import BaseObject
 from variables.undetermined_variable import UndeterminedVariable
 
@@ -131,16 +130,23 @@ class TrainerDatasetManager(BaseObject):
         :param dataset_creators_map: a map of dataset role to all dataset creators
         :return: a dictionary mapping dataset role to split for all split data
         """
-        dataset_percent_splits = OrderedDict({dataset_role: dataset_creator.val_percentage
-                                              for dataset_role, dataset_creator in dataset_creators_map.items()
-                                              if isinstance(dataset_creator, SplitDatasetCreator)})
+        split_roles = []
+        split_percentages = []
+        split_strategies = []
+        for dataset_role, dataset_creator in dataset_creators_map.items():
+            if isinstance(dataset_creator, SplitDatasetCreator):
+                split_roles.append(dataset_role)
+                split_percentages.append(dataset_creator.val_percentage)
+                split_strategies.append(dataset_creator.split_strategy)
+
         dataset_splits_map = {}
-        if len(dataset_percent_splits) < 1:
+        if len(split_roles) < 1:
             return dataset_splits_map
-        splits = train_dataset.split_multiple(list(dataset_percent_splits.values()))
+        splitter = TraceDatasetSplitter(train_dataset)
+        splits = splitter.split_multiple(split_percentages, split_strategies)
         train_dataset, split_datasets = splits[0], splits[1:]
         dataset_splits_map[DatasetRole.TRAIN] = train_dataset
-        for i, dataset_role in enumerate(dataset_percent_splits.keys()):
+        for i, dataset_role in enumerate(split_roles):
             dataset_splits_map[dataset_role] = split_datasets[i]
         return dataset_splits_map
 

@@ -2,7 +2,7 @@ import os
 import random
 from collections import OrderedDict
 from copy import deepcopy
-from typing import Callable, Dict, List, Sized, Tuple
+from typing import Callable, Dict, List, Tuple
 
 import pandas as pd
 
@@ -26,14 +26,7 @@ class TraceDataset(AbstractDataset):
         :param links: The candidate links.
         """
         self.links = OrderedDict(links)
-        self.pos_link_ids = []
-        self.neg_link_ids = []
-        for link in links.values():
-            if link.is_true_link:
-                self.pos_link_ids.append(link.id)
-            else:
-                self.neg_link_ids.append(link.id)
-
+        self.pos_link_ids, self.neg_link_ids = self.__create_pos_neg_links(links)
         self._shuffle_link_ids(self.pos_link_ids)
         self._shuffle_link_ids(self.neg_link_ids)
 
@@ -107,25 +100,6 @@ class TraceDataset(AbstractDataset):
         return [(self.links[link_id].source.id, self.links[link_id].target.id) for link_id in
                 self.pos_link_ids + self.neg_link_ids]
 
-    def split(self, percent_split: float) -> Tuple["TraceDataset", "TraceDataset"]:
-        """
-        Splits trace data into two, with latter containing percentage of links specified.
-        :param percent_split: The percent of links to include trace data.
-        :return: Tuple of two trace data.
-        """
-        first_slice = self._create_new_dataset_from_slice(percent_split, slice_num=1)
-        second_slice = self._create_new_dataset_from_slice(percent_split, slice_num=2)
-        return first_slice, second_slice
-
-    def split_multiple(self, percent_splits: List[float]) -> Tuple["TraceDataset"]:
-        """
-         Splits trace data into multiple data, with each part containing the corresponding percentage of links specified.
-         :param percent_splits: The percent of links to include trace data for each split.
-         :return: Tuple of trace data for each split specified
-         """
-        percent_splits = [1 - sum(percent_splits)] + percent_splits
-        return self._split_multiple_helper(percent_splits, splits=[self])
-
     def prepare_for_training(self, augmenter: DataAugmenter = None) -> None:
         """
         Resamples positive links and resizes negative links to create 50-50 ratio.
@@ -173,22 +147,6 @@ class TraceDataset(AbstractDataset):
         df = self.to_dataframe()
         df.to_csv(output_path)
         return output_path
-
-    def _split_multiple_helper(self, percent_splits: List, splits: List) -> Tuple["TraceDataset"]:
-        """
-        Recursive method to split a dataset into multiple parts fir all percentages provided
-        :param percent_splits: a list of all split percentages (should sum to 1)
-        :param splits: list of already split data (the last element should be the portion remaining to split)
-        :return: Tuple of trace data for each split specified
-        """
-        if len(percent_splits) <= 1:
-            return tuple(splits)
-        dataset_to_split = splits.pop()
-        total_percent_to_split = 1 - percent_splits.pop(0)
-        slices = dataset_to_split.split(total_percent_to_split)
-        splits.extend(slices)
-        updated_percent_splits = [percent_split / total_percent_to_split for percent_split in percent_splits]
-        return self._split_multiple_helper(updated_percent_splits, splits)
 
     def _get_data_entries_for_augmentation(self) -> Tuple[List[TraceLink], List[Tuple[str, str]]]:
         """
@@ -258,20 +216,6 @@ class TraceDataset(AbstractDataset):
         reduction_func = random.choices if include_duplicates else random.sample
         return reduction_func(data, k=new_length)
 
-    def _create_new_dataset_from_slice(self, percent_split: float, slice_num: int) -> "TraceDataset":
-        """
-        Creates a new trace data from the slice defined by the percent split.
-        :param percent_split: The percentage of links included in second slice.
-        :param slice_num: Whether to return first or second slice.
-        :return:
-        """
-        slice_pos_link_ids = TraceDataset._get_data_split(self.pos_link_ids, percent_split, slice_num == 2)
-        slice_neg_link_ids = TraceDataset._get_data_split(self.neg_link_ids, percent_split, slice_num == 2)
-        slice_links = {
-            link_id: self.links[link_id] for link_id in slice_pos_link_ids + slice_neg_link_ids
-        }
-        return TraceDataset(slice_links)
-
     def _get_feature_entry(self, link: TraceLink, arch_type: ModelArchitectureType, feature_func: Callable) \
             -> Dict[str, any]:
         """
@@ -312,26 +256,20 @@ class TraceDataset(AbstractDataset):
         random.shuffle(link_ids)
 
     @staticmethod
-    def _get_data_split(data: List, percent_split: float, for_second_split: bool = False) -> List:
+    def __create_pos_neg_links(links: Dict[int, TraceLink]):
         """
-        Splits the data and returns the split
-        :param data: a list of the data
-        :param percent_split: The percentage of samples in second split.
-        :param for_second_split: If True, returns the second portion.
-        :return: the subsection of the data in the split
+        Generates the list of positive and negative link ids.
+        :param links: Dictionary of links to their ids.
+        :return: Tuple containing positive link ids and negative link ids.
         """
-        split_size = TraceDataset._get_first_split_size(data, percent_split)
-        return data[split_size:] if for_second_split else data[:split_size]
-
-    @staticmethod
-    def _get_first_split_size(data: Sized, percent_split: float) -> int:
-        """
-        Gets the size of the data for the first split
-        :param data: a list of the data
-        :param percent_split: The percentage of samples in second split.
-        :return: the size of the data split
-        """
-        return len(data) - round(len(data) * percent_split)
+        pos_link_ids = []
+        neg_link_ids = []
+        for link in links.values():
+            if link.is_true_link:
+                pos_link_ids.append(link.id)
+            else:
+                neg_link_ids.append(link.id)
+        return pos_link_ids, neg_link_ids
 
     def __len__(self) -> int:
         """

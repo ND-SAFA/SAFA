@@ -92,10 +92,13 @@ class TraceTrainer(Trainer, BaseObject):
         """
         metric_paths = [get_metric_path(name) for name in metric_names]
         results = deepcopy(output_metrics)
+        trace_matrix_metrics = ["map"]
         for metric_path in metric_paths:
             metric = load_metric(metric_path, keep_in_memory=True)
-            metric_result = metric.compute(predictions=trace_matrix.scores, references=label_ids,
-                                           trace_matrix=trace_matrix)
+            args = {"predictions": trace_matrix.scores, "references": label_ids}
+            if metric.name in trace_matrix_metrics:
+                args["trace_matrix"] = trace_matrix
+            metric_result = metric.compute(**args)
             metric_name = get_metric_name(metric)
             if isinstance(metric_result, dict) and metric_name in metric_result:
                 results.update(metric_result)

@@ -23,6 +23,13 @@ class TestTraceMatrix(BaseTest):
     def setUp(self):
         self.manager = TraceMatrixManager(self.get_artifact_pairs(), self.PREDICTION_OUTPUT)
 
+    def test_map_correctness(self) -> None:
+        """
+        Asserts that the correct map score is calculated.
+        """
+        map_score = self.manager.calculate_query_metric(average_precision_score)
+        self.assertEqual(map_score, 0.75)
+
     def assert_matrix_sizes(self) -> None:
         """
         Assert that queries containing right number of elements.
@@ -45,13 +52,6 @@ class TestTraceMatrix(BaseTest):
         source_2 = self.SOURCE_ARTIFACTS[1]
         source_2_query = self.manager.queries[source_2]
         self.assert_query(source_2_query, [False, True], [1, 0])
-
-    def test_map_correctness(self) -> None:
-        """
-        Asserts that the correct map score is calculated.
-        """
-        map_score = self.manager.calculate_query_metric(average_precision_score)
-        self.assertEqual(map_score, 0.75)
 
     def assert_query(self, queries, expected_greater: List[bool], expected_labels: List[int]) -> None:
         """
@@ -78,3 +78,6 @@ class TestTraceMatrix(BaseTest):
             for target_artifact in self.TARGET_ARTIFACTS:
                 pairs.append((source_artifact, target_artifact))
         return pairs
+
+    def test_map(self):
+        pass

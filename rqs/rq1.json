@@ -48,7 +48,7 @@
             }
           },
           "trainer_args": {
-            "output_dir": "[OUTPUT_PATH]/lhp/rq1/models",
+            "output_dir": "[OUTPUT_PATH]/rq1/models",
             "train_epochs_range": [
               1,
               21,
@@ -93,5 +93,5 @@
       ]
     }
   ],
-  "output_dir": "[OUTPUT_PATH]/lhp/rq1/jobs"
+  "output_dir": "[OUTPUT_PATH]/rq1/jobs"
 }

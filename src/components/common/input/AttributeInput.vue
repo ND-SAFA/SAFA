@@ -160,22 +160,30 @@ export default Vue.extend({
     /**
      * Creates an error when an integer has a float value.
      */
-    intRules(): (value: string | undefined) => string | true {
-      return (value) =>
-        value?.includes(".") ? "Must be a valid integer." : true;
+    intRules(): (value: string | number | undefined) => string | true {
+      return (value) => {
+        if (value === undefined || value === "") {
+          return true;
+        } else {
+          const strValue = typeof value === "string" ? value : String(value);
+
+          return strValue.includes(".") ? "Must be a valid integer." : true;
+        }
+      };
     },
     /**
      * Creates an error when a number is not within bounds.
      */
-    numRules(): (value: string | undefined) => string | true {
+    numRules(): (value: string | number | undefined) => string | true {
       return (value) => {
         const { min = null, max = null } = this.attribute;
+        const numValue = typeof value === "string" ? parseFloat(value) : value;
 
-        if (!value) {
+        if (numValue === undefined || isNaN(numValue)) {
           return true;
-        } else if (max !== null && parseFloat(value) > max) {
+        } else if (max !== null && numValue > max) {
           return `Value is greater than ${max}.`;
-        } else if (min !== null && parseFloat(value) < min) {
+        } else if (min !== null && numValue < min) {
           return `Value is less than ${min}.`;
         } else {
           return true;

@@ -1,5 +1,6 @@
 import os
 import random
+import sys
 import threading
 import traceback
 import uuid
@@ -54,6 +55,7 @@ class AbstractJob(threading.Thread, BaseObject):
         if self.save_job_output and self.job_args.output_dir:
             self.save(self.job_args.output_dir)
         self.cleanup()
+        sys.exit()
 
     def cleanup(self) -> None:
         """

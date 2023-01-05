@@ -1,10 +1,10 @@
-from typing import Dict, Optional, List
+from typing import Dict, List, Optional
 
+from torch.nn.parameter import Parameter
 from transformers import AutoConfig
 from transformers.modeling_utils import PreTrainedModel
 from transformers.models.auto.tokenization_auto import AutoTokenizer
 from transformers.tokenization_utils import PreTrainedTokenizer
-from torch.nn.parameter import Parameter
 
 from config.constants import MAX_SEQ_LENGTH_DEFAULT
 from models.model_properties import ModelArchitectureType, ModelSize, ModelTask
@@ -68,6 +68,7 @@ class ModelManager(BaseObject):
         :return: the Tokenizer
         """
         if self.__tokenizer is None:
+            print("TOKENIZER:", self.model_path)
             self.__tokenizer = AutoTokenizer.from_pretrained(self.model_path)
         return self.__tokenizer
 

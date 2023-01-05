@@ -14,6 +14,7 @@ class TrainJob(AbstractTraceJob):
         training_output = trainer.perform_training(
             self.trainer_args.checkpoint_path)  # will also switch dataset in val to eval if present.
         trainer.save_model(self.model_manager.model_output_path)
+        print("SAVED:", self.model_manager.model_output_path)
         if DatasetRole.VAL in self.trainer_dataset_manager:
             val_metrics = trainer.perform_prediction(DatasetRole.VAL)
             training_output[JobResult.METRICS].update(val_metrics[JobResult.METRICS])

@@ -52,10 +52,10 @@ class AbstractJob(threading.Thread, BaseObject):
             self.result[JobResult.TRACEBACK] = traceback.format_exc()
             self.result[JobResult.EXCEPTION] = str(e)
             self.result.set_job_status(Status.FAILURE)
+            sys.exit()
         if self.save_job_output and self.job_args.output_dir:
             self.save(self.job_args.output_dir)
         self.cleanup()
-        sys.exit()
 
     def cleanup(self) -> None:
         """

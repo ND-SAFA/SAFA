@@ -273,7 +273,8 @@ class TraceDataset(AbstractDataset):
             else:
                 queries[source_id] = [link]
         source_names = list(queries.keys())
-        split_size = round(len(self.links.values()) * percent_split)
+        slice_percent_split = 1 - percent_split if slice_num == 1 else percent_split
+        split_size = round(len(self.links.values()) * slice_percent_split)
         random.shuffle(source_names)
         sorted_queries = {k: v for k, v in
                           sorted(queries.items(), key=lambda item: len(item[1]), reverse=slice_num == 1)}

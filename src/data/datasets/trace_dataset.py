@@ -275,7 +275,8 @@ class TraceDataset(AbstractDataset):
         source_names = list(queries.keys())
         split_size = TraceDataset._get_first_split_size(self.links.values(), percent_split)
         random.shuffle(source_names)
-        sorted_queries = {k: v for k, v in sorted(queries.items(), key=lambda item: len(item[1]), reverse=True)}
+        sorted_queries = {k: v for k, v in
+                          sorted(queries.items(), key=lambda item: len(item[1]), reverse=slice_num == 2)}
         source_split_one = []
         source_split_two = []
         count = 0

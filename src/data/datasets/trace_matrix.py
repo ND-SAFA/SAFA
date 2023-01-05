@@ -35,15 +35,9 @@ class TraceMatrixManager:
         for source, query in self.queries.items():
             query_predictions = query[self.PRED_KEY]
             query_labels = query[self.LABEL_KEY]
-            query_map = metric(query_labels, query_predictions)
-            print("-" * 15)
-            results = list(zip(query_labels, query_predictions))
-            res = sorted(results, key=lambda x: x[1], reverse=True)
-            print([a for a, b in res])
-            print([b for a, b in res])
-            print(query_map)
-            if not np.isnan(query_map):
-                metric_values.append(query_map)
+            query_metric = metric(query_labels, query_predictions)
+            if not np.isnan(query_metric):
+                metric_values.append(query_metric)
         return sum(metric_values) / len(metric_values)
 
     @staticmethod

@@ -284,16 +284,16 @@ public class AttributeService {
 
         if (isNew) {
             if (serviceProvider.getCustomAttributeRepository().existsByProjectAndKeyname(project, appEntity.getKey())) {
-                throw new SafaError(String.format("Attribute with the name %s already exists within this project.",
-                    appEntity.getKey()));
+                throw new SafaError("Attribute with the name %s already exists within this project.",
+                    appEntity.getKey());
             }
         } else {
             Optional<CustomAttribute> oldAttributeOpt = serviceProvider.getCustomAttributeRepository()
                 .findByProjectAndKeyname(project, appEntity.getKey());
 
             if (oldAttributeOpt.isEmpty()) {
-                throw new SafaError(String.format("Attribute with the name %s doesn't exist within this project.",
-                    appEntity.getKey()));
+                throw new SafaError("Attribute with the name %s doesn't exist within this project.",
+                    appEntity.getKey());
             }
 
             checkModifiedValues(newAttribute, oldAttributeOpt.get());
@@ -316,7 +316,7 @@ public class AttributeService {
             throw new SafaError("Cannot modify keyname.");
         }
         if (newAttribute.getType() != oldAttribute.getType()) {
-            throw new SafaError("Cannot modify type."); //TODO some type modifications are allowed
+            throw new SafaError("Cannot modify type."); //TODO some type modifications might later be allowed
         }
     }
 

@@ -40,15 +40,15 @@ public enum CustomAttributeStorageType {
     final BiFunction<AttributeSystemServiceProvider, ArtifactAttributeVersion, JsonNode> jsonValueRetriever;
 
     /**
-     * Converts a list of string attribute values to a json array node.
+     * Converts a list of attribute values to a json array node.
      *
-     * @param stringArrayAttributeValues String array attribute values to put into a json array.
+     * @param attributeValues List of attribute values to put into a json array.
      * @return A json array node containing the given values.
      */
-    private static JsonNode toJsonArray(List<StringArrayAttributeValue> stringArrayAttributeValues) {
-        List<JsonNode> childNodes = stringArrayAttributeValues
+    private static JsonNode toJsonArray(List<? extends IAttributeValue> attributeValues) {
+        List<JsonNode> childNodes = attributeValues
                 .stream()
-                .map(StringArrayAttributeValue::getValueAsJsonNode)
+                .map(IAttributeValue::getValueAsJsonNode)
                 .collect(Collectors.toList());
 
         return new ArrayNode(JsonNodeFactory.instance, childNodes);

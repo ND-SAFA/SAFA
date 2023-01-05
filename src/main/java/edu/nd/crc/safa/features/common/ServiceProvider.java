@@ -6,7 +6,6 @@ import edu.nd.crc.safa.features.artifacts.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepositoryImpl;
 import edu.nd.crc.safa.features.artifacts.services.ArtifactService;
-import edu.nd.crc.safa.features.attributes.repositories.layouts.AttributeLayoutRepository;
 import edu.nd.crc.safa.features.attributes.services.AttributeLayoutService;
 import edu.nd.crc.safa.features.attributes.services.AttributeService;
 import edu.nd.crc.safa.features.attributes.services.AttributeValueService;
@@ -101,7 +100,6 @@ public class ServiceProvider {
     // Custom Attributes
     private final AttributeService attributeService;
     private final AttributeValueService attributeValueService;
-    private final AttributeLayoutRepository attributeLayoutRepository;
     private final AttributeLayoutService attributeLayoutService;
 
     //Traces

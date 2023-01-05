@@ -24,8 +24,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-//TODO send notifications
-
 @RestController
 public class AttributeController extends BaseController  {
 
@@ -65,7 +63,7 @@ public class AttributeController extends BaseController  {
 
         Project project = this.resourceBuilder.fetchProject(projectId).withEditProject();
 
-        if (appEntity.getKey().isBlank()) {
+        if (appEntity.getKey() == null || appEntity.getKey().isBlank()) {
             throw new SafaError("Attribute key cannot be blank");
         }
 
@@ -95,7 +93,7 @@ public class AttributeController extends BaseController  {
         Optional<CustomAttribute> attr = attributeService.getByProjectAndKeyname(project, key);
 
         if (attr.isEmpty()) {
-            throw new SafaError(String.format("No attribute named %s in project.", key));
+            throw new SafaError("No attribute named %s in project.", key);
         }
 
         return attributeService.appEntityFromCustomAttribute(attr.get());
@@ -120,7 +118,7 @@ public class AttributeController extends BaseController  {
             throw new SafaError("Attribute key cannot be blank");
         }
 
-        if (!appEntity.getKey().equals(key)) {
+        if (!key.equals(appEntity.getKey())) {
             throw new SafaError("Cannot change attribute key.");
         }
 

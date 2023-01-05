@@ -37,7 +37,7 @@ public class AttributeValueService {
 
     /**
      * Gets a map with all the custom attributes that are set for this artifact. The map
-     * goes from keyname to string value.
+     * goes from keyname to json nodes containing the values.
      *
      * @param artifactVersion The artifact version we're looking at.
      * @return A map from attribute keynames to values.
@@ -60,7 +60,7 @@ public class AttributeValueService {
     }
 
     /**
-     * Saves the given string as the value of the given attribute within the given version
+     * Saves the given json node as the value of the given attribute within the given version
      * of the given artifact.
      *
      * @param attribute The schema of the attribute we are saving a value to.
@@ -103,7 +103,7 @@ public class AttributeValueService {
     }
 
     /**
-     * Saves the given strings as the values of the given attributes within the given version
+     * Saves the given json nodes as the values of the given attributes within the given version
      * of the given artifact.
      *
      * @param artifactVersion The version of the artifact we are setting a value within.

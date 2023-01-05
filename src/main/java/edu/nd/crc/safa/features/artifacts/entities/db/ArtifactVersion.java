@@ -130,6 +130,15 @@ public class ArtifactVersion implements Serializable, IVersionEntity<ArtifactApp
         return this.artifact.getType().getName();
     }
 
+    /**
+     * Adds a custom attribute value to this ArtifactVersion object. This does NOT associate this
+     * custom attribute value with this artifact version in the database. It is merely a convenience so
+     * that all attribute values associated with this artifact version can be stored in a single
+     * object temporarily while this object is in flight.
+     *
+     * @param keyname The key for the attribute.
+     * @param value The value of the attribute as a json node.
+     */
     public void addCustomAttributeValue(String keyname, JsonNode value) {
         customAttributeValues.put(keyname, value);
     }

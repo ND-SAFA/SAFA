@@ -12,6 +12,7 @@ import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.features.artifacts.entities.db.FTAArtifact;
 import edu.nd.crc.safa.features.artifacts.entities.db.SafetyCaseArtifact;
+import edu.nd.crc.safa.features.attributes.services.AttributeValueService;
 import edu.nd.crc.safa.features.commits.repositories.GenericVersionRepository;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
@@ -26,10 +27,9 @@ import edu.nd.crc.safa.features.traces.repositories.TraceLinkVersionRepository;
 import edu.nd.crc.safa.features.types.ArtifactType;
 import edu.nd.crc.safa.features.versions.VersionCalculator;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
-import edu.nd.crc.safa.utilities.JsonFileUtilities;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -62,11 +62,19 @@ public class ArtifactVersionRepositoryImpl
     @Autowired
     TraceLinkVersionRepository traceLinkVersionRepository;
 
+    @Autowired
+    AttributeValueService attributeValueService;
+
     VersionCalculator versionCalculator = new VersionCalculator();
 
     @Override
     public ArtifactVersion save(ArtifactVersion artifactVersion) {
-        return this.artifactVersionRepository.save(artifactVersion);
+        ArtifactVersion version = this.artifactVersionRepository.save(artifactVersion);
+
+        attributeValueService.saveAllAttributeValues(artifactVersion,
+            artifactVersion.getCustomAttributeValues());
+
+        return version;
     }
 
     @Override
@@ -80,15 +88,19 @@ public class ArtifactVersionRepositoryImpl
                 ModificationType.REMOVED,
                 artifact,
                 "",
-                "",
                 "");
         }
-        return new ArtifactVersion(projectVersion,
+        ArtifactVersion artifactVersion = new ArtifactVersion(projectVersion,
             modificationType,
             artifact,
             artifactAppEntity.getSummary(),
-            artifactAppEntity.getBody(),
-            JsonFileUtilities.toJson(artifactAppEntity.getCustomFields()).toString());
+            artifactAppEntity.getBody());
+
+        for (Map.Entry<String, JsonNode> entry : artifactAppEntity.getAttributes().entrySet()) {
+            artifactVersion.addCustomAttributeValue(entry.getKey(), entry.getValue());
+        }
+
+        return artifactVersion;
     }
 
     @Override
@@ -109,8 +121,10 @@ public class ArtifactVersionRepositoryImpl
 
     @Override
     public Optional<ArtifactVersion> findExistingVersionEntity(ArtifactVersion artifactVersion) {
-        return this.artifactVersionRepository
-            .findByProjectVersionAndArtifactName(artifactVersion.getProjectVersion(), artifactVersion.getName());
+        Optional<ArtifactVersion> version = this.artifactVersionRepository
+                .findByProjectVersionAndArtifactName(artifactVersion.getProjectVersion(), artifactVersion.getName());
+        version.ifPresent(this::attachCustomAttributesToArtifactVersion);
+        return version;
     }
 
     @Override
@@ -120,12 +134,16 @@ public class ArtifactVersionRepositoryImpl
 
     @Override
     public List<ArtifactVersion> retrieveVersionEntitiesByProject(Project project) {
-        return artifactVersionRepository.findByProjectVersionProject(project);
+        List<ArtifactVersion> versions = artifactVersionRepository.findByProjectVersionProject(project);
+        versions.forEach(this::attachCustomAttributesToArtifactVersion);
+        return versions;
     }
 
     @Override
     public List<ArtifactVersion> retrieveVersionEntitiesByBaseEntity(Artifact artifact) {
-        return artifactVersionRepository.findByArtifact(artifact);
+        List<ArtifactVersion> versions = artifactVersionRepository.findByArtifact(artifact);
+        versions.forEach(this::attachCustomAttributesToArtifactVersion);
+        return versions;
     }
 
     @Override
@@ -137,10 +155,7 @@ public class ArtifactVersionRepositoryImpl
     public ArtifactAppEntity retrieveAppEntityFromVersionEntity(ArtifactVersion artifactVersion) {
         // Step 1 - Create base entity information
 
-        ProjectVersion projectVersion = artifactVersion.getProjectVersion();
-        TypeReference<Map<String, String>> typeReference = new TypeReference<Map<String, String>>() {
-        };
-        Map<String, String> customFields = JsonFileUtilities.parse(artifactVersion.getCustomFields(), typeReference);
+        attachCustomAttributesToArtifactVersion(artifactVersion);
 
         ArtifactAppEntity artifactAppEntity =
             new ArtifactAppEntity(artifactVersion.getArtifact().getArtifactId(),
@@ -149,7 +164,7 @@ public class ArtifactVersionRepositoryImpl
                 artifactVersion.getSummary(),
                 artifactVersion.getContent(),
                 artifactVersion.getArtifact().getDocumentType(),
-                customFields);
+                artifactVersion.getCustomAttributeValues());
 
         // Step 2 - Attach document links
         attachDocumentLinks(artifactVersion, artifactAppEntity);
@@ -174,6 +189,12 @@ public class ArtifactVersionRepositoryImpl
         }
 
         artifactAppEntity.setDocumentIds(documentIds);
+    }
+
+    private void attachCustomAttributesToArtifactVersion(ArtifactVersion artifactVersion) {
+        Map<String, JsonNode> customFields =
+                attributeValueService.getCustomAttributeValuesForArtifact(artifactVersion);
+        customFields.forEach(artifactVersion::addCustomAttributeValue);
     }
 
     private void attachDocumentNodeInformation(ArtifactAppEntity artifactAppEntity, Artifact artifact) {

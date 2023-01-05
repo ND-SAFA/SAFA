@@ -1,24 +1,27 @@
 package features.artifacts.properties;
 
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
+import edu.nd.crc.safa.features.attributes.entities.CustomAttributeType;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.delta.entities.app.EntityDelta;
 import edu.nd.crc.safa.features.delta.entities.app.ModifiedEntity;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import builders.CommitBuilder;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import common.ApplicationBaseTest;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 class TestArtifactCustomFields extends ApplicationBaseTest {
 
@@ -41,6 +44,7 @@ class TestArtifactCustomFields extends ApplicationBaseTest {
 
         ProjectVersion projectVersion = this.dbEntityBuilder
             .newProject(projectName)
+            .newCustomAttribute(projectName, CustomAttributeType.TEXT, fieldName, fieldName)
             .newVersionWithReturn(projectName);
 
         // Step - Create artifact json
@@ -52,7 +56,7 @@ class TestArtifactCustomFields extends ApplicationBaseTest {
         // Step - Add custom fields
         JSONObject customFields = new JSONObject();
         customFields.put(fieldName, fieldValue);
-        artifactJson.put("customFields", customFields);
+        artifactJson.put("attributes", customFields);
 
         // Step - Save added artifact
         ProjectCommit commit = commitService.commit(CommitBuilder
@@ -70,16 +74,16 @@ class TestArtifactCustomFields extends ApplicationBaseTest {
         // VP - Verify that custom fields persisted
         ArtifactAppEntity appEntity =
             artifactVersionRepository.retrieveAppEntitiesByProjectVersion(projectVersion).get(0);
-        Map<String, String> customFieldsResponse = appEntity.getCustomFields();
+        Map<String, JsonNode> customFieldsResponse = appEntity.getAttributes();
         assertThat(customFieldsResponse)
             .hasSize(1)
-            .containsEntry(fieldName, fieldValue);
+            .containsEntry(fieldName, TextNode.valueOf(fieldValue));
 
         // Step - Create second version
         ProjectVersion afterVersion = this.dbEntityBuilder.newVersionWithReturn(projectName);
 
         // Step - Add new field to `customFields`
-        artifact.getCustomFields().put(fieldName, newFieldValue);
+        artifact.getAttributes().put(fieldName, TextNode.valueOf(newFieldValue));
         commitService.commit(CommitBuilder.withVersion(afterVersion).withModifiedArtifact(artifact));
 
         // Step - Get delta
@@ -90,9 +94,9 @@ class TestArtifactCustomFields extends ApplicationBaseTest {
         // VP - Verify change detected
         assertThat(modifiedArtifacts).containsKey(artifactId);
         ModifiedEntity<ArtifactAppEntity> modifiedArtifactEntity = modifiedArtifacts.get(artifactId);
-        String beforeValue = modifiedArtifactEntity.getBefore().getCustomFields().get(fieldName);
-        String afterValue = modifiedArtifactEntity.getAfter().getCustomFields().get(fieldName);
-        assertThat(beforeValue).isEqualTo(fieldValue);
-        assertThat(afterValue).isEqualTo(newFieldValue);
+        JsonNode beforeValue = modifiedArtifactEntity.getBefore().getAttributes().get(fieldName);
+        JsonNode afterValue = modifiedArtifactEntity.getAfter().getAttributes().get(fieldName);
+        assertThat(beforeValue).isEqualTo(TextNode.valueOf(fieldValue));
+        assertThat(afterValue).isEqualTo(TextNode.valueOf(newFieldValue));
     }
 }

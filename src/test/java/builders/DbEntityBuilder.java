@@ -15,6 +15,9 @@ import edu.nd.crc.safa.features.artifacts.repositories.ArtifactRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactTypeRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepositoryImpl;
+import edu.nd.crc.safa.features.attributes.entities.CustomAttributeType;
+import edu.nd.crc.safa.features.attributes.entities.db.definitions.CustomAttribute;
+import edu.nd.crc.safa.features.attributes.repositories.definitions.CustomAttributeRepository;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
@@ -64,6 +67,8 @@ public class DbEntityBuilder extends AbstractBuilder {
     private final ProjectMembershipRepository projectMembershipRepository;
     private final ArtifactVersionRepositoryImpl artifactVersionRepositoryImpl;
     private final ProjectService projectService;
+    private final CustomAttributeRepository customAttributeRepository;
+
     Map<String, Project> projects;
     Map<String, Map<Integer, ProjectVersion>> versions;
     Map<String, Map<String, Document>> documents;
@@ -74,7 +79,7 @@ public class DbEntityBuilder extends AbstractBuilder {
     SafaUser currentUser;
 
     @Autowired
-    public DbEntityBuilder(ServiceProvider serviceProvider) {
+    public DbEntityBuilder(ServiceProvider serviceProvider, CustomAttributeRepository customAttributeRepository) {
         this.projectRepository = serviceProvider.getProjectRepository();
         this.projectService = serviceProvider.getProjectService();
         this.projectVersionRepository = serviceProvider.getProjectVersionRepository();
@@ -87,6 +92,7 @@ public class DbEntityBuilder extends AbstractBuilder {
         this.traceLinkVersionRepository = serviceProvider.getTraceLinkVersionRepository();
         this.projectMembershipRepository = serviceProvider.getProjectMembershipRepository();
         this.artifactVersionRepositoryImpl = serviceProvider.getArtifactVersionRepositoryImpl();
+        this.customAttributeRepository = customAttributeRepository;
         DbEntityBuilder.instance = this;
     }
 
@@ -110,6 +116,7 @@ public class DbEntityBuilder extends AbstractBuilder {
         this.artifactTypeRepository.deleteAll();
         this.artifactRepository.deleteAll();
         this.artifactVersionRepository.deleteAll();
+        this.customAttributeRepository.deleteAll();
         this.revisionNumber = 1;
     }
 
@@ -209,6 +216,21 @@ public class DbEntityBuilder extends AbstractBuilder {
         return this.artifactTypes.get(projectName).containsKey(typeName);
     }
 
+    public DbEntityBuilder newCustomAttribute(String projectName, CustomAttributeType type, String label, String key) {
+        newCustomAttributeWithReturn(projectName, type, label, key);
+        return this;
+    }
+
+    public CustomAttribute newCustomAttributeWithReturn(String projectName, CustomAttributeType type, String label, String key) {
+        Project project = getProject(projectName);
+        CustomAttribute field = new CustomAttribute();
+        field.setProject(project);
+        field.setType(type);
+        field.setLabel(label);
+        field.setKeyname(key);
+        return this.customAttributeRepository.save(field);
+    }
+
     public Artifact newArtifactWithReturn(String projectName, String typeName, String artifactName) {
         return this.newArtifact(projectName, typeName, artifactName).getArtifact(projectName, artifactName);
     }
@@ -287,8 +309,7 @@ public class DbEntityBuilder extends AbstractBuilder {
             modificationType,
             artifact,
             summary,
-            content,
-            "{}");
+            content);
         this.artifactVersionRepository.save(artifactVersion);
         addArtifactBody(bodies, projectName, artifactName, versionIndex, artifactVersion);
         return this;

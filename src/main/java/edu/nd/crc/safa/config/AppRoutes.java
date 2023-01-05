@@ -35,6 +35,18 @@ public class AppRoutes {
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class Attribute {
+        public static final String ROOT = Projects.BY_ID + "/attributes";
+        public static final String BY_KEY = ROOT + "/{key}";
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class AttributeLayout {
+        public static final String ROOT = Projects.BY_ID + "/attribute-layouts";
+        public static final String BY_ID = ROOT + "/{id}";
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Commits {
         public static final String COMMIT_CHANGE = Projects.ROOT + "/versions/{versionId}/commit";
     }

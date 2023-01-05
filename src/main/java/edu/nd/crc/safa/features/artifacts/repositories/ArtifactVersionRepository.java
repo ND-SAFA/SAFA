@@ -15,7 +15,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ArtifactVersionRepository extends CrudRepository<ArtifactVersion, UUID>,
-    IVersionRepository<ArtifactVersion, ArtifactAppEntity> {
+        IVersionRepository<ArtifactVersion, ArtifactAppEntity> {
 
     List<ArtifactVersion> findByArtifact(Artifact artifact);
 

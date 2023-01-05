@@ -1,20 +1,17 @@
 package requests;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+import javax.servlet.http.Cookie;
 
 import edu.nd.crc.safa.utilities.JsonFileUtilities;
 
-import javax.servlet.http.Cookie;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.http.MediaType;
@@ -24,6 +21,12 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Responsible for sending request and parsing responses
@@ -115,6 +118,10 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
         );
     }
 
+    public JSONObject putWithJsonObject(Object body) throws Exception {
+        return putWithJsonObject(body, status().is2xxSuccessful());
+    }
+
     public <T> T postWithResponseParser(Object body,
                                         Function<String, T> responseParser,
                                         ResultMatcher resultMatcher) throws Exception {
@@ -158,6 +165,49 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
 
     public JSONObject getWithoutBody(ResultMatcher resultMatcher) throws Exception {
         return makeAsyncRequestWithoutBody(get(this.buildEndpoint()), resultMatcher);
+    }
+
+    public <T> T getWithResponseParser(Function<String, T> responseParser,
+                                       ResultMatcher resultMatcher) throws Exception {
+        return getWithResponseParser(
+                responseParser,
+                resultMatcher,
+                SafaRequest.authorizationToken
+        );
+    }
+
+    public <T> T getWithResponseParser(Function<String, T> responseParser) throws Exception {
+        return getWithResponseParser(
+                responseParser,
+                status().is2xxSuccessful()
+        );
+    }
+
+    public <T> T getAsType(TypeReference<T> typeReference) throws Exception {
+        return getWithResponseParser(
+                string -> this.jacksonParse(string, typeReference),
+                status().is2xxSuccessful()
+        );
+    }
+
+    private <T> T jacksonParse(String string, TypeReference<T> typeReference) {
+        try {
+            return new ObjectMapper().readValue(string, typeReference);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private <T> T getWithResponseParser(Function<String, T> responseParser,
+                                        ResultMatcher resultMatcher,
+                                        Cookie localAuthorizationToken
+    ) throws Exception {
+        return sendAuthenticatedRequest(
+                get(this.buildEndpoint()),
+                resultMatcher,
+                localAuthorizationToken,
+                responseParser
+        );
     }
 
     public JSONObject makeAsyncRequestWithoutBody(MockHttpServletRequestBuilder request,

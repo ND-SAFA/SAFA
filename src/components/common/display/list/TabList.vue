@@ -1,16 +1,14 @@
 <template>
   <div>
-    <v-lazy>
-      <flex-box class="width-fit" align="center">
-        <slot name="before" />
-        <v-tabs v-model="model" class="transparent-bg">
-          <v-tab v-for="{ name } in tabs" :key="name" class="transparent-bg">
-            <typography :value="name" />
-          </v-tab>
-        </v-tabs>
-        <slot name="after" />
-      </flex-box>
-    </v-lazy>
+    <flex-box class="width-fit" align="center">
+      <slot name="before" />
+      <v-tabs v-model="model" class="transparent-bg">
+        <v-tab v-for="{ name } in tabs" :key="name" class="transparent-bg">
+          <typography :value="name" />
+        </v-tab>
+      </v-tabs>
+      <slot name="after" />
+    </flex-box>
     <v-tabs-items v-model="model" class="mt-1">
       <slot />
     </v-tabs-items>
@@ -20,7 +18,7 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { SelectOption } from "@/types";
-import FlexBox from "@/components/common/layout/FlexBox.vue";
+import { FlexBox } from "@/components/common/layout";
 import Typography from "../Typography.vue";
 
 /**

@@ -4,7 +4,6 @@ import {
   AttributeLayoutSchema,
   AttributePositionSchema,
   AttributeSchema,
-  AttributeType,
   ProjectSchema,
 } from "@/types";
 import { removeMatches } from "@/util";

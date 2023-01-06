@@ -1,5 +1,6 @@
 import argparse
 import os
+import subprocess
 import sys
 
 import pandas as pd
@@ -51,4 +52,8 @@ if __name__ == "__main__":
     entries_df = pd.DataFrame(entries)
     output_path = os.path.join(OUTPUT_DIR, output_file)
     entries_df.to_csv(output_path, index=False)
+    # Push to s3
+    bucket_name = os.environ.get("BUCKET", None)
+    if bucket_name:
+        subprocess.run(["aws", "s3", "cp", output_path, bucket_name])
     print(entries_df)

@@ -15,13 +15,7 @@
             }
           },
           "model_manager": {
-            "model_path": {
-              "*": [
-                "roberta-base",
-                "thearod5/automotive",
-                "thearod5/sebert-task-cls"
-              ]
-            }
+            "model_path": "roberta-base"
           },
           "trainer_args": {
             "output_dir": "[OUTPUT_PATH]/rq3/models",

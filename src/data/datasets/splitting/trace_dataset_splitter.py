@@ -41,7 +41,7 @@ class TraceDatasetSplitter:
          """
         print("STRATEGIES", strategies)
         if strategies is None:
-            strategies = [SupportedSplitStrategy.RANDOM] * len(percent_splits)
+            strategies = [SupportedSplitStrategy.RANDOM.value] * len(percent_splits)
         percent_splits = [1 - sum(percent_splits)] + percent_splits
         return self._split_multiple_helper(percent_splits, splits=[self.trace_dataset], strategies=strategies)
 

@@ -11,7 +11,7 @@ from data.processing.cleaning.data_cleaner import DataCleaner
 class SplitDatasetCreator(AbstractDatasetCreator):
 
     def __init__(self, val_percentage: float = VALIDATION_PERCENTAGE_DEFAULT,
-                 data_cleaner: DataCleaner = None, split_strategy: str = SupportedSplitStrategy.SOURCE_RANDOM):
+                 data_cleaner: DataCleaner = None, split_strategy: str = SupportedSplitStrategy.SOURCE_RANDOM.value):
         """
         Represents a dataset that is a split of the training dataset
         :param val_percentage: the percent of links to use in this dataset

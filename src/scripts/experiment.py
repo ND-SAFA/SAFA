@@ -20,6 +20,7 @@ if __name__ == "__main__":
     from experiments.experiment import Experiment
     from util.object_creator import ObjectCreator
     from scripts.script_utils import read_job_definition
+    from util.file_util import FileUtil
 
     #
     # Argument Parsing
@@ -31,6 +32,11 @@ if __name__ == "__main__":
     args = parser.parse_args()
     file_path = os.path.join(RQ_PATH, args.file)
     job_definition = read_job_definition(file_path)
+    #
+    #
+    #
+    experiment_base_path = os.path.dirname(job_definition["output_dir"])
+    FileUtil.delete_dir(experiment_base_path)
     #
     # Logs
     #

@@ -12,7 +12,7 @@ assert os.path.exists(ROOT_PATH), ROOT_PATH
 sys.path.append(ROOT_PATH)
 
 IGNORE = ["job_args", "trainer_args", "model_manager", "val_dataset_creator", "trainer_dataset_manager",
-          "train_dataset"]
+          "train_dataset", "eval_dataset_creator"]
 COPY_PATHS = [["metrics", "map"], ["metrics", "ap"], ["metrics", "f1"], ["metrics", "f2"], ["experimental_vars"]]
 RQ_PATH = os.path.expanduser(os.environ["RQ_PATH"])
 
@@ -32,6 +32,7 @@ if __name__ == "__main__":
     parser.add_argument("experiment")
     args = parser.parse_args()
     file_path = os.path.join(RQ_PATH, args.experiment)
+    output_file = args.experiment.split(".")[0] + ".csv"
     job_definition = read_job_definition(file_path)
 
     OUTPUT_DIR = job_definition["output_dir"]
@@ -48,6 +49,6 @@ if __name__ == "__main__":
                 entries.append(entry)
 
     entries_df = pd.DataFrame(entries)
-    output_path = os.path.join(OUTPUT_DIR, "result.csv")
+    output_path = os.path.join(OUTPUT_DIR, output_file)
     entries_df.to_csv(output_path, index=False)
     print(entries_df)

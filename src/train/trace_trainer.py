@@ -86,7 +86,9 @@ class TraceTrainer(Trainer, BaseObject):
               metric_names: List) -> Dict:
         """
         Performs the evaluation of the model (use this instead of Trainer.evaluation to utilize predefined metrics from models)
-        :param output: the output from predictions
+        :param trace_matrix: the matrix of trace links and their scores
+        :param label_ids: the list of ground truth labels
+        :param output_metrics: the dictionary of metrics to include in the results
         :param metric_names: name of metrics desired for evaluation
         :return: a dictionary of metric_name to result
         """

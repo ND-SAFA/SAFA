@@ -1,10 +1,11 @@
-from typing import Dict, Optional, List
+import gc
+from typing import Dict, List, Optional
 
+from torch.nn.parameter import Parameter
 from transformers import AutoConfig
 from transformers.modeling_utils import PreTrainedModel
 from transformers.models.auto.tokenization_auto import AutoTokenizer
 from transformers.tokenization_utils import PreTrainedTokenizer
-from torch.nn.parameter import Parameter
 
 from config.constants import MAX_SEQ_LENGTH_DEFAULT
 from models.model_properties import ModelArchitectureType, ModelSize, ModelTask
@@ -60,7 +61,11 @@ class ModelManager(BaseObject):
         Removes reference to model.
         :return: None
         """
+        del self.__model  # need delete because other pointers exist in trainer
+        del self.__tokenizer
         self.__model = None
+        self.__tokenizer = None
+        gc.collect()
 
     def get_tokenizer(self) -> PreTrainedTokenizer:
         """

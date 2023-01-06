@@ -61,7 +61,7 @@ class ModelManager(BaseObject):
         Removes reference to model.
         :return: None
         """
-        del self.__model
+        del self.__model  # need delete because other pointers exist in trainer
         del self.__tokenizer
         self.__model = None
         self.__tokenizer = None

@@ -104,7 +104,7 @@ class FileUtil:
     @staticmethod
     def delete_dir(dir_path: str) -> None:
         """
-        Deletes folder and everything inside it.
+        Deletes folder and everything inside it if it exists.
         :param dir_path: The path to the folder.
         """
         if os.path.exists(dir_path):

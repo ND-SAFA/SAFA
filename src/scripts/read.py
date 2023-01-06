@@ -55,5 +55,6 @@ if __name__ == "__main__":
     # Push to s3
     bucket_name = os.environ.get("BUCKET", None)
     if bucket_name:
-        subprocess.run(["aws", "s3", "cp", output_path, bucket_name])
+        bucket_path = os.path.join(bucket_name, output_file)
+        subprocess.run(["aws", "s3", "cp", output_path, bucket_path])
     print(entries_df)

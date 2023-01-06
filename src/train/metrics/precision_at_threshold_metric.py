@@ -1,7 +1,10 @@
+from typing import Dict
+
 import datasets
 from sklearn.metrics import precision_score
 
 from config.constants import K_METRIC_DEFAULT
+from data.datasets.trace_matrix import TraceMatrixManager
 from train.metrics.abstract_trace_metric import AbstractTraceMetric
 
 _DESCRIPTION = """
@@ -24,8 +27,8 @@ _CITATION = """
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
 class PrecisionAtThresholdMetric(AbstractTraceMetric):
 
-    # TODO
-    def _compute(self, predictions, references, k=K_METRIC_DEFAULT, **kwargs) -> float:
+    def _compute(self, predictions, references, trace_matrix: TraceMatrixManager = None, k=K_METRIC_DEFAULT,
+                 **kwargs) -> Dict:
         """
         Computes the Precision@K or the percentage of links that were correctly predicted
         :param predictions: predicted labels
@@ -34,8 +37,10 @@ class PrecisionAtThresholdMetric(AbstractTraceMetric):
         :param kwargs: any other necessary params
         :return: Precision@K score.
         """
-        predicted_labels = [1 if p >= k else 0 for p in predictions]
-        return precision_score(references, predicted_labels)
+
+        score = trace_matrix.calculate_query_metric_at_k(precision_score, k)
+        metric_name = "P@%s" % k
+        return {metric_name: score}
 
     def _info(self) -> datasets.MetricInfo:
         """

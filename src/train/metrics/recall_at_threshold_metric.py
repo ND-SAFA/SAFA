@@ -1,7 +1,10 @@
+from typing import Dict
+
 import datasets
 from sklearn.metrics import recall_score
 
 from config.constants import K_METRIC_DEFAULT
+from data.datasets.trace_matrix import TraceMatrixManager
 from train.metrics.abstract_trace_metric import AbstractTraceMetric
 
 _DESCRIPTION = """
@@ -24,8 +27,8 @@ _CITATION = """
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
 class RecallAtThresholdMetric(AbstractTraceMetric):
 
-    # TODO
-    def _compute(self, predictions, references, k=K_METRIC_DEFAULT, **kwargs) -> float:
+    def _compute(self, predictions, references, trace_matrix: TraceMatrixManager = None, k=K_METRIC_DEFAULT,
+                 **kwargs) -> Dict:
         """
         Recall@K metric measures the percentage of true links that were correctly predicted.
         :param predictions: predicted labels
@@ -34,8 +37,9 @@ class RecallAtThresholdMetric(AbstractTraceMetric):
         :param kwargs: any other necessary params
         :return: Recall@K score.
         """
-        predicted_labels = [1 if p >= k else 0 for p in predictions]
-        return recall_score(references, predicted_labels)
+        score = trace_matrix.calculate_query_metric_at_k(recall_score, k)
+        metric_name = "Recall@%s" % k
+        return {metric_name: score}
 
     def _info(self) -> datasets.MetricInfo:
         """

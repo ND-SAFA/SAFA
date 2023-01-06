@@ -14,8 +14,8 @@ class TraceDatasetSplitter:
     RANDOM_KEY = "random"
     SOURCE_RANDOM_KEY = "source-random"
     STRATEGIES: Dict[str, Type[AbstractSplitStrategy]] = {
-        SupportedSplitStrategy.RANDOM: RandomSplitStrategy,
-        SupportedSplitStrategy.SOURCE_RANDOM: SourceSplitStrategy
+        SupportedSplitStrategy.RANDOM.value: RandomSplitStrategy,
+        SupportedSplitStrategy.SOURCE_RANDOM.value: SourceSplitStrategy
     }
 
     def __init__(self, trace_dataset: TraceDataset):

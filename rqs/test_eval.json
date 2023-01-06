@@ -1,42 +1,42 @@
 {
   "steps": [
     {
-      "comparison_metric": "map",
-      "should_maximize_metric": true,
       "jobs": [
         {
-          "object_type": "TRAIN",
+          "object_type": "PREDICT",
           "job_args": {
-            "random_seed": 36
           },
           "model_manager": {
-            "model_path": "roberta-base"
+            "model_path": {
+              "*": [
+                "thearod5/bert4re2",
+                "thearod5/tbert"
+              ]
+            }
           },
           "trainer_args": {
-            "output_dir": "[OUTPUT_PATH]/test/models",
-            "train_epochs_range": [
-              1,
-              6,
-              1
-            ],
+            "output_dir": "[OUTPUT_PATH]/eval/models",
             "per_device_train_batch_size": 2,
             "metrics": [
-              "map"
+              "map",
+              "f"
             ]
           },
           "trainer_dataset_manager": {
-            "train_dataset_creator": {
+            "eval_dataset_creator": {
               "object_type": "SAFA",
-              "project_path": "~/desktop/safa/datasets/lhp/experiment/cooling"
-            },
-            "val_dataset_creator": {
-              "object_type": "SPLIT",
-              "val_percentage": 0.2
+              "project_path": {
+                "*": [
+                  "[DATA_PATH]/lhp/heating",
+                  "[DATA_PATH]/lhp/cooling",
+                  "[DATA_PATH]/lhp/vehiclemodes"
+                ]
+              }
             }
           }
         }
       ]
     }
   ],
-  "output_dir": "[OUTPUT_PATH]/test/jobs"
+  "output_dir": "[OUTPUT_PATH]/eval/jobs"
 }

@@ -12,7 +12,7 @@ assert os.path.exists(ROOT_PATH), ROOT_PATH
 sys.path.append(ROOT_PATH)
 
 IGNORE = ["job_args", "trainer_args", "model_manager", "val_dataset_creator", "trainer_dataset_manager",
-          "train_dataset"]
+          "train_dataset", "eval_dataset_creator"]
 COPY_PATHS = [["metrics", "map"], ["metrics", "ap"], ["metrics", "f1"], ["metrics", "f2"], ["experimental_vars"]]
 RQ_PATH = os.path.expanduser(os.environ["RQ_PATH"])
 

@@ -80,4 +80,13 @@ class TestTraceMatrix(BaseTest):
         return pairs
 
     def test_map(self):
-        pass
+        pass  # TODO: Where did this go??
+
+    def test_metric_at_k(self):
+        def metric_creator(k):
+            def metric(labels, preds):
+                self.assertEqual(len(labels), k)
+                self.assertEqual(len(preds), k)
+                return labels[0], preds[0]
+
+        self.manager.calculate_query_metric_at_k(metric_creator)

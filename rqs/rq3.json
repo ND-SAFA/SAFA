@@ -24,7 +24,7 @@
             }
           },
           "trainer_args": {
-            "output_dir": "[OUTPUT_PATH]/lhp/rq3/models",
+            "output_dir": "[OUTPUT_PATH]/rq3/models",
             "train_epochs_range": [
               1,
               25,

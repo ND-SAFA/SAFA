@@ -39,6 +39,7 @@ class TraceDatasetSplitter:
          :param percent_splits: The percent of links to include trace data for each split.
          :return: Tuple of trace data for each split specified
          """
+        print("STRATEGIES", strategies)
         if strategies is None:
             strategies = [SupportedSplitStrategy.RANDOM] * len(percent_splits)
         percent_splits = [1 - sum(percent_splits)] + percent_splits

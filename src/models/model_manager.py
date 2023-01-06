@@ -66,7 +66,6 @@ class ModelManager(BaseObject):
         self.__model = None
         self.__tokenizer = None
         gc.collect()
-        print("Model and tokenizer have been cleared.")
 
     def get_tokenizer(self) -> PreTrainedTokenizer:
         """
@@ -74,7 +73,6 @@ class ModelManager(BaseObject):
         :return: the Tokenizer
         """
         if self.__tokenizer is None:
-            print("TOKENIZER:", self.model_path)
             self.__tokenizer = AutoTokenizer.from_pretrained(self.model_path)
         return self.__tokenizer
 

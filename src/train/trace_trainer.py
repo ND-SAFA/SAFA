@@ -47,7 +47,6 @@ class TraceTrainer(Trainer, BaseObject):
         :param checkpoint: path to checkpoint.
         :return: a dictionary containing the results
         """
-        torch.cuda.empty_cache()
         self.model = self.model_manager.get_model()
         self._move_model_to_device(self.model, self.args.device)
         self.train_dataset = self.trainer_dataset_manager[DatasetRole.TRAIN].to_trainer_dataset(self.model_manager)

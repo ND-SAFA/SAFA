@@ -56,4 +56,3 @@ class AbstractTraceJob(AbstractJob, ABC):
         """
         super().cleanup()
         self._trainer = None
-        self.trainer_dataset_manager = None

@@ -61,6 +61,8 @@ class ModelManager(BaseObject):
         :return: None
         """
         self.__model = None
+        self.__tokenizer = None
+        print("Model and tokenizer have been cleared.")
 
     def get_tokenizer(self) -> PreTrainedTokenizer:
         """

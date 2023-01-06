@@ -1,5 +1,5 @@
 <template>
-  <v-navigation-drawer absolute permanent width="33%">
+  <div>
     <flex-box
       t="6"
       full-width
@@ -53,7 +53,7 @@
         value="You have not yet created any custom attributes."
       />
     </flex-box>
-  </v-navigation-drawer>
+  </div>
 </template>
 
 <script lang="ts">

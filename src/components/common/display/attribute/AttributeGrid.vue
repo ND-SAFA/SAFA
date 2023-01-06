@@ -120,7 +120,7 @@ export default Vue.extend({
 
       this.staticLayout = Array.from(Array(maxY + 1)).map(
         (_, idx) =>
-          attributesByY[idx].map((key) =>
+          attributesByY[idx]?.map((key) =>
             attributesStore.attributes.find((attr) => attr.key === key)
           ) || []
       );

@@ -1,5 +1,6 @@
 from typing import Dict, List, Optional
 
+import torch
 from torch.nn.parameter import Parameter
 from transformers import AutoConfig
 from transformers.modeling_utils import PreTrainedModel
@@ -60,6 +61,8 @@ class ModelManager(BaseObject):
         Removes reference to model.
         :return: None
         """
+        cpu = torch.device("cpu")
+        self.__model.to(cpu)
         self.__model = None
         self.__tokenizer = None
         print("Model and tokenizer have been cleared.")

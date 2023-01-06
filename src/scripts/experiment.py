@@ -1,6 +1,5 @@
 import argparse
 import os
-import shutil
 import sys
 
 import torch
@@ -21,6 +20,7 @@ if __name__ == "__main__":
     from experiments.experiment import Experiment
     from util.object_creator import ObjectCreator
     from scripts.script_utils import read_job_definition
+    from util.file_util import FileUtil
 
     #
     # Argument Parsing
@@ -35,7 +35,8 @@ if __name__ == "__main__":
     #
     #
     #
-    shutil.rmtree(os.path.dirname(job_definition["output_dir"]))
+    experiment_base_path = os.path.dirname(job_definition["output_dir"])
+    FileUtil.delete_dir(experiment_base_path)
     #
     # Logs
     #

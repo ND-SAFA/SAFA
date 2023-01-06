@@ -1,5 +1,6 @@
 import json
 import os
+import shutil
 from typing import Dict, List, Union
 
 from util.json_util import JSONUtil
@@ -99,3 +100,12 @@ class FileUtil:
     def create_dir(dir_path: str):
         if not os.path.exists(os.path.dirname(dir_path)):
             os.makedirs(os.path.dirname(dir_path))
+
+    @staticmethod
+    def delete_dir(dir_path: str) -> None:
+        """
+        Deletes folder and everything inside it.
+        :param dir_path: The path to the folder.
+        """
+        if os.path.exists(dir_path):
+            shutil.rmtree(dir_path)

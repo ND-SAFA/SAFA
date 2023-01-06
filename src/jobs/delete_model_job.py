@@ -1,7 +1,6 @@
-import os
-import shutil
 from jobs.abstract_job import AbstractJob
 from jobs.components.job_result import JobResult
+from util.file_util import FileUtil
 
 
 class DeleteModelJob(AbstractJob):
@@ -11,6 +10,5 @@ class DeleteModelJob(AbstractJob):
         Deletes a new model directory
         :return: Empty Dict
         """
-        if os.path.exists(self.model_manager.model_path):
-            shutil.rmtree(self.model_manager.model_path)
+        FileUtil.delete_dir(self.model_manager.model_path)
         return JobResult()

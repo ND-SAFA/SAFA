@@ -1,4 +1,5 @@
-from typing import Callable, Dict, List, Iterable
+from collections import namedtuple
+from typing import Callable, Dict, List, Iterable, NamedTuple
 
 import numpy as np
 
@@ -6,11 +7,10 @@ from data.tree.trace_link import TraceLink
 
 ArtifactQuery = Dict[str, List[TraceLink]]
 ProjectQueries = Dict[str, ArtifactQuery]
+Query = namedtuple('Query', ['links', 'preds'])
 
 
 class TraceMatrixManager:
-    PRED_KEY = "preds"
-    LINK_KEY = "links"
     """
     Contains trace and similarity matrices for computing query-based metrics.
     """
@@ -32,10 +32,10 @@ class TraceMatrixManager:
         :return: None
         """
         if link.source.id not in self.query_matrix:
-            self.query_matrix[link.source.id] = {self.LINK_KEY: [], self.PRED_KEY: []}
-        self.query_matrix[link.source.id][self.LINK_KEY].append(link)
+            self.query_matrix[link.source.id] = Query(links=[], preds=[])
+        self.query_matrix[link.source.id].links.append(link)
         if pred is not None:
-            self.query_matrix[link.source.id][self.PRED_KEY].append(pred)
+            self.query_matrix[link.source.id].preds.append(pred)
 
     def calculate_query_metric(self, metric: Callable[[List[int], List[float]], float]):
         """
@@ -45,8 +45,8 @@ class TraceMatrixManager:
         """
         metric_values = []
         for source, query in self.query_matrix.items():
-            query_predictions = query[self.PRED_KEY]
-            query_labels = [link.label for link in query[self.LINK_KEY]]
+            query_predictions = query.preds
+            query_labels = [link.label for link in query.links]
             query_metric = metric(query_labels, query_predictions)
             if not np.isnan(query_metric):
                 metric_values.append(query_metric)

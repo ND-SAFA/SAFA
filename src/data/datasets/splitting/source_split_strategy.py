@@ -48,5 +48,5 @@ class SourceSplitStrategy(AbstractSplitStrategy):
         random.shuffle(source_names)
         agg_links = []
         for source_name in source_names:
-            agg_links.extend(source_queries[source_name][TraceMatrixManager.LINK_KEY])
+            agg_links.extend(source_queries[source_name].links)
         return agg_links

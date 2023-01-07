@@ -29,7 +29,8 @@ REPLACEMENT_PERCENTAGE_DEFAULT = 0.15
 MIN_LENGTH_DEFAULT = 1
 
 # -------------- METRICS --------------
-K_METRIC_DEFAULT = .5  # TODO
+K_METRIC_DEFAULT = [1, 2, 3]
+THRESHOLD_DEFAULT = 0.5
 
 # -------------- MODELS --------------
 LOGITS = "logits"

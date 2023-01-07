@@ -11,6 +11,9 @@ from data.datasets.dataset_role import DatasetRole
 from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
 from data.datasets.trace_matrix import TraceMatrixManager
 from models.model_manager import ModelManager
+from train.metrics.map_metric import MapMetric
+from train.metrics.precision_at_threshold_metric import PrecisionAtThresholdMetric
+from train.metrics.recall_at_threshold_metric import RecallAtThresholdMetric
 from train.metrics.supported_trace_metric import get_metric_name, get_metric_path
 from train.trainer_args import TrainerArgs
 from util.base_object import BaseObject
@@ -94,13 +97,13 @@ class TraceTrainer(Trainer, BaseObject):
         """
         metric_paths = [get_metric_path(name) for name in metric_names]
         results = deepcopy(output_metrics)
-        trace_matrix_metrics = ["map"]
+        trace_matrix_metrics = [MapMetric.name, PrecisionAtThresholdMetric.name, RecallAtThresholdMetric.name]
         for metric_path in metric_paths:
             metric = load_metric(metric_path, keep_in_memory=True)
-            args = {"predictions": trace_matrix.scores, "references": label_ids}
+            metric_args = {"predictions": trace_matrix.scores, "references": label_ids}
             if metric.name in trace_matrix_metrics:
-                args["trace_matrix"] = trace_matrix
-            metric_result = metric.compute(**args)
+                metric_args["trace_matrix"] = trace_matrix
+            metric_result = metric.compute(**metric_args)
             metric_name = get_metric_name(metric)
             if isinstance(metric_result, dict) and metric_name in metric_result:
                 results.update(metric_result)

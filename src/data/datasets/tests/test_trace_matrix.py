@@ -34,27 +34,27 @@ class TestTraceMatrix(BaseTest):
         map_score = self.manager.calculate_query_metric(average_precision_score)
         self.assertEqual(map_score, 0.75)
 
-    def assert_matrix_sizes(self) -> None:
+    def test_matrix_sizes(self) -> None:
         """
         Assert that queries containing right number of elements.
         """
         for source in self.SOURCE_ARTIFACTS:
-            source_queries = self.manager.queries[source]
-            source_pred = source_queries[TraceMatrixManager.PRED_KEY]
-            source_labels = source_queries[TraceMatrixManager.LINK_KEY]
+            source_queries = self.manager.query_matrix[source]
+            source_pred = source_queries.preds
+            source_labels = source_queries.links
             self.assertEquals(len(source_pred), self.N_TARGETS)
             self.assertEquals(len(source_labels), self.N_TARGETS)
 
-    def assert_source_queries(self) -> None:
+    def test_source_queries(self) -> None:
         """
         Asserts that source queries containing write scores and labels.
         """
         source_1 = self.SOURCE_ARTIFACTS[0]
-        source_1_query = self.manager.queries[source_1]
+        source_1_query = self.manager.query_matrix[source_1]
         self.assert_query(source_1_query, [False, True], [0, 1])
 
         source_2 = self.SOURCE_ARTIFACTS[1]
-        source_2_query = self.manager.queries[source_2]
+        source_2_query = self.manager.query_matrix[source_2]
         self.assert_query(source_2_query, [False, True], [1, 0])
 
     def assert_query(self, queries, expected_greater: List[bool], expected_labels: List[int]) -> None:
@@ -65,12 +65,12 @@ class TestTraceMatrix(BaseTest):
         :param expected_labels: List of expected values.
         :return: None
         """
-        predictions = queries[TraceMatrixManager.PRED_KEY]
-        labels = queries[TraceMatrixManager.LINK_KEY]
+        predictions = queries.preds
+        links = queries.links
         for i in range(self.N_TARGETS):
             assertion = self.assertGreater if expected_greater[i] else self.assertLess
             assertion(predictions[i], self.THRESHOLD)
-            self.assertEqual(labels[i], expected_labels[i])
+            self.assertEqual(links[i].label, expected_labels[i])
 
     def get_artifact_pairs(self) -> List[TraceLink]:
         """

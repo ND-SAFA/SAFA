@@ -4,6 +4,7 @@ from typing import Dict, List
 from config.override import overrides
 from data.datasets.splitting.abstract_split_strategy import AbstractSplitStrategy
 from data.datasets.trace_dataset import TraceDataset
+from data.datasets.trace_matrix import TraceMatrixManager
 from data.tree.trace_link import TraceLink
 
 
@@ -42,26 +43,10 @@ class SourceSplitStrategy(AbstractSplitStrategy):
         :param trace_dataset: The dataset whose trace links are put in array.
         :return: Array of trace links.
         """
-        source_queries = SourceSplitStrategy.__create_query_map(trace_dataset.links)
+        source_queries = TraceMatrixManager(trace_dataset.links.values()).query_matrix
         source_names = list(source_queries.keys())
         random.shuffle(source_names)
         agg_links = []
         for source_name in source_names:
-            agg_links.extend(source_queries[source_name])
+            agg_links.extend(source_queries[source_name].links)
         return agg_links
-
-    @staticmethod
-    def __create_query_map(links: Dict[int, TraceLink]) -> Dict[str, List[TraceLink]]:
-        """
-        Creates a map between source artifacts and their associated trace links.
-        :param links: The dictionary of link ids to trace links.
-        :return: Dictionary containing source ids as keys and trace links as values.
-        """
-        queries = {}
-        for link in links.values():
-            source_id = link.source.id
-            if source_id in queries:
-                queries[source_id].append(link)
-            else:
-                queries[source_id] = [link]
-        return queries

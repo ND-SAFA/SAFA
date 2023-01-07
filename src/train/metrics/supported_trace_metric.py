@@ -8,6 +8,7 @@ from train.metrics.abstract_trace_metric import AbstractTraceMetric
 from train.metrics.calculate_threshold import CalculateThreshold
 from train.metrics.confusion_matrix_at_threshold_metric import ConfusionMatrixAtThresholdMetric
 from train.metrics.f1_metric import FMetric
+from train.metrics.map_at_k_metric import MapAtKMetric
 from train.metrics.map_metric import MapMetric
 from train.metrics.mrr_metric import MRRMetric
 from train.metrics.precision_at_threshold_metric import PrecisionAtKMetric
@@ -17,6 +18,7 @@ metric_suffix = "Metric"
 
 
 class SupportedTraceMetric(Enum):
+    MAP_AT_K = MapAtKMetric
     MAP = MapMetric
     PRECISION = PrecisionAtKMetric
     RECALL = RecallAtThresholdMetric

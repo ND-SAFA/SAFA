@@ -1,76 +1,86 @@
-from typing import Callable, Dict, List, Tuple, Union
+from collections import namedtuple
+from typing import Callable, Dict, List, Iterable, NamedTuple
 
 import numpy as np
-from scipy.special import softmax
-from transformers.trainer_utils import PredictionOutput
 
-ArtifactQuery = Dict[str, List[float]]
+from data.tree.trace_link import TraceLink
+
+ArtifactQuery = Dict[str, List[TraceLink]]
 ProjectQueries = Dict[str, ArtifactQuery]
+Query = namedtuple('Query', ['links', 'preds'])
 
 
 class TraceMatrixManager:
-    PRED_KEY = "preds"
-    LABEL_KEY = "labels"
     """
     Contains trace and similarity matrices for computing query-based metrics.
     """
 
-    def __init__(self, source_target_pairs: List[Tuple], output: PredictionOutput):
+    def __init__(self, links: Iterable[TraceLink], predicted_scores: List[float] = None):
         """
         Constructs similarity and trace matrices using predictions output.
-        :param source_target_pairs: The pairs of artifact represented by the predictions.
-        :param output: The prediction output on the source-target pairs.
+        :param links: The list of trace links.
+        :param predicted_scores: The prediction scores on the links.
         """
-        self.source_target_pairs = source_target_pairs
-        self.scores = self.get_similarity_scores(output.predictions)
-        self.queries = self.create_trace_matrix(source_target_pairs, self.scores, output.label_ids)
+        self.query_matrix = {}
+        self._fill_trace_matrix(links, [None for link in links] if predicted_scores is None else predicted_scores)
 
-    def calculate_query_metric(self, metric: Callable[[List[float], List[int]], float]):
+    def add_link(self, link: TraceLink, pred: float = None) -> None:
+        """
+        Adds a new link to the trace matrix
+        :param link: the trace link
+        :param pred: the prediction associated with the link
+        :return: None
+        """
+        if link.source.id not in self.query_matrix:
+            self.query_matrix[link.source.id] = Query(links=[], preds=[])
+        self.query_matrix[link.source.id].links.append(link)
+        if pred is not None:
+            self.query_matrix[link.source.id].preds.append(pred)
+
+    def calculate_query_metric(self, metric: Callable[[List[int], List[float]], float]):
         """
         Calculates the average metric for each source artifact in project.
         :param metric: The metric to compute for each query in matrix.
         :return: Average metric value.
         """
         metric_values = []
-        for source, query in self.queries.items():
-            query_predictions = query[self.PRED_KEY]
-            query_labels = query[self.LABEL_KEY]
+        for source, query in self.query_matrix.items():
+            query_predictions = query.preds
+            query_labels = [link.label for link in query.links]
             query_metric = metric(query_labels, query_predictions)
             if not np.isnan(query_metric):
                 metric_values.append(query_metric)
         return sum(metric_values) / len(metric_values)
 
-    @staticmethod
-    def create_trace_matrix(artifact_pairs: List[Tuple[str, str]], scores: List[float], labels: List[int]) -> Dict:
+    def calculate_query_metric_at_k(self, metric: Callable[[List[int], List[float]], float], k: int):
         """
-        Creates similarity and trace matrices from scores and labels.
-        :param artifact_pairs: The pairs of artifact corresponding to scores.
-        :param scores: The similarity scores between artifacts in pairs.
-        :param labels: The labels representing if the artifact pair is traced or not.
-        :return: SimilarityMatrix, TraceMatrix
+        Calculates given metric for each query considering the top k elements.
+        :param metric: The metric function to apply to query scores.
+        :param k: The top elements to consider.
+        :return: The average of metric across queries.
         """
-        queries: ProjectQueries = {}
-        for (source, target), pred, label in zip(artifact_pairs, scores, labels):
-            if source in queries:
-                assert target not in queries[source]
-                queries[source][TraceMatrixManager.PRED_KEY].append(pred)
-                queries[source][TraceMatrixManager.LABEL_KEY].append(label)
-            else:
-                queries[source] = {
-                    TraceMatrixManager.PRED_KEY: [pred],
-                    TraceMatrixManager.LABEL_KEY: [label]
-                }
-        return queries
 
-    @staticmethod
-    def get_similarity_scores(predictions: Union[np.ndarray, Tuple[np.ndarray]]) -> List[float]:
+        def metric_at_k(query_labels: Iterable[int], query_preds: Iterable[float]):
+            """
+            Calculates the precision at the given k.
+            :param query_labels: The labels associated with given predictions.
+            :param query_preds: The predicted scores for the labels.
+            :return: The metric score.
+            """
+            zipped = zip(query_labels, query_preds)
+            results = sorted(zipped, key=lambda x: x[1])[:k]
+            local_preds = [p for l, p in results]
+            local_labels = [l for l, p in results]
+            return metric(local_labels, local_preds)
+
+        return self.calculate_query_metric(metric_at_k)
+
+    def _fill_trace_matrix(self, links: Iterable[TraceLink], predicted_scores: List[float]) -> None:
         """
-        Transforms predictions into similarity scores.
-        :param predictions: The model predictions.
-        :return: List of similarity scores associated with predictions.
+        Adds all links to the map between source artifacts and their associated trace links.
+        :param links: The list of trace links.
+        :param predicted_scores: the list of similarity scores for each link
+        :return: None
         """
-        similarity_scores = []
-        for pred_i in range(predictions.shape[0]):
-            prediction = predictions[pred_i]
-            similarity_scores.append(softmax(prediction)[1])
-        return similarity_scores
+        for link, pred in zip(links, predicted_scores):
+            self.add_link(link, pred)

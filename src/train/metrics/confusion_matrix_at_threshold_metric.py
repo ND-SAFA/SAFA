@@ -1,6 +1,6 @@
 import datasets
 
-from config.constants import K_METRIC_DEFAULT
+from config.constants import THRESHOLD_DEFAULT
 from train.metrics.abstract_trace_metric import AbstractTraceMetric
 
 _DESCRIPTION = """
@@ -24,7 +24,7 @@ _CITATION = """
 class ConfusionMatrixAtThresholdMetric(AbstractTraceMetric):
 
     # TODO
-    def _compute(self, predictions, references, k=K_METRIC_DEFAULT, **kwargs) -> float:
+    def _compute(self, predictions, references, k=THRESHOLD_DEFAULT, **kwargs) -> float:
         """
         Confusion matrix metric calculates the number of true and false positives and the true/false negatives.
         :param predictions: predicted labels

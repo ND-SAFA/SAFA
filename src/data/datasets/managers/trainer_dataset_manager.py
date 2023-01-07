@@ -122,8 +122,7 @@ class TrainerDatasetManager(BaseObject):
 
     @staticmethod
     def _create_dataset_splits(train_dataset: TraceDataset,
-                               dataset_creators_map: Dict[DatasetRole, AbstractDatasetCreator]) \
-            -> Dict[DatasetRole, TraceDataset]:
+                               dataset_creators_map: Dict[DatasetRole, AbstractDatasetCreator]) -> Dict[DatasetRole, TraceDataset]:
         """
         Splits the train dataset into desired splits and creates a dictionary mapping dataset role to split for all split data
         :param train_dataset: the train dataset

@@ -1,3 +1,4 @@
+import random
 from collections import namedtuple
 from typing import Callable, Dict, List, Iterable, NamedTuple
 
@@ -22,7 +23,9 @@ class TraceMatrixManager:
         :param predicted_scores: The prediction scores on the links.
         """
         self.query_matrix = {}
+        self.source_ids = []
         self._fill_trace_matrix(links, [None for link in links] if predicted_scores is None else predicted_scores)
+        random.shuffle(self.source_ids)
 
     def add_link(self, link: TraceLink, pred: float = None) -> None:
         """
@@ -33,6 +36,7 @@ class TraceMatrixManager:
         """
         if link.source.id not in self.query_matrix:
             self.query_matrix[link.source.id] = Query(links=[], preds=[])
+            self.source_ids.append(link.source.id)
         self.query_matrix[link.source.id].links.append(link)
         if pred is not None:
             self.query_matrix[link.source.id].preds.append(pred)

@@ -1,10 +1,15 @@
 from enum import Enum
 
+from data.datasets.splitting.combination_split_strategy import CombinationSplitStrategy
+from data.datasets.splitting.random_split_strategy import RandomSplitStrategy
+from data.datasets.splitting.source_split_strategy import SourceSplitStrategy
+
 
 class SupportedSplitStrategy(Enum):
     """
     Enum of keys enumerating supported trace dataset split methods.
     Note, values are keys instead of classes to avoid circular imports.
     """
-    RANDOM = "random"
-    SOURCE_RANDOM = "source_random"
+    RANDOM = RandomSplitStrategy
+    SOURCE_RANDOM = SourceSplitStrategy
+    COMBINATION = CombinationSplitStrategy

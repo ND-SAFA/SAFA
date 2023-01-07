@@ -3,7 +3,6 @@ from typing import Dict
 import datasets
 from sklearn.metrics import precision_recall_curve
 
-from config.constants import K_METRIC_DEFAULT
 from train.metrics.abstract_trace_metric import AbstractTraceMetric
 
 _DESCRIPTION = """
@@ -31,12 +30,11 @@ class FMetric(AbstractTraceMetric):
     F2_KEY = "f2"
 
     # TODO
-    def _compute(self, predictions, references, k=K_METRIC_DEFAULT, **kwargs) -> Dict:
+    def _compute(self, predictions, references, **kwargs) -> Dict:
         """
         Computes the max f1 and f2 scores for all thresholds for given predictions.
         :param predictions: predicted labels
         :param labels: ground truth labels.
-        :param k: considers only the subset of recommendations from rank 1 through k
         :param kwargs: any other necessary params
         :return: Dictionary containing f1 and f2 scores.
         """

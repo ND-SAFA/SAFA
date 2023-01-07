@@ -3,7 +3,7 @@ from typing import Dict
 import datasets
 from sklearn.metrics import average_precision_score
 
-from config.constants import K_METRIC_DEFAULT
+from config.constants import THRESHOLD_DEFAULT
 from data.datasets.trace_matrix import TraceMatrixManager
 from train.metrics.abstract_trace_metric import AbstractTraceMetric
 
@@ -18,7 +18,7 @@ Args:
     references (`list` of `int`): Ground truth labels.
     k (int): considers only the subset of recommendations from rank 1 through k
 Returns:
-    map_at_k (`float` or `int`): Mean Average Precision@K score. 
+    map (`float` or `int`): Mean Average Precision@K score. 
 """
 
 _CITATION = """
@@ -32,7 +32,7 @@ class MapMetric(AbstractTraceMetric):
     AP_KEY = "ap"
 
     # TODO
-    def _compute(self, predictions, references, trace_matrix: TraceMatrixManager, k=K_METRIC_DEFAULT,
+    def _compute(self, predictions, references, trace_matrix: TraceMatrixManager, k=THRESHOLD_DEFAULT,
                  **kwargs) -> Dict:
         """
         computes the Mean Average Precision@K or the average precision over k for recommendations shown for different links
@@ -43,11 +43,11 @@ class MapMetric(AbstractTraceMetric):
         :param kwargs: any other necessary params
         :return: Mean Average Precision@K score.
         """
-        map = trace_matrix.calculate_query_metric(average_precision_score)
-        ap = average_precision_score(references, predictions)
+        map_score = trace_matrix.calculate_query_metric(average_precision_score)
+        ap_score = average_precision_score(references, predictions)
         return {
-            self.MAP_KEY: map,
-            self.AP_KEY: ap
+            self.MAP_KEY: map_score,
+            self.AP_KEY: ap_score
         }
 
     def _info(self) -> datasets.MetricInfo:

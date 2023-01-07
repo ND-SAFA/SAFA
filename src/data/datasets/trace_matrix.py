@@ -1,4 +1,4 @@
-from typing import Callable, Dict, List, Tuple, Union
+from typing import Callable, Dict, Iterable, List, Tuple, Union
 
 import numpy as np
 from scipy.special import softmax
@@ -25,7 +25,7 @@ class TraceMatrixManager:
         self.scores = self.get_similarity_scores(output.predictions)
         self.queries = self.create_trace_matrix(source_target_pairs, self.scores, output.label_ids)
 
-    def calculate_query_metric(self, metric: Callable[[List[float], List[int]], float]):
+    def calculate_query_metric(self, metric: Callable[[List[int], List[float]], float]):
         """
         Calculates the average metric for each source artifact in project.
         :param metric: The metric to compute for each query in matrix.
@@ -39,6 +39,29 @@ class TraceMatrixManager:
             if not np.isnan(query_metric):
                 metric_values.append(query_metric)
         return sum(metric_values) / len(metric_values)
+
+    def calculate_query_metric_at_k(self, metric: Callable[[List[int], List[float]], float], k: int):
+        """
+        Calculates given metric for each query considering the top k elements.
+        :param metric: The metric function to apply to query scores.
+        :param k: The top elements to consider.
+        :return: The average of metric across queries.
+        """
+
+        def metric_at_k(query_labels: Iterable[int], query_preds: Iterable[float]):
+            """
+            Calculates the precision at the given k.
+            :param query_labels: The labels associated with given predictions.
+            :param query_preds: The predicted scores for the labels.
+            :return: The metric score.
+            """
+            zipped = zip(query_labels, query_preds)
+            results = sorted(zipped, key=lambda x: x[1])[:k]
+            local_preds = [p for l, p in results]
+            local_labels = [l for l, p in results]
+            return metric(local_labels, local_preds)
+
+        return self.calculate_query_metric(metric_at_k)
 
     @staticmethod
     def create_trace_matrix(artifact_pairs: List[Tuple[str, str]], scores: List[float], labels: List[int]) -> Dict:

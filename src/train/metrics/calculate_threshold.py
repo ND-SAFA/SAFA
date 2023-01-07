@@ -1,7 +1,7 @@
 import datasets
 from sklearn.metrics import precision_recall_curve
 
-from config.constants import K_METRIC_DEFAULT
+from config.constants import THRESHOLD_DEFAULT
 from train.metrics.abstract_trace_metric import AbstractTraceMetric
 
 _DESCRIPTION = """
@@ -27,7 +27,7 @@ class CalculateThreshold(AbstractTraceMetric):
     UPPER_RECALL_THRESHOLD = .95
 
     # TODO
-    def _compute(self, predictions, references, k=K_METRIC_DEFAULT, **kwargs) -> float:
+    def _compute(self, predictions, references, k=THRESHOLD_DEFAULT, **kwargs) -> float:
         """
         computes the Mean Average Precision@K or the average precision over k for recommendations shown for different links
          and averages them over all queries in the dataset.

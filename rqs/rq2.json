@@ -58,7 +58,9 @@
             "per_device_eval_batch_size": 4,
             "metrics": [
               "map",
-              "f"
+              "map_at_k",
+              "f",
+              "precision"
             ]
           },
           "trainer_dataset_manager": {

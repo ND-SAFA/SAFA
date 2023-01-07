@@ -18,7 +18,7 @@ Args:
     references (`list` of `int`): Ground truth labels.
     k (int): considers only the subset of recommendations from rank 1 through k
 Returns:
-    map_at_k (`float` or `int`): Mean Average Precision@K score. 
+    map (`float` or `int`): Mean Average Precision@K score. 
 """
 
 _CITATION = """

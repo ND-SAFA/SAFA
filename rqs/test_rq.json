@@ -32,9 +32,9 @@
             "per_device_train_batch_size": 4,
             "metrics": [
               "map",
+              "map_at_k",
               "f",
-              "precision",
-              "recall"
+              "precision"
             ]
           },
           "trainer_dataset_manager": {

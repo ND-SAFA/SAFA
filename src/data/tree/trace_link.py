@@ -20,6 +20,7 @@ class TraceLink(BaseObject):
         self.source = source
         self.target = target
         self.id = self.generate_link_id(self.source.id, self.target.id)
+        self.label = int(is_true_link)
         self.is_true_link = is_true_link
 
     def get_feature(self, feature_func: Callable) -> Dict:

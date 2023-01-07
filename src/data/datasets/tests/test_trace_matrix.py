@@ -5,7 +5,10 @@ from sklearn.metrics import average_precision_score
 from transformers.trainer_utils import PredictionOutput
 
 from data.datasets.trace_matrix import TraceMatrixManager
+from data.tree.artifact import Artifact
+from data.tree.trace_link import TraceLink
 from testres.base_test import BaseTest
+from train.trace_trainer import TraceTrainer
 
 
 class TestTraceMatrix(BaseTest):
@@ -21,12 +24,13 @@ class TestTraceMatrix(BaseTest):
     manager = None
 
     def setUp(self):
-        self.manager = TraceMatrixManager(self.get_artifact_pairs(), self.PREDICTION_OUTPUT)
+        self.manager = TraceMatrixManager(self.get_artifact_pairs(), TraceTrainer.get_similarity_scores(self.PREDICTIONS))
 
     def test_map_correctness(self) -> None:
         """
         Asserts that the correct map score is calculated.
         """
+
         map_score = self.manager.calculate_query_metric(average_precision_score)
         self.assertEqual(map_score, 0.75)
 
@@ -37,7 +41,7 @@ class TestTraceMatrix(BaseTest):
         for source in self.SOURCE_ARTIFACTS:
             source_queries = self.manager.queries[source]
             source_pred = source_queries[TraceMatrixManager.PRED_KEY]
-            source_labels = source_queries[TraceMatrixManager.LABEL_KEY]
+            source_labels = source_queries[TraceMatrixManager.LINK_KEY]
             self.assertEquals(len(source_pred), self.N_TARGETS)
             self.assertEquals(len(source_labels), self.N_TARGETS)
 
@@ -62,21 +66,24 @@ class TestTraceMatrix(BaseTest):
         :return: None
         """
         predictions = queries[TraceMatrixManager.PRED_KEY]
-        labels = queries[TraceMatrixManager.LABEL_KEY]
+        labels = queries[TraceMatrixManager.LINK_KEY]
         for i in range(self.N_TARGETS):
             assertion = self.assertGreater if expected_greater[i] else self.assertLess
             assertion(predictions[i], self.THRESHOLD)
             self.assertEqual(labels[i], expected_labels[i])
 
-    def get_artifact_pairs(self) -> List[Tuple[str, str]]:
+    def get_artifact_pairs(self) -> List[TraceLink]:
         """
         Returns list of tuples for each combination of source and target artifacts.
         :return: List of tuples containing artifact ids.
         """
         pairs = []
+        i = 0
         for source_artifact in self.SOURCE_ARTIFACTS:
             for target_artifact in self.TARGET_ARTIFACTS:
-                pairs.append((source_artifact, target_artifact))
+                pairs.append(TraceLink(Artifact(source_artifact, "token"), Artifact(target_artifact, "token"),
+                                       is_true_link=bool(self.LABEL_IDS[i])))
+                i += 1
         return pairs
 
     def test_map(self):

@@ -14,6 +14,7 @@ class TestTraceDatasetSplitter(BaseTraceTest):
 
     def test_splits(self):
         for split_type in SupportedSplitStrategy:
+            print(split_type)
             self.assert_split(split_type)
             self.assert_split_multiple(split_type)
 

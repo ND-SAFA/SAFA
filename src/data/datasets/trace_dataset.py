@@ -28,7 +28,7 @@ class TraceDataset(AbstractDataset):
         """
         self.links = OrderedDict(links)
         self.pos_link_ids, self.neg_link_ids = self.__create_pos_neg_links(links)
-        self.trace_matrix = TraceMatrixManager(self.links.values())
+        self.trace_matrix = TraceMatrixManager(self.links.values(), randomize=True)
         self._shuffle_link_ids(self.pos_link_ids)
         self._shuffle_link_ids(self.neg_link_ids)
 

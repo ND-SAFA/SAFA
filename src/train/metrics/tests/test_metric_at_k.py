@@ -61,8 +61,15 @@ class TestMetricAtK(BaseTest, ABC):
         return trace_links
 
     @staticmethod
-    def create_artifacts(prefix: str, n_artifacts: int):
-        return [Artifact(prefix + str(i), "body") for i in range(n_artifacts)]
+    def create_artifacts(prefix: str, n_artifacts: int, body: str = "body"):
+        """
+        Creates list of artifacts whose id contain prefix.
+        :param prefix: The prefix to name artifact with.
+        :param n_artifacts: The number of artifacts to create.
+        :param body: The artifact body to supply artifacts with.
+        :return: List of artifacts created.
+        """
+        return [Artifact(prefix + str(i), body) for i in range(n_artifacts)]
 
     @property
     @abstractmethod

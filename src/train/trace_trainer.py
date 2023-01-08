@@ -1,20 +1,20 @@
 import os
 from copy import deepcopy
-from typing import Dict, List, NamedTuple, Union, Tuple
+from typing import Dict, List, NamedTuple, Tuple, Union
 
 import numpy as np
 import torch
 from datasets import load_metric
+from scipy.special import softmax
 from transformers.trainer import Trainer
 
-from scipy.special import softmax
 from data.datasets.dataset_role import DatasetRole
 from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
 from data.datasets.trace_matrix import TraceMatrixManager
 from models.model_manager import ModelManager
 from train.metrics.map_at_k_metric import MapAtKMetric
 from train.metrics.map_metric import MapMetric
-from train.metrics.precision_at_threshold_metric import PrecisionAtThresholdMetric
+from train.metrics.precision_at_threshold_metric import PrecisionAtKMetric
 from train.metrics.recall_at_threshold_metric import RecallAtThresholdMetric
 from train.metrics.supported_trace_metric import get_metric_name, get_metric_path
 from train.trainer_args import TrainerArgs
@@ -100,7 +100,7 @@ class TraceTrainer(Trainer, BaseObject):
         """
         metric_paths = [get_metric_path(name) for name in metric_names]
         results = deepcopy(output_metrics)
-        trace_matrix_metrics = [MapMetric.name, MapAtKMetric.name, PrecisionAtThresholdMetric.name,
+        trace_matrix_metrics = [MapMetric.name, MapAtKMetric.name, PrecisionAtKMetric.name,
                                 RecallAtThresholdMetric.name]
         for metric_path in metric_paths:
             metric = load_metric(metric_path, keep_in_memory=True)

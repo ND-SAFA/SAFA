@@ -75,7 +75,7 @@ class TraceMatrixManager:
             :return: The metric score.
             """
             zipped = zip(query_labels, query_preds)
-            results = sorted(zipped, key=lambda x: x[1])[:k]
+            results = sorted(zipped, key=lambda x: x[1], reverse=True)[:k]
             local_preds = [p for l, p in results]
             local_labels = [l for l, p in results]
             return metric(local_labels, local_preds)

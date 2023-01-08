@@ -44,6 +44,7 @@ class TestTraceMatrix(BaseTest):
             source_labels = source_queries.links
             self.assertEquals(len(source_pred), self.N_TARGETS)
             self.assertEquals(len(source_labels), self.N_TARGETS)
+        self.assertEquals(len(self.manager.source_ids), len(self.SOURCE_ARTIFACTS))
 
     def test_source_queries(self) -> None:
         """

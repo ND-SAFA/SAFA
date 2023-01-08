@@ -28,6 +28,7 @@ class TraceDataset(AbstractDataset):
         """
         self.links = OrderedDict(links)
         self.pos_link_ids, self.neg_link_ids = self.__create_pos_neg_links(links)
+        self.trace_matrix = TraceMatrixManager(self.links.values())
         self._shuffle_link_ids(self.pos_link_ids)
         self._shuffle_link_ids(self.neg_link_ids)
 
@@ -76,6 +77,7 @@ class TraceDataset(AbstractDataset):
             self.pos_link_ids.append(new_link.id)
         else:
             self.neg_link_ids.append(new_link.id)
+        self.trace_matrix.add_link(link=new_link)
         return new_link.id
 
     def augment_pos_links(self, augmenter: DataAugmenter) -> None:

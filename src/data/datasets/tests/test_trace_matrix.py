@@ -5,7 +5,10 @@ from sklearn.metrics import average_precision_score
 from transformers.trainer_utils import PredictionOutput
 
 from data.datasets.trace_matrix import TraceMatrixManager
+from data.tree.artifact import Artifact
+from data.tree.trace_link import TraceLink
 from testres.base_test import BaseTest
+from train.trace_trainer import TraceTrainer
 
 
 class TestTraceMatrix(BaseTest):
@@ -21,36 +24,38 @@ class TestTraceMatrix(BaseTest):
     manager = None
 
     def setUp(self):
-        self.manager = TraceMatrixManager(self.get_artifact_pairs(), self.PREDICTION_OUTPUT)
+        self.manager = TraceMatrixManager(self.get_artifact_pairs(), TraceTrainer.get_similarity_scores(self.PREDICTIONS))
 
     def test_map_correctness(self) -> None:
         """
         Asserts that the correct map score is calculated.
         """
+
         map_score = self.manager.calculate_query_metric(average_precision_score)
         self.assertEqual(map_score, 0.75)
 
-    def assert_matrix_sizes(self) -> None:
+    def test_matrix_sizes(self) -> None:
         """
         Assert that queries containing right number of elements.
         """
         for source in self.SOURCE_ARTIFACTS:
-            source_queries = self.manager.queries[source]
-            source_pred = source_queries[TraceMatrixManager.PRED_KEY]
-            source_labels = source_queries[TraceMatrixManager.LABEL_KEY]
+            source_queries = self.manager.query_matrix[source]
+            source_pred = source_queries.preds
+            source_labels = source_queries.links
             self.assertEquals(len(source_pred), self.N_TARGETS)
             self.assertEquals(len(source_labels), self.N_TARGETS)
+        self.assertEquals(len(self.manager.source_ids), len(self.SOURCE_ARTIFACTS))
 
-    def assert_source_queries(self) -> None:
+    def test_source_queries(self) -> None:
         """
         Asserts that source queries containing write scores and labels.
         """
         source_1 = self.SOURCE_ARTIFACTS[0]
-        source_1_query = self.manager.queries[source_1]
+        source_1_query = self.manager.query_matrix[source_1]
         self.assert_query(source_1_query, [False, True], [0, 1])
 
         source_2 = self.SOURCE_ARTIFACTS[1]
-        source_2_query = self.manager.queries[source_2]
+        source_2_query = self.manager.query_matrix[source_2]
         self.assert_query(source_2_query, [False, True], [1, 0])
 
     def assert_query(self, queries, expected_greater: List[bool], expected_labels: List[int]) -> None:
@@ -61,22 +66,25 @@ class TestTraceMatrix(BaseTest):
         :param expected_labels: List of expected values.
         :return: None
         """
-        predictions = queries[TraceMatrixManager.PRED_KEY]
-        labels = queries[TraceMatrixManager.LABEL_KEY]
+        predictions = queries.preds
+        links = queries.links
         for i in range(self.N_TARGETS):
             assertion = self.assertGreater if expected_greater[i] else self.assertLess
             assertion(predictions[i], self.THRESHOLD)
-            self.assertEqual(labels[i], expected_labels[i])
+            self.assertEqual(links[i].label, expected_labels[i])
 
-    def get_artifact_pairs(self) -> List[Tuple[str, str]]:
+    def get_artifact_pairs(self) -> List[TraceLink]:
         """
         Returns list of tuples for each combination of source and target artifacts.
         :return: List of tuples containing artifact ids.
         """
         pairs = []
+        i = 0
         for source_artifact in self.SOURCE_ARTIFACTS:
             for target_artifact in self.TARGET_ARTIFACTS:
-                pairs.append((source_artifact, target_artifact))
+                pairs.append(TraceLink(Artifact(source_artifact, "token"), Artifact(target_artifact, "token"),
+                                       is_true_link=bool(self.LABEL_IDS[i])))
+                i += 1
         return pairs
 
     def test_map(self):

@@ -9,6 +9,7 @@ import pandas as pd
 from data.datasets.abstract_dataset import AbstractDataset
 from data.datasets.data_key import DataKey
 from data.datasets.keys.csv_format import CSVKeys
+from data.datasets.trace_matrix import TraceMatrixManager
 from data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
 from data.processing.augmentation.data_augmenter import DataAugmenter
 from data.processing.augmentation.source_target_swap_step import SourceTargetSwapStep
@@ -27,6 +28,7 @@ class TraceDataset(AbstractDataset):
         """
         self.links = OrderedDict(links)
         self.pos_link_ids, self.neg_link_ids = self.__create_pos_neg_links(links)
+        self.trace_matrix = TraceMatrixManager(self.links.values())
         self._shuffle_link_ids(self.pos_link_ids)
         self._shuffle_link_ids(self.neg_link_ids)
 
@@ -39,8 +41,8 @@ class TraceDataset(AbstractDataset):
         feature_entries = {
             link.id: self._get_feature_entry(link, model_generator.arch_type, model_generator.get_feature)
             for link in self.links.values()}
-        project_links = (self.pos_link_ids + self.neg_link_ids)
-        return [feature_entries[link_id] for link_id in project_links]
+        project_links = self.get_ordered_links()
+        return [feature_entries[link.id] for link in project_links]
 
     def to_dataframe(self) -> pd.DataFrame:
         """
@@ -50,7 +52,7 @@ class TraceDataset(AbstractDataset):
         link_ids_to_rows = {}
         for link in self.links.values():
             link_ids_to_rows[link.id] = [link.source.id, link.source.token, link.target.id, link.target.token,
-                                         int(link.is_true_link)]
+                                         link.label]
         data = [link_ids_to_rows[link_id] for link_id in self.pos_link_ids + self.neg_link_ids]
         return pd.DataFrame(data,
                             columns=[CSVKeys.SOURCE_ID, CSVKeys.SOURCE, CSVKeys.TARGET_ID, CSVKeys.TARGET,
@@ -75,6 +77,7 @@ class TraceDataset(AbstractDataset):
             self.pos_link_ids.append(new_link.id)
         else:
             self.neg_link_ids.append(new_link.id)
+        self.trace_matrix.add_link(link=new_link)
         return new_link.id
 
     def augment_pos_links(self, augmenter: DataAugmenter) -> None:
@@ -92,13 +95,19 @@ class TraceDataset(AbstractDataset):
             augmentation_results = run(data_entries)
             self._create_links_from_augmentation(augmentation_results, pos_links)
 
+    def get_ordered_links(self) -> List[TraceLink]:
+        """
+        Gets links in the order that they are given in the trainer dataset
+        :return: a list of ordered links
+        """
+        return [self.links[link_id] for link_id in self.pos_link_ids + self.neg_link_ids]
+
     def get_source_target_pairs(self) -> List[Tuple]:
         """
         Gets the list of source target pairs in the order corresponding to the trainer data
         :return: list of tuples containing source id and target id
         """
-        return [(self.links[link_id].source.id, self.links[link_id].target.id) for link_id in
-                self.pos_link_ids + self.neg_link_ids]
+        return [(link.source.id, link.target.id) for link in self.get_ordered_links()]
 
     def prepare_for_training(self, augmenter: DataAugmenter = None) -> None:
         """
@@ -156,8 +165,7 @@ class TraceDataset(AbstractDataset):
         pos_links = [self.links[link_id] for link_id in self.pos_link_ids]
         return pos_links, [(link.source.token, link.target.token) for link in pos_links]
 
-    def _create_links_from_augmentation(self, augmentation_results: Dict[
-        str, AbstractDataAugmentationStep.AUGMENTATION_RESULT],
+    def _create_links_from_augmentation(self, augmentation_results: Dict[str, AbstractDataAugmentationStep.AUGMENTATION_RESULT],
                                         orig_links: List[TraceLink]) -> None:
         """
         Creates new trace links from the results of an augmentation step
@@ -178,8 +186,7 @@ class TraceDataset(AbstractDataset):
                               source_tokens=aug_source_tokens, target_tokens=aug_target_tokens, is_true_link=True)
 
     def _get_augmented_artifact_ids(self, augmented_tokens: Tuple[str, str], orig_link: TraceLink, aug_step_id: str,
-                                    entry_num: int) \
-            -> Tuple[str, str]:
+                                    entry_num: int) -> Tuple[str, str]:
         """
         Gets the augmented artifact ids for the new augmented source and target artifact
         :param augmented_tokens: the augmented tokens for source and target
@@ -194,8 +201,7 @@ class TraceDataset(AbstractDataset):
 
         new_id = TraceLink.generate_link_id(aug_source_id, aug_target_id)
         if new_id in self.links:
-            if self.links[new_id].source.token != aug_source_tokens or self.links[
-                new_id].target.token != aug_target_tokens:
+            if self.links[new_id].source.token != aug_source_tokens or self.links[new_id].target.token != aug_target_tokens:
                 aug_source_id += str(entry_num)
                 aug_target_id += str(entry_num)
         return aug_source_id, aug_target_id

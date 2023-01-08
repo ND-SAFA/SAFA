@@ -1,46 +1,42 @@
-import numpy as np
-from transformers.trainer_utils import PredictionOutput
+from typing import List, Type
 
-from data.datasets.trace_matrix import TraceMatrixManager
-from testres.base_test import BaseTest
+from train.metrics.abstract_trace_metric import AbstractTraceMetric
 from train.metrics.precision_at_threshold_metric import PrecisionAtKMetric
+from train.metrics.tests.test_metric_at_k import TestMetricAtK
 
 
-class TestPrecisionAtKMetric(BaseTest):
-    def test_correctness(self):
-        """
-        Tests that precision score accurately returns expected metrics.
-        ---
-        Predictions: 1, 1, 1
+class TestPrecisionAtKMetric(TestMetricAtK):
+    """
+    Tests that precision at k correctly identifies the correct k elements and applies the
+    correct metric to them.
+    ---
+        Predictions: 1 (0.6), 1 (0.9), 1 (0.7)
         Labels: 1, 0, 1
+        PrecisionAtK: Sort by similarity score, get top k, evaluate precision. [(0.9, 0), (0.7, 1), (0.6, 1)]
         Precision: tp / tp + fp
-        ---
-        If k = 1 then 1 / (1 + 0) = 1 / 1
-        If k = 2 then 1 / (1 + 1) = 1 / 2
-        If k = 3 then 1 / (2 + 1) = 1 / 3
-        """
-        predictions = np.array([self.create_prediction(0.6),
-                                self.create_prediction(0.7),
-                                self.create_prediction(0.8)
-                                ])
-        references = np.array([1, 0, 1, 0, 1, 0])
-        source_target_pairs = [("S1", "T1"), ("S1", "T2"), ("S1", "T3")]
-        output = PredictionOutput(predictions, references, [])
-        trace_matrix = TraceMatrixManager(source_target_pairs, output)
+    ---
+        If k = 1 then 0 / (0 + 1) = 0 / 1 = 0
+        If k = 2 then 1 / (1 + 1) = 1 / 2 = .5
+        If k = 3 then 1 / (2 + 1) = 1 / 3 = .66
+    """
 
-        metric = PrecisionAtKMetric()
-        score = metric._compute(predictions, references, trace_matrix)
-        self.assertAlmostEqual(score["precision@1"], 1)
-        self.assertAlmostEqual(score["precision@2"], 1 / 2)
-        self.assertAlmostEqual(score["precision@3"], 2 / 3)
+    @property
+    def metric_class(self) -> Type[AbstractTraceMetric]:
+        """
+        :return:Returns the precision at k metric class.
+        """
+        return PrecisionAtKMetric
 
-    @staticmethod
-    def create_prediction(score: float):
+    @property
+    def metric_name(self):
         """
-        Creates the prediction for wanted softmax score.
-        :param score: The score desired after softmax applied to prediction.
-        :return: List of tuples representing prediction per class.
+        :return: Returns the name of the precision metric within results.
         """
-        positive_score = score
-        negative_score = 1 - score
-        return [negative_score, positive_score]
+        return "precision"
+
+    @property
+    def expected_metric_scores(self) -> List[float]:
+        """
+        :return: Returns the expected metric scores per k in increasing order (e.g. 1,2,3)
+        """
+        return [0, 1 / 2, 2 / 3]

@@ -1,13 +1,13 @@
 import os
 from copy import deepcopy
-from typing import Dict, List, NamedTuple, Union, Tuple
+from typing import Dict, List, NamedTuple, Tuple, Union
 
 import numpy as np
 import torch
 from datasets import load_metric
+from scipy.special import softmax
 from transformers.trainer import Trainer
 
-from scipy.special import softmax
 from data.datasets.dataset_role import DatasetRole
 from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
 from data.datasets.trace_matrix import TraceMatrixManager

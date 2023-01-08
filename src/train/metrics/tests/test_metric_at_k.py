@@ -21,7 +21,7 @@ class TestMetricAtK(BaseTest, ABC):
     predictions = np.array([0.6, 0.9, 0.7])
     labels = np.array([1, 0, 1])
 
-    def test_correctness(self):
+    def assert_correctness(self):
         metric = self.metric_class()
         trace_links = self.create_trace_links()
         trace_matrix = TraceMatrixManager(trace_links, self.predictions)
@@ -30,7 +30,7 @@ class TestMetricAtK(BaseTest, ABC):
             metric_name = self.metric_name + "@%s" % (str(i + 1))
             self.assertAlmostEqual(metric_results[metric_name], expected_score, msg="Failed:" + metric_name)
 
-    def test_construction(self):
+    def assert_construction(self):
         """
         That that trace links are constructed according to requirements.
         :return:

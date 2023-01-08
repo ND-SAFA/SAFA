@@ -20,6 +20,10 @@ class TestPrecisionAtKMetric(TestMetricAtK):
         If k = 3 then 1 / (2 + 1) = 1 / 3 = .66
     """
 
+    def test_correctness(self):
+        self.assert_construction()
+        self.assert_correctness()
+
     @property
     def metric_class(self) -> Type[AbstractTraceMetric]:
         """

@@ -25,7 +25,7 @@ _CITATION = """
 
 
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
-class PrecisionAtThresholdMetric(AbstractTraceMetric):
+class PrecisionAtKMetric(AbstractTraceMetric):
     name = "precision@k"
 
     def _compute(self, predictions, references, trace_matrix: TraceMatrixManager = None, **kwargs) -> Dict:

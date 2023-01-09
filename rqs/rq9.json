@@ -32,7 +32,7 @@
             "per_device_eval_batch_size": 4,
             "metrics": [
               "map",
-              "map_at_k"
+              "map_at_k",
               "f",
               "precision"
             ]

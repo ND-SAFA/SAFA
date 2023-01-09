@@ -1,6 +1,7 @@
 import typing
 from enum import Enum
-from typing import Any, Dict, List, Type, Union
+from typing import Any, Dict, List, Type
+
 
 class ParamScope(Enum):
     LOCAL = 0
@@ -105,13 +106,17 @@ class ReflectionUtil:
         raise ValueError("Could not convert " + str(type(instance)) + " into" + str(enum) + ".")
 
     @staticmethod
-    def set_attributes(instance: Any, params: Dict) -> Any:
+    def set_attributes(instance: Any, params: Dict, missing_ok=False) -> Any:
         """
         Sets the instance variables matching param keys to param values.
         :param instance: The object whose properties will be updated.
         :param params: Dictionary whose keys match field names and values are set to field.
+        :param missing_ok: Whether missing properties should be ignored.
         :return: Updated instance.
         """
         for param_name, param_value in params.items():
-            setattr(instance, param_name, param_value)
+            if hasattr(instance, param_name):
+                setattr(instance, param_name, param_value)
+            elif not missing_ok:
+                raise ValueError(f"Instance {instance} missing property {param_name}.")
         return instance

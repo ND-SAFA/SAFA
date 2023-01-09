@@ -28,6 +28,7 @@ class AbstractTraceProjectReader(ABC):
         self.project_path = project_path
         self.definition = self._read_definition()
         self.conversions = self.definition.get(StructureKeys.CONVERSIONS, conversions)
+        self.overrides = self.definition.get(StructureKeys.OVERRIDES, {})
 
     @abstractmethod
     def _get_definition_file_name(self) -> str:
@@ -64,7 +65,8 @@ class AbstractTraceProjectReader(ABC):
         trace_links: Dict[int, TraceLink] = {}
         for trace_matrix_name, trace_definition_json in self.get_trace_definitions().items():
             trace_definition = TraceEntityReader(self.project_path, trace_definition_json, name2artifacts,
-                                                 conversions=self.conversions)
+                                                 conversions=self.conversions,
+                                                 overrides=self.overrides)
             trace_links.update(trace_definition.get_entities())
         return trace_links
 
@@ -80,7 +82,8 @@ class AbstractTraceProjectReader(ABC):
         for artifact_name, artifact_definition in name2definition.items():
             name2artifacts[artifact_name] = ArtifactReader(project_path,
                                                            artifact_definition,
-                                                           conversions=self.conversions)
+                                                           conversions=self.conversions,
+                                                           overrides=self.overrides)
         return name2artifacts
 
     def _read_definition(self, definition_file_reader=FileUtil.read_json_file) -> UncasedDict:
@@ -90,5 +93,4 @@ class AbstractTraceProjectReader(ABC):
         :return: Dictionary representing project definition.
         """
         definition_path = os.path.join(self.project_path, self._get_definition_file_name())
-        definition_content = definition_file_reader(definition_path)
-        return UncasedDict(definition_content)
+        return definition_file_reader(definition_path, as_uncased_dict=True)

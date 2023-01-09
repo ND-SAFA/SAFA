@@ -4,6 +4,7 @@ import shutil
 from typing import Dict, List, Union
 
 from util.json_util import JSONUtil
+from util.uncased_dict import UncasedDict
 
 
 class FileUtil:
@@ -31,14 +32,16 @@ class FileUtil:
             return file.read()
 
     @staticmethod
-    def read_json_file(file_path: str) -> Dict:
+    def read_json_file(file_path: str, as_uncased_dict: bool = False) -> Union[Dict, UncasedDict]:
         """
         Reads JSON from file at path.
         :param file_path: Path to JSON file.
+        :param as_uncased_dict: Whether to convert output to uncased dict
         :return: Dictionary content of file.
         """
         with open(file_path) as file:
-            return json.load(file)
+            content = json.load(file)
+        return UncasedDict(content) if as_uncased_dict else content
 
     @staticmethod
     def get_file_list(data_path: str, exclude: List[str] = None) -> List[str]:

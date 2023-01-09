@@ -1,7 +1,7 @@
 import os
 from abc import ABC, abstractmethod
 from enum import Enum
-from typing import Callable, Dict, Generic, List, Optional, Type, TypeVar
+from typing import Any, Callable, Dict, Generic, List, Optional, Type, TypeVar
 
 import pandas as pd
 
@@ -9,6 +9,7 @@ from data.datasets.keys.structure_keys import StructureKeys
 from util.dataframe_util import DataFrameUtil
 from util.file_util import FileUtil
 from util.json_util import JSONUtil
+from util.reflection_util import ReflectionUtil
 
 
 class Wrapper:
@@ -19,12 +20,19 @@ class Wrapper:
         return self.f(*args, **kwargs)
 
 
-def read_files_as_artifacts(files: List[str]):
+def read_files_as_artifacts(file_paths: List[str], use_file_name: bool = True):
+    """
+    Reads file at each path and creates artifact with name
+    :param file_paths: List of paths to file to read as artifacts
+    :param use_file_name: Whether to use file name as artifact id, otherwise file path is used.
+    :return: DataFrame containing artifact properties id and body.
+    """
     entries = []
-    for file in files:
+    for file_path in file_paths:
+        artifact_name = os.path.basename(file_path) if use_file_name else file_path
         entry = {
-            StructureKeys.Artifact.ID: file,
-            StructureKeys.Artifact.BODY: FileUtil.read_file(file)
+            StructureKeys.Artifact.ID: artifact_name,
+            StructureKeys.Artifact.BODY: FileUtil.read_file(file_path)
         }
         entries.append(entry)
     return pd.DataFrame(entries)
@@ -75,12 +83,13 @@ class EntityReader(ABC, Generic[EntityType]):
     Responsible for converting data into entities.
     """
 
-    def __init__(self, base_path: str, definition: Dict, conversions: Dict = None):
+    def __init__(self, base_path: str, definition: Dict, conversions: Dict = None, overrides: Dict = None):
         """
-        Creates reader
+        Creates entity reader for project at base_path using definition given.
         :param base_path: The base path to find data.
         :param definition: Defines how to parse the data.
         :param conversions: The conversions to the data to standardize it.
+        :param overrides: The properties to override in class if they exist.
         """
         required_properties = [StructureKeys.PATH]
         JSONUtil.require_properties(definition, required_properties)
@@ -88,6 +97,7 @@ class EntityReader(ABC, Generic[EntityType]):
         self.path = os.path.join(base_path, self.get_property(StructureKeys.PATH))
         self.conversions: Dict[str, Dict] = conversions if conversions else None
         self.entity_type = None
+        self.set_properties(self, overrides)
 
     def get_entities(self):
         if self.entity_type is None:
@@ -139,3 +149,16 @@ class EntityReader(ABC, Generic[EntityType]):
 
         supported_file_types = [f.name.lower() for f in EntityFormats]
         raise ValueError(data_file_name, "does not have supported file type: ", supported_file_types)
+
+    @staticmethod
+    def set_properties(obj: Any, properties: Optional[Dict[str, Any]]) -> None:
+        """
+        Sets key-value in object if they exist.
+        :param obj: The object to set properties in.
+        :param properties: The properties to override.
+        :return: None
+        """
+        if properties is None:
+            return
+        properties = {k.upper(): v for k, v in properties.items()}
+        ReflectionUtil.set_attributes(obj, properties, missing_ok=True)

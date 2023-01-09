@@ -16,3 +16,5 @@ class StructureKeys:
     PATH = "path"
     CONVERSIONS = "conversions"
     PARAMS = "params"
+    ARTIFACTS = "artifacts"
+    TRACES = "traces"

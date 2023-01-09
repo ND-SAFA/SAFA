@@ -9,7 +9,6 @@ class SafaKeys:
     SAFA_JSON_ARTIFACT_TOKEN = "body"
     SOURCE_ID = "source"
     TARGET_ID = "target"
-    ARTIFACTS = "artifacts"
-    TRACES = "traces"
+    
     FILE = "file"
     SUPPORTED_EXTENSIONS = [".json", ".csv"]

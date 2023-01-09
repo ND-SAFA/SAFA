@@ -1,5 +1,5 @@
 <template>
-  <flex-box b="2" v-if="doDisplay">
+  <flex-box wrap b="2" v-if="doDisplay">
     <text-button text icon-id="mdi-download" @click="handleDownload">
       Download
     </text-button>

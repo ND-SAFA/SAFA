@@ -19,12 +19,19 @@ class Wrapper:
         return self.f(*args, **kwargs)
 
 
-def read_files_as_artifacts(files: List[str]):
+def read_files_as_artifacts(file_paths: List[str], use_file_name: bool = True):
+    """
+    Reads file at each path and creates artifact with name
+    :param file_paths: List of paths to file to read as artifacts
+    :param use_file_name: Whether to use file name as artifact id, otherwise file path is used.
+    :return: DataFrame containing artifact properties id and body.
+    """
     entries = []
-    for file in files:
+    for file_path in file_paths:
+        file_name = os.path.basename(file_path) if use_file_name else file_path
         entry = {
-            StructureKeys.Artifact.ID: file,
-            StructureKeys.Artifact.BODY: FileUtil.read_file(file)
+            StructureKeys.Artifact.ID: file_name,
+            StructureKeys.Artifact.BODY: FileUtil.read_file(file_path)
         }
         entries.append(entry)
     return pd.DataFrame(entries)

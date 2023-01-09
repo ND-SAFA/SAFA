@@ -9,6 +9,7 @@ from data.datasets.keys.structure_keys import StructureKeys
 from util.dataframe_util import DataFrameUtil
 from util.file_util import FileUtil
 from util.json_util import JSONUtil
+from util.reflection_util import ReflectionUtil
 
 
 class Wrapper:
@@ -159,7 +160,5 @@ class EntityReader(ABC, Generic[EntityType]):
         """
         if properties is None:
             return
-        for rule_name, rule_value in properties.items():
-            rule_name = rule_name.upper()
-            if hasattr(obj, rule_name):
-                setattr(obj, rule_name, rule_value)
+        properties = {k.upper(): v for k, v in properties.items()}
+        ReflectionUtil.set_attributes(obj, properties, missing_ok=True)

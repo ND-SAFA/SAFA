@@ -1,6 +1,7 @@
 import typing
 from enum import Enum
-from typing import Any, Dict, List, Type, Union
+from typing import Any, Dict, List, Type
+
 
 class ParamScope(Enum):
     LOCAL = 0
@@ -105,7 +106,7 @@ class ReflectionUtil:
         raise ValueError("Could not convert " + str(type(instance)) + " into" + str(enum) + ".")
 
     @staticmethod
-    def set_attributes(instance: Any, params: Dict) -> Any:
+    def set_attributes(instance: Any, params: Dict, missing_ok=False) -> Any:
         """
         Sets the instance variables matching param keys to param values.
         :param instance: The object whose properties will be updated.
@@ -113,5 +114,6 @@ class ReflectionUtil:
         :return: Updated instance.
         """
         for param_name, param_value in params.items():
-            setattr(instance, param_name, param_value)
+            if hasattr(instance, param_name) and not missing_ok:
+                setattr(instance, param_name, param_value)
         return instance

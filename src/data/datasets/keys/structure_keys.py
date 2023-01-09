@@ -18,3 +18,4 @@ class StructureKeys:
     PARAMS = "params"
     ARTIFACTS = "artifacts"
     TRACES = "traces"
+    OVERRIDES = "overrides"

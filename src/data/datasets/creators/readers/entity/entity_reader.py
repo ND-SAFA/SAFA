@@ -1,7 +1,7 @@
 import os
 from abc import ABC, abstractmethod
 from enum import Enum
-from typing import Callable, Dict, Generic, List, Optional, Type, TypeVar
+from typing import Any, Callable, Dict, Generic, List, Optional, Type, TypeVar
 
 import pandas as pd
 
@@ -82,12 +82,13 @@ class EntityReader(ABC, Generic[EntityType]):
     Responsible for converting data into entities.
     """
 
-    def __init__(self, base_path: str, definition: Dict, conversions: Dict = None):
+    def __init__(self, base_path: str, definition: Dict, conversions: Dict = None, overrides: Dict = None):
         """
-        Creates reader
+        Creates entity reader for project at base_path using definition given.
         :param base_path: The base path to find data.
         :param definition: Defines how to parse the data.
         :param conversions: The conversions to the data to standardize it.
+        :param overrides: The properties to override in class if they exist.
         """
         required_properties = [StructureKeys.PATH]
         JSONUtil.require_properties(definition, required_properties)
@@ -95,6 +96,7 @@ class EntityReader(ABC, Generic[EntityType]):
         self.path = os.path.join(base_path, self.get_property(StructureKeys.PATH))
         self.conversions: Dict[str, Dict] = conversions if conversions else None
         self.entity_type = None
+        self.set_properties(self, overrides)
 
     def get_entities(self):
         if self.entity_type is None:
@@ -146,3 +148,18 @@ class EntityReader(ABC, Generic[EntityType]):
 
         supported_file_types = [f.name.lower() for f in EntityFormats]
         raise ValueError(data_file_name, "does not have supported file type: ", supported_file_types)
+
+    @staticmethod
+    def set_properties(obj: Any, properties: Optional[Dict[str, Any]]) -> None:
+        """
+        Sets key-value in object if they exist.
+        :param obj: The object to set properties in.
+        :param properties: The properties to override.
+        :return: None
+        """
+        if properties is None:
+            return
+        for rule_name, rule_value in properties.items():
+            rule_name = rule_name.upper()
+            if hasattr(obj, rule_name):
+                setattr(obj, rule_name, rule_value)

@@ -28,9 +28,9 @@ def read_files_as_artifacts(file_paths: List[str], use_file_name: bool = True):
     """
     entries = []
     for file_path in file_paths:
-        file_name = os.path.basename(file_path) if use_file_name else file_path
+        artifact_name = os.path.basename(file_path) if use_file_name else file_path
         entry = {
-            StructureKeys.Artifact.ID: file_name,
+            StructureKeys.Artifact.ID: artifact_name,
             StructureKeys.Artifact.BODY: FileUtil.read_file(file_path)
         }
         entries.append(entry)

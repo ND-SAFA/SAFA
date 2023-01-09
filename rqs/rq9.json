@@ -42,7 +42,6 @@
               "object_type": "STRUCTURE",
               "project_path": {
                 "*": [
-                  "[DATA_PATH]/cchit",
                   "[DATA_PATH]/drone",
                   "[DATA_PATH]/cm1"
                 ]

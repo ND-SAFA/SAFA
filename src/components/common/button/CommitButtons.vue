@@ -49,6 +49,7 @@ export default Vue.extend({
           label: "Undo",
           icon: "mdi-undo",
           isDisabled: !commitStore.canUndo,
+          dataCy: "button-nav-undo",
         },
         {
           type: ButtonType.ICON,
@@ -56,6 +57,7 @@ export default Vue.extend({
           label: "Redo",
           icon: "mdi-redo",
           isDisabled: !commitStore.canRedo,
+          dataCy: "button-nav-redo",
         },
       ];
     },

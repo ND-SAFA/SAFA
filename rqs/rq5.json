@@ -18,7 +18,7 @@
             "model_path": "roberta-base"
           },
           "trainer_args": {
-            "output_dir": "[OUTPUT_PATH]/rq3/models",
+            "output_dir": "[OUTPUT_PATH]/rq5/models",
             "train_epochs_range": [
               1,
               21,
@@ -35,17 +35,17 @@
           "trainer_dataset_manager": {
             "train_dataset_creator": {
               "object_type": "SAFA",
-              "project_path": {
-                "*": [
-                  "[DATA_PATH]/lhp/cooling",
-                  "[DATA_PATH]/lhp/heating",
-                  "[DATA_PATH]/lhp/vehiclemodes"
-                ]
-              }
+              "project_path": "[DATA_PATH]/cchit"
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",
-              "val_percentage": 0.5,
+              "val_percentage": {
+                "*": [
+                  0.2,
+                  0.5,
+                  0.8
+                ]
+              },
               "split_strategy": {
                 "*": [
                   "random",
@@ -65,5 +65,5 @@
       ]
     }
   ],
-  "output_dir": "[OUTPUT_PATH]/rq3/jobs"
+  "output_dir": "[OUTPUT_PATH]/rq5/jobs"
 }

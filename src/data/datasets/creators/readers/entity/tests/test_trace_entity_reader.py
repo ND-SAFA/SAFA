@@ -36,7 +36,7 @@ class TestTraceEntityReader(BaseTest):
         """
         name2artifacts = self.create_artifact_reader()
         trace_entity_reader = TraceEntityReader(self.PROJECT_PATH, self.TRACE_DEFINITION, name2artifacts, **{
-            "rules": {
+            StructureKeys.OVERRIDES: {
                 "ALLOW_MISSING_SOURCE": True
             }
         })
@@ -50,7 +50,7 @@ class TestTraceEntityReader(BaseTest):
         """
         name2artifacts = self.create_artifact_reader()
         trace_entity_reader = TraceEntityReader(self.PROJECT_PATH, self.TRACE_DEFINITION, name2artifacts, **{
-            "rules": {
+            StructureKeys.OVERRIDES: {
                 "ALLOW_MISSING_SOURCE": True,
                 "ALLOW_MISSING_TARGET": True
             }

@@ -111,9 +111,12 @@ class ReflectionUtil:
         Sets the instance variables matching param keys to param values.
         :param instance: The object whose properties will be updated.
         :param params: Dictionary whose keys match field names and values are set to field.
+        :param missing_ok: Whether missing properties should be ignored.
         :return: Updated instance.
         """
         for param_name, param_value in params.items():
-            if hasattr(instance, param_name) and not missing_ok:
+            if hasattr(instance, param_name):
                 setattr(instance, param_name, param_value)
+            elif not missing_ok:
+                raise ValueError(f"Instance {instance} missing property {param_name}.")
         return instance

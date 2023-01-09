@@ -15,16 +15,47 @@
             }
           },
           "model_manager": {
-            "model_path": "roberta-base"
+            "model_path": "roberta-base",
+            "layers_to_freeze": {
+              "*": [
+                null,
+                [
+                  0
+                ],
+                [
+                  0,
+                  1
+                ],
+                [
+                  0,
+                  1,
+                  2
+                ],
+                [
+                  0,
+                  1,
+                  2,
+                  3
+                ],
+                [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4
+                ]
+              ]
+            }
           },
           "trainer_args": {
-            "output_dir": "[OUTPUT_PATH]/rq3/models",
+            "output_dir": "[OUTPUT_PATH]/rq4/models",
             "train_epochs_range": [
               1,
               21,
               1
             ],
-            "per_device_train_batch_size": 2,
+            "per_device_train_batch_size": 4,
+            "per_device_eval_batch_size": 4,
             "metrics": [
               "map",
               "map_at_k",
@@ -37,21 +68,22 @@
               "object_type": "SAFA",
               "project_path": {
                 "*": [
-                  "[DATA_PATH]/lhp/cooling",
                   "[DATA_PATH]/lhp/heating",
+                  "[DATA_PATH]/lhp/cooling",
                   "[DATA_PATH]/lhp/vehiclemodes"
                 ]
               }
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",
-              "val_percentage": 0.5,
-              "split_strategy": {
+              "val_percentage": {
                 "*": [
-                  "random",
-                  "source_random"
+                  0.2,
+                  0.5,
+                  0.8
                 ]
-              }
+              },
+              "split_strategy": "random"
             },
             "augmenter": {
               "steps": [
@@ -65,5 +97,5 @@
       ]
     }
   ],
-  "output_dir": "[OUTPUT_PATH]/rq3/jobs"
+  "output_dir": "[OUTPUT_PATH]/rq4/jobs"
 }

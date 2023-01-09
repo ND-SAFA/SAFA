@@ -15,16 +15,16 @@
             }
           },
           "model_manager": {
-            "model_path": "roberta-base"
+            "model_path": "sentence-transformers/sentence-t5-base"
           },
           "trainer_args": {
-            "output_dir": "[OUTPUT_PATH]/rq3/models",
+            "output_dir": "[OUTPUT_PATH]/rq7/models",
             "train_epochs_range": [
               1,
               21,
               1
             ],
-            "per_device_train_batch_size": 2,
+            "per_device_train_batch_size": 8,
             "metrics": [
               "map",
               "map_at_k",
@@ -35,23 +35,12 @@
           "trainer_dataset_manager": {
             "train_dataset_creator": {
               "object_type": "SAFA",
-              "project_path": {
-                "*": [
-                  "[DATA_PATH]/lhp/cooling",
-                  "[DATA_PATH]/lhp/heating",
-                  "[DATA_PATH]/lhp/vehiclemodes"
-                ]
-              }
+              "project_path": "[DATA_PATH]/cchit"
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",
-              "val_percentage": 0.5,
-              "split_strategy": {
-                "*": [
-                  "random",
-                  "source_random"
-                ]
-              }
+              "val_percentage": 0.2,
+              "split_strategy": "source-random"
             },
             "augmenter": {
               "steps": [
@@ -65,5 +54,5 @@
       ]
     }
   ],
-  "output_dir": "[OUTPUT_PATH]/rq3/jobs"
+  "output_dir": "[OUTPUT_PATH]/rq7/jobs"
 }

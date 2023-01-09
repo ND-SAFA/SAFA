@@ -1,6 +1,7 @@
 from enum import Enum
 
 from data.datasets.splitting.combination_split_strategy import CombinationSplitStrategy
+from data.datasets.splitting.random_all_sources_split_strategy import RandomAllSourcesSplitStrategy
 from data.datasets.splitting.random_split_strategy import RandomSplitStrategy
 from data.datasets.splitting.source_split_strategy import SourceSplitStrategy
 
@@ -11,5 +12,6 @@ class SupportedSplitStrategy(Enum):
     Note, values are keys instead of classes to avoid circular imports.
     """
     RANDOM = RandomSplitStrategy
-    SOURCE_RANDOM = SourceSplitStrategy
+    SOURCE = SourceSplitStrategy
     COMBINATION = CombinationSplitStrategy
+    RANDOM_ALL_SOURCES = RandomAllSourcesSplitStrategy

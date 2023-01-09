@@ -1,6 +1,7 @@
 import random
 from collections import namedtuple
-from typing import Callable, Dict, Iterable, List
+from copy import deepcopy
+from typing import Callable, Dict, List, Iterable, NamedTuple
 
 import numpy as np
 
@@ -16,16 +17,18 @@ class TraceMatrixManager:
     Contains trace and similarity matrices for computing query-based metrics.
     """
 
-    def __init__(self, links: Iterable[TraceLink], predicted_scores: List[float] = None):
+    def __init__(self, links: Iterable[TraceLink], predicted_scores: List[float] = None, randomize: bool = False):
         """
         Constructs similarity and trace matrices using predictions output.
         :param links: The list of trace links.
         :param predicted_scores: The prediction scores on the links.
+        :param randomize: if True, randomizes the order of links in the matrix
         """
         self.query_matrix = {}
         self.source_ids = []
         self._fill_trace_matrix(links, [None for link in links] if predicted_scores is None else predicted_scores)
-        random.shuffle(self.source_ids)
+        if randomize:
+            self._do_randomize()
 
     def add_link(self, link: TraceLink, pred: float = None) -> None:
         """
@@ -88,3 +91,14 @@ class TraceMatrixManager:
         """
         for link, pred in zip(links, predicted_scores):
             self.add_link(link, pred)
+
+    def _do_randomize(self) -> None:
+        """
+        Randomizes the order of links in the matrix
+        :return: None
+        """
+        random.shuffle(self.source_ids)
+        for source, query in self.query_matrix.items():
+            links_to_randomize = deepcopy(query.links)
+            random.shuffle(links_to_randomize)
+            self.query_matrix[source] = Query(links=links_to_randomize, preds=query.preds)

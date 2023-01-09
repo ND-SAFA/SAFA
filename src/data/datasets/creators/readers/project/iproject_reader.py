@@ -93,5 +93,4 @@ class AbstractTraceProjectReader(ABC):
         :return: Dictionary representing project definition.
         """
         definition_path = os.path.join(self.project_path, self._get_definition_file_name())
-        definition_content = definition_file_reader(definition_path)
-        return UncasedDict(definition_content)
+        return definition_file_reader(definition_path, as_uncased_dict=True)

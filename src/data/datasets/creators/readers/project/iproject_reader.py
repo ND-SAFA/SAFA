@@ -70,8 +70,7 @@ class AbstractTraceProjectReader(ABC):
             trace_links.update(trace_definition.get_entities())
         return trace_links
 
-    def _create_artifact_readers(self, project_path: str, name2definition: Dict[str, Dict]) -> Dict[
-        str, ArtifactReader]:
+    def _create_artifact_readers(self, project_path: str, name2definition: Dict[str, Dict]) -> Dict[str, ArtifactReader]:
         """
         Creates artifact reader for each artifact definition.
         :param project_path: Path to project.

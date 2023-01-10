@@ -1,0 +1,59 @@
+{
+  "steps": [
+    {
+      "jobs": [
+        {
+          "object_type": "TRAIN",
+          "job_args": {
+            "random_seed": {
+              "*": [
+                197,
+                914,
+                209,
+                330
+              ]
+            }
+          },
+          "model_manager": {
+            "model_path": "bert-base-uncased"
+          },
+          "trainer_args": {
+            "output_dir": "[OUTPUT_PATH]/rq13/models",
+            "train_epochs_range": [
+              1,
+              21,
+              1
+            ],
+            "per_device_train_batch_size": 4,
+            "per_device_eval_batch_size": 4,
+            "metrics": [
+              "map",
+              "map_at_k",
+              "f",
+              "precision"
+            ]
+          },
+          "trainer_dataset_manager": {
+            "train_dataset_creator": {
+              "object_type": "STRUCTURE",
+              "project_path": "[DATA_PATH]/cm1"
+            },
+            "val_dataset_creator": {
+              "object_type": "SPLIT",
+              "val_percentage": 0.2
+            },
+            "augmenter": {
+              "steps": [
+                {
+                  "object_type": "RESAMPLE",
+                  "percent_to_weight": 1
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "output_dir": "[OUTPUT_PATH]/rq13/jobs"
+}

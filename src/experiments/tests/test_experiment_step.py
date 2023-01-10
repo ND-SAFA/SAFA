@@ -41,6 +41,14 @@ class TestExperimentStep(BaseExperimentTest):
         self.assertEquals(max(self.accuracies), best_job.result[JobResult.METRICS]["accuracy"])
         self.assertEqual(train_job_run_mock.call_count, 4)
 
+    @patch.object(TrainJob, "_run")
+    def test_run_failed(self, train_job_run_mock: mock.MagicMock):
+        train_job_run_mock.side_effect = ValueError()
+        experiment_step = self.get_experiment_step()
+        experiment_step.run(TEST_OUTPUT_DIR)
+        self.assertEquals(experiment_step.status, Status.FAILURE)
+        self.assertEqual(train_job_run_mock.call_count, 1)
+
     @patch.object(PredictJob, "_run")
     def test_run_with_best_prior(self, predict_job_run_mock: mock.MagicMock):
         predict_job_run_mock.side_effect = self.job_fake_run
@@ -68,6 +76,12 @@ class TestExperimentStep(BaseExperimentTest):
         for job in final_jobs:
             self.assertTrue(not isinstance(job.trainer_args.num_train_epochs, UndeterminedVariable))
             self.assertTrue(not isinstance(job.model_manager.model_path, UndeterminedVariable))
+
+    def test_get_failed_jobs(self):
+        jobs = self.get_test_jobs()
+        jobs[0].result.set_job_status(Status.FAILURE)
+        failed_jobs = ExperimentStep._get_failed_jobs(jobs)
+        self.assertEquals(1, len(failed_jobs))
 
     def test_run_on_all_jobs(self):
         jobs = self.get_test_jobs()
@@ -102,7 +116,7 @@ class TestExperimentStep(BaseExperimentTest):
     def get_test_jobs():
         job1 = TrainJob(JobArgs(output_dir=TEST_OUTPUT_DIR), ModelManager(TEST_OUTPUT_DIR), None,
                         TrainerArgs(output_dir=TEST_OUTPUT_DIR))
-        job2 = TrainJob(JobArgs(output_dir=TEST_OUTPUT_DIR),  ModelManager(TEST_OUTPUT_DIR), None,
+        job2 = TrainJob(JobArgs(output_dir=TEST_OUTPUT_DIR), ModelManager(TEST_OUTPUT_DIR), None,
                         TrainerArgs(output_dir=TEST_OUTPUT_DIR))
         return [job1, job2]
 

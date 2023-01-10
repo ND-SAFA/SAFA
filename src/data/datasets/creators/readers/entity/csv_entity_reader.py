@@ -24,24 +24,25 @@ class CSVEntityReader(EntityReader):
             StructureKeys.PATH: file_path
         })
 
+    @staticmethod
+    def add_artifact(a_id: str, a_body: str, mapping):
+        if a_id not in mapping:
+            artifact = Artifact(a_id, a_body)
+            mapping[a_id] = artifact
+        return mapping[a_id]
+
     def create(self, entity_df: pd.DataFrame) -> EntityType:
         source_artifact_mapping: Dict[str, Artifact] = {}
         target_artifact_mapping: Dict[str, Artifact] = {}
 
-        def add_artifact(a_id: str, a_body: str, mapping):
-            if a_id not in mapping:
-                artifact = Artifact(a_id, a_body)
-                mapping[a_id] = artifact
-            return mapping[a_id]
-
         trace_links: Dict[int, TraceLink] = {}
         for row_index, row in entity_df.iterrows():
-            source = add_artifact(
+            source = self.add_artifact(
                 row[CSVSourceData.source_id],
                 row[CSVSourceData.source_body],
                 source_artifact_mapping
             )
-            target = add_artifact(
+            target = self.add_artifact(
                 row[CSVSourceData.target_id],
                 row[CSVSourceData.target_body],
                 target_artifact_mapping

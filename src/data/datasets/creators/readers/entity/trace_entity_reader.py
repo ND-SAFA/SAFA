@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Set
 
 import pandas as pd
 
@@ -43,31 +43,39 @@ class TraceEntityReader(EntityReader):
         :return: Mapping between trace link id and the trace link.
         """
         trace_links: Dict[int, TraceLink] = {}
-        n_positive = 0
+        pos_link_ids = self.traces_df_to_link_ids(traces_df)
         for source_artifact in self.source_artifacts:
             for target_artifact in self.target_artifacts:
-                trace_link = self.create_trace_link(source_artifact, target_artifact, traces_df)
+                trace_link = self.create_trace_link(source_artifact, target_artifact, pos_link_ids)
                 trace_links[trace_link.id] = trace_link
-                n_positive += 1 if trace_link.is_true_link else 0
         is_ok, msg = self.assert_missing_trace_links(traces_df)
         assert is_ok, msg
         return trace_links
 
     @staticmethod
-    def create_trace_link(source_artifact: Artifact, target_artifact: Artifact, traces_df: pd.DataFrame) -> TraceLink:
+    def create_trace_link(source_artifact: Artifact, target_artifact: Artifact, pos_link_ids: pd.DataFrame) -> TraceLink:
         """
         Creates a trace link between artifacts checking matrix if link is positive or not.
         :param source_artifact: The source artifact to reference in trace link.
         :param target_artifact: The target artifact to reference in trace link.
-        :param traces_df: DataFrame containing positive links in dataset.
+        :param pos_link_ids: A set of positive trace link ids
         :return: TraceLink created.
         """
-        source_id = source_artifact.id
-        target_id = target_artifact.id
-        trace_query = traces_df[(traces_df[SafaKeys.SOURCE_ID] == source_id) &
-                                (traces_df[SafaKeys.TARGET_ID] == target_id)]
-        is_positive = len(trace_query) >= 1
-        return TraceLink(source_artifact, target_artifact, is_true_link=is_positive)
+        link_id = TraceLink.generate_link_id(source_artifact.id, target_artifact.id)
+        return TraceLink(source_artifact, target_artifact, is_true_link=link_id in pos_link_ids)
+
+    @staticmethod
+    def traces_df_to_link_ids(traces_df: pd.DataFrame) -> Set[int]:
+        """
+        Converts a dataframe of source id, target id pairs into a set of positive trace link ids
+        :param traces_df: a dataframe of source id, target id pairs
+        :return: a set of positive trace link ids
+        """
+        pos_link_ids = set()
+        for i, row in traces_df.iterrows():
+            link_id = TraceLink.generate_link_id(row[SafaKeys.SOURCE_ID], row[SafaKeys.TARGET_ID])
+            pos_link_ids.add(link_id)
+        return pos_link_ids
 
     def assert_missing_trace_links(self, traces_df: pd.DataFrame) -> Tuple[bool, Optional[str]]:
         """

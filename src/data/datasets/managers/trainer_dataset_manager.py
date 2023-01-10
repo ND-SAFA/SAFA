@@ -97,6 +97,13 @@ class TrainerDatasetManager(BaseObject):
             self._prepare_datasets(self.augmenter)
         return self.__datasets
 
+    def cleanup(self) -> None:
+        """
+        Clears datasets out of memory
+        :return: None
+        """
+        self.__datasets = None
+
     @classmethod
     @overrides(BaseObject)
     def _get_child_enum_class(cls, abstract_class: Type, child_class_name: str) -> Type:
@@ -160,8 +167,7 @@ class TrainerDatasetManager(BaseObject):
                 for dataset_role, dataset_creator in dataset_creators_map.items()}
 
     @staticmethod
-    def __optional_create(dataset_creator: Optional[AbstractDatasetCreator]) -> Optional[
-        Union[TraceDataset, PreTrainDataset]]:
+    def __optional_create(dataset_creator: Optional[AbstractDatasetCreator]) -> Optional[Union[TraceDataset, PreTrainDataset]]:
         """
         Creates dataset set if not None, otherwise None is returned.
         :param dataset_creator: The optional dataset creator to use.

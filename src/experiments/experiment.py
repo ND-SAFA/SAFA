@@ -6,6 +6,7 @@ from experiments.experiment_step import ExperimentStep
 from jobs.abstract_job import AbstractJob
 from util.base_object import BaseObject
 from util.file_util import FileUtil
+from util.status import Status
 
 
 class Experiment(BaseObject):
@@ -30,6 +31,8 @@ class Experiment(BaseObject):
         for i, step in enumerate(self.steps):
             step_output_dir = os.path.join(self.output_dir, str(self.id), self._STEP_DIR_NAME % i)
             jobs_for_undetermined_vals = step.run(step_output_dir, jobs_for_undetermined_vals)
+            if step.status == Status.FAILURE:
+                break
 
     def get_all_jobs(self) -> List[AbstractJob]:
         """

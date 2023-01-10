@@ -21,6 +21,7 @@ class ExperimentStep(BaseObject):
     OUTPUT_FILENAME = "output.json"
     MAX_JOBS = 1
     RUN_ASYNC = False
+    EXIT_ON_FAILED_JOB = True
 
     def __init__(self, jobs: Union[List[AbstractJob], ExperimentalVariable],
                  comparison_metric: Union[str, SupportedTraceMetric] = None, should_maximize_metric: bool = True):
@@ -41,8 +42,7 @@ class ExperimentStep(BaseObject):
         if not self.RUN_ASYNC:
             self.MAX_JOBS = 1
 
-    def run(self, output_dir: str, jobs_for_undetermined_vars: List[AbstractJob] = None) -> \
-            List[AbstractJob]:
+    def run(self, output_dir: str, jobs_for_undetermined_vars: List[AbstractJob] = None) -> List[AbstractJob]:
         """
         Runs all step jobs
         :param output_dir: the directory to save to
@@ -61,12 +61,40 @@ class ExperimentStep(BaseObject):
                 self.best_job = self._run_multi_epoch_step(jobs, output_dir)
             else:
                 self.best_job = self._run_jobs(jobs, output_dir)
+            failed_jobs = self._get_failed_jobs(jobs)
+            if len(failed_jobs) > 0 and self.EXIT_ON_FAILED_JOB:
+                self.status = Status.FAILURE
+                break
 
-        self.status = Status.SUCCESS
+        if self.status != Status.FAILURE:
+            self.status = Status.SUCCESS
         self.save_results(output_dir)
         return [self.best_job] if self.best_job else self.jobs
 
-    def _run_multi_epoch_step(self, jobs: List[AbstractJob], output_dir: str):
+    def save_results(self, output_dir: str) -> None:
+        """
+        Saves the results of the step
+        :param output_dir: the directory to output results to
+        :return: None
+        """
+        FileUtil.make_dir_safe(output_dir)
+        json_output = JSONUtil.dict_to_json(self.get_results())
+        output_filepath = os.path.join(output_dir, ExperimentStep.OUTPUT_FILENAME)
+        FileUtil.save_to_file(json_output, output_filepath)
+
+    def get_results(self) -> Dict[str, str]:
+        """
+        Gets the results of the step
+        :return: a dictionary containing the results
+        """
+        results = {}
+        for var_name, var_value in vars(self).items():
+            if var_name.startswith("_") or callable(var_value):
+                continue
+            results[var_name] = var_value
+        return results
+
+    def _run_multi_epoch_step(self, jobs: List[AbstractJob], output_dir: str) -> AbstractJob:
         """
         Runs the a multi epoch step for a given epoch range inside the jobs' trainer args
         :param jobs: a list of jobs to run
@@ -95,30 +123,16 @@ class ExperimentStep(BaseObject):
         self._run_on_jobs(jobs, "save", output_dir=output_dir)
         return best_job
 
-    def save_results(self, output_dir: str) -> None:
+    @staticmethod
+    def _get_failed_jobs(jobs: List[AbstractJob]) -> List[str]:
         """
-        Saves the results of the step
-        :param output_dir: the directory to output results to
-        :return: None
+        Returns a list of a failed job ids
+        :param jobs: a list of jobs to check which failed
+        :return: a list of a failed job ids
         """
-        FileUtil.make_dir_safe(output_dir)
-        json_output = JSONUtil.dict_to_json(self.get_results())
-        output_filepath = os.path.join(output_dir, ExperimentStep.OUTPUT_FILENAME)
-        FileUtil.save_to_file(json_output, output_filepath)
+        return [job.id for job in jobs if job.result.get_job_status() == Status.FAILURE]
 
-    def get_results(self) -> Dict[str, str]:
-        """
-        Gets the results of the step
-        :return: a dictionary containing the results
-        """
-        results = {}
-        for var_name, var_value in vars(self).items():
-            if var_name.startswith("_") or callable(var_value):
-                continue
-            results[var_name] = var_value
-        return results
-
-    def _conditional_save(self, best_job: AbstractTraceJob, job: AbstractTraceJob, best_model_name: str = "best"):
+    def _conditional_save(self, best_job: AbstractTraceJob, job: AbstractTraceJob, best_model_name: str = "best") -> AbstractJob:
         """
         Checks job against best model and if better will override best model path.
         :param best_job: The best job.

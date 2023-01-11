@@ -143,8 +143,15 @@ public class GithubCredentialsController extends BaseController {
 
         SafaUser principal = safaUserService.getCurrentUser();
         executorDelegate.submit(output, () -> {
-            GithubAccessCredentials githubAccessCredentials = githubAccessCredentialsRepository.findByUser(principal)
-                .orElseThrow(() -> new SafaError("No GitHub credentials found"));
+            Optional<GithubAccessCredentials> githubAccessCredentialsOptional =
+                githubAccessCredentialsRepository.findByUser(principal);
+
+            if (githubAccessCredentialsOptional.isEmpty()) {
+                output.setResult(new GithubResponseDTO<>(null, GithubResponseMessage.MISSING));
+                return;
+            }
+
+            GithubAccessCredentials githubAccessCredentials = githubAccessCredentialsOptional.get();
 
             GithubResponseDTO<Boolean> responseDTO = githubControllerUtils.checkCredentials(githubAccessCredentials);
 

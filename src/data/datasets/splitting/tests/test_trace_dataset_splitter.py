@@ -14,7 +14,7 @@ class TestTraceDatasetSplitter(BaseTraceTest):
 
     def test_splits(self):
         for split_type in SupportedSplitStrategy:
-            if split_type == SupportedSplitStrategy.RANDOM_ALL_SOURCES:
+            if split_type != SupportedSplitStrategy.RANDOM_ALL_ARTIFACTS:
                 self.assert_split(split_type)
                 self.assert_split_multiple(split_type)
 

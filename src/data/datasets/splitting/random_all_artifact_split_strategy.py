@@ -26,13 +26,12 @@ class RandomAllArtifactSplitStrategy(AbstractSplitStrategy):
         sources_seen = []
         targets_seen = []
         first_split_links = []
-        second_split_links = []
         links: List[TraceLink] = list(trace_dataset.links.values())
 
-        for source_id in trace_dataset.trace_matrix.source_ids:
+        for source_id in trace_dataset.trace_matrix.source_ids:  # will select one link per source
             source_traces = trace_dataset.trace_matrix.query_matrix[source_id]
             source_traces = source_traces.links.copy()
-            for source_trace in source_traces:  # select link with new target
+            for source_trace in source_traces:  # select link containing new target
                 source_id = source_trace.source.id
                 target_id = source_trace.target.id
                 if target_id not in targets_seen:
@@ -41,10 +40,14 @@ class RandomAllArtifactSplitStrategy(AbstractSplitStrategy):
                     first_split_links.append(source_trace.id)
                     break
 
+        for link in links:  # ensures all targets are covered
+            if link.target.id not in targets_seen:
+                first_split_links.append(link.id)
+                targets_seen.append(link.target.id)
+
         if percent_split * len(links) < len(first_split_links):
             raise ValueError(f"Referencing all artifacts led to split greater than percentage desired: {percent_split}.")
-        split_links = first_split_links if slice_num == 1 else second_split_links
         return CombinationSplitStrategy.create_split_containing_specified_link_ids(trace_dataset=trace_dataset,
-                                                                                   link_ids_for_first_split=split_links,
+                                                                                   link_ids_for_first_split=first_split_links,
                                                                                    percent_split=percent_split,
                                                                                    slice_num=slice_num)

@@ -36,6 +36,8 @@ class CSVEntityReader(EntityReader):
         target_artifact_mapping: Dict[str, Artifact] = {}
 
         trace_links: Dict[int, TraceLink] = {}
+        pos_link_ids = []
+        neg_link_ids = []
         for row_index, row in entity_df.iterrows():
             source = self.add_artifact(
                 row[CSVSourceData.source_id],
@@ -51,4 +53,8 @@ class CSVEntityReader(EntityReader):
             is_true_link = int(label) == 1
             trace_link = TraceLink(source, target, is_true_link=is_true_link)
             trace_links[trace_link.id] = trace_link
-        return trace_links
+            if is_true_link:
+                pos_link_ids.append(trace_link.id)
+            else:
+                neg_link_ids.append(trace_link.id)
+        return trace_links, pos_link_ids, neg_link_ids

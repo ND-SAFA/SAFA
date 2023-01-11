@@ -1,6 +1,8 @@
 from abc import ABC
+from typing import Type, Any
 
 from config.override import overrides
+from data.datasets.managers.deterministic_trainer_dataset_manager import DeterministicTrainerDatasetManager
 from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
 from jobs.abstract_job import AbstractJob
 from jobs.components.job_args import JobArgs
@@ -8,6 +10,9 @@ from jobs.create_datasets_job import CreateDatasetsJob
 from models.model_manager import ModelManager
 from train.trace_trainer import TraceTrainer
 from train.trainer_args import TrainerArgs
+from util.base_object import BaseObject
+from util.reflection_util import ReflectionUtil
+from variables.definition_variable import DefinitionVariable
 
 
 class AbstractTraceJob(AbstractJob, ABC):
@@ -57,3 +62,18 @@ class AbstractTraceJob(AbstractJob, ABC):
         super().cleanup()
         self._trainer = None
         self.trainer_dataset_manager.cleanup()
+
+    @classmethod
+    @overrides(BaseObject)
+    def _make_child_object(cls, definition: DefinitionVariable, expected_class: Type) -> Any:
+        """
+        Handles making children objects
+        :param expected_class: the expected_class for the child obj
+        :param definition: contains attributes necessary to construct the child
+        :return: the child obj
+        """
+        expected_class = ReflectionUtil.get_target_class_from_type(expected_class)
+        if ReflectionUtil.is_instance_or_subclass(expected_class, TrainerDatasetManager) \
+                and DeterministicTrainerDatasetManager.DETERMINISTIC_KEY in definition:
+            return DeterministicTrainerDatasetManager.initialize_from_definition(definition)
+        return cls._make_child_object_helper(definition, expected_class)

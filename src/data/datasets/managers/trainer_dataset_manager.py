@@ -35,7 +35,7 @@ class TrainerDatasetManager(BaseObject):
         self._dataset_creators = {DatasetRole.PRE_TRAIN: pre_train_dataset_creator,
                                   DatasetRole.TRAIN: train_dataset_creator,
                                   DatasetRole.VAL: val_dataset_creator, DatasetRole.EVAL: eval_dataset_creator}
-        self.__datasets = None
+        self._datasets = None
         self.augmenter = augmenter
 
     def get_creator(self, dataset_role: DatasetRole) -> AbstractDatasetCreator:
@@ -55,7 +55,7 @@ class TrainerDatasetManager(BaseObject):
         output_paths = []
         for dataset_role in DatasetRole:
             if dataset_role in self:
-                output_path = self[dataset_role].save(output_dir, dataset_role.name.lower())
+                output_path = self[dataset_role].save(output_dir, self._get_dataset_filename(dataset_role))
                 output_paths.append(output_path)
         return output_paths
 
@@ -92,17 +92,26 @@ class TrainerDatasetManager(BaseObject):
         Gets the dictionary mapping dataset role to the dataset
         :return: the dictionary of datasets
         """
-        if self.__datasets is None:
-            self.__datasets = self._create_datasets_from_creators(self._dataset_creators)
+        if self._datasets is None:
+            self._datasets = self._create_datasets_from_creators(self._dataset_creators)
             self._prepare_datasets(self.augmenter)
-        return self.__datasets
+        return self._datasets
 
     def cleanup(self) -> None:
         """
         Clears datasets out of memory
         :return: None
         """
-        self.__datasets = None
+        self._datasets = None
+
+    @staticmethod
+    def _get_dataset_filename(dataset_role: DatasetRole) -> str:
+        """
+        Returns the filename associated with the dataset corresponding to the given role
+        :param dataset_role: the role of the dataset
+        :return: the dataset filename
+        """
+        return dataset_role.name.lower()
 
     @classmethod
     @overrides(BaseObject)

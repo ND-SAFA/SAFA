@@ -4,12 +4,13 @@ from unittest.mock import patch
 
 from config.constants import VALIDATION_PERCENTAGE_DEFAULT
 from data.datasets.dataset_role import DatasetRole
+from data.datasets.managers.deterministic_trainer_dataset_manager import DeterministicTrainerDatasetManager
 from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
 from jobs.components.job_args import JobArgs
 from jobs.tests.base_job_test import BaseJobTest
 from jobs.train_job import TrainJob
 from models.model_manager import ModelManager
-from testres.paths.paths import TEST_DATA_DIR
+from testres.paths.paths import TEST_DATA_DIR, TEST_OUTPUT_DIR
 from testres.test_assertions import TestAssertions
 from train.trace_trainer import TraceTrainer
 from train.trainer_args import TrainerArgs
@@ -36,20 +37,27 @@ class TestTrainJob(BaseJobTest):
     def _assert_success(self, output_dict: dict):
         TestAssertions.assert_training_output_matches_expected(self, output_dict)
 
-    def _get_job(self) -> TrainJob:
-        job_args: JobArgs = ObjectCreator.create(JobArgs)
-        trainer_args: TrainerArgs = ObjectCreator.create(TrainerArgs)
+    def test_initialize_with_deterministic_dataset_manager(self):
+        job = self._get_job(deterministic=True)
+        self.assertIsInstance(job.trainer_dataset_manager, DeterministicTrainerDatasetManager)
+        self.assertEquals(job.trainer_dataset_manager.output_dir, TEST_OUTPUT_DIR)
+
+    def _get_job(self, deterministic: bool = False) -> TrainJob:
         dataset_param = "_".join([self.EXPECTED_SPLIT_ROLE.value, "dataset", "creator"])
-        trainer_dataset_manager: TrainerDatasetManager = ObjectCreator.create(TrainerDatasetManager, **{
+        trainer_dataset_manager = ObjectCreator.get_definition(TrainerDatasetManager)
+        if deterministic:
+            trainer_dataset_manager[DeterministicTrainerDatasetManager.DETERMINISTIC_KEY] = TEST_OUTPUT_DIR
+        trainer_dataset_manager.update(**{
             dataset_param: {
                 TypedDefinitionVariable.OBJECT_TYPE_KEY: "SPLIT",
                 "val_percentage": VALIDATION_PERCENTAGE_DEFAULT
-            }
-        })
-        model_manager: ModelManager = ObjectCreator.create(ModelManager)
-        job = TrainJob(job_args,
-                       trainer_dataset_manager=trainer_dataset_manager,
-                       trainer_args=trainer_args,
-                       model_manager=model_manager)
+            }})
+        train_job_definition = {
+            "model_manager": ObjectCreator.get_definition(ModelManager),
+            "job_args": ObjectCreator.get_definition(JobArgs),
+            "trainer_dataset_manager": trainer_dataset_manager,
+            "trainer_args": ObjectCreator.get_definition(TrainerArgs)
+        }
+        job = ObjectCreator.create(TrainJob, override=True, **train_job_definition)
         self.assertEquals(job.trainer_args.num_train_epochs, 1)
         return job

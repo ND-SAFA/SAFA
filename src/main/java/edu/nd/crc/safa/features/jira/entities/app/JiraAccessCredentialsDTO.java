@@ -14,12 +14,6 @@ import lombok.Data;
 public class JiraAccessCredentialsDTO {
 
     /**
-     * The domain resource id
-     */
-    @NotNull
-    private String cloudId;
-
-    /**
      * The user authentication id
      */
     @NotNull
@@ -49,7 +43,6 @@ public class JiraAccessCredentialsDTO {
         entity.setBearerAccessToken(this.getBearerAccessToken().getBytes(StandardCharsets.UTF_8));
         entity.setClientId(this.getClientId());
         entity.setClientSecret(this.getClientSecret());
-        entity.setCloudId(this.getCloudId());
         entity.setRefreshToken(this.getRefreshToken());
 
         return entity;

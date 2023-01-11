@@ -16,5 +16,4 @@ public interface JiraAccessCredentialsRepository extends JpaRepository<JiraAcces
 
     Optional<JiraAccessCredentials> findByUser(SafaUser user);
 
-    Optional<JiraAccessCredentials> findByUserAndCloudId(SafaUser user, String cloudId);
 }

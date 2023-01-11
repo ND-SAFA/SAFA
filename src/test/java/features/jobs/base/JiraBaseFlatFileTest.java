@@ -14,6 +14,7 @@ import edu.nd.crc.safa.features.jobs.entities.app.JobSteps;
 import edu.nd.crc.safa.features.jobs.entities.app.JobType;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.utilities.JsonFileUtilities;
+
 import features.flatfiles.base.BaseFlatFileTest;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -40,7 +41,6 @@ public abstract class JiraBaseFlatFileTest extends BaseFlatFileTest {
         // Step - Create fake credentials
         JiraAccessCredentials credentials = new JiraAccessCredentials();
         credentials.setUser(currentUser);
-        credentials.setCloudId(cloudId);
         serviceProvider.getJiraAccessCredentialsRepository().save(credentials);
 
         originalJraProjectCreationSteps = Arrays.stream(JobSteps.jiraProjectCreationSteps).toArray(String[]::new);

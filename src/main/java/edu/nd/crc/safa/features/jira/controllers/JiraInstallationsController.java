@@ -93,8 +93,6 @@ public class JiraInstallationsController extends BaseController {
 
             JiraAccessCredentials credentials = credentialsOptional.get();
 
-            credentials.setCloudId(cloudId);
-
             if (!jiraConnectionService.checkCredentials(credentials)) {
                 output.setResult(new JiraResponseDTO<>(null, JiraResponseMessage.INVALID_CREDENTIALS));
                 return;

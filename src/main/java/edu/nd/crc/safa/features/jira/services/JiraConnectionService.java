@@ -9,8 +9,6 @@ import edu.nd.crc.safa.features.jira.entities.app.JiraInstallationDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraIssuesResponseDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraProjectResponseDTO;
 import edu.nd.crc.safa.features.jira.entities.db.JiraAccessCredentials;
-import edu.nd.crc.safa.features.jira.entities.db.JiraProject;
-import edu.nd.crc.safa.features.projects.entities.db.Project;
 
 import org.springframework.context.annotation.Scope;
 
@@ -32,10 +30,11 @@ public interface JiraConnectionService {
      * Retrieve a JIRA project by its id
      *
      * @param credentials   The credentials of the user accessing JIRA.
+     * @param cloudId       The ID of the resource the project is in.
      * @param jiraProjectId The JIRA project id.
      * @return JIRA API Response
      */
-    JiraProjectResponseDTO retrieveJIRAProject(JiraAccessCredentials credentials, Long jiraProjectId);
+    JiraProjectResponseDTO retrieveJIRAProject(JiraAccessCredentials credentials, String cloudId, Long jiraProjectId);
 
     /**
      * Get new credentials based on old ones
@@ -49,28 +48,32 @@ public interface JiraConnectionService {
      * Retrieve all JIRA projects
      *
      * @param credentials The credentials of the user accessing JIRA.
+     * @param cloudId     The ID of the resource the projects are in.
      * @return JIRA API Response
      */
-    List<JiraProjectResponseDTO> retrieveJIRAProjectsPreview(JiraAccessCredentials credentials);
+    List<JiraProjectResponseDTO> retrieveJIRAProjectsPreview(JiraAccessCredentials credentials, String cloudId);
 
     /**
      * Retrieve issues associated with a JIRA project
      *
      * @param credentials   The credentials of the user accessing JIRA.
+     * @param cloudId       The ID of the resource the project is in.
      * @param jiraProjectId The JIRA project id.
      * @return JIRA issues for the given project
      */
-    JiraIssuesResponseDTO retrieveJIRAIssues(JiraAccessCredentials credentials, Long jiraProjectId);
+    JiraIssuesResponseDTO retrieveJIRAIssues(JiraAccessCredentials credentials, String cloudId, Long jiraProjectId);
 
     /**
      * Retrieve updated issues associated with a JIRA project after a certain timestamp
      *
      * @param credentials   The credentials of the user accessing JIRA.
+     * @param cloudId       The ID of the resource the project is in.
      * @param jiraProjectId The JIRA project id.
      * @param timestamp     Timestamp after which issues were updated
      * @return JIRA the updated issues for the given project
      */
     JiraIssuesResponseDTO retrieveUpdatedJIRAIssues(JiraAccessCredentials credentials,
+                                                    String cloudId,
                                                     Long jiraProjectId,
                                                     Date timestamp);
 
@@ -78,10 +81,11 @@ public interface JiraConnectionService {
      * Check whether the 'ADMINISTER_PROJECTS' permissions is set for a given user and project id.
      *
      * @param credentials   The credentials of the user accessing JIRA.
+     * @param cloudId     The ID of the resource the project is in.
      * @param jiraProjectId The JIRA project id.
      * @return A flag indicating the permission existence.
      */
-    boolean checkUserCanViewProjectIssues(JiraAccessCredentials credentials, Long jiraProjectId);
+    boolean checkUserCanViewProjectIssues(JiraAccessCredentials credentials, String cloudId, Long jiraProjectId);
 
     /**
      * @param accessCode Code retrieved from FEND after user has authorized our application

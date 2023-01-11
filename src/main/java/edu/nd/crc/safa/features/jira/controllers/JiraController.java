@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.features.jira.controllers;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -9,6 +10,7 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.jira.entities.api.JiraIdentifier;
+import edu.nd.crc.safa.features.jira.entities.app.JiraInstallationDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraProjectResponseDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraResponseDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraResponseDTO.JiraResponseMessage;
@@ -69,8 +71,14 @@ public class JiraController extends BaseController {
                 return;
             }
 
-            List<JiraProjectResponseDTO> response = jiraConnectionService
-                .retrieveJIRAProjectsPreview(credentialsOptional.get());
+            List<JiraInstallationDTO> installations = jiraConnectionService.getInstallations(credentialsOptional.get());
+
+            List<JiraProjectResponseDTO> response = new ArrayList<>();
+
+            for (JiraInstallationDTO installation : installations) {
+                response.addAll(jiraConnectionService
+                    .retrieveJIRAProjectsPreview(credentialsOptional.get(), installation.getId()));
+            }
 
             output.setResult(new JiraResponseDTO<>(response, JiraResponseMessage.OK));
         });
@@ -79,7 +87,8 @@ public class JiraController extends BaseController {
     }
 
     @PostMapping(AppRoutes.Jira.Import.BY_ID)
-    public JiraResponseDTO<JobAppEntity> createJiraProject(@PathVariable("id") Long jiraProjectId) throws Exception {
+    public JiraResponseDTO<JobAppEntity> createJiraProject(@PathVariable("id") Long jiraProjectId,
+        @PathVariable String cloudId) throws Exception {
 
         SafaUser principal = safaUserService.getCurrentUser();
         Optional<JiraAccessCredentials> credentialsOptional = accessCredentialsRepository
@@ -91,14 +100,14 @@ public class JiraController extends BaseController {
 
         JiraAccessCredentials jiraAccessCredentials = credentialsOptional.get();
 
-        if (!jiraConnectionService.checkUserCanViewProjectIssues(jiraAccessCredentials, jiraProjectId)) {
+        if (!jiraConnectionService.checkUserCanViewProjectIssues(jiraAccessCredentials, cloudId, jiraProjectId)) {
             return new JiraResponseDTO<>(null, JiraResponseMessage.CANNOT_PARSE_PROJECT);
         }
 
         // version created in job
         CreateProjectViaJiraBuilder createProjectViaJira = new CreateProjectViaJiraBuilder(
             serviceProvider,
-            new JiraIdentifier(null, jiraProjectId, jiraAccessCredentials.getCloudId()),
+            new JiraIdentifier(null, jiraProjectId, cloudId),
             principal);
 
         return new JiraResponseDTO<>(createProjectViaJira.perform(), JiraResponseMessage.OK);
@@ -106,6 +115,7 @@ public class JiraController extends BaseController {
 
     @PutMapping(AppRoutes.Jira.Import.UPDATE)
     public JiraResponseDTO<JobAppEntity> updateJiraProject(@PathVariable UUID versionId,
+                                                           @PathVariable String cloudId,
                                                            @PathVariable("id") Long jiraProjectId) throws Exception {
         SafaUser principal = safaUserService.getCurrentUser();
 
@@ -118,13 +128,12 @@ public class JiraController extends BaseController {
 
         JiraAccessCredentials jiraAccessCredentials = credentialsOptional.get();
 
-        if (!jiraConnectionService.checkUserCanViewProjectIssues(jiraAccessCredentials, jiraProjectId)) {
+        if (!jiraConnectionService.checkUserCanViewProjectIssues(jiraAccessCredentials, cloudId, jiraProjectId)) {
             return new JiraResponseDTO<>(null, JiraResponseMessage.CANNOT_PARSE_PROJECT);
         }
 
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersion();
-        JiraIdentifier jiraIdentifier = new JiraIdentifier(projectVersion, jiraProjectId,
-            jiraAccessCredentials.getCloudId());
+        JiraIdentifier jiraIdentifier = new JiraIdentifier(projectVersion, jiraProjectId, cloudId);
         UpdateProjectViaJiraBuilder updateProjectViaJira = new UpdateProjectViaJiraBuilder(
             this.serviceProvider,
             jiraIdentifier,
@@ -137,7 +146,9 @@ public class JiraController extends BaseController {
     @PostMapping(AppRoutes.Jira.Import.IMPORT_INTO_EXISTING)
     public JiraResponseDTO<JobAppEntity> importIntoExisting(
         @PathVariable UUID versionId,
+        @PathVariable String cloudId,
         @PathVariable("id") Long jiraProjectId) throws Exception {
+
         SafaUser principal = safaUserService.getCurrentUser();
 
         Optional<JiraAccessCredentials> credentialsOptional = accessCredentialsRepository
@@ -149,13 +160,12 @@ public class JiraController extends BaseController {
 
         JiraAccessCredentials jiraAccessCredentials = credentialsOptional.get();
 
-        if (!jiraConnectionService.checkUserCanViewProjectIssues(jiraAccessCredentials, jiraProjectId)) {
+        if (!jiraConnectionService.checkUserCanViewProjectIssues(jiraAccessCredentials, cloudId, jiraProjectId)) {
             return new JiraResponseDTO<>(null, JiraResponseMessage.CANNOT_PARSE_PROJECT);
         }
 
         ProjectVersion projectVersion = this.resourceBuilder.fetchVersion(versionId).withEditVersion();
-        JiraIdentifier jiraIdentifier = new JiraIdentifier(projectVersion, jiraProjectId,
-            jiraAccessCredentials.getCloudId());
+        JiraIdentifier jiraIdentifier = new JiraIdentifier(projectVersion, jiraProjectId, cloudId);
         ImportIntoProjectViaJiraBuilder updateProjectViaJira = new ImportIntoProjectViaJiraBuilder(
             this.serviceProvider,
             jiraIdentifier,

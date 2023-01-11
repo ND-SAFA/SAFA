@@ -36,9 +36,6 @@ public class JiraAccessCredentials {
     @Version
     private Short version;
 
-    @Column(name = "cloud_id", length = 64)
-    private String cloudId;
-
     @Lob
     @Column(name = "bearer_access_token", columnDefinition = "BLOB", length = 2048)
     private byte[] bearerAccessToken;

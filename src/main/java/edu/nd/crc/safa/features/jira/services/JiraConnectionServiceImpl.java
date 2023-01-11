@@ -27,8 +27,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.reactive.function.client.WebClient;
 
 public class JiraConnectionServiceImpl implements JiraConnectionService {
@@ -77,8 +75,10 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
     }
 
     @Override
-    public JiraProjectResponseDTO retrieveJIRAProject(JiraAccessCredentials credentials, Long jiraProjectId) {
-        String uri = this.buildApiRequestURI(credentials.getCloudId(), ApiRoute.PROJECT);
+    public JiraProjectResponseDTO retrieveJIRAProject(JiraAccessCredentials credentials,
+                                                      String cloudId, Long jiraProjectId) {
+
+        String uri = this.buildApiRequestURI(cloudId, ApiRoute.PROJECT);
 
         return WebApiUtils.blockOptional(
             this.webClient
@@ -92,20 +92,12 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
     }
 
     public boolean checkCredentials(JiraAccessCredentials credentials) {
-        String uri = this.buildApiRequestURI(credentials.getCloudId(), ApiRoute.MYSELF);
-
-        HttpStatus code = WebApiUtils.blockOptional(
-            this.webClient
-                .method(ApiRoute.MYSELF.getMethod())
-                .uri(uri)
-                .header(HttpHeaders.AUTHORIZATION,
-                    this.buildAuthorizationHeaderValue(credentials.getBearerAccessToken()))
-                .retrieve()
-                .toBodilessEntity()
-                .map(ResponseEntity::getStatusCode)
-        ).orElseGet(() -> HttpStatus.BAD_REQUEST);
-
-        return HttpStatus.OK.equals(code);
+        try {
+            getInstallations(credentials);
+            return true;
+        } catch (SafaError e) {
+            return false;
+        }
     }
 
     public JiraAuthResponseDTO refreshAccessToken(JiraAccessCredentials credentials) {
@@ -127,8 +119,8 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
     }
 
     @Override
-    public List<JiraProjectResponseDTO> retrieveJIRAProjectsPreview(JiraAccessCredentials credentials) {
-        String uri = this.buildApiRequestURI(credentials.getCloudId(), ApiRoute.PROJECTS_PREVIEW);
+    public List<JiraProjectResponseDTO> retrieveJIRAProjectsPreview(JiraAccessCredentials credentials, String cloudId) {
+        String uri = this.buildApiRequestURI(cloudId, ApiRoute.PROJECTS_PREVIEW);
 
         return WebApiUtils.blockOptional(
             this.webClient
@@ -143,26 +135,32 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
     }
 
     @Override
-    public JiraIssuesResponseDTO retrieveJIRAIssues(JiraAccessCredentials credentials, Long jiraProjectId) {
+    public JiraIssuesResponseDTO retrieveJIRAIssues(JiraAccessCredentials credentials,
+                                                    String cloudId, Long jiraProjectId) {
+
         String jqlQuery = String.format("project=%s", jiraProjectId);
 
-        return this.getJIRAIssues(credentials, jqlQuery);
+        return this.getJIRAIssues(credentials, cloudId, jqlQuery);
     }
 
     @Override
     public JiraIssuesResponseDTO retrieveUpdatedJIRAIssues(JiraAccessCredentials credentials,
+                                                           String cloudId,
                                                            Long jiraProjectId,
                                                            Date timestamp) {
+
         String updateDate = new SimpleDateFormat(JIRA_ISSUE_UPDATE_DATE_FORMAT).format(timestamp);
         String jqlQuery = String.format(
             "project=%s AND (updated>\"%s\" OR created>\"%s\")", jiraProjectId, updateDate, updateDate);
 
-        return this.getJIRAIssues(credentials, jqlQuery);
+        return this.getJIRAIssues(credentials, cloudId, jqlQuery);
     }
 
     @Override
-    public boolean checkUserCanViewProjectIssues(JiraAccessCredentials credentials, Long jiraProjectId) {
-        String uri = this.buildApiRequestURI(credentials.getCloudId(), ApiRoute.PERMISSIONS);
+    public boolean checkUserCanViewProjectIssues(JiraAccessCredentials credentials,
+                                                 String cloudId, Long jiraProjectId) {
+
+        String uri = this.buildApiRequestURI(cloudId, ApiRoute.PERMISSIONS);
 
         JiraProjectPermissionDTO permissionDTO = WebApiUtils.blockOptional(
             this.webClient
@@ -212,7 +210,6 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
         result.setClientId(clientId);
         result.setClientSecret(clientSecret);
         result.setRefreshToken(dto.getRefreshToken());
-        result.setCloudId(null);
         return result;
     }
 
@@ -239,8 +236,8 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
         }
     }
 
-    public JiraIssuesResponseDTO getJIRAIssues(JiraAccessCredentials credentials, String jqlQuery) {
-        String baseUri = this.buildApiRequestURI(credentials.getCloudId(), ApiRoute.ISSUES);
+    public JiraIssuesResponseDTO getJIRAIssues(JiraAccessCredentials credentials, String cloudId, String jqlQuery) {
+        String baseUri = this.buildApiRequestURI(cloudId, ApiRoute.ISSUES);
 
         return WebApiUtils.blockOptional(
             this.webClient
@@ -263,7 +260,6 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
     private enum ApiRoute {
         PROJECT(ATLASSIAN_API_URL, "/project/{id}", HttpMethod.GET),
         PROJECTS_PREVIEW(ATLASSIAN_API_URL, "/project", HttpMethod.GET),
-        MYSELF(ATLASSIAN_API_URL, "/myself", HttpMethod.GET),
         REFRESH_TOKEN(ATLASSIAN_AUTH_URL, "/oauth/token", HttpMethod.POST),
         ISSUES(ATLASSIAN_API_URL, "/search", HttpMethod.GET),
         PERMISSIONS(ATLASSIAN_API_URL, "/mypermissions", HttpMethod.GET),

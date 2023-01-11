@@ -54,6 +54,11 @@ declare namespace Cypress {
      */
     dbResetDocuments(): Chainable<void>;
 
+    /**
+     * Removes all changes on the most recent created project except for the original version.
+     */
+    dbResetVersions(): Chainable<void>;
+
     // Base Commands
 
     /**

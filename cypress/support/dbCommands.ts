@@ -85,3 +85,28 @@ Cypress.Commands.add("dbResetDocuments", () => {
     })
     .clearCookies();
 });
+
+// TODO: Add new function called dbResetVersions that will delete all versions for a project except the first one.
+Cypress.Commands.add("dbResetVersions", () => {
+  cy.dbToken()
+    .then(() => {
+      cy.request<{ projectId: string }[]>({
+        method: "GET",
+        url: `${apiUrl}/projects`,
+      }).then(({ body: projects }) => {
+        const projectId = projects[0].projectId;
+        cy.request<{ versionId: string }[]>({
+          method: "GET",
+          url: `${apiUrl}/projects/${projectId}/versions`,
+        }).then(({ body: versions }) => {
+          versions.slice(0, -1).forEach(({ versionId }) =>
+            cy.request({
+              method: "DELETE",
+              url: `${apiUrl}/projects/versions/${versionId}`,
+            })
+          );
+        });
+      });
+    })
+    .clearCookies();
+});

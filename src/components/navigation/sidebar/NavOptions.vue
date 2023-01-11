@@ -6,7 +6,7 @@
         <v-list-item
           :key="option.label"
           :to="option.path"
-          :data-cy="'nav-' + option.label + '-button'"
+          :data-cy="'button-nav-' + option.label"
         >
           <v-list-item-icon>
             <v-icon>{{ option.icon }}</v-icon>

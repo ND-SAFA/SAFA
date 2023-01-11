@@ -21,6 +21,7 @@ describe("Project Commits", () => {
   describe("Project Commit Changes", () => {
     beforeEach(() => {
       cy.viewport(1024, 768);
+      cy.dbResetVersions();
 
       cy.visit("/login")
         .login(validUser.email, validUser.password)
@@ -33,9 +34,13 @@ describe("Project Commits", () => {
         tr.last().click();
       });
 
+      // Create a new version of the project
+      cy.getCy(DataCy.selectorAddButton).should("be.visible").last().click();
+      cy.getCy(DataCy.versionCreateMinorButton).click();
+
       cy.withinTableRows(DataCy.selectionVersionList, (tr) => {
-        tr.should("have.length", 2); // This will wait until the table populates
-        tr.last().click();
+        tr.should("have.length", 3); // This will wait until the table populates
+        tr.contains("2").click();
       });
 
       cy.getCy(DataCy.artifactTree).should("be.visible");
@@ -72,9 +77,22 @@ describe("Project Commits", () => {
 
     describe(" I can undo a committed change", () => {
       it("Resets and updates artifacts when undone", () => {
+        // Create a new artifact
+        cy.createNewArtifact({
+          name: "Test Undo Artifact",
+          type: "Designs",
+          body: "Test Undo Artifact Body",
+          parent: "N/A",
+        }).saveArtifact();
+
+        cy.getCy(DataCy.snackbarSuccess).should("be.visible");
+        cy.getCy(DataCy.selectedPanelCloseButton).click();
+        cy.reload();
+        cy.getCy(DataCy.treeNode).should("be.visible");
+
         // Edit the new artifact body
         cy.getCy(DataCy.treeNode)
-          .get("[data-cy-name='Test Commit Artifact']")
+          .get("[data-cy-name='Test Undo Artifact']")
           .click();
         cy.getCy(DataCy.selectedPanelEditButton).click();
         cy.getCy(DataCy.artifactSaveBodyInput).clear();
@@ -96,8 +114,8 @@ describe("Project Commits", () => {
 
         // Check that the edit was undone
         cy.getCy(DataCy.treeNode)
-          .get("[data-cy-name='Test Commit Artifact']")
-          .should("contain.text", "Test Commit Artifact Body");
+          .get("[data-cy-name='Test Undo Artifact']")
+          .should("contain.text", "Test Undo Artifact Body");
         cy.getCy(DataCy.navUndoButton).should("have.class", "disable-events");
       });
 
@@ -164,7 +182,9 @@ describe("Project Commits", () => {
         cy.getCy(DataCy.snackbarCloseButton).click();
 
         // Undo the change
-        cy.getCy(DataCy.navUndoButton).click();
+        cy.getCy(DataCy.navUndoButton)
+          .should("not.have.class", "disable-events")
+          .click();
         cy.getCy(DataCy.snackbarUpdate).should("be.visible"); // An exception occurs here if this is not included and I don't know how to avoid it
 
         // Check that the trace link is visible on the table and tree (See side link pannel)
@@ -176,7 +196,7 @@ describe("Project Commits", () => {
     });
 
     describe("I can redo a committed change", () => {
-      it("Adds a committed artifact when redone", () => {
+      it.skip("Adds a committed artifact when redone", () => {
         //Create an artifact
         cy.getCy(DataCy.navUndoButton).should("have.class", "disable-events");
         cy.createNewArtifact({

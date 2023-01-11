@@ -32,14 +32,14 @@ export default Vue.extend({
     /**
      * @return The layout for this artifact.
      */
-    layout(): AttributeLayoutSchema {
+    layout(): AttributeLayoutSchema | undefined {
       return attributesStore.getLayoutByType(this.artifact.type);
     },
     /**
      * @return Whether the attribute list should be displayed.
      */
     doDisplay(): boolean {
-      return this.layout.positions.length > 0;
+      return !!this.layout && this.layout.positions.length > 0;
     },
   },
 });

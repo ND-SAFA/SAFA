@@ -118,6 +118,8 @@ public abstract class AbstractGithubTest extends ApplicationBaseTest {
     protected void mockRepositoryFindByUser(GithubAccessCredentials credentials) {
         Mockito.when(repositoryMock.findByUser(Mockito.any(SafaUser.class)))
             .thenReturn(Optional.of(credentials));
+        Mockito.when(serviceMock.getGithubCredentials(Mockito.any(SafaUser.class)))
+            .thenReturn(Optional.of(credentials));
     }
 
     protected void mockRepositoryDelete() {

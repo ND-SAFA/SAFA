@@ -9,6 +9,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.Version;
 
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
@@ -40,10 +41,10 @@ public class JiraAccessCredentials {
     @Column(name = "bearer_access_token", columnDefinition = "BLOB", length = 2048)
     private byte[] bearerAccessToken;
 
-    @Column(name = "client_secret", length = 64)
+    @Transient
     private String clientSecret;
 
-    @Column(name = "client_id", length = 32)
+    @Transient
     private String clientId;
 
     @Lob

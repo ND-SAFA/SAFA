@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import edu.nd.crc.safa.features.jira.entities.app.JiraAccessCredentialsDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraAuthResponseDTO;
@@ -15,8 +16,10 @@ import edu.nd.crc.safa.features.jira.entities.app.JiraIssuesResponseDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraProjectPermissionDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraProjectResponseDTO;
 import edu.nd.crc.safa.features.jira.entities.db.JiraAccessCredentials;
+import edu.nd.crc.safa.features.jira.repositories.JiraAccessCredentialsRepository;
 import edu.nd.crc.safa.features.jira.repositories.JiraProjectRepository;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.utilities.WebApiUtils;
 
 import lombok.AllArgsConstructor;
@@ -40,6 +43,8 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
 
     private static final String JIRA_ISSUE_UPDATE_DATE_FORMAT = "yyyy-MM-dd HH:mm";
 
+    private final JiraAccessCredentialsRepository accessCredentialsRepository;
+
     private final WebClient webClient;
     private final JiraProjectRepository jiraProjectRepository;
 
@@ -53,9 +58,20 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
     private String redirectLink;
 
     public JiraConnectionServiceImpl(JiraProjectRepository jiraProjectRepository,
+                                     JiraAccessCredentialsRepository accessCredentialsRepository,
                                      WebClient webClient) {
         this.webClient = webClient;
+        this.accessCredentialsRepository = accessCredentialsRepository;
         this.jiraProjectRepository = jiraProjectRepository;
+    }
+
+    public Optional<JiraAccessCredentials> getJiraCredentials(SafaUser user) {
+        Optional<JiraAccessCredentials> credentials = accessCredentialsRepository.findByUser(user);
+        credentials.ifPresent(cred -> {
+            cred.setClientId(clientId);
+            cred.setClientSecret(clientSecret);
+        });
+        return credentials;
     }
 
     private String buildBaseURI(String cloudId) {

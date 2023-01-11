@@ -2,6 +2,7 @@ package edu.nd.crc.safa.features.jira.services;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import edu.nd.crc.safa.features.jira.entities.app.JiraAccessCredentialsDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraAuthResponseDTO;
@@ -9,6 +10,7 @@ import edu.nd.crc.safa.features.jira.entities.app.JiraInstallationDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraIssuesResponseDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraProjectResponseDTO;
 import edu.nd.crc.safa.features.jira.entities.db.JiraAccessCredentials;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
 import org.springframework.context.annotation.Scope;
 
@@ -17,6 +19,14 @@ import org.springframework.context.annotation.Scope;
  */
 @Scope("singleton")
 public interface JiraConnectionService {
+
+    /**
+     * Gets access credentials for the given user.
+     *
+     * @param user The safa user to look up credentials for
+     * @return The user's jira credentials, if they exist
+     */
+    Optional<JiraAccessCredentials> getJiraCredentials(SafaUser user);
 
     /**
      * Validate received credentials

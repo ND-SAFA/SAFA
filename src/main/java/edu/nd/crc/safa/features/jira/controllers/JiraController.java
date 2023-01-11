@@ -15,7 +15,6 @@ import edu.nd.crc.safa.features.jira.entities.app.JiraProjectResponseDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraResponseDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraResponseDTO.JiraResponseMessage;
 import edu.nd.crc.safa.features.jira.entities.db.JiraAccessCredentials;
-import edu.nd.crc.safa.features.jira.repositories.JiraAccessCredentialsRepository;
 import edu.nd.crc.safa.features.jira.services.JiraConnectionService;
 import edu.nd.crc.safa.features.jobs.builders.CreateProjectViaJiraBuilder;
 import edu.nd.crc.safa.features.jobs.builders.ImportIntoProjectViaJiraBuilder;
@@ -41,7 +40,6 @@ import org.springframework.web.context.request.async.DeferredResult;
 @Controller
 public class JiraController extends BaseController {
 
-    private final JiraAccessCredentialsRepository accessCredentialsRepository;
     private final SafaUserService safaUserService;
     private final JiraConnectionService jiraConnectionService;
     private final ExecutorDelegate executorDelegate;
@@ -51,7 +49,6 @@ public class JiraController extends BaseController {
                           ServiceProvider serviceProvider) {
         super(resourceBuilder, serviceProvider);
         this.safaUserService = serviceProvider.getSafaUserService();
-        this.accessCredentialsRepository = serviceProvider.getJiraAccessCredentialsRepository();
         this.jiraConnectionService = serviceProvider.getJiraConnectionService();
         this.executorDelegate = serviceProvider.getExecutorDelegate();
     }
@@ -63,8 +60,7 @@ public class JiraController extends BaseController {
 
         SafaUser principal = safaUserService.getCurrentUser();
         executorDelegate.submit(output, () -> {
-            Optional<JiraAccessCredentials> credentialsOptional = accessCredentialsRepository
-                .findByUser(principal);
+            Optional<JiraAccessCredentials> credentialsOptional = jiraConnectionService.getJiraCredentials(principal);
 
             if (credentialsOptional.isEmpty()) {
                 output.setResult(new JiraResponseDTO<>(null, JiraResponseMessage.NO_CREDENTIALS_REGISTERED));
@@ -91,8 +87,7 @@ public class JiraController extends BaseController {
         @PathVariable String cloudId) throws Exception {
 
         SafaUser principal = safaUserService.getCurrentUser();
-        Optional<JiraAccessCredentials> credentialsOptional = accessCredentialsRepository
-            .findByUser(principal);
+        Optional<JiraAccessCredentials> credentialsOptional = jiraConnectionService.getJiraCredentials(principal);
 
         if (credentialsOptional.isEmpty()) {
             return new JiraResponseDTO<>(null, JiraResponseMessage.NO_CREDENTIALS_REGISTERED);
@@ -119,8 +114,7 @@ public class JiraController extends BaseController {
                                                            @PathVariable("id") Long jiraProjectId) throws Exception {
         SafaUser principal = safaUserService.getCurrentUser();
 
-        Optional<JiraAccessCredentials> credentialsOptional = accessCredentialsRepository
-            .findByUser(principal);
+        Optional<JiraAccessCredentials> credentialsOptional = jiraConnectionService.getJiraCredentials(principal);
 
         if (credentialsOptional.isEmpty()) {
             return new JiraResponseDTO<>(null, JiraResponseMessage.NO_CREDENTIALS_REGISTERED);
@@ -151,8 +145,7 @@ public class JiraController extends BaseController {
 
         SafaUser principal = safaUserService.getCurrentUser();
 
-        Optional<JiraAccessCredentials> credentialsOptional = accessCredentialsRepository
-            .findByUser(principal);
+        Optional<JiraAccessCredentials> credentialsOptional = jiraConnectionService.getJiraCredentials(principal);
 
         if (credentialsOptional.isEmpty()) {
             return new JiraResponseDTO<>(null, JiraResponseMessage.NO_CREDENTIALS_REGISTERED);

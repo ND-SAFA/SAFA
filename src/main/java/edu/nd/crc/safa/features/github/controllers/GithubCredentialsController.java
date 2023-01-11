@@ -122,8 +122,7 @@ public class GithubCredentialsController extends BaseController {
 
         SafaUser principal = safaUserService.getCurrentUser();
         executorDelegate.submit(output, () -> {
-            Optional<GithubAccessCredentials> credentials = githubAccessCredentialsRepository
-                .findByUser(principal);
+            Optional<GithubAccessCredentials> credentials = githubConnectionService.getGithubCredentials(principal);
 
             if (credentials.isEmpty()) {
                 output.setResult(new GithubResponseDTO<>(false, GithubResponseMessage.MISSING));
@@ -144,7 +143,7 @@ public class GithubCredentialsController extends BaseController {
         SafaUser principal = safaUserService.getCurrentUser();
         executorDelegate.submit(output, () -> {
             Optional<GithubAccessCredentials> githubAccessCredentialsOptional =
-                githubAccessCredentialsRepository.findByUser(principal);
+                githubConnectionService.getGithubCredentials(principal);
 
             if (githubAccessCredentialsOptional.isEmpty()) {
                 output.setResult(new GithubResponseDTO<>(null, GithubResponseMessage.MISSING));

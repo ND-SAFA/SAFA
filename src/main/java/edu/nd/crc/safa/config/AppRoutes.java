@@ -195,7 +195,6 @@ public class AppRoutes {
         public static class Installations {
             public static final String ROOT = Accounts.PREFIX + "/jira/installations";
             public static final String RETRIEVE_AVAILABLE = Installations.ROOT;
-            public static final String REGISTER = RETRIEVE_AVAILABLE + "/{cloudId}";
         }
 
         @NoArgsConstructor(access = AccessLevel.PRIVATE)

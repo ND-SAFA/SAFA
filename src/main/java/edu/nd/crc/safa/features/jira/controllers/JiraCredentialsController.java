@@ -87,8 +87,7 @@ public class JiraCredentialsController extends BaseController {
 
         SafaUser principal = safaUserService.getCurrentUser();
         executorDelegate.submit(output, () -> {
-            Optional<JiraAccessCredentials> credentialsOptional = accessCredentialsRepository
-                .findByUser(principal);
+            Optional<JiraAccessCredentials> credentialsOptional = jiraConnectionService.getJiraCredentials(principal);
 
             if (credentialsOptional.isEmpty()) {
                 output.setResult(new JiraResponseDTO<>(null, JiraResponseMessage.NO_CREDENTIALS_REGISTERED));
@@ -119,8 +118,7 @@ public class JiraCredentialsController extends BaseController {
 
         SafaUser principal = safaUserService.getCurrentUser();
         executorDelegate.submit(output, () -> {
-            Optional<JiraAccessCredentials> credentialsOptional = accessCredentialsRepository
-                .findByUser(principal);
+            Optional<JiraAccessCredentials> credentialsOptional = jiraConnectionService.getJiraCredentials(principal);
 
             if (credentialsOptional.isEmpty()) {
                 output.setResult(new JiraResponseDTO<>(null, JiraResponseMessage.NO_CREDENTIALS_REGISTERED));

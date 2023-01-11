@@ -1,5 +1,6 @@
 import os
 import shutil
+from typing import List, Tuple
 
 import mock
 from django.test import TestCase
@@ -10,6 +11,8 @@ from transformers.models.bert.tokenization_bert import BertTokenizer
 from config.constants import DELETE_TEST_OUTPUT
 from data.processing.cleaning.data_cleaner import DataCleaner
 from data.processing.cleaning.supported_data_cleaning_step import SupportedDataCleaningStep
+from data.tree.artifact import Artifact
+from data.tree.trace_link import TraceLink
 from testres.paths.paths import TEST_DATA_DIR, TEST_OUTPUT_DIR, TEST_VOCAB_FILE
 
 
@@ -66,3 +69,36 @@ class BaseTest(TestCase):
     def read_file(file_path: str):
         with open(file_path) as file:
             return file.read()
+
+    @staticmethod
+    def create_trace_links(prefixes: Tuple[str, str], n_artifacts: Tuple[int, int], labels: List[int]):
+        """
+        Creates trace links between source and targets.
+        :param prefixes: The prefix for each artifact type (e.g. source/targets)
+        :param n_artifacts: Tuple containing number of artifacts per type
+        :param labels: The labels of the trace links.
+        :return: Trace links constructed defined by n_sources and n_targets.
+        """
+        source_prefix, target_prefix = prefixes
+        n_source, n_target = n_artifacts
+        source_artifacts = BaseTest.create_artifacts(source_prefix, n_source)
+        target_artifacts = BaseTest.create_artifacts(target_prefix, n_target)
+        trace_links = []
+        label_index = 0
+        for source_artifact in source_artifacts:
+            for target_artifact in target_artifacts:
+                is_true_link = labels[label_index] == 1
+                trace_links.append(TraceLink(source_artifact, target_artifact, is_true_link))
+                label_index += 1
+        return trace_links
+
+    @staticmethod
+    def create_artifacts(prefix: str, n_artifacts: int, body: str = "body"):
+        """
+        Creates list of artifacts whose id contain prefix.
+        :param prefix: The prefix to name artifact with.
+        :param n_artifacts: The number of artifacts to create.
+        :param body: The artifact body to supply artifacts with.
+        :return: List of artifacts created.
+        """
+        return [Artifact(prefix + str(i), body) for i in range(n_artifacts)]

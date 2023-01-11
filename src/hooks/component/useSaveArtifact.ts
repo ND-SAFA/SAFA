@@ -133,6 +133,7 @@ export const useSaveArtifact = defineStore("saveArtifact", {
 
       this.editedArtifact = createArtifactOfType(artifact, type);
       this.isNameValid = !!artifact?.name;
+      this.parentId = "";
     },
     /**
      * Updates the edited artifact to a new type.

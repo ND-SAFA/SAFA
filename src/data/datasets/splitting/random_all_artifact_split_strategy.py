@@ -1,4 +1,3 @@
-import random
 from typing import List
 
 from config.override import overrides
@@ -26,33 +25,26 @@ class RandomAllArtifactSplitStrategy(AbstractSplitStrategy):
 
         sources_seen = []
         targets_seen = []
-        required_links = []
+        first_split_links = []
+        second_split_links = []
         links: List[TraceLink] = list(trace_dataset.links.values())
-        random.shuffle(links)
 
-        for trace_link in links:
-            source_id = trace_link.source.id
-            target_id = trace_link.target.id
-            new_source = RandomAllArtifactSplitStrategy.add_if_new(sources_seen, source_id)
-            new_target = RandomAllArtifactSplitStrategy.add_if_new(targets_seen, target_id)
-            if new_source or new_target:
-                required_links.append(trace_link.id)
-                
-        if percent_split * len(links) < len(required_links):
+        for source_id in trace_dataset.trace_matrix.source_ids:
+            source_traces = trace_dataset.trace_matrix.query_matrix[source_id]
+            source_traces = source_traces.links.copy()
+            for source_trace in source_traces:  # select link with new target
+                source_id = source_trace.source.id
+                target_id = source_trace.target.id
+                if target_id not in targets_seen:
+                    targets_seen.append(target_id)
+                    sources_seen.append(source_id)
+                    first_split_links.append(source_trace.id)
+                    break
+
+        if percent_split * len(links) < len(first_split_links):
             raise ValueError(f"Referencing all artifacts led to split greater than percentage desired: {percent_split}.")
-
-        return CombinationSplitStrategy.create_split_containing_specified_link_ids(trace_dataset, required_links,
-                                                                                   percent_split, slice_num)
-
-    @staticmethod
-    def add_if_new(seen_list, new_item) -> bool:
-        """
-        Adds new item if not in list.
-        :param seen_list: The list to check if item is present.
-        :param new_item: The new item to add to list.
-        :return: True if new item added False otherwise.
-        """
-        if new_item not in seen_list:
-            seen_list.append(new_item)
-            return True
-        return False
+        split_links = first_split_links if slice_num == 1 else second_split_links
+        return CombinationSplitStrategy.create_split_containing_specified_link_ids(trace_dataset=trace_dataset,
+                                                                                   link_ids_for_first_split=split_links,
+                                                                                   percent_split=percent_split,
+                                                                                   slice_num=slice_num)

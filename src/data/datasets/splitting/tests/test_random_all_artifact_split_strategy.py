@@ -26,14 +26,15 @@ class TestRandomAllArtifactSplitStrategy(BaseTest):
         """
         validation_percentage = 0.5
         trace_dataset = self.create_trace_dataset()
-        split = RandomAllArtifactSplitStrategy.create_split(trace_dataset, validation_percentage, 1)
-        self.assert_split_correct(split, validation_percentage)
+        for split_index in [1, 2]:
+            split = RandomAllArtifactSplitStrategy.create_split(trace_dataset, validation_percentage, split_index)
+            self.assert_split_correct(split, validation_percentage)
 
     def test_error_on_small_split(self):
         """
         Tests that if splitting leads to too many links, error is thrown.
         """
-        validation_percentage = 0.25
+        validation_percentage = 0.1
         trace_dataset = self.create_trace_dataset()
         with self.assertRaises(ValueError) as e:
             RandomAllArtifactSplitStrategy.create_split(trace_dataset, validation_percentage, 1)

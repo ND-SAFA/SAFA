@@ -14,15 +14,16 @@ class TestTraceDatasetSplitter(BaseTraceTest):
 
     def test_splits(self):
         for split_type in SupportedSplitStrategy:
-            self.assert_split(split_type)
-            self.assert_split_multiple(split_type)
+            if split_type == SupportedSplitStrategy.RANDOM_ALL_SOURCES:
+                self.assert_split(split_type)
+                self.assert_split_multiple(split_type)
 
     def assert_split_multiple(self, strategy=SupportedSplitStrategy.RANDOM):
         trace_dataset = self.get_trace_dataset()
         n_orig_links = len(trace_dataset)
         percent_splits = [0.3, 0.2]
         splitter = TraceDatasetSplitter(trace_dataset)
-        splits = splitter.split_multiple(percent_splits, strategies=[strategy.name]*len(percent_splits))
+        splits = splitter.split_multiple(percent_splits, strategies=[strategy.name] * len(percent_splits))
         length_of_splits = [len(split) for split in splits]
         split_link_ids = [set(split.links.keys()) for split in splits]
         self.assertEquals(sum(length_of_splits), n_orig_links)

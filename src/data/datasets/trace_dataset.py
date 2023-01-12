@@ -21,14 +21,14 @@ from models.model_properties import ModelArchitectureType
 
 class TraceDataset(AbstractDataset):
 
-    def __init__(self, links: Dict[int, TraceLink]):
+    def __init__(self, links: Dict[int, TraceLink], randomize: bool = False):
         """
         Represents the config format for all data used by the huggingface trainer.
         :param links: The candidate links.
         """
         self.links = OrderedDict(links)
         self.pos_link_ids, self.neg_link_ids = self.__create_pos_neg_links(links)
-        self.trace_matrix = TraceMatrixManager(self.links.values(), randomize=True)
+        self.trace_matrix = TraceMatrixManager(self.links.values(), randomize=randomize)
         self._shuffle_link_ids(self.pos_link_ids)
         self._shuffle_link_ids(self.neg_link_ids)
 

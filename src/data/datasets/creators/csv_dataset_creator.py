@@ -25,4 +25,4 @@ class CSVDatasetCreator(AbstractTraceDatasetCreator):
         """
         project_reader = CSVEntityReader(self.data_file_path)
         trace_links: Dict[int, TraceLink] = project_reader.get_entities()
-        return TraceDataset(links=trace_links)
+        return TraceDataset(links=trace_links, randomize=True)

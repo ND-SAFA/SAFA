@@ -52,7 +52,7 @@ class ExperimentStep(BaseObject):
         self.status = Status.IN_PROGRESS
         if jobs_for_undetermined_vars:
             self.jobs = self._update_jobs_undetermined_vars(self.jobs, jobs_for_undetermined_vars)
-
+        self.jobs = self._update_job_children_output_paths(self.jobs, output_dir)
         use_multi_epoch_step = isinstance(self.jobs[0], TrainJob) and self.jobs[0].trainer_args.train_epochs_range is not None
         job_runs = self._divide_jobs_into_runs()
 
@@ -232,3 +232,17 @@ class ExperimentStep(BaseObject):
         :return: the enum class mapping name to class
         """
         return SupportedJobType
+
+    @staticmethod
+    def _update_job_children_output_paths(jobs: List[AbstractJob], output_dir: str) -> List[AbstractJob]:
+        """
+        Updates necessary job children output paths to reflect experiment step output path
+        :param jobs: the list of jobs to update
+        :param output_dir: the output directory to use
+        :return: the updated jobs
+        """
+        for job in jobs:
+            if isinstance(job, AbstractTraceJob):
+                if getattr(job.model_manager, "output_dir", "ignore") is None:
+                    setattr(job.model_manager, "output_dir", output_dir)
+        return jobs

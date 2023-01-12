@@ -13,7 +13,8 @@ from variables.experimental_variable import ExperimentalVariable
 
 
 class TestDeterministicTrainerDatasetsManager(BaseTrainerDatasetsManagerTest):
-    OUTPUT_DIR = os.path.join(TEST_OUTPUT_DIR, "deterministic")
+    DETERMINISTIC_ID = "deterministic"
+    OUTPUT_DIR = os.path.join(TEST_OUTPUT_DIR, DETERMINISTIC_ID)
 
     def test_get_datasets(self):
         expected_dataset_roles = [DatasetRole.TRAIN, DatasetRole.VAL, DatasetRole.EVAL]
@@ -40,6 +41,7 @@ class TestDeterministicTrainerDatasetsManager(BaseTrainerDatasetsManagerTest):
             arg_name, definition = dataset_creators[key]
             args[arg_name] = definition
         args["augmenter"] = ObjectCreator.augmenter_definition
-        args[DeterministicTrainerDatasetManager.DETERMINISTIC_KEY] = self.OUTPUT_DIR
+        args[DeterministicTrainerDatasetManager.DETERMINISTIC_KEY] = self.DETERMINISTIC_ID
+        args["output_dir"] = TEST_OUTPUT_DIR
         experiment_vars: ExperimentalVariable = ObjectCreator.create(DeterministicTrainerDatasetManager, override=True, **args)
         return experiment_vars.get_values_of_all_variables()[-1]

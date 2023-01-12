@@ -11,27 +11,30 @@ from data.processing.augmentation.data_augmenter import DataAugmenter
 
 
 class DeterministicTrainerDatasetManager(TrainerDatasetManager):
-    DETERMINISTIC_KEY = "deterministic_output_dir"
+    DETERMINISTIC_KEY = "deterministic_id"
 
     def __init__(self,
-                 deterministic_output_dir: str,
+                 deterministic_id: str,
                  pre_train_dataset_creator: AbstractDatasetCreator = None,
                  train_dataset_creator: AbstractDatasetCreator = None,
                  val_dataset_creator: AbstractDatasetCreator = None,
                  eval_dataset_creator: AbstractDatasetCreator = None,
                  augmenter: DataAugmenter = None,
+                 output_dir: str = None
                  ):
         """
         Container to hold all the data used in the TraceTrainer
-        :param deterministic_output_dir: where datasets will be saved + loaded
+        :param deterministic_id: identifier for this set of splits
         :param pre_train_dataset_creator: The pre-training dataset creator.
         :param train_dataset_creator: The training dataset creator.
         :param val_dataset_creator: the validation dataset creator.
         :param eval_dataset_creator: The training dataset creator.data
         :param augmenter: augmenter to use for augmenting datasets
+        :param output_dir: where to save the datasets to
         """
         super().__init__(pre_train_dataset_creator, train_dataset_creator, val_dataset_creator, eval_dataset_creator, augmenter)
-        self.output_dir = deterministic_output_dir
+        self.deterministic_id = deterministic_id
+        self.output_dir = output_dir
 
     def get_datasets(self) -> Dict[DatasetRole, AbstractDataset]:
         """
@@ -42,8 +45,17 @@ class DeterministicTrainerDatasetManager(TrainerDatasetManager):
             self._datasets, reloaded = self._create_datasets_from_creators_deterministic(self._dataset_creators)
             if not reloaded:
                 self._prepare_datasets(self.augmenter)
-                self.save_dataset_splits(self.output_dir)
+                self.save_dataset_splits(self.get_output_path())
         return self._datasets
+
+    def get_output_path(self) -> str:
+        """
+        Gets the path where datasets should be saved
+        :return: the output path
+        """
+        if self.output_dir:
+            return os.path.join(self.output_dir, self.deterministic_id)
+        return self.deterministic_id
 
     def _create_datasets_from_creators_deterministic(self, dataset_creators_map: Dict[DatasetRole, AbstractDatasetCreator]) \
             -> Tuple[Dict[DatasetRole, TrainerDatasetManager.DATASET_TYPE], bool]:
@@ -54,7 +66,7 @@ class DeterministicTrainerDatasetManager(TrainerDatasetManager):
         deterministic_dataset_creators_map = {}
         reloaded = False
         for dataset_role in dataset_creators_map.keys():
-            dataset_filepath = os.path.join(self.output_dir, self._get_dataset_filename(dataset_role)) + CSVKeys.EXT
+            dataset_filepath = os.path.join(self.get_output_path(), self._get_dataset_filename(dataset_role)) + CSVKeys.EXT
             if os.path.exists(dataset_filepath):
                 deterministic_dataset_creators_map[dataset_role] = CSVDatasetCreator(data_file_path=dataset_filepath)
                 reloaded = True

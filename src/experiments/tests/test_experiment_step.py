@@ -4,6 +4,7 @@ from unittest import mock
 from unittest.mock import patch
 
 from data.datasets.dataset_role import DatasetRole
+from data.datasets.managers.deterministic_trainer_dataset_manager import DeterministicTrainerDatasetManager
 from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
 from experiments.experiment_step import ExperimentStep
 from experiments.tests.base_experiment_test import BaseExperimentTest
@@ -99,6 +100,13 @@ class TestExperimentStep(BaseExperimentTest):
         best_job = step._get_best_job([job1, job2])
         self.assertEquals(best_job.id, job2.id)
 
+    def test_update_job_children_output_paths(self):
+        job1, job2 = self.get_test_jobs()
+        output_dir = os.path.join(TEST_OUTPUT_DIR, "experiment_step")
+        job1.model_manager = DeterministicTrainerDatasetManager(deterministic_id="1234")
+        job1, job2 = ExperimentStep._update_job_children_output_paths([job1, job2], output_dir)
+        self.assertEquals(job1.model_manager.output_dir, output_dir)
+
     def get_experiment_step(self, train=True):
         kwargs = {}
         if not train:
@@ -114,9 +122,9 @@ class TestExperimentStep(BaseExperimentTest):
 
     @staticmethod
     def get_test_jobs():
-        job1 = TrainJob(JobArgs(output_dir=TEST_OUTPUT_DIR), ModelManager(TEST_OUTPUT_DIR), None,
+        job1 = TrainJob(JobArgs(output_dir=TEST_OUTPUT_DIR), ModelManager(TEST_OUTPUT_DIR), TrainerDatasetManager(),
                         TrainerArgs(output_dir=TEST_OUTPUT_DIR))
-        job2 = TrainJob(JobArgs(output_dir=TEST_OUTPUT_DIR), ModelManager(TEST_OUTPUT_DIR), None,
+        job2 = TrainJob(JobArgs(output_dir=TEST_OUTPUT_DIR), ModelManager(TEST_OUTPUT_DIR), TrainerDatasetManager(),
                         TrainerArgs(output_dir=TEST_OUTPUT_DIR))
         return [job1, job2]
 

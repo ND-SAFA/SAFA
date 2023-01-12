@@ -12,6 +12,7 @@
           },
           "trainer_args": {
             "output_dir": "[OUTPUT_PATH]/rq14/models",
+            "learning_rate": 5e-7,
             "train_epochs_range": [
               1,
               3,

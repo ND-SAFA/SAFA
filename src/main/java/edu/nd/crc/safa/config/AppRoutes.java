@@ -202,7 +202,7 @@ public class AppRoutes {
             public static final String ROOT = Projects.ROOT + "/import";
             public static final String BY_ID = Import.ROOT + "/jira/{cloudId}/{id}";
             public static final String UPDATE = Versions.BY_ID + "/import/jira/{cloudId}/{id}";
-            public static final String RETRIEVE_JIRA_PROJECTS = Projects.ROOT + "/jira";
+            public static final String RETRIEVE_JIRA_PROJECTS = Projects.ROOT + "/jira/{cloudId}";
             public static final String IMPORT_INTO_EXISTING = Versions.BY_ID + "/import/jira/{cloudId}/{id}";
         }
     }

@@ -1,6 +1,5 @@
 package edu.nd.crc.safa.features.jira.controllers;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -10,7 +9,6 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.jira.entities.api.JiraIdentifier;
-import edu.nd.crc.safa.features.jira.entities.app.JiraInstallationDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraProjectResponseDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraResponseDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraResponseDTO.JiraResponseMessage;
@@ -54,7 +52,9 @@ public class JiraController extends BaseController {
     }
 
     @GetMapping(AppRoutes.Jira.Import.RETRIEVE_JIRA_PROJECTS)
-    public DeferredResult<JiraResponseDTO<List<JiraProjectResponseDTO>>> retrieveJIRAProjects() {
+    public DeferredResult<JiraResponseDTO<List<JiraProjectResponseDTO>>> retrieveJIRAProjects(
+            @PathVariable String cloudId) {
+
         DeferredResult<JiraResponseDTO<List<JiraProjectResponseDTO>>> output =
             executorDelegate.createOutput(5000L);
 
@@ -67,14 +67,8 @@ public class JiraController extends BaseController {
                 return;
             }
 
-            List<JiraInstallationDTO> installations = jiraConnectionService.getInstallations(credentialsOptional.get());
-
-            List<JiraProjectResponseDTO> response = new ArrayList<>();
-
-            for (JiraInstallationDTO installation : installations) {
-                response.addAll(jiraConnectionService
-                    .retrieveJIRAProjectsPreview(credentialsOptional.get(), installation.getId()));
-            }
+            List<JiraProjectResponseDTO> response =
+                    jiraConnectionService.retrieveJIRAProjectsPreview(credentialsOptional.get(), cloudId);
 
             output.setResult(new JiraResponseDTO<>(response, JiraResponseMessage.OK));
         });

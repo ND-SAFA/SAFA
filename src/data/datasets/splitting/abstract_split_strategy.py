@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Sized, List
+from typing import List, Sized
 
 from data.datasets.trace_dataset import TraceDataset
 
@@ -11,7 +11,7 @@ class AbstractSplitStrategy(ABC):
 
     @staticmethod
     @abstractmethod
-    def create_split(trace_dataset: TraceDataset, percent_split: float, slice_num: int):
+    def create_split(trace_dataset: TraceDataset, percent_split: float, slice_num: int) -> TraceDataset:
         """
         Creates the split of the dataset
         :param trace_dataset: The dataset to split.
@@ -41,6 +41,6 @@ class AbstractSplitStrategy(ABC):
         :param split_size: May be specified instead of percent split to get a certain number of links
         :return: the subsection of the data in the split
         """
-        assert(percent_split is not None or split_size is not None)
+        assert (percent_split is not None or split_size is not None)
         split_size = AbstractSplitStrategy.get_first_split_size(data, percent_split) if split_size is None else split_size
         return data[split_size:] if for_second_split else data[:split_size]

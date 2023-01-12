@@ -1,5 +1,3 @@
-from typing import List, Sized
-
 from config.override import overrides
 from data.datasets.splitting.abstract_split_strategy import AbstractSplitStrategy
 from data.datasets.trace_dataset import TraceDataset

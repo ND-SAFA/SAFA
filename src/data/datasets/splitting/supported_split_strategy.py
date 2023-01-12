@@ -15,5 +15,5 @@ class SupportedSplitStrategy(Enum):
     RANDOM = RandomSplitStrategy
     SOURCE = SourceSplitStrategy
     COMBINATION = CombinationSplitStrategy
-    RANDOM_ALL_SOURCES = AllSourcesSplitStrategy
-    RANDOM_ALL_ARTIFACTS = AllArtifactSplitStrategy
+    ALL_SOURCES = AllSourcesSplitStrategy
+    ALL_ARTIFACTS = AllArtifactSplitStrategy

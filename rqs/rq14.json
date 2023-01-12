@@ -34,7 +34,7 @@
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",
-              "split_strategy": "RANDOM_ALL_ARTIFACTS",
+              "split_strategy": "ALL_ARTIFACTS",
               "val_percentage": 0.25
             },
             "augmenter": {

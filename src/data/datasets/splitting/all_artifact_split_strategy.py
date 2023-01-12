@@ -2,12 +2,11 @@ from typing import List
 
 from config.override import overrides
 from data.datasets.splitting.abstract_split_strategy import AbstractSplitStrategy
-from data.datasets.splitting.combination_split_strategy import CombinationSplitStrategy
 from data.datasets.trace_dataset import TraceDataset
 from data.tree.trace_link import TraceLink
 
 
-class RandomAllArtifactSplitStrategy(AbstractSplitStrategy):
+class AllArtifactSplitStrategy(AbstractSplitStrategy):
     """
     Responsible for splitting a dataset randomly while ensuring each source and target appears once in training.
     """
@@ -47,7 +46,7 @@ class RandomAllArtifactSplitStrategy(AbstractSplitStrategy):
 
         if percent_split * len(links) < len(first_split_links):
             raise ValueError(f"Referencing all artifacts led to split greater than percentage desired: {percent_split}.")
-        return CombinationSplitStrategy.create_split_containing_specified_link_ids(trace_dataset=trace_dataset,
-                                                                                   link_ids_for_first_split=first_split_links,
-                                                                                   percent_split=percent_split,
-                                                                                   slice_num=slice_num)
+        return AbstractSplitStrategy.create_split_containing_specified_link_ids(trace_dataset=trace_dataset,
+                                                                                link_ids_for_first_split=first_split_links,
+                                                                                percent_split=percent_split,
+                                                                                slice_num=slice_num)

@@ -1,8 +1,8 @@
 from enum import Enum
 
+from data.datasets.splitting.all_artifact_split_strategy import AllArtifactSplitStrategy
+from data.datasets.splitting.all_sources_split_strategy import AllSourcesSplitStrategy
 from data.datasets.splitting.combination_split_strategy import CombinationSplitStrategy
-from data.datasets.splitting.random_all_artifact_split_strategy import RandomAllArtifactSplitStrategy
-from data.datasets.splitting.random_all_sources_split_strategy import RandomAllSourcesSplitStrategy
 from data.datasets.splitting.random_split_strategy import RandomSplitStrategy
 from data.datasets.splitting.source_split_strategy import SourceSplitStrategy
 
@@ -15,5 +15,5 @@ class SupportedSplitStrategy(Enum):
     RANDOM = RandomSplitStrategy
     SOURCE = SourceSplitStrategy
     COMBINATION = CombinationSplitStrategy
-    RANDOM_ALL_SOURCES = RandomAllSourcesSplitStrategy
-    RANDOM_ALL_ARTIFACTS = RandomAllArtifactSplitStrategy
+    RANDOM_ALL_SOURCES = AllSourcesSplitStrategy
+    RANDOM_ALL_ARTIFACTS = AllArtifactSplitStrategy

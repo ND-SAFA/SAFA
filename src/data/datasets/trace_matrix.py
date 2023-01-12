@@ -53,7 +53,7 @@ class TraceMatrixManager:
         metric_values = []
         for source, query in self.query_matrix.items():
             query_predictions = query.preds
-            query_labels = [link.label for link in query.links]
+            query_labels = [link.get_label() for link in query.links]
             query_metric = metric(query_labels, query_predictions)
             if not np.isnan(query_metric):
                 metric_values.append(query_metric)

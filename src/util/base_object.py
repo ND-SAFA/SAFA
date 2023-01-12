@@ -137,6 +137,16 @@ class BaseObject(ABC):
         :param definition: contains attributes necessary to construct the child
         :return: the child obj
         """
+        return cls._make_child_object_helper(definition, expected_class)
+
+    @classmethod
+    def _make_child_object_helper(cls, definition: DefinitionVariable, expected_class: Type) -> Any:
+        """
+        Handles the logic to make children objects
+        :param expected_class: the expected_class for the child obj
+        :param definition: contains attributes necessary to construct the child
+        :return: the child obj
+        """
         expected_class = ReflectionUtil.get_target_class_from_type(expected_class)
         if ReflectionUtil.is_instance_or_subclass(expected_class, BaseObject):
             return expected_class.initialize_from_definition(definition)

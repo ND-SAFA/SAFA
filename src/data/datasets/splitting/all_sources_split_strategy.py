@@ -1,11 +1,10 @@
 from config.override import overrides
 from data.datasets.splitting.abstract_split_strategy import AbstractSplitStrategy
-from data.datasets.splitting.combination_split_strategy import CombinationSplitStrategy
 from data.datasets.splitting.source_split_strategy import SourceSplitStrategy
 from data.datasets.trace_dataset import TraceDataset
 
 
-class RandomAllSourcesSplitStrategy(AbstractSplitStrategy):
+class AllSourcesSplitStrategy(AbstractSplitStrategy):
     """
     Responsible for splitting a dataset randomly while ensuring each source appears once in training
     """
@@ -22,5 +21,5 @@ class RandomAllSourcesSplitStrategy(AbstractSplitStrategy):
         """
         source_link_ids_first_split = {link.id for link
                                        in SourceSplitStrategy.create_random_trace_link_array(trace_dataset, n_links_per_source=1)}
-        return CombinationSplitStrategy.create_split_containing_specified_link_ids(trace_dataset, source_link_ids_first_split,
-                                                                                   percent_split, slice_num)
+        return AbstractSplitStrategy.create_split_containing_specified_link_ids(trace_dataset, source_link_ids_first_split,
+                                                                                percent_split, slice_num)

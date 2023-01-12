@@ -71,7 +71,7 @@ class TestTraceMatrix(BaseTest):
         for i in range(self.N_TARGETS):
             assertion = self.assertGreater if expected_greater[i] else self.assertLess
             assertion(predictions[i], self.THRESHOLD)
-            self.assertEqual(links[i].label, expected_labels[i])
+            self.assertEqual(links[i].get_label(), expected_labels[i])
 
     def get_artifact_pairs(self) -> List[TraceLink]:
         """

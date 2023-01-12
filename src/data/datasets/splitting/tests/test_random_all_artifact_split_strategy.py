@@ -1,6 +1,6 @@
 from typing import List
 
-from data.datasets.splitting.random_all_artifact_split_strategy import RandomAllArtifactSplitStrategy
+from data.datasets.splitting.all_artifact_split_strategy import AllArtifactSplitStrategy
 from data.datasets.trace_dataset import TraceDataset
 from data.tree.trace_link import TraceLink
 from testres.base_test import BaseTest
@@ -27,7 +27,7 @@ class TestRandomAllArtifactSplitStrategy(BaseTest):
         validation_percentage = 0.5
         trace_dataset = self.create_trace_dataset()
         for split_index in [1, 2]:
-            split = RandomAllArtifactSplitStrategy.create_split(trace_dataset, validation_percentage, split_index)
+            split = AllArtifactSplitStrategy.create_split(trace_dataset, validation_percentage, split_index)
             self.assert_split_correct(split, validation_percentage)
 
     def test_error_on_small_split(self):
@@ -37,7 +37,7 @@ class TestRandomAllArtifactSplitStrategy(BaseTest):
         validation_percentage = 0.1
         trace_dataset = self.create_trace_dataset()
         with self.assertRaises(ValueError) as e:
-            RandomAllArtifactSplitStrategy.create_split(trace_dataset, validation_percentage, 1)
+            AllArtifactSplitStrategy.create_split(trace_dataset, validation_percentage, 1)
         self.assertIn(f"{validation_percentage}", e.exception.args[0])
 
     def assert_split_correct(self, split: TraceDataset, validation_percentage: float):

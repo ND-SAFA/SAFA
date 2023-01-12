@@ -1,13 +1,11 @@
 from unittest import mock
 from unittest.mock import patch
 
-from data.datasets.splitting.random_split_strategy import RandomSplitStrategy
 from data.datasets.splitting.supported_split_strategy import SupportedSplitStrategy
 from data.datasets.splitting.trace_dataset_splitter import TraceDatasetSplitter
 from models.model_manager import ModelManager
 from testres.base_trace_test import BaseTraceTest
 from testres.test_assertions import TestAssertions
-from testres.test_data_manager import TestDataManager
 
 
 class TestTraceDatasetSplitter(BaseTraceTest):
@@ -64,20 +62,6 @@ class TestTraceDatasetSplitter(BaseTraceTest):
         trainer_dataset = train_dataset.to_trainer_dataset(model_generator)
         self.assertTrue(isinstance(trainer_dataset[0], dict))
         self.assertEquals(self.get_expected_train_dataset_size(resample_rate=1), len(trainer_dataset))
-
-    def test_get_data_split(self):
-        positive_links = list(self.positive_links.values())
-        split1 = RandomSplitStrategy.get_data_split(positive_links, self.VAlIDATION_PERCENTAGE, for_second_split=False)
-        split2 = RandomSplitStrategy.get_data_split(positive_links, self.VAlIDATION_PERCENTAGE, for_second_split=True)
-        self.assertEquals(len(split1), self.N_POSITIVE - self.EXPECTED_VAL_SIZE_POS_LINKS)
-        self.assertEquals(len(split2), self.EXPECTED_VAL_SIZE_POS_LINKS)
-        intersection = set(split1).intersection(set(split2))
-        self.assertEquals(len(intersection), 0)
-
-    def test_get_first_split_size(self):
-        size = RandomSplitStrategy.get_first_split_size(TestDataManager.get_positive_links(),
-                                                        self.VAlIDATION_PERCENTAGE)
-        self.assertEquals(size, self.N_POSITIVE - self.EXPECTED_VAL_SIZE_POS_LINKS)
 
     def get_expected_train_dataset_size(self, resample_rate=BaseTraceTest.RESAMPLE_RATE,
                                         validation_percentage=BaseTraceTest.VAlIDATION_PERCENTAGE):

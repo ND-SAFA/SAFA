@@ -1,11 +1,11 @@
 import math
-import random
-from typing import Dict, List
+from typing import List
+
+from sklearn.model_selection import train_test_split
 
 from config.override import overrides
 from data.datasets.splitting.abstract_split_strategy import AbstractSplitStrategy
 from data.datasets.trace_dataset import TraceDataset
-from data.datasets.trace_matrix import TraceMatrixManager
 from data.tree.trace_link import TraceLink
 
 
@@ -26,7 +26,8 @@ class SourceSplitStrategy(AbstractSplitStrategy):
         :return: the dataset split
         """
         links = SourceSplitStrategy.create_random_trace_link_array(trace_dataset)
-        slice_links = SourceSplitStrategy.get_data_split(links, percent_split, slice_num == 2)
+        first_slice_links, second_slice_links = train_test_split(links, test_size=percent_split)
+        slice_links = first_slice_links if slice_num == 1 else second_slice_links
         slice_links = {
             trace_link.id: trace_link for trace_link in slice_links
         }

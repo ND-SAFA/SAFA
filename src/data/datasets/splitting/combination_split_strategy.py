@@ -1,4 +1,6 @@
-from typing import Iterable, Sized, Union, Set, List
+from typing import List, Set, Union
+
+from sklearn.model_selection import train_test_split
 
 from config.override import overrides
 from data.datasets.splitting.abstract_split_strategy import AbstractSplitStrategy
@@ -40,9 +42,10 @@ class CombinationSplitStrategy(AbstractSplitStrategy):
         """
         all_link_ids = (trace_dataset.pos_link_ids + trace_dataset.neg_link_ids)
         remaining_link_ids = [link_id for link_id in all_link_ids if link_id not in link_ids_for_first_split]
-        split_size = CombinationSplitStrategy.get_first_split_size(all_link_ids, percent_split) - len(link_ids_for_first_split)
-        random_link_ids = CombinationSplitStrategy.get_data_split(remaining_link_ids, for_second_split=slice_num == 2,
-                                                                  split_size=split_size) if split_size > 0 else []
+        labels = [1 if trace_dataset.links[t_id].is_true_link else 0 for t_id in remaining_link_ids]
+        first_split_link_ids, second_split_link_ids = train_test_split(remaining_link_ids, test_size=percent_split, stratify=labels)
+        random_link_ids = first_split_link_ids if slice_num == 1 else second_split_link_ids
+
         if slice_num == 1:
             split_links_ids = list(link_ids_for_first_split) + random_link_ids
         else:

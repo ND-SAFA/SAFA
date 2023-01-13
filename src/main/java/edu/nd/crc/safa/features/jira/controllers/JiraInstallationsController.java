@@ -11,7 +11,6 @@ import edu.nd.crc.safa.features.jira.entities.app.JiraInstallationDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraResponseDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraResponseDTO.JiraResponseMessage;
 import edu.nd.crc.safa.features.jira.entities.db.JiraAccessCredentials;
-import edu.nd.crc.safa.features.jira.repositories.JiraAccessCredentialsRepository;
 import edu.nd.crc.safa.features.jira.services.JiraConnectionService;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
@@ -21,10 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.context.request.async.DeferredResult;
 
 
@@ -35,7 +31,6 @@ import org.springframework.web.context.request.async.DeferredResult;
 public class JiraInstallationsController extends BaseController {
 
     private final Logger log = LoggerFactory.getLogger(JiraInstallationsController.class);
-    private final JiraAccessCredentialsRepository accessCredentialsRepository;
     private final SafaUserService safaUserService;
     private final JiraConnectionService jiraConnectionService;
     private final ExecutorDelegate executorDelegate;
@@ -45,7 +40,6 @@ public class JiraInstallationsController extends BaseController {
                                        ServiceProvider serviceProvider) {
         super(resourceBuilder, serviceProvider);
         this.safaUserService = serviceProvider.getSafaUserService();
-        this.accessCredentialsRepository = serviceProvider.getJiraAccessCredentialsRepository();
         this.jiraConnectionService = serviceProvider.getJiraConnectionService();
         this.executorDelegate = serviceProvider.getExecutorDelegate();
     }
@@ -56,8 +50,7 @@ public class JiraInstallationsController extends BaseController {
 
         SafaUser principal = safaUserService.getCurrentUser();
         executorDelegate.submit(output, () -> {
-            Optional<JiraAccessCredentials> credentials = accessCredentialsRepository
-                .findByUser(principal);
+            Optional<JiraAccessCredentials> credentials = jiraConnectionService.getJiraCredentials(principal);
 
             if (credentials.isEmpty()) {
                 output.setResult(new JiraResponseDTO<>(null, JiraResponseMessage.NO_CREDENTIALS_REGISTERED));
@@ -66,44 +59,6 @@ public class JiraInstallationsController extends BaseController {
 
             output.setResult(new JiraResponseDTO<>(jiraConnectionService.getInstallations(credentials.get()),
                 JiraResponseMessage.OK));
-        });
-
-        return output;
-    }
-
-    @PutMapping(AppRoutes.Jira.Installations.REGISTER)
-    public DeferredResult<JiraResponseDTO<Void>> registerInstallation(
-        @PathVariable("cloudId") String cloudId) {
-        DeferredResult<JiraResponseDTO<Void>> output = executorDelegate.createOutput(5000L);
-
-        SafaUser principal = safaUserService.getCurrentUser();
-        executorDelegate.submit(output, () -> {
-            if (!StringUtils.hasText(cloudId)) {
-                output.setResult(new JiraResponseDTO<>(null, JiraResponseMessage.ERROR));
-                return;
-            }
-
-            Optional<JiraAccessCredentials> credentialsOptional = accessCredentialsRepository
-                .findByUser(principal);
-
-            if (credentialsOptional.isEmpty()) {
-                output.setResult(new JiraResponseDTO<>(null, JiraResponseMessage.NO_CREDENTIALS_REGISTERED));
-                return;
-            }
-
-            JiraAccessCredentials credentials = credentialsOptional.get();
-
-            credentials.setCloudId(cloudId);
-
-            if (!jiraConnectionService.checkCredentials(credentials)) {
-                output.setResult(new JiraResponseDTO<>(null, JiraResponseMessage.INVALID_CREDENTIALS));
-                return;
-            }
-
-
-            accessCredentialsRepository.save(credentials);
-            output.setResult(new JiraResponseDTO<>(null, JiraResponseMessage.OK));
-
         });
 
         return output;

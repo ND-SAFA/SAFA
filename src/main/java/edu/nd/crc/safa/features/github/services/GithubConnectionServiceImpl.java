@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.features.github.services;
 
 import java.util.List;
+import java.util.Optional;
 
 import edu.nd.crc.safa.config.WebApiConfiguration;
 import edu.nd.crc.safa.features.github.entities.app.GithubAccessCredentialsDTO;
@@ -12,7 +13,9 @@ import edu.nd.crc.safa.features.github.entities.app.GithubRepositoryDTO;
 import edu.nd.crc.safa.features.github.entities.app.GithubRepositoryFiletreeResponseDTO;
 import edu.nd.crc.safa.features.github.entities.app.GithubSelfResponseDTO;
 import edu.nd.crc.safa.features.github.entities.db.GithubAccessCredentials;
+import edu.nd.crc.safa.features.github.repositories.GithubAccessCredentialsRepository;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.utilities.WebApiUtils;
 
 import lombok.AllArgsConstructor;
@@ -46,14 +49,28 @@ public class GithubConnectionServiceImpl implements GithubConnectionService {
 
     private final WebClient webClient;
 
+    private final GithubAccessCredentialsRepository accessCredentialsRepository;
+
     @Value("${integrations.github.client-id}")
     private String clientId;
 
     @Value("${integrations.github.client-secret}")
     private String clientSecret;
 
-    public GithubConnectionServiceImpl(WebClient webClient) {
+    public GithubConnectionServiceImpl(WebClient webClient,
+                                       GithubAccessCredentialsRepository accessCredentialsRepository) {
         this.webClient = webClient;
+        this.accessCredentialsRepository = accessCredentialsRepository;
+    }
+
+    @Override
+    public Optional<GithubAccessCredentials> getGithubCredentials(SafaUser user) {
+        Optional<GithubAccessCredentials> credentials = accessCredentialsRepository.findByUser(user);
+        credentials.ifPresent(cred -> {
+            cred.setClientId(clientId);
+            cred.setClientSecret(clientSecret);
+        });
+        return credentials;
     }
 
     @Override

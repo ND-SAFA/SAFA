@@ -195,16 +195,15 @@ public class AppRoutes {
         public static class Installations {
             public static final String ROOT = Accounts.PREFIX + "/jira/installations";
             public static final String RETRIEVE_AVAILABLE = Installations.ROOT;
-            public static final String REGISTER = RETRIEVE_AVAILABLE + "/{cloudId}";
         }
 
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
         public static class Import {
             public static final String ROOT = Projects.ROOT + "/import";
-            public static final String BY_ID = Import.ROOT + "/jira/{id}";
-            public static final String UPDATE = Versions.BY_ID + "/import/jira/{id}";
-            public static final String RETRIEVE_JIRA_PROJECTS = Projects.ROOT + "/jira";
-            public static final String IMPORT_INTO_EXISTING = Versions.BY_ID + "/import/jira/{id}";
+            public static final String BY_ID = Import.ROOT + "/jira/{cloudId}/{id}";
+            public static final String UPDATE = Versions.BY_ID + "/import/jira/{cloudId}/{id}";
+            public static final String RETRIEVE_JIRA_PROJECTS = Projects.ROOT + "/jira/{cloudId}";
+            public static final String IMPORT_INTO_EXISTING = Versions.BY_ID + "/import/jira/{cloudId}/{id}";
         }
     }
 

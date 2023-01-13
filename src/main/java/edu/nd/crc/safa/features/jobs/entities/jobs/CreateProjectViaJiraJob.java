@@ -34,9 +34,6 @@ import org.springframework.util.StringUtils;
  * 4. Returning project created
  */
 public class CreateProjectViaJiraJob extends CommitJob {
-
-    private static final String EMPTY_STRING = "";
-
     /**
      * The project version to upload entities to.
      */
@@ -86,7 +83,7 @@ public class CreateProjectViaJiraJob extends CommitJob {
 
         SafaUser principal = safaUserService.getCurrentUser();
         this.credentials = jiraAccessCredentialsRepository
-            .findByUserAndCloudId(principal, this.jiraIdentifier.getCloudId())
+            .findByUser(principal)
             .orElseThrow(() -> new SafaError("No JIRA credentials found"));
     }
 
@@ -97,8 +94,9 @@ public class CreateProjectViaJiraJob extends CommitJob {
 
         // Step - Retrieve project information including issues
         Long jiraProjectId = this.jiraIdentifier.getJiraProjectId();
-        this.jiraProjectResponse = jiraConnectionService.retrieveJIRAProject(credentials, jiraProjectId);
-        this.issues = jiraConnectionService.retrieveJIRAIssues(credentials, jiraProjectId).getIssues();
+        String cloudId = jiraIdentifier.getCloudId();
+        this.jiraProjectResponse = jiraConnectionService.retrieveJIRAProject(credentials, cloudId, jiraProjectId);
+        this.issues = jiraConnectionService.retrieveJIRAIssues(credentials, cloudId, jiraProjectId).getIssues();
     }
 
     @IJobStep(value = "Creating SAFA Project", position = 3)

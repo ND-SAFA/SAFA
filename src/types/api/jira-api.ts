@@ -1,4 +1,18 @@
 /**
+ * Represents a Jira installation (authorized organization).
+ */
+export interface JiraOrganizationSchema {
+  /**
+   * The installation's unique id.
+   */
+  id: string;
+  /**
+   * The installation's name.
+   */
+  name: string;
+}
+
+/**
  * Represents a jira project.
  */
 export interface JiraProjectSchema {

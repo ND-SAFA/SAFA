@@ -1,7 +1,9 @@
 import {
+  GitHubOrganizationSchema,
   GitHubProjectSchema,
   InstallationSchema,
   IOHandlerCallback,
+  JiraOrganizationSchema,
   JiraProjectSchema,
 } from "@/types";
 import { integrationsStore, logStore, projectStore } from "@/hooks";
@@ -19,6 +21,8 @@ import {
   createGitHubProjectSync,
   createJiraProjectSync,
   handleJobSubmission,
+  getJiraInstallations,
+  getGitHubInstallations,
 } from "@/api";
 
 /**
@@ -58,6 +62,7 @@ export async function handleSyncInstallation(
     if (installation.type === "GITHUB") {
       const job = await createGitHubProjectSync(
         projectStore.versionId,
+        installation.installationOrgId,
         installation.installationId
       );
 
@@ -65,6 +70,7 @@ export async function handleSyncInstallation(
     } else if (installation.type === "JIRA") {
       const job = await createJiraProjectSync(
         projectStore.versionId,
+        installation.installationOrgId,
         installation.installationId
       );
 
@@ -138,6 +144,24 @@ export function handleAuthorizeJira({
 }
 
 /**
+ * Loads Jira installations.
+ *
+ * @param onSuccess - Called if the action is successful, with the jira project list.
+ * @param onError - Called if the action fails.
+ */
+export function handleLoadJiraOrganizations({
+  onSuccess,
+  onError,
+}: IOHandlerCallback<JiraOrganizationSchema[]>): void {
+  getJiraInstallations()
+    .then(onSuccess)
+    .catch((e) => {
+      onError?.(e);
+      logStore.onError(e);
+    });
+}
+
+/**
  * Loads Jira projects and sets the currently selected cloud id.
  *
  * @param onSuccess - Called if the action is successful, with the jira project list.
@@ -147,7 +171,11 @@ export function handleLoadJiraProjects({
   onSuccess,
   onError,
 }: IOHandlerCallback<JiraProjectSchema[]>): void {
-  getJiraProjects()
+  const installationId = integrationsStore.jiraOrganization?.id;
+
+  if (!installationId) return;
+
+  getJiraProjects(installationId)
     .then(onSuccess)
     .catch((e) => {
       onError?.(e);
@@ -207,9 +235,27 @@ export function handleAuthorizeGitHub({
 }
 
 /**
- * Loads GitHub projects and sets the currently selected cloud id.
+ * Loads GitHub installations.
  *
  * @param credentials - The access and refresh token received from authorizing GitHub.
+ * @param onSuccess - Called if the action is successful, with the jira project list.
+ * @param onError - Called if the action fails.
+ */
+export function handleLoadGitHubOrganizations({
+  onSuccess,
+  onError,
+}: IOHandlerCallback<GitHubOrganizationSchema[]>): void {
+  getGitHubInstallations()
+    .then(onSuccess)
+    .catch((e) => {
+      onError?.(e);
+      logStore.onError(e);
+    });
+}
+
+/**
+ * Loads GitHub projects and sets the currently selected cloud id.
+ *
  * @param onSuccess - Called if the action is successful, with the jira project list.
  * @param onError - Called if the action fails.
  */
@@ -217,7 +263,11 @@ export function handleLoadGitHubProjects({
   onSuccess,
   onError,
 }: IOHandlerCallback<GitHubProjectSchema[]>): void {
-  getGitHubProjects()
+  const installationId = integrationsStore.gitHubOrganization?.id;
+
+  if (!installationId) return;
+
+  getGitHubProjects(installationId)
     .then(onSuccess)
     .catch((e) => {
       onError?.(e);

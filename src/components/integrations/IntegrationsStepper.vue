@@ -9,11 +9,11 @@
       <v-stepper-content step="1">
         <authentication-selector v-model="source" />
       </v-stepper-content>
-      <v-stepper-content step="3">
+      <v-stepper-content step="2">
         <jira-organization-selector v-if="source === 'Jira'" />
         <git-hub-organization-selector v-if="source === 'GitHub'" />
       </v-stepper-content>
-      <v-stepper-content step="2">
+      <v-stepper-content step="3">
         <jira-project-selector v-if="source === 'Jira'" />
         <git-hub-project-selector v-if="source === 'GitHub'" />
       </v-stepper-content>

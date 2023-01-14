@@ -43,8 +43,6 @@ export default Vue.extend({
     };
   },
   mounted() {
-    if (!integrationsStore.validGitHubCredentials) return;
-
     this.loadOrganizations();
   },
   computed: {
@@ -59,9 +57,7 @@ export default Vue.extend({
     /**
      * Loads organizations when credentials are valid.
      */
-    hasCredentials(valid: boolean): void {
-      if (!valid) return;
-
+    hasCredentials(): void {
       this.loadOrganizations();
     },
   },
@@ -70,6 +66,8 @@ export default Vue.extend({
      * Loads a user's GitHub organizations.
      */
     async loadOrganizations() {
+      if (!integrationsStore.validGitHubCredentials) return;
+
       integrationsStore.gitHubOrganization = undefined;
       this.organizationsLoading = true;
 

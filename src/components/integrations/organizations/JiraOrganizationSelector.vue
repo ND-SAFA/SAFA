@@ -42,8 +42,6 @@ export default Vue.extend({
     };
   },
   mounted() {
-    if (!integrationsStore.validJiraCredentials) return;
-
     this.loadOrganizations();
   },
   computed: {
@@ -58,9 +56,7 @@ export default Vue.extend({
     /**
      * Loads organizations when credentials are valid.
      */
-    hasCredentials(valid: boolean): void {
-      if (!valid) return;
-
+    hasCredentials(): void {
       this.loadOrganizations();
     },
   },
@@ -69,6 +65,8 @@ export default Vue.extend({
      * Loads a user's Jira organizations.
      */
     async loadOrganizations() {
+      if (!integrationsStore.validJiraCredentials) return;
+
       integrationsStore.jiraOrganization = undefined;
       this.organizationsLoading = true;
 

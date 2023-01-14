@@ -46,8 +46,6 @@ export default Vue.extend({
     };
   },
   mounted() {
-    if (!integrationsStore.validJiraCredentials) return;
-
     this.loadProjects();
   },
   computed: {
@@ -55,16 +53,14 @@ export default Vue.extend({
      * @return Whether there are current valid credentials.
      */
     hasCredentials(): boolean {
-      return integrationsStore.validJiraCredentials;
+      return !!integrationsStore.jiraOrganization;
     },
   },
   watch: {
     /**
      * Loads projects when credentials are valid.
      */
-    hasCredentials(valid: boolean): void {
-      if (!valid) return;
-
+    hasCredentials(): void {
       this.loadProjects();
     },
   },
@@ -73,6 +69,8 @@ export default Vue.extend({
      * Loads a user's Jira projects for a selected site.
      */
     async loadProjects() {
+      if (!integrationsStore.jiraOrganization) return;
+
       integrationsStore.jiraProject = undefined;
       this.projectsLoading = true;
 

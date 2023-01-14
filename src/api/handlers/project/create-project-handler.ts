@@ -93,13 +93,14 @@ export function handleImportJiraProject({
   onSuccess,
   onError,
 }: IOHandlerCallback): void {
+  const installationId = integrationsStore.jiraOrganization?.id;
   const projectId = integrationsStore.jiraProject?.id;
 
-  if (!projectId) return;
+  if (!installationId || !projectId) return;
 
   appStore.onLoadStart();
 
-  createJiraProject(projectId)
+  createJiraProject(installationId, projectId)
     .then(async (job) => {
       await handleJobSubmission(job);
       integrationsStore.jiraProject = undefined;
@@ -125,13 +126,14 @@ export function handleImportGitHubProject({
   onSuccess,
   onError,
 }: IOHandlerCallback): void {
+  const installationId = integrationsStore.gitHubOrganization?.id;
   const repositoryName = integrationsStore.gitHubProject?.name;
 
-  if (!repositoryName) return;
+  if (!installationId || !repositoryName) return;
 
   appStore.onLoadStart();
 
-  createGitHubProject(repositoryName)
+  createGitHubProject(installationId, repositoryName)
     .then(async (job) => {
       await handleJobSubmission(job);
       integrationsStore.gitHubProject = undefined;

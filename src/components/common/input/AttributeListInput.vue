@@ -1,5 +1,5 @@
 <template>
-  <attribute-grid :layout="layout">
+  <attribute-grid v-if="layout" :layout="layout">
     <template v-slot:item="{ attribute }">
       <attribute-input
         :model="artifact.attributes || {}"
@@ -35,7 +35,7 @@ export default Vue.extend({
     /**
      * @return The layout for this artifact.
      */
-    layout(): AttributeLayoutSchema {
+    layout(): AttributeLayoutSchema | undefined {
       return attributesStore.getLayoutByType(this.artifact.type);
     },
   },

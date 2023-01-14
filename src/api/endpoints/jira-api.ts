@@ -1,4 +1,4 @@
-import { JiraProjectSchema, JobSchema } from "@/types";
+import { JiraOrganizationSchema, JiraProjectSchema, JobSchema } from "@/types";
 import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
 
 /**
@@ -101,15 +101,38 @@ export async function deleteJiraCredentials(): Promise<void> {
 }
 
 /**
+ * Gets Jira installations.
+ *
+ * @return The user's installations.
+ */
+export async function getJiraInstallations(): Promise<
+  JiraOrganizationSchema[]
+> {
+  return (
+    (
+      await authHttpClient<{ payload: JiraOrganizationSchema[] }>(
+        Endpoint.jiraGetInstallations,
+        {
+          method: "GET",
+        }
+      )
+    ).payload || []
+  );
+}
+
+/**
  * Gets Jira projects for an organization.
  *
+ * @param cloudId - The Jira installation to get projects for.
  * @return The user's projects.
  */
-export async function getJiraProjects(): Promise<JiraProjectSchema[]> {
+export async function getJiraProjects(
+  cloudId: string
+): Promise<JiraProjectSchema[]> {
   return (
     (
       await authHttpClient<{ payload: JiraProjectSchema[] }>(
-        Endpoint.jiraGetProjects,
+        fillEndpoint(Endpoint.jiraGetProjects, { cloudId }),
         {
           method: "GET",
         }
@@ -121,13 +144,17 @@ export async function getJiraProjects(): Promise<JiraProjectSchema[]> {
 /**
  * Creates a new project based on a Jira project.
  *
+ * @param cloudId - The Jira installation to import projects from.
  * @param id - The Jira project id to import.
  * @return The created import job.
  */
-export async function createJiraProject(id: string): Promise<JobSchema> {
+export async function createJiraProject(
+  cloudId: string,
+  id: string
+): Promise<JobSchema> {
   return (
     await authHttpClient<{ payload: JobSchema }>(
-      fillEndpoint(Endpoint.jiraCreateProject, { id }),
+      fillEndpoint(Endpoint.jiraCreateProject, { cloudId, id }),
       {
         method: "POST",
       }
@@ -139,15 +166,17 @@ export async function createJiraProject(id: string): Promise<JobSchema> {
  * Synchronizes the state of Jira artifacts in a project.
  *
  * @param versionId - The project version to sync.
+ * @param cloudId - The Jira installation to import projects from.
  * @param id - The Jira project id to import.
  */
 export async function createJiraProjectSync(
   versionId: string,
+  cloudId: string,
   id: string
 ): Promise<JobSchema> {
   return (
     await authHttpClient<{ payload: JobSchema }>(
-      fillEndpoint(Endpoint.jiraSyncProject, { versionId, id }),
+      fillEndpoint(Endpoint.jiraSyncProject, { versionId, cloudId, id }),
       {
         method: "PUT",
       }

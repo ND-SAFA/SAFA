@@ -54,7 +54,7 @@ class AbstractTraceProjectReader(ABC):
     def create(self) -> TraceDataset:
         name2artifacts = self._create_artifact_readers(self.project_path, self.get_artifact_definitions())
         trace_links = self._create_trace_links(name2artifacts)
-        return TraceDataset(links=trace_links)
+        return TraceDataset(links=trace_links, randomize=True)
 
     def _create_trace_links(self, name2artifacts: Dict[str, ArtifactReader]) -> Dict[int, TraceLink]:
         """

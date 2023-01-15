@@ -1,7 +1,7 @@
 import random
 from collections import namedtuple
 from copy import deepcopy
-from typing import Callable, Dict, List, Iterable, NamedTuple
+from typing import Callable, Dict, Iterable, List
 
 import numpy as np
 
@@ -94,7 +94,7 @@ class TraceMatrixManager:
 
     def _do_randomize(self) -> None:
         """
-        Randomizes the order of links in the matrix
+        Randomizes the order of links in the matrix and source ids.
         :return: None
         """
         random.shuffle(self.source_ids)

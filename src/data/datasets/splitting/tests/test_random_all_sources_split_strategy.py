@@ -10,7 +10,7 @@ class TestRandomAllSourcesSplitStrategy(BaseTraceTest):
     def test_one_of_each_source(self):
         trace_dataset = self.get_trace_dataset()
         splitter = TraceDatasetSplitter(trace_dataset)
-        split1, split2 = splitter.split(self.VAlIDATION_PERCENTAGE, strategy=SupportedSplitStrategy.RANDOM_ALL_SOURCES.name)
+        split1, split2 = splitter.split(self.VAlIDATION_PERCENTAGE, strategy=SupportedSplitStrategy.ALL_SOURCES.name)
         split1: TraceDataset
         for source in self.SOURCES:
             self.assertIn(source, split1.trace_matrix.source_ids)

@@ -116,7 +116,8 @@ class EntityReader(ABC, Generic[EntityType]):
     def read_entities(self) -> pd.DataFrame:
         source_entities_df = self.read_source_entities()
         column_conversion = self.read_column_conversion()
-        return DataFrameUtil.convert_columns(source_entities_df, column_conversion)
+        processed_df = DataFrameUtil.rename_columns(source_entities_df, column_conversion)
+        return processed_df
 
     def read_source_entities(self):
         parser_params = self.get_property(StructureKeys.PARAMS, {})

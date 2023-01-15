@@ -34,7 +34,7 @@ class ClassicTraceDatasetCreator(AbstractTraceDatasetCreator):
         """
         pos_link_ids = self._get_pos_link_ids(self.true_links) if self.true_links else set()
         all_links = self._generate_all_links(self.source_layers, self.target_layers, pos_link_ids)
-        return TraceDataset(links=all_links)
+        return TraceDataset(links=all_links, randomize=True)
 
     def _generate_all_links(self, source_layers: List[Dict[str, str]], target_layers: List[Dict[str, str]],
                             pos_link_ids: Set[int]) -> Dict[int, TraceLink]:

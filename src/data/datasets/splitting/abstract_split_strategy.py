@@ -1,7 +1,12 @@
 from abc import ABC, abstractmethod
-from typing import Sized, List
+from typing import List, Set, Tuple, TypeVar, Union
+
+from sklearn.model_selection import train_test_split
 
 from data.datasets.trace_dataset import TraceDataset
+
+GenericDatum = TypeVar("GenericData")
+GenericData = List[GenericDatum]
 
 
 class AbstractSplitStrategy(ABC):
@@ -11,7 +16,7 @@ class AbstractSplitStrategy(ABC):
 
     @staticmethod
     @abstractmethod
-    def create_split(trace_dataset: TraceDataset, percent_split: float, slice_num: int):
+    def create_split(trace_dataset: TraceDataset, percent_split: float, slice_num: int) -> TraceDataset:
         """
         Creates the split of the dataset
         :param trace_dataset: The dataset to split.
@@ -22,25 +27,44 @@ class AbstractSplitStrategy(ABC):
         raise NotImplementedError()
 
     @staticmethod
-    def get_first_split_size(data: Sized, percent_split: float) -> int:
+    def split_data(data: GenericData, percent_split: float, labels: List[int] = None) -> Tuple[GenericData, GenericData]:
         """
-        Gets the size of the data for the first split
-        :param data: a list of the data
-        :param percent_split: The percentage of samples in second split.
-        :return: the size of the data split
+        Splits data into slices using labels to guarantee equal proportions of the labels in each split
+        :param data: The data to split.
+        :param percent_split: The percentage of the data to be contained in second split
+        :param labels: The labels to stratify data with.
+        :return: Two slices of data.
         """
-        return len(data) - round(len(data) * percent_split)
+        return train_test_split(data, test_size=percent_split, stratify=labels, random_state=0)
 
     @staticmethod
-    def get_data_split(data: List, percent_split: float = None, for_second_split: bool = False, split_size: int = None) -> List:
+    def create_split_containing_specified_link_ids(trace_dataset: TraceDataset, link_ids_for_first_split: Union[Set[str], List[str]],
+                                                   percent_split: float, slice_num: int) -> "TraceDataset":
         """
-        Splits the data and returns the split
-        :param data: a list of the data
-        :param percent_split: The percentage of samples in second split.
-        :param for_second_split: If True, returns the second portion.
-        :param split_size: May be specified instead of percent split to get a certain number of links
-        :return: the subsection of the data in the split
+        Creates a new trace data from the slice defined by the percent split.
+        :param trace_dataset: The trace dataset to split.
+        :param link_ids_for_first_split: A set of link ids to include in the first split
+        :param percent_split: The percentage of links included in second slice.
+        :param slice_num: Whether to return first or second slice.
+        :return: the dataset split
         """
-        assert(percent_split is not None or split_size is not None)
-        split_size = AbstractSplitStrategy.get_first_split_size(data, percent_split) if split_size is None else split_size
-        return data[split_size:] if for_second_split else data[:split_size]
+        all_link_ids = (trace_dataset.pos_link_ids + trace_dataset.neg_link_ids)
+        remaining_link_ids = [link_id for link_id in all_link_ids if link_id not in link_ids_for_first_split]
+
+        # Adjust percentage to account for links selected for first split
+        first_split_size = len(all_link_ids) * (1 - percent_split)
+        remaining_links_in_first_split = first_split_size - len(link_ids_for_first_split)
+        new_split_size = 1 - (remaining_links_in_first_split / len(remaining_link_ids))
+
+        labels = [trace_dataset.links[t_id].get_label() for t_id in remaining_link_ids]
+        first_split_link_ids, second_split_link_ids = AbstractSplitStrategy.split_data(remaining_link_ids, new_split_size, labels)
+        random_link_ids = first_split_link_ids if slice_num == 1 else second_split_link_ids
+
+        if slice_num == 1:
+            split_links_ids = list(link_ids_for_first_split) + random_link_ids
+        else:
+            split_links_ids = random_link_ids if len(random_link_ids) > 0 else remaining_link_ids
+        slice_links = {
+            link_id: trace_dataset.links[link_id] for link_id in split_links_ids
+        }
+        return TraceDataset(slice_links)

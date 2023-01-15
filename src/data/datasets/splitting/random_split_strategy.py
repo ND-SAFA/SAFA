@@ -1,5 +1,3 @@
-from typing import List, Sized
-
 from config.override import overrides
 from data.datasets.splitting.abstract_split_strategy import AbstractSplitStrategy
 from data.datasets.trace_dataset import TraceDataset
@@ -17,12 +15,9 @@ class RandomSplitStrategy(AbstractSplitStrategy):
         :param slice_num: The slice number to retrieve.
         :return: Slice of dataset associated with slice num.
         """
-        slice_pos_link_ids = RandomSplitStrategy.get_data_split(trace_dataset.pos_link_ids, percent_split,
-                                                                slice_num == 2)
-        slice_neg_link_ids = RandomSplitStrategy.get_data_split(trace_dataset.neg_link_ids, percent_split,
-                                                                slice_num == 2)
+        first_slice_pos_ids, second_slice_pos_ids = AbstractSplitStrategy.split_data(trace_dataset.pos_link_ids, percent_split)
+        first_slice_neg_ids, second_slice_neg_ids = AbstractSplitStrategy.split_data(trace_dataset.neg_link_ids, percent_split)
+        slice_ids = first_slice_pos_ids + first_slice_neg_ids if slice_num == 1 else second_slice_pos_ids + second_slice_neg_ids
 
-        slice_links = {
-            link_id: trace_dataset.links[link_id] for link_id in slice_pos_link_ids + slice_neg_link_ids
-        }
+        slice_links = {link_id: trace_dataset.links[link_id] for link_id in slice_ids}
         return TraceDataset(slice_links)

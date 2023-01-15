@@ -22,18 +22,20 @@ from util.file_util import FileUtil
 
 class TraceDataset(AbstractDataset):
 
-    def __init__(self, links: Dict[int, TraceLink], pos_link_ids: List[int] = None, neg_link_ids: List[int] = None):
+    def __init__(self, links: Dict[int, TraceLink], pos_link_ids: List[int] = None, neg_link_ids: List[int] = None,
+                 randomize: bool = False):
         """
         Represents the config format for all data used by the huggingface trainer.
         :param links: The candidate links.
         :param pos_link_ids: A list of all positive link ids in the dataset
         :param neg_link_ids: A list of all negative link ids in the dataset
+        :param randomize: Whether to randomize the trace links.
         """
         self.links = OrderedDict(links)
         if pos_link_ids is None or neg_link_ids is None:
             pos_link_ids, neg_link_ids = self.__create_pos_neg_links(links)
         self.pos_link_ids, self.neg_link_ids = pos_link_ids, neg_link_ids
-        self.trace_matrix = TraceMatrixManager(self.links.values(), randomize=True)
+        self.trace_matrix = TraceMatrixManager(list(self.links.values()), randomize=randomize)
         self._shuffle_link_ids(self.pos_link_ids)
         self._shuffle_link_ids(self.neg_link_ids)
 

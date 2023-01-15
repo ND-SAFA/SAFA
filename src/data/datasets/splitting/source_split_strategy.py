@@ -1,11 +1,9 @@
 import math
-import random
-from typing import Dict, List
+from typing import List
 
 from config.override import overrides
 from data.datasets.splitting.abstract_split_strategy import AbstractSplitStrategy
 from data.datasets.trace_dataset import TraceDataset
-from data.datasets.trace_matrix import TraceMatrixManager
 from data.tree.trace_link import TraceLink
 
 
@@ -26,7 +24,9 @@ class SourceSplitStrategy(AbstractSplitStrategy):
         :return: the dataset split
         """
         links = SourceSplitStrategy.create_random_trace_link_array(trace_dataset)
-        slice_links = SourceSplitStrategy.get_data_split(links, percent_split, slice_num == 2)
+        labels = [t.get_label() for t in links]
+        first_slice_links, second_slice_links = AbstractSplitStrategy.split_data(links, percent_split, labels)
+        slice_links = first_slice_links if slice_num == 1 else second_slice_links
         slice_links = {
             trace_link.id: trace_link for trace_link in slice_links
         }
@@ -49,6 +49,6 @@ class SourceSplitStrategy(AbstractSplitStrategy):
         agg_links = []
         for source_name in source_names[:n_sources]:
             links = trace_dataset.trace_matrix.query_matrix[source_name].links
-            n_links_per_source = min(len(links), n_links_per_source)
-            agg_links.extend(links[:n_links_per_source])
+            links_per_query = min(len(links), n_links_per_source)
+            agg_links.extend(links[:links_per_query])
         return agg_links

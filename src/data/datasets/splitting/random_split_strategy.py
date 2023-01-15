@@ -18,10 +18,6 @@ class RandomSplitStrategy(AbstractSplitStrategy):
         first_slice_pos_ids, second_slice_pos_ids = AbstractSplitStrategy.split_data(trace_dataset.pos_link_ids, percent_split)
         first_slice_neg_ids, second_slice_neg_ids = AbstractSplitStrategy.split_data(trace_dataset.neg_link_ids, percent_split)
         slice_ids = first_slice_pos_ids + first_slice_neg_ids if slice_num == 1 else second_slice_pos_ids + second_slice_neg_ids
-        print(list(set(first_slice_neg_ids).intersection(set(second_slice_neg_ids))))
-        print(list(set(first_slice_pos_ids).intersection(set(second_slice_pos_ids))))
-        print(list(set(first_slice_neg_ids).intersection(set(second_slice_pos_ids))))
-        print(list(set(first_slice_pos_ids).intersection(set(second_slice_neg_ids))))
 
         slice_links = {link_id: trace_dataset.links[link_id] for link_id in slice_ids}
         return TraceDataset(slice_links)

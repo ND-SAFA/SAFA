@@ -12,7 +12,7 @@ class CSVDatasetCreator(AbstractTraceDatasetCreator):
         :param data_file_path: path to csv
         :param data_cleaner: Responsible for processing artifact tokens.
         """
-        super().__init__(data_cleaner, use_linked_targets_only=False)
+        super().__init__(data_cleaner)
         self.data_file_path = data_file_path
 
     def create(self) -> TraceDataset:

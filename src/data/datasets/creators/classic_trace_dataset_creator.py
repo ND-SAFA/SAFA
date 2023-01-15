@@ -1,6 +1,5 @@
 from typing import Dict, List, Set, Tuple
 
-from config.constants import USE_LINKED_TARGETS_ONLY_DEFAULT
 from data.datasets.creators.abstract_trace_dataset_creator import AbstractTraceDatasetCreator
 from data.datasets.trace_dataset import TraceDataset
 from data.processing.cleaning.data_cleaner import DataCleaner
@@ -12,17 +11,15 @@ class ClassicTraceDatasetCreator(AbstractTraceDatasetCreator):
 
     def __init__(self, source_layers: List[Dict[str, str]], target_layers: List[Dict[str, str]],
                  true_links: List[Tuple[str, str]] = None,
-                 data_cleaner: DataCleaner = None,
-                 use_linked_targets_only: bool = USE_LINKED_TARGETS_ONLY_DEFAULT):
+                 data_cleaner: DataCleaner = None):
         """
         Constructs data in classic trace format
         :param source_layers: a list of source artifacts across all layers
         :param target_layers: a list of target artifacts across all layers
         :param true_links: list of tuples containing linked source and target ids
         :param data_cleaner: The cleaner responsible for processing artifact tokens.
-        :param use_linked_targets_only: if True, uses only the targets that make up at least one true link
         """
-        super().__init__(data_cleaner, use_linked_targets_only)
+        super().__init__(data_cleaner)
         self.source_layers = source_layers
         self.target_layers = target_layers
         self.true_links = true_links
@@ -65,7 +62,8 @@ class ClassicTraceDatasetCreator(AbstractTraceDatasetCreator):
             artifacts.append(Artifact(artifact_id, processed_artifact_token))
         return artifacts
 
-    def _create_links_for_layer(self, source_artifacts: List[Artifact], target_artifacts: List[Artifact],
+    @staticmethod
+    def _create_links_for_layer(source_artifacts: List[Artifact], target_artifacts: List[Artifact],
                                 pos_link_ids: Set[int]) -> Dict[int, TraceLink]:
         """
         Creates map between trace link id to trace link.
@@ -74,8 +72,6 @@ class ClassicTraceDatasetCreator(AbstractTraceDatasetCreator):
         :param pos_link_ids: The list of all positive link ids in project.
         :return: Map between trace link ids and trace links for given source and target artifacts.
         """
-        if self.use_linked_targets_only:
-            target_artifacts = self._filter_unlinked_targets(target_artifacts)
 
         links = {}
         for source in source_artifacts:
@@ -84,3 +80,16 @@ class ClassicTraceDatasetCreator(AbstractTraceDatasetCreator):
                 link.is_true_link = link.id in pos_link_ids
                 links[link.id] = link
         return links
+
+    @staticmethod
+    def _get_pos_link_ids(true_links: List[Tuple[str, str]]) -> Set[int]:
+        """
+        Creates a set of all positive and negative link ids
+        :param true_links: list of tuples containing linked source and target ids
+        :return: a list of the positive link ids, and a list of the negative link ids
+        """
+        pos_link_ids = set()
+        for source_id, target_id in true_links:
+            link_id = TraceLink.generate_link_id(source_id, target_id)
+            pos_link_ids.add(link_id)
+        return pos_link_ids

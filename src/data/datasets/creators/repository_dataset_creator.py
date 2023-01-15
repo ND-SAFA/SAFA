@@ -1,6 +1,5 @@
 from typing import List
 
-from config.constants import USE_LINKED_TARGETS_ONLY_DEFAULT
 from data.datasets.creators.abstract_trace_dataset_creator import AbstractTraceDatasetCreator
 from data.datasets.creators.readers.project.repository_project_reader import RepositoryProjectReader
 from data.datasets.keys.safa_format import SafaKeys
@@ -11,15 +10,14 @@ from data.processing.cleaning.data_cleaner import DataCleaner
 class RepositoryDatasetCreator(AbstractTraceDatasetCreator):
 
     def __init__(self, repo_paths: List[str], data_cleaner: DataCleaner = None,
-                 data_keys: SafaKeys = SafaKeys, use_linked_targets_only: bool = USE_LINKED_TARGETS_ONLY_DEFAULT):
+                 data_keys: SafaKeys = SafaKeys):
         """
         Responsible for creating a data from a repository
         :param repo_paths: list of paths to all repositories
         :param data_cleaner: The cleaner responsible for processing artifact tokens.
         :param data_keys: keys to use to access data
-        :param use_linked_targets_only: if True, uses only the targets that make up at least one true link
         """
-        super().__init__(data_cleaner, use_linked_targets_only)
+        super().__init__(data_cleaner)
         self.repo_paths = repo_paths
         self.data_keys = data_keys
 

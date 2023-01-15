@@ -24,7 +24,7 @@ class DataFrameUtil:
 
         for df_col in df.select_dtypes(include=[float]).columns:
             df[df_col] = df[df_col].map(lambda v: int(v) if isinstance(v, float) and not np.isnan(v) else v)
-
+        df = df[column_translation.keys()]
         df = df.rename(column_translation, axis=1)
         df = df[list(column_translation.values())]
 

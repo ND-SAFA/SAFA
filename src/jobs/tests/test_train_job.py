@@ -22,6 +22,7 @@ class TestTrainJob(BaseJobTest):
     CSV_DATA_DIR = os.path.join(TEST_DATA_DIR, "csv")
     CSV_DATA_FILE = os.path.join(CSV_DATA_DIR, "test_csv_data.csv")
     EXPECTED_SPLIT_ROLE: DatasetRole = DatasetRole.EVAL
+    DETERMINISTIC_ID = "1234"
 
     @patch.object(TraceTrainer, "save_model")
     def test_run_success(self, save_model_mock: mock.MagicMock):
@@ -40,13 +41,14 @@ class TestTrainJob(BaseJobTest):
     def test_initialize_with_deterministic_dataset_manager(self):
         job = self._get_job(deterministic=True)
         self.assertIsInstance(job.trainer_dataset_manager, DeterministicTrainerDatasetManager)
-        self.assertEquals(job.trainer_dataset_manager.output_dir, TEST_OUTPUT_DIR)
+        self.assertEquals(job.trainer_dataset_manager.get_output_path(), os.path.join(TEST_OUTPUT_DIR, self.DETERMINISTIC_ID))
 
     def _get_job(self, deterministic: bool = False) -> TrainJob:
         dataset_param = "_".join([self.EXPECTED_SPLIT_ROLE.value, "dataset", "creator"])
         trainer_dataset_manager = ObjectCreator.get_definition(TrainerDatasetManager)
         if deterministic:
-            trainer_dataset_manager[DeterministicTrainerDatasetManager.DETERMINISTIC_KEY] = TEST_OUTPUT_DIR
+            trainer_dataset_manager[DeterministicTrainerDatasetManager.DETERMINISTIC_KEY] = self.DETERMINISTIC_ID
+            trainer_dataset_manager["output_dir"] = TEST_OUTPUT_DIR
         trainer_dataset_manager.update(**{
             dataset_param: {
                 TypedDefinitionVariable.OBJECT_TYPE_KEY: "SPLIT",

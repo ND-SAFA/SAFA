@@ -10,3 +10,4 @@ class CSVKeys:
     TARGET = "target"
     TEXT = "text"
     LABEL = "label"
+    EXT = ".csv"

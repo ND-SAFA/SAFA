@@ -17,17 +17,22 @@ from data.tree.artifact import Artifact
 from data.tree.trace_link import TraceLink
 from models.model_manager import ModelManager
 from models.model_properties import ModelArchitectureType
+from util.file_util import FileUtil
 
 
 class TraceDataset(AbstractDataset):
 
-    def __init__(self, links: Dict[int, TraceLink]):
+    def __init__(self, links: Dict[int, TraceLink], pos_link_ids: List[int] = None, neg_link_ids: List[int] = None):
         """
         Represents the config format for all data used by the huggingface trainer.
         :param links: The candidate links.
+        :param pos_link_ids: A list of all positive link ids in the dataset
+        :param neg_link_ids: A list of all negative link ids in the dataset
         """
         self.links = OrderedDict(links)
-        self.pos_link_ids, self.neg_link_ids = self.__create_pos_neg_links(links)
+        if pos_link_ids is None or neg_link_ids is None:
+            pos_link_ids, neg_link_ids = self.__create_pos_neg_links(links)
+        self.pos_link_ids, self.neg_link_ids = pos_link_ids, neg_link_ids
         self.trace_matrix = TraceMatrixManager(self.links.values(), randomize=True)
         self._shuffle_link_ids(self.pos_link_ids)
         self._shuffle_link_ids(self.neg_link_ids)
@@ -52,7 +57,7 @@ class TraceDataset(AbstractDataset):
         link_ids_to_rows = {}
         for link in self.links.values():
             link_ids_to_rows[link.id] = [link.source.id, link.source.token, link.target.id, link.target.token,
-                                         link.label]
+                                         link.get_label()]
         data = [link_ids_to_rows[link_id] for link_id in self.pos_link_ids + self.neg_link_ids]
         return pd.DataFrame(data,
                             columns=[CSVKeys.SOURCE_ID, CSVKeys.SOURCE, CSVKeys.TARGET_ID, CSVKeys.TARGET,
@@ -152,7 +157,8 @@ class TraceDataset(AbstractDataset):
         :param filename: name of the file (no ext)
         :return: location the file was saved to
         """
-        output_path = os.path.join(output_dir, filename + ".csv")
+        FileUtil.make_dir_safe(output_dir)
+        output_path = os.path.join(output_dir, filename + CSVKeys.EXT)
         df = self.to_dataframe()
         df.to_csv(output_path)
         return output_path

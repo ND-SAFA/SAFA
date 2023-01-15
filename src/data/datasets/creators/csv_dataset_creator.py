@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, List
 
 from data.datasets.creators.abstract_trace_dataset_creator import AbstractTraceDatasetCreator
 from data.datasets.creators.readers.entity.csv_entity_reader import CSVEntityReader
@@ -24,5 +24,5 @@ class CSVDatasetCreator(AbstractTraceDatasetCreator):
         :return: the dataset
         """
         project_reader = CSVEntityReader(self.data_file_path)
-        trace_links: Dict[int, TraceLink] = project_reader.get_entities()
-        return TraceDataset(links=trace_links)
+        trace_links, pos_link_ids, neg_link_ids = project_reader.get_entities()
+        return TraceDataset(links=trace_links, pos_link_ids=pos_link_ids, neg_link_ids=neg_link_ids)

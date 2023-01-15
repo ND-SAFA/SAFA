@@ -5,9 +5,9 @@ from unittest.mock import patch
 from data.datasets.creators.classic_trace_dataset_creator import ClassicTraceDatasetCreator
 from data.datasets.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
 from data.datasets.dataset_role import DatasetRole
+from data.datasets.managers.tests.base_trainer_datasets_manager_test import BaseTrainerDatasetsManagerTest
 from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
 from data.datasets.trace_dataset import TraceDataset
-from testres.base_trace_test import BaseTraceTest
 from testres.paths.paths import TEST_OUTPUT_DIR
 from testres.test_assertions import TestAssertions
 from util.object_creator import ObjectCreator
@@ -15,16 +15,7 @@ from variables.experimental_variable import ExperimentalVariable
 from variables.typed_definition_variable import TypedDefinitionVariable
 
 
-class TestTrainerDatasetsManager(BaseTraceTest):
-    val_dataset_creator_definition = {
-        TypedDefinitionVariable.OBJECT_TYPE_KEY: "SPLIT",
-        "val_percentage": 0.3
-    }
-    eval_dataset_creator_definition = {
-        TypedDefinitionVariable.OBJECT_TYPE_KEY: "SPLIT",
-        "val_percentage": 0.2
-    }
-
+class TestTrainerDatasetsManager(BaseTrainerDatasetsManagerTest):
     @patch.object(MLMPreTrainDatasetCreator, "create")
     def test_prepare_datasets(self, create_mock):
         dataset_container_manager = self.create_dataset_manager(
@@ -93,12 +84,3 @@ class TestTrainerDatasetsManager(BaseTraceTest):
         if not experiment:
             managers = managers.get_values_of_all_variables()[-1]
         return managers
-
-    def assert_final_datasets_are_as_expected(self, datasets_container):
-        expected_dataset_split_roles = [DatasetRole.TRAIN, DatasetRole.VAL, DatasetRole.EVAL]
-        for dataset_role in expected_dataset_split_roles:
-            self.assertIn(dataset_role, datasets_container)
-            self.assertTrue(isinstance(datasets_container[dataset_role], TraceDataset))
-        self.assertIn(DatasetRole.PRE_TRAIN, datasets_container)
-        self.assertEquals(len(datasets_container[DatasetRole.TRAIN].pos_link_ids),
-                          len(datasets_container[DatasetRole.TRAIN].neg_link_ids))

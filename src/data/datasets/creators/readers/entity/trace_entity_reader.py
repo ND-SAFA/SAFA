@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional, Tuple, Set
+from typing import Dict, Iterable, List, Optional, Set, Tuple
 
 import pandas as pd
 
@@ -53,7 +53,7 @@ class TraceEntityReader(EntityReader):
         return trace_links
 
     @staticmethod
-    def create_trace_link(source_artifact: Artifact, target_artifact: Artifact, pos_link_ids: pd.DataFrame) -> TraceLink:
+    def create_trace_link(source_artifact: Artifact, target_artifact: Artifact, pos_link_ids: Iterable[int]) -> TraceLink:
         """
         Creates a trace link between artifacts checking matrix if link is positive or not.
         :param source_artifact: The source artifact to reference in trace link.

@@ -1,5 +1,5 @@
 from data.datasets.creators.abstract_trace_dataset_creator import AbstractTraceDatasetCreator
-from data.datasets.creators.readers.project.tim_project_reader import TimProjectReader
+from data.datasets.creators.readers.definitions.tim_project_definition import TimProjectDefinition
 from data.datasets.trace_dataset import TraceDataset
 from data.processing.cleaning.data_cleaner import DataCleaner
 
@@ -22,4 +22,4 @@ class SafaDatasetCreator(AbstractTraceDatasetCreator):
         Creates the data
         :return: the data
         """
-        return TimProjectReader(self.project_path).create()
+        return TimProjectDefinition(self.project_path).read_project()

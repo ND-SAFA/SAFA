@@ -1,5 +1,5 @@
 from data.datasets.creators.abstract_trace_dataset_creator import AbstractTraceDatasetCreator
-from data.datasets.creators.readers.project.structure_project_reader import StructureProjectReader
+from data.datasets.creators.readers.definitions.structure_project_definition import StructureProjectDefinition
 from data.datasets.trace_dataset import TraceDataset
 from data.processing.cleaning.data_cleaner import DataCleaner
 
@@ -21,4 +21,4 @@ class StructureDatasetCreator(AbstractTraceDatasetCreator):
         Creates the structure dataset using the structured project reader
         :return: the dataset
         """
-        return StructureProjectReader(self.project_path).create()
+        return StructureProjectDefinition(self.project_path).read_project()

@@ -1,0 +1,102 @@
+from typing import Dict, Tuple
+
+import pandas as pd
+
+from data.datasets.creators.readers.abstract_project_reader import AbstractProjectReader
+from data.datasets.creators.readers.definitions.abstract_project_definition import AbstractProjectDefinition
+from data.datasets.creators.readers.entity_reader import EntityReader
+from data.datasets.keys.structure_keys import StructureKeys
+from util.json_util import JSONUtil
+
+
+class StructuredProjectReader(AbstractProjectReader):
+    """
+    Responsible for reading artifacts and trace links and constructing
+    a trace dataset.
+    """
+
+    def __init__(self, project_path: str, definition_reader: AbstractProjectDefinition, conversions=None):
+        """
+        Creates reader for project at path and column definitions given.
+        :param project_path: Path to the project.
+        :param definition_reader: Responsible for reading and translating project definition into structure format.
+        :param conversions: Column definitions available to project.
+        """
+        if conversions is None:
+            conversions = {}
+        self.project_path = project_path
+        self.definition = definition_reader.read_project_definition(project_path)
+        self.conversions = self.definition.get(StructureKeys.CONVERSIONS, conversions)
+        self.overrides = self.definition.get(StructureKeys.OVERRIDES, {})
+
+    def read_project(self) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+        """
+        Reads artifact and trace links from files.
+        :return: Returns DataFrames containing artifacts, traces, and mapping between layers.
+        """
+        artifact_df = self._read_artifact_df(self.project_path, self.get_artifact_definitions())
+        trace_df = self._read_trace_df()
+        layer_mapping_df = self._read_layer_mapping_df()
+        return artifact_df, trace_df, layer_mapping_df
+
+    def _read_artifact_df(self, project_path: str, type2definition: Dict[str, Dict]) -> pd.DataFrame:
+        """
+        Reads artifacts in project converting each to its own data frame.
+        :param project_path: Path to project.
+        :param type2definition: Mapping between artifacts' name and definition.
+        :return:  Mapping between artifacts' name and its reader.
+        """
+        artifacts_df = pd.DataFrame()
+        for artifact_type, artifact_definition in type2definition.items():
+            artifact_reader = EntityReader(project_path,
+                                           artifact_definition,
+                                           conversions=self.conversions,
+                                           overrides=self.overrides)
+            artifact_type_df = artifact_reader.read_entities()
+            artifact_type_df[StructureKeys.Artifact.LAYER_ID] = artifact_type
+            artifacts_df = pd.concat([artifacts_df, artifact_type_df])
+        return artifacts_df
+
+    def _read_trace_df(self) -> pd.DataFrame:
+        """
+        Reads trace matrix files and aggregates them into single data frame.
+        :return: DataFrame containing all trace links read from project.
+        """
+        trace_links = pd.DataFrame()
+        for _, trace_definition_json in self.get_trace_definitions().items():
+            trace_reader = EntityReader(self.project_path, trace_definition_json,
+                                        conversions=self.conversions,
+                                        overrides=self.overrides)
+            trace_links = pd.concat([trace_links, trace_reader.read_entities()])
+        return trace_links
+
+    def _read_layer_mapping_df(self) -> pd.DataFrame:
+        """
+        Creates DataFrame containing entries mapping layers to generate trace links for.
+        :return: DataFrame containing layer mappings.
+        """
+        entries = []
+        for _, trace_definition_json in self.get_trace_definitions().items():
+            source_layer_id = trace_definition_json[StructureKeys.Trace.SOURCE]
+            target_layer_id = trace_definition_json[StructureKeys.Trace.TARGET]
+            entries.append({
+                StructureKeys.LayerMapping.SOURCE_TYPE: source_layer_id,
+                StructureKeys.LayerMapping.TARGET_TYPE: target_layer_id
+            })
+        return pd.DataFrame(entries)
+
+    def get_artifact_definitions(self) -> Dict[str, Dict]:
+        """
+        Returns project's artifact definitions.
+        :return: Artifact name to definition mapping.
+        """
+        JSONUtil.require_properties(self.definition, [StructureKeys.ARTIFACTS])
+        return self.definition[StructureKeys.ARTIFACTS]
+
+    def get_trace_definitions(self) -> Dict[str, Dict]:
+        """
+        Returns project's trace definitions.
+        :return: Mapping of trace matrix name to its trace defintion.
+        """
+        JSONUtil.require_properties(self.definition, [StructureKeys.TRACES])
+        return self.definition[StructureKeys.TRACES]

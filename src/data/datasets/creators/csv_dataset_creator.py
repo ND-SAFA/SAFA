@@ -1,5 +1,5 @@
 from data.datasets.creators.abstract_trace_dataset_creator import AbstractTraceDatasetCreator
-from data.datasets.creators.readers.entity.csv_entity_reader import CSVEntityReader
+from data.datasets.creators.readers.csv_project_reader import CSVProjectReader
 from data.datasets.trace_dataset import TraceDataset
 from data.processing.cleaning.data_cleaner import DataCleaner
 
@@ -20,6 +20,6 @@ class CSVDatasetCreator(AbstractTraceDatasetCreator):
         Creates the data from the csv
         :return: the dataset
         """
-        project_reader = CSVEntityReader(self.data_file_path)
+        project_reader = CSVProjectReader(self.data_file_path)
         trace_links, pos_link_ids, neg_link_ids = project_reader.get_entities()
         return TraceDataset(links=trace_links, pos_link_ids=pos_link_ids, neg_link_ids=neg_link_ids, randomize=True)

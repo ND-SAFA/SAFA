@@ -1,7 +1,7 @@
 from typing import List
 
 from data.datasets.creators.abstract_trace_dataset_creator import AbstractTraceDatasetCreator
-from data.datasets.creators.readers.project.repository_project_reader import RepositoryProjectReader
+from data.datasets.creators.readers.repository_project_reader import RepositoryProjectReader
 from data.datasets.keys.safa_format import SafaKeys
 from data.datasets.trace_dataset import TraceDataset
 from data.processing.cleaning.data_cleaner import DataCleaner
@@ -29,6 +29,6 @@ class RepositoryDatasetCreator(AbstractTraceDatasetCreator):
         dataset = None
         for repo_path in self.repo_paths:
             repository_project_reader = RepositoryProjectReader(repo_path)
-            repo_dataset = repository_project_reader.create()
+            repo_dataset = repository_project_reader.read_project()
             dataset = dataset + repo_dataset if dataset else repo_dataset
         return dataset

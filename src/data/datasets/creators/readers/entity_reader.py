@@ -1,5 +1,4 @@
 import os
-from abc import ABC, abstractmethod
 from enum import Enum
 from typing import Any, Callable, Dict, Generic, List, Optional, Type, TypeVar
 
@@ -78,7 +77,7 @@ EntityFileTypes = [
 EntityType = TypeVar("EntityType")
 
 
-class EntityReader(ABC, Generic[EntityType]):
+class EntityReader(Generic[EntityType]):
     """
     Responsible for converting data into entities.
     """
@@ -88,57 +87,64 @@ class EntityReader(ABC, Generic[EntityType]):
         Creates entity reader for project at base_path using definition given.
         :param base_path: The base path to find data.
         :param definition: Defines how to parse the data.
-        :param conversions: The conversions to the data to standardize it.
+        :param conversions: The definitions to the data to standardize it.
         :param overrides: The properties to override in class if they exist.
         """
         required_properties = [StructureKeys.PATH]
         JSONUtil.require_properties(definition, required_properties)
         self.definition: Dict = definition
-        self.path = os.path.join(base_path, self.get_property(StructureKeys.PATH))
+        self.path = os.path.join(base_path, self._get_property(StructureKeys.PATH))
         self.conversions: Dict[str, Dict] = conversions if conversions else None
         self.entity_type = None
-        self.set_properties(self, overrides)
-
-    def get_entities(self):
-        if self.entity_type is None:
-            entity_df = self.read_entities()
-            self.entity_type = self.create(entity_df)
-        return self.entity_type
-
-    @abstractmethod
-    def create(self, entity_df) -> EntityType:
-        """
-        Creates the entities.
-        :param entity_df: DataFrame containing many instances of entities.
-        :return: The final entity type.
-        """
+        self._set_properties(self, overrides)
 
     def read_entities(self) -> pd.DataFrame:
-        source_entities_df = self.read_source_entities()
-        column_conversion = self.read_column_conversion()
+        """
+        Reads original entities and applies any column conversion defined in definition.
+        :return: DataFrame containing processed entities.
+        """
+        source_entities_df = self._read_original_entities()
+        column_conversion = self._read_column_conversion()
         processed_df = DataFrameUtil.rename_columns(source_entities_df, column_conversion)
         return processed_df
 
-    def read_source_entities(self):
-        parser_params = self.get_property(StructureKeys.PARAMS, {})
-        parser = self.get_entity_parser()
+    def _read_original_entities(self) -> pd.DataFrame:
+        """
+        Reads data and aggregates examples into data frame.
+        :return: DataFrame containing original examples
+        """
+        parser_params = self._get_property(StructureKeys.PARAMS, {})
+        parser = self._get_entity_parser()
         return parser(self.path, **parser_params)
 
-    def read_column_conversion(self) -> Optional[Dict]:
+    def _read_column_conversion(self) -> Optional[Dict]:
+        """
+        Reads the column conversion to apply to given source entities.
+        :return: Dictionary containing mapping from original column names to target ones.
+        """
         if StructureKeys.COLS in self.definition:
-            conversion_id = self.get_property(StructureKeys.COLS)
+            conversion_id = self._get_property(StructureKeys.COLS)
             assert self.conversions is not None, "Could not find conversion %s because none defined." % conversion_id
             return self.conversions[conversion_id]
         return None
 
-    def get_property(self, property_name: str, default_value=None):
+    def _get_property(self, property_name: str, default_value=None) -> Any:
+        """
+        Returns property in definition if exists. Otherwise default is returned is available.
+        :param property_name: The name of the property to retrieve.
+        :param default_value: The default value to return if property is not found.
+        :return: The property under given name.
+        """
         if property_name not in self.definition and default_value is None:
             raise ValueError(self.definition, "does not contain property: ", property_name)
         return self.definition.get(property_name, default_value)
 
-    def get_entity_parser(self) -> Type[Callable]:
+    def _get_entity_parser(self) -> Type[Callable]:
+        """
+        :return: Returns the function that will read data into a data frame.
+        """
         if StructureKeys.PARSER in self.definition:
-            parser_key = self.get_property(StructureKeys.PARSER).upper()
+            parser_key = self._get_property(StructureKeys.PARSER).upper()
             return EntityFormats[parser_key].value
         if os.path.isdir(self.path):
             return EntityFormats.FOLDER.value
@@ -152,7 +158,7 @@ class EntityReader(ABC, Generic[EntityType]):
         raise ValueError(data_file_name, "does not have supported file type: ", supported_file_types)
 
     @staticmethod
-    def set_properties(obj: Any, properties: Optional[Dict[str, Any]]) -> None:
+    def _set_properties(obj: Any, properties: Optional[Dict[str, Any]]) -> None:
         """
         Sets key-value in object if they exist.
         :param obj: The object to set properties in.

@@ -48,7 +48,7 @@ class SerializerUtility:
             is_serializer = isinstance(field, serializers.Serializer)
             has_child_serializer = hasattr(field, "child") and isinstance(field.child, serializers.Serializer)
             if is_serializer or has_child_serializer:
-                kwargs[field_name] = field.create(validated_data[field_name])
+                kwargs[field_name] = field.read_project(validated_data[field_name])
             else:
                 kwargs[field_name] = validated_data[field_name]
         return kwargs

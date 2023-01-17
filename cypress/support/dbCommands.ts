@@ -86,7 +86,6 @@ Cypress.Commands.add("dbResetDocuments", () => {
     .clearCookies();
 });
 
-// TODO: Add new function called dbResetVersions that will delete all versions for a project except the first one.
 Cypress.Commands.add("dbResetVersions", () => {
   cy.dbToken()
     .then(() => {

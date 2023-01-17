@@ -22,7 +22,7 @@ import {
 } from "@/api";
 
 /**
- * Returns all generated links.
+ * Updates the storage of generated links.
  *
  * @param onSuccess - Called if the action is successful.
  * @param onError - Called if the action fails.

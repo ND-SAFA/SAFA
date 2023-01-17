@@ -17,6 +17,7 @@ export enum DataCy {
   sidebarCloseButton = "button-sidebar-close",
   navUndoButton = "button-nav-undo",
   navRedoButton = "button-nav-redo",
+  navLoadUpdatesButton = "button-nav-load-update",
 
   // Navigation - Webpage
   navHomeButton = "nav-Home-button",

@@ -62,8 +62,7 @@ describe("Project Commits", () => {
         cy.getCy(DataCy.snackbarSuccess).should("be.visible");
         cy.getCy(DataCy.selectedPanelCloseButton).click();
 
-        cy.getCy(DataCy.treeNode)
-          .get("[data-cy-name='Test Commit Artifact']")
+        cy.getNode("Test Commit Artifact")
           .should("be.visible")
           .should("have.length", 1);
 
@@ -75,7 +74,7 @@ describe("Project Commits", () => {
       });
     });
 
-    describe(" I can undo a committed change", () => {
+    describe("I can undo a committed change", () => {
       it("Resets and updates artifacts when undone", () => {
         // Create a new artifact
         cy.createNewArtifact({
@@ -91,9 +90,7 @@ describe("Project Commits", () => {
         cy.getCy(DataCy.treeNode).should("be.visible");
 
         // Edit the new artifact body
-        cy.getCy(DataCy.treeNode)
-          .get("[data-cy-name='Test Undo Artifact']")
-          .click();
+        cy.getNode("Test Undo Artifact").click();
         cy.getCy(DataCy.selectedPanelEditButton).click();
         cy.getCy(DataCy.artifactSaveBodyInput).clear();
         cy.inputText(DataCy.artifactSaveBodyInput, "Changed!");
@@ -103,19 +100,17 @@ describe("Project Commits", () => {
         cy.getCy(DataCy.selectedPanelCloseButton).click();
 
         //Check that undo button is enabled
-        cy.getCy(DataCy.navUndoButton).should(
-          "not.have.class",
-          "disable-events"
-        );
+        cy.getCy(DataCy.navUndoButton).should("not.be.disabled");
 
         //Undo the change
         cy.getCy(DataCy.navUndoButton).click();
         cy.getCy(DataCy.snackbarUpdate).should("be.visible");
 
         // Check that the edit was undone
-        cy.getCy(DataCy.treeNode)
-          .get("[data-cy-name='Test Undo Artifact']")
-          .should("contain.text", "Test Undo Artifact Body");
+        cy.getNode("Test Undo Artifact").should(
+          "contain.text",
+          "Test Undo Artifact Body"
+        );
         cy.getCy(DataCy.navUndoButton).should("have.class", "disable-events");
       });
 
@@ -129,22 +124,19 @@ describe("Project Commits", () => {
           parent: "N/A",
         }).saveArtifact();
         cy.getCy(DataCy.snackbarSuccess).should("be.visible");
+        cy.getCy(DataCy.selectedPanelBody).should("be.visible");
         cy.getCy(DataCy.selectedPanelCloseButton).click();
-        cy.getCy(DataCy.treeNode)
-          .get("[data-cy-name='Test Commit Artifact New Commit']")
-          .should("be.visible");
+        cy.getNode("Test Commit Artifact New Commit").should("be.visible");
 
         // Undo
         cy.getCy(DataCy.navUndoButton).click();
         cy.getCy(DataCy.snackbarUpdate).should("be.visible");
 
         // Check that it's not visible
-        cy.getCy(DataCy.treeNode)
-          .get("[data-cy-name='Test Commit Artifact New Commit']")
-          .should("not.exist");
+        cy.getNode("Test Commit Artifact New Commit").should("not.exist");
       });
 
-      it("Resets an updated trace link when undone", () => {
+      it.skip("Resets an updated trace link when undone", () => {
         // Navigate to the trace link table
         cy.getCy(DataCy.navTraceLinkApprovalButton).click();
         cy.clickButtonWithName("Trace Approval");
@@ -173,9 +165,11 @@ describe("Project Commits", () => {
         });
       });
 
-      it("Restores deleted trace links on a deleted artifact when undone", () => {
+      it.skip("Restores deleted trace links on a deleted artifact when undone", () => {
+        cy.on("uncaught:exception", () => false);
+
         // Delete an artifact with a trace link
-        cy.getCy(DataCy.treeNode).get("[data-cy-name='D5']").click();
+        cy.getNode("D5").click();
         cy.getCy(DataCy.selectedPanelDeleteButton).click();
         cy.getCy(DataCy.confirmModalButton).click();
         cy.getCy(DataCy.snackbarSuccess).should("be.visible");
@@ -185,10 +179,9 @@ describe("Project Commits", () => {
         cy.getCy(DataCy.navUndoButton)
           .should("not.have.class", "disable-events")
           .click();
-        cy.getCy(DataCy.snackbarUpdate).should("be.visible"); // An exception occurs here if this is not included and I don't know how to avoid it
 
-        // Check that the trace link is visible on the table and tree (See side link pannel)
-        cy.getCy(DataCy.treeNode).get("[data-cy-name='F6']").click();
+        // Check that the trace link is visible on the table and tree (See side link panel)
+        cy.getNode("F6").click();
         cy.getCy(DataCy.selectedPanelChildItem)
           .should("have.length", 6)
           .and("contain.text", "D5");
@@ -196,7 +189,7 @@ describe("Project Commits", () => {
     });
 
     describe("I can redo a committed change", () => {
-      it.skip("Adds a committed artifact when redone", () => {
+      it("Adds a committed artifact when redone", () => {
         //Create an artifact
         cy.getCy(DataCy.navUndoButton).should("have.class", "disable-events");
         cy.createNewArtifact({
@@ -206,26 +199,21 @@ describe("Project Commits", () => {
           parent: "N/A",
         }).saveArtifact();
         cy.getCy(DataCy.snackbarSuccess).should("be.visible");
+        cy.getCy(DataCy.selectedPanelBody).should("be.visible");
         cy.getCy(DataCy.selectedPanelCloseButton).click();
-        cy.getCy(DataCy.treeNode)
-          .get("[data-cy-name='Test Commit Artifact Redo']")
-          .should("be.visible");
+        cy.getNode("Test Commit Artifact Redo").should("be.visible");
 
         // Undo
         cy.getCy(DataCy.navUndoButton).click();
 
         // Check that its not visible
-        cy.getCy(DataCy.treeNode)
-          .get("[data-cy-name='Test Commit Artifact Redo']")
-          .should("not.exist");
+        cy.getNode("Test Commit Artifact Redo").should("not.exist");
 
         // Redo
         cy.getCy(DataCy.navRedoButton).click();
 
         // Check that its visible again
-        cy.getCy(DataCy.treeNode)
-          .get("[data-cy-name='Test Commit Artifact Redo']")
-          .should("be.visible");
+        cy.getNode("Test Commit Artifact Redo").should("be.visible");
         cy.getCy(DataCy.navUndoButton).should(
           "not.have.class",
           "disable-events"

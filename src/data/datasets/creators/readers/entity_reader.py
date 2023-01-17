@@ -156,16 +156,3 @@ class EntityReader(Generic[EntityType]):
 
         supported_file_types = [f.name.lower() for f in EntityFormats]
         raise ValueError(data_file_name, "does not have supported file type: ", supported_file_types)
-
-    @staticmethod
-    def _set_properties(obj: Any, properties: Optional[Dict[str, Any]]) -> None:
-        """
-        Sets key-value in object if they exist.
-        :param obj: The object to set properties in.
-        :param properties: The properties to override.
-        :return: None
-        """
-        if properties is None:
-            return
-        properties = {k.upper(): v for k, v in properties.items()}
-        ReflectionUtil.set_attributes(obj, properties, missing_ok=True)

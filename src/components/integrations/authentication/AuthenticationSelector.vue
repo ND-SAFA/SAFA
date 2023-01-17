@@ -6,8 +6,14 @@
   >
     <template v-slot:items>
       <under-construction-alert />
-      <jira-authentication @click="$emit('input', 'Jira')" />
-      <git-hub-authentication @click="$emit('input', 'GitHub')" />
+      <jira-authentication
+        :inactive="inactive"
+        @click="$emit('input', 'Jira')"
+      />
+      <git-hub-authentication
+        :inactive="inactive"
+        @click="$emit('input', 'GitHub')"
+      />
     </template>
   </stepper-list-step>
 </template>
@@ -30,6 +36,9 @@ export default Vue.extend({
     JiraAuthentication,
     StepperListStep,
     UnderConstructionAlert,
+  },
+  props: {
+    inactive: Boolean,
   },
 });
 </script>

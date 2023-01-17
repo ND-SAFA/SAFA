@@ -125,7 +125,13 @@ export default Vue.extend({
      * Updates the selection step when a project is selected.
      */
     organizationIsSelected(selected: boolean): void {
-      this.setStepIsValid(1, selected);
+      if (selected) {
+        this.currentStep = 3;
+        this.setStepIsValid(1, true);
+      } else {
+        this.currentStep = 2;
+        this.setStepIsValid(1, false);
+      }
     },
     /**
      * Updates the selection step when a project is selected.

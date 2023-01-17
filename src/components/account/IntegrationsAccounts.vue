@@ -1,6 +1,6 @@
 <template>
   <panel-card>
-    <authentication-selector />
+    <authentication-selector inactive />
   </panel-card>
 </template>
 

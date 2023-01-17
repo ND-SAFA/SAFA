@@ -1,41 +1,15 @@
-from typing import Dict
-
 from data.datasets.creators.readers.definitions.abstract_project_definition import AbstractProjectDefinition
-from data.datasets.creators.readers.definitions.tim_project_definition import TimProjectDefinition
-from data.datasets.keys.structure_keys import StructureKeys
+from data.datasets.creators.readers.definitions.repository_project_definition import RepositoryProjectDefinition
+from data.datasets.creators.readers.structured_project_reader import StructuredProjectReader
 
 
-class RepositoryProjectReader(AbstractProjectDefinition):
+class RepositoryProjectReader(StructuredProjectReader):
     """
-    Reads project extracted from GitHub repository.
+    Overrides structured project to return repository project definition.
     """
 
-    @staticmethod
-    def read_project_definition(_: str) -> Dict:
+    def _get_definition_reader(self) -> AbstractProjectDefinition:
         """
-        Creates definition for reading GitHub repository composed of commit and issues.
-        :return: Project definition for repository.
+        :return: Returns repository project definition.
         """
-        return {
-            StructureKeys.ARTIFACTS: {
-                "Commit": {
-                    StructureKeys.PATH: "commit.csv",
-                    StructureKeys.COLS: StructureKeys.ARTIFACTS
-                },
-                "Issue": {
-                    StructureKeys.PATH: "issue.csv",
-                    StructureKeys.COLS: StructureKeys.ARTIFACTS
-                }
-            },
-            StructureKeys.TRACES: {
-                "commit2issue": {
-                    StructureKeys.Trace.SOURCE: "Commit",
-                    StructureKeys.Trace.TARGET: "Issue",
-                    StructureKeys.PATH: "commit2issue.csv",
-                    StructureKeys.COLS: StructureKeys.TRACES
-                }
-            },
-            StructureKeys.COLS: {
-                **TimProjectDefinition.CONVERSIONS[TimProjectDefinition.CSV]
-            }
-        }
+        return RepositoryProjectDefinition()

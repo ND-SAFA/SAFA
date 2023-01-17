@@ -3,9 +3,10 @@ from typing import List
 
 from data.datasets.creators.readers.entity_reader import EntityReader
 from data.datasets.keys.structure_keys import StructureKeys
+from util.base_object import BaseObject
 
 
-class PreTrainReader:
+class PreTrainProjectReader(BaseObject):
     """
     Responsible for reading pre-training examples from series of files.
     """

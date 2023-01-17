@@ -1,10 +1,14 @@
+import os
 from typing import Dict, Tuple
 
 import pandas as pd
 
 from data.datasets.creators.readers.abstract_project_reader import AbstractProjectReader
 from data.datasets.creators.readers.definitions.abstract_project_definition import AbstractProjectDefinition
+from data.datasets.creators.readers.definitions.structure_project_definition import StructureProjectDefinition
+from data.datasets.creators.readers.definitions.tim_project_definition import TimProjectDefinition
 from data.datasets.creators.readers.entity_reader import EntityReader
+from data.datasets.keys.safa_format import SafaKeys
 from data.datasets.keys.structure_keys import StructureKeys
 from util.json_util import JSONUtil
 
@@ -15,16 +19,16 @@ class StructuredProjectReader(AbstractProjectReader):
     a trace dataset.
     """
 
-    def __init__(self, project_path: str, definition_reader: AbstractProjectDefinition, conversions=None):
+    def __init__(self, project_path: str, conversions=None):
         """
         Creates reader for project at path and column definitions given.
         :param project_path: Path to the project.
-        :param definition_reader: Responsible for reading and translating project definition into structure format.
         :param conversions: Column definitions available to project.
         """
         if conversions is None:
             conversions = {}
         self.project_path = project_path
+        definition_reader = self._get_definition_reader()
         self.definition = definition_reader.read_project_definition(project_path)
         self.conversions = self.definition.get(StructureKeys.CONVERSIONS, conversions)
         self.overrides = self.definition.get(StructureKeys.OVERRIDES, {})
@@ -34,7 +38,7 @@ class StructuredProjectReader(AbstractProjectReader):
         Reads artifact and trace links from files.
         :return: Returns DataFrames containing artifacts, traces, and mapping between layers.
         """
-        artifact_df = self._read_artifact_df(self.project_path, self.get_artifact_definitions())
+        artifact_df = self._read_artifact_df(self.project_path, self._get_artifact_definitions())
         trace_df = self._read_trace_df()
         layer_mapping_df = self._read_layer_mapping_df()
         return artifact_df, trace_df, layer_mapping_df
@@ -63,7 +67,7 @@ class StructuredProjectReader(AbstractProjectReader):
         :return: DataFrame containing all trace links read from project.
         """
         trace_links = pd.DataFrame()
-        for _, trace_definition_json in self.get_trace_definitions().items():
+        for _, trace_definition_json in self._get_trace_definitions().items():
             trace_reader = EntityReader(self.project_path, trace_definition_json,
                                         conversions=self.conversions,
                                         overrides=self.overrides)
@@ -76,7 +80,7 @@ class StructuredProjectReader(AbstractProjectReader):
         :return: DataFrame containing layer mappings.
         """
         entries = []
-        for _, trace_definition_json in self.get_trace_definitions().items():
+        for _, trace_definition_json in self._get_trace_definitions().items():
             source_layer_id = trace_definition_json[StructureKeys.Trace.SOURCE]
             target_layer_id = trace_definition_json[StructureKeys.Trace.TARGET]
             entries.append({
@@ -85,7 +89,7 @@ class StructuredProjectReader(AbstractProjectReader):
             })
         return pd.DataFrame(entries)
 
-    def get_artifact_definitions(self) -> Dict[str, Dict]:
+    def _get_artifact_definitions(self) -> Dict[str, Dict]:
         """
         Returns project's artifact definitions.
         :return: Artifact name to definition mapping.
@@ -93,10 +97,21 @@ class StructuredProjectReader(AbstractProjectReader):
         JSONUtil.require_properties(self.definition, [StructureKeys.ARTIFACTS])
         return self.definition[StructureKeys.ARTIFACTS]
 
-    def get_trace_definitions(self) -> Dict[str, Dict]:
+    def _get_trace_definitions(self) -> Dict[str, Dict]:
         """
         Returns project's trace definitions.
         :return: Mapping of trace matrix name to its trace defintion.
         """
         JSONUtil.require_properties(self.definition, [StructureKeys.TRACES])
         return self.definition[StructureKeys.TRACES]
+
+    def _get_definition_reader(self) -> AbstractProjectDefinition:
+        """
+        If tim.json file exists in project, then TimProjectDefinition is returned. Otherwise, StructuredProjectDefinition is returned.
+        :return: AbstractProjectDefinition corresponding to definition file found.
+        """
+        tim_path = os.path.join(self.project_path, SafaKeys.TIM_FILE)
+        if os.path.exists(tim_path):
+            return TimProjectDefinition()
+        else:
+            return StructureProjectDefinition()

@@ -1,6 +1,6 @@
 import os
 
-from data.datasets.creators.readers.repository_project_reader import RepositoryProjectReader
+from data.datasets.creators.readers.definitions.repository_project_definition import RepositoryProjectDefinition
 from data.datasets.keys.safa_format import SafaKeys
 from testres.base_test import BaseTest
 from testres.paths.paths import TEST_DATA_DIR
@@ -13,7 +13,7 @@ class TestRepositoryProjectReader(BaseTest):
     TRACE_FILES = ["commit2issue.csv"]
 
     def test_read_definition(self):
-        repository_project_reader = RepositoryProjectReader(self.PROJECT_PATH)
+        repository_project_reader = RepositoryProjectDefinition(self.PROJECT_PATH)
         definition = repository_project_reader.definition
         # VP 1. Verify artifact files
         artifact_definitions = definition[SafaKeys.DATAFILES_KEY]

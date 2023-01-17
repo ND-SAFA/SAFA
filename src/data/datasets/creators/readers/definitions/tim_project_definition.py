@@ -13,7 +13,6 @@ class TimProjectDefinition(AbstractProjectDefinition):
     """
     Responsible for converting the definition for a SAFA project into the structured project format.
     """
-    TIM_FILE_NAME = "tim.json"
     CSV = "csv"
     JSON = "json"
     CONVERSIONS = {
@@ -46,7 +45,7 @@ class TimProjectDefinition(AbstractProjectDefinition):
         :param project_path: Path to safa project.
         :return: Dictionary representing project definition.
         """
-        tim_file_path = os.path.join(project_path, TimProjectDefinition.TIM_FILE_NAME)
+        tim_file_path = os.path.join(project_path, SafaKeys.TIM_FILE)
         tim_file = FileUtil.read_json_file(tim_file_path)
         artifact_definitions = TimProjectDefinition._create_artifact_definitions(tim_file)
         trace_definitions = TimProjectDefinition._create_trace_definitions(tim_file)

@@ -1,8 +1,10 @@
 from abc import ABC, abstractmethod
 from typing import Dict
 
+from util.base_object import BaseObject
 
-class AbstractProjectDefinition(ABC):
+
+class AbstractProjectDefinition(BaseObject, ABC):
     """
     Defines interface for reading a project definition file.
     """

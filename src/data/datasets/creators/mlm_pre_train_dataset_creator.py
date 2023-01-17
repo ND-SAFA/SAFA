@@ -5,12 +5,12 @@ from typing import List
 
 from config.constants import BLOCK_SIZE_DEFAULT
 from data.datasets.creators.abstract_dataset_creator import AbstractDatasetCreator
-from data.datasets.creators.readers.pre_train_project_reader import PreTrainReader
+from data.datasets.creators.readers.pre_train_project_reader import PreTrainProjectReader
 from data.datasets.pre_train_dataset import PreTrainDataset
 from data.processing.cleaning.data_cleaner import DataCleaner
 
 
-class MLMPreTrainDatasetCreator(AbstractDatasetCreator):
+class MLMPreTrainDatasetCreator(AbstractDatasetCreator[PreTrainDataset]):
     DELIMINATOR = "\n"
     OUTPUT_FILE_EXT = ".txt"
 
@@ -37,7 +37,7 @@ class MLMPreTrainDatasetCreator(AbstractDatasetCreator):
         Reads pre-training documents and converts lines into pre-training examples.
         :return: The pre-training dataset.
         """
-        pre_train_reader = PreTrainReader(self.orig_data_path)
+        pre_train_reader = PreTrainProjectReader(self.orig_data_path)
         training_examples = pre_train_reader.create()
         dataset_file = self._write_training_examples(training_examples)
         return PreTrainDataset(dataset_file, block_size=self.block_size)

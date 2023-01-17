@@ -3,8 +3,10 @@ from typing import Tuple
 
 import pandas as pd
 
+from util.base_object import BaseObject
 
-class AbstractProjectReader(ABC):
+
+class AbstractProjectReader(BaseObject, ABC):
     """
     Defines interface for objects responsible for reading projects.
     """

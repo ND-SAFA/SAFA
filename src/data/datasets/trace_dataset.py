@@ -22,8 +22,7 @@ from util.file_util import FileUtil
 
 class TraceDataset(AbstractDataset):
 
-    def __init__(self, links: Dict[int, TraceLink], pos_link_ids: List[int] = None, neg_link_ids: List[int] = None,
-                 randomize: bool = False):
+    def __init__(self, links: Dict[int, TraceLink], pos_link_ids: List[int], neg_link_ids: List[int], randomize: bool = False):
         """
         Represents the config format for all data used by the huggingface trainer.
         :param links: The candidate links.
@@ -32,12 +31,9 @@ class TraceDataset(AbstractDataset):
         :param randomize: Whether to randomize the trace links.
         """
         self.links = OrderedDict(links)
-        if pos_link_ids is None or neg_link_ids is None:
-            pos_link_ids, neg_link_ids = self.__create_pos_neg_links(links)
         self.pos_link_ids, self.neg_link_ids = pos_link_ids, neg_link_ids
         self.trace_matrix = TraceMatrixManager(list(self.links.values()), randomize=randomize)
-        self._shuffle_link_ids(self.pos_link_ids)
-        self._shuffle_link_ids(self.neg_link_ids)
+        self.shuffle_link_ids()
 
     def to_trainer_dataset(self, model_generator: ModelManager) -> List[Dict]:
         """
@@ -65,8 +61,8 @@ class TraceDataset(AbstractDataset):
                             columns=[CSVKeys.SOURCE_ID, CSVKeys.SOURCE, CSVKeys.TARGET_ID, CSVKeys.TARGET,
                                      CSVKeys.LABEL])
 
-    def add_link(self, source_id: str, target_id: str, source_tokens: str, target_tokens: str,
-                 is_true_link: bool) -> int:
+    def create_and_add_link(self, source_id: str, target_id: str, source_tokens: str, target_tokens: str,
+                            is_true_link: bool) -> int:
         """
         Adds a link to the dataset
         :param source_id: the id of the source artifact
@@ -79,8 +75,16 @@ class TraceDataset(AbstractDataset):
         source = Artifact(source_id, source_tokens)
         target = Artifact(target_id, target_tokens)
         new_link = TraceLink(source, target, is_true_link=is_true_link)
+        return self.add_link(new_link)
+
+    def add_link(self, new_link: TraceLink) -> int:
+        """
+        Add trace link to existing links including link id list and trace matrix.
+        :param new_link: The new trace link to add to dataset.
+        :return: Trace link id.
+        """
         self.links[new_link.id] = new_link
-        if is_true_link:
+        if new_link.is_true_link:
             self.pos_link_ids.append(new_link.id)
         else:
             self.neg_link_ids.append(new_link.id)
@@ -165,6 +169,14 @@ class TraceDataset(AbstractDataset):
         df.to_csv(output_path)
         return output_path
 
+    def shuffle_link_ids(self) -> None:
+        """
+        Shuffles the positive and negative link ids.
+        :return: None
+        """
+        random.shuffle(self.pos_link_ids)
+        random.shuffle(self.neg_link_ids)
+
     def _get_data_entries_for_augmentation(self) -> Tuple[List[TraceLink], List[Tuple[str, str]]]:
         """
         Gets the data entries (link source, target, token pairs) for the augmentation
@@ -190,8 +202,8 @@ class TraceDataset(AbstractDataset):
                                                                                 orig_link=orig_links[reference_index],
                                                                                 aug_step_id=id_, entry_num=i)
                 aug_source_tokens, aug_target_tokens = entry
-                self.add_link(source_id=aug_source_id, target_id=aug_target_id,
-                              source_tokens=aug_source_tokens, target_tokens=aug_target_tokens, is_true_link=True)
+                self.create_and_add_link(source_id=aug_source_id, target_id=aug_target_id,
+                                         source_tokens=aug_source_tokens, target_tokens=aug_target_tokens, is_true_link=True)
 
     def _get_augmented_artifact_ids(self, augmented_tokens: Tuple[str, str], orig_link: TraceLink, aug_step_id: str,
                                     entry_num: int) -> Tuple[str, str]:
@@ -214,22 +226,6 @@ class TraceDataset(AbstractDataset):
                 aug_target_id += str(entry_num)
         return aug_source_id, aug_target_id
 
-    @staticmethod
-    def _resize_data(data: List, new_length: int, include_duplicates: bool = False) -> List:
-        """
-        Changes the size of the given data by using random choice or sample
-        :param data: list of data
-        :param new_length: desired length
-        :param include_duplicates: if True, uses sampling
-        :return: a list with the data of the new_length
-        """
-        if new_length == len(data):
-            return data
-        include_duplicates = True if new_length > len(
-            data) else include_duplicates  # must include duplicates to make a bigger data
-        reduction_func = random.choices if include_duplicates else random.sample
-        return reduction_func(data, k=new_length)
-
     def _get_feature_entry(self, link: TraceLink, arch_type: ModelArchitectureType, feature_func: Callable) \
             -> Dict[str, any]:
         """
@@ -248,6 +244,22 @@ class TraceDataset(AbstractDataset):
         return entry
 
     @staticmethod
+    def _resize_data(data: List, new_length: int, include_duplicates: bool = False) -> List:
+        """
+        Changes the size of the given data by using random choice or sample
+        :param data: list of data
+        :param new_length: desired length
+        :param include_duplicates: if True, uses sampling
+        :return: a list with the data of the new_length
+        """
+        if new_length == len(data):
+            return data
+        include_duplicates = True if new_length > len(
+            data) else include_duplicates  # must include duplicates to make a bigger data
+        reduction_func = random.choices if include_duplicates else random.sample
+        return reduction_func(data, k=new_length)
+
+    @staticmethod
     def _extract_feature_info(feature: Dict[str, any], prefix: str = '') -> Dict[str, any]:
         """
         Extracts the required info from a feature for data creation
@@ -260,14 +272,6 @@ class TraceDataset(AbstractDataset):
             if key_ in feature:
                 feature_info[prefix + key_] = feature[key_]
         return feature_info
-
-    @staticmethod
-    def _shuffle_link_ids(link_ids: List) -> None:
-        """
-        Shuffles the link ids
-        :param link_ids: a set of link ids
-        """
-        random.shuffle(link_ids)
 
     @staticmethod
     def __create_pos_neg_links(links: Dict[int, TraceLink]):

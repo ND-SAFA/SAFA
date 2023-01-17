@@ -3,8 +3,10 @@ from typing import Dict, List, Optional, Type, Union
 from config.override import overrides
 from data.datasets.abstract_dataset import AbstractDataset
 from data.datasets.creators.abstract_dataset_creator import AbstractDatasetCreator
+from data.datasets.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
 from data.datasets.creators.split_dataset_creator import SplitDatasetCreator
 from data.datasets.creators.supported_dataset_creator import SupportedDatasetCreator
+from data.datasets.creators.trace_dataset_creator import TraceDatasetCreator
 from data.datasets.dataset_role import DatasetRole
 from data.datasets.pre_train_dataset import PreTrainDataset
 from data.datasets.splitting.trace_dataset_splitter import TraceDatasetSplitter
@@ -18,10 +20,10 @@ class TrainerDatasetManager(BaseObject):
     DATASET_TYPE = Union[PreTrainDataset, TraceDataset, AbstractDataset]
 
     def __init__(self,
-                 pre_train_dataset_creator: AbstractDatasetCreator = None,
-                 train_dataset_creator: AbstractDatasetCreator = None,
-                 val_dataset_creator: AbstractDatasetCreator = None,
-                 eval_dataset_creator: AbstractDatasetCreator = None,
+                 pre_train_dataset_creator: MLMPreTrainDatasetCreator = None,
+                 train_dataset_creator: TraceDatasetCreator = None,
+                 val_dataset_creator: TraceDatasetCreator = None,
+                 eval_dataset_creator: TraceDatasetCreator = None,
                  augmenter: DataAugmenter = None
                  ):
         """

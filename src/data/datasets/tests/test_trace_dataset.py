@@ -91,7 +91,7 @@ class TestTraceDataset(BaseTraceTest):
         source_tokens, target_tokens = "s_token", "t_token"
 
         true_source_id, true_target_id = "source_id1", "target_id1"
-        trace_dataset.add_link(true_source_id, true_target_id, source_tokens, target_tokens, is_true_link=True)
+        trace_dataset.create_and_add_link(true_source_id, true_target_id, source_tokens, target_tokens, is_true_link=True)
         true_link_id = TraceLink.generate_link_id(true_source_id, true_target_id)
         self.assertIn(true_link_id, trace_dataset.links)
         self.assertNotIn(true_link_id, trace_dataset.neg_link_ids)
@@ -100,7 +100,7 @@ class TestTraceDataset(BaseTraceTest):
         self.assertEquals(trace_dataset.links[true_link_id].target.token, target_tokens)
 
         false_source_id, false_target_id = "source_id2", "target_id2"
-        trace_dataset.add_link(false_source_id, false_target_id, source_tokens, target_tokens, is_true_link=False)
+        trace_dataset.create_and_add_link(false_source_id, false_target_id, source_tokens, target_tokens, is_true_link=False)
         false_link_id = TraceLink.generate_link_id(false_source_id, false_target_id)
         self.assertIn(false_link_id, trace_dataset.links)
         self.assertIn(false_link_id, trace_dataset.neg_link_ids)
@@ -119,14 +119,14 @@ class TestTraceDataset(BaseTraceTest):
         self.assertEquals(aug_target_id, orig_link.target.id + aug_step_id)
 
         # link id already exists but is same as augmented
-        trace_dataset.add_link(aug_source_id, aug_target_id, *augmented_tokens, is_true_link=True)
+        trace_dataset.create_and_add_link(aug_source_id, aug_target_id, *augmented_tokens, is_true_link=True)
         aug_source_id, aug_target_id = trace_dataset._get_augmented_artifact_ids(augmented_tokens, orig_link,
                                                                                  aug_step_id, entry_num)
         self.assertEquals(aug_source_id, orig_link.source.id + aug_step_id)
         self.assertEquals(aug_target_id, orig_link.target.id + aug_step_id)
 
         # link id already exists but is NOT the same as augmented
-        trace_dataset.add_link(aug_source_id, aug_target_id, "s_token", "t_token", is_true_link=True)
+        trace_dataset.create_and_add_link(aug_source_id, aug_target_id, "s_token", "t_token", is_true_link=True)
         aug_source_id, aug_target_id = trace_dataset._get_augmented_artifact_ids(augmented_tokens, orig_link,
                                                                                  aug_step_id, entry_num)
         self.assertEquals(aug_source_id, orig_link.source.id + aug_step_id + str(entry_num))

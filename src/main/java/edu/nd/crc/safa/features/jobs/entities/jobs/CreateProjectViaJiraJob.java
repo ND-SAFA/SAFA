@@ -74,7 +74,7 @@ public class CreateProjectViaJiraJob extends CommitJob {
     }
 
     public static String createJobName(String jiraProjectName) {
-        return "Importing JIRA project:" + jiraProjectName;
+        return "Importing JIRA project: " + jiraProjectName;
     }
 
     @IJobStep(value = "Authenticating User Credentials", position = 1)

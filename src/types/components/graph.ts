@@ -10,6 +10,16 @@ import {
 } from "@/types";
 
 /**
+ * Enumerates the modes of the project graph.
+ */
+export enum GraphMode {
+  tim = "tim",
+  tree = "tree",
+  table = "table",
+  delta = "delta",
+}
+
+/**
  * Defines an artifact's data in cytoscape.
  */
 export interface ArtifactData extends CytoCoreElementData {

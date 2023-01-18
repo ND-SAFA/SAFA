@@ -34,7 +34,7 @@
       @click="handleGenerateTraceLink"
     />
     <icon-button
-      v-if="isVisible"
+      v-if="isTreeMode"
       fab
       small
       :icon-style="isCreateLinkEnabled ? '' : 'transform: rotate(-45deg)'"
@@ -64,7 +64,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { appStore, documentStore, projectStore, sessionStore } from "@/hooks";
+import { appStore, layoutStore, projectStore, sessionStore } from "@/hooks";
 import { disableDrawMode, enableDrawMode } from "@/cytoscape";
 import { IconButton } from "@/components/common";
 
@@ -83,8 +83,8 @@ export default Vue.extend({
     /**
      * @return Whether to render the artifact tree.
      */
-    isVisible(): boolean {
-      return !appStore.isLoading && !documentStore.isTableDocument;
+    isTreeMode(): boolean {
+      return !appStore.isLoading && layoutStore.isTreeMode;
     },
     /**
      * @return Whether trace link draw mode is currently enabled.

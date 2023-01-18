@@ -24,7 +24,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { tableViewTabOptions } from "@/util";
-import { documentStore } from "@/hooks";
+import { layoutStore } from "@/hooks";
 import {
   ArtifactTree,
   ArtifactTable,
@@ -58,7 +58,7 @@ export default Vue.extend({
      * @return Whether table view is enabled.
      */
     isTableView(): boolean {
-      return documentStore.isTableDocument;
+      return layoutStore.isTableMode;
     },
   },
 });

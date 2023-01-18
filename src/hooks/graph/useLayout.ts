@@ -6,6 +6,7 @@ import {
   IGraphLayout,
   LayoutPayload,
   PositionSchema,
+  GraphMode,
 } from "@/types";
 import {
   ArtifactGraphLayout,
@@ -41,8 +42,24 @@ export const useLayout = defineStore("layout", {
      * The current graph layout.
      */
     layout: undefined as IGraphLayout | undefined,
+    /**
+     * The current view mode of the graph.
+     */
+    mode: GraphMode.tree as GraphMode,
   }),
   getters: {
+    /**
+     * @return Whether the graph is in tree mode.
+     */
+    isTreeMode(): boolean {
+      return this.mode === GraphMode.tree;
+    },
+    /**
+     * @return Whether the graph is in table mode.
+     */
+    isTableMode(): boolean {
+      return this.mode === GraphMode.table;
+    },
     /**
      * @return Layout options for the graph.
      */

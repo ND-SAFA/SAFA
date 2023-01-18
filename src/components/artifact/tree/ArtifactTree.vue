@@ -34,12 +34,16 @@
 <script lang="ts">
 import Vue from "vue";
 import { Route } from "vue-router";
-import { TraceLinkSchema, ArtifactSchema, CytoCoreGraph } from "@/types";
+import {
+  TraceLinkSchema,
+  ArtifactSchema,
+  CytoCoreGraph,
+  GraphMode,
+} from "@/types";
 import {
   appStore,
   artifactStore,
   traceStore,
-  documentStore,
   deltaStore,
   subtreeStore,
   selectionStore,
@@ -67,7 +71,7 @@ export default Vue.extend({
      * @return Whether the tree should be rendered at all.
      */
     isInView(): boolean {
-      return !documentStore.isTableDocument;
+      return !layoutStore.isTableMode;
     },
     /**
      * @return The class name for the artifact tree.

@@ -4,7 +4,7 @@ export * from "./display";
 export * from "./buttons";
 export * from "./navigation";
 export * from "./project-creator";
-export * from "./artifact-tree-view";
+export * from "./graph";
 export * from "./tim-tree";
 export * from "./table";
 export * from "./models";

@@ -85,3 +85,31 @@ Cypress.Commands.add("dbResetDocuments", () => {
     })
     .clearCookies();
 });
+
+Cypress.Commands.add("dbResetVersions", () => {
+  cy.dbToken()
+    .then(() => {
+      cy.request<{ projectId: string }[]>({
+        method: "GET",
+        url: `${apiUrl}/projects`,
+      }).then(({ body: projects }) => {
+        const projectId = projects[0].projectId;
+        cy.request<{ versionId: string }[]>({
+          method: "GET",
+          url: `${apiUrl}/projects/${projectId}/versions`,
+        }).then(({ body: versions }) => {
+          versions.slice(0, -1).forEach(({ versionId }) =>
+            cy.request({
+              method: "DELETE",
+              url: `${apiUrl}/projects/versions/${versionId}`,
+            })
+          );
+          cy.request({
+            method: "POST",
+            url: `${apiUrl}/projects/${projectId}/versions/minor`,
+          });
+        });
+      });
+    })
+    .clearCookies();
+});

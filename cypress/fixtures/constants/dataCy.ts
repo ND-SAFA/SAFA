@@ -6,7 +6,7 @@ export enum DataCy {
 
   appLoading = "app-loading",
 
-  // Navigation
+  // Navigation - Project Graph
 
   navGraphCenterButton = "button-nav-graph-center",
   navGraphFilterButton = "button-nav-graph-filter",
@@ -15,6 +15,17 @@ export enum DataCy {
   navTableButton = "button-nav-table",
   navDeltaButton = "button-nav-delta",
   sidebarCloseButton = "button-sidebar-close",
+  navUndoButton = "button-nav-undo",
+  navRedoButton = "button-nav-redo",
+  navLoadUpdatesButton = "button-nav-load-update",
+
+  // Navigation - Webpage
+  navHomeButton = "nav-Home-button",
+  navCreateProjectButton = "button-nav-Create Project",
+  navOpenProjectButton = "button-nav-Open Project",
+  navProjectUploadButton = "button-nav-Project Upload",
+  navArtifactViewButton = "button-nav-Artifact View",
+  navTraceLinkApprovalButton = "button-nav-Trace Prediction",
 
   // Steppers
 
@@ -62,6 +73,7 @@ export enum DataCy {
   snackbarInfo = "snackbar-info",
   snackbarSuccess = "snackbar-success",
   snackbarWarning = "snackbar-warning",
+  snackbarUpdate = "snackbar-update",
   snackbarError = "snackbar-error",
   snackbarCloseButton = "button-snackbar-close",
 
@@ -240,6 +252,9 @@ export enum DataCy {
   traceLinkTableApprovalTypeButton = "button-trace-link-generate-approval-type",
   traceLinkTableSortByInput = "artifact-table-sort-by",
   traceLinkTableGroupByInput = "artifact-table-group-by",
+
+  // Project Version
+  projectSavingIndicator = "project-saving-indicator",
 }
 
 export enum DataIds {

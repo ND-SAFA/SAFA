@@ -1,6 +1,6 @@
 import { Commit } from "@/types";
 import { appStore, commitStore, traceStore, artifactStore } from "@/hooks";
-import { persistCommit } from "@/api";
+import { handleGetGeneratedLinks, persistCommit } from "@/api";
 
 /**
  * Saves commit to the application store, and persist the commit.
@@ -90,4 +90,5 @@ async function applyArtifactChanges(commit: Commit): Promise<void> {
     ...commit.traces.modified,
   ]);
   await traceStore.deleteTraceLinks(commit.traces.removed);
+  await handleGetGeneratedLinks({});
 }

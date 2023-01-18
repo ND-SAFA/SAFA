@@ -34,12 +34,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { Route } from "vue-router";
-import {
-  TraceLinkSchema,
-  ArtifactSchema,
-  CytoCoreGraph,
-  GraphMode,
-} from "@/types";
+import { TraceLinkSchema, ArtifactSchema, CytoCoreGraph } from "@/types";
 import {
   appStore,
   artifactStore,

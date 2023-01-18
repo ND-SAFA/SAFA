@@ -4,7 +4,12 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { ArtifactPanel, TimNodeDefinition } from "@/types";
+import {
+  ArtifactPanel,
+  GraphElementType,
+  GraphMode,
+  TimNodeDefinition,
+} from "@/types";
 
 /**
  * The node representing an artifact type in the tim tree.
@@ -25,8 +30,8 @@ export default Vue.extend({
       return {
         data: {
           id: this.artifactPanel.projectFile.type,
-          type: "node",
-          graph: "tim",
+          type: GraphElementType.node,
+          graph: GraphMode.tim,
           count: this.artifactPanel.projectFile.artifacts.length,
         },
       };

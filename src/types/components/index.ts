@@ -5,7 +5,6 @@ export * from "./buttons";
 export * from "./navigation";
 export * from "./project-creator";
 export * from "./graph";
-export * from "./tim-tree";
 export * from "./table";
 export * from "./models";
 export * from "./settings";

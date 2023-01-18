@@ -1,4 +1,5 @@
 import { Stylesheet } from "cytoscape";
+import { GraphMode } from "@/types";
 import { ThemeColors } from "@/util";
 import { CytoStyleSheet } from "@/types/cytoscape";
 import {
@@ -13,10 +14,11 @@ import {
   TIM_NODE_WIDTH,
 } from "@/cytoscape/styles/config/tim-tree-config";
 
-export const TIM_NODE_SELECTOR = "node[graph='tim']";
-export const TIM_EDGE_SELECTOR = "edge[graph='tim']";
+export const TIM_NODE_SELECTOR = `node[graph='${GraphMode.tim}']`;
+export const TIM_EDGE_SELECTOR = `edge[graph='${GraphMode.tim}']`;
 
 export const TimStyleSheets: (Stylesheet | CytoStyleSheet)[] = [
+  // Edges
   {
     selector: TIM_EDGE_SELECTOR,
     style: {
@@ -33,6 +35,7 @@ export const TimStyleSheets: (Stylesheet | CytoStyleSheet)[] = [
       "control-point-step-size": 120,
     },
   },
+  // Nodes
   {
     selector: TIM_NODE_SELECTOR,
     style: {

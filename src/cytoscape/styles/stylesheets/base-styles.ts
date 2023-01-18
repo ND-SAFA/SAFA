@@ -5,13 +5,14 @@ import {
   SafetyCaseType,
   ApprovalType,
   TraceType,
+  GraphMode,
 } from "@/types";
 import { ThemeColors } from "@/util";
 import { ARTIFACT_HEIGHT, ARTIFACT_WIDTH } from "@/cytoscape/styles/config";
 import { CytoStyleSheet } from "@/types/cytoscape";
 
-export const ARTIFACT_NODE_SELECTOR = "node[graph='artifact']";
-export const ARTIFACT_EDGE_SELECTOR = "edge[graph='artifact']";
+export const ARTIFACT_NODE_SELECTOR = `node[graph='${GraphMode.tree}']`;
+export const ARTIFACT_EDGE_SELECTOR = `edge[graph='${GraphMode.tree}']`;
 export const GENERATED_LINK_SELECTOR = `${ARTIFACT_EDGE_SELECTOR}[traceType='${TraceType.GENERATED}']`;
 export const GENERATED_APPROVED_LINK_SELECTOR = `${GENERATED_LINK_SELECTOR}[approvalStatus='${ApprovalType.APPROVED}']`;
 

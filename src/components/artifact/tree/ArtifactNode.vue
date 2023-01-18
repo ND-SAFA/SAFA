@@ -8,6 +8,8 @@ import {
   ArtifactSchema,
   ArtifactCytoCoreElement,
   ArtifactDeltaState,
+  GraphMode,
+  GraphElementType,
 } from "@/types";
 import {
   warningStore,
@@ -62,8 +64,8 @@ export default Vue.extend({
 
       return {
         data: {
-          type: "node",
-          graph: "artifact",
+          type: GraphElementType.node,
+          graph: GraphMode.tree,
           id,
           body,
           artifactName: name,

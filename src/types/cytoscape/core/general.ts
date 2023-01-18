@@ -246,46 +246,15 @@ export interface CytoEventDefinition {
 export type CytoEventHandlers = Record<string, CytoEventDefinition>;
 
 /**
- * Defines the style properties within cytoscape
- */
-type CytoscapeStyle = Record<string, unknown>;
-
-/**
  * Defines a cyto style sheet.
  */
 export interface CytoStyleSheet {
+  /**
+   * The selector to add this style to.
+   */
   selector: string;
-  style: CytoscapeStyle;
-}
-
-/**
- * The required properties for defining an element (e.g. node or edge)
- * in cytoscape.
- */
-export interface CytoCoreElementDefinition {
-  data: CytoCoreElementData;
-  style?: CytoscapeStyle;
-}
-
-/**
- * Required properties for defining the data that is held within each
- * cytoscape element.
- */
-export interface CytoCoreElementData {
   /**
-   * A unique identifier for the element with cytoscape instance.
+   * The style attributes to add for this selector.
    */
-  id: string;
-  /**
-   * The type of element being represented.
-   */
-  type: "node" | "edge";
-  /**
-   * The type of graph for this node.
-   */
-  graph: "artifact" | "tim";
-  /**
-   * The cytoscape label placed within nodes and besides edges.
-   */
-  label?: string;
+  style: Record<string, unknown>;
 }

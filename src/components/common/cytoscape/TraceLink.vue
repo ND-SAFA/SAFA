@@ -1,7 +1,7 @@
 <template>
   <cy-element
     :definition="definition"
-    v-on:click="$emit('click:right', traceDefinition)"
+    v-on:click="$emit('click:right', trace)"
   />
 </template>
 
@@ -17,22 +17,17 @@ import {
 import { deltaStore } from "@/hooks";
 
 /**
- * Displays trace link edge.
+ * Displays trace link edge between artifacts.
  *
- * @emits `click:right` - On right click.
+ * @emits `click:right` (TraceLinkSchema) - On right click.
  */
 export default Vue.extend({
   name: "GraphLink",
   props: {
-    traceDefinition: {
+    trace: {
       type: Object as PropType<TraceLinkSchema>,
       required: true,
     },
-    graph: {
-      type: String as PropType<"tim" | "artifact">,
-      required: true,
-    },
-    count: Number,
     faded: Boolean,
   },
   computed: {
@@ -40,33 +35,27 @@ export default Vue.extend({
      * @return The delta state of this trace link.
      */
     linkDeltaState(): ArtifactDeltaState {
-      if (!deltaStore.inDeltaView) {
-        return ArtifactDeltaState.NO_CHANGE;
-      }
-
-      return (
-        deltaStore.getTraceDeltaType(this.traceDefinition.traceLinkId) ||
-        ArtifactDeltaState.NO_CHANGE
-      );
+      return deltaStore.getTraceDeltaType(this.trace.traceLinkId);
     },
     /**
      * @return The trace link's data definition.
      */
     definition(): TraceCytoCoreElement {
-      const { sourceId, targetId, traceLinkId } = this.traceDefinition;
+      const { sourceId, targetId, traceLinkId, traceType, approvalStatus } =
+        this.trace;
 
       return {
         data: {
-          ...this.traceDefinition,
           type: GraphElementType.edge,
-          graph: this.graph === "artifact" ? GraphMode.tree : GraphMode.tim,
+          graph: GraphMode.tree,
           id: traceLinkId,
           // Reversed to show arrow toward parent.
           source: targetId,
           target: sourceId,
-          count: this.count || 1,
           deltaType: this.linkDeltaState,
           faded: this.faded,
+          traceType,
+          approvalStatus,
         },
         classes: sourceId === targetId ? ["loop"] : [],
       };

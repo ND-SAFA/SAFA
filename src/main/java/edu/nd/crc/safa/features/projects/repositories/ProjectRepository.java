@@ -19,7 +19,7 @@ public interface ProjectRepository extends CrudRepository<Project, UUID> {
     @Query(value =
         "SELECT new edu.nd.crc.safa.features.installations.app.InstallationDTO("
             + "  CAST(j.jiraProjectId AS string), "
-            + "  CAST(j.orgId AS string), "
+            + "   j.orgId, "
             + "   j.lastUpdate, "
             + "   'JIRA') "
             + "FROM Project p "

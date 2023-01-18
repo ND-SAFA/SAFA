@@ -5,4 +5,4 @@
 DELETE FROM jira_project;
 
 ALTER TABLE jira_project
-    ADD org_id BINARY(16) NOT NULL;
+    ADD COLUMN org_id BINARY(16) NOT NULL;

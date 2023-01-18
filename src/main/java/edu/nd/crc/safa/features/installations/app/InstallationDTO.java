@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.features.installations.app;
 
 import java.util.Date;
+import java.util.UUID;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -47,5 +48,20 @@ public class InstallationDTO {
                            Date lastUpdate,
                            String type) {
         this(installationId, installationOrgId, lastUpdate, InstallationTypeEnum.valueOf(type));
+    }
+
+    /**
+     * Required for JPQL query projection
+     *
+     * @param installationId    JIRA project id/GitHub repository name
+     * @param installationOrgId The Jira or GitHub organization id that the project is within
+     * @param lastUpdate        Timestamp of the last update
+     * @param type              Instance of {@link InstallationTypeEnum}
+     */
+    public InstallationDTO(String installationId,
+                           UUID installationOrgId,
+                           Date lastUpdate,
+                           String type) {
+        this(installationId, installationOrgId.toString(), lastUpdate, InstallationTypeEnum.valueOf(type));
     }
 }

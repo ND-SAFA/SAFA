@@ -1,6 +1,8 @@
 from typing import Dict, List
 from unittest import TestCase
 
+import pandas as pd
+
 from data.datasets.keys.structure_keys import StructureKeys
 from jobs.components.job_result import JobResult
 from testres.test_data_manager import TestDataManager
@@ -60,3 +62,20 @@ class TestAssertions:
                                            expected_artifact_files: List[str]):
         artifact_files = [artifact_def[StructureKeys.PATH] for artifact_def in artifact_definitions.values()]
         TestAssertions.assert_lists_have_the_same_vals(test_case, artifact_files, expected_artifact_files)
+
+    @staticmethod
+    def verify_entities_in_df(test_case: TestCase, expected_entities: List[Dict], entity_df: pd.DataFrame, **kwargs) -> None:
+        """
+        Verifies that each data frame contains entities given.
+        :param test_case: The test case used to verify result.
+        :param entity_df: The data frame expected to contain entities
+        :param expected_entities: The entities to verify exist in data frame
+        :param kwargs: Any additional parameters to assertion function
+        :return: None
+        """
+        test_case.assertEqual(len(expected_entities), len(entity_df))
+        for row_index, row in entity_df.iterrows():
+            entity = expected_entities[row_index]
+            for param_name, param_value in entity.items():
+                assert param_name in row, f"{row.to_dict()} does not contain: {param_name}"
+                test_case.assertEqual(param_value, row[param_name], **kwargs)

@@ -41,7 +41,7 @@ class JsonUtil:
     def require_properties(json_obj: Dict, required_properties: List[str]):
         for required_property in required_properties:
             if required_property not in json_obj:
-                raise Exception("Expected {%s} in :" % required_property, json_obj)
+                raise Exception(f"Expected {required_property} in {json}.")
 
     @staticmethod
     def get_property(definition: Dict, property_name: str, default_value=None) -> Any:

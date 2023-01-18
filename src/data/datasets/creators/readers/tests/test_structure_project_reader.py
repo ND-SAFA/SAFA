@@ -1,22 +1,21 @@
-import os
+from data.datasets.creators.readers.abstract_project_reader import AbstractProjectReader
+from data.datasets.creators.readers.structured_project_reader import StructuredProjectReader
+from data.datasets.creators.readers.tests.abstract_project_reader_test import AbstractProjectReaderTest
+from testres.paths.project_paths import STRUCTURE_PROJECT_PATH
+from testres.testprojects.structured_test_project import StructuredTestProject
 
-from data.datasets.creators.readers.definitions.structure_project_definition import StructureProjectDefinition
-from testres.base_test import BaseTest
-from testres.paths.paths import TEST_DATA_DIR
-from testres.test_assertions import TestAssertions
 
+class TestStructureProjectReader(AbstractProjectReaderTest):
+    """
+    Tests that structure project data is read and converted to data frames.
+    """
 
-class TestStructureProjectReader(BaseTest):
-    PROJECT_PATH = os.path.join(TEST_DATA_DIR, "structure")
-    ARTIFACT_FILES = ["source.xml", "target.xml"]
-    TRACE_FILES = ["answer.txt"]
+    def test_read_project(self):
+        """
+        Tests that the repository project can be read and translated to data frames.
+        """
+        test_project = StructuredTestProject()
+        self.verify_project_data_frames(test_project)
 
-    def test_get_artifact_definitions(self):
-        structure_project_reader = StructureProjectDefinition(self.PROJECT_PATH)
-        artifact_definitions = structure_project_reader.get_artifact_definitions()
-        TestAssertions.assert_file_definitions_have_files(self, artifact_definitions, self.ARTIFACT_FILES)
-
-    def test_get_trace_definitions(self):
-        structure_project_reader = StructureProjectDefinition(self.PROJECT_PATH)
-        trace_definitions = structure_project_reader.get_trace_definitions()
-        TestAssertions.assert_file_definitions_have_files(self, trace_definitions, self.TRACE_FILES)
+    def get_project_reader(self) -> AbstractProjectReader:
+        return StructuredProjectReader(STRUCTURE_PROJECT_PATH)

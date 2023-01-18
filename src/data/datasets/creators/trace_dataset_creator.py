@@ -12,6 +12,7 @@ from data.processing.cleaning.data_cleaner import DataCleaner
 from data.tree.artifact import Artifact
 from data.tree.trace_link import TraceLink
 from util.base_object import BaseObject
+from util.reflection_util import ReflectionUtil
 from util.uncased_dict import UncasedDict
 
 ArtifactMap = Dict[str, Dict[str, Artifact]]
@@ -38,6 +39,7 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         self.project_reader = project_reader
         self.filter_unlinked_artifacts = filter_unlinked_artifacts
         self.artifact_df = self._set_index(self.artifact_df, StructureKeys.Artifact.ID)
+        ReflectionUtil.set_attributes(self, self.project_reader.get_overrides())
 
     def create(self) -> TraceDataset:
         """

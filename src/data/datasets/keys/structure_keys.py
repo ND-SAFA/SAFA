@@ -25,7 +25,7 @@ class StructureKeys:
     PARSER = "parser"
     COLS = "cols"
     PATH = "path"
-    CONVERSIONS = "definitions"
+    CONVERSIONS = "conversions"
     PARAMS = "params"
     OVERRIDES = "overrides"
 

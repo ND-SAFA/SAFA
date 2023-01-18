@@ -77,6 +77,6 @@ class AbstractTraceView(APIView):
         """
         data = json.loads(request.body)
         serializer = serializer_class(data=data)
-        if serializer.is_valid():
+        if serializer.is_format():
             return serializer.save()
         raise Exception(serializer.errors)

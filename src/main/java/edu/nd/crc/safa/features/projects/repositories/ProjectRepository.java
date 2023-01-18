@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.UUID;
 
 import edu.nd.crc.safa.features.installations.app.InstallationDTO;
-import edu.nd.crc.safa.features.installations.app.ProjectWithInstallationDTO;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 
 import org.springframework.data.jpa.repository.Query;
@@ -20,6 +19,7 @@ public interface ProjectRepository extends CrudRepository<Project, UUID> {
     @Query(value =
         "SELECT new edu.nd.crc.safa.features.installations.app.InstallationDTO("
             + "  CAST(j.jiraProjectId AS string), "
+            + "   j.orgId, "
             + "   j.lastUpdate, "
             + "   'JIRA') "
             + "FROM Project p "
@@ -32,6 +32,7 @@ public interface ProjectRepository extends CrudRepository<Project, UUID> {
     @Query(value =
         "SELECT new edu.nd.crc.safa.features.installations.app.InstallationDTO("
             + "  g.repositoryName, "
+            + "   '',"  // TODO org ID for github
             + "   g.lastUpdate, "
             + "   'GITHUB') "
             + "FROM Project p "
@@ -49,45 +50,4 @@ public interface ProjectRepository extends CrudRepository<Project, UUID> {
         lo.addAll(hi);
         return lo;
     }
-
-    /**
-     * Given a list of JIRA project identifiers find all SAFA projects that have imported
-     * them
-     *
-     * @param projects List of JIRA identifiers
-     * @return list of projects that imported specified JIRA identifiers
-     */
-    @Query(value =
-        "SELECT new edu.nd.crc.safa.features.installations.app.ProjectWithInstallationDTO("
-            + "     p.id, "
-            + "     p.name, "
-            + "     CAST(j.jiraProjectId as string), "
-            + "     j.lastUpdate, "
-            + "    'JIRA')"
-            + "FROM Project p "
-            + "JOIN FETCH JiraProject j "
-            + "ON j.project.id = p.id "
-            + "WHERE j.jiraProjectId IN :projects"
-    )
-    List<ProjectWithInstallationDTO> findAllThatImportedGivenJIRAProjects(@Param("projects") List<Long> projects);
-
-    /**
-     * Given a list of GitHub repository names find all SAFA projects that have imported
-     * them
-     *
-     * @param projects List of GitHub repository names
-     * @return list of projects that imported specified GitHub repository names
-     */
-    @Query(value = "SELECT new edu.nd.crc.safa.features.installations.app.ProjectWithInstallationDTO("
-        + "     p.id, "
-        + "     p.name, "
-        + "     g.repositoryName, "
-        + "     g.lastUpdate, "
-        + "    'GITHUB') "
-        + "FROM Project p "
-        + "JOIN FETCH GithubProject g "
-        + "ON g.project.id = p.id "
-        + "WHERE g.repositoryName IN :projects"
-    )
-    List<ProjectWithInstallationDTO> findAllThatImportedGivenGithubProjects(@Param("projects") List<String> projects);
 }

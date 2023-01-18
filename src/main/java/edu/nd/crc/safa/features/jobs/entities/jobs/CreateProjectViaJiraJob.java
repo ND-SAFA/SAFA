@@ -3,6 +3,7 @@ package edu.nd.crc.safa.features.jobs.entities.jobs;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.common.ProjectEntities;
@@ -95,9 +96,9 @@ public class CreateProjectViaJiraJob extends CommitJob {
 
         // Step - Retrieve project information including issues
         Long jiraProjectId = this.jiraIdentifier.getJiraProjectId();
-        String cloudId = jiraIdentifier.getCloudId();
-        this.jiraProjectResponse = jiraConnectionService.retrieveJIRAProject(credentials, cloudId, jiraProjectId);
-        this.issues = jiraConnectionService.retrieveJIRAIssues(credentials, cloudId, jiraProjectId).getIssues();
+        UUID orgId = jiraIdentifier.getOrgId();
+        this.jiraProjectResponse = jiraConnectionService.retrieveJIRAProject(credentials, orgId, jiraProjectId);
+        this.issues = jiraConnectionService.retrieveJIRAIssues(credentials, orgId, jiraProjectId).getIssues();
     }
 
     @IJobStep(value = "Creating SAFA Project", position = 3)
@@ -122,11 +123,12 @@ public class CreateProjectViaJiraJob extends CommitJob {
         // Step - Map JIRA project to SAFA project
         this.jiraProject = this.getJiraProjectMapping(
             project,
+            this.jiraIdentifier.getOrgId(),
             this.jiraIdentifier.getJiraProjectId());
     }
 
-    protected JiraProject getJiraProjectMapping(Project project, Long jiraProjectId)  {
-        JiraProject jiraProject = new JiraProject(project, jiraProjectId);
+    protected JiraProject getJiraProjectMapping(Project project, UUID orgId, Long jiraProjectId)  {
+        JiraProject jiraProject = new JiraProject(project, orgId, jiraProjectId);
 
         return this.serviceProvider.getJiraProjectRepository().save(jiraProject);
     }

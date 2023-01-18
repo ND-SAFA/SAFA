@@ -17,7 +17,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
-import org.hibernate.annotations.UpdateTimestamp;
 
 
 /**
@@ -49,14 +48,18 @@ public class JiraProject {
     @Column(name = "jira_project_id", nullable = false)
     Long jiraProjectId;
 
+    @Column(nullable = false)
+    UUID orgId;
+
     /**
      * Timestamp of the last update
      */
     @Column(name = "last_update", nullable = false)
     private Date lastUpdate = new Date();
 
-    public JiraProject(Project project, Long jiraProjectId) {
+    public JiraProject(Project project, UUID orgId, Long jiraProjectId) {
         this.project = project;
+        this.orgId = orgId;
         this.jiraProjectId = jiraProjectId;
     }
 }

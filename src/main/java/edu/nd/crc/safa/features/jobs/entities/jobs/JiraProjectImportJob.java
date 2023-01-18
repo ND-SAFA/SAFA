@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.features.jobs.entities.jobs;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.jira.entities.api.JiraIdentifier;
@@ -26,7 +27,7 @@ public class JiraProjectImportJob extends CreateProjectViaJiraJob {
     }
 
     @Override
-    protected JiraProject getJiraProjectMapping(Project project, Long jiraProjectId) {
+    protected JiraProject getJiraProjectMapping(Project project, UUID orgId, Long jiraProjectId) {
         Optional<JiraProject> optional = this.serviceProvider
             .getJiraProjectRepository()
             .findByProjectAndJiraProjectId(project, jiraProjectId);
@@ -35,6 +36,6 @@ public class JiraProjectImportJob extends CreateProjectViaJiraJob {
             throw new SafaError("JIRA project already imported into this SAFA project");
         }
 
-        return super.getJiraProjectMapping(project, jiraProjectId);
+        return super.getJiraProjectMapping(project, orgId, jiraProjectId);
     }
 }

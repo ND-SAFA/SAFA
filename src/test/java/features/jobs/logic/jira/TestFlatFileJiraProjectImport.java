@@ -45,7 +45,7 @@ class TestFlatFileJiraProjectImport extends JiraBaseFlatFileTest {
 
         ProjectVersion projectVersion = dbEntityBuilder.getProjectVersion(projectName, 0);
         Project project = dbEntityBuilder.getProject(projectName);
-        JiraIdentifier jiraIdentifier = new JiraIdentifier(projectVersion, jiraProjectId, cloudId);
+        JiraIdentifier jiraIdentifier = new JiraIdentifier(projectVersion, jiraProjectId, orgId);
 
         // Step - Create job and worker
         JiraProjectImportJob job = new JiraProjectImportJob(

@@ -3,8 +3,6 @@ package features.jobs.logic.jira;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import features.jobs.base.JiraBaseFlatFileTest;
-
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.features.jira.entities.api.JiraIdentifier;
 import edu.nd.crc.safa.features.jira.entities.app.JiraIssueDTO;
@@ -13,6 +11,8 @@ import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.jobs.entities.jobs.JiraProjectImportJob;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
+
+import features.jobs.base.JiraBaseFlatFileTest;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -51,7 +51,8 @@ class TestFlatFileJiraProjectImport extends JiraBaseFlatFileTest {
         JiraProjectImportJob job = new JiraProjectImportJob(
             jobDbEntity,
             serviceProvider,
-            jiraIdentifier
+            jiraIdentifier,
+            currentUser
         );
 
         job.setJiraProjectResponse(createMockJiraProject());

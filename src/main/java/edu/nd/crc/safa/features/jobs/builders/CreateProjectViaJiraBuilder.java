@@ -42,7 +42,8 @@ public class CreateProjectViaJiraBuilder extends AbstractJobBuilder<JiraIdentifi
         return new CreateProjectViaJiraJob(
             this.jobDbEntity,
             serviceProvider,
-            this.identifier
+            this.identifier,
+            this.user
         );
     }
 

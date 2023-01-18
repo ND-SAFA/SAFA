@@ -1,6 +1,5 @@
 import os
 
-from data.datasets.creators.csv_dataset_creator import CSVDatasetCreator
 from testres.base_trace_test import BaseTraceTest
 from testres.paths.paths import TEST_DATA_DIR
 from testres.test_assertions import TestAssertions

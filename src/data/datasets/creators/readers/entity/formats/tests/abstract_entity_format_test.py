@@ -1,0 +1,54 @@
+from abc import abstractmethod
+from typing import Dict, List, Type
+
+from data.datasets.creators.readers.entity.formats.abstract_entity_format import AbstractEntityFormat
+from testres.base_test import BaseTest
+from testres.test_assertions import TestAssertions
+
+
+class AbstractEntityFormatTest(BaseTest):
+    """
+    Tests all entity formats by testing the common abstract functionality for all formats.
+    """
+
+    def verify_extensions(self):
+        """
+        Tests that all supported file extensions are valid paths in format.
+        """
+        entity_format = self.entity_format
+        for extension in entity_format.get_file_extensions():
+            self.assertTrue(entity_format.is_format(extension))
+
+    def verify_parser(self, **kwargs) -> None:
+        """
+        Verifies that parser returns entities defined by class.
+        :param kwargs: Any additional parameters passed to parser.
+        :return: None
+        """
+        entity_format_parser = self.entity_format.get_parser()
+        entity_df = entity_format_parser(self.data_path, **kwargs)
+        expected_entities = self.get_entities()
+        TestAssertions.verify_entities_in_df(self, expected_entities, entity_df)
+
+    @property
+    @abstractmethod
+    def entity_format(self) -> Type[AbstractEntityFormat]:
+        """
+        :return:Returns the entity format being tested.
+        """
+
+    @property
+    @abstractmethod
+    def data_path(self) -> str:
+        """
+        :return: Returns path to data of the format being tested
+        """
+
+    @staticmethod
+    @abstractmethod
+    def get_entities() -> List[Dict]:
+        """
+        Performs the verification of the data frame processed by format.
+        :param df: The data frame produced by the format parser.
+        :return: None
+        """

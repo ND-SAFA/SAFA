@@ -1,7 +1,7 @@
 import os
 from typing import List
 
-from data.datasets.creators.readers.entity_reader import EntityReader
+from data.datasets.creators.readers.entity.entity_reader import EntityReader
 from data.datasets.keys.structure_keys import StructureKeys
 from util.base_object import BaseObject
 

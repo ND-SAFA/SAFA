@@ -104,6 +104,14 @@ Cypress.Commands.add("dbResetVersions", () => {
               url: `${apiUrl}/projects/versions/${versionId}`,
             })
           );
+          // TODO: Run a cy.request() call here to POST a new version.
+          cy.request({
+            method: "POST",
+            url: `${apiUrl}/projects/${projectId}/versions`,
+            body: {
+              versionName: "1.1.2",
+            },
+          });
         });
       });
     })

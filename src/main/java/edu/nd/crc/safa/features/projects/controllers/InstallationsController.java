@@ -45,6 +45,7 @@ public class InstallationsController extends BaseController {
         )
     )
     public List<InstallationDTO> getInstallationsByProject(@PathVariable("id") UUID id) {
+        this.resourceBuilder.fetchProject(id).withViewProject();
         return this.projectRepository.findInstallationsByProjectId(id);
     }
 

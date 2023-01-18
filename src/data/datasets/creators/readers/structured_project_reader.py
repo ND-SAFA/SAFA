@@ -3,14 +3,15 @@ from typing import Dict, Tuple
 
 import pandas as pd
 
+from config.override import overrides
 from data.datasets.creators.readers.abstract_project_reader import AbstractProjectReader
 from data.datasets.creators.readers.definitions.abstract_project_definition import AbstractProjectDefinition
 from data.datasets.creators.readers.definitions.structure_project_definition import StructureProjectDefinition
 from data.datasets.creators.readers.definitions.tim_project_definition import TimProjectDefinition
-from data.datasets.creators.readers.entity_reader import EntityReader
+from data.datasets.creators.readers.entity.entity_reader import EntityReader
 from data.datasets.keys.safa_format import SafaKeys
 from data.datasets.keys.structure_keys import StructureKeys
-from util.json_util import JSONUtil
+from util.json_util import JsonUtil
 
 
 class StructuredProjectReader(AbstractProjectReader):
@@ -43,6 +44,13 @@ class StructuredProjectReader(AbstractProjectReader):
         layer_mapping_df = self._read_layer_mapping_df()
         return artifact_df, trace_df, layer_mapping_df
 
+    @overrides(AbstractProjectReader)
+    def get_overrides(self) -> Dict:
+        """
+        :return: Returns properties to override defined in project definition.
+        """
+        return {k.upper(): v for k, v in self.overrides.items()}
+
     def _read_artifact_df(self, project_path: str, type2definition: Dict[str, Dict]) -> pd.DataFrame:
         """
         Reads artifacts in project converting each to its own data frame.
@@ -54,11 +62,10 @@ class StructuredProjectReader(AbstractProjectReader):
         for artifact_type, artifact_definition in type2definition.items():
             artifact_reader = EntityReader(project_path,
                                            artifact_definition,
-                                           conversions=self.conversions,
-                                           overrides=self.overrides)
+                                           conversions=self.conversions)
             artifact_type_df = artifact_reader.read_entities()
             artifact_type_df[StructureKeys.Artifact.LAYER_ID] = artifact_type
-            artifacts_df = pd.concat([artifacts_df, artifact_type_df])
+            artifacts_df = pd.concat([artifacts_df, artifact_type_df], ignore_index=True)
         return artifacts_df
 
     def _read_trace_df(self) -> pd.DataFrame:
@@ -69,9 +76,8 @@ class StructuredProjectReader(AbstractProjectReader):
         trace_links = pd.DataFrame()
         for _, trace_definition_json in self._get_trace_definitions().items():
             trace_reader = EntityReader(self.project_path, trace_definition_json,
-                                        conversions=self.conversions,
-                                        overrides=self.overrides)
-            trace_links = pd.concat([trace_links, trace_reader.read_entities()])
+                                        conversions=self.conversions)
+            trace_links = pd.concat([trace_links, trace_reader.read_entities()], ignore_index=True)
         return trace_links
 
     def _read_layer_mapping_df(self) -> pd.DataFrame:
@@ -94,7 +100,7 @@ class StructuredProjectReader(AbstractProjectReader):
         Returns project's artifact definitions.
         :return: Artifact name to definition mapping.
         """
-        JSONUtil.require_properties(self.definition, [StructureKeys.ARTIFACTS])
+        JsonUtil.require_properties(self.definition, [StructureKeys.ARTIFACTS])
         return self.definition[StructureKeys.ARTIFACTS]
 
     def _get_trace_definitions(self) -> Dict[str, Dict]:
@@ -102,7 +108,7 @@ class StructuredProjectReader(AbstractProjectReader):
         Returns project's trace definitions.
         :return: Mapping of trace matrix name to its trace defintion.
         """
-        JSONUtil.require_properties(self.definition, [StructureKeys.TRACES])
+        JsonUtil.require_properties(self.definition, [StructureKeys.TRACES])
         return self.definition[StructureKeys.TRACES]
 
     def _get_definition_reader(self) -> AbstractProjectDefinition:

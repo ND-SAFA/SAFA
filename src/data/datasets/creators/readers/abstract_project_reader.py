@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Tuple
+from typing import Dict, Tuple
 
 import pandas as pd
 
@@ -24,3 +24,11 @@ class AbstractProjectReader(BaseObject, ABC):
         :return: Returns whether negative links should be implied by comparing artifacts.
         """
         return True
+
+    def get_overrides(self) -> Dict:
+        """
+        Returns any properties that should be overriden. This is a commonly used to set rules like
+        allowing missing source / target references in trace links.
+        :return: Dictionary of parameter names to their new values to override.
+        """
+        return {}

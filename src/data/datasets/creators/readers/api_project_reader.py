@@ -30,13 +30,14 @@ class ApiProjectReader(AbstractProjectReader):
 
         source_layers = self.api_definition["source_layers"]
         target_layers = self.api_definition["target_layers"]
-        links = self.api_definition["links"]
+        links = self.api_definition["true_links"]  # TODO : need to rename back-end to thiss
 
         for i, (source_layer, target_layer) in enumerate(zip(source_layers, target_layers)):
-            source_layer_id = self._create_layer_id(StructureKeys.LayerMapping.SOURCE_TYPE, i)
-            target_layer_id = self._create_layer_id(StructureKeys.LayerMapping.TARGET_TYPE, i)
+            source_layer_id = self.create_layer_id(StructureKeys.LayerMapping.SOURCE_TYPE, i)
+            target_layer_id = self.create_layer_id(StructureKeys.LayerMapping.TARGET_TYPE, i)
             artifact_df = self.add_artifact_layer(source_layer, source_layer_id, artifact_df)
             artifact_df = self.add_artifact_layer(target_layer, target_layer_id, artifact_df)
+            artifact_df = artifact_df.sort_values([StructureKeys.Artifact.LAYER_ID, StructureKeys.Artifact.ID]).reset_index()
             layer_mapping_df = layer_mapping_df.append({
                 StructureKeys.LayerMapping.SOURCE_TYPE: source_layer_id,
                 StructureKeys.LayerMapping.TARGET_TYPE: target_layer_id
@@ -69,7 +70,7 @@ class ApiProjectReader(AbstractProjectReader):
         return artifact_df
 
     @staticmethod
-    def _create_layer_id(layer_name: str, layer_index: int) -> str:
+    def create_layer_id(layer_name: str, layer_index: int) -> str:
         """
         Creates identifier for layer at index.
         :param layer_name: Either `source` or `target`

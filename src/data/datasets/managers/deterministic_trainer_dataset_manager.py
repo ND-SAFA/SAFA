@@ -3,7 +3,7 @@ from typing import Dict, Tuple
 
 from data.datasets.abstract_dataset import AbstractDataset
 from data.datasets.creators.abstract_dataset_creator import AbstractDatasetCreator
-from data.datasets.creators.readers.csv_project_reader import CSVProjectReader
+from data.datasets.creators.readers.csv_project_reader import CsvProjectReader
 from data.datasets.creators.trace_dataset_creator import TraceDatasetCreator
 from data.datasets.dataset_role import DatasetRole
 from data.datasets.keys.csv_format import CSVKeys
@@ -69,7 +69,7 @@ class DeterministicTrainerDatasetManager(TrainerDatasetManager):
         for dataset_role in dataset_creators_map.keys():
             dataset_filepath = os.path.join(self.get_output_path(), self._get_dataset_filename(dataset_role)) + CSVKeys.EXT
             if os.path.exists(dataset_filepath):
-                deterministic_dataset_creators_map[dataset_role] = TraceDatasetCreator(CSVProjectReader(dataset_filepath))
+                deterministic_dataset_creators_map[dataset_role] = TraceDatasetCreator(CsvProjectReader(dataset_filepath))
                 reloaded = True
             else:
                 deterministic_dataset_creators_map[dataset_role] = dataset_creators_map[dataset_role]

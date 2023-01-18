@@ -1,5 +1,6 @@
-from typing import Dict, List
 import json
+from typing import Any, Dict, List
+
 import numpy as np
 
 from util.base_object import BaseObject
@@ -22,7 +23,10 @@ class NpEncoder(json.JSONEncoder):
         return super(NpEncoder, self).default(obj)
 
 
-class JSONUtil:
+class JsonUtil:
+    """
+    Provides utility methods for dealing with JSON / Dict.
+    """
 
     @staticmethod
     def dict_to_json(dict_: Dict) -> str:
@@ -37,4 +41,17 @@ class JSONUtil:
     def require_properties(json_obj: Dict, required_properties: List[str]):
         for required_property in required_properties:
             if required_property not in json_obj:
-                raise Exception("Expected {%s} in :" % required_property, json_obj)
+                raise Exception(f"Expected {required_property} in {json}.")
+
+    @staticmethod
+    def get_property(definition: Dict, property_name: str, default_value=None) -> Any:
+        """
+        Returns property in definition if exists. Otherwise, default is returned is available.
+        :param definition: The base dictionary to retrieve property from.
+        :param property_name: The name of the property to retrieve.
+        :param default_value: The default value to return if property is not found.
+        :return: The property under given name.
+        """
+        if property_name not in definition and default_value is None:
+            raise ValueError(definition, "does not contain property: ", property_name)
+        return definition.get(property_name, default_value)

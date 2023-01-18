@@ -6,7 +6,7 @@ from data.datasets.creators.readers.definitions.abstract_project_definition impo
 from data.datasets.keys.safa_format import SafaKeys
 from data.datasets.keys.structure_keys import StructureKeys
 from util.file_util import FileUtil
-from util.json_util import JSONUtil
+from util.json_util import JsonUtil
 
 
 class TimProjectDefinition(AbstractProjectDefinition):
@@ -52,7 +52,7 @@ class TimProjectDefinition(AbstractProjectDefinition):
         return {
             StructureKeys.ARTIFACTS: artifact_definitions,
             StructureKeys.TRACES: trace_definitions,
-            StructureKeys.COLS: TimProjectDefinition.get_flattened_conversions()
+            StructureKeys.CONVERSIONS: TimProjectDefinition.get_flattened_conversions()
         }
 
     @staticmethod
@@ -62,33 +62,36 @@ class TimProjectDefinition(AbstractProjectDefinition):
         :param definition: The project definition
         :return: Mapping between artifact type to its definition.
         """
-        JSONUtil.require_properties(definition, [SafaKeys.DATAFILES_KEY])
+        JsonUtil.require_properties(definition, [SafaKeys.DATAFILES_KEY])
         artifact_definitions = definition[SafaKeys.DATAFILES_KEY]
         for _, artifact_definition in artifact_definitions.items():
-            col_conversion_name = TimProjectDefinition.get_file_format(artifact_definition[SafaKeys.FILE])
+            artifact_data_path = artifact_definition.pop(SafaKeys.FILE)
+            col_conversion_name = TimProjectDefinition.get_file_format(artifact_data_path)
+            artifact_definition[StructureKeys.PATH] = artifact_data_path
             artifact_definition[StructureKeys.COLS] = TimProjectDefinition.get_conversion_id(col_conversion_name,
                                                                                              StructureKeys.ARTIFACTS)
         return artifact_definitions
 
     @staticmethod
-    def _create_trace_definitions(definition: Dict) -> Dict[str, Dict]:
+    def _create_trace_definitions(project_definition: Dict) -> Dict[str, Dict]:
         """
         Creates trace definitions from project definition in structure project format.
-        :param definition: The project definition.
+        :param project_definition: The project definition.
         :return: Mapping of trace matrix name to its definition.
         """
-        definition = deepcopy(definition)
-        definition.pop(SafaKeys.DATAFILES_KEY)
-        file_format = TimProjectDefinition.get_file_format(definition[StructureKeys.PATH])
+        definitions = deepcopy(project_definition)
+        definitions.pop(SafaKeys.DATAFILES_KEY, None)
 
         return {
             key: {
-                StructureKeys.PATH: definition[StructureKeys.PATH],
+                StructureKeys.PATH: definition[SafaKeys.FILE],
                 StructureKeys.Trace.SOURCE: definition[SafaKeys.SOURCE_ID],
                 StructureKeys.Trace.TARGET: definition[SafaKeys.TARGET_ID],
-                StructureKeys.COLS: TimProjectDefinition.get_conversion_id(file_format, StructureKeys.TRACES)
+                StructureKeys.COLS: TimProjectDefinition.get_conversion_id(
+                    TimProjectDefinition.get_file_format(definition[SafaKeys.FILE]),
+                    StructureKeys.TRACES)
             }
-            for key, definition in definition.items()
+            for key, definition in definitions.items()
         }
 
     @staticmethod

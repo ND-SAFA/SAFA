@@ -60,7 +60,7 @@ def read_aggregate_df(folder_path: str, column_sort: List[str]):
     df = None
     for data_path in result_files:
         current_df = pd.read_csv(data_path)
-        df = pd.concat([current_df, df])
+        df = pd.concat([current_df, df], ignore_index=True)
     df = df.sort_values(column_sort, ascending=False)
     return df[column_sort]
 

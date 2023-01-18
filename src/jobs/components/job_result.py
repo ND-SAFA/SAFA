@@ -4,7 +4,7 @@ from drf_yasg.openapi import FORMAT_UUID, Schema, TYPE_INTEGER, TYPE_STRING
 
 from train.metrics.supported_trace_metric import SupportedTraceMetric
 from util.base_object import BaseObject
-from util.json_util import JSONUtil
+from util.json_util import JsonUtil
 from util.status import Status
 from util.uncased_dict import UncasedDict
 
@@ -74,7 +74,7 @@ class JobResult(BaseObject):
         :return: the output as json
         """
         obj = {key: self.__result[key] for key in keys if key in self.__result} if keys else self.__result
-        return JSONUtil.dict_to_json(obj)
+        return JsonUtil.dict_to_json(obj)
 
     def as_dict(self) -> dict:
         """

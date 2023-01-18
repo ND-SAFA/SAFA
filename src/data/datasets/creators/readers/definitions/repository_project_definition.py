@@ -35,7 +35,7 @@ class RepositoryProjectDefinition(AbstractProjectDefinition):
                     StructureKeys.COLS: StructureKeys.TRACES
                 }
             },
-            StructureKeys.COLS: {
+            StructureKeys.CONVERSIONS: {
                 **TimProjectDefinition.CONVERSIONS[TimProjectDefinition.CSV]
             }
         }

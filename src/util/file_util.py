@@ -3,7 +3,7 @@ import os
 import shutil
 from typing import Dict, List, Union
 
-from util.json_util import JSONUtil
+from util.json_util import JsonUtil
 from util.uncased_dict import UncasedDict
 
 
@@ -90,7 +90,7 @@ class FileUtil:
         :param output_file_path: The path to save the file to.
         """
         if isinstance(content, dict):
-            content = JSONUtil.dict_to_json(content)
+            content = JsonUtil.dict_to_json(content)
         with FileUtil.safe_open_w(output_file_path) as file:
             file.write(content)
 

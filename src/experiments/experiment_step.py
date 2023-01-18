@@ -1,7 +1,7 @@
 import math
 import os
 from copy import deepcopy
-from typing import Any, Dict, List, Type, Union, Optional
+from typing import Any, Dict, List, Optional, Type, Union
 
 from config.override import overrides
 from jobs.abstract_job import AbstractJob
@@ -12,7 +12,7 @@ from jobs.train_job import TrainJob
 from train.metrics.supported_trace_metric import SupportedTraceMetric
 from util.base_object import BaseObject
 from util.file_util import FileUtil
-from util.json_util import JSONUtil
+from util.json_util import JsonUtil
 from util.status import Status
 from variables.experimental_variable import ExperimentalVariable
 
@@ -78,7 +78,7 @@ class ExperimentStep(BaseObject):
         :return: None
         """
         FileUtil.make_dir_safe(output_dir)
-        json_output = JSONUtil.dict_to_json(self.get_results())
+        json_output = JsonUtil.dict_to_json(self.get_results())
         output_filepath = os.path.join(output_dir, ExperimentStep.OUTPUT_FILENAME)
         FileUtil.save_to_file(json_output, output_filepath)
 

@@ -8,4 +8,4 @@ class ApiDefinition(TypedDict):
     """
     source_layers: List[Dict[str, str]]
     target_layers: List[Dict[str, str]]
-    links: List[Tuple[str, str]]
+    true_links: List[Tuple[str, str]]

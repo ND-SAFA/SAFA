@@ -1,3 +1,4 @@
+import math
 import os
 import random
 from collections import OrderedDict
@@ -35,16 +36,18 @@ class TraceDataset(AbstractDataset):
         self.trace_matrix = TraceMatrixManager(list(self.links.values()), randomize=randomize)
         self.shuffle_link_ids()
 
-    def to_trainer_dataset(self, model_generator: ModelManager) -> List[Dict]:
+    def to_trainer_dataset(self, model_generator: ModelManager, batch_size_to_balance: int = None) -> List[Dict]:
         """
         Converts trace links in data to feature entries used by Huggingface (HF) trainer.
         :param model_generator: The model generator determining architecture and feature function for trace links.
+        :param batch_size_to_balance: The size of the batch. If provided, balances the batches with equal pos and neg links
         :return: A data used by the HF trainer.
         """
         feature_entries = {
             link.id: self._get_feature_entry(link, model_generator.arch_type, model_generator.get_feature)
             for link in self.links.values()}
-        project_links = self.get_ordered_links()
+        project_links = self.get_ordered_links() if batch_size_to_balance is None \
+            else self.get_links_for_balanced_batches(batch_size_to_balance)
         return [feature_entries[link.id] for link in project_links]
 
     def to_dataframe(self) -> pd.DataFrame:
@@ -105,6 +108,25 @@ class TraceDataset(AbstractDataset):
             pos_links, data_entries = self._get_data_entries_for_augmentation()
             augmentation_results = run(data_entries)
             self._create_links_from_augmentation(augmentation_results, pos_links)
+
+    def get_links_for_balanced_batches(self, batch_size: int) -> List[TraceLink]:
+        """
+        Gets links in the order that they are given in the trainer dataset
+        :param batch_size: the size of the batch
+        :return: a list of ordered links
+        """
+        n_pos_links_per_batch, extra_neg = divmod(batch_size, 2)
+        n_neg_links_per_batch = n_pos_links_per_batch + extra_neg
+        n_batches, rem = divmod(len(self.pos_link_ids), n_pos_links_per_batch)
+        links_ids = []
+
+        for i in range(n_batches):
+            pos_links = self._get_n_items_from_list(self.pos_link_ids, i, n_pos_links_per_batch)
+            neg_links = self._get_n_items_from_list(self.neg_link_ids, i + extra_neg, n_neg_links_per_batch)
+            batch = pos_links + neg_links
+            random.shuffle(batch)
+            links_ids.extend(batch)
+        return [self.links[link_id] for link_id in links_ids]
 
     def get_ordered_links(self) -> List[TraceLink]:
         """
@@ -242,6 +264,19 @@ class TraceDataset(AbstractDataset):
             entry = self._extract_feature_info(link.get_feature(feature_func))
         entry[DataKey.LABEL_KEY] = int(link.is_true_link)
         return entry
+
+    @staticmethod
+    def _get_n_items_from_list(list_, init_index, n_items) -> List:
+        """
+        Returns the start and end index to get n items from a list starting from a initial index
+        :param list_: the list to retrieve items from
+        :param init_index: the initial index to start from
+        :param n_items: the number of items to get from list
+        :return: a list of n_items from the list
+        """
+        start = n_items * init_index
+        end = start + n_items
+        return list_[start:end]
 
     @staticmethod
     def _resize_data(data: List, new_length: int, include_duplicates: bool = False) -> List:

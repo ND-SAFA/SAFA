@@ -34,13 +34,9 @@ describe("Project Commits", () => {
         tr.last().click();
       });
 
-      // Create a new version of the project
-      cy.getCy(DataCy.selectorAddButton).should("be.visible").last().click();
-      cy.getCy(DataCy.versionCreateMinorButton).click();
-
       cy.withinTableRows(DataCy.selectionVersionList, (tr) => {
-        tr.should("have.length", 3); // This will wait until the table populates
-        tr.contains("2").click();
+        tr.should("have.length", 3).should("all.be.visible");
+        tr.get("tbody").contains("2").click();
       });
 
       cy.getCy(DataCy.artifactTree).should("be.visible");

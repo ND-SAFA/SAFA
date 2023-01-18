@@ -69,7 +69,10 @@ Cypress.Commands.add("closeModal", (dataCy) => {
 });
 
 Cypress.Commands.add("withinTableRows", (dataCy, fn) => {
-  cy.getCy(dataCy).within(() => {
-    fn(cy.get("tr"));
-  });
+  cy.getCy(dataCy)
+    .should("be.visible")
+    .within(() => {
+      cy.get("tr").should("have.length.greaterThan", 0);
+      fn(cy.get("tr").should("be.visible"));
+    });
 });

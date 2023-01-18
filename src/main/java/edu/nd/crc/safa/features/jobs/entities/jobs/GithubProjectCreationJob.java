@@ -71,7 +71,7 @@ public class GithubProjectCreationJob extends CommitJob {
     }
 
     public static String createJobName(String repositoryName) {
-        return "Importing GitHub project:" + repositoryName;
+        return "Importing GitHub project: " + repositoryName;
     }
 
     public static String createJobName(GithubIdentifier identifier) {

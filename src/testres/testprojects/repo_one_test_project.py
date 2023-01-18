@@ -17,10 +17,13 @@ class RepositoryOneTestProject(AbstractTestProject):
     def project_path(self) -> str:
         return REPO_ONE_PROJECT_PATH
 
-    def get_artifact_entries(self) -> List[Dict]:
-        commits = EntryCreator.get_entries_in_type(TestDataManager.Keys.SOURCE, artifact_set_indices=[self.ARTIFACT_SET_INDEX])
-        issues = EntryCreator.get_entries_in_type(TestDataManager.Keys.TARGET, artifact_set_indices=[self.ARTIFACT_SET_INDEX])
-        return commits + issues
+    @classmethod
+    def get_source_entries(cls) -> List[List[Dict]]:
+        return EntryCreator.get_entries_in_type(TestDataManager.Keys.SOURCE, [cls.ARTIFACT_SET_INDEX])
+
+    @classmethod
+    def get_target_entries(cls) -> List[List[Dict]]:
+        return EntryCreator.get_entries_in_type(TestDataManager.Keys.TARGET, [cls.ARTIFACT_SET_INDEX])
 
     def get_trace_entries(self) -> List[Dict]:
         trace_data = TestDataManager.DATA[TestDataManager.Keys.TRACES][:self.TRACE_RANGE]

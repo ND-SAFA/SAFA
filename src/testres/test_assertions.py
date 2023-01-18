@@ -78,4 +78,5 @@ class TestAssertions:
             entity = expected_entities[row_index]
             for param_name, param_value in entity.items():
                 assert param_name in row, f"{row.to_dict()} does not contain: {param_name}"
-                test_case.assertEqual(param_value, row[param_name], **kwargs)
+                error_message = f"Row: {row.to_dict()} | Param: {param_name}"
+                test_case.assertEqual(param_value, row[param_name], msg=error_message)

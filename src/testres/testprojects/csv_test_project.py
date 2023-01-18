@@ -12,6 +12,7 @@ class CsvTestProject(AbstractTestProject):
     """
     Contains entries for CSV project.
     """
+
     BATCH_ONE_RANGE = [1, 2, 3]
     BATCH_TWO_RANGE = [4, 5, 6]
     BATCH_RANGES = [BATCH_ONE_RANGE, BATCH_TWO_RANGE]
@@ -20,11 +21,13 @@ class CsvTestProject(AbstractTestProject):
     def project_path(self) -> str:
         return CSV_PROJECT_PATH
 
-    def get_artifact_entries(self) -> List[Dict]:
-        entries = []
-        entries.extend(EntryCreator.get_entries_in_type(TestDataManager.Keys.SOURCE))
-        entries.extend(EntryCreator.get_entries_in_type(TestDataManager.Keys.TARGET))
-        return entries
+    @staticmethod
+    def get_source_entries() -> List[List[Dict[str, str]]]:
+        return EntryCreator.get_entries_in_type(TestDataManager.Keys.SOURCE)
+
+    @staticmethod
+    def get_target_entries() -> List[List[Dict[str, str]]]:
+        return EntryCreator.get_entries_in_type(TestDataManager.Keys.TARGET)
 
     def get_trace_entries(self) -> List[Dict]:
         trace_data = []

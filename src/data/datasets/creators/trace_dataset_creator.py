@@ -130,6 +130,7 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         """
 
         def filter_unlinked_artifact(row: pd.Series):
+            assert StructureKeys.Artifact.ID in row, f"Missing artifact id: {row.to_dict()}"
             return row[StructureKeys.Artifact.ID] in artifact_ids
 
         def filter_unlinked_trace(row: pd.Series):

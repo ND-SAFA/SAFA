@@ -1,7 +1,18 @@
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, NamedTuple, Optional, Tuple
 
 from data.datasets.keys.structure_keys import StructureKeys
 from testres.test_data_manager import TestDataManager
+
+ArtifactInstruction = Tuple[Any, str]
+LayerInstruction = List[ArtifactInstruction]
+Entry = Dict
+LayerEntry = List[Entry]
+
+
+class TraceInstruction(NamedTuple):
+    source: str
+    target: str
+    label: Optional[int]
 
 
 class EntryCreator:
@@ -10,19 +21,7 @@ class EntryCreator:
     """
 
     @staticmethod
-    def create_artifact_entries(artifact_items: List[Tuple[Any, str]]):
-        """
-        Creates artifact entries by extracting id and body from items.
-        :param artifact_items: Items containing artifact ids and body.
-        :return: artifact entries created.
-        """
-        return [{
-            StructureKeys.Artifact.ID: a_id,
-            StructureKeys.Artifact.BODY: a_body
-        } for a_id, a_body in artifact_items]
-
-    @staticmethod
-    def create_trace_entries(trace_artifact_ids: List[Tuple]):
+    def create_trace_entries(trace_artifact_ids: List[TraceInstruction]):
         """
         Generates trace entries between artifact in each entry.
         :param trace_artifact_ids: The artifacts ids to create link for.
@@ -32,21 +31,19 @@ class EntryCreator:
         return [EntryCreator.create_trace_entry(params) for params in trace_artifact_ids]
 
     @staticmethod
-    def create_trace_entry(params: Tuple):
+    def create_trace_entry(params: TraceInstruction):
         """
         Creates a trace entry with optional labels.
         :param params: Tuple consisting of source id, target id, and optionally the label.
         :return: List of trace entries.
         """
-        entry = {}
-        entry[StructureKeys.Trace.SOURCE] = params[0]
-        entry[StructureKeys.Trace.TARGET] = params[1]
+        entry = {StructureKeys.Trace.SOURCE: params[0], StructureKeys.Trace.TARGET: params[1]}
         if len(params) == 3:
             entry[StructureKeys.Trace.LABEL] = params[2]
         return entry
 
     @staticmethod
-    def create_layer_mapping_entries(layer_mappings: List[Tuple[str, str]]) -> List[Dict]:
+    def create_layer_mapping_entries(layer_mappings: List[ArtifactInstruction]) -> LayerEntry:
         """
         Creates layer mapping in structured dataset format.
         :param layer_mappings: List of source and target types to map together.
@@ -57,30 +54,45 @@ class EntryCreator:
                 for s_type, t_type in layer_mappings]
 
     @staticmethod
-    def get_entries_in_type(type_key: TestDataManager.Keys, **kwargs) -> List[Dict]:
+    def get_entries_in_type(type_key: TestDataManager.Keys, layers_to_include: List[int] = None) -> List[LayerEntry]:
         """
         Returns entries associated with type existing in data manager.
         :param type_key: The key to access artifacts in artifact type.
-        :param kwargs: Additional arguments passed to reader.
+        :param layers_to_include: The layers to filter artifacts by.
         :return: List of entries.
         """
-        artifact_data = EntryCreator.read_artifacts_in_type(type_key, **kwargs)
+        artifact_data = EntryCreator.read_artifact_layers(type_key, layers_to_include)
         return EntryCreator.create_artifact_entries(artifact_data)
 
     @staticmethod
-    def read_artifacts_in_type(type_key: TestDataManager.Keys, artifact_set_indices: List[int] = None) -> List[Tuple[str, str]]:
+    def read_artifact_layers(type_key: TestDataManager.Keys, layer_indices: List[int] = None) -> List[LayerInstruction]:
         """
         Extracts the artifact data associated with type.
         :param type_key: The key referring to source or target artifacts.
-        :param artifact_set_indices: The set of artifacts within type to extract. If none, all sets are used.
+        :param layer_indices: The set of artifacts within type to extract. If none, all sets are used.
         :return: Data used to create entries using EntryCreator.
         """
 
         entries = []
-        for i, artifact_set in enumerate(TestDataManager.DATA[TestDataManager.Keys.ARTIFACTS][type_key]):
-            if artifact_set_indices is not None:
-                if i not in artifact_set_indices:
+        for layer_index, artifact_layer in enumerate(TestDataManager.DATA[TestDataManager.Keys.ARTIFACTS][type_key]):
+            layer_entries = []
+            if layer_indices is not None:
+                if layer_index not in layer_indices:
                     continue
-            for a_id, a_body in artifact_set.items():
-                entries.append((a_id, a_body))
+            for a_id, a_body in artifact_layer.items():
+                layer_entries.append((a_id, a_body))
+            entries.append(layer_entries)
         return entries
+
+    @staticmethod
+    def create_artifact_entries(artifact_layers: List[LayerInstruction]) -> List[List[Entry]]:
+        """
+        Creates artifact entries by extracting id and body from items.
+        :param artifact_layers: Items containing artifact ids and body per layer.
+        :return: artifact entries created.
+        """
+        return [
+            [{
+                StructureKeys.Artifact.ID: a_id,
+                StructureKeys.Artifact.BODY: a_body
+            } for a_id, a_body in artifact_items] for artifact_items in artifact_layers]

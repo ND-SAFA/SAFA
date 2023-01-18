@@ -1,35 +1,53 @@
 from abc import abstractmethod
 from typing import Dict, List
 
+from data.datasets.creators.readers.abstract_project_reader import AbstractProjectReader
 from testres.testprojects.entry_creator import LayerEntry
 
 
 class AbstractTestProject:
-    @property
+    """
+    Represents interface for defining a test project to create assertions for.
+    """
+
+    @staticmethod
     @abstractmethod
-    def project_path(self) -> str:
+    def get_project_path() -> str:
         """
         :return: Path to the test project.
+        """
+
+    @classmethod
+    @abstractmethod
+    def get_project_reader(cls) -> AbstractProjectReader:
+        """
+        :return: Returns project reader for project.
         """
 
     @staticmethod
     @abstractmethod
     def get_source_entries() -> List[LayerEntry]:
-        pass
+        """
+        :return: Returns the source artifact entries per artifact layer.
+        """
 
     @staticmethod
     @abstractmethod
     def get_target_entries() -> List[LayerEntry]:
-        pass
+        """
+        :return: Returns the target artifact entries per artifact layer.
+        """
 
+    @classmethod
     @abstractmethod
-    def get_trace_entries(self) -> LayerEntry:
+    def get_trace_entries(cls) -> LayerEntry:
         """
         :return: Returns trace entries in project.
         """
 
+    @classmethod
     @abstractmethod
-    def get_layer_mapping_entries(self) -> List[Dict]:
+    def get_layer_mapping_entries(cls) -> List[Dict]:
         """
         :return: Returns layer mapping entries in project.
         """
@@ -46,13 +64,16 @@ class AbstractTestProject:
             targets.extend(target_features)
         return sources + targets  # matches the order of the datasets
 
-    @classmethod
-    def get_n_links(cls) -> int:
-        n_links = 0
-        for source, targets in zip(cls.get_source_entries(), cls.get_target_entries()):
-            n_links += len(source) * len(targets)
-        return n_links
+    @staticmethod
+    @abstractmethod
+    def get_n_links() -> int:
+        """
+        :return: Returns the number of expected links after construction.
+        """
 
     @classmethod
-    def get_n_positive_links(cls):
-        return len(cls.get_trace_entries())
+    @abstractmethod
+    def get_n_positive_links(cls) -> int:
+        """
+        :return: Returns the number of positive links in project.
+        """

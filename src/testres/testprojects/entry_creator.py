@@ -1,4 +1,5 @@
-from typing import Any, Dict, List, NamedTuple, Optional, Tuple
+from copy import deepcopy
+from typing import Any, Dict, List, Tuple
 
 from data.datasets.keys.structure_keys import StructureKeys
 from testres.test_data_manager import TestDataManager
@@ -7,12 +8,7 @@ ArtifactInstruction = Tuple[Any, str]
 LayerInstruction = List[ArtifactInstruction]
 Entry = Dict
 LayerEntry = List[Entry]
-
-
-class TraceInstruction(NamedTuple):
-    source: str
-    target: str
-    label: Optional[int]
+TraceInstruction = Tuple
 
 
 class EntryCreator:
@@ -82,7 +78,7 @@ class EntryCreator:
             for a_id, a_body in artifact_layer.items():
                 layer_entries.append((a_id, a_body))
             entries.append(layer_entries)
-        return entries
+        return deepcopy(entries)
 
     @staticmethod
     def create_artifact_entries(artifact_layers: List[LayerInstruction]) -> List[List[Entry]]:

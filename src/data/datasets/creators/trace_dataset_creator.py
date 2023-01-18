@@ -1,4 +1,4 @@
-from typing import Callable, Dict, Iterable, Set, Type
+from typing import Any, Callable, Dict, Iterable, Set, Type
 
 import pandas as pd
 
@@ -38,7 +38,7 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         self.artifact_df, self.trace_df, self.layer_mapping_df = project_reader.read_project()
         self.project_reader = project_reader
         self.filter_unlinked_artifacts = filter_unlinked_artifacts
-        self.artifact_df = self._set_index(self.artifact_df, StructureKeys.Artifact.ID)
+        self._add_optional_column(self.trace_df, StructureKeys.Trace.LABEL, 1)
         ReflectionUtil.set_attributes(self, self.project_reader.get_overrides())
 
     def create(self) -> TraceDataset:
@@ -109,10 +109,11 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         trace_link_map = {}
         positive_link_ids = []
         negative_link_ids = []
-
         for _, row in self.trace_df.iterrows():
-            source_artifact = self._add_artifact_to_map(self.artifact_df.loc[row[StructureKeys.Trace.SOURCE]], artifact_map)
-            target_artifact = self._add_artifact_to_map(self.artifact_df.loc[row[StructureKeys.Trace.TARGET]], artifact_map)
+            source_row = self.artifact_df[self.artifact_df[StructureKeys.Artifact.ID] == row[StructureKeys.Trace.SOURCE]].iloc[0]
+            target_row = self.artifact_df[self.artifact_df[StructureKeys.Artifact.ID] == row[StructureKeys.Trace.TARGET]].iloc[0]
+            source_artifact = self._add_artifact_to_map(source_row, artifact_map)
+            target_artifact = self._add_artifact_to_map(target_row, artifact_map)
             is_true_link = int(row[StructureKeys.Trace.LABEL]) == 1
             trace_link = TraceLink(source_artifact, target_artifact, is_true_link=is_true_link)
             trace_link_map[trace_link.id] = trace_link
@@ -172,13 +173,14 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         :return: DataFrame of trace links without links containing null references.
         """
         valid_traces = []
+        valid_artifact_ids = artifact_df[StructureKeys.Artifact.ID].values
         for _, row in trace_df.iterrows():
             source_id = row[StructureKeys.Trace.SOURCE]
             target_id = row[StructureKeys.Trace.TARGET]
-            if source_id not in artifact_df.index:
+            if source_id not in valid_artifact_ids:
                 if not allow_missing_sources:
                     raise ValueError(f"Unknown source artifact reference: {source_id}")
-            elif target_id not in artifact_df.index:
+            elif target_id not in valid_artifact_ids:
                 if not allow_missing_targets:
                     raise ValueError(f"Unknown target artifact reference: {target_id}")
             else:
@@ -193,7 +195,7 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         :param artifact_map: The map of type to artifact map (id to artifact).
         :return: Artifact created or retrieved if existent.
         """
-        artifact_id = artifact_row[StructureKeys.Artifact.ID]
+        artifact_id: str = artifact_row[StructureKeys.Artifact.ID]
         artifact_type = artifact_row[StructureKeys.Artifact.LAYER_ID]
         if artifact_type not in artifact_map:
             artifact_map[artifact_type] = UncasedDict()
@@ -219,6 +221,18 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         return linked_artifact_ids
 
     @staticmethod
+    def _add_optional_column(df: pd.DataFrame, col_name: str, default_value: Any) -> None:
+        """
+        Adds default value to column if not found in data frame.
+        :param df: The data frame to modifiy.
+        :param col_name: The name of the column to verify or add.
+        :param default_value: The value of the column if creating new one.
+        :return: None
+        """
+        if col_name not in df.columns:
+            df[col_name] = [default_value] * len(df)
+
+    @staticmethod
     def _filter_df(df: pd.DataFrame, filter_lambda: Callable[[pd.Series], bool]) -> pd.DataFrame:
         """
         Returns DataFrame containing rows returning true in filter.
@@ -226,7 +240,7 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         :param filter_lambda: The lambda determining which rows to keep.
         :return: DataFrame containing filtered rows.
         """
-        return df[df.apply(filter_lambda)]
+        return df[df.apply(filter_lambda, axis=1)]
 
     @staticmethod
     def _set_index(df: pd.DataFrame, col_name: str) -> pd.DataFrame:

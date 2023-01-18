@@ -1,7 +1,5 @@
-from abc import abstractmethod
 from typing import Dict, List
 
-from data.datasets.creators.readers.abstract_project_reader import AbstractProjectReader
 from testres.base_test import BaseTest
 from testres.test_assertions import TestAssertions
 from testres.testprojects.abstract_test_project import AbstractTestProject
@@ -18,17 +16,11 @@ class AbstractProjectReaderTest(BaseTest):
         :param test_project: Project containing entities to compare data frames to.
         :return: None
         """
-        project_reader = self.get_project_reader()
+        project_reader = test_project.get_project_reader()
         artifact_df, trace_df, layer_mapping_df = project_reader.read_project()
         TestAssertions.verify_entities_in_df(self, test_project.get_artifact_entries(), artifact_df)
         TestAssertions.verify_entities_in_df(self, test_project.get_trace_entries(), trace_df)
         TestAssertions.verify_entities_in_df(self, test_project.get_layer_mapping_entries(), layer_mapping_df)
-
-    @abstractmethod
-    def get_project_reader(self) -> AbstractProjectReader:
-        """
-        :return: Returns the project reader responsible for creating data frames.
-        """
 
     @staticmethod
     def generate_artifact_entries(artifact_ids: List[int], prefix: str = "None") -> List[Dict]:

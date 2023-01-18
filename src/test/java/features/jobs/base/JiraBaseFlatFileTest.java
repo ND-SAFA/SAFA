@@ -30,7 +30,7 @@ public abstract class JiraBaseFlatFileTest extends BaseFlatFileTest {
 
     protected String jiraProjectName = "test-jira-project";
     protected int N_STEPS = 4;
-    protected String cloudId = UUID.randomUUID().toString();
+    protected UUID orgId = UUID.randomUUID();
     protected Long jiraProjectId = (long) 1;
     protected String[] originalJraProjectCreationSteps;
 

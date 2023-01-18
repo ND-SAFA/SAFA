@@ -1,12 +1,12 @@
 package edu.nd.crc.safa.features.jira.services;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import edu.nd.crc.safa.features.jira.entities.app.JiraAccessCredentialsDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraAuthResponseDTO;
@@ -74,12 +74,12 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
         return credentials;
     }
 
-    private String buildBaseURI(String cloudId) {
-        return String.format("/ex/jira/%s/rest/api/%d", cloudId, API_VERSION);
+    private String buildBaseURI(UUID orgId) {
+        return String.format("/ex/jira/%s/rest/api/%d", orgId, API_VERSION);
     }
 
-    private String buildApiRequestURI(String cloudId, ApiRoute apiRoute) {
-        return apiRoute.getUrl() + this.buildBaseURI(cloudId) + apiRoute.getPath();
+    private String buildApiRequestURI(UUID orgId, ApiRoute apiRoute) {
+        return apiRoute.getUrl() + this.buildBaseURI(orgId) + apiRoute.getPath();
     }
 
     private String buildAuthRequestURI(ApiRoute apiRoute) {
@@ -92,9 +92,9 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
 
     @Override
     public JiraProjectResponseDTO retrieveJIRAProject(JiraAccessCredentials credentials,
-                                                      String cloudId, Long jiraProjectId) {
+                                                      UUID orgId, Long jiraProjectId) {
 
-        String uri = this.buildApiRequestURI(cloudId, ApiRoute.PROJECT);
+        String uri = this.buildApiRequestURI(orgId, ApiRoute.PROJECT);
 
         return WebApiUtils.blockOptional(
             this.webClient
@@ -135,8 +135,8 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
     }
 
     @Override
-    public List<JiraProjectResponseDTO> retrieveJIRAProjectsPreview(JiraAccessCredentials credentials, String cloudId) {
-        String uri = this.buildApiRequestURI(cloudId, ApiRoute.PROJECTS_PREVIEW);
+    public List<JiraProjectResponseDTO> retrieveJIRAProjectsPreview(JiraAccessCredentials credentials, UUID orgId) {
+        String uri = this.buildApiRequestURI(orgId, ApiRoute.PROJECTS_PREVIEW);
 
         return WebApiUtils.blockOptional(
             this.webClient
@@ -152,16 +152,16 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
 
     @Override
     public JiraIssuesResponseDTO retrieveJIRAIssues(JiraAccessCredentials credentials,
-                                                    String cloudId, Long jiraProjectId) {
+                                                    UUID orgId, Long jiraProjectId) {
 
         String jqlQuery = String.format("project=%s", jiraProjectId);
 
-        return this.getJIRAIssues(credentials, cloudId, jqlQuery);
+        return this.getJIRAIssues(credentials, orgId, jqlQuery);
     }
 
     @Override
     public JiraIssuesResponseDTO retrieveUpdatedJIRAIssues(JiraAccessCredentials credentials,
-                                                           String cloudId,
+                                                           UUID orgId,
                                                            Long jiraProjectId,
                                                            Date timestamp) {
 
@@ -169,14 +169,14 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
         String jqlQuery = String.format(
             "project=%s AND (updated>\"%s\" OR created>\"%s\")", jiraProjectId, updateDate, updateDate);
 
-        return this.getJIRAIssues(credentials, cloudId, jqlQuery);
+        return this.getJIRAIssues(credentials, orgId, jqlQuery);
     }
 
     @Override
     public boolean checkUserCanViewProjectIssues(JiraAccessCredentials credentials,
-                                                 String cloudId, Long jiraProjectId) {
+                                                 UUID orgId, Long jiraProjectId) {
 
-        String uri = this.buildApiRequestURI(cloudId, ApiRoute.PERMISSIONS);
+        String uri = this.buildApiRequestURI(orgId, ApiRoute.PERMISSIONS);
 
         JiraProjectPermissionDTO permissionDTO = WebApiUtils.blockOptional(
             this.webClient
@@ -245,15 +245,11 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
     }
 
     private String encodeValue(String value) {
-        try {
-            return URLEncoder.encode(value, StandardCharsets.UTF_8.toString());
-        } catch (UnsupportedEncodingException e) {
-            throw new SafaError("Could not encode value " + value);
-        }
+        return URLEncoder.encode(value, StandardCharsets.UTF_8);
     }
 
-    public JiraIssuesResponseDTO getJIRAIssues(JiraAccessCredentials credentials, String cloudId, String jqlQuery) {
-        String baseUri = this.buildApiRequestURI(cloudId, ApiRoute.ISSUES);
+    public JiraIssuesResponseDTO getJIRAIssues(JiraAccessCredentials credentials, UUID orgId, String jqlQuery) {
+        String baseUri = this.buildApiRequestURI(orgId, ApiRoute.ISSUES);
 
         return WebApiUtils.blockOptional(
             this.webClient

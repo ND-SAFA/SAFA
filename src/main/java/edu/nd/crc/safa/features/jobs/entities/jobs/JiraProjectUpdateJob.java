@@ -26,7 +26,7 @@ public class JiraProjectUpdateJob extends CreateProjectViaJiraJob {
     public ProjectEntities retrieveJiraEntities() {
         JiraIssuesResponseDTO dto = jiraConnectionService.retrieveUpdatedJIRAIssues(
             credentials,
-            jiraIdentifier.getCloudId(),
+            jiraIdentifier.getOrgId(),
             this.jiraIdentifier.getJiraProjectId(),
             jiraProject.getLastUpdate());
 

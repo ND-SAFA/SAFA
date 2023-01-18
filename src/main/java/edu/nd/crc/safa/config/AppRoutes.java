@@ -200,10 +200,10 @@ public class AppRoutes {
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
         public static class Import {
             public static final String ROOT = Projects.ROOT + "/import";
-            public static final String BY_ID = Import.ROOT + "/jira/{cloudId}/{id}";
-            public static final String UPDATE = Versions.BY_ID + "/import/jira/{cloudId}/{id}";
-            public static final String RETRIEVE_JIRA_PROJECTS = Projects.ROOT + "/jira/{cloudId}";
-            public static final String IMPORT_INTO_EXISTING = Versions.BY_ID + "/import/jira/{cloudId}/{id}";
+            public static final String BY_ID = Import.ROOT + "/jira/{orgId}/{id}";
+            public static final String UPDATE = Versions.BY_ID + "/import/jira/{orgId}/{id}";
+            public static final String RETRIEVE_JIRA_PROJECTS = Projects.ROOT + "/jira/{orgId}";
+            public static final String IMPORT_INTO_EXISTING = Versions.BY_ID + "/import/jira/{orgId}/{id}";
         }
     }
 

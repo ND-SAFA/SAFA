@@ -30,7 +30,8 @@ public class UpdateProjectViaJiraBuilder extends CreateProjectViaJiraBuilder {
         return new JiraProjectUpdateJob(
             jobDbEntity,
             serviceProvider,
-            this.identifier
+            this.identifier,
+            user
         );
     }
 }

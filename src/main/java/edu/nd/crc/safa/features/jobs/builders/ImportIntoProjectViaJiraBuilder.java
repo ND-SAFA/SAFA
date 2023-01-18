@@ -31,7 +31,8 @@ public class ImportIntoProjectViaJiraBuilder extends CreateProjectViaJiraBuilder
         return new JiraProjectImportJob(
             jobDbEntity,
             serviceProvider,
-            this.identifier
+            this.identifier,
+            user
         );
     }
 }

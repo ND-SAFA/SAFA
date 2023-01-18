@@ -6,8 +6,8 @@ import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.features.jira.entities.api.JiraIdentifier;
 import edu.nd.crc.safa.features.jira.entities.app.JiraIssueDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraProjectResponseDTO;
-import edu.nd.crc.safa.features.jobs.entities.jobs.CreateProjectViaJiraJob;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
+import edu.nd.crc.safa.features.jobs.entities.jobs.CreateProjectViaJiraJob;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
@@ -50,7 +50,8 @@ class TestFlatFileJiraProjectCreation extends JiraBaseFlatFileTest {
         CreateProjectViaJiraJob job = new CreateProjectViaJiraJob(
             jobDbEntity,
             serviceProvider,
-            jiraIdentifier
+            jiraIdentifier,
+            currentUser
         );
 
         job.setJiraProjectResponse(createMockJiraProject());

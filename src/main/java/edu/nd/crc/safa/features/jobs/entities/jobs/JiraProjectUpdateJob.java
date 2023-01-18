@@ -6,6 +6,7 @@ import edu.nd.crc.safa.features.jira.entities.api.JiraIdentifier;
 import edu.nd.crc.safa.features.jira.entities.app.JiraIssuesResponseDTO;
 import edu.nd.crc.safa.features.jira.services.JiraConnectionService;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
 /**
  * Job to update an already imported JIRA project
@@ -15,8 +16,9 @@ public class JiraProjectUpdateJob extends CreateProjectViaJiraJob {
 
     public JiraProjectUpdateJob(JobDbEntity jobDbEntity,
                                 ServiceProvider serviceProvider,
-                                JiraIdentifier jiraIdentifier) {
-        super(jobDbEntity, serviceProvider, jiraIdentifier);
+                                JiraIdentifier jiraIdentifier,
+                                SafaUser user) {
+        super(jobDbEntity, serviceProvider, jiraIdentifier, user);
         this.jiraConnectionService = this.serviceProvider.getJiraConnectionService();
     }
 

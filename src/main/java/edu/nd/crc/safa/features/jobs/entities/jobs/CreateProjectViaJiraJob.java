@@ -21,7 +21,6 @@ import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
-import edu.nd.crc.safa.features.users.services.SafaUserService;
 
 import lombok.Setter;
 import org.springframework.util.StringUtils;
@@ -57,13 +56,17 @@ public class CreateProjectViaJiraJob extends CommitJob {
      */
     JiraProject jiraProject;
 
+    private final SafaUser user;
+
     public CreateProjectViaJiraJob(
         JobDbEntity jobDbEntity,
         ServiceProvider serviceProvider,
-        JiraIdentifier jiraIdentifier) {
+        JiraIdentifier jiraIdentifier,
+        SafaUser user) {
         super(jobDbEntity, serviceProvider, new ProjectCommit(jiraIdentifier.getProjectVersion(), false));
         this.jiraIdentifier = jiraIdentifier;
         this.issues = new ArrayList<>();
+        this.user = user;
     }
 
     public static String createJobName(JiraIdentifier jiraIdentifier) {
@@ -77,13 +80,11 @@ public class CreateProjectViaJiraJob extends CommitJob {
     @IJobStep(value = "Authenticating User Credentials", position = 1)
     public void authenticateUserCredentials() {
         // Step - Get services needed
-        SafaUserService safaUserService = this.serviceProvider.getSafaUserService();
         JiraAccessCredentialsRepository jiraAccessCredentialsRepository = this.serviceProvider
             .getJiraAccessCredentialsRepository();
 
-        SafaUser principal = safaUserService.getCurrentUser();
         this.credentials = jiraAccessCredentialsRepository
-            .findByUser(principal)
+            .findByUser(user)
             .orElseThrow(() -> new SafaError("No JIRA credentials found"));
     }
 

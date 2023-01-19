@@ -28,6 +28,7 @@ import edu.nd.crc.safa.features.jira.repositories.JiraAccessCredentialsRepositor
 import edu.nd.crc.safa.features.jira.repositories.JiraProjectRepository;
 import edu.nd.crc.safa.features.jira.services.JiraConnectionService;
 import edu.nd.crc.safa.features.jira.services.JiraParsingService;
+import edu.nd.crc.safa.features.jobs.logging.services.JobLoggingService;
 import edu.nd.crc.safa.features.jobs.services.JobService;
 import edu.nd.crc.safa.features.layout.repositories.ArtifactPositionRepository;
 import edu.nd.crc.safa.features.layout.services.ArtifactPositionService;
@@ -163,4 +164,5 @@ public class ServiceProvider {
     private final GithubProjectRepository githubProjectRepository;
     // Jobs
     JobLauncher jobLauncher; // Not final because runtime changes on test vs dev.
+    private JobLoggingService jobLoggingService;
 }

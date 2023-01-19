@@ -38,7 +38,7 @@ public class JobLoggingService {
      * @return A list of logs sorted by timestamp.
      */
     public List<JobLogEntry> getLogsForJobStep(JobDbEntity job, short stepNum) {
-        return jobLogEntryRepository.findByJobAndStepNumOrderByTimestampDesc(job, stepNum);
+        return jobLogEntryRepository.findByJobAndStepNumOrderByTimestampAsc(job, stepNum);
     }
 
     /**
@@ -148,6 +148,16 @@ public class JobLoggingService {
      */
     public JobLogEntryAppEntity getJsonEntityFromDatabaseEntity(JobLogEntry entry) {
         return new JobLogEntryAppEntity(entry.getTimestamp(), entry.getEntry());
+    }
+
+    /**
+     * Adds a log entry to the database.
+     *
+     * @param entry The entry to add.
+     * @return The saved entity.
+     */
+    public JobLogEntry saveLog(JobLogEntry entry) {
+        return jobLogEntryRepository.save(entry);
     }
 
     /**

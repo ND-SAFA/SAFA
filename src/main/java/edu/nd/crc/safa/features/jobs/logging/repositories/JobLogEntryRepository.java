@@ -10,5 +10,5 @@ import org.springframework.data.repository.CrudRepository;
 
 public interface JobLogEntryRepository extends CrudRepository<JobLogEntry, UUID> {
 
-    List<JobLogEntry> findByJobAndStepNumOrderByTimestampDesc(JobDbEntity job, short stepNum);
+    List<JobLogEntry> findByJobAndStepNumOrderByTimestampAsc(JobDbEntity job, short stepNum);
 }

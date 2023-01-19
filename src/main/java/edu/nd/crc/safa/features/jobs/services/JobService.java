@@ -14,6 +14,7 @@ import edu.nd.crc.safa.features.jobs.entities.app.JobType;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.jobs.repositories.JobDbRepository;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.projects.entities.app.SafaItemNotFoundError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
 
@@ -166,7 +167,7 @@ public class JobService {
         if (jobOption.isPresent()) {
             return jobOption.get();
         }
-        throw new SafaError("Could not find job with id:" + jobId);
+        throw new SafaItemNotFoundError("Could not find job with id: " + jobId);
     }
 
     public void setJobName(JobDbEntity jobDbEntity, String newName) {

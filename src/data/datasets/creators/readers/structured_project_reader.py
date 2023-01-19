@@ -29,16 +29,18 @@ class StructuredProjectReader(AbstractProjectReader):
         if conversions is None:
             conversions = {}
         self.project_path = project_path
-        definition_reader = self._get_definition_reader()
-        self.definition = definition_reader.read_project_definition(project_path)
-        self.conversions = self.definition.get(StructuredKeys.CONVERSIONS, conversions)
-        self.overrides = self.definition.get(StructuredKeys.OVERRIDES, {})
+        self.definition_reader = self._get_definition_reader()
+        self.definition = None
+        self.conversions = conversions
 
     def read_project(self) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
         """
         Reads artifact and trace links from files.
         :return: Returns DataFrames containing artifacts, traces, and mapping between layers.
         """
+        self.definition = self.definition_reader.read_project_definition(self.project_path)
+        self.conversions = self.definition.get(StructuredKeys.CONVERSIONS, self.conversions)
+        self.overrides = self.definition.get(StructuredKeys.OVERRIDES, {})
         artifact_df = self._read_artifact_df(self.project_path, self._get_artifact_definitions())
         trace_df = self._read_trace_df()
         layer_mapping_df = self._read_layer_mapping_df()

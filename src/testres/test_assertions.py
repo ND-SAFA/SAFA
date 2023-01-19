@@ -38,7 +38,7 @@ class TestAssertions:
         :param threshold: The tolerance threshold between score and base score.
         :return: None
         """
-        JsonUtil.require_properties(output, [JobResult.PREDICTIONS])
+        output.require_properties([JobResult.PREDICTIONS])
         predictions = output[JobResult.PREDICTIONS]
         test_case.assertEqual(len(eval_dataset), len(predictions))
 
@@ -50,7 +50,7 @@ class TestAssertions:
                 test_case.fail(cls._VAL_ERROR_MESSAGE.format(JobResult.SCORE, score, base_score, JobResult.PREDICTIONS))
 
         predicted_links: List[Tuple[str, str]] = [(p[JobResult.SOURCE], p[JobResult.TARGET]) for p in predictions]
-        expected_links: List[Tuple[str, str]] = [(t.source.id, t.target.id) for t in eval_dataset.links.values()]
+        expected_links: List[Tuple[str, str]] = eval_dataset.get_source_target_pairs()
         cls.assert_lists_have_the_same_vals(test_case, expected_links, predicted_links)
 
     @classmethod
@@ -61,7 +61,7 @@ class TestAssertions:
         :param output: The result of a prediction job.
         :return: None
         """
-        JsonUtil.require_properties(output, JobResult.METRICS)
+        output.require_properties([JobResult.METRICS])
         for metric in TestDataManager.EXAMPLE_PREDICTION_METRICS.keys():
             if metric not in output[JobResult.METRICS]:
                 test_case.fail(

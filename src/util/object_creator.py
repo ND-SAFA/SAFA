@@ -70,8 +70,12 @@ class ObjectCreator:
         "job_args": {},
         "trainer_dataset_manager": {
             "train_dataset_creator": {
-                TypedDefinitionVariable.OBJECT_TYPE_KEY: "Safa",
-                "project_path": {"*": ["path1", "path2"]}}
+                TypedDefinitionVariable.OBJECT_TYPE_KEY: "TRACE",
+                "project_reader": {
+                    TypedDefinitionVariable.OBJECT_TYPE_KEY: "STRUCTURE",
+                    "project_path": {"*": ["path1", "path2"]}
+                }
+            }
         },
         "trainer_args": {
             "output_dir": TEST_OUTPUT_DIR,

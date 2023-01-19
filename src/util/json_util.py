@@ -38,7 +38,7 @@ class JsonUtil:
         return json.dumps(dict_, indent=4, cls=NpEncoder)
 
     @staticmethod
-    def require_properties(json_obj: Dict, required_properties: List[str]):
+    def require_properties(json_obj: Dict, required_properties: List[str]) -> None:
         """
         Verifies that the json object contains each property. Throws error otherwise.
         :param json_obj: The json object to verify.

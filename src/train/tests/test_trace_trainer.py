@@ -85,11 +85,11 @@ class TestTraceTrainer(BaseTraceTest):
         self.assertIsInstance(data_loader.sampler, RandomSampler)
 
     def set_train_dataset(self, test_trace_trainer):
-        train_dataset = self.get_dataset_container()[DatasetRole.TRAIN]
+        train_dataset = self.create_trainer_dataset_manager()[DatasetRole.TRAIN]
         test_trace_trainer.train_dataset = train_dataset
 
     def get_test_trace_trainer(self, dataset_container_args: Dict = None, **kwargs):
-        trainer_dataset_manager = self.get_dataset_container(dataset_container_args)
+        trainer_dataset_manager = self.create_trainer_dataset_manager(dataset_container_args)
         model_manager = ObjectCreator.create(ModelManager)
         model_manager.get_model = mock.MagicMock(return_value=self.get_test_model())
         model_manager.get_tokenizer = mock.MagicMock(return_value=self.get_test_tokenizer())
@@ -100,7 +100,12 @@ class TestTraceTrainer(BaseTraceTest):
             model_manager=model_manager)
 
     @staticmethod
-    def get_dataset_container(kwargs: Dict):
+    def create_trainer_dataset_manager(kwargs: Dict = None) -> TrainerDatasetManager:
+        """
+        Creates dataset manager with optional kwargs used to modify definition.
+        :param kwargs: Dictionary of properties to overwrite in dataset manager definition.
+        :return: Dataset manager created.
+        """
         if kwargs is None:
             kwargs = {}
         return ObjectCreator.create(TrainerDatasetManager, **{

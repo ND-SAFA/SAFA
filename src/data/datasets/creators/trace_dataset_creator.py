@@ -36,17 +36,20 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         :param filter_unlinked_artifacts: Whether to remove artifacts without a positive trace link.
         """
         super().__init__(data_cleaner)
-        self.artifact_df, self.trace_df, self.layer_mapping_df = project_reader.read_project()
+        self.artifact_df = None
+        self.trace_df = None
+        self.layer_mapping_df = None
         self.project_reader = project_reader
         self.filter_unlinked_artifacts = filter_unlinked_artifacts
-        self.trace_df = DataFrameUtil.add_optional_column(self.trace_df, StructuredKeys.Trace.LABEL, 1)
-        ReflectionUtil.set_attributes(self, self.project_reader.get_overrides())
 
     def create(self) -> TraceDataset:
         """
         Creates TraceDataset with links.
         :return: TraceDataset.
         """
+        self.artifact_df, self.trace_df, self.layer_mapping_df = self.project_reader.read_project()
+        self.trace_df = DataFrameUtil.add_optional_column(self.trace_df, StructuredKeys.Trace.LABEL, 1)
+        ReflectionUtil.set_attributes(self, self.project_reader.get_overrides())
         if self.filter_unlinked_artifacts:
             self._filter_unlinked_artifacts()
         self._filter_null_references()

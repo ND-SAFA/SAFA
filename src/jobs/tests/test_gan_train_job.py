@@ -35,7 +35,7 @@ class TestGanTrainJob(BaseJobTest):
     def test_run_success(self, save_model_mock: mock.MagicMock):
         self._test_run_success()
 
-    def _assert_success(self, output_dict: dict):
+    def _assert_success(self, job: GanTrainJob, output_dict: dict):
         TestAssertions.assert_training_output_matches_expected(self, output_dict, self.EXAMPLE_TRAINING_OUTPUT)
 
     def _get_job(self) -> AbstractJob:

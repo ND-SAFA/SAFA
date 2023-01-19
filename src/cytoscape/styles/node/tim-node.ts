@@ -1,5 +1,5 @@
 import { TimNodeCytoElementData } from "@/types";
-import { ThemeColors } from "@/util";
+import { getBackgroundColor, getBorderColor } from "@/util";
 import { TIM_NODE_HEIGHT, TIM_NODE_WIDTH } from "@/cytoscape/styles/config";
 import { svgRect } from "./node-shapes";
 import { svgDiv, svgTitle } from "./svg-node";
@@ -14,7 +14,9 @@ import { svgDiv, svgTitle } from "./svg-node";
 export function svgTIM(data: TimNodeCytoElementData): string {
   const x = 10;
   const y = 10;
-  const color = ThemeColors.darkGrey;
+  const borderColor = getBorderColor();
+  const bgColor = getBackgroundColor("", data.dark);
+  const count = data.count == 1 ? "1 Node" : `${data.count} Nodes`;
 
   return `
     <svg
@@ -27,13 +29,18 @@ export function svgTIM(data: TimNodeCytoElementData): string {
           width: TIM_NODE_WIDTH,
           height: TIM_NODE_HEIGHT,
         },
-        color,
-        ThemeColors.lightGrey,
+        borderColor,
+        bgColor,
         8
       )}
       ${svgTitle(data.id, y, "type")}
-      ${svgDiv({ x, y: y + 37, width: TIM_NODE_WIDTH - x * 2, color })}
-      ${svgTitle(`${data.count} Nodes`, y + 50, "count")}
+      ${svgDiv({
+        x,
+        y: y + 37,
+        width: TIM_NODE_WIDTH - x * 2,
+        color: borderColor,
+      })}
+      ${svgTitle(count, y + 50, "count")}
     </svg>
   `;
 }

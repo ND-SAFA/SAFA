@@ -178,6 +178,12 @@ export default Vue.extend({
       }, 200);
     },
     /**
+     * Resets the layout when the mode changes.
+     */
+    isTreeMode() {
+      layoutStore.resetLayout();
+    },
+    /**
      * Resets the layout when the route changes.
      */
     $route(to: Route) {

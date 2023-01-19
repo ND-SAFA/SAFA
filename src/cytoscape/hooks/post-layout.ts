@@ -9,7 +9,8 @@ import {
 } from "@/types";
 import { isArtifactData } from "@/util";
 import { selectionStore } from "@/hooks";
-import { cyCenterNodes, cyZoomReset, timTreeCyPromise } from "@/cytoscape";
+import { timTreeCyPromise } from "@/cytoscape/cy";
+import { cyCenterNodes, cyZoomReset } from "@/cytoscape/operations";
 import { MenuItem } from "@/types/cytoscape/plugins/context-menus";
 import { artifactTreeMenuItems } from "@/cytoscape/plugins";
 

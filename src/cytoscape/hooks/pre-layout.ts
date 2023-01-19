@@ -1,10 +1,9 @@
 import { EdgeSingular } from "cytoscape";
 import { CytoCore, LayoutHook } from "@/types";
 import {
-  artifactHtml,
   GENERATED_LINK_SELECTOR,
   GENERATED_TRACE_MAX_WIDTH,
-  timNodeHtml,
+  labelHTML,
 } from "@/cytoscape/styles";
 
 let ARTIFACT_LABEL_APPLIED = false;
@@ -18,7 +17,7 @@ let TIM_LABEL_APPLIED = false;
 export const applyTIMLabels: LayoutHook = (cy: CytoCore): void => {
   if (TIM_LABEL_APPLIED) return;
 
-  cy.nodeHtmlLabel([timNodeHtml]);
+  cy.nodeHtmlLabel(labelHTML);
 
   TIM_LABEL_APPLIED = true;
 };
@@ -31,7 +30,7 @@ export const applyTIMLabels: LayoutHook = (cy: CytoCore): void => {
 export const applyArtifactLabels: LayoutHook = (cy: CytoCore): void => {
   if (ARTIFACT_LABEL_APPLIED) return;
 
-  cy.nodeHtmlLabel([artifactHtml, timNodeHtml]);
+  cy.nodeHtmlLabel(labelHTML);
 
   ARTIFACT_LABEL_APPLIED = true;
 };

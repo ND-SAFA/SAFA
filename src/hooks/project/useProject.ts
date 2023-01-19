@@ -6,7 +6,7 @@ import {
   VersionSchema,
   TimStructure,
 } from "@/types";
-import { createProject } from "@/util";
+import { createProject, createTIM } from "@/util";
 import { pinia } from "@/plugins";
 import sessionStore from "../core/useSession";
 import selectionStore from "../graph/useSelection";
@@ -133,46 +133,7 @@ export const useProject = defineStore("project", {
      * Initializes the current project's TIM structure.
      */
     initializeTim(project: ProjectSchema): void {
-      const delimiter = `~~~`;
-      const artifactCounts: Record<string, number> = {};
-      const artifactTypes: Record<string, string> = {};
-      const traceCounts: Record<string, number> = {};
-
-      project.artifacts.forEach(({ id, type }) => {
-        if (!artifactCounts[type]) {
-          artifactCounts[type] = 1;
-        } else {
-          artifactCounts[type] += 1;
-        }
-
-        artifactTypes[id] = type;
-      });
-
-      project.traces.forEach(({ sourceId, targetId }) => {
-        const type = `${artifactTypes[sourceId]}${delimiter}${artifactTypes[targetId]}`;
-
-        if (!traceCounts[type]) {
-          traceCounts[type] = 1;
-        } else {
-          traceCounts[type] += 1;
-        }
-      });
-
-      this.tim = {
-        artifacts: Object.entries(artifactCounts).map(
-          ([artifactType, count]) => ({
-            artifactType,
-            count,
-          })
-        ),
-        traces: Object.entries(traceCounts).map(
-          ([sourceAndTargetType, count]) => ({
-            source: sourceAndTargetType.split(delimiter)[0],
-            target: sourceAndTargetType.split(delimiter)[1],
-            count,
-          })
-        ),
-      };
+      this.tim = createTIM(project);
     },
     /**
      * Runs the callback only if the project is defined. Otherwise logs a warning.

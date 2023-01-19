@@ -36,11 +36,12 @@ export default class GraphLayout implements IGraphLayout {
    * Creates the layout.
    *
    * @param cy - The cy instance.
+   * @param generate - Whether to generate the layout positions.
    */
-  createLayout(cy: CytoCore): void {
+  createLayout(cy: CytoCore, generate?: boolean): void {
     this.preLayoutHook(cy);
 
-    if (this.klaySettings) {
+    if (this.klaySettings && generate) {
       cy.layout({
         name: "klay",
         klay: this.klaySettings,

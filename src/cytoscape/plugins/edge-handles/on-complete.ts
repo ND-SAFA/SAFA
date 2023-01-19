@@ -2,7 +2,7 @@ import { CollectionReturnValue, EventObject, NodeSingular } from "cytoscape";
 
 import { ArtifactCytoElementData, CytoCore } from "@/types";
 import { handleCreateLink } from "@/api";
-import { disableDrawMode } from "@/cytoscape";
+import { disableDrawMode } from "@/cytoscape/plugins";
 
 /**
  * Creates the finalized trace link when an edge creation draw is completed.

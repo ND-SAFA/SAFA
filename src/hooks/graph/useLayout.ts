@@ -102,16 +102,19 @@ export const useLayout = defineStore("layout", {
     },
     /**
      * Resets the graph layout.
+     *
+     * @param layoutPayload - The cy instance and layout.
+     * @param generate - Whether to generate the layout positions.
      */
-    setGraphLayout(layoutPayload: LayoutPayload): void {
+    setGraphLayout(layoutPayload: LayoutPayload, generate?: boolean): void {
       appStore.onLoadStart();
 
       this.layout = layoutPayload.layout;
-      cyCreateLayout(layoutPayload);
+      cyCreateLayout(layoutPayload, generate);
       this.applyAutomove();
 
+      // Wait for the graph to render.
       setTimeout(() => {
-        // Wait for the graph to render.
         cyResetTim();
         cyResetTree();
         appStore.onLoadEnd();
@@ -124,7 +127,7 @@ export const useLayout = defineStore("layout", {
       const layout = new ArtifactGraphLayout();
       const payload = { layout, cyPromise: artifactTreeCyPromise };
 
-      this.setGraphLayout(payload);
+      this.setGraphLayout(payload, this.mode === GraphMode.tim);
     },
     /**
      * Resets the graph layout of the TIM tree.
@@ -133,7 +136,7 @@ export const useLayout = defineStore("layout", {
       const layout = new TimGraphLayout();
       const payload = { layout, cyPromise: timTreeCyPromise };
 
-      this.setGraphLayout(payload);
+      this.setGraphLayout(payload, true);
     },
     /**
      * Resets the layout of the graph.
@@ -147,8 +150,8 @@ export const useLayout = defineStore("layout", {
       deltaStore.clear();
       appStore.closeSidePanels();
 
+      // Wait for graph to render.
       setTimeout(() => {
-        // Wait for graph to render.
         this.setArtifactTreeLayout();
         appStore.onLoadEnd();
       }, 200);

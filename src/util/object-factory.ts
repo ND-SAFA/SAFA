@@ -69,7 +69,7 @@ export function createSession(): SessionSchema {
 }
 
 /**
- * @return An empty project identifier.
+ * @return A project identifier initialized to the given values.
  */
 export function createProjectIdentifier(
   identifier?: Partial<IdentifierSchema>
@@ -84,7 +84,7 @@ export function createProjectIdentifier(
 }
 
 /**
- * @return An empty project.
+ * @return A project initialized to the given values.
  */
 export function createProject(project?: Partial<ProjectSchema>): ProjectSchema {
   return {

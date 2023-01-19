@@ -1,3 +1,2 @@
-export * from "./base-styles";
+export * from "./node-styles";
 export * from "./edge-styles";
-export * from "./tim-styles";

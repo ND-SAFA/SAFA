@@ -6,7 +6,7 @@ import {
 import {
   ARTIFACT_NODE_SELECTOR,
   TIM_NODE_SELECTOR,
-} from "@/cytoscape/styles/stylesheets";
+} from "@/cytoscape/styles/config";
 import { svgTIM } from "./tim-node";
 import { svgDefault } from "./default-node";
 import { svgSafetyCase } from "./sc-node";
@@ -49,3 +49,5 @@ export const artifactHtml: HtmlDefinition<ArtifactCytoElementData> = {
     }
   },
 };
+
+export default [artifactHtml, timNodeHtml];

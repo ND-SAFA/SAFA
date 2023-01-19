@@ -6,7 +6,7 @@ import {
   TraceCytoElementData,
 } from "@/types";
 import { appStore, layoutStore, selectionStore, traceStore } from "@/hooks";
-import { disableDrawMode } from "@/cytoscape";
+import { disableDrawMode } from "@/cytoscape/plugins";
 import { DefaultCytoEvents } from "@/cytoscape/events/cyto-events";
 import { CytoCore, CytoEvent, CytoEventHandlers } from "@/types/cytoscape/core";
 

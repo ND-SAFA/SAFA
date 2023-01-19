@@ -1,4 +1,10 @@
-import { Core, EventObject, LayoutOptions, Layouts } from "cytoscape";
+import {
+  Core,
+  EventObject,
+  LayoutOptions,
+  Layouts,
+  Stylesheet,
+} from "cytoscape";
 import { ArtifactCytoElementData, TimNodeCytoElementData } from "@/types";
 import {
   AutoMoveOptions,
@@ -248,13 +254,15 @@ export type CytoEventHandlers = Record<string, CytoEventDefinition>;
 /**
  * Defines a cyto style sheet.
  */
-export interface CytoStyleSheet {
-  /**
-   * The selector to add this style to.
-   */
-  selector: string;
-  /**
-   * The style attributes to add for this selector.
-   */
-  style: Record<string, unknown>;
-}
+export type CytoStyleSheet =
+  | Stylesheet
+  | {
+      /**
+       * The selector to add this style to.
+       */
+      selector: string;
+      /**
+       * The style attributes to add for this selector.
+       */
+      style: Record<string, unknown>;
+    };

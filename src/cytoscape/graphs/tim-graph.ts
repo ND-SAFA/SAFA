@@ -6,9 +6,9 @@ import { layoutStore } from "@/hooks";
 import { timTreeResolveCy } from "@/cytoscape/cy";
 import {
   DEFAULT_ARTIFACT_TREE_ZOOM,
-  MOTION_BLUE_OPACITY,
   USE_MOTION_BLUR,
-  TimStyle,
+  nodeStyles,
+  edgeStyles,
 } from "@/cytoscape/styles";
 
 /**
@@ -17,9 +17,8 @@ import {
 export const timGraph: CytoCoreGraph = {
   name: "tim-tree-graph",
   config: {
-    style: TimStyle,
+    style: [...nodeStyles, ...edgeStyles],
     motionBlur: USE_MOTION_BLUR,
-    motionBlurOpacity: MOTION_BLUE_OPACITY,
     zoom: DEFAULT_ARTIFACT_TREE_ZOOM,
   },
   saveCy: timTreeResolveCy,

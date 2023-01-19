@@ -10,7 +10,7 @@ import {
   sessionStore,
 } from "@/hooks";
 import { handleDeleteArtifact, handleDuplicateArtifact } from "@/api";
-import { enableDrawMode } from "@/cytoscape";
+import { enableDrawMode } from "@/cytoscape/plugins";
 import { safetyCaseMenuOption } from "./safety-case-menu-option";
 import { ftaMenuItem } from "./fta-menu-options";
 

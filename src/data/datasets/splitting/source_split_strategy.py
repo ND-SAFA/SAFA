@@ -23,14 +23,20 @@ class SourceSplitStrategy(AbstractSplitStrategy):
         :param slice_num: Whether to return first or second slice.
         :return: the dataset split
         """
+        # TODO: Modify this to consider case when augmentation is used
         links = SourceSplitStrategy.create_random_trace_link_array(trace_dataset)
         labels = [t.get_label() for t in links]
         first_slice_links, second_slice_links = AbstractSplitStrategy.split_data(links, percent_split, labels)
         slice_links = first_slice_links if slice_num == 1 else second_slice_links
-        slice_links = {
-            trace_link.id: trace_link for trace_link in slice_links
-        }
-        return TraceDataset(slice_links)
+        slice_links_map = {trace_link.id: trace_link for trace_link in slice_links}
+        positive_link_ids = []
+        negative_link_ids = []
+        for slice_link in slice_links:
+            if slice_link.is_true_link:
+                positive_link_ids.append(slice_link.id)
+            else:
+                negative_link_ids.append(slice_link.id)
+        return TraceDataset(slice_links_map, pos_link_ids=positive_link_ids, neg_link_ids=negative_link_ids)
 
     @staticmethod
     def create_random_trace_link_array(trace_dataset: TraceDataset, n_sources: int = None, n_links_per_source: int = None) \

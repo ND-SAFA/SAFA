@@ -22,7 +22,7 @@ class TestPredictJob(BaseJobTest):
         model_manager: ModelManager = ObjectCreator.create(ModelManager)
         trainer_dataset_manager: TrainerDatasetManager = ObjectCreator.create(TrainerDatasetManager, **{
             "eval_dataset_creator": {
-                TypedDefinitionVariable.OBJECT_TYPE_KEY: "CLASSIC_TRACE",
+                TypedDefinitionVariable.OBJECT_TYPE_KEY: "TRACE",
                 **ObjectCreator.dataset_creator_definition
             }
         }, override=True)

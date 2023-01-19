@@ -2,8 +2,8 @@ import os
 from typing import List
 from unittest.mock import patch
 
-from data.datasets.creators.classic_trace_dataset_creator import ClassicTraceDatasetCreator
 from data.datasets.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
+from data.datasets.creators.trace_dataset_creator import TraceDatasetCreator
 from data.datasets.dataset_role import DatasetRole
 from data.datasets.managers.tests.base_trainer_datasets_manager_test import BaseTrainerDatasetsManagerTest
 from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
@@ -12,7 +12,6 @@ from testres.paths.paths import TEST_OUTPUT_DIR
 from testres.test_assertions import TestAssertions
 from util.object_creator import ObjectCreator
 from variables.experimental_variable import ExperimentalVariable
-from variables.typed_definition_variable import TypedDefinitionVariable
 
 
 class TestTrainerDatasetsManager(BaseTrainerDatasetsManagerTest):
@@ -39,7 +38,7 @@ class TestTrainerDatasetsManager(BaseTrainerDatasetsManagerTest):
     def test_get_creator(self):
         dataset_container_manager = self.create_dataset_manager(
             [DatasetRole.PRE_TRAIN, DatasetRole.VAL, DatasetRole.EVAL])
-        self.assertIsInstance(dataset_container_manager.get_creator(DatasetRole.TRAIN), ClassicTraceDatasetCreator)
+        self.assertIsInstance(dataset_container_manager.get_creator(DatasetRole.TRAIN), TraceDatasetCreator)
 
     def test_save_dataset_splits(self):
         if not os.path.exists(TEST_OUTPUT_DIR):

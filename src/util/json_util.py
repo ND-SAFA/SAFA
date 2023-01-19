@@ -39,9 +39,15 @@ class JsonUtil:
 
     @staticmethod
     def require_properties(json_obj: Dict, required_properties: List[str]):
+        """
+        Verifies that the json object contains each property. Throws error otherwise.
+        :param json_obj: The json object to verify.
+        :param required_properties: List of properties to verify exist in json object.
+        :return: None
+        """
         for required_property in required_properties:
             if required_property not in json_obj:
-                raise Exception(f"Expected {required_property} in {json}.")
+                raise Exception(f"Expected {required_property} in: \n{json.dumps(json_obj, indent=4)}.")
 
     @staticmethod
     def get_property(definition: Dict, property_name: str, default_value=None) -> Any:

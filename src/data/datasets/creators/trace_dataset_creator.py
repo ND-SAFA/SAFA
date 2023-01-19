@@ -1,4 +1,4 @@
-from typing import Any, Callable, Dict, Iterable, Set, Type
+from typing import Dict, Iterable, Set, Type
 
 import pandas as pd
 
@@ -12,6 +12,7 @@ from data.processing.cleaning.data_cleaner import DataCleaner
 from data.tree.artifact import Artifact
 from data.tree.trace_link import TraceLink
 from util.base_object import BaseObject
+from util.dataframe_util import DataFrameUtil
 from util.reflection_util import ReflectionUtil
 from util.uncased_dict import UncasedDict
 
@@ -38,7 +39,7 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         self.artifact_df, self.trace_df, self.layer_mapping_df = project_reader.read_project()
         self.project_reader = project_reader
         self.filter_unlinked_artifacts = filter_unlinked_artifacts
-        self._add_optional_column(self.trace_df, StructureKeys.Trace.LABEL, 1)
+        self.trace_df = DataFrameUtil.add_optional_column(self.trace_df, StructureKeys.Trace.LABEL, 1)
         ReflectionUtil.set_attributes(self, self.project_reader.get_overrides())
 
     def create(self) -> TraceDataset:
@@ -137,8 +138,8 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         def filter_unlinked_trace(row: pd.Series):
             return row[StructureKeys.Trace.SOURCE] in artifact_ids and row[StructureKeys.Trace.TARGET] in artifact_ids
 
-        self.artifact_df = TraceDatasetCreator._filter_df(self.artifact_df, filter_unlinked_artifact)
-        self.trace_df = TraceDatasetCreator._filter_df(self.trace_df, filter_unlinked_trace)
+        self.artifact_df = DataFrameUtil.filter_df(self.artifact_df, filter_unlinked_artifact)
+        self.trace_df = DataFrameUtil.filter_df(self.trace_df, filter_unlinked_trace)
 
     @staticmethod
     def _generate_negative_links(layer_mapping_df: pd.DataFrame, artifact_map: ArtifactMap, trace_dataset: TraceDataset) -> None:
@@ -219,28 +220,6 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
             if is_true_link:
                 linked_artifact_ids.update({source_id, target_id})
         return linked_artifact_ids
-
-    @staticmethod
-    def _add_optional_column(df: pd.DataFrame, col_name: str, default_value: Any) -> None:
-        """
-        Adds default value to column if not found in data frame.
-        :param df: The data frame to modifiy.
-        :param col_name: The name of the column to verify or add.
-        :param default_value: The value of the column if creating new one.
-        :return: None
-        """
-        if col_name not in df.columns:
-            df[col_name] = [default_value] * len(df)
-
-    @staticmethod
-    def _filter_df(df: pd.DataFrame, filter_lambda: Callable[[pd.Series], bool]) -> pd.DataFrame:
-        """
-        Returns DataFrame containing rows returning true in filter.
-        :param df: The original DataFrame.
-        :param filter_lambda: The lambda determining which rows to keep.
-        :return: DataFrame containing filtered rows.
-        """
-        return df[df.apply(filter_lambda, axis=1)]
 
     @staticmethod
     def _set_index(df: pd.DataFrame, col_name: str) -> pd.DataFrame:

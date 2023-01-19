@@ -42,7 +42,7 @@ class TestGanTrainJob(BaseJobTest):
         trainer_dataset_manager = ObjectCreator.create(TrainerDatasetManager, override=True, **{
             "pre_train_dataset_creator": ObjectCreator.pretrain_dataset_definition,
             "train_dataset_creator": {
-                TypedDefinitionVariable.OBJECT_TYPE_KEY: "CLASSIC_TRACE",
+                TypedDefinitionVariable.OBJECT_TYPE_KEY: "TRACE",
                 **ObjectCreator.dataset_creator_definition
             },
         })

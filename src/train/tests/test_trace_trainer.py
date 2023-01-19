@@ -100,7 +100,7 @@ class TestTraceTrainer(BaseTraceTest):
     def get_dataset_container():
         return ObjectCreator.create(TrainerDatasetManager, **{
             "eval_dataset_creator": {
-                TypedDefinitionVariable.OBJECT_TYPE_KEY: "CLASSIC_TRACE",
+                TypedDefinitionVariable.OBJECT_TYPE_KEY: "TRACE",
                 **ObjectCreator.dataset_creator_definition
             },
             "val_dataset_creator": {

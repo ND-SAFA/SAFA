@@ -14,8 +14,8 @@ class ApiTestProject(AbstractTestProject):
     Contains entries for classic trace project.
     """
 
-    @overrides(AbstractTestProject)
-    def get_project_path(self) -> str:
+    @staticmethod
+    def get_project_path() -> str:
         """
         :return: Throws eror because api project does not have path.
         """

@@ -12,5 +12,5 @@ class SupportedDatasetReader(Enum):
     REPOSITORY = RepositoryProjectReader
     CSV = CsvProjectReader
     SAFA = StructuredProjectReader
-    CLASSIC_TRACE = ApiProjectReader
+    API = ApiProjectReader
     MLM_PRETRAIN = PreTrainProjectReader

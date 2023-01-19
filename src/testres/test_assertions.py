@@ -3,9 +3,9 @@ from unittest import TestCase
 
 import pandas as pd
 
-from data.datasets.keys.structure_keys import StructureKeys
 from jobs.components.job_result import JobResult
 from testres.test_data_manager import TestDataManager
+from testres.testprojects.api_test_project import ApiTestProject
 
 
 class TestAssertions:
@@ -19,7 +19,7 @@ class TestAssertions:
             test_case.fail(cls._KEY_ERROR_MESSAGE.format(JobResult.PREDICTIONS, output))
         predictions = output[JobResult.PREDICTIONS]
         all_links = TestDataManager.get_all_links()
-        test_case.assertEquals(len(predictions), len(all_links), cls._LEN_ERROR.format(JobResult.PREDICTIONS))
+        test_case.assertEquals(len(predictions), ApiTestProject.get_n_links(), cls._LEN_ERROR.format(JobResult.PREDICTIONS))
         expected_links = {link for link in all_links}
         predicted_links = set()
         for link_dict in output[JobResult.PREDICTIONS]:
@@ -50,18 +50,18 @@ class TestAssertions:
             test_case.assertIn(key, output_dict)
 
     @staticmethod
-    def assert_lists_have_the_same_vals(test_case: TestCase, list1, list2):
+    def assert_lists_have_the_same_vals(test_case: TestCase, list1, list2) -> None:
+        """
+        Tests that list items are identical in both lists.
+        :param test_case: The test to use for assertions.
+        :param list1: One of the lists to compare.
+        :param list2: The other list to compare.
+        :return: None
+        """
         diff1 = set(list1).difference(list2)
         diff2 = set(list2).difference(list1)
         test_case.assertEquals(len(diff1), 0)
         test_case.assertEquals(len(diff2), 0)
-
-    @staticmethod
-    def assert_file_definitions_have_files(test_case: TestCase,
-                                           artifact_definitions: Dict,
-                                           expected_artifact_files: List[str]):
-        artifact_files = [artifact_def[StructureKeys.PATH] for artifact_def in artifact_definitions.values()]
-        TestAssertions.assert_lists_have_the_same_vals(test_case, artifact_files, expected_artifact_files)
 
     @staticmethod
     def verify_entities_in_df(test_case: TestCase, expected_entities: List[Dict], entity_df: pd.DataFrame, **kwargs) -> None:

@@ -31,7 +31,7 @@ export const applyTIMLabels: LayoutHook = (cy: CytoCore): void => {
 export const applyArtifactLabels: LayoutHook = (cy: CytoCore): void => {
   if (ARTIFACT_LABEL_APPLIED) return;
 
-  cy.nodeHtmlLabel([artifactHtml]);
+  cy.nodeHtmlLabel([artifactHtml, timNodeHtml]);
 
   ARTIFACT_LABEL_APPLIED = true;
 };

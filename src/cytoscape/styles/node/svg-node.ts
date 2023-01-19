@@ -1,5 +1,5 @@
 import {
-  ArtifactData,
+  ArtifactCytoElementData,
   ReservedArtifactType,
   SvgNodeStyle,
   SvgStyle,
@@ -20,7 +20,7 @@ import { getBody, sanitizeText } from "./node-helper";
  * @return stringified SVG for the node.
  */
 export function svgNode(
-  data: ArtifactData,
+  data: ArtifactCytoElementData,
   style: SvgNodeStyle,
   svgShape: string
 ): string {
@@ -120,7 +120,7 @@ export function svgDiv(style: Omit<SvgStyle, "height">): string {
  * @return stringified SVG for the node.
  */
 function svgBody(
-  data: ArtifactData,
+  data: ArtifactCytoElementData,
   truncateLength: number,
   style: SvgStyle
 ): string {

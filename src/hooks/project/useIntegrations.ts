@@ -3,6 +3,7 @@ import { defineStore } from "pinia";
 import {
   GitHubOrganizationSchema,
   GitHubProjectSchema,
+  InstallationSchema,
   JiraOrganizationSchema,
   JiraProjectSchema,
 } from "@/types";
@@ -13,6 +14,10 @@ import { pinia } from "@/plugins";
  */
 export const useIntegrations = defineStore("integrations", {
   state: () => ({
+    /**
+     * The 3rd party installations linked to the current project.
+     */
+    installations: [] as InstallationSchema[],
     /**
      * Whether this user is connected to Jira.
      */

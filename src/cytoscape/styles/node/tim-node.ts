@@ -1,4 +1,4 @@
-import { TimNodeData } from "@/types";
+import { TimNodeCytoElementData } from "@/types";
 import { ThemeColors } from "@/util";
 import { TIM_NODE_HEIGHT, TIM_NODE_WIDTH } from "@/cytoscape/styles/config";
 import { svgRect } from "./node-shapes";
@@ -11,7 +11,7 @@ import { svgDiv, svgTitle } from "./svg-node";
  *
  * @return stringified SVG for the node.
  */
-export function svgTIM(data: TimNodeData): string {
+export function svgTIM(data: TimNodeCytoElementData): string {
   const x = 10;
   const y = 10;
   const color = ThemeColors.darkGrey;

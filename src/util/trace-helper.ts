@@ -1,7 +1,7 @@
 import {
   allowedSafetyCaseTypes,
   ApprovalType,
-  ArtifactData,
+  ArtifactCytoElementData,
   ArtifactSchema,
   ArtifactTypeDirections,
   LinkSchema,
@@ -59,8 +59,8 @@ export function matchTrace(
  * @return Whether the link is allowed.
  */
 export function isLinkAllowedByType(
-  source: ArtifactSchema | ArtifactData,
-  target: ArtifactSchema | ArtifactData,
+  source: ArtifactSchema | ArtifactCytoElementData,
+  target: ArtifactSchema | ArtifactCytoElementData,
   artifactTypeDirections: ArtifactTypeDirections
 ): boolean {
   const sourceType =

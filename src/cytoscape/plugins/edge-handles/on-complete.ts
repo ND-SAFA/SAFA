@@ -1,6 +1,6 @@
 import { CollectionReturnValue, EventObject, NodeSingular } from "cytoscape";
 
-import { ArtifactData, CytoCore } from "@/types";
+import { ArtifactCytoElementData, CytoCore } from "@/types";
 import { handleCreateLink } from "@/api";
 import { disableDrawMode } from "@/cytoscape";
 
@@ -20,8 +20,8 @@ export function onArtifactTreeEdgeComplete(
   targetNode: NodeSingular,
   addedEdge: CollectionReturnValue
 ): void {
-  const sourceData: ArtifactData = sourceNode.data();
-  const targetData: ArtifactData = targetNode.data();
+  const sourceData: ArtifactCytoElementData = sourceNode.data();
+  const targetData: ArtifactCytoElementData = targetNode.data();
 
   disableDrawMode();
 

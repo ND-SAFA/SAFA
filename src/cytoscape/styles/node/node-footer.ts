@@ -1,4 +1,4 @@
-import { ArtifactData, SvgStyle } from "@/types";
+import { ArtifactCytoElementData, SvgStyle } from "@/types";
 import { getBackgroundColor, getBorderColor, ThemeColors } from "@/util";
 import { ARTIFACT_BORDER_WIDTH, ARTIFACT_CHILDREN_HEIGHT } from "@/cytoscape";
 import { svgIcon, svgText } from "./svg-text";
@@ -14,7 +14,7 @@ import { getWarnings } from "./node-helper";
  * @return stringified SVG for the node.
  */
 export function svgFooter(
-  data: ArtifactData,
+  data: ArtifactCytoElementData,
   outerStyle: Pick<SvgStyle, "width" | "height">
 ): string {
   const baseY = outerStyle.height + 4;

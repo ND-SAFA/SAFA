@@ -1,5 +1,5 @@
 import { NodeSingular } from "cytoscape";
-import { ArtifactData } from "@/types";
+import { ArtifactCytoElementData } from "@/types";
 import { traceStore } from "@/hooks";
 
 /**
@@ -13,8 +13,8 @@ export function canConnect(
   sourceNode: NodeSingular,
   targetNode: NodeSingular
 ): boolean {
-  const sourceData: ArtifactData | undefined = sourceNode.data();
-  const targetData: ArtifactData | undefined = targetNode.data();
+  const sourceData: ArtifactCytoElementData | undefined = sourceNode.data();
+  const targetData: ArtifactCytoElementData | undefined = targetNode.data();
 
   if (!sourceData || !targetData) return false;
 

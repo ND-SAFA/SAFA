@@ -8,7 +8,7 @@ import {
   DEFAULT_ARTIFACT_TREE_ZOOM,
   MOTION_BLUE_OPACITY,
   USE_MOTION_BLUR,
-  TimStyleSheets,
+  TimStyle,
 } from "@/cytoscape/styles";
 
 /**
@@ -17,7 +17,7 @@ import {
 export const timGraph: CytoCoreGraph = {
   name: "tim-tree-graph",
   config: {
-    style: TimStyleSheets,
+    style: TimStyle,
     motionBlur: USE_MOTION_BLUR,
     motionBlurOpacity: MOTION_BLUE_OPACITY,
     zoom: DEFAULT_ARTIFACT_TREE_ZOOM,

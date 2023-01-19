@@ -6,7 +6,7 @@
 import Vue, { PropType } from "vue";
 import {
   ArtifactSchema,
-  ArtifactCytoCoreElement,
+  ArtifactCytoElement,
   ArtifactDeltaState,
   GraphMode,
   GraphElementType,
@@ -18,10 +18,13 @@ import {
   selectionStore,
 } from "@/hooks";
 
+/**
+ * Renders an artifact node within the graph.
+ */
 export default Vue.extend({
   name: "ArtifactNode",
   props: {
-    artifactDefinition: {
+    artifact: {
       type: Object as PropType<ArtifactSchema>,
       required: true,
     },
@@ -33,27 +36,19 @@ export default Vue.extend({
      * @return Whether the current artifact is selected.
      */
     isSelected(): boolean {
-      return selectionStore.isArtifactInSelected(this.artifactDefinition.id);
+      return selectionStore.isArtifactInSelected(this.artifact.id);
     },
     /**
      * @return The delta state of this artifact.
      */
     artifactDeltaState(): ArtifactDeltaState {
-      if (!deltaStore.inDeltaView) {
-        return ArtifactDeltaState.NO_CHANGE;
-      }
-
-      return (
-        deltaStore.getArtifactDeltaType(this.artifactDefinition.id) ||
-        ArtifactDeltaState.NO_CHANGE
-      );
+      return deltaStore.getArtifactDeltaType(this.artifact.id);
     },
     /**
      * @return The cytoscape definition of this artifact.
      */
-    definition(): ArtifactCytoCoreElement {
-      const { id, body, type, name, safetyCaseType, logicType } =
-        this.artifactDefinition;
+    definition(): ArtifactCytoElement {
+      const { id, body, type, name, safetyCaseType, logicType } = this.artifact;
       const warnings = warningStore.artifactWarnings[id] || [];
       const hiddenChildren = subtreeStore.getHiddenChildren(id);
       const hiddenChildWarnings =

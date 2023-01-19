@@ -5,27 +5,39 @@
     :class="className"
     data-cy="view-artifact-tree"
   >
-    <template v-slot:elements>
+    <template v-slot:elements v-if="isTreeMode">
       <artifact-node
         v-for="artifact in artifacts"
         :key="artifact.id"
-        :artifact-definition="artifact"
+        :artifact="artifact"
         :hidden="isArtifactHidden(artifact.id)"
         :faded="isArtifactFaded(artifact.id)"
       />
-      <graph-link
+      <trace-link
         v-for="traceLink in traceLinks"
         :key="traceLink.traceLinkId"
-        :trace-definition="traceLink"
+        :trace="traceLink"
         :faded="isTraceLinkFaded(traceLink)"
-        @click:right="handleLinkRightClick"
-        graph="artifact"
       />
-      <graph-link
+      <trace-link
         v-for="traceLink in subtreeLinks"
         :key="traceLink.traceLinkId"
-        :trace-definition="traceLink"
-        graph="artifact"
+        :trace="traceLink"
+      />
+    </template>
+    <template v-slot:elements v-else>
+      <tim-node
+        v-for="level in tim.artifacts"
+        :key="level.artifactType"
+        :count="level.count"
+        :artifact-type="level.artifactType"
+      />
+      <tim-link
+        v-for="matrix in tim.traces"
+        :key="matrix.source + matrix.target"
+        :count="matrix.count"
+        :target="matrix.target"
+        :source="matrix.source"
       />
     </template>
   </cytoscape-controller>
@@ -34,7 +46,12 @@
 <script lang="ts">
 import Vue from "vue";
 import { Route } from "vue-router";
-import { TraceLinkSchema, ArtifactSchema, CytoCoreGraph } from "@/types";
+import {
+  TraceLinkSchema,
+  ArtifactSchema,
+  CytoCoreGraph,
+  TimStructure,
+} from "@/types";
 import {
   appStore,
   artifactStore,
@@ -43,18 +60,26 @@ import {
   subtreeStore,
   selectionStore,
   layoutStore,
+  projectStore,
 } from "@/hooks";
 import { Routes } from "@/router";
 import { artifactTreeGraph, cyResetTree } from "@/cytoscape";
-import { GraphLink, CytoscapeController } from "@/components/common";
-import ArtifactNode from "./ArtifactNode.vue";
+import CytoscapeController from "./CytoscapeController.vue";
+import { ArtifactNode, TraceLink } from "./tree";
+import { TimNode, TimLink } from "./tim";
 
+/**
+ * Renders a tree of project data.
+ * Will either render the TIM tree, or artifacts and trace links, depending on the graph mode.
+ */
 export default Vue.extend({
-  name: "ArtifactTree",
+  name: "ProjectTree",
   components: {
-    ArtifactNode,
-    GraphLink,
     CytoscapeController,
+    ArtifactNode,
+    TraceLink,
+    TimNode,
+    TimLink,
   },
   data() {
     return {
@@ -67,6 +92,12 @@ export default Vue.extend({
      */
     isInView(): boolean {
       return !layoutStore.isTableMode;
+    },
+    /**
+     * @return Whether the tree is in tree mode, rather than TIM mode.
+     */
+    isTreeMode(): boolean {
+      return layoutStore.isTreeMode;
     },
     /**
      * @return The class name for the artifact tree.
@@ -103,7 +134,7 @@ export default Vue.extend({
     /**
      * @return All subtree trace links.
      */
-    subtreeLinks() {
+    subtreeLinks(): TraceLinkSchema[] {
       return subtreeStore.subtreeLinks;
     },
     /**
@@ -117,6 +148,12 @@ export default Vue.extend({
      */
     hiddenSubtreeIds(): string[] {
       return subtreeStore.hiddenSubtreeNodes;
+    },
+    /**
+     * @return The TIM structure of this project.
+     */
+    tim(): TimStructure {
+      return projectStore.tim;
     },
   },
   mounted() {
@@ -176,13 +213,6 @@ export default Vue.extend({
         !this.artifactsInView.includes(link.targetId) ||
         !this.artifactsInView.includes(link.sourceId)
       );
-    },
-    /**
-     * Selects a clicked trace link and opens the link modal.
-     * @param traceLink - The trace link to select.
-     */
-    handleLinkRightClick(traceLink: TraceLinkSchema): void {
-      selectionStore.selectTraceLink(traceLink);
     },
   },
 });

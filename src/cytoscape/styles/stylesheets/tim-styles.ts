@@ -17,7 +17,7 @@ import {
 export const TIM_NODE_SELECTOR = `node[graph='${GraphMode.tim}']`;
 export const TIM_EDGE_SELECTOR = `edge[graph='${GraphMode.tim}']`;
 
-export const TimStyleSheets: (Stylesheet | CytoStyleSheet)[] = [
+export const TimStyle: (Stylesheet | CytoStyleSheet)[] = [
   // Edges
   {
     selector: TIM_EDGE_SELECTOR,

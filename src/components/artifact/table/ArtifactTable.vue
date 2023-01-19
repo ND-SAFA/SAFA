@@ -60,7 +60,10 @@
         v-slot:[`item.${attribute.key}`]="{ item }"
       >
         <td :key="attribute.key" class="v-data-table__divider">
-          <attribute-display :attribute="attribute" :model="item.attributes" />
+          <attribute-display
+            :attribute="attribute"
+            :model="item.attributes || {}"
+          />
         </td>
       </template>
 

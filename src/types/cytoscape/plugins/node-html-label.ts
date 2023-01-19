@@ -1,4 +1,4 @@
-import { CytoCoreElementData } from "@/types";
+import { CytoElementData } from "@/types";
 
 /**
  * Defines horizontal alignment options.
@@ -13,14 +13,12 @@ type VerticalAlignment = "center" | "top" | "bottom";
 /**
  * Returns the html in string for the given artifact.
  */
-type HtmlDefinitionFunction<T extends CytoCoreElementData> = (
-  data: T
-) => string;
+type HtmlDefinitionFunction<T extends CytoElementData> = (data: T) => string;
 
 /**
  * Defines an html node.
  */
-export interface HtmlDefinition<T extends CytoCoreElementData> {
+export interface HtmlDefinition<T extends CytoElementData> {
   /**
    * The cytoscape query selector.
    * `cytoscape que./cytoscape-stylesheets`

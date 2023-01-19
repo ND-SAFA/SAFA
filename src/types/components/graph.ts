@@ -29,7 +29,7 @@ export enum GraphElementType {
  * The required properties for defining an element (e.g. node or edge)
  * in cytoscape.
  */
-export interface CytoCoreElementDefinition<Data = CytoCoreElementData> {
+export interface CytoElement<Data = CytoElementData> {
   /**
    * The data for the graph node or link.
    */
@@ -48,7 +48,7 @@ export interface CytoCoreElementDefinition<Data = CytoCoreElementData> {
  * Required properties for defining the data that is held within each
  * cytoscape element.
  */
-export interface CytoCoreElementData {
+export interface CytoElementData {
   /**
    * A unique identifier for the element with cytoscape instance.
    */
@@ -68,9 +68,23 @@ export interface CytoCoreElementData {
 }
 
 /**
+ * Required properties for defining a cytoscape edge.
+ */
+export interface CytoEdgeData extends CytoElementData {
+  /**
+   * The cytoscape element id to point from.
+   */
+  source: string;
+  /**
+   * The cytoscape element id to point toward.
+   */
+  target: string;
+}
+
+/**
  * Defines an artifact's data in cytoscape.
  */
-export interface ArtifactData extends CytoCoreElementData {
+export interface ArtifactCytoElementData extends CytoElementData {
   /**
    * The id of the artifact.
    */
@@ -134,8 +148,8 @@ export interface ArtifactData extends CytoCoreElementData {
 /**
  * Defines an artifact element.
  */
-export interface ArtifactCytoCoreElement
-  extends CytoCoreElementDefinition<ArtifactData> {
+export interface ArtifactCytoElement
+  extends CytoElement<ArtifactCytoElementData> {
   /**
    * The artifact's position in the graph
    */
@@ -145,25 +159,13 @@ export interface ArtifactCytoCoreElement
 /**
  * Defines a trace link's data in cytoscape.
  */
-export interface TraceData
-  extends CytoCoreElementData,
+export interface TraceCytoElementData
+  extends CytoEdgeData,
     Pick<TraceLinkSchema, "traceType" | "approvalStatus"> {
-  /**
-   * The cytoscape element id to point from.
-   */
-  source: string;
-  /**
-   * The cytoscape element id to point toward.
-   */
-  target: string;
   /**
    * The state of changes to the trace link.
    */
   deltaType: ArtifactDeltaState;
-  /**
-   * The count to display on the trace link.
-   */
-  count?: number;
   /**
    * Whether to fade this trace link.
    */
@@ -173,42 +175,51 @@ export interface TraceData
 /**
  * Defines a trace link element.
  */
-export type TraceCytoCoreElement = CytoCoreElementDefinition<TraceData>;
+export type TraceCytoElement = CytoElement<TraceCytoElementData>;
 
 /**
  * Defines a tim node's data in cytoscape.
  */
-export interface TimNodeData extends CytoCoreElementData {
+export interface TimNodeCytoElementData extends CytoElementData {
+  /**
+   * The type of the artifact.
+   */
+  artifactType: string;
   /**
    * The number of artifacts of this artifact type.
    */
   count: number;
+
+  /**
+   * Whether the app is running in dark mode.
+   */
+  dark: boolean;
 }
 
 /**
  * Defines a tim node in cytoscape.
  */
-export type TimNodeDefinition = CytoCoreElementDefinition<TimNodeData>;
+export type TimNodeCytoElement = CytoElement<TimNodeCytoElementData>;
 
 /**
  * Defines a tim edge's data in cytoscape.
  */
-export interface TimEdgeData extends CytoCoreElementData {
+export interface TimEdgeCytoElementData extends CytoEdgeData {
   /**
    * The number of links between these artifact layers.
    */
   count: number;
-  /**
-   * The artifact type that this matrix goes from.
-   */
-  sourceType: string;
-  /**
-   * The artifact type that this matrix goes to.
-   */
-  targetType: string;
 }
 
 /**
  * Defines a tim edge in cytoscape.
  */
-export type TimEdgeDefinition = CytoCoreElementDefinition<TimEdgeData>;
+export type TimEdgeCytoElement = CytoElement<TimEdgeCytoElementData>;
+
+/**
+ * Defines the structure of a TIM graph.
+ */
+export interface TimStructure {
+  artifacts: Pick<TimNodeCytoElementData, "artifactType" | "count">[];
+  traces: Pick<TimEdgeCytoElementData, "source" | "target" | "count">[];
+}

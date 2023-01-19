@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 
 import {
   ApprovalType,
-  ArtifactData,
+  ArtifactCytoElementData,
   ArtifactSchema,
   DocumentTraces,
   TraceLinkSchema,
@@ -180,8 +180,8 @@ export const useTraces = defineStore("traces", {
      * @return Whether a link can be created, or a reason why it cant.
      */
     isLinkAllowed(
-      source: ArtifactSchema | ArtifactData,
-      target: ArtifactSchema | ArtifactData
+      source: ArtifactSchema | ArtifactCytoElementData,
+      target: ArtifactSchema | ArtifactCytoElementData
     ): string | boolean {
       if (source.id === target.id) {
         return "An artifact cannot link to itself.";

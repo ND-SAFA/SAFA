@@ -1,4 +1,8 @@
-import { ArtifactData, HtmlDefinition, TimNodeData } from "@/types";
+import {
+  ArtifactCytoElementData,
+  HtmlDefinition,
+  TimNodeCytoElementData,
+} from "@/types";
 import {
   ARTIFACT_NODE_SELECTOR,
   TIM_NODE_SELECTOR,
@@ -11,13 +15,13 @@ import { htmlFTA } from "./fta-node";
 /**
  * Defines tim node html.
  */
-export const timNodeHtml: HtmlDefinition<TimNodeData> = {
+export const timNodeHtml: HtmlDefinition<TimNodeCytoElementData> = {
   query: TIM_NODE_SELECTOR,
   halign: "center",
   valign: "center",
   halignBox: "center",
   valignBox: "center",
-  tpl(data?: TimNodeData) {
+  tpl(data?: TimNodeCytoElementData) {
     if (!data) return "";
 
     return svgTIM(data);
@@ -27,13 +31,13 @@ export const timNodeHtml: HtmlDefinition<TimNodeData> = {
 /**
  * Renders artifact html.
  */
-export const artifactHtml: HtmlDefinition<ArtifactData> = {
+export const artifactHtml: HtmlDefinition<ArtifactCytoElementData> = {
   query: ARTIFACT_NODE_SELECTOR,
   halign: "center",
   valign: "center",
   halignBox: "center",
   valignBox: "center",
-  tpl(data?: ArtifactData) {
+  tpl(data?: ArtifactCytoElementData) {
     if (!data?.artifactType) return "";
 
     if (data.logicType) {

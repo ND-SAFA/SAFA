@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 
 import {
-  ArtifactData,
+  ArtifactCytoElementData,
   ArtifactSchema,
   ArtifactTypeDirections,
   ArtifactTypeSchema,
@@ -169,8 +169,8 @@ export const useTypeOptions = defineStore("typeOptions", {
      * @return Whether the link is allowed.
      */
     isLinkAllowedByType(
-      source: ArtifactSchema | ArtifactData,
-      target: ArtifactSchema | ArtifactData
+      source: ArtifactSchema | ArtifactCytoElementData,
+      target: ArtifactSchema | ArtifactCytoElementData
     ): boolean {
       return isLinkAllowedByType(source, target, this.artifactTypeDirections);
     },

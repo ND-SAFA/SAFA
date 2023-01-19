@@ -39,7 +39,7 @@ export function handleLoadInstallations({
 }: IOHandlerCallback): void {
   getProjectInstallations(projectStore.projectId)
     .then((installations) => {
-      projectStore.installations = installations;
+      integrationsStore.installations = installations;
       onSuccess?.();
     })
     .catch(onError)

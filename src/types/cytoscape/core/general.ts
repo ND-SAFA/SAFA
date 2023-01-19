@@ -1,5 +1,5 @@
 import { Core, EventObject, LayoutOptions, Layouts } from "cytoscape";
-import { ArtifactData, TimNodeData } from "@/types";
+import { ArtifactCytoElementData, TimNodeCytoElementData } from "@/types";
 import {
   AutoMoveOptions,
   AutoMoveRule,
@@ -15,8 +15,8 @@ import {
  * The HtmlDefinitions used with in the application.
  */
 type AppHtmlDefinitions = (
-  | HtmlDefinition<ArtifactData>
-  | HtmlDefinition<TimNodeData>
+  | HtmlDefinition<ArtifactCytoElementData>
+  | HtmlDefinition<TimNodeCytoElementData>
 )[];
 
 /**

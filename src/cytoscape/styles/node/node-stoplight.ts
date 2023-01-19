@@ -1,5 +1,5 @@
 import {
-  ArtifactData,
+  ArtifactCytoElementData,
   ArtifactDeltaState,
   NodeChildDelta,
   SvgStyle,
@@ -15,7 +15,7 @@ import { ThemeColors } from "@/util";
  * @return stringified SVG for the node.
  */
 export function svgStoplight(
-  data: ArtifactData,
+  data: ArtifactCytoElementData,
   style: Omit<SvgStyle, "height">
 ): string {
   const childDeltaStates = getChildDeltaStates(data);
@@ -44,7 +44,7 @@ export function svgStoplight(
  *
  * @return The child delta states to render.
  */
-function getChildDeltaStates(data: ArtifactData): NodeChildDelta[] {
+function getChildDeltaStates(data: ArtifactCytoElementData): NodeChildDelta[] {
   const { childDeltaStates = [] } = data;
 
   const toRender = [

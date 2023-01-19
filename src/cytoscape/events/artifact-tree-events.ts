@@ -1,18 +1,35 @@
 import { EventObject } from "cytoscape";
-import { ArtifactSchema, DetailsOpenState } from "@/types";
-import { appStore, layoutStore, selectionStore } from "@/hooks";
+import {
+  ArtifactCytoElementData,
+  DetailsOpenState,
+  GraphMode,
+  TraceCytoElementData,
+} from "@/types";
+import { appStore, layoutStore, selectionStore, traceStore } from "@/hooks";
 import { disableDrawMode } from "@/cytoscape";
 import { DefaultCytoEvents } from "@/cytoscape/events/cyto-events";
 import { CytoCore, CytoEvent, CytoEventHandlers } from "@/types/cytoscape/core";
-
-// const doubleClickDelayMs = 350;
-// let previousTapStamp = doubleClickDelayMs;
 
 /**
  * Handlers for mouse events on the artifact tree.
  */
 export const ArtifactTreeCytoEvents: CytoEventHandlers = {
   ...DefaultCytoEvents,
+  setInitialPosition: {
+    events: [CytoEvent.ADD],
+    action(cy: CytoCore, event: EventObject) {
+      const artifact = event.target.data() as ArtifactCytoElementData;
+
+      cy.nodes()
+        .filter((n) => n.data().id === artifact.id)
+        .layout(layoutStore.layoutOptions)
+        .run();
+
+      if (artifact.id === selectionStore.selectedArtifactId) {
+        selectionStore.selectArtifact(artifact.id);
+      }
+    },
+  },
   unselectArtifactOnBackgroundClick: {
     events: [CytoEvent.TAP],
     action(cy: CytoCore, event: EventObject) {
@@ -33,22 +50,9 @@ export const ArtifactTreeCytoEvents: CytoEventHandlers = {
   },
   select: {
     events: [CytoEvent.TAP],
-    selector: "node",
-    // action(cy: CytoCore, event: EventObject) {
-    //   const currentTimeStamp = event.timeStamp;
-    //   const artifact = event.target.data() as ArtifactModel;
-    //   const msFromLastTap = currentTimeStamp - previousTapStamp;
-    //
-    //   if (msFromLastTap === 0 || !artifact.id) return;
-    //
-    //   if (msFromLastTap < doubleClickDelayMs) {
-    //     selectionStore.toggleSelectArtifact(artifact.id);
-    //   }
-    //
-    //   previousTapStamp = currentTimeStamp;
-    // },
+    selector: `node[graph='${GraphMode.tree}']`,
     action(cy: CytoCore, event: EventObject) {
-      const artifact = event.target.data() as ArtifactSchema;
+      const artifact = event.target.data() as ArtifactCytoElementData;
 
       if (!artifact.id) return;
 
@@ -58,24 +62,22 @@ export const ArtifactTreeCytoEvents: CytoEventHandlers = {
   selectAll: {
     events: [CytoEvent.BOX_SELECT],
     action(cy: CytoCore, event: EventObject) {
-      const artifact = event.target.data() as ArtifactSchema;
+      const artifact = event.target.data() as ArtifactCytoElementData;
 
       selectionStore.addToSelectedGroup(artifact.id);
     },
   },
-  setInitialPosition: {
-    events: [CytoEvent.ADD],
+
+  selectEdge: {
+    events: [CytoEvent.TAP],
+    selector: `edge[graph='${GraphMode.tree}']`,
     action(cy: CytoCore, event: EventObject) {
-      const artifact = event.target.data() as ArtifactSchema;
+      const data = event.target.data() as TraceCytoElementData;
+      const trace = traceStore.getTraceLinkById(data.id);
 
-      cy.nodes()
-        .filter((n) => n.data().id === artifact.id)
-        .layout(layoutStore.layoutOptions)
-        .run();
+      if (!trace) return;
 
-      if (artifact.id === selectionStore.selectedArtifactId) {
-        selectionStore.selectArtifact(artifact.id);
-      }
+      selectionStore.selectTraceLink(trace);
     },
   },
 };

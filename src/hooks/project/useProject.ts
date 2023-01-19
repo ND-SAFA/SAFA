@@ -4,7 +4,7 @@ import {
   ProjectSchema,
   GenerationModelSchema,
   VersionSchema,
-  InstallationSchema,
+  TimStructure,
 } from "@/types";
 import { createProject } from "@/util";
 import { pinia } from "@/plugins";
@@ -32,9 +32,9 @@ export const useProject = defineStore("project", {
      */
     project: createProject(),
     /**
-     * The 3rd party installations linked to the current project.
+     * The TIM structure for the current project.
      */
-    installations: [] as InstallationSchema[],
+    tim: { artifacts: [], traces: [] } as TimStructure,
   }),
   getters: {
     /**
@@ -127,6 +127,52 @@ export const useProject = defineStore("project", {
       subtreeStore.initializeProject(project);
       attributesStore.initializeProject(project);
       warningStore.artifactWarnings = project.warnings;
+      this.initializeTim(project);
+    },
+    /**
+     * Initializes the current project's TIM structure.
+     */
+    initializeTim(project: ProjectSchema): void {
+      const delimiter = `~~~`;
+      const artifactCounts: Record<string, number> = {};
+      const artifactTypes: Record<string, string> = {};
+      const traceCounts: Record<string, number> = {};
+
+      project.artifacts.forEach(({ id, type }) => {
+        if (!artifactCounts[type]) {
+          artifactCounts[type] = 1;
+        } else {
+          artifactCounts[type] += 1;
+        }
+
+        artifactTypes[id] = type;
+      });
+
+      project.traces.forEach(({ sourceId, targetId }) => {
+        const type = `${artifactTypes[sourceId]}${delimiter}${artifactTypes[targetId]}`;
+
+        if (!traceCounts[type]) {
+          traceCounts[type] = 1;
+        } else {
+          traceCounts[type] += 1;
+        }
+      });
+
+      this.tim = {
+        artifacts: Object.entries(artifactCounts).map(
+          ([artifactType, count]) => ({
+            artifactType,
+            count,
+          })
+        ),
+        traces: Object.entries(traceCounts).map(
+          ([sourceAndTargetType, count]) => ({
+            source: sourceAndTargetType.split(delimiter)[0],
+            target: sourceAndTargetType.split(delimiter)[1],
+            count,
+          })
+        ),
+      };
     },
     /**
      * Runs the callback only if the project is defined. Otherwise logs a warning.

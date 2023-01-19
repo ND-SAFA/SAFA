@@ -12,9 +12,11 @@ import {
   setEdgeHandlesCore,
 } from "@/cytoscape/plugins";
 import {
+  CytoscapeStyle,
   DEFAULT_ARTIFACT_TREE_ZOOM,
-  GraphStyle,
+  EdgeHandlesStyle,
   MOTION_BLUE_OPACITY,
+  TimStyle,
   USE_MOTION_BLUR,
 } from "@/cytoscape/styles";
 
@@ -24,7 +26,7 @@ import {
 export const artifactTreeGraph: CytoCoreGraph = {
   name: "artifact-tree-graph",
   config: {
-    style: GraphStyle,
+    style: [...CytoscapeStyle, ...EdgeHandlesStyle, ...TimStyle],
     motionBlur: USE_MOTION_BLUR,
     motionBlurOpacity: MOTION_BLUE_OPACITY,
     zoom: DEFAULT_ARTIFACT_TREE_ZOOM,

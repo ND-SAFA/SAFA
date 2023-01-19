@@ -1,5 +1,7 @@
 import uuid
 from collections import Counter
+from copy import deepcopy
+from unittest import mock
 from unittest.mock import patch
 
 from data.datasets.data_key import DataKey
@@ -10,6 +12,7 @@ from data.processing.augmentation.resample_step import ResampleStep
 from data.processing.augmentation.simple_word_replacement_step import SimpleWordReplacementStep
 from data.processing.augmentation.source_target_swap_step import SourceTargetSwapStep
 from data.tree.trace_link import TraceLink
+from models.model_manager import ModelManager
 from models.model_properties import ModelArchitectureType
 from testres.base_trace_test import BaseTraceTest
 from testres.test_assertions import TestAssertions
@@ -198,7 +201,6 @@ class TestTraceDataset(BaseTraceTest):
             self.assertEquals(new_length, len(set(link_ids)))  # no duplicates
 
     def test_prepare_for_training(self):
-
         trace_dataset_aug = self.get_trace_dataset()
         data_augmenter = DataAugmenter([SimpleWordReplacementStep(1, 0.15)])
         trace_dataset_aug.prepare_for_training(data_augmenter)
@@ -232,3 +234,48 @@ class TestTraceDataset(BaseTraceTest):
         feature_info_prefix = TraceDataset._extract_feature_info(self.TEST_FEATURE, prefix)
         for feature_name in feature_info_prefix.keys():
             self.assertTrue(feature_name.startswith(prefix))
+
+    def test_get_links_for_balanced_batches(self):
+        dataset = self.get_trace_dataset()
+        batch_sizes = [i for i in range(2, 12)]
+        for batch_size in batch_sizes:
+            result = dataset.get_links_for_balanced_batches(batch_size=batch_size)
+            neg_link_ids = deepcopy(dataset.neg_link_ids)
+            pos_link_ids = deepcopy(dataset.pos_link_ids)
+            selected_link_ids = [link.id for link in result]
+            n_total_pos, n_total_neg = 0, 0
+            n_batch_pos, n_batch_neg = 0, 0
+            for i, link_id in enumerate(selected_link_ids):
+                if i % batch_size == 0:
+                    self.assertLessEqual(abs(n_batch_pos - n_batch_neg), 1)
+                    n_batch_pos, n_batch_neg = 0, 0
+                if link_id in neg_link_ids:
+                    neg_link_ids.remove(link_id)
+                    n_total_neg += 1
+                    n_batch_neg += 1
+                    continue
+                if link_id in pos_link_ids:
+                    pos_link_ids.remove(link_id)
+                    n_total_pos += 1
+                    n_batch_pos += 1
+                    continue
+                self.fail(f'Link {i}/{len(selected_link_ids)} was selected too many times')
+            self.assertEquals(0, len(pos_link_ids))  # use all pos links
+            self.assertLessEqual(abs(n_total_pos - n_total_neg), 1)
+
+    @patch.object(ModelManager, "get_tokenizer")
+    def test_to_trainer_dataset(self, get_tokenizer_mock: mock.MagicMock):
+        get_tokenizer_mock.return_value = self.get_test_tokenizer()
+        train_dataset = self.get_trace_dataset()
+        batch_size = 8
+        model_generator = ModelManager(**self.MODEL_MANAGER_PARAMS)
+        trainer_dataset = train_dataset.to_trainer_dataset(model_generator, batch_size_to_balance=batch_size)
+        self.assertTrue(isinstance(trainer_dataset[0], dict))
+        self.assertEquals(len(train_dataset.pos_link_ids) * 2, len(trainer_dataset))
+        labels = [link[DataKey.LABEL_KEY] for link in trainer_dataset]
+        start, end = 0, batch_size
+        while end < len(labels):
+            batch = labels[start:end]
+            self.assertEquals(sum(batch), len(batch) / 2)
+            start = end
+            end = end + batch_size

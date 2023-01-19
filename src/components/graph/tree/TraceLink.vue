@@ -51,6 +51,7 @@ export default Vue.extend({
           faded: this.faded,
           traceType,
           approvalStatus,
+          dark: this.$vuetify.theme.dark,
         },
         classes: sourceId === targetId ? ["loop"] : [],
       };

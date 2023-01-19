@@ -45,3 +45,4 @@ export const TIM_EDGE_ARROW_SHAPE = "chevron";
 export const TIM_EDGE_X_MARGIN = 10;
 export const TIM_EDGE_FONT_WEIGHT = 600;
 export const TIM_EDGE_FONT_SIZE = 20;
+export const TIM_EDGE_LOOP_STEP_SIZE = 140;

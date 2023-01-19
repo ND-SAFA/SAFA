@@ -16,7 +16,7 @@ export function svgTIM(data: TimNodeCytoElementData): string {
   const y = 10;
   const borderColor = getBorderColor();
   const bgColor = getBackgroundColor("", data.dark);
-  const count = data.count == 1 ? "1 Node" : `${data.count} Nodes`;
+  const count = data.count == 1 ? "1 Artifact" : `${data.count} Artifacts`;
 
   return `
     <svg

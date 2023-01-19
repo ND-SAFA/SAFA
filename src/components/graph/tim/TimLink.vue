@@ -40,6 +40,8 @@ export default Vue.extend({
           source: this.target,
           target: this.source,
           count: this.count,
+          label: this.count === 1 ? `1 Link` : `${this.count} Links`,
+          dark: this.$vuetify.theme.dark,
         },
         classes: this.source === this.target ? ["loop"] : [],
       };

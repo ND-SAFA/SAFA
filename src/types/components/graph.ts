@@ -61,6 +61,11 @@ export interface CytoElementData {
    * The type of graph for this node.
    */
   graph: GraphMode.tree | GraphMode.tim;
+
+  /**
+   * Whether the app is running in dark mode.
+   */
+  dark: boolean;
   /**
    * The cytoscape label placed within nodes and besides edges.
    */
@@ -138,11 +143,6 @@ export interface ArtifactCytoElementData extends CytoElementData {
    * Any warnings in child elements.
    */
   childWarnings?: WarningSchema[];
-
-  /**
-   * Whether the app is running in dark mode.
-   */
-  dark: boolean;
 }
 
 /**
@@ -189,11 +189,6 @@ export interface TimNodeCytoElementData extends CytoElementData {
    * The number of artifacts of this artifact type.
    */
   count: number;
-
-  /**
-   * Whether the app is running in dark mode.
-   */
-  dark: boolean;
 }
 
 /**

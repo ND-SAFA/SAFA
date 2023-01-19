@@ -16,6 +16,8 @@ import {
   TRACE_LINE_STYLE,
   TIM_EDGE_FONT_WEIGHT,
   TIM_EDGE_FONT_SIZE,
+  TIM_EDGE_LOOP_STEP_SIZE,
+  NODE_BG_COLOR,
 } from "@/cytoscape/styles/config";
 
 export const edgeStyles: CytoStyleSheet[] = [
@@ -153,13 +155,26 @@ export const edgeStyles: CytoStyleSheet[] = [
       "line-color": EDGE_COLOR.DEFAULT,
       "font-weight": TIM_EDGE_FONT_WEIGHT,
       "font-size": TIM_EDGE_FONT_SIZE,
-      label: "data(count)",
+      "text-background-opacity": 0.5,
+      "text-background-color": NODE_BG_COLOR.LIGHT,
+      label: "data(label)",
+    },
+  },
+  {
+    selector: `${TIM_EDGE_SELECTOR}[?dark]`,
+    style: {
+      "text-background-color": NODE_BG_COLOR.DARK,
+      color: NODE_BG_COLOR.LIGHT,
     },
   },
   {
     selector: ".loop",
     style: {
-      "control-point-step-size": 120,
+      "control-point-step-size": TIM_EDGE_LOOP_STEP_SIZE,
+      "loop-direction": "60deg",
+      "loop-sweep": "-60deg",
+      "target-endpoint": "outside-to-line",
+      "source-endpoint": "outside-to-line",
     },
   },
 ];

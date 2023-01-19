@@ -83,7 +83,7 @@ class AbstractJob(threading.Thread, BaseObject):
         if output_dir is None:
             output_dir = self.job_args.output_dir
         output_path = os.path.join(output_dir, str(self.id))
-        FileUtil.make_dir_safe(output_path)
+        FileUtil.create_dir_safely(output_path)
         return os.path.join(output_path, AbstractJob.OUTPUT_FILENAME)
 
     @abstractmethod

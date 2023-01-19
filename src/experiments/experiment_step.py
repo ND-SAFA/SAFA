@@ -77,7 +77,7 @@ class ExperimentStep(BaseObject):
         :param output_dir: the directory to output results to
         :return: None
         """
-        FileUtil.make_dir_safe(output_dir)
+        FileUtil.create_dir_safely(output_dir)
         json_output = JsonUtil.dict_to_json(self.get_results())
         output_filepath = os.path.join(output_dir, ExperimentStep.OUTPUT_FILENAME)
         FileUtil.save_to_file(json_output, output_filepath)

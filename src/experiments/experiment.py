@@ -20,7 +20,7 @@ class Experiment(BaseObject):
         self.id = uuid.uuid4()
         self.steps = steps
         self.output_dir = output_dir
-        FileUtil.make_dir_safe(output_dir)
+        FileUtil.create_dir_safely(output_dir)
 
     def run(self):
         """

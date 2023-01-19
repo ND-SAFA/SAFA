@@ -3,6 +3,7 @@ from typing import Dict, Tuple
 
 from data.datasets.abstract_dataset import AbstractDataset
 from data.datasets.creators.abstract_dataset_creator import AbstractDatasetCreator
+from data.datasets.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
 from data.datasets.creators.readers.csv_project_reader import CsvProjectReader
 from data.datasets.creators.trace_dataset_creator import TraceDatasetCreator
 from data.datasets.dataset_role import DatasetRole
@@ -16,7 +17,7 @@ class DeterministicTrainerDatasetManager(TrainerDatasetManager):
 
     def __init__(self,
                  deterministic_id: str,
-                 pre_train_dataset_creator: AbstractDatasetCreator = None,
+                 pre_train_dataset_creator: MLMPreTrainDatasetCreator = None,
                  train_dataset_creator: AbstractDatasetCreator = None,
                  val_dataset_creator: AbstractDatasetCreator = None,
                  eval_dataset_creator: AbstractDatasetCreator = None,

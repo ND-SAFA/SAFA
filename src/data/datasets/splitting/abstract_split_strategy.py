@@ -61,10 +61,29 @@ class AbstractSplitStrategy(ABC):
         random_link_ids = first_split_link_ids if slice_num == 1 else second_split_link_ids
 
         if slice_num == 1:
-            split_links_ids = list(link_ids_for_first_split) + random_link_ids
+            slice_link_ids = list(link_ids_for_first_split) + random_link_ids
         else:
-            split_links_ids = random_link_ids if len(random_link_ids) > 0 else remaining_link_ids
-        slice_links = {
-            link_id: trace_dataset.links[link_id] for link_id in split_links_ids
-        }
-        return TraceDataset(slice_links)
+            slice_link_ids = random_link_ids if len(random_link_ids) > 0 else remaining_link_ids
+
+        return AbstractSplitStrategy.create_dataset_slice(trace_dataset, slice_link_ids)
+
+    @staticmethod
+    def create_dataset_slice(trace_dataset: TraceDataset, slice_link_ids: List[int]) -> TraceDataset:
+        """
+        Creates dataset slice from trace dataset.
+        :param trace_dataset: The dataset to extract slice from.
+        :param slice_link_ids: The trace link ids in slice.
+        :return: TraceDataset composed of links in split ids.
+        """
+        slice_pos_link_ids = []
+        slice_neg_link_ids = []
+        slice_links = {}
+        for link_id in slice_link_ids:
+            trace_link = trace_dataset.links[link_id]
+            if trace_link.is_true_link:
+                slice_pos_link_ids.append(trace_link.id)
+            else:
+                slice_neg_link_ids.append(trace_link.id)
+            slice_links[trace_link.id] = trace_link
+
+        return TraceDataset(slice_links, pos_link_ids=slice_pos_link_ids, neg_link_ids=slice_neg_link_ids)

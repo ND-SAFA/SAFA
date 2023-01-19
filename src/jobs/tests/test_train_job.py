@@ -6,6 +6,7 @@ from config.constants import VALIDATION_PERCENTAGE_DEFAULT
 from data.datasets.dataset_role import DatasetRole
 from data.datasets.managers.deterministic_trainer_dataset_manager import DeterministicTrainerDatasetManager
 from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
+from jobs.abstract_job import AbstractJob
 from jobs.components.job_args import JobArgs
 from jobs.tests.base_job_test import BaseJobTest
 from jobs.train_job import TrainJob
@@ -35,7 +36,7 @@ class TestTrainJob(BaseJobTest):
         job = self._get_job()
         self.assertTrue(job.trainer_dataset_manager[self.EXPECTED_SPLIT_ROLE] is not None)
 
-    def _assert_success(self, output_dict: dict):
+    def _assert_success(self, job: AbstractJob, output_dict: dict):
         TestAssertions.assert_training_output_matches_expected(self, output_dict)
 
     def test_initialize_with_deterministic_dataset_manager(self):

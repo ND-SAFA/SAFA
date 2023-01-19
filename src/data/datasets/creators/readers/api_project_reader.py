@@ -3,7 +3,7 @@ from typing import Dict, Tuple
 import pandas as pd
 
 from data.datasets.creators.readers.abstract_project_reader import AbstractProjectReader
-from data.datasets.keys.structure_keys import StructureKeys
+from data.datasets.keys.structure_keys import StructuredKeys
 from server.api.api_definition import ApiDefinition
 
 
@@ -33,21 +33,21 @@ class ApiProjectReader(AbstractProjectReader):
         links = self.api_definition["true_links"]  # TODO : need to rename back-end to thiss
 
         for i, (source_layer, target_layer) in enumerate(zip(source_layers, target_layers)):
-            source_layer_id = self.create_layer_id(StructureKeys.LayerMapping.SOURCE_TYPE, i)
-            target_layer_id = self.create_layer_id(StructureKeys.LayerMapping.TARGET_TYPE, i)
+            source_layer_id = self.create_layer_id(StructuredKeys.LayerMapping.SOURCE_TYPE, i)
+            target_layer_id = self.create_layer_id(StructuredKeys.LayerMapping.TARGET_TYPE, i)
             artifact_df = self.add_artifact_layer(source_layer, source_layer_id, artifact_df)
             artifact_df = self.add_artifact_layer(target_layer, target_layer_id, artifact_df)
-            artifact_df = artifact_df.sort_values([StructureKeys.Artifact.LAYER_ID, StructureKeys.Artifact.ID]).reset_index()
+            artifact_df = artifact_df.sort_values([StructuredKeys.Artifact.LAYER_ID, StructuredKeys.Artifact.ID]).reset_index()
             layer_mapping_df = layer_mapping_df.append({
-                StructureKeys.LayerMapping.SOURCE_TYPE: source_layer_id,
-                StructureKeys.LayerMapping.TARGET_TYPE: target_layer_id
+                StructuredKeys.LayerMapping.SOURCE_TYPE: source_layer_id,
+                StructuredKeys.LayerMapping.TARGET_TYPE: target_layer_id
             }, ignore_index=True)
 
         for source_id, target_id in links:
             trace_df = trace_df.append({
-                StructureKeys.Trace.SOURCE: source_id,
-                StructureKeys.Trace.TARGET: target_id,
-                StructureKeys.Trace.LABEL: 1
+                StructuredKeys.Trace.SOURCE: source_id,
+                StructuredKeys.Trace.TARGET: target_id,
+                StructuredKeys.Trace.LABEL: 1
             }, ignore_index=True)
 
         return artifact_df, trace_df, layer_mapping_df
@@ -63,9 +63,9 @@ class ApiProjectReader(AbstractProjectReader):
         """
         for t_id, t_body in artifact_layer.items():
             artifact_df = artifact_df.append({
-                StructureKeys.Artifact.ID: t_id,
-                StructureKeys.Artifact.BODY: t_body,
-                StructureKeys.Artifact.LAYER_ID: layer_id
+                StructuredKeys.Artifact.ID: t_id,
+                StructuredKeys.Artifact.BODY: t_body,
+                StructuredKeys.Artifact.LAYER_ID: layer_id
             }, ignore_index=True)
         return artifact_df
 

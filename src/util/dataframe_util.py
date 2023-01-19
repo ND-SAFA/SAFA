@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Any, Callable, Dict
 
 import numpy as np
 import pandas as pd
@@ -10,7 +10,7 @@ class DataFrameUtil:
     """
 
     @staticmethod
-    def rename_columns(df: pd.DataFrame, column_translation: Dict[str, str], drop_na=True) -> pd.DataFrame:
+    def rename_columns(df: pd.DataFrame, column_translation: Dict[str, str] = None, drop_na=True) -> pd.DataFrame:
         """
         Renames the columns of the data frame.
         :param df: The data frame whose columns should be renamed.
@@ -30,4 +30,28 @@ class DataFrameUtil:
 
         if drop_na:
             return df.dropna()
+        return df
+
+    @staticmethod
+    def filter_df(df: pd.DataFrame, filter_lambda: Callable[[pd.Series], bool]) -> pd.DataFrame:
+        """
+        Returns DataFrame containing rows returning true in filter.
+        :param df: The original DataFrame.
+        :param filter_lambda: The lambda determining which rows to keep.
+        :return: DataFrame containing filtered rows.
+        """
+        return df[df.apply(filter_lambda, axis=1)]
+
+    @staticmethod
+    def add_optional_column(df: pd.DataFrame, col_name: str, default_value: Any) -> pd.DataFrame:
+        """
+        Adds default value to column if not found in data frame.
+        :param df: The data frame to modify.
+        :param col_name: The name of the column to verify or add.
+        :param default_value: The value of the column if creating new one.
+        :return: None
+        """
+        df = df.copy()
+        if col_name not in df.columns:
+            df[col_name] = [default_value] * len(df)
         return df

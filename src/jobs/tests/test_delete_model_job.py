@@ -20,7 +20,7 @@ class TestDeleteModelJob(BaseJobTest):
         job = self.get_job()
         job.run()
         output_dict = self._load_job_output(job)
-        self.assert_output_on_success(output_dict)
+        self.assert_output_on_success(job, output_dict)
 
     def make_test_output_dir(self):
         if not os.path.exists(self.MODEL_DIR):
@@ -28,7 +28,7 @@ class TestDeleteModelJob(BaseJobTest):
         with open(os.path.join(self.MODEL_DIR, "test.txt"), "w") as test_file:
             test_file.write("This is a test.")
 
-    def _assert_success(self, output_dict: dict):
+    def _assert_success(self, job: DeleteModelJob, output_dict: dict):
         self.assertFalse(os.path.exists(self.MODEL_DIR))
 
     def _get_job(self):

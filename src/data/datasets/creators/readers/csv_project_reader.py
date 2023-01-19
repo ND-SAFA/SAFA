@@ -4,7 +4,7 @@ import pandas as pd
 
 from data.datasets.creators.readers.abstract_project_reader import AbstractProjectReader
 from data.datasets.keys.csv_format import CSVKeys
-from data.datasets.keys.structure_keys import StructureKeys
+from data.datasets.keys.structure_keys import StructuredKeys
 
 
 class CsvProjectReader(AbstractProjectReader):
@@ -26,7 +26,7 @@ class CsvProjectReader(AbstractProjectReader):
         :return: Artifact and Trace DataFrame
         """
         entity_df = pd.read_csv(self.data_path)
-        artifact_df = pd.DataFrame(columns=StructureKeys.get_artifact_cols())
+        artifact_df = pd.DataFrame(columns=StructuredKeys.get_artifact_cols())
         trace_df = pd.DataFrame()
         for _, row in entity_df.iterrows():
             source_id = row[CSVKeys.SOURCE_ID]
@@ -40,15 +40,15 @@ class CsvProjectReader(AbstractProjectReader):
                                             CSVKeys.TARGET,
                                             artifact_df)
             trace_df = trace_df.append({
-                StructureKeys.Trace.SOURCE: source_id,
-                StructureKeys.Trace.TARGET: target_id,
-                StructureKeys.Trace.LABEL: row[CSVKeys.LABEL]
+                StructuredKeys.Trace.SOURCE: source_id,
+                StructuredKeys.Trace.TARGET: target_id,
+                StructuredKeys.Trace.LABEL: row[CSVKeys.LABEL]
             }, ignore_index=True)
         layer_mapping_df = pd.DataFrame([{
-            StructureKeys.LayerMapping.SOURCE_TYPE: self.get_layer_id(CSVKeys.SOURCE),
-            StructureKeys.LayerMapping.TARGET_TYPE: self.get_layer_id(CSVKeys.TARGET),
+            StructuredKeys.LayerMapping.SOURCE_TYPE: self.get_layer_id(CSVKeys.SOURCE),
+            StructuredKeys.LayerMapping.TARGET_TYPE: self.get_layer_id(CSVKeys.TARGET),
         }])
-        artifact_df = artifact_df.sort_values([StructureKeys.Artifact.LAYER_ID, StructureKeys.Artifact.ID]).reset_index()
+        artifact_df = artifact_df.sort_values([StructuredKeys.Artifact.LAYER_ID, StructuredKeys.Artifact.ID]).reset_index()
         return artifact_df, trace_df, layer_mapping_df
 
     @staticmethod
@@ -69,11 +69,11 @@ class CsvProjectReader(AbstractProjectReader):
         :param artifact_df: DataFrame containing entries for each artifact processed.
         :return: The artifact body of the entry added.
         """
-        if a_id not in artifact_df[StructureKeys.Artifact.ID].values:
+        if a_id not in artifact_df[StructuredKeys.Artifact.ID].values:
             artifact_df = artifact_df.append({
-                StructureKeys.Artifact.ID: a_id,
-                StructureKeys.Artifact.BODY: a_body,
-                StructureKeys.Artifact.LAYER_ID: CsvProjectReader.get_layer_id(artifact_type)
+                StructuredKeys.Artifact.ID: a_id,
+                StructuredKeys.Artifact.BODY: a_body,
+                StructuredKeys.Artifact.LAYER_ID: CsvProjectReader.get_layer_id(artifact_type)
             }, ignore_index=True)
         return artifact_df
 

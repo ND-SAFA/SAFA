@@ -1,7 +1,7 @@
 from typing import List
 
 
-class StructureKeys:
+class StructuredKeys:
     """
     Keys used in the STRUCTURE project format.
     """
@@ -34,11 +34,11 @@ class StructureKeys:
         """
         :return:Returns the columns of the DataFrame containing artifacts.
         """
-        return [StructureKeys.Artifact.ID, StructureKeys.Artifact.BODY, StructureKeys.Artifact.LAYER_ID]
+        return [StructuredKeys.Artifact.ID, StructuredKeys.Artifact.BODY, StructuredKeys.Artifact.LAYER_ID]
 
     @staticmethod
     def get_trace_cols() -> List[str]:
         """
         :return:Returns the columns of the DataFrame containing trace links.
         """
-        return [StructureKeys.Trace.SOURCE, StructureKeys.Trace.TARGET, StructureKeys.Trace.LABEL]
+        return [StructuredKeys.Trace.SOURCE, StructuredKeys.Trace.TARGET, StructuredKeys.Trace.LABEL]

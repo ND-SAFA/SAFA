@@ -146,6 +146,14 @@ class JobResult(BaseObject):
             return self[JobResult.METRICS][comparison_metric_name], other[JobResult.METRICS][comparison_metric_name]
         return self.get_job_status(), other.get_job_status()
 
+    def require_properties(self, properties: List[str]) -> None:
+        """
+        Requires that given properties exist in result.
+        :param properties: List of required properties.
+        :return: None
+        """
+        JsonUtil.require_properties(self.__result, properties)
+
     def __getitem__(self, key: str) -> Any:
         """
         Returns value matching the given key in the results dictionary

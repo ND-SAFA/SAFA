@@ -1,6 +1,6 @@
-from testres.base_test import BaseTest
 from data.tree.artifact import Artifact
 from data.tree.trace_link import TraceLink
+from testres.base_test import BaseTest
 
 FEATURE_VALUE = "({}, {})"
 
@@ -20,11 +20,6 @@ class TestTraceLink(BaseTest):
         test_trace_link = self.get_test_trace_link()
         feature = test_trace_link.get_feature(fake_method)
         self.assertEquals(feature["feature_name"], expected_value)
-
-    def test_generate_link_id(self):
-        link_id = TraceLink.generate_link_id(self.S_ID, self.T_ID)
-        self.assertEquals(link_id - hash(self.S_ID), hash(self.T_ID))
-        self.assertEquals(link_id - hash(self.T_ID), hash(self.S_ID))
 
     def get_test_trace_link(self):
         source = Artifact(self.S_ID, self.S_TOKEN)

@@ -23,11 +23,14 @@ from util.general_util import get_n_items_from_list
 
 
 class TraceDataset(AbstractDataset):
+    """
+    Represents the config format for all data used by the huggingface trainer.
+    """
 
     def __init__(self, links: Dict[int, TraceLink], pos_link_ids: List[int], neg_link_ids: List[int], randomize: bool = False):
         """
-        Represents the config format for all data used by the huggingface trainer.
-        :param links: The candidate links.
+        Initializes trace dataset to contain links in link ids lists. 
+        :param links: The candidate links referenced in link ids list.
         :param pos_link_ids: A list of all positive link ids in the dataset
         :param neg_link_ids: A list of all negative link ids in the dataset
         :param randomize: Whether to randomize the trace links.

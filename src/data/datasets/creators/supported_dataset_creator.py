@@ -6,6 +6,6 @@ from data.datasets.creators.trace_dataset_creator import TraceDatasetCreator
 
 
 class SupportedDatasetCreator(Enum):
-    PRETRAIN = MLMPreTrainDatasetCreator
+    MLM_PRETRAIN = MLMPreTrainDatasetCreator
     SPLIT = SplitDatasetCreator
     TRACE = TraceDatasetCreator

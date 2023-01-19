@@ -1,4 +1,5 @@
 from copy import deepcopy
+from typing import Dict
 from unittest.mock import patch
 
 import mock
@@ -35,10 +36,12 @@ class TestTraceTrainer(BaseTraceTest):
         self.assertIn("training_loss", output)
 
     def test_perform_prediction(self):
-        test_trace_trainer = self.get_test_trace_trainer(metrics=self.TEST_METRIC_NAMES)
+        test_trace_trainer = self.get_test_trace_trainer(dataset_container_args={"val_dataset_creator": None},
+                                                         metrics=self.TEST_METRIC_NAMES)
         output = test_trace_trainer.perform_prediction()
-        output = PredictJob._result_from_prediction_output(output)
-        TestAssertions.assert_prediction_output_matches_expected(self, output.as_dict())
+        output = PredictJob.result_from_prediction_output(output)
+        eval_dataset = test_trace_trainer.trainer_dataset_manager[DatasetRole.EVAL]
+        TestAssertions.verify_prediction_output(self, output, eval_dataset)
 
     def test_perform_prediction_with_metrics(self):
         test_trace_trainer = self.get_test_trace_trainer(metrics=self.TEST_METRIC_NAMES)
@@ -82,11 +85,11 @@ class TestTraceTrainer(BaseTraceTest):
         self.assertIsInstance(data_loader.sampler, RandomSampler)
 
     def set_train_dataset(self, test_trace_trainer):
-        train_dataset = self.get_dataset_container()[DatasetRole.TRAIN]
+        train_dataset = self.create_trainer_dataset_manager()[DatasetRole.TRAIN]
         test_trace_trainer.train_dataset = train_dataset
 
-    def get_test_trace_trainer(self, **kwargs):
-        trainer_dataset_manager = self.get_dataset_container()
+    def get_test_trace_trainer(self, dataset_container_args: Dict = None, **kwargs):
+        trainer_dataset_manager = self.create_trainer_dataset_manager(dataset_container_args)
         model_manager = ObjectCreator.create(ModelManager)
         model_manager.get_model = mock.MagicMock(return_value=self.get_test_model())
         model_manager.get_tokenizer = mock.MagicMock(return_value=self.get_test_tokenizer())
@@ -97,14 +100,22 @@ class TestTraceTrainer(BaseTraceTest):
             model_manager=model_manager)
 
     @staticmethod
-    def get_dataset_container():
+    def create_trainer_dataset_manager(kwargs: Dict = None) -> TrainerDatasetManager:
+        """
+        Creates dataset manager with optional kwargs used to modify definition.
+        :param kwargs: Dictionary of properties to overwrite in dataset manager definition.
+        :return: Dataset manager created.
+        """
+        if kwargs is None:
+            kwargs = {}
         return ObjectCreator.create(TrainerDatasetManager, **{
             "eval_dataset_creator": {
-                TypedDefinitionVariable.OBJECT_TYPE_KEY: "CLASSIC_TRACE",
+                TypedDefinitionVariable.OBJECT_TYPE_KEY: "TRACE",
                 **ObjectCreator.dataset_creator_definition
             },
             "val_dataset_creator": {
                 TypedDefinitionVariable.OBJECT_TYPE_KEY: "SPLIT",
                 "val_percentage": .3
-            }
+            },
+            **kwargs
         })

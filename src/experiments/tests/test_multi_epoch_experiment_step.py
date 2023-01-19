@@ -1,25 +1,20 @@
-import math
 import os
 from unittest import mock
 from unittest.mock import patch
 
 from data.datasets.dataset_role import DatasetRole
 from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
-from experiments.experiment_step import ExperimentStep
 from experiments.multi_epoch_experiment_step import MultiEpochExperimentStep
 from experiments.tests.base_experiment_test import BaseExperimentTest
 from jobs.abstract_job import AbstractJob
 from jobs.components.job_args import JobArgs
 from jobs.components.job_result import JobResult
 from jobs.delete_model_job import DeleteModelJob
-from jobs.predict_job import PredictJob
 from jobs.supported_job_type import SupportedJobType
 from jobs.train_job import TrainJob
 from testres.paths.paths import TEST_OUTPUT_DIR
 from util.object_creator import ObjectCreator
-from util.status import Status
 from variables.typed_definition_variable import TypedDefinitionVariable
-from variables.undetermined_variable import UndeterminedVariable
 
 
 class TestMultiEpochExperimentStep(BaseExperimentTest):
@@ -52,7 +47,7 @@ class TestMultiEpochExperimentStep(BaseExperimentTest):
                 "job_args": {},
                 "trainer_dataset_manager": {
                     "train_dataset_creator": {
-                        TypedDefinitionVariable.OBJECT_TYPE_KEY: "CLASSIC_TRACE",
+                        TypedDefinitionVariable.OBJECT_TYPE_KEY: "TRACE",
                         **ObjectCreator.dataset_creator_definition
                     }
                 },

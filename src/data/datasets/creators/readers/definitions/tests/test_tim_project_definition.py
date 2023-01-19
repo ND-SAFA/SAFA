@@ -3,7 +3,7 @@ from unittest.mock import patch
 
 from data.datasets.creators.readers.definitions.tim_project_definition import TimProjectDefinition
 from data.datasets.keys.safa_format import SafaKeys
-from data.datasets.keys.structure_keys import StructureKeys
+from data.datasets.keys.structure_keys import StructuredKeys
 from testres.base_test import BaseTest
 from util.file_util import FileUtil
 
@@ -30,21 +30,21 @@ class TestTimProjectDefinition(BaseTest):
         }
     }
     expected = {
-        StructureKeys.ARTIFACTS: {
+        StructuredKeys.ARTIFACTS: {
             artifact_type: {
-                StructureKeys.PATH: file_name,
-                StructureKeys.COLS: "csv-artifacts"
+                StructuredKeys.PATH: file_name,
+                StructuredKeys.COLS: "csv-artifacts"
             }
         },
-        StructureKeys.TRACES: {
+        StructuredKeys.TRACES: {
             trace_matrix_name: {
-                StructureKeys.PATH: file_name,
-                StructureKeys.COLS: "csv-traces",
-                StructureKeys.Trace.SOURCE: source,
-                StructureKeys.Trace.TARGET: target
+                StructuredKeys.PATH: file_name,
+                StructuredKeys.COLS: "csv-traces",
+                StructuredKeys.Trace.SOURCE: source,
+                StructuredKeys.Trace.TARGET: target
             }
         },
-        StructureKeys.CONVERSIONS: {
+        StructuredKeys.CONVERSIONS: {
             **TimProjectDefinition.get_flattened_conversions()
         }
     }
@@ -65,7 +65,7 @@ class TestTimProjectDefinition(BaseTest):
         """
 
         original_def = deepcopy(self.original)
-        expected_def = deepcopy(self.expected[StructureKeys.ARTIFACTS])
+        expected_def = deepcopy(self.expected[StructuredKeys.ARTIFACTS])
         artifact_definitions = TimProjectDefinition._create_artifact_definitions(original_def)
         self.assertDictEqual(expected_def, artifact_definitions)
 
@@ -75,7 +75,7 @@ class TestTimProjectDefinition(BaseTest):
         """
 
         original_def = {self.trace_matrix_name: deepcopy(self.original[self.trace_matrix_name])}
-        expected_def = deepcopy(self.expected[StructureKeys.TRACES])
+        expected_def = deepcopy(self.expected[StructuredKeys.TRACES])
         artifact_definitions = TimProjectDefinition._create_trace_definitions(original_def)
         self.assertDictEqual(expected_def, artifact_definitions)
 

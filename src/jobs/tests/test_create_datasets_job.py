@@ -12,9 +12,10 @@ class TestCreateDatasetsJob(BaseJobTest):
     def test_run_success(self):
         self._test_run_success()
 
-    def _assert_success(self, output_dict: dict):
-        self.assertIn(JobResult.SAVED_DATASET_PATHS, output_dict)
-        self.assertGreater(len(output_dict[JobResult.SAVED_DATASET_PATHS]), 0)
+    def _assert_success(self, job: CreateDatasetsJob, job_result: JobResult):
+        result = JobResult.SAVED_DATASET_PATHS in job_result
+        self.assertIn(JobResult.SAVED_DATASET_PATHS, job_result)
+        self.assertGreater(len(job_result[JobResult.SAVED_DATASET_PATHS]), 0)
 
     def test_run_failure(self):
         job = self._get_job(include_dataset=False)

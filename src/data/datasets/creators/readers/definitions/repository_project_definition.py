@@ -2,7 +2,7 @@ from typing import Dict
 
 from data.datasets.creators.readers.definitions.abstract_project_definition import AbstractProjectDefinition
 from data.datasets.creators.readers.definitions.tim_project_definition import TimProjectDefinition
-from data.datasets.keys.structure_keys import StructureKeys
+from data.datasets.keys.structure_keys import StructuredKeys
 
 
 class RepositoryProjectDefinition(AbstractProjectDefinition):
@@ -17,25 +17,25 @@ class RepositoryProjectDefinition(AbstractProjectDefinition):
         :return: Project definition for repository.
         """
         return {
-            StructureKeys.ARTIFACTS: {
+            StructuredKeys.ARTIFACTS: {
                 "Commit": {
-                    StructureKeys.PATH: "commit.csv",
-                    StructureKeys.COLS: StructureKeys.ARTIFACTS
+                    StructuredKeys.PATH: "commit.csv",
+                    StructuredKeys.COLS: StructuredKeys.ARTIFACTS
                 },
                 "Issue": {
-                    StructureKeys.PATH: "issue.csv",
-                    StructureKeys.COLS: StructureKeys.ARTIFACTS
+                    StructuredKeys.PATH: "issue.csv",
+                    StructuredKeys.COLS: StructuredKeys.ARTIFACTS
                 }
             },
-            StructureKeys.TRACES: {
+            StructuredKeys.TRACES: {
                 "commit2issue": {
-                    StructureKeys.Trace.SOURCE: "Commit",
-                    StructureKeys.Trace.TARGET: "Issue",
-                    StructureKeys.PATH: "commit2issue.csv",
-                    StructureKeys.COLS: StructureKeys.TRACES
+                    StructuredKeys.Trace.SOURCE: "Commit",
+                    StructuredKeys.Trace.TARGET: "Issue",
+                    StructuredKeys.PATH: "commit2issue.csv",
+                    StructuredKeys.COLS: StructuredKeys.TRACES
                 }
             },
-            StructureKeys.CONVERSIONS: {
+            StructuredKeys.CONVERSIONS: {
                 **TimProjectDefinition.CONVERSIONS[TimProjectDefinition.CSV]
             }
         }

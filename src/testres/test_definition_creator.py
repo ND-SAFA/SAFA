@@ -19,11 +19,16 @@ class TestDefinitionCreator(BaseTest):
         "model_path": "roberta-base"
     }
     DATASET_CREATOR_DEFINITION = {
-        TypedDefinitionVariable.OBJECT_TYPE_KEY: "STRUCTURE",
-        "project_path": os.path.join(TEST_DATA_DIR, "structure")
+        "project_reader": {
+            TypedDefinitionVariable.OBJECT_TYPE_KEY: "STRUCTURE",
+            "project_path": os.path.join(TEST_DATA_DIR, "structure")
+        }
     }
     DATASET_MANAGER_DEFINITION = {
-        "eval_dataset_creator": DATASET_CREATOR_DEFINITION
+        "eval_dataset_creator": {
+            TypedDefinitionVariable.OBJECT_TYPE_KEY: "TRACE",
+            **DATASET_CREATOR_DEFINITION
+        }
     }
     TRAINER_ARGS_DEFINITION = {"output_dir": TEST_OUTPUT_DIR}
     DEFINITION = {

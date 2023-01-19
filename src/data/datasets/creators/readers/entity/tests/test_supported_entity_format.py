@@ -3,7 +3,7 @@ from data.datasets.creators.readers.entity.formats.folder_entity_format import F
 from data.datasets.creators.readers.entity.formats.json_entity_format import JsonEntityFormat
 from data.datasets.creators.readers.entity.formats.xml_entity_format import XmlEntityFormat
 from data.datasets.creators.readers.entity.supported_entity_formats import SupportedEntityFormats
-from data.datasets.keys.structure_keys import StructureKeys
+from data.datasets.keys.structure_keys import StructuredKeys
 from testres.base_test import BaseTest
 from testres.paths.test_format_paths import CSV_ENTITY_PATH, FOLDER_PROJECT_PATH, JSON_ENTITY_PATH, XML_ENTITY_PATH
 
@@ -34,5 +34,5 @@ class TestSupportedEntityFormat(BaseTest):
         """
         for entity_format_name, entity_format in SupportedEntityFormats.FORMATS.items():
             data_path = self.DATUM[entity_format]
-            retrieved_parser = SupportedEntityFormats.get_parser(data_path, {StructureKeys.PARSER: entity_format_name})
+            retrieved_parser = SupportedEntityFormats.get_parser(data_path, {StructuredKeys.PARSER: entity_format_name})
             self.assertEqual(retrieved_parser, entity_format.get_parser())

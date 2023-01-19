@@ -2,8 +2,8 @@ from copy import deepcopy
 from typing import Type, TypeVar
 
 from config.constants import VALIDATION_PERCENTAGE_DEFAULT
-from data.datasets.creators.classic_trace_dataset_creator import ClassicTraceDatasetCreator
 from data.datasets.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
+from data.datasets.creators.trace_dataset_creator import TraceDatasetCreator
 from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
 from data.processing.augmentation.data_augmenter import DataAugmenter
 from experiments.experiment import Experiment
@@ -37,9 +37,14 @@ class ObjectCreator:
     job_args_definition = {"output_dir": TEST_OUTPUT_DIR}
 
     dataset_creator_definition = {
-        "source_layers": TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS, TestDataManager.Keys.SOURCE]),
-        "target_layers": TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS, TestDataManager.Keys.TARGET]),
-        "true_links": TestDataManager.get_path(TestDataManager.Keys.TRACES)
+        "project_reader": {
+            TypedDefinitionVariable.OBJECT_TYPE_KEY: "API",
+            "api_definition": {
+                "source_layers": TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS, TestDataManager.Keys.SOURCE]),
+                "target_layers": TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS, TestDataManager.Keys.TARGET]),
+                "true_links": TestDataManager.get_path(TestDataManager.Keys.TRACES)
+            }
+        }
     }
 
     pretrain_dataset_definition = {
@@ -48,8 +53,10 @@ class ObjectCreator:
     }
 
     trainer_dataset_manager_definition = {
-        "train_dataset_creator": {TypedDefinitionVariable.OBJECT_TYPE_KEY: "CLASSIC_TRACE",
-                                  **dataset_creator_definition}
+        "train_dataset_creator": {
+            TypedDefinitionVariable.OBJECT_TYPE_KEY: "TRACE",
+            **dataset_creator_definition
+        }
     }
 
     model_manager_definition = {
@@ -63,8 +70,12 @@ class ObjectCreator:
         "job_args": {},
         "trainer_dataset_manager": {
             "train_dataset_creator": {
-                TypedDefinitionVariable.OBJECT_TYPE_KEY: "Safa",
-                "project_path": {"*": ["path1", "path2"]}}
+                TypedDefinitionVariable.OBJECT_TYPE_KEY: "TRACE",
+                "project_reader": {
+                    TypedDefinitionVariable.OBJECT_TYPE_KEY: "STRUCTURE",
+                    "project_path": {"*": ["path1", "path2"]}
+                }
+            }
         },
         "trainer_args": {
             "output_dir": TEST_OUTPUT_DIR,
@@ -78,7 +89,7 @@ class ObjectCreator:
         "job_args": {},
         "trainer_dataset_manager": {
             "eval_dataset_creator": {
-                TypedDefinitionVariable.OBJECT_TYPE_KEY: "CLASSIC_TRACE",
+                TypedDefinitionVariable.OBJECT_TYPE_KEY: "TRACE",
                 **dataset_creator_definition
             }
         },
@@ -94,7 +105,7 @@ class ObjectCreator:
     SUPPORTED_OBJECTS = {
         TrainerArgs: trainer_args_definition,
         JobArgs: job_args_definition,
-        ClassicTraceDatasetCreator: dataset_creator_definition,
+        TraceDatasetCreator: dataset_creator_definition,
         TrainerDatasetManager: trainer_dataset_manager_definition,
         DataAugmenter: augmenter_definition,
         ModelManager: model_manager_definition,

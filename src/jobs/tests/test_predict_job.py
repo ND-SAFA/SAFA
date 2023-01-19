@@ -1,3 +1,4 @@
+from data.datasets.dataset_role import DatasetRole
 from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
 from jobs.components.job_args import JobArgs
 from jobs.predict_job import PredictJob
@@ -22,7 +23,7 @@ class TestPredictJob(BaseJobTest):
         model_manager: ModelManager = ObjectCreator.create(ModelManager)
         trainer_dataset_manager: TrainerDatasetManager = ObjectCreator.create(TrainerDatasetManager, **{
             "eval_dataset_creator": {
-                TypedDefinitionVariable.OBJECT_TYPE_KEY: "CLASSIC_TRACE",
+                TypedDefinitionVariable.OBJECT_TYPE_KEY: "TRACE",
                 **ObjectCreator.dataset_creator_definition
             }
         }, override=True)
@@ -30,5 +31,6 @@ class TestPredictJob(BaseJobTest):
         return PredictJob(job_args=job_args, model_manager=model_manager,
                           trainer_dataset_manager=trainer_dataset_manager, trainer_args=trainer_args)
 
-    def _assert_success(self, output_dict: dict):
-        TestAssertions.assert_prediction_output_matches_expected(self, output_dict)
+    def _assert_success(self, job: PredictJob, output_dict: dict):
+        eval_dataset = job.trainer_dataset_manager[DatasetRole.EVAL]
+        TestAssertions.verify_prediction_output(self, output_dict, eval_dataset)

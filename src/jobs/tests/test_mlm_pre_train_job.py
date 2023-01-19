@@ -20,9 +20,9 @@ class TestMLMPreTrainJob(BaseJobTest):
     def _test_run_success(self):
         job = self.get_job()
         job.run()
-        self.assert_output_on_success(self._load_job_output(job))
+        self.assert_output_on_success(job, self._load_job_output(job))
 
-    def _assert_success(self, output_dict: dict):
+    def _assert_success(self, job: MLMPreTrainJob, output_dict: dict):
         TestAssertions.assert_training_output_matches_expected(self, output_dict)
 
     def _get_job(self):

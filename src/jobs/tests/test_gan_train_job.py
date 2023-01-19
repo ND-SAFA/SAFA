@@ -35,14 +35,14 @@ class TestGanTrainJob(BaseJobTest):
     def test_run_success(self, save_model_mock: mock.MagicMock):
         self._test_run_success()
 
-    def _assert_success(self, output_dict: dict):
+    def _assert_success(self, job: GanTrainJob, output_dict: dict):
         TestAssertions.assert_training_output_matches_expected(self, output_dict, self.EXAMPLE_TRAINING_OUTPUT)
 
     def _get_job(self) -> AbstractJob:
         trainer_dataset_manager = ObjectCreator.create(TrainerDatasetManager, override=True, **{
             "pre_train_dataset_creator": ObjectCreator.pretrain_dataset_definition,
             "train_dataset_creator": {
-                TypedDefinitionVariable.OBJECT_TYPE_KEY: "CLASSIC_TRACE",
+                TypedDefinitionVariable.OBJECT_TYPE_KEY: "TRACE",
                 **ObjectCreator.dataset_creator_definition
             },
         })

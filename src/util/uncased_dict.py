@@ -43,7 +43,9 @@ class UncasedDict(dict):
         :param key: the key to process
         :return: the processed key
         """
-        return key.lower()
+        if isinstance(key, str):
+            return key.lower()
+        return key
 
     @staticmethod
     def _process_value(value: Any):

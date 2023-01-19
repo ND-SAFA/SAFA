@@ -5,9 +5,9 @@ from unittest.mock import patch
 
 from jobs.abstract_job import AbstractJob
 from jobs.components.job_result import JobResult
-from util.status import Status
 from models.model_manager import ModelManager
 from testres.base_trace_test import BaseTraceTest
+from util.status import Status
 
 
 class BaseJobTest(BaseTraceTest, ABC):
@@ -19,7 +19,7 @@ class BaseJobTest(BaseTraceTest, ABC):
         get_tokenizer_mock.return_value = self.get_test_tokenizer()
         job = self.get_job()
         job.run()
-        self.assert_output_on_success(self._load_job_output(job))
+        self.assert_output_on_success(job, job.result)
 
     @patch.object(ModelManager, "get_model")
     @patch.object(ModelManager, "get_tokenizer")
@@ -42,16 +42,16 @@ class BaseJobTest(BaseTraceTest, ABC):
         with open(job.get_output_filepath(output_dir=job.job_args.output_dir)) as out_file:
             return json.load(out_file)
 
-    def assert_output_on_success(self, output_dict: dict):
-        self.assertIn(JobResult.STATUS, output_dict)
-        if output_dict[JobResult.STATUS] == Status.FAILURE:
-            failure_msg = output_dict[JobResult.EXCEPTION] if JobResult.EXCEPTION in output_dict \
+    def assert_output_on_success(self, job: AbstractJob, job_result: JobResult):
+        self.assertIn(JobResult.STATUS, job_result)
+        if job_result[JobResult.STATUS] == Status.FAILURE:
+            failure_msg = job_result[JobResult.EXCEPTION] if JobResult.EXCEPTION in job_result \
                 else "Status is FAILURE but should be SUCCESS"
-            if JobResult.TRACEBACK in output_dict:
-                failure_msg += "\n " + output_dict[JobResult.TRACEBACK]
+            if JobResult.TRACEBACK in job_result:
+                failure_msg += "\n " + job_result[JobResult.TRACEBACK]
             self.fail(failure_msg)
-        self.assertEquals(output_dict[JobResult.STATUS], Status.SUCCESS)
-        self._assert_success(output_dict)
+        self.assertEquals(job_result[JobResult.STATUS], Status.SUCCESS)
+        self._assert_success(job, job_result)
 
     def assert_output_on_failure(self, output_dict: dict):
         self.assertIn(JobResult.EXCEPTION, output_dict)
@@ -59,7 +59,7 @@ class BaseJobTest(BaseTraceTest, ABC):
         self.assertEquals(output_dict[JobResult.STATUS], Status.FAILURE)
 
     @abstractmethod
-    def _assert_success(self, output_dict: dict):
+    def _assert_success(self, job: AbstractJob, output_dict: dict):
         pass
 
     @abstractmethod

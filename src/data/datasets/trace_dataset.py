@@ -19,6 +19,7 @@ from data.tree.trace_link import TraceLink
 from models.model_manager import ModelManager
 from models.model_properties import ModelArchitectureType
 from util.file_util import FileUtil
+from util.general_util import get_n_items_from_list
 
 
 class TraceDataset(AbstractDataset):
@@ -115,17 +116,25 @@ class TraceDataset(AbstractDataset):
         :param batch_size: the size of the batch
         :return: a list of ordered links
         """
-        n_pos_links_per_batch, extra_neg = divmod(batch_size, 2)
-        n_neg_links_per_batch = n_pos_links_per_batch + extra_neg
-        n_batches, rem = divmod(len(self.pos_link_ids), n_pos_links_per_batch)
+        n_links_per_batch, rem_per_batch = divmod(batch_size,  2)
         links_ids = []
 
-        for i in range(n_batches):
-            pos_links = self._get_n_items_from_list(self.pos_link_ids, i, n_pos_links_per_batch)
-            neg_links = self._get_n_items_from_list(self.neg_link_ids, i + extra_neg, n_neg_links_per_batch)
-            batch = pos_links + neg_links
+        def add_batch(batch):
             random.shuffle(batch)
             links_ids.extend(batch)
+
+        pos_start, neg_start = 0, 0
+        while pos_start < len(self.pos_link_ids):
+            pos_links, pos_start = get_n_items_from_list(self.pos_link_ids, n_items=n_links_per_batch, init_index=pos_start)
+            neg_links, neg_start = get_n_items_from_list(self.neg_link_ids, n_items=len(pos_links), init_index=neg_start)
+            new_batch = pos_links + neg_links
+            if rem_per_batch > 0:
+                if pos_start <= neg_start:
+                    extra_links, pos_start = get_n_items_from_list(self.pos_link_ids, n_items=rem_per_batch, init_index=pos_start)
+                else:
+                    extra_links, neg_start = get_n_items_from_list(self.neg_link_ids, n_items=rem_per_batch, init_index=neg_start)
+                new_batch += extra_links
+            add_batch(new_batch)
         return [self.links[link_id] for link_id in links_ids]
 
     def get_ordered_links(self) -> List[TraceLink]:
@@ -264,19 +273,6 @@ class TraceDataset(AbstractDataset):
             entry = self._extract_feature_info(link.get_feature(feature_func))
         entry[DataKey.LABEL_KEY] = int(link.is_true_link)
         return entry
-
-    @staticmethod
-    def _get_n_items_from_list(list_, init_index, n_items) -> List:
-        """
-        Returns the start and end index to get n items from a list starting from a initial index
-        :param list_: the list to retrieve items from
-        :param init_index: the initial index to start from
-        :param n_items: the number of items to get from list
-        :return: a list of n_items from the list
-        """
-        start = n_items * init_index
-        end = start + n_items
-        return list_[start:end]
 
     @staticmethod
     def _resize_data(data: List, new_length: int, include_duplicates: bool = False) -> List:

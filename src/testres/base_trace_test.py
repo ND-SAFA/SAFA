@@ -22,4 +22,5 @@ class BaseTraceTest(BaseTest):
         for link in links.values():
             if link.id in pos_links_ids:
                 link.is_true_link = True
-        return TraceDataset(links)
+        return TraceDataset(links, pos_link_ids=TestDataManager.get_positive_link_ids(),
+                            neg_link_ids=TestDataManager.get_negative_link_ids())

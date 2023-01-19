@@ -14,6 +14,7 @@ from models.model_properties import ModelArchitectureType
 from testres.base_trace_test import BaseTraceTest
 from testres.test_assertions import TestAssertions
 from testres.test_data_manager import TestDataManager
+from testres.testprojects.api_test_project import ApiTestProject
 
 FEATURE_VALUE = "({}, {})"
 
@@ -170,7 +171,7 @@ class TestTraceDataset(BaseTraceTest):
         trace_dataset = self.get_trace_dataset()
 
         source_target_pairs = trace_dataset.get_source_target_pairs()
-        expected_pairs = TestDataManager.get_all_links()
+        expected_pairs = ApiTestProject.get_expected_links()
         TestAssertions.assert_lists_have_the_same_vals(self, source_target_pairs, expected_pairs)
 
     def test_resize_links_duplicates(self):
@@ -210,7 +211,7 @@ class TestTraceDataset(BaseTraceTest):
 
     def test_get_feature_entry(self):
         trace_dataset = self.get_trace_dataset()
-        source, target = TestDataManager.get_positive_links()[0]
+        source, target = ApiTestProject.get_positive_links()[0]
         test_link = TestDataManager._create_test_link(source, target)
 
         feature_entry_siamese = trace_dataset._get_feature_entry(test_link, ModelArchitectureType.SIAMESE, fake_method)

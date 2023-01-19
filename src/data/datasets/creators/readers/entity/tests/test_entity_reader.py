@@ -2,7 +2,7 @@ import os
 
 from data.datasets.creators.readers.entity.entity_reader import EntityReader
 from data.datasets.creators.readers.entity.formats.tests.test_xml_entity_format import TestXmlEntityFormat
-from data.datasets.keys.structure_keys import StructureKeys
+from data.datasets.keys.structure_keys import StructuredKeys
 from testres.base_test import BaseTest
 from testres.paths.test_format_paths import XML_ENTITY_PATH
 from testres.test_assertions import TestAssertions
@@ -22,7 +22,7 @@ class TestEntityReader(BaseTest):
         conversion_id = "conversion-id"
         conversions = {conversion_id: {"name": new_col}}
         definition = self.create_definition(file, **{
-            StructureKeys.PARAMS: {"xpath": TestXmlEntityFormat.get_xpath()},
+            StructuredKeys.PARAMS: {"xpath": TestXmlEntityFormat.get_xpath()},
             "cols": conversion_id
         })
         entity_reader = EntityReader(project_path, definition, conversions)
@@ -35,7 +35,7 @@ class TestEntityReader(BaseTest):
         Tests that source entities are read in and all entries are present.
         """
         project_path, file = os.path.split(XML_ENTITY_PATH)
-        definition = self.create_definition(file, **{StructureKeys.PARAMS: {"xpath": TestXmlEntityFormat.get_xpath()}})
+        definition = self.create_definition(file, **{StructuredKeys.PARAMS: {"xpath": TestXmlEntityFormat.get_xpath()}})
         entity_reader = EntityReader(project_path, definition)
         original_df = entity_reader.read_original_entities()
         TestAssertions.verify_entities_in_df(self, TestXmlEntityFormat.get_entities(), original_df)
@@ -45,7 +45,7 @@ class TestEntityReader(BaseTest):
         Tests ability to read column conversions from definition.
         """
         expected_value = 42
-        definition = self.create_definition(**{StructureKeys.COLS: "conversion-id"})
+        definition = self.create_definition(**{StructuredKeys.COLS: "conversion-id"})
         conversions = {"conversion-id": expected_value}
         entity_reader = EntityReader("", definition, conversions)
         self.assertEqual(expected_value, entity_reader.get_column_conversion())
@@ -54,10 +54,10 @@ class TestEntityReader(BaseTest):
         """
         Tests that default value is None when definition contains no column conversions.
         """
-        definition = {StructureKeys.PATH: ""}
+        definition = {StructuredKeys.PATH: ""}
         entity_reader = EntityReader("", definition, {})
         self.assertIsNone(entity_reader.get_column_conversion())
 
     @staticmethod
     def create_definition(path: str = "", **kwargs):
-        return {StructureKeys.PATH: path, **kwargs}
+        return {StructuredKeys.PATH: path, **kwargs}

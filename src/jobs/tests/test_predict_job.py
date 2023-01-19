@@ -31,4 +31,4 @@ class TestPredictJob(BaseJobTest):
                           trainer_dataset_manager=trainer_dataset_manager, trainer_args=trainer_args)
 
     def _assert_success(self, output_dict: dict):
-        TestAssertions.assert_prediction_output_matches_expected(self, output_dict)
+        TestAssertions.verify_prediction_output(self, output_dict)

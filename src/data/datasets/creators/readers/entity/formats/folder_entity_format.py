@@ -5,7 +5,7 @@ import pandas as pd
 
 from data.datasets.creators.readers.entity.entity_parser_type import EntityParserType
 from data.datasets.creators.readers.entity.formats.abstract_entity_format import AbstractEntityFormat
-from data.datasets.keys.structure_keys import StructureKeys
+from data.datasets.keys.structure_keys import StructuredKeys
 from util.file_util import FileUtil
 
 
@@ -53,8 +53,8 @@ class FolderEntityFormat(AbstractEntityFormat):
         for file_path in file_paths:
             artifact_name = os.path.basename(file_path) if use_file_name else file_path
             entry = {
-                StructureKeys.Artifact.ID: artifact_name,
-                StructureKeys.Artifact.BODY: FileUtil.read_file(file_path)
+                StructuredKeys.Artifact.ID: artifact_name,
+                StructuredKeys.Artifact.BODY: FileUtil.read_file(file_path)
             }
             entries.append(entry)
-        return pd.DataFrame(entries).sort_values([StructureKeys.Artifact.ID], ignore_index=True)
+        return pd.DataFrame(entries).sort_values([StructuredKeys.Artifact.ID], ignore_index=True)

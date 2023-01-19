@@ -12,10 +12,10 @@ class PredictJob(AbstractTraceJob):
         :return: results of the prediction including prediction values and associated ids
         """
         prediction_output = self.get_trainer().perform_prediction()
-        return self._result_from_prediction_output(prediction_output)
+        return self.result_from_prediction_output(prediction_output)
 
     @staticmethod
-    def _result_from_prediction_output(trainer_output: Dict) -> JobResult:
+    def result_from_prediction_output(trainer_output: Dict) -> JobResult:
         """
         Creates a TraceJobResult from a dictionary
         :return: a new TraceJobResult

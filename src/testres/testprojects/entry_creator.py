@@ -1,7 +1,7 @@
 from copy import deepcopy
 from typing import Any, Dict, List, Tuple
 
-from data.datasets.keys.structure_keys import StructureKeys
+from data.datasets.keys.structure_keys import StructuredKeys
 from testres.test_data_manager import TestDataManager
 
 ArtifactInstruction = Tuple[Any, str]
@@ -33,9 +33,9 @@ class EntryCreator:
         :param params: Tuple consisting of source id, target id, and optionally the label.
         :return: List of trace entries.
         """
-        entry = {StructureKeys.Trace.SOURCE: params[0], StructureKeys.Trace.TARGET: params[1]}
+        entry = {StructuredKeys.Trace.SOURCE: params[0], StructuredKeys.Trace.TARGET: params[1]}
         if len(params) == 3:
-            entry[StructureKeys.Trace.LABEL] = params[2]
+            entry[StructuredKeys.Trace.LABEL] = params[2]
         return entry
 
     @staticmethod
@@ -45,8 +45,8 @@ class EntryCreator:
         :param layer_mappings: List of source and target types to map together.
         :return: List of layer mapping entries.
         """
-        return [{StructureKeys.LayerMapping.SOURCE_TYPE: s_type,
-                 StructureKeys.LayerMapping.TARGET_TYPE: t_type}
+        return [{StructuredKeys.LayerMapping.SOURCE_TYPE: s_type,
+                 StructuredKeys.LayerMapping.TARGET_TYPE: t_type}
                 for s_type, t_type in layer_mappings]
 
     @staticmethod
@@ -89,6 +89,6 @@ class EntryCreator:
         """
         return [
             [{
-                StructureKeys.Artifact.ID: a_id,
-                StructureKeys.Artifact.BODY: a_body
+                StructuredKeys.Artifact.ID: a_id,
+                StructuredKeys.Artifact.BODY: a_body
             } for a_id, a_body in artifact_items] for artifact_items in artifact_layers]

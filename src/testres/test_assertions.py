@@ -1,11 +1,12 @@
-from typing import Dict, List
+from typing import Dict, List, Tuple
 from unittest import TestCase
 
 import pandas as pd
 
+from data.datasets.trace_dataset import TraceDataset
 from jobs.components.job_result import JobResult
 from testres.test_data_manager import TestDataManager
-from testres.testprojects.api_test_project import ApiTestProject
+from util.json_util import JsonUtil
 
 
 class TestAssertions:
@@ -14,30 +15,53 @@ class TestAssertions:
     _LEN_ERROR = "Length of {} does not match expected"
 
     @classmethod
-    def assert_prediction_output_matches_expected(cls, test_case: TestCase, output: dict, threshold: int = 0.05):
-        if JobResult.PREDICTIONS not in output:
-            test_case.fail(cls._KEY_ERROR_MESSAGE.format(JobResult.PREDICTIONS, output))
+    def verify_prediction_output(cls, test_case: TestCase, output: JobResult, test_project: TraceDataset) -> None:
+        """
+        Verifies that prediction output contains correctly formatted predictions and metrics.
+        :param test_case: The test case used for making assertions.
+        :param output: The output of the prediction job.
+        :param test_project: The test project that was being predicted on.
+        :return: None
+        """
+        cls.verify_predictions(test_case, output, test_project)
+        cls.verify_metrics_output(test_case, output)
+
+    @classmethod
+    def verify_predictions(cls, test_case: TestCase, output: JobResult, eval_dataset: TraceDataset,
+                           base_score: float = 0.5, threshold=0.3) -> None:
+        """
+        Verifies that output contains predictions matching data in evaluation dataset.
+        :param test_case: The test case to make assertions with.
+        :param output: The output of a prediction job.
+        :param eval_dataset: The evaluation dataset used in prediction job.
+        :param base_score: The base score that other scores are expected to be a threshold away from.
+        :param threshold: The tolerance threshold between score and base score.
+        :return: None
+        """
+        JsonUtil.require_properties(output, [JobResult.PREDICTIONS])
         predictions = output[JobResult.PREDICTIONS]
-        all_links = TestDataManager.get_all_links()
-        test_case.assertEquals(len(predictions), ApiTestProject.get_n_links(), cls._LEN_ERROR.format(JobResult.PREDICTIONS))
-        expected_links = {link for link in all_links}
-        predicted_links = set()
-        for link_dict in output[JobResult.PREDICTIONS]:
-            link = [None, None]
-            for key, val in TestDataManager.EXAMPLE_PREDICTION_LINKS.items():
-                if key not in link_dict:
-                    test_case.fail(cls._KEY_ERROR_MESSAGE.format(key, JobResult.PREDICTIONS))
-                if key == "score":
-                    expected_val = TestDataManager.EXAMPLE_PREDICTION_LINKS["score"]
-                    if abs(val - expected_val) >= threshold:
-                        test_case.fail(
-                            cls._VAL_ERROR_MESSAGE.format(key, val, expected_val, JobResult.PREDICTIONS))
-                else:
-                    link[val] = link_dict[key]
-            predicted_links.add(tuple(link))
+        test_case.assertEqual(len(eval_dataset), len(predictions))
+
+        expected_keys = [JobResult.SOURCE, JobResult.TARGET, JobResult.SCORE]
+        for prediction in predictions:
+            JsonUtil.require_properties(prediction, expected_keys)
+            score = prediction[JobResult.SCORE]
+            if abs(score - base_score) >= threshold:
+                test_case.fail(cls._VAL_ERROR_MESSAGE.format(JobResult.SCORE, score, base_score, JobResult.PREDICTIONS))
+
+        predicted_links: List[Tuple[str, str]] = [(p[JobResult.SOURCE], p[JobResult.TARGET]) for p in predictions]
+        expected_links: List[Tuple[str, str]] = [(t.source.id, t.target.id) for t in eval_dataset.links.values()]
         cls.assert_lists_have_the_same_vals(test_case, expected_links, predicted_links)
-        if JobResult.METRICS not in output:
-            test_case.fail(cls._KEY_ERROR_MESSAGE.format(JobResult.METRICS, output))
+
+    @classmethod
+    def verify_metrics_output(cls, test_case: TestCase, output: JobResult) -> None:
+        """
+        Verifies that prediction job result contains valid metric results.
+        :param test_case: The test case used to make assertions.
+        :param output: The result of a prediction job.
+        :return: None
+        """
+        JsonUtil.require_properties(output, JobResult.METRICS)
         for metric in TestDataManager.EXAMPLE_PREDICTION_METRICS.keys():
             if metric not in output[JobResult.METRICS]:
                 test_case.fail(

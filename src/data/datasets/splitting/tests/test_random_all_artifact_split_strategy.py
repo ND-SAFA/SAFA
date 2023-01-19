@@ -63,7 +63,15 @@ class TestRandomAllArtifactSplitStrategy(BaseTest):
             self.assertIn(expected_id, artifact_ids)
 
     def create_trace_dataset(self) -> TraceDataset:
-        links = {t.id: t for t in self.create_trace_links((self.SOURCE_PREFIX, self.TARGET_PREFIX),
-                                                          (self.N_SOURCES, self.N_TARGETS),
-                                                          [0] * self.N_LINKS)}
-        return TraceDataset(links)
+        positive_link_ids = []
+        negative_link_ids = []
+        links = {}
+        for trace_link in self.create_trace_links((self.SOURCE_PREFIX, self.TARGET_PREFIX),
+                                                  (self.N_SOURCES, self.N_TARGETS),
+                                                  [0] * self.N_LINKS):
+            if trace_link.is_true_link:
+                positive_link_ids.append(trace_link.id)
+            else:
+                negative_link_ids.append(trace_link.id)
+            links[trace_link.id] = trace_link
+        return TraceDataset(links, pos_link_ids=positive_link_ids, neg_link_ids=negative_link_ids)

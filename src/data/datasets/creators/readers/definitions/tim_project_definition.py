@@ -4,7 +4,7 @@ from typing import Dict
 
 from data.datasets.creators.readers.definitions.abstract_project_definition import AbstractProjectDefinition
 from data.datasets.keys.safa_format import SafaKeys
-from data.datasets.keys.structure_keys import StructureKeys
+from data.datasets.keys.structure_keys import StructuredKeys
 from util.file_util import FileUtil
 from util.json_util import JsonUtil
 
@@ -17,23 +17,23 @@ class TimProjectDefinition(AbstractProjectDefinition):
     JSON = "json"
     CONVERSIONS = {
         JSON: {
-            StructureKeys.ARTIFACTS: {
-                "name": StructureKeys.Artifact.ID,
-                "body": StructureKeys.Artifact.BODY
+            StructuredKeys.ARTIFACTS: {
+                "name": StructuredKeys.Artifact.ID,
+                "body": StructuredKeys.Artifact.BODY
             },
-            StructureKeys.TRACES: {
-                "sourceName": StructureKeys.Trace.SOURCE,
-                "targetName": StructureKeys.Trace.TARGET,
+            StructuredKeys.TRACES: {
+                "sourceName": StructuredKeys.Trace.SOURCE,
+                "targetName": StructuredKeys.Trace.TARGET,
             }
         },
         CSV: {
-            StructureKeys.ARTIFACTS: {
-                "id": StructureKeys.Artifact.ID,
-                "content": StructureKeys.Artifact.BODY
+            StructuredKeys.ARTIFACTS: {
+                "id": StructuredKeys.Artifact.ID,
+                "content": StructuredKeys.Artifact.BODY
             },
-            StructureKeys.TRACES: {
-                "source": StructureKeys.Trace.SOURCE,
-                "target": StructureKeys.Trace.TARGET,
+            StructuredKeys.TRACES: {
+                "source": StructuredKeys.Trace.SOURCE,
+                "target": StructuredKeys.Trace.TARGET,
             }
         }
     }
@@ -50,9 +50,9 @@ class TimProjectDefinition(AbstractProjectDefinition):
         artifact_definitions = TimProjectDefinition._create_artifact_definitions(tim_file)
         trace_definitions = TimProjectDefinition._create_trace_definitions(tim_file)
         return {
-            StructureKeys.ARTIFACTS: artifact_definitions,
-            StructureKeys.TRACES: trace_definitions,
-            StructureKeys.CONVERSIONS: TimProjectDefinition.get_flattened_conversions()
+            StructuredKeys.ARTIFACTS: artifact_definitions,
+            StructuredKeys.TRACES: trace_definitions,
+            StructuredKeys.CONVERSIONS: TimProjectDefinition.get_flattened_conversions()
         }
 
     @staticmethod
@@ -67,9 +67,9 @@ class TimProjectDefinition(AbstractProjectDefinition):
         for _, artifact_definition in artifact_definitions.items():
             artifact_data_path = artifact_definition.pop(SafaKeys.FILE)
             col_conversion_name = TimProjectDefinition.get_file_format(artifact_data_path)
-            artifact_definition[StructureKeys.PATH] = artifact_data_path
-            artifact_definition[StructureKeys.COLS] = TimProjectDefinition.get_conversion_id(col_conversion_name,
-                                                                                             StructureKeys.ARTIFACTS)
+            artifact_definition[StructuredKeys.PATH] = artifact_data_path
+            artifact_definition[StructuredKeys.COLS] = TimProjectDefinition.get_conversion_id(col_conversion_name,
+                                                                                              StructuredKeys.ARTIFACTS)
         return artifact_definitions
 
     @staticmethod
@@ -84,12 +84,12 @@ class TimProjectDefinition(AbstractProjectDefinition):
 
         return {
             key: {
-                StructureKeys.PATH: definition[SafaKeys.FILE],
-                StructureKeys.Trace.SOURCE: definition[SafaKeys.SOURCE_ID],
-                StructureKeys.Trace.TARGET: definition[SafaKeys.TARGET_ID],
-                StructureKeys.COLS: TimProjectDefinition.get_conversion_id(
+                StructuredKeys.PATH: definition[SafaKeys.FILE],
+                StructuredKeys.Trace.SOURCE: definition[SafaKeys.SOURCE_ID],
+                StructuredKeys.Trace.TARGET: definition[SafaKeys.TARGET_ID],
+                StructuredKeys.COLS: TimProjectDefinition.get_conversion_id(
                     TimProjectDefinition.get_file_format(definition[SafaKeys.FILE]),
-                    StructureKeys.TRACES)
+                    StructuredKeys.TRACES)
             }
             for key, definition in definitions.items()
         }

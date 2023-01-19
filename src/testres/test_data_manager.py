@@ -1,4 +1,4 @@
-from typing import List, Tuple, Union
+from typing import List, Union
 
 import numpy as np
 from transformers.trainer_utils import PredictionOutput
@@ -50,31 +50,6 @@ class TestDataManager:
                                   'test_samples_per_second': 240.328, 'test_steps_per_second': 40.055}
 
     @staticmethod
-    def get_all_links() -> List[Tuple[str, str]]:
-        sources = TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS, TestDataManager.Keys.SOURCE])
-        targets = TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS, TestDataManager.Keys.TARGET])
-        links = []
-        for source_dict, target_dict in zip(sources, targets):
-            for source_id, source_body in source_dict.items():
-                for target_id, target_body in target_dict.items():
-                    links.append((source_id, target_id))
-        return links
-
-    @staticmethod
-    def get_positive_links():
-        return TestDataManager.get_path(TestDataManager.Keys.TRACES)
-
-    @staticmethod
-    def get_negative_links():
-        all_links = TestDataManager.get_all_links()
-        pos_links = TestDataManager.get_positive_links()
-        return set(all_links).difference(set(pos_links))
-
-    @staticmethod
-    def get_linked_targets():
-        return [link[1] for link in TestDataManager.get_positive_links()]
-
-    @staticmethod
     def get_path(paths: Union[List[str], str], data=None):
         """
         Returns the data at given JSON path.
@@ -93,26 +68,7 @@ class TestDataManager:
         return TestDataManager.get_path(paths[1:], export_data)
 
     @staticmethod
-    def get_positive_link_ids() -> List[int]:
-        positive_links = TestDataManager.get_positive_links()
-        return TestDataManager._get_link_ids(positive_links)
-
-    @staticmethod
-    def get_all_link_ids() -> List[int]:
-        all_links = TestDataManager.get_all_links()
-        return TestDataManager._get_link_ids(all_links)
-
-    @staticmethod
-    def get_negative_link_ids() -> List[int]:
-        negative_links = TestDataManager.get_negative_links()
-        return TestDataManager._get_link_ids(negative_links)
-
-    @staticmethod
-    def _get_link_ids(links_list):
-        return list(TestDataManager._create_link_map(links_list).keys())
-
-    @staticmethod
-    def _create_link_map(link_list):
+    def create_link_map(link_list):
         links = {}
         for source, target in link_list:
             link = TestDataManager._create_test_link(source, target)

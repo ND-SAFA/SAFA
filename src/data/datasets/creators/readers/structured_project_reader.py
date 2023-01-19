@@ -10,7 +10,7 @@ from data.datasets.creators.readers.definitions.structure_project_definition imp
 from data.datasets.creators.readers.definitions.tim_project_definition import TimProjectDefinition
 from data.datasets.creators.readers.entity.entity_reader import EntityReader
 from data.datasets.keys.safa_format import SafaKeys
-from data.datasets.keys.structure_keys import StructureKeys
+from data.datasets.keys.structure_keys import StructuredKeys
 from util.json_util import JsonUtil
 
 
@@ -31,8 +31,8 @@ class StructuredProjectReader(AbstractProjectReader):
         self.project_path = project_path
         definition_reader = self._get_definition_reader()
         self.definition = definition_reader.read_project_definition(project_path)
-        self.conversions = self.definition.get(StructureKeys.CONVERSIONS, conversions)
-        self.overrides = self.definition.get(StructureKeys.OVERRIDES, {})
+        self.conversions = self.definition.get(StructuredKeys.CONVERSIONS, conversions)
+        self.overrides = self.definition.get(StructuredKeys.OVERRIDES, {})
 
     def read_project(self) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
         """
@@ -64,7 +64,7 @@ class StructuredProjectReader(AbstractProjectReader):
                                            artifact_definition,
                                            conversions=self.conversions)
             artifact_type_df = artifact_reader.read_entities()
-            artifact_type_df[StructureKeys.Artifact.LAYER_ID] = artifact_type
+            artifact_type_df[StructuredKeys.Artifact.LAYER_ID] = artifact_type
             artifacts_df = pd.concat([artifacts_df, artifact_type_df], ignore_index=True)
         return artifacts_df
 
@@ -87,11 +87,11 @@ class StructuredProjectReader(AbstractProjectReader):
         """
         entries = []
         for _, trace_definition_json in self._get_trace_definitions().items():
-            source_layer_id = trace_definition_json[StructureKeys.Trace.SOURCE]
-            target_layer_id = trace_definition_json[StructureKeys.Trace.TARGET]
+            source_layer_id = trace_definition_json[StructuredKeys.Trace.SOURCE]
+            target_layer_id = trace_definition_json[StructuredKeys.Trace.TARGET]
             entries.append({
-                StructureKeys.LayerMapping.SOURCE_TYPE: source_layer_id,
-                StructureKeys.LayerMapping.TARGET_TYPE: target_layer_id
+                StructuredKeys.LayerMapping.SOURCE_TYPE: source_layer_id,
+                StructuredKeys.LayerMapping.TARGET_TYPE: target_layer_id
             })
         return pd.DataFrame(entries)
 
@@ -100,16 +100,16 @@ class StructuredProjectReader(AbstractProjectReader):
         Returns project's artifact definitions.
         :return: Artifact name to definition mapping.
         """
-        JsonUtil.require_properties(self.definition, [StructureKeys.ARTIFACTS])
-        return self.definition[StructureKeys.ARTIFACTS]
+        JsonUtil.require_properties(self.definition, [StructuredKeys.ARTIFACTS])
+        return self.definition[StructuredKeys.ARTIFACTS]
 
     def _get_trace_definitions(self) -> Dict[str, Dict]:
         """
         Returns project's trace definitions.
         :return: Mapping of trace matrix name to its trace defintion.
         """
-        JsonUtil.require_properties(self.definition, [StructureKeys.TRACES])
-        return self.definition[StructureKeys.TRACES]
+        JsonUtil.require_properties(self.definition, [StructuredKeys.TRACES])
+        return self.definition[StructuredKeys.TRACES]
 
     def _get_definition_reader(self) -> AbstractProjectDefinition:
         """

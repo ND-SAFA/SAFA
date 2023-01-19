@@ -7,7 +7,7 @@ from data.datasets.creators.readers.entity.formats.csv_entity_format import CsvE
 from data.datasets.creators.readers.entity.formats.folder_entity_format import FolderEntityFormat
 from data.datasets.creators.readers.entity.formats.json_entity_format import JsonEntityFormat
 from data.datasets.creators.readers.entity.formats.xml_entity_format import XmlEntityFormat
-from data.datasets.keys.structure_keys import StructureKeys
+from data.datasets.keys.structure_keys import StructuredKeys
 from util.json_util import JsonUtil
 
 
@@ -29,8 +29,8 @@ class SupportedEntityFormats:
         """
         :return: Returns the function that will read data into a data frame.
         """
-        if definition and StructureKeys.PARSER in definition:
-            parser_key = JsonUtil.get_property(definition, StructureKeys.PARSER).upper()
+        if definition and StructuredKeys.PARSER in definition:
+            parser_key = JsonUtil.get_property(definition, StructuredKeys.PARSER).upper()
             return SupportedEntityFormats.FORMATS[parser_key].get_parser()
         if os.path.isdir(data_path):
             return SupportedEntityFormats.FORMATS["FOLDER"].get_parser()

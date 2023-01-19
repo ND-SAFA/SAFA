@@ -44,8 +44,7 @@ class ObjectCreator:
                 "target_layers": TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS, TestDataManager.Keys.TARGET]),
                 "true_links": TestDataManager.get_path(TestDataManager.Keys.TRACES)
             }
-        },
-        "filter_unlinked_artifacts": False
+        }
     }
 
     pretrain_dataset_definition = {

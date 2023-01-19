@@ -6,6 +6,7 @@ from data.datasets.creators.abstract_dataset_creator import AbstractDatasetCreat
 from data.datasets.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
 from data.datasets.creators.split_dataset_creator import SplitDatasetCreator
 from data.datasets.creators.supported_dataset_creator import SupportedDatasetCreator
+from data.datasets.creators.trace_dataset_creator import TraceDatasetCreator
 from data.datasets.dataset_role import DatasetRole
 from data.datasets.pre_train_dataset import PreTrainDataset
 from data.datasets.splitting.trace_dataset_splitter import TraceDatasetSplitter
@@ -173,6 +174,9 @@ class TrainerDatasetManager(BaseObject):
         Creates the data from their corresponding creators
         :return: a dictionary mapping dataset role to the corresponding dataset
         """
+        train_dataset_creator = dataset_creators_map[DatasetRole.TRAIN]
+        if train_dataset_creator and isinstance(train_dataset_creator, TraceDatasetCreator):
+            train_dataset_creator.filter_unlinked_artifacts = True
         return {dataset_role: TrainerDatasetManager.__optional_create(dataset_creator)
                 for dataset_role, dataset_creator in dataset_creators_map.items()}
 

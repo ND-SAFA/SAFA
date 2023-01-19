@@ -1,12 +1,13 @@
 import os
 from copy import deepcopy
-from typing import Dict, List, NamedTuple, Tuple, Union
+from typing import Dict, List, NamedTuple, Tuple, Union, Any
 
 import numpy as np
 import torch
 from datasets import load_metric
 from scipy.special import softmax
 from transformers.trainer import Trainer
+from transformers.trainer_utils import PREFIX_CHECKPOINT_DIR
 
 from data.datasets.dataset_role import DatasetRole
 from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
@@ -19,9 +20,12 @@ from train.metrics.recall_at_threshold_metric import RecallAtThresholdMetric
 from train.metrics.supported_trace_metric import get_metric_name, get_metric_path
 from train.trainer_args import TrainerArgs
 from util.base_object import BaseObject
+from util.file_util import FileUtil
 
 os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":16:8"
 torch.use_deterministic_algorithms(True)
+
+TRIAL = Union["optuna.Trial", Dict[str, Any]]
 
 
 class TraceTrainer(Trainer, BaseObject):
@@ -75,6 +79,56 @@ class TraceTrainer(Trainer, BaseObject):
                                                   source_target_pairs=dataset.get_source_target_pairs())
         return output_dict
 
+    def save_model_and_checkpoint(self, output_dir: str) -> None:
+        """
+        Saves the model and checkpoint
+        :param output_dir: the path to save the model to
+        :return: None
+        """
+        self.save_model(output_dir)
+        self.save_checkpoint(output_dir)
+
+    def save_checkpoint(self, output_dir: str = None, trial: TRIAL = None, save_metrics: bool = False):
+        """
+        Saves the checkpoint in the output dir specified in training args
+        :param output_dir: where to save the checkpoint to
+        :param trial: optional, will be given to the original _save_checkpoint if provided
+        :param save_metrics: if True, gives the metrics to the original _save_checkpoint so the best_metric can be saved in state
+        :return: None
+        """
+        metrics = self.trainer_args.metrics if save_metrics else None
+        if self.model is None:
+            raise Exception("Must perform training before checkpoint can be saved.")
+        self._save_checkpoint(model=self.model, trial=trial, metrics=metrics)
+        checkpoint_dir = self._get_checkpoint_dir()
+        assert checkpoint_dir is not None
+        checkpoint_path = os.path.join(self.trainer_args.output_dir, checkpoint_dir)
+        FileUtil.move_dir_contents(orig_path=checkpoint_path, new_path=output_dir if output_dir else self.trainer_args.output_dir,
+                                   delete_after_move=True)
+
+    def _get_checkpoint_dir(self) -> str:
+        """
+        Gets the directory where the checkpoint was saved to
+        :return:the checkpoint dir if the checkpoint was saved properly
+        """
+        checkpoint_dir = [dir_name for dir_name in os.listdir(self.trainer_args.output_dir)
+                          if os.path.isdir(os.path.join(self.trainer_args.output_dir, dir_name))
+                          and dir_name.startswith(PREFIX_CHECKPOINT_DIR)]
+        return checkpoint_dir.pop() if len(checkpoint_dir) > 0 else None
+
+    @staticmethod
+    def get_similarity_scores(predictions: Union[np.ndarray, Tuple[np.ndarray]]) -> List[float]:
+        """
+        Transforms predictions into similarity scores.
+        :param predictions: The model predictions.
+        :return: List of similarity scores associated with predictions.
+        """
+        similarity_scores = []
+        for pred_i in range(predictions.shape[0]):
+            prediction = predictions[pred_i]
+            similarity_scores.append(softmax(prediction)[1])
+        return similarity_scores
+
     @staticmethod
     def output_to_dict(output: NamedTuple, **kwargs) -> Dict:
         """
@@ -113,16 +167,3 @@ class TraceTrainer(Trainer, BaseObject):
             else:
                 results[metric_name] = metric_result
         return results
-
-    @staticmethod
-    def get_similarity_scores(predictions: Union[np.ndarray, Tuple[np.ndarray]]) -> List[float]:
-        """
-        Transforms predictions into similarity scores.
-        :param predictions: The model predictions.
-        :return: List of similarity scores associated with predictions.
-        """
-        similarity_scores = []
-        for pred_i in range(predictions.shape[0]):
-            prediction = predictions[pred_i]
-            similarity_scores.append(softmax(prediction)[1])
-        return similarity_scores

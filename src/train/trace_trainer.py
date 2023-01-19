@@ -53,7 +53,8 @@ class TraceTrainer(Trainer, BaseObject):
         """
         self.model = self.model_manager.get_model()
         self._move_model_to_device(self.model, self.args.device)
-        self.train_dataset = self.trainer_dataset_manager[DatasetRole.TRAIN].to_trainer_dataset(self.model_manager)
+        self.train_dataset = self.trainer_dataset_manager[DatasetRole.TRAIN].to_trainer_dataset(self.model_manager,
+                                                                                                self.trainer_args.train_batch_size)
         output = self.train(resume_from_checkpoint=checkpoint)
         output_dict = TraceTrainer.output_to_dict(output)
         return output_dict

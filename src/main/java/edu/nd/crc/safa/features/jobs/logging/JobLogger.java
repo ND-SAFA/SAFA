@@ -1,5 +1,7 @@
 package edu.nd.crc.safa.features.jobs.logging;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.sql.Timestamp;
 import java.time.Instant;
 
@@ -47,5 +49,17 @@ public class JobLogger {
      */
     public void log(String format, Object... args) {
         log(String.format(format, args));
+    }
+
+    /**
+     * Add a log message for an exception.
+     *
+     * @param exception The exception that was thrown.
+     */
+    public void logException(Throwable exception) {
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(stringWriter);
+        exception.printStackTrace(printWriter);
+        log(stringWriter.toString());
     }
 }

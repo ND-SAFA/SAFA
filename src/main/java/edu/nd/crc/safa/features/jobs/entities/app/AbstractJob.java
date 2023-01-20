@@ -144,7 +144,7 @@ public abstract class AbstractJob implements Job {
             }
         } catch (Exception e) {
             jobService.failJob(jobDbEntity);
-            e.printStackTrace();
+            logger.logException(e);
             notificationService.broadcastJob(JobAppEntity.createFromJob(jobDbEntity));
             throw new SafaError(e.getMessage());
         }

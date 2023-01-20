@@ -198,7 +198,7 @@ class TraceDataset(AbstractDataset):
         :param filename: name of the file (no ext)
         :return: location the file was saved to
         """
-        FileUtil.make_dir_safe(output_dir)
+        FileUtil.create_dir_safely(output_dir)
         output_path = os.path.join(output_dir, filename + CSVKeys.EXT)
         df = self.to_dataframe()
         df.to_csv(output_path)

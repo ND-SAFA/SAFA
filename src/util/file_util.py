@@ -1,7 +1,7 @@
 import json
 import os
 import shutil
-from typing import Dict, List, Union
+from typing import Dict, List, Union, IO
 
 from util.json_util import JsonUtil
 from util.uncased_dict import UncasedDict
@@ -10,7 +10,7 @@ from util.uncased_dict import UncasedDict
 class FileUtil:
 
     @staticmethod
-    def make_dir_safe(output_path: str, *additional_path_parts) -> str:
+    def create_dir_safely(output_path: str, *additional_path_parts) -> str:
         """
         Makes a directory, by first checking if the directory exists
         :return: the output path
@@ -95,14 +95,14 @@ class FileUtil:
             file.write(content)
 
     @staticmethod
-    def safe_open_w(path):
-        FileUtil.create_dir(path)
+    def safe_open_w(path: str) -> IO:
+        """
+        Opens given file without throwing exception if it does not exist
+        :param path: the path to file
+        :return: the file object
+        """
+        FileUtil.create_dir_safely(os.path.dirname(path))
         return open(path, 'w')
-
-    @staticmethod
-    def create_dir(dir_path: str):
-        if not os.path.exists(os.path.dirname(dir_path)):
-            os.makedirs(os.path.dirname(dir_path))
 
     @staticmethod
     def delete_dir(dir_path: str) -> None:
@@ -112,3 +112,19 @@ class FileUtil:
         """
         if os.path.exists(dir_path):
             shutil.rmtree(dir_path)
+
+    @staticmethod
+    def move_dir_contents(orig_path: str, new_path: str, delete_after_move: bool = False) -> None:
+        """
+        Moves the directory at the original path to the new path
+        :param orig_path: the original path to move
+        :param new_path: the new path to move the dir to
+        :param delete_after_move: if True, deletes the original directory after moving all contents
+        :return: None
+        """
+        FileUtil.create_dir_safely(new_path)
+        for file in os.listdir(orig_path):
+            file_path = os.path.join(orig_path, file)
+            shutil.move(file_path, new_path)
+        if delete_after_move:
+            FileUtil.delete_dir(orig_path)

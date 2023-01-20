@@ -1,3 +1,4 @@
+import os
 from copy import deepcopy
 from typing import Dict
 from unittest.mock import patch
@@ -98,6 +99,16 @@ class TestTraceTrainer(BaseTraceTest):
             trainer_args=trainer_args,
             trainer_dataset_manager=trainer_dataset_manager,
             model_manager=model_manager)
+
+    def test_save_checkpoint(self):
+        test_trace_trainer = self.get_test_trace_trainer()
+        test_trace_trainer.perform_training()
+        test_trace_trainer.save_checkpoint()
+        checkpoint_files = ["optimizer.pt", "config.json", "pytorch_model.bin", "rng_state.pth", "scheduler.pt", "trainer_state.json",
+                            "training_args.bin"]
+        output_files = list(os.listdir(test_trace_trainer.trainer_args.output_dir))
+        for file in checkpoint_files:
+            self.assertIn(file, output_files)
 
     @staticmethod
     def create_trainer_dataset_manager(kwargs: Dict = None) -> TrainerDatasetManager:

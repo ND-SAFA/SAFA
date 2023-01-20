@@ -14,7 +14,7 @@ N_EPOCHS_DEFAULT = 3
 EVALUATION_STRATEGY_DEFAULT = SAVE_STRATEGY_DEFAULT = "epoch"  # should be the same to load best model as per transformers docs
 SAVE_TOTAL_LIMIT_DEFAULT = 2
 LOAD_BEST_MODEL_AT_END_DEFAULT = True
-METRIC_FOR_BEST_MODEL_DEFAULT = "f1"  # TODO
+METRIC_FOR_BEST_MODEL_DEFAULT = "f2"
 
 # -------------- DATASET --------------
 BLOCK_SIZE_DEFAULT = 128

@@ -43,6 +43,13 @@ class DataFrameUtil:
         return df[df.apply(filter_lambda, axis=1)]
 
     @staticmethod
+    def query_df(df: pd.DataFrame, query: Dict):
+        query_df = df
+        for k, v in query.items():
+            query_df = query_df[query_df[k] == v]
+        return query_df
+
+    @staticmethod
     def add_optional_column(df: pd.DataFrame, col_name: str, default_value: Any) -> pd.DataFrame:
         """
         Adds default value to column if not found in data frame.

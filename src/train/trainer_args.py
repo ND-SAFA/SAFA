@@ -43,7 +43,7 @@ class TrainerArgs(TrainingArguments, BaseObject):
     optimizer_constructor: Type[Optimizer] = FunctionalWrapper(torch.optim.Adam)
     loss_function: Callable = FunctionalWrapper(cross_entropy)
     scheduler_constructor: Type[_LRScheduler] = FunctionalWrapper(LinearLR)
-    use_custom_train_loop: bool = True
+    use_custom_train_loop: bool = False
     gradient_accumulation_steps: int = 8
     custom_save_strategy: AbstractSaveStrategy = MetricSaveStrategy(metric_name="map")
 

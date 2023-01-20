@@ -26,8 +26,7 @@ class ApiProjectReader(AbstractProjectReader):
         :return: Artifacts, Traces, and Layer Mappings.
         """
         artifact_map = {}
-        trace_map = {}
-        layer_mapping = {}
+        layer_mapping = []
 
         source_layers = self.api_definition["source_layers"]
         target_layers = self.api_definition["target_layers"]
@@ -38,20 +37,22 @@ class ApiProjectReader(AbstractProjectReader):
             target_layer_id = self.create_layer_id(StructuredKeys.LayerMapping.TARGET_TYPE, i)
             artifact_map = self.add_artifact_layer(source_layer, source_layer_id, artifact_map)
             artifact_map = self.add_artifact_layer(target_layer, target_layer_id, artifact_map)
-            layer_mapping = DataFrameUtil.append(layer_mapping, {
+            layer_mapping.append({
                 StructuredKeys.LayerMapping.SOURCE_TYPE: source_layer_id,
                 StructuredKeys.LayerMapping.TARGET_TYPE: target_layer_id
             })
 
-        artifact_df = pd.DataFrame(artifact_map, ignore_index=True)
-        layer_mapping_df = pd.DataFrame(layer_mapping, ignore_index=True)
+        trace_df_entries = []
         for source_id, target_id in links:
-            trace_map = DataFrameUtil.append(trace_map, {
+            trace_df_entries.append({
                 StructuredKeys.Trace.SOURCE: source_id,
                 StructuredKeys.Trace.TARGET: target_id,
                 StructuredKeys.Trace.LABEL: 1
             })
-        trace_df = pd.DataFrame(trace_map, ignore_index=True)
+
+        artifact_df = pd.DataFrame(artifact_map)
+        layer_mapping_df = pd.DataFrame(layer_mapping)
+        trace_df = pd.DataFrame(trace_df_entries)
         return artifact_df, trace_df, layer_mapping_df
 
     @staticmethod

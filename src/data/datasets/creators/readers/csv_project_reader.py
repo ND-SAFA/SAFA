@@ -1,10 +1,11 @@
-from typing import Tuple
+from typing import Dict, Tuple
 
 import pandas as pd
 
 from data.datasets.creators.readers.abstract_project_reader import AbstractProjectReader
 from data.datasets.keys.csv_format import CSVKeys
 from data.datasets.keys.structure_keys import StructuredKeys
+from util.dataframe_util import DataFrameUtil
 
 
 class CsvProjectReader(AbstractProjectReader):
@@ -26,29 +27,30 @@ class CsvProjectReader(AbstractProjectReader):
         :return: Artifact and Trace DataFrame
         """
         entity_df = pd.read_csv(self.data_path)
-        artifact_df = pd.DataFrame(columns=StructuredKeys.get_artifact_cols())
-        trace_df = pd.DataFrame()
+        trace_df_entries = []
+        artifact_df_entries = {}
         for _, row in entity_df.iterrows():
             source_id = row[CSVKeys.SOURCE_ID]
             target_id = row[CSVKeys.TARGET_ID]
-            artifact_df = self.add_artifact(source_id,
-                                            row[CSVKeys.SOURCE],
-                                            CSVKeys.SOURCE,
-                                            artifact_df)
-            artifact_df = self.add_artifact(target_id,
-                                            row[CSVKeys.TARGET],
-                                            CSVKeys.TARGET,
-                                            artifact_df)
-            trace_df = trace_df.append({
+            self.add_artifact(source_id,
+                              row[CSVKeys.SOURCE],
+                              CSVKeys.SOURCE,
+                              artifact_df_entries)
+            self.add_artifact(target_id,
+                              row[CSVKeys.TARGET],
+                              CSVKeys.TARGET,
+                              artifact_df_entries)
+            trace_df_entries.append({
                 StructuredKeys.Trace.SOURCE: source_id,
                 StructuredKeys.Trace.TARGET: target_id,
                 StructuredKeys.Trace.LABEL: row[CSVKeys.LABEL]
-            }, ignore_index=True)
+            })
+        trace_df = pd.DataFrame(trace_df_entries)
         layer_mapping_df = pd.DataFrame([{
             StructuredKeys.LayerMapping.SOURCE_TYPE: self.get_layer_id(CSVKeys.SOURCE),
             StructuredKeys.LayerMapping.TARGET_TYPE: self.get_layer_id(CSVKeys.TARGET),
         }])
-        artifact_df = artifact_df.sort_values([StructuredKeys.Artifact.LAYER_ID, StructuredKeys.Artifact.ID]).reset_index()
+        artifact_df = pd.DataFrame(artifact_df_entries)
         return artifact_df, trace_df, layer_mapping_df
 
     @staticmethod
@@ -60,22 +62,20 @@ class CsvProjectReader(AbstractProjectReader):
         return False
 
     @staticmethod
-    def add_artifact(a_id: str, a_body: str, artifact_type: str, artifact_df: pd.DataFrame) -> pd.DataFrame:
+    def add_artifact(a_id: str, a_body: str, artifact_type: str, artifact_df_entries: Dict):
         """
         Adds artifact entry to DataFrame if not already present.
         :param a_id: The artifact id used to check if artifact entry exists.
         :param a_body: The artifact body to store in mapping if entry does not exist.
         :param artifact_type: The name of type of artifact.
-        :param artifact_df: DataFrame containing entries for each artifact processed.
-        :return: The artifact body of the entry added.
+        :param artifact_df_entries: DataFrame containing entries for each artifact processed.
         """
-        if a_id not in artifact_df[StructuredKeys.Artifact.ID].values:
-            artifact_df = artifact_df.append({
+        if StructuredKeys.Artifact.ID not in artifact_df_entries or a_id not in artifact_df_entries[StructuredKeys.Artifact.ID]:
+            DataFrameUtil.append(artifact_df_entries, {
                 StructuredKeys.Artifact.ID: a_id,
                 StructuredKeys.Artifact.BODY: a_body,
                 StructuredKeys.Artifact.LAYER_ID: CsvProjectReader.get_layer_id(artifact_type)
-            }, ignore_index=True)
-        return artifact_df
+            })
 
     @staticmethod
     def get_layer_id(artifact_type: str) -> str:

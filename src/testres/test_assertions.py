@@ -6,6 +6,7 @@ import pandas as pd
 from data.datasets.trace_dataset import TraceDataset
 from jobs.components.job_result import JobResult
 from testres.test_data_manager import TestDataManager
+from util.dataframe_util import DataFrameUtil
 from util.json_util import JsonUtil
 
 
@@ -98,9 +99,6 @@ class TestAssertions:
         :return: None
         """
         test_case.assertEqual(len(expected_entities), len(entity_df))
-        for row_index, row in entity_df.iterrows():
-            entity = expected_entities[row_index]
-            for param_name, param_value in entity.items():
-                assert param_name in row, f"{row.to_dict()} does not contain: {param_name}"
-                error_message = f"Row: {row.to_dict()} | Param: {param_name}"
-                test_case.assertEqual(param_value, row[param_name], msg=error_message)
+        for entity in expected_entities:
+            query_df = DataFrameUtil.query_df(entity_df, entity)
+            test_case.assertEquals(1, len(query_df), msg=f"Could not find row with: {entity}")

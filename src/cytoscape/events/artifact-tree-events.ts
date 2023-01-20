@@ -107,8 +107,8 @@ export const ArtifactTreeCytoEvents: CytoEventHandlers = {
       if (!artifactLevel.source || !artifactLevel.target) return;
 
       selectionStore.selectTraceMatrix(
-        artifactLevel.source,
-        artifactLevel.target
+        artifactLevel.target,
+        artifactLevel.source
       );
     },
   },

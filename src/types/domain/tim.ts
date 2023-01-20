@@ -1,7 +1,7 @@
 /**
  * Defines an artifact level in the project.
  */
-export interface TimArtifactLevel {
+export interface TimArtifactLevelSchema {
   /**
    * The type of the artifact.
    */
@@ -15,7 +15,7 @@ export interface TimArtifactLevel {
 /**
  * Defines a trace matrix in the project.
  */
-export interface TimTraceMatrix {
+export interface TimTraceMatrixSchema {
   /**
    * The type of the artifact that this matrix links from.
    */
@@ -37,9 +37,9 @@ export interface TimSchema {
   /**
    * The artifact levels in the project.
    */
-  artifacts: TimArtifactLevel[];
+  artifacts: TimArtifactLevelSchema[];
   /**
    * The trace matrices in the project
    */
-  traces: TimTraceMatrix[];
+  traces: TimTraceMatrixSchema[];
 }

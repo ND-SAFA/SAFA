@@ -8,6 +8,8 @@ import {
   LabelledTraceDirectionSchema,
   ProjectSchema,
   SafetyCaseType,
+  TimArtifactLevelSchema,
+  TimTraceMatrixSchema,
   TraceDirectionSchema,
 } from "@/types";
 import {
@@ -214,6 +216,33 @@ export const useTypeOptions = defineStore("typeOptions", {
             iconIndex: allTypeIcons.indexOf(icon),
           };
         }
+      );
+    },
+    /**
+     * Finds the artifact level info for an artifact type.
+     *
+     * @param type - The artifact type.
+     * @return The artifact level, if one exists.
+     */
+    getArtifactLevel(type: string): TimArtifactLevelSchema | undefined {
+      return this.tim.artifacts.find(
+        ({ artifactType }) => artifactType === type
+      );
+    },
+    /**
+     * Finds the artifact level info for an artifact type.
+     *
+     * @param source - The source artifact type.
+     * @param target - The target artifact type.
+     * @return The trace matrix, if one exists.
+     */
+    getTraceMatrix(
+      source: string,
+      target: string
+    ): TimTraceMatrixSchema | undefined {
+      return this.tim.traces.find(
+        ({ sourceType, targetType }) =>
+          sourceType === source && targetType === target
       );
     },
   },

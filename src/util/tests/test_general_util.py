@@ -1,8 +1,11 @@
 from testres.base_test import BaseTest
-from util.general_util import get_n_items_from_list
+from util.general_util import ListUtil
 
 
-class TestGeneralUtil(BaseTest):
+class TestListUtil(BaseTest):
+    """
+    Tests list utility methods.
+    """
 
     def test_get_n_items_from_list(self):
         test_list = [i for i in range(50)]

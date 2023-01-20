@@ -19,6 +19,7 @@ class TestDefinitionCreator(BaseTest):
         "model_path": "roberta-base"
     }
     DATASET_CREATOR_DEFINITION = {
+        TypedDefinitionVariable.OBJECT_TYPE_KEY: "TRACE",
         "project_reader": {
             TypedDefinitionVariable.OBJECT_TYPE_KEY: "STRUCTURE",
             "project_path": os.path.join(TEST_DATA_DIR, "structure")

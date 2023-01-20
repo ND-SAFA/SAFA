@@ -2,6 +2,7 @@ from typing import Any, Dict
 
 
 class UncasedDict(dict):
+    # TODO : Test that updates with uncased dictionaries work as expect
     def __init__(self, dict_: Dict[Any, Any] = None):
         """
         Represents a dictionary whose keys are uncased

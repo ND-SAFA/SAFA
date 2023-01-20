@@ -1,4 +1,3 @@
-import math
 import os
 import random
 from collections import OrderedDict
@@ -19,7 +18,7 @@ from data.tree.trace_link import TraceLink
 from models.model_manager import ModelManager
 from models.model_properties import ModelArchitectureType
 from util.file_util import FileUtil
-from util.general_util import get_n_items_from_list
+from util.general_util import ListUtil
 
 
 class TraceDataset(AbstractDataset):
@@ -119,7 +118,7 @@ class TraceDataset(AbstractDataset):
         :param batch_size: the size of the batch
         :return: a list of ordered links
         """
-        n_links_per_batch, rem_per_batch = divmod(batch_size,  2)
+        n_links_per_batch, rem_per_batch = divmod(batch_size, 2)
         links_ids = []
 
         def add_batch(batch):
@@ -128,14 +127,16 @@ class TraceDataset(AbstractDataset):
 
         pos_start, neg_start = 0, 0
         while pos_start < len(self.pos_link_ids):
-            pos_links, pos_start = get_n_items_from_list(self.pos_link_ids, n_items=n_links_per_batch, init_index=pos_start)
-            neg_links, neg_start = get_n_items_from_list(self.neg_link_ids, n_items=len(pos_links), init_index=neg_start)
+            pos_links, pos_start = ListUtil.get_n_items_from_list(self.pos_link_ids, n_items=n_links_per_batch, init_index=pos_start)
+            neg_links, neg_start = ListUtil.get_n_items_from_list(self.neg_link_ids, n_items=len(pos_links), init_index=neg_start)
             new_batch = pos_links + neg_links
             if rem_per_batch > 0:
                 if pos_start <= neg_start:
-                    extra_links, pos_start = get_n_items_from_list(self.pos_link_ids, n_items=rem_per_batch, init_index=pos_start)
+                    extra_links, pos_start = ListUtil.get_n_items_from_list(self.pos_link_ids, n_items=rem_per_batch,
+                                                                            init_index=pos_start)
                 else:
-                    extra_links, neg_start = get_n_items_from_list(self.neg_link_ids, n_items=rem_per_batch, init_index=neg_start)
+                    extra_links, neg_start = ListUtil.get_n_items_from_list(self.neg_link_ids, n_items=rem_per_batch,
+                                                                            init_index=neg_start)
                 new_batch += extra_links
             add_batch(new_batch)
         return [self.links[link_id] for link_id in links_ids]

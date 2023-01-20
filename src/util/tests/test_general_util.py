@@ -19,7 +19,7 @@ class TestListUtil(BaseTest):
         for i in range(0, 5, 2):
             for n_items in n_items_nums:
                 expected_start = n_items * i
-                result = get_n_items_from_list(test_list, n_items, iteration_num=i)[0]
+                result = ListUtil.get_n_items_from_list(test_list, n_items, iteration_num=i)[0]
                 verify(expected_start)
-                result = get_n_items_from_list(test_list, n_items, init_index=i)[0]
+                result = ListUtil.get_n_items_from_list(test_list, n_items, init_index=i)[0]
                 verify(i)

@@ -55,3 +55,17 @@ class DataFrameUtil:
         if col_name not in df.columns:
             df[col_name] = [default_value] * len(df)
         return df
+
+    @staticmethod
+    def append(df_dict: Dict, col2value: Dict) -> Dict:
+        """
+        Replaces old append method in panda dataframe by adding rows to the dictionary which can be used to initialize the df
+        :param df_dict: dictionary representing the dataframe
+        :param col2value: maps column name to value
+        :return: the updated dictionary
+        """
+        for col, value in col2value.items():
+            if col not in df_dict:
+                df_dict[col] = []
+            df_dict[col].append(value)
+        return df_dict

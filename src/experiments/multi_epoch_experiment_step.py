@@ -35,10 +35,9 @@ class MultiEpochExperimentStep(ExperimentStep):
         jobs = []
         for i, epoch_total in enumerate(epochs):
             prev_epoch = epochs[i - 1] if (i - 1) >= 0 else None
-            epoch = epoch_total - prev_epoch if prev_epoch else epoch_total
             epoch_job = deepcopy(orig_job)
             epoch_job.id = str(uuid.uuid4())
-            epoch_job.trainer_args.num_train_epochs = epoch
+            epoch_job.trainer_args.num_train_epochs = epoch_total
             epoch_job.result[JobResult.EXPERIMENTAL_VARS]["num_train_epochs"] = epoch_total
             epoch_job.trainer_args.total_training_epochs = epoch_total
 

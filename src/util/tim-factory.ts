@@ -1,15 +1,15 @@
-import { ProjectSchema, TimStructure } from "@/types";
+import { ProjectSchema, TimSchema } from "@/types";
 
 /**
  * @return A project TIM structure initialized to the given values.
  */
-export function createTIM(project: ProjectSchema): TimStructure {
+export function createTIM(project?: ProjectSchema): TimSchema {
   const delimiter = `~~~`;
   const artifactCounts: Record<string, number> = {};
   const artifactTypes: Record<string, string> = {};
   const traceCounts: Record<string, number> = {};
 
-  project.artifacts.forEach(({ id, type }) => {
+  project?.artifacts.forEach(({ id, type }) => {
     if (!artifactCounts[type]) {
       artifactCounts[type] = 1;
     } else {
@@ -19,7 +19,7 @@ export function createTIM(project: ProjectSchema): TimStructure {
     artifactTypes[id] = type;
   });
 
-  project.traces.forEach(({ sourceId, targetId }) => {
+  project?.traces.forEach(({ sourceId, targetId }) => {
     const type = `${artifactTypes[sourceId]}${delimiter}${artifactTypes[targetId]}`;
 
     if (!traceCounts[type]) {
@@ -35,8 +35,8 @@ export function createTIM(project: ProjectSchema): TimStructure {
       count,
     })),
     traces: Object.entries(traceCounts).map(([sourceAndTargetType, count]) => ({
-      source: sourceAndTargetType.split(delimiter)[0],
-      target: sourceAndTargetType.split(delimiter)[1],
+      sourceType: sourceAndTargetType.split(delimiter)[0],
+      targetType: sourceAndTargetType.split(delimiter)[1],
       count,
     })),
   };

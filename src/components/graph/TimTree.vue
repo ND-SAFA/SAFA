@@ -19,8 +19,8 @@
           v-for="panel in tracePanels"
           :key="panel.projectFile.sourceId + panel.projectFile.targetId"
           :count="panel.projectFile.traces.length"
-          :target="panel.projectFile.targetId"
-          :source="panel.projectFile.sourceId"
+          :target-type="panel.projectFile.targetId"
+          :source-type="panel.projectFile.sourceId"
         />
       </template>
     </cytoscape-controller>

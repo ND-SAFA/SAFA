@@ -4,9 +4,8 @@ import {
   ProjectSchema,
   GenerationModelSchema,
   VersionSchema,
-  TimStructure,
 } from "@/types";
-import { createProject, createTIM } from "@/util";
+import { createProject } from "@/util";
 import { pinia } from "@/plugins";
 import sessionStore from "../core/useSession";
 import selectionStore from "../graph/useSelection";
@@ -31,10 +30,6 @@ export const useProject = defineStore("project", {
      * The currently loaded project.
      */
     project: createProject(),
-    /**
-     * The TIM structure for the current project.
-     */
-    tim: { artifacts: [], traces: [] } as TimStructure,
   }),
   getters: {
     /**
@@ -127,13 +122,6 @@ export const useProject = defineStore("project", {
       subtreeStore.initializeProject(project);
       attributesStore.initializeProject(project);
       warningStore.artifactWarnings = project.warnings;
-      this.initializeTim(project);
-    },
-    /**
-     * Initializes the current project's TIM structure.
-     */
-    initializeTim(project: ProjectSchema): void {
-      this.tim = createTIM(project);
     },
     /**
      * Runs the callback only if the project is defined. Otherwise logs a warning.

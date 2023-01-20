@@ -210,11 +210,3 @@ export interface TimEdgeCytoElementData extends CytoEdgeData {
  * Defines a tim edge in cytoscape.
  */
 export type TimEdgeCytoElement = CytoElement<TimEdgeCytoElementData>;
-
-/**
- * Defines the structure of a TIM graph.
- */
-export interface TimStructure {
-  artifacts: Pick<TimNodeCytoElementData, "artifactType" | "count">[];
-  traces: Pick<TimEdgeCytoElementData, "source" | "target" | "count">[];
-}

@@ -13,11 +13,11 @@ import { getTraceId } from "@/util";
 export default Vue.extend({
   name: "TimLink",
   props: {
-    source: {
+    sourceType: {
       type: String,
       required: true,
     },
-    target: {
+    targetType: {
       type: String,
       required: true,
     },
@@ -35,15 +35,15 @@ export default Vue.extend({
         data: {
           type: GraphElementType.edge,
           graph: GraphMode.tim,
-          id: getTraceId(this.source, this.target),
+          id: getTraceId(this.sourceType, this.targetType),
           // Reversed to show arrow toward parent.
-          source: this.target,
-          target: this.source,
+          source: this.targetType,
+          target: this.sourceType,
           count: this.count,
           label: this.count === 1 ? `1 Link` : `${this.count} Links`,
           dark: this.$vuetify.theme.dark,
         },
-        classes: this.source === this.target ? ["loop"] : [],
+        classes: this.sourceType === this.targetType ? ["loop"] : [],
       };
     },
   },

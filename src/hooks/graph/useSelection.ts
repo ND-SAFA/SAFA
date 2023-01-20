@@ -32,6 +32,14 @@ export const useSelection = defineStore("selection", {
      */
     selectedTraceLinkId: "",
     /**
+     * The currently selected artifact type.
+     */
+    selectedArtifactLevel: "",
+    /**
+     * The currently selected artifact type.
+     */
+    selectedTraceMatrix: { source: "", target: "" },
+    /**
      * The currently selected artifact subtree.
      */
     selectedSubtreeIds: [] as string[],
@@ -82,6 +90,8 @@ export const useSelection = defineStore("selection", {
       this.selectedGroupIds = [];
       this.selectedArtifactId = "";
       this.selectedTraceLinkId = "";
+      this.selectedArtifactLevel = "";
+      this.selectedTraceMatrix = { source: "", target: "" };
       appStore.closeSidePanels();
     },
     /**
@@ -131,10 +141,9 @@ export const useSelection = defineStore("selection", {
      * @param artifactId - The artifact to select.
      */
     selectArtifact(artifactId: string): void {
+      this.clearSelections();
       this.selectedArtifactId = artifactId;
-      this.selectedTraceLinkId = "";
       this.centerOnArtifacts([artifactId]);
-      this.selectedSubtreeIds = [];
       appStore.openDetailsPanel("displayArtifact");
     },
     /**
@@ -143,7 +152,7 @@ export const useSelection = defineStore("selection", {
      * @param traceLink - The trace link to select.
      */
     selectTraceLink(traceLink: TraceLinkSchema): void {
-      this.selectedArtifactId = "";
+      this.clearSelections();
       this.selectedTraceLinkId = traceLink.traceLinkId;
       this.selectedSubtreeIds = [traceLink.sourceId, traceLink.targetId];
       this.centerOnArtifacts([traceLink.sourceId, traceLink.targetId]);
@@ -200,6 +209,29 @@ export const useSelection = defineStore("selection", {
         artifactId === this.selectedArtifactId ||
         this.selectedGroupIds.includes(artifactId)
       );
+    },
+    /**
+     * Sets the given artifact level as selected.
+     *
+     * @param artifactType - The artifact type to select.
+     */
+    selectArtifactLevel(artifactType: string): void {
+      this.clearSelections();
+      this.selectedArtifactLevel = artifactType;
+      this.centerOnArtifacts([artifactType]);
+      appStore.openDetailsPanel("displayArtifactLevel");
+    },
+    /**
+     * Sets the given trace matrix as selected.
+     *
+     * @param sourceType - The artifact source type to select.
+     * @param targetType - The artifact target type to select.
+     */
+    selectTraceMatrix(sourceType: string, targetType: string): void {
+      this.clearSelections();
+      this.selectedTraceMatrix = { source: sourceType, target: targetType };
+      this.centerOnArtifacts([sourceType, targetType]);
+      appStore.openDetailsPanel("displayTraceMatrix");
     },
   },
 });

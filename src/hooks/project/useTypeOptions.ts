@@ -13,6 +13,7 @@ import {
 import {
   allTypeIcons,
   createDefaultTypeIcons,
+  createTIM,
   defaultTypeIcon,
   isLinkAllowedByType,
   preserveObjectKeys,
@@ -39,6 +40,7 @@ export const useTypeOptions = defineStore("typeOptions", {
      * A mapping of the icons for each artifact type.
      */
     artifactTypeIcons: createDefaultTypeIcons([]),
+    tim: createTIM(),
   }),
   getters: {
     /**
@@ -61,6 +63,7 @@ export const useTypeOptions = defineStore("typeOptions", {
     initializeProject(project: ProjectSchema): void {
       this.artifactTypeDirections = {};
       this.initializeTypeIcons(project.artifactTypes);
+      this.tim = createTIM(project);
     },
     /**
      * Changes what directions of trace links between artifacts are allowed.

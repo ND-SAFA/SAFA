@@ -34,10 +34,10 @@
       />
       <tim-link
         v-for="matrix in tim.traces"
-        :key="matrix.source + matrix.target"
+        :key="matrix.sourceType + matrix.targetType"
         :count="matrix.count"
-        :target="matrix.target"
-        :source="matrix.source"
+        :target-type="matrix.targetType"
+        :source-type="matrix.sourceType"
       />
     </template>
   </cytoscape-controller>
@@ -50,7 +50,7 @@ import {
   TraceLinkSchema,
   ArtifactSchema,
   CytoCoreGraph,
-  TimStructure,
+  TimSchema,
 } from "@/types";
 import {
   appStore,
@@ -60,7 +60,7 @@ import {
   subtreeStore,
   selectionStore,
   layoutStore,
-  projectStore,
+  typeOptionsStore,
 } from "@/hooks";
 import { Routes } from "@/router";
 import { artifactTreeGraph, cyResetTree } from "@/cytoscape";
@@ -152,8 +152,8 @@ export default Vue.extend({
     /**
      * @return The TIM structure of this project.
      */
-    tim(): TimStructure {
-      return projectStore.tim;
+    tim(): TimSchema {
+      return typeOptionsStore.tim;
     },
   },
   mounted() {

@@ -12,8 +12,7 @@ class TestCreateDatasetsJob(BaseJobTest):
     def test_run_success(self):
         self._test_run_success()
 
-    def _assert_success(self, job: CreateDatasetsJob, job_result: JobResult):
-        result = JobResult.SAVED_DATASET_PATHS in job_result
+    def _assert_success(self, _: CreateDatasetsJob, job_result: JobResult):
         self.assertIn(JobResult.SAVED_DATASET_PATHS, job_result)
         self.assertGreater(len(job_result[JobResult.SAVED_DATASET_PATHS]), 0)
 

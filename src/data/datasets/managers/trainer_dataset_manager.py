@@ -82,11 +82,13 @@ class TrainerDatasetManager(BaseObject):
         :return: None
         """
         for dataset_role, dataset_creator in self._dataset_creators.items():
+            creator = obj.get_creator(dataset_role)
+            if creator is None:
+                continue
             if isinstance(dataset_creator, UndeterminedVariable):
-                self._dataset_creators[dataset_role] = obj.get_creator(dataset_role)
+                self._dataset_creators[dataset_role] = creator
             elif isinstance(dataset_creator, BaseObject):
-                self._dataset_creators[dataset_role].use_values_from_object_for_undetermined(
-                    obj.get_creator(dataset_role))
+                self._dataset_creators[dataset_role].use_values_from_object_for_undetermined(creator)
         super().use_values_from_object_for_undetermined(obj)
 
     def get_datasets(self) -> Dict[DatasetRole, AbstractDataset]:

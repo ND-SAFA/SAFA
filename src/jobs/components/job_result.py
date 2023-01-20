@@ -65,7 +65,7 @@ class JobResult(BaseObject):
         """
         if isinstance(other_result, JobResult):
             other_result = other_result.__result
-        self.__result.update(other_result)
+        self.__result.update(UncasedDict(other_result))
         return self
 
     def to_json(self, keys: List[str] = None) -> str:

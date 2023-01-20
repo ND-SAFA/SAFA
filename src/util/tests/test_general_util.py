@@ -1,8 +1,11 @@
 from testres.base_test import BaseTest
-from util.general_util import get_n_items_from_list
+from util.general_util import ListUtil
 
 
-class TestGeneralUtil(BaseTest):
+class TestListUtil(BaseTest):
+    """
+    Tests list utility methods.
+    """
 
     def test_get_n_items_from_list(self):
         test_list = [i for i in range(50)]
@@ -15,8 +18,8 @@ class TestGeneralUtil(BaseTest):
 
         for i in range(0, 5, 2):
             for n_items in n_items_nums:
-                expected_start = n_items*i
-                result = get_n_items_from_list(test_list, n_items, iteration_num=i)
+                expected_start = n_items * i
+                result = ListUtil.get_n_items_from_list(test_list, n_items, iteration_num=i)
                 verify(expected_start)
-                result = get_n_items_from_list(test_list, n_items, init_index=i)
+                result = ListUtil.get_n_items_from_list(test_list, n_items, init_index=i)
                 verify(i)

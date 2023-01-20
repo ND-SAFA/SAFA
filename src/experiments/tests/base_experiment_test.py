@@ -27,11 +27,13 @@ class BaseExperimentTest(BaseTest):
                         "model_path": ExperimentalVariable([Variable("roberta-base"), Variable("bert-base-uncased")]),
                     }),
                     "trainer_dataset_manager": DefinitionVariable({
-                        "train_dataset_creator":
-                            TypedDefinitionVariable({
-                                "object_type": "Safa",
+                        "train_dataset_creator": TypedDefinitionVariable({
+                            TypedDefinitionVariable.OBJECT_TYPE_KEY: "TRACE",
+                            "project_reader": TypedDefinitionVariable({
+                                TypedDefinitionVariable.OBJECT_TYPE_KEY: "STRUCTURE",
                                 "project_path": ExperimentalVariable([Variable("safa1"), Variable("safa2")])
                             })
+                        })
                     }),
                     "trainer_args": DefinitionVariable({
                         "output_dir": Variable(TEST_OUTPUT_DIR),
@@ -50,8 +52,11 @@ class BaseExperimentTest(BaseTest):
                 "trainer_dataset_manager": DefinitionVariable({
                     "eval_dataset_creator":
                         TypedDefinitionVariable({
-                            "object_type": "Safa",
-                            "project_path": "safa"
+                            TypedDefinitionVariable.OBJECT_TYPE_KEY: "TRACE",
+                            "project_reader": TypedDefinitionVariable({
+                                TypedDefinitionVariable.OBJECT_TYPE_KEY: "STRUCTURE",
+                                "project_path": "SAFA"
+                            })
                         }),
                 }),
                 "trainer_args": DefinitionVariable({

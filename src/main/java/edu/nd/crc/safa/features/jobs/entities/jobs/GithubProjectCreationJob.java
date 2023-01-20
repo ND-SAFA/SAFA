@@ -22,9 +22,9 @@ import edu.nd.crc.safa.features.github.services.GithubConnectionService;
 import edu.nd.crc.safa.features.jobs.entities.IJobStep;
 import edu.nd.crc.safa.features.jobs.entities.app.CommitJob;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
+import edu.nd.crc.safa.features.jobs.logging.JobLogger;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
-import edu.nd.crc.safa.features.projects.services.ProjectService;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
 import org.springframework.util.StringUtils;
@@ -90,19 +90,21 @@ public class GithubProjectCreationJob extends CommitJob {
 
     /**
      * Separate method for retrieving the GitHub project such that it can be mocked
+     *
+     * @param logger Logger for this job
      */
     @IJobStep(value = "Retrieving Github Repository", position = 2)
-    public void retrieveGitHubRepository() {
+    public void retrieveGitHubRepository(JobLogger logger) {
         GithubConnectionService connectionService = serviceProvider.getGithubConnectionService();
         String repositoryName = this.githubIdentifier.getRepositoryName();
 
         this.githubRepositoryDTO = connectionService.getUserRepository(this.credentials, repositoryName);
+
+        logger.log("GitHub repository '%s' retrieved.", githubRepositoryDTO.getName());
     }
 
     @IJobStep(value = "Creating SAFA Project", position = 3)
-    public void createSafaProject() {
-        ProjectService projectService = this.serviceProvider.getProjectService();
-
+    public void createSafaProject(JobLogger logger) {
         // Step - Save as SAFA project
         String projectName = this.githubRepositoryDTO.getName();
         String projectDescription = this.githubRepositoryDTO.getDescription();
@@ -121,11 +123,15 @@ public class GithubProjectCreationJob extends CommitJob {
         }
         this.serviceProvider.getProjectRepository().save(project);
 
+        logger.log("Created new project '%s' with id %s", project.getName(), project.getProjectId());
+
         // Step - Update job name
         this.serviceProvider.getJobService().setJobName(this.getJobDbEntity(), createJobName(projectName));
 
         // Step - Map GitHub project to SAFA project
         this.githubProject = this.getGithubProjectMapping(project);
+
+        logger.log("Project %s is mapped to GitHub project %s.", project.getProjectId(), githubProject.getId());
     }
 
     protected GithubProject getGithubProjectMapping(Project project) {
@@ -140,7 +146,7 @@ public class GithubProjectCreationJob extends CommitJob {
     }
 
     @IJobStep(value = "Convert Filetree To Artifacts And TraceLinks", position = 4)
-    public void convertFiletreeToArtifactsAndTraceLinks() {
+    public void convertFiletreeToArtifactsAndTraceLinks(JobLogger logger) {
         GithubConnectionService connectionService = serviceProvider.getGithubConnectionService();
         String repositoryName = this.githubIdentifier.getRepositoryName();
 
@@ -149,6 +155,8 @@ public class GithubProjectCreationJob extends CommitJob {
         this.projectCommit.addArtifacts(ModificationType.ADDED, getArtifacts());
         this.githubProject.setLastCommitSha(this.commitSha);
         this.serviceProvider.getGithubProjectRepository().save(githubProject);
+
+        logger.log("Retrieved %d artifacts from project.", projectCommit.getArtifacts().getSize());
     }
 
     protected List<ArtifactAppEntity> getArtifacts() {

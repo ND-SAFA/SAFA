@@ -165,6 +165,7 @@ public abstract class AbstractJob implements Job {
 
         Method method = stepImplementation.method;
 
+        // TODO this is fine now, but if the possible method signatures ever get more complex this will need to be refactored
         if (method.getParameterCount() == 0) {
             method.invoke(this);
         } else if (method.getParameterCount() == 1) {

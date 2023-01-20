@@ -1,14 +1,18 @@
 import os
 from copy import deepcopy
-from typing import Dict, List, NamedTuple, Tuple, Union, Any
+from typing import Any, Dict, List, NamedTuple, Tuple, Union
 
 import numpy as np
 import torch
+from accelerate import Accelerator, memory_utils
 from datasets import load_metric
 from scipy.special import softmax
+from tqdm import tqdm
+from transformers.modeling_outputs import SequenceClassifierOutput
 from transformers.trainer import Trainer
 from transformers.trainer_utils import PREFIX_CHECKPOINT_DIR
 
+from data.datasets.data_key import DataKey
 from data.datasets.dataset_role import DatasetRole
 from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
 from data.datasets.trace_matrix import TraceMatrixManager
@@ -59,9 +63,69 @@ class TraceTrainer(Trainer, BaseObject):
         self._move_model_to_device(self.model, self.args.device)
         self.train_dataset = self.trainer_dataset_manager[DatasetRole.TRAIN].to_trainer_dataset(self.model_manager,
                                                                                                 self.trainer_args.train_batch_size)
-        output = self.train(resume_from_checkpoint=checkpoint)
+        train_function = self.custom_train if self.trainer_args.use_custom_train_loop else self.train
+        output = train_function(resume_from_checkpoint=checkpoint)
         output_dict = TraceTrainer.output_to_dict(output)
         return output_dict
+
+    def custom_train(self, resume_from_checkpoint: str = None):
+        # TODO : Add timing metrics (e.g. total time per epoch)
+        # TODO : If loss is nan or inf simply add the average of previous logged losses
+        # TODO: Add evaluation whenever save strategy needs it
+        # TODO: Add flag to load best model at the end
+
+        accelerator = Accelerator(gradient_accumulation_steps=self.trainer_args.gradient_accumulation_steps)
+        device = accelerator.device
+        self.model = self.model_manager.get_model()
+        self.model.to(device)
+        inner_training_loop = memory_utils.find_executable_batch_size(self._inner_custom_training_loop)
+        return inner_training_loop(resume_from_checkpoint=resume_from_checkpoint, accelerator=accelerator, device=device)
+
+    def _inner_custom_training_loop(
+            self, batch_size=None, args=None, resume_from_checkpoint=None, trial=None, ignore_keys_for_eval=None, accelerator=None,
+            device=None,
+    ):
+        self._train_batch_size = batch_size
+        self.args.per_device_train_batch_size = batch_size
+        optimizer = self.trainer_args.optimizer_constructor(self.model.parameters())
+        scheduler = self.trainer_args.scheduler_constructor(optimizer)
+        loss_function = self.trainer_args.loss_function
+        data = self.get_train_dataloader()
+
+        model, optimizer, scheduler, data = accelerator.prepare(self.model, optimizer, scheduler, data)
+        model.train()
+        training_output: Dict = {}
+        for epoch in range(self.trainer_args.num_train_epochs):
+            for batch in tqdm(data):
+                batch = batch.to(device)
+                optimizer.zero_grad()
+
+                labels = batch.pop(DataKey.LABELS_KEY)
+                output: SequenceClassifierOutput = model(**batch)
+                loss = loss_function(output.logits, labels)
+
+                # loss.backward()
+                accelerator.backward(loss)
+                optimizer.step()
+                self.end_step(training_output)
+            scheduler.step()
+            # TODO: Call save strategy
+            self.end_epoch(training_output)
+        print("Done")
+
+    def end_step(self, training_output: Dict) -> None:
+        """
+        Callback function called at the end of each training step.
+        :param training_output: The current output of the training session.
+        :return: None
+        """
+
+    def end_epoch(self, training_output: Dict) -> None:
+        """
+        Callback function called at the end of each epoch.
+        :param training_output: The current output of the training session.
+        :return: None
+        """
 
     def perform_prediction(self, dataset_role: DatasetRole = DatasetRole.EVAL) -> Dict:
         """
@@ -85,8 +149,8 @@ class TraceTrainer(Trainer, BaseObject):
         :param output_dir: the path to save the model to
         :return: None
         """
-        self.save_model(output_dir)
-        self.save_checkpoint(output_dir)
+        # self.save_model(output_dir)
+        self.save_checkpoint()
 
     def save_checkpoint(self, output_dir: str = None, trial: TRIAL = None, save_metrics: bool = False):
         """

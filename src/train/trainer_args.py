@@ -1,10 +1,24 @@
-from typing import List
+from typing import Callable, List, Type
 
+import torch
+from torch.nn.functional import cross_entropy
+from torch.optim import Optimizer
+from torch.optim.lr_scheduler import LinearLR, _LRScheduler
 from transformers.training_args import TrainingArguments
 
 from config.constants import EVALUATION_STRATEGY_DEFAULT, LOAD_BEST_MODEL_AT_END_DEFAULT, MAX_SEQ_LENGTH_DEFAULT, \
     METRIC_FOR_BEST_MODEL_DEFAULT, N_EPOCHS_DEFAULT, SAVE_STRATEGY_DEFAULT, SAVE_TOTAL_LIMIT_DEFAULT
+from train.save_strategy.abstract_save_strategy import AbstractSaveStrategy
+from train.save_strategy.epoch_save_strategy import MetricSaveStrategy
 from util.base_object import BaseObject
+
+
+class FunctionalWrapper:
+    def __init__(self, f: Callable):
+        self.f = f
+
+    def __call__(self, *args, **kwargs):
+        return self.f(*args, **kwargs)
 
 
 class TrainerArgs(TrainingArguments, BaseObject):
@@ -25,7 +39,13 @@ class TrainerArgs(TrainingArguments, BaseObject):
     metric_for_best_model_default: str = METRIC_FOR_BEST_MODEL_DEFAULT
     metrics: List[str] = None
     place_model_on_device: bool = False
-    total_training_epochs = None
+    total_training_epochs: int = None
+    optimizer_constructor: Type[Optimizer] = FunctionalWrapper(torch.optim.Adam)
+    loss_function: Callable = FunctionalWrapper(cross_entropy)
+    scheduler_constructor: Type[_LRScheduler] = FunctionalWrapper(LinearLR)
+    use_custom_train_loop: bool = True
+    gradient_accumulation_steps: int = 8
+    custom_save_strategy: AbstractSaveStrategy = MetricSaveStrategy(metric_name="map")
 
     # GAN
     n_hidden_layers_g: int = 1

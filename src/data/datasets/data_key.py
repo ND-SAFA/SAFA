@@ -9,6 +9,7 @@ class DataKey:
     TARGET_PRE = 't'
     ID_KEY = 'id'
     LABEL_KEY = 'label'
+    LABELS_KEY = "labels"
     INPUT_IDS = "input_ids"
     TOKEN_TYPE_IDS = "token_type_ids"
     ATTEN_MASK = "attention_mask"

@@ -37,7 +37,6 @@ public class JobLogger {
     public void log(String message) {
         Timestamp timestamp = Timestamp.from(Instant.now());
         JobLogEntry entry = new JobLogEntry(job, (short) stepNum, timestamp, message);
-        System.out.println(entry);
         loggingService.saveLog(entry);
     }
 

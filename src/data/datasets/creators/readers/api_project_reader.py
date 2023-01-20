@@ -5,6 +5,7 @@ import pandas as pd
 from data.datasets.creators.readers.abstract_project_reader import AbstractProjectReader
 from data.datasets.keys.structure_keys import StructuredKeys
 from server.api.api_definition import ApiDefinition
+from util.dataframe_util import DataFrameUtil
 
 
 class ApiProjectReader(AbstractProjectReader):
@@ -24,9 +25,9 @@ class ApiProjectReader(AbstractProjectReader):
         Extracts artifacts and trace links from API payload.
         :return: Artifacts, Traces, and Layer Mappings.
         """
-        artifact_df = pd.DataFrame()
-        trace_df = pd.DataFrame()
-        layer_mapping_df = pd.DataFrame()
+        artifact_map = {}
+        trace_map = {}
+        layer_mapping = {}
 
         source_layers = self.api_definition["source_layers"]
         target_layers = self.api_definition["target_layers"]
@@ -35,39 +36,40 @@ class ApiProjectReader(AbstractProjectReader):
         for i, (source_layer, target_layer) in enumerate(zip(source_layers, target_layers)):
             source_layer_id = self.create_layer_id(StructuredKeys.LayerMapping.SOURCE_TYPE, i)
             target_layer_id = self.create_layer_id(StructuredKeys.LayerMapping.TARGET_TYPE, i)
-            artifact_df = self.add_artifact_layer(source_layer, source_layer_id, artifact_df)
-            artifact_df = self.add_artifact_layer(target_layer, target_layer_id, artifact_df)
-            artifact_df = artifact_df.sort_values([StructuredKeys.Artifact.LAYER_ID, StructuredKeys.Artifact.ID]).reset_index()
-            layer_mapping_df = layer_mapping_df.append({
+            artifact_map = self.add_artifact_layer(source_layer, source_layer_id, artifact_map)
+            artifact_map = self.add_artifact_layer(target_layer, target_layer_id, artifact_map)
+            layer_mapping = DataFrameUtil.append(layer_mapping, {
                 StructuredKeys.LayerMapping.SOURCE_TYPE: source_layer_id,
                 StructuredKeys.LayerMapping.TARGET_TYPE: target_layer_id
-            }, ignore_index=True)
+            })
 
+        artifact_df = pd.DataFrame(artifact_map, ignore_index=True)
+        layer_mapping_df = pd.DataFrame(layer_mapping, ignore_index=True)
         for source_id, target_id in links:
-            trace_df = trace_df.append({
+            trace_map = DataFrameUtil.append(trace_map, {
                 StructuredKeys.Trace.SOURCE: source_id,
                 StructuredKeys.Trace.TARGET: target_id,
                 StructuredKeys.Trace.LABEL: 1
-            }, ignore_index=True)
-
+            })
+        trace_df = pd.DataFrame(trace_map, ignore_index=True)
         return artifact_df, trace_df, layer_mapping_df
 
     @staticmethod
-    def add_artifact_layer(artifact_layer: Dict[str, str], layer_id: str, artifact_df: pd.DataFrame):
+    def add_artifact_layer(artifact_layer: Dict[str, str], layer_id: str, artifact_map: Dict):
         """
         Adds series of artifacts in layer to artifact DataFrame.
         :param artifact_layer: Layer containing series of artifacts.
         :param layer_id: The id of the layer associated with the artifacts.
-        :param artifact_df: DataFrame containing artifact aggregate.
-        :return: Updated DataFrame containing new artifacts.
+        :param artifact_map: Dictionary representing DataFrame containing artifact aggregate.
+        :return: Updated dictionary containing new artifacts.
         """
         for t_id, t_body in artifact_layer.items():
-            artifact_df = artifact_df.append({
+            artifact_map = DataFrameUtil.append(artifact_map, {
                 StructuredKeys.Artifact.ID: t_id,
                 StructuredKeys.Artifact.BODY: t_body,
                 StructuredKeys.Artifact.LAYER_ID: layer_id
-            }, ignore_index=True)
-        return artifact_df
+            })
+        return artifact_map
 
     @staticmethod
     def create_layer_id(layer_name: str, layer_index: int) -> str:

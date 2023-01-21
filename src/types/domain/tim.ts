@@ -25,9 +25,17 @@ export interface TimTraceMatrixSchema {
    */
   targetType: string;
   /**
-   * The number of artifacts of this artifact type.
+   * The total number of trace links between these types.
    */
   count: number;
+  /**
+   * The number of trace links between these types that were generated.
+   */
+  generatedCount: number;
+  /**
+   * The number of trace links between these types that were generated and approved.
+   */
+  approvedCount: number;
 }
 
 /**

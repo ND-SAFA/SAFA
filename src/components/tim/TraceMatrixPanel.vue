@@ -7,14 +7,19 @@
         <attribute-chip artifact-type :value="targetType" />
       </flex-box>
       <v-divider class="mt-1" />
-      <typography variant="caption" value="Details" />
-      <typography el="p" :value="traceCount" />
+      <typography variant="caption" value="Total Trace Links" />
+      <typography el="p" :value="traceTotalCount" />
+      <typography variant="caption" value="Generated Trace Links" />
+      <typography el="p" :value="traceGeneratedCount" />
+      <typography variant="caption" value="Approved Trace Links" />
+      <typography el="p" :value="traceApprovedCount" />
     </panel-card>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
+import { TimTraceMatrixSchema } from "@/types";
 import { appStore, selectionStore } from "@/hooks";
 import {
   PanelCard,
@@ -37,24 +42,46 @@ export default Vue.extend({
       return appStore.isDetailsPanelOpen === "displayTraceMatrix";
     },
     /**
+     * @return The selected trace matrix
+     */
+    traceMatrix(): TimTraceMatrixSchema | undefined {
+      return selectionStore.selectedTraceMatrix;
+    },
+    /**
      * @return The selected source artifact type.
      */
     sourceType(): string {
-      return selectionStore.selectedTraceMatrix?.sourceType || "";
+      return this.traceMatrix?.sourceType || "";
     },
     /**
      * @return The selected target artifact type.
      */
     targetType(): string {
-      return selectionStore.selectedTraceMatrix?.targetType || "";
+      return this.traceMatrix?.targetType || "";
     },
     /**
-     * @return The number of traces between the selected types.
+     * @return The total number of traces between the selected types.
      */
-    traceCount(): string {
-      const count = selectionStore.selectedTraceMatrix?.count || 0;
+    traceTotalCount(): string {
+      const count = this.traceMatrix?.count || 0;
 
-      return count === 1 ? "1 Trace Links" : `${count} Trace Links`;
+      return count === 1 ? "1 Link" : `${count} Links`;
+    },
+    /**
+     * @return The number of generated traces between the selected types.
+     */
+    traceGeneratedCount(): string {
+      const count = this.traceMatrix?.generatedCount || 0;
+
+      return count === 1 ? "1 Link" : `${count} Links`;
+    },
+    /**
+     * @return The number of approved traces between the selected types.
+     */
+    traceApprovedCount(): string {
+      const count = this.traceMatrix?.approvedCount || 0;
+
+      return count === 1 ? "1 Link" : `${count} Links`;
     },
   },
 });

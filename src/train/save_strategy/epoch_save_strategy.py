@@ -10,6 +10,7 @@ class MetricSaveStrategy(AbstractSaveStrategy):
 
     def __init__(self, stage: SaveStrategyStage = SaveStrategyStage.EPOCH, interval=1, metric_name: str = None,
                  comparison: ComparisonFunction = ComparisonFunction.MAX):
+        super().__init__()
         self.stage = stage
         self.interval = interval
         self.metric_name = metric_name
@@ -33,5 +34,6 @@ class MetricSaveStrategy(AbstractSaveStrategy):
         :param evaluation_result: The result of evaluating the model.
         :return: If evaluation is best.
         """
+        super().should_save(evaluation_result)
         score = evaluation_result[self.metric_name]
         return self.comparison.value(score, self.best_score)

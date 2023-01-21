@@ -30,7 +30,7 @@ class TestMultiEpochExperimentStep(BaseExperimentTest):
         experiment_step.run(TEST_OUTPUT_DIR)
 
         output_dirs = os.listdir(TEST_OUTPUT_DIR)
-        output_dirs.remove('output.json')
+        output_dirs.remove('trace_output.json')
         epochs = set()
         for job_id in output_dirs:
             output_file = os.path.join(TEST_OUTPUT_DIR, job_id, AbstractJob.OUTPUT_FILENAME)

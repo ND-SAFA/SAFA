@@ -1,48 +1,34 @@
 import random
 from collections import namedtuple
 from copy import deepcopy
-from typing import Callable, Dict, Iterable, List
+from typing import Callable, Iterable, List
 
 import numpy as np
 
 from data.tree.trace_link import TraceLink
 
-ArtifactQuery = Dict[str, List[TraceLink]]
-ProjectQueries = Dict[str, ArtifactQuery]
 Query = namedtuple('Query', ['links', 'preds'])
 
 
-class TraceMatrixManager:
+class TraceMatrix:
     """
     Contains trace and similarity matrices for computing query-based metrics.
     """
 
     def __init__(self, links: Iterable[TraceLink], predicted_scores: List[float] = None, randomize: bool = False):
         """
-        Constructs similarity and trace matrices using predictions output.
+        Constructs similarity and trace matrices using predictions trace_output.
         :param links: The list of trace links.
         :param predicted_scores: The prediction scores on the links.
         :param randomize: if True, randomizes the order of links in the matrix
         """
         self.query_matrix = {}
         self.source_ids = []
+        self.labels = []
+        self.scores = predicted_scores
         self._fill_trace_matrix(links, [None for link in links] if predicted_scores is None else predicted_scores)
         if randomize:
             self._do_randomize()
-
-    def add_link(self, link: TraceLink, pred: float = None) -> None:
-        """
-        Adds a new link to the trace matrix
-        :param link: the trace link
-        :param pred: the prediction associated with the link
-        :return: None
-        """
-        if link.source.id not in self.query_matrix:
-            self.query_matrix[link.source.id] = Query(links=[], preds=[])
-            self.source_ids.append(link.source.id)
-        self.query_matrix[link.source.id].links.append(link)
-        if pred is not None:
-            self.query_matrix[link.source.id].preds.append(pred)
 
     def calculate_query_metric(self, metric: Callable[[List[int], List[float]], float]):
         """
@@ -91,6 +77,21 @@ class TraceMatrixManager:
         """
         for link, pred in zip(links, predicted_scores):
             self.add_link(link, pred)
+
+    def add_link(self, link: TraceLink, pred: float = None) -> None:
+        """
+        Adds a new link to the trace matrix
+        :param link: the trace link
+        :param pred: the prediction associated with the link
+        :return: None
+        """
+        if link.source.id not in self.query_matrix:
+            self.query_matrix[link.source.id] = Query(links=[], preds=[])
+            self.source_ids.append(link.source.id)
+            self.labels.append(link.get_label())
+        self.query_matrix[link.source.id].links.append(link)
+        if pred is not None:
+            self.query_matrix[link.source.id].preds.append(pred)
 
     def _do_randomize(self) -> None:
         """

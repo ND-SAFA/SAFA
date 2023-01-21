@@ -53,7 +53,7 @@ class DeterministicTrainerDatasetManager(TrainerDatasetManager):
     def get_output_path(self) -> str:
         """
         Gets the path where datasets should be saved
-        :return: the output path
+        :return: the trace_output path
         """
         if self.output_dir:
             return os.path.join(self.output_dir, self.deterministic_id)

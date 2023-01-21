@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Dict, Any
+from typing import Any, Dict
 
 from config.constants import SAVE_OUTPUT_DEFAULT
 from util.base_object import BaseObject
@@ -12,7 +12,7 @@ class JobArgs(BaseObject):
     """
     output_dir: str = None
     """
-    If True, saves the output to the output_dir
+    If True, saves the trace_output to the output_dir
     """
     save_job_output: bool = SAVE_OUTPUT_DEFAULT
     """

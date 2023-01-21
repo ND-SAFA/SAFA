@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import Type, Any
+from typing import Any, Type
 
 from config.override import overrides
 from data.datasets.managers.deterministic_trainer_dataset_manager import DeterministicTrainerDatasetManager
@@ -36,7 +36,7 @@ class AbstractTraceJob(AbstractJob, ABC):
     @overrides(AbstractJob)
     def run(self) -> None:
         """
-        Runs the job and saves the output
+        Runs the job and saves the trace_output
         """
         if self.job_args.save_dataset_splits:
             CreateDatasetsJob(self.job_args, self.trainer_dataset_manager).run()

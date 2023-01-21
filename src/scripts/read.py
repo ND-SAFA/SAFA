@@ -47,7 +47,7 @@ if __name__ == "__main__":
         for step in ls_filter(experiment_path, ignore=IGNORE):
             step_path = os.path.join(experiment_path, step)
             for job_id in ls_jobs(step_path):
-                job_output_path = os.path.join(step_path, job_id, "output.json")
+                job_output_path = os.path.join(step_path, job_id, "trace_output.json")
                 job_output = FileUtil.read_json_file(job_output_path)
                 entry = extract_info(job_output, COPY_PATHS, IGNORE)
                 entries.append(entry)

@@ -1,28 +1,20 @@
 import os
-from copy import deepcopy
-from typing import Any, Dict, List, NamedTuple, Tuple, Union
+from typing import Any, Dict, Union
 
-import numpy as np
 import torch
 from accelerate import Accelerator, memory_utils
-from datasets import load_metric
-from scipy.special import softmax
 from tqdm import tqdm
 from transformers.modeling_outputs import SequenceClassifierOutput
 from transformers.trainer import Trainer
-from transformers.trainer_utils import PREFIX_CHECKPOINT_DIR
+from transformers.trainer_utils import PREFIX_CHECKPOINT_DIR, PredictionOutput, TrainOutput
 
 from data.datasets.data_key import DataKey
 from data.datasets.dataset_role import DatasetRole
 from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
-from data.datasets.trace_matrix import TraceMatrixManager
 from models.model_manager import ModelManager
-from train.metrics.map_at_k_metric import MapAtKMetric
-from train.metrics.map_metric import MapMetric
-from train.metrics.precision_at_threshold_metric import PrecisionAtKMetric
-from train.metrics.recall_at_threshold_metric import RecallAtThresholdMetric
-from train.metrics.supported_trace_metric import get_metric_name, get_metric_path
+from train.metrics.metrics_manager import MetricsManager
 from train.save_strategy.abstract_save_strategy import AbstractSaveStrategy, SaveStrategyStage
+from train.trace_output.trace_output_types import TracePredictionOutput, TraceTrainOutput
 from train.trainer_args import TrainerArgs
 from util.base_object import BaseObject
 from util.file_util import FileUtil
@@ -55,7 +47,7 @@ class TraceTrainer(Trainer, BaseObject):
                          callbacks=trainer_args.callbacks,
                          **kwargs)
 
-    def perform_training(self, checkpoint: str = None) -> Dict:
+    def perform_training(self, checkpoint: str = None) -> TrainOutput:
         """
         Performs the model training.
         :param checkpoint: path to checkpoint.
@@ -70,7 +62,7 @@ class TraceTrainer(Trainer, BaseObject):
         output_dict = TraceTrainer.output_to_dict(output)
         return output_dict
 
-    def custom_train(self, resume_from_checkpoint: str = None):
+    def custom_train(self, resume_from_checkpoint: str = None) -> TrainOutput:
         # TODO : Add timing metrics (e.g. total time per epoch)
         # TODO : If loss is nan or inf simply add the average of previous logged losses
         # TODO: Add flag to load best model at the end
@@ -85,7 +77,7 @@ class TraceTrainer(Trainer, BaseObject):
     def _inner_custom_training_loop(
             self, batch_size=None, args=None, resume_from_checkpoint=None, trial=None, ignore_keys_for_eval=None, accelerator=None,
             device=None,
-    ):
+    ) -> TrainOutput:
         self._train_batch_size = batch_size
         self.args.per_device_train_batch_size = batch_size
         optimizer = self.trainer_args.optimizer_constructor(self.model.parameters())
@@ -95,8 +87,10 @@ class TraceTrainer(Trainer, BaseObject):
 
         model, optimizer, scheduler, data = accelerator.prepare(self.model, optimizer, scheduler, data)
         model.train()
-        training_output: Dict = {}
+        global_step = 0
+        training_loss = 0
         save_strategy = self.trainer_args.custom_save_strategy
+        training_metrics = {}
 
         for epoch in range(self.trainer_args.num_train_epochs):
             for batch_index, batch in enumerate(tqdm(data)):
@@ -107,13 +101,30 @@ class TraceTrainer(Trainer, BaseObject):
                 output: SequenceClassifierOutput = model(**batch)
                 loss = loss_function(output.logits, labels)
 
-                # loss.backward()
                 accelerator.backward(loss)
                 optimizer.step()
                 self.conditional_evaluate(save_strategy, SaveStrategyStage.STEP, batch_index)
+                training_loss += loss.item()
+                global_step += 1
 
             scheduler.step()
             self.conditional_evaluate(save_strategy, SaveStrategyStage.EPOCH, epoch)
+        return TraceTrainOutput(global_step=global_step, training_loss=training_loss, metrics=training_metrics,
+                                eval_metrics=save_strategy.stage_evaluations)
+
+    def perform_prediction(self, dataset_role: DatasetRole = DatasetRole.EVAL) -> TracePredictionOutput:
+        """
+        Performs the prediction and (optionally) evaluation for the model
+        :return: A dictionary containing the results.
+        """
+        dataset = self.trainer_dataset_manager[dataset_role]
+        self.eval_dataset = dataset.to_trainer_dataset(self.model_manager)
+        output: PredictionOutput = self.predict(self.eval_dataset)
+        metrics_manager = MetricsManager(dataset.get_ordered_links(), output)
+        eval_metrics = metrics_manager.eval(self.trainer_args.metrics) if self.trainer_args.metrics else {}
+        output.metrics.update(eval_metrics)
+        return TracePredictionOutput(predictions=metrics_manager.get_scores(), label_ids=output.label_ids, metrics=output.metrics,
+                                     source_target_pairs=dataset.get_source_target_pairs())
 
     def conditional_evaluate(self, save_strategy: AbstractSaveStrategy, stage: SaveStrategyStage, stage_iteration: int) -> None:
         """
@@ -131,22 +142,6 @@ class TraceTrainer(Trainer, BaseObject):
             if should_save:
                 self.save_model_and_checkpoint()
 
-    def perform_prediction(self, dataset_role: DatasetRole = DatasetRole.EVAL) -> Dict:
-        """
-        Performs the prediction and (optionally) evaluation for the model
-        :return: A dictionary containing the results.
-        """
-        dataset = self.trainer_dataset_manager[dataset_role]
-        self.eval_dataset = dataset.to_trainer_dataset(self.model_manager)
-        output = self.predict(self.eval_dataset)
-        scores = self.get_similarity_scores(output.predictions)
-        trace_matrix = TraceMatrixManager(dataset.get_ordered_links(), scores)
-        results = self._eval(trace_matrix, scores, output.label_ids, output.metrics,
-                             self.trainer_args.metrics) if self.trainer_args.metrics else None
-        output_dict = TraceTrainer.output_to_dict(output, metrics=results, predictions=scores,
-                                                  source_target_pairs=dataset.get_source_target_pairs())
-        return output_dict
-
     def save_model_and_checkpoint(self, output_dir: str = None) -> None:
         """
         Saves the model and checkpoint
@@ -158,7 +153,7 @@ class TraceTrainer(Trainer, BaseObject):
 
     def save_checkpoint(self, output_dir: str = None, trial: TRIAL = None, save_metrics: bool = False):
         """
-        Saves the checkpoint in the output dir specified in training args
+        Saves the checkpoint in the trace_output dir specified in training args
         :param output_dir: where to save the checkpoint to
         :param trial: optional, will be given to the original _save_checkpoint if provided
         :param save_metrics: if True, gives the metrics to the original _save_checkpoint so the best_metric can be saved in state
@@ -183,55 +178,3 @@ class TraceTrainer(Trainer, BaseObject):
                           if os.path.isdir(os.path.join(self.trainer_args.output_dir, dir_name))
                           and dir_name.startswith(PREFIX_CHECKPOINT_DIR)]
         return checkpoint_dir.pop() if len(checkpoint_dir) > 0 else None
-
-    @staticmethod
-    def get_similarity_scores(predictions: Union[np.ndarray, Tuple[np.ndarray]]) -> List[float]:
-        """
-        Transforms predictions into similarity scores.
-        :param predictions: The model predictions.
-        :return: List of similarity scores associated with predictions.
-        """
-        similarity_scores = []
-        for pred_i in range(predictions.shape[0]):
-            prediction = predictions[pred_i]
-            similarity_scores.append(softmax(prediction)[1])
-        return similarity_scores
-
-    @staticmethod
-    def output_to_dict(output: NamedTuple, **kwargs) -> Dict:
-        """
-        Converts train/prediction output to a dictionary
-        :param output: output from training or prediction
-        :return: the output represented as a dictionary
-        """
-        base_output = {field: kwargs[field] if (field in kwargs and kwargs[field]) else getattr(output, field) for field
-                       in output._fields}
-        additional_attrs = {field: kwargs[field] for field in kwargs.keys() if field not in base_output}
-        return {**base_output, **additional_attrs}
-
-    @staticmethod
-    def _eval(trace_matrix: TraceMatrixManager, predicted_scores: List[float], label_ids: np.ndarray,
-              output_metrics: Dict, metric_names: List) -> Dict:
-        """
-        Performs the evaluation of the model (use this instead of Trainer.evaluation to utilize predefined metrics from models)
-        :param trace_matrix: the matrix of trace links and their scores
-        :param predicted_scores: a list of the predicted similarity scores
-        :param label_ids: the list of ground truth labels
-        :param output_metrics: the dictionary of metrics to include in the results
-        :param metric_names: name of metrics desired for evaluation
-        :return: a dictionary of metric_name to result
-        """
-        metric_paths = [get_metric_path(name) for name in metric_names]
-        results = deepcopy(output_metrics)
-        trace_matrix_metrics = [MapMetric.name, MapAtKMetric.name, PrecisionAtKMetric.name,
-                                RecallAtThresholdMetric.name]
-        for metric_path in metric_paths:
-            metric = load_metric(metric_path, keep_in_memory=True)
-            args = {"trace_matrix": trace_matrix} if metric.name in trace_matrix_metrics else {}
-            metric_result = metric.compute(predictions=predicted_scores, references=label_ids, **args)
-            metric_name = get_metric_name(metric)
-            if isinstance(metric_result, dict):
-                results.update(metric_result)
-            else:
-                results[metric_name] = metric_result
-        return results

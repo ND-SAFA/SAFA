@@ -35,7 +35,7 @@ class PreTrainDataset(AbstractDataset):
 
     def save(self, output_dir: str, filename: str) -> str:
         """
-        Saves the dataset to the output dir
+        Saves the dataset to the trace_output dir
         :param output_dir: directory to save to
         :param filename: name of the file (no ext)
         :return: location the file was saved to

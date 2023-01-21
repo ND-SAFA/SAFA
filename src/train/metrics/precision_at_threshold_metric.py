@@ -4,8 +4,8 @@ import datasets
 from sklearn.metrics import precision_score
 
 from config.constants import K_METRIC_DEFAULT
-from data.datasets.trace_matrix import TraceMatrixManager
 from train.metrics.abstract_trace_metric import AbstractTraceMetric
+from train.metrics.metrics_manager import MetricsManager
 
 _DESCRIPTION = """
 Precision@K metric measures the percentage of predicted links that were correct.
@@ -28,7 +28,7 @@ _CITATION = """
 class PrecisionAtKMetric(AbstractTraceMetric):
     name = "precision@k"
 
-    def _compute(self, predictions, references, trace_matrix: TraceMatrixManager = None, **kwargs) -> Dict:
+    def _compute(self, predictions, references, trace_matrix: MetricsManager = None, **kwargs) -> Dict:
         """
         Computes the Precision@K or the percentage of links that were correctly predicted
         :param predictions: predicted labels

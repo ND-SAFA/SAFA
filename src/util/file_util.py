@@ -1,7 +1,7 @@
 import json
 import os
 import shutil
-from typing import Dict, List, Union, IO
+from typing import Dict, IO, List, Union
 
 from util.json_util import JsonUtil
 from util.uncased_dict import UncasedDict
@@ -13,7 +13,7 @@ class FileUtil:
     def create_dir_safely(output_path: str, *additional_path_parts) -> str:
         """
         Makes a directory, by first checking if the directory exists
-        :return: the output path
+        :return: the trace_output path
         """
         if additional_path_parts:
             output_path = os.path.join(output_path, *additional_path_parts)
@@ -36,7 +36,7 @@ class FileUtil:
         """
         Reads JSON from file at path.
         :param file_path: Path to JSON file.
-        :param as_uncased_dict: Whether to convert output to uncased dict
+        :param as_uncased_dict: Whether to convert trace_output to uncased dict
         :return: Dictionary content of file.
         """
         with open(file_path) as file:

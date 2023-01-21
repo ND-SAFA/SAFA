@@ -9,12 +9,12 @@ from torch.utils.data.sampler import RandomSampler
 
 from data.datasets.dataset_role import DatasetRole
 from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
-from data.datasets.trace_matrix import TraceMatrixManager
 from jobs.predict_job import PredictJob
 from models.model_manager import ModelManager
 from testres.base_trace_test import BaseTraceTest
 from testres.test_assertions import TestAssertions
 from testres.test_data_manager import TestDataManager
+from train.metrics.metrics_manager import MetricsManager
 from train.trace_trainer import TraceTrainer
 from train.trainer_args import TrainerArgs
 from util.object_creator import ObjectCreator
@@ -60,8 +60,8 @@ class TestTraceTrainer(BaseTraceTest):
     def test_eval(self):
         output = deepcopy(TestDataManager.EXAMPLE_PREDICTION_OUTPUT)
         test_trace_trainer = self.get_test_trace_trainer(metrics=self.TEST_METRIC_NAMES)
-        trace_matrix = TraceMatrixManager(test_trace_trainer.trainer_dataset_manager[DatasetRole.EVAL].links.values(),
-                                          output.predictions)
+        trace_matrix = MetricsManager(test_trace_trainer.trainer_dataset_manager[DatasetRole.EVAL].links.values(),
+                                      output.predictions)
         result = TraceTrainer._eval(trace_matrix, output.predictions, output.label_ids, output.metrics, self.TEST_METRIC_NAMES)
         for metric in self.TEST_METRIC_NAMES:
             self.assertIn(metric, result)

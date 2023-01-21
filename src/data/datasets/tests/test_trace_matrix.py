@@ -1,13 +1,13 @@
-from typing import List, Tuple
+from typing import List
 
 import numpy as np
 from sklearn.metrics import average_precision_score
 from transformers.trainer_utils import PredictionOutput
 
-from data.datasets.trace_matrix import TraceMatrixManager
 from data.tree.artifact import Artifact
 from data.tree.trace_link import TraceLink
 from testres.base_test import BaseTest
+from train.metrics.metrics_manager import MetricsManager
 from train.trace_trainer import TraceTrainer
 
 
@@ -24,7 +24,7 @@ class TestTraceMatrix(BaseTest):
     manager = None
 
     def setUp(self):
-        self.manager = TraceMatrixManager(self.get_artifact_pairs(), TraceTrainer.get_similarity_scores(self.PREDICTIONS))
+        self.manager = MetricsManager(self.get_artifact_pairs(), TraceTrainer.get_similarity_scores(self.PREDICTIONS))
 
     def test_map_correctness(self) -> None:
         """

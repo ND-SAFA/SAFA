@@ -50,7 +50,7 @@ class TrainerDatasetManager(BaseObject):
 
     def save_dataset_splits(self, output_dir: str) -> List[str]:
         """
-        Saves all dataset splits to the output dir
+        Saves all dataset splits to the trace_output dir
         :param output_dir: directory to save to
         :return: the list of files that were saved
         """

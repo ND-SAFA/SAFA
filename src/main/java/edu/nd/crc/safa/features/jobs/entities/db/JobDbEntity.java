@@ -40,6 +40,7 @@ public class JobDbEntity {
     /**
      * The name of job (e.g. project creation).
      */
+    @JsonIgnore
     @NotNull
     @Column(name = "job_type", nullable = false)
     protected Class<? extends AbstractJob> jobType;

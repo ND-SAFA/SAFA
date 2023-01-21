@@ -1,8 +1,4 @@
-import {
-  GitHubOrganizationSchema,
-  GitHubProjectSchema,
-  JobSchema,
-} from "@/types";
+import { GitHubProjectSchema, JobSchema } from "@/types";
 import { authHttpClient, Endpoint, fillEndpoint } from "@/api";
 
 /**
@@ -82,38 +78,15 @@ export async function deleteGitHubCredentials(): Promise<void> {
 }
 
 /**
- * Gets GitHub installations.
- *
- * @return The user's installations.
- */
-export async function getGitHubInstallations(): Promise<
-  GitHubOrganizationSchema[]
-> {
-  return (
-    (
-      await authHttpClient<{ payload: GitHubOrganizationSchema[] }>(
-        Endpoint.githubGetInstallations,
-        {
-          method: "GET",
-        }
-      )
-    ).payload || []
-  );
-}
-
-/**
  * Gets the list of authorized repositories from GitHub.
  *
- * @param installationId - The GitHub installation to get projects for.
  * @return The GitHub repositories for this user.
  */
-export async function getGitHubProjects(
-  installationId: string
-): Promise<GitHubProjectSchema[]> {
+export async function getGitHubProjects(): Promise<GitHubProjectSchema[]> {
   return (
     (
       await authHttpClient<{ payload: GitHubProjectSchema[] }>(
-        fillEndpoint(Endpoint.githubGetProjects, { installationId }),
+        Endpoint.githubGetProjects,
         {
           method: "GET",
         }
@@ -125,18 +98,15 @@ export async function getGitHubProjects(
 /**
  * Creates a new project based on a GitHub project.
  *
- * @param installationId - The GitHub installation to import from.
  * @param repositoryName - The repository to create a project from.
  * @return The created import job.
  */
 export async function createGitHubProject(
-  installationId: string,
   repositoryName: string
 ): Promise<JobSchema> {
   return (
     await authHttpClient<{ payload: JobSchema }>(
       fillEndpoint(Endpoint.githubCreateProject, {
-        installationId,
         repositoryName,
       }),
       {
@@ -150,20 +120,17 @@ export async function createGitHubProject(
  * Synchronizes the state of GitHub artifacts in a project.
  *
  * @param versionId - The project version to sync.
- * @param installationId - The GitHub installation to import from.
  * @param repositoryName - The repository to create a project from.
  * @return The created import job.
  */
 export async function createGitHubProjectSync(
   versionId: string,
-  installationId: string,
   repositoryName: string
 ): Promise<JobSchema> {
   return (
     await authHttpClient<{ payload: JobSchema }>(
       fillEndpoint(Endpoint.githubSyncProject, {
         versionId,
-        installationId,
         repositoryName,
       }),
       {

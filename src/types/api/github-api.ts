@@ -40,4 +40,8 @@ export interface GitHubProjectSchema {
    * A timestamp for the project was created.
    */
   created_at: string;
+  /**
+   * The owner of this project.
+   */
+  owner: string;
 }

@@ -126,14 +126,13 @@ export function handleImportGitHubProject({
   onSuccess,
   onError,
 }: IOHandlerCallback): void {
-  const installationId = integrationsStore.gitHubOrganization?.id;
   const repositoryName = integrationsStore.gitHubProject?.name;
 
-  if (!installationId || !repositoryName) return;
+  if (!repositoryName) return;
 
   appStore.onLoadStart();
 
-  createGitHubProject(installationId, repositoryName)
+  createGitHubProject(repositoryName)
     .then(async (job) => {
       await handleJobSubmission(job);
       integrationsStore.gitHubProject = undefined;

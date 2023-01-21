@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import List, Tuple, Union
 
 import numpy as np
 from transformers.trainer_utils import PredictionOutput
@@ -35,7 +35,7 @@ class TestDataManager:
 
     _EXAMPLE_METRIC_RESULTS = {'test_loss': 0.6929082870483398}
     _EXAMPLE_PREDICTIONS = np.array(
-        [0.6, 0.4, 0.3, 0.8, 0.1, 0.01, 0.2, 0.4, 0.4])
+        [[0.4, 0.6], [0.6, 0.4], [0.7, 0.3], [0.2, 0.8], [0.9, 0.1], [0.99, 0.01], [0.8, 0.2], [0.6, 0.4], [0.6, 0.4]])
     _EXAMPLE_LABEL_IDS = np.array([1, 0, 0, 1, 0, 0, 0, 1, 0])
     EXAMPLE_PREDICTION_OUTPUT = PredictionOutput(predictions=_EXAMPLE_PREDICTIONS,
                                                  label_ids=_EXAMPLE_LABEL_IDS,
@@ -93,3 +93,12 @@ class TestDataManager:
                 if artifact_id in artifact_level:
                     return artifact_level[artifact_id]
         raise ValueError("Could not find artifact with id:" + artifact_id)
+
+    @staticmethod
+    def create_score_output(score: float) -> Tuple[float, float]:
+        """
+        Creates an output vector whose softmax should equal about the score value.
+        :param score: The score to estimate.
+        :return: Model output vector whose softmax is about equal to score.
+        """
+        return (1 - score, score)

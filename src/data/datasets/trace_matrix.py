@@ -1,7 +1,7 @@
 import random
 from collections import namedtuple
 from copy import deepcopy
-from typing import Callable, Iterable, List
+from typing import Callable, Iterable, List, Union
 
 import numpy as np
 
@@ -15,7 +15,7 @@ class TraceMatrix:
     Contains trace and similarity matrices for computing query-based metrics.
     """
 
-    def __init__(self, links: Iterable[TraceLink], predicted_scores: List[float] = None, randomize: bool = False):
+    def __init__(self, links: Iterable[TraceLink], predicted_scores: Union[List[float], np.ndarray] = None, randomize: bool = False):
         """
         Constructs similarity and trace matrices using predictions trace_output.
         :param links: The list of trace links.
@@ -88,8 +88,8 @@ class TraceMatrix:
         if link.source.id not in self.query_matrix:
             self.query_matrix[link.source.id] = Query(links=[], preds=[])
             self.source_ids.append(link.source.id)
-            self.labels.append(link.get_label())
         self.query_matrix[link.source.id].links.append(link)
+        self.labels.append(link.get_label())
         if pred is not None:
             self.query_matrix[link.source.id].preds.append(pred)
 

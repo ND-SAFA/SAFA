@@ -1,6 +1,7 @@
 from typing import Dict
 
-from train.save_strategy.abstract_save_strategy import AbstractSaveStrategy, ComparisonFunction, SaveStrategyStage
+from train.save_strategy.abstract_save_strategy import AbstractSaveStrategy, ComparisonFunction
+from train.save_strategy.save_strategy_stage import SaveStrategyStage
 
 
 class MetricSaveStrategy(AbstractSaveStrategy):

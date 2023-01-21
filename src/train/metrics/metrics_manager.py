@@ -2,7 +2,7 @@ from typing import Dict, List, Tuple, Union
 
 import numpy as np
 from datasets import load_metric
-from torch import softmax
+from scipy.special import softmax
 from transformers.trainer_utils import PredictionOutput
 
 from data.datasets.trace_matrix import TraceMatrix
@@ -20,13 +20,14 @@ ProjectQueries = Dict[str, ArtifactQuery]
 
 class MetricsManager:
     """
-    Contains trace and similarity matrices for computing query-based metrics.
+    Calculates metrics for trace trainer.
     """
 
     def __init__(self, trace_links: List[TraceLink], prediction_output: PredictionOutput):
         """
-        Constructs similarity and trace matrices using predictions trace_output.
-        :param trace_matrix: The matrix containing similarity scores.
+        Constructs metrics manager with labels from trace links and scores from prediction output.
+        :param trace_links: The links defining the labels associated with prediction output.
+        :param prediction_output: The output of a model.
         """
         scores = self.get_similarity_scores(prediction_output.predictions)
         self.trace_matrix = TraceMatrix(trace_links, scores)
@@ -41,10 +42,13 @@ class MetricsManager:
         results = {}
         trace_matrix_metrics = [MapMetric.name, MapAtKMetric.name, PrecisionAtKMetric.name,
                                 RecallAtThresholdMetric.name]
+        scores = self.trace_matrix.scores
+        labels = self.trace_matrix.labels
         for metric_path in metric_paths:
             metric = load_metric(metric_path, keep_in_memory=True)
-            args = {"trace_matrix": self} if metric.name in trace_matrix_metrics else {}
-            metric_result = metric.compute(predictions=self.trace_matrix.scores, references=self.trace_matrix.labels, **args)
+            args = {"trace_matrix": self.trace_matrix} if metric.name in trace_matrix_metrics else {}
+
+            metric_result = metric.compute(predictions=scores, references=labels, **args)
             metric_name = get_metric_name(metric)
             if isinstance(metric_result, dict):
                 results.update(metric_result)

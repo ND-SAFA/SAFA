@@ -13,7 +13,8 @@ from data.datasets.dataset_role import DatasetRole
 from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
 from models.model_manager import ModelManager
 from train.metrics.metrics_manager import MetricsManager
-from train.save_strategy.abstract_save_strategy import AbstractSaveStrategy, SaveStrategyStage
+from train.save_strategy.abstract_save_strategy import AbstractSaveStrategy
+from train.save_strategy.save_strategy_stage import SaveStrategyStage
 from train.trace_output.trace_output_types import TracePredictionOutput, TraceTrainOutput
 from train.trainer_args import TrainerArgs
 from util.base_object import BaseObject
@@ -47,7 +48,7 @@ class TraceTrainer(Trainer, BaseObject):
                          callbacks=trainer_args.callbacks,
                          **kwargs)
 
-    def perform_training(self, checkpoint: str = None) -> TrainOutput:
+    def perform_training(self, checkpoint: str = None) -> TraceTrainOutput:
         """
         Performs the model training.
         :param checkpoint: path to checkpoint.
@@ -58,9 +59,8 @@ class TraceTrainer(Trainer, BaseObject):
         self.train_dataset = self.trainer_dataset_manager[DatasetRole.TRAIN].to_trainer_dataset(self.model_manager,
                                                                                                 self.trainer_args.train_batch_size)
         train_function = self.custom_train if self.trainer_args.use_custom_train_loop else self.train
-        output = train_function(resume_from_checkpoint=checkpoint)
-        output_dict = TraceTrainer.output_to_dict(output)
-        return output_dict
+        train_output = train_function(resume_from_checkpoint=checkpoint)
+        return TraceTrainOutput(train_output)
 
     def custom_train(self, resume_from_checkpoint: str = None) -> TrainOutput:
         # TODO : Add timing metrics (e.g. total time per epoch)

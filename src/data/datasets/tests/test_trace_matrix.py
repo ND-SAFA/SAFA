@@ -4,11 +4,11 @@ import numpy as np
 from sklearn.metrics import average_precision_score
 from transformers.trainer_utils import PredictionOutput
 
+from data.datasets.trace_matrix import TraceMatrix
 from data.tree.artifact import Artifact
 from data.tree.trace_link import TraceLink
 from testres.base_test import BaseTest
 from train.metrics.metrics_manager import MetricsManager
-from train.trace_trainer import TraceTrainer
 
 
 class TestTraceMatrix(BaseTest):
@@ -21,17 +21,17 @@ class TestTraceMatrix(BaseTest):
     PREDICTIONS = np.array([[0.3, 0.2], [0.3, 0.6], [0.5, 0.1], [0.1, 0.5]])
     PREDICTION_OUTPUT = PredictionOutput(label_ids=LABEL_IDS, predictions=PREDICTIONS, metrics=["map"])
 
-    manager = None
+    trace_matrix = None
 
     def setUp(self):
-        self.manager = MetricsManager(self.get_artifact_pairs(), TraceTrainer.get_similarity_scores(self.PREDICTIONS))
+        self.trace_matrix = TraceMatrix(self.get_artifact_pairs(), MetricsManager.get_similarity_scores(self.PREDICTIONS))
 
     def test_map_correctness(self) -> None:
         """
         Asserts that the correct map score is calculated.
         """
 
-        map_score = self.manager.calculate_query_metric(average_precision_score)
+        map_score = self.trace_matrix.calculate_query_metric(average_precision_score)
         self.assertEqual(map_score, 0.75)
 
     def test_matrix_sizes(self) -> None:
@@ -39,23 +39,23 @@ class TestTraceMatrix(BaseTest):
         Assert that queries containing right number of elements.
         """
         for source in self.SOURCE_ARTIFACTS:
-            source_queries = self.manager.query_matrix[source]
+            source_queries = self.trace_matrix.query_matrix[source]
             source_pred = source_queries.preds
             source_labels = source_queries.links
             self.assertEquals(len(source_pred), self.N_TARGETS)
             self.assertEquals(len(source_labels), self.N_TARGETS)
-        self.assertEquals(len(self.manager.source_ids), len(self.SOURCE_ARTIFACTS))
+        self.assertEquals(len(self.trace_matrix.source_ids), len(self.SOURCE_ARTIFACTS))
 
     def test_source_queries(self) -> None:
         """
         Asserts that source queries containing write scores and labels.
         """
         source_1 = self.SOURCE_ARTIFACTS[0]
-        source_1_query = self.manager.query_matrix[source_1]
+        source_1_query = self.trace_matrix.query_matrix[source_1]
         self.assert_query(source_1_query, [False, True], [0, 1])
 
         source_2 = self.SOURCE_ARTIFACTS[1]
-        source_2_query = self.manager.query_matrix[source_2]
+        source_2_query = self.trace_matrix.query_matrix[source_2]
         self.assert_query(source_2_query, [False, True], [1, 0])
 
     def assert_query(self, queries, expected_greater: List[bool], expected_labels: List[int]) -> None:
@@ -100,5 +100,5 @@ class TestTraceMatrix(BaseTest):
 
                 return metric
 
-            metric_value = self.manager.calculate_query_metric_at_k(metric_creator(k), k)
+            metric_value = self.trace_matrix.calculate_query_metric_at_k(metric_creator(k), k)
             self.assertEqual(metric_value, 0.5)

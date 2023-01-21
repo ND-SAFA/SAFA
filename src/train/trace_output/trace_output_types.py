@@ -1,13 +1,15 @@
-from typing import Dict, List, NamedTuple, Tuple
+from typing import Dict, List, Optional, Tuple, TypedDict, Union
 
-from transformers.trainer_utils import PredictionOutput, TrainOutput
+import numpy as np
+from transformers.trainer_utils import TrainOutput
 
-from train.save_strategy.abstract_save_strategy import SaveStrategyStage
+from train.save_strategy.save_strategy_stage import SaveStrategyStage
+from util.reflection_util import ReflectionUtil
 
 Metrics = Dict[str, float]
 
 
-class StageEval(NamedTuple):
+class StageEval(TypedDict):
     """
     Represents the evaluation of a stage.
     """
@@ -16,21 +18,34 @@ class StageEval(NamedTuple):
     metrics: Metrics
 
 
-class TraceTrainOutput(TrainOutput):
+class TraceTrainOutput:
     """
-    The trace_output of training with the trace trainer.
+    The output of training with the trace trainer.
     """
-    eval_metrics: List[StageEval]
+
+    def __init__(self, train_output: Union[TrainOutput, "TraceTrainOutput"]):
+        """
+        Provides wrapper method to convert output from default and custom training loop.
+        :param train_output: The output of the training function.
+        """
+        self.global_step: Optional[int] = None
+        self.training_loss: Optional[float] = None
+        self.metrics: List[StageEval] = []
+        self.eval_metrics: List[StageEval] = []
+        ReflectionUtil.copy_attributes(train_output, self)
 
 
-class TracePredictionOutput(PredictionOutput):
+class TracePredictionOutput(TypedDict):
     """
-    The trace_output of predicting on the trace trainer.
+    The output of predicting on the trace trainer.
     """
+    predictions: Union[np.ndarray, Tuple[np.ndarray]]
+    label_ids: Optional[Union[np.ndarray, Tuple[np.ndarray]]]
+    metrics: Optional[Dict[str, float]]
     source_target_pairs: List[Tuple[str, str]]
 
 
-class TraceEvalOutput(NamedTuple):
+class TraceEvalOutput(TypedDict):
     """
-    The trace_output of evaluating a set of predictions on the trace trainer.
+    The output of evaluating a set of predictions on the trace trainer.
     """

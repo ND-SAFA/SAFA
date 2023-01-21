@@ -9,6 +9,7 @@ import pandas as pd
 from data.datasets.abstract_dataset import AbstractDataset
 from data.datasets.data_key import DataKey
 from data.datasets.keys.csv_format import CSVKeys
+from data.datasets.trace_matrix import TraceMatrix
 from data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
 from data.processing.augmentation.data_augmenter import DataAugmenter
 from data.processing.augmentation.source_target_swap_step import SourceTargetSwapStep
@@ -16,7 +17,6 @@ from data.tree.artifact import Artifact
 from data.tree.trace_link import TraceLink
 from models.model_manager import ModelManager
 from models.model_properties import ModelArchitectureType
-from train.metrics.metrics_manager import MetricsManager
 from util.file_util import FileUtil
 from util.general_util import ListUtil
 
@@ -36,7 +36,7 @@ class TraceDataset(AbstractDataset):
         """
         self.links = OrderedDict(links)
         self.pos_link_ids, self.neg_link_ids = pos_link_ids, neg_link_ids
-        self.trace_matrix = MetricsManager(list(self.links.values()), randomize=randomize)
+        self.trace_matrix = TraceMatrix(list(self.links.values()), randomize=randomize)
         self.shuffle_link_ids()
 
     def to_trainer_dataset(self, model_generator: ModelManager, batch_size_to_balance: int = None) -> List[Dict]:

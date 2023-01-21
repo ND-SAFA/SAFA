@@ -15,6 +15,7 @@ from testres.base_trace_test import BaseTraceTest
 from testres.test_assertions import TestAssertions
 from testres.test_data_manager import TestDataManager
 from train.metrics.metrics_manager import MetricsManager
+from train.trace_output.trace_output_util import TraceOutputUtil
 from train.trace_trainer import TraceTrainer
 from train.trainer_args import TrainerArgs
 from util.object_creator import ObjectCreator
@@ -33,8 +34,8 @@ class TestTraceTrainer(BaseTraceTest):
     def test_perform_training(self):
         test_trace_trainer = self.get_test_trace_trainer(metrics=self.TEST_METRIC_NAMES)
         test_trace_trainer.model_manager.get_tokenizer().padding = True
-        output = test_trace_trainer.perform_training()
-        self.assertIn("training_loss", output)
+        train_output = test_trace_trainer.perform_training()
+        self.assertGreater(train_output.training_loss, 0)
 
     def test_perform_prediction(self):
         test_trace_trainer = self.get_test_trace_trainer(dataset_container_args={"val_dataset_creator": None},
@@ -51,7 +52,7 @@ class TestTraceTrainer(BaseTraceTest):
             self.assertIn(metric, output["metrics"])
 
     def test_output_to_dict(self):
-        output_dict = TraceTrainer.output_to_dict(TestDataManager.EXAMPLE_PREDICTION_OUTPUT)
+        output_dict = TraceOutputUtil.output_to_dict(TestDataManager.EXAMPLE_PREDICTION_OUTPUT)
         self.assertIsInstance(output_dict, dict)
         self.assertIn("predictions", output_dict)
         self.assertIn("label_ids", output_dict)
@@ -60,9 +61,9 @@ class TestTraceTrainer(BaseTraceTest):
     def test_eval(self):
         output = deepcopy(TestDataManager.EXAMPLE_PREDICTION_OUTPUT)
         test_trace_trainer = self.get_test_trace_trainer(metrics=self.TEST_METRIC_NAMES)
-        trace_matrix = MetricsManager(test_trace_trainer.trainer_dataset_manager[DatasetRole.EVAL].links.values(),
-                                      output.predictions)
-        result = TraceTrainer._eval(trace_matrix, output.predictions, output.label_ids, output.metrics, self.TEST_METRIC_NAMES)
+        metrics_manager = MetricsManager(test_trace_trainer.trainer_dataset_manager[DatasetRole.EVAL].links.values(),
+                                         output)
+        result = metrics_manager.eval(self.TEST_METRIC_NAMES)
         for metric in self.TEST_METRIC_NAMES:
             self.assertIn(metric, result)
 

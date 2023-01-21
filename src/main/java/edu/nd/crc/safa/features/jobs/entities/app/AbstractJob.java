@@ -130,7 +130,7 @@ public abstract class AbstractJob implements Job {
                     continue;
                 }
                 // Pre-step
-                logger.setStepNum(stepImplementation.annotation.position());
+                logger.setStepNum(getStepIndex(stepImplementation.annotation.position(), nSteps));
                 jobService.startStep(jobDbEntity, nSteps);
                 notificationService.broadcastJob(JobAppEntity.createFromJob(jobDbEntity));
 

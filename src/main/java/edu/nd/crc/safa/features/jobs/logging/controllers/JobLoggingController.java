@@ -53,7 +53,7 @@ public class JobLoggingController extends BaseController {
      * out of range, an empty list will be returned.
      *
      * @param jobId The ID of the job.
-     * @param stepNum The index of the step.
+     * @param stepNum The index of the step. 0-indexed.
      * @return The logs for that job step, sorted by timestamp.
      * @throws SafaError If there is a problem accessing the job or its logs.
      */

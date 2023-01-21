@@ -38,6 +38,9 @@ public class JobLogger {
         Timestamp timestamp = Timestamp.from(Instant.now());
         JobLogEntry entry = new JobLogEntry(job, (short) stepNum, timestamp, message);
         loggingService.saveLog(entry);
+
+        // Uncomment to show job logs on the command line
+        //System.out.println(entry);
     }
 
     /**

@@ -70,8 +70,8 @@ class JobResult(BaseObject):
 
     def to_json(self, keys: List[str] = None) -> str:
         """
-        Returns the job trace_output as json
-        :return: the trace_output as json
+        Returns the job output as json
+        :return: the output as json
         """
         obj = {key: self.__result[key] for key in keys if key in self.__result} if keys else self.__result
         return JsonUtil.dict_to_json(obj)

@@ -3,15 +3,15 @@ from typing import Dict, NamedTuple
 
 class TraceOutputUtil:
     """
-    Contains utility methods for processing the trace_output of the trace trainer.
+    Contains utility methods for processing the output of the trace trainer.
     """
 
     @staticmethod
     def output_to_dict(output: NamedTuple, **kwargs) -> Dict:
         """
-        Converts train/prediction trace_output to a dictionary
-        :param output: trace_output from training or prediction
-        :return: the trace_output represented as a dictionary
+        Converts train/prediction output to a dictionary
+        :param output: output from training or prediction
+        :return: the output represented as a dictionary
         """
         base_output = {field: kwargs[field] if (field in kwargs and kwargs[field]) else getattr(output, field) for field
                        in output._fields}

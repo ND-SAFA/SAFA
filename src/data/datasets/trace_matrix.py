@@ -17,7 +17,7 @@ class TraceMatrix:
 
     def __init__(self, links: Iterable[TraceLink], predicted_scores: Union[List[float], np.ndarray] = None, randomize: bool = False):
         """
-        Constructs similarity and trace matrices using predictions trace_output.
+        Constructs similarity and trace matrices using predictions output.
         :param links: The list of trace links.
         :param predicted_scores: The prediction scores on the links.
         :param randomize: if True, randomizes the order of links in the matrix

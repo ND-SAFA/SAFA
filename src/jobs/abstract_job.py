@@ -20,7 +20,7 @@ from util.status import Status
 
 
 class AbstractJob(threading.Thread, BaseObject):
-    OUTPUT_FILENAME = "trace_output.json"
+    OUTPUT_FILENAME = "output.json"
 
     def __init__(self, job_args: JobArgs, model_manager: ModelManager = None):
         """
@@ -39,7 +39,7 @@ class AbstractJob(threading.Thread, BaseObject):
 
     def run(self) -> None:
         """
-        Runs the job and saves the trace_output
+        Runs the job and saves the output
         """
         self.result.set_job_status(Status.IN_PROGRESS)
         try:
@@ -76,8 +76,8 @@ class AbstractJob(threading.Thread, BaseObject):
 
     def get_output_filepath(self, output_dir: str = None) -> str:
         """
-        Gets the path to the file for job trace_output
-        :param output_dir: the directory to the trace_output
+        Gets the path to the file for job output
+        :param output_dir: the directory to the output
         :return: the filepath
         """
         if output_dir is None:
@@ -90,12 +90,12 @@ class AbstractJob(threading.Thread, BaseObject):
     def _run(self) -> JobResult:
         """
         Runs job specific logic
-        :return: trace_output of job as a dictionary
+        :return: output of job as a dictionary
         """
 
     def save(self, output_dir: str) -> bool:
         """
-        Saves the trace_output dictionary as json
+        Saves the output dictionary as json
         :param output_dir: the directory to save to
         :return: True if save was successful else false
         """

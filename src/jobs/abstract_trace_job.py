@@ -36,7 +36,7 @@ class AbstractTraceJob(AbstractJob, ABC):
     @overrides(AbstractJob)
     def run(self) -> None:
         """
-        Runs the job and saves the trace_output
+        Runs the job and saves the output
         """
         if self.job_args.save_dataset_splits:
             CreateDatasetsJob(self.job_args, self.trainer_dataset_manager).run()

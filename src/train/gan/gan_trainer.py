@@ -130,13 +130,13 @@ class GanTrainer(TraceTrainer):
                 # Generate Fake data
                 gen_embeddings = generator(noise)
 
-                # Generate the trace_output of the Discriminator for real and fake data.
-                # First, we put together the trace_output of the transformer and the generator
+                # Generate the output of the Discriminator for real and fake data.
+                # First, we put together the output of the transformer and the generator
                 dis_input = torch.cat([real_embeddings, gen_embeddings], dim=0)
-                # Then, we select the trace_output of the disciminator
+                # Then, we select the output of the disciminator
                 features, logits, probs = discriminator(dis_input)
 
-                # Finally, we separate the discriminator's trace_output for the real and fake
+                # Finally, we separate the discriminator's output for the real and fake
                 # data
                 features_list = torch.split(features, real_batch_size)
                 dis_real_features = features_list[0]
@@ -164,7 +164,7 @@ class GanTrainer(TraceTrainer):
                 # Disciminator's LOSS estimation
                 logits = dis_real_logits[:, 0:-1]
                 log_probs = F.log_softmax(logits, dim=-1)
-                # The discriminator provides an trace_output for labeled and unlabeled real data
+                # The discriminator provides an output for labeled and unlabeled real data
                 # so the loss evaluated for unlabeled data is ignored (masked)
                 label2one_hot = torch.nn.functional.one_hot(b_labels, len(self.train_dataset))
                 per_example_loss = -torch.sum(label2one_hot * log_probs, dim=-1)

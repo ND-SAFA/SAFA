@@ -18,7 +18,7 @@ from variables.experimental_variable import ExperimentalVariable
 
 
 class ExperimentStep(BaseObject):
-    OUTPUT_FILENAME = "trace_output.json"
+    OUTPUT_FILENAME = "output.json"
     MAX_JOBS = 1
     RUN_ASYNC = False
     EXIT_ON_FAILED_JOB = True
@@ -74,7 +74,7 @@ class ExperimentStep(BaseObject):
     def save_results(self, output_dir: str) -> None:
         """
         Saves the results of the step
-        :param output_dir: the directory to trace_output results to
+        :param output_dir: the directory to output results to
         :return: None
         """
         FileUtil.create_dir_safely(output_dir)
@@ -98,7 +98,7 @@ class ExperimentStep(BaseObject):
         """
         Runs the a multi epoch step for a given epoch range inside the jobs' trainer args
         :param jobs: a list of jobs to run
-        :param output_dir: path to produce trace_output to
+        :param output_dir: path to produce output to
         :return: the best job
         """
         from experiments.multi_epoch_experiment_step import MultiEpochExperimentStep
@@ -114,7 +114,7 @@ class ExperimentStep(BaseObject):
         """
         Runs the jobs and returns the current best job from all runs
         :param jobs: a list of jobs to run
-        :param output_dir: path to produce trace_output to
+        :param output_dir: path to produce output to
         :return: the best job
         """
         self._run_on_jobs(jobs, "start")
@@ -137,7 +137,7 @@ class ExperimentStep(BaseObject):
         Checks job against best model and if better will override best model path.
         :param best_job: The best job.
         :param job: The current job to check against best job.
-        :param best_model_name: The name of the directory within model trace_output path to store model in.
+        :param best_model_name: The name of the directory within model output path to store model in.
         :return: The best job.
         """
 
@@ -236,9 +236,9 @@ class ExperimentStep(BaseObject):
     @staticmethod
     def _update_job_children_output_paths(jobs: List[AbstractJob], output_dir: str) -> List[AbstractJob]:
         """
-        Updates necessary job children trace_output paths to reflect experiment step trace_output path
+        Updates necessary job children output paths to reflect experiment step output path
         :param jobs: the list of jobs to update
-        :param output_dir: the trace_output directory to use
+        :param output_dir: the output directory to use
         :return: the updated jobs
         """
         for job in jobs:

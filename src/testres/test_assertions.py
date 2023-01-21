@@ -18,9 +18,9 @@ class TestAssertions:
     @classmethod
     def verify_prediction_output(cls, test_case: TestCase, output: JobResult, test_project: TraceDataset) -> None:
         """
-        Verifies that prediction trace_output contains correctly formatted predictions and metrics.
+        Verifies that prediction output contains correctly formatted predictions and metrics.
         :param test_case: The test case used for making assertions.
-        :param output: The trace_output of the prediction job.
+        :param output: The output of the prediction job.
         :param test_project: The test project that was being predicted on.
         :return: None
         """
@@ -31,9 +31,9 @@ class TestAssertions:
     def verify_predictions(cls, test_case: TestCase, output: JobResult, eval_dataset: TraceDataset,
                            base_score: float = 0.5, threshold=0.3) -> None:
         """
-        Verifies that trace_output contains predictions matching data in evaluation dataset.
+        Verifies that output contains predictions matching data in evaluation dataset.
         :param test_case: The test case to make assertions with.
-        :param output: The trace_output of a prediction job.
+        :param output: The output of a prediction job.
         :param eval_dataset: The evaluation dataset used in prediction job.
         :param base_score: The base score that other scores are expected to be a threshold away from.
         :param threshold: The tolerance threshold between score and base score.

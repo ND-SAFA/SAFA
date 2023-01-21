@@ -11,7 +11,7 @@ class Generator(nn.Module):
         """
         Generator for GAN
         :param noise_size: the size of the noise/input layer
-        :param output_size: the size of the trace_output layer
+        :param output_size: the size of the output layer
         :param hidden_sizes: list of sizes for all hidden layers
         :param dropout_rate: the rate at which to apply dropout
         """
@@ -29,7 +29,7 @@ class Generator(nn.Module):
         """
         Performed on forward pass
         :param noise: the noise
-        :return: the trace_output representation
+        :return: the output representation
         """
         output_rep = self.layers(noise)
         return output_rep

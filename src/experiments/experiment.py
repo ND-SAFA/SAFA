@@ -46,8 +46,8 @@ class Experiment(BaseObject):
 
     def _get_step_output_path(self, step_num: int) -> str:
         """
-        Gets the trace_output path for the step
+        Gets the output path for the step
         :param step_num: the number of the step
-        :return: the trace_output path
+        :return: the output path
         """
         return os.path.join(self.output_dir, str(self.id), self._STEP_DIR_NAME.format(step_num))

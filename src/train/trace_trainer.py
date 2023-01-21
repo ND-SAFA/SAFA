@@ -153,7 +153,7 @@ class TraceTrainer(Trainer, BaseObject):
 
     def save_checkpoint(self, output_dir: str = None, trial: TRIAL = None, save_metrics: bool = False):
         """
-        Saves the checkpoint in the trace_output dir specified in training args
+        Saves the checkpoint in the output dir specified in training args
         :param output_dir: where to save the checkpoint to
         :param trial: optional, will be given to the original _save_checkpoint if provided
         :param save_metrics: if True, gives the metrics to the original _save_checkpoint so the best_metric can be saved in state

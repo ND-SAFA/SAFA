@@ -14,7 +14,7 @@ class MultiEpochExperimentStep(ExperimentStep):
     def run(self, output_dir: str, jobs_for_undetermined_vars: List[AbstractJob] = None) -> List[AbstractJob]:
         """
         Runs a job for each epoch in the trainer_args.train_epochs_range
-        :param output_dir: the base trace_output dir for the step
+        :param output_dir: the base output dir for the step
         :param jobs_for_undetermined_vars: job used to fill in any undetermined vars
         :return: the best job
         """

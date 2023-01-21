@@ -68,7 +68,7 @@ class TrainerArgs(TrainingArguments, BaseObject):
     def __init__(self, output_dir: str, **kwargs):
         """
         Arguments for Learning Model
-        :param output_dir: dir to save trainer trace_output to
+        :param output_dir: dir to save trainer output to
         :param dataset_container: The map containing data for each of the roles used in a model training.
         :param kwargs: optional arguments for Trainer as identified at link below + other class attributes (i.e. resample_rate)
         https://huggingface.co/docs/transformers/v4.21.0/en/main_classes/trainer#transformers.TrainingArguments

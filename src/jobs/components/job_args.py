@@ -12,7 +12,7 @@ class JobArgs(BaseObject):
     """
     output_dir: str = None
     """
-    If True, saves the trace_output to the output_dir
+    If True, saves the output to the output_dir
     """
     save_job_output: bool = SAVE_OUTPUT_DEFAULT
     """

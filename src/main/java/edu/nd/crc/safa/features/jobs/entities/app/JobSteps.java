@@ -18,7 +18,7 @@ public class JobSteps {
         "Convert Issues To Artifacts And Trace Links"
     };
 
-    public static List<String> getJobSteps(JobType jobType) {
-        return AbstractJob.getJobSteps(jobType.getJobClass());
+    public static List<String> getJobSteps(Class<? extends AbstractJob> jobType) {
+        return AbstractJob.getJobSteps(jobType);
     }
 }

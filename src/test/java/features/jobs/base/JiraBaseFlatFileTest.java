@@ -11,8 +11,8 @@ import edu.nd.crc.safa.authentication.AuthorizationSetter;
 import edu.nd.crc.safa.features.jira.entities.app.JiraIssueDTO;
 import edu.nd.crc.safa.features.jira.entities.db.JiraAccessCredentials;
 import edu.nd.crc.safa.features.jobs.entities.app.JobSteps;
-import edu.nd.crc.safa.features.jobs.entities.app.JobType;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
+import edu.nd.crc.safa.features.jobs.entities.jobs.CreateProjectViaJiraJob;
 import edu.nd.crc.safa.utilities.JsonFileUtilities;
 
 import features.flatfiles.base.BaseFlatFileTest;
@@ -74,6 +74,6 @@ public abstract class JiraBaseFlatFileTest extends BaseFlatFileTest {
     }
 
     public JobDbEntity createJIRAJob() {
-        return this.jobService.createNewJob(JobType.PROJECT_CREATION_VIA_JIRA, jiraProjectName);
+        return this.jobService.createNewJob(CreateProjectViaJiraJob.class, jiraProjectName);
     }
 }

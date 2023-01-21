@@ -10,7 +10,6 @@ import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.jobs.entities.app.AbstractJob;
 import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
 import edu.nd.crc.safa.features.jobs.entities.app.JobStatus;
-import edu.nd.crc.safa.features.jobs.entities.app.JobType;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.jobs.repositories.JobDbRepository;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
@@ -80,7 +79,7 @@ public class JobService {
      * @param user    The user to create the job for
      * @return The saved job db entity.
      */
-    public JobDbEntity createNewJobForUser(JobType jobType, String name, SafaUser user) {
+    public JobDbEntity createNewJobForUser(Class<? extends AbstractJob> jobType, String name, SafaUser user) {
         JobDbEntity jobDbEntity = new JobDbEntity(
             user,
             name,
@@ -106,7 +105,7 @@ public class JobService {
      * @param name    The name of the job.
      * @return The saved job db entity.
      */
-    public JobDbEntity createNewJob(JobType jobType, String name) {
+    public JobDbEntity createNewJob(Class<? extends AbstractJob> jobType, String name) {
         SafaUser currentUser = this.safaUserService.getCurrentUser();
         return createNewJobForUser(jobType, name, currentUser);
     }

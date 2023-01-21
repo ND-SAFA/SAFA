@@ -5,7 +5,6 @@ import java.util.List;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommit;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.jobs.entities.app.AbstractJob;
-import edu.nd.crc.safa.features.jobs.entities.app.JobType;
 import edu.nd.crc.safa.features.jobs.entities.jobs.CreateProjectViaJsonJob;
 import edu.nd.crc.safa.features.models.tgen.entities.TraceGenerationRequest;
 import edu.nd.crc.safa.features.models.tgen.entities.TracingRequest;
@@ -70,7 +69,7 @@ public class CreateProjectByJsonJobBuilder extends AbstractJobBuilder<ProjectVer
     }
 
     @Override
-    JobType getJobType() {
-        return JobType.PROJECT_CREATION_VIA_JSON;
+    Class<? extends AbstractJob> getJobType() {
+        return CreateProjectViaJsonJob.class;
     }
 }

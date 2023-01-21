@@ -5,7 +5,6 @@ import java.io.IOException;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.jobs.entities.app.AbstractJob;
 import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
-import edu.nd.crc.safa.features.jobs.entities.app.JobType;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.jobs.services.JobService;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
@@ -85,7 +84,7 @@ public abstract class AbstractJobBuilder<I> {
     /**
      * @return The type of job used to identify operation being performed.return
      */
-    abstract JobType getJobType();
+    abstract Class<? extends AbstractJob> getJobType();
 
     @AllArgsConstructor
     protected static class JobDefinition {

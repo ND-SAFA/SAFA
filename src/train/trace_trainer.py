@@ -63,10 +63,6 @@ class TraceTrainer(Trainer, BaseObject):
         return TraceTrainOutput(train_output)
 
     def custom_train(self, resume_from_checkpoint: str = None) -> TrainOutput:
-        # TODO : Add timing metrics (e.g. total time per epoch)
-        # TODO : If loss is nan or inf simply add the average of previous logged losses
-        # TODO: Add flag to load best model at the end
-
         accelerator = Accelerator(gradient_accumulation_steps=self.trainer_args.gradient_accumulation_steps)
         device = accelerator.device
         self.model = self.model_manager.get_model()

@@ -1,4 +1,4 @@
-from typing import List, Tuple, Union
+from typing import List, Union
 
 import numpy as np
 from transformers.trainer_utils import PredictionOutput
@@ -93,12 +93,3 @@ class TestDataManager:
                 if artifact_id in artifact_level:
                     return artifact_level[artifact_id]
         raise ValueError("Could not find artifact with id:" + artifact_id)
-
-    @staticmethod
-    def create_score_output(score: float) -> Tuple[float, float]:
-        """
-        Creates an output vector whose softmax should equal about the score value.
-        :param score: The score to estimate.
-        :return: Model output vector whose softmax is about equal to score.
-        """
-        return (1 - score, score)

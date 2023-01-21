@@ -146,10 +146,7 @@ public abstract class AbstractJob implements Job {
             jobService.failJob(jobDbEntity);
             logger.logException(e);
             notificationService.broadcastJob(JobAppEntity.createFromJob(jobDbEntity));
-            throw new SafaError(e.getMessage());
         }
-
-        this.done();
     }
 
     /**

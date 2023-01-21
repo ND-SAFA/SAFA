@@ -58,7 +58,7 @@
 import Vue from "vue";
 import { InstallationSchema } from "@/types";
 import { timestampToDisplay } from "@/util";
-import { projectStore } from "@/hooks";
+import { integrationsStore } from "@/hooks";
 import { handleSyncInstallation } from "@/api";
 import {
   Typography,
@@ -99,7 +99,7 @@ export default Vue.extend({
      * @return All project installations.
      */
     installations(): InstallationSchema[] {
-      return projectStore.installations;
+      return integrationsStore.installations;
     },
   },
   methods: {

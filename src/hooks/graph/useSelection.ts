@@ -1,6 +1,12 @@
 import { defineStore } from "pinia";
 
-import { ArtifactSchema, FilterAction, TraceLinkSchema } from "@/types";
+import {
+  ArtifactSchema,
+  FilterAction,
+  TimArtifactLevelSchema,
+  TimTraceMatrixSchema,
+  TraceLinkSchema,
+} from "@/types";
 import {
   artifactTreeCyPromise,
   cyCenterOnArtifacts,
@@ -12,6 +18,7 @@ import { pinia } from "@/plugins";
 import traceStore from "../project/useTraces";
 import subtreeStore from "../project/useSubtree";
 import artifactStore from "../project/useArtifacts";
+import typeOptionsStore from "../project/useTypeOptions";
 import appStore from "../core/useApp";
 
 /**
@@ -31,6 +38,14 @@ export const useSelection = defineStore("selection", {
      * The currently selected trace link.
      */
     selectedTraceLinkId: "",
+    /**
+     * The currently selected artifact type.
+     */
+    selectedArtifactType: "",
+    /**
+     * The currently selected trace matrix types.
+     */
+    selectedTraceTypes: ["", ""] as [string, string],
     /**
      * The currently selected artifact subtree.
      */
@@ -72,6 +87,21 @@ export const useSelection = defineStore("selection", {
     selectedTraceLink(): TraceLinkSchema | undefined {
       return traceStore.getTraceLinkById(this.selectedTraceLinkId);
     },
+    /**
+     * @return The currently selected artifact level.
+     */
+    selectedArtifactLevel(): TimArtifactLevelSchema | undefined {
+      return typeOptionsStore.getArtifactLevel(this.selectedArtifactType);
+    },
+    /**
+     * @return The currently selected trace matrix.
+     */
+    selectedTraceMatrix(): TimTraceMatrixSchema | undefined {
+      return typeOptionsStore.getTraceMatrix(
+        this.selectedTraceTypes[0],
+        this.selectedTraceTypes[1]
+      );
+    },
   },
   actions: {
     /**
@@ -82,6 +112,8 @@ export const useSelection = defineStore("selection", {
       this.selectedGroupIds = [];
       this.selectedArtifactId = "";
       this.selectedTraceLinkId = "";
+      this.selectedArtifactType = "";
+      this.selectedTraceTypes = ["", ""];
       appStore.closeSidePanels();
     },
     /**
@@ -131,10 +163,9 @@ export const useSelection = defineStore("selection", {
      * @param artifactId - The artifact to select.
      */
     selectArtifact(artifactId: string): void {
+      this.clearSelections();
       this.selectedArtifactId = artifactId;
-      this.selectedTraceLinkId = "";
       this.centerOnArtifacts([artifactId]);
-      this.selectedSubtreeIds = [];
       appStore.openDetailsPanel("displayArtifact");
     },
     /**
@@ -143,7 +174,7 @@ export const useSelection = defineStore("selection", {
      * @param traceLink - The trace link to select.
      */
     selectTraceLink(traceLink: TraceLinkSchema): void {
-      this.selectedArtifactId = "";
+      this.clearSelections();
       this.selectedTraceLinkId = traceLink.traceLinkId;
       this.selectedSubtreeIds = [traceLink.sourceId, traceLink.targetId];
       this.centerOnArtifacts([traceLink.sourceId, traceLink.targetId]);
@@ -200,6 +231,29 @@ export const useSelection = defineStore("selection", {
         artifactId === this.selectedArtifactId ||
         this.selectedGroupIds.includes(artifactId)
       );
+    },
+    /**
+     * Sets the given artifact level as selected.
+     *
+     * @param artifactType - The artifact type to select.
+     */
+    selectArtifactLevel(artifactType: string): void {
+      this.clearSelections();
+      this.selectedArtifactType = artifactType;
+      this.centerOnArtifacts([artifactType]);
+      appStore.openDetailsPanel("displayArtifactLevel");
+    },
+    /**
+     * Sets the given trace matrix as selected.
+     *
+     * @param sourceType - The artifact source type to select.
+     * @param targetType - The artifact target type to select.
+     */
+    selectTraceMatrix(sourceType: string, targetType: string): void {
+      this.clearSelections();
+      this.selectedTraceTypes = [sourceType, targetType];
+      this.centerOnArtifacts([sourceType, targetType]);
+      appStore.openDetailsPanel("displayTraceMatrix");
     },
   },
 });

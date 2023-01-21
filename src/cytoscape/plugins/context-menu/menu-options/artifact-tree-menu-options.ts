@@ -1,5 +1,5 @@
 import { EventObject } from "cytoscape";
-import { ArtifactSchema, ArtifactData, MenuItem } from "@/types";
+import { ArtifactSchema, ArtifactCytoElementData, MenuItem } from "@/types";
 import {
   appStore,
   artifactStore,
@@ -10,7 +10,7 @@ import {
   sessionStore,
 } from "@/hooks";
 import { handleDeleteArtifact, handleDuplicateArtifact } from "@/api";
-import { enableDrawMode } from "@/cytoscape";
+import { enableDrawMode } from "@/cytoscape/plugins";
 import { safetyCaseMenuOption } from "./safety-case-menu-option";
 import { ftaMenuItem } from "./fta-menu-options";
 
@@ -87,7 +87,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
         selectionStore.selectArtifact(artifact.id);
       });
     },
-    isVisible(artifactData: ArtifactData | undefined): boolean {
+    isVisible(artifactData: ArtifactCytoElementData | undefined): boolean {
       return artifactData !== undefined;
     },
   },
@@ -104,7 +104,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
         appStore.openDetailsPanel("displayArtifactBody");
       });
     },
-    isVisible(artifactData: ArtifactData | undefined): boolean {
+    isVisible(artifactData: ArtifactCytoElementData | undefined): boolean {
       return artifactData !== undefined;
     },
   },
@@ -120,7 +120,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
         appStore.openArtifactCreatorTo({});
       });
     },
-    isVisible(artifactData: ArtifactData | undefined): boolean {
+    isVisible(artifactData: ArtifactCytoElementData | undefined): boolean {
       return (
         artifactData !== undefined &&
         sessionStore.isEditor(projectStore.project)
@@ -138,7 +138,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
         handleDeleteArtifact(artifact, {});
       });
     },
-    isVisible(artifactData: ArtifactData | undefined): boolean {
+    isVisible(artifactData: ArtifactCytoElementData | undefined): boolean {
       return (
         artifactData !== undefined &&
         sessionStore.isEditor(projectStore.project)
@@ -157,7 +157,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
         await handleDuplicateArtifact(artifact, {});
       });
     },
-    isVisible(artifactData: ArtifactData | undefined): boolean {
+    isVisible(artifactData: ArtifactCytoElementData | undefined): boolean {
       return (
         artifactData !== undefined &&
         sessionStore.isEditor(projectStore.project)
@@ -197,7 +197,7 @@ export const artifactTreeMenuItems: MenuItem[] = [
 
       await subtreeStore.showSubtree(artifactId);
     },
-    isVisible(artifactData: ArtifactData | undefined): boolean {
+    isVisible(artifactData: ArtifactCytoElementData | undefined): boolean {
       if (artifactData !== undefined) {
         return subtreeStore.collapsedParentNodes.includes(artifactData.id);
       }
@@ -208,7 +208,9 @@ export const artifactTreeMenuItems: MenuItem[] = [
   safetyCaseMenuOption,
 ];
 
-function hasSubtree(artifactData: ArtifactData | undefined): boolean {
+function hasSubtree(
+  artifactData: ArtifactCytoElementData | undefined
+): boolean {
   if (artifactData !== undefined) {
     return !subtreeStore.collapsedParentNodes.includes(artifactData.id);
   }
@@ -224,7 +226,7 @@ type ArtifactHandler = (a: ArtifactSchema) => void | Promise<void>;
  */
 function handleOnClick(event: EventObject, handler: ArtifactHandler): void {
   if (event.target !== null) {
-    const artifactData: ArtifactData = event.target.data();
+    const artifactData: ArtifactCytoElementData = event.target.data();
     const artifact = artifactStore.getArtifactById(artifactData.id);
 
     if (!artifact) return;

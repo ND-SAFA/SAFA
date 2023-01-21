@@ -1,36 +1,28 @@
 <template>
-  <cy-element
-    :definition="definition"
-    v-on:click="$emit('click:right', traceDefinition)"
-  />
+  <cy-element :definition="definition" />
 </template>
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import {
   ArtifactDeltaState,
-  TraceCytoCoreElement,
+  GraphElementType,
+  GraphMode,
+  TraceCytoElement,
   TraceLinkSchema,
 } from "@/types";
 import { deltaStore } from "@/hooks";
 
 /**
- * Displays trace link edge.
- *
- * @emits `click:right` - On right click.
+ * Displays trace link edge between artifacts.
  */
 export default Vue.extend({
-  name: "GraphLink",
+  name: "TraceLink",
   props: {
-    traceDefinition: {
+    trace: {
       type: Object as PropType<TraceLinkSchema>,
       required: true,
     },
-    graph: {
-      type: String as PropType<"tim" | "artifact">,
-      required: true,
-    },
-    count: Number,
     faded: Boolean,
   },
   computed: {
@@ -38,33 +30,28 @@ export default Vue.extend({
      * @return The delta state of this trace link.
      */
     linkDeltaState(): ArtifactDeltaState {
-      if (!deltaStore.inDeltaView) {
-        return ArtifactDeltaState.NO_CHANGE;
-      }
-
-      return (
-        deltaStore.getTraceDeltaType(this.traceDefinition.traceLinkId) ||
-        ArtifactDeltaState.NO_CHANGE
-      );
+      return deltaStore.getTraceDeltaType(this.trace.traceLinkId);
     },
     /**
      * @return The trace link's data definition.
      */
-    definition(): TraceCytoCoreElement {
-      const { sourceId, targetId, traceLinkId } = this.traceDefinition;
+    definition(): TraceCytoElement {
+      const { sourceId, targetId, traceLinkId, traceType, approvalStatus } =
+        this.trace;
 
       return {
         data: {
-          ...this.traceDefinition,
-          type: "edge",
-          graph: this.graph,
+          type: GraphElementType.edge,
+          graph: GraphMode.tree,
           id: traceLinkId,
           // Reversed to show arrow toward parent.
           source: targetId,
           target: sourceId,
-          count: this.count || 1,
           deltaType: this.linkDeltaState,
           faded: this.faded,
+          traceType,
+          approvalStatus,
+          dark: this.$vuetify.theme.dark,
         },
         classes: sourceId === targetId ? ["loop"] : [],
       };

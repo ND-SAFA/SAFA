@@ -42,7 +42,9 @@ export type DetailsOpenState =
   | "saveArtifact"
   | "displayTrace"
   | "saveTrace"
-  | "generateTrace";
+  | "generateTrace"
+  | "displayArtifactLevel"
+  | "displayTraceMatrix";
 
 /**
  * Represents the states of all openable panels.

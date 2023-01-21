@@ -5,11 +5,12 @@ import {
   CytoCore,
   IGraphLayout,
   CytoEvent,
-  ArtifactData,
+  ArtifactCytoElementData,
 } from "@/types";
 import { isArtifactData } from "@/util";
 import { selectionStore } from "@/hooks";
-import { cyCenterNodes, cyZoomReset, timTreeCyPromise } from "@/cytoscape";
+import { timTreeCyPromise } from "@/cytoscape/cy";
+import { cyCenterNodes, cyZoomReset } from "@/cytoscape/operations";
 import { MenuItem } from "@/types/cytoscape/plugins/context-menus";
 import { artifactTreeMenuItems } from "@/cytoscape/plugins";
 
@@ -105,7 +106,9 @@ export const dynamicVisibilityHookForContextMenuItems = (
 
   cy.on(CytoEvent.CXT_TAP, (event: EventObject) => {
     const data = event.target.data();
-    const artifactData: ArtifactData | undefined = isArtifactData(data)
+    const artifactData: ArtifactCytoElementData | undefined = isArtifactData(
+      data
+    )
       ? data
       : undefined;
     const contextMenuInstance = cy.contextMenus("get");

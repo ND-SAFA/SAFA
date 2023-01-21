@@ -1,4 +1,4 @@
-import { ArtifactData } from "@/types";
+import { ArtifactCytoElementData } from "@/types";
 import { getBackgroundColor, getBorderColor } from "@/util";
 import { svgRect } from "./node-shapes";
 import { svgNode } from "./svg-node";
@@ -10,7 +10,7 @@ import { svgNode } from "./svg-node";
  *
  * @return stringified SVG for the node.
  */
-export function svgDefault(data: ArtifactData): string {
+export function svgDefault(data: ArtifactCytoElementData): string {
   const outer = { width: 206, height: 160 };
 
   return svgNode(

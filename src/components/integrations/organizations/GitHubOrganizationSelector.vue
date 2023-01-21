@@ -25,7 +25,7 @@
 import Vue from "vue";
 import { GitHubOrganizationSchema } from "@/types";
 import { integrationsStore } from "@/hooks";
-import { handleLoadGitHubOrganizations } from "@/api";
+import { handleLoadGitHubProjects } from "@/api";
 import { StepperListStep } from "@/components/common";
 
 /**
@@ -71,9 +71,16 @@ export default Vue.extend({
       integrationsStore.gitHubOrganization = undefined;
       this.organizationsLoading = true;
 
-      handleLoadGitHubOrganizations({
-        onSuccess: (organizations) => {
-          this.organizations = organizations;
+      handleLoadGitHubProjects({
+        onSuccess: (projects) => {
+          this.organizations = [];
+
+          projects.forEach(({ owner }) => {
+            if (this.organizations.find(({ id }) => id === owner)) return;
+
+            this.organizations.push({ id: owner, name: owner });
+          });
+
           this.organizationsLoading = false;
         },
         onError: () => (this.organizationsLoading = false),

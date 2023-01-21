@@ -84,27 +84,27 @@ export default Vue.extend({
       }
     },
     /**
-     * @return Whether an organization is selected.
+     * @return What organization is selected.
      */
-    organizationIsSelected(): boolean {
+    organizationIsSelected(): string | undefined {
       if (this.source === "Jira") {
-        return !!integrationsStore.jiraOrganization;
+        return integrationsStore.jiraOrganization?.name;
       } else if (this.source === "GitHub") {
-        return !!integrationsStore.gitHubOrganization;
+        return integrationsStore.gitHubOrganization?.name;
       } else {
-        return false;
+        return undefined;
       }
     },
     /**
      * @return Whether a project is selected.
      */
-    projectIsSelected(): boolean {
+    projectIsSelected(): string | undefined {
       if (this.source === "Jira") {
-        return !!integrationsStore.jiraProject;
+        return integrationsStore.jiraProject?.name;
       } else if (this.source === "GitHub") {
-        return !!integrationsStore.gitHubProject;
+        return integrationsStore.gitHubProject?.name;
       } else {
-        return false;
+        return undefined;
       }
     },
   },
@@ -124,8 +124,8 @@ export default Vue.extend({
     /**
      * Updates the selection step when a project is selected.
      */
-    organizationIsSelected(selected: boolean): void {
-      if (selected) {
+    organizationIsSelected(name: string | undefined): void {
+      if (name) {
         this.currentStep = 3;
         this.setStepIsValid(1, true);
       } else {
@@ -136,8 +136,8 @@ export default Vue.extend({
     /**
      * Updates the selection step when a project is selected.
      */
-    projectIsSelected(selected: boolean): void {
-      this.setStepIsValid(2, selected);
+    projectIsSelected(name: string | undefined): void {
+      this.setStepIsValid(2, !!name);
     },
   },
   methods: {

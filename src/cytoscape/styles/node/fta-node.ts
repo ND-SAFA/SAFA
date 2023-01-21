@@ -1,4 +1,4 @@
-import { ArtifactData } from "@/types";
+import { ArtifactCytoElementData } from "@/types";
 
 /**
  * Creates the HTML for representing an artifact node in a graph.
@@ -7,7 +7,7 @@ import { ArtifactData } from "@/types";
  *
  * @return stringified HTML for the node.
  */
-export function htmlFTA(data: ArtifactData): string {
+export function htmlFTA(data: ArtifactCytoElementData): string {
   const visibility =
     data.opacity !== undefined ? `opacity: ${data.opacity};` : "";
 

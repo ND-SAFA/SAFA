@@ -29,6 +29,8 @@
       <trace-link-panel />
       <save-trace-link-panel />
       <generate-trace-link-panel />
+      <artifact-level-panel />
+      <trace-matrix-panel />
     </v-container>
   </v-navigation-drawer>
 </template>
@@ -50,6 +52,7 @@ import {
   SaveTraceLinkPanel,
   GenerateTraceLinkPanel,
 } from "@/components/traceLink/panels";
+import { ArtifactLevelPanel, TraceMatrixPanel } from "@/components/tim";
 
 /**
  * Renders content in a right side panel.
@@ -57,6 +60,8 @@ import {
 export default Vue.extend({
   name: "DetailsDrawer",
   components: {
+    TraceMatrixPanel,
+    ArtifactLevelPanel,
     SaveTraceLinkPanel,
     TraceLinkPanel,
     SaveArtifactPanel,
@@ -103,6 +108,10 @@ export default Vue.extend({
           return "Create Trace Link";
         case "generateTrace":
           return "Generate Trace Links";
+        case "displayArtifactLevel":
+          return "Artifact Type";
+        case "displayTraceMatrix":
+          return "Trace Matrix";
         default:
           return "";
       }
@@ -134,5 +143,3 @@ export default Vue.extend({
   },
 });
 </script>
-
-<style scoped lang="scss"></style>

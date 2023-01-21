@@ -1,8 +1,18 @@
 <template>
   <v-btn-toggle tile group multiple dense :value="value">
     <text-button
+      :value="options.tim"
+      text
+      color="accent"
+      data-cy="button-nav-tim"
+      icon-id="mdi-ballot"
+      @click="handleTimView"
+    >
+      TIM
+    </text-button>
+    <text-button
       :disabled="isTreeDisabled"
-      value="tree"
+      :value="options.tree"
       text
       color="accent"
       data-cy="button-nav-tree"
@@ -12,7 +22,7 @@
       Tree
     </text-button>
     <text-button
-      value="table"
+      :value="options.table"
       text
       color="accent"
       data-cy="button-nav-table"
@@ -22,7 +32,8 @@
       Table
     </text-button>
     <text-button
-      value="delta"
+      :disabled="isDeltaDisabled"
+      :value="options.delta"
       text
       color="accent"
       data-cy="button-nav-delta"
@@ -36,7 +47,8 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { appStore, deltaStore, documentStore } from "@/hooks";
+import { GraphMode } from "@/types";
+import { appStore, deltaStore, documentStore, layoutStore } from "@/hooks";
 import { TextButton } from "@/components/common";
 
 /**
@@ -47,7 +59,13 @@ export default Vue.extend({
   components: { TextButton },
   data() {
     return {
-      value: [] as string[],
+      value: [] as GraphMode[],
+      options: {
+        tim: GraphMode.tim,
+        tree: GraphMode.tree,
+        table: GraphMode.table,
+        delta: GraphMode.delta,
+      },
     };
   },
   mounted() {
@@ -64,7 +82,13 @@ export default Vue.extend({
      * @return Whether the tree view is disabled.
      */
     isTreeDisabled(): boolean {
-      return documentStore.isEditableTableDocument;
+      return documentStore.isTableOnlyDocument;
+    },
+    /**
+     * @return Whether the tree view is disabled.
+     */
+    isDeltaDisabled(): boolean {
+      return layoutStore.mode === GraphMode.tim;
     },
   },
   methods: {
@@ -72,12 +96,12 @@ export default Vue.extend({
      * Updates the values of which buttons are highlighted.
      */
     updateValue(): void {
-      const selected: string[] = [];
+      const selected: GraphMode[] = [];
 
-      selected.push(documentStore.isTableDocument ? "table" : "tree");
+      selected.push(layoutStore.mode);
 
       if (this.inDeltaView) {
-        selected.push("delta");
+        selected.push(GraphMode.delta);
       }
 
       this.value = selected;
@@ -85,15 +109,22 @@ export default Vue.extend({
     /**
      * Opens tree view.
      */
+    handleTimView(): void {
+      layoutStore.mode = GraphMode.tim;
+      this.updateValue();
+    },
+    /**
+     * Opens tree view.
+     */
     handleTreeView(): void {
-      documentStore.isTableView = false;
+      layoutStore.mode = GraphMode.tree;
       this.updateValue();
     },
     /**
      * Opens table view.
      */
     handleTableView(): void {
-      documentStore.isTableView = true;
+      layoutStore.mode = GraphMode.table;
       this.updateValue();
     },
     /**
@@ -117,8 +148,12 @@ export default Vue.extend({
     isTreeDisabled(): void {
       this.updateValue();
     },
+    /**
+     * Updates the value when the graph mode changes.
+     */
+    isDeltaDisabled(): void {
+      this.updateValue();
+    },
   },
 });
 </script>
-
-<style scoped lang="scss"></style>

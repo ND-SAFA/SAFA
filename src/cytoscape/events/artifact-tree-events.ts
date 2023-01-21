@@ -1,18 +1,43 @@
 import { EventObject } from "cytoscape";
-import { ArtifactSchema, DetailsOpenState } from "@/types";
-import { appStore, layoutStore, selectionStore } from "@/hooks";
-import { disableDrawMode } from "@/cytoscape";
+import {
+  ArtifactCytoElementData,
+  DetailsOpenState,
+  TimEdgeCytoElementData,
+  TimNodeCytoElementData,
+  TraceCytoElementData,
+} from "@/types";
+import { appStore, layoutStore, selectionStore, traceStore } from "@/hooks";
+import {
+  ARTIFACT_EDGE_SELECTOR,
+  ARTIFACT_NODE_SELECTOR,
+  TIM_EDGE_SELECTOR,
+  TIM_NODE_SELECTOR,
+} from "@/cytoscape/styles";
+import { disableDrawMode } from "@/cytoscape/plugins";
 import { DefaultCytoEvents } from "@/cytoscape/events/cyto-events";
 import { CytoCore, CytoEvent, CytoEventHandlers } from "@/types/cytoscape/core";
-
-// const doubleClickDelayMs = 350;
-// let previousTapStamp = doubleClickDelayMs;
 
 /**
  * Handlers for mouse events on the artifact tree.
  */
 export const ArtifactTreeCytoEvents: CytoEventHandlers = {
   ...DefaultCytoEvents,
+  setInitialArtifactPosition: {
+    events: [CytoEvent.ADD],
+    selector: ARTIFACT_NODE_SELECTOR,
+    action(cy: CytoCore, event: EventObject) {
+      const artifact = event.target.data() as ArtifactCytoElementData;
+
+      cy.nodes()
+        .filter((n) => n.data().id === artifact.id)
+        .layout(layoutStore.layoutOptions)
+        .run();
+
+      if (artifact.id === selectionStore.selectedArtifactId) {
+        selectionStore.selectArtifact(artifact.id);
+      }
+    },
+  },
   unselectArtifactOnBackgroundClick: {
     events: [CytoEvent.TAP],
     action(cy: CytoCore, event: EventObject) {
@@ -31,51 +56,60 @@ export const ArtifactTreeCytoEvents: CytoEventHandlers = {
       }
     },
   },
-  select: {
+  selectArtifact: {
     events: [CytoEvent.TAP],
-    selector: "node",
-    // action(cy: CytoCore, event: EventObject) {
-    //   const currentTimeStamp = event.timeStamp;
-    //   const artifact = event.target.data() as ArtifactModel;
-    //   const msFromLastTap = currentTimeStamp - previousTapStamp;
-    //
-    //   if (msFromLastTap === 0 || !artifact.id) return;
-    //
-    //   if (msFromLastTap < doubleClickDelayMs) {
-    //     selectionStore.toggleSelectArtifact(artifact.id);
-    //   }
-    //
-    //   previousTapStamp = currentTimeStamp;
-    // },
+    selector: ARTIFACT_NODE_SELECTOR,
     action(cy: CytoCore, event: EventObject) {
-      const artifact = event.target.data() as ArtifactSchema;
+      const artifact = event.target.data() as ArtifactCytoElementData;
 
       if (!artifact.id) return;
 
       selectionStore.selectArtifact(artifact.id);
     },
   },
-  selectAll: {
+  selectAllArtifacts: {
     events: [CytoEvent.BOX_SELECT],
     action(cy: CytoCore, event: EventObject) {
-      const artifact = event.target.data() as ArtifactSchema;
+      const artifact = event.target.data() as ArtifactCytoElementData;
 
       selectionStore.addToSelectedGroup(artifact.id);
     },
   },
-  setInitialPosition: {
-    events: [CytoEvent.ADD],
+  selectTraceLink: {
+    events: [CytoEvent.TAP],
+    selector: ARTIFACT_EDGE_SELECTOR,
     action(cy: CytoCore, event: EventObject) {
-      const artifact = event.target.data() as ArtifactSchema;
+      const data = event.target.data() as TraceCytoElementData;
+      const trace = traceStore.getTraceLinkById(data.id);
 
-      cy.nodes()
-        .filter((n) => n.data().id === artifact.id)
-        .layout(layoutStore.layoutOptions)
-        .run();
+      if (!trace) return;
 
-      if (artifact.id === selectionStore.selectedArtifactId) {
-        selectionStore.selectArtifact(artifact.id);
-      }
+      selectionStore.selectTraceLink(trace);
+    },
+  },
+  selectTimNode: {
+    events: [CytoEvent.TAP],
+    selector: TIM_NODE_SELECTOR,
+    action(cy: CytoCore, event: EventObject) {
+      const artifactLevel = event.target.data() as TimNodeCytoElementData;
+
+      if (!artifactLevel.artifactType) return;
+
+      selectionStore.selectArtifactLevel(artifactLevel.artifactType);
+    },
+  },
+  selectTimEdge: {
+    events: [CytoEvent.TAP],
+    selector: TIM_EDGE_SELECTOR,
+    action(cy: CytoCore, event: EventObject) {
+      const artifactLevel = event.target.data() as TimEdgeCytoElementData;
+
+      if (!artifactLevel.source || !artifactLevel.target) return;
+
+      selectionStore.selectTraceMatrix(
+        artifactLevel.target,
+        artifactLevel.source
+      );
     },
   },
 };

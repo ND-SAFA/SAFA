@@ -1,5 +1,4 @@
 import {
-  GitHubOrganizationSchema,
   GitHubProjectSchema,
   InstallationSchema,
   IOHandlerCallback,
@@ -22,7 +21,6 @@ import {
   createJiraProjectSync,
   handleJobSubmission,
   getJiraInstallations,
-  getGitHubInstallations,
 } from "@/api";
 
 /**
@@ -39,7 +37,7 @@ export function handleLoadInstallations({
 }: IOHandlerCallback): void {
   getProjectInstallations(projectStore.projectId)
     .then((installations) => {
-      projectStore.installations = installations;
+      integrationsStore.installations = installations;
       onSuccess?.();
     })
     .catch(onError)
@@ -62,7 +60,6 @@ export async function handleSyncInstallation(
     if (installation.type === "GITHUB") {
       const job = await createGitHubProjectSync(
         projectStore.versionId,
-        installation.installationOrgId,
         installation.installationId
       );
 
@@ -235,25 +232,6 @@ export function handleAuthorizeGitHub({
 }
 
 /**
- * Loads GitHub installations.
- *
- * @param credentials - The access and refresh token received from authorizing GitHub.
- * @param onSuccess - Called if the action is successful, with the jira project list.
- * @param onError - Called if the action fails.
- */
-export function handleLoadGitHubOrganizations({
-  onSuccess,
-  onError,
-}: IOHandlerCallback<GitHubOrganizationSchema[]>): void {
-  getGitHubInstallations()
-    .then(onSuccess)
-    .catch((e) => {
-      onError?.(e);
-      logStore.onError(e);
-    });
-}
-
-/**
  * Loads GitHub projects and sets the currently selected cloud id.
  *
  * @param onSuccess - Called if the action is successful, with the jira project list.
@@ -263,11 +241,7 @@ export function handleLoadGitHubProjects({
   onSuccess,
   onError,
 }: IOHandlerCallback<GitHubProjectSchema[]>): void {
-  const installationId = integrationsStore.gitHubOrganization?.id;
-
-  if (!installationId) return;
-
-  getGitHubProjects(installationId)
+  getGitHubProjects()
     .then(onSuccess)
     .catch((e) => {
       onError?.(e);

@@ -1,4 +1,4 @@
-import { ArtifactData } from "@/types";
+import { ArtifactCytoElementData } from "@/types";
 import { getBackgroundColor, getBorderColor } from "@/util";
 import { svgCircle, svgRect, svgRhombus } from "./node-shapes";
 import { svgDefault } from "./default-node";
@@ -11,7 +11,7 @@ import { svgNode } from "./svg-node";
  *
  * @return stringified HTML for the node.
  */
-export function svgSafetyCase(data: ArtifactData): string {
+export function svgSafetyCase(data: ArtifactCytoElementData): string {
   switch (data.safetyCaseType) {
     case "GOAL":
       return svgGoal(data);
@@ -33,7 +33,7 @@ export function svgSafetyCase(data: ArtifactData): string {
  *
  * @return stringified SVG for the node.
  */
-function svgGoal(data: ArtifactData): string {
+function svgGoal(data: ArtifactCytoElementData): string {
   const outer = { width: 206, height: 160 };
 
   return svgNode(
@@ -59,7 +59,7 @@ function svgGoal(data: ArtifactData): string {
  *
  * @return stringified SVG for the node.
  */
-function svgSolution(data: ArtifactData): string {
+function svgSolution(data: ArtifactCytoElementData): string {
   const radius = 92;
 
   return svgNode(
@@ -86,7 +86,7 @@ function svgSolution(data: ArtifactData): string {
  *
  * @return stringified SVG for the node.
  */
-function svgStrategy(data: ArtifactData): string {
+function svgStrategy(data: ArtifactCytoElementData): string {
   const outerHeight = 160;
   const outerWidth = 206;
   const xOffset = 20;

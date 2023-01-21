@@ -1,18 +1,21 @@
 import { defineStore } from "pinia";
 
 import {
-  ArtifactData,
+  ArtifactCytoElementData,
   ArtifactSchema,
   ArtifactTypeDirections,
   ArtifactTypeSchema,
   LabelledTraceDirectionSchema,
   ProjectSchema,
   SafetyCaseType,
+  TimArtifactLevelSchema,
+  TimTraceMatrixSchema,
   TraceDirectionSchema,
 } from "@/types";
 import {
   allTypeIcons,
   createDefaultTypeIcons,
+  createTIM,
   defaultTypeIcon,
   isLinkAllowedByType,
   preserveObjectKeys,
@@ -39,6 +42,7 @@ export const useTypeOptions = defineStore("typeOptions", {
      * A mapping of the icons for each artifact type.
      */
     artifactTypeIcons: createDefaultTypeIcons([]),
+    tim: createTIM(),
   }),
   getters: {
     /**
@@ -61,6 +65,7 @@ export const useTypeOptions = defineStore("typeOptions", {
     initializeProject(project: ProjectSchema): void {
       this.artifactTypeDirections = {};
       this.initializeTypeIcons(project.artifactTypes);
+      this.tim = createTIM(project);
     },
     /**
      * Changes what directions of trace links between artifacts are allowed.
@@ -169,8 +174,8 @@ export const useTypeOptions = defineStore("typeOptions", {
      * @return Whether the link is allowed.
      */
     isLinkAllowedByType(
-      source: ArtifactSchema | ArtifactData,
-      target: ArtifactSchema | ArtifactData
+      source: ArtifactSchema | ArtifactCytoElementData,
+      target: ArtifactSchema | ArtifactCytoElementData
     ): boolean {
       return isLinkAllowedByType(source, target, this.artifactTypeDirections);
     },
@@ -211,6 +216,33 @@ export const useTypeOptions = defineStore("typeOptions", {
             iconIndex: allTypeIcons.indexOf(icon),
           };
         }
+      );
+    },
+    /**
+     * Finds the artifact level info for an artifact type.
+     *
+     * @param type - The artifact type.
+     * @return The artifact level, if one exists.
+     */
+    getArtifactLevel(type: string): TimArtifactLevelSchema | undefined {
+      return this.tim.artifacts.find(
+        ({ artifactType }) => artifactType === type
+      );
+    },
+    /**
+     * Finds the artifact level info for an artifact type.
+     *
+     * @param source - The source artifact type.
+     * @param target - The target artifact type.
+     * @return The trace matrix, if one exists.
+     */
+    getTraceMatrix(
+      source: string,
+      target: string
+    ): TimTraceMatrixSchema | undefined {
+      return this.tim.traces.find(
+        ({ sourceType, targetType }) =>
+          sourceType === source && targetType === target
       );
     },
   },

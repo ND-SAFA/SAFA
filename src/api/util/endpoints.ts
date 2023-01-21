@@ -47,10 +47,9 @@ export enum Endpoint {
   githubCreateCredentials = "accounts/github/credentials/:accessCode",
   githubEditCredentials = "accounts/github/credentials",
   githubValidateCredentials = "accounts/github/credentials/check",
-  githubGetInstallations = "accounts/github/installations",
-  githubGetProjects = "projects/github/:installationId",
-  githubCreateProject = "projects/import/github/:installationId/:repositoryName",
-  githubSyncProject = "projects/versions/:versionId/import/github/:installationId/:repositoryName",
+  githubGetProjects = "projects/github",
+  githubCreateProject = "projects/import/github/:repositoryName",
+  githubSyncProject = "projects/versions/:versionId/import/github/:repositoryName",
 
   // Commits
   commit = "projects/versions/:versionId/commit",

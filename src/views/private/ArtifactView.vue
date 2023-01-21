@@ -1,7 +1,7 @@
 <template>
   <private-page full-window>
     <template v-slot:page>
-      <artifact-tree />
+      <project-tree />
       <artifact-fab />
 
       <tab-list
@@ -24,14 +24,14 @@
 <script lang="ts">
 import Vue from "vue";
 import { tableViewTabOptions } from "@/util";
-import { documentStore } from "@/hooks";
+import { layoutStore } from "@/hooks";
 import {
-  ArtifactTree,
   ArtifactTable,
   PrivatePage,
   ArtifactFab,
   TabList,
   TraceMatrixTable,
+  ProjectTree,
 } from "@/components";
 
 /**
@@ -40,12 +40,12 @@ import {
 export default Vue.extend({
   name: "ArtifactView",
   components: {
+    ProjectTree,
     TraceMatrixTable,
     TabList,
     ArtifactFab,
     ArtifactTable,
     PrivatePage,
-    ArtifactTree,
   },
   data() {
     return {
@@ -58,7 +58,7 @@ export default Vue.extend({
      * @return Whether table view is enabled.
      */
     isTableView(): boolean {
-      return documentStore.isTableDocument;
+      return layoutStore.isTableMode;
     },
   },
 });

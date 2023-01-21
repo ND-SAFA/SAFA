@@ -9,17 +9,18 @@
       :class="className"
     >
       <template v-slot:elements>
-        <artifact-type-node
-          v-for="artifactPanel in artifactPanels"
-          :artifact-panel="artifactPanel"
-          :key="artifactPanel.title"
+        <tim-node
+          v-for="panel in artifactPanels"
+          :key="panel.title"
+          :count="panel.projectFile.artifacts.length"
+          :artifact-type="panel.projectFile.type"
         />
-        <graph-link
-          v-for="tracePanel in tracePanels"
-          :key="getTraceId(tracePanel)"
-          :trace-definition="tracePanel.projectFile"
-          :count="tracePanel.projectFile.traces.length"
-          graph="tim"
+        <tim-link
+          v-for="panel in tracePanels"
+          :key="panel.projectFile.sourceId + panel.projectFile.targetId"
+          :count="panel.projectFile.traces.length"
+          :target-type="panel.projectFile.targetId"
+          :source-type="panel.projectFile.sourceId"
         />
       </template>
     </cytoscape-controller>
@@ -29,11 +30,11 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { TracePanel, CytoCoreGraph, ArtifactPanel } from "@/types";
-import { getTraceId } from "@/util";
 import { appStore, layoutStore } from "@/hooks";
 import { timGraph, cyResetTim } from "@/cytoscape";
-import { GraphLink, CytoscapeController, FlexBox } from "@/components/common";
-import ArtifactTypeNode from "./ArtifactTypeNode.vue";
+import { FlexBox } from "@/components/common/layout";
+import CytoscapeController from "./CytoscapeController.vue";
+import { TimNode, TimLink } from "./tim";
 
 /**
  * Creates a Cytoscape graph containing artifact types are nodes
@@ -43,9 +44,9 @@ export default Vue.extend({
   name: "TimTree",
   components: {
     FlexBox,
-    ArtifactTypeNode,
     CytoscapeController,
-    GraphLink,
+    TimNode,
+    TimLink,
   },
   props: {
     tracePanels: {
@@ -62,14 +63,6 @@ export default Vue.extend({
     },
   },
   methods: {
-    /**
-     * Returns the trace id for a panel.
-     * @param tracePanel - The panel to return the id for.
-     */
-    getTraceId(tracePanel: TracePanel): string {
-      const traceFile = tracePanel.projectFile;
-      return getTraceId(traceFile.sourceId, traceFile.targetId);
-    },
     /**
      * Resets the cytoscape viewport and centers artifacts.
      */

@@ -78,9 +78,9 @@ import {
   handleImportProject,
 } from "@/api";
 import { Stepper } from "@/components/common";
+import { TimTree } from "@/components/graph";
 import { ProjectIdentifierInput } from "@/components/project/base";
 import { FileUploader, ArtifactTypeCreator, TraceFileCreator } from "../panels";
-import { TimTree } from "../timTree";
 
 const PROJECT_IDENTIFIER_STEP_NAME = "Name Project";
 

@@ -1,11 +1,11 @@
 import {
-  ArtifactData,
+  ArtifactCytoElementData,
   ReservedArtifactType,
   SvgNodeStyle,
   SvgStyle,
 } from "@/types";
 import { capitalize, getBorderColor } from "@/util";
-import { ARTIFACT_CHILDREN_HEIGHT } from "@/cytoscape";
+import { ARTIFACT_CHILDREN_HEIGHT } from "@/cytoscape/styles/config";
 import { svgText } from "@/cytoscape/styles/node/svg-text";
 import { svgFooter } from "./node-footer";
 import { getBody, sanitizeText } from "./node-helper";
@@ -20,7 +20,7 @@ import { getBody, sanitizeText } from "./node-helper";
  * @return stringified SVG for the node.
  */
 export function svgNode(
-  data: ArtifactData,
+  data: ArtifactCytoElementData,
   style: SvgNodeStyle,
   svgShape: string
 ): string {
@@ -120,7 +120,7 @@ export function svgDiv(style: Omit<SvgStyle, "height">): string {
  * @return stringified SVG for the node.
  */
 function svgBody(
-  data: ArtifactData,
+  data: ArtifactCytoElementData,
   truncateLength: number,
   style: SvgStyle
 ): string {

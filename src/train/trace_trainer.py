@@ -22,6 +22,7 @@ from train.metrics.map_metric import MapMetric
 from train.metrics.precision_at_threshold_metric import PrecisionAtKMetric
 from train.metrics.recall_at_threshold_metric import RecallAtThresholdMetric
 from train.metrics.supported_trace_metric import get_metric_name, get_metric_path
+from train.save_strategy.abstract_save_strategy import AbstractSaveStrategy, SaveStrategyStage
 from train.trainer_args import TrainerArgs
 from util.base_object import BaseObject
 from util.file_util import FileUtil
@@ -36,6 +37,7 @@ class TraceTrainer(Trainer, BaseObject):
     """
     Responsible for using given model for training and prediction using given data.
     """
+    BEST_MODEL_NAME = "best"
 
     def __init__(self, trainer_args: TrainerArgs, model_manager: ModelManager,
                  trainer_dataset_manager: TrainerDatasetManager, **kwargs):
@@ -71,7 +73,6 @@ class TraceTrainer(Trainer, BaseObject):
     def custom_train(self, resume_from_checkpoint: str = None):
         # TODO : Add timing metrics (e.g. total time per epoch)
         # TODO : If loss is nan or inf simply add the average of previous logged losses
-        # TODO: Add evaluation whenever save strategy needs it
         # TODO: Add flag to load best model at the end
 
         accelerator = Accelerator(gradient_accumulation_steps=self.trainer_args.gradient_accumulation_steps)
@@ -95,8 +96,10 @@ class TraceTrainer(Trainer, BaseObject):
         model, optimizer, scheduler, data = accelerator.prepare(self.model, optimizer, scheduler, data)
         model.train()
         training_output: Dict = {}
+        save_strategy = self.trainer_args.custom_save_strategy
+
         for epoch in range(self.trainer_args.num_train_epochs):
-            for batch in tqdm(data):
+            for batch_index, batch in enumerate(tqdm(data)):
                 batch = batch.to(device)
                 optimizer.zero_grad()
 
@@ -107,25 +110,26 @@ class TraceTrainer(Trainer, BaseObject):
                 # loss.backward()
                 accelerator.backward(loss)
                 optimizer.step()
-                self.end_step(training_output)
+                self.conditional_evaluate(save_strategy, SaveStrategyStage.STEP, batch_index)
+
             scheduler.step()
-            # TODO: Call save strategy
-            self.end_epoch(training_output)
-        print("Done")
+            self.conditional_evaluate(save_strategy, SaveStrategyStage.EPOCH, epoch)
 
-    def end_step(self, training_output: Dict) -> None:
+    def conditional_evaluate(self, save_strategy: AbstractSaveStrategy, stage: SaveStrategyStage, stage_iteration: int) -> None:
         """
-        Callback function called at the end of each training step.
-        :param training_output: The current output of the training session.
+        Conditionally evaluates model depending on save strategy and saves it if it is the current best.
+        :param save_strategy: The strategy determining if it is time to evaluate.
+        :param stage: The stage in training.
+        :param stage_iteration: The number of times this stage has been reached.
         :return: None
         """
+        should_evaluate = save_strategy.should_evaluate(stage, stage_iteration)
 
-    def end_epoch(self, training_output: Dict) -> None:
-        """
-        Callback function called at the end of each epoch.
-        :param training_output: The current output of the training session.
-        :return: None
-        """
+        if should_evaluate:
+            eval_result = self.perform_prediction(DatasetRole.VAL)
+            should_save = save_strategy.should_save(eval_result)
+            if should_save:
+                self.save_model_and_checkpoint()
 
     def perform_prediction(self, dataset_role: DatasetRole = DatasetRole.EVAL) -> Dict:
         """
@@ -143,14 +147,14 @@ class TraceTrainer(Trainer, BaseObject):
                                                   source_target_pairs=dataset.get_source_target_pairs())
         return output_dict
 
-    def save_model_and_checkpoint(self, output_dir: str) -> None:
+    def save_model_and_checkpoint(self, output_dir: str = None) -> None:
         """
         Saves the model and checkpoint
         :param output_dir: the path to save the model to
         :return: None
         """
         # self.save_model(output_dir)
-        self.save_checkpoint()
+        self.save_checkpoint(output_dir)
 
     def save_checkpoint(self, output_dir: str = None, trial: TRIAL = None, save_metrics: bool = False):
         """

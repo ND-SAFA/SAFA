@@ -62,7 +62,7 @@ class TestTraceTrainer(BaseTraceTest):
         output = deepcopy(TestDataManager.EXAMPLE_PREDICTION_OUTPUT)
         test_trace_trainer = self.get_test_trace_trainer(metrics=self.TEST_METRIC_NAMES)
         metrics_manager = MetricsManager(test_trace_trainer.trainer_dataset_manager[DatasetRole.EVAL].links.values(),
-                                         output)
+                                         output.predictions)
         result = metrics_manager.eval(self.TEST_METRIC_NAMES)
         for metric in self.TEST_METRIC_NAMES:
             self.assertIn(metric, result)

@@ -3,7 +3,6 @@ from typing import Dict, List, Tuple, Union
 import numpy as np
 from datasets import load_metric
 from scipy.special import softmax
-from transformers.trainer_utils import PredictionOutput
 
 from data.datasets.trace_matrix import TraceMatrix
 from data.tree.trace_link import TraceLink
@@ -12,7 +11,7 @@ from train.metrics.map_metric import MapMetric
 from train.metrics.precision_at_threshold_metric import PrecisionAtKMetric
 from train.metrics.recall_at_threshold_metric import RecallAtThresholdMetric
 from train.metrics.supported_trace_metric import get_metric_name, get_metric_path
-from train.trace_output.trace_output_types import Metrics
+from train.trace_output.trace_output_types import Metrics, TracePredictions
 
 ArtifactQuery = Dict[str, List[TraceLink]]
 ProjectQueries = Dict[str, ArtifactQuery]
@@ -23,13 +22,13 @@ class MetricsManager:
     Calculates metrics for trace trainer.
     """
 
-    def __init__(self, trace_links: List[TraceLink], prediction_output: PredictionOutput):
+    def __init__(self, trace_links: List[TraceLink], trace_predictions: TracePredictions):
         """
         Constructs metrics manager with labels from trace links and scores from prediction output.
         :param trace_links: The links defining the labels associated with prediction output.
-        :param prediction_output: The output of a model.
+        :param trace_predictions: The output of a model.
         """
-        scores = self.get_similarity_scores(prediction_output.predictions)
+        scores = self.get_similarity_scores(trace_predictions)
         self.trace_matrix = TraceMatrix(trace_links, scores)
 
     def eval(self, metric_names: List) -> Metrics:

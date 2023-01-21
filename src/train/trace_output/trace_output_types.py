@@ -7,6 +7,7 @@ from train.save_strategy.save_strategy_stage import SaveStrategyStage
 from util.reflection_util import ReflectionUtil
 
 Metrics = Dict[str, float]
+TracePredictions = Union[np.ndarray, Tuple[np.ndarray]]
 
 
 class StageEval(TypedDict):
@@ -39,7 +40,7 @@ class TracePredictionOutput(TypedDict):
     """
     The output of predicting on the trace trainer.
     """
-    predictions: Union[np.ndarray, Tuple[np.ndarray]]
+    predictions: TracePredictions
     label_ids: Optional[Union[np.ndarray, Tuple[np.ndarray]]]
     metrics: Optional[Dict[str, float]]
     source_target_pairs: List[Tuple[str, str]]

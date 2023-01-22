@@ -18,13 +18,15 @@ class MetricSaveStrategy(AbstractSaveStrategy):
         :param interval: How many iterations of the stage to evaluate at.
         """
         super().__init__()
+        assert len(comparison_criterion.metrics) == 1, "Expected single criterion metric."
         self.stage = stage
         self.interval = interval
         self.comparison_criterion = comparison_criterion
+        self.comparison_metric = comparison_criterion.metrics[0]
+        self.comparison_function = comparison_criterion.comparison_function.value
         self.iteration = 0
         self.best_score = None
         self.best_iteration = None
-        assert len(self.comparison_criterion.metrics) == 1, "Expected single criterion metric."
 
     def should_evaluate(self, stage: SaveStrategyStage, stage_iteration: int) -> bool:
         """
@@ -42,5 +44,5 @@ class MetricSaveStrategy(AbstractSaveStrategy):
         :return: True if evaluation is best and false otherwise.
         """
         super().should_save(evaluation_result)
-        score = evaluation_result.metrics[self.metric_name]
-        return self.comparison.value(score, self.best_score)
+        score = evaluation_result.metrics[self.comparison_metric]
+        return self.comparison_function(score, self.best_score)

@@ -11,8 +11,8 @@ class PredictJob(AbstractTraceJob):
         Performs predictions and (optionally) evaluation of model
         :return: results of the prediction including prediction values and associated ids
         """
-        prediction_output = self.get_trainer().perform_prediction()
-        return self.result_from_prediction_output(prediction_output)
+        trace_prediction_output = self.get_trainer().perform_prediction()
+        return JobResult.from_trace_output(trace_prediction_output)
 
     @staticmethod
     def result_from_prediction_output(trainer_output: Dict) -> JobResult:

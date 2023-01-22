@@ -17,6 +17,7 @@ class JobResult(BaseObject):
     MODEL_PATH = "modelPath"
     TRACEBACK = "traceback"
     PREDICTIONS = "predictions"
+    PREDICTION_ENTRIES = "prediction_entries"
     ARTIFACT_IDS = "ids"
     METRICS = "metrics"
     TOTAL_EPOCHS = "total_epochs"  # distinguishes from epochs which does not describe global training loop
@@ -92,6 +93,17 @@ class JobResult(BaseObject):
         :return: the results as a dictionary
         """
         return self.__result
+
+    @staticmethod
+    def from_trace_output(trace_output: AbstractTraceOutput) -> "JobResult":
+        """
+        Creates JobResult from trace output.
+        :param trace_output: The trace output to create job result from.
+        :return: JobResult with trace output.
+        """
+        job_result = JobResult()
+        job_result.add_trace_output(trace_output)
+        return job_result
 
     @staticmethod
     def from_dict(results_dict: Dict) -> "JobResult":

@@ -39,18 +39,18 @@ class TestAssertions:
         :param threshold: The tolerance threshold between score and base score.
         :return: None
         """
-        output.require_properties([JobResult.PREDICTIONS])
-        predictions = output[JobResult.PREDICTIONS]
-        test_case.assertEqual(len(eval_dataset), len(predictions))
+        output.require_properties([JobResult.PREDICTION_ENTRIES])
+        prediction_entries = output[JobResult.PREDICTION_ENTRIES]
+        test_case.assertEqual(len(eval_dataset), len(prediction_entries))
 
-        expected_keys = [JobResult.SOURCE, JobResult.TARGET, JobResult.SCORE]
-        for prediction in predictions:
-            JsonUtil.require_properties(prediction, expected_keys)
-            score = prediction[JobResult.SCORE]
+        expected_keys = [JobResult.SOURCE, JobResult.TARGET, JobResult.SCORE]  # todo: replace with reflection
+        for prediction_entry in prediction_entries:
+            JsonUtil.require_properties(prediction_entry, expected_keys)
+            score = prediction_entry[JobResult.SCORE]
             if abs(score - base_score) >= threshold:
                 test_case.fail(cls._VAL_ERROR_MESSAGE.format(JobResult.SCORE, score, base_score, JobResult.PREDICTIONS))
 
-        predicted_links: List[Tuple[str, str]] = [(p[JobResult.SOURCE], p[JobResult.TARGET]) for p in predictions]
+        predicted_links: List[Tuple[str, str]] = [(p[JobResult.SOURCE], p[JobResult.TARGET]) for p in prediction_entries]
         expected_links: List[Tuple[str, str]] = eval_dataset.get_source_target_pairs()
         cls.assert_lists_have_the_same_vals(test_case, expected_links, predicted_links)
 

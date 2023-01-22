@@ -12,4 +12,4 @@ class TrainJob(AbstractTraceJob):
         trainer = self.get_trainer(**kwargs)
         training_output = trainer.perform_training(
             self.trainer_args.checkpoint_path)  # will also switch dataset in val to eval if present.
-        return JobResult.from_dict(training_output)
+        return JobResult.from_trace_output(training_output)

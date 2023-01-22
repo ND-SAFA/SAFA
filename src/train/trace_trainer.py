@@ -38,7 +38,6 @@ class TraceTrainer(Trainer, BaseObject):
         self.trainer_dataset_manager = trainer_dataset_manager
         self.model_manager = model_manager
         self.model_manager.set_max_seq_length(self.trainer_args.max_seq_length)
-
         model_init = lambda: self.model_manager.get_model()
         tokenizer = self.model_manager.get_tokenizer()
         super().__init__(model_init=model_init, args=trainer_args, tokenizer=tokenizer,
@@ -55,6 +54,7 @@ class TraceTrainer(Trainer, BaseObject):
         self.train_dataset = self.trainer_dataset_manager[DatasetRole.TRAIN].to_trainer_dataset(self.model_manager,
                                                                                                 self.trainer_args.train_batch_size)
         train_output = self.train(resume_from_checkpoint=checkpoint)
+        self.save_model()
         return TraceTrainOutput(train_output)
 
     def perform_prediction(self, dataset_role: DatasetRole = DatasetRole.EVAL) -> TracePredictionOutput:

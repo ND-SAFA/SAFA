@@ -23,6 +23,7 @@ class BaseTest(TestCase):
         SupportedDataCleaningStep.REMOVE_UNWANTED_CHARS.value(),
         SupportedDataCleaningStep.SEPARATE_JOINED_WORDS.value(),
         SupportedDataCleaningStep.FILTER_MIN_LENGTH.value()])
+    BASE_TEST_MODEL = "hf-internal-testing/tiny-random-bert"
 
     def setUp(self):
         os.makedirs(TEST_OUTPUT_DIR, exist_ok=True)
@@ -37,7 +38,7 @@ class BaseTest(TestCase):
 
     @staticmethod
     def get_test_model():
-        return AutoModelForSequenceClassification.from_pretrained("bert-base-uncased")
+        return AutoModelForSequenceClassification.from_pretrained(BaseTest.BASE_TEST_MODEL)
 
     @staticmethod
     def get_test_config():

@@ -29,7 +29,7 @@ class TestMLMPreTrainJob(BaseJobTest):
         job_args = ObjectCreator.create(JobArgs)
         model_manager = ObjectCreator.create(ModelManager, **{
             "model_task": ModelTask.MASKED_LEARNING,
-            "model_path": "bert-base-uncased"
+            "model_path": BaseJobTest.BASE_TEST_MODEL
         })
         trainer_dataset_manager = ObjectCreator.create(TrainerDatasetManager, **{
             "train_dataset_creator": ObjectCreator.pretrain_dataset_definition

@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import Any, Type
+from typing import Any, Optional, Type
 
 from config.override import overrides
 from data.datasets.managers.deterministic_trainer_dataset_manager import DeterministicTrainerDatasetManager
@@ -31,7 +31,7 @@ class AbstractTraceJob(AbstractJob, ABC):
         super().__init__(job_args=job_args, model_manager=model_manager)
         self.trainer_dataset_manager = trainer_dataset_manager
         self.trainer_args = trainer_args
-        self._trainer = None
+        self._trainer: Optional[TraceTrainer] = None
 
     @overrides(AbstractJob)
     def run(self) -> None:
@@ -60,6 +60,7 @@ class AbstractTraceJob(AbstractJob, ABC):
         :return: None
         """
         super().cleanup()
+        self._trainer.trace_trainer_state.get_accelerator().free_memory()
         self._trainer = None
         self.trainer_dataset_manager.cleanup()
 

@@ -2,23 +2,18 @@ import os
 from typing import Any, Dict, Union
 
 import torch
-from accelerate import Accelerator, memory_utils
-from tqdm import tqdm
-from transformers.modeling_outputs import SequenceClassifierOutput
 from transformers.trainer import Trainer
-from transformers.trainer_utils import PREFIX_CHECKPOINT_DIR, PredictionOutput, TrainOutput
+from transformers.trainer_utils import PredictionOutput
 
-from data.datasets.data_key import DataKey
 from data.datasets.dataset_role import DatasetRole
 from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
 from models.model_manager import ModelManager
 from train.metrics.metrics_manager import MetricsManager
-from train.save_strategy.abstract_save_strategy import AbstractSaveStrategy
 from train.save_strategy.save_strategy_stage import SaveStrategyStage
-from train.trace_output.trace_output_types import TracePredictionOutput, TraceTrainOutput
+from train.trace_output.trace_prediction_output import TracePredictionOutput
+from train.trace_output.trace_train_output import TraceTrainOutput
 from train.trainer_args import TrainerArgs
 from util.base_object import BaseObject
-from util.file_util import FileUtil
 
 os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":16:8"
 torch.use_deterministic_algorithms(True)
@@ -31,6 +26,7 @@ class TraceTrainer(Trainer, BaseObject):
     Responsible for using given model for training and prediction using given data.
     """
     BEST_MODEL_NAME = "best"
+    CURRENT_MODEL_NAME = "current"
 
     def __init__(self, trainer_args: TrainerArgs, model_manager: ModelManager,
                  trainer_dataset_manager: TrainerDatasetManager, **kwargs):
@@ -42,6 +38,7 @@ class TraceTrainer(Trainer, BaseObject):
         self.trainer_dataset_manager = trainer_dataset_manager
         self.model_manager = model_manager
         self.model_manager.set_max_seq_length(self.trainer_args.max_seq_length)
+
         model_init = lambda: self.model_manager.get_model()
         tokenizer = self.model_manager.get_tokenizer()
         super().__init__(model_init=model_init, args=trainer_args, tokenizer=tokenizer,
@@ -55,58 +52,10 @@ class TraceTrainer(Trainer, BaseObject):
         :return: a dictionary containing the results
         """
         self.model = self.model_manager.get_model()
-        self._move_model_to_device(self.model, self.args.device)
         self.train_dataset = self.trainer_dataset_manager[DatasetRole.TRAIN].to_trainer_dataset(self.model_manager,
                                                                                                 self.trainer_args.train_batch_size)
-        train_function = self.custom_train if self.trainer_args.use_custom_train_loop else self.train
-        train_output = train_function(resume_from_checkpoint=checkpoint)
+        train_output = self.train(resume_from_checkpoint=checkpoint)
         return TraceTrainOutput(train_output)
-
-    def custom_train(self, resume_from_checkpoint: str = None) -> TrainOutput:
-        accelerator = Accelerator(gradient_accumulation_steps=self.trainer_args.gradient_accumulation_steps)
-        device = accelerator.device
-        self.model = self.model_manager.get_model()
-        self.model.to(device)
-        inner_training_loop = memory_utils.find_executable_batch_size(self._inner_custom_training_loop)
-        return inner_training_loop(resume_from_checkpoint=resume_from_checkpoint, accelerator=accelerator, device=device)
-
-    def _inner_custom_training_loop(
-            self, batch_size=None, args=None, resume_from_checkpoint=None, trial=None, ignore_keys_for_eval=None, accelerator=None,
-            device=None,
-    ) -> TrainOutput:
-        self._train_batch_size = batch_size
-        self.args.per_device_train_batch_size = batch_size
-        optimizer = self.trainer_args.optimizer_constructor(self.model.parameters())
-        scheduler = self.trainer_args.scheduler_constructor(optimizer)
-        loss_function = self.trainer_args.loss_function
-        data = self.get_train_dataloader()
-
-        model, optimizer, scheduler, data = accelerator.prepare(self.model, optimizer, scheduler, data)
-        model.train()
-        global_step = 0
-        training_loss = 0
-        save_strategy = self.trainer_args.custom_save_strategy
-        training_metrics = {}
-
-        for epoch in range(self.trainer_args.num_train_epochs):
-            for batch_index, batch in enumerate(tqdm(data)):
-                batch = batch.to(device)
-                optimizer.zero_grad()
-
-                labels = batch.pop(DataKey.LABELS_KEY)
-                output: SequenceClassifierOutput = model(**batch)
-                loss = loss_function(output.logits, labels)
-
-                accelerator.backward(loss)
-                optimizer.step()
-                self.conditional_evaluate(save_strategy, SaveStrategyStage.STEP, batch_index)
-                training_loss += loss.item()
-                global_step += 1
-
-            scheduler.step()
-            self.conditional_evaluate(save_strategy, SaveStrategyStage.EPOCH, epoch)
-        return TraceTrainOutput(global_step=global_step, training_loss=training_loss, metrics=training_metrics,
-                                eval_metrics=save_strategy.stage_evaluations)
 
     def perform_prediction(self, dataset_role: DatasetRole = DatasetRole.EVAL) -> TracePredictionOutput:
         """
@@ -122,55 +71,46 @@ class TraceTrainer(Trainer, BaseObject):
         return TracePredictionOutput(predictions=metrics_manager.get_scores(), label_ids=output.label_ids, metrics=output.metrics,
                                      source_target_pairs=dataset.get_source_target_pairs())
 
-    def conditional_evaluate(self, save_strategy: AbstractSaveStrategy, stage: SaveStrategyStage, stage_iteration: int) -> None:
+    def on_step(self, step_iteration: int) -> None:
+        """
+        Callback function called after every training step.
+        :param step_iteration: The global step count of the training loop.
+        :return: None
+        """
+        self.conditional_evaluate(SaveStrategyStage.STEP, step_iteration)
+
+    def on_epoch(self, epoch_iteration: int) -> None:
+        """
+        Callback function called after every training epoch.
+        :param epoch_iteration: The index of epoch performed.
+        :return: None
+        """
+        self.conditional_evaluate(SaveStrategyStage.EPOCH, epoch_iteration)
+        self.save_model(self.get_output_path(self.CURRENT_MODEL_NAME))
+
+    def conditional_evaluate(self, stage: SaveStrategyStage, stage_iteration: int) -> None:
         """
         Conditionally evaluates model depending on save strategy and saves it if it is the current best.
-        :param save_strategy: The strategy determining if it is time to evaluate.
         :param stage: The stage in training.
         :param stage_iteration: The number of times this stage has been reached.
         :return: None
         """
+        save_strategy = self.trainer_args.custom_save_strategy
         should_evaluate = save_strategy.should_evaluate(stage, stage_iteration)
 
         if should_evaluate:
             eval_result = self.perform_prediction(DatasetRole.VAL)
             should_save = save_strategy.should_save(eval_result)
             if should_save:
-                self.save_model_and_checkpoint()
+                self.save_model(self.get_output_path(self.BEST_MODEL_NAME))
 
-    def save_model_and_checkpoint(self, output_dir: str = None) -> None:
+    def get_output_path(self, dir_name: str = None):
         """
-        Saves the model and checkpoint
-        :param output_dir: the path to save the model to
-        :return: None
+        Returns the output path of trainer, with argument accessing directories within it.
+        :param dir_name: The directory within the output path to retrieve.
+        :return: The path to the trainer output or directory within it.
         """
-        # self.save_model(output_dir)
-        self.save_checkpoint(output_dir)
-
-    def save_checkpoint(self, output_dir: str = None, trial: TRIAL = None, save_metrics: bool = False):
-        """
-        Saves the checkpoint in the output dir specified in training args
-        :param output_dir: where to save the checkpoint to
-        :param trial: optional, will be given to the original _save_checkpoint if provided
-        :param save_metrics: if True, gives the metrics to the original _save_checkpoint so the best_metric can be saved in state
-        :return: None
-        """
-        metrics = self.trainer_args.metrics if save_metrics else None
-        if self.model is None:
-            raise Exception("Must perform training before checkpoint can be saved.")
-        self._save_checkpoint(model=self.model, trial=trial, metrics=metrics)
-        checkpoint_dir = self._get_checkpoint_dir()
-        assert checkpoint_dir is not None
-        checkpoint_path = os.path.join(self.trainer_args.output_dir, checkpoint_dir)
-        FileUtil.move_dir_contents(orig_path=checkpoint_path, new_path=output_dir if output_dir else self.trainer_args.output_dir,
-                                   delete_after_move=True)
-
-    def _get_checkpoint_dir(self) -> str:
-        """
-        Gets the directory where the checkpoint was saved to
-        :return:the checkpoint dir if the checkpoint was saved properly
-        """
-        checkpoint_dir = [dir_name for dir_name in os.listdir(self.trainer_args.output_dir)
-                          if os.path.isdir(os.path.join(self.trainer_args.output_dir, dir_name))
-                          and dir_name.startswith(PREFIX_CHECKPOINT_DIR)]
-        return checkpoint_dir.pop() if len(checkpoint_dir) > 0 else None
+        base_output_path = self.trainer_args.output_dir
+        if dir_name:
+            return os.path.join(base_output_path, dir_name)
+        return base_output_path

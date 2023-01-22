@@ -2,7 +2,8 @@ from typing import Any, Dict, List, Tuple, Union
 
 from drf_yasg.openapi import FORMAT_UUID, Schema, TYPE_INTEGER, TYPE_STRING
 
-from train.metrics.supported_trace_metric import SupportedTraceMetric
+from train.save_strategy.comparison_criteria import ComparisonCriterion
+from train.trace_output.abstract_trace_output import AbstractTraceOutput
 from util.base_object import BaseObject
 from util.json_util import JsonUtil
 from util.status import Status
@@ -68,6 +69,15 @@ class JobResult(BaseObject):
         self.__result.update(UncasedDict(other_result))
         return self
 
+    def add_trace_output(self, trace_output: AbstractTraceOutput) -> None:
+        """
+        Adds the trace output to the job result.
+        :param trace_output: The trace output to add to job result.
+        :return: None
+        """
+        trace_output_dict = trace_output.output_to_dict()
+        self.update(trace_output_dict)
+
     def to_json(self, keys: List[str] = None) -> str:
         """
         Returns the job output as json
@@ -107,21 +117,19 @@ class JobResult(BaseObject):
                 properties[key] = JobResult._properties[key]
         return properties
 
-    def is_better_than(self, other: "JobResult", comparison_metric: Union[str, SupportedTraceMetric] = None,
-                       should_maximize: bool = True) -> bool:
+    def is_better_than(self, other: "JobResult", comparison_criterion: ComparisonCriterion = None) -> bool:
         """
         Evaluates whether this result is better than the other result
         :param other: the other result
-        :param comparison_metric: metric to use for comparison (defaults to status)
-        :param should_maximize: if True, a better result means maximizing the provided metric, else aims to minimize it
+        :param comparison_criterion: The criterion used to determine best job.
         :return: True if this result is better than the other result else False
         """
-        if isinstance(comparison_metric, SupportedTraceMetric):
-            comparison_metric = comparison_metric.name
+        if comparison_criterion is None:
+            comparison_criterion = ComparisonCriterion(metrics=[])
+        assert len(comparison_criterion.metrics) <= 1, "Expected no more than 1 metric in comparison criterion."
+        comparison_metric = comparison_criterion.metrics[0] if len(comparison_criterion.metrics) > 0 else None
         self_val, other_val = self._get_comparison_vals(other, comparison_metric)
-        if should_maximize:
-            return self_val >= other_val
-        return self_val <= other_val
+        return comparison_criterion.comparison_function.value(self_val, other_val)
 
     def _can_compare_with_metric(self, other: "JobResult", comparison_metric_name: str) -> bool:
         """

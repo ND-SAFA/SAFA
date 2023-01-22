@@ -74,7 +74,7 @@ class ReflectionUtil:
         return ParamScope.PUBLIC
 
     @staticmethod
-    def get_fields(instance: Any, scope: ParamScope, ignore: List[str] = None) -> Dict:
+    def get_fields(instance: Any, scope: ParamScope = ParamScope.PUBLIC, ignore: List[str] = None) -> Dict:
         """
         Returns the fields of the instance within the scope given.
         :param ignore: will ignore any fields in this list

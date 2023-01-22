@@ -2,16 +2,17 @@ from abc import ABC, abstractmethod
 from enum import Enum
 
 from train.save_strategy.save_strategy_stage import SaveStrategyStage
-from train.trace_output.trace_output_types import TracePredictionOutput
+from train.trace_output.trace_prediction_output import TracePredictionOutput
 from util.base_object import BaseObject
+from util.enum_util import FunctionalWrapper
 
 
 class ComparisonFunction(Enum):
     """
     Represents the different ways to compare metrics scores.
     """
-    MAX = lambda a, b: b is None or a >= b
-    MIN = lambda a, b: b is None or a <= b
+    MAX = FunctionalWrapper(lambda a, b: b is None or a >= b)
+    MIN = FunctionalWrapper(lambda a, b: b is None or a <= b)
 
 
 class AbstractSaveStrategy(BaseObject, ABC):

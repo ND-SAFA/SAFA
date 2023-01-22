@@ -11,7 +11,7 @@ from train.metrics.map_metric import MapMetric
 from train.metrics.precision_at_threshold_metric import PrecisionAtKMetric
 from train.metrics.recall_at_threshold_metric import RecallAtThresholdMetric
 from train.metrics.supported_trace_metric import get_metric_name, get_metric_path
-from train.trace_output.trace_output_types import Metrics, TracePredictions
+from train.trace_output.stage_eval import Metrics, TracePredictions
 
 ArtifactQuery = Dict[str, List[TraceLink]]
 ProjectQueries = Dict[str, ArtifactQuery]

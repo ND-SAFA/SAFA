@@ -15,7 +15,7 @@ class AbstractDataset(BaseObject):
         :param batch_size_to_balance: The size of the batch. If provided, balances the batches with equal pos and neg links
         :return: A data used by the HF trainer.
         """
-        
+
     @abstractmethod
     def save(self, output_dir: str, filename: str) -> str:
         """

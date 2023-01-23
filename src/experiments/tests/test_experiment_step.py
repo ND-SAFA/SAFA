@@ -1,8 +1,11 @@
-import math
 import os
 from unittest import mock
 from unittest.mock import patch
 
+import math
+
+from data.datasets.creators.readers.definitions.structure_project_definition import StructureProjectDefinition
+from data.datasets.creators.readers.structured_project_reader import StructuredProjectReader
 from data.datasets.dataset_role import DatasetRole
 from data.datasets.managers.deterministic_trainer_dataset_manager import DeterministicTrainerDatasetManager
 from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
@@ -25,9 +28,11 @@ class TestExperimentStep(BaseExperimentTest):
     EXPERIMENT_VARS = ["trainer_dataset_manager.train_dataset_creator.project_path",
                        "trainer_args.num_train_epochs"]
 
+    @patch.object(StructuredProjectReader, "_get_definition_reader")
     @patch.object(TrainJob, "_run")
-    def test_run(self, train_job_run_mock: mock.MagicMock):
+    def test_run(self, train_job_run_mock: mock.MagicMock, definition_mock: mock.MagicMock):
         train_job_run_mock.side_effect = self.job_fake_run
+        definition_mock.return_value = StructureProjectDefinition()
         experiment_step = self.get_experiment_step()
         experiment_step.run(TEST_OUTPUT_DIR)
         experiment_step.save_results(TEST_OUTPUT_DIR)
@@ -42,17 +47,21 @@ class TestExperimentStep(BaseExperimentTest):
         self.assertEquals(max(self.accuracies), best_job.result[JobResult.METRICS]["accuracy"])
         self.assertEqual(train_job_run_mock.call_count, 4)
 
+    @patch.object(StructuredProjectReader, "_get_definition_reader")
     @patch.object(TrainJob, "_run")
-    def test_run_failed(self, train_job_run_mock: mock.MagicMock):
+    def test_run_failed(self, train_job_run_mock: mock.MagicMock, definition_mock: mock.MagicMock):
         train_job_run_mock.side_effect = ValueError()
+        definition_mock.return_value = StructureProjectDefinition()
         experiment_step = self.get_experiment_step()
         experiment_step.run(TEST_OUTPUT_DIR)
         self.assertEquals(experiment_step.status, Status.FAILURE)
         self.assertEqual(train_job_run_mock.call_count, 1)
 
+    @patch.object(StructuredProjectReader, "_get_definition_reader")
     @patch.object(PredictJob, "_run")
-    def test_run_with_best_prior(self, predict_job_run_mock: mock.MagicMock):
+    def test_run_with_best_prior(self, predict_job_run_mock: mock.MagicMock, definition_mock: mock.MagicMock):
         predict_job_run_mock.side_effect = self.job_fake_run
+        definition_mock.return_value = StructureProjectDefinition()
         train_experiment_step = self.get_experiment_step()
         predict_experiment_step = self.get_experiment_step(train=False)
         best_job_from_prior = train_experiment_step.jobs.pop()
@@ -61,14 +70,18 @@ class TestExperimentStep(BaseExperimentTest):
         self.assertEquals(best_job.model_manager.model_path, expected_model_path)
         self.assertEqual(predict_job_run_mock.call_count, 1)
 
-    def test_divide_jobs_into_runs(self):
+    @patch.object(StructuredProjectReader, "_get_definition_reader")
+    def test_divide_jobs_into_runs(self, definition_mock: mock.MagicMock):
+        definition_mock.return_value = StructureProjectDefinition()
         train_step = self.get_experiment_step()
         runs = train_step._divide_jobs_into_runs()
         self.assertEquals(len(runs), math.ceil(len(train_step.jobs) / train_step.MAX_JOBS))
         for run_ in runs:
             self.assertLessEqual(len(run_), train_step.MAX_JOBS)
 
-    def test_update_jobs_undetermined_vars(self):
+    @patch.object(StructuredProjectReader, "_get_definition_reader")
+    def test_update_jobs_undetermined_vars(self, definition_mock: mock.MagicMock):
+        definition_mock.return_value = StructureProjectDefinition()
         train_step = self.get_experiment_step()
         predict_step = self.get_experiment_step(train=False)
         predict_step.jobs[0].trainer_args.num_train_epochs = UndeterminedVariable()
@@ -84,14 +97,18 @@ class TestExperimentStep(BaseExperimentTest):
         failed_jobs = ExperimentStep._get_failed_jobs(jobs)
         self.assertEquals(1, len(failed_jobs))
 
-    def test_run_on_all_jobs(self):
+    @patch.object(StructuredProjectReader, "_get_definition_reader")
+    def test_run_on_all_jobs(self, definition_mock: mock.MagicMock):
+        definition_mock.return_value = StructureProjectDefinition()
         jobs = self.get_test_jobs()
         results = ExperimentStep._run_on_jobs(jobs, "get_output_filepath")
         self.assertEquals(len(results), 2)
         self.assertNotEquals(results[0], results[1])
 
+    @patch.object(StructuredProjectReader, "_get_definition_reader")
     @patch.object(AbstractTraceJob, "get_trainer")
-    def test_get_best_job(self, get_trainer_mock):
+    def test_get_best_job(self, get_trainer_mock, definition_mock: mock.MagicMock):
+        definition_mock.return_value = StructureProjectDefinition()
         job1, job2 = self.get_test_jobs()
         step = self.get_experiment_step()
         job1.result[JobResult.METRICS] = {"accuracy": 0.5}
@@ -107,7 +124,7 @@ class TestExperimentStep(BaseExperimentTest):
         job1, job2 = ExperimentStep._update_job_children_output_paths([job1, job2], output_dir)
         self.assertEquals(job1.model_manager.output_dir, output_dir)
 
-    def get_experiment_step(self, train=True):
+    def get_experiment_step(self, train=True) -> ExperimentStep:
         kwargs = {}
         if not train:
             kwargs = {"override": True, **{

@@ -27,13 +27,13 @@ class TestEnum(Enum):
 class TestReflectionUtil(BaseTest):
 
     def test_get_param_scope(self):
-        self.__assert_scope("hello", ParamScope.LOCAL)
+        self.__assert_scope("hello", ParamScope.PUBLIC)
         self.__assert_scope("_hello", ParamScope.PROTECTED)
         self.__assert_scope("__hello", ParamScope.PRIVATE)
         self.__assert_scope("_TestClass__hello", ParamScope.PRIVATE, "TestClass")
 
     def test_get_fields(self):
-        scopes = [(ParamScope.LOCAL, {"local": "local"}),
+        scopes = [(ParamScope.PUBLIC, {"local": "local"}),
                   (ParamScope.PROTECTED, {"_protected": "protected"}),
                   (ParamScope.PRIVATE, {"_TestClassOne__private": "private"})]
         test_class = TestClassOne()

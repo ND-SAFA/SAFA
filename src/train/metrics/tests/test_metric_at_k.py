@@ -3,7 +3,7 @@ from typing import List, Type
 
 import numpy as np
 
-from data.datasets.trace_matrix import TraceMatrixManager
+from data.datasets.trace_matrix import TraceMatrix
 from testres.base_test import BaseTest
 from train.metrics.abstract_trace_metric import AbstractTraceMetric
 
@@ -24,7 +24,7 @@ class TestMetricAtK(BaseTest, ABC):
         prefix = (self.SOURCE_PREFIX, self.TARGET_PREFIX)
         n_artifacts = (self.n_sources, self.n_targets)
         trace_links = self.create_trace_links(prefix, n_artifacts, self.labels)
-        trace_matrix = TraceMatrixManager(trace_links, self.predictions)
+        trace_matrix = TraceMatrix(trace_links, self.predictions)
         metric_results = metric._compute(self.predictions, self.labels, trace_matrix)
         for i, expected_score in enumerate(self.expected_metric_scores):
             metric_name = self.metric_name + "@%s" % (str(i + 1))

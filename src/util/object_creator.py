@@ -11,6 +11,7 @@ from experiments.experiment_step import ExperimentStep
 from jobs.components.job_args import JobArgs
 from jobs.supported_job_type import SupportedJobType
 from models.model_manager import ModelManager
+from testres.base_test import BaseTest
 from testres.paths.paths import PRETRAIN_DIR, TEST_OUTPUT_DIR
 from testres.test_data_manager import TestDataManager
 from train.trainer_args import TrainerArgs
@@ -60,7 +61,7 @@ class ObjectCreator:
     }
 
     model_manager_definition = {
-        "model_path": "bert-base-uncased",
+        "model_path": BaseTest.BASE_TEST_MODEL,
         "model_output_path": TEST_OUTPUT_DIR
     }
 
@@ -97,8 +98,12 @@ class ObjectCreator:
 
     }
 
-    experiment_train_step_definition = {"jobs": [experiment_train_job_definition], "comparison_metric": "accuracy"}
-    experiment_predict_step_definition = {"jobs": [experiment_predict_job_definition], "comparison_metric": "accuracy"}
+    experiment_train_step_definition = {"jobs": [experiment_train_job_definition], "comparison_criterion": {
+        "metrics": "accuracy"
+    }}
+    experiment_predict_step_definition = {"jobs": [experiment_predict_job_definition], "comparison_criterion": {
+        "metrics": "accuracy"
+    }}
     experiment_definition = {"steps": [experiment_train_step_definition, experiment_predict_step_definition],
                              "output_dir": TEST_OUTPUT_DIR}
 

@@ -4,7 +4,7 @@ import datasets
 from sklearn.metrics import average_precision_score
 
 from config.constants import K_METRIC_DEFAULT
-from data.datasets.trace_matrix import TraceMatrixManager
+from data.datasets.trace_matrix import TraceMatrix
 from train.metrics.abstract_trace_metric import AbstractTraceMetric
 
 _DESCRIPTION = """
@@ -30,7 +30,7 @@ class MapAtKMetric(AbstractTraceMetric):
     name = "map@k"
 
     # TODO
-    def _compute(self, predictions, references, trace_matrix: TraceMatrixManager, **kwargs) -> Dict:
+    def _compute(self, predictions, references, trace_matrix: TraceMatrix, **kwargs) -> Dict:
         """
         computes the Mean Average Precision@K or the average precision over k for recommendations shown for different links
          and averages them over all queries in the data.

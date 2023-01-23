@@ -9,7 +9,7 @@ from jobs.abstract_trace_job import AbstractTraceJob
 from jobs.components.job_result import JobResult
 from jobs.supported_job_type import SupportedJobType
 from jobs.train_job import TrainJob
-from train.metrics.supported_trace_metric import SupportedTraceMetric
+from train.save_strategy.comparison_criteria import ComparisonCriterion
 from util.base_object import BaseObject
 from util.file_util import FileUtil
 from util.json_util import JsonUtil
@@ -18,18 +18,19 @@ from variables.experimental_variable import ExperimentalVariable
 
 
 class ExperimentStep(BaseObject):
+    """
+    Container for parallel jobs to run.
+    """
     OUTPUT_FILENAME = "output.json"
     MAX_JOBS = 1
     RUN_ASYNC = False
     EXIT_ON_FAILED_JOB = True
 
-    def __init__(self, jobs: Union[List[AbstractJob], ExperimentalVariable],
-                 comparison_metric: Union[str, SupportedTraceMetric] = None, should_maximize_metric: bool = True):
+    def __init__(self, jobs: Union[List[AbstractJob], ExperimentalVariable], comparison_criterion: ComparisonCriterion = None):
         """
-        Represents an experiment step
+        Initialized step with jobs and comparison criterion for determining best job.
         :param jobs: all the jobs to run in this step
-        :param comparison_metric: the metric to use to determine the best job
-        :param should_maximize_metric: True if should maximize the comparison metric to find best job
+        :param comparison_criterion: The criterion used to determine the best job.
         """
         if not isinstance(jobs, ExperimentalVariable):
             jobs = ExperimentalVariable(jobs)
@@ -37,8 +38,7 @@ class ExperimentStep(BaseObject):
         self.jobs = self._update_jobs_with_experimental_vars(jobs, experimental_vars)
         self.status = Status.NOT_STARTED
         self.best_job = None
-        self.comparison_metric = comparison_metric
-        self.should_maximize_metric = should_maximize_metric
+        self.comparison_criterion = comparison_criterion
         if not self.RUN_ASYNC:
             self.MAX_JOBS = 1
 
@@ -132,25 +132,6 @@ class ExperimentStep(BaseObject):
         """
         return [job.id for job in jobs if job.result.get_job_status() == Status.FAILURE]
 
-    def _conditional_save(self, best_job: AbstractTraceJob, job: AbstractTraceJob, best_model_name: str = "best") -> AbstractJob:
-        """
-        Checks job against best model and if better will override best model path.
-        :param best_job: The best job.
-        :param job: The current job to check against best job.
-        :param best_model_name: The name of the directory within model output path to store model in.
-        :return: The best job.
-        """
-
-        def save_best():
-            best_model_path = os.path.join(job.model_manager.model_output_path, best_model_name)
-            job.get_trainer().save_model(best_model_path)
-
-        if best_job is None or job.result.is_better_than(best_job.result, self.comparison_metric,
-                                                         self.should_maximize_metric):
-            save_best()
-            return job
-        return best_job
-
     def _divide_jobs_into_runs(self) -> List[List[AbstractJob]]:
         """
         Divides the jobs up into runs of size MAX JOBS
@@ -171,12 +152,13 @@ class ExperimentStep(BaseObject):
         :param best_job: the current best job
         :return: the best job
         """
-        if self.comparison_metric is None:
+        if self.comparison_criterion is None:
             return None
         best_job = best_job if best_job else jobs[0]
         for job in jobs:
             if isinstance(job, AbstractTraceJob):
-                best_job = self._conditional_save(best_job, job)
+                if best_job is None or job.result.is_better_than(best_job.result, self.comparison_criterion):
+                    best_job = job
         return best_job
 
     @staticmethod

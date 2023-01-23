@@ -10,6 +10,7 @@ from jobs.components.job_result import JobResult
 from jobs.train_job import TrainJob
 from models.model_manager import ModelManager
 from models.model_properties import ModelTask
+from train.base_trainer import BaseTrainer
 from train.trainer_args import TrainerArgs
 
 
@@ -42,7 +43,15 @@ class MLMPreTrainJob(TrainJob):
         tokenizer.save_vocabulary(self.job_args.output_dir)
 
         job_result = super()._run(data_collator=data_collator)
+        self._trainer.save_model()
 
         train_dataset: PreTrainDataset = self.trainer_dataset_manager[DatasetRole.TRAIN]
         os.remove(train_dataset.training_file_path)
         return job_result
+
+    def get_trainer(self, **kwargs) -> BaseTrainer:
+        if self._trainer is None:
+            self._trainer = BaseTrainer(trainer_args=self.trainer_args,
+                                        trainer_dataset_manager=self.trainer_dataset_manager,
+                                        model_manager=self.model_manager, **kwargs)
+        return self._trainer

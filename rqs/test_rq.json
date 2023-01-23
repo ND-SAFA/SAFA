@@ -1,35 +1,27 @@
 {
   "steps": [
     {
-      "comparison_metric": "map",
-      "should_maximize_metric": true,
       "jobs": [
         {
           "object_type": "TRAIN",
           "job_args": {
-            "random_seed": 36
-          },
-          "model_manager": {
-            "model_path": "roberta-base",
-            "layers_to_freeze": {
+            "random_seed": {
               "*": [
-                null,
-                [
-                  0,
-                  1,
-                  2
-                ]
+                197,
+                914,
+                209,
+                330
               ]
             }
           },
+          "model_manager": {
+            "model_path": "hf-internal-testing/tiny-random-bert"
+          },
           "trainer_args": {
-            "output_dir": "[OUTPUT_PATH]/test/models",
-            "train_epochs_range": [
-              1,
-              5,
-              1
-            ],
+            "output_dir": "[OUTPUT_PATH]/rq1/models",
+            "num_train_epochs": 5,
             "per_device_train_batch_size": 4,
+            "per_device_eval_batch_size": 4,
             "metrics": [
               "map",
               "map_at_k",
@@ -39,17 +31,27 @@
           },
           "trainer_dataset_manager": {
             "train_dataset_creator": {
-              "object_type": "SAFA",
-              "project_path": "[DATA_PATH]/lhp/cooling"
+              "object_type": "TRACE",
+              "project_reader": {
+                "object_type": "STRUCTURE",
+                "project_path": "[DATA_PATH]/lhp/experiment/lhp/heating"
+              }
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",
               "val_percentage": 0.2
+            },
+            "augmenter": {
+              "steps": [
+                {
+                  "object_type": "RESAMPLE"
+                }
+              ]
             }
           }
         }
       ]
     }
   ],
-  "output_dir": "[OUTPUT_PATH]/test/jobs"
+  "output_dir": "[OUTPUT_PATH]/rq1/jobs"
 }

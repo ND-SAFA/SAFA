@@ -1,9 +1,10 @@
 import json
 
 from jobs.components.job_result import JobResult
-from util.status import Status
 from testres.base_test import BaseTest
 from train.metrics.supported_trace_metric import SupportedTraceMetric
+from train.save_strategy.comparison_criteria import ComparisonCriterion
+from util.status import Status
 
 
 class TestJobResult(BaseTest):
@@ -53,14 +54,14 @@ class TestJobResult(BaseTest):
         result1 = self.get_job_result(precision_at_k=0.8)
         result2 = self.get_job_result(precision_at_k=0.3)
         self.assertTrue(
-            result1.is_better_than(result2, SupportedTraceMetric.PRECISION, should_maximize=True))
+            result1.is_better_than(result2, ComparisonCriterion("precision", "max")))
         self.assertFalse(
-            result1.is_better_than(result2, SupportedTraceMetric.PRECISION, should_maximize=False))
-        self.assertFalse(result2.is_better_than(result1, SupportedTraceMetric.PRECISION, should_maximize=True))
+            result1.is_better_than(result2, ComparisonCriterion("precision", "min")))
+        self.assertFalse(result2.is_better_than(result1, ComparisonCriterion("precision", "max")))
 
         result3 = self.get_job_result({JobResult.STATUS: 1})
         result4 = self.get_job_result({})
-        self.assertTrue(result3.is_better_than(result4, should_maximize=True))
+        self.assertTrue(result3.is_better_than(result4))
 
     def test_can_compare_with_metric(self):
         result1 = self.get_job_result(precision_at_k=0.8)

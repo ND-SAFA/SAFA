@@ -4,7 +4,7 @@ import datasets
 from sklearn.metrics import average_precision_score
 
 from config.constants import THRESHOLD_DEFAULT
-from data.datasets.trace_matrix import TraceMatrixManager
+from data.datasets.trace_matrix import TraceMatrix
 from train.metrics.abstract_trace_metric import AbstractTraceMetric
 
 _DESCRIPTION = """
@@ -32,7 +32,7 @@ class MapMetric(AbstractTraceMetric):
     AP_KEY = "ap"
 
     # TODO
-    def _compute(self, predictions, references, trace_matrix: TraceMatrixManager, k=THRESHOLD_DEFAULT,
+    def _compute(self, predictions, references, trace_matrix: TraceMatrix, k=THRESHOLD_DEFAULT,
                  **kwargs) -> Dict:
         """
         computes the Mean Average Precision@K or the average precision over k for recommendations shown for different links

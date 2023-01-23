@@ -1,9 +1,11 @@
 import json
+from enum import Enum
 from typing import Any, Dict, List
 
 import numpy as np
 
 from util.base_object import BaseObject
+from util.reflection_util import ReflectionUtil
 
 
 class NpEncoder(json.JSONEncoder):
@@ -18,9 +20,19 @@ class NpEncoder(json.JSONEncoder):
             return float(obj)
         if isinstance(obj, np.ndarray):
             return obj.tolist()
+        if hasattr(obj, "_fields"):
+            instance_fields: Dict = ReflectionUtil.get_fields(obj)
+            return self.default(instance_fields)
+        if isinstance(obj, Enum):
+            return obj.name
         if isinstance(obj, BaseObject):
             return str(obj)
-        return super(NpEncoder, self).default(obj)
+        if isinstance(obj, list):
+            return [self.default(v) for v in obj]
+        if hasattr(obj, "__dict__"):
+            instance_fields: Dict = ReflectionUtil.get_fields(obj)
+            return {k: self.default(v) for k, v in instance_fields.items()}
+        return obj
 
 
 class JsonUtil:
@@ -61,3 +73,13 @@ class JsonUtil:
         if property_name not in definition and default_value is None:
             raise ValueError(definition, "does not contain property: ", property_name)
         return definition.get(property_name, default_value)
+
+    @staticmethod
+    def to_dict(instance: Any) -> Dict:
+        """
+        Converts object to serialize dictionary.
+        :param instance: The instance to convert to dictionary.
+        :return: The serializable dictionary.
+        """
+        encoder = NpEncoder()
+        return encoder.default(instance)

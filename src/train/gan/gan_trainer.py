@@ -16,12 +16,12 @@ from data.datasets.trace_dataset import TraceDataset
 from models.gan.discriminator import Discriminator
 from models.gan.generator import Generator
 from models.model_manager import ModelManager
+from train.base_trainer import BaseTrainer
 from train.gan.gan_dataset_converter import GanDatasetConverter
-from train.trace_trainer import TraceTrainer
 from train.trainer_args import TrainerArgs
 
 
-class GanTrainer(TraceTrainer):
+class GanTrainer(BaseTrainer):
 
     def __init__(self, args: TrainerArgs, model_manager: ModelManager, trainer_dataset_manager: TrainerDatasetManager,
                  **kwargs):
@@ -43,9 +43,9 @@ class GanTrainer(TraceTrainer):
         if DatasetRole.EVAL in self.trainer_dataset_manager:
             self.eval_dataset = self.to_gan_dataset(self.trainer_dataset_manager[DatasetRole.EVAL])
         output = self.train(resume_from_checkpoint=checkpoint)
-        return TraceTrainer.output_to_dict(output)
+        return BaseTrainer.output_to_dict(output)
 
-    @overrides(TraceTrainer)
+    @overrides(BaseTrainer)
     def train(self, resume_from_checkpoint: Optional[Union[str, bool]] = None,
               trial: Union["optuna.Trial", Dict[str, Any]] = None,
               ignore_keys_for_eval: Optional[List[str]] = None, **kwargs):

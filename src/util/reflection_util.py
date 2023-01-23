@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Type
 
 
 class ParamScope(Enum):
-    LOCAL = 0
+    PUBLIC = 0
     PROTECTED = 1
     PRIVATE = 2
 
@@ -71,10 +71,10 @@ class ReflectionUtil:
             if class_prefix and field_name.startswith(class_prefix):
                 return ReflectionUtil.get_field_scope(field_name.replace(class_prefix, ""))
             return ParamScope.PROTECTED
-        return ParamScope.LOCAL
+        return ParamScope.PUBLIC
 
     @staticmethod
-    def get_fields(instance: Any, scope: ParamScope, ignore: List[str] = None) -> Dict:
+    def get_fields(instance: Any, scope: ParamScope = ParamScope.PUBLIC, ignore: List[str] = None) -> Dict:
         """
         Returns the fields of the instance within the scope given.
         :param ignore: will ignore any fields in this list
@@ -82,7 +82,11 @@ class ReflectionUtil:
         :param scope: The scope of the fields to return.
         :return: Dictionary whose keys are field names and values are field values.
         """
+        if hasattr(instance, "_fields"):  # named tuple
+            return {field: getattr(instance, field) for field in instance._fields}
+
         params = {}
+
         for param_id in vars(instance):
             if ignore and param_id in ignore:
                 continue
@@ -120,3 +124,15 @@ class ReflectionUtil:
             elif not missing_ok:
                 raise ValueError(f"Instance {instance} missing property {param_name}.")
         return instance
+
+    @staticmethod
+    def copy_attributes(instance: Any, other: Any, param_scope: ParamScope = ParamScope.PUBLIC) -> None:
+        """
+        Copies attributes in instance to the other.
+        :param instance: The instance whose values are moved to the other.
+        :param other: The object whose values are getting set.
+        :param param_scope: The scope of the attributes to copy over. Defaults to public
+        :return: None
+        """
+        values = ReflectionUtil.get_fields(instance, param_scope)
+        ReflectionUtil.set_attributes(other, values)

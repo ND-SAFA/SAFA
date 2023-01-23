@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Dict, Any
+from typing import Any, Dict
 
 from config.constants import SAVE_OUTPUT_DEFAULT
 from util.base_object import BaseObject

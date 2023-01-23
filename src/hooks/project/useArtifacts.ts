@@ -105,7 +105,7 @@ export const useArtifacts = defineStore("artifacts", {
       projectStore.updateProject({ artifacts: allArtifacts });
       subtreeStore.updateSubtreeMap();
 
-      if (ids.includes(selectionStore.selectedArtifactId)) {
+      if (ids.includes(selectionStore.selectedArtifact?.id || "")) {
         selectionStore.clearSelections();
       }
     },

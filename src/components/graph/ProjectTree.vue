@@ -28,9 +28,9 @@
     <template v-slot:elements v-else>
       <tim-node
         v-for="level in tim.artifacts"
-        :key="level.artifactType"
+        :key="level.typeId"
         :count="level.count"
-        :artifact-type="level.artifactType"
+        :artifact-type="level.name"
       />
       <tim-link
         v-for="matrix in tim.traces"

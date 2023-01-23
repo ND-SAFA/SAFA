@@ -4,13 +4,13 @@
 
     <v-list expand>
       <toggle-list
-        v-for="entry in typeDirections"
-        :key="entry.type"
+        v-for="entry in artifactLevels"
+        :key="entry.typeId"
         :icon="entry.icon"
         data-cy="list-type-options"
       >
         <template v-slot:activator>
-          <typography :value="entry.label" ellipsis />
+          <typography :value="entry.name" ellipsis />
         </template>
         <v-container>
           <type-direction-input :entry="entry" />
@@ -23,7 +23,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { LabelledTraceDirectionSchema } from "@/types";
+import { TimArtifactLevelSchema } from "@/types";
 import { typeOptionsStore } from "@/hooks";
 import {
   Typography,
@@ -50,8 +50,8 @@ export default Vue.extend({
     /**
      * @return The current project's artifact types.
      */
-    typeDirections(): LabelledTraceDirectionSchema[] {
-      return typeOptionsStore.typeDirections();
+    artifactLevels(): TimArtifactLevelSchema[] {
+      return typeOptionsStore.artifactLevels;
     },
   },
 });

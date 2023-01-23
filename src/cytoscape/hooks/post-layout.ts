@@ -79,7 +79,7 @@ export const applyCytoEvents: LayoutHook = (
  * Centers on the selected or root node of the graph.
  */
 export const centerViewOnNode: LayoutHook = (): void => {
-  const selectedArtifacts = selectionStore.selectedArtifactId;
+  const selectedArtifacts = selectionStore.selectedArtifact?.id;
 
   if (!selectedArtifacts) {
     cyZoomReset();

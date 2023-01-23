@@ -1,15 +1,21 @@
+import { ArtifactTypeSchema } from "@/types/domain/artifact-types";
+
 /**
  * Defines an artifact level in the project.
  */
-export interface TimArtifactLevelSchema {
-  /**
-   * The type of the artifact.
-   */
-  artifactType: string;
+export interface TimArtifactLevelSchema extends ArtifactTypeSchema {
   /**
    * The number of artifacts of this artifact type.
    */
   count: number;
+  /**
+   * The types that this artifact type can trace toward.
+   */
+  allowedTypes: string[];
+  /**
+   * The index of the icon representing this artifact type.
+   */
+  iconIndex: number;
 }
 
 /**
@@ -45,7 +51,7 @@ export interface TimSchema {
   /**
    * The artifact levels in the project.
    */
-  artifacts: TimArtifactLevelSchema[];
+  artifacts: Record<string, TimArtifactLevelSchema>;
   /**
    * The trace matrices in the project
    */

@@ -231,7 +231,7 @@ export function cyDisplayAll(
 export function cyResetTree(
   cyPromise: CyPromise = artifactTreeCyPromise
 ): void {
-  const selectedId = selectionStore.selectedArtifactId;
+  const selectedId = selectionStore.selectedArtifact?.id;
 
   if (selectedId) {
     selectionStore.selectArtifact(selectedId);

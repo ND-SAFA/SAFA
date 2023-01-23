@@ -1,4 +1,4 @@
-import { LabelledTraceDirectionSchema } from "@/types";
+import { TimArtifactLevelSchema } from "@/types";
 import { typeOptionsStore, projectStore } from "@/hooks";
 import { deleteTraceMatrix, getTraceMatrices } from "@/api";
 
@@ -8,8 +8,8 @@ import { deleteTraceMatrix, getTraceMatrices } from "@/api";
  * @return The current trace matrices.
  */
 export async function handleLoadTraceMatrices(): Promise<void> {
-  typeOptionsStore.artifactTypeDirections = await getTraceMatrices(
-    projectStore.projectId
+  typeOptionsStore.initializeTypeDirections(
+    await getTraceMatrices(projectStore.projectId)
   );
 }
 
@@ -33,17 +33,17 @@ export async function handleRemoveTraceType(
 /**
  * Removes a saved artifact type direction and updates related stores.
  *
- * @param labeledType - The artifact type to edit.
+ * @param artifactLevel - The artifact type to edit.
  * @param removedType - The type direction to remove.
  */
 export async function handleRemoveDirection(
-  labeledType: LabelledTraceDirectionSchema,
+  artifactLevel: TimArtifactLevelSchema,
   removedType: string
 ): Promise<void> {
-  labeledType.allowedTypes = labeledType.allowedTypes.filter(
+  artifactLevel.allowedTypes = artifactLevel.allowedTypes.filter(
     (allowedType) => allowedType !== removedType
   );
 
-  typeOptionsStore.updateLinkDirections(labeledType);
-  await handleRemoveTraceType(labeledType.type, removedType);
+  typeOptionsStore.updateLinkDirections(artifactLevel);
+  await handleRemoveTraceType(artifactLevel.name, removedType);
 }

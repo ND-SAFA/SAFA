@@ -2,7 +2,7 @@ import os
 from typing import Optional, Tuple
 
 import torch
-from accelerate import Accelerator, memory_utils
+from accelerate import Accelerator, find_executable_batch_size
 from torch.optim import Optimizer
 from torch.optim.lr_scheduler import _LRScheduler
 from torch.utils.data import DataLoader
@@ -19,6 +19,8 @@ from train.base_trainer import BaseTrainer
 from train.save_strategy.save_strategy_stage import SaveStrategyStage
 from train.trace_output.trace_train_output import TraceTrainOutput
 from train.trainer_args import TrainerArgs
+
+os.environ['TRANSFORMERS_NO_ADVISORY_WARNINGS'] = 'true'
 
 
 class TraceTrainer(BaseTrainer):
@@ -43,7 +45,7 @@ class TraceTrainer(BaseTrainer):
         device = accelerator.device
         self.model = self.model_manager.get_model()
         self.model.to(device)
-        inner_training_loop = memory_utils.find_executable_batch_size(self._inner_custom_training_loop)
+        inner_training_loop = find_executable_batch_size(self._inner_custom_training_loop)
         trace_train_output = inner_training_loop(resume_from_checkpoint=resume_from_checkpoint, accelerator=accelerator, device=device)
         if self.trainer_args.load_best_model_at_end:
             best_model_path = self.get_output_path(self.BEST_MODEL_NAME)
@@ -74,7 +76,7 @@ class TraceTrainer(BaseTrainer):
         :return: None
         """
         if not output_dir:
-            output_dir = self.trainer_args.output_dir
+            raise ValueError("Expected output_dir to be defined.")
         super().save_model(output_dir=output_dir, _internal_call=_internal_call)
         self.accelerator.save_state(output_dir)
 

@@ -11,13 +11,15 @@ class TraceTrainOutput(AbstractTraceOutput):
     The output of training with the trace trainer.
     """
 
-    def __init__(self, train_output: Union[TrainOutput, "TraceTrainOutput"] = None, **kwargs):
+    def __init__(self, global_step: Optional[int] = None, training_loss: Optional[float] = None,
+                 train_output: Union[TrainOutput, "TraceTrainOutput"] = None, metrics: Optional[List[StageEval]] = None,
+                 eval_metrics: Optional[List[StageEval]] = None):
         """
         Provides wrapper method to convert output from default and custom training loop.
         :param train_output: The output of the training function.
         """
-        self.global_step: Optional[int] = None
-        self.training_loss: Optional[float] = None
-        self.metrics: List[StageEval] = []
-        self.eval_metrics: List[StageEval] = []
-        super().__init__(train_output, **kwargs)
+        self.global_step: Optional[int] = global_step
+        self.training_loss: Optional[float] = training_loss
+        self.metrics: List[StageEval] = metrics
+        self.eval_metrics: List[StageEval] = eval_metrics
+        super().__init__(hf_output=train_output)

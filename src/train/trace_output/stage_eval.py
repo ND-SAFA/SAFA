@@ -13,6 +13,15 @@ class StageEval(AbstractTraceOutput):
     """
     Represents the evaluation of a stage.
     """
-    stage: SaveStrategyStage
-    iteration: int
-    metrics: Metrics
+
+    def __init__(self, stage: SaveStrategyStage, iteration: int, metrics: Metrics):
+        """
+        Constructs evaluation of stage for given iteration and stores associated metrics.
+        :param stage: The stage being evaluated.
+        :param iteration: The iteration of that stage.
+        :param metrics: The metrics of the evaluation
+        """
+        super().__init__(hf_output=None)
+        self.stage: SaveStrategyStage = stage
+        self.iteration: int = iteration
+        self.metrics: Metrics = metrics

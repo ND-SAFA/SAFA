@@ -86,6 +86,8 @@ class ReflectionUtil:
             return {field: getattr(instance, field) for field in instance._fields}
 
         params = {}
+        print(instance)
+        print("-" * 25)
         for param_id in vars(instance):
             if ignore and param_id in ignore:
                 continue

@@ -2,6 +2,10 @@ from enum import Enum
 from typing import Dict
 
 from testres.base_test import BaseTest
+from train.save_strategy.save_strategy_stage import SaveStrategyStage
+from train.trace_output.stage_eval import StageEval
+from train.trace_output.trace_train_output import TraceTrainOutput
+from util.json_util import JsonUtil
 from util.reflection_util import ParamScope, ReflectionUtil
 
 
@@ -54,6 +58,18 @@ class TestReflectionUtil(BaseTest):
         expected_value = "hello"
         ReflectionUtil.set_attributes(test_class, {"local": expected_value})
         self.assertEqual(test_class.local, expected_value)
+
+    def test_jsonify(self):
+        t_loss = 10
+        metrics = {"map": .34}
+        stage_eval = StageEval(stage=SaveStrategyStage.EPOCH, iteration=1, metrics=metrics)
+        stage_eval_json = JsonUtil.to_dict(stage_eval)
+        self.assertEqual(3, len(stage_eval_json))
+        self.assertListEqual(["stage", "iteration", "metrics"], list(stage_eval_json.keys()))
+        eval_metrics = [stage_eval]
+        trace_train_output = TraceTrainOutput(global_step=1, training_loss=t_loss, metrics=[], eval_metrics=eval_metrics)
+        output_json = JsonUtil.to_dict(trace_train_output)
+        print(output_json)
 
     def __assert_scope(self, param_name, expected_scope: ParamScope, class_name: str = None):
         param_scope = ReflectionUtil.get_field_scope(param_name, class_name=class_name)

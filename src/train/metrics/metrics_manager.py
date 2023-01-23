@@ -1,3 +1,4 @@
+import warnings
 from typing import Dict, List, Tuple, Union
 
 import numpy as np
@@ -13,6 +14,7 @@ from train.metrics.recall_at_threshold_metric import RecallAtThresholdMetric
 from train.metrics.supported_trace_metric import get_metric_name, get_metric_path
 from train.trace_output.stage_eval import Metrics, TracePredictions
 
+warnings.filterwarnings('ignore')
 ArtifactQuery = Dict[str, List[TraceLink]]
 ProjectQueries = Dict[str, ArtifactQuery]
 

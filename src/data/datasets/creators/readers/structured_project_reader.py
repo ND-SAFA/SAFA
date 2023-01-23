@@ -119,7 +119,11 @@ class StructuredProjectReader(AbstractProjectReader):
         :return: AbstractProjectDefinition corresponding to definition file found.
         """
         tim_path = os.path.join(self.project_path, SafaKeys.TIM_FILE)
+        structure_definition_path = os.path.join(self.project_path, StructureProjectDefinition.STRUCTURE_DEFINITION_FILE_NAME)
         if os.path.exists(tim_path):
             return TimProjectDefinition()
-        else:
+        elif os.path.exists(structure_definition_path):
             return StructureProjectDefinition()
+        else:
+            required_paths = [tim_path, structure_definition_path]
+            raise ValueError(f"{self.project_path} does not contain: {required_paths}")

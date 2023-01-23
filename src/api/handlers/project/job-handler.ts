@@ -35,7 +35,7 @@ export async function connectAndSubscribeToJob(jobId: string): Promise<void> {
 export function updateJobFromWebsocketMessage(frame: Frame): void {
   const job: JobSchema | ChangeMessageSchema = JSON.parse(frame.body);
 
-  if (!("jobType" in job)) return;
+  if (!("status" in job)) return;
 
   jobStore.updateJob(job);
 }

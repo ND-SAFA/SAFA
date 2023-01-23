@@ -1,15 +1,18 @@
 package features.jobs;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.List;
 
 import edu.nd.crc.safa.features.jobs.entities.app.AbstractJob;
 import edu.nd.crc.safa.features.jobs.entities.app.JobSteps;
-import edu.nd.crc.safa.features.jobs.entities.app.JobType;
+import edu.nd.crc.safa.features.jobs.entities.jobs.CreateProjectViaJiraJob;
+import edu.nd.crc.safa.features.jobs.entities.jobs.CreateProjectViaJsonJob;
+import edu.nd.crc.safa.features.jobs.entities.jobs.FlatFileProjectCreationJob;
+import edu.nd.crc.safa.features.jobs.entities.jobs.JiraProjectUpdateJob;
 
 import common.ApplicationBaseTest;
 import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests that the correct steps are retrieved for each available job.
@@ -23,7 +26,7 @@ class TestJobStepNames extends ApplicationBaseTest {
 
     @Test
     void testCommitJobSteps() {
-        List<String> stepNames = JobSteps.getJobSteps(JobType.PROJECT_CREATION_VIA_JSON);
+        List<String> stepNames = JobSteps.getJobSteps(CreateProjectViaJsonJob.class);
         String[] expectedStepNames = new String[]{
             "Generating Trace Links",
             "Committing Entities",
@@ -34,7 +37,7 @@ class TestJobStepNames extends ApplicationBaseTest {
 
     @Test
     void testFlatFileProjectCreationSteps() {
-        List<String> stepNames = JobSteps.getJobSteps(JobType.PROJECT_CREATION_VIA_FLAT_FILE);
+        List<String> stepNames = JobSteps.getJobSteps(FlatFileProjectCreationJob.class);
         String[] expectedStepNames = new String[]{
             "Uploading Flat Files",
             "Parsing Files",
@@ -47,14 +50,14 @@ class TestJobStepNames extends ApplicationBaseTest {
 
     @Test
     void testJiraProjectCreationSteps() {
-        List<String> stepNames = JobSteps.getJobSteps(JobType.PROJECT_CREATION_VIA_JIRA);
+        List<String> stepNames = JobSteps.getJobSteps(CreateProjectViaJiraJob.class);
         String[] expectedStepNames = getJiraStepNames();
         testStepNames(expectedStepNames, stepNames);
     }
 
     @Test
     void testJiraProjectUpdateSteps() {
-        List<String> stepNames = JobSteps.getJobSteps(JobType.PROJECT_UPDATE_VIA_JIRA);
+        List<String> stepNames = JobSteps.getJobSteps(JiraProjectUpdateJob.class);
         String[] expectedStepNames = getJiraStepNames();
         testStepNames(expectedStepNames, stepNames);
     }

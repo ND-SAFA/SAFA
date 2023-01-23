@@ -8,6 +8,7 @@ import edu.nd.crc.safa.config.AppConstraints;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.documents.repositories.DocumentRepository;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.projects.entities.app.SafaItemNotFoundError;
 import edu.nd.crc.safa.utilities.exception.ExternalAPIException;
 
 import lombok.AllArgsConstructor;
@@ -76,6 +77,12 @@ public abstract class BaseController {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public SafaError handleServerError(SafaError safaError) {
         safaError.printError();
+        return safaError;
+    }
+
+    @ExceptionHandler(SafaItemNotFoundError.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public SafaItemNotFoundError handleServerError(SafaItemNotFoundError safaError) {
         return safaError;
     }
 

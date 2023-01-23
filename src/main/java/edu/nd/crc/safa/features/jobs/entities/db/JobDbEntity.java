@@ -15,8 +15,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import edu.nd.crc.safa.features.jobs.entities.app.AbstractJob;
 import edu.nd.crc.safa.features.jobs.entities.app.JobStatus;
-import edu.nd.crc.safa.features.jobs.entities.app.JobType;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -40,9 +40,10 @@ public class JobDbEntity {
     /**
      * The name of job (e.g. project creation).
      */
+    @JsonIgnore
     @NotNull
     @Column(name = "job_type", nullable = false)
-    protected JobType jobType;
+    protected Class<? extends AbstractJob> jobType;
     /**
      * The name of the job used for as a human readable description / id.
      */
@@ -113,7 +114,7 @@ public class JobDbEntity {
 
     public JobDbEntity(SafaUser user,
                        String name,
-                       JobType jobType,
+                       Class<? extends AbstractJob> jobType,
                        JobStatus status,
                        Timestamp startedAt,
                        Timestamp lastUpdatedAt,

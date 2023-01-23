@@ -19,6 +19,7 @@ import edu.nd.crc.safa.features.flatfiles.parser.TimFileParser;
 import edu.nd.crc.safa.features.jobs.entities.IJobStep;
 import edu.nd.crc.safa.features.jobs.entities.app.CommitJob;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
+import edu.nd.crc.safa.features.jobs.logging.JobLogger;
 import edu.nd.crc.safa.features.models.tgen.generator.TraceGenerationService;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
@@ -88,25 +89,31 @@ public class FlatFileProjectCreationJob extends CommitJob {
     }
 
     @IJobStep(value = "Parsing Files", position = 2)
-    public void parsingFiles() {
-        parsingArtifactFiles();
-        parsingTraceFiles();
+    public void parsingFiles(JobLogger logger) {
+        parsingArtifactFiles(logger);
+        parsingTraceFiles(logger);
     }
 
-    public void parsingArtifactFiles() throws SafaError {
+    public void parsingArtifactFiles(JobLogger logger) throws SafaError {
         EntityParsingResult<ArtifactAppEntity, String> artifactCreationResponse = flatFileParser.parseArtifacts();
         projectCommit.getArtifacts().setAdded(artifactCreationResponse.getEntities());
+        logger.log("%d artifacts created.", projectCommit.getArtifacts().getSize());
+
         List<CommitError> artifactErrors = createErrors(artifactCreationResponse.getErrors(), ProjectEntity.ARTIFACTS);
         projectCommit.getErrors().addAll(artifactErrors);
+        logger.log("%d errors found.", projectCommit.getErrors().size());
     }
 
-    public void parsingTraceFiles() throws SafaError {
+    public void parsingTraceFiles(JobLogger logger) throws SafaError {
         List<ArtifactAppEntity> artifactsCreated = projectCommit.getArtifacts().getAdded();
         EntityParsingResult<TraceAppEntity, String> traceCreationResponse =
             flatFileParser.parseTraces(artifactsCreated);
         projectCommit.getTraces().setAdded(traceCreationResponse.getEntities());
+        logger.log("%d traces created.", projectCommit.getTraces().getSize());
+
         List<CommitError> traceErrors = createErrors(traceCreationResponse.getErrors(), ProjectEntity.TRACES);
         projectCommit.getErrors().addAll(traceErrors);
+        logger.log("%d errors found.", projectCommit.getErrors().size());
     }
 
     private List<CommitError> createErrors(List<String> errorMessages,
@@ -121,7 +128,7 @@ public class FlatFileProjectCreationJob extends CommitJob {
     }
 
     @IJobStep(value = "Generating Trace Links", position = 3)
-    public void generatingTraces() throws IOException, InterruptedException {
+    public void generatingTraces(JobLogger logger) {
         TraceGenerationService traceGenerationService = this.getServiceProvider().getTraceGenerationService();
         ProjectAppEntity projectAppEntity = new ProjectAppEntity(this.projectCommit);
         List<TraceAppEntity> generatedLinks = traceGenerationService.generateTraceLinks(
@@ -129,6 +136,8 @@ public class FlatFileProjectCreationJob extends CommitJob {
             projectAppEntity);
         generatedLinks = traceGenerationService.filterDuplicateGeneratedLinks(projectCommit.getTraces().getAdded(),
             generatedLinks);
+        logger.log("%d traces generated.", generatedLinks.size());
+
         projectCommit.getTraces().getAdded().addAll(generatedLinks);
     }
 }

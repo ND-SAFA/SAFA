@@ -11,6 +11,7 @@ import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.jobs.entities.IJobStep;
 import edu.nd.crc.safa.features.jobs.entities.app.CommitJob;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
+import edu.nd.crc.safa.features.jobs.logging.JobLogger;
 import edu.nd.crc.safa.features.models.entities.ModelAppEntity;
 import edu.nd.crc.safa.features.models.tgen.entities.TraceGenerationRequest;
 import edu.nd.crc.safa.features.models.tgen.entities.TracingPayload;
@@ -70,10 +71,13 @@ public class GenerateLinksJob extends CommitJob {
     }
 
     @IJobStep(value = "Generating links", position = 2)
-    public void generateLinks() {
+    public void generateLinks(JobLogger logger) {
         for (TracingRequest tracingRequest : traceGenerationRequest.getRequests()) {
-            TracingPayload tracingPayload = TraceGenerationService.extractPayload(tracingRequest,
-                projectAppEntity);
+            logger.log("Running tracing request:\n\tModel: %s\n\tMethod: %s\n\tLevels: %s",
+                    tracingRequest.getModel(), tracingRequest.getMethod(),
+                    tracingRequest.getArtifactLevels());
+
+            TracingPayload tracingPayload = TraceGenerationService.extractPayload(tracingRequest, projectAppEntity);
             if (tracingPayload.getModel() == null) {
                 this.generatedTraces = new ArrayList<>();
                 this.generatedTraces.addAll(this.serviceProvider
@@ -91,6 +95,8 @@ public class GenerateLinksJob extends CommitJob {
                     true,
                     tracingPayload);
             }
+
+            logger.log("Generated %d traces.", generatedTraces.size());
 
             // Step - Filter our trace links overriding manual or approved links
             HashMap<String, List<String>> traceHashMap = new HashMap<>();
@@ -113,7 +119,12 @@ public class GenerateLinksJob extends CommitJob {
                 .filter(t -> !traceHashMap.containsKey(t.getSourceName())
                     || !traceHashMap.get(t.getSourceName()).contains(t.getTargetName())).collect(Collectors.toList());
 
+            logger.log("Filtered down to %d traces that will be committed.", filteredGeneratedLinks.size());
+
             this.projectCommit.addTraces(ModificationType.ADDED, filteredGeneratedLinks);
+            logger.log("\n================\n");
         }
+
+        logger.log("Total links generated: %d", projectCommit.getTraces().getSize());
     }
 }

@@ -7,7 +7,6 @@ import java.util.UUID;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.flatfiles.services.FileUploadService;
 import edu.nd.crc.safa.features.jobs.entities.app.AbstractJob;
-import edu.nd.crc.safa.features.jobs.entities.app.JobType;
 import edu.nd.crc.safa.features.jobs.entities.jobs.FlatFileProjectCreationJob;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
@@ -62,8 +61,8 @@ public class UpdateProjectByFlatFileJobBuilder extends AbstractJobBuilder<Projec
     }
 
     @Override
-    JobType getJobType() {
-        return JobType.PROJECT_CREATION_VIA_FLAT_FILE;
+    Class<? extends AbstractJob> getJobType() {
+        return FlatFileProjectCreationJob.class;
     }
 
     private void uploadFlatFiles(Project project) throws IOException {

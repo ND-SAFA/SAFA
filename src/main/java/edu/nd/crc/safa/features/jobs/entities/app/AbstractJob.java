@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.features.jobs.entities.app;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,6 +12,7 @@ import java.util.stream.Collectors;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.jobs.entities.IJobStep;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
+import edu.nd.crc.safa.features.jobs.logging.JobLogger;
 import edu.nd.crc.safa.features.jobs.services.JobService;
 import edu.nd.crc.safa.features.notifications.services.NotificationService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
@@ -120,18 +122,21 @@ public abstract class AbstractJob implements Job {
         List<JobStepImplementation> jobSteps = getSteps(this.getClass());
         int nSteps = jobSteps.size();
 
+        JobLogger logger = new JobLogger(serviceProvider.getJobLoggingService(), jobDbEntity, 0);
+
         try {
             for (JobStepImplementation stepImplementation : jobSteps) {
                 if (this.skipSteps.contains(stepImplementation.annotation.position())) {
                     continue;
                 }
                 // Pre-step
+                logger.setStepNum(getStepIndex(stepImplementation.annotation.position(), nSteps));
                 jobService.startStep(jobDbEntity, nSteps);
                 notificationService.broadcastJob(JobAppEntity.createFromJob(jobDbEntity));
 
                 // Pre-step
                 log.info("Running job step " + stepImplementation.method.getName());
-                stepImplementation.method.invoke(this);
+                invokeStep(stepImplementation, logger);
 
                 // Post-step
                 jobService.endStep(jobDbEntity);
@@ -139,12 +144,39 @@ public abstract class AbstractJob implements Job {
             }
         } catch (Exception e) {
             jobService.failJob(jobDbEntity);
-            e.printStackTrace();
+            logger.logException(e);
             notificationService.broadcastJob(JobAppEntity.createFromJob(jobDbEntity));
-            throw new SafaError(e.getMessage());
         }
+    }
 
-        this.done();
+    /**
+     * Runs a step, giving it the job logger if necessary.
+     *
+     * @param stepImplementation The step to run
+     * @param logger The logger to give to the step if it wants it
+     * @throws InvocationTargetException If there is a problem invoking the method
+     * @throws IllegalAccessException If there is a problem invoking the method
+     */
+    private void invokeStep(JobStepImplementation stepImplementation, JobLogger logger)
+            throws InvocationTargetException, IllegalAccessException {
+
+        Method method = stepImplementation.method;
+
+        // TODO this is fine now, but if the possible method signatures
+        //      ever get more complex this will need to be refactored
+        if (method.getParameterCount() == 0) {
+            method.invoke(this);
+        } else if (method.getParameterCount() == 1) {
+            if (method.getParameterTypes()[0].equals(JobLogger.class)) {
+                method.invoke(this, logger);
+            } else {
+                throw new SafaError("Unsure how to invoke method %s of %s. Parameter 1 is not a JobLogger",
+                        method.getName(), method.getDeclaringClass().getName());
+            }
+        } else {
+            throw new SafaError("Unsure how to invoke method %s of %s. Too many parameters found",
+                    method.getName(), method.getDeclaringClass().getName());
+        }
     }
 
     /**

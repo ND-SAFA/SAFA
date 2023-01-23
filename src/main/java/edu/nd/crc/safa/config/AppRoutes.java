@@ -130,6 +130,12 @@ public class AppRoutes {
         public static class Models {
             public static final String TRAIN = JOBS_PREFIX + AppRoutes.Projects.BY_ID + "/models/train";
         }
+
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        public static class Logs {
+            public static final String BY_JOB_ID = Meta.JOB_ID + "/logs";
+            public static final String BY_JOB_ID_AND_STEP_NUM = BY_JOB_ID + "/{stepNum}";
+        }
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)

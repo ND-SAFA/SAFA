@@ -3,7 +3,6 @@ package edu.nd.crc.safa.features.jobs.builders;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.jira.entities.api.JiraIdentifier;
 import edu.nd.crc.safa.features.jobs.entities.app.AbstractJob;
-import edu.nd.crc.safa.features.jobs.entities.app.JobType;
 import edu.nd.crc.safa.features.jobs.entities.jobs.CreateProjectViaJiraJob;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
@@ -53,7 +52,7 @@ public class CreateProjectViaJiraBuilder extends AbstractJobBuilder<JiraIdentifi
     }
 
     @Override
-    JobType getJobType() {
-        return JobType.PROJECT_CREATION_VIA_JIRA;
+    Class<? extends AbstractJob> getJobType() {
+        return CreateProjectViaJiraJob.class;
     }
 }

@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.jobs.entities.app.AbstractJob;
-import edu.nd.crc.safa.features.jobs.entities.app.JobType;
 import edu.nd.crc.safa.features.jobs.entities.jobs.TrainModelJob;
 import edu.nd.crc.safa.features.models.entities.api.TrainingRequest;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
@@ -46,7 +45,7 @@ public class TrainModelJobBuilder extends AbstractJobBuilder<TrainingRequest> {
     }
 
     @Override
-    JobType getJobType() {
-        return JobType.TRAIN_MODEL;
+    Class<? extends AbstractJob> getJobType() {
+        return TrainModelJob.class;
     }
 }

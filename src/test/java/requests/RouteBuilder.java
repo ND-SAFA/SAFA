@@ -102,6 +102,11 @@ public class RouteBuilder<T extends RouteBuilder<T>> {
         return (T) this;
     }
 
+    public T withStepNum(int stepNum) {
+        this.path = this.path.replace("{stepNum}", Integer.toString(stepNum));
+        return (T) this;
+    }
+
     public T withFileType(DataFileBuilder.AcceptedFileTypes fileType) {
         this.path = this.path.replace("{fileType}", fileType.toString());
         return (T) this;

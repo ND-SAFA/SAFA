@@ -1,6 +1,7 @@
 from abc import ABC
 from typing import Dict, NamedTuple, Optional
 
+from util.json_util import JsonUtil
 from util.reflection_util import ReflectionUtil
 
 
@@ -22,4 +23,4 @@ class AbstractTraceOutput(ABC):
         Converts instance to a dictionary.
         :return: The output represented as a dictionary.
         """
-        return ReflectionUtil.jsonify(self)
+        return JsonUtil.to_dict(self)

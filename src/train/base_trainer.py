@@ -51,7 +51,7 @@ class BaseTrainer(Trainer, BaseObject):
         self.train_dataset = self.trainer_dataset_manager[DatasetRole.TRAIN].to_trainer_dataset(self.model_manager,
                                                                                                 self.trainer_args.train_batch_size)
         train_output = self.train(resume_from_checkpoint=checkpoint)
-        return TraceTrainOutput(train_output)
+        return TraceTrainOutput(train_output=train_output)
 
     def perform_prediction(self, dataset_role: DatasetRole = DatasetRole.EVAL) -> TracePredictionOutput:
         """

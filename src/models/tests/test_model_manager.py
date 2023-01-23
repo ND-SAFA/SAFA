@@ -1,5 +1,6 @@
 import mock
 from mock import patch
+from transformers import BertPreTrainedModel
 from transformers.modeling_utils import PreTrainedModel
 from transformers.models.auto import AutoModelForSequenceClassification
 from transformers.models.auto.tokenization_auto import AutoTokenizer
@@ -15,10 +16,10 @@ class TestTokenizer:
 class TestModelManager(BaseTest):
 
     def test_get_encoder_layers(self):
-        model = AutoModelForSequenceClassification.from_pretrained(BaseTest.BASE_TEST_MODEL)
+        model: BertPreTrainedModel = AutoModelForSequenceClassification.from_pretrained(BaseTest.BASE_TEST_MODEL)
         manager = self.get_model_manager()
         layers = manager.get_encoder_layers(model)
-        self.assertEquals(len(layers), 12)
+        self.assertEquals(len(layers), BaseTest.BASE_MODEL_LAYERS)
 
     def test_freeze_layers(self):
         layers2freeze = [-2, 0]

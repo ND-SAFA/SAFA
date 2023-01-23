@@ -32,7 +32,7 @@ class AbstractTraceJob(AbstractJob, ABC):
         super().__init__(job_args=job_args, model_manager=model_manager)
         self.trainer_dataset_manager = trainer_dataset_manager
         self.trainer_args = trainer_args
-        self._trainer: Optional[TraceTrainer] = None
+        self._trainer: Optional[CustomTraceTrainer] = None
 
     @overrides(AbstractJob)
     def run(self) -> None:
@@ -61,7 +61,8 @@ class AbstractTraceJob(AbstractJob, ABC):
         :return: None
         """
         super().cleanup()
-        self._trainer.trace_trainer_state.get_accelerator().free_memory()
+        if hasattr(self._trainer, "accelerator") and self._trainer.accelerator:  # covers custom and non-custom
+            self._trainer.accelerator.free_memory()
         self._trainer = None
         self.trainer_dataset_manager.cleanup()
 

@@ -98,8 +98,12 @@ class ObjectCreator:
 
     }
 
-    experiment_train_step_definition = {"jobs": [experiment_train_job_definition], "comparison_metric": "accuracy"}
-    experiment_predict_step_definition = {"jobs": [experiment_predict_job_definition], "comparison_metric": "accuracy"}
+    experiment_train_step_definition = {"jobs": [experiment_train_job_definition], "comparison_criterion": {
+        "metrics": "accuracy"
+    }}
+    experiment_predict_step_definition = {"jobs": [experiment_predict_job_definition], "comparison_criterion": {
+        "metrics": "accuracy"
+    }}
     experiment_definition = {"steps": [experiment_train_step_definition, experiment_predict_step_definition],
                              "output_dir": TEST_OUTPUT_DIR}
 

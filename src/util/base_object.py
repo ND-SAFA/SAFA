@@ -2,7 +2,7 @@ import traceback
 from abc import ABC
 from copy import deepcopy
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Type, Union, _UnionGenericAlias
+from typing import Any, Dict, List, Type, Union
 
 from typeguard import check_type
 from typing_extensions import get_args

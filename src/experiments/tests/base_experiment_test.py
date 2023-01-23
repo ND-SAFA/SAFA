@@ -40,7 +40,9 @@ class BaseExperimentTest(BaseTest):
                         "num_train_epochs": ExperimentalVariable([Variable(100), Variable(200)])
                     })
                 })]),
-                "comparison_metric": "accuracy"
+                "comparison_criterion": DefinitionVariable({
+                    "metrics": Variable(["accuracy"])
+                })
             }),
             DefinitionVariable({"jobs": MultiVariable([TypedDefinitionVariable({
                 TypedDefinitionVariable.OBJECT_TYPE_KEY: SupportedJobType.PREDICT.name,
@@ -66,7 +68,6 @@ class BaseExperimentTest(BaseTest):
             })
         ]),
         "output_dir": TEST_OUTPUT_DIR,
-
     })
 
     def setUp(self):

@@ -24,6 +24,7 @@ class BaseTest(TestCase):
         SupportedDataCleaningStep.SEPARATE_JOINED_WORDS.value(),
         SupportedDataCleaningStep.FILTER_MIN_LENGTH.value()])
     BASE_TEST_MODEL = "hf-internal-testing/tiny-random-bert"
+    BASE_MODEL_LAYERS = 5  # bert-base = 12
 
     def setUp(self):
         os.makedirs(TEST_OUTPUT_DIR, exist_ok=True)

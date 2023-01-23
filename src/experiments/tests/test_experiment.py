@@ -36,5 +36,5 @@ class TestExperiment(BaseExperimentTest):
     def get_experiment(self, use_metric: bool = True):
         definition = deepcopy(self.EXPERIMENT_DEFINITION)
         if not use_metric:
-            definition["steps"][0].pop("comparison_metric")
+            definition["steps"][0].pop("comparison_criterion")
         return Experiment.initialize_from_definition(definition)

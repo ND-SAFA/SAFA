@@ -1,15 +1,18 @@
 from abc import ABC, abstractmethod
-from enum import Enum
+from typing import Any, Callable
 
 from train.save_strategy.save_strategy_stage import SaveStrategyStage
 from train.trace_output.trace_prediction_output import TracePredictionOutput
 from util.base_object import BaseObject
 from util.enum_util import FunctionalWrapper
 
+ComparisonFunction = Callable[[Any, Any], bool]
 
-class ComparisonFunction(Enum):
+
+class SupportedComparisonFunction:
     """
     Represents the different ways to compare metrics scores.
+    Note, this is not an enum because functional wrapper break deepcopy method.
     """
     MAX = FunctionalWrapper(lambda a, b: b is None or a >= b)
     MIN = FunctionalWrapper(lambda a, b: b is None or a <= b)

@@ -141,7 +141,7 @@ class JobResult(BaseObject):
         assert len(comparison_criterion.metrics) <= 1, "Expected no more than 1 metric in comparison criterion."
         comparison_metric = comparison_criterion.metrics[0] if len(comparison_criterion.metrics) > 0 else None
         self_val, other_val = self._get_comparison_vals(other, comparison_metric)
-        return comparison_criterion.comparison_function.value(self_val, other_val)
+        return comparison_criterion.comparison_function(self_val, other_val)
 
     def _can_compare_with_metric(self, other: "JobResult", comparison_metric_name: str) -> bool:
         """

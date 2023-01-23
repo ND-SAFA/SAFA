@@ -12,11 +12,13 @@ from config.constants import REPLACEMENT_PERCENTAGE_DEFAULT
 from data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
 
 Synset = nltk.corpus.reader.wordnet.Synset
-nltk.download('stopwords')
-nltk.download('wordnet')
-nltk.download('omw-1.4')
-nltk.download('punkt')
-nltk.download('averaged_perceptron_tagger')
+
+
+# nltk.download('stopwords')
+# nltk.download('wordnet')
+# nltk.download('omw-1.4')
+# nltk.download('punkt')
+# nltk.download('averaged_perceptron_tagger')
 
 
 @dataclass

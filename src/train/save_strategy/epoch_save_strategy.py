@@ -23,7 +23,7 @@ class MetricSaveStrategy(AbstractSaveStrategy):
         self.interval = interval
         self.comparison_criterion = comparison_criterion
         self.comparison_metric = comparison_criterion.metrics[0]
-        self.comparison_function = comparison_criterion.comparison_function.value
+        self.comparison_function = comparison_criterion.comparison_function
         self.iteration = 0
         self.best_score = None
         self.best_iteration = None

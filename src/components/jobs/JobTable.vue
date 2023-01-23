@@ -97,45 +97,71 @@
             </v-stepper>
 
             <flex-box full-width justify="end">
-              <v-btn
+              <text-button
                 outlined
-                color="error"
+                class="mr-1"
+                data-cy="button-job-log"
+                icon-id="mdi-post-outline"
+                @click="handleViewLogs(item)"
+              >
+                View Logs
+              </text-button>
+              <text-button
+                outlined
+                variant="delete"
                 class="mr-1"
                 data-cy="button-delete-job"
                 @click="handleDeleteJob(item)"
               >
                 Delete Upload
-              </v-btn>
-              <v-btn
+              </text-button>
+              <text-button
                 color="primary"
                 :disabled="!isCompleted(item.status)"
                 data-cy="button-open-job"
+                icon-id="mdi-family-tree"
                 @click="handleViewProject(item)"
               >
                 View Project
-              </v-btn>
+              </text-button>
             </flex-box>
           </v-container>
         </td>
       </template>
     </v-data-table>
+    <modal
+      title="Logs"
+      :is-open="jobLog.length > 0"
+      :actions-height="0"
+      @close="handleCloseLogs"
+    >
+      <template v-slot:body>
+        <typography t="4" default-expanded variant="code" :value="log" />
+      </template>
+    </modal>
   </panel-card>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { JobSchema, JobStatus } from "@/types";
+import { JobLogSchema, JobSchema, JobStatus } from "@/types";
 import { enumToDisplay, getJobStatusColor, timestampToDisplay } from "@/util";
 import { appStore, jobStore, logStore } from "@/hooks";
-import { handleDeleteJob, handleLoadVersion, handleReloadJobs } from "@/api";
-import { Typography, FlexBox, PanelCard } from "@/components/common";
+import {
+  getJobLog,
+  handleDeleteJob,
+  handleLoadVersion,
+  handleReloadJobs,
+} from "@/api";
+import { Typography, FlexBox, PanelCard, Modal } from "@/components/common";
+import TextButton from "@/components/common/button/TextButton.vue";
 
 /**
  * Renders a list of jobs.
  */
 export default Vue.extend({
   name: "JobTable",
-  components: { PanelCard, Typography, FlexBox },
+  components: { TextButton, Modal, PanelCard, Typography, FlexBox },
   props: {},
   data() {
     return {
@@ -144,6 +170,7 @@ export default Vue.extend({
         { text: "Progress", value: "currentProgress" },
         { text: "Status", value: "status" },
       ],
+      jobLog: [] as JobLogSchema[],
     };
   },
   mounted() {
@@ -167,6 +194,12 @@ export default Vue.extend({
      */
     expanded(): JobSchema[] {
       return jobStore.selectedJob ? [jobStore.selectedJob] : [];
+    },
+    /**
+     * return The current selected job index.
+     */
+    log(): string {
+      return JSON.stringify(this.jobLog, null, 2);
     },
   },
   methods: {
@@ -241,6 +274,19 @@ export default Vue.extend({
       } else {
         logStore.onError("Unable to view this project right now.");
       }
+    },
+    /**
+     * Gets the log for a job.
+     * @param job - The job to view.
+     */
+    async handleViewLogs(job: JobSchema): Promise<void> {
+      this.jobLog = await getJobLog(job.id);
+    },
+    /**
+     * Closes the job log.
+     */
+    handleCloseLogs(): void {
+      this.jobLog = [];
     },
   },
 });

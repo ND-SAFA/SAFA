@@ -124,6 +124,15 @@ class TraceTrainer(BaseTrainer):
             return os.path.join(base_output_path, dir_name)
         return base_output_path
 
+    def cleanup(self) -> None:
+        """
+        Free memory associated with accelerator.
+        :return: None
+        """
+        super().cleanup()
+        if self.accelerator:  # covers custom and non-custom
+            self.accelerator.free_memory()
+
     def _initialize_state(self, model: PreTrainedModel) -> None:
         """
         Initializes accelerator and related entities.

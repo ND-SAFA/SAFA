@@ -61,8 +61,7 @@ class AbstractTraceJob(AbstractJob, ABC):
         :return: None
         """
         super().cleanup()
-        if hasattr(self._trainer, "accelerator") and self._trainer.accelerator:  # covers custom and non-custom
-            self._trainer.accelerator.free_memory()
+        self._trainer.cleanup()
         self._trainer = None
         self.trainer_dataset_manager.cleanup()
 

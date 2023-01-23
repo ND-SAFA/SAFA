@@ -66,3 +66,9 @@ class BaseTrainer(Trainer, BaseObject):
         output.metrics.update(eval_metrics)
         return TracePredictionOutput(predictions=metrics_manager.get_scores(), label_ids=output.label_ids, metrics=output.metrics,
                                      source_target_pairs=dataset.get_source_target_pairs())
+
+    def cleanup(self) -> None:
+        """
+        Free memory associated with trainer.
+        :return: None
+        """

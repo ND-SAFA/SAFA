@@ -61,7 +61,8 @@ class AbstractTraceJob(AbstractJob, ABC):
         :return: None
         """
         super().cleanup()
-        self._trainer.cleanup()
+        if self._trainer:
+            self._trainer.cleanup()
         self._trainer = None
         self.trainer_dataset_manager.cleanup()
 

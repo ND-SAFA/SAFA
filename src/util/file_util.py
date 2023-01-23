@@ -17,8 +17,7 @@ class FileUtil:
         """
         if additional_path_parts:
             output_path = os.path.join(output_path, *additional_path_parts)
-        if not os.path.exists(output_path):
-            os.makedirs(output_path)
+        os.makedirs(output_path, exist_ok=True)
         return output_path
 
     @staticmethod
@@ -91,6 +90,7 @@ class FileUtil:
         """
         if isinstance(content, dict):
             content = JsonUtil.dict_to_json(content)
+        FileUtil.create_dir_safely(os.path.dirname(output_file_path))
         with FileUtil.safe_open_w(output_file_path) as file:
             file.write(content)
 

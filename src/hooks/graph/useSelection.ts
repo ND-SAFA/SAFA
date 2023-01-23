@@ -17,6 +17,7 @@ import {
 import { pinia } from "@/plugins";
 import subtreeStore from "../project/useSubtree";
 import artifactStore from "../project/useArtifacts";
+import traceStore from "../project/useTraces";
 import typeOptionsStore from "../project/useTypeOptions";
 import appStore from "../core/useApp";
 
@@ -45,21 +46,51 @@ export const useSelection = defineStore("selection", {
     /**
      * The currently selected artifact.
      */
-    selectedArtifact: undefined as ArtifactSchema | undefined,
+    selectedArtifactId: "",
     /**
      * The currently selected trace link.
      */
-    selectedTraceLink: undefined as TraceLinkSchema | undefined,
+    selectedTraceLinkIds: ["", ""] as [string, string],
     /**
      * The currently selected artifact level.
      */
-    selectedArtifactLevel: undefined as TimArtifactLevelSchema | undefined,
+    selectedArtifactLevelType: "",
     /**
      * The currently selected trace matrix.
      */
-    selectedTraceMatrix: undefined as TimTraceMatrixSchema | undefined,
+    selectedTraceMatrixTypes: ["", ""] as [string, string],
   }),
   getters: {
+    /**
+     * @return The currently selected artifact.
+     */
+    selectedArtifact(): ArtifactSchema | undefined {
+      return artifactStore.getArtifactById(this.selectedArtifactId);
+    },
+    /**
+     * @return The currently selected trace link.
+     */
+    selectedTraceLink(): TraceLinkSchema | undefined {
+      return traceStore.getTraceLinkByArtifacts(
+        this.selectedTraceLinkIds[0],
+        this.selectedTraceLinkIds[1]
+      );
+    },
+    /**
+     * @return The currently selected artifact level.
+     */
+    selectedArtifactLevel(): TimArtifactLevelSchema | undefined {
+      return typeOptionsStore.getArtifactLevel(this.selectedArtifactLevelType);
+    },
+    /**
+     * @return The currently selected trace matrix.
+     */
+    selectedTraceMatrix(): TimTraceMatrixSchema | undefined {
+      return typeOptionsStore.getTraceMatrix(
+        this.selectedTraceMatrixTypes[0],
+        this.selectedTraceMatrixTypes[1]
+      );
+    },
     /**
      * @return The ids of artifacts that are in the viewport.
      */
@@ -86,10 +117,10 @@ export const useSelection = defineStore("selection", {
       this.ignoreTypes = clearFilter ? [] : this.ignoreTypes;
       this.selectedSubtreeIds = [];
       this.selectedGroupIds = [];
-      this.selectedArtifact = undefined;
-      this.selectedTraceLink = undefined;
-      this.selectedArtifactLevel = undefined;
-      this.selectedTraceMatrix = undefined;
+      this.selectedArtifactId = "";
+      this.selectedTraceLinkIds = ["", ""];
+      this.selectedArtifactLevelType = "";
+      this.selectedTraceMatrixTypes = ["", ""];
       appStore.closeSidePanels();
     },
     /**
@@ -140,7 +171,7 @@ export const useSelection = defineStore("selection", {
      */
     selectArtifact(artifactId: string): void {
       this.clearSelections();
-      this.selectedArtifact = artifactStore.getArtifactById(artifactId);
+      this.selectedArtifactId = artifactId;
       this.centerOnArtifacts([artifactId]);
       appStore.openDetailsPanel("displayArtifact");
     },
@@ -164,7 +195,7 @@ export const useSelection = defineStore("selection", {
      */
     selectTraceLink(traceLink: TraceLinkSchema): void {
       this.clearSelections();
-      this.selectedTraceLink = traceLink;
+      this.selectedTraceLinkIds = [traceLink.sourceId, traceLink.targetId];
       this.selectedSubtreeIds = [traceLink.sourceId, traceLink.targetId];
       this.centerOnArtifacts([traceLink.sourceId, traceLink.targetId]);
       appStore.openDetailsPanel("displayTrace");
@@ -176,8 +207,7 @@ export const useSelection = defineStore("selection", {
      */
     selectArtifactLevel(artifactType: string): void {
       this.clearSelections();
-      this.selectedArtifactLevel =
-        typeOptionsStore.getArtifactLevel(artifactType);
+      this.selectedArtifactLevelType = artifactType;
       this.centerOnArtifacts([artifactType]);
       appStore.openDetailsPanel("displayArtifactLevel");
     },
@@ -189,10 +219,7 @@ export const useSelection = defineStore("selection", {
      */
     selectTraceMatrix(sourceType: string, targetType: string): void {
       this.clearSelections();
-      this.selectedTraceMatrix = typeOptionsStore.getTraceMatrix(
-        sourceType,
-        targetType
-      );
+      this.selectedTraceMatrixTypes = [sourceType, targetType];
       this.centerOnArtifacts([sourceType, targetType]);
       appStore.openDetailsPanel("displayTraceMatrix");
     },

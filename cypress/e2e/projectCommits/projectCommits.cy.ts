@@ -20,7 +20,7 @@ describe("Project Commits", () => {
 
   describe("Project Commit Changes", () => {
     beforeEach(() => {
-      cy.viewport(1024, 768);
+      cy.viewport(2048, 1024);
       cy.dbResetVersions();
 
       cy.visit("/login")

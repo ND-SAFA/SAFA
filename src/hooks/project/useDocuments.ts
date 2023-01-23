@@ -5,6 +5,7 @@ import {
   DocumentSchema,
   DocumentType,
   ProjectSchema,
+  GraphMode,
 } from "@/types";
 import { createDocument, isTableDocument, removeMatches } from "@/util";
 import { pinia } from "@/plugins";
@@ -174,6 +175,10 @@ export const useDocuments = defineStore("documents", {
       artifactStore.initializeArtifacts({ currentArtifactIds });
       traceStore.initializeTraces({ currentArtifactIds });
       layoutStore.updatePositions(document.layout);
+
+      if (isTableDocument(document.type)) {
+        layoutStore.mode = GraphMode.table;
+      }
     },
     /**
      * Adds a new document.

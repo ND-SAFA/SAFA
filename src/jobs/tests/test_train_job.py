@@ -22,7 +22,7 @@ from variables.typed_definition_variable import TypedDefinitionVariable
 class TestTrainJob(BaseJobTest):
     CSV_DATA_DIR = os.path.join(TEST_DATA_DIR, "csv")
     CSV_DATA_FILE = os.path.join(CSV_DATA_DIR, "test_csv_data.csv")
-    EXPECTED_SPLIT_ROLE: DatasetRole = DatasetRole.EVAL
+    EXPECTED_SPLIT_ROLE: DatasetRole = DatasetRole.VAL
     DETERMINISTIC_ID = "1234"
 
     @patch.object(TraceTrainer, "save_model")

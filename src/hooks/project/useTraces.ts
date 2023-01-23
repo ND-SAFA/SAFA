@@ -76,6 +76,7 @@ export const useTraces = defineStore("traces", {
       });
       projectStore.updateProject({ traces: updatedTraces });
       subtreeStore.updateSubtreeMap();
+      typeOptionsStore.updateTIM();
       layoutStore.applyAutomove();
     },
     /**
@@ -97,6 +98,7 @@ export const useTraces = defineStore("traces", {
       });
       projectStore.updateProject({ traces: allTraces });
       subtreeStore.updateSubtreeMap();
+      typeOptionsStore.updateTIM();
       layoutStore.applyAutomove();
     },
     /**

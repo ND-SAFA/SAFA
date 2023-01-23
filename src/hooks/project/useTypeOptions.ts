@@ -56,6 +56,12 @@ export const useTypeOptions = defineStore("typeOptions", {
   },
   actions: {
     /**
+     * Refreshes the TIM structure.
+     */
+    updateTIM(): void {
+      this.initializeProject(projectStore.project);
+    },
+    /**
      *Initializes project data.
      *
      * @param project - The project to load.

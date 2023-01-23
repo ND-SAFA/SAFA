@@ -10,7 +10,7 @@ from jobs.components.job_result import JobResult
 from jobs.train_job import TrainJob
 from models.model_manager import ModelManager
 from models.model_properties import ModelTask
-from train.trace_trainer import TraceTrainer
+from train.base_trainer import BaseTrainer
 from train.trainer_args import TrainerArgs
 
 
@@ -48,9 +48,9 @@ class MLMPreTrainJob(TrainJob):
         os.remove(train_dataset.training_file_path)
         return job_result
 
-    def get_trainer(self, **kwargs) -> TraceTrainer:
+    def get_trainer(self, **kwargs) -> BaseTrainer:
         if self._trainer is None:
-            self._trainer = TraceTrainer(trainer_args=self.trainer_args,
-                                         trainer_dataset_manager=self.trainer_dataset_manager,
-                                         model_manager=self.model_manager, **kwargs)
+            self._trainer = BaseTrainer(trainer_args=self.trainer_args,
+                                        trainer_dataset_manager=self.trainer_dataset_manager,
+                                        model_manager=self.model_manager, **kwargs)
         return self._trainer

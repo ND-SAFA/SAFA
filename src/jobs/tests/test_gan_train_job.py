@@ -10,7 +10,7 @@ from jobs.tests.base_job_test import BaseJobTest
 from models.model_manager import ModelManager
 from testres.paths.paths import TEST_DATA_DIR
 from testres.test_assertions import TestAssertions
-from train.trace_trainer import TraceTrainer
+from train.base_trainer import BaseTrainer
 from train.trainer_args import TrainerArgs
 from util.object_creator import ObjectCreator
 from variables.typed_definition_variable import TypedDefinitionVariable
@@ -31,7 +31,7 @@ class TestGanTrainJob(BaseJobTest):
     }
 
     @skip
-    @patch.object(TraceTrainer, "save_model")
+    @patch.object(BaseTrainer, "save_model")
     def test_run_success(self, save_model_mock: mock.MagicMock):
         self._test_run_success()
 

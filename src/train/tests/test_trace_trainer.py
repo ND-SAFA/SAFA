@@ -14,9 +14,9 @@ from models.model_manager import ModelManager
 from testres.base_trace_test import BaseTraceTest
 from testres.test_assertions import TestAssertions
 from testres.test_data_manager import TestDataManager
-from train.custom_trace_trainer import CustomTraceTrainer
 from train.metrics.metrics_manager import MetricsManager
 from train.trace_output.trace_prediction_output import TracePredictionOutput
+from train.trace_trainer import TraceTrainer
 from train.trainer_args import TrainerArgs
 from util.object_creator import ObjectCreator
 from variables.typed_definition_variable import TypedDefinitionVariable
@@ -97,7 +97,7 @@ class TestTraceTrainer(BaseTraceTest):
         model_manager.get_model = mock.MagicMock(return_value=self.get_test_model())
         model_manager.get_tokenizer = mock.MagicMock(return_value=self.get_test_tokenizer())
         trainer_args = ObjectCreator.create(TrainerArgs, **kwargs)
-        return CustomTraceTrainer(
+        return TraceTrainer(
             trainer_args=trainer_args,
             trainer_dataset_manager=trainer_dataset_manager,
             model_manager=model_manager)
@@ -107,7 +107,7 @@ class TestTraceTrainer(BaseTraceTest):
         test_trace_trainer.perform_training()
         checkpoint_files = ["optimizer.bin", "config.json", "pytorch_model.bin", "scheduler.bin",
                             "training_args.bin"]
-        for folder_name in [CustomTraceTrainer.BEST_MODEL_NAME, CustomTraceTrainer.CURRENT_MODEL_NAME]:
+        for folder_name in [TraceTrainer.BEST_MODEL_NAME, TraceTrainer.CURRENT_MODEL_NAME]:
             folder_path = os.path.join(test_trace_trainer.trainer_args.output_dir, folder_name)
             output_files = list(os.listdir(folder_path))
             for file in checkpoint_files:

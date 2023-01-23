@@ -8,7 +8,7 @@ from jobs.abstract_job import AbstractJob
 from jobs.components.job_args import JobArgs
 from jobs.create_datasets_job import CreateDatasetsJob
 from models.model_manager import ModelManager
-from train.custom_trace_trainer import CustomTraceTrainer
+from train.base_trainer import BaseTrainer
 from train.trace_trainer import TraceTrainer
 from train.trainer_args import TrainerArgs
 from util.base_object import BaseObject
@@ -32,7 +32,7 @@ class AbstractTraceJob(AbstractJob, ABC):
         super().__init__(job_args=job_args, model_manager=model_manager)
         self.trainer_dataset_manager = trainer_dataset_manager
         self.trainer_args = trainer_args
-        self._trainer: Optional[CustomTraceTrainer] = None
+        self._trainer: Optional[TraceTrainer] = None
 
     @overrides(AbstractJob)
     def run(self) -> None:
@@ -43,16 +43,16 @@ class AbstractTraceJob(AbstractJob, ABC):
             CreateDatasetsJob(self.job_args, self.trainer_dataset_manager).run()
         super().run()
 
-    def get_trainer(self, **kwargs) -> TraceTrainer:
+    def get_trainer(self, **kwargs) -> BaseTrainer:
         """
         Gets the trace trainer for the job
         :param kwargs: any additional parameters for the trainer
         :return: the trainer
         """
         if self._trainer is None:
-            self._trainer = CustomTraceTrainer(trainer_args=self.trainer_args,
-                                               trainer_dataset_manager=self.trainer_dataset_manager,
-                                               model_manager=self.model_manager, **kwargs)
+            self._trainer = TraceTrainer(trainer_args=self.trainer_args,
+                                         trainer_dataset_manager=self.trainer_dataset_manager,
+                                         model_manager=self.model_manager, **kwargs)
         return self._trainer
 
     def cleanup(self) -> None:

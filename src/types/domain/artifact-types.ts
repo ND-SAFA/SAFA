@@ -5,8 +5,7 @@ export interface ArtifactTypeSchema {
   /**
    * The UUID for specific artifact type.
    */
-  typeId?: string;
-
+  typeId: string;
   /**
    * The name of this type of artifacts.
    */

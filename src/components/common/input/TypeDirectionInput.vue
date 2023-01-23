@@ -1,7 +1,7 @@
 <template>
   <div>
     <span class="mt-1">
-      <typography bold color="primary" :value="entry.label" />
+      <typography bold color="primary" :value="entry.name" />
       <typography secondary value="Traces To:" />
     </span>
     <v-chip-group column>
@@ -23,7 +23,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { LabelledTraceDirectionSchema } from "@/types";
+import { TimArtifactLevelSchema } from "@/types";
 import { projectStore, sessionStore, typeOptionsStore } from "@/hooks";
 import { handleRemoveDirection } from "@/api";
 import { Typography } from "@/components/common/display";
@@ -35,7 +35,7 @@ export default Vue.extend({
   name: "TypeDirectionInput",
   components: { Typography },
   props: {
-    entry: Object as PropType<LabelledTraceDirectionSchema>,
+    entry: Object as PropType<TimArtifactLevelSchema>,
   },
   computed: {
     /**
@@ -59,10 +59,7 @@ export default Vue.extend({
      * @param entry - The type to update.
      * @param removedType - The type to remove.
      */
-    handleDeleteDirection(
-      entry: LabelledTraceDirectionSchema,
-      removedType: string
-    ) {
+    handleDeleteDirection(entry: TimArtifactLevelSchema, removedType: string) {
       handleRemoveDirection(entry, removedType);
     },
   },

@@ -5,16 +5,13 @@ import {
   ArtifactSchema,
   ArtifactTypeDirections,
   ArtifactTypeSchema,
-  LabelledTraceDirectionSchema,
   ProjectSchema,
   SafetyCaseType,
   TimArtifactLevelSchema,
   TimTraceMatrixSchema,
-  TraceDirectionSchema,
 } from "@/types";
 import {
   allTypeIcons,
-  createDefaultTypeIcons,
   createTIM,
   defaultTypeIcon,
   isLinkAllowedByType,
@@ -31,29 +28,30 @@ import projectStore from "@/hooks/project/useProject";
 export const useTypeOptions = defineStore("typeOptions", {
   state: () => ({
     /**
-     * A mapping of the allowed directions of links between artifacts.
-     */
-    artifactTypeDirections: {} as ArtifactTypeDirections,
-    /**
      * A list of all artifact types.
      */
     allArtifactTypes: [] as ArtifactTypeSchema[],
     /**
-     * A mapping of the icons for each artifact type.
+     * Internal details stored for each artifact type and type matrix.
      */
-    artifactTypeIcons: createDefaultTypeIcons([]),
     tim: createTIM(),
   }),
   getters: {
+    /**
+     * @return All levels of artifacts.
+     */
+    artifactLevels(): TimArtifactLevelSchema[] {
+      return Object.values(this.tim.artifacts);
+    },
     /**
      * @returns all types of artifacts.
      */
     artifactTypes(): string[] {
       const safetyCaseTypes = Object.values(SafetyCaseType) as string[];
 
-      return Object.keys(this.artifactTypeDirections).filter(
-        (type) => !safetyCaseTypes.includes(type)
-      );
+      return Object.values(this.tim.artifacts)
+        .map(({ name }) => name)
+        .filter((name) => !safetyCaseTypes.includes(name));
     },
   },
   actions: {
@@ -63,19 +61,36 @@ export const useTypeOptions = defineStore("typeOptions", {
      * @param project - The project to load.
      */
     initializeProject(project: ProjectSchema): void {
-      this.artifactTypeDirections = {};
-      this.initializeTypeIcons(project.artifactTypes);
       this.tim = createTIM(project);
+      this.allArtifactTypes = project.artifactTypes;
+      this.initializeTypeIcons(project.artifactTypes);
     },
     /**
-     * Changes what directions of trace links between artifacts are allowed.
+     * Initializes the icons for artifact types.
      *
      * @param allArtifactTypes - The artifact types to set.
      */
     initializeTypeIcons(allArtifactTypes: ArtifactTypeSchema[]): void {
-      this.$patch({
-        artifactTypeIcons: createDefaultTypeIcons(allArtifactTypes),
-        allArtifactTypes,
+      allArtifactTypes.forEach((artifactType) => {
+        const icon = artifactType.icon.replace("mdi-help", defaultTypeIcon);
+        this.tim.artifacts[artifactType.name] = {
+          ...this.tim.artifacts[artifactType.name],
+          icon,
+          iconIndex: allTypeIcons.indexOf(icon),
+        };
+      });
+    },
+    /**
+     * Changes what directions of trace links between artifacts are allowed.
+     *
+     * @param directions - The artifact types to set.
+     */
+    initializeTypeDirections(directions: ArtifactTypeDirections): void {
+      Object.entries(directions).forEach(([type, allowedTypes]) => {
+        this.tim.artifacts[type] = {
+          ...this.tim.artifacts[type],
+          allowedTypes,
+        };
       });
     },
     /**
@@ -84,10 +99,10 @@ export const useTypeOptions = defineStore("typeOptions", {
      * @param type - The type to update.
      * @param allowedTypes - The allowed types to set.
      */
-    updateLinkDirections({ type, allowedTypes }: TraceDirectionSchema): void {
-      this.artifactTypeDirections = {
-        ...this.artifactTypeDirections,
-        [type]: allowedTypes,
+    updateLinkDirections({ name, allowedTypes }: TimArtifactLevelSchema): void {
+      this.tim.artifacts[name] = {
+        ...this.tim.artifacts[name],
+        allowedTypes,
       };
     },
     /**
@@ -96,10 +111,11 @@ export const useTypeOptions = defineStore("typeOptions", {
      * @param type - The type to update.
      * @param icon - The icon to set.
      */
-    updateArtifactIcon({ type, icon }: LabelledTraceDirectionSchema): void {
-      this.artifactTypeIcons = {
-        ...this.artifactTypeIcons,
-        [type]: icon,
+    updateArtifactIcon({ name, icon }: TimArtifactLevelSchema): void {
+      this.tim.artifacts[name] = {
+        ...this.tim.artifacts[name],
+        icon,
+        iconIndex: allTypeIcons.indexOf(icon),
       };
     },
     /**
@@ -108,13 +124,13 @@ export const useTypeOptions = defineStore("typeOptions", {
      * @param artifactTypes - The artifact types to add.
      */
     addOrUpdateArtifactTypes(artifactTypes: ArtifactTypeSchema[]): void {
-      const ids = artifactTypes.map(({ typeId }) => typeId);
+      const ids = artifactTypes.map(({ name }) => name);
       const allArtifactTypes = [
-        ...removeMatches(this.allArtifactTypes, "typeId", ids),
+        ...removeMatches(this.allArtifactTypes, "name", ids),
         ...artifactTypes,
       ];
 
-      this.initializeTypeIcons(allArtifactTypes);
+      this.initializeTypeIcons(artifactTypes);
       projectStore.updateProject({ artifactTypes: allArtifactTypes });
     },
     /**
@@ -124,18 +140,13 @@ export const useTypeOptions = defineStore("typeOptions", {
      */
     addTypesFromArtifacts(newArtifacts: ArtifactSchema[]): void {
       newArtifacts.forEach(({ type }) => {
-        if (this.artifactTypeDirections[type]) return;
+        if (this.tim.artifacts[type]) return;
 
-        this.$patch({
-          artifactTypeIcons: {
-            ...this.artifactTypeIcons,
-            [type]: defaultTypeIcon,
-          },
-          artifactTypeDirections: {
-            ...this.artifactTypeDirections,
-            [type]: [],
-          },
-        });
+        this.tim.artifacts[type] = {
+          ...this.tim.artifacts[type],
+          icon: defaultTypeIcon,
+          allowedTypes: [],
+        };
       });
     },
     /**
@@ -150,19 +161,14 @@ export const useTypeOptions = defineStore("typeOptions", {
         removedTypeIds
       );
       const names = preservedTypes.map(({ name }) => name);
-      const artifactTypeIcons = preserveObjectKeys(
-        this.artifactTypeIcons,
-        names
-      );
-      const artifactTypeDirections = preserveObjectKeys(
-        this.artifactTypeDirections,
-        names
-      );
+      const preservedLevels = preserveObjectKeys(this.tim.artifacts, names);
 
-      this.$patch((state) => {
-        state.allArtifactTypes = preservedTypes;
-        state.artifactTypeIcons = artifactTypeIcons;
-        state.artifactTypeDirections = artifactTypeDirections;
+      this.$patch({
+        allArtifactTypes: preservedTypes,
+        tim: {
+          ...this.tim,
+          artifacts: preservedLevels,
+        },
       });
       projectStore.updateProject({ artifactTypes: preservedTypes });
     },
@@ -177,7 +183,7 @@ export const useTypeOptions = defineStore("typeOptions", {
       source: ArtifactSchema | ArtifactCytoElementData,
       target: ArtifactSchema | ArtifactCytoElementData
     ): boolean {
-      return isLinkAllowedByType(source, target, this.artifactTypeDirections);
+      return isLinkAllowedByType(source, target, this.tim);
     },
     /**
      * Returns the display name for the given type.
@@ -186,10 +192,7 @@ export const useTypeOptions = defineStore("typeOptions", {
      * @return The artifact type icon id.
      */
     getArtifactTypeDisplay(type: string): string {
-      return (
-        this.allArtifactTypes.find(({ typeId }) => typeId === type)?.name ||
-        type
-      );
+      return this.tim.artifacts[type].name;
     },
     /**
      * Finds the icon id for the given artifact type.
@@ -198,25 +201,7 @@ export const useTypeOptions = defineStore("typeOptions", {
      * @return The artifact type icon id.
      */
     getArtifactTypeIcon(type: string): string {
-      return this.artifactTypeIcons[type] || this.artifactTypeIcons.default;
-    },
-    /**
-     * Generates labeled artifact type directions.
-     */
-    typeDirections(): LabelledTraceDirectionSchema[] {
-      return Object.entries(this.artifactTypeDirections).map(
-        ([type, allowedTypes]) => {
-          const icon = this.getArtifactTypeIcon(type);
-
-          return {
-            type,
-            allowedTypes,
-            label: type,
-            icon,
-            iconIndex: allTypeIcons.indexOf(icon),
-          };
-        }
-      );
+      return this.tim.artifacts[type].icon;
     },
     /**
      * Finds the artifact level info for an artifact type.
@@ -225,9 +210,7 @@ export const useTypeOptions = defineStore("typeOptions", {
      * @return The artifact level, if one exists.
      */
     getArtifactLevel(type: string): TimArtifactLevelSchema | undefined {
-      return this.tim.artifacts.find(
-        ({ artifactType }) => artifactType === type
-      );
+      return this.tim.artifacts[type];
     },
     /**
      * Finds the artifact level info for an artifact type.

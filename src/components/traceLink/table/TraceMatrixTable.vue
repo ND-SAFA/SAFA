@@ -160,7 +160,7 @@ export default Vue.extend({
      * @param item - The artifact to view.
      */
     handleView(item: FlatArtifact) {
-      if (selectionStore.selectedArtifactId === item.id) {
+      if (selectionStore.selectedArtifact?.id === item.id) {
         this.selected = [];
       } else {
         this.selected = [item];

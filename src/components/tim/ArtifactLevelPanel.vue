@@ -1,7 +1,12 @@
 <template>
   <div v-if="isOpen">
+    <flex-box t="2">
+      <text-button text variant="artifact" @click="handleViewLevel">
+        View In Tree
+      </text-button>
+    </flex-box>
     <panel-card class="mt-2">
-      <attribute-chip artifact-type :value="artifactType" />
+      <attribute-chip artifact-type :value="artifactLevel.name" />
       <v-divider class="mt-1" />
       <typography variant="caption" value="Details" />
       <typography el="p" :value="artifactCount" />
@@ -9,22 +14,24 @@
     <panel-card class="mt-2">
       <typography variant="subtitle" value="Type Options" />
       <v-divider class="my-1" />
-      <type-direction-input v-if="typeDirection" :entry="typeDirection" />
-      <type-icon-input v-if="typeDirection" :entry="typeDirection" />
+      <type-direction-input v-if="artifactLevel" :entry="artifactLevel" />
+      <type-icon-input v-if="artifactLevel" :entry="artifactLevel" />
     </panel-card>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { LabelledTraceDirectionSchema } from "@/types";
-import { appStore, selectionStore, typeOptionsStore } from "@/hooks";
+import { TimArtifactLevelSchema } from "@/types";
+import { appStore, layoutStore, selectionStore } from "@/hooks";
 import {
   PanelCard,
   AttributeChip,
   Typography,
   TypeDirectionInput,
   TypeIconInput,
+  TextButton,
+  FlexBox,
 } from "@/components/common";
 
 /**
@@ -33,6 +40,8 @@ import {
 export default Vue.extend({
   name: "ArtifactLevelPanel",
   components: {
+    TextButton,
+    FlexBox,
     PanelCard,
     AttributeChip,
     Typography,
@@ -47,26 +56,28 @@ export default Vue.extend({
       return appStore.isDetailsPanelOpen === "displayArtifactLevel";
     },
     /**
-     * @return The selected artifact type.
-     */
-    artifactType(): string {
-      return selectionStore.selectedArtifactType;
-    },
-    /**
      * @return The selected trace matrix.
      */
-    typeDirection(): LabelledTraceDirectionSchema | undefined {
-      return typeOptionsStore
-        .typeDirections()
-        .find(({ type }) => type === this.artifactType);
+    artifactLevel(): TimArtifactLevelSchema | undefined {
+      return selectionStore.selectedArtifactLevel;
     },
     /**
      * @return The number of artifacts of the selected type.
      */
     artifactCount(): string {
-      const count = selectionStore.selectedArtifactLevel?.count || 0;
+      const count = this.artifactLevel?.count || 0;
 
       return count === 1 ? "1 Artifact" : `${count} Artifacts`;
+    },
+  },
+  methods: {
+    /**
+     * Switches to tree view and highlights this type level.
+     */
+    handleViewLevel(): void {
+      if (!this.artifactLevel) return;
+
+      layoutStore.viewTreeTypes([this.artifactLevel.name]);
     },
   },
 });

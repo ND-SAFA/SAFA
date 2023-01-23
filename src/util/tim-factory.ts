@@ -1,4 +1,5 @@
 import { ApprovalType, ProjectSchema, TimSchema, TraceType } from "@/types";
+import { defaultTypeIcon } from "@/util/icons";
 
 /**
  * @return A project TIM structure initialized to the given values.
@@ -36,10 +37,20 @@ export function createTIM(project?: ProjectSchema): TimSchema {
   );
 
   return {
-    artifacts: Object.entries(artifactCounts).map(([artifactType, count]) => ({
-      artifactType,
-      count,
-    })),
+    artifacts: Object.entries(artifactCounts)
+      .map(([artifactType, count]) => ({
+        [artifactType]: {
+          typeId:
+            project?.artifactTypes.find(({ name }) => name === artifactType)
+              ?.typeId || artifactType,
+          name: artifactType,
+          count,
+          icon: defaultTypeIcon,
+          allowedTypes: [],
+          iconIndex: 0,
+        },
+      }))
+      .reduce((acc, cur) => ({ ...acc, ...cur }), {}),
     traces: Object.entries(traceCounts).map(([sourceAndTargetType, count]) => ({
       sourceType: sourceAndTargetType.split(delimiter)[0],
       targetType: sourceAndTargetType.split(delimiter)[1],

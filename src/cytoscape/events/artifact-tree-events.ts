@@ -33,7 +33,7 @@ export const ArtifactTreeCytoEvents: CytoEventHandlers = {
         .layout(layoutStore.layoutOptions)
         .run();
 
-      if (artifact.id === selectionStore.selectedArtifactId) {
+      if (artifact.id === selectionStore.selectedArtifact?.id) {
         selectionStore.selectArtifact(artifact.id);
       }
     },
@@ -52,7 +52,7 @@ export const ArtifactTreeCytoEvents: CytoEventHandlers = {
         )
           return;
 
-        selectionStore.clearSelections();
+        selectionStore.clearSelections(true);
       }
     },
   },

@@ -111,38 +111,6 @@ export interface SubtreeLinkSchema extends TraceLinkSchema {
 }
 
 /**
- * The direction of trace links allowed by an artifact type.
- */
-export interface TraceDirectionSchema {
-  /**
-   * The name of source the artifact type.
-   */
-  type: string;
-  /**
-   * The names of the allowed target types.
-   */
-  allowedTypes: string[];
-}
-
-/**
- * The direction of trace links allowed by an artifact type, with a label.
- */
-export interface LabelledTraceDirectionSchema extends TraceDirectionSchema {
-  /**
-   * The label to present an artifact direction.
-   */
-  label: string;
-  /**
-   * The icon representing this artifact type.
-   */
-  icon: string;
-  /**
-   * The index of the icon representing this artifact type.
-   */
-  iconIndex: number;
-}
-
-/**
  * Represents links generated for a project.
  */
 export interface GeneratedLinksSchema {

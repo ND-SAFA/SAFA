@@ -1,5 +1,10 @@
 <template>
   <div v-if="isOpen">
+    <flex-box t="2">
+      <text-button text variant="artifact" @click="handleViewLevel">
+        View In Tree
+      </text-button>
+    </flex-box>
     <panel-card class="mt-2">
       <flex-box wrap>
         <attribute-chip artifact-type :value="sourceType" />
@@ -20,12 +25,13 @@
 <script lang="ts">
 import Vue from "vue";
 import { TimTraceMatrixSchema } from "@/types";
-import { appStore, selectionStore } from "@/hooks";
+import { appStore, layoutStore, selectionStore } from "@/hooks";
 import {
   PanelCard,
   AttributeChip,
   Typography,
   FlexBox,
+  TextButton,
 } from "@/components/common";
 
 /**
@@ -33,7 +39,13 @@ import {
  */
 export default Vue.extend({
   name: "TraceMatrixPanel",
-  components: { FlexBox, PanelCard, AttributeChip, Typography },
+  components: {
+    FlexBox,
+    PanelCard,
+    AttributeChip,
+    Typography,
+    TextButton,
+  },
   computed: {
     /**
      * @return Whether this panel is open.
@@ -82,6 +94,19 @@ export default Vue.extend({
       const count = this.traceMatrix?.approvedCount || 0;
 
       return count === 1 ? "1 Link" : `${count} Links`;
+    },
+  },
+  methods: {
+    /**
+     * Switches to tree view and highlights this type matrix.
+     */
+    handleViewLevel(): void {
+      if (!this.traceMatrix) return;
+
+      layoutStore.viewTreeTypes([
+        this.traceMatrix.sourceType,
+        this.traceMatrix.targetType,
+      ]);
     },
   },
 });

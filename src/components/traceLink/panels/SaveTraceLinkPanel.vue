@@ -21,7 +21,7 @@
           <typography value="Allowed Trace Directions" />
         </v-expansion-panel-header>
         <v-expansion-panel-content>
-          <div v-for="entry in typeDirections" :key="entry.label">
+          <div v-for="entry in artifactLevels" :key="entry.typeId">
             <type-direction-input :entry="entry" />
           </div>
         </v-expansion-panel-content>
@@ -45,7 +45,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { ArtifactSchema, LabelledTraceDirectionSchema } from "@/types";
+import { ArtifactSchema, TimArtifactLevelSchema } from "@/types";
 import { appStore, artifactStore, traceStore, typeOptionsStore } from "@/hooks";
 import { handleCreateLink } from "@/api";
 import {
@@ -115,8 +115,8 @@ export default Vue.extend({
     /**
      * @return The current project's artifact types.
      */
-    typeDirections(): LabelledTraceDirectionSchema[] {
-      return typeOptionsStore.typeDirections();
+    artifactLevels(): TimArtifactLevelSchema[] {
+      return typeOptionsStore.artifactLevels;
     },
   },
   methods: {

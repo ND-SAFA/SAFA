@@ -1,7 +1,5 @@
 import {
   ArtifactSchema,
-  ArtifactTypeIcons,
-  ArtifactTypeSchema,
   Commit,
   ConfirmationType,
   ConfirmDialogueMessage,
@@ -23,7 +21,6 @@ import {
   AttributeType,
   AttributeLayoutSchema,
 } from "@/types";
-import { defaultTypeIcon } from "@/util/icons";
 
 /**
  * @return An empty snackbar message.
@@ -204,19 +201,6 @@ export function createCommit(version: VersionSchema): Commit {
       modified: [],
     },
   };
-}
-
-/**
- * @returns A record mapping the lowercase artifact type name to the corresponding default icon.
- */
-export function createDefaultTypeIcons(
-  artifactTypes: ArtifactTypeSchema[] = []
-): ArtifactTypeIcons {
-  return artifactTypes
-    .map((t) => ({ [t.name]: t.icon.replace("mdi-help", defaultTypeIcon) }))
-    .reduce((acc, cur) => ({ ...acc, ...cur }), {
-      default: defaultTypeIcon,
-    });
 }
 
 /**

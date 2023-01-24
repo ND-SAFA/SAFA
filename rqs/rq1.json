@@ -34,7 +34,7 @@
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "STRUCTURE",
-                "project_path": "[DATA_PATH]/lhp/experiment/lhp/heating"
+                "project_path": "[DATA_PATH]/cm1"
               }
             },
             "val_dataset_creator": {

@@ -15,10 +15,10 @@
             }
           },
           "model_manager": {
-            "model_path": "hf-internal-testing/tiny-random-bert"
+            "model_path": "roberta-base"
           },
           "trainer_args": {
-            "output_dir": "[OUTPUT_PATH]/rq1/models",
+            "output_dir": "[OUTPUT_PATH]/rq2/models",
             "num_train_epochs": 5,
             "per_device_train_batch_size": 4,
             "per_device_eval_batch_size": 4,
@@ -36,12 +36,16 @@
               "filter_unlinked_artifacts": true,
               "project_reader": {
                 "object_type": "STRUCTURE",
-                "project_path": "[DATA_PATH]/lhp/experiment/lhp/heating"
+                "project_path": "[DATA_PATH]/cm1"
               }
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",
-              "val_percentage": 0.2
+              "val_percentage": 0.25
+            },
+            "eval_dataset_creator": {
+              "object_type": "SPLIT",
+              "val_percentage": 0.25
             },
             "augmenter": {
               "steps": [
@@ -55,5 +59,5 @@
       ]
     }
   ],
-  "output_dir": "[OUTPUT_PATH]/rq1/jobs"
+  "output_dir": "[OUTPUT_PATH]/rq2/jobs"
 }

@@ -14,6 +14,7 @@ from config.override import overrides
 from data.datasets.data_key import DataKey
 from data.datasets.dataset_role import DatasetRole
 from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
+from data.samplers.balanced_batch_sampler import BalancedBatchSampler
 from models.model_manager import ModelManager
 from train.base_trainer import BaseTrainer
 from train.save_strategy.save_strategy_stage import SaveStrategyStage
@@ -29,6 +30,7 @@ class TraceTrainer(BaseTrainer):
     """
     BEST_MODEL_NAME = "best"
     CURRENT_MODEL_NAME = "current"
+    USE_BALANCED_BATCHES = True
 
     def __init__(self, trainer_args: TrainerArgs, model_manager: ModelManager, trainer_dataset_manager: TrainerDatasetManager,
                  **kwargs):
@@ -52,12 +54,13 @@ class TraceTrainer(BaseTrainer):
             self.model = AutoModelForSequenceClassification.from_pretrained(best_model_path)
         return trace_train_output
 
-    def create_or_load_state(self, model: PreTrainedModel, data_loader: DataLoader,
-                             resume_from_checkpoint: Optional[str] = None) -> Tuple[
-        PreTrainedModel, Optimizer, _LRScheduler, DataLoader]:
+    def create_or_load_state(self, model: PreTrainedModel, data_loader: DataLoader, resume_from_checkpoint: Optional[str] = None)\
+            -> Tuple[PreTrainedModel, Optimizer, _LRScheduler, DataLoader]:
         """
         If checkpoint given, accelerate entities are instantiated with their previous state. Otherwise, they are instantiated with new
         states.
+        :param model: The model to use to prepare accelerator
+        :param data_loader: The data loader to use to prepare accelerator
         :param resume_from_checkpoint: Path to previous checkpoint.
         :type resume_from_checkpoint:
         :return: Instantiated model, optimizer, scheduler, and train data loader.
@@ -143,8 +146,8 @@ class TraceTrainer(BaseTrainer):
         self.optimizer = self.trainer_args.optimizer_constructor(model.parameters())
         self.lr_scheduler = self.trainer_args.scheduler_constructor(self.optimizer)
 
-    def _prepare_accelerator(self, model: PreTrainedModel, data_loader: DataLoader) -> Tuple[
-        PreTrainedModel, Optimizer, _LRScheduler, DataLoader]:
+    def _prepare_accelerator(self, model: PreTrainedModel, data_loader: DataLoader) \
+            -> Tuple[PreTrainedModel, Optimizer, _LRScheduler, DataLoader]:
         """
         Prepares the model, optimizer, scheduler and data loader for distributed training.
         :param model: The model being trained.
@@ -158,6 +161,16 @@ class TraceTrainer(BaseTrainer):
                                         self.optimizer,
                                         self.lr_scheduler,
                                         data_loader)
+
+    @overrides(Trainer)
+    def _get_train_sampler(self) -> Optional[torch.utils.data.Sampler]:
+        """
+        Gets the data sampler used for training
+        :return: the train sampler
+        """
+        if self.USE_BALANCED_BATCHES and self.train_dataset is not None:
+            return BalancedBatchSampler(data_source=self.train_dataset, batch_size=self._train_batch_size)
+        return super()._get_train_sampler()
 
     def _inner_custom_training_loop(self, batch_size: int = None, accelerator: Accelerator = None, device: torch.device = None,
                                     resume_from_checkpoint: Optional[str] = None, **kwargs) -> TraceTrainOutput:

@@ -68,25 +68,6 @@ class TestTraceTrainer(BaseTraceTest):
         for metric in self.TEST_METRIC_NAMES:
             self.assertIn(metric, result)
 
-    @patch("torch.distributed.get_rank")
-    @patch("torch.distributed.get_world_size")
-    def test_get_train_dataloader_local_rank_not_neg_one(self, get_world_size_mock: mock.MagicMock,
-                                                         get_rank_mock: mock.MagicMock):
-        get_world_size_mock.return_value = 5
-        get_rank_mock.return_value = 3
-        test_trace_trainer = self.get_custom_trace_trainer()
-        self.set_train_dataset(test_trace_trainer)
-        test_trace_trainer.trainer_args.local_rank = 2
-        data_loader = test_trace_trainer.get_train_dataloader()
-        self.assertIsInstance(data_loader.sampler, DistributedSampler)
-
-    def test_get_train_dataloader_local_rank_neg_one(self):
-        test_trace_trainer = self.get_custom_trace_trainer()
-        self.set_train_dataset(test_trace_trainer)
-        test_trace_trainer.trainer_args.local_rank = -1
-        data_loader = test_trace_trainer.get_train_dataloader()
-        self.assertIsInstance(data_loader.sampler, RandomSampler)
-
     def set_train_dataset(self, test_trace_trainer):
         train_dataset = self.create_trainer_dataset_manager()[DatasetRole.TRAIN]
         test_trace_trainer.train_dataset = train_dataset

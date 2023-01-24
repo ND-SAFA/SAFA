@@ -30,7 +30,7 @@ mock==5.0.1
 multidict==6.0.4
 multiprocess==0.70.14
 nltk==3.8.1
-numpy==1.24.1
+numpy==1.21.6
 packaging==23.0
 pandas==1.5.3
 psutil==5.9.4

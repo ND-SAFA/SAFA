@@ -28,7 +28,7 @@
               "filter_unlinked_artifacts": true,
               "project_reader": {
                 "object_type": "STRUCTURE",
-                "project_path": "[DATA_PATH]/software-data/cm1"
+                "project_path": "[DATA_PATH]/cm1"
               }
             },
             "val_dataset_creator": {

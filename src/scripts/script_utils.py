@@ -1,5 +1,6 @@
 import os
-from typing import Callable, Dict, List
+import traceback
+from typing import Callable, Dict, List, Union
 
 from util.file_util import FileUtil
 
@@ -37,40 +38,65 @@ def filter_entries(entry_dict: Dict, filter: Callable[[str], bool] = lambda s: s
     return {k: v for k, v in entry_dict.items() if filter(k)}
 
 
-def ls_filter(path: str, f: Callable[[str], bool] = None, ignore: List[str] = None):
+def ls_filter(path: str, f: Callable[[str], bool] = None, ignore: List[str] = None, add_base: bool = False):
     if f is None:
         f = lambda s: s
     if ignore is None:
         ignore = []
-    return list(filter(lambda p: f(p) and p not in ignore, os.listdir(path)))
+    results = list(filter(lambda p: f(p) and p not in ignore, os.listdir(path)))
+    if add_base:
+        return [os.path.join(path, r) for r in results]
+    else:
+        return results
 
 
-def ls_jobs(path: str):
-    return ls_filter(path, f=lambda p: len(p.split("-")) == 5)
+def ls_jobs(path: str, **kwargs):
+    return ls_filter(path, f=lambda p: len(p.split("-")) == 5, **kwargs)
 
 
-def get_dict_path(data: Dict, instructions: List[str]):
+def get_dict_path(data: Union[Dict, List], instructions: List[Union[str, List[str]]]) -> List[Dict]:
     if len(instructions) == 0:
-        return data
+        return [data]
     current_key = instructions[0]
     next_keys = instructions[1:]
+    if isinstance(data, list):  # following paths are per element
+        items: List = data
+        entries: List[Dict] = []
+        for item in items:
+            for result in get_dict_path(item[current_key], next_keys):
+                entries.append(result)
+        return entries
+    if isinstance(current_key, list):  # many keys = extract values into single entry
+        agg = {k: data[k] for k in current_key if k in data}
+        return [agg]
+    if current_key not in data:
+        raise ValueError(f"Data does not contain key:{current_key} {data.keys()}")
     return get_dict_path(data[current_key], next_keys)
 
 
 def extract_info(data: Dict, copy_paths: List[List[str]], ignore=None, log=False):
     if ignore is None:
         ignore = []
-    result = {}
+    entries = []
+    current = {}
     for path in copy_paths:
         try:
             value = get_dict_path(data, path)
             if isinstance(value, dict):
                 filter_values = {k: v for k, v in value.items() if k not in ignore}
-                result = {**result, **filter_values}
+                current = {**current, **filter_values}
+            elif isinstance(value, list):
+                if len(value) == 1:
+                    current = {**current, **{k: v for k, v in value[0].items() if k not in ignore}}
+                else:
+                    for i, v in enumerate(value):
+                        entry = [{**current, **v, "epoch": i + 1}]
+                        entries.append(entry)
             else:
-                result = {**result, path[-1]: value}
+                current = {**current, path[-1]: value}
         except Exception as e:
+            print(traceback.format_exc())
             if log:
                 print(e)
 
-    return result
+    return entries

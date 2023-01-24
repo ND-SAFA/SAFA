@@ -43,7 +43,7 @@ class TraceMatrix:
             query_metric = metric(query_labels, query_predictions)
             if not np.isnan(query_metric):
                 metric_values.append(query_metric)
-        return sum(metric_values) / len(metric_values)
+        return round(sum(metric_values) / len(metric_values), 2)
 
     def calculate_query_metric_at_k(self, metric: Callable[[List[int], List[float]], float], k: int):
         """

@@ -45,7 +45,7 @@ class PrecisionAtKMetric(AbstractTraceMetric):
         for k in K_METRIC_DEFAULT:
             score = trace_matrix.calculate_query_metric_at_k(precision, k)
             metric_name = self.name.replace("k", str(k))
-            results[metric_name] = score
+            results[metric_name] = round(score, 2)
         return results
 
     def _info(self) -> datasets.MetricInfo:

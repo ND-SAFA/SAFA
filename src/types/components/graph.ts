@@ -204,6 +204,10 @@ export interface TimEdgeCytoElementData extends CytoEdgeData {
    * The number of links between these artifact layers.
    */
   count: number;
+  /**
+   * Whether this edge contains generated links.
+   */
+  generated: boolean;
 }
 
 /**

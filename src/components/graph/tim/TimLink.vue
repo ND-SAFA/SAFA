@@ -25,6 +25,7 @@ export default Vue.extend({
       type: Number,
       required: true,
     },
+    generated: Boolean,
   },
   computed: {
     /**
@@ -42,6 +43,7 @@ export default Vue.extend({
           count: this.count,
           label: this.count === 1 ? `1 Link` : `${this.count} Links`,
           dark: this.$vuetify.theme.dark,
+          generated: this.generated,
         },
         classes: this.sourceType === this.targetType ? ["loop"] : [],
       };

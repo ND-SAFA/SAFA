@@ -38,6 +38,7 @@
         :count="matrix.count"
         :target-type="matrix.targetType"
         :source-type="matrix.sourceType"
+        :generated="matrix.generatedCount > 0"
       />
     </template>
   </cytoscape-controller>

@@ -21,6 +21,7 @@
           :count="panel.projectFile.traces.length"
           :target-type="panel.projectFile.targetId"
           :source-type="panel.projectFile.sourceId"
+          :generated="panel.projectFile.isGenerated"
         />
       </template>
     </cytoscape-controller>

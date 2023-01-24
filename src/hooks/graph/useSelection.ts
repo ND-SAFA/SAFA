@@ -194,7 +194,7 @@ export const useSelection = defineStore("selection", {
      * @param traceLink - The trace link to select.
      */
     selectTraceLink(traceLink: TraceLinkSchema): void {
-      this.clearSelections();
+      // this.clearSelections();
       this.selectedTraceLinkIds = [traceLink.sourceId, traceLink.targetId];
       this.selectedSubtreeIds = [traceLink.sourceId, traceLink.targetId];
       this.centerOnArtifacts([traceLink.sourceId, traceLink.targetId]);

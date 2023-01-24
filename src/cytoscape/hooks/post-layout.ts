@@ -67,9 +67,12 @@ export const applyCytoEvents: LayoutHook = (
     const eventName: string = cytoEvent.events.join(" ");
     const selector = cytoEvent.selector;
     const handler = (event: EventObject) => cytoEvent.action(cy, event);
+
     if (selector === undefined) {
+      cy.off(eventName);
       cy.on(eventName, handler);
     } else {
+      cy.off(eventName, selector);
       cy.on(eventName, selector, handler);
     }
   }

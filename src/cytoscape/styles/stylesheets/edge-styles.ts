@@ -168,11 +168,18 @@ export const edgeStyles: CytoStyleSheet[] = [
     },
   },
   {
+    selector: `${TIM_EDGE_SELECTOR}[?generated]`,
+    style: {
+      "line-color": EDGE_COLOR.GENERATED,
+      "source-arrow-color": EDGE_COLOR.GENERATED,
+    },
+  },
+  {
     selector: ".loop",
     style: {
       "control-point-step-size": TIM_EDGE_LOOP_STEP_SIZE,
-      "loop-direction": "60deg",
-      "loop-sweep": "-60deg",
+      "loop-direction": "-90deg",
+      "loop-sweep": "40deg",
       "target-endpoint": "outside-to-line",
       "source-endpoint": "outside-to-line",
     },

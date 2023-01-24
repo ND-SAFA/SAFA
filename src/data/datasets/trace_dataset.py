@@ -39,18 +39,16 @@ class TraceDataset(AbstractDataset):
         self.trace_matrix = TraceMatrix(list(self.links.values()), randomize=randomize)
         self.shuffle_link_ids()
 
-    def to_trainer_dataset(self, model_generator: ModelManager, batch_size_to_balance: int = None) -> List[Dict]:
+    def to_trainer_dataset(self, model_generator: ModelManager) -> List[Dict]:
         """
         Converts trace links in data to feature entries used by Huggingface (HF) trainer.
         :param model_generator: The model generator determining architecture and feature function for trace links.
-        :param batch_size_to_balance: The size of the batch. If provided, balances the batches with equal pos and neg links
         :return: A data used by the HF trainer.
         """
         feature_entries = {
             link.id: self._get_feature_entry(link, model_generator.arch_type, model_generator.get_feature)
             for link in self.links.values()}
-        project_links = self.get_ordered_links() if batch_size_to_balance is None \
-            else self.get_links_for_balanced_batches(batch_size_to_balance)
+        project_links = self.get_ordered_links()
         return [feature_entries[link.id] for link in project_links]
 
     def to_dataframe(self) -> pd.DataFrame:
@@ -111,35 +109,6 @@ class TraceDataset(AbstractDataset):
             pos_links, data_entries = self._get_data_entries_for_augmentation()
             augmentation_results = run(data_entries)
             self._create_links_from_augmentation(augmentation_results, pos_links)
-
-    def get_links_for_balanced_batches(self, batch_size: int) -> List[TraceLink]:
-        """
-        Gets links in the order that they are given in the trainer dataset
-        :param batch_size: the size of the batch
-        :return: a list of ordered links
-        """
-        n_links_per_batch, rem_per_batch = divmod(batch_size, 2)
-        links_ids = []
-
-        def add_batch(batch):
-            random.shuffle(batch)
-            links_ids.extend(batch)
-
-        pos_start, neg_start = 0, 0
-        while pos_start < len(self.pos_link_ids):
-            pos_links, pos_start = ListUtil.get_n_items_from_list(self.pos_link_ids, n_items=n_links_per_batch, init_index=pos_start)
-            neg_links, neg_start = ListUtil.get_n_items_from_list(self.neg_link_ids, n_items=len(pos_links), init_index=neg_start)
-            new_batch = pos_links + neg_links
-            if rem_per_batch > 0:
-                if pos_start <= neg_start:
-                    extra_links, pos_start = ListUtil.get_n_items_from_list(self.pos_link_ids, n_items=rem_per_batch,
-                                                                            init_index=pos_start)
-                else:
-                    extra_links, neg_start = ListUtil.get_n_items_from_list(self.neg_link_ids, n_items=rem_per_batch,
-                                                                            init_index=neg_start)
-                new_batch += extra_links
-            add_batch(new_batch)
-        return [self.links[link_id] for link_id in links_ids]
 
     def get_ordered_links(self) -> List[TraceLink]:
         """

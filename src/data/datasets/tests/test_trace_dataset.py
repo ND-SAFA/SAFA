@@ -235,47 +235,11 @@ class TestTraceDataset(BaseTraceTest):
         for feature_name in feature_info_prefix.keys():
             self.assertTrue(feature_name.startswith(prefix))
 
-    def test_get_links_for_balanced_batches(self):
-        dataset = self.get_trace_dataset()
-        batch_sizes = [i for i in range(2, 12)]
-        for batch_size in batch_sizes:
-            result = dataset.get_links_for_balanced_batches(batch_size=batch_size)
-            neg_link_ids = deepcopy(dataset.neg_link_ids)
-            pos_link_ids = deepcopy(dataset.pos_link_ids)
-            selected_link_ids = [link.id for link in result]
-            n_total_pos, n_total_neg = 0, 0
-            n_batch_pos, n_batch_neg = 0, 0
-            for i, link_id in enumerate(selected_link_ids):
-                if i % batch_size == 0:
-                    self.assertLessEqual(abs(n_batch_pos - n_batch_neg), 1)
-                    n_batch_pos, n_batch_neg = 0, 0
-                if link_id in neg_link_ids:
-                    neg_link_ids.remove(link_id)
-                    n_total_neg += 1
-                    n_batch_neg += 1
-                    continue
-                if link_id in pos_link_ids:
-                    pos_link_ids.remove(link_id)
-                    n_total_pos += 1
-                    n_batch_pos += 1
-                    continue
-                self.fail(f'Link {i}/{len(selected_link_ids)} was selected too many times')
-            self.assertEquals(0, len(pos_link_ids))  # use all pos links
-            self.assertLessEqual(abs(n_total_pos - n_total_neg), 1)
-
     @patch.object(ModelManager, "get_tokenizer")
     def test_to_trainer_dataset(self, get_tokenizer_mock: mock.MagicMock):
         get_tokenizer_mock.return_value = self.get_test_tokenizer()
         train_dataset = self.get_trace_dataset()
-        batch_size = 8
         model_generator = ModelManager(**self.MODEL_MANAGER_PARAMS)
-        trainer_dataset = train_dataset.to_trainer_dataset(model_generator, batch_size_to_balance=batch_size)
+        trainer_dataset = train_dataset.to_trainer_dataset(model_generator)
         self.assertTrue(isinstance(trainer_dataset[0], dict))
-        self.assertEquals(len(train_dataset.pos_link_ids) * 2, len(trainer_dataset))
-        labels = [link[DataKey.LABEL_KEY] for link in trainer_dataset]
-        start, end = 0, batch_size
-        while end < len(labels):
-            batch = labels[start:end]
-            self.assertEquals(sum(batch), len(batch) / 2)
-            start = end
-            end = end + batch_size
+        self.assertEquals(len(train_dataset), len(trainer_dataset))

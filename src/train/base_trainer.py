@@ -48,8 +48,7 @@ class BaseTrainer(Trainer, BaseObject):
         :return: a dictionary containing the results
         """
         self.model = self.model_manager.get_model()
-        self.train_dataset = self.trainer_dataset_manager[DatasetRole.TRAIN].to_trainer_dataset(self.model_manager,
-                                                                                                self.trainer_args.train_batch_size)
+        self.train_dataset = self.trainer_dataset_manager[DatasetRole.TRAIN].to_trainer_dataset(self.model_manager)
         train_output = self.train(resume_from_checkpoint=checkpoint)
         return TraceTrainOutput(train_output=train_output)
 

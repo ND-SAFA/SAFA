@@ -5,30 +5,22 @@
         {
           "object_type": "TRAIN",
           "job_args": {
-            "random_seed": {
-              "*": [
-                197,
-                914,
-                209,
-                330
-              ]
-            }
+            "random_seed": 914
           },
           "model_manager": {
             "model_path": "roberta-base"
           },
           "trainer_args": {
-            "output_dir": "[OUTPUT_PATH]/rq2/models",
+            "output_dir": "[OUTPUT_PATH]/rq1/models",
             "num_train_epochs": 5,
             "per_device_train_batch_size": 4,
             "per_device_eval_batch_size": 4,
-            "learning_rate": 5e-6,
+            "learning_rate": 1e-05,
             "metrics": [
               "map",
-              "map_at_k",
-              "f",
-              "precision"
-            ]
+              "f"
+            ],
+            "skip_save": true
           },
           "trainer_dataset_manager": {
             "train_dataset_creator": {
@@ -36,20 +28,22 @@
               "filter_unlinked_artifacts": true,
               "project_reader": {
                 "object_type": "STRUCTURE",
-                "project_path": {
-                  "*": [
-                    "[DATA_PATH]/cm1",
-                    "[DATA_PATH]/cchit"
-                  ]
-                }
+                "project_path": "[DATA_PATH]/software-data/cm1"
               }
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",
+              "split_strategy": {
+                "*": [
+                  "RANDOM",
+                  "SOURCE"
+                ]
+              },
               "val_percentage": 0.25
             },
             "eval_dataset_creator": {
               "object_type": "SPLIT",
+              "split_strategy": "RANDOM",
               "val_percentage": 0.25
             },
             "augmenter": {
@@ -64,5 +58,5 @@
       ]
     }
   ],
-  "output_dir": "[OUTPUT_PATH]/rq2/jobs"
+  "output_dir": "[OUTPUT_PATH]/rq1/jobs"
 }

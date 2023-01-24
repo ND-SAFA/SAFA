@@ -54,8 +54,8 @@ if __name__ == "__main__":
             job_output = FileUtil.read_json_file(job_output_path)
             step_entries = extract_info(job_output, COPY_PATHS, IGNORE)
             print(len(step_entries))
-            for step_entry in step_entries:
-                entries.append(step_entry[0])
+            for step_entry_container in step_entries:
+                entries.append(step_entry_container[0])
     entries_df = pd.DataFrame(entries)
     output_path = os.path.join(OUTPUT_DIR, output_file)
     entries_df.to_csv(output_path, index=False)

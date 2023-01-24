@@ -54,7 +54,7 @@ class TraceTrainer(BaseTrainer):
             self.model = AutoModelForSequenceClassification.from_pretrained(best_model_path)
         return trace_train_output
 
-    def create_or_load_state(self, model: PreTrainedModel, data_loader: DataLoader, resume_from_checkpoint: Optional[str] = None)\
+    def create_or_load_state(self, model: PreTrainedModel, data_loader: DataLoader, resume_from_checkpoint: Optional[str] = None) \
             -> Tuple[PreTrainedModel, Optimizer, _LRScheduler, DataLoader]:
         """
         If checkpoint given, accelerate entities are instantiated with their previous state. Otherwise, they are instantiated with new
@@ -80,6 +80,8 @@ class TraceTrainer(BaseTrainer):
         """
         if not output_dir:
             raise ValueError("Expected output_dir to be defined.")
+        if self.trainer_args.skip_save:
+            return
         super().save_model(output_dir=output_dir, _internal_call=_internal_call)
         self.accelerator.save_state(output_dir)
 

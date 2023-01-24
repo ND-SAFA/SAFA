@@ -1,5 +1,6 @@
-import math
 from typing import List
+
+import math
 
 from config.override import overrides
 from data.datasets.splitting.abstract_split_strategy import AbstractSplitStrategy
@@ -23,7 +24,7 @@ class SourceSplitStrategy(AbstractSplitStrategy):
         :param slice_num: Whether to return first or second slice.
         :return: the dataset split
         """
-        links = SourceSplitStrategy.create_random_trace_link_array(trace_dataset)
+        links = SourceSplitStrategy.create_trace_link_array_by_source(trace_dataset)
         labels = [t.get_label() for t in links]
         first_slice_links, second_slice_links = AbstractSplitStrategy.split_data(links, percent_split, labels)
         slice_links = first_slice_links if slice_num == 1 else second_slice_links
@@ -31,7 +32,7 @@ class SourceSplitStrategy(AbstractSplitStrategy):
         return AbstractSplitStrategy.create_dataset_slice(trace_dataset, slice_link_ids)
 
     @staticmethod
-    def create_random_trace_link_array(trace_dataset: TraceDataset, n_sources: int = None, n_links_per_source: int = None) \
+    def create_trace_link_array_by_source(trace_dataset: TraceDataset, n_sources: int = None, n_links_per_source: int = None) \
             -> List[TraceLink]:
         """
         Creates an array of trace links constructed by contiguously placing trace links
@@ -46,7 +47,7 @@ class SourceSplitStrategy(AbstractSplitStrategy):
         n_links_per_source = math.inf if n_links_per_source is None else n_links_per_source
         agg_links = []
         for source_name in source_names[:n_sources]:
-            links = trace_dataset.trace_matrix.query_matrix[source_name].links
-            links_per_query = min(len(links), n_links_per_source)
-            agg_links.extend(links[:links_per_query])
+            source_links = trace_dataset.trace_matrix.query_matrix[source_name].links
+            links_per_query = min(len(source_links), n_links_per_source)
+            agg_links.extend(source_links[:links_per_query])
         return agg_links

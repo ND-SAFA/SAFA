@@ -43,7 +43,7 @@ class MapMetric(AbstractTraceMetric):
         :param kwargs: any other necessary params
         :return: Mean Average Precision@K score.
         """
-        map_score = trace_matrix.calculate_query_metric(average_precision_score)
+        map_score = trace_matrix.calculate_query_metric(average_precision_score, default_value=0)
         ap_score = average_precision_score(references, predictions)
         return {
             self.MAP_KEY: map_score,

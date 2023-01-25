@@ -9,7 +9,7 @@ class BaseSplitTest(BaseTraceTest):
     Responsible for providing assertions for testing data split strategies.
     """
 
-    def assert_split_multiple(self, strategy=SupportedSplitStrategy.RANDOM):
+    def assert_split_multiple(self, strategy=SupportedSplitStrategy.SPLIT_BY_LINK):
         trace_dataset = self.get_trace_dataset()
         n_orig_links = len(trace_dataset)
         percent_splits = [0.3, 0.2]
@@ -31,7 +31,7 @@ class BaseSplitTest(BaseTraceTest):
                 intersection = other_link_ids.intersection(link_ids)
                 self.assertEquals(len(intersection), 0)
 
-    def assert_split(self, strategy=SupportedSplitStrategy.RANDOM):
+    def assert_split(self, strategy=SupportedSplitStrategy.SPLIT_BY_LINK):
         trace_dataset = self.get_trace_dataset()
         splitter = TraceDatasetSplitter(trace_dataset)
         split1, split2 = splitter.split(self.VAlIDATION_PERCENTAGE, strategy=strategy.name)

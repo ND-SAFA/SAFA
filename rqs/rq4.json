@@ -22,6 +22,7 @@
             "skip_save": true
           },
           "trainer_dataset_manager": {
+            "deterministic_id": "cm1_test_rq",
             "train_dataset_creator": {
               "object_type": "TRACE",
               "filter_unlinked_artifacts": {
@@ -37,7 +38,7 @@
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",
-              "split_strategy": "RANDOM",
+              "split_strategy": "SOURCE",
               "val_percentage": 0.25
             },
             "eval_dataset_creator": {

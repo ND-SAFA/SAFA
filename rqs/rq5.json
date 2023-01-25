@@ -5,34 +5,58 @@
         {
           "object_type": "TRAIN",
           "job_args": {
-            "random_seed": 914
+            "random_seed": {
+              "*": [
+                197,
+                914,
+                209,
+                330
+              ]
+            }
           },
           "model_manager": {
-            "model_path": "hf-internal-testing/tiny-random-bert"
+            "model_path": "roberta-base"
           },
           "trainer_args": {
-            "output_dir": "[OUTPUT_PATH]/rq1/models",
-            "num_train_epochs": 5,
-            "per_device_train_batch_size": 4,
-            "per_device_eval_batch_size": 4,
-            "learning_rate": 5e-06,
+            "output_dir": "[OUTPUT_PATH]/rq5/models",
+            "num_train_epochs": 10,
+            "learning_rate": 5e-6,
             "metrics": [
               "map",
-              "f"
+              "map_at_k",
+              "f",
+              "precision"
             ],
-            "skip_save": true
+            "skip_save": true,
+            "use_balanced_batches": {
+              "*": [
+                true,
+                false
+              ]
+            }
           },
           "trainer_dataset_manager": {
             "train_dataset_creator": {
               "object_type": "TRACE",
+              "filter_unlinked_artifacts": {
+                "*": [
+                  true,
+                  false
+                ]
+              },
               "project_reader": {
                 "object_type": "STRUCTURE",
-                "project_path": "[DATA_PATH]/software-data/cm1"
+                "project_path": "[DATA_PATH]/cm1"
               }
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",
-              "split_strategy": "SPLIT_BY_SOURCE",
+              "split_strategy": {
+                "*": [
+                  "SPLIT_BY_SOURCE",
+                  "SPLIT_BY_LINK"
+                ]
+              },
               "val_percentage": 0.25
             },
             "eval_dataset_creator": {
@@ -52,5 +76,5 @@
       ]
     }
   ],
-  "output_dir": "[OUTPUT_PATH]/rq1/jobs"
+  "output_dir": "[OUTPUT_PATH]/rq5/jobs"
 }

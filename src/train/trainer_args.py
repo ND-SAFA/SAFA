@@ -38,6 +38,8 @@ class TrainerArgs(TrainingArguments, BaseObject):
     gradient_accumulation_steps: int = 8
     custom_save_strategy: AbstractSaveStrategy = None
     skip_save: bool = False
+    use_balanced_batches: bool = True
+    per_device_train_batch_size = None
 
     # GAN
     n_hidden_layers_g: int = 1

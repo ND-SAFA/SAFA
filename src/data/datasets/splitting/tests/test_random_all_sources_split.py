@@ -8,6 +8,6 @@ class TestRandomAllSourcesSplit(BaseSplitTest):
     """
 
     def test_split_sizes(self):
-        split_type = SupportedSplitStrategy.SOURCE
+        split_type = SupportedSplitStrategy.SPLIT_BY_SOURCE
         self.assert_split(split_type)
         self.assert_split_multiple(split_type)

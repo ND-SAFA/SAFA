@@ -12,8 +12,8 @@ class SupportedSplitStrategy(Enum):
     Enum of keys enumerating supported trace dataset split methods.
     Note, values are keys instead of classes to avoid circular imports.
     """
-    RANDOM = RandomSplitStrategy
-    SOURCE = SourceSplitStrategy
+    SPLIT_BY_LINK = RandomSplitStrategy
+    SPLIT_BY_SOURCE = SourceSplitStrategy
     COMBINATION = CombinationSplitStrategy
     ALL_SOURCES = AllSourcesSplitStrategy
     ALL_ARTIFACTS = AllArtifactSplitStrategy

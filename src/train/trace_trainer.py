@@ -30,7 +30,6 @@ class TraceTrainer(BaseTrainer):
     """
     BEST_MODEL_NAME = "best"
     CURRENT_MODEL_NAME = "current"
-    USE_BALANCED_BATCHES = True
 
     def __init__(self, trainer_args: TrainerArgs, model_manager: ModelManager, trainer_dataset_manager: TrainerDatasetManager,
                  **kwargs):
@@ -47,7 +46,8 @@ class TraceTrainer(BaseTrainer):
         device = accelerator.device
         self.model = self.model_manager.get_model()
         self.model.to(device)
-        inner_training_loop = find_executable_batch_size(self._inner_custom_training_loop)
+        inner_training_loop = find_executable_batch_size(
+            self._inner_custom_training_loop) if self.trainer_args.per_device_train_batch_size is None else self._inner_custom_training_loop
         trace_train_output = inner_training_loop(resume_from_checkpoint=resume_from_checkpoint, accelerator=accelerator, device=device)
         if self.trainer_args.load_best_model_at_end:
             best_model_path = self.get_output_path(self.BEST_MODEL_NAME)
@@ -170,7 +170,7 @@ class TraceTrainer(BaseTrainer):
         Gets the data sampler used for training
         :return: the train sampler
         """
-        if self.USE_BALANCED_BATCHES and self.train_dataset is not None:
+        if self.trainer_args.use_balanced_batches and self.train_dataset is not None:
             return BalancedBatchSampler(data_source=self.train_dataset, batch_size=self._train_batch_size)
         return super()._get_train_sampler()
 
@@ -184,7 +184,8 @@ class TraceTrainer(BaseTrainer):
         :param kwargs: Any additional arguments. Currently, ignored but necessary for finding optimal batch size.
         :return: The output of the training session.
         """
-
+        if batch_size is None:
+            batch_size = self.args.per_device_train_batch_size
         self._train_batch_size = batch_size
         self.args.per_device_train_batch_size = batch_size
         loss_function = self.trainer_args.loss_function

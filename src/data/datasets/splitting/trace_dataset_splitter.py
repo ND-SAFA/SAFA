@@ -34,7 +34,7 @@ class TraceDatasetSplitter:
          :return: Tuple of trace data for each split specified
          """
         if not strategies or strategies[0] is None:
-            strategies = [SupportedSplitStrategy.RANDOM] * len(percent_splits)
+            strategies = [SupportedSplitStrategy.SPLIT_BY_LINK] * len(percent_splits)
         percent_splits = [1 - sum(percent_splits)] + percent_splits
         return self._split_multiple_helper(percent_splits, splits=[self.trace_dataset], strategies=strategies)
 

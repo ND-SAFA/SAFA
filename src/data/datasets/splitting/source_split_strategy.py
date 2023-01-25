@@ -25,8 +25,7 @@ class SourceSplitStrategy(AbstractSplitStrategy):
         :return: the dataset split
         """
         links = SourceSplitStrategy.create_trace_link_array_by_source(trace_dataset)
-        labels = [t.get_label() for t in links]
-        first_slice_links, second_slice_links = AbstractSplitStrategy.split_data(links, percent_split, labels)
+        first_slice_links, second_slice_links = AbstractSplitStrategy.split_data(links, percent_split, shuffle=False)
         slice_links = first_slice_links if slice_num == 1 else second_slice_links
         slice_link_ids = [t.id for t in slice_links]
         return AbstractSplitStrategy.create_dataset_slice(trace_dataset, slice_link_ids)

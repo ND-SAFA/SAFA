@@ -29,7 +29,8 @@
               "precision"
             ],
             "skip_save": true,
-            "use_balanced_batches": true
+            "use_balanced_batches": true,
+            "gradient_accumulation_steps": 8
           },
           "trainer_dataset_manager": {
             "train_dataset_creator": {

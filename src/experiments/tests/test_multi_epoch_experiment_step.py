@@ -3,7 +3,7 @@ from unittest import mock
 from unittest.mock import patch
 
 from data.datasets.dataset_role import DatasetRole
-from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
+from data.managers.trainer_dataset_manager import TrainerDatasetManager
 from experiments.multi_epoch_experiment_step import MultiEpochExperimentStep
 from experiments.tests.base_experiment_test import BaseExperimentTest
 from jobs.abstract_job import AbstractJob

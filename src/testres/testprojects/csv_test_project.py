@@ -1,8 +1,8 @@
 from typing import Dict, List, Tuple
 
-from data.datasets.creators.readers.abstract_project_reader import AbstractProjectReader
-from data.datasets.creators.readers.csv_project_reader import CsvProjectReader
-from data.datasets.keys.csv_format import CSVKeys
+from data.readers.abstract_project_reader import AbstractProjectReader
+from data.readers.csv_project_reader import CsvProjectReader
+from data.keys.csv_format import CSVKeys
 from testres.paths.project_paths import CSV_PROJECT_PATH
 from testres.test_data_manager import TestDataManager
 from testres.testprojects.abstract_test_project import AbstractTestProject

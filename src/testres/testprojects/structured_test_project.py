@@ -1,7 +1,7 @@
 from typing import Dict, List
 
-from data.datasets.creators.readers.abstract_project_reader import AbstractProjectReader
-from data.datasets.creators.readers.structured_project_reader import StructuredProjectReader
+from data.readers.abstract_project_reader import AbstractProjectReader
+from data.readers.structured_project_reader import StructuredProjectReader
 from testres.paths.project_paths import STRUCTURE_PROJECT_PATH
 from testres.testprojects.abstract_test_project import AbstractTestProject
 from testres.testprojects.entry_creator import EntryCreator, LayerEntry, LayerInstruction

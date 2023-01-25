@@ -1,7 +1,7 @@
 from copy import deepcopy
 from typing import Any, Dict, List, Tuple
 
-from data.datasets.keys.structure_keys import StructuredKeys
+from data.keys.structure_keys import StructuredKeys
 from testres.test_data_manager import TestDataManager
 
 ArtifactInstruction = Tuple[Any, str]

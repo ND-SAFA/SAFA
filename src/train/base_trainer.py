@@ -6,7 +6,7 @@ from transformers.trainer import Trainer
 from transformers.trainer_utils import PredictionOutput
 
 from data.datasets.dataset_role import DatasetRole
-from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
+from data.managers.trainer_dataset_manager import TrainerDatasetManager
 from models.model_manager import ModelManager
 from train.metrics.metrics_manager import MetricsManager
 from train.trace_output.trace_prediction_output import TracePredictionOutput

@@ -10,7 +10,7 @@ from transformers import AutoModel, get_constant_schedule_with_warmup
 
 from config.override import overrides
 from data.datasets.dataset_role import DatasetRole
-from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
+from data.managers.trainer_dataset_manager import TrainerDatasetManager
 from data.datasets.pre_train_dataset import PreTrainDataset
 from data.datasets.trace_dataset import TraceDataset
 from models.gan.discriminator import Discriminator

@@ -47,12 +47,57 @@ class TraceTrainer(BaseTrainer):
         self.model = self.model_manager.get_model()
         self.model.to(device)
         inner_training_loop = find_executable_batch_size(
-            self._inner_custom_training_loop) if self.trainer_args.per_device_train_batch_size is None else self._inner_custom_training_loop
+            self.inner_training_loop) if self.trainer_args.per_device_train_batch_size is None else self.inner_training_loop
         trace_train_output = inner_training_loop(resume_from_checkpoint=resume_from_checkpoint, accelerator=accelerator, device=device)
         if self.trainer_args.load_best_model_at_end:
             best_model_path = self.get_output_path(self.BEST_MODEL_NAME)
             self.model = AutoModelForSequenceClassification.from_pretrained(best_model_path)
         return trace_train_output
+
+    def inner_training_loop(self, batch_size: int = None, accelerator: Accelerator = None, device: torch.device = None,
+                            resume_from_checkpoint: Optional[str] = None, **kwargs) -> TraceTrainOutput:
+        """
+        Trains model for the epochs specified in training arguments.
+        :param batch_size: The batch size of the training step.
+        :param accelerator: The accelerator used to perform distributed training of the model.
+        :param device: The primary device to storage model.
+        :param kwargs: Any additional arguments. Currently, ignored but necessary for finding optimal batch size.
+        :return: The output of the training session.
+        """
+        if batch_size is None:
+            batch_size = self.args.per_device_train_batch_size
+        self._train_batch_size = batch_size
+        self.args.per_device_train_batch_size = batch_size
+        loss_function = self.trainer_args.loss_function
+        self.model.train()
+        model, optimizer, scheduler, train_data_loader = self.create_or_load_state(self.model,
+                                                                                   self.get_train_dataloader(),
+                                                                                   resume_from_checkpoint)
+        global_step = 0
+        training_loss = 0
+        save_strategy = self.trainer_args.custom_save_strategy
+        training_metrics = {}
+
+        for epoch_index in range(self.trainer_args.num_train_epochs):
+            for batch_index, batch in enumerate(tqdm(train_data_loader)):
+                batch = batch.to(device)
+                optimizer.zero_grad()
+
+                labels = batch.pop(DataKey.LABELS_KEY)
+                output: SequenceClassifierOutput = model(**batch)
+                loss = loss_function(output.logits, labels)
+
+                accelerator.backward(loss)
+                optimizer.step()
+                self.on_step(global_step)
+                training_loss += loss.item()
+                global_step += 1
+
+            scheduler.step()
+            self.on_epoch(epoch_index)
+
+        return TraceTrainOutput(global_step=global_step, training_loss=training_loss, metrics=training_metrics,
+                                eval_metrics=save_strategy.stage_evaluations)
 
     def create_or_load_state(self, model: PreTrainedModel, data_loader: DataLoader, resume_from_checkpoint: Optional[str] = None) \
             -> Tuple[PreTrainedModel, Optimizer, _LRScheduler, DataLoader]:
@@ -173,48 +218,3 @@ class TraceTrainer(BaseTrainer):
         if self.trainer_args.use_balanced_batches and self.train_dataset is not None:
             return BalancedBatchSampler(data_source=self.train_dataset, batch_size=self._train_batch_size)
         return super()._get_train_sampler()
-
-    def _inner_custom_training_loop(self, batch_size: int = None, accelerator: Accelerator = None, device: torch.device = None,
-                                    resume_from_checkpoint: Optional[str] = None, **kwargs) -> TraceTrainOutput:
-        """
-        Trains model for the epochs specified in training arguments.
-        :param batch_size: The batch size of the training step.
-        :param accelerator: The accelerator used to perform distributed training of the model.
-        :param device: The primary device to storage model.
-        :param kwargs: Any additional arguments. Currently, ignored but necessary for finding optimal batch size.
-        :return: The output of the training session.
-        """
-        if batch_size is None:
-            batch_size = self.args.per_device_train_batch_size
-        self._train_batch_size = batch_size
-        self.args.per_device_train_batch_size = batch_size
-        loss_function = self.trainer_args.loss_function
-        self.model.train()
-        model, optimizer, scheduler, train_data_loader = self.create_or_load_state(self.model,
-                                                                                   self.get_train_dataloader(),
-                                                                                   resume_from_checkpoint)
-        global_step = 0
-        training_loss = 0
-        save_strategy = self.trainer_args.custom_save_strategy
-        training_metrics = {}
-
-        for epoch_index in range(self.trainer_args.num_train_epochs):
-            for batch_index, batch in enumerate(tqdm(train_data_loader)):
-                batch = batch.to(device)
-                optimizer.zero_grad()
-
-                labels = batch.pop(DataKey.LABELS_KEY)
-                output: SequenceClassifierOutput = model(**batch)
-                loss = loss_function(output.logits, labels)
-
-                accelerator.backward(loss)
-                optimizer.step()
-                self.on_step(global_step)
-                training_loss += loss.item()
-                global_step += 1
-
-            scheduler.step()
-            self.on_epoch(epoch_index)
-
-        return TraceTrainOutput(global_step=global_step, training_loss=training_loss, metrics=training_metrics,
-                                eval_metrics=save_strategy.stage_evaluations)

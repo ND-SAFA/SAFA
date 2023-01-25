@@ -20,7 +20,7 @@ describe("Project Commits", () => {
 
   describe("Project Commit Changes", () => {
     beforeEach(() => {
-      cy.viewport(2048, 1024);
+      cy.viewport(1024, 768);
       cy.dbResetVersions();
 
       cy.visit("/login")
@@ -44,23 +44,18 @@ describe("Project Commits", () => {
 
     describe("I can create a commit to create an artifact", () => {
       it("Creates a commit to create an artifact", () => {
+        const name = "Test Commit Artifact";
+
         // Verify that the undo button is disabled
         cy.getCy(DataCy.navUndoButton).should("have.class", "disable-events");
 
         // Create a New Artifact + Verify it exists
-        cy.createNewArtifact({
-          name: "Test Commit Artifact",
-          type: "Designs",
-          body: "Test Commit Artifact Body",
-          parent: "N/A",
-        }).saveArtifact();
+        cy.createNewArtifact({ name }).saveArtifact();
 
         cy.getCy(DataCy.snackbarSuccess).should("be.visible");
         cy.getCy(DataCy.selectedPanelCloseButton).click();
 
-        cy.getNode("Test Commit Artifact")
-          .should("be.visible")
-          .should("have.length", 1);
+        cy.getNode(name).should("be.visible").should("have.length", 1);
 
         // Verify that the undo button is enabled
         cy.getCy(DataCy.navUndoButton).should(
@@ -72,13 +67,11 @@ describe("Project Commits", () => {
 
     describe("I can undo a committed change", () => {
       it("Resets and updates artifacts when undone", () => {
+        const name = "Test Undo Artifact";
+        const body = "Test Undo Artifact Body";
+
         // Create a new artifact
-        cy.createNewArtifact({
-          name: "Test Undo Artifact",
-          type: "Designs",
-          body: "Test Undo Artifact Body",
-          parent: "N/A",
-        }).saveArtifact();
+        cy.createNewArtifact({ name, body }).saveArtifact();
 
         cy.getCy(DataCy.snackbarSuccess).should("be.visible");
         cy.getCy(DataCy.selectedPanelCloseButton).click();
@@ -86,7 +79,7 @@ describe("Project Commits", () => {
         cy.getCy(DataCy.treeNode).should("be.visible");
 
         // Edit the new artifact body
-        cy.getNode("Test Undo Artifact").click();
+        cy.getNode(name).click();
         cy.getCy(DataCy.selectedPanelEditButton).click();
         cy.getCy(DataCy.artifactSaveBodyInput).clear();
         cy.inputText(DataCy.artifactSaveBodyInput, "Changed!");
@@ -103,33 +96,27 @@ describe("Project Commits", () => {
         cy.getCy(DataCy.snackbarUpdate).should("be.visible");
 
         // Check that the edit was undone
-        cy.getNode("Test Undo Artifact").should(
-          "contain.text",
-          "Test Undo Artifact Body"
-        );
+        cy.getNode(name).should("contain.text", body);
         cy.getCy(DataCy.navUndoButton).should("have.class", "disable-events");
       });
 
       it("Removes a committed artifact when undone", () => {
+        const name = "Test Commit Artifact New Commit";
+
         // Create an artifact
         cy.getCy(DataCy.navUndoButton).should("have.class", "disable-events");
-        cy.createNewArtifact({
-          name: "Test Commit Artifact New Commit",
-          type: "Designs",
-          body: "Test Commit Artifact Body",
-          parent: "N/A",
-        }).saveArtifact();
+        cy.createNewArtifact({ name }).saveArtifact();
         cy.getCy(DataCy.snackbarSuccess).should("be.visible");
         cy.getCy(DataCy.selectedPanelBody).should("be.visible");
         cy.getCy(DataCy.selectedPanelCloseButton).click();
-        cy.getNode("Test Commit Artifact New Commit").should("be.visible");
+        cy.getNode(name).should("be.visible");
 
         // Undo
         cy.getCy(DataCy.navUndoButton).click();
         cy.getCy(DataCy.snackbarUpdate).should("be.visible");
 
         // Check that it's not visible
-        cy.getNode("Test Commit Artifact New Commit").should("not.exist");
+        cy.getNode(name).should("not.exist");
       });
 
       it.skip("Resets an updated trace link when undone", () => {
@@ -186,30 +173,27 @@ describe("Project Commits", () => {
 
     describe("I can redo a committed change", () => {
       it("Adds a committed artifact when redone", () => {
+        const name = "Test Commit Artifact Redo";
+
         //Create an artifact
         cy.getCy(DataCy.navUndoButton).should("have.class", "disable-events");
-        cy.createNewArtifact({
-          name: "Test Commit Artifact Redo",
-          type: "Designs",
-          body: "Test Commit Artifact Body",
-          parent: "N/A",
-        }).saveArtifact();
+        cy.createNewArtifact({ name }).saveArtifact();
         cy.getCy(DataCy.snackbarSuccess).should("be.visible");
         cy.getCy(DataCy.selectedPanelBody).should("be.visible");
         cy.getCy(DataCy.selectedPanelCloseButton).click();
-        cy.getNode("Test Commit Artifact Redo").should("be.visible");
+        cy.getNode(name).should("be.visible");
 
         // Undo
         cy.getCy(DataCy.navUndoButton).click();
 
         // Check that its not visible
-        cy.getNode("Test Commit Artifact Redo").should("not.exist");
+        cy.getNode(name).should("not.exist");
 
         // Redo
         cy.getCy(DataCy.navRedoButton).click();
 
         // Check that its visible again
-        cy.getNode("Test Commit Artifact Redo").should("be.visible");
+        cy.getNode(name).should("be.visible");
         cy.getCy(DataCy.navUndoButton).should(
           "not.have.class",
           "disable-events"

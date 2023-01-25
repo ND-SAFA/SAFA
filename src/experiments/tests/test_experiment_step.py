@@ -4,11 +4,11 @@ from unittest.mock import patch
 
 import math
 
-from data.datasets.creators.readers.definitions.structure_project_definition import StructureProjectDefinition
-from data.datasets.creators.readers.structured_project_reader import StructuredProjectReader
+from data.readers.definitions.structure_project_definition import StructureProjectDefinition
+from data.readers.structured_project_reader import StructuredProjectReader
 from data.datasets.dataset_role import DatasetRole
-from data.datasets.managers.deterministic_trainer_dataset_manager import DeterministicTrainerDatasetManager
-from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
+from data.managers.deterministic_trainer_dataset_manager import DeterministicTrainerDatasetManager
+from data.managers.trainer_dataset_manager import TrainerDatasetManager
 from experiments.experiment_step import ExperimentStep
 from experiments.tests.base_experiment_test import BaseExperimentTest
 from jobs.abstract_trace_job import AbstractTraceJob

@@ -1,5 +1,5 @@
 from data.datasets.dataset_role import DatasetRole
-from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
+from data.managers.trainer_dataset_manager import TrainerDatasetManager
 from jobs.components.job_args import JobArgs
 from jobs.predict_job import PredictJob
 from jobs.tests.base_job_test import BaseJobTest

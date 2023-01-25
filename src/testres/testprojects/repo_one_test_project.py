@@ -1,7 +1,7 @@
 from typing import Dict, List
 
-from data.datasets.creators.readers.abstract_project_reader import AbstractProjectReader
-from data.datasets.creators.readers.repository_project_reader import RepositoryProjectReader
+from data.readers.abstract_project_reader import AbstractProjectReader
+from data.readers.repository_project_reader import RepositoryProjectReader
 from testres.paths.project_paths import REPO_ONE_PROJECT_PATH
 from testres.test_data_manager import TestDataManager
 from testres.testprojects.abstract_test_project import AbstractTestProject

@@ -4,8 +4,8 @@ from unittest.mock import patch
 
 from config.constants import VALIDATION_PERCENTAGE_DEFAULT
 from data.datasets.dataset_role import DatasetRole
-from data.datasets.managers.deterministic_trainer_dataset_manager import DeterministicTrainerDatasetManager
-from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
+from data.managers.deterministic_trainer_dataset_manager import DeterministicTrainerDatasetManager
+from data.managers.trainer_dataset_manager import TrainerDatasetManager
 from jobs.abstract_job import AbstractJob
 from jobs.components.job_args import JobArgs
 from jobs.tests.base_job_test import BaseJobTest

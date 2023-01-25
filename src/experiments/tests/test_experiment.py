@@ -3,8 +3,8 @@ from copy import deepcopy
 from unittest import mock
 from unittest.mock import patch
 
-from data.datasets.creators.readers.definitions.structure_project_definition import StructureProjectDefinition
-from data.datasets.creators.readers.structured_project_reader import StructuredProjectReader
+from data.readers.definitions.structure_project_definition import StructureProjectDefinition
+from data.readers.structured_project_reader import StructuredProjectReader
 from experiments.experiment import Experiment
 from experiments.tests.base_experiment_test import BaseExperimentTest
 from jobs.predict_job import PredictJob

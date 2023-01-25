@@ -8,7 +8,7 @@ import pandas as pd
 
 from data.datasets.abstract_dataset import AbstractDataset
 from data.datasets.data_key import DataKey
-from data.datasets.keys.csv_format import CSVKeys
+from data.keys.csv_format import CSVKeys
 from data.datasets.trace_matrix import TraceMatrix
 from data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
 from data.processing.augmentation.data_augmenter import DataAugmenter
@@ -18,7 +18,6 @@ from data.tree.trace_link import TraceLink
 from models.model_manager import ModelManager
 from models.model_properties import ModelArchitectureType
 from util.file_util import FileUtil
-from util.general_util import ListUtil
 
 
 class TraceDataset(AbstractDataset):

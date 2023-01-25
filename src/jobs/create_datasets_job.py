@@ -1,6 +1,4 @@
-from typing import Dict, Any
-
-from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
+from data.managers.trainer_dataset_manager import TrainerDatasetManager
 from jobs.abstract_job import AbstractJob
 from jobs.components.job_args import JobArgs
 from jobs.components.job_result import JobResult

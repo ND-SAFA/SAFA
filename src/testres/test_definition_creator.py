@@ -2,7 +2,7 @@ import os
 from copy import deepcopy
 
 from data.datasets.dataset_role import DatasetRole
-from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
+from data.managers.trainer_dataset_manager import TrainerDatasetManager
 from jobs.predict_job import PredictJob
 from testres.base_test import BaseTest
 from testres.paths.paths import TEST_DATA_DIR, TEST_OUTPUT_DIR

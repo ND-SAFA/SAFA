@@ -13,7 +13,7 @@ from transformers.modeling_outputs import SequenceClassifierOutput
 from config.override import overrides
 from data.datasets.data_key import DataKey
 from data.datasets.dataset_role import DatasetRole
-from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
+from data.managers.trainer_dataset_manager import TrainerDatasetManager
 from data.samplers.balanced_batch_sampler import BalancedBatchSampler
 from models.model_manager import ModelManager
 from train.base_trainer import BaseTrainer
@@ -54,7 +54,7 @@ class TraceTrainer(BaseTrainer):
             self.model = AutoModelForSequenceClassification.from_pretrained(best_model_path)
         return trace_train_output
 
-    def create_or_load_state(self, model: PreTrainedModel, data_loader: DataLoader, resume_from_checkpoint: Optional[str] = None)\
+    def create_or_load_state(self, model: PreTrainedModel, data_loader: DataLoader, resume_from_checkpoint: Optional[str] = None) \
             -> Tuple[PreTrainedModel, Optimizer, _LRScheduler, DataLoader]:
         """
         If checkpoint given, accelerate entities are instantiated with their previous state. Otherwise, they are instantiated with new
@@ -83,39 +83,6 @@ class TraceTrainer(BaseTrainer):
         super().save_model(output_dir=output_dir, _internal_call=_internal_call)
         self.accelerator.save_state(output_dir)
 
-    def on_step(self, step_iteration: int) -> None:
-        """
-        Callback function called after every training step.
-        :param step_iteration: The global step count of the training loop.
-        :return: None
-        """
-        self.conditional_evaluate(SaveStrategyStage.STEP, step_iteration)
-
-    def on_epoch(self, epoch_iteration: int) -> None:
-        """
-        Callback function called after every training epoch.
-        :param epoch_iteration: The index of epoch performed.
-        :return: None
-        """
-        self.conditional_evaluate(SaveStrategyStage.EPOCH, epoch_iteration)
-        self.save_model(self.get_output_path(self.CURRENT_MODEL_NAME))
-
-    def conditional_evaluate(self, stage: SaveStrategyStage, stage_iteration: int) -> None:
-        """
-        Conditionally evaluates model depending on save strategy and saves it if it is the current best.
-        :param stage: The stage in training.
-        :param stage_iteration: The number of times this stage has been reached.
-        :return: None
-        """
-        save_strategy = self.trainer_args.custom_save_strategy
-        should_evaluate = save_strategy.should_evaluate(stage, stage_iteration)
-
-        if should_evaluate:
-            eval_result = self.perform_prediction(DatasetRole.VAL)
-            should_save = save_strategy.should_save(eval_result)
-            if should_save:
-                self.save_model(self.get_output_path(self.BEST_MODEL_NAME))
-
     def get_output_path(self, dir_name: str = None):
         """
         Returns the output path of trainer, with argument accessing directories within it.
@@ -135,6 +102,83 @@ class TraceTrainer(BaseTrainer):
         super().cleanup()
         if self.accelerator:  # covers custom and non-custom
             self.accelerator.free_memory()
+
+    def _inner_custom_training_loop(self, batch_size: int = None, accelerator: Accelerator = None, device: torch.device = None,
+                                    resume_from_checkpoint: Optional[str] = None, **kwargs) -> TraceTrainOutput:
+        """
+        Trains model for the epochs specified in training arguments.
+        :param batch_size: The batch size of the training step.
+        :param accelerator: The accelerator used to perform distributed training of the model.
+        :param device: The primary device to storage model.
+        :param kwargs: Any additional arguments. Currently, ignored but necessary for finding optimal batch size.
+        :return: The output of the training session.
+        """
+
+        self._train_batch_size = batch_size
+        self.args.per_device_train_batch_size = batch_size
+        loss_function = self.trainer_args.loss_function
+        self.model.train()
+        model, optimizer, scheduler, train_data_loader = self.create_or_load_state(self.model,
+                                                                                   self.get_train_dataloader(),
+                                                                                   resume_from_checkpoint)
+        global_step = 0
+        training_loss = 0
+        save_strategy = self.trainer_args.custom_save_strategy
+        training_metrics = {}
+
+        for epoch_index in range(self.trainer_args.num_train_epochs):
+            for batch_index, batch in enumerate(tqdm(train_data_loader)):
+                batch = batch.to(device)
+                optimizer.zero_grad()
+
+                labels = batch.pop(DataKey.LABELS_KEY)
+                output: SequenceClassifierOutput = model(**batch)
+                loss = loss_function(output.logits, labels)
+
+                accelerator.backward(loss)
+                optimizer.step()
+                self._on_step(global_step)
+                training_loss += loss.item()
+                global_step += 1
+
+            scheduler.step()
+            self._on_epoch(epoch_index)
+
+        return TraceTrainOutput(global_step=global_step, training_loss=training_loss, metrics=training_metrics,
+                                eval_metrics=save_strategy.stage_evaluations)
+
+    def _on_step(self, step_iteration: int) -> None:
+        """
+        Callback function called after every training step.
+        :param step_iteration: The global step count of the training loop.
+        :return: None
+        """
+        self._conditional_evaluate(SaveStrategyStage.STEP, step_iteration)
+
+    def _on_epoch(self, epoch_iteration: int) -> None:
+        """
+        Callback function called after every training epoch.
+        :param epoch_iteration: The index of epoch performed.
+        :return: None
+        """
+        self._conditional_evaluate(SaveStrategyStage.EPOCH, epoch_iteration)
+        self.save_model(self.get_output_path(self.CURRENT_MODEL_NAME))
+
+    def _conditional_evaluate(self, stage: SaveStrategyStage, stage_iteration: int) -> None:
+        """
+        Conditionally evaluates model depending on save strategy and saves it if it is the current best.
+        :param stage: The stage in training.
+        :param stage_iteration: The number of times this stage has been reached.
+        :return: None
+        """
+        save_strategy = self.trainer_args.custom_save_strategy
+        should_evaluate = save_strategy.should_evaluate(stage, stage_iteration)
+
+        if should_evaluate:
+            eval_result = self.perform_prediction(DatasetRole.VAL)
+            should_save = save_strategy.should_save(eval_result)
+            if should_save:
+                self.save_model(self.get_output_path(self.BEST_MODEL_NAME))
 
     def _initialize_state(self, model: PreTrainedModel) -> None:
         """
@@ -172,46 +216,3 @@ class TraceTrainer(BaseTrainer):
             return BalancedBatchSampler(data_source=self.train_dataset, batch_size=self._train_batch_size)
         return super()._get_train_sampler()
 
-    def _inner_custom_training_loop(self, batch_size: int = None, accelerator: Accelerator = None, device: torch.device = None,
-                                    resume_from_checkpoint: Optional[str] = None, **kwargs) -> TraceTrainOutput:
-        """
-        Trains model for the epochs specified in training arguments.
-        :param batch_size: The batch size of the training step.
-        :param accelerator: The accelerator used to perform distributed training of the model.
-        :param device: The primary device to storage model.
-        :param kwargs: Any additional arguments. Currently, ignored but necessary for finding optimal batch size.
-        :return: The output of the training session.
-        """
-
-        self._train_batch_size = batch_size
-        self.args.per_device_train_batch_size = batch_size
-        loss_function = self.trainer_args.loss_function
-        self.model.train()
-        model, optimizer, scheduler, train_data_loader = self.create_or_load_state(self.model,
-                                                                                   self.get_train_dataloader(),
-                                                                                   resume_from_checkpoint)
-        global_step = 0
-        training_loss = 0
-        save_strategy = self.trainer_args.custom_save_strategy
-        training_metrics = {}
-
-        for epoch_index in range(self.trainer_args.num_train_epochs):
-            for batch_index, batch in enumerate(tqdm(train_data_loader)):
-                batch = batch.to(device)
-                optimizer.zero_grad()
-
-                labels = batch.pop(DataKey.LABELS_KEY)
-                output: SequenceClassifierOutput = model(**batch)
-                loss = loss_function(output.logits, labels)
-
-                accelerator.backward(loss)
-                optimizer.step()
-                self.on_step(global_step)
-                training_loss += loss.item()
-                global_step += 1
-
-            scheduler.step()
-            self.on_epoch(epoch_index)
-
-        return TraceTrainOutput(global_step=global_step, training_loss=training_loss, metrics=training_metrics,
-                                eval_metrics=save_strategy.stage_evaluations)

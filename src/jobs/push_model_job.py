@@ -1,6 +1,6 @@
 import shutil
 
-from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
+from data.managers.trainer_dataset_manager import TrainerDatasetManager
 from jobs.abstract_trace_job import AbstractTraceJob
 from jobs.components.job_args import JobArgs
 from jobs.components.job_result import JobResult

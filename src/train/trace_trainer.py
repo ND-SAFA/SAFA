@@ -82,21 +82,23 @@ class TraceTrainer(BaseTrainer):
         accelerator.init_trackers("my_test_project", config=hps)
         for epoch_index in range(self.trainer_args.num_train_epochs):
             for batch_index, batch in enumerate(tqdm(train_data_loader)):
-                optimizer.zero_grad()
-                batch = batch.to(device)
+                with accelerator.accumulate(model):
+                    optimizer.zero_grad()
+                    batch = batch.to(device)
 
-                labels = batch.pop(DataKey.LABELS_KEY)
-                output: SequenceClassifierOutput = model(**batch)
-                loss = loss_function(output.logits, labels)
+                    labels = batch.pop(DataKey.LABELS_KEY)
+                    output: SequenceClassifierOutput = model(**batch)
+                    loss = loss_function(output.logits, labels)
+                    loss = loss / self.trainer_args.gradient_accumulation_steps
 
-                accelerator.backward(loss)
-                optimizer.step()
-                scheduler.step()
+                    accelerator.backward(loss)
+                    optimizer.step()
+                    scheduler.step()
 
-                self.on_step(global_step)
-                accelerator.log({"train_loss": loss.item()}, step=global_step)
-                training_loss += loss.item()
-                global_step += 1
+                    self.on_step(global_step)
+                    accelerator.log({"train_loss": loss.item()}, step=global_step)
+                    training_loss += loss.item()
+                    global_step += 1
 
             self.on_epoch(epoch_index)
         accelerator.end_training()

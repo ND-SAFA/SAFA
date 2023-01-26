@@ -20,22 +20,26 @@ describe("Type Options CRUD", () => {
       cy.getNodes(true).should("be.visible");
       cy.getCy(DataCy.selectedPanelType).should("contain", type);
 
-      cy.clickButtonWithName("Settings").switchTab("Artifact Types");
-      cy.getCy(DataCy.typeOptionsList).should("contain", type);
+      cy.clickButton(DataCy.selectedPanelCloseButton).clickButton(
+        DataCy.navTimButton
+      );
+
+      cy.getNode(type).should("be.visible");
     });
   });
 
   describe("I can change the icon of an artifact type", () => {
     it("Changes the icon of a type", () => {
-      cy.clickButtonWithName("Settings").switchTab("Artifact Types");
+      const type = "design";
 
-      cy.getCy(DataCy.typeOptionsList)
-        .first()
-        .click()
-        .within(() => {
-          cy.getCy(DataCy.typeOptionsIconButton).first().click();
-          cy.get("i").should("have.class", "mdi-clipboard-text");
-        });
+      cy.clickButton(DataCy.navTimButton);
+
+      cy.getNode(type).click();
+      cy.getCy(DataCy.typeOptionsIconButton).last().click();
+
+      cy.getCy(DataCy.artifactLevelContent).within(() => {
+        cy.get("i").should("have.class", "mdi-alpha-a-box-outline");
+      });
     });
   });
 });

@@ -14,6 +14,7 @@ export enum DataCy {
   navTreeButton = "button-nav-tree",
   navTableButton = "button-nav-table",
   navDeltaButton = "button-nav-delta",
+  navTimButton = "button-nav-tim",
   sidebarCloseButton = "button-sidebar-close",
   navUndoButton = "button-nav-undo",
   navRedoButton = "button-nav-redo",
@@ -196,8 +197,9 @@ export enum DataCy {
 
   // Type Options
 
-  typeOptionsList = "list-type-options",
   typeOptionsIconButton = "button-type-options-icon",
+  artifactLevelContent = "panel-artifact-type",
+  artifactLevelOptions = "panel-artifact-type-options",
 
   // Project settings
 

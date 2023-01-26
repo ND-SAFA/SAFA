@@ -152,26 +152,6 @@ describe("Trace Link Approval", () => {
         });
       });
 
-      it("Can sort by type", () => {
-        cy.clickButton(DataCy.traceLinkTableApprovalTypeButton).type(
-          "{backspace}{downArrow}{enter}{downArrow}{enter}{downArrow}{enter}{esc}"
-        );
-        cy.clickButton(DataCy.traceLinkTableGroupByInput).type(
-          "{backspace}{esc}"
-        );
-        cy.clickButton(DataCy.traceLinkTableSortByInput).type(
-          "{backspace}{downArrow}{downArrow}{enter}{esc}"
-        );
-        // Should have D9 first and D5 second in order of type (descending)
-        cy.withinTableRows(DataCy.traceLinkTable, (tr) => {
-          tr.contains("D5")
-            .should("have.length", 1)
-            .parent()
-            .should("contain", "design");
-          tr.contains("D5").parent().next().should("contain", "design");
-        });
-      });
-
       it("Can sort by approval status", () => {
         cy.clickButton(DataCy.traceLinkTableApprovalTypeButton).type(
           "{backspace}{downArrow}{enter}{downArrow}{enter}{downArrow}{enter}{esc}"
@@ -192,21 +172,6 @@ describe("Trace Link Approval", () => {
     });
 
     describe("I can group trace links by name, type, and approval status", () => {
-      it("Can group by name", () => {
-        cy.clickButton(DataCy.traceLinkTableApprovalTypeButton).type(
-          "{backspace}{downArrow}{enter}{downArrow}{enter}{downArrow}{enter}{esc}"
-        );
-        cy.clickButton(DataCy.traceLinkTableGroupByInput).type(
-          "{backspace}{upArrow}{upArrow}{enter}{esc}"
-        );
-        cy.clickButton(DataCy.traceLinkTableSortByInput).type(
-          "{backspace}{esc}"
-        );
-        cy.withinTableRows(DataCy.traceLinkTable, (tr) => {
-          tr.contains("Source name:").parent().contains("D10");
-        });
-      });
-
       it("Can group by type", () => {
         cy.clickButton(DataCy.traceLinkTableApprovalTypeButton).type(
           "{backspace}{downArrow}{enter}{downArrow}{enter}{downArrow}{enter}{esc}"

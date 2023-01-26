@@ -5,9 +5,9 @@ Cypress.Commands.add("getCy", (dataCy, elementPosition, timeout) => {
   const elements = cy.get(`[data-cy="${dataCy}"]`, { timeout });
 
   if (elementPosition === "first") {
-    return elements.first();
+    return elements.first({ timeout });
   } else if (elementPosition === "last") {
-    return elements.last();
+    return elements.last({ timeout });
   } else {
     return elements;
   }

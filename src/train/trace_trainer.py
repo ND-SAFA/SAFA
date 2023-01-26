@@ -47,8 +47,6 @@ class TraceTrainer(BaseTrainer):
                                   log_with=["wandb", LoggerType.TENSORBOARD])
         device = accelerator.device
         self.model = self.model_manager.get_model()
-        self.model = self.model.to(device)
-        assert accelerator.num_processes >= 2, "this script expects that two GPUs are available"
         inner_training_loop = find_executable_batch_size(
             self.inner_training_loop) if self.trainer_args.per_device_train_batch_size is None else self.inner_training_loop
         trace_train_output = inner_training_loop(resume_from_checkpoint=resume_from_checkpoint, accelerator=accelerator, device=device)

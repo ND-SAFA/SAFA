@@ -95,6 +95,7 @@ class TraceTrainer(BaseTrainer):
                     global_step += 1
                     epoch_loss += loss.item()
 
+            print("Epoch Loss:", epoch_loss)
             epoch_loss = 0
             scheduler.step()
             self.on_epoch(epoch_index)

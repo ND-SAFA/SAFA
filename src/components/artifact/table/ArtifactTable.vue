@@ -61,6 +61,7 @@
       >
         <td :key="attribute.key" class="v-data-table__divider">
           <attribute-display
+            hide-title
             :attribute="attribute"
             :model="item.attributes || {}"
           />

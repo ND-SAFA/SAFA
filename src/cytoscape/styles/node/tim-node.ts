@@ -33,7 +33,7 @@ export function svgTIM(data: TimNodeCytoElementData): string {
         bgColor,
         8
       )}
-      ${svgTitle(data.id, y, "type")}
+      ${svgTitle(data.artifactType, y, "type")}
       ${svgDiv({
         x,
         y: y + 37,

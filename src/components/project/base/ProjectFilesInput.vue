@@ -19,7 +19,7 @@
             deletable-chips
             multiple
             v-model="artifactTypes"
-            label="Artifact Types"
+            label="Artifact Files"
             :items="typeOptions"
             hint="Select the artifact files. Reads the file name <type>.csv"
             persistent-hint
@@ -33,7 +33,7 @@
             deletable-chips
             return-object
             v-model="traceMatrices"
-            label="Trace Matrices"
+            label="Trace Matrix Files"
             :items="matrixOptions"
             :item-text="(item) => `${item.source} To ${item.target}`"
             hint="Select the trace matrix files. Reads the file name <source>2<target>.csv"
@@ -168,7 +168,9 @@ export default Vue.extend({
       reader.addEventListener("load", (event) => {
         this.tim = JSON.parse(String(event.target?.result));
 
-        this.artifactTypes = Object.keys(this.tim?.DataFiles || {});
+        this.artifactTypes = Object.values(this.tim?.DataFiles || {}).map(
+          ({ File }) => File.split(".")[0]
+        );
         this.traceMatrices = Object.values(this.tim || {})
           .filter(({ Source, Target }) => Source && Target)
           .map(({ Source, Target }) => ({

@@ -88,7 +88,6 @@ class TraceTrainer(BaseTrainer):
                     accelerator.backward(loss)
                     optimizer.step()
                     optimizer.zero_grad()
-
                     self.on_step(global_step)
                     training_loss += loss.item()
                     global_step += 1

@@ -28,7 +28,7 @@ class TestMetricAtK(BaseTest, ABC):
         metric_results = metric._compute(self.predictions, self.labels, trace_matrix)
         for i, expected_score in enumerate(self.expected_metric_scores):
             metric_name = self.metric_name + "@%s" % (str(i + 1))
-            self.assertAlmostEqual(metric_results[metric_name], expected_score, msg="Failed:" + metric_name, delta=0.01)
+            self.assertAlmostEqual(expected_score, metric_results[metric_name], msg="Failed:" + metric_name, delta=0.01)
 
     def assert_construction(self):
         """

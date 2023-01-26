@@ -3,6 +3,7 @@ from typing import Optional, Tuple
 
 import torch
 from accelerate import Accelerator, find_executable_batch_size
+from accelerate.utils import LoggerType
 from torch.optim import Optimizer
 from torch.optim.lr_scheduler import _LRScheduler
 from torch.utils.data import DataLoader
@@ -42,7 +43,8 @@ class TraceTrainer(BaseTrainer):
         :param resume_from_checkpoint: The checkpoint to resume from.
         :return: Output of training session.
         """
-        accelerator = Accelerator(gradient_accumulation_steps=self.trainer_args.gradient_accumulation_steps)
+        accelerator = Accelerator(gradient_accumulation_steps=self.trainer_args.gradient_accumulation_steps,
+                                  log_with=["wandb", LoggerType.TENSORBOARD])
         device = accelerator.device
         self.model = self.model_manager.get_model()
         self.model.to(device)
@@ -77,24 +79,28 @@ class TraceTrainer(BaseTrainer):
         training_loss = 0
         save_strategy = self.trainer_args.custom_save_strategy
         training_metrics = {}
-
+        hps = {"test_prop": 42}
+        accelerator.init_trackers("my_test_project", config=hps)
         for epoch_index in range(self.trainer_args.num_train_epochs):
             for batch_index, batch in enumerate(tqdm(train_data_loader)):
-                with accelerator.accumulate(model):
-                    labels = batch.pop(DataKey.LABELS_KEY)
-                    output: SequenceClassifierOutput = model(**batch)
-                    loss = loss_function(output.logits, labels)
+                optimizer.zero_grad()
+                batch = batch.to(device)
 
-                    accelerator.backward(loss)
-                    optimizer.step()
-                    scheduler.step()
-                    optimizer.zero_grad()
+                labels = batch.pop(DataKey.LABELS_KEY)
+                output: SequenceClassifierOutput = model(**batch)
+                loss = loss_function(output.logits, labels)
 
-                    self.on_step(global_step)
-                    training_loss += loss.item()
-                    global_step += 1
+                accelerator.backward(loss)
+                optimizer.step()
+                scheduler.step()
+
+                self.on_step(global_step)
+                accelerator.log({"train_loss": loss.item()}, step=global_step)
+                training_loss += loss.item()
+                global_step += 1
+
             self.on_epoch(epoch_index)
-
+        accelerator.end_training()
         return TraceTrainOutput(global_step=global_step, training_loss=training_loss, metrics=training_metrics,
                                 eval_metrics=save_strategy.stage_evaluations)
 

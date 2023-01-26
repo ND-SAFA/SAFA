@@ -8,7 +8,7 @@
             "random_seed": 914
           },
           "model_manager": {
-            "model_path": "bert-base-uncased"
+            "model_path": "hf-internal-testing/tiny-random-bert"
           },
           "trainer_args": {
             "output_dir": "[OUTPUT_PATH]/test/models",
@@ -39,7 +39,7 @@
             "eval_dataset_creator": {
               "object_type": "SPLIT",
               "split_strategy": "SPLIT_BY_LINK",
-              "val_percentage": 0.25
+              "val_percentage": 0.50
             },
             "augmenter": {
               "steps": [

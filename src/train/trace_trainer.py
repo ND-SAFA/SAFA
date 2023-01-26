@@ -72,6 +72,7 @@ class TraceTrainer(BaseTrainer):
         model, optimizer, scheduler, train_data_loader = self.create_or_load_state(self.model,
                                                                                    self.get_train_dataloader(),
                                                                                    resume_from_checkpoint)
+        assert accelerator.num_processes > 1, f"Number of GPUS: {accelerator.num_processes}. Torch devices: {torch.cuda.device_count()}"
         global_step = 0
         training_loss = 0
         save_strategy = self.trainer_args.custom_save_strategy

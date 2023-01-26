@@ -86,6 +86,7 @@ class TraceTrainer(BaseTrainer):
                     labels = batch.pop(DataKey.LABELS_KEY)
                     output: SequenceClassifierOutput = model(**batch)
                     loss = loss_function(output.logits, labels)
+                    loss = accelerator.scaler.scale(loss)
                     accelerator.backward(loss)
                     optimizer.step()
                     optimizer.zero_grad()

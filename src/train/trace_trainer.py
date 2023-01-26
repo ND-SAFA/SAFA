@@ -84,13 +84,10 @@ class TraceTrainer(BaseTrainer):
 
                     labels = batch.pop(DataKey.LABELS_KEY)
                     output: SequenceClassifierOutput = model(**batch)
-                    # loss_scores = MetricsManager.get_similarity_scores(output.logits.detach().numpy())
                     loss = loss_function(output.logits, labels)
-                    loss.backward()
+                    accelerator.backward(loss)
                     optimizer.step()
-                    scheduler.step()
                     optimizer.zero_grad()
-                    # accelerator.backward(loss)
 
                     self.on_step(global_step)
                     training_loss += loss.item()
@@ -98,7 +95,7 @@ class TraceTrainer(BaseTrainer):
                     epoch_loss += loss.item()
 
             epoch_loss = 0
-            # scheduler.step()
+            scheduler.step()
             self.on_epoch(epoch_index)
         return TraceTrainOutput(global_step=global_step, training_loss=training_loss, metrics=training_metrics,
                                 eval_metrics=save_strategy.stage_evaluations)

@@ -30,7 +30,7 @@ export default Vue.extend({
         data: {
           type: GraphElementType.node,
           graph: GraphMode.tim,
-          id: this.artifactType,
+          id: this.artifactType.replace(/ /g, ""),
           artifactType: this.artifactType,
           count: this.count,
           dark: this.$vuetify.theme.dark,

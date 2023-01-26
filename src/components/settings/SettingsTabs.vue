@@ -18,9 +18,6 @@
         <project-installations-table />
       </v-tab-item>
       <v-tab-item key="4">
-        <type-options />
-      </v-tab-item>
-      <v-tab-item key="5">
         <attribute-settings />
       </v-tab-item>
     </tab-list>
@@ -41,7 +38,6 @@ import {
 import { ProjectInstallationsTable } from "@/components/integrations";
 import { AttributeSettings } from "@/components/attributes";
 import SettingsHeader from "./SettingsHeader.vue";
-import TypeOptions from "./TypeOptions.vue";
 import { SettingsMembers } from "./members";
 
 /**
@@ -55,7 +51,6 @@ export default Vue.extend({
     SidebarGrid,
     ProjectDisplay,
     ProjectButtons,
-    TypeOptions,
     UploadNewVersion,
     TabList,
     SettingsMembers,

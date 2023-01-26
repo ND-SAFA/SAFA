@@ -4,7 +4,7 @@ import { validUser } from "../../fixtures/data/user.json";
 describe("Project Selection", () => {
   beforeEach(() => {
     cy.viewport(1024, 768);
-    cy.dbResetProjects();
+    cy.dbResetJobs().dbResetProjects();
     cy.loadNewProject();
 
     cy.visit("/open")

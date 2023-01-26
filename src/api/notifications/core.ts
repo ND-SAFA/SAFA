@@ -51,6 +51,7 @@ function getStompClient(reconnect = false): Client {
       }
     }
   }
+
   return stompClient;
 }
 

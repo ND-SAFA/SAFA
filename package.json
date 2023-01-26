@@ -50,6 +50,7 @@
     "webstomp-client": "^1.2.6"
   },
   "devDependencies": {
+    "@lensesio/cypress-websocket-testing": "^1.0.1",
     "@types/chai": "^4.2.11",
     "@types/config": "^0.0.39",
     "@types/electron-devtools-installer": "^2.2.0",
@@ -79,6 +80,7 @@
     "eslint-plugin-prettier": "^3.3.1",
     "eslint-plugin-vue": "^7.0.0",
     "prettier": "^2.2.1",
+    "rxjs": "^6.5.0",
     "sass": "~1.32.0",
     "sass-loader": "^10.0.0",
     "spectron": "15.0.0",

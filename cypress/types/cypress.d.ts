@@ -187,6 +187,12 @@ declare namespace Cypress {
     setProjectIdentifier(type: "bulk" | "standard" | "modal"): Chainable<void>;
 
     /**
+     * TODO: Work in progress.
+     * Loads a new project and quickly waits for its upload.
+     */
+    loadProject(): Chainable<void>;
+
+    /**
      * Creates a new bulk upload project.
      */
     createBulkProject(): Chainable<void>;

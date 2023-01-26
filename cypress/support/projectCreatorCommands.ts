@@ -79,10 +79,9 @@ Cypress.Commands.add("createReqToHazardFiles", (createTraces, next) => {
 });
 
 Cypress.Commands.add("waitForJobLoad", () => {
-  cy.getCy(DataCy.jobStatus, "first", 20000).should(
-    "contain.text",
-    "Completed"
-  );
+  cy.wrap(null, { timeout: 10000 }).then(() => {
+    cy.getCy(DataCy.jobStatus, "first").should("contain.text", "Completed");
+  });
 });
 
 Cypress.Commands.add("loadNewProject", () => {
@@ -102,3 +101,39 @@ Cypress.Commands.add("loadNewGeneratedProject", () => {
     .location("pathname", { timeout: 5000 })
     .should("equal", "/create");
 });
+
+// Cypress.Commands.add("loadProject", () => {
+//   cy.visit("/create")
+//     .login(validUser.email, validUser.password)
+//     .location("pathname", { timeout: 5000 })
+//     .should("equal", "/create");
+//
+//   cy.intercept({ method: "POST", url: "/projects" }).as("postProject");
+//
+//   cy.switchTab("Bulk Upload")
+//     .setProjectIdentifier("bulk")
+//     .uploadFiles(DataCy.creationBulkFilesInput, ...miniProjectFiles)
+//     .clickButton(DataCy.creationUploadButton);
+//
+//   cy.wait("@postProject").then((interception) => {
+//     const { body } = interception.response;
+//     const versionId = body.projectVersion.versionId;
+//
+//     cy.wrap(null, { timeout: 10000 }).then(() => {
+//       cy.streamRequest<any>(
+//         {
+//           url: `wss://dev-api.safa.ai`,
+//         },
+//         {}
+//       ).then((results) => {
+//         const result = results?.[1];
+//         const data = result?.data;
+//       });
+//     });
+//   });
+//
+//   cy.getCy(DataCy.jobStatus, "first", 20000).should(
+//     "contain.text",
+//     "Completed"
+//   );
+// });

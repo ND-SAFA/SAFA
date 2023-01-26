@@ -11,7 +11,7 @@
             "model_path": "prajjwal1/bert-small"
           },
           "trainer_args": {
-            "output_dir": "[OUTPUT_PATH]/rq1/models",
+            "output_dir": "[OUTPUT_PATH]/test/models",
             "num_train_epochs": 5,
             "per_device_train_batch_size": 4,
             "per_device_eval_batch_size": 4,
@@ -52,5 +52,5 @@
       ]
     }
   ],
-  "output_dir": "[OUTPUT_PATH]/rq1/jobs"
+  "output_dir": "[OUTPUT_PATH]/test/jobs"
 }

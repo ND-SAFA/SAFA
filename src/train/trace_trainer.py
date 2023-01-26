@@ -92,13 +92,13 @@ class TraceTrainer(BaseTrainer):
 
                     accelerator.backward(loss)
                     optimizer.step()
-                    scheduler.step()
 
                     self.on_step(global_step)
                     accelerator.log({"train_loss": loss.item()}, step=global_step)
                     training_loss += loss.item()
                     global_step += 1
-
+                    
+            scheduler.step()
             self.on_epoch(epoch_index)
         accelerator.end_training()
         return TraceTrainOutput(global_step=global_step, training_loss=training_loss, metrics=training_metrics,

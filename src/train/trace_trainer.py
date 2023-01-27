@@ -142,6 +142,7 @@ class TraceTrainer(BaseTrainer):
         :type resume_from_checkpoint:
         :return: Instantiated model, optimizer, scheduler, and train data loader.
         """
+        print("Preparing accelerator")
         model, optimizer, scheduler, data_loader = self._prepare_accelerator(model, data_loader)
         if resume_from_checkpoint:
             self.accelerator.load_state(resume_from_checkpoint)
@@ -236,8 +237,9 @@ class TraceTrainer(BaseTrainer):
         :return: Prepared model, optimizer, scheduler, and data loader.
         """
         if self.accelerator is None:
+            print("Initializing state")
             self._initialize_state(model)
-
+        print("Preparing entities")
         return self.accelerator.prepare(model,
                                         self.optimizer,
                                         self.lr_scheduler,

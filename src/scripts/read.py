@@ -49,7 +49,7 @@ if __name__ == "__main__":
                         experiments]
     step_jobs = [ls_jobs(step, add_base=True) for steps in experiment_steps for step in steps]
     METRICS = ["map", "f2"]
-    IGNORE = "job_args"
+    IGNORE = ["job_args", "model_manager"]
     val_entries = []
     eval_entries = []
     for job in ls_jobs(OUTPUT_DIR):

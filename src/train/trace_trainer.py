@@ -18,6 +18,8 @@ from data.samplers.balanced_batch_sampler import BalancedBatchSampler
 from models.model_manager import ModelManager
 from train.base_trainer import BaseTrainer
 from train.save_strategy.save_strategy_stage import SaveStrategyStage
+from train.supported_optimizers import SupportedOptimizers
+from train.supported_schedulers import SupportedSchedulers
 from train.trace_output.trace_train_output import TraceTrainOutput
 from train.trainer_args import TrainerArgs
 
@@ -223,8 +225,8 @@ class TraceTrainer(BaseTrainer):
         :return: None
         """
         self.accelerator = Accelerator()
-        self.optimizer = self.trainer_args.optimizer_constructor(model.parameters())
-        self.lr_scheduler = self.trainer_args.scheduler_constructor(self.optimizer)
+        self.optimizer = SupportedOptimizers.create(self.trainer_args.optimizer_name, model)
+        self.lr_scheduler = SupportedSchedulers.create(self.trainer_args.scheduler_name, self.optimizer)
 
     def _prepare_accelerator(self, model: PreTrainedModel, data_loader: DataLoader) \
             -> Tuple[PreTrainedModel, Optimizer, _LRScheduler, DataLoader]:
@@ -251,4 +253,3 @@ class TraceTrainer(BaseTrainer):
         if self.USE_BALANCED_BATCHES and self.train_dataset is not None:
             return BalancedBatchSampler(data_source=self.train_dataset, batch_size=self._train_batch_size)
         return super()._get_train_sampler()
-

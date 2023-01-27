@@ -1,9 +1,6 @@
-from typing import Callable, List, Type
+from typing import Callable, List
 
-import torch
 from torch.nn.functional import cross_entropy
-from torch.optim import Optimizer
-from torch.optim.lr_scheduler import LinearLR, _LRScheduler
 from transformers.training_args import TrainingArguments
 
 from config.constants import EVALUATION_STRATEGY_DEFAULT, LOAD_BEST_MODEL_AT_END_DEFAULT, MAX_SEQ_LENGTH_DEFAULT, \
@@ -34,9 +31,9 @@ class TrainerArgs(TrainingArguments, BaseObject):
     metrics: List[str] = None
     place_model_on_device: bool = False
     total_training_epochs: int = None
-    optimizer_constructor: Type[Optimizer] = FunctionalWrapper(torch.optim.Adam)
+    optimizer_name: str = "adam"
     loss_function: Callable = FunctionalWrapper(cross_entropy)
-    scheduler_constructor: Type[_LRScheduler] = FunctionalWrapper(LinearLR)
+    scheduler_name: str = "linear"
     gradient_accumulation_steps: int = 8
     custom_save_strategy: AbstractSaveStrategy = MetricSaveStrategy(ComparisonCriterion(metrics=["map"]))
 

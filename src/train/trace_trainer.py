@@ -9,6 +9,7 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 from transformers import PreTrainedModel, Trainer
 from transformers.modeling_outputs import SequenceClassifierOutput
+from transformers.trainer_pt_utils import nested_concat
 from transformers.trainer_utils import PredictionOutput
 
 from config.override import overrides
@@ -114,6 +115,7 @@ class TraceTrainer(BaseTrainer):
         :return: The prediction output.
         """
         print("Preparing")
+        self.accelerator.free_memory()
         self.accelerator = None
         model, optimizer, scheduler, eval_data_loader = self.create_or_load_state(self.model,
                                                                                   self.get_eval_dataloader(),
@@ -121,7 +123,13 @@ class TraceTrainer(BaseTrainer):
 
         self.model = model
         print("Eval loop")
-        return self.evaluation_loop(eval_data_loader, description="Evaluation")
+        agg_predictions = None
+        agg_labels = None
+        for inputs in tqdm(eval_data_loader):
+            loss, logits, labels = self.prediction_step(self.model, inputs, prediction_loss_only=False)
+            agg_predictions = logits if agg_predictions is None else nested_concat(logits, agg_predictions)
+            agg_labels = labels if agg_labels is None else nested_concat(labels, agg_labels)
+        return PredictionOutput(predictions=agg_predictions, label_ids=None, metrics={})
 
     def create_or_load_state(self, model: PreTrainedModel, data_loader: DataLoader, resume_from_checkpoint: Optional[str] = None) \
             -> Tuple[PreTrainedModel, Optimizer, _LRScheduler, DataLoader]:

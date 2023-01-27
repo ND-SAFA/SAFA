@@ -27,7 +27,7 @@ if __name__ == "__main__":
     #
     # Imports
     #
-    from scripts.script_utils import extract_info, ls_filter, ls_jobs, read_job_definition
+    from scripts.script_utils import ls_filter, ls_jobs, read_job_definition, read_params
     from util.file_util import FileUtil
 
     #
@@ -39,7 +39,8 @@ if __name__ == "__main__":
     parser.add_argument("experiment")
     args = parser.parse_args()
     file_path = os.path.join(RQ_PATH, args.experiment)
-    output_file = args.experiment.split(".")[0] + ".csv"
+    export_file_name = args.experiment.split(".")[0]
+    output_file = export_file_name + ".csv"
     job_definition = read_job_definition(file_path)
 
     OUTPUT_DIR = job_definition["output_dir"]
@@ -47,22 +48,41 @@ if __name__ == "__main__":
     experiment_steps = [ls_filter(os.path.join(OUTPUT_DIR, experiment_id), ignore=IGNORE, add_base=True) for experiment_id in
                         experiments]
     step_jobs = [ls_jobs(step, add_base=True) for steps in experiment_steps for step in steps]
-    entries = []
-    for experiment_steps in step_jobs:
-        for step_path in experiment_steps:
-            job_output_path = os.path.join(step_path, "output.json")
-            job_output = FileUtil.read_json_file(job_output_path)
-            step_entries = extract_info(job_output, COPY_PATHS, IGNORE)
-            print(len(step_entries))
-            for step_entry_container in step_entries:
-                entries.append(step_entry_container[0])
-    entries_df = pd.DataFrame(entries)
-    output_path = os.path.join(OUTPUT_DIR, output_file)
-    entries_df.to_csv(output_path, index=False)
+    METRICS = ["map", "f2"]
+    IGNORE = "job_args"
+    val_entries = []
+    eval_entries = []
+    for job in ls_jobs("jobs"):
+        job_path = os.path.join("jobs", job)
+        for step in ls_filter(job_path, ignore=[".DS_Store"]):
+            step_path = os.path.join(job_path, step)
+            for step_job in ls_jobs(step_path):
+                step_job_path = os.path.join(step_path, step_job)
+                output_path = os.path.join(step_job_path, "output.json")
+                output_json = FileUtil.read_json_file(output_path)
+                base_entry = {k: v for k, v in output_json["experimental_vars"].items() if k not in IGNORE}
+
+                for epoch_index, metrics in output_json["val_metrics"].items():
+                    metrics_entry = metrics["metrics"]
+                    # print(metrics.keys())
+                    entry = {**read_params(metrics_entry, METRICS), "epoch": epoch_index, **base_entry}
+                    val_entries.append(entry)
+                eval_entries.append({**read_params(output_json["eval_metrics"], METRICS), **base_entry})
+    print("Validation:", len(val_entries))
+    print("Evaluation:", len(eval_entries))
+
+    """
+    Export Results
+    """
+    val_output_path = os.path.join(OUTPUT_DIR, export_file_name + "-" + "val.csv")
+    eval_output_path = os.path.join(OUTPUT_DIR, export_file_name + "-" + "eval.csv")
+    val_df = pd.DataFrame(val_entries).to_csv(val_output_path, index=False)
+    eval_df = pd.DataFrame(eval_entries).to_csv(eval_output_path, index=False)
     # Push to s3
     bucket_name = os.environ.get("BUCKET", None)
     if bucket_name:
         bucket_path = os.path.join(bucket_name, output_file)
-        subprocess.run(["aws", "s3", "cp", output_path, bucket_path])
-    print(entries_df)
-    print(output_path)
+        for output_path in [val_output_path, eval_output_path]:
+            subprocess.run(["aws", "s3", "cp", output_path, bucket_path])
+    print(eval_df)
+    print(f"Exported files: {eval_output_path} & {val_output_path}")

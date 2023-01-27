@@ -38,13 +38,14 @@ class MetricSaveStrategy(AbstractSaveStrategy):
         """
         return stage == self.stage and self.iteration % self.interval == 0
 
-    def should_save(self, evaluation_result: TracePredictionOutput) -> bool:
+    def should_save(self, evaluation_result: TracePredictionOutput, evaluation_id: int) -> bool:
         """
         Returns whether current evaluation is the best one yet.
         :param evaluation_result: The result of evaluating the model.
+        :param evaluation_id: The id of the evaluation.
         :return: True if evaluation is best and false otherwise.
         """
-        super().should_save(evaluation_result)
+        super().should_save(evaluation_result, evaluation_id)
         score = evaluation_result.metrics[self.comparison_metric]
         is_better = self.comparison_function(score, self.best_score)
         if is_better:

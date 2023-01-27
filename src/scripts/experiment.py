@@ -48,3 +48,4 @@ if __name__ == "__main__":
     experiment = ObjectCreator.create(Experiment, override=True, **job_definition)
     experiment.run()
     print("\nFinished. Have a good day :)")
+    sys.exit()

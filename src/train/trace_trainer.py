@@ -56,6 +56,7 @@ class TraceTrainer(BaseTrainer):
             else:
                 best_model_path = self.get_output_path(self.BEST_MODEL_NAME)
                 self.model = self.model_manager.update_model(best_model_path)
+                self.model = accelerator.prepare_model(self.model)
         return trace_train_output
 
     def inner_training_loop(self, batch_size: int = None, accelerator: Accelerator = None, device: torch.device = None,

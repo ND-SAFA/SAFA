@@ -3,12 +3,14 @@ from typing import Any, Dict, Union
 
 import torch
 from transformers.trainer import Trainer
-from transformers.trainer_utils import PredictionOutput
 
 from data.datasets.dataset_role import DatasetRole
 from data.managers.trainer_dataset_manager import TrainerDatasetManager
 from models.model_manager import ModelManager
 from train.metrics.metrics_manager import MetricsManager
+from train.save_strategy.abstract_save_strategy import AbstractSaveStrategy
+from train.save_strategy.comparison_criteria import ComparisonCriterion
+from train.save_strategy.epoch_save_strategy import MetricSaveStrategy
 from train.trace_output.trace_prediction_output import TracePredictionOutput
 from train.trace_output.trace_train_output import TraceTrainOutput
 from train.trainer_args import TrainerArgs
@@ -26,7 +28,7 @@ class BaseTrainer(Trainer, BaseObject):
     """
 
     def __init__(self, trainer_args: TrainerArgs, model_manager: ModelManager,
-                 trainer_dataset_manager: TrainerDatasetManager, **kwargs):
+                 trainer_dataset_manager: TrainerDatasetManager, save_strategy: AbstractSaveStrategy = None, **kwargs):
         """
         Handles the training and evaluation of learning models
         :param args: the learning model arguments
@@ -37,6 +39,8 @@ class BaseTrainer(Trainer, BaseObject):
         self.model_manager.set_max_seq_length(self.trainer_args.max_seq_length)
         model_init = lambda: self.model_manager.get_model()
         tokenizer = self.model_manager.get_tokenizer()
+        if save_strategy is None:
+            self.save_strategy = MetricSaveStrategy(ComparisonCriterion("map"))
         super().__init__(model_init=model_init, args=trainer_args, tokenizer=tokenizer,
                          callbacks=trainer_args.callbacks,
                          **kwargs)
@@ -58,10 +62,11 @@ class BaseTrainer(Trainer, BaseObject):
         :return: A dictionary containing the results.
         """
         dataset = self.trainer_dataset_manager[dataset_role]
-        self.eval_dataset = dataset.to_trainer_dataset(self.model_manager)
-        output: PredictionOutput = self.predict(self.eval_dataset)
+        eval_dataset = dataset.to_trainer_dataset(self.model_manager)
+        output = self.predict(eval_dataset)
         metrics_manager = MetricsManager(dataset.get_ordered_links(), output.predictions)
         eval_metrics = metrics_manager.eval(self.trainer_args.metrics) if self.trainer_args.metrics else {}
+        print(eval_metrics)
         output.metrics.update(eval_metrics)
         return TracePredictionOutput(predictions=metrics_manager.get_scores(), label_ids=output.label_ids, metrics=output.metrics,
                                      source_target_pairs=dataset.get_source_target_pairs())

@@ -9,7 +9,7 @@ SAVE_OUTPUT_DEFAULT = True
 SAVE_DATASET_SPLITS_DEFAULT = True
 
 # -------------- TRACE ARGS --------------
-MAX_SEQ_LENGTH_DEFAULT = 256
+MAX_SEQ_LENGTH_DEFAULT = 512
 N_EPOCHS_DEFAULT = 3
 EVALUATION_STRATEGY_DEFAULT = SAVE_STRATEGY_DEFAULT = "epoch"  # should be the same to load best model as per transformers docs
 SAVE_TOTAL_LIMIT_DEFAULT = 2

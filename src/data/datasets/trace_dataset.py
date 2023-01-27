@@ -33,7 +33,7 @@ class TraceDataset(AbstractDataset):
         :param neg_link_ids: A list of all negative link ids in the dataset
         :param randomize: Whether to randomize the trace links.
         """
-        self.links = OrderedDict(links)
+        self.links: Dict[int, TraceLink] = OrderedDict(links)
         self.pos_link_ids, self.neg_link_ids = pos_link_ids, neg_link_ids
         self.trace_matrix = TraceMatrix(list(self.links.values()), randomize=randomize)
         self.shuffle_link_ids()

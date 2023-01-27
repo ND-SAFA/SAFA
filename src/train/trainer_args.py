@@ -1,16 +1,10 @@
-from typing import Callable, List, Type
+from typing import Callable, List
 
-import torch
 from torch.nn.functional import cross_entropy
-from torch.optim import Optimizer
-from torch.optim.lr_scheduler import LinearLR, _LRScheduler
 from transformers.training_args import TrainingArguments
 
 from config.constants import EVALUATION_STRATEGY_DEFAULT, LOAD_BEST_MODEL_AT_END_DEFAULT, MAX_SEQ_LENGTH_DEFAULT, \
     METRIC_FOR_BEST_MODEL_DEFAULT, N_EPOCHS_DEFAULT, SAVE_STRATEGY_DEFAULT, SAVE_TOTAL_LIMIT_DEFAULT
-from train.save_strategy.abstract_save_strategy import AbstractSaveStrategy
-from train.save_strategy.comparison_criteria import ComparisonCriterion
-from train.save_strategy.epoch_save_strategy import MetricSaveStrategy
 from util.base_object import BaseObject
 from util.enum_util import FunctionalWrapper
 
@@ -34,11 +28,13 @@ class TrainerArgs(TrainingArguments, BaseObject):
     metrics: List[str] = None
     place_model_on_device: bool = False
     total_training_epochs: int = None
-    optimizer_constructor: Type[Optimizer] = FunctionalWrapper(torch.optim.Adam)
+    optimizer_name: str = "adam"
     loss_function: Callable = FunctionalWrapper(cross_entropy)
-    scheduler_constructor: Type[_LRScheduler] = FunctionalWrapper(LinearLR)
+    scheduler_name: str = "linear"
     gradient_accumulation_steps: int = 8
-    custom_save_strategy: AbstractSaveStrategy = MetricSaveStrategy(ComparisonCriterion(metrics=["map"]))
+    skip_save: bool = False
+    use_balanced_batches: bool = True
+    per_device_train_batch_size = None
 
     # GAN
     n_hidden_layers_g: int = 1

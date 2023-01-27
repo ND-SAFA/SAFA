@@ -5,14 +5,27 @@
         {
           "object_type": "TRAIN",
           "job_args": {
-            "random_seed": 914
+            "random_seed": {
+              "*": [
+                87975,
+                7265,
+                35236,
+                21284,
+                56778
+              ]
+            }
           },
           "model_manager": {
-            "model_path": "hf-internal-testing/tiny-random-bert"
+            "model_path": {
+              "*": [
+                "prajjwal1/bert-tiny",
+                "bert-base-uncased"
+              ]
+            }
           },
           "trainer_args": {
-            "output_dir": "[OUTPUT_PATH]/test/models",
-            "num_train_epochs": 1,
+            "output_dir": "[OUTPUT_PATH]/cchit/base_models/models",
+            "num_train_epochs": 10,
             "per_device_train_batch_size": 8,
             "per_device_eval_batch_size": 8,
             "gradient_accumulation_steps": 8,
@@ -31,19 +44,19 @@
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "STRUCTURE",
-                "project_path": "[DATA_PATH]/cm1"
+                "project_path": "[DATA_PATH]/cchit"
               },
               "filter_unlinked_artifacts": true
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",
               "split_strategy": "SPLIT_BY_LINK",
-              "val_percentage": 0.25
+              "val_percentage": 0.1
             },
             "eval_dataset_creator": {
               "object_type": "SPLIT",
               "split_strategy": "SPLIT_BY_LINK",
-              "val_percentage": 0.50
+              "val_percentage": 0.1
             },
             "augmenter": {
               "steps": [
@@ -57,5 +70,5 @@
       ]
     }
   ],
-  "output_dir": "[OUTPUT_PATH]/test/jobs"
+  "output_dir": "[OUTPUT_PATH]/cchit/base_models/jobs"
 }

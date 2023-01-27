@@ -67,6 +67,11 @@ class ModelManager(BaseObject):
         self.__tokenizer = None
         gc.collect()
 
+    def update_model(self, model_path: str) -> PreTrainedModel:
+        self.clear_model()
+        self.model_path = model_path
+        return self.get_model()
+
     def get_tokenizer(self) -> PreTrainedTokenizer:
         """
         Gets the pretrained Tokenizer
@@ -92,9 +97,10 @@ class ModelManager(BaseObject):
         :return: feature name, value mappings
         """
         tokenizer = self.get_tokenizer()
-        return tokenizer(truncation=True, return_attention_mask=True,
-                         max_length=self._max_seq_length,
-                         padding="max_length", return_token_type_ids=return_token_type_ids, **kwargs)
+        feature = tokenizer(truncation=True, return_attention_mask=True,
+                            max_length=self._max_seq_length,
+                            padding="max_length", return_token_type_ids=return_token_type_ids, **kwargs)
+        return feature
 
     @staticmethod
     def get_encoder_layers(model: PreTrainedModel) -> List[LAYER]:

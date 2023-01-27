@@ -1,6 +1,7 @@
 from train.save_strategy.abstract_save_strategy import AbstractSaveStrategy
 from train.save_strategy.comparison_criteria import ComparisonCriterion
 from train.save_strategy.save_strategy_stage import SaveStrategyStage
+from train.trace_output.stage_eval import Metrics
 from train.trace_output.trace_prediction_output import TracePredictionOutput
 
 
@@ -37,12 +38,24 @@ class MetricSaveStrategy(AbstractSaveStrategy):
         """
         return stage == self.stage and self.iteration % self.interval == 0
 
-    def should_save(self, evaluation_result: TracePredictionOutput) -> bool:
+    def should_save(self, evaluation_result: TracePredictionOutput, evaluation_id: int) -> bool:
         """
         Returns whether current evaluation is the best one yet.
         :param evaluation_result: The result of evaluating the model.
+        :param evaluation_id: The id of the evaluation.
         :return: True if evaluation is best and false otherwise.
         """
-        super().should_save(evaluation_result)
+        super().should_save(evaluation_result, evaluation_id)
         score = evaluation_result.metrics[self.comparison_metric]
-        return self.comparison_function(score, self.best_score)
+        is_better = self.comparison_function(score, self.best_score)
+        if is_better:
+            self.best_score = score
+        return is_better
+
+    def get_metric_score(self, evaluation_metrics: Metrics) -> float:
+        """
+        Returns the score of the evaluation metric in given metrics.
+        :param evaluation_metrics: The metrics to extract the score from.
+        :return: The metric score.
+        """
+        return evaluation_metrics[self.comparison_metric]

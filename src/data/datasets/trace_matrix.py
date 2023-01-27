@@ -30,10 +30,11 @@ class TraceMatrix:
         if randomize:
             self._do_randomize()
 
-    def calculate_query_metric(self, metric: Callable[[List[int], List[float]], float]):
+    def calculate_query_metric(self, metric: Callable[[List[int], List[float]], float], default_value: float = None):
         """
         Calculates the average metric for each source artifact in project.
         :param metric: The metric to compute for each query in matrix.
+        :param default_value: The value to use if there are no valid metric scores.
         :return: Average metric value.
         """
         metric_values = []
@@ -43,9 +44,11 @@ class TraceMatrix:
             query_metric = metric(query_labels, query_predictions)
             if not np.isnan(query_metric):
                 metric_values.append(query_metric)
-        return round(sum(metric_values) / len(metric_values), 2)
+        if len(metric_values) == 0:
+            return default_value
+        return sum(metric_values) / len(metric_values)
 
-    def calculate_query_metric_at_k(self, metric: Callable[[List[int], List[float]], float], k: int):
+    def calculate_query_metric_at_k(self, metric: Callable[[List[int], List[float]], float], k: int, **kwargs):
         """
         Calculates given metric for each query considering the top k elements.
         :param metric: The metric function to apply to query scores.
@@ -66,7 +69,7 @@ class TraceMatrix:
             local_labels = [l for l, p in results]
             return metric(local_labels, local_preds)
 
-        return self.calculate_query_metric(metric_at_k)
+        return self.calculate_query_metric(metric_at_k, **kwargs)
 
     def _fill_trace_matrix(self, links: Iterable[TraceLink], predicted_scores: List[float]) -> None:
         """

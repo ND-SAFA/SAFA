@@ -7,27 +7,32 @@
           "job_args": {
             "random_seed": {
               "*": [
-                197,
-                914,
-                209,
-                330
+                87975,
+                7265,
+                35236,
+                21284,
+                56778
               ]
             }
           },
           "model_manager": {
-            "model_path": "roberta-base"
+            "model_path": "bert-base-uncased"
           },
           "trainer_args": {
-            "output_dir": "[OUTPUT_PATH]/rq1/models",
-            "num_train_epochs": 5,
-            "per_device_train_batch_size": 4,
-            "per_device_eval_batch_size": 4,
+            "output_dir": "[OUTPUT_PATH]/cm1/bert-base/models",
+            "num_train_epochs": 10,
+            "per_device_train_batch_size": 8,
+            "per_device_eval_batch_size": 8,
+            "gradient_accumulation_steps": 8,
+            "learning_rate": 1e-5,
             "metrics": [
               "map",
               "map_at_k",
               "f",
               "precision"
-            ]
+            ],
+            "skip_save": false,
+            "load_best_model_at_end": true
           },
           "trainer_dataset_manager": {
             "train_dataset_creator": {
@@ -35,11 +40,18 @@
               "project_reader": {
                 "object_type": "STRUCTURE",
                 "project_path": "[DATA_PATH]/cm1"
-              }
+              },
+              "filter_unlinked_artifacts": true
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",
-              "val_percentage": 0.2
+              "split_strategy": "SPLIT_BY_LINK",
+              "val_percentage": 0.25
+            },
+            "eval_dataset_creator": {
+              "object_type": "SPLIT",
+              "split_strategy": "SPLIT_BY_LINK",
+              "val_percentage": 0.25
             },
             "augmenter": {
               "steps": [
@@ -53,5 +65,5 @@
       ]
     }
   ],
-  "output_dir": "[OUTPUT_PATH]/rq1/jobs"
+  "output_dir": "[OUTPUT_PATH]/cm1/bert-base/jobs"
 }

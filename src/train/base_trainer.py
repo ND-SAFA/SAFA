@@ -3,7 +3,6 @@ from typing import Any, Dict, Union
 
 import torch
 from transformers.trainer import Trainer
-from transformers.trainer_utils import PredictionOutput
 
 from data.datasets.dataset_role import DatasetRole
 from data.managers.trainer_dataset_manager import TrainerDatasetManager
@@ -63,11 +62,8 @@ class BaseTrainer(Trainer, BaseObject):
         :return: A dictionary containing the results.
         """
         dataset = self.trainer_dataset_manager[dataset_role]
-        self.eval_dataset = dataset.to_trainer_dataset(self.model_manager)
-        if dataset_role == DatasetRole.VAL:
-            output: PredictionOutput = self.predict(self.eval_dataset)
-        else:
-            output: PredictionOutput = self.predict_eval()
+        eval_dataset = dataset.to_trainer_dataset(self.model_manager)
+        output = self.predict(eval_dataset)
         metrics_manager = MetricsManager(dataset.get_ordered_links(), output.predictions)
         eval_metrics = metrics_manager.eval(self.trainer_args.metrics) if self.trainer_args.metrics else {}
         print(eval_metrics)

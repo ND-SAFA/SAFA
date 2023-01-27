@@ -8,12 +8,7 @@
             "random_seed": 914
           },
           "model_manager": {
-            "model_path": {
-              "*": [
-                "hf-internal-testing/tiny-random-bert",
-                "prajjwal1/bert-tiny"
-              ]
-            }
+            "model_path": "hf-internal-testing/tiny-random-bert"
           },
           "trainer_args": {
             "output_dir": "[OUTPUT_PATH]/test/models",

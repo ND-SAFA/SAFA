@@ -176,9 +176,6 @@ class TrainerDatasetManager(BaseObject):
         Creates the data from their corresponding creators
         :return: a dictionary mapping dataset role to the corresponding dataset
         """
-        train_dataset_creator = dataset_creators_map[DatasetRole.TRAIN]
-        if train_dataset_creator and isinstance(train_dataset_creator, TraceDatasetCreator):
-            train_dataset_creator.filter_unlinked_artifacts = True
         return {dataset_role: TrainerDatasetManager.__optional_create(dataset_creator)
                 for dataset_role, dataset_creator in dataset_creators_map.items()}
 

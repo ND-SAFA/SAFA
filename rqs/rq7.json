@@ -5,37 +5,45 @@
         {
           "object_type": "TRAIN",
           "job_args": {
-            "random_seed": 914
+            "random_seed": {
+              "*": [
+                197,
+                914,
+                209,
+                330
+              ]
+            }
           },
           "model_manager": {
             "model_path": "bert-base-uncased"
           },
           "trainer_args": {
-            "output_dir": "[OUTPUT_PATH]/test/models",
-            "num_train_epochs": 25,
-            "per_device_train_batch_size": 8,
-            "per_device_eval_batch_size": 8,
-            "gradient_accumulation_steps": 8,
+            "output_dir": "[OUTPUT_PATH]/rq7/models",
+            "num_train_epochs": 100,
             "learning_rate": 1e-5,
+            "per_device_train_batch_size": 8,
             "metrics": [
               "map",
-              "f"
+              "map_at_k",
+              "f",
+              "precision"
             ],
             "skip_save": true,
-            "load_best_model_at_end": true
+            "use_balanced_batches": true,
+            "gradient_accumulation_steps": 8
           },
           "trainer_dataset_manager": {
             "train_dataset_creator": {
               "object_type": "TRACE",
+              "filter_unlinked_artifacts": false,
               "project_reader": {
                 "object_type": "STRUCTURE",
                 "project_path": "[DATA_PATH]/cm1"
-              },
-              "filter_unlinked_artifacts": true
+              }
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",
-              "split_strategy": "SPLIT_BY_SOURCE",
+              "split_strategy": "SPLIT_BY_LINK",
               "val_percentage": 0.25
             },
             "eval_dataset_creator": {
@@ -55,5 +63,5 @@
       ]
     }
   ],
-  "output_dir": "[OUTPUT_PATH]/test/jobs"
+  "output_dir": "[OUTPUT_PATH]/rq7/jobs"
 }

@@ -47,7 +47,7 @@ class TraceLink(BaseObject):
         :param target_id: id of target artifact
         :return: the link id
         """
-
+        # f"{source_id}-{target_id}"
         return hash(str(hash(source_id)) + "-" + str(hash(target_id)))
 
     def __hash__(self):

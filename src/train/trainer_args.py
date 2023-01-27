@@ -6,8 +6,6 @@ from transformers.training_args import TrainingArguments
 from config.constants import EVALUATION_STRATEGY_DEFAULT, LOAD_BEST_MODEL_AT_END_DEFAULT, MAX_SEQ_LENGTH_DEFAULT, \
     METRIC_FOR_BEST_MODEL_DEFAULT, N_EPOCHS_DEFAULT, SAVE_STRATEGY_DEFAULT, SAVE_TOTAL_LIMIT_DEFAULT
 from train.save_strategy.abstract_save_strategy import AbstractSaveStrategy
-from train.save_strategy.comparison_criteria import ComparisonCriterion
-from train.save_strategy.epoch_save_strategy import MetricSaveStrategy
 from util.base_object import BaseObject
 from util.enum_util import FunctionalWrapper
 
@@ -35,7 +33,10 @@ class TrainerArgs(TrainingArguments, BaseObject):
     loss_function: Callable = FunctionalWrapper(cross_entropy)
     scheduler_name: str = "linear"
     gradient_accumulation_steps: int = 8
-    custom_save_strategy: AbstractSaveStrategy = MetricSaveStrategy(ComparisonCriterion(metrics=["map"]))
+    custom_save_strategy: AbstractSaveStrategy = None
+    skip_save: bool = False
+    use_balanced_batches: bool = True
+    per_device_train_batch_size = None
 
     # GAN
     n_hidden_layers_g: int = 1

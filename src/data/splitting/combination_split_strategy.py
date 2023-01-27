@@ -21,6 +21,6 @@ class CombinationSplitStrategy(AbstractSplitStrategy):
         :return: the dataset split
         """
         source_link_ids_first_split = {link.id for link
-                                       in SourceSplitStrategy.create_random_trace_link_array(trace_dataset, n_sources=n_sources)}
+                                       in SourceSplitStrategy.create_trace_link_array_by_source(trace_dataset, n_sources=n_sources)}
         return AbstractSplitStrategy.create_split_containing_specified_link_ids(trace_dataset, source_link_ids_first_split,
                                                                                 percent_split, slice_num)

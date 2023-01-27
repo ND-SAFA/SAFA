@@ -27,7 +27,7 @@ class AbstractSplitStrategy(ABC):
         raise NotImplementedError()
 
     @staticmethod
-    def split_data(data: GenericData, percent_split: float, labels: List[int] = None) -> Tuple[GenericData, GenericData]:
+    def split_data(data: GenericData, percent_split: float, labels: List[int] = None, **kwargs) -> Tuple[GenericData, GenericData]:
         """
         Splits data into slices using labels to guarantee equal proportions of the labels in each split
         :param data: The data to split.
@@ -35,7 +35,7 @@ class AbstractSplitStrategy(ABC):
         :param labels: The labels to stratify data with.
         :return: Two slices of data.
         """
-        return train_test_split(data, test_size=percent_split, stratify=labels, random_state=0)
+        return train_test_split(data, test_size=percent_split, stratify=labels, random_state=0, **kwargs)
 
     @staticmethod
     def create_split_containing_specified_link_ids(trace_dataset: TraceDataset, link_ids_for_first_split: Union[Set[str], List[str]],

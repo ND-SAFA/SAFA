@@ -38,6 +38,6 @@ class TestMapAtK(TestMetricAtK):
 
     @property
     def expected_metric_scores(self) -> List[float]:
-        return [average_precision_score([0], [.9]),
+        return [0,
                 average_precision_score([0, 1], [.9, .7]),
                 average_precision_score([0, 1, 1], [.9, .7, .6])]

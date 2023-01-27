@@ -65,9 +65,9 @@ if __name__ == "__main__":
                 for epoch_index, metrics in output_json["val_metrics"].items():
                     metrics_entry = metrics["metrics"]
                     # print(metrics.keys())
-                    entry = {**read_params(metrics_entry, METRICS), "epoch": epoch_index, **base_entry}
+                    entry = {**base_entry, **read_params(metrics_entry, METRICS), "epoch": epoch_index}
                     val_entries.append(entry)
-                eval_entries.append({**read_params(output_json["eval_metrics"], METRICS), **base_entry})
+                eval_entries.append({**base_entry, **read_params(output_json["eval_metrics"], METRICS)})
     print("Validation:", len(val_entries))
     print("Evaluation:", len(eval_entries))
 

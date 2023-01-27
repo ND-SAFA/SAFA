@@ -5,7 +5,14 @@
         {
           "object_type": "TRAIN",
           "job_args": {
-            "random_seed": 914
+            "random_seed": {
+              "*": [
+                914,
+                416,
+                36,
+                20
+              ]
+            }
           },
           "model_manager": {
             "model_path": "prajjwal1/bert-tiny"

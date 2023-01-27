@@ -5,7 +5,15 @@
         {
           "object_type": "TRAIN",
           "job_args": {
-            "random_seed": 914
+            "random_seed": {
+              "*": [
+                87975,
+                7265,
+                35236,
+                21284,
+                56778
+              ]
+            }
           },
           "model_manager": {
             "model_path": {

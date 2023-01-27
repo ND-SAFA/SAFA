@@ -8,7 +8,7 @@
             "random_seed": 914
           },
           "model_manager": {
-            "model_path": "bert-base-uncased"
+            "model_path": "hf-internal-testing/tiny-random-bert"
           },
           "trainer_args": {
             "output_dir": "[OUTPUT_PATH]/test/models",
@@ -21,7 +21,7 @@
               "map",
               "f"
             ],
-            "skip_save": true,
+            "skip_save": false,
             "load_best_model_at_end": true
           },
           "trainer_dataset_manager": {
@@ -35,7 +35,7 @@
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",
-              "split_strategy": "SPLIT_BY_SOURCE",
+              "split_strategy": "SPLIT_BY_LINK",
               "val_percentage": 0.25
             },
             "eval_dataset_creator": {

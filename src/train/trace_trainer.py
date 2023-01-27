@@ -80,7 +80,6 @@ class TraceTrainer(BaseTrainer):
         assert not torch.cuda.is_available() or accelerator.num_processes > 1, f"Number of GPUS: {accelerator.num_processes}. Torch devices: {torch.cuda.device_count()}"
         global_step = 0
         training_loss = 0
-        save_strategy = self.trainer_args.custom_save_strategy
         training_metrics = {}
         epoch_loss = 0
         for epoch_index in range(self.trainer_args.num_train_epochs):
@@ -105,7 +104,7 @@ class TraceTrainer(BaseTrainer):
             scheduler.step()
             self.on_epoch(epoch_index)
         return TraceTrainOutput(global_step=global_step, training_loss=training_loss, metrics=training_metrics,
-                                eval_metrics=save_strategy.stage_evaluations)
+                                eval_metrics=self.save_strategy.stage_evaluations)
 
     def create_or_load_state(self, model: PreTrainedModel, data_loader: DataLoader, resume_from_checkpoint: Optional[str] = None) \
             -> Tuple[PreTrainedModel, Optimizer, _LRScheduler, DataLoader]:
@@ -162,12 +161,11 @@ class TraceTrainer(BaseTrainer):
         :param stage_iteration: The number of times this stage has been reached.
         :return: None
         """
-        save_strategy = self.trainer_args.custom_save_strategy
-        should_evaluate = save_strategy.should_evaluate(stage, stage_iteration)
+        should_evaluate = self.save_strategy.should_evaluate(stage, stage_iteration)
 
         if should_evaluate and DatasetRole.VAL in self.trainer_dataset_manager:
             eval_result = self.perform_prediction(DatasetRole.VAL)
-            should_save = save_strategy.should_save(eval_result)
+            should_save = self.save_strategy.should_save(eval_result)
             if should_save:
                 self.save_model(self.get_output_path(self.BEST_MODEL_NAME))
 
@@ -198,8 +196,8 @@ class TraceTrainer(BaseTrainer):
         :return: None
         """
         self.accelerator = Accelerator()
-        self.optimizer = self.trainer_args.optimizer_constructor(model.parameters())
-        self.lr_scheduler = self.trainer_args.scheduler_constructor(self.optimizer)
+        self.optimizer = SupportedOptimizers.create(self.trainer_args.optimizer_name, model)
+        self.lr_scheduler = SupportedSchedulers.create(self.trainer_args.scheduler_name, self.optimizer)
 
     def _prepare_accelerator(self, model: PreTrainedModel, data_loader: DataLoader) \
             -> Tuple[PreTrainedModel, Optimizer, _LRScheduler, DataLoader]:

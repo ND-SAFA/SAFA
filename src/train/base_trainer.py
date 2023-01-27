@@ -9,6 +9,7 @@ from data.datasets.dataset_role import DatasetRole
 from data.managers.trainer_dataset_manager import TrainerDatasetManager
 from models.model_manager import ModelManager
 from train.metrics.metrics_manager import MetricsManager
+from train.save_strategy.abstract_save_strategy import AbstractSaveStrategy
 from train.save_strategy.comparison_criteria import ComparisonCriterion
 from train.save_strategy.epoch_save_strategy import MetricSaveStrategy
 from train.trace_output.trace_prediction_output import TracePredictionOutput
@@ -28,7 +29,7 @@ class BaseTrainer(Trainer, BaseObject):
     """
 
     def __init__(self, trainer_args: TrainerArgs, model_manager: ModelManager,
-                 trainer_dataset_manager: TrainerDatasetManager, **kwargs):
+                 trainer_dataset_manager: TrainerDatasetManager, save_strategy: AbstractSaveStrategy = None, **kwargs):
         """
         Handles the training and evaluation of learning models
         :param args: the learning model arguments
@@ -39,8 +40,8 @@ class BaseTrainer(Trainer, BaseObject):
         self.model_manager.set_max_seq_length(self.trainer_args.max_seq_length)
         model_init = lambda: self.model_manager.get_model()
         tokenizer = self.model_manager.get_tokenizer()
-        if trainer_args.custom_save_strategy is None:
-            self.trainer_args.custom_save_strategy = MetricSaveStrategy(ComparisonCriterion("f2"))
+        if save_strategy is None:
+            self.save_strategy = MetricSaveStrategy(ComparisonCriterion("map"))
         super().__init__(model_init=model_init, args=trainer_args, tokenizer=tokenizer,
                          callbacks=trainer_args.callbacks,
                          **kwargs)

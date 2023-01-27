@@ -52,8 +52,8 @@ if __name__ == "__main__":
     IGNORE = "job_args"
     val_entries = []
     eval_entries = []
-    for job in ls_jobs("jobs"):
-        job_path = os.path.join("jobs", job)
+    for job in ls_jobs(OUTPUT_DIR):
+        job_path = os.path.join(OUTPUT_DIR, job)
         for step in ls_filter(job_path, ignore=[".DS_Store"]):
             step_path = os.path.join(job_path, step)
             for step_job in ls_jobs(step_path):
@@ -77,7 +77,8 @@ if __name__ == "__main__":
     val_output_path = os.path.join(OUTPUT_DIR, export_file_name + "-" + "val.csv")
     eval_output_path = os.path.join(OUTPUT_DIR, export_file_name + "-" + "eval.csv")
     val_df = pd.DataFrame(val_entries).to_csv(val_output_path, index=False)
-    eval_df = pd.DataFrame(eval_entries).to_csv(eval_output_path, index=False)
+    eval_df = pd.DataFrame(eval_entries)
+    eval_df.to_csv(eval_output_path, index=False)
     # Push to s3
     bucket_name = os.environ.get("BUCKET", None)
     if bucket_name:

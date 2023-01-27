@@ -113,10 +113,13 @@ class TraceTrainer(BaseTrainer):
         :param kwargs: Additional parameters passed to super predict function.
         :return: The prediction output.
         """
+        print("Preparing")
         model, optimizer, scheduler, eval_data_loader = self.create_or_load_state(self.model,
                                                                                   self.get_eval_dataloader(),
                                                                                   resume_from_checkpoint=None)
+
         self.model = model
+        print("Eval loop")
         return self.evaluation_loop(eval_data_loader, description="Evaluation")
 
     def create_or_load_state(self, model: PreTrainedModel, data_loader: DataLoader, resume_from_checkpoint: Optional[str] = None) \

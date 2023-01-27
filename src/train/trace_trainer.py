@@ -99,7 +99,7 @@ class TraceTrainer(BaseTrainer):
                     global_step += 1
                     epoch_loss += loss.item()
 
-            print("Epoch Loss:", epoch_loss)
+            self.accelerator.print("Epoch Loss:", epoch_loss)
             epoch_loss = 0
             scheduler.step()
             self.on_epoch(epoch_index)
@@ -112,7 +112,6 @@ class TraceTrainer(BaseTrainer):
         :param kwargs: Additional parameters passed to super predict function.
         :return: The prediction output.
         """
-        print("Preparing")
         self.accelerator = self._create_accelerator()
         eval_data_loader = self.get_eval_dataloader()
         self.model, eval_data_loader = self.accelerator.prepare(self.model, eval_data_loader)
@@ -129,7 +128,6 @@ class TraceTrainer(BaseTrainer):
         :type resume_from_checkpoint:
         :return: Instantiated model, optimizer, scheduler, and train data loader.
         """
-        print("Preparing accelerator")
         model, optimizer, scheduler, data_loader = self._prepare_accelerator(model, data_loader)
         if resume_from_checkpoint:
             self.accelerator.load_state(resume_from_checkpoint)
@@ -178,12 +176,15 @@ class TraceTrainer(BaseTrainer):
 
         if should_evaluate and DatasetRole.VAL in self.trainer_dataset_manager:
             eval_result = self.perform_prediction(DatasetRole.VAL)
+            previous_best = self.save_strategy.best_score
             should_save = self.save_strategy.should_save(eval_result)
             if should_save:
                 current_score = self.save_strategy.get_metric_score(eval_result.metrics)
                 print("-" * 25, "Saving Best Model", "-" * 25)
-                print(f"New Best: {current_score}\tPrevious: {self.save_strategy.best_score}")
+                print(f"New Best: {current_score}\tPrevious: {previous_best}")
                 self.save_model(self.get_output_path(self.BEST_MODEL_NAME))
+            else:
+                self.accelerator.print(f"")
 
     def get_output_path(self, dir_name: str = None):
         """
@@ -214,9 +215,7 @@ class TraceTrainer(BaseTrainer):
         :return: Prepared model, optimizer, scheduler, and data loader.
         """
         if self.accelerator is None:
-            print("Initializing state")
             self._initialize_state(model)
-        print("Preparing entities")
         return self.accelerator.prepare(model,
                                         self.optimizer,
                                         self.lr_scheduler,

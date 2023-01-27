@@ -19,7 +19,9 @@
             "learning_rate": 1e-5,
             "metrics": [
               "map",
-              "f"
+              "map_at_k",
+              "f",
+              "precision"
             ],
             "skip_save": false,
             "load_best_model_at_end": true

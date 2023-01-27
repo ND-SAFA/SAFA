@@ -5,13 +5,21 @@
         {
           "object_type": "TRAIN",
           "job_args": {
-            "random_seed": 914
+            "random_seed": {
+              "*": [
+                87975,
+                7265,
+                35236,
+                21284,
+                56778
+              ]
+            }
           },
           "model_manager": {
-            "model_path": "prajjwal1/bert-small"
+            "model_path": "bert-base-uncased"
           },
           "trainer_args": {
-            "output_dir": "[OUTPUT_PATH]/test/models",
+            "output_dir": "[OUTPUT_PATH]/cm1/bert-base/models",
             "num_train_epochs": 10,
             "per_device_train_batch_size": 8,
             "per_device_eval_batch_size": 8,
@@ -57,5 +65,5 @@
       ]
     }
   ],
-  "output_dir": "[OUTPUT_PATH]/test/jobs"
+  "output_dir": "[OUTPUT_PATH]/cm1/bert-base/jobs"
 }

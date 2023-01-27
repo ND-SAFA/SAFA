@@ -46,7 +46,10 @@ class MetricSaveStrategy(AbstractSaveStrategy):
         """
         super().should_save(evaluation_result)
         score = evaluation_result.metrics[self.comparison_metric]
-        return self.comparison_function(score, self.best_score)
+        is_better = self.comparison_function(score, self.best_score)
+        if is_better:
+            self.best_score = score
+        return is_better
 
     def get_metric_score(self, evaluation_metrics: Metrics) -> float:
         """

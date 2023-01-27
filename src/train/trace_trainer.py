@@ -3,7 +3,6 @@ from typing import Optional, Tuple
 
 import torch
 from accelerate import Accelerator, find_executable_batch_size
-from datasets import Dataset
 from torch.optim import Optimizer
 from torch.optim.lr_scheduler import _LRScheduler
 from torch.utils.data import DataLoader
@@ -47,11 +46,10 @@ class TraceTrainer(BaseTrainer):
         :return: Output of training session.
         """
         accelerator = Accelerator(gradient_accumulation_steps=self.trainer_args.gradient_accumulation_steps)
-        device = accelerator.device
         self.model = self.model_manager.get_model()
         inner_training_loop = find_executable_batch_size(
             self.inner_training_loop) if self.trainer_args.per_device_train_batch_size is None else self.inner_training_loop
-        trace_train_output = inner_training_loop(resume_from_checkpoint=resume_from_checkpoint, accelerator=accelerator, device=device)
+        trace_train_output = inner_training_loop(resume_from_checkpoint=resume_from_checkpoint, accelerator=accelerator)
         if self.trainer_args.load_best_model_at_end:
             if not self.trainer_args.should_save:
                 print("Unable to load best model because configuration defined `should_save` to False.")
@@ -61,7 +59,7 @@ class TraceTrainer(BaseTrainer):
                 self.model = accelerator.prepare_model(self.model)
         return trace_train_output
 
-    def inner_training_loop(self, batch_size: int = None, accelerator: Accelerator = None, device: torch.device = None,
+    def inner_training_loop(self, batch_size: int = None, accelerator: Accelerator = None,
                             resume_from_checkpoint: Optional[str] = None, **kwargs) -> TraceTrainOutput:
         """
         Trains model for the epochs specified in training arguments.
@@ -88,7 +86,7 @@ class TraceTrainer(BaseTrainer):
         for epoch_index in range(self.trainer_args.num_train_epochs):
             with accelerator.accumulate(model):
                 for batch_index, batch in enumerate(tqdm(train_data_loader)):
-                    batch = batch.to(device)
+                    batch = batch.to(accelerator.device)
 
                     labels = batch.pop(DataKey.LABELS_KEY)
                     output: SequenceClassifierOutput = model(**batch)
@@ -109,21 +107,17 @@ class TraceTrainer(BaseTrainer):
         return TraceTrainOutput(global_step=global_step, training_loss=training_loss, metrics=training_metrics,
                                 eval_metrics=self.save_strategy.stage_evaluations)
 
-    def predict(self, test_dataset: Dataset, resume_from_checkpoint: str = None, **kwargs) -> PredictionOutput:
+    def predict_eval(self, **kwargs) -> PredictionOutput:
         """
         Moves model to accelerate device then predicts current model on dataset.
-        :param test_dataset: The test dataset to predict on.
-        :param resume_from_checkpoint: A checkpoint to load before prediction.
         :param kwargs: Additional parameters passed to super predict function.
         :return: The prediction output.
         """
-        model, optimizer, scheduler, eval_dataset = self.create_or_load_state(self.model,
-                                                                              test_dataset,
-                                                                              resume_from_checkpoint)
+        model, optimizer, scheduler, eval_data_loader = self.create_or_load_state(self.model,
+                                                                                  self.get_eval_dataloader(),
+                                                                                  resume_from_checkpoint=None)
         self.model = model
-        self.eval_dataset = eval_dataset
-        self.model.eval()
-        return super().predict(test_dataset, **kwargs)
+        return self.evaluation_loop(eval_data_loader, description="Evaluation")
 
     def create_or_load_state(self, model: PreTrainedModel, data_loader: DataLoader, resume_from_checkpoint: Optional[str] = None) \
             -> Tuple[PreTrainedModel, Optimizer, _LRScheduler, DataLoader]:

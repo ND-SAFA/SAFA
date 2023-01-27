@@ -24,7 +24,7 @@
             }
           },
           "trainer_args": {
-            "output_dir": "[OUTPUT_PATH]/test_small_size/models",
+            "output_dir": "[OUTPUT_PATH]/cchit/base_models/models",
             "num_train_epochs": 10,
             "per_device_train_batch_size": 8,
             "per_device_eval_batch_size": 8,
@@ -70,5 +70,5 @@
       ]
     }
   ],
-  "output_dir": "[OUTPUT_PATH]/test_small_size/jobs"
+  "output_dir": "[OUTPUT_PATH]/cchit/base_models/jobs"
 }

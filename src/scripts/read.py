@@ -85,5 +85,12 @@ if __name__ == "__main__":
         bucket_path = os.path.join(bucket_name, output_file)
         for output_path in [val_output_path, eval_output_path]:
             subprocess.run(["aws", "s3", "cp", output_path, bucket_path])
-    print(eval_df)
+    """
+    Print eval
+    """
+    GROUP_METRICS = [c for c in eval_df.columns if c not in METRICS]
+    if len(GROUP_METRICS) > 0:
+        print(eval_df.groupby(GROUP_METRICS)[METRICS].mean())
+    else:
+        print(eval_df[METRICS].mean())
     print(f"Exported files: {eval_output_path} & {val_output_path}")

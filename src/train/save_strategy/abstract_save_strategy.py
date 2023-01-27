@@ -24,7 +24,7 @@ class AbstractSaveStrategy(BaseObject, ABC):
     """
 
     def __init__(self):
-        self.stage_evaluations = []
+        self.stage_evaluations = {}
 
     @abstractmethod
     def should_evaluate(self, stage: SaveStrategyStage, stage_iteration: int) -> bool:
@@ -36,10 +36,11 @@ class AbstractSaveStrategy(BaseObject, ABC):
         """
 
     @abstractmethod
-    def should_save(self, evaluation_result: TracePredictionOutput) -> bool:
+    def should_save(self, evaluation_result: TracePredictionOutput, id: int) -> bool:
         """
         Returns whether current model state should be saved.
         :param evaluation_result: The results of evaluating the model.
+        :param id: The id of the evaluation result.
         :return: True if model should be saved otherwise false.
         """
-        self.stage_evaluations.append(evaluation_result)
+        self.stage_evaluations[id] = evaluation_result

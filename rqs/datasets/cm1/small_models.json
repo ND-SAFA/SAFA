@@ -5,14 +5,29 @@
         {
           "object_type": "TRAIN",
           "job_args": {
-            "random_seed": 914
+            "random_seed": {
+              "*": [
+                87975,
+                7265,
+                35236,
+                21284,
+                56778
+              ]
+            }
           },
           "model_manager": {
-            "model_path": "hf-internal-testing/tiny-random-bert"
+            "model_path": {
+              "*": [
+                "prajjwal1/bert-tiny",
+                "prajjwal1/bert-mini",
+                "prajjwal1/bert-small",
+                "prajjwal1/bert-medium"
+              ]
+            }
           },
           "trainer_args": {
-            "output_dir": "[OUTPUT_PATH]/test/models",
-            "num_train_epochs": 1,
+            "output_dir": "[OUTPUT_PATH]/test_small_size/models",
+            "num_train_epochs": 10,
             "per_device_train_batch_size": 8,
             "per_device_eval_batch_size": 8,
             "gradient_accumulation_steps": 8,
@@ -43,7 +58,7 @@
             "eval_dataset_creator": {
               "object_type": "SPLIT",
               "split_strategy": "SPLIT_BY_LINK",
-              "val_percentage": 0.50
+              "val_percentage": 0.25
             },
             "augmenter": {
               "steps": [
@@ -57,5 +72,5 @@
       ]
     }
   ],
-  "output_dir": "[OUTPUT_PATH]/test/jobs"
+  "output_dir": "[OUTPUT_PATH]/test_small_size/jobs"
 }

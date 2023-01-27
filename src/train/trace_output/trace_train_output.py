@@ -21,5 +21,6 @@ class TraceTrainOutput(AbstractTraceOutput):
         self.global_step: Optional[int] = global_step
         self.training_loss: Optional[float] = training_loss
         self.metrics: List[StageEval] = metrics
-        self.eval_metrics: List[StageEval] = eval_metrics
+        self.val_metrics: List[StageEval] = eval_metrics
+        self.eval_metrics: List[StageEval] = []
         super().__init__(hf_output=train_output)

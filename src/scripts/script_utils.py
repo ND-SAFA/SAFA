@@ -38,6 +38,13 @@ def filter_entries(entry_dict: Dict, filter: Callable[[str], bool] = lambda s: s
     return {k: v for k, v in entry_dict.items() if filter(k)}
 
 
+def read_params(metrics, params):
+    entry = {}
+    for param in params:
+        entry[param] = metrics[param]
+    return entry
+
+
 def ls_filter(path: str, f: Callable[[str], bool] = None, ignore: List[str] = None, add_base: bool = False):
     if f is None:
         f = lambda s: s

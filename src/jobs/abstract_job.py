@@ -31,8 +31,6 @@ class AbstractJob(threading.Thread, BaseObject):
         super().__init__()
         self.job_args = job_args
         self.model_manager = model_manager
-        if self.job_args.random_seed:
-            self.set_random_seed(self.job_args.random_seed)
         self.result = JobResult()
         self.id = uuid.uuid4()
         self.save_job_output = job_args.save_job_output
@@ -43,6 +41,8 @@ class AbstractJob(threading.Thread, BaseObject):
         """
         self.result.set_job_status(Status.IN_PROGRESS)
         try:
+            if self.job_args.random_seed:
+                self.set_random_seed(self.job_args.random_seed)
             run_result = self._run()
             self.result = run_result.update(self.result)
             self.result.set_job_status(Status.SUCCESS)

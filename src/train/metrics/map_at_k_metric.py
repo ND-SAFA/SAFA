@@ -46,7 +46,7 @@ class MapAtKMetric(AbstractTraceMetric):
             return average_precision_score(labels, preds)
 
         for k in K_METRIC_DEFAULT:
-            score = trace_matrix.calculate_query_metric_at_k(calculate_ap, k)
+            score = trace_matrix.calculate_query_metric_at_k(calculate_ap, k, default_value=0)
             metric_name = self.name.replace("k", str(k))
             results[metric_name] = score
 

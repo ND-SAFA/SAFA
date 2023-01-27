@@ -71,9 +71,6 @@ class BaseTrainer(Trainer, BaseObject):
         return TracePredictionOutput(predictions=metrics_manager.get_scores(), label_ids=output.label_ids, metrics=output.metrics,
                                      source_target_pairs=dataset.get_source_target_pairs())
 
-    def predict_eval(self, *args, **kwargs):
-        return self.predict(*args, **kwargs)
-
     def cleanup(self) -> None:
         """
         Free memory associated with trainer.

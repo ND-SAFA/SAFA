@@ -3,6 +3,7 @@ from typing import Optional, Tuple
 
 import torch
 from accelerate import Accelerator, find_executable_batch_size
+from datasets import Dataset
 from torch.optim import Optimizer
 from torch.optim.lr_scheduler import _LRScheduler
 from torch.utils.data import DataLoader
@@ -106,15 +107,17 @@ class TraceTrainer(BaseTrainer):
         return TraceTrainOutput(global_step=global_step, training_loss=training_loss, metrics=training_metrics,
                                 eval_metrics=self.save_strategy.stage_evaluations)
 
-    def predict_eval(self, **kwargs) -> PredictionOutput:
+    @overrides(BaseTrainer)
+    def predict(self, test_dataset: Dataset) -> PredictionOutput:
         """
         Moves model to accelerate device then predicts current model on dataset.
-        :param kwargs: Additional parameters passed to super predict function.
+        :param test_dataset: Dataset: The dataset to evaluate.
         :return: The prediction output.
         """
+
         self.accelerator = self._create_accelerator()
-        eval_data_loader = self.get_eval_dataloader()
-        self.model, eval_data_loader = self.accelerator.prepare(self.model, eval_data_loader)
+        test_dataloader = self.get_test_dataloader(test_dataset)
+        self.model, eval_data_loader = self.accelerator.prepare(self.model, test_dataloader)
         return self.evaluation_loop(eval_data_loader, description="Evaluation.")
 
     def create_or_load_state(self, model: PreTrainedModel, data_loader: DataLoader, resume_from_checkpoint: Optional[str] = None) \

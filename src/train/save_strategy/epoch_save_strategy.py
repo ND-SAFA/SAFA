@@ -1,6 +1,7 @@
 from train.save_strategy.abstract_save_strategy import AbstractSaveStrategy
 from train.save_strategy.comparison_criteria import ComparisonCriterion
 from train.save_strategy.save_strategy_stage import SaveStrategyStage
+from train.trace_output.stage_eval import Metrics
 from train.trace_output.trace_prediction_output import TracePredictionOutput
 
 
@@ -46,3 +47,11 @@ class MetricSaveStrategy(AbstractSaveStrategy):
         super().should_save(evaluation_result)
         score = evaluation_result.metrics[self.comparison_metric]
         return self.comparison_function(score, self.best_score)
+
+    def get_metric_score(self, evaluation_metrics: Metrics) -> float:
+        """
+        Returns the score of the evaluation metric in given metrics.
+        :param evaluation_metrics: The metrics to extract the score from.
+        :return: The metric score.
+        """
+        return evaluation_metrics[self.comparison_metric]

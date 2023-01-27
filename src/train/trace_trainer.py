@@ -122,6 +122,7 @@ class TraceTrainer(BaseTrainer):
                                                                               resume_from_checkpoint)
         self.model = model
         self.eval_dataset = eval_dataset
+        self.model.eval()
         return super().predict(test_dataset, **kwargs)
 
     def create_or_load_state(self, model: PreTrainedModel, data_loader: DataLoader, resume_from_checkpoint: Optional[str] = None) \
@@ -185,7 +186,9 @@ class TraceTrainer(BaseTrainer):
             eval_result = self.perform_prediction(DatasetRole.VAL)
             should_save = self.save_strategy.should_save(eval_result)
             if should_save:
+                current_score = self.save_strategy.get_metric_score(eval_result.metrics)
                 print("-" * 25, "Saving Best Model", "-" * 25)
+                print(f"New Best: {current_score}\tPrevious: {self.save_strategy.best_score}")
                 self.save_model(self.get_output_path(self.BEST_MODEL_NAME))
 
     def get_output_path(self, dir_name: str = None):

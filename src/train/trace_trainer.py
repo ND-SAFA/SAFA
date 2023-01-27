@@ -114,6 +114,7 @@ class TraceTrainer(BaseTrainer):
         :return: The prediction output.
         """
         print("Preparing")
+        self.accelerator = self._create_accelerator()
         eval_data_loader = self.get_eval_dataloader()
         eval_data_loader = self.accelerator.prepare(eval_data_loader)
         return self.evaluation_loop(eval_data_loader, description="Evaluation.")

@@ -231,7 +231,11 @@ class TraceTrainer(BaseTrainer):
         self.optimizer = SupportedOptimizers.create(self.trainer_args.optimizer_name, model)
         self.lr_scheduler = SupportedSchedulers.create(self.trainer_args.scheduler_name, self.optimizer)
 
-    def _create_accelerator(self):
+    def _create_accelerator(self) -> Accelerator:
+        """
+        Creates accelerator from the training arguments.
+        :return: Constructed accelerator.
+        """
         return Accelerator(gradient_accumulation_steps=self.trainer_args.gradient_accumulation_steps)
 
     @overrides(Trainer)

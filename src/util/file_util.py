@@ -90,7 +90,6 @@ class FileUtil:
         """
         if isinstance(content, dict):
             content = JsonUtil.dict_to_json(content)
-        FileUtil.create_dir_safely(os.path.dirname(output_file_path))
         with FileUtil.safe_open_w(output_file_path) as file:
             file.write(content)
 

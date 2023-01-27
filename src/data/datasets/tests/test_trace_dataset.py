@@ -177,6 +177,13 @@ class TestTraceDataset(BaseTraceTest):
         expected_pairs = ApiTestProject.get_expected_links()
         TestAssertions.assert_lists_have_the_same_vals(self, source_target_pairs, expected_pairs)
 
+        random_order = list(trace_dataset.links.values())
+        source_target_pairs = trace_dataset.get_source_target_pairs(random_order)
+        self.assertEquals(len(random_order), len(source_target_pairs))
+        for i, link_id in enumerate(random_order):
+            link = trace_dataset.links[link_id]
+            self.assertEquals(source_target_pairs[i], (link.source.id, link.target.id))
+
     def test_resize_links_duplicates(self):
         new_length = 5
 

@@ -17,6 +17,7 @@ from data.managers.trainer_dataset_manager import TrainerDatasetManager
 from data.samplers.balanced_batch_sampler import BalancedBatchSampler
 from models.model_manager import ModelManager
 from train.base_trainer import BaseTrainer
+from train.link_training_tracker import LinkTrainingTracker
 from train.save_strategy.save_strategy_stage import SaveStrategyStage
 from train.trace_output.trace_train_output import TraceTrainOutput
 from train.trainer_args import TrainerArgs
@@ -36,6 +37,8 @@ class TraceTrainer(BaseTrainer):
                  **kwargs):
         super().__init__(trainer_args, model_manager, trainer_dataset_manager, **kwargs)
         self.accelerator: Optional[Accelerator] = None
+        self._link_tracker = LinkTrainingTracker(self.trainer_dataset_manager[DatasetRole.TRAIN]) \
+            if DatasetRole.TRAIN in self.trainer_dataset_manager else None
 
     def train(self, resume_from_checkpoint: str = None, **kwargs) -> TraceTrainOutput:
         """
@@ -121,6 +124,7 @@ class TraceTrainer(BaseTrainer):
         model, optimizer, scheduler, train_data_loader = self.create_or_load_state(self.model,
                                                                                    self.get_train_dataloader(),
                                                                                    resume_from_checkpoint)
+        sampler = train_data_loader.batch_sampler.sampler
         global_step = 0
         training_loss = 0
         save_strategy = self.trainer_args.custom_save_strategy
@@ -134,6 +138,10 @@ class TraceTrainer(BaseTrainer):
                 labels = batch.pop(DataKey.LABELS_KEY)
                 output: SequenceClassifierOutput = model(**batch)
                 loss = loss_function(output.logits, labels)
+
+                if isinstance(sampler, BalancedBatchSampler):
+                    self._link_tracker.track_batch(sampler.get_current_link_indices_by_batch(batch_index),
+                                                   output.logits.detach().numpy())
 
                 accelerator.backward(loss)
                 optimizer.step()
@@ -161,6 +169,7 @@ class TraceTrainer(BaseTrainer):
         :param epoch_iteration: The index of epoch performed.
         :return: None
         """
+        self._link_tracker.eval_last_epoch(save_path=self.trainer_args.output_dir if not self.trainer_args.skip_save else None)
         self._conditional_evaluate(SaveStrategyStage.EPOCH, epoch_iteration)
         self.save_model(self.get_output_path(self.CURRENT_MODEL_NAME))
 
@@ -215,4 +224,3 @@ class TraceTrainer(BaseTrainer):
         if self.USE_BALANCED_BATCHES and self.train_dataset is not None:
             return BalancedBatchSampler(data_source=self.train_dataset, batch_size=self._train_batch_size)
         return super()._get_train_sampler()
-

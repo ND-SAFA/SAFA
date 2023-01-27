@@ -1,14 +1,11 @@
 import os
 from copy import deepcopy
 from typing import Dict
-from unittest.mock import patch
 
 import mock
-from torch.utils.data.distributed import DistributedSampler
-from torch.utils.data.sampler import RandomSampler
 
 from data.datasets.dataset_role import DatasetRole
-from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
+from data.managers.trainer_dataset_manager import TrainerDatasetManager
 from jobs.components.job_result import JobResult
 from models.model_manager import ModelManager
 from testres.base_trace_test import BaseTraceTest

@@ -2,8 +2,8 @@ from abc import ABC
 from typing import Any, Optional, Type
 
 from config.override import overrides
-from data.datasets.managers.deterministic_trainer_dataset_manager import DeterministicTrainerDatasetManager
-from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
+from data.managers.deterministic_trainer_dataset_manager import DeterministicTrainerDatasetManager
+from data.managers.trainer_dataset_manager import TrainerDatasetManager
 from jobs.abstract_job import AbstractJob
 from jobs.components.job_args import JobArgs
 from jobs.create_datasets_job import CreateDatasetsJob

@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from typing import Dict, List
 
-from data.datasets.creators.readers.abstract_project_reader import AbstractProjectReader
+from data.readers.abstract_project_reader import AbstractProjectReader
 from testres.testprojects.entry_creator import LayerEntry
 
 

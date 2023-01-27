@@ -1,9 +1,9 @@
 from typing import Dict, List, Tuple
 
 from config.override import overrides
-from data.datasets.creators.readers.abstract_project_reader import AbstractProjectReader
-from data.datasets.creators.readers.api_project_reader import ApiProjectReader
-from data.datasets.keys.structure_keys import StructuredKeys
+from data.readers.abstract_project_reader import AbstractProjectReader
+from data.readers.api_project_reader import ApiProjectReader
+from data.keys.structure_keys import StructuredKeys
 from testres.test_data_manager import TestDataManager
 from testres.testprojects.abstract_test_project import AbstractTestProject
 from testres.testprojects.entry_creator import EntryCreator, LayerEntry, TraceInstruction

@@ -1,4 +1,3 @@
-from data.datasets.managers.trainer_dataset_manager import TrainerDatasetManager
 from data.processing.augmentation.data_augmenter import DataAugmenter
 from testres.base_test import BaseTest
 from util.object_creator import ObjectCreator

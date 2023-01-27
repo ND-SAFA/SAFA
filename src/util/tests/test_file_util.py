@@ -1,6 +1,6 @@
 import os
 
-from data.datasets.creators.tests.test_mlm_pre_train_dataset_creator import TestMLMPreTrainDatasetCreator
+from data.creators.tests.test_mlm_pre_train_dataset_creator import TestMLMPreTrainDatasetCreator
 from testres.base_test import BaseTest
 from testres.paths.paths import TEST_OUTPUT_DIR
 from testres.test_assertions import TestAssertions

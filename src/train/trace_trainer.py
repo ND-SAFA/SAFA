@@ -114,6 +114,7 @@ class TraceTrainer(BaseTrainer):
         :return: The prediction output.
         """
         print("Preparing")
+        self.accelerator = None
         model, optimizer, scheduler, eval_data_loader = self.create_or_load_state(self.model,
                                                                                   self.get_eval_dataloader(),
                                                                                   resume_from_checkpoint=None)

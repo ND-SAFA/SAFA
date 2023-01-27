@@ -9,7 +9,6 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 from transformers import PreTrainedModel, Trainer
 from transformers.modeling_outputs import SequenceClassifierOutput
-from transformers.trainer_pt_utils import nested_concat
 from transformers.trainer_utils import PredictionOutput
 
 from config.override import overrides
@@ -46,7 +45,7 @@ class TraceTrainer(BaseTrainer):
         :param resume_from_checkpoint: The checkpoint to resume from.
         :return: Output of training session.
         """
-        accelerator = Accelerator(gradient_accumulation_steps=self.trainer_args.gradient_accumulation_steps)
+        accelerator = self._create_accelerator()
         self.model = self.model_manager.get_model()
         inner_training_loop = find_executable_batch_size(
             self.inner_training_loop) if self.trainer_args.per_device_train_batch_size is None else self.inner_training_loop
@@ -115,21 +114,9 @@ class TraceTrainer(BaseTrainer):
         :return: The prediction output.
         """
         print("Preparing")
-        self.accelerator.free_memory()
-        self.accelerator = None
-        model, optimizer, scheduler, eval_data_loader = self.create_or_load_state(self.model,
-                                                                                  self.get_eval_dataloader(),
-                                                                                  resume_from_checkpoint=None)
-
-        self.model = model
-        print("Eval loop")
-        agg_predictions = None
-        agg_labels = None
-        for inputs in tqdm(eval_data_loader):
-            loss, logits, labels = self.prediction_step(self.model, inputs, prediction_loss_only=False)
-            agg_predictions = logits if agg_predictions is None else nested_concat(logits, agg_predictions)
-            agg_labels = labels if agg_labels is None else nested_concat(labels, agg_labels)
-        return PredictionOutput(predictions=agg_predictions, label_ids=None, metrics={})
+        eval_data_loader = self.get_eval_dataloader()
+        eval_data_loader = self.accelerator.prepare(eval_data_loader)
+        return self.evaluation_loop(eval_data_loader, description="Evaluation.")
 
     def create_or_load_state(self, model: PreTrainedModel, data_loader: DataLoader, resume_from_checkpoint: Optional[str] = None) \
             -> Tuple[PreTrainedModel, Optimizer, _LRScheduler, DataLoader]:
@@ -218,16 +205,6 @@ class TraceTrainer(BaseTrainer):
         if self.accelerator:  # covers custom and non-custom
             self.accelerator.free_memory()
 
-    def _initialize_state(self, model: PreTrainedModel) -> None:
-        """
-        Initializes accelerator and related entities.
-        :param model: The model used to initialize the optimizer.
-        :return: None
-        """
-        self.accelerator = Accelerator()
-        self.optimizer = SupportedOptimizers.create(self.trainer_args.optimizer_name, model)
-        self.lr_scheduler = SupportedSchedulers.create(self.trainer_args.scheduler_name, self.optimizer)
-
     def _prepare_accelerator(self, model: PreTrainedModel, data_loader: DataLoader) \
             -> Tuple[PreTrainedModel, Optimizer, _LRScheduler, DataLoader]:
         """
@@ -244,6 +221,19 @@ class TraceTrainer(BaseTrainer):
                                         self.optimizer,
                                         self.lr_scheduler,
                                         data_loader)
+
+    def _initialize_state(self, model: PreTrainedModel) -> None:
+        """
+        Initializes accelerator and related entities.
+        :param model: The model used to initialize the optimizer.
+        :return: None
+        """
+        self.accelerator = self._create_accelerator()
+        self.optimizer = SupportedOptimizers.create(self.trainer_args.optimizer_name, model)
+        self.lr_scheduler = SupportedSchedulers.create(self.trainer_args.scheduler_name, self.optimizer)
+
+    def _create_accelerator(self):
+        return Accelerator(gradient_accumulation_steps=self.trainer_args.gradient_accumulation_steps)
 
     @overrides(Trainer)
     def _get_train_sampler(self) -> Optional[torch.utils.data.Sampler]:

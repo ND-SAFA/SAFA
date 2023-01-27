@@ -19,7 +19,7 @@ IGNORE = ["job_args", "trainer_args", "model_manager", "val_dataset_creator", "t
 METRICS = ["map", "map@1", "map@2", "map@3", "ap", "f1", "f2", "precision@1", "precision@2", "precision@3", "recall@1",
            "recall@2", "recall@3"]
 
-METRIC_PATHS = ["eval_metrics", "metrics", METRICS]
+METRIC_PATHS = ["val_metrics", "metrics", METRICS]
 COPY_PATHS = [["experimental_vars"]] + [METRIC_PATHS]
 RQ_PATH = os.path.expanduser(os.environ["RQ_PATH"])
 

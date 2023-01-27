@@ -65,7 +65,6 @@ class TraceTrainer(BaseTrainer):
         Trains model for the epochs specified in training arguments.
         :param batch_size: The batch size of the training step.
         :param accelerator: The accelerator used to perform distributed training of the model.
-        :param device: The primary device to storage model.
         :param kwargs: Any additional arguments. Currently, ignored but necessary for finding optimal batch size.
         :return: The output of the training session.
         """

@@ -7,7 +7,7 @@ from torch.optim import Optimizer
 from torch.optim.lr_scheduler import _LRScheduler
 from torch.utils.data import DataLoader
 from tqdm import tqdm
-from transformers import AutoModelForSequenceClassification, PreTrainedModel, Trainer
+from transformers import PreTrainedModel, Trainer
 from transformers.modeling_outputs import SequenceClassifierOutput
 
 from config.override import overrides
@@ -50,8 +50,11 @@ class TraceTrainer(BaseTrainer):
         inner_training_loop = find_executable_batch_size(self._inner_custom_training_loop)
         trace_train_output = inner_training_loop(resume_from_checkpoint=resume_from_checkpoint, accelerator=accelerator, device=device)
         if self.trainer_args.load_best_model_at_end:
-            best_model_path = self.get_output_path(self.BEST_MODEL_NAME)
-            self.model = AutoModelForSequenceClassification.from_pretrained(best_model_path)
+            if not self.trainer_args.should_save:
+                print("Unable to load best model because configuration defined `should_save` to False.")
+            else:
+                best_model_path = self.get_output_path(self.BEST_MODEL_NAME)
+                self.model = self.model_manager.update_model(best_model_path)
         return trace_train_output
 
     def create_or_load_state(self, model: PreTrainedModel, data_loader: DataLoader, resume_from_checkpoint: Optional[str] = None)\
@@ -110,7 +113,7 @@ class TraceTrainer(BaseTrainer):
         save_strategy = self.trainer_args.custom_save_strategy
         should_evaluate = save_strategy.should_evaluate(stage, stage_iteration)
 
-        if should_evaluate:
+        if should_evaluate and DatasetRole.VAL in self.trainer_dataset_manager:
             eval_result = self.perform_prediction(DatasetRole.VAL)
             should_save = save_strategy.should_save(eval_result)
             if should_save:

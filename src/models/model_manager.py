@@ -67,6 +67,11 @@ class ModelManager(BaseObject):
         self.__tokenizer = None
         gc.collect()
 
+    def update_model(self, model_path: str) -> PreTrainedModel:
+        self.clear_model()
+        self.model_path = model_path
+        return self.get_model()
+
     def get_tokenizer(self) -> PreTrainedTokenizer:
         """
         Gets the pretrained Tokenizer

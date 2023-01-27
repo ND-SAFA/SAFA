@@ -117,11 +117,11 @@ class TraceTrainer(BaseTrainer):
         :param kwargs: Additional parameters passed to super predict function.
         :return: The prediction output.
         """
-        model, optimizer, scheduler, eval_data_loader = self.create_or_load_state(self.model,
-                                                                                  self.get_eval_dataloader(),
-                                                                                  resume_from_checkpoint)
+        model, optimizer, scheduler, eval_dataset = self.create_or_load_state(self.model,
+                                                                              test_dataset,
+                                                                              resume_from_checkpoint)
         self.model = model
-        self.eval_dataset = eval_data_loader
+        self.eval_dataset = eval_dataset
         return super().predict(test_dataset, **kwargs)
 
     def create_or_load_state(self, model: PreTrainedModel, data_loader: DataLoader, resume_from_checkpoint: Optional[str] = None) \
@@ -185,6 +185,7 @@ class TraceTrainer(BaseTrainer):
             eval_result = self.perform_prediction(DatasetRole.VAL)
             should_save = self.save_strategy.should_save(eval_result)
             if should_save:
+                print("-" * 25, "Saving Best Model", "-" * 25)
                 self.save_model(self.get_output_path(self.BEST_MODEL_NAME))
 
     def get_output_path(self, dir_name: str = None):

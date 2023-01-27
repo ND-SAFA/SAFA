@@ -88,7 +88,7 @@ if __name__ == "__main__":
     """
     Print eval
     """
-    GROUP_METRICS = [c for c in eval_df.columns if c not in METRICS]
+    GROUP_METRICS = [c for c in eval_df.columns if c not in METRICS and c != "random_seed"]
     if len(GROUP_METRICS) > 0:
         print(eval_df.groupby(GROUP_METRICS)[METRICS].mean())
     else:

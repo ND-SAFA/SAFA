@@ -115,7 +115,7 @@ class TraceTrainer(BaseTrainer):
         """
         print("Preparing")
         eval_data_loader = self.get_eval_dataloader()
-        self.model, eval_data_loader = self.accelerator.prepare(self.model, eval_data_loader)
+        eval_data_loader = self.accelerator.prepare(eval_data_loader)
         return self.evaluation_loop(eval_data_loader, description="Evaluation.")
 
     def create_or_load_state(self, model: PreTrainedModel, data_loader: DataLoader, resume_from_checkpoint: Optional[str] = None) \

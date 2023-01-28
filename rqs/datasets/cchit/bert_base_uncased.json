@@ -43,7 +43,7 @@
             "val_dataset_creator": {
               "object_type": "SPLIT",
               "split_strategy": "SPLIT_BY_LINK",
-              "val_percentage": 0.35
+              "val_percentage": 0.45
             },
             "eval_dataset_creator": {
               "object_type": "SPLIT",

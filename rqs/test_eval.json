@@ -5,10 +5,10 @@
         {
           "object_type": "PREDICT",
           "job_args": {
-            "random_seed": 68
+            "random_seed": 1231231
           },
           "model_manager": {
-            "model_path": "[OUTPUT_PATH]/test_train/models/best"
+            "model_path": "[OUTPUT_PATH]/best_model"
           },
           "trainer_args": {
             "output_dir": "[OUTPUT_PATH]/test_eval/models",
@@ -24,7 +24,7 @@
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "CSV",
-                "project_path": "[OUTPUT_PATH]/create_dataset/cm1/eval.csv"
+                "project_path": "[OUTPUT_PATH]/best_model_eval/eval.csv"
               }
             }
           }

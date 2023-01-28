@@ -73,6 +73,7 @@ class TraceTrainer(BaseTrainer):
         self._train_batch_size = batch_size
         self.args.per_device_train_batch_size = batch_size
         loss_function = self.trainer_args.loss_function
+        print("Training batch size:", self._train_batch_size)
         self.model.train()
         model, optimizer, scheduler, train_data_loader = self.create_or_load_state(self.model,
                                                                                    self.get_train_dataloader(),

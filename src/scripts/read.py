@@ -67,7 +67,8 @@ if __name__ == "__main__":
                     # print(metrics.keys())
                     entry = {**base_entry, **read_params(metrics_entry, METRICS), "epoch": epoch_index}
                     val_entries.append(entry)
-                eval_entries.append({**base_entry, **read_params(output_json["eval_metrics"], METRICS)})
+                if len(output_json["eval_metrics"]) > 0:
+                    eval_entries.append({**base_entry, **read_params(output_json["eval_metrics"], METRICS)})
     print("Validation:", len(val_entries))
     print("Evaluation:", len(eval_entries))
 
@@ -76,7 +77,8 @@ if __name__ == "__main__":
     """
     val_output_path = os.path.join(OUTPUT_DIR, export_file_name + "-" + "val.csv")
     eval_output_path = os.path.join(OUTPUT_DIR, export_file_name + "-" + "eval.csv")
-    val_df = pd.DataFrame(val_entries).to_csv(val_output_path, index=False)
+    val_df = pd.DataFrame(val_entries)
+    val_df.to_csv(val_output_path, index=False)
     eval_df = pd.DataFrame(eval_entries)
     eval_df.to_csv(eval_output_path, index=False)
     # Push to s3
@@ -92,5 +94,5 @@ if __name__ == "__main__":
     if len(GROUP_METRICS) > 0:
         print(eval_df.groupby(GROUP_METRICS)[METRICS].mean())
     else:
-        print(eval_df[METRICS].mean())
+        print(val_df[METRICS].mean())
     print(f"Exported files: {eval_output_path} & {val_output_path}")

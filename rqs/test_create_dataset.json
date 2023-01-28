@@ -3,28 +3,10 @@
     {
       "jobs": [
         {
-          "object_type": "TRAIN",
+          "object_type": "CREATE_DATASETS",
           "job_args": {
-            "random_seed": 68
-          },
-          "model_manager": {
-            "model_path": "hf-internal-testing/tiny-random-bert"
-          },
-          "trainer_args": {
-            "output_dir": "[OUTPUT_PATH]/test/models",
-            "num_train_epochs": 10,
-            "per_device_train_batch_size": 8,
-            "per_device_eval_batch_size": 8,
-            "gradient_accumulation_steps": 8,
-            "learning_rate": 1e-5,
-            "metrics": [
-              "map",
-              "map_at_k",
-              "f",
-              "precision"
-            ],
-            "skip_save": false,
-            "load_best_model_at_end": true
+            "random_seed": 68,
+            "output_dir": "[OUTPUT_PATH]/create_dataset/cm1"
           },
           "trainer_dataset_manager": {
             "train_dataset_creator": {
@@ -57,5 +39,5 @@
       ]
     }
   ],
-  "output_dir": "[OUTPUT_PATH]/test/jobs"
+  "output_dir": "[OUTPUT_PATH]/create_dataset/cm1"
 }

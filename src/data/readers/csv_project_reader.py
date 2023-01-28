@@ -2,9 +2,9 @@ from typing import Dict, Tuple
 
 import pandas as pd
 
-from data.readers.abstract_project_reader import AbstractProjectReader
 from data.keys.csv_format import CSVKeys
 from data.keys.structure_keys import StructuredKeys
+from data.readers.abstract_project_reader import AbstractProjectReader
 from util.dataframe_util import DataFrameUtil
 
 
@@ -14,19 +14,19 @@ class CsvProjectReader(AbstractProjectReader):
     """
     LAYER_ID = "CSV_LAYER_ID"
 
-    def __init__(self, data_path: str):
+    def __init__(self, project_path: str):
         """
         Creates reader targeted at reading entries located at given path.
-        :param data_path: Path to data file containing entity entries.
+        :param project_path: Path to data file containing entity entries.
         """
-        self.data_path = data_path
+        self.project_path = project_path
 
     def read_project(self) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
         """
         Reads csv containing trace links and constructs separate data frames containing artifacts and trace links.
         :return: Artifact and Trace DataFrame
         """
-        entity_df = pd.read_csv(self.data_path)
+        entity_df = pd.read_csv(self.project_path)
         trace_df_entries = []
         artifact_df_entries = {}
         for _, row in entity_df.iterrows():

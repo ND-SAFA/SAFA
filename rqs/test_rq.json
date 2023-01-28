@@ -5,7 +5,12 @@
         {
           "object_type": "TRAIN",
           "job_args": {
-            "random_seed": 68
+            "random_seed": {
+              "*": [
+                68,
+                62
+              ]
+            }
           },
           "model_manager": {
             "model_path": "hf-internal-testing/tiny-random-bert"
@@ -43,7 +48,7 @@
             "eval_dataset_creator": {
               "object_type": "SPLIT",
               "split_strategy": "SPLIT_BY_LINK",
-              "val_percentage": 0.25
+              "val_percentage": 0.50
             },
             "augmenter": {
               "steps": [

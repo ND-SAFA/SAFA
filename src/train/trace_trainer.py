@@ -117,7 +117,7 @@ class TraceTrainer(BaseTrainer):
         self.accelerator = self._create_accelerator()
         test_dataloader = self.get_test_dataloader(test_dataset)
         self.model, eval_data_loader = self.accelerator.prepare(self.model, test_dataloader)
-        return self.evaluation_loop(eval_data_loader, description="Evaluation.")
+        return self.evaluation_loop(tqdm(eval_data_loader), description="Evaluation.")
 
     def create_or_load_state(self, model: PreTrainedModel, data_loader: DataLoader, resume_from_checkpoint: Optional[str] = None) \
             -> Tuple[PreTrainedModel, Optimizer, _LRScheduler, DataLoader]:

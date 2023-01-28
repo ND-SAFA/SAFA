@@ -41,13 +41,6 @@
                 "project_path": "[OUTPUT_PATH]/create_dataset/cm1/val.csv"
               }
             },
-            "eval_dataset_creator": {
-              "object_type": "TRACE",
-              "project_reader": {
-                "object_type": "CSV",
-                "project_path": "[OUTPUT_PATH]/create_dataset/cm1/eval.csv"
-              }
-            },
             "augmenter": {
               "steps": [
                 {

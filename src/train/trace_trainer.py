@@ -29,8 +29,6 @@ from train.trainer_args import TrainerArgs
 
 os.environ['TRANSFORMERS_NO_ADVISORY_WARNINGS'] = 'true'
 
-import torch.distributed.run
-
 
 class TraceTrainer(BaseTrainer):
     """
@@ -114,10 +112,12 @@ class TraceTrainer(BaseTrainer):
     def predict(self, eval_dataset: Dataset) -> PredictionOutput:
         eval_dataloader = self.get_test_dataloader(eval_dataset)
         self.model, eval_dataloader, _, _ = self._prepare_accelerator(self.model, eval_dataloader)
-
+        self.accelerator.wait_for_everyone()
         self.accelerator.print(f"Distributed type: {AcceleratorState().distributed_type}")
 
         predictions, labels = [], []
+        n_batches = 0
+        n_outputs = 0
         for batch in eval_dataloader:
             batch.to(self.accelerator.device)
             targets = batch.pop(DataKey.LABELS_KEY)
@@ -126,6 +126,11 @@ class TraceTrainer(BaseTrainer):
             self.accelerator.wait_for_everyone()
             predictions.append(self.accelerator.gather(output.logits).cpu().numpy())
             labels.append(self.accelerator.gather(targets).cpu().numpy())
+            n_outputs += len(output.logits)
+            n_batches += 1
+
+        self.accelerator.print("# OUTPUT:", n_outputs)
+        self.accelerator.print("# BATCHES:", n_batches)
         self.accelerator.wait_for_everyone()
         self.accelerator.print("Predictions (before):", len(predictions))
         predictions = np.concatenate(predictions)

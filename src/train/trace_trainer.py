@@ -120,7 +120,7 @@ class TraceTrainer(BaseTrainer):
             targets = batch.pop(DataKey.LABELS_KEY)
             with torch.no_grad():
                 output = self.model(**batch)
-
+            self.accelerator.wait_for_everyone()
             predictions.append(self.accelerator.gather(output.logits).cpu().numpy())
             labels.append(self.accelerator.gather(targets).cpu().numpy())
         self.accelerator.wait_for_everyone()

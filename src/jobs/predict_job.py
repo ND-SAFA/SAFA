@@ -1,9 +1,7 @@
 from typing import Dict
 
-from config.override import overrides
 from jobs.abstract_trace_job import AbstractTraceJob
 from jobs.components.job_result import JobResult
-from train.base_trainer import BaseTrainer
 
 
 class PredictJob(AbstractTraceJob):
@@ -15,19 +13,6 @@ class PredictJob(AbstractTraceJob):
         """
         trace_prediction_output = self.get_trainer().perform_prediction()
         return JobResult.from_trace_output(trace_prediction_output)
-
-    @overrides(AbstractTraceJob)
-    def get_trainer(self, **kwargs) -> BaseTrainer:
-        """
-        Gets the trace trainer for the job
-        :param kwargs: any additional parameters for the trainer
-        :return: the trainer
-        """
-        if self._trainer is None:
-            self._trainer = BaseTrainer(trainer_args=self.trainer_args,
-                                        trainer_dataset_manager=self.trainer_dataset_manager,
-                                        model_manager=self.model_manager, **kwargs)
-        return self._trainer
 
     @staticmethod
     def result_from_prediction_output(trainer_output: Dict) -> JobResult:

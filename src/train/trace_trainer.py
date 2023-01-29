@@ -29,6 +29,8 @@ from train.trainer_args import TrainerArgs
 
 os.environ['TRANSFORMERS_NO_ADVISORY_WARNINGS'] = 'true'
 
+import torch.distributed.run
+
 
 class TraceTrainer(BaseTrainer):
     """
@@ -112,29 +114,28 @@ class TraceTrainer(BaseTrainer):
     def predict(self, eval_dataset: Dataset) -> PredictionOutput:
         eval_dataloader = self.get_test_dataloader(eval_dataset)
         self.model, eval_dataloader, _, _ = self._prepare_accelerator(self.model, eval_dataloader)
-        if self.accelerator.is_main_process:
 
-            self.accelerator.print(f"Distributed type: {AcceleratorState().distributed_type}")
+        self.accelerator.print(f"Distributed type: {AcceleratorState().distributed_type}")
 
-            predictions, labels = [], []
-            for batch in eval_dataloader:
-                batch.to(self.accelerator.device)
-                targets = batch.pop(DataKey.LABELS_KEY)
-                with torch.no_grad():
-                    output = self.model(**batch)
-                self.accelerator.wait_for_everyone()
-                predictions.append(self.accelerator.gather(output.logits).cpu().numpy())
-                labels.append(self.accelerator.gather(targets).cpu().numpy())
+        predictions, labels = [], []
+        for batch in eval_dataloader:
+            batch.to(self.accelerator.device)
+            targets = batch.pop(DataKey.LABELS_KEY)
+            with torch.no_grad():
+                output = self.model(**batch)
             self.accelerator.wait_for_everyone()
-            self.accelerator.print("Predictions (before):", len(predictions))
-            predictions = np.concatenate(predictions)
-            self.accelerator.print("Predictions (after):", len(predictions))
-            labels = np.concatenate(labels)
+            predictions.append(self.accelerator.gather(output.logits).cpu().numpy())
+            labels.append(self.accelerator.gather(targets).cpu().numpy())
+        self.accelerator.wait_for_everyone()
+        self.accelerator.print("Predictions (before):", len(predictions))
+        predictions = np.concatenate(predictions)
+        self.accelerator.print("Predictions (after):", len(predictions))
+        labels = np.concatenate(labels)
 
-            predictions = predictions[:len(eval_dataloader.dataset)]
-            labels = labels[:len(eval_dataloader.dataset)]
+        predictions = predictions[:len(eval_dataloader.dataset)]
+        labels = labels[:len(eval_dataloader.dataset)]
 
-            return PredictionOutput(predictions=predictions, label_ids=labels, metrics={})
+        return PredictionOutput(predictions=predictions, label_ids=labels, metrics={})
 
     def predict_old(self, test_dataset: Dataset) -> PredictionOutput:
         """

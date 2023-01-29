@@ -112,15 +112,15 @@ class TraceTrainer(BaseTrainer):
         self.model, eval_dataloader, _, _ = self._prepare_accelerator(self.model, eval_dataloader)
 
         predictions, labels = torch.tensor([]), torch.tensor([])
-        predictions.to(self.accelerator.device)
-        labels.to(self.accelerator.device)
+        predictions = predictions.to(self.accelerator.device)
+        labels = labels.to(self.accelerator.device)
         for batch in eval_dataloader:
-            batch.to(self.accelerator.device)
+            batch = batch.to(self.accelerator.device)
             targets = batch.pop(DataKey.LABELS_KEY)
             with torch.no_grad():
                 model_predictions = self.model(**batch)
-            model_predictions.logits.to(self.accelerator.device)
-            predictions = torch.cat((predictions, model_predictions.logits))
+            model_predictions = model_predictions.logits.to(self.accelerator.device)
+            predictions = torch.cat((predictions, model_predictions))
             labels = torch.cat((labels, targets))
 
         all_predictions, all_targets = self.accelerator.gather_for_metrics((predictions, labels))

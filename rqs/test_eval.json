@@ -8,7 +8,7 @@
             "random_seed": 1231231
           },
           "model_manager": {
-            "model_path": "[OUTPUT_PATH]/test_train/models/a59ecfee-6f47-4789-842e-1294737ea5ec/best "
+            "model_path": "[OUTPUT_PATH]/test_train/models/a59ecfee-6f47-4789-842e-1294737ea5ec/best"
           },
           "trainer_args": {
             "output_dir": "[OUTPUT_PATH]/test_eval/models",

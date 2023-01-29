@@ -118,7 +118,10 @@ class TraceTrainer(BaseTrainer):
         self.accelerator = self._create_accelerator()
         test_dataloader = self.get_test_dataloader(test_dataset)
         self.model, eval_data_loader = self.accelerator.prepare(self.model, test_dataloader)
-        return self.evaluation_loop(eval_data_loader, description="Evaluation.")
+        evaluation_output = self.evaluation_loop(eval_data_loader, description="Evaluation.")
+        n_predictions, n_expected = len(evaluation_output.predictions), len(test_dataset)
+        assert n_predictions == n_expected, f"Expected {n_expected} samples but received {n_predictions} predictions."
+        return evaluation_output
 
     def create_or_load_state(self, model: PreTrainedModel, data_loader: DataLoader, resume_from_checkpoint: Optional[str] = None) \
             -> Tuple[PreTrainedModel, Optimizer, _LRScheduler, DataLoader]:

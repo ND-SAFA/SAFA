@@ -4,6 +4,7 @@ from typing import Optional, Tuple
 import numpy as np
 import torch
 from accelerate import Accelerator, find_executable_batch_size
+from accelerate.state import AcceleratorState
 from datasets import Dataset
 from torch.optim import Optimizer
 from torch.optim.lr_scheduler import _LRScheduler
@@ -109,6 +110,8 @@ class TraceTrainer(BaseTrainer):
                                 eval_metrics=self.save_strategy.stage_evaluations)
 
     def predict(self, eval_dataset: Dataset) -> PredictionOutput:
+        print(f"Distributed type: {AcceleratorState().distributed_type}")
+
         eval_dataloader = self.get_test_dataloader(eval_dataset)
         self.model, eval_dataloader, _, _ = self._prepare_accelerator(self.model, eval_dataloader)
 
@@ -121,7 +124,9 @@ class TraceTrainer(BaseTrainer):
             predictions.append(self.accelerator.gather(output.logits).cpu().numpy())
             labels.append(self.accelerator.gather(targets).cpu().numpy())
 
+        print("Predictions (before):", len(predictions))
         predictions = np.concatenate(predictions)
+        print("Predictions (after):", len(predictions))
         labels = np.concatenate(labels)
 
         predictions = predictions[:len(eval_dataloader.dataset)]

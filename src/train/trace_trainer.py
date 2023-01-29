@@ -1,7 +1,6 @@
 import os
 from typing import Optional, Tuple
 
-import numpy as np
 import torch
 from accelerate import Accelerator, find_executable_batch_size
 from datasets import Dataset
@@ -116,18 +115,12 @@ class TraceTrainer(BaseTrainer):
         for batch in eval_dataloader:
             targets = batch.pop(DataKey.LABELS_KEY)
             with torch.no_grad():
-                output = self.model(**batch)
+                predictions = self.model(**batch)
 
-            predictions.append(self.accelerator.gather(output.logits).cpu().numpy())
-            labels.append(self.accelerator.gather(targets).cpu().numpy())
+            all_predictions, all_targets = self.accelerator.gather_for_metrics((predictions.logits, targets))
+            print(self.accelerator.process_index, len(all_predictions), len(all_targets))
 
-        predictions = np.concatenate(predictions)
-        labels = np.concatenate(labels)
-
-        predictions = predictions[:len(eval_dataloader.dataset)]
-        labels = labels[:len(eval_dataloader.dataset)]
-
-        return PredictionOutput(predictions=predictions, label_ids=labels, metrics={})
+        return PredictionOutput(predictions=all_predictions, label_ids=all_targets, metrics={})
 
     def predict_old(self, test_dataset: Dataset) -> PredictionOutput:
         """

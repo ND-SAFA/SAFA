@@ -1,6 +1,7 @@
 import gc
 from typing import Dict, List, Optional
 
+import torch
 from torch.nn.parameter import Parameter
 from transformers import AutoConfig
 from transformers.modeling_utils import PreTrainedModel
@@ -54,6 +55,8 @@ class ModelManager(BaseObject):
         """
         if self.__model is None:
             self.__model = self.__load_model()
+            device = torch.device("cpu")
+            self.__model.to(device)
         return self.__model
 
     def clear_model(self) -> None:

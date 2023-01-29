@@ -62,8 +62,8 @@ class BaseTrainer(Trainer, BaseObject):
         :return: A dictionary containing the results.
         """
         dataset = self.trainer_dataset_manager[dataset_role]
-        eval_dataset = dataset.to_trainer_dataset(self.model_manager)
-        output = self.predict(eval_dataset)
+        self.eval_dataset = dataset.to_trainer_dataset(self.model_manager)
+        output = self.predict(self.eval_dataset)
         metrics_manager = MetricsManager(dataset.get_ordered_links(), output.predictions)
         eval_metrics = metrics_manager.eval(self.trainer_args.metrics) if self.trainer_args.metrics else {}
         print(eval_metrics)

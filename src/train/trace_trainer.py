@@ -116,8 +116,8 @@ class TraceTrainer(BaseTrainer):
             targets = batch.pop(DataKey.LABELS_KEY)
             with torch.no_grad():
                 model_predictions = self.model(**batch)
-            predictions = torch.cat(predictions, model_predictions.logits)
-            labels = torch.cat(labels, targets)
+            predictions = torch.cat((predictions, model_predictions.logits))
+            labels = torch.cat((labels, targets))
 
         all_predictions, all_targets = self.accelerator.gather_for_metrics((predictions, labels))
         return PredictionOutput(predictions=all_predictions, label_ids=all_targets, metrics={})

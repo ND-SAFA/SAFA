@@ -8,7 +8,7 @@
             "random_seed": 1231231
           },
           "model_manager": {
-            "model_path": "hf-internal-testing/tiny-random-bert"
+            "model_path": "[OUTPUT_PATH]/test_train/models/75681a72-e0f0-4a68-9093-807c55bd35b3/best"
           },
           "trainer_args": {
             "output_dir": "[OUTPUT_PATH]/test_eval/models",

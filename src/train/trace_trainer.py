@@ -119,6 +119,7 @@ class TraceTrainer(BaseTrainer):
             targets = batch.pop(DataKey.LABELS_KEY)
             with torch.no_grad():
                 model_predictions = self.model(**batch)
+            model_predictions.logits.to(self.accelerator.device)
             predictions = torch.cat((predictions, model_predictions.logits))
             labels = torch.cat((labels, targets))
 

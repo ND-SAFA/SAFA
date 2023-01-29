@@ -8,7 +8,7 @@ from accelerate.state import AcceleratorState
 from datasets import Dataset
 from torch.optim import Optimizer
 from torch.optim.lr_scheduler import _LRScheduler
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, DistributedSampler
 from tqdm import tqdm
 from transformers import PreTrainedModel, Trainer
 from transformers.modeling_outputs import SequenceClassifierOutput
@@ -123,16 +123,18 @@ class TraceTrainer(BaseTrainer):
             predictions.append(self.accelerator.gather(output.logits).cpu().numpy())
             labels.append(self.accelerator.gather(targets).cpu().numpy())
 
-        if self.accelerator.is_main_process:
-            print("Predictions (before):", len(predictions))
-            predictions = np.concatenate(predictions)
-            print("Predictions (after):", len(predictions))
-            labels = np.concatenate(labels)
+        print("Predictions (before):", len(predictions))
+        predictions = np.concatenate(predictions)
+        print("Predictions (after):", len(predictions))
+        labels = np.concatenate(labels)
 
-            predictions = predictions[:len(eval_dataloader.dataset)]
-            labels = labels[:len(eval_dataloader.dataset)]
+        predictions = predictions[:len(eval_dataloader.dataset)]
+        labels = labels[:len(eval_dataloader.dataset)]
 
-            return PredictionOutput(predictions=predictions, label_ids=labels, metrics={})
+        return PredictionOutput(predictions=predictions, label_ids=labels, metrics={})
+
+    def _get_eval_sampler(self, eval_dataset: Dataset) -> Optional[torch.utils.data.Sampler]:
+        return DistributedSampler(eval_dataset)
 
     def predict_old(self, test_dataset: Dataset) -> PredictionOutput:
         """

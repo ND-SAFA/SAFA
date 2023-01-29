@@ -116,6 +116,7 @@ class TraceTrainer(BaseTrainer):
 
         predictions, labels = [], []
         for batch in eval_dataloader:
+            batch.to(self.accelerator.device)
             targets = batch.pop(DataKey.LABELS_KEY)
             with torch.no_grad():
                 output = self.model(**batch)

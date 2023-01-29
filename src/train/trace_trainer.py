@@ -4,7 +4,6 @@ from typing import Optional, Tuple
 import numpy as np
 import torch
 from accelerate import Accelerator, find_executable_batch_size
-from accelerate.state import AcceleratorState
 from datasets import Dataset
 from torch.optim import Optimizer
 from torch.optim.lr_scheduler import _LRScheduler
@@ -112,29 +111,17 @@ class TraceTrainer(BaseTrainer):
     def predict(self, eval_dataset: Dataset) -> PredictionOutput:
         eval_dataloader = self.get_test_dataloader(eval_dataset)
         self.model, eval_dataloader, _, _ = self._prepare_accelerator(self.model, eval_dataloader)
-        self.accelerator.wait_for_everyone()
-        self.accelerator.print(f"Distributed type: {AcceleratorState().distributed_type}")
 
         predictions, labels = [], []
-        n_batches = 0
-        n_outputs = 0
         for batch in eval_dataloader:
-            batch.to(self.accelerator.device)
             targets = batch.pop(DataKey.LABELS_KEY)
             with torch.no_grad():
                 output = self.model(**batch)
-            self.accelerator.wait_for_everyone()
+
             predictions.append(self.accelerator.gather(output.logits).cpu().numpy())
             labels.append(self.accelerator.gather(targets).cpu().numpy())
-            n_outputs += len(output.logits)
-            n_batches += 1
 
-        self.accelerator.print("# OUTPUT:", n_outputs)
-        self.accelerator.print("# BATCHES:", n_batches)
-        self.accelerator.wait_for_everyone()
-        self.accelerator.print("Predictions (before):", len(predictions))
         predictions = np.concatenate(predictions)
-        self.accelerator.print("Predictions (after):", len(predictions))
         labels = np.concatenate(labels)
 
         predictions = predictions[:len(eval_dataloader.dataset)]
@@ -275,7 +262,7 @@ class TraceTrainer(BaseTrainer):
         Creates accelerator from the training arguments.
         :return: Constructed accelerator.
         """
-        return Accelerator(gradient_accumulation_steps=self.trainer_args.gradient_accumulation_steps)
+        return Accelerator(gradient_accumulation_steps=self.trainer_args.gradient_accumulation_steps, split_batches=True)
 
     @overrides(Trainer)
     def _get_train_sampler(self) -> Optional[torch.utils.data.Sampler]:

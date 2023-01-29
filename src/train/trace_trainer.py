@@ -3,12 +3,14 @@ from typing import Optional, Tuple
 
 import torch
 from accelerate import Accelerator, find_executable_batch_size
+from datasets import Dataset
 from torch.optim import Optimizer
 from torch.optim.lr_scheduler import _LRScheduler
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 from transformers import PreTrainedModel, Trainer
 from transformers.modeling_outputs import SequenceClassifierOutput
+from transformers.trainer_utils import PredictionOutput
 
 from config.override import overrides
 from data.datasets.data_key import DataKey
@@ -105,18 +107,18 @@ class TraceTrainer(BaseTrainer):
         return TraceTrainOutput(global_step=global_step, training_loss=training_loss, metrics=training_metrics,
                                 eval_metrics=self.save_strategy.stage_evaluations)
 
-    # @overrides(BaseTrainer)
-    # def predict(self, test_dataset: Dataset) -> PredictionOutput:
-    #     """
-    #     Moves model to accelerate device then predicts current model on dataset.
-    #     :param test_dataset: Dataset: The dataset to evaluate.
-    #     :return: The prediction output.
-    #     """
-    #
-    #     self.accelerator = self._create_accelerator()
-    #     test_dataloader = self.get_test_dataloader(test_dataset)
-    #     self.model, eval_data_loader = self.accelerator.prepare(self.model, test_dataloader)
-    #     return self.evaluation_loop(tqdm(eval_data_loader), description="Evaluation.")
+    @overrides(BaseTrainer)
+    def predict(self, test_dataset: Dataset) -> PredictionOutput:
+        """
+        Moves model to accelerate device then predicts current model on dataset.
+        :param test_dataset: Dataset: The dataset to evaluate.
+        :return: The prediction output.
+        """
+
+        self.accelerator = self._create_accelerator()
+        test_dataloader = self.get_test_dataloader(test_dataset)
+        self.model, eval_data_loader = self.accelerator.prepare(self.model, test_dataloader)
+        return self.evaluation_loop(tqdm(eval_data_loader), description="Evaluation.")
 
     def create_or_load_state(self, model: PreTrainedModel, data_loader: DataLoader, resume_from_checkpoint: Optional[str] = None) \
             -> Tuple[PreTrainedModel, Optimizer, _LRScheduler, DataLoader]:

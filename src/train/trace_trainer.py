@@ -110,8 +110,9 @@ class TraceTrainer(BaseTrainer):
                                 eval_metrics=self.save_strategy.stage_evaluations)
 
     def predict(self, eval_dataset: Dataset) -> PredictionOutput:
+        self.accelerator = Accelerator()
         eval_dataloader = self.get_test_dataloader(eval_dataset)
-        self.model, eval_dataloader, _, _ = self._prepare_accelerator(self.model, eval_dataloader)
+        eval_dataloader = self.accelerator.prepare(eval_dataloader)
         print(f"Distributed type: {AcceleratorState().distributed_type}")
 
         predictions, labels = [], []
@@ -120,10 +121,10 @@ class TraceTrainer(BaseTrainer):
             targets = batch.pop(DataKey.LABELS_KEY)
             with torch.no_grad():
                 output = self.model(**batch)
-            self.accelerator.wait_for_everyone()
+
             predictions.append(self.accelerator.gather(output.logits).cpu().numpy())
             labels.append(self.accelerator.gather(targets).cpu().numpy())
-        self.accelerator.wait_for_everyone()
+
         self.accelerator.print("Predictions (before):", len(predictions))
         predictions = np.concatenate(predictions)
         self.accelerator.print("Predictions (after):", len(predictions))

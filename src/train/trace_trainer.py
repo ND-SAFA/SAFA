@@ -112,7 +112,7 @@ class TraceTrainer(BaseTrainer):
     def predict(self, eval_dataset: Dataset) -> PredictionOutput:
         eval_dataloader = self.get_test_dataloader(eval_dataset)
         self.model, eval_dataloader, _, _ = self._prepare_accelerator(self.model, eval_dataloader)
-        if self.accelerator.is_main_process():
+        if self.accelerator.is_main_process:
 
             self.accelerator.print(f"Distributed type: {AcceleratorState().distributed_type}")
 

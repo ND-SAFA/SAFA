@@ -117,6 +117,8 @@ class TraceTrainer(BaseTrainer):
 
         self.accelerator = self._create_accelerator()
         test_dataloader = self.get_test_dataloader(test_dataset)
+        print("Test data set:", len(test_dataset))
+        print("Test data loader:", len(test_dataloader))
         self.model, eval_data_loader = self.accelerator.prepare(self.model, test_dataloader)
         return self.evaluation_loop(tqdm(eval_data_loader), description="Evaluation.")
 

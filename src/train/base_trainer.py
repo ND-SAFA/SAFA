@@ -64,6 +64,8 @@ class BaseTrainer(Trainer, BaseObject):
         dataset = self.trainer_dataset_manager[dataset_role]
         self.eval_dataset = dataset.to_trainer_dataset(self.model_manager)
         output = self.predict(self.eval_dataset)
+        n_predictions, n_expected = len(output.predictions), len(dataset)
+        assert n_predictions == n_expected, f"Expected {n_expected} samples but received {n_predictions} predictions."
         metrics_manager = MetricsManager(dataset.get_ordered_links(), output.predictions)
         eval_metrics = metrics_manager.eval(self.trainer_args.metrics) if self.trainer_args.metrics else {}
         print(eval_metrics)

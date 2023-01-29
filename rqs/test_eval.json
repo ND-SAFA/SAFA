@@ -17,7 +17,8 @@
               "map_at_k",
               "f",
               "precision"
-            ]
+            ],
+            "per_device_eval_batch_size": 8
           },
           "trainer_dataset_manager": {
             "eval_dataset_creator": {

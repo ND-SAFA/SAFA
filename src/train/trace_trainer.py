@@ -118,7 +118,8 @@ class TraceTrainer(BaseTrainer):
                 predictions = self.model(**batch)
 
             all_predictions, all_targets = self.accelerator.gather_for_metrics((predictions.logits, targets))
-            print(self.accelerator.process_index, len(all_predictions), len(all_targets))
+            if self.accelerator.is_main_process:
+                print(self.accelerator.process_index, len(all_predictions), len(all_targets))
 
         return PredictionOutput(predictions=all_predictions, label_ids=all_targets, metrics={})
 

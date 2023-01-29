@@ -123,15 +123,16 @@ class TraceTrainer(BaseTrainer):
             predictions.append(self.accelerator.gather(output.logits).cpu().numpy())
             labels.append(self.accelerator.gather(targets).cpu().numpy())
 
-        print("Predictions (before):", len(predictions))
-        predictions = np.concatenate(predictions)
-        print("Predictions (after):", len(predictions))
-        labels = np.concatenate(labels)
+        if self.accelerator.is_main_process:
+            print("Predictions (before):", len(predictions))
+            predictions = np.concatenate(predictions)
+            print("Predictions (after):", len(predictions))
+            labels = np.concatenate(labels)
 
-        predictions = predictions[:len(eval_dataloader.dataset)]
-        labels = labels[:len(eval_dataloader.dataset)]
+            predictions = predictions[:len(eval_dataloader.dataset)]
+            labels = labels[:len(eval_dataloader.dataset)]
 
-        return PredictionOutput(predictions=predictions, label_ids=labels, metrics={})
+            return PredictionOutput(predictions=predictions, label_ids=labels, metrics={})
 
     def predict_old(self, test_dataset: Dataset) -> PredictionOutput:
         """

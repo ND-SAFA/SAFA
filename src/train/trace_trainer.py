@@ -1,6 +1,7 @@
 import os
 from typing import Optional, Tuple
 
+import numpy as np
 import torch
 from accelerate import Accelerator, find_executable_batch_size
 from datasets import Dataset
@@ -75,7 +76,7 @@ class TraceTrainer(BaseTrainer):
         loss_function = self.trainer_args.loss_function
         print("Training batch size:", self._train_batch_size)
         self.model.train()
-        model, optimizer, scheduler, train_data_loader = self.create_or_load_state(self.model,
+        model, train_data_loader, optimizer, scheduler = self.create_or_load_state(self.model,
                                                                                    self.get_train_dataloader(),
                                                                                    resume_from_checkpoint)
         print(f"Number of GPUS: {accelerator.num_processes}. Torch devices: {torch.cuda.device_count()}")
@@ -107,8 +108,28 @@ class TraceTrainer(BaseTrainer):
         return TraceTrainOutput(global_step=global_step, training_loss=training_loss, metrics=training_metrics,
                                 eval_metrics=self.save_strategy.stage_evaluations)
 
-    @overrides(BaseTrainer)
-    def predict(self, test_dataset: Dataset) -> PredictionOutput:
+    def predict(self, eval_dataset: Dataset) -> PredictionOutput:
+        eval_dataloader = self.get_test_dataloader(eval_dataset)
+        self.model, eval_dataloader, _, _ = self._prepare_accelerator(self.model, eval_dataloader)
+
+        predictions, labels = [], []
+        for batch in eval_dataloader:
+            targets = batch.pop(DataKey.LABELS_KEY)
+            with torch.no_grad():
+                output = self.model(**batch)
+
+            predictions.append(self.accelerator.gather(output.logits).cpu().numpy())
+            labels.append(self.accelerator.gather(targets).cpu().numpy())
+
+        predictions = np.concatenate(predictions)
+        labels = np.concatenate(labels)
+
+        predictions = predictions[:len(eval_dataloader.dataset)]
+        labels = labels[:len(eval_dataloader.dataset)]
+
+        return PredictionOutput(predictions=predictions, label_ids=labels, metrics={})
+
+    def predict_old(self, test_dataset: Dataset) -> PredictionOutput:
         """
         Moves model to accelerate device then predicts current model on dataset.
         :param test_dataset: Dataset: The dataset to evaluate.
@@ -124,7 +145,7 @@ class TraceTrainer(BaseTrainer):
         return evaluation_output
 
     def create_or_load_state(self, model: PreTrainedModel, data_loader: DataLoader, resume_from_checkpoint: Optional[str] = None) \
-            -> Tuple[PreTrainedModel, Optimizer, _LRScheduler, DataLoader]:
+            -> Tuple[PreTrainedModel, DataLoader, Optimizer, _LRScheduler]:
         """
         If checkpoint given, accelerate entities are instantiated with their previous state. Otherwise, they are instantiated with new
         states.
@@ -134,10 +155,10 @@ class TraceTrainer(BaseTrainer):
         :type resume_from_checkpoint:
         :return: Instantiated model, optimizer, scheduler, and train data loader.
         """
-        model, optimizer, scheduler, data_loader = self._prepare_accelerator(model, data_loader)
+        model, data_loader, optimizer, scheduler = self._prepare_accelerator(model, data_loader)
         if resume_from_checkpoint:
             self.accelerator.load_state(resume_from_checkpoint)
-        return model, optimizer, scheduler, data_loader
+        return model, data_loader, optimizer, scheduler
 
     @overrides(Trainer)
     def save_model(self, output_dir: Optional[str] = None, _internal_call: bool = False) -> None:
@@ -214,7 +235,7 @@ class TraceTrainer(BaseTrainer):
             del self.accelerator
 
     def _prepare_accelerator(self, model: PreTrainedModel, data_loader: DataLoader) \
-            -> Tuple[PreTrainedModel, Optimizer, _LRScheduler, DataLoader]:
+            -> Tuple[PreTrainedModel, DataLoader, Optimizer, _LRScheduler]:
         """
         Prepares the model, optimizer, scheduler and data loader for distributed training.
         :param model: The model being trained.
@@ -224,9 +245,9 @@ class TraceTrainer(BaseTrainer):
         if self.accelerator is None:
             self._initialize_state(model)
         return self.accelerator.prepare(model,
+                                        data_loader,
                                         self.optimizer,
-                                        self.lr_scheduler,
-                                        data_loader)
+                                        self.lr_scheduler)
 
     def _initialize_state(self, model: PreTrainedModel) -> None:
         """

@@ -3,6 +3,7 @@
 /**/__pycache__
 cache
 /storage/**
+/**/.ipynb_checkpoints/**
 
 # IDEs
 .idea

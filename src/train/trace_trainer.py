@@ -107,15 +107,12 @@ class TraceTrainer(BaseTrainer):
         return TraceTrainOutput(global_step=global_step, training_loss=training_loss, metrics=training_metrics,
                                 eval_metrics=self.save_strategy.stage_evaluations)
 
-    def predict(self, eval_dataset: Dataset) -> PredictionOutput:
+    def predict_old(self, eval_dataset: Dataset) -> PredictionOutput:
         eval_dataloader = self.get_test_dataloader(eval_dataset)
         self.model, eval_dataloader, _, _ = self._prepare_accelerator(self.model, eval_dataloader)
 
-        predictions, labels = torch.tensor([]), torch.tensor([])
-        predictions = predictions.to(self.accelerator.device)
-        labels = labels.to(self.accelerator.device)
+        predictions, labels = [], []
         for batch in eval_dataloader:
-            batch = batch.to(self.accelerator.device)
             targets = batch.pop(DataKey.LABELS_KEY)
             with torch.no_grad():
                 model_predictions = self.model(**batch)
@@ -126,7 +123,7 @@ class TraceTrainer(BaseTrainer):
         all_predictions, all_targets = self.accelerator.gather_for_metrics((predictions, labels))
         return PredictionOutput(predictions=all_predictions, label_ids=all_targets, metrics={})
 
-    def predict_old(self, test_dataset: Dataset) -> PredictionOutput:
+    def predict(self, test_dataset: Dataset) -> PredictionOutput:
         """
         Moves model to accelerate device then predicts current model on dataset.
         :param test_dataset: Dataset: The dataset to evaluate.

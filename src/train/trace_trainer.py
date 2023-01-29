@@ -123,11 +123,10 @@ class TraceTrainer(BaseTrainer):
 
             predictions.append(self.accelerator.gather_for_metrics(output.logits).cpu().numpy())
             labels.append(self.accelerator.gather_for_metrics(targets).cpu().numpy())
-        if self.accelerator.is_main_process:
-            print("Predictions (before):", len(predictions))
+        self.accelerator.wait_for_everyone()
+        self.accelerator.print("Predictions (before):", len(predictions))
         predictions = np.concatenate(predictions)
-        if self.accelerator.is_main_process:
-            print("Predictions (after):", len(predictions))
+        self.accelerator.print("Predictions (after):", len(predictions))
         labels = np.concatenate(labels)
 
         predictions = predictions[:len(eval_dataloader.dataset)]

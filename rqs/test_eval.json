@@ -24,7 +24,7 @@
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "CSV",
-                "project_path": "[OUTPUT_PATH]/best_model_eval/eval.csv"
+                "project_path": "[OUTPUT_PATH]/create_dataset/cm1/eval.csv"
               }
             }
           }

@@ -18,7 +18,7 @@
               "f",
               "precision"
             ],
-            "per_gpu_eval_batch_size": 8
+            "per_device_eval_batch_size": 2
           },
           "trainer_dataset_manager": {
             "eval_dataset_creator": {

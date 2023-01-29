@@ -121,8 +121,8 @@ class TraceTrainer(BaseTrainer):
             with torch.no_grad():
                 output = self.model(**batch)
 
-            predictions.append(self.accelerator.gather_for_metrics(output.logits).cpu().numpy())
-            labels.append(self.accelerator.gather_for_metrics(targets).cpu().numpy())
+            predictions.append(self.accelerator.gather(output.logits).cpu().numpy())
+            labels.append(self.accelerator.gather(targets).cpu().numpy())
         self.accelerator.wait_for_everyone()
         self.accelerator.print("Predictions (before):", len(predictions))
         predictions = np.concatenate(predictions)

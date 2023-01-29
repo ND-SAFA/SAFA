@@ -32,3 +32,27 @@ class TestFileUtil(BaseTest):
         for filename in files:  # create empty files
             self.assertTrue(os.path.exists(os.path.join(new_dir, filename)))
         self.assertFalse(os.path.exists(os.path.join(TEST_OUTPUT_DIR, orig_dir)))
+
+    def test_add_to_path(self):
+        """
+        Test ability to add components to path by index
+        """
+        test_component = "new-file"
+        path = "/folder_1/folder_2/file"
+        expected_path = f"/folder_1/folder_2/file/{test_component}"
+        path_result = FileUtil.add_to_path(path, test_component, 3)
+        self.assertEqual(expected_path, path_result)
+        path_result = FileUtil.add_to_path(path, test_component, -1)
+        self.assertEqual(expected_path, path_result)
+        path_result = FileUtil.add_to_path(path, test_component, -2)
+        self.assertEqual(f"/folder_1/folder_2/{test_component}/file", path_result)
+
+    def test_path_to_list(self):
+        """
+        Tests that path is able to split into component parts
+        """
+        path = "/folder_1/folder_2/file"
+        path_list = FileUtil.path_to_list(path)
+        self.assertEqual(3, len(path_list))
+        for expected_item in ["folder_1", "folder_2", "file"]:
+            self.assertIn(expected_item, path_list)

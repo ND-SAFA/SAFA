@@ -8,7 +8,7 @@
             "random_seed": 1231231
           },
           "model_manager": {
-            "model_path": "[OUTPUT_PATH]/best_model"
+            "model_path": "ProsusAI/finbert"
           },
           "trainer_args": {
             "output_dir": "[OUTPUT_PATH]/test_eval/models",

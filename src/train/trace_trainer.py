@@ -115,13 +115,15 @@ class TraceTrainer(BaseTrainer):
         for batch in eval_dataloader:
             targets = batch.pop(DataKey.LABELS_KEY)
             with torch.no_grad():
-                predictions = self.model(**batch)
+                model_predictions = self.model(**batch)
 
-            all_predictions, all_targets = self.accelerator.gather_for_metrics((predictions.logits, targets))
+            all_predictions, all_targets = self.accelerator.gather_for_metrics((model_predictions.logits, targets))
+            predictions.append(all_predictions)
+            labels.append(all_targets)
             if self.accelerator.is_main_process:
-                print(self.accelerator.process_index, len(all_predictions), len(all_targets))
+                print(self.accelerator.process_index, len(predictions), len(targets))
 
-        return PredictionOutput(predictions=all_predictions, label_ids=all_targets, metrics={})
+        return PredictionOutput(predictions=predictions, label_ids=labels, metrics={})
 
     def predict_old(self, test_dataset: Dataset) -> PredictionOutput:
         """

@@ -3,24 +3,21 @@ FROM ubuntu:12.04 as config
 ADD src/main/resources /app/src/main/resources
 ARG PathToProperties="/app/src/main/resources/application-deployment.properties"
 
-ARG DB_URL=jdbc:mysql://host.docker.internal/safa-db
-ARG DB_USER=root
-ARG DB_PASSWORD=secret2
+ENV DB_URL=jdbc:mysql://host.docker.internal/safa-db
+ENV DB_USER=root
+ENV DB_PASSWORD=secret2
 ARG DB_INSTANCE
-ARG JWT_KEY=3s6v9y$B&E)H@MbQeThWmZq4t7w!z%C*F-JaNdRfUjXn2r5u8x/A?D(G+KbPeShV
-ARG TGEN_ENDPOINT=http://35.184.232.43
+ENV JWT_KEY=3s6v9y$B&E)H@MbQeThWmZq4t7w!z%C*F-JaNdRfUjXn2r5u8x/A?D(G+KbPeShV
+ENV TGEN_ENDPOINT=http://35.184.232.43
+ENV JIRA_REDIRECT_LINK="https://dev.safa.ai/account?tab=jira"
 
 RUN test -n "$DB_URL"
 RUN test -n "$DB_USER"
 RUN test -n "$DB_PASSWORD"
 RUN test -n "$JWT_KEY"
 RUN test -n "$TGEN_ENDPOINT"
+RUN test -n "$JIRA_REDIRECT_LINK"
 
-RUN sed -i -e "s,url=,url=$DB_URL,g" $PathToProperties
-RUN sed -i -e "s,username=,username=$DB_USER,g" $PathToProperties
-RUN sed -i -e "s,password=,password=$DB_PASSWORD,g" $PathToProperties
-RUN sed -i -e "s,jwt.key=,jwt.key=$JWT_KEY,g" $PathToProperties
-RUN sed -i -e "s,tgen.endpoint=,tgen.endpoint=$TGEN_ENDPOINT,g" $PathToProperties
 RUN if [ ! -z "$DB_INSTANCE" ] ; \
     then \
       echo "spring.datasource.hikari.data-source-properties.cloudSqlInstance=$DB_INSTANCE" >> $PathToProperties && \

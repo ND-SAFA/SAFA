@@ -205,9 +205,9 @@ class TraceTrainer(BaseTrainer):
                 self.accelerator.print("-" * 25, "Saving Best Model", "-" * 25)
                 self.accelerator.print(f"New Best: {current_score}\tPrevious: {previous_best}")
                 self.save_model(self.get_output_path(self.BEST_MODEL_NAME))
+                self.accelerator.print("-" * 20, "Evaluation Finished.", "-" * 20)
             else:
                 self.accelerator.print(f"Previous best is still {previous_best}.")
-        self.accelerator.print("-" * 20, "Evaluation Finished.", "-" * 20)
 
     def get_output_path(self, dir_name: str = None):
         """

@@ -50,7 +50,7 @@ class TestJsonUtil(BaseTest):
         eval_metrics = [stage_eval]
         trace_train_output = TraceTrainOutput(global_step=1, training_loss=t_loss, metrics=[], eval_metrics=eval_metrics)
         output_json = JsonUtil.to_dict(trace_train_output)
-        self.assertListEqual(["global_step", "training_loss", "metrics", "eval_metrics"], list(output_json.keys()))
+        self.assertListEqual(["global_step", "training_loss", "metrics", "eval_metrics", "val_metrics"], list(output_json.keys()))
         self.assertEqual(t_loss, output_json["training_loss"])
         # Verify evaluations
         stage_evals_json = output_json["eval_metrics"]

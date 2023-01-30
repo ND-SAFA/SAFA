@@ -3,7 +3,7 @@ from functools import partial
 from typing import Optional, Tuple
 
 import torch
-from accelerate import Accelerator, find_executable_batch_size
+from accelerate import find_executable_batch_size
 from datasets import Dataset
 from torch.optim import Optimizer
 from torch.optim.lr_scheduler import _LRScheduler
@@ -77,14 +77,14 @@ class TraceTrainer(BaseTrainer):
         self._train_batch_size = batch_size
         self.args.per_device_train_batch_size = batch_size
         loss_function = self.trainer_args.loss_function
-        self.get_accelerator().print("Training batch size:", self._train_batch_size)
+        self.print("Training batch size:", self._train_batch_size)
         self.model.train()
-        self.get_accelerator().print("Model is training position....")
+        self.print("Model is training position....")
         model, train_data_loader, optimizer, scheduler = self.create_or_load_state(self.model,
                                                                                    self.get_train_dataloader(),
                                                                                    resume_from_checkpoint)
-        model = self.accelerator.prepare_model(model)
-        self.get_accelerator().print(f"Number of GPUS: {accelerator.num_processes}. Torch devices: {torch.cuda.device_count()}")
+        model = TraceAccelerator.prepare_model(model)
+        self.print(f"Number of GPUS: {TraceAccelerator.num_processes}. Torch devices: {torch.cuda.device_count()}")
         global_step = 0
         training_loss = 0
         training_metrics = {}
@@ -112,7 +112,6 @@ class TraceTrainer(BaseTrainer):
             epoch_loss = 0
             scheduler.step()
             self.on_epoch(epoch_index)
-        self._is_prepared = False
         return TraceTrainOutput(global_step=global_step, training_loss=training_loss, metrics=training_metrics,
                                 eval_metrics=self.save_strategy.stage_evaluations)
 
@@ -212,7 +211,7 @@ class TraceTrainer(BaseTrainer):
                 TraceAccelerator.print("-" * 25, "Saving Best Model", "-" * 25)
                 TraceAccelerator.print(f"New Best: {current_score}\tPrevious: {previous_best}")
                 self.save_model(self.get_output_path(self.BEST_MODEL_NAME))
-                self.accelerator.print("-" * 20, "Evaluation Finished.", "-" * 20)
+                TraceAccelerator.print("-" * 20, "Evaluation Finished.", "-" * 20)
             else:
                 TraceAccelerator.print(f"Previous best is still {previous_best}.")
 
@@ -250,7 +249,7 @@ class TraceTrainer(BaseTrainer):
         TraceAccelerator.clear()
         self.__should_prepare_accumulator = False
         return TraceAccelerator.prepare(model, data_loader, self.optimizer, self.lr_scheduler)
-        if self.accelerator is None or self.optimizer is None or self.lr_scheduler is None:
+        if self.optimizer is None or self.lr_scheduler is None:
             self._initialize_state(model)
         self.print("accelerator state has been initialized.")
 

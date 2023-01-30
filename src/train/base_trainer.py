@@ -1,8 +1,7 @@
 import os
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, Union
 
 import torch
-from accelerate import Accelerator
 from transformers.trainer import Trainer
 
 from data.datasets.dataset_role import DatasetRole
@@ -12,6 +11,7 @@ from train.metrics.metrics_manager import MetricsManager
 from train.save_strategy.abstract_save_strategy import AbstractSaveStrategy
 from train.save_strategy.comparison_criteria import ComparisonCriterion
 from train.save_strategy.epoch_save_strategy import MetricSaveStrategy
+from train.trace_accelerator import TraceAccelerator
 from train.trace_output.trace_prediction_output import TracePredictionOutput
 from train.trace_output.trace_train_output import TraceTrainOutput
 from train.trainer_args import TrainerArgs
@@ -27,7 +27,6 @@ class BaseTrainer(Trainer, BaseObject):
     """
     Trains model on data for generic task.
     """
-    accelerator: Optional[Accelerator] = None
 
     def __init__(self, trainer_args: TrainerArgs, model_manager: ModelManager,
                  trainer_dataset_manager: TrainerDatasetManager, save_strategy: AbstractSaveStrategy = None, **kwargs):
@@ -77,26 +76,19 @@ class BaseTrainer(Trainer, BaseObject):
         return TracePredictionOutput(predictions=metrics_manager.get_scores(), label_ids=output.label_ids, metrics=output.metrics,
                                      source_target_pairs=dataset.get_source_target_pairs())
 
-    def get_accelerator(self) -> Accelerator:
-        """
-        Creates accelerator from the training arguments.
-        :return: Constructed accelerator.
-        """
-        if self.accelerator is None:
-            self.accelerator = Accelerator(gradient_accumulation_steps=self.trainer_args.gradient_accumulation_steps,
-                                           split_batches=True, step_scheduler_with_optimizer=False)
-        return self.accelerator
-
     def cleanup(self) -> None:
         """
         Free memory associated with trainer.
         :return: None
         """
-        if self.accelerator:  # covers custom and non-custom
-            self.accelerator.free_memory()
+        TraceAccelerator.free_memory()
         if self.model:
             del self.model
 
-    def print(self, *args):
-        # TODO: Refactor into logger
-        self.get_accelerator().print(*args)
+    def print(self, *args) -> None:
+        """
+        Performs a print statement per job even in multi gpu setup.
+        :param args: The arguments to print.
+        :return: None
+        """
+        TraceAccelerator.print(*args)

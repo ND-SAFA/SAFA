@@ -244,14 +244,13 @@ class TraceTrainer(BaseTrainer):
         :param data_loader: The data loader containing training data.
         :return: Prepared model, optimizer, scheduler, and data loader.
         """
+        if self.optimizer is None or self.lr_scheduler is None:
+            self._initialize_state(model)
         if not self.__should_prepare_accumulator:
             return model, data_loader, self.optimizer, self.lr_scheduler
         TraceAccelerator.clear()
         self.__should_prepare_accumulator = False
         return TraceAccelerator.prepare(model, data_loader, self.optimizer, self.lr_scheduler)
-        if self.optimizer is None or self.lr_scheduler is None:
-            self._initialize_state(model)
-        self.print("accelerator state has been initialized.")
 
     def _initialize_state(self, model: PreTrainedModel) -> None:
         """

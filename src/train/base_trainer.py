@@ -97,7 +97,7 @@ class BaseTrainer(Trainer, BaseObject):
             self.accelerator.free_memory()
         if self.model:
             del self.model
-
+        
     def print(self, *args):
         # TODO: Refactor into logger
         self.get_accelerator().print(*args)

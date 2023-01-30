@@ -255,10 +255,6 @@ class TraceTrainer(BaseTrainer):
         self.accelerator.print("Optimizer prepared.")
         self.lr_scheduler = self.accelerator.prepare_scheduler(self.lr_scheduler)
         self.accelerator.print("Scheduler prepared.")
-        payload = self.accelerator.prepare(model,
-                                           data_loader,
-                                           self.optimizer,
-                                           self.lr_scheduler)
 
         return model, data_loader, self.optimizer, self.lr_scheduler
 

@@ -123,8 +123,8 @@ class TraceTrainer(BaseTrainer):
             targets = batch.pop("labels")
             with torch.no_grad():
                 output = self.model(**batch)
-            predictions.append(self.accelerator.gather(output.logits).numpy())
-            labels.append(self.accelerator.gather(targets).numpy())
+            predictions.append(self.accelerator.gather(output.logits).cpu().numpy())
+            labels.append(self.accelerator.gather(targets).cpu().numpy())
         predictions = np.concatenate(predictions)
         labels = np.concatenate(labels)
 

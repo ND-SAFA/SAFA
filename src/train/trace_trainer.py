@@ -251,6 +251,8 @@ class TraceTrainer(BaseTrainer):
         if not self._is_prepared:
             self.print("model not prepared, freeing memory.")
             self.accelerator.free_memory()
+            self.print("waiting for everyone")
+            self.accelerator.wait_for_everyone()
             self.print(f"Model is about to be prepared:", self.model_manager.model_path)
             model = self.accelerator.prepare_model(model)
 

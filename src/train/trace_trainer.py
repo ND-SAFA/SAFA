@@ -162,12 +162,14 @@ class TraceTrainer(BaseTrainer):
         :param _internal_call: Internal property used within HuggingFace Trainer.
         :return: None
         """
-        # if not output_dir:
-        #     raise ValueError("Expected output_dir to be defined.")
-        # if self.trainer_args.skip_save:
-        #     return
-        # super().save_model(output_dir=output_dir, _internal_call=_internal_call)
-        # self.accelerator.save_state(output_dir)
+        if self.accelerator.is_main_process:
+            if not output_dir:
+                raise ValueError("Expected output_dir to be defined.")
+            if self.trainer_args.skip_save:
+                return
+            super().save_model(output_dir=output_dir, _internal_call=_internal_call)
+            self.accelerator.save_state(output_dir)
+        self.accelerator.wait_for_everyone()
 
     def on_step(self, step_iteration: int) -> None:
         """

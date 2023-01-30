@@ -9,7 +9,7 @@ from torch.optim import Optimizer
 from torch.optim.lr_scheduler import _LRScheduler
 from torch.utils.data import DataLoader
 from tqdm import tqdm
-from transformers import PreTrainedModel, Trainer
+from transformers import PreTrainedModel, Trainer, WEIGHTS_NAME
 from transformers.modeling_outputs import SequenceClassifierOutput
 from transformers.trainer_utils import PredictionOutput
 
@@ -25,6 +25,7 @@ from train.supported_optimizers import SupportedOptimizers
 from train.supported_schedulers import SupportedSchedulers
 from train.trace_output.trace_train_output import TraceTrainOutput
 from train.trainer_args import TrainerArgs
+from util.file_util import FileUtil
 
 os.environ['TRANSFORMERS_NO_ADVISORY_WARNINGS'] = 'true'
 
@@ -167,8 +168,12 @@ class TraceTrainer(BaseTrainer):
                 raise ValueError("Expected output_dir to be defined.")
             if self.trainer_args.skip_save:
                 return
-            super().save_model(output_dir)
-            self.accelerator.wait_for_everyone()
+            model_weights_path = os.path.join(output_dir, WEIGHTS_NAME)
+            FileUtil.create_dir_safely(output_dir)
+            model = self.accelerator.unwrap_model(self.model)
+            self._save(output_dir, state_dict=model.state_dict())
+            self.model_manager.get_config().save_pretrained(output_dir)
+            self.model_manager.get_tokenizer().save_pretrained(output_dir)
 
     def on_step(self, step_iteration: int) -> None:
         """

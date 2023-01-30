@@ -45,10 +45,10 @@ class TraceTrainer(BaseTrainer):
         :param resume_from_checkpoint: The checkpoint to resume from.
         :return: Output of training session.
         """
-        self.print("starting training.")
-        self.model = self.model_manager.get_model()
-        self.print("model loaded")
-        self._initialize_state(self.model)
+        with self.get_accelerator().main_process_first():
+            self.print("starting training.")
+            self.model = self.model_manager.get_model()
+            self.print("model loaded")
         self.print("accelerate initialized iwth model")
         inner_training_loop = find_executable_batch_size(
             self.inner_training_loop) if self.trainer_args.per_device_train_batch_size is None else self.inner_training_loop
@@ -122,7 +122,7 @@ class TraceTrainer(BaseTrainer):
 
         self.accelerator = self.get_accelerator()
         test_dataloader = self.get_test_dataloader(test_dataset)
-        self.model, eval_data_loader = self.accelerator.prepare(self.model, test_dataloader)
+        self.model, eval_data_loader, _, _ = self.create_or_load_state(self.model, test_dataloader)
         self.model.eval()
         eval_predictions, eval_labels = [], []
         for batch in test_dataloader:
@@ -244,7 +244,7 @@ class TraceTrainer(BaseTrainer):
         """
         if self.accelerator is None:
             self._initialize_state(model)
-        with self.get_accelerator().on_main_process():
+        with self.get_accelerator().main_process_first():
             self.get_accelerator().print("accelerator state has been initialized.")
             payload = self.accelerator.prepare(model,
                                                data_loader,

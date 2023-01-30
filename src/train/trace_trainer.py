@@ -38,6 +38,7 @@ class TraceTrainer(BaseTrainer):
     def __init__(self, trainer_args: TrainerArgs, model_manager: ModelManager, trainer_dataset_manager: TrainerDatasetManager,
                  **kwargs):
         super().__init__(trainer_args, model_manager, trainer_dataset_manager, **kwargs)
+        self._is_prepared = False
 
     def train(self, resume_from_checkpoint: str = None, **kwargs) -> TraceTrainOutput:
         """
@@ -81,6 +82,7 @@ class TraceTrainer(BaseTrainer):
         model, train_data_loader, optimizer, scheduler = self.create_or_load_state(self.model,
                                                                                    self.get_train_dataloader(),
                                                                                    resume_from_checkpoint)
+        self._is_prepared = True
         self.get_accelerator().print(f"Number of GPUS: {accelerator.num_processes}. Torch devices: {torch.cuda.device_count()}")
         global_step = 0
         training_loss = 0
@@ -109,6 +111,7 @@ class TraceTrainer(BaseTrainer):
             epoch_loss = 0
             scheduler.step()
             self.on_epoch(epoch_index)
+        self._is_prepared = False
         return TraceTrainOutput(global_step=global_step, training_loss=training_loss, metrics=training_metrics,
                                 eval_metrics=self.save_strategy.stage_evaluations)
 
@@ -243,15 +246,14 @@ class TraceTrainer(BaseTrainer):
         """
         if self.accelerator is None or self.optimizer is None or self.lr_scheduler is None:
             self._initialize_state(model)
-        self.print("state initialized, freeing memory")
-        self.accelerator.free_memory()
-        print("waiting for everyone")
-        self.accelerator.wait_for_everyone()
-        self.print("accelerator state has been initialized. Pre-paring entities")
-        assert len(self.accelerator._models) == 0, f"Accelerator contains left-over model."
-        self.print(f"Model is about to be prepared:", self.model_manager.model_path)
+        self.print("accelerator state has been initialized.")
 
-        model = self.accelerator.prepare_model(model)
+        if not self._is_prepared:
+            self.print("model not prepared, freeing memory.")
+            self.accelerator.free_memory()
+            self.print(f"Model is about to be prepared:", self.model_manager.model_path)
+            model = self.accelerator.prepare_model(model)
+
         self.print("Model prepared.")
         data_loader = self.accelerator.prepare_data_loader(data_loader)
         self.print("Data Loader prepared.")

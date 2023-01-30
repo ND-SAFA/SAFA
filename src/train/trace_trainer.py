@@ -1,4 +1,5 @@
 import os
+from functools import partial
 from typing import Optional, Tuple
 
 import torch
@@ -83,9 +84,11 @@ class TraceTrainer(BaseTrainer):
         training_loss = 0
         training_metrics = {}
         epoch_loss = 0
+        _is_local_main_process = accelerator.is_local_main_process
+        accelerate_tqdm = partial(tqdm, disable=not _is_local_main_process, position=0)
         for epoch_index in range(self.trainer_args.num_train_epochs):
             with accelerator.accumulate(model):
-                for batch_index, batch in enumerate(tqdm(train_data_loader)):
+                for batch_index, batch in enumerate(accelerate_tqdm(train_data_loader)):
                     batch = batch.to(accelerator.device)
 
                     labels = batch.pop(DataKey.LABELS_KEY)
@@ -253,7 +256,7 @@ class TraceTrainer(BaseTrainer):
         """
         if self.accelerator is None:
             self.accelerator = Accelerator(gradient_accumulation_steps=self.trainer_args.gradient_accumulation_steps,
-                                           split_batches=True)
+                                           split_batches=True, step_scheduler_with_optimizer=False)
         return self.accelerator
 
     @overrides(Trainer)

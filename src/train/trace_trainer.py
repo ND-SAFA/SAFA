@@ -244,12 +244,13 @@ class TraceTrainer(BaseTrainer):
         """
         if self.accelerator is None:
             self._initialize_state(model)
-        self.get_accelerator().print("accelerator state has been initialized.")
-        payload = self.accelerator.prepare(model,
-                                           data_loader,
-                                           self.optimizer,
-                                           self.lr_scheduler)
-        self.get_accelerator().print("Prepare has finished.")
+        with self.get_accelerator().on_main_process():
+            self.get_accelerator().print("accelerator state has been initialized.")
+            payload = self.accelerator.prepare(model,
+                                               data_loader,
+                                               self.optimizer,
+                                               self.lr_scheduler)
+            self.get_accelerator().print("Prepare has finished.")
         return payload
 
     def _initialize_state(self, model: PreTrainedModel) -> None:

@@ -78,9 +78,9 @@ if __name__ == "__main__":
     val_output_path = os.path.join(OUTPUT_DIR, export_file_name + "-" + "val.csv")
     eval_output_path = os.path.join(OUTPUT_DIR, export_file_name + "-" + "eval.csv")
     val_df = pd.DataFrame(val_entries)
-    val_df.to_csv(val_output_path, index=False)
+    # val_df.to_csv(val_output_path, index=False)
     eval_df = pd.DataFrame(eval_entries)
-    eval_df.to_csv(eval_output_path, index=False)
+    # eval_df.to_csv(eval_output_path, index=False)
     # Push to s3
     bucket_name = os.environ.get("BUCKET", None)
     if bucket_name:

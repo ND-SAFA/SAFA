@@ -18,16 +18,13 @@
           "model_manager": {
             "model_path": {
               "*": [
-                "prajjwal1/bert-tiny",
-                "bert-base-uncased"
+                "prajjwal1/bert-tiny"
               ]
             }
           },
           "trainer_args": {
             "output_dir": "[OUTPUT_PATH]/cchit/base_models/models",
             "num_train_epochs": 10,
-            "per_device_train_batch_size": 8,
-            "per_device_eval_batch_size": 8,
             "gradient_accumulation_steps": 8,
             "learning_rate": 1e-5,
             "metrics": [

@@ -229,8 +229,9 @@ class TraceTrainer(BaseTrainer):
         super().cleanup()
         if self.accelerator:  # covers custom and non-custom
             self.accelerator.free_memory()
-            del self.model
             del self.accelerator
+        if self.trainer_dataset_manager:
+            del self.trainer_dataset_manager
 
     def _prepare_accelerator(self, model: PreTrainedModel, data_loader: DataLoader) \
             -> Tuple[PreTrainedModel, DataLoader, Optimizer, _LRScheduler]:

@@ -78,3 +78,5 @@ class BaseTrainer(Trainer, BaseObject):
         Free memory associated with trainer.
         :return: None
         """
+        if self.model:
+            del self.model

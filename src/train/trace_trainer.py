@@ -168,7 +168,6 @@ class TraceTrainer(BaseTrainer):
                 raise ValueError("Expected output_dir to be defined.")
             if self.trainer_args.skip_save:
                 return
-            self.model.config.save_pretrained(output_dir)
             super().save_model(output_dir=output_dir, _internal_call=_internal_call)
             self.accelerator.save_state(output_dir)
         self.accelerator.wait_for_everyone()

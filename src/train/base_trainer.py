@@ -52,10 +52,8 @@ class BaseTrainer(Trainer, BaseObject):
         :param checkpoint: path to checkpoint.
         :return: a dictionary containing the results
         """
-        self.print("*" * 20, "Starting new training job", "-" * 20)
         self.model = self.model_manager.get_model()
         self.train_dataset = self.trainer_dataset_manager[DatasetRole.TRAIN].to_trainer_dataset(self.model_manager)
-        self.print("*" * 20, "finished dataset construction", "-" * 20)
         train_output = self.train(resume_from_checkpoint=checkpoint)
         return TraceTrainOutput(train_output=train_output)
 
@@ -71,6 +69,7 @@ class BaseTrainer(Trainer, BaseObject):
         assert n_predictions == n_expected, f"Expected {n_expected} samples but received {n_predictions} predictions."
         metrics_manager = MetricsManager(dataset.get_ordered_links(), output.predictions)
         eval_metrics = metrics_manager.eval(self.trainer_args.metrics) if self.trainer_args.metrics else {}
+        TraceAccelerator.print("-" * 10, "Eval Metrics", "-" * 10)
         self.print(eval_metrics)
         output.metrics.update(eval_metrics)
         return TracePredictionOutput(predictions=metrics_manager.get_scores(), label_ids=output.label_ids, metrics=output.metrics,

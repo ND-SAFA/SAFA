@@ -1,18 +1,23 @@
 import { validUser, invalidUser, DataCy } from "../../fixtures";
 
 describe("Authentication", () => {
+  // TODO: Fix the dbDeleteUser command
+  // before(() => {
+  //   cy.dbDeleteUser("newAccount@new.com");
+  // });
+
   beforeEach(() => {
     cy.visit("/login");
   });
 
   // Disabled until account deletion is added, or until running in a test DB
-  describe.skip("Account Creation", () => {
-    describe("I can create an account", () => {
+  describe("Account Creation", () => {
+    describe.skip("I can create an account", () => {
       it("displays successful account creation", () => {
         cy.clickButton("button-create-account-redirect").wait(500);
 
-        cy.inputText(DataCy.emailInput, validUser.email)
-          .inputText(DataCy.passwordInput, validUser.password)
+        cy.inputText(DataCy.newAccountEmailInput, "newAccount@new.com")
+          .inputText(DataCy.newAccountPasswordInput, "newPassword")
           .clickButton("button-create-account");
 
         cy.contains(

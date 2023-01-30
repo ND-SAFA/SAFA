@@ -56,10 +56,11 @@ describe("Account Editing", () => {
         );
       });
 
-      it.skip("Successfully deletes my account", () => {
+      it("Successfully deletes my account", () => {
         cy.inputText(DataCy.accountDeletePasswordInput, editUser.password);
         cy.getCy(DataCy.accountDeleteButton).click();
         cy.getCy(DataCy.confirmModalButton).click();
+        cy.clickButtonWithName("Login");
         cy.location("pathname", { timeout: 5000 }).should("equal", "/login");
       });
     });

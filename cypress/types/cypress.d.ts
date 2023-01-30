@@ -59,6 +59,11 @@ declare namespace Cypress {
      */
     dbResetVersions(): Chainable<void>;
 
+    /**
+     * Removes specified user from database.
+     */
+    dbDeleteUser(email: string): Chainable<void>;
+
     // Base Commands
 
     /**

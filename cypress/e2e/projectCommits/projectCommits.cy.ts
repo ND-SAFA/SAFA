@@ -4,12 +4,13 @@ import { validUser } from "../../fixtures/data/user.json";
 
 describe("Project Commits", () => {
   before(() => {
-    cy.dbResetJobs().dbResetProjects();
+    cy.dbResetJobs().dbResetProjects().clearCookies();
 
-    cy.visit("/create")
+    cy.visit("/login")
       .login(validUser.email, validUser.password)
-      .location("pathname", { timeout: 2000 })
-      .should("equal", "/create");
+      .location("pathname", { timeout: 2000 });
+
+    cy.visit("/create");
 
     cy.createBulkProject()
       .waitForJobLoad()

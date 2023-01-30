@@ -113,3 +113,43 @@ Cypress.Commands.add("dbResetVersions", () => {
     })
     .clearCookies();
 });
+
+// TODO: Fix this command with the correct API endpoint.
+Cypress.Commands.add("dbDeleteUser", (email) => {
+  cy.dbToken().then(() => {
+    cy.request<{ id: string; username: string; password: string }[]>({
+      method: "GET",
+      url: `${apiUrl}/users`,
+    }).then(({ body: users }) => {
+      const user = users.find((user) => user.username === email);
+      if (!user) {
+        throw new Error(`User ${validUser.username} not found`);
+      }
+      cy.request({
+        method: "DELETE",
+        url: `${apiUrl}/users/${user.id}`,
+      });
+    });
+  });
+});
+// Cypress.Commands.add("dbDeleteUser", (username: string, password: string) => {
+//   cy.dbToken()
+//     .then(() => {
+//       cy.request<{ id: string; username: string; password: string }[]>({
+//         method: "GET",
+//         url: ${apiUrl}/users,
+//       }).then(({ body: users }) => {
+//         const user = users.find(
+//           (user) => user.username === username && user.password === password
+//         );
+//         if (!user) {
+//           throw new Error(User ${username} not found);
+//         }
+//         cy.request({
+//           method: "DELETE",
+//           url: ${apiUrl}/users/${user.id},
+//         });
+//       });
+//     })
+//     .clearCookies();
+// });

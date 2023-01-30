@@ -27,6 +27,7 @@ export enum DataCy {
   navProjectUploadButton = "button-nav-Project Upload",
   navArtifactViewButton = "button-nav-Artifact View",
   navTraceLinkApprovalButton = "button-nav-Trace Prediction",
+  navSettingsButton = "button-nav-Settings",
 
   // Steppers
 
@@ -257,6 +258,18 @@ export enum DataCy {
 
   // Project Version
   projectSavingIndicator = "project-saving-indicator",
+
+  // Custom Attributes
+  addAttributeButton = "button-add-attribute",
+  attributeKeyInput = "input-attribute-key",
+  attributeLabelInput = "input-attribute-label",
+  attributeTypeInput = "input-attribute-type",
+  attributeOptionsInput = "input-attribute-options",
+  attributeMinInput = "input-attribute-min",
+  attributeMaxInput = "input-attribute-max",
+  attributeDeleteButton = "button-delete-attribute",
+  attributeSaveButton = "button-save-attribute",
+  attributeTableItem = "generic-list-item",
 }
 
 export enum DataIds {

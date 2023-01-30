@@ -246,15 +246,15 @@ class TraceTrainer(BaseTrainer):
         self.accelerator.free_memory()
         self.accelerator.print("accelerator state has been initialized. Pre-paring entities")
         assert len(self.accelerator._models) == 0, f"Accelerator contains left-over model."
-
+        self.print(f"Model is about to be prepared:", self.model_manager.model_path)
         model = self.accelerator.prepare_model(model)
-        self.accelerator.print("Model prepared.")
+        self.print("Model prepared.")
         data_loader = self.accelerator.prepare_data_loader(data_loader)
-        self.accelerator.print("Data Loader prepared.")
+        self.print("Data Loader prepared.")
         self.optimizer = self.accelerator.prepare_optimizer(self.optimizer)
-        self.accelerator.print("Optimizer prepared.")
+        self.print("Optimizer prepared.")
         self.lr_scheduler = self.accelerator.prepare_scheduler(self.lr_scheduler)
-        self.accelerator.print("Scheduler prepared.")
+        self.print("Scheduler prepared.")
 
         return model, data_loader, self.optimizer, self.lr_scheduler
 

@@ -53,9 +53,11 @@ class BaseTrainer(Trainer, BaseObject):
         :param checkpoint: path to checkpoint.
         :return: a dictionary containing the results
         """
+        print("*" * 20, "Starting new training job", "-" * 20)
         with self.get_accelerator().main_process_first():
             self.model = self.model_manager.get_model()
             self.train_dataset = self.trainer_dataset_manager[DatasetRole.TRAIN].to_trainer_dataset(self.model_manager)
+        print("*" * 20, "finished dataset construction", "-" * 20)
         train_output = self.train(resume_from_checkpoint=checkpoint)
         return TraceTrainOutput(train_output=train_output)
 

@@ -208,7 +208,7 @@ class TraceTrainer(BaseTrainer):
                 self.save_model(self.get_output_path(self.BEST_MODEL_NAME))
             else:
                 self.accelerator.print(f"Previous best is still {previous_best}.")
-        print("-" * 20, "Evaluation Finished.", "-" * 20)
+        self.accelerator.print("-" * 20, "Evaluation Finished.", "-" * 20)
 
     def get_output_path(self, dir_name: str = None):
         """
@@ -227,9 +227,6 @@ class TraceTrainer(BaseTrainer):
         :return: None
         """
         super().cleanup()
-        if self.accelerator:  # covers custom and non-custom
-            self.accelerator.free_memory()
-            del self.accelerator
         if self.trainer_dataset_manager:
             del self.trainer_dataset_manager
 

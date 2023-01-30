@@ -27,6 +27,7 @@ class BaseTrainer(Trainer, BaseObject):
     """
     Trains model on data for generic task.
     """
+    accelerator: Optional[Accelerator] = None
 
     def __init__(self, trainer_args: TrainerArgs, model_manager: ModelManager,
                  trainer_dataset_manager: TrainerDatasetManager, save_strategy: AbstractSaveStrategy = None, **kwargs):
@@ -38,7 +39,6 @@ class BaseTrainer(Trainer, BaseObject):
         self.trainer_dataset_manager = trainer_dataset_manager
         self.model_manager = model_manager
         self.model_manager.set_max_seq_length(self.trainer_args.max_seq_length)
-        self.accelerator: Optional[Accelerator] = None
         model_init = lambda: self.model_manager.get_model()
         tokenizer = self.model_manager.get_tokenizer()
         if save_strategy is None:
@@ -93,5 +93,7 @@ class BaseTrainer(Trainer, BaseObject):
         Free memory associated with trainer.
         :return: None
         """
+        if self.accelerator:  # covers custom and non-custom
+            self.accelerator.free_memory()
         if self.model:
             del self.model

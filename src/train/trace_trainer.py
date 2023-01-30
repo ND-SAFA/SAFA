@@ -27,8 +27,6 @@ from train.trace_output.trace_train_output import TraceTrainOutput
 from train.trainer_args import TrainerArgs
 from util.file_util import FileUtil
 
-os.environ['TRANSFORMERS_NO_ADVISORY_WARNINGS'] = 'true'
-
 
 class TraceTrainer(BaseTrainer):
     """

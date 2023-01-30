@@ -168,6 +168,7 @@ class TraceTrainer(BaseTrainer):
             if self.trainer_args.skip_save:
                 return
             super().save_model(output_dir)
+            self.accelerator.wait_for_everyone()
 
     def on_step(self, step_iteration: int) -> None:
         """

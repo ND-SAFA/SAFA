@@ -45,10 +45,14 @@ class TraceTrainer(BaseTrainer):
         :param resume_from_checkpoint: The checkpoint to resume from.
         :return: Output of training session.
         """
+        self.print("starting training.")
         self.model = self.model_manager.get_model()
+        self.print("model loaded")
         self._initialize_state(self.model)
+        self.print("accelerate initialized iwth model")
         inner_training_loop = find_executable_batch_size(
             self.inner_training_loop) if self.trainer_args.per_device_train_batch_size is None else self.inner_training_loop
+        self.print("training loop found")
         trace_train_output = inner_training_loop(resume_from_checkpoint=resume_from_checkpoint, accelerator=self.accelerator)
         if self.trainer_args.load_best_model_at_end:
             if not self.trainer_args.should_save:

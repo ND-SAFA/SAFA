@@ -53,11 +53,11 @@ class BaseTrainer(Trainer, BaseObject):
         :param checkpoint: path to checkpoint.
         :return: a dictionary containing the results
         """
-        print("*" * 20, "Starting new training job", "-" * 20)
+        self.print("*" * 20, "Starting new training job", "-" * 20)
         with self.get_accelerator().main_process_first():
             self.model = self.model_manager.get_model()
             self.train_dataset = self.trainer_dataset_manager[DatasetRole.TRAIN].to_trainer_dataset(self.model_manager)
-        print("*" * 20, "finished dataset construction", "-" * 20)
+        self.print("*" * 20, "finished dataset construction", "-" * 20)
         train_output = self.train(resume_from_checkpoint=checkpoint)
         return TraceTrainOutput(train_output=train_output)
 
@@ -73,7 +73,7 @@ class BaseTrainer(Trainer, BaseObject):
         assert n_predictions == n_expected, f"Expected {n_expected} samples but received {n_predictions} predictions."
         metrics_manager = MetricsManager(dataset.get_ordered_links(), output.predictions)
         eval_metrics = metrics_manager.eval(self.trainer_args.metrics) if self.trainer_args.metrics else {}
-        print(eval_metrics)
+        self.print(eval_metrics)
         output.metrics.update(eval_metrics)
         return TracePredictionOutput(predictions=metrics_manager.get_scores(), label_ids=output.label_ids, metrics=output.metrics,
                                      source_target_pairs=dataset.get_source_target_pairs())
@@ -97,3 +97,7 @@ class BaseTrainer(Trainer, BaseObject):
             self.accelerator.free_memory()
         if self.model:
             del self.model
+
+    def print(self, *args):
+        # TODO: Refactor into logger
+        self.get_accelerator().print(*args)

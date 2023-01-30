@@ -4,6 +4,7 @@ from typing import Optional, Tuple
 
 import torch
 from accelerate import Accelerator, find_executable_batch_size
+from accelerate.state import AcceleratorState
 from datasets import Dataset
 from torch.optim import Optimizer
 from torch.optim.lr_scheduler import _LRScheduler
@@ -162,11 +163,12 @@ class TraceTrainer(BaseTrainer):
         :param _internal_call: Internal property used within HuggingFace Trainer.
         :return: None
         """
-        if self.accelerator.is_main_process:
+        if AcceleratorState().local_process_index == 0:
             if not output_dir:
                 raise ValueError("Expected output_dir to be defined.")
             if self.trainer_args.skip_save:
                 return
+            self.model.config.save_pretrained(output_dir)
             super().save_model(output_dir=output_dir, _internal_call=_internal_call)
             self.accelerator.save_state(output_dir)
         self.accelerator.wait_for_everyone()

@@ -116,12 +116,22 @@ class TraceDataset(AbstractDataset):
         """
         return [self.links[link_id] for link_id in self.pos_link_ids + self.neg_link_ids]
 
-    def get_source_target_pairs(self) -> List[Tuple]:
+    def get_source_target_pairs(self, link_ids: List = None) -> List[Tuple]:
         """
         Gets the list of source target pairs in the order corresponding to the trainer data
+        :param link_ids: List of link ids to get source target pairs for. If not provided, defaults to ordered links
         :return: list of tuples containing source id and target id
         """
-        return [(link.source.id, link.target.id) for link in self.get_ordered_links()]
+        links = self.get_ordered_links() if link_ids is None else self.get_links_from_ids(link_ids)
+        return [(link.source.id, link.target.id) for link in links]
+
+    def get_links_from_ids(self, link_ids: List = None) -> List[TraceLink]:
+        """
+        Gets a list of links in the order of the provided link ids
+        :param link_ids: List of link ids to get links for.
+        :return: A list of Links
+        """
+        return [self.links[link_id] for link_id in link_ids]
 
     def prepare_for_training(self, augmenter: DataAugmenter = None) -> None:
         """

@@ -64,6 +64,14 @@ class TestBalancedBatchSampler(BaseTraceTest):
         self.assertEquals(0, len(pos_link_ids))  # use all pos links
         self.assertLessEqual(abs(n_total_pos - n_total_neg), 1)
 
+    def test_get_current_link_indices_by_batch(self):
+        batch_size = 4
+        sampler = self.get_sampler(batch_size=batch_size)
+        indices = [i for i in iter(sampler)]
+        batch_indices = sampler.get_current_link_indices_by_batch(0)
+        self.assertEquals(len(batch_indices), 4)
+        self.assertListEqual(indices[:4], batch_indices)
+
     @patch.object(ModelManager, "get_tokenizer")
     def get_sampler(self, get_tokenizer_mock: mock.MagicMock, batch_size: int = 4):
         get_tokenizer_mock.return_value = self.get_test_tokenizer()

@@ -18,6 +18,15 @@ class BalancedBatchSampler(Sampler[int]):
         self.data_source = data_source
         self.batch_size = batch_size
         self.pos_link_indices, self.neg_link_indices = self._get_pos_neg_link_indices(data_source)
+        self._curr_indices = []
+
+    def get_current_link_indices_by_batch(self, batch_index: int) -> List[int]:
+        """
+        Returns a list of the indices corresponding to the links in the given batch
+        :param batch_index: the number of the batch
+        :return: a list of the indices corresponding to the links in the given batch
+        """
+        return self._curr_indices[batch_index * self.batch_size:self.batch_size]
 
     def _get_link_indices_for_balanced_batches(self) -> List[int]:
         """
@@ -78,7 +87,8 @@ class BalancedBatchSampler(Sampler[int]):
         :return: iterator with balanced batches
         """
         self._shuffle_indices()
-        return iter(self._get_link_indices_for_balanced_batches())
+        self._curr_indices = self._get_link_indices_for_balanced_batches()
+        return iter(self._curr_indices)
 
     def __len__(self) -> int:
         """

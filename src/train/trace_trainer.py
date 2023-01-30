@@ -128,7 +128,7 @@ class TraceTrainer(BaseTrainer):
                 output = self.model(**batch)
             eval_predictions.append(output.logits)
             eval_labels.append(targets)
-        self.accelerator.free_memory()
+
         eval_labels = torch.cat(eval_labels, dim=0)
         eval_predictions = torch.cat(eval_predictions, dim=0)
         eval_labels, eval_predictions = self.accelerator.gather((eval_labels, eval_predictions))

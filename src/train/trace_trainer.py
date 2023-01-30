@@ -1,7 +1,6 @@
 import os
 from typing import Optional, Tuple
 
-import numpy as np
 import torch
 from accelerate import Accelerator, find_executable_batch_size
 from datasets import Dataset
@@ -118,19 +117,21 @@ class TraceTrainer(BaseTrainer):
         self.accelerator = self._create_accelerator()
         test_dataloader = self.get_test_dataloader(test_dataset)
         self.model, eval_data_loader = self.accelerator.prepare(self.model, test_dataloader)
-        predictions, labels = [], []
+        self.model.eval()
+        eval_predictions, eval_labels = [], []
         for batch in eval_data_loader:
+            batch.to(self.accelerator.device)
             targets = batch.pop("labels")
             with torch.no_grad():
                 output = self.model(**batch)
-            predictions.append(self.accelerator.gather_for_metrics(output.logits).cpu().numpy())
-            labels.append(self.accelerator.gather_for_metrics(targets).cpu().numpy())
-        predictions = np.concatenate(predictions)
-        labels = np.concatenate(labels)
-
-        predictions = predictions[:len(eval_data_loader.dataset)]
-        labels = labels[:len(eval_data_loader.dataset)]
-        return PredictionOutput(predictions=predictions, label_ids=labels, metrics={})
+            predictions = output.logits
+            batch_predictions, batch_labels = self.accelerator.gather_for_metrics((predictions, targets))
+            eval_predictions.append(batch_predictions.cpu())
+            eval_labels.append(batch_labels.cpu())
+        self.accelerator.free_memory()
+        eval_labels = torch.cat(eval_labels, dim=0).cpu().numpy()
+        eval_predictions = torch.cat(eval_predictions, dim=0).cpu().numpy()
+        return PredictionOutput(predictions=eval_predictions, label_ids=eval_labels, metrics={})
 
     def create_or_load_state(self, model: PreTrainedModel, data_loader: DataLoader, resume_from_checkpoint: Optional[str] = None) \
             -> Tuple[PreTrainedModel, DataLoader, Optimizer, _LRScheduler]:

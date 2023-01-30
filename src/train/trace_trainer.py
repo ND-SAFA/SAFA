@@ -243,6 +243,7 @@ class TraceTrainer(BaseTrainer):
         """
         if self.accelerator is None or self.optimizer is None or self.lr_scheduler is None:
             self._initialize_state(model)
+        self.accelerator.free_memory()
         self.get_accelerator().print("accelerator state has been initialized.")
         payload = self.accelerator.prepare(model,
                                            data_loader,

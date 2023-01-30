@@ -82,6 +82,7 @@ class TraceTrainer(BaseTrainer):
         model, train_data_loader, optimizer, scheduler = self.create_or_load_state(self.model,
                                                                                    self.get_train_dataloader(),
                                                                                    resume_from_checkpoint)
+        model = self.accelerator.prepare_model(model)
         self._is_prepared = True
         self.get_accelerator().print(f"Number of GPUS: {accelerator.num_processes}. Torch devices: {torch.cuda.device_count()}")
         global_step = 0
@@ -252,9 +253,9 @@ class TraceTrainer(BaseTrainer):
             self.print("model not prepared, freeing memory.")
             self.accelerator.free_memory()
             self.print(f"Model is about to be prepared:", self.model_manager.model_path)
-            model = self.accelerator.prepare_model(model)
+            # model = self.accelerator.prepare_model(model)
             self.print("Model prepared.")
-            
+
         data_loader = self.accelerator.prepare_data_loader(data_loader)
         self.print("Data Loader prepared.")
         self.optimizer = self.accelerator.prepare_optimizer(self.optimizer)

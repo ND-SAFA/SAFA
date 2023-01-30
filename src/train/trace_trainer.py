@@ -245,9 +245,9 @@ class TraceTrainer(BaseTrainer):
             self._initialize_state(model)
         self.print("state initialized, freeing memory")
         self.accelerator.free_memory()
-        self.print("waiting for everyone")
+        print("waiting for everyone")
         self.accelerator.wait_for_everyone()
-        self.accelerator.print("accelerator state has been initialized. Pre-paring entities")
+        self.print("accelerator state has been initialized. Pre-paring entities")
         assert len(self.accelerator._models) == 0, f"Accelerator contains left-over model."
         self.print(f"Model is about to be prepared:", self.model_manager.model_path)
 

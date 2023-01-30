@@ -75,8 +75,8 @@ if __name__ == "__main__":
     """
     Export Results
     """
-    val_output_path = os.path.join(OUTPUT_DIR, export_file_name + "-" + "val.csv")
-    eval_output_path = os.path.join(OUTPUT_DIR, export_file_name + "-" + "eval.csv")
+    val_output_path = os.path.join(OUTPUT_DIR, "results-val.csv")
+    eval_output_path = os.path.join(OUTPUT_DIR, "results-eval.csv")
     val_df = pd.DataFrame(val_entries)
     # val_df.to_csv(val_output_path, index=False)
     eval_df = pd.DataFrame(eval_entries)

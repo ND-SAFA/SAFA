@@ -2,12 +2,13 @@ import traceback
 from abc import ABC
 from copy import deepcopy
 from dataclasses import dataclass, field
+from logging import Logger
 from typing import Any, Dict, List, Type, Union
 
 from typeguard import check_type
 from typing_extensions import get_args
 
-from util.enum_utils import get_enum_from_name
+from util.enum_util import get_enum_from_name
 from util.param_specs import ParamSpecs
 from util.reflection_util import ReflectionUtil
 from variables.definition_variable import DefinitionVariable

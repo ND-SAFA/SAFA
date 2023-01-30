@@ -5,19 +5,14 @@
         {
           "object_type": "TRAIN",
           "job_args": {
-            "random_seed": {
-              "*": [
-                87975,
-                7265
-              ]
-            }
+            "random_seed": 7265
           },
           "model_manager": {
             "model_path": "bert-base-uncased"
           },
           "trainer_args": {
             "output_dir": "[OUTPUT_PATH]/cchit/bert-base/models",
-            "num_train_epochs": 1,
+            "num_train_epochs": 100,
             "per_device_train_batch_size": 8,
             "per_device_eval_batch_size": 8,
             "gradient_accumulation_steps": 8,
@@ -43,12 +38,12 @@
             "val_dataset_creator": {
               "object_type": "SPLIT",
               "split_strategy": "SPLIT_BY_LINK",
-              "val_percentage": 0.4
+              "val_percentage": 0.10
             },
             "eval_dataset_creator": {
               "object_type": "SPLIT",
               "split_strategy": "SPLIT_BY_LINK",
-              "val_percentage": 0.50
+              "val_percentage": 0.10
             },
             "augmenter": {
               "steps": [

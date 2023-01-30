@@ -206,8 +206,8 @@ class TraceTrainer(BaseTrainer):
             should_save = self.save_strategy.should_save(eval_result, stage_iteration)
             if should_save:
                 current_score = self.save_strategy.get_metric_score(eval_result.metrics)
-                print("-" * 25, "Saving Best Model", "-" * 25)
-                print(f"New Best: {current_score}\tPrevious: {previous_best}")
+                self.accelerator.print("-" * 25, "Saving Best Model", "-" * 25)
+                self.accelerator.print(f"New Best: {current_score}\tPrevious: {previous_best}")
                 self.save_model(self.get_output_path(self.BEST_MODEL_NAME))
             else:
                 self.accelerator.print(f"Previous best is still {previous_best}.")

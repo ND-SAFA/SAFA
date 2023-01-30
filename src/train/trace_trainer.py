@@ -46,7 +46,7 @@ class TraceTrainer(BaseTrainer):
         :param resume_from_checkpoint: The checkpoint to resume from.
         :return: Output of training session.
         """
-        accelerator = self._create_accelerator()
+        accelerator = self.get_accelerator()
         self.model = self.model_manager.get_model()
         inner_training_loop = find_executable_batch_size(
             self.inner_training_loop) if self.trainer_args.per_device_train_batch_size is None else self.inner_training_loop
@@ -114,7 +114,7 @@ class TraceTrainer(BaseTrainer):
         :return: The prediction output.
         """
 
-        self.accelerator = self._create_accelerator()
+        self.accelerator = self.get_accelerator()
         test_dataloader = self.get_test_dataloader(test_dataset)
         # self.model, eval_data_loader = self.accelerator.prepare(self.model, test_dataloader)
         self.model.eval()
@@ -242,16 +242,19 @@ class TraceTrainer(BaseTrainer):
         :param model: The model used to initialize the optimizer.
         :return: None
         """
-        self.accelerator = self._create_accelerator()
+        self.accelerator = self.get_accelerator()
         self.optimizer = SupportedOptimizers.create(self.trainer_args.optimizer_name, model)
         self.lr_scheduler = SupportedSchedulers.create(self.trainer_args.scheduler_name, self.optimizer)
 
-    def _create_accelerator(self) -> Accelerator:
+    def get_accelerator(self) -> Accelerator:
         """
         Creates accelerator from the training arguments.
         :return: Constructed accelerator.
         """
-        return Accelerator(gradient_accumulation_steps=self.trainer_args.gradient_accumulation_steps, split_batches=True)
+        if self.accelerator is None:
+            self.accelerator = Accelerator(gradient_accumulation_steps=self.trainer_args.gradient_accumulation_steps,
+                                           split_batches=True)
+        return self.accelerator
 
     @overrides(Trainer)
     def _get_train_sampler(self) -> Optional[torch.utils.data.Sampler]:

@@ -167,7 +167,6 @@ class TraceTrainer(BaseTrainer):
                 return
             super().save_model(output_dir=output_dir, _internal_call=_internal_call)
             self.accelerator.save_state(output_dir)
-        self.accelerator.wait_for_everyone()
 
     def on_step(self, step_iteration: int) -> None:
         """

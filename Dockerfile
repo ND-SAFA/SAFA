@@ -6,15 +6,15 @@ ARG PathToProperties="/app/src/main/resources/application-deployment.properties"
 ARG DB_INSTANCE
 
 ENV DB_URL=jdbc:mysql://host.docker.internal/safa-db
-    DB_USER=root
-    DB_PASSWORD=secret2
-    JWT_KEY=3s6v9y$B&E)H@MbQeThWmZq4t7w!z%C*F-JaNdRfUjXn2r5u8x/A?D(G+KbPeShV
-    TGEN_ENDPOINT=http://35.184.232.43
-    JIRA_REDIRECT_LINK="https://localhost.safa.ai:8080/create?tab=jira"
-    JIRA_CLIENT_ID="lWzIreg3PMSqkjkkvKyqR6xvHJDXvRAF"
-    JIRA_SECRET="YhfXF-mR0-ZZoH1RD0T504nAfAB002dNVmsmd-JES3LL3_X6kvebRUWh3Ja0IgdT"
-    GITHUB_CLIENT_ID="Iv1.75905e8f5ace1f4b"
-    GITHUB_SECRET="2d6bd433619bebf523cef951bd1296ac2d2795c3"
+ENV DB_USER=root
+ENV DB_PASSWORD=secret2
+ENV JWT_KEY=3s6v9y$B&E)H@MbQeThWmZq4t7w!z%C*F-JaNdRfUjXn2r5u8x/A?D(G+KbPeShV
+ENV TGEN_ENDPOINT=http://35.184.232.43
+ENV JIRA_REDIRECT_LINK="https://localhost.safa.ai:8080/create?tab=jira"
+ENV JIRA_CLIENT_ID="lWzIreg3PMSqkjkkvKyqR6xvHJDXvRAF"
+ENV JIRA_SECRET="YhfXF-mR0-ZZoH1RD0T504nAfAB002dNVmsmd-JES3LL3_X6kvebRUWh3Ja0IgdT"
+ENV GITHUB_CLIENT_ID="Iv1.75905e8f5ace1f4b"
+ENV GITHUB_SECRET="2d6bd433619bebf523cef951bd1296ac2d2795c3"
 
 RUN test -n "$DB_URL"
 RUN test -n "$DB_USER"

@@ -178,7 +178,7 @@ class TraceTrainer(BaseTrainer):
         should_evaluate = self.save_strategy.should_evaluate(stage, stage_iteration)
 
         if should_evaluate and DatasetRole.VAL in self.trainer_dataset_manager:
-            eval_result = self.perform_prediction(DatasetRole.VAL)
+            eval_result = self.perform_prediction(DatasetRole.TRAIN)
             previous_best = self.save_strategy.best_score
             should_save = self.save_strategy.should_save(eval_result, stage_iteration)
             if should_save:

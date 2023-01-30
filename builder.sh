@@ -1,105 +1,112 @@
-runDev(){
-  setGoogleCredentials
-  runServer safa-dev
-  return $?
-}
+#!/bin/bash
 
-runProd(){
-  setGoogleCredentials
-  runServer safa-prod
-  return $?
-}
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
-runLocalWithCredentials(){
-  setGoogleCredentials
-  runLocal
-  return $?
-}
+JAR_PATH="$SCRIPT_DIR/build/libs/edu.nd.crc.safa-0.1.0.jar"
 
-setGoogleCredentials(){
-    export GOOGLE_APPLICATION_CREDENTIALS="$PWD/application-credentials.json"
-}
+HELP_TEXT="
+Usage: builder.sh [options] <command>...
 
-runLocal() {
-  runServer dev
-  return $?
-}
+Options:
+      -h    Display this message.
+      -n    Do not run unit tests. Overrides a previous -t. Ignored if
+            'build' is not one of the commands.
+      -t    Run unit tests (this is the default behavior if building).
+            Overrides a previous -n. Ignored if 'build' is not one of the
+            commands.
+      -e    Specify the environment (local, dev, or prod). If not specified,
+            it defaults to local.
 
-buildNoTests() {
-  (
-    ./gradlew build --stacktrace -x Test -x checkstyleMain -x checkstyleTest
-    return $?
-  )
-}
+Commands:
+      build    Build the backend with Gradle
+      run      Run the backend
+"
 
-buildWithTests() {
-  (
-    ./gradlew build --stacktrace
-    return $?
-  )
-}
+function help {
+  echo "$HELP_TEXT"
 
-build(){
-  if [ $1 == "test" ]; then
-    buildWithTests
-    return $?
+  if [ -z "$1" ]; then
+    exit 0
   else
-    buildNoTests
-    return $?
+    exit "$1"
   fi
 }
 
-runServer(){
-  JAR_PATH="$PWD/build/libs/edu.nd.crc.safa-0.1.0.jar"
-
-  (
-    java -jar -Dspring.profiles.active="$1" "$JAR_PATH"
-    return $?
-  )
+function setGoogleCredentials {
+    export GOOGLE_APPLICATION_CREDENTIALS="$SCRIPT_DIR/application-credentials.json"
 }
 
-# Checks that valid command was given
-for command in "build" "buildrun"; do
-    if [ -z "$1" ]
-      then
-        echo "Please choose a comment: build, buildrun"
-        exit
-    fi
-  done
+function build {
+  # Set up args for testing
+  if $1; then
+    TEST_ARGS=""
+  else
+    TEST_ARGS="-x Test -x checkstyleMain -x checkstyleTest"
+  fi
 
-if [ -z "$2" ]
-  then
-    echo "Please choose an environment: local, dev, prod"
-    exit
+  # shellcheck disable=SC2086
+  "$SCRIPT_DIR/gradlew" build --stacktrace $TEST_ARGS
+  return $?
+}
+
+function run {
+  java -jar -Dspring.profiles.active="$1" "$JAR_PATH"
+  return $?
+}
+
+function checkReturn {
+  if [ "$1" -ne 0 ]; then
+    exit "$1"
+  fi
+}
+
+# Parse arguments
+TEST=true
+ENVIRONMENT=local
+BUILD=false
+RUN=false
+while [ $OPTIND -le "$#" ]; do
+  if getopts ':hnte:' option; then
+    case $option in
+      h) help;;
+      n) TEST=false;;
+      t) TEST=true;;
+      e) ENVIRONMENT="$OPTARG";;
+      :) echo -e "option requires an argument."; help 1;;
+      ?) echo -e "Invalid command option."; help 1;;
+    esac
+  else
+    command="${!OPTIND}"
+    ((OPTIND++))
+
+    case $command in
+      build) BUILD=true;;
+      run) RUN=true;;
+      *) echo -e "Unknown command $command"; help 1;;
+    esac
+  fi
+done
+
+# Check that the environment is valid and translate the name
+case $ENVIRONMENT in
+  local) ENVIRONMENT=dev;;
+  dev) ENVIRONMENT=safa-dev;;
+  prod) ENVIRONMENT=safa-prod;;
+  *) echo -e "Unknown environment $ENVIRONMENT"; help 1;;
+esac
+
+# Check the user gave us something to do
+if [[ $BUILD = false && $RUN = false ]]; then
+  echo -e "No command specified."
+  help 1
 fi
 
-if [ -z "$3" ]
-  then
-    echo "Please choose an environment: test, no-test"
-    exit
+if $BUILD; then
+  build $TEST
+  checkReturn $?
 fi
 
-if [ $1 == "build" ]; then
-  build "test"
-  exit $?
-fi
-
-if [ $2 == "local" ]; then
-  build $3 && runLocalWithCredentials
-  exit $?
-fi
-
-if [ $2 == "local-nocreds" ]; then
-  build $3 && runLocal
-  exit $?
-fi
-
-if [ $2 == "dev" ]; then
-  build $3 && runDev
-  exit $?
-fi
-
-if [ $2 == "prod" ]; then
-  build $3 && runProd
-  exit $?
+if $RUN; then
+  run $ENVIRONMENT
+  checkReturn $?
 fi

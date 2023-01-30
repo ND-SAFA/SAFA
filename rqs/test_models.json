@@ -10,6 +10,7 @@
           "model_manager": {
             "model_path": {
               "*": [
+                "prajjwal1/bert-tiny",
                 "prajjwal1/bert-mini",
                 "prajjwal1/bert-small",
                 "prajjwal1/bert-medium"

@@ -134,7 +134,9 @@ class TraceTrainer(BaseTrainer):
         eval_labels = torch.cat(eval_labels, dim=0)
         eval_predictions = torch.cat(eval_predictions, dim=0)
         eval_labels, eval_predictions = self.accelerator.gather((eval_labels, eval_predictions))
-        return PredictionOutput(predictions=eval_predictions.cpu().numpy(), label_ids=eval_labels.cpu().numpy(), metrics={})
+        eval_predictions = eval_predictions.cpu().numpy()[:len(test_dataset)]
+        eval_labels = eval_labels.cpu().numpy()[:len(test_dataset)]
+        return PredictionOutput(predictions=eval_predictions, label_ids=eval_labels, metrics={})
 
     def create_or_load_state(self, model: PreTrainedModel, data_loader: DataLoader, resume_from_checkpoint: Optional[str] = None) \
             -> Tuple[PreTrainedModel, DataLoader, Optimizer, _LRScheduler]:

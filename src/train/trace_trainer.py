@@ -1,4 +1,5 @@
 import os
+from functools import partial
 from typing import Optional, Tuple
 
 import torch
@@ -25,8 +26,7 @@ from train.supported_optimizers import SupportedOptimizers
 from train.supported_schedulers import SupportedSchedulers
 from train.trace_output.trace_train_output import TraceTrainOutput
 from train.trainer_args import TrainerArgs
-
-os.environ['TRANSFORMERS_NO_ADVISORY_WARNINGS'] = 'true'
+from util.file_util import FileUtil
 
 
 class TraceTrainer(BaseTrainer):
@@ -39,7 +39,6 @@ class TraceTrainer(BaseTrainer):
     def __init__(self, trainer_args: TrainerArgs, model_manager: ModelManager, trainer_dataset_manager: TrainerDatasetManager,
                  **kwargs):
         super().__init__(trainer_args, model_manager, trainer_dataset_manager, **kwargs)
-        self.accelerator: Optional[Accelerator] = None
         self._link_tracker = LinkTrainingTracker(self.trainer_dataset_manager[DatasetRole.TRAIN]) \
             if DatasetRole.TRAIN in self.trainer_dataset_manager else None
 
@@ -49,11 +48,11 @@ class TraceTrainer(BaseTrainer):
         :param resume_from_checkpoint: The checkpoint to resume from.
         :return: Output of training session.
         """
-        accelerator = self._create_accelerator()
         self.model = self.model_manager.get_model()
+        self._initialize_state(self.model)
         inner_training_loop = find_executable_batch_size(
             self.inner_training_loop) if self.trainer_args.per_device_train_batch_size is None else self.inner_training_loop
-        trace_train_output = inner_training_loop(resume_from_checkpoint=resume_from_checkpoint, accelerator=accelerator)
+        trace_train_output = inner_training_loop(resume_from_checkpoint=resume_from_checkpoint, accelerator=self.accelerator)
         if self.trainer_args.load_best_model_at_end:
             if not self.trainer_args.should_save:
                 print("Unable to load best model because configuration defined `should_save` to False.")
@@ -71,23 +70,27 @@ class TraceTrainer(BaseTrainer):
         :param kwargs: Any additional arguments. Currently, ignored but necessary for finding optimal batch size.
         :return: The output of the training session.
         """
+        accelerator.free_memory()
         if batch_size is None:
             batch_size = self.args.per_device_train_batch_size
         self._train_batch_size = batch_size
         self.args.per_device_train_batch_size = batch_size
         loss_function = self.trainer_args.loss_function
+        print("Training batch size:", self._train_batch_size)
         self.model.train()
-        model, optimizer, scheduler, train_data_loader = self.create_or_load_state(self.model,
+        model, train_data_loader, optimizer, scheduler = self.create_or_load_state(self.model,
                                                                                    self.get_train_dataloader(),
                                                                                    resume_from_checkpoint)
-        assert not torch.cuda.is_available() or accelerator.num_processes > 1, f"Number of GPUS: {accelerator.num_processes}. Torch devices: {torch.cuda.device_count()}"
+        print(f"Number of GPUS: {accelerator.num_processes}. Torch devices: {torch.cuda.device_count()}")
         global_step = 0
         training_loss = 0
         training_metrics = {}
         epoch_loss = 0
+        _is_local_main_process = accelerator.is_local_main_process
+        accelerate_tqdm = partial(tqdm, disable=not _is_local_main_process, position=0)
         for epoch_index in range(self.trainer_args.num_train_epochs):
             with accelerator.accumulate(model):
-                for batch_index, batch in enumerate(tqdm(train_data_loader)):
+                for batch_index, batch in enumerate(accelerate_tqdm(train_data_loader)):
                     batch = batch.to(accelerator.device)
 
                     labels = batch.pop(DataKey.LABELS_KEY)
@@ -109,7 +112,6 @@ class TraceTrainer(BaseTrainer):
         return TraceTrainOutput(global_step=global_step, training_loss=training_loss, metrics=training_metrics,
                                 eval_metrics=self.save_strategy.stage_evaluations)
 
-    @overrides(BaseTrainer)
     def predict(self, test_dataset: Dataset) -> PredictionOutput:
         """
         Moves model to accelerate device then predicts current model on dataset.
@@ -117,13 +119,28 @@ class TraceTrainer(BaseTrainer):
         :return: The prediction output.
         """
 
-        self.accelerator = self._create_accelerator()
+        self.accelerator = self.get_accelerator()
         test_dataloader = self.get_test_dataloader(test_dataset)
         self.model, eval_data_loader = self.accelerator.prepare(self.model, test_dataloader)
-        return self.evaluation_loop(eval_data_loader, description="Evaluation.")
+        self.model.eval()
+        eval_predictions, eval_labels = [], []
+        for batch in test_dataloader:
+            batch.to(self.accelerator.device)
+            targets = batch.pop("labels")
+            with torch.no_grad():
+                output = self.model(**batch)
+            eval_predictions.append(output.logits)
+            eval_labels.append(targets)
+        self.accelerator.free_memory()
+        eval_labels = torch.cat(eval_labels, dim=0)
+        eval_predictions = torch.cat(eval_predictions, dim=0)
+        eval_labels, eval_predictions = self.accelerator.gather((eval_labels, eval_predictions))
+        eval_predictions = eval_predictions.cpu().numpy()[:len(test_dataset)]
+        eval_labels = eval_labels.cpu().numpy()[:len(test_dataset)]
+        return PredictionOutput(predictions=eval_predictions, label_ids=eval_labels, metrics={})
 
     def create_or_load_state(self, model: PreTrainedModel, data_loader: DataLoader, resume_from_checkpoint: Optional[str] = None) \
-            -> Tuple[PreTrainedModel, Optimizer, _LRScheduler, DataLoader]:
+            -> Tuple[PreTrainedModel, DataLoader, Optimizer, _LRScheduler]:
         """
         If checkpoint given, accelerate entities are instantiated with their previous state. Otherwise, they are instantiated with new
         states.
@@ -133,10 +150,10 @@ class TraceTrainer(BaseTrainer):
         :type resume_from_checkpoint:
         :return: Instantiated model, optimizer, scheduler, and train data loader.
         """
-        model, optimizer, scheduler, data_loader = self._prepare_accelerator(model, data_loader)
+        model, data_loader, optimizer, scheduler = self._prepare_accelerator(model, data_loader)
         if resume_from_checkpoint:
             self.accelerator.load_state(resume_from_checkpoint)
-        return model, optimizer, scheduler, data_loader
+        return model, data_loader, optimizer, scheduler
 
     @overrides(Trainer)
     def save_model(self, output_dir: Optional[str] = None, _internal_call: bool = False) -> None:
@@ -146,12 +163,16 @@ class TraceTrainer(BaseTrainer):
         :param _internal_call: Internal property used within HuggingFace Trainer.
         :return: None
         """
-        if not output_dir:
-            raise ValueError("Expected output_dir to be defined.")
-        if self.trainer_args.skip_save:
-            return
-        super().save_model(output_dir=output_dir, _internal_call=_internal_call)
-        self.accelerator.save_state(output_dir)
+        with self.accelerator.main_process_first():
+            if not output_dir:
+                raise ValueError("Expected output_dir to be defined.")
+            if self.trainer_args.skip_save:
+                return
+            FileUtil.create_dir_safely(output_dir)
+            model = self.accelerator.unwrap_model(self.model)
+            self._save(output_dir, state_dict=model.state_dict())
+            self.model_manager.get_config().save_pretrained(output_dir)
+            self.model_manager.get_tokenizer().save_pretrained(output_dir)
 
     def on_step(self, step_iteration: int) -> None:
         """
@@ -185,8 +206,8 @@ class TraceTrainer(BaseTrainer):
             should_save = self.save_strategy.should_save(eval_result, stage_iteration)
             if should_save:
                 current_score = self.save_strategy.get_metric_score(eval_result.metrics)
-                print("-" * 25, "Saving Best Model", "-" * 25)
-                print(f"New Best: {current_score}\tPrevious: {previous_best}")
+                self.accelerator.print("-" * 25, "Saving Best Model", "-" * 25)
+                self.accelerator.print(f"New Best: {current_score}\tPrevious: {previous_best}")
                 self.save_model(self.get_output_path(self.BEST_MODEL_NAME))
             else:
                 self.accelerator.print(f"Previous best is still {previous_best}.")
@@ -211,9 +232,11 @@ class TraceTrainer(BaseTrainer):
         if self.accelerator:  # covers custom and non-custom
             self.accelerator.free_memory()
             del self.accelerator
+        if self.trainer_dataset_manager:
+            del self.trainer_dataset_manager
 
     def _prepare_accelerator(self, model: PreTrainedModel, data_loader: DataLoader) \
-            -> Tuple[PreTrainedModel, Optimizer, _LRScheduler, DataLoader]:
+            -> Tuple[PreTrainedModel, DataLoader, Optimizer, _LRScheduler]:
         """
         Prepares the model, optimizer, scheduler and data loader for distributed training.
         :param model: The model being trained.
@@ -223,9 +246,9 @@ class TraceTrainer(BaseTrainer):
         if self.accelerator is None:
             self._initialize_state(model)
         return self.accelerator.prepare(model,
+                                        data_loader,
                                         self.optimizer,
-                                        self.lr_scheduler,
-                                        data_loader)
+                                        self.lr_scheduler)
 
     def _initialize_state(self, model: PreTrainedModel) -> None:
         """
@@ -233,16 +256,9 @@ class TraceTrainer(BaseTrainer):
         :param model: The model used to initialize the optimizer.
         :return: None
         """
-        self.accelerator = self._create_accelerator()
+        self.accelerator = self.get_accelerator()
         self.optimizer = SupportedOptimizers.create(self.trainer_args.optimizer_name, model)
         self.lr_scheduler = SupportedSchedulers.create(self.trainer_args.scheduler_name, self.optimizer)
-
-    def _create_accelerator(self) -> Accelerator:
-        """
-        Creates accelerator from the training arguments.
-        :return: Constructed accelerator.
-        """
-        return Accelerator(gradient_accumulation_steps=self.trainer_args.gradient_accumulation_steps)
 
     @overrides(Trainer)
     def _get_train_sampler(self) -> Optional[torch.utils.data.Sampler]:

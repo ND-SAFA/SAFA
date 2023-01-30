@@ -1,0 +1,36 @@
+{
+  "steps": [
+    {
+      "jobs": [
+        {
+          "object_type": "PREDICT",
+          "job_args": {
+            "random_seed": 1231231
+          },
+          "model_manager": {
+            "model_path": "prajjwal1/bert-mini"
+          },
+          "trainer_args": {
+            "output_dir": "[OUTPUT_PATH]/test_eval/models",
+            "metrics": [
+              "map",
+              "map_at_k",
+              "f",
+              "precision"
+            ]
+          },
+          "trainer_dataset_manager": {
+            "eval_dataset_creator": {
+              "object_type": "TRACE",
+              "project_reader": {
+                "object_type": "CSV",
+                "project_path": "[OUTPUT_PATH]/create_dataset/cm1/eval.csv"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "output_dir": "[OUTPUT_PATH]/test_eval/jobs"
+}

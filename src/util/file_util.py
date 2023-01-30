@@ -1,6 +1,7 @@
 import json
 import os
 import shutil
+from copy import deepcopy
 from typing import Dict, IO, List, Union
 
 from util.json_util import JsonUtil
@@ -127,3 +128,30 @@ class FileUtil:
             shutil.move(file_path, new_path)
         if delete_after_move:
             FileUtil.delete_dir(orig_path)
+
+    @staticmethod
+    def add_to_path(path: str, addition: str, index: int) -> str:
+        """"
+        Adds component to path at given index.
+        :param path: The path to add component to.
+        :param addition: The component to add to path.
+        :param index: The index to add component in path.
+        :return path with component added.
+        """
+        path = deepcopy(path)
+        path_list = FileUtil.path_to_list(path)
+        index = index if index >= 0 else len(path_list) + index + 1
+        path_list.insert(index, addition)
+        if os.path.isabs(path):
+            path_list.insert(0, "/")
+        return os.path.join(*path_list)
+
+    @staticmethod
+    def path_to_list(path: str) -> List[str]:
+        """
+        Creates list of folders and files in path.
+        :param path: The path to split into components.
+        :return: List of components creating path.
+        """
+        path = os.path.normpath(path)
+        return [p for p in path.split(os.sep) if p != ""]

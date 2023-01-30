@@ -1,7 +1,8 @@
-import math
 import os
 from copy import deepcopy
 from typing import Any, Dict, List, Optional, Type, Union
+
+import math
 
 from config.override import overrides
 from jobs.abstract_job import AbstractJob
@@ -57,6 +58,7 @@ class ExperimentStep(BaseObject):
         job_runs = self._divide_jobs_into_runs()
 
         for jobs in job_runs:
+            print("-" * 10, "Starting new job run", "-" * 10)
             if use_multi_epoch_step:
                 self.best_job = self._run_multi_epoch_step(jobs, output_dir)
             else:

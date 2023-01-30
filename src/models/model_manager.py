@@ -2,7 +2,7 @@ import gc
 from typing import Dict, List, Optional
 
 from torch.nn.parameter import Parameter
-from transformers import AutoConfig
+from transformers import AutoConfig, PretrainedConfig
 from transformers.modeling_utils import PreTrainedModel
 from transformers.models.auto.tokenization_auto import AutoTokenizer
 from transformers.tokenization_utils import PreTrainedTokenizer
@@ -28,6 +28,7 @@ class ModelManager(BaseObject):
 
         self.__tokenizer: Optional[AutoTokenizer] = None
         self.__model: Optional[PreTrainedModel] = None
+        self.__config: Optional[PretrainedConfig] = None
         self.model_path = model_path
         self.model_output_path = model_output_path
         self.model_task = model_task
@@ -40,9 +41,9 @@ class ModelManager(BaseObject):
         Loads the model from the pretrained model path
         :return: the PreTrainedModel object
         """
-        config = AutoConfig.from_pretrained(self.model_path)
-        config.num_labels = 2
-        model = self.model_task.value.from_pretrained(self.model_path, config=config)
+        self.__config = AutoConfig.from_pretrained(self.model_path)
+        self.__config.num_labels = 2
+        model = self.model_task.value.from_pretrained(self.model_path, config=self.__config)
         if self.layers_to_freeze:
             self._freeze_layers(model, self.layers_to_freeze)
         return model
@@ -55,6 +56,15 @@ class ModelManager(BaseObject):
         if self.__model is None:
             self.__model = self.__load_model()
         return self.__model
+
+    def get_config(self) -> PretrainedConfig:
+        """
+        Gets the PreTrainedModel configuration.
+        :return: the PreTrainedModel object
+        """
+        if self.__config is None:
+            self.get_model()
+        return self.__config
 
     def clear_model(self) -> None:
         """

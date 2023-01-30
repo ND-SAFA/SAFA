@@ -3,34 +3,10 @@
     {
       "jobs": [
         {
-          "object_type": "TRAIN",
+          "object_type": "CREATE_DATASETS",
           "job_args": {
-            "random_seed": {
-              "*": [
-                812,
-                924,
-                316,
-                540,
-                457
-              ]
-            }
-          },
-          "model_manager": {
-            "model_path": "bert-base-uncased"
-          },
-          "trainer_args": {
-            "output_dir": "[OUTPUT_PATH]/cm1/bert-base/models",
-            "num_train_epochs": 1,
-            "gradient_accumulation_steps": 8,
-            "learning_rate": 1e-5,
-            "metrics": [
-              "map",
-              "map_at_k",
-              "f",
-              "precision"
-            ],
-            "skip_save": false,
-            "load_best_model_at_end": true
+            "random_seed": 68,
+            "output_dir": "[OUTPUT_PATH]/create_dataset/cm1"
           },
           "trainer_dataset_manager": {
             "train_dataset_creator": {
@@ -63,5 +39,5 @@
       ]
     }
   ],
-  "output_dir": "[OUTPUT_PATH]/cm1/bert-base/jobs"
+  "output_dir": "[OUTPUT_PATH]/create_dataset/cm1"
 }

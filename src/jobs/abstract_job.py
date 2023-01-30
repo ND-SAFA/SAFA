@@ -41,8 +41,7 @@ class AbstractJob(threading.Thread, BaseObject):
         """
         self.result.set_job_status(Status.IN_PROGRESS)
         try:
-            if self.job_args.random_seed:
-                self.set_random_seed(self.job_args.random_seed)
+            self.set_seed()
             run_result = self._run()
             self.result = run_result.update(self.result)
             self.result.set_job_status(Status.SUCCESS)
@@ -73,6 +72,8 @@ class AbstractJob(threading.Thread, BaseObject):
         """
         random.seed(random_seed)
         set_seed(random_seed)
+        torch.backends.cudnn.deterministic = True
+        torch.backends.cudnn.benchmark = False
 
     def get_output_filepath(self, output_dir: str = None) -> str:
         """
@@ -107,6 +108,14 @@ class AbstractJob(threading.Thread, BaseObject):
         except Exception:
             print(traceback.format_exc())  # to save in logs
             return False
+
+    def set_seed(self) -> None:
+        """
+        Sets the random seed for this job.
+        :return: None
+        """
+        if self.job_args.random_seed:
+            self.set_random_seed(self.job_args.random_seed)
 
     def __deepcopy__(self, memodict: Dict = {}) -> "AbstractJob":
         """

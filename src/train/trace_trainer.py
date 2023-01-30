@@ -126,13 +126,13 @@ class TraceTrainer(BaseTrainer):
             with torch.no_grad():
                 output = self.model(**batch)
             predictions = output.logits
-            batch_predictions, batch_labels = self.accelerator.gather_for_metrics((predictions, targets))
+            batch_predictions, batch_labels = self.accelerator.gather((predictions, targets))
             eval_predictions.append(batch_predictions.cpu())
             eval_labels.append(batch_labels.cpu())
         self.accelerator.free_memory()
         eval_labels = torch.cat(eval_labels, dim=0)
         eval_predictions = torch.cat(eval_predictions, dim=0)
-        eval_labels, eval_predictions = self.accelerator.gather_for_metrics((eval_labels, eval_predictions))
+        eval_labels, eval_predictions = self.accelerator.gather((eval_labels, eval_predictions))
         self.accelerator.print(f"Preds: {len(eval_predictions)} Labels: {len(eval_labels)}")
         return PredictionOutput(predictions=eval_predictions.cpu().numpy(), label_ids=eval_labels.cpu().numpy(), metrics={})
 

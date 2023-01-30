@@ -244,15 +244,23 @@ class TraceTrainer(BaseTrainer):
         if self.accelerator is None or self.optimizer is None or self.lr_scheduler is None:
             self._initialize_state(model)
         self.accelerator.free_memory()
-        self.accelerator.print("accelerator state has been initialized.")
+        self.accelerator.print("accelerator state has been initialized. Pre-paring entities")
         assert len(self.accelerator._models) == 0, f"Accelerator contains left-over model."
+
+        model = self.accelerator.prepare_model(model)
+        self.accelerator.print("Model prepared.")
+        data_loader = self.accelerator.prepare_data_loader(data_loader)
+        self.accelerator.print("Data Loader prepared.")
+        self.optimizer = self.accelerator.prepare_optimizer(self.optimizer)
+        self.accelerator.print("Optimizer prepared.")
+        self.lr_scheduler = self.accelerator.prepare_scheduler(self.lr_scheduler)
+        self.accelerator.print("Scheduler prepared.")
         payload = self.accelerator.prepare(model,
                                            data_loader,
                                            self.optimizer,
                                            self.lr_scheduler)
-        self.get_accelerator().print("Prepare has finished.")
 
-        return payload
+        return model, data_loader, self.optimizer, self.lr_scheduler
 
     def _initialize_state(self, model: PreTrainedModel) -> None:
         """

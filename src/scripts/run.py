@@ -6,6 +6,8 @@ import torch
 from django.core.wsgi import get_wsgi_application
 from dotenv import load_dotenv
 
+from train.trace_accelerator import TraceAccelerator
+
 load_dotenv()
 
 ROOT_PATH = os.path.expanduser(os.environ["ROOT_PATH"])
@@ -36,7 +38,9 @@ if __name__ == "__main__":
     #
     #
     experiment_base_path = os.path.dirname(job_definition["output_dir"])
-    FileUtil.delete_dir(experiment_base_path)
+    if TraceAccelerator.is_local_main_process:
+        FileUtil.delete_dir(experiment_base_path)
+    TraceAccelerator.wait_for_everyone()
     #
     # Logs
     #

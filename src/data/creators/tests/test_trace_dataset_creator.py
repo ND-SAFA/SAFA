@@ -50,7 +50,7 @@ class TestTraceDatasetCreator(BaseTest):
         :return: None
         """
         project_reader = test_project.get_project_reader()
-        trace_dataset_creator = TraceDatasetCreator(project_reader)
+        trace_dataset_creator = TraceDatasetCreator(project_reader, filter_unlinked_artifacts=False)
         trace_dataset = trace_dataset_creator.create()
         self.assertEqual(test_project.get_n_links(), len(trace_dataset))
         self.assertEqual(test_project.get_n_positive_links(), len(trace_dataset.pos_link_ids))

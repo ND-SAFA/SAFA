@@ -119,7 +119,7 @@ class ExperimentStep(BaseObject):
         :param output_dir: path to produce output to
         :return: the best job
         """
-        self._run_on_jobs(jobs, "run")
+        self._run_on_jobs(jobs, "start")
         self._run_on_jobs(jobs, "join")
         best_job = self._get_best_job(jobs, self.best_job)
         self._run_on_jobs(jobs, "save", output_dir=output_dir)

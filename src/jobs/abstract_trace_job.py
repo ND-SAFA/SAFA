@@ -1,4 +1,3 @@
-import gc
 from abc import ABC
 from typing import Any, Optional, Type
 
@@ -66,7 +65,6 @@ class AbstractTraceJob(AbstractJob, ABC):
             self._trainer.cleanup()
         self._trainer = None
         self.trainer_dataset_manager.cleanup()
-        gc.collect()
 
     @classmethod
     @overrides(BaseObject)

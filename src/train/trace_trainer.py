@@ -38,7 +38,6 @@ class TraceTrainer(BaseTrainer):
     def __init__(self, trainer_args: TrainerArgs, model_manager: ModelManager, trainer_dataset_manager: TrainerDatasetManager,
                  **kwargs):
         super().__init__(trainer_args, model_manager, trainer_dataset_manager, **kwargs)
-        self.accelerator: Optional[Accelerator] = None
 
     def train(self, resume_from_checkpoint: str = None, **kwargs) -> TraceTrainOutput:
         """
@@ -257,16 +256,6 @@ class TraceTrainer(BaseTrainer):
         self.accelerator = self.get_accelerator()
         self.optimizer = SupportedOptimizers.create(self.trainer_args.optimizer_name, model)
         self.lr_scheduler = SupportedSchedulers.create(self.trainer_args.scheduler_name, self.optimizer)
-
-    def get_accelerator(self) -> Accelerator:
-        """
-        Creates accelerator from the training arguments.
-        :return: Constructed accelerator.
-        """
-        if self.accelerator is None:
-            self.accelerator = Accelerator(gradient_accumulation_steps=self.trainer_args.gradient_accumulation_steps,
-                                           split_batches=True, step_scheduler_with_optimizer=False)
-        return self.accelerator
 
     @overrides(Trainer)
     def _get_train_sampler(self) -> Optional[torch.utils.data.Sampler]:

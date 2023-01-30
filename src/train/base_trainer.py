@@ -1,7 +1,8 @@
 import os
-from typing import Any, Dict, Union
+from typing import Any, Dict, Optional, Union
 
 import torch
+from accelerate import Accelerator
 from transformers.trainer import Trainer
 
 from data.datasets.dataset_role import DatasetRole
@@ -37,6 +38,7 @@ class BaseTrainer(Trainer, BaseObject):
         self.trainer_dataset_manager = trainer_dataset_manager
         self.model_manager = model_manager
         self.model_manager.set_max_seq_length(self.trainer_args.max_seq_length)
+        self.accelerator: Optional[Accelerator] = None
         model_init = lambda: self.model_manager.get_model()
         tokenizer = self.model_manager.get_tokenizer()
         if save_strategy is None:
@@ -51,8 +53,9 @@ class BaseTrainer(Trainer, BaseObject):
         :param checkpoint: path to checkpoint.
         :return: a dictionary containing the results
         """
-        self.model = self.model_manager.get_model()
-        self.train_dataset = self.trainer_dataset_manager[DatasetRole.TRAIN].to_trainer_dataset(self.model_manager)
+        with self.get_accelerator().main_process_first():
+            self.model = self.model_manager.get_model()
+            self.train_dataset = self.trainer_dataset_manager[DatasetRole.TRAIN].to_trainer_dataset(self.model_manager)
         train_output = self.train(resume_from_checkpoint=checkpoint)
         return TraceTrainOutput(train_output=train_output)
 
@@ -72,6 +75,16 @@ class BaseTrainer(Trainer, BaseObject):
         output.metrics.update(eval_metrics)
         return TracePredictionOutput(predictions=metrics_manager.get_scores(), label_ids=output.label_ids, metrics=output.metrics,
                                      source_target_pairs=dataset.get_source_target_pairs())
+
+    def get_accelerator(self) -> Accelerator:
+        """
+        Creates accelerator from the training arguments.
+        :return: Constructed accelerator.
+        """
+        if self.accelerator is None:
+            self.accelerator = Accelerator(gradient_accumulation_steps=self.trainer_args.gradient_accumulation_steps,
+                                           split_batches=True, step_scheduler_with_optimizer=False)
+        return self.accelerator
 
     def cleanup(self) -> None:
         """

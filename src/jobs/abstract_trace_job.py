@@ -8,7 +8,6 @@ from jobs.abstract_job import AbstractJob
 from jobs.components.job_args import JobArgs
 from jobs.create_datasets_job import CreateDatasetsJob
 from models.model_manager import ModelManager
-from train.base_trainer import BaseTrainer
 from train.trace_trainer import TraceTrainer
 from train.trainer_args import TrainerArgs
 from util.base_object import BaseObject
@@ -44,7 +43,7 @@ class AbstractTraceJob(AbstractJob, ABC):
             CreateDatasetsJob(self.job_args, self.trainer_dataset_manager).run()
         super().run()
 
-    def get_trainer(self, **kwargs) -> BaseTrainer:
+    def get_trainer(self, **kwargs) -> TraceTrainer:
         """
         Gets the trace trainer for the job
         :param kwargs: any additional parameters for the trainer

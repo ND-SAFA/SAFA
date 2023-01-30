@@ -9,7 +9,7 @@ from torch.optim import Optimizer
 from torch.optim.lr_scheduler import _LRScheduler
 from torch.utils.data import DataLoader
 from tqdm import tqdm
-from transformers import PreTrainedModel, Trainer, WEIGHTS_NAME
+from transformers import PreTrainedModel, Trainer
 from transformers.modeling_outputs import SequenceClassifierOutput
 from transformers.trainer_utils import PredictionOutput
 
@@ -168,7 +168,6 @@ class TraceTrainer(BaseTrainer):
                 raise ValueError("Expected output_dir to be defined.")
             if self.trainer_args.skip_save:
                 return
-            model_weights_path = os.path.join(output_dir, WEIGHTS_NAME)
             FileUtil.create_dir_safely(output_dir)
             model = self.accelerator.unwrap_model(self.model)
             self._save(output_dir, state_dict=model.state_dict())

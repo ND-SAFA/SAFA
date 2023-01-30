@@ -5,7 +5,12 @@
         {
           "object_type": "TRAIN",
           "job_args": {
-            "random_seed": 68
+            "random_seed": {
+              "*": [
+                68,
+                12
+              ]
+            }
           },
           "model_manager": {
             "model_path": "hf-internal-testing/tiny-random-bert"

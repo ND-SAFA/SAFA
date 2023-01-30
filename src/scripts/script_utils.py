@@ -21,7 +21,8 @@ def read_job_definition(file_path: str):
     file_path = os.path.expanduser(file_path)
     env_replacements = get_env_replacements()
     job_definition = FileUtil.read_json_file(file_path)
-    return FileUtil.expand_paths_in_dictionary(job_definition, env_replacements)
+    result = FileUtil.expand_paths_in_dictionary(job_definition, env_replacements)
+    return result
 
 
 def get_path(entry_dict: Dict, paths: List[str]):

@@ -30,6 +30,7 @@ class ThreadExample(Thread):
 
 
 if __name__ == "__main__":
+    print("Starting...")
     bert_thread = ThreadExample("bert-base-uncased")
     roberta_thread = ThreadExample("roberta-base")
 

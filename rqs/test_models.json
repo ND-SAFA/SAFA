@@ -29,7 +29,7 @@
               "precision"
             ],
             "skip_save": false,
-            "load_best_model_at_end": true
+            "load_best_model_at_end": false
           },
           "trainer_dataset_manager": {
             "train_dataset_creator": {

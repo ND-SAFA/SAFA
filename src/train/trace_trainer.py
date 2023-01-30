@@ -116,24 +116,19 @@ class TraceTrainer(BaseTrainer):
 
         self.accelerator = self._create_accelerator()
         test_dataloader = self.get_test_dataloader(test_dataset)
-        self.model, eval_data_loader = self.accelerator.prepare(self.model, test_dataloader)
-        self.accelerator.print(f"Test dataset size: {len(test_dataloader.dataset)}")
+        # self.model, eval_data_loader = self.accelerator.prepare(self.model, test_dataloader)
         self.model.eval()
         eval_predictions, eval_labels = [], []
-        for batch in eval_data_loader:
+        for batch in test_dataloader:
             batch.to(self.accelerator.device)
             targets = batch.pop("labels")
             with torch.no_grad():
                 output = self.model(**batch)
-            predictions = output.logits
-            batch_predictions, batch_labels = self.accelerator.gather((predictions, targets))
-            eval_predictions.append(batch_predictions.cpu())
-            eval_labels.append(batch_labels.cpu())
+            eval_predictions.append(output.logits)
+            eval_labels.append(targets)
         self.accelerator.free_memory()
         eval_labels = torch.cat(eval_labels, dim=0)
         eval_predictions = torch.cat(eval_predictions, dim=0)
-        eval_labels, eval_predictions = self.accelerator.gather((eval_labels, eval_predictions))
-        self.accelerator.print(f"Preds: {len(eval_predictions)} Labels: {len(eval_labels)}")
         return PredictionOutput(predictions=eval_predictions.cpu().numpy(), label_ids=eval_labels.cpu().numpy(), metrics={})
 
     def create_or_load_state(self, model: PreTrainedModel, data_loader: DataLoader, resume_from_checkpoint: Optional[str] = None) \

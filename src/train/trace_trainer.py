@@ -120,7 +120,7 @@ class TraceTrainer(BaseTrainer):
 
         self.accelerator = self.get_accelerator()
         test_dataloader = self.get_test_dataloader(test_dataset)
-        # self.model, eval_data_loader = self.accelerator.prepare(self.model, test_dataloader)
+        self.model, eval_data_loader = self.accelerator.prepare(self.model, test_dataloader)
         self.model.eval()
         eval_predictions, eval_labels = [], []
         for batch in test_dataloader:

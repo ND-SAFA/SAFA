@@ -36,6 +36,8 @@ class TraceTrainer(BaseTrainer):
     """
     BEST_MODEL_NAME = "best"
     CURRENT_MODEL_NAME = "current"
+    OPTIMIZER_FILE_NAME = "optimizer.bin"
+    SCHEDULER_FILE_NAME = "scheduler.bin"
 
     def __init__(self, trainer_args: TrainerArgs, model_manager: ModelManager, trainer_dataset_manager: TrainerDatasetManager,
                  **kwargs):
@@ -171,6 +173,8 @@ class TraceTrainer(BaseTrainer):
             FileUtil.create_dir_safely(output_dir)
             model = TraceAccelerator.unwrap_model(self.model)
             self._save(output_dir, state_dict=model.state_dict())
+            TraceAccelerator.save(self.optimizer.state_dict(), os.path.join(output_dir, self.OPTIMIZER_FILE_NAME))
+            TraceAccelerator.save(self.lr_scheduler.state_dict(), os.path.join(output_dir, self.SCHEDULER_FILE_NAME))
             self.model_manager.get_config().save_pretrained(output_dir)
             self.model_manager.get_tokenizer().save_pretrained(output_dir)
 

@@ -17,7 +17,7 @@ class TestTraceDatasetCreator(BaseTest):
         """
         Tests that csv project can be read and converted to trace dataset.
         """
-        self.verify_trace_dataset_creation(CsvTestProject())
+        self.verify_trace_dataset_creation(CsvTestProject(), filter_unlinked_artifacts=False)
 
     def test_api(self):
         """
@@ -43,14 +43,15 @@ class TestTraceDatasetCreator(BaseTest):
         """
         self.verify_trace_dataset_creation(SafaTestProject())
 
-    def verify_trace_dataset_creation(self, test_project: AbstractTestProject) -> None:
+    def verify_trace_dataset_creation(self, test_project: AbstractTestProject, filter_unlinked_artifacts=True) -> None:
         """
         Verifies that test project can be converted to trace dataset.
         :param test_project: The test project to be tested.
+        :param filter_unlinked_artifacts: Whether to remove artifacts without any positive trace links.
         :return: None
         """
         project_reader = test_project.get_project_reader()
-        trace_dataset_creator = TraceDatasetCreator(project_reader, filter_unlinked_artifacts=False)
+        trace_dataset_creator = TraceDatasetCreator(project_reader, filter_unlinked_artifacts=filter_unlinked_artifacts)
         trace_dataset = trace_dataset_creator.create()
         self.assertEqual(test_project.get_n_links(), len(trace_dataset))
         self.assertEqual(test_project.get_n_positive_links(), len(trace_dataset.pos_link_ids))

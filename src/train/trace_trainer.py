@@ -1,6 +1,7 @@
 import os
 from typing import Optional, Tuple
 
+import numpy as np
 import torch
 from accelerate import Accelerator, find_executable_batch_size
 from datasets import Dataset
@@ -117,8 +118,19 @@ class TraceTrainer(BaseTrainer):
         self.accelerator = self._create_accelerator()
         test_dataloader = self.get_test_dataloader(test_dataset)
         self.model, eval_data_loader = self.accelerator.prepare(self.model, test_dataloader)
-        evaluation_output = self.evaluation_loop(eval_data_loader, description="Evaluation.")
-        return evaluation_output
+        predictions, labels = [], []
+        for batch in eval_data_loader:
+            targets = batch.pop("labels")
+            with torch.no_grad():
+                output = self.model(**batch)
+            predictions.append(self.accelerator.gather(output.logits).numpy())
+            labels.append(self.accelerator.gather(targets).numpy())
+        predictions = np.concatenate(predictions)
+        labels = np.concatenate(labels)
+
+        predictions = predictions[:len(eval_data_loader.dataset)]
+        labels = labels[:len(eval_data_loader.dataset)]
+        return PredictionOutput(predictions=predictions, label_ids=labels, metrics={})
 
     def create_or_load_state(self, model: PreTrainedModel, data_loader: DataLoader, resume_from_checkpoint: Optional[str] = None) \
             -> Tuple[PreTrainedModel, DataLoader, Optimizer, _LRScheduler]:

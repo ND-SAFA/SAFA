@@ -5,22 +5,10 @@
         {
           "object_type": "TRAIN",
           "job_args": {
-            "random_seed": {
-              "*": [
-                87975,
-                7265,
-                35236,
-                21284,
-                56778
-              ]
-            }
+            "random_seed": 87975
           },
           "model_manager": {
-            "model_path": {
-              "*": [
-                "prajjwal1/bert-tiny"
-              ]
-            }
+            "model_path": "prajjwal1/bert-tiny"
           },
           "trainer_args": {
             "output_dir": "[OUTPUT_PATH]/cchit/base_models/models",

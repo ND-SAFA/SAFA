@@ -165,7 +165,7 @@ class TraceTrainer(BaseTrainer):
         :param _internal_call: Internal property used within HuggingFace Trainer.
         :return: None
         """
-        with TraceAccelerator.main_process_first():
+        with TraceAccelerator.is_local_main_process:
             if not output_dir:
                 raise ValueError("Expected output_dir to be defined.")
             if self.trainer_args.skip_save:

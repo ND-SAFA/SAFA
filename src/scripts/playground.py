@@ -13,14 +13,15 @@ sys.path.append(os.environ["ROOT_PATH"])
 class ThreadExample(Thread):
     accelerate = None
 
-    def start(self):
-        model_1 = AutoModelForSequenceClassification.from_pretrained("bert-base-uncased")
+    def __init__(self, model_path: str):
+        super().__init__()
+        self.model_path = model_path
+
+    def run(self):
+        model = AutoModelForSequenceClassification.from_pretrained(self.model_path)
         accelerate = self.get_accelerate()
-        model_1 = accelerate.prepare_model(model_1)
-        model_2 = AutoModelForSequenceClassification.from_pretrained("roberta-base")
-        accelerate.free_memory()
-        accelerate.prepare_model(model_2)
-        print("Done")
+        accelerate.prepare_model(model)
+        print(f"Prepared {self.model_path}")
 
     def get_accelerate(self):
         if self.accelerate is None:
@@ -29,5 +30,11 @@ class ThreadExample(Thread):
 
 
 if __name__ == "__main__":
-    thread = ThreadExample()
-    thread.run()
+    bert_thread = ThreadExample("bert-base-uncased")
+    roberta_thread = ThreadExample("roberta-base")
+
+    bert_thread.start()
+    bert_thread.join()
+    roberta_thread.start()
+    roberta_thread.join()
+    print("Done")

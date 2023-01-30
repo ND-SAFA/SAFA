@@ -132,6 +132,7 @@ class TraceTrainer(BaseTrainer):
         eval_labels = torch.cat(eval_labels, dim=0).cpu().numpy()
         eval_predictions = torch.cat(eval_predictions, dim=0).cpu().numpy()
         self.accelerator.wait_for_everyone()
+        self.accelerator.print(f"Preds: {len(eval_predictions)} Labels: {len(eval_labels)}")
         return PredictionOutput(predictions=eval_predictions, label_ids=eval_labels, metrics={})
 
     def create_or_load_state(self, model: PreTrainedModel, data_loader: DataLoader, resume_from_checkpoint: Optional[str] = None) \

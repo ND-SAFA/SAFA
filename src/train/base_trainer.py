@@ -54,9 +54,8 @@ class BaseTrainer(Trainer, BaseObject):
         :return: a dictionary containing the results
         """
         self.print("*" * 20, "Starting new training job", "-" * 20)
-        with self.get_accelerator().main_process_first():
-            self.model = self.model_manager.get_model()
-            self.train_dataset = self.trainer_dataset_manager[DatasetRole.TRAIN].to_trainer_dataset(self.model_manager)
+        self.model = self.model_manager.get_model()
+        self.train_dataset = self.trainer_dataset_manager[DatasetRole.TRAIN].to_trainer_dataset(self.model_manager)
         self.print("*" * 20, "finished dataset construction", "-" * 20)
         train_output = self.train(resume_from_checkpoint=checkpoint)
         return TraceTrainOutput(train_output=train_output)
@@ -97,7 +96,7 @@ class BaseTrainer(Trainer, BaseObject):
             self.accelerator.free_memory()
         if self.model:
             del self.model
-        
+
     def print(self, *args):
         # TODO: Refactor into logger
         self.get_accelerator().print(*args)

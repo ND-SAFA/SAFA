@@ -72,12 +72,13 @@ class TraceTrainer(BaseTrainer):
         self._train_batch_size = batch_size
         self.args.per_device_train_batch_size = batch_size
         loss_function = self.trainer_args.loss_function
-        print("Training batch size:", self._train_batch_size)
+        self.get_accelerator().print("Training batch size:", self._train_batch_size)
         self.model.train()
+        self.get_accelerator().print("Model is training position....")
         model, train_data_loader, optimizer, scheduler = self.create_or_load_state(self.model,
                                                                                    self.get_train_dataloader(),
                                                                                    resume_from_checkpoint)
-        print(f"Number of GPUS: {accelerator.num_processes}. Torch devices: {torch.cuda.device_count()}")
+        self.get_accelerator().print(f"Number of GPUS: {accelerator.num_processes}. Torch devices: {torch.cuda.device_count()}")
         global_step = 0
         training_loss = 0
         training_metrics = {}
@@ -239,10 +240,13 @@ class TraceTrainer(BaseTrainer):
         """
         if self.accelerator is None:
             self._initialize_state(model)
-        return self.accelerator.prepare(model,
-                                        data_loader,
-                                        self.optimizer,
-                                        self.lr_scheduler)
+        self.get_accelerator().print("accelerator state has been initialized.")
+        payload = self.accelerator.prepare(model,
+                                           data_loader,
+                                           self.optimizer,
+                                           self.lr_scheduler)
+        self.get_accelerator().print("Prepare has finished.")
+        return payload
 
     def _initialize_state(self, model: PreTrainedModel) -> None:
         """

@@ -167,7 +167,7 @@ class TraceTrainer(BaseTrainer):
                 raise ValueError("Expected output_dir to be defined.")
             if self.trainer_args.skip_save:
                 return
-            self._save(output_dir)
+            super().save_model(output_dir)
 
     def on_step(self, step_iteration: int) -> None:
         """

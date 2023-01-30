@@ -67,7 +67,6 @@ class TraceTrainer(BaseTrainer):
         :param kwargs: Any additional arguments. Currently, ignored but necessary for finding optimal batch size.
         :return: The output of the training session.
         """
-        accelerator.free_memory()
         if batch_size is None:
             batch_size = self.args.per_device_train_batch_size
         self._train_batch_size = batch_size

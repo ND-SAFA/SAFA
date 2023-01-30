@@ -1,6 +1,7 @@
 from data.datasets.dataset_role import DatasetRole
 from jobs.abstract_trace_job import AbstractTraceJob
 from jobs.components.job_result import JobResult
+from train.trace_accelerator import TraceAccelerator
 
 
 class TrainJob(AbstractTraceJob):
@@ -16,7 +17,6 @@ class TrainJob(AbstractTraceJob):
         if DatasetRole.EVAL in self.trainer_dataset_manager:
             eval_predictions = trainer.perform_prediction(DatasetRole.EVAL)
             training_output.eval_metrics = eval_predictions.metrics
-            accelerator = trainer.get_accelerator()
-            accelerator.print("-" * 10, "Eval Metrics", "-" * 10)
-            accelerator.print(eval_predictions.metrics)
+            TraceAccelerator.print("-" * 10, "Eval Metrics", "-" * 10)
+            TraceAccelerator.print(eval_predictions.metrics)
         return JobResult.from_trace_output(training_output)

@@ -20,6 +20,7 @@ from data.managers.trainer_dataset_manager import TrainerDatasetManager
 from data.samplers.balanced_batch_sampler import BalancedBatchSampler
 from models.model_manager import ModelManager
 from train.base_trainer import BaseTrainer
+from train.link_training_tracker import LinkTrainingTracker
 from train.save_strategy.save_strategy_stage import SaveStrategyStage
 from train.supported_optimizers import SupportedOptimizers
 from train.supported_schedulers import SupportedSchedulers
@@ -38,6 +39,8 @@ class TraceTrainer(BaseTrainer):
     def __init__(self, trainer_args: TrainerArgs, model_manager: ModelManager, trainer_dataset_manager: TrainerDatasetManager,
                  **kwargs):
         super().__init__(trainer_args, model_manager, trainer_dataset_manager, **kwargs)
+        self._link_tracker = LinkTrainingTracker(self.trainer_dataset_manager[DatasetRole.TRAIN]) \
+            if DatasetRole.TRAIN in self.trainer_dataset_manager else None
 
     def train(self, resume_from_checkpoint: str = None, **kwargs) -> TraceTrainOutput:
         """

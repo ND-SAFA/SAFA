@@ -21,6 +21,7 @@ if __name__ == "__main__":
     from util.object_creator import ObjectCreator
     from scripts.script_utils import read_job_definition
     from util.file_util import FileUtil
+    from train.trace_accelerator import TraceAccelerator
 
     #
     # Argument Parsing
@@ -36,7 +37,9 @@ if __name__ == "__main__":
     #
     #
     experiment_base_path = os.path.dirname(job_definition["output_dir"])
-    FileUtil.delete_dir(experiment_base_path)
+    if TraceAccelerator.is_local_main_process:
+        FileUtil.delete_dir(experiment_base_path)
+    TraceAccelerator.wait_for_everyone()
     #
     # Logs
     #

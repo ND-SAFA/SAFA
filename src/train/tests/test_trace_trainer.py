@@ -1,6 +1,7 @@
 import os
 from copy import deepcopy
 from typing import Dict
+from unittest.mock import patch
 
 import mock
 
@@ -28,7 +29,8 @@ class TestTraceTrainer(BaseTraceTest):
     EXPECTED_PREDICTION_SIZE = len(TARGET_LAYERS) * len(SOURCE_LAYERS)
     TEST_METRIC_NAMES = ["accuracy", "map"]
 
-    def test_perform_training(self):
+    @patch.object(TraceTrainer, "save_model")
+    def test_perform_training(self, save_model_mock: mock.Mock):
         test_trace_trainer = self.get_custom_trace_trainer(metrics=self.TEST_METRIC_NAMES)
         test_trace_trainer.model_manager.get_tokenizer().padding = True
         train_output = test_trace_trainer.perform_training()
@@ -74,6 +76,7 @@ class TestTraceTrainer(BaseTraceTest):
         model_manager = ObjectCreator.create(ModelManager)
         model_manager.get_model = mock.MagicMock(return_value=self.get_test_model())
         model_manager.get_tokenizer = mock.MagicMock(return_value=self.get_test_tokenizer())
+        model_manager.get_config = mock.MagicMock(return_value=self.get_test_config())
         trainer_args = ObjectCreator.create(TrainerArgs, **kwargs)
         return TraceTrainer(
             trainer_args=trainer_args,

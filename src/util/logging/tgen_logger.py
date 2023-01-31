@@ -23,6 +23,18 @@ class TgenLogger(Logger):
         if TraceAccelerator.is_main_process:
             super()._log(level, msg, args, exc_info, extra, stack_info, stacklevel)
 
+    def log_with_title(self, title: str, message: str) -> None:
+        """
+        Logs the message with a title
+        :param title: The title to the message
+        :param message: The message
+        :return: None
+        """
+        title_border = '-' * max(round(len(message)/2), 10)
+        title = f"{title_border} {title} {title}"
+        msg = f"{title}\n{message}"
+        self.info(msg)
+
 
 logging.setLoggerClass(TgenLogger)
 __logger: Optional[TgenLogger] = None

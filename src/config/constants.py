@@ -7,7 +7,7 @@ load_dotenv()
 # -------------- LOGGING --------------
 LOG_LEVEL_DEFAULT = logging.INFO
 LOG_FILE_DEFAULT = "file.log"
-VERBOSE_DEFAULT = True
+VERBOSE_DEFAULT = False
 LOG_FORMAT = '%(asctime)s - %(levelname)s - %(filename)s(%(lineno)d) %(message)s'
 LOG_TO_CONSOLE_DEFAULT = True
 

@@ -3,6 +3,7 @@ from sklearn.metrics import precision_recall_curve
 
 from config.constants import THRESHOLD_DEFAULT
 from train.metrics.abstract_trace_metric import AbstractTraceMetric
+from util.logging.tgen_logger import get_logger
 
 _DESCRIPTION = """
 Calculates the optimal threshold for predictions.
@@ -49,7 +50,7 @@ class CalculateThreshold(AbstractTraceMetric):
                 threshold = t
 
         if threshold is None:
-            print("Could not find threshold under ", self.UPPER_RECALL_THRESHOLD, " recall.")
+            get_logger().warning(f"Could not find threshold under {self.UPPER_RECALL_THRESHOLD} recall.")
             threshold = 0.5
         return threshold
 

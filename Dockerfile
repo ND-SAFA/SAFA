@@ -53,7 +53,7 @@ RUN \
     mkdir -p "$(dirname $RUN_SCRIPT)"; \
     touch "$RUN_SCRIPT"; \
     chmod +x "$RUN_SCRIPT"; \
-    if [ ! -z "$DB_URL_ARG" ]; then echo "export DB_ARG=\"$DB_URL_ARG\"" >> "$RUN_SCRIPT"; fi; \
+    if [ ! -z "$DB_URL_ARG" ]; then echo "export DB_URL=\"$DB_URL_ARG\"" >> "$RUN_SCRIPT"; fi; \
     if [ ! -z "$DB_USER_ARG" ]; then echo "export DB_USER=\"$DB_USER_ARG\"" >> "$RUN_SCRIPT"; fi; \
     if [ ! -z "$DB_PASSWORD_ARG" ]; then echo "export DB_PASSWORD=\"$DB_PASSWORD_ARG\"" >> "$RUN_SCRIPT"; fi; \
     if [ ! -z "$JWT_KEY_ARG" ]; then echo "export JWT_KEY=\"$JWT_KEY_ARG\"" >> "$RUN_SCRIPT"; fi; \

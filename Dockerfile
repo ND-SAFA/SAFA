@@ -63,7 +63,8 @@ RUN \
     if [ ! -z "$JIRA_SECRET_ARG" ]; then echo "export JIRA_SECRET=\"$JIRA_SECRET_ARG\"" >> "$RUN_SCRIPT"; fi; \
     if [ ! -z "$GITHUB_CLIENT_ID_ARG" ]; then echo "export GITHUB_CLIENT_ID=\"$GITHUB_CLIENT_ID_ARG\"" >> "$RUN_SCRIPT"; fi; \
     if [ ! -z "$GITHUB_SECRET_ARG" ]; then echo "export GITHUB_SECRET=\"$GITHUB_SECRET_ARG\"" >> "$RUN_SCRIPT"; fi; \
-    echo "java -Djava.security.egd=file:/dev/./urandom -jar -Dspring.profiles.active=deployment /app.jar" >> "$RUN_SCRIPT";
+    echo "java -Djava.security.egd=file:/dev/./urandom -jar -Dspring.profiles.active=deployment /app.jar" >> "$RUN_SCRIPT"; \
+    cat "$RUN_SCRIPT"
 
 COPY --from=config /app/src/main/resources /app/src/main/resources
 COPY --from=builder /app/build/libs/edu.nd.crc.safa-0.1.0.jar /app.jar

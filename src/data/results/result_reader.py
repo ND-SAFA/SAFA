@@ -7,13 +7,15 @@ import pandas as pd
 from data.results.result_utils import ls_filter, ls_jobs, read_params
 from experiments.experiment_step import ExperimentStep
 from jobs.components.job_result import JobResult
-from train.trace_accelerator import AcceleratorSingleton
+from train.trace_accelerator import TraceAccelerator
 from util.file_util import FileUtil
 from util.json_util import JsonUtil
 
 METRICS = ["map", "map@1", "map@2", "map@3", "ap", "f2", "f1", "precision@1", "precision@2", "precision@3"]
+DISPLAY_METRICS = ["map", "f2"]
 OS_IGNORE = [".DS_Store"]
 EXPERIMENTAL_VARS_IGNORE = ["job_args", "model_manager"]
+pd.set_option('display.max_colwidth', None)
 
 
 class ResultReader:
@@ -22,12 +24,26 @@ class ResultReader:
     """
     HEADER = "-" * 10
 
-    def __init__(self, experiment_path: str, experimental_vars_ignore: List[str] = None, metrics: List[str] = None):
+    def __init__(self, experiment_path: str, experimental_vars_ignore: List[str] = None, metrics: List[str] = None,
+                 display_metrics: List[str] = None):
+        """
+        Constructs reader of results for experiment at given path.
+        :param experiment_path: Path to experiment containing experiments,
+        :type experiment_path:
+        :param experimental_vars_ignore:
+        :type experimental_vars_ignore:
+        :param metrics:
+        :type metrics:
+        :param display_metrics:
+        :type display_metrics:
+        """
         self.experiment_path = experiment_path
         if experimental_vars_ignore is None:
             self.experiment_vars_ignore = EXPERIMENTAL_VARS_IGNORE
         if metrics is None:
             self.metrics = METRICS
+        if display_metrics is None:
+            self.display_metrics = DISPLAY_METRICS
         self.eval_df = None
         self.val_df = None
 
@@ -36,18 +52,18 @@ class ResultReader:
         Prints the evaluation metrics.
         :return: None
         """
-        AcceleratorSingleton.print(self.HEADER, "Evaluation Results", self.HEADER)
+        TraceAccelerator.print(self.HEADER, "Evaluation Results", self.HEADER)
         eval_df = self.get_eval_df()
-        self.print_results(eval_df, self.metrics)
+        self.print_results(eval_df, self.metrics, self.display_metrics)
 
     def print_val(self) -> None:
         """
         Prints the validation metrics of experiment.
         :return: None
         """
-        AcceleratorSingleton.print(self.HEADER, "Evaluation Results", self.HEADER)
+        TraceAccelerator.print(self.HEADER, "Validation Results", self.HEADER)
         val_df = self.get_val_df()
-        self.print_results(val_df, self.metrics)
+        self.print_results(val_df, self.metrics, self.display_metrics)
 
     def get_eval_df(self) -> pd.DataFrame:
         """
@@ -82,9 +98,8 @@ class ResultReader:
             eval_metric_entry = self.read_eval_entry(job_result, self.metrics, base_entry=base_entry)
             if eval_metric_entry:
                 eval_entries.append(eval_metric_entry)
-        val_df = pd.DataFrame(val_entries)
-        eval_df = pd.DataFrame(eval_entries)
-        return val_df, eval_df
+        self.val_df, self.eval_df = pd.DataFrame(val_entries), pd.DataFrame(eval_entries)
+        return self.val_df, self.eval_df
 
     @staticmethod
     def read_validation_entries(job_result: Dict, metric_names: List[str], base_entry: Dict = None, entry_id_key: str = "epoch") -> \
@@ -142,15 +157,16 @@ class ResultReader:
         return step_jobs
 
     @staticmethod
-    def print_results(df: pd.DataFrame, metrics: List[str]) -> None:
+    def print_results(df: pd.DataFrame, metrics: List[str], display_metrics: List[str]) -> None:
         """
         Prints the metrics with grouped columns.
         :param metrics: The metrics to show in dataframe.
         :param df: The dataframe containing experimental vars and metrics.
         :return: None
         """
+
         group_metrics = [c for c in df.columns if c not in metrics and c != "random_seed"]
         if len(group_metrics) > 0:
-            print(df.groupby(group_metrics)[metrics].mean())
+            print(df.groupby(group_metrics)[display_metrics].mean())
         else:
-            print(df[METRICS].mean())
+            print(df[display_metrics].mean())

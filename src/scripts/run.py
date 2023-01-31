@@ -6,6 +6,8 @@ import torch
 from django.core.wsgi import get_wsgi_application
 from dotenv import load_dotenv
 
+from data.results.result_reader import ResultReader
+
 load_dotenv()
 
 ROOT_PATH = os.path.expanduser(os.environ["ROOT_PATH"])
@@ -50,5 +52,9 @@ if __name__ == "__main__":
     application = get_wsgi_application()
     experiment = ObjectCreator.create(Experiment, override=True, **job_definition)
     experiment.run()
-    print("\nFinished. Have a good day :)")
+    print("\nExperiment Finished!")
+    OUTPUT_DIR = job_definition["output_dir"]
+    result_reader = ResultReader(OUTPUT_DIR)
+    result_reader.print_val()
+    result_reader.print_eval()
     sys.exit()

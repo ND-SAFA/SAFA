@@ -11,7 +11,7 @@ from train.metrics.metrics_manager import MetricsManager
 from train.save_strategy.abstract_save_strategy import AbstractSaveStrategy
 from train.save_strategy.comparison_criteria import ComparisonCriterion
 from train.save_strategy.epoch_save_strategy import MetricSaveStrategy
-from train.trace_accelerator import TraceAccelerator
+from train.trainer_tools.trace_accelerator import TraceAccelerator
 from train.trace_output.trace_prediction_output import TracePredictionOutput
 from train.trace_output.trace_train_output import TraceTrainOutput
 from train.trainer_args import TrainerArgs

@@ -2,7 +2,7 @@ import torch
 from torch.optim import Optimizer
 from transformers import PreTrainedModel
 
-from train.supported_enum import SupportedEnum
+from util.supported_enum import SupportedEnum
 from util.enum_util import FunctionalWrapper
 
 

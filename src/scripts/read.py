@@ -61,7 +61,7 @@ if __name__ == "__main__":
                 output_path = os.path.join(step_job_path, "output.json")
                 output_json = FileUtil.read_json_file(output_path)
                 base_entry = {k: v for k, v in output_json["experimental_vars"].items() if k not in IGNORE}
-
+                
                 for epoch_index, metrics in output_json["val_metrics"].items():
                     metrics_entry = metrics["metrics"]
                     # print(metrics.keys())

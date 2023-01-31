@@ -113,7 +113,7 @@ class TraceTrainer(BaseTrainer):
             scheduler.step()
             self.on_epoch(epoch_index)
         return TraceTrainOutput(global_step=global_step, training_loss=training_loss, metrics=training_metrics,
-                                eval_metrics=self.save_strategy.stage_evaluations)
+                                val_metrics=self.save_strategy.stage_evaluations)
 
     def predict(self, test_dataset: Dataset) -> PredictionOutput:
         """

@@ -72,6 +72,8 @@ class AbstractJob(threading.Thread, BaseObject):
         """
         random.seed(random_seed)
         set_seed(random_seed)
+        torch.backends.cudnn.deterministic = True
+        torch.backends.cudnn.benchmark = False
 
     def get_output_filepath(self, output_dir: str = None) -> str:
         """

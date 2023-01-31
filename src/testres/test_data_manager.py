@@ -46,8 +46,7 @@ class TestDataManager:
                                            'epoch': 3.0},
                                'status': 0}
     EXAMPLE_PREDICTION_LINKS = {'source': 0, 'target': 1, 'score': 0.5}
-    EXAMPLE_PREDICTION_METRICS = {'test_loss': 0.6948729753494263, 'test_runtime': 0.0749,
-                                  'test_samples_per_second': 240.328, 'test_steps_per_second': 40.055}
+    EXAMPLE_PREDICTION_METRICS = {'map': 0.6948729753494263, 'ap': 0.0749}
 
     @staticmethod
     def get_path(paths: Union[List[str], str], data=None):

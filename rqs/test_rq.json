@@ -5,18 +5,13 @@
         {
           "object_type": "TRAIN",
           "job_args": {
-            "random_seed": {
-              "*": [
-                812,
-                924
-              ]
-            }
+            "random_seed": 812
           },
           "model_manager": {
             "model_path": "hf-internal-testing/tiny-random-bert"
           },
           "trainer_args": {
-            "output_dir": "",
+            "output_dir": "[OUTPUT_PATH]/test-rq/models",
             "num_train_epochs": 1,
             "gradient_accumulation_steps": 8,
             "learning_rate": 1e-5,
@@ -41,12 +36,12 @@
             "val_dataset_creator": {
               "object_type": "SPLIT",
               "split_strategy": "SPLIT_BY_LINK",
-              "val_percentage": 0.25
+              "val_percentage": 0.45
             },
             "eval_dataset_creator": {
               "object_type": "SPLIT",
               "split_strategy": "SPLIT_BY_LINK",
-              "val_percentage": 0.25
+              "val_percentage": 0.50
             },
             "augmenter": {
               "steps": [
@@ -60,5 +55,5 @@
       ]
     }
   ],
-  "output_dir": "[OUTPUT_PATH]/cm1/bert-base/jobs"
+  "output_dir": "[OUTPUT_PATH]/test-rq/jobs"
 }

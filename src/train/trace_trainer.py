@@ -3,7 +3,7 @@ from functools import partial
 from typing import Optional, Tuple
 
 import torch
-from accelerate import Accelerator, find_executable_batch_size
+from accelerate import find_executable_batch_size
 from datasets import Dataset
 from torch.optim import Optimizer
 from torch.optim.lr_scheduler import _LRScheduler
@@ -20,6 +20,7 @@ from data.managers.trainer_dataset_manager import TrainerDatasetManager
 from data.samplers.balanced_batch_sampler import BalancedBatchSampler
 from models.model_manager import ModelManager
 from train.base_trainer import BaseTrainer
+from train.link_training_tracker import LinkTrainingTracker
 from train.save_strategy.save_strategy_stage import SaveStrategyStage
 from train.supported_optimizers import SupportedOptimizers
 from train.supported_schedulers import SupportedSchedulers
@@ -35,12 +36,16 @@ class TraceTrainer(BaseTrainer):
     """
     BEST_MODEL_NAME = "best"
     CURRENT_MODEL_NAME = "current"
+    OPTIMIZER_FILE_NAME = "optimizer.bin"
+    SCHEDULER_FILE_NAME = "scheduler.bin"
 
     def __init__(self, trainer_args: TrainerArgs, model_manager: ModelManager, trainer_dataset_manager: TrainerDatasetManager,
                  **kwargs):
         super().__init__(trainer_args, model_manager, trainer_dataset_manager, **kwargs)
         TraceAccelerator.update(gradient_accumulation_steps=self.trainer_args.gradient_accumulation_steps)
         self.__should_prepare_accumulator = True
+        self._link_tracker = LinkTrainingTracker(self.trainer_dataset_manager[DatasetRole.TRAIN]) \
+            if DatasetRole.TRAIN in self.trainer_dataset_manager else None
 
     def train(self, resume_from_checkpoint: str = None, **kwargs) -> TraceTrainOutput:
         """
@@ -49,7 +54,6 @@ class TraceTrainer(BaseTrainer):
         :return: Output of training session.
         """
         self.model = self.model_manager.get_model()
-        self._initialize_state(self.model)
         inner_training_loop = find_executable_batch_size(
             self.inner_training_loop) if self.trainer_args.per_device_train_batch_size is None else self.inner_training_loop
         trace_train_output = inner_training_loop(resume_from_checkpoint=resume_from_checkpoint)
@@ -75,12 +79,12 @@ class TraceTrainer(BaseTrainer):
         self._train_batch_size = batch_size
         self.args.per_device_train_batch_size = batch_size
         loss_function = self.trainer_args.loss_function
-        print("Training batch size:", self._train_batch_size)
         self.model.train()
         model, train_data_loader, optimizer, scheduler = self.create_or_load_state(self.model,
                                                                                    self.get_train_dataloader(),
                                                                                    resume_from_checkpoint)
-        print(f"Number of GPUS: {TraceAccelerator.num_processes}. Torch devices: {torch.cuda.device_count()}")
+        model = TraceAccelerator.prepare_model(model)
+        self.print(f"Number of GPUS: {TraceAccelerator.num_processes}. Torch devices: {torch.cuda.device_count()}")
         global_step = 0
         training_loss = 0
         training_metrics = {}
@@ -108,7 +112,7 @@ class TraceTrainer(BaseTrainer):
             scheduler.step()
             self.on_epoch(epoch_index)
         return TraceTrainOutput(global_step=global_step, training_loss=training_loss, metrics=training_metrics,
-                                eval_metrics=self.save_strategy.stage_evaluations)
+                                val_metrics=self.save_strategy.stage_evaluations)
 
     def predict(self, test_dataset: Dataset) -> PredictionOutput:
         """
@@ -127,6 +131,7 @@ class TraceTrainer(BaseTrainer):
                 output = self.model(**batch)
             eval_predictions.append(output.logits)
             eval_labels.append(targets)
+
         eval_labels = torch.cat(eval_labels, dim=0)
         eval_predictions = torch.cat(eval_predictions, dim=0)
         eval_labels, eval_predictions = TraceAccelerator.gather((eval_labels, eval_predictions))
@@ -158,15 +163,18 @@ class TraceTrainer(BaseTrainer):
         :param _internal_call: Internal property used within HuggingFace Trainer.
         :return: None
         """
-        if not output_dir:
-            raise ValueError("Expected output_dir to be defined.")
-        if self.trainer_args.skip_save or not TraceAccelerator.is_main_process:
-            return
-        FileUtil.create_dir_safely(output_dir)
-        model = TraceAccelerator.unwrap_model(self.model)
-        self._save(output_dir, state_dict=model.state_dict())
-        self.model_manager.get_config().save_pretrained(output_dir)
-        self.model_manager.get_tokenizer().save_pretrained(output_dir)
+        if TraceAccelerator.is_main_process:
+            if not output_dir:
+                raise ValueError("Expected output_dir to be defined.")
+            if self.trainer_args.skip_save:
+                return
+            FileUtil.create_dir_safely(output_dir)
+            model = TraceAccelerator.unwrap_model(self.model)
+            self._save(output_dir, state_dict=model.state_dict())
+            TraceAccelerator.save(self.optimizer.state_dict(), os.path.join(output_dir, self.OPTIMIZER_FILE_NAME))
+            TraceAccelerator.save(self.lr_scheduler.state_dict(), os.path.join(output_dir, self.SCHEDULER_FILE_NAME))
+            self.model_manager.get_config().save_pretrained(output_dir)
+            self.model_manager.get_tokenizer().save_pretrained(output_dir)
 
     def on_step(self, step_iteration: int) -> None:
         """
@@ -203,6 +211,7 @@ class TraceTrainer(BaseTrainer):
                 TraceAccelerator.print("-" * 25, "Saving Best Model", "-" * 25)
                 TraceAccelerator.print(f"New Best: {current_score}\tPrevious: {previous_best}")
                 self.save_model(self.get_output_path(self.BEST_MODEL_NAME))
+                TraceAccelerator.print("-" * 20, "Evaluation Finished.", "-" * 20)
             else:
                 TraceAccelerator.print(f"Previous best is still {previous_best}.")
 
@@ -235,7 +244,7 @@ class TraceTrainer(BaseTrainer):
         :param data_loader: The data loader containing training data.
         :return: Prepared model, optimizer, scheduler, and data loader.
         """
-        if not self.optimizer:
+        if self.optimizer is None or self.lr_scheduler is None:
             self._initialize_state(model)
         if not self.__should_prepare_accumulator:
             return model, data_loader, self.optimizer, self.lr_scheduler

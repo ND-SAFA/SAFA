@@ -19,7 +19,7 @@ if __name__ == "__main__":
     #
     from experiments.experiment import Experiment
     from util.object_creator import ObjectCreator
-    from scripts.script_utils import read_job_definition
+    from data.results.result_utils import read_job_definition
     from util.file_util import FileUtil
     from train.trace_accelerator import TraceAccelerator
 

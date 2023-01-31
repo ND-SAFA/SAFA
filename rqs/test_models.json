@@ -34,7 +34,7 @@
               "f",
               "precision"
             ],
-            "skip_save": false,
+            "skip_save": true,
             "load_best_model_at_end": false
           },
           "trainer_dataset_manager": {

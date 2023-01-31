@@ -19,7 +19,7 @@ from models.model_manager import ModelManager
 from train.base_trainer import BaseTrainer
 from train.gan.gan_dataset_converter import GanDatasetConverter
 from train.trainer_args import TrainerArgs
-from util.logging.tgen_logger import get_logger
+from util.logging.logger_manager import logger
 
 
 class GanTrainer(BaseTrainer):
@@ -85,7 +85,7 @@ class GanTrainer(BaseTrainer):
             #               Training
             # ========================================
             # Perform one full pass over the training set.
-            get_logger().info('======== Epoch {:} / {:} ========'.format(epoch_i + 1, self.trainer_args.num_train_epochs))
+            logger.info('======== Epoch {:} / {:} ========'.format(epoch_i + 1, self.trainer_args.num_train_epochs))
 
             # Measure how long the training epoch takes.
             t0 = time.time()
@@ -108,7 +108,7 @@ class GanTrainer(BaseTrainer):
                     elapsed = self.format_time(time.time() - t0)
 
                     # Report progress.
-                    get_logger().info('  Batch {:>5,}  of  {:>5,}.    Elapsed: {:}.'.format(step, len(self.train_dataset), elapsed))
+                    logger.info('  Batch {:>5,}  of  {:>5,}.    Elapsed: {:}.'.format(step, len(self.train_dataset), elapsed))
 
                 # Unpack this training batch from our dataloader.
                 b_input_ids = batch[0].to(device)
@@ -220,16 +220,16 @@ class GanTrainer(BaseTrainer):
             # Measure how long this epoch took.
             training_time = self.format_time(time.time() - t0)
 
-            get_logger().info("  Average training loss generetor: {0:.3f}".format(avg_train_loss_g))
-            get_logger().info("  Average training loss discriminator: {0:.3f}".format(avg_train_loss_d))
-            get_logger().info("  Training epcoh took: {:}".format(training_time))
+            logger.info("  Average training loss generetor: {0:.3f}".format(avg_train_loss_g))
+            logger.info("  Average training loss discriminator: {0:.3f}".format(avg_train_loss_d))
+            logger.info("  Training epcoh took: {:}".format(training_time))
 
             # ========================================
             #     TEST ON THE EVALUATION DATASET
             # ========================================
             # After the completion of each training epoch, measure our performance on
             # our test set.
-            get_logger().info("Running Test...")
+            logger.info("Running Test...")
 
             t0 = time.time()
 
@@ -280,7 +280,7 @@ class GanTrainer(BaseTrainer):
             all_preds = torch.stack(all_preds).numpy()
             all_labels_ids = torch.stack(all_labels_ids).numpy()
             test_accuracy = np.sum(all_preds == all_labels_ids) / len(all_preds)
-            get_logger().info("  Accuracy: {0:.3f}".format(test_accuracy))
+            logger.info("  Accuracy: {0:.3f}".format(test_accuracy))
 
             # Calculate the average loss over all of the batches.
             avg_test_loss = total_test_loss / len(self.eval_dataset)
@@ -289,8 +289,8 @@ class GanTrainer(BaseTrainer):
             # Measure how long the validation run took.
             test_time = self.format_time(time.time() - t0)
 
-            get_logger().info("  Test Loss: {0:.3f}".format(avg_test_loss))
-            get_logger().info("  Test took: {:}".format(test_time))
+            logger.info("  Test Loss: {0:.3f}".format(avg_test_loss))
+            logger.info("  Test took: {:}".format(test_time))
 
             # Record all statistics from this epoch.
             training_stats.append(
@@ -366,9 +366,9 @@ class GanTrainer(BaseTrainer):
         """
         if torch.cuda.is_available():
             device = torch.device("cuda")
-            get_logger().info('There are %d GPU(s) available.' % torch.cuda.device_count())
-            get_logger().info('We will use the GPU:', torch.cuda.get_device_name(0))
+            logger.info('There are %d GPU(s) available.' % torch.cuda.device_count())
+            logger.info('We will use the GPU:', torch.cuda.get_device_name(0))
         else:
-            get_logger().info('No GPU available, using the CPU instead.')
+            logger.info('No GPU available, using the CPU instead.')
             device = torch.device("cpu")
         return device

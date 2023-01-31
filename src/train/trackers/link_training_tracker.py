@@ -9,7 +9,7 @@ from data.tree.trace_link import TraceLink
 from train.metrics.metrics_manager import MetricsManager
 from util.file_util import FileUtil
 from util.json_util import JsonUtil
-from util.logging.tgen_logger import get_logger
+from util.logging.logger_manager import logger
 
 
 @dataclass
@@ -77,7 +77,7 @@ class LinkTrainingTracker:
         """
         epoch_result = self.get_epoch_training_result(epoch_iteration)
         if epoch_result is None:
-            get_logger().warning("Cannot save until epoch %d has been evaluated" % epoch_iteration)
+            logger.warning("Cannot save until epoch %d has been evaluated" % epoch_iteration)
             return False
         output_dict = {EpochTrainingResult.POS_LINKS_KEY: self._get_worst_and_best_result(epoch_result.pos_link_ids_worst_to_best),
                        EpochTrainingResult.NEG_LINKS_KEY: self._get_worst_and_best_result(epoch_result.neg_link_ids_worst_to_best)}

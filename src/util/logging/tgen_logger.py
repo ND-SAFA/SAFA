@@ -1,12 +1,7 @@
-import logging
-import os
 from logging import Logger
-from typing import Optional
 
-from config.constants import LOG_FORMAT
 from config.override import overrides
-from train.trace_accelerator import TraceAccelerator
-from util.logging.logger_config import LoggerConfig
+from train.trainer_tools.trace_accelerator import TraceAccelerator
 
 
 class TgenLogger(Logger):
@@ -30,52 +25,8 @@ class TgenLogger(Logger):
         :param message: The message
         :return: None
         """
-        title_border = '-' * max(round(len(message)/2), 10)
+        title_border = '-' * max(round(len(message) / 2), 10)
         title = f"{title_border} {title} {title}"
         msg = f"{title}\n{message}"
         self.info(msg)
 
-
-logging.setLoggerClass(TgenLogger)
-__logger: Optional[TgenLogger] = None
-
-
-def setup_logger(logger_config: LoggerConfig) -> TgenLogger:
-    """
-    Setups the logger to use for TGEN
-    :param logger_config: Configurations for the logger
-    :return: the Logger
-    """
-    global __logger
-    __logger: TgenLogger = logging.getLogger("root")
-    log_filepath = os.path.join(logger_config.output_dir, logger_config.log_filename) \
-        if logger_config.output_dir else logger_config.log_filename
-    file_handler = logging.FileHandler(log_filepath)
-    console_handler = logging.StreamHandler()
-
-    default_formatter = logging.Formatter(LOG_FORMAT, datefmt='%d/%m/%Y %H:%M:%S')
-    formatters = [default_formatter]
-    if logger_config.verbose:
-        formatters.append(default_formatter)
-    else:
-        formatters.append(logging.Formatter("%(message)s"))
-
-    for i, handler in [file_handler, console_handler]:
-        handler.setLevel(logger_config.log_level)
-        handler.setFormatter(formatters[i])
-
-    if logger_config.log_to_console:
-        __logger.addHandler(console_handler)
-    __logger.addHandler(file_handler)
-    return __logger
-
-
-def get_logger() -> TgenLogger:
-    """
-    Gets the logger for TGen
-    :return: The Logger
-    """
-    global __logger
-    if __logger is None:
-        __logger = setup_logger(LoggerConfig())
-    return __logger

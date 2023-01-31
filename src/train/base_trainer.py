@@ -16,7 +16,7 @@ from train.trace_output.trace_prediction_output import TracePredictionOutput
 from train.trace_output.trace_train_output import TraceTrainOutput
 from train.trainer_args import TrainerArgs
 from util.base_object import BaseObject
-from util.logging.tgen_logger import get_logger
+from util.logging.logger_manager import logger
 
 os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":16:8"
 torch.use_deterministic_algorithms(True)
@@ -69,7 +69,7 @@ class BaseTrainer(Trainer, BaseObject):
         assert n_predictions == n_expected, f"Expected {n_expected} samples but received {n_predictions} predictions."
         metrics_manager = MetricsManager(dataset.get_ordered_links(), output.predictions)
         eval_metrics = metrics_manager.eval(self.trainer_args.metrics) if self.trainer_args.metrics else {}
-        get_logger().log_with_title("Eval Metrics", repr(eval_metrics))
+        logger.log_with_title("Eval Metrics", repr(eval_metrics))
         output.metrics.update(eval_metrics)
         return TracePredictionOutput(predictions=metrics_manager.get_scores(), label_ids=output.label_ids, metrics=output.metrics,
                                      source_target_pairs=dataset.get_source_target_pairs())

@@ -7,7 +7,7 @@ from jobs.abstract_job import AbstractJob
 from util.base_object import BaseObject
 from util.file_util import FileUtil
 from util.logging.logger_config import LoggerConfig
-from util.logging.tgen_logger import setup_logger
+from util.logging.logger_manager import LoggerManager
 from util.status import Status
 
 
@@ -57,7 +57,7 @@ class Experiment(BaseObject):
         """
         if self.logger_config.output_dir is None:
             self.logger_config.output_dir = self.output_dir
-        setup_logger(self.logger_config)
+        LoggerManager.setup_logger(self.logger_config)
 
     def _get_step_output_path(self, step_num: int) -> str:
         """

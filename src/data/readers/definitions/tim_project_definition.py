@@ -2,10 +2,9 @@ import os
 from copy import deepcopy
 from typing import Dict
 
-from data.readers.definitions.abstract_project_definition import AbstractProjectDefinition
 from data.keys.safa_format import SafaKeys
 from data.keys.structure_keys import StructuredKeys
-from util.file_util import FileUtil
+from data.readers.definitions.abstract_project_definition import AbstractProjectDefinition
 from util.json_util import JsonUtil
 
 
@@ -46,7 +45,7 @@ class TimProjectDefinition(AbstractProjectDefinition):
         :return: Dictionary representing project definition.
         """
         tim_file_path = os.path.join(project_path, SafaKeys.TIM_FILE)
-        tim_file = FileUtil.read_json_file(tim_file_path)
+        tim_file = JsonUtil.read_json_file(tim_file_path)
         artifact_definitions = TimProjectDefinition._create_artifact_definitions(tim_file)
         trace_definitions = TimProjectDefinition._create_trace_definitions(tim_file)
         return {

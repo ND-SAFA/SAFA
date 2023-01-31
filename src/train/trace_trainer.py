@@ -89,8 +89,8 @@ class TraceTrainer(BaseTrainer):
         training_loss = 0
         training_metrics = {}
         epoch_loss = 0
-        _is_local_main_process = TraceAccelerator.is_local_main_process
-        accelerate_tqdm = partial(tqdm, disable=not _is_local_main_process, position=0)
+        is_main_process = TraceAccelerator.is_main_process
+        accelerate_tqdm = partial(tqdm, disable=not is_main_process, position=0)
         for epoch_index in range(self.trainer_args.num_train_epochs):
             with TraceAccelerator.accumulate(model):
                 for batch_index, batch in enumerate(accelerate_tqdm(train_data_loader)):
@@ -164,7 +164,7 @@ class TraceTrainer(BaseTrainer):
         :param _internal_call: Internal property used within HuggingFace Trainer.
         :return: None
         """
-        if TraceAccelerator.is_local_main_process:
+        if TraceAccelerator.is_main_process:
             if not output_dir:
                 raise ValueError("Expected output_dir to be defined.")
             if self.trainer_args.skip_save:

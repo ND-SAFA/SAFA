@@ -6,8 +6,6 @@ import torch
 from django.core.wsgi import get_wsgi_application
 from dotenv import load_dotenv
 
-from data.results.result_reader import ResultReader
-
 load_dotenv()
 
 ROOT_PATH = os.path.expanduser(os.environ["ROOT_PATH"])
@@ -21,9 +19,10 @@ if __name__ == "__main__":
     #
     from experiments.experiment import Experiment
     from util.object_creator import ObjectCreator
-    from data.results.result_utils import read_job_definition
     from util.file_util import FileUtil
     from train.trace_accelerator import TraceAccelerator
+    from data.results.experiment_definition import ExperimentDefinition
+    from data.results.experiment_reader import ExperimentReader
 
     #
     # Argument Parsing
@@ -34,12 +33,12 @@ if __name__ == "__main__":
     parser.add_argument('file')
     args = parser.parse_args()
     file_path = os.path.join(RQ_PATH, args.file)
-    job_definition = read_job_definition(file_path)
+    job_definition = ExperimentDefinition.read_experiment_definition(file_path)
     #
     #
     #
     experiment_base_path = os.path.dirname(job_definition["output_dir"])
-    if TraceAccelerator.is_local_main_process:
+    if TraceAccelerator.is_main_process:
         FileUtil.delete_dir(experiment_base_path)
     TraceAccelerator.wait_for_everyone()
     #
@@ -54,7 +53,7 @@ if __name__ == "__main__":
     experiment.run()
     print("\nExperiment Finished!")
     OUTPUT_DIR = job_definition["output_dir"]
-    result_reader = ResultReader(OUTPUT_DIR)
+    result_reader = ExperimentReader(OUTPUT_DIR)
     result_reader.print_val()
     result_reader.print_eval()
     sys.exit()

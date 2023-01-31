@@ -5,8 +5,6 @@ import sys
 
 from dotenv import load_dotenv
 
-from data.results.result_reader import ResultReader
-
 load_dotenv()
 
 ROOT_PATH = os.path.expanduser(os.environ["ROOT_PATH"])
@@ -28,11 +26,9 @@ if __name__ == "__main__":
     #
     # Imports
     #
-    from data.results.result_utils import read_job_definition
+    from data.results.experiment_definition import ExperimentDefinition
+    from data.results.experiment_reader import ExperimentReader
 
-    #
-    #
-    #
     parser = argparse.ArgumentParser(
         prog='Results reader',
         description='Reads experiment results.')
@@ -41,11 +37,11 @@ if __name__ == "__main__":
     file_path = os.path.join(RQ_PATH, args.experiment)
     export_file_name = args.experiment.split(".")[0]
     output_file = export_file_name + ".csv"
-    job_definition = read_job_definition(file_path)
+    job_definition = ExperimentDefinition.read_experiment_definition(file_path)
 
     OUTPUT_DIR = job_definition["output_dir"]
 
-    result_reader = ResultReader(OUTPUT_DIR)
+    result_reader = ExperimentReader(OUTPUT_DIR)
     val_df, eval_df = result_reader.read()
     print("Validation:", len(val_df))
     print("Evaluation:", len(eval_df))

@@ -4,7 +4,6 @@ from typing import Dict, List, Optional, Tuple
 
 import pandas as pd
 
-from data.results.result_utils import ls_filter, ls_jobs, read_params
 from experiments.experiment_step import ExperimentStep
 from jobs.components.job_result import JobResult
 from train.trace_accelerator import TraceAccelerator
@@ -18,7 +17,7 @@ EXPERIMENTAL_VARS_IGNORE = ["job_args", "model_manager"]
 pd.set_option('display.max_colwidth', None)
 
 
-class ResultReader:
+class ExperimentReader:
     """
     Responsible for reading the results of an experiment.
     """
@@ -90,7 +89,7 @@ class ResultReader:
         eval_entries = []
         experiment_jobs = self.read_experiment_jobs(self.experiment_path)
         for output_path in experiment_jobs:
-            job_result = FileUtil.read_json_file(output_path)
+            job_result = JsonUtil.read_json_file(output_path)
             JsonUtil.require_properties(job_result, [JobResult.EXPERIMENTAL_VARS])
             base_entry = {k: v for k, v in job_result[JobResult.EXPERIMENTAL_VARS].items() if k not in self.experiment_vars_ignore}
             validation_metrics = self.read_validation_entries(job_result, self.metrics, base_entry=base_entry)
@@ -120,7 +119,7 @@ class ResultReader:
         for epoch_index, val_metric_entry in job_result[JobResult.VAL_METRICS].items():
             JsonUtil.require_properties(val_metric_entry, [JobResult.METRICS])
             metrics_entry = val_metric_entry[JobResult.METRICS]
-            metric_entry = {**base_entry, **read_params(metrics_entry, metric_names), entry_id_key: epoch_index}
+            metric_entry = {**base_entry, **JsonUtil.read_params(metrics_entry, metric_names), entry_id_key: epoch_index}
             val_metric_entries.append(metric_entry)
         return val_metric_entries
 
@@ -137,7 +136,7 @@ class ResultReader:
             base_entry = {}
         JsonUtil.require_properties(job_result, [JobResult.EVAL_METRICS])
         if len(job_result[JobResult.EVAL_METRICS]) > 0:
-            return {**base_entry, **read_params(job_result[JobResult.EVAL_METRICS], metrics)}
+            return {**base_entry, **JsonUtil.read_params(job_result[JobResult.EVAL_METRICS], metrics)}
         return None
 
     @staticmethod
@@ -147,11 +146,12 @@ class ResultReader:
         :param experiment_path: Path to experiment.
         :return: List of paths corresponding to each output file in experiment.
         """
-        experiments = ls_jobs(experiment_path, add_base=True)
-        experiment_steps = [ls_filter(os.path.join(experiment_path, experiment_id), ignore=OS_IGNORE, add_base=True) for experiment_id
+        experiments = ExperimentReader.ls_jobs(experiment_path, add_base_path=True)
+        experiment_steps = [FileUtil.ls_filter(os.path.join(experiment_path, experiment_id), ignore=OS_IGNORE, add_base_path=True) for
+                            experiment_id
                             in
                             experiments]
-        step_jobs = [ls_jobs(step, add_base=True) for steps in experiment_steps for step in steps]
+        step_jobs = [ExperimentReader.ls_jobs(step, add_base_path=True) for steps in experiment_steps for step in steps]
         step_jobs = reduce(lambda a, b: a + b, step_jobs)
         step_jobs = [os.path.join(p, ExperimentStep.OUTPUT_FILENAME) for p in step_jobs]
         return step_jobs
@@ -160,13 +160,24 @@ class ResultReader:
     def print_results(df: pd.DataFrame, metrics: List[str], display_metrics: List[str]) -> None:
         """
         Prints the metrics with grouped columns.
-        :param metrics: The metrics to show in dataframe.
         :param df: The dataframe containing experimental vars and metrics.
+        :param metrics: The metrics used to calculate with columns are the grouped columns.
+        :param display_metrics: The metrics to print out in data frame.
         :return: None
         """
 
         group_metrics = [c for c in df.columns if c not in metrics and c != "random_seed"]
         if len(group_metrics) > 0:
-            print(df.groupby(group_metrics)[display_metrics].mean())
+            TraceAccelerator.print(df.groupby(group_metrics)[display_metrics].mean())
         else:
-            print(df[display_metrics].mean())
+            TraceAccelerator.print(df[display_metrics].mean())
+
+    @staticmethod
+    def ls_jobs(path: str, **kwargs) -> List[str]:
+        """
+        Returns jobs in path.
+        :param path: The path to list jobs in.
+        :param kwargs: Additional parameters passed to ls filter.
+        :return: List of jobs in path.
+        """
+        return FileUtil.ls_filter(path, f=lambda p: len(p.split("-")) == 5, **kwargs)

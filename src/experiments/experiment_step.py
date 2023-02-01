@@ -121,8 +121,6 @@ class ExperimentStep(BaseObject):
         self._run_on_jobs(jobs, "run")
         best_job = self._get_best_job(jobs, self.best_job)
         self._run_on_jobs(jobs, "save", output_dir=output_dir)
-        for j in jobs:
-            del j
         return best_job
 
     @staticmethod

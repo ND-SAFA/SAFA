@@ -5,8 +5,6 @@ import sys
 from django.core.wsgi import get_wsgi_application
 from dotenv import load_dotenv
 
-from util.logging.logger_config import LoggerConfig
-
 load_dotenv()
 
 ROOT_PATH = os.path.expanduser(os.environ["ROOT_PATH"])
@@ -25,6 +23,7 @@ if __name__ == "__main__":
     from data.results.experiment_reader import ExperimentReader
     from train.trainer_tools.trace_accelerator import TraceAccelerator
     from util.logging.logger_manager import LoggerManager, logger
+    from util.logging.logger_config import LoggerConfig
 
     #
     # Argument Parsing

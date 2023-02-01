@@ -17,8 +17,8 @@ class TestResultReader(BaseTest):
     TEST_ENTRY = {
         JobResult.EVAL_METRICS: {"a": 1, "b": 2, "c": 3},
         JobResult.VAL_METRICS: {
-            0: {JobResult.METRICS: {"a": 1, "b": 2, "c": 3}},
-            1: {JobResult.METRICS: {"a": 3, "b": 6, "c": 9}}
+            0: {"a": 1, "b": 2, "c": 3},
+            1: {"a": 3, "b": 6, "c": 9}
         }
     }
     EXPECTED_VAL_METRICS = {"map": 0.242, "ap": 0.0819, "map@1": 1.0, "map@2": 1.0,

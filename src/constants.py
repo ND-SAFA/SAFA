@@ -11,9 +11,14 @@ VERBOSE_DEFAULT = False
 LOG_FORMAT = '%(asctime)s - %(levelname)s - %(filename)s(%(lineno)d) %(message)s'
 LOG_TO_CONSOLE_DEFAULT = True
 
+# -------------- EXPERIMENT --------------
+MAX_JOBS = 1
+RUN_ASYNC = False
+EXIT_ON_FAILED_JOB = True
+
 # -------------- JOB ARGS --------------
 SAVE_OUTPUT_DEFAULT = True
-SAVE_DATASET_SPLITS_DEFAULT = True
+SAVE_DATASET_SPLITS_DEFAULT = False
 
 # -------------- TRACE ARGS --------------
 MAX_SEQ_LENGTH_DEFAULT = 512
@@ -22,11 +27,14 @@ EVALUATION_STRATEGY_DEFAULT = SAVE_STRATEGY_DEFAULT = "epoch"  # should be the s
 SAVE_TOTAL_LIMIT_DEFAULT = 2
 LOAD_BEST_MODEL_AT_END_DEFAULT = True
 METRIC_FOR_BEST_MODEL_DEFAULT = "f2"
+OPTIMIZER_DEFAULT = "adam"
+SCHEDULER_DEFAULT = "linear"
+GRADIENT_ACCUMULATION_DEFAULT = 8
+USE_BALANCED_BATCHES_DEFAULT = True
+MULTI_GPU_DEFAULT = True
 
 # -------------- DATASET --------------
 BLOCK_SIZE_DEFAULT = 128
-TRAINING_DATA_DIR_DEFAULT = "jobs/pretrain/mlm"
-USE_LINKED_TARGETS_ONLY_DEFAULT = False
 VALIDATION_PERCENTAGE_DEFAULT = 0.1
 RESAMPLE_RATE_DEFAULT = 2
 MLM_PROBABILITY_DEFAULT = 0.15
@@ -38,10 +46,7 @@ MIN_LENGTH_DEFAULT = 1
 # -------------- METRICS --------------
 K_METRIC_DEFAULT = [1, 2, 3]
 THRESHOLD_DEFAULT = 0.5
-
-# -------------- MODELS --------------
-LOGITS = "logits"
-LOSS = "loss"
+UPPER_RECALL_THRESHOLD = .95
 
 # -------------- TEST/DEV --------------
 IS_TEST = os.getenv("DEPLOYMENT", "development").lower() == "test"

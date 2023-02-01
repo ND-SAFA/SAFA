@@ -4,6 +4,7 @@ from typing import Any, Dict, List, Optional, Type, Union
 
 import math
 
+from constants import EXIT_ON_FAILED_JOB, RUN_ASYNC
 from jobs.abstract_job import AbstractJob
 from jobs.abstract_trace_job import AbstractTraceJob
 from jobs.components.job_result import JobResult
@@ -23,9 +24,6 @@ class ExperimentStep(BaseObject):
     Container for parallel jobs to run.
     """
     OUTPUT_FILENAME = "output.json"
-    MAX_JOBS = 1
-    RUN_ASYNC = False
-    EXIT_ON_FAILED_JOB = True
 
     def __init__(self, jobs: Union[List[AbstractJob], ExperimentalVariable], comparison_criterion: ComparisonCriterion = None):
         """
@@ -40,7 +38,7 @@ class ExperimentStep(BaseObject):
         self.status = Status.NOT_STARTED
         self.best_job = None
         self.comparison_criterion = comparison_criterion
-        if not self.RUN_ASYNC:
+        if not RUN_ASYNC:
             self.MAX_JOBS = 1
 
     def run(self, output_dir: str, jobs_for_undetermined_vars: List[AbstractJob] = None) -> List[AbstractJob]:
@@ -63,7 +61,7 @@ class ExperimentStep(BaseObject):
             else:
                 self.best_job = self._run_jobs(jobs, output_dir)
             failed_jobs = self._get_failed_jobs(jobs)
-            if len(failed_jobs) > 0 and self.EXIT_ON_FAILED_JOB:
+            if len(failed_jobs) > 0 and EXIT_ON_FAILED_JOB:
                 self.status = Status.FAILURE
                 break
 
@@ -105,8 +103,7 @@ class ExperimentStep(BaseObject):
         from experiments.multi_epoch_experiment_step import MultiEpochExperimentStep
         best_job = None
         for job in jobs:
-            multi_epoch_experiment_step = MultiEpochExperimentStep([job], self.comparison_metric,
-                                                                   self.should_maximize_metric)
+            multi_epoch_experiment_step = MultiEpochExperimentStep([job], self.comparison_criterion)
             best_epoch_job = multi_epoch_experiment_step.run(output_dir)
             best_job = self._get_best_job(best_epoch_job, self.best_job)
         return best_job

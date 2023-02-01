@@ -25,8 +25,8 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
     Responsible for creating TraceDataset from DataFrames containing artifacts, traces, and
     layer mappings.
     """
-    ALLOW_MISSING_SOURCE = False
-    ALLOW_MISSING_TARGET = False
+
+    ALLOW_MISSING_SOURCE, ALLOW_MISSING_TARGET = False, False
 
     def __init__(self, project_reader: AbstractProjectReader, data_cleaner: DataCleaner = None,
                  filter_unlinked_artifacts: bool = False):

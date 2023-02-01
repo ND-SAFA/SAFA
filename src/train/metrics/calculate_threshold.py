@@ -1,7 +1,7 @@
 import datasets
 from sklearn.metrics import precision_recall_curve
 
-from constants import THRESHOLD_DEFAULT
+from constants import THRESHOLD_DEFAULT, UPPER_RECALL_THRESHOLD
 from train.metrics.abstract_trace_metric import AbstractTraceMetric
 from util.logging.logger_manager import logger
 
@@ -25,7 +25,6 @@ _CITATION = """
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
 class CalculateThreshold(AbstractTraceMetric):
     metric_name = "threshold"
-    UPPER_RECALL_THRESHOLD = .95
 
     # TODO
     def _compute(self, predictions, references, k=THRESHOLD_DEFAULT, **kwargs) -> float:
@@ -50,7 +49,7 @@ class CalculateThreshold(AbstractTraceMetric):
                 threshold = t
 
         if threshold is None:
-            logger.warning(f"Could not find threshold under {self.UPPER_RECALL_THRESHOLD} recall.")
+            logger.warning(f"Could not find threshold under {UPPER_RECALL_THRESHOLD} recall.")
             threshold = 0.5
         return threshold
 

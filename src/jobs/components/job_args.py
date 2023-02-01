@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Any, Dict
 
-from constants import SAVE_OUTPUT_DEFAULT
+from constants import SAVE_DATASET_SPLITS_DEFAULT, SAVE_OUTPUT_DEFAULT
 from util.base_object import BaseObject
 
 
@@ -18,7 +18,7 @@ class JobArgs(BaseObject):
     """
     If True, saves the dataset splits to the output_dir
     """
-    save_dataset_splits: bool = False
+    save_dataset_splits: bool = SAVE_DATASET_SPLITS_DEFAULT
     """
     Sets the random seed for a job
     """

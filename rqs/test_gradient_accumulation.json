@@ -24,8 +24,9 @@
             "gradient_accumulation_steps": {
               "*": [
                 1,
-                3,
-                5
+                7,
+                9,
+                11
               ]
             },
             "learning_rate": 5e-6,

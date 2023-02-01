@@ -15,7 +15,7 @@ METRICS = ["map", "map@1", "map@2", "map@3", "ap", "f2", "f1", "precision@1", "p
 DISPLAY_METRICS = ["map", "f2"]
 OS_IGNORE = [".DS_Store"]
 EXPERIMENTAL_VARS_IGNORE = ["job_args", "model_manager", "train_dataset_creator", "project_reader", "eval_dataset_creator",
-                            "trainer_dataset_manager"]
+                            "trainer_dataset_manager", "trainer_args"]
 pd.set_option('display.max_colwidth', None)
 
 

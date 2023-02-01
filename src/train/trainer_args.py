@@ -5,7 +5,7 @@ from transformers.training_args import TrainingArguments
 
 from constants import EVALUATION_STRATEGY_DEFAULT, GRADIENT_ACCUMULATION_DEFAULT, LOAD_BEST_MODEL_AT_END_DEFAULT, \
     MAX_SEQ_LENGTH_DEFAULT, METRIC_FOR_BEST_MODEL_DEFAULT, MULTI_GPU_DEFAULT, N_EPOCHS_DEFAULT, OPTIMIZER_DEFAULT, \
-    SAVE_STRATEGY_DEFAULT, SAVE_TOTAL_LIMIT_DEFAULT, SCHEDULER_DEFAULT, USE_BALANCED_BATCHES_DEFAULT
+    SAVE_STRATEGY_DEFAULT, SAVE_TOTAL_LIMIT_DEFAULT, SCHEDULER_DEFAULT, USE_BALANCED_BATCHES_DEFAULT, EVAL_ON_EPOCH_DEFAULT
 from util.base_object import BaseObject
 from util.enum_util import FunctionalWrapper
 
@@ -36,6 +36,7 @@ class TrainerArgs(TrainingArguments, BaseObject):
     skip_save: bool = False
     use_balanced_batches: bool = USE_BALANCED_BATCHES_DEFAULT
     per_device_train_batch_size = None
+    eval_on_each_epoch: bool = EVAL_ON_EPOCH_DEFAULT
 
     # GAN
     n_hidden_layers_g: int = 1

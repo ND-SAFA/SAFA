@@ -65,7 +65,6 @@ class TestBaseObject(BaseTest):
         experiment_serializer = ExperimentSerializer(data=nested_params)
         assert experiment_serializer.is_valid(), experiment_serializer.errors
         definition_variable = experiment_serializer.save()
-        print(definition_variable)
         outer_class = TestOuterClass.initialize_from_definition(definition_variable)
         self.assert_has_params(outer_class.a, self.class_params)
 

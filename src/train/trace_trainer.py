@@ -40,7 +40,6 @@ class TraceTrainer(BaseTrainer):
     CURRENT_MODEL_NAME = "current"
     OPTIMIZER_FILE_NAME = "optimizer.bin"
     SCHEDULER_FILE_NAME = "scheduler.bin"
-    PREDICT_ON_EACH_EPOCH = True
 
     def __init__(self, trainer_args: TrainerArgs, model_manager: ModelManager, trainer_dataset_manager: TrainerDatasetManager,
                  **kwargs):
@@ -193,8 +192,8 @@ class TraceTrainer(BaseTrainer):
         :param epoch_iteration: The index of epoch performed.
         :return: None
         """
-        if self.PREDICT_ON_EACH_EPOCH:
-            self.perform_prediction()
+        if self.trainer_args.eval_on_each_epoch and DatasetRole.EVAL in self.trainer_dataset_manager:
+            self.perform_prediction(DatasetRole.EVAL)
         self.conditional_evaluate(SaveStrategyStage.EPOCH, epoch_iteration)
         self.save_model(self.get_output_path(self.CURRENT_MODEL_NAME))
 

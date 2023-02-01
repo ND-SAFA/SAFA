@@ -11,17 +11,17 @@ from train.metrics.metrics_manager import MetricsManager
 from train.save_strategy.abstract_save_strategy import AbstractSaveStrategy
 from train.save_strategy.comparison_criteria import ComparisonCriterion
 from train.save_strategy.epoch_save_strategy import MetricSaveStrategy
-from train.trace_accelerator import TraceAccelerator
+from train.trainer_tools.trace_accelerator import TraceAccelerator
 from train.trace_output.trace_prediction_output import TracePredictionOutput
 from train.trace_output.trace_train_output import TraceTrainOutput
 from train.trainer_args import TrainerArgs
 from util.base_object import BaseObject
+from util.logging.logger_manager import logger
 
 os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":16:8"
 torch.use_deterministic_algorithms(True)
 
 TRIAL = Union["optuna.Trial", Dict[str, Any]]
-
 
 class BaseTrainer(Trainer, BaseObject):
     """
@@ -69,8 +69,7 @@ class BaseTrainer(Trainer, BaseObject):
         assert n_predictions == n_expected, f"Expected {n_expected} samples but received {n_predictions} predictions."
         metrics_manager = MetricsManager(dataset.get_ordered_links(), output.predictions)
         eval_metrics = metrics_manager.eval(self.trainer_args.metrics) if self.trainer_args.metrics else {}
-        TraceAccelerator.print("-" * 10, "Eval Metrics", "-" * 10)
-        self.print(eval_metrics)
+        logger.log_with_title("Eval Metrics", repr(eval_metrics))
         output.metrics.update(eval_metrics)
         return TracePredictionOutput(predictions=metrics_manager.get_scores(), label_ids=output.label_ids, metrics=output.metrics,
                                      source_target_pairs=dataset.get_source_target_pairs())
@@ -83,11 +82,3 @@ class BaseTrainer(Trainer, BaseObject):
         TraceAccelerator.free_memory()
         if self.model:
             del self.model
-
-    def print(self, *args) -> None:
-        """
-        Performs a print statement per job even in multi gpu setup.
-        :param args: The arguments to print.
-        :return: None
-        """
-        TraceAccelerator.print(*args)

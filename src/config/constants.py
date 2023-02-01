@@ -1,9 +1,16 @@
 import os
 from os.path import abspath, dirname
-
+import logging
 from dotenv import load_dotenv
 
 load_dotenv()
+# -------------- LOGGING --------------
+LOG_LEVEL_DEFAULT = logging.INFO
+LOG_FILE_DEFAULT = "output.log"
+VERBOSE_DEFAULT = False
+LOG_FORMAT = '%(asctime)s - %(levelname)s - %(filename)s(%(lineno)d) %(message)s'
+LOG_TO_CONSOLE_DEFAULT = True
+
 # -------------- JOB ARGS --------------
 SAVE_OUTPUT_DEFAULT = True
 SAVE_DATASET_SPLITS_DEFAULT = True

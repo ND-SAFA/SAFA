@@ -4,7 +4,7 @@ import pandas as pd
 
 from data.readers.entity.entity_parser_type import EntityParserType
 from data.readers.entity.formats.abstract_entity_format import AbstractEntityFormat
-from util.file_util import FileUtil
+from util.json_util import JsonUtil
 
 
 class JsonEntityFormat(AbstractEntityFormat):
@@ -34,7 +34,7 @@ class JsonEntityFormat(AbstractEntityFormat):
         :param entity_prop_name: The name of the property containing entities in json file. If none, dictionary is assumed to contain single property
         :return: DataFrame containing entities defined in JSON file.
         """
-        data = FileUtil.read_json_file(json_file_path)
+        data = JsonUtil.read_json_file(json_file_path)
         if entity_prop_name is None:
             keys = list(data.keys())
             assert len(keys) == 1, f"Unable to imply entity property name in JSON, found multiple: {keys}."

@@ -102,3 +102,16 @@ class TestAssertions:
         for entity in expected_entities:
             query_df = DataFrameUtil.query_df(entity_df, entity)
             test_case.assertEquals(1, len(query_df), msg=f"Could not find row with: {entity}")
+
+    @staticmethod
+    def verify_row_contains(test_case: TestCase, row: pd.Series, properties: Dict, delta=0.01) -> None:
+        """
+        Verifies that row contains properties within delta range.
+        :param test_case: The test case used to make assertions.
+        :param row: The row whose properties are checked.
+        :param properties: The properties to assert in row.
+        :param delta: The allowable delta between comparisons.
+        :return: None
+        """
+        for k, v in properties.items():
+            test_case.assertAlmostEqual(v, row[k], delta=delta)

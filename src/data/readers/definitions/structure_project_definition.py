@@ -2,7 +2,7 @@ import os
 from typing import Dict
 
 from data.readers.definitions.abstract_project_definition import AbstractProjectDefinition
-from util.file_util import FileUtil
+from util.json_util import JsonUtil
 
 
 class StructureProjectDefinition(AbstractProjectDefinition):
@@ -19,4 +19,4 @@ class StructureProjectDefinition(AbstractProjectDefinition):
         :return: Dict representing content of project definition.
         """
         definition_path = os.path.join(project_path, StructureProjectDefinition.STRUCTURE_DEFINITION_FILE_NAME)
-        return FileUtil.read_json_file(definition_path)
+        return JsonUtil.read_json_file(definition_path)

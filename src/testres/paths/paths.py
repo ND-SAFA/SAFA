@@ -5,3 +5,5 @@ TEST_DATA_DIR = join(TEST_DIR, "data")
 TEST_VOCAB_FILE = join(TEST_DIR, "test_vocab.txt")
 TEST_OUTPUT_DIR = join(TEST_DIR, "output")
 PRETRAIN_DIR = join(TEST_DATA_DIR, "pre_train")
+#
+TEST_RESULT_READER = join(TEST_DATA_DIR, "result_reader")

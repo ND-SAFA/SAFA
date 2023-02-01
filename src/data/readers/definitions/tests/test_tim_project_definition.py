@@ -1,11 +1,11 @@
 from copy import deepcopy
 from unittest.mock import patch
 
-from data.readers.definitions.tim_project_definition import TimProjectDefinition
 from data.keys.safa_format import SafaKeys
 from data.keys.structure_keys import StructuredKeys
+from data.readers.definitions.tim_project_definition import TimProjectDefinition
 from testres.base_test import BaseTest
-from util.file_util import FileUtil
+from util.json_util import JsonUtil
 
 
 class TestTimProjectDefinition(BaseTest):
@@ -49,7 +49,7 @@ class TestTimProjectDefinition(BaseTest):
         }
     }
 
-    @patch.object(FileUtil, "read_json_file")
+    @patch.object(JsonUtil, "read_json_file")
     def test_read_project_definition(self, read_json_file_mock):
         """
         Tests that both artifacts and trace matrices are converted to structured format.

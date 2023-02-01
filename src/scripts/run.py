@@ -19,9 +19,10 @@ if __name__ == "__main__":
     #
     from experiments.experiment import Experiment
     from util.object_creator import ObjectCreator
-    from scripts.script_utils import read_job_definition
     from util.file_util import FileUtil
     from train.trace_accelerator import TraceAccelerator
+    from data.results.experiment_definition import ExperimentDefinition
+    from data.results.experiment_reader import ExperimentReader
 
     #
     # Argument Parsing
@@ -32,12 +33,12 @@ if __name__ == "__main__":
     parser.add_argument('file')
     args = parser.parse_args()
     file_path = os.path.join(RQ_PATH, args.file)
-    job_definition = read_job_definition(file_path)
+    job_definition = ExperimentDefinition.read_experiment_definition(file_path)
     #
     #
     #
     experiment_base_path = os.path.dirname(job_definition["output_dir"])
-    if TraceAccelerator.is_local_main_process:
+    if TraceAccelerator.is_main_process:
         FileUtil.delete_dir(experiment_base_path)
     TraceAccelerator.wait_for_everyone()
     #
@@ -50,5 +51,9 @@ if __name__ == "__main__":
     application = get_wsgi_application()
     experiment = ObjectCreator.create(Experiment, override=True, **job_definition)
     experiment.run()
-    print("\nFinished. Have a good day :)")
+    print("\nExperiment Finished!")
+    OUTPUT_DIR = job_definition["output_dir"]
+    result_reader = ExperimentReader(OUTPUT_DIR)
+    result_reader.print_val()
+    result_reader.print_eval()
     sys.exit()

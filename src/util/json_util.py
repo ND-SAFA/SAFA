@@ -1,11 +1,12 @@
 import json
 from enum import Enum
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Union
 
 import numpy as np
 
 from util.base_object import BaseObject
 from util.reflection_util import ReflectionUtil
+from util.uncased_dict import UncasedDict
 
 
 class NpEncoder(json.JSONEncoder):
@@ -39,6 +40,18 @@ class JsonUtil:
     """
     Provides utility methods for dealing with JSON / Dict.
     """
+
+    @staticmethod
+    def read_json_file(file_path: str, as_uncased_dict: bool = False) -> Union[Dict, UncasedDict]:
+        """
+        Reads JSON from file at path.
+        :param file_path: Path to JSON file.
+        :param as_uncased_dict: Whether to convert output to uncased dict
+        :return: Dictionary content of file.
+        """
+        with open(file_path) as file:
+            content = json.load(file)
+        return UncasedDict(content) if as_uncased_dict else content
 
     @staticmethod
     def dict_to_json(dict_: Dict) -> str:
@@ -83,3 +96,16 @@ class JsonUtil:
         """
         encoder = NpEncoder()
         return encoder.default(instance)
+
+    @staticmethod
+    def read_params(source: Dict, params: List[str]) -> Dict:
+        """
+        Reads parameters in entry.
+        :param source: The entry to extract params from
+        :param params: List of params to extract.
+        :return: Dictionary containing parameters from entry.
+        """
+        entry = {}
+        for param in params:
+            entry[param] = source[param]
+        return entry

@@ -6,9 +6,9 @@ import pandas as pd
 
 from experiments.experiment_step import ExperimentStep
 from jobs.components.job_result import JobResult
-from train.trace_accelerator import TraceAccelerator
 from util.file_util import FileUtil
 from util.json_util import JsonUtil
+from util.logging.logger_manager import logger
 
 METRICS = ["map", "map@1", "map@2", "map@3", "ap", "f2", "f1", "precision@1", "precision@2", "precision@3"]
 DISPLAY_METRICS = ["map", "f2"]
@@ -51,7 +51,7 @@ class ExperimentReader:
         Prints the evaluation metrics.
         :return: None
         """
-        TraceAccelerator.print(self.HEADER, "Evaluation Results", self.HEADER)
+        logger.log_with_title("Evaluation Results", "")
         eval_df = self.get_eval_df()
         self.print_results(eval_df, self.metrics, self.display_metrics)
 
@@ -60,7 +60,7 @@ class ExperimentReader:
         Prints the validation metrics of experiment.
         :return: None
         """
-        TraceAccelerator.print(self.HEADER, "Validation Results", self.HEADER)
+        logger.log_with_title("Validation Results", "")
         val_df = self.get_val_df()
         self.print_results(val_df, self.metrics, self.display_metrics)
 
@@ -168,9 +168,9 @@ class ExperimentReader:
 
         group_metrics = [c for c in df.columns if c not in metrics and c != "random_seed"]
         if len(group_metrics) > 0:
-            TraceAccelerator.print(df.groupby(group_metrics)[display_metrics].mean())
+            logger.info(df.groupby(group_metrics)[display_metrics].mean())
         else:
-            TraceAccelerator.print(df[display_metrics].mean())
+            logger.info(df[display_metrics].mean())
 
     @staticmethod
     def ls_jobs(path: str, **kwargs) -> List[str]:

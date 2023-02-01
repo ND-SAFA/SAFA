@@ -13,22 +13,23 @@ from transformers import PreTrainedModel, Trainer
 from transformers.modeling_outputs import SequenceClassifierOutput
 from transformers.trainer_utils import PredictionOutput
 
-from config.override import overrides
 from data.datasets.data_key import DataKey
 from data.datasets.dataset_role import DatasetRole
 from data.managers.trainer_dataset_manager import TrainerDatasetManager
 from data.samplers.balanced_batch_sampler import BalancedBatchSampler
 from models.model_manager import ModelManager
 from train.base_trainer import BaseTrainer
-from train.trackers.link_training_tracker import LinkTrainingTracker
 from train.save_strategy.save_strategy_stage import SaveStrategyStage
+from train.trace_output.trace_prediction_output import TracePredictionOutput
+from train.trace_output.trace_train_output import TraceTrainOutput
+from train.trackers.link_training_tracker import LinkTrainingTracker
+from train.trainer_args import TrainerArgs
 from train.trainer_tools.supported_optimizers import SupportedOptimizers
 from train.trainer_tools.supported_schedulers import SupportedSchedulers
 from train.trainer_tools.trace_accelerator import TraceAccelerator
-from train.trace_output.trace_train_output import TraceTrainOutput
-from train.trainer_args import TrainerArgs
 from util.file_util import FileUtil
 from util.logging.logger_manager import logger
+from util.override import overrides
 
 
 class TraceTrainer(BaseTrainer):
@@ -204,11 +205,11 @@ class TraceTrainer(BaseTrainer):
         should_evaluate = self.save_strategy.should_evaluate(stage, stage_iteration)
 
         if should_evaluate and DatasetRole.VAL in self.trainer_dataset_manager:
-            eval_result = self.perform_prediction(DatasetRole.VAL)
-            previous_best = self.save_strategy.best_score
-            should_save = self.save_strategy.should_save(eval_result, stage_iteration)
+            eval_result: TracePredictionOutput = self.perform_prediction(DatasetRole.VAL)
+            previous_best = self.save_strategy.best_scores
+            should_save = self.save_strategy.should_save(eval_result.metrics, stage_iteration)
             if should_save:
-                current_score = self.save_strategy.get_metric_score(eval_result.metrics)
+                current_score = self.save_strategy.get_metric_scores(eval_result.metrics)
                 logger.log_with_title("Saving Best Model", f"New Best: {current_score}\tPrevious: {previous_best}")
                 self.save_model(self.get_output_path(self.BEST_MODEL_NAME))
                 logger.log_with_title("Evaluation Finished.", "-" * 10)

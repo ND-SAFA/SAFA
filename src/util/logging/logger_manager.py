@@ -1,13 +1,13 @@
+import logging
 import os
 import sys
 from os.path import dirname
-from typing import Optional, Any
+from typing import Any, Optional
 
-from config.constants import LOG_FORMAT
+from constants import LOG_FORMAT
 from util.file_util import FileUtil
 from util.logging.logger_config import LoggerConfig
 from util.logging.tgen_logger import TGenLogger
-import logging
 
 logging.setLoggerClass(TGenLogger)
 

@@ -1,6 +1,6 @@
 from typing import List
 
-from config.constants import MIN_LENGTH_DEFAULT
+from constants import MIN_LENGTH_DEFAULT
 from data.processing.abstract_data_processing_step import AbstractDataProcessingStep, ProcessingOrder
 
 

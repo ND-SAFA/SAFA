@@ -2,7 +2,7 @@ import os
 from unittest import mock
 from unittest.mock import patch
 
-from config.constants import VALIDATION_PERCENTAGE_DEFAULT
+from constants import VALIDATION_PERCENTAGE_DEFAULT
 from data.datasets.dataset_role import DatasetRole
 from data.managers.deterministic_trainer_dataset_manager import DeterministicTrainerDatasetManager
 from data.managers.trainer_dataset_manager import TrainerDatasetManager

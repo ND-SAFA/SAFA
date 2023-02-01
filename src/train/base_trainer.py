@@ -10,11 +10,11 @@ from models.model_manager import ModelManager
 from train.metrics.metrics_manager import MetricsManager
 from train.save_strategy.abstract_save_strategy import AbstractSaveStrategy
 from train.save_strategy.comparison_criteria import ComparisonCriterion
-from train.save_strategy.epoch_save_strategy import MetricSaveStrategy
-from train.trainer_tools.trace_accelerator import TraceAccelerator
+from train.save_strategy.metric_save_strategy import MetricSaveStrategy
 from train.trace_output.trace_prediction_output import TracePredictionOutput
 from train.trace_output.trace_train_output import TraceTrainOutput
 from train.trainer_args import TrainerArgs
+from train.trainer_tools.trace_accelerator import TraceAccelerator
 from util.base_object import BaseObject
 from util.logging.logger_manager import logger
 
@@ -22,6 +22,7 @@ os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":16:8"
 torch.use_deterministic_algorithms(True)
 
 TRIAL = Union["optuna.Trial", Dict[str, Any]]
+
 
 class BaseTrainer(Trainer, BaseObject):
     """
@@ -41,7 +42,7 @@ class BaseTrainer(Trainer, BaseObject):
         model_init = lambda: self.model_manager.get_model()
         tokenizer = self.model_manager.get_tokenizer()
         if save_strategy is None:
-            self.save_strategy = MetricSaveStrategy(ComparisonCriterion("map"))
+            self.save_strategy = MetricSaveStrategy(ComparisonCriterion(["map", "f2"]))
         super().__init__(model_init=model_init, args=trainer_args, tokenizer=tokenizer,
                          callbacks=trainer_args.callbacks,
                          **kwargs)

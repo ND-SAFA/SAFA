@@ -1,7 +1,7 @@
-from config.override import overrides
+from data.datasets.trace_dataset import TraceDataset
 from data.splitting.abstract_split_strategy import AbstractSplitStrategy
 from data.splitting.source_split_strategy import SourceSplitStrategy
-from data.datasets.trace_dataset import TraceDataset
+from util.override import overrides
 
 
 class CombinationSplitStrategy(AbstractSplitStrategy):

@@ -3,7 +3,7 @@ from typing import Dict
 import datasets
 from sklearn.metrics import precision_score
 
-from config.constants import K_METRIC_DEFAULT
+from constants import K_METRIC_DEFAULT
 from data.datasets.trace_matrix import TraceMatrix
 from train.metrics.abstract_trace_metric import AbstractTraceMetric
 

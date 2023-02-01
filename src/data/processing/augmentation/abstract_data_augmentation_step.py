@@ -3,8 +3,8 @@ import uuid
 from abc import ABC, abstractmethod
 from typing import Any, Iterable, List, Tuple
 
-from config.override import overrides
 from data.processing.abstract_data_processing_step import AbstractDataProcessingStep, ProcessingOrder
+from util.override import overrides
 
 
 class AbstractDataAugmentationStep(AbstractDataProcessingStep, ABC):

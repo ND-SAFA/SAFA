@@ -87,7 +87,7 @@ class TraceTrainer(BaseTrainer):
                                                                                    self.get_train_dataloader(),
                                                                                    resume_from_checkpoint)
         model = TraceAccelerator.prepare_model(model)
-        logger.info(f"Number of GPUS: {TraceAccelerator.num_processes}. Torch devices: {torch.cuda.device_count()}")
+        logger.info(f"Number of workers: {TraceAccelerator.num_processes}. GPUs devices: {torch.cuda.device_count()}")
         global_step = 0
         training_loss = 0
         training_metrics = {}

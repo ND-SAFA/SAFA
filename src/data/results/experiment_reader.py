@@ -8,8 +8,7 @@ from experiments.experiment_step import ExperimentStep
 from jobs.components.job_result import JobResult
 from util.file_util import FileUtil
 from util.json_util import JsonUtil
-from util.logging.logger_config import LoggerConfig
-from util.logging.logger_manager import LoggerManager, logger
+from util.logging.logger_manager import logger
 
 METRICS = ["map", "map@1", "map@2", "map@3", "ap", "f2", "f1", "precision@1", "precision@2", "precision@3"]
 DISPLAY_METRICS = ["map", "f2"]
@@ -48,8 +47,7 @@ class ExperimentReader:
         self.eval_df = None
         self.val_df = None
         self.log_dir = os.path.join(experiment_path, "logs")
-        LoggerManager.configure_logger(LoggerConfig(output_dir=self.log_dir))
-
+        
     def print_eval(self) -> None:
         """
         Prints the evaluation metrics.

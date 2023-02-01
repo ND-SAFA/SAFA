@@ -1,5 +1,13 @@
 import "cypress-file-upload";
-import { DataCy } from "../fixtures";
+import { DataCy } from "@/fixtures";
+
+Cypress.Commands.add("expandViewport", (size) => {
+  if (size === "l") {
+    cy.viewport(1024 * 2, 768 * 2);
+  } else {
+    cy.viewport(1024, 768);
+  }
+});
 
 Cypress.Commands.add("getCy", (dataCy, elementPosition, timeout) => {
   const elements = cy.get(`[data-cy="${dataCy}"]`, { timeout });
@@ -72,7 +80,7 @@ Cypress.Commands.add("withinTableRows", (dataCy, fn) => {
   cy.getCy(dataCy)
     .should("be.visible")
     .within(() => {
-      cy.get("tr").should("have.length.greaterThan", 0);
-      fn(cy.get("tr").should("be.visible"));
+      cy.get(".v-data-table__progress").should("not.exist");
+      fn(cy.get("tr"));
     });
 });

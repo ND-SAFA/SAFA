@@ -1,4 +1,4 @@
-import { validUser } from "../fixtures";
+import { validUser } from "@/fixtures";
 
 const apiUrl = "https://dev-api.safa.ai";
 
@@ -36,7 +36,7 @@ Cypress.Commands.add("dbResetJobs", () => {
         )
       );
     })
-    .clearCookies();
+    .clearAllCookies();
 });
 
 Cypress.Commands.add("dbResetProjects", () => {
@@ -54,7 +54,7 @@ Cypress.Commands.add("dbResetProjects", () => {
         )
       );
     })
-    .clearCookies();
+    .clearAllCookies();
 });
 
 Cypress.Commands.add("dbResetDocuments", () => {
@@ -83,7 +83,7 @@ Cypress.Commands.add("dbResetDocuments", () => {
           )
         );
     })
-    .clearCookies();
+    .clearAllCookies();
 });
 
 Cypress.Commands.add("dbResetVersions", () => {
@@ -111,7 +111,7 @@ Cypress.Commands.add("dbResetVersions", () => {
         });
       });
     })
-    .clearCookies();
+    .clearAllCookies();
 });
 
 Cypress.Commands.add("dbDeleteUser", (email, password) => {

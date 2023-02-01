@@ -79,6 +79,11 @@ declare namespace Cypress {
     // Base Commands
 
     /**
+     * Expands the viewport to a preset size.
+     */
+    expandViewport(size?: "m" | "l"): Chainable<void>;
+
+    /**
      * Gets an element based on the `data-cy` selector.
      *
      * @param dataCy - The testing selector to find.

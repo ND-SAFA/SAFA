@@ -111,9 +111,12 @@ export enum DataCy {
 
   jobTable = "job-table",
   jobStatus = "job-status",
+  jobProgress = "job-progress",
   jobPanel = "job-panel",
   jobDeleteButton = "button-delete-job",
   jobOpenButton = "button-open-job",
+  jobLogButton = "button-job-log",
+  jobLogText = "text-job-log",
 
   // Project Selection
 

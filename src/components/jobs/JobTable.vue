@@ -32,6 +32,7 @@
             <typography
               secondary
               :value="`Upload Progress: ${item.currentProgress}%`"
+              data-cy="job-progress"
             />
           </v-col>
           <v-col cols="4">
@@ -136,7 +137,13 @@
       @close="handleCloseLogs"
     >
       <template v-slot:body>
-        <typography t="4" default-expanded variant="code" :value="log" />
+        <typography
+          t="4"
+          default-expanded
+          variant="code"
+          :value="log"
+          data-cy="text-job-log"
+        />
       </template>
     </modal>
   </panel-card>

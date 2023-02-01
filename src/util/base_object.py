@@ -9,6 +9,7 @@ from typeguard import check_type
 from typing_extensions import get_args
 
 from util.enum_util import get_enum_from_name
+from util.logging.logger_manager import logger
 from util.param_specs import ParamSpecs
 from util.reflection_util import ReflectionUtil
 from variables.definition_variable import DefinitionVariable
@@ -160,7 +161,7 @@ class BaseObject(ABC):
                 return params
             return expected_class(**params)
         except Exception as e:
-            print(traceback.format_exc())
+            logger.exception("Unable to initialize %s for %s" % (expected_class, cls.__name__))
             raise TypeError("Unable to initialize %s for %s" % (expected_class, cls.__name__))
 
     @classmethod

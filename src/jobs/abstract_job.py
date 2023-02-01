@@ -16,6 +16,7 @@ from jobs.components.job_result import JobResult
 from models.model_manager import ModelManager
 from util.base_object import BaseObject
 from util.file_util import FileUtil
+from util.logging.logger_manager import logger
 from util.status import Status
 
 
@@ -39,6 +40,8 @@ class AbstractJob(threading.Thread, BaseObject):
         """
         Runs the job and saves the output
         """
+        logger.log_with_title(f"Starting New {self.get_job_name()} Job with Following Experiment Vars",
+                    self.result.get_printable_experiment_vars())
         self.result.set_job_status(Status.IN_PROGRESS)
         try:
             self.set_seed()
@@ -46,7 +49,7 @@ class AbstractJob(threading.Thread, BaseObject):
             self.result = run_result.update(self.result)
             self.result.set_job_status(Status.SUCCESS)
         except Exception as e:
-            print(traceback.format_exc())
+            logger.exception("Job failed during run")
             self.result[JobResult.TRACEBACK] = traceback.format_exc()
             self.result[JobResult.EXCEPTION] = str(e)
             self.result.set_job_status(Status.FAILURE)
@@ -106,7 +109,7 @@ class AbstractJob(threading.Thread, BaseObject):
             FileUtil.save_to_file(json_output, job_output_filepath)
             return True
         except Exception:
-            print(traceback.format_exc())  # to save in logs
+            logger.exception("Unable to save job output")  # to save in logs
             return False
 
     def set_seed(self) -> None:
@@ -116,6 +119,13 @@ class AbstractJob(threading.Thread, BaseObject):
         """
         if self.job_args.random_seed:
             self.set_random_seed(self.job_args.random_seed)
+
+    def get_job_name(self) -> str:
+        """
+        Gets the name of the job
+        :return: The job name
+        """
+        return self.__class__.__name__.split("Job")[0]
 
     def __deepcopy__(self, memodict: Dict = {}) -> "AbstractJob":
         """

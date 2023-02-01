@@ -8,6 +8,7 @@ from data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from data.datasets.pre_train_dataset import PreTrainDataset
 from data.processing.cleaning.data_cleaner import DataCleaner
 from data.readers.pre_train_project_reader import PreTrainProjectReader
+from util.logging.logger_manager import logger
 
 
 class MLMPreTrainDatasetCreator(AbstractDatasetCreator[PreTrainDataset]):
@@ -50,7 +51,7 @@ class MLMPreTrainDatasetCreator(AbstractDatasetCreator[PreTrainDataset]):
         """
         training_file_content = self.DELIMINATOR.join(examples)
         os.makedirs(os.path.dirname(self.training_dataset_file), exist_ok=True)
-        print("Exporting: ", self.training_dataset_file)
+        logger.info(f"Exporting: {self.training_dataset_file}")
         with open(self.training_dataset_file, "w") as training_file:
             training_file.write(training_file_content)
         return self.training_dataset_file

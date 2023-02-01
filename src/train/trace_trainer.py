@@ -205,11 +205,11 @@ class TraceTrainer(BaseTrainer):
         should_evaluate = self.save_strategy.should_evaluate(stage, stage_iteration)
 
         if should_evaluate and DatasetRole.VAL in self.trainer_dataset_manager:
-            eval_result: TracePredictionOutput = self.perform_prediction(DatasetRole.VAL)
+            val_prediction_output: TracePredictionOutput = self.perform_prediction(DatasetRole.VAL)
             previous_best = self.save_strategy.best_scores
-            should_save = self.save_strategy.should_save(eval_result.metrics, stage_iteration)
+            should_save = self.save_strategy.should_save(val_prediction_output.metrics, stage_iteration)
             if should_save:
-                current_score = self.save_strategy.get_metric_scores(eval_result.metrics)
+                current_score = self.save_strategy.get_metric_scores(val_prediction_output.metrics)
                 logger.log_with_title("Saving Best Model", f"New Best: {current_score}\tPrevious: {previous_best}")
                 self.save_model(self.get_output_path(self.BEST_MODEL_NAME))
                 logger.log_with_title("Evaluation Finished.", "")

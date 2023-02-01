@@ -6,6 +6,8 @@ import torch
 from django.core.wsgi import get_wsgi_application
 from dotenv import load_dotenv
 
+from util.logging.logger_manager import logger
+
 load_dotenv()
 
 ROOT_PATH = os.path.expanduser(os.environ["ROOT_PATH"])
@@ -44,14 +46,14 @@ if __name__ == "__main__":
     #
     # Logs
     #
-    print("GPUS : ", torch.cuda.device_count())
+    logger.info("GPUS : ", torch.cuda.device_count())
     #
     # Run Job
     #
     application = get_wsgi_application()
     experiment = ObjectCreator.create(Experiment, override=True, **job_definition)
     experiment.run()
-    print("\nExperiment Finished!")
+    logger.info("\nExperiment Finished!")
     OUTPUT_DIR = job_definition["output_dir"]
     result_reader = ExperimentReader(OUTPUT_DIR)
     result_reader.print_val()

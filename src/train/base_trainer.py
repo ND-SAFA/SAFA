@@ -70,7 +70,7 @@ class BaseTrainer(Trainer, BaseObject):
         assert n_predictions == n_expected, f"Expected {n_expected} samples but received {n_predictions} predictions."
         metrics_manager = MetricsManager(dataset.get_ordered_links(), output.predictions)
         eval_metrics = metrics_manager.eval(self.trainer_args.metrics) if self.trainer_args.metrics else {}
-        logger.log_with_title("Eval Metrics", repr(eval_metrics))
+        logger.log_with_title(f"{dataset_role.name} Metrics", repr(eval_metrics))
         output.metrics.update(eval_metrics)
         return TracePredictionOutput(predictions=metrics_manager.get_scores(), label_ids=output.label_ids, metrics=output.metrics,
                                      source_target_pairs=dataset.get_source_target_pairs())

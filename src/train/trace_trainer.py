@@ -93,8 +93,8 @@ class TraceTrainer(BaseTrainer):
         epoch_loss = 0
         accelerate_tqdm = partial(tqdm, disable=not TraceAccelerator.is_main_process, position=0)
         for epoch_index in range(self.trainer_args.num_train_epochs):
-            with TraceAccelerator.accumulate(model):
-                for batch_index, batch in enumerate(accelerate_tqdm(train_data_loader)):
+            for batch_index, batch in enumerate(accelerate_tqdm(train_data_loader)):
+                with TraceAccelerator.accumulate(model):
                     batch = batch.to(TraceAccelerator.device)
 
                     labels = batch.pop(DataKey.LABELS_KEY)

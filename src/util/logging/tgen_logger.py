@@ -4,7 +4,7 @@ from config.override import overrides
 from train.trainer_tools.trace_accelerator import TraceAccelerator
 
 
-class TgenLogger(Logger):
+class TGenLogger(Logger):
     """
     Handles Logging for TGEN
     """
@@ -26,7 +26,6 @@ class TgenLogger(Logger):
         :return: None
         """
         title_border = '-' * max(round(len(message) / 2), 10)
-        title = f"{title_border} {title} {title}"
+        title = f"{title_border} {title} {title_border}"
         msg = f"{title}\n{message}"
         self.info(msg)
-

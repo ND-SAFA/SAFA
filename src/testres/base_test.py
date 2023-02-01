@@ -30,6 +30,10 @@ class BaseTest(TestCase):
         os.makedirs(TEST_OUTPUT_DIR, exist_ok=True)
 
     def tearDown(self):
+        BaseTest.remove_output_dir()
+
+    @staticmethod
+    def remove_output_dir():
         if DELETE_TEST_OUTPUT and os.path.exists(TEST_OUTPUT_DIR):
             shutil.rmtree(TEST_OUTPUT_DIR)
             for file in os.listdir(TEST_DATA_DIR):

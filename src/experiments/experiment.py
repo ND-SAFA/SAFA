@@ -57,7 +57,7 @@ class Experiment(BaseObject):
         """
         if self.logger_config.output_dir is None:
             self.logger_config.output_dir = self.output_dir
-        LoggerManager.setup_logger(self.logger_config)
+        LoggerManager.configure_logger(self.logger_config)
 
     def _get_step_output_path(self, step_num: int) -> str:
         """

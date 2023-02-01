@@ -1,54 +1,66 @@
 import os
+import sys
+from os.path import dirname
 from typing import Optional, Any
 
 from config.constants import LOG_FORMAT
+from util.file_util import FileUtil
 from util.logging.logger_config import LoggerConfig
-from util.logging.tgen_logger import TgenLogger
+from util.logging.tgen_logger import TGenLogger
 import logging
 
-logging.setLoggerClass(TgenLogger)
+logging.setLoggerClass(TGenLogger)
 
 
 class LoggerManager:
-    __logger: Optional[TgenLogger] = None
+    __logger: Optional[TGenLogger] = None
+    __logger_is_configured = False
 
     @staticmethod
-    def setup_logger(logger_config: LoggerConfig) -> TgenLogger:
+    def configure_logger(logger_config: LoggerConfig) -> TGenLogger:
         """
         Setups the logger to use for TGEN
         :param logger_config: Configurations for the logger
         :return: the Logger
         """
-        LoggerManager.__logger = logging.getLogger("root")
+        if LoggerManager.__logger_is_configured:
+            curr_logger = LoggerManager.get_logger()
+            curr_logger.warning("Logger is already configured. Using existing logger.")
+            return curr_logger
+        LoggerManager.__logger_is_configured = True
+        LoggerManager.__logger: TGenLogger = logging.getLogger("tgen")
+        logger.setLevel(logger_config.log_level)
         log_filepath = os.path.join(logger_config.output_dir, logger_config.log_filename) \
             if logger_config.output_dir else logger_config.log_filename
+        FileUtil.create_dir_safely(dirname(log_filepath))
         file_handler = logging.FileHandler(log_filepath)
-        console_handler = logging.StreamHandler()
+        console_handler = logging.StreamHandler(sys.stdout)
 
-        default_formatter = logging.Formatter(LOG_FORMAT, datefmt='%d/%m/%Y %H:%M:%S')
+        default_formatter = logging.Formatter(LOG_FORMAT, datefmt='%m/%d %H:%M:%S')
         formatters = [default_formatter]
         if logger_config.verbose:
             formatters.append(default_formatter)
         else:
             formatters.append(logging.Formatter("%(message)s"))
 
-        for i, handler in [file_handler, console_handler]:
+        for i, handler in enumerate([file_handler, console_handler]):
             handler.setLevel(logger_config.log_level)
             handler.setFormatter(formatters[i])
 
         if logger_config.log_to_console:
             LoggerManager.__logger.addHandler(console_handler)
         LoggerManager.__logger.addHandler(file_handler)
+
         return LoggerManager.__logger
 
     @staticmethod
-    def get_logger() -> TgenLogger:
+    def get_logger() -> TGenLogger:
         """
         Gets the logger for TGen
         :return: The Logger
         """
         if LoggerManager.__logger is None:
-            LoggerManager.__logger = LoggerManager.setup_logger(LoggerConfig())
+            LoggerManager.__logger = LoggerManager.configure_logger(LoggerConfig())
         return LoggerManager.__logger
 
     @classmethod
@@ -63,4 +75,4 @@ class LoggerManager:
         return getattr(LoggerManager.get_logger(), attr)
 
 
-logger = LoggerManager()
+logger: TGenLogger = LoggerManager()

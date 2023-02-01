@@ -12,7 +12,7 @@ class MetricSaveStrategy(AbstractSaveStrategy):
     """
 
     def __init__(self, comparison_criterion: ComparisonCriterion, stage: SaveStrategyStage = SaveStrategyStage.EPOCH,
-                 interval: int = 1, delta: int = 0.01):
+                 interval: int = 1, delta: int = 0.001):
         """
         Creates save strategy evaluating at the given stage at the interval defined.
         :param comparison_criterion: How to compare metrics to determine the best one.

@@ -1,3 +1,4 @@
+import inspect
 import logging
 import os
 import sys
@@ -8,9 +9,7 @@ from constants import LOG_FORMAT
 from util.file_util import FileUtil
 from util.logging.logger_config import LoggerConfig
 from util.logging.tgen_logger import TGenLogger
-
-logging.setLoggerClass(TGenLogger)
-
+from huggingface_hub.utils import logging as hf_logging
 
 class LoggerManager:
     __logger: Optional[TGenLogger] = None
@@ -63,6 +62,17 @@ class LoggerManager:
             LoggerManager.__logger = LoggerManager.configure_logger(LoggerConfig())
         return LoggerManager.__logger
 
+    @staticmethod
+    def turn_off_hugging_face_logging() -> None:
+        """
+        Turns off all logging for hugging face
+        :return: None
+        """
+        for module in sys.modules.keys():
+            if module.startswith("transformers"):
+                hf_logger = hf_logging.get_logger(module)
+                hf_logger.setLevel(logging.ERROR)
+
     @classmethod
     def __getattr__(cls, attr: str) -> Any:
         """
@@ -74,5 +84,6 @@ class LoggerManager:
             return super().__getattribute__(cls, attr)
         return getattr(LoggerManager.get_logger(), attr)
 
-
+logging.setLoggerClass(TGenLogger)
+LoggerManager.turn_off_hugging_face_logging()
 logger: TGenLogger = LoggerManager()

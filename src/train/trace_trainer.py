@@ -215,7 +215,7 @@ class TraceTrainer(BaseTrainer):
                 current_score = self.save_strategy.get_metric_scores(eval_result.metrics)
                 logger.log_with_title("Saving Best Model", f"New Best: {current_score}\tPrevious: {previous_best}")
                 self.save_model(self.get_output_path(self.BEST_MODEL_NAME))
-                logger.log_with_title("Evaluation Finished.", "-" * 10)
+                logger.log_with_title("Evaluation Finished.", "")
             else:
                 logger.info(f"Previous best is still {previous_best}.")
 

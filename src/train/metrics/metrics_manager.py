@@ -35,7 +35,8 @@ class MetricsManager:
 
     def eval(self, metric_names: List) -> Metrics:
         """
-        Evaluates scores using metrics and adds to base metrics. (use this instead of Trainer.evaluation to utilize predefined metrics from models)
+        Evaluates scores using metrics and adds to base metrics. (use this instead of Trainer.evaluation to utilize predefined metrics
+        from models)
         :param metric_names: name of metrics desired for evaluation
         :return: a dictionary of metric_name to result
         """

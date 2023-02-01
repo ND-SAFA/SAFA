@@ -23,6 +23,7 @@ torch.use_deterministic_algorithms(True)
 
 TRIAL = Union["optuna.Trial", Dict[str, Any]]
 
+
 class BaseTrainer(Trainer, BaseObject):
     """
     Trains model on data for generic task.

@@ -4,7 +4,8 @@ from torch.nn.functional import cross_entropy
 from transformers.training_args import TrainingArguments
 
 from config.constants import EVALUATION_STRATEGY_DEFAULT, LOAD_BEST_MODEL_AT_END_DEFAULT, MAX_SEQ_LENGTH_DEFAULT, \
-    METRIC_FOR_BEST_MODEL_DEFAULT, N_EPOCHS_DEFAULT, SAVE_STRATEGY_DEFAULT, SAVE_TOTAL_LIMIT_DEFAULT
+    METRIC_FOR_BEST_MODEL_DEFAULT, N_EPOCHS_DEFAULT, SAVE_STRATEGY_DEFAULT, SAVE_TOTAL_LIMIT_DEFAULT, OPTIMIZER_DEFAULT, \
+    SCHEDULER_DEFAULT, GRADIENT_ACCUMULATION_DEFAULT, USE_BALANCED_BATCHES_DEFAULT, MULTI_GPU_DEFAULT
 from util.base_object import BaseObject
 from util.enum_util import FunctionalWrapper
 
@@ -28,12 +29,12 @@ class TrainerArgs(TrainingArguments, BaseObject):
     metrics: List[str] = None
     place_model_on_device: bool = False
     total_training_epochs: int = None
-    optimizer_name: str = "adam"
+    optimizer_name: str = OPTIMIZER_DEFAULT
     loss_function: Callable = FunctionalWrapper(cross_entropy)
-    scheduler_name: str = "linear"
-    gradient_accumulation_steps: int = 8
+    scheduler_name: str = SCHEDULER_DEFAULT
+    gradient_accumulation_steps: int = GRADIENT_ACCUMULATION_DEFAULT
     skip_save: bool = False
-    use_balanced_batches: bool = True
+    use_balanced_batches: bool = USE_BALANCED_BATCHES_DEFAULT
     per_device_train_batch_size = None
 
     # GAN
@@ -52,7 +53,7 @@ class TrainerArgs(TrainingArguments, BaseObject):
 
     # Misc
     callbacks: List = None
-    multi_gpu: bool = True
+    multi_gpu: bool = MULTI_GPU_DEFAULT
 
     def __init__(self, output_dir: str, **kwargs):
         """

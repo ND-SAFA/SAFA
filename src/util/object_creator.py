@@ -1,5 +1,5 @@
 from copy import deepcopy
-from typing import Type, TypeVar
+from typing import Type, TypeVar, Dict
 
 from config.constants import VALIDATION_PERCENTAGE_DEFAULT
 from data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
@@ -121,6 +121,13 @@ class ObjectCreator:
 
     @staticmethod
     def create(class_type: Type[ObjectType], override=False, **kwargs) -> ObjectType:
+        """
+        Creates an object of the given type using any additional arguments provided
+        :param class_type: The type of object to create
+        :param override: Will override default args if True
+        :param kwargs: Additional arguments to use for intialization
+        :return: The object
+        """
         kwargs = deepcopy(kwargs)
         if override:
             args = kwargs
@@ -131,7 +138,12 @@ class ObjectCreator:
         return DefinitionCreator.create(class_type, args)
 
     @staticmethod
-    def get_definition(class_type):
+    def get_definition(class_type: Type[ObjectType]) -> Dict:
+        """
+        Gets the definition for instantiating an object
+        :param class_type: The type of object to get a definition for
+        :return: The definition
+        """
         if class_type in ObjectCreator.SUPPORTED_OBJECTS:
             return deepcopy(ObjectCreator.SUPPORTED_OBJECTS[class_type])
 

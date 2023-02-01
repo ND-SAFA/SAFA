@@ -31,7 +31,8 @@ class JsonEntityFormat(AbstractEntityFormat):
         """
         Reads json file and construct data frame with entities.
         :param json_file_path: The path to the json file.
-        :param entity_prop_name: The name of the property containing entities in json file. If none, dictionary is assumed to contain single property
+        :param entity_prop_name: The name of the property containing entities in json file. If none, dictionary is assumed to contain
+        single property
         :return: DataFrame containing entities defined in JSON file.
         """
         data = JsonUtil.read_json_file(json_file_path)

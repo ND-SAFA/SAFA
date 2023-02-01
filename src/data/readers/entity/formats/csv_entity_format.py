@@ -8,7 +8,7 @@ from data.readers.entity.formats.abstract_entity_format import AbstractEntityFor
 
 class CsvEntityFormat(AbstractEntityFormat):
     """
-    Defines format for reading CSV files as entitites.
+    Defines format for reading CSV files as entities.
     """
 
     @staticmethod

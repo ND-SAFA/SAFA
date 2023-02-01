@@ -41,7 +41,7 @@ class BaseTrainer(Trainer, BaseObject):
         model_init = lambda: self.model_manager.get_model()
         tokenizer = self.model_manager.get_tokenizer()
         if save_strategy is None:
-            self.save_strategy = MetricSaveStrategy(ComparisonCriterion("map"))
+            self.save_strategy = MetricSaveStrategy(ComparisonCriterion(["map", "f2"]))
         super().__init__(model_init=model_init, args=trainer_args, tokenizer=tokenizer,
                          callbacks=trainer_args.callbacks,
                          **kwargs)

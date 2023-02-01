@@ -6,7 +6,7 @@ from train.save_strategy.metric_save_strategy import MetricSaveStrategy
 from train.save_strategy.save_strategy_stage import SaveStrategyStage
 
 
-class TestEpochSaveStrategy(BaseTest):
+class TestMetricSaveStrategy(BaseTest):
     """
     Tests that save strategy alerts thread when to save correctly and the comparison
     between metrics to decide best.

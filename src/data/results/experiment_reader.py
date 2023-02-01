@@ -8,7 +8,8 @@ from experiments.experiment_step import ExperimentStep
 from jobs.components.job_result import JobResult
 from util.file_util import FileUtil
 from util.json_util import JsonUtil
-from util.logging.logger_manager import logger
+from util.logging.logger_config import LoggerConfig
+from util.logging.logger_manager import LoggerManager, logger
 
 METRICS = ["map", "map@1", "map@2", "map@3", "ap", "f2", "f1", "precision@1", "precision@2", "precision@3"]
 DISPLAY_METRICS = ["map", "f2"]
@@ -45,6 +46,8 @@ class ExperimentReader:
             self.display_metrics = DISPLAY_METRICS
         self.eval_df = None
         self.val_df = None
+        self.log_dir = os.path.join(experiment_path, "logs")
+        LoggerManager.configure_logger(LoggerConfig(output_dir=self.log_dir))
 
     def print_eval(self) -> None:
         """
@@ -117,9 +120,7 @@ class ExperimentReader:
         JsonUtil.require_properties(job_result, [JobResult.VAL_METRICS])
         val_metric_entries = []
         for epoch_index, val_metric_entry in job_result[JobResult.VAL_METRICS].items():
-            JsonUtil.require_properties(val_metric_entry, [JobResult.METRICS])
-            metrics_entry = val_metric_entry[JobResult.METRICS]
-            metric_entry = {**base_entry, **JsonUtil.read_params(metrics_entry, metric_names), entry_id_key: epoch_index}
+            metric_entry = {**base_entry, **JsonUtil.read_params(val_metric_entry, metric_names), entry_id_key: epoch_index}
             val_metric_entries.append(metric_entry)
         return val_metric_entries
 

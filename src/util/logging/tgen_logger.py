@@ -1,7 +1,7 @@
 from logging import Logger
 
-from config.override import overrides
 from train.trainer_tools.trace_accelerator import TraceAccelerator
+from util.override import overrides
 
 
 class TGenLogger(Logger):

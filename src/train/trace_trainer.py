@@ -13,7 +13,6 @@ from transformers import PreTrainedModel, Trainer
 from transformers.modeling_outputs import SequenceClassifierOutput
 from transformers.trainer_utils import PredictionOutput
 
-from config.override import overrides
 from data.datasets.data_key import DataKey
 from data.datasets.dataset_role import DatasetRole
 from data.managers.trainer_dataset_manager import TrainerDatasetManager
@@ -30,6 +29,7 @@ from train.trainer_tools.supported_schedulers import SupportedSchedulers
 from train.trainer_tools.trace_accelerator import TraceAccelerator
 from util.file_util import FileUtil
 from util.logging.logger_manager import logger
+from util.override import overrides
 
 
 class TraceTrainer(BaseTrainer):

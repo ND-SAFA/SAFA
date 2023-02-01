@@ -8,7 +8,7 @@ from nltk import pos_tag, word_tokenize
 from nltk.corpus import stopwords, wordnet as wn
 from nltk.stem import WordNetLemmatizer
 
-from config.constants import REPLACEMENT_PERCENTAGE_DEFAULT
+from constants import REPLACEMENT_PERCENTAGE_DEFAULT
 from data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
 
 Synset = nltk.corpus.reader.wordnet.Synset

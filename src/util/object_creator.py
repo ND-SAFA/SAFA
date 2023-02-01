@@ -1,7 +1,7 @@
 from copy import deepcopy
 from typing import Type, TypeVar
 
-from config.constants import VALIDATION_PERCENTAGE_DEFAULT
+from constants import VALIDATION_PERCENTAGE_DEFAULT
 from data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
 from data.creators.trace_dataset_creator import TraceDatasetCreator
 from data.managers.trainer_dataset_manager import TrainerDatasetManager

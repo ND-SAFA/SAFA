@@ -20,9 +20,9 @@ if __name__ == "__main__":
     from experiments.experiment import Experiment
     from util.object_creator import ObjectCreator
     from util.file_util import FileUtil
-    from train.trace_accelerator import TraceAccelerator
     from data.results.experiment_definition import ExperimentDefinition
     from data.results.experiment_reader import ExperimentReader
+    from train.trainer_tools.trace_accelerator import TraceAccelerator
 
     #
     # Argument Parsing

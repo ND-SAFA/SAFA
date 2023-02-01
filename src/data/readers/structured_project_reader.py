@@ -3,15 +3,15 @@ from typing import Dict, Tuple
 
 import pandas as pd
 
-from config.override import overrides
+from data.keys.safa_format import SafaKeys
+from data.keys.structure_keys import StructuredKeys
 from data.readers.abstract_project_reader import AbstractProjectReader
 from data.readers.definitions.abstract_project_definition import AbstractProjectDefinition
 from data.readers.definitions.structure_project_definition import StructureProjectDefinition
 from data.readers.definitions.tim_project_definition import TimProjectDefinition
 from data.readers.entity.entity_reader import EntityReader
-from data.keys.safa_format import SafaKeys
-from data.keys.structure_keys import StructuredKeys
 from util.json_util import JsonUtil
+from util.override import overrides
 
 
 class StructuredProjectReader(AbstractProjectReader):

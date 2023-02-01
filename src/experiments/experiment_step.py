@@ -4,7 +4,6 @@ from typing import Any, Dict, List, Optional, Type, Union
 
 import math
 
-from config.override import overrides
 from jobs.abstract_job import AbstractJob
 from jobs.abstract_trace_job import AbstractTraceJob
 from jobs.components.job_result import JobResult
@@ -14,6 +13,7 @@ from train.save_strategy.comparison_criteria import ComparisonCriterion
 from util.base_object import BaseObject
 from util.file_util import FileUtil
 from util.json_util import JsonUtil
+from util.override import overrides
 from util.status import Status
 from variables.experimental_variable import ExperimentalVariable
 

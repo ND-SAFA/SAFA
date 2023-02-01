@@ -5,11 +5,17 @@
         {
           "object_type": "TRAIN",
           "job_args": {
-            "random_seed": 68
+            "random_seed": {
+              "*": [
+                68,
+                120
+              ]
+            }
           },
           "model_manager": {
             "model_path": {
               "*": [
+                "bert-base-uncased",
                 "prajjwal1/bert-tiny",
                 "prajjwal1/bert-mini",
                 "prajjwal1/bert-small",
@@ -28,7 +34,7 @@
               "f",
               "precision"
             ],
-            "skip_save": false,
+            "skip_save": true,
             "load_best_model_at_end": false
           },
           "trainer_dataset_manager": {

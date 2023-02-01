@@ -5,18 +5,25 @@
         {
           "object_type": "TRAIN",
           "job_args": {
-            "random_seed": 7265
+            "random_seed": {
+              "*": [
+                812,
+                924,
+                316,
+                540,
+                457
+              ]
+            }
           },
           "model_manager": {
             "model_path": "bert-base-uncased"
           },
           "trainer_args": {
-            "output_dir": "[OUTPUT_PATH]/cchit/bert-base/models",
-            "num_train_epochs": 100,
-            "per_device_train_batch_size": 8,
-            "per_device_eval_batch_size": 8,
+            "output_dir": "[OUTPUT_PATH]/cchit/bert_base_uncased/models",
+            "num_train_epochs": 30,
+            "per_device_train_batch_size": 16,
             "gradient_accumulation_steps": 8,
-            "learning_rate": 1e-5,
+            "learning_rate": 5e-6,
             "metrics": [
               "map",
               "map_at_k",
@@ -57,5 +64,5 @@
       ]
     }
   ],
-  "output_dir": "[OUTPUT_PATH]/cchit/bert-base/jobs"
+  "output_dir": "[OUTPUT_PATH]/cchit/bert_base_uncased/jobs"
 }

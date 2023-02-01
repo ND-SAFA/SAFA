@@ -13,7 +13,7 @@ cache
 
 # Transformers
 src/tes/output/runs/**
-/**/output.json
+
 /**/output
 
 # Deployment

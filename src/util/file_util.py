@@ -1,11 +1,9 @@
-import json
 import os
 import shutil
 from copy import deepcopy
-from typing import Dict, IO, List, Union
+from typing import Callable, Dict, IO, List, Union
 
 from util.json_util import JsonUtil
-from util.uncased_dict import UncasedDict
 
 
 class FileUtil:
@@ -30,18 +28,6 @@ class FileUtil:
         """
         with open(file_path) as file:
             return file.read()
-
-    @staticmethod
-    def read_json_file(file_path: str, as_uncased_dict: bool = False) -> Union[Dict, UncasedDict]:
-        """
-        Reads JSON from file at path.
-        :param file_path: Path to JSON file.
-        :param as_uncased_dict: Whether to convert output to uncased dict
-        :return: Dictionary content of file.
-        """
-        with open(file_path) as file:
-            content = json.load(file)
-        return UncasedDict(content) if as_uncased_dict else content
 
     @staticmethod
     def get_file_list(data_path: str, exclude: List[str] = None) -> List[str]:
@@ -155,3 +141,23 @@ class FileUtil:
         """
         path = os.path.normpath(path)
         return [p for p in path.split(os.sep) if p != ""]
+
+    @staticmethod
+    def ls_filter(path: str, f: Callable[[str], bool] = None, ignore: List[str] = None, add_base_path: bool = False) -> List[str]:
+        """
+        List and filters files in path.
+        :param path: The path to list its contents.
+        :param f: The filtering function to select entities or not.
+        :param ignore: List of files to ignored completely.
+        :param add_base_path: Whether listed files should be complete paths.
+        :return: List of files in path.
+        """
+        if f is None:
+            f = lambda s: s
+        if ignore is None:
+            ignore = []
+        results = list(filter(lambda p: f(p) and p not in ignore, os.listdir(path)))
+        if add_base_path:
+            return [os.path.join(path, r) for r in results]
+        else:
+            return results

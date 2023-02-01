@@ -3,7 +3,6 @@ import os
 import subprocess
 import sys
 
-import pandas as pd
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -27,12 +26,9 @@ if __name__ == "__main__":
     #
     # Imports
     #
-    from scripts.script_utils import ls_filter, ls_jobs, read_job_definition, read_params
-    from util.file_util import FileUtil
+    from data.results.experiment_definition import ExperimentDefinition
+    from data.results.experiment_reader import ExperimentReader
 
-    #
-    #
-    #
     parser = argparse.ArgumentParser(
         prog='Results reader',
         description='Reads experiment results.')
@@ -41,47 +37,26 @@ if __name__ == "__main__":
     file_path = os.path.join(RQ_PATH, args.experiment)
     export_file_name = args.experiment.split(".")[0]
     output_file = export_file_name + ".csv"
-    job_definition = read_job_definition(file_path)
+    job_definition = ExperimentDefinition.read_experiment_definition(file_path)
 
     OUTPUT_DIR = job_definition["output_dir"]
-    experiments = ls_jobs(OUTPUT_DIR, add_base=True)
-    experiment_steps = [ls_filter(os.path.join(OUTPUT_DIR, experiment_id), ignore=IGNORE, add_base=True) for experiment_id in
-                        experiments]
-    step_jobs = [ls_jobs(step, add_base=True) for steps in experiment_steps for step in steps]
-    METRICS = ["map", "f2"]
-    IGNORE = ["job_args", "model_manager"]
-    val_entries = []
-    eval_entries = []
-    for job in ls_jobs(OUTPUT_DIR):
-        job_path = os.path.join(OUTPUT_DIR, job)
-        for step in ls_filter(job_path, ignore=[".DS_Store"]):
-            step_path = os.path.join(job_path, step)
-            for step_job in ls_jobs(step_path):
-                step_job_path = os.path.join(step_path, step_job)
-                output_path = os.path.join(step_job_path, "output.json")
-                output_json = FileUtil.read_json_file(output_path)
-                base_entry = {k: v for k, v in output_json["experimental_vars"].items() if k not in IGNORE}
-                
-                for epoch_index, metrics in output_json["val_metrics"].items():
-                    metrics_entry = metrics["metrics"]
-                    # print(metrics.keys())
-                    entry = {**base_entry, **read_params(metrics_entry, METRICS), "epoch": epoch_index}
-                    val_entries.append(entry)
-                if len(output_json["eval_metrics"]) > 0:
-                    eval_entries.append({**base_entry, **read_params(output_json["eval_metrics"], METRICS)})
-    print("Validation:", len(val_entries))
-    print("Evaluation:", len(eval_entries))
+
+    result_reader = ExperimentReader(OUTPUT_DIR)
+    val_df, eval_df = result_reader.read()
+    print("Validation:", len(val_df))
+    print("Evaluation:", len(eval_df))
 
     """
     Export Results
     """
     val_output_path = os.path.join(OUTPUT_DIR, "results-val.csv")
     eval_output_path = os.path.join(OUTPUT_DIR, "results-eval.csv")
-    val_df = pd.DataFrame(val_entries)
     val_df.to_csv(val_output_path, index=False)
-    eval_df = pd.DataFrame(eval_entries)
     eval_df.to_csv(eval_output_path, index=False)
-    # Push to s3
+    print(f"Exported files: {eval_output_path} & {val_output_path}")
+    """
+    Push to bucket and tensorboard (TODO)
+    """
     bucket_name = os.environ.get("BUCKET", None)
     if bucket_name:
         bucket_path = os.path.join(bucket_name, output_file)
@@ -90,9 +65,5 @@ if __name__ == "__main__":
     """
     Print eval
     """
-    GROUP_METRICS = [c for c in eval_df.columns if c not in METRICS and c != "random_seed"]
-    if len(GROUP_METRICS) > 0:
-        print(eval_df.groupby(GROUP_METRICS)[METRICS].mean())
-    else:
-        print(val_df[METRICS].mean())
-    print(f"Exported files: {eval_output_path} & {val_output_path}")
+    result_reader.print_val()
+    result_reader.print_eval()

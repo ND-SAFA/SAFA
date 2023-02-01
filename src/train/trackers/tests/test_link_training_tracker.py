@@ -4,8 +4,8 @@ from unittest.mock import patch
 from data.tree.trace_link import TraceLink
 from testres.base_trace_test import BaseTraceTest
 from testres.paths.paths import TEST_OUTPUT_DIR
-from train.trackers.link_training_tracker import LinkTrainingTracker, EpochTrainingResult
-from util.file_util import FileUtil
+from train.link_training_tracker import EpochTrainingResult, LinkTrainingTracker
+from util.json_util import JsonUtil
 
 
 class TestLinkTrainingTracker(BaseTraceTest):
@@ -46,7 +46,7 @@ class TestLinkTrainingTracker(BaseTraceTest):
         self.assertTrue(tracker.save_epoch_result(TEST_OUTPUT_DIR, 0))
         output_path = tracker.get_output_path(TEST_OUTPUT_DIR, 0)
         self.assertTrue(os.path.exists(output_path))
-        output_dict = FileUtil.read_json_file(output_path)
+        output_dict = JsonUtil.read_json_file(output_path)
         self.assertIn(EpochTrainingResult.POS_LINKS_KEY, output_dict)
         self.assertIn(EpochTrainingResult.NEG_LINKS_KEY, output_dict)
 

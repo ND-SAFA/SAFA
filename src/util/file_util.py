@@ -20,7 +20,7 @@ class FileUtil:
         return output_path
 
     @staticmethod
-    def read_file(file_path: str):
+    def read_file(file_path: str) -> str:
         """
         Reads file at given path if exists.
         :param file_path: Path of the file to read.

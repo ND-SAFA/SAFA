@@ -1,7 +1,7 @@
 from torch.optim import Optimizer
 from torch.optim.lr_scheduler import LinearLR
 
-from train.supported_enum import SupportedEnum
+from util.supported_enum import SupportedEnum
 from util.enum_util import FunctionalWrapper
 
 

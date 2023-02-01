@@ -20,14 +20,15 @@ from data.managers.trainer_dataset_manager import TrainerDatasetManager
 from data.samplers.balanced_batch_sampler import BalancedBatchSampler
 from models.model_manager import ModelManager
 from train.base_trainer import BaseTrainer
-from train.link_training_tracker import LinkTrainingTracker
+from train.trackers.link_training_tracker import LinkTrainingTracker
 from train.save_strategy.save_strategy_stage import SaveStrategyStage
-from train.supported_optimizers import SupportedOptimizers
-from train.supported_schedulers import SupportedSchedulers
-from train.trace_accelerator import TraceAccelerator
+from train.trainer_tools.supported_optimizers import SupportedOptimizers
+from train.trainer_tools.supported_schedulers import SupportedSchedulers
+from train.trainer_tools.trace_accelerator import TraceAccelerator
 from train.trace_output.trace_train_output import TraceTrainOutput
 from train.trainer_args import TrainerArgs
 from util.file_util import FileUtil
+from util.logging.logger_manager import logger
 
 
 class TraceTrainer(BaseTrainer):
@@ -60,7 +61,7 @@ class TraceTrainer(BaseTrainer):
         self.__should_prepare_accumulator = True
         if self.trainer_args.load_best_model_at_end:
             if not self.trainer_args.should_save:
-                print("Unable to load best model because configuration defined `should_save` to False.")
+                logger.warning("Unable to load best model because configuration defined `should_save` to False.")
             else:
                 best_model_path = self.get_output_path(self.BEST_MODEL_NAME)
                 self.model = self.model_manager.update_model(best_model_path)
@@ -84,13 +85,12 @@ class TraceTrainer(BaseTrainer):
                                                                                    self.get_train_dataloader(),
                                                                                    resume_from_checkpoint)
         model = TraceAccelerator.prepare_model(model)
-        self.print(f"Number of GPUS: {TraceAccelerator.num_processes}. Torch devices: {torch.cuda.device_count()}")
+        logger.info(f"Number of GPUS: {TraceAccelerator.num_processes}. Torch devices: {torch.cuda.device_count()}")
         global_step = 0
         training_loss = 0
         training_metrics = {}
         epoch_loss = 0
-        is_main_process = TraceAccelerator.is_main_process
-        accelerate_tqdm = partial(tqdm, disable=not is_main_process, position=0)
+        accelerate_tqdm = partial(tqdm, disable=not TraceAccelerator.is_main_process, position=0)
         for epoch_index in range(self.trainer_args.num_train_epochs):
             with TraceAccelerator.accumulate(model):
                 for batch_index, batch in enumerate(accelerate_tqdm(train_data_loader)):
@@ -108,7 +108,7 @@ class TraceTrainer(BaseTrainer):
                     global_step += 1
                     epoch_loss += loss.item()
 
-            TraceAccelerator.print("Epoch Loss:", epoch_loss)
+            logger.info(f"Epoch Loss: {epoch_loss}")
             epoch_loss = 0
             scheduler.step()
             self.on_epoch(epoch_index)
@@ -209,12 +209,11 @@ class TraceTrainer(BaseTrainer):
             should_save = self.save_strategy.should_save(eval_result, stage_iteration)
             if should_save:
                 current_score = self.save_strategy.get_metric_score(eval_result.metrics)
-                TraceAccelerator.print("-" * 25, "Saving Best Model", "-" * 25)
-                TraceAccelerator.print(f"New Best: {current_score}\tPrevious: {previous_best}")
+                logger.log_with_title("Saving Best Model", f"New Best: {current_score}\tPrevious: {previous_best}")
                 self.save_model(self.get_output_path(self.BEST_MODEL_NAME))
-                TraceAccelerator.print("-" * 20, "Evaluation Finished.", "-" * 20)
+                logger.log_with_title("Evaluation Finished.", "-" * 10)
             else:
-                TraceAccelerator.print(f"Previous best is still {previous_best}.")
+                logger.info(f"Previous best is still {previous_best}.")
 
     def get_output_path(self, dir_name: str = None):
         """

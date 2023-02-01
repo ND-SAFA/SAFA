@@ -6,21 +6,27 @@ from experiments.experiment_step import ExperimentStep
 from jobs.abstract_job import AbstractJob
 from util.base_object import BaseObject
 from util.file_util import FileUtil
+from util.logging.logger_config import LoggerConfig
+from util.logging.logger_manager import LoggerManager
 from util.status import Status
 
 
 class Experiment(BaseObject):
     _STEP_DIR_NAME = "step_%s"
 
-    def __init__(self, steps: List[ExperimentStep], output_dir: str):
+    def __init__(self, steps: List[ExperimentStep], output_dir: str, logger_config: LoggerConfig = LoggerConfig()):
         """
         Represents an experiment run
-        :param steps: list of all experiment steps to run
+        :param steps: List of all experiment steps to run
+        :param output_dir: The path to save output to
+        :param logger_config: Configures the logging for the project
         """
         self.id = uuid.uuid4()
         self.steps = steps
         self.output_dir = output_dir
         FileUtil.create_dir_safely(output_dir)
+        self.logger_config = logger_config
+        self._setup_logger()
 
     def run(self):
         """
@@ -43,6 +49,15 @@ class Experiment(BaseObject):
         for step in self.steps:
             jobs.extend(step.jobs)
         return jobs
+
+    def _setup_logger(self) -> None:
+        """
+        Setups the logger for the experiment
+        :return: None
+        """
+        if self.logger_config.output_dir is None:
+            self.logger_config.output_dir = self.output_dir
+        LoggerManager.configure_logger(self.logger_config)
 
     def _get_step_output_path(self, step_num: int) -> str:
         """

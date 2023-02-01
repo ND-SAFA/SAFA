@@ -14,6 +14,8 @@ from data.processing.cleaning.supported_data_cleaning_step import SupportedDataC
 from data.tree.artifact import Artifact
 from data.tree.trace_link import TraceLink
 from testres.paths.paths import TEST_DATA_DIR, TEST_OUTPUT_DIR, TEST_VOCAB_FILE
+from util.logging.logger_config import LoggerConfig
+from util.logging.logger_manager import LoggerManager
 
 
 class BaseTest(TestCase):
@@ -25,11 +27,24 @@ class BaseTest(TestCase):
         SupportedDataCleaningStep.FILTER_MIN_LENGTH.value()])
     BASE_TEST_MODEL = "hf-internal-testing/tiny-random-bert"
     BASE_MODEL_LAYERS = 5  # bert-base = 12
+    configure_logging = True
 
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
+        super(BaseTest, cls).setUpClass()
+        if BaseTest.configure_logging:
+            config = LoggerConfig(output_dir=TEST_OUTPUT_DIR)
+            LoggerManager.configure_logger(config)
+            BaseTest.configure_logging = False
         os.makedirs(TEST_OUTPUT_DIR, exist_ok=True)
 
-    def tearDown(self):
+    @classmethod
+    def tearDownClass(cls):
+        super(BaseTest, cls).tearDownClass()
+        BaseTest.remove_output_dir()
+
+    @staticmethod
+    def remove_output_dir():
         if DELETE_TEST_OUTPUT and os.path.exists(TEST_OUTPUT_DIR):
             shutil.rmtree(TEST_OUTPUT_DIR)
             for file in os.listdir(TEST_DATA_DIR):

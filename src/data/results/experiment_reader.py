@@ -6,7 +6,6 @@ import pandas as pd
 
 from experiments.experiment_step import ExperimentStep
 from jobs.components.job_result import JobResult
-from train.trainer_tools.trace_accelerator import TraceAccelerator
 from util.file_util import FileUtil
 from util.json_util import JsonUtil
 from util.logging.logger_config import LoggerConfig
@@ -170,6 +169,7 @@ class ExperimentReader:
 
         group_metrics = [c for c in df.columns if c not in metrics and c != "random_seed"]
         if len(group_metrics) > 0:
+            df = df.sort_values(by=group_metrics)
             logger.info(df.groupby(group_metrics)[display_metrics].mean())
         else:
             logger.info(df[display_metrics].mean())

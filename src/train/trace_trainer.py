@@ -227,16 +227,6 @@ class TraceTrainer(BaseTrainer):
             return os.path.join(base_output_path, dir_name)
         return base_output_path
 
-    def cleanup(self) -> None:
-        """
-        Free memory associated with accelerator and dataset.
-        :return: None
-        """
-        super().cleanup()
-        TraceAccelerator.clear()
-        if self.trainer_dataset_manager:
-            del self.trainer_dataset_manager
-
     def _prepare_accelerator(self, model: PreTrainedModel, data_loader: DataLoader) \
             -> Tuple[PreTrainedModel, DataLoader, Optimizer, _LRScheduler]:
         """

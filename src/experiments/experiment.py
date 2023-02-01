@@ -1,6 +1,9 @@
 import os
 import uuid
+from logging import ERROR
 from typing import List
+
+from huggingface_hub.utils import logging
 
 from experiments.experiment_step import ExperimentStep
 from jobs.abstract_job import AbstractJob
@@ -10,6 +13,8 @@ from util.logging.logger_config import LoggerConfig
 from util.logging.logger_manager import LoggerManager
 from util.status import Status
 
+hf_logger = logging.get_logger("transformers.configuration_utils")
+hf_logger.setLevel(ERROR)
 
 class Experiment(BaseObject):
     _STEP_DIR_NAME = "step_%s"

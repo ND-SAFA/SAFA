@@ -80,6 +80,6 @@ class BaseTrainer(Trainer, BaseObject):
         Free memory associated with trainer.
         :return: None
         """
-        TraceAccelerator.free_memory()
+        TraceAccelerator.clear()
         if self.model:
             del self.model

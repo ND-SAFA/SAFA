@@ -12,8 +12,8 @@
           },
           "trainer_args": {
             "output_dir": "[OUTPUT_PATH]/cm1/test_bert/models",
-            "num_train_epochs": 1,
-            "per_device_train_batch_size": 16,
+            "num_train_epochs": 3,
+            "per_device_train_batch_size": 8,
             "gradient_accumulation_steps": 8,
             "learning_rate": {
               "*": [

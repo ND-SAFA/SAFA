@@ -55,6 +55,10 @@ class TraceTrainer(BaseTrainer):
         :param resume_from_checkpoint: The checkpoint to resume from.
         :return: Output of training session.
         """
+        config = {"test_param": 0.42}
+        test_log_dir = os.path.expanduser("~/projects/safa/tgen/logs")
+        TraceAccelerator.init_trackers("example_project", config=config)
+        TraceAccelerator.update(logging_dir=test_log_dir)
         self.model = self.model_manager.get_model()
         inner_training_loop = find_executable_batch_size(
             self.inner_training_loop) if self.trainer_args.per_device_train_batch_size is None else self.inner_training_loop
@@ -108,11 +112,13 @@ class TraceTrainer(BaseTrainer):
                     training_loss += loss.item()
                     global_step += 1
                     epoch_loss += loss.item()
+                    TraceAccelerator.log({"training_loss": loss}, step=global_step)
 
             logger.info(f"Epoch Loss: {epoch_loss}")
             epoch_loss = 0
             scheduler.step()
             self.on_epoch(epoch_index)
+            TraceAccelerator.end_training()
         return TraceTrainOutput(global_step=global_step, training_loss=training_loss, metrics=training_metrics,
                                 val_metrics=self.save_strategy.stage_evaluations)
 

@@ -1,7 +1,8 @@
 from copy import deepcopy
-from typing import Dict, Any
+from typing import Any
 
 from accelerate import Accelerator
+from accelerate.utils import LoggerType
 
 from util.reflection_util import ReflectionUtil
 
@@ -11,7 +12,7 @@ class AcceleratorSingleton:
     Singleton of the Accelerator
     """
 
-    INIT_DEFAULTS = {"split_batches": True, "step_scheduler_with_optimizer": False}
+    INIT_DEFAULTS = {"split_batches": True, "step_scheduler_with_optimizer": False, "log_with": [LoggerType.TENSORBOARD]}
     __accelerator: Accelerator = None
 
     @staticmethod

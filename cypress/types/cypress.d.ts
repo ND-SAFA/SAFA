@@ -61,8 +61,20 @@ declare namespace Cypress {
 
     /**
      * Removes specified user from database.
+     *
+     * @param email - The user's email.
+     * @param password - The user's password.
      */
-    dbDeleteUser(email: string): Chainable<void>;
+    dbDeleteUser(email: string, password: string): Chainable<void>;
+
+    // Should Commands
+
+    /**
+     * Asserts that the current location matches the given route.
+     *
+     * @param route - Thee route that should match the location.
+     */
+    locationShouldEqual(route: string): Chainable<void>;
 
     // Base Commands
 

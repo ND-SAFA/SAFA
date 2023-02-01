@@ -12,5 +12,9 @@
     "password": "123",
     "invalidPassword": "invalidPassword",
     "newPassword": "newPassword"
+  },
+  "createUser": {
+    "email": "test-create@test.com",
+    "password": "123"
   }
 }

@@ -4,6 +4,7 @@ addStreamCommands();
 
 import "./baseCommands";
 import "./dbCommands";
+import "./shouldCommands";
 import "./authenticationCommands";
 import "./projectCreatorCommands";
 import "./projectSelectionCommands";

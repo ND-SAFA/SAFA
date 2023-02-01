@@ -4,7 +4,11 @@
     "esModuleInterop": true,
     "target": "es5",
     "lib": ["es5", "dom"],
-    "types": ["cypress", "node", "@lensesio/cypress-websocket-testing"]
+    "types": ["cypress", "node", "@lensesio/cypress-websocket-testing"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"]
+    }
   },
   "include": ["**/*.ts", "**/*.d.ts"],
   "exclude": ["node_modules"]

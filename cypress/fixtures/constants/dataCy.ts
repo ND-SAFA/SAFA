@@ -50,6 +50,7 @@ export enum DataCy {
 
   newAccountEmailInput = "input-new-email",
   newAccountPasswordInput = "input-new-password",
+  createAccountPageButton = "button-create-account-redirect",
   createAccountButton = "button-create-account",
   createAccountLoginButton = "button-create-account-login",
 

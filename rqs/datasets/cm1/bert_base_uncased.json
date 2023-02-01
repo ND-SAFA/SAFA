@@ -22,7 +22,7 @@
             "output_dir": "[OUTPUT_PATH]/cm1/bert-base/models",
             "num_train_epochs": 30,
             "per_device_train_batch_size": 32,
-            "gradient_accumulation_steps": 8,
+            "gradient_accumulation_steps": 12,
             "learning_rate": 5e-6,
             "metrics": [
               "map",

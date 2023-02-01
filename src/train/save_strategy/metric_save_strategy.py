@@ -8,7 +8,7 @@ from train.trace_output.stage_eval import Metrics
 
 class MetricSaveStrategy(AbstractSaveStrategy):
     """
-    Defines save strategy that defines the best metrics as the one greatest across a series of metrics.
+    Defines save strategy that defines the best metrics using a prioritized list of metrics.
     """
 
     def __init__(self, comparison_criterion: ComparisonCriterion, stage: SaveStrategyStage = SaveStrategyStage.EPOCH,
@@ -63,7 +63,7 @@ class MetricSaveStrategy(AbstractSaveStrategy):
         for metric_name in self.comparison_criterion.metrics:
             self_score = self.best_scores[metric_name]
             other_score = metrics[metric_name]
-            if self_score - other_score <= self.delta:
+            if abs(self_score - other_score) <= self.delta:
                 continue
             return self.comparison_function(other_score, self_score)
 

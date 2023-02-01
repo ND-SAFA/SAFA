@@ -61,11 +61,10 @@ if __name__ == "__main__":
                 output_path = os.path.join(step_job_path, "output.json")
                 output_json = FileUtil.read_json_file(output_path)
                 base_entry = {k: v for k, v in output_json["experimental_vars"].items() if k not in IGNORE}
-                
+
                 for epoch_index, metrics in output_json["val_metrics"].items():
-                    metrics_entry = metrics["metrics"]
                     # print(metrics.keys())
-                    entry = {**base_entry, **read_params(metrics_entry, METRICS), "epoch": epoch_index}
+                    entry = {**base_entry, **read_params(metrics, METRICS), "epoch": epoch_index}
                     val_entries.append(entry)
                 if len(output_json["eval_metrics"]) > 0:
                     eval_entries.append({**base_entry, **read_params(output_json["eval_metrics"], METRICS)})

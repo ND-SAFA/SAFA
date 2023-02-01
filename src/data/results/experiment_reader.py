@@ -6,6 +6,7 @@ import pandas as pd
 
 from experiments.experiment_step import ExperimentStep
 from jobs.components.job_result import JobResult
+from train.trainer_tools.trace_accelerator import TraceAccelerator
 from util.file_util import FileUtil
 from util.json_util import JsonUtil
 from util.logging.logger_config import LoggerConfig

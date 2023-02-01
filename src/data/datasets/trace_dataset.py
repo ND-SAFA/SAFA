@@ -308,13 +308,3 @@ class TraceDataset(AbstractDataset):
         :return: the length of the dataset
         """
         return len(self.pos_link_ids) + len(self.neg_link_ids)
-
-    def __add__(self, other: "TraceDataset") -> "TraceDataset":
-        """
-        Combines two datasets
-        :param other: the other dataset
-        :return: the combined dataset
-        """
-        combined_links = deepcopy(self.links)
-        combined_links.update(other.links)
-        return TraceDataset(combined_links)

@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, Optional
 
 from constants import VALIDATION_PERCENTAGE_DEFAULT
 from data.creators.abstract_dataset_creator import AbstractDatasetCreator
@@ -22,7 +22,7 @@ class SplitDatasetCreator(AbstractDatasetCreator):
         self.val_percentage = val_percentage
         self.split_strategy = split_strategy
 
-    def create(self) -> Union[TraceDataset, PreTrainDataset]:
+    def create(self) -> Optional[Union[TraceDataset, PreTrainDataset]]:
         """
         Creation will occur by splitting train dataset in Trainer Dataset Container
         :return: None

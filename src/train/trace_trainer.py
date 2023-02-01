@@ -25,6 +25,7 @@ from train.save_strategy.save_strategy_stage import SaveStrategyStage
 from train.supported_optimizers import SupportedOptimizers
 from train.supported_schedulers import SupportedSchedulers
 from train.trace_accelerator import TraceAccelerator
+from train.trace_output.trace_prediction_output import TracePredictionOutput
 from train.trace_output.trace_train_output import TraceTrainOutput
 from train.trainer_args import TrainerArgs
 from util.file_util import FileUtil
@@ -204,13 +205,13 @@ class TraceTrainer(BaseTrainer):
         should_evaluate = self.save_strategy.should_evaluate(stage, stage_iteration)
 
         if should_evaluate and DatasetRole.VAL in self.trainer_dataset_manager:
-            eval_result = self.perform_prediction(DatasetRole.VAL)
-            previous_best = self.save_strategy.best_score
-            should_save = self.save_strategy.should_save(eval_result, stage_iteration)
+            eval_result: TracePredictionOutput = self.perform_prediction(DatasetRole.VAL)
+            previous_best = self.save_strategy.best_scores
+            should_save = self.save_strategy.should_save(eval_result.metrics, stage_iteration)
             if should_save:
-                current_score = self.save_strategy.get_metric_score(eval_result.metrics)
+                current_scores = self.save_strategy.get_metric_scores(eval_result.metrics)
                 TraceAccelerator.print("-" * 25, "Saving Best Model", "-" * 25)
-                TraceAccelerator.print(f"New Best: {current_score}\tPrevious: {previous_best}")
+                TraceAccelerator.print(f"New Best: {current_scores}\tPrevious: {previous_best}")
                 self.save_model(self.get_output_path(self.BEST_MODEL_NAME))
                 TraceAccelerator.print("-" * 20, "Evaluation Finished.", "-" * 20)
             else:

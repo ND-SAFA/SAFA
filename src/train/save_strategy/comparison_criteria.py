@@ -14,6 +14,9 @@ class ComparisonCriterion(BaseObject):
     comparison_function: Union[ComparisonFunction, str] = SupportedComparisonFunction.MAX
 
     def __post_init__(self):
+        """
+        Initialized single metric into list, retrieves comparison function.
+        """
         if isinstance(self.metrics, str):
             self.metrics = [self.metrics]
         if isinstance(self.comparison_function, str):

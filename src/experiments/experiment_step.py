@@ -4,8 +4,7 @@ from typing import Any, Dict, List, Optional, Type, Union
 
 import math
 
-from config.constants import RUN_ASYNC, EXIT_ON_FAILED_JOB
-from config.override import overrides
+from constants import EXIT_ON_FAILED_JOB, RUN_ASYNC
 from jobs.abstract_job import AbstractJob
 from jobs.abstract_trace_job import AbstractTraceJob
 from jobs.components.job_result import JobResult

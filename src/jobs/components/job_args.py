@@ -1,8 +1,7 @@
 from dataclasses import dataclass
 from typing import Any, Dict
 
-from config.constants import SAVE_OUTPUT_DEFAULT, SAVE_DATASET_SPLITS_DEFAULT
-from constants import SAVE_OUTPUT_DEFAULT
+from constants import SAVE_DATASET_SPLITS_DEFAULT, SAVE_OUTPUT_DEFAULT
 from util.base_object import BaseObject
 
 

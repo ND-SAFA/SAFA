@@ -1,7 +1,7 @@
 import datasets
 from sklearn.metrics import precision_recall_curve
 
-from config.constants import THRESHOLD_DEFAULT, UPPER_RECALL_THRESHOLD
+from constants import THRESHOLD_DEFAULT, UPPER_RECALL_THRESHOLD
 from train.metrics.abstract_trace_metric import AbstractTraceMetric
 from util.logging.logger_manager import logger
 

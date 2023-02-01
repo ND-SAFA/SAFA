@@ -171,9 +171,10 @@ class ExperimentReader:
         group_metrics = [c for c in df.columns if c not in metrics and c != "random_seed"]
         if len(group_metrics) > 0:
             df = df.sort_values(by=group_metrics)
-            logger.info(df.groupby(group_metrics)[display_metrics].mean())
+            output_df = df.groupby(group_metrics)[display_metrics].mean()
         else:
-            logger.info(df[display_metrics].mean())
+            output_df = df[display_metrics].mean()
+        logger.info(output_df.to_string())
 
     @staticmethod
     def ls_jobs(path: str, **kwargs) -> List[str]:

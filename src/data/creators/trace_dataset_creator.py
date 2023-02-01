@@ -2,7 +2,6 @@ from typing import Dict, List, Set, Tuple, Type
 
 import pandas as pd
 
-from config.constants import ALLOW_MISSING_SOURCE, ALLOW_MISSING_TARGET
 from config.override import overrides
 from data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from data.readers.abstract_project_reader import AbstractProjectReader
@@ -26,6 +25,8 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
     Responsible for creating TraceDataset from DataFrames containing artifacts, traces, and
     layer mappings.
     """
+
+    ALLOW_MISSING_SOURCE, ALLOW_MISSING_TARGET = False, False
 
     def __init__(self, project_reader: AbstractProjectReader, data_cleaner: DataCleaner = None,
                  filter_unlinked_artifacts: bool = False):
@@ -80,8 +81,8 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         Checks that trace links reference known artifacts.
         :return: None
         """
-        valid_traces = self._filter_unreferenced_traces(self.artifact_df, self.trace_df, ALLOW_MISSING_SOURCE,
-                                                        ALLOW_MISSING_TARGET)
+        valid_traces = self._filter_unreferenced_traces(self.artifact_df, self.trace_df, self.ALLOW_MISSING_SOURCE,
+                                                        self.ALLOW_MISSING_TARGET)
         self.trace_df = pd.DataFrame(valid_traces)
 
     def _clean_artifact_tokens(self) -> None:

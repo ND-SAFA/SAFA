@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
-from typing import Any, Callable
+from typing import Any, Callable, Dict
 
 from train.save_strategy.save_strategy_stage import SaveStrategyStage
-from train.trace_output.trace_prediction_output import TracePredictionOutput
+from train.trace_output.stage_eval import Metrics
 from util.base_object import BaseObject
 from util.enum_util import FunctionalWrapper
 
@@ -14,8 +14,8 @@ class SupportedComparisonFunction:
     Represents the different ways to compare metrics scores.
     Note, this is not an enum because functional wrapper break deepcopy method.
     """
-    MAX = FunctionalWrapper(lambda a, b: b is None or a >= b)
-    MIN = FunctionalWrapper(lambda a, b: b is None or a <= b)
+    MAX = FunctionalWrapper(lambda a, b: b is None or a > b)
+    MIN = FunctionalWrapper(lambda a, b: b is None or a < b)
 
 
 class AbstractSaveStrategy(BaseObject, ABC):
@@ -24,7 +24,10 @@ class AbstractSaveStrategy(BaseObject, ABC):
     """
 
     def __init__(self):
-        self.stage_evaluations = {}
+        """
+        Constructs save strategy with empty evaluations.
+        """
+        self.stage_evaluations: Dict[int, Metrics] = {}
 
     @abstractmethod
     def should_evaluate(self, stage: SaveStrategyStage, stage_iteration: int) -> bool:
@@ -36,11 +39,11 @@ class AbstractSaveStrategy(BaseObject, ABC):
         """
 
     @abstractmethod
-    def should_save(self, evaluation_result: TracePredictionOutput, id: int) -> bool:
+    def should_save(self, metrics: Metrics, id: int) -> bool:
         """
         Returns whether current model state should be saved.
-        :param evaluation_result: The results of evaluating the model.
+        :param metrics: The results of evaluating the model.
         :param id: The id of the evaluation result.
         :return: True if model should be saved otherwise false.
         """
-        self.stage_evaluations[id] = evaluation_result
+        self.stage_evaluations[id] = metrics

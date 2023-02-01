@@ -8,11 +8,10 @@ import torch
 import torch.nn.functional as F
 from transformers import AutoModel, get_constant_schedule_with_warmup
 
-from config.override import overrides
 from data.datasets.dataset_role import DatasetRole
-from data.managers.trainer_dataset_manager import TrainerDatasetManager
 from data.datasets.pre_train_dataset import PreTrainDataset
 from data.datasets.trace_dataset import TraceDataset
+from data.managers.trainer_dataset_manager import TrainerDatasetManager
 from models.gan.discriminator import Discriminator
 from models.gan.generator import Generator
 from models.model_manager import ModelManager
@@ -20,6 +19,7 @@ from train.base_trainer import BaseTrainer
 from train.gan.gan_dataset_converter import GanDatasetConverter
 from train.trainer_args import TrainerArgs
 from util.logging.logger_manager import logger
+from util.override import overrides
 
 
 class GanTrainer(BaseTrainer):

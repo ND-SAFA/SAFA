@@ -8,7 +8,7 @@ from transformers import AutoModelForSequenceClassification
 from transformers.models.bert.configuration_bert import BertConfig
 from transformers.models.bert.tokenization_bert import BertTokenizer
 
-from config.constants import DELETE_TEST_OUTPUT
+from constants import DELETE_TEST_OUTPUT
 from data.processing.cleaning.data_cleaner import DataCleaner
 from data.processing.cleaning.supported_data_cleaning_step import SupportedDataCleaningStep
 from data.tree.artifact import Artifact

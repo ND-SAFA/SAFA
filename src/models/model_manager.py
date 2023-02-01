@@ -7,7 +7,7 @@ from transformers.modeling_utils import PreTrainedModel
 from transformers.models.auto.tokenization_auto import AutoTokenizer
 from transformers.tokenization_utils import PreTrainedTokenizer
 
-from config.constants import MAX_SEQ_LENGTH_DEFAULT
+from constants import MAX_SEQ_LENGTH_DEFAULT
 from models.model_properties import ModelArchitectureType, ModelSize, ModelTask
 from util.base_object import BaseObject
 

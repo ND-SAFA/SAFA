@@ -1,7 +1,6 @@
 from abc import ABC
 from typing import Any, Optional, Type
 
-from config.override import overrides
 from data.managers.deterministic_trainer_dataset_manager import DeterministicTrainerDatasetManager
 from data.managers.trainer_dataset_manager import TrainerDatasetManager
 from jobs.abstract_job import AbstractJob
@@ -12,6 +11,7 @@ from train.trace_trainer import TraceTrainer
 from train.trainer_args import TrainerArgs
 from util.base_object import BaseObject
 from util.file_util import FileUtil
+from util.override import overrides
 from util.reflection_util import ReflectionUtil
 from variables.definition_variable import DefinitionVariable
 

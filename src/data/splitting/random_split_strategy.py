@@ -1,6 +1,6 @@
-from config.override import overrides
-from data.splitting.abstract_split_strategy import AbstractSplitStrategy
 from data.datasets.trace_dataset import TraceDataset
+from data.splitting.abstract_split_strategy import AbstractSplitStrategy
+from util.override import overrides
 
 
 class RandomSplitStrategy(AbstractSplitStrategy):

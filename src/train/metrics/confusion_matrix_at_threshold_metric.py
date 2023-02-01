@@ -1,6 +1,6 @@
 import datasets
 
-from config.constants import THRESHOLD_DEFAULT
+from constants import THRESHOLD_DEFAULT
 from train.metrics.abstract_trace_metric import AbstractTraceMetric
 
 _DESCRIPTION = """

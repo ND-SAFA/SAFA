@@ -1,11 +1,11 @@
 from typing import Union, Optional
 
-from config.constants import VALIDATION_PERCENTAGE_DEFAULT
+from constants import VALIDATION_PERCENTAGE_DEFAULT
 from data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from data.datasets.pre_train_dataset import PreTrainDataset
-from data.splitting.supported_split_strategy import SupportedSplitStrategy
 from data.datasets.trace_dataset import TraceDataset
 from data.processing.cleaning.data_cleaner import DataCleaner
+from data.splitting.supported_split_strategy import SupportedSplitStrategy
 
 
 class SplitDatasetCreator(AbstractDatasetCreator):

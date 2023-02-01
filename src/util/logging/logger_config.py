@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from config.constants import LOG_LEVEL_DEFAULT, LOG_FILE_DEFAULT, VERBOSE_DEFAULT, LOG_TO_CONSOLE_DEFAULT
+from constants import LOG_FILE_DEFAULT, LOG_LEVEL_DEFAULT, LOG_TO_CONSOLE_DEFAULT, VERBOSE_DEFAULT
 
 
 @dataclass

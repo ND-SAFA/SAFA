@@ -9,6 +9,8 @@ from jobs.components.job_result import JobResult
 from train.trainer_tools.trace_accelerator import TraceAccelerator
 from util.file_util import FileUtil
 from util.json_util import JsonUtil
+from util.logging.logger_config import LoggerConfig
+from util.logging.logger_manager import LoggerManager, logger
 
 METRICS = ["map", "map@1", "map@2", "map@3", "ap", "f2", "f1", "precision@1", "precision@2", "precision@3"]
 DISPLAY_METRICS = ["map", "f2"]
@@ -45,13 +47,15 @@ class ExperimentReader:
             self.display_metrics = DISPLAY_METRICS
         self.eval_df = None
         self.val_df = None
+        self.log_dir = os.path.join(experiment_path, "logs")
+        LoggerManager.configure_logger(LoggerConfig(output_dir=self.log_dir))
 
     def print_eval(self) -> None:
         """
         Prints the evaluation metrics.
         :return: None
         """
-        TraceAccelerator.print(self.HEADER, "Evaluation Results", self.HEADER)
+        logger.log_with_title("Evaluation Results", "")
         eval_df = self.get_eval_df()
         self.print_results(eval_df, self.metrics, self.display_metrics)
 
@@ -60,7 +64,7 @@ class ExperimentReader:
         Prints the validation metrics of experiment.
         :return: None
         """
-        TraceAccelerator.print(self.HEADER, "Validation Results", self.HEADER)
+        logger.log_with_title("Validation Results", "")
         val_df = self.get_val_df()
         self.print_results(val_df, self.metrics, self.display_metrics)
 
@@ -117,9 +121,7 @@ class ExperimentReader:
         JsonUtil.require_properties(job_result, [JobResult.VAL_METRICS])
         val_metric_entries = []
         for epoch_index, val_metric_entry in job_result[JobResult.VAL_METRICS].items():
-            JsonUtil.require_properties(val_metric_entry, [JobResult.METRICS])
-            metrics_entry = val_metric_entry[JobResult.METRICS]
-            metric_entry = {**base_entry, **JsonUtil.read_params(metrics_entry, metric_names), entry_id_key: epoch_index}
+            metric_entry = {**base_entry, **JsonUtil.read_params(val_metric_entry, metric_names), entry_id_key: epoch_index}
             val_metric_entries.append(metric_entry)
         return val_metric_entries
 
@@ -168,9 +170,9 @@ class ExperimentReader:
 
         group_metrics = [c for c in df.columns if c not in metrics and c != "random_seed"]
         if len(group_metrics) > 0:
-            TraceAccelerator.print(df.groupby(group_metrics)[display_metrics].mean())
+            logger.info(df.groupby(group_metrics)[display_metrics].mean())
         else:
-            TraceAccelerator.print(df[display_metrics].mean())
+            logger.info(df[display_metrics].mean())
 
     @staticmethod
     def ls_jobs(path: str, **kwargs) -> List[str]:

@@ -2,8 +2,11 @@ package edu.nd.crc.safa.features.flatfiles.parser.formats.csv;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
@@ -13,6 +16,8 @@ import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.flatfiles.parser.base.AbstractArtifactFile;
 import edu.nd.crc.safa.utilities.CsvFileUtilities;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -96,6 +101,17 @@ public class CsvArtifactFile extends AbstractArtifactFile<CSVRecord> {
                 ? entityRecord.get(Constants.SUMMARY_PARAM) : "";
             String artifactContent = entityRecord.get(Constants.CONTENT_PARAM);
 
+            Map<String, JsonNode> recordAttributes = new HashMap<>();
+
+            for (Map.Entry<String, String> entry : entityRecord.toMap().entrySet()) {
+                String key = entry.getKey();
+                String value = entry.getValue();
+
+                if (!Constants.ALL_COLUMNS_SET.contains(key)) {
+                    recordAttributes.put(key, TextNode.valueOf(value));
+                }
+            }
+
             artifactSummary = artifactSummary == null ? "" : artifactSummary;
             artifactContent = artifactContent == null ? "" : artifactContent;
             ArtifactAppEntity artifactAppEntity = new ArtifactAppEntity(
@@ -105,7 +121,7 @@ public class CsvArtifactFile extends AbstractArtifactFile<CSVRecord> {
                 artifactSummary,
                 artifactContent,
                 DocumentType.ARTIFACT_TREE,
-                new Hashtable<>()
+                recordAttributes
             );
 
             if (this.documentType == DocumentType.SAFETY_CASE) {
@@ -157,5 +173,7 @@ public class CsvArtifactFile extends AbstractArtifactFile<CSVRecord> {
         public static final String[] REQUIRED_COLUMNS = new String[]{NAME_PARAM, CONTENT_PARAM};
         public static final String[] ALL_COLUMNS = new String[]{NAME_PARAM, SUMMARY_PARAM, CONTENT_PARAM,
             LOGIC_TYPE_PARAM, SAFETY_CASE_TYPE_PARAM};
+
+        public static final Set<String> ALL_COLUMNS_SET = new HashSet<>(List.of(ALL_COLUMNS));
     }
 }

@@ -16,22 +16,28 @@
             }
           },
           "model_manager": {
-            "model_path": "bert-base-uncased"
+            "model_path": "prajjwal1/bert-tiny"
           },
           "trainer_args": {
-            "output_dir": "[OUTPUT_PATH]/cm1/bert-base/models",
-            "num_train_epochs": 30,
-            "per_device_train_batch_size": 32,
-            "gradient_accumulation_steps": 12,
-            "learning_rate": 1e-6,
+            "output_dir": "[OUTPUT_PATH]/test/models",
+            "num_train_epochs": 10,
+            "gradient_accumulation_steps": {
+              "*": [
+                1,
+                7,
+                9,
+                11
+              ]
+            },
+            "learning_rate": 5e-6,
             "metrics": [
               "map",
               "map_at_k",
               "f",
               "precision"
             ],
-            "skip_save": false,
-            "load_best_model_at_end": true
+            "skip_save": true,
+            "load_best_model_at_end": false
           },
           "trainer_dataset_manager": {
             "train_dataset_creator": {
@@ -39,8 +45,7 @@
               "project_reader": {
                 "object_type": "STRUCTURE",
                 "project_path": "[DATA_PATH]/cm1"
-              },
-              "filter_unlinked_artifacts": true
+              }
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",
@@ -64,5 +69,5 @@
       ]
     }
   ],
-  "output_dir": "[OUTPUT_PATH]/cm1/bert-base/jobs"
+  "output_dir": "[OUTPUT_PATH]/test/jobs"
 }

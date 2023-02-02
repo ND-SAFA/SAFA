@@ -86,15 +86,15 @@ class TraceTrainer(BaseTrainer):
                                                                                    self.get_train_dataloader(),
                                                                                    resume_from_checkpoint)
         model = TraceAccelerator.prepare_model(model)
-        logger.info(f"Number of GPUS: {TraceAccelerator.num_processes}. Torch devices: {torch.cuda.device_count()}")
+        logger.info(f"Number of workers: {TraceAccelerator.num_processes}. GPUs devices: {torch.cuda.device_count()}")
         global_step = 0
         training_loss = 0
         training_metrics = {}
         epoch_loss = 0
         accelerate_tqdm = partial(tqdm, disable=not TraceAccelerator.is_main_process, position=0)
         for epoch_index in range(self.trainer_args.num_train_epochs):
-            with TraceAccelerator.accumulate(model):
-                for batch_index, batch in enumerate(accelerate_tqdm(train_data_loader)):
+            for batch_index, batch in enumerate(accelerate_tqdm(train_data_loader)):
+                with TraceAccelerator.accumulate(model):
                     batch = batch.to(TraceAccelerator.device)
 
                     labels = batch.pop(DataKey.LABELS_KEY)
@@ -194,6 +194,8 @@ class TraceTrainer(BaseTrainer):
         :param epoch_iteration: The index of epoch performed.
         :return: None
         """
+        if self.trainer_args.eval_on_each_epoch and DatasetRole.EVAL in self.trainer_dataset_manager:
+            self.perform_prediction(DatasetRole.EVAL)
         self.conditional_evaluate(SaveStrategyStage.EPOCH, epoch_iteration)
         self.save_model(self.get_output_path(self.CURRENT_MODEL_NAME))
 
@@ -207,11 +209,11 @@ class TraceTrainer(BaseTrainer):
         should_evaluate = self.save_strategy.should_evaluate(stage, stage_iteration)
 
         if should_evaluate and DatasetRole.VAL in self.trainer_dataset_manager:
-            eval_result: TracePredictionOutput = self.perform_prediction(DatasetRole.VAL)
+            val_prediction_output: TracePredictionOutput = self.perform_prediction(DatasetRole.VAL)
             previous_best = self.save_strategy.best_scores
-            should_save = self.save_strategy.should_save(eval_result.metrics, stage_iteration)
+            should_save = self.save_strategy.should_save(val_prediction_output.metrics, stage_iteration)
             if should_save:
-                current_score = self.save_strategy.get_metric_scores(eval_result.metrics)
+                current_score = self.save_strategy.get_metric_scores(val_prediction_output.metrics)
                 logger.log_with_title("Saving Best Model", f"New Best: {current_score}\tPrevious: {previous_best}")
                 self.save_model(self.get_output_path(self.BEST_MODEL_NAME))
                 logger.log_with_title("Evaluation Finished.", "")

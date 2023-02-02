@@ -39,8 +39,6 @@ class BaseSplitTest(BaseTraceTest):
         self.assertLessEqual(abs(len(split1) - (len(self.all_links) - expected_val_link_size)), 1)
         self.assertLessEqual(abs(len(split2) - expected_val_link_size), 1)
         intersection = set(split1.links.keys()).intersection(set(split2.links.keys()))
-        for t_id in intersection:
-            print(trace_dataset.links[t_id])
         self.assertEquals(len(intersection), 0)
 
         for split in [split1, split2]:

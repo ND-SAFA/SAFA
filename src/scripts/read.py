@@ -5,6 +5,8 @@ import sys
 
 from dotenv import load_dotenv
 
+from util.logging.logger_manager import logger
+
 load_dotenv()
 
 ROOT_PATH = os.path.expanduser(os.environ["ROOT_PATH"])
@@ -43,8 +45,8 @@ if __name__ == "__main__":
 
     result_reader = ExperimentReader(OUTPUT_DIR)
     val_df, eval_df = result_reader.read()
-    print("Validation:", len(val_df))
-    print("Evaluation:", len(eval_df))
+    logger.log_with_title("Validation:", str(len(val_df)))
+    logger.log_with_title("Evaluation:", str(len(eval_df)))
 
     """
     Export Results
@@ -53,7 +55,7 @@ if __name__ == "__main__":
     eval_output_path = os.path.join(OUTPUT_DIR, "results-eval.csv")
     val_df.to_csv(val_output_path, index=False)
     eval_df.to_csv(eval_output_path, index=False)
-    print(f"Exported files: {eval_output_path} & {val_output_path}")
+    logger.info(f"Exported files: {eval_output_path} & {val_output_path}")
     """
     Push to bucket and tensorboard (TODO)
     """

@@ -25,6 +25,7 @@ class TGenLogger(Logger):
         :param message: The message
         :return: None
         """
+        message = "" if message is None else message
         title_border = '-' * min(max(round(len(message) / 2), 10), 50)
         title = f"{title_border} {title} {title_border}"
         msg = f"{title}\n{message}"

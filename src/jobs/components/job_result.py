@@ -4,6 +4,7 @@ from drf_yasg.openapi import FORMAT_UUID, Schema, TYPE_INTEGER, TYPE_STRING
 
 from train.save_strategy.comparison_criteria import ComparisonCriterion
 from train.trace_output.abstract_trace_output import AbstractTraceOutput
+from train.trainer_args import TrainerArgs
 from util.base_object import BaseObject
 from util.json_util import JsonUtil
 from util.status import Status
@@ -129,6 +130,19 @@ class JobResult(BaseObject):
             if key in JobResult._properties:
                 properties[key] = JobResult._properties[key]
         return properties
+
+    def get_printable_experiment_vars(self) -> str:
+        """
+        Gets the experimental vars as a string which can be printed
+        :return: Experimental vars as a string
+        """
+        if JobResult.EXPERIMENTAL_VARS not in self or len(self[JobResult.EXPERIMENTAL_VARS]) < 1:
+            return repr(None)
+        printable = {}
+        for name, val in self[JobResult.EXPERIMENTAL_VARS].items():
+            if not isinstance(val, BaseObject) and not isinstance(val, TrainerArgs):
+                printable[name] = val
+        return repr(printable)
 
     def is_better_than(self, other: "JobResult", comparison_criterion: ComparisonCriterion = None) -> bool:
         """

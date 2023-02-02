@@ -1,14 +1,8 @@
-import { Routes, validUser, DataCy } from "@/fixtures";
+import { DataCy } from "@/fixtures";
 
 describe("Job Status", () => {
   beforeEach(() => {
-    cy.dbResetJobs().dbResetProjects();
-
-    cy.visit(Routes.PROJECT_CREATOR)
-      .login(validUser.email, validUser.password)
-      .locationShouldEqual(Routes.PROJECT_CREATOR);
-
-    cy.createBulkProject();
+    cy.initProject(false);
   });
 
   describe("I can see the current status of a job", () => {

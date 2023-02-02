@@ -208,6 +208,10 @@ export enum DataCy {
 
   // Project settings
 
+  projectSettingsDownloadButton = "button-settings-download",
+  projectSettingsEditButton = "button-settings-edit",
+  projectSettingsDeleteButton = "button-settings-delete",
+
   projectSettingsAddEmail = "settings-input-user-email",
   projectSettingsAddRole = "settings-input-user-role",
   projectSettingsAddToProject = "button-add-user-to-project",

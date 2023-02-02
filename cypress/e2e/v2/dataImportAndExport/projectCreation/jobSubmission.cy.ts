@@ -1,14 +1,8 @@
-import { Routes, validUser, DataCy } from "@/fixtures";
+import { DataCy } from "@/fixtures";
 
 describe("Job Submission", () => {
   beforeEach(() => {
-    cy.dbResetJobs().dbResetProjects();
-
-    cy.visit(Routes.PROJECT_CREATOR)
-      .login(validUser.email, validUser.password)
-      .locationShouldEqual(Routes.PROJECT_CREATOR);
-
-    cy.createBulkProject();
+    cy.initProject(false);
   });
 
   describe("I can create a job", () => {
@@ -21,9 +15,13 @@ describe("Job Submission", () => {
     it("Shows a list of imported projects", () => {
       cy.clickButtonWithName("Project Uploads");
 
-      cy.withinTableRows(DataCy.jobTable, (tr) => {
-        tr.should("have.length.above", 1);
-      });
+      cy.withinTableRows(
+        DataCy.jobTable,
+        (tr) => {
+          tr.should("have.length.above", 1);
+        },
+        false
+      );
     });
   });
 

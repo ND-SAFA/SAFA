@@ -106,7 +106,7 @@ Cypress.Commands.add("dbResetVersions", () => {
           );
           cy.request({
             method: "POST",
-            url: `${apiUrl}/projects/${projectId}/versions/minor`,
+            url: `${apiUrl}/projects/${projectId}/versions/revision`,
           });
         });
       });

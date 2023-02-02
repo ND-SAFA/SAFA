@@ -1,11 +1,28 @@
 <template>
   <flex-box wrap b="2" v-if="doDisplay">
-    <text-button text icon-id="mdi-download" @click="handleDownload">
+    <text-button
+      text
+      icon-id="mdi-download"
+      data-cy="button-settings-download"
+      @click="handleDownload"
+    >
       Download
     </text-button>
-    <text-button text variant="edit" @click="handleEdit"> Edit </text-button>
+    <text-button
+      text
+      variant="edit"
+      data-cy="button-settings-edit"
+      @click="handleEdit"
+    >
+      Edit
+    </text-button>
     <v-divider vertical />
-    <text-button text variant="delete" @click="handleDelete">
+    <text-button
+      text
+      variant="delete"
+      data-cy="button-settings-delete"
+      @click="handleDelete"
+    >
       Delete
     </text-button>
     <project-identifier-modal

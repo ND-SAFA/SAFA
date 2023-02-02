@@ -13,11 +13,11 @@ Cypress.Commands.add("openUploadFiles", () => {
 Cypress.Commands.add("projectSelectorContinue", (select) => {
   if (select === "project") {
     cy.withinTableRows(DataCy.selectionProjectList, (tr) => {
-      tr.last().click();
+      tr.eq(1).click();
     });
   } else if (select === "version") {
     cy.withinTableRows(DataCy.selectionVersionList, (tr) => {
-      tr.last().click();
+      tr.eq(1).click();
     });
   } else {
     cy.clickButton(DataCy.stepperContinueButton);

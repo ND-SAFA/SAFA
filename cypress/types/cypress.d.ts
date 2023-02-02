@@ -178,10 +178,12 @@ declare namespace Cypress {
      *
      * @param dataCy - The testing selector of the table.
      * @param fn - A callback run on each row of the table.
+     * @param waitForLoad - Defaults to true. Waits for the table to stop loading.
      */
     withinTableRows(
       dataCy: string,
-      fn: (tr: Chainable<JQuery<HTMLElement>>) => void
+      fn: (tr: Chainable<JQuery<HTMLElement>>) => void,
+      waitForLoad?: boolean
     ): Chainable<void>;
 
     // Authentication Commands
@@ -202,22 +204,40 @@ declare namespace Cypress {
     // Project Creation
 
     /**
+     * Clears the DB of existing projects and jobs.
+     * Logs into the create project page and creates an empty project.
+     * The user will remain logged in on the open project page.
+     */
+    initEmptyProject(): Chainable<void>;
+
+    /**
+     * Clears the DB of existing projects and jobs.
+     * Logs into the create project page and creates a bulk project.
+     * The user will remain logged in on the job status page.
+     *
+     * @param waitForComplete - Defaults to true. Whether to wait for the creation job to complete.
+     */
+    initProject(waitForComplete?: boolean): Chainable<void>;
+
+    /**
+     * @deprecated
+     * Creates a new bulk upload project.
+     */
+    createBulkProject(): Chainable<void>;
+
+    /**
+     * @deprecated
+     * Logs into the create project page, uploads a project, and waits for it to complete.
+     * The user will be logged out.
+     */
+    loadNewProject(): Chainable<void>;
+
+    /**
      * Setting the project name and description within the project creator.
      *
      * @param type - The type of project identifier to set.
      */
     setProjectIdentifier(type: "bulk" | "standard" | "modal"): Chainable<void>;
-
-    /**
-     * TODO: Work in progress.
-     * Loads a new project and quickly waits for its upload.
-     */
-    loadProject(): Chainable<void>;
-
-    /**
-     * Creates a new bulk upload project.
-     */
-    createBulkProject(): Chainable<void>;
 
     /**
      * Opens the last file panel after waiting for it to close when files are parsed.
@@ -273,11 +293,6 @@ declare namespace Cypress {
      * Waits for the most recent job to complete.
      */
     waitForJobLoad(): Chainable<void>;
-
-    /**
-     * Logs into the create project page, uploads a project, and waits for it to complete.
-     */
-    loadNewProject(): Chainable<void>;
 
     // Project Selection
 
@@ -485,12 +500,11 @@ declare namespace Cypress {
 
     /**
      * Navigates to the Approve Generated Trace Links page.
-     *
      */
     openApproveGeneratedTraceLinks(): Chainable<void>;
+
     /**
      * Loads in a new project with generated trace links.
-     *
      */
     loadNewGeneratedProject(): Chainable<void>;
   }

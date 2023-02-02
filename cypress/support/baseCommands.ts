@@ -76,11 +76,14 @@ Cypress.Commands.add("closeModal", (dataCy) => {
   cy.getCy(dataCy).within(() => cy.clickButton(DataCy.modalCloseButton));
 });
 
-Cypress.Commands.add("withinTableRows", (dataCy, fn) => {
+Cypress.Commands.add("withinTableRows", (dataCy, fn, waitForLoad = true) => {
   cy.getCy(dataCy)
     .should("be.visible")
     .within(() => {
-      cy.get(".v-data-table__progress").should("not.exist");
+      if (waitForLoad) {
+        cy.get(".v-data-table__progress").should("not.exist");
+      }
+
       fn(cy.get("tr"));
     });
 });

@@ -10,8 +10,8 @@
           "model_manager": {
             "model_path": {
               "*": [
-                "[OUTPUT_PATH]/test_random_selection/models/052a77f3-29d3-4bc0-a11f-bbfb04073869/best",
-                "[OUTPUT_PATH]/test_random_selection/models/052a77f3-29d3-4bc0-a11f-bbfb04073869/random_epoch_6"
+                "[OUTPUT_PATH]/test_random_selection/models/c10096c1-d9e5-47f2-9faa-b21ee893d00c/best",
+                "[OUTPUT_PATH]/test_random_selection/models/c10096c1-d9e5-47f2-9faa-b21ee893d00c/random_epoch_6"
               ]
             }
           },

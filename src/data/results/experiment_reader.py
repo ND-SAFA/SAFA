@@ -47,7 +47,7 @@ class ExperimentReader:
         self.eval_df = None
         self.val_df = None
         self.log_dir = os.path.join(experiment_path, "logs")
-        
+
     def print_eval(self) -> None:
         """
         Prints the evaluation metrics.
@@ -104,8 +104,7 @@ class ExperimentReader:
 
     @staticmethod
     def read_validation_entries(job_result: Dict, metric_names: List[str], base_entry: Dict = None, entry_id_key: str = "epoch") -> \
-            List[
-                Dict]:
+            List[Dict]:
         """
         Reads the validation metrics for job result
         :param job_result: The result of a job run.
@@ -116,8 +115,10 @@ class ExperimentReader:
         """
         if base_entry is None:
             base_entry = {}
-        JsonUtil.require_properties(job_result, [JobResult.VAL_METRICS])
         val_metric_entries = []
+        if JobResult.VAL_METRICS not in job_result:
+            return val_metric_entries
+
         for epoch_index, val_metric_entry in job_result[JobResult.VAL_METRICS].items():
             metric_entry = {**base_entry, **JsonUtil.read_params(val_metric_entry, metric_names), entry_id_key: epoch_index}
             val_metric_entries.append(metric_entry)
@@ -134,9 +135,9 @@ class ExperimentReader:
         """
         if base_entry is None:
             base_entry = {}
-        JsonUtil.require_properties(job_result, [JobResult.EVAL_METRICS])
-        if len(job_result[JobResult.EVAL_METRICS]) > 0:
-            return {**base_entry, **JsonUtil.read_params(job_result[JobResult.EVAL_METRICS], metrics)}
+        metric_key = ExperimentReader.find_eval_key(job_result, [JobResult.EVAL_METRICS, JobResult.METRICS])
+        if metric_key is not None and len(job_result[metric_key]) > 0:
+            return {**base_entry, **JsonUtil.read_params(job_result[metric_key], metrics)}
         return None
 
     @staticmethod
@@ -170,8 +171,10 @@ class ExperimentReader:
         if len(group_metrics) > 0:
             df = df.sort_values(by=group_metrics)
             output_df = df.groupby(group_metrics)[display_metrics].mean()
-        else:
+        elif all([c in df.columns for c in display_metrics]):
             output_df = df[display_metrics].mean()
+        else:
+            output_df = df
         logger.info(output_df.to_string())
 
     @staticmethod
@@ -183,3 +186,16 @@ class ExperimentReader:
         :return: List of jobs in path.
         """
         return FileUtil.ls_filter(path, f=lambda p: len(p.split("-")) == 5, **kwargs)
+
+    @staticmethod
+    def find_eval_key(dict_obj: Dict, keys: List[str]) -> Optional[str]:
+        """
+        Returns key found in output dictionary. Return none if none found.
+        :param dict_obj: The object to search key in.
+        :param keys: The keys to search object key.
+        :return: Key found in object.
+        """
+        for k in keys:
+            if k in dict_obj:
+                return k
+        return None

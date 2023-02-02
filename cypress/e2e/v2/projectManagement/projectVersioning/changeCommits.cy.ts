@@ -8,12 +8,13 @@ describe("Change Commits", () => {
   beforeEach(() => {
     cy.dbResetVersions();
 
-    cy.expandViewport()
-      .visit(Routes.MY_PROJECTS)
+    cy.visit(Routes.MY_PROJECTS)
       .login(validUser.email, validUser.password)
       .locationShouldEqual(Routes.MY_PROJECTS);
 
-    cy.projectSelectorContinue("project").projectSelectorContinue("version");
+    cy.expandViewport()
+      .projectSelectorContinue("project")
+      .projectSelectorContinue("version");
   });
 
   describe("I can create a commit to change project entities", () => {
@@ -63,8 +64,12 @@ describe("Change Commits", () => {
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
 
       cy.clickButton(DataCy.selectedPanelCloseButton);
+      cy.clickButton(DataCy.snackbarCloseButton);
 
-      cy.getNode(name).click().clickButton(DataCy.selectedPanelEditButton);
+      cy.centerGraph()
+        .getNode(name)
+        .click()
+        .clickButton(DataCy.selectedPanelEditButton);
 
       cy.getCy(DataCy.artifactSaveNameInput)
         .clear()

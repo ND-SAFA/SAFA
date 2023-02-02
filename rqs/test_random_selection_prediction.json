@@ -3,7 +3,7 @@
     {
       "jobs": [
         {
-          "object_type": "TRAIN",
+          "object_type": "PREDICT",
           "job_args": {
             "random_seed": 68
           },

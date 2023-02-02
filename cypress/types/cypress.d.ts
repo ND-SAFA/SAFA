@@ -206,7 +206,7 @@ declare namespace Cypress {
     /**
      * Clears the DB of existing projects and jobs.
      * Logs into the create project page and creates an empty project.
-     * The user will remain logged in on the open project page.
+     * The user will remain logged in on the artifact view page.
      */
     initEmptyProject(): Chainable<void>;
 
@@ -218,6 +218,15 @@ declare namespace Cypress {
      * @param waitForComplete - Defaults to true. Whether to wait for the creation job to complete.
      */
     initProject(waitForComplete?: boolean): Chainable<void>;
+
+    /**
+     * Clears the DB of existing project versions.
+     * Logs into the open project page and creates a new project version.
+     * The user will remain logged in on the artifact view page.
+     *
+     * @param waitForComplete - Defaults to true. Whether to wait for the artifact tree to display nodes.
+     */
+    initProjectVersion(waitForComplete?: boolean): Chainable<void>;
 
     /**
      * @deprecated
@@ -400,6 +409,7 @@ declare namespace Cypress {
     waitForProjectLoad(waitForNodes?: boolean): Chainable<void>;
 
     /**
+     * @deprecated
      * Logs in to the project page and waits for the most recent project to load.
      *
      * @param waitForNodes - If true, this will wait for nodes to be painted on the graph.

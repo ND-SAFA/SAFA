@@ -16,5 +16,9 @@
   "createUser": {
     "email": "test-create@test.com",
     "password": "123"
+  },
+  "inviteUser": {
+    "email": "test-invite@test.com",
+    "invalidEmail": "test-invite-invalid@test.com"
   }
 }

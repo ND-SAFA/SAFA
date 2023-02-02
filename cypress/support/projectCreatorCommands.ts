@@ -35,6 +35,21 @@ Cypress.Commands.add("initProject", (waitForComplete = true) => {
   cy.waitForJobLoad();
 });
 
+Cypress.Commands.add("initProjectVersion", (waitForComplete = true) => {
+  cy.dbResetVersions();
+
+  cy.visit(Routes.MY_PROJECTS)
+    .login(validUser.email, validUser.password)
+    .locationShouldEqual(Routes.MY_PROJECTS);
+
+  cy.expandViewport()
+    .projectSelectorContinue("project")
+    .projectSelectorContinue("version")
+    .locationShouldEqual(Routes.ARTIFACT);
+
+  cy.waitForProjectLoad(waitForComplete);
+});
+
 Cypress.Commands.add("createBulkProject", () => {
   cy.visit("/create?tab=bulk")
     .location("pathname", { timeout: 2000 })

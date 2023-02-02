@@ -1,4 +1,4 @@
-import { DataCy, Routes, validUser } from "@/fixtures";
+import { DataCy } from "@/fixtures";
 
 describe("Change Commits", () => {
   before(() => {
@@ -6,15 +6,7 @@ describe("Change Commits", () => {
   });
 
   beforeEach(() => {
-    cy.dbResetVersions();
-
-    cy.visit(Routes.MY_PROJECTS)
-      .login(validUser.email, validUser.password)
-      .locationShouldEqual(Routes.MY_PROJECTS);
-
-    cy.expandViewport()
-      .projectSelectorContinue("project")
-      .projectSelectorContinue("version");
+    cy.initProjectVersion();
   });
 
   describe("I can create a commit to change project entities", () => {

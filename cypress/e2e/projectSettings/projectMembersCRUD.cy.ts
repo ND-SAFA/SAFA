@@ -21,6 +21,7 @@ describe("Project Members CRUD", () => {
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
     });
   });
+
   describe("As an owner, I can edit a project member’s permissions", () => {
     it("Can edit the permissions of a project member", () => {
       cy.clickButton(DataCy.projectSettingsEditUserButton);

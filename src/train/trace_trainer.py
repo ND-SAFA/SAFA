@@ -113,6 +113,7 @@ class TraceTrainer(BaseTrainer):
             epoch_loss = 0
             scheduler.step()
             self.on_epoch(epoch_index)
+
         return TraceTrainOutput(global_step=global_step, training_loss=training_loss, metrics=training_metrics,
                                 val_metrics=self.save_strategy.stage_evaluations)
 
@@ -139,6 +140,7 @@ class TraceTrainer(BaseTrainer):
         eval_labels, eval_predictions = TraceAccelerator.gather((eval_labels, eval_predictions))
         eval_predictions = eval_predictions.cpu().numpy()[:len(test_dataset)]
         eval_labels = eval_labels.cpu().numpy()[:len(test_dataset)]
+        self.model.train()
         return PredictionOutput(predictions=eval_predictions, label_ids=eval_labels, metrics={})
 
     def create_or_load_state(self, model: PreTrainedModel, data_loader: DataLoader, resume_from_checkpoint: Optional[str] = None) \

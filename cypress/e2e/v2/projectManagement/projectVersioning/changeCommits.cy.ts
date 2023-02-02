@@ -15,11 +15,7 @@ describe("Change Commits", () => {
 
       cy.getCy(DataCy.navUndoButton).should("have.class", "disable-events");
 
-      cy.createNewArtifact({ name }, true);
-
-      cy.getCy(DataCy.snackbarSuccess).should("be.visible");
-
-      cy.clickButton(DataCy.selectedPanelCloseButton);
+      cy.createNewArtifact({ name }, true, true);
 
       cy.getNode(name).should("be.visible");
       cy.getCy(DataCy.navUndoButton).should("not.have.class", "disable-events");
@@ -30,12 +26,7 @@ describe("Change Commits", () => {
     it("Undoes a created artifact", () => {
       const name = "Test Undo Artifact";
 
-      cy.createNewArtifact({ name }, true);
-
-      cy.getCy(DataCy.snackbarSuccess).should("be.visible");
-      cy.getNode(name).should("be.visible");
-
-      cy.clickButton(DataCy.selectedPanelCloseButton);
+      cy.createNewArtifact({ name }, true, true);
 
       cy.getNode(name).should("be.visible");
       cy.getCy(DataCy.navUndoButton).should("not.have.class", "disable-events");
@@ -51,11 +42,7 @@ describe("Change Commits", () => {
       const name = "Test Undo Artifact";
       const changedName = "Test Changed Artifact";
 
-      cy.createNewArtifact({ name }, true);
-
-      cy.getCy(DataCy.snackbarSuccess).should("be.visible");
-
-      cy.clickButton(DataCy.selectedPanelCloseButton);
+      cy.createNewArtifact({ name }, true, true);
       cy.clickButton(DataCy.snackbarCloseButton);
 
       cy.centerGraph()
@@ -134,12 +121,7 @@ describe("Change Commits", () => {
     it("Reverts a deleted artifact", () => {
       const name = "Test Redo Artifact";
 
-      cy.createNewArtifact({ name }, true);
-
-      cy.getCy(DataCy.snackbarSuccess).should("be.visible");
-      cy.getNode(name).should("be.visible");
-
-      cy.clickButton(DataCy.selectedPanelCloseButton);
+      cy.createNewArtifact({ name }, true, true);
 
       cy.getNode(name).should("be.visible");
 

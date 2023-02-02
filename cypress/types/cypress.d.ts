@@ -173,13 +173,6 @@ declare namespace Cypress {
     switchTab(tabLabel: string): Chainable<void>;
 
     /**
-     * Closes a given modal.
-     *
-     * @param dataCy - The testing selector of the modal.
-     */
-    closeModal(dataCy: string): Chainable<void>;
-
-    /**
      * Runs a callback on all rows of a table.
      *
      * @param dataCy - The testing selector of the table.
@@ -355,9 +348,36 @@ declare namespace Cypress {
      */
     createNewVersion(type: "major" | "minor" | "revision"): Chainable<void>;
 
-    // Artifact View
+    // Project Settings
 
     /**
+     * Opens the project settings page.
+     */
+    openProjectSettings(): Chainable<void>;
+
+    // Project Membership
+
+    /**
+     * Adds New member into a project
+     * Must be in project settings.
+     * @param name - Input email of new member.
+     * @param projectRole - Input project role such as "owner", "Editor", "Viewer", "Admin"
+     */
+    projectAddNewMember(name: string, projectRole: string): Chainable<void>;
+
+    // Artifacts
+
+    /**
+     * Fills inputs in the artifact panel.
+     * The artifact name, type, and body will be filled with preset values if not set.
+     * The panel must already be open.
+     *
+     * @param props - The artifact fields to set.
+     */
+    fillArtifactFields(props: ArtifactFields): Chainable<void>;
+
+    /**
+     * @deprecated
      * Fills inputs in the artifact modal.
      * The artifact name, type, and body will be filled with preset values if not set.
      *
@@ -370,8 +390,13 @@ declare namespace Cypress {
      *
      * @param props - The artifact fields to set.
      * @param save - Defaults to false. Whether to save the artifact or keep the panel open.
+     * @param close - Defaults to false. Whether to close the artifact panel after creation.
      */
-    createNewArtifact(props: ArtifactFields, save?: boolean): Chainable<void>;
+    createNewArtifact(
+      props: ArtifactFields,
+      save?: boolean,
+      close?: boolean
+    ): Chainable<void>;
 
     /**
      * @deprecated
@@ -379,7 +404,22 @@ declare namespace Cypress {
      */
     saveArtifact(): Chainable<void>;
 
+    // Trace Links
+
     /**
+     * Fills in inputs within the trace link panel.
+     * The panel must already be open.
+     *
+     * @param sourceName - The name of the source artifact.
+     * @param targetName - The name of the target artifact.
+     */
+    fillTraceLinkFields(
+      sourceName?: string,
+      targetName?: string
+    ): Chainable<void>;
+
+    /**
+     * @deprecated
      * Fills in inputs within the trace link modal.
      *
      * @param sourceName - The name of the source artifact.
@@ -491,8 +531,8 @@ declare namespace Cypress {
     openDocumentEditor(name: string): Chainable<void>;
 
     /**
-     * Fills the document modal fields.
-     * The document modal must be open.
+     * Fills the document fields in the panel.
+     * The document panel must be open.
      *
      * @param props - The document fields to set.
      *                The name will be added if not set.
@@ -514,21 +554,6 @@ declare namespace Cypress {
      * The document modal must be open.
      */
     saveDocument(): Chainable<void>;
-
-    // Project Settings
-
-    /**
-     * Opens the project settings modal.
-     */
-    openProjectSettings(): Chainable<void>;
-
-    /**
-     * Adds New member into a project
-     * Must be in project settings.
-     * @param name - Input email of new member.
-     * @param projectRole - Input project role such as "owner", "Editor", "Viewer", "Admin"
-     */
-    projectAddNewMember(name: string, projectRole: string): Chainable<void>;
 
     // Trace Approval
 

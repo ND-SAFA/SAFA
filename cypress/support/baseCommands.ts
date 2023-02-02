@@ -72,10 +72,6 @@ Cypress.Commands.add("switchTab", (tabLabel) => {
   cy.contains("div", tabLabel).click();
 });
 
-Cypress.Commands.add("closeModal", (dataCy) => {
-  cy.getCy(dataCy).within(() => cy.clickButton(DataCy.modalCloseButton));
-});
-
 Cypress.Commands.add("withinTableRows", (dataCy, fn, waitForLoad = true) => {
   cy.getCy(dataCy)
     .should("be.visible")

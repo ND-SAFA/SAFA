@@ -25,7 +25,6 @@ class LoggerManager:
         """
         if LoggerManager.__logger_is_configured:
             curr_logger = LoggerManager.get_logger()
-            curr_logger.warning("Logger is already configured. Using existing logger.")
             return curr_logger
         LoggerManager.__logger_is_configured = True
         LoggerManager.__logger: TGenLogger = logging.getLogger("tgen")

@@ -69,7 +69,6 @@ class LoggerManager:
         Turns off all logging for hugging face
         :return: None
         """
-        print("Turning off hg logger")
         for module in sys.modules.keys():
             if module.startswith("transformers"):
                 hf_logger = hf_logging.get_logger(module)

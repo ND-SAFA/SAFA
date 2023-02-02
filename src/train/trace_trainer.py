@@ -30,6 +30,7 @@ from train.trainer_tools.trace_accelerator import TraceAccelerator
 from util.file_util import FileUtil
 from util.logging.logger_manager import logger
 from util.override import overrides
+import random
 
 
 class TraceTrainer(BaseTrainer):
@@ -38,6 +39,7 @@ class TraceTrainer(BaseTrainer):
     """
     BEST_MODEL_NAME = "best"
     CURRENT_MODEL_NAME = "current"
+    RANDOM_MODEL_BASE_NAME = "random_epoch_{}"
     OPTIMIZER_FILE_NAME = "optimizer.bin"
     SCHEDULER_FILE_NAME = "scheduler.bin"
 
@@ -48,6 +50,7 @@ class TraceTrainer(BaseTrainer):
         self.__should_prepare_accumulator = True
         self._link_tracker = LinkTrainingTracker(self.trainer_dataset_manager[DatasetRole.TRAIN]) \
             if DatasetRole.TRAIN in self.trainer_dataset_manager else None
+        self.random_epoch, self.random_model_name = self._select_random_epoch()
 
     def train(self, resume_from_checkpoint: str = None, **kwargs) -> TraceTrainOutput:
         """
@@ -198,6 +201,8 @@ class TraceTrainer(BaseTrainer):
             self.perform_prediction(DatasetRole.EVAL)
         self.conditional_evaluate(SaveStrategyStage.EPOCH, epoch_iteration)
         self.save_model(self.get_output_path(self.CURRENT_MODEL_NAME))
+        if self.trainer_args.save_random_model and epoch_iteration == self.random_epoch:
+            self.save_model(self.get_output_path(self.random_model_name))
 
     def conditional_evaluate(self, stage: SaveStrategyStage, stage_iteration: int) -> None:
         """
@@ -255,6 +260,15 @@ class TraceTrainer(BaseTrainer):
         """
         self.optimizer = SupportedOptimizers.create(self.trainer_args.optimizer_name, model)
         self.lr_scheduler = SupportedSchedulers.create(self.trainer_args.scheduler_name, self.optimizer)
+
+    def _select_random_epoch(self) -> Tuple[int, str]:
+        """
+        Selects a epoch randomly in the range of [0, self.trainer_args.num_train_epochs]
+        :return: The selected epoch and the corresponding model directory name to use when saving the model
+        """
+        random_epoch = random.randint(0, self.trainer_args.num_train_epochs)
+        random_model_name = self.RANDOM_MODEL_BASE_NAME.format(random_epoch)
+        return random_epoch, random_model_name
 
     @overrides(Trainer)
     def _get_train_sampler(self) -> Optional[torch.utils.data.Sampler]:

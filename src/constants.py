@@ -1,6 +1,7 @@
+import logging
 import os
 from os.path import abspath, dirname
-import logging
+
 from dotenv import load_dotenv
 
 load_dotenv()

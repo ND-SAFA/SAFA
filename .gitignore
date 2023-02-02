@@ -19,6 +19,9 @@ src/tes/output/runs/**
 # Deployment
 /deployment/**
 
+# Datasets
+datasets/**
+
 # Secrets
 application-credentials.json
 *.pem

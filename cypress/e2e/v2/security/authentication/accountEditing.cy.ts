@@ -3,18 +3,14 @@ import { Routes, editUser, DataCy } from "@/fixtures";
 describe("Account Editing", () => {
   describe("I can edit my password while logged in", () => {
     before(() => {
-      cy.dbDeleteUser(editUser.email, editUser.password);
-
-      cy.visit(Routes.CREATE_ACCOUNT).createNewAccount(
+      cy.dbDeleteUser(editUser.email, editUser.password).createNewAccount(
         editUser.email,
         editUser.password
       );
     });
 
     beforeEach(() => {
-      cy.visit(Routes.ACCOUNT)
-        .login(editUser.email, editUser.password)
-        .locationShouldEqual(Routes.ACCOUNT);
+      cy.loginToPage(editUser.email, editUser.password, Routes.ACCOUNT);
     });
 
     it("Should not be able to change my password without an old and new password set", () => {
@@ -48,14 +44,9 @@ describe("Account Editing", () => {
 
   describe("I can delete my account", () => {
     beforeEach(() => {
-      cy.visit(Routes.CREATE_ACCOUNT).createNewAccount(
-        editUser.email,
-        editUser.password
-      );
+      cy.createNewAccount(editUser.email, editUser.password);
 
-      cy.visit(Routes.ACCOUNT)
-        .login(editUser.email, editUser.password)
-        .locationShouldEqual(Routes.ACCOUNT);
+      cy.loginToPage(editUser.email, editUser.password, Routes.ACCOUNT);
     });
 
     it("Cannot delete my account with an invalid password", () => {

@@ -1,4 +1,5 @@
 /* eslint-disable max-lines */
+
 /**
  * The position of an element within a list.
  */
@@ -30,6 +31,11 @@ declare namespace Cypress {
   interface Chainable<Subject> {
     // Database Cleanup
 
+    /**
+     * Chains together requests that return data.
+     * @param cb - The request options that return data.
+     * @return Chainable with request data.
+     */
     chainRequest<T>(
       cb: (data: Subject) => Partial<RequestOptions>
     ): Chainable<Response<T>>;
@@ -37,7 +43,7 @@ declare namespace Cypress {
     /**
      * Gets an api token.
      */
-    dbToken(): Chainable<Cypress.Response<{ token: string }>>;
+    dbToken(): Chainable<void>;
 
     /**
      * Removes all stored jobs.
@@ -50,14 +56,14 @@ declare namespace Cypress {
     dbResetProjects(): Chainable<void>;
 
     /**
+     * Deletes all additional project versions, and creates a new version.
+     */
+    dbResetVersions(): Chainable<void>;
+
+    /**
      * Removes all stored documents on the most recent project.
      */
     dbResetDocuments(): Chainable<void>;
-
-    /**
-     * Removes all changes on the most recent created project except for the original version.
-     */
-    dbResetVersions(): Chainable<void>;
 
     /**
      * Removes specified user from database.
@@ -189,12 +195,36 @@ declare namespace Cypress {
     // Authentication Commands
 
     /**
+     * Creates a new account on start page.
+     * Should ideally be used before running a test that requires a new account.
+     *
+     * @param email - The email to create the account with.
+     * @param password - The password to create the account with.
+     */
+    createNewAccount(email: string, password: string): Chainable<void>;
+
+    /**
      * Logs into the app with the given credentials.
      *
      * @param email - The email to log in with.
      * @param password - The password to log in with.
      */
     login(email: string, password: string): Chainable<void>;
+
+    /**
+     * Logs into a specific page with the given credentials.
+     *
+     * @param email - The email to log in with.
+     * @param password - The password to log in with.
+     * @param route - The route to navigate to.
+     * @param query - Any query parameters to include.
+     */
+    loginToPage(
+      email: string,
+      password: string,
+      route: string,
+      query?: Record<string, string>
+    ): Chainable<void>;
 
     /**
      * Logs out of the app.
@@ -294,7 +324,7 @@ declare namespace Cypress {
     ): Chainable<void>;
 
     /**
-     * Opens the upload flat files modal.
+     * Navigates to the settings page and upload flat files tab.
      */
     openUploadFiles(): Chainable<void>;
 
@@ -306,7 +336,7 @@ declare namespace Cypress {
     // Project Selection
 
     /**
-     * Opens the project selection modal.
+     * Opens the project selector page.
      */
     openProjectSelector(): Chainable<void>;
 
@@ -337,13 +367,14 @@ declare namespace Cypress {
 
     /**
      * Creates a new artifact from the artifact fab button.
-     * Does not click the save button on the artifact, leaving the modal open.
      *
      * @param props - The artifact fields to set.
+     * @param save - Defaults to false. Whether to save the artifact or keep the panel open.
      */
-    createNewArtifact(props: ArtifactFields): Chainable<void>;
+    createNewArtifact(props: ArtifactFields, save?: boolean): Chainable<void>;
 
     /**
+     * @deprecated
      * Saves the artifact that is currently open in the creator modal.
      */
     saveArtifact(): Chainable<void>;
@@ -361,26 +392,19 @@ declare namespace Cypress {
 
     /**
      * Creates a new trace link from the artifact fab button.
-     * Does not click the save button on the trace link, leaving the modal open.
      *
      * @param sourceName - The name of the source artifact.
      * @param targetName - The name of the target artifact.
+     * @param save - Defaults to false. Whether to save the trace link or keep the panel open.
      */
     createNewTraceLink(
       sourceName?: string,
-      targetName?: string
+      targetName?: string,
+      save?: boolean
     ): Chainable<void>;
 
     /**
-     * Creates a new account on start page.
-     * Should ideally be used before running a test that requires a new account.
-     *
-     * @param email - The email to create the account with.
-     * @param password - The password to create the account with.
-     */
-    createNewAccount(email: string, password: string): Chainable<void>;
-
-    /**
+     * @deprecated
      * Saves the trace link that is currently open in the creator modal.
      */
     saveTraceLink(): Chainable<void>;
@@ -402,7 +426,7 @@ declare namespace Cypress {
     getNodes(selected?: boolean): Chainable<JQuery<HTMLElement>>;
 
     /**
-     * Waits for a project to load.
+     * Waits for the artifact tree to load.
      *
      * @param waitForNodes - If true, this will wait for nodes to be painted on the graph.
      */
@@ -423,6 +447,7 @@ declare namespace Cypress {
 
     /**
      * Selects an artifact on the graph.
+     *
      * @param name - The artifact name to select.
      */
     selectArtifact(name: string): Chainable<void>;
@@ -476,24 +501,21 @@ declare namespace Cypress {
 
     /**
      * Creates a new document.
-     * Does not save the document, leaving the modal open.
      *
      * @param props - The document fields to set.
      *                The name will be added if not set.
+     * @param save. Defaults to false. Whether to save the document or leave the panel open.
      */
-    createDocument(props: DocumentFields): Chainable<void>;
+    createDocument(props: DocumentFields, save?: boolean): Chainable<void>;
 
     /**
+     * @deprecated
      * Saves the current document
      * The document modal must be open.
      */
     saveDocument(): Chainable<void>;
 
-    /**
-     * Uploads file containing trace links.
-     * @param file - Contains trace links.
-     */
-    uploadingTraceLinks(file: string): Chainable<void>;
+    // Project Settings
 
     /**
      * Opens the project settings modal.
@@ -508,14 +530,11 @@ declare namespace Cypress {
      */
     projectAddNewMember(name: string, projectRole: string): Chainable<void>;
 
+    // Trace Approval
+
     /**
      * Navigates to the Approve Generated Trace Links page.
      */
     openApproveGeneratedTraceLinks(): Chainable<void>;
-
-    /**
-     * Loads in a new project with generated trace links.
-     */
-    loadNewGeneratedProject(): Chainable<void>;
   }
 }

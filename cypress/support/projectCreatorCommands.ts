@@ -4,8 +4,8 @@ import {
   Routes,
   simpleProjectFilesMap,
   testProject,
-} from "../fixtures";
-import { validUser } from "../fixtures/data/user.json";
+  validUser,
+} from "@/fixtures";
 
 Cypress.Commands.add("initEmptyProject", () => {
   cy.dbResetJobs().dbResetProjects();
@@ -140,13 +140,6 @@ Cypress.Commands.add("loadNewProject", () => {
   cy.createBulkProject().waitForJobLoad();
 
   cy.logout();
-});
-
-Cypress.Commands.add("loadNewGeneratedProject", () => {
-  cy.visit("/create")
-    .login(validUser.email, validUser.password)
-    .location("pathname", { timeout: 5000 })
-    .should("equal", "/create");
 });
 
 // Cypress.Commands.add("loadProject", () => {

@@ -4,8 +4,7 @@ import {
   simpleProjectFilesMap,
   DataCy,
   testProject,
-  Routes,
-} from "@/fixtures";
+} from "../../../fixtures";
 
 describe("Bulk Project Creation", () => {
   before(() => {
@@ -13,20 +12,20 @@ describe("Bulk Project Creation", () => {
   });
 
   beforeEach(() => {
-    cy.loginToPage(
-      validUser.email,
-      validUser.password,
-      Routes.PROJECT_CREATOR,
-      { tab: "bulk" }
-    );
+    cy.visit("/login")
+      .login(validUser.email, validUser.password)
+      .location("pathname", { timeout: 2000 })
+      .should("equal", "/");
+
+    cy.visit("/create?tab=bulk")
+      .location("pathname", { timeout: 2000 })
+      .should("equal", "/create");
   });
 
   describe("I cannot create a project without a name", () => {
     it("Cant create a project without a name", () => {
-      cy.inputText(
-        DataCy.creationBulkDescriptionInput,
-        testProject.name
-      ).uploadFiles(DataCy.creationBulkFilesInput, simpleProjectFilesMap.tim);
+      cy.getCy(DataCy.creationBulkDescriptionInput).type(testProject.name);
+      cy.uploadFiles(DataCy.creationBulkFilesInput, simpleProjectFilesMap.tim);
 
       cy.getCy(DataCy.creationUploadButton).should("be.disabled");
     });
@@ -38,9 +37,9 @@ describe("Bulk Project Creation", () => {
 
       cy.getCy(DataCy.creationUploadButton).should("be.disabled");
 
-      cy.clickButton(DataCy.creationEmptyToggle).clickButton(
-        DataCy.creationUploadButton
-      );
+      cy.clickButton(DataCy.creationEmptyToggle);
+
+      cy.getCy(DataCy.creationUploadButton).should("not.be.disabled").click();
 
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
     });
@@ -49,9 +48,10 @@ describe("Bulk Project Creation", () => {
       cy.openProjectSelector().clickButton(DataCy.selectorAddButton);
 
       cy.getCy(DataCy.projectEditModal).within(() => {
-        cy.setProjectIdentifier("modal")
-          .clickButton(DataCy.creationEmptyToggle)
-          .clickButton(DataCy.creationUploadButton);
+        cy.setProjectIdentifier("modal").clickButton(
+          DataCy.creationEmptyToggle
+        );
+        cy.getCy(DataCy.creationUploadButton).should("not.be.disabled").click();
       });
 
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
@@ -60,7 +60,8 @@ describe("Bulk Project Creation", () => {
 
   describe("I can generate a TIM configuration file", () => {
     it("Generates a missing TIM file", () => {
-      cy.setProjectIdentifier("bulk").uploadFiles(
+      cy.setProjectIdentifier("bulk");
+      cy.uploadFiles(
         DataCy.creationBulkFilesInput,
         ...simpleProjectFiles.filter((name) => !name.includes("tim"))
       );
@@ -83,9 +84,10 @@ describe("Bulk Project Creation", () => {
 
   describe("I can create a project from flat files", () => {
     it("Can create a valid project", () => {
-      cy.setProjectIdentifier("bulk")
-        .uploadFiles(DataCy.creationBulkFilesInput, ...simpleProjectFiles)
-        .clickButton(DataCy.creationUploadButton);
+      cy.setProjectIdentifier("bulk");
+      cy.uploadFiles(DataCy.creationBulkFilesInput, ...simpleProjectFiles);
+
+      cy.getCy(DataCy.creationUploadButton).should("not.be.disabled").click();
 
       cy.getCy(DataCy.snackbarSuccess).should("be.visible");
     });

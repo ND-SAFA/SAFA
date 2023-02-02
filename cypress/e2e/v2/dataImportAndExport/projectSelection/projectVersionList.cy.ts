@@ -7,10 +7,11 @@ describe("Project Version List", () => {
   });
 
   beforeEach(() => {
-    cy.expandViewport()
-      .visit(Routes.MY_PROJECTS)
-      .login(validUser.email, validUser.password)
-      .locationShouldEqual(Routes.MY_PROJECTS);
+    cy.expandViewport().loginToPage(
+      validUser.email,
+      validUser.password,
+      Routes.MY_PROJECTS
+    );
   });
 
   describe("I can select and load a version of the project", () => {

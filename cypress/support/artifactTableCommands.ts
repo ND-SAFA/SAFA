@@ -1,4 +1,4 @@
-import { DataCy } from "../fixtures";
+import { DataCy } from "@/fixtures";
 
 Cypress.Commands.add("switchToTableView", () => {
   cy.clickButtonWithName("table");

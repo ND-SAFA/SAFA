@@ -18,7 +18,7 @@ Cypress.Commands.add(
 );
 
 Cypress.Commands.add("dbToken", () => {
-  return cy.request<{ token: string }>("POST", `${apiUrl}/login`, validUser);
+  cy.request<{ token: string }>("POST", `${apiUrl}/login`, validUser);
 });
 
 Cypress.Commands.add("dbResetJobs", () => {

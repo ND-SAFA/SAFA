@@ -1,4 +1,4 @@
-import { DataCy } from "../fixtures";
+import { DataCy, Routes } from "@/fixtures";
 
 Cypress.Commands.add("login", (email, password) => {
   cy.inputText(DataCy.emailInput, email)
@@ -6,18 +6,27 @@ Cypress.Commands.add("login", (email, password) => {
     .clickButton(DataCy.loginButton);
 });
 
+Cypress.Commands.add("loginToPage", (email, password, route, query = {}) => {
+  const queryString =
+    Object.keys(query).length > 0
+      ? "?" + new URLSearchParams(query).toString()
+      : "";
+
+  cy.visit(route + queryString)
+    .login(email, password)
+    .locationShouldEqual(route);
+});
+
 Cypress.Commands.add("logout", () => {
   cy.wait(1000)
-    .getCy(DataCy.accountPage)
-    .click()
-    .location("pathname", { timeout: 2000 })
-    .should("equal", "/account")
+    .clickButton(DataCy.accountPage)
+    .locationShouldEqual(Routes.ACCOUNT)
     .clickButton(DataCy.logoutButton);
 });
 
 Cypress.Commands.add("createNewAccount", (email, password) => {
-  cy.inputText(DataCy.newAccountEmailInput, email)
+  cy.visit(Routes.CREATE_ACCOUNT)
+    .inputText(DataCy.newAccountEmailInput, email)
     .inputText(DataCy.newAccountPasswordInput, password)
-    .clickButton(DataCy.createAccountButton)
-    .clickButton(DataCy.createAccountLoginButton);
+    .clickButton(DataCy.createAccountButton);
 });

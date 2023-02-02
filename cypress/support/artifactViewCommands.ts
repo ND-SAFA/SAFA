@@ -1,4 +1,4 @@
-import { DataCy } from "../fixtures";
+import { DataCy } from "@/fixtures";
 
 Cypress.Commands.add("fillArtifactModal", ({ name, type, body, parent }) => {
   if (name === undefined) name = `New ${Math.random()}`;
@@ -14,10 +14,14 @@ Cypress.Commands.add("fillArtifactModal", ({ name, type, body, parent }) => {
   }
 });
 
-Cypress.Commands.add("createNewArtifact", (props) => {
+Cypress.Commands.add("createNewArtifact", (props, save) => {
   cy.clickButton(DataCy.artifactFabToggle)
     .clickButton(DataCy.artifactFabCreateArtifact)
     .fillArtifactModal(props);
+
+  if (!save) return;
+
+  cy.clickButton(DataCy.artifactSaveSubmitButton);
 });
 
 Cypress.Commands.add("saveArtifact", () => {
@@ -31,10 +35,14 @@ Cypress.Commands.add("fillTraceLinkModal", (source = "", target = "") => {
   ).inputText(DataCy.traceSaveTargetInput, `${target}{downArrow}{enter}`);
 });
 
-Cypress.Commands.add("createNewTraceLink", (source = "", target = "") => {
+Cypress.Commands.add("createNewTraceLink", (source = "", target = "", save) => {
   cy.clickButton(DataCy.artifactFabToggle)
     .clickButton(DataCy.artifactFabCreateTrace)
     .fillTraceLinkModal(source, target);
+
+  if (!save) return;
+
+  cy.clickButton(DataCy.traceSaveSubmitButton);
 });
 
 Cypress.Commands.add("saveTraceLink", () => {

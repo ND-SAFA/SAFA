@@ -1,9 +1,7 @@
-import { DataCy } from "../fixtures";
+import { DataCy, Routes } from "@/fixtures";
 
 Cypress.Commands.add("openProjectSelector", () => {
-  cy.visit("/open")
-    .location("pathname", { timeout: 2000 })
-    .should("equal", "/open");
+  cy.visit(Routes.MY_PROJECTS).locationShouldEqual(Routes.MY_PROJECTS);
 });
 
 Cypress.Commands.add("openUploadFiles", () => {

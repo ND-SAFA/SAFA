@@ -11,10 +11,11 @@ describe("Standard Project Creation", () => {
   beforeEach(() => {
     cy.dbResetJobs().dbResetProjects();
 
-    cy.expandViewport()
-      .visit(Routes.PROJECT_CREATOR)
-      .login(validUser.email, validUser.password)
-      .locationShouldEqual(Routes.PROJECT_CREATOR);
+    cy.expandViewport().loginToPage(
+      validUser.email,
+      validUser.password,
+      Routes.PROJECT_CREATOR
+    );
   });
 
   describe("Project Artifact Uploading", () => {

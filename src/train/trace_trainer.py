@@ -56,9 +56,7 @@ class TraceTrainer(BaseTrainer):
         :return: Output of training session.
         """
         config = {"test_param": 0.42}
-        test_log_dir = os.path.expanduser("~/projects/safa/tgen/logs")
         TraceAccelerator.init_trackers("example_project", config=config)
-        TraceAccelerator.update(logging_dir=test_log_dir)
         self.model = self.model_manager.get_model()
         inner_training_loop = find_executable_batch_size(
             self.inner_training_loop) if self.trainer_args.per_device_train_batch_size is None else self.inner_training_loop
@@ -109,10 +107,11 @@ class TraceTrainer(BaseTrainer):
                     optimizer.step()
                     optimizer.zero_grad()
                     self.on_step(global_step)
-                    training_loss += loss.item()
+                    step_loss = loss.item()
+                    training_loss += step_loss
                     global_step += 1
-                    epoch_loss += loss.item()
-                    TraceAccelerator.log({"training_loss": loss}, step=global_step)
+                    epoch_loss += step_loss
+                    TraceAccelerator.log({"training_loss": step_loss}, step=batch_index)
 
             logger.info(f"Epoch Loss: {epoch_loss}")
             epoch_loss = 0

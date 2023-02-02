@@ -1,3 +1,4 @@
+import os.path
 from copy import deepcopy
 from typing import Any
 
@@ -11,8 +12,9 @@ class AcceleratorSingleton:
     """
     Singleton of the Accelerator
     """
-
-    INIT_DEFAULTS = {"split_batches": True, "step_scheduler_with_optimizer": False, "log_with": [LoggerType.TENSORBOARD]}
+    LOG_DIR_DEFAULT = os.path.expanduser("~/projects/safa/tgen/tensorboard")
+    INIT_DEFAULTS = {"split_batches": True, "step_scheduler_with_optimizer": False, "log_with": [LoggerType.TENSORBOARD],
+                     "logging_dir": LOG_DIR_DEFAULT}
     __accelerator: Accelerator = None
 
     @staticmethod
@@ -22,7 +24,7 @@ class AcceleratorSingleton:
         :return: The current __accelerator instance
         """
         if not AcceleratorSingleton.exists():
-            AcceleratorSingleton.__initialize()
+            AcceleratorSingleton.__initialize(**AcceleratorSingleton.INIT_DEFAULTS)
         return AcceleratorSingleton.__accelerator
 
     @staticmethod

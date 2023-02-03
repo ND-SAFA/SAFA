@@ -1,14 +1,7 @@
-import { Routes, editUser, DataCy } from "@/fixtures";
+import { Routes, editUser, invalidUser, deleteUser, DataCy } from "@/fixtures";
 
 describe("Account Editing", () => {
   describe("I can edit my password while logged in", () => {
-    before(() => {
-      cy.dbDeleteUser(editUser.email, editUser.password).createNewAccount(
-        editUser.email,
-        editUser.password
-      );
-    });
-
     beforeEach(() => {
       cy.loginToPage(editUser.email, editUser.password, Routes.ACCOUNT);
     });
@@ -18,7 +11,7 @@ describe("Account Editing", () => {
     });
 
     it("Should not be able to change my password with an invalid current password", () => {
-      cy.inputText(DataCy.passwordCurrentInput, editUser.invalidPassword)
+      cy.inputText(DataCy.passwordCurrentInput, invalidUser.password)
         .inputText(DataCy.passwordNewInput, editUser.newPassword)
         .clickButton(DataCy.passwordChangeButton);
 
@@ -43,24 +36,22 @@ describe("Account Editing", () => {
   });
 
   describe("I can delete my account", () => {
-    beforeEach(() => {
-      cy.createNewAccount(editUser.email, editUser.password);
-
-      cy.loginToPage(editUser.email, editUser.password, Routes.ACCOUNT);
-    });
-
     it("Cannot delete my account with an invalid password", () => {
-      cy.inputText(DataCy.accountDeletePasswordInput, editUser.invalidPassword)
+      cy.loginToPage(editUser.email, editUser.password, Routes.ACCOUNT);
+
+      cy.inputText(DataCy.accountDeletePasswordInput, invalidUser.password)
         .clickButton(DataCy.accountDeleteButton)
         .clickButton(DataCy.confirmModalButton);
 
       cy.getCy(DataCy.snackbarError).should("be.visible");
-
-      cy.dbDeleteUser(editUser.email, editUser.password);
     });
 
     it("Successfully deletes my account", () => {
-      cy.inputText(DataCy.accountDeletePasswordInput, editUser.password)
+      cy.createNewAccount(deleteUser.email, deleteUser.password);
+
+      cy.loginToPage(deleteUser.email, deleteUser.password, Routes.ACCOUNT);
+
+      cy.inputText(DataCy.accountDeletePasswordInput, deleteUser.password)
         .clickButton(DataCy.accountDeleteButton)
         .clickButton(DataCy.confirmModalButton);
 

@@ -5,16 +5,19 @@
   },
   "invalidUser": {
     "email": "test@test.com",
-    "password": "321"
+    "password": "super-invalid-password"
   },
   "editUser": {
-    "email": "edited.test@test.com",
+    "email": "test-edit@test.com",
     "password": "123",
-    "invalidPassword": "invalidPassword",
     "newPassword": "newPassword"
   },
   "createUser": {
     "email": "test-create@test.com",
+    "password": "123"
+  },
+  "deleteUser": {
+    "email": "test-delete@test.com",
     "password": "123"
   },
   "inviteUser": {

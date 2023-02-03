@@ -1,12 +1,18 @@
 import { DataCy, Routes, simpleProjectFiles } from "@/fixtures";
+import { validUser } from "@/fixtures/data/user.json";
 
 describe("Project Versions", () => {
-  beforeEach(() => {
+  before(() => {
     cy.initEmptyProject();
+  });
 
-    cy.expandViewport()
-      .visit(Routes.MY_PROJECTS)
-      .locationShouldEqual(Routes.MY_PROJECTS);
+  beforeEach(() => {
+    cy.dbResetVersions();
+
+    cy.visit(Routes.MY_PROJECTS)
+      .login(validUser.email, validUser.password)
+      .locationShouldEqual(Routes.MY_PROJECTS)
+      .expandViewport();
   });
 
   describe("I can create a new major, minor, or revision version", () => {
@@ -31,7 +37,7 @@ describe("Project Versions", () => {
 
   describe("I can delete a project version", () => {
     it("Deletes a version", () => {
-      cy.projectSelectorContinue("project").createNewVersion("revision");
+      cy.projectSelectorContinue("project");
 
       cy.getCy(DataCy.selectionVersionList).within(() => {
         cy.clickButton(DataCy.selectorDeleteButton);

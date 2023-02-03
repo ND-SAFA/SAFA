@@ -189,7 +189,7 @@ declare namespace Cypress {
 
     /**
      * Creates a new account on start page.
-     * Should ideally be used before running a test that requires a new account.
+     * If the account already exists, it will be deleted and recreated.
      *
      * @param email - The email to create the account with.
      * @param password - The password to create the account with.
@@ -243,8 +243,8 @@ declare namespace Cypress {
     initProject(waitForComplete?: boolean): Chainable<void>;
 
     /**
-     * Clears the DB of existing project versions.
-     * Logs into the open project page and creates a new project version.
+     * Clears the DB of existing project versions, and creates 1 new revision version.
+     * Loads the newly created project version.
      * The user will remain logged in on the artifact view page.
      *
      * @param waitForComplete - Defaults to true. Whether to wait for the artifact tree to display nodes.

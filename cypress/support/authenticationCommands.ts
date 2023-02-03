@@ -25,6 +25,8 @@ Cypress.Commands.add("logout", () => {
 });
 
 Cypress.Commands.add("createNewAccount", (email, password) => {
+  cy.dbDeleteUser(email, password);
+
   cy.visit(Routes.CREATE_ACCOUNT)
     .inputText(DataCy.newAccountEmailInput, email)
     .inputText(DataCy.newAccountPasswordInput, password)

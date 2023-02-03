@@ -50,16 +50,6 @@ Cypress.Commands.add("initProjectVersion", (waitForComplete = true) => {
   cy.waitForProjectLoad(waitForComplete);
 });
 
-Cypress.Commands.add("createBulkProject", () => {
-  cy.visit("/create?tab=bulk")
-    .location("pathname", { timeout: 2000 })
-    .should("equal", "/create");
-
-  cy.setProjectIdentifier("bulk")
-    .uploadFiles(DataCy.creationBulkFilesInput, ...miniProjectFiles)
-    .clickButton(DataCy.creationUploadButton);
-});
-
 Cypress.Commands.add("setProjectIdentifier", (type) => {
   if (type === "standard") {
     cy.getCy(DataCy.creationStandardNameInput).type(testProject.name);
@@ -129,17 +119,6 @@ Cypress.Commands.add("waitForJobLoad", () => {
       "Completed"
     );
   });
-});
-
-Cypress.Commands.add("loadNewProject", () => {
-  cy.visit("/create")
-    .login(validUser.email, validUser.password)
-    .location("pathname", { timeout: 5000 })
-    .should("equal", "/create");
-
-  cy.createBulkProject().waitForJobLoad();
-
-  cy.logout();
 });
 
 // Cypress.Commands.add("loadProject", () => {

@@ -252,19 +252,6 @@ declare namespace Cypress {
     initProjectVersion(waitForComplete?: boolean): Chainable<void>;
 
     /**
-     * @deprecated
-     * Creates a new bulk upload project.
-     */
-    createBulkProject(): Chainable<void>;
-
-    /**
-     * @deprecated
-     * Logs into the create project page, uploads a project, and waits for it to complete.
-     * The user will be logged out.
-     */
-    loadNewProject(): Chainable<void>;
-
-    /**
      * Setting the project name and description within the project creator.
      *
      * @param type - The type of project identifier to set.
@@ -377,15 +364,6 @@ declare namespace Cypress {
     fillArtifactFields(props: ArtifactFields): Chainable<void>;
 
     /**
-     * @deprecated
-     * Fills inputs in the artifact modal.
-     * The artifact name, type, and body will be filled with preset values if not set.
-     *
-     * @param props - The artifact fields to set.
-     */
-    fillArtifactModal(props: ArtifactFields): Chainable<void>;
-
-    /**
      * Creates a new artifact from the artifact fab button.
      *
      * @param props - The artifact fields to set.
@@ -397,12 +375,6 @@ declare namespace Cypress {
       save?: boolean,
       close?: boolean
     ): Chainable<void>;
-
-    /**
-     * @deprecated
-     * Saves the artifact that is currently open in the creator modal.
-     */
-    saveArtifact(): Chainable<void>;
 
     // Trace Links
 
@@ -419,18 +391,6 @@ declare namespace Cypress {
     ): Chainable<void>;
 
     /**
-     * @deprecated
-     * Fills in inputs within the trace link modal.
-     *
-     * @param sourceName - The name of the source artifact.
-     * @param targetName - The name of the target artifact.
-     */
-    fillTraceLinkModal(
-      sourceName?: string,
-      targetName?: string
-    ): Chainable<void>;
-
-    /**
      * Creates a new trace link from the artifact fab button.
      *
      * @param sourceName - The name of the source artifact.
@@ -442,12 +402,6 @@ declare namespace Cypress {
       targetName?: string,
       save?: boolean
     ): Chainable<void>;
-
-    /**
-     * @deprecated
-     * Saves the trace link that is currently open in the creator modal.
-     */
-    saveTraceLink(): Chainable<void>;
 
     // Artifact Tree
 
@@ -473,14 +427,6 @@ declare namespace Cypress {
     waitForProjectLoad(waitForNodes?: boolean): Chainable<void>;
 
     /**
-     * @deprecated
-     * Logs in to the project page and waits for the most recent project to load.
-     *
-     * @param waitForNodes - If true, this will wait for nodes to be painted on the graph.
-     */
-    loadCurrentProject(waitForNodes?: boolean): Chainable<void>;
-
-    /**
      * Centers the graph.
      */
     centerGraph(): Chainable<void>;
@@ -499,17 +445,12 @@ declare namespace Cypress {
      */
     switchToTableView(): Chainable<void>;
 
-    /**
-     * Looks up the first element in the artifact table view by node name.
-     */
-    artifactTableFirstElementLookUp(): Chainable<void>;
+    // TIM View
 
     /**
-     * Sorts the artifact table by the given sort type.
-     *
-     * @param sortType - The type of sort to use.
+     * Switches to TIM view.
      */
-    artifactTableChangeSort(sortType: string): Chainable<void>;
+    switchToTimView(): Chainable<void>;
 
     // Project Documents
 
@@ -548,18 +489,34 @@ declare namespace Cypress {
      */
     createDocument(props: DocumentFields, save?: boolean): Chainable<void>;
 
-    /**
-     * @deprecated
-     * Saves the current document
-     * The document modal must be open.
-     */
-    saveDocument(): Chainable<void>;
-
     // Trace Approval
 
     /**
-     * Navigates to the Approve Generated Trace Links page.
+     * Navigates to the trace approval page.
      */
-    openApproveGeneratedTraceLinks(): Chainable<void>;
+    openTraceApproval(): Chainable<void>;
+
+    /**
+     * Sorts the trace approval table.
+     *
+     * @param sort - The type of sort to apply.
+     */
+    sortTraceApproval(sort: "none" | "name" | "approval"): Chainable<void>;
+
+    /**
+     * Groups the trace approval table.
+     *
+     * @param group - The type of group to apply.
+     */
+    groupTraceApproval(group: "none" | "type" | "status"): Chainable<void>;
+
+    /**
+     * Filters the trace approval table.
+     *
+     * @param filter - The type of filter to apply.
+     */
+    filterTraceApproval(
+      filter: "all" | "approved" | "declined"
+    ): Chainable<void>;
   }
 }

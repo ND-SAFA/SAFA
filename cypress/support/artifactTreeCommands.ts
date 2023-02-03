@@ -23,20 +23,6 @@ Cypress.Commands.add("waitForProjectLoad", (waitForNodes = true) => {
   }
 });
 
-Cypress.Commands.add("loadCurrentProject", (waitForNodes = true) => {
-  cy.visit("/login")
-    .login(validUser.email, validUser.password)
-    .location("pathname", { timeout: 10000 })
-    .should("equal", "/")
-    .openProjectSelector()
-    .projectSelectorContinue("project")
-    .projectSelectorContinue("version")
-    .location("pathname", { timeout: 10000 })
-    .should("equal", "/project");
-
-  cy.waitForProjectLoad(waitForNodes);
-});
-
 Cypress.Commands.add("centerGraph", () => {
   // Wait for graph to center.
   cy.clickButton(DataCy.navGraphCenterButton).wait(200);

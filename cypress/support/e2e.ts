@@ -12,6 +12,7 @@ import "./artifactCommands";
 import "./traceLinkCommands";
 import "./artifactTreeCommands";
 import "./artifactTableCommands";
+import "./timTreeCommands";
 import "./projectDocumentCommands";
 import "./projectSettingCommands";
 import "./traceLinkGenerationCommands";

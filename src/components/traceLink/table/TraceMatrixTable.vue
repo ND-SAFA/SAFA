@@ -21,13 +21,15 @@
       class="mt-4 trace-matrix-table"
     >
       <template v-slot:top>
-        <table-header
+        <trace-matrix-table-header
           :headers="headers"
           :search-text.sync="searchText"
           :group-by.sync="groupBy"
           :sort-by.sync="sortBy"
           :sort-desc.sync="sortDesc"
           :group-desc.sync="groupDesc"
+          :row-types.sync="rowTypes"
+          :col-types.sync="colTypes"
         />
       </template>
 
@@ -41,14 +43,17 @@
         </td>
       </template>
 
-      <template v-for="id in artifactColumns" v-slot:[`item.${id}`]="{ item }">
+      <template
+        v-for="{ id } in artifactColumns"
+        v-slot:[`item.${id}`]="{ item }"
+      >
         <v-chip :key="id" v-if="item[id] === 'Parent'" color="primary">
           <v-icon style="transform: rotate(-90deg)">mdi-ray-start-arrow</v-icon>
-          Parent
+          <typography value="Parent" color="white" />
         </v-chip>
-        <v-chip :key="id" v-else-if="item[id] === 'Child'" color="secondary">
+        <v-chip :key="id" v-else-if="item[id] === 'Child'" class="secondary">
           <v-icon style="transform: rotate(90deg)">mdi-ray-start-arrow</v-icon>
-          Child
+          <typography value="Child" />
         </v-chip>
       </template>
     </v-data-table>
@@ -58,14 +63,15 @@
 <script lang="ts">
 import Vue from "vue";
 import { DataTableHeader } from "vuetify";
-import { FlatArtifact } from "@/types";
+import { ArtifactSchema, FlatArtifact } from "@/types";
 import { appStore, artifactStore, selectionStore, subtreeStore } from "@/hooks";
 import {
   AttributeChip,
   TableGroupHeader,
-  TableHeader,
   PanelCard,
 } from "@/components/common";
+import Typography from "@/components/common/display/Typography.vue";
+import TraceMatrixTableHeader from "./TraceMatrixTableHeader.vue";
 
 /**
  * Displays a matrix of artifacts, showing their relationships.
@@ -73,8 +79,9 @@ import {
 export default Vue.extend({
   name: "TraceMatrixTable",
   components: {
+    Typography,
+    TraceMatrixTableHeader,
     PanelCard,
-    TableHeader,
     TableGroupHeader,
     AttributeChip,
   },
@@ -85,6 +92,8 @@ export default Vue.extend({
       groupBy: "type",
       sortDesc: false,
       groupDesc: false,
+      rowTypes: [] as string[],
+      colTypes: [] as string[],
       selected: [] as FlatArtifact[],
     };
   },
@@ -99,27 +108,34 @@ export default Vue.extend({
      * @return All rows to render.
      */
     items(): FlatArtifact[] {
-      return artifactStore.currentArtifacts.map(({ id, name, type }) => {
-        return {
-          id,
-          name,
-          type,
-          ...subtreeStore
-            .getParents(id)
-            .map((id) => ({ [id]: "Parent" }))
-            .reduce((acc, cur) => ({ ...acc, ...cur }), {}),
-          ...subtreeStore
-            .getChildren(id)
-            .map((id) => ({ [id]: "Child" }))
-            .reduce((acc, cur) => ({ ...acc, ...cur }), {}),
-        };
-      });
+      return artifactStore.currentArtifacts
+        .filter(
+          ({ type }) =>
+            this.rowTypes.length === 0 || this.rowTypes.includes(type)
+        )
+        .map(({ id, name, type }) => {
+          return {
+            id,
+            name,
+            type,
+            ...subtreeStore
+              .getParents(id)
+              .map((id) => ({ [id]: "Parent" }))
+              .reduce((acc, cur) => ({ ...acc, ...cur }), {}),
+            ...subtreeStore
+              .getChildren(id)
+              .map((id) => ({ [id]: "Child" }))
+              .reduce((acc, cur) => ({ ...acc, ...cur }), {}),
+          };
+        });
     },
     /**
      * @return The ids of artifact columns.
      */
-    artifactColumns(): string[] {
-      return artifactStore.currentArtifacts.map(({ id }) => id);
+    artifactColumns(): ArtifactSchema[] {
+      return artifactStore.currentArtifacts.filter(
+        ({ type }) => this.colTypes.length === 0 || this.colTypes.includes(type)
+      );
     },
     /**
      * @return All columns to render.
@@ -142,7 +158,7 @@ export default Vue.extend({
           divider: true,
           width: "200px",
         },
-        ...artifactStore.currentArtifacts.map(({ id, name }) => ({
+        ...this.artifactColumns.map(({ id, name }) => ({
           text: name,
           value: id,
           sortable: true,

@@ -1,56 +1,62 @@
 <template>
   <v-row dense class="mb-2">
-    <v-col cols="8">
-      <v-text-field
-        dense
-        outlined
-        clearable
-        hide-details
-        label="Search"
-        style="width: 100%"
-        v-model="currentSearch"
-        append-icon="mdi-magnify"
-      />
+    <v-col cols="12">
       <flex-box align="center">
-        <commit-buttons v-if="showCommitButtons" color="primary" class="mt-2" />
-        <slot name="bottom" />
+        <v-text-field
+          dense
+          outlined
+          clearable
+          hide-details
+          label="Search"
+          style="width: 100%"
+          v-model="currentSearch"
+          append-icon="mdi-magnify"
+        />
+        <commit-buttons v-if="showCommitButtons" color="primary" class="mx-2" />
       </flex-box>
     </v-col>
-    <v-col cols="4">
-      <slot name="right" />
-      <v-autocomplete
-        clearable
-        outlined
-        dense
-        hide-details
-        label="Group By"
-        v-model="currentGroup"
-        :items="options"
-        item-text="text"
-        item-value="value"
-        :prepend-inner-icon="`mdi-arrow-${
-          currentGroupDesc ? 'up' : 'down'
-        }-thin-circle-outline`"
-        @click:prepend-inner="currentGroupDesc = !currentGroupDesc"
-        data-cy="artifact-table-group-by"
-      />
-      <v-autocomplete
-        outlined
-        multiple
-        dense
-        hide-details
-        label="Sort By"
-        v-model="currentSort"
-        :items="options"
-        item-text="text"
-        item-value="value"
-        class="mt-1"
-        :prepend-inner-icon="`mdi-arrow-${
-          currentSortDesc ? 'up' : 'down'
-        }-thin-circle-outline`"
-        @click:prepend-inner="currentSortDesc = !currentSortDesc"
-        data-cy="artifact-table-sort-by"
-      />
+    <v-col cols="12">
+      <flex-box>
+        <v-autocomplete
+          clearable
+          outlined
+          dense
+          hide-details
+          label="Group By"
+          v-model="currentGroup"
+          :items="options"
+          item-text="text"
+          item-value="value"
+          :prepend-inner-icon="`mdi-arrow-${
+            currentGroupDesc ? 'up' : 'down'
+          }-thin-circle-outline`"
+          @click:prepend-inner="currentGroupDesc = !currentGroupDesc"
+          data-cy="artifact-table-group-by"
+          style="max-width: 300px"
+        />
+        <v-autocomplete
+          outlined
+          multiple
+          dense
+          hide-details
+          label="Sort By"
+          v-model="currentSort"
+          :items="options"
+          item-text="text"
+          item-value="value"
+          class="mx-2"
+          :prepend-inner-icon="`mdi-arrow-${
+            currentSortDesc ? 'up' : 'down'
+          }-thin-circle-outline`"
+          @click:prepend-inner="currentSortDesc = !currentSortDesc"
+          data-cy="artifact-table-sort-by"
+          style="max-width: 300px"
+        />
+        <slot name="right" />
+      </flex-box>
+    </v-col>
+    <v-col cols="12">
+      <slot name="bottom" />
     </v-col>
   </v-row>
 </template>

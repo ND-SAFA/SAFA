@@ -4,7 +4,7 @@ from unittest.mock import patch
 from data.tree.trace_link import TraceLink
 from testres.base_trace_test import BaseTraceTest
 from testres.paths.paths import TEST_OUTPUT_DIR
-from train.trackers.link_training_tracker import EpochTrainingResult, LinkTrainingTracker
+from train.trainer_tools.link_training_tracker import EpochTrainingResult, LinkTrainingTracker
 from util.json_util import JsonUtil
 
 

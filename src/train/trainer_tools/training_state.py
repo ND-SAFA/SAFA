@@ -1,15 +1,15 @@
 import time
-from typing import Dict, Any
+from typing import Any, Dict
+
+import torch
 
 from data.datasets.dataset_role import DatasetRole
-from train.save_strategy.abstract_save_strategy import AbstractSaveStrategy
 from train.save_strategy.metric_save_strategy import MetricSaveStrategy
 from train.save_strategy.save_strategy_stage import SaveStrategyStage
+from train.trace_output.stage_eval import Metrics
 from train.trace_output.trace_prediction_output import TracePredictionOutput
-from train.trainer_args import TrainerArgs
 from train.trainer_tools.trace_accelerator import TraceAccelerator
 from util.logging.logger_manager import logger
-import torch
 
 
 class TrainingMetrics:
@@ -21,8 +21,8 @@ class TrainingMetrics:
         """
         Defaults all starting values
         """
-        self.val_results: Dict[int, Dict] = {}
-        self.eval_results: Dict[int, Dict] = {}
+        self.val_results: Dict[int, Metrics] = {}
+        self.eval_results: Dict[int, Metrics] = {}
         self.epoch_losses: Dict[int, float] = {}
         self.curr_stage: SaveStrategyStage = SaveStrategyStage.STEP
         self.elapsed_time: float = -1

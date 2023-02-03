@@ -49,7 +49,7 @@ jobs:
         run: sudo sed -i "2i 127.0.0.1 localhost.safa.ai" /etc/hosts
 
       - name: Cypress run
-        uses: cypress-io/github-action@v4
+        uses: cypress-io/github-action@v5
         with:
           start: npm start
           wait-on: 'https://localhost.safa.ai:8080'

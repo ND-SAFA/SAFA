@@ -20,10 +20,10 @@
           },
           "trainer_args": {
             "output_dir": "[OUTPUT_PATH]/cchit/bert_base_uncased/models",
-            "num_train_epochs": 30,
-            "per_device_train_batch_size": 16,
-            "gradient_accumulation_steps": 8,
-            "learning_rate": 5e-6,
+            "num_train_epochs": 5,
+            "per_device_train_batch_size": 4,
+            "gradient_accumulation_steps": 15,
+            "learning_rate": 5e-5,
             "metrics": [
               "map",
               "map_at_k",

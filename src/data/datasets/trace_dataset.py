@@ -1,15 +1,14 @@
 import os
 import random
 from collections import OrderedDict
-from copy import deepcopy
 from typing import Callable, Dict, List, Tuple
 
 import pandas as pd
 
 from data.datasets.abstract_dataset import AbstractDataset
 from data.datasets.data_key import DataKey
-from data.keys.csv_format import CSVKeys
 from data.datasets.trace_matrix import TraceMatrix
+from data.keys.csv_format import CSVKeys
 from data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
 from data.processing.augmentation.data_augmenter import DataAugmenter
 from data.processing.augmentation.source_target_swap_step import SourceTargetSwapStep
@@ -100,6 +99,7 @@ class TraceDataset(AbstractDataset):
         :param augmenter: the augmentation to use for augmentation
         :return: None
         """
+
         augmentation_runs = [lambda data: augmenter.run(data, n_total_expected=2 * len(data),
                                                         exclude_all_but_step_type=SourceTargetSwapStep),
                              lambda data: augmenter.run(data, n_total_expected=len(self.neg_link_ids),

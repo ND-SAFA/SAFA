@@ -3,10 +3,10 @@ from typing import Callable, List
 from torch.nn.functional import cross_entropy
 from transformers.training_args import TrainingArguments
 
-from constants import EVALUATION_STRATEGY_DEFAULT, GRADIENT_ACCUMULATION_DEFAULT, LOAD_BEST_MODEL_AT_END_DEFAULT, \
-    MAX_SEQ_LENGTH_DEFAULT, METRIC_FOR_BEST_MODEL_DEFAULT, MULTI_GPU_DEFAULT, N_EPOCHS_DEFAULT, OPTIMIZER_DEFAULT, \
-    SAVE_STRATEGY_DEFAULT, SAVE_TOTAL_LIMIT_DEFAULT, SCHEDULER_DEFAULT, USE_BALANCED_BATCHES_DEFAULT, EVAL_ON_EPOCH_DEFAULT, \
-    SAVE_RANDOM_MODEL_DEFAULT
+from constants import EVALUATION_STRATEGY_DEFAULT, EVAL_ON_EPOCH_DEFAULT, GRADIENT_ACCUMULATION_DEFAULT, \
+    LOAD_BEST_MODEL_AT_END_DEFAULT, MAX_SEQ_LENGTH_DEFAULT, METRIC_FOR_BEST_MODEL_DEFAULT, MULTI_GPU_DEFAULT, N_EPOCHS_DEFAULT, \
+    OPTIMIZER_DEFAULT, SAVE_RANDOM_MODEL_DEFAULT, SAVE_STRATEGY_DEFAULT, SAVE_TOTAL_LIMIT_DEFAULT, SCHEDULER_DEFAULT, \
+    USE_BALANCED_BATCHES_DEFAULT
 from util.base_object import BaseObject
 from util.enum_util import FunctionalWrapper
 
@@ -28,7 +28,7 @@ class TrainerArgs(TrainingArguments, BaseObject):
     load_best_model_at_end: bool = LOAD_BEST_MODEL_AT_END_DEFAULT
     metric_for_best_model_default: str = METRIC_FOR_BEST_MODEL_DEFAULT
     metrics: List[str] = None
-    place_model_on_device: bool = False
+    place_model_on_device: bool = True
     total_training_epochs: int = None
     optimizer_name: str = OPTIMIZER_DEFAULT
     loss_function: Callable = FunctionalWrapper(cross_entropy)

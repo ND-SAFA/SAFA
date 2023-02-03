@@ -1,4 +1,5 @@
 import os
+import random
 from functools import partial
 from typing import Optional, Tuple
 
@@ -29,7 +30,6 @@ from train.trainer_tools.training_state import TrainingState
 from util.file_util import FileUtil
 from util.logging.logger_manager import logger
 from util.override import overrides
-import random
 
 
 class TraceTrainer(BaseTrainer):
@@ -97,11 +97,11 @@ class TraceTrainer(BaseTrainer):
                     loss = self.trainer_args.loss_function(output.logits, labels)
 
                     TraceAccelerator.backward(loss)
-                    self.optimizer.step()
-                    self.optimizer.zero_grad()
                     self.on_step(training_state, loss)
+                    self.optimizer.step()
+                    self.scheduler.step()
+                    self.optimizer.zero_grad()
 
-            self.scheduler.step()
             self.on_epoch(training_state)
         training_state.on_finish()
         return TraceTrainOutput(global_step=training_state.global_step, training_loss=training_state.training_loss,

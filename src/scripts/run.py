@@ -49,7 +49,7 @@ if __name__ == "__main__":
     #
     application = get_wsgi_application()
     experiment = ObjectCreator.create(Experiment, override=True, **job_definition)
-    LoggerManager.turn_off_hugging_face_logging()
+    # LoggerManager.turn_off_hugging_face_logging()
     experiment.run()
     logger.info("\nExperiment Finished!")
 

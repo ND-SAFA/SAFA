@@ -18,6 +18,7 @@
         text
         variant="add"
         @click="createOpen = true"
+        data-cy="button-add-attribute"
       >
         Add Attribute
       </text-button>

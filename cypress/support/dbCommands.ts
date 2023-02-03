@@ -1,4 +1,4 @@
-import { validUser } from "../fixtures";
+import { validUser } from "@/fixtures";
 
 const apiUrl = "https://dev-api.safa.ai";
 
@@ -18,7 +18,7 @@ Cypress.Commands.add(
 );
 
 Cypress.Commands.add("dbToken", () => {
-  return cy.request<{ token: string }>("POST", `${apiUrl}/login`, validUser);
+  cy.request<{ token: string }>("POST", `${apiUrl}/login`, validUser);
 });
 
 Cypress.Commands.add("dbResetJobs", () => {
@@ -36,7 +36,7 @@ Cypress.Commands.add("dbResetJobs", () => {
         )
       );
     })
-    .clearCookies();
+    .clearAllCookies();
 });
 
 Cypress.Commands.add("dbResetProjects", () => {
@@ -54,7 +54,7 @@ Cypress.Commands.add("dbResetProjects", () => {
         )
       );
     })
-    .clearCookies();
+    .clearAllCookies();
 });
 
 Cypress.Commands.add("dbResetDocuments", () => {
@@ -83,7 +83,7 @@ Cypress.Commands.add("dbResetDocuments", () => {
           )
         );
     })
-    .clearCookies();
+    .clearAllCookies();
 });
 
 Cypress.Commands.add("dbResetVersions", () => {
@@ -106,10 +106,26 @@ Cypress.Commands.add("dbResetVersions", () => {
           );
           cy.request({
             method: "POST",
-            url: `${apiUrl}/projects/${projectId}/versions/minor`,
+            url: `${apiUrl}/projects/${projectId}/versions/revision`,
           });
         });
       });
     })
-    .clearCookies();
+    .clearAllCookies();
+});
+
+Cypress.Commands.add("dbDeleteUser", (email, password) => {
+  cy.request<{ token: string }>({
+    method: "POST",
+    url: `${apiUrl}/login`,
+    body: { email, password },
+    failOnStatusCode: false,
+  }).then(() => {
+    cy.request<{ token: string }>({
+      method: "POST",
+      url: `${apiUrl}/accounts/delete`,
+      body: { password },
+      failOnStatusCode: false,
+    });
+  });
 });

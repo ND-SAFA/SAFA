@@ -1,4 +1,5 @@
 /* eslint-disable max-lines */
+
 /**
  * The position of an element within a list.
  */
@@ -30,6 +31,11 @@ declare namespace Cypress {
   interface Chainable<Subject> {
     // Database Cleanup
 
+    /**
+     * Chains together requests that return data.
+     * @param cb - The request options that return data.
+     * @return Chainable with request data.
+     */
     chainRequest<T>(
       cb: (data: Subject) => Partial<RequestOptions>
     ): Chainable<Response<T>>;
@@ -37,7 +43,7 @@ declare namespace Cypress {
     /**
      * Gets an api token.
      */
-    dbToken(): Chainable<Cypress.Response<{ token: string }>>;
+    dbToken(): Chainable<void>;
 
     /**
      * Removes all stored jobs.
@@ -50,16 +56,38 @@ declare namespace Cypress {
     dbResetProjects(): Chainable<void>;
 
     /**
+     * Deletes all additional project versions, and creates a new version.
+     */
+    dbResetVersions(): Chainable<void>;
+
+    /**
      * Removes all stored documents on the most recent project.
      */
     dbResetDocuments(): Chainable<void>;
 
     /**
-     * Removes all changes on the most recent created project except for the original version.
+     * Removes specified user from database.
+     *
+     * @param email - The user's email.
+     * @param password - The user's password.
      */
-    dbResetVersions(): Chainable<void>;
+    dbDeleteUser(email: string, password: string): Chainable<void>;
+
+    // Should Commands
+
+    /**
+     * Asserts that the current location matches the given route.
+     *
+     * @param route - Thee route that should match the location.
+     */
+    locationShouldEqual(route: string): Chainable<void>;
 
     // Base Commands
+
+    /**
+     * Expands the viewport to a preset size.
+     */
+    expandViewport(size?: "m" | "l"): Chainable<void>;
 
     /**
      * Gets an element based on the `data-cy` selector.
@@ -145,24 +173,28 @@ declare namespace Cypress {
     switchTab(tabLabel: string): Chainable<void>;
 
     /**
-     * Closes a given modal.
-     *
-     * @param dataCy - The testing selector of the modal.
-     */
-    closeModal(dataCy: string): Chainable<void>;
-
-    /**
      * Runs a callback on all rows of a table.
      *
      * @param dataCy - The testing selector of the table.
      * @param fn - A callback run on each row of the table.
+     * @param waitForLoad - Defaults to true. Waits for the table to stop loading.
      */
     withinTableRows(
       dataCy: string,
-      fn: (tr: Chainable<JQuery<HTMLElement>>) => void
+      fn: (tr: Chainable<JQuery<HTMLElement>>) => void,
+      waitForLoad?: boolean
     ): Chainable<void>;
 
     // Authentication Commands
+
+    /**
+     * Creates a new account on start page.
+     * If the account already exists, it will be deleted and recreated.
+     *
+     * @param email - The email to create the account with.
+     * @param password - The password to create the account with.
+     */
+    createNewAccount(email: string, password: string): Chainable<void>;
 
     /**
      * Logs into the app with the given credentials.
@@ -173,6 +205,21 @@ declare namespace Cypress {
     login(email: string, password: string): Chainable<void>;
 
     /**
+     * Logs into a specific page with the given credentials.
+     *
+     * @param email - The email to log in with.
+     * @param password - The password to log in with.
+     * @param route - The route to navigate to.
+     * @param query - Any query parameters to include.
+     */
+    loginToPage(
+      email: string,
+      password: string,
+      route: string,
+      query?: Record<string, string>
+    ): Chainable<void>;
+
+    /**
      * Logs out of the app.
      */
     logout(): Chainable<void>;
@@ -180,22 +227,36 @@ declare namespace Cypress {
     // Project Creation
 
     /**
+     * Clears the DB of existing projects and jobs.
+     * Logs into the create project page and creates an empty project.
+     * The user will remain logged in on the artifact view page.
+     */
+    initEmptyProject(): Chainable<void>;
+
+    /**
+     * Clears the DB of existing projects and jobs.
+     * Logs into the create project page and creates a bulk project.
+     * The user will remain logged in on the job status page.
+     *
+     * @param waitForComplete - Defaults to true. Whether to wait for the creation job to complete.
+     */
+    initProject(waitForComplete?: boolean): Chainable<void>;
+
+    /**
+     * Clears the DB of existing project versions, and creates 1 new revision version.
+     * Loads the newly created project version.
+     * The user will remain logged in on the artifact view page.
+     *
+     * @param waitForComplete - Defaults to true. Whether to wait for the artifact tree to display nodes.
+     */
+    initProjectVersion(waitForComplete?: boolean): Chainable<void>;
+
+    /**
      * Setting the project name and description within the project creator.
      *
      * @param type - The type of project identifier to set.
      */
     setProjectIdentifier(type: "bulk" | "standard" | "modal"): Chainable<void>;
-
-    /**
-     * TODO: Work in progress.
-     * Loads a new project and quickly waits for its upload.
-     */
-    loadProject(): Chainable<void>;
-
-    /**
-     * Creates a new bulk upload project.
-     */
-    createBulkProject(): Chainable<void>;
 
     /**
      * Opens the last file panel after waiting for it to close when files are parsed.
@@ -243,7 +304,7 @@ declare namespace Cypress {
     ): Chainable<void>;
 
     /**
-     * Opens the upload flat files modal.
+     * Navigates to the settings page and upload flat files tab.
      */
     openUploadFiles(): Chainable<void>;
 
@@ -252,15 +313,10 @@ declare namespace Cypress {
      */
     waitForJobLoad(): Chainable<void>;
 
-    /**
-     * Logs into the create project page, uploads a project, and waits for it to complete.
-     */
-    loadNewProject(): Chainable<void>;
-
     // Project Selection
 
     /**
-     * Opens the project selection modal.
+     * Opens the project selector page.
      */
     openProjectSelector(): Chainable<void>;
 
@@ -279,65 +335,73 @@ declare namespace Cypress {
      */
     createNewVersion(type: "major" | "minor" | "revision"): Chainable<void>;
 
-    // Artifact View
+    // Project Settings
 
     /**
-     * Fills inputs in the artifact modal.
+     * Opens the project settings page.
+     */
+    openProjectSettings(): Chainable<void>;
+
+    // Project Membership
+
+    /**
+     * Adds New member into a project
+     * Must be in project settings.
+     * @param name - Input email of new member.
+     * @param projectRole - Input project role such as "owner", "Editor", "Viewer", "Admin"
+     */
+    projectAddNewMember(name: string, projectRole: string): Chainable<void>;
+
+    // Artifacts
+
+    /**
+     * Fills inputs in the artifact panel.
      * The artifact name, type, and body will be filled with preset values if not set.
+     * The panel must already be open.
      *
      * @param props - The artifact fields to set.
      */
-    fillArtifactModal(props: ArtifactFields): Chainable<void>;
+    fillArtifactFields(props: ArtifactFields): Chainable<void>;
 
     /**
      * Creates a new artifact from the artifact fab button.
-     * Does not click the save button on the artifact, leaving the modal open.
      *
      * @param props - The artifact fields to set.
+     * @param save - Defaults to false. Whether to save the artifact or keep the panel open.
+     * @param close - Defaults to false. Whether to close the artifact panel after creation.
      */
-    createNewArtifact(props: ArtifactFields): Chainable<void>;
+    createNewArtifact(
+      props: ArtifactFields,
+      save?: boolean,
+      close?: boolean
+    ): Chainable<void>;
+
+    // Trace Links
 
     /**
-     * Saves the artifact that is currently open in the creator modal.
-     */
-    saveArtifact(): Chainable<void>;
-
-    /**
-     * Fills in inputs within the trace link modal.
+     * Fills in inputs within the trace link panel.
+     * The panel must already be open.
      *
      * @param sourceName - The name of the source artifact.
      * @param targetName - The name of the target artifact.
      */
-    fillTraceLinkModal(
+    fillTraceLinkFields(
       sourceName?: string,
       targetName?: string
     ): Chainable<void>;
 
     /**
      * Creates a new trace link from the artifact fab button.
-     * Does not click the save button on the trace link, leaving the modal open.
      *
      * @param sourceName - The name of the source artifact.
      * @param targetName - The name of the target artifact.
+     * @param save - Defaults to false. Whether to save the trace link or keep the panel open.
      */
     createNewTraceLink(
       sourceName?: string,
-      targetName?: string
+      targetName?: string,
+      save?: boolean
     ): Chainable<void>;
-
-    /**
-     * Creates a new account on start page.
-     * Should ideally be used before running a test that requires a new account.
-     *
-     * @param email - The email to create the account with.
-     * @param password - The password to create the account with.
-     */
-    createNewAccount(email: string, password: string): Chainable<void>;
-
-    /**
-     * Saves the trace link that is currently open in the creator modal.
-     */
-    saveTraceLink(): Chainable<void>;
 
     // Artifact Tree
 
@@ -356,18 +420,11 @@ declare namespace Cypress {
     getNodes(selected?: boolean): Chainable<JQuery<HTMLElement>>;
 
     /**
-     * Waits for a project to load.
+     * Waits for the artifact tree to load.
      *
      * @param waitForNodes - If true, this will wait for nodes to be painted on the graph.
      */
     waitForProjectLoad(waitForNodes?: boolean): Chainable<void>;
-
-    /**
-     * Logs in to the project page and waits for the most recent project to load.
-     *
-     * @param waitForNodes - If true, this will wait for nodes to be painted on the graph.
-     */
-    loadCurrentProject(waitForNodes?: boolean): Chainable<void>;
 
     /**
      * Centers the graph.
@@ -376,6 +433,7 @@ declare namespace Cypress {
 
     /**
      * Selects an artifact on the graph.
+     *
      * @param name - The artifact name to select.
      */
     selectArtifact(name: string): Chainable<void>;
@@ -387,17 +445,12 @@ declare namespace Cypress {
      */
     switchToTableView(): Chainable<void>;
 
-    /**
-     * Looks up the first element in the artifact table view by node name.
-     */
-    artifactTableFirstElementLookUp(): Chainable<void>;
+    // TIM View
 
     /**
-     * Sorts the artifact table by the given sort type.
-     *
-     * @param sortType - The type of sort to use.
+     * Switches to TIM view.
      */
-    artifactTableChangeSort(sortType: string): Chainable<void>;
+    switchToTimView(): Chainable<void>;
 
     // Project Documents
 
@@ -419,8 +472,8 @@ declare namespace Cypress {
     openDocumentEditor(name: string): Chainable<void>;
 
     /**
-     * Fills the document modal fields.
-     * The document modal must be open.
+     * Fills the document fields in the panel.
+     * The document panel must be open.
      *
      * @param props - The document fields to set.
      *                The name will be added if not set.
@@ -429,47 +482,41 @@ declare namespace Cypress {
 
     /**
      * Creates a new document.
-     * Does not save the document, leaving the modal open.
      *
      * @param props - The document fields to set.
      *                The name will be added if not set.
+     * @param save. Defaults to false. Whether to save the document or leave the panel open.
      */
-    createDocument(props: DocumentFields): Chainable<void>;
+    createDocument(props: DocumentFields, save?: boolean): Chainable<void>;
+
+    // Trace Approval
 
     /**
-     * Saves the current document
-     * The document modal must be open.
+     * Navigates to the trace approval page.
      */
-    saveDocument(): Chainable<void>;
+    openTraceApproval(): Chainable<void>;
 
     /**
-     * Uploads file containing trace links.
-     * @param file - Contains trace links.
-     */
-    uploadingTraceLinks(file: string): Chainable<void>;
-
-    /**
-     * Opens the project settings modal.
-     */
-    openProjectSettings(): Chainable<void>;
-
-    /**
-     * Adds New member into a project
-     * Must be in project settings.
-     * @param name - Input email of new member.
-     * @param projectRole - Input project role such as "owner", "Editor", "Viewer", "Admin"
-     */
-    projectAddNewMember(name: string, projectRole: string): Chainable<void>;
-
-    /**
-     * Navigates to the Approve Generated Trace Links page.
+     * Sorts the trace approval table.
      *
+     * @param sort - The type of sort to apply.
      */
-    openApproveGeneratedTraceLinks(): Chainable<void>;
+    sortTraceApproval(sort: "none" | "name" | "approval"): Chainable<void>;
+
     /**
-     * Loads in a new project with generated trace links.
+     * Groups the trace approval table.
      *
+     * @param group - The type of group to apply.
      */
-    loadNewGeneratedProject(): Chainable<void>;
+    groupTraceApproval(group: "none" | "type" | "status"): Chainable<void>;
+
+    /**
+     * Filters the trace approval table.
+     *
+     * @param filter - The type of filter to apply.
+     */
+    filterTraceApproval(
+      filter: "all" | "approved" | "declined"
+    ): Chainable<void>;
   }
 }

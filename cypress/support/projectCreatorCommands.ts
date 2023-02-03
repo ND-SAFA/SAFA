@@ -1,10 +1,54 @@
 import {
   DataCy,
   miniProjectFiles,
+  Routes,
   simpleProjectFilesMap,
   testProject,
-} from "../fixtures";
-import { validUser } from "../fixtures/data/user.json";
+  validUser,
+} from "@/fixtures";
+
+Cypress.Commands.add("initEmptyProject", () => {
+  cy.dbResetJobs().dbResetProjects();
+
+  cy.visit(Routes.PROJECT_CREATOR + "?tab=bulk")
+    .login(validUser.email, validUser.password)
+    .locationShouldEqual(Routes.PROJECT_CREATOR);
+
+  cy.setProjectIdentifier("bulk")
+    .clickButton(DataCy.creationEmptyToggle)
+    .clickButton(DataCy.creationUploadButton);
+});
+
+Cypress.Commands.add("initProject", (waitForComplete = true) => {
+  cy.dbResetJobs().dbResetProjects();
+
+  cy.visit(Routes.PROJECT_CREATOR + "?tab=bulk")
+    .login(validUser.email, validUser.password)
+    .locationShouldEqual(Routes.PROJECT_CREATOR);
+
+  cy.setProjectIdentifier("bulk")
+    .uploadFiles(DataCy.creationBulkFilesInput, ...miniProjectFiles)
+    .clickButton(DataCy.creationUploadButton);
+
+  if (!waitForComplete) return;
+
+  cy.waitForJobLoad();
+});
+
+Cypress.Commands.add("initProjectVersion", (waitForComplete = true) => {
+  cy.dbResetVersions();
+
+  cy.visit(Routes.MY_PROJECTS)
+    .login(validUser.email, validUser.password)
+    .locationShouldEqual(Routes.MY_PROJECTS);
+
+  cy.expandViewport()
+    .projectSelectorContinue("project")
+    .projectSelectorContinue("version")
+    .locationShouldEqual(Routes.ARTIFACT);
+
+  cy.waitForProjectLoad(waitForComplete);
+});
 
 Cypress.Commands.add("setProjectIdentifier", (type) => {
   if (type === "standard") {
@@ -20,16 +64,6 @@ Cypress.Commands.add("setProjectIdentifier", (type) => {
     cy.getCy(DataCy.creationBulkNameInput).type(testProject.name);
     cy.getCy(DataCy.creationBulkDescriptionInput).type(testProject.description);
   }
-});
-
-Cypress.Commands.add("createBulkProject", () => {
-  cy.visit("/create?tab=bulk")
-    .location("pathname", { timeout: 2000 })
-    .should("equal", "/create");
-
-  cy.setProjectIdentifier("bulk")
-    .uploadFiles(DataCy.creationBulkFilesInput, ...miniProjectFiles)
-    .clickButton(DataCy.creationUploadButton);
 });
 
 Cypress.Commands.add("openPanelAfterClose", () => {
@@ -85,24 +119,6 @@ Cypress.Commands.add("waitForJobLoad", () => {
       "Completed"
     );
   });
-});
-
-Cypress.Commands.add("loadNewProject", () => {
-  cy.visit("/create")
-    .login(validUser.email, validUser.password)
-    .location("pathname", { timeout: 5000 })
-    .should("equal", "/create");
-
-  cy.createBulkProject().waitForJobLoad();
-
-  cy.logout();
-});
-
-Cypress.Commands.add("loadNewGeneratedProject", () => {
-  cy.visit("/create")
-    .login(validUser.email, validUser.password)
-    .location("pathname", { timeout: 5000 })
-    .should("equal", "/create");
 });
 
 // Cypress.Commands.add("loadProject", () => {

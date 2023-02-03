@@ -27,6 +27,7 @@ export enum DataCy {
   navProjectUploadButton = "button-nav-Project Upload",
   navArtifactViewButton = "button-nav-Artifact View",
   navTraceLinkApprovalButton = "button-nav-Trace Prediction",
+  navSettingsButton = "button-nav-Settings",
 
   // Steppers
 
@@ -49,6 +50,7 @@ export enum DataCy {
 
   newAccountEmailInput = "input-new-email",
   newAccountPasswordInput = "input-new-password",
+  createAccountPageButton = "button-create-account-redirect",
   createAccountButton = "button-create-account",
   createAccountLoginButton = "button-create-account-login",
 
@@ -109,9 +111,12 @@ export enum DataCy {
 
   jobTable = "job-table",
   jobStatus = "job-status",
+  jobProgress = "job-progress",
   jobPanel = "job-panel",
   jobDeleteButton = "button-delete-job",
   jobOpenButton = "button-open-job",
+  jobLogButton = "button-job-log",
+  jobLogText = "text-job-log",
 
   // Project Selection
 
@@ -203,6 +208,10 @@ export enum DataCy {
 
   // Project settings
 
+  projectSettingsDownloadButton = "button-settings-download",
+  projectSettingsEditButton = "button-settings-edit",
+  projectSettingsDeleteButton = "button-settings-delete",
+
   projectSettingsAddEmail = "settings-input-user-email",
   projectSettingsAddRole = "settings-input-user-role",
   projectSettingsAddToProject = "button-add-user-to-project",
@@ -257,6 +266,18 @@ export enum DataCy {
 
   // Project Version
   projectSavingIndicator = "project-saving-indicator",
+
+  // Custom Attributes
+  addAttributeButton = "button-add-attribute",
+  attributeKeyInput = "input-attribute-key",
+  attributeLabelInput = "input-attribute-label",
+  attributeTypeInput = "input-attribute-type",
+  attributeOptionsInput = "input-attribute-options",
+  attributeMinInput = "input-attribute-min",
+  attributeMaxInput = "input-attribute-max",
+  attributeDeleteButton = "button-delete-attribute",
+  attributeSaveButton = "button-save-attribute",
+  attributeTableItem = "generic-list-item",
 }
 
 export enum DataIds {

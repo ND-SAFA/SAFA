@@ -127,7 +127,12 @@ export function handleDeleteAccount(password: string): void {
     async (isConfirmed) => {
       if (!isConfirmed) return;
 
-      deleteAccount(password).then(() => handleLogout());
+      deleteAccount(password)
+        .then(() => handleLogout())
+        .catch((e) => {
+          logStore.onError("Unable to delete your account.");
+          logStore.onDevError(e);
+        });
     }
   );
 }

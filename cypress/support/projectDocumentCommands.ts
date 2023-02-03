@@ -1,4 +1,4 @@
-import { DataCy } from "../fixtures";
+import { DataCy } from "@/fixtures";
 
 Cypress.Commands.add("openDocumentSelector", () => {
   cy.clickButton(DataCy.documentSelectButton, undefined, true);
@@ -56,8 +56,12 @@ Cypress.Commands.add(
   }
 );
 
-Cypress.Commands.add("createDocument", (props) => {
+Cypress.Commands.add("createDocument", (props, save) => {
   cy.openDocumentCreator().fillDocumentFields(props);
+
+  if (!save) return;
+
+  cy.clickButton(DataCy.documentSaveButton);
 });
 
 Cypress.Commands.add("saveDocument", () => {

@@ -1,5 +1,4 @@
-import { DataCy } from "../fixtures";
-import { validUser } from "../fixtures/data/user.json";
+import { DataCy, validUser } from "@/fixtures";
 
 Cypress.Commands.add("getNode", (name) => {
   return cy.get(`[data-cy-name="${name}"]`);
@@ -22,20 +21,6 @@ Cypress.Commands.add("waitForProjectLoad", (waitForNodes = true) => {
   if (waitForNodes) {
     cy.getNodes().should("be.visible");
   }
-});
-
-Cypress.Commands.add("loadCurrentProject", (waitForNodes = true) => {
-  cy.visit("/login")
-    .login(validUser.email, validUser.password)
-    .location("pathname", { timeout: 10000 })
-    .should("equal", "/")
-    .openProjectSelector()
-    .projectSelectorContinue("project")
-    .projectSelectorContinue("version")
-    .location("pathname", { timeout: 10000 })
-    .should("equal", "/project");
-
-  cy.waitForProjectLoad(waitForNodes);
 });
 
 Cypress.Commands.add("centerGraph", () => {

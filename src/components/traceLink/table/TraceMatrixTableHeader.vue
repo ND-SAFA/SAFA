@@ -21,6 +21,7 @@
           :items="artifactTypes"
           style="max-width: 300px"
           class="mx-2"
+          data-cy="input-trace-matrix-table-row-types"
         />
         <v-autocomplete
           outlined
@@ -31,6 +32,7 @@
           v-model="currentColTypes"
           :items="artifactTypes"
           style="max-width: 300px"
+          data-cy="input-trace-matrix-table-col-types"
         />
       </flex-box>
     </template>

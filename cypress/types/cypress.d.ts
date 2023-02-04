@@ -443,7 +443,29 @@ declare namespace Cypress {
     /**
      * Switches to table view.
      */
-    switchToTableView(): Chainable<void>;
+    switchToTableView(tab?: "artifact" | "trace"): Chainable<void>;
+
+    /**
+     * Sorts the artifact and trace matrix tables.
+     *
+     * @param sort - The type of sort to apply.
+     */
+    sortArtifactTable(sort: "none" | "name" | "type"): Chainable<void>;
+
+    /**
+     * Groups the artifact and trace matrix tables.
+     *
+     * @param group - The type of group to apply.
+     */
+    groupArtifactTable(group: "none" | "name" | "type"): Chainable<void>;
+
+    /**
+     * Filters the rows and columns of the trace matrix table.
+     *
+     * @param row - The row type to filter by.
+     * @param col - The column type to filter by.
+     */
+    filterTraceMatrixTable(row: string, col: string): Chainable<void>;
 
     // TIM View
 

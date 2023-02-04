@@ -10,7 +10,7 @@
     <typography
       l="1"
       :value="artifact.name"
-      data-cy="artifact-table-artifact"
+      data-cy="artifact-table-row-name"
     />
   </flex-box>
 </template>

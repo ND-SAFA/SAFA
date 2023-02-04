@@ -241,21 +241,29 @@ export enum DataCy {
   // Artifact Table
 
   artifactTable = "view-artifact-table",
-  artifactTableRow = "table-row-artifact",
-  artifactTableSortBy = "artifact-table-sort-by",
-  artifactTableGroupBy = "artifact-table-group-by",
-  artifactTableGroupByTableHeader = "artifact-table-group-sort-header",
+  artifactTableRowName = "artifact-table-row-name",
+
+  artifactTableSortByInput = "artifact-table-sort-by",
+  artifactTableGroupByInput = "artifact-table-group-by",
+
+  artifactTableGroup = "artifact-table-group",
+  artifactTableGroupType = "artifact-table-group-type",
+  artifactTableGroupValue = "artifact-table-group-value",
+
   artifactTableListItems = "button-checkmark-menu-item",
   artifactTableColumnHeader = "artifact-table-column-header",
-  artifactTableNameHeaderNotSorted = '*[aria-label= "Name: Not sorted. Activate to sort ascending."][aria-sort= "none"]',
-  artifactTableTypeHeaderNotSorted = '*[aria-label= "Type: Not sorted. Activate to sort ascending."][aria-sort= "none"]',
-  artifactTableNameHeaderSortedAsc = '*[aria-label= "Name: Sorted ascending. Activate to sort descending."][aria-sort= "ascending"]',
-  artifactTableTypeHeaderSortedAsc = '*[aria-label= "Type: Sorted ascending. Activate to sort descending."][aria-sort= "ascending"]',
-  artifactTableArtifact = "artifact-table-artifact",
+  artifactTableDeleteArtifactButton = "button-artifact-delete-icon",
+
   artifactTableArtifactWarning = "artifact-table-artifact-warning",
   artifactTableArtifactWarningLabel = "artifact-table-panel-warnings-title",
   artifactTableEditArtifactRowButton = "button-artifact-edit-icon",
-  artifactTableDeleteArtifactRowButton = "button-artifact-delete-icon",
+
+  // Trace Matrix Table
+
+  traceMatrixTable = "view-trace-matrix-table",
+
+  traceMatrixTableRowTypeInput = "input-trace-matrix-table-row-types",
+  traceMatrixTableColTypeInput = "input-trace-matrix-table-col-types",
 
   // Trace Link Generation
 

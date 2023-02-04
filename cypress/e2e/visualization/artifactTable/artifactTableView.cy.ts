@@ -56,4 +56,14 @@ describe("Artifact Table View", () => {
         });
     });
   });
+
+  describe("I can select an artifact to view more details", () => {
+    it("Selects an artifact that is clicked", () => {
+      cy.withinTableRows(DataCy.artifactTable, (tr) => {
+        tr.last().click();
+      });
+
+      cy.getCy(DataCy.selectedPanelName).should("contain", "F6");
+    });
+  });
 });

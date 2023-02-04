@@ -34,4 +34,25 @@ describe("Trace Matrix Table View", () => {
       });
     });
   });
+
+  describe("I can select an artifact to view more details", () => {
+    it("Selects an artifact that is clicked", () => {
+      cy.withinTableRows(DataCy.traceMatrixTable, (tr) => {
+        tr.last().contains("F6").click();
+      });
+
+      cy.getCy(DataCy.selectedPanelName).should("contain", "F6");
+    });
+  });
+
+  describe("I can select a trace link to view more details", () => {
+    it("Selects a trace link that is clicked", () => {
+      cy.withinTableRows(DataCy.traceMatrixTable, (tr) => {
+        tr.last().contains("D11").click();
+      });
+
+      cy.getCy(DataCy.selectedPanelTraceTarget).should("contain", "F6");
+      cy.getCy(DataCy.selectedPanelTraceSource).should("contain", "D11");
+    });
+  });
 });

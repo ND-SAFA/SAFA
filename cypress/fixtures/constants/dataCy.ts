@@ -185,6 +185,9 @@ export enum DataCy {
   selectedPanelChildItem = "list-selected-child-item",
   selectedPanelChildLinkButton = "button-selected-child-link",
 
+  selectedPanelTraceSource = "panel-trace-link-source",
+  selectedPanelTraceTarget = "panel-trace-link-target",
+
   // Artifact Tree
 
   artifactTree = "view-artifact-tree",

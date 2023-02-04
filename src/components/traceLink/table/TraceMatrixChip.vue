@@ -43,6 +43,12 @@ export default Vue.extend({
       return this.source[this.target.id];
     },
     /**
+     * @return Whether the relationship is as a child.
+     */
+    isChild(): boolean {
+      return this.relationship === "Child";
+    },
+    /**
      * @return Whether to display the chip.
      */
     doDisplay(): boolean {
@@ -52,13 +58,15 @@ export default Vue.extend({
      * @return The style for the chip arrow.
      */
     arrowStyle(): string {
-      return this.relationship === "Child" ? "transform: rotate(-180deg)" : "";
+      return this.isChild ? "transform: rotate(-180deg)" : "";
     },
     /**
      * @return The trace link between these artifacts.
      */
     traceLink(): TraceLinkSchema | undefined {
-      return traceStore.getTraceLinkByArtifacts(this.source.id, this.target.id);
+      return this.isChild
+        ? traceStore.getTraceLinkByArtifacts(this.target.id, this.source.id)
+        : traceStore.getTraceLinkByArtifacts(this.source.id, this.target.id);
     },
     /**
      * @return Whether this trace link is generated

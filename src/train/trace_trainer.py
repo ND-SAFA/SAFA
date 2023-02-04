@@ -55,6 +55,8 @@ class TraceTrainer(BaseTrainer):
         :param resume_from_checkpoint: The checkpoint to resume from.
         :return: Output of training session.
         """
+        config = {"test_param": 0.42}
+        TraceAccelerator.init_trackers("example_project", config=config)
         self.model = self.model_manager.get_model()
         self.model.train()
         inner_training_loop = find_executable_batch_size(

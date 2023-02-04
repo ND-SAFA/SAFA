@@ -48,6 +48,9 @@ scikit-learn==1.0.2
 scipy==1.7.3
 six==1.16.0
 sqlparse==0.4.3
+tensorboard==2.11.2
+tensorboard-data-server==0.6.1
+tensorboard-plugin-wit==1.8.1
 threadpoolctl==3.1.0
 tokenizers==0.13.2
 torch==1.13.1

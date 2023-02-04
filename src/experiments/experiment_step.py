@@ -227,4 +227,5 @@ class ExperimentStep(BaseObject):
             if isinstance(job, AbstractTraceJob):
                 if getattr(job.model_manager, "output_dir", "ignore") is None:
                     setattr(job.model_manager, "output_dir", output_dir)
+                setattr(job.job_args, "output_dir", output_dir)
         return jobs

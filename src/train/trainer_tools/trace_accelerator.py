@@ -1,7 +1,9 @@
+import os.path
 from copy import deepcopy
 from typing import Any
 
 from accelerate import Accelerator
+from accelerate.utils import LoggerType
 
 from util.reflection_util import ReflectionUtil
 
@@ -10,7 +12,6 @@ class AcceleratorSingleton:
     """
     Singleton of the Accelerator
     """
-
     INIT_DEFAULTS = {"split_batches": True, "step_scheduler_with_optimizer": True}
     __accelerator: Accelerator = None
 
@@ -21,7 +22,7 @@ class AcceleratorSingleton:
         :return: The current __accelerator instance
         """
         if not AcceleratorSingleton.exists():
-            AcceleratorSingleton.__initialize()
+            AcceleratorSingleton.__initialize(**AcceleratorSingleton.INIT_DEFAULTS)
         return AcceleratorSingleton.__accelerator
 
     @staticmethod

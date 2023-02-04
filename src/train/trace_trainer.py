@@ -1,11 +1,13 @@
 import os
-from typing import Any, Dict, Union
+from typing import Any, Dict, Union, Optional
 
 import torch
 from transformers.trainer import Trainer
 
+from data.datasets.data_key import DataKey
 from data.datasets.dataset_role import DatasetRole
 from data.managers.trainer_dataset_manager import TrainerDatasetManager
+from data.samplers.balanced_batch_sampler import BalancedBatchSampler
 from models.model_manager import ModelManager
 from train.metrics.metrics_manager import MetricsManager
 from train.save_strategy.abstract_save_strategy import AbstractSaveStrategy
@@ -17,6 +19,7 @@ from train.trainer_args import TrainerArgs
 from train.trainer_tools.trace_accelerator import TraceAccelerator
 from util.base_object import BaseObject
 from util.logging.logger_manager import logger
+from util.override import overrides
 
 os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":16:8"
 torch.use_deterministic_algorithms(True)
@@ -83,3 +86,13 @@ class TraceTrainer(Trainer, BaseObject):
         TraceAccelerator.clear()
         if self.model:
             del self.model
+
+    @overrides(Trainer)
+    def _get_train_sampler(self) -> Optional[torch.utils.data.Sampler]:
+        """
+        Gets the data sampler used for training
+        :return: the train sampler
+        """
+        if self.trainer_args.use_balanced_batches and self.train_dataset is not None and DataKey.LABEL_KEY in self.train_dataset:
+            return BalancedBatchSampler(data_source=self.train_dataset, batch_size=self._train_batch_size)
+        return super()._get_train_sampler()

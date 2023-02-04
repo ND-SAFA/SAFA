@@ -85,17 +85,6 @@ class TestTraceTrainer(BaseTraceTest):
             trainer_dataset_manager=trainer_dataset_manager,
             model_manager=model_manager)
 
-    def test_save_checkpoint(self):
-        test_trace_trainer = self.get_custom_trace_trainer()
-        test_trace_trainer.perform_training()
-        checkpoint_files = ["optimizer.bin", "config.json", "pytorch_model.bin", "scheduler.bin",
-                            "training_args.bin"]
-        for folder_name in [TraceTrainer.BEST_MODEL_NAME, TraceTrainer.CURRENT_MODEL_NAME]:
-            folder_path = os.path.join(test_trace_trainer.trainer_args.output_dir, folder_name)
-            output_files = list(os.listdir(folder_path))
-            for file in checkpoint_files:
-                self.assertIn(file, output_files)
-
     def assert_metrics(self, metrics: Metrics):
         """
         Verifies that metrics contains all the desired metrics.

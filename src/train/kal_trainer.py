@@ -254,13 +254,3 @@ class KalTrainer(TraceTrainer):
         random_epoch = random.randint(0, self.trainer_args.num_train_epochs)
         random_model_name = self.RANDOM_MODEL_BASE_NAME.format(random_epoch)
         return random_epoch, random_model_name
-
-    @overrides(Trainer)
-    def _get_train_sampler(self) -> Optional[torch.utils.data.Sampler]:
-        """
-        Gets the data sampler used for training
-        :return: the train sampler
-        """
-        if self.trainer_args.use_balanced_batches and self.train_dataset is not None:
-            return BalancedBatchSampler(data_source=self.train_dataset, batch_size=self._train_batch_size)
-        return super()._get_train_sampler()

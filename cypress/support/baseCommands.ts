@@ -1,5 +1,4 @@
 import "cypress-file-upload";
-import { DataCy } from "@/fixtures";
 
 Cypress.Commands.add("expandViewport", (size) => {
   if (size === "l") {

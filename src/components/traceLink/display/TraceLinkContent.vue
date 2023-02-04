@@ -5,6 +5,7 @@
         :artifact="targetArtifact"
         display-title
         display-divider
+        data-cy="panel-trace-link-target"
       />
       <v-card-actions>
         <text-button
@@ -33,6 +34,7 @@
         :artifact="sourceArtifact"
         display-title
         display-divider
+        data-cy="panel-trace-link-source"
       />
       <v-card-actions>
         <v-btn text data-cy="button-trace-source" @click="handleViewSource">

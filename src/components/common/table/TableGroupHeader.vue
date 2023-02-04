@@ -1,5 +1,5 @@
 <template>
-  <td :colspan="data.headers.length">
+  <td :colspan="data.headers.length" data-cy="artifact-table-group">
     <flex-box y="2" x="2" align="center" justify="space-between">
       <flex-box align="center">
         <icon-button
@@ -11,12 +11,13 @@
         <typography
           :value="groupHeader"
           x="2"
-          data-cy="artifact-table-group-sort-header"
+          data-cy="artifact-table-group-type"
         />
         <attribute-chip
           :value="data.group"
           :artifact-type="artifactType"
           :confidence-score="score"
+          data-cy="artifact-table-group-value"
         />
         <attribute-chip
           v-if="displayArtifact"

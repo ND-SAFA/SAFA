@@ -1,40 +1,40 @@
 <template>
   <table-header
-    show-commit-buttons
     :headers="headers"
+    :search-text.sync="currentSearch"
     :group-by.sync="currentGroup"
     :sort-by.sync="currentSort"
     :sort-desc.sync="currentSortDesc"
     :group-desc.sync="currentGroupDesc"
-    :search-text.sync="currentSearch"
+    data-cy="table-header"
   >
-    <template v-slot:right>
+    <template slot="right">
       <flex-box>
         <v-divider vertical />
         <v-autocomplete
           outlined
+          multiple
           dense
           hide-details
+          label="Row Types"
+          v-model="currentRowTypes"
+          :items="artifactTypes"
+          style="max-width: 300px"
+          class="mx-2"
+          data-cy="input-trace-matrix-table-row-types"
+        />
+        <v-autocomplete
+          outlined
           multiple
-          label="Approval Types"
-          v-model="currentApprovalTypes"
-          :items="options"
-          item-text="name"
-          item-value="id"
-          class="ml-2"
-          data-cy="button-trace-link-generate-approval-type"
+          dense
+          hide-details
+          label="Column Types"
+          v-model="currentColTypes"
+          :items="artifactTypes"
+          style="max-width: 300px"
+          data-cy="input-trace-matrix-table-col-types"
         />
       </flex-box>
-    </template>
-    <template v-slot:bottom>
-      <text-button
-        text
-        color="error"
-        icon-id="mdi-close-circle-multiple-outline"
-        @click="handleClear"
-      >
-        Clear Unreviewed
-      </text-button>
     </template>
   </table-header>
 </template>
@@ -42,24 +42,23 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { DataTableHeader } from "vuetify";
-import { approvalTypeOptions } from "@/util";
-import { handleDeclineAll } from "@/api";
-import { TableHeader, TextButton, FlexBox } from "@/components/common";
+import { typeOptionsStore } from "@/hooks";
+import { TableHeader, FlexBox } from "@/components/common";
 
 /**
- * Displays the header for the trace links table.
+ * Represents the header and inputs for a table of trace links.
  *
  * @emits-1 `update:searchText` (String) on search.
  * @emits-2 `update:sortBy` (String[]) on sort update.
  * @emits-3 `update:groupBy` (String) on group update.
- * @emits-3 `update:approvalTypes` (String) on approval type update.
+ * @emits-3 `update:rowTypes` (String[]) on row filter update.
+ * @emits-3 `update:colTypes` (String[]) on column filter update.
  */
 export default Vue.extend({
-  name: "TraceApprovalTableHeader",
+  name: "TraceMatrixTableHeader",
   components: {
-    TextButton,
-    TableHeader,
     FlexBox,
+    TableHeader,
   },
   props: {
     headers: {
@@ -71,24 +70,15 @@ export default Vue.extend({
     sortBy: Array as PropType<string[]>,
     groupDesc: Boolean,
     sortDesc: Boolean,
-    approvalTypes: Array as PropType<string[]>,
-  },
-  data() {
-    return {
-      options: approvalTypeOptions(),
-    };
+    rowTypes: Array as PropType<string[]>,
+    colTypes: Array as PropType<string[]>,
   },
   computed: {
     /**
-     * Emits changes to approval types.
+     * @return All types of artifacts in the current project.
      */
-    currentApprovalTypes: {
-      get(): string[] {
-        return this.approvalTypes;
-      },
-      set(newTypes: string[]) {
-        this.$emit("update:approvalTypes", newTypes);
-      },
+    artifactTypes(): string[] {
+      return typeOptionsStore.artifactTypes;
     },
     /**
      * Emits changes to the grouping.
@@ -145,13 +135,27 @@ export default Vue.extend({
         this.$emit("update:groupDesc", newDesc);
       },
     },
-  },
-  methods: {
     /**
-     * Clears all unreviewed links.
+     * Emits changes to the column types.
      */
-    handleClear(): void {
-      handleDeclineAll();
+    currentRowTypes: {
+      get(): string[] {
+        return this.rowTypes;
+      },
+      set(newTypes: string[]): void {
+        this.$emit("update:rowTypes", newTypes);
+      },
+    },
+    /**
+     * Emits changes to the row types.
+     */
+    currentColTypes: {
+      get(): string[] {
+        return this.colTypes;
+      },
+      set(newTypes: string[]): void {
+        this.$emit("update:colTypes", newTypes);
+      },
     },
   },
 });

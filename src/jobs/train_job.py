@@ -8,8 +8,8 @@ class TrainJob(AbstractTraceJob):
 
     def _run(self, **kwargs) -> JobResult:
         """
-        Runs the training and obtains results
-        :return: results of the training including as loss and time
+        Runs the training and obtains results.
+        :return: Results of the training including as loss and time
         """
         trainer = self.get_trainer(**kwargs)
         training_output = trainer.perform_training(

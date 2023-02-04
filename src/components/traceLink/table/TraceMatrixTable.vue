@@ -44,17 +44,14 @@
       </template>
 
       <template
-        v-for="{ id } in artifactColumns"
-        v-slot:[`item.${id}`]="{ item }"
+        v-for="artifact in artifactColumns"
+        v-slot:[`item.${artifact.id}`]="{ item }"
       >
-        <v-chip :key="id" v-if="item[id] === 'Parent'" color="primary">
-          <v-icon style="transform: rotate(-90deg)">mdi-ray-start-arrow</v-icon>
-          <typography value="Parent" color="white" />
-        </v-chip>
-        <v-chip :key="id" v-else-if="item[id] === 'Child'" class="secondary">
-          <v-icon style="transform: rotate(90deg)">mdi-ray-start-arrow</v-icon>
-          <typography value="Child" />
-        </v-chip>
+        <trace-matrix-chip
+          :key="artifact.id"
+          :source="item"
+          :target="artifact"
+        />
       </template>
     </v-data-table>
   </panel-card>
@@ -70,7 +67,7 @@ import {
   TableGroupHeader,
   PanelCard,
 } from "@/components/common";
-import Typography from "@/components/common/display/Typography.vue";
+import TraceMatrixChip from "./TraceMatrixChip.vue";
 import TraceMatrixTableHeader from "./TraceMatrixTableHeader.vue";
 
 /**
@@ -79,7 +76,7 @@ import TraceMatrixTableHeader from "./TraceMatrixTableHeader.vue";
 export default Vue.extend({
   name: "TraceMatrixTable",
   components: {
-    Typography,
+    TraceMatrixChip,
     TraceMatrixTableHeader,
     PanelCard,
     TableGroupHeader,

@@ -90,15 +90,6 @@ class TraceTrainer(Trainer, BaseObject):
         if self.model:
             del self.model
 
-    def _get_dataset(self, dataset_role: DatasetRole) -> Optional[Dataset]:
-        """
-        Returns dataset set in role if it exists, otherwise none is returned.
-        :param dataset_role: The role of the dataset to return.
-        :return: Dataset at dataset role if it exists.
-        """
-        return self.trainer_dataset_manager[dataset_role].to_trainer_dataset(
-            self.model_manager) if dataset_role in self.trainer_dataset_manager else None
-
     @overrides(Trainer)
     def _get_train_sampler(self) -> Optional[torch.utils.data.Sampler]:
         """
@@ -108,3 +99,12 @@ class TraceTrainer(Trainer, BaseObject):
         if self.trainer_args.use_balanced_batches and self.train_dataset is not None and DataKey.LABEL_KEY in self.train_dataset:
             return BalancedBatchSampler(data_source=self.train_dataset, batch_size=self._train_batch_size)
         return super()._get_train_sampler()
+
+    def _get_dataset(self, dataset_role: DatasetRole) -> Optional[Dataset]:
+        """
+        Returns dataset set in role if it exists, otherwise none is returned.
+        :param dataset_role: The role of the dataset to return.
+        :return: Dataset at dataset role if it exists.
+        """
+        return self.trainer_dataset_manager[dataset_role].to_trainer_dataset(
+            self.model_manager) if dataset_role in self.trainer_dataset_manager else None

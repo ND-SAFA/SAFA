@@ -21,13 +21,13 @@ class PreTrainDataset(AbstractDataset):
         self.block_size = block_size
         self.kwargs = kwargs
 
-    def to_trainer_dataset(self, model_generator: ModelManager) -> Dataset:
+    def to_trainer_dataset(self, model_manager: ModelManager) -> Dataset:
         """
         Uses pretrain datafile to create a Dataset (i.e. LineByLineDataset) for Huggingface (HF) trainer.
-        :param model_generator: The model generator determining tokenizer to be used.
+        :param model_manager: The model generator determining tokenizer to be used.
         :return: A data used by the HF trainer.
         """
-        return LineByLineTextDataset(tokenizer=model_generator.get_tokenizer(),
+        return LineByLineTextDataset(tokenizer=model_manager.get_tokenizer(),
                                      file_path=self.training_file_path,
                                      block_size=self.block_size,
                                      **self.kwargs)

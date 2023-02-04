@@ -55,7 +55,11 @@ class BaseTrainer(Trainer, BaseObject):
         """
         self.model = self.model_manager.get_model()
         self.train_dataset = self.trainer_dataset_manager[DatasetRole.TRAIN].to_trainer_dataset(self.model_manager)
+        self.eval_dataset = self.trainer_dataset_manager[
+            DatasetRole.VAL].to_trainer_dataset(self.model_manager) if DatasetRole.VAL in self.trainer_dataset_manager else None
         train_output = self.train(resume_from_checkpoint=checkpoint)
+        self.eval_dataset = self.trainer_dataset_manager[
+            DatasetRole.EVAL].to_trainer_dataset(self.model_manager) if DatasetRole.EVAL in self.trainer_dataset_manager else None
         return TraceTrainOutput(train_output=train_output)
 
     def perform_prediction(self, dataset_role: DatasetRole = DatasetRole.EVAL) -> TracePredictionOutput:

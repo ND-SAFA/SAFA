@@ -40,7 +40,13 @@
                 "object_type": "STRUCTURE",
                 "project_path": "[DATA_PATH]/cm1"
               },
-              "filter_unlinked_artifacts": true
+              "filter_unlinked_artifacts": false,
+              "use_balanced_batches": {
+                "*": [
+                  true,
+                  false
+                ]
+              }
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",

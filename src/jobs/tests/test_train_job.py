@@ -61,7 +61,8 @@ class TestTrainJob(BaseJobTest):
             "trainer_dataset_manager": trainer_dataset_manager,
             "trainer_args": {
                 **ObjectCreator.get_definition(TrainerArgs),
-                "evaluation_strategy": "no"
+                "evaluation_strategy": "no",
+                "save_strategy": "no"
             }
         }
         job = ObjectCreator.create(TrainJob, override=True, **train_job_definition)

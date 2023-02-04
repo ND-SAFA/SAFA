@@ -5,8 +5,6 @@ import sys
 
 from dotenv import load_dotenv
 
-from util.logging.logger_manager import logger
-
 load_dotenv()
 
 ROOT_PATH = os.path.expanduser(os.environ["ROOT_PATH"])
@@ -30,6 +28,7 @@ if __name__ == "__main__":
     #
     from data.results.experiment_definition import ExperimentDefinition
     from data.results.experiment_reader import ExperimentReader
+    from util.logging.logger_manager import logger
 
     parser = argparse.ArgumentParser(
         prog='Results reader',

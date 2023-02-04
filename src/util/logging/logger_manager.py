@@ -86,5 +86,5 @@ class LoggerManager:
 
 
 logging.setLoggerClass(TGenLogger)
-# LoggerManager.turn_off_hugging_face_logging()
+LoggerManager.turn_off_hugging_face_logging()
 logger: TGenLogger = LoggerManager()

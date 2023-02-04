@@ -54,8 +54,6 @@ class TraceTrainer(Trainer, BaseObject):
         :param checkpoint: path to checkpoint.
         :return: a dictionary containing the results
         """
-        config = {"test_param": 0.42}
-        TraceAccelerator.init_trackers("example_project", config=config)
         self.model = self.model_manager.get_model()
         self.train_dataset = self.trainer_dataset_manager[DatasetRole.TRAIN].to_trainer_dataset(self.model_manager)
         self.eval_dataset = self._get_dataset(DatasetRole.VAL)

@@ -1,7 +1,5 @@
-import os
 from copy import deepcopy
 from typing import Dict
-from unittest.mock import patch
 
 import mock
 
@@ -32,9 +30,7 @@ class TestTraceTrainer(BaseTraceTest):
                               ["f", ["f1", "f2"]]]
     TEST_METRICS_NAMES = [m for m, aliases in TEST_METRIC_DEFINITION]
 
-    @patch.object(TraceTrainer, "save_model")
-    def test_perform_training(self, save_model_mock: mock.Mock):
-
+    def test_perform_training(self):
         test_trace_trainer = self.get_custom_trace_trainer(metrics=self.TEST_METRICS_NAMES)
         test_trace_trainer.model_manager.get_tokenizer().padding = True
         train_output = test_trace_trainer.perform_training()

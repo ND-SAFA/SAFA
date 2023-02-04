@@ -1,7 +1,8 @@
 import os
-from typing import Any, Dict, Union, Optional
+from typing import Any, Dict, Optional, Union
 
 import torch
+from datasets import Dataset
 from transformers.trainer import Trainer
 
 from data.datasets.data_key import DataKey
@@ -58,7 +59,9 @@ class TraceTrainer(Trainer, BaseObject):
         """
         self.model = self.model_manager.get_model()
         self.train_dataset = self.trainer_dataset_manager[DatasetRole.TRAIN].to_trainer_dataset(self.model_manager)
+        self.eval_dataset = self._get_dataset(DatasetRole.VAL)
         train_output = self.train(resume_from_checkpoint=checkpoint)
+        self.eval_dataset = self._get_dataset(DatasetRole.EVAL)
         return TraceTrainOutput(train_output=train_output)
 
     def perform_prediction(self, dataset_role: DatasetRole = DatasetRole.EVAL) -> TracePredictionOutput:
@@ -96,3 +99,12 @@ class TraceTrainer(Trainer, BaseObject):
         if self.trainer_args.use_balanced_batches and self.train_dataset is not None and DataKey.LABEL_KEY in self.train_dataset:
             return BalancedBatchSampler(data_source=self.train_dataset, batch_size=self._train_batch_size)
         return super()._get_train_sampler()
+
+    def _get_dataset(self, dataset_role: DatasetRole) -> Optional[Dataset]:
+        """
+        Returns dataset set in role if it exists, otherwise none is returned.
+        :param dataset_role: The role of the dataset to return.
+        :return: Dataset at dataset role if it exists.
+        """
+        return self.trainer_dataset_manager[dataset_role].to_trainer_dataset(
+            self.model_manager) if dataset_role in self.trainer_dataset_manager else None

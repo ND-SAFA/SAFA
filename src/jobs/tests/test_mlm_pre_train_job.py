@@ -34,6 +34,6 @@ class TestMLMPreTrainJob(BaseJobTest):
         trainer_dataset_manager = ObjectCreator.create(TrainerDatasetManager, **{
             "train_dataset_creator": ObjectCreator.pretrain_dataset_definition
         }, override=True)
-        trainer_args = ObjectCreator.create(TrainerArgs)
+        trainer_args = ObjectCreator.create(TrainerArgs, evaluation_strategy="no", save_strategy="no")
         return MLMPreTrainJob(job_args=job_args, model_manager=model_manager,
                               trainer_dataset_manager=trainer_dataset_manager, trainer_args=trainer_args)

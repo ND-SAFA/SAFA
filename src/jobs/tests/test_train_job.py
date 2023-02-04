@@ -59,7 +59,11 @@ class TestTrainJob(BaseJobTest):
             "model_manager": ObjectCreator.get_definition(ModelManager),
             "job_args": ObjectCreator.get_definition(JobArgs),
             "trainer_dataset_manager": trainer_dataset_manager,
-            "trainer_args": ObjectCreator.get_definition(TrainerArgs)
+            "trainer_args": {
+                **ObjectCreator.get_definition(TrainerArgs),
+                "evaluation_strategy": "no",
+                "save_strategy": "no"
+            }
         }
         job = ObjectCreator.create(TrainJob, override=True, **train_job_definition)
         self.assertEquals(job.trainer_args.num_train_epochs, 1)

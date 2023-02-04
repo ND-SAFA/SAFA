@@ -116,7 +116,7 @@ class ExperimentReader:
         if base_entry is None:
             base_entry = {}
         val_metric_entries = []
-        if JobResult.VAL_METRICS not in job_result:
+        if JobResult.VAL_METRICS not in job_result or job_result[JobResult.VAL_METRICS] is None:
             return val_metric_entries
 
         for epoch_index, val_metric_entry in job_result[JobResult.VAL_METRICS].items():

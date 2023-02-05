@@ -3,8 +3,9 @@ from typing import Callable, List
 from torch.nn.functional import cross_entropy
 from transformers.training_args import TrainingArguments
 
-from constants import EVALUATION_STRATEGY_DEFAULT, EVAL_ON_EPOCH_DEFAULT, GRADIENT_ACCUMULATION_DEFAULT, \
-    GREATER_IS_BETTER_DEFAULT, LOAD_BEST_MODEL_AT_END_DEFAULT, MAX_SEQ_LENGTH_DEFAULT, METRIC_FOR_BEST_MODEL_DEFAULT, \
+from constants import EVALUATION_STRATEGY_DEFAULT, EVAL_ON_EPOCH_DEFAULT, EVAL_STEPS_DEFAULT, GRADIENT_ACCUMULATION_DEFAULT, \
+    GREATER_IS_BETTER_DEFAULT, LOAD_BEST_MODEL_AT_END_DEFAULT, LOGGING_STEPS_DEFAULT, LOGGING_STRATEGY_DEFAULT, MAX_SEQ_LENGTH_DEFAULT, \
+    METRIC_FOR_BEST_MODEL_DEFAULT, \
     MULTI_GPU_DEFAULT, N_EPOCHS_DEFAULT, \
     OPTIMIZER_DEFAULT, SAVE_RANDOM_MODEL_DEFAULT, SAVE_STEPS_DEFAULT, SAVE_STRATEGY_DEFAULT, SAVE_TOTAL_LIMIT_DEFAULT, \
     SCHEDULER_DEFAULT, \
@@ -25,15 +26,17 @@ class TrainerArgs(TrainingArguments, BaseObject):
     num_train_epochs: int = N_EPOCHS_DEFAULT
     checkpoint_path: str = None
     evaluation_strategy: str = EVALUATION_STRATEGY_DEFAULT
-    do_eval: bool = True
     save_strategy: str = SAVE_STRATEGY_DEFAULT
+    logging_strategy: str = LOGGING_STRATEGY_DEFAULT
     save_steps = SAVE_STEPS_DEFAULT
-    eval_steps: int = None
+    eval_steps: int = EVAL_STEPS_DEFAULT
+    logging_steps = LOGGING_STEPS_DEFAULT
     greater_is_better: bool = GREATER_IS_BETTER_DEFAULT
     save_total_limit: int = SAVE_TOTAL_LIMIT_DEFAULT
     load_best_model_at_end: bool = LOAD_BEST_MODEL_AT_END_DEFAULT
     metric_for_best_model: str = METRIC_FOR_BEST_MODEL_DEFAULT
     metrics: List[str] = ["map", "f"]
+    do_eval: bool = True
     place_model_on_device: bool = True
     total_training_epochs: int = None
     optimizer_name: str = OPTIMIZER_DEFAULT
@@ -75,7 +78,8 @@ class TrainerArgs(TrainingArguments, BaseObject):
         super().__init__(log_level="info", log_level_replica="info", output_dir=output_dir,
                          num_train_epochs=self.num_train_epochs, evaluation_strategy=self.evaluation_strategy,
                          save_strategy=self.save_strategy, save_steps=self.save_steps, save_total_limit=self.save_total_limit,
-                         load_best_model_at_end=self.load_best_model_at_end)
+                         load_best_model_at_end=self.load_best_model_at_end, logging_strategy=self.logging_strategy,
+                         logging_steps=self.logging_steps)
         self.__set_args(**kwargs)
 
     def __set_args(self, **kwargs) -> None:

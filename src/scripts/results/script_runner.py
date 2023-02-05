@@ -1,7 +1,6 @@
 import os
 from typing import Dict
 
-import wandb
 from django.core.wsgi import get_wsgi_application
 
 from experiments.experiment import Experiment
@@ -33,8 +32,7 @@ class ScriptRunner:
         self.experiment_dir = None
         self.logging_dir = None
         os.environ["WANDB_PROJECT"] = self.script_name
-        wandb_output_path = os.path.join(os.environ["OUTPUT_PATH"], "wandb")
-        wandb.init(dir=os.path.expanduser(wandb_output_path))
+        os.environ["WANDB_DIR"] = os.path.join(os.environ["OUTPUT_PATH"], "wandb")
 
     def run(self) -> None:
         """

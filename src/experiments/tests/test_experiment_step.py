@@ -4,11 +4,11 @@ from unittest.mock import patch
 
 import math
 
-from data.readers.definitions.structure_project_definition import StructureProjectDefinition
-from data.readers.structured_project_reader import StructuredProjectReader
 from data.datasets.dataset_role import DatasetRole
 from data.managers.deterministic_trainer_dataset_manager import DeterministicTrainerDatasetManager
 from data.managers.trainer_dataset_manager import TrainerDatasetManager
+from data.readers.definitions.structure_project_definition import StructureProjectDefinition
+from data.readers.structured_project_reader import StructuredProjectReader
 from experiments.experiment_step import ExperimentStep
 from experiments.tests.base_experiment_test import BaseExperimentTest
 from jobs.abstract_trace_job import AbstractTraceJob
@@ -121,7 +121,7 @@ class TestExperimentStep(BaseExperimentTest):
         job1, job2 = self.get_test_jobs()
         output_dir = os.path.join(TEST_OUTPUT_DIR, "experiment_step")
         job1.model_manager = DeterministicTrainerDatasetManager(deterministic_id="1234")
-        job1, job2 = ExperimentStep._update_job_children_output_paths([job1, job2], output_dir)
+        job1, job2 = ExperimentStep._update_job_children([job1, job2], output_dir)
         self.assertEquals(job1.model_manager.output_dir, output_dir)
 
     def get_experiment_step(self, train=True) -> ExperimentStep:

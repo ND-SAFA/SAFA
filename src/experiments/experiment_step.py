@@ -41,7 +41,6 @@ class ExperimentStep(BaseObject):
         self.status = Status.NOT_STARTED
         self.best_job = None
         self.comparison_criterion = comparison_criterion
-        self.experiment_dir = None
         if not RUN_ASYNC:
             self.MAX_JOBS = 1
 
@@ -55,7 +54,7 @@ class ExperimentStep(BaseObject):
         self.status = Status.IN_PROGRESS
         if jobs_for_undetermined_vars:
             self.jobs = self._update_jobs_undetermined_vars(self.jobs, jobs_for_undetermined_vars)
-        self._update_job_children_output_paths(output_dir)
+        self._update_job_children(output_dir)
         use_multi_epoch_step = isinstance(self.jobs[0], TrainJob) and self.jobs[0].trainer_args.train_epochs_range is not None
         job_runs = self._divide_jobs_into_runs()
 
@@ -96,6 +95,23 @@ class ExperimentStep(BaseObject):
                 continue
             results[var_name] = var_value
         return results
+
+    def _update_job_children(self, output_dir: str) -> None:
+        """
+        Updates necessary job children output paths to reflect experiment step output path
+        :param output_dir: the output directory to use
+        :return: the updated jobs
+        """
+        for job, experimental_vars in zip(self.jobs, self.experimental_vars):
+            job_id = str(job.id)
+            job_base_path = os.path.join(output_dir, job_id)
+            if isinstance(job, AbstractTraceJob):
+                model_path = os.path.join(job_base_path, "models")
+                setattr(job.trainer_args, "run_name", self.get_run_name(experimental_vars))  # run name = experimental vars
+                setattr(job.trainer_args, "output_dir", model_path)  # models save in same dir as job
+                setattr(job.trainer_args, "seed", job.job_args.random_seed)  # sets random seed so base trainer has access to it
+                setattr(job.model_manager, "output_dir", model_path)  # final model path same as checkpoint path
+            setattr(job.job_args, "output_dir", job_base_path)  # points job to its unique path
 
     def _run_multi_epoch_step(self, jobs: List[AbstractJob], output_dir: str) -> AbstractJob:
         """
@@ -218,23 +234,6 @@ class ExperimentStep(BaseObject):
         :return: the enum class mapping name to class
         """
         return SupportedJobType
-
-    def _update_job_children_output_paths(self, output_dir: str) -> None:
-        """
-        Updates necessary job children output paths to reflect experiment step output path
-        :param output_dir: the output directory to use
-        :return: the updated jobs
-        """
-        for job, experimental_vars in zip(self.jobs, self.experimental_vars):
-            job_id = str(job.id)
-            job_base_path = os.path.join(output_dir, job_id)
-            if isinstance(job, AbstractTraceJob):
-                model_path = os.path.join(job_base_path, "models")
-                setattr(job.trainer_args, "run_name", self.get_run_name(experimental_vars))
-                setattr(job.trainer_args, "output_dir", model_path)
-                setattr(job.trainer_args, "seed", job.job_args.random_seed)
-                setattr(job.model_manager, "output_dir", model_path)
-            setattr(job.job_args, "output_dir", job_base_path)
 
     @staticmethod
     def get_run_name(experimental_vars) -> str:

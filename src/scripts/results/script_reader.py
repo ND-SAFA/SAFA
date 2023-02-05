@@ -94,6 +94,8 @@ class ScriptOutputReader:
             if eval_metric_entry:
                 eval_entries.append(eval_metric_entry)
         self.val_df, self.eval_df = pd.DataFrame(val_entries), pd.DataFrame(eval_entries)
+        self.val_df.to_csv(self.val_output_path, index=False)
+        self.eval_df.to_csv(self.eval_output_path, index=False)
         return self.val_df, self.eval_df
 
     def _get_eval_df(self) -> pd.DataFrame:

@@ -25,6 +25,7 @@ class ExperimentStep(BaseObject):
     Container for parallel jobs to run.
     """
     OUTPUT_FILENAME = "output.json"
+    BASE_EXPERIMENT_NAME = "base_experiment"
 
     def __init__(self, jobs: Union[List[AbstractJob], ExperimentalVariable], comparison_criterion: ComparisonCriterion = None):
         """
@@ -36,7 +37,7 @@ class ExperimentStep(BaseObject):
             jobs = ExperimentalVariable(jobs)
         jobs, experimental_vars = jobs.get_values_of_all_variables(), jobs.experimental_param_names_to_vals
         self.jobs = self._update_jobs_with_experimental_vars(jobs, experimental_vars)
-        self.experimental_vars = experimental_vars
+        self.experimental_vars = experimental_vars if experimental_vars else [self.BASE_EXPERIMENT_NAME]
         self.status = Status.NOT_STARTED
         self.best_job = None
         self.comparison_criterion = comparison_criterion
@@ -241,5 +242,7 @@ class ExperimentStep(BaseObject):
         :param experimental_vars: The variables used to identify this run.
         :return: String representing run name.
         """
+        if isinstance(experimental_vars, str):
+            return experimental_vars
         run_name = {k: v for k, v in experimental_vars.items() if k not in EXPERIMENTAL_VARS_IGNORE}
         return json.dumps(run_name)

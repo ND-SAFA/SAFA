@@ -99,4 +99,4 @@ class ScriptDefinition:
         path_without_extension, _ = os.path.splitext(script_path)
         base_name, file_name = os.path.split(path_without_extension)
         base_name, folder_name = os.path.split(base_name)
-        return os.path.join(folder_name, file_name)
+        return "-".join([folder_name, file_name])

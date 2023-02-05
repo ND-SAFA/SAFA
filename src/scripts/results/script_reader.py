@@ -1,52 +1,50 @@
 import os
+import subprocess
 from functools import reduce
 from typing import Dict, List, Optional, Tuple
 
 import pandas as pd
 
+from constants import DISPLAY_METRICS, EXPERIMENTAL_VARS_IGNORE, METRICS, OS_IGNORE
 from experiments.experiment_step import ExperimentStep
 from jobs.components.job_result import JobResult
+from scripts.results.script_definition import ScriptDefinition
 from util.file_util import FileUtil
 from util.json_util import JsonUtil
 from util.logging.logger_manager import logger
 
-METRICS = ["map", "map@1", "map@2", "map@3", "ap", "f2", "f1", "precision@1", "precision@2", "precision@3"]
-DISPLAY_METRICS = ["map", "f2"]
-OS_IGNORE = [".DS_Store"]
-EXPERIMENTAL_VARS_IGNORE = ["job_args", "model_manager", "train_dataset_creator", "project_reader", "eval_dataset_creator",
-                            "trainer_dataset_manager", "trainer_args"]
 pd.set_option('display.max_colwidth', None)
 
 
-class ExperimentReader:
+class ScriptOutputReader:
     """
-    Responsible for reading the results of an experiment.
+    Reads the output of a script.
     """
     HEADER = "-" * 10
 
     def __init__(self, experiment_path: str, experimental_vars_ignore: List[str] = None, metrics: List[str] = None,
                  display_metrics: List[str] = None):
         """
-        Constructs reader of results for experiment at given path.
-        :param experiment_path: Path to experiment containing experiments,
-        :type experiment_path:
-        :param experimental_vars_ignore:
-        :type experimental_vars_ignore:
-        :param metrics:
-        :type metrics:
-        :param display_metrics:
-        :type display_metrics:
+        Initializes reader for experiment at path.
+        :param experiment_path: Path to experiment to read.
+        :param experimental_vars_ignore: List of experimental variables to ignore reading.
+        :param metrics: List of metrics to read from jobs and save in results.
+        :param display_metrics: List of metrics to display in CLI.
         """
-        self.experiment_path = experiment_path
         if experimental_vars_ignore is None:
             self.experiment_vars_ignore = EXPERIMENTAL_VARS_IGNORE
         if metrics is None:
             self.metrics = METRICS
         if display_metrics is None:
             self.display_metrics = DISPLAY_METRICS
+
+        self.experiment_path = experiment_path
+        self.script_name = ScriptDefinition.get_script_name(experiment_path)
+        self.val_output_path = os.path.join(self.experiment_path, "validation_results.csv")
+        self.eval_output_path = os.path.join(self.experiment_path, "test_results.csv")
+
         self.eval_df = None
         self.val_df = None
-        self.log_dir = os.path.join(experiment_path, "logs")
 
     def print_eval(self) -> None:
         """
@@ -54,7 +52,7 @@ class ExperimentReader:
         :return: None
         """
         logger.log_with_title("Evaluation Results", "")
-        eval_df = self.get_eval_df()
+        eval_df = self._get_eval_df()
         self.print_results(eval_df, self.metrics, self.display_metrics)
 
     def print_val(self) -> None:
@@ -63,24 +61,19 @@ class ExperimentReader:
         :return: None
         """
         logger.log_with_title("Validation Results", "")
-        val_df = self.get_val_df()
+        val_df = self._get_val_df()
         self.print_results(val_df, self.metrics, self.display_metrics)
 
-    def get_eval_df(self) -> pd.DataFrame:
+    def upload_to_s3(self) -> None:
         """
-        :return:Returns dataframe containing evaluations in experiment.
+        Uploads results files to s3 bucket.
+        :return: None
         """
-        if self.eval_df is None:
-            self.read()
-        return self.eval_df
-
-    def get_val_df(self) -> pd.DataFrame:
-        """
-        :return: Returns dataframe containing validation metrics in experiment.
-        """
-        if self.val_df is None:
-            self.read()
-        return self.val_df
+        bucket_name = os.environ.get("BUCKET", None)
+        if bucket_name:
+            bucket_path = os.path.join(bucket_name, self.script_name)
+            for output_path in [self.val_output_path, self.eval_output_path]:
+                subprocess.run(["aws", "s3", "cp", output_path, bucket_path])
 
     def read(self) -> Tuple[pd.DataFrame, pd.DataFrame]:
         """
@@ -89,8 +82,9 @@ class ExperimentReader:
         """
         val_entries = []
         eval_entries = []
-        experiment_jobs = self.read_experiment_jobs(self.experiment_path)
-        for output_path in experiment_jobs:
+        job_paths = self.read_experiment_jobs(self.experiment_path)
+        for job_path in job_paths:
+            output_path = os.path.join(job_path, ExperimentStep.OUTPUT_FILENAME)
             job_result = JsonUtil.read_json_file(output_path)
             JsonUtil.require_properties(job_result, [JobResult.EXPERIMENTAL_VARS])
             base_entry = {k: v for k, v in job_result[JobResult.EXPERIMENTAL_VARS].items() if k not in self.experiment_vars_ignore}
@@ -101,6 +95,22 @@ class ExperimentReader:
                 eval_entries.append(eval_metric_entry)
         self.val_df, self.eval_df = pd.DataFrame(val_entries), pd.DataFrame(eval_entries)
         return self.val_df, self.eval_df
+
+    def _get_eval_df(self) -> pd.DataFrame:
+        """
+        :return:Returns dataframe containing evaluations in experiment.
+        """
+        if self.eval_df is None:
+            self.read()
+        return self.eval_df
+
+    def _get_val_df(self) -> pd.DataFrame:
+        """
+        :return: Returns dataframe containing validation metrics in experiment.
+        """
+        if self.val_df is None:
+            self.read()
+        return self.val_df
 
     @staticmethod
     def read_validation_entries(job_result: Dict, metric_names: List[str], base_entry: Dict = None, entry_id_key: str = "epoch") -> \
@@ -135,7 +145,7 @@ class ExperimentReader:
         """
         if base_entry is None:
             base_entry = {}
-        metric_key = ExperimentReader.find_eval_key(job_result, [JobResult.EVAL_METRICS, JobResult.METRICS])
+        metric_key = ScriptOutputReader.find_eval_key(job_result, [JobResult.EVAL_METRICS, JobResult.METRICS])
         if metric_key is not None and len(job_result[metric_key]) > 0:
             return {**base_entry, **JsonUtil.read_params(job_result[metric_key], metrics)}
         return None
@@ -147,15 +157,12 @@ class ExperimentReader:
         :param experiment_path: Path to experiment.
         :return: List of paths corresponding to each output file in experiment.
         """
-        experiments = ExperimentReader.ls_jobs(experiment_path, add_base_path=True)
+        experiment_ids = ScriptOutputReader.ls_jobs(experiment_path, add_base_path=True)
         experiment_steps = [FileUtil.ls_filter(os.path.join(experiment_path, experiment_id), ignore=OS_IGNORE, add_base_path=True) for
-                            experiment_id
-                            in
-                            experiments]
-        step_jobs = [ExperimentReader.ls_jobs(step, add_base_path=True) for steps in experiment_steps for step in steps]
-        step_jobs = reduce(lambda a, b: a + b, step_jobs)
-        step_jobs = [os.path.join(p, ExperimentStep.OUTPUT_FILENAME) for p in step_jobs]
-        return step_jobs
+                            experiment_id in experiment_ids]
+        job_paths = [ScriptOutputReader.ls_jobs(step, add_base_path=True) for steps in experiment_steps for step in steps]
+        job_paths = reduce(lambda a, b: a + b, job_paths)
+        return job_paths
 
     @staticmethod
     def print_results(df: pd.DataFrame, metrics: List[str], display_metrics: List[str]) -> None:

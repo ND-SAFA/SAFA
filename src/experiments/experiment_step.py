@@ -1,10 +1,11 @@
+import json
 import os
 from copy import deepcopy
 from typing import Any, Dict, List, Optional, Type, Union
 
 import math
 
-from constants import EXIT_ON_FAILED_JOB, RUN_ASYNC
+from constants import EXIT_ON_FAILED_JOB, EXPERIMENTAL_VARS_IGNORE, RUN_ASYNC
 from jobs.abstract_job import AbstractJob
 from jobs.abstract_trace_job import AbstractTraceJob
 from jobs.components.job_result import JobResult
@@ -35,9 +36,11 @@ class ExperimentStep(BaseObject):
             jobs = ExperimentalVariable(jobs)
         jobs, experimental_vars = jobs.get_values_of_all_variables(), jobs.experimental_param_names_to_vals
         self.jobs = self._update_jobs_with_experimental_vars(jobs, experimental_vars)
+        self.experimental_vars = experimental_vars
         self.status = Status.NOT_STARTED
         self.best_job = None
         self.comparison_criterion = comparison_criterion
+        self.experiment_dir = None
         if not RUN_ASYNC:
             self.MAX_JOBS = 1
 
@@ -51,7 +54,7 @@ class ExperimentStep(BaseObject):
         self.status = Status.IN_PROGRESS
         if jobs_for_undetermined_vars:
             self.jobs = self._update_jobs_undetermined_vars(self.jobs, jobs_for_undetermined_vars)
-        self.jobs = self._update_job_children_output_paths(self.jobs, output_dir)
+        self._update_job_children_output_paths(output_dir)
         use_multi_epoch_step = isinstance(self.jobs[0], TrainJob) and self.jobs[0].trainer_args.train_epochs_range is not None
         job_runs = self._divide_jobs_into_runs()
 
@@ -215,16 +218,28 @@ class ExperimentStep(BaseObject):
         """
         return SupportedJobType
 
-    @staticmethod
-    def _update_job_children_output_paths(jobs: List[AbstractJob], output_dir: str) -> List[AbstractJob]:
+    def _update_job_children_output_paths(self, output_dir: str) -> None:
         """
         Updates necessary job children output paths to reflect experiment step output path
-        :param jobs: the list of jobs to update
         :param output_dir: the output directory to use
         :return: the updated jobs
         """
-        for job in jobs:
+        for job, experimental_vars in zip(self.jobs, self.experimental_vars):
+            job_id = str(job.id)
+            job_base_path = os.path.join(output_dir, job_id)
             if isinstance(job, AbstractTraceJob):
-                if getattr(job.model_manager, "output_dir", "ignore") is None:
-                    setattr(job.model_manager, "output_dir", output_dir)
-        return jobs
+                model_path = os.path.join(job_base_path, "models")
+                setattr(job.trainer_args, "run_name", self.get_run_name(experimental_vars))
+                setattr(job.trainer_args, "output_dir", model_path)
+                setattr(job.model_manager, "output_dir", model_path)
+            setattr(job.job_args, "output_dir", job_base_path)
+
+    @staticmethod
+    def get_run_name(experimental_vars) -> str:
+        """
+        Returns the name of the run by parsing experimental variables.
+        :param experimental_vars: The variables used to identify this run.
+        :return: String representing run name.
+        """
+        run_name = {k: v for k, v in experimental_vars.items() if k not in EXPERIMENTAL_VARS_IGNORE}
+        return json.dumps(run_name)

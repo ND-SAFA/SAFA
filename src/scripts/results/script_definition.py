@@ -47,11 +47,10 @@ class ScriptDefinition:
         :return: Script definition with output paths modifications.
         """
         script_output_path = os.path.join(ScriptDefinition.ENV_OUTPUT_PARMA, script_name)
-        script_definition[ScriptDefinition.OUTPUT_DIR_PARAM] = os.path.join(script_output_path, ScriptDefinition.JOB_DIR_NAME)
-        script_definition[ScriptDefinition.LOGGING_DIR_PARAM] = os.path.join(script_output_path, ScriptDefinition.LOG_DIR_NAME)
-        model_output_path = os.path.join(script_output_path, ScriptDefinition.MODELS_DIR_NAME)
+        script_definition[ScriptDefinition.OUTPUT_DIR_PARAM] = script_output_path
+        script_definition[ScriptDefinition.LOGGING_DIR_PARAM] = script_output_path
         script_definition = ScriptDefinition.set_object_property(
-            ("trainer_args", ScriptDefinition.OUTPUT_DIR_PARAM, model_output_path),
+            ("trainer_args", ScriptDefinition.OUTPUT_DIR_PARAM, script_output_path),
             script_definition)
         return script_definition
 

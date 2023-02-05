@@ -1,11 +1,12 @@
 import os
 from typing import Dict
 
+import wandb
 from django.core.wsgi import get_wsgi_application
 
 from experiments.experiment import Experiment
 from scripts.results.script_definition import ScriptDefinition
-from scripts.results.script_reader import ExperimentReader
+from scripts.results.script_reader import ScriptOutputReader
 from train.trainer_tools.trace_accelerator import TraceAccelerator
 from util.file_util import FileUtil
 from util.logging.logger_config import LoggerConfig
@@ -27,9 +28,12 @@ class ScriptRunner:
         :param script_definition_path: Path to the script definition defining experiment to open.
         """
         self.script_definition_path = script_definition_path
+        self.script_name = ScriptDefinition.get_script_name(script_definition_path)
         self.experiment_definition = None
         self.experiment_dir = None
         self.logging_dir = None
+        os.environ["WANDB_PROJECT"] = self.script_name
+        wandb.setup({""})
 
     def run(self) -> None:
         """
@@ -49,9 +53,15 @@ class ScriptRunner:
         :return:
         """
         self._load_experiment_definition()
-        result_reader = ExperimentReader(self.experiment_dir)
-        result_reader.print_val()
-        result_reader.print_eval()
+        self.script_reader.print_val()
+        self.script_reader.print_eval()
+
+    def upload_results(self) -> None:
+        """
+        Uploads results to tensorboard and s3 if bucket is available.
+        :return: None
+        """
+        self.script_reader.upload_to_s3()
 
     def _load_experiment_definition(self) -> Dict:
         """
@@ -63,8 +73,8 @@ class ScriptRunner:
             experiment_definition = self._load_experiment_definition()
             self.experiment_dir = experiment_definition[ScriptDefinition.OUTPUT_DIR_PARAM]
             self.logging_dir = experiment_definition.pop(ScriptDefinition.LOGGING_DIR_PARAM)
-            os.makedirs(self.logging_dir, exist_ok=True)
             LoggerManager.configure_logger(LoggerConfig(output_dir=self.logging_dir))
+            self.script_reader = ScriptOutputReader(self.experiment_dir)
         return self.experiment_definition
 
     def _setup_run(self) -> None:

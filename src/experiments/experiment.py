@@ -10,6 +10,7 @@ from util.logging.logger_config import LoggerConfig
 from util.logging.logger_manager import LoggerManager
 from util.status import Status
 
+
 class Experiment(BaseObject):
     _STEP_DIR_NAME = "step_%s"
 
@@ -26,6 +27,7 @@ class Experiment(BaseObject):
         FileUtil.create_dir_safely(output_dir)
         self.logger_config = logger_config
         self._setup_logger()
+        self._update_step_paths()
 
     def run(self):
         """
@@ -48,6 +50,14 @@ class Experiment(BaseObject):
         for step in self.steps:
             jobs.extend(step.jobs)
         return jobs
+
+    def _update_step_paths(self) -> None:
+        """
+        Updates the experiment directory of given steps.
+        :return: None
+        """
+        for step in self.steps:
+            step.experiment_dir = self.output_dir
 
     def _setup_logger(self) -> None:
         """

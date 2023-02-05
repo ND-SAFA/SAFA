@@ -229,9 +229,8 @@ class ExperimentStep(BaseObject):
             job_base_path = os.path.join(output_dir, job_id)
             if isinstance(job, AbstractTraceJob):
                 model_path = os.path.join(job_base_path, "models")
-                experimental_vars = job.result.EXPERIMENTAL_VARS if job.result.EXPERIMENTAL_VARS else ExperimentStep.BASE_EXPERIMENT_NAME
-                setattr(job.trainer_args, "run_name",
-                        ExperimentStep.get_run_name(experimental_vars))  # run name = experimental vars
+                run_name = ExperimentStep.get_run_name(job.result[JobResult.EXPERIMENTAL_VARS])
+                setattr(job.trainer_args, "run_name", run_name)  # run name = experimental vars
                 setattr(job.trainer_args, "output_dir", model_path)  # models save in same dir as job
                 setattr(job.trainer_args, "seed", job.job_args.random_seed)  # sets random seed so base trainer has access to it
                 setattr(job.model_manager, "output_dir", model_path)  # final model path same as checkpoint path
@@ -245,6 +244,8 @@ class ExperimentStep(BaseObject):
         :param experimental_vars: The variables used to identify this run.
         :return: String representing run name.
         """
+        if experimental_vars is None:
+            return ExperimentStep.BASE_EXPERIMENT_NAME
         if isinstance(experimental_vars, str):
             return experimental_vars
         run_name = {k: v for k, v in experimental_vars.items() if k not in EXPERIMENTAL_VARS_IGNORE}

@@ -28,7 +28,7 @@ class ScriptDefinition:
         """
         if env_replacements is None:
             env_replacements = ENV_REPLACEMENT_VARIABLES
-        if os.path.isfile(definition_path):
+        if not os.path.isfile(definition_path):
             raise ValueError(f"{definition_path} does not exists.")
 
         definition_path = os.path.expanduser(definition_path)

@@ -232,6 +232,7 @@ class ExperimentStep(BaseObject):
                 model_path = os.path.join(job_base_path, "models")
                 setattr(job.trainer_args, "run_name", self.get_run_name(experimental_vars))
                 setattr(job.trainer_args, "output_dir", model_path)
+                setattr(job.trainer_args, "seed", job.job_args.random_seed)
                 setattr(job.model_manager, "output_dir", model_path)
             setattr(job.job_args, "output_dir", job_base_path)
 

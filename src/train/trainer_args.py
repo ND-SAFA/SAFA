@@ -22,6 +22,7 @@ class TrainerArgs(TrainingArguments, BaseObject):
     max_seq_length: int = MAX_SEQ_LENGTH_DEFAULT
 
     # Trainer
+    full_determinism = True
     train_epochs_range: List = None
     num_train_epochs: int = N_EPOCHS_DEFAULT
     checkpoint_path: str = None

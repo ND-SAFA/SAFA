@@ -26,8 +26,8 @@ if __name__ == "__main__":
     #
     # Imports
     #
-    from data.results.experiment_definition import ExperimentDefinition
-    from data.results.experiment_reader import ExperimentReader
+    from scripts.results import ExperimentDefinition
+    from scripts.results import ExperimentReader
     from util.logging.logger_manager import logger
 
     parser = argparse.ArgumentParser(
@@ -38,12 +38,12 @@ if __name__ == "__main__":
     file_path = os.path.join(RQ_PATH, args.experiment)
     export_file_name = args.experiment.split(".")[0]
     output_file = export_file_name + ".csv"
-    job_definition = ExperimentDefinition.read_experiment_definition(file_path)
+    job_definition = ExperimentDefinition._load_experiment_definition(file_path)
 
     OUTPUT_DIR = job_definition["output_dir"]
 
     result_reader = ExperimentReader(OUTPUT_DIR)
-    val_df, eval_df = result_reader.read()
+    val_df, eval_df = result_reader._load_experiment_definition()
     logger.log_with_title("Validation:", str(len(val_df)))
     logger.log_with_title("Evaluation:", str(len(eval_df)))
 

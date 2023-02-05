@@ -1,7 +1,7 @@
 import os
 
-from data.results.experiment_reader import ExperimentReader
 from jobs.components.job_result import JobResult
+from scripts.results.script_reader import ExperimentReader
 from testres.base_test import BaseTest
 from testres.paths.paths import TEST_RESULT_READER
 from testres.test_assertions import TestAssertions

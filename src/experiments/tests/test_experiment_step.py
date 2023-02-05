@@ -103,7 +103,7 @@ class TestExperimentStep(BaseExperimentTest):
         jobs = self.get_test_jobs()
         results = ExperimentStep._run_on_jobs(jobs, "get_output_filepath")
         self.assertEquals(len(results), 2)
-        self.assertNotEquals(results[0], results[1])
+        self.assertEquals(results[0], results[1])  # Nothing differentiating the two paths other than id which is set by experiment
 
     @patch.object(StructuredProjectReader, "_get_definition_reader")
     @patch.object(AbstractTraceJob, "get_trainer")
@@ -121,8 +121,8 @@ class TestExperimentStep(BaseExperimentTest):
         job1, job2 = self.get_test_jobs()
         output_dir = os.path.join(TEST_OUTPUT_DIR, "experiment_step")
         job1.model_manager = DeterministicTrainerDatasetManager(deterministic_id="1234")
-        job1, job2 = ExperimentStep._update_job_children([job1, job2], output_dir)
-        self.assertEquals(job1.model_manager.output_dir, output_dir)
+        ExperimentStep._update_job_children([job1, job2], output_dir)
+        self.assertEquals(job1.model_manager.output_dir, os.path.join(output_dir, str(job1.id), "models"))
 
     def get_experiment_step(self, train=True) -> ExperimentStep:
         kwargs = {}

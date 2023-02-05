@@ -27,7 +27,6 @@ class Experiment(BaseObject):
         FileUtil.create_dir_safely(output_dir)
         self.logger_config = logger_config
         self._setup_logger()
-        self._set_experiment_dir()
 
     def run(self):
         """

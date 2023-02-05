@@ -33,7 +33,8 @@ class ScriptRunner:
         self.experiment_dir = None
         self.logging_dir = None
         os.environ["WANDB_PROJECT"] = self.script_name
-        wandb.setup({""})
+        wandb_output_path = os.path.join(os.environ["OUTPUT_PATH"], "wandb")
+        wandb.init(dir=os.path.expanduser(wandb_output_path))
 
     def run(self) -> None:
         """

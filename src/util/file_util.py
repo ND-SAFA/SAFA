@@ -161,3 +161,13 @@ class FileUtil:
             return [os.path.join(path, r) for r in results]
         else:
             return results
+
+    @staticmethod
+    def ls_jobs(path: str, **kwargs) -> List[str]:
+        """
+        Returns jobs in path.
+        :param path: The path to list jobs in.
+        :param kwargs: Additional parameters passed to ls filter.
+        :return: List of jobs in path.
+        """
+        return FileUtil.ls_filter(path, f=lambda p: len(p.split("-")) == 5, **kwargs)

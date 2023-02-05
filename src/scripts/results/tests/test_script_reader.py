@@ -29,7 +29,7 @@ class TestResultReader(BaseTest):
                              "precision@2": 0.053, "precision@3": 0.035}
 
     def test_read(self):
-        result_reader = ScriptOutputReader(self.EXPERIMENT_PATH)
+        result_reader = ScriptOutputReader(self.EXPERIMENT_PATH, export=False)
         val_df, eval_df = result_reader.read()
         self.assertEqual(1, len(val_df))
         self.assertEqual(1, len(eval_df))

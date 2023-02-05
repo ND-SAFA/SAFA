@@ -23,7 +23,7 @@ class ScriptOutputReader:
     HEADER = "-" * 10
 
     def __init__(self, experiment_path: str, experimental_vars_ignore: List[str] = None, metrics: List[str] = None,
-                 display_metrics: List[str] = None):
+                 display_metrics: List[str] = None, export: bool = True):
         """
         Initializes reader for experiment at path.
         :param experiment_path: Path to experiment to read.
@@ -45,6 +45,7 @@ class ScriptOutputReader:
 
         self.eval_df = None
         self.val_df = None
+        self.export = export
 
     def print_eval(self) -> None:
         """
@@ -94,8 +95,9 @@ class ScriptOutputReader:
             if eval_metric_entry:
                 eval_entries.append(eval_metric_entry)
         self.val_df, self.eval_df = pd.DataFrame(val_entries), pd.DataFrame(eval_entries)
-        self.val_df.to_csv(self.val_output_path, index=False)
-        self.eval_df.to_csv(self.eval_output_path, index=False)
+        if self.export:
+            self.val_df.to_csv(self.val_output_path, index=False)
+            self.eval_df.to_csv(self.eval_output_path, index=False)
         return self.val_df, self.eval_df
 
     def _get_eval_df(self) -> pd.DataFrame:
@@ -159,10 +161,10 @@ class ScriptOutputReader:
         :param experiment_path: Path to experiment.
         :return: List of paths corresponding to each output file in experiment.
         """
-        experiment_ids = ScriptOutputReader.ls_jobs(experiment_path, add_base_path=True)
+        experiment_ids = FileUtil.ls_jobs(experiment_path, add_base_path=True)
         experiment_steps = [FileUtil.ls_filter(os.path.join(experiment_path, experiment_id), ignore=OS_IGNORE, add_base_path=True) for
                             experiment_id in experiment_ids]
-        job_paths = [ScriptOutputReader.ls_jobs(step, add_base_path=True) for steps in experiment_steps for step in steps]
+        job_paths = [FileUtil.ls_jobs(step, add_base_path=True) for steps in experiment_steps for step in steps]
         job_paths = reduce(lambda a, b: a + b, job_paths)
         return job_paths
 
@@ -185,16 +187,6 @@ class ScriptOutputReader:
         else:
             output_df = df
         logger.info(output_df.to_string())
-
-    @staticmethod
-    def ls_jobs(path: str, **kwargs) -> List[str]:
-        """
-        Returns jobs in path.
-        :param path: The path to list jobs in.
-        :param kwargs: Additional parameters passed to ls filter.
-        :return: List of jobs in path.
-        """
-        return FileUtil.ls_filter(path, f=lambda p: len(p.split("-")) == 5, **kwargs)
 
     @staticmethod
     def find_eval_key(dict_obj: Dict, keys: List[str]) -> Optional[str]:

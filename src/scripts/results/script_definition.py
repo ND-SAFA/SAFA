@@ -11,9 +11,6 @@ class ScriptDefinition:
     """
     Contains functionality for reading and applying transformations to experiment definition.
     """
-    MODELS_DIR_NAME = "models"
-    LOG_DIR_NAME = "logs"
-    JOB_DIR_NAME = "jobs"
     LOGGING_DIR_PARAM = "logging_dir"
     OUTPUT_DIR_PARAM = "output_dir"
     ENV_OUTPUT_PARMA = "[OUTPUT_PATH]"

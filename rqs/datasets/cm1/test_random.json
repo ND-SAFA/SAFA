@@ -16,14 +16,7 @@
             }
           },
           "model_manager": {
-            "model_path": {
-              "*": [
-                "prajjwal1/bert-tiny",
-                "prajjwal1/bert-mini",
-                "prajjwal1/bert-small",
-                "prajjwal1/bert-medium"
-              ]
-            }
+            "model_path": "hf-internal-testing/tiny-random-bert"
           },
           "trainer_args": {
             "num_train_epochs": 5,

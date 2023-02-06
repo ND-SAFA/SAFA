@@ -7,6 +7,7 @@ import java.sql.Statement;
 import javax.annotation.PostConstruct;
 
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
+import edu.nd.crc.safa.features.users.services.SafaUserService;
 
 import builders.DbEntityBuilder;
 import builders.JsonBuilder;
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.core.task.SyncTaskExecutor;
+import org.springframework.test.util.ReflectionTestUtils;
 import requests.SafaRequest;
 import services.AssertionTestService;
 import services.AuthorizationTestService;
@@ -140,5 +142,7 @@ public abstract class ApplicationBaseTest extends EntityBaseTest {
         token = null;
         this.authorizationService.defaultLogin();
         this.dbEntityBuilder.setCurrentUser(currentUser);
+
+        ReflectionTestUtils.setField(SafaUserService.class, "CHECK_USER_THREAD", false);
     }
 }

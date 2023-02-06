@@ -31,7 +31,7 @@ $graph-border-radius: 8px;
     }
 
     &:hover > foreignObject > * {
-      color: white;
+      color: var(--v-text-base);
     }
   }
 

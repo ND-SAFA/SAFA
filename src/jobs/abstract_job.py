@@ -9,6 +9,7 @@ from inspect import getfullargspec
 from typing import Dict
 
 import torch
+import wandb
 from transformers import set_seed
 
 from jobs.components.job_args import JobArgs
@@ -55,6 +56,7 @@ class AbstractJob(threading.Thread, BaseObject):
             self.result.set_job_status(Status.FAILURE)
         if self.save_job_output and self.job_args.output_dir:
             self.save(self.job_args.output_dir)
+            wandb.finish()
         self.cleanup()
 
     def cleanup(self) -> None:
@@ -86,9 +88,8 @@ class AbstractJob(threading.Thread, BaseObject):
         """
         if output_dir is None:
             output_dir = self.job_args.output_dir
-        output_path = os.path.join(output_dir, str(self.id))
-        FileUtil.create_dir_safely(output_path)
-        return os.path.join(output_path, AbstractJob.OUTPUT_FILENAME)
+        FileUtil.create_dir_safely(output_dir)
+        return os.path.join(output_dir, AbstractJob.OUTPUT_FILENAME)
 
     @abstractmethod
     def _run(self) -> JobResult:

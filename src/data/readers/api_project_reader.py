@@ -2,8 +2,8 @@ from typing import Dict, Tuple
 
 import pandas as pd
 
-from data.readers.abstract_project_reader import AbstractProjectReader
 from data.keys.structure_keys import StructuredKeys
+from data.readers.abstract_project_reader import AbstractProjectReader
 from server.api.api_definition import ApiDefinition
 from util.dataframe_util import DataFrameUtil
 
@@ -54,6 +54,12 @@ class ApiProjectReader(AbstractProjectReader):
         layer_mapping_df = pd.DataFrame(layer_mapping)
         trace_df = pd.DataFrame(trace_df_entries)
         return artifact_df, trace_df, layer_mapping_df
+
+    def get_project_name(self) -> str:
+        """
+        :return: Under Construction. Currently, returns identifier that project is api request.
+        """
+        return "Api Request"
 
     @staticmethod
     def add_artifact_layer(artifact_layer: Dict[str, str], layer_id: str, artifact_map: Dict):

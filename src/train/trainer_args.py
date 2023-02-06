@@ -22,6 +22,7 @@ class TrainerArgs(TrainingArguments, BaseObject):
     max_seq_length: int = MAX_SEQ_LENGTH_DEFAULT
 
     # Trainer
+    full_determinism = True
     train_epochs_range: List = None
     num_train_epochs: int = N_EPOCHS_DEFAULT
     checkpoint_path: str = None
@@ -79,7 +80,7 @@ class TrainerArgs(TrainingArguments, BaseObject):
                          num_train_epochs=self.num_train_epochs, evaluation_strategy=self.evaluation_strategy,
                          save_strategy=self.save_strategy, save_steps=self.save_steps, save_total_limit=self.save_total_limit,
                          load_best_model_at_end=self.load_best_model_at_end, logging_strategy=self.logging_strategy,
-                         logging_steps=self.logging_steps)
+                         logging_steps=self.logging_steps, report_to="wandb")
         self.__set_args(**kwargs)
 
     def __set_args(self, **kwargs) -> None:

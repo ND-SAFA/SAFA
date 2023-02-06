@@ -5,25 +5,28 @@
         {
           "object_type": "TRAIN",
           "job_args": {
-            "random_seed": 68
+            "random_seed": {
+              "*": [
+                812,
+                42
+              ]
+            }
           },
           "model_manager": {
             "model_path": "prajjwal1/bert-tiny"
           },
           "trainer_args": {
-            "output_dir": "[OUTPUT_PATH]/test/models",
-            "num_train_epochs": 1,
-            "per_device_batch_size": 32,
-            "gradient_accumulation_steps": 8,
-            "learning_rate": 5e-6,
+            "num_train_epochs": 3,
+            "gradient_accumulation_steps": 16,
+            "learning_rate": 5e-5,
             "metrics": [
               "map",
               "map_at_k",
               "f",
               "precision"
             ],
-            "skip_save": true,
-            "load_best_model_at_end": false
+            "skip_save": false,
+            "load_best_model_at_end": true
           },
           "trainer_dataset_manager": {
             "train_dataset_creator": {
@@ -32,26 +35,22 @@
                 "object_type": "STRUCTURE",
                 "project_path": {
                   "*": [
-                    "[DATA_PATH]/cchit",
-                    "[DATA_PATH]/drone",
-                    "[DATA_PATH]/cm1",
-                    "[DATA_PATH]/ptc",
-                    "[DATA_PATH]/lhp/heating",
                     "[DATA_PATH]/lhp/cooling",
-                    "[DATA_PATH]/lhp/vehiclemodes"
+                    "[DATA_PATH]/lhp/heating"
                   ]
                 }
-              }
+              },
+              "filter_unlinked_artifacts": true
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",
               "split_strategy": "SPLIT_BY_LINK",
-              "val_percentage": 0.25
+              "val_percentage": 0.30
             },
             "eval_dataset_creator": {
               "object_type": "SPLIT",
               "split_strategy": "SPLIT_BY_LINK",
-              "val_percentage": 0.25
+              "val_percentage": 0.30
             },
             "augmenter": {
               "steps": [
@@ -64,6 +63,5 @@
         }
       ]
     }
-  ],
-  "output_dir": "[OUTPUT_PATH]/test/jobs"
+  ]
 }

@@ -1,7 +1,7 @@
 import os
 
-from data.results.experiment_reader import ExperimentReader
 from jobs.components.job_result import JobResult
+from scripts.results.script_reader import ScriptOutputReader
 from testres.base_test import BaseTest
 from testres.paths.paths import TEST_RESULT_READER
 from testres.test_assertions import TestAssertions
@@ -29,7 +29,7 @@ class TestResultReader(BaseTest):
                              "precision@2": 0.053, "precision@3": 0.035}
 
     def test_read(self):
-        result_reader = ExperimentReader(self.EXPERIMENT_PATH)
+        result_reader = ScriptOutputReader(self.EXPERIMENT_PATH, export=False)
         val_df, eval_df = result_reader.read()
         self.assertEqual(1, len(val_df))
         self.assertEqual(1, len(eval_df))
@@ -40,7 +40,7 @@ class TestResultReader(BaseTest):
         """
         Tests that all validation entries are read and metrics extracted.
         """
-        val_entries = ExperimentReader.read_validation_entries(self.TEST_ENTRY, ["a", "c"])
+        val_entries = ScriptOutputReader.read_validation_entries(self.TEST_ENTRY, ["a", "c"])
         self.assertEqual(2, len(val_entries))
         for i, (a, c) in enumerate([(1, 3), (3, 9)]):
             val_entry = val_entries[i]
@@ -51,15 +51,15 @@ class TestResultReader(BaseTest):
         """
         Tests that eval metric for job result is able to be read.
         """
-        eval_entry = ExperimentReader.read_eval_entry(self.TEST_ENTRY, ["a", "b"])
+        eval_entry = ScriptOutputReader.read_eval_entry(self.TEST_ENTRY, ["a", "b"])
         self.assertEqual(1, eval_entry["a"])
         self.assertEqual(2, eval_entry["b"])
 
-    def test_experiment_jobs(self) -> None:
+    def test_read_experiment_jobs(self) -> None:
         """
         Tests that output files are all found.
         """
-        experiment_results = ExperimentReader.read_experiment_jobs(self.EXPERIMENT_PATH)
+        experiment_results = ScriptOutputReader.read_experiment_jobs(self.EXPERIMENT_PATH)
         self.assertEqual(1, len(experiment_results))
         step_path = experiment_results[0]
         self.assertIn(self.EXPERIMENT_ID, step_path)

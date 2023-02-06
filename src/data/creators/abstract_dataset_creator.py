@@ -23,3 +23,9 @@ class AbstractDatasetCreator(BaseObject, ABC, Generic[DatasetType]):
         Creates the data
         :return: the data
         """
+
+    @abstractmethod
+    def get_name(self) -> str:
+        """
+        :return: Returns the name of the dataset.
+        """

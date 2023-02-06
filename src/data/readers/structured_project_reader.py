@@ -10,6 +10,7 @@ from data.readers.definitions.abstract_project_definition import AbstractProject
 from data.readers.definitions.structure_project_definition import StructureProjectDefinition
 from data.readers.definitions.tim_project_definition import TimProjectDefinition
 from data.readers.entity.entity_reader import EntityReader
+from util.file_util import FileUtil
 from util.json_util import JsonUtil
 from util.override import overrides
 
@@ -45,6 +46,12 @@ class StructuredProjectReader(AbstractProjectReader):
         trace_df = self._read_trace_df()
         layer_mapping_df = self._read_layer_mapping_df()
         return artifact_df, trace_df, layer_mapping_df
+
+    def get_project_name(self) -> str:
+        """
+        :return: Returns the name of the project directory.
+        """
+        return FileUtil.get_file_name(self.project_path)
 
     @overrides(AbstractProjectReader)
     def get_overrides(self) -> Dict:

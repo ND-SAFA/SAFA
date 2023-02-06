@@ -10,6 +10,7 @@ from util.logging.logger_config import LoggerConfig
 from util.logging.logger_manager import LoggerManager
 from util.status import Status
 
+
 class Experiment(BaseObject):
     _STEP_DIR_NAME = "step_%s"
 

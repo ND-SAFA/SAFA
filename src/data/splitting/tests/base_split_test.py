@@ -1,5 +1,5 @@
 from data.splitting.supported_split_strategy import SupportedSplitStrategy
-from data.splitting.trace_dataset_splitter import TraceDatasetSplitter
+from data.splitting.dataset_splitter import DatasetSplitter
 from testres.base_trace_test import BaseTraceTest
 from testres.test_assertions import TestAssertions
 
@@ -13,7 +13,7 @@ class BaseSplitTest(BaseTraceTest):
         trace_dataset = self.get_trace_dataset()
         n_orig_links = len(trace_dataset)
         percent_splits = [0.3, 0.2]
-        splitter = TraceDatasetSplitter(trace_dataset)
+        splitter = DatasetSplitter(trace_dataset)
         splits = splitter.split_multiple(percent_splits, strategies=[strategy.name] * len(percent_splits))
         length_of_splits = [len(split) for split in splits]
         split_link_ids = [set(split.links.keys()) for split in splits]
@@ -33,7 +33,7 @@ class BaseSplitTest(BaseTraceTest):
 
     def assert_split(self, strategy=SupportedSplitStrategy.SPLIT_BY_LINK):
         trace_dataset = self.get_trace_dataset()
-        splitter = TraceDatasetSplitter(trace_dataset)
+        splitter = DatasetSplitter(trace_dataset)
         split1, split2 = splitter.split(self.VAlIDATION_PERCENTAGE, strategy=strategy.name)
         expected_val_link_size = (self.EXPECTED_VAL_SIZE_POS_LINKS + self.EXPECTED_VAL_SIZE_NEG_LINKS)
         self.assertLessEqual(abs(len(split1) - (len(self.all_links) - expected_val_link_size)), 1)

@@ -9,7 +9,7 @@ from data.datasets.dataset_role import DatasetRole
 from data.datasets.pre_train_dataset import PreTrainDataset
 from data.datasets.trace_dataset import TraceDataset
 from data.processing.augmentation.data_augmenter import DataAugmenter
-from data.splitting.trace_dataset_splitter import TraceDatasetSplitter
+from data.splitting.dataset_splitter import DatasetSplitter
 from util.base_object import BaseObject
 from util.override import overrides
 from variables.undetermined_variable import UndeterminedVariable
@@ -134,10 +134,11 @@ class TrainerDatasetManager(BaseObject):
         :return: None
         """
         train_dataset = self._datasets[DatasetRole.TRAIN] if DatasetRole.TRAIN in self else None
-        if train_dataset and isinstance(train_dataset, TraceDataset):
+        if train_dataset:
             dataset_splits_map = self._create_dataset_splits(train_dataset, self._dataset_creators)
             self._datasets.update(dataset_splits_map)
-            self._datasets[DatasetRole.TRAIN].prepare_for_training(data_augmenter)
+            if isinstance(train_dataset, TraceDataset):
+                self._datasets[DatasetRole.TRAIN].prepare_for_training(data_augmenter)
 
     @staticmethod
     def _create_dataset_splits(train_dataset: TraceDataset,
@@ -160,7 +161,7 @@ class TrainerDatasetManager(BaseObject):
         dataset_splits_map = {}
         if len(split_roles) < 1:
             return dataset_splits_map
-        splitter = TraceDatasetSplitter(train_dataset)
+        splitter = DatasetSplitter(train_dataset)
         splits = splitter.split_multiple(split_percentages, split_strategies)
         train_dataset, split_datasets = splits[0], splits[1:]
         dataset_splits_map[DatasetRole.TRAIN] = train_dataset

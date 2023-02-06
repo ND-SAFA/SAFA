@@ -1,7 +1,7 @@
 import os
 import shutil
 from copy import deepcopy
-from typing import Callable, Dict, IO, List, Union
+from typing import Callable, Dict, IO, List, Union, Tuple
 
 from util.json_util import JsonUtil
 
@@ -161,3 +161,12 @@ class FileUtil:
             return [os.path.join(path, r) for r in results]
         else:
             return results
+
+    @staticmethod
+    def split_base_path_and_filename(file_path: str) -> Tuple[str, str]:
+        """
+        Splits the filepath into base directory and the filename
+        :param file_path: The path to the file
+        :return: A tuple containing the base directory and the filename
+        """
+        return os.path.dirname(file_path), os.path.basename(file_path)

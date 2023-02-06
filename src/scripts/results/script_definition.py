@@ -90,13 +90,9 @@ class ScriptDefinition:
         return new_obj
 
     @staticmethod
-    def get_script_name(script_path: str):
+    def get_script_name(path: str) -> str:
         """
-        Returns the name of the file referenced in path.
-        :param script_path: Path to script file whose name is returned.
-        :return: The name of the script.
+        :param path: Path used to construct id.
+        :return: Returns the directory and file name of path used to identify scripts.
         """
-        path_without_extension, _ = os.path.splitext(script_path)
-        base_name, file_name = os.path.split(path_without_extension)
-        base_name, folder_name = os.path.split(base_name)
-        return "-".join([folder_name, file_name])
+        return FileUtil.get_file_name(path, n_parents=1)

@@ -18,6 +18,12 @@ class AbstractProjectReader(BaseObject, ABC):
         :return: Returns data frames containing artifacts, trace links, and layer mappings.
         """
 
+    @abstractmethod
+    def get_project_name(self) -> str:
+        """
+        :return:  Returns the name of the project being read.
+        """
+
     @staticmethod
     def should_generate_negative_links() -> bool:
         """

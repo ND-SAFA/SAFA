@@ -1,4 +1,4 @@
-from typing import Union, Optional
+from typing import Optional, Union
 
 from constants import VALIDATION_PERCENTAGE_DEFAULT
 from data.creators.abstract_dataset_creator import AbstractDatasetCreator
@@ -28,3 +28,10 @@ class SplitDatasetCreator(AbstractDatasetCreator):
         :return: None
         """
         return None
+
+    def get_name(self) -> None:
+        """
+        Raises not implemented error. TODO: Get name of the dataset being split.
+        :return: None
+        """
+        raise NotImplementedError("Split dataset does not support get_name.")

@@ -56,3 +56,13 @@ class TestFileUtil(BaseTest):
         self.assertEqual(3, len(path_list))
         for expected_item in ["folder_1", "folder_2", "file"]:
             self.assertIn(expected_item, path_list)
+
+    def test_get_file_name(self):
+        """
+        Tests that construction of parent-based file names works.
+        :return:
+        """
+        self.assertEqual("456", FileUtil.get_file_name("456"))
+        self.assertEqual("456", FileUtil.get_file_name("123/456"))
+        self.assertEqual("123-456", FileUtil.get_file_name("123/456", 1))
+        self.assertEqual("def-123-456", FileUtil.get_file_name("abc/def/123/456", 2))

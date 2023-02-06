@@ -6,12 +6,14 @@ from data.keys.csv_format import CSVKeys
 from data.keys.structure_keys import StructuredKeys
 from data.readers.abstract_project_reader import AbstractProjectReader
 from util.dataframe_util import DataFrameUtil
+from util.file_util import FileUtil
 
 
 class CsvProjectReader(AbstractProjectReader):
     """
     Responsible for reading trace links and artifacts from CSV file.
     """
+
     LAYER_ID = "CSV_LAYER_ID"
 
     def __init__(self, project_path: str):
@@ -52,6 +54,12 @@ class CsvProjectReader(AbstractProjectReader):
         }])
         artifact_df = pd.DataFrame(artifact_df_entries)
         return artifact_df, trace_df, layer_mapping_df
+
+    def get_project_name(self) -> str:
+        """
+        :return: Returns the file name of the csv file.
+        """
+        return FileUtil.get_file_name(self.project_path)
 
     @staticmethod
     def should_generate_negative_links() -> bool:

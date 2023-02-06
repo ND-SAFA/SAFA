@@ -5,6 +5,7 @@ import torch
 from datasets import Dataset
 from transformers.trainer import Trainer
 
+from data.creators.trace_dataset_creator import TraceDatasetCreator
 from data.datasets.data_key import DataKey
 from data.datasets.dataset_role import DatasetRole
 from data.managers.trainer_dataset_manager import TrainerDatasetManager
@@ -57,8 +58,10 @@ class TraceTrainer(Trainer, BaseObject):
         :param checkpoint: path to checkpoint.
         :return: a dictionary containing the results
         """
+
         self.model = self.model_manager.get_model()
         self.train_dataset = self.trainer_dataset_manager[DatasetRole.TRAIN].to_trainer_dataset(self.model_manager)
+        self._set_tracker_group(self.trainer_dataset_manager.get_creator(DatasetRole.TRAIN))
         self.eval_dataset = self._get_dataset(DatasetRole.VAL)
         train_output = self.train(resume_from_checkpoint=checkpoint)
         self.eval_dataset = self._get_dataset(DatasetRole.EVAL)
@@ -108,3 +111,10 @@ class TraceTrainer(Trainer, BaseObject):
         """
         return self.trainer_dataset_manager[dataset_role].to_trainer_dataset(
             self.model_manager) if dataset_role in self.trainer_dataset_manager else None
+
+    def _set_tracker_group(self, creator: TraceDatasetCreator) -> None:
+        """
+        Sets the current run to be grouped with dataset.
+        :return: None
+        """
+        os.environ["WANDB_RUN_GROUP"] = creator.project_reader.get_project_name()

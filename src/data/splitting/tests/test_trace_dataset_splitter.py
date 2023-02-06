@@ -2,7 +2,7 @@ from unittest import mock
 from unittest.mock import patch
 
 from data.splitting.tests.base_split_test import BaseSplitTest
-from data.splitting.trace_dataset_splitter import TraceDatasetSplitter
+from data.splitting.dataset_splitter import DatasetSplitter
 from models.model_manager import ModelManager
 from testres.base_trace_test import BaseTraceTest
 
@@ -16,7 +16,7 @@ class TestTraceDatasetSplitter(BaseSplitTest):
     @patch.object(ModelManager, "get_tokenizer")
     def test_to_trainer_dataset(self, get_tokenizer_mock: mock.MagicMock):
         get_tokenizer_mock.return_value = self.get_test_tokenizer()
-        splitter = TraceDatasetSplitter(self.get_trace_dataset())
+        splitter = DatasetSplitter(self.get_trace_dataset())
         train_dataset, test_dataset = splitter.split(self.VAlIDATION_PERCENTAGE)
         train_dataset.prepare_for_training()
         model_generator = ModelManager(**self.MODEL_MANAGER_PARAMS)

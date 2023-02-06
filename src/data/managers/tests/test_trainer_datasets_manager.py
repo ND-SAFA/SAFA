@@ -5,21 +5,34 @@ from unittest.mock import patch
 from data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
 from data.creators.trace_dataset_creator import TraceDatasetCreator
 from data.datasets.dataset_role import DatasetRole
+from data.datasets.pre_train_dataset import PreTrainDataset
 from data.datasets.trace_dataset import TraceDataset
 from data.managers.tests.base_trainer_datasets_manager_test import BaseTrainerDatasetsManagerTest
 from data.managers.trainer_dataset_manager import TrainerDatasetManager
 from testres.paths.paths import TEST_OUTPUT_DIR
-from testres.test_assertions import TestAssertions
 from util.object_creator import ObjectCreator
 from variables.experimental_variable import ExperimentalVariable
 
 
 class TestTrainerDatasetsManager(BaseTrainerDatasetsManagerTest):
+
+    def test_prepare_datasets_pretrain(self):
+        dataset_container_manager: TrainerDatasetManager = self.create_dataset_manager(
+            [DatasetRole.PRE_TRAIN, DatasetRole.VAL])
+        pre_train_creator = dataset_container_manager._dataset_creators.pop(DatasetRole.PRE_TRAIN)
+        dataset_container_manager._dataset_creators[DatasetRole.TRAIN] = pre_train_creator
+        dataset_container_manager._dataset_creators[DatasetRole.VAL].split_strategy = None
+        dataset_container_manager._prepare_datasets(None)
+        self.assertTrue(isinstance(dataset_container_manager[DatasetRole.VAL], PreTrainDataset))
+        for role in [DatasetRole.TRAIN, DatasetRole.VAL]:
+            dataset = dataset_container_manager[role]
+            self.assertTrue(os.path.exists(dataset.training_file_path))
+
     @patch.object(MLMPreTrainDatasetCreator, "create")
     def test_prepare_datasets(self, create_mock):
         dataset_container_manager: TrainerDatasetManager = self.create_dataset_manager(
             [DatasetRole.PRE_TRAIN, DatasetRole.EVAL, DatasetRole.VAL])
-        dataset_container_manager._prepare_datasets([])
+        dataset_container_manager._prepare_datasets(None)
         self.assert_final_datasets_are_as_expected(dataset_container_manager)
 
     @patch.object(MLMPreTrainDatasetCreator, "create")
@@ -45,7 +58,10 @@ class TestTrainerDatasetsManager(BaseTrainerDatasetsManagerTest):
             os.makedirs(TEST_OUTPUT_DIR)
         dataset_container_manager = self.create_dataset_manager([DatasetRole.VAL])
         dataset_container_manager.save_dataset_splits(TEST_OUTPUT_DIR)
-        TestAssertions.assert_lists_have_the_same_vals(self, ["train.csv", "val.csv"], os.listdir(TEST_OUTPUT_DIR))
+        dataset_files = ["train.csv", "val.csv"]
+        output_files = os.listdir(TEST_OUTPUT_DIR)
+        for dataset_file in dataset_files:
+            self.assertIn(dataset_file, output_files)
 
     @patch.object(MLMPreTrainDatasetCreator, "create")
     def test_create_from_map(self, create_mock):

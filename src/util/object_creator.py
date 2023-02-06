@@ -50,7 +50,8 @@ class ObjectCreator:
 
     pretrain_dataset_definition = {
         TypedDefinitionVariable.OBJECT_TYPE_KEY: "MLM_PRETRAIN",
-        "orig_data_path": PRETRAIN_DIR
+        "orig_data_path": PRETRAIN_DIR,
+        "training_data_dir": TEST_OUTPUT_DIR
     }
 
     trainer_dataset_manager_definition = {

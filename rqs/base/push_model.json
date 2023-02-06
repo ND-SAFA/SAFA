@@ -1,0 +1,19 @@
+{
+  "steps": [
+    {
+      "jobs": [
+        {
+          "object_type": "PUSH_MODEL",
+          "job_args": {
+          },
+          "model_manager": {
+            "model_path": "[INPUT_MODEL]"
+          },
+          "trainer_args": {
+            "hub_model_id": "thearod5/[MODEL_NAME]"
+          }
+        }
+      ]
+    }
+  ]
+}

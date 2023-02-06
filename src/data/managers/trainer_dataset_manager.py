@@ -134,10 +134,11 @@ class TrainerDatasetManager(BaseObject):
         :return: None
         """
         train_dataset = self._datasets[DatasetRole.TRAIN] if DatasetRole.TRAIN in self else None
-        if train_dataset and isinstance(train_dataset, TraceDataset):
+        if train_dataset:
             dataset_splits_map = self._create_dataset_splits(train_dataset, self._dataset_creators)
             self._datasets.update(dataset_splits_map)
-            self._datasets[DatasetRole.TRAIN].prepare_for_training(data_augmenter)
+            if isinstance(train_dataset, TraceDataset):
+                self._datasets[DatasetRole.TRAIN].prepare_for_training(data_augmenter)
 
     @staticmethod
     def _create_dataset_splits(train_dataset: TraceDataset,

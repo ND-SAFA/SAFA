@@ -1,6 +1,7 @@
 import os
 import random
 from collections import OrderedDict
+from copy import deepcopy
 from typing import Callable, Dict, List, Tuple
 
 import pandas as pd
@@ -308,3 +309,15 @@ class TraceDataset(AbstractDataset):
         :return: the length of the dataset
         """
         return len(self.pos_link_ids) + len(self.neg_link_ids)
+
+    def __add__(self, other: "TraceDataset") -> "TraceDataset":
+        """
+        Combines two trace datasets
+        :param other: Dataset to combine
+        :return: The combined dataset
+        """
+        links = deepcopy(self.links)
+        links.update(deepcopy(other.links))
+        pos_link_ids = deepcopy(self.pos_link_ids) + deepcopy(other.pos_link_ids)
+        neg_link_ids = deepcopy(self.neg_link_ids) + deepcopy(other.neg_link_ids)
+        return TraceDataset(links, pos_link_ids, neg_link_ids)

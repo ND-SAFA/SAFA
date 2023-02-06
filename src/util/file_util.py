@@ -69,7 +69,7 @@ class FileUtil:
         return value
 
     @staticmethod
-    def save_to_file(content: Union[str, Dict], output_file_path: str):
+    def write(content: Union[str, Dict], output_file_path: str):
         """
         Soon to be mock function for saving files to storage but using the filesystem instead.
         :param content: The content of the file to create.

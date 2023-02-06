@@ -107,7 +107,7 @@ class AbstractJob(threading.Thread, BaseObject):
         try:
             json_output = self.result.to_json()
             job_output_filepath = self.get_output_filepath(output_dir)
-            FileUtil.save_to_file(json_output, job_output_filepath)
+            FileUtil.write(json_output, job_output_filepath)
             return True
         except Exception:
             logger.exception("Unable to save job output")  # to save in logs

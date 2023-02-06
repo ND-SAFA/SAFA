@@ -1,4 +1,4 @@
-from typing import Generic, Type
+from typing import Type
 
 from data.creators.abstract_dataset_creator import AbstractDatasetCreator, DatasetType
 from data.creators.trace_dataset_creator import TraceDatasetCreator
@@ -14,6 +14,7 @@ class MultiTraceDatasetCreator(AbstractDatasetCreator):
     Responsible for creating Combining Multiple TraceDataset from DataFrames containing artifacts, traces, and
     layer mappings.
     """
+    DELIMITER = "-"
 
     def __init__(self, project_readers: [AbstractProjectReader], data_cleaner: DataCleaner = None,
                  filter_unlinked_artifacts: bool = False):
@@ -41,6 +42,12 @@ class MultiTraceDatasetCreator(AbstractDatasetCreator):
             else:
                 multi_dataset += dataset  # combine datasets
         return multi_dataset
+
+    def get_name(self) -> str:
+        """
+        :return: Returns name of combination of datasets.
+        """
+        return self.DELIMITER.join([p.get_name() for p in self.project_readers])
 
     @classmethod
     @overrides(BaseObject)

@@ -41,7 +41,7 @@ class AbstractJob(threading.Thread, BaseObject):
         Runs the job and saves the output
         """
         logger.log_with_title(f"Starting New {self.get_job_name()} Job with Following Experiment Vars",
-                    self.result.get_printable_experiment_vars())
+                              self.result.get_printable_experiment_vars())
         self.result.set_job_status(Status.IN_PROGRESS)
         try:
             self.set_seed()
@@ -106,7 +106,7 @@ class AbstractJob(threading.Thread, BaseObject):
         try:
             json_output = self.result.to_json()
             job_output_filepath = self.get_output_filepath(output_dir)
-            FileUtil.save_to_file(json_output, job_output_filepath)
+            FileUtil.write(json_output, job_output_filepath)
             return True
         except Exception:
             logger.exception("Unable to save job output")  # to save in logs

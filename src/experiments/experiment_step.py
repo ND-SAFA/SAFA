@@ -79,7 +79,7 @@ class ExperimentStep(BaseObject):
         FileUtil.create_dir_safely(output_dir)
         json_output = JsonUtil.dict_to_json(self.get_results())
         output_filepath = os.path.join(output_dir, ExperimentStep.OUTPUT_FILENAME)
-        FileUtil.save_to_file(json_output, output_filepath)
+        FileUtil.write(json_output, output_filepath)
 
     def get_results(self) -> Dict[str, str]:
         """

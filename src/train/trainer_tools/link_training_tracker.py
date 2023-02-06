@@ -1,6 +1,6 @@
 import os
 from dataclasses import dataclass
-from typing import List, Dict, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 
@@ -83,7 +83,7 @@ class LinkTrainingTracker:
                        EpochTrainingResult.NEG_LINKS_KEY: self._get_worst_and_best_result(epoch_result.neg_link_ids_worst_to_best)}
         output_path = self.get_output_path(output_dir, epoch_iteration)
         output_json = JsonUtil.dict_to_json(output_dict)
-        FileUtil.save_to_file(output_json, output_file_path=output_path)
+        FileUtil.write(output_json, output_file_path=output_path)
         return True
 
     def get_output_path(self, output_dir: str, epoch_iteration: int) -> str:

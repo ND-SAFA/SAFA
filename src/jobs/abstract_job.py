@@ -1,5 +1,4 @@
 import os
-import random
 import threading
 import traceback
 import uuid
@@ -10,7 +9,6 @@ from typing import Dict
 
 import torch
 import wandb
-from transformers import set_seed
 
 from jobs.components.job_args import JobArgs
 from jobs.components.job_result import JobResult
@@ -18,6 +16,7 @@ from models.model_manager import ModelManager
 from util.base_object import BaseObject
 from util.file_util import FileUtil
 from util.logging.logger_manager import logger
+from util.random_util import RandomUtil
 from util.status import Status
 
 
@@ -45,7 +44,7 @@ class AbstractJob(threading.Thread, BaseObject):
                               self.result.get_printable_experiment_vars())
         self.result.set_job_status(Status.IN_PROGRESS)
         try:
-            self.set_seed()
+            RandomUtil.set_seed(self.job_args.random_seed)
             run_result = self._run()
             self.result = run_result.update(self.result)
             self.result.set_job_status(Status.SUCCESS)
@@ -68,17 +67,6 @@ class AbstractJob(threading.Thread, BaseObject):
             self.model_manager.clear_model()
         torch.cuda.empty_cache()
 
-    @staticmethod
-    def set_random_seed(random_seed: int) -> None:
-        """
-        Sets the random seed used for training
-        :param random_seed: the random seed to use
-        :return: None
-        """
-        random.seed(random_seed)
-        set_seed(random_seed)
-        torch.backends.cudnn.deterministic = True
-        torch.backends.cudnn.benchmark = False
 
     def get_output_filepath(self, output_dir: str = None) -> str:
         """
@@ -112,14 +100,6 @@ class AbstractJob(threading.Thread, BaseObject):
         except Exception:
             logger.exception("Unable to save job output")  # to save in logs
             return False
-
-    def set_seed(self) -> None:
-        """
-        Sets the random seed for this job.
-        :return: None
-        """
-        if self.job_args.random_seed:
-            self.set_random_seed(self.job_args.random_seed)
 
     def get_job_name(self) -> str:
         """

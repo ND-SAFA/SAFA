@@ -9,7 +9,7 @@ from util.base_object import BaseObject
 from util.override import overrides
 
 
-class MultiTraceDatasetCreator(AbstractDatasetCreator[Generic[DatasetType]]):
+class MultiTraceDatasetCreator(AbstractDatasetCreator):
     """
     Responsible for creating Combining Multiple TraceDataset from DataFrames containing artifacts, traces, and
     layer mappings.

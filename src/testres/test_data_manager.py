@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import Dict, List, Union
 
 import numpy as np
 from transformers.trainer_utils import PredictionOutput
@@ -86,9 +86,24 @@ class TestDataManager:
 
     @staticmethod
     def _get_artifact_body(artifact_id: str):
+        """
+        :param artifact_id: The id of the artifact whose body is returned.
+        :return: Returns the body of the artifact with given id.
+        """
+        artifact_map = TestDataManager.get_artifact_map()
+        if artifact_id in artifact_map:
+            return artifact_map[artifact_id]
+        raise ValueError("Could not find artifact with id:" + artifact_id)
+
+    @staticmethod
+    def get_artifact_map() -> Dict[str, str]:
+        """
+        :return: map between artifact id to its body.
+        """
+        artifacts = {}
         for artifact_type_key in [TestDataManager.Keys.SOURCE, TestDataManager.Keys.TARGET]:
             artifact_levels = TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS, artifact_type_key])
             for artifact_level in artifact_levels:
-                if artifact_id in artifact_level:
-                    return artifact_level[artifact_id]
-        raise ValueError("Could not find artifact with id:" + artifact_id)
+                for artifact_id, artifact_body in artifact_level.items():
+                    artifacts[artifact_id] = artifact_body
+        return artifacts

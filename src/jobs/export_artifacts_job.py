@@ -24,7 +24,7 @@ class ExportArtifactJob(AbstractJob):
         """
         super().__init__(job_args=job_args)
         self.trace_dataset_creator = trace_dataset_creator
-        self.file_name = file_name if file_name else "pretrained.txt"
+        self.file_name = file_name if file_name else trace_dataset_creator.get_name()
         self.delimiter = delimiter
 
     def _run(self) -> JobResult:
@@ -32,6 +32,7 @@ class ExportArtifactJob(AbstractJob):
         Exports artifact bodies as delimited file. Any delimiter found in artifact bodies is removed.
         :return: JobResult containing export path.
         """
+        self.trace_dataset_creator.create()
         artifacts: Iterable[str] = self.trace_dataset_creator.artifact_df[StructuredKeys.Artifact.BODY]
         artifacts = [a.replace(self.delimiter, "") for a in artifacts]
         content = self.delimiter.join(artifacts)

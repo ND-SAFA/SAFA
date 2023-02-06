@@ -9,7 +9,7 @@ from jobs.components.job_result import JobResult
 from util.file_util import FileUtil
 
 
-class ExportArtifactJob(AbstractJob):
+class ExportArtifactsJob(AbstractJob):
     """
     Exports projects artifacts across all levels to newline delimited file.
     """
@@ -24,7 +24,7 @@ class ExportArtifactJob(AbstractJob):
         """
         super().__init__(job_args=job_args)
         self.trace_dataset_creator = trace_dataset_creator
-        self.file_name = file_name if file_name else trace_dataset_creator.get_name()
+        self.file_name = file_name if file_name else trace_dataset_creator.get_name() + ".txt"
         self.delimiter = delimiter
 
     def _run(self) -> JobResult:

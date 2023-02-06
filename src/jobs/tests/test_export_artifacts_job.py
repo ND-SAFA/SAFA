@@ -4,7 +4,7 @@ from data.managers.trainer_dataset_manager import TrainerDatasetManager
 from jobs.components.job_args import JobArgs
 from jobs.components.job_result import JobResult
 from jobs.create_datasets_job import CreateDatasetsJob
-from jobs.export_artifacts_job import ExportArtifactJob
+from jobs.export_artifacts_job import ExportArtifactsJob
 from jobs.tests.base_job_test import BaseJobTest
 from testres.test_data_manager import TestDataManager
 from util.file_util import FileUtil
@@ -43,11 +43,11 @@ class TestExportArtifactsJob(BaseJobTest):
         job.run()
         self.assert_output_on_failure(self._load_job_output(job))
 
-    def _get_job(self, **kwargs) -> ExportArtifactJob:
+    def _get_job(self, **kwargs) -> ExportArtifactsJob:
         """
         Creates job to export project artifacts.
         """
         job_args = ObjectCreator.create(JobArgs)
         trainer_dataset_manager = ObjectCreator.create(TrainerDatasetManager)
         trace_project_creator: TraceDatasetCreator = trainer_dataset_manager.get_creator(DatasetRole.TRAIN)
-        return ExportArtifactJob(job_args, trace_project_creator, **kwargs)
+        return ExportArtifactsJob(job_args, trace_project_creator, **kwargs)

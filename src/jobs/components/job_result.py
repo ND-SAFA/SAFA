@@ -31,6 +31,7 @@ class JobResult(BaseObject):
     VAL_METRICS = "val_metrics"
     EVAL_METRICS = "eval_metrics"
     EXPERIMENTAL_VARS = "experimental_vars"
+    EXPORT_PATH = "export_path"
 
     _properties = {JOB_ID: Schema(type=TYPE_STRING, format=FORMAT_UUID),
                    STATUS: Schema(type=TYPE_INTEGER),

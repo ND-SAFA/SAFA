@@ -8,7 +8,7 @@
             "random_seed": 42
           },
           "model_manager": {
-            "model_path": "roberta-base"
+            "model_path": "prajjwal1/bert-tiny"
           },
           "trainer_args": {
             "num_train_epochs": 30,
@@ -24,7 +24,13 @@
           "trainer_dataset_manager": {
             "train_dataset_creator": {
               "object_type": "MLM_PRE_TRAIN",
-              "orig_data_path": "[DATA_PATH]/pretrain/itrust"
+              "orig_data_path": {
+                "*": [
+                  "[DATA_PATH]/pretrain/automotive",
+                  "[DATA_PATH]/pretrain/itrust",
+                  "[DATA_PATH]/pretrain/mip"
+                ]
+              }
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",

@@ -107,7 +107,7 @@ public class CsvArtifactFile extends AbstractArtifactFile<CSVRecord> {
                 String key = entry.getKey();
                 String value = entry.getValue();
 
-                if (!Constants.ALL_COLUMNS_SET.contains(key)) {
+                if (!Constants.ALL_COLUMNS_SET.contains(key.toLowerCase())) {
                     recordAttributes.put(key, TextNode.valueOf(value));
                 }
             }

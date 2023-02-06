@@ -17,7 +17,7 @@
           },
           "trainer_args": {
             "num_train_epochs": 3,
-            "gradient_accumulation_steps": 1,
+            "gradient_accumulation_steps": 16,
             "learning_rate": 5e-5,
             "metrics": [
               "map",
@@ -33,7 +33,12 @@
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "STRUCTURE",
-                "project_path": "[DATA_PATH]/lhp/cooling"
+                "project_path": {
+                  "*": [
+                    "[DATA_PATH]/lhp/cooling",
+                    "[DATA_PATH]/lhp/heating"
+                  ]
+                }
               },
               "filter_unlinked_artifacts": true
             },

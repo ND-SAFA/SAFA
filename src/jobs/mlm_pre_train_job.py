@@ -3,8 +3,8 @@ import os
 from transformers import DataCollatorForLanguageModeling
 
 from data.datasets.dataset_role import DatasetRole
-from data.managers.trainer_dataset_manager import TrainerDatasetManager
 from data.datasets.pre_train_dataset import PreTrainDataset
+from data.managers.trainer_dataset_manager import TrainerDatasetManager
 from jobs.components.job_args import JobArgs
 from jobs.components.job_result import JobResult
 from jobs.train_job import TrainJob
@@ -40,7 +40,7 @@ class MLMPreTrainJob(TrainJob):
         data_collator = DataCollatorForLanguageModeling(
             tokenizer=tokenizer, mlm=True, mlm_probability=self.mlm_probability
         )
-        tokenizer.save_vocabulary(self.job_args.output_dir)
+        tokenizer.save_pretrained(self.job_args.output_dir)
 
         job_result = super()._run(data_collator=data_collator)
         self._trainer.save_model()

@@ -57,6 +57,12 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         self._clean_artifact_tokens()
         return self._create_trace_dataset()
 
+    def get_name(self) -> str:
+        """
+        :return: Returns the name of the project read in.
+        """
+        return self.project_reader.get_project_name()
+
     @classmethod
     @overrides(BaseObject)
     def _get_child_enum_class(cls, abstract_class: Type, child_class_name: str) -> Type:

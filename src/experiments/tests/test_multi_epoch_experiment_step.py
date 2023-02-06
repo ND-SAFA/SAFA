@@ -13,6 +13,7 @@ from jobs.delete_model_job import DeleteModelJob
 from jobs.supported_job_type import SupportedJobType
 from jobs.train_job import TrainJob
 from testres.paths.paths import TEST_OUTPUT_DIR
+from util.file_util import FileUtil
 from util.object_creator import ObjectCreator
 from variables.typed_definition_variable import TypedDefinitionVariable
 
@@ -29,12 +30,13 @@ class TestMultiEpochExperimentStep(BaseExperimentTest):
         experiment_step = self.get_experiment_step()
         experiment_step.run(TEST_OUTPUT_DIR)
 
-        output_dirs = os.listdir(TEST_OUTPUT_DIR)
-        output_dirs.remove('output.json')
+        output_dirs = FileUtil.ls_jobs(TEST_OUTPUT_DIR)
         epochs = set()
         for job_id in output_dirs:
             output_file = os.path.join(TEST_OUTPUT_DIR, job_id, AbstractJob.OUTPUT_FILENAME)
-            epochs.add(self._load_step_output(output_file_path=output_file)[JobResult.EXPERIMENTAL_VARS]["num_train_epochs"])
+            step_output = self._load_step_output(output_file_path=output_file)
+            step_experimental_vars = step_output[JobResult.EXPERIMENTAL_VARS]
+            epochs.add(step_experimental_vars["num_train_epochs"])
         self.assertEquals(len(epochs), len(self.EPOCH_ARGS))
         for epoch in range(*self.EPOCH_ARGS):
             self.assertIn(epoch, epochs)

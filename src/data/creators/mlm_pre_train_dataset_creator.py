@@ -8,6 +8,7 @@ from data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from data.datasets.pre_train_dataset import PreTrainDataset
 from data.processing.cleaning.data_cleaner import DataCleaner
 from data.readers.pre_train_project_reader import PreTrainProjectReader
+from util.file_util import FileUtil
 from util.logging.logger_manager import logger
 
 
@@ -42,6 +43,12 @@ class MLMPreTrainDatasetCreator(AbstractDatasetCreator[PreTrainDataset]):
         training_examples = pre_train_reader.create()
         dataset_file = self._write_training_examples(training_examples)
         return PreTrainDataset(dataset_file, block_size=self.block_size)
+
+    def get_name(self) -> str:
+        """
+        :return: Returns the file name of the data path.
+        """
+        return FileUtil.get_file_name(self.orig_data_path)
 
     def _write_training_examples(self, examples: List[str]) -> str:
         """

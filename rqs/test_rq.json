@@ -5,16 +5,20 @@
         {
           "object_type": "TRAIN",
           "job_args": {
-            "random_seed": 812
+            "random_seed": {
+              "*": [
+                812,
+                42
+              ]
+            }
           },
           "model_manager": {
             "model_path": "hf-internal-testing/tiny-random-bert"
           },
           "trainer_args": {
-            "output_dir": "[OUTPUT_PATH]/test-rq/models",
-            "num_train_epochs": 3,
+            "num_train_epochs": 5,
             "gradient_accumulation_steps": 1,
-            "learning_rate": 1e-5,
+            "learning_rate": 5e-5,
             "metrics": [
               "map",
               "map_at_k",
@@ -29,19 +33,19 @@
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "STRUCTURE",
-                "project_path": "[DATA_PATH]/cm1"
+                "project_path": "[DATA_PATH]/lhp/cooling"
               },
               "filter_unlinked_artifacts": true
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",
               "split_strategy": "SPLIT_BY_LINK",
-              "val_percentage": 0.45
+              "val_percentage": 0.30
             },
             "eval_dataset_creator": {
               "object_type": "SPLIT",
               "split_strategy": "SPLIT_BY_LINK",
-              "val_percentage": 0.50
+              "val_percentage": 0.30
             },
             "augmenter": {
               "steps": [
@@ -54,6 +58,5 @@
         }
       ]
     }
-  ],
-  "output_dir": "[OUTPUT_PATH]/test-rq/jobs"
+  ]
 }

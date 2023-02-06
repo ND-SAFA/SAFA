@@ -170,3 +170,28 @@ class FileUtil:
         :return: A tuple containing the base directory and the filename
         """
         return os.path.dirname(file_path), os.path.basename(file_path)
+    def ls_jobs(path: str, **kwargs) -> List[str]:
+        """
+        Returns jobs in path.
+        :param path: The path to list jobs in.
+        :param kwargs: Additional parameters passed to ls filter.
+        :return: List of jobs in path.
+        """
+        return FileUtil.ls_filter(path, f=lambda p: len(p.split("-")) == 5, **kwargs)
+
+    @staticmethod
+    def get_file_name(script_path: str, n_parents: int = 0, delimiter: str = "-"):
+        """
+        Returns the name of the file referenced in path.
+        :param script_path: Path to script file whose name is returned.
+        :param n_parents: The number of directories above file to include.
+        :param delimiter: The delimiter to use if parents included.
+        :return: The name of the script.
+        """
+        base_name, _ = os.path.splitext(script_path)
+        components = []
+        for i in range(n_parents + 1):  # file name + parents
+            base_name, file_name = os.path.split(base_name)
+            components.append(file_name)
+        components.reverse()
+        return delimiter.join(components)

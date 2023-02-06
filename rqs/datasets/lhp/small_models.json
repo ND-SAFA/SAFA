@@ -16,13 +16,19 @@
             }
           },
           "model_manager": {
-            "model_path": "prajjwal1/bert-tiny"
+            "model_path": {
+              "*": [
+                "prajjwal1/bert-tiny",
+                "prajjwal1/bert-mini",
+                "prajjwal1/bert-small",
+                "prajjwal1/bert-medium"
+              ]
+            }
           },
           "trainer_args": {
-            "output_dir": "[OUTPUT_PATH]/lhp/small_models/models",
-            "num_train_epochs": 30,
-            "per_device_train_batch_size": 32,
-            "gradient_accumulation_steps": 8,
+            "num_train_epochs": 5,
+            "per_device_train_batch_size": 4,
+            "gradient_accumulation_steps": 16,
             "learning_rate": 5e-6,
             "metrics": [
               "map",
@@ -51,16 +57,16 @@
             "val_dataset_creator": {
               "object_type": "SPLIT",
               "split_strategy": "SPLIT_BY_LINK",
-              "val_percentage": 0.10
+              "val_percentage": 0.15
             },
             "eval_dataset_creator": {
               "object_type": "SPLIT",
               "split_strategy": "SPLIT_BY_LINK",
               "val_percentage": {
                 "*": [
-                  0.20,
+                  0.30,
                   0.50,
-                  0.80
+                  0.70
                 ]
               }
             },
@@ -75,6 +81,5 @@
         }
       ]
     }
-  ],
-  "output_dir": "[OUTPUT_PATH]/lhp/small_models/jobs"
+  ]
 }

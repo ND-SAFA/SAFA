@@ -1,13 +1,8 @@
 from abc import ABC
-from typing import List, Set, Tuple, TypeVar, Union
-
-from sklearn.model_selection import train_test_split
+from typing import List, Set, Union
 
 from data.datasets.trace_dataset import TraceDataset
 from data.splitting.abstract_split_strategy import AbstractSplitStrategy
-
-GenericDatum = TypeVar("GenericData")
-GenericData = List[GenericDatum]
 
 
 class AbstractTraceSplitStrategy(AbstractSplitStrategy, ABC):
@@ -16,19 +11,8 @@ class AbstractTraceSplitStrategy(AbstractSplitStrategy, ABC):
     """
 
     @staticmethod
-    def split_data(data: GenericData, percent_split: float, labels: List[int] = None, **kwargs) -> Tuple[GenericData, GenericData]:
-        """
-        Splits data into slices using labels to guarantee equal proportions of the labels in each split
-        :param data: The data to split.
-        :param percent_split: The percentage of the data to be contained in second split
-        :param labels: The labels to stratify data with.
-        :return: Two slices of data.
-        """
-        return train_test_split(data, test_size=percent_split, stratify=labels, random_state=0, **kwargs)
-
-    @staticmethod
     def create_split_containing_specified_link_ids(trace_dataset: TraceDataset, link_ids_for_first_split: Union[Set[str], List[str]],
-                                                   percent_split: float, slice_num: int) -> "TraceDataset":
+                                                   percent_split: float, slice_num: int) -> TraceDataset:
         """
         Creates a new trace data from the slice defined by the percent split.
         :param trace_dataset: The trace dataset to split.

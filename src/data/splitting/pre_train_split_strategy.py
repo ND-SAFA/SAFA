@@ -26,5 +26,5 @@ class PreTrainSplitStrategy(AbstractSplitStrategy):
         split_contents = AbstractSplitStrategy.split_data(file_contents, percent_split)[slice_num - 1]
         base_dir, filename = FileUtil.split_base_path_and_filename(dataset.training_file_path)
         new_training_path = os.path.join(base_dir, PreTrainSplitStrategy.SPLIT_DIR_NAME.format(slice_num), filename)
-        FileUtil.save_to_file(PreTrainProjectReader.DELIMINATOR.join(split_contents), new_training_path)
+        FileUtil.write(PreTrainProjectReader.DELIMINATOR.join(split_contents), new_training_path)
         return PreTrainDataset(training_file_path=new_training_path, block_size=dataset.block_size, **dataset.kwargs)

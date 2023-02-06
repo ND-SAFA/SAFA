@@ -3,33 +3,48 @@
     {
       "jobs": [
         {
-          "object_type": "TRAIN",
+          "object_type": "MLM_PRE_TRAIN",
           "job_args": {
-            "random_seed": {
-              "*": [
-                87975,
-                7265,
-                35236,
-                21284,
-                56778
-              ]
-            }
+            "random_seed": 42
           },
           "model_manager": {
-            "model_path": {
-              "*": [
-                "prajjwal1/bert-tiny",
-                "prajjwal1/bert-mini",
-                "prajjwal1/bert-small",
-                "prajjwal1/bert-medium"
-              ]
-            }
+            "model_path": "prajjwal1/bert-tiny"
           },
           "trainer_args": {
-            "num_train_epochs": 5,
+            "num_train_epochs": 30,
             "per_device_train_batch_size": 4,
             "gradient_accumulation_steps": 16,
             "learning_rate": 1e-6,
+            "metrics": [
+              "accuracy"
+            ],
+            "skip_save": false,
+            "load_best_model_at_end": true
+          },
+          "trainer_dataset_manager": {
+            "train_dataset_creator": {
+              "object_type": "MLM_PRE_TRAIN",
+              "orig_data_path": "[DATA_PATH]/pretrain/automotive"
+            },
+            "val_dataset_creator": {
+              "object_type": "SPLIT",
+              "split_strategy": "PRE_TRAIN",
+              "val_percentage": 0.20
+            }
+          }
+        },
+        {
+          "object_type": "TRAIN",
+          "job_args": {
+            "random_seed": 42
+          },
+          "model_manager": {
+            "model_path": "?"
+          },
+          "trainer_args": {
+            "num_train_epochs": 5,
+            "gradient_accumulation_steps": 1,
+            "learning_rate": 5e-5,
             "metrics": [
               "map",
               "map_at_k",
@@ -44,9 +59,9 @@
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "STRUCTURE",
-                "project_path": "[DATA_PATH]/cm1"
+                "project_path": "[DATA_PATH]/lhp/heating"
               },
-              "filter_unlinked_artifacts": false
+              "filter_unlinked_artifacts": true
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",

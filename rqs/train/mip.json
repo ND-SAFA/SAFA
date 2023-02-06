@@ -18,10 +18,11 @@
           "model_manager": {
             "model_path": {
               "*": [
+                "thearod5/mip",
+                "bert-base-uncased",
+                "roberta-base",
                 "prajjwal1/bert-tiny",
-                "prajjwal1/bert-mini",
-                "prajjwal1/bert-small",
-                "prajjwal1/bert-medium"
+                "distilbert-base-uncased"
               ]
             }
           },
@@ -29,7 +30,7 @@
             "num_train_epochs": 5,
             "per_device_train_batch_size": 4,
             "gradient_accumulation_steps": 16,
-            "learning_rate": 5e-6,
+            "learning_rate": 1e-6,
             "metrics": [
               "map",
               "map_at_k",
@@ -44,13 +45,7 @@
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "STRUCTURE",
-                "project_path": {
-                  "*": [
-                    "[DATA_PATH]/lhp/heating",
-                    "[DATA_PATH]/lhp/cooling",
-                    "[DATA_PATH]/lhp/vehiclemodes"
-                  ]
-                }
+                "project_path": "[DATA_PATH]/mip"
               },
               "filter_unlinked_artifacts": true
             },

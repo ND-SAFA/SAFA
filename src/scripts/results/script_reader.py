@@ -86,6 +86,8 @@ class ScriptOutputReader:
         job_paths = self.read_experiment_jobs(self.experiment_path)
         for job_path in job_paths:
             output_path = os.path.join(job_path, ExperimentStep.OUTPUT_FILENAME)
+            if not os.path.exists(output_path):
+                continue
             job_result = JsonUtil.read_json_file(output_path)
             JsonUtil.require_properties(job_result, [JobResult.EXPERIMENTAL_VARS])
             base_entry = {k: v for k, v in job_result[JobResult.EXPERIMENTAL_VARS].items() if k not in self.experiment_vars_ignore}

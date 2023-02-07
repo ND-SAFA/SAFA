@@ -1,0 +1,25 @@
+{
+  "steps": [
+    {
+      "jobs": [
+        {
+          "object_type": "EXPORT_ARTIFACTS",
+          "job_args": {},
+          "trace_dataset_creator": {
+            "project_reader": {
+              "object_type": "STRUCTURE",
+              "project_path": {
+                "*": [
+                  "[DATA_PATH]/lhp/experiment/heating",
+                  "[DATA_PATH]/lhp/experiment/cooling",
+                  "[DATA_PATH]/lhp/experiment/vehiclemodes"
+                ]
+              }
+            },
+            "filter_unlinked_artifacts": true
+          }
+        }
+      ]
+    }
+  ]
+}

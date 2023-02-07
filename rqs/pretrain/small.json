@@ -33,9 +33,9 @@
               "object_type": "MLM_PRE_TRAIN",
               "orig_data_path": {
                 "*": [
-                  "[DATA_PATH]/pretrain/automotive",
-                  "[DATA_PATH]/pretrain/itrust",
-                  "[DATA_PATH]/pretrain/mip"
+                  "[DATA_PATH]/pretrain/heating",
+                  "[DATA_PATH]/pretrain/cooling",
+                  "[DATA_PATH]/pretrain/vehiclemodes"
                 ]
               }
             },

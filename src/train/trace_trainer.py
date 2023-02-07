@@ -97,7 +97,7 @@ class TraceTrainer(Trainer, BaseObject):
         Gets the data sampler used for training
         :return: the train sampler
         """
-        if self.trainer_args.use_balanced_batches and self.train_dataset is not None and DataKey.LABEL_KEY in self.train_dataset:
+        if self.trainer_args.use_balanced_batches and self.train_dataset is not None and DataKey.LABEL_KEY in self.train_dataset[0]:
             return BalancedBatchSampler(data_source=self.train_dataset, batch_size=self._train_batch_size)
         return super()._get_train_sampler()
 

@@ -44,7 +44,8 @@ class AbstractJob(threading.Thread, BaseObject):
                               self.result.get_printable_experiment_vars())
         self.result.set_job_status(Status.IN_PROGRESS)
         try:
-            RandomUtil.set_seed(self.job_args.random_seed)
+            if self.job_args.random_seed is not None:
+                RandomUtil.set_seed(self.job_args.random_seed)
             run_result = self._run()
             self.result = run_result.update(self.result)
             self.result.set_job_status(Status.SUCCESS)

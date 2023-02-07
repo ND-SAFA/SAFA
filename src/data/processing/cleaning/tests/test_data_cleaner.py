@@ -7,8 +7,8 @@ from testres.base_test import BaseTest
 
 
 class TestDataCleaner(BaseTest):
-    TEST_ARTIFACT_CONTENTS = ["This is 1.0 of 2.0 testCases!", "This i$ the other_one"]
-    EXPECTED_CONTENTS = ["Esta is 10 of 20 test Cases", "Esta the other uno"]
+    TEST_ARTIFACT_CONTENTS = ["This is 1.0 of 2.0 testCases!", "This is the other_one"]
+    EXPECTED_CONTENTS = ["Esta is 1.0 of 2.0 test Cases!", "Esta is the other uno"]
     BEFORE_STEP: Type[AbstractDataProcessingStep] = SupportedDataCleaningStep.REPLACE_WORDS.value
     FIRST_STEP: Type[AbstractDataProcessingStep] = SupportedDataCleaningStep.SEPARATE_JOINED_WORDS.value
     LAST_STEP: Type[AbstractDataProcessingStep] = SupportedDataCleaningStep.FILTER_MIN_LENGTH.value

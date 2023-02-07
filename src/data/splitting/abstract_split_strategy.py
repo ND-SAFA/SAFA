@@ -4,6 +4,7 @@ from typing import List, Tuple, TypeVar
 from sklearn.model_selection import train_test_split
 
 from data.creators.abstract_dataset_creator import DatasetType
+from util.random_util import RandomUtil
 
 GenericDatum = TypeVar("GenericData")
 GenericData = List[GenericDatum]
@@ -35,4 +36,5 @@ class AbstractSplitStrategy(ABC):
         :param labels: The labels to stratify data with.
         :return: Two slices of data.
         """
-        return train_test_split(data, test_size=percent_split, stratify=labels, random_state=0, **kwargs)
+        random_state = RandomUtil.CURRENT_SEED if RandomUtil.CURRENT_SEED is not None else 0
+        return train_test_split(data, test_size=percent_split, stratify=labels, random_state=random_state, **kwargs)

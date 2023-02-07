@@ -246,5 +246,13 @@ class ExperimentStep(BaseObject):
             return ExperimentStep.BASE_EXPERIMENT_NAME
         if isinstance(experimental_vars, str):
             return experimental_vars
-        run_name = {k: v for k, v in experimental_vars.items() if k not in EXPERIMENTAL_VARS_IGNORE}
+
+        def clean(v: str):
+            if "/" in v:
+                v = os.path.split(v)[1]
+            if isinstance(v, float):
+                v = round(v, 2)
+            return v
+
+        run_name = {k: clean(v) for k, v in experimental_vars.items() if k not in EXPERIMENTAL_VARS_IGNORE}
         return json.dumps(run_name)

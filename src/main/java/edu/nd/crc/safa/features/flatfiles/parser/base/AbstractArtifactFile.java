@@ -54,7 +54,7 @@ public abstract class AbstractArtifactFile<I> extends AbstractDataFile<ArtifactA
 
     private Pair<List<ArtifactAppEntity>, List<String>> checkForDuplicates(
         HashMap<String, ArtifactAppEntity> artifactsProcessed) {
-        List<String> errors = new ArrayList<>();
+        List<String> errors = this.errors;
         List<ArtifactAppEntity> validArtifacts = new ArrayList<>();
         entities.forEach(artifact -> {
             if (artifactsProcessed.containsKey(artifact.getName())) {

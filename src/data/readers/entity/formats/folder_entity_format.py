@@ -3,9 +3,9 @@ from typing import List
 
 import pandas as pd
 
+from data.keys.structure_keys import StructuredKeys
 from data.readers.entity.entity_parser_type import EntityParserType
 from data.readers.entity.formats.abstract_entity_format import AbstractEntityFormat
-from data.keys.structure_keys import StructuredKeys
 from util.file_util import FileUtil
 
 
@@ -31,7 +31,7 @@ class FolderEntityFormat(AbstractEntityFormat):
         return []
 
     @staticmethod
-    def read_folder(path: str, exclude=None) -> pd.DataFrame:
+    def read_folder(path: str, exclude=None, **kwargs) -> pd.DataFrame:
         """
         Creates artifact for each file in folder path.
         :param path: Path to folder containing artifact files.
@@ -39,19 +39,22 @@ class FolderEntityFormat(AbstractEntityFormat):
         :return: DataFrame containing artifact ids and tokens.
         """
         files_in_path = FileUtil.get_file_list(path, exclude=exclude)
-        return FolderEntityFormat.read_files_as_artifacts(files_in_path)
+        return FolderEntityFormat.read_files_as_artifacts(files_in_path, **kwargs)
 
     @staticmethod
-    def read_files_as_artifacts(file_paths: List[str], use_file_name: bool = True) -> pd.DataFrame:
+    def read_files_as_artifacts(file_paths: List[str], use_file_name: bool = True, with_extension: bool = True) -> pd.DataFrame:
         """
         Reads file at each path and creates artifact with name
         :param file_paths: List of paths to file to read as artifacts
         :param use_file_name: Whether to use file name as artifact id, otherwise file path is used.
+        :param with_extension: Whether file extracted should contain its file extension.
         :return: DataFrame containing artifact properties id and body.
         """
         entries = []
         for file_path in file_paths:
             artifact_name = os.path.basename(file_path) if use_file_name else file_path
+            if not with_extension:
+                artifact_name = os.path.splitext(artifact_name)[0]
             entry = {
                 StructuredKeys.Artifact.ID: artifact_name,
                 StructuredKeys.Artifact.BODY: FileUtil.read_file(file_path)

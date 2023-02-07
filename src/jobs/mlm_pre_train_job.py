@@ -43,7 +43,7 @@ class MLMPreTrainJob(TrainJob):
         tokenizer.save_pretrained(self.job_args.output_dir)
 
         job_result = super()._run(data_collator=data_collator)
-        self._trainer.save_model()
+        self.trainer_args.output_dir = os.path.join(self.trainer_args.output_dir, "best")
 
         train_dataset: PreTrainDataset = self.trainer_dataset_manager[DatasetRole.TRAIN]
         os.remove(train_dataset.training_file_path)

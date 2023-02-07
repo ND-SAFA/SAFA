@@ -5,7 +5,7 @@ from typing import Dict, List, Optional, Tuple
 
 import pandas as pd
 
-from constants import DISPLAY_METRICS, EXPERIMENTAL_VARS_IGNORE, METRICS, OS_IGNORE
+from constants import DISPLAY_METRICS, EXPERIMENTAL_VARS_IGNORE, METRICS
 from experiments.experiment_step import ExperimentStep
 from jobs.components.job_result import JobResult
 from scripts.results.script_definition import ScriptDefinition
@@ -152,7 +152,7 @@ class ScriptOutputReader:
         if base_entry is None:
             base_entry = {}
         metric_key = ScriptOutputReader.find_eval_key(job_result, [JobResult.EVAL_METRICS, JobResult.METRICS])
-        if metric_key is not None and len(job_result[metric_key]) > 0:
+        if metric_key is not None and job_result[metric_key] is not None and len(job_result[metric_key]) > 0:
             return {**base_entry, **JsonUtil.read_params(job_result[metric_key], metrics)}
         return None
 
@@ -163,10 +163,10 @@ class ScriptOutputReader:
         :param experiment_path: Path to experiment.
         :return: List of paths corresponding to each output file in experiment.
         """
-        experiment_ids = FileUtil.ls_jobs(experiment_path, add_base_path=True)
-        experiment_steps = [FileUtil.ls_filter(os.path.join(experiment_path, experiment_id), ignore=OS_IGNORE, add_base_path=True) for
-                            experiment_id in experiment_ids]
-        job_paths = [FileUtil.ls_jobs(step, add_base_path=True) for steps in experiment_steps for step in steps]
+        experiment_paths = FileUtil.ls_filter(experiment_path, f=lambda f: "experiment_" in f, add_base_path=True)
+        experiment_step_paths = [FileUtil.ls_dir(experiment_path) for experiment_path in experiment_paths]
+        job_paths = [FileUtil.ls_dir(experiment_step_job_path) for experiment_step_path in experiment_step_paths
+                     for experiment_step_job_path in experiment_step_path]
         job_paths = reduce(lambda a, b: a + b, job_paths)
         return job_paths
 

@@ -1,7 +1,7 @@
 import os
 import shutil
 from copy import deepcopy
-from typing import Callable, Dict, IO, List, Union, Tuple
+from typing import Callable, Dict, IO, List, Tuple, Union
 
 from util.json_util import JsonUtil
 
@@ -143,6 +143,10 @@ class FileUtil:
         return [p for p in path.split(os.sep) if p != ""]
 
     @staticmethod
+    def ls_dir(path: str, **kwargs):
+        return FileUtil.ls_filter(path, f=lambda f: os.path.isdir(f), add_base_path=True, **kwargs)
+
+    @staticmethod
     def ls_filter(path: str, f: Callable[[str], bool] = None, ignore: List[str] = None, add_base_path: bool = False) -> List[str]:
         """
         List and filters files in path.
@@ -156,11 +160,9 @@ class FileUtil:
             f = lambda s: s
         if ignore is None:
             ignore = []
-        results = list(filter(lambda p: f(p) and p not in ignore, os.listdir(path)))
-        if add_base_path:
-            return [os.path.join(path, r) for r in results]
-        else:
-            return results
+        results = list(map(lambda r: os.path.join(path, r) if add_base_path else r, os.listdir(path)))
+        results = list(filter(lambda p: f(p) and p not in ignore, results))
+        return results
 
     @staticmethod
     def split_base_path_and_filename(file_path: str) -> Tuple[str, str]:
@@ -170,6 +172,7 @@ class FileUtil:
         :return: A tuple containing the base directory and the filename
         """
         return os.path.dirname(file_path), os.path.basename(file_path)
+
     def ls_jobs(path: str, **kwargs) -> List[str]:
         """
         Returns jobs in path.

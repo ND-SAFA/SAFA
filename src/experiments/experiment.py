@@ -13,6 +13,7 @@ from util.status import Status
 
 class Experiment(BaseObject):
     _STEP_DIR_NAME = "step_%s"
+    _EXPERIMENT_DIR_NAME = "experiment_%s"
 
     def __init__(self, steps: List[ExperimentStep], output_dir: str, logger_config: LoggerConfig = LoggerConfig()):
         """
@@ -35,7 +36,7 @@ class Experiment(BaseObject):
         """
         jobs_for_undetermined_vals = None
         for i, step in enumerate(self.steps):
-            step_output_dir = os.path.join(self.output_dir, str(self.id), self._STEP_DIR_NAME % i)
+            step_output_dir = os.path.join(self.output_dir, self._EXPERIMENT_DIR_NAME % i, self._STEP_DIR_NAME % i)
             jobs_for_undetermined_vals = step.run(step_output_dir, jobs_for_undetermined_vals)
             if step.status == Status.FAILURE:
                 break

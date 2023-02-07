@@ -1,7 +1,8 @@
+import os
+
 from data.datasets.dataset_role import DatasetRole
 from jobs.abstract_trace_job import AbstractTraceJob
 from jobs.components.job_result import JobResult
-from train.trace_trainer import TraceTrainer
 
 
 class TrainJob(AbstractTraceJob):
@@ -17,4 +18,7 @@ class TrainJob(AbstractTraceJob):
         if DatasetRole.EVAL in self.trainer_dataset_manager:
             eval_predictions = trainer.perform_prediction(DatasetRole.EVAL)
             training_output.eval_metrics = eval_predictions.metrics
+        best_model_path = self._trainer.state.best_model_checkpoint
+        if best_model_path:
+            os.rename(best_model_path, os.path.join(self.trainer_args.output_dir, "best"))
         return JobResult.from_trace_output(training_output)

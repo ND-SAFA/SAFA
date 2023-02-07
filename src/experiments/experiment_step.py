@@ -225,16 +225,14 @@ class ExperimentStep(BaseObject):
         :return: the updated jobs
         """
         for job in jobs:
-            job_id = str(job.id)
-            job_base_path = os.path.join(output_dir, job_id)
+            run_name = ExperimentStep.get_run_name(job.result[JobResult.EXPERIMENTAL_VARS])
+            job_base_path = os.path.join(output_dir, run_name)
             if isinstance(job, AbstractTraceJob):
                 model_path = os.path.join(job_base_path, "models")
-                run_name = ExperimentStep.get_run_name(job.result[JobResult.EXPERIMENTAL_VARS])
                 setattr(job.trainer_args, "run_name", run_name)  # run name = experimental vars
                 setattr(job.trainer_args, "output_dir", model_path)  # models save in same dir as job
                 setattr(job.trainer_args, "seed", job.job_args.random_seed)  # sets random seed so base trainer has access to it
                 setattr(job.model_manager, "output_dir", model_path)  # final model path same as checkpoint path
-
             setattr(job.job_args, "output_dir", job_base_path)  # points job to its unique path
 
     @staticmethod

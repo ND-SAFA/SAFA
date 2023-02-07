@@ -16,8 +16,10 @@ import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.flatfiles.parser.base.AbstractArtifactFile;
 import edu.nd.crc.safa.utilities.CsvFileUtilities;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.TextNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -103,12 +105,20 @@ public class CsvArtifactFile extends AbstractArtifactFile<CSVRecord> {
 
             Map<String, JsonNode> recordAttributes = new HashMap<>();
 
+            ObjectMapper objectMapper = new ObjectMapper();
+
             for (Map.Entry<String, String> entry : entityRecord.toMap().entrySet()) {
                 String key = entry.getKey();
                 String value = entry.getValue();
 
                 if (!Constants.ALL_COLUMNS_SET.contains(key.toLowerCase())) {
-                    recordAttributes.put(key, TextNode.valueOf(value));
+                    TypeReference<JsonNode> type = new TypeReference<>(){};
+
+                    try {
+                        recordAttributes.put(key, objectMapper.readValue(value, type));
+                    } catch (JsonProcessingException ignore) {
+                        recordAttributes.put(key, objectMapper.readValue("\"" + value + "\"", type));
+                    }
                 }
             }
 

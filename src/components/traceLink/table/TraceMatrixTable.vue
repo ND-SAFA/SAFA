@@ -15,7 +15,7 @@
       :group-desc.sync="groupDesc"
       :sort-desc.sync="sortDesc"
       item-key="name"
-      :items-per-page="10"
+      :items-per-page="50"
       @click:row="handleView($event)"
       data-cy="view-trace-matrix-table"
       class="mt-4 trace-matrix-table"

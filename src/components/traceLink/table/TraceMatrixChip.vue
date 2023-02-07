@@ -1,23 +1,25 @@
 <template>
-  <v-chip
-    v-if="doDisplay"
-    outlined
-    :color="isGenerated ? 'secondary' : 'primary'"
-    @click.stop="handleClick"
-  >
-    <typography :value="source.name" />
-    <v-icon class="mx-1" :style="arrowStyle">mdi-ray-start-arrow</v-icon>
-    <typography :value="target.name" />
-  </v-chip>
-  <div v-else class="show-on-hover">
-    <div @click.stop class="width-fit">
-      <icon-button
-        icon-id="mdi-plus"
-        tooltip="Create trace link"
-        @click="handleCreateLink"
-      />
+  <v-lazy>
+    <v-chip
+      v-if="doDisplay"
+      outlined
+      :color="isGenerated ? 'secondary' : 'primary'"
+      @click.stop="handleClick"
+    >
+      <typography :value="source.name" />
+      <v-icon class="mx-1" :style="arrowStyle">mdi-ray-start-arrow</v-icon>
+      <typography :value="target.name" />
+    </v-chip>
+    <div v-else class="show-on-hover">
+      <div @click.stop class="width-fit">
+        <icon-button
+          icon-id="mdi-plus"
+          tooltip="Create trace link"
+          @click="handleCreateLink"
+        />
+      </div>
     </div>
-  </div>
+  </v-lazy>
 </template>
 
 <script lang="ts">

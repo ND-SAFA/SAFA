@@ -248,7 +248,7 @@ class ExperimentStep(BaseObject):
             return experimental_vars
 
         def clean(v: str):
-            if "/" in v:
+            if isinstance(v, str) and "/" in v:
                 v = os.path.split(v)[1]
             if isinstance(v, float):
                 v = round(v, 2)

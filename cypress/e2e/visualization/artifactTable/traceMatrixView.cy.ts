@@ -48,6 +48,7 @@ describe("Trace Matrix Table View", () => {
   describe("I can select a trace link to view more details", () => {
     it("Selects a trace link that is clicked", () => {
       cy.withinTableRows(DataCy.traceMatrixTable, (tr) => {
+        cy.get(".v-data-table__wrapper").scrollTo("bottomRight");
         tr.last().contains("D11").click();
       });
 

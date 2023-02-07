@@ -144,10 +144,20 @@ export default Vue.extend({
      * Resets fields when the panel opens.
      */
     isOpen(open: boolean) {
+      const openState = appStore.isTraceCreatorOpen;
+
       if (!open) return;
 
       this.sourceArtifactId = "";
       this.targetArtifactId = "";
+
+      if (typeof openState !== "object") return;
+
+      if (openState.type === "source") {
+        this.sourceArtifactId = openState.artifactId;
+      } else {
+        this.targetArtifactId = openState.artifactId;
+      }
     },
   },
 });

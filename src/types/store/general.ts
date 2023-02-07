@@ -37,7 +37,8 @@ export type ArtifactCreatorOpenState =
 export type TraceCreatorOpenState =
   | boolean
   | { type: "source"; artifactId: string }
-  | { type: "target"; artifactId: string };
+  | { type: "target"; artifactId: string }
+  | { type: "both"; sourceId: string; targetId: string };
 
 /**
  * Represents the type of details panel states.

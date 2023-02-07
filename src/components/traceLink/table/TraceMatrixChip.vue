@@ -9,13 +9,22 @@
     <v-icon class="mx-1" :style="arrowStyle">mdi-ray-start-arrow</v-icon>
     <typography :value="target.name" />
   </v-chip>
+  <div v-else class="show-on-hover">
+    <div @click.stop class="width-fit">
+      <icon-button
+        icon-id="mdi-plus"
+        tooltip="Create trace link"
+        @click="handleCreateLink"
+      />
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { FlatArtifact, TraceLinkSchema, TraceType } from "@/types";
-import { selectionStore, traceStore } from "@/hooks";
-import { Typography } from "@/components/common";
+import { appStore, selectionStore, traceStore } from "@/hooks";
+import { Typography, IconButton } from "@/components/common";
 
 /**
  * Renders a chip representing a trace link between two artifacts.
@@ -23,6 +32,7 @@ import { Typography } from "@/components/common";
 export default Vue.extend({
   name: "TraceMatrixChip",
   components: {
+    IconButton,
     Typography,
   },
   props: {
@@ -85,6 +95,16 @@ export default Vue.extend({
       if (!traceLink) return;
 
       selectionStore.selectTraceLink(traceLink);
+    },
+    /**
+     * Opens the trace creation panel to create a link between these artifacts.
+     */
+    handleCreateLink(): void {
+      appStore.openTraceCreatorTo({
+        type: "both",
+        sourceId: this.source.id,
+        targetId: this.target.id,
+      });
     },
   },
 });

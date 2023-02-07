@@ -155,8 +155,11 @@ export default Vue.extend({
 
       if (openState.type === "source") {
         this.sourceArtifactId = openState.artifactId;
-      } else {
+      } else if (openState.type === "target") {
         this.targetArtifactId = openState.artifactId;
+      } else {
+        this.sourceArtifactId = openState.sourceId;
+        this.targetArtifactId = openState.targetId;
       }
     },
   },

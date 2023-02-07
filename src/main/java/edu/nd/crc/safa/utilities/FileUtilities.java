@@ -193,16 +193,7 @@ public class FileUtilities {
      * @return String representing built path.
      */
     public static String buildPath(String... directories) {
-        StringBuilder finalPath = new StringBuilder();
-        for (int i = 0; i < directories.length; i++) {
-            String p = directories[i];
-            if (i < directories.length - 1) {
-                finalPath.append(p).append(File.separator);
-            } else {
-                finalPath.append(p);
-            }
-        }
-        return finalPath.toString();
+        return String.join(File.separator, directories);
     }
 
     /**

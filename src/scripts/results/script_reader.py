@@ -163,7 +163,7 @@ class ScriptOutputReader:
         :param experiment_path: Path to experiment.
         :return: List of paths corresponding to each output file in experiment.
         """
-        experiment_paths = FileUtil.ls_filter(experiment_path, f=lambda f: "experiment_" in f, add_base_path=True)
+        experiment_paths = FileUtil.ls_dir(experiment_path)
         experiment_step_paths = [FileUtil.ls_dir(experiment_path) for experiment_path in experiment_paths]
         job_paths = [FileUtil.ls_dir(experiment_step_job_path) for experiment_step_path in experiment_step_paths
                      for experiment_step_job_path in experiment_step_path]

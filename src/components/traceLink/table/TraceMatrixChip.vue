@@ -22,8 +22,8 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { FlatArtifact, TraceLinkSchema, TraceType } from "@/types";
-import { appStore, selectionStore, traceStore } from "@/hooks";
+import { ArtifactSchema, TraceLinkSchema, TraceType } from "@/types";
+import { appStore, selectionStore, subtreeStore, traceStore } from "@/hooks";
 import { Typography, IconButton } from "@/components/common";
 
 /**
@@ -37,11 +37,11 @@ export default Vue.extend({
   },
   props: {
     source: {
-      type: Object as PropType<FlatArtifact>,
+      type: Object as PropType<ArtifactSchema>,
       required: true,
     },
     target: {
-      type: Object as PropType<FlatArtifact>,
+      type: Object as PropType<ArtifactSchema>,
       required: true,
     },
   },
@@ -49,20 +49,20 @@ export default Vue.extend({
     /**
      * @return The relationship from the parent to the child artifact.
      */
-    relationship(): "Parent" | "Child" | string {
-      return this.source[this.target.id];
+    direction(): "parent" | "child" | undefined {
+      return subtreeStore.getRelationship(this.source.id, this.target.id);
     },
     /**
      * @return Whether the relationship is as a child.
      */
     isChild(): boolean {
-      return this.relationship === "Child";
+      return this.direction === "child";
     },
     /**
      * @return Whether to display the chip.
      */
     doDisplay(): boolean {
-      return !!this.relationship;
+      return !!this.direction;
     },
     /**
      * @return The style for the chip arrow.

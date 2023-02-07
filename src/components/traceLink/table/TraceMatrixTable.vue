@@ -7,7 +7,7 @@
       height="60vh"
       v-model="selected"
       :headers="headers"
-      :items="items"
+      :items="artifactRows"
       :search="searchText"
       :loading="isLoading"
       :sort-by.sync="sortBy"
@@ -15,7 +15,7 @@
       :group-desc.sync="groupDesc"
       :sort-desc.sync="sortDesc"
       item-key="name"
-      :items-per-page="50"
+      :items-per-page="10"
       @click:row="handleView($event)"
       data-cy="view-trace-matrix-table"
       class="mt-4 trace-matrix-table"
@@ -61,7 +61,7 @@
 import Vue from "vue";
 import { DataTableHeader } from "vuetify";
 import { ArtifactSchema, FlatArtifact } from "@/types";
-import { appStore, artifactStore, selectionStore, subtreeStore } from "@/hooks";
+import { appStore, artifactStore, selectionStore } from "@/hooks";
 import {
   AttributeChip,
   TableGroupHeader,
@@ -102,32 +102,15 @@ export default Vue.extend({
       return appStore.isLoading > 0;
     },
     /**
-     * @return All rows to render.
+     * @return All artifacts that represent all rows.
      */
-    items(): FlatArtifact[] {
-      return artifactStore.currentArtifacts
-        .filter(
-          ({ type }) =>
-            this.rowTypes.length === 0 || this.rowTypes.includes(type)
-        )
-        .map(({ id, name, type }) => {
-          return {
-            id,
-            name,
-            type,
-            ...subtreeStore
-              .getParents(id)
-              .map((id) => ({ [id]: "Parent" }))
-              .reduce((acc, cur) => ({ ...acc, ...cur }), {}),
-            ...subtreeStore
-              .getChildren(id)
-              .map((id) => ({ [id]: "Child" }))
-              .reduce((acc, cur) => ({ ...acc, ...cur }), {}),
-          };
-        });
+    artifactRows(): ArtifactSchema[] {
+      return artifactStore.currentArtifacts.filter(
+        ({ type }) => this.rowTypes.length === 0 || this.rowTypes.includes(type)
+      );
     },
     /**
-     * @return The ids of artifact columns.
+     * @return The artifacts that represent all columns.
      */
     artifactColumns(): ArtifactSchema[] {
       return artifactStore.currentArtifacts.filter(

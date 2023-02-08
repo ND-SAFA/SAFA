@@ -30,11 +30,24 @@ class PreTrainDataset(AbstractDataset):
         tokenizer = model_manager.get_tokenizer()
 
         def tokenize_batches(examples):
-            tokenized_example = tokenizer(examples["text"], padding=True, truncation=True, return_special_tokens_mask=True)
+            tokenized_example = tokenizer(examples["text"], truncation=True, max_length=self.block_size,
+                                          return_special_tokens_mask=True, return_overflowing_tokens=True)
             return tokenized_example
+
+        @staticmethod
+        def tokenize_and_chunk(texts):
+            all_input_ids = []
+            for input_ids in tokenizer(texts["text"]["input_ids"]):
+                all_input_ids.extend(input_ids)
+                all_input_ids.append(tokenizer.eos_token)
+            chunks = []
+            for idx in range(0, len(all_input_ids, self.block_size)):
+                chunks.append(all_input_ids[idx: idx + self.block_size])
+            return {"input_ids": chunks}
 
         dataset = load_dataset("text", data_files={"train": self.training_file_path})
         dataset = dataset.map(tokenize_batches, batched=True)
+        dataset = dataset.map(tokenize_and_chunk, batched=True)
         return dataset["train"]
 
     def save(self, output_dir: str, filename: str) -> str:

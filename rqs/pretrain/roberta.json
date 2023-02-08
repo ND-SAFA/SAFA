@@ -26,7 +26,6 @@
               "object_type": "MLM_PRE_TRAIN",
               "orig_data_path": {
                 "*": [
-                  "[DATA_PATH]/pretrain/automotive",
                   "[DATA_PATH]/pretrain/itrust",
                   "[DATA_PATH]/pretrain/mip"
                 ]

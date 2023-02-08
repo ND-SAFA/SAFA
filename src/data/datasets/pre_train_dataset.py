@@ -31,7 +31,7 @@ class PreTrainDataset(AbstractDataset):
 
         def tokenize_and_chunk(texts):
             all_input_ids = []
-            tokenizer_output = tokenizer(texts["text"])["input_ids"]
+            tokenizer_output = tokenizer(texts["text"], add_special_tokens=True)["input_ids"]
             for input_ids in tokenizer_output:
                 all_input_ids.extend(input_ids)
                 all_input_ids.append(tokenizer.sep_token_id)

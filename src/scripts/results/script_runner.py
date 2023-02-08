@@ -42,7 +42,7 @@ class ScriptRunner:
         experiment_definition = self._load_experiment_definition()
         self._setup_run()
         experiment = ObjectCreator.create(Experiment, override=True, **experiment_definition)
-        # LoggerManager.turn_off_hugging_face_logging()
+        LoggerManager.turn_off_hugging_face_logging()
         experiment.run()
         logger.info(self.FINISHED_HEADER)
 

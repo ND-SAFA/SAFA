@@ -47,12 +47,19 @@ describe("Trace Matrix Table View", () => {
 
   describe("I can select a trace link to view more details", () => {
     it("Selects a trace link that is clicked", () => {
+      cy.filterTraceMatrixTable("des", "req").clickButton(
+        DataCy.sidebarCloseButton
+      );
+
       cy.withinTableRows(DataCy.traceMatrixTable, (tr) => {
-        tr.last().contains("D11").click();
+        // Scroll and wait for cells to lazy load.
+        cy.get(".v-data-table__wrapper").scrollTo("bottom");
+
+        tr.last().contains("F11").click();
       });
 
-      cy.getCy(DataCy.selectedPanelTraceTarget).should("contain", "F6");
-      cy.getCy(DataCy.selectedPanelTraceSource).should("contain", "D11");
+      cy.getCy(DataCy.selectedPanelTraceTarget).should("contain", "F11");
+      cy.getCy(DataCy.selectedPanelTraceSource).should("contain", "F9");
     });
   });
 });

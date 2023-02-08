@@ -1,8 +1,14 @@
-import { DataCy } from "@/fixtures";
+import { DataCy, Routes } from "@/fixtures";
 
 describe("Job Status", () => {
   beforeEach(() => {
     cy.initProject(false);
+
+    cy.locationShouldEqual(Routes.UPLOAD_STATUS);
+  });
+
+  afterEach(() => {
+    cy.waitForJobLoad();
   });
 
   describe("I can see the current status of a job", () => {
@@ -11,7 +17,7 @@ describe("Job Status", () => {
     });
 
     it("Shows completed jobs", () => {
-      cy.getCy(DataCy.jobStatus, "first", 20000).should(
+      cy.getCy(DataCy.jobStatus, "first", 10000).should(
         "contain.text",
         "Completed"
       );
@@ -20,14 +26,14 @@ describe("Job Status", () => {
 
   describe("I can see the current progress of a job", () => {
     it("Shows in progress jobs", () => {
-      cy.getCy(DataCy.jobProgress, "first", 20000).should(
+      cy.getCy(DataCy.jobProgress, "first", 10000).should(
         "contain.text",
         "75%"
       );
     });
 
     it("Shows completed jobs", () => {
-      cy.getCy(DataCy.jobProgress, "first", 20000).should(
+      cy.getCy(DataCy.jobProgress, "first", 10000).should(
         "contain.text",
         "100%"
       );
@@ -36,14 +42,8 @@ describe("Job Status", () => {
 
   describe("I can see real-time job updates", () => {
     it("Shows the progress updating", () => {
-      cy.getCy(DataCy.jobProgress, "first", 20000).should(
-        "contain.text",
-        "75%"
-      );
-      cy.getCy(DataCy.jobProgress, "first", 20000).should(
-        "contain.text",
-        "100%"
-      );
+      cy.getCy(DataCy.jobOpenButton, "first", 10000).should("be.disabled");
+      cy.getCy(DataCy.jobOpenButton, "first", 10000).should("not.be.disabled");
     });
   });
 

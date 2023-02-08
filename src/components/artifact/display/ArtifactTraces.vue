@@ -1,9 +1,20 @@
 <template>
   <div v-if="doDisplay">
-    <panel-card v-if="parents.length > 0">
-      <typography el="h2" l="1" variant="subtitle" value="Parent Artifacts" />
+    <panel-card>
+      <flex-box justify="space-between" align="center">
+        <typography el="h2" l="1" variant="subtitle" value="Parent Artifacts" />
+        <text-button
+          text
+          variant="add"
+          data-cy="button-artifact-link-parent"
+          @click="handleLinkParent"
+        >
+          Link Parent
+        </text-button>
+      </flex-box>
       <v-divider />
       <v-list
+        v-if="parents.length > 0"
         dense
         style="max-height: 300px"
         class="overflow-y-auto"
@@ -29,11 +40,29 @@
           </v-list-item>
         </template>
       </v-list>
+      <typography
+        v-else
+        l="1"
+        variant="caption"
+        value="There are no parent artifacts."
+      />
     </panel-card>
-    <panel-card v-if="children.length > 0">
-      <typography el="h2" l="1" variant="subtitle" value="Child Artifacts" />
+
+    <panel-card>
+      <flex-box justify="space-between" align="center">
+        <typography el="h2" l="1" variant="subtitle" value="Child Artifacts" />
+        <text-button
+          text
+          variant="add"
+          data-cy="button-artifact-link-child"
+          @click="handleLinkChild"
+        >
+          Link Child
+        </text-button>
+      </flex-box>
       <v-divider />
       <v-list
+        v-if="children.length > 0"
         dense
         style="max-height: 300px"
         class="overflow-y-auto"
@@ -59,6 +88,12 @@
           </v-list-item>
         </template>
       </v-list>
+      <typography
+        v-else
+        l="1"
+        variant="caption"
+        value="There are no child artifacts."
+      />
     </panel-card>
   </div>
 </template>
@@ -67,6 +102,7 @@
 import Vue from "vue";
 import { ArtifactSchema } from "@/types";
 import {
+  appStore,
   artifactStore,
   selectionStore,
   subtreeStore,
@@ -77,6 +113,8 @@ import {
   IconButton,
   PanelCard,
   ArtifactBodyDisplay,
+  TextButton,
+  FlexBox,
 } from "@/components/common";
 
 /**
@@ -85,36 +123,38 @@ import {
 export default Vue.extend({
   name: "ArtifactTraces",
   components: {
+    FlexBox,
     ArtifactBodyDisplay,
     PanelCard,
     IconButton,
     Typography,
+    TextButton,
   },
   computed: {
     /**
      * @return The selected artifact.
      */
-    selectedArtifact() {
+    artifact() {
       return selectionStore.selectedArtifact;
     },
     /**
      * @return The selected artifact's parents.
      */
     parents(): ArtifactSchema[] {
-      if (!this.selectedArtifact) return [];
+      if (!this.artifact) return [];
 
       return subtreeStore
-        .getParents(this.selectedArtifact.id)
+        .getParents(this.artifact.id)
         .map((id) => artifactStore.getArtifactById(id)) as ArtifactSchema[];
     },
     /**
      * @return The selected artifact's children.
      */
     children(): ArtifactSchema[] {
-      if (!this.selectedArtifact) return [];
+      if (!this.artifact) return [];
 
       return subtreeStore
-        .getChildren(this.selectedArtifact.id)
+        .getChildren(this.artifact.id)
         .map((id) => artifactStore.getArtifactById(id)) as ArtifactSchema[];
     },
     /**
@@ -167,17 +207,39 @@ export default Vue.extend({
     handleTraceLinkClick(artifactName: string): void {
       const artifact = artifactStore.getArtifactByName(artifactName);
 
-      if (!artifact || !this.selectedArtifact) return;
+      if (!artifact || !this.artifact) return;
 
       const traceLink = traceStore.getTraceLinkByArtifacts(
         artifact.id,
-        this.selectedArtifact.id,
+        this.artifact.id,
         true
       );
 
       if (!traceLink) return;
 
       selectionStore.selectTraceLink(traceLink);
+    },
+    /**
+     * Opens the create trace link panel with this artifact as the child.
+     */
+    handleLinkParent(): void {
+      if (!this.artifact) return;
+
+      appStore.openTraceCreatorTo({
+        type: "source",
+        artifactId: this.artifact.id,
+      });
+    },
+    /**
+     * Opens the create trace link panel with this artifact as the parent.
+     */
+    handleLinkChild(): void {
+      if (!this.artifact) return;
+
+      appStore.openTraceCreatorTo({
+        type: "target",
+        artifactId: this.artifact.id,
+      });
     },
   },
 });

@@ -27,7 +27,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { ArtifactSchema, CreatorOpenState } from "@/types";
+import { ArtifactSchema, ArtifactCreatorOpenState } from "@/types";
 import { appStore, artifactSaveStore, selectionStore } from "@/hooks";
 import { handleDeleteArtifact, handleSaveArtifact } from "@/api";
 import { FlexBox, TextButton } from "@/components/common";
@@ -61,7 +61,7 @@ export default Vue.extend({
     /**
      * @return Whether the artifact creator is open.
      */
-    isOpen(): CreatorOpenState {
+    isOpen(): ArtifactCreatorOpenState {
       return appStore.isDetailsPanelOpen && appStore.isArtifactCreatorOpen;
     },
     /**
@@ -82,7 +82,7 @@ export default Vue.extend({
      * Resets artifact data when opened.
      * If opened with a string, attempts to switch the artifact type to match the type given.
      */
-    isOpen(openOrType: CreatorOpenState): void {
+    isOpen(openOrType: ArtifactCreatorOpenState): void {
       if (!openOrType) return;
 
       artifactSaveStore.resetArtifact(openOrType);

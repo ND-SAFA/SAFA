@@ -79,11 +79,6 @@ public abstract class AbstractDataFile<E, I> implements IDataFile<E>, IFlatFileP
                 this.errors.add(error);
             }
         }
-
-        // Filters out invalid artifacts
-        Pair<List<E>, List<String>> validationResponse = this.validateEntitiesCreated();
-        this.entities = validationResponse.getValue0();
-        this.errors = validationResponse.getValue1();
     }
 
     @Override

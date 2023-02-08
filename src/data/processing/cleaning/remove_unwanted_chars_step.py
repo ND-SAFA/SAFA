@@ -1,3 +1,4 @@
+import string
 from typing import List
 
 from data.processing.abstract_data_processing_step import AbstractDataProcessingStep, ProcessingOrder
@@ -20,7 +21,7 @@ class RemoveUnwantedCharsStep(AbstractDataProcessingStep):
         :param char: the char
         :return: True if char should be kept, else False
         """
-        return char.isdigit() or char.isalpha() or char in SeparateJoinedWordsStep.DELIMINATORS
+        return char in string.printable
 
     @staticmethod
     def _remove_unwanted_chars_from_word(word: str) -> str:

@@ -36,7 +36,7 @@
             "val_dataset_creator": {
               "object_type": "SPLIT",
               "split_strategy": "PRE_TRAIN",
-              "val_percentage": 0.20
+              "val_percentage": 0.1
             }
           }
         }

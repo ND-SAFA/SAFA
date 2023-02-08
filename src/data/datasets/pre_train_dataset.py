@@ -29,12 +29,12 @@ class PreTrainDataset(AbstractDataset):
         """
         tokenizer = model_manager.get_tokenizer()
 
-        def preprocess_function(examples):
-            tokenized_example = tokenizer(examples["text"], padding=True, truncation=True)
+        def tokenize_batches(examples):
+            tokenized_example = tokenizer(examples["text"], padding=True, truncation=True, return_special_tokens_mask=True)
             return tokenized_example
 
         dataset = load_dataset("text", data_files={"train": self.training_file_path})
-        dataset = dataset.map(preprocess_function, batched=True)
+        dataset = dataset.map(tokenize_batches, batched=True)
         return dataset["train"]
 
     def save(self, output_dir: str, filename: str) -> str:

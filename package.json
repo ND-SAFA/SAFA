@@ -70,7 +70,7 @@
     "@vue/test-utils": "^1.0.3",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
-    "cypress": "^12.4.1",
+    "cypress": "^12.5.1",
     "cypress-file-upload": "^5.0.8",
     "cypress-wait-until": "^1.7.2",
     "electron": "^19.0.4",

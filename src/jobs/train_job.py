@@ -1,5 +1,7 @@
 import os
 
+from transformers.integrations import WandbCallback
+
 from data.datasets.dataset_role import DatasetRole
 from jobs.abstract_trace_job import AbstractTraceJob
 from jobs.components.job_result import JobResult
@@ -13,6 +15,7 @@ class TrainJob(AbstractTraceJob):
         :return: Results of the training including as loss and time
         """
         trainer = self.get_trainer(**kwargs)
+        trainer.remove_callback(WandbCallback)
         training_output = trainer.perform_training(
             self.trainer_args.checkpoint_path)  # will also switch dataset in val to eval if present.
         if DatasetRole.EVAL in self.trainer_dataset_manager:

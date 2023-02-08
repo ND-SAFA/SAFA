@@ -176,6 +176,8 @@ class ExperimentStep(BaseObject):
                 job.result[JobResult.EXPERIMENTAL_VARS] = {}
             if experimental_vars:
                 job.result[JobResult.EXPERIMENTAL_VARS].update(experimental_vars[i])
+            if isinstance(job, AbstractTraceJob):
+                job.trainer_args.experimental_vars = experimental_vars[i]
         return jobs
 
     def _update_jobs_undetermined_vars(self, jobs2update: List[AbstractJob], jobs2use: List[AbstractJob]) -> List[AbstractJob]:

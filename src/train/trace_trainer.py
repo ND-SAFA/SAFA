@@ -14,6 +14,7 @@ from train.metrics.metrics_manager import MetricsManager
 from train.save_strategy.abstract_save_strategy import AbstractSaveStrategy
 from train.save_strategy.comparison_criteria import ComparisonCriterion
 from train.save_strategy.metric_save_strategy import MetricSaveStrategy
+from train.trace_callback import TraceCallback
 from train.trace_output.trace_prediction_output import TracePredictionOutput
 from train.trace_output.trace_train_output import TraceTrainOutput
 from train.trainer_args import TrainerArgs
@@ -43,13 +44,12 @@ class TraceTrainer(Trainer, BaseObject):
         self.trainer_dataset_manager = trainer_dataset_manager
         self.model_manager = model_manager
         self.model_manager.set_max_seq_length(self.trainer_args.max_seq_length)
+        callbacks = [TraceCallback()]
         model_init = lambda: self.model_manager.get_model()
         tokenizer = self.model_manager.get_tokenizer()
         if save_strategy is None:
             self.save_strategy = MetricSaveStrategy(ComparisonCriterion(["map", "f2"]))
-        super().__init__(model_init=model_init, args=trainer_args, tokenizer=tokenizer,
-                         callbacks=trainer_args.callbacks,
-                         **kwargs)
+        super().__init__(model_init=model_init, args=trainer_args, tokenizer=tokenizer, callbacks=callbacks, **kwargs)
 
     def perform_training(self, checkpoint: str = None) -> TraceTrainOutput:
         """

@@ -1,4 +1,4 @@
-from typing import Callable, List
+from typing import Callable, Dict, List
 
 from torch.nn.functional import cross_entropy
 from transformers.training_args import TrainingArguments
@@ -65,8 +65,8 @@ class TrainerArgs(TrainingArguments, BaseObject):
     shuffle: bool = True
 
     # Misc
-    callbacks: List = None
     multi_gpu: bool = MULTI_GPU_DEFAULT
+    experimental_vars: Dict = None
 
     def __init__(self, output_dir: str, **kwargs):
         """

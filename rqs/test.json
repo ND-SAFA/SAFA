@@ -34,7 +34,12 @@
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "STRUCTURE",
-                "project_path": "[DATA_PATH]/lhp/cooling"
+                "project_path": {
+                  "*": [
+                    "[DATA_PATH]/lhp/cooling",
+                    "[DATA_PATH]/lhp/heating"
+                  ]
+                }
               },
               "filter_unlinked_artifacts": true
             },

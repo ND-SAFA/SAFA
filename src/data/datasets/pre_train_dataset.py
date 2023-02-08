@@ -27,10 +27,12 @@ class PreTrainDataset(AbstractDataset):
         :param model_manager: The model generator determining tokenizer to be used.
         :return: A data used by the HF trainer.
         """
-        return LineByLineTextDataset(tokenizer=model_manager.get_tokenizer(),
-                                     file_path=self.training_file_path,
-                                     block_size=self.block_size,
-                                     **self.kwargs)
+        text_dataset = LineByLineTextDataset(tokenizer=model_manager.get_tokenizer(),
+                                             file_path=self.training_file_path,
+                                             block_size=self.block_size,
+                                             **self.kwargs)
+        for e in text_dataset.examples:
+            e["labels"] = e["input_ids"].copy()
 
     def save(self, output_dir: str, filename: str) -> str:
         """

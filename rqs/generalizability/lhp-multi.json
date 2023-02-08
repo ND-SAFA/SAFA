@@ -38,18 +38,15 @@
               "project_readers": [
                 {
                   "object_type": "STRUCTURE",
-                  "project_path": "[DATA_PATH]/lhp/heating",
-                  "filter_unlinked_artifacts": true
+                  "project_path": "[DATA_PATH]/lhp/heating"
                 },
                 {
                   "object_type": "STRUCTURE",
-                  "project_path": "[DATA_PATH]/lhp/cooling",
-                  "filter_unlinked_artifacts": true
+                  "project_path": "[DATA_PATH]/lhp/cooling"
                 },
                 {
                   "object_type": "STRUCTURE",
-                  "project_path": "[DATA_PATH]/lhp/vehiclemodes",
-                  "filter_unlinked_artifacts": true
+                  "project_path": "[DATA_PATH]/lhp/vehiclemodes"
                 }
               ],
               "filter_unlinked_artifacts": true

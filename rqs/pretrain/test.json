@@ -25,7 +25,16 @@
           "trainer_dataset_manager": {
             "train_dataset_creator": {
               "object_type": "MLM_PRE_TRAIN",
-              "orig_data_path": "[DATA_PATH]/pretrain/heating"
+              "orig_data_path": "[DATA_PATH]/pretrain/heating",
+              "block_size": {
+                "*": [
+                  10,
+                  20,
+                  30,
+                  40,
+                  50
+                ]
+              }
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",

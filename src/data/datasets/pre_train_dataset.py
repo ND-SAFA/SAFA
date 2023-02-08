@@ -1,8 +1,8 @@
 import os
 import shutil
 
+from datasets import load_dataset
 from torch.utils.data import Dataset
-from transformers import LineByLineTextDataset
 
 from data.datasets.abstract_dataset import AbstractDataset
 from models.model_manager import ModelManager
@@ -27,12 +27,20 @@ class PreTrainDataset(AbstractDataset):
         :param model_manager: The model generator determining tokenizer to be used.
         :return: A data used by the HF trainer.
         """
-        text_dataset = LineByLineTextDataset(tokenizer=model_manager.get_tokenizer(),
-                                             file_path=self.training_file_path,
-                                             block_size=self.block_size,
-                                             **self.kwargs)
-        for e in text_dataset.examples:
-            e["labels"] = e["input_ids"].copy()
+        tokenizer = model_manager.get_tokenizer()
+
+        def preprocess_function(examples):
+            tokenized_example = tokenizer(examples["text"], padding=True, truncation=True)
+            return tokenized_example
+
+        def add_labels(examples):
+            examples["labels"] = examples["input_ids"].copy()
+            return examples
+
+        dataset = load_dataset("text", data_files={"train": self.training_file_path})
+        dataset = dataset.map(preprocess_function, batched=True)
+        dataset = dataset.map(add_labels, batched=True)
+        return dataset["train"]
 
     def save(self, output_dir: str, filename: str) -> str:
         """

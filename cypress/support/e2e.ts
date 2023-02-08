@@ -16,3 +16,4 @@ import "./timTreeCommands";
 import "./projectDocumentCommands";
 import "./projectSettingCommands";
 import "./traceLinkGenerationCommands";
+import "./customAttributesCommands";

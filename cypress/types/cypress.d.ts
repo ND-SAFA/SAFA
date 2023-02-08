@@ -540,5 +540,15 @@ declare namespace Cypress {
     filterTraceApproval(
       filter: "all" | "approved" | "declined"
     ): Chainable<void>;
+
+    // Custom Attributes
+
+    /**
+     * Creates a new custom attribute.
+     * The custom attribute panel must be open.
+     *
+     * @param customAttribute - The custom attribute definition to create.
+     */
+    createCustomAttribute(customAttribute): Chainable<void>;
   }
 }

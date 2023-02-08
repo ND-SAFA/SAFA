@@ -5,6 +5,7 @@ describe("Custom Attributes", () => {
   });
 
   beforeEach(() => {
+    cy.dbResetProjects().initProject();
     cy.initProjectVersion();
   });
 
@@ -43,10 +44,29 @@ describe("Custom Attributes", () => {
     it("Creates a custom attribute and edits it", () => {
       cy.clickButton(DataCy.navSettingsButton);
       cy.clickButtonWithName("Custom Attributes");
+      cy.createCustomAttribute(customAttribute);
+      cy.clickButtonWithName("Test Label");
+      cy.getCy(DataCy.attributeLabelInput).clear().type("New Label");
+      cy.clickButton(DataCy.attributeSaveButton);
+      cy.getCy(DataCy.snackbarSuccess).should("be.visible");
+      cy.getCy(DataCy.attributeTableItem)
+        .should("be.visible")
+        .and("contain", "New Label");
     });
   });
 
-  describe("I can delete a custom attribute on my project", () => {});
+  describe("I can delete a custom attribute on my project", () => {
+    it("Creates a custom attribute and deletes it", () => {
+      cy.clickButton(DataCy.navSettingsButton);
+      cy.clickButtonWithName("Custom Attributes");
+      cy.createCustomAttribute(customAttribute);
+      cy.clickButtonWithName("Test Label");
+      cy.clickButton(DataCy.attributeDeleteButton);
+      cy.clickButton(DataCy.confirmModalButton);
+      cy.getCy(DataCy.snackbarSuccess).should("be.visible");
+      cy.getCy(DataCy.attributeTableItem).should("not.exist");
+    });
+  });
 
   describe.skip("I can generate FMEA attributes for traced artifact children", () => {
     // TODO: Add this test once FMEA attributes are implemented

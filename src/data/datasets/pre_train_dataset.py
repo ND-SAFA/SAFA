@@ -33,13 +33,8 @@ class PreTrainDataset(AbstractDataset):
             tokenized_example = tokenizer(examples["text"], padding=True, truncation=True)
             return tokenized_example
 
-        def add_labels(examples):
-            examples["labels"] = examples["input_ids"].copy()
-            return examples
-
         dataset = load_dataset("text", data_files={"train": self.training_file_path})
         dataset = dataset.map(preprocess_function, batched=True)
-        dataset = dataset.map(add_labels, batched=True)
         return dataset["train"]
 
     def save(self, output_dir: str, filename: str) -> str:

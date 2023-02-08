@@ -10,6 +10,13 @@
           "model_manager": {
             "model_path": "prajjwal1/bert-mini"
           },
+          "mlm_probability": {
+            "*": [
+              0.05,
+              0.15,
+              0.30
+            ]
+          },
           "trainer_args": {
             "num_train_epochs": 30,
             "per_device_train_batch_size": 16,

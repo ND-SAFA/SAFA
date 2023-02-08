@@ -1,6 +1,7 @@
 import os
 import shutil
 from copy import deepcopy
+from os.path import splitext
 from typing import Callable, Dict, IO, List, Tuple, Union
 
 from util.json_util import JsonUtil
@@ -30,20 +31,27 @@ class FileUtil:
             return file.read()
 
     @staticmethod
-    def get_file_list(data_path: str, exclude: List[str] = None) -> List[str]:
+    def get_file_list(data_path: str, exclude: List[str] = None, exclude_ext: List[str] = None) -> List[str]:
         """
         Gets list of files in the data path
         :param data_path: the path to the data
         :param exclude: list of strings to exclude
+        :param exclude_ext: list of file extensions to exclude
         :return: a list of files
         """
         if exclude is None:
             exclude = [".DS_Store"]
+        if exclude_ext is None:
+            exclude_ext = []
         if os.path.isfile(data_path):
             files = [data_path]
         elif os.path.isdir(data_path):
-            files = list(filter(lambda f: f not in exclude, os.listdir(data_path)))
+            files = list(filter(lambda f: not (f in exclude or splitext(f)[1] in exclude_ext), os.listdir(data_path)))
             files = list(map(lambda f: os.path.join(data_path, f), files))
+            all_files = []
+            for file in files:
+                all_files.extend(FileUtil.get_file_list(file, exclude=exclude, exclude_ext=exclude_ext))
+            files = all_files
         else:
             raise Exception("Unable to read pretraining data file path " + data_path)
         return files
@@ -144,6 +152,12 @@ class FileUtil:
 
     @staticmethod
     def ls_dir(path: str, **kwargs):
+        """
+        Gets the directories at the current path
+        :param path: Path to the directory
+        :param kwargs: Additional parameters
+        :return: The list of directories at the path
+        """
         return FileUtil.ls_filter(path, f=lambda f: os.path.isdir(f), add_base_path=True, **kwargs)
 
     @staticmethod

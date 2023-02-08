@@ -26,9 +26,9 @@
               "object_type": "MLM_PRE_TRAIN",
               "orig_data_path": {
                 "*": [
-                  "[DATA_PATH]/pretrain/heating",
-                  "[DATA_PATH]/pretrain/cooling",
-                  "[DATA_PATH]/pretrain/vehiclemodes"
+                  "[DATA_PATH]/pretrain/heating/heating.txt",
+                  "[DATA_PATH]/pretrain/cooling/cooling.txt",
+                  "[DATA_PATH]/pretrain/vehiclemodes/vehiclemodes.txt"
                 ]
               },
               "block_size": 70

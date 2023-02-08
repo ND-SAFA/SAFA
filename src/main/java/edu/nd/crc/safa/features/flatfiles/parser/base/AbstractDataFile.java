@@ -2,6 +2,7 @@ package edu.nd.crc.safa.features.flatfiles.parser.base;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileSystems;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +34,10 @@ public abstract class AbstractDataFile<E, I> implements IDataFile<E>, IFlatFileP
      * List of errors created while parsing entities.
      */
     protected List<String> errors;
+    /**
+     * The name of the file being parsed - used to generate more helpful error messages
+     */
+    protected String filename;
 
     protected AbstractDataFile() {
         this.artifactRecords = new ArrayList<>();
@@ -51,7 +56,8 @@ public abstract class AbstractDataFile<E, I> implements IDataFile<E>, IFlatFileP
 
     protected AbstractDataFile(String pathToFile, boolean parseOnConstructor) throws IOException {
         this();
-        this.artifactRecords = readFileRecords(pathToFile);
+        this.filename = FileSystems.getDefault().getPath(pathToFile).getFileName().toString();
+        this.artifactRecords = tryReadFileRecords(() -> this.readFileRecords(pathToFile));
         if (parseOnConstructor) {
             this.parseEntities();
         }
@@ -59,9 +65,25 @@ public abstract class AbstractDataFile<E, I> implements IDataFile<E>, IFlatFileP
 
     protected AbstractDataFile(MultipartFile file, boolean parseOnConstructor) throws IOException {
         this();
-        this.artifactRecords = readFileRecords(file);
+        this.filename = file.getOriginalFilename();
+        this.artifactRecords = tryReadFileRecords(() -> this.readFileRecords(file));
         if (parseOnConstructor) {
             this.parseEntities();
+        }
+    }
+
+    /**
+     * Try to read the file, and reformat the thrown exception if there is an issue with it.
+     *
+     * @param file The file object being parsed.
+     * @return The records in the file.
+     * @throws IOException If there is a problem with the file.
+     */
+    private List<I> tryReadFileRecords(ParsableFile<I> file) throws IOException {
+        try {
+            return file.parseFile();
+        } catch (IOException e) {
+            throw new IOException(String.format("%s: %s", filename, e.getMessage()), e);
         }
     }
 
@@ -126,4 +148,13 @@ public abstract class AbstractDataFile<E, I> implements IDataFile<E>, IFlatFileP
      * @return The parsed artifact.
      */
     protected abstract Pair<E, String> parseRecord(I entityRecord);
+
+    /**
+     * Quick interface to wrap calls to readFileRecords so I don't have to duplicate code.
+     * @param <I> The type of records in the file.
+     */
+    @FunctionalInterface
+    private interface ParsableFile<I> {
+        List<I> parseFile() throws IOException;
+    }
 }

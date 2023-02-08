@@ -30,7 +30,8 @@
                   "[DATA_PATH]/pretrain/itrust",
                   "[DATA_PATH]/pretrain/mip"
                 ]
-              }
+              },
+              "block_size": 70
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",

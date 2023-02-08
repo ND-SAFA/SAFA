@@ -34,7 +34,6 @@ class PreTrainDataset(AbstractDataset):
                                           return_special_tokens_mask=True, return_overflowing_tokens=True)
             return tokenized_example
 
-        @staticmethod
         def tokenize_and_chunk(texts):
             all_input_ids = []
             for input_ids in tokenizer(texts["text"]["input_ids"]):

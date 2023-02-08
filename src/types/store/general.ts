@@ -15,20 +15,30 @@ export type ArtifactTypeIcons = Record<string, string>;
  */
 export enum PanelType {
   appPanel = "appPanel",
+  errorDisplay = "errorDisplay",
   detailsPanel = "detailsPanel",
   artifactCreator = "artifactCreator",
-  errorDisplay = "errorDisplay",
+  traceCreator = "traceCreator",
   traceLinkDraw = "traceLinkDraw",
 }
 
 /**
  * Represents the open state of the artifact creator.
  */
-export type CreatorOpenState =
+export type ArtifactCreatorOpenState =
   | boolean
   | SafetyCaseType
   | FTANodeType
   | DocumentType;
+
+/**
+ * Represents the open state of the trace link creator.
+ */
+export type TraceCreatorOpenState =
+  | boolean
+  | { type: "source"; artifactId: string }
+  | { type: "target"; artifactId: string }
+  | { type: "both"; sourceId: string; targetId: string };
 
 /**
  * Represents the type of details panel states.
@@ -52,7 +62,8 @@ export type DetailsOpenState =
 export interface PanelStateMap {
   [PanelType.appPanel]: boolean;
   [PanelType.detailsPanel]: DetailsOpenState;
-  [PanelType.artifactCreator]: CreatorOpenState;
+  [PanelType.artifactCreator]: ArtifactCreatorOpenState;
+  [PanelType.traceCreator]: TraceCreatorOpenState;
   [PanelType.errorDisplay]: boolean;
   [PanelType.traceLinkDraw]: boolean;
 }

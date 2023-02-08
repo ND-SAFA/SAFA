@@ -114,10 +114,7 @@ Cypress.Commands.add("createReqToHazardFiles", (createTraces, next) => {
 
 Cypress.Commands.add("waitForJobLoad", () => {
   cy.wrap(null, { timeout: 10000 }).then(() => {
-    cy.getCy(DataCy.jobStatus, "first", 10000).should(
-      "contain.text",
-      "Completed"
-    );
+    cy.getCy(DataCy.jobOpenButton, "first", 10000).should("not.be.disabled");
   });
 });
 

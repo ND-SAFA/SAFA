@@ -48,7 +48,6 @@ public interface CsvFileUtilities {
                                            String[] headers,
                                            List<T> entities,
                                            Function<T, String[]> entity2values) throws IOException {
-        //TODO attributes
         try (FileWriter reader = new FileWriter(file)) {
             try (CSVPrinter printer = new CSVPrinter(reader, createCsvFormat(headers))) {
                 for (T entity : entities) {

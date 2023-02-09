@@ -242,7 +242,7 @@ class ExperimentStep(BaseObject):
         :param experimental_vars: The variables used to identify this run.
         :return: String representing run name.
         """
-        if experimental_vars is None:
+        if experimental_vars is None or len(experimental_vars) == 0:
             return ExperimentStep.BASE_EXPERIMENT_NAME
         if isinstance(experimental_vars, str):
             return experimental_vars

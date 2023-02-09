@@ -122,7 +122,7 @@ class TestExperimentStep(BaseExperimentTest):
         output_dir = os.path.join(TEST_OUTPUT_DIR, "experiment_step")
         job1.model_manager = DeterministicTrainerDatasetManager(deterministic_id="1234")
         ExperimentStep._update_job_children([job1, job2], output_dir)
-        self.assertEquals(job1.model_manager.output_dir, os.path.join(output_dir, str(job1.id), "models"))
+        self.assertEquals(job1.model_manager.output_dir, os.path.join(output_dir, ExperimentStep.BASE_EXPERIMENT_NAME, "models"))
 
     def get_experiment_step(self, train=True) -> ExperimentStep:
         kwargs = {}

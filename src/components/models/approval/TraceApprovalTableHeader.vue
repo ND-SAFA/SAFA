@@ -1,5 +1,5 @@
 <template>
-  <TableHeader
+  <table-header
     v-model:group-by="groupBy"
     v-model:sort-by="sortBy"
     v-model:sort-desc="sortDesc"
@@ -9,7 +9,7 @@
     :headers="headers"
   >
     <template #right>
-      <FlexBox>
+      <flex-box>
         <v-divider vertical />
         <v-autocomplete
           v-model="approvalTypes"
@@ -24,19 +24,19 @@
           class="ml-2"
           data-cy="button-trace-link-generate-approval-type"
         />
-      </FlexBox>
+      </fle>
     </template>
     <template #bottom>
-      <TextButton
+      <text-button
         text
         color="error"
         icon-id="mdi-close-circle-multiple-outline"
         @click="handleDeclineAll"
       >
         Clear Unreviewed
-      </TextButton>
+      </text-button>
     </template>
-  </TableHeader>
+  </table-header>
 </template>
 
 <script lang="ts">

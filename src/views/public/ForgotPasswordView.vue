@@ -1,6 +1,6 @@
 <template>
   <card-page>
-    <template v-slot:form>
+    <template #form>
       <typography
         align="center"
         variant="title"
@@ -16,9 +16,9 @@
         />
 
         <v-text-field
+          v-model="email"
           filled
           label="Email"
-          v-model="email"
           :error-messages="isError ? ['Unable to reset password'] : []"
         />
       </div>
@@ -31,13 +31,13 @@
       />
     </template>
 
-    <template v-slot:actions>
+    <template #actions>
       <v-btn
         v-if="!isSubmitted"
         color="primary"
-        @click="handleReset"
         :disabled="email.length === 0"
         :loading="isLoading"
+        @click="handleReset"
       >
         Reset Password
       </v-btn>
@@ -52,48 +52,46 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+/**
+ * Displays the forgot password page.
+ */
+export default {
+  name: "ForgotPasswordView",
+};
+</script>
+
+<script setup lang="ts">
+import { ref } from "vue";
 import { navigateTo, Routes } from "@/router";
 import { createPasswordReset } from "@/api";
 import { CardPage, Typography } from "@/components";
 
-/**
- * Displays the forgot password page.
- */
-export default Vue.extend({
-  name: "ForgotPasswordView",
-  components: { CardPage, Typography },
-  data() {
-    return {
-      email: "",
-      isSubmitted: false,
-      isError: false,
-      isLoading: false,
-    };
-  },
-  methods: {
-    /**
-     * Navigates to the login page.
-     */
-    handleLogin() {
-      navigateTo(Routes.LOGIN_ACCOUNT);
-    },
-    /**
-     * Sends a password reset email.
-     */
-    handleReset() {
-      this.isLoading = true;
+const email = ref("");
+const isError = ref(false);
+const isLoading = ref(false);
+const isSubmitted = ref(false);
 
-      createPasswordReset({
-        email: this.email,
-      })
-        .then(() => {
-          this.isSubmitted = true;
-          this.isError = false;
-        })
-        .catch(() => (this.isError = true))
-        .finally(() => (this.isLoading = false));
-    },
-  },
-});
+/**
+ * Navigates to the login page.
+ */
+function handleLogin() {
+  navigateTo(Routes.LOGIN_ACCOUNT);
+}
+
+/**
+ * Sends a password reset email.
+ */
+function handleReset() {
+  isLoading.value = true;
+
+  createPasswordReset({
+    email: email.value,
+  })
+    .then(() => {
+      isSubmitted.value = true;
+      isError.value = false;
+    })
+    .catch(() => (isError.value = true))
+    .finally(() => (isLoading.value = false));
+}
 </script>

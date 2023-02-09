@@ -1,23 +1,23 @@
 <template>
   <sidebar-grid>
-    <template v-slot:header>
+    <template #header>
       <trace-prediction-header />
     </template>
-    <template v-slot:sidebar>
+    <template #sidebar>
       <project-display />
     </template>
     <tab-list v-model="tab" :tabs="tabs">
-      <v-tab-item key="1">
+      <v-tab key="1">
         <model-table />
-      </v-tab-item>
-      <v-tab-item key="2">
+      </v-tab>
+      <v-tab key="2">
         <panel-card>
           <trace-link-generator :is-open="tab === 1" />
         </panel-card>
-      </v-tab-item>
-      <v-tab-item key="3">
+      </v-tab>
+      <v-tab key="3">
         <trace-approval-table />
-      </v-tab-item>
+      </v-tab>
     </tab-list>
   </sidebar-grid>
 </template>

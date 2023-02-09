@@ -8,15 +8,15 @@
       value="Create a project using one of the following methods."
     />
     <tab-list v-model="tab" :tabs="tabs">
-      <v-tab-item key="1">
+      <v-tab key="1">
         <project-creator-stepper />
-      </v-tab-item>
-      <v-tab-item key="2">
+      </v-tab>
+      <v-tab key="2">
         <project-bulk-upload />
-      </v-tab-item>
-      <v-tab-item key="3">
+      </v-tab>
+      <v-tab key="3">
         <integrations-stepper type="create" />
-      </v-tab-item>
+      </v-tab>
     </tab-list>
   </v-container>
 </template>
@@ -47,25 +47,6 @@ export default Vue.extend({
       tabs: creatorTabOptions(),
     };
   },
-  /**
-   * When the page loads, switch to any set tab in the query.
-   */
-  mounted() {
-    this.openCurrentTab();
-  },
-  methods: {
-    /**
-     * Switch to any set tab in the query.
-     */
-    openCurrentTab() {
-      const tabId = getParam(QueryParams.TAB);
-      const tabIndex = this.tabs.findIndex(({ id }) => id === tabId);
-
-      if (!tabId || tabIndex === -1 || this.tab === tabIndex) return;
-
-      this.tab = tabIndex;
-    },
-  },
   watch: {
     /**
      * When the tab changes, update the query tab id.
@@ -83,6 +64,25 @@ export default Vue.extend({
      */
     $route() {
       this.openCurrentTab();
+    },
+  },
+  /**
+   * When the page loads, switch to any set tab in the query.
+   */
+  mounted() {
+    this.openCurrentTab();
+  },
+  methods: {
+    /**
+     * Switch to any set tab in the query.
+     */
+    openCurrentTab() {
+      const tabId = getParam(QueryParams.TAB);
+      const tabIndex = this.tabs.findIndex(({ id }) => id === tabId);
+
+      if (!tabId || tabIndex === -1 || this.tab === tabIndex) return;
+
+      this.tab = tabIndex;
     },
   },
 });

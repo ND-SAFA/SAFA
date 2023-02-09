@@ -1,5 +1,5 @@
 <template>
-  <TableHeader
+  <table-header
     v-model:search-text="searchText"
     v-model:group-by="groupBy"
     v-model:sort-by="sortBy"
@@ -9,7 +9,7 @@
     data-cy="table-header"
   >
     <template #right>
-      <FlexBox>
+      <flex-box>
         <v-divider vertical />
         <v-autocomplete
           v-model="rowTypes"
@@ -34,9 +34,9 @@
           style="max-width: 300px"
           data-cy="input-trace-matrix-table-col-types"
         />
-      </FlexBox>
+      </flex-box>
     </template>
-  </TableHeader>
+  </table-header>
 </template>
 
 <script lang="ts">

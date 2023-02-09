@@ -1,10 +1,10 @@
 <template>
   <card-page id="login-view">
-    <template v-slot:form>
+    <template #form>
       <v-text-field
+        v-model="email"
         filled
         label="Email"
-        v-model="email"
         :error-messages="isError ? ['Invalid username or password'] : []"
         data-cy="input-email"
         @keydown.enter="handleLogin"
@@ -12,14 +12,14 @@
       <password-field v-model="password" @enter="handleLogin" />
     </template>
 
-    <template v-slot:actions>
+    <template #actions>
       <v-btn
         color="primary"
         width="8em"
         :disabled="password.length === 0"
         :loading="isLoading"
         data-cy="button-login"
-        @click="handleLogin"
+        @click="handleSubmit"
       >
         Login
       </v-btn>
@@ -55,52 +55,51 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+/**
+ * Displays the login page.
+ */
+export default {
+  name: "LoginView",
+};
+</script>
+
+<script setup lang="ts">
+import { ref } from "vue";
 import { navigateTo, Routes } from "@/router";
 import { handleLogin } from "@/api";
 import { CardPage, PasswordField, Typography } from "@/components";
 
-/**
- * Displays the login page.
- */
-export default Vue.extend({
-  name: "LoginView",
-  components: { Typography, PasswordField, CardPage },
-  data() {
-    return {
-      email: "",
-      password: "",
-      isError: false,
-      isLoading: false,
-    };
-  },
-  methods: {
-    /**
-     * Navigate to the sign up page.
-     */
-    handleSignUp() {
-      navigateTo(Routes.CREATE_ACCOUNT);
-    },
-    /**
-     * Navigate to the forgot password page.
-     */
-    handleForgotPassword() {
-      navigateTo(Routes.FORGOT_PASSWORD);
-    },
-    /**
-     * Attempts to log the user in.
-     */
-    handleLogin() {
-      this.isLoading = true;
+const email = ref("");
+const password = ref("");
+const isError = ref(false);
+const isLoading = ref(false);
 
-      handleLogin({
-        email: this.email,
-        password: this.password,
-      })
-        .then(() => (this.isError = false))
-        .catch(() => (this.isError = true))
-        .finally(() => (this.isLoading = false));
-    },
-  },
-});
+/**
+ * Navigate to the sign-up page.
+ */
+function handleSignUp() {
+  navigateTo(Routes.CREATE_ACCOUNT);
+}
+
+/**
+ * Navigate to the forgot password page.
+ */
+function handleForgotPassword() {
+  navigateTo(Routes.FORGOT_PASSWORD);
+}
+
+/**
+ * Attempts to log the user in.
+ */
+function handleSubmit() {
+  isLoading.value = true;
+
+  handleLogin({
+    email: email.value,
+    password: password.value,
+  })
+    .then(() => (isError.value = false))
+    .catch(() => (isError.value = true))
+    .finally(() => (isLoading.value = false));
+}
 </script>

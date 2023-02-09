@@ -1,7 +1,7 @@
 <template>
   <v-row dense class="mb-2">
     <v-col cols="12">
-      <FlexBox align="center">
+      <flex-box align="center">
         <v-text-field
           v-model="searchText"
           dense
@@ -12,11 +12,11 @@
           style="width: 100%"
           append-icon="mdi-magnify"
         />
-        <CommitButtons v-if="showCommitButtons" color="primary" class="mx-2" />
-      </FlexBox>
+        <commit-buttons v-if="showCommitButtons" color="primary" class="mx-2" />
+      </flex-box>
     </v-col>
     <v-col cols="12">
-      <FlexBox>
+      <flex-box>
         <v-autocomplete
           v-model="groupBy"
           clearable
@@ -53,7 +53,7 @@
           @click:prepend-inner="sortDesc = !sortDesc"
         />
         <slot name="right" />
-      </FlexBox>
+      </flex-box>
     </v-col>
     <v-col cols="12">
       <slot name="bottom" />

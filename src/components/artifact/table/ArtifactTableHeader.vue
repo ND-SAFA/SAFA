@@ -1,5 +1,5 @@
 <template>
-  <TableHeader
+  <table-header
     v-model:search-text="searchText"
     v-model:group-by="groupBy"
     v-model:sort-by="sortBy"
@@ -9,7 +9,7 @@
     data-cy="table-header"
   >
     <template #right>
-      <FlexBox v-if="deltaStore.inDeltaView">
+      <flex-box v-if="deltaStore.inDeltaView">
         <v-divider vertical />
         <v-autocomplete
           v-model="selectedDeltaTypes"
@@ -24,9 +24,9 @@
           class="ml-2"
           style="max-width: 300px"
         />
-      </FlexBox>
+      </flex-box>
     </template>
-  </TableHeader>
+  </table-header>
 </template>
 
 <script lang="ts">

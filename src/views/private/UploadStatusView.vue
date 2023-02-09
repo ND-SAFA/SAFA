@@ -1,23 +1,20 @@
 <template>
   <private-page>
-    <template v-slot:page>
+    <template #page>
       <job-display />
     </template>
   </private-page>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { PrivatePage, JobDisplay } from "@/components";
-
 /**
  * Displays project uploads.
  */
-export default Vue.extend({
+export default {
   name: "UploadStatusView",
-  components: {
-    JobDisplay,
-    PrivatePage,
-  },
-});
+};
+</script>
+
+<script setup lang="ts">
+import { PrivatePage, JobDisplay } from "@/components";
 </script>

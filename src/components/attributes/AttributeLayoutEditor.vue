@@ -1,10 +1,10 @@
 <template>
   <div>
     <tab-list v-model="tab" :tabs="tabs">
-      <template v-slot:before>
+      <template #before>
         <typography r="4" el="h2" variant="subtitle" value="Layouts" />
       </template>
-      <template v-slot:after>
+      <template #after>
         <text-button
           v-if="!createOpen"
           text
@@ -14,13 +14,13 @@
           Add Layout
         </text-button>
       </template>
-      <v-tab-item v-for="(_, idx) in tabs" :key="idx + 1">
+      <v-tab v-for="(_, idx) in tabs" :key="idx + 1">
         <save-attribute-layout
           v-if="idx === tab"
           :layout="layouts[idx]"
           @save="handleSaveLayout(idx)"
         />
-      </v-tab-item>
+      </v-tab>
     </tab-list>
   </div>
 </template>

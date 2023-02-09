@@ -1,62 +1,49 @@
 <template>
   <v-text-field
+    v-model="model"
     filled
     :label="label"
-    v-model="model"
     :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
     :type="showPassword ? 'text' : 'password'"
     data-cy="input-password"
-    @click:append="showPassword = !showPassword"
     :error-messages="errors"
     :error="errors.length > 0"
-    @keydown.enter="$emit('enter')"
+    @click:append="showPassword = !showPassword"
+    @keydown.enter="emit('enter')"
   />
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
-
 /**
  * A generic password input.
- *
- * @emits `input` (string) - On input change.
- * @emits `enter` - On submit.
  */
-export default Vue.extend({
+export default {
   name: "PasswordField",
-  props: {
-    value: {
-      type: String,
-      required: true,
-    },
-    label: {
-      type: String,
-      default: "Password",
-    },
-    errors: {
-      type: Array as PropType<string[]>,
-      default: () => [],
-    },
-  },
-  data() {
-    return {
-      model: this.value,
-      showPassword: false,
-    };
-  },
-  watch: {
-    /**
-     * Updates the model if the value changes.
-     */
-    value(currentValue: string) {
-      this.model = currentValue;
-    },
-    /**
-     * Emits changes to the model.
-     */
-    model(currentValue: string) {
-      this.$emit("input", currentValue);
-    },
-  },
-});
+};
+</script>
+
+<script setup lang="ts">
+import { defineProps, defineEmits, withDefaults, ref, watch } from "vue";
+
+const props = withDefaults(
+  defineProps<{
+    modelValue: string;
+    label?: string;
+    errors?: string[];
+  }>(),
+  { label: "Password", errors: undefined }
+);
+
+const emit = defineEmits<{
+  (e: "update:modelValue", value: string): void;
+  (e: "enter"): void;
+}>();
+
+const model = ref(props.modelValue);
+const showPassword = ref(false);
+
+watch(
+  () => model.value,
+  () => emit("update:modelValue", model.value)
+);
 </script>

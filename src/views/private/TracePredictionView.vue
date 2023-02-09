@@ -1,20 +1,20 @@
 <template>
   <private-page full-window>
-    <template v-slot:page>
+    <template #page>
       <trace-prediction-tabs />
     </template>
   </private-page>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { PrivatePage, TracePredictionTabs } from "@/components";
-
-export default Vue.extend({
+/**
+ * Renders a page for model training and trace approval.
+ */
+export default {
   name: "ApproveLinksView",
-  components: {
-    TracePredictionTabs,
-    PrivatePage,
-  },
-});
+};
+</script>
+
+<script setup lang="ts">
+import { PrivatePage, TracePredictionTabs } from "@/components";
 </script>

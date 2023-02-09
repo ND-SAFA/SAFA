@@ -1,25 +1,25 @@
 <template>
   <sidebar-grid>
-    <template v-slot:header>
+    <template #header>
       <settings-header />
     </template>
-    <template v-slot:sidebar>
+    <template #sidebar>
       <project-buttons />
       <project-display />
     </template>
     <tab-list v-model="tab" :tabs="tabs">
-      <v-tab-item key="1">
+      <v-tab key="1">
         <settings-members />
-      </v-tab-item>
-      <v-tab-item key="2">
+      </v-tab>
+      <v-tab key="2">
         <upload-new-version :is-open="tab === 2" />
-      </v-tab-item>
-      <v-tab-item key="3">
+      </v-tab>
+      <v-tab key="3">
         <project-installations-table />
-      </v-tab-item>
-      <v-tab-item key="4">
+      </v-tab>
+      <v-tab key="4">
         <attribute-settings />
-      </v-tab-item>
+      </v-tab>
     </tab-list>
   </sidebar-grid>
 </template>

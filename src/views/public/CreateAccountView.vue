@@ -1,6 +1,6 @@
 <template>
   <card-page>
-    <template v-slot:form>
+    <template #form>
       <typography
         align="center"
         variant="title"
@@ -16,9 +16,9 @@
         />
 
         <v-text-field
+          v-model="email"
           filled
           label="Email"
-          v-model="email"
           :error-messages="isError ? ['Unable to create an account'] : []"
           data-cy="input-new-email"
         />
@@ -33,7 +33,7 @@
       />
     </template>
 
-    <template v-slot:actions>
+    <template #actions>
       <v-btn
         v-if="!isCreated"
         color="primary"
@@ -52,8 +52,8 @@
           small
           class="px-1"
           color="primary"
-          @click="handleLogin"
           data-cy="button-create-account-login"
+          @click="handleLogin"
         >
           Login
         </v-btn>
@@ -63,50 +63,48 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+/**
+ * Displays the create account page.
+ */
+export default {
+  name: "CreateAccountView",
+};
+</script>
+
+<script setup lang="ts">
+import { ref } from "vue";
 import { navigateTo, Routes } from "@/router";
 import { createUser } from "@/api";
 import { CardPage, PasswordField, Typography } from "@/components";
 
-/**
- * Displays the create account page.
- */
-export default Vue.extend({
-  name: "CreateAccountView",
-  components: { CardPage, PasswordField, Typography },
-  data() {
-    return {
-      email: "",
-      password: "",
-      isError: false,
-      isLoading: false,
-      isCreated: false,
-    };
-  },
-  methods: {
-    /**
-     * Navigates to the login page.
-     */
-    handleLogin() {
-      navigateTo(Routes.LOGIN_ACCOUNT);
-    },
-    /**
-     * Attempts to create a new account.
-     */
-    handleCreateAccount() {
-      this.isLoading = true;
+const email = ref("");
+const password = ref("");
+const isError = ref(false);
+const isLoading = ref(false);
+const isCreated = ref(false);
 
-      createUser({
-        email: this.email,
-        password: this.password,
-      })
-        .then(() => {
-          this.isError = false;
-          this.isCreated = true;
-        })
-        .catch(() => (this.isError = true))
-        .finally(() => (this.isLoading = false));
-    },
-  },
-});
+/**
+ * Navigates to the login page.
+ */
+function handleLogin() {
+  navigateTo(Routes.LOGIN_ACCOUNT);
+}
+
+/**
+ * Attempts to create a new account.
+ */
+function handleCreateAccount() {
+  isLoading.value = true;
+
+  createUser({
+    email: email.value,
+    password: password.value,
+  })
+    .then(() => {
+      isError.value = false;
+      isCreated.value = true;
+    })
+    .catch(() => (isError.value = true))
+    .finally(() => (isLoading.value = false));
+}
 </script>

@@ -1,6 +1,6 @@
 <template>
   <private-page>
-    <template v-slot:page>
+    <template #page>
       <v-row justify="center">
         <v-col align-self="center">
           <safa-icon />
@@ -15,18 +15,14 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { PrivatePage, SafaIcon, Typography } from "@/components";
-
 /**
  * The default page displayed if an unknown error is encountered.
  */
-export default Vue.extend({
+export default {
   name: "ErrorPageView",
-  components: {
-    Typography,
-    SafaIcon,
-    PrivatePage,
-  },
-});
+};
+</script>
+
+<script setup lang="ts">
+import { PrivatePage, SafaIcon, Typography } from "@/components";
 </script>

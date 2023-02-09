@@ -1,6 +1,6 @@
 <template>
   <private-page>
-    <template v-slot:page>
+    <template #page>
       <typography
         el="h1"
         y="10"
@@ -74,7 +74,15 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+/**
+ * Displays the home page.
+ */
+export default {
+  name: "HomeView",
+};
+</script>
+
+<script setup lang="ts">
 import { CreatorTabTypes } from "@/types";
 import { navigateTo, QueryParams, Routes } from "@/router";
 import {
@@ -84,33 +92,21 @@ import {
   PanelCard,
 } from "@/components";
 
-/**
- * Displays the home page.
- */
-export default Vue.extend({
-  name: "HomeView",
-  components: {
-    PanelCard,
-    PrivatePage,
-    MiniProjectVersionStepper,
-    Typography,
-  },
-  methods: {
-    handleOpenStandard() {
-      navigateTo(Routes.PROJECT_CREATOR, {
-        [QueryParams.TAB]: CreatorTabTypes.standard,
-      });
-    },
-    handleOpenBulk() {
-      navigateTo(Routes.PROJECT_CREATOR, {
-        [QueryParams.TAB]: CreatorTabTypes.bulk,
-      });
-    },
-    handleOpenImport() {
-      navigateTo(Routes.PROJECT_CREATOR, {
-        [QueryParams.TAB]: CreatorTabTypes.import,
-      });
-    },
-  },
-});
+function handleOpenStandard() {
+  navigateTo(Routes.PROJECT_CREATOR, {
+    [QueryParams.TAB]: CreatorTabTypes.standard,
+  });
+}
+
+function handleOpenBulk() {
+  navigateTo(Routes.PROJECT_CREATOR, {
+    [QueryParams.TAB]: CreatorTabTypes.bulk,
+  });
+}
+
+function handleOpenImport() {
+  navigateTo(Routes.PROJECT_CREATOR, {
+    [QueryParams.TAB]: CreatorTabTypes.import,
+  });
+}
 </script>

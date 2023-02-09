@@ -1,23 +1,20 @@
 <template>
   <private-page>
-    <template v-slot:page>
+    <template #page>
       <project-version-stepper />
     </template>
   </private-page>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { PrivatePage, ProjectVersionStepper } from "@/components";
-
 /**
  * Displays the steps for creating a project.
  */
-export default Vue.extend({
+export default {
   name: "ProjectCreatorView",
-  components: {
-    ProjectVersionStepper,
-    PrivatePage,
-  },
-});
+};
+</script>
+
+<script setup lang="ts">
+import { PrivatePage, ProjectVersionStepper } from "@/components";
 </script>

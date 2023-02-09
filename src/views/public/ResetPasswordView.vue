@@ -1,6 +1,6 @@
 <template>
   <card-page>
-    <template v-slot:form>
+    <template #form>
       <typography
         align="center"
         variant="title"
@@ -22,13 +22,13 @@
       />
     </template>
 
-    <template v-slot:actions>
+    <template #actions>
       <v-btn
         v-if="!isSubmitted"
         color="primary"
-        @click="handleReset"
         :disabled="password.length === 0"
         :loading="isLoading"
+        @click="handleReset"
       >
         Update Password
       </v-btn>
@@ -43,65 +43,60 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+/**
+ * Displays the reset password page.
+ */
+export default {
+  name: "ResetPasswordView",
+};
+</script>
+
+<script setup lang="ts">
+import { ref, onMounted, computed } from "vue";
 import { getParam, navigateTo, QueryParams, Routes } from "@/router";
 import { updatePassword } from "@/api";
 import { CardPage, PasswordField, Typography } from "@/components";
 
-/**
- * Displays the reset password page.
- */
-export default Vue.extend({
-  name: "ResetPasswordView",
-  components: { PasswordField, CardPage, Typography },
-  data() {
-    return {
-      password: "",
-      token: "",
-      isSubmitted: false,
-      isError: false,
-      isLoading: false,
-    };
-  },
-  mounted() {
-    const token = getParam(QueryParams.PW_RESET);
+const token = ref("");
+const password = ref("");
+const isError = ref(false);
+const isLoading = ref(false);
+const isSubmitted = ref(false);
 
-    if (!token) return;
+const errors = computed(() =>
+  isError.value ? ["Unable to reset your password."] : []
+);
 
-    this.token = String(token);
-  },
-  computed: {
-    /**
-     * @return Any errors encountered.
-     */
-    errors(): string[] {
-      return this.isError ? ["Unable to reset your password."] : [];
-    },
-  },
-  methods: {
-    /**
-     * Navigates to the login page.
-     */
-    handleLogin() {
-      navigateTo(Routes.LOGIN_ACCOUNT);
-    },
-    /**
-     * Attempts to reset a user's password.
-     */
-    handleReset() {
-      this.isLoading = true;
+onMounted(() => {
+  const loadedToken = getParam(QueryParams.PW_RESET);
 
-      updatePassword({
-        newPassword: this.password,
-        resetToken: this.token,
-      })
-        .then(() => {
-          this.isSubmitted = true;
-          this.isError = false;
-        })
-        .catch(() => (this.isError = true))
-        .finally(() => (this.isLoading = false));
-    },
-  },
+  if (!loadedToken) return;
+
+  token.value = String(loadedToken);
 });
+
+/**
+ * Navigates to the login page.
+ */
+function handleLogin() {
+  navigateTo(Routes.LOGIN_ACCOUNT);
+}
+
+/**
+ * Attempts to reset a user's password.
+ */
+function handleReset() {
+  isLoading.value = true;
+
+  updatePassword({
+    newPassword: password.value,
+    resetToken: token.value,
+  })
+    .then(() => {
+      isSubmitted.value = true;
+      isError.value = false;
+    })
+    .catch(() => (isError.value = true))
+    .finally(() => (isLoading.value = false));
+}
 </script>

@@ -16,11 +16,11 @@
             }
           },
           "model_manager": {
-            "model_path": "distilbert-base-uncased"
+            "model_path": "prajjwal1/bert-medium"
           },
           "trainer_args": {
-            "num_train_epochs": 50,
-            "per_device_train_batch_size": 8,
+            "num_train_epochs": 1,
+            "per_device_train_batch_size": 4,
             "gradient_accumulation_steps": 16,
             "learning_rate": 5e-5,
             "metrics": [
@@ -34,12 +34,34 @@
           },
           "trainer_dataset_manager": {
             "train_dataset_creator": {
-              "object_type": "TRACE",
-              "project_reader": {
-                "object_type": "STRUCTURE",
-                "project_path": "[DATA_PATH]/cm1"
-              },
-              "filter_unlinked_artifacts": false
+              "object_type": "MULTI",
+              "project_readers": [
+                {
+                  "object_type": "STRUCTURE",
+                  "project_path": "[DATA_PATH]/git/data/commit_to_issue/safa"
+                },
+                {
+                  "object_type": "STRUCTURE",
+                  "project_path": "[DATA_PATH]/git/data/issue_to_issue_comment/safa"
+                },
+                {
+                  "object_type": "STRUCTURE",
+                  "project_path": "[DATA_PATH]/git/data/pr_to_commit/safa"
+                },
+                {
+                  "object_type": "STRUCTURE",
+                  "project_path": "[DATA_PATH]/git/data/pr_to_issue/safa"
+                },
+                {
+                  "object_type": "STRUCTURE",
+                  "project_path": "[DATA_PATH]/git/data/pr_to_prc/safa"
+                },
+                {
+                  "object_type": "STRUCTURE",
+                  "project_path": "[DATA_PATH]/git/data/prc_to_prc/safa"
+                }
+              ],
+              "filter_unlinked_artifacts": true
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",

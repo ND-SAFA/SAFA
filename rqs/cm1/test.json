@@ -16,11 +16,11 @@
             }
           },
           "model_manager": {
-            "model_path": "distilbert-base-uncased"
+            "model_path": "[OUTPUT_PATH]/git-test/experiment_0/step_0/{}/models/checkpoint-440"
           },
           "trainer_args": {
             "num_train_epochs": 50,
-            "per_device_train_batch_size": 8,
+            "per_device_train_batch_size": 16,
             "gradient_accumulation_steps": 16,
             "learning_rate": 5e-5,
             "metrics": [

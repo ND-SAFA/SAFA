@@ -5,22 +5,14 @@
         {
           "object_type": "TRAIN",
           "job_args": {
-            "random_seed": {
-              "*": [
-                812,
-                924,
-                316,
-                540,
-                457
-              ]
-            }
+            "random_seed": 812
           },
           "model_manager": {
             "model_path": "distilbert-base-uncased"
           },
           "trainer_args": {
             "num_train_epochs": 50,
-            "per_device_train_batch_size": 8,
+            "per_device_train_batch_size": 16,
             "gradient_accumulation_steps": 16,
             "learning_rate": 5e-5,
             "metrics": [
@@ -34,28 +26,19 @@
           },
           "trainer_dataset_manager": {
             "train_dataset_creator": {
-              "object_type": "TRACE",
-              "project_reader": {
-                "object_type": "STRUCTURE",
-                "project_path": "[DATA_PATH]/cm1"
-              },
-              "filter_unlinked_artifacts": false
+              "object_type": "MULTI",
+              "project_readers": [
+                {
+                  "object_type": "CSV",
+                  "project_path": "[DATA_PATH]/git.csv"
+                }
+              ],
+              "filter_unlinked_artifacts": true
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",
               "split_strategy": "SPLIT_BY_LINK",
-              "val_percentage": 0.15
-            },
-            "eval_dataset_creator": {
-              "object_type": "SPLIT",
-              "split_strategy": "SPLIT_BY_LINK",
-              "val_percentage": {
-                "*": [
-                  0.30,
-                  0.50,
-                  0.70
-                ]
-              }
+              "val_percentage": 0.20
             },
             "augmenter": {
               "steps": [

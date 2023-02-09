@@ -10,6 +10,7 @@ from data.datasets.dataset_role import DatasetRole
 from data.managers.trainer_dataset_manager import TrainerDatasetManager
 from data.samplers.balanced_batch_sampler import BalancedBatchSampler
 from models.model_manager import ModelManager
+from train.itrainer import iTrainer
 from train.metrics.metrics_manager import MetricsManager
 from train.save_strategy.abstract_save_strategy import AbstractSaveStrategy
 from train.save_strategy.comparison_criteria import ComparisonCriterion
@@ -28,7 +29,7 @@ torch.use_deterministic_algorithms(True)
 TRIAL = Union["optuna.Trial", Dict[str, Any]]
 
 
-class TraceTrainer(Trainer, BaseObject):
+class TraceTrainer(Trainer, iTrainer, BaseObject):
     """
     Trains model on data for generic task.
     """
@@ -37,7 +38,11 @@ class TraceTrainer(Trainer, BaseObject):
                  trainer_dataset_manager: TrainerDatasetManager, save_strategy: AbstractSaveStrategy = None, **kwargs):
         """
         Handles the training and evaluation of learning models
-        :param args: the learning model arguments
+        :param trainer_args: The learning model arguments
+        :param model_manager: The manager for the model used for training and/or predicting
+        :param trainer_dataset_manager: The manager for the datasets used for training and/or predicting
+        :param save_strategy: The strategy used to save the best model
+        :param kwargs: Any additional arguments given to the HF Trainer
         """
         self.trainer_args = trainer_args
         self.trainer_dataset_manager = trainer_dataset_manager
@@ -68,7 +73,8 @@ class TraceTrainer(Trainer, BaseObject):
     def perform_prediction(self, dataset_role: DatasetRole = DatasetRole.EVAL) -> TracePredictionOutput:
         """
         Performs the prediction and (optionally) evaluation for the model
-        :return: A dictionary containing the results.
+        :param dataset_role: The dataset role to use for evaluation (e.g. VAL or EVAL)
+        :return: THe prediction output
         """
         dataset = self.trainer_dataset_manager[dataset_role]
         self.eval_dataset = dataset.to_trainer_dataset(self.model_manager)

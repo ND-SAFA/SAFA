@@ -23,7 +23,7 @@ class ListUtil:
         return list_[start:end], end
 
     @staticmethod
-    def batch(iterable, n=1):
+    def batch(iterable: List, n: int = 1):
         """
         Creates batches of constant size except for possible the last batch.
         :param iterable: The iterable containing items to batch.

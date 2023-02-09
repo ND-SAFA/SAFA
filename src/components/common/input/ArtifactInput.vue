@@ -121,7 +121,7 @@ export default Vue.extend({
       if (typeof this.model === "string") {
         this.model = "";
       } else if (Array.isArray(this.model)) {
-        this.model = this.model.filter((id) => id !== item.id);
+        this.model = this.model.filter((id: string) => id !== item.id);
       }
     },
     /**

@@ -129,7 +129,7 @@ export default Vue.extend({
      * Attempts to save a change to a project member.
      */
     async handleConfirm() {
-      this.projectIds.forEach((projectId) => {
+      this.projectIds.forEach((projectId: string) => {
         if (!this.validated || !this.userRole) return;
 
         handleInviteMember(projectId, this.userEmail, this.userRole, {

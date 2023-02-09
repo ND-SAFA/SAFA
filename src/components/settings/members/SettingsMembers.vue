@@ -118,8 +118,9 @@ export default Vue.extend({
     handleDeleteMember(member: MembershipSchema): void {
       if (
         member.role === ProjectRole.OWNER &&
-        this.members.filter(({ role }) => role === ProjectRole.OWNER).length ===
-          1
+        this.members.filter(
+          ({ role }: MembershipSchema) => role === ProjectRole.OWNER
+        ).length === 1
       ) {
         logStore.onInfo("You cannot delete the only owner of this project.");
       } else {

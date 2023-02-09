@@ -45,8 +45,8 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { Route } from "vue-router";
+import Vue, { watch } from "vue";
+import { useRoute } from "vue-router";
 import {
   TraceLinkSchema,
   ArtifactSchema,
@@ -81,6 +81,19 @@ export default Vue.extend({
     TraceLink,
     TimNode,
     TimLink,
+  },
+  setup() {
+    const currentRoute = useRoute();
+
+    /** Resets the layout when the route changes. */
+    watch(
+      () => currentRoute.path,
+      () => {
+        if (currentRoute.path !== Routes.ARTIFACT) return;
+
+        layoutStore.resetLayout();
+      }
+    );
   },
   data() {
     return {
@@ -182,14 +195,6 @@ export default Vue.extend({
      * Resets the layout when the mode changes.
      */
     isTreeMode() {
-      layoutStore.resetLayout();
-    },
-    /**
-     * Resets the layout when the route changes.
-     */
-    $route(to: Route) {
-      if (to.path !== Routes.ARTIFACT) return;
-
       layoutStore.resetLayout();
     },
   },

@@ -1,162 +1,120 @@
 <template>
-  <table-header
+  <TableHeader
+    v-model:search-text="searchText"
+    v-model:group-by="groupBy"
+    v-model:sort-by="sortBy"
+    v-model:sort-desc="sortDesc"
+    v-model:group-desc="groupDesc"
     :headers="headers"
-    :search-text.sync="currentSearch"
-    :group-by.sync="currentGroup"
-    :sort-by.sync="currentSort"
-    :sort-desc.sync="currentSortDesc"
-    :group-desc.sync="currentGroupDesc"
     data-cy="table-header"
   >
-    <template v-slot:right>
-      <flex-box>
+    <template #right>
+      <FlexBox>
         <v-divider vertical />
         <v-autocomplete
+          v-model="rowTypes"
           outlined
           multiple
           dense
           hide-details
           label="Row Types"
-          v-model="currentRowTypes"
-          :items="artifactTypes"
+          :items="typeOptionsStore.artifactTypes"
           style="max-width: 300px"
           class="mx-2"
           data-cy="input-trace-matrix-table-row-types"
         />
         <v-autocomplete
+          v-model="colTypes"
           outlined
           multiple
           dense
           hide-details
           label="Column Types"
-          v-model="currentColTypes"
-          :items="artifactTypes"
+          :items="typeOptionsStore.artifactTypes"
           style="max-width: 300px"
           data-cy="input-trace-matrix-table-col-types"
         />
-      </flex-box>
+      </FlexBox>
     </template>
-  </table-header>
+  </TableHeader>
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
-import { DataTableHeader } from "vuetify";
+/**
+ * Represents the header and inputs for a table of trace links.
+ */
+export default {
+  name: "TraceMatrixTableHeader",
+};
+</script>
+
+<script setup lang="ts">
+import { defineProps, defineEmits, ref, watch } from "vue";
+import { ArtifactSchema, DataTableHeader } from "@/types";
 import { typeOptionsStore } from "@/hooks";
 import { TableHeader, FlexBox } from "@/components/common";
 
-/**
- * Represents the header and inputs for a table of trace links.
- *
- * @emits-1 `update:searchText` (String) on search.
- * @emits-2 `update:sortBy` (String[]) on sort update.
- * @emits-3 `update:groupBy` (String) on group update.
- * @emits-3 `update:rowTypes` (String[]) on row filter update.
- * @emits-3 `update:colTypes` (String[]) on column filter update.
- */
-export default Vue.extend({
-  name: "TraceMatrixTableHeader",
-  components: {
-    FlexBox,
-    TableHeader,
-  },
-  props: {
-    headers: {
-      type: Array as PropType<DataTableHeader[]>,
-      required: true,
-    },
-    searchText: String,
-    groupBy: String,
-    sortBy: Array as PropType<string[]>,
-    groupDesc: Boolean,
-    sortDesc: Boolean,
-    rowTypes: Array as PropType<string[]>,
-    colTypes: Array as PropType<string[]>,
-  },
-  computed: {
-    /**
-     * @return All types of artifacts in the current project.
-     */
-    artifactTypes(): string[] {
-      return typeOptionsStore.artifactTypes;
-    },
-    /**
-     * Emits changes to the grouping.
-     */
-    currentSearch: {
-      get(): string {
-        return this.searchText;
-      },
-      set(newSearch: string): void {
-        this.$emit("update:searchText", newSearch);
-      },
-    },
-    /**
-     * Emits changes to the sorting.
-     */
-    currentSort: {
-      get(): string[] {
-        return this.sortBy;
-      },
-      set(newSort: string[]): void {
-        this.$emit("update:sortBy", newSort);
-      },
-    },
-    /**
-     * Emits changes to the grouping.
-     */
-    currentGroup: {
-      get(): string {
-        return this.groupBy;
-      },
-      set(newGroup: string): void {
-        this.$emit("update:groupBy", newGroup);
-      },
-    },
-    /**
-     * Emits changes to the sorting order.
-     */
-    currentSortDesc: {
-      get(): boolean {
-        return this.sortDesc;
-      },
-      set(newDesc: boolean): void {
-        this.$emit("update:sortDesc", newDesc);
-      },
-    },
-    /**
-     * Emits changes to the grouping order.
-     */
-    currentGroupDesc: {
-      get(): boolean {
-        return this.groupDesc;
-      },
-      set(newDesc: boolean): void {
-        this.$emit("update:groupDesc", newDesc);
-      },
-    },
-    /**
-     * Emits changes to the column types.
-     */
-    currentRowTypes: {
-      get(): string[] {
-        return this.rowTypes;
-      },
-      set(newTypes: string[]): void {
-        this.$emit("update:rowTypes", newTypes);
-      },
-    },
-    /**
-     * Emits changes to the row types.
-     */
-    currentColTypes: {
-      get(): string[] {
-        return this.colTypes;
-      },
-      set(newTypes: string[]): void {
-        this.$emit("update:colTypes", newTypes);
-      },
-    },
-  },
-});
+const props = defineProps<{
+  headers: DataTableHeader<ArtifactSchema>[];
+  searchText: string;
+  groupBy: string;
+  sortBy: string[];
+  groupDesc: boolean;
+  sortDesc: boolean;
+  colTypes: string[];
+  rowTypes: string[];
+}>();
+
+const emit = defineEmits<{
+  (e: "update:searchText", text: string): void;
+  (e: "update:sortBy", values: string[]): void;
+  (e: "update:sortDesc", descending: boolean): void;
+  (e: "update:groupBy", value: string): void;
+  (e: "update:groupDesc", descending: boolean): void;
+  (e: "update:colTypes", types: string[]): void;
+  (e: "update:rowTypes", types: string[]): void;
+}>();
+
+const searchText = ref(props.searchText);
+const sortBy = ref(props.sortBy);
+const sortDesc = ref(props.sortDesc);
+const groupBy = ref(props.groupBy);
+const groupDesc = ref(props.groupDesc);
+const colTypes = ref(props.colTypes);
+const rowTypes = ref(props.rowTypes);
+
+watch(
+  () => searchText.value,
+  () => emit("update:searchText", searchText.value)
+);
+
+watch(
+  () => sortBy.value,
+  () => emit("update:sortBy", sortBy.value)
+);
+
+watch(
+  () => sortDesc.value,
+  () => emit("update:sortDesc", sortDesc.value)
+);
+
+watch(
+  () => groupBy.value,
+  () => emit("update:groupBy", groupBy.value)
+);
+
+watch(
+  () => groupDesc.value,
+  () => emit("update:groupDesc", groupDesc.value)
+);
+
+watch(
+  () => colTypes.value,
+  () => emit("update:colTypes", colTypes.value)
+);
+
+watch(
+  () => rowTypes.value,
+  () => emit("update:rowTypes", rowTypes.value)
+);
 </script>

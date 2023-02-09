@@ -59,7 +59,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { AttributeSchema } from "@/types";
+import { AttributePositionSchema, AttributeSchema } from "@/types";
 import { attributeTypeOptions } from "@/util";
 import { attributeLayoutSaveStore, attributesStore } from "@/hooks";
 import {
@@ -110,7 +110,7 @@ export default Vue.extend({
      */
     isAttributeInLayout(attribute: AttributeSchema): boolean {
       return !!this.layoutStore.editedLayout.positions.find(
-        ({ key }) => key === attribute.key
+        ({ key }: AttributePositionSchema) => key === attribute.key
       );
     },
     /**

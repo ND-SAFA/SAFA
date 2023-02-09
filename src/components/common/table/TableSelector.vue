@@ -85,7 +85,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { DataTableHeader } from "vuetify";
+import { DataTableHeader } from "@/types";
 import { FlexBox } from "@/components/common/layout";
 import { IconButton } from "@/components/common/button";
 

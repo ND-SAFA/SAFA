@@ -1,158 +1,114 @@
 <template>
-  <table-header
+  <TableHeader
+    v-model:group-by="groupBy"
+    v-model:sort-by="sortBy"
+    v-model:sort-desc="sortDesc"
+    v-model:group-desc="groupDesc"
+    v-model:search-text="searchText"
     show-commit-buttons
     :headers="headers"
-    :group-by.sync="currentGroup"
-    :sort-by.sync="currentSort"
-    :sort-desc.sync="currentSortDesc"
-    :group-desc.sync="currentGroupDesc"
-    :search-text.sync="currentSearch"
   >
-    <template v-slot:right>
-      <flex-box>
+    <template #right>
+      <FlexBox>
         <v-divider vertical />
         <v-autocomplete
+          v-model="approvalTypes"
           outlined
           dense
           hide-details
           multiple
           label="Approval Types"
-          v-model="currentApprovalTypes"
           :items="options"
           item-text="name"
           item-value="id"
           class="ml-2"
           data-cy="button-trace-link-generate-approval-type"
         />
-      </flex-box>
+      </FlexBox>
     </template>
-    <template v-slot:bottom>
-      <text-button
+    <template #bottom>
+      <TextButton
         text
         color="error"
         icon-id="mdi-close-circle-multiple-outline"
-        @click="handleClear"
+        @click="handleDeclineAll"
       >
         Clear Unreviewed
-      </text-button>
+      </TextButton>
     </template>
-  </table-header>
+  </TableHeader>
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
-import { DataTableHeader } from "vuetify";
+/**
+ * Displays the header for the trace approval table.
+ */
+export default {
+  name: "TraceApprovalTableHeader",
+};
+</script>
+
+<script setup lang="ts">
+import { defineProps, defineEmits, ref, watch } from "vue";
+import { DataTableHeader, FlatTraceLink } from "@/types";
 import { approvalTypeOptions } from "@/util";
 import { handleDeclineAll } from "@/api";
 import { TableHeader, TextButton, FlexBox } from "@/components/common";
 
-/**
- * Displays the header for the trace links table.
- *
- * @emits-1 `update:searchText` (String) on search.
- * @emits-2 `update:sortBy` (String[]) on sort update.
- * @emits-3 `update:groupBy` (String) on group update.
- * @emits-3 `update:approvalTypes` (String) on approval type update.
- */
-export default Vue.extend({
-  name: "TraceApprovalTableHeader",
-  components: {
-    TextButton,
-    TableHeader,
-    FlexBox,
-  },
-  props: {
-    headers: {
-      type: Array as PropType<DataTableHeader[]>,
-      required: true,
-    },
-    searchText: String,
-    groupBy: String,
-    sortBy: Array as PropType<string[]>,
-    groupDesc: Boolean,
-    sortDesc: Boolean,
-    approvalTypes: Array as PropType<string[]>,
-  },
-  data() {
-    return {
-      options: approvalTypeOptions(),
-    };
-  },
-  computed: {
-    /**
-     * Emits changes to approval types.
-     */
-    currentApprovalTypes: {
-      get(): string[] {
-        return this.approvalTypes;
-      },
-      set(newTypes: string[]) {
-        this.$emit("update:approvalTypes", newTypes);
-      },
-    },
-    /**
-     * Emits changes to the grouping.
-     */
-    currentSearch: {
-      get(): string {
-        return this.searchText;
-      },
-      set(newSearch: string): void {
-        this.$emit("update:searchText", newSearch);
-      },
-    },
-    /**
-     * Emits changes to the sorting.
-     */
-    currentSort: {
-      get(): string[] {
-        return this.sortBy;
-      },
-      set(newSort: string[]): void {
-        this.$emit("update:sortBy", newSort);
-      },
-    },
-    /**
-     * Emits changes to the grouping.
-     */
-    currentGroup: {
-      get(): string {
-        return this.groupBy;
-      },
-      set(newGroup: string): void {
-        this.$emit("update:groupBy", newGroup);
-      },
-    },
-    /**
-     * Emits changes to the sorting order.
-     */
-    currentSortDesc: {
-      get(): boolean {
-        return this.sortDesc;
-      },
-      set(newDesc: boolean): void {
-        this.$emit("update:sortDesc", newDesc);
-      },
-    },
-    /**
-     * Emits changes to the grouping order.
-     */
-    currentGroupDesc: {
-      get(): boolean {
-        return this.groupDesc;
-      },
-      set(newDesc: boolean): void {
-        this.$emit("update:groupDesc", newDesc);
-      },
-    },
-  },
-  methods: {
-    /**
-     * Clears all unreviewed links.
-     */
-    handleClear(): void {
-      handleDeclineAll();
-    },
-  },
-});
+const props = defineProps<{
+  headers: DataTableHeader<FlatTraceLink>[];
+  searchText: string;
+  groupBy: string;
+  sortBy: string[];
+  groupDesc: boolean;
+  sortDesc: boolean;
+  approvalTypes: string[];
+}>();
+
+const emit = defineEmits<{
+  (e: "update:searchText", text: string): void;
+  (e: "update:sortBy", values: string[]): void;
+  (e: "update:sortDesc", descending: boolean): void;
+  (e: "update:groupBy", value: string): void;
+  (e: "update:groupDesc", descending: boolean): void;
+  (e: "update:approvalTypes", types: string[]): void;
+}>();
+
+const options = approvalTypeOptions();
+const searchText = ref(props.searchText);
+const sortBy = ref(props.sortBy);
+const sortDesc = ref(props.sortDesc);
+const groupBy = ref(props.groupBy);
+const groupDesc = ref(props.groupDesc);
+const approvalTypes = ref(props.approvalTypes);
+
+watch(
+  () => searchText.value,
+  () => emit("update:searchText", searchText.value)
+);
+
+watch(
+  () => sortBy.value,
+  () => emit("update:sortBy", sortBy.value)
+);
+
+watch(
+  () => sortDesc.value,
+  () => emit("update:sortDesc", sortDesc.value)
+);
+
+watch(
+  () => groupBy.value,
+  () => emit("update:groupBy", groupBy.value)
+);
+
+watch(
+  () => groupDesc.value,
+  () => emit("update:groupDesc", groupDesc.value)
+);
+
+watch(
+  () => approvalTypes.value,
+  () => emit("update:approvalTypes", approvalTypes.value)
+);
 </script>

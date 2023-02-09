@@ -16,9 +16,9 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { Route } from "vue-router";
-import { router, Routes } from "@/router";
+import Vue, { ref, watch } from "vue";
+import { useRoute } from "vue-router";
+import { Routes } from "@/router";
 import { FlexBox } from "@/components/common";
 import Searchbar from "./Searchbar.vue";
 import AppVersion from "./AppVersion.vue";
@@ -39,21 +39,16 @@ export default Vue.extend({
     FlexBox,
     LoadingBar,
   },
-  data() {
-    return {
-      graphVisible: router.currentRoute.path === Routes.ARTIFACT,
-    };
+  setup() {
+    const currentRoute = useRoute();
+    const graphVisible = ref(currentRoute.path === Routes.ARTIFACT);
+
+    watch(
+      () => currentRoute.path,
+      () => (graphVisible.value = currentRoute.path === Routes.ARTIFACT)
+    );
+
+    return { graphVisible };
   },
-  watch: {
-    /**
-     * Checks whether the graph buttons should be visible when the route changes.
-     */
-    $route(to: Route) {
-      this.graphVisible = to.path === Routes.ARTIFACT;
-    },
-  },
-  computed: {},
 });
 </script>
-
-<style scoped lang="scss"></style>

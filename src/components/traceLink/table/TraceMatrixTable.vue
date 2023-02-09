@@ -1,43 +1,43 @@
 <template>
   <panel-card>
     <v-data-table
+      v-model="selected"
+      v-model:sort-by="sortBy"
+      v-model:group-by="groupBy"
+      v-model:group-desc="groupDesc"
+      v-model:sort-desc="sortDesc"
       single-select
       show-group-by
       fixed-header
       height="60vh"
-      v-model="selected"
       :headers="headers"
       :items="artifactRows"
       :search="searchText"
       :loading="isLoading"
-      :sort-by.sync="sortBy"
-      :group-by.sync="groupBy"
-      :group-desc.sync="groupDesc"
-      :sort-desc.sync="sortDesc"
       item-key="name"
       :items-per-page="50"
-      @click:row="handleView($event)"
       data-cy="view-trace-matrix-table"
       class="mt-4 trace-matrix-table"
+      @click:row="handleView($event)"
     >
-      <template v-slot:top>
+      <template #top>
         <trace-matrix-table-header
+          v-model:search-text="searchText"
+          v-model:group-by="groupBy"
+          v-model:sort-by="sortBy"
+          v-model:sort-desc="sortDesc"
+          v-model:group-desc="groupDesc"
+          v-model:row-types="rowTypes"
+          v-model:col-types="colTypes"
           :headers="headers"
-          :search-text.sync="searchText"
-          :group-by.sync="groupBy"
-          :sort-by.sync="sortBy"
-          :sort-desc.sync="sortDesc"
-          :group-desc.sync="groupDesc"
-          :row-types.sync="rowTypes"
-          :col-types.sync="colTypes"
         />
       </template>
 
-      <template v-slot:[`group.header`]="data">
+      <template #[`group.header`]="data">
         <table-group-header :data="data" />
       </template>
 
-      <template v-slot:[`item.type`]="{ item }">
+      <template #[`item.type`]="{ item }">
         <td class="v-data-table__divider">
           <attribute-chip :value="item.type" artifact-type />
         </td>
@@ -45,13 +45,10 @@
 
       <template
         v-for="artifact in artifactColumns"
-        v-slot:[`item.${artifact.id}`]="{ item }"
+        #[`item.${artifact.id}`]="{ item }"
+        :key="artifact.id"
       >
-        <trace-matrix-chip
-          :key="artifact.id"
-          :source="item"
-          :target="artifact"
-        />
+        <trace-matrix-chip :source="item" :target="artifact" />
       </template>
     </v-data-table>
   </panel-card>
@@ -59,8 +56,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { DataTableHeader } from "vuetify";
-import { ArtifactSchema, FlatArtifact } from "@/types";
+import { ArtifactSchema, FlatArtifact, DataTableHeader } from "@/types";
 import { appStore, artifactStore, selectionStore } from "@/hooks";
 import {
   AttributeChip,
@@ -120,7 +116,7 @@ export default Vue.extend({
     /**
      * @return All columns to render.
      */
-    headers(): Partial<DataTableHeader>[] {
+    headers(): Partial<DataTableHeader<ArtifactSchema>[]> {
       return [
         {
           text: "Name",
@@ -138,7 +134,7 @@ export default Vue.extend({
           divider: true,
           width: "200px",
         },
-        ...this.artifactColumns.map(({ id, name }) => ({
+        ...this.artifactColumns.map(({ id, name }: ArtifactSchema) => ({
           text: name,
           value: id,
           sortable: true,
@@ -148,6 +144,18 @@ export default Vue.extend({
           width: "100px",
         })),
       ];
+    },
+  },
+  watch: {
+    /**
+     * Updates the selection store when the selected artifact changes.
+     */
+    selected(items: FlatArtifact[]) {
+      if (items.length === 0) {
+        selectionStore.clearSelections();
+      } else {
+        selectionStore.selectArtifact(items[0].id);
+      }
     },
   },
   methods: {
@@ -160,18 +168,6 @@ export default Vue.extend({
         this.selected = [];
       } else {
         this.selected = [item];
-      }
-    },
-  },
-  watch: {
-    /**
-     * Updates the selection store when the selected artifact changes.
-     */
-    selected(items: FlatArtifact[]) {
-      if (items.length === 0) {
-        selectionStore.clearSelections();
-      } else {
-        selectionStore.selectArtifact(items[0].id);
       }
     },
   },

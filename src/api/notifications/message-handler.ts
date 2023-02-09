@@ -1,4 +1,5 @@
 import { Frame } from "webstomp-client";
+import { useRoute } from "vue-router";
 import {
   ActionType,
   ChangeMessageSchema,
@@ -19,7 +20,7 @@ import {
   traceStore,
   typeOptionsStore,
 } from "@/hooks";
-import { router, routesWithRequiredProject } from "@/router";
+import { routesWithRequiredProject } from "@/router";
 import {
   handleClearProject,
   handleLoadVersion,
@@ -38,13 +39,14 @@ export async function handleEntityChangeMessage(
   versionId: string,
   frame: Frame
 ): Promise<void> {
+  const currentRoute = useRoute();
   const message: ChangeMessageSchema = JSON.parse(frame.body);
   const project = await getChanges(versionId, message);
   //TODO: current user check is disabled. Evaluate a better way of filtering updates by the current user.
   const isCurrentUser = message.user === sessionStore.userEmail && false;
   const updateLayout =
     message.updateLayout &&
-    routesWithRequiredProject.includes(router.currentRoute.path);
+    routesWithRequiredProject.includes(currentRoute.path);
 
   // Skip updates by the current user that dont involve a layout update.
   if (isCurrentUser && !updateLayout) return;

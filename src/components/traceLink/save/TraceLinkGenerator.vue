@@ -83,8 +83,10 @@ export default Vue.extend({
      */
     areMatricesValid(): boolean {
       return this.matrices
-        .map((matrix) => !!matrix.source && !!matrix.target)
-        .reduce((acc, cur) => acc && cur, true);
+        .map(
+          (matrix: ArtifactLevelSchema) => !!matrix.source && !!matrix.target
+        )
+        .reduce((acc: boolean, cur: boolean) => acc && cur, true);
     },
     /**
      * @return Whether the current request is valid.

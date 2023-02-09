@@ -1,52 +1,52 @@
 <template>
   <panel-card>
     <v-data-table
+      v-model="selected"
+      v-model:sort-by="sortBy"
+      v-model:group-by="groupBy"
+      v-model:group-desc="groupDesc"
+      v-model:sort-desc="sortDesc"
       single-select
       show-group-by
       fixed-header
       height="60vh"
-      v-model="selected"
       :headers="headers"
       :items="items"
       :search="searchText"
-      :sort-by.sync="sortBy"
-      :group-by.sync="groupBy"
-      :group-desc.sync="groupDesc"
-      :sort-desc.sync="sortDesc"
       :items-per-page="50"
       data-cy="view-artifact-table"
       class="mt-4 artifact-table"
       @click:row="handleView($event)"
     >
-      <template v-slot:top>
+      <template #top>
         <artifact-table-header
+          v-model:group-by="groupBy"
+          v-model:sort-by="sortBy"
+          v-model:group-desc="groupDesc"
+          v-model:sort-desc="sortDesc"
+          v-model:search-text="searchText"
           :headers="headers"
-          :group-by.sync="groupBy"
-          :sort-by.sync="sortBy"
-          :group-desc.sync="groupDesc"
-          :sort-desc.sync="sortDesc"
-          :search-text.sync="searchText"
           @filter="selectedDeltaTypes = $event"
         />
       </template>
 
-      <template v-slot:[`group.header`]="data">
+      <template #[`group.header`]="data">
         <table-group-header :data="data" />
       </template>
 
-      <template v-slot:[`item.name`]="{ item }">
+      <template #[`item.name`]="{ item }">
         <td class="v-data-table__divider">
           <artifact-table-row-name :artifact="item" />
         </td>
       </template>
 
-      <template v-slot:[`item.deltaState`]="{ item }">
+      <template #[`item.deltaState`]="{ item }">
         <td class="v-data-table__divider">
           <artifact-table-delta-chip :artifact="item" />
         </td>
       </template>
 
-      <template v-slot:[`item.type`]="{ item }">
+      <template #[`item.type`]="{ item }">
         <td class="v-data-table__divider">
           <attribute-chip :value="item.type" artifact-type />
         </td>
@@ -54,9 +54,10 @@
 
       <template
         v-for="attribute in attributes"
-        v-slot:[`item.${attribute.key}`]="{ item }"
+        #[`item.${attribute.key}`]="{ item }"
+        :key="attribute.key"
       >
-        <td :key="attribute.key" class="v-data-table__divider">
+        <td class="v-data-table__divider">
           <attribute-display
             hide-title
             :attribute="attribute"
@@ -65,7 +66,7 @@
         </td>
       </template>
 
-      <template v-slot:[`item.actions`]="{ item }">
+      <template #[`item.actions`]="{ item }">
         <td @click.stop="">
           <artifact-table-row-actions :artifact="item" />
         </td>
@@ -76,8 +77,13 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { DataTableHeader } from "vuetify";
-import { ArtifactDeltaState, FlatArtifact, AttributeSchema } from "@/types";
+import {
+  ArtifactDeltaState,
+  FlatArtifact,
+  AttributeSchema,
+  DataTableHeader,
+  ArtifactSchema,
+} from "@/types";
 import {
   artifactStore,
   deltaStore,
@@ -131,7 +137,7 @@ export default Vue.extend({
     /**
      * @return The artifact table's headers.
      */
-    headers(): Partial<DataTableHeader>[] {
+    headers(): Partial<DataTableHeader<ArtifactSchema>>[] {
       return [
         {
           text: "Name",
@@ -190,6 +196,18 @@ export default Vue.extend({
       );
     },
   },
+  watch: {
+    /**
+     * Updates the selection store when the selected artifact changes.
+     */
+    selected(items: FlatArtifact[]) {
+      if (items.length === 0) {
+        selectionStore.clearSelections();
+      } else {
+        selectionStore.selectArtifact(items[0].id);
+      }
+    },
+  },
   methods: {
     /**
      * Opens the view artifact side panel.
@@ -200,18 +218,6 @@ export default Vue.extend({
         this.selected = [];
       } else {
         this.selected = [item];
-      }
-    },
-  },
-  watch: {
-    /**
-     * Updates the selection store when the selected artifact changes.
-     */
-    selected(items: FlatArtifact[]) {
-      if (items.length === 0) {
-        selectionStore.clearSelections();
-      } else {
-        selectionStore.selectArtifact(items[0].id);
       }
     },
   },

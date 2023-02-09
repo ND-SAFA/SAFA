@@ -12,7 +12,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { CytoCore, CytoCoreGraph } from "@/types";
+import { CytoCore, CytoCoreGraph, CytoCorePlugin } from "@/types";
 import { logStore } from "@/hooks";
 
 /**
@@ -41,7 +41,7 @@ export default Vue.extend({
      * @param cy - The cytoscape instance.
      */
     preConfig(cy: CytoCore) {
-      this.cytoCoreGraph.plugins.forEach((plugin) => {
+      this.cytoCoreGraph.plugins.forEach((plugin: CytoCorePlugin) => {
         try {
           plugin.initialize(cy);
         } catch (e) {
@@ -61,7 +61,7 @@ export default Vue.extend({
           `Unable to save cytoscape instance in: ${this.cytoCoreGraph.name}`
         );
       }
-      this.cytoCoreGraph.plugins.forEach((plugin) => {
+      this.cytoCoreGraph.plugins.forEach((plugin: CytoCorePlugin) => {
         plugin.afterInit(cy);
       });
       this.cytoCoreGraph.afterInit(cy);

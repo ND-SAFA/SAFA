@@ -7,6 +7,10 @@
       value="Review, approve, and decline generated trace links."
     />
     <v-data-table
+      v-model:sort-by="sortBy"
+      v-model:group-by="groupBy"
+      v-model:group-desc="groupDesc"
+      v-model:sort-desc="sortDesc"
       class="trace-link-table"
       show-group-by
       show-expand
@@ -17,28 +21,24 @@
       :expanded="selectedLinks"
       :search="searchText"
       :loading="isLoading"
-      :sort-by.sync="sortBy"
-      :group-by.sync="groupBy"
-      :group-desc.sync="groupDesc"
-      :sort-desc.sync="sortDesc"
       item-key="traceLinkId"
       :items-per-page="50"
-      @click:row="handleView($event)"
       data-cy="table-trace-link"
+      @click:row="handleView($event)"
     >
-      <template v-slot:top>
+      <template #top>
         <trace-approval-table-header
+          v-model:group-by="groupBy"
+          v-model:sort-by="sortBy"
+          v-model:group-desc="groupDesc"
+          v-model:sort-desc="sortDesc"
+          v-model:search-text="searchText"
+          v-model:approval-types="approvalTypes"
           :headers="headers"
-          :group-by.sync="groupBy"
-          :sort-by.sync="sortBy"
-          :group-desc.sync="groupDesc"
-          :sort-desc.sync="sortDesc"
-          :search-text.sync="searchText"
-          :approval-types.sync="approvalTypes"
         />
       </template>
 
-      <template v-slot:[`group.header`]="data">
+      <template #[`group.header`]="data">
         <table-group-header
           show-expand
           :data="data"
@@ -47,37 +47,37 @@
         />
       </template>
 
-      <template v-slot:[`item.sourceType`]="{ item }">
+      <template #[`item.sourceType`]="{ item }">
         <td class="v-data-table__divider">
           <attribute-chip :value="item.sourceType" artifact-type />
         </td>
       </template>
 
-      <template v-slot:[`item.targetType`]="{ item }">
+      <template #[`item.targetType`]="{ item }">
         <td class="v-data-table__divider">
           <attribute-chip :value="item.targetType" artifact-type />
         </td>
       </template>
 
-      <template v-slot:[`item.approvalStatus`]="{ item }">
+      <template #[`item.approvalStatus`]="{ item }">
         <td class="v-data-table__divider">
           <attribute-chip :value="item.approvalStatus" />
         </td>
       </template>
 
-      <template v-slot:[`item.score`]="{ item }">
+      <template #[`item.score`]="{ item }">
         <td class="v-data-table__divider">
           <attribute-chip confidence-score :value="String(item.score)" />
         </td>
       </template>
 
-      <template v-slot:[`item.actions`]="{ item }">
+      <template #[`item.actions`]="{ item }">
         <td class="v-data-table__divider" @click.stop="">
           <trace-link-approval :link="item" />
         </td>
       </template>
 
-      <template v-slot:expanded-item="{ headers, item }">
+      <template #expanded-item="{ headers, item }">
         <td :colspan="headers.length" class="pb-2">
           <trace-link-display :link="item" :show-only="showOnly" />
         </td>
@@ -88,8 +88,12 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { DataTableHeader } from "vuetify";
-import { ApprovalType, FlatTraceLink, TraceTableGroup } from "@/types";
+import {
+  ApprovalType,
+  FlatTraceLink,
+  TraceTableGroup,
+  DataTableHeader,
+} from "@/types";
 import { approvalStore, appStore, projectStore } from "@/hooks";
 import { handleGetGeneratedLinks } from "@/api";
 import {
@@ -126,25 +130,6 @@ export default Vue.extend({
       headers: traceApprovalTableHeaders,
       approvalTypes: [ApprovalType.UNREVIEWED],
     };
-  },
-  mounted() {
-    handleGetGeneratedLinks({});
-  },
-  watch: {
-    /**
-     * Loads generated links when the route changes.
-     */
-    $route() {
-      handleGetGeneratedLinks({});
-    },
-    /**
-     * Loads generated links when the version changes.
-     */
-    versionId(newVersionId: string) {
-      if (!newVersionId) return;
-
-      handleGetGeneratedLinks({});
-    },
   },
   computed: {
     /**
@@ -188,8 +173,8 @@ export default Vue.extend({
     /**
      * @return All visible links.
      */
-    visibleHeaders(): Partial<DataTableHeader>[] {
-      return this.headers.filter((header) => {
+    visibleHeaders(): Partial<DataTableHeader<FlatTraceLink>>[] {
+      return this.headers.filter((header: DataTableHeader<FlatTraceLink>) => {
         return !(
           (this.approvalTypes.length === 1 &&
             header.value === "approvalStatus") ||
@@ -200,6 +185,25 @@ export default Vue.extend({
         );
       });
     },
+  },
+  watch: {
+    /**
+     * Loads generated links when the route changes.
+     */
+    $route() {
+      handleGetGeneratedLinks({});
+    },
+    /**
+     * Loads generated links when the version changes.
+     */
+    versionId(newVersionId: string) {
+      if (!newVersionId) return;
+
+      handleGetGeneratedLinks({});
+    },
+  },
+  mounted() {
+    handleGetGeneratedLinks({});
   },
   methods: {
     /**

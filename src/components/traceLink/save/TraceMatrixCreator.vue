@@ -124,7 +124,9 @@ export default Vue.extend({
      * @param idx - The matrix index to remove.
      */
     handleRemoveMatrix(idx: number) {
-      this.model = this.model.filter((_, currentIdx) => currentIdx !== idx);
+      this.model = this.model.filter(
+        (_: ArtifactLevelSchema, currentIdx: number) => currentIdx !== idx
+      );
     },
   },
   watch: {

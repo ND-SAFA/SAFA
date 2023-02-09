@@ -45,7 +45,11 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { GridLayout, GridItem, GridItemData } from "vue-grid-layout";
-import { AttributeSchema, AttributeLayoutSchema } from "@/types";
+import {
+  AttributeSchema,
+  AttributeLayoutSchema,
+  AttributePositionSchema,
+} from "@/types";
 import { attributesStore } from "@/hooks";
 import { FlexBox } from "@/components/common/layout";
 
@@ -79,7 +83,7 @@ export default Vue.extend({
       attr: AttributeSchema | undefined;
       pos: GridItemData;
     }[] {
-      return this.gridLayout.map((pos) => ({
+      return this.gridLayout.map((pos: GridItemData) => ({
         pos,
         attr: attributesStore.attributes.find(({ key }) => pos.i === key),
       }));
@@ -98,25 +102,27 @@ export default Vue.extend({
       let maxY = 0;
       const attributesByY: Record<number, string[]> = {};
 
-      this.gridLayout = this.layout.positions.map((pos) => {
-        maxY = Math.max(pos.y, maxY);
+      this.gridLayout = this.layout.positions.map(
+        (pos: AttributePositionSchema) => {
+          maxY = Math.max(pos.y, maxY);
 
-        if (!attributesByY[pos.y]) attributesByY[pos.y] = [];
+          if (!attributesByY[pos.y]) attributesByY[pos.y] = [];
 
-        if (pos.x === 0) {
-          attributesByY[pos.y] = [pos.key, attributesByY[pos.y][1]];
-        } else {
-          attributesByY[pos.y] = [attributesByY[pos.y][0], pos.key];
+          if (pos.x === 0) {
+            attributesByY[pos.y] = [pos.key, attributesByY[pos.y][1]];
+          } else {
+            attributesByY[pos.y] = [attributesByY[pos.y][0], pos.key];
+          }
+
+          return {
+            i: pos.key,
+            x: pos.x,
+            y: pos.y,
+            w: pos.width,
+            h: pos.height,
+          };
         }
-
-        return {
-          i: pos.key,
-          x: pos.x,
-          y: pos.y,
-          w: pos.width,
-          h: pos.height,
-        };
-      });
+      );
 
       this.staticLayout = Array.from(Array(maxY + 1)).map(
         (_, idx) =>
@@ -129,7 +135,9 @@ export default Vue.extend({
      * Called when an attribute is moved.
      */
     handleMoveEvent(i: string, x: number, y: number) {
-      const position = this.layout.positions.find(({ key }) => key === i);
+      const position = this.layout.positions.find(
+        ({ key }: AttributePositionSchema) => key === i
+      );
 
       if (!position) return;
 
@@ -140,7 +148,9 @@ export default Vue.extend({
      * Called when an attribute is resized.
      */
     handleResizeEvent(i: string, height: number, width: number) {
-      const position = this.layout.positions.find(({ key }) => key === i);
+      const position = this.layout.positions.find(
+        ({ key }: AttributePositionSchema) => key === i
+      );
 
       if (!position) return;
 

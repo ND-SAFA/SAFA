@@ -15,12 +15,14 @@ class Experiment(BaseObject):
     _STEP_DIR_NAME = "step_%s"
     _EXPERIMENT_DIR_NAME = "experiment_%s"
 
-    def __init__(self, steps: List[ExperimentStep], output_dir: str, logger_config: LoggerConfig = LoggerConfig()):
+    def __init__(self, steps: List[ExperimentStep], output_dir: str, logger_config: LoggerConfig = LoggerConfig(),
+                 experiment_id: int = 0):
         """
         Represents an experiment run
         :param steps: List of all experiment steps to run
         :param output_dir: The path to save output to
         :param logger_config: Configures the logging for the project
+        :param experiment_id: The id (or index) of the experiment being run. Used for creating readable output directories.
         """
         self.id = uuid.uuid4()
         self.steps = steps
@@ -28,6 +30,8 @@ class Experiment(BaseObject):
         FileUtil.create_dir_safely(output_dir)
         self.logger_config = logger_config
         self._setup_logger()
+        self.experiment_index = experiment_id
+        self.experiment_index = experiment_id
 
     def run(self):
         """
@@ -36,7 +40,7 @@ class Experiment(BaseObject):
         """
         jobs_for_undetermined_vals = None
         for i, step in enumerate(self.steps):
-            step_output_dir = os.path.join(self.output_dir, self._EXPERIMENT_DIR_NAME % i, self._STEP_DIR_NAME % i)
+            step_output_dir = os.path.join(self.output_dir, self._EXPERIMENT_DIR_NAME % self.experiment_index, self._STEP_DIR_NAME % i)
             jobs_for_undetermined_vals = step.run(step_output_dir, jobs_for_undetermined_vals)
             if step.status == Status.FAILURE:
                 break

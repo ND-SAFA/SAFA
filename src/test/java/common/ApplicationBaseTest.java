@@ -76,7 +76,7 @@ public abstract class ApplicationBaseTest extends EntityBaseTest {
      */
     private void initBuilders() {
         assert this.serviceProvider != null;
-        this.dbEntityBuilder = new DbEntityBuilder(serviceProvider, customAttributeRepository);
+        this.dbEntityBuilder = new DbEntityBuilder(serviceProvider, customAttributeRepository, attributeSystemServiceProvider);
         this.jsonBuilder = new JsonBuilder();
     }
 

@@ -30,16 +30,16 @@ class TestMultiEpochExperimentStep(BaseExperimentTest):
         experiment_step = self.get_experiment_step()
         experiment_step.run(TEST_OUTPUT_DIR)
 
-        output_dirs = FileUtil.ls_jobs(TEST_OUTPUT_DIR)
-        epochs = set()
+        output_dirs = FileUtil.ls_dir(TEST_OUTPUT_DIR)
+        epochs_run = set()
         for job_id in output_dirs:
             output_file = os.path.join(TEST_OUTPUT_DIR, job_id, AbstractJob.OUTPUT_FILENAME)
             step_output = self._load_step_output(output_file_path=output_file)
             step_experimental_vars = step_output[JobResult.EXPERIMENTAL_VARS]
-            epochs.add(step_experimental_vars["num_train_epochs"])
-        self.assertEquals(len(epochs), len(self.EPOCH_ARGS))
+            epochs_run.add(step_experimental_vars["num_train_epochs"])
+        self.assertEquals(len(epochs_run), len(self.EPOCH_ARGS))
         for epoch in range(*self.EPOCH_ARGS):
-            self.assertIn(epoch, epochs)
+            self.assertIn(epoch, epochs_run)
 
     def get_experiment_step(self):
         kwargs = {"override": True, **{

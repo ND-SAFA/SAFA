@@ -14,6 +14,7 @@ from data.tree.artifact import Artifact
 from data.tree.trace_link import TraceLink
 from util.base_object import BaseObject
 from util.dataframe_util import DataFrameUtil
+from util.logging.logger_manager import logger
 from util.general_util import ListUtil
 from util.override import overrides
 from util.reflection_util import ReflectionUtil
@@ -213,11 +214,15 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
             source_id = row[StructuredKeys.Trace.SOURCE]
             target_id = row[StructuredKeys.Trace.TARGET]
             if source_id not in valid_artifact_ids:
+                error_msg = f"Unknown source artifact reference: {source_id}"
                 if not allow_missing_sources:
-                    raise ValueError(f"Unknown source artifact reference: {source_id}")
+                    raise ValueError(error_msg)
+                logger.warning(error_msg)
             elif target_id not in valid_artifact_ids:
+                error_msg = f"Unknown target artifact reference: {target_id}"
                 if not allow_missing_targets:
-                    raise ValueError(f"Unknown target artifact reference: {target_id}")
+                    raise ValueError(error_msg)
+                logger.warning(error_msg)
             else:
                 valid_traces.append(row.to_dict())
         return pd.DataFrame(valid_traces)

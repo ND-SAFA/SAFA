@@ -16,15 +16,17 @@ class TestAssertions:
     _LEN_ERROR = "Length of {} does not match expected"
 
     @classmethod
-    def verify_prediction_output(cls, test_case: TestCase, output: JobResult, test_project: TraceDataset) -> None:
+    def verify_prediction_output(cls, test_case: TestCase, output: JobResult, test_project: TraceDataset,
+                                 base_score: float = 0.5) -> None:
         """
         Verifies that prediction output contains correctly formatted predictions and metrics.
         :param test_case: The test case used for making assertions.
         :param output: The output of the prediction job.
         :param test_project: The test project that was being predicted on.
+        :param base_score: The base score that other scores are expected to be a threshold away from.
         :return: None
         """
-        cls.verify_predictions(test_case, output, test_project)
+        cls.verify_predictions(test_case, output, test_project, base_score)
         cls.verify_metrics_output(test_case, output)
 
     @classmethod

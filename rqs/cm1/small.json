@@ -16,15 +16,7 @@
             }
           },
           "model_manager": {
-            "model_path": {
-              "*": [
-                "prajjwal1/bert-tiny",
-                "prajjwal1/bert-mini",
-                "prajjwal1/bert-small",
-                "prajjwal1/bert-medium",
-                "distilbert-base-uncased"
-              ]
-            }
+            "model_path": "distilbert-base-uncased"
           },
           "trainer_args": {
             "num_train_epochs": 50,
@@ -45,13 +37,7 @@
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "STRUCTURE",
-                "project_path": {
-                  "*": [
-                    "[DATA_PATH]/lhp/heating",
-                    "[DATA_PATH]/lhp/cooling",
-                    "[DATA_PATH]/lhp/vehiclemodes"
-                  ]
-                }
+                "project_path": "[DATA_PATH]/cm1"
               },
               "filter_unlinked_artifacts": true
             },

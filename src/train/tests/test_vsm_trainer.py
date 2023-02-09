@@ -25,7 +25,7 @@ class TestVSMTrainer(BaseTraceTest):
     def test_perform_prediction(self):
         test_trace_trainer = self.get_custom_trace_trainer(dataset_container_args={"val_dataset_creator": None})
         test_trace_trainer.perform_training()
-        trace_prediction_output = test_trace_trainer.perform_prediction(metrics=self.TEST_METRICS_NAMES)
+        trace_prediction_output = test_trace_trainer.perform_prediction()
         trace_prediction_job_result = JobResult.from_trace_output(trace_prediction_output)
         eval_dataset = test_trace_trainer.trainer_dataset_manager[DatasetRole.EVAL]
         TestAssertions.verify_prediction_output(self, trace_prediction_job_result, eval_dataset, base_score=0.0)
@@ -33,7 +33,7 @@ class TestVSMTrainer(BaseTraceTest):
 
     def get_custom_trace_trainer(self, dataset_container_args: Dict = None):
         trainer_dataset_manager = self.create_trainer_dataset_manager(dataset_container_args)
-        return VSMTrainer(trainer_dataset_manager=trainer_dataset_manager)
+        return VSMTrainer(trainer_dataset_manager=trainer_dataset_manager, metrics=self.TEST_METRICS_NAMES)
 
     def assert_metrics(self, metrics: Metrics):
         """

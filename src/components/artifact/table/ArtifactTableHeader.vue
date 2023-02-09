@@ -8,7 +8,7 @@
     :group-desc.sync="currentGroupDesc"
     data-cy="table-header"
   >
-    <template slot="right">
+    <template v-slot:right>
       <flex-box v-if="inDeltaView">
         <v-divider vertical />
         <v-autocomplete

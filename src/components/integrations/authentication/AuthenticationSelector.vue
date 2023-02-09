@@ -4,17 +4,12 @@
     :item-count="2"
     empty-message=""
   >
-    <template v-slot:items>
-      <under-construction-alert />
-      <jira-authentication
-        :inactive="inactive"
-        @click="$emit('input', 'Jira')"
-      />
-      <git-hub-authentication
-        :inactive="inactive"
-        @click="$emit('input', 'GitHub')"
-      />
-    </template>
+    <under-construction-alert />
+    <jira-authentication :inactive="inactive" @click="$emit('input', 'Jira')" />
+    <git-hub-authentication
+      :inactive="inactive"
+      @click="$emit('input', 'GitHub')"
+    />
   </stepper-list-step>
 </template>
 

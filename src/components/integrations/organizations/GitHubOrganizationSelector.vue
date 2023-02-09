@@ -5,18 +5,16 @@
     :loading="organizationsLoading"
     empty-message="There are no organizations."
   >
-    <template slot="items">
-      <template v-for="organization in organizations">
-        <v-list-item
-          three-line
-          :key="organization.id"
-          @click="handleOrganizationSelect(organization)"
-        >
-          <v-list-item-content>
-            <v-list-item-title v-text="organization.name" />
-          </v-list-item-content>
-        </v-list-item>
-      </template>
+    <template v-for="organization in organizations">
+      <v-list-item
+        three-line
+        :key="organization.id"
+        @click="handleOrganizationSelect(organization)"
+      >
+        <v-list-item-content>
+          <v-list-item-title v-text="organization.name" />
+        </v-list-item-content>
+      </v-list-item>
     </template>
   </stepper-list-step>
 </template>

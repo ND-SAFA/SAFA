@@ -5,25 +5,23 @@
     :loading="repositoriesLoading"
     empty-message="There are no repositories."
   >
-    <template slot="items">
-      <template v-for="repository in repositories">
-        <v-list-item
-          three-line
-          :key="repository.id"
-          @click="handleRepositorySelect(repository)"
-        >
-          <v-list-item-icon v-if="!!repository.avatar_url">
-            <v-avatar>
-              <img :src="repository.avatar_url" :alt="repository.name" />
-            </v-avatar>
-          </v-list-item-icon>
-          <v-list-item-content>
-            <v-list-item-title v-text="repository.name" />
-            <v-list-item-subtitle v-text="getRepositorySubtitle(repository)" />
-            <v-list-item-subtitle v-text="getRepositoryTime(repository)" />
-          </v-list-item-content>
-        </v-list-item>
-      </template>
+    <template v-for="repository in repositories">
+      <v-list-item
+        three-line
+        :key="repository.id"
+        @click="handleRepositorySelect(repository)"
+      >
+        <v-list-item-icon v-if="!!repository.avatar_url">
+          <v-avatar>
+            <img :src="repository.avatar_url" :alt="repository.name" />
+          </v-avatar>
+        </v-list-item-icon>
+        <v-list-item-content>
+          <v-list-item-title v-text="repository.name" />
+          <v-list-item-subtitle v-text="getRepositorySubtitle(repository)" />
+          <v-list-item-subtitle v-text="getRepositoryTime(repository)" />
+        </v-list-item-content>
+      </v-list-item>
     </template>
   </stepper-list-step>
 </template>

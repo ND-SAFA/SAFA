@@ -5,21 +5,19 @@
     :loading="projectsLoading"
     title="Jira Projects"
   >
-    <template slot="items">
-      <template v-for="project in projects">
-        <v-list-item :key="project.id" @click="handleProjectSelect(project)">
-          <v-list-item-icon>
-            <v-avatar>
-              <img :src="project.mediumAvatarUrl" :alt="project.name" />
-            </v-avatar>
-          </v-list-item-icon>
-          <v-list-item-content>
-            <v-list-item-title v-text="project.name" />
+    <template v-for="project in projects">
+      <v-list-item :key="project.id" @click="handleProjectSelect(project)">
+        <v-list-item-icon>
+          <v-avatar>
+            <img :src="project.mediumAvatarUrl" :alt="project.name" />
+          </v-avatar>
+        </v-list-item-icon>
+        <v-list-item-content>
+          <v-list-item-title v-text="project.name" />
 
-            <v-list-item-subtitle v-text="getProjectSubtitle(project)" />
-          </v-list-item-content>
-        </v-list-item>
-      </template>
+          <v-list-item-subtitle v-text="getProjectSubtitle(project)" />
+        </v-list-item-content>
+      </v-list-item>
     </template>
   </stepper-list-step>
 </template>

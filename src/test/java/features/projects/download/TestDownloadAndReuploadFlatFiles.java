@@ -50,13 +50,17 @@ class TestDownloadAndReuploadFlatFiles extends ApplicationBaseTest {
             .withFileType(DataFileBuilder.AcceptedFileTypes.JSON)
             .getWithFilesInZip();
 
+        dbEntityBuilder.newProject("new project");
+        ProjectVersion version = dbEntityBuilder.newVersionWithReturn("new project");
+
         // Step - Create files with flat files downloaded
         String newVersionIdString = SafaRequest
-            .withRoute(AppRoutes.FlatFiles.CREATE_NEW_PROJECT_FROM_FLAT_FILES)
-            .getFlatFileHelper()
-            .postWithFiles(projectFiles, new JSONObject())
-            .getJSONObject("projectVersion")
-            .getString("versionId");
+                .withRoute(AppRoutes.FlatFiles.UPDATE_PROJECT_VERSION_FROM_FLAT_FILES)
+                .withVersion(version)
+                .getFlatFileHelper()
+                .postWithFiles(projectFiles, new JSONObject())
+                .getJSONObject("projectVersion")
+                .getString("versionId");
 
         // Step - Retrieve new project
         UUID newVersionId = UUID.fromString(newVersionIdString);

@@ -55,17 +55,17 @@ public class AttributesForTesting {
                     BooleanNode.TRUE, BooleanNode.FALSE)
     );
 
-    public final float floatMax = 100.5f;
-    public final float floatMin = -24.7f;
-    public final int intMax = 99;
-    public final int intMin = 1;
-    public final List<String> selections = List.of("str1", "str2", "str3");
+    public static final float floatMax = 100.5f;
+    public static final float floatMin = -24.7f;
+    public static final int intMax = 99;
+    public static final int intMin = 1;
+    public static final List<String> selections = List.of("str1", "str2", "str3");
 
-    public final float altFloatMax = 4.20f;
-    public final float altFloatMin = 13.37f;
-    public final int altIntMax = 7;
-    public final int altIntMin = 6;
-    public final List<String> altSelections = List.of("str4", "str5", "str6");
+    public static final float altFloatMax = 4.20f;
+    public static final float altFloatMin = 13.37f;
+    public static final int altIntMax = 7;
+    public static final int altIntMin = 6;
+    public static final List<String> altSelections = List.of("str4", "str5", "str6");
 
     public CustomAttribute setupAttribute(DbEntityBuilder dbEntityBuilder, String projectName,
                                           AttributeSystemServiceProvider serviceProvider, CustomAttributeType attributeType) {
@@ -74,6 +74,14 @@ public class AttributesForTesting {
 
         CustomAttribute attribute = dbEntityBuilder.newCustomAttributeWithReturn(projectName, attributeType,
                 schemaInfo.displayName, schemaInfo.keyName);
+
+        addExtraInfo(attribute, serviceProvider);
+
+        return attribute;
+    }
+
+    public static void addExtraInfo(CustomAttribute attribute, AttributeSystemServiceProvider serviceProvider) {
+        CustomAttributeType attributeType = attribute.getType();
 
         if (attributeType.getExtraInfoType() == CustomAttributeExtraInfoType.FLOAT_BOUNDS) {
             FloatAttributeInfo floatAttributeInfo = new FloatAttributeInfo(attribute, floatMin, floatMax);
@@ -87,8 +95,6 @@ public class AttributesForTesting {
                 serviceProvider.getSelectionAttributeOptionRepository().save(option);
             }
         }
-
-        return attribute;
     }
 
     public CustomAttributeAppEntity setupAttributeAppEntity(CustomAttributeType type) {

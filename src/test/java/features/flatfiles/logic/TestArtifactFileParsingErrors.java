@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.config.ProjectPaths;
+import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import common.ApplicationBaseTest;
 import org.json.JSONArray;
@@ -20,14 +21,17 @@ class TestArtifactFileParsingErrors extends ApplicationBaseTest {
 
     @Test
     void testArtifactTypeNotFound() throws Exception {
+        dbEntityBuilder.newProject(projectName);
+        ProjectVersion version = dbEntityBuilder.newVersionWithReturn(projectName);
 
         // Step 1 - Upload flat files
         JSONObject responseBody = SafaRequest
-            .withRoute(AppRoutes.FlatFiles.CREATE_NEW_PROJECT_FROM_FLAT_FILES)
-            .getFlatFileHelper()
-            .postWithFilesInDirectory(ProjectPaths.Resources.Tests.TEST2,
-                MockMvcResultMatchers.status().isBadRequest(),
-                new JSONObject());
+                .withRoute(AppRoutes.FlatFiles.UPDATE_PROJECT_VERSION_FROM_FLAT_FILES)
+                .withVersion(version)
+                .getFlatFileHelper()
+                .postWithFilesInDirectory(ProjectPaths.Resources.Tests.TEST2,
+                    MockMvcResultMatchers.status().isBadRequest(),
+                    new JSONObject());
 
         // VP - Verify that message contains constraint
         String message = responseBody.getString("message").toLowerCase();
@@ -36,11 +40,16 @@ class TestArtifactFileParsingErrors extends ApplicationBaseTest {
 
     @Test
     void testDuplicateArtifactBody() throws Exception {
+        dbEntityBuilder.newProject(projectName);
+        ProjectVersion version = dbEntityBuilder.newVersionWithReturn(projectName);
+
         // Step 1 - Upload flat files
         JSONObject responseBody = SafaRequest
-            .withRoute(AppRoutes.FlatFiles.CREATE_NEW_PROJECT_FROM_FLAT_FILES)
-            .getFlatFileHelper()
-            .postWithFilesInDirectory(ProjectPaths.Resources.Tests.TEST3, new JSONObject());
+                .withRoute(AppRoutes.FlatFiles.UPDATE_PROJECT_VERSION_FROM_FLAT_FILES)
+                .withVersion(version)
+                .getFlatFileHelper()
+                .postWithFilesInDirectory(ProjectPaths.Resources.Tests.TEST3, new JSONObject());
+
         // VP - Verify that message contains artifact that failed constraint
         JSONObject errors = responseBody.getJSONObject("errors");
         JSONArray artifactErrors = errors.getJSONArray("artifacts");

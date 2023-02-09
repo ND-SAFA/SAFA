@@ -2,8 +2,12 @@ package edu.nd.crc.safa.features.flatfiles.parser.formats.csv;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Hashtable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
@@ -13,6 +17,10 @@ import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.flatfiles.parser.base.AbstractArtifactFile;
 import edu.nd.crc.safa.utilities.CsvFileUtilities;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -65,14 +73,64 @@ public class CsvArtifactFile extends AbstractArtifactFile<CSVRecord> {
 
     @Override
     protected void exportAsFileContent(File file) throws IOException {
-        CsvFileUtilities.writeEntitiesAsCsvFile(file, Constants.ALL_COLUMNS, this.entities, this::getArtifactRow);
+        String[] headers = getHeaders();
+        CsvFileUtilities.writeEntitiesAsCsvFile(file, headers, this.entities,
+            artifact -> this.getArtifactRow(artifact, headers));
     }
 
-    private String[] getArtifactRow(ArtifactAppEntity artifact) {
-        return new String[]{artifact.getSummary(),
-            artifact.getBody(),
-            artifact.getLogicType() == null ? null : artifact.getLogicType().toString(),
-            artifact.getSafetyCaseType() == null ? null : artifact.getSafetyCaseType().toString()};
+    /**
+     * Retrieve the list of headers for the output file. The list consists of all the
+     * default headers plus all the keys for the custom attributes.
+     *
+     * @return The headers
+     */
+    private String[] getHeaders() {
+        Set<String> headers = Constants.ALL_COLUMNS_SET;
+        for (ArtifactAppEntity entity : entities) {
+            headers.addAll(entity.getAttributes().keySet());
+        }
+        return headers.toArray(new String[0]);
+    }
+
+    /**
+     * Gets a row for the output file based on the given artifact.
+     *
+     * @param artifact The artifact to output.
+     * @param headers The list of headers (used to determine the order of the items to output).
+     * @return A list of strings corresponding to entries in this row of the CSV file.
+     */
+    private String[] getArtifactRow(ArtifactAppEntity artifact, String[] headers) {
+        List<String> rowItems = new ArrayList<>();
+
+        for (String header : headers) {
+            rowItems.add(getValueOfColumn(artifact, header));
+        }
+
+        return rowItems.toArray(new String[0]);
+    }
+
+    /**
+     * Retrieves the value of the given column for the given artifact.
+     * @param artifact The artifact
+     * @param header The column in the CSV file we are trying to get the value of
+     * @return The value of that column
+     */
+    private String getValueOfColumn(ArtifactAppEntity artifact, String header) {
+        switch (header) {
+            case Constants.NAME_PARAM:
+                return artifact.getName();
+            case Constants.CONTENT_PARAM:
+                return artifact.getBody();
+            case Constants.SUMMARY_PARAM:
+                return artifact.getSummary();
+            case Constants.LOGIC_TYPE_PARAM:
+                return artifact.getLogicType() == null ? null : artifact.getLogicType().toString();
+            case Constants.SAFETY_CASE_TYPE_PARAM:
+                return artifact.getSafetyCaseType() == null ? null : artifact.getSafetyCaseType().toString();
+            default:
+                Map<String, JsonNode> attributes = artifact.getAttributes();
+                return attributes.containsKey(header) ? attributes.get(header).toString() : null;
+        }
     }
 
     @Override
@@ -96,6 +154,8 @@ public class CsvArtifactFile extends AbstractArtifactFile<CSVRecord> {
                 ? entityRecord.get(Constants.SUMMARY_PARAM) : "";
             String artifactContent = entityRecord.get(Constants.CONTENT_PARAM);
 
+            Map<String, JsonNode> recordAttributes = getCustomAttributes(entityRecord);
+
             artifactSummary = artifactSummary == null ? "" : artifactSummary;
             artifactContent = artifactContent == null ? "" : artifactContent;
             ArtifactAppEntity artifactAppEntity = new ArtifactAppEntity(
@@ -105,7 +165,7 @@ public class CsvArtifactFile extends AbstractArtifactFile<CSVRecord> {
                 artifactSummary,
                 artifactContent,
                 DocumentType.ARTIFACT_TREE,
-                new Hashtable<>()
+                recordAttributes
             );
 
             if (this.documentType == DocumentType.SAFETY_CASE) {
@@ -126,7 +186,79 @@ public class CsvArtifactFile extends AbstractArtifactFile<CSVRecord> {
 
             return new Pair<>(artifactAppEntity, null);
         } catch (Exception e) {
-            return new Pair<>(null, e.getMessage());
+            return new Pair<>(null, String.format("%s: %s", filename, e.getMessage()));
+        }
+    }
+
+    /**
+     * Given a line in a CSV file, get the custom attributes in the line.
+     *
+     * @param entityRecord The CSV file entry.
+     * @return A map from the names of the attributes to their values.
+     * @throws JsonProcessingException If there is an issue parsing the value of the attribute.
+     */
+    private Map<String, JsonNode> getCustomAttributes(CSVRecord entityRecord) throws JsonProcessingException {
+        Map<String, JsonNode> recordAttributes = new HashMap<>();
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        for (Map.Entry<String, String> entry : entityRecord.toMap().entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue();
+
+            if (!isKnownColumn(key)) {
+                recordAttributes.put(key, getCustomAttributeValue(objectMapper, value));
+            }
+        }
+
+        return recordAttributes;
+    }
+
+    /**
+     * Check whether a column is known or if it describes a custom attribute.
+     *
+     * @param key The name of the column.
+     * @return True if the column maps to a known field, false if it is for a custom attribute.
+     */
+    private boolean isKnownColumn(String key) {
+        return Constants.ALL_COLUMNS_SET.contains(key.toLowerCase());
+    }
+
+    /**
+     * Checks if a string is likely to be JSON. We consider it likely to be JSON encoded
+     * if it starts and ends with {}, [], or "".
+     *
+     * @param value The string in question.
+     * @return Whether the string is probably a JSON encoded string.
+     */
+    private boolean isLikelyJsonString(String value) {
+        return (value.startsWith("{") && value.endsWith("}"))
+            || (value.startsWith("[") && value.endsWith("]"))
+            || (value.startsWith("\"") && value.endsWith("\""));
+    }
+
+    /**
+     * Gets the JsonNode value of a custom attribute value.
+     *
+     * @param objectMapper The object mapper for reading JSON values.
+     * @param value The string value of the custom attribute.
+     * @return The parsed JSON value of the custom attribute.
+     * @throws JsonProcessingException If the JSON is invalid.
+     */
+    private JsonNode getCustomAttributeValue(ObjectMapper objectMapper, String value) throws JsonProcessingException {
+        TypeReference<JsonNode> type = new TypeReference<>(){};
+
+        try {
+            return objectMapper.readValue(value, type);
+        } catch (JsonProcessingException e) {
+
+            // If the string is likely to be a JSON string, then the processing exception is likely
+            // valid, so allow it to pass through. Otherwise, it's likely just a normal string that
+            // needs to be surrounded in quotes in order for the object mapper to recognize it as such.
+            if (isLikelyJsonString(value)) {
+                throw e;
+            } else {
+                return objectMapper.readValue(String.format("\"%s\"", value), type);
+            }
         }
     }
 
@@ -157,5 +289,7 @@ public class CsvArtifactFile extends AbstractArtifactFile<CSVRecord> {
         public static final String[] REQUIRED_COLUMNS = new String[]{NAME_PARAM, CONTENT_PARAM};
         public static final String[] ALL_COLUMNS = new String[]{NAME_PARAM, SUMMARY_PARAM, CONTENT_PARAM,
             LOGIC_TYPE_PARAM, SAFETY_CASE_TYPE_PARAM};
+
+        public static final Set<String> ALL_COLUMNS_SET = new HashSet<>(List.of(ALL_COLUMNS));
     }
 }

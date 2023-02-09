@@ -18,6 +18,7 @@ import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository
 import edu.nd.crc.safa.features.attributes.entities.CustomAttributeType;
 import edu.nd.crc.safa.features.attributes.entities.db.definitions.CustomAttribute;
 import edu.nd.crc.safa.features.attributes.repositories.definitions.CustomAttributeRepository;
+import edu.nd.crc.safa.features.attributes.services.AttributeSystemServiceProvider;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
@@ -42,6 +43,7 @@ import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.features.versions.repositories.ProjectVersionRepository;
 
+import features.attributes.AttributesForTesting;
 import org.junit.jupiter.api.AfterEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -68,6 +70,7 @@ public class DbEntityBuilder extends AbstractBuilder {
     private final ArtifactVersionRepositoryImpl artifactVersionRepositoryImpl;
     private final ProjectService projectService;
     private final CustomAttributeRepository customAttributeRepository;
+    private final AttributeSystemServiceProvider attributeSystemServiceProvider;
 
     Map<String, Project> projects;
     Map<String, Map<Integer, ProjectVersion>> versions;
@@ -79,7 +82,7 @@ public class DbEntityBuilder extends AbstractBuilder {
     SafaUser currentUser;
 
     @Autowired
-    public DbEntityBuilder(ServiceProvider serviceProvider, CustomAttributeRepository customAttributeRepository) {
+    public DbEntityBuilder(ServiceProvider serviceProvider, CustomAttributeRepository customAttributeRepository, AttributeSystemServiceProvider attributeSystemServiceProvider) {
         this.projectRepository = serviceProvider.getProjectRepository();
         this.projectService = serviceProvider.getProjectService();
         this.projectVersionRepository = serviceProvider.getProjectVersionRepository();
@@ -93,6 +96,7 @@ public class DbEntityBuilder extends AbstractBuilder {
         this.projectMembershipRepository = serviceProvider.getProjectMembershipRepository();
         this.artifactVersionRepositoryImpl = serviceProvider.getArtifactVersionRepositoryImpl();
         this.customAttributeRepository = customAttributeRepository;
+        this.attributeSystemServiceProvider = attributeSystemServiceProvider;
         DbEntityBuilder.instance = this;
     }
 
@@ -223,12 +227,16 @@ public class DbEntityBuilder extends AbstractBuilder {
 
     public CustomAttribute newCustomAttributeWithReturn(String projectName, CustomAttributeType type, String label, String key) {
         Project project = getProject(projectName);
+
         CustomAttribute field = new CustomAttribute();
         field.setProject(project);
         field.setType(type);
         field.setLabel(label);
         field.setKeyname(key);
-        return this.customAttributeRepository.save(field);
+
+        field = this.customAttributeRepository.save(field);
+        AttributesForTesting.addExtraInfo(field, attributeSystemServiceProvider);
+        return field;
     }
 
     public Artifact newArtifactWithReturn(String projectName, String typeName, String artifactName) {

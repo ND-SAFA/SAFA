@@ -30,11 +30,14 @@ public class SafaUserService {
     private final PasswordEncoder passwordEncoder;
     private final SafaUserRepository safaUserRepository;
 
+    // This exists solely so that it can be set to false during testing so that we can disable the check in that context
+    private static boolean CHECK_USER_THREAD = true;
+
     /**
      * @return the current {@link SafaUser} logged in
      */
     public SafaUser getCurrentUser() {
-        if (!Thread.currentThread().getName().startsWith("https-jsse-nio-3000-exec")) {
+        if (CHECK_USER_THREAD && !Thread.currentThread().getName().startsWith("https-jsse-nio-3000-exec")) {
             logger.warn("Attempt to get user information from a thread that does not appear to be a spring thread ("
                 + Thread.currentThread().getName() + "). This is dangerous and should not be done.");
         }

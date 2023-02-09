@@ -65,6 +65,8 @@ public class ProjectPaths {
             public static final String TEST2 = PATH + "/test2";
             public static final String TEST3 = PATH + "/test3";
             public static final String MISSING_DATA_FILE = PATH + "/missing_data_file";
+            public static final String CUSTOM_ATTRIBUTES_CSV = PATH + "/custom_attributes_csv";
+            public static final String CUSTOM_ATTRIBUTES_JSON = PATH + "/custom_attributes_json";
 
             @NoArgsConstructor(access = AccessLevel.PRIVATE)
             public static class DefaultProject {

@@ -60,7 +60,7 @@ public class JsonArtifactFile extends AbstractArtifactFile<JSONObject> {
             ArtifactAppEntity artifactAppEntity = mapper.readValue(entityRecord.toString(), ArtifactAppEntity.class);
             return new Pair<>(artifactAppEntity, null);
         } catch (Exception e) {
-            return new Pair<>(null, e.getMessage());
+            return new Pair<>(null, String.format("%s: %s", filename, e.getMessage()));
         }
     }
 

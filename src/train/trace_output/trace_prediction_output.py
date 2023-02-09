@@ -28,6 +28,15 @@ class TracePredictionOutput(AbstractTraceOutput):
                  metrics: Optional[Metrics] = None, source_target_pairs: List[Tuple[str, str]] = None,
                  prediction_entries: List[TracePredictionEntry] = None,
                  prediction_output: PredictionOutput = None):
+        """
+        Initializes the output with the various outputs from predictions
+        :param predictions: List of 2-dimensional arrays representing similarity between each source-artifact pair.
+        :param label_ids: The label associated with each prediction.
+        :param metrics: Mapping between metric name and its value for predictions.
+        :param source_target_pairs: List of tuples containing the source and target artifact ids for each prediction.
+        :param prediction_entries: List containing source artifact, target artifact, and similarity score between them.
+        :param prediction_output: The output of the prediction job.
+        """
         self.predictions: TracePredictions = predictions
         self.label_ids = label_ids
         self.metrics = metrics

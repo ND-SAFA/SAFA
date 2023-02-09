@@ -2,6 +2,7 @@ package edu.nd.crc.safa.features.flatfiles.parser.formats.csv;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -72,14 +73,64 @@ public class CsvArtifactFile extends AbstractArtifactFile<CSVRecord> {
 
     @Override
     protected void exportAsFileContent(File file) throws IOException {
-        CsvFileUtilities.writeEntitiesAsCsvFile(file, Constants.ALL_COLUMNS, this.entities, this::getArtifactRow);
+        String[] headers = getHeaders();
+        CsvFileUtilities.writeEntitiesAsCsvFile(file, headers, this.entities,
+            artifact -> this.getArtifactRow(artifact, headers));
     }
 
-    private String[] getArtifactRow(ArtifactAppEntity artifact) {
-        return new String[]{artifact.getSummary(),
-            artifact.getBody(),
-            artifact.getLogicType() == null ? null : artifact.getLogicType().toString(),
-            artifact.getSafetyCaseType() == null ? null : artifact.getSafetyCaseType().toString()};
+    /**
+     * Retrieve the list of headers for the output file. The list consists of all the
+     * default headers plus all the keys for the custom attributes.
+     *
+     * @return The headers
+     */
+    private String[] getHeaders() {
+        Set<String> headers = Constants.ALL_COLUMNS_SET;
+        for (ArtifactAppEntity entity : entities) {
+            headers.addAll(entity.getAttributes().keySet());
+        }
+        return headers.toArray(new String[0]);
+    }
+
+    /**
+     * Gets a row for the output file based on the given artifact.
+     *
+     * @param artifact The artifact to output.
+     * @param headers The list of headers (used to determine the order of the items to output).
+     * @return A list of strings corresponding to entries in this row of the CSV file.
+     */
+    private String[] getArtifactRow(ArtifactAppEntity artifact, String[] headers) {
+        List<String> rowItems = new ArrayList<>();
+
+        for (String header : headers) {
+            rowItems.add(getValueOfColumn(artifact, header));
+        }
+
+        return rowItems.toArray(new String[0]);
+    }
+
+    /**
+     * Retrieves the value of the given column for the given artifact.
+     * @param artifact The artifact
+     * @param header The column in the CSV file we are trying to get the value of
+     * @return The value of that column
+     */
+    private String getValueOfColumn(ArtifactAppEntity artifact, String header) {
+        switch (header) {
+            case Constants.NAME_PARAM:
+                return artifact.getName();
+            case Constants.CONTENT_PARAM:
+                return artifact.getBody();
+            case Constants.SUMMARY_PARAM:
+                return artifact.getSummary();
+            case Constants.LOGIC_TYPE_PARAM:
+                return artifact.getLogicType() == null ? null : artifact.getLogicType().toString();
+            case Constants.SAFETY_CASE_TYPE_PARAM:
+                return artifact.getSafetyCaseType() == null ? null : artifact.getSafetyCaseType().toString();
+            default:
+                Map<String, JsonNode> attributes = artifact.getAttributes();
+                return attributes.containsKey(header) ? attributes.get(header).toString() : null;
+        }
     }
 
     @Override

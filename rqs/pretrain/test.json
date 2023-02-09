@@ -8,13 +8,14 @@
             "random_seed": 42
           },
           "model_manager": {
-            "model_path": "prajjwal1/bert-medium"
+            "model_path": "prajjwal1/bert-mini"
           },
+          "mlm_probability": 0.15,
           "trainer_args": {
-            "num_train_epochs": 200,
-            "per_device_train_batch_size": 32,
+            "num_train_epochs": 100,
+            "per_device_train_batch_size": 4,
             "gradient_accumulation_steps": 16,
-            "learning_rate": 5e-5,
+            "learning_rate": 1e-6,
             "metrics": [
               "accuracy"
             ],
@@ -24,14 +25,15 @@
           "trainer_dataset_manager": {
             "train_dataset_creator": {
               "object_type": "MLM_PRE_TRAIN",
-              "orig_data_path": {
+              "orig_data_path": "[DATA_PATH]/pretrain/heating",
+              "block_size": {
                 "*": [
-                  "[DATA_PATH]/pretrain/heating",
-                  "[DATA_PATH]/pretrain/cooling",
-                  "[DATA_PATH]/pretrain/vehiclemodes"
+                  30,
+                  50,
+                  70,
+                  90
                 ]
-              },
-              "block_size": 70
+              }
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",

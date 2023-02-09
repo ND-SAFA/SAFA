@@ -8,15 +8,19 @@
             "random_seed": {
               "*": [
                 812,
-                42
+                924,
+                316,
+                540,
+                457
               ]
             }
           },
           "model_manager": {
-            "model_path": "prajjwal1/bert-tiny"
+            "model_path": "prajjwal1/bert-medium"
           },
           "trainer_args": {
-            "num_train_epochs": 3,
+            "num_train_epochs": 100,
+            "per_device_train_batch_size": 16,
             "gradient_accumulation_steps": 16,
             "learning_rate": 5e-5,
             "metrics": [
@@ -30,27 +34,38 @@
           },
           "trainer_dataset_manager": {
             "train_dataset_creator": {
-              "object_type": "TRACE",
-              "project_reader": {
-                "object_type": "STRUCTURE",
-                "project_path": {
-                  "*": [
-                    "[DATA_PATH]/lhp/cooling",
-                    "[DATA_PATH]/lhp/heating"
-                  ]
+              "object_type": "MULTI",
+              "project_readers": [
+                {
+                  "object_type": "STRUCTURE",
+                  "project_path": "[DATA_PATH]/lhp/heating"
+                },
+                {
+                  "object_type": "STRUCTURE",
+                  "project_path": "[DATA_PATH]/lhp/cooling"
+                },
+                {
+                  "object_type": "STRUCTURE",
+                  "project_path": "[DATA_PATH]/lhp/vehiclemodes"
                 }
-              },
+              ],
               "filter_unlinked_artifacts": true
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",
               "split_strategy": "SPLIT_BY_LINK",
-              "val_percentage": 0.30
+              "val_percentage": 0.15
             },
             "eval_dataset_creator": {
               "object_type": "SPLIT",
               "split_strategy": "SPLIT_BY_LINK",
-              "val_percentage": 0.30
+              "val_percentage": {
+                "*": [
+                  0.30,
+                  0.50,
+                  0.70
+                ]
+              }
             },
             "augmenter": {
               "steps": [

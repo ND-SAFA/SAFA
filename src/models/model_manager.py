@@ -88,7 +88,7 @@ class ModelManager(BaseObject):
         :return: the Tokenizer
         """
         if self.__tokenizer is None:
-            self.__tokenizer = AutoTokenizer.from_pretrained(self.model_path)
+            self.__tokenizer = AutoTokenizer.from_pretrained(self.model_path, eos_token='[EOS]')
         return self.__tokenizer
 
     def set_max_seq_length(self, max_seq_length: int) -> None:

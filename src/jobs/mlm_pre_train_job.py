@@ -2,6 +2,7 @@ import os
 
 from transformers import DataCollatorForLanguageModeling
 
+from constants import MLM_PROBABILITY_DEFAULT
 from data.datasets.dataset_role import DatasetRole
 from data.datasets.pre_train_dataset import PreTrainDataset
 from data.managers.trainer_dataset_manager import TrainerDatasetManager
@@ -18,7 +19,7 @@ class MLMPreTrainJob(TrainJob):
 
     def __init__(self, job_args: JobArgs, model_manager: ModelManager,
                  trainer_dataset_manager: TrainerDatasetManager, trainer_args: TrainerArgs,
-                 mlm_probability: float = 0.15):
+                 mlm_probability: float = MLM_PROBABILITY_DEFAULT):
         """
         The base job class for tracing jobs
         :param job_args: the arguments for the job

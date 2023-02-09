@@ -16,12 +16,13 @@ class Experiment(BaseObject):
     _EXPERIMENT_DIR_NAME = "experiment_%s"
 
     def __init__(self, steps: List[ExperimentStep], output_dir: str, logger_config: LoggerConfig = LoggerConfig(),
-                 experiment_index: int = 0):
+                 experiment_id: int = 0):
         """
         Represents an experiment run
         :param steps: List of all experiment steps to run
         :param output_dir: The path to save output to
         :param logger_config: Configures the logging for the project
+        :param experiment_id: The id (or index) of the experiment being run. Used for creating readable output directories.
         """
         self.id = uuid.uuid4()
         self.steps = steps
@@ -29,8 +30,8 @@ class Experiment(BaseObject):
         FileUtil.create_dir_safely(output_dir)
         self.logger_config = logger_config
         self._setup_logger()
-        self.experiment_index = experiment_index
-        self.experiment_index = experiment_index
+        self.experiment_index = experiment_id
+        self.experiment_index = experiment_id
 
     def run(self):
         """

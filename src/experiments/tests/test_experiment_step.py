@@ -19,6 +19,7 @@ from jobs.train_job import TrainJob
 from models.model_manager import ModelManager
 from testres.paths.paths import TEST_OUTPUT_DIR
 from train.trainer_args import TrainerArgs
+from util.file_util import FileUtil
 from util.object_creator import ObjectCreator
 from util.status import Status
 from variables.undetermined_variable import UndeterminedVariable
@@ -37,9 +38,8 @@ class TestExperimentStep(BaseExperimentTest):
         experiment_step.run(TEST_OUTPUT_DIR)
         experiment_step.save_results(TEST_OUTPUT_DIR)
         output = self._load_step_output(experiment_step)
-        result_dirs = os.listdir(os.path.join(TEST_OUTPUT_DIR))
-        for job_id in output["jobs"]:
-            self.assertIn(job_id, result_dirs)
+        job_dirs = FileUtil.ls_dir(TEST_OUTPUT_DIR)
+        self.assertEqual(len(output["jobs"]), len(job_dirs))
         self.assert_experimental_vars(experiment_step)
         self.assertEquals(output["status"], Status.SUCCESS.value)
         best_job = self.get_job_by_id(experiment_step, output["best_job"])

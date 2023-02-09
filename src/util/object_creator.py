@@ -1,5 +1,5 @@
 from copy import deepcopy
-from typing import Type, TypeVar, Dict
+from typing import Dict, Type, TypeVar
 
 from constants import VALIDATION_PERCENTAGE_DEFAULT
 from data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
@@ -49,7 +49,7 @@ class ObjectCreator:
     }
 
     pretrain_dataset_definition = {
-        TypedDefinitionVariable.OBJECT_TYPE_KEY: "MLM_PRETRAIN",
+        TypedDefinitionVariable.OBJECT_TYPE_KEY: "MLM_PRE_TRAIN",
         "orig_data_path": PRETRAIN_DIR,
         "training_data_dir": TEST_OUTPUT_DIR
     }

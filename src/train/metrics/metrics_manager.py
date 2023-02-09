@@ -24,13 +24,15 @@ class MetricsManager:
     Calculates metrics for trace trainer.
     """
 
-    def __init__(self, trace_links: List[TraceLink], trace_predictions: TracePredictions):
+    def __init__(self, trace_links: List[TraceLink], trace_predictions: TracePredictions = None,
+                 predicted_similarities: List[float] = None):
         """
         Constructs metrics manager with labels from trace links and scores from prediction output.
         :param trace_links: The links defining the labels associated with prediction output.
         :param trace_predictions: The output of a model.
+        :param predicted_similarities: The similarity scores predicted
         """
-        scores = self.get_similarity_scores(trace_predictions)
+        scores = self.get_similarity_scores(trace_predictions) if predicted_similarities is None else predicted_similarities
         self.trace_matrix = TraceMatrix(trace_links, scores)
 
     def eval(self, metric_names: List) -> Metrics:

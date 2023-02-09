@@ -11,7 +11,7 @@
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "STRUCTURE",
-                "project_path": "[DATA_PATH]/git/data/commit_to_issue/safa"
+                "project_path": "[DATA_PATH]/git"
               },
               "filter_unlinked_artifacts": true
             }

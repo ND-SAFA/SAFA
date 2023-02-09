@@ -1,5 +1,4 @@
-import { NavigationGuardNext, Route } from "vue-router";
-import { NavigationGuard } from "vue-router/types/router";
+import { RouteLocationNormalized, RouteLocationRaw } from "vue-router";
 import { appStore, projectStore, sessionStore } from "@/hooks";
 import { handleAuthentication, handleLoadVersion } from "@/api";
 import {
@@ -18,12 +17,12 @@ import {
  * that once a check has used the `next` function the remaining checks
  * are ignored.
  */
-export const routerChecks: Record<string, NavigationGuard> = {
+export const routerChecks = {
   async redirectToLoginIfNoSessionFound(
-    to: Route,
-    from: Route,
-    next: NavigationGuardNext
-  ) {
+    to: RouteLocationNormalized,
+    from: RouteLocationNormalized,
+    next: (location: RouteLocationRaw) => void
+  ): Promise<void> {
     if (sessionStore.doesSessionExist || routesPublic.includes(to.path)) {
       return;
     }
@@ -42,7 +41,7 @@ export const routerChecks: Record<string, NavigationGuard> = {
       });
     }
   },
-  requireProjectForRoutes(to: Route) {
+  requireProjectForRoutes(to: RouteLocationNormalized): void {
     if (
       projectStore.isProjectDefined ||
       !routesWithRequiredProject.includes(to.path)
@@ -55,7 +54,7 @@ export const routerChecks: Record<string, NavigationGuard> = {
       handleLoadVersion(versionId, undefined, false);
     }
   },
-  closePanelsIfNotInGraph(to: Route) {
+  closePanelsIfNotInGraph(to: RouteLocationNormalized): void {
     if (to.path === Routes.ARTIFACT) return;
 
     appStore.closeSidePanels();

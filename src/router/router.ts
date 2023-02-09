@@ -1,5 +1,4 @@
-import Vue from "vue";
-import VueRouter, { NavigationGuardNext, Route, RouteConfig } from "vue-router";
+import VueRouter, { RouteRecordRaw } from "vue-router";
 import { routerChecks } from "@/router/checks";
 import {
   TracePredictionView,
@@ -20,9 +19,7 @@ import { Routes } from "./routes";
 
 export { Routes };
 
-Vue.use(VueRouter);
-
-const routes: Array<RouteConfig> = [
+const routes: Array<RouteRecordRaw> = [
   {
     path: Routes.LOGIN_ACCOUNT,
     name: "Login",
@@ -91,20 +88,21 @@ const routes: Array<RouteConfig> = [
   },
 ];
 
-const router = new VueRouter({
-  mode: "history",
-  base: process.env.BASE_URL,
+const router = VueRouter.createRouter({
+  history: VueRouter.createWebHashHistory(),
   routes,
 });
 
 /**
- * Iterates through each router checks and exits after the first check
+ * Iterates through each router check and exits after the first check
  * uses the next function.
  */
-router.beforeResolve((to: Route, from: Route, next: NavigationGuardNext) => {
+router.beforeResolve((to, from, next) => {
   let exit = false;
+
   for (const check of Object.values(routerChecks)) {
     if (exit) return;
+
     check(to, from, (p) => {
       next(p);
       exit = true;

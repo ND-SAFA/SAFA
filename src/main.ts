@@ -7,8 +7,4 @@ import { router } from "@/router";
 import App from "@/App.vue";
 import { vuetify, pinia } from "@/plugins";
 
-export default createApp(App)
-  .use(vuetify)
-  .use(pinia)
-  // .use(router)
-  .mount("#app");
+export default createApp(App).use(vuetify).use(pinia).use(router).mount("#app");

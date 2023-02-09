@@ -32,9 +32,7 @@ export default Vue.extend({
      * @return The page's class name.
      */
     className(): string {
-      return this.fullWindow
-        ? "full-window-page primary lighten-5"
-        : "primary lighten-5";
+      return this.fullWindow ? "full-window-page primary-bg" : "primary-bg";
     },
   },
 });

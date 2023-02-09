@@ -105,7 +105,7 @@ export function preserveObjectKeys<O, K extends keyof O>(
   obj: O,
   keys: K[]
 ): Pick<O, K> {
-  return Object.entries(obj)
+  return Object.entries(obj as Record<string, unknown>)
     .filter(([key]) => (keys as string[]).includes(key))
     .reduce((acc, cur) => ({ ...acc, ...cur }), {} as O);
 }

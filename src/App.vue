@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-main class="primary lighten-5">
+    <v-main class="primary-bg">
       <transition name="fade" mode="out-in">
         <keep-alive>
           <router-view />

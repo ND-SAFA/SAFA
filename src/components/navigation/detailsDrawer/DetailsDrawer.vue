@@ -8,7 +8,7 @@
     :value="drawerOpen"
     height="100%"
     :width="width"
-    class="primary lighten-5"
+    class="primary-bg"
   >
     <v-container class="full-height">
       <flex-box justify="space-between" align="center">

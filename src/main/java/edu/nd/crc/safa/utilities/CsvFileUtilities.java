@@ -51,7 +51,6 @@ public interface CsvFileUtilities {
         //TODO attributes
         try (FileWriter reader = new FileWriter(file)) {
             try (CSVPrinter printer = new CSVPrinter(reader, createCsvFormat(headers))) {
-                printer.printRecord((Object[]) headers);
                 for (T entity : entities) {
                     printer.printRecord((Object[]) entity2values.apply(entity));
                 }

@@ -17,14 +17,14 @@
 
     <v-expansion-panels>
       <v-expansion-panel data-cy="panel-trace-directions">
-        <v-expansion-panel-header>
+        <v-expansion-panel-title>
           <typography value="Allowed Trace Directions" />
-        </v-expansion-panel-header>
-        <v-expansion-panel-content>
+        </v-expansion-panel-title>
+        <v-expansion-panel-text>
           <div v-for="entry in artifactLevels" :key="entry.typeId">
             <type-direction-input :entry="entry" />
           </div>
-        </v-expansion-panel-content>
+        </v-expansion-panel-text>
       </v-expansion-panel>
     </v-expansion-panels>
 
@@ -119,26 +119,6 @@ export default Vue.extend({
       return typeOptionsStore.artifactLevels;
     },
   },
-  methods: {
-    /**
-     * Creates a trace link from the given artifacts.
-     */
-    async handleSubmit(): Promise<void> {
-      const source = this.sourceArtifact;
-      const target = this.targetArtifact;
-
-      if (!source || !target) return;
-
-      await handleCreateLink(source, target);
-      this.handleClose();
-    },
-    /**
-     * Closes the trace link creator.
-     */
-    handleClose(): void {
-      appStore.closeSidePanels();
-    },
-  },
   watch: {
     /**
      * Resets fields when the panel opens.
@@ -161,6 +141,26 @@ export default Vue.extend({
         this.sourceArtifactId = openState.sourceId;
         this.targetArtifactId = openState.targetId;
       }
+    },
+  },
+  methods: {
+    /**
+     * Creates a trace link from the given artifacts.
+     */
+    async handleSubmit(): Promise<void> {
+      const source = this.sourceArtifact;
+      const target = this.targetArtifact;
+
+      if (!source || !target) return;
+
+      await handleCreateLink(source, target);
+      this.handleClose();
+    },
+    /**
+     * Closes the trace link creator.
+     */
+    handleClose(): void {
+      appStore.closeSidePanels();
     },
   },
 });

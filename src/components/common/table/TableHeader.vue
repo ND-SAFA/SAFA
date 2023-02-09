@@ -71,8 +71,9 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { defineProps, defineEmits, ref, watch, computed } from "vue";
+import { defineProps, defineEmits, computed } from "vue";
 import { DataTableHeader } from "@/types";
+import { useVModel } from "@/hooks";
 import { FlexBox } from "@/components/common/layout";
 import { CommitButtons } from "@/components/common/button";
 
@@ -94,40 +95,15 @@ const emit = defineEmits<{
   (e: "update:groupDesc", descending: boolean): void;
 }>();
 
-const searchText = ref(props.searchText);
-const sortBy = ref(props.sortBy);
-const sortDesc = ref(props.sortDesc);
-const groupBy = ref(props.groupBy);
-const groupDesc = ref(props.groupDesc);
+const searchText = useVModel(props, "searchText");
+const sortBy = useVModel(props, "sortBy");
+const sortDesc = useVModel(props, "sortDesc");
+const groupBy = useVModel(props, "groupBy");
+const groupDesc = useVModel(props, "groupDesc");
 
 const options = computed(() =>
   props.headers
     .filter(({ text }: DataTableHeader) => !!text && text !== "Actions")
     .map(({ text, value }: DataTableHeader) => ({ text, value }))
-);
-
-watch(
-  () => searchText.value,
-  () => emit("update:searchText", searchText.value)
-);
-
-watch(
-  () => sortBy.value,
-  () => emit("update:sortBy", sortBy.value)
-);
-
-watch(
-  () => sortDesc.value,
-  () => emit("update:sortDesc", sortDesc.value)
-);
-
-watch(
-  () => groupBy.value,
-  () => emit("update:groupBy", groupBy.value)
-);
-
-watch(
-  () => groupDesc.value,
-  () => emit("update:groupDesc", groupDesc.value)
 );
 </script>

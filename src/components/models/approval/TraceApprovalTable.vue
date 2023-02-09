@@ -173,7 +173,7 @@ export default Vue.extend({
     /**
      * @return All visible links.
      */
-    visibleHeaders(): Partial<DataTableHeader<FlatTraceLink>>[] {
+    visibleHeaders(): DataTableHeader<FlatTraceLink>[] {
       return this.headers.filter((header: DataTableHeader<FlatTraceLink>) => {
         return !(
           (this.approvalTypes.length === 1 &&

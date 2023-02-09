@@ -1,15 +1,15 @@
 <template>
   <div>
     <project-identifier-input
-      v-bind:name.sync="identifier.name"
-      v-bind:description.sync="identifier.description"
+      v-model:name="identifier.name"
+      v-model:description="identifier.description"
       :data-cy-name="dataCyName"
       :data-cy-description="dataCyDescription"
     />
     <v-container style="max-width: 40em">
       <switch-input
-        class="mt-0"
         v-model="emptyFiles"
+        class="mt-0"
         label="Create an empty project"
         data-cy="toggle-create-empty-project"
       />
@@ -22,9 +22,9 @@
         block
         color="primary"
         :disabled="isDisabled"
-        @click="handleCreate"
         :loading="isLoading"
         data-cy="button-create-project"
+        @click="handleCreate"
       >
         Create Project From Files
       </v-btn>

@@ -26,8 +26,9 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { ref, watch, defineProps, defineEmits } from "vue";
+import { defineProps, defineEmits } from "vue";
 import { SelectOption } from "@/types";
+import { useVModel } from "@/hooks";
 import { FlexBox } from "@/components/common/layout";
 import Typography from "../Typography.vue";
 
@@ -40,10 +41,5 @@ const emit = defineEmits<{
   (e: "update:modelValue", value: number): void;
 }>();
 
-const model = ref(props.modelValue);
-
-watch(
-  () => model.value,
-  () => emit("update:modelValue", model.value)
-);
+const model = useVModel(props, "modelValue");
 </script>

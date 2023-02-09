@@ -7,18 +7,16 @@
       :errors="errors"
       @clear="handleClear"
     />
-    <v-expansion-panels class="mb-4" v-if="selectedFiles.length > 0">
+    <v-expansion-panels v-if="selectedFiles.length > 0" class="mb-4">
       <v-expansion-panel data-cy="toggle-tim-manage">
-        <v-expansion-panel-header>
-          Manage Project TIM
-        </v-expansion-panel-header>
-        <v-expansion-panel-content>
+        <v-expansion-panel-title> Manage Project TIM </v-expansion-panel-title>
+        <v-expansion-panel-text>
           <v-autocomplete
+            v-model="artifactTypes"
             filled
             chips
             deletable-chips
             multiple
-            v-model="artifactTypes"
             label="Artifact Files"
             :items="typeOptions"
             hint="Select the artifact files. Reads the file name <type>.csv"
@@ -27,12 +25,12 @@
             @change="handleTypesChange"
           />
           <v-autocomplete
+            v-model="traceMatrices"
             filled
             multiple
             chips
             deletable-chips
             return-object
-            v-model="traceMatrices"
             label="Trace Matrix Files"
             :items="matrixOptions"
             :item-text="(item) => `${item.source} To ${item.target}`"
@@ -41,146 +39,145 @@
             data-cy="input-tim-traces"
             @change="handleTimChange"
           />
-        </v-expansion-panel-content>
+        </v-expansion-panel-text>
       </v-expansion-panel>
     </v-expansion-panels>
   </div>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+/**
+ * An input for project files.
+ */
+export default {
+  name: "ProjectFilesInput",
+};
+</script>
+
+<script setup lang="ts">
+import { ref, computed, defineProps, defineEmits, watch } from "vue";
 import { ArtifactLevelSchema, TimJsonSchema } from "@/types";
 import { FileInput, FileFormatAlert } from "@/components/common";
 
+const props = defineProps<{
+  dataCy?: string;
+}>();
+
+const emit = defineEmits<{
+  (e: "input", files: File[]): void;
+}>();
+
+const selectedFiles = ref<File[]>([]);
+const tim = ref<TimJsonSchema | undefined>(undefined);
+const artifactTypes = ref<string[]>([]);
+const traceMatrices = ref<ArtifactLevelSchema[]>([]);
+
 /**
- * An input for project files.
- *
- * @emits-1 `input` (File[]) - On flat files updated.
+ * @return Generated artifact types based on file names.
  */
-export default Vue.extend({
-  name: "ProjectFilesInput",
-  components: {
-    FileFormatAlert,
-    FileInput,
-  },
-  props: {
-    dataCy: String,
-  },
-  data() {
-    return {
-      selectedFiles: [] as File[],
-      tim: undefined as TimJsonSchema | undefined,
-      artifactTypes: [] as string[],
-      traceMatrices: [] as ArtifactLevelSchema[],
-    };
-  },
-  computed: {
-    /**
-     * @return Generated artifact types based on file names.
-     */
-    typeOptions(): string[] {
-      return this.selectedFiles
-        .map(({ name }) => name.split(".")[0])
-        .filter((name) => name !== "tim");
-    },
-    /**
-     * @return Generated trace matrices based on file names.
-     */
-    matrixOptions(): ArtifactLevelSchema[] {
-      return this.artifactTypes
-        .map((source) =>
-          this.artifactTypes.map((target) => ({ source, target }))
-        )
-        .reduce((acc, cur) => [...acc, ...cur], []);
-    },
-    /**
-     * @return Any errors on uploaded files.
-     */
-    errors(): string[] {
-      return this.selectedFiles.length === 0 ||
-        this.selectedFiles.find(({ name }) => name === "tim.json")
-        ? []
-        : ["Missing project TIM. Please create one below."];
-    },
-  },
-  methods: {
-    /**
-     * Clears the current tim file data.
-     */
-    handleClear(): void {
-      this.tim = undefined;
-      this.artifactTypes = [];
-      this.traceMatrices = [];
-    },
-    /**
-     * Selects relevant trace matrices when the types change, and updates the tim file.
-     */
-    handleTypesChange(): void {
-      this.traceMatrices = this.matrixOptions.filter(({ source, target }) =>
-        this.selectedFiles.find(
-          ({ name }) => name === `${source}2${target}.csv`
-        )
+const typeOptions = computed(() =>
+  selectedFiles.value
+    .map(({ name }) => name.split(".")[0])
+    .filter((name) => name !== "tim")
+);
+
+/**
+ * @return Generated trace matrices based on file names.
+ */
+const matrixOptions = computed(() =>
+  artifactTypes.value
+    .map((source) => artifactTypes.value.map((target) => ({ source, target })))
+    .reduce((acc, cur) => [...acc, ...cur], [])
+);
+
+/**
+ * @return Any errors on uploaded files.
+ */
+const errors = computed(() =>
+  selectedFiles.value.length === 0 ||
+  selectedFiles.value.find(({ name }) => name === "tim.json")
+    ? []
+    : ["Missing project TIM. Please create one below."]
+);
+
+/**
+ * Clears the current tim file data.
+ */
+function handleClear(): void {
+  tim.value = undefined;
+  artifactTypes.value = [];
+  traceMatrices.value = [];
+}
+
+/**
+ * Creates a new tim file when the inputs change.
+ */
+function handleTimChange(): void {
+  tim.value = {
+    DataFiles: artifactTypes.value
+      .map((type) => ({ [type]: { File: `${type}.csv` } }))
+      .reduce((acc, cur) => ({ ...acc, ...cur }), {}),
+    ...traceMatrices.value
+      .map(({ source, target }) => ({
+        [`${source}2${target}`]: {
+          Source: source,
+          Target: target,
+          File: `${source}2${target}.csv`,
+        },
+      }))
+      .reduce((acc, cur) => ({ ...acc, ...cur }), {}),
+  } as TimJsonSchema;
+
+  selectedFiles.value = [
+    ...selectedFiles.value.filter(({ name }) => name !== "tim.json"),
+    new File([JSON.stringify(tim.value)], "tim.json", {
+      type: "application/json",
+    }),
+  ];
+}
+
+/**
+ * Selects relevant trace matrices when the types change, and updates the tim file.
+ */
+function handleTypesChange(): void {
+  traceMatrices.value = matrixOptions.value.filter(({ source, target }) =>
+    selectedFiles.value.find(({ name }) => name === `${source}2${target}.csv`)
+  );
+
+  handleTimChange();
+}
+
+/**
+ * Emits changes to selected files.
+ * If a tim file is loaded, it is parsed so that it can be edited.
+ */
+watch(
+  () => selectedFiles.value,
+  (files: File[]) => {
+    emit("input", files);
+
+    const timFile = files.find(({ name }) => name === "tim.json");
+
+    if (!timFile) return;
+
+    const reader = new FileReader();
+
+    reader.addEventListener("load", (event) => {
+      tim.value = JSON.parse(String(event.target?.result));
+
+      artifactTypes.value = Object.values(tim.value?.DataFiles || {}).map(
+        ({ File }) => File.split(".")[0]
       );
 
-      this.handleTimChange();
-    },
-    /**
-     * Creates a new tim file when the inputs change.
-     */
-    handleTimChange(): void {
-      this.tim = {
-        DataFiles: this.artifactTypes
-          .map((type) => ({ [type]: { File: `${type}.csv` } }))
-          .reduce((acc, cur) => ({ ...acc, ...cur }), {}),
-        ...this.traceMatrices
-          .map(({ source, target }) => ({
-            [`${source}2${target}`]: {
-              Source: source,
-              Target: target,
-              File: `${source}2${target}.csv`,
-            },
-          }))
-          .reduce((acc, cur) => ({ ...acc, ...cur }), {}),
-      } as TimJsonSchema;
+      traceMatrices.value = Object.values(tim.value || {})
+        .filter(({ Source, Target }) => Source && Target)
+        .map(({ Source, Target }) => ({
+          source: String(Source),
+          target: String(Target),
+        }));
+    });
 
-      this.selectedFiles = [
-        ...this.selectedFiles.filter(({ name }) => name !== "tim.json"),
-        new File([JSON.stringify(this.tim)], "tim.json", {
-          type: "application/json",
-        }),
-      ];
-    },
-  },
-  watch: {
-    /**
-     * Emits changes to selected files.
-     * If a tim file is loaded, it is parsed so that it can be edited.
-     */
-    selectedFiles(files: File[]) {
-      this.$emit("input", files);
-
-      const timFile = files.find(({ name }) => name === "tim.json");
-
-      if (!timFile) return;
-
-      const reader = new FileReader();
-
-      reader.addEventListener("load", (event) => {
-        this.tim = JSON.parse(String(event.target?.result));
-
-        this.artifactTypes = Object.values(this.tim?.DataFiles || {}).map(
-          ({ File }) => File.split(".")[0]
-        );
-        this.traceMatrices = Object.values(this.tim || {})
-          .filter(({ Source, Target }) => Source && Target)
-          .map(({ Source, Target }) => ({
-            source: String(Source),
-            target: String(Target),
-          }));
-      });
-
-      reader.readAsText(timFile);
-    },
-  },
-});
+    reader.readAsText(timFile);
+  }
+);
 </script>

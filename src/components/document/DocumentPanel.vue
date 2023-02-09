@@ -1,60 +1,60 @@
 <template>
   <div v-if="isOpen">
     <v-text-field
+      v-model="store.editedDocument.name"
       filled
       label="Name"
       class="mt-4"
-      v-model="store.editedDocument.name"
       :error-messages="nameErrors"
       data-cy="input-document-name"
     />
     <v-select
+      v-model="store.editedDocument.type"
       filled
       label="Type"
-      v-model="store.editedDocument.type"
       :items="types"
       item-text="name"
       item-value="id"
       data-cy="input-document-type"
     />
     <artifact-type-input
+      v-model="store.includedTypes"
       multiple
       label="Include Artifact Types"
-      v-model="store.includedTypes"
-      @blur="handleSaveTypes"
       data-cy="input-document-include-types"
+      @blur="handleSaveTypes"
     />
     <artifact-input
-      label="Artifacts"
       v-model="store.editedDocument.artifactIds"
+      label="Artifacts"
       data-cy="input-document-artifacts"
     />
     <switch-input
+      v-model="store.includeChildren"
       class="ml-1"
       label="Include artifact children"
-      v-model="store.includeChildren"
       data-cy="button-document-include-children"
     />
     <artifact-type-input
       v-if="store.includeChildren"
+      v-model="store.includedChildTypes"
       multiple
       label="Include Child Types"
-      v-model="store.includedChildTypes"
-      @blur="handleSaveChildren"
       data-cy="input-document-include-child-types"
+      @blur="handleSaveChildren"
     />
     <artifact-input
       v-if="store.includeChildren"
-      label="Child Artifacts"
       v-model="store.childIds"
+      label="Child Artifacts"
       data-cy="input-document-child-artifacts"
     />
 
     <v-divider class="my-4" />
     <flex-box justify="space-between">
       <text-button
-        text
         v-if="isUpdate"
+        text
         variant="delete"
         data-cy="button-document-delete"
         @click="handleDelete"
@@ -151,6 +151,22 @@ export default Vue.extend({
       return documentSaveStore.baseDocument;
     },
   },
+  watch: {
+    /**
+     * Reset the document when the modal is opened.
+     */
+    isOpen(open: boolean) {
+      if (!open) return;
+
+      documentSaveStore.resetDocument();
+    },
+    /**
+     * Reset the document when the base document changes.
+     */
+    baseDocument() {
+      documentSaveStore.resetDocument();
+    },
+  },
   methods: {
     /**
      * Emits a request to close the modal.
@@ -185,22 +201,6 @@ export default Vue.extend({
       handleDeleteDocument({
         onSuccess: () => this.handleClose(),
       });
-    },
-  },
-  watch: {
-    /**
-     * Reset the document when the modal is opened.
-     */
-    isOpen(open: boolean) {
-      if (!open) return;
-
-      documentSaveStore.resetDocument();
-    },
-    /**
-     * Reset the document when the base document changes.
-     */
-    baseDocument() {
-      documentSaveStore.resetDocument();
     },
   },
 });

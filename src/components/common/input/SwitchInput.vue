@@ -1,39 +1,29 @@
 <template>
-  <v-switch inset v-model="switchValue" :label="label" class="mr-2" />
+  <v-switch v-model="model" inset :label="label" class="mr-2" />
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-
 /**
  * Displays a generic switch input.
- *
- * @emits `input` (boolean) - On input change.
  */
-export default Vue.extend({
+export default {
   name: "SwitchInput",
-  props: {
-    label: {
-      type: String,
-      required: true,
-    },
-    value: {
-      type: Boolean,
-      required: true,
-    },
-  },
-  computed: {
-    /**
-     * @return The current value, and emits the value when changed.
-     */
-    switchValue: {
-      get(): boolean {
-        return this.value;
-      },
-      set(isOn: boolean): void {
-        this.$emit("input", isOn);
-      },
-    },
-  },
-});
+};
+</script>
+
+<script setup lang="ts">
+import { defineProps, defineEmits } from "vue";
+
+import { useVModel } from "@/hooks";
+
+const props = defineProps<{
+  modelValue: boolean;
+  label: string;
+}>();
+
+const emit = defineEmits<{
+  (e: "update:modelValue", value: string): void;
+}>();
+
+const model = useVModel(props, "modelValue");
 </script>

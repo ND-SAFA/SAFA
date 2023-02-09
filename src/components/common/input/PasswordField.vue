@@ -23,7 +23,8 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { defineProps, defineEmits, withDefaults, ref, watch } from "vue";
+import { defineProps, defineEmits, withDefaults, ref } from "vue";
+import { useVModel } from "@/hooks";
 
 const props = withDefaults(
   defineProps<{
@@ -39,11 +40,6 @@ const emit = defineEmits<{
   (e: "enter"): void;
 }>();
 
-const model = ref(props.modelValue);
 const showPassword = ref(false);
-
-watch(
-  () => model.value,
-  () => emit("update:modelValue", model.value)
-);
+const model = useVModel(props, "modelValue");
 </script>

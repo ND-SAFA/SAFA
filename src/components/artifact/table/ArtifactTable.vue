@@ -119,8 +119,8 @@ export default Vue.extend({
   data() {
     return {
       searchText: "",
-      sortBy: ["name"] as (keyof FlatArtifact)[],
-      groupBy: "type" as keyof FlatArtifact,
+      sortBy: ["name"],
+      groupBy: "type",
       sortDesc: false,
       groupDesc: false,
       selectedDeltaTypes: [] as ArtifactDeltaState[],
@@ -137,7 +137,7 @@ export default Vue.extend({
     /**
      * @return The artifact table's headers.
      */
-    headers(): Partial<DataTableHeader<ArtifactSchema>>[] {
+    headers(): DataTableHeader<ArtifactSchema>[] {
       return [
         {
           text: "Name",

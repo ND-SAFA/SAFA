@@ -4,7 +4,7 @@
     <v-divider class="mb-2" />
     <switch-input
       label="Enable dark mode"
-      :value="darkMode"
+      :model-value="darkMode"
       @input="toggleTheme"
     />
   </panel-card>

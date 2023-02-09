@@ -42,7 +42,7 @@ export default {
 import { defineProps, defineEmits, ref, watch } from "vue";
 import { ArtifactDeltaState, ArtifactSchema, DataTableHeader } from "@/types";
 import { deltaTypeOptions } from "@/util";
-import { deltaStore } from "@/hooks";
+import { deltaStore, useVModel } from "@/hooks";
 import { TableHeader, FlexBox } from "@/components/common";
 
 const props = defineProps<{
@@ -64,37 +64,12 @@ const emit = defineEmits<{
 }>();
 
 const deltaTypes = deltaTypeOptions();
-const searchText = ref(props.searchText);
-const sortBy = ref(props.sortBy);
-const sortDesc = ref(props.sortDesc);
-const groupBy = ref(props.groupBy);
-const groupDesc = ref(props.groupDesc);
+const searchText = useVModel(props, "searchText");
+const sortBy = useVModel(props, "sortBy");
+const sortDesc = useVModel(props, "sortDesc");
+const groupBy = useVModel(props, "groupBy");
+const groupDesc = useVModel(props, "groupDesc");
 const selectedDeltaTypes = ref<ArtifactDeltaState[]>([]);
-
-watch(
-  () => searchText.value,
-  () => emit("update:searchText", searchText.value)
-);
-
-watch(
-  () => sortBy.value,
-  () => emit("update:sortBy", sortBy.value)
-);
-
-watch(
-  () => sortDesc.value,
-  () => emit("update:sortDesc", sortDesc.value)
-);
-
-watch(
-  () => groupBy.value,
-  () => emit("update:groupBy", groupBy.value)
-);
-
-watch(
-  () => groupDesc.value,
-  () => emit("update:groupDesc", groupDesc.value)
-);
 
 watch(
   () => selectedDeltaTypes.value,

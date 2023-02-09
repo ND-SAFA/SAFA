@@ -1,15 +1,15 @@
 <template>
   <v-select
+    v-model="model"
     filled
     hide-details
     label="Custom Model"
-    v-model="model"
-    :items="modelOptions"
+    :items="projectStore.models"
     class="mr-2"
     item-text="name"
     item-value="id"
   >
-    <template v-slot:item="{ item }">
+    <template #item="{ item }">
       <div class="my-1">
         <typography el="div" :value="item.name" />
         <typography variant="caption" :value="item.baseModel" />
@@ -19,53 +19,38 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+/**
+ * A selector for custom models.
+ */
+export default {
+  name: "CustomModelInput",
+};
+</script>
+
+<script setup lang="ts">
+import { defineProps, defineEmits, computed } from "vue";
 import { GenerationModelSchema } from "@/types";
 import { projectStore } from "@/hooks";
 import { Typography } from "@/components/common/display";
 
-/**
- * A selector for custom models.
- *
- * @emits-1 `input` (TrainedModel | undefined) - On value change.
- */
-export default Vue.extend({
-  name: "CustomModelInput",
-  components: {
-    Typography,
+const props = defineProps<{
+  modelValue?: GenerationModelSchema;
+}>();
+
+const emit = defineEmits<{
+  (e: "update:modelValue", value: GenerationModelSchema | undefined): void;
+  (e: "enter"): void;
+}>();
+
+const model = computed({
+  get() {
+    return props.modelValue?.id;
   },
-  props: {
-    value: Object as PropType<GenerationModelSchema | undefined>,
-  },
-  data() {
-    return {
-      model: this.value?.id,
-    };
-  },
-  computed: {
-    /**
-     * @return The trace generation model types.
-     */
-    modelOptions(): GenerationModelSchema[] {
-      return projectStore.models;
-    },
-  },
-  watch: {
-    /**
-     * Updates the model if the value changes.
-     */
-    value(currentValue: GenerationModelSchema) {
-      this.model = currentValue?.id;
-    },
-    /**
-     * Emits changes to the model.
-     */
-    model(currentId: string) {
-      this.$emit(
-        "input",
-        projectStore.models.find(({ id }) => id === currentId)
-      );
-    },
+  set(value) {
+    emit(
+      "update:modelValue",
+      projectStore.models.find(({ id }) => id === value)
+    );
   },
 });
 </script>

@@ -1,15 +1,15 @@
 <template>
   <v-expansion-panel data-cy="panel-files" class="primary-border">
-    <v-expansion-panel-header>
+    <v-expansion-panel-title>
       <flex-box align="center">
-        <v-progress-circular indeterminate v-if="isLoading" class="mr-2" />
+        <v-progress-circular v-if="isLoading" indeterminate class="mr-2" />
         <v-icon v-else class="mr-1" :color="iconColor">
           {{ iconName }}
         </v-icon>
         <slot name="title" />
       </flex-box>
-    </v-expansion-panel-header>
-    <v-expansion-panel-content>
+    </v-expansion-panel-title>
+    <v-expansion-panel-text>
       <slot name="before-rows" />
 
       <file-input
@@ -31,55 +31,55 @@
 
       <v-expansion-panels accordion>
         <v-expansion-panel v-if="entityNames.length !== 0">
-          <v-expansion-panel-header data-cy="button-file-entities">
+          <v-expansion-panel-title data-cy="button-file-entities">
             <typography variant="subtitle" value="Entities" />
-          </v-expansion-panel-header>
-          <v-expansion-panel-content>
+          </v-expansion-panel-title>
+          <v-expansion-panel-text>
             <v-btn
+              v-for="entityName in entityNames"
+              :key="entityName"
               outlined
               color="primary"
               class="ma-1"
-              v-for="entityName in entityNames"
-              :key="entityName"
               data-cy="button-created-entity"
               @click="underDevelopmentError()"
             >
               {{ entityName }}
             </v-btn>
-          </v-expansion-panel-content>
+          </v-expansion-panel-text>
         </v-expansion-panel>
         <v-expansion-panel v-if="errors.length > 0">
-          <v-expansion-panel-header disable-icon-rotate>
+          <v-expansion-panel-title disable-icon-rotate>
             <typography
               variant="subtitle"
               :value="errors.length === 0 ? 'No Errors' : 'Errors'"
             />
-            <template v-slot:actions>
+            <template #actions>
               <v-icon color="error">mdi-alert-circle</v-icon>
             </template>
-          </v-expansion-panel-header>
-          <v-expansion-panel-content>
+          </v-expansion-panel-title>
+          <v-expansion-panel-text>
             <typography
               v-for="(error, i) in errors"
               :key="i"
               error
               :value="error"
             />
-          </v-expansion-panel-content>
+          </v-expansion-panel-text>
         </v-expansion-panel>
       </v-expansion-panels>
 
       <flex-box justify="space-between" t="4">
         <v-spacer />
         <v-btn
-          @click="$emit('delete')"
           color="error"
           data-cy="button-delete-artifact"
+          @click="$emit('delete')"
         >
           Delete
         </v-btn>
       </flex-box>
-    </v-expansion-panel-content>
+    </v-expansion-panel-text>
   </v-expansion-panel>
 </template>
 

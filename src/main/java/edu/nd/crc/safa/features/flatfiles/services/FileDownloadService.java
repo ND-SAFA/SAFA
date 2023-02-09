@@ -107,13 +107,13 @@ public class FileDownloadService {
         return artifactFiles;
     }
 
-    private <T extends Enum<T>> DocumentType getDocumentTypeFromType(String artifactType) {
-        List<Pair<DocumentType, Class<T>>> documentValues = new ArrayList<>();
-        documentValues.add(new Pair<>(DocumentType.SAFETY_CASE, (Class<T>) SafetyCaseType.class));
-        documentValues.add(new Pair<>(DocumentType.FTA, (Class<T>) FTAType.class));
+    private DocumentType getDocumentTypeFromType(String artifactType) {
+        List<Pair<DocumentType, Class<? extends Enum<?>>>> documentValues = new ArrayList<>();
+        documentValues.add(new Pair<>(DocumentType.SAFETY_CASE, SafetyCaseType.class));
+        documentValues.add(new Pair<>(DocumentType.FTA, FTAType.class));
 
-        for (Pair<DocumentType, Class<T>> documentTypeClassPair : documentValues) {
-            Class<T> enumClass = documentTypeClassPair.getValue1();
+        for (Pair<DocumentType, Class<? extends Enum<?>>> documentTypeClassPair : documentValues) {
+            Class<? extends Enum<?>> enumClass = documentTypeClassPair.getValue1();
             boolean hasMatch = Arrays
                 .stream(enumClass.getEnumConstants())
                 .anyMatch(enumValue -> enumValue.toString()

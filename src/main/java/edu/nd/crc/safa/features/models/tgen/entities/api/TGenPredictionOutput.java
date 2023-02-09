@@ -4,11 +4,13 @@ import java.util.List;
 import java.util.Map;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * Output of TGEN /predict/ endpoint.
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class TGenPredictionOutput extends AbstractTGenResponse {
     /**
      * List of links with their predicted similarity score.

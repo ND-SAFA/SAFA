@@ -1,0 +1,23 @@
+{
+  "steps": [
+    {
+      "jobs": [
+        {
+          "object_type": "CREATE_DATASETS",
+          "job_args": {
+          },
+          "trainer_dataset_manager": {
+            "train_dataset_creator": {
+              "object_type": "TRACE",
+              "project_reader": {
+                "object_type": "STRUCTURE",
+                "project_path": "[DATA_PATH]/git/data/commit_to_issue/safa"
+              },
+              "filter_unlinked_artifacts": true
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

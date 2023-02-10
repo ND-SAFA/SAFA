@@ -4,6 +4,7 @@ from unittest.mock import patch
 
 import math
 
+from constants import BASE_EXPERIMENT_NAME
 from data.datasets.dataset_role import DatasetRole
 from data.managers.deterministic_trainer_dataset_manager import DeterministicTrainerDatasetManager
 from data.managers.trainer_dataset_manager import TrainerDatasetManager
@@ -122,9 +123,10 @@ class TestExperimentStep(BaseExperimentTest):
         output_dir = os.path.join(TEST_OUTPUT_DIR, "experiment_step")
         job1.model_manager = DeterministicTrainerDatasetManager(deterministic_id="1234")
         ExperimentStep._update_job_children([job1, job2], output_dir)
-        self.assertEquals(job1.model_manager.output_dir, os.path.join(output_dir, ExperimentStep.BASE_EXPERIMENT_NAME, "models"))
+        self.assertEquals(job1.model_manager.output_dir, os.path.join(output_dir, BASE_EXPERIMENT_NAME, "models"))
 
-    def get_experiment_step(self, train=True) -> ExperimentStep:
+    @staticmethod
+    def get_experiment_step(train=True) -> ExperimentStep:
         kwargs = {}
         if not train:
             kwargs = {"override": True, **{

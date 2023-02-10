@@ -16,7 +16,7 @@ LOG_TO_CONSOLE_DEFAULT = True
 MAX_JOBS = 1
 RUN_ASYNC = False
 EXIT_ON_FAILED_JOB = True
-
+BASE_EXPERIMENT_NAME = "base_experiment"
 # -------------- JOB ARGS --------------
 SAVE_OUTPUT_DEFAULT = True
 SAVE_DATASET_SPLITS_DEFAULT = False

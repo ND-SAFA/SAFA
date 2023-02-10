@@ -16,7 +16,7 @@
             "model_path": "hf-internal-testing/tiny-random-bert"
           },
           "trainer_args": {
-            "num_train_epochs": 5,
+            "num_train_epochs": 2,
             "gradient_accumulation_steps": 1,
             "learning_rate": 5e-5,
             "metrics": [
@@ -34,19 +34,29 @@
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "STRUCTURE",
-                "project_path": "[DATA_PATH]/lhp/cooling"
+                "project_path": {
+                  "*": [
+                    "[DATA_PATH]/lhp/cooling",
+                    "[DATA_PATH]/lhp/heating"
+                  ]
+                }
               },
               "filter_unlinked_artifacts": true
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",
               "split_strategy": "SPLIT_BY_LINK",
-              "val_percentage": 0.30
+              "val_percentage": 0.15
             },
             "eval_dataset_creator": {
               "object_type": "SPLIT",
               "split_strategy": "SPLIT_BY_LINK",
-              "val_percentage": 0.30
+              "val_percentage": {
+                "*": [
+                  0.30,
+                  0.7
+                ]
+              }
             },
             "augmenter": {
               "steps": [

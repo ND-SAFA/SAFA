@@ -1,8 +1,6 @@
 <template>
   <private-page>
-    <template #page>
-      <project-version-stepper />
-    </template>
+    <project-version-stepper />
   </private-page>
 </template>
 

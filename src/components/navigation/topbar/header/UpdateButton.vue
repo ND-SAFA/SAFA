@@ -1,6 +1,6 @@
 <template>
   <text-button
-    v-if="hasUpdate"
+    v-if="appStore.runUpdate"
     text
     small
     color="accent"
@@ -13,31 +13,22 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+/**
+ * Renders a button to update the current project.
+ */
+export default {
+  name: "UpdateButton",
+};
+</script>
+
+<script setup lang="ts">
 import { appStore } from "@/hooks";
 import { TextButton } from "@/components/common";
 
 /**
- * Renders a button to update the current project.
+ * Runs the current update.
  */
-export default Vue.extend({
-  name: "UpdateButton",
-  components: { TextButton },
-  computed: {
-    /**
-     * @return Whether the app has an update.
-     */
-    hasUpdate(): boolean {
-      return !!appStore.runUpdate;
-    },
-  },
-  methods: {
-    /**
-     * Runs the current update.
-     */
-    async handleClick(): Promise<void> {
-      await appStore.loadAppChanges();
-    },
-  },
-});
+function handleClick(): void {
+  appStore.loadAppChanges();
+}
 </script>

@@ -13,15 +13,15 @@
       <v-icon class="white--text"> {{ messageIcon }} </v-icon>
       <typography color="white" align="center" x="2" :value="snackbarMessage" />
       <flex-box align="center">
-        <v-btn
-          text
+        <text-button
           v-if="hasErrors"
+          text
           color="white"
-          @click="handleSeeError"
           class="ma-0"
+          @click="handleSeeError"
         >
           See Errors
-        </v-btn>
+        </text-button>
         <icon-button
           v-if="showAction"
           color="white"
@@ -39,12 +39,21 @@
       </flex-box>
     </flex-box>
 
-    <ServerErrorModal :isOpen="isErrorDisplayOpen" :errors="errors" />
+    <ServerErrorModal :is-open="appStore.isErrorDisplayOpen" :errors="errors" />
   </v-snackbar>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+/**
+ * Displays snackbar messages.
+ */
+export default {
+  name: "Snackbar",
+};
+</script>
+
+<script setup lang="ts">
+import { computed, ref, watch } from "vue";
 import { MessageType, SnackbarMessage } from "@/types";
 import { ThemeColors } from "@/util";
 import { appStore, logStore } from "@/hooks";
@@ -53,123 +62,83 @@ import {
   IconButton,
   Typography,
   FlexBox,
+  TextButton,
 } from "@/components/common";
 
-/**
- * Displays snackbar messages.
- */
-export default Vue.extend({
-  name: "Snackbar",
-  components: {
-    IconButton,
-    FlexBox,
-    Typography,
-    ServerErrorModal,
-  },
-  data() {
-    return {
-      timeout: 5000,
-      showSnackbar: false,
-      snackbarMessage: "",
-      messageType: MessageType.CLEAR as MessageType,
-      errors: [] as string[],
-    };
-  },
-  methods: {
-    /**
-     * Displays a snackbar message.
-     * @param snackbarMessage - The message to display.
-     */
-    showMessage(snackbarMessage: SnackbarMessage) {
-      this.showSnackbar = true;
-      this.snackbarMessage = String(snackbarMessage.message);
-      this.errors = snackbarMessage.errors || [];
-      this.messageType = snackbarMessage.type;
-    },
-    /**
-     * Opens the error display panel.
-     */
-    handleSeeError(): void {
-      appStore.toggleErrorDisplay();
-    },
-    /**
-     * Runs changes that are pending.
-     */
-    handleAction(): void {
-      this.showSnackbar = false;
-      appStore.loadAppChanges();
-    },
-  },
-  computed: {
-    /**
-     * @return Whether there arte any errors.
-     */
-    hasErrors(): boolean {
-      return this.errors.length > 0;
-    },
-    /**
-     * @return The current message.
-     */
-    message() {
-      return logStore.message;
-    },
-    /**
-     * @return Whether the error display is open.
-     */
-    isErrorDisplayOpen(): boolean {
-      return appStore.isErrorDisplayOpen;
-    },
-    /**
-     * @return The message color for the current message.
-     */
-    messageColor(): string {
-      switch (this.messageType) {
-        case MessageType.INFO:
-          return "primary";
-        case MessageType.WARNING:
-          return "warning";
-        case MessageType.ERROR:
-          return "error";
-        case MessageType.SUCCESS:
-          return ThemeColors.added;
-        default:
-          return ThemeColors.modified;
-      }
-    },
-    /**
-     * @return The message icon for the current message.
-     */
-    messageIcon(): string {
-      switch (this.messageType) {
-        case MessageType.INFO:
-          return "mdi-alert-circle-outline";
-        case MessageType.WARNING:
-          return "mdi-alert-outline";
-        case MessageType.ERROR:
-          return "mdi-alert-octagon-outline";
-        case MessageType.SUCCESS:
-          return "mdi-check-outline";
-        default:
-          return "mdi-alert-circle-outline";
-      }
-    },
-    /**
-     * @return Whether an action if one should be run on this notification.
-     */
-    showAction(): boolean {
-      return this.messageType === MessageType.UPDATE;
-    },
-  },
-  watch: {
-    /**
-     * When a new message is added, it will be displayed.
-     */
-    message(newMessage: SnackbarMessage) {
-      if (newMessage.type === MessageType.CLEAR) return;
+const timeout = 5000;
 
-      this.showMessage(newMessage);
-      logStore.clearMessage();
-    },
-  },
+const showSnackbar = ref(false);
+const snackbarMessage = ref("");
+const messageType = ref<MessageType>(MessageType.CLEAR);
+const errors = ref<string[]>([]);
+
+const hasErrors = computed(() => errors.value.length > 0);
+
+const messageColor = computed(() => {
+  switch (messageType.value) {
+    case MessageType.INFO:
+      return "primary";
+    case MessageType.WARNING:
+      return "warning";
+    case MessageType.ERROR:
+      return "error";
+    case MessageType.SUCCESS:
+      return ThemeColors.added;
+    default:
+      return ThemeColors.modified;
+  }
 });
+
+const messageIcon = computed(() => {
+  switch (messageType.value) {
+    case MessageType.INFO:
+      return "mdi-alert-circle-outline";
+    case MessageType.WARNING:
+      return "mdi-alert-outline";
+    case MessageType.ERROR:
+      return "mdi-alert-octagon-outline";
+    case MessageType.SUCCESS:
+      return "mdi-check-outline";
+    default:
+      return "mdi-alert-circle-outline";
+  }
+});
+
+const showAction = computed(() => messageType.value === MessageType.UPDATE);
+
+/**
+ * Displays a snackbar message.
+ * @param message - The message to display.
+ */
+function handleShowMessage(message: SnackbarMessage) {
+  showSnackbar.value = true;
+  snackbarMessage.value = String(message.message);
+  errors.value = message.errors || [];
+  messageType.value = message.type;
+}
+
+/**
+ * Opens the error display panel.
+ */
+function handleSeeError(): void {
+  appStore.toggleErrorDisplay();
+}
+
+/**
+ * Runs changes that are pending.
+ */
+function handleAction(): void {
+  showSnackbar.value = false;
+  appStore.loadAppChanges();
+}
+
+watch(
+  () => logStore.message,
+  (newMessage) => {
+    if (newMessage.type === MessageType.CLEAR) return;
+
+    handleShowMessage(newMessage);
+    logStore.clearMessage();
+  }
+);
 </script>

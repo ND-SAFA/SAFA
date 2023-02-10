@@ -13,31 +13,17 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+/**
+ * Renders options specific to the artifact graph.
+ */
+export default {
+  name: "GraphBar",
+};
+</script>
+
+<script setup lang="ts">
 import { FlexBox, CommitButtons } from "@/components/common";
 import { DocumentSelector } from "@/components/document";
 import GraphButtons from "./GraphButtons.vue";
 import ModeButtons from "./ModeButtons.vue";
-
-/**
- * Renders options specific to the artifact graph.
- */
-export default Vue.extend({
-  name: "GraphBar",
-  components: {
-    ModeButtons,
-    GraphButtons,
-    CommitButtons,
-    FlexBox,
-    DocumentSelector,
-  },
-  props: {},
-  data() {
-    return {};
-  },
-  computed: {},
-  methods: {},
-});
 </script>
-
-<style scoped lang="scss"></style>

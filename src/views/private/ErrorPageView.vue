@@ -1,16 +1,14 @@
 <template>
   <private-page>
-    <template #page>
-      <v-row justify="center">
-        <v-col align-self="center">
-          <safa-icon />
-          <typography
-            value="Sorry, an error has occurred. Please refresh your browser and try
+    <v-row justify="center">
+      <v-col align-self="center">
+        <safa-icon />
+        <typography
+          value="Sorry, an error has occurred. Please refresh your browser and try
             again."
-          />
-        </v-col>
-      </v-row>
-    </template>
+        />
+      </v-col>
+    </v-row>
   </private-page>
 </template>
 

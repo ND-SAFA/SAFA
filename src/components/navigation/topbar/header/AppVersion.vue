@@ -22,13 +22,13 @@
       class="nav-input"
       @input="handleLoadVersion"
     >
-      <template v-slot:selection>
-        {{ getVersionName(version) }}
+      <template #selection>
+        {{ versionToString(version) }}
       </template>
-      <template v-slot:item="{ item }">
-        {{ getVersionName(item) }}
+      <template #item="{ item }">
+        {{ versionToString(item) }}
       </template>
-      <template v-slot:append-item>
+      <template #append-item>
         <text-button text variant="add" @click="openCreateVersion = true">
           Add Version
         </text-button>
@@ -45,7 +45,16 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+/**
+ * Displays the current project version.
+ */
+export default {
+  name: "AppVersion",
+};
+</script>
+
+<script setup lang="ts">
+import { computed, onMounted, ref, watch } from "vue";
 import { VersionSchema } from "@/types";
 import { versionToString } from "@/util";
 import { projectStore } from "@/hooks";
@@ -53,83 +62,38 @@ import { getProjectVersions, handleLoadVersion } from "@/api";
 import { Typography, FlexBox, TextButton } from "@/components/common";
 import { VersionCreator } from "@/components/project/selector";
 
+const versions = ref<VersionSchema[]>([]);
+const openCreateVersion = ref(false);
+
+const project = computed(() => projectStore.project);
+const version = computed(() => projectStore.version);
+const isProjectDefined = computed(() => projectStore.isProjectDefined);
+const projectName = computed(() =>
+  isProjectDefined.value ? project.value.name : "No Project Selected"
+);
+
 /**
- * Displays the current project version.
+ * Loads the versions of the current project.
  */
-export default Vue.extend({
-  name: "AppVersion",
-  components: { TextButton, FlexBox, Typography, VersionCreator },
-  data() {
-    return {
-      versions: [] as VersionSchema[],
-      openCreateVersion: false,
-    };
-  },
-  mounted() {
-    this.loadVersions();
-  },
-  computed: {
-    /**
-     * @return The current project.
-     */
-    project() {
-      return projectStore.project;
-    },
-    /**
-     * @return The current version.
-     */
-    version() {
-      return projectStore.project.projectVersion;
-    },
-    /**
-     * @return Whether a project is currently loaded.
-     */
-    isProjectDefined(): boolean {
-      return projectStore.isProjectDefined;
-    },
-    /**
-     * @return The name of this project.
-     */
-    projectName(): string {
-      return this.isProjectDefined ? this.project.name : "No Project Selected";
-    },
-  },
-  methods: {
-    /**
-     * Loads the versions of the current project.
-     */
-    async loadVersions(): Promise<void> {
-      const { projectId } = this.project;
-      this.versions = projectId ? await getProjectVersions(projectId) : [];
-    },
-    /**
-     * Returns a version's name.
-     * @param version - The version to name.
-     * @return The version's name.
-     */
-    getVersionName(version: VersionSchema): string {
-      return versionToString(version);
-    },
-    /**
-     * Loads the versions of the current project.
-     */
-    async handleLoadVersion(versionId: string): Promise<void> {
-      await handleLoadVersion(versionId);
-    },
-    /**
-     * Adds the new version the version list and loads that version.
-     * @param version - The new version.
-     */
-    async handleVersionCreated(version: VersionSchema): Promise<void> {
-      this.versions = [version, ...this.versions];
-      this.openCreateVersion = false;
-      await handleLoadVersion(version.versionId);
-    },
-  },
-  watch: {
-    project() {
-      this.loadVersions();
-    },
-  },
-});
+async function updateVersionList(): Promise<void> {
+  const { projectId } = project.value;
+  versions.value = projectId ? await getProjectVersions(projectId) : [];
+}
+
+/**
+ * Adds the new version the version list and loads that version.
+ * @param version - The new version.
+ */
+async function handleVersionCreated(version: VersionSchema): Promise<void> {
+  versions.value = [version, ...versions.value];
+  openCreateVersion.value = false;
+  await handleLoadVersion(version.versionId);
+}
+
+onMounted(() => updateVersionList());
+
+watch(
+  () => project.value,
+  () => updateVersionList()
+);
 </script>

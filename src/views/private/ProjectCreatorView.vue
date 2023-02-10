@@ -1,8 +1,6 @@
 <template>
   <private-page>
-    <template #page>
-      <project-creator />
-    </template>
+    <project-creator />
   </private-page>
 </template>
 

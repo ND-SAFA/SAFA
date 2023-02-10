@@ -1,8 +1,6 @@
 <template>
   <private-page full-window>
-    <template #page>
-      <trace-prediction-tabs />
-    </template>
+    <trace-prediction-tabs />
   </private-page>
 </template>
 

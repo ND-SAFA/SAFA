@@ -1,6 +1,6 @@
 <template>
-  <v-container v-if="isLoggedIn" :class="className">
-    <slot name="page" />
+  <v-container v-if="sessionStore.doesSessionExist" :class="className">
+    <slot />
   </v-container>
   <v-container v-else class="my-8">
     <div class="mx-auto width-fit" style="margin-top: 40vh">
@@ -10,30 +10,23 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { sessionStore } from "@/hooks";
-
 /**
  * Displays a page with top and sidebars.
  */
-export default Vue.extend({
+export default {
   name: "PrivatePage",
-  props: {
-    fullWindow: Boolean,
-  },
-  computed: {
-    /**
-     * Returns whether a user is currently logged in.
-     */
-    isLoggedIn() {
-      return sessionStore.doesSessionExist;
-    },
-    /**
-     * @return The page's class name.
-     */
-    className(): string {
-      return this.fullWindow ? "full-window-page primary-bg" : "primary-bg";
-    },
-  },
-});
+};
+</script>
+
+<script setup lang="ts">
+import { computed, defineProps } from "vue";
+import { sessionStore } from "@/hooks";
+
+const props = defineProps<{
+  fullWindow?: boolean;
+}>();
+
+const className = computed(() =>
+  props.fullWindow ? "full-window-page primary-bg" : "primary-bg"
+);
 </script>

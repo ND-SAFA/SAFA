@@ -1,14 +1,12 @@
 <template>
   <v-navigation-drawer
-    app
-    right
-    clipped
-    hide-overlay
+    location="right"
     disable-resize-watcher
-    :value="drawerOpen"
+    :model-value="drawerOpen"
     height="100%"
     :width="width"
     class="primary-bg"
+    :scrim="false"
   >
     <v-container class="full-height">
       <flex-box justify="space-between" align="center">
@@ -36,8 +34,16 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { DetailsOpenState } from "@/types";
+/**
+ * Renders content in a right side panel.
+ */
+export default {
+  name: "DetailsDrawer",
+};
+</script>
+
+<script setup lang="ts">
+import { computed } from "vue";
 import { appStore, selectionStore } from "@/hooks";
 import { IconButton, Typography, FlexBox } from "@/components/common";
 import { DeltaPanel } from "@/components/delta";
@@ -54,92 +60,54 @@ import {
 } from "@/components/traceLink/panels";
 import { ArtifactLevelPanel, TraceMatrixPanel } from "@/components/tim";
 
-/**
- * Renders content in a right side panel.
- */
-export default Vue.extend({
-  name: "DetailsDrawer",
-  components: {
-    TraceMatrixPanel,
-    ArtifactLevelPanel,
-    SaveTraceLinkPanel,
-    TraceLinkPanel,
-    SaveArtifactPanel,
-    ArtifactBodyPanel,
-    ArtifactPanel,
-    DocumentPanel,
-    DeltaPanel,
-    Typography,
-    FlexBox,
-    IconButton,
-    GenerateTraceLinkPanel,
-  },
-  computed: {
-    /**
-     * @return The state of the details panel.
-     */
-    openState(): DetailsOpenState {
-      return appStore.isDetailsPanelOpen;
-    },
-    /**
-     * @return Whether the details panel is open.
-     */
-    drawerOpen(): boolean {
-      return typeof this.openState === "string";
-    },
-    /**
-     * @return The title of the panel.
-     */
-    title(): string {
-      switch (appStore.isDetailsPanelOpen) {
-        case "delta":
-          return "Version Delta";
-        case "document":
-          return "Save View";
-        case "displayArtifact":
-          return "Artifact";
-        case "displayArtifactBody":
-          return "Artifact Body";
-        case "saveArtifact":
-          return "Save Artifact";
-        case "displayTrace":
-          return "Trace Link";
-        case "saveTrace":
-          return "Create Trace Link";
-        case "generateTrace":
-          return "Generate Trace Links";
-        case "displayArtifactLevel":
-          return "Artifact Type";
-        case "displayTraceMatrix":
-          return "Trace Matrix";
-        default:
-          return "";
-      }
-    },
-    /**
-     * @return The width of the panel.
-     */
-    width(): string {
-      if (
-        appStore.isDetailsPanelOpen === "displayArtifactBody" ||
-        appStore.isDetailsPanelOpen === "displayArtifact" ||
-        appStore.isDetailsPanelOpen === "saveArtifact"
-      ) {
-        return "600";
-      } else if (appStore.isDetailsPanelOpen === "generateTrace") {
-        return "800";
-      } else {
-        return "400";
-      }
-    },
-  },
-  methods: {
-    /**
-     * Toggles whether the details panel is open.
-     */
-    handleClose(): void {
-      selectionStore.clearSelections();
-    },
-  },
+const openState = computed(() => appStore.isDetailsPanelOpen);
+const drawerOpen = computed(() => typeof openState.value === "string");
+
+const title = computed(() => {
+  switch (openState.value) {
+    case "delta":
+      return "Version Delta";
+    case "document":
+      return "Save View";
+    case "displayArtifact":
+      return "Artifact";
+    case "displayArtifactBody":
+      return "Artifact Body";
+    case "saveArtifact":
+      return "Save Artifact";
+    case "displayTrace":
+      return "Trace Link";
+    case "saveTrace":
+      return "Create Trace Link";
+    case "generateTrace":
+      return "Generate Trace Links";
+    case "displayArtifactLevel":
+      return "Artifact Type";
+    case "displayTraceMatrix":
+      return "Trace Matrix";
+    default:
+      return "";
+  }
 });
+
+const width = computed(() => {
+  if (
+    openState.value === "displayArtifactBody" ||
+    openState.value === "displayArtifact" ||
+    openState.value === "saveArtifact"
+  ) {
+    return "600";
+  } else if (openState.value === "generateTrace") {
+    return "800";
+  } else {
+    return "400";
+  }
+});
+
+/**
+ * Toggles whether the details panel is open.
+ */
+function handleClose(): void {
+  selectionStore.clearSelections();
+}
 </script>

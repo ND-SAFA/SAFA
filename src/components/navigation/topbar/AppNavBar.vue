@@ -1,38 +1,37 @@
 <template>
-  <v-app-bar app clipped-right :color="$vuetify.theme.dark ? '' : 'primary'">
+  <v-app-bar clipped-right :color="darkMode ? '' : 'primary'">
     <header-bar />
-    <template v-slot:extension v-if="graphVisible">
+    <template v-if="graphVisible" #extension>
       <graph-bar />
     </template>
   </v-app-bar>
 </template>
 
 <script lang="ts">
-import Vue, { ref, watch } from "vue";
+/**
+ * Renders the top navigation bar.
+ */
+export default {
+  name: "AppNavBar",
+};
+</script>
+
+<script setup lang="ts">
+import { useTheme } from "vuetify";
+import { computed, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { Routes } from "@/router";
 import { HeaderBar } from "./header";
 import { GraphBar } from "./graph";
 
-/**
- * Renders the top navigation bar.
- */
-export default Vue.extend({
-  name: "AppNavBar",
-  components: {
-    HeaderBar,
-    GraphBar,
-  },
-  setup() {
-    const currentRoute = useRoute();
-    const graphVisible = ref(currentRoute.path === Routes.ARTIFACT);
+const theme = useTheme();
+const darkMode = computed(() => theme.global.current.value.dark);
 
-    watch(
-      () => currentRoute.path,
-      () => (graphVisible.value = currentRoute.path === Routes.ARTIFACT)
-    );
+const currentRoute = useRoute();
+const graphVisible = ref(currentRoute.path === Routes.ARTIFACT);
 
-    return { graphVisible };
-  },
-});
+watch(
+  () => currentRoute.path,
+  () => (graphVisible.value = currentRoute.path === Routes.ARTIFACT)
+);
 </script>

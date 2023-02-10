@@ -1,8 +1,6 @@
 <template>
   <private-page full-window>
-    <template #page>
-      <settings-tabs />
-    </template>
+    <settings-tabs />
   </private-page>
 </template>
 

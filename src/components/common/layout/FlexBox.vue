@@ -5,85 +5,65 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
-import { JustifyType, SizeType, AlignType } from "@/types";
-
 /**
  * A generic component for displaying flex content.
  */
-export default Vue.extend({
+export default {
   name: "FlexBox",
-  props: {
-    align: {
-      type: String as PropType<AlignType>,
-      default: "left",
-    },
-    justify: {
-      type: String as PropType<JustifyType>,
-      default: "start",
-    },
-    x: {
-      type: String as PropType<SizeType>,
-      default: "",
-    },
-    l: {
-      type: String as PropType<SizeType>,
-      default: "",
-    },
-    r: {
-      type: String as PropType<SizeType>,
-      default: "",
-    },
-    y: {
-      type: String as PropType<SizeType>,
-      default: "",
-    },
-    t: {
-      type: String as PropType<SizeType>,
-      default: "",
-    },
-    b: {
-      type: String as PropType<SizeType>,
-      default: "",
-    },
-    maxWidth: Number,
-    fullWidth: Boolean,
-    column: Boolean,
-    wrap: Boolean,
-  },
-  computed: {
-    /**
-     * @return The class name.
-     */
-    style(): string {
-      if (this.maxWidth) {
-        return `max-width: ${this.maxWidth}px`;
-      } else {
-        return "";
-      }
-    },
-    /**
-     * @return The class name.
-     */
-    className(): string {
-      let classNames = `d-flex `;
-
-      if (this.align) classNames += ` align-${this.align}`;
-      if (this.justify) classNames += ` justify-${this.justify}`;
-      if (this.fullWidth) classNames += ` full-width`;
-      if (this.column) classNames += ` flex-column`;
-      if (this.wrap) classNames += ` flex-wrap`;
-      if (this.x) classNames += ` mx-${this.x}`;
-      if (this.l) classNames += ` ml-${this.l}`;
-      if (this.r) classNames += ` mr-${this.r}`;
-      if (this.y) classNames += ` my-${this.y}`;
-      if (this.t) classNames += ` mt-${this.t}`;
-      if (this.b) classNames += ` mb-${this.b}`;
-
-      return classNames;
-    },
-  },
-});
+};
 </script>
 
-<style scoped></style>
+<script setup lang="ts">
+import { computed, withDefaults, defineProps } from "vue";
+import { JustifyType, SizeType, AlignType } from "@/types";
+
+const props = withDefaults(
+  defineProps<{
+    align?: AlignType;
+    justify?: JustifyType;
+    x?: SizeType;
+    y?: SizeType;
+    l?: SizeType;
+    r?: SizeType;
+    t?: SizeType;
+    b?: SizeType;
+    maxWidth?: number;
+    fullWidth?: boolean;
+    column?: boolean;
+    wrap?: boolean;
+  }>(),
+  {
+    align: "start",
+    justify: "start",
+    x: "",
+    y: "",
+    l: "",
+    r: "",
+    t: "",
+    b: "",
+    maxWidth: undefined,
+  }
+);
+
+const style = computed(() =>
+  props.maxWidth ? `max-width: ${props.maxWidth}px` : ""
+);
+
+const className = computed(() => {
+  let classNames = `d-flex `;
+
+  if (props.align) classNames += ` align-${props.align}`;
+  if (props.justify) classNames += ` justify-${props.justify}`;
+  if (props.fullWidth) classNames += ` full-width`;
+  if (props.column) classNames += ` flex-column`;
+  if (props.wrap) classNames += ` flex-wrap`;
+  if (props.x) classNames += ` mx-${props.x}`;
+  if (props.l) classNames += ` ml-${props.l}`;
+  if (props.r) classNames += ` mr-${props.r}`;
+  if (props.y) classNames += ` my-${props.y}`;
+  if (props.t) classNames += ` mt-${props.t}`;
+  if (props.b) classNames += ` mb-${props.b}`;
+
+  return classNames;
+});
+</script>

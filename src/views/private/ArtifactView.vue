@@ -1,23 +1,21 @@
 <template>
   <private-page full-window>
-    <template #page>
-      <project-tree />
-      <artifact-fab />
+    <project-tree />
+    <artifact-fab />
 
-      <tab-list
-        v-if="layoutStore.isTableMode"
-        v-model="tab"
-        :tabs="tabs"
-        class="my-4 mx-10"
-      >
-        <v-tab key="1">
-          <artifact-table />
-        </v-tab>
-        <v-tab key="2">
-          <trace-matrix-table />
-        </v-tab>
-      </tab-list>
-    </template>
+    <tab-list
+      v-if="layoutStore.isTableMode"
+      v-model="tab"
+      :tabs="tabs"
+      class="my-4 mx-10"
+    >
+      <v-tab key="1">
+        <artifact-table />
+      </v-tab>
+      <v-tab key="2">
+        <trace-matrix-table />
+      </v-tab>
+    </tab-list>
   </private-page>
 </template>
 

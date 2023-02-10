@@ -1,21 +1,20 @@
 <template>
-  <v-menu offset-y @input="handleOpen" top>
-    <template v-slot:activator="{ on, attrs }">
+  <v-menu offset-y top @input="handleOpen">
+    <template #activator="{ props }">
       <v-btn
         icon
+        size="small"
+        variant="text"
         color="primary"
-        v-bind="attrs"
-        v-on="on"
-        style="position: relative; right: 6px"
+        v-bind="props"
+        style="position: relative; right: 8px"
       >
-        <v-badge overlap color="primary" :value="newNotifications > 0">
-          <template v-slot:badge>
-            <typography
-              color="white"
-              :value="newNotifications"
-              style="line-height: unset; font-size: 12px !important"
-            />
-          </template>
+        <v-badge
+          overlap
+          color="primary"
+          :model-value="newNotifications > 0"
+          :content="newNotifications"
+        >
           <v-icon>mdi-bell-outline</v-icon>
         </v-badge>
       </v-btn>
@@ -38,41 +37,30 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { SnackbarMessage } from "@/types";
-import { logStore } from "@/hooks";
-import { Typography } from "@/components/common";
-
 /**
  * Displays the user's notifications.
  */
-export default Vue.extend({
+export default {
   name: "Notifications",
-  components: { Typography },
-  data() {
-    return { viewedMessages: 0 };
-  },
-  computed: {
-    /**
-     * @return The current list of notifications.
-     */
-    notifications(): SnackbarMessage[] {
-      return logStore.notifications;
-    },
-    /**
-     * @return The number of new notifications.
-     */
-    newNotifications(): number {
-      return Math.max(this.notifications.length - this.viewedMessages, 0);
-    },
-  },
-  methods: {
-    /**
-     * Sets all messages to viewed on open.
-     */
-    handleOpen() {
-      this.viewedMessages = this.notifications.length;
-    },
-  },
-});
+};
+</script>
+
+<script setup lang="ts">
+import { computed, ref } from "vue";
+import { logStore } from "@/hooks";
+import { Typography } from "@/components/common";
+
+const viewedMessages = ref(0);
+
+const notifications = computed(() => logStore.notifications);
+const newNotifications = computed(() =>
+  Math.max(notifications.value.length - viewedMessages.value, 0)
+);
+
+/**
+ * Sets all messages to viewed on open.
+ */
+function handleOpen() {
+  viewedMessages.value = notifications.value.length;
+}
 </script>

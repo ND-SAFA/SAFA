@@ -1,8 +1,6 @@
 <template>
   <private-page>
-    <template #page>
-      <my-account />
-    </template>
+    <my-account />
   </private-page>
 </template>
 

@@ -1,8 +1,6 @@
 <template>
   <private-page>
-    <template #page>
-      <job-display />
-    </template>
+    <job-display />
   </private-page>
 </template>
 

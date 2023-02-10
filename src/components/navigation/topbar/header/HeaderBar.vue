@@ -10,13 +10,22 @@
         <app-version />
       </flex-box>
     </flex-box>
-    <v-divider class="accent faded mt-2" v-if="graphVisible" />
+    <v-divider v-if="graphVisible" class="accent faded mt-2" />
     <loading-bar />
   </div>
 </template>
 
 <script lang="ts">
-import Vue, { ref, watch } from "vue";
+/**
+ * Renders the top navigation bar header.
+ */
+export default {
+  name: "HeaderBar",
+};
+</script>
+
+<script setup lang="ts">
+import { ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { Routes } from "@/router";
 import { FlexBox } from "@/components/common";
@@ -26,29 +35,11 @@ import SavingIcon from "./SavingIcon.vue";
 import UpdateButton from "./UpdateButton.vue";
 import LoadingBar from "./LoadingBar.vue";
 
-/**
- * Renders the top navigation bar header.
- */
-export default Vue.extend({
-  name: "HeaderBar",
-  components: {
-    Searchbar,
-    SavingIcon,
-    UpdateButton,
-    AppVersion,
-    FlexBox,
-    LoadingBar,
-  },
-  setup() {
-    const currentRoute = useRoute();
-    const graphVisible = ref(currentRoute.path === Routes.ARTIFACT);
+const currentRoute = useRoute();
+const graphVisible = ref(currentRoute.path === Routes.ARTIFACT);
 
-    watch(
-      () => currentRoute.path,
-      () => (graphVisible.value = currentRoute.path === Routes.ARTIFACT)
-    );
-
-    return { graphVisible };
-  },
-});
+watch(
+  () => currentRoute.path,
+  () => (graphVisible.value = currentRoute.path === Routes.ARTIFACT)
+);
 </script>

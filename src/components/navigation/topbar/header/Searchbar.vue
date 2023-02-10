@@ -14,7 +14,7 @@
       item-text="name"
       item-value="id"
       class="mx-1 mt-1 nav-input"
-      :filter="filterArtifacts"
+      :filter="filter"
       data-cy="input-artifact-search-nav"
     >
       <template #append>
@@ -45,80 +45,68 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+/**
+ * Artifact search bar.
+ */
+export default {
+  name: "Searchbar",
+};
+</script>
+
+<script setup lang="ts">
+import { computed, ref } from "vue";
 import { ArtifactSearchItem } from "@/types";
 import { filterArtifacts, objectToArray } from "@/util";
 import { typeOptionsStore, artifactStore, selectionStore } from "@/hooks";
 import { ArtifactBodyDisplay, Typography, FlexBox } from "@/components/common";
 
+const queryText = ref<string | null>("");
+
 /**
- * Artifact search bar.
+ * Filters what artifacts are currently visible.
+ * @param artifact - The artifact item to filter.
+ * @param queryText - The current query text.
  */
-export default Vue.extend({
-  name: "Searchbar",
-  components: {
-    FlexBox,
-    Typography,
-    ArtifactBodyDisplay,
-  },
-  data() {
-    return {
-      queryText: "" as string | null,
-    };
-  },
-  computed: {
-    /**
-     * Returns the display text for how many matches there are.
-     */
-    matchText(): string {
-      if (!this.queryText) return "";
+function filter(artifact: ArtifactSearchItem, queryText: string | null) {
+  if (!queryText) {
+    return true;
+  } else if ("header" in artifact || "divider" in artifact) {
+    return false;
+  } else {
+    return filterArtifacts(artifact, queryText);
+  }
+}
 
-      const count = artifactStore.currentArtifacts.filter((artifact) =>
-        filterArtifacts(artifact, this.queryText || "")
-      ).length;
+/**
+ * Returns the display text for how many matches there are.
+ */
+const matchText = computed(() => {
+  if (!queryText.value) return "";
 
-      return count === 1 ? "1 Match" : `${count} Matches`;
-    },
-    /**
-     * @return The artifacts to select from.
-     */
-    artifacts(): ArtifactSearchItem[] {
-      return objectToArray(
-        artifactStore.getArtifactsByType,
-        ([type, artifacts]) => [
-          { header: typeOptionsStore.getArtifactTypeDisplay(type) },
-          ...artifacts,
-        ]
-      );
-    },
-    value: {
-      get() {
-        return selectionStore.selectedArtifact?.id;
-      },
-      set(artifactId: string | null) {
-        if (artifactId) {
-          selectionStore.viewArtifactSubtree(artifactId);
-        } else {
-          selectionStore.clearSelections();
-        }
-      },
-    },
+  const count = artifactStore.currentArtifacts.filter((artifact) =>
+    filter(artifact, queryText.value || "")
+  ).length;
+
+  return count === 1 ? "1 Match" : `${count} Matches`;
+});
+
+const artifacts = computed(() =>
+  objectToArray(artifactStore.getArtifactsByType, ([type, artifacts]) => [
+    { header: typeOptionsStore.getArtifactTypeDisplay(type) },
+    ...artifacts,
+  ])
+);
+
+const value = computed({
+  get() {
+    return selectionStore.selectedArtifact?.id;
   },
-  methods: {
-    /**
-     * Filters what artifacts are currently visible.
-     * @param artifact
-     * @param queryText
-     */
-    filterArtifacts(artifact: ArtifactSearchItem, queryText: string | null) {
-      if (!queryText) {
-        return true;
-      } else if ("header" in artifact || "divider" in artifact) {
-        return false;
-      } else {
-        return filterArtifacts(artifact, queryText);
-      }
-    },
+  set(artifactId: string | undefined) {
+    if (artifactId) {
+      selectionStore.viewArtifactSubtree(artifactId);
+    } else {
+      selectionStore.clearSelections();
+    }
   },
 });
 </script>

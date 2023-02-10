@@ -46,114 +46,92 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+/**
+ * Buttons for changing the mode of the artifact view.
+ */
+export default {
+  name: "ModeButtons",
+};
+</script>
+
+<script setup lang="ts">
+import { computed, ref, onMounted, watch } from "vue";
 import { GraphMode } from "@/types";
 import { appStore, deltaStore, documentStore, layoutStore } from "@/hooks";
 import { TextButton } from "@/components/common";
 
+const options = {
+  tim: GraphMode.tim,
+  tree: GraphMode.tree,
+  table: GraphMode.table,
+  delta: GraphMode.delta,
+};
+
+const value = ref<GraphMode[]>([]);
+
+const isTreeDisabled = computed(() => documentStore.isTableOnlyDocument);
+const isDeltaDisabled = computed(() => layoutStore.mode === GraphMode.tim);
+
 /**
- * Buttons for changing the mode of the artifact view.
+ * Updates the values of which buttons are highlighted.
  */
-export default Vue.extend({
-  name: "ModeButtons",
-  components: { TextButton },
-  data() {
-    return {
-      value: [] as GraphMode[],
-      options: {
-        tim: GraphMode.tim,
-        tree: GraphMode.tree,
-        table: GraphMode.table,
-        delta: GraphMode.delta,
-      },
-    };
-  },
-  mounted() {
-    this.updateValue();
-  },
-  computed: {
-    /**
-     * @return Whether the project is currently in delta view.
-     */
-    inDeltaView(): boolean {
-      return deltaStore.inDeltaView;
-    },
-    /**
-     * @return Whether the tree view is disabled.
-     */
-    isTreeDisabled(): boolean {
-      return documentStore.isTableOnlyDocument;
-    },
-    /**
-     * @return Whether the tree view is disabled.
-     */
-    isDeltaDisabled(): boolean {
-      return layoutStore.mode === GraphMode.tim;
-    },
-  },
-  methods: {
-    /**
-     * Updates the values of which buttons are highlighted.
-     */
-    updateValue(): void {
-      const selected: GraphMode[] = [];
+function updateValue(): void {
+  const selected: GraphMode[] = [];
 
-      selected.push(layoutStore.mode);
+  selected.push(layoutStore.mode);
 
-      if (this.inDeltaView) {
-        selected.push(GraphMode.delta);
-      }
+  if (deltaStore.inDeltaView) {
+    selected.push(GraphMode.delta);
+  }
 
-      this.value = selected;
-    },
-    /**
-     * Opens tree view.
-     */
-    handleTimView(): void {
-      layoutStore.mode = GraphMode.tim;
-      this.updateValue();
-    },
-    /**
-     * Opens tree view.
-     */
-    handleTreeView(): void {
-      layoutStore.mode = GraphMode.tree;
-      this.updateValue();
-    },
-    /**
-     * Opens table view.
-     */
-    handleTableView(): void {
-      layoutStore.mode = GraphMode.table;
-      this.updateValue();
-    },
-    /**
-     * Opens delta view.
-     */
-    handleDeltaView(): void {
-      appStore.openDetailsPanel("delta");
-      this.updateValue();
-    },
-  },
-  watch: {
-    /**
-     * Updates the value when delta view changes.
-     */
-    inDeltaView(): void {
-      this.updateValue();
-    },
-    /**
-     * Updates the value when the document type changes.
-     */
-    isTreeDisabled(): void {
-      this.updateValue();
-    },
-    /**
-     * Updates the value when the graph mode changes.
-     */
-    isDeltaDisabled(): void {
-      this.updateValue();
-    },
-  },
-});
+  value.value = selected;
+}
+
+/**
+ * Opens tree view.
+ */
+function handleTimView(): void {
+  layoutStore.mode = GraphMode.tim;
+  updateValue();
+}
+
+/**
+ * Opens tree view.
+ */
+function handleTreeView(): void {
+  layoutStore.mode = GraphMode.tree;
+  updateValue();
+}
+
+/**
+ * Opens table view.
+ */
+function handleTableView(): void {
+  layoutStore.mode = GraphMode.table;
+  updateValue();
+}
+/**
+ * Opens delta view.
+ */
+function handleDeltaView(): void {
+  appStore.openDetailsPanel("delta");
+  updateValue();
+}
+
+onMounted(() => updateValue());
+
+watch(
+  () => deltaStore.inDeltaView,
+  () => updateValue()
+);
+
+watch(
+  () => isTreeDisabled.value,
+  () => updateValue()
+);
+
+watch(
+  () => isDeltaDisabled.value,
+  () => updateValue()
+);
 </script>

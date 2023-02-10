@@ -1,31 +1,37 @@
 <template>
   <v-navigation-drawer
-    app
     permanent
-    :mini-variant="!sidebarOpen"
+    :rail="!sidebarOpen"
     height="100%"
-    class="elevation-1"
+    elevation="1"
   >
-    <flex-box v-if="sidebarOpen" full-width justify="center" t="3" b="3">
+    <flex-box
+      v-if="sidebarOpen"
+      full-width
+      justify="center"
+      align="center"
+      t="3"
+      b="3"
+    >
       <safa-icon style="width: 180px" />
       <icon-button
         large
         icon-id="mdi-menu-open"
         tooltip="Close sidebar"
-        :color="$vuetify.theme.dark ? 'secondary' : 'primary'"
+        :color="darkMode ? 'secondary' : 'primary'"
         data-cy="button-sidebar-close"
         @click="sidebarOpen = false"
       />
     </flex-box>
-    <flex-box justify="center" full-width v-else t="2">
+    <flex-box v-else justify="center" full-width t="2">
       <icon-button
         large
         icon-id="mdi-menu-open"
         tooltip="Open sidebar"
-        @click="sidebarOpen = true"
         color="primary"
         data-cy="button-sidebar-open"
         icon-style="transform: rotate(180deg)"
+        @click="sidebarOpen = true"
       />
     </flex-box>
 
@@ -35,38 +41,31 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+/**
+ * Renders the navigation drawer.
+ */
+export default {
+  name: "AppNavDrawer",
+};
+</script>
+
+<script setup lang="ts">
+import { computed } from "vue";
+import { useTheme } from "vuetify";
 import { appStore } from "@/hooks";
 import { FlexBox, IconButton, SafaIcon } from "@/components/common";
 import NavOptions from "./NavOptions.vue";
 import NavAccount from "./NavAccount.vue";
 
-/**
- * Renders the navigation drawer.
- */
-export default Vue.extend({
-  name: "AppNavDrawer",
-  components: {
-    NavOptions,
-    NavAccount,
-    FlexBox,
-    IconButton,
-    SafaIcon,
+const theme = useTheme();
+const darkMode = computed(() => theme.global.current.value.dark);
+
+const sidebarOpen = computed({
+  get(): boolean {
+    return appStore.isAppPanelOpen;
   },
-  computed: {
-    /**
-     * Manages changes to the panel open state.
-     */
-    sidebarOpen: {
-      get(): boolean {
-        return appStore.isAppPanelOpen;
-      },
-      set() {
-        appStore.toggleAppPanel();
-      },
-    },
+  set() {
+    appStore.toggleAppPanel();
   },
 });
 </script>
-
-<style scoped lang="scss"></style>

@@ -34,9 +34,9 @@
                   "object_type": "STRUCTURE",
                   "project_path": "[DATA_PATH]/git-data/prc_to_prc"
                 }
-              ]
-            },
-            "filter_unlinked_artifacts": true
+              ],
+              "filter_unlinked_artifacts": true
+            }
           }
         }
       ]

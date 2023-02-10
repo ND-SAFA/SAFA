@@ -1,17 +1,17 @@
-import json
 import os
 from copy import deepcopy
 from typing import Any, Dict, List, Optional, Type, Union
 
 import math
 
-from constants import EXIT_ON_FAILED_JOB, EXPERIMENTAL_VARS_IGNORE, RUN_ASYNC
+from constants import EXIT_ON_FAILED_JOB, RUN_ASYNC
 from jobs.abstract_job import AbstractJob
 from jobs.abstract_trace_job import AbstractTraceJob
 from jobs.components.job_result import JobResult
 from jobs.supported_job_type import SupportedJobType
 from jobs.train_job import TrainJob
 from train.save_strategy.comparison_criteria import ComparisonCriterion
+from train.wandb.Wandb import Wandb
 from util.base_object import BaseObject
 from util.file_util import FileUtil
 from util.json_util import JsonUtil
@@ -25,7 +25,6 @@ class ExperimentStep(BaseObject):
     Container for parallel jobs to run.
     """
     OUTPUT_FILENAME = "output.json"
-    BASE_EXPERIMENT_NAME = "base_experiment"
 
     def __init__(self, jobs: Union[List[AbstractJob], ExperimentalVariable], comparison_criterion: ComparisonCriterion = None):
         """
@@ -227,7 +226,7 @@ class ExperimentStep(BaseObject):
         :return: the updated jobs
         """
         for job in jobs:
-            run_name = ExperimentStep.get_run_name(job.result[JobResult.EXPERIMENTAL_VARS])
+            run_name = Wandb.get_run_name(job.result[JobResult.EXPERIMENTAL_VARS])
             job_base_path = os.path.join(output_dir, run_name)
             if isinstance(job, AbstractTraceJob):
                 model_path = os.path.join(job_base_path, "models")
@@ -236,25 +235,3 @@ class ExperimentStep(BaseObject):
                 setattr(job.trainer_args, "seed", job.job_args.random_seed)  # sets random seed so base trainer has access to it
                 setattr(job.model_manager, "output_dir", model_path)  # final model path same as checkpoint path
             setattr(job.job_args, "output_dir", job_base_path)  # points job to its unique path
-
-    @staticmethod
-    def get_run_name(experimental_vars) -> str:
-        """
-        Returns the name of the run by parsing experimental variables.
-        :param experimental_vars: The variables used to identify this run.
-        :return: String representing run name.
-        """
-        if experimental_vars is None or len(experimental_vars) == 0:
-            return ExperimentStep.BASE_EXPERIMENT_NAME
-        if isinstance(experimental_vars, str):
-            return experimental_vars
-
-        def clean(v: str):
-            if isinstance(v, str) and "/" in v:
-                v = os.path.split(v)[1]
-            if isinstance(v, float):
-                v = round(v, 2)
-            return v
-
-        run_name = {k: clean(v) for k, v in experimental_vars.items() if k not in EXPERIMENTAL_VARS_IGNORE}
-        return json.dumps(run_name)

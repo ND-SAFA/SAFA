@@ -5,6 +5,7 @@ from transformers import is_torch_tpu_available
 from transformers.integrations import WandbCallback
 
 from train.trainer_args import TrainerArgs
+from train.wandb.Wandb import Wandb
 
 GROUP_PROPERTIES = ["project_path"]
 
@@ -14,7 +15,15 @@ class TraceCallback(WandbCallback):
     Contains modifications including setting group of run.
     """
 
-    def setup(self, args: TrainerArgs, state, model, **kwargs):
+    def setup(self, args: TrainerArgs, state, model, **kwargs) -> None:
+        """
+        Initialize wandb with the correct group name using experimental variables.
+        :param args: The trainer args used to identify run.
+        :param state: The trainer state
+        :param model: The model being trained.
+        :param kwargs: Any additional arguments.
+        :return: None
+        """
         project = os.getenv("WANDB_PROJECT", "huggingface")
         run = args.run_name
         group = self.get_group(args.experimental_vars)
@@ -38,12 +47,14 @@ class TraceCallback(WandbCallback):
                     model, log=os.getenv("WANDB_WATCH", "gradients"), log_freq=max(100, args.logging_steps)
                 )
 
-    def get_group(self, experimental_vars: Dict) -> Optional[str]:
+    @staticmethod
+    def get_group(experimental_vars: Dict) -> Optional[str]:
         """
         Returns the name of the group using priority of group properties.
         :param experimental_vars:
         :return:
         """
+        experimental_vars = Wandb.get_clean_vars(experimental_vars)
         for prop in GROUP_PROPERTIES:
             if prop in experimental_vars:
                 return experimental_vars[prop]

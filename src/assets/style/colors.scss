@@ -1,31 +1,22 @@
 $color-accent: #FFD592;
 
+$background: rgb(var(--v-theme-background));
+$selected: rgb(var(--v-theme-selected));
+$text: rgb(var(--v-theme-text));
+$neutral: rgb(var(--v-theme-neutral));
+$primary: rgb(var(--v-theme-primary));
+
+$modifiedLight: rgb(var(--v-theme-modifiedLight));
+$removedLight: rgb(var(--v-theme-removedLight));
+
 .primary-border {
-  border: 1px solid var(--v-modifiedLight-base) !important;
+  border: 1px solid $modifiedLight !important;
 }
 
 .error-border {
-  border-color: var(--v-removedLight-base) !important;
+  border-color: $removedLight !important;
 }
 
 .transparent-bg {
   background-color: transparent !important;
-}
-
-.neutral-bg {
-  background-color: var(--v-neutral-base) !important;
-}
-
-.primary-bg {
-  background-color: var(--v-background-base) !important;
-}
-
-.primary {
-  background-color:  var(--v-primary-base) !important;
-  border-color: var(--v-primary-base) !important;
-}
-
-.secondary {
-  background-color: var(--v-secondary-base) !important;
-  border-color: var(--v-secondary-base) !important;
 }

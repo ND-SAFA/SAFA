@@ -9,12 +9,12 @@
       :tabs="tabs"
       class="my-4 mx-10"
     >
-      <v-tab key="1">
+      <v-window-item key="1">
         <artifact-table />
-      </v-tab>
-      <v-tab key="2">
+      </v-window-item>
+      <v-window-item key="2">
         <trace-matrix-table />
-      </v-tab>
+      </v-window-item>
     </tab-list>
   </private-page>
 </template>

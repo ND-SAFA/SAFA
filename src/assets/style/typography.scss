@@ -5,7 +5,7 @@ $body-font-family: "Source Sans Pro";
 
 .v-application {
   [class*="text-"] {
-    color: var(--v-text-base);
+    color: $text;
     font-family: $body-font-family, sans-serif !important;
   }
   font-family: $body-font-family, sans-serif !important;

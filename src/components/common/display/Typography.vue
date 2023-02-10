@@ -83,6 +83,7 @@ const props = withDefaults(
     ellipsis?: boolean;
     secondary?: boolean;
     bold?: boolean;
+    wrap?: boolean;
     variant?: TextType;
     el?: ElementType;
     align?: TextAlignType;
@@ -122,11 +123,11 @@ const className = computed(() => {
   let classNames = ` text-${props.align}`;
 
   if (props.classes) classNames += ` ${props.classes}`;
-  if (props.color && !darkMode.value) classNames += ` ${props.color}--text`;
+  if (props.color && !darkMode.value) classNames += ` text-${props.color}`;
   if (props.inheritColor) classNames += ` inherit-color`;
-  if (props.error) classNames += ` error--text`;
+  if (props.error) classNames += ` text-error`;
   if (props.ellipsis) classNames += ` text-ellipsis`;
-  if (props.secondary) classNames += ` text--secondary`;
+  if (props.secondary) classNames += ` text-secondary`;
   if (props.bold) classNames += ` font-weight-bold`;
   if (props.x) classNames += ` mx-${props.x}`;
   if (props.l) classNames += ` ml-${props.l}`;
@@ -134,6 +135,7 @@ const className = computed(() => {
   if (props.y) classNames += ` my-${props.y}`;
   if (props.t) classNames += ` mt-${props.t}`;
   if (props.b) classNames += ` mb-${props.b}`;
+  if (props.wrap) classNames += " text-wrap";
 
   switch (props.variant) {
     case "large":

@@ -1,32 +1,33 @@
 <template>
   <div class="mb-4">
-    <v-card outlined :class="className">
+    <v-card variant="outlined" :class="className">
       <slot />
     </v-card>
   </div>
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
-
 /**
  * Displays a card that contains panel content.
  */
-export default Vue.extend({
+export default {
   name: "PanelCard",
-  props: {
-    color: {
-      type: String as PropType<"primary" | "error" | "none">,
-      default: "primary",
-    },
-  },
-  computed: {
-    /**
-     * This card's class names.
-     */
-    className(): string {
-      return `pa-4 overflow-hidden ${this.color}-border`;
-    },
-  },
-});
+};
+</script>
+
+<script setup lang="ts">
+import { computed, withDefaults, defineProps } from "vue";
+
+const props = withDefaults(
+  defineProps<{
+    color?: "primary" | "error" | "none";
+  }>(),
+  {
+    color: "primary",
+  }
+);
+
+const className = computed(
+  () => `pa-4 overflow-hidden bg-neutral ${props.color}-border`
+);
 </script>

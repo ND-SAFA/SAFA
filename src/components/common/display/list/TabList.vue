@@ -9,9 +9,9 @@
       </v-tabs>
       <slot name="after" />
     </flex-box>
-    <v-tabs v-model="model" class="mt-1">
+    <v-window v-model="model" class="mt-1">
       <slot />
-    </v-tabs>
+    </v-window>
   </div>
 </template>
 

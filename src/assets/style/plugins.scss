@@ -4,7 +4,7 @@ code.hljs {
 }
 
 .vue-grid-item.vue-grid-placeholder {
-  background-color: var(--v-modifiedLight-base);
+  background-color: $modifiedLight;
 }
 
 .v-field__append-inner {

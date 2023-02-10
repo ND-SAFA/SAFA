@@ -8,15 +8,15 @@
       value="Create a project using one of the following methods."
     />
     <tab-list v-model="tab" :tabs="tabs">
-      <v-tab key="1">
+      <v-window-item key="1">
         <project-creator-stepper />
-      </v-tab>
-      <v-tab key="2">
+      </v-window-item>
+      <v-window-item key="2">
         <project-bulk-upload />
-      </v-tab>
-      <v-tab key="3">
+      </v-window-item>
+      <v-window-item key="3">
         <integrations-stepper type="create" />
-      </v-tab>
+      </v-window-item>
     </tab-list>
   </v-container>
 </template>

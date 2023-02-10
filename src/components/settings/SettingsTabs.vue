@@ -8,18 +8,18 @@
       <project-display />
     </template>
     <tab-list v-model="tab" :tabs="tabs">
-      <v-tab key="1">
+      <v-window-item key="1">
         <settings-members />
-      </v-tab>
-      <v-tab key="2">
+      </v-window-item>
+      <v-window-item key="2">
         <upload-new-version :is-open="tab === 2" />
-      </v-tab>
-      <v-tab key="3">
+      </v-window-item>
+      <v-window-item key="3">
         <project-installations-table />
-      </v-tab>
-      <v-tab key="4">
+      </v-window-item>
+      <v-window-item key="4">
         <attribute-settings />
-      </v-tab>
+      </v-window-item>
     </tab-list>
   </sidebar-grid>
 </template>

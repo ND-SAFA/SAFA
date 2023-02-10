@@ -7,17 +7,17 @@
       <project-display />
     </template>
     <tab-list v-model="tab" :tabs="tabs">
-      <v-tab key="1">
+      <v-window-item key="1">
         <model-table />
-      </v-tab>
-      <v-tab key="2">
+      </v-window-item>
+      <v-window-item key="2">
         <panel-card>
           <trace-link-generator :is-open="tab === 1" />
         </panel-card>
-      </v-tab>
-      <v-tab key="3">
+      </v-window-item>
+      <v-window-item key="3">
         <trace-approval-table />
-      </v-tab>
+      </v-window-item>
     </tab-list>
   </sidebar-grid>
 </template>

@@ -5,18 +5,18 @@
     </v-btn>
     <v-card v-else outlined class="pa-2">
       <tab-list v-model="tab" :tabs="tabs">
-        <v-tab key="1">
+        <v-window-item key="1">
           <model-document-step :model="model" @submit="handleSubmit" />
-        </v-tab>
-        <v-tab key="2">
+        </v-window-item>
+        <v-window-item key="2">
           <model-repository-step :model="model" @submit="handleSubmit" />
-        </v-tab>
-        <v-tab key="3">
+        </v-window-item>
+        <v-window-item key="3">
           <model-keywords-step :model="model" @submit="handleSubmit" />
-        </v-tab>
-        <v-tab key="4">
+        </v-window-item>
+        <v-window-item key="4">
           <model-project-step :model="model" @submit="handleSubmit" />
-        </v-tab>
+        </v-window-item>
       </tab-list>
     </v-card>
   </v-timeline-item>

@@ -10,8 +10,8 @@
     <v-row>
       <v-col cols="6">
         <panel-card>
-          <v-card-title>
-            <v-icon large color="primary"> mdi-view-list </v-icon>
+          <v-card-title class="d-flex">
+            <v-icon color="primary"> mdi-view-list </v-icon>
             <typography
               el="h2"
               l="2"
@@ -33,8 +33,8 @@
       </v-col>
       <v-col cols="6">
         <panel-card>
-          <v-card-title>
-            <v-icon large color="primary"> mdi-folder-plus-outline </v-icon>
+          <v-card-title class="d-flex">
+            <v-icon color="primary"> mdi-folder-plus-outline </v-icon>
             <typography
               el="h2"
               l="2"
@@ -45,24 +45,25 @@
           <v-card-subtitle>
             <v-divider class="mb-2" />
             <typography
+              wrap
               variant="small"
               value="Chose which data source you would like to create a project from."
             />
           </v-card-subtitle>
           <v-card-text>
             <div class="mx-auto width-min">
-              <v-btn text @click="handleOpenStandard">
+              <text-button text @click="handleOpenStandard">
                 <v-icon>mdi-plus</v-icon>
                 Create New Project
-              </v-btn>
-              <v-btn text @click="handleOpenBulk">
+              </text-button>
+              <text-button text @click="handleOpenBulk">
                 <v-icon>mdi-folder-arrow-up-outline</v-icon>
                 Bulk Upload Project
-              </v-btn>
-              <v-btn text @click="handleOpenImport">
+              </text-button>
+              <text-button text @click="handleOpenImport">
                 <v-icon>mdi-transit-connection-variant</v-icon>
                 Import Jira/GitHub Project
-              </v-btn>
+              </text-button>
             </div>
           </v-card-text>
         </panel-card>
@@ -88,6 +89,7 @@ import {
   MiniProjectVersionStepper,
   Typography,
   PanelCard,
+  TextButton,
 } from "@/components";
 
 function handleOpenStandard() {

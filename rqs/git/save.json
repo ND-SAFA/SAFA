@@ -8,12 +8,35 @@
           },
           "trainer_dataset_manager": {
             "train_dataset_creator": {
-              "object_type": "TRACE",
-              "project_reader": {
-                "object_type": "STRUCTURE",
-                "project_path": "[DATA_PATH]/git"
-              }
-            }
+              "object_type": "MULTI",
+              "project_readers": [
+                {
+                  "object_type": "STRUCTURE",
+                  "project_path": "[DATA_PATH]/git-data/commit_to_issue"
+                },
+                {
+                  "object_type": "STRUCTURE",
+                  "project_path": "[DATA_PATH]/git-data/issue_to_issue_comment"
+                },
+                {
+                  "object_type": "STRUCTURE",
+                  "project_path": "[DATA_PATH]/git-data/pr_to_commit"
+                },
+                {
+                  "object_type": "STRUCTURE",
+                  "project_path": "[DATA_PATH]/git-data/pr_to_issue"
+                },
+                {
+                  "object_type": "STRUCTURE",
+                  "project_path": "[DATA_PATH]/git-data/pr_to_prc"
+                },
+                {
+                  "object_type": "STRUCTURE",
+                  "project_path": "[DATA_PATH]/git-data/prc_to_prc"
+                }
+              ]
+            },
+            "filter_unlinked_artifacts": true
           }
         }
       ]

@@ -8,15 +8,15 @@ class TestRemoveUnwantedCharStep(BaseTest):
         keep_chars = ["2", "a", "A"]
         remove_chars = ["�"]
         for char in keep_chars:
-            self.assertTrue(RemoveUnwantedCharsStep._char2keep(char))
+            self.assertTrue(self.get_test_step()._char2keep(char))
 
         for char in remove_chars:
-            self.assertFalse(RemoveUnwantedCharsStep._char2keep(char))
+            self.assertFalse(self.get_test_step()._char2keep(char))
 
     def test_remove_unwanted_chars_from_word(self):
         test_word = "test�w0rd!"
         expected_result = "testw0rd!"
-        result = RemoveUnwantedCharsStep._remove_unwanted_chars_from_word(test_word)
+        result = self.get_test_step()._remove_unwanted_chars_from_word(test_word)
         self.assertEquals(result, expected_result)
 
     def test_run(self):

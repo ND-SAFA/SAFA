@@ -2,7 +2,7 @@ import os
 import random
 from collections import OrderedDict
 from copy import deepcopy
-from typing import Callable, Dict, List, Tuple
+from typing import Callable, Dict, List, Tuple, Set
 
 import pandas as pd
 
@@ -13,6 +13,7 @@ from data.keys.csv_format import CSVKeys
 from data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
 from data.processing.augmentation.data_augmenter import DataAugmenter
 from data.processing.augmentation.source_target_swap_step import SourceTargetSwapStep
+from data.processing.cleaning.data_cleaner import DataCleaner
 from data.tree.artifact import Artifact
 from data.tree.trace_link import TraceLink
 from models.model_manager import ModelManager
@@ -190,6 +191,19 @@ class TraceDataset(AbstractDataset):
         """
         random.shuffle(self.pos_link_ids)
         random.shuffle(self.neg_link_ids)
+
+    def get_vocab(self, cleaner: DataCleaner = None) -> Set[str]:
+        """
+        Gets all words in the dataset's artifact bodies
+        :param cleaner: If provided, cleans the artifact bodies before adding to vocabulary set
+        :return: The set of all words in the dataset
+        """
+        vocab = set()
+        for link in self.links.values():
+            for artifact_body in [link.source.token, link.target.token]:
+                artifact_body = cleaner.run([artifact_body.lower()]).pop()
+                vocab.update(artifact_body.split())
+        return vocab
 
     def _get_data_entries_for_augmentation(self) -> Tuple[List[TraceLink], List[Tuple[str, str]]]:
         """

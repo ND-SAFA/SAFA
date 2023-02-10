@@ -1,3 +1,5 @@
+from typing import Optional
+
 from data.managers.trainer_dataset_manager import TrainerDatasetManager
 from jobs.abstract_trace_job import AbstractTraceJob
 from jobs.components.job_args import JobArgs
@@ -9,7 +11,7 @@ from train.trainer_args import TrainerArgs
 class PushModelJob(AbstractTraceJob):
 
     def __init__(self, job_args: JobArgs, model_manager: ModelManager,
-                 trainer_dataset_manager: TrainerDatasetManager, trainer_args: TrainerArgs):
+                 trainer_dataset_manager: Optional[TrainerDatasetManager], trainer_args: TrainerArgs):
         """
         Responsible for pushing model to hugging face repo
         :param job_args: the arguments for the job

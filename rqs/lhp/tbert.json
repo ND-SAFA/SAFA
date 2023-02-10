@@ -7,8 +7,6 @@
           "job_args": {
             "random_seed": {
               "*": [
-                812,
-                924,
                 316,
                 540,
                 457
@@ -16,7 +14,12 @@
             }
           },
           "model_manager": {
-            "model_path": "thearod5/sebert-task-cls"
+            "model_path": {
+              "*": [
+                "thearod5/git-bert",
+                "thearod5/sebert-task-cls"
+              ]
+            }
           },
           "trainer_args": {
             "num_train_epochs": 50,
@@ -54,13 +57,7 @@
             "eval_dataset_creator": {
               "object_type": "SPLIT",
               "split_strategy": "SPLIT_BY_LINK",
-              "val_percentage": {
-                "*": [
-                  0.30,
-                  0.50,
-                  0.70
-                ]
-              }
+              "val_percentage": 0.70
             },
             "augmenter": {
               "steps": [

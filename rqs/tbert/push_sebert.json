@@ -1,0 +1,21 @@
+{
+  "steps": [
+    {
+      "jobs": [
+        {
+          "object_type": "PUSH_MODEL",
+          "job_args": {
+            "random_seed": 42
+          },
+          "model_manager": {
+            "model_path": "/Users/albertorodriguez/desktop/safa/datasets/git-data/tse2022/TSE2022/model/sebert"
+          },
+          "trainer_args": {
+            "hub_model_id": "thearod5/se-bert"
+          },
+          "trainer_dataset_manager": null
+        }
+      ]
+    }
+  ]
+}

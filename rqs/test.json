@@ -16,7 +16,7 @@
             "model_path": "hf-internal-testing/tiny-random-bert"
           },
           "trainer_args": {
-            "num_train_epochs": 2,
+            "num_train_epochs": 5,
             "gradient_accumulation_steps": 1,
             "learning_rate": 5e-5,
             "metrics": [
@@ -40,8 +40,7 @@
                     "[DATA_PATH]/lhp/heating"
                   ]
                 }
-              },
-              "filter_unlinked_artifacts": true
+              }
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",

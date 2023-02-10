@@ -8,12 +8,23 @@
             "random_seed": {
               "*": [
                 812,
-                924
+                924,
+                316,
+                540,
+                457
               ]
             }
           },
           "model_manager": {
-            "model_path": "[OUTPUT_PATH]/usecase-pretrain-vm-bert/experiment_0/step_0/{}/models/best"
+            "model_path": {
+              "*": [
+                "thearod5/itrust",
+                "bert-base-uncased",
+                "roberta-base",
+                "prajjwal1/bert-tiny",
+                "distilbert-base-uncased"
+              ]
+            }
           },
           "trainer_args": {
             "num_train_epochs": 5,
@@ -34,9 +45,8 @@
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "STRUCTURE",
-                "project_path": "[DATA_PATH]/lhp/vehiclemodes"
-              },
-              "filter_unlinked_artifacts": true
+                "project_path": "[DATA_PATH]/itrust"
+              }
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",

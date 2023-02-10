@@ -30,8 +30,7 @@
                     "[DATA_PATH]/lhp/experiment/vehiclemodes"
                   ]
                 }
-              },
-              "filter_unlinked_artifacts": true
+              }
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",

@@ -67,8 +67,7 @@ export default {
 import { ref } from "vue";
 import { navigateTo, Routes } from "@/router";
 import { handleLogin } from "@/api";
-import TextButton from "@/components/common/button/TextButton.vue";
-import { CardPage, PasswordField, Typography } from "@/components";
+import { CardPage, PasswordField, Typography, TextButton } from "@/components";
 
 const email = ref("");
 const password = ref("");

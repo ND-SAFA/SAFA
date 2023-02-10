@@ -63,5 +63,18 @@ class TraceCallback(WandbCallback):
         for k, v in experimental_vars.items():
             if k in GROUP_EXCLUDE:
                 continue
-            group.append(json.dumps({k: v}))
+            group.append(json.dumps({TraceCallback.get_group_id(k): v}))
         return None if len(group) == 0 else delimiter.join(group)  # no grouping if none exists, else return group
+
+    @staticmethod
+    def get_group_id(group_name: str):
+        """
+        :param group_name: The name whose id is returned.
+        :return: Returns the initials of group name.
+        """
+        if "_" in group_name:
+            group_parts = group_name.split("_")
+            group_parts = [g[0] for g in group_parts]
+        else:
+            group_parts = [group_name[0]]
+        return "".join(group_parts)

@@ -17,8 +17,6 @@ import {
 } from "@/views";
 import { Routes } from "./routes";
 
-export { Routes };
-
 export const routes: Array<RouteRecordRaw> = [
   {
     path: Routes.LOGIN_ACCOUNT,

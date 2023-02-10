@@ -1,6 +1,7 @@
 import { useRoute, useRouter } from "vue-router";
 import { URLParameter } from "@/types";
 import { QueryParams, Routes } from "@/router/routes";
+import { router } from "@/router/router";
 
 /**
  * Navigates app to given route, if app is already on the route then
@@ -13,10 +14,10 @@ export async function navigateTo(
   route: Routes | string,
   query: Record<string, null | string | (string | null)[]> = {}
 ): Promise<void> {
-  const router = useRouter();
-  const currentRoute = useRoute();
-
-  if (currentRoute.path === route && Object.keys(query).length === 0) {
+  if (
+    router.currentRoute.value.path === route &&
+    Object.keys(query).length === 0
+  ) {
     return;
   } else {
     await router.push({ path: route, query });
@@ -27,8 +28,6 @@ export async function navigateTo(
  * Navigates to the previous page.
  */
 export function navigateBack(): void {
-  const router = useRouter();
-
   router.back();
 }
 
@@ -36,9 +35,7 @@ export function navigateBack(): void {
  * Return the app's query parameters.
  */
 export function getParams(): Record<string, null | string | (string | null)[]> {
-  const currentRoute = useRoute();
-
-  return currentRoute.query;
+  return router.currentRoute.value.query;
 }
 
 /**
@@ -48,9 +45,7 @@ export function getParams(): Record<string, null | string | (string | null)[]> {
  * @return The query parameter value.
  */
 export function getParam(key: QueryParams): URLParameter {
-  const currentRoute = useRoute();
-
-  return currentRoute.query[key];
+  return router.currentRoute.value.query[key];
 }
 
 /**
@@ -60,7 +55,7 @@ export function getParam(key: QueryParams): URLParameter {
  * @param value - The query param value.
  */
 export async function updateParam(key: string, value: string): Promise<void> {
-  const currentRoute = useRoute();
+  const currentRoute = router.currentRoute.value;
 
   if (currentRoute.query[key] === value) return;
 
@@ -71,7 +66,7 @@ export async function updateParam(key: string, value: string): Promise<void> {
  * Removes all query parameters.
  */
 export async function removeParams(): Promise<void> {
-  const currentRoute = useRoute();
+  const currentRoute = router.currentRoute.value;
 
   if (Object.values(currentRoute.query).length === 0) return;
 

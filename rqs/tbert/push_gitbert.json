@@ -8,10 +8,10 @@
             "random_seed": 42
           },
           "model_manager": {
-            "model_path": "[INPUT_MODEL]"
+            "model_path": "/Users/albertorodriguez/desktop/safa/datasets/git-data/tse2022/TSE2022/model/commit_issue_bert"
           },
           "trainer_args": {
-            "hub_model_id": "thearod5/[MODEL_NAME]"
+            "hub_model_id": "thearod5/git-bert"
           },
           "trainer_dataset_manager": null
         }

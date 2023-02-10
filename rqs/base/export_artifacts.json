@@ -12,8 +12,7 @@
             "project_reader": {
               "object_type": "STRUCTURE",
               "project_path": "[DATA_PATH]/[PROJECT_NAME]"
-            },
-            "filter_unlinked_artifacts": true
+            }
           }
         }
       ]

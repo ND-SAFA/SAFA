@@ -8,20 +8,16 @@
             "random_seed": {
               "*": [
                 812,
-                924,
-                316,
-                540,
-                457
+                42
               ]
             }
           },
           "model_manager": {
-            "model_path": "prajjwal1/bert-medium"
+            "model_path": "hf-internal-testing/tiny-random-bert"
           },
           "trainer_args": {
-            "num_train_epochs": 100,
-            "per_device_train_batch_size": 16,
-            "gradient_accumulation_steps": 16,
+            "num_train_epochs": 5,
+            "gradient_accumulation_steps": 1,
             "learning_rate": 5e-5,
             "metrics": [
               "map",
@@ -30,26 +26,25 @@
               "precision"
             ],
             "skip_save": false,
+            "use_balanced_batches": true,
             "load_best_model_at_end": true
           },
           "trainer_dataset_manager": {
             "train_dataset_creator": {
-              "object_type": "MULTI",
-              "project_readers": [
-                {
-                  "object_type": "STRUCTURE",
-                  "project_path": "[DATA_PATH]/lhp/heating"
-                },
-                {
-                  "object_type": "STRUCTURE",
-                  "project_path": "[DATA_PATH]/lhp/cooling"
-                },
-                {
-                  "object_type": "STRUCTURE",
-                  "project_path": "[DATA_PATH]/lhp/vehiclemodes"
+              "object_type": "TRACE",
+              "project_reader": {
+                "object_type": "STRUCTURE",
+                "project_path": {
+                  "*": [
+                    "[DATA_PATH]/lhp/cooling",
+                    "[DATA_PATH]/lhp/heating",
+                    "[DATA_PATH]/lhp/vehiclemodes",
+                    "[DATA_PATH]/cm1",
+                    "[DATA_PATH]/cchit",
+                    "[DATA_PATH]/itrust"
+                  ]
                 }
-              ],
-              "filter_unlinked_artifacts": true
+              }
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",
@@ -62,8 +57,7 @@
               "val_percentage": {
                 "*": [
                   0.30,
-                  0.50,
-                  0.70
+                  0.7
                 ]
               }
             },

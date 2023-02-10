@@ -15,8 +15,7 @@
                   "[DATA_PATH]/lhp/experiment/vehiclemodes"
                 ]
               }
-            },
-            "filter_unlinked_artifacts": true
+            }
           }
         }
       ]

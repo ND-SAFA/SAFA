@@ -30,8 +30,7 @@
               "project_reader": {
                 "object_type": "CSV",
                 "project_path": "[DATA_PATH]/git.csv"
-              },
-              "filter_unlinked_artifacts": true
+              }
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",

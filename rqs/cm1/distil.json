@@ -16,13 +16,13 @@
             }
           },
           "model_manager": {
-            "model_path": "prajjwal1/bert-medium"
+            "model_path": "distilbert-base-uncased"
           },
           "trainer_args": {
-            "num_train_epochs": 30,
-            "per_device_train_batch_size": 4,
+            "num_train_epochs": 50,
+            "per_device_train_batch_size": 32,
             "gradient_accumulation_steps": 16,
-            "learning_rate": 1e-6,
+            "learning_rate": 5e-5,
             "metrics": [
               "map",
               "map_at_k",
@@ -37,22 +37,24 @@
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "STRUCTURE",
-                "project_path": "[DATA_PATH]/lhp/heating"
-              },
-              "filter_unlinked_artifacts": true
+                "project_path": "[DATA_PATH]/cm1"
+              }
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",
               "split_strategy": "SPLIT_BY_LINK",
-              "val_percentage": 0.20
+              "val_percentage": 0.15
             },
             "eval_dataset_creator": {
-              "object_type": "TRACE",
-              "project_reader": {
-                "object_type": "STRUCTURE",
-                "project_path": "[DATA_PATH]/lhp/cooling"
-              },
-              "filter_unlinked_artifacts": true
+              "object_type": "SPLIT",
+              "split_strategy": "SPLIT_BY_LINK",
+              "val_percentage": {
+                "*": [
+                  0.30,
+                  0.50,
+                  0.70
+                ]
+              }
             },
             "augmenter": {
               "steps": [

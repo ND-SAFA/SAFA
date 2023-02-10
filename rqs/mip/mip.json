@@ -18,7 +18,7 @@
           "model_manager": {
             "model_path": {
               "*": [
-                "thearod5/automotive",
+                "thearod5/mip",
                 "bert-base-uncased",
                 "roberta-base",
                 "prajjwal1/bert-tiny",
@@ -45,15 +45,8 @@
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "STRUCTURE",
-                "project_path": {
-                  "*": [
-                    "[DATA_PATH]/lhp/heating",
-                    "[DATA_PATH]/lhp/cooling",
-                    "[DATA_PATH]/lhp/vehiclemodes"
-                  ]
-                }
-              },
-              "filter_unlinked_artifacts": true
+                "project_path": "[DATA_PATH]/mip"
+              }
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",

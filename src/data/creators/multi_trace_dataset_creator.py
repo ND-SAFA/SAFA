@@ -1,5 +1,6 @@
 from typing import Type
 
+from constants import FILTER_UNLINKED_ARTIFACTS_DEFAULT
 from data.creators.abstract_dataset_creator import AbstractDatasetCreator, DatasetType
 from data.creators.trace_dataset_creator import TraceDatasetCreator
 from data.processing.cleaning.data_cleaner import DataCleaner
@@ -17,7 +18,7 @@ class MultiTraceDatasetCreator(AbstractDatasetCreator):
     DELIMITER = "-"
 
     def __init__(self, project_readers: [AbstractProjectReader], data_cleaner: DataCleaner = None,
-                 filter_unlinked_artifacts: bool = False):
+                 filter_unlinked_artifacts: bool = FILTER_UNLINKED_ARTIFACTS_DEFAULT):
         """
         Initializes creator with entities extracted from reader.
         :param project_readers: The project readers responsible for extracting project entities for each dataset.

@@ -3,43 +3,28 @@
     {
       "jobs": [
         {
-          "object_type": "TRAIN",
+          "object_type": "VSM",
           "job_args": {
             "random_seed": {
               "*": [
                 812,
-                924,
-                316,
-                540,
-                457
+                42
               ]
             }
           },
-          "model_manager": {
-            "model_path": "distilbert-base-uncased"
-          },
-          "trainer_args": {
-            "num_train_epochs": 50,
-            "per_device_train_batch_size": 8,
-            "gradient_accumulation_steps": 16,
-            "learning_rate": 5e-5,
-            "metrics": [
-              "map",
-              "map_at_k",
-              "f",
-              "precision"
-            ],
-            "skip_save": false,
-            "load_best_model_at_end": true
-          },
+          "metrics": [
+            "map",
+            "map_at_k",
+            "f",
+            "precision"
+          ],
           "trainer_dataset_manager": {
             "train_dataset_creator": {
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "STRUCTURE",
                 "project_path": "[DATA_PATH]/cm1"
-              },
-              "filter_unlinked_artifacts": false
+              }
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",
@@ -51,9 +36,9 @@
               "split_strategy": "SPLIT_BY_LINK",
               "val_percentage": {
                 "*": [
-                  0.30,
-                  0.50,
-                  0.70
+                  0.3,
+                  0.5,
+                  0.7
                 ]
               }
             },

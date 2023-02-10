@@ -4,6 +4,7 @@ from typing import Dict, List, Set, Tuple, Type
 import pandas as pd
 from tqdm import tqdm
 
+from constants import FILTER_UNLINKED_ARTIFACTS_DEFAULT
 from data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from data.datasets.trace_dataset import TraceDataset
 from data.keys.structure_keys import StructuredKeys
@@ -14,8 +15,8 @@ from data.tree.artifact import Artifact
 from data.tree.trace_link import TraceLink
 from util.base_object import BaseObject
 from util.dataframe_util import DataFrameUtil
-from util.logging.logger_manager import logger
 from util.general_util import ListUtil
+from util.logging.logger_manager import logger
 from util.override import overrides
 from util.reflection_util import ReflectionUtil
 from util.uncased_dict import UncasedDict
@@ -33,7 +34,7 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
     ALLOW_MISSING_SOURCE, ALLOW_MISSING_TARGET = False, False
 
     def __init__(self, project_reader: AbstractProjectReader, data_cleaner: DataCleaner = None,
-                 filter_unlinked_artifacts: bool = False):
+                 filter_unlinked_artifacts: bool = FILTER_UNLINKED_ARTIFACTS_DEFAULT):
         """
         Initializes creator with entities extracted from reader.
         :param project_reader: Project reader responsible for extracting project entities.

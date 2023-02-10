@@ -9,18 +9,16 @@
               "*": [
                 812,
                 924,
-                316,
-                540,
-                457
+                316
               ]
             }
           },
           "model_manager": {
-            "model_path": "distilbert-base-uncased"
+            "model_path": "[OUTPUT_PATH]/git-small/experiment_0/step_0/base_experiment/models/best"
           },
           "trainer_args": {
             "num_train_epochs": 50,
-            "per_device_train_batch_size": 8,
+            "per_device_train_batch_size": 32,
             "gradient_accumulation_steps": 16,
             "learning_rate": 5e-5,
             "metrics": [
@@ -37,9 +35,15 @@
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "STRUCTURE",
-                "project_path": "[DATA_PATH]/cm1"
+                "project_path": {
+                  "*": [
+                    "[DATA_PATH]/lhp/heating",
+                    "[DATA_PATH]/lhp/cooling",
+                    "[DATA_PATH]/lhp/vehiclemodes"
+                  ]
+                }
               },
-              "filter_unlinked_artifacts": false
+              "filter_unlinked_artifacts": true
             },
             "val_dataset_creator": {
               "object_type": "SPLIT",

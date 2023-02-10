@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Optional, Type, Union
 
 import math
 
-from constants import EXIT_ON_FAILED_JOB, RUN_ASYNC
+from constants import EXIT_ON_FAILED_JOB, EXPERIMENTAL_VARS_IGNORE, RUN_ASYNC
 from jobs.abstract_job import AbstractJob
 from jobs.abstract_trace_job import AbstractTraceJob
 from jobs.components.job_result import JobResult
@@ -14,6 +14,7 @@ from train.save_strategy.comparison_criteria import ComparisonCriterion
 from train.wandb.Wandb import Wandb
 from util.base_object import BaseObject
 from util.file_util import FileUtil
+from util.general_util import ListUtil
 from util.json_util import JsonUtil
 from util.override import overrides
 from util.status import Status
@@ -138,13 +139,15 @@ class ExperimentStep(BaseObject):
         Divides the jobs up into runs of size MAX JOBS
         :return: a list of runs containing at most MAX JOBS per run
         """
-        job_runs = [[] for i in range(math.ceil(len(self.jobs) / self.MAX_JOBS))]
-        run_index = 0
-        for job_index, job in enumerate(self.jobs):
-            job_runs[run_index].append(job)
-            if (job_index + 1) % self.MAX_JOBS == 0:
-                run_index += 1
-        return job_runs
+        job_indices = list(range(0, len(self.jobs)))
+        job_indices_batches = ListUtil.batch(job_indices, self.MAX_JOBS)
+        job_batches = []
+        for job_indices_batch in job_indices_batches:
+            job_batch = []
+            for job_index in job_indices_batch:
+                job_batch.append(self.jobs[job_index])
+            job_batches.append(job_batch)
+        return job_batches
 
     def _get_best_job(self, jobs: List[AbstractJob], best_job: AbstractJob = None) -> Optional[AbstractJob]:
         """

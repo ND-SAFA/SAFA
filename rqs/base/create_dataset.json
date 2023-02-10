@@ -1,0 +1,20 @@
+{
+  "steps": [
+    {
+      "jobs": [
+        {
+          "object_type": "CREATE_DATASETS",
+          "job_args": {
+          },
+          "train_dataset_creator": {
+            "project_reader": {
+              "object_type": "STRUCTURE",
+              "project_path": "[DATA_PATH]/[PROJECT]"
+            },
+            "filter_unlinked_artifacts": true
+          }
+        }
+      ]
+    }
+  ]
+}

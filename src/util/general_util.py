@@ -21,3 +21,17 @@ class ListUtil:
         start = n_items * iteration_num if init_index is None else init_index
         end = start + n_items
         return list_[start:end], end
+
+    @staticmethod
+    def batch(iterable: List, n: int = 1):
+        """
+        Creates batches of constant size except for possible the last batch.
+        :param iterable: The iterable containing items to batch.
+        :param n: The batch size.
+        :return: List of batches
+        """
+        iterable_len = len(iterable)
+        batches = []
+        for ndx in range(0, iterable_len, n):
+            batches.append(iterable[ndx:min(ndx + n, iterable_len)])
+        return batches

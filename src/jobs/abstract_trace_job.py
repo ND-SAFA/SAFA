@@ -62,7 +62,8 @@ class AbstractTraceJob(AbstractJob, ABC):
         if self._trainer:
             self._trainer.cleanup()
         self._trainer = None
-        self.trainer_dataset_manager.cleanup()
+        if self.trainer_dataset_manager:  # push model job has not dataset
+            self.trainer_dataset_manager.cleanup()
 
     @classmethod
     @overrides(BaseObject)

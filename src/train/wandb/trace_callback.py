@@ -1,3 +1,4 @@
+import json
 import os
 from typing import Dict, Optional
 
@@ -7,7 +8,7 @@ from transformers.integrations import WandbCallback
 from train.trainer_args import TrainerArgs
 from train.wandb.Wandb import Wandb
 
-GROUP_PROPERTIES = ["project_path"]
+GROUP_EXCLUDE = ["random_seed"]
 
 
 class TraceCallback(WandbCallback):
@@ -51,13 +52,14 @@ class TraceCallback(WandbCallback):
                 )
 
     @staticmethod
-    def get_group(experimental_vars: Dict) -> Optional[str]:
+    def get_group(experimental_vars: Dict, delimiter="*") -> Optional[str]:
         """
         Returns the name of the group using priority of group properties.
         :param experimental_vars: The experimental variables to find group for.
+        :param delimiter: The delimiter used to combine groups into identifier.
         :return: Returns the first group property contained in experimental vars, None otherwise.
         """
-        for prop in GROUP_PROPERTIES:
-            if prop in experimental_vars:
-                return experimental_vars[prop]
-        return None
+        group = []
+        for item in experimental_vars.items():
+            group.append(json.dumps(item))
+        return None if len(group) == 0 else delimiter.join(group)  # no grouping if none exists, else return group

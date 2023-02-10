@@ -2,9 +2,7 @@ import os
 from copy import deepcopy
 from typing import Any, Dict, List, Optional, Type, Union
 
-import math
-
-from constants import EXIT_ON_FAILED_JOB, EXPERIMENTAL_VARS_IGNORE, RUN_ASYNC
+from constants import EXIT_ON_FAILED_JOB, RUN_ASYNC
 from jobs.abstract_job import AbstractJob
 from jobs.abstract_trace_job import AbstractTraceJob
 from jobs.components.job_result import JobResult
@@ -178,8 +176,8 @@ class ExperimentStep(BaseObject):
                 job.result[JobResult.EXPERIMENTAL_VARS] = {}
             if experimental_vars:
                 job.result[JobResult.EXPERIMENTAL_VARS].update(experimental_vars[i])
-            if isinstance(job, AbstractTraceJob):
-                job.trainer_args.experimental_vars = experimental_vars[i]
+                if isinstance(job, AbstractTraceJob):
+                    job.trainer_args.experimental_vars = experimental_vars[i]
         return jobs
 
     def _update_jobs_undetermined_vars(self, jobs2update: List[AbstractJob], jobs2use: List[AbstractJob]) -> List[AbstractJob]:

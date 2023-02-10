@@ -26,7 +26,10 @@ class TraceCallback(WandbCallback):
         """
         project = os.getenv("WANDB_PROJECT", "huggingface")
         run = args.run_name
-        group = self.get_group(args.experimental_vars)
+        experimental_vars = Wandb.get_clean_vars(args.experimental_vars)
+        if isinstance(experimental_vars, str):
+            experimental_vars = {"name": experimental_vars}
+        group = self.get_group(experimental_vars)
         if self._wandb.run is None:
             self._wandb.init(
                 project=project,
@@ -34,7 +37,7 @@ class TraceCallback(WandbCallback):
                 group=group
             )
             # add config parameters (run may have been created manually)
-            self._wandb.config.update(args.experimental_vars, allow_val_change=True)
+            self._wandb.config.update(experimental_vars, allow_val_change=True)
 
             # define default x-axis (for latest wandb versions)
             if getattr(self._wandb, "define_metric", None):
@@ -51,10 +54,9 @@ class TraceCallback(WandbCallback):
     def get_group(experimental_vars: Dict) -> Optional[str]:
         """
         Returns the name of the group using priority of group properties.
-        :param experimental_vars:
-        :return:
+        :param experimental_vars: The experimental variables to find group for.
+        :return: Returns the first group property contained in experimental vars, None otherwise.
         """
-        experimental_vars = Wandb.get_clean_vars(experimental_vars)
         for prop in GROUP_PROPERTIES:
             if prop in experimental_vars:
                 return experimental_vars[prop]

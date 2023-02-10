@@ -18,6 +18,8 @@ class Wandb:
         :return: String representing run name.
         """
         clean_vars = Wandb.get_clean_vars(experimental_vars)
+        if isinstance(clean_vars, str):
+            return clean_vars
         return json.dumps(clean_vars)
 
     @staticmethod
@@ -35,7 +37,7 @@ class Wandb:
         return {k: Wandb.clean_var(v) for k, v in experimental_vars.items() if k not in EXPERIMENTAL_VARS_IGNORE}
 
     @staticmethod
-    def clean_var(v: str):
+    def clean_var(v: str) -> Union[str, float, int]:
         """
         Cleans the given variable to fix nicely with WandB.
         :param v: The variable to clean.

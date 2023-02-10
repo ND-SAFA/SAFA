@@ -1,0 +1,58 @@
+{
+  "steps": [
+    {
+      "jobs": [
+        {
+          "object_type": "VSM",
+          "job_args": {
+            "random_seed": {
+              "*": [
+                812,
+                42
+              ]
+            }
+          },
+          "metrics": [
+            "map",
+            "map_at_k",
+            "f",
+            "precision"
+          ],
+          "trainer_dataset_manager": {
+            "train_dataset_creator": {
+              "object_type": "TRACE",
+              "project_reader": {
+                "object_type": "STRUCTURE",
+                "project_path": "[DATA_PATH]/[DATASET]"
+              },
+              "filter_unlinked_artifacts": true
+            },
+            "val_dataset_creator": {
+              "object_type": "SPLIT",
+              "split_strategy": "SPLIT_BY_LINK",
+              "val_percentage": 0.15
+            },
+            "eval_dataset_creator": {
+              "object_type": "SPLIT",
+              "split_strategy": "SPLIT_BY_LINK",
+              "val_percentage": {
+                "*": [
+                  0.3,
+                  0.5,
+                  0.7
+                ]
+              }
+            },
+            "augmenter": {
+              "steps": [
+                {
+                  "object_type": "RESAMPLE"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -9,6 +9,7 @@ from jobs.mlm_pre_train_job import MLMPreTrainJob
 from jobs.predict_job import PredictJob
 from jobs.push_model_job import PushModelJob
 from jobs.train_job import TrainJob
+from jobs.vsm_job import VSMJob
 
 
 class SupportedJobType(Enum):
@@ -22,3 +23,4 @@ class SupportedJobType(Enum):
     PRE_TRAIN = MLMPreTrainJob
     PREDICT = PredictJob
     TRAIN = TrainJob
+    VSM = VSMJob

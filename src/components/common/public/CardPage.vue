@@ -36,6 +36,6 @@ import { SafaIcon } from "@/components/common/display";
 const theme = useTheme();
 const darkMode = computed(() => theme.global.current.value.dark);
 const className = computed(() =>
-  darkMode.value ? "neutral-bg fill-height" : "primary fill-height"
+  darkMode.value ? "bg-neutral fill-height" : "bg-primary fill-height"
 );
 </script>

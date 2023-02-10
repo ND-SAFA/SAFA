@@ -65,11 +65,13 @@ export default {
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { navigateTo, Routes } from "@/router";
+import { useRouter } from "vue-router";
+import { Routes } from "@/router";
 import { handleLogin } from "@/api";
 import TextButton from "@/components/common/button/TextButton.vue";
 import { CardPage, PasswordField, Typography } from "@/components";
 
+const router = useRouter();
 const email = ref("");
 const password = ref("");
 const isError = ref(false);
@@ -79,14 +81,14 @@ const isLoading = ref(false);
  * Navigate to the sign-up page.
  */
 function handleSignUp() {
-  navigateTo(Routes.CREATE_ACCOUNT);
+  router.push(Routes.CREATE_ACCOUNT);
 }
 
 /**
  * Navigate to the forgot password page.
  */
 function handleForgotPassword() {
-  navigateTo(Routes.FORGOT_PASSWORD);
+  router.push(Routes.FORGOT_PASSWORD);
 }
 
 /**

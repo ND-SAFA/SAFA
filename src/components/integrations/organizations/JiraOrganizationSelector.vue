@@ -5,11 +5,8 @@
     :item-count="organizations.length"
     :loading="organizationsLoading"
   >
-    <template v-for="organization in organizations">
-      <v-list-item
-        :key="organization.id"
-        @click="handleOrganizationSelect(organization)"
-      >
+    <template v-for="organization in organizations" :key="organization.id">
+      <v-list-item @click="handleOrganizationSelect(organization)">
         <v-list-item-content>
           <v-list-item-title v-text="organization.name" />
         </v-list-item-content>
@@ -39,9 +36,6 @@ export default Vue.extend({
       organizationsLoading: false,
     };
   },
-  mounted() {
-    this.loadOrganizations();
-  },
   computed: {
     /**
      * @return Whether there are current valid credentials.
@@ -57,6 +51,9 @@ export default Vue.extend({
     hasCredentials(): void {
       this.loadOrganizations();
     },
+  },
+  mounted() {
+    this.loadOrganizations();
   },
   methods: {
     /**

@@ -13,7 +13,7 @@
     </template>
 
     <template #actions>
-      <v-btn
+      <text-button
         color="primary"
         width="8em"
         :disabled="password.length === 0"
@@ -22,13 +22,13 @@
         @click="handleSubmit"
       >
         Login
-      </v-btn>
+      </text-button>
 
       <div class="ml-auto text-right">
         <span>
           <typography value="Dont have an account yet?" />
 
-          <v-btn
+          <text-button
             text
             small
             class="px-1"
@@ -37,10 +37,10 @@
             @click="handleSignUp"
           >
             Sign Up
-          </v-btn>
+          </text-button>
         </span>
 
-        <v-btn
+        <text-button
           text
           small
           class="px-1"
@@ -48,7 +48,7 @@
           @click="handleForgotPassword"
         >
           Forgot Password
-        </v-btn>
+        </text-button>
       </div>
     </template>
   </card-page>
@@ -67,6 +67,7 @@ export default {
 import { ref } from "vue";
 import { navigateTo, Routes } from "@/router";
 import { handleLogin } from "@/api";
+import TextButton from "@/components/common/button/TextButton.vue";
 import { CardPage, PasswordField, Typography } from "@/components";
 
 const email = ref("");

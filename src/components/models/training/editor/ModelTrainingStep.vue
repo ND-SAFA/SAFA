@@ -9,39 +9,39 @@
         <v-chip :color="stepColor">{{ step.status }}</v-chip>
       </flex-box>
 
-      <flex-box t="2" align="center" v-if="step.type === 'document'">
+      <flex-box v-if="step.type === 'document'" t="2" align="center">
         <typography value="Trained on documents:" />
         <v-chip
-          outlined
-          class="ma-1"
           v-for="document in step.documents"
           :key="document.url"
+          outlined
+          class="ma-1"
         >
           {{ document.name }}
         </v-chip>
       </flex-box>
-      <flex-box t="2" align="center" v-else-if="step.type === 'repository'">
+      <flex-box v-else-if="step.type === 'repository'" t="2" align="center">
         <typography value="Trained on repositories:" />
         <v-chip
-          outlined
-          class="ma-1"
           v-for="repo in step.repositories"
           :key="repo.url"
+          outlined
+          class="ma-1"
         >
           {{ repo.name }}
         </v-chip>
       </flex-box>
-      <flex-box t="2" align="center" v-else-if="step.type === 'project'">
+      <flex-box v-else-if="step.type === 'project'" t="2" align="center">
         <typography value="Trained on project data:" />
         <flex-box v-for="project in step.projects" :key="project.id">
           <v-chip outlined color="primary" class="ma-1">
             {{ project.name }}
           </v-chip>
           <v-chip
-            outlined
-            class="ma-1"
             v-for="level in project.levels"
             :key="level.source + level.target"
+            outlined
+            class="ma-1"
           >
             {{ level.source }} To {{ level.target }}
           </v-chip>
@@ -52,62 +52,41 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
-import { TrainingStepSchema } from "@/types";
-import { Typography, FlexBox } from "@/components/common";
-
 /**
  * Displays logs of the model's training process.
  */
-export default Vue.extend({
+export default {
   name: "ModelTrainingStep",
-  components: {
-    FlexBox,
-    Typography,
-  },
-  props: {
-    step: {
-      type: Object as PropType<TrainingStepSchema>,
-      required: true,
-    },
-  },
-  computed: {
-    /**
-     * Returns the name of the given step.
-     * @return The step's name.
-     */
-    stepName(): string {
-      return (
-        {
-          keywords: "Pre-Training: Keywords",
-          document: "Pre-Training: Documents",
-          repository: "Intermediate-Training: Repositories",
-          project: "Fine-Tuning: Project Data",
-        }[this.step.type] || "Training"
-      );
-    },
-    /**
-     * Returns the color of the given step.
-     * @return The step's color.
-     */
-    stepColor(): string {
-      return (
-        {
-          "In Progress": "secondary",
-          Completed: "primary",
-          Failed: "error",
-        }[this.step.status] || "Training"
-      );
-    },
-    /**
-     * Returns the timestamp of the given step.
-     * @return The step's timestamp.
-     */
-    stepTimestamp(): string {
-      return "12:00 PM, Oct 31, 2022";
-    },
-  },
-});
+};
 </script>
 
-<style scoped lang="scss"></style>
+<script setup lang="ts">
+import { defineProps, computed } from "vue";
+import { TrainingStepSchema } from "@/types";
+import { Typography, FlexBox } from "@/components/common";
+
+const props = defineProps<{
+  step: TrainingStepSchema;
+}>();
+
+const stepName = computed(
+  () =>
+    ({
+      keywords: "Pre-Training: Keywords",
+      document: "Pre-Training: Documents",
+      repository: "Intermediate-Training: Repositories",
+      project: "Fine-Tuning: Project Data",
+    }[props.step.type] || "Training")
+);
+
+const stepColor = computed(
+  () =>
+    ({
+      "In Progress": "secondary",
+      Completed: "primary",
+      Failed: "error",
+    }[props.step.status] || "Training")
+);
+
+const stepTimestamp = computed(() => "12:00 PM, Jan 1, 2023");
+</script>

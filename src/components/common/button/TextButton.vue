@@ -1,16 +1,15 @@
 <template>
   <v-btn
-    :outlined="outlined"
-    :text="text"
     :disabled="disabled"
-    :large="large"
+    :size="buttonSize"
     :block="block"
     :loading="loading"
     :color="buttonColor"
     :value="value"
     :class="buttonClassName"
     :data-cy="dataCy"
-    @click="$emit('click')"
+    :variant="buttonVariant"
+    @click.native="emit('click')"
   >
     <v-icon v-if="buttonIconId" class="mr-1">{{ buttonIconId }}</v-icon>
     <slot />
@@ -18,80 +17,96 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
-
 /**
  * A generic text button.
- *
- * @emits-1 `click` - On click.
  */
-export default Vue.extend({
+export default {
   name: "TextButton",
-  props: {
-    outlined: Boolean,
-    text: Boolean,
-    disabled: Boolean,
-    large: Boolean,
-    block: Boolean,
-    loading: Boolean,
-    color: String,
-    iconId: String,
-    value: String,
-    y: String,
-    x: String,
-    classes: String,
-    variant: String as PropType<
-      "add" | "edit" | "save" | "delete" | "cancel" | "artifact"
-    >,
-    dataCy: String,
-  },
-  computed: {
-    /**
-     * @return The icon to render.
-     */
-    buttonIconId(): string | undefined {
-      switch (this.variant) {
-        case "add":
-          return "mdi-plus";
-        case "edit":
-          return "mdi-pencil";
-        case "save":
-          return "mdi-content-save";
-        case "delete":
-          return "mdi-delete";
-        case "cancel":
-          return "mdi-close";
-        case "artifact":
-          return "mdi-application-array-outline";
-        default:
-          return this.iconId;
-      }
-    },
-    /**
-     * @return The color to render.
-     */
-    buttonColor(): string | undefined {
-      switch (this.variant) {
-        case "add":
-        case "save":
-          return "primary";
-        case "delete":
-          return "error";
-        default:
-          return this.color;
-      }
-    },
-    /**
-     * @return The button's class name.
-     */
-    buttonClassName(): string {
-      let classNames = this.classes || "";
+};
+</script>
 
-      if (this.x) classNames += ` mx-${this.x}`;
-      if (this.y) classNames += ` my-${this.y}`;
+<script setup lang="ts">
+import { defineProps, defineEmits, computed } from "vue";
 
-      return classNames;
-    },
-  },
+const props = defineProps<{
+  outlined?: boolean;
+  text?: boolean;
+  disabled?: boolean;
+  large?: boolean;
+  small?: boolean;
+  block?: boolean;
+  loading?: boolean;
+  color?: string;
+  iconId?: string;
+  value?: string;
+  y?: string;
+  x?: string;
+  classes?: string;
+  variant?: "add" | "edit" | "save" | "delete" | "cancel" | "artifact";
+  dataCy?: string;
+}>();
+
+const emit = defineEmits<{
+  (e: "click"): void;
+}>();
+
+const buttonIconId = computed(() => {
+  switch (props.variant) {
+    case "add":
+      return "mdi-plus";
+    case "edit":
+      return "mdi-pencil";
+    case "save":
+      return "mdi-content-save";
+    case "delete":
+      return "mdi-delete";
+    case "cancel":
+      return "mdi-close";
+    case "artifact":
+      return "mdi-application-array-outline";
+    default:
+      return props.iconId;
+  }
+});
+
+const buttonColor = computed(() => {
+  switch (props.variant) {
+    case "add":
+    case "save":
+      return "primary";
+    case "delete":
+      return "error";
+    default:
+      return props.color;
+  }
+});
+
+const buttonClassName = computed(() => {
+  let classNames = props.classes || "";
+
+  if (props.x) classNames += ` mx-${props.x}`;
+  if (props.y) classNames += ` my-${props.y}`;
+
+  return classNames;
+});
+
+const buttonVariant = computed(() => {
+  if (props.outlined) {
+    return "outlined";
+  } else if (props.text) {
+    return "text";
+  } else {
+    return "elevated";
+  }
+});
+
+const buttonSize = computed(() => {
+  if (props.large) {
+    return "large";
+  } else if (props.small) {
+    return "small";
+  } else {
+    return undefined;
+  }
 });
 </script>

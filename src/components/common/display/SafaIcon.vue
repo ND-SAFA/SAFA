@@ -1,14 +1,14 @@
 <template>
   <img
-    v-if="!this.$vuetify.theme.dark"
-    src="@/assets/images/SAFA-primary.svg"
+    v-if="!darkMode"
+    :src="iconLight"
     alt="SAFA"
     class="full-width"
     @click="$emit('click')"
   />
   <img
     v-else
-    src="@/assets/images/SAFA-secondary.svg"
+    :src="iconDark"
     alt="SAFA"
     class="full-width"
     @click="$emit('click')"
@@ -16,12 +16,24 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-
 /**
  * Displays the SAFA icon.
  */
-export default Vue.extend({
+export default {
   name: "SafaIcon",
-});
+};
+</script>
+
+<script setup lang="ts">
+import { defineEmits, computed } from "vue";
+import { useTheme } from "vuetify";
+import iconLight from "@/assets/images/SAFA-primary.svg";
+import iconDark from "@/assets/images/SAFA-secondary.svg";
+
+defineEmits<{
+  (e: "click"): void;
+}>();
+
+const theme = useTheme();
+const darkMode = computed(() => theme.global.current.value.dark);
 </script>

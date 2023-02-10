@@ -13,8 +13,8 @@
     <v-btn
       text
       small
-      @click.stop="isExpanded = !isExpanded"
       class="text--secondary"
+      @click.stop="isExpanded = !isExpanded"
     >
       {{ isExpanded ? "See Less" : "See More" }}
     </v-btn>
@@ -31,8 +31,8 @@
     <v-btn
       text
       small
-      @click.stop="isExpanded = !isExpanded"
       class="text--secondary"
+      @click.stop="isExpanded = !isExpanded"
     >
       {{ isExpanded ? "See Less" : "See More" }}
     </v-btn>
@@ -59,111 +59,97 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
-import { TextAlignType, ElementType, SizeType, TextType } from "@/types";
-
 /**
  * A generic component for displaying text.
  */
-export default Vue.extend({
+export default {
   name: "Typography",
-  props: {
-    value: [String, Number],
-    classes: String,
-    color: String,
-    inheritColor: Boolean,
-    error: Boolean,
-    defaultExpanded: Boolean,
-    ellipsis: Boolean,
-    secondary: Boolean,
-    bold: Boolean,
-    variant: {
-      type: String as PropType<TextType>,
-      default: "body",
-    },
-    el: {
-      type: String as PropType<ElementType>,
-      default: "span",
-    },
-    align: {
-      type: String as PropType<TextAlignType>,
-      default: "left",
-    },
-    x: {
-      type: String as PropType<SizeType>,
-      default: "",
-    },
-    l: {
-      type: String as PropType<SizeType>,
-      default: "",
-    },
-    r: {
-      type: String as PropType<SizeType>,
-      default: "",
-    },
-    y: {
-      type: String as PropType<SizeType>,
-      default: "",
-    },
-    t: {
-      type: String as PropType<SizeType>,
-      default: "",
-    },
-    b: {
-      type: String as PropType<SizeType>,
-      default: "",
-    },
-  },
-  data() {
-    return {
-      isExpanded: this.defaultExpanded && String(this.value).length < 500,
-    };
-  },
-  computed: {
-    /**
-     * @return Whether this text is expandable.
-     */
-    isExpandable(): boolean {
-      return this.variant === "expandable";
-    },
-    /**
-     * @return The class name.
-     */
-    className(): string {
-      let classNames = ` text-${this.align}`;
+};
+</script>
 
-      if (this.classes) classNames += ` ${this.classes}`;
-      if (this.color && !this.$vuetify.theme.dark)
-        classNames += ` ${this.color}--text`;
-      if (this.inheritColor) classNames += ` inherit-color`;
-      if (this.error) classNames += ` error--text`;
-      if (this.ellipsis) classNames += ` text-ellipsis`;
-      if (this.secondary) classNames += ` text--secondary`;
-      if (this.bold) classNames += ` font-weight-bold`;
-      if (this.x) classNames += ` mx-${this.x}`;
-      if (this.l) classNames += ` ml-${this.l}`;
-      if (this.r) classNames += ` mr-${this.r}`;
-      if (this.y) classNames += ` my-${this.y}`;
-      if (this.t) classNames += ` mt-${this.t}`;
-      if (this.b) classNames += ` mb-${this.b}`;
+<script setup lang="ts">
+import { ref, computed, withDefaults, defineProps } from "vue";
+import { useTheme } from "vuetify";
+import { TextAlignType, ElementType, SizeType, TextType } from "@/types";
 
-      switch (this.variant) {
-        case "large":
-          return "text-h3" + classNames;
-        case "title":
-          return "text-h4" + classNames;
-        case "subtitle":
-          return "text-h5" + classNames;
-        case "small":
-          return "text-subtitle-2" + classNames;
-        case "caption":
-          return "text-caption text--secondary" + classNames;
-        case "code":
-          return "text-body-1 overflow-y-auto" + classNames;
-        default:
-          return "text-body-1" + classNames;
-      }
-    },
-  },
+const props = withDefaults(
+  defineProps<{
+    value?: string | number;
+    classes?: string;
+    color?: string;
+    inheritColor?: boolean;
+    error?: boolean;
+    defaultExpanded?: boolean;
+    ellipsis?: boolean;
+    secondary?: boolean;
+    bold?: boolean;
+    variant?: TextType;
+    el?: ElementType;
+    align?: TextAlignType;
+    x?: SizeType;
+    y?: SizeType;
+    l?: SizeType;
+    r?: SizeType;
+    t?: SizeType;
+    b?: SizeType;
+  }>(),
+  {
+    value: "",
+    classes: undefined,
+    color: undefined,
+    variant: "body",
+    el: "span",
+    align: "left",
+    x: "",
+    y: "",
+    l: "",
+    r: "",
+    t: "",
+    b: "",
+  }
+);
+
+const theme = useTheme();
+const isExpanded = ref(
+  props.defaultExpanded && String(props.value).length < 500
+);
+
+const darkMode = computed(() => theme.global.current.value.dark);
+
+const isExpandable = computed(() => props.variant === "expandable");
+
+const className = computed(() => {
+  let classNames = ` text-${props.align}`;
+
+  if (props.classes) classNames += ` ${props.classes}`;
+  if (props.color && !darkMode.value) classNames += ` ${props.color}--text`;
+  if (props.inheritColor) classNames += ` inherit-color`;
+  if (props.error) classNames += ` error--text`;
+  if (props.ellipsis) classNames += ` text-ellipsis`;
+  if (props.secondary) classNames += ` text--secondary`;
+  if (props.bold) classNames += ` font-weight-bold`;
+  if (props.x) classNames += ` mx-${props.x}`;
+  if (props.l) classNames += ` ml-${props.l}`;
+  if (props.r) classNames += ` mr-${props.r}`;
+  if (props.y) classNames += ` my-${props.y}`;
+  if (props.t) classNames += ` mt-${props.t}`;
+  if (props.b) classNames += ` mb-${props.b}`;
+
+  switch (props.variant) {
+    case "large":
+      return "text-h3" + classNames;
+    case "title":
+      return "text-h4" + classNames;
+    case "subtitle":
+      return "text-h5" + classNames;
+    case "small":
+      return "text-subtitle-2" + classNames;
+    case "caption":
+      return "text-caption text--secondary" + classNames;
+    case "code":
+      return "text-body-1 overflow-y-auto" + classNames;
+    default:
+      return "text-body-1" + classNames;
+  }
 });
 </script>

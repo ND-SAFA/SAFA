@@ -8,7 +8,7 @@
     :actions-height="doShowUpload ? 0 : 50"
     @close="handleClose"
   >
-    <template v-slot:body>
+    <template #body>
       <project-files-uploader
         v-if="doShowUpload"
         data-cy-name="input-project-name-modal"
@@ -17,19 +17,19 @@
       />
       <project-identifier-input
         v-else
-        v-bind:name.sync="identifier.name"
-        v-bind:description.sync="identifier.description"
+        v-model:name="identifier.name"
+        v-model:description="identifier.description"
         data-cy-name="input-project-name-modal"
         data-cy-description="input-project-description-modal"
       />
     </template>
-    <template v-slot:actions v-if="!doShowUpload">
+    <template v-if="!doShowUpload" #actions>
       <v-btn
-        @click="handleSave"
         color="primary"
         class="ml-auto"
         :disabled="!canSave"
         data-cy="button-project-save"
+        @click="handleSave"
       >
         Save
       </v-btn>
@@ -98,6 +98,16 @@ export default Vue.extend({
       return identifierSaveStore.canSave;
     },
   },
+  watch: {
+    /**
+     * Resets identifier data when opened.
+     */
+    isOpen(open: boolean) {
+      if (!open) return;
+
+      identifierSaveStore.resetIdentifier();
+    },
+  },
   methods: {
     /**
      * Emits a request to close.
@@ -110,16 +120,6 @@ export default Vue.extend({
      */
     handleSave() {
       this.$emit("save");
-    },
-  },
-  watch: {
-    /**
-     * Resets identifier data when opened.
-     */
-    isOpen(open: boolean) {
-      if (!open) return;
-
-      identifierSaveStore.resetIdentifier();
     },
   },
 });

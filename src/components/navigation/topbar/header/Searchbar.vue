@@ -1,6 +1,8 @@
 <template>
   <v-form style="min-width: 200px; width: 30vw">
     <v-autocomplete
+      v-model="value"
+      v-model:search-input="queryText"
       outlined
       dense
       hide-details
@@ -8,21 +10,19 @@
       clearable
       label="Search Artifacts"
       color="accent"
-      v-model="value"
       :items="artifacts"
-      :search-input.sync="queryText"
       item-text="name"
       item-value="id"
       class="mx-1 mt-1 nav-input"
       :filter="filterArtifacts"
       data-cy="input-artifact-search-nav"
     >
-      <template v-slot:append>
+      <template #append>
         <v-icon color="accent" class="input-no-icon-rotate">
           mdi-magnify
         </v-icon>
       </template>
-      <template v-slot:prepend-item>
+      <template #prepend-item>
         <flex-box x="3">
           <v-spacer />
           <typography
@@ -33,7 +33,7 @@
           />
         </flex-box>
       </template>
-      <template v-slot:item="{ item }">
+      <template #item="{ item }">
         <artifact-body-display
           display-title
           :artifact="item"
@@ -65,22 +65,6 @@ export default Vue.extend({
     return {
       queryText: "" as string | null,
     };
-  },
-  methods: {
-    /**
-     * Filters what artifacts are currently visible.
-     * @param artifact
-     * @param queryText
-     */
-    filterArtifacts(artifact: ArtifactSearchItem, queryText: string | null) {
-      if (!queryText) {
-        return true;
-      } else if ("header" in artifact || "divider" in artifact) {
-        return false;
-      } else {
-        return filterArtifacts(artifact, queryText);
-      }
-    },
   },
   computed: {
     /**
@@ -118,6 +102,22 @@ export default Vue.extend({
           selectionStore.clearSelections();
         }
       },
+    },
+  },
+  methods: {
+    /**
+     * Filters what artifacts are currently visible.
+     * @param artifact
+     * @param queryText
+     */
+    filterArtifacts(artifact: ArtifactSearchItem, queryText: string | null) {
+      if (!queryText) {
+        return true;
+      } else if ("header" in artifact || "divider" in artifact) {
+        return false;
+      } else {
+        return filterArtifacts(artifact, queryText);
+      }
     },
   },
 });

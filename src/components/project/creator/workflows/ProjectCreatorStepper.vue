@@ -2,16 +2,16 @@
   <stepper
     v-model="currentStep"
     :steps="steps"
-    submitText="Create Project"
+    submit-text="Create Project"
     @submit="saveProject()"
   >
-    <template v-slot:items>
+    <template #items>
       <v-stepper-content step="1">
         <project-identifier-input
+          v-model:description="projectSaveStore.description"
+          v-model:name="projectSaveStore.name"
           data-cy-description="input-project-description-standard"
           data-cy-name="input-project-name-standard"
-          v-bind:description.sync="store.description"
-          v-bind:name.sync="store.name"
         />
       </v-stepper-content>
 
@@ -24,7 +24,7 @@
           @upload:valid="setStepIsValid(1, true)"
           @upload:invalid="setStepIsValid(1, false)"
         >
-          <template v-slot:creator="{ isCreatorOpen, onAddFile, onClose }">
+          <template #creator="{ isCreatorOpen, onAddFile, onClose }">
             <artifact-type-creator
               :artifact-types="artifactTypes"
               :is-open="isCreatorOpen"
@@ -45,7 +45,7 @@
           @upload:valid="setStepIsValid(2, true)"
           @upload:invalid="setStepIsValid(2, false)"
         >
-          <template v-slot:creator="{ isCreatorOpen, onAddFile, onClose }">
+          <template #creator="{ isCreatorOpen, onAddFile, onClose }">
             <trace-file-creator
               :artifact-types="artifactTypes"
               :is-open="isCreatorOpen"
@@ -69,8 +69,15 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { ArtifactMap, StepState, TraceFile } from "@/types";
+export default {
+  name: "ProjectCreatorStepper",
+};
+</script>
+
+<script setup lang="ts">
+import { computed, ref, watch } from "vue";
+import { useRoute } from "vue-router";
+import { ArtifactMap, StepState } from "@/types";
 import { projectSaveStore } from "@/hooks";
 import {
   createArtifactUploader,
@@ -84,117 +91,89 @@ import { FileUploader, ArtifactTypeCreator, TraceFileCreator } from "../panels";
 
 const PROJECT_IDENTIFIER_STEP_NAME = "Name Project";
 
-export default Vue.extend({
-  name: "ProjectCreatorStepper",
-  components: {
-    ProjectIdentifierInput,
-    Stepper,
-    FileUploader,
-    ArtifactTypeCreator,
-    TraceFileCreator,
-    TimTree,
-  },
-  data() {
-    return {
-      steps: [
-        [PROJECT_IDENTIFIER_STEP_NAME, false],
-        ["Upload Artifacts", true],
-        ["Upload Trace Links", true],
-        ["View TIM", true],
-      ] as StepState[],
-      currentStep: 1,
+const steps = ref<StepState[]>([
+  [PROJECT_IDENTIFIER_STEP_NAME, false],
+  ["Upload Artifacts", true],
+  ["Upload Trace Links", true],
+  ["View TIM", true],
+]);
+const currentRoute = useRoute();
+const currentStep = ref(1);
+const artifactUploader = ref(createArtifactUploader());
+const traceUploader = ref(createTraceUploader());
 
-      artifactUploader: createArtifactUploader(),
-      traceUploader: createTraceUploader(),
-    };
-  },
-  computed: {
-    /**
-     * @return The store for creating a project.
-     */
-    store(): typeof projectSaveStore {
-      return projectSaveStore;
-    },
-    /**
-     * @return A collection of all artifacts.
-     */
-    artifactMap(): ArtifactMap {
-      return this.artifactUploader.panels
-        .map(({ projectFile }) => projectFile.artifacts || [])
-        .reduce((acc, cur) => [...acc, ...cur], [])
-        .map((artifact) => ({ [artifact.name]: artifact }))
-        .reduce((acc, cur) => ({ ...acc, ...cur }), {});
-    },
-    /**
-     * @return All artifacts types.
-     */
-    artifactTypes(): string[] {
-      return this.artifactUploader.panels.map((p) => p.projectFile.type);
-    },
-    /**
-     * @return All trace files.
-     */
-    traceFiles(): TraceFile[] {
-      return this.traceUploader.panels.map((p) => p.projectFile);
-    },
-  },
-  methods: {
-    /**
-     * Sets the valid state of a step.
-     * @param stepIndex - The step cto change.
-     * @param isValid - Whether the step is valid.
-     */
-    setStepIsValid(stepIndex: number, isValid: boolean): void {
-      Vue.set(this.steps, stepIndex, [this.steps[stepIndex][0], isValid]);
-    },
-    /**
-     * Clears stepper data.
-     */
-    clearData() {
-      projectSaveStore.resetProject();
-      this.currentStep = 1;
-      this.artifactUploader = createArtifactUploader();
-      this.traceUploader = createTraceUploader();
-    },
-    /**
-     * Attempts to create a project.
-     */
-    saveProject(): void {
-      handleImportProject(
-        projectSaveStore.getCreationRequest(
-          this.artifactUploader,
-          this.traceUploader
-        ),
-        {
-          onSuccess: () => this.clearData(),
-        }
-      );
-    },
-  },
-  watch: {
-    /**
-     * When the step changes, update the project step to include the project's name.
-     */
-    currentStep(stepNumber: number): void {
-      if (stepNumber === 1) {
-        const hasName = this.store.name !== "";
-        Vue.set(this.steps, 0, [PROJECT_IDENTIFIER_STEP_NAME, hasName]);
-      } else if (stepNumber === 2) {
-        Vue.set(this.steps, 0, [this.store.name, true]);
-      }
-    },
-    /**
-     * When the name changes, update the project step to the new name.
-     */
-    "store.name"(newName: string): void {
-      Vue.set(this.steps, 0, [PROJECT_IDENTIFIER_STEP_NAME, newName !== ""]);
-    },
-    /**
-     * Opens the current tab when the route changes.
-     */
-    $route() {
-      this.clearData();
-    },
-  },
-});
+const artifactMap = computed<ArtifactMap>(() =>
+  artifactUploader.value.panels
+    .map(({ projectFile }) => projectFile.artifacts || [])
+    .reduce((acc, cur) => [...acc, ...cur], [])
+    .map((artifact) => ({ [artifact.name]: artifact }))
+    .reduce((acc, cur) => ({ ...acc, ...cur }), {})
+);
+
+const artifactTypes = computed(() =>
+  artifactUploader.value.panels.map((p) => p.projectFile.type)
+);
+
+const traceFiles = computed(() =>
+  traceUploader.value.panels.map((p) => p.projectFile)
+);
+
+/**
+ * Sets the valid state of a step.
+ * @param stepIndex - The step cto change.
+ * @param isValid - Whether the step is valid.
+ */
+function setStepIsValid(stepIndex: number, isValid: boolean): void {
+  steps.value[stepIndex] = [steps.value[stepIndex][0], isValid];
+}
+
+/**
+ * Clears stepper data.
+ */
+function handleClearData() {
+  projectSaveStore.resetProject();
+  currentStep.value = 1;
+  artifactUploader.value = createArtifactUploader();
+  traceUploader.value = createTraceUploader();
+}
+
+/**
+ * Attempts to create a project.
+ */
+function saveProject(): void {
+  handleImportProject(
+    projectSaveStore.getCreationRequest(
+      artifactUploader.value,
+      traceUploader.value
+    ),
+    {
+      onSuccess: () => handleClearData(),
+    }
+  );
+}
+
+watch(
+  () => currentStep.value,
+  (stepNumber) => {
+    if (stepNumber === 1) {
+      const hasName = projectSaveStore.name !== "";
+
+      steps.value[0] = [PROJECT_IDENTIFIER_STEP_NAME, hasName];
+    } else if (stepNumber === 2) {
+      steps.value[0] = [projectSaveStore.name, true];
+    }
+  }
+);
+
+watch(
+  () => projectSaveStore.name,
+  (newName) => {
+    steps.value[0] = [PROJECT_IDENTIFIER_STEP_NAME, newName !== ""];
+  }
+);
+
+watch(
+  () => currentRoute.path,
+  () => handleClearData()
+);
 </script>

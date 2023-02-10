@@ -4,10 +4,9 @@
     <v-divider />
 
     <v-list>
-      <template v-for="(doc, idx) in documents">
-        <v-divider :key="doc.documentId + '-div'" v-if="idx !== 0" />
+      <template v-for="(doc, idx) in documents" :key="doc.documentId">
+        <v-divider v-if="idx !== 0" />
         <list-item
-          :key="doc.documentId"
           :item="{ title: doc.name, subtitle: documentTypeName(doc.type) }"
           @click="handleSwitchDocument(doc)"
         />

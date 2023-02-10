@@ -26,7 +26,11 @@
           label="Ignore Errors"
           data-cy="button-ignore-errors"
         />
-        <typography v-if="!isValid && showFileUploader" error :value="error" />
+        <typography
+          v-if="!isValid && showFileUploader"
+          error
+          :value="errorMessage"
+        />
       </flex-box>
 
       <v-expansion-panels accordion>
@@ -42,7 +46,7 @@
               color="primary"
               class="ma-1"
               data-cy="button-created-entity"
-              @click="underDevelopmentError()"
+              @click="underDevelopmentError"
             >
               {{ entityName }}
             </v-btn>
@@ -74,7 +78,7 @@
         <v-btn
           color="error"
           data-cy="button-delete-artifact"
-          @click="$emit('delete')"
+          @click="emit('delete')"
         >
           Delete
         </v-btn>
@@ -84,8 +88,24 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
-import { logStore } from "@/hooks";
+/**
+ * Displays a file panel.
+ */
+export default {
+  name: "FilePanel",
+};
+</script>
+
+<script setup lang="ts">
+import {
+  computed,
+  ref,
+  watch,
+  withDefaults,
+  defineEmits,
+  defineProps,
+} from "vue";
+import { logStore, useVModel } from "@/hooks";
 import {
   SwitchInput,
   FileInput,
@@ -95,128 +115,70 @@ import {
 
 const DEFAULT_ERROR_MESSAGE = "No file has been uploaded.";
 
+const props = withDefaults(
+  defineProps<{
+    entityNames: string[];
+    errors: string[];
+    ignoreErrors: boolean;
+    isLoading: boolean;
+    showFileUploader?: boolean;
+    fileRequired?: boolean;
+    entitiesAreFab?: boolean;
+  }>(),
+  { showFileUploader: true, fileRequired: true, entitiesAreFab: true }
+);
+
+const emit = defineEmits<{
+  (e: "update:ignoreErrors", value: boolean): void;
+  (e: "validate", isValue: boolean): void;
+  (e: "change", file: File | null): void;
+  (e: "delete"): void;
+}>();
+
+const errorMessage = ref(props.showFileUploader ? DEFAULT_ERROR_MESSAGE : "");
+const ignoreErrors = useVModel(props, "ignoreErrors");
+
+const isValid = computed(
+  () =>
+    ignoreErrors.value ||
+    (errorMessage.value === "" && props.errors.length === 0) ||
+    !props.showFileUploader
+);
+
+const iconName = computed(() => (isValid.value ? "mdi-check" : "mdi-close"));
+const iconColor = computed(() => (isValid.value ? "success" : "error"));
+
 /**
- * Displays a file panel.
- *
- * @emits-1 `delete` - On delete.
- * @emits-2 `update:ignore-errors-flag` (ignoreErrors: boolean) - On update ignore errors.
- * @emits-3 `validate` (isValid: boolean) - On validate.
- * @emits-4 `change` (file?: File) - On change.
+ * Emits a change when the panel is cleared.
  */
-export default Vue.extend({
-  name: "FilePanel",
-  components: {
-    FlexBox,
-    Typography,
-    SwitchInput,
-    FileInput,
-  },
-  props: {
-    fileRequired: {
-      type: Boolean,
-      default: true,
-    },
-    showFileUploader: {
-      type: Boolean,
-      default: true,
-    },
-    errors: {
-      type: Array as PropType<string[]>,
-      required: true,
-    },
-    entityNames: {
-      type: Array as PropType<string[]>,
-      required: true,
-    },
-    entitiesAreFab: {
-      type: Boolean,
-      default: true,
-    },
-    ignoreErrorsFlag: {
-      type: Boolean,
-      required: true,
-    },
-    isLoading: {
-      type: Boolean,
-      required: true,
-    },
-  },
-  data() {
-    return {
-      isOpen: true,
-      error: this.showFileUploader ? DEFAULT_ERROR_MESSAGE : "",
-    };
-  },
-  computed: {
-    /**
-     * Emits updates to ignore errors.
-     */
-    ignoreErrors: {
-      get(): boolean {
-        return this.ignoreErrorsFlag;
-      },
-      set(ignoreErrors: boolean): void {
-        this.$emit("update:ignore-errors-flag", ignoreErrors);
-      },
-    },
-    /**
-     * Whether this file panel is valid.
-     */
-    isValid(): boolean {
-      return (
-        this.ignoreErrors ||
-        (this.error === "" && this.errors.length === 0) ||
-        !this.showFileUploader
-      );
-    },
-    /**
-     * The panel's icon.
-     */
-    iconName(): string {
-      return this.isValid ? "mdi-check" : "mdi-close";
-    },
-    /**
-     * The panel's color.
-     */
-    iconColor(): string {
-      return this.isValid ? "success" : "error";
-    },
-  },
-  watch: {
-    /**
-     * Emit changes to the validation status.
-     */
-    isValid(): void {
-      this.$emit("validate", this.isValid);
-    },
-  },
-  methods: {
-    /**
-     * Emits a change when the panel is cleared.
-     */
-    handleClear(): void {
-      this.$emit("change", undefined);
-    },
-    /**
-     * Emits changed files.
-     * @param file - The uploaded file.
-     */
-    emitChangeFiles(file: File | null): void {
-      const fileIsEmpty = file === null;
+function handleClear(): void {
+  emit("change", null);
+}
 
-      if (this.fileRequired) {
-        this.error = fileIsEmpty ? DEFAULT_ERROR_MESSAGE : "";
-      }
+/**
+ * Emits changed files.
+ * @param file - The uploaded file.
+ */
+function emitChangeFiles(file: File | null): void {
+  const fileIsEmpty = file === null;
 
-      if (fileIsEmpty) {
-        this.handleClear();
-      } else {
-        this.$emit("change", file);
-      }
-    },
-    underDevelopmentError(): void {
-      logStore.onInfo("Viewing parsed entities is under development.");
-    },
-  },
-});
+  if (props.fileRequired) {
+    errorMessage.value = fileIsEmpty ? DEFAULT_ERROR_MESSAGE : "";
+  }
+
+  if (fileIsEmpty) {
+    handleClear();
+  } else {
+    emit("change", file);
+  }
+}
+
+function underDevelopmentError(): void {
+  logStore.onInfo("Viewing parsed entities is under development.");
+}
+
+watch(
+  () => isValid.value,
+  () => emit("validate", isValid.value)
+);
 </script>

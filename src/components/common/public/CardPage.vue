@@ -19,25 +19,23 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { SafaIcon } from "@/components/common/display";
-
 /**
  * Presents the page within a card containing SAFA title, a slot for a form,
  * and a slot for its actions.
  */
-export default Vue.extend({
+export default {
   name: "CardPage",
-  components: { SafaIcon },
-  computed: {
-    /**
-     * @return The page's class name.
-     */
-    className(): string {
-      return this.$vuetify.theme.dark
-        ? "neutral-bg fill-height"
-        : "primary fill-height";
-    },
-  },
-});
+};
+</script>
+
+<script setup lang="ts">
+import { useTheme } from "vuetify";
+import { computed } from "vue";
+import { SafaIcon } from "@/components/common/display";
+
+const theme = useTheme();
+const darkMode = computed(() => theme.global.current.value.dark);
+const className = computed(() =>
+  darkMode.value ? "neutral-bg fill-height" : "primary fill-height"
+);
 </script>

@@ -1,14 +1,14 @@
 <template>
   <div>
-    <v-row dense v-if="store.isCustom">
+    <v-row v-if="store.isCustom" dense>
       <v-col cols="6">
-        <v-text-field filled label="Name" v-model="store.editedLayout.name"
+        <v-text-field v-model="store.editedLayout.name" filled label="Name"
       /></v-col>
       <v-col cols="6">
         <artifact-type-input
+          v-model="store.editedLayout.artifactTypes"
           multiple
           persistent-hint
-          v-model="store.editedLayout.artifactTypes"
           hint="The layout will only appear on these artifact types."
           :error-messages="store.typeErrors"
       /></v-col>
@@ -16,7 +16,7 @@
 
     <panel-card>
       <attribute-grid editable :layout="store.editedLayout">
-        <template v-slot:item="{ attribute }">
+        <template #item="{ attribute }">
           <v-card v-if="!!attribute" outlined class="pa-3 mx-2">
             <flex-box align="center" justify="space-between">
               <div>
@@ -58,9 +58,18 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
-import { AttributeLayoutSchema, AttributeSchema } from "@/types";
-import { attributeLayoutSaveStore, attributesStore } from "@/hooks";
+/**
+ * Allows for editing attribute layouts.
+ */
+export default {
+  name: "SaveAttributeLayout",
+};
+</script>
+
+<script setup lang="ts">
+import { onMounted, ref, watch, defineProps, defineEmits } from "vue";
+import { AttributeSchema, AttributeLayoutSchema } from "@/types";
+import { attributeLayoutSaveStore } from "@/hooks";
 import { handleDeleteAttributeLayout, handleSaveAttributeLayout } from "@/api";
 import {
   AttributeGrid,
@@ -72,82 +81,43 @@ import {
   TextButton,
 } from "@/components/common";
 
-/**
- * Allows for editing attribute layouts.
- *
- * @emits-1 `save` - On attribute layout save.
- */
-export default Vue.extend({
-  name: "SaveAttributeLayout",
-  components: {
-    TextButton,
-    IconButton,
-    Typography,
-    PanelCard,
-    ArtifactTypeInput,
-    AttributeGrid,
-    FlexBox,
-  },
-  props: {
-    layout: Object as PropType<AttributeLayoutSchema>,
-  },
-  data() {
-    return {
-      store: attributeLayoutSaveStore(this.layout?.id || ""),
-      addedAttribute: "",
-    };
-  },
-  mounted() {
-    this.store.resetLayout(this.layout);
-  },
-  computed: {
-    /**
-     * @return All project attributes not currently in the layout.
-     */
-    unusedAttributes(): AttributeSchema[] {
-      const usedKeys = this.store.editedLayout.positions.map(({ key }) => key);
+const props = defineProps<{
+  layout?: AttributeLayoutSchema;
+}>();
 
-      return attributesStore.attributes.filter(
-        ({ key }) => !usedKeys.includes(key)
-      );
-    },
-  },
-  methods: {
-    /**
-     * Saves an attribute layout.
-     */
-    handleSave() {
-      handleSaveAttributeLayout(this.store.editedLayout, this.store.isUpdate, {
-        onSuccess: () => this.$emit("save"),
-      });
-    },
-    /**
-     * Deletes an attribute layout.
-     */
-    handleDeleteLayout() {
-      handleDeleteAttributeLayout(this.store.editedLayout, {});
-    },
-    /**
-     * Deletes an attribute from the layout.
-     */
-    handleDeleteAttribute(attribute: AttributeSchema) {
-      this.store.deleteAttribute(attribute);
-    },
-    /**
-     * Adds an attribute to the layout.
-     */
-    handleAddAttribute() {
-      this.store.addAttribute(this.addedAttribute);
-      this.addedAttribute = "";
-    },
-  },
-  watch: {
-    /**
-     * Updates the store when the layout changes.
-     */
-    layout(): void {
-      this.store.resetLayout(this.layout);
-    },
-  },
-});
+const emit = defineEmits<{
+  (e: "save"): void;
+}>();
+
+const store = ref(attributeLayoutSaveStore(props.layout?.id || ""));
+
+/**
+ * Saves an attribute layout.
+ */
+function handleSave() {
+  handleSaveAttributeLayout(store.value.editedLayout, store.value.isUpdate, {
+    onSuccess: () => emit("save"),
+  });
+}
+
+/**
+ * Deletes an attribute layout.
+ */
+function handleDeleteLayout() {
+  handleDeleteAttributeLayout(store.value.editedLayout, {});
+}
+
+/**
+ * Deletes an attribute from the layout.
+ */
+function handleDeleteAttribute(attribute: AttributeSchema) {
+  store.value.deleteAttribute(attribute);
+}
+
+onMounted(() => store.value.resetLayout(props.layout));
+
+watch(
+  () => props.layout,
+  () => store.value.resetLayout(props.layout)
+);
 </script>

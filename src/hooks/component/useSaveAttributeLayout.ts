@@ -68,7 +68,7 @@ export const useSaveAttributeLayout = (id: string) =>
        * Resets the state of the attribute layout to the selected artifact.
        * @param baseLayout - The layout to reset data to.
        */
-      resetLayout(baseLayout: AttributeLayoutSchema): void {
+      resetLayout(baseLayout: AttributeLayoutSchema | undefined): void {
         this.baseLayout = baseLayout;
         this.editedLayout = createAttributeLayout(this.baseLayout);
       },

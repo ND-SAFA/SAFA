@@ -1,8 +1,8 @@
 <template>
   <v-select
     ref="documentSelector"
-    v-model="select"
-    :items="items"
+    :items="documentStore.projectDocuments"
+    :model-value="documentStore.currentDocument"
     label="View"
     outlined
     color="accent"
@@ -13,8 +13,9 @@
     class="mx-1 nav-input"
     item-text="name"
     data-cy="button-document-select-open"
+    @update:model-value="handleSetDocument"
   >
-    <template v-slot:item="{ item }">
+    <template #item="{ item }">
       <v-row dense align="center" :data-cy-name="item.name">
         <v-col data-cy="button-document-select-item">
           {{ item.name }}
@@ -30,7 +31,7 @@
       </v-row>
     </template>
 
-    <template v-slot:append-item>
+    <template #append-item>
       <text-button
         v-if="canEdit()"
         text
@@ -46,7 +47,16 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+/**
+ * A selector for switching between documents.
+ */
+export default {
+  name: "DocumentSelector",
+};
+</script>
+
+<script setup lang="ts">
+import { ref } from "vue";
 import { DocumentSchema } from "@/types";
 import {
   appStore,
@@ -58,63 +68,52 @@ import {
 import { handleSwitchDocuments } from "@/api";
 import { IconButton, TextButton } from "@/components/common";
 
-export default Vue.extend({
-  name: "DocumentSelector",
-  components: { TextButton, IconButton },
-  computed: {
-    /**
-     * @return The current documents.
-     */
-    items() {
-      return documentStore.projectDocuments;
-    },
-    /**
-     * Switches documents when a document is selected.
-     */
-    select: {
-      get() {
-        return documentStore.currentDocument;
-      },
-      set(documentName: string) {
-        const document = this.items.find(({ name }) => documentName === name);
+const documentSelector = ref<HTMLElement | null>(null);
 
-        if (document) {
-          handleSwitchDocuments(document);
-        }
-      },
-    },
-  },
-  methods: {
-    /**
-     * Returns whether a document can be edited.
-     * @param name - The document name, or none to check for general editing ability.
-     * @return Whether editing is allowed.
-     */
-    canEdit(name = ""): boolean {
-      return name !== "Default" && sessionStore.isEditor(projectStore.project);
-    },
-    /**
-     * Closes the selector menu and resets all data.
-     */
-    handleCloseMenu() {
-      (this.$refs.documentSelector as HTMLElement).blur();
-    },
-    /**
-     * Opens the create document modal.
-     */
-    handleCreateOpen() {
-      documentSaveStore.baseDocument = undefined;
-      this.handleCloseMenu();
-      appStore.openDetailsPanel("document");
-    },
-    /**
-     * Opens the edit document modal.
-     */
-    handleEditOpen(document: DocumentSchema) {
-      documentSaveStore.baseDocument = document;
-      this.handleCloseMenu();
-      appStore.openDetailsPanel("document");
-    },
-  },
-});
+/**
+ * Switches to the given document name.
+ * @param documentName - The document name to switch to.
+ */
+function handleSetDocument(documentName: string) {
+  const document = documentStore.projectDocuments.find(
+    ({ name }) => documentName === name
+  );
+
+  if (!document) return;
+
+  handleSwitchDocuments(document);
+}
+/**
+ * Returns whether a document can be edited.
+ * @param name - The document name, or none to check for general editing ability.
+ * @return Whether editing is allowed.
+ */
+function canEdit(name = ""): boolean {
+  return name !== "Default" && sessionStore.isEditor(projectStore.project);
+}
+
+/**
+ * Closes the selector menu and resets all data.
+ */
+function handleCloseMenu() {
+  documentSelector.value?.blur();
+}
+
+/**
+ * Opens the document creation panel.
+ */
+function handleCreateOpen() {
+  documentSaveStore.baseDocument = undefined;
+  handleCloseMenu();
+  appStore.openDetailsPanel("document");
+}
+
+/**
+ * Opens the document edit panel.
+ */
+function handleEditOpen(document: DocumentSchema) {
+  documentSaveStore.baseDocument = document;
+  handleCloseMenu();
+  appStore.openDetailsPanel("document");
+}
 </script>

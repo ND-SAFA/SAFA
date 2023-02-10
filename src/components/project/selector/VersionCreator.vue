@@ -1,14 +1,14 @@
 <template>
   <modal
+    v-model:is-loading="isLoading"
     :title="`Current Version: ${version}`"
     size="xs"
     :is-open="isOpen"
     :actions-height="0"
-    v-bind:isLoading.sync="isLoading"
     data-cy="modal-version-create"
     @close="handleClose"
   >
-    <template v-slot:body>
+    <template #body>
       <v-container class="mt-2">
         <v-row justify="center">
           <v-btn
@@ -93,6 +93,18 @@ export default Vue.extend({
       return versionToString(this.currentVersion);
     },
   },
+  watch: {
+    /**
+     * Gets the current version when opened.
+     */
+    isOpen(open: boolean) {
+      if (!open || !this.project) return;
+
+      getCurrentVersion(this.project.projectId).then(
+        (version) => (this.currentVersion = version)
+      );
+    },
+  },
   methods: {
     /**
      * Returns the next version name.
@@ -133,18 +145,6 @@ export default Vue.extend({
      */
     handleClose() {
       this.$emit("close");
-    },
-  },
-  watch: {
-    /**
-     * Gets the current version when opened.
-     */
-    isOpen(open: boolean) {
-      if (!open || !this.project) return;
-
-      getCurrentVersion(this.project.projectId).then(
-        (version) => (this.currentVersion = version)
-      );
     },
   },
 });

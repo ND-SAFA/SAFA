@@ -20,9 +20,8 @@
         class="overflow-y-auto"
         data-cy="list-selected-parents"
       >
-        <template v-for="parent in parents">
+        <template v-for="parent in parents" :key="parent.id">
           <v-list-item
-            :key="parent.id"
             data-cy="list-selected-parent-item"
             @click="handleArtifactClick(parent.name)"
           >
@@ -68,9 +67,8 @@
         class="overflow-y-auto"
         data-cy="list-selected-children"
       >
-        <template v-for="child in children">
+        <template v-for="child in children" :key="child.name">
           <v-list-item
-            :key="child.name"
             data-cy="list-selected-child-item"
             @click="handleArtifactClick(child.name)"
           >

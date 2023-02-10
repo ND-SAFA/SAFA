@@ -5,8 +5,8 @@
     :loading="projectsLoading"
     title="Jira Projects"
   >
-    <template v-for="project in projects">
-      <v-list-item :key="project.id" @click="handleProjectSelect(project)">
+    <template v-for="project in projects" :key="project.id">
+      <v-list-item @click="handleProjectSelect(project)">
         <v-list-item-icon>
           <v-avatar>
             <img :src="project.mediumAvatarUrl" :alt="project.name" />
@@ -43,9 +43,6 @@ export default Vue.extend({
       projectsLoading: false,
     };
   },
-  mounted() {
-    this.loadProjects();
-  },
   computed: {
     /**
      * @return Whether there are current valid credentials.
@@ -61,6 +58,9 @@ export default Vue.extend({
     hasCredentials(): void {
       this.loadProjects();
     },
+  },
+  mounted() {
+    this.loadProjects();
   },
   methods: {
     /**

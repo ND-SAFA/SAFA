@@ -1,29 +1,27 @@
 <template>
   <v-app>
     <v-main class="primary-bg">
-      <transition name="fade" mode="out-in">
+      <router-view v-slot="{ Component }">
         <keep-alive>
-          <router-view />
+          <component :is="Component" />
         </keep-alive>
-      </transition>
+      </router-view>
     </v-main>
     <app-nav />
   </v-app>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { AppNav } from "@/components";
-
 /**
  * Renders the SAFA app.
  */
-export default Vue.extend({
+export default {
   name: "App",
-  components: {
-    AppNav,
-  },
-});
+};
+</script>
+
+<script setup lang="ts">
+import { AppNav } from "@/components";
 </script>
 
 <style lang="scss">

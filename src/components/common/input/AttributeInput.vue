@@ -58,30 +58,30 @@
     v-else-if="attribute.type === 'date'"
     ref="menu"
     v-model="menu"
+    v-model:return-value="model[attribute.key]"
     :close-on-content-click="false"
-    :return-value.sync="model[attribute.key]"
     transition="scale-transition"
     offset-y
     min-width="auto"
   >
-    <template v-slot:activator="{ on, attrs }">
+    <template #activator="{ on, attrs }">
       <v-text-field
-        filled
         v-model="model[attribute.key]"
+        filled
         :label="attribute.label"
         append-icon="mdi-calendar"
         readonly
         v-bind="attrs"
-        v-on="on"
         class="mr-2"
+        v-on="on"
       ></v-text-field>
     </template>
     <v-date-picker
       :value="model[attribute.key]"
-      @input="handleInput"
       no-title
       scrollable
       color="primary"
+      @input="handleInput"
     >
       <v-spacer></v-spacer>
       <v-btn text color="primary" @click="menu = false"> Cancel </v-btn>

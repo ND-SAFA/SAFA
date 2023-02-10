@@ -5,12 +5,8 @@
     :loading="repositoriesLoading"
     empty-message="There are no repositories."
   >
-    <template v-for="repository in repositories">
-      <v-list-item
-        three-line
-        :key="repository.id"
-        @click="handleRepositorySelect(repository)"
-      >
+    <template v-for="repository in repositories" :key="repository.id">
+      <v-list-item three-line @click="handleRepositorySelect(repository)">
         <v-list-item-icon v-if="!!repository.avatar_url">
           <v-avatar>
             <img :src="repository.avatar_url" :alt="repository.name" />
@@ -47,9 +43,6 @@ export default Vue.extend({
       repositoriesLoading: false,
     };
   },
-  mounted() {
-    this.loadProjects();
-  },
   computed: {
     /**
      * @return The selected GitHub organization name.
@@ -65,6 +58,9 @@ export default Vue.extend({
     organizationName(): void {
       this.loadProjects();
     },
+  },
+  mounted() {
+    this.loadProjects();
   },
   methods: {
     /**

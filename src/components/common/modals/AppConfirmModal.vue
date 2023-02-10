@@ -1,14 +1,14 @@
 <template>
   <modal
     size="xs"
-    :isOpen="isMessageDefined"
+    :is-open="isMessageDefined"
     :title="title"
     @close="handleClose"
   >
-    <template v-slot:body>
+    <template #body>
       <typography y="2" el="p" :value="body" />
     </template>
-    <template v-slot:actions>
+    <template #actions>
       <v-spacer />
       <v-btn
         color="primary"

@@ -1,20 +1,20 @@
 <template>
   <file-panel
+    v-model:ignore-errors="ignoreErrors"
     :show-file-uploader="!isGeneratedToggle"
-    @change="handleChange"
-    @delete="$emit('delete')"
-    @validate="setValidationState"
-    :errors="errors"
-    :entity-names="entityNames"
-    :entities-are-fab="!isTracePanel"
+    :errors="panel.projectFile.errors"
+    :entity-names="panel.entityNames"
+    :entities-are-fab="!isTracePanel(panel)"
     :is-loading="isLoading"
-    v-bind:ignore-errors-flag.sync="ignoreErrors"
+    @change="handleChange"
+    @delete="emit('delete')"
+    @validate="handleValidate"
   >
-    <template v-slot:title>
-      <typography el="h2" variant="subtitle" :value="title" />
+    <template #title>
+      <typography el="h2" variant="subtitle" :value="panel.title" />
     </template>
 
-    <template v-slot:before-rows v-if="isTracePanel">
+    <template v-if="isTracePanel(panel)" #before-rows>
       <switch-input v-model="isGeneratedToggle" label="Generate Trace Links" />
       <gen-method-input v-if="isGeneratedToggle" v-model="method" />
     </template>
@@ -22,7 +22,16 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+/**
+ * Controls a file panel.
+ */
+export default {
+  name: "FilePanelController",
+};
+</script>
+
+<script setup lang="ts">
+import { computed, ref, watch, defineProps, defineEmits } from "vue";
 import {
   ArtifactMap,
   ParseFilePanel,
@@ -33,116 +42,65 @@ import { isTracePanel } from "@/util";
 import { SwitchInput, GenMethodInput, Typography } from "@/components/common";
 import FilePanel from "./FilePanel.vue";
 
-/**
- * Controls a file panel.
- *
- * @emits-1 `delete` - On delete.
- * @emits-2 `validate` (isValid: boolean) - On validate.
- */
-export default Vue.extend({
-  name: "FilePanelController",
-  components: {
-    GenMethodInput,
-    SwitchInput,
-    FilePanel,
-    Typography,
-  },
-  props: {
-    artifactMap: {
-      type: Object as PropType<ArtifactMap>,
-      required: true,
-    },
-    panel: {
-      type: Object as PropType<ParseFilePanel<ArtifactMap, ValidFileTypes>>,
-      required: true,
-    },
-  },
-  data() {
-    return {
-      isLoading: false,
-      ignoreErrors: false,
-      isGeneratedToggle: false,
-    };
-  },
-  computed: {
-    /**
-     * @return Whether this is a trace panel.
-     */
-    isTracePanel(): boolean {
-      return isTracePanel(this.panel);
-    },
-    /**
-     * @return Whether this panel is valid.
-     */
-    isValid(): boolean {
-      return this.panel.getIsValid();
-    },
-    /**
-     * @return Any errors in this panel.
-     */
-    errors(): string[] {
-      return this.panel.projectFile.errors;
-    },
-    /**
-     * @return The title of the panel.
-     */
-    title(): string {
-      return this.panel.title;
-    },
-    /**
-     * @return The names of the entities in the panel.
-     */
-    entityNames(): string[] {
-      return this.panel.entityNames;
-    },
-    method: {
-      get(): ModelType {
-        if (isTracePanel(this.panel)) {
-          return this.panel.projectFile.method;
-        } else {
-          return ModelType.NLBert;
-        }
-      },
-      set(newMethod: ModelType): void {
-        if (isTracePanel(this.panel)) {
-          this.panel.projectFile.method = newMethod;
-        }
-      },
-    },
-  },
-  methods: {
-    /**
-     * Parses added files.
-     * @param file - The file to parse.
-     */
-    async handleChange(file: File | undefined): Promise<void> {
-      if (file === undefined) {
-        this.panel.clearPanel();
-      } else {
-        this.isLoading = true;
-        await this.panel.parseFile(this.artifactMap, file);
-        this.isLoading = false;
-      }
-    },
-    /**
-     * Sets whether the panel is valid, and emits that change.
-     * @param isValid - Whether the panel is valid.
-     */
-    setValidationState(isValid: boolean): void {
-      this.panel.projectFile.isValid = isValid;
-      this.$emit("validate", isValid);
-    },
-  },
-  watch: {
-    /**
-     * Generates trace files when generate is toggled on.
-     */
-    isGeneratedToggle(isGenerated: boolean) {
-      if (!isTracePanel(this.panel)) return;
+const props = defineProps<{
+  artifactMap: ArtifactMap;
+  panel: ParseFilePanel<ArtifactMap, ValidFileTypes>;
+}>();
 
-      this.panel.projectFile.isGenerated = isGenerated;
-      this.panel.clearPanel();
-    },
+const emit = defineEmits<{
+  (e: "validate", isValid: boolean): void;
+  (e: "delete"): void;
+}>();
+
+const isLoading = ref(false);
+const ignoreErrors = ref(false);
+const isGeneratedToggle = ref(false);
+
+const method = computed({
+  get() {
+    if (isTracePanel(props.panel)) {
+      return props.panel.projectFile.method;
+    } else {
+      return ModelType.NLBert;
+    }
+  },
+  set(newMethod): void {
+    if (isTracePanel(props.panel)) {
+      props.panel.projectFile.method = newMethod;
+    }
   },
 });
+
+/**
+ * Parses added files.
+ * @param file - The file to parse.
+ */
+async function handleChange(file: File | undefined): Promise<void> {
+  if (file === undefined) {
+    props.panel.clearPanel();
+  } else {
+    isLoading.value = true;
+    await props.panel.parseFile(props.artifactMap, file);
+    isLoading.value = false;
+  }
+}
+
+/**
+ * Sets whether the panel is valid, and emits that change.
+ * @param isValid - Whether the panel is valid.
+ */
+function handleValidate(isValid: boolean): void {
+  props.panel.projectFile.isValid = isValid;
+  emit("validate", isValid);
+}
+
+watch(
+  () => isGeneratedToggle.value,
+  (isGenerated) => {
+    if (!isTracePanel(props.panel)) return;
+
+    props.panel.projectFile.isGenerated = isGenerated;
+    props.panel.clearPanel();
+  }
+);
 </script>

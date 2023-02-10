@@ -22,68 +22,55 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+/**
+ * Allows for creating a project.
+ */
+export default {
+  name: "ProjectCreator",
+};
+</script>
+
+<script setup lang="ts">
+import { onMounted, ref, watch } from "vue";
+import { useRoute } from "vue-router";
 import { creatorTabOptions } from "@/util";
 import { getParam, QueryParams, updateParam } from "@/router";
 import { TabList, Typography } from "@/components/common";
 import { IntegrationsStepper } from "@/components/integrations";
 import { ProjectCreatorStepper, ProjectBulkUpload } from "./workflows";
 
+const tabs = creatorTabOptions();
+const tab = ref(0);
+const currentRoute = useRoute();
+
 /**
- * Allows for creating a project.
+ * Switch to any set tab in the query.
  */
-export default Vue.extend({
-  name: "ProjectCreator",
-  components: {
-    IntegrationsStepper,
-    TabList,
-    ProjectCreatorStepper,
-    ProjectBulkUpload,
-    Typography,
-  },
-  data() {
-    return {
-      tab: 0,
-      tabs: creatorTabOptions(),
-    };
-  },
-  watch: {
-    /**
-     * When the tab changes, update the query tab id.
-     */
-    tab(index: number) {
-      const currentTabId = this.tabs[index].id;
-      const routeTabId = getParam(QueryParams.TAB);
+function openCurrentTab() {
+  const tabId = getParam(QueryParams.TAB);
+  const tabIndex = tabs.findIndex(({ id }) => id === tabId);
 
-      if (currentTabId !== routeTabId) {
-        updateParam(QueryParams.TAB, currentTabId);
-      }
-    },
-    /**
-     * Opens the current tab when the route changes.
-     */
-    $route() {
-      this.openCurrentTab();
-    },
-  },
-  /**
-   * When the page loads, switch to any set tab in the query.
-   */
-  mounted() {
-    this.openCurrentTab();
-  },
-  methods: {
-    /**
-     * Switch to any set tab in the query.
-     */
-    openCurrentTab() {
-      const tabId = getParam(QueryParams.TAB);
-      const tabIndex = this.tabs.findIndex(({ id }) => id === tabId);
+  if (!tabId || tabIndex === -1 || tab.value === tabIndex) return;
 
-      if (!tabId || tabIndex === -1 || this.tab === tabIndex) return;
+  tab.value = tabIndex;
+}
 
-      this.tab = tabIndex;
-    },
-  },
-});
+onMounted(() => openCurrentTab());
+
+watch(
+  () => currentRoute.path,
+  () => openCurrentTab()
+);
+
+watch(
+  () => tab.value,
+  (index) => {
+    const currentTabId = tabs[index].id;
+    const routeTabId = getParam(QueryParams.TAB);
+
+    if (currentTabId !== routeTabId) {
+      updateParam(QueryParams.TAB, currentTabId);
+    }
+  }
+);
 </script>

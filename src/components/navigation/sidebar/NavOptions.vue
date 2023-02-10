@@ -1,13 +1,9 @@
 <template>
   <v-list>
     <v-list-item-group active-class="nav-selected">
-      <template v-for="option in options">
-        <v-divider v-if="option.divider" :key="option.label + '-div'" />
-        <v-list-item
-          :key="option.label"
-          :to="option.path"
-          :data-cy="'button-nav-' + option.label"
-        >
+      <template v-for="option in options" :key="option.label">
+        <v-divider v-if="option.divider" />
+        <v-list-item :to="option.path" :data-cy="'button-nav-' + option.label">
           <v-list-item-icon>
             <v-icon>{{ option.icon }}</v-icon>
           </v-list-item-icon>

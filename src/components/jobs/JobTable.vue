@@ -10,10 +10,10 @@
       data-cy="job-table"
       @click:row="handleView($event)"
     >
-      <template v-slot:[`item.name`]="{ item }">
+      <template #[`item.name`]="{ item }">
         <typography bold :value="item.name" />
       </template>
-      <template v-slot:[`item.currentProgress`]="{ item }">
+      <template #[`item.currentProgress`]="{ item }">
         <v-row v-if="isCancelled(item.status)" no-gutters>
           <v-col cols="4">
             <typography secondary value="Cancelled" />
@@ -40,7 +40,7 @@
           </v-col>
         </v-row>
       </template>
-      <template v-slot:[`item.status`]="{ item }">
+      <template #[`item.status`]="{ item }">
         <v-chip
           outlined
           :color="getStatusColor(item.status)"
@@ -70,18 +70,21 @@
           </span>
         </v-chip>
       </template>
-      <template v-slot:expanded-item="{ headers, item }">
+      <template #expanded-item="{ headers, item }">
         <td :colspan="headers.length">
           <v-container>
             <v-stepper
+              v-model="item.currentStep"
               alt-labels
               class="elevation-0"
               style="background-color: transparent"
-              v-model="item.currentStep"
             >
               <v-stepper-header>
-                <template v-for="(step, stepIndex) in item.steps">
-                  <v-stepper-step :key="stepIndex" :step="stepIndex">
+                <template
+                  v-for="(step, stepIndex) in item.steps"
+                  :key="stepIndex"
+                >
+                  <v-stepper-step :step="stepIndex">
                     <typography
                       class="upload-step"
                       align="center"
@@ -90,8 +93,8 @@
                     />
                   </v-stepper-step>
                   <v-divider
-                    :key="step"
                     v-if="stepIndex < item.steps.length - 1"
+                    :key="step"
                   />
                 </template>
               </v-stepper-header>
@@ -136,7 +139,7 @@
       :actions-height="0"
       @close="handleCloseLogs"
     >
-      <template v-slot:body>
+      <template #body>
         <typography
           t="4"
           default-expanded
@@ -180,9 +183,6 @@ export default Vue.extend({
       jobLog: [] as JobLogSchema[],
     };
   },
-  mounted() {
-    this.handleRefresh();
-  },
   computed: {
     /**
      * @return Whether the app is loading.
@@ -208,6 +208,9 @@ export default Vue.extend({
     log(): string {
       return JSON.stringify(this.jobLog, null, 2);
     },
+  },
+  mounted() {
+    this.handleRefresh();
   },
   methods: {
     /**

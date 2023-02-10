@@ -1,4 +1,4 @@
-import VueRouter, { RouteRecordRaw } from "vue-router";
+import { RouteRecordRaw, createRouter, createWebHistory } from "vue-router";
 import { routerChecks } from "@/router/checks";
 import {
   TracePredictionView,
@@ -19,7 +19,7 @@ import { Routes } from "./routes";
 
 export { Routes };
 
-const routes: Array<RouteRecordRaw> = [
+export const routes: Array<RouteRecordRaw> = [
   {
     path: Routes.LOGIN_ACCOUNT,
     name: "Login",
@@ -88,8 +88,8 @@ const routes: Array<RouteRecordRaw> = [
   },
 ];
 
-const router = VueRouter.createRouter({
-  history: VueRouter.createWebHashHistory(),
+export const router = createRouter({
+  history: createWebHistory(),
   routes,
 });
 
@@ -110,5 +110,3 @@ router.beforeResolve((to, from, next) => {
   }
   next();
 });
-
-export default router;

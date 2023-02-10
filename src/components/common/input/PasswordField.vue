@@ -3,14 +3,21 @@
     v-model="model"
     filled
     :label="label"
-    :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
     :type="showPassword ? 'text' : 'password'"
     data-cy="input-password"
     :error-messages="errors"
-    :error="errors.length > 0"
-    @click:append="showPassword = !showPassword"
+    :error="errors && errors.length > 0"
     @keydown.enter="emit('enter')"
-  />
+  >
+    <template #append-inner>
+      <icon-button
+        small
+        :icon-id="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+        tooltip="Toggle show password"
+        @click="handleToggle"
+      />
+    </template>
+  </v-text-field>
 </template>
 
 <script lang="ts">
@@ -25,6 +32,7 @@ export default {
 <script setup lang="ts">
 import { defineProps, defineEmits, withDefaults, ref } from "vue";
 import { useVModel } from "@/hooks";
+import IconButton from "@/components/common/button/IconButton.vue";
 
 const props = withDefaults(
   defineProps<{
@@ -42,4 +50,11 @@ const emit = defineEmits<{
 
 const showPassword = ref(false);
 const model = useVModel(props, "modelValue");
+
+/**
+ * Toggles the password visibility.
+ */
+function handleToggle() {
+  showPassword.value = !showPassword.value;
+}
 </script>

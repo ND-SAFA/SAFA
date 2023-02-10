@@ -10,7 +10,7 @@
       />
 
       <div v-if="!isSubmitted">
-        <typography el="p" value="Please enter a new password." />
+        <typography b="2" el="p" value="Please enter a new password." />
 
         <password-field v-model="password" :errors="errors" />
       </div>
@@ -23,7 +23,7 @@
     </template>
 
     <template #actions>
-      <v-btn
+      <text-button
         v-if="!isSubmitted"
         color="primary"
         :disabled="password.length === 0"
@@ -31,12 +31,18 @@
         @click="handleReset"
       >
         Update Password
-      </v-btn>
+      </text-button>
 
       <span class="ml-auto">
-        <v-btn text small class="px-1" color="primary" @click="handleLogin">
+        <text-button
+          text
+          small
+          class="px-1"
+          color="primary"
+          @click="handleLogin"
+        >
           Back To Login
-        </v-btn>
+        </text-button>
       </span>
     </template>
   </card-page>
@@ -55,6 +61,7 @@ export default {
 import { ref, onMounted, computed } from "vue";
 import { getParam, navigateTo, QueryParams, Routes } from "@/router";
 import { updatePassword } from "@/api";
+import TextButton from "@/components/common/button/TextButton.vue";
 import { CardPage, PasswordField, Typography } from "@/components";
 
 const token = ref("");

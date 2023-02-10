@@ -12,6 +12,7 @@
       <div v-if="!isSubmitted">
         <typography
           el="p"
+          b="2"
           value=" Please enter your email to reset your password."
         />
 
@@ -32,7 +33,7 @@
     </template>
 
     <template #actions>
-      <v-btn
+      <text-button
         v-if="!isSubmitted"
         color="primary"
         :disabled="email.length === 0"
@@ -40,12 +41,18 @@
         @click="handleReset"
       >
         Reset Password
-      </v-btn>
+      </text-button>
 
       <span class="ml-auto">
-        <v-btn text small class="px-1" color="primary" @click="handleLogin">
+        <text-button
+          text
+          small
+          class="px-1"
+          color="primary"
+          @click="handleLogin"
+        >
           Back To Login
-        </v-btn>
+        </text-button>
       </span>
     </template>
   </card-page>
@@ -64,6 +71,7 @@ export default {
 import { ref } from "vue";
 import { navigateTo, Routes } from "@/router";
 import { createPasswordReset } from "@/api";
+import TextButton from "@/components/common/button/TextButton.vue";
 import { CardPage, Typography } from "@/components";
 
 const email = ref("");

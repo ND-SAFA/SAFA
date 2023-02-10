@@ -34,7 +34,7 @@
     </template>
 
     <template #actions>
-      <v-btn
+      <text-button
         v-if="!isCreated"
         color="primary"
         :disabled="password.length === 0"
@@ -42,12 +42,12 @@
         @click="handleCreateAccount"
       >
         Create Account
-      </v-btn>
+      </text-button>
 
       <span class="ml-auto text-right text-body-1">
         <typography value="Already have an account?" />
 
-        <v-btn
+        <text-button
           text
           small
           class="px-1"
@@ -56,7 +56,7 @@
           @click="handleLogin"
         >
           Login
-        </v-btn>
+        </text-button>
       </span>
     </template>
   </card-page>
@@ -75,6 +75,7 @@ export default {
 import { ref } from "vue";
 import { navigateTo, Routes } from "@/router";
 import { createUser } from "@/api";
+import TextButton from "@/components/common/button/TextButton.vue";
 import { CardPage, PasswordField, Typography } from "@/components";
 
 const email = ref("");

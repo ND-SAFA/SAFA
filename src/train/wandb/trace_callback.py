@@ -60,6 +60,8 @@ class TraceCallback(WandbCallback):
         :return: Returns the first group property contained in experimental vars, None otherwise.
         """
         group = []
-        for item in experimental_vars.items():
-            group.append(json.dumps(item))
+        for k, v in experimental_vars.items():
+            if k in GROUP_EXCLUDE:
+                continue
+            group.append(json.dumps({k: v}))
         return None if len(group) == 0 else delimiter.join(group)  # no grouping if none exists, else return group

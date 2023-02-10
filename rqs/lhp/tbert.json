@@ -17,7 +17,7 @@
             "model_path": {
               "*": [
                 "thearod5/git-bert",
-                "thearod5/sebert-task-cls"
+                "thearod5/se-bert"
               ]
             }
           },

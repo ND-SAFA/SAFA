@@ -21,6 +21,18 @@ class SupportedEnum(Enum):
         raise ValueError(f"{key_name} is not one of {cls.get_keys()}")
 
     @classmethod
+    def has_value(cls, key_name: str) -> bool:
+        """
+        :param key_name: The key interested in check for associated value.
+        :return:Returns is value under key name.
+        """
+        try:
+            cls.get_value(key_name)
+            return True
+        except:
+            return False
+
+    @classmethod
     def get_keys(cls) -> List[str]:
         """
         :return: Returns list of keys in enum.

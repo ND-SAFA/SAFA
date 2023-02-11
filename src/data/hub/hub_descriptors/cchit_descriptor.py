@@ -4,19 +4,10 @@ from data.hub.abstract_dataset_descriptor import AbstractDatasetDescriptor
 from util.override import overrides
 
 
-class CCHITReader(AbstractDatasetDescriptor):
+class CCHITDescriptor(AbstractDatasetDescriptor):
     """
     Describes the CCHIT project reader.
     """
-
-    @classmethod
-    @overrides(AbstractDatasetDescriptor)
-    def get_description(cls) -> str:
-        """
-        :return: Description of CCHIT from coest.org.
-        """
-        return "Provides trace links between CCHIT healthcare regulatory codes and requirements for World Vista. Dataset is " \
-               "industrial and created by research team."
 
     @classmethod
     @overrides(AbstractDatasetDescriptor)
@@ -25,15 +16,6 @@ class CCHITReader(AbstractDatasetDescriptor):
         :return: Returns URL to CCHIT on the SAFA bucket containing defefinition file.
         """
         return "https://safa-datasets-open.s3.amazonaws.com/datasets/CCHIT.zip"
-
-    @classmethod
-    @overrides(AbstractDatasetDescriptor)
-    def get_citation(cls) -> str:
-        """
-        TODO: Find original paper citation
-        :return: Returns the citation for CCHIT dataset.
-        """
-        return "Under construction."
 
     @classmethod
     @overrides(AbstractDatasetDescriptor)

@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Dict, Tuple
 
 import pandas as pd
 
@@ -19,7 +19,7 @@ class HubProjectReader(AbstractProjectReader):
         """
         self.project_name = name
         self.kwargs = kwargs
-        self.adapter = None
+        self.project_reader = None
 
     def read_project(self) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
         """
@@ -27,11 +27,17 @@ class HubProjectReader(AbstractProjectReader):
         """
         downloader = TraceDatasetDownloader(self.project_name)
         project_path = downloader.download()
-        project_reader = StructuredProjectReader(project_path, **self.kwargs)
-        return project_reader.read_project()
+        self.project_reader = StructuredProjectReader(project_path, **self.kwargs)
+        return self.project_reader.read_project()
 
     def get_project_name(self) -> str:
         """
         :return: Returns the name of the project being read.
         """
         return self.project_name
+
+    def get_overrides(self) -> Dict:
+        """
+        :return: Returns the overrides of the project reader.
+        """
+        return self.project_reader.get_overrides()

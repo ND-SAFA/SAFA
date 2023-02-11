@@ -1,6 +1,10 @@
-from data.hub.cchit_reader import CCHITReader
+from data.hub.hub_descriptors.cchit_descriptor import CCHITDescriptor
+from data.hub.hub_descriptors.cm1_descriptor import CM1Descriptor
+from data.hub.hub_descriptors.train_controller_descriptor import TrainControllerDescriptor
 from util.supported_enum import SupportedEnum
 
 
 class SupportedDatasets(SupportedEnum):
-    CCHIT = CCHITReader
+    CCHIT = CCHITDescriptor
+    CM1 = CM1Descriptor
+    TRAINCONTROLLER = TrainControllerDescriptor

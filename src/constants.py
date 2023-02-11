@@ -5,6 +5,12 @@ from os.path import abspath, dirname
 from dotenv import load_dotenv
 
 load_dotenv()
+# -------------- END --------------
+ROOT_PATH_PARAM = "ROOT_PATH"
+DATA_PATH_PARAM = "DATA_PATH"
+OUTPUT_PATH_PARAM = "OUTPUT_PATH"
+WANDB_DIR_PARAM = "WANDB_DIR"
+WANDB_PROJECT_PARAM = "WANDB_PROJECT"
 # -------------- LOGGING --------------
 LOG_LEVEL_DEFAULT = logging.INFO
 LOG_FILE_DEFAULT = "output.log"
@@ -72,3 +78,5 @@ DISPLAY_METRICS = ["map", "f2"]
 OS_IGNORE = [".DS_Store"]
 EXPERIMENTAL_VARS_IGNORE = ["job_args", "model_manager", "train_dataset_creator", "project_reader", "eval_dataset_creator",
                             "trainer_dataset_manager", "trainer_args"]
+# -------------- Datasets --------------
+CACHE_DIR_NAME = "HuggingFace"

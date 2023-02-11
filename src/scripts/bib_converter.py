@@ -8,13 +8,15 @@ from typing import Dict, List
 import pandas as pd
 from dotenv import load_dotenv
 
+from constants import OUTPUT_PATH_PARAM, ROOT_PATH_PARAM
+
 load_dotenv()
 
-ROOT_PATH = os.path.expanduser(os.environ["ROOT_PATH"])
+ROOT_PATH = os.path.expanduser(os.environ[ROOT_PATH_PARAM])
 assert os.path.exists(ROOT_PATH), ROOT_PATH
 sys.path.append(ROOT_PATH)
 
-OUTPUT_PATH = os.path.expanduser(os.environ["OUTPUT_PATH"])
+OUTPUT_PATH = os.path.expanduser(os.environ[OUTPUT_PATH_PARAM])
 RESULTS_PATH = os.path.join(OUTPUT_PATH, "results")
 
 

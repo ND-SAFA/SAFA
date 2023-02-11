@@ -1,5 +1,5 @@
 <template>
-  <flex-box align="center">
+  <flex-box align="center" r="1">
     <typography
       el="h1"
       variant="subtitle"
@@ -9,16 +9,15 @@
       x="4"
     />
     <v-select
-      v-if="isProjectDefined"
-      outlined
+      v-if="!isProjectDefined"
+      variant="outlined"
       hide-details
-      dark
-      dense
+      density="compact"
       label="Version"
       :value="version"
       :items="versions"
       item-value="versionId"
-      style="width: 100px"
+      style="width: 120px"
       class="nav-input"
       @input="handleLoadVersion"
     >

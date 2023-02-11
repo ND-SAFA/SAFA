@@ -5,10 +5,9 @@
     :model-value="drawerOpen"
     height="100%"
     :width="width"
-    class="primary-bg"
     :scrim="false"
   >
-    <v-container class="full-height">
+    <v-container class="full-height bg-background">
       <flex-box justify="space-between" align="center">
         <typography color="primary" el="h2" variant="subtitle" :value="title" />
         <icon-button

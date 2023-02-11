@@ -1,6 +1,6 @@
 <template>
   <div class="full-width">
-    <flex-box full-width justify="space-between">
+    <flex-box full-width justify="space-between" align="center">
       <flex-box align="center">
         <searchbar v-if="graphVisible" />
       </flex-box>
@@ -10,7 +10,7 @@
         <app-version />
       </flex-box>
     </flex-box>
-    <v-divider v-if="graphVisible" class="accent faded mt-2" />
+    <v-divider v-if="graphVisible" class="text-accent mt-2" />
     <loading-bar />
   </div>
 </template>

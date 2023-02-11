@@ -86,6 +86,7 @@ const buttonClassName = computed(() => {
 
   if (props.x) classNames += ` mx-${props.x}`;
   if (props.y) classNames += ` my-${props.y}`;
+  if (props.color) classNames += ` text-${props.color}`;
 
   return classNames;
 });

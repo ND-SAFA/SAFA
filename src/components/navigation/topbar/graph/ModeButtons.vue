@@ -1,5 +1,5 @@
 <template>
-  <v-btn-toggle tile group multiple dense :value="value">
+  <v-btn-toggle multiple density="compact" :model-value="value">
     <text-button
       :value="options.tim"
       text

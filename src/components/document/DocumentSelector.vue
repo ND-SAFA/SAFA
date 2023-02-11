@@ -4,9 +4,9 @@
     :items="documentStore.projectDocuments"
     :model-value="documentStore.currentDocument"
     label="View"
-    outlined
+    variant="outlined"
     color="accent"
-    dense
+    density="compact"
     hide-details
     dark
     style="max-width: 200px"

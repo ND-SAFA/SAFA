@@ -5,7 +5,7 @@
       :definition="filterButton"
       :is-disabled="isButtonDisabled(filterButton)"
     />
-    <v-divider inset vertical class="accent mx-1 faded mb-2" />
+    <v-divider inset vertical class="text-accent mx-1 mb-2" />
     <template v-for="definition in viewButtons">
       <icon-button
         v-if="definition.handler"

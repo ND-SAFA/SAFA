@@ -3,10 +3,9 @@
     <v-autocomplete
       v-model="value"
       v-model:search-input="queryText"
-      outlined
-      dense
+      variant="outlined"
+      density="compact"
       hide-details
-      dark
       clearable
       label="Search Artifacts"
       color="accent"
@@ -17,7 +16,7 @@
       :filter="filter"
       data-cy="input-artifact-search-nav"
     >
-      <template #append>
+      <template #prepend-inner>
         <v-icon color="accent" class="input-no-icon-rotate">
           mdi-magnify
         </v-icon>

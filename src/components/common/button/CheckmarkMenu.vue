@@ -1,11 +1,10 @@
 <template>
   <v-menu offset-y left :close-on-content-click="false">
-    <template v-slot:activator="{ on: menuOn }">
+    <template #activator="{ props: menuProps }">
       <v-tooltip bottom>
-        <template v-slot:activator="{ on, attrs }">
+        <template #activator="{ props }">
           <v-btn
-            v-on="{ ...menuOn, ...on }"
-            v-bind="attrs"
+            v-bind="{ ...menuProps, ...props }"
             color="accent"
             icon
             :data-cy="definition.dataCy"
@@ -19,14 +18,14 @@
     </template>
     <v-list>
       <v-hover
-        v-slot:default="{ hover }"
         v-for="(item, itemIndex) in definition.menuItems"
+        v-slot="{ hover }"
         :key="item.name"
       >
         <v-list-item
           :style="hover ? `background-color: ${hoverColor};` : ''"
-          @click.stop="item.onClick"
           data-cy="button-checkmark-menu-item"
+          @click.stop="item.onClick"
         >
           <v-checkbox
             readonly

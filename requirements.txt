@@ -61,3 +61,4 @@ wandb==0.13.10
 xxhash==3.2.0
 yarl==1.8.2
 py-readability-metrics==1.4.5
+pyspellchecker==0.7.1

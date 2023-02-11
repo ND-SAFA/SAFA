@@ -1,3 +1,4 @@
+from analysis import word_tools
 from analysis.dataset_analyzer import DatasetAnalyzer
 from data.datasets.trace_dataset import TraceDataset
 from data.tree.artifact import Artifact
@@ -21,7 +22,7 @@ class TestDatasetAnalyzer(BaseTest):
     def test_get_high_frequency_word_counts(self):
         analyzer = self.get_dataset_analyzer()
         expected_low_freq_words = [word for body in [self.a1_body, self.a2_body, self.a3_body] for word in body.split()
-                                   if word not in self.expected_high_freq_words and word not in DatasetAnalyzer.STOP_WORDS]
+                                   if word not in self.expected_high_freq_words and word not in word_tools.STOP_WORDS]
         expected_proportion = 0.64
         low_freq_words, proportion = analyzer.get_low_frequency_word_counts(0.1)
         TestAssertions.assert_lists_have_the_same_vals(self, expected_low_freq_words, low_freq_words)
@@ -43,7 +44,7 @@ class TestDatasetAnalyzer(BaseTest):
 
     def test_get_vocab(self):
         artifact_bodies = [self.a1_body, self.a2_body, self.a3_body]
-        artifact_bodies = DatasetAnalyzer.CLEANER.run(artifact_bodies)
+        artifact_bodies = word_tools.CLEANER.run(artifact_bodies)
         expected_vocab = []
         for a_bod in artifact_bodies:
             expected_vocab.extend([word.lower() for word in a_bod.split()])

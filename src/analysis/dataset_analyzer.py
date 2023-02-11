@@ -1,19 +1,16 @@
-import string
-from typing import Dict, Tuple, List
+from typing import Tuple, List
+
+import nltk
+from readability.readability import Readability
+
+from analysis import word_tools
+from analysis.link_analyzer import LinkAnalyzer
 from analysis.supported_analysis import SupportedDatasetAnalysisSteps
-from analysis.word_counter import WordCounter
+from analysis.word_tools import WordCounter
 from constants import HIGH_FREQ_THRESHOLD_DEFAULT, LOW_FREQ_THRESHOLD_DEFAULT
 from data.datasets.trace_dataset import TraceDataset
-from data.processing.cleaning.data_cleaner import DataCleaner
-from data.processing.cleaning.remove_unwanted_chars_step import RemoveUnwantedCharsStep
-from data.processing.cleaning.remove_white_space_step import RemoveWhiteSpaceStep
-from data.processing.cleaning.separate_joined_words_step import SeparateJoinedWordsStep
 from models.model_manager import ModelManager
-from readability.readability import Readability
-import nltk
-from nltk.corpus import stopwords
 
-nltk.download('stopwords', quiet=True)
 nltk.download('punkt', quiet=True)
 
 
@@ -22,20 +19,16 @@ class DatasetAnalyzer:
     Handles analysis of a dataset
     """
 
-    CLEANER = DataCleaner([RemoveWhiteSpaceStep(), SeparateJoinedWordsStep(),
-                           RemoveUnwantedCharsStep(additional_unwanted_chars=string.punctuation + string.digits)])
-    STOP_WORDS = set(stopwords.words('english'))
-
     def __init__(self, dataset: TraceDataset, analysis_steps: List[SupportedDatasetAnalysisSteps] = None):
         """
-        Initializes the analyzer
+        Initializes the analyzer for analysis of given dataset
         :param dataset: The dataset to from which OOV words will be extracted
         :param analysis_steps: The analysis steps to perform
         """
         self.dataset = dataset
         self.analysis_steps = SupportedDatasetAnalysisSteps.get_all() if analysis_steps is None else analysis_steps
         self.vocab = self._get_vocab()
-        self.word_counts = WordCounter(self.vocab).filter(lambda word, _: word not in self.STOP_WORDS)
+        self.word_counts = WordCounter(self.vocab).filter_stop_words()
         self.__analysis = {}
 
     def get_readability_score(self) -> float:
@@ -69,17 +62,14 @@ class DatasetAnalyzer:
             lambda _, count: count <= min(total_words * threshold, 1))
         return low_frequency_counts, low_frequency_counts.total / total_words
 
-    def get_oov_words(self, model_manager: ModelManager) -> WordCounter:
+    def get_oov_words(self, model_manager: ModelManager) -> "WordCounter":
         """
         Gets all the OOV words from the dataset
-        :param model_manager: The model whose vocab will be compared to the dataset
+        :param model_manager: The model to compare vocab to
         :return The set of OOV words
         """
-        model_vocab = model_manager.get_tokenizer().vocab.keys()
-        dataset_vocab = set(self.word_counts.keys())
-        oov_words = dataset_vocab.difference(model_vocab)
-        return WordCounter.from_dict({word: self.word_counts[word] for word in oov_words})
-
+        return self.word_counts.get_oov_words(model_manager)
+    
     def _get_vocab(self) -> List[str]:
         """
         Gets all words in the dataset's artifact bodies
@@ -92,6 +82,5 @@ class DatasetAnalyzer:
                 if artifact.id in artifact_ids:
                     continue
                 artifact_ids.add(artifact.id)
-                artifact_body = self.CLEANER.run([artifact.token.lower()]).pop()
-                vocab.extend(artifact_body.split())
+                vocab.extend(LinkAnalyzer.get_artifact_vocab(artifact))
         return vocab

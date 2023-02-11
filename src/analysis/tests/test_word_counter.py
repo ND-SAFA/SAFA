@@ -1,4 +1,5 @@
-from analysis.word_counter import WordCounter
+from analysis import word_tools
+from analysis.word_tools import WordCounter
 from testres.base_test import BaseTest
 from testres.test_assertions import TestAssertions
 

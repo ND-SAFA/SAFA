@@ -1,6 +1,8 @@
+from jobs.components.job_result import JobResult
 from testres.base_test import BaseTest
 from train.save_strategy.save_strategy_stage import SaveStrategyStage
 from train.trace_output.stage_eval import StageEval
+from train.trace_output.trace_prediction_output import TracePredictionOutput
 from train.trace_output.trace_train_output import TraceTrainOutput
 from util.json_util import JsonUtil
 
@@ -41,19 +43,23 @@ class TestJsonUtil(BaseTest):
     def test_jsonify(self):
         """
         Tests that objects can be recursively constructed into serializable dictionary.
+        TODO: Does this test unsupported functionality?
         """
         t_loss = 10
         metrics = {"map": .34}
         stage_eval = StageEval(stage=SaveStrategyStage.EPOCH,
                                iteration=1,
                                metrics=metrics)
-        eval_metrics = [stage_eval]
-        trace_train_output = TraceTrainOutput(global_step=1, training_loss=t_loss, metrics=[], eval_metrics=eval_metrics)
+        eval_prediction_output = TracePredictionOutput(metrics=metrics)
+        trace_train_output = TraceTrainOutput(global_step=1, training_loss=t_loss, metrics=[],
+                                              val_metrics=[stage_eval],
+                                              prediction_output=eval_prediction_output)
         output_json = JsonUtil.to_dict(trace_train_output)
-        self.assertListEqual(["global_step", "training_loss", "metrics", "val_metrics", "eval_metrics"], list(output_json.keys()))
+        self.assertListEqual(["global_step", "training_loss", JobResult.METRICS, JobResult.VAL_METRICS, JobResult.PREDICTION_OUTPUT],
+                             list(output_json.keys()))
         self.assertEqual(t_loss, output_json["training_loss"])
         # Verify evaluations
-        stage_evals_json = output_json["eval_metrics"]
+        stage_evals_json = output_json["val_metrics"]
         self.assertEqual(1, len(stage_evals_json))
         # Verify metric
         stage_eval_json = stage_evals_json[0]

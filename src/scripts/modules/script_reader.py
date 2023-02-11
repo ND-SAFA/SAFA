@@ -150,7 +150,9 @@ class ScriptOutputReader:
         """
         if base_entry is None:
             base_entry = {}
-        job_result = job_result["prediction_output"]
+        if JobResult.PREDICTION_OUTPUT not in job_result:
+            return None
+        job_result = job_result[JobResult.PREDICTION_OUTPUT]
         metric_key = ScriptOutputReader.find_eval_key(job_result, [JobResult.EVAL_METRICS, JobResult.METRICS])
         if metric_key is not None and job_result[metric_key] is not None and len(job_result[metric_key]) > 0:
             return {**base_entry, **JsonUtil.read_params(job_result[metric_key], metrics)}

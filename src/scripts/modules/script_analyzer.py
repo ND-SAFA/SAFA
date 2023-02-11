@@ -4,6 +4,7 @@ from typing import Dict, Iterator, Tuple
 from constants import EXPERIMENT_ID_DEFAULT, OUTPUT_FILENAME
 from data.datasets.dataset_role import DatasetRole
 from jobs.abstract_trace_job import AbstractTraceJob
+from jobs.components.job_result import JobResult
 from scripts.modules.script_runner import ScriptRunner
 from train.trace_output.trace_prediction_output import TracePredictionOutput
 from util.json_util import JsonUtil
@@ -24,7 +25,7 @@ class ScriptAnalyzer:
         """
         for job, job_output in self.get_job_iterator():
             job.load_best_model()
-            prediction_output = TracePredictionOutput(**job_output["prediction_output"])
+            prediction_output = TracePredictionOutput(**job_output[JobResult.PREDICTION_OUTPUT])
             model_manager = job.model_manager
             eval_dataset = job.trainer_dataset_manager[DatasetRole.EVAL].to_trainer_dataset(model_manager)
             print("Analyzed job: ", job.id)
@@ -42,5 +43,5 @@ class ScriptAnalyzer:
                 output_file_path = os.path.join(job.job_args.output_dir, OUTPUT_FILENAME)
                 job_output = JsonUtil.read_json_file(output_file_path)
 
-                if isinstance(job, AbstractTraceJob) and "prediction_output" in job_output:
+                if isinstance(job, AbstractTraceJob) and JobResult.PREDICTION_OUTPUT in job_output:
                     yield job, job_output

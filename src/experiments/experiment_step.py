@@ -2,7 +2,7 @@ import os
 from copy import deepcopy
 from typing import Any, Dict, List, Optional, Type, Union
 
-from constants import EXIT_ON_FAILED_JOB, RUN_ASYNC
+from constants import EXIT_ON_FAILED_JOB, OUTPUT_FILENAME, RUN_ASYNC
 from jobs.abstract_job import AbstractJob
 from jobs.abstract_trace_job import AbstractTraceJob
 from jobs.components.job_result import JobResult
@@ -23,7 +23,6 @@ class ExperimentStep(BaseObject):
     """
     Container for parallel jobs to run.
     """
-    OUTPUT_FILENAME = "output.json"
 
     def __init__(self, jobs: Union[List[AbstractJob], ExperimentalVariable], comparison_criterion: ComparisonCriterion = None):
         """
@@ -51,7 +50,7 @@ class ExperimentStep(BaseObject):
         self.status = Status.IN_PROGRESS
         if jobs_for_undetermined_vars:
             self.jobs = self._update_jobs_undetermined_vars(self.jobs, jobs_for_undetermined_vars)
-        self._update_job_children(self.jobs, output_dir)
+        self.update_output_path(output_dir)
         use_multi_epoch_step = isinstance(self.jobs[0], TrainJob) and self.jobs[0].trainer_args.train_epochs_range is not None
         job_runs = self._divide_jobs_into_runs()
 
@@ -78,7 +77,7 @@ class ExperimentStep(BaseObject):
         """
         FileUtil.create_dir_safely(output_dir)
         json_output = JsonUtil.dict_to_json(self.get_results())
-        output_filepath = os.path.join(output_dir, ExperimentStep.OUTPUT_FILENAME)
+        output_filepath = os.path.join(output_dir, OUTPUT_FILENAME)
         FileUtil.write(json_output, output_filepath)
 
     def get_results(self) -> Dict[str, str]:
@@ -197,6 +196,23 @@ class ExperimentStep(BaseObject):
             final_jobs.extend(jobs2update)
         return final_jobs
 
+    def update_output_path(self, output_dir: str) -> None:
+        """
+        Updates necessary job children output paths to reflect experiment step output path
+        :param output_dir: the output directory to use
+        :return: the updated jobs
+        """
+        for job in self.jobs:
+            run_name = Wandb.get_run_name(job.result[JobResult.EXPERIMENTAL_VARS])
+            job_base_path = os.path.join(output_dir, run_name)
+            if isinstance(job, AbstractTraceJob):
+                model_path = os.path.join(job_base_path, "models")
+                setattr(job.trainer_args, "run_name", run_name)  # run name = experimental vars
+                setattr(job.trainer_args, "output_dir", model_path)  # models save in same dir as job
+                setattr(job.trainer_args, "seed", job.job_args.random_seed)  # sets random seed so base trainer has access to it
+                setattr(job.model_manager, "output_dir", model_path)  # final model path same as checkpoint path
+            setattr(job.job_args, "output_dir", job_base_path)  # points job to its unique path
+
     @staticmethod
     def _run_on_jobs(jobs: List[AbstractJob], method_name: str, **method_params) -> List:
         """
@@ -218,21 +234,3 @@ class ExperimentStep(BaseObject):
         :return: the enum class mapping name to class
         """
         return SupportedJobType
-
-    @staticmethod
-    def _update_job_children(jobs: List[AbstractJob], output_dir: str) -> None:
-        """
-        Updates necessary job children output paths to reflect experiment step output path
-        :param output_dir: the output directory to use
-        :return: the updated jobs
-        """
-        for job in jobs:
-            run_name = Wandb.get_run_name(job.result[JobResult.EXPERIMENTAL_VARS])
-            job_base_path = os.path.join(output_dir, run_name)
-            if isinstance(job, AbstractTraceJob):
-                model_path = os.path.join(job_base_path, "models")
-                setattr(job.trainer_args, "run_name", run_name)  # run name = experimental vars
-                setattr(job.trainer_args, "output_dir", model_path)  # models save in same dir as job
-                setattr(job.trainer_args, "seed", job.job_args.random_seed)  # sets random seed so base trainer has access to it
-                setattr(job.model_manager, "output_dir", model_path)  # final model path same as checkpoint path
-            setattr(job.job_args, "output_dir", job_base_path)  # points job to its unique path

@@ -1,6 +1,8 @@
+import os
 from abc import ABC
 from typing import Any, Optional, Type
 
+from constants import BEST_MODEL_NAME
 from data.managers.deterministic_trainer_dataset_manager import DeterministicTrainerDatasetManager
 from data.managers.trainer_dataset_manager import TrainerDatasetManager
 from jobs.abstract_job import AbstractJob
@@ -79,3 +81,11 @@ class AbstractTraceJob(AbstractJob, ABC):
                 and DeterministicTrainerDatasetManager.DETERMINISTIC_KEY in definition:
             return DeterministicTrainerDatasetManager.initialize_from_definition(definition)
         return cls._make_child_object_helper(definition, expected_class)
+
+    def load_best_model(self):
+        """
+        Loads the best model found during job.
+        :return: The best model
+        """
+        self.model_manager.model_path = os.path.join(self.trainer_args.output_dir, BEST_MODEL_NAME)
+        return self.model_manager.get_model()

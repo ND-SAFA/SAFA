@@ -2,6 +2,7 @@ import os
 from typing import Dict
 from unittest import mock
 
+from constants import BEST_MODEL_NAME
 from data.managers.trainer_dataset_manager import TrainerDatasetManager
 from models.model_manager import ModelManager
 from testres.base_trace_test import BaseTraceTest
@@ -18,7 +19,7 @@ class TestKalTrainer(BaseTraceTest):
         test_trace_trainer.perform_training()
         checkpoint_files = ["optimizer.bin", "config.json", "pytorch_model.bin", "scheduler.bin",
                             "training_args.bin"]
-        for folder_name in [KalTrainer.BEST_MODEL_NAME, KalTrainer.CURRENT_MODEL_NAME]:
+        for folder_name in [BEST_MODEL_NAME, KalTrainer.CURRENT_MODEL_NAME]:
             folder_path = os.path.join(test_trace_trainer.trainer_args.output_dir, folder_name)
             output_files = list(os.listdir(folder_path))
             for file in checkpoint_files:

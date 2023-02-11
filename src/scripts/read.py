@@ -4,18 +4,16 @@ import sys
 
 from dotenv import load_dotenv
 
-from constants import ROOT_PATH_PARAM
-
 load_dotenv()
 
-ROOT_PATH = os.path.expanduser(os.environ[ROOT_PATH_PARAM])
+ROOT_PATH = os.path.expanduser(os.environ["ROOT_PATH"])
 assert os.path.exists(ROOT_PATH), ROOT_PATH
 sys.path.append(ROOT_PATH)
 
 RQ_PATH = os.path.expanduser(os.environ["RQ_PATH"])
 
 if __name__ == "__main__":
-    from scripts.results.script_runner import ScriptRunner
+    from scripts.modules.script_runner import ScriptRunner
 
     parser = argparse.ArgumentParser(
         prog='Experiment',

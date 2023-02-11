@@ -10,6 +10,7 @@ from typing import Dict
 import torch
 import wandb
 
+from constants import OUTPUT_FILENAME
 from jobs.components.job_args import JobArgs
 from jobs.components.job_result import JobResult
 from models.model_manager import ModelManager
@@ -21,7 +22,6 @@ from util.status import Status
 
 
 class AbstractJob(threading.Thread, BaseObject):
-    OUTPUT_FILENAME = "output.json"
 
     def __init__(self, job_args: JobArgs, model_manager: ModelManager = None):
         """
@@ -68,7 +68,6 @@ class AbstractJob(threading.Thread, BaseObject):
             self.model_manager.clear_model()
         torch.cuda.empty_cache()
 
-
     def get_output_filepath(self, output_dir: str = None) -> str:
         """
         Gets the path to the file for job output
@@ -78,7 +77,7 @@ class AbstractJob(threading.Thread, BaseObject):
         if output_dir is None:
             output_dir = self.job_args.output_dir
         FileUtil.create_dir_safely(output_dir)
-        return os.path.join(output_dir, AbstractJob.OUTPUT_FILENAME)
+        return os.path.join(output_dir, OUTPUT_FILENAME)
 
     @abstractmethod
     def _run(self) -> JobResult:

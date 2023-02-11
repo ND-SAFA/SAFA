@@ -5,10 +5,9 @@ from typing import Dict, List, Optional, Tuple
 
 import pandas as pd
 
-from constants import DISPLAY_METRICS, EXPERIMENTAL_VARS_IGNORE, METRICS
-from experiments.experiment_step import ExperimentStep
+from constants import DISPLAY_METRICS, EXPERIMENTAL_VARS_IGNORE, METRICS, OUTPUT_FILENAME
 from jobs.components.job_result import JobResult
-from scripts.results.script_definition import ScriptDefinition
+from scripts.modules.script_definition import ScriptDefinition
 from util.file_util import FileUtil
 from util.json_util import JsonUtil
 from util.logging.logger_manager import logger
@@ -85,7 +84,7 @@ class ScriptOutputReader:
         eval_entries = []
         job_paths = self.read_experiment_jobs(self.experiment_path)
         for job_path in job_paths:
-            output_path = os.path.join(job_path, ExperimentStep.OUTPUT_FILENAME)
+            output_path = os.path.join(job_path, OUTPUT_FILENAME)
             if not os.path.exists(output_path):
                 continue
             job_result = JsonUtil.read_json_file(output_path)
@@ -151,6 +150,7 @@ class ScriptOutputReader:
         """
         if base_entry is None:
             base_entry = {}
+        job_result = job_result["prediction_output"]
         metric_key = ScriptOutputReader.find_eval_key(job_result, [JobResult.EVAL_METRICS, JobResult.METRICS])
         if metric_key is not None and job_result[metric_key] is not None and len(job_result[metric_key]) > 0:
             return {**base_entry, **JsonUtil.read_params(job_result[metric_key], metrics)}

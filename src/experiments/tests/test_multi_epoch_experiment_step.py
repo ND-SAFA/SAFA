@@ -2,11 +2,11 @@ import os
 from unittest import mock
 from unittest.mock import patch
 
+from constants import OUTPUT_FILENAME
 from data.datasets.dataset_role import DatasetRole
 from data.managers.trainer_dataset_manager import TrainerDatasetManager
 from experiments.multi_epoch_experiment_step import MultiEpochExperimentStep
 from experiments.tests.base_experiment_test import BaseExperimentTest
-from jobs.abstract_job import AbstractJob
 from jobs.components.job_args import JobArgs
 from jobs.components.job_result import JobResult
 from jobs.delete_model_job import DeleteModelJob
@@ -33,7 +33,7 @@ class TestMultiEpochExperimentStep(BaseExperimentTest):
         output_dirs = FileUtil.ls_dir(TEST_OUTPUT_DIR)
         epochs_run = set()
         for job_id in output_dirs:
-            output_file = os.path.join(TEST_OUTPUT_DIR, job_id, AbstractJob.OUTPUT_FILENAME)
+            output_file = os.path.join(TEST_OUTPUT_DIR, job_id, OUTPUT_FILENAME)
             step_output = self._load_step_output(output_file_path=output_file)
             step_experimental_vars = step_output[JobResult.EXPERIMENTAL_VARS]
             epochs_run.add(step_experimental_vars["num_train_epochs"])

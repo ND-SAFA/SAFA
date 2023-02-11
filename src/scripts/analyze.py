@@ -4,18 +4,17 @@ import sys
 
 from dotenv import load_dotenv
 
-from constants import ROOT_PATH_PARAM
-
 load_dotenv()
 
-ROOT_PATH = os.path.expanduser(os.environ[ROOT_PATH_PARAM])
+ROOT_PATH = os.path.expanduser(os.environ["ROOT_PATH"])
 assert os.path.exists(ROOT_PATH), ROOT_PATH
 sys.path.append(ROOT_PATH)
 
 RQ_PATH = os.path.expanduser(os.environ["RQ_PATH"])
 
 if __name__ == "__main__":
-    from scripts.results.script_runner import ScriptRunner
+    from scripts.modules.script_runner import ScriptRunner
+    from scripts.modules.script_analyzer import ScriptAnalyzer
 
     parser = argparse.ArgumentParser(
         prog='Experiment',
@@ -24,6 +23,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
     file_path = os.path.join(RQ_PATH, args.file)
     script_runner = ScriptRunner(file_path)
-    script_runner.print_results()
-    script_runner.upload_results()
-    sys.exit()
+    scripter_analyzer = ScriptAnalyzer(script_runner)
+    scripter_analyzer.analyze()
+    print("Analysis finished")

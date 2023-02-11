@@ -2,7 +2,7 @@ import os
 
 from transformers import DataCollatorForLanguageModeling
 
-from constants import MLM_PROBABILITY_DEFAULT
+from constants import BEST_MODEL_NAME, MLM_PROBABILITY_DEFAULT
 from data.datasets.dataset_role import DatasetRole
 from data.datasets.pre_train_dataset import PreTrainDataset
 from data.managers.trainer_dataset_manager import TrainerDatasetManager
@@ -44,7 +44,7 @@ class MLMPreTrainJob(TrainJob):
         tokenizer.save_pretrained(self.job_args.output_dir)
 
         job_result = super()._run(data_collator=data_collator)
-        self.trainer_args.output_dir = os.path.join(self.trainer_args.output_dir, "best")
+        self.trainer_args.output_dir = os.path.join(self.trainer_args.output_dir, BEST_MODEL_NAME)
 
         train_dataset: PreTrainDataset = self.trainer_dataset_manager[DatasetRole.TRAIN]
         os.remove(train_dataset.training_file_path)

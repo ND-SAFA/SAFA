@@ -5,8 +5,8 @@ from django.core.wsgi import get_wsgi_application
 
 from constants import OUTPUT_PATH_PARAM, WANDB_DIR_PARAM, WANDB_PROJECT_PARAM
 from experiments.experiment import Experiment
-from scripts.results.script_definition import ScriptDefinition
-from scripts.results.script_reader import ScriptOutputReader
+from scripts.modules.script_definition import ScriptDefinition
+from scripts.modules.script_reader import ScriptOutputReader
 from train.trainer_tools.trace_accelerator import TraceAccelerator
 from util.file_util import FileUtil
 from util.logging.logger_config import LoggerConfig
@@ -41,8 +41,8 @@ class ScriptRunner:
         Runs experiment defined by definition
         :return: None
         """
-        self._setup_run()
         experiment = self.get_experiment()
+        self._setup_run()
         LoggerManager.turn_off_hugging_face_logging()
         experiment.run()
         logger.info(self.FINISHED_HEADER)
@@ -95,5 +95,6 @@ class ScriptRunner:
         """
         if TraceAccelerator.is_main_process:
             FileUtil.delete_dir(self.experiment_dir)
+            FileUtil.create_dir_safely(self.experiment_dir)
         TraceAccelerator.wait_for_everyone()
         get_wsgi_application()

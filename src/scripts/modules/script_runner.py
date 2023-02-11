@@ -32,6 +32,7 @@ class ScriptRunner:
         self.experiment_definition = None
         self.experiment_dir = None
         self.logging_dir = None
+        self.experiment = None
         os.environ[WANDB_PROJECT_PARAM] = self.script_name
         os.environ[WANDB_DIR_PARAM] = os.path.join(os.environ[OUTPUT_PATH_PARAM], "wandb")
 
@@ -40,9 +41,8 @@ class ScriptRunner:
         Runs experiment defined by definition
         :return: None
         """
-        experiment_definition = self._load_experiment_definition()
         self._setup_run()
-        experiment = ObjectCreator.create(Experiment, override=True, **experiment_definition)
+        experiment = self.get_experiment()
         LoggerManager.turn_off_hugging_face_logging()
         experiment.run()
         logger.info(self.FINISHED_HEADER)
@@ -62,6 +62,15 @@ class ScriptRunner:
         :return: None
         """
         self.script_reader.upload_to_s3()
+
+    def get_experiment(self) -> Experiment:
+        """
+        :return: Returns the script experiment.
+        """
+        if self.experiment is None:
+            experiment_definition = self._load_experiment_definition()
+            self.experiment = ObjectCreator.create(Experiment, override=True, **experiment_definition)
+        return self.experiment
 
     def _load_experiment_definition(self) -> Dict:
         """

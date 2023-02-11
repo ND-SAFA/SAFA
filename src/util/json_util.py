@@ -20,6 +20,8 @@ class NpEncoder(json.JSONEncoder):
             return float(obj)
         if isinstance(obj, np.ndarray):
             return obj.tolist()
+        if isinstance(obj, set):
+            return list(obj)
         if hasattr(obj, "_fields"):
             instance_fields: Dict = ReflectionUtil.get_fields(obj)
             return self.default(instance_fields)

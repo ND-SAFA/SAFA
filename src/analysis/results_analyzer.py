@@ -1,5 +1,5 @@
 import os
-from typing import List, Dict, Any, Set
+from typing import List, Dict, Any, Set, Tuple
 
 from tqdm import tqdm
 
@@ -7,6 +7,7 @@ from analysis.link_analyzer import LinkAnalyzer
 from constants import LINK_COMMON_WORDS_THRESHOLD_DEFAULT, SAVE_LINK_ANALYSIS_DEFAULT
 from data.datasets.trace_dataset import TraceDataset
 from data.tree.trace_link import TraceLink
+from models.model_manager import ModelManager
 from train.trace_output.trace_prediction_output import TracePredictionOutput
 from util.file_util import FileUtil
 from util.json_util import JsonUtil
@@ -19,18 +20,21 @@ class ResultsAnalyzer:
      Handles analysis of a trace link
      """
 
-    LINK_CATEGORIZATIONS = "link_categorizations"
-    N_PER_CATEGORY = "n_per_category"
+    MIS_PREDICTED_LINK_CATEGORIZATIONS = "mis_predicted_link_categorizations"
+    MIS_PREDICTED_N_PER_CATEGORY = "mis_predicted_n_per_category"
+    CORRECTLY_PREDICTED_N_PER_CATEGORY = "correctly_predicted_n_per_category"
     OUTPUT_FILENAME = "output.json"
 
-    def __init__(self, prediction_output: TracePredictionOutput, dataset: TraceDataset):
+    def __init__(self, prediction_output: TracePredictionOutput, dataset: TraceDataset, model_manager: ModelManager):
         """
         Initializes the analyzer for analysis of given prediction results
         :param prediction_output: The output of a prediction job
         :param dataset: The dataset associated with the result
+        :param model_manager: The model to use to compare vocabs
         """
         self.prediction_output = prediction_output
-        self.mis_predicted_links = self._get_mis_predicted_links(dataset)
+        self.model_manager = model_manager
+        self.mis_predicted_links, self.correctly_predicted_links = self._get_mis_and_correctly_predicted_links(dataset)
 
     def analyze_and_save(self, output_dir: str, save_link_analysis: bool = SAVE_LINK_ANALYSIS_DEFAULT) -> None:
         """
@@ -39,9 +43,16 @@ class ResultsAnalyzer:
         :param save_link_analysis: If True, saves each individual link analysis
         :return: None
         """
-        link_categorizations = self._analyze_mis_predicted_links(output_dir=output_dir if save_link_analysis else None)
-        n_per_category = self._get_n_per_category(link_categorizations)
-        analysis = {self.LINK_CATEGORIZATIONS: link_categorizations, self.N_PER_CATEGORY: n_per_category}
+        mis_predicted_link_categorizations = self._analyze_links(links=self.mis_predicted_links,
+                                                                 output_dir=output_dir if save_link_analysis else None)
+        mis_predicted_n_per_category = self._get_n_per_category(mis_predicted_link_categorizations)
+        correctly_predicted_link_categorizations = self._analyze_links(links=self.correctly_predicted_links)
+        correct_n_per_category = self._get_n_per_category(correctly_predicted_link_categorizations)
+
+        analysis = {self.MIS_PREDICTED_LINK_CATEGORIZATIONS: mis_predicted_link_categorizations,
+                    self.MIS_PREDICTED_N_PER_CATEGORY: mis_predicted_n_per_category,
+                    self.CORRECTLY_PREDICTED_N_PER_CATEGORY: correct_n_per_category
+                    }
         self._save(analysis, output_dir)
 
     def intersection(self, other: "ResultsAnalyzer") -> Set[TraceLink]:
@@ -64,7 +75,7 @@ class ResultsAnalyzer:
         FileUtil.write(output, filepath)
 
     @staticmethod
-    def _get_n_per_category(link_categorizations: LINK_CATEGORIZATIONS) -> Dict[str, int]:
+    def _get_n_per_category(link_categorizations: MIS_PREDICTED_LINK_CATEGORIZATIONS) -> Dict[str, int]:
         """
         Gets the counts for each category that the mis-predicted links fall into
         :param link_categorizations: Dictionary mapping link id to the categories it falls into
@@ -78,8 +89,8 @@ class ResultsAnalyzer:
                 n_per_category[category] += 1
         return n_per_category
 
-    def _analyze_mis_predicted_links(self, common_words_threshold: int = LINK_COMMON_WORDS_THRESHOLD_DEFAULT,
-                                     output_dir: str = None) -> LINK_CATEGORIZATIONS:
+    def _analyze_links(self, links: Set[TraceLink], common_words_threshold: int = LINK_COMMON_WORDS_THRESHOLD_DEFAULT,
+                       output_dir: str = None) -> MIS_PREDICTED_LINK_CATEGORIZATIONS:
         """
         Analyzes all mis predicted links
         :param common_words_threshold: % of total artifact words, above which link counts as sharing common words b/w artifacts
@@ -87,9 +98,9 @@ class ResultsAnalyzer:
         :return: A dictionary mapping link id to the category it falls into
         """
         link_categorizations = {}
-        for link in tqdm(self.mis_predicted_links):
+        for link in tqdm(links):
             link_categorizations[link.id] = []
-            analyzer = LinkAnalyzer(link)
+            analyzer = LinkAnalyzer(link, self.model_manager)
             analysis_counts = analyzer.get_analysis_counts()
             shares_common_words = analysis_counts.pop(LinkAnalyzer.COMMON_WORDS) > len(
                 link.source.token + link.target.token) * common_words_threshold
@@ -102,16 +113,19 @@ class ResultsAnalyzer:
                 analyzer.save(output_dir)
         return link_categorizations
 
-    def _get_mis_predicted_links(self, dataset: TraceDataset) -> Set[TraceLink]:
+    def _get_mis_and_correctly_predicted_links(self, dataset: TraceDataset) -> Tuple[Set[TraceLink], Set[TraceLink]]:
         """
-        Gets all mis predicted links from the output
+        Gets all mis and correctly predicted links from the output
         :param dataset: The dataset containing the original links
-        :return: A set of the mis-predicted links
+        :return: A set of the mis-predicted links and a set of the correctly predicted links
         """
         mis_predicted_links = set()
+        correctly_predicted_links = set()
         for i, source_id, target_id in enumerate(self.prediction_output.source_target_pairs):
             link = dataset.links[TraceLink.generate_link_id(source_id, target_id)]
             pred_label = self.prediction_output.label_ids[i]
             if pred_label != link.get_label():
                 mis_predicted_links.add(link)
-        return mis_predicted_links
+            else:
+                correctly_predicted_links.add(link)
+        return mis_predicted_links, correctly_predicted_links

@@ -36,9 +36,8 @@ class TestDatasetAnalyzer(BaseTest):
         self.assertLessEqual(abs(proportion - expected_proportion), 0.01)
 
     def test_get_oov_words(self):
-        model_manager = ModelManager("bert-base-uncased")
         analyzer = self.get_dataset_analyzer()
-        oov = analyzer.get_oov_words(model_manager)
+        oov = analyzer.get_oov_words(analyzer.model_managers[0])
         expected_oov_words = {"betito": 1, "hvac": 1, "funsies": 3}
         self.assertDictEqual(oov, expected_oov_words)
 
@@ -71,5 +70,4 @@ class TestDatasetAnalyzer(BaseTest):
         links = {l1.id: l1, l2.id: l2}
 
         dataset = TraceDataset(links, [l1.id, l2.id], [])
-
-        return DatasetAnalyzer(dataset)
+        return DatasetAnalyzer(dataset, [ModelManager("bert-base-uncased"), ModelManager("roberta-base-uncased")])

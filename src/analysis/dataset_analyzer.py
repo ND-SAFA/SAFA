@@ -78,10 +78,10 @@ class DatasetAnalyzer:
         :param threshold: Percentage of all vocab words, where all words that occur more than this amount will be considered high freq
         :return: A dictionary of high freq words and their counts and the proportion of high freq words to total vocab size
         """
-        total_words = self.word_counts.total
+        total_words = self.word_counts.total()
         high_frequency_counts = self.word_counts.filter(
             lambda _, count: count >= total_words * threshold)
-        return high_frequency_counts, high_frequency_counts.total / total_words
+        return high_frequency_counts, high_frequency_counts.total() / total_words
 
     def get_low_frequency_word_counts(self, threshold: float = LOW_FREQ_THRESHOLD_DEFAULT) -> Tuple[WordCounter, float]:
         """
@@ -89,10 +89,10 @@ class DatasetAnalyzer:
         :param threshold: Percentage of all vocab words, where all words that occur less than this amount will be considered low freq
         :return: A dictionary of low freq words and their counts and the proportion of low freq words to total vocab size
         """
-        total_words = self.word_counts.total
+        total_words = self.word_counts.total()
         low_frequency_counts = self.word_counts.filter(
             lambda _, count: count <= min(total_words * threshold, 1))
-        return low_frequency_counts, low_frequency_counts.total / total_words
+        return low_frequency_counts, low_frequency_counts.total() / total_words
 
     def get_oov_words(self, model_manager: ModelManager) -> "WordCounter":
         """

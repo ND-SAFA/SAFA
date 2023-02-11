@@ -27,7 +27,20 @@ class WordCounter(Counter):
         :param words: The words to get counts for
         """
         super().__init__(words)
-        self.total = sum(self.values())
+
+    def total(self) -> int:
+        """
+        Gets the total number of elements in the counter
+        :return: The total
+        """
+        return sum(self.values())
+
+    def as_dict(self) -> Dict[str, int]:
+        """
+        Gets the word counter as a dictionary
+        :return: A dictionary mapping word to its count
+        """
+        return dict(self)
 
     @staticmethod
     def from_dict(word_counts: Dict[str, int]) -> "WordCounter":
@@ -60,15 +73,16 @@ class WordCounter(Counter):
         """
         return set(self.keys())
 
-    def intersection(self, other: Union["WordCounter", Set[str]]) -> Set[str]:
+    def intersection(self, other: Union["WordCounter", Set[str]]) -> "WordCounter":
         """
         Gets the intersection of words between self and other
         :param other: The other word counter or a set of words
         :return: The intersecting set of words
         """
-        if isinstance(other, WordCounter):
-            other = other.get_word_set()
-        return self.get_word_set().intersection(other)
+        if not isinstance(other, WordCounter):
+            other = WordCounter(other)
+        intersecting_words = self.get_word_set().intersection(other)
+        return WordCounter({word: self[word] + other[word] for word in intersecting_words})
 
     def get_oov_words(self, model_manager: ModelManager) -> "WordCounter":
         """

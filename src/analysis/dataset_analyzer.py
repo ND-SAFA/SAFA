@@ -1,15 +1,16 @@
-from typing import Tuple, List
+import os
+from typing import Tuple, List, Dict, Any
 
 import nltk
 from readability.readability import Readability
 
-from analysis import word_tools
 from analysis.link_analyzer import LinkAnalyzer
-from analysis.supported_analysis import SupportedDatasetAnalysisSteps
 from analysis.word_tools import WordCounter
 from constants import HIGH_FREQ_THRESHOLD_DEFAULT, LOW_FREQ_THRESHOLD_DEFAULT
 from data.datasets.trace_dataset import TraceDataset
 from models.model_manager import ModelManager
+from util.file_util import FileUtil
+from util.json_util import JsonUtil
 
 nltk.download('punkt', quiet=True)
 
@@ -18,18 +19,49 @@ class DatasetAnalyzer:
     """
     Handles analysis of a dataset
     """
+    READABILITY_SCORE = "readability_score"
+    HIGH_FREQUENCY_WORDS = "high_freq_words"
+    LOW_FREQUENCY_WORDS = "low_freq_words"
+    OOV_WORDS = "oov_words_with_model_{}"
 
-    def __init__(self, dataset: TraceDataset, analysis_steps: List[SupportedDatasetAnalysisSteps] = None):
+    OUTPUT_FILENAME = "output.json"
+
+    def __init__(self, dataset: TraceDataset, model_managers: List[ModelManager]):
         """
         Initializes the analyzer for analysis of given dataset
         :param dataset: The dataset to from which OOV words will be extracted
-        :param analysis_steps: The analysis steps to perform
         """
         self.dataset = dataset
-        self.analysis_steps = SupportedDatasetAnalysisSteps.get_all() if analysis_steps is None else analysis_steps
         self.vocab = self._get_vocab()
         self.word_counts = WordCounter(self.vocab).filter_stop_words()
+        self.model_managers = model_managers
         self.__analysis = {}
+
+    def get_analysis(self) -> Dict[str, Any]:
+        """
+        Gets the analysis of the dataset
+        :return: A dictionary mapping analysis name to its result
+        """
+        if self.__analysis is None:
+            self.__analysis = {
+                self.READABILITY_SCORE: self.get_readability_score(),
+                self.HIGH_FREQUENCY_WORDS: self.get_high_frequency_word_counts(),
+                self.LOW_FREQUENCY_WORDS: self.get_low_frequency_word_counts(),
+            }
+            for model in self.model_managers:
+                self.__analysis[self.OOV_WORDS.format(model.model_path)] = self.get_oov_words(model)
+        return self.__analysis
+
+    def save(self, output_dir: str) -> None:
+        """
+        Saves the analysis output to the given directory
+        :param output_dir: The directory to save to
+        :return: None
+        """
+        analysis = self.get_analysis()
+        output = JsonUtil.dict_to_json(analysis)
+        output_file_path = os.path.join(output_dir, self.OUTPUT_FILENAME)
+        FileUtil.write(output, output_file_path)
 
     def get_readability_score(self) -> float:
         """
@@ -69,7 +101,7 @@ class DatasetAnalyzer:
         :return The set of OOV words
         """
         return self.word_counts.get_oov_words(model_manager)
-    
+
     def _get_vocab(self) -> List[str]:
         """
         Gets all words in the dataset's artifact bodies

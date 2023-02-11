@@ -1,4 +1,5 @@
-from typing import List, Set, Tuple
+import os
+from typing import List, Set, Tuple, Dict
 
 from analysis import word_tools
 from analysis.word_tools import WordCounter
@@ -6,8 +7,11 @@ from data.tree.artifact import Artifact
 from data.tree.trace_link import TraceLink
 from spellchecker import SpellChecker
 from nltk.corpus import wordnet as wn
+import nltk
 
 from models.model_manager import ModelManager
+from util.file_util import FileUtil
+from util.json_util import JsonUtil
 
 nltk.download('wordnet', quiet=True)
 
@@ -17,6 +21,16 @@ class LinkAnalyzer:
      Handles analysis of a trace link
      """
 
+    COMMON_WORDS = "common_words"
+    MISSPELLED_WORDS = "misspelled_words"
+    SHARED_SYNONYMS_AND_ANTONYMS = "shared_synonyms_and_antonyms"
+    OOV_WORDS = "oov_words"
+
+    ARTIFACT_TOKENS = "artifact_tokens"
+    ANALYSIS = "analysis"
+
+    OUTPUT_FILENAME = "link_{}.json"
+
     def __init__(self, link: TraceLink):
         """
          Initializes the analyzer for analysis of given link
@@ -25,6 +39,26 @@ class LinkAnalyzer:
         self.link = link
         self.vocabs = [self.get_artifact_vocab(link.source), self.get_artifact_vocab(link.target)]
         self.word_counts = [WordCounter(vocab).filter_stop_words() for vocab in self.vocabs]
+        self.__analysis = None
+
+    def get_analysis_counts(self) -> Dict[str, int]:
+        """
+        Gets the counts of all analyzed words
+        :return: A dictionary mapping analysis name and the result
+        """
+        return {analysis: len(result) for analysis, result in self.get_analysis()}
+
+    def get_analysis(self) -> Dict[str, List[str]]:
+        """
+        Gets the counts of all analyzed words
+        :return: A dictionary mapping analysis name and the result
+        """
+        if self.__analysis is None:
+            self.__analysis = {self.COMMON_WORDS: self.get_words_in_common(),
+                               self.MISSPELLED_WORDS: self.get_misspelled_words(),
+                               self.SHARED_SYNONYMS_AND_ANTONYMS: self.get_shared_synonyms_and_antonyms(),
+                               self.OOV_WORDS: self.get_oov_words(self.model_manager)}  # TODO
+        return self.__analysis
 
     def get_words_in_common(self) -> Set[str]:
         """
@@ -49,7 +83,7 @@ class LinkAnalyzer:
         Gets the set of shared synonyms and antonyms between artifacts
         :return: The set of shared synonyms and antonyms
         """
-        synonyms, antonyms = self.get_synonyms_and_antonyms(self.word_counts[0])
+        synonyms, antonyms = self._get_synonyms_and_antonyms(self.word_counts[0])
         shared_synonyms = self.word_counts[1].intersection(synonyms)
         shared_antonyms = self.word_counts[1].intersection(antonyms)
         return shared_synonyms, shared_antonyms
@@ -66,7 +100,30 @@ class LinkAnalyzer:
         return oov_words
 
     @staticmethod
-    def get_synonyms_and_antonyms(vocab: List[str]) -> Tuple[Set[str], Set[str]]:
+    def get_artifact_vocab(artifact: Artifact) -> List[str]:
+        """
+        Gets the vocabulary of the artifact
+        :param artifact: The artifact to get vocab of
+        :return: The vocabulary of the artifact
+        """
+        artifact_body = word_tools.CLEANER.run([artifact.token.lower()]).pop()
+        return artifact_body.split()
+
+    def save(self, output_dir: str) -> str:
+        """
+        Saves the analysis output to the given directory
+        :param output_dir: The directory to save to
+        :return: The full filepath where the output was saved
+        """
+        output_file_path = os.path.join(output_dir, self.OUTPUT_FILENAME.format(str(self.link.id)))
+        analysis = self.get_analysis()
+        output_dict = {self.ARTIFACT_TOKENS: [self.link.source.token, self.link.target.token],
+                       self.ANALYSIS: analysis}
+        FileUtil.write(JsonUtil.dict_to_json(output_dict), output_file_path)
+        return output_file_path
+
+    @staticmethod
+    def _get_synonyms_and_antonyms(vocab: List[str]) -> Tuple[Set[str], Set[str]]:
         """
         Gets the synonyms from the vocab
         :param vocab: The vocab to get all synonyms for
@@ -81,13 +138,3 @@ class LinkAnalyzer:
                     if lemma.antonyms():
                         antonyms.add(lemma.antonyms()[0].name())
         return synonyms, antonyms
-
-    @staticmethod
-    def get_artifact_vocab(artifact: Artifact) -> List[str]:
-        """
-        Gets the vocabulary of the artifact
-        :param artifact: The artifact to get vocab of
-        :return: The vocabulary of the artifact
-        """
-        artifact_body = word_tools.CLEANER.run([artifact.token.lower()]).pop()
-        return artifact_body.split()

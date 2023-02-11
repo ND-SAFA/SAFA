@@ -10,10 +10,6 @@ import App from "@/App.vue";
 configureCompat({
   COMPONENT_ASYNC: false,
   COMPONENT_V_MODEL: false,
-  OPTIONS_DESTROYED: false,
-  COMPONENT_FUNCTIONAL: false,
-  INSTANCE_EVENT_HOOKS: false,
-  INSTANCE_EVENT_EMITTER: false,
 });
 
 const app = createApp(App);

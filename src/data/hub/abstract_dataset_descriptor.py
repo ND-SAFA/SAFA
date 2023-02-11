@@ -4,19 +4,19 @@ from typing import Dict
 
 class AbstractDatasetDescriptor(ABC):
     """
-    Provides common interface for supported dataset.
+    Interface for definition where to download a dataset and how to read it.
     """
 
     @classmethod
     @abstractmethod
     def get_url(cls) -> str:
         """
-        :return: Returns the url of the download file.
+        :return: The url of the file(s) to download.
         """
 
     @classmethod
     @abstractmethod
     def get_definition(cls) -> Dict:
         """
-        :return: Returns project definition.
+        :return: Returns project definition for structured project reader.
         """

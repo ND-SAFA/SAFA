@@ -2,6 +2,7 @@ import os
 
 from datasets import DownloadConfig, DownloadManager
 
+from constants import CACHE_DIR_NAME, DATA_PATH_PARAM
 from data.hub.abstract_dataset_descriptor import AbstractDatasetDescriptor
 from data.hub.supported_datasets import SupportedDatasets
 from data.readers.definitions.structure_project_definition import StructureProjectDefinition
@@ -11,9 +12,7 @@ from util.json_util import JsonUtil
 
 class TraceDatasetDownloader:
     """
-    Experimental dataset for software traceability.
-    Refer https://huggingface.co/docs/datasets/add_dataset.html for more information
-    Load data in stream: https://huggingface.co/docs/datasets/dataset_streaming.html
+    Responsible for downloading and loading files for supported dataset.
     """
 
     def __init__(self, dataset_name: str, zip_file_name: str = None, **config_kwargs):
@@ -38,7 +37,7 @@ class TraceDatasetDownloader:
         :return: Returns path to dataset.
         """
         if self.project_path is None:
-            hub_path = os.path.join(os.environ["DATA_PATH"], "HuggingFace")
+            hub_path = os.path.join(os.environ[DATA_PATH_PARAM], CACHE_DIR_NAME)
             hub_path = os.path.expanduser(hub_path)
             download_config = DownloadConfig(cache_dir=hub_path)
             download_manager = DownloadManager(download_config=download_config)

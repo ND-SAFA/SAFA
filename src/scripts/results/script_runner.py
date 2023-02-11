@@ -3,6 +3,7 @@ from typing import Dict
 
 from django.core.wsgi import get_wsgi_application
 
+from constants import OUTPUT_PATH_PARAM, WANDB_DIR_PARAM, WANDB_PROJECT_PARAM
 from experiments.experiment import Experiment
 from scripts.results.script_definition import ScriptDefinition
 from scripts.results.script_reader import ScriptOutputReader
@@ -31,8 +32,8 @@ class ScriptRunner:
         self.experiment_definition = None
         self.experiment_dir = None
         self.logging_dir = None
-        os.environ["WANDB_PROJECT"] = self.script_name
-        os.environ["WANDB_DIR"] = os.path.join(os.environ["OUTPUT_PATH"], "wandb")
+        os.environ[WANDB_PROJECT_PARAM] = self.script_name
+        os.environ[WANDB_DIR_PARAM] = os.path.join(os.environ[OUTPUT_PATH_PARAM], "wandb")
 
     def run(self) -> None:
         """

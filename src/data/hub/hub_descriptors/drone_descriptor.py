@@ -4,7 +4,7 @@ from data.hub.abstract_dataset_descriptor import AbstractDatasetDescriptor
 from util.override import overrides
 
 
-class DroneResponseDescriptor(AbstractDatasetDescriptor):
+class DroneDescriptor(AbstractDatasetDescriptor):
     """
     Describes the DroneResponse project reader.
     """
@@ -70,6 +70,6 @@ class DroneResponseDescriptor(AbstractDatasetDescriptor):
             },
             "overrides": {
                 "allow_missing_source": True,
-                "allow_missing_target": False
+                "allow_missing_target": True
             }
         }

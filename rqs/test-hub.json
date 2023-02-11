@@ -34,7 +34,7 @@
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "HUB",
-                "name": "TrainController"
+                "name": "Drone"
               }
             },
             "val_dataset_creator": {

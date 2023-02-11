@@ -1,6 +1,6 @@
 import os
 import random
-from collections import OrderedDict
+from collections import OrderedDict, Counter
 from copy import deepcopy
 from typing import Callable, Dict, List, Tuple, Set
 
@@ -191,19 +191,6 @@ class TraceDataset(AbstractDataset):
         """
         random.shuffle(self.pos_link_ids)
         random.shuffle(self.neg_link_ids)
-
-    def get_vocab(self, cleaner: DataCleaner = None) -> Set[str]:
-        """
-        Gets all words in the dataset's artifact bodies
-        :param cleaner: If provided, cleans the artifact bodies before adding to vocabulary set
-        :return: The set of all words in the dataset
-        """
-        vocab = set()
-        for link in self.links.values():
-            for artifact_body in [link.source.token, link.target.token]:
-                artifact_body = cleaner.run([artifact_body.lower()]).pop()
-                vocab.update(artifact_body.split())
-        return vocab
 
     def _get_data_entries_for_augmentation(self) -> Tuple[List[TraceLink], List[Tuple[str, str]]]:
         """

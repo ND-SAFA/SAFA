@@ -21,7 +21,6 @@
               "precision"
             ],
             "skip_save": false,
-            "use_balanced_batches": true,
             "load_best_model_at_end": true
           },
           "trainer_dataset_manager": {
@@ -29,18 +28,13 @@
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "HUB",
-                "name": "CCHIT"
+                "name": "Drone"
               }
-            },
-            "val_dataset_creator": {
-              "object_type": "SPLIT",
-              "split_strategy": "SPLIT_BY_LINK",
-              "val_percentage": 0.15
             },
             "eval_dataset_creator": {
               "object_type": "SPLIT",
               "split_strategy": "SPLIT_BY_LINK",
-              "val_percentage": 0.7
+              "val_percentage": 0.80
             },
             "augmenter": {
               "steps": [

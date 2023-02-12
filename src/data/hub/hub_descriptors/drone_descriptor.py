@@ -69,7 +69,8 @@ class DroneDescriptor(AbstractDatasetDescriptor):
                 }
             },
             "overrides": {
-                "allowed_missing_sources": 0,
-                "allowed_missing_targets": 0
+                "allowed_orphans": 341,
+                "allowed_missing_sources": 98,
+                "allowed_missing_targets": 74
             }
         }

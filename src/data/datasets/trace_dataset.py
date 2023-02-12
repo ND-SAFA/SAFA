@@ -18,7 +18,7 @@ from data.tree.trace_link import TraceLink
 from models.model_manager import ModelManager
 from models.model_properties import ModelArchitectureType
 from util.file_util import FileUtil
-from util.general_util import ListUtil
+from util.logging.logger_manager import logger
 from util.thread_util import ThreadUtil
 
 
@@ -46,7 +46,6 @@ class TraceDataset(AbstractDataset):
         :param model_generator: The model generator determining architecture and feature function for trace links.
         :return: A data used by the HF trainer.
         """
-        link_batches = ListUtil.batch(list(self.links.values()), n_threads)
         feature_entries = {}
 
         def create_link_feature(target_link: TraceLink) -> None:
@@ -62,6 +61,7 @@ class TraceDataset(AbstractDataset):
         ThreadUtil.multi_thread_process("Generating trace features.", list(self.links.values()), create_link_feature, n_threads)
 
         project_links = self.get_ordered_links()
+        logger.info(f"Trace links after processing: {len(project_links)}")
         return [feature_entries[link.id] for link in project_links]
 
     def to_dataframe(self) -> pd.DataFrame:

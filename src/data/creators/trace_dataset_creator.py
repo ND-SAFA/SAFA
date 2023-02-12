@@ -67,7 +67,9 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
             self._remove_orphans()
         self._filter_null_references()
         self._clean_artifact_tokens()
-        return self._create_trace_dataset()
+        trace_dataset = self._create_trace_dataset()
+        logger.info(f"Trace dataset read with ({len(trace_dataset.links)}) links.")
+        return trace_dataset
 
     def get_name(self) -> str:
         """
@@ -203,8 +205,8 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
                     if trace_link_id not in trace_dataset.links:
                         trace_dataset.add_link(TraceLink(artifact, target_artifact, is_true_link=False))
 
-            ThreadUtil.multi_thread_process("Generating negative links", source_artifact_ids, create_target_links, n_threads)
-
+            title = f"Generating negative links between {source_type} -> {target_type}"
+            ThreadUtil.multi_thread_process(title, source_artifact_ids, create_target_links, n_threads)
         trace_dataset.shuffle_link_ids()
 
     @staticmethod
@@ -247,6 +249,9 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         id_2_artifact: Id2Artifact = UncasedDict()
         for _, row in artifact_df.iterrows():
             TraceDatasetCreator._add_artifact_to_maps(row, artifact_type_2_id, id_2_artifact)
+
+        for artifact_type, artifact_ids in artifact_type_2_id.items():
+            logger.info(f"{artifact_type.title()}: {len(artifact_ids)}")
         return artifact_type_2_id, id_2_artifact
 
     @staticmethod

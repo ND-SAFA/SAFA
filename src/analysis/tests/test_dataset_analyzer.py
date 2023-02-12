@@ -18,7 +18,7 @@ class TestDatasetAnalyzer(BaseTest):
 
     def test_save(self):
         analyzer = self.get_dataset_analyzer(lengthen=True)
-        save_path = analyzer.save(TEST_OUTPUT_DIR)
+        save_path = analyzer.analyze_and_save(TEST_OUTPUT_DIR)
         output = JsonUtil.read_json_file(save_path)
         self.assertIn(DatasetAnalyzer.READABILITY_SCORE, output)
         self.assertIn(DatasetAnalyzer.HIGH_FREQUENCY_WORDS, output)

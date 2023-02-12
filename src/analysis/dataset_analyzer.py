@@ -3,6 +3,7 @@ from typing import Tuple, List, Dict, Any
 
 import nltk
 from readability.readability import Readability
+from readability.exceptions import ReadabilityException
 
 from analysis.link_analyzer import LinkAnalyzer
 from analysis.word_tools import WordCounter
@@ -10,6 +11,7 @@ from constants import HIGH_FREQ_THRESHOLD_DEFAULT, LOW_FREQ_THRESHOLD_DEFAULT
 from data.datasets.trace_dataset import TraceDataset
 from models.model_manager import ModelManager
 from util.file_util import FileUtil
+from util.logging.logger_manager import logger
 
 nltk.download('punkt', quiet=True)
 
@@ -51,7 +53,7 @@ class DatasetAnalyzer:
                 self.__analysis[self.OOV_WORDS.format(model.model_path)] = self.get_oov_words(model)
         return self.__analysis
 
-    def save(self, output_dir: str) -> str:
+    def analyze_and_save(self, output_dir: str) -> str:
         """
         Saves the analysis output to the given directory
         :param output_dir: The directory to save to
@@ -67,9 +69,13 @@ class DatasetAnalyzer:
         Gets the readability score of the dataset
         :return: The readability score and grade level of the dataset
         """
-        r = Readability(" ".join(self.vocab))
-        fk = r.flesch_kincaid()
-        return fk.score
+        try:
+            r = Readability(" ".join(self.vocab))
+            fk = r.flesch_kincaid()
+            return fk.score
+        except ReadabilityException as e:
+            logger.warning("Unable to get readability score; %s" % e)
+            return -1
 
     def get_high_frequency_word_counts(self, threshold: float = HIGH_FREQ_THRESHOLD_DEFAULT) -> Tuple[WordCounter, float]:
         """

@@ -51,5 +51,8 @@ class CCHITDescriptor(AbstractDatasetDescriptor):
                     "source": "source",
                     "target": "target"
                 }
+            },
+            "overrides": {
+                "allowed_orphans": 693
             }
         }

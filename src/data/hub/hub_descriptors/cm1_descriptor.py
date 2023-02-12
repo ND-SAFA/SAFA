@@ -51,5 +51,8 @@ class CM1Descriptor(AbstractDatasetDescriptor):
                     "source_artifact_id": "source",
                     "target_artifact_id": "target"
                 }
+            },
+            "overrides": {
+                "allowed_orphans": 26
             }
         }

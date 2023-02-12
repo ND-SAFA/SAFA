@@ -1,8 +1,6 @@
-import threading
 from typing import Dict, List, Set, Tuple, Type
 
 import pandas as pd
-from tqdm import tqdm
 
 from constants import ALLOWED_MISSING_SOURCES_DEFAULT, ALLOWED_MISSING_TARGETS_DEFAULT, ALLOWED_ORPHANS_DEFAULT, \
     REMOVE_ORPHANS_DEFAULT
@@ -16,10 +14,10 @@ from data.tree.artifact import Artifact
 from data.tree.trace_link import TraceLink
 from util.base_object import BaseObject
 from util.dataframe_util import DataFrameUtil
-from util.general_util import ListUtil
 from util.logging.logger_manager import logger
 from util.override import overrides
 from util.reflection_util import ReflectionUtil
+from util.thread_util import ThreadUtil
 from util.uncased_dict import UncasedDict
 
 ArtifactType2Id = Dict[str, List[str]]
@@ -192,29 +190,21 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
             source_artifact_ids: List[str] = artifact_type_2_id[source_type]
             target_artifact_ids: List[str] = artifact_type_2_id[target_type]
 
-            def create_target_links(artifact_id, artifact) -> None:
+            def create_target_links(artifact_id) -> None:
                 """
                 Create negative links for artifact against target artifacts.
                 :param artifact_id: The id of the artifact to link to targets.
-                :param artifact: The artifact to use as the source for any trace links created.
                 :return:  None
                 """
+                artifact = id_2_artifact[artifact_id]
                 for target_artifact_id in target_artifact_ids:
                     target_artifact = id_2_artifact[target_artifact_id]
                     trace_link_id = TraceLink.generate_link_id(artifact_id, target_artifact_id)
                     if trace_link_id not in trace_dataset.links:
                         trace_dataset.add_link(TraceLink(artifact, target_artifact, is_true_link=False))
 
-            source_artifact_batches = ListUtil.batch(source_artifact_ids, n_threads)
-            for bach_source_artifact_ids in tqdm(source_artifact_batches, desc="Generating negative links"):
-                threads = []
-                for source_artifact_id in bach_source_artifact_ids:
-                    source_artifact = id_2_artifact[source_artifact_id]
-                    t1 = threading.Thread(target=create_target_links, args=(source_artifact_id, source_artifact))
-                    threads.append(t1)
-                    t1.start()
-                for t in threads:
-                    t.join()
+            ThreadUtil.multi_thread_process("Generating negative links", source_artifact_ids, create_target_links, n_threads)
+
         trace_dataset.shuffle_link_ids()
 
     @staticmethod

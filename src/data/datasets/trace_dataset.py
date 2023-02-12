@@ -18,6 +18,8 @@ from data.tree.trace_link import TraceLink
 from models.model_manager import ModelManager
 from models.model_properties import ModelArchitectureType
 from util.file_util import FileUtil
+from util.general_util import ListUtil
+from util.thread_util import ThreadUtil
 
 
 class TraceDataset(AbstractDataset):
@@ -38,15 +40,27 @@ class TraceDataset(AbstractDataset):
         self.trace_matrix = TraceMatrix(list(self.links.values()), randomize=randomize)
         self.shuffle_link_ids()
 
-    def to_trainer_dataset(self, model_generator: ModelManager) -> List[Dict]:
+    def to_trainer_dataset(self, model_generator: ModelManager, n_threads=100) -> List[Dict]:
         """
         Converts trace links in data to feature entries used by Huggingface (HF) trainer.
         :param model_generator: The model generator determining architecture and feature function for trace links.
         :return: A data used by the HF trainer.
         """
-        feature_entries = {
-            link.id: self._get_feature_entry(link, model_generator.arch_type, model_generator.get_feature)
-            for link in self.links.values()}
+        link_batches = ListUtil.batch(list(self.links.values()), n_threads)
+        feature_entries = {}
+
+        def create_link_feature(target_link: TraceLink) -> None:
+            """
+            Creates and store link feature in feature_entries.
+            :param target_link: The trace link to generate feature for.
+            :return: None
+            """
+            feature_entries[target_link.id] = self._get_feature_entry(target_link,
+                                                                      model_generator.arch_type,
+                                                                      model_generator.get_feature)
+
+        ThreadUtil.multi_thread_process("Generating trace features.", list(self.links.values()), create_link_feature, n_threads)
+
         project_links = self.get_ordered_links()
         return [feature_entries[link.id] for link in project_links]
 

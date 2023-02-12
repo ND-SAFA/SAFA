@@ -82,5 +82,12 @@ DISPLAY_METRICS = ["map", "f2"]
 OS_IGNORE = [".DS_Store"]
 EXPERIMENTAL_VARS_IGNORE = ["job_args", "model_manager", "train_dataset_creator", "project_reader", "eval_dataset_creator",
                             "trainer_dataset_manager", "trainer_args"]
+
+# -------------- ANALYSIS --------------
+HIGH_FREQ_THRESHOLD_DEFAULT = 0.1
+LOW_FREQ_THRESHOLD_DEFAULT = 0.02
+LINK_COMMON_WORDS_THRESHOLD_DEFAULT = 0.01
+SAVE_LINK_ANALYSIS_DEFAULT = True
+
 # -------------- Datasets --------------
 CACHE_DIR_NAME = "HuggingFace"

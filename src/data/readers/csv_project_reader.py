@@ -16,11 +16,13 @@ class CsvProjectReader(AbstractProjectReader):
 
     LAYER_ID = "CSV_LAYER_ID"
 
-    def __init__(self, project_path: str):
+    def __init__(self, project_path: str, overrides: dict = None):
         """
         Creates reader targeted at reading entries located at given path.
         :param project_path: Path to data file containing entity entries.
+        :param overrides: Parameters to override in the project creator.
         """
+        super().__init__(overrides)
         self.project_path = project_path
 
     def read_project(self) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:

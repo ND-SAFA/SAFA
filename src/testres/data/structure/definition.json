@@ -32,7 +32,7 @@
     }
   },
   "overrides": {
-    "ALLOW_MISSING_TARGET": true,
-    "ALLOW_MISSING_SOURCE": true
+    "allowed_missing_sources": 1,
+    "allowed_missing_targets": 1
   }
 }

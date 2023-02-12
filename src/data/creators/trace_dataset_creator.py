@@ -1,10 +1,9 @@
-import threading
 from typing import Dict, List, Set, Tuple, Type
 
 import pandas as pd
-from tqdm import tqdm
 
-from constants import FILTER_UNLINKED_ARTIFACTS_DEFAULT
+from constants import ALLOWED_MISSING_SOURCES_DEFAULT, ALLOWED_MISSING_TARGETS_DEFAULT, ALLOWED_ORPHANS_DEFAULT, \
+    REMOVE_ORPHANS_DEFAULT
 from data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from data.datasets.trace_dataset import TraceDataset
 from data.keys.structure_keys import StructuredKeys
@@ -15,10 +14,10 @@ from data.tree.artifact import Artifact
 from data.tree.trace_link import TraceLink
 from util.base_object import BaseObject
 from util.dataframe_util import DataFrameUtil
-from util.general_util import ListUtil
 from util.logging.logger_manager import logger
 from util.override import overrides
 from util.reflection_util import ReflectionUtil
+from util.thread_util import ThreadUtil
 from util.uncased_dict import UncasedDict
 
 ArtifactType2Id = Dict[str, List[str]]
@@ -31,22 +30,28 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
     layer mappings.
     """
 
-    ALLOW_MISSING_SOURCE, ALLOW_MISSING_TARGET = False, False
-
     def __init__(self, project_reader: AbstractProjectReader, data_cleaner: DataCleaner = None,
-                 filter_unlinked_artifacts: bool = FILTER_UNLINKED_ARTIFACTS_DEFAULT):
+                 remove_orphans: bool = REMOVE_ORPHANS_DEFAULT,
+                 allowed_missing_sources: int = ALLOWED_MISSING_SOURCES_DEFAULT,
+                 allowed_missing_targets: int = ALLOWED_MISSING_TARGETS_DEFAULT,
+                 allowed_orphans: int = ALLOWED_ORPHANS_DEFAULT):
         """
         Initializes creator with entities extracted from reader.
         :param project_reader: Project reader responsible for extracting project entities.
         :param data_cleaner: Data Cleaner containing list of data cleaning steps to perform on artifact tokens.
-        :param filter_unlinked_artifacts: Whether to remove artifacts without a positive trace link.
+        :param remove_orphans: Whether to remove artifacts without a positive trace link.
         """
         super().__init__(data_cleaner)
+        self.allowed_missing_sources = allowed_missing_sources
+        self.allowed_missing_targets = allowed_missing_targets
+        self.allowed_orphans = allowed_orphans
         self.artifact_df = None
         self.trace_df = None
         self.layer_mapping_df = None
         self.project_reader = project_reader
-        self.should_filter_unlinked_artifacts = filter_unlinked_artifacts
+        self.remove_orphans = remove_orphans
+        self.linked_artifact_ids = None
+        self.orphan_artifact_ids = None
 
     def create(self) -> TraceDataset:
         """
@@ -55,12 +60,16 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         """
         self.artifact_df, self.trace_df, self.layer_mapping_df = self.project_reader.read_project()
         self.trace_df = DataFrameUtil.add_optional_column(self.trace_df, StructuredKeys.Trace.LABEL, 1)
-        ReflectionUtil.set_attributes(self, self.project_reader.get_overrides())
-        if self.should_filter_unlinked_artifacts:
-            self._filter_unlinked_artifacts()
+        overrides = self.project_reader.get_overrides()
+        ReflectionUtil.set_attributes(self, overrides)
+        self._verify_orphans()
+        if self.remove_orphans:
+            self._remove_orphans()
         self._filter_null_references()
         self._clean_artifact_tokens()
-        return self._create_trace_dataset()
+        trace_dataset = self._create_trace_dataset()
+        logger.info(f"Trace dataset read with ({len(trace_dataset.links)}) links.")
+        return trace_dataset
 
     def get_name(self) -> str:
         """
@@ -79,12 +88,13 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         """
         return SupportedDatasetReader
 
-    def _filter_unlinked_artifacts(self):
+    def _remove_orphans(self):
         """
         Removes artifacts containing no positive links.
         :return: None
         """
-        linked_artifact_ids = self._get_linked_artifact_ids(self.trace_df)
+        linked_artifact_ids = self._get_linked_artifact_ids()
+        self._verify_orphans()
         self._filter_artifacts_by_ids(linked_artifact_ids)
 
     def _filter_null_references(self) -> None:
@@ -92,8 +102,8 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         Checks that trace links reference known artifacts.
         :return: None
         """
-        valid_traces = self._filter_unreferenced_traces(self.artifact_df, self.trace_df, self.ALLOW_MISSING_SOURCE,
-                                                        self.ALLOW_MISSING_TARGET)
+        valid_traces = self._filter_unreferenced_traces(self.artifact_df, self.trace_df,
+                                                        self.allowed_missing_sources, self.allowed_missing_targets)
         self.trace_df = pd.DataFrame(valid_traces)
 
     def _clean_artifact_tokens(self) -> None:
@@ -146,15 +156,24 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         :return: None
         """
 
-        def filter_unlinked_artifact(row: pd.Series):
-            assert StructuredKeys.Artifact.ID in row, f"Missing artifact id: {row.to_dict()}"
+        def filter_by_id(row: pd.Series):
+            assert StructuredKeys.Artifact.ID in row, f"Missing artifact id property ({StructuredKeys.Artifact.ID}): {row.to_dict()}"
             return row[StructuredKeys.Artifact.ID] in artifact_ids
 
-        def filter_unlinked_trace(row: pd.Series):
+        def remove_traces_with_missing_artifacts(row: pd.Series):
             return row[StructuredKeys.Trace.SOURCE] in artifact_ids and row[StructuredKeys.Trace.TARGET] in artifact_ids
 
-        self.artifact_df = DataFrameUtil.filter_df(self.artifact_df, filter_unlinked_artifact)
-        self.trace_df = DataFrameUtil.filter_df(self.trace_df, filter_unlinked_trace)
+        self.artifact_df = DataFrameUtil.filter_df(self.artifact_df, filter_by_id)
+        self.trace_df = DataFrameUtil.filter_df(self.trace_df, remove_traces_with_missing_artifacts)
+
+    def _verify_orphans(self) -> None:
+        """
+        Verifies that orphans lie below a certain threshold.
+        :return: None
+        """
+        error_msg = f"Found too many orphan artifacts"
+        default_msg = f"Number of orphan artifacts"
+        TraceDatasetCreator.assert_artifact_less_than(self.get_orphan_artifact_ids(), self.allowed_orphans, error_msg, default_msg)
 
     @staticmethod
     def _generate_negative_links(layer_mapping_df: pd.DataFrame, artifact_type_2_id: ArtifactType2Id, id_2_artifact: Id2Artifact,
@@ -173,59 +192,50 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
             source_artifact_ids: List[str] = artifact_type_2_id[source_type]
             target_artifact_ids: List[str] = artifact_type_2_id[target_type]
 
-            def create_target_links(artifact_id, artifact) -> None:
+            def create_target_links(artifact_id) -> None:
                 """
                 Create negative links for artifact against target artifacts.
                 :param artifact_id: The id of the artifact to link to targets.
-                :param artifact: The artifact to use as the source for any trace links created.
                 :return:  None
                 """
+                artifact = id_2_artifact[artifact_id]
                 for target_artifact_id in target_artifact_ids:
                     target_artifact = id_2_artifact[target_artifact_id]
                     trace_link_id = TraceLink.generate_link_id(artifact_id, target_artifact_id)
                     if trace_link_id not in trace_dataset.links:
                         trace_dataset.add_link(TraceLink(artifact, target_artifact, is_true_link=False))
 
-            source_artifact_batches = ListUtil.batch(source_artifact_ids, n_threads)
-            for bach_source_artifact_ids in tqdm(source_artifact_batches, desc="Generating negative links"):
-                threads = []
-                for source_artifact_id in bach_source_artifact_ids:
-                    source_artifact = id_2_artifact[source_artifact_id]
-                    t1 = threading.Thread(target=create_target_links, args=(source_artifact_id, source_artifact))
-                    threads.append(t1)
-                    t1.start()
-                for t in threads:
-                    t.join()
+            title = f"Generating negative links between {source_type} -> {target_type}"
+            ThreadUtil.multi_thread_process(title, source_artifact_ids, create_target_links, n_threads)
         trace_dataset.shuffle_link_ids()
 
     @staticmethod
-    def _filter_unreferenced_traces(artifact_df: pd.DataFrame, trace_df: pd.DataFrame, allow_missing_sources: bool,
-                                    allow_missing_targets: bool) -> pd.DataFrame:
+    def _filter_unreferenced_traces(artifact_df: pd.DataFrame, trace_df: pd.DataFrame, max_missing_sources: int,
+                                    max_missing_targets: int) -> pd.DataFrame:
         """
         Filters out trace links with references to unknown artifacts. Errors are thrown when flags are set to not allow null references.
         :param artifact_df: DataFrame containing artifacts.
         :param trace_df: DataFrame containing trace links.
-        :param allow_missing_sources: If true, null references are removed. Otherwise,error is thrown if null source reference is encountered.
-        :param allow_missing_targets: If true, null references are removed. Otherwise,error is thrown if null target reference is encountered.
+        :param max_missing_sources: The maximum number of allowed missing sources.
+        :param max_missing_targets: The maximum number of allowed missing targets.
         :return: DataFrame of trace links without links containing null references.
         """
         valid_traces = []
         valid_artifact_ids = artifact_df[StructuredKeys.Artifact.ID].values
+        missing_sources = []
+        missing_targets = []
         for _, row in trace_df.iterrows():
             source_id = row[StructuredKeys.Trace.SOURCE]
             target_id = row[StructuredKeys.Trace.TARGET]
             if source_id not in valid_artifact_ids:
-                error_msg = f"Unknown source artifact reference: {source_id}"
-                if not allow_missing_sources:
-                    raise ValueError(error_msg)
-                logger.warning(error_msg)
+                missing_sources.append(source_id)
             elif target_id not in valid_artifact_ids:
-                error_msg = f"Unknown target artifact reference: {target_id}"
-                if not allow_missing_targets:
-                    raise ValueError(error_msg)
-                logger.warning(error_msg)
+                missing_targets.append(target_id)
             else:
                 valid_traces.append(row.to_dict())
+
+        TraceDatasetCreator.assert_missing_artifact_ids(missing_sources, max_missing_sources, "source")
+        TraceDatasetCreator.assert_missing_artifact_ids(missing_targets, max_missing_targets, "target")
         return pd.DataFrame(valid_traces)
 
     @staticmethod
@@ -239,6 +249,9 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         id_2_artifact: Id2Artifact = UncasedDict()
         for _, row in artifact_df.iterrows():
             TraceDatasetCreator._add_artifact_to_maps(row, artifact_type_2_id, id_2_artifact)
+
+        for artifact_type, artifact_ids in artifact_type_2_id.items():
+            logger.info(f"{artifact_type.title()}: {len(artifact_ids)}")
         return artifact_type_2_id, id_2_artifact
 
     @staticmethod
@@ -261,21 +274,63 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
             id_2_artifact[artifact_id] = Artifact(artifact_id, artifact_body)
         return id_2_artifact[artifact_id]
 
-    @staticmethod
-    def _get_linked_artifact_ids(trace_df) -> Set[str]:
+    def _get_linked_artifact_ids(self) -> Set[str]:
         """
         Extracts set of artifact id containing at least one positive link.
         :return: Set of artifact ids.
         """
-        linked_artifact_ids = set()
-        for _, row in trace_df.iterrows():
-            source_id = row[StructuredKeys.Trace.SOURCE]
-            target_id = row[StructuredKeys.Trace.TARGET]
-            is_true_link = int(row[StructuredKeys.Trace.LABEL]) == 1
-            if is_true_link:
-                linked_artifact_ids.update({source_id, target_id})
-        return linked_artifact_ids
+        if self.linked_artifact_ids is None:
+            linked_artifact_ids = set()
+            for _, row in self.trace_df.iterrows():
+                source_id = row[StructuredKeys.Trace.SOURCE]
+                target_id = row[StructuredKeys.Trace.TARGET]
+                is_true_link = int(row[StructuredKeys.Trace.LABEL]) == 1
+                if is_true_link:
+                    linked_artifact_ids.update({source_id, target_id})
+            self.linked_artifact_ids = linked_artifact_ids
+        return self.linked_artifact_ids
+
+    def get_orphan_artifact_ids(self) -> List[str]:
+        """
+        :return: Returns list of orphan artifact ids.
+        """
+        if self.orphan_artifact_ids is None:
+            orphan_artifact_ids: Set = set()
+            linked_artifact_ids = self._get_linked_artifact_ids()
+            for i, row in self.artifact_df.iterrows():
+                artifact_id = row[StructuredKeys.Artifact.ID]
+                if artifact_id not in linked_artifact_ids:
+                    orphan_artifact_ids.add(artifact_id)
+            self.orphan_artifact_ids = list(orphan_artifact_ids)
+        return self.orphan_artifact_ids
 
     @staticmethod
-    def _set_index(df: pd.DataFrame, col_name: str) -> pd.DataFrame:
-        return df.reset_index().set_index(col_name)
+    def assert_missing_artifact_ids(missing_artifact_ids: List[str], max_missing_allowed: int, label: str) -> None:
+        """
+        Verifies that the missing artifacts does not exceed the maximum allowed.
+        :param missing_artifact_ids: The ids of the missing artifacts.
+        :param max_missing_allowed: The maximum allowed of missing artifacts.
+        :param label: The label to group error with, if it exists.
+        :return: None
+        """
+        error_msg = f"Found too null references to {label} artifacts ({len(missing_artifact_ids)})"
+        default_msg = f"No missing {label} artifacts."
+        TraceDatasetCreator.assert_artifact_less_than(missing_artifact_ids, max_missing_allowed, error_msg, default_msg)
+
+    @staticmethod
+    def assert_artifact_less_than(artifact_ids: List, n_allowed: int, error_msg: str, default_msg: str = None):
+        """
+        Asserts that artifacts ids are less than number allowed. Otherwise, error is thrown with error message.
+        :param artifact_ids: The artifacts ids to verify.
+        :param n_allowed: The maximum allowed of artifacts ids in list.
+        :param error_msg: The error message to print if verification fails.
+        :param default_msg: The message to display if artifacts are under threshold.
+        :return: None
+        """
+        n_artifacts = len(artifact_ids)
+        if n_artifacts > n_allowed:
+            artifact_id_str = ",".join([str(a) for a in artifact_ids])
+            raise ValueError(f"{error_msg}. Expected {n_allowed} but found {n_artifacts}.\n {artifact_id_str}")
+        else:
+            if default_msg:
+                logger.info(f"{default_msg} ({n_artifacts})")

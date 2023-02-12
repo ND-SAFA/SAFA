@@ -20,9 +20,10 @@ if __name__ == "__main__":
         prog='Experiment',
         description='Runs experiment definitions')
     parser.add_argument('file')
+    parser.add_argument('output_path')
     args = parser.parse_args()
     file_path = os.path.join(RQ_PATH, args.file)
     script_runner = ScriptRunner(file_path)
-    scripter_analyzer = ScriptAnalyzer(script_runner)
+    scripter_analyzer = ScriptAnalyzer(script_runner, args.output_path)
     scripter_analyzer.analyze()
     print("Analysis finished")

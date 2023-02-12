@@ -1,10 +1,10 @@
 import os
-from typing import List, Dict, Any, Set, Tuple
+from typing import Any, Dict, List, Set, Tuple
 
 from tqdm import tqdm
 
 from analysis.link_analyzer import LinkAnalyzer
-from constants import LINK_COMMON_WORDS_THRESHOLD_DEFAULT, SAVE_LINK_ANALYSIS_DEFAULT
+from constants import LINK_COMMON_WORDS_THRESHOLD_DEFAULT, SAVE_LINK_ANALYSIS_DEFAULT, THRESHOLD_DEFAULT
 from data.datasets.trace_dataset import TraceDataset
 from data.tree.trace_link import TraceLink
 from models.model_manager import ModelManager
@@ -59,13 +59,13 @@ class ResultsAnalyzer:
                     }
         return self._save(analysis, output_dir)
 
-    def intersection(self, other: "ResultsAnalyzer") -> Set[TraceLink]:
+    def intersection(self, other: "ResultsAnalyzer") -> Set[int]:
         """
         Returns the intersection of mis-predicted links between self and other
         :param other: Another results analyzer
         :return: The set of overlapping mis-predicted links
         """
-        return self.mis_predicted_links.intersection(other.mis_predicted_links)
+        return {link.id for link in self.mis_predicted_links.intersection(other.mis_predicted_links)}
 
     @staticmethod
     def _save(analysis: Dict[str, Any], output_dir: str) -> str:
@@ -127,8 +127,9 @@ class ResultsAnalyzer:
         mis_predicted_links = set()
         correctly_predicted_links = set()
         for i, (source_id, target_id) in enumerate(self.prediction_output.source_target_pairs):
-            link = dataset.links[TraceLink.generate_link_id(source_id, target_id)]
-            pred_label = self.prediction_output.label_ids[i]
+            trace_link_id = TraceLink.generate_link_id(source_id, target_id)
+            link = dataset.links[trace_link_id]
+            pred_label = self.prediction_output.predictions[i] > THRESHOLD_DEFAULT
             if pred_label != link.get_label():
                 mis_predicted_links.add(link)
             else:

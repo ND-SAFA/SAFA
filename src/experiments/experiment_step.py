@@ -203,7 +203,7 @@ class ExperimentStep(BaseObject):
         :return: the updated jobs
         """
         for job in self.jobs:
-            run_name = Wandb.get_run_name(job.result[JobResult.EXPERIMENTAL_VARS])
+            run_name = Wandb.get_run_name(job.result[JobResult.EXPERIMENTAL_VARS], str(job.id))
             job_base_path = os.path.join(output_dir, run_name)
             if isinstance(job, AbstractTraceJob):
                 model_path = os.path.join(job_base_path, "models")

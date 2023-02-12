@@ -1,0 +1,27 @@
+{
+  "steps": [
+    {
+      "jobs": [
+        {
+          "object_type": "DATASET_ANALYSIS",
+          "job_args": {
+          },
+          "model_managers": [
+            {
+              "model_path": "hf-internal-testing/tiny-random-bert"
+            },
+            {
+              "model_path": "prajjwal1/bert-medium"
+            }
+          ],
+          "dataset_creator": {
+            "project_reader": {
+              "object_type": "STRUCTURE",
+              "project_path": "[DATA_PATH]/lhp/heating"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 import os
-from typing import List, Set, Tuple, Dict, Any
+from typing import Any, Dict, List, Set, Tuple
 
 import nltk
 from nltk.corpus import wordnet as wn
@@ -27,6 +27,7 @@ class LinkAnalyzer:
 
     ARTIFACT_TOKENS = "artifact_tokens"
     ANALYSIS = "analysis"
+    LINK_TRUE_LABEL = "link_true_label"
 
     OUTPUT_FILENAME = "link_{}_analysis.json"
 
@@ -76,6 +77,7 @@ class LinkAnalyzer:
             if isinstance(result, WordCounter):
                 analysis[name] = result.as_dict()
         output_dict = {self.ARTIFACT_TOKENS: [self.link.source.token, self.link.target.token],
+                       self.LINK_TRUE_LABEL: self.link.get_label(),
                        self.ANALYSIS: analysis}
         FileUtil.write(output_dict, output_file_path)
         return output_file_path

@@ -187,7 +187,7 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
                         trace_dataset.add_link(TraceLink(artifact, target_artifact, is_true_link=False))
 
             source_artifact_batches = ListUtil.batch(source_artifact_ids, n_threads)
-            for bach_source_artifact_ids in tqdm(source_artifact_batches):
+            for bach_source_artifact_ids in tqdm(source_artifact_batches, desc="Generating negative links"):
                 threads = []
                 for source_artifact_id in bach_source_artifact_ids:
                     source_artifact = id_2_artifact[source_artifact_id]

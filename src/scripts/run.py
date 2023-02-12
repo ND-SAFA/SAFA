@@ -4,9 +4,11 @@ import sys
 
 from dotenv import load_dotenv
 
+from constants import ROOT_PATH_PARAM
+
 load_dotenv()
 
-ROOT_PATH = os.path.expanduser(os.environ["ROOT_PATH"])
+ROOT_PATH = os.path.expanduser(os.environ[ROOT_PATH_PARAM])
 assert os.path.exists(ROOT_PATH), ROOT_PATH
 sys.path.append(ROOT_PATH)
 

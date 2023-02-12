@@ -1,10 +1,11 @@
 import os
 from typing import Any, Dict, List, Tuple
 
+from constants import DATA_PATH_PARAM, OUTPUT_PATH_PARAM, ROOT_PATH_PARAM
 from util.file_util import FileUtil
 from util.json_util import JsonUtil
 
-ENV_REPLACEMENT_VARIABLES = ["DATA_PATH", "ROOT_PATH", "OUTPUT_PATH"]
+ENV_REPLACEMENT_VARIABLES = [DATA_PATH_PARAM, ROOT_PATH_PARAM, OUTPUT_PATH_PARAM]
 
 
 class ScriptDefinition:
@@ -13,7 +14,7 @@ class ScriptDefinition:
     """
     LOGGING_DIR_PARAM = "logging_dir"
     OUTPUT_DIR_PARAM = "output_dir"
-    ENV_OUTPUT_PARMA = "[OUTPUT_PATH]"
+    ENV_OUTPUT_PARMA = f"[{OUTPUT_PATH_PARAM}]"
 
     @staticmethod
     def read_experiment_definition(definition_path: str, env_replacements: List[str] = None) -> Dict:

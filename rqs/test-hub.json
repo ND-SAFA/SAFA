@@ -1,0 +1,62 @@
+{
+  "steps": [
+    {
+      "jobs": [
+        {
+          "object_type": "TRAIN",
+          "job_args": {
+            "random_seed": {
+              "*": [
+                812,
+                42
+              ]
+            }
+          },
+          "model_manager": {
+            "model_path": "hf-internal-testing/tiny-random-bert"
+          },
+          "trainer_args": {
+            "num_train_epochs": 5,
+            "gradient_accumulation_steps": 1,
+            "learning_rate": 5e-5,
+            "metrics": [
+              "map",
+              "map_at_k",
+              "f",
+              "precision"
+            ],
+            "skip_save": false,
+            "use_balanced_batches": true,
+            "load_best_model_at_end": true
+          },
+          "trainer_dataset_manager": {
+            "train_dataset_creator": {
+              "object_type": "TRACE",
+              "project_reader": {
+                "object_type": "HUB",
+                "name": "Drone"
+              }
+            },
+            "val_dataset_creator": {
+              "object_type": "SPLIT",
+              "split_strategy": "SPLIT_BY_LINK",
+              "val_percentage": 0.15
+            },
+            "eval_dataset_creator": {
+              "object_type": "SPLIT",
+              "split_strategy": "SPLIT_BY_LINK",
+              "val_percentage": 0.7
+            },
+            "augmenter": {
+              "steps": [
+                {
+                  "object_type": "RESAMPLE"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

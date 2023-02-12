@@ -5,6 +5,12 @@ from os.path import abspath, dirname
 from dotenv import load_dotenv
 
 load_dotenv()
+# -------------- END --------------
+ROOT_PATH_PARAM = "ROOT_PATH"
+DATA_PATH_PARAM = "DATA_PATH"
+OUTPUT_PATH_PARAM = "OUTPUT_PATH"
+WANDB_DIR_PARAM = "WANDB_DIR"
+WANDB_PROJECT_PARAM = "WANDB_PROJECT"
 # -------------- LOGGING --------------
 LOG_LEVEL_DEFAULT = logging.INFO
 LOG_FILE_DEFAULT = "output.log"
@@ -78,3 +84,6 @@ HIGH_FREQ_THRESHOLD_DEFAULT = 0.1
 LOW_FREQ_THRESHOLD_DEFAULT = 0.02
 LINK_COMMON_WORDS_THRESHOLD_DEFAULT = 0.01
 SAVE_LINK_ANALYSIS_DEFAULT = True
+
+# -------------- Datasets --------------
+CACHE_DIR_NAME = "HuggingFace"

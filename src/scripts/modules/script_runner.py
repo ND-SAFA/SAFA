@@ -5,8 +5,8 @@ from django.core.wsgi import get_wsgi_application
 
 from constants import OUTPUT_PATH_PARAM, WANDB_DIR_PARAM, WANDB_PROJECT_PARAM
 from experiments.experiment import Experiment
-from scripts.results.script_definition import ScriptDefinition
-from scripts.results.script_reader import ScriptOutputReader
+from scripts.modules.script_definition import ScriptDefinition
+from scripts.modules.script_reader import ScriptOutputReader
 from train.trainer_tools.trace_accelerator import TraceAccelerator
 from util.file_util import FileUtil
 from util.logging.logger_config import LoggerConfig
@@ -32,6 +32,7 @@ class ScriptRunner:
         self.experiment_definition = None
         self.experiment_dir = None
         self.logging_dir = None
+        self.experiment = None
         os.environ[WANDB_PROJECT_PARAM] = self.script_name
         os.environ[WANDB_DIR_PARAM] = os.path.join(os.environ[OUTPUT_PATH_PARAM], "wandb")
 
@@ -40,9 +41,8 @@ class ScriptRunner:
         Runs experiment defined by definition
         :return: None
         """
-        experiment_definition = self._load_experiment_definition()
+        experiment = self.get_experiment()
         self._setup_run()
-        experiment = ObjectCreator.create(Experiment, override=True, **experiment_definition)
         LoggerManager.turn_off_hugging_face_logging()
         experiment.run()
         logger.info(self.FINISHED_HEADER)
@@ -62,6 +62,15 @@ class ScriptRunner:
         :return: None
         """
         self.script_reader.upload_to_s3()
+
+    def get_experiment(self) -> Experiment:
+        """
+        :return: Returns the script experiment.
+        """
+        if self.experiment is None:
+            experiment_definition = self._load_experiment_definition()
+            self.experiment = ObjectCreator.create(Experiment, override=True, **experiment_definition)
+        return self.experiment
 
     def _load_experiment_definition(self) -> Dict:
         """
@@ -86,5 +95,6 @@ class ScriptRunner:
         """
         if TraceAccelerator.is_main_process:
             FileUtil.delete_dir(self.experiment_dir)
+            FileUtil.create_dir_safely(self.experiment_dir)
         TraceAccelerator.wait_for_everyone()
         get_wsgi_application()

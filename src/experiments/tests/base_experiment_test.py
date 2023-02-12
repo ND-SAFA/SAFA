@@ -2,6 +2,7 @@ import json
 import os
 import random
 
+from constants import OUTPUT_FILENAME
 from jobs.components.job_result import JobResult
 from jobs.supported_job_type import SupportedJobType
 from testres.base_test import BaseTest
@@ -75,9 +76,9 @@ class BaseExperimentTest(BaseTest):
         self.accuracies = []
 
     @staticmethod
-    def _load_step_output(step=None, output_file_path=None):
+    def _load_step_output(output_file_path=None):
         if not output_file_path:
-            output_file_path = os.path.join(TEST_OUTPUT_DIR, step.OUTPUT_FILENAME)
+            output_file_path = os.path.join(TEST_OUTPUT_DIR, OUTPUT_FILENAME)
         with open(output_file_path) as out_file:
             output = json.load(out_file)
         return output

@@ -38,7 +38,7 @@ class TestExperimentStep(BaseExperimentTest):
         experiment_step = self.get_experiment_step()
         experiment_step.run(TEST_OUTPUT_DIR)
         experiment_step.save_results(TEST_OUTPUT_DIR)
-        output = self._load_step_output(experiment_step)
+        output = self._load_step_output()
         job_dirs = FileUtil.ls_dir(TEST_OUTPUT_DIR)
         self.assertEqual(len(output["jobs"]), len(job_dirs))
         self.assert_experimental_vars(experiment_step)
@@ -122,7 +122,8 @@ class TestExperimentStep(BaseExperimentTest):
         job1, job2 = self.get_test_jobs()
         output_dir = os.path.join(TEST_OUTPUT_DIR, "experiment_step")
         job1.model_manager = DeterministicTrainerDatasetManager(deterministic_id="1234")
-        ExperimentStep._update_job_children([job1, job2], output_dir)
+        experiment_step = ExperimentStep([job1, job2])
+        experiment_step.update_output_path(output_dir)
         self.assertEquals(job1.model_manager.output_dir, os.path.join(output_dir, BASE_EXPERIMENT_NAME, "models"))
 
     @staticmethod

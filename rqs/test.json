@@ -5,18 +5,13 @@
         {
           "object_type": "TRAIN",
           "job_args": {
-            "random_seed": {
-              "*": [
-                812,
-                42
-              ]
-            }
+            "random_seed": 812
           },
           "model_manager": {
             "model_path": "hf-internal-testing/tiny-random-bert"
           },
           "trainer_args": {
-            "num_train_epochs": 5,
+            "num_train_epochs": 1,
             "gradient_accumulation_steps": 1,
             "learning_rate": 5e-5,
             "metrics": [
@@ -34,12 +29,7 @@
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "STRUCTURE",
-                "project_path": {
-                  "*": [
-                    "[DATA_PATH]/lhp/cooling",
-                    "[DATA_PATH]/lhp/heating"
-                  ]
-                }
+                "project_path": "[DATA_PATH]/lhp/heating"
               }
             },
             "val_dataset_creator": {
@@ -52,7 +42,7 @@
               "split_strategy": "SPLIT_BY_LINK",
               "val_percentage": {
                 "*": [
-                  0.30,
+                  0.3,
                   0.7
                 ]
               }

@@ -1,4 +1,4 @@
-from scripts.results.script_definition import ScriptDefinition
+from scripts.modules.script_definition import ScriptDefinition
 from testres.base_test import BaseTest
 
 

@@ -2,6 +2,7 @@ import os
 import uuid
 from typing import List
 
+from constants import EXPERIMENT_ID_DEFAULT
 from experiments.experiment_step import ExperimentStep
 from jobs.abstract_job import AbstractJob
 from util.base_object import BaseObject
@@ -16,7 +17,7 @@ class Experiment(BaseObject):
     _EXPERIMENT_DIR_NAME = "experiment_%s"
 
     def __init__(self, steps: List[ExperimentStep], output_dir: str, logger_config: LoggerConfig = LoggerConfig(),
-                 experiment_id: int = 0):
+                 experiment_id: int = EXPERIMENT_ID_DEFAULT):
         """
         Represents an experiment run
         :param steps: List of all experiment steps to run
@@ -40,7 +41,7 @@ class Experiment(BaseObject):
         """
         jobs_for_undetermined_vals = None
         for i, step in enumerate(self.steps):
-            step_output_dir = os.path.join(self.output_dir, self._EXPERIMENT_DIR_NAME % self.experiment_index, self._STEP_DIR_NAME % i)
+            step_output_dir = self.get_step_output_dir(self.experiment_index, i)
             jobs_for_undetermined_vals = step.run(step_output_dir, jobs_for_undetermined_vals)
             if step.status == Status.FAILURE:
                 break
@@ -71,3 +72,12 @@ class Experiment(BaseObject):
         :return: the output path
         """
         return os.path.join(self.output_dir, str(self.id), self._STEP_DIR_NAME.format(step_num))
+
+    def get_step_output_dir(self, experiment_id: int, step_id: int) -> str:
+        """
+        Returns the output path of the step from base directory.
+        :param experiment_id: The id or index of the step.
+        :param step_id: The id or index of the step.
+        :return: Step's output path.
+        """
+        return os.path.join(self.output_dir, Experiment._EXPERIMENT_DIR_NAME % experiment_id, Experiment._STEP_DIR_NAME % step_id)

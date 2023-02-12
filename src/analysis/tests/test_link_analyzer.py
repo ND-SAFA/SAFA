@@ -11,22 +11,22 @@ from util.json_util import JsonUtil
 class TestLinkAnalyzer(BaseTest):
     a1_body = "This is a really small artifact body to use as a test."
     a2_body = "This is a really large artifct body to try out for funsies."
-    expected_oov_words = {"funsies": 1, "artifct": 1}
-    expected_analyses = [LinkAnalyzer.COMMON_WORDS, LinkAnalyzer.MISSPELLED_WORDS, LinkAnalyzer.SHARED_SYNONYMS_AND_ANTONYMS,
+    EXPECTED_OOV_WORDS = {"funsies": 1, "artifct": 1}
+    EXPECTED_ANALYSES = [LinkAnalyzer.COMMON_WORDS, LinkAnalyzer.MISSPELLED_WORDS, LinkAnalyzer.SHARED_SYNONYMS_AND_ANTONYMS,
                          LinkAnalyzer.OOV_WORDS]
-    expected_counts = {name: 2 for name in expected_analyses}
+    EXPECTED_COUNTS = {name: 2 for name in EXPECTED_ANALYSES}
 
     def test_get_analysis_counts(self):
         analyzer = self.get_link_analyzer()
         analysis = analyzer.get_analysis_counts()
-        for analysis_name in self.expected_counts.keys():
+        for analysis_name in self.EXPECTED_COUNTS.keys():
             self.assertIn(analysis_name, analysis)
-            self.assertEquals(analysis[analysis_name], self.expected_counts[analysis_name])
+            self.assertEquals(analysis[analysis_name], self.EXPECTED_COUNTS[analysis_name])
 
     def test_get_analysis(self):
         analyzer = self.get_link_analyzer()
         analysis = analyzer.get_analysis()
-        for analysis_name in self.expected_analyses:
+        for analysis_name in self.EXPECTED_ANALYSES:
             self.assertIn(analysis_name, analysis)
 
     def test_save(self):
@@ -48,7 +48,7 @@ class TestLinkAnalyzer(BaseTest):
     def test_get_misspelled_words(self):
         analyzer = self.get_link_analyzer()
         misspelled = analyzer.get_misspelled_words()
-        self.assertDictEqual(misspelled, self.expected_oov_words)
+        self.assertDictEqual(misspelled, self.EXPECTED_OOV_WORDS)
 
     def test_get_shared_synonyms_and_antonyms(self):
         analyzer = self.get_link_analyzer()
@@ -59,7 +59,7 @@ class TestLinkAnalyzer(BaseTest):
     def test_get_oov_vocab(self):
         analyzer = self.get_link_analyzer()
         oov = analyzer.get_oov_words(analyzer.model_manager)
-        self.assertDictEqual(oov, self.expected_oov_words)
+        self.assertDictEqual(oov, self.EXPECTED_OOV_WORDS)
 
     def test_get_artifact_vocab(self):
         analyzer = self.get_link_analyzer()

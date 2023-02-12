@@ -28,7 +28,7 @@ class LinkAnalyzer:
     ARTIFACT_TOKENS = "artifact_tokens"
     ANALYSIS = "analysis"
 
-    OUTPUT_FILENAME = "link_{}.json"
+    OUTPUT_FILENAME = "link_{}_analysis.json"
 
     def __init__(self, link: TraceLink, model_manager: ModelManager):
         """

@@ -10,7 +10,6 @@ from constants import HIGH_FREQ_THRESHOLD_DEFAULT, LOW_FREQ_THRESHOLD_DEFAULT
 from data.datasets.trace_dataset import TraceDataset
 from models.model_manager import ModelManager
 from util.file_util import FileUtil
-from util.json_util import JsonUtil
 
 nltk.download('punkt', quiet=True)
 
@@ -24,7 +23,7 @@ class DatasetAnalyzer:
     LOW_FREQUENCY_WORDS = "low_freq_words"
     OOV_WORDS = "oov_words_with_model_{}"
 
-    OUTPUT_FILENAME = "output.json"
+    OUTPUT_FILENAME = "dataset_analysis_output.json"
 
     def __init__(self, dataset: TraceDataset, model_managers: List[ModelManager]):
         """
@@ -35,7 +34,7 @@ class DatasetAnalyzer:
         self.vocab = self._get_vocab()
         self.word_counts = WordCounter(self.vocab).filter_stop_words()
         self.model_managers = model_managers
-        self.__analysis = {}
+        self.__analysis = None
 
     def get_analysis(self) -> Dict[str, Any]:
         """
@@ -52,16 +51,16 @@ class DatasetAnalyzer:
                 self.__analysis[self.OOV_WORDS.format(model.model_path)] = self.get_oov_words(model)
         return self.__analysis
 
-    def save(self, output_dir: str) -> None:
+    def save(self, output_dir: str) -> str:
         """
         Saves the analysis output to the given directory
         :param output_dir: The directory to save to
-        :return: None
+        :return: The output file path
         """
         analysis = self.get_analysis()
-        output = JsonUtil.dict_to_json(analysis)
         output_file_path = os.path.join(output_dir, self.OUTPUT_FILENAME)
-        FileUtil.write(output, output_file_path)
+        FileUtil.write(analysis, output_file_path)
+        return output_file_path
 
     def get_readability_score(self) -> float:
         """

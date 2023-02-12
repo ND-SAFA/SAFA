@@ -1,8 +1,8 @@
 import os
 import random
-from collections import OrderedDict, Counter
+from collections import OrderedDict
 from copy import deepcopy
-from typing import Callable, Dict, List, Tuple, Set
+from typing import Callable, Dict, List, Tuple
 
 import pandas as pd
 
@@ -13,7 +13,6 @@ from data.keys.csv_format import CSVKeys
 from data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
 from data.processing.augmentation.data_augmenter import DataAugmenter
 from data.processing.augmentation.source_target_swap_step import SourceTargetSwapStep
-from data.processing.cleaning.data_cleaner import DataCleaner
 from data.tree.artifact import Artifact
 from data.tree.trace_link import TraceLink
 from models.model_manager import ModelManager

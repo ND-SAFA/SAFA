@@ -44,6 +44,9 @@ class ObjectCreator:
                 "source_layers": TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS, TestDataManager.Keys.SOURCE]),
                 "target_layers": TestDataManager.get_path([TestDataManager.Keys.ARTIFACTS, TestDataManager.Keys.TARGET]),
                 "true_links": TestDataManager.get_path(TestDataManager.Keys.TRACES)
+            },
+            "overrides": {
+                "ALLOWED_ORPHANS": 2
             }
         }
     }

@@ -1,6 +1,6 @@
 from typing import Type
 
-from constants import FILTER_UNLINKED_ARTIFACTS_DEFAULT
+from constants import REMOVE_ORPHANS_DEFAULT
 from data.creators.abstract_dataset_creator import AbstractDatasetCreator, DatasetType
 from data.creators.trace_dataset_creator import TraceDatasetCreator
 from data.processing.cleaning.data_cleaner import DataCleaner
@@ -18,16 +18,16 @@ class MultiTraceDatasetCreator(AbstractDatasetCreator):
     DELIMITER = "-"
 
     def __init__(self, project_readers: [AbstractProjectReader], data_cleaner: DataCleaner = None,
-                 filter_unlinked_artifacts: bool = FILTER_UNLINKED_ARTIFACTS_DEFAULT):
+                 remove_orphans: bool = REMOVE_ORPHANS_DEFAULT):
         """
         Initializes creator with entities extracted from reader.
         :param project_readers: The project readers responsible for extracting project entities for each dataset.
         :param data_cleaner: Data Cleaner containing list of data cleaning steps to perform on artifact tokens.
-        :param filter_unlinked_artifacts: Whether to remove artifacts without a positive trace link.
+        :param remove_orphans: Whether to remove artifacts without a positive trace link.
         """
         super().__init__(data_cleaner)
         self.project_readers = project_readers
-        self.should_filter_unlinked_artifacts = filter_unlinked_artifacts
+        self.remove_orphans = remove_orphans
 
     def create(self) -> DatasetType:
         """
@@ -37,7 +37,7 @@ class MultiTraceDatasetCreator(AbstractDatasetCreator):
         multi_dataset = None
         for reader in self.project_readers:
             dataset = TraceDatasetCreator(project_reader=reader, data_cleaner=self.data_cleaner,
-                                          filter_unlinked_artifacts=self.should_filter_unlinked_artifacts).create()
+                                          remove_orphans=self.remove_orphans).create()
             if multi_dataset is None:
                 multi_dataset = dataset
             else:

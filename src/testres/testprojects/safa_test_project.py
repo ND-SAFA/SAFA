@@ -21,4 +21,4 @@ class SafaTestProject(ApiTestProject):
         """
         :return: Returns structured project reader for project
         """
-        return StructuredProjectReader(SAFA_PROJECT_PATH)
+        return StructuredProjectReader(SAFA_PROJECT_PATH, overrides={"allowed_orphans": 2, "remove_orphans": True})

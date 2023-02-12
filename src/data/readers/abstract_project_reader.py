@@ -11,6 +11,13 @@ class AbstractProjectReader(BaseObject, ABC):
     Defines interface for objects responsible for reading projects.
     """
 
+    def __init__(self, overrides: dict = None):
+        """
+        Initialized project reader with overrides.
+        :param overrides: The overrides to apply to project creator.
+        """
+        self.overrides = overrides if overrides else {}
+
     @abstractmethod
     def read_project(self) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
         """
@@ -37,4 +44,4 @@ class AbstractProjectReader(BaseObject, ABC):
         allowing missing source / target references in trace links.
         :return: Dictionary of parameter names to their new values to override.
         """
-        return {}
+        return self.overrides

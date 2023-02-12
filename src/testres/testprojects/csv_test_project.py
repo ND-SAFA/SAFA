@@ -1,8 +1,8 @@
 from typing import Dict, List, Tuple
 
+from data.keys.csv_format import CSVKeys
 from data.readers.abstract_project_reader import AbstractProjectReader
 from data.readers.csv_project_reader import CsvProjectReader
-from data.keys.csv_format import CSVKeys
 from testres.paths.project_paths import CSV_PROJECT_PATH
 from testres.test_data_manager import TestDataManager
 from testres.testprojects.abstract_test_project import AbstractTestProject
@@ -31,7 +31,7 @@ class CsvTestProject(AbstractTestProject):
         """
         :return: Returns csv reader for project.
         """
-        return CsvProjectReader(cls.get_project_path())
+        return CsvProjectReader(cls.get_project_path(), overrides={"allowed_orphans": 2})
 
     @staticmethod
     def get_source_entries() -> List[List[Dict[str, str]]]:

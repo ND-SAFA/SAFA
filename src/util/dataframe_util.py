@@ -1,6 +1,5 @@
 from typing import Any, Callable, Dict
 
-import numpy as np
 import pandas as pd
 
 
@@ -10,7 +9,7 @@ class DataFrameUtil:
     """
 
     @staticmethod
-    def rename_columns(df: pd.DataFrame, column_translation: Dict[str, str] = None, drop_na=True) -> pd.DataFrame:
+    def rename_columns(df: pd.DataFrame, column_translation: Dict[str, str] = None) -> pd.DataFrame:
         """
         Renames the columns of the data frame.
         :param df: The data frame whose columns should be renamed.
@@ -22,14 +21,13 @@ class DataFrameUtil:
         if column_translation is None or len(column_translation) == 0:
             column_translation = {col: col for col in df.columns}
 
-        for df_col in df.select_dtypes(include=[float]).columns:
-            df[df_col] = df[df_col].map(lambda v: int(v) if isinstance(v, float) and not np.isnan(v) else v)
         df = df[column_translation.keys()]
         df = df.rename(column_translation, axis=1)
         df = df[list(column_translation.values())]
 
-        if drop_na:
-            return df.dropna()
+        df = df.dropna()
+        for df_col in df.select_dtypes(include=[float]).columns:
+            df[df_col] = df[df_col].astype(int)
         return df
 
     @staticmethod

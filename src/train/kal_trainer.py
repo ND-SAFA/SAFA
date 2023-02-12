@@ -14,14 +14,14 @@ from transformers import PreTrainedModel, Trainer
 from transformers.modeling_outputs import SequenceClassifierOutput
 from transformers.trainer_utils import PredictionOutput
 
+from constants import BEST_MODEL_NAME
 from data.datasets.data_key import DataKey
 from data.datasets.dataset_role import DatasetRole
 from data.managers.trainer_dataset_manager import TrainerDatasetManager
-from data.samplers.balanced_batch_sampler import BalancedBatchSampler
 from models.model_manager import ModelManager
-from train.trace_trainer import TraceTrainer
 from train.trace_output.trace_prediction_output import TracePredictionOutput
 from train.trace_output.trace_train_output import TraceTrainOutput
+from train.trace_trainer import TraceTrainer
 from train.trainer_args import TrainerArgs
 from train.trainer_tools.supported_optimizers import SupportedOptimizers
 from train.trainer_tools.supported_schedulers import SupportedSchedulers
@@ -36,7 +36,6 @@ class KalTrainer(TraceTrainer):
     """
     Trace trainer for training for trace link prediction.
     """
-    BEST_MODEL_NAME = "best"
     CURRENT_MODEL_NAME = "current"
     RANDOM_MODEL_BASE_NAME = "random_epoch_{}"
     OPTIMIZER_FILE_NAME = "optimizer.bin"
@@ -65,7 +64,7 @@ class KalTrainer(TraceTrainer):
             if not self.trainer_args.should_save:
                 logger.warning("Unable to load best model because configuration defined `should_save` to False.")
             else:
-                best_model_path = self.get_output_path(self.BEST_MODEL_NAME)
+                best_model_path = self.get_output_path(BEST_MODEL_NAME)
                 self.model = self.model_manager.update_model(best_model_path)
         return trace_train_output
 
@@ -191,7 +190,7 @@ class KalTrainer(TraceTrainer):
             prediction_output: TracePredictionOutput = self.perform_prediction(dataset_role)
             should_save = training_state.on_eval(dataset_role, prediction_output)
             if should_save:
-                self.save_model(self.get_output_path(self.BEST_MODEL_NAME))
+                self.save_model(self.get_output_path(BEST_MODEL_NAME))
             logger.log_with_title("Evaluation Finished.", "")
 
     def get_output_path(self, dir_name: str = None):

@@ -35,7 +35,7 @@
                   "project_path": "[DATA_PATH]/git-data/prc_to_prc"
                 }
               ],
-              "filter_unlinked_artifacts": true
+              "remove_orphans": true
             }
           }
         }

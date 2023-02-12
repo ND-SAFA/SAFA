@@ -12,7 +12,6 @@ from data.readers.definitions.tim_project_definition import TimProjectDefinition
 from data.readers.entity.entity_reader import EntityReader
 from util.file_util import FileUtil
 from util.json_util import JsonUtil
-from util.override import overrides
 
 
 class StructuredProjectReader(AbstractProjectReader):
@@ -21,12 +20,13 @@ class StructuredProjectReader(AbstractProjectReader):
     a trace dataset.
     """
 
-    def __init__(self, project_path: str, conversions=None):
+    def __init__(self, project_path: str, conversions=None, overrides: dict = None):
         """
         Creates reader for project at path and column definitions given.
         :param project_path: Path to the project.
         :param conversions: Column definitions available to project.
         """
+        super().__init__(overrides)
         if conversions is None:
             conversions = {}
         self.project_path = project_path
@@ -41,7 +41,7 @@ class StructuredProjectReader(AbstractProjectReader):
         """
         self.definition = self.definition_reader.read_project_definition(self.project_path)
         self.conversions = self.definition.get(StructuredKeys.CONVERSIONS, self.conversions)
-        self.overrides = self.definition.get(StructuredKeys.OVERRIDES, {})
+        self.overrides.update(self.definition.get(StructuredKeys.OVERRIDES, {}))
         artifact_df = self._read_artifact_df(self.project_path, self._get_artifact_definitions())
         trace_df = self._read_trace_df()
         layer_mapping_df = self._read_layer_mapping_df()
@@ -52,13 +52,6 @@ class StructuredProjectReader(AbstractProjectReader):
         :return: Returns the name of the project directory.
         """
         return FileUtil.get_file_name(self.project_path)
-
-    @overrides(AbstractProjectReader)
-    def get_overrides(self) -> Dict:
-        """
-        :return: Returns properties to override defined in project definition.
-        """
-        return {k.upper(): v for k, v in self.overrides.items()}
 
     def _read_artifact_df(self, project_path: str, type2definition: Dict[str, Dict]) -> pd.DataFrame:
         """

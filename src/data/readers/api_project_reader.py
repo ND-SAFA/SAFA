@@ -13,11 +13,13 @@ class ApiProjectReader(AbstractProjectReader):
     Responsible for converting JSON from API into DataFrames containing artifacts and traces.
     """
 
-    def __init__(self, api_definition: ApiDefinition):
+    def __init__(self, api_definition: ApiDefinition, overrides: dict = None):
         """
         Constructs project reader targeting given api.
         :param api_definition: The API payload containing artifacts and trace links.
+        :param overrides: The parameters to override.
         """
+        super().__init__(overrides)
         self.api_definition = api_definition
 
     def read_project(self) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:

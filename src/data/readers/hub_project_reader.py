@@ -17,6 +17,7 @@ class HubProjectReader(AbstractProjectReader):
         Initializes reader for supported project.
         :param name: Name of supported project.
         """
+        super().__init__()
         self.project_name = name
         self.kwargs = kwargs
         self.project_reader = None

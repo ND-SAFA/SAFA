@@ -23,6 +23,10 @@ MAX_JOBS = 1
 RUN_ASYNC = False
 EXIT_ON_FAILED_JOB = True
 BASE_EXPERIMENT_NAME = "base_experiment"
+BEST_MODEL_NAME = "best"
+EXPERIMENT_ID_DEFAULT = 0
+OUTPUT_FILENAME = "output.json"
+
 # -------------- JOB ARGS --------------
 SAVE_OUTPUT_DEFAULT = True
 SAVE_DATASET_SPLITS_DEFAULT = False
@@ -81,5 +85,12 @@ DISPLAY_METRICS = ["map", "f2"]
 OS_IGNORE = [".DS_Store"]
 EXPERIMENTAL_VARS_IGNORE = ["job_args", "model_manager", "train_dataset_creator", "project_reader", "eval_dataset_creator",
                             "trainer_dataset_manager", "trainer_args"]
+
+# -------------- ANALYSIS --------------
+HIGH_FREQ_THRESHOLD_DEFAULT = 0.1
+LOW_FREQ_THRESHOLD_DEFAULT = 0.02
+LINK_COMMON_WORDS_THRESHOLD_DEFAULT = 0.01
+SAVE_LINK_ANALYSIS_DEFAULT = True
+
 # -------------- Datasets --------------
 CACHE_DIR_NAME = "HuggingFace"

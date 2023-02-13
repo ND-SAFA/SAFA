@@ -28,7 +28,7 @@
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "HUB",
-                "name": "mip"
+                "name": "traincontroller"
               }
             },
             "eval_dataset_creator": {

@@ -3,7 +3,7 @@ from typing import Dict, List, Set, Tuple, Type
 import pandas as pd
 
 from constants import ALLOWED_MISSING_SOURCES_DEFAULT, ALLOWED_MISSING_TARGETS_DEFAULT, ALLOWED_ORPHANS_DEFAULT, \
-    REMOVE_ORPHANS_DEFAULT
+    NO_ORPHAN_CHECK_VALUE, REMOVE_ORPHANS_DEFAULT
 from data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from data.datasets.trace_dataset import TraceDataset
 from data.keys.structure_keys import StructuredKeys
@@ -171,6 +171,8 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         Verifies that orphans lie below a certain threshold.
         :return: None
         """
+        if self.allowed_orphans == NO_ORPHAN_CHECK_VALUE:
+            return
         error_msg = f"Found too many orphan artifacts"
         default_msg = f"Number of orphan artifacts"
         TraceDatasetCreator.assert_artifact_less_than(self.get_orphan_artifact_ids(), self.allowed_orphans, error_msg, default_msg)

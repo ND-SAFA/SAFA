@@ -2,6 +2,7 @@ from typing import Dict, Tuple
 
 import pandas as pd
 
+from constants import NO_ORPHAN_CHECK_VALUE
 from data.keys.csv_format import CSVKeys
 from data.keys.structure_keys import StructuredKeys
 from data.readers.abstract_project_reader import AbstractProjectReader
@@ -24,6 +25,7 @@ class CsvProjectReader(AbstractProjectReader):
         """
         super().__init__(overrides)
         self.project_path = project_path
+        self.overrides["allowed_orphans"] = NO_ORPHAN_CHECK_VALUE
 
     def read_project(self) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
         """

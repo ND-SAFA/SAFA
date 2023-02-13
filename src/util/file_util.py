@@ -161,10 +161,10 @@ class FileUtil:
         return FileUtil.ls_filter(path, f=lambda f: os.path.isdir(f), add_base_path=True, **kwargs)
 
     @staticmethod
-    def ls_filter(path: str, f: Callable[[str], bool] = None, ignore: List[str] = None, add_base_path: bool = False) -> List[str]:
+    def ls_filter(base_path: str, f: Callable[[str], bool] = None, ignore: List[str] = None, add_base_path: bool = False) -> List[str]:
         """
         List and filters files in path.
-        :param path: The path to list its contents.
+        :param base_path: The path to list its contents.
         :param f: The filtering function to select entities or not.
         :param ignore: List of files to ignored completely.
         :param add_base_path: Whether listed files should be complete paths.
@@ -174,8 +174,11 @@ class FileUtil:
             f = lambda s: s
         if ignore is None:
             ignore = []
-        results = list(map(lambda r: os.path.join(path, r) if add_base_path else r, os.listdir(path)))
-        results = list(filter(lambda p: f(p) and p not in ignore, results))
+        results = os.listdir(base_path)
+        results = list(filter(lambda p: p not in ignore, results))
+        if add_base_path:
+            results = list(map(lambda r: os.path.join(base_path, r), results))
+        results = list(filter(lambda p: f(p), results))
         return results
 
     @staticmethod

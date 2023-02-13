@@ -44,6 +44,7 @@ class TraceDataset(AbstractDataset):
         """
         Converts trace links in data to feature entries used by Huggingface (HF) trainer.
         :param model_generator: The model generator determining architecture and feature function for trace links.
+        :param n_threads: The number of threads to use to calculate link features.
         :return: A data used by the HF trainer.
         """
         feature_entries = {}

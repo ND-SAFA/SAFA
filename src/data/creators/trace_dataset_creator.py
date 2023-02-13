@@ -14,6 +14,7 @@ from data.tree.artifact import Artifact
 from data.tree.trace_link import TraceLink
 from util.base_object import BaseObject
 from util.dataframe_util import DataFrameUtil
+from util.general_util import ListUtil
 from util.logging.logger_manager import logger
 from util.override import overrides
 from util.reflection_util import ReflectionUtil
@@ -68,7 +69,7 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         self._filter_null_references()
         self._clean_artifact_tokens()
         trace_dataset = self._create_trace_dataset()
-        logger.info(f"Trace dataset read with ({len(trace_dataset.links)}) links.")
+        TraceDatasetCreator._log_trace_dataset(trace_dataset)
         return trace_dataset
 
     def get_name(self) -> str:
@@ -96,6 +97,20 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         linked_artifact_ids = self._get_linked_artifact_ids()
         self._verify_orphans()
         self._filter_artifacts_by_ids(linked_artifact_ids)
+
+    def _get_orphan_artifact_ids(self) -> List[str]:
+        """
+        :return: Returns list of orphan artifact ids.
+        """
+        if self.orphan_artifact_ids is None:
+            orphan_artifact_ids: Set = set()
+            linked_artifact_ids = self._get_linked_artifact_ids()
+            for i, row in self.artifact_df.iterrows():
+                artifact_id = row[StructuredKeys.Artifact.ID]
+                if artifact_id not in linked_artifact_ids:
+                    orphan_artifact_ids.add(artifact_id)
+            self.orphan_artifact_ids = list(orphan_artifact_ids)
+        return self.orphan_artifact_ids
 
     def _filter_null_references(self) -> None:
         """
@@ -175,7 +190,23 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
             return
         error_msg = f"Found too many orphan artifacts"
         default_msg = f"Number of orphan artifacts"
-        TraceDatasetCreator.assert_artifact_less_than(self.get_orphan_artifact_ids(), self.allowed_orphans, error_msg, default_msg)
+        TraceDatasetCreator.assert_artifact_less_than(self._get_orphan_artifact_ids(), self.allowed_orphans, error_msg, default_msg)
+
+    def _get_linked_artifact_ids(self) -> Set[str]:
+        """
+        Extracts set of artifact id containing at least one positive link.
+        :return: Set of artifact ids.
+        """
+        if self.linked_artifact_ids is None:
+            linked_artifact_ids = set()
+            for _, row in self.trace_df.iterrows():
+                source_id = row[StructuredKeys.Trace.SOURCE]
+                target_id = row[StructuredKeys.Trace.TARGET]
+                is_true_link = int(row[StructuredKeys.Trace.LABEL]) == 1
+                if is_true_link:
+                    linked_artifact_ids.update({source_id, target_id})
+            self.linked_artifact_ids = linked_artifact_ids
+        return self.linked_artifact_ids
 
     @staticmethod
     def _generate_negative_links(layer_mapping_df: pd.DataFrame, artifact_type_2_id: ArtifactType2Id, id_2_artifact: Id2Artifact,
@@ -276,36 +307,6 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
             id_2_artifact[artifact_id] = Artifact(artifact_id, artifact_body)
         return id_2_artifact[artifact_id]
 
-    def _get_linked_artifact_ids(self) -> Set[str]:
-        """
-        Extracts set of artifact id containing at least one positive link.
-        :return: Set of artifact ids.
-        """
-        if self.linked_artifact_ids is None:
-            linked_artifact_ids = set()
-            for _, row in self.trace_df.iterrows():
-                source_id = row[StructuredKeys.Trace.SOURCE]
-                target_id = row[StructuredKeys.Trace.TARGET]
-                is_true_link = int(row[StructuredKeys.Trace.LABEL]) == 1
-                if is_true_link:
-                    linked_artifact_ids.update({source_id, target_id})
-            self.linked_artifact_ids = linked_artifact_ids
-        return self.linked_artifact_ids
-
-    def get_orphan_artifact_ids(self) -> List[str]:
-        """
-        :return: Returns list of orphan artifact ids.
-        """
-        if self.orphan_artifact_ids is None:
-            orphan_artifact_ids: Set = set()
-            linked_artifact_ids = self._get_linked_artifact_ids()
-            for i, row in self.artifact_df.iterrows():
-                artifact_id = row[StructuredKeys.Artifact.ID]
-                if artifact_id not in linked_artifact_ids:
-                    orphan_artifact_ids.add(artifact_id)
-            self.orphan_artifact_ids = list(orphan_artifact_ids)
-        return self.orphan_artifact_ids
-
     @staticmethod
     def assert_missing_artifact_ids(missing_artifact_ids: List[str], max_missing_allowed: int, label: str) -> None:
         """
@@ -320,19 +321,34 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         TraceDatasetCreator.assert_artifact_less_than(missing_artifact_ids, max_missing_allowed, error_msg, default_msg)
 
     @staticmethod
-    def assert_artifact_less_than(artifact_ids: List, n_allowed: int, error_msg: str, default_msg: str = None):
+    def assert_artifact_less_than(artifact_ids: List, n_allowed: int, error_msg: str, default_msg: str = None, n_items_per_line=10):
         """
         Asserts that artifacts ids are less than number allowed. Otherwise, error is thrown with error message.
         :param artifact_ids: The artifacts ids to verify.
         :param n_allowed: The maximum allowed of artifacts ids in list.
         :param error_msg: The error message to print if verification fails.
         :param default_msg: The message to display if artifacts are under threshold.
+        :param n_items_per_line: How many items to print per line.
         :return: None
         """
         n_artifacts = len(artifact_ids)
         if n_artifacts > n_allowed:
-            artifact_id_str = ",".join([str(a) for a in artifact_ids])
+            artifact_id_str = "\n".join(
+                [",".join([str(a) for a in batch]) for batch in ListUtil.batch(artifact_ids, n_items_per_line)])
             raise ValueError(f"{error_msg}. Expected {n_allowed} but found {n_artifacts}.\n {artifact_id_str}")
         else:
             if default_msg:
                 logger.info(f"{default_msg} ({n_artifacts})")
+
+    @staticmethod
+    def _log_trace_dataset(trace_dataset) -> None:
+        """
+        Logs dataset detailing the number of positive, negative, and total links it has.
+        :param trace_dataset: The trace dataset containing links.
+        :return: None
+        """
+        n_positive = len(trace_dataset.pos_link_ids)
+        n_total = len(trace_dataset.links)
+        n_negative = n_total - n_positive
+        logger.info(f"Trace dataset(+{n_positive}, -({n_negative}) = {n_total})")
+        return trace_dataset

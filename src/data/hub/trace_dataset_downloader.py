@@ -40,7 +40,7 @@ class TraceDatasetDownloader:
             download_manager = DownloadManager(download_config=download_config)
             data_dir = download_manager.download_and_extract(self.descriptor.get_url())
             assert os.path.isdir(data_dir), f"Expected {data_dir} to be folder."
-            zip_file_query = FileUtil.ls_dir(data_dir)
+            zip_file_query = FileUtil.ls_dir(data_dir, ignore=["__MACOSX"])
             assert len(zip_file_query) == 1, f"Found more than one folder for extracted files:{zip_file_query}"
             self.project_path = zip_file_query[0]  # include path to directory
             definition_content = JsonUtil.dict_to_json(self.descriptor.get_definition())

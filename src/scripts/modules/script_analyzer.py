@@ -3,7 +3,7 @@ import os
 from typing import Dict, Iterator, List, Set, Tuple
 
 from analysis.results_analyzer import ResultsAnalyzer
-from constants import EXPERIMENT_ID_DEFAULT, OUTPUT_FILENAME
+from constants import EXPERIMENTAL_VARS_IGNORE, EXPERIMENT_ID_DEFAULT, OUTPUT_FILENAME
 from data.datasets.dataset_role import DatasetRole
 from jobs.abstract_trace_job import AbstractTraceJob
 from jobs.components.job_result import JobResult
@@ -14,6 +14,7 @@ from util.json_util import JsonUtil
 from util.logging.logger_manager import logger
 
 DATASET_ROLE = DatasetRole.EVAL
+GROUPING_VARS = ["name", "project_path", "random_seed"]
 
 
 class ScriptAnalyzer:
@@ -46,8 +47,8 @@ class ScriptAnalyzer:
                 project_analyzer = analyzer_store[project][random_seed]
                 for (job_id_a, analyzer_a), (job_id_b, analyzer_b) in itertools.product(project_analyzer.items(),
                                                                                         project_analyzer.items()):
-                    analysis_id = f"{job_id_a} {job_id_b}"
-                    reverse_analysis_id = f"{job_id_b} {job_id_a}"
+                    analysis_id = f"{job_id_a} x {job_id_b}"
+                    reverse_analysis_id = f"{job_id_b} x {job_id_a}"
                     if job_id_a == job_id_b or reverse_analysis_id in intersecting_mis_predicted_links:
                         continue
                     intersecting_links = analyzer_a.mis_predictions_intersection(analyzer_b)
@@ -90,7 +91,8 @@ class ScriptAnalyzer:
             analyzer_store[project_path] = {}
         if random_seed not in analyzer_store[project_path]:
             analyzer_store[project_path][random_seed] = {}
-        analyzer_store[project_path][job.job_args.random_seed][job.id] = analyzer
+        job_id = ScriptAnalyzer.get_job_id(job.result[JobResult.EXPERIMENTAL_VARS])
+        analyzer_store[project_path][job.job_args.random_seed][job_id] = analyzer
 
     def get_job_iterator(self) -> Iterator[Tuple[AbstractTraceJob, Dict]]:
         """
@@ -107,3 +109,17 @@ class ScriptAnalyzer:
 
                     if JobResult.PREDICTION_OUTPUT in job_output:
                         yield job, job_output
+
+    @staticmethod
+    def get_job_id(experimental_vars: Dict) -> str:
+        """
+        Returns readable job id from the experimental vars.
+        :param experimental_vars: The job's experimental variables.
+        :return:
+        """
+        id_vars = []
+        for experimental_variable in experimental_vars:
+            if experimental_variable in GROUPING_VARS or experimental_variable in EXPERIMENTAL_VARS_IGNORE:
+                continue
+            id_vars.append(f"{experimental_vars[experimental_variable]}")
+        return " ".join(id_vars) if len(id_vars) else "NO_EXPERIMENT_VARIABLES"

@@ -15,8 +15,8 @@
           "model_manager": {
             "model_path": {
               "*": [
-                "bert-base-uncased",
-                "roberta-base"
+                "hf-internal-testing/tiny-random-bert",
+                "prajjwal1/bert-tiny"
               ]
             }
           },
@@ -40,12 +40,7 @@
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "STRUCTURE",
-                "project_path": {
-                  "*": [
-                    "[DATA_PATH]/lhp/heating",
-                    "[DATA_PATH]/lhp/cooling"
-                  ]
-                }
+                "project_path": "[DATA_PATH]/lhp/heating"
               }
             },
             "val_dataset_creator": {

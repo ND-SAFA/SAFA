@@ -34,7 +34,7 @@ class ScriptRunner:
         self.logging_dir = None
         self.experiment = None
         os.environ[WANDB_PROJECT_PARAM] = self.script_name
-        os.environ[WANDB_DIR_PARAM] = os.path.join(os.environ[OUTPUT_PATH_PARAM], "wandb")
+        os.environ[WANDB_DIR_PARAM] = os.path.join(os.environ[OUTPUT_PATH_PARAM])
 
     def run(self) -> None:
         """

@@ -1,0 +1,76 @@
+{
+  "steps": [
+    {
+      "jobs": [
+        {
+          "object_type": "TRAIN",
+          "job_args": {
+            "random_seed": {
+              "*": [
+                812,
+                234
+              ]
+            }
+          },
+          "model_manager": {
+            "model_path": {
+              "*": [
+                "hf-internal-testing/tiny-random-bert",
+                "prajjwal1/bert-tiny"
+              ]
+            }
+          },
+          "trainer_args": {
+            "num_train_epochs": 1,
+            "per_device_train_batch_size": 32,
+            "gradient_accumulation_steps": 16,
+            "learning_rate": 5e-5,
+            "metrics": [
+              "map",
+              "map_at_k",
+              "f",
+              "precision"
+            ],
+            "skip_save": false,
+            "load_best_model_at_end": true
+          },
+          "trainer_dataset_manager": {
+            "deterministic_id": 42,
+            "train_dataset_creator": {
+              "object_type": "MULTI",
+              "project_readers": [
+                {
+                  "object_type": "CSV",
+                  "project_path": "[OUTPUT_PATH]/acl-train/experiment_0/step_0/heating/234/heating_train.csv"
+                },
+                {
+                  "object_type": "CSV",
+                  "project_path": "[OUTPUT_PATH]/acl-train/experiment_0/step_0/heating/234/heating_val.csv"
+                }
+              ]
+            },
+            "val_dataset_creator": {
+              "object_type": "SPLIT",
+              "split_strategy": "SPLIT_BY_LINK",
+              "val_percentage": 0.10
+            },
+            "eval_dataset_creator": {
+              "object_type": "TRACE",
+              "project_reader": {
+                 "object_type": "CSV",
+                "project_path": "[OUTPUT_PATH]/acl-train/experiment_0/step_0/heating/234/heating_eval.csv"
+              }
+            },
+            "augmenter": {
+              "steps": [
+                {
+                  "object_type": "RESAMPLE"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

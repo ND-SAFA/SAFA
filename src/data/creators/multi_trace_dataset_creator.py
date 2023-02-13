@@ -48,7 +48,7 @@ class MultiTraceDatasetCreator(AbstractDatasetCreator):
         """
         :return: Returns name of combination of datasets.
         """
-        return self.DELIMITER.join([p.get_name() for p in self.project_readers])
+        return self.DELIMITER.join([p.get_project_name() for p in self.project_readers])
 
     @classmethod
     @overrides(BaseObject)

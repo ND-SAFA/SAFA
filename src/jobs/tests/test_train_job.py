@@ -42,7 +42,8 @@ class TestTrainJob(BaseJobTest):
     def test_initialize_with_deterministic_dataset_manager(self):
         job = self._get_job(deterministic=True)
         self.assertIsInstance(job.trainer_dataset_manager, DeterministicTrainerDatasetManager)
-        self.assertEquals(job.trainer_dataset_manager.get_output_path(), os.path.join(TEST_OUTPUT_DIR, self.DETERMINISTIC_ID))
+        self.assertEquals(job.trainer_dataset_manager.get_output_path(), os.path.join(TEST_OUTPUT_DIR,
+                                                                                      job.trainer_dataset_manager.dataset_name))
 
     def _get_job(self, deterministic: bool = False) -> TrainJob:
         dataset_param = "_".join([self.EXPECTED_SPLIT_ROLE.value, "dataset", "creator"])

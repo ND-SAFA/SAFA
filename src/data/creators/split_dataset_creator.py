@@ -21,6 +21,7 @@ class SplitDatasetCreator(AbstractDatasetCreator):
         super().__init__(data_cleaner)
         self.val_percentage = val_percentage
         self.split_strategy = split_strategy
+        self.name = ''
 
     def create(self) -> Optional[Union[TraceDataset, PreTrainDataset]]:
         """
@@ -29,9 +30,9 @@ class SplitDatasetCreator(AbstractDatasetCreator):
         """
         return None
 
-    def get_name(self) -> None:
+    def get_name(self) -> str:
         """
-        Raises not implemented error. TODO: Get name of the dataset being split.
-        :return: None
+        Returns the name of the dataset which was split, if set else empty string
+        :return: the name of the dataset which was split, if set else empty string
         """
-        raise NotImplementedError("Split dataset does not support get_name.")
+        return self.name

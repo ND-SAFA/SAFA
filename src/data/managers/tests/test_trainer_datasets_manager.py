@@ -58,7 +58,8 @@ class TestTrainerDatasetsManager(BaseTrainerDatasetsManagerTest):
             os.makedirs(TEST_OUTPUT_DIR)
         dataset_container_manager = self.create_dataset_manager([DatasetRole.VAL])
         dataset_container_manager.save_dataset_splits(TEST_OUTPUT_DIR)
-        dataset_files = ["train.csv", "val.csv"]
+        dataset_files = [dataset_container_manager._get_dataset_filename(DatasetRole.TRAIN),
+                         dataset_container_manager._get_dataset_filename(DatasetRole.VAL)]
         output_files = os.listdir(TEST_OUTPUT_DIR)
         for dataset_file in dataset_files:
             self.assertIn(dataset_file, output_files)

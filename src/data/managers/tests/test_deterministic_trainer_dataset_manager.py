@@ -19,14 +19,16 @@ class TestDeterministicTrainerDatasetsManager(BaseTrainerDatasetsManagerTest):
         dataset_container_manager_first = self.create_dataset_manager(expected_dataset_roles[1:])
         datasets1 = dataset_container_manager_first.get_datasets()
         self.assert_final_datasets_are_as_expected(dataset_container_manager_first, include_pretrain=False)
-        self.assertTrue(os.path.exists(self.OUTPUT_DIR))
-        dataset_files = os.listdir(self.OUTPUT_DIR)
+        self.assertTrue(os.path.exists(dataset_container_manager_first.get_output_path()))
+        dataset_files = os.listdir(dataset_container_manager_first.get_output_path())
         for dataset_role in expected_dataset_roles:
-            self.assertIn(TrainerDatasetManager._get_dataset_filename(dataset_role) + ".csv", dataset_files)
+            self.assertIn(dataset_container_manager_first._get_dataset_filename(dataset_role,
+                                                                                dataset_container_manager_first.dataset_name),
+                          dataset_files)
         dataset_container_manager_second = self.create_dataset_manager(expected_dataset_roles[1:])
         datasets2 = dataset_container_manager_second.get_datasets()
         for dataset_role, dataset in datasets1.items():
-            if dataset_role in expected_dataset_roles:
+            if dataset_role in expected_dataset_roles[1:]:
                 self.assertListEqual(sorted(dataset.pos_link_ids), sorted(datasets2[dataset_role].pos_link_ids))
 
     def create_dataset_manager(self, keys: List[DatasetRole]):
@@ -39,7 +41,7 @@ class TestDeterministicTrainerDatasetsManager(BaseTrainerDatasetsManagerTest):
             arg_name, definition = dataset_creators[key]
             args[arg_name] = definition
         args["augmenter"] = ObjectCreator.augmenter_definition
-        args[DeterministicTrainerDatasetManager.DETERMINISTIC_KEY] = self.DETERMINISTIC_ID
+        args["random_seed"] = 10
         args["output_dir"] = TEST_OUTPUT_DIR
         experiment_vars: ExperimentalVariable = ObjectCreator.create(DeterministicTrainerDatasetManager, override=True, **args)
         return experiment_vars.get_values_of_all_variables()[-1]

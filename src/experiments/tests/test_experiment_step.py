@@ -121,7 +121,7 @@ class TestExperimentStep(BaseExperimentTest):
     def test_update_job_children_output_paths(self):
         job1, job2 = self.get_test_jobs()
         output_dir = os.path.join(TEST_OUTPUT_DIR, "experiment_step")
-        job1.model_manager = DeterministicTrainerDatasetManager(deterministic_id="1234")
+        job1.model_manager = ModelManager("bert-base-uncased")
         experiment_step = ExperimentStep([job1, job2])
         experiment_step.update_output_path(output_dir)
         self.assertEquals(job1.model_manager.output_dir, os.path.join(output_dir, BASE_EXPERIMENT_NAME, "models"))

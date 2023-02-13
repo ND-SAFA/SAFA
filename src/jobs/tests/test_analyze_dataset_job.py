@@ -6,8 +6,6 @@ from jobs.analyze_dataset_job import AnalyzeDatasetJob
 from jobs.tests.base_job_test import BaseJobTest
 from testres.paths.paths import TEST_OUTPUT_DIR
 from util.object_creator import ObjectCreator
-from variables.definition_variable import DefinitionVariable
-from variables.variable import Variable
 
 
 class TestAnalyzeDatasetJob(BaseJobTest):

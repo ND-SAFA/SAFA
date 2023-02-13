@@ -29,7 +29,7 @@
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "HUB",
-                "project_path": "itrust"
+                "name": "itrust"
               }
             },
             "val_dataset_creator": {

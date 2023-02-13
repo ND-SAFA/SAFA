@@ -1,0 +1,35 @@
+{
+  "steps": [
+    {
+      "jobs": [
+        {
+          "object_type": "DATASET_ANALYSIS",
+          "job_args": {
+          },
+          "model_managers": [
+            {
+              "model_path": "thearod5/git-bert"
+            },
+            {
+              "model_path": "prajjwal1/bert-medium"
+            }
+          ],
+          "dataset_creator": {
+            "project_reader": {
+              "object_type": "HUB",
+              "project_path": {
+                "*": [
+                  "cm1",
+                  "cchit",
+                  "itrust",
+                  "drone",
+                  "traincontroller"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -35,24 +35,26 @@ class ScriptAnalyzer:
         Runs error analysis on experiment.
         :return: None
         """
-        analyzer_store: Dict[str, Dict[int, ResultsAnalyzer]] = {}
+        analyzer_store: Dict[str, Dict[int, Dict[int, ResultsAnalyzer]]] = {}
         for job, job_output in self.get_job_iterator():
+            job.trainer_dataset_manager.get_datasets()  # sets construction variables
             self.analyze_job(job, job_output, analyzer_store)
 
         for project in analyzer_store.keys():
-            intersecting_mis_predicted_links: Dict[str, Set[int]] = {}
-            project_analyzer = analyzer_store[project]
-            for (job_id_a, analyzer_a), (job_id_b, analyzer_b) in itertools.product(project_analyzer.items(),
-                                                                                    project_analyzer.items()):
-                analysis_id = f"{job_id_a} {job_id_b}"
-                reverse_analysis_id = f"{job_id_b} {job_id_a}"
-                if job_id_a == job_id_b or reverse_analysis_id in intersecting_mis_predicted_links:
-                    continue
-                intersecting_links = analyzer_a.mis_predictions_intersection(analyzer_b)
-                intersecting_mis_predicted_links[analysis_id] = intersecting_links
-            project_output_path = os.path.join(self.output_dir, project + ".json")
-            FileUtil.write(intersecting_mis_predicted_links, project_output_path)
-            logger.info(f"Analysis written to: {project_output_path}")
+            for random_seed in analyzer_store[project].keys():
+                intersecting_mis_predicted_links: Dict[str, Set[int]] = {}
+                project_analyzer = analyzer_store[project][random_seed]
+                for (job_id_a, analyzer_a), (job_id_b, analyzer_b) in itertools.product(project_analyzer.items(),
+                                                                                        project_analyzer.items()):
+                    analysis_id = f"{job_id_a} {job_id_b}"
+                    reverse_analysis_id = f"{job_id_b} {job_id_a}"
+                    if job_id_a == job_id_b or reverse_analysis_id in intersecting_mis_predicted_links:
+                        continue
+                    intersecting_links = analyzer_a.mis_predictions_intersection(analyzer_b)
+                    intersecting_mis_predicted_links[analysis_id] = intersecting_links
+                project_output_path = os.path.join(self.output_dir, project, str(random_seed), "analysis.json")
+                FileUtil.write(intersecting_mis_predicted_links, project_output_path)
+                logger.info(f"Analysis written to: {project_output_path}")
 
     @staticmethod
     def analyze_job(job, job_output, analyzer_store) -> None:
@@ -81,10 +83,14 @@ class ScriptAnalyzer:
         :return: None
         """
         project_creator = job.trainer_dataset_manager.get_creator(DATASET_ROLE)
+
         project_path = project_creator.get_name()
+        random_seed = job.job_args.random_seed
         if project_path not in analyzer_store:
             analyzer_store[project_path] = {}
-        analyzer_store[project_path][job.id] = analyzer
+        if random_seed not in analyzer_store[project_path]:
+            analyzer_store[project_path][random_seed] = {}
+        analyzer_store[project_path][job.job_args.random_seed][job.id] = analyzer
 
     def get_job_iterator(self) -> Iterator[Tuple[AbstractTraceJob, Dict]]:
         """

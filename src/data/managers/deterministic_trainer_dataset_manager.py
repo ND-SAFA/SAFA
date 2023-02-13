@@ -6,7 +6,6 @@ from data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreato
 from data.creators.trace_dataset_creator import TraceDatasetCreator
 from data.datasets.abstract_dataset import AbstractDataset
 from data.datasets.dataset_role import DatasetRole
-from data.keys.csv_format import CSVKeys
 from data.managers.trainer_dataset_manager import TrainerDatasetManager
 from data.processing.augmentation.data_augmenter import DataAugmenter
 from data.readers.csv_project_reader import CsvProjectReader
@@ -79,4 +78,5 @@ class DeterministicTrainerDatasetManager(TrainerDatasetManager):
                 reloaded = True
             else:
                 deterministic_dataset_creators_map[dataset_role] = dataset_creators_map[dataset_role]
+        self._dataset_creators = deterministic_dataset_creators_map
         return super()._create_datasets_from_creators(deterministic_dataset_creators_map), reloaded

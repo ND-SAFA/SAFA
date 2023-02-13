@@ -59,7 +59,7 @@ class ResultsAnalyzer:
                     }
         return self._save(analysis, output_dir)
 
-    def intersection(self, other: "ResultsAnalyzer") -> Set[int]:
+    def mis_predictions_intersection(self, other: "ResultsAnalyzer") -> Set[int]:
         """
         Returns the intersection of mis-predicted links between self and other
         :param other: Another results analyzer
@@ -103,7 +103,7 @@ class ResultsAnalyzer:
         :return: A dictionary mapping link id to the category it falls into
         """
         link_categorizations = {}
-        for link in tqdm(links):
+        for link in tqdm(links, desc="Categorizing predicted links"):
             link_categorizations[link.id] = []
             analyzer = LinkAnalyzer(link, self.model_manager)
             analysis_counts = analyzer.get_analysis_counts()

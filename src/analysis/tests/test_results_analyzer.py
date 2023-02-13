@@ -1,4 +1,5 @@
 import os
+from typing import List
 
 from analysis.link_analyzer import LinkAnalyzer
 from analysis.results_analyzer import ResultsAnalyzer
@@ -32,6 +33,13 @@ class TestResultsAnalyzer(BaseTraceTest):
                                 ALL_LINKS[3].id: [LinkAnalyzer.COMMON_WORDS]}
     MIS_PREDICTED_LINKS = ALL_LINKS[:2]
     CORRECTLY_PREDICTED_LINKS = ALL_LINKS[2:]
+
+    def test_intersection(self):
+        analyzer1 = self.get_results_analyzer()
+        analyzer2 = self.get_results_analyzer(mis_predicted_links=[self.ALL_LINKS[0], self.ALL_LINKS[-1]])
+        intersection = analyzer1.mis_predictions_intersection(analyzer2)
+        self.assertEquals(len(intersection), 1)
+        self.assertEquals(self.ALL_LINKS[0].id, intersection.pop())
 
     def test_analyze_and_save(self):
         analyzer = self.get_results_analyzer()
@@ -84,19 +92,25 @@ class TestResultsAnalyzer(BaseTraceTest):
         TestAssertions.assert_lists_have_the_same_vals(self, analyzer.mis_predicted_links, self.MIS_PREDICTED_LINKS)
         TestAssertions.assert_lists_have_the_same_vals(self, analyzer.correctly_predicted_links, self.CORRECTLY_PREDICTED_LINKS)
 
-    def get_results_analyzer(self):
+    def get_results_analyzer(self, mis_predicted_links=None):
         model_manager = ModelManager('bert-base-uncased')
 
         links = {link.id: link for link in self.ALL_LINKS}
         eval_dataset = TraceDataset(links, pos_link_ids=[link.id for link in self.ALL_LINKS if link.is_true_link],
                                     neg_link_ids=[link.id for link in self.ALL_LINKS if not link.is_true_link])
-        label_ids = []
-        for i, link in enumerate(eval_dataset.get_ordered_links()):
-            if link in self.MIS_PREDICTED_LINKS:
-                label_ids.append(abs(link.get_label()-1))
-            elif link in self.CORRECTLY_PREDICTED_LINKS:
-                label_ids.append(link.get_label())
+        predictions = self.get_predictions(eval_dataset, mis_predicted_links=self.MIS_PREDICTED_LINKS if not mis_predicted_links
+        else mis_predicted_links)
 
         prediction_output = TracePredictionOutput(source_target_pairs=eval_dataset.get_source_target_pairs(),
-                                                  label_ids=label_ids)
+                                                  predictions=predictions)
         return ResultsAnalyzer(prediction_output, eval_dataset, model_manager)
+
+    @staticmethod
+    def get_predictions(dataset: TraceDataset, mis_predicted_links: List):
+        predictions = []
+        for i, link in enumerate(dataset.get_ordered_links()):
+            if link in mis_predicted_links:
+                predictions.append(abs(link.get_label() - 1))
+            else:
+                predictions.append(link.get_label())
+        return predictions

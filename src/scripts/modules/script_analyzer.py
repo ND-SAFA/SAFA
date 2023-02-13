@@ -45,7 +45,7 @@ class ScriptAnalyzer:
                                                                                     project_analyzer.items()):
                 if job_id_a == job_id_b:
                     continue
-                intersecting_links = analyzer_a.intersection(analyzer_b)
+                intersecting_links = analyzer_a.mis_predictions_intersection(analyzer_b)
                 intersecting_mis_predicted_links[f"{job_id_a} {job_id_b}"] = intersecting_links
             project_output_path = os.path.join(self.output_dir, project + ".json")
             FileUtil.write(intersecting_mis_predicted_links, project_output_path)

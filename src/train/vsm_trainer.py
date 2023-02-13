@@ -1,6 +1,12 @@
-from typing import List, Tuple, Dict, Union
+from typing import List, Tuple, Union
 
 import numpy as np
+import pandas as pd
+from scipy.sparse import csr_matrix
+from sklearn import exceptions
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+from sklearn.metrics import pairwise_distances
+from transformers.trainer_utils import PredictionOutput
 
 from constants import VSM_THRESHOLD_DEFAULT
 from data.datasets.dataset_role import DatasetRole
@@ -12,12 +18,6 @@ from train.metrics.metrics_manager import MetricsManager
 from train.trace_output.stage_eval import Metrics
 from train.trace_output.trace_prediction_output import TracePredictionOutput
 from train.trace_output.trace_train_output import TraceTrainOutput
-import pandas as pd
-from sklearn import exceptions
-from scipy.sparse import csr_matrix, vstack
-from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
-from sklearn.metrics import pairwise_distances
-
 from util.override import overrides
 
 SimilarityMatrix = Union[csr_matrix, np.array]
@@ -98,8 +98,9 @@ class VSMTrainer(iTrainer):
             links.append(eval_dataset.links[link_id])
             source_target_pairs.append(pair)
         metrics = self.eval(links, predictions, self.metrics) if self.metrics else None
-        return TracePredictionOutput(predictions=predictions, label_ids=label_ids, source_target_pairs=source_target_pairs,
-                                     metrics=metrics)
+        prediction_output = PredictionOutput(predictions=predictions, label_ids=label_ids, metrics=metrics)
+        trace_prediction_output = TracePredictionOutput(prediction_output=prediction_output, source_target_pairs=source_target_pairs)
+        return trace_prediction_output
 
     def create_term_frequency_matrices(self, raw_sources: pd.Series, raw_targets: pd.Series) -> Tuple[csr_matrix, csr_matrix]:
         """

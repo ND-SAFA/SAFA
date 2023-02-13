@@ -2,6 +2,7 @@ import os
 from copy import deepcopy
 from typing import Dict
 
+from constants import NO_ORPHAN_CHECK_VALUE
 from data.keys.safa_format import SafaKeys
 from data.keys.structure_keys import StructuredKeys
 from data.readers.definitions.abstract_project_definition import AbstractProjectDefinition
@@ -51,7 +52,10 @@ class TimProjectDefinition(AbstractProjectDefinition):
         return {
             StructuredKeys.ARTIFACTS: artifact_definitions,
             StructuredKeys.TRACES: trace_definitions,
-            StructuredKeys.CONVERSIONS: TimProjectDefinition.get_flattened_conversions()
+            StructuredKeys.CONVERSIONS: TimProjectDefinition.get_flattened_conversions(),
+            StructuredKeys.OVERRIDES: {
+                "allowed_orphans": NO_ORPHAN_CHECK_VALUE
+            }
         }
 
     @staticmethod

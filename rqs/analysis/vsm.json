@@ -1,0 +1,50 @@
+{
+  "steps": [
+    {
+      "jobs": [
+        {
+          "object_type": "VSM",
+          "job_args": {
+            "random_seed": 812
+          },
+          "metrics": [
+            "map",
+            "map_at_k",
+            "f",
+            "precision"
+          ],
+          "trainer_dataset_manager": {
+            "train_dataset_creator": {
+              "object_type": "TRACE",
+              "project_reader": {
+                "object_type": "CSV",
+                "project_path": "[OUTPUT_PATH]/analysis-create_dataset/experiment_0/step_0/{\"val_percentage\": 0.7}/train.csv"
+              }
+            },
+            "val_dataset_creator": {
+              "object_type": "TRACE",
+              "project_reader": {
+                "object_type": "CSV",
+                "project_path": "[OUTPUT_PATH]/analysis-create_dataset/experiment_0/step_0/{\"val_percentage\": 0.7}/val.csv"
+              }
+            },
+            "eval_dataset_creator": {
+              "object_type": "TRACE",
+              "project_reader": {
+                "object_type": "CSV",
+                "project_path": "[OUTPUT_PATH]/analysis-create_dataset/experiment_0/step_0/{\"val_percentage\": 0.7}/eval.csv"
+              }
+            },
+            "augmenter": {
+              "steps": [
+                {
+                  "object_type": "RESAMPLE"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

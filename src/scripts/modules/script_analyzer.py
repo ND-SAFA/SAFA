@@ -1,6 +1,6 @@
 import itertools
 import os
-from typing import Dict, Iterator, Set, Tuple
+from typing import Dict, Iterator, List, Set, Tuple
 
 from analysis.results_analyzer import ResultsAnalyzer
 from constants import EXPERIMENT_ID_DEFAULT, OUTPUT_FILENAME
@@ -21,13 +21,13 @@ class ScriptAnalyzer:
     Reads evaluation output of jobs in experiment and runs statistics on them.
     """
 
-    def __init__(self, script_runner: ScriptRunner, output_dir: str):
+    def __init__(self, script_runners: List[ScriptRunner], output_dir: str):
         """
         Creates script analyzer for given runner and stores output at directory.
-        :param script_runner: The runner containing the experiment to analyze.
+        :param script_runners: The runners containing the experiment to analyze.
         :param output_dir: Path of directory to save results to.
         """
-        self.script_runner = script_runner
+        self.script_runners = script_runners
         self.output_dir = os.path.expanduser(output_dir)
 
     def analyze(self) -> None:
@@ -44,10 +44,12 @@ class ScriptAnalyzer:
             project_analyzer = analyzer_store[project]
             for (job_id_a, analyzer_a), (job_id_b, analyzer_b) in itertools.product(project_analyzer.items(),
                                                                                     project_analyzer.items()):
-                if job_id_a == job_id_b:
+                analysis_id = f"{job_id_a} {job_id_b}"
+                reverse_analysis_id = f"{job_id_b} {job_id_a}"
+                if job_id_a == job_id_b or reverse_analysis_id in intersecting_mis_predicted_links:
                     continue
                 intersecting_links = analyzer_a.mis_predictions_intersection(analyzer_b)
-                intersecting_mis_predicted_links[f"{job_id_a} {job_id_b}"] = intersecting_links
+                intersecting_mis_predicted_links[analysis_id] = intersecting_links
             project_output_path = os.path.join(self.output_dir, project + ".json")
             FileUtil.write(intersecting_mis_predicted_links, project_output_path)
             logger.info(f"Analysis written to: {project_output_path}")
@@ -88,13 +90,14 @@ class ScriptAnalyzer:
         """
         :return: Iterator of jobs whose
         """
-        experiment = self.script_runner.get_experiment()
-        for i, step in enumerate(experiment.steps):
-            step_output_dir = experiment.get_step_output_dir(EXPERIMENT_ID_DEFAULT, i)
-            step.update_output_path(step_output_dir)
-            for job in step.jobs:
-                output_file_path = os.path.join(job.job_args.output_dir, OUTPUT_FILENAME)
-                job_output = JsonUtil.read_json_file(output_file_path)
+        for script_runner in self.script_runners:
+            experiment = script_runner.get_experiment()
+            for i, step in enumerate(experiment.steps):
+                step_output_dir = experiment.get_step_output_dir(EXPERIMENT_ID_DEFAULT, i)
+                step.update_output_path(step_output_dir)
+                for job in step.jobs:
+                    output_file_path = os.path.join(job.job_args.output_dir, OUTPUT_FILENAME)
+                    job_output = JsonUtil.read_json_file(output_file_path)
 
-                if JobResult.PREDICTION_OUTPUT in job_output:
-                    yield job, job_output
+                    if JobResult.PREDICTION_OUTPUT in job_output:
+                        yield job, job_output

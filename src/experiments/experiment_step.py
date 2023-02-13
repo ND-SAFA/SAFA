@@ -3,6 +3,7 @@ from copy import deepcopy
 from typing import Any, Dict, List, Optional, Type, Union
 
 from constants import EXIT_ON_FAILED_JOB, OUTPUT_FILENAME, RUN_ASYNC
+from data.managers.deterministic_trainer_dataset_manager import DeterministicTrainerDatasetManager
 from jobs.abstract_job import AbstractJob
 from jobs.abstract_trace_job import AbstractTraceJob
 from jobs.components.job_result import JobResult
@@ -211,6 +212,9 @@ class ExperimentStep(BaseObject):
                 setattr(job.trainer_args, "output_dir", model_path)  # models save in same dir as job
                 setattr(job.trainer_args, "seed", job.job_args.random_seed)  # sets random seed so base trainer has access to it
                 setattr(job.model_manager, "output_dir", model_path)  # final model path same as checkpoint path
+                if isinstance(job.trainer_dataset_manager, DeterministicTrainerDatasetManager):
+                    setattr(job.trainer_dataset_manager, "output_dir", output_dir)
+                    setattr(job.trainer_dataset_manager, "random_seed", job.job_args.random_seed)
             setattr(job.job_args, "output_dir", job_base_path)  # points job to its unique path
 
     @staticmethod

@@ -29,7 +29,6 @@ class AbstractTraceJob(AbstractJob, ABC):
         :param trainer_args: other arguments needed for the trainer
         """
         super().__init__(job_args=job_args, model_manager=model_manager)
-
         self.trainer_dataset_manager = trainer_dataset_manager
         self.trainer_args = trainer_args
         self._trainer: Optional[TraceTrainer] = None
@@ -79,6 +78,7 @@ class AbstractTraceJob(AbstractJob, ABC):
         expected_class = ReflectionUtil.get_target_class_from_type(expected_class)
         if ReflectionUtil.is_instance_or_subclass(expected_class, TrainerDatasetManager) \
                 and DeterministicTrainerDatasetManager.DETERMINISTIC_KEY in definition:
+            definition.pop(DeterministicTrainerDatasetManager.DETERMINISTIC_KEY)
             return DeterministicTrainerDatasetManager.initialize_from_definition(definition)
         return cls._make_child_object_helper(definition, expected_class)
 

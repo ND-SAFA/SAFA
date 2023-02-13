@@ -8,6 +8,7 @@ from data.datasets.abstract_dataset import AbstractDataset
 from data.datasets.dataset_role import DatasetRole
 from data.datasets.pre_train_dataset import PreTrainDataset
 from data.datasets.trace_dataset import TraceDataset
+from data.keys.csv_format import CSVKeys
 from data.processing.augmentation.data_augmenter import DataAugmenter
 from data.splitting.dataset_splitter import DatasetSplitter
 from util.base_object import BaseObject
@@ -54,9 +55,10 @@ class TrainerDatasetManager(BaseObject):
         :return: the list of files that were saved
         """
         output_paths = []
+        datasets = self.get_datasets() if not self._datasets else self._datasets
         for dataset_role in DatasetRole:
-            if dataset_role in self:
-                output_path = self[dataset_role].save(output_dir, self._get_dataset_filename(dataset_role))
+            if dataset_role in datasets and datasets[dataset_role] is not None:
+                output_path = datasets[dataset_role].save(output_dir, self._get_dataset_filename(dataset_role))
                 output_paths.append(output_path)
         return output_paths
 
@@ -107,14 +109,14 @@ class TrainerDatasetManager(BaseObject):
         """
         self._datasets = None
 
-    @staticmethod
-    def _get_dataset_filename(dataset_role: DatasetRole) -> str:
+    def _get_dataset_filename(self, dataset_role: DatasetRole, dataset_name: str = None) -> str:
         """
         Returns the filename associated with the dataset corresponding to the given role
         :param dataset_role: the role of the dataset
         :return: the dataset filename
         """
-        return dataset_role.name.lower()
+        dataset_name = self.get_creator(dataset_role).get_name() if not dataset_name else dataset_name
+        return f"{dataset_name}_{dataset_role.name.lower()}{CSVKeys.EXT}"
 
     @classmethod
     @overrides(BaseObject)
@@ -154,6 +156,7 @@ class TrainerDatasetManager(BaseObject):
         split_strategies = []
         for dataset_role, dataset_creator in dataset_creators_map.items():
             if isinstance(dataset_creator, SplitDatasetCreator):
+                dataset_creator.name = dataset_creators_map[DatasetRole.TRAIN].get_name()
                 split_roles.append(dataset_role)
                 split_percentages.append(dataset_creator.val_percentage)
                 split_strategies.append(dataset_creator.split_strategy)

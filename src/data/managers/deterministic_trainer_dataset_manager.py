@@ -16,27 +16,29 @@ class DeterministicTrainerDatasetManager(TrainerDatasetManager):
     DETERMINISTIC_KEY = "deterministic_id"
 
     def __init__(self,
-                 deterministic_id: str,
                  pre_train_dataset_creator: MLMPreTrainDatasetCreator = None,
                  train_dataset_creator: AbstractDatasetCreator = None,
                  val_dataset_creator: AbstractDatasetCreator = None,
                  eval_dataset_creator: AbstractDatasetCreator = None,
                  augmenter: DataAugmenter = None,
-                 output_dir: str = None
+                 output_dir: str = None,
+                 random_seed: int = None
                  ):
         """
         Container to hold all the data used in the TraceTrainer
-        :param deterministic_id: identifier for this set of splits
         :param pre_train_dataset_creator: The pre-training dataset creator.
         :param train_dataset_creator: The training dataset creator.
         :param val_dataset_creator: the validation dataset creator.
         :param eval_dataset_creator: The training dataset creator.data
         :param augmenter: augmenter to use for augmenting datasets
         :param output_dir: where to save the datasets to
+        :param random_seed: the random seed for this split
         """
         super().__init__(pre_train_dataset_creator, train_dataset_creator, val_dataset_creator, eval_dataset_creator, augmenter)
-        self.deterministic_id = deterministic_id
         self.output_dir = output_dir
+        self.dataset_name = self.get_creator(DatasetRole.TRAIN).get_name() if self.get_creator(DatasetRole.TRAIN) is not None \
+            else "Unknown_Dataset"
+        self.random_seed = random_seed
 
     def get_datasets(self) -> Dict[DatasetRole, AbstractDataset]:
         """
@@ -55,9 +57,10 @@ class DeterministicTrainerDatasetManager(TrainerDatasetManager):
         Gets the path where datasets should be saved
         :return: the output path
         """
-        if self.output_dir:
-            return os.path.join(self.output_dir, self.deterministic_id)
-        return self.deterministic_id
+        output_path = os.path.join(self.output_dir, self.dataset_name) if self.output_dir else self.dataset_name
+        if self.random_seed:
+            output_path = os.path.join(output_path, str(self.random_seed))
+        return output_path
 
     def _create_datasets_from_creators_deterministic(self, dataset_creators_map: Dict[DatasetRole, AbstractDatasetCreator]) \
             -> Tuple[Dict[DatasetRole, TrainerDatasetManager.DATASET_TYPE], bool]:
@@ -68,7 +71,8 @@ class DeterministicTrainerDatasetManager(TrainerDatasetManager):
         deterministic_dataset_creators_map = {}
         reloaded = False
         for dataset_role in dataset_creators_map.keys():
-            dataset_filepath = os.path.join(self.get_output_path(), self._get_dataset_filename(dataset_role)) + CSVKeys.EXT
+            dataset_filepath = os.path.join(self.get_output_path(), self._get_dataset_filename(dataset_role,
+                                                                                               dataset_name=self.dataset_name))
             if os.path.exists(dataset_filepath):
                 deterministic_dataset_creators_map[dataset_role] = TraceDatasetCreator(CsvProjectReader(dataset_filepath),
                                                                                        allowed_orphans=5)

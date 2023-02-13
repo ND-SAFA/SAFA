@@ -31,7 +31,7 @@ class LinkAnalyzer:
 
     OUTPUT_FILENAME = "link_{}_analysis.json"
 
-    def __init__(self, link: TraceLink, model_manager: ModelManager):
+    def __init__(self, link: TraceLink, model_manager: ModelManager = None):
         """
          Initializes the analyzer for analysis of given link
         :param link: The link to analyze
@@ -62,7 +62,7 @@ class LinkAnalyzer:
             self.__analysis = {self.COMMON_WORDS: self.get_words_in_common(),
                                self.MISSPELLED_WORDS: self.get_misspelled_words(),
                                self.SHARED_SYNONYMS_AND_ANTONYMS: self.get_shared_synonyms_and_antonyms(),
-                               self.OOV_WORDS: self.get_oov_words(self.model_manager)}
+                               self.OOV_WORDS: self.get_oov_words()}
         return self.__analysis
 
     def save(self, output_dir: str) -> str:
@@ -110,15 +110,16 @@ class LinkAnalyzer:
         shared_antonyms = self.word_counts[1].intersection(antonyms).get_word_set()
         return shared_synonyms.union(shared_antonyms)
 
-    def get_oov_words(self, model_manager: ModelManager) -> "WordCounter":
+    def get_oov_words(self) -> "WordCounter":
         """
         Gets all the OOV words from the artifacts
-        :param model_manager: The model to compare vocab to
         :return The set of OOV words
         """
+        if not self.model_manager:
+            return WordCounter()
         oov_words = WordCounter()
         for word_count in self.word_counts:
-            oov_words.update(word_count.get_oov_words(model_manager))
+            oov_words.update(word_count.get_oov_words(self.model_manager))
         return oov_words
 
     @staticmethod

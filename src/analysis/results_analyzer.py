@@ -25,7 +25,7 @@ class ResultsAnalyzer:
     CORRECTLY_PREDICTED_N_PER_CATEGORY = "correctly_predicted_n_per_category"
     OUTPUT_FILENAME = "results_analysis.json"
 
-    def __init__(self, prediction_output: TracePredictionOutput, dataset: TraceDataset, model_manager: ModelManager):
+    def __init__(self, prediction_output: TracePredictionOutput, dataset: TraceDataset, model_manager: ModelManager = None):
         """
         Initializes the analyzer for analysis of given prediction results
         :param prediction_output: The output of a prediction job

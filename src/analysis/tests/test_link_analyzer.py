@@ -58,7 +58,7 @@ class TestLinkAnalyzer(BaseTest):
 
     def test_get_oov_vocab(self):
         analyzer = self.get_link_analyzer()
-        oov = analyzer.get_oov_words(analyzer.model_manager)
+        oov = analyzer.get_oov_words()
         self.assertDictEqual(oov, self.EXPECTED_OOV_WORDS)
 
     def test_get_artifact_vocab(self):

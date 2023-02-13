@@ -1,6 +1,7 @@
 from data.datasets.dataset_role import DatasetRole
 from data.managers.trainer_dataset_manager import TrainerDatasetManager
 from jobs.components.job_args import JobArgs
+from jobs.components.job_result import JobResult
 from jobs.tests.base_job_test import BaseJobTest
 from jobs.vsm_job import VSMJob
 from testres.test_assertions import TestAssertions
@@ -26,4 +27,5 @@ class TestVSMJob(BaseJobTest):
 
     def _assert_success(self, job: VSMJob, output_dict: dict):
         eval_dataset = job.trainer_dataset_manager[DatasetRole.EVAL]
+        output_dict = output_dict[JobResult.PREDICTION_OUTPUT]
         TestAssertions.verify_prediction_output(self, output_dict, eval_dataset, base_score=0.0)

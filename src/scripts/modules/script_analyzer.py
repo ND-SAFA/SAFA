@@ -11,6 +11,7 @@ from scripts.modules.script_runner import ScriptRunner
 from train.trace_output.trace_prediction_output import TracePredictionOutput
 from util.file_util import FileUtil
 from util.json_util import JsonUtil
+from util.logging.logger_manager import logger
 
 DATASET_ROLE = DatasetRole.EVAL
 
@@ -49,6 +50,7 @@ class ScriptAnalyzer:
                 intersecting_mis_predicted_links[f"{job_id_a} {job_id_b}"] = intersecting_links
             project_output_path = os.path.join(self.output_dir, project + ".json")
             FileUtil.write(intersecting_mis_predicted_links, project_output_path)
+            logger.info(f"Analysis written to: {project_output_path}")
 
     @staticmethod
     def analyze_job(job, job_output, analyzer_store) -> None:
@@ -94,5 +96,5 @@ class ScriptAnalyzer:
                 output_file_path = os.path.join(job.job_args.output_dir, OUTPUT_FILENAME)
                 job_output = JsonUtil.read_json_file(output_file_path)
 
-                if isinstance(job, AbstractTraceJob) and JobResult.PREDICTION_OUTPUT in job_output:
+                if JobResult.PREDICTION_OUTPUT in job_output:
                     yield job, job_output

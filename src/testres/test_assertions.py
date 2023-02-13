@@ -41,7 +41,10 @@ class TestAssertions:
         :param threshold: The tolerance threshold between score and base score.
         :return: None
         """
-        output.require_properties([JobResult.PREDICTION_ENTRIES])
+        if isinstance(output, JobResult):
+            output.require_properties([JobResult.PREDICTION_ENTRIES])
+        else:
+            JsonUtil.require_properties(output, [JobResult.PREDICTION_ENTRIES])
         prediction_entries = output[JobResult.PREDICTION_ENTRIES]
         test_case.assertEqual(len(eval_dataset), len(prediction_entries))
 
@@ -64,7 +67,7 @@ class TestAssertions:
         :param output: The result of a prediction job.
         :return: None
         """
-        output.require_properties([JobResult.METRICS])
+        JsonUtil.require_properties(output, [JobResult.METRICS])
         for metric in TestDataManager.EXAMPLE_PREDICTION_METRICS.keys():
             if metric not in output[JobResult.METRICS]:
                 test_case.fail(

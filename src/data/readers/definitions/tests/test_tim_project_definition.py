@@ -1,6 +1,7 @@
 from copy import deepcopy
 from unittest.mock import patch
 
+from constants import NO_ORPHAN_CHECK_VALUE
 from data.keys.safa_format import SafaKeys
 from data.keys.structure_keys import StructuredKeys
 from data.readers.definitions.tim_project_definition import TimProjectDefinition
@@ -46,6 +47,9 @@ class TestTimProjectDefinition(BaseTest):
         },
         StructuredKeys.CONVERSIONS: {
             **TimProjectDefinition.get_flattened_conversions()
+        },
+        StructuredKeys.OVERRIDES: {
+            "allowed_orphans": NO_ORPHAN_CHECK_VALUE
         }
     }
 

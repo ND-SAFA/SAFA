@@ -65,7 +65,14 @@ class ResultsAnalyzer:
         :param other: Another results analyzer
         :return: The set of overlapping mis-predicted links
         """
-        return {link.id for link in self.mis_predicted_links.intersection(other.mis_predicted_links)}
+        return self.get_mis_predicted_link_ids().intersection(other.get_mis_predicted_link_ids())
+
+    def get_mis_predicted_link_ids(self) -> Set[int]:
+        """
+        Get the link ids of all mis-predicted links
+        :return: The link ids of mis-predicted links
+        """
+        return {link.id for link in self.mis_predicted_links}
 
     @staticmethod
     def _save(analysis: Dict[str, Any], output_dir: str) -> str:

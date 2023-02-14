@@ -63,7 +63,8 @@ class TrainControllerDescriptor(AbstractDatasetDescriptor):
                 }
             },
             "overrides": {
-                "ALLOW_MISSING_SOURCE": True,
-                "ALLOW_MISSING_TARGET": True
+                "allowed_orphans": 150,
+                "allowed_missing_sources": 16,
+                "allowed_missing_targets": 23
             }
         }

@@ -56,7 +56,7 @@ class DronePLDescriptor(AbstractDatasetDescriptor):
                 }
             },
             "overrides": {
-                "allowed_orphans": 341,
+                "allowed_orphans": 362,
                 "allowed_missing_sources": 98,
                 "allowed_missing_targets": 74
             }

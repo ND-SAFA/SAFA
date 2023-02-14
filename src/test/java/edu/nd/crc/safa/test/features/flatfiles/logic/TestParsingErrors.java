@@ -38,7 +38,7 @@ class TestParsingErrors extends ParseBaseTest {
             .withRoute(AppRoutes.FlatFiles.PARSE_ARTIFACT_FILE)
             .withArtifactType("Designs")
             .buildEndpoint();
-        String fileName = "tim.json";
+        String fileName = "empty.json";
 
         // VP - Verify error message informs that columns are wrong
         String c = uploadEntityFileAndGetError(routeName, fileName);
@@ -47,7 +47,7 @@ class TestParsingErrors extends ParseBaseTest {
 
     @Test
     void jsonFileHasMissingTraceKey() throws Exception {
-        String fileName = "tim.json";
+        String fileName = "empty.json";
 
         // VP - Verify error message informs that columns are wrong
         String c = uploadEntityFileAndGetError(AppRoutes.FlatFiles.PARSE_TRACE_FILE, fileName);

@@ -55,6 +55,7 @@ class ScriptAnalyzer:
                     intersecting_mis_predicted_links[analysis_id] = intersecting_links
                 project_output_path = os.path.join(self.output_dir, project, str(random_seed), "analysis.json")
                 FileUtil.write(intersecting_mis_predicted_links, project_output_path)
+                logger.info(f"{intersecting_mis_predicted_links}")
                 logger.info(f"Analysis written to: {project_output_path}")
 
     @staticmethod

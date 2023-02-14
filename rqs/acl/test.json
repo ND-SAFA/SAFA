@@ -7,8 +7,6 @@
           "job_args": {
             "random_seed": {
               "*": [
-                812,
-                234,
                 645
               ]
             }
@@ -16,14 +14,14 @@
           "model_manager": {
             "model_path": {
               "*": [
-                "thearod5/git-bert",
-                "prajjwal1/bert-medium"
+                "prajjwal1/bert-mini",
+                "prajjwal1/bert-tiny"
               ]
             }
           },
           "trainer_args": {
-            "num_train_epochs": 20,
-            "per_device_train_batch_size": 16,
+            "num_train_epochs": 1,
+            "per_device_train_batch_size": 4,
             "gradient_accumulation_steps": 16,
             "learning_rate": 5e-5,
             "metrics": [
@@ -44,8 +42,7 @@
                 "name": {
                   "*": [
                     "mip",
-                    "cm1",
-                    "Drone"
+                    "cm1"
                   ]
                 }
               }
@@ -58,7 +55,7 @@
             "eval_dataset_creator": {
               "object_type": "SPLIT",
               "split_strategy": "SPLIT_BY_LINK",
-              "val_percentage": 0.55
+              "val_percentage": 0.75
             },
             "augmenter": {
               "steps": [

@@ -30,7 +30,7 @@
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "HUB",
-                "name": "drone-pl"
+                "name": "drone_pl"
               }
             },
             "val_dataset_creator": {

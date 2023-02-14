@@ -16,17 +16,18 @@ import edu.nd.crc.safa.features.common.Type2TraceMap;
 import edu.nd.crc.safa.features.documents.entities.db.DocumentType;
 import edu.nd.crc.safa.features.flatfiles.parser.base.AbstractArtifactFile;
 import edu.nd.crc.safa.features.flatfiles.parser.base.AbstractTraceFile;
+import edu.nd.crc.safa.features.flatfiles.parser.tim.TimArtifactDefinition;
+import edu.nd.crc.safa.features.flatfiles.parser.tim.TimSchema;
+import edu.nd.crc.safa.features.flatfiles.parser.tim.TimTraceDefinition;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectAppEntity;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.projects.services.ProjectRetrievalService;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
-import edu.nd.crc.safa.utilities.FileUtilities;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import org.javatuples.Pair;
-import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
 /**
@@ -44,23 +45,23 @@ public class FileDownloadService {
         List<File> projectFiles = new ArrayList<>();
 
         ProjectEntities projectEntityMaps = new ProjectEntities(projectAppEntity);
-        List<ArtifactFileIdentifier> artifactFiles = writeArtifactFiles(fileType, project, projectEntityMaps,
+        List<TimArtifactDefinition> artifactFiles = writeArtifactFiles(fileType, project, projectEntityMaps,
             projectFiles);
-        List<TraceFileIdentifier> traceFiles = writeTraceFiles(fileType, project, projectFiles,
+        List<TimTraceDefinition> traceFiles = writeTraceFiles(fileType, project, projectFiles,
             projectAppEntity,
             projectEntityMaps);
-        File timFile = writeTimFile(project, artifactFiles, traceFiles);
+        TimSchema timData = new TimSchema(artifactFiles, traceFiles);
+        File timFile = writeTimFile(project, timData);
         projectFiles.add(timFile);
         return projectFiles;
     }
 
-    private List<TraceFileIdentifier> writeTraceFiles(String fileType,
-                                                      Project project,
-                                                      List<File> projectFiles,
-                                                      ProjectAppEntity projectAppEntity,
-                                                      ProjectEntities projectEntityMaps) throws Exception {
+    private List<TimTraceDefinition> writeTraceFiles(String fileType, Project project, List<File> projectFiles,
+                                                     ProjectAppEntity projectAppEntity,
+                                                     ProjectEntities projectEntityMaps) throws Exception {
+
         Type2TraceMap type2TraceMap = new Type2TraceMap(projectAppEntity, projectEntityMaps);
-        List<TraceFileIdentifier> traceFiles = new ArrayList<>();
+        List<TimTraceDefinition> traceFiles = new ArrayList<>();
         for (String sourceType : type2TraceMap.getSourceTypes()) {
             for (String targetType : type2TraceMap.getTargetTypes(sourceType)) {
                 // Step - Create file
@@ -71,7 +72,8 @@ public class FileDownloadService {
                 // Step - Create trace file
                 List<TraceAppEntity> traces = type2TraceMap.getTracesBetweenTypes(sourceType, targetType);
                 AbstractTraceFile<?> traceFile = DataFileBuilder.createTraceFileParser(pathToFile, traces);
-                TraceFileIdentifier traceFileIdentifier = new TraceFileIdentifier(fileName, sourceType, targetType);
+                TimTraceDefinition traceFileIdentifier
+                    = new TimTraceDefinition(sourceType, targetType, fileName, false);
                 traceFiles.add(traceFileIdentifier);
                 traceFile.export(traceFileOutput);
 
@@ -81,11 +83,11 @@ public class FileDownloadService {
         return traceFiles;
     }
 
-    private List<ArtifactFileIdentifier> writeArtifactFiles(String fileType,
+    private List<TimArtifactDefinition> writeArtifactFiles(String fileType,
                                                             Project project,
                                                             ProjectEntities projectEntityMaps,
                                                             List<File> projectFiles) throws Exception {
-        List<ArtifactFileIdentifier> artifactFiles = new ArrayList<>();
+        List<TimArtifactDefinition> artifactFiles = new ArrayList<>();
         for (String artifactType : projectEntityMaps.getArtifactTypes()) {
             String fileName = String.format("%s.%s", artifactType, fileType);
             String pathToFile = ProjectPaths.Storage.getPathToProjectFile(project, fileName);
@@ -97,9 +99,7 @@ public class FileDownloadService {
                 pathToFile,
                 documentType,
                 artifacts);
-            ArtifactFileIdentifier artifactFileIdentifier = new ArtifactFileIdentifier(fileName,
-                artifactType,
-                documentType);
+            TimArtifactDefinition artifactFileIdentifier = new TimArtifactDefinition(artifactType, fileName);
             artifactFiles.add(artifactFileIdentifier);
             artifactFile.export(artifactFileOutput);
             projectFiles.add(artifactFileOutput);
@@ -125,63 +125,10 @@ public class FileDownloadService {
         return DocumentType.ARTIFACT_TREE;
     }
 
-    private File writeTimFile(Project project,
-                              List<ArtifactFileIdentifier> artifactFiles,
-                              List<TraceFileIdentifier> traceFiles) throws IOException {
+    private File writeTimFile(Project project, TimSchema timData) throws IOException {
         String pathToFile = ProjectPaths.Storage.getPathToProjectFile(project, ProjectVariables.TIM_FILENAME);
         File timFile = new File(pathToFile);
-        JSONObject fileContent = new JSONObject();
-        JSONObject dataFiles = new JSONObject();
-        for (ArtifactFileIdentifier artifactFileIdentifier : artifactFiles) {
-            JSONObject artifactDefinition = new JSONObject();
-            artifactDefinition.put("File", artifactFileIdentifier.getFileName());
-            artifactDefinition.put("Type", artifactFileIdentifier.getDocumentType().toString());
-            dataFiles.put(artifactFileIdentifier.getArtifactType(), artifactDefinition);
-        }
-
-        for (TraceFileIdentifier traceFileIdentifier : traceFiles) {
-            JSONObject traceDefinition = new JSONObject();
-            String source = traceFileIdentifier.getSource();
-            String target = traceFileIdentifier.getTarget();
-            String title = String.format("%sTo%s", source, target);
-            traceDefinition.put("Source", traceFileIdentifier.getSource());
-            traceDefinition.put("Target", traceFileIdentifier.getTarget());
-            traceDefinition.put("File", traceFileIdentifier.getFileName());
-            fileContent.put(title, traceDefinition);
-        }
-        fileContent.put("DataFiles", dataFiles);
-        FileUtilities.writeToFile(timFile, fileContent.toString());
+        new ObjectMapper().writeValue(timFile, timData);
         return timFile;
-    }
-
-    /**
-     * Identifies a flat file defining a set of artifacts with the same type.
-     */
-    @AllArgsConstructor
-    @Data
-    static class ArtifactFileIdentifier {
-        /**
-         * The name of the file.
-         */
-        String fileName;
-        /**
-         * The artifact type of the artifacts in file
-         */
-        String artifactType;
-        /**
-         * The type of document these artifact belong to.
-         */
-        DocumentType documentType;
-    }
-
-    /**
-     * A flat file defining a set of trace links.
-     */
-    @AllArgsConstructor
-    @Data
-    static class TraceFileIdentifier {
-        String fileName;
-        String source;
-        String target;
     }
 }

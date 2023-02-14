@@ -50,7 +50,7 @@ class TestArtifactIFileParser extends ApplicationBaseTest {
         String pathToFiles = ProjectPaths.Storage.projectUploadsPath(projectVersion.getProject(), false);
         TimFileParser timFileParser = new TimFileParser(jsonSpec, pathToFiles);
         Exception exception = assertThrows(SafaError.class, () -> new FlatFileParser(timFileParser));
-        assertThat(exception.getMessage()).contains(TimFileParser.Constants.FILE_PARAM);
+        assertThat(exception.getMessage()).contains("file");
         projectService.deleteProject(projectVersion.getProject());
     }
 }

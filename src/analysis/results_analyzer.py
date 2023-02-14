@@ -135,7 +135,7 @@ class ResultsAnalyzer:
         """
         mis_predicted_links = set()
         correctly_predicted_links = set()
-        for i, (source_id, target_id) in enumerate(self.prediction_output.source_target_pairs[:10]):
+        for i, (source_id, target_id) in enumerate(self.prediction_output.source_target_pairs):
             trace_link_id = TraceLink.generate_link_id(source_id, target_id)
             link = dataset.links[trace_link_id]
             pred_label = self.prediction_output.predictions[i] > THRESHOLD_DEFAULT

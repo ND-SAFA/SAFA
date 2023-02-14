@@ -21,7 +21,6 @@ class ResultsAnalyzer:
      Handles analysis of a trace link
      """
 
-    MIS_PREDICTED_LINK_CATEGORIZATIONS = "mis_predicted_link_categorizations"
     MIS_PREDICTED_N_PER_CATEGORY = "mis_predicted_n_per_category"
     CORRECTLY_PREDICTED_N_PER_CATEGORY = "correctly_predicted_n_per_category"
     OUTPUT_FILENAME = "results_analysis.json"

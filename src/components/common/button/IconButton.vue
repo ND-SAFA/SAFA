@@ -1,8 +1,8 @@
 <template>
   <v-tooltip bottom z-index="10000">
-    <template #activator="{ on, attrs }">
+    <template #activator="{ props }">
       <v-btn
-        v-bind="attrs"
+        v-bind="props"
         :color="color"
         :icon="!fab"
         :fab="fab"
@@ -12,7 +12,6 @@
         :hidden="isHidden"
         :data-cy="dataCy"
         variant="text"
-        v-on="on"
         @click.native="emit('click')"
       >
         <v-icon :style="iconStyle">{{ iconId }}</v-icon>

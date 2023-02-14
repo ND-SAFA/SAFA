@@ -6,13 +6,13 @@
     <v-list expand>
       <delta-button-group
         is-traces
-        deltaType="added"
+        delta-type="added"
         :items="addedTraces"
         @click="handleAddedSelect"
       />
       <delta-button-group
         is-traces
-        deltaType="removed"
+        delta-type="removed"
         :items="removedTraces"
         @click="handleRemovedSelect"
       />
@@ -21,7 +21,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { deltaStore, selectionStore } from "@/hooks";
 import { Typography, PanelCard } from "@/components/common";
 import DeltaButtonGroup from "./DeltaButtonGroup.vue";
@@ -31,7 +31,7 @@ import DeltaButtonGroup from "./DeltaButtonGroup.vue";
  *
  * @emits `open` - On open.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "TraceDeltas",
   components: { PanelCard, DeltaButtonGroup, Typography },
   data() {
@@ -59,6 +59,20 @@ export default Vue.extend({
       return deltaStore.inDeltaView;
     },
   },
+  watch: {
+    /**
+     * When the delta traces change, set all panels to open.
+     */
+    isDeltaMode() {
+      const panels: number[] = [];
+
+      if (Object.keys(this.addedTraces).length > 0) panels.push(0);
+      if (Object.keys(this.removedTraces).length > 0) panels.push(1);
+
+      this.openPanels = panels;
+      this.$emit("open");
+    },
+  },
   methods: {
     /**
      * Selects an added trace.
@@ -73,20 +87,6 @@ export default Vue.extend({
      */
     handleRemovedSelect(id: string): void {
       selectionStore.selectTraceLink(this.removedTraces[id]);
-    },
-  },
-  watch: {
-    /**
-     * When the delta traces change, set all panels to open.
-     */
-    isDeltaMode() {
-      const panels: number[] = [];
-
-      if (Object.keys(this.addedTraces).length > 0) panels.push(0);
-      if (Object.keys(this.removedTraces).length > 0) panels.push(1);
-
-      this.openPanels = panels;
-      this.$emit("open");
     },
   },
 });

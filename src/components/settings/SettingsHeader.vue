@@ -7,14 +7,14 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { Typography, BackButton } from "@/components/common";
 
 /**
  * Represents the section describing the project name and descriptions
  * within the settings.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "SettingsHeader",
   components: {
     Typography,

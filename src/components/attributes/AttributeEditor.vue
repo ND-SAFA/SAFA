@@ -17,8 +17,8 @@
         v-if="!createOpen"
         text
         variant="add"
-        @click="createOpen = true"
         data-cy="button-add-attribute"
+        @click="createOpen = true"
       >
         Add Attribute
       </text-button>
@@ -34,7 +34,7 @@
         :key="attribute.key"
         :title="attribute.label"
       >
-        <template v-slot:activator>
+        <template #activator>
           <span @click.stop="">
             <icon-button
               class="ml-auto"
@@ -58,7 +58,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { AttributePositionSchema, AttributeSchema } from "@/types";
 import { attributeTypeOptions } from "@/util";
 import { attributeLayoutSaveStore, attributesStore } from "@/hooks";
@@ -74,7 +74,7 @@ import SaveAttribute from "./SaveAttribute.vue";
 /**
  * Renders the list of project attributes and allows for editing them.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "AttributeEditor",
   components: {
     IconButton,

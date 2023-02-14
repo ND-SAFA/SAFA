@@ -7,13 +7,13 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import Typography from "../Typography.vue";
 
 /**
  * An alert for components that are still under construction.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "UnderConstructionAlert",
   components: { Typography },
 });

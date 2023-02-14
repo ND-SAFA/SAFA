@@ -1,5 +1,5 @@
 <template>
-  <flex-box justify="space-between" v-if="doDisplay">
+  <flex-box v-if="doDisplay" justify="space-between">
     <flex-box align="center" justify="center">
       <text-button
         v-if="showUnreviewed"
@@ -35,7 +35,7 @@
       </text-button>
     </flex-box>
     <flex-box v-if="showDelete">
-      <v-divider vertical v-if="showApproved || showDeclined" />
+      <v-divider v-if="showApproved || showDeclined" vertical />
       <text-button
         text
         variant="delete"
@@ -49,7 +49,7 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import { defineComponent, PropType } from "vue";
 import { TraceLinkSchema } from "@/types";
 import { linkStatus } from "@/util";
 import { projectStore, sessionStore } from "@/hooks";
@@ -69,7 +69,7 @@ import { FlexBox, TextButton } from "@/components/common";
  * @emits-2 `link:unreview` - On Link Un-review.
  * @emits-2 `link:delete` - On Link Delete.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "TraceLinkApproval",
   components: {
     TextButton,

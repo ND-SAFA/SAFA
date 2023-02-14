@@ -8,7 +8,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import ArtifactFields from "./ArtifactFields.vue";
 import ArtifactDocuments from "./ArtifactDocuments.vue";
 import ArtifactErrors from "./ArtifactErrors.vue";
@@ -17,7 +17,7 @@ import ArtifactTraces from "./ArtifactTraces.vue";
 /**
  * Displays artifact information.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "ArtifactContent",
   components: {
     ArtifactFields,

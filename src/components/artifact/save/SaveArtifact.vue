@@ -26,7 +26,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { ArtifactSchema, ArtifactCreatorOpenState } from "@/types";
 import { appStore, artifactSaveStore, selectionStore } from "@/hooks";
 import { handleDeleteArtifact, handleSaveArtifact } from "@/api";
@@ -36,7 +36,7 @@ import SaveArtifactInputs from "./SaveArtifactInputs.vue";
 /**
  * Displays inputs for editing and saving artifacts.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "SaveArtifact",
   components: {
     TextButton,
@@ -47,9 +47,6 @@ export default Vue.extend({
     return {
       isLoading: false,
     };
-  },
-  mounted() {
-    artifactSaveStore.resetArtifact(true);
   },
   computed: {
     /**
@@ -93,6 +90,9 @@ export default Vue.extend({
     baseArtifact(): void {
       artifactSaveStore.resetArtifact(true);
     },
+  },
+  mounted() {
+    artifactSaveStore.resetArtifact(true);
   },
   methods: {
     /**

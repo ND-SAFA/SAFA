@@ -5,7 +5,8 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import { computed, defineComponent, PropType } from "vue";
+import { useTheme } from "vuetify";
 import { ArtifactSchema, ArtifactDeltaState } from "@/types";
 import { capitalize, getBackgroundColor } from "@/util";
 import { deltaStore } from "@/hooks";
@@ -14,11 +15,14 @@ import { Typography } from "@/components/common";
 /**
  * Renders a chip for the delta state of this artifact.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "ArtifactTableDeltaChip",
   components: { Typography },
   props: {
-    artifact: Object as PropType<ArtifactSchema>,
+    artifact: {
+      type: Object as PropType<ArtifactSchema>,
+      required: true,
+    },
   },
   computed: {
     /**
@@ -43,7 +47,10 @@ export default Vue.extend({
      * @return The color to display for this chip.
      */
     color(): string {
-      return getBackgroundColor(this.deltaState, this.$vuetify.theme.dark);
+      const theme = useTheme();
+      const darkMode = computed(() => theme.global.current.value.dark);
+
+      return getBackgroundColor(this.deltaState, darkMode.value);
     },
   },
 });

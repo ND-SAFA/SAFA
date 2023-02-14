@@ -3,9 +3,9 @@
     outlined
     block
     :color="titleColor"
-    @click="$emit('click', name)"
     class="my-1"
     style="background-color: white"
+    @click="$emit('click', name)"
   >
     <span class="text-ellipsis" style="max-width: 300px; color: inherit">
       {{ name }}
@@ -14,7 +14,7 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import { defineComponent, PropType } from "vue";
 import { DeltaType } from "@/types";
 
 /**
@@ -22,7 +22,7 @@ import { DeltaType } from "@/types";
  *
  * @emits `click` (name: string) - On click.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "ArtifactDeltaButton",
   props: {
     name: {

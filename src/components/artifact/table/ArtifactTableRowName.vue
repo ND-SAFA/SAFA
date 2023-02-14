@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import { defineComponent, PropType } from "vue";
 import { ArtifactSchema } from "@/types";
 import { warningStore } from "@/hooks";
 import { Typography, FlexBox } from "@/components/common";
@@ -24,7 +24,7 @@ import { Typography, FlexBox } from "@/components/common";
 /**
  * Displays the name of a row of artifacts.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "ArtifactTableRowName",
   components: {
     FlexBox,

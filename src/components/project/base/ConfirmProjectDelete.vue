@@ -6,28 +6,28 @@
     data-cy="modal-project-delete"
     @close="handleCancel"
   >
-    <template v-slot:body>
+    <template #body>
       <typography
         t="2"
         el="p"
         value="Are you sure you want to delete this project? Type in the project's name to confirm deletion."
       />
       <v-text-field
-        hide-details
         v-model="confirmText"
+        hide-details
         :label="label"
         class="mt-4"
         filled
         data-cy="input-project-delete-name"
       />
     </template>
-    <template v-slot:actions>
+    <template #actions>
       <v-btn
         :disabled="!canDelete"
         color="error"
-        @click="handleConfirm"
         class="ml-auto"
         data-cy="button-project-delete"
+        @click="handleConfirm"
       >
         Delete
       </v-btn>
@@ -36,7 +36,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { identifierSaveStore } from "@/hooks";
 import { Modal, Typography } from "@/components/common";
 
@@ -46,7 +46,7 @@ import { Modal, Typography } from "@/components/common";
  * @emits-1 `confirm` - On delete confirm.
  * @emits-2 `cancel` - On delete cancel.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "ConfirmProjectDelete",
   components: { Typography, Modal },
   props: {
@@ -80,6 +80,16 @@ export default Vue.extend({
       return this.confirmText === this.projectName;
     },
   },
+  watch: {
+    /**
+     * Clears the modal data when opened.
+     */
+    isOpen(open: boolean) {
+      if (!open) return;
+
+      this.clearData();
+    },
+  },
   methods: {
     /**
      * Clears modal data.
@@ -98,16 +108,6 @@ export default Vue.extend({
      */
     handleCancel() {
       this.$emit("cancel");
-    },
-  },
-  watch: {
-    /**
-     * Clears the modal data when opened.
-     */
-    isOpen(open: boolean) {
-      if (!open) return;
-
-      this.clearData();
     },
   },
 });

@@ -44,7 +44,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { ArtifactSchema, TimArtifactLevelSchema } from "@/types";
 import { appStore, artifactStore, traceStore, typeOptionsStore } from "@/hooks";
 import { handleCreateLink } from "@/api";
@@ -58,7 +58,7 @@ import {
 /**
  * Allows for creating trace links.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "SaveTraceLinkPanel",
   components: { FlexBox, Typography, ArtifactInput, TypeDirectionInput },
   data() {

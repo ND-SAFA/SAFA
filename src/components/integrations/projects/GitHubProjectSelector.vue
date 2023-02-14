@@ -23,7 +23,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { GitHubProjectSchema } from "@/types";
 import { integrationsStore } from "@/hooks";
 import { handleLoadGitHubProjects } from "@/api";
@@ -32,7 +32,7 @@ import { StepperListStep } from "@/components/common";
 /**
  * Allows for selecting a GitHub repository.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "GitHubProjectSelector",
   components: {
     StepperListStep,

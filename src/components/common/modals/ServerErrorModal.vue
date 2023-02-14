@@ -1,12 +1,12 @@
 <template>
   <modal
     title="Server Errors"
-    :isOpen="isOpen"
-    :actionsHeight="0"
-    :isLoading="isLoading"
+    :is-open="isOpen"
+    :actions-height="0"
+    :is-loading="isLoading"
     @close="handleClose"
   >
-    <template v-slot:body>
+    <template #body>
       <v-list disabled>
         <v-list-item v-for="(error, errorIndex) in errors" :key="errorIndex">
           <v-list-item-content class="pa-0">
@@ -21,14 +21,14 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import { defineComponent, PropType } from "vue";
 import { appStore } from "@/hooks";
 import Modal from "./Modal.vue";
 
 /**
  * Renders server errors.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "ServerErrorModal",
   components: {
     Modal,

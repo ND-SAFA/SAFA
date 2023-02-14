@@ -11,7 +11,7 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import { defineComponent, PropType } from "vue";
 import { GenerationModelSchema } from "@/types";
 import {
   Typography,
@@ -22,7 +22,7 @@ import {
 /**
  * A step for training a model on documents.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "ModelDocumentStep",
   components: {
     Typography,

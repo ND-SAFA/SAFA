@@ -47,7 +47,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { ArtifactSchema, TraceLinkSchema, TraceType } from "@/types";
 import { artifactStore, selectionStore } from "@/hooks";
 import {
@@ -61,7 +61,7 @@ import {
 /**
  * Displays trace link information.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "TraceLinkContent",
   components: {
     TextButton,

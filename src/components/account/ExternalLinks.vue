@@ -11,13 +11,13 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { PanelCard, FlexBox, Typography } from "@/components/common";
 
 /**
  * Provides links to external documentation.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "ExternalLinks",
   components: {
     PanelCard,

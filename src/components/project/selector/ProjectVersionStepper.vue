@@ -13,7 +13,7 @@
       data-cy="project-version-stepper"
       @submit="handleSubmit"
     >
-      <template v-slot:items>
+      <template #items>
         <v-stepper-content step="1">
           <project-selector
             :is-open="projectSelectorIsOpen"
@@ -36,7 +36,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import {
   OptionalProjectIdentifier,
   OptionalProjectVersion,
@@ -57,7 +57,7 @@ const SELECT_VERSION_DEFAULT_NAME = "Select a Version";
 /**
  * Presents a stepper in a modal for selecting a project and version.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "ProjectVersionStepper",
   components: {
     Stepper,
@@ -109,9 +109,9 @@ export default Vue.extend({
       this.currentStep = 1;
 
       if (this.selectedProject?.name) {
-        Vue.set(this.steps, 0, [this.selectedProject.name, true]);
+        this.steps[0] = [this.selectedProject.name, true];
       } else {
-        Vue.set(this.steps, 0, [SELECT_PROJECT_DEFAULT_NAME, false]);
+        this.steps[0] = [SELECT_PROJECT_DEFAULT_NAME, false];
       }
     },
     /**
@@ -130,7 +130,7 @@ export default Vue.extend({
       this.selectedProject = project;
       this.unselectVersion();
 
-      Vue.set(this.steps, 0, [project.name, true]);
+      this.steps[0] = [project.name, true];
 
       if (goToNextStep) this.currentStep++;
     },
@@ -139,7 +139,7 @@ export default Vue.extend({
      */
     unselectProject() {
       this.selectedProject = undefined;
-      Vue.set(this.steps, 0, [SELECT_PROJECT_DEFAULT_NAME, false]);
+      this.steps[0] = [SELECT_PROJECT_DEFAULT_NAME, false];
     },
     /**
      * Selects a version.
@@ -147,7 +147,7 @@ export default Vue.extend({
      */
     selectVersion(version: VersionSchema) {
       this.selectedVersion = version;
-      Vue.set(this.steps, 1, [versionToString(version), true]);
+      this.steps[1] = [versionToString(version), true];
       this.handleSubmit();
     },
     /**
@@ -155,7 +155,7 @@ export default Vue.extend({
      */
     unselectVersion() {
       this.selectedVersion = undefined;
-      Vue.set(this.steps, 1, [SELECT_VERSION_DEFAULT_NAME, false]);
+      this.steps[1] = [SELECT_VERSION_DEFAULT_NAME, false];
     },
     /**
      * Loads the selected project.

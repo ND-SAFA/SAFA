@@ -18,7 +18,7 @@
       @item:delete="handleDelete"
       @refresh="handleRefresh"
     >
-      <template v-slot:addItemDialogue>
+      <template #addItemDialogue>
         <model-creator-modal :is-open="isSaveOpen" @close="handleClose" />
         <model-share-modal
           :model="currentItem"
@@ -26,10 +26,10 @@
           @close="handleClose"
         />
       </template>
-      <template v-slot:expanded-item="{ item }">
+      <template #expanded-item="{ item }">
         <ModelEditor :model="item" />
       </template>
-      <template v-slot:[`item.actions`]="{ item }">
+      <template #[`item.actions`]="{ item }">
         <icon-button
           icon-id="mdi-share-variant"
           tooltip="Share Model"
@@ -41,7 +41,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { GenerationModelSchema } from "@/types";
 import { modelSaveStore, projectStore } from "@/hooks";
 import { handleDeleteModel, handleLoadModels } from "@/api";
@@ -58,7 +58,7 @@ import ModelCreatorModal from "./ModelCreatorModal.vue";
 /**
  * Renders a table of project models.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "ModelTable",
   components: {
     PanelCard,

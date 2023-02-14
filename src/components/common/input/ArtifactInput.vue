@@ -1,18 +1,18 @@
 <template>
   <v-autocomplete
-    hide-details
     ref="artifactInput"
+    v-model="model"
+    hide-details
     :filled="filled"
     :multiple="multiple"
     :label="label"
-    v-model="model"
     :items="artifacts"
     item-text="name"
     item-value="id"
     :filter="filterArtifacts"
     @keydown.enter="$emit('enter')"
   >
-    <template v-slot:append>
+    <template #append>
       <icon-button
         small
         icon-id="mdi-content-save-outline"
@@ -21,13 +21,13 @@
         @click="handleClose"
       />
     </template>
-    <template v-slot:item="{ item, on, attrs }">
-      <v-list-item v-on="on" v-bind="attrs" dense>
+    <template #item="{ item, props }">
+      <v-list-item v-bind="props" dense>
         <v-checkbox :value="isSelected(item)" />
         <artifact-body-display display-title :artifact="item" />
       </v-list-item>
     </template>
-    <template v-slot:selection="{ item, index }">
+    <template #selection="{ item, index }">
       <v-chip
         v-if="index < 3"
         close
@@ -48,7 +48,7 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import { defineComponent, PropType } from "vue";
 import { ArtifactSchema } from "@/types";
 import { filterArtifacts } from "@/util";
 import { artifactStore } from "@/hooks";
@@ -61,7 +61,7 @@ import { Typography, ArtifactBodyDisplay } from "@/components/common/display";
  * @emits `input` (Artifact[]) - On input change.
  * @emits `enter` - On submit.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "ArtifactInput",
   components: {
     IconButton,
@@ -94,42 +94,6 @@ export default Vue.extend({
     return {
       model: this.value,
     };
-  },
-  methods: {
-    filterArtifacts,
-    /**
-     * Determines whether an artifact is in the selected state.
-     *
-     * @param item - The artifact to check.
-     * @return Whether it is selected.
-     */
-    isSelected(item: ArtifactSchema): boolean {
-      if (typeof this.model === "string") {
-        return item.id === this.model;
-      } else if (Array.isArray(this.model)) {
-        return this.model.includes(item.id);
-      } else {
-        return false;
-      }
-    },
-    /**
-     * Removes an artifact from the selection.
-     *
-     * @param item - The artifact to remove.
-     */
-    handleDelete(item: ArtifactSchema): void {
-      if (typeof this.model === "string") {
-        this.model = "";
-      } else if (Array.isArray(this.model)) {
-        this.model = this.model.filter((id: string) => id !== item.id);
-      }
-    },
-    /**
-     * Closes the selection window.
-     */
-    handleClose(): void {
-      (this.$refs.artifactInput as HTMLElement).blur();
-    },
   },
   computed: {
     /**
@@ -165,6 +129,42 @@ export default Vue.extend({
      */
     model(currentValue: string[] | string | undefined) {
       this.$emit("input", currentValue);
+    },
+  },
+  methods: {
+    filterArtifacts,
+    /**
+     * Determines whether an artifact is in the selected state.
+     *
+     * @param item - The artifact to check.
+     * @return Whether it is selected.
+     */
+    isSelected(item: ArtifactSchema): boolean {
+      if (typeof this.model === "string") {
+        return item.id === this.model;
+      } else if (Array.isArray(this.model)) {
+        return this.model.includes(item.id);
+      } else {
+        return false;
+      }
+    },
+    /**
+     * Removes an artifact from the selection.
+     *
+     * @param item - The artifact to remove.
+     */
+    handleDelete(item: ArtifactSchema): void {
+      if (typeof this.model === "string") {
+        this.model = "";
+      } else if (Array.isArray(this.model)) {
+        this.model = this.model.filter((id: string) => id !== item.id);
+      }
+    },
+    /**
+     * Closes the selection window.
+     */
+    handleClose(): void {
+      (this.$refs.artifactInput as HTMLElement).blur();
     },
   },
 });

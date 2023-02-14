@@ -1,6 +1,6 @@
 <template>
   <attribute-grid v-if="layout" :layout="layout">
-    <template v-slot:item="{ attribute }">
+    <template #item="{ attribute }">
       <attribute-input
         :model="artifact.attributes || {}"
         :attribute="attribute"
@@ -10,7 +10,7 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import { defineComponent, PropType } from "vue";
 import { ArtifactSchema, AttributeLayoutSchema } from "@/types";
 import { attributesStore } from "@/hooks";
 import { AttributeGrid } from "@/components/common/display";
@@ -19,7 +19,7 @@ import AttributeInput from "./AttributeInput.vue";
 /**
  * A list of inputs for a list of generic attributes.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "AttributeListInput",
   components: { AttributeGrid, AttributeInput },
   props: {
@@ -27,9 +27,6 @@ export default Vue.extend({
       type: Object as PropType<ArtifactSchema>,
       required: true,
     },
-  },
-  mounted() {
-    this.initializeArtifact();
   },
   computed: {
     /**
@@ -39,6 +36,14 @@ export default Vue.extend({
       return attributesStore.getLayoutByType(this.artifact.type);
     },
   },
+  watch: {
+    artifact() {
+      this.initializeArtifact();
+    },
+  },
+  mounted() {
+    this.initializeArtifact();
+  },
   methods: {
     /**
      * Initializes the artifact's custom attributes.
@@ -47,11 +52,6 @@ export default Vue.extend({
       if (this.artifact.attributes) return;
 
       this.artifact.attributes = {};
-    },
-  },
-  watch: {
-    artifact() {
-      this.initializeArtifact();
     },
   },
 });

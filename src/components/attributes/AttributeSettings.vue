@@ -20,7 +20,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { PanelCard } from "@/components/common";
 import AttributeEditor from "./AttributeEditor.vue";
 import AttributeLayoutEditor from "./AttributeLayoutEditor.vue";
@@ -28,7 +28,7 @@ import AttributeLayoutEditor from "./AttributeLayoutEditor.vue";
 /**
  * Renders settings for customizing artifact attributes.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "AttributeSettings",
   components: {
     AttributeLayoutEditor,

@@ -38,7 +38,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { IdentifierSchema } from "@/types";
 import { identifierSaveStore } from "@/hooks";
 import { Modal } from "@/components/common";
@@ -51,7 +51,7 @@ import ProjectIdentifierInput from "./ProjectIdentifierInput.vue";
  * @emits-1 `close` - On close.
  * @emits-2 `save` - On project save.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "ProjectIdentifierModal",
   components: {
     Modal,

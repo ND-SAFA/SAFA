@@ -18,7 +18,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { IconButton } from "@/components/common/button";
 import { FlexBox } from "@/components/common/layout";
 
@@ -28,7 +28,7 @@ import { FlexBox } from "@/components/common/layout";
  * @emits-1 `open:all` - On open all.
  * @emits-2 `close:all` - On close all.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "SectionControls",
   components: { FlexBox, IconButton },
 });

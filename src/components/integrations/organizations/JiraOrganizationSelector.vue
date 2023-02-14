@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { JiraOrganizationSchema } from "@/types";
 import { integrationsStore } from "@/hooks";
 import { handleLoadJiraOrganizations } from "@/api";
@@ -25,7 +25,7 @@ import { StepperListStep } from "@/components";
 /**
  * Allows for selecting a jira organization.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "JiraOrganizationSelector",
   components: {
     StepperListStep,

@@ -75,7 +75,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { DocumentSchema } from "@/types";
 import { documentTypeOptions } from "@/util";
 import { appStore, documentSaveStore } from "@/hooks";
@@ -91,7 +91,7 @@ import {
 /**
  * Allows for creating and editing documents.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "DocumentPanel",
   components: {
     TextButton,

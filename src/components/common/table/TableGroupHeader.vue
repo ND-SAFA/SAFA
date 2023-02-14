@@ -40,7 +40,7 @@
         />
       </flex-box>
     </flex-box>
-    <div class="mb-1" v-if="displayArtifact">
+    <div v-if="displayArtifact" class="mb-1">
       <typography
         default-expanded
         variant="expandable"
@@ -51,7 +51,7 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import { defineComponent, PropType } from "vue";
 import { DataTableGroup } from "@/types";
 import { camelcaseToDisplay } from "@/util";
 import { artifactStore } from "@/hooks";
@@ -66,7 +66,7 @@ import SectionControls from "./SectionControls.vue";
  * @emits-1 `open:all` (DataTableGroup) - On open all expanded.
  * @emits-2 `close:all` (DataTableGroup) - On close all expanded.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "TableGroupHeader",
   components: {
     AttributeChip,

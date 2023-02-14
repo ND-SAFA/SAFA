@@ -7,22 +7,22 @@
       value="Type in your current password and the new password you would like to set."
     />
     <password-field
-      label="Current Password"
       v-model="oldPassword"
+      label="Current Password"
       :errors="passwordErrors"
       data-cy="input-current-password"
     />
     <password-field
-      label="New Password"
       v-model="newPassword"
+      label="New Password"
       data-cy="input-new-password"
     />
     <v-card-actions>
       <v-btn
         :disabled="!oldPassword || !newPassword"
         outlined
-        @click="handleEditPassword"
         data-cy="button-update-password"
+        @click="handleEditPassword"
       >
         Update Password
       </v-btn>
@@ -31,14 +31,14 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { handleChangePassword } from "@/api";
 import { PasswordField, Typography, PanelCard } from "@/components/common";
 
 /**
  * Allows for password updating.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "MyAccountView",
   components: {
     PanelCard,

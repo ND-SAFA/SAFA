@@ -7,13 +7,13 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { Typography, BackButton } from "@/components/common";
 
 /**
  * Displays the header of the trace prediction page.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "TracePredictionHeader",
   components: {
     BackButton,

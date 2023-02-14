@@ -52,7 +52,7 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import { defineComponent, PropType } from "vue";
 import { IdentifierSchema, VersionSchema, VersionType } from "@/types";
 import { versionToString } from "@/util";
 import { getCurrentVersion, handleCreateVersion } from "@/api";
@@ -64,7 +64,7 @@ import { Modal } from "@/components/common";
  * @emits-1 `create` (ProjectVersion) - On version creation.
  * @emits-2 `close` - On close.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "VersionCreator",
   components: {
     Modal,

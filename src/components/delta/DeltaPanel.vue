@@ -7,7 +7,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { appStore } from "@/hooks";
 import DeltaPanelNav from "./DeltaPanelNav.vue";
 import ArtifactDeltas from "./ArtifactDeltas.vue";
@@ -16,7 +16,7 @@ import TraceDeltas from "./TraceDeltas.vue";
 /**
  * Displays project version delta information.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "DeltaPanel",
   components: { DeltaPanelNav, ArtifactDeltas, TraceDeltas },
   computed: {

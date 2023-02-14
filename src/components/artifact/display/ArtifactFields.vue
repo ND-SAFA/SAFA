@@ -2,11 +2,10 @@
   <panel-card>
     <flex-box align="center" justify="space-between">
       <v-tooltip bottom>
-        <template v-slot:activator="{ on, attrs }">
+        <template #activator="{ props }">
           <typography
             ellipsis
-            v-on="on"
-            v-bind="attrs"
+            v-bind="props"
             variant="subtitle"
             el="h1"
             :value="name"
@@ -37,7 +36,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { ReservedArtifactType, TextType } from "@/types";
 import { selectionStore } from "@/hooks";
 import {
@@ -51,7 +50,7 @@ import {
 /**
  * Displays the selected node's title and option buttons.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "ArtifactFields",
   components: {
     AttributeListDisplay,

@@ -27,10 +27,10 @@
   </grid-layout>
   <div v-else>
     <flex-box
-      full-width
-      justify="space-between"
       v-for="(attrs, y) of staticLayout"
       :key="y"
+      full-width
+      justify="space-between"
     >
       <div v-if="attrs[0]" :style="attrs[1] ? 'width: 50%' : 'width: 100%'">
         <slot name="item" :attribute="attrs[0]" />
@@ -43,7 +43,7 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import { defineComponent, PropType } from "vue";
 import { GridLayout, GridItem, GridItemData } from "vue-grid-layout";
 import {
   AttributeSchema,
@@ -56,7 +56,7 @@ import { FlexBox } from "@/components/common/layout";
 /**
  * Renders a grid of attributes.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "AttributeGrid",
   components: { FlexBox, GridLayout, GridItem },
   props: {
@@ -72,9 +72,6 @@ export default Vue.extend({
       staticLayout: [] as (AttributeSchema | undefined)[][],
     };
   },
-  mounted() {
-    this.resetLayout();
-  },
   computed: {
     /**
      * @return All attributes and their positions in the active layout.
@@ -88,6 +85,17 @@ export default Vue.extend({
         attr: attributesStore.attributes.find(({ key }) => pos.i === key),
       }));
     },
+  },
+  watch: {
+    /**
+     * Resets the layout when the stored layout changes.
+     */
+    "layout.positions"() {
+      this.resetLayout();
+    },
+  },
+  mounted() {
+    this.resetLayout();
   },
   methods: {
     /**
@@ -156,14 +164,6 @@ export default Vue.extend({
 
       position.height = height;
       position.width = width;
-    },
-  },
-  watch: {
-    /**
-     * Resets the layout when the stored layout changes.
-     */
-    "layout.positions"() {
-      this.resetLayout();
     },
   },
 });

@@ -1,9 +1,9 @@
 <template>
   <v-data-table
+    v-model="selected"
     :show-select="hasSelect"
     dense
     single-select
-    v-model="selected"
     checkbox-color="primary"
     :headers="headers"
     :items="items"
@@ -13,12 +13,12 @@
     :search="search"
     :no-data-text="noDataText"
     :show-expand="showExpand"
+    data-cy="generic-selector-table"
     @item-selected="$emit('item:select', $event)"
     @click:row="handleClick"
-    data-cy="generic-selector-table"
   >
     <slot />
-    <template v-slot:top>
+    <template #top>
       <slot name="deleteItemDialogue" />
       <slot name="editItemDialogue" />
       <slot name="addItemDialogue" />
@@ -41,7 +41,7 @@
         />
       </flex-box>
     </template>
-    <template v-slot:[`item.actions`]="{ item }">
+    <template #[`item.actions`]="{ item }">
       <td @click.stop="">
         <flex-box>
           <slot name="item.actions" :item="item" />
@@ -62,7 +62,7 @@
         </flex-box>
       </td>
     </template>
-    <template v-slot:[`footer.prepend`]>
+    <template #[`footer.prepend`]>
       <div class="py-3">
         <icon-button
           v-if="!minimal && hasAdd"
@@ -75,7 +75,7 @@
         />
       </div>
     </template>
-    <template v-slot:expanded-item="{ headers, item }">
+    <template #expanded-item="{ headers, item }">
       <td :colspan="headers.length" data-cy="table-generic-selector">
         <slot name="expanded-item" :item="item" />
       </td>
@@ -84,7 +84,7 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import { defineComponent, PropType } from "vue";
 import { DataTableHeader } from "@/types";
 import { FlexBox } from "@/components/common/layout";
 import { IconButton } from "@/components/common/button";
@@ -98,7 +98,7 @@ import { IconButton } from "@/components/common/button";
  * @emits-4 `item:delete` (item: Record<string, unknown>) - On delete item.
  * @emits-5 `item:add` - On add item.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "TableSelector",
   components: { FlexBox, IconButton },
   props: {
@@ -173,6 +173,23 @@ export default Vue.extend({
       previousItems: [] as Record<string, unknown>[],
     };
   },
+  watch: {
+    /**
+     * Resets selected when new items are loaded.
+     */
+    items(newItems: Record<string, unknown>[]) {
+      this.selected = [];
+      this.previousItems = newItems;
+    },
+    /**
+     * Clears data when the selector opens.
+     */
+    isOpen(open: boolean) {
+      if (!open) return;
+
+      this.clearData();
+    },
+  },
   methods: {
     /**
      * Clears all selected data.
@@ -190,7 +207,7 @@ export default Vue.extend({
       const index = this.items.indexOf(item);
       const isNotLastItem = index !== this.items.length - 1;
 
-      return (
+      return !!(
         (this.hasDelete || this.hasDeleteForIndexes?.includes(index)) &&
         (this.canDeleteLastItem || isNotLastItem)
       );
@@ -207,23 +224,6 @@ export default Vue.extend({
         this.selected = [];
         this.$emit("item:select");
       }
-    },
-  },
-  watch: {
-    /**
-     * Resets selected when new items are loaded.
-     */
-    items(newItems: Record<string, unknown>[]) {
-      this.selected = [];
-      this.previousItems = newItems;
-    },
-    /**
-     * Clears data when the selector opens.
-     */
-    isOpen(open: boolean) {
-      if (!open) return;
-
-      this.clearData();
     },
   },
 });

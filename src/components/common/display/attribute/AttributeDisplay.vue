@@ -9,7 +9,7 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import { defineComponent, PropType } from "vue";
 import { AttributeCollectionSchema, AttributeSchema } from "@/types";
 import { timestampToDisplay } from "@/util";
 import { artifactStore } from "@/hooks";
@@ -19,7 +19,7 @@ import AttributeChip from "./AttributeChip.vue";
 /**
  * Displays a generic attribute.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "AttributeDisplay",
   components: { Typography, AttributeChip },
   props: {

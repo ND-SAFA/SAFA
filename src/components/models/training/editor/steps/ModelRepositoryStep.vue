@@ -11,14 +11,14 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import { defineComponent, PropType } from "vue";
 import { GenerationModelSchema } from "@/types";
 import { Typography, UnderConstructionAlert } from "@/components/common";
 
 /**
  * A step for training a model on repositories.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "ModelRepositoryStep",
   components: { Typography, UnderConstructionAlert },
   props: {

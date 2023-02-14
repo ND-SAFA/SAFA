@@ -6,7 +6,7 @@
     size="l"
     @close="$emit('close')"
   >
-    <template v-slot:body>
+    <template #body>
       <div class="mt-5">
         <code-diff
           v-if="deltaType === 'added'"
@@ -38,7 +38,7 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import { defineComponent, PropType } from "vue";
 import CodeDiff from "vue-code-diff";
 import {
   ArtifactSchema,
@@ -54,7 +54,7 @@ import { Modal } from "@/components/common";
  *
  * @emits `close` - On close.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "ArtifactDeltaDiff",
   components: { Modal, CodeDiff },
   props: {

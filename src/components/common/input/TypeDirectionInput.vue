@@ -22,7 +22,7 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import { defineComponent, PropType } from "vue";
 import { TimArtifactLevelSchema } from "@/types";
 import { projectStore, sessionStore, typeOptionsStore } from "@/hooks";
 import { handleRemoveDirection } from "@/api";
@@ -31,7 +31,7 @@ import { Typography } from "@/components/common/display";
 /**
  * Renders an input for changing the allowed artifact type directions.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "TypeDirectionInput",
   components: { Typography },
   props: {

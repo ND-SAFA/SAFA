@@ -8,13 +8,13 @@
       item-key="installationId"
       class="mt-5"
     >
-      <template v-slot:[`item.lastUpdate`]="{ item }">
+      <template #[`item.lastUpdate`]="{ item }">
         <span>
           {{ getDateDisplay(item.lastUpdate) }}
         </span>
       </template>
 
-      <template v-slot:[`item.actions`]="{ item }">
+      <template #[`item.actions`]="{ item }">
         <text-button
           text
           color="primary"
@@ -25,7 +25,7 @@
         </text-button>
       </template>
 
-      <template v-slot:[`footer.prepend`]>
+      <template #[`footer.prepend`]>
         <div class="py-3">
           <icon-button
             fab
@@ -41,7 +41,7 @@
             :actions-height="0"
             @close="modalOpen = false"
           >
-            <template v-slot:body>
+            <template #body>
               <integrations-stepper
                 type="connect"
                 @submit="modalOpen = false"
@@ -55,7 +55,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { InstallationSchema } from "@/types";
 import { timestampToDisplay } from "@/util";
 import { integrationsStore } from "@/hooks";
@@ -72,7 +72,7 @@ import IntegrationsStepper from "./IntegrationsStepper.vue";
 /**
  * Renders a table of all active installations for the current project.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "ProjectInstallationsTable",
   components: {
     TextButton,

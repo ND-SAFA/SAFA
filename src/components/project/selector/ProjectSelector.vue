@@ -17,14 +17,14 @@
     @item:add="handleAddItem"
     @refresh="fetchProjects"
   >
-    <template v-slot:editItemDialogue>
+    <template #editItemDialogue>
       <project-identifier-modal
         :is-open="isSaveOpen"
         @save="handleConfirmSaveProject"
         @close="handleCloseSaveProject"
       />
     </template>
-    <template v-slot:deleteItemDialogue>
+    <template #deleteItemDialogue>
       <confirm-project-delete
         :is-open="isDeleteOpen"
         @confirm="handleConfirmDeleteProject"
@@ -35,7 +35,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { IdentifierSchema } from "@/types";
 import { identifierSaveStore, projectStore, sessionStore } from "@/hooks";
 import {
@@ -54,7 +54,7 @@ import { ConfirmProjectDelete, ProjectIdentifierModal } from "../base";
  * @emits-1 `selected` (IdentifierModal) - On project selected.
  * @emits-1 `unselected` - On project unselected.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "ProjectSelector",
   components: {
     TableSelector,

@@ -55,7 +55,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { ArtifactSchema, FlatArtifact, DataTableHeader } from "@/types";
 import { appStore, artifactStore, selectionStore } from "@/hooks";
 import {
@@ -69,7 +69,7 @@ import TraceMatrixTableHeader from "./TraceMatrixTableHeader.vue";
 /**
  * Displays a matrix of artifacts, showing their relationships.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "TraceMatrixTable",
   components: {
     TraceMatrixChip,

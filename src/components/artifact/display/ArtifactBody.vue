@@ -10,7 +10,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { ReservedArtifactType, TextType } from "@/types";
 import { appStore, selectionStore } from "@/hooks";
 import { Typography, TextButton, PanelCard } from "@/components/common";
@@ -18,7 +18,7 @@ import { Typography, TextButton, PanelCard } from "@/components/common";
 /**
  * Displays the selected node's body.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "ArtifactBody",
   components: {
     TextButton,

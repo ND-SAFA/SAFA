@@ -1,5 +1,5 @@
 <template>
-  <flex-box t="2" v-if="doDisplay">
+  <flex-box v-if="doDisplay" t="2">
     <text-button
       text
       variant="artifact"
@@ -29,7 +29,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { ArtifactSchema } from "@/types";
 import { appStore, projectStore, selectionStore, sessionStore } from "@/hooks";
 import { handleDeleteArtifact } from "@/api";
@@ -38,7 +38,7 @@ import { FlexBox, TextButton } from "@/components/common";
 /**
  * Displays artifact buttons.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "ArtifactButtons",
   components: { TextButton, FlexBox },
   computed: {

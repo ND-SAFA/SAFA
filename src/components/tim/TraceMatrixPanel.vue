@@ -23,7 +23,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { TimTraceMatrixSchema } from "@/types";
 import { appStore, layoutStore, selectionStore } from "@/hooks";
 import {
@@ -37,7 +37,7 @@ import {
 /**
  * Displays trace matrix information.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "TraceMatrixPanel",
   components: {
     FlexBox,

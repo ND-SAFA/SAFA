@@ -5,14 +5,14 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { appStore } from "@/hooks";
 import { TraceLinkGenerator } from "../save";
 
 /**
  * Displays trace link information.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "TraceLinkPanel",
   components: { TraceLinkGenerator },
   computed: {

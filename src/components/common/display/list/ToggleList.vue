@@ -1,6 +1,6 @@
 <template>
   <v-list-group :prepend-icon="icon" :value="value" @click="$emit('click')">
-    <template v-slot:activator>
+    <template #activator>
       <v-list-item-title>
         <slot name="activator" />
         <typography v-if="title" :value="title" data-cy="generic-list-item" />
@@ -13,7 +13,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import Typography from "../Typography.vue";
 
 /**
@@ -21,7 +21,7 @@ import Typography from "../Typography.vue";
  *
  * @emits-1 `click` - On activator click.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "ToggleList",
   components: { Typography },
   props: {

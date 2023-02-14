@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-timeline dense>
-      <v-timeline-item small color="accent" v-if="steps.length === 0">
+      <v-timeline-item v-if="steps.length === 0" small color="accent">
         <v-alert outlined border="left" color="accent">
           <typography
             value="This model has not yet been trained. To add a new training step, click the button below."
@@ -19,7 +19,7 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import { defineComponent, PropType } from "vue";
 import { GenerationModelSchema, TrainingStepSchema } from "@/types";
 import { ENABLED_FEATURES, EXAMPLE_TRAINING_STEPS } from "@/util";
 import { Typography } from "@/components/common";
@@ -30,7 +30,7 @@ import ModelTrainingCreator from "./ModelTrainingCreator.vue";
  * Displays logs of the model's training process,
  * and allows for further model training.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "ModelTraining",
   components: {
     ModelTrainingCreator,

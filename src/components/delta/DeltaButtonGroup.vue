@@ -4,14 +4,14 @@
       v-for="{ name, id } in itemFields"
       :key="name"
       :name="name"
-      :deltaType="deltaType"
+      :delta-type="deltaType"
       @click="$emit('click', id)"
     />
   </toggle-list>
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import { defineComponent, PropType } from "vue";
 import {
   ArtifactSchema,
   DeltaType,
@@ -27,7 +27,7 @@ import ArtifactDeltaButton from "./ArtifactDeltaButton.vue";
  *
  * @emits `click` (String) - On delta button click.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "DeltaButtonGroup",
   components: { ArtifactDeltaButton, ToggleList },
   props: {
@@ -51,15 +51,6 @@ export default Vue.extend({
     return {
       selectedName: undefined as string | undefined,
     };
-  },
-  methods: {
-    /**
-     * Selects the given artifact.
-     * @param artifactName - The artifact to select.
-     */
-    selectArtifact(artifactName: string): void {
-      this.selectedName = artifactName;
-    },
   },
   computed: {
     /**
@@ -91,6 +82,15 @@ export default Vue.extend({
             )
           : (items as ArtifactSchema[]).map(({ id, name }) => ({ id, name }));
       }
+    },
+  },
+  methods: {
+    /**
+     * Selects the given artifact.
+     * @param artifactName - The artifact to select.
+     */
+    selectArtifact(artifactName: string): void {
+      this.selectedName = artifactName;
     },
   },
 });

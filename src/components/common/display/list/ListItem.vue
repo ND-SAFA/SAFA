@@ -1,12 +1,7 @@
 <template>
   <v-tooltip bottom :disabled="tooltip.length < 20">
-    <template v-slot:activator="{ on, attrs }">
-      <v-list-item
-        v-on="on"
-        v-bind="attrs"
-        :data-cy="dataCy"
-        @click="handleClick"
-      >
+    <template #activator="{ props }">
+      <v-list-item v-bind="props" :data-cy="dataCy" @click="handleClick">
         <v-list-item-title>
           <typography :value="item.title" data-cy="generic-list-item" />
         </v-list-item-title>
@@ -23,7 +18,7 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import { defineComponent, PropType } from "vue";
 import { ListItem } from "@/types";
 import Typography from "../Typography.vue";
 
@@ -32,11 +27,14 @@ import Typography from "../Typography.vue";
  *
  * @emits `click` - On click.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "ListItem",
   components: { Typography },
   props: {
-    item: Object as PropType<ListItem>,
+    item: {
+      type: Object as PropType<ListItem>,
+      required: true,
+    },
     dataCy: String,
   },
   computed: {

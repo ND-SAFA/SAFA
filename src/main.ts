@@ -1,6 +1,5 @@
 import { configureCompat, createApp } from "vue";
 
-import "@/plugins/vue-cytoscape";
 import "@mdi/font/css/materialdesignicons.css";
 
 import { router } from "@/router";

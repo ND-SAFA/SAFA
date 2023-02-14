@@ -1,18 +1,18 @@
 <template>
   <v-autocomplete
+    ref="projectInput"
+    v-model="model"
     chips
     deletable-chips
-    ref="projectInput"
     filled
     :multiple="multiple"
     label="My Projects"
-    v-model="model"
     :items="projects"
     item-text="name"
     item-value="projectId"
     @keydown.enter="$emit('enter')"
   >
-    <template v-slot:append>
+    <template #append>
       <icon-button
         small
         icon-id="mdi-content-save-outline"
@@ -25,7 +25,7 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import { defineComponent, PropType } from "vue";
 import { IdentifierSchema } from "@/types";
 import { projectStore } from "@/hooks";
 import { IconButton } from "@/components/common/button";
@@ -35,7 +35,7 @@ import { IconButton } from "@/components/common/button";
  *
  * @emits-1 `input` (string[] | string | undefined) - On value change.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "ProjectInput",
   components: {
     IconButton,
@@ -69,14 +69,6 @@ export default Vue.extend({
         : projectStore.allProjects;
     },
   },
-  methods: {
-    /**
-     * Closes the selection window.
-     */
-    handleClose(): void {
-      (this.$refs.projectInput as HTMLElement).blur();
-    },
-  },
   watch: {
     /**
      * Updates the model if the value changes.
@@ -89,6 +81,14 @@ export default Vue.extend({
      */
     model(currentValue: string[] | string | undefined) {
       this.$emit("input", currentValue);
+    },
+  },
+  methods: {
+    /**
+     * Closes the selection window.
+     */
+    handleClose(): void {
+      (this.$refs.projectInput as HTMLElement).blur();
     },
   },
 });

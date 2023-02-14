@@ -23,7 +23,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { tracePredictionTabOptions } from "@/util";
 import { TabList, SidebarGrid, PanelCard } from "@/components/common";
 import { TraceLinkGenerator } from "@/components/traceLink";
@@ -35,7 +35,7 @@ import TracePredictionHeader from "./TracePredictionHeader.vue";
 /**
  * Tabs for predicting and approving trace links.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "TracePredictionTabs",
   components: {
     PanelCard,

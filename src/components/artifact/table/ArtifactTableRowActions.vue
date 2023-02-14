@@ -3,20 +3,20 @@
     <icon-button
       icon-id="mdi-pencil"
       :tooltip="`Edit '${artifact.name}'`"
-      @click="handleEdit(artifact)"
       data-cy="button-artifact-edit-icon"
+      @click="handleEdit(artifact)"
     />
     <icon-button
       icon-id="mdi-delete"
       :tooltip="`Delete '${artifact.name}'`"
-      @click="handleDelete(artifact)"
       data-cy="button-artifact-delete-icon"
+      @click="handleDelete(artifact)"
     />
   </flex-box>
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import { defineComponent, PropType } from "vue";
 import { ArtifactSchema } from "@/types";
 import { appStore, selectionStore } from "@/hooks";
 import { handleDeleteArtifact } from "@/api";
@@ -25,7 +25,7 @@ import { FlexBox, IconButton } from "@/components/common";
 /**
  * Represents actions for an artifact.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "ArtifactTableRowActions",
   components: {
     FlexBox,

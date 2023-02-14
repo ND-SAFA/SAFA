@@ -39,14 +39,14 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import { defineComponent, PropType } from "vue";
 import { ButtonDefinition } from "@/types";
 import { ThemeColors } from "@/util";
 
 /**
  * Renders a checkbox dropdown menu.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "CheckmarkMenu",
   props: {
     definition: Object as PropType<ButtonDefinition>,

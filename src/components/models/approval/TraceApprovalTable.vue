@@ -87,7 +87,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import {
   ApprovalType,
   FlatTraceLink,
@@ -109,7 +109,7 @@ import TraceApprovalTableHeader from "./TraceApprovalTableHeader.vue";
 /**
  * Displays a table of trace links.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "TraceApprovalTable",
   components: {
     PanelCard,
@@ -127,7 +127,7 @@ export default Vue.extend({
       groupBy: "targetName" as keyof FlatTraceLink | undefined,
       sortDesc: true,
       groupDesc: false,
-      headers: traceApprovalTableHeaders,
+      headers: traceApprovalTableHeaders as DataTableHeader<FlatTraceLink>[],
       approvalTypes: [ApprovalType.UNREVIEWED],
     };
   },

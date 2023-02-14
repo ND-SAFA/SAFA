@@ -25,7 +25,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { SelectOption } from "@/types";
 import { settingsTabOptions } from "@/util";
 import { projectStore, sessionStore } from "@/hooks";
@@ -43,7 +43,7 @@ import { SettingsMembers } from "./members";
 /**
  * Tabs for changing project settings.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "TracePredictionTabs",
   components: {
     AttributeSettings,

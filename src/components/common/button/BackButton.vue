@@ -6,13 +6,13 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import { defineComponent, PropType } from "vue";
 import { getParams, navigateBack, navigateTo, Routes } from "@/router";
 
 /**
  * A generic back button
  */
-export default Vue.extend({
+export default defineComponent({
   name: "BackButton",
   props: {
     text: {

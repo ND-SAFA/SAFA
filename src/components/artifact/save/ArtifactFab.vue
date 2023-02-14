@@ -1,13 +1,13 @@
 <template>
   <v-speed-dial
     v-if="isEditor"
+    v-model="fab"
     fixed
     bottom
     right
-    v-model="fab"
     transition="scroll-y-transition"
   >
-    <template v-slot:activator>
+    <template #activator>
       <v-btn
         v-model="fab"
         :color="isCreateLinkEnabled ? 'secondary darken-1' : 'primary'"
@@ -63,7 +63,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { appStore, layoutStore, projectStore, sessionStore } from "@/hooks";
 import { disableDrawMode, enableDrawMode } from "@/cytoscape";
 import { IconButton } from "@/components/common";
@@ -71,7 +71,7 @@ import { IconButton } from "@/components/common";
 /**
  * Displays the artifact tree action buttons.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "ArtifactFab",
   components: {
     IconButton,

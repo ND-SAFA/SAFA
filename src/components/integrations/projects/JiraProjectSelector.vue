@@ -23,7 +23,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { JiraProjectSchema } from "@/types";
 import { integrationsStore } from "@/hooks";
 import { handleLoadJiraProjects } from "@/api";
@@ -32,7 +32,7 @@ import { StepperListStep } from "@/components";
 /**
  * Allows for selecting a jira project.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "JiraProjectSelector",
   components: {
     StepperListStep,

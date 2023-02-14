@@ -15,14 +15,14 @@
       @item:delete="handleDeleteMember"
       @refresh="handleRetrieveMembers"
     >
-      <template v-slot:addItemDialogue>
+      <template #addItemDialogue>
         <settings-member-information-modal
           :is-open="isNewOpen"
           @cancel="handleConfirmAdd"
           @confirm="handleConfirmAdd"
         />
       </template>
-      <template v-slot:editItemDialogue>
+      <template #editItemDialogue>
         <settings-member-information-modal
           :is-open="isEditOpen"
           :clear-on-close="false"
@@ -36,7 +36,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { MembershipSchema, ProjectSchema, ProjectRole } from "@/types";
 import { logStore, membersStore, projectStore, sessionStore } from "@/hooks";
 import { handleDeleteMember, handleGetMembers } from "@/api";
@@ -46,7 +46,7 @@ import SettingsMemberInformationModal from "./SettingsMemberInformationModal.vue
 /**
  * List the members of given project within the settings.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "SettingsMembers",
   components: {
     PanelCard,

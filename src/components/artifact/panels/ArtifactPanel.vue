@@ -6,14 +6,14 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { appStore } from "@/hooks";
 import { ArtifactButtons, ArtifactContent } from "../display";
 
 /**
  * Displays artifact information.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "ArtifactPanel",
   components: { ArtifactContent, ArtifactButtons },
   computed: {

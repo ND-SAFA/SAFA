@@ -12,8 +12,8 @@
       value="Type in your current password to delete your account."
     />
     <password-field
-      label="Password"
       v-model="deletePassword"
+      label="Password"
       data-cy="input-delete-password"
     />
     <v-card-actions>
@@ -21,8 +21,8 @@
         outlined
         color="error"
         :disabled="!deletePassword"
-        @click="handleDeleteAccount"
         data-cy="button-delete-my-account"
+        @click="handleDeleteAccount"
       >
         Delete my account
       </v-btn>
@@ -31,14 +31,14 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { handleDeleteAccount } from "@/api";
 import { PasswordField, Typography, PanelCard } from "@/components/common";
 
 /**
  * Displays account deletion.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "DeleteAccount",
   components: {
     PanelCard,

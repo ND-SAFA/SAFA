@@ -19,7 +19,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { ArtifactLevelSchema, ModelType, GenerationModelSchema } from "@/types";
 import { handleGenerateLinks } from "@/api";
 import { Typography, CustomModelInput } from "@/components/common";
@@ -30,7 +30,7 @@ import { TraceMatrixCreator } from "../save";
  *
  * @emits `submit` - On submit.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "TraceLinkGenerator",
   components: {
     TraceMatrixCreator,
@@ -48,28 +48,6 @@ export default Vue.extend({
       model: undefined as GenerationModelSchema | undefined,
       matrices: [{ source: "", target: "" }] as ArtifactLevelSchema[],
     };
-  },
-  watch: {
-    /**
-     * Reset the state when opened.
-     */
-    isOpen(open: boolean) {
-      if (!open) return;
-
-      this.reset();
-    },
-    /**
-     * Validates that all matrices are valid on change.
-     */
-    matrices: {
-      deep: true,
-      handler() {
-        this.isValid = this.isEverythingValid;
-      },
-    },
-    model() {
-      this.isValid = this.isEverythingValid;
-    },
   },
   computed: {
     /**
@@ -93,6 +71,28 @@ export default Vue.extend({
      */
     isEverythingValid(): boolean {
       return !!this.model && this.areMatricesValid;
+    },
+  },
+  watch: {
+    /**
+     * Reset the state when opened.
+     */
+    isOpen(open: boolean) {
+      if (!open) return;
+
+      this.reset();
+    },
+    /**
+     * Validates that all matrices are valid on change.
+     */
+    matrices: {
+      deep: true,
+      handler() {
+        this.isValid = this.isEverythingValid;
+      },
+    },
+    model() {
+      this.isValid = this.isEverythingValid;
     },
   },
   methods: {

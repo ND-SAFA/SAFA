@@ -21,7 +21,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { TimArtifactLevelSchema } from "@/types";
 import { appStore, layoutStore, selectionStore } from "@/hooks";
 import {
@@ -37,7 +37,7 @@ import {
 /**
  * Displays artifact level information.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "ArtifactLevelPanel",
   components: {
     TextButton,

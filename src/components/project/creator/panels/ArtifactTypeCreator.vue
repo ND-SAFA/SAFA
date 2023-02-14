@@ -1,21 +1,21 @@
 <template>
   <flex-box v-if="isOpen" full-width y="3">
     <v-text-field
+      v-model="artifactName"
       filled
       required
       dense
-      v-model="artifactName"
       label="Artifact Type Name"
       :error-messages="errors"
-      @keydown.enter="handleEnterPress"
       data-cy="input-artifact-type"
+      @keydown.enter="handleEnterPress"
     />
     <v-btn
       :disabled="artifactName.length === 0"
-      @click="handleSubmit"
       color="primary"
       class="ml-1 mt-2"
       data-cy="button-artifact-type"
+      @click="handleSubmit"
     >
       Create Artifact Type
     </v-btn>
@@ -23,7 +23,7 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import { defineComponent, PropType } from "vue";
 import { FlexBox } from "@/components/common";
 
 /**
@@ -32,7 +32,7 @@ import { FlexBox } from "@/components/common";
  * @emits-1 `close` - On close.
  * @emits-2 `submit` (artifactName: string) - On submit.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "ArtifactTypeCreator",
   components: { FlexBox },
   props: {
@@ -50,6 +50,16 @@ export default Vue.extend({
       artifactName: "",
       errors: [] as string[],
     };
+  },
+  watch: {
+    /**
+     * Empties the artifact name when opened.
+     */
+    isOpen(open: boolean): void {
+      if (!open) return;
+
+      this.artifactName = "";
+    },
   },
   methods: {
     /**
@@ -72,16 +82,6 @@ export default Vue.extend({
     handleEnterPress(event: Event): void {
       event.preventDefault();
       this.handleSubmit();
-    },
-  },
-  watch: {
-    /**
-     * Empties the artifact name when opened.
-     */
-    isOpen(open: boolean): void {
-      if (!open) return;
-
-      this.artifactName = "";
     },
   },
 });

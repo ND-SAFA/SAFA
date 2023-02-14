@@ -5,14 +5,14 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { appStore } from "@/hooks";
 import { SaveArtifact } from "../save";
 
 /**
  * Allows for creating and editing artifacts.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "SaveArtifactPanel",
   components: { SaveArtifact },
   computed: {

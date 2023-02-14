@@ -6,9 +6,9 @@
     </div>
     <v-btn-toggle v-model="entry.iconIndex" class="my-1" borderless>
       <v-btn
-        :disabled="!allowEditing"
         v-for="option in icons"
         :key="option"
+        :disabled="!allowEditing"
         data-cy="button-type-options-icon"
         @change="handleIconChange(entry, option)"
       >
@@ -19,7 +19,7 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import { defineComponent, PropType } from "vue";
 import { TimArtifactLevelSchema } from "@/types";
 import { allTypeIcons } from "@/util";
 import { projectStore, sessionStore } from "@/hooks";
@@ -29,7 +29,7 @@ import { Typography } from "@/components/common/display";
 /**
  * Renders an input for changing the icon for an artifact type.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "TypeIconInput",
   components: { Typography },
   props: {

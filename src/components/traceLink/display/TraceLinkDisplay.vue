@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-row class="my-1" v-if="!showOnly">
+    <v-row v-if="!showOnly" class="my-1">
       <v-col cols="6">
         <artifact-body-display
           :artifact="sourceArtifact"
@@ -22,7 +22,7 @@
 
     <typography
       v-else
-      defaultExpanded
+      default-expanded
       secondary
       t="1"
       variant="expandable"
@@ -32,7 +32,7 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import { defineComponent, PropType } from "vue";
 import { ArtifactSchema, TraceLinkSchema } from "@/types";
 import { artifactStore } from "@/hooks";
 import { Typography, ArtifactBodyDisplay } from "@/components/common";
@@ -40,7 +40,7 @@ import { Typography, ArtifactBodyDisplay } from "@/components/common";
 /**
  * Displays a trace link.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "TraceLinkDisplay",
   components: {
     Typography,

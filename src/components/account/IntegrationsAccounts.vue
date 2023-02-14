@@ -5,14 +5,14 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { AuthenticationSelector } from "@/components/integrations";
 import { PanelCard } from "@/components/common";
 
 /**
  * IntegrationsAccounts.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "IntegrationsAccounts",
   components: {
     PanelCard,

@@ -28,9 +28,9 @@
           </div>
         </flex-box>
         <flex-box
-          wrap
           v-for="direction in typeDirections"
           :key="direction[0]"
+          wrap
           y="2"
           align="center"
         >
@@ -48,7 +48,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { versionToString } from "@/util";
 import { projectStore, typeOptionsStore } from "@/hooks";
 import {
@@ -61,7 +61,7 @@ import {
 /**
  * ProjectDisplay.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "ProjectDisplay",
   components: { FlexBox, PanelCard, AttributeChip, Typography },
   computed: {

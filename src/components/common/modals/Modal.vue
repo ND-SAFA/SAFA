@@ -44,7 +44,7 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import { defineComponent, PropType } from "vue";
 import { ModalSize } from "@/types";
 import { Typography } from "@/components/common/display";
 import { IconButton } from "@/components/common/button";
@@ -55,7 +55,7 @@ import { FlexBox } from "@/components/common/layout";
  *
  * @emits `close` - On close.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "Modal",
   components: {
     FlexBox,

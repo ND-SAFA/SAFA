@@ -23,7 +23,7 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import { defineComponent, PropType } from "vue";
 import { GenerationModelSchema } from "@/types";
 import { trainingTabOptions } from "@/util";
 import { TabList } from "@/components/common";
@@ -37,7 +37,7 @@ import {
 /**
  * Displays inputs for training a model.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "ModelTrainingCreator",
   components: {
     TabList,

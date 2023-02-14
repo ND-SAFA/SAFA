@@ -23,7 +23,7 @@
 
     <artifact-delta-diff
       v-if="selectedDeltaArtifact !== undefined"
-      :isOpen="selectedDeltaArtifact !== undefined"
+      :is-open="selectedDeltaArtifact !== undefined"
       :name="selectedDeltaArtifact.name"
       :input-artifact="selectedDeltaArtifact.artifact"
       :delta-type="selectedDeltaArtifact.deltaType"
@@ -33,7 +33,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { DeltaType, DeltaArtifact, ChangedArtifact } from "@/types";
 import { deltaStore, selectionStore } from "@/hooks";
 import { Typography, PanelCard } from "@/components/common";
@@ -45,7 +45,7 @@ import DeltaButtonGroup from "./DeltaButtonGroup.vue";
  *
  * @emits `open` - On open.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "ArtifactDeltas",
   components: { PanelCard, ArtifactDeltaDiff, DeltaButtonGroup, Typography },
   data() {
@@ -78,6 +78,21 @@ export default Vue.extend({
      */
     isDeltaMode(): boolean {
       return deltaStore.inDeltaView;
+    },
+  },
+  watch: {
+    /**
+     * When the delta artifacts change, set all panels to open.
+     */
+    isDeltaMode() {
+      const panels: number[] = [];
+
+      if (Object.keys(this.addedArtifacts).length > 0) panels.push(0);
+      if (Object.keys(this.removedArtifacts).length > 0) panels.push(1);
+      if (Object.keys(this.modifiedArtifacts).length > 0) panels.push(2);
+
+      this.openPanels = panels;
+      this.$emit("open");
     },
   },
   methods: {
@@ -132,21 +147,6 @@ export default Vue.extend({
      */
     handleCloseModal(): void {
       this.selectedDeltaArtifact = undefined;
-    },
-  },
-  watch: {
-    /**
-     * When the delta artifacts change, set all panels to open.
-     */
-    isDeltaMode() {
-      const panels: number[] = [];
-
-      if (Object.keys(this.addedArtifacts).length > 0) panels.push(0);
-      if (Object.keys(this.removedArtifacts).length > 0) panels.push(1);
-      if (Object.keys(this.modifiedArtifacts).length > 0) panels.push(2);
-
-      this.openPanels = panels;
-      this.$emit("open");
     },
   },
 });

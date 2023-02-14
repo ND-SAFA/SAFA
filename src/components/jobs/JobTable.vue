@@ -153,7 +153,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { JobLogSchema, JobSchema, JobStatus } from "@/types";
 import { enumToDisplay, getJobStatusColor, timestampToDisplay } from "@/util";
 import { appStore, jobStore, logStore } from "@/hooks";
@@ -169,7 +169,7 @@ import TextButton from "@/components/common/button/TextButton.vue";
 /**
  * Renders a list of jobs.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "JobTable",
   components: { TextButton, Modal, PanelCard, Typography, FlexBox },
   props: {},

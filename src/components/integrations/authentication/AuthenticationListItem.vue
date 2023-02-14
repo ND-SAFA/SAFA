@@ -42,7 +42,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { Typography, TextButton } from "@/components/common";
 import FlexBox from "@/components/common/layout/FlexBox.vue";
 
@@ -53,7 +53,7 @@ import FlexBox from "@/components/common/layout/FlexBox.vue";
  * @emits `connect` - On connect button click.
  * @emits `disconnect` - On disconnect button click.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "AuthenticationListItem",
   components: { FlexBox, TextButton, Typography },
   props: {

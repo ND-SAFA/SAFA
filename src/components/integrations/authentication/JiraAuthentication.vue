@@ -11,7 +11,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { integrationsStore } from "@/hooks";
 import {
   authorizeJira,
@@ -23,7 +23,7 @@ import AuthenticationListItem from "./AuthenticationListItem.vue";
 /**
  * Prompts the user to authenticate their Jira account.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "JiraAuthentication",
   components: {
     AuthenticationListItem,
@@ -36,6 +36,14 @@ export default Vue.extend({
       isLoading: false,
     };
   },
+  computed: {
+    /**
+     * @return Whether there are current valid credentials.
+     */
+    hasCredentials(): boolean {
+      return integrationsStore.validJiraCredentials;
+    },
+  },
   /**
    * If a Jira access code is found in the query, loads the Jira authorization token and sites
    * for the user.
@@ -46,14 +54,6 @@ export default Vue.extend({
     handleAuthorizeJira({
       onComplete: () => (this.isLoading = false),
     });
-  },
-  computed: {
-    /**
-     * @return Whether there are current valid credentials.
-     */
-    hasCredentials(): boolean {
-      return integrationsStore.validJiraCredentials;
-    },
   },
   methods: {
     /**

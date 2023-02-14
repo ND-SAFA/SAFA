@@ -26,7 +26,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { projectStore } from "@/hooks";
 import { handleUploadProjectVersion } from "@/api";
 import { SwitchInput, Typography, PanelCard } from "@/components/common";
@@ -35,7 +35,7 @@ import { ProjectFilesInput } from "../base";
 /**
  * Displays inputs for uploading a new version.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "UploadNewVersion",
   components: {
     PanelCard,

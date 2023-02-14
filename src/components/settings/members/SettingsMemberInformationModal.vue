@@ -1,22 +1,22 @@
 <template>
   <modal :is-open="isOpen" :title="modelTitle" @close="handleCancel">
-    <template v-slot:body>
+    <template #body>
       <flex-box align="center" t="4">
         <v-text-field
-          filled
           v-model="userEmail"
+          filled
           label="User Email"
           class="mr-1"
           style="min-width: 300px"
           :readonly="member !== undefined"
           :rules="emailRules"
-          @update:error="handleErrorUpdate"
           data-cy="settings-input-user-email"
+          @update:error="handleErrorUpdate"
         />
         <v-select
+          v-model="userRole"
           filled
           label="Role"
-          v-model="userRole"
           :items="projectRoles"
           item-value="id"
           item-text="name"
@@ -25,13 +25,13 @@
       </flex-box>
       <project-input v-if="!member" v-model="projectIds" multiple />
     </template>
-    <template v-slot:actions>
+    <template #actions>
       <v-spacer />
       <v-btn
         :disabled="!validated"
         color="primary"
-        @click="handleConfirm"
         data-cy="button-add-user-to-project"
+        @click="handleConfirm"
       >
         {{ buttonLabel }}
       </v-btn>
@@ -40,7 +40,7 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import { defineComponent, PropType } from "vue";
 import { MembershipSchema, ProjectRole } from "@/types";
 import { projectRoleOptions } from "@/util";
 import { projectStore } from "@/hooks";
@@ -50,7 +50,7 @@ import { Modal, FlexBox, ProjectInput } from "@/components/common";
 /**
  * The modal for sharing a project with a user.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "SettingsMemberInformation",
   components: { ProjectInput, FlexBox, Modal },
   props: {
@@ -109,6 +109,26 @@ export default Vue.extend({
       );
     },
   },
+  watch: {
+    /**
+     * Clears the modal data when opened.
+     */
+    isOpen(open: boolean) {
+      if (!open || !this.clearOnClose) return;
+
+      this.clearData();
+    },
+    /**
+     * Updates member fields when the member changes.
+     * @param newMember - The new member.
+     */
+    member(newMember: MembershipSchema | undefined): void {
+      if (!newMember) return;
+
+      this.userRole = newMember.role;
+      this.userEmail = newMember.email;
+    },
+  },
   methods: {
     /**
      * Handles any errors.
@@ -142,26 +162,6 @@ export default Vue.extend({
      */
     handleCancel() {
       this.$emit("cancel");
-    },
-  },
-  watch: {
-    /**
-     * Clears the modal data when opened.
-     */
-    isOpen(open: boolean) {
-      if (!open || !this.clearOnClose) return;
-
-      this.clearData();
-    },
-    /**
-     * Updates member fields when the member changes.
-     * @param newMember - The new member.
-     */
-    member(newMember: MembershipSchema | undefined): void {
-      if (!newMember) return;
-
-      this.userRole = newMember.role;
-      this.userEmail = newMember.email;
     },
   },
 });

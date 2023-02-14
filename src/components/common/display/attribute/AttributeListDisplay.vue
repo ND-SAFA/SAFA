@@ -1,6 +1,6 @@
 <template>
   <attribute-grid v-if="doDisplay" :layout="layout">
-    <template v-slot:item="{ attribute }">
+    <template #item="{ attribute }">
       <attribute-display
         :model="artifact.attributes || {}"
         :attribute="attribute"
@@ -10,7 +10,7 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import { defineComponent, PropType } from "vue";
 import { ArtifactSchema, AttributeLayoutSchema } from "@/types";
 import { attributesStore } from "@/hooks";
 import AttributeGrid from "./AttributeGrid.vue";
@@ -19,7 +19,7 @@ import AttributeDisplay from "./AttributeDisplay.vue";
 /**
  * Displays a list of generic attributes.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "AttributeListDisplay",
   components: { AttributeDisplay, AttributeGrid },
   props: {

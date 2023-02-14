@@ -26,7 +26,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { AttributeLayoutSchema, SelectOption } from "@/types";
 import { attributesStore } from "@/hooks";
 import { TabList, TextButton, Typography } from "@/components/common";
@@ -35,7 +35,7 @@ import SaveAttributeLayout from "./SaveAttributeLayout.vue";
 /**
  * Allows for editing attribute layouts.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "AttributeLayoutEditor",
   components: {
     TextButton,

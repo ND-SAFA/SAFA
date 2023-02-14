@@ -1,6 +1,6 @@
 <template>
-  <stepper minimal v-model="currentStep" :steps="steps" @submit="handleSubmit">
-    <template v-slot:items>
+  <stepper v-model="currentStep" minimal :steps="steps" @submit="handleSubmit">
+    <template #items>
       <v-stepper-content :step="projectStep">
         <project-selector
           minimal
@@ -24,7 +24,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import {
   OptionalProjectIdentifier,
   OptionalProjectVersion,
@@ -45,7 +45,7 @@ const SELECT_VERSION_DEFAULT_NAME = "Select a Version";
 /**
  * Presents a stepper in a modal for selecting a project and version.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "ProjectVersionList",
   components: {
     Stepper,
@@ -66,71 +66,6 @@ export default Vue.extend({
         [SELECT_VERSION_DEFAULT_NAME, false],
       ] as StepState[],
     };
-  },
-  methods: {
-    /**
-     * Clears all modal data.
-     */
-    clearData() {
-      this.selectedProject = undefined;
-      this.selectedVersion = undefined;
-      this.currentStep = this.startStep;
-    },
-    /**
-     * Selects a project.
-     * @param project - The project to select
-     * @param goToNextStep - If true, the step will be incremented.
-     */
-    selectProject(project: IdentifierSchema, goToNextStep = false) {
-      if (this.currentStep !== 1) return;
-
-      this.selectedProject = project;
-      this.unselectVersion();
-
-      Vue.set(this.steps, 0, [project.name, true]);
-
-      if (goToNextStep) this.currentStep++;
-    },
-    /**
-     * Deselects a project.
-     */
-    unselectProject() {
-      this.selectedProject = undefined;
-      Vue.set(this.steps, 0, [SELECT_PROJECT_DEFAULT_NAME, false]);
-    },
-    /**
-     * Selects a version.
-     * @param version - The version to select.
-     */
-    selectVersion(version: VersionSchema) {
-      this.selectedVersion = version;
-      Vue.set(this.steps, 1, [versionToString(version), true]);
-      this.handleSubmit();
-    },
-    /**
-     * Deselects a version.
-     */
-    unselectVersion() {
-      this.selectedVersion = undefined;
-      Vue.set(this.steps, 1, [SELECT_VERSION_DEFAULT_NAME, false]);
-    },
-    /**
-     * Submits a project version to load.
-     */
-    async handleSubmit(): Promise<void> {
-      if (this.selectedProject === undefined) {
-        logStore.onWarning("Please select a project to update.");
-      } else if (this.selectedVersion === undefined) {
-        logStore.onWarning("Please select a baseline version.");
-      } else {
-        this.isLoading = true;
-
-        await handleLoadVersion(this.selectedVersion.versionId);
-
-        this.isLoading = false;
-        this.$emit("close");
-      }
-    },
   },
   computed: {
     /**
@@ -160,6 +95,71 @@ export default Vue.extend({
         this.selectedProject !== undefined &&
         this.currentStep === this.versionStep
       );
+    },
+  },
+  methods: {
+    /**
+     * Clears all modal data.
+     */
+    clearData() {
+      this.selectedProject = undefined;
+      this.selectedVersion = undefined;
+      this.currentStep = this.startStep;
+    },
+    /**
+     * Selects a project.
+     * @param project - The project to select
+     * @param goToNextStep - If true, the step will be incremented.
+     */
+    selectProject(project: IdentifierSchema, goToNextStep = false) {
+      if (this.currentStep !== 1) return;
+
+      this.selectedProject = project;
+      this.unselectVersion();
+
+      this.steps[0] = [project.name, true];
+
+      if (goToNextStep) this.currentStep++;
+    },
+    /**
+     * Deselects a project.
+     */
+    unselectProject() {
+      this.selectedProject = undefined;
+      this.steps[0] = [SELECT_PROJECT_DEFAULT_NAME, false];
+    },
+    /**
+     * Selects a version.
+     * @param version - The version to select.
+     */
+    selectVersion(version: VersionSchema) {
+      this.selectedVersion = version;
+      this.steps[1] = [versionToString(version), true];
+      this.handleSubmit();
+    },
+    /**
+     * Deselects a version.
+     */
+    unselectVersion() {
+      this.selectedVersion = undefined;
+      this.steps[1] = [SELECT_VERSION_DEFAULT_NAME, false];
+    },
+    /**
+     * Submits a project version to load.
+     */
+    async handleSubmit(): Promise<void> {
+      if (this.selectedProject === undefined) {
+        logStore.onWarning("Please select a project to update.");
+      } else if (this.selectedVersion === undefined) {
+        logStore.onWarning("Please select a baseline version.");
+      } else {
+        this.isLoading = true;
+
+        await handleLoadVersion(this.selectedVersion.versionId);
+
+        this.isLoading = false;
+        this.$emit("close");
+      }
     },
   },
 });

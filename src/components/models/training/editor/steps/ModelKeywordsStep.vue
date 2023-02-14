@@ -20,14 +20,14 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import { defineComponent, PropType } from "vue";
 import { GenerationModelSchema } from "@/types";
 import { Typography, UnderConstructionAlert } from "@/components/common";
 
 /**
  * A step for pre-training a model with keywords and documents.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "ModelKeywordsStep",
   components: { Typography, UnderConstructionAlert },
   props: {

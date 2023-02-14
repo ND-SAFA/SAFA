@@ -1,11 +1,11 @@
 <template>
   <stepper
-    :minimal="type === 'connect'"
     v-model="currentStep"
+    :minimal="type === 'connect'"
     :steps="steps"
     @submit="handleSaveProject"
   >
-    <template v-slot:items>
+    <template #items>
       <v-stepper-content step="1">
         <authentication-selector v-model="source" />
       </v-stepper-content>
@@ -22,7 +22,7 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import { defineComponent, PropType } from "vue";
 import { StepState } from "@/types";
 import { integrationsStore } from "@/hooks";
 import {
@@ -43,7 +43,7 @@ import { JiraProjectSelector, GitHubProjectSelector } from "./projects";
  *
  * @emits-1 `submit` - On project submission.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "IntegrationsStepper",
   components: {
     JiraOrganizationSelector,
@@ -147,7 +147,7 @@ export default Vue.extend({
      * @param isValid - Whether the step is valid.
      */
     setStepIsValid(stepIndex: number, isValid: boolean): void {
-      Vue.set(this.steps, stepIndex, [this.steps[stepIndex][0], isValid]);
+      this.steps[stepIndex] = [this.steps[stepIndex][0], isValid];
     },
     /**
      * Attempts to import a project.

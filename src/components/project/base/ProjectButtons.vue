@@ -1,5 +1,5 @@
 <template>
-  <flex-box wrap b="2" v-if="doDisplay">
+  <flex-box v-if="doDisplay" wrap b="2">
     <text-button
       text
       icon-id="mdi-download"
@@ -40,7 +40,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { identifierSaveStore, projectStore, sessionStore } from "@/hooks";
 import {
   handleSaveProject,
@@ -54,7 +54,7 @@ import ConfirmProjectDelete from "./ConfirmProjectDelete.vue";
 /**
  * Displays buttons for interacting with projects.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "ProjectButtons",
   components: {
     TextButton,

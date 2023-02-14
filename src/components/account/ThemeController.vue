@@ -11,7 +11,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { useTheme } from "vuetify";
 import { LocalStorageKeys } from "@/types";
 import { PanelCard, Typography, SwitchInput } from "@/components/common";
@@ -19,7 +19,7 @@ import { PanelCard, Typography, SwitchInput } from "@/components/common";
 /**
  * ThemeController
  */
-export default Vue.extend({
+export default defineComponent({
   name: "ThemeController",
   components: { SwitchInput, PanelCard, Typography },
   setup() {

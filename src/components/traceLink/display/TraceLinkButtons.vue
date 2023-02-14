@@ -12,7 +12,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { TraceLinkSchema } from "@/types";
 import { appStore, selectionStore } from "@/hooks";
 import { FlexBox } from "@/components/common";
@@ -21,7 +21,7 @@ import { TraceLinkApproval } from "./index";
 /**
  * Displays buttons for the selected trace link.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "TraceLinkButtons",
   components: { TraceLinkApproval, FlexBox },
   computed: {

@@ -22,7 +22,7 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import { defineComponent, PropType } from "vue";
 import { ConfirmationType, ConfirmDialogueMessage } from "@/types";
 import { logStore } from "@/hooks";
 import { Typography } from "@/components/common/display";
@@ -31,7 +31,7 @@ import Modal from "./Modal.vue";
 /**
  * Displays a modal for confirming sensitive actions.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "AppConfirmModal",
   components: { Typography, Modal },
   props: {

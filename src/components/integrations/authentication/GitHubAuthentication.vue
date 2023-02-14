@@ -11,7 +11,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { integrationsStore } from "@/hooks";
 import {
   authorizeGitHub,
@@ -23,7 +23,7 @@ import AuthenticationListItem from "./AuthenticationListItem.vue";
 /**
  * Prompts the user to authenticate their GitHub account.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "GitHubAuthentication",
   components: {
     AuthenticationListItem,
@@ -36,6 +36,14 @@ export default Vue.extend({
       isLoading: false,
     };
   },
+  computed: {
+    /**
+     * @return Whether there are current valid credentials.
+     */
+    hasCredentials(): boolean {
+      return integrationsStore.validGitHubCredentials;
+    },
+  },
   /**
    * If a GitHub access code is found in the query, loads the GitHub authorization token and sites for the user.
    */
@@ -45,14 +53,6 @@ export default Vue.extend({
     handleAuthorizeGitHub({
       onComplete: () => (this.isLoading = false),
     });
-  },
-  computed: {
-    /**
-     * @return Whether there are current valid credentials.
-     */
-    hasCredentials(): boolean {
-      return integrationsStore.validGitHubCredentials;
-    },
   },
   methods: {
     /**

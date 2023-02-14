@@ -5,14 +5,14 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { appStore } from "@/hooks";
 import { ArtifactBody } from "../display";
 
 /**
  * Displays artifact content.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "ArtifactBodyPanel",
   components: { ArtifactBody },
   computed: {

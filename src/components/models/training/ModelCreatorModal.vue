@@ -1,23 +1,23 @@
 <template>
   <modal :is-open="!!isOpen" :title="modalTitle" @close="handleClose">
-    <template v-slot:body>
+    <template #body>
       <flex-box t="4">
         <v-text-field
-          filled
           v-model="editedModel.name"
+          filled
           label="Model Name"
           class="mr-1"
           hide-details
         />
         <gen-method-input
           v-if="!isUpdate"
-          only-trainable
           v-model="editedModel.baseModel"
+          only-trainable
           style="max-width: 200px"
         />
       </flex-box>
     </template>
-    <template v-slot:actions>
+    <template #actions>
       <v-spacer />
       <v-btn :disabled="!canSave" color="primary" @click="handleSave">
         Save
@@ -27,7 +27,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { GenerationModelSchema } from "@/types";
 import { modelSaveStore } from "@/hooks";
 import { handleSaveModel } from "@/api";
@@ -38,7 +38,7 @@ import { Modal, GenMethodInput, FlexBox } from "@/components/common";
  *
  * @emits-1 `close` - On close.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "ModelCreatorModal",
   components: {
     Modal,
@@ -74,6 +74,16 @@ export default Vue.extend({
       return modelSaveStore.canSave;
     },
   },
+  watch: {
+    /**
+     * Resets the modal when opened.
+     */
+    isOpen(open: boolean) {
+      if (!open) return;
+
+      modelSaveStore.resetModel();
+    },
+  },
   methods: {
     /**
      * Emits an event to close the modal.
@@ -87,16 +97,6 @@ export default Vue.extend({
     handleSave() {
       handleSaveModel({});
       this.handleClose();
-    },
-  },
-  watch: {
-    /**
-     * Resets the modal when opened.
-     */
-    isOpen(open: boolean) {
-      if (!open) return;
-
-      modelSaveStore.resetModel();
     },
   },
 });

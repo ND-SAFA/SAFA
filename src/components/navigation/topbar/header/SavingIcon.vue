@@ -1,12 +1,11 @@
 <template>
   <v-tooltip v-if="appStore.isSaving" bottom z-index="10000">
-    <template #activator="{ on, attrs }">
+    <template #activator="{ props }">
       <v-progress-circular
-        v-bind="attrs"
+        v-bind="props"
         indeterminate
         size="36"
         color="accent"
-        v-on="on"
       >
         <v-icon color="accent"> mdi-cloud-upload-outline </v-icon>
       </v-progress-circular>

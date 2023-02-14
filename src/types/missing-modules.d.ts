@@ -14,7 +14,7 @@ declare module "vue" {
 }
 
 declare module "vue-grid-layout" {
-  import Vue from "vue";
+  import { defineComponent } from "vue";
 
   export class GridLayout extends Vue {}
 

@@ -1,15 +1,15 @@
 <template>
   <v-select
+    v-model="model"
     filled
     hide-details
     label="Model"
-    v-model="model"
     :items="modelOptions"
     class="mr-2"
     item-value="id"
     item-text="id"
   >
-    <template v-slot:item="{ item }">
+    <template #item="{ item }">
       <div class="my-1">
         <typography el="div" :value="item.id" />
         <typography variant="caption" :value="item.name" />
@@ -19,7 +19,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { ModelType, SelectOption } from "@/types";
 import { traceModelOptions } from "@/util";
 import { Typography } from "@/components/common/display";
@@ -27,7 +27,7 @@ import { Typography } from "@/components/common/display";
 /**
  * A selector for trace generation methods.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "GenMethodInput",
   components: {
     Typography,

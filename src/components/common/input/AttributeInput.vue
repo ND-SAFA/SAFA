@@ -64,16 +64,15 @@
     offset-y
     min-width="auto"
   >
-    <template #activator="{ on, attrs }">
+    <template #activator="{ props }">
       <v-text-field
         v-model="model[attribute.key]"
         filled
         :label="attribute.label"
         append-icon="mdi-calendar"
         readonly
-        v-bind="attrs"
+        v-bind="props"
         class="mr-2"
-        v-on="on"
       ></v-text-field>
     </template>
     <v-date-picker
@@ -127,7 +126,7 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import { defineComponent, PropType } from "vue";
 import {
   AttributeCollectionSchema,
   AttributeSchema,
@@ -138,7 +137,7 @@ import ArtifactInput from "./ArtifactInput.vue";
 /**
  * An input for a generic attribute.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "AttributeInput",
   components: { ArtifactInput },
   props: {

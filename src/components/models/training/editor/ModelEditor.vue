@@ -13,7 +13,7 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import { defineComponent, PropType } from "vue";
 import { GenerationModelSchema } from "@/types";
 import { modelEditorTabOptions } from "@/util";
 import ModelTraining from "./ModelTraining.vue";
@@ -21,7 +21,7 @@ import ModelTraining from "./ModelTraining.vue";
 /**
  * Renders model configuration options.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "ModelEditor",
   components: { ModelTraining },
   props: {

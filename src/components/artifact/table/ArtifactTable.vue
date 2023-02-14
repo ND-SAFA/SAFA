@@ -76,7 +76,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import {
   ArtifactDeltaState,
   FlatArtifact,
@@ -104,7 +104,7 @@ import ArtifactTableDeltaChip from "./ArtifactTableDeltaChip.vue";
 /**
  * Represents a table of artifacts.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "ArtifactTable",
   components: {
     PanelCard,

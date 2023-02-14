@@ -5,21 +5,21 @@
         <typography :value="artifact.name" />
         <attribute-chip artifact-type :value="artifactType" />
       </flex-box>
-      <v-divider class="mt-1" v-if="!!displayDivider" />
+      <v-divider v-if="!!displayDivider" class="mt-1" />
     </v-list-item-title>
     <v-list-item-subtitle>
       <typography
         secondary
         variant="expandable"
         :value="artifact.body"
-        :defaultExpanded="!!displayDivider && !!displayTitle"
+        :default-expanded="!!displayDivider && !!displayTitle"
       />
     </v-list-item-subtitle>
   </v-list-item-content>
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import { defineComponent, PropType } from "vue";
 import { ArtifactSchema } from "@/types";
 import { typeOptionsStore } from "@/hooks";
 import { FlexBox } from "@/components/common/layout";
@@ -29,7 +29,7 @@ import Typography from "./Typography.vue";
 /**
  * Displays the body of an artifact that can be expanded.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "ArtifactBodyDisplay",
   components: { AttributeChip, FlexBox, Typography },
   props: {

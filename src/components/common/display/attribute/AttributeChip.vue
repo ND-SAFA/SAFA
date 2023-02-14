@@ -5,10 +5,9 @@
     z-index="12"
     :disabled="text.length < 10"
   >
-    <template v-slot:activator="{ on, attrs }">
+    <template #activator="{ props }">
       <v-chip
-        v-on="on"
-        v-bind="attrs"
+        v-bind="props"
         small
         style="max-width: 200px"
         :class="chipBlassName"
@@ -41,7 +40,8 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { computed, defineComponent } from "vue";
+import { useTheme } from "vuetify";
 import { ApprovalType } from "@/types";
 import {
   camelcaseToDisplay,
@@ -56,11 +56,14 @@ import Typography from "../Typography.vue";
 /**
  * Displays a generic chip that can render specific attributes.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "AttributeChip",
   components: { FlexBox, Typography },
   props: {
-    value: String,
+    value: {
+      type: String,
+      required: true,
+    },
     format: Boolean,
     icon: String,
     artifactType: Boolean,
@@ -97,18 +100,21 @@ export default Vue.extend({
     iconId(): string {
       return this.artifactType
         ? typeOptionsStore.getArtifactTypeIcon(this.value || "")
-        : this.icon;
+        : this.icon || "";
     },
     /**
      * @return The color to display for this chip.
      */
     displayColor(): string {
+      const theme = useTheme();
+      const darkMode = computed(() => theme.global.current.value.dark);
+
       if (this.color) {
         return this.color;
       } else if (this.confidenceScore) {
         return getScoreColor(this.value || "");
       } else if (this.enumerated) {
-        return getBackgroundColor(this.value || "", this.$vuetify.theme.dark);
+        return getBackgroundColor(this.value || "", darkMode.value);
       } else {
         return "";
       }

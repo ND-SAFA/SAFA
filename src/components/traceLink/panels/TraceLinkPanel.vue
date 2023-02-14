@@ -6,14 +6,14 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { appStore } from "@/hooks";
 import { TraceLinkButtons, TraceLinkContent } from "../display";
 
 /**
  * Displays trace link information.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "TraceLinkPanel",
   components: { TraceLinkButtons, TraceLinkContent },
   computed: {

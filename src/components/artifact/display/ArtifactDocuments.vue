@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { DocumentSchema } from "@/types";
 import { documentTypeOptions } from "@/util";
 import { documentStore, selectionStore } from "@/hooks";
@@ -26,7 +26,7 @@ import { Typography, ListItem, PanelCard } from "@/components/common";
 /**
  * Displays the selected node's documents.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "ArtifactDocuments",
   components: { PanelCard, Typography, ListItem },
   computed: {

@@ -11,7 +11,7 @@
       <typography :value="target.name" />
     </v-chip>
     <div v-else class="show-on-hover">
-      <div @click.stop class="width-fit">
+      <div class="width-fit" @click.stop>
         <icon-button
           icon-id="mdi-plus"
           tooltip="Create trace link"
@@ -23,7 +23,7 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import { defineComponent, PropType } from "vue";
 import { ArtifactSchema, TraceLinkSchema, TraceType } from "@/types";
 import { appStore, selectionStore, subtreeStore, traceStore } from "@/hooks";
 import { Typography, IconButton } from "@/components/common";
@@ -31,7 +31,7 @@ import { Typography, IconButton } from "@/components/common";
 /**
  * Renders a chip representing a trace link between two artifacts.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "TraceMatrixChip",
   components: {
     IconButton,

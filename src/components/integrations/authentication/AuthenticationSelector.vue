@@ -14,7 +14,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { StepperListStep, UnderConstructionAlert } from "@/components/common";
 import JiraAuthentication from "./JiraAuthentication.vue";
 import GitHubAuthentication from "./GitHubAuthentication.vue";
@@ -24,7 +24,7 @@ import GitHubAuthentication from "./GitHubAuthentication.vue";
  *
  * @emits-1 `input` ("Jira" | "GitHub") - on source change.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "AuthenticationSelector",
   components: {
     GitHubAuthentication,

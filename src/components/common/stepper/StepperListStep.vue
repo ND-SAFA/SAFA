@@ -23,13 +23,13 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { Typography } from "@/components/common/display";
 
 /**
  * Presents a list in a stepper workflow for item selection.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "StepperListStep",
   components: { Typography },
   props: {

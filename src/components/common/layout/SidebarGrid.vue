@@ -13,13 +13,13 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 
 /**
  * Represents a grid with a sidebar that changes
  * to a stacked representation at smaller screen sizes.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "SidebarGrid",
 });
 </script>

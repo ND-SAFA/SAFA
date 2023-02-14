@@ -8,14 +8,14 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { ProjectFilesUploader } from "@/components/project/base";
 import { PanelCard } from "@/components/common";
 
 /**
  * Allows for creating a project with a bulk upload.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "ProjectBulkUpload",
   components: {
     PanelCard,

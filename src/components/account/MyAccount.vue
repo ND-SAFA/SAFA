@@ -30,7 +30,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { handleLogout } from "@/api";
 import { Typography, FlexBox, TextButton } from "@/components/common";
 import ExternalLinks from "./ExternalLinks.vue";
@@ -42,7 +42,7 @@ import ThemeController from "./ThemeController.vue";
 /**
  * Displays information on the current user.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "MyAccount",
   components: {
     TextButton,

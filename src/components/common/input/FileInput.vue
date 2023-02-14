@@ -1,5 +1,6 @@
 <template>
   <v-file-input
+    v-model="model"
     clearable
     filled
     small-chips
@@ -7,7 +8,6 @@
     :multiple="multiple"
     truncate-length="30"
     class="mt-4"
-    v-model="model"
     :data-cy="dataCy"
     :error-messages="errors"
     @click:clear="$emit('clear')"
@@ -15,7 +15,7 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import { defineComponent, PropType } from "vue";
 
 /**
  * Displays a generic file selector.
@@ -23,7 +23,7 @@ import Vue, { PropType } from "vue";
  * @emits-1 `clear` - On clear.
  * @emits-2 `input` (File[] | File | null) - On file change.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "FileInput",
   props: {
     value: Array as PropType<File[] | File | null>,

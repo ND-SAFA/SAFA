@@ -12,14 +12,14 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { Typography } from "@/components/common";
 import JobTable from "./JobTable.vue";
 
 /**
  * Displays all upload jobs.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "JobDisplay",
   components: { Typography, JobTable },
   props: {},

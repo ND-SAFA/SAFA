@@ -1,20 +1,20 @@
 <template>
   <modal :is-open="!!isOpen" title="Share Model" @close="handleClose">
-    <template v-slot:body>
+    <template #body>
       <flex-box column t="4">
         <project-input v-model="projectId" exclude-current-project />
         <v-select
+          v-model="shareMethod"
           filled
           hide-details
           label="Share Method"
-          v-model="shareMethod"
           :items="shareMethods"
           item-value="id"
           item-text="name"
         />
       </flex-box>
     </template>
-    <template v-slot:actions>
+    <template #actions>
       <v-spacer />
       <v-btn :disabled="!canSave" color="primary" @click="handleSave">
         Share
@@ -24,7 +24,7 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import { defineComponent, PropType } from "vue";
 import {
   IdentifierSchema,
   ModelShareType,
@@ -40,7 +40,7 @@ import { FlexBox, Modal, ProjectInput } from "@/components/common";
  *
  * @emits-1 `close` - On close.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "ModelShareModal",
   components: {
     ProjectInput,
@@ -72,6 +72,17 @@ export default Vue.extend({
       return this.projectId !== "" && !!this.model;
     },
   },
+  watch: {
+    /**
+     * Resets the modal when opened.
+     */
+    isOpen(open: boolean) {
+      if (!open) return;
+
+      this.projectId = "";
+      this.shareMethod = ModelShareType.CLONE;
+    },
+  },
   methods: {
     /**
      * Emits an event to close the modal.
@@ -88,17 +99,6 @@ export default Vue.extend({
       handleShareModel(this.projectId, this.model, this.shareMethod);
 
       this.handleClose();
-    },
-  },
-  watch: {
-    /**
-     * Resets the modal when opened.
-     */
-    isOpen(open: boolean) {
-      if (!open) return;
-
-      this.projectId = "";
-      this.shareMethod = ModelShareType.CLONE;
     },
   },
 });

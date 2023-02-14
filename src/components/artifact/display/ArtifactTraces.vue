@@ -97,7 +97,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent } from "vue";
 import { ArtifactSchema } from "@/types";
 import {
   appStore,
@@ -118,7 +118,7 @@ import {
 /**
  * Displays the selected node's parents and children.
  */
-export default Vue.extend({
+export default defineComponent({
   name: "ArtifactTraces",
   components: {
     FlexBox,

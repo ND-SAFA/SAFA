@@ -106,6 +106,9 @@ class ScriptAnalyzer:
                 step.update_output_path(step_output_dir)
                 for job in step.jobs:
                     output_file_path = os.path.join(job.job_args.output_dir, OUTPUT_FILENAME)
+                    if not os.path.isfile(output_file_path):
+                        continue
+                        
                     job_output = JsonUtil.read_json_file(output_file_path)
 
                     if JobResult.PREDICTION_OUTPUT in job_output:

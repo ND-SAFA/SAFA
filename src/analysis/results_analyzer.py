@@ -23,7 +23,6 @@ class ResultsAnalyzer:
 
     MIS_PREDICTED_N_PER_CATEGORY = "mis_predicted_n_per_category"
     CORRECTLY_PREDICTED_N_PER_CATEGORY = "correctly_predicted_n_per_category"
-    OUTPUT_FILENAME = "results_analysis.json"
 
     def __init__(self, prediction_output: TracePredictionOutput, dataset: TraceDataset, model_manager: ModelManager = None):
         """
@@ -53,7 +52,6 @@ class ResultsAnalyzer:
 
         summary: JobSummaryMetrics = JobSummaryMetrics(mis_predicted_n_per_category=mis_predicted_n_per_category,
                                                        correctly_predicted_n_per_category=correct_n_per_category)
-
         return JobAnalysis(summary=summary, mis_link_collection=mis_link_collection_analysis,
                            correct_link_collection=correct_link_collection_analysis)
 

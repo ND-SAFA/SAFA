@@ -11,7 +11,7 @@ from analysis.word_tools import WordCounter
 from data.tree.artifact import Artifact
 from data.tree.trace_link import TraceLink
 from models.model_manager import ModelManager
-from scripts.modules.analysis_types import JobAnalysis, LinkAnalysis
+from scripts.modules.analysis_types import JobAnalysis, LinkMetrics
 from util.file_util import FileUtil
 
 nltk.download('wordnet', quiet=True)
@@ -46,7 +46,7 @@ class LinkAnalyzer:
         self.word_counts = [WordCounter(vocab).filter_stop_words() for vocab in self.vocabs]
         self.model_manager = model_manager
         self.__analysis: JobAnalysis = None
-        self.__link_analysis: LinkAnalysis = None
+        self.__link_analysis: LinkMetrics = None
         self._lock = Lock()
 
     def get_category_counts(self) -> Dict[str, int]:
@@ -60,7 +60,7 @@ class LinkAnalyzer:
             analysis_counts[analysis] = n
         return analysis_counts
 
-    def get_link_info(self) -> LinkAnalysis:
+    def get_link_info(self) -> LinkMetrics:
         """
         :return: Returns the link analysis.
         """

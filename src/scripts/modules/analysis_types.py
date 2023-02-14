@@ -1,14 +1,17 @@
 from typing import Dict, List, TypedDict
 
 
-class LinkAnalysis(TypedDict):
+class LinkMetrics(TypedDict):
+    """
+    The metrics calculated for a link.
+    """
     artifact_tokens: List[str]
     link_true_label: int
     analysis: Dict
     categories: List[str]
 
 
-LinkCollectionAnalysis = Dict[str, LinkAnalysis]
+LinkCollectionAnalysis = Dict[str, LinkMetrics]
 JobCollection = Dict[str, Dict[int, List[str]]]
 
 

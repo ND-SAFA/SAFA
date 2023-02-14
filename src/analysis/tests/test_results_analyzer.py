@@ -6,7 +6,7 @@ from data.datasets.trace_dataset import TraceDataset
 from data.tree.artifact import Artifact
 from data.tree.trace_link import TraceLink
 from models.model_manager import ModelManager
-from scripts.modules.analysis_types import JobAnalysis, LinkAnalysis, LinkCollectionAnalysis
+from scripts.modules.analysis_types import JobAnalysis, LinkCollectionAnalysis, LinkMetrics
 from testres.base_trace_test import BaseTraceTest
 from testres.test_assertions import TestAssertions
 from train.trace_output.trace_prediction_output import TracePredictionOutput
@@ -70,7 +70,7 @@ class TestResultsAnalyzer(BaseTraceTest):
         expected_n_per_category = {LinkAnalyzer.SHARED_SYNONYMS_AND_ANTONYMS: 2, LinkAnalyzer.COMMON_WORDS: 1,
                                    LinkAnalyzer.OOV_WORDS: 4, LinkAnalyzer.MISSPELLED_WORDS: 4}
         categorizations: LinkCollectionAnalysis = {
-            link_id: LinkAnalysis(categories=categories + [LinkAnalyzer.MISSPELLED_WORDS, LinkAnalyzer.OOV_WORDS])
+            link_id: LinkMetrics(categories=categories + [LinkAnalyzer.MISSPELLED_WORDS, LinkAnalyzer.OOV_WORDS])
             for link_id, categories in self.EXPECTED_CATEGORIZATIONS.items()}
         n_per_category = analyzer._get_n_per_category(categorizations)
         self.assertDictEqual(expected_n_per_category, n_per_category)

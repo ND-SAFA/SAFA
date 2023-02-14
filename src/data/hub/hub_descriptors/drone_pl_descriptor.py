@@ -4,7 +4,7 @@ from data.hub.abstract_dataset_descriptor import AbstractDatasetDescriptor
 from util.override import overrides
 
 
-class DroneDescriptor(AbstractDatasetDescriptor):
+class DronePLDescriptor(AbstractDatasetDescriptor):
     """
     Describes the DroneResponse project reader.
     """
@@ -25,10 +25,6 @@ class DroneDescriptor(AbstractDatasetDescriptor):
         """
         return {
             "artifacts": {
-                "Requirements": {
-                    "path": "Originals/Definitions/requirements.csv",
-                    "cols": "artifacts"
-                },
                 "Design Definitions": {
                     "path": "Originals/Definitions/designdefinitions.csv",
                     "cols": "artifacts"
@@ -43,15 +39,6 @@ class DroneDescriptor(AbstractDatasetDescriptor):
                     "source": "Design Definitions",
                     "target": "Code",
                     "path": "Originals/TraceMatrices/dd2codematrix.txt",
-                    "cols": "traces",
-                    "params": {
-                        "sep": " "
-                    }
-                },
-                "reqs2DDMatrix.csv": {
-                    "source": "Requirements",
-                    "target": "Design Definitions",
-                    "path": "Originals/TraceMatrices/reqs2DDmatrix.txt",
                     "cols": "traces",
                     "params": {
                         "sep": " "

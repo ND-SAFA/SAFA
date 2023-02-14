@@ -1,5 +1,6 @@
 import itertools
 import os
+import subprocess
 from typing import Dict, Iterator, List, Set, Tuple
 
 from analysis.results_analyzer import ResultsAnalyzer
@@ -62,12 +63,14 @@ class ScriptAnalyzer:
                         continue
                     intersecting_links = analyzer_a.mis_predictions_intersection(analyzer_b)
                     intersection_analysis[project][random_seed][analysis_id] = intersecting_links
-
-        output_path = os.path.join(self.output_dir, f"{self.name}.json")
+        file_name = f"{self.name}.json"
+        output_path = os.path.join(self.output_dir, file_name)
         final_analysis = MultiJobAnalysis(jobs=self.jobs,
                                           job_analysis=self.link_analysis_store,
                                           intersections=intersection_analysis)
         FileUtil.write(final_analysis, output_path)
+        if "BUCKET" in os.environ:
+            subprocess.run(["aws", "s3", "cp", output_path, f"s3://safa-datasets-open/results/analysis/{file_name}"])
         logger.info(f"Analysis written to: {output_path}")
 
     def analyze_job(self, job, job_output) -> None:

@@ -81,7 +81,7 @@ class TestResultsAnalyzer(BaseTraceTest):
 
     def test_analyze_links(self):
         analyzer = self.get_results_analyzer()
-        link_categorizations = analyzer._analyze_links(links=set(self.ALL_LINKS), common_words_threshold=0.2)
+        link_categorizations = analyzer._analyze_link_collection(links=set(self.ALL_LINKS), common_words_threshold=0.2)
         self.assertEquals(len(link_categorizations), len(self.ALL_LINKS))
         for link_id, categories in link_categorizations.items():
             expected_categories = self.EXPECTED_CATEGORIZATIONS[link_id] + [LinkAnalyzer.MISSPELLED_WORDS, LinkAnalyzer.OOV_WORDS]

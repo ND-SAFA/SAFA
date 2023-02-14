@@ -4,10 +4,11 @@ from typing import Any, Dict, List, Set, Tuple
 from tqdm import tqdm
 
 from analysis.link_analyzer import LinkAnalyzer
-from constants import LINK_COMMON_WORDS_THRESHOLD_DEFAULT, SAVE_LINK_ANALYSIS_DEFAULT, THRESHOLD_DEFAULT
+from constants import LINK_COMMON_WORDS_THRESHOLD_DEFAULT, THRESHOLD_DEFAULT
 from data.datasets.trace_dataset import TraceDataset
 from data.tree.trace_link import TraceLink
 from models.model_manager import ModelManager
+from scripts.modules.analysis_types import JobAnalysis, JobSummaryMetrics, LinkCollectionAnalysis
 from train.trace_output.trace_prediction_output import TracePredictionOutput
 from util.file_util import FileUtil
 from util.json_util import JsonUtil
@@ -36,28 +37,26 @@ class ResultsAnalyzer:
         self.model_manager = model_manager
         self.mis_predicted_links, self.correctly_predicted_links = self._get_mis_and_correctly_predicted_links(dataset)
 
-    def analyze_and_save(self, output_dir: str, save_link_analysis: bool = SAVE_LINK_ANALYSIS_DEFAULT,
-                         common_words_threshold: float = LINK_COMMON_WORDS_THRESHOLD_DEFAULT) -> str:
+    def analyze(self, common_words_threshold: float = LINK_COMMON_WORDS_THRESHOLD_DEFAULT) -> JobAnalysis:
         """
         Analyzes and saves the results of the prediction
-        :param output_dir: The directory to output the results to
-        :param save_link_analysis: If True, saves each individual link analysis
         :param common_words_threshold: % of total artifact words, above which link counts as sharing common words b/w artifacts
         :return: The path where the results were saved
         """
-        mis_predicted_link_categorizations = self._analyze_links(links=self.mis_predicted_links,
-                                                                 output_dir=output_dir if save_link_analysis else None,
-                                                                 common_words_threshold=common_words_threshold)
-        mis_predicted_n_per_category = self._get_n_per_category(mis_predicted_link_categorizations)
-        correctly_predicted_link_categorizations = self._analyze_links(links=self.correctly_predicted_links,
-                                                                       common_words_threshold=common_words_threshold)
-        correct_n_per_category = self._get_n_per_category(correctly_predicted_link_categorizations)
+        # Generate collection analysis
+        mis_link_collection_analysis = self._analyze_link_collection(links=self.mis_predicted_links,
+                                                                     common_words_threshold=common_words_threshold)
+        correct_link_collection_analysis = self._analyze_link_collection(links=self.correctly_predicted_links,
+                                                                         common_words_threshold=common_words_threshold)
+        # Create summary statistics
+        mis_predicted_n_per_category = self._get_n_per_category(mis_link_collection_analysis)
+        correct_n_per_category = self._get_n_per_category(correct_link_collection_analysis)
 
-        analysis = {self.MIS_PREDICTED_LINK_CATEGORIZATIONS: mis_predicted_link_categorizations,
-                    self.MIS_PREDICTED_N_PER_CATEGORY: mis_predicted_n_per_category,
-                    self.CORRECTLY_PREDICTED_N_PER_CATEGORY: correct_n_per_category
-                    }
-        return self._save(analysis, output_dir)
+        summary: JobSummaryMetrics = JobSummaryMetrics(mis_predicted_n_per_category=mis_predicted_n_per_category,
+                                                       correctly_predicted_n_per_category=correct_n_per_category)
+
+        return JobAnalysis(summary=summary, mis_link_collection=mis_link_collection_analysis,
+                           correct_link_collection=correct_link_collection_analysis)
 
     def mis_predictions_intersection(self, other: "ResultsAnalyzer") -> Set[int]:
         """
@@ -87,43 +86,46 @@ class ResultsAnalyzer:
         return filepath
 
     @staticmethod
-    def _get_n_per_category(link_categorizations: LINK_CATEGORIZATIONS) -> Dict[str, int]:
+    def _get_n_per_category(link_categorizations: LinkCollectionAnalysis) -> Dict[str, int]:
         """
         Gets the counts for each category that the mis-predicted links fall into
         :param link_categorizations: Dictionary mapping link id to the categories it falls into
         :return: A dictionary mapping category to the number of links in that category
         """
         n_per_category = {}
-        for link, categories in link_categorizations.items():
-            for category in categories:
+        for link_id, link_analysis in link_categorizations.items():
+            for category in link_analysis["categories"]:
                 if category not in n_per_category:
                     n_per_category[category] = 0
                 n_per_category[category] += 1
         return n_per_category
 
-    def _analyze_links(self, links: Set[TraceLink], common_words_threshold: float, output_dir: str = None) -> LINK_CATEGORIZATIONS:
+    def _analyze_link_collection(self, links: Set[TraceLink], common_words_threshold: float) -> LinkCollectionAnalysis:
         """
-        Analyzes all mis predicted links
-        :param links: links to analyze
+        Analyzes all mis predicted trace links.
+        :param links: trace links. to analyze
         :param common_words_threshold: % of total artifact words, above which link counts as sharing common words b/w artifacts
-        :param output_dir: If provided saves the output if the link analysis to the directory
         :return: A dictionary mapping link id to the category it falls into
         """
-        link_categorizations = {}
+        link_collection_analysis: LinkCollectionAnalysis = {}
         for link in tqdm(links, desc="Categorizing predicted links"):
-            link_categorizations[link.id] = []
-            analyzer = LinkAnalyzer(link, self.model_manager)
-            analysis_counts = analyzer.get_analysis_counts()
-            total_words = sum([wc.total() for wc in analyzer.word_counts])
+            link_categories = []
+            link_analyzer = LinkAnalyzer(link, self.model_manager)
+            analysis_counts = link_analyzer.get_category_counts()
+            total_words = sum([wc.total() for wc in link_analyzer.word_counts])
             shares_common_words = analysis_counts.pop(LinkAnalyzer.COMMON_WORDS) >= total_words * common_words_threshold
             if shares_common_words:
-                link_categorizations[link.id].append(LinkAnalyzer.COMMON_WORDS)
-            for analysis, count in analysis_counts.items():
+                link_categories.append(LinkAnalyzer.COMMON_WORDS)
+            for category, count in analysis_counts.items():
                 if count > 0:
-                    link_categorizations[link.id].append(analysis)
-            if output_dir:
-                analyzer.save(output_dir)
-        return link_categorizations
+                    link_categories.append(category)
+
+            link_collection_analysis[link.id] = {
+                **link_analyzer.get_link_info(),
+                "categories": link_categories
+            }
+
+        return link_collection_analysis
 
     def _get_mis_and_correctly_predicted_links(self, dataset: TraceDataset) -> Tuple[Set[TraceLink], Set[TraceLink]]:
         """
@@ -133,7 +135,7 @@ class ResultsAnalyzer:
         """
         mis_predicted_links = set()
         correctly_predicted_links = set()
-        for i, (source_id, target_id) in enumerate(self.prediction_output.source_target_pairs):
+        for i, (source_id, target_id) in enumerate(self.prediction_output.source_target_pairs[:10]):
             trace_link_id = TraceLink.generate_link_id(source_id, target_id)
             link = dataset.links[trace_link_id]
             pred_label = self.prediction_output.predictions[i] > THRESHOLD_DEFAULT

@@ -18,7 +18,7 @@ class TestLinkAnalyzer(BaseTest):
 
     def test_get_analysis_counts(self):
         analyzer = self.get_link_analyzer()
-        analysis = analyzer.get_analysis_counts()
+        analysis = analyzer.get_category_counts()
         for analysis_name in self.EXPECTED_COUNTS.keys():
             self.assertIn(analysis_name, analysis)
             self.assertEquals(analysis[analysis_name], self.EXPECTED_COUNTS[analysis_name])

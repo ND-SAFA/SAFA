@@ -3,37 +3,22 @@
     {
       "jobs": [
         {
-          "object_type": "TRAIN",
+          "object_type": "VSM",
           "job_args": {
             "random_seed": {
               "*": [
-                645,
-                1231
+                812,
+                234,
+                645
               ]
             }
           },
-          "model_manager": {
-            "model_path": {
-              "*": [
-                "prajjwal1/bert-mini",
-                "prajjwal1/bert-tiny"
-              ]
-            }
-          },
-          "trainer_args": {
-            "num_train_epochs": 1,
-            "per_device_train_batch_size": 4,
-            "gradient_accumulation_steps": 16,
-            "learning_rate": 5e-5,
-            "metrics": [
-              "map",
-              "map_at_k",
-              "f",
-              "precision"
-            ],
-            "skip_save": false,
-            "load_best_model_at_end": true
-          },
+          "metrics": [
+            "map",
+            "map_at_k",
+            "f",
+            "precision"
+          ],
           "trainer_dataset_manager": {
             "deterministic_id": 42,
             "train_dataset_creator": {
@@ -43,7 +28,8 @@
                 "name": {
                   "*": [
                     "mip",
-                    "cm1"
+                    "cm1",
+                    "Drone"
                   ]
                 }
               }
@@ -51,12 +37,12 @@
             "val_dataset_creator": {
               "object_type": "SPLIT",
               "split_strategy": "SPLIT_BY_LINK",
-              "val_percentage": 0.70
+              "val_percentage": 0.10
             },
             "eval_dataset_creator": {
               "object_type": "SPLIT",
               "split_strategy": "SPLIT_BY_LINK",
-              "val_percentage": 0.25
+              "val_percentage": 0.55
             },
             "augmenter": {
               "steps": [

@@ -1,4 +1,5 @@
 import os
+from threading import Lock
 from typing import Any, Dict, List, Set, Tuple
 
 import nltk
@@ -10,9 +11,13 @@ from analysis.word_tools import WordCounter
 from data.tree.artifact import Artifact
 from data.tree.trace_link import TraceLink
 from models.model_manager import ModelManager
+from scripts.modules.analysis_types import JobAnalysis, LinkMetrics
 from util.file_util import FileUtil
 
 nltk.download('wordnet', quiet=True)
+next(wn.all_synsets())
+next(wn.all_lemma_names())
+wn.ensure_loaded()
 
 
 class LinkAnalyzer:
@@ -40,9 +45,11 @@ class LinkAnalyzer:
         self.vocabs = [self.get_artifact_vocab(link.source), self.get_artifact_vocab(link.target)]
         self.word_counts = [WordCounter(vocab).filter_stop_words() for vocab in self.vocabs]
         self.model_manager = model_manager
-        self.__analysis = None
+        self.__analysis: JobAnalysis = None
+        self.__link_analysis: LinkMetrics = None
+        self._lock = Lock()
 
-    def get_analysis_counts(self) -> Dict[str, int]:
+    def get_category_counts(self) -> Dict[str, int]:
         """
         Gets the counts of all analyzed words
         :return: A dictionary mapping analysis name and the result
@@ -53,16 +60,34 @@ class LinkAnalyzer:
             analysis_counts[analysis] = n
         return analysis_counts
 
+    def get_link_info(self) -> LinkMetrics:
+        """
+        :return: Returns the link analysis.
+        """
+        if self.__link_analysis is None:
+            analysis = self.get_analysis()
+            for name, result in analysis.items():
+                if isinstance(result, WordCounter):
+                    analysis[name] = result.as_dict()
+            self.__link_analysis = {
+                self.ARTIFACT_TOKENS: [self.link.source.token, self.link.target.token],
+                self.LINK_TRUE_LABEL: self.link.get_label(),
+                self.ANALYSIS: analysis
+            }
+        return self.__link_analysis
+
     def get_analysis(self) -> Dict[str, Any]:
         """
         Gets the counts of all analyzed words
         :return: A dictionary mapping analysis name and the result
         """
         if self.__analysis is None:
-            self.__analysis = {self.COMMON_WORDS: self.get_words_in_common(),
-                               self.MISSPELLED_WORDS: self.get_misspelled_words(),
-                               self.SHARED_SYNONYMS_AND_ANTONYMS: self.get_shared_synonyms_and_antonyms(),
-                               self.OOV_WORDS: self.get_oov_words()}
+            self.__analysis = {
+                self.COMMON_WORDS: self.get_words_in_common(),
+                self.MISSPELLED_WORDS: self.get_misspelled_words(),
+                self.SHARED_SYNONYMS_AND_ANTONYMS: self.get_shared_synonyms_and_antonyms(),
+                self.OOV_WORDS: self.get_oov_words()
+            }
         return self.__analysis
 
     def save(self, output_dir: str) -> str:
@@ -72,13 +97,7 @@ class LinkAnalyzer:
         :return: The full filepath where the output was saved
         """
         output_file_path = os.path.join(output_dir, self.OUTPUT_FILENAME.format(str(self.link.id)))
-        analysis = self.get_analysis()
-        for name, result in analysis.items():
-            if isinstance(result, WordCounter):
-                analysis[name] = result.as_dict()
-        output_dict = {self.ARTIFACT_TOKENS: [self.link.source.token, self.link.target.token],
-                       self.LINK_TRUE_LABEL: self.link.get_label(),
-                       self.ANALYSIS: analysis}
+        output_dict = self.get_link_info()
         FileUtil.write(output_dict, output_file_path)
         return output_file_path
 
@@ -143,6 +162,8 @@ class LinkAnalyzer:
         antonyms = set()
         for word in vocab:
             for synset in wn.synsets(word):
+                if synset is None:
+                    continue
                 for lemma in synset.lemmas():
                     if lemma.name() != word:
                         synonyms.add(lemma.name())

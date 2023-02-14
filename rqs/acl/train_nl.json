@@ -45,7 +45,7 @@
                   "*": [
                     "mip",
                     "cm1",
-                    "Drone"
+                    "drone_nl"
                   ]
                 }
               }

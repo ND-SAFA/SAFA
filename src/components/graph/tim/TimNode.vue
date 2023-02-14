@@ -1,42 +1,38 @@
 <template>
-  <cy-element :definition="definition" />
+  <cy-element3 :definition="definition" />
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { GraphMode, GraphElementType, TimNodeCytoElement } from "@/types";
-
 /**
  * Renders a TIM node within the graph.
  */
-export default Vue.extend({
+export default {
   name: "TimNode",
-  props: {
-    artifactType: {
-      type: String,
-      required: true,
-    },
-    count: {
-      type: Number,
-      required: true,
-    },
+};
+</script>
+
+<script setup lang="ts">
+import { defineProps, computed } from "vue";
+import { useTheme } from "vuetify";
+import { GraphMode, GraphElementType, TimNodeCytoElement } from "@/types";
+import { CyElement3 } from "../base";
+
+const props = defineProps<{
+  artifactType: string;
+  count: number;
+}>();
+
+const theme = useTheme();
+const darkMode = computed(() => theme.global.current.value.dark);
+
+const definition = computed<TimNodeCytoElement>(() => ({
+  data: {
+    type: GraphElementType.node,
+    graph: GraphMode.tim,
+    id: props.artifactType.replace(/ /g, ""),
+    artifactType: props.artifactType,
+    count: props.count,
+    dark: darkMode.value,
   },
-  computed: {
-    /**
-     * @return The cytoscape definition of this artifact.
-     */
-    definition(): TimNodeCytoElement {
-      return {
-        data: {
-          type: GraphElementType.node,
-          graph: GraphMode.tim,
-          id: this.artifactType.replace(/ /g, ""),
-          artifactType: this.artifactType,
-          count: this.count,
-          dark: this.$vuetify.theme.dark,
-        },
-      };
-    },
-  },
-});
+}));
 </script>

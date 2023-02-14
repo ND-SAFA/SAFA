@@ -1,83 +1,67 @@
 <template>
-  <cy-element :definition="definition" />
+  <cy-element3 :definition="definition" />
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
-import {
-  ArtifactSchema,
-  ArtifactCytoElement,
-  ArtifactDeltaState,
-  GraphMode,
-  GraphElementType,
-} from "@/types";
-import {
-  warningStore,
-  deltaStore,
-  subtreeStore,
-  selectionStore,
-} from "@/hooks";
-
 /**
  * Renders an artifact node within the graph.
  */
-export default Vue.extend({
+export default {
   name: "ArtifactNode",
-  props: {
-    artifact: {
-      type: Object as PropType<ArtifactSchema>,
-      required: true,
-    },
-    hidden: Boolean,
-    faded: Boolean,
-  },
-  computed: {
-    /**
-     * @return Whether the current artifact is selected.
-     */
-    isSelected(): boolean {
-      return selectionStore.isArtifactInSelected(this.artifact.id);
-    },
-    /**
-     * @return The delta state of this artifact.
-     */
-    artifactDeltaState(): ArtifactDeltaState {
-      return deltaStore.getArtifactDeltaType(this.artifact.id);
-    },
-    /**
-     * @return The cytoscape definition of this artifact.
-     */
-    definition(): ArtifactCytoElement {
-      const { id, body, type, name, safetyCaseType, logicType } = this.artifact;
-      const warnings = warningStore.artifactWarnings[id] || [];
-      const hiddenChildren = subtreeStore.getHiddenChildren(id);
-      const hiddenChildWarnings =
-        warningStore.getArtifactWarnings(hiddenChildren);
-      const hiddenChildDeltaStates =
-        deltaStore.getArtifactDeltaStates(hiddenChildren);
-      const opacity = this.hidden ? 0 : this.faded ? 0.3 : 1;
+};
+</script>
 
-      return {
-        data: {
-          type: GraphElementType.node,
-          graph: GraphMode.tree,
-          id,
-          body,
-          artifactName: name,
-          warnings,
-          artifactType: type,
-          artifactDeltaState: this.artifactDeltaState,
-          isSelected: this.isSelected,
-          opacity,
-          hiddenChildren: hiddenChildren.length,
-          childWarnings: hiddenChildWarnings,
-          childDeltaStates: hiddenChildDeltaStates,
-          safetyCaseType,
-          logicType,
-          dark: this.$vuetify.theme.dark,
-        },
-      };
+<script setup lang="ts">
+import { computed, defineProps } from "vue";
+import { useTheme } from "vuetify";
+import { ArtifactSchema, GraphElementType, GraphMode } from "@/types";
+import {
+  deltaStore,
+  selectionStore,
+  subtreeStore,
+  warningStore,
+} from "@/hooks";
+import { CyElement3 } from "../base";
+
+const props = defineProps<{
+  artifact: ArtifactSchema;
+  hidden?: boolean;
+  faded?: boolean;
+}>();
+
+const theme = useTheme();
+const darkMode = computed(() => theme.global.current.value.dark);
+
+const definition = computed(() => {
+  const { id, body, type, name, safetyCaseType, logicType } = props.artifact;
+  const warnings = warningStore.artifactWarnings[id] || [];
+  const hiddenChildren = subtreeStore.getHiddenChildren(id);
+  const hiddenChildWarnings = warningStore.getArtifactWarnings(hiddenChildren);
+  const hiddenChildDeltaStates =
+    deltaStore.getArtifactDeltaStates(hiddenChildren);
+  const artifactDeltaState = deltaStore.getArtifactDeltaType(id);
+  const isSelected = selectionStore.isArtifactInSelected(id);
+  const opacity = props.hidden ? 0 : props.faded ? 0.3 : 1;
+
+  return {
+    data: {
+      type: GraphElementType.node,
+      graph: GraphMode.tree,
+      id,
+      body,
+      artifactName: name,
+      warnings,
+      artifactType: type,
+      artifactDeltaState,
+      isSelected,
+      opacity,
+      hiddenChildren: hiddenChildren.length,
+      childWarnings: hiddenChildWarnings,
+      childDeltaStates: hiddenChildDeltaStates,
+      safetyCaseType,
+      logicType,
+      dark: darkMode.value,
     },
-  },
+  };
 });
 </script>

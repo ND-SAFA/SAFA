@@ -9,7 +9,7 @@
       x="4"
     />
     <v-select
-      v-if="!isProjectDefined"
+      v-if="isProjectDefined"
       variant="outlined"
       hide-details
       density="compact"

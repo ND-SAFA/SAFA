@@ -1,61 +1,45 @@
 <template>
-  <cy-element :definition="definition" />
+  <cy-element3 :definition="definition" />
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
-import {
-  ArtifactDeltaState,
-  GraphElementType,
-  GraphMode,
-  TraceCytoElement,
-  TraceLinkSchema,
-} from "@/types";
-import { deltaStore } from "@/hooks";
-
 /**
  * Displays trace link edge between artifacts.
  */
-export default Vue.extend({
+export default {
   name: "TraceLink",
-  props: {
-    trace: {
-      type: Object as PropType<TraceLinkSchema>,
-      required: true,
-    },
-    faded: Boolean,
-  },
-  computed: {
-    /**
-     * @return The delta state of this trace link.
-     */
-    linkDeltaState(): ArtifactDeltaState {
-      return deltaStore.getTraceDeltaType(this.trace.traceLinkId);
-    },
-    /**
-     * @return The trace link's data definition.
-     */
-    definition(): TraceCytoElement {
-      const { sourceId, targetId, traceLinkId, traceType, approvalStatus } =
-        this.trace;
+};
+</script>
 
-      return {
-        data: {
-          type: GraphElementType.edge,
-          graph: GraphMode.tree,
-          id: traceLinkId,
-          // Reversed to show arrow toward parent.
-          source: targetId,
-          target: sourceId,
-          deltaType: this.linkDeltaState,
-          faded: this.faded,
-          traceType,
-          approvalStatus,
-          dark: this.$vuetify.theme.dark,
-        },
-        classes: sourceId === targetId ? ["loop"] : [],
-      };
-    },
+<script setup lang="ts">
+import { useTheme } from "vuetify";
+import { computed, defineProps } from "vue";
+import { GraphElementType, GraphMode, TraceLinkSchema } from "@/types";
+import { deltaStore } from "@/hooks";
+import { CyElement3 } from "../base";
+
+const props = defineProps<{
+  trace: TraceLinkSchema;
+  faded?: boolean;
+}>();
+
+const theme = useTheme();
+const darkMode = computed(() => theme.global.current.value.dark);
+
+const definition = computed(() => ({
+  data: {
+    type: GraphElementType.edge,
+    graph: GraphMode.tree,
+    id: props.trace.traceLinkId,
+    // Reversed to show arrow toward parent.
+    source: props.trace.targetId,
+    target: props.trace.sourceId,
+    deltaType: deltaStore.getTraceDeltaType(props.trace.traceLinkId),
+    faded: props.faded,
+    traceType: props.trace.traceType,
+    approvalStatus: props.trace.approvalStatus,
+    dark: darkMode.value,
   },
-});
+  classes: props.trace.sourceId === props.trace.targetId ? ["loop"] : [],
+}));
 </script>

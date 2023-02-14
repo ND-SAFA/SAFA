@@ -1,14 +1,14 @@
 <template>
   <v-container>
     <flex-box justify="end">
-      <v-btn text @click="handleResetGraph"> Reset Graph </v-btn>
+      <v-btn text @click="cyResetTim"> Reset Graph </v-btn>
     </flex-box>
     <cytoscape-controller
       id="cytoscape-tim"
-      :cyto-core-graph="cytoCoreGraph"
+      :cyto-core-graph="timGraph"
       :class="className"
     >
-      <template v-slot:elements>
+      <template #elements>
         <tim-node
           v-for="panel in artifactPanels"
           :key="panel.title"
@@ -29,77 +29,46 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
-import { TracePanel, CytoCoreGraph, ArtifactPanel } from "@/types";
+/**
+ * Creates a Cytoscape graph containing artifact types are nodes
+ * and links between them as edges.
+ */
+export default {
+  name: "TimTree",
+};
+</script>
+
+<script setup lang="ts">
+import { computed, defineProps, watch } from "vue";
+import { TracePanel, ArtifactPanel } from "@/types";
 import { appStore, layoutStore } from "@/hooks";
 import { timGraph, cyResetTim } from "@/cytoscape";
 import { FlexBox } from "@/components/common/layout";
 import CytoscapeController from "./CytoscapeController.vue";
 import { TimNode, TimLink } from "./tim";
 
-/**
- * Creates a Cytoscape graph containing artifact types are nodes
- * and links between them as edges.
- */
-export default Vue.extend({
-  name: "TimTree",
-  components: {
-    FlexBox,
-    CytoscapeController,
-    TimNode,
-    TimLink,
-  },
-  props: {
-    tracePanels: {
-      type: Array as PropType<TracePanel[]>,
-      required: true,
-    },
-    artifactPanels: {
-      type: Array as PropType<ArtifactPanel[]>,
-      required: true,
-    },
-    inView: {
-      type: Boolean,
-      required: true,
-    },
-  },
-  methods: {
-    /**
-     * Resets the cytoscape viewport and centers artifacts.
-     */
-    async handleResetGraph(): Promise<void> {
-      cyResetTim();
-    },
-  },
-  computed: {
-    /**
-     * @return The tim graph.
-     */
-    cytoCoreGraph(): CytoCoreGraph {
-      return timGraph;
-    },
-    /**
-     * @return The class name for the tim tree.
-     */
-    className(): string {
-      if (!this.inView) {
-        return "artifact-view disabled";
-      } else if (!appStore.isLoading) {
-        return "artifact-view visible elevation-3";
-      } else {
-        return "artifact-view";
-      }
-    },
-  },
-  watch: {
-    /**
-     * When in view, reset the tim graph.
-     */
-    async inView(inView: boolean): Promise<void> {
-      if (!inView) return;
+const props = defineProps<{
+  tracePanels: TracePanel[];
+  artifactPanels: ArtifactPanel[];
+  inView: boolean;
+}>();
 
-      await layoutStore.setTimTreeLayout();
-    },
-  },
+const className = computed(() => {
+  if (!props.inView) {
+    return "artifact-view disabled";
+  } else if (!appStore.isLoading) {
+    return "artifact-view visible elevation-3";
+  } else {
+    return "artifact-view";
+  }
 });
+
+watch(
+  () => props.inView,
+  (inView) => {
+    if (!inView) return;
+
+    layoutStore.setTimTreeLayout();
+  }
+);
 </script>

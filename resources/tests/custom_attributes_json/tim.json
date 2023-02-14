@@ -1,1 +1,9 @@
-{"DataFiles":{"requirement":{"Type":"ARTIFACT_TREE","File":"requirement.json"}}}
+{
+    "artifacts": [
+        {
+            "type": "requirement",
+            "fileName": "requirement.json"
+        }
+    ],
+    "traces": []
+}

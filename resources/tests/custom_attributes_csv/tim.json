@@ -1,7 +1,9 @@
 {
-  "DataFiles": {
-    "Requirement": {
-      "File": "Requirements.csv"
-    }
-  }
+    "artifacts": [
+        {
+            "type": "Requirement",
+            "fileName": "Requirements.csv"
+        }
+    ],
+    "traces": []
 }

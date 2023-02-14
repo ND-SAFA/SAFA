@@ -1,8 +1,9 @@
 {
-    "DataFiles": 
-      {
-        "SafetyRequirement": {
-          "File": "SafetyRequirements.csv"
+    "artifacts": [
+        {
+            "type": "SafetyRequirement",
+            "fileName": "SafetyRequirements.csv"
         }
-      }
-  }
+    ],
+    "traces": []
+}

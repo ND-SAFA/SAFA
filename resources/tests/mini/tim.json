@@ -1,15 +1,19 @@
 {
-  "DataFiles": {
-    "SafetyRequirement": {
-      "File": "SafetyRequirements.csv"
-    },
-    "Requirement": {
-      "File": "Requirements.csv"
-    }
-  },
-  "RequirementToSafetyRequirement": {
-    "Source": "Requirement",
-    "Target": "SafetyRequirement",
-    "File": "Requirements2SafetyRequirements.csv"
-  }
+    "artifacts": [
+        {
+            "type": "SafetyRequirement",
+            "fileName": "SafetyRequirements.csv"
+        },
+        {
+            "type": "Requirement",
+            "fileName": "Requirements.csv"
+        }
+    ],
+    "traces": [
+        {
+            "sourceType": "Requirement",
+            "targetType": "SafetyRequirement",
+            "fileName": "Requirements2SafetyRequirements.csv"
+        }
+    ]
 }

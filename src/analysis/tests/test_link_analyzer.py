@@ -15,10 +15,11 @@ class TestLinkAnalyzer(BaseTest):
     a2_body = "This is a really large artifct body to try out for funsies."
     EXPECTED_MISSPELLED_WORDS = {"funsies": 1, "artifct": 1}
     EXPECTED_OOV_WORDS = {"rationally": 1}
-    EXPECTED_ANALYSES = [LinkAnalyzer.COMMON_WORDS, LinkAnalyzer.MISSPELLED_WORDS, LinkAnalyzer.SHARED_SYNONYMS_AND_ANTONYMS,
-                         LinkAnalyzer.OOV_WORDS]
-    EXPECTED_COUNTS = {name: 2 for name in EXPECTED_ANALYSES}
-    EXPECTED_COUNTS[LinkAnalyzer.OOV_WORDS] = 1
+    EXPECTED_ANALYSES = [LinkAnalyzer.COMMON_WORDS, LinkAnalyzer.MISSPELLED_WORDS, LinkAnalyzer.SHARED_ANTONYMS,
+                         LinkAnalyzer.SHARED_SYNONYMS, LinkAnalyzer.OOV_WORDS]
+    EXPECTED_COUNTS = {name: 1 for name in EXPECTED_ANALYSES[2:]}
+    EXPECTED_COUNTS[LinkAnalyzer.COMMON_WORDS] = 2
+    EXPECTED_COUNTS[LinkAnalyzer.MISSPELLED_WORDS] = 2
 
     def test_get_analysis_counts(self):
         analyzer = self.get_link_analyzer()
@@ -39,9 +40,7 @@ class TestLinkAnalyzer(BaseTest):
         output_dict = JsonUtil.read_json_file(output_path)
         self.assertIn(analyzer.ARTIFACT_TOKENS, output_dict)
         self.assertIn(analyzer.ANALYSIS, output_dict)
-        expected_analyses = [analyzer.COMMON_WORDS, analyzer.MISSPELLED_WORDS, analyzer.SHARED_SYNONYMS_AND_ANTONYMS,
-                             analyzer.OOV_WORDS]
-        for analysis in expected_analyses:
+        for analysis in self.EXPECTED_ANALYSES:
             self.assertIn(analysis, output_dict[analyzer.ANALYSIS])
 
     def test_get_words_in_common(self):
@@ -56,9 +55,11 @@ class TestLinkAnalyzer(BaseTest):
 
     def test_get_shared_synonyms_and_antonyms(self):
         analyzer = self.get_link_analyzer()
-        syn_and_ant = analyzer.get_shared_synonyms_and_antonyms()
-        self.assertIn('try', syn_and_ant)
-        self.assertIn('large', syn_and_ant)
+        shared_syns, shared_ants = analyzer.get_shared_synonyms_and_antonyms()
+        self.assertIn('test', shared_syns)
+        self.assertIn('try', shared_syns['test'])
+        self.assertIn("small", shared_ants)
+        self.assertIn('large', shared_ants['small'])
 
     def test_get_oov_vocab(self):
         analyzer = self.get_link_analyzer()
@@ -73,12 +74,6 @@ class TestLinkAnalyzer(BaseTest):
         vocab = analyzer.get_artifact_vocab(artifact)
         expected_vocab = self.a1_body[:-1].lower().split()
         TestAssertions.assert_lists_have_the_same_vals(self, vocab, expected_vocab)
-
-    def test_get_synonyms_and_antonyms(self):
-        analyzer = self.get_link_analyzer()
-        synonyms, antonyms = analyzer._get_synonyms_and_antonyms(analyzer.word_counts[0])
-        self.assertIn("try_out", synonyms)
-        self.assertIn("large", antonyms)
 
     def get_link_analyzer(self):
         a1 = Artifact("s1", self.a1_body)

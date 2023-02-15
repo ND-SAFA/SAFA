@@ -25,9 +25,9 @@ class TestResultsAnalyzer(BaseTraceTest):
 
     ALL_LINKS = [TraceLink(A1, A2, True), TraceLink(A1, A3, False), TraceLink(A4, A2, False), TraceLink(A4, A3, True)]
 
-    EXPECTED_CATEGORIZATIONS = {ALL_LINKS[0].id: [LinkAnalyzer.SHARED_SYNONYMS_AND_ANTONYMS, LinkAnalyzer.OOV_WORDS],
+    EXPECTED_CATEGORIZATIONS = {ALL_LINKS[0].id: [LinkAnalyzer.SHARED_SYNONYMS, LinkAnalyzer.SHARED_ANTONYMS, LinkAnalyzer.OOV_WORDS],
                                 ALL_LINKS[1].id: [LinkAnalyzer.OOV_WORDS],
-                                ALL_LINKS[2].id: [LinkAnalyzer.SHARED_SYNONYMS_AND_ANTONYMS],
+                                ALL_LINKS[2].id: [LinkAnalyzer.SHARED_SYNONYMS],
                                 ALL_LINKS[3].id: [LinkAnalyzer.COMMON_WORDS]}
     MIS_PREDICTED_LINKS = ALL_LINKS[:2]
     CORRECTLY_PREDICTED_LINKS = ALL_LINKS[2:]
@@ -77,7 +77,7 @@ class TestResultsAnalyzer(BaseTraceTest):
 
     def test_get_n_per_category(self):
         analyzer = self.get_results_analyzer()
-        expected_n_per_category = {LinkAnalyzer.SHARED_SYNONYMS_AND_ANTONYMS: 2, LinkAnalyzer.COMMON_WORDS: 1,
+        expected_n_per_category = {LinkAnalyzer.SHARED_SYNONYMS: 2, LinkAnalyzer.SHARED_ANTONYMS: 1, LinkAnalyzer.COMMON_WORDS: 1,
                                    LinkAnalyzer.OOV_WORDS: 2, LinkAnalyzer.MISSPELLED_WORDS: 4}
         categorizations: LinkCollectionAnalysis = {
             link_id: LinkMetrics(categories=categories + [LinkAnalyzer.MISSPELLED_WORDS])

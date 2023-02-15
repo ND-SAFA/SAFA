@@ -16,7 +16,7 @@
           "model_manager": {
             "model_path": {
               "*": [
-                "thearod5/tbert",
+                "thearod5/pl-bert",
                 "bert-base-uncased"
               ]
             }

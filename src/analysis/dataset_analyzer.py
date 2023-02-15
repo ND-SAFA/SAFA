@@ -23,6 +23,7 @@ class DatasetAnalyzer:
     READABILITY_SCORE = "readability_score"
     HIGH_FREQUENCY_WORDS = "high_freq_words"
     LOW_FREQUENCY_WORDS = "low_freq_words"
+    MISSPELLED_WORDS = "misspelled_words"
     OOV_WORDS = "oov_words_with_model_{}"
 
     OUTPUT_FILENAME = "dataset_analysis_output.json"
@@ -48,9 +49,11 @@ class DatasetAnalyzer:
                 self.READABILITY_SCORE: self.get_readability_score(),
                 self.HIGH_FREQUENCY_WORDS: self.get_high_frequency_word_counts(),
                 self.LOW_FREQUENCY_WORDS: self.get_low_frequency_word_counts(),
+                self.MISSPELLED_WORDS: self.get_misspelled_words()
             }
             for model in self.model_managers:
-                self.__analysis[self.OOV_WORDS.format(model.model_path)] = self.get_oov_words(model)
+                self.__analysis[self.OOV_WORDS.format(model.model_path)] = self.get_oov_words(model).difference(
+                    self.__analysis[self.MISSPELLED_WORDS])
         return self.__analysis
 
     def analyze_and_save(self, output_dir: str) -> str:
@@ -98,6 +101,13 @@ class DatasetAnalyzer:
         low_frequency_counts = self.word_counts.filter(
             lambda _, count: count <= min(total_words * threshold, 1))
         return low_frequency_counts, low_frequency_counts.total() / total_words
+
+    def get_misspelled_words(self) -> "WordCounter":
+        """
+        Gets the misspelled words from the dataset
+        :return: The list of misspelled words
+        """
+        return self.word_counts.get_misspelled_words()
 
     def get_oov_words(self, model_manager: ModelManager) -> "WordCounter":
         """

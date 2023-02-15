@@ -17,7 +17,7 @@
             "model_path": {
               "*": [
                 "thearod5/git-bert",
-                "prajjwal1/bert-medium"
+                "bert-base-uncased"
               ]
             }
           },

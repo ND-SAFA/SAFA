@@ -84,3 +84,15 @@ export type SizeType =
   | "8"
   | "9"
   | "10";
+
+/**
+ * Package: 'vue3-drr-grid-layout'
+ * Defines component props.
+ */
+export interface GridItemData {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  i: string;
+}

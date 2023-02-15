@@ -1,18 +1,16 @@
-import { configureCompat, createApp } from "vue";
+import { createApp } from "vue";
 
 import "@mdi/font/css/materialdesignicons.css";
+import "vue3-drr-grid-layout/dist/style.css";
 
 import { router } from "@/router";
-import { vuetify, pinia } from "@/plugins";
+import { vuetify, pinia, gridLayout, codeDiff } from "@/plugins";
 import App from "@/App.vue";
-
-configureCompat({
-  COMPONENT_ASYNC: false,
-  COMPONENT_V_MODEL: false,
-});
 
 const app = createApp(App);
 
-app.use(vuetify).use(pinia).use(router).mount("#app");
+app.use(vuetify).use(pinia).use(router).use(gridLayout).use(codeDiff);
+
+app.mount("#app");
 
 export default app;

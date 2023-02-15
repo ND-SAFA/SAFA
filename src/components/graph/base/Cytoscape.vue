@@ -19,12 +19,14 @@ import { CytoEvent } from "@/types";
 const props = withDefaults(
   defineProps<{
     config: CytoscapeOptions;
-    preConfig?: (x: any) => void;
-    afterCreated?: (x: any) => void;
+    preConfig?: (cy: typeof cytoscape) => void;
+    afterCreated?: (cy: Core) => void;
   }>(),
   {
-    preConfig: (x: any) => {},
-    afterCreated: (x: any) => {},
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    preConfig: () => {},
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    afterCreated: () => {},
   }
 );
 
@@ -34,8 +36,10 @@ const emit = defineEmits<{
 
 const container = ref<HTMLElement | null>(null);
 const instance = ref<Core | undefined>(undefined);
+// eslint-disable-next-line @typescript-eslint/no-empty-function
 const resolve = ref<(value: PromiseLike<Core> | Core) => void>(() => {});
-const reject = ref<(reason?: any) => void>(() => {});
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+const reject = ref<() => void>(() => {});
 
 provide(
   "cy",

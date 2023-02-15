@@ -1,5 +1,5 @@
 <template>
-  <v-menu offset-y top @input="handleOpen">
+  <v-menu @input="handleOpen">
     <template #activator="{ props }">
       <v-btn
         icon
@@ -19,7 +19,7 @@
         </v-badge>
       </v-btn>
     </template>
-    <div class="neutral-bg pa-2">
+    <div class="pa-2">
       <typography
         v-if="notifications.length === 0"
         secondary

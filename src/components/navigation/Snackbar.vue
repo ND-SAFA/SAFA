@@ -10,7 +10,7 @@
       justify="space-between"
       :data-cy="`snackbar-${messageType}`"
     >
-      <v-icon class="white--text"> {{ messageIcon }} </v-icon>
+      <v-icon color="white"> {{ messageIcon }} </v-icon>
       <typography color="white" align="center" x="2" :value="snackbarMessage" />
       <flex-box align="center">
         <text-button

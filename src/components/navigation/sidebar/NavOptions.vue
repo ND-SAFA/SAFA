@@ -3,11 +3,15 @@
     <v-item-group selected-class="nav-selected">
       <template v-for="option in options" :key="option.label">
         <v-divider v-if="option.divider" />
-        <v-list-item :to="option.path" :data-cy="'button-nav-' + option.label">
+        <v-list-item
+          :to="option.path"
+          color="primary"
+          :data-cy="'button-nav-' + option.label"
+        >
           <template #prepend>
             <v-icon :icon="option.icon" />
           </template>
-          <v-list-item-title class="ml-4">
+          <v-list-item-title>
             <typography bold :value="option.label" />
           </v-list-item-title>
         </v-list-item>

@@ -44,11 +44,12 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import { GridLayout, GridItem, GridItemData } from "vue-grid-layout";
+import { GridItem, GridLayout } from "vue3-drr-grid-layout";
 import {
   AttributeSchema,
   AttributeLayoutSchema,
   AttributePositionSchema,
+  GridItemData,
 } from "@/types";
 import { attributesStore } from "@/hooks";
 import { FlexBox } from "@/components/common/layout";
@@ -58,7 +59,7 @@ import { FlexBox } from "@/components/common/layout";
  */
 export default defineComponent({
   name: "AttributeGrid",
-  components: { FlexBox, GridLayout, GridItem },
+  components: { FlexBox, GridItem, GridLayout },
   props: {
     editable: Boolean,
     layout: {

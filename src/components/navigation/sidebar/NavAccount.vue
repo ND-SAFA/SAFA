@@ -5,17 +5,17 @@
         <notifications />
       </template>
       <v-list-item-title>
-        <typography value="Notifications" />
+        <typography value="Notifications" l="3" />
       </v-list-item-title>
     </v-list-item>
 
     <v-divider />
 
-    <v-list-item :to="accountPath">
+    <v-list-item :to="accountPath" color="primary">
       <template #prepend>
-        <v-icon color="primary">mdi-account-circle</v-icon>
+        <v-icon>mdi-account-circle</v-icon>
       </template>
-      <v-list-item-title data-cy="page-account" class="ml-4 py-3">
+      <v-list-item-title data-cy="page-account" class="py-3">
         <typography bold value="My Account" />
       </v-list-item-title>
     </v-list-item>

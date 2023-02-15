@@ -12,7 +12,7 @@
         :hidden="isHidden"
         :data-cy="dataCy"
         variant="text"
-        @click.native="emit('click')"
+        @click="emit('click')"
       >
         <v-icon :style="iconStyle">{{ iconId }}</v-icon>
       </v-btn>

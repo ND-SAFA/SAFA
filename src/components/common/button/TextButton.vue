@@ -9,7 +9,7 @@
     :class="buttonClassName"
     :data-cy="dataCy"
     :variant="buttonVariant"
-    @click.native="emit('click')"
+    @click="emit('click')"
   >
     <v-icon v-if="buttonIconId" class="mr-1">{{ buttonIconId }}</v-icon>
     <slot />

@@ -39,7 +39,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import CodeDiff from "vue-code-diff";
+import { CodeDiff } from "v-code-diff";
 import {
   ArtifactSchema,
   DeltaArtifact,

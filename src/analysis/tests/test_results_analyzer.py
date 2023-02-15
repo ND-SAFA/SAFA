@@ -31,6 +31,8 @@ class TestResultsAnalyzer(BaseTraceTest):
                                 ALL_LINKS[3].id: [LinkAnalyzer.COMMON_WORDS]}
     MIS_PREDICTED_LINKS = ALL_LINKS[:2]
     CORRECTLY_PREDICTED_LINKS = ALL_LINKS[2:]
+    FALSE_NEGATIVE = ALL_LINKS[0]
+    FALSE_POSITIVE = ALL_LINKS[1]
 
     def test_intersection(self):
         analyzer1 = self.get_results_analyzer()
@@ -42,10 +44,12 @@ class TestResultsAnalyzer(BaseTraceTest):
     def test_analyze_and_save(self):
         analyzer = self.get_results_analyzer()
         job_analysis: JobAnalysis = analyzer.analyze(common_words_threshold=0.2)
-        for link_id, link_analysis in job_analysis["mis_link_collection"].items():
-            self.assertIn("categories", link_analysis)
-        self.assertIn(analyzer.MIS_PREDICTED_N_PER_CATEGORY, job_analysis["summary"])
-        self.assertIn(analyzer.CORRECTLY_PREDICTED_N_PER_CATEGORY, job_analysis["summary"])
+        for mis_prediction_collection_name in ["false_positive_collection", "false_negative_collection"]:
+            for link_id, link_analysis in job_analysis[mis_prediction_collection_name].items():
+                self.assertIn("categories", link_analysis)
+        self.assertIn("false_positive_n_per_category", job_analysis["summary"])
+        self.assertIn("false_negative_n_per_category", job_analysis["summary"])
+        self.assertIn("correctly_predicted_n_per_category", job_analysis["summary"])
 
         def add_to_expected_n_per_category(link_id, expected_n_per_category):
             for cat in self.EXPECTED_CATEGORIZATIONS[link_id]:
@@ -53,11 +57,17 @@ class TestResultsAnalyzer(BaseTraceTest):
                     expected_n_per_category[cat] = 0
                 expected_n_per_category[cat] += 1
 
-        mis_predicted_expected_n_per_category = {LinkAnalyzer.MISSPELLED_WORDS: 2}
+        false_negative_expected_n_per_category = {LinkAnalyzer.MISSPELLED_WORDS: 1}
+        false_positive_expected_n_per_category = {LinkAnalyzer.MISSPELLED_WORDS: 1}
         for link in self.MIS_PREDICTED_LINKS:
-            self.assertIn(link.id, job_analysis["mis_link_collection"].keys())
-            add_to_expected_n_per_category(link.id, mis_predicted_expected_n_per_category)
-        self.assertDictEqual(mis_predicted_expected_n_per_category, job_analysis["summary"]["mis_predicted_n_per_category"])
+            if link.is_true_link:
+                self.assertIn(link.id, job_analysis["false_negative_collection"].keys())
+                add_to_expected_n_per_category(link.id, false_negative_expected_n_per_category)
+            else:
+                self.assertIn(link.id, job_analysis["false_positive_collection"].keys())
+                add_to_expected_n_per_category(link.id, false_positive_expected_n_per_category)
+        self.assertDictEqual(false_positive_expected_n_per_category, job_analysis["summary"]["false_positive_n_per_category"])
+        self.assertDictEqual(false_negative_expected_n_per_category, job_analysis["summary"]["false_negative_n_per_category"])
 
         correctly_predicted_expected_n_per_category = {LinkAnalyzer.MISSPELLED_WORDS: 2}
         for link in self.CORRECTLY_PREDICTED_LINKS:
@@ -85,7 +95,8 @@ class TestResultsAnalyzer(BaseTraceTest):
 
     def test_get_mis_and_correctly_predicted_links(self):
         analyzer = self.get_results_analyzer()
-        TestAssertions.assert_lists_have_the_same_vals(self, analyzer.mis_predicted_links, self.MIS_PREDICTED_LINKS)
+        TestAssertions.assert_lists_have_the_same_vals(self, analyzer.mis_predicted_links.false_positives, [self.FALSE_POSITIVE])
+        TestAssertions.assert_lists_have_the_same_vals(self, analyzer.mis_predicted_links.false_negatives, [self.FALSE_NEGATIVE])
         TestAssertions.assert_lists_have_the_same_vals(self, analyzer.correctly_predicted_links, self.CORRECTLY_PREDICTED_LINKS)
 
     def get_results_analyzer(self, mis_predicted_links=None):

@@ -64,7 +64,7 @@ class DatasetAnalyzer:
         FileUtil.write(analysis, output_file_path)
         return output_file_path
 
-    def get_readability_score(self) -> float:
+    def get_readability_score(self) -> Tuple[float, float]:
         """
         Gets the readability score of the dataset
         :return: The readability score and grade level of the dataset
@@ -72,7 +72,8 @@ class DatasetAnalyzer:
         try:
             r = Readability(" ".join(self.vocab))
             fk = r.flesch_kincaid()
-            return fk.score
+            dc = r.dale_chall()
+            return fk.score, dc.score
         except ReadabilityException as e:
             logger.warning("Unable to get readability score; %s" % e)
             return -1

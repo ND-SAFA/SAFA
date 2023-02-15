@@ -28,7 +28,8 @@ class TestDatasetAnalyzer(BaseTest):
     def test_get_readability_score(self):
         analyzer = self.get_dataset_analyzer(lengthen=True)
         readability_score = analyzer.get_readability_score()
-        self.assertGreater(readability_score, 0)
+        self.assertGreater(readability_score[0], 0)
+        self.assertGreater(readability_score[1], 0)
 
     def test_get_high_frequency_word_counts(self):
         analyzer = self.get_dataset_analyzer()

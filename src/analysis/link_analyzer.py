@@ -26,7 +26,8 @@ class LinkAnalyzer:
 
     COMMON_WORDS = "common_words"
     MISSPELLED_WORDS = "misspelled_words"
-    SHARED_SYNONYMS_AND_ANTONYMS = "shared_synonyms_and_antonyms"
+    SHARED_SYNONYMS = "shared_antonyms"
+    SHARED_ANTONYMS = "shared_synonyms"
     OOV_WORDS = "oov_words"
     DIFF_FROM_PREDICTION_SCORE = "difference_from_prediction_score"
 
@@ -87,8 +88,8 @@ class LinkAnalyzer:
             self.__analysis = {
                 self.COMMON_WORDS: self.get_words_in_common(),
                 self.MISSPELLED_WORDS: self.get_misspelled_words(),
-                self.SHARED_SYNONYMS_AND_ANTONYMS: self.get_shared_synonyms_and_antonyms(),
             }
+            self.__analysis[self.SHARED_SYNONYMS], self.__analysis[self.SHARED_ANTONYMS] = self.get_shared_synonyms_and_antonyms()
             self.__analysis[self.OOV_WORDS] = self.get_oov_words().difference(self.__analysis[self.MISSPELLED_WORDS])
         return self.__analysis
 
@@ -109,16 +110,6 @@ class LinkAnalyzer:
         :return: The intersecting set of words
         """
         return self.word_counts[0].intersection(self.word_counts[1]).get_word_set()
-
-    def get_shared_synonyms_and_antonyms(self) -> Tuple[Set[str], Set[str]]:
-        """
-        Gets the set of shared synonyms and antonyms between artifacts
-        :return: The set of shared synonyms and antonyms
-        """
-        synonyms, antonyms = self._get_synonyms_and_antonyms(self.word_counts[0])
-        shared_synonyms = self.word_counts[1].intersection(synonyms).get_word_set()
-        shared_antonyms = self.word_counts[1].intersection(antonyms).get_word_set()
-        return shared_synonyms.union(shared_antonyms)
 
     def get_misspelled_words(self) -> "WordCounter":
         """
@@ -142,6 +133,30 @@ class LinkAnalyzer:
             oov_words.update(word_count.get_oov_words(self.model_manager))
         return oov_words
 
+    def get_shared_synonyms_and_antonyms(self) -> Tuple[Dict[str, Set[str]], Dict[str, Set[str]]]:
+        """
+        Gets the synonyms from the vocab
+        :return: A set of synonyms for the vocab
+        """
+
+        def add_related_word_if_shared(related_word: str, shared_dict: Dict):
+            if related_word in self.word_counts[1]:
+                if orig_word not in shared_dict:
+                    shared_dict[orig_word] = set()
+                shared_dict[orig_word].add(related_word)
+
+        shared_synonyms, shared_antonyms = {}, {}
+        for orig_word in self.word_counts[0]:
+            for synset in wn.synsets(orig_word):
+                if synset is None:
+                    continue
+                for lemma in synset.lemmas():
+                    if lemma.name() != orig_word and lemma.name():
+                        add_related_word_if_shared(lemma.name(), shared_synonyms)
+                    for antonym in lemma.antonyms():
+                        add_related_word_if_shared(antonym.name(), shared_antonyms)
+        return shared_synonyms, shared_antonyms
+
     @staticmethod
     def get_artifact_vocab(artifact: Artifact) -> List[str]:
         """
@@ -151,23 +166,3 @@ class LinkAnalyzer:
         """
         artifact_body = word_tools.CLEANER.run([artifact.token.lower()]).pop()
         return artifact_body.split()
-
-    @staticmethod
-    def _get_synonyms_and_antonyms(vocab: List[str]) -> Tuple[Set[str], Set[str]]:
-        """
-        Gets the synonyms from the vocab
-        :param vocab: The vocab to get all synonyms for
-        :return: A set of synonyms for the vocab
-        """
-        synonyms = set()
-        antonyms = set()
-        for word in vocab:
-            for synset in wn.synsets(word):
-                if synset is None:
-                    continue
-                for lemma in synset.lemmas():
-                    if lemma.name() != word:
-                        synonyms.add(lemma.name())
-                    for antonym in lemma.antonyms():
-                        antonyms.add(antonym.name())
-        return synonyms, antonyms

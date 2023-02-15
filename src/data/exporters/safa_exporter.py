@@ -95,7 +95,8 @@ class SafaExporter:
         for source_id in source_artifact_ids:
             for target_id in target_artifact_ids:
                 trace_link_id = TraceLink.generate_link_id(source_id, target_id)
-                if trace_link_id in self.trace_dataset.links:
+                trace_link: TraceLink = self.trace_dataset.links[trace_link_id]
+                if trace_link.is_true_link:
                     entries.append({
                         StructuredKeys.Trace.SOURCE: source_id,
                         StructuredKeys.Trace.TARGET: target_id

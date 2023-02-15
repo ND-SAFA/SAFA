@@ -25,6 +25,7 @@ class DatasetAnalyzer:
     LOW_FREQUENCY_WORDS = "low_freq_words"
     MISSPELLED_WORDS = "misspelled_words"
     OOV_WORDS = "oov_words_with_model_{}"
+    VOCAB_LENGTH = "vocab_length"
 
     OUTPUT_FILENAME = "dataset_analysis_output.json"
 
@@ -46,6 +47,7 @@ class DatasetAnalyzer:
         """
         if self.__analysis is None:
             self.__analysis = {
+                self.VOCAB_LENGTH: len(self.vocab),
                 self.READABILITY_SCORE: self.get_readability_score(),
                 self.HIGH_FREQUENCY_WORDS: self.get_high_frequency_word_counts(),
                 self.LOW_FREQUENCY_WORDS: self.get_low_frequency_word_counts(),
@@ -67,7 +69,7 @@ class DatasetAnalyzer:
         FileUtil.write(analysis, output_file_path)
         return output_file_path
 
-    def get_readability_score(self) -> float:
+    def get_readability_score(self) -> Tuple[float, float]:
         """
         Gets the readability score of the dataset
         :return: The readability score and grade level of the dataset
@@ -75,7 +77,8 @@ class DatasetAnalyzer:
         try:
             r = Readability(" ".join(self.vocab))
             fk = r.flesch_kincaid()
-            return fk.score
+            dc = r.dale_chall()
+            return fk.score, dc.score
         except ReadabilityException as e:
             logger.warning("Unable to get readability score; %s" % e)
             return -1

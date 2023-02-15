@@ -25,6 +25,7 @@ class DatasetAnalyzer:
     LOW_FREQUENCY_WORDS = "low_freq_words"
     MISSPELLED_WORDS = "misspelled_words"
     OOV_WORDS = "oov_words_with_model_{}"
+    VOCAB_LENGTH = "vocab_length"
 
     OUTPUT_FILENAME = "dataset_analysis_output.json"
 
@@ -46,6 +47,7 @@ class DatasetAnalyzer:
         """
         if self.__analysis is None:
             self.__analysis = {
+                self.VOCAB_LENGTH: len(self.vocab),
                 self.READABILITY_SCORE: self.get_readability_score(),
                 self.HIGH_FREQUENCY_WORDS: self.get_high_frequency_word_counts(),
                 self.LOW_FREQUENCY_WORDS: self.get_low_frequency_word_counts(),
